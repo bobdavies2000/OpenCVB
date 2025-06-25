@@ -7,7 +7,6 @@ Public Class LineRGB_Basics : Inherits TaskParent
     Public rawLines As New LineRGB_Raw
     Public minAge As Integer = 5 ' line has to be around for a little while before it is recorded as a line.
     Public Sub New()
-        task.brickRunFlag = True
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -18,20 +17,6 @@ Public Class LineRGB_Basics : Inherits TaskParent
         End If
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
-        'For Each lp In lpLastList
-        '    Dim noMotionTest As Boolean = True
-        '    For Each index In lp.bricks
-        '        Dim brick = If(index < task.bricks.brickList.Count, task.bricks.brickList(index), task.bricks.brickList(0))
-        '        If task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X) Then
-        '            noMotionTest = False
-        '            Exit For
-        '        End If
-        '    Next
-        '    If noMotionTest And lp.bricks.Count > 1 Then
-        '        lp.age += 1
-        '        sortlines.Add(lp.length, lp)
-        '    End If
-        'Next
 
         rawLines.Run(src)
         dst3 = rawLines.dst2
@@ -863,29 +848,44 @@ Public Class LineRGB_GravityToLongest : Inherits TaskParent
         matchLine.Run(src)
         dst2 = matchLine.dst2
         dst3 = lines.rawLines.dst2
+    End Sub
+End Class
 
-        'If standalone Then dst3 = task.lineRGB.rawLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        'Dim deltaList As New List(Of Single)
-        'For Each lp In task.lineRGB.rawLines.lpList
-        '    If lp.vertical And Math.Sign(task.gravityVec.m) = Math.Sign(lp.m) Then
-        '        Dim delta = lp.ep1.X - lp.ep2.X
-        '        If Math.Abs(gravityDelta - delta) < 3 Then
-        '            deltaList.Add(delta)
-        '            DrawLine(dst2, lp.ep1, lp.ep2, task.highlight)
-        '            If standalone Then DrawLine(dst3, lp.p1, lp.p2, task.highlight)
-        '        End If
-        '    End If
-        'Next
 
-        'If task.heartBeat Then
-        '    labels(3) = "Gravity offset at image edge = " + Format(gravityDelta, fmt3) + " and m = " +
-        '                Format(task.gravityVec.m, fmt3)
-        '    If deltaList.Count > 0 Then
-        '        labels(2) = Format(gravityDelta, fmt3) + "/" + Format(deltaList.Average(), fmt3) +
-        '                    " gravity delta/line average delta"
-        '    Else
-        '        labels(2) = "No lines matched the gravity vector..."
-        '    End If
-        'End If
+
+
+
+
+
+Public Class LineRGB_GravityLines : Inherits TaskParent
+    Dim options As New Options_GravityLines
+    Public gLines As New List(Of lpData)
+    Public Sub New()
+        desc = "Find all the lines similar to gravity."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        dst3 = task.lineRGB.dst3
+        labels(3) = task.lineRGB.labels(3)
+
+        dst2 = src
+        dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth + 1, task.lineType)
+        gLines.Clear()
+        For Each lp In task.lineRGB.rawLines.lpList
+            Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - lp.ep1.X)
+            Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - lp.ep2.X)
+            If Math.Abs(deltaX1 - deltaX2) < options.pixelThreshold Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                gLines.Add(lp)
+                Exit For ' only need the longest one...
+            End If
+        Next
+
+        Dim lineLen = If(gLines.Count, gLines(0).length, 0)
+        If lineLen = 0 Then
+            labels(2) = "There were no lines parallel to gravity in the RGB image."
+        Else
+            labels(2) = "The best line parallel to gravity was " + CStr(lineLen) + " pixels in length."
+        End If
     End Sub
 End Class

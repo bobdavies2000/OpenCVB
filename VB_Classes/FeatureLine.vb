@@ -5,6 +5,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
     Dim firstRect As cv.Rect, lastRect As cv.Rect
     Dim matchRuns As Integer, lineRuns As Integer, totalLineRuns As Integer
     Public runOnEachFrame As Boolean
+    Public gravityLines As New LineRGB_GravityLines
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find and track the longest line by matching line bricks."
@@ -37,7 +38,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
                         "line detection runs = " + CStr(totalLineRuns)
         End If
 
-        If task.heartBeat Or task.lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Or runOnEachFrame Then
+        If task.heartBeatLT Or task.lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Or runOnEachFrame Then
             task.motionMask.SetTo(255) ' force a complete line detection
             task.lineRGB.Run(src.Clone)
             If task.lineRGB.lpList.Count = 0 Then Exit Sub
@@ -57,10 +58,10 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         End If
 
         labels(3) = "Currently available lines."
-        dst3.SetTo(0)
-        For Each lp In task.lineRGB.lpList
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
+        dst3 = task.lineRGB.dst3
+        labels(3) = task.lineRGB.labels(3)
+
+        gravityLines.Run(src)
 
         dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
         dst2.Rectangle(lastRect, task.highlight, task.lineWidth)

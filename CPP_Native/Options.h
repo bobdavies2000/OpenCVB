@@ -2187,3 +2187,9 @@ public:
 	Options_FAST() {
 	}
 };
+class Options_GravityLines {
+public:
+	void Run() {}
+	Options_GravityLines() {
+	}
+};
