@@ -8,12 +8,12 @@ Public Class KNN_Basics : Inherits TaskParent
     Public neighbors As New List(Of List(Of Integer))
     Public result(,) As Integer ' Get results here...
     Public desiredMatches As Integer = -1 ' -1 indicates it is to use the number of queries.
+    Dim ptBest As New BrickPoint_Basics
     Public Sub New()
         desc = "Default unnormalized KNN with dimension 2"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static ptBest As New BrickPoint_Basics
             ptBest.Run(src)
             trainInput = ptBest.intensityFeatures
             queries = trainInput

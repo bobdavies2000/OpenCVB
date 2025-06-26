@@ -2,7 +2,7 @@
 Public Class DepthLogic_Basics : Inherits TaskParent
     Dim structured As New Structured_Basics
     Dim gcUpdates As New List(Of Tuple(Of Integer, Single))
-    Dim options As Options_Features
+    Dim options As New Options_Features
     Public Sub New()
         task.brickRunFlag = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)

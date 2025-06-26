@@ -44,6 +44,7 @@ End Class
 
 Public Class Delaunay_Contours : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
+    Dim ptBest As New BrickPoint_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(3) = "CV_8U map of Delaunay cells"
@@ -51,7 +52,6 @@ Public Class Delaunay_Contours : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static ptBest As New BrickPoint_Basics
             ptBest.Run(src)
             task.features = ptBest.intensityFeatures
         End If

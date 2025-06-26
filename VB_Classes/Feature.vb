@@ -764,9 +764,8 @@ Public Class Feature_FacetPoints : Inherits TaskParent
         Next
 
         If standalone And task.redC.rcList.Count > 0 Then
-            Dim rc = task.redC.rcList(task.rcD.index)
-            task.color.Rectangle(rc.rect, task.highlight, task.lineWidth)
-            For Each pt In rc.ptFacets
+            task.color.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
+            For Each pt In task.rcD.ptFacets
                 DrawCircle(task.color, pt, task.DotSize, task.highlight)
             Next
         End If
