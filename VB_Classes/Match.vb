@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 Imports System.Windows.Forms
-Imports System.Text.RegularExpressions
 Public Class Match_Basics : Inherits TaskParent
     Public template As cv.Mat ' Provide this
     Public correlation As Single ' Resulting Correlation coefficient
@@ -30,7 +29,7 @@ Public Class Match_Basics : Inherits TaskParent
         Dim w = template.Width, h = template.Height
         matchCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
         matchRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
-        If standaloneTest() Or src.Size = template.Size Then
+        If standaloneTest() Then
             dst2 = src
             dst3 = template
         End If
@@ -610,7 +609,7 @@ End Class
 
 
 Public Class Match_Line : Inherits TaskParent
-    Public lineInput As lpData
+    Public lpInput As lpData
     Dim match As New Match_Basics
     Public correlation As Single
     Public Sub New()
@@ -618,26 +617,21 @@ Public Class Match_Line : Inherits TaskParent
         desc = "Match the endpoints of a line to make sure it is still there before line detection runs."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then lineInput = task.gravityBasics.gravityProxy
+        If standalone Then lpInput = task.gravityBasics.cameraMotionProxy
 
-        Dim index = task.grid.gridMap.Get(Of Single)(lineInput.p1.Y, lineInput.p1.X)
-        Dim firstRect = task.gridNabeRects(index)
-        index = task.grid.gridMap.Get(Of Single)(lineInput.p2.Y, lineInput.p2.X)
-        Dim lastRect = task.gridNabeRects(index)
-
-        If correlation = 0 Then
-            cv.Cv2.HConcat(src(firstRect), src(lastRect), match.template)
-        End If
-
+        match.template = lpInput.template
         Dim matchInput As New cv.Mat
-        cv.Cv2.HConcat(src(firstRect), src(lastRect), matchInput)
+        cv.Cv2.HConcat(src(lpInput.matchRect1), src(lpInput.matchRect2), matchInput)
 
         match.Run(matchInput)
         correlation = match.correlation
 
-        labels(2) = "Correlation = " + Format(correlation, fmt3)
-        If match.correlation < 0.98 Then correlation = 0 ' try again...
-        dst2 = matchInput
-        dst3 = match.template
+        labels(2) = "Camera Motion Proxy Correlation = " + Format(correlation, fmt3)
+
+        Dim tmp As New cv.Mat
+        cv.Cv2.HConcat(matchInput, match.template, tmp)
+        Dim sz = New cv.Size(dst2.Width, tmp.Height * dst2.Width / tmp.Width)
+        tmp = tmp.Resize(sz)
+        tmp.CopyTo(dst2(New cv.Rect(0, 0, sz.Width, sz.Height)))
     End Sub
 End Class

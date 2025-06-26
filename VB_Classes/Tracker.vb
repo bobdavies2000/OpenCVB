@@ -80,16 +80,3 @@ Public Class Tracker_Correlation : Inherits TaskParent
         task.drawRect = New cv.Rect
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Tracker_GravityLine : Inherits TaskParent
-    Public Sub New()
-        desc = "Track the gravity line"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-    End Sub
-End Class

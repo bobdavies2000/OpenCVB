@@ -1,12 +1,12 @@
-﻿Imports System.Windows.Shapes
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
     Public options As New Options_GravityLines
     Dim gravityRaw As New Gravity_BasicsRaw
     Dim imuGravityCount As Integer
     Public featLine As New FeatureLine_Basics
-    Public gravityProxy As lpData
+    Public cameraMotionProxy As lpData
     Public gravityRGB As lpData
+    Public gravityMatch As New LineRGB_MatchGravity
     Public Sub New()
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
     End Sub
@@ -23,27 +23,30 @@ Public Class Gravity_Basics : Inherits TaskParent
         dst.Line(task.horizonVec.p1, task.horizonVec.p2, white, task.lineWidth, task.lineType)
         dst.Line(task.gravityVec.p1, task.gravityVec.p2, white, task.lineWidth, task.lineType)
 
-        showVec(dst, task.gravityBasics.gravityProxy)
+        showVec(dst, task.gravityBasics.cameraMotionProxy)
         showVec(dst, task.gravityBasics.gravityRGB)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         If task.firstPass Then gravityRaw.Run(emptyMat)
+
+        gravityMatch.Run(src)
+        If gravityMatch.gLines.Count > 0 Then gravityRGB = gravityMatch.gLines(0)
+
         Static savedLine = task.gravityVec
         featLine.Run(src)
 
-        gravityProxy = featLine.gravityProxy
-        gravityRGB = featLine.gravityRGB
-        If CInt(savedLine.ep1.X) <> CInt(gravityProxy.ep1.X) Or
-           CInt(savedLine.ep1.Y) <> CInt(gravityProxy.ep1.Y) Or
-           CInt(savedLine.ep2.X) <> CInt(gravityProxy.ep2.X) Or
-           CInt(savedLine.ep2.Y) <> CInt(gravityProxy.ep2.Y) Or
+        cameraMotionProxy = featLine.cameraMotionProxy
+        If CInt(savedLine.ep1.X) <> CInt(cameraMotionProxy.ep1.X) Or
+           CInt(savedLine.ep1.Y) <> CInt(cameraMotionProxy.ep1.Y) Or
+           CInt(savedLine.ep2.X) <> CInt(cameraMotionProxy.ep2.X) Or
+           CInt(savedLine.ep2.Y) <> CInt(cameraMotionProxy.ep2.Y) Or
            task.lineRGB.lpList.Count = 0 Then ' No lines to confirm the gravity vector means use raw gravity vector.
 
             imuGravityCount += 1
             gravityRaw.Run(src)
-            savedLine = featLine.gravityProxy
+            savedLine = featLine.cameraMotionProxy
             task.gravityVec = gravityRaw.gravityVec
         End If
 
@@ -54,7 +57,7 @@ Public Class Gravity_Basics : Inherits TaskParent
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.highlight)
             DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
             dst3 = src
-            dst3.Line(featLine.gravityProxy.p1, featLine.gravityProxy.p2, task.highlight, task.lineWidth, task.lineType)
+            dst3.Line(featLine.cameraMotionProxy.p1, featLine.cameraMotionProxy.p2, task.highlight, task.lineWidth, task.lineType)
         End If
         labels(2) = "IMU gravity use " + CStr(imuGravityCount) + " times or " + Format(imuGravityCount / task.frameCount, "0%")
     End Sub

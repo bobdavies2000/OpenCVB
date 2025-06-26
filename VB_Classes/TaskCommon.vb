@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Imports VB_Classes.TaskParent
-Imports System.Security.Cryptography
 Public Module vbc
     Public task As VBtask
     Public taskReady As Boolean
@@ -488,158 +487,6 @@ End Class
 
 
 
-Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
-    Public age As Integer = 1
-    Public p1 As cv.Point2f
-    Public p2 As cv.Point2f
-    Public ep1 As cv.Point2f ' extended line endpoints - goes to the edge of the image.
-    Public ep2 As cv.Point2f ' extended line endpoints - goes to the edge of the image.
-    Public length As Single
-    Public rect As cv.Rect
-    Public index As Integer
-    Public indexContour As Integer
-    Public hullMaxDStable As cv.Point
-    Public vertical As Boolean ' false is horizontal
-    Public bricks As New List(Of Integer)  ' index of each brick containing the line.
-    Public m As Single
-    Public b As Single
-    Public center As cv.Point2f
-    Public Function perpendicularPoints(pt As cv.Point2f) As lpData
-        Dim perpSlope = -1 / m
-        Dim angleRadians As Double = Math.Atan(perpSlope)
-        Dim xShift = task.cellSize * Math.Cos(angleRadians)
-        Dim yShift = task.cellSize * Math.Sin(angleRadians)
-        Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
-        Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
-        If p1.X < 0 Then p1.X = 0
-        If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
-        If p1.Y < 0 Then p1.Y = 0
-        If p1.Y >= task.color.Height Then p1.Y = task.color.Height - 1
-        If p2.X < 0 Then p2.X = 0
-        If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
-        If p2.Y < 0 Then p2.Y = 0
-        If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
-
-        Return New lpData(p1, p2)
-    End Function
-    Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
-        If pt.X < 0 Then pt.X = 0
-        If pt.X > task.color.Width - 1 Then pt.X = task.color.Width - 1
-        If pt.Y < 0 Then pt.Y = 0
-        If pt.Y > task.color.Height - 1 Then pt.Y = task.color.Height - 1
-        Return pt
-    End Function
-    Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
-        p1 = validatePoint(_p1)
-        p2 = validatePoint(_p2)
-        center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
-
-        If p1.X > p2.X Then
-            Dim ptTemp = p1
-            p1 = p2
-            p2 = ptTemp
-        End If
-
-        If p1.X = p2.X Then
-            m = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
-        Else
-            m = (p1.Y - p2.Y) / (p1.X - p2.X)
-        End If
-        b = -p1.X * m + p1.Y
-
-        length = p1.DistanceTo(p2)
-
-        Dim brickptList As New List(Of cv.Point2f)
-        vertical = True
-        If Math.Abs(p1.X - p2.X) <= 2 Then
-            m = 100000 ' a big number for slope 
-            ' handle the special case of slope 0
-            Dim stepSize = If(p1.Y > p2.Y, -task.cellSize, task.cellSize)
-            For y = p1.Y To p2.Y Step stepSize
-                Dim index = task.grid.gridMap.Get(Of Single)(y, p1.X)
-                bricks.Add(index)
-                brickptList.Add(task.gridRects(index).TopLeft)
-            Next
-        Else
-            If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then
-                vertical = False
-                Dim stepSize = If(p1.X > p2.X, -1, 1)
-                For x = p1.X To p2.X Step stepSize
-                    Dim y = m * x + b
-                    Dim index = task.grid.gridMap.Get(Of Single)(y, x)
-                    If bricks.Contains(index) = False Then
-                        bricks.Add(index)
-                        brickptList.Add(task.gridRects(index).TopLeft)
-                    End If
-                Next
-            Else
-                Dim stepSize = If(p1.Y > p2.Y, -1, 1)
-                For y = p1.Y To p2.Y Step stepSize
-                    Dim x = (y - b) / m
-                    Dim index = task.grid.gridMap.Get(Of Single)(y, x)
-                    If bricks.Contains(index) = False Then
-                        bricks.Add(index)
-                        brickptList.Add(task.gridRects(index).TopLeft)
-                    End If
-                Next
-            End If
-        End If
-
-        Dim minX As Single = brickptList.Min(Function(p) p.X)
-        Dim maxX As Single = brickptList.Max(Function(p) p.X)
-        Dim minY As Single = brickptList.Min(Function(p) p.Y)
-        Dim maxY As Single = brickptList.Max(Function(p) p.Y)
-
-        Dim w = maxX + task.cellSize - minX
-        Dim h = maxY + task.cellSize - minY
-        If minX + w >= task.workingRes.Width Then w = task.workingRes.Width - minX
-        If minY + h >= task.workingRes.Height Then h = task.workingRes.Height - minY
-        rect = New cv.Rect(minX, minY, w, h)
-
-        If p1.X <> p2.X Then
-            Dim b = p1.Y - p1.X * m
-            If p1.Y = p2.Y Then
-                ep1 = New cv.Point2f(0, p1.Y)
-                ep2 = New cv.Point2f(task.workingRes.Width, p1.Y)
-                Exit Sub
-            Else
-                Dim x1 = -b / m
-                Dim x2 = (task.workingRes.Height - b) / m
-                Dim y1 = b
-                Dim y2 = m * task.workingRes.Width + b
-
-                Dim pts As New List(Of cv.Point2f)
-                If x1 >= 0 And x1 <= task.workingRes.Width Then pts.Add(New cv.Point2f(x1, 0))
-                If x2 >= 0 And x2 <= task.workingRes.Width Then pts.Add(New cv.Point2f(x2, task.workingRes.Height))
-                If y1 >= 0 And y1 <= task.workingRes.Height Then pts.Add(New cv.Point2f(0, y1))
-                If y2 >= 0 And y2 <= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, y2))
-                ep1 = pts(0)
-                If pts.Count < 2 Then
-                    If CInt(x2) >= task.workingRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workingRes.Height))
-                    If CInt(y2) >= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, CInt(y2)))
-                End If
-                ep2 = pts(1)
-                Exit Sub
-            End If
-        End If
-        ep1 = New cv.Point2f(p1.X, 0)
-        ep2 = New cv.Point2f(p1.X, task.workingRes.Height)
-    End Sub
-    Sub New()
-        p1 = New cv.Point2f()
-        p2 = New cv.Point2f()
-        rect = New cv.Rect(0, 0, 8, 8) ' dummy rect for first pass through Gradient_DepthLines
-    End Sub
-
-    Public Function compare(mp As lpData) As Boolean
-        If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
-        Return False
-    End Function
-End Class
-
-
-
-
 
 
 
@@ -757,4 +604,180 @@ Public Class contourData
     End Function
     Public Sub New()
     End Sub
+End Class
+
+
+
+
+Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
+    Public age As Integer = 1
+    Public p1 As cv.Point2f
+    Public p2 As cv.Point2f
+    Public ep1 As cv.Point2f ' extended line endpoints - goes to the edge of the image.
+    Public ep2 As cv.Point2f ' extended line endpoints - goes to the edge of the image.
+    Public length As Single
+    Public rect As cv.Rect
+    Public roRect As cv.RotatedRect
+    Public vertices(3) As cv.Point2f
+    Public index As Integer
+    Public indexContour As Integer
+    Public hullMaxDStable As cv.Point
+    Public vertical As Boolean ' false is horizontal
+    Public bricks As New List(Of Integer)  ' index of each brick containing the line.
+    Public m As Single
+    Public b As Single
+    Public center As cv.Point2f
+    Public thickness As Single = 10.0
+    Public matchRect1 As cv.Rect
+    Public matchRect2 As cv.Rect
+    Public template As New cv.Mat
+    Public correlation As Single
+    Public Function perpendicularPoints(pt As cv.Point2f) As lpData
+        Dim perpSlope = -1 / m
+        Dim angleRadians As Double = Math.Atan(perpSlope)
+        Dim xShift = task.cellSize * Math.Cos(angleRadians)
+        Dim yShift = task.cellSize * Math.Sin(angleRadians)
+        Dim p1 = New cv.Point(pt.X + xShift, pt.Y + yShift)
+        Dim p2 = New cv.Point(pt.X - xShift, pt.Y - yShift)
+        If p1.X < 0 Then p1.X = 0
+        If p1.X >= task.color.Width Then p1.X = task.color.Width - 1
+        If p1.Y < 0 Then p1.Y = 0
+        If p1.Y >= task.color.Height Then p1.Y = task.color.Height - 1
+        If p2.X < 0 Then p2.X = 0
+        If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
+        If p2.Y < 0 Then p2.Y = 0
+        If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
+
+        Return New lpData(p1, p2)
+    End Function
+    Public Sub CalculateRotatedRectFromLine()
+        Dim deltaX As Single = p2.X - p1.X
+        Dim deltaY As Single = p2.Y - p1.Y
+        Dim outSize = New cv.Size2f(length, thickness)
+
+        Dim angleRadians As Double = Math.Atan2(deltaY, deltaX)
+        Dim outAngle = CType(angleRadians * (180.0 / Math.PI), Single)
+        If outAngle >= 90.0 Then outAngle -= 180.0
+        If outAngle < -90.0 Then outAngle += 180.0
+        roRect = New cv.RotatedRect(center, outSize, outAngle)
+        vertices = roRect.Points()
+    End Sub
+    Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
+        If pt.X < 0 Then pt.X = 0
+        If pt.X > task.color.Width - 1 Then pt.X = task.color.Width - 1
+        If pt.Y < 0 Then pt.Y = 0
+        If pt.Y > task.color.Height - 1 Then pt.Y = task.color.Height - 1
+        Return pt
+    End Function
+    Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
+        p1 = validatePoint(_p1)
+        p2 = validatePoint(_p2)
+        center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
+
+        If p1.X > p2.X Then
+            Dim ptTemp = p1
+            p1 = p2
+            p2 = ptTemp
+        End If
+
+        If p1.X = p2.X Then
+            m = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
+        Else
+            m = (p1.Y - p2.Y) / (p1.X - p2.X)
+        End If
+        b = -p1.X * m + p1.Y
+
+        length = p1.DistanceTo(p2)
+        CalculateRotatedRectFromLine()
+
+        Dim brickptList As New List(Of cv.Point2f)
+        vertical = True
+        If Math.Abs(p1.X - p2.X) <= 2 Then
+            m = 100000 ' a big number for slope 
+            ' handle the special case of slope 0
+            Dim stepSize = If(p1.Y > p2.Y, -task.cellSize, task.cellSize)
+            For y = p1.Y To p2.Y Step stepSize
+                Dim index = task.grid.gridMap.Get(Of Single)(y, p1.X)
+                bricks.Add(index)
+                brickptList.Add(task.gridRects(index).TopLeft)
+            Next
+        Else
+            If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then
+                vertical = False
+                Dim stepSize = If(p1.X > p2.X, -1, 1)
+                For x = p1.X To p2.X Step stepSize
+                    Dim y = m * x + b
+                    Dim index = task.grid.gridMap.Get(Of Single)(y, x)
+                    If bricks.Contains(index) = False Then
+                        bricks.Add(index)
+                        brickptList.Add(task.gridRects(index).TopLeft)
+                    End If
+                Next
+            Else
+                Dim stepSize = If(p1.Y > p2.Y, -1, 1)
+                For y = p1.Y To p2.Y Step stepSize
+                    Dim x = (y - b) / m
+                    Dim index = task.grid.gridMap.Get(Of Single)(y, x)
+                    If bricks.Contains(index) = False Then
+                        bricks.Add(index)
+                        brickptList.Add(task.gridRects(index).TopLeft)
+                    End If
+                Next
+            End If
+        End If
+
+        Dim minX As Single = brickptList.Min(Function(p) p.X)
+        Dim maxX As Single = brickptList.Max(Function(p) p.X)
+        Dim minY As Single = brickptList.Min(Function(p) p.Y)
+        Dim maxY As Single = brickptList.Max(Function(p) p.Y)
+
+        Dim w = maxX + task.cellSize - minX
+        Dim h = maxY + task.cellSize - minY
+        If minX + w >= task.workingRes.Width Then w = task.workingRes.Width - minX
+        If minY + h >= task.workingRes.Height Then h = task.workingRes.Height - minY
+        rect = New cv.Rect(minX, minY, w, h)
+
+        matchRect1 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(p1.Y, p1.X))
+        matchRect2 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(p2.Y, p2.X))
+        cv.Cv2.HConcat(task.color(matchRect1), task.color(matchRect2), template)
+
+        If p1.X <> p2.X Then
+            Dim b = p1.Y - p1.X * m
+            If p1.Y = p2.Y Then
+                ep1 = New cv.Point2f(0, p1.Y)
+                ep2 = New cv.Point2f(task.workingRes.Width, p1.Y)
+                Exit Sub
+            Else
+                Dim x1 = -b / m
+                Dim x2 = (task.workingRes.Height - b) / m
+                Dim y1 = b
+                Dim y2 = m * task.workingRes.Width + b
+
+                Dim pts As New List(Of cv.Point2f)
+                If x1 >= 0 And x1 <= task.workingRes.Width Then pts.Add(New cv.Point2f(x1, 0))
+                If x2 >= 0 And x2 <= task.workingRes.Width Then pts.Add(New cv.Point2f(x2, task.workingRes.Height))
+                If y1 >= 0 And y1 <= task.workingRes.Height Then pts.Add(New cv.Point2f(0, y1))
+                If y2 >= 0 And y2 <= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, y2))
+                ep1 = pts(0)
+                If pts.Count < 2 Then
+                    If CInt(x2) >= task.workingRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workingRes.Height))
+                    If CInt(y2) >= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, CInt(y2)))
+                End If
+                ep2 = pts(1)
+                Exit Sub
+            End If
+        End If
+        ep1 = New cv.Point2f(p1.X, 0)
+        ep2 = New cv.Point2f(p1.X, task.workingRes.Height)
+    End Sub
+    Sub New()
+        p1 = New cv.Point2f()
+        p2 = New cv.Point2f()
+        rect = New cv.Rect(0, 0, 8, 8) ' dummy rect for first pass through Gradient_DepthLines
+    End Sub
+
+    Public Function compare(mp As lpData) As Boolean
+        If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
+        Return False
+    End Function
 End Class

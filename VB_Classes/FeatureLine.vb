@@ -1,12 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class FeatureLine_Basics : Inherits TaskParent
-    Dim match As New Match_Basics
-    Public gravityProxy As New lpData
-    Public gravityRGB As lpData
+    Public cameraMotionProxy As New lpData
     Dim matchRuns As Integer, lineRuns As Integer, totalLineRuns As Integer
     Public runOnEachFrame As Boolean
-    Public gravityMatch As New LineRGB_MatchGravity
-    Dim trackGravity As New Tracker_GravityLine
+    Dim match As New Match_Line
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -21,23 +18,15 @@ Public Class FeatureLine_Basics : Inherits TaskParent
             matchRuns = lineRuns / percent
         End If
 
-        Dim index = task.grid.gridMap.Get(Of Single)(gravityProxy.p1.Y, gravityProxy.p1.X)
-        Dim firstRect = task.gridNabeRects(index)
-        index = task.grid.gridMap.Get(Of Single)(gravityProxy.p2.Y, gravityProxy.p2.X)
-        Dim lastRect = task.gridNabeRects(index)
-
         dst2 = src.Clone
         If task.lineRGB.lpList.Count > 0 Then
+            cameraMotionProxy = task.lineRGB.lpList(0)
             matchRuns += 1
-            gravityProxy = task.lineRGB.lpList(0)
+            match.lpInput = cameraMotionProxy
+            match.Run(src)
+            dst1 = match.dst2
 
-            Dim matchInput As New cv.Mat
-            cv.Cv2.HConcat(src(firstRect), src(lastRect), matchInput)
-
-            match.Run(matchInput)
-            dst1 = matchInput
-
-            labels(2) = "Line end point correlation: " + Format(match.correlation, fmt3) + " / " +
+            labels(2) = "Line end point correlation:  " + Format(match.correlation, fmt3) + " / " +
                         " with " + Format(lineRuns / matchRuns, "0%") + " requiring line detection.  " +
                         "line detection runs = " + CStr(totalLineRuns)
         End If
@@ -47,29 +36,19 @@ Public Class FeatureLine_Basics : Inherits TaskParent
             task.lineRGB.Run(src.Clone)
             If task.lineRGB.lpList.Count = 0 Then Exit Sub
 
-            gravityProxy = task.lineRGB.lpList(0)
+            match.lpInput = task.lineRGB.lpList(0)
             lineRuns += 1
             totalLineRuns += 1
-
-            Dim matchTemplate As New cv.Mat
-            cv.Cv2.HConcat(src(firstRect), src(lastRect), matchTemplate)
-            match.template = matchTemplate
+            match.Run(src)
         End If
 
         labels(3) = "Currently available lines."
         dst3 = task.lineRGB.dst3
         labels(3) = task.lineRGB.labels(3)
 
-        gravityMatch.Run(src)
-        If gravityMatch.gLines.Count > 0 Then
-            trackGravity.Run(src)
-            gravityRGB = gravityMatch.gLines(0)
-        End If
-
-        dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
-        dst2.Rectangle(lastRect, task.highlight, task.lineWidth)
-        dst2.Line(gravityProxy.p1, gravityProxy.p2, task.highlight, task.lineWidth, task.lineType)
-        dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth, task.lineType)
+        dst2.Rectangle(match.lpInput.matchRect1, task.highlight, task.lineWidth)
+        dst2.Rectangle(match.lpInput.matchRect2, task.highlight, task.lineWidth)
+        dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, task.highlight, task.lineWidth, task.lineType)
     End Sub
 End Class
 

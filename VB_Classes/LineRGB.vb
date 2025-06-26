@@ -1,4 +1,4 @@
-Imports System.Runtime.InteropServices
+Imports System.Text.RegularExpressions
 Imports cv = OpenCvSharp
 Public Class LineRGB_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
@@ -31,6 +31,12 @@ Public Class LineRGB_Basics : Inherits TaskParent
             lp.index = lpList.Count
             lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+
+            If standaloneTest() Then
+                For i As Integer = 0 To 3
+                    dst2.Line(lp.vertices(i), lp.vertices((i + 1) Mod 4), task.highlight, task.lineWidth)
+                Next
+            End If
             If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
 
@@ -793,14 +799,14 @@ Public Class LineRGB_MatchGravity : Inherits TaskParent
         Dim lpList As New List(Of lpData)
         Dim lengthTooShort As Boolean
         If gLines.Count > 0 Then
-            match.lineInput = gLines(0)
+            match.lpInput = gLines(0)
             match.Run(src)
             If gLines(0).length < dst2.Height / 4 Then lengthTooShort = True
         Else
             match.correlation = 0
         End If
 
-        dst2 = src
+        dst2 = src.Clone
         dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth + 1, task.lineType)
         If match.correlation < 0.98 Or lengthTooShort Then
             lpList = New List(Of lpData)(task.lineRGB.rawLines.lpList)
@@ -825,5 +831,91 @@ Public Class LineRGB_MatchGravity : Inherits TaskParent
             labels(2) = "Of the " + CStr(gLines.Count) + " lines found, the best line parallel to gravity was " +
                        CStr(CInt(lineLen)) + " pixels in length."
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LineRGB_Match : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Public lpLastList As New List(Of lpData)
+    Dim rawLines As New LineRGB_Raw
+    Dim match As New Match_Line
+    Public Sub New()
+        task.brickRunFlag = True
+        desc = "Retain earlier lines based on the end point correlations.  Line can be partially hidden but is still be there."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then
+            lpLastList.Clear()
+            lpList.Clear()
+            task.motionMask.SetTo(255)
+        End If
+
+        lpList.Clear()
+        For Each lp In lpLastList
+            match.lpInput = lp
+            match.Run(src)
+            lp.correlation = match.correlation
+            If lp.correlation > 0.98 Then lpList.Add(lp)
+        Next
+
+        If lpList.Count < task.FeatureSampleSize Then
+            Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+            For Each lp In lpLastList
+                Dim noMotionTest As Boolean = True
+                For Each index In lp.bricks
+                    Dim pt = task.bricks.brickList(index).rect.TopLeft
+                    If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then
+                        noMotionTest = False
+                        Exit For
+                    End If
+                Next
+                If noMotionTest And lp.bricks.Count > 1 Then
+                    lp.age += 1
+                    sortlines.Add(lp.length, lp)
+                End If
+            Next
+
+            rawLines.Run(src)
+            dst3 = rawLines.dst2
+            labels(3) = rawLines.labels(2)
+
+            For Each lp In rawLines.lpList
+                Dim motionTest As Boolean = False
+
+                For Each index In lp.bricks
+                    Dim pt = task.bricks.brickList(index).rect.TopLeft
+                    If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then
+                        motionTest = True
+                        Exit For
+                    End If
+                Next
+                If motionTest Then sortlines.Add(lp.length, lp)
+            Next
+
+            lpList.Clear()
+            For Each lp In sortlines.Values
+                lp.index = lpList.Count
+                lpList.Add(lp)
+                If standaloneTest() Then
+                    For i As Integer = 0 To 3
+                        dst2.Line(lp.vertices(i), lp.vertices((i + 1) Mod 4), task.highlight, task.lineWidth)
+                    Next
+                End If
+                If lpList.Count >= task.FeatureSampleSize * 2 Then Exit For
+            Next
+
+            dst2 = src
+            For Each lp In lpList
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            Next
+        End If
+
+        lpLastList = New List(Of lpData)(lpList)
+        labels(2) = "Of the " + CStr(rawLines.lpList.Count) + " raw lines found, shown below are the " + CStr(lpList.Count) + " longest."
     End Sub
 End Class

@@ -845,19 +845,19 @@ Public Class VBtask : Implements IDisposable
             If gOptions.ShowGrid.Checked Then dst2.SetTo(cv.Scalar.White, gridMask)
 
             If gOptions.showMotionMask.Checked Then
-                For i = 0 To task.gridRects.Count - 1
+                For i = 0 To gridRects.Count - 1
                     If motionBasics.motionFlags(i) Then
-                        dst0.Rectangle(task.gridRects(i), cv.Scalar.White, lineWidth)
+                        dst0.Rectangle(gridRects(i), cv.Scalar.White, lineWidth)
                     End If
                 Next
             End If
 
-            If gOptions.CrossHairs.Checked Then
+            If gOptions.CrossHairs.Checked And gravityBasics.gravityRGB IsNot Nothing Then
                 Gravity_Basics.showVectors(dst0)
-                Dim p1 = task.gravityBasics.gravityProxy.center
-                displayObject.trueData.Add(New TrueText("Camera Motion Check", p1, 0))
+                Dim p1 = gravityBasics.cameraMotionProxy.center
+                displayObject.trueData.Add(New TrueText("Camera Motion Proxy", p1, 0))
 
-                Dim p2 = task.gravityBasics.gravityRGB.center
+                Dim p2 = gravityBasics.gravityRGB.center
                 p2 = New cv.Point(p2.X, p2.Y + 10)
                 displayObject.trueData.Add(New TrueText("Gravity Line Match", p2, 0))
             End If

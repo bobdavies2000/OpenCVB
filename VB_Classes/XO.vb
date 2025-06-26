@@ -5550,3 +5550,154 @@ Public Class XO_LineRGB_BasicsAlternative : Inherits TaskParent
         labels(3) = CStr(lines.lpList.Count) + " lines were in the motion mask."
     End Sub
 End Class
+
+
+
+
+
+
+Public Class XO_FeatureLine_Basics : Inherits TaskParent
+    Dim match As New Match_Basics
+    Public cameraMotionProxy As New lpData
+    Public gravityRGB As lpData
+    Dim matchRuns As Integer, lineRuns As Integer, totalLineRuns As Integer
+    Public runOnEachFrame As Boolean
+    Public gravityMatch As New LineRGB_MatchGravity
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Find and track the longest line by matching line bricks."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then task.lineRGB.lpList.Clear()
+
+        If matchRuns > 500 Then
+            Dim percent = lineRuns / matchRuns
+            lineRuns = 10
+            matchRuns = lineRuns / percent
+        End If
+
+        Dim index = task.grid.gridMap.Get(Of Single)(cameraMotionProxy.p1.Y, cameraMotionProxy.p1.X)
+        Dim firstRect = task.gridNabeRects(index)
+        index = task.grid.gridMap.Get(Of Single)(cameraMotionProxy.p2.Y, cameraMotionProxy.p2.X)
+        Dim lastRect = task.gridNabeRects(index)
+
+        dst2 = src.Clone
+        If task.lineRGB.lpList.Count > 0 Then
+            matchRuns += 1
+            cameraMotionProxy = task.lineRGB.lpList(0)
+
+            Dim matchInput As New cv.Mat
+            cv.Cv2.HConcat(src(firstRect), src(lastRect), matchInput)
+
+            match.Run(matchInput)
+
+            labels(2) = "Line end point correlation:  " + Format(match.correlation, fmt3) + " / " +
+                        " with " + Format(lineRuns / matchRuns, "0%") + " requiring line detection.  " +
+                        "line detection runs = " + CStr(totalLineRuns)
+        End If
+
+        If task.heartBeatLT Or task.lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Or runOnEachFrame Then
+            task.motionMask.SetTo(255) ' force a complete line detection
+            task.lineRGB.Run(src.Clone)
+            If task.lineRGB.lpList.Count = 0 Then Exit Sub
+
+            cameraMotionProxy = task.lineRGB.lpList(0)
+            lineRuns += 1
+            totalLineRuns += 1
+
+            Dim matchTemplate As New cv.Mat
+            cv.Cv2.HConcat(src(firstRect), src(lastRect), matchTemplate)
+            match.template = matchTemplate
+        End If
+
+        labels(3) = "Currently available lines."
+        dst3 = task.lineRGB.dst3
+        labels(3) = task.lineRGB.labels(3)
+
+        gravityMatch.Run(src)
+        If gravityMatch.gLines.Count > 0 Then gravityRGB = gravityMatch.gLines(0)
+
+        dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
+        dst2.Rectangle(lastRect, task.highlight, task.lineWidth)
+        dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, task.highlight, task.lineWidth, task.lineType)
+        dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth, task.lineType)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_LineRGB_BasicsOld : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Public lpMap As New cv.Mat
+    Dim rawLines As New LineRGB_Raw
+    Public Sub New()
+        task.brickRunFlag = True
+        lpMap = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 255)
+        desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static lastList As New List(Of lpData)
+        If task.optionsChanged Then
+            lastList.Clear()
+            lpList.Clear()
+            task.motionMask.SetTo(255)
+        End If
+
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        For Each lp In lastList
+            Dim noMotionTest As Boolean = True
+            For Each index In lp.bricks
+                Dim brick = If(index < task.bricks.brickList.Count, task.bricks.brickList(index), task.bricks.brickList(0))
+                If task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X) Then
+                    noMotionTest = False
+                    Exit For
+                End If
+            Next
+            If noMotionTest And lp.bricks.Count > 1 Then
+                lp.age += 1
+                sortlines.Add(lp.length, lp)
+            End If
+        Next
+
+        rawLines.Run(src)
+
+        For Each lp In rawLines.lpList
+            Dim motionTest As Boolean = False
+            For Each index In lp.bricks
+                Dim brick = task.bricks.brickList(index)
+                If task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X) Then
+                    motionTest = True
+                    Exit For
+                End If
+            Next
+            If motionTest Then sortlines.Add(lp.length, lp)
+        Next
+
+        lpList.Clear()
+        ' placeholder for zero so we can distinguish line 1 from the background which is 0.
+        lpList.Add(New lpData(New cv.Point, New cv.Point))
+
+        ' update lpMap from smallest to largest so the largest lines own any brick.
+        lpMap.SetTo(0)
+        For Each lp In sortlines.Values
+            lp.index = lpList.Count
+            For Each index In lp.bricks
+                lpMap(task.bricks.brickList(index).rect).SetTo(lp.index)
+            Next
+            lpList.Add(lp)
+            If lpList.Count >= task.FeatureSampleSize Then Exit For
+        Next
+
+        dst2 = src
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        Next
+
+        lastList = New List(Of lpData)(lpList)
+        labels(2) = "Of the " + CStr(rawLines.lpList.Count) + " raw lines found, shown below are the " + CStr(lpList.Count) + " longest."
+    End Sub
+End Class
