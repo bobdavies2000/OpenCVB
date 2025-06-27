@@ -31,7 +31,8 @@ Public Class FeatureLine_Basics : Inherits TaskParent
                         "line detection runs = " + CStr(totalLineRuns)
         End If
 
-        If task.heartBeatLT Or task.lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Or runOnEachFrame Then
+        If task.heartBeatLT Or task.lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Or
+            runOnEachFrame Or task.frameCount < 10 Then
             task.motionMask.SetTo(255) ' force a complete line detection
             task.lineRGB.Run(src.Clone)
             If task.lineRGB.lpList.Count = 0 Then Exit Sub

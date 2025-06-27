@@ -296,7 +296,7 @@ Public Class LineRGB_Perpendicular : Inherits TaskParent
     End Sub
     Public Shared Function computePerp(lp As lpData) As lpData
         Dim midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
-        Dim m = If(lp.m = 0, 100000, -1 / lp.m)
+        Dim m = If(lp.slope = 0, 100000, -1 / lp.slope)
         Dim b = midPoint.Y - m * midPoint.X
         Dim p1 = New cv.Point2f(-b / m, 0)
         Dim p2 = New cv.Point2f((task.workingRes.Height - b) / m, task.workingRes.Height)
@@ -364,7 +364,7 @@ Public Class LineRGB_Info : Inherits TaskParent
         strOut += "Age = " + CStr(task.lpD.age) + vbCrLf
 
         strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf + vbCrLf
-        strOut += "Slope = " + Format(task.lpD.m, fmt3) + vbCrLf
+        strOut += "Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
         strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
 
         strOut += "Below are the task.gridRects that the line intersects." + vbCrLf
@@ -717,7 +717,7 @@ Public Class LineRGB_GravityToAverage : Inherits TaskParent
         If standalone Then dst3 = lines.rawLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim deltaList As New List(Of Single)
         For Each lp In lines.rawLines.lpList
-            If lp.vertical And Math.Sign(task.gravityVec.m) = Math.Sign(lp.m) Then
+            If lp.vertical And Math.Sign(task.gravityVec.slope) = Math.Sign(lp.slope) Then
                 Dim delta = lp.ep1.X - lp.ep2.X
                 If Math.Abs(gravityDelta - delta) < 3 Then
                     deltaList.Add(delta)
@@ -729,7 +729,8 @@ Public Class LineRGB_GravityToAverage : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            labels(3) = "Gravity offset at image edge = " + Format(gravityDelta, fmt3) + " and m = " + Format(task.gravityVec.m, fmt3)
+            labels(3) = "Gravity offset at image edge = " + Format(gravityDelta, fmt3) + " and m = " +
+                        Format(task.gravityVec.slope, fmt3)
             If deltaList.Count > 0 Then
                 labels(2) = Format(gravityDelta, fmt3) + "/" + Format(deltaList.Average(), fmt3) + " gravity delta/line average delta"
             Else
@@ -785,51 +786,27 @@ End Class
 
 Public Class LineRGB_MatchGravity : Inherits TaskParent
     Public gLines As New List(Of lpData)
-    Dim match As New Match_Line
-    Dim rawRuns As Integer, totalRuns As Integer
     Public Sub New()
         desc = "Find all the lines similar to gravity."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst3 = task.lineRGB.dst3
         labels(3) = task.lineRGB.labels(3)
-        totalRuns += 1
 
-        labels(3) = "Runs to find lines / total runs = " + Format(rawRuns / totalRuns, "0%")
-        Dim lpList As New List(Of lpData)
-        Dim lengthTooShort As Boolean
-        If gLines.Count > 0 Then
-            match.lpInput = gLines(0)
-            match.Run(src)
-            If gLines(0).length < dst2.Height / 4 Then lengthTooShort = True
-        Else
-            match.correlation = 0
-        End If
-
+        gLines.Clear()
         dst2 = src.Clone
-        dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth + 1, task.lineType)
-        If match.correlation < 0.98 Or lengthTooShort Then
-            lpList = New List(Of lpData)(task.lineRGB.rawLines.lpList)
-            rawRuns += 1
-            gLines.Clear()
-        Else
-            dst2.Line(gLines(0).p1, gLines(0).p2, task.highlight, task.lineWidth + 1, task.lineType)
-        End If
-
-        For Each lp In lpList
-            If lp.vertical = False Then Continue For
-            If lp.length < task.gravityBasics.options.minLength Then Continue For
-            Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - lp.ep1.X)
-            Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - lp.ep2.X)
-            If Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold Then gLines.Add(lp)
+        For Each lp In task.lineRGB.lpList
+            If lp.gravityProxy Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
+                gLines.Add(lp)
+            End If
         Next
 
-        Dim lineLen = If(gLines.Count, gLines(0).length, 0)
-        If lineLen = 0 Then
+        If gLines.Count = 0 Then
             labels(2) = "There were no lines parallel to gravity in the RGB image."
         Else
             labels(2) = "Of the " + CStr(gLines.Count) + " lines found, the best line parallel to gravity was " +
-                       CStr(CInt(lineLen)) + " pixels in length."
+                       CStr(CInt(gLines(0).length)) + " pixels in length."
         End If
     End Sub
 End Class

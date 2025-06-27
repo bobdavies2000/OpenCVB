@@ -31,8 +31,22 @@ Public Class Gravity_Basics : Inherits TaskParent
 
         If task.firstPass Then gravityRaw.Run(emptyMat)
 
-        gravityMatch.Run(src)
-        If gravityMatch.gLines.Count > 0 Then gravityRGB = gravityMatch.gLines(0)
+        If task.gravityVec IsNot Nothing Then
+            gravityMatch.Run(src)
+            If gravityMatch.gLines.Count > 2 Then
+                gravityRGB = gravityMatch.gLines(0)
+                Dim mList As New List(Of Single)
+                For Each lp In gravityMatch.gLines
+                    mList.Add(lp.slope)
+                Next
+
+                Dim slope = gravityMatch.gLines(0).slope
+                Dim center = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
+                Dim yIntercept As Single = center.Y - slope * center.X
+                Dim x = (center.Y - yIntercept) / slope
+                Dim test = New lpData(New cv.Point2f(yIntercept, 0), New cv.Point2f(x, dst2.Height))
+            End If
+        End If
 
         Static savedLine = task.gravityVec
         featLine.Run(src)

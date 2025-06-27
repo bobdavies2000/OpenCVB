@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports VB_Classes.TaskParent
+Imports System.Windows.Shapes
 Public Module vbc
     Public task As VBtask
     Public taskReady As Boolean
@@ -180,14 +181,14 @@ Public Module vbc
 
     Public Function findEdgePoints(lp As lpData) As lpData
         ' compute the edge to edge line - might be useful...
-        Dim yIntercept = lp.p1.Y - lp.m * lp.p1.X
+        Dim yIntercept = lp.p1.Y - lp.slope * lp.p1.X
         Dim w = task.cols, h = task.rows
 
         Dim xp1 = New cv.Point2f(0, yIntercept)
-        Dim xp2 = New cv.Point2f(w, w * lp.m + yIntercept)
-        Dim xIntercept = -yIntercept / lp.m
+        Dim xp2 = New cv.Point2f(w, w * lp.slope + yIntercept)
+        Dim xIntercept = -yIntercept / lp.slope
         If xp1.Y > h Then
-            xp1.X = (h - yIntercept) / lp.m
+            xp1.X = (h - yIntercept) / lp.slope
             xp1.Y = h
         End If
         If xp1.Y < 0 Then
@@ -196,7 +197,7 @@ Public Module vbc
         End If
 
         If xp2.Y > h Then
-            xp2.X = (h - yIntercept) / lp.m
+            xp2.X = (h - yIntercept) / lp.slope
             xp2.Y = h
         End If
         If xp2.Y < 0 Then
@@ -624,16 +625,17 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public hullMaxDStable As cv.Point
     Public vertical As Boolean ' false is horizontal
     Public bricks As New List(Of Integer)  ' index of each brick containing the line.
-    Public m As Single
-    Public b As Single
+    Public slope As Single
+    Public yIntercept As Single
     Public center As cv.Point2f
     Public thickness As Single = 10.0
     Public matchRect1 As cv.Rect
     Public matchRect2 As cv.Rect
     Public template As New cv.Mat
     Public correlation As Single
+    Public gravityProxy As Boolean
     Public Function perpendicularPoints(pt As cv.Point2f) As lpData
-        Dim perpSlope = -1 / m
+        Dim perpSlope = -1 / slope
         Dim angleRadians As Double = Math.Atan(perpSlope)
         Dim xShift = task.cellSize * Math.Cos(angleRadians)
         Dim yShift = task.cellSize * Math.Sin(angleRadians)
@@ -681,11 +683,11 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         End If
 
         If p1.X = p2.X Then
-            m = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
+            slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
         Else
-            m = (p1.Y - p2.Y) / (p1.X - p2.X)
+            slope = (p1.Y - p2.Y) / (p1.X - p2.X)
         End If
-        b = -p1.X * m + p1.Y
+        yIntercept = -p1.X * slope + p1.Y
 
         length = p1.DistanceTo(p2)
         CalculateRotatedRectFromLine()
@@ -693,7 +695,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         Dim brickptList As New List(Of cv.Point2f)
         vertical = True
         If Math.Abs(p1.X - p2.X) <= 2 Then
-            m = 100000 ' a big number for slope 
+            slope = 100000 ' a big number for slope 
             ' handle the special case of slope 0
             Dim stepSize = If(p1.Y > p2.Y, -task.cellSize, task.cellSize)
             For y = p1.Y To p2.Y Step stepSize
@@ -706,7 +708,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
                 vertical = False
                 Dim stepSize = If(p1.X > p2.X, -1, 1)
                 For x = p1.X To p2.X Step stepSize
-                    Dim y = m * x + b
+                    Dim y = slope * x + yIntercept
                     Dim index = task.grid.gridMap.Get(Of Single)(y, x)
                     If bricks.Contains(index) = False Then
                         bricks.Add(index)
@@ -716,7 +718,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
             Else
                 Dim stepSize = If(p1.Y > p2.Y, -1, 1)
                 For y = p1.Y To p2.Y Step stepSize
-                    Dim x = (y - b) / m
+                    Dim x = (y - yIntercept) / slope
                     Dim index = task.grid.gridMap.Get(Of Single)(y, x)
                     If bricks.Contains(index) = False Then
                         bricks.Add(index)
@@ -742,16 +744,15 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         cv.Cv2.HConcat(task.color(matchRect1), task.color(matchRect2), template)
 
         If p1.X <> p2.X Then
-            Dim b = p1.Y - p1.X * m
+            Dim b = p1.Y - p1.X * slope
             If p1.Y = p2.Y Then
                 ep1 = New cv.Point2f(0, p1.Y)
                 ep2 = New cv.Point2f(task.workingRes.Width, p1.Y)
-                Exit Sub
             Else
-                Dim x1 = -b / m
-                Dim x2 = (task.workingRes.Height - b) / m
+                Dim x1 = -b / slope
+                Dim x2 = (task.workingRes.Height - b) / slope
                 Dim y1 = b
-                Dim y2 = m * task.workingRes.Width + b
+                Dim y2 = slope * task.workingRes.Width + b
 
                 Dim pts As New List(Of cv.Point2f)
                 If x1 >= 0 And x1 <= task.workingRes.Width Then pts.Add(New cv.Point2f(x1, 0))
@@ -764,11 +765,17 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
                     If CInt(y2) >= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, CInt(y2)))
                 End If
                 ep2 = pts(1)
-                Exit Sub
             End If
+        Else
+            ep1 = New cv.Point2f(p1.X, 0)
+            ep2 = New cv.Point2f(p1.X, task.workingRes.Height)
         End If
-        ep1 = New cv.Point2f(p1.X, 0)
-        ep2 = New cv.Point2f(p1.X, task.workingRes.Height)
+
+        If vertical And length >= task.gravityBasics.options.minLength Then
+            Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - ep1.X)
+            Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - ep2.X)
+            If Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold Then gravityProxy = True
+        End If
     End Sub
     Sub New()
         p1 = New cv.Point2f()
