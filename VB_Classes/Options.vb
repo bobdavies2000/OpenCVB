@@ -7381,59 +7381,6 @@ End Class
 
 
 
-
-
-
-Public Class Options_Sobel : Inherits OptionParent
-    Public kernelSize As Integer = 3
-    Public threshold As Integer = 50
-    Public distanceThreshold As Integer = 10
-    Public derivativeRange As Double = 0.1
-    Public horizontalDerivative As Boolean = True
-    Public verticalDerivative As Boolean = True
-    Public useBlur As Boolean = False
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Sobel kernel Size", 1, 31, kernelSize)
-            sliders.setupTrackBar("Threshold to zero pixels below this value", 0, 255, threshold)
-            sliders.setupTrackBar("Range around zero X100", 1, 500, derivativeRange * 100)
-            sliders.setupTrackBar("Threshold distance", 0, 100, distanceThreshold)
-        End If
-
-        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("Vertical Derivative")
-            check.addCheckBox("Horizontal Derivative")
-            check.addCheckBox("Blur input before Sobel")
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
-        End If
-    End Sub
-    Public Sub Run()
-        Static thresholdSlider = OptionParent.FindSlider("Threshold to zero pixels below this value")
-        Static ksizeSlider = OptionParent.FindSlider("Sobel kernel Size")
-        Static rangeSlider = OptionParent.FindSlider("Range around zero X100")
-        Static distanceSlider = OptionParent.FindSlider("Threshold distance")
-        kernelSize = ksizeSlider.Value Or 1
-        threshold = thresholdSlider.value
-        Static vDeriv = FindCheckBox("Vertical Derivative")
-        Static hDeriv = FindCheckBox("Horizontal Derivative")
-        Static checkBlur = FindCheckBox("Blur input before Sobel")
-        horizontalDerivative = hDeriv.checked
-        verticalDerivative = vDeriv.checked
-        useBlur = checkBlur.checked
-        derivativeRange = rangeSlider.value / 100
-        distanceThreshold = distanceSlider.value
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Options_Derivative : Inherits OptionParent
     Public channel As Integer = 2
     Dim options As New Options_Sobel
@@ -8004,5 +7951,52 @@ Public Class Options_Features : Inherits OptionParent
         quality = qualitySlider.Value / 100
         Static corrSlider = FindSlider("Brick Correlation Threshold")
         correlationThreshold = corrSlider.value / 100
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Sobel : Inherits OptionParent
+    Public kernelSize As Integer = 3
+    Public sobelThreshold As Integer = 250
+    Public distanceThreshold As Integer = 10
+    Public derivativeRange As Double = 0.1
+    Public horizontalDerivative As Boolean = True
+    Public verticalDerivative As Boolean = True
+    Public useBlur As Boolean = False
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Sobel kernel Size", 1, 31, kernelSize)
+            sliders.setupTrackBar("Sobel Intensity Threshold", 0, 255, sobelThreshold)
+            sliders.setupTrackBar("Range around zero X100", 1, 500, derivativeRange * 100)
+            sliders.setupTrackBar("Threshold distance", 0, 100, distanceThreshold)
+        End If
+
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Vertical Derivative")
+            check.addCheckBox("Horizontal Derivative")
+            check.addCheckBox("Blur input before Sobel")
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+        End If
+    End Sub
+    Public Sub Run()
+        Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
+        Static ksizeSlider = OptionParent.FindSlider("Sobel kernel Size")
+        Static rangeSlider = OptionParent.FindSlider("Range around zero X100")
+        Static distanceSlider = OptionParent.FindSlider("Threshold distance")
+        kernelSize = ksizeSlider.Value Or 1
+        sobelThreshold = thresholdSlider.value
+        Static vDeriv = FindCheckBox("Vertical Derivative")
+        Static hDeriv = FindCheckBox("Horizontal Derivative")
+        Static checkBlur = FindCheckBox("Blur input before Sobel")
+        horizontalDerivative = hDeriv.checked
+        verticalDerivative = vDeriv.checked
+        useBlur = checkBlur.checked
+        derivativeRange = rangeSlider.value / 100
+        distanceThreshold = distanceSlider.value
     End Sub
 End Class

@@ -2010,19 +2010,6 @@ public:
 	Options_OpenGLFunctions() {
 	}
 };
-class Options_Sobel {
-public:
-	int kernelSize =  3;
-	int threshold =  50;
-	int distanceThreshold =  10;
-	double derivativeRange =  0.1;
-	bool horizontalDerivative = true;
-	bool verticalDerivative = true;
-	bool useBlur = false;
-	void Run() {}
-	Options_Sobel() {
-	}
-};
 class Options_Derivative {
 public:
 	int channel =  2;
@@ -2191,5 +2178,18 @@ public:
 	int agastThreshold =  20;
 	void Run() {}
 	Options_Features() {
+	}
+};
+class Options_Sobel {
+public:
+	int kernelSize =  3;
+	int sobelThreshold =  250;
+	int distanceThreshold =  10;
+	double derivativeRange =  0.1;
+	bool horizontalDerivative = true;
+	bool verticalDerivative = true;
+	bool useBlur = false;
+	void Run() {}
+	Options_Sobel() {
 	}
 };

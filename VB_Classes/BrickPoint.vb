@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class BrickPoint_Basics : Inherits TaskParent
-    Public sobel As New Edge_SobelQT
+    Public sobel As New Edge_Sobel
     Public intensityFeatures As New List(Of cv.Point2f)
     Public Sub New()
         task.brickRunFlag = True
@@ -19,7 +19,7 @@ Public Class BrickPoint_Basics : Inherits TaskParent
             brick.pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
             brick.feature = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
             brick.intensity = mm.maxVal
-            If brick.intensity = 255 Then intensityFeatures.Add(brick.feature)
+            If brick.intensity >= sobel.options.sobelThreshold Then intensityFeatures.Add(brick.feature)
         Next
 
         For Each pt In intensityFeatures

@@ -1385,7 +1385,7 @@ End Class
 
 'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edge_Sobel : Inherits TaskParent
-    Dim options As New Options_Sobel
+    Public options As New Options_Sobel
     Public Sub New()
         desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
