@@ -990,7 +990,7 @@ Public Class Contour_RedCloud : Inherits TaskParent
     Dim sortContours As New Contour_Sort
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Use the RedCloud_PrepData as input to contours_basics."
+        desc = "Use the RedPrep_Basics as input to contours_basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -1197,7 +1197,7 @@ Public Class Contour_DepthRegions : Inherits TaskParent
     Public contourList As New List(Of contourData)
     Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Dim sortContours As New Contour_Sort
-    Dim prep As New RedPrep_Basics
+    Dim prep As New RedPrep_Depth
     Public Sub New()
         desc = "Use the mask from RedCloud_PrepXYZero to create color contours."
     End Sub

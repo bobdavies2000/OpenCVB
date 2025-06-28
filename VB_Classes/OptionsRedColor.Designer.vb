@@ -160,7 +160,7 @@ Partial Class OptionsRedColor
         Me.SimpleReductionBar.Size = New System.Drawing.Size(506, 69)
         Me.SimpleReductionBar.TabIndex = 7
         Me.SimpleReductionBar.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.SimpleReductionBar.Value = 80
+        Me.SimpleReductionBar.Value = 200
         '
         'SimpleReduceLabel
         '
@@ -275,14 +275,14 @@ Partial Class OptionsRedColor
         Me.ColorSourceLabel.AutoSize = True
         Me.ColorSourceLabel.Location = New System.Drawing.Point(259, 134)
         Me.ColorSourceLabel.Name = "ColorSourceLabel"
-        Me.ColorSourceLabel.Size = New System.Drawing.Size(105, 20)
+        Me.ColorSourceLabel.Size = New System.Drawing.Size(271, 20)
         Me.ColorSourceLabel.TabIndex = 10
-        Me.ColorSourceLabel.Text = "Color Source:"
+        Me.ColorSourceLabel.Text = "Color Source when running RedColor"
         '
         'ColorSource
         '
         Me.ColorSource.FormattingEnabled = True
-        Me.ColorSource.Location = New System.Drawing.Point(387, 134)
+        Me.ColorSource.Location = New System.Drawing.Point(263, 157)
         Me.ColorSource.Name = "ColorSource"
         Me.ColorSource.Size = New System.Drawing.Size(222, 28)
         Me.ColorSource.TabIndex = 11
@@ -324,7 +324,7 @@ Partial Class OptionsRedColor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1585, 604)
+        Me.ClientSize = New System.Drawing.Size(950, 604)
         Me.Controls.Add(Me.ColoringGroup)
         Me.Controls.Add(Me.ColorSource)
         Me.Controls.Add(Me.ColorSourceLabel)

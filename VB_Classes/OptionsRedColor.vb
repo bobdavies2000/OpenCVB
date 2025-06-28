@@ -11,7 +11,6 @@ Public Class OptionsRedColor
     Public bitReduction As Integer
     Public bitReductionChecked As Boolean
 
-    Public PointCloudReduction As Integer
     Public PointCloudReductionLabel As String
     Public channels() As Integer = {0, 1}
     Public channelIndex As Integer
@@ -83,7 +82,7 @@ Public Class OptionsRedColor
         task.channelsSide = {1, 2}
 
         UseSimpleReduction.Checked = True
-        PointCloudReduction = 3
+        PointCloudReductionLabel = "XY Reduction"
         XYReduction.Checked = True
         histBinList = {task.histogramBins, task.histogramBins}
 
@@ -122,37 +121,37 @@ Public Class OptionsRedColor
 
         channelCount = 1
         channelIndex = 0
-        Select Case task.redOptions.PointCloudReduction
-            Case 0 ' "X Reduction"
+        Select Case task.redOptions.PointCloudReductionLabel
+            Case "X Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
                 channels = {0}
                 histBinList = {task.histogramBins}
-            Case 1 ' "Y Reduction"
+            Case "Y Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1)}
                 channels = {1}
                 histBinList = {task.histogramBins}
-            Case 2 ' "Z Reduction"
+            Case "Z Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(rz.Item0, rz.Item1)}
                 channels = {2}
                 histBinList = {task.histogramBins}
-            Case 3 ' "XY Reduction"
+            Case "XY Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
                 channelCount = 2
                 channels = {0, 1}
                 histBinList = {task.histogramBins, task.histogramBins}
-            Case 4 ' "XZ Reduction"
+            Case "XZ Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
                 channelCount = 2
                 channels = {0, 2}
                 channelIndex = 1
                 histBinList = {task.histogramBins, task.histogramBins}
-            Case 5 ' "YZ Reduction"
+            Case "YZ Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
                 channelCount = 2
                 channels = {1, 2}
                 channelIndex = 1
                 histBinList = {task.histogramBins, task.histogramBins}
-            Case 6 ' "XYZ Reduction"
+            Case "XYZ Reduction"
                 ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
                 channelCount = 3
                 channels = {0, 1, 2}
@@ -200,37 +199,30 @@ Public Class OptionsRedColor
 
     Private Sub XReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XReduction.CheckedChanged
         task.optionsChanged = True
-        PointCloudReduction = XReduction.Tag
         PointCloudReductionLabel = "X Reduction"
     End Sub
     Private Sub YReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YReduction.CheckedChanged
         task.optionsChanged = True
-        PointCloudReduction = YReduction.Tag
         PointCloudReductionLabel = "Y Reduction"
     End Sub
     Private Sub ZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles ZReduction.CheckedChanged
         task.optionsChanged = True
-        PointCloudReduction = ZReduction.Tag
         PointCloudReductionLabel = "Z Reduction"
     End Sub
     Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles XYReduction.CheckedChanged
         task.optionsChanged = True
-        PointCloudReduction = XYReduction.Tag
         PointCloudReductionLabel = "XY Reduction"
     End Sub
     Private Sub XZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XZReduction.CheckedChanged
         task.optionsChanged = True
-        PointCloudReduction = XZReduction.Tag
         PointCloudReductionLabel = "XZ Reduction"
     End Sub
     Private Sub YZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YZReduction.CheckedChanged
         task.optionsChanged = True
-        PointCloudReduction = YZReduction.Tag
         PointCloudReductionLabel = "YZ Reduction"
     End Sub
     Public Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XYZReduction.CheckedChanged
         task.optionsChanged = True
-        PointCloudReduction = XYZReduction.Tag
         PointCloudReductionLabel = "XYZ Reduction"
     End Sub
 

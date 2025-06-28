@@ -11,10 +11,14 @@ Public Class RedColor_Basics : Inherits TaskParent
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Or task.redOptions.ColorSource.SelectedItem = "EdgeLine_Basics" Then
-            dst1 = task.contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cv.MatType.CV_8U Then
+            If standalone Or task.redOptions.ColorSource.SelectedItem = "EdgeLine_Basics" Then
+                dst1 = task.contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Else
+                dst1 = srcMustBe8U(src)
+            End If
         Else
-            dst1 = srcMustBe8U(src)
+            dst1 = src
         End If
 
         If inputRemoved IsNot Nothing Then dst1.SetTo(0, inputRemoved)
@@ -1395,39 +1399,6 @@ End Class
 
 
 
-Public Class RedColor_BasicsHist : Inherits TaskParent
-    Dim plot As New Plot_Histogram
-    Public Sub New()
-        task.gOptions.setHistogramBins(64)
-        labels(3) = "Plot of the depth of the tracking cells (in grayscale), zero to task.maxZmeters in depth"
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-        plot.createHistogram = True
-        desc = "Display the histogram of the RedCloud_Basics output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        runRedC(src, labels(2))
-
-        If task.heartBeat Then
-            dst2.SetTo(0)
-            For Each rc In task.redC.rcList
-                dst2(rc.rect).SetTo(rc.depth, rc.mask)
-            Next
-            Dim mm = GetMinMax(dst2)
-
-            plot.minRange = mm.minVal
-            plot.maxRange = mm.maxVal
-            plot.Run(dst2)
-        End If
-        dst3 = plot.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 
@@ -1983,5 +1954,37 @@ Public Class RedColor_Hulls : Inherits TaskParent
         dst3 = ShowPalette(rcMap)
         labels(3) = CStr(rcList.Count) + " hulls identified below.  " + CStr(defectCount) +
                     " hulls failed to build the defect list."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedColor_BasicsHist : Inherits TaskParent
+    Dim plot As New Plot_Histogram
+    Public Sub New()
+        task.gOptions.setHistogramBins(100)
+        plot.createHistogram = True
+        desc = "Display the histogram of a selected RedColor cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+        If task.heartBeat Then
+            Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
+            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+            plot.minRange = 0
+            plot.maxRange = task.MaxZmeters
+            plot.Run(depth)
+            labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + "meters - vertical lines every meter"
+
+            Dim incr = dst2.Width / task.MaxZmeters
+            For i = 1 To CInt(task.MaxZmeters - 1)
+                Dim x = incr * i
+                DrawLine(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White)
+            Next
+        End If
+        dst3 = plot.dst2
     End Sub
 End Class

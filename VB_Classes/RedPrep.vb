@@ -1,6 +1,78 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class RedPrep_Basics : Inherits TaskParent
+    Dim plot As New Plot_Histogram
+    Public Sub New()
+        desc = "Reduction transform for the point cloud"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
+        Dim reduceAmt = task.redOptions.SimpleReductionBar.Value
+        task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
+        task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
+        task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
+
+        Select Case task.redOptions.PointCloudReductionLabel
+            Case "X Reduction"
+                dst0 = (Split(0) * reduceAmt).ToMat
+            Case "Y Reduction"
+                dst0 = (Split(1) * reduceAmt).ToMat
+            Case "Z Reduction"
+                dst0 = (Split(2) * reduceAmt).ToMat
+            Case "XY Reduction"
+                dst0 = (Split(0) * reduceAmt + Split(1) * reduceAmt).ToMat
+            Case "XZ Reduction"
+                dst0 = (Split(0) * reduceAmt + Split(2) * reduceAmt).ToMat
+            Case "YZ Reduction"
+                dst0 = (Split(1) * reduceAmt + Split(2) * reduceAmt).ToMat
+            Case "XYZ Reduction"
+                dst0 = (Split(0) * reduceAmt + Split(1) * reduceAmt + Split(2) * reduceAmt).ToMat
+        End Select
+
+        Dim mm As mmData = GetMinMax(dst0)
+        Dim dst32f As New cv.Mat
+        If Math.Abs(mm.minVal) > mm.maxVal Then
+            mm.minVal = -mm.maxVal
+            dst0.ConvertTo(dst32f, cv.MatType.CV_32F)
+            Dim mask = dst32f.Threshold(mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
+            mask.ConvertTo(mask, cv.MatType.CV_8U)
+            dst32f.SetTo(mm.minVal, mask)
+        End If
+        dst2 = (dst0 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        dst2.SetTo(0, task.noDepthMask)
+
+        If standaloneTest() Then
+            mm = GetMinMax(dst2)
+            plot.createHistogram = True
+            plot.removeZeroEntry = False
+            plot.maxRange = mm.maxVal
+            plot.Run(dst2)
+            dst3 = plot.dst2
+
+            For i = 0 To plot.histArray.Count - 1
+                plot.histArray(i) = i
+            Next
+
+            Marshal.Copy(plot.histArray, 0, plot.histogram.Data, plot.histArray.Length)
+            cv.Cv2.CalcBackProject({dst2}, {0}, plot.histogram, dst1, plot.ranges)
+            dst3 = ShowPalette(dst1)
+            dst3.SetTo(0, task.noDepthMask)
+            labels(3) = CStr(plot.histArray.Count) + " different levels in the prepared data."
+        End If
+
+        labels(2) = task.redOptions.PointCloudReductionLabel + " with reduction factor = " + CStr(reduceAmt)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedPrep_Depth : Inherits TaskParent
     Public Sub New()
         cPtr = PrepXY_Open()
         desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
@@ -27,6 +99,52 @@ Public Class RedPrep_Basics : Inherits TaskParent
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedPrep_FloodFill : Inherits TaskParent
+    Public classCount As Integer
+    Public rectList As New List(Of cv.Rect)
+    Public identifyCount As Integer = 255
+    Public Sub New()
+        cPtr = RedCloud_Open()
+        desc = "Run the C++ RedCloud to create a list of mask, rect, and other info about image"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, 0)
+        handleInput.Free()
+        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+
+        classCount = Math.Min(RedCloud_Count(cPtr), identifyCount * 2)
+        If classCount = 0 Then Exit Sub ' no data to process.
+
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
+
+        Dim rects(classCount * 4) As Integer
+        Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+
+        rectList.Clear()
+        For i = 0 To classCount * 4 - 4 Step 4
+            rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
+        Next
+
+        If standalone Then dst3 = ShowPalette(dst2)
+
+        If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
+        If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
     End Sub
 End Class
 
@@ -83,7 +201,7 @@ End Class
 
 
 Public Class RedPrep_Edges : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
+    Dim prep As New RedPrep_Depth
     Dim edges As New Edge_Basics
     Public Sub New()
         desc = "Find the edges of XY depth boundaries."
@@ -104,11 +222,10 @@ End Class
 
 
 Public Class RedPrep_DepthTiers : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
+    Dim prep As New RedPrep_Depth
     Dim tiers As New Depth_Tiers
-    Dim contours As New Contour_Basics
     Public Sub New()
-        labels(3) = "RedPrep_Basics output define regions with common XY."
+        labels(3) = "RedPrep_Depth output define regions with common XY."
         desc = "Find the edges of XY depth boundaries."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

@@ -1513,19 +1513,19 @@ Public Class Hist_PointCloud : Inherits TaskParent
         cv.Cv2.CalcHist({task.pointCloud}, task.redOptions.channels, New cv.Mat(), histogram, task.redOptions.channelCount,
                         task.redOptions.histBinList, task.redOptions.ranges)
 
-        Select Case task.redOptions.PointCloudReduction
-            Case 0, 1, 2 ' "X Reduction", "Y Reduction", "Z Reduction"
+        Select Case task.redOptions.PointCloudReductionLabel
+            Case "X Reduction", "Y Reduction", "Z Reduction"
                 Static plot As New Plot_Histogram
                 plot.Run(histogram)
                 dst2 = plot.histogram
                 labels(2) = "2D plot of 1D histogram."
-            Case 3, 4, 5 ' "XY Reduction", "XZ Reduction", "YZ Reduction"
+            Case "XY Reduction", "XZ Reduction", "YZ Reduction"
                 Static plot2D As New Plot_Histogram2D
                 plot2D.Run(histogram)
                 dst2 = plot2D.dst2
                 labels(2) = "2D plot of 2D histogram."
                 If dst2.Type <> cv.MatType.CV_8U Then dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-            Case 6 ' "XYZ Reduction"
+            Case "XYZ Reduction"
                 Static hcloud As New Hist3Dcloud_Basics
                 dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
 

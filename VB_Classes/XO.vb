@@ -5569,3 +5569,62 @@ Public Class XO_Mat_ToList : Inherits TaskParent
         labels(2) = "There were " + CStr(ptList.Count) + " points identified"
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+
+Public Class XO_RedPrep_BasicsCalcHist : Inherits TaskParent
+    Public Sub New()
+        desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim histogram As New cv.Mat
+
+        Dim channels() As Integer = {0}
+        Select Case task.redOptions.PointCloudReductionLabel
+            Case "X Reduction"
+                dst0 = task.pcSplit(0)
+            Case "Y Reduction"
+                dst0 = task.pcSplit(1)
+            Case "Z Reduction"
+                dst0 = task.pcSplit(2)
+            Case "XY Reduction"
+                dst0 = task.pcSplit(0) + task.pcSplit(1)
+                channels = {0, 1}
+            Case "XZ Reduction"
+                dst0 = task.pcSplit(0) + task.pcSplit(2)
+                channels = {0, 1}
+            Case "YZ Reduction"
+                dst0 = task.pcSplit(1) + task.pcSplit(2)
+                channels = {0, 1}
+            Case "XYZ Reduction"
+                dst0 = task.pcSplit(0) + task.pcSplit(1) + task.pcSplit(2)
+                channels = {0, 1}
+        End Select
+
+        Dim mm = GetMinMax(dst0)
+        Dim ranges = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
+        cv.Cv2.CalcHist({dst0}, channels, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+
+        Dim histArray(histogram.Total - 1) As Single
+        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+        For i = 0 To histArray.Count - 1
+            histArray(i) = i
+        Next
+
+        histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
+        cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst1, ranges)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst3 = ShowPalette(dst2)
+        dst3.SetTo(0, task.noDepthMask)
+
+        labels(2) = "Pointcloud data backprojection to " + CStr(task.histogramBins) + " classes."
+    End Sub
+End Class

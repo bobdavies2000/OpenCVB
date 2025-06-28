@@ -119,7 +119,7 @@ End Class
 
 
 Public Class Boundary_RedCloud : Inherits TaskParent
-    Dim prep As New RedCloud_PrepData
+    Dim prep As New RedPrep_Basics
     Public Sub New()
         task.gOptions.MaxDepthBar.Value = 20
         task.redOptions.TrackingColor.Checked = True
