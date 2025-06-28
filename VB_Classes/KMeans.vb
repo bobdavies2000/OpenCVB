@@ -489,6 +489,7 @@ Public Class KMeans_SimKColor : Inherits TaskParent
         desc = "Use the gaps in the 3D histogram of the color image to find 'k' and backproject the results."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
         If task.heartBeat Then
             plot1D.Run(src)
             dst3 = plot1D.dst2
@@ -502,7 +503,7 @@ Public Class KMeans_SimKColor : Inherits TaskParent
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst1, task.redOptions.rangesBGR)
 
         dst2 = ShowPalette(dst1)
-        labels(2) = simK.labels(2) + " with " + CStr(task.redOptions.histBins3D) + " histogram bins"
+        labels(2) = simK.labels(2) + " with " + CStr(binSlider.value) + " histogram bins"
     End Sub
 End Class
 
@@ -518,6 +519,7 @@ Public Class KMeans_SimKDepth : Inherits TaskParent
         desc = "Use the gaps in the 3D histogram of depth to find simK and backproject the results."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         If task.heartBeat Then
             plot1D.Run(src)
@@ -533,6 +535,6 @@ Public Class KMeans_SimKDepth : Inherits TaskParent
 
         dst2 = ShowPalette(dst1)
 
-        labels(2) = simK.labels(2) + " with " + CStr(task.redOptions.histBins3D) + " histogram bins"
+        labels(2) = simK.labels(2) + " with " + CStr(binSlider.value) + " histogram bins"
     End Sub
 End Class

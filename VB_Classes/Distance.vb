@@ -327,7 +327,7 @@ Public Class Distance_RedColor : Inherits TaskParent
     Dim lastrcList As New List(Of rcData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        task.redOptions.HistBinBar3D.Value = 5
+        OptionParent.FindSlider("Histogram 3D Bins").Value = 5
         hColor.noMotionMask = True
         labels(1) = "3D Histogram distance for each of the cells at left"
         labels(2) = "RedColor output with the cell's distance from zero depth"

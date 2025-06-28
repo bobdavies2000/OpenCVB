@@ -46,18 +46,12 @@ Partial Class OptionsRedColor
         Me.ColoringGroup = New System.Windows.Forms.GroupBox()
         Me.TrackingColor = New System.Windows.Forms.RadioButton()
         Me.TrackingMeanColor = New System.Windows.Forms.RadioButton()
-        Me.Label7 = New System.Windows.Forms.Label()
-        Me.HistBinBar3D = New System.Windows.Forms.TrackBar()
-        Me.LabelHistogramBins = New System.Windows.Forms.Label()
-        Me.RedCloudSliders = New System.Windows.Forms.GroupBox()
         Me.ReductionTypeGroup.SuspendLayout()
         Me.ReductionSliders.SuspendLayout()
         CType(Me.BitwiseReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RedCloudOnly.SuspendLayout()
         Me.ColoringGroup.SuspendLayout()
-        CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.RedCloudSliders.SuspendLayout()
         Me.SuspendLayout()
         '
         'ReductionTypeGroup
@@ -65,7 +59,7 @@ Partial Class OptionsRedColor
         Me.ReductionTypeGroup.Controls.Add(Me.NoReduction)
         Me.ReductionTypeGroup.Controls.Add(Me.BitwiseReduction)
         Me.ReductionTypeGroup.Controls.Add(Me.UseSimpleReduction)
-        Me.ReductionTypeGroup.Location = New System.Drawing.Point(792, 318)
+        Me.ReductionTypeGroup.Location = New System.Drawing.Point(36, 321)
         Me.ReductionTypeGroup.Name = "ReductionTypeGroup"
         Me.ReductionTypeGroup.Size = New System.Drawing.Size(220, 129)
         Me.ReductionTypeGroup.TabIndex = 5
@@ -113,7 +107,7 @@ Partial Class OptionsRedColor
         Me.ReductionSliders.Controls.Add(Me.ColorLabel)
         Me.ReductionSliders.Controls.Add(Me.SimpleReductionBar)
         Me.ReductionSliders.Controls.Add(Me.SimpleReduceLabel)
-        Me.ReductionSliders.Location = New System.Drawing.Point(792, 453)
+        Me.ReductionSliders.Location = New System.Drawing.Point(36, 456)
         Me.ReductionSliders.Name = "ReductionSliders"
         Me.ReductionSliders.Size = New System.Drawing.Size(779, 140)
         Me.ReductionSliders.TabIndex = 6
@@ -185,7 +179,7 @@ Partial Class OptionsRedColor
         Me.RedCloudOnly.Controls.Add(Me.ZReduction)
         Me.RedCloudOnly.Controls.Add(Me.YReduction)
         Me.RedCloudOnly.Controls.Add(Me.XReduction)
-        Me.RedCloudOnly.Location = New System.Drawing.Point(792, 23)
+        Me.RedCloudOnly.Location = New System.Drawing.Point(21, 12)
         Me.RedCloudOnly.Name = "RedCloudOnly"
         Me.RedCloudOnly.Size = New System.Drawing.Size(220, 289)
         Me.RedCloudOnly.TabIndex = 7
@@ -279,7 +273,7 @@ Partial Class OptionsRedColor
         'ColorSourceLabel
         '
         Me.ColorSourceLabel.AutoSize = True
-        Me.ColorSourceLabel.Location = New System.Drawing.Point(1042, 208)
+        Me.ColorSourceLabel.Location = New System.Drawing.Point(259, 134)
         Me.ColorSourceLabel.Name = "ColorSourceLabel"
         Me.ColorSourceLabel.Size = New System.Drawing.Size(105, 20)
         Me.ColorSourceLabel.TabIndex = 10
@@ -288,7 +282,7 @@ Partial Class OptionsRedColor
         'ColorSource
         '
         Me.ColorSource.FormattingEnabled = True
-        Me.ColorSource.Location = New System.Drawing.Point(1170, 208)
+        Me.ColorSource.Location = New System.Drawing.Point(387, 134)
         Me.ColorSource.Name = "ColorSource"
         Me.ColorSource.Size = New System.Drawing.Size(222, 28)
         Me.ColorSource.TabIndex = 11
@@ -297,7 +291,7 @@ Partial Class OptionsRedColor
         '
         Me.ColoringGroup.Controls.Add(Me.TrackingColor)
         Me.ColoringGroup.Controls.Add(Me.TrackingMeanColor)
-        Me.ColoringGroup.Location = New System.Drawing.Point(1046, 23)
+        Me.ColoringGroup.Location = New System.Drawing.Point(263, 12)
         Me.ColoringGroup.Name = "ColoringGroup"
         Me.ColoringGroup.Size = New System.Drawing.Size(220, 103)
         Me.ColoringGroup.TabIndex = 78
@@ -326,45 +320,6 @@ Partial Class OptionsRedColor
         Me.TrackingMeanColor.Text = "Mean Color"
         Me.TrackingMeanColor.UseVisualStyleBackColor = True
         '
-        'Label7
-        '
-        Me.Label7.Location = New System.Drawing.Point(8, 22)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(152, 48)
-        Me.Label7.TabIndex = 30
-        Me.Label7.Text = "3D Histogram Bins"
-        '
-        'HistBinBar3D
-        '
-        Me.HistBinBar3D.Location = New System.Drawing.Point(156, 15)
-        Me.HistBinBar3D.Maximum = 16
-        Me.HistBinBar3D.Minimum = 2
-        Me.HistBinBar3D.Name = "HistBinBar3D"
-        Me.HistBinBar3D.Size = New System.Drawing.Size(506, 69)
-        Me.HistBinBar3D.TabIndex = 31
-        Me.HistBinBar3D.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.HistBinBar3D.Value = 4
-        '
-        'LabelHistogramBins
-        '
-        Me.LabelHistogramBins.AutoSize = True
-        Me.LabelHistogramBins.Location = New System.Drawing.Point(668, 22)
-        Me.LabelHistogramBins.Name = "LabelHistogramBins"
-        Me.LabelHistogramBins.Size = New System.Drawing.Size(57, 20)
-        Me.LabelHistogramBins.TabIndex = 32
-        Me.LabelHistogramBins.Text = "Label5"
-        '
-        'RedCloudSliders
-        '
-        Me.RedCloudSliders.Controls.Add(Me.LabelHistogramBins)
-        Me.RedCloudSliders.Controls.Add(Me.HistBinBar3D)
-        Me.RedCloudSliders.Controls.Add(Me.Label7)
-        Me.RedCloudSliders.Location = New System.Drawing.Point(12, 318)
-        Me.RedCloudSliders.Name = "RedCloudSliders"
-        Me.RedCloudSliders.Size = New System.Drawing.Size(763, 242)
-        Me.RedCloudSliders.TabIndex = 2
-        Me.RedCloudSliders.TabStop = False
-        '
         'OptionsRedColor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -376,7 +331,6 @@ Partial Class OptionsRedColor
         Me.Controls.Add(Me.RedCloudOnly)
         Me.Controls.Add(Me.ReductionSliders)
         Me.Controls.Add(Me.ReductionTypeGroup)
-        Me.Controls.Add(Me.RedCloudSliders)
         Me.Name = "OptionsRedColor"
         Me.Text = "OptionsRedCloud"
         Me.ReductionTypeGroup.ResumeLayout(False)
@@ -389,9 +343,6 @@ Partial Class OptionsRedColor
         Me.RedCloudOnly.PerformLayout()
         Me.ColoringGroup.ResumeLayout(False)
         Me.ColoringGroup.PerformLayout()
-        CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.RedCloudSliders.ResumeLayout(False)
-        Me.RedCloudSliders.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -420,8 +371,4 @@ Partial Class OptionsRedColor
     Friend WithEvents ColoringGroup As Windows.Forms.GroupBox
     Friend WithEvents TrackingColor As Windows.Forms.RadioButton
     Friend WithEvents TrackingMeanColor As Windows.Forms.RadioButton
-    Friend WithEvents Label7 As Windows.Forms.Label
-    Friend WithEvents HistBinBar3D As Windows.Forms.TrackBar
-    Friend WithEvents LabelHistogramBins As Windows.Forms.Label
-    Friend WithEvents RedCloudSliders As Windows.Forms.GroupBox
 End Class

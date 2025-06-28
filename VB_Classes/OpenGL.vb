@@ -1222,8 +1222,9 @@ Public Class OpenGL_HistDepth3D : Inherits TaskParent
         desc = "Display the 3D histogram of the depth in OpenGL"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
         hcloud.Run(src)
-        Dim histogram = cv.Mat.FromPixelData(task.redOptions.histBins3D, 1, cv.MatType.CV_32F, hcloud.histogram.Data)
+        Dim histogram = cv.Mat.FromPixelData(binSlider.value, 1, cv.MatType.CV_32F, hcloud.histogram.Data)
         task.ogl.dataInput = histogram
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(New cv.Mat)

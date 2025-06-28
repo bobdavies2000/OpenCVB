@@ -7988,10 +7988,10 @@ End Class
 Public Class Options_Hist3D : Inherits OptionParent
     Public histogram3DBins As Integer = 4
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Histogram 3D bins", 2, 16, histogram3DBins)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Histogram 3D Bins", 2, 16, histogram3DBins)
     End Sub
     Public Sub Run()
-        Static binSlider = FindSlider("Histogram 3D bins")
+        Static binSlider = FindSlider("Histogram 3D Bins")
         histogram3DBins = binSlider.value
     End Sub
 End Class

@@ -12,13 +12,14 @@ Public Class Hist3Dcloud_Basics : Inherits TaskParent
         desc = "Build a 3D histogram from the pointcloud and backproject it to segment the image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
+        Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
-        Dim bins = task.redOptions.HistBinBar3D.Value
+        Dim bins = binSlider.Value
 
         cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, {bins, bins, bins}, task.redOptions.rangesCloud)
 
-        ReDim histArray(task.redOptions.histBins3D - 1)
+        ReDim histArray(binSlider - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
         Dim threshold = src.Total * 0.001
@@ -39,7 +40,7 @@ Public Class Hist3Dcloud_Basics : Inherits TaskParent
         'dst2.SetTo(classCount, task.maxDepthMask)
         dst3 = ShowPalette(dst2)
 
-        labels(2) = simK.labels(2) + " with " + CStr(task.redOptions.histBins3D) + " histogram bins"
+        labels(2) = simK.labels(2) + " with " + CStr(binSlider.value) + " histogram bins"
         labels(3) = "LastClassCount/classCount = " + CStr(classCount) + "/" + CStr(classCount)
     End Sub
 End Class
@@ -99,7 +100,8 @@ Public Class Hist3Dcloud_Highlights : Inherits TaskParent
         desc = "Plot the 3D histogram of the depth data"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Dim bins = task.redOptions.HistBinBar3D.Value
+        Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
+        Dim bins = binSlider.Value
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim histInput(src.Total * src.ElemSize - 1) As Byte
@@ -115,7 +117,7 @@ Public Class Hist3Dcloud_Highlights : Inherits TaskParent
                                      rx.Item(1), ry.Item(1), rz.Item(1))
         handleInput.Free()
 
-        histogram = cv.Mat.FromPixelData(task.redOptions.histBins3D, 1, cv.MatType.CV_32F, dstPtr)
+        histogram = cv.Mat.FromPixelData(binSlider.value, 1, cv.MatType.CV_32F, dstPtr)
 
         ranges = New cv.Rangef() {New cv.Rangef(rx(0), rx(1)), New cv.Rangef(ry(0), ry(1)), New cv.Rangef(rz(0), rz(1))}
 
@@ -155,15 +157,16 @@ Public Class Hist3Dcloud_BP_Filter : Inherits TaskParent
     Public histogram As New cv.Mat
     Dim options As New Options_HistXD
     Public Sub New()
-        task.redOptions.HistBinBar3D.Value = 16
+        OptionParent.FindSlider("Histogram 3D Bins").Value = 16
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
         labels(2) = "Mask of the pointcloud image after backprojection that removes 'blowback' pixels"
         desc = "Backproject a 3D pointcloud histogram after thresholding the bins with the small samples."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
+        Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
         options.Run()
 
-        Dim bins = task.redOptions.HistBinBar3D.Value
+        Dim bins = binSlider.Value
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim histInput(src.Total * 3 - 1) As Single

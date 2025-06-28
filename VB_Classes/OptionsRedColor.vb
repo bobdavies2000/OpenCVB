@@ -21,7 +21,6 @@ Public Class OptionsRedColor
     Public ranges() As cv.Rangef
     Public channelCount As Integer
     Public histBinList() As Integer
-    Public histBins3D As Integer
     Public trackingLabel As String
     Public colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions",
                                        "Binarize_DepthTiers", "EdgeLine_Basics", "Hist3DColor_Basics",
@@ -245,11 +244,9 @@ Public Class OptionsRedColor
         task.optionsChanged = True
         depthInputIndex = 1
     End Sub
-    Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar3D.ValueChanged
-        task.optionsChanged = True
-        LabelHistogramBins.Text = CStr(HistBinBar3D.Value)
-        histBins3D = HistBinBar3D.Value * HistBinBar3D.Value * HistBinBar3D.Value
-    End Sub
+
+
+
 
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ColorSource.SelectedIndexChanged
         task.optionsChanged = True
