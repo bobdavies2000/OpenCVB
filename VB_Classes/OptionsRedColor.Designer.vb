@@ -32,9 +32,6 @@ Partial Class OptionsRedColor
         Me.XLabel = New System.Windows.Forms.Label()
         Me.XRangeBar = New System.Windows.Forms.TrackBar()
         Me.Label2 = New System.Windows.Forms.Label()
-        Me.SideLabel = New System.Windows.Forms.Label()
-        Me.ProjectionThresholdBar = New System.Windows.Forms.TrackBar()
-        Me.Label8 = New System.Windows.Forms.Label()
         Me.ReductionTypeGroup = New System.Windows.Forms.GroupBox()
         Me.NoReduction = New System.Windows.Forms.RadioButton()
         Me.BitwiseReduction = New System.Windows.Forms.RadioButton()
@@ -64,13 +61,11 @@ Partial Class OptionsRedColor
         CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.XRangeBar, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.ProjectionThresholdBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ReductionTypeGroup.SuspendLayout()
         Me.ReductionSliders.SuspendLayout()
         CType(Me.BitwiseReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RedCloudOnly.SuspendLayout()
-        Me.GroupBox2.SuspendLayout()
         Me.ColoringGroup.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -176,34 +171,6 @@ Partial Class OptionsRedColor
         Me.Label2.Size = New System.Drawing.Size(115, 20)
         Me.Label2.TabIndex = 9
         Me.Label2.Text = "X-Range X100"
-        '
-        'SideLabel
-        '
-        Me.SideLabel.AutoSize = True
-        Me.SideLabel.Location = New System.Drawing.Point(668, 102)
-        Me.SideLabel.Name = "SideLabel"
-        Me.SideLabel.Size = New System.Drawing.Size(57, 20)
-        Me.SideLabel.TabIndex = 17
-        Me.SideLabel.Text = "Label7"
-        '
-        'ProjectionThresholdBar
-        '
-        Me.ProjectionThresholdBar.Location = New System.Drawing.Point(180, 96)
-        Me.ProjectionThresholdBar.Maximum = 200
-        Me.ProjectionThresholdBar.Name = "ProjectionThresholdBar"
-        Me.ProjectionThresholdBar.Size = New System.Drawing.Size(482, 69)
-        Me.ProjectionThresholdBar.TabIndex = 16
-        Me.ProjectionThresholdBar.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.ProjectionThresholdBar.Value = 10
-        '
-        'Label8
-        '
-        Me.Label8.AutoSize = True
-        Me.Label8.Location = New System.Drawing.Point(21, 96)
-        Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(153, 20)
-        Me.Label8.TabIndex = 15
-        Me.Label8.Text = "Projection Threshold"
         '
         'ReductionTypeGroup
         '
@@ -423,9 +390,6 @@ Partial Class OptionsRedColor
         '
         'GroupBox2
         '
-        Me.GroupBox2.Controls.Add(Me.ProjectionThresholdBar)
-        Me.GroupBox2.Controls.Add(Me.Label8)
-        Me.GroupBox2.Controls.Add(Me.SideLabel)
         Me.GroupBox2.Location = New System.Drawing.Point(12, 4)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(763, 255)
@@ -503,7 +467,6 @@ Partial Class OptionsRedColor
         CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.XRangeBar, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.ProjectionThresholdBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ReductionTypeGroup.ResumeLayout(False)
         Me.ReductionTypeGroup.PerformLayout()
         Me.ReductionSliders.ResumeLayout(False)
@@ -512,8 +475,6 @@ Partial Class OptionsRedColor
         CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.RedCloudOnly.ResumeLayout(False)
         Me.RedCloudOnly.PerformLayout()
-        Me.GroupBox2.ResumeLayout(False)
-        Me.GroupBox2.PerformLayout()
         Me.ColoringGroup.ResumeLayout(False)
         Me.ColoringGroup.PerformLayout()
         Me.ResumeLayout(False)
@@ -527,9 +488,6 @@ Partial Class OptionsRedColor
     Friend WithEvents XLabel As System.Windows.Forms.Label
     Friend WithEvents XRangeBar As System.Windows.Forms.TrackBar
     Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents SideLabel As System.Windows.Forms.Label
-    Friend WithEvents ProjectionThresholdBar As System.Windows.Forms.TrackBar
-    Friend WithEvents Label8 As System.Windows.Forms.Label
     Friend WithEvents ReductionTypeGroup As System.Windows.Forms.GroupBox
     Friend WithEvents BitwiseReduction As System.Windows.Forms.RadioButton
     Friend WithEvents UseSimpleReduction As System.Windows.Forms.RadioButton

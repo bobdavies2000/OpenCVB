@@ -96,30 +96,6 @@ End Class
 
 
 
-
-
-
-
-Public Class HeatMap_HotNot : Inherits TaskParent
-    Dim heat As New HeatMap_Hot
-    Public Sub New()
-        labels = {"", "", "Mask of cool areas in the heat map - top view", "Mask of cool areas in the heat map - side view"}
-        desc = "Isolate points with low histogram values in side and top views"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        heat.Run(src)
-        dst0 = heat.dst2.ConvertScaleAbs
-        dst1 = heat.dst3.ConvertScaleAbs
-        dst2 = dst0.Threshold(task.redOptions.ProjectionThresholdBar.Value, 255, cv.ThresholdTypes.Binary)
-        dst3 = dst1.Threshold(task.redOptions.ProjectionThresholdBar.Value, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class HeatMap_Hot : Inherits TaskParent
     Dim histTop As New Projection_HistTop
     Dim histSide As New Projection_HistSide
@@ -182,7 +158,6 @@ End Class
 Public Class HeatMap_GuidedBP : Inherits TaskParent
     Dim guided As New GuidedBP_Basics
     Public Sub New()
-        task.redOptions.setProjection(1)
         desc = "This is just a placeholder to make it easy to find the GuidedBP_Basics which shows objects in top/side views."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

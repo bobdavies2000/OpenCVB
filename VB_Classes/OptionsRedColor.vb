@@ -119,8 +119,6 @@ Public Class OptionsRedColor
         task.sideCameraPoint = New cv.Point(0, CInt(task.dst2.Height / 2))
         task.topCameraPoint = New cv.Point(CInt(task.dst2.Width / 2), 0)
 
-        task.projectionThreshold = ProjectionThresholdBar.Value
-
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
         Dim rz = New cv.Vec2f(0, task.MaxZmeters)
@@ -182,10 +180,6 @@ Public Class OptionsRedColor
         task.optionsChanged = True
         task.yRange = YRangeSlider.Value / 100
         YLabel.Text = CStr(YRangeSlider.Value)
-    End Sub
-    Private Sub ProjectionThreshold_ValueChanged(sender As Object, e As EventArgs) Handles ProjectionThresholdBar.ValueChanged
-        task.optionsChanged = True
-        SideLabel.Text = CStr(ProjectionThresholdBar.Value)
     End Sub
 
 
@@ -297,9 +291,6 @@ Public Class OptionsRedColor
     End Function
     Public Sub checkBitReduction(newVal As Boolean)
         BitwiseReduction.Checked = newVal
-    End Sub
-    Public Sub setProjection(val As Integer)
-        ProjectionThresholdBar.Value = val
     End Sub
     Public Sub setXRangeSlider(val As Integer)
         XRangeBar.Value = val

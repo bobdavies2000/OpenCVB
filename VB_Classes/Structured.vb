@@ -487,7 +487,6 @@ Public Class Structured_CountSideSum : Inherits TaskParent
     Public maxCountIndex As Integer
     Public yValues As New List(Of Single)
     Public Sub New()
-        task.redOptions.ProjectionThresholdBar.Value += 50 ' to get the point cloud into the histogram.
         labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
         desc = "Count the number of points found in each slice of the point cloud data."
     End Sub
