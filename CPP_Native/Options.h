@@ -2183,7 +2183,7 @@ public:
 class Options_Sobel {
 public:
 	int kernelSize =  3;
-	int sobelThreshold =  250;
+	int sobelThreshold =  150;
 	int distanceThreshold =  10;
 	double derivativeRange =  0.1;
 	bool horizontalDerivative = true;

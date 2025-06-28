@@ -1380,6 +1380,21 @@ End Class
 
 
 
+'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edge_SobelQT : Inherits TaskParent
+    Public Sub New()
+        desc = "Show Sobel vertical and horizontal edge detection no options."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst0 = task.grayStable.Sobel(cv.MatType.CV_32F, 1, 0, 3)
+        dst1 = task.grayStable.Sobel(cv.MatType.CV_32F, 0, 1, 3)
+        Dim diagonal = task.grayStable.Sobel(cv.MatType.CV_32F, 1, 1, 3)
+        dst2 = (dst1 + dst0 + diagonal).ToMat.ConvertScaleAbs()
+    End Sub
+End Class
+
+
+
 
 
 
@@ -1395,34 +1410,9 @@ Public Class Edge_Sobel : Inherits TaskParent
         dst0 = src.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
         If options.horizontalDerivative And options.verticalDerivative Then
             dst1 = src.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
-            If standaloneTest() Then
-                dst2 = ShowAddweighted(dst1, dst0, labels(2))
-            Else
-                dst2 = (dst1 + dst0).ToMat.ConvertScaleAbs()
-            End If
+            dst2 = (dst1 + dst0).ToMat.ConvertScaleAbs()
         Else
             dst2 = dst0.ConvertScaleAbs()
         End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_SobelQT : Inherits TaskParent
-    Public Sub New()
-        desc = "Show Sobel vertical and horizontal edge detection no options."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst0 = task.grayStable.Sobel(cv.MatType.CV_32F, 1, 0, 3)
-        dst1 = task.grayStable.Sobel(cv.MatType.CV_32F, 0, 1, 3)
-        Dim diagonal = task.grayStable.Sobel(cv.MatType.CV_32F, 1, 1, 3)
-        dst2 = (dst1 + dst0 + diagonal).ToMat.ConvertScaleAbs()
     End Sub
 End Class

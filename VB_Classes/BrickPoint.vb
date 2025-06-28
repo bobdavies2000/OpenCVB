@@ -2,6 +2,7 @@
 Public Class BrickPoint_Basics : Inherits TaskParent
     Public sobel As New Edge_Sobel
     Public intensityFeatures As New List(Of cv.Point2f)
+    Public bpFeatures As New List(Of cv.Point)
     Public Sub New()
         task.brickRunFlag = True
         labels(3) = "Sobel input to BrickPoint_Basics"
@@ -14,12 +15,16 @@ Public Class BrickPoint_Basics : Inherits TaskParent
         dst3 = sobel.dst2
 
         intensityFeatures.Clear()
+        bpFeatures.Clear()
         For Each brick In task.bricks.brickList
             Dim mm = GetMinMax(dst3(brick.rect))
             brick.pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
             brick.feature = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
             brick.intensity = mm.maxVal
-            If brick.intensity >= sobel.options.sobelThreshold Then intensityFeatures.Add(brick.feature)
+            If brick.intensity >= sobel.options.sobelThreshold Then
+                bpFeatures.Add(brick.feature)
+                intensityFeatures.Add(brick.feature)
+            End If
         Next
 
         For Each pt In intensityFeatures
@@ -27,11 +32,9 @@ Public Class BrickPoint_Basics : Inherits TaskParent
         Next
 
         labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(intensityFeatures.Count) +
-                    " had the maximum intensity (255). "
+                    " had brickpoint intensity >= " + CStr(sobel.options.sobelThreshold)
     End Sub
 End Class
-
-
 
 
 

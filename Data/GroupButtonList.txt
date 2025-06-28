@@ -156,6 +156,7 @@ MeanShift
 MeanSubtraction
 Mesh
 MiniCloud
+MinMath
 ML
 Model
 Moments

@@ -510,7 +510,7 @@ Public Class brickData
     Public mm As mmData ' min and max values of the depth data.
     Public corners As New List(Of cv.Point3f)
     Public feature As cv.Point ' the max grid output from the current image
-    Public intensity As Byte ' sobel maximum intensity in this brick.
+    Public intensity As Integer ' sobel maximum intensity in this brick.
     Public pt As cv.Point ' Brick's Sobel maximum in absolute coordinates.
     Sub New()
     End Sub
@@ -628,7 +628,7 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public slope As Single
     Public yIntercept As Single
     Public center As cv.Point2f
-    Public thickness As Single = 10.0
+    Public thickness As Single = 3
     Public matchRect1 As cv.Rect
     Public matchRect2 As cv.Rect
     Public template As New cv.Mat

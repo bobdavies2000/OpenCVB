@@ -2,6 +2,7 @@ Imports System.Text.RegularExpressions
 Imports cv = OpenCvSharp
 Public Class LineRGB_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
+    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public lpLastList As New List(Of lpData)
     Public rawLines As New LineRGB_Raw
     Public minAge As Integer = 5 ' line has to be around for a little while before it is recorded as a line.
@@ -27,10 +28,12 @@ Public Class LineRGB_Basics : Inherits TaskParent
 
         lpList.Clear()
         dst2 = src
+        lpMap.SetTo(0)
         For Each lp In sortlines.Values
             lp.index = lpList.Count
             lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            lpMap.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth * 3, cv.LineTypes.Link8)
 
             If standaloneTest() Then
                 For i As Integer = 0 To 3
@@ -40,6 +43,7 @@ Public Class LineRGB_Basics : Inherits TaskParent
             If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
 
+        If standaloneTest() Then dst1 = ShowPalette(lpMap)
         lpLastList = New List(Of lpData)(lpList)
         labels(2) = "Of the " + CStr(rawLines.lpList.Count) + " raw lines found, shown below are the " + CStr(lpList.Count) + " longest."
     End Sub
