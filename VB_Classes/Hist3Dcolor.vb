@@ -117,15 +117,17 @@ Public Class Hist3Dcolor_ZeroGroups : Inherits TaskParent
     Public maskInput As New cv.Mat
     Public classCount As Integer
     Public histogram As New cv.Mat
+    Dim options As New Options_Hist3D
     Public Sub New()
         desc = "Breakdown the 3D histogram using the '0' entries as boundaries between clusters."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         If src.Channels() <> 3 Then src = task.color
 
         If task.optionsChanged Then
-            Dim bins = binSlider.Value
+            Dim bins = options.histogram3DBins
             Dim hBins() As Integer = {bins, bins, bins}
             cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, task.redOptions.rangesBGR)
 
@@ -233,20 +235,22 @@ Public Class Hist3Dcolor_Basics_CPP : Inherits TaskParent
     Public histogram1D As New cv.Mat
     Public simK As New Hist3D_BuildHistogram
     Public classCount As Integer
+    Dim options As New Options_Hist3D
     Public Sub New()
         desc = "Build a 3D histogram from the BGR image and sort it by histogram entry size."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         Dim histInput(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, histInput, 0, histInput.Length)
 
         Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
-        Dim bins = binSlider.Value
+        Dim bins = options.histogram3DBins
         Dim imagePtr = Hist3Dcolor_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins)
         handleInput.Free()
 
-        histogram = cv.Mat.FromPixelData(binSlider.value, 1, cv.MatType.CV_32F, imagePtr)
+        histogram = cv.Mat.FromPixelData(bins, 1, cv.MatType.CV_32F, imagePtr)
         If prepareImage Then
             Dim histArray(histogram.Total - 1) As Single
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -305,17 +309,16 @@ Public Class Hist3Dcolor_Vector : Inherits TaskParent
     Public histArray() As Single
     Public simK As New Hist3D_BuildHistogram
     Dim binArray() As Integer
+    Dim options As New Options_Hist3D
     Public Sub New()
-        Dim bins = OptionParent.FindSlider("Histogram 3D Bins").Value
-        binArray = {bins, bins, bins}
         desc = "Capture a 3D color histogram for input src - likely to be src(rect)."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         If src.Channels() <> 3 Then src = task.color
         If task.optionsChanged Then
-            Dim bins = binSlider.Value
-            binArray = {bins, bins, bins}
+            binArray = {options.histogram3DBins, options.histogram3DBins, options.histogram3DBins}
         End If
 
         cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, binArray, task.redOptions.rangesBGR)

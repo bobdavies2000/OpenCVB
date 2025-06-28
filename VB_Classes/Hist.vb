@@ -1511,7 +1511,7 @@ Public Class Hist_PointCloud : Inherits TaskParent
         task.redOptions.Sync() ' make sure settings are consistent
 
         cv.Cv2.CalcHist({task.pointCloud}, task.redOptions.channels, New cv.Mat(), histogram, task.redOptions.channelCount,
-                        task.redOptions.histBinList, task.redOptions.ranges)
+                         task.redOptions.histBinList, task.redOptions.ranges)
 
         Select Case task.redOptions.PointCloudReductionLabel
             Case "X Reduction", "Y Reduction", "Z Reduction"

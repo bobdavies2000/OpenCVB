@@ -165,13 +165,15 @@ Public Class Hist3D_Pixel : Inherits TaskParent
     Public histogram As New cv.Mat
     Public histArray() As Single
     Public classCount As Integer
+    Dim options As New Options_Hist3D
     Public Sub New()
         desc = "Classify each pixel using a 3D histogram backprojection."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
+        options.Run()
+
         If src.Channels() <> 3 Then src = task.color
-        Dim bins = binSlider.Value
+        Dim bins = options.histogram3DBins
         cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.redOptions.rangesBGR)
 
         ReDim histArray(histogram.Total - 1)
@@ -181,7 +183,7 @@ Public Class Hist3D_Pixel : Inherits TaskParent
             histArray(i) = i + 1
         Next
 
-        classCount = binSlider.value
+        classCount = bins * bins * bins
         Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
 
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
