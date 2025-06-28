@@ -97,7 +97,6 @@ End Class
 
 Public Class XO_Horizon_FindNonZero : Inherits TaskParent
     Public Sub New()
-        task.redOptions.YRangeSlider.Value = 3
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.gravityVec = New lpData(New cv.Point2f(dst2.Width / 2, 0),
@@ -1434,7 +1433,7 @@ End Class
 
 
 Public Class XO_Line_ViewSide : Inherits TaskParent
-    Public autoY As New OpAuto_YRange
+    Public autoY As New XO_OpAuto_YRange
     Dim histSide As New Projection_HistSide
     Dim lines As New LineRGB_RawSorted
     Public Sub New()
@@ -5438,5 +5437,135 @@ Public Class XO_MiniCloud_RotateSinglePass : Inherits TaskParent
         dst3 = peak.dst3
 
         SetTrueText("Peak concentration in the histogram is at angle " + CStr(bestAngle) + " degrees", 3)
+    End Sub
+End Class
+
+
+
+
+Public Class XO_OpAuto_XRange : Inherits TaskParent
+    Public histogram As New cv.Mat
+    Dim adjustedCount As Integer = 0
+    Public Sub New()
+        labels(2) = "Optimized top view to show as many samples as possible."
+        desc = "Automatically adjust the X-Range option of the pointcloud to maximize visible pixels"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim expectedCount = task.depthMask.CountNonZero
+
+        Dim diff = Math.Abs(expectedCount - adjustedCount)
+
+        ' the input is a histogram.  If standaloneTest(), go get one...
+        If standaloneTest() Then
+            cv.Cv2.CalcHist({task.pointCloud}, task.channelsTop, New cv.Mat, histogram, 2, task.bins2D, task.rangesTop)
+            histogram.Row(0).SetTo(0)
+            dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            src = histogram
+        End If
+
+        histogram = src
+        adjustedCount = histogram.Sum()(0)
+
+        strOut = "Adjusted = " + vbTab + CStr(adjustedCount) + "k" + vbCrLf +
+                 "Expected = " + vbTab + CStr(expectedCount) + "k" + vbCrLf +
+                 "Diff = " + vbTab + vbTab + CStr(diff) + vbCrLf +
+                 "xRange = " + vbTab + Format(task.xRange, fmt3)
+
+        If task.useXYRange Then
+            Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
+            Dim leftGap = histogram.Col(0).CountNonZero
+            Dim rightGap = histogram.Col(histogram.Width - 1).CountNonZero
+            'If leftGap = 0 And rightGap = 0 And task.redOptions.XRangeBar.Value > 3 Then
+            '    task.redOptions.XRangeBar.Value -= 1
+            'Else
+            '    If adjustedCount < expectedCount Then task.redOptions.XRangeBar.Value += 1 Else task.redOptions.XRangeBar.Value -= 1
+            'End If
+            task.optionsChanged = saveOptionState
+        End If
+
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_OpAuto_YRange : Inherits TaskParent
+    Public histogram As New cv.Mat
+    Dim adjustedCount As Integer = 0
+    Public Sub New()
+        labels(2) = "Optimized side view to show as much as possible."
+        desc = "Automatically adjust the Y-Range option of the pointcloud to maximize visible pixels"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim expectedCount = task.depthMask.CountNonZero
+
+        Dim diff = Math.Abs(expectedCount - adjustedCount)
+
+        ' the input is a histogram.  If standaloneTest(), go get one...
+        If standaloneTest() Then
+            cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
+            histogram.Col(0).SetTo(0)
+            dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            src = histogram
+        End If
+
+        histogram = src
+        adjustedCount = histogram.Sum()(0)
+
+        strOut = "Adjusted = " + vbTab + CStr(adjustedCount) + "k" + vbCrLf +
+                 "Expected = " + vbTab + CStr(expectedCount) + "k" + vbCrLf +
+                 "Diff = " + vbTab + vbTab + CStr(diff) + vbCrLf +
+                 "yRange = " + vbTab + Format(task.yRange, fmt3)
+
+        If task.useXYRange Then
+            Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
+            Dim topGap = histogram.Row(0).CountNonZero
+            Dim botGap = histogram.Row(histogram.Height - 1).CountNonZero
+            'If topGap = 0 And botGap = 0 And task.redOptions.YRangeSlider.Value > 3 Then
+            '    task.redOptions.YRangeSlider.Value -= 1
+            'Else
+            '    If adjustedCount < expectedCount Then task.redOptions.YRangeSlider.Value += 1 Else task.redOptions.YRangeSlider.Value -= 1
+            'End If
+            task.optionsChanged = saveOptionState
+        End If
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Mat_ToList : Inherits TaskParent
+    Dim autoX As New XO_OpAuto_XRange
+    Dim histTop As New Projection_HistTop
+    Public Sub New()
+        desc = "Convert a Mat to List of points in 2 ways to measure which is better"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        histTop.Run(src)
+
+        autoX.Run(histTop.histogram)
+        dst2 = histTop.histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+
+        Dim ptList As New List(Of cv.Point)
+        If task.gOptions.DebugCheckBox.Checked Then
+            For y = 0 To dst2.Height - 1
+                For x = 0 To dst2.Width - 1
+                    If dst2.Get(Of Byte)(y, x) <> 0 Then ptList.Add(New cv.Point(x, y))
+                Next
+            Next
+        Else
+            Dim points = dst2.FindNonZero()
+            For i = 0 To points.Rows - 1
+                ptList.Add(points.Get(Of cv.Point)(i, 0))
+            Next
+        End If
+
+        labels(2) = "There were " + CStr(ptList.Count) + " points identified"
     End Sub
 End Class

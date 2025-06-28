@@ -497,40 +497,6 @@ End Class
 
 
 
-Public Class Mat_ToList : Inherits TaskParent
-    Dim autoX As New OpAuto_XRange
-    Dim histTop As New Projection_HistTop
-    Public Sub New()
-        desc = "Convert a Mat to List of points in 2 ways to measure which is better"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        histTop.Run(src)
-
-        autoX.Run(histTop.histogram)
-        dst2 = histTop.histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-
-        Dim ptList As New List(Of cv.Point)
-        If task.gOptions.DebugCheckBox.Checked Then
-            For y = 0 To dst2.Height - 1
-                For x = 0 To dst2.Width - 1
-                    If dst2.Get(Of Byte)(y, x) <> 0 Then ptList.Add(New cv.Point(x, y))
-                Next
-            Next
-        Else
-            Dim points = dst2.FindNonZero()
-            For i = 0 To points.Rows - 1
-                ptList.Add(points.Get(Of cv.Point)(i, 0))
-            Next
-        End If
-
-        labels(2) = "There were " + CStr(ptList.Count) + " points identified"
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class Mat_FindNearZero : Inherits TaskParent

@@ -22,16 +22,6 @@ Partial Class OptionsRedColor
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.RedCloudSliders = New System.Windows.Forms.GroupBox()
-        Me.LabelHistogramBins = New System.Windows.Forms.Label()
-        Me.HistBinBar3D = New System.Windows.Forms.TrackBar()
-        Me.Label7 = New System.Windows.Forms.Label()
-        Me.YLabel = New System.Windows.Forms.Label()
-        Me.YRangeSlider = New System.Windows.Forms.TrackBar()
-        Me.Label4 = New System.Windows.Forms.Label()
-        Me.XLabel = New System.Windows.Forms.Label()
-        Me.XRangeBar = New System.Windows.Forms.TrackBar()
-        Me.Label2 = New System.Windows.Forms.Label()
         Me.ReductionTypeGroup = New System.Windows.Forms.GroupBox()
         Me.NoReduction = New System.Windows.Forms.RadioButton()
         Me.BitwiseReduction = New System.Windows.Forms.RadioButton()
@@ -51,126 +41,24 @@ Partial Class OptionsRedColor
         Me.ZReduction = New System.Windows.Forms.RadioButton()
         Me.YReduction = New System.Windows.Forms.RadioButton()
         Me.XReduction = New System.Windows.Forms.RadioButton()
-        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
         Me.ColoringGroup = New System.Windows.Forms.GroupBox()
         Me.TrackingColor = New System.Windows.Forms.RadioButton()
         Me.TrackingMeanColor = New System.Windows.Forms.RadioButton()
-        Me.RedCloudSliders.SuspendLayout()
-        CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.XRangeBar, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.HistBinBar3D = New System.Windows.Forms.TrackBar()
+        Me.LabelHistogramBins = New System.Windows.Forms.Label()
+        Me.RedCloudSliders = New System.Windows.Forms.GroupBox()
         Me.ReductionTypeGroup.SuspendLayout()
         Me.ReductionSliders.SuspendLayout()
         CType(Me.BitwiseReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RedCloudOnly.SuspendLayout()
         Me.ColoringGroup.SuspendLayout()
+        CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.RedCloudSliders.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'RedCloudSliders
-        '
-        Me.RedCloudSliders.Controls.Add(Me.LabelHistogramBins)
-        Me.RedCloudSliders.Controls.Add(Me.HistBinBar3D)
-        Me.RedCloudSliders.Controls.Add(Me.Label7)
-        Me.RedCloudSliders.Controls.Add(Me.YLabel)
-        Me.RedCloudSliders.Controls.Add(Me.YRangeSlider)
-        Me.RedCloudSliders.Controls.Add(Me.Label4)
-        Me.RedCloudSliders.Controls.Add(Me.XLabel)
-        Me.RedCloudSliders.Controls.Add(Me.XRangeBar)
-        Me.RedCloudSliders.Controls.Add(Me.Label2)
-        Me.RedCloudSliders.Location = New System.Drawing.Point(12, 318)
-        Me.RedCloudSliders.Name = "RedCloudSliders"
-        Me.RedCloudSliders.Size = New System.Drawing.Size(763, 242)
-        Me.RedCloudSliders.TabIndex = 2
-        Me.RedCloudSliders.TabStop = False
-        '
-        'LabelHistogramBins
-        '
-        Me.LabelHistogramBins.AutoSize = True
-        Me.LabelHistogramBins.Location = New System.Drawing.Point(668, 22)
-        Me.LabelHistogramBins.Name = "LabelHistogramBins"
-        Me.LabelHistogramBins.Size = New System.Drawing.Size(57, 20)
-        Me.LabelHistogramBins.TabIndex = 32
-        Me.LabelHistogramBins.Text = "Label5"
-        '
-        'HistBinBar3D
-        '
-        Me.HistBinBar3D.Location = New System.Drawing.Point(156, 15)
-        Me.HistBinBar3D.Maximum = 16
-        Me.HistBinBar3D.Minimum = 2
-        Me.HistBinBar3D.Name = "HistBinBar3D"
-        Me.HistBinBar3D.Size = New System.Drawing.Size(506, 69)
-        Me.HistBinBar3D.TabIndex = 31
-        Me.HistBinBar3D.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.HistBinBar3D.Value = 4
-        '
-        'Label7
-        '
-        Me.Label7.Location = New System.Drawing.Point(8, 22)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(152, 48)
-        Me.Label7.TabIndex = 30
-        Me.Label7.Text = "3D Histogram Bins"
-        '
-        'YLabel
-        '
-        Me.YLabel.AutoSize = True
-        Me.YLabel.Location = New System.Drawing.Point(668, 168)
-        Me.YLabel.Name = "YLabel"
-        Me.YLabel.Size = New System.Drawing.Size(57, 20)
-        Me.YLabel.TabIndex = 14
-        Me.YLabel.Text = "Label3"
-        '
-        'YRangeSlider
-        '
-        Me.YRangeSlider.Location = New System.Drawing.Point(156, 161)
-        Me.YRangeSlider.Maximum = 1000
-        Me.YRangeSlider.Minimum = 3
-        Me.YRangeSlider.Name = "YRangeSlider"
-        Me.YRangeSlider.Size = New System.Drawing.Size(506, 69)
-        Me.YRangeSlider.TabIndex = 13
-        Me.YRangeSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.YRangeSlider.Value = 5
-        '
-        'Label4
-        '
-        Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(8, 168)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(115, 20)
-        Me.Label4.TabIndex = 12
-        Me.Label4.Text = "Y-Range X100"
-        '
-        'XLabel
-        '
-        Me.XLabel.AutoSize = True
-        Me.XLabel.Location = New System.Drawing.Point(668, 94)
-        Me.XLabel.Name = "XLabel"
-        Me.XLabel.Size = New System.Drawing.Size(57, 20)
-        Me.XLabel.TabIndex = 11
-        Me.XLabel.Text = "Label1"
-        '
-        'XRangeBar
-        '
-        Me.XRangeBar.Location = New System.Drawing.Point(156, 88)
-        Me.XRangeBar.Maximum = 1000
-        Me.XRangeBar.Minimum = 3
-        Me.XRangeBar.Name = "XRangeBar"
-        Me.XRangeBar.Size = New System.Drawing.Size(506, 69)
-        Me.XRangeBar.TabIndex = 10
-        Me.XRangeBar.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.XRangeBar.Value = 5
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(8, 94)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(115, 20)
-        Me.Label2.TabIndex = 9
-        Me.Label2.Text = "X-Range X100"
         '
         'ReductionTypeGroup
         '
@@ -388,15 +276,6 @@ Partial Class OptionsRedColor
         Me.XReduction.Text = "X Reduction"
         Me.XReduction.UseVisualStyleBackColor = True
         '
-        'GroupBox2
-        '
-        Me.GroupBox2.Location = New System.Drawing.Point(12, 4)
-        Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(763, 255)
-        Me.GroupBox2.TabIndex = 9
-        Me.GroupBox2.TabStop = False
-        Me.GroupBox2.Text = "RedCloud Options"
-        '
         'ColorSourceLabel
         '
         Me.ColorSourceLabel.AutoSize = True
@@ -447,6 +326,45 @@ Partial Class OptionsRedColor
         Me.TrackingMeanColor.Text = "Mean Color"
         Me.TrackingMeanColor.UseVisualStyleBackColor = True
         '
+        'Label7
+        '
+        Me.Label7.Location = New System.Drawing.Point(8, 22)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(152, 48)
+        Me.Label7.TabIndex = 30
+        Me.Label7.Text = "3D Histogram Bins"
+        '
+        'HistBinBar3D
+        '
+        Me.HistBinBar3D.Location = New System.Drawing.Point(156, 15)
+        Me.HistBinBar3D.Maximum = 16
+        Me.HistBinBar3D.Minimum = 2
+        Me.HistBinBar3D.Name = "HistBinBar3D"
+        Me.HistBinBar3D.Size = New System.Drawing.Size(506, 69)
+        Me.HistBinBar3D.TabIndex = 31
+        Me.HistBinBar3D.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.HistBinBar3D.Value = 4
+        '
+        'LabelHistogramBins
+        '
+        Me.LabelHistogramBins.AutoSize = True
+        Me.LabelHistogramBins.Location = New System.Drawing.Point(668, 22)
+        Me.LabelHistogramBins.Name = "LabelHistogramBins"
+        Me.LabelHistogramBins.Size = New System.Drawing.Size(57, 20)
+        Me.LabelHistogramBins.TabIndex = 32
+        Me.LabelHistogramBins.Text = "Label5"
+        '
+        'RedCloudSliders
+        '
+        Me.RedCloudSliders.Controls.Add(Me.LabelHistogramBins)
+        Me.RedCloudSliders.Controls.Add(Me.HistBinBar3D)
+        Me.RedCloudSliders.Controls.Add(Me.Label7)
+        Me.RedCloudSliders.Location = New System.Drawing.Point(12, 318)
+        Me.RedCloudSliders.Name = "RedCloudSliders"
+        Me.RedCloudSliders.Size = New System.Drawing.Size(763, 242)
+        Me.RedCloudSliders.TabIndex = 2
+        Me.RedCloudSliders.TabStop = False
+        '
         'OptionsRedColor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -455,18 +373,12 @@ Partial Class OptionsRedColor
         Me.Controls.Add(Me.ColoringGroup)
         Me.Controls.Add(Me.ColorSource)
         Me.Controls.Add(Me.ColorSourceLabel)
-        Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.RedCloudOnly)
         Me.Controls.Add(Me.ReductionSliders)
         Me.Controls.Add(Me.ReductionTypeGroup)
         Me.Controls.Add(Me.RedCloudSliders)
         Me.Name = "OptionsRedColor"
         Me.Text = "OptionsRedCloud"
-        Me.RedCloudSliders.ResumeLayout(False)
-        Me.RedCloudSliders.PerformLayout()
-        CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.XRangeBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ReductionTypeGroup.ResumeLayout(False)
         Me.ReductionTypeGroup.PerformLayout()
         Me.ReductionSliders.ResumeLayout(False)
@@ -477,17 +389,13 @@ Partial Class OptionsRedColor
         Me.RedCloudOnly.PerformLayout()
         Me.ColoringGroup.ResumeLayout(False)
         Me.ColoringGroup.PerformLayout()
+        CType(Me.HistBinBar3D, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.RedCloudSliders.ResumeLayout(False)
+        Me.RedCloudSliders.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents RedCloudSliders As System.Windows.Forms.GroupBox
-    Friend WithEvents YLabel As System.Windows.Forms.Label
-    Friend WithEvents YRangeSlider As System.Windows.Forms.TrackBar
-    Friend WithEvents Label4 As System.Windows.Forms.Label
-    Friend WithEvents XLabel As System.Windows.Forms.Label
-    Friend WithEvents XRangeBar As System.Windows.Forms.TrackBar
-    Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents ReductionTypeGroup As System.Windows.Forms.GroupBox
     Friend WithEvents BitwiseReduction As System.Windows.Forms.RadioButton
     Friend WithEvents UseSimpleReduction As System.Windows.Forms.RadioButton
@@ -507,13 +415,13 @@ Partial Class OptionsRedColor
     Friend WithEvents XYZReduction As System.Windows.Forms.RadioButton
     Friend WithEvents YZReduction As System.Windows.Forms.RadioButton
     Friend WithEvents NoReduction As System.Windows.Forms.RadioButton
-    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
-    Friend WithEvents LabelHistogramBins As System.Windows.Forms.Label
-    Friend WithEvents HistBinBar3D As System.Windows.Forms.TrackBar
-    Friend WithEvents Label7 As System.Windows.Forms.Label
     Friend WithEvents ColorSourceLabel As System.Windows.Forms.Label
     Friend WithEvents ColorSource As System.Windows.Forms.ComboBox
     Friend WithEvents ColoringGroup As Windows.Forms.GroupBox
     Friend WithEvents TrackingColor As Windows.Forms.RadioButton
     Friend WithEvents TrackingMeanColor As Windows.Forms.RadioButton
+    Friend WithEvents Label7 As Windows.Forms.Label
+    Friend WithEvents HistBinBar3D As Windows.Forms.TrackBar
+    Friend WithEvents LabelHistogramBins As Windows.Forms.Label
+    Friend WithEvents RedCloudSliders As Windows.Forms.GroupBox
 End Class

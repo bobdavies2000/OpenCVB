@@ -237,19 +237,13 @@ End Class
 
 
 Public Class BackProject_Side : Inherits TaskParent
-    Dim autoY As New OpAuto_YRange
     Dim histSide As New Projection_HistSide
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Back projection of the hotspots in the Side View"}
         desc = "Display the back projection of the hotspots in the Side View"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        histSide.Run(src)
-        autoY.Run(histSide.histogram)
-
-        dst2 = autoY.histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        Dim histogram = autoY.histogram.SetTo(0, Not dst2)
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogram, dst3, task.rangesSide)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histSide.histogram, dst3, task.rangesSide)
         dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
     End Sub
 End Class

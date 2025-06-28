@@ -1,105 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class OpAuto_XRange : Inherits TaskParent
-    Public histogram As New cv.Mat
-    Dim adjustedCount As Integer = 0
-    Public Sub New()
-        labels(2) = "Optimized top view to show as many samples as possible."
-        desc = "Automatically adjust the X-Range option of the pointcloud to maximize visible pixels"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Dim expectedCount = task.depthMask.CountNonZero
-
-        Dim diff = Math.Abs(expectedCount - adjustedCount)
-
-        ' the input is a histogram.  If standaloneTest(), go get one...
-        If standaloneTest() Then
-            cv.Cv2.CalcHist({task.pointCloud}, task.channelsTop, New cv.Mat, histogram, 2, task.bins2D, task.rangesTop)
-            histogram.Row(0).SetTo(0)
-            dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-            dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-            src = histogram
-        End If
-
-        histogram = src
-        adjustedCount = histogram.Sum()(0)
-
-        strOut = "Adjusted = " + vbTab + CStr(adjustedCount) + "k" + vbCrLf +
-                 "Expected = " + vbTab + CStr(expectedCount) + "k" + vbCrLf +
-                 "Diff = " + vbTab + vbTab + CStr(diff) + vbCrLf +
-                 "xRange = " + vbTab + Format(task.xRange, fmt3)
-
-        If task.useXYRange Then
-            Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
-            Dim leftGap = histogram.Col(0).CountNonZero
-            Dim rightGap = histogram.Col(histogram.Width - 1).CountNonZero
-            If leftGap = 0 And rightGap = 0 And task.redOptions.XRangeBar.Value > 3 Then
-                task.redOptions.XRangeBar.Value -= 1
-            Else
-                If adjustedCount < expectedCount Then task.redOptions.XRangeBar.Value += 1 Else task.redOptions.XRangeBar.Value -= 1
-            End If
-            task.optionsChanged = saveOptionState
-        End If
-
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-Public Class OpAuto_YRange : Inherits TaskParent
-    Public histogram As New cv.Mat
-    Dim adjustedCount As Integer = 0
-    Public Sub New()
-        labels(2) = "Optimized side view to show as much as possible."
-        desc = "Automatically adjust the Y-Range option of the pointcloud to maximize visible pixels"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Dim expectedCount = task.depthMask.CountNonZero
-
-        Dim diff = Math.Abs(expectedCount - adjustedCount)
-
-        ' the input is a histogram.  If standaloneTest(), go get one...
-        If standaloneTest() Then
-            cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
-            histogram.Col(0).SetTo(0)
-            dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-            dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-            src = histogram
-        End If
-
-        histogram = src
-        adjustedCount = histogram.Sum()(0)
-
-        strOut = "Adjusted = " + vbTab + CStr(adjustedCount) + "k" + vbCrLf +
-                 "Expected = " + vbTab + CStr(expectedCount) + "k" + vbCrLf +
-                 "Diff = " + vbTab + vbTab + CStr(diff) + vbCrLf +
-                 "yRange = " + vbTab + Format(task.yRange, fmt3)
-
-        If task.useXYRange Then
-            Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
-            Dim topGap = histogram.Row(0).CountNonZero
-            Dim botGap = histogram.Row(histogram.Height - 1).CountNonZero
-            If topGap = 0 And botGap = 0 And task.redOptions.YRangeSlider.Value > 3 Then
-                task.redOptions.YRangeSlider.Value -= 1
-            Else
-                If adjustedCount < expectedCount Then task.redOptions.YRangeSlider.Value += 1 Else task.redOptions.YRangeSlider.Value -= 1
-            End If
-            task.optionsChanged = saveOptionState
-        End If
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class OpAuto_Valley : Inherits TaskParent
     Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public options As New Options_Boundary
@@ -108,7 +8,7 @@ Public Class OpAuto_Valley : Inherits TaskParent
         If standalone Then task.gOptions.setHistogramBins(256)
         desc = "Get the top X highest quality valley points in the histogram."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         Dim desiredBoundaries = options.desiredBoundaries
 
@@ -246,43 +146,5 @@ Public Class OpAuto_Peaks2DGrid : Inherits TaskParent
 
         dst2.SetTo(white, task.gridMask)
         labels(3) = CStr(pointPop.Count) + " grid samples trimmed to " + CStr(clusterPoints.Count)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-Public Class OpAuto_PixelDifference : Inherits TaskParent
-    Dim diff As New Diff_Basics
-    Public Sub New()
-        task.gOptions.pixelDiffThreshold = 2 ' set it low so it will move up to the right value.
-        labels = {"", "", "2D Histogram view with highlighted peaks", ""}
-        desc = "Find the peaks in a 2D histogram"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        If not task.heartBeat And task.frameCount > 10 Then Exit Sub
-        If standaloneTest() Then
-            diff.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            src = diff.dst2
-        End If
-
-        Dim gridCount As Integer
-        For Each roi In task.gridRects
-            If src(roi).CountNonZero Then gridCount += 1
-        Next
-
-        If task.gOptions.pixelDiffThreshold < task.gOptions.PixelDiffBar.Maximum Then
-            If gridCount > task.gridRects.Count / 10 Then task.gOptions.pixelDiffThreshold += 1
-        End If
-        If gridCount = 0 And task.gOptions.pixelDiffThreshold > 1 Then task.gOptions.pixelDiffThreshold -= 1
-        SetTrueText("Color difference threshold is at " + CStr(task.gOptions.pixelDiffThreshold))
-        dst2 = src
     End Sub
 End Class

@@ -74,9 +74,6 @@ Public Class OptionsRedColor
             End Select
         End If
 
-        XRangeBar.Value = task.xRange * 100
-        YRangeSlider.Value = task.yRange * 100
-
         task.xRangeDefault = task.xRange
         task.yRangeDefault = task.yRange
 
@@ -166,20 +163,6 @@ Public Class OptionsRedColor
 
         SimpleReductionBar.Enabled = Not BitwiseReduction.Checked
         BitwiseReductionBar.Enabled = BitwiseReduction.Checked
-    End Sub
-
-
-
-
-    Private Sub XRangeSlider_ValueChanged(sender As Object, e As EventArgs) Handles XRangeBar.ValueChanged
-        task.optionsChanged = True
-        task.xRange = XRangeBar.Value / 100
-        XLabel.Text = CStr(XRangeBar.Value)
-    End Sub
-    Private Sub YRangeSlider_ValueChanged(sender As Object, e As EventArgs) Handles YRangeSlider.ValueChanged
-        task.optionsChanged = True
-        task.yRange = YRangeSlider.Value / 100
-        YLabel.Text = CStr(YRangeSlider.Value)
     End Sub
 
 
@@ -292,13 +275,6 @@ Public Class OptionsRedColor
     Public Sub checkBitReduction(newVal As Boolean)
         BitwiseReduction.Checked = newVal
     End Sub
-    Public Sub setXRangeSlider(val As Integer)
-        XRangeBar.Value = val
-    End Sub
-    Public Function getXRangeSlider() As Integer
-        Return XRangeBar.Value
-    End Function
-
 
 
 
