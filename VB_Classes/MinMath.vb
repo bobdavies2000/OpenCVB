@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class MinMath_Line : Inherits TaskParent
     Dim bPoints As New BrickPoint_Basics
     Public lpList As New List(Of lpData) ' lines after being checked with brick points.
@@ -92,6 +93,26 @@ Public Class MinMath_EdgeLine : Inherits TaskParent
             Dim val = dst3.Get(Of Byte)(bp.Y, bp.X)
             If val = 0 Then Continue For
             dst3.Circle(bp, task.DotSize, 255, -1, task.lineType)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class MinMath_Neighbors : Inherits TaskParent
+    Dim bPoints As New BrickPoint_Basics
+    Public Sub New()
+        desc = "Connect each brick to its neighbors"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        bPoints.Run(src)
+        dst2 = bPoints.dst2
+        labels(2) = bPoints.labels(2)
+
+        For Each brick In task.bricks.brickList
         Next
     End Sub
 End Class
