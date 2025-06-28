@@ -87,6 +87,8 @@ Public Class Grid_Basics : Inherits TaskParent
                     If r.Y + r.Height >= dst2.Height Then r.Y = dst2.Height - cellSize * 3
                     r.Height = cellSize * 3
                 End If
+                If r.Width <> cellSize * 3 Then r.Width = cellSize * 3
+                If r.Height <> cellSize * 3 Then r.Height = cellSize * 3
                 task.gridNabeRects.Add(r)
             Next
 

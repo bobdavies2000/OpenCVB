@@ -492,8 +492,6 @@ Public Class brickData
     Public color As cv.Vec3f
     Public correlation As Single
     Public index As Integer
-    Public contourFull As Integer
-    Public contourPartial As Integer
 
     Public rect As cv.Rect ' rectange under the cursor in the color image.
     Public lRect As New cv.Rect ' Intel RealSense camera use this. They don't align left and color automatically.

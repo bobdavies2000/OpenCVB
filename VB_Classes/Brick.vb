@@ -57,8 +57,6 @@ Public Class Brick_Basics : Inherits TaskParent
                     ' no need to recompute everything when there is no motion in the cell.
                     brick = brickLast(i)
                     brick.age = task.motionBasics.cellAge(i)
-                    brick.contourFull = 0
-                    brick.contourPartial = 0
                 Else
                     If task.rgbLeftAligned Then
                         brick.rRect = brick.rect
