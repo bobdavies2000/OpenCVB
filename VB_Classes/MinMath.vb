@@ -1,6 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class MinMath_Line : Inherits TaskParent
     Dim bPoints As New BrickPoint_Basics
+    Public lpList As New List(Of lpData) ' lines after being checked with brick points.
     Public Sub New()
         desc = "Track lines with brickpoints."
     End Sub
@@ -21,17 +22,21 @@ Public Class MinMath_Line : Inherits TaskParent
             bpList(val).Add(bp)
         Next
 
+        dst3.SetTo(0)
+        lpList.Clear()
         For i = 0 To bpList.Count - 1
             If bpList(i) Is Nothing Then Continue For
             Dim p1 = bpList(i)(0)
-            Dim p2 = bpList(i)(bplist(i).Count -1)
+            Dim p2 = bpList(i)(bpList(i).Count - 1)
             dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+            Dim lp = New lpData(p1, p2)
+            lp.index = lpList.Count + 1
+            lpList.Add(lp)
+            dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
         Next
 
-        dst3.SetTo(0)
         For Each index In linesFound
             Dim lp = task.lineRGB.lpList(index - 1)
-            dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
         labels(3) = CStr(linesFound.Count) + " lines were confirmed by brick points."
     End Sub

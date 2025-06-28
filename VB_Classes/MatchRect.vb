@@ -39,7 +39,7 @@ Public Class MatchRect_RedCloud : Inherits TaskParent
     Public Sub New()
         desc = "Track a RedCloud cell using MatchTemplate."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
         task.ClickPoint = task.rcD.maxDist
 
@@ -54,3 +54,5 @@ Public Class MatchRect_RedCloud : Inherits TaskParent
                     " - Red = current gravity vector, yellow is matchLine output"
     End Sub
 End Class
+
+

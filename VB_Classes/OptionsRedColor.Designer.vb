@@ -58,7 +58,6 @@ Partial Class OptionsRedColor
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
         Me.ColoringGroup = New System.Windows.Forms.GroupBox()
-        Me.TrackingDepthColor = New System.Windows.Forms.RadioButton()
         Me.TrackingColor = New System.Windows.Forms.RadioButton()
         Me.TrackingMeanColor = New System.Windows.Forms.RadioButton()
         Me.RedCloudSliders.SuspendLayout()
@@ -453,26 +452,14 @@ Partial Class OptionsRedColor
         '
         'ColoringGroup
         '
-        Me.ColoringGroup.Controls.Add(Me.TrackingDepthColor)
         Me.ColoringGroup.Controls.Add(Me.TrackingColor)
         Me.ColoringGroup.Controls.Add(Me.TrackingMeanColor)
         Me.ColoringGroup.Location = New System.Drawing.Point(1046, 23)
         Me.ColoringGroup.Name = "ColoringGroup"
-        Me.ColoringGroup.Size = New System.Drawing.Size(220, 155)
+        Me.ColoringGroup.Size = New System.Drawing.Size(220, 103)
         Me.ColoringGroup.TabIndex = 78
         Me.ColoringGroup.TabStop = False
         Me.ColoringGroup.Text = "RedCloud Output Color"
-        '
-        'TrackingDepthColor
-        '
-        Me.TrackingDepthColor.AutoSize = True
-        Me.TrackingDepthColor.Location = New System.Drawing.Point(15, 89)
-        Me.TrackingDepthColor.Name = "TrackingDepthColor"
-        Me.TrackingDepthColor.Size = New System.Drawing.Size(183, 24)
-        Me.TrackingDepthColor.TabIndex = 4
-        Me.TrackingDepthColor.TabStop = True
-        Me.TrackingDepthColor.Text = "Depth Tracking Color"
-        Me.TrackingDepthColor.UseVisualStyleBackColor = True
         '
         'TrackingColor
         '
@@ -490,13 +477,13 @@ Partial Class OptionsRedColor
         Me.TrackingMeanColor.AutoSize = True
         Me.TrackingMeanColor.Location = New System.Drawing.Point(15, 29)
         Me.TrackingMeanColor.Name = "TrackingMeanColor"
-        Me.TrackingMeanColor.Size = New System.Drawing.Size(112, 24)
+        Me.TrackingMeanColor.Size = New System.Drawing.Size(115, 24)
         Me.TrackingMeanColor.TabIndex = 0
         Me.TrackingMeanColor.TabStop = True
-        Me.TrackingMeanColor.Text = "Mean color"
+        Me.TrackingMeanColor.Text = "Mean Color"
         Me.TrackingMeanColor.UseVisualStyleBackColor = True
         '
-        'OptionsRedCloud
+        'OptionsRedColor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -509,7 +496,7 @@ Partial Class OptionsRedColor
         Me.Controls.Add(Me.ReductionSliders)
         Me.Controls.Add(Me.ReductionTypeGroup)
         Me.Controls.Add(Me.RedCloudSliders)
-        Me.Name = "OptionsRedCloud"
+        Me.Name = "OptionsRedColor"
         Me.Text = "OptionsRedCloud"
         Me.RedCloudSliders.ResumeLayout(False)
         Me.RedCloudSliders.PerformLayout()
@@ -569,7 +556,6 @@ Partial Class OptionsRedColor
     Friend WithEvents ColorSourceLabel As System.Windows.Forms.Label
     Friend WithEvents ColorSource As System.Windows.Forms.ComboBox
     Friend WithEvents ColoringGroup As Windows.Forms.GroupBox
-    Friend WithEvents TrackingDepthColor As Windows.Forms.RadioButton
     Friend WithEvents TrackingColor As Windows.Forms.RadioButton
     Friend WithEvents TrackingMeanColor As Windows.Forms.RadioButton
 End Class

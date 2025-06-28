@@ -50,21 +50,17 @@ Public Module vbc
         task.redC.rcList.Clear()
         task.redC.rcList.Add(New rcData) ' placeholder rcData so map is correct.
         task.redC.rcMap.SetTo(0)
-        Static saveColorSetting = task.redOptions.trackingIndex
+        Static saveColorSetting = task.redOptions.trackingLabel
         For Each rc In sortedCells.Values
             rc.index = task.redC.rcList.Count
 
-            If saveColorSetting <> task.redOptions.trackingIndex Then rc.color = black
-            Select Case task.redOptions.trackingIndex
-                Case trackColor.meanColor
+            If saveColorSetting <> task.redOptions.trackingLabel Then rc.color = black
+            Select Case task.redOptions.trackingLabel
+                Case "Mean Color"
                     Dim colorStdev As cv.Scalar
                     cv.Cv2.MeanStdDev(task.color(rc.rect), rc.color, colorStdev, rc.mask)
-                Case trackColor.tracking
+                Case "Tracking Color"
                     If rc.color = black Then rc.color = task.scalarColors(rc.index)
-                Case trackColor.colorWithDepth
-                    If rc.depth > task.MaxZmeters Then rc.depth = task.MaxZmeters
-                    Dim index = CInt(255 * rc.depth / task.MaxZmeters)
-                    rc.color = task.vecColors(index)
             End Select
 
             task.redC.rcList.Add(rc)
@@ -72,7 +68,7 @@ Public Module vbc
             DisplayCells.Circle(rc.maxDStable, task.DotSize, task.highlight, -1)
             If rc.index >= 255 Then Exit For
         Next
-        saveColorSetting = task.redOptions.trackingIndex
+        saveColorSetting = task.redOptions.trackingLabel
         task.redC.rcMap.SetTo(0, task.noDepthMask)
         Return DisplayCells()
     End Function
