@@ -19,7 +19,7 @@ Public Class Hist3D_Basics : Inherits TaskParent
         hCloud.dst2 += hColor.classCount + 1
         hCloud.dst2.SetTo(0, task.noDepthMask)
 
-        If options.addCloud Then dst2 += hCloud.dst2 Else hCloud.dst2.CopyTo(dst2, task.depthMask)
+        hCloud.dst2.CopyTo(dst2, task.depthMask)
         classCount = hColor.classCount + hCloud.classCount
 
         dst3 = ShowPalette(dst2)

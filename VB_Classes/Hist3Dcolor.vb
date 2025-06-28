@@ -9,10 +9,13 @@ Public Class Hist3Dcolor_Basics : Inherits TaskParent
     Public simK As New Hist3D_BuildHistogram
     Public alwaysRun As Boolean
     Public noMotionMask As Boolean
+    Public options As New Options_Hist3D
     Public Sub New()
         desc = "Capture a 3D color histogram, find the gaps, and backproject the clusters found."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         If src.Type <> cv.MatType.CV_8UC3 Then src = task.color
         If task.heartBeat Or alwaysRun Or histogram.Width = 0 Then
             Dim bins = task.redOptions.HistBinBar3D.Value

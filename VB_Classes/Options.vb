@@ -5430,26 +5430,6 @@ End Class
 
 
 
-Public Class Options_Hist3D : Inherits OptionParent
-    Public addCloud As Boolean = True
-    Public Sub New()
-        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Add color and cloud 8UC1")
-            radio.addRadio("Copy cloud into color 8UC1")
-            radio.check(0).Checked = True
-        End If
-    End Sub
-    Public Sub Run()
-        Static addRadio = findRadio("Add color and cloud 8UC1")
-        addCloud = addRadio.checked
-    End Sub
-End Class
-
-
-
-
-
 Public Class Options_HOG : Inherits OptionParent
     Public thresholdHOG As Integer = 0
     Public strideHOG As Integer = 1
@@ -7998,5 +7978,20 @@ Public Class Options_Sobel : Inherits OptionParent
         useBlur = checkBlur.checked
         derivativeRange = rangeSlider.value / 100
         distanceThreshold = distanceSlider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Hist3D : Inherits OptionParent
+    Public histogram3DBins As Integer = 4
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Histogram 3D bins", 2, 16, histogram3DBins)
+    End Sub
+    Public Sub Run()
+        Static binSlider = FindSlider("Histogram 3D bins")
+        histogram3DBins = binSlider.value
     End Sub
 End Class

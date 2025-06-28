@@ -1411,13 +1411,6 @@ public:
 	Options_Guess() {
 	}
 };
-class Options_Hist3D {
-public:
-	bool addCloud = true;
-	void Run() {}
-	Options_Hist3D() {
-	}
-};
 class Options_HOG {
 public:
 	int thresholdHOG =  0;
@@ -2191,5 +2184,12 @@ public:
 	bool useBlur = false;
 	void Run() {}
 	Options_Sobel() {
+	}
+};
+class Options_Hist3D {
+public:
+	int histogram3DBins =  4;
+	void Run() {}
+	Options_Hist3D() {
 	}
 };

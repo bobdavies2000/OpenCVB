@@ -8,7 +8,7 @@
             <Code Language="VB">
                 <![CDATA[
 Public Class Options_Example : Inherits OptionParent
-    Public count
+    Public count as integer
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("firstSlider", 0, 100, 50)
