@@ -14,11 +14,6 @@ Public Class HullLine_Basics : Inherits TaskParent
         labels(3) = hulls.labels(3)
 
         lpLastList = New List(Of lpData)(lpList)
-        Dim ptList As New List(Of cv.Point)
-        For Each lp In lpLastList
-            ptList.Add(lp.hullMaxDStable)
-        Next
-
         lpList.Clear()
         dst2 = dst3.Clone
         Dim maxLines = task.gOptions.DebugSlider.Value * 2
@@ -31,8 +26,6 @@ Public Class HullLine_Basics : Inherits TaskParent
                 Dim lp = New lpData(pt, ptLast)
                 If lp.slope >= 100000 Then Continue For ' likely just the edge of the image.
                 If Math.Abs(lp.slope) < 0.0001 Then Continue For ' likely just the edge of the image
-                lp.hullMaxDStable = contour.maxDstable
-                lp.indexContour = ptList.IndexOf(lp.hullMaxDStable)
 
                 lp.index = lpList.Count
                 lpList.Add(lp)

@@ -218,7 +218,6 @@ Public Class LineRGB_Intercepts : Inherits TaskParent
     Public extended As New LongLine_ExtendTest
     Public p1List As New List(Of cv.Point2f)
     Public p2List As New List(Of cv.Point2f)
-    Dim longLine As New XO_LongLine_BasicsEx
     Public options As New Options_Intercepts
     Public intercept As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public topIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
@@ -371,10 +370,6 @@ Public Class LineRGB_Info : Inherits TaskParent
         strOut += "Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
         strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
 
-        strOut += "Below are the task.gridRects that the line intersects." + vbCrLf
-        For Each index In task.lpD.bricks
-            If index = task.lpD.bricks.Last Then strOut += CStr(index) Else strOut += CStr(index) + ", "
-        Next
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -519,67 +514,6 @@ Public Class LineRGB_Intersection : Inherits TaskParent
         End If
     End Sub
 End Class
-
-
-
-
-
-
-Public Class LineRGB_Bricks : Inherits TaskParent
-    Public lp As lpData
-    Public Sub New()
-        task.brickRunFlag = True
-        desc = "Create the bricks for a given line."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            If task.heartBeatLT Then
-                lp = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
-                                New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
-                dst2.SetTo(0)
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
-                Dim rotatedRect = cv.Cv2.MinAreaRect({lp.p1, lp.p2})
-                dst2.Rectangle(rotatedRect.BoundingRect, task.highlight, task.lineWidth)
-            End If
-        End If
-
-        For Each index In lp.bricks
-            dst2.Rectangle(task.bricks.brickList(index).rect, task.highlight, task.lineWidth)
-        Next
-        labels(2) = CStr(lp.bricks.Count) + " bricks will cover the line."
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class LineRGB_BricksValidate : Inherits TaskParent
-    Public lp As lpData
-    Public Sub New()
-        task.brickRunFlag = True
-        desc = "Validate the bricks for a given line."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            If task.heartBeatLT Then
-                lp = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
-                                New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
-                dst2.SetTo(0)
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
-            End If
-        End If
-        For Each index In lp.bricks
-            dst2.Rectangle(task.bricks.brickList(index).rect, task.highlight, task.lineWidth)
-        Next
-        labels(2) = CStr(lp.bricks.Count) + " bricks will cover the line."
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -812,91 +746,5 @@ Public Class LineRGB_MatchGravity : Inherits TaskParent
             labels(2) = "Of the " + CStr(gLines.Count) + " lines found, the best line parallel to gravity was " +
                        CStr(CInt(gLines(0).length)) + " pixels in length."
         End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class LineRGB_Match : Inherits TaskParent
-    Public lpList As New List(Of lpData)
-    Public lpLastList As New List(Of lpData)
-    Dim rawLines As New LineRGB_Raw
-    Dim match As New Match_Line
-    Public Sub New()
-        task.brickRunFlag = True
-        desc = "Retain earlier lines based on the end point correlations.  Line can be partially hidden but is still be there."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then
-            lpLastList.Clear()
-            lpList.Clear()
-            task.motionMask.SetTo(255)
-        End If
-
-        lpList.Clear()
-        For Each lp In lpLastList
-            match.lpInput = lp
-            match.Run(src)
-            lp.correlation = match.correlation
-            If lp.correlation > 0.98 Then lpList.Add(lp)
-        Next
-
-        If lpList.Count < task.FeatureSampleSize Then
-            Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
-            For Each lp In lpLastList
-                Dim noMotionTest As Boolean = True
-                For Each index In lp.bricks
-                    Dim pt = task.bricks.brickList(index).rect.TopLeft
-                    If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then
-                        noMotionTest = False
-                        Exit For
-                    End If
-                Next
-                If noMotionTest And lp.bricks.Count > 1 Then
-                    lp.age += 1
-                    sortlines.Add(lp.length, lp)
-                End If
-            Next
-
-            rawLines.Run(src)
-            dst3 = rawLines.dst2
-            labels(3) = rawLines.labels(2)
-
-            For Each lp In rawLines.lpList
-                Dim motionTest As Boolean = False
-
-                For Each index In lp.bricks
-                    Dim pt = task.bricks.brickList(index).rect.TopLeft
-                    If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then
-                        motionTest = True
-                        Exit For
-                    End If
-                Next
-                If motionTest Then sortlines.Add(lp.length, lp)
-            Next
-
-            lpList.Clear()
-            For Each lp In sortlines.Values
-                lp.index = lpList.Count
-                lpList.Add(lp)
-                If standaloneTest() Then
-                    For i As Integer = 0 To 3
-                        dst2.Line(lp.vertices(i), lp.vertices((i + 1) Mod 4), task.highlight, task.lineWidth)
-                    Next
-                End If
-                If lpList.Count >= task.FeatureSampleSize * 2 Then Exit For
-            Next
-
-            dst2 = src
-            For Each lp In lpList
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            Next
-        End If
-
-        lpLastList = New List(Of lpData)(lpList)
-        labels(2) = "Of the " + CStr(rawLines.lpList.Count) + " raw lines found, shown below are the " + CStr(lpList.Count) + " longest."
     End Sub
 End Class

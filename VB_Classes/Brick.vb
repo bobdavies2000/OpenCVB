@@ -701,36 +701,6 @@ End Class
 
 
 
-
-
-Public Class Brick_Lines : Inherits TaskParent
-    Dim info As New LineRGB_Info
-    Public Sub New()
-        task.brickRunFlag = True
-        desc = "Lines can mean cells are connected - use the debug slider to indicate which line to highlight."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lineRGB.dst2.Clone
-
-        If task.heartBeat Then info.Run(emptyMat)
-        Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
-        If index < task.lineRGB.lpList.Count Then task.lpD = task.lineRGB.lpList(index) Else task.lpD = task.lineRGB.lpList(0)
-        For Each index In task.lpD.bricks
-            Dim brick = task.bricks.brickList(index)
-            dst2.Rectangle(brick.rect, task.highlight, task.lineWidth, task.lineType)
-        Next
-
-        SetTrueText(info.strOut, 3)
-
-        labels(2) = task.lineRGB.labels(2) + " - Click on any line in below to get details on that line."
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Brick_LeftRightMouse : Inherits TaskParent
     Public means As New List(Of Single)
     Public Sub New()

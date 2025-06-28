@@ -47,7 +47,6 @@ Delaunay
 Density
 Depth
 DepthColorizer
-DepthLogic
 Derivative
 Deterministic
 DFT
@@ -139,7 +138,6 @@ LeftRight
 Line3D
 Linear
 LinearRegression
-LineDepth
 LineRect
 LineRGB
 LineTrack

@@ -611,14 +611,10 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public ep1 As cv.Point2f ' extended line endpoints - goes to the edge of the image.
     Public ep2 As cv.Point2f ' extended line endpoints - goes to the edge of the image.
     Public length As Single
-    Public rect As cv.Rect
     Public roRect As cv.RotatedRect
     Public vertices(3) As cv.Point2f
     Public index As Integer
-    Public indexContour As Integer
-    Public hullMaxDStable As cv.Point
     Public vertical As Boolean ' false is horizontal
-    Public bricks As New List(Of Integer)  ' index of each brick containing the line.
     Public slope As Single
     Public yIntercept As Single
     Public center As cv.Point2f
@@ -686,52 +682,12 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         length = p1.DistanceTo(p2)
         CalculateRotatedRectFromLine()
 
-        Dim brickptList As New List(Of cv.Point2f)
         vertical = True
         If Math.Abs(p1.X - p2.X) <= 2 Then
             slope = 100000 ' a big number for slope 
-            ' handle the special case of slope 0
-            Dim stepSize = If(p1.Y > p2.Y, -task.cellSize, task.cellSize)
-            For y = p1.Y To p2.Y Step stepSize
-                Dim index = task.grid.gridMap.Get(Of Single)(y, p1.X)
-                bricks.Add(index)
-                brickptList.Add(task.gridRects(index).TopLeft)
-            Next
         Else
-            If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then
-                vertical = False
-                Dim stepSize = If(p1.X > p2.X, -1, 1)
-                For x = p1.X To p2.X Step stepSize
-                    Dim y = slope * x + yIntercept
-                    Dim index = task.grid.gridMap.Get(Of Single)(y, x)
-                    If bricks.Contains(index) = False Then
-                        bricks.Add(index)
-                        brickptList.Add(task.gridRects(index).TopLeft)
-                    End If
-                Next
-            Else
-                Dim stepSize = If(p1.Y > p2.Y, -1, 1)
-                For y = p1.Y To p2.Y Step stepSize
-                    Dim x = (y - yIntercept) / slope
-                    Dim index = task.grid.gridMap.Get(Of Single)(y, x)
-                    If bricks.Contains(index) = False Then
-                        bricks.Add(index)
-                        brickptList.Add(task.gridRects(index).TopLeft)
-                    End If
-                Next
-            End If
+            If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then vertical = False
         End If
-
-        Dim minX As Single = brickptList.Min(Function(p) p.X)
-        Dim maxX As Single = brickptList.Max(Function(p) p.X)
-        Dim minY As Single = brickptList.Min(Function(p) p.Y)
-        Dim maxY As Single = brickptList.Max(Function(p) p.Y)
-
-        Dim w = maxX + task.cellSize - minX
-        Dim h = maxY + task.cellSize - minY
-        If minX + w >= task.workingRes.Width Then w = task.workingRes.Width - minX
-        If minY + h >= task.workingRes.Height Then h = task.workingRes.Height - minY
-        rect = New cv.Rect(minX, minY, w, h)
 
         matchRect1 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(p1.Y, p1.X))
         matchRect2 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(p2.Y, p2.X))
@@ -774,7 +730,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Sub New()
         p1 = New cv.Point2f()
         p2 = New cv.Point2f()
-        rect = New cv.Rect(0, 0, 8, 8) ' dummy rect for first pass through Gradient_DepthLines
     End Sub
 
     Public Function compare(mp As lpData) As Boolean

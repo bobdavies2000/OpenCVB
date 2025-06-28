@@ -123,8 +123,6 @@
     <Compile Include="HullLine.vb" />
     <Compile Include="Intrinsics.vb" />
     <Compile Include="FindTriangle.vb" />
-    <Compile Include="DepthLogic.vb" />
-    <Compile Include="LineDepth.vb" />
     <Compile Include="MinMath.vb" />
     <Compile Include="MotionCam.vb" />
     <Compile Include="MotionLine.vb" />
