@@ -12,14 +12,6 @@ Public Class OptionsRedColor
     Public bitReductionChecked As Boolean
 
     Public PointCloudReductionLabel As String
-    Public channels() As Integer = {0, 1}
-    Public channelIndex As Integer
-    Public rangesBGR() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 256), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
-    Public rangesHSV() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
-    Public rangesCloud() As cv.Rangef
-    Public ranges() As cv.Rangef
-    Public channelCount As Integer
-    Public histBinList() As Integer
     Public trackingLabel As String
     Public colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions",
                                        "Binarize_DepthTiers", "EdgeLine_Basics", "Hist3DColor_Basics",
@@ -83,8 +75,6 @@ Public Class OptionsRedColor
 
         UseSimpleReduction.Checked = True
         PointCloudReductionLabel = "XY Reduction"
-        XYReduction.Checked = True
-        histBinList = {task.histogramBins, task.histogramBins}
 
         For i = 0 To colorMethods.Count - 1
             Dim method = colorMethods(i)
@@ -114,53 +104,10 @@ Public Class OptionsRedColor
         task.sideCameraPoint = New cv.Point(0, CInt(task.dst2.Height / 2))
         task.topCameraPoint = New cv.Point(CInt(task.dst2.Width / 2), 0)
 
-        Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
-        Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        Dim rz = New cv.Vec2f(0, task.MaxZmeters)
-        rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-
-        channelCount = 1
-        channelIndex = 0
-        Select Case task.redOptions.PointCloudReductionLabel
-            Case "X Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
-                channels = {0}
-                histBinList = {task.histogramBins}
-            Case "Y Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1)}
-                channels = {1}
-                histBinList = {task.histogramBins}
-            Case "Z Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rz.Item0, rz.Item1)}
-                channels = {2}
-                histBinList = {task.histogramBins}
-            Case "XY Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
-                channelCount = 2
-                channels = {0, 1}
-                histBinList = {task.histogramBins, task.histogramBins}
-            Case "XZ Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-                channelCount = 2
-                channels = {0, 2}
-                channelIndex = 1
-                histBinList = {task.histogramBins, task.histogramBins}
-            Case "YZ Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-                channelCount = 2
-                channels = {1, 2}
-                channelIndex = 1
-                histBinList = {task.histogramBins, task.histogramBins}
-            Case "XYZ Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-                channelCount = 3
-                channels = {0, 1, 2}
-                channelIndex = 2
-                histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
-        End Select
-
         SimpleReductionBar.Enabled = Not BitwiseReduction.Checked
         BitwiseReductionBar.Enabled = BitwiseReduction.Checked
+
+        ' task.redCloudOptions.Run()
     End Sub
 
 

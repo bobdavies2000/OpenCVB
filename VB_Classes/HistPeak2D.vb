@@ -30,11 +30,11 @@ Public Class HistPeak2D_Basics : Inherits TaskParent
         If ranges Is Nothing Or task.optionsChanged Then
             ' the pcsplit arrays have been patched for inf and nan's already in task.vb.
             If task.cameraName.StartsWith("StereoLabs") Then cv.Cv2.Merge(task.pcSplit, src)
-            ranges = GetHist2Dminmax(src, task.redOptions.channels(0), task.redOptions.channels(1))
+            ranges = GetHist2Dminmax(src, task.redCloudOptions.channels(0), task.redCloudOptions.channels(1))
         End If
 
         Dim backProjection As New cv.Mat
-        cv.Cv2.CalcBackProject({src}, task.redOptions.channels, histogram, backProjection, ranges)
+        cv.Cv2.CalcBackProject({src}, task.redCloudOptions.channels, histogram, backProjection, ranges)
         dst2 = ShowPalette(backProjection)
     End Sub
 End Class
@@ -58,11 +58,11 @@ Public Class HistPeak2D_TopAndSide : Inherits TaskParent
         If task.toggleOn Then
             histSide.Run(src)
             peak.ranges = task.rangesSide
-            task.redOptions.channels = task.channelsSide
+            task.redCloudOptions.channels = task.channelsSide
             peak.histogram = histSide.histogram
         Else
             histTop.Run(src)
-            task.redOptions.channels = task.channelsTop
+            task.redCloudOptions.channels = task.channelsTop
             peak.ranges = task.rangesTop
             peak.histogram = histTop.histogram
         End If
@@ -218,7 +218,7 @@ Public Class HistPeak2D_HotSide : Inherits TaskParent
 
         peak.histogram = histSide.histogram
         peak.ranges = task.rangesSide
-        task.redOptions.channels = task.channelsSide
+        task.redCloudOptions.channels = task.channelsSide
         peak.Run(task.pointCloud)
         dst2 = peak.dst2
         dst2.SetTo(0, task.noDepthMask)
@@ -248,7 +248,7 @@ Public Class HistPeak2D_HotTop : Inherits TaskParent
 
         peak.histogram = histTop.histogram
         peak.ranges = task.rangesTop
-        task.redOptions.channels = task.channelsTop
+        task.redCloudOptions.channels = task.channelsTop
         peak.Run(task.pointCloud)
         dst2 = peak.dst2
         dst2.SetTo(0, task.noDepthMask)

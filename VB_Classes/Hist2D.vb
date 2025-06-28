@@ -34,20 +34,20 @@ Public Class Hist2D_Cloud : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Dim r1 As cv.Vec2f, r2 As cv.Vec2f
-        If task.redOptions.channels(0) = 0 Or task.redOptions.channels(0) = 1 Then
+        If task.redCloudOptions.channels(0) = 0 Or task.redCloudOptions.channels(0) = 1 Then
             r1 = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         End If
-        If task.redOptions.channels(1) = 1 Then r2 = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        If task.redOptions.channels(1) = 2 Then r2 = New cv.Vec2f(0, task.MaxZmeters)
+        If task.redCloudOptions.channels(1) = 1 Then r2 = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+        If task.redCloudOptions.channels(1) = 2 Then r2 = New cv.Vec2f(0, task.MaxZmeters)
 
         ranges = New cv.Rangef() {New cv.Rangef(r1.Item0, r1.Item1),
                                   New cv.Rangef(r2.Item0, r2.Item1)}
-        cv.Cv2.CalcHist({task.pointCloud}, task.redOptions.channels, New cv.Mat(),
+        cv.Cv2.CalcHist({task.pointCloud}, task.redCloudOptions.channels, New cv.Mat(),
                         histogram, 2, {task.histogramBins, task.histogramBins}, ranges)
 
         plot1D.Run(histogram)
         dst2 = plot1D.dst2
-        channels = task.redOptions.channels
+        channels = task.redCloudOptions.channels
     End Sub
 End Class
 
@@ -69,7 +69,7 @@ Public Class Hist2D_Depth : Inherits TaskParent
 
         histogram = hist2d.histogram
         ranges = hist2d.ranges
-        channels = task.redOptions.channels
+        channels = task.redCloudOptions.channels
 
         dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
@@ -122,10 +122,10 @@ Public Class Hist2D_HSV : Inherits TaskParent
         Dim histRowsCols = {dst2.Height, dst2.Width}
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        cv.Cv2.CalcHist({src}, {0, 2}, task.depthMask, histogram02, 2, histRowsCols, task.redOptions.rangesHSV)
+        cv.Cv2.CalcHist({src}, {0, 2}, task.depthMask, histogram02, 2, histRowsCols, task.redCloudOptions.rangesHSV)
         dst2 = histogram02.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        cv.Cv2.CalcHist({src}, {0, 1}, task.depthMask, histogram01, 2, histRowsCols, task.redOptions.rangesHSV)
+        cv.Cv2.CalcHist({src}, {0, 1}, task.depthMask, histogram01, 2, histRowsCols, task.redCloudOptions.rangesHSV)
         dst3 = histogram01.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         labels(2) = "Hue is on the X-Axis and Value is on the Y-Axis"
@@ -147,10 +147,10 @@ Public Class Hist2D_BGR : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Dim histRowsCols = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist({src}, {0, 2}, task.depthMask, histogram02, 2, histRowsCols, task.redOptions.rangesBGR)
+        cv.Cv2.CalcHist({src}, {0, 2}, task.depthMask, histogram02, 2, histRowsCols, task.redCloudOptions.rangesBGR)
         dst2 = histogram02.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        cv.Cv2.CalcHist({src}, {0, 1}, task.depthMask, histogram01, 2, histRowsCols, task.redOptions.rangesBGR)
+        cv.Cv2.CalcHist({src}, {0, 1}, task.depthMask, histogram01, 2, histRowsCols, task.redCloudOptions.rangesBGR)
         dst3 = histogram01.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         labels(2) = "Blue is on the X-Axis and Red is on the Y-Axis"
@@ -172,8 +172,8 @@ Public Class Hist2D_PlotHistogram1D : Inherits TaskParent
         desc = "Create a 2D histogram for blue to red and blue to green."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        cv.Cv2.CalcHist({src}, task.redOptions.channels, task.depthMask, histogram, 2, {task.histogramBins, task.histogramBins},
-                        task.redOptions.rangesBGR)
+        cv.Cv2.CalcHist({src}, task.redCloudOptions.channels, task.depthMask, histogram, 2,
+                        {task.histogramBins, task.histogramBins}, task.redCloudOptions.rangesBGR)
         dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         plotHist.Run(histogram)

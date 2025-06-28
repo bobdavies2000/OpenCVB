@@ -1501,25 +1501,28 @@ Public Class Hist_PointCloud : Inherits TaskParent
     Dim grid As New Grid_Basics
     Public histogram As New cv.Mat
     Public histArray() As Single
+    Dim options As New Options_RedCloud
     Public Sub New()
         task.gOptions.setHistogramBins(9)
-        task.redOptions.XYReduction.Checked = True
         labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
         desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.redOptions.Sync() ' make sure settings are consistent
+        options.Run()
 
-        cv.Cv2.CalcHist({task.pointCloud}, task.redOptions.channels, New cv.Mat(), histogram, task.redOptions.channelCount,
-                         task.redOptions.histBinList, task.redOptions.ranges)
-
-        Select Case task.redOptions.PointCloudReductionLabel
+        Select Case options.reductionName
             Case "X Reduction", "Y Reduction", "Z Reduction"
+                cv.Cv2.CalcHist({task.pointCloud}, options.channels, New cv.Mat(), histogram,
+                         options.channelCount, options.histBinList, options.ranges)
+
                 Static plot As New Plot_Histogram
                 plot.Run(histogram)
                 dst2 = plot.histogram
                 labels(2) = "2D plot of 1D histogram."
             Case "XY Reduction", "XZ Reduction", "YZ Reduction"
+                cv.Cv2.CalcHist({task.pointCloud}, options.channels, New cv.Mat(), histogram,
+                         options.channelCount, options.histBinList, options.ranges)
+
                 Static plot2D As New Plot_Histogram2D
                 plot2D.Run(histogram)
                 dst2 = plot2D.dst2

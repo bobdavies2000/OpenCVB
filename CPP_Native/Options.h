@@ -2193,3 +2193,12 @@ public:
 	Options_Hist3D() {
 	}
 };
+class Options_RedCloud {
+public:
+	cv::Rangef rangesBGR[] =  cv::Rangef() {New cv::Rangef(0, 256), cv::Rangef(0, 256), cv::Rangef(0, 256)};
+	cv::Rangef rangesHSV[] =  cv::Rangef() {New cv::Rangef(0, 180), cv::Rangef(0, 256), cv::Rangef(0, 256)};
+	int channels[] =  {0, 1};
+	void Run() {}
+	Options_RedCloud() {
+	}
+};

@@ -19,7 +19,7 @@ Public Class Hist3Dcolor_Basics : Inherits TaskParent
         If src.Type <> cv.MatType.CV_8UC3 Then src = task.color
         If task.heartBeat Or alwaysRun Or histogram.Width = 0 Then
             Dim bins = options.histogram3DBins
-            cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, {bins, bins, bins}, task.redOptions.rangesBGR)
+            cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, {bins, bins, bins}, task.redCloudOptions.rangesBGR)
 
             ReDim histArray(histogram.Total - 1)
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -30,7 +30,7 @@ Public Class Hist3Dcolor_Basics : Inherits TaskParent
             classCount = simK.classCount
         End If
 
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redCloudOptions.rangesBGR)
 
         dst3 = ShowPalette(dst2)
 
@@ -129,7 +129,7 @@ Public Class Hist3Dcolor_ZeroGroups : Inherits TaskParent
         If task.optionsChanged Then
             Dim bins = options.histogram3DBins
             Dim hBins() As Integer = {bins, bins, bins}
-            cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, task.redOptions.rangesBGR)
+            cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, task.redCloudOptions.rangesBGR)
 
             Dim histArray(histogram.Total - 1) As Single
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -161,7 +161,7 @@ Public Class Hist3Dcolor_ZeroGroups : Inherits TaskParent
 
             Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
         End If
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redCloudOptions.rangesBGR)
         dst3 = ShowPalette(dst2)
         labels(2) = "Hist3Dcolor_ZeroGroups classCount = " + CStr(classCount)
     End Sub
@@ -260,7 +260,7 @@ Public Class Hist3Dcolor_Basics_CPP : Inherits TaskParent
             histogram = simK.dst2
             classCount = simK.classCount
 
-            cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
+            cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redCloudOptions.rangesBGR)
 
             Dim mm As mmData = GetMinMax(dst2)
 
@@ -321,7 +321,7 @@ Public Class Hist3Dcolor_Vector : Inherits TaskParent
             binArray = {options.histogram3DBins, options.histogram3DBins, options.histogram3DBins}
         End If
 
-        cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, binArray, task.redOptions.rangesBGR)
+        cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, binArray, task.redCloudOptions.rangesBGR)
 
         ReDim histArray(histogram.Total - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)

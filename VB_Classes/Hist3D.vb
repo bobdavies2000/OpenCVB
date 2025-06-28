@@ -174,7 +174,7 @@ Public Class Hist3D_Pixel : Inherits TaskParent
 
         If src.Channels() <> 3 Then src = task.color
         Dim bins = options.histogram3DBins
-        cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.redOptions.rangesBGR)
+        cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.redCloudOptions.rangesBGR)
 
         ReDim histArray(histogram.Total - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -186,7 +186,7 @@ Public Class Hist3D_Pixel : Inherits TaskParent
         classCount = bins * bins * bins
         Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
 
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redOptions.rangesBGR)
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.redCloudOptions.rangesBGR)
         dst3 = ShowPalette(dst2)
     End Sub
 End Class
@@ -213,7 +213,7 @@ Public Class Hist3D_PixelCells : Inherits TaskParent
 
         For Each rc In task.redC.rcList
             cv.Cv2.CalcBackProject({src(rc.rect)}, {0, 1, 2}, pixel.histogram, dst2(rc.rect),
-                                   task.redOptions.rangesBGR)
+                                   task.redCloudOptions.rangesBGR)
         Next
 
         dst3 = ShowPalette(dst2)

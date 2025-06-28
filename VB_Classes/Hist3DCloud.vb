@@ -19,7 +19,7 @@ Public Class Hist3Dcloud_Basics : Inherits TaskParent
 
         Dim bins = options.histogram3DBins
 
-        cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, {bins, bins, bins}, task.redOptions.rangesCloud)
+        cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, {bins, bins, bins}, options.rangesCloud)
 
         ReDim histArray(bins - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -35,7 +35,8 @@ Public Class Hist3Dcloud_Basics : Inherits TaskParent
         histogram = cv.Mat.FromPixelData(histArray.Count, 1, cv.MatType.CV_32F, simK.histArray)
         classCount = simK.classCount
 
-        cv.Cv2.CalcBackProject({src}, {2}, histogram, dst2, {task.redOptions.rangesCloud(task.redOptions.rangesCloud.Count - 1)})
+        cv.Cv2.CalcBackProject({src}, {2}, histogram, dst2,
+                               {task.redCloudOptions.rangesCloud(task.redCloudOptions.rangesCloud.Count - 1)})
         dst2 = dst2.ConvertScaleAbs
 
         dst2.SetTo(0, task.noDepthMask)
@@ -72,9 +73,9 @@ Public Class Hist3Dcloud_DepthSplit : Inherits TaskParent
             hist(i).Run(task.pcSplit(i))
             mats1.mat(i) = hist(i).dst2.Clone
 
-            If i = 0 Then task.redOptions.channels = {0, 1}
-            If i = 1 Then task.redOptions.channels = {0, 2}
-            If i = 2 Then task.redOptions.channels = {1, 2}
+            If i = 0 Then task.redCloudOptions.channels = {0, 1}
+            If i = 1 Then task.redCloudOptions.channels = {0, 2}
+            If i = 2 Then task.redCloudOptions.channels = {1, 2}
             hist2d(i).Run(task.pointCloud)
             mats2.mat(i) = hist2d(i).histogram.ConvertScaleAbs
         Next
