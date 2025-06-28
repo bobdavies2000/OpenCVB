@@ -898,27 +898,6 @@ End Class
 
 
 
-'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edge_SobelHorizontal : Inherits TaskParent
-    Dim edges As New Edge_Sobel
-    Public Sub New()
-        OptionParent.findCheckBox("Vertical Derivative").Checked = False
-        OptionParent.findCheckBox("Horizontal Derivative").Checked = True
-        desc = "Find edges with Sobel only in the horizontal direction"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static thresholdSlider = OptionParent.FindSlider("Threshold to zero pixels below this value")
-        edges.Run(src)
-
-        dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Edge_MotionFrames : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim frames As New History_Basics
@@ -1402,17 +1381,59 @@ End Class
 Public Class Edge_Sobel : Inherits TaskParent
     Public options As New Options_Sobel
     Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32F, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst0 = src.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
-        If options.horizontalDerivative And options.verticalDerivative Then
-            dst1 = src.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
-            dst2 = (dst1 + dst0).ToMat.ConvertScaleAbs()
-        Else
-            dst2 = dst0.ConvertScaleAbs()
-        End If
+        dst0.SetTo(0)
+        dst1.SetTo(0)
+        If options.horizontalDerivative Then dst0 = src.Sobel(cv.MatType.CV_32F, 0, 1, options.kernelSize)
+        If options.verticalDerivative Then dst1 = src.Sobel(cv.MatType.CV_32F, 1, 0, options.kernelSize)
+        dst2 = (dst1 + dst0).ToMat.ConvertScaleAbs()
+    End Sub
+End Class
+
+
+
+
+
+
+
+'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edge_SobelHorizontal : Inherits TaskParent
+    Dim edges As New Edge_Sobel
+    Public Sub New()
+        OptionParent.FindCheckBox("Vertical Derivative").Checked = False
+        desc = "Find edges with Sobel only in the horizontal direction"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
+        edges.Run(src)
+
+        dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+
+
+'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edge_SobelVertical : Inherits TaskParent
+    Dim edges As New Edge_Sobel
+    Public Sub New()
+        OptionParent.FindCheckBox("Horizontal Derivative").Checked = False
+        desc = "Find edges with Sobel only in the horizontal direction"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
+        edges.Run(src)
+
+        dst2 = edges.dst2.Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class

@@ -261,7 +261,6 @@
     <Compile Include="LongLine.vb" />
     <Compile Include="Match.vb" />
     <Compile Include="MatchShapes.vb" />
-    <Compile Include="MiniCloud.vb" />
     <Compile Include="Pendulum.vb" />
     <Compile Include="Stable.vb" />
     <Compile Include="Puzzle.vb" />
