@@ -82,7 +82,6 @@ Public Class Feature_Basics : Inherits TaskParent
                 For Each lp In task.lineRGB.lpList
                     features.Add(lp.p1)
                     features.Add(lp.p2)
-                    lp.index = task.logicalLines.Count
                     task.logicalLines.Add(lp)
                 Next
         End Select

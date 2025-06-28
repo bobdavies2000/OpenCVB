@@ -27,7 +27,6 @@ Public Class HullLine_Basics : Inherits TaskParent
                 If lp.slope >= 100000 Then Continue For ' likely just the edge of the image.
                 If Math.Abs(lp.slope) < 0.0001 Then Continue For ' likely just the edge of the image
 
-                lp.index = lpList.Count
                 lpList.Add(lp)
                 ptLast = pt
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)

@@ -613,7 +613,6 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public length As Single
     Public roRect As cv.RotatedRect
     Public vertices(3) As cv.Point2f
-    Public index As Integer
     Public vertical As Boolean ' false is horizontal
     Public slope As Single
     Public yIntercept As Single

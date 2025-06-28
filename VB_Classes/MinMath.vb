@@ -31,7 +31,6 @@ Public Class MinMath_Line : Inherits TaskParent
             Dim p2 = bpList(i)(bpList(i).Count - 1)
             dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
             Dim lp = New lpData(p1, p2)
-            lp.index = lpList.Count + 1
             lpList.Add(lp)
             dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
         Next

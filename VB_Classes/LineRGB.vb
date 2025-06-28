@@ -30,10 +30,9 @@ Public Class LineRGB_Basics : Inherits TaskParent
         dst2 = src
         lpMap.SetTo(0)
         For Each lp In sortlines.Values
-            lp.index = lpList.Count
             lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            lpMap.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth * 3, cv.LineTypes.Link8)
+            lpMap.Line(lp.p1, lp.p2, sortlines.Values.IndexOf(lp) + 1, task.lineWidth * 3, cv.LineTypes.Link8)
 
             If standaloneTest() Then
                 For i As Integer = 0 To 3
@@ -81,7 +80,6 @@ Public Class LineRGB_Raw : Inherits TaskParent
                     p1 = validatePoint(p1)
                     p2 = validatePoint(p2)
                     Dim lp = New lpData(p1, p2)
-                    lp.index = lpList.Count
                     lpList.Add(lp)
                 End If
             End If
@@ -134,7 +132,6 @@ Public Class LineRGB_RawSorted : Inherits TaskParent
 
         lpList.Clear()
         For Each lp In sortlines.Values
-            lp.index = lpList.Count
             lp.p1 = validatePoint(lp.p1)
             lp.p2 = validatePoint(lp.p2)
             lpList.Add(lp)
@@ -193,7 +190,6 @@ Public Class LineRGB_RawSubset : Inherits TaskParent
 
         lpList.Clear()
         For Each lp In sortlines.Values
-            lp.index = lpList.Count
             lpList.Add(lp)
         Next
 
@@ -362,8 +358,9 @@ Public Class LineRGB_Info : Inherits TaskParent
 
         dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
-        strOut += "Line ID = " + CStr(task.lpD.index) + vbCrLf + vbCrLf
-        strOut += "index = " + CStr(task.lpD.index) + vbCrLf
+        Dim index = task.lineRGB.lpList.IndexOf(task.lpD)
+        strOut += "Line ID = " + CStr(index) + vbCrLf + vbCrLf
+        strOut += "index = " + CStr(index) + vbCrLf
         strOut += "Age = " + CStr(task.lpD.age) + vbCrLf
 
         strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf + vbCrLf

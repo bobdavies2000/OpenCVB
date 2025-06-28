@@ -16,7 +16,7 @@ Public Class Structured_Basics : Inherits TaskParent
         dst2 = src.Clone
         lpListX = New List(Of lpData)(linesX.lpList)
         For Each lp In linesX.lpList
-            dst2.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+            dst2.Line(lp.p1, lp.p2, linesX.lpList.IndexOf(lp), task.lineWidth, task.lineType)
         Next
 
         linesY.Run(struct.dst3)
@@ -28,7 +28,7 @@ Public Class Structured_Basics : Inherits TaskParent
         dst3 = src.Clone
         lpListY = New List(Of lpData)(linesY.lpList)
         For Each lp In linesY.lpList
-            dst3.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+            dst3.Line(lp.p1, lp.p2, linesY.lpList.IndexOf(lp), task.lineWidth, task.lineType)
         Next
     End Sub
 End Class

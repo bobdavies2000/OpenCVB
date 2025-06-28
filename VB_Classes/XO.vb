@@ -883,7 +883,6 @@ Public Class XO_Line_BasicsRawOld : Inherits TaskParent
                 Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
                 Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
                 Dim lp = New lpData(p1, p2)
-                lp.index = lpList.Count
                 lpList.Add(lp)
                 ptList.Add(New cv.Point(CInt(lp.p1.X), CInt(lp.p1.Y)))
             End If
@@ -1605,10 +1604,9 @@ Public Class XO_Line_Core : Inherits TaskParent
         dst2.SetTo(0)
         lpMap.SetTo(0)
         For i = 0 To lpList.Count - 1
-            lpList(i).index = i
             Dim lp = lpList(i)
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+            lpMap.Line(lp.p1, lp.p2, i, task.lineWidth, task.lineType)
         Next
 
         If task.heartBeat Then
@@ -1638,7 +1636,7 @@ Public Class XO_Line_Basics : Inherits TaskParent
         dst3.SetTo(0)
         dst2.SetTo(cv.Scalar.White, lineCore.dst2)
         For Each lp In lineCore.lpList
-            lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
+            lpMap.Line(lp.p1, lp.p2, lineCore.lpList.IndexOf(lp), task.lineWidth + 1, cv.LineTypes.Link8)
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
@@ -2857,7 +2855,7 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
             Dim facets = delaunay.facetList(i)
 
             DrawContour(dst1, facets, 255, task.lineWidth)
-            DrawContour(task.fpMap, facets, lp.index)
+            DrawContour(task.fpMap, facets, i)
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
             Dim brick = task.bricks.brickList(task.grid.gridMap.Get(Of Single)(center.Y, center.X))
             task.lineRGB.lpList(i) = lp
@@ -2865,7 +2863,7 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
 
         Dim index = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         task.lpD = task.lineRGB.lpList(index)
-        Dim facetsD = delaunay.facetList(task.lpD.index)
+        Dim facetsD = delaunay.facetList(task.lineRGB.lpList.IndexOf(task.lpD))
         DrawContour(dst2, facetsD, white, task.lineWidth)
 
         labels(2) = task.lineRGB.labels(2)
@@ -5140,7 +5138,7 @@ Public Class XO_LineRGB_BasicsAlternative : Inherits TaskParent
             Dim histogram As New cv.Mat
             dst1.SetTo(0)
             For Each lp In lpList
-                dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
+                dst1.Line(lp.p1, lp.p2, lpList.IndexOf(lp) + 1, task.lineWidth, cv.LineTypes.Link4)
             Next
 
             cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lpList.Count)})
@@ -5188,7 +5186,6 @@ Public Class XO_LineRGB_BasicsAlternative : Inherits TaskParent
 
         dst2 = src
         For Each lp In sortlines.Values
-            lp.index = task.lineRGB.lpList.Count
             task.lineRGB.lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
