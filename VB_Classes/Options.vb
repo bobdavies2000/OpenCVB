@@ -8003,14 +8003,6 @@ End Class
 
 Public Class Options_RedCloud : Inherits OptionParent
     Public reductionName As String
-    Public channelCount As Integer
-    Public channelIndex As Integer
-    Public rangesBGR() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 256), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
-    Public rangesHSV() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
-    Public rangesCloud() As cv.Rangef
-    Public ranges() As cv.Rangef
-    Public channels() As Integer = {0, 1}
-    Public histBinList() As Integer
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -8031,47 +8023,46 @@ Public Class Options_RedCloud : Inherits OptionParent
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
         Dim rz = New cv.Vec2f(0, task.MaxZmeters)
-        rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1),
-                                       New cv.Rangef(rz.Item0, rz.Item1)}
-        channelCount = 1
-        channelIndex = 0
+        task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1),
+                                            New cv.Rangef(rz.Item0, rz.Item1)}
+        task.channelCount = 1
+        task.channelIndex = 0
         Select Case reductionName
             Case "X Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
-                channels = {0}
-                histBinList = {task.histogramBins}
+                task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
+                task.channels = {0}
+                task.histBinList = {task.histogramBins}
             Case "Y Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1)}
-                channels = {1}
-                histBinList = {task.histogramBins}
+                task.ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1)}
+                task.channels = {1}
+                task.histBinList = {task.histogramBins}
             Case "Z Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rz.Item0, rz.Item1)}
-                channels = {2}
-                histBinList = {task.histogramBins}
+                task.ranges = New cv.Rangef() {New cv.Rangef(rz.Item0, rz.Item1)}
+                task.channels = {2}
+                task.histBinList = {task.histogramBins}
             Case "XY Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
-                channelCount = 2
-                channels = {0, 1}
-                histBinList = {task.histogramBins, task.histogramBins}
+                task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
+                task.channelCount = 2
+                task.channels = {0, 1}
+                task.histBinList = {task.histogramBins, task.histogramBins}
             Case "XZ Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-                channelCount = 2
-                channels = {0, 2}
-                channelIndex = 1
-                histBinList = {task.histogramBins, task.histogramBins}
+                task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                task.channelCount = 2
+                task.channels = {0, 2}
+                task.channelIndex = 1
+                task.histBinList = {task.histogramBins, task.histogramBins}
             Case "YZ Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-                channelCount = 2
-                channels = {1, 2}
-                channelIndex = 1
-                histBinList = {task.histogramBins, task.histogramBins}
+                task.ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                task.channelCount = 2
+                task.channels = {1, 2}
+                task.channelIndex = 1
+                task.histBinList = {task.histogramBins, task.histogramBins}
             Case "XYZ Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-                channelCount = 3
-                channels = {0, 1, 2}
-                channelIndex = 2
-                histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
+                task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                task.channelCount = 3
+                task.channels = {0, 1, 2}
+                task.channelIndex = 2
+                task.histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
         End Select
-        histBinList = {task.histogramBins, task.histogramBins}
     End Sub
 End Class

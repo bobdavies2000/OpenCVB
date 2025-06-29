@@ -500,7 +500,7 @@ Public Class KMeans_SimKColor : Inherits TaskParent
             classCount = simK.classCount
         End If
 
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst1, task.redCloudOptions.rangesBGR)
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst1, task.rangesBGR)
 
         dst2 = ShowPalette(dst1)
         labels(2) = simK.labels(2) + " with " + CStr(binSlider.value) + " histogram bins"
@@ -530,7 +530,7 @@ Public Class KMeans_SimKDepth : Inherits TaskParent
             plot1D.histogram = simK.dst2
             classCount = simK.classCount
         End If
-        cv.Cv2.CalcBackProject({src}, {2}, plot1D.histogram, dst1, task.redCloudOptions.rangesCloud)
+        cv.Cv2.CalcBackProject({src}, {2}, plot1D.histogram, dst1, task.rangesCloud)
         dst1 = dst1.ConvertScaleAbs
 
         dst2 = ShowPalette(dst1)

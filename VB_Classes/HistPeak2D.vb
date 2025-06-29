@@ -30,11 +30,11 @@ Public Class HistPeak2D_Basics : Inherits TaskParent
         If ranges Is Nothing Or task.optionsChanged Then
             ' the pcsplit arrays have been patched for inf and nan's already in task.vb.
             If task.cameraName.StartsWith("StereoLabs") Then cv.Cv2.Merge(task.pcSplit, src)
-            ranges = GetHist2Dminmax(src, task.redCloudOptions.channels(0), task.redCloudOptions.channels(1))
+            ranges = GetHist2Dminmax(src, task.channels(0), task.channels(1))
         End If
 
         Dim backProjection As New cv.Mat
-        cv.Cv2.CalcBackProject({src}, task.redCloudOptions.channels, histogram, backProjection, ranges)
+        cv.Cv2.CalcBackProject({src}, task.channels, histogram, backProjection, ranges)
         dst2 = ShowPalette(backProjection)
     End Sub
 End Class
@@ -54,15 +54,15 @@ Public Class HistPeak2D_TopAndSide : Inherits TaskParent
     Public Sub New()
         desc = "Find the top X peaks in the 2D histogram of the top and side views and backproject them."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.toggleOn Then
             histSide.Run(src)
             peak.ranges = task.rangesSide
-            task.redCloudOptions.channels = task.channelsSide
+            task.channels = task.channelsSide
             peak.histogram = histSide.histogram
         Else
             histTop.Run(src)
-            task.redCloudOptions.channels = task.channelsTop
+            task.channels = task.channelsTop
             peak.ranges = task.rangesTop
             peak.histogram = histTop.histogram
         End If
@@ -86,7 +86,7 @@ Public Class HistPeak2D_NotHotTop : Inherits TaskParent
     Public Sub New()
         desc = "Find the regions with the non-zero (low) samples in the top view"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         histTop.Run(src)
         dst1 = histTop.histogram.InRange(0, 0).ConvertScaleAbs
 
@@ -114,7 +114,7 @@ Public Class HistPeak2D_Edges : Inherits TaskParent
     Public Sub New()
         desc = "Display the HistPeak2D_Basics edges in the RGB image"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         histTop.Run(src)
 
         dst3 = histTop.histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary)
@@ -140,7 +140,7 @@ Public Class HistPeak2D_HSV : Inherits TaskParent
     Public Sub New()
         desc = "Find the peaks in the 2D plot of the HSV image"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         hsv.Run(src)
         peak.histogram = hsv.histogram01
         peak.Run(hsv.dst1)
@@ -162,7 +162,7 @@ Public Class HistPeak2D_BGR : Inherits TaskParent
     Public Sub New()
         desc = "Find the peaks in the 2D plot of the BGR image"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         bgr.Run(src)
 
         peak.histogram = bgr.histogram02
@@ -185,7 +185,7 @@ Public Class HistPeak2D_RGB : Inherits TaskParent
     Public Sub New()
         desc = "Find the peaks in the 2D plot of the BGR image"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         peak.Run(src)
         dst2 = peak.dst2
         dst3 = peak.dst3
@@ -207,18 +207,18 @@ Public Class HistPeak2D_HotSide : Inherits TaskParent
         labels = {"", "", "Backprojection of Side View hotspots", "Side view with highlighted hot spots"}
         desc = "Find the top X peaks in the 2D histogram of the side view and backproject it."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         histSide.Run(src)
         dst3 = histSide.histogram
 
         For i = 0 To peak.auto.clusterPoints.Count - 1
             Dim pt = peak.auto.clusterPoints(i)
-            DrawCircle(dst3,pt, task.DotSize * 3, white)
+            DrawCircle(dst3, pt, task.DotSize * 3, white)
         Next
 
         peak.histogram = histSide.histogram
         peak.ranges = task.rangesSide
-        task.redCloudOptions.channels = task.channelsSide
+        task.channels = task.channelsSide
         peak.Run(task.pointCloud)
         dst2 = peak.dst2
         dst2.SetTo(0, task.noDepthMask)
@@ -237,18 +237,18 @@ Public Class HistPeak2D_HotTop : Inherits TaskParent
         labels = {"", "", "Backprojection of Top View hotspots", "Top view with highlighted hot spots"}
         desc = "Find the top X peaks in the 2D histogram of the top view and backproject it."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         histTop.Run(src)
         dst3 = histTop.histogram
 
         For i = 0 To peak.auto.clusterPoints.Count - 1
             Dim pt = peak.auto.clusterPoints(i)
-            DrawCircle(dst3,pt, task.DotSize * 3, white)
+            DrawCircle(dst3, pt, task.DotSize * 3, white)
         Next
 
         peak.histogram = histTop.histogram
         peak.ranges = task.rangesTop
-        task.redCloudOptions.channels = task.channelsTop
+        task.channels = task.channelsTop
         peak.Run(task.pointCloud)
         dst2 = peak.dst2
         dst2.SetTo(0, task.noDepthMask)

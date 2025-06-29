@@ -39,7 +39,7 @@ Public Class BackProject2D_Basics : Inherits TaskParent
         End If
         If task.heartBeat Then
             labels(2) = colorFmt.options.colorFormat + " format " + If(classCount > 0, CStr(classCount) + " classes", " ")
-            Dim c1 = task.redCloudOptions.channels(0), c2 = task.redCloudOptions.channels(1)
+            Dim c1 = task.channels(0), c2 = task.channels(1)
             labels(3) = "That combination of channel " + CStr(c1) + "/" + CStr(c2) + " has " + CStr(bpCount) +
                         " pixels while image total is " + Format(dst0.Total, "0")
         End If

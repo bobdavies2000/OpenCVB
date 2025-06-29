@@ -214,6 +214,16 @@ Public Class VBtask : Implements IDisposable
     Public featureOptions As OptionsFeatures
     Public treeView As TreeviewForm
 
+    ' RedCloud variables
+    Public channelCount As Integer = 2
+    Public channelIndex As Integer = 0
+    Public channels() As Integer = {0, 1}
+    Public histBinList() As Integer
+    Public ranges() As cv.Rangef
+    Public rangesBGR() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 256), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
+    Public rangesHSV() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
+    Public rangesCloud() As cv.Rangef
+
     Public paletteIndex As Integer
 
     Public mouseClickFlag As Boolean
@@ -787,6 +797,7 @@ Public Class VBtask : Implements IDisposable
         End If
 
         gravityBasics.Run(src.Clone)
+        histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
 
         Dim saveOptionsChanged = task.optionsChanged
         If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True

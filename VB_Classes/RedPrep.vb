@@ -239,3 +239,26 @@ Public Class RedPrep_DepthTiers : Inherits TaskParent
         dst2 = ShowPalette(dst1)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class RedPrep_BasicsShow : Inherits TaskParent
+    Public prep As New RedCloud_PrepOutline
+    Public Sub New()
+        desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+        dst2 = prep.dst2
+
+        ' dst2.SetTo(0, task.noDepthMask)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        Dim mm = GetMinMax(dst2)
+        dst3 = ShowPalette(dst2)
+
+        labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
+    End Sub
+End Class
