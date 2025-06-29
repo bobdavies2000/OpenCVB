@@ -238,11 +238,17 @@ End Class
 
 Public Class BackProject_Side : Inherits TaskParent
     Dim histSide As New Projection_HistSide
+    Dim options As New Options_RedCloud
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Back projection of the hotspots in the Side View"}
         desc = "Display the back projection of the hotspots in the Side View"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        histSide.Run(src)
+        dst2 = histSide.dst2
+
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histSide.histogram, dst3, task.rangesSide)
         dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
     End Sub
@@ -263,12 +269,7 @@ Public Class BackProject_Top : Inherits TaskParent
         histTop.Run(src)
         dst2 = histTop.dst2
 
-        Dim histogram = histTop.histogram
-        If Not standalone Then
-            histogram = histTop.histogram.SetTo(0, Not dst2) ' use this to isolate the non-vertical areas.
-        End If
-
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogram, dst3, task.rangesTop)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst3, task.rangesTop)
         dst3 = ShowPalette(dst3.ConvertScaleAbs)
     End Sub
 End Class

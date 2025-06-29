@@ -2,31 +2,35 @@
 Imports System.Runtime.InteropServices
 Public Class RedPrep_Basics : Inherits TaskParent
     Dim plot As New Plot_Histogram
+    Dim options As New Options_RedCloud
     Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Reduction transform for the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
         Dim reduceAmt = task.redOptions.SimpleReductionBar.Value
         task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
         task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
         task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
 
-        Select Case task.redOptions.PointCloudReductionLabel
+        Select Case options.reductionName
             Case "X Reduction"
-                dst0 = (Split(0) * reduceAmt).ToMat
+                dst0 = (split(0) * reduceAmt).ToMat
             Case "Y Reduction"
-                dst0 = (Split(1) * reduceAmt).ToMat
+                dst0 = (split(1) * reduceAmt).ToMat
             Case "Z Reduction"
-                dst0 = (Split(2) * reduceAmt).ToMat
+                dst0 = (split(2) * reduceAmt).ToMat
             Case "XY Reduction"
-                dst0 = (Split(0) * reduceAmt + Split(1) * reduceAmt).ToMat
+                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt).ToMat
             Case "XZ Reduction"
-                dst0 = (Split(0) * reduceAmt + Split(2) * reduceAmt).ToMat
+                dst0 = (split(0) * reduceAmt + split(2) * reduceAmt).ToMat
             Case "YZ Reduction"
-                dst0 = (Split(1) * reduceAmt + Split(2) * reduceAmt).ToMat
+                dst0 = (split(1) * reduceAmt + split(2) * reduceAmt).ToMat
             Case "XYZ Reduction"
-                dst0 = (Split(0) * reduceAmt + Split(1) * reduceAmt + Split(2) * reduceAmt).ToMat
+                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt).ToMat
         End Select
 
         Dim mm As mmData = GetMinMax(dst0)
@@ -49,18 +53,19 @@ Public Class RedPrep_Basics : Inherits TaskParent
             plot.removeZeroEntry = False
             plot.maxRange = mm.maxVal
             plot.Run(dst2)
-            dst3 = plot.dst2
+            dst1 = plot.dst2
 
             For i = 0 To plot.histArray.Count - 1
                 plot.histArray(i) = i
             Next
 
-            Marshal.Copy(plot.histArray, 0, plot.histogram.Data, plot.histArray.Length)
-            cv.Cv2.CalcBackProject({dst2}, {0}, plot.histogram, dst1, plot.ranges)
-            dst3 = ShowPalette(dst1)
-            dst3.SetTo(0, task.noDepthMask)
-            labels(3) = CStr(plot.histArray.Count) + " different levels in the prepared data."
+            'Marshal.Copy(plot.histArray, 0, plot.histogram.Data, plot.histArray.Length)
+            'cv.Cv2.CalcBackProject({dst2}, {0}, plot.histogram, dst1, plot.ranges)
+            'dst3 = ShowPalette(dst1)
+            'dst3.SetTo(0, task.noDepthMask)
+            'labels(3) = CStr(plot.histArray.Count) + " different levels in the prepared data."
         End If
+        dst3 = ShowPalette(dst2)
 
         labels(2) = task.redOptions.PointCloudReductionLabel + " with reduction factor = " + CStr(reduceAmt)
     End Sub

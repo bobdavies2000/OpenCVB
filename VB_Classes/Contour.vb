@@ -22,7 +22,7 @@ Public Class Contour_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst3 = task.edges.dst2
+        If src.Type = cv.MatType.CV_8U Then dst3 = src Else dst3 = task.edges.dst2
 
         Dim mode = options.options2.ApproximationMode
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then
@@ -1316,5 +1316,25 @@ Public Class Contour_Sort : Inherits TaskParent
                         CStr(allContours.Count) + " found.  " + CStr(matched) + " matched to the previous generation."
         End If
 
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Contour_DepthData : Inherits TaskParent
+    Dim prep As New RedPrep_Basics
+    Dim contours As New Contour_Basics
+    Public Sub New()
+        desc = "Find the contours in the cloud data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+
+        contours.Run(prep.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst2 = contours.dst2
+        labels(2) = contours.labels(2)
     End Sub
 End Class
