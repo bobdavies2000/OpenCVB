@@ -11,7 +11,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
         options.Run()
 
         Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
-        Dim reduceAmt = task.redOptions.SimpleReductionBar.Value
+        Dim reduceAmt = options.reductionTarget
         task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
         task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
         task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
@@ -58,12 +58,6 @@ Public Class RedPrep_Basics : Inherits TaskParent
             For i = 0 To plot.histArray.Count - 1
                 plot.histArray(i) = i
             Next
-
-            'Marshal.Copy(plot.histArray, 0, plot.histogram.Data, plot.histArray.Length)
-            'cv.Cv2.CalcBackProject({dst2}, {0}, plot.histogram, dst1, plot.ranges)
-            'dst3 = ShowPalette(dst1)
-            'dst3.SetTo(0, task.noDepthMask)
-            'labels(3) = CStr(plot.histArray.Count) + " different levels in the prepared data."
         End If
         dst3 = ShowPalette(dst2)
 

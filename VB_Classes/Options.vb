@@ -8003,7 +8003,10 @@ End Class
 
 Public Class Options_RedCloud : Inherits OptionParent
     Public reductionName As String
+    Public reductionTarget As Integer ' how many classes will there be in the resulting reduced cloud data.
     Public Sub New()
+
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Reduction Target", 1, 255, 200)
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("X Reduction")
@@ -8018,6 +8021,9 @@ Public Class Options_RedCloud : Inherits OptionParent
     End Sub
     Public Sub Run()
         Static frm = FindFrm(traceName + " Radio Buttons")
+        Static redSlider = FindSlider("Reduction Target")
+        reductionTarget = redSlider.value
+
         reductionName = frm.check(findRadioIndex(frm.check)).Text
 
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
