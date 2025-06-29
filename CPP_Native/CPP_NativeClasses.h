@@ -3827,9 +3827,10 @@ public:
         {
             const Point* pts = &segments[i][0];
             int n = (int)segments[i].size();
-            float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
-            bool drawClosed = distance < 10;
-            polylines(dst, &pts, &n, 1, drawClosed, i + 1, lineWidth, LINE_4);
+            //float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
+            //bool drawClosed = distance < 10;
+            //polylines(dst, &pts, &n, 1, drawClosed, i + 1, lineWidth, LINE_4);
+            polylines(dst, &pts, &n, 1, false, i + 1, lineWidth, LINE_4);
         }
     }
 };
@@ -4039,9 +4040,11 @@ public:
         {
             const Point* pts = &segments[i][0];
             int n = (int)segments[i].size();
-            float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
-            bool drawClosed = distance < 10;
-            polylines(dst, &pts, &n, 1, drawClosed, 255, lineWidth, LINE_AA);
+            // float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
+            // bool drawClosed = distance < 10;
+            // polylines(dst, &pts, &n, 1, drawClosed, i + 1, lineWidth, LINE_4);
+            polylines(dst, &pts, &n, 1, false, i + 1, lineWidth, LINE_4);
+            if (i == 255) break; // if there are more segments, it is not likely to add much value.
         }
     }
 };

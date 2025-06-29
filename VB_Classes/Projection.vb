@@ -161,7 +161,7 @@ Public Class Projection_Object : Inherits TaskParent
     Dim top As New Projection_ViewTop
     Dim side As New Projection_ViewSide
     Public Sub New()
-        task.gOptions.setDebugSlider(0) ' pick the biggest object...
+        task.gOptions.DebugSlider.Value = 0 ' pick the biggest object...
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
         top.objects.showRectangles = False

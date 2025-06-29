@@ -76,6 +76,7 @@ FeatureLess
 FeatureLine
 Fibonacci
 Filter
+Find
 FindCells
 FindContours
 FindMinRect
@@ -182,7 +183,7 @@ Plane
 Plot
 PlyFormat
 PointCloud
-Polylines
+PolyLine
 PongWars
 ProCon
 Profile

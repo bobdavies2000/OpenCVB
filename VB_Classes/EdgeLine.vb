@@ -1,45 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class EdgeLine_Basics : Inherits TaskParent
-    Public classCount As Integer = 2
-    Public Sub New()
-        cPtr = EdgeLineSimple_Open()
-        desc = "Retain the existing edge/lines and add the edge/lines where motion occurred."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim input = If(src.Channels() = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        Dim edgeLineWidth = 1, imageEdgeWidth = 2
-        If dst2.Width >= 1280 Then
-            edgeLineWidth = 3
-            imageEdgeWidth = 4
-        End If
-
-        Dim cppData(input.Total - 1) As Byte
-        Marshal.Copy(input.Data, cppData, 0, cppData.Length)
-        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = EdgeLineSimple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), input.Rows, input.Cols, edgeLineWidth)
-        handleSrc.Free()
-
-        dst2 = cv.Mat.FromPixelData(input.Rows, input.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth) ' prevent leaks at the image boundary...
-    End Sub
-    Public Sub Close()
-        EdgeLineSimple_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class EdgeLine_Raw : Inherits TaskParent
     Public segments As New List(Of List(Of cv.Point))
+    Public classCount As Integer
     Public Sub New()
         cPtr = EdgeLineRaw_Open()
-        labels = {"", "", "CV_8U Image showing merged lines and edges.", "CV_32S image - lines identified by their index in segments list"}
+        labels(3) = "Highlighting the individual segments one by one."
         desc = "Use EdgeLines to find edges/lines but without using motionMask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -50,14 +16,13 @@ Public Class EdgeLine_Raw : Inherits TaskParent
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
         handleSrc.Free()
-        If imagePtr <> 0 Then dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
-        dst3.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        If imagePtr <> 0 Then dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        Dim segCount = EdgeLineRaw_GetSegCount(cPtr)
+        classCount = EdgeLineRaw_GetSegCount(cPtr)
         segments.Clear()
-
-        For i = 0 To segCount - 1
+        Dim pointCount As Integer
+        For i = 0 To classCount - 1
             Dim len = EdgeLineRaw_NextLength(cPtr)
             Dim nextSeg(len - 1) As Integer
             Dim segPtr = EdgeLineRaw_NextSegment(cPtr)
@@ -66,14 +31,69 @@ Public Class EdgeLine_Raw : Inherits TaskParent
             Dim segment As New List(Of cv.Point)
             For j = 0 To nextSeg.Length - 2 Step 2
                 segment.Add(New cv.Point(nextSeg(j), nextSeg(j + 1)))
+                pointCount += 1
             Next
             segments.Add(segment)
         Next
+        labels(2) = CStr(classCount) + " segments were found using " + CStr(pointCount) + " points."
+
+        If standaloneTest() Then
+            Static debugSegment = 1
+            If debugSegment >= segments.Count Then
+                debugSegment = 1
+                dst3.SetTo(0)
+            End If
+            While segments(debugSegment) Is Nothing
+                debugSegment += 1
+                If debugSegment >= segments.Count Then Exit Sub ' nothing left to show...
+            End While
+            If debugSegment Then
+                dst1 = task.edges.dst2.InRange(debugSegment, debugSegment)
+                dst1.CopyTo(dst3, dst1)
+            End If
+            debugSegment += 1
+        End If
     End Sub
     Public Sub Close()
         EdgeLineRaw_Close(cPtr)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class EdgeLine_Simple : Inherits TaskParent
+    Public classCount As Integer
+    Public Sub New()
+        cPtr = EdgeLineSimple_Open()
+        desc = "Retain the existing edge/lines and add the edge/lines where motion occurred."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim input = If(src.Channels() = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        Dim imageEdgeWidth = 2
+        If dst2.Width >= 1280 Then imageEdgeWidth = 4
+
+        Dim cppData(input.Total - 1) As Byte
+        Marshal.Copy(input.Data, cppData, 0, cppData.Length)
+        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+        Dim imagePtr = EdgeLineSimple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), input.Rows, input.Cols, task.lineWidth * 2)
+        handleSrc.Free()
+
+        dst2 = cv.Mat.FromPixelData(input.Rows, input.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        Dim mm = GetMinMax(task.edges.dst2)
+        classCount = mm.maxVal
+        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth) ' prevent leaks at the image boundary...
+    End Sub
+    Public Sub Close()
+        EdgeLineSimple_Close(cPtr)
+    End Sub
+End Class
+
+
 
 
 
@@ -110,7 +130,7 @@ End Class
 
 Public Class EdgeLine_SplitMean : Inherits TaskParent
     Dim binary As New Bin4Way_SplitMean
-    Dim edges As New EdgeLine_Raw
+    Dim edges As New EdgeLine_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "find the edges in a 4-way color split of the image."
@@ -176,7 +196,7 @@ End Class
 
 
 
-Public Class EdgeLine_BasicsMotion : Inherits TaskParent
+Public Class EdgeLine_SimpleMotion : Inherits TaskParent
     Public edgeList As New List(Of List(Of cv.Point))
     Public Sub New()
         cPtr = EdgeLine_Open()
@@ -218,7 +238,7 @@ End Class
 
 
 Public Class EdgeLine_LeftRight : Inherits TaskParent
-    Dim edges As New EdgeLine_Raw
+    Dim edges As New EdgeLine_Basics
     Public Sub New()
         labels(3) = "Right View: Note it is updated on every frame - it does not use the motion mask."
         desc = "Build the left and right edge lines."

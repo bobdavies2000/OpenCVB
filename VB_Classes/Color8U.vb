@@ -33,10 +33,10 @@ Public Class Color8U_Basics : Inherits TaskParent
                 Case 9
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New MeanSubtraction_Gray
             End Select
-            classifier = colorMethods(Index)
+            classifier = colorMethods(index)
         End If
 
-        ' edgeLine_Basics is already running on each frame so it may not need to be run...
+        ' EdgeLine_Basics is already running on each frame so it may not need to be run...
         If task.redOptions.colorInputName <> "EdgeLine_Basics" And src.Type <> cv.MatType.CV_8U Then
             If task.redOptions.colorInputName = "PCA_NColor_CPP" Then ' requires RGB input.
                 classifier.Run(src.Clone)

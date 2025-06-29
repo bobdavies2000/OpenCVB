@@ -416,7 +416,7 @@ Public Class XO_CameraMotion_Basics : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.gOptions.setDebugSlider(3)
+        task.gOptions.DebugSlider.Value = 3
         desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

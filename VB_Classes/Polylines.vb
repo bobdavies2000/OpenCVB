@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Polylines_Basics : Inherits TaskParent
+Public Class PolyLine_Basics : Inherits TaskParent
     Public edgeList As New List(Of List(Of cv.Point))
-    Dim eSeg As New EdgeLine_Raw
+    Dim eSeg As New EdgeLine_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Retain edges where there was no motion."
@@ -69,12 +69,12 @@ End Class
 
 
 
-Public Class Polylines_IEnumerableExample : Inherits TaskParent
+Public Class PolyLine_IEnumerableExample : Inherits TaskParent
     Dim options As New Options_PolyLines
     Public Sub New()
         desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         Dim points = Enumerable.Range(0, options.polyCount).Select(Of cv.Point)(
@@ -96,13 +96,13 @@ End Class
 
 ' VB.Net implementation of the browse example in Opencvb.
 ' https://github.com/opencv/opencv/blob/master/samples/python/browse.py
-Public Class Polylines_Random : Inherits TaskParent
+Public Class PolyLine_Random : Inherits TaskParent
     Dim zoom As New Pixel_Zoom
     Public Sub New()
         labels(2) = "To zoom move the mouse over the image"
         desc = "Create a random procedural image"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.frameCount Mod (task.fpsAlgorithm * 3) = 0 Then ' every x frames.
             Dim h = src.Height, w = src.Width
             Dim autorand As New Random

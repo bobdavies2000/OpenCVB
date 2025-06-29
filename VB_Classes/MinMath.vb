@@ -13,7 +13,7 @@ Public Class MinMath_Line : Inherits TaskParent
 
         Dim linesFound As New List(Of Byte)
         Dim bpList(task.lineRGB.lpList.Count) As List(Of cv.Point)
-        For Each bp In bPoints.bpFeatures
+        For Each bp In bPoints.bpList
             Dim val = task.lineRGB.lpMap.Get(Of Byte)(bp.Y, bp.X)
             If val = 0 Then Continue For
             If linesFound.Contains(val) = False Then
@@ -63,7 +63,7 @@ Public Class MinMath_Edges : Inherits TaskParent
         dst3 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         labels(3) = edges.labels(2)
 
-        For Each bp In bPoints.bpFeatures
+        For Each bp In bPoints.bpList
             dst3.Circle(bp, task.DotSize, task.highlight, -1, task.lineType)
         Next
     End Sub
@@ -88,7 +88,7 @@ Public Class MinMath_EdgeLine : Inherits TaskParent
         dst3 = task.edges.dst2
         labels(3) = task.edges.labels(2)
 
-        For Each bp In bPoints.bpFeatures
+        For Each bp In bPoints.bpList
             Dim val = dst3.Get(Of Byte)(bp.Y, bp.X)
             If val = 0 Then Continue For
             dst3.Circle(bp, task.DotSize, 255, -1, task.lineType)

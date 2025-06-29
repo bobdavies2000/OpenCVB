@@ -585,7 +585,7 @@ Public Class Brick_EdgeDraw : Inherits TaskParent
         dst2 = regions.dst3
         labels(2) = regions.labels(2)
 
-        dst2.SetTo(cv.Scalar.White, task.edges.dst2) ' edgeLine_Basics has already been run as part of fcsBasics.
+        dst2.SetTo(cv.Scalar.White, task.edges.dst2) ' edgeLine has already been run
     End Sub
 End Class
 

@@ -55,7 +55,7 @@ End Class
 
 
 Public Class Disparity_Edges : Inherits TaskParent
-    Dim edges As New EdgeLine_Raw
+    Dim edges As New EdgeLine_Basics
     Dim disparity As New Disparity_Basics
     Public Sub New()
         desc = "Use features in bricks to confirm depth."

@@ -309,12 +309,6 @@ Public Class OptionsGlobal
     Public Function getShowGrid() As Boolean
         Return ShowGrid.Checked
     End Function
-    Public Sub setDebugSlider(val As Integer)
-        DebugSlider.Value = val
-    End Sub
-    Public Sub setDebugCheckBox(val As Boolean)
-        DebugCheckBox.Checked = val
-    End Sub
     Public Function getPalette() As String
         Return Palettes.Text
     End Function
@@ -327,12 +321,6 @@ Public Class OptionsGlobal
     Public Sub setOpenGLCapture(val As Boolean)
         OpenGLCapture.Checked = val
     End Sub
-    Public Function getDebugCheckBox() As Boolean
-        Return DebugCheckBox.Checked
-    End Function
-    Public Function getDebugSlider() As Integer
-        Return DebugSlider.Value
-    End Function
     Public Sub setGravityUsage(val As Boolean)
         gravityPointCloud.Checked = val
     End Sub
