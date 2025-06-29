@@ -106,8 +106,6 @@ Public Class OptionsRedColor
 
         SimpleReductionBar.Enabled = Not BitwiseReduction.Checked
         BitwiseReductionBar.Enabled = BitwiseReduction.Checked
-
-        ' task.redCloudOptions.Run()
     End Sub
 
 

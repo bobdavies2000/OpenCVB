@@ -13,7 +13,7 @@ Public Class Match_Basics : Inherits TaskParent
                "(allows multiple targets per image.)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
+        If standalone And task.algorithmPrep = False Then
             If task.gOptions.DebugCheckBox.Checked Then
                 task.gOptions.DebugCheckBox.Checked = False
                 Dim inputRect = If(task.firstPass, New cv.Rect(25, 25, 25, 25), ValidateRect(task.drawRect))
@@ -617,7 +617,9 @@ Public Class Match_Line : Inherits TaskParent
         desc = "Match the endpoints of a line to make sure it is still there before line detection runs."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then lpInput = task.gravityBasics.cameraMotionProxy
+        If standalone And task.algorithmPrep = False Then lpInput = task.gravityVec
+        If lpInput Is Nothing Then Exit Sub
+        If lpInput.length = 0 Then Exit Sub
 
         match.template = lpInput.template
         Dim matchInput As New cv.Mat

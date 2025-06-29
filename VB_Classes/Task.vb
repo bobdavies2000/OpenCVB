@@ -210,7 +210,6 @@ Public Class VBtask : Implements IDisposable
 
     Public gOptions As OptionsGlobal
     Public redOptions As OptionsRedColor
-    Public redCloudOptions As Options_RedCloud
     Public featureOptions As OptionsFeatures
     Public treeView As TreeviewForm
 
@@ -514,7 +513,6 @@ Public Class VBtask : Implements IDisposable
 
         gOptions = New OptionsGlobal
         redOptions = New OptionsRedColor
-        ' redCloudOptions = New Options_RedCloud
         featureOptions = New OptionsFeatures
         treeView = New TreeviewForm
 
