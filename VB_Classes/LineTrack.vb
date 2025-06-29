@@ -33,7 +33,7 @@ Public Class LineTrack_Map : Inherits TaskParent
     Public Sub New()
         task.brickRunFlag = True
         task.gOptions.CrossHairs.Checked = False
-        desc = "Show the brickMap (bricks) and fpMap (features points) "
+        desc = "Show the gridMap and fpMap (features points) "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lTrack.Run(src)

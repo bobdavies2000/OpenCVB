@@ -725,14 +725,15 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
             Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - ep2.X)
             If Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold Then gravityProxy = True
         End If
+
+        If p1.X < 0 Or p1.Y < 0 Or p2.X < 0 Or p2.Y < 0 Then Dim k = 0
     End Sub
     Sub New()
         p1 = New cv.Point2f()
         p2 = New cv.Point2f()
     End Sub
-
-    Public Function compare(mp As lpData) As Boolean
-        If mp.p1.X = p1.X And mp.p1.Y = p1.Y And mp.p2.X = p2.X And p2.Y = p2.Y Then Return True
+    Public Function compare(lp As lpData) As Boolean
+        If lp.p1.X = p1.X And lp.p1.Y = p1.Y And lp.p2.X = p2.X And p2.Y = p2.Y Then Return True
         Return False
     End Function
 End Class

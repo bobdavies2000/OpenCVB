@@ -735,6 +735,14 @@ Public Class VBtask : Implements IDisposable
             cv.Cv2.Merge(pcSplit, pointCloud)
         End If
 
+        If task.rangesCloud Is Nothing Then
+            Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+            Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+            Dim rz = New cv.Vec2f(0, task.MaxZmeters)
+            task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1),
+                                                New cv.Rangef(rz.Item0, rz.Item1)}
+        End If
+
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
         motionBasics.Run(src)

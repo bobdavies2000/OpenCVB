@@ -254,14 +254,13 @@ Public Class Grid_Emax : Inherits TaskParent
     Public gridWidth As Integer = 10
     Public gridHeight As Integer = 10
     Public gridRects As New List(Of cv.Rect)
+    Public gridMap As New cv.Mat
     Public cellsPerCol As Integer
     Public cellsPerRow As Integer
     Public gridMask As cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
-    Public brickMap As cv.Mat
     Public Sub New()
         gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        brickMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
         desc = "Grids are normally square.  Grid_Special allows grid elements to be rectangles." +
                 "  Specify the Y size."
     End Sub
@@ -294,7 +293,7 @@ Public Class Grid_Emax : Inherits TaskParent
             Next
 
             For Each roi In gridRects
-                brickMap.Rectangle(roi, gridRects.IndexOf(roi), -1)
+                gridMap.Rectangle(roi, gridRects.IndexOf(roi), -1)
             Next
 
             gridNeighbors.Clear()
@@ -307,7 +306,7 @@ Public Class Grid_Emax : Inherits TaskParent
                     Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
                                           roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
                     If x >= 0 And x < dst2.Width And y >= 0 And y < dst2.Height Then
-                        gridNeighbors(gridNeighbors.Count - 1).Add(brickMap.Get(Of Integer)(y, x))
+                        gridNeighbors(gridNeighbors.Count - 1).Add(gridMap.Get(Of Integer)(y, x))
                     End If
                 Next
             Next

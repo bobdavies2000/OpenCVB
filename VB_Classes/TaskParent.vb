@@ -340,9 +340,9 @@ Public Class TaskParent : Implements IDisposable
     End Function
     Public Function validatePoint(pt As cv.Point2f) As cv.Point
         If pt.X < 0 Then pt.X = 0
-        If pt.X > dst2.Width Then pt.X = dst2.Width
+        If pt.X > dst2.Width Then pt.X = dst2.Width - 1
         If pt.Y < 0 Then pt.Y = 0
-        If pt.Y > dst2.Height Then pt.Y = dst2.Height
+        If pt.Y > dst2.Height Then pt.Y = dst2.Height - 1
         Return pt
     End Function
     Public Shared Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
