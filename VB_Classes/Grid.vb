@@ -250,82 +250,6 @@ End Class
 
 
 
-Public Class Grid_Emax : Inherits TaskParent
-    Public gridWidth As Integer = 10
-    Public gridHeight As Integer = 10
-    Public gridRects As New List(Of cv.Rect)
-    Public gridMap As New cv.Mat
-    Public cellsPerCol As Integer
-    Public cellsPerRow As Integer
-    Public gridMask As cv.Mat
-    Public gridNeighbors As New List(Of List(Of Integer))
-    Public Sub New()
-        gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
-        desc = "Grids are normally square.  Grid_Special allows grid elements to be rectangles." +
-                "  Specify the Y size."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then
-            gridRects.Clear()
-            cellsPerCol = 0
-            cellsPerRow = 0
-            For y = 0 To dst2.Height - 1 Step gridHeight
-                For x = 0 To dst2.Width - 1 Step gridWidth
-                    Dim roi = New cv.Rect(x, y, gridWidth, gridHeight)
-                    If x + roi.Width >= dst2.Width Then roi.Width = dst2.Width - x
-                    If y + roi.Height >= dst2.Height Then roi.Height = dst2.Height - y
-                    If roi.Width > 0 And roi.Height > 0 Then
-                        If x = 0 Then cellsPerCol += 1
-                        If y = 0 Then cellsPerRow += 1
-                        gridRects.Add(roi)
-                    End If
-                Next
-            Next
-
-            gridMask.SetTo(0)
-            For x = gridWidth To dst2.Width - 1 Step gridWidth
-                Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, dst2.Height)
-                gridMask.Line(p1, p2, 255, task.lineWidth)
-            Next
-            For y = gridHeight To dst2.Height - 1 Step gridHeight
-                Dim p1 = New cv.Point(0, y), p2 = New cv.Point(dst2.Width, y)
-                gridMask.Line(p1, p2, 255, task.lineWidth)
-            Next
-
-            For Each roi In gridRects
-                gridMap.Rectangle(roi, gridRects.IndexOf(roi), -1)
-            Next
-
-            gridNeighbors.Clear()
-            For Each roi In gridRects
-                gridNeighbors.Add(New List(Of Integer))
-                For i = 0 To 8
-                    Dim x = Choose(i + 1, roi.X - 1, roi.X, roi.X + roi.Width + 1,
-                                          roi.X - 1, roi.X, roi.X + roi.Width + 1,
-                                          roi.X - 1, roi.X, roi.X + roi.Width + 1)
-                    Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
-                                          roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
-                    If x >= 0 And x < dst2.Width And y >= 0 And y < dst2.Height Then
-                        gridNeighbors(gridNeighbors.Count - 1).Add(gridMap.Get(Of Integer)(y, x))
-                    End If
-                Next
-            Next
-
-        End If
-        If standaloneTest() Then
-            task.color.CopyTo(dst2)
-            dst2.SetTo(white, gridMask)
-            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(cellsPerCol) + "X" + CStr(cellsPerRow) + ") " +
-                          CStr(gridWidth) + "X" + CStr(gridHeight) + " regions"
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Grid_MinMaxDepth : Inherits TaskParent
     Public minMaxLocs(0) As lpData
@@ -399,6 +323,84 @@ Public Class Grid_TrackCenter : Inherits TaskParent
             SetTrueText(Format(match.correlation, fmt3), center, 3)
 
             labels(3) = "Match correlation = " + Format(match.correlation, fmt3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Grid_Rectangles : Inherits TaskParent
+    Public gridWidth As Integer = 10
+    Public gridHeight As Integer = 10
+    Public gridRects As New List(Of cv.Rect)
+    Public gridMap As New cv.Mat
+    Public cellsPerCol As Integer
+    Public cellsPerRow As Integer
+    Public gridMask As cv.Mat
+    Public gridNeighbors As New List(Of List(Of Integer))
+    Public Sub New()
+        gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        gridMap = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        desc = "Grids are normally square.  Grid_Special allows grid elements to be rectangles." +
+                "  Specify the Y size."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then
+            gridRects.Clear()
+            cellsPerCol = 0
+            cellsPerRow = 0
+            For y = 0 To dst2.Height - 1 Step gridHeight
+                For x = 0 To dst2.Width - 1 Step gridWidth
+                    Dim roi = New cv.Rect(x, y, gridWidth, gridHeight)
+                    If x + roi.Width >= dst2.Width Then roi.Width = dst2.Width - x
+                    If y + roi.Height >= dst2.Height Then roi.Height = dst2.Height - y
+                    If roi.Width > 0 And roi.Height > 0 Then
+                        If x = 0 Then cellsPerCol += 1
+                        If y = 0 Then cellsPerRow += 1
+                        gridRects.Add(roi)
+                    End If
+                Next
+            Next
+
+            gridMask.SetTo(0)
+            For x = gridWidth To dst2.Width - 1 Step gridWidth
+                Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, dst2.Height)
+                gridMask.Line(p1, p2, 255, task.lineWidth)
+            Next
+            For y = gridHeight To dst2.Height - 1 Step gridHeight
+                Dim p1 = New cv.Point(0, y), p2 = New cv.Point(dst2.Width, y)
+                gridMask.Line(p1, p2, 255, task.lineWidth)
+            Next
+
+            For Each roi In gridRects
+                gridMap.Rectangle(roi, gridRects.IndexOf(roi), -1)
+            Next
+
+            gridNeighbors.Clear()
+            For Each roi In gridRects
+                gridNeighbors.Add(New List(Of Integer))
+                For i = 0 To 8
+                    Dim x = Choose(i + 1, roi.X - 1, roi.X, roi.X + roi.Width + 1,
+                                          roi.X - 1, roi.X, roi.X + roi.Width + 1,
+                                          roi.X - 1, roi.X, roi.X + roi.Width + 1)
+                    Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
+                                          roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
+                    If x >= 0 And x < dst2.Width And y >= 0 And y < dst2.Height Then
+                        gridNeighbors(gridNeighbors.Count - 1).Add(gridMap.Get(Of Integer)(y, x))
+                    End If
+                Next
+            Next
+
+        End If
+        If standaloneTest() Then
+            task.color.CopyTo(dst2)
+            dst2.SetTo(white, gridMask)
+            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(cellsPerCol) + "X" + CStr(cellsPerRow) + ") " +
+                          CStr(gridWidth) + "X" + CStr(gridHeight) + " regions"
         End If
     End Sub
 End Class

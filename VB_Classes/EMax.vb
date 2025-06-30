@@ -101,7 +101,7 @@ Public Class EMax_InputClusters : Inherits TaskParent
     Public eSamples As New List(Of cv.Point2f)
     Public centers As New List(Of cv.Point2f)
     Dim options As New Options_EmaxInputClusters
-    Dim grid As New Grid_Emax
+    Dim grid As New Grid_Rectangles
     Public Sub New()
         labels(2) = "EMax algorithms input samples"
         OptionParent.FindSlider("EMax Cell Size").Value = CInt(dst2.Width / 3)
