@@ -1,4 +1,59 @@
 ﻿Imports cv = OpenCvSharp
+Public Class Find_Basics : Inherits TaskParent
+    Public nrclist As New List(Of nrcData)
+    Public Sub New()
+        task.gOptions.DebugSlider.Value = 1
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        desc = "Create an entry for each segment"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.edges.dst2
+        labels(2) = task.edges.labels(2)
+
+        Dim sortList As New SortedList(Of Integer, nrcData)(New compareAllowIdenticalIntegerInverted)
+        For Each seg In task.edges.segments
+            Dim nrc = New nrcData
+            Dim segIndex = sortList.Count + 1
+            nrc.rect = task.edges.rectList(segIndex - 1)
+            nrc.mask = dst2(nrc.rect).InRange(segIndex, segIndex)
+            nrc.pixels = seg.Count
+            nrc.segment = seg
+            sortList.Add(nrc.pixels, nrc)
+        Next
+
+        Dim nrcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim sortGridID As New SortedList(Of Integer, nrcData)(New compareAllowIdenticalInteger)
+        Dim duplicatePixels As Integer
+        For Each nrc In sortList.Values
+            nrc.ID = task.grid.gridMap.Get(Of Single)(nrc.segment(0).Y, nrc.segment(0).X)
+            Dim takenFlag = nrcMap.Get(Of Byte)(nrc.segment(0).Y, nrc.segment(0).X)
+            If takenFlag <> 0 Then
+                duplicatePixels += nrc.pixels
+                Continue For ' this id is already taken by a larger segment
+            End If
+            nrcMap(task.gridRects(nrc.ID)).SetTo(255)
+            sortGridID.Add(nrc.ID, nrc)
+        Next
+
+        nrclist = New List(Of nrcData)(sortGridID.Values)
+
+        dst1.SetTo(0)
+        For i = 0 To nrclist.Count - 1
+            Dim nrc = nrclist(i)
+            dst1(nrc.rect).SetTo(nrc.ID Mod 255, nrc.mask)
+        Next
+        dst3 = ShowPalette(dst1)
+
+        labels(3) = CStr(nrclist.Count) + " segments are present.  " + CStr(duplicatePixels) +
+                    " pixels were dropped because the segment hit an already occupied grid cell."
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class Find_PolyLines : Inherits TaskParent
     Dim ptBrick As New BrickPoint_Basics
     Dim polyLine As New PolyLine_Basics
@@ -120,64 +175,6 @@ Public Class Find_Segment : Inherits TaskParent
             Next
         Next
         labels(3) = "After using depth to isolate segments there are " + CStr(segments.Count) + " segments"
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Find_Basics : Inherits TaskParent
-    Public nrclist As New List(Of nrcData)
-    Public Sub New()
-        task.gOptions.DebugSlider.Value = 1
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Create an entry for each segment"
-    End Sub
-    Public Shared Function buildRectFromSeg(seg As List(Of cv.Point)) As cv.Rect
-        Dim minX As Single = seg.Min(Function(p) p.X)
-        Dim maxX As Single = seg.Max(Function(p) p.X)
-        Dim minY As Single = seg.Min(Function(p) p.Y)
-        Dim maxY As Single = seg.Max(Function(p) p.Y)
-        Return TaskParent.ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.edges.dst2
-        labels(2) = task.edges.labels(2)
-
-        dst1.SetTo(0)
-        nrclist.Clear()
-        'Dim nrcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        For Each seg In task.edges.segments
-            Dim nrc = New nrcData
-            'Dim ID = task.grid.gridMap.Get(Of Single)(seg(0).Y, seg(0).X)
-            'Dim takenFlag = nrcMap.Get(Of Byte)(seg(0).Y, seg(0).X)
-            'If takenFlag <> 0 Then Continue For ' this id is already taken by a larger segment
-            'nrcMap(task.gridRects(ID)).SetTo(255)
-            Dim segIndex = nrclist.Count + 1
-            nrc.rect = task.edges.rectList(segIndex - 1)
-            nrc.mask = dst2(nrc.rect).InRange(segIndex, segIndex)
-            nrc.pixels = seg.Count
-            nrc.segment = seg
-            dst1(nrc.rect).SetTo(segIndex, nrc.mask)
-            nrclist.Add(nrc)
-        Next
-
-        dst3 = ShowPalette(dst1)
-        Dim sortList As New SortedList(Of Integer, nrcData)(New compareAllowIdenticalIntegerInverted)
-
-        Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
-        If index <> 0 Then
-            dst1.SetTo(0)
-            Dim nrc = nrclist(index - 1)
-            dst1(nrc.rect).SetTo(255, nrc.mask)
-            dst1.Rectangle(nrc.rect, 255, task.lineWidth)
-        End If
-
-        labels(3) = CStr(nrclist.Count) + " segments are present.  " + CStr(task.edges.segments.Count - nrclist.Count) +
-                    " segments hit an already occupied grid cell.  Using " + CStr(dst1.CountNonZero) + " pixels."
     End Sub
 End Class
 

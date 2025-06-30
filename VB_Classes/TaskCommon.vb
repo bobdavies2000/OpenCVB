@@ -744,6 +744,7 @@ End Class
 Public Class nrcData
     Public rect As cv.Rect
     Public mask As cv.Mat
+    Public ID As Integer
     Public pixels As Integer
     Public age As Integer
     Public depth As Single

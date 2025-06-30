@@ -66,14 +66,14 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         Next
         labels(2) = CStr(classCount) + " segments were found using " + CStr(pointCount) + " points."
 
-        Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
-        If index <> 0 Then
-            dst3 = task.edges.dst2.InRange(index, index)
-            Dim rect = rectList(index - 1)
-            dst3.Rectangle(rect, 255, task.lineWidth)
-        End If
+        'Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
+        'If index <> 0 Then
+        '    dst3 = task.edges.dst2.InRange(index, index)
+        '    Dim rect = rectList(index - 1)
+        '    dst3.Rectangle(rect, 255, task.lineWidth)
+        'End If
 
-        'If standaloneTest() Then showSegment(dst3)
+        If standaloneTest() Then showSegment(dst3)
     End Sub
     Public Sub Close()
         EdgeLineRaw_Close(cPtr)
