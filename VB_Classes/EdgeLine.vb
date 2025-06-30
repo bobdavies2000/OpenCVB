@@ -1,10 +1,12 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class EdgeLine_Basics : Inherits TaskParent
-    Public sortedSegments As New SortedList(Of Integer, List(Of cv.Point))(New compareAllowIdenticalIntegerInverted)
+    Public segments As New List(Of List(Of cv.Point))
+    Public rectList As New List(Of cv.Rect)
     Public classCount As Integer
     Public Sub New()
         cPtr = EdgeLineRaw_Open()
+        task.gOptions.DebugSlider.Value = 1
         labels(3) = "Highlighting the individual segments one by one."
         desc = "Use EdgeLines to find edges/lines but without using motionMask"
     End Sub
@@ -12,17 +14,17 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         If task.quarterBeat Then
             Static debugSegment = 0
             debugSegment += 1
-            If debugSegment >= task.edges.sortedSegments.Count Then
+            If debugSegment >= task.edges.segments.Count Then
                 debugSegment = 0
                 dst.SetTo(0)
             End If
-            If debugSegment >= task.edges.sortedSegments.Values.Count Then debugSegment = 0
+            If debugSegment >= task.edges.segments.Count Then debugSegment = 0
             If debugSegment Then
-                task.edges.dst1 = task.edges.dst2.InRange(debugSegment, debugSegment)
-                task.edges.dst1.CopyTo(dst, task.edges.dst1)
+                    task.edges.dst1 = task.edges.dst2.InRange(debugSegment, debugSegment)
+                    task.edges.dst1.CopyTo(dst, task.edges.dst1)
+                End If
+                debugSegment += 1
             End If
-            debugSegment += 1
-        End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -35,8 +37,18 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         If imagePtr <> 0 Then dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
 
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, EdgeLineRaw_Rects(cPtr))
+
         classCount = EdgeLineRaw_GetSegCount(cPtr)
-        sortedSegments.Clear()
+        Dim rects(classCount * 4) As Integer
+        Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+
+        rectList.Clear()
+        For i = 0 To classCount * 4 - 4 Step 4
+            rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
+        Next
+
+        segments.Clear()
         Dim pointCount As Integer
         For i = 0 To classCount - 1
             Dim len = EdgeLineRaw_NextLength(cPtr)
@@ -50,11 +62,18 @@ Public Class EdgeLine_Basics : Inherits TaskParent
                 segment.Add(New cv.Point(nextSeg(j), nextSeg(j + 1)))
                 pointCount += 1
             Next
-            sortedSegments.Add(len, segment)
+            segments.Add(segment)
         Next
         labels(2) = CStr(classCount) + " segments were found using " + CStr(pointCount) + " points."
 
-        If standaloneTest() Then showSegment(dst3)
+        Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
+        If index <> 0 Then
+            dst3 = task.edges.dst2.InRange(index, index)
+            Dim rect = rectList(index - 1)
+            dst3.Rectangle(rect, 255, task.lineWidth)
+        End If
+
+        'If standaloneTest() Then showSegment(dst3)
     End Sub
     Public Sub Close()
         EdgeLineRaw_Close(cPtr)

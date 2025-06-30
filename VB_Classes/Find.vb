@@ -86,7 +86,7 @@ Public Class Find_Segment : Inherits TaskParent
         dst2 = task.edges.dst2
 
         segments.Clear()
-        For Each seg In task.edges.sortedSegments.Values
+        For Each seg In task.edges.segments
             Dim nextSeg As New List(Of cv.Point)
             Dim lastDepth = -1
             For Each pt In seg
@@ -128,13 +128,15 @@ End Class
 
 
 
-Public Class Find_BuildList : Inherits TaskParent
+Public Class Find_Basics : Inherits TaskParent
     Public nrclist As New List(Of nrcData)
     Public Sub New()
+        task.gOptions.DebugSlider.Value = 1
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Create an entry for each segment"
     End Sub
-    Public Shared Function buildRect(seg As List(Of cv.Point)) As cv.Rect
+    Public Shared Function buildRectFromSeg(seg As List(Of cv.Point)) As cv.Rect
         Dim minX As Single = seg.Min(Function(p) p.X)
         Dim maxX As Single = seg.Max(Function(p) p.X)
         Dim minY As Single = seg.Min(Function(p) p.Y)
@@ -142,41 +144,40 @@ Public Class Find_BuildList : Inherits TaskParent
         Return TaskParent.ValidateRect(New cv.Rect(minX, minY, maxX - minX, maxY - minY))
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2 = task.edges.dst2
         labels(2) = task.edges.labels(2)
 
         dst1.SetTo(0)
         nrclist.Clear()
-        Dim nrcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        For Each seg In task.edges.sortedSegments.Values
+        'Dim nrcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        For Each seg In task.edges.segments
             Dim nrc = New nrcData
-            nrc.ID = task.grid.gridMap.Get(Of Single)(seg(0).Y, seg(0).X)
-            Dim takenFlag = nrcMap.Get(Of Byte)(seg(0).Y, seg(0).X)
-            If takenFlag <> 0 Then Continue For ' this id is already taken by a larger segment
-            nrcMap(task.gridRects(nrc.ID)).SetTo(255)
-            nrc.rect = buildRect(seg)
-            nrc.mask = dst2(nrc.rect)
+            'Dim ID = task.grid.gridMap.Get(Of Single)(seg(0).Y, seg(0).X)
+            'Dim takenFlag = nrcMap.Get(Of Byte)(seg(0).Y, seg(0).X)
+            'If takenFlag <> 0 Then Continue For ' this id is already taken by a larger segment
+            'nrcMap(task.gridRects(ID)).SetTo(255)
+            Dim segIndex = nrclist.Count + 1
+            nrc.rect = task.edges.rectList(segIndex - 1)
+            nrc.mask = dst2(nrc.rect).InRange(segIndex, segIndex)
             nrc.pixels = seg.Count
             nrc.segment = seg
-            dst1(nrc.rect).SetTo(nrc.ID Mod 255, nrc.mask)
+            dst1(nrc.rect).SetTo(segIndex, nrc.mask)
             nrclist.Add(nrc)
-            If nrclist.Count > task.gOptions.DebugSlider.Value Then Exit For
         Next
 
         dst3 = ShowPalette(dst1)
-        dst0 = ShowPalette(dst1)
+        Dim sortList As New SortedList(Of Integer, nrcData)(New compareAllowIdenticalIntegerInverted)
 
-        For i = 0 To Math.Min(task.gOptions.DebugSlider.Value, nrclist.Count) - 1
-            Dim nrc = nrclist(i)
-            Dim seg = nrc.segment
-            SetTrueText(CStr(i) + " " + CStr(seg.Count), seg(0), 3)
-            dst3.Rectangle(nrc.rect, task.highlight, task.lineWidth)
-            dst2(nrc.rect).SetTo(0, nrc.mask)
-        Next
+        Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
+        If index <> 0 Then
+            dst1.SetTo(0)
+            Dim nrc = nrclist(index - 1)
+            dst1(nrc.rect).SetTo(255, nrc.mask)
+            dst1.Rectangle(nrc.rect, 255, task.lineWidth)
+        End If
 
-        labels(3) = CStr(nrclist.Count) + " segments are present.  " + CStr(task.edges.sortedSegments.Values.Count - nrclist.Count) +
+        labels(3) = CStr(nrclist.Count) + " segments are present.  " + CStr(task.edges.segments.Count - nrclist.Count) +
                     " segments hit an already occupied grid cell.  Using " + CStr(dst1.CountNonZero) + " pixels."
     End Sub
 End Class
-
 

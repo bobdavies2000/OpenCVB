@@ -747,7 +747,6 @@ Public Class nrcData
     Public pixels As Integer
     Public age As Integer
     Public depth As Single
-    Public ID As Integer
     Public segment As New List(Of cv.Point)
     Public Sub New()
     End Sub
