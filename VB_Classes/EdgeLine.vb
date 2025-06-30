@@ -1,12 +1,28 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class EdgeLine_Basics : Inherits TaskParent
-    Public segments As New List(Of List(Of cv.Point))
+    Public sortedSegments As New SortedList(Of Integer, List(Of cv.Point))(New compareAllowIdenticalIntegerInverted)
     Public classCount As Integer
     Public Sub New()
         cPtr = EdgeLineRaw_Open()
         labels(3) = "Highlighting the individual segments one by one."
         desc = "Use EdgeLines to find edges/lines but without using motionMask"
+    End Sub
+    Public Shared Sub showSegment(dst As cv.Mat)
+        If task.quarterBeat Then
+            Static debugSegment = 0
+            debugSegment += 1
+            If debugSegment >= task.edges.sortedSegments.Count Then
+                debugSegment = 0
+                dst.SetTo(0)
+            End If
+            If debugSegment >= task.edges.sortedSegments.Values.Count Then debugSegment = 0
+            If debugSegment Then
+                task.edges.dst1 = task.edges.dst2.InRange(debugSegment, debugSegment)
+                task.edges.dst1.CopyTo(dst, task.edges.dst1)
+            End If
+            debugSegment += 1
+        End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -20,11 +36,12 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
 
         classCount = EdgeLineRaw_GetSegCount(cPtr)
-        segments.Clear()
+        sortedSegments.Clear()
         Dim pointCount As Integer
         For i = 0 To classCount - 1
             Dim len = EdgeLineRaw_NextLength(cPtr)
-            Dim nextSeg(len - 1) As Integer
+            If len < 2 Then Continue For
+            Dim nextSeg(len * 2 - 1) As Integer
             Dim segPtr = EdgeLineRaw_NextSegment(cPtr)
             Marshal.Copy(segPtr, nextSeg, 0, nextSeg.Length)
 
@@ -33,26 +50,11 @@ Public Class EdgeLine_Basics : Inherits TaskParent
                 segment.Add(New cv.Point(nextSeg(j), nextSeg(j + 1)))
                 pointCount += 1
             Next
-            segments.Add(segment)
+            sortedSegments.Add(len, segment)
         Next
         labels(2) = CStr(classCount) + " segments were found using " + CStr(pointCount) + " points."
 
-        If standaloneTest() Then
-            Static debugSegment = 1
-            If debugSegment >= segments.Count Then
-                debugSegment = 1
-                dst3.SetTo(0)
-            End If
-            While segments(debugSegment) Is Nothing
-                debugSegment += 1
-                If debugSegment >= segments.Count Then Exit Sub ' nothing left to show...
-            End While
-            If debugSegment Then
-                dst1 = task.edges.dst2.InRange(debugSegment, debugSegment)
-                dst1.CopyTo(dst3, dst1)
-            End If
-            debugSegment += 1
-        End If
+        If standaloneTest() Then showSegment(dst3)
     End Sub
     Public Sub Close()
         EdgeLineRaw_Close(cPtr)

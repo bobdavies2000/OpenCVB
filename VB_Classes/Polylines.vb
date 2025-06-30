@@ -26,16 +26,16 @@ Public Class PolyLine_Basics : Inherits TaskParent
 
         eSeg.Run(src)
 
-        ReDim histarray(eSeg.segments.Count - 1)
+        ReDim histarray(eSeg.sortedSegments.Values.Count - 1)
 
         eSeg.dst3.ConvertTo(dst1, cv.MatType.CV_32F)
 
-        Dim ranges2 = New cv.Rangef() {New cv.Rangef(0, eSeg.segments.Count)}
-        cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {eSeg.segments.Count}, ranges2)
+        Dim ranges2 = New cv.Rangef() {New cv.Rangef(0, eSeg.sortedSegments.Values.Count)}
+        cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {eSeg.sortedSegments.Values.Count}, ranges2)
         Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
         For i = 1 To histarray.Count - 1
-            If histarray(i) > 0 Then edgeList.Add(eSeg.segments(i - 1))
+            If histarray(i) > 0 Then edgeList.Add(eSeg.sortedSegments.Values(i - 1))
         Next
 
         dst1.SetTo(0)
@@ -57,9 +57,9 @@ Public Class PolyLine_Basics : Inherits TaskParent
         dst3 = ShowPalette(dst3)
 
         If task.heartBeat Then
-            labels(2) = CStr(eSeg.segments.Count) + " lines found in EdgeLines C++ in the latest image and " +
+            labels(2) = CStr(eSeg.sortedSegments.Values.Count) + " lines found in EdgeLines C++ in the latest image and " +
                         CStr(edgeList.Count) + " resulted after filtering with the motion mask."
-            labels(3) = "The " + CStr(eSeg.segments.Count) + " segments found in the current image are colored with the index of each segment"
+            labels(3) = "The " + CStr(eSeg.sortedSegments.Values.Count) + " segments found in the current image are colored with the index of each segment"
         End If
     End Sub
 End Class

@@ -737,3 +737,18 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
         Return False
     End Function
 End Class
+
+
+
+
+Public Class nrcData
+    Public rect As cv.Rect
+    Public mask As cv.Mat
+    Public pixels As Integer
+    Public age As Integer
+    Public depth As Single
+    Public ID As Integer
+    Public segment As New List(Of cv.Point)
+    Public Sub New()
+    End Sub
+End Class

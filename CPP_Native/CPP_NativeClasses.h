@@ -3819,7 +3819,7 @@ public:
         segments.clear();
 
         eDraw->ed->detectEdges(src);
-        eDraw->ed->detectLines(lines);
+        //eDraw->ed->detectLines(lines);
         segments = eDraw->ed->getSegments();
 
         dst.setTo(0);
@@ -3867,7 +3867,6 @@ int EdgeLineRaw_GetSegCount(EdgeDrawRaw* cPtr)
 extern "C" __declspec(dllexport)
 int EdgeLineRaw_NextLength(EdgeDrawRaw* cPtr)
 {
-    if (cPtr->segments.size() < cPtr->segmentIndex) return 0;
     return (int)cPtr->segments[cPtr->segmentIndex].size();
 }
 
