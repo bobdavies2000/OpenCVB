@@ -1095,7 +1095,6 @@ Public Class Edge_DiffX_CPP : Inherits TaskParent
     Public segments As New Hist_CloudSegments
     Dim edges As New Edge_Sobel
     Public Sub New()
-        task.redOptions.XReduction.Checked = True
         cPtr = Edge_DiffX_Open()
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
@@ -1125,7 +1124,6 @@ Public Class Edge_DiffY_CPP : Inherits TaskParent
     Public segments As New Hist_CloudSegments
     Dim edges As New Edge_Sobel
     Public Sub New()
-        task.redOptions.YReduction.Checked = True
         cPtr = Edge_DiffY_Open()
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub
@@ -1155,7 +1153,6 @@ Public Class Edge_DiffZ_CPP : Inherits TaskParent
     Public segments As New Hist_CloudSegments
     Dim edges As New Edge_Sobel
     Public Sub New()
-        task.redOptions.ZReduction.Checked = True
         cPtr = Edge_DiffY_Open()
         desc = "Ignore edges with zero - in C++ because it needs to be optimized."
     End Sub

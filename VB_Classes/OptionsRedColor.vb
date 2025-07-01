@@ -142,31 +142,31 @@ Public Class OptionsRedColor
 
 
 
-    Private Sub XReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XReduction.CheckedChanged
+    Private Sub XReduction_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
         PointCloudReductionLabel = "X Reduction"
     End Sub
-    Private Sub YReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YReduction.CheckedChanged
+    Private Sub YReduction_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
         PointCloudReductionLabel = "Y Reduction"
     End Sub
-    Private Sub ZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles ZReduction.CheckedChanged
+    Private Sub ZReduction_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
         PointCloudReductionLabel = "Z Reduction"
     End Sub
-    Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles XYReduction.CheckedChanged
+    Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
         PointCloudReductionLabel = "XY Reduction"
     End Sub
-    Private Sub XZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XZReduction.CheckedChanged
+    Private Sub XZReduction_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
         PointCloudReductionLabel = "XZ Reduction"
     End Sub
-    Private Sub YZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YZReduction.CheckedChanged
+    Private Sub YZReduction_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
         PointCloudReductionLabel = "YZ Reduction"
     End Sub
-    Public Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XYZReduction.CheckedChanged
+    Public Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
         PointCloudReductionLabel = "XYZ Reduction"
     End Sub

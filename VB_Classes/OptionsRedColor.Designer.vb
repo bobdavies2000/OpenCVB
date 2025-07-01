@@ -33,14 +33,6 @@ Partial Class OptionsRedColor
         Me.ColorLabel = New System.Windows.Forms.Label()
         Me.SimpleReductionBar = New System.Windows.Forms.TrackBar()
         Me.SimpleReduceLabel = New System.Windows.Forms.Label()
-        Me.RedCloudOnly = New System.Windows.Forms.GroupBox()
-        Me.XYZReduction = New System.Windows.Forms.RadioButton()
-        Me.YZReduction = New System.Windows.Forms.RadioButton()
-        Me.XZReduction = New System.Windows.Forms.RadioButton()
-        Me.XYReduction = New System.Windows.Forms.RadioButton()
-        Me.ZReduction = New System.Windows.Forms.RadioButton()
-        Me.YReduction = New System.Windows.Forms.RadioButton()
-        Me.XReduction = New System.Windows.Forms.RadioButton()
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
         Me.ColoringGroup = New System.Windows.Forms.GroupBox()
@@ -50,7 +42,6 @@ Partial Class OptionsRedColor
         Me.ReductionSliders.SuspendLayout()
         CType(Me.BitwiseReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.RedCloudOnly.SuspendLayout()
         Me.ColoringGroup.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -170,106 +161,6 @@ Partial Class OptionsRedColor
         Me.SimpleReduceLabel.TabIndex = 6
         Me.SimpleReduceLabel.Text = "Simple Reduction"
         '
-        'RedCloudOnly
-        '
-        Me.RedCloudOnly.Controls.Add(Me.XYZReduction)
-        Me.RedCloudOnly.Controls.Add(Me.YZReduction)
-        Me.RedCloudOnly.Controls.Add(Me.XZReduction)
-        Me.RedCloudOnly.Controls.Add(Me.XYReduction)
-        Me.RedCloudOnly.Controls.Add(Me.ZReduction)
-        Me.RedCloudOnly.Controls.Add(Me.YReduction)
-        Me.RedCloudOnly.Controls.Add(Me.XReduction)
-        Me.RedCloudOnly.Location = New System.Drawing.Point(21, 12)
-        Me.RedCloudOnly.Name = "RedCloudOnly"
-        Me.RedCloudOnly.Size = New System.Drawing.Size(220, 289)
-        Me.RedCloudOnly.TabIndex = 7
-        Me.RedCloudOnly.TabStop = False
-        Me.RedCloudOnly.Text = "RedCloud Reduction"
-        '
-        'XYZReduction
-        '
-        Me.XYZReduction.AutoSize = True
-        Me.XYZReduction.Location = New System.Drawing.Point(28, 248)
-        Me.XYZReduction.Name = "XYZReduction"
-        Me.XYZReduction.Size = New System.Drawing.Size(143, 24)
-        Me.XYZReduction.TabIndex = 8
-        Me.XYZReduction.TabStop = True
-        Me.XYZReduction.Tag = "6"
-        Me.XYZReduction.Text = "XYZ Reduction"
-        Me.XYZReduction.UseVisualStyleBackColor = True
-        '
-        'YZReduction
-        '
-        Me.YZReduction.AutoSize = True
-        Me.YZReduction.Location = New System.Drawing.Point(28, 212)
-        Me.YZReduction.Name = "YZReduction"
-        Me.YZReduction.Size = New System.Drawing.Size(132, 24)
-        Me.YZReduction.TabIndex = 7
-        Me.YZReduction.TabStop = True
-        Me.YZReduction.Tag = "5"
-        Me.YZReduction.Text = "YZ Reduction"
-        Me.YZReduction.UseVisualStyleBackColor = True
-        '
-        'XZReduction
-        '
-        Me.XZReduction.AutoSize = True
-        Me.XZReduction.Location = New System.Drawing.Point(28, 177)
-        Me.XZReduction.Name = "XZReduction"
-        Me.XZReduction.Size = New System.Drawing.Size(132, 24)
-        Me.XZReduction.TabIndex = 6
-        Me.XZReduction.TabStop = True
-        Me.XZReduction.Tag = "4"
-        Me.XZReduction.Text = "XZ Reduction"
-        Me.XZReduction.UseVisualStyleBackColor = True
-        '
-        'XYReduction
-        '
-        Me.XYReduction.AutoSize = True
-        Me.XYReduction.Location = New System.Drawing.Point(28, 142)
-        Me.XYReduction.Name = "XYReduction"
-        Me.XYReduction.Size = New System.Drawing.Size(133, 24)
-        Me.XYReduction.TabIndex = 5
-        Me.XYReduction.TabStop = True
-        Me.XYReduction.Tag = "3"
-        Me.XYReduction.Text = "XY Reduction"
-        Me.XYReduction.UseVisualStyleBackColor = True
-        '
-        'ZReduction
-        '
-        Me.ZReduction.AutoSize = True
-        Me.ZReduction.Location = New System.Drawing.Point(28, 108)
-        Me.ZReduction.Name = "ZReduction"
-        Me.ZReduction.Size = New System.Drawing.Size(121, 24)
-        Me.ZReduction.TabIndex = 4
-        Me.ZReduction.TabStop = True
-        Me.ZReduction.Tag = "2"
-        Me.ZReduction.Text = "Z Reduction"
-        Me.ZReduction.UseVisualStyleBackColor = True
-        '
-        'YReduction
-        '
-        Me.YReduction.AutoSize = True
-        Me.YReduction.Location = New System.Drawing.Point(28, 72)
-        Me.YReduction.Name = "YReduction"
-        Me.YReduction.Size = New System.Drawing.Size(122, 24)
-        Me.YReduction.TabIndex = 3
-        Me.YReduction.TabStop = True
-        Me.YReduction.Tag = "1"
-        Me.YReduction.Text = "Y Reduction"
-        Me.YReduction.UseVisualStyleBackColor = True
-        '
-        'XReduction
-        '
-        Me.XReduction.AutoSize = True
-        Me.XReduction.Location = New System.Drawing.Point(28, 37)
-        Me.XReduction.Name = "XReduction"
-        Me.XReduction.Size = New System.Drawing.Size(122, 24)
-        Me.XReduction.TabIndex = 0
-        Me.XReduction.TabStop = True
-        Me.XReduction.Tag = "0"
-        Me.XReduction.Text = "X Reduction"
-        Me.XReduction.UseVisualStyleBackColor = True
-        '
         'ColorSourceLabel
         '
         Me.ColorSourceLabel.AutoSize = True
@@ -328,7 +219,6 @@ Partial Class OptionsRedColor
         Me.Controls.Add(Me.ColoringGroup)
         Me.Controls.Add(Me.ColorSource)
         Me.Controls.Add(Me.ColorSourceLabel)
-        Me.Controls.Add(Me.RedCloudOnly)
         Me.Controls.Add(Me.ReductionSliders)
         Me.Controls.Add(Me.ReductionTypeGroup)
         Me.Name = "OptionsRedColor"
@@ -339,8 +229,6 @@ Partial Class OptionsRedColor
         Me.ReductionSliders.PerformLayout()
         CType(Me.BitwiseReductionBar, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.RedCloudOnly.ResumeLayout(False)
-        Me.RedCloudOnly.PerformLayout()
         Me.ColoringGroup.ResumeLayout(False)
         Me.ColoringGroup.PerformLayout()
         Me.ResumeLayout(False)
@@ -357,14 +245,6 @@ Partial Class OptionsRedColor
     Friend WithEvents ColorLabel As System.Windows.Forms.Label
     Friend WithEvents SimpleReductionBar As System.Windows.Forms.TrackBar
     Friend WithEvents SimpleReduceLabel As System.Windows.Forms.Label
-    Friend WithEvents RedCloudOnly As System.Windows.Forms.GroupBox
-    Friend WithEvents XZReduction As System.Windows.Forms.RadioButton
-    Friend WithEvents XYReduction As System.Windows.Forms.RadioButton
-    Friend WithEvents ZReduction As System.Windows.Forms.RadioButton
-    Friend WithEvents YReduction As System.Windows.Forms.RadioButton
-    Friend WithEvents XReduction As System.Windows.Forms.RadioButton
-    Friend WithEvents XYZReduction As System.Windows.Forms.RadioButton
-    Friend WithEvents YZReduction As System.Windows.Forms.RadioButton
     Friend WithEvents NoReduction As System.Windows.Forms.RadioButton
     Friend WithEvents ColorSourceLabel As System.Windows.Forms.Label
     Friend WithEvents ColorSource As System.Windows.Forms.ComboBox

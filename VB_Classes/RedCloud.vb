@@ -4,7 +4,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Dim prep As New RedPrep_Basics
     Dim stats As New RedCell_Basics
     Public Sub New()
-        task.redOptions.XYReduction.Checked = True
+        OptionParent.findRadio("XY Reduction").Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub
@@ -217,7 +217,7 @@ Public Class RedCloud_XYZ : Inherits TaskParent
     Public redMask As New RedMask_Basics
     Dim rcMask As cv.Mat
     Public Sub New()
-        task.redOptions.XYZReduction.Checked = True
+        OptionParent.findRadio("XYZ Reduction").Checked = True
         rcMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub
@@ -262,7 +262,7 @@ Public Class RedCloud_YZ : Inherits TaskParent
     Dim prep As New RedPrep_Basics
     Dim stats As New RedCell_Basics
     Public Sub New()
-        task.redOptions.YZReduction.Checked = True
+        OptionParent.findRadio("YZ Reduction").Checked = True
         labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build YZ RedCloud cells"
@@ -287,7 +287,7 @@ Public Class RedCloud_XZ : Inherits TaskParent
     Dim prep As New RedPrep_Basics
     Dim stats As New RedCell_Basics
     Public Sub New()
-        task.redOptions.XZReduction.Checked = True
+        OptionParent.findRadio("XZ Reduction").Checked = True
         labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build XZ RedCloud cells."
@@ -311,7 +311,7 @@ Public Class RedCloud_X : Inherits TaskParent
     Dim prep As New RedPrep_Basics
     Dim stats As New RedCell_Basics
     Public Sub New()
-        task.redOptions.XReduction.Checked = True
+        OptionParent.findRadio("X Reduction").Checked = True
         labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build X RedCloud cells."
@@ -335,7 +335,7 @@ Public Class RedCloud_Y : Inherits TaskParent
     Dim prep As New RedPrep_Basics
     Dim stats As New RedCell_Basics
     Public Sub New()
-        task.redOptions.YReduction.Checked = True
+        OptionParent.findRadio("Y Reduction").Checked = True
         labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build Y RedCloud cells."
@@ -358,7 +358,7 @@ Public Class RedCloud_Z : Inherits TaskParent
     Dim prep As New RedPrep_Basics
     Dim stats As New RedCell_Basics
     Public Sub New()
-        task.redOptions.ZReduction.Checked = True
+        OptionParent.findRadio("Z Reduction").Checked = True
         labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build Z RedCloud cells."
@@ -381,7 +381,7 @@ Public Class RedCloud_XY : Inherits TaskParent
     Dim prep As New RedPrep_Basics
     Dim stats As New RedCell_Basics
     Public Sub New()
-        task.redOptions.XYReduction.Checked = True
+        OptionParent.findRadio("XY Reduction").Checked = True
         labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build XY RedCloud cells."

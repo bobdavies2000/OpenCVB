@@ -20,11 +20,11 @@ Public Class EdgeLine_Basics : Inherits TaskParent
             End If
             If debugSegment >= task.edges.segments.Count Then debugSegment = 0
             If debugSegment Then
-                    task.edges.dst1 = task.edges.dst2.InRange(debugSegment, debugSegment)
-                    task.edges.dst1.CopyTo(dst, task.edges.dst1)
-                End If
-                debugSegment += 1
+                task.edges.dst1 = task.edges.dst2.InRange(debugSegment, debugSegment)
+                task.edges.dst1.CopyTo(dst, task.edges.dst1)
             End If
+            debugSegment += 1
+        End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -36,6 +36,10 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         handleSrc.Free()
         If imagePtr <> 0 Then dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        Dim imageEdgeWidth = 2
+        If dst2.Width >= 1280 Then imageEdgeWidth = 4
+        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth) ' prevent leaks at the image boundary...
 
         Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, EdgeLineRaw_Rects(cPtr))
 
@@ -95,9 +99,6 @@ Public Class EdgeLine_Simple : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim input = If(src.Channels() = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
-        Dim imageEdgeWidth = 2
-        If dst2.Width >= 1280 Then imageEdgeWidth = 4
-
         Dim cppData(input.Total - 1) As Byte
         Marshal.Copy(input.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
@@ -105,8 +106,11 @@ Public Class EdgeLine_Simple : Inherits TaskParent
         handleSrc.Free()
 
         dst2 = cv.Mat.FromPixelData(input.Rows, input.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        Dim mm = GetMinMax(task.edges.dst2)
+        Dim mm = GetMinMax(dst2)
         classCount = mm.maxVal
+
+        Dim imageEdgeWidth = 2
+        If dst2.Width >= 1280 Then imageEdgeWidth = 4
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth) ' prevent leaks at the image boundary...
     End Sub
     Public Sub Close()

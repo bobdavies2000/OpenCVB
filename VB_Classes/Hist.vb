@@ -1291,7 +1291,6 @@ Public Class Hist_CloudSegments : Inherits TaskParent
     Dim index As Integer = 2
     Dim mm As mmData
     Public Sub New()
-        If standalone Then task.redOptions.XReduction.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         plot.createHistogram = True
         plot.removeZeroEntry = False
