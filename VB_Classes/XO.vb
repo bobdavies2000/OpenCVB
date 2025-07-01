@@ -5682,3 +5682,42 @@ Public Class XO_Contour_Depth : Inherits TaskParent
         labels(2) = "CV_8U format of the " + CStr(depthContourList.Count) + " depth contours"
     End Sub
 End Class
+
+
+
+
+
+
+Public Class XO_Contour_DepthRegions : Inherits TaskParent
+    Public options As New Options_Contours
+    Public contourList As New List(Of contourData)
+    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Dim sortContours As New Contour_Sort
+    Dim prep As New RedPrep_Depth
+    Public Sub New()
+        desc = "Use the mask from RedCloud_PrepXYZero to create color contours."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        prep.Run(src)
+
+        dst1 = prep.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim mode = options.options2.ApproximationMode
+        cv.Cv2.FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.List, mode)
+        If sortContours.allContours.Count <= 1 Then Exit Sub
+
+        sortContours.Run(src)
+
+        contourList = sortContours.contourList
+        contourMap = sortContours.contourMap
+        labels(2) = sortContours.labels(2)
+        dst2 = sortContours.dst2
+
+        For Each contour In contourList
+            contour.ID = prep.dst3.Get(Of Byte)(contour.maxDist.Y, contour.maxDist.X)
+            contourMap(contour.rect).SetTo(contour.ID Mod 255, contour.mask)
+        Next
+
+        dst2 = ShowPalette(contourMap)
+    End Sub
+End Class
