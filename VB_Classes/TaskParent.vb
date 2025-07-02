@@ -575,6 +575,18 @@ Public Class TaskParent : Implements IDisposable
 
         Return output
     End Function
+    Public Shared Function ShowPaletteNoZero(input As cv.Mat) As cv.Mat
+        Dim output As New cv.Mat
+        If input.Type <> cv.MatType.CV_8U Then
+            Dim input8u As New cv.Mat
+            input.ConvertTo(input8u, cv.MatType.CV_8U)
+            cv.Cv2.ApplyColorMap(input8u, output, task.colorMapNoZero)
+        Else
+            cv.Cv2.ApplyColorMap(input, output, task.colorMapNoZero)
+        End If
+
+        Return output
+    End Function
     Public Shared Function ShowPaletteOriginal(input As cv.Mat) As cv.Mat
         If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
         If input.Type <> cv.MatType.CV_8U Then input.ConvertTo(input, cv.MatType.CV_8U)

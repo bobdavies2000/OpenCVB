@@ -76,7 +76,6 @@ FeatureLess
 FeatureLine
 Fibonacci
 Filter
-Find
 FindCells
 FindContours
 FindMinRect

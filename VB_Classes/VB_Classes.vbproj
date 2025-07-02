@@ -116,7 +116,6 @@
     <Compile Include="AddWeighted.vb" />
     <Compile Include="ApproxPoly.vb" />
     <Compile Include="ContourPlane.vb" />
-    <Compile Include="Find.vb" />
     <Compile Include="FindCells.vb" />
     <Compile Include="FindContours.vb" />
     <Compile Include="FindNonZero.vb" />
@@ -421,7 +420,7 @@
     <Compile Include="Pixel.vb" />
     <Compile Include="Plane.vb" />
     <Compile Include="Plot.vb" />
-    <Compile Include="Polylines.vb" />
+    <Compile Include="Polyline.vb" />
     <Compile Include="Pyramid.vb" />
     <Compile Include="Python.vb" />
     <Compile Include="QRcode.vb" />
