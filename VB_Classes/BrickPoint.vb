@@ -338,24 +338,6 @@ End Class
 
 
 
-Public Class BrickPoint_RedCloud : Inherits TaskParent
-    Public Sub New()
-        desc = "Run RedCloud to find the cells not already identified as contours."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.contours.dst2
-        labels(2) = task.contours.labels(2)
-
-        task.contours.contourMap.ConvertTo(dst1, cv.MatType.CV_8U)
-        dst3 = runRedC(src, labels(3), dst1)
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 

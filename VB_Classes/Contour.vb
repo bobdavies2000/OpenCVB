@@ -1,10 +1,10 @@
-Imports System.Text.RegularExpressions
 Imports cv = OpenCvSharp
 Public Class Contour_Basics : Inherits TaskParent
     Public options As New Options_Contours
     Public classCount As Integer
     Public contourList As New List(Of contourData)
-    Public contourMap As New cv.Mat(task.workingRes, cv.MatType.CV_32F, 0)
+    Public contourLookup As New cv.Mat(task.workingRes, cv.MatType.CV_32F, 0)
+    Public contourIDs As New List(Of Integer)
     Dim sortContours As New Contour_Sort
     Public Sub New()
         OptionParent.findRadio("List").Checked = True
@@ -14,10 +14,12 @@ Public Class Contour_Basics : Inherits TaskParent
     Public Shared Function selectContour() As contourData
         Static pt = task.ClickPoint
         If task.mouseClickFlag Then pt = task.ClickPoint
-        Dim index = task.contours.contourMap.Get(Of Single)(pt.Y, pt.X)
-        If index = 0 Then index = 1
+        Dim id = task.contours.contourLookup.Get(Of Single)(pt.Y, pt.X)
+        Dim index = task.contours.contourIDs.IndexOf(id)
+        If index < 0 Then index = 0
+        task.contourD = task.contours.contourList(index)
         task.color(task.contourD.rect).SetTo(cv.Scalar.White, task.contourD.mask)
-        Return task.contours.contourList(index - 1)
+        Return task.contours.contourList(index)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -36,7 +38,8 @@ Public Class Contour_Basics : Inherits TaskParent
         sortContours.Run(src)
 
         contourList = sortContours.contourList
-        contourMap = sortContours.contourMap
+        contourLookup = sortContours.contourLookup
+        contourIDs = sortContours.contourIDs
         labels(2) = sortContours.labels(2)
         dst2 = sortContours.dst2
 
@@ -52,8 +55,9 @@ End Class
 
 Public Class Contour_Basics_List : Inherits TaskParent
     Public contourList As New List(Of contourData)
-    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public contourLookup As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Public options As New Options_Contours
+    Public contourIDs As New List(Of Integer)
     Dim sortContours As New Contour_Sort
     Public Sub New()
         desc = "List retrieval mode contour finder"
@@ -70,76 +74,10 @@ Public Class Contour_Basics_List : Inherits TaskParent
         sortContours.Run(src)
 
         contourList = sortContours.contourList
-        contourMap = sortContours.contourMap
+        contourLookup = sortContours.contourLookup
+        contourIDs = sortContours.contourIDs
         labels(2) = sortContours.labels(2)
         dst2 = sortContours.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Contour_Info : Inherits TaskParent
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst0.Checked = True
-        desc = "Provide details about the selected contour's contourList entry."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            dst2 = task.contours.dst2
-            labels(2) = task.contours.labels(2)
-        End If
-
-        task.contourD = Contour_Basics.selectContour()
-
-        Dim contour = task.contourD
-
-        strOut = vbCrLf + vbCrLf
-        Dim index = task.contours.contourList.IndexOf(task.contourD)
-        strOut += "Index = " + CStr(index) + vbCrLf
-        strOut += "Depth = " + Format(contour.depth, fmt1) + vbCrLf
-        strOut += "Range (m) = " + Format(contour.mm.range, fmt1) + vbCrLf
-        strOut += "Number of pixels in the mask: " + CStr(contour.pixels) + vbCrLf
-
-        strOut += "MaxDist point = " + CStr(contour.maxDist.X) + ", " + CStr(contour.maxDist.Y) + vbCrLf
-        strOut += "MaxDStable point = " + CStr(contour.maxDstable.X) + ", " + CStr(contour.maxDstable.Y) + vbCrLf
-
-        dst0 = src
-        dst0(contour.rect).SetTo(white, contour.mask)
-
-        dst2.Rectangle(contour.rect, task.highlight, task.lineWidth)
-
-        For i = 0 To task.contours.contourList.Count - 1
-            If i > 10 Then Exit For
-            Dim contourNext = task.contours.contourList(i)
-            index = task.contours.contourList.IndexOf(contourNext)
-            dst2.Circle(contourNext.maxDstable, task.DotSize, task.highlight, -1, task.lineType)
-            SetTrueText(CStr(index), contourNext.maxDstable, 2)
-        Next
-
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Contour_Bricks : Inherits TaskParent
-    Public Sub New()
-        desc = "Display the full and partial bricks in each contour"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = ShowPalette(task.contours.contourMap)
-        task.contours.contourMap.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertTo(dst1, cv.MatType.CV_8U)
-        dst2.SetTo(white, dst1)
-
-        task.contourD = Contour_Basics.selectContour()
-
-        labels(2) = task.contours.labels(2)
     End Sub
 End Class
 
@@ -211,7 +149,7 @@ Public Class Contour_Features : Inherits TaskParent
         desc = "Show contours and features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = ShowPalette(task.contours.contourMap)
+        dst2 = task.contours.dst2
         feat.Run(src)
 
         dst3.SetTo(0)
@@ -790,7 +728,7 @@ Public Class Contour_InfoDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            dst2 = ShowPalette(task.contours.contourMap)
+            dst2 = task.contours.dst2
             labels(2) = task.contours.labels(2)
         End If
 
@@ -799,7 +737,8 @@ Public Class Contour_InfoDepth : Inherits TaskParent
         Dim contour = task.contourD
 
         strOut = vbCrLf + vbCrLf
-        strOut += "Index = " + CStr(contour.index) + vbCrLf
+        Dim index = task.contours.contourList.IndexOf(task.contourD)
+        strOut += "Index = " + CStr(index) + vbCrLf
         strOut += "Depth = " + Format(contour.depth, fmt1) + vbCrLf
         strOut += "Range (m) = " + Format(contour.mm.range, fmt1) + vbCrLf
         strOut += "Number of pixels in the mask: " + CStr(contour.pixels) + vbCrLf
@@ -855,9 +794,11 @@ Public Class Contour_Isolate : Inherits TaskParent
         task.contourD = Contour_Basics.selectContour()
 
         dst1.SetTo(0)
+        Dim indexD = task.contours.contourList.IndexOf(task.contourD)
         For Each contour In task.contours.contourList
-            If contour.index = task.contourD.index Then Continue For
-            dst1(contour.rect).SetTo(contour.index + 1, contour.mask)
+            Dim index = task.contours.contourList.IndexOf(contour)
+            If index = indexD Then Continue For
+            dst1(contour.rect).SetTo(index + 1, contour.mask)
         Next
 
         dst3 = ShowPalette(dst1)
@@ -878,24 +819,29 @@ End Class
 Public Class Contour_Hulls : Inherits TaskParent
     Public contourList As New List(Of contourData)
     Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public contourLookup As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Public Sub New()
         desc = "Add hulls and improved contours using ConvexityDefects to each contour cell"
     End Sub
     Public Function getSelectedHull() As contourData
-        Dim index = contourMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
-        If index = 0 Then Return contourList(0)
-        Return contourList(index - 1)
+        Dim id = contourLookup.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+        If id > 0 Then
+            Dim index = task.contours.contourIDs.IndexOf(id)
+            Return contourList(index)
+        End If
+        Return contourList(1)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         labels(2) = task.contours.labels(2)
         dst2 = task.contours.dst2
 
-        contourMap.SetTo(0)
+        contourLookup.SetTo(0)
         contourList.Clear()
         For Each contour In task.contours.contourList
             If contour.points.Count >= 5 Then
                 contour.hull = cv.Cv2.ConvexHull(contour.points.ToArray, True).ToList
-                DrawContour(contourMap, contour.hull, contour.index + 1, -1)
+                Dim index = task.contours.contourList.IndexOf(contour)
+                DrawContour(contourMap, contour.hull, contour.ID Mod 255, -1)
                 contourList.Add(contour)
             End If
         Next
@@ -941,14 +887,15 @@ Public Class Contour_EdgePoints : Inherits TaskParent
         dst1.SetTo(0)
         Dim maxLines = 3 ' task.gOptions.DebugSlider.Value * 2
         For Each contour In task.contours.contourList
-            If contour.index < 3 Then Continue For
+            Dim index = task.contours.contourList.IndexOf(contour)
+            If index < 3 Then Continue For
             ptList.Add(New cv.Point(0, contour.rect.TopLeft.Y))
             ptList.Add(New cv.Point(contour.rect.TopLeft.X, 0))
 
-            Dim index = ptList.Count - 1
+            Dim ptIndex = ptList.Count - 1
             For i = 0 To 1
-                Dim pt = ptList(index - i)
-                dst1.Set(Of Single)(pt.Y, pt.X, contour.index + 1)
+                Dim pt = ptList(ptIndex - i)
+                dst1.Set(Of Single)(pt.Y, pt.X, index + 1)
                 dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
             Next
             If ptList.Count >= maxLines Then Exit For
@@ -984,7 +931,8 @@ Public Class Contour_RedCloud : Inherits TaskParent
     Dim prep As New RedCloud_PrepOutline
     Public options As New Options_Contours
     Public contourList As New List(Of contourData)
-    Public contourMap As New cv.Mat(task.workingRes, cv.MatType.CV_32F, 0)
+    Public contourLookup As New cv.Mat(task.workingRes, cv.MatType.CV_32F, 0)
+    Public contourIDs As New List(Of Integer)
     Dim sortContours As New Contour_Sort
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1004,7 +952,8 @@ Public Class Contour_RedCloud : Inherits TaskParent
         sortContours.Run(src)
 
         contourList = sortContours.contourList
-        contourMap = sortContours.contourMap
+        contourLookup = sortContours.contourLookup
+        contourIDs = sortContours.contourIDs
         labels(2) = sortContours.labels(2)
         dst2 = sortContours.dst2
     End Sub
@@ -1017,7 +966,8 @@ End Class
 Public Class Contour_Basics_FloodFill : Inherits TaskParent
     Public options As New Options_Contours
     Public contourList As New List(Of contourData)
-    Public contourMap As New cv.Mat(task.workingRes, cv.MatType.CV_32F, 0)
+    Public contourLookup As New cv.Mat(task.workingRes, cv.MatType.CV_32F, 0)
+    Public contourIDs As New List(Of Integer)
     Dim sortContours As New Contour_Sort
     Public Sub New()
         desc = "FloodFill retrieval mode contour finder"
@@ -1035,7 +985,8 @@ Public Class Contour_Basics_FloodFill : Inherits TaskParent
         sortContours.Run(src)
 
         contourList = sortContours.contourList
-        contourMap = sortContours.contourMap
+        contourLookup = sortContours.contourLookup
+        contourIDs = sortContours.contourIDs
         labels(2) = sortContours.labels(2)
         dst2 = sortContours.dst2
     End Sub
@@ -1049,7 +1000,8 @@ End Class
 Public Class Contour_Basics_CComp : Inherits TaskParent
     Public options As New Options_Contours
     Public contourList As New List(Of contourData)
-    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public contourLookup As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public contourIDs As New List(Of Integer)
     Dim sortContours As New Contour_Sort
     Public Sub New()
         desc = "CComp retrieval mode contour finder"
@@ -1066,7 +1018,8 @@ Public Class Contour_Basics_CComp : Inherits TaskParent
         sortContours.Run(src)
 
         contourList = sortContours.contourList
-        contourMap = sortContours.contourMap
+        contourLookup = sortContours.contourLookup
+        contourIDs = sortContours.contourIDs
         labels(2) = sortContours.labels(2)
         dst2 = sortContours.dst2
     End Sub
@@ -1079,7 +1032,8 @@ End Class
 Public Class Contour_Basics_Tree : Inherits TaskParent
     Public options As New Options_Contours
     Public contourList As New List(Of contourData)
-    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public contourLookup As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public contourIDs As New List(Of Integer)
     Dim sortContours As New Contour_Sort
     Public Sub New()
         desc = "Tree retrieval mode contour finder"
@@ -1096,7 +1050,8 @@ Public Class Contour_Basics_Tree : Inherits TaskParent
         sortContours.Run(src)
 
         contourList = sortContours.contourList
-        contourMap = sortContours.contourMap
+        contourLookup = sortContours.contourLookup
+        contourIDs = sortContours.contourIDs
         labels(2) = sortContours.labels(2)
         dst2 = sortContours.dst2
     End Sub
@@ -1109,7 +1064,8 @@ End Class
 Public Class Contour_Basics_External : Inherits TaskParent
     Public options As New Options_Contours
     Public contourList As New List(Of contourData)
-    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public contourLookup As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public contourIDs As New List(Of Integer)
     Dim sortContours As New Contour_Sort
     Public Sub New()
         desc = "External retrieval mode contour finder"
@@ -1126,7 +1082,8 @@ Public Class Contour_Basics_External : Inherits TaskParent
         sortContours.Run(src)
 
         contourList = sortContours.contourList
-        contourMap = sortContours.contourMap
+        contourLookup = sortContours.contourLookup
+        contourIDs = sortContours.contourIDs
         labels(2) = sortContours.labels(2)
         dst2 = sortContours.dst2
     End Sub
@@ -1137,10 +1094,76 @@ End Class
 
 
 
+Public Class Contour_Depth : Inherits TaskParent
+    Dim prep As New RedPrep_Depth ' only interested in XY reduction.
+    Dim contours As New Contour_Basics
+    Public Sub New()
+        OptionParent.findRadio("FloodFill").Checked = True
+        desc = "Find the contours in the cloud data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+
+        contours.Run(prep.dst2)
+        dst2 = contours.dst2
+        labels(2) = contours.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Contour_Info : Inherits TaskParent
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst0.Checked = True
+        desc = "Provide details about the selected contour's contourList entry."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            dst2 = task.contours.dst2
+            labels(2) = task.contours.labels(2)
+        End If
+
+        task.contourD = Contour_Basics.selectContour()
+
+        Dim contour = task.contourD
+
+        strOut = vbCrLf + vbCrLf
+        strOut += "ID = " + CStr(contour.ID) + vbCrLf
+        strOut += "Depth = " + Format(contour.depth, fmt1) + vbCrLf
+        strOut += "Range (m) = " + Format(contour.mm.range, fmt1) + vbCrLf
+        strOut += "Number of pixels in the mask: " + CStr(contour.pixels) + vbCrLf
+
+        strOut += "MaxDist point = " + CStr(contour.maxDist.X) + ", " + CStr(contour.maxDist.Y) + vbCrLf
+
+        dst0 = src
+        dst0(contour.rect).SetTo(white, contour.mask)
+
+        dst2.Rectangle(contour.rect, task.highlight, task.lineWidth)
+
+        For i = 0 To task.contours.contourList.Count - 1
+            If i > 10 Then Exit For
+            Dim contourNext = task.contours.contourList(i)
+            Dim index = task.contours.contourList.IndexOf(contourNext)
+            SetTrueText(CStr(index), contourNext.maxDist, 2)
+        Next
+
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
 Public Class Contour_Sort : Inherits TaskParent
     Public allContours As cv.Point()()
     Public contourList As New List(Of contourData)
-    Public contourMap As New cv.Mat(task.workingRes, cv.MatType.CV_32F, 0)
+    Public contourLookup As New cv.Mat(task.workingRes, cv.MatType.CV_32F, 0)
+    Public contourIDs As New List(Of Integer)
+    Dim contourMap As New cv.Mat(task.workingRes, cv.MatType.CV_32F, 0)
     Public Sub New()
         desc = "Sort the contours by size and prepare the contour map"
     End Sub
@@ -1165,8 +1188,8 @@ Public Class Contour_Sort : Inherits TaskParent
             Dim contour = New contourData
             contour.pixels = cv.Cv2.ContourArea(tour)
             contour.points = New List(Of cv.Point)(tour)
-            If contour.pixels > task.color.Total * 3 / 4 Then Continue For
-            If tour.Count < 4 Then Continue For
+            If contour.pixels > task.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
+            'If tour.Count < 4 Then Continue For
 
             contour.rect = contour.buildRect(tour)
             If contour.rect.Width = 0 Or contour.rect.Height = 0 Then Continue For
@@ -1178,52 +1201,48 @@ Public Class Contour_Sort : Inherits TaskParent
             contour.depth = task.pcSplit(2)(contour.rect).Mean(task.depthMask(contour.rect))(0)
             contour.mm = GetMinMaxShared(task.pcSplit(2)(contour.rect), contour.mask)
             contour.maxDist = GetMaxDistContour(contour)
-            contour.maxDstable = contour.maxDist
+            contour.ID = task.grid.gridMap.Get(Of Single)(contour.maxDist.Y, contour.maxDist.X)
             sortedList.Add(contour.pixels, contour)
         Next
 
         Dim contourLast As New List(Of contourData)(contourList)
-        Dim contourMapLast = contourMap.Clone
+        Dim contourIDsLast As New List(Of Integer)(contourIDs)
+        Dim contourLookupLast = contourLookup.Clone
 
-        contourList.Clear()
-        contourMap.SetTo(0)
-        For Each contour In sortedList.Values
-            contour.index = contourList.Count
-            contourList.Add(contour)
-        Next
+        contourList = New List(Of contourData)(sortedList.Values)
 
         Dim matched As Integer
         Dim colorStdev As cv.Scalar, colorMean = cv.Scalar.All(-1)
+        contourIDs.Clear()
+        contourLookup.SetTo(0)
+        dst2.SetTo(0)
         For Each contour In contourList
-            Dim indexLast = CInt(contourMapLast.Get(Of Single)(contour.maxDist.Y, contour.maxDist.X)) - 1
-            If indexLast >= 0 And contourLast.Count > indexLast Then
-                contour.maxDstable = contourLast(indexLast).maxDstable
-                matched += 1
+            Dim idLast = CInt(contourLookupLast.Get(Of Single)(contour.maxDist.Y, contour.maxDist.X))
+            If idLast >= 0 Then
+                Dim indexLast = contourIDsLast.IndexOf(idLast)
+                If indexLast >= 0 And contour.ID = idLast Then
+                    contour.ID = contourLast(indexLast).ID
+                    matched += 1
+                End If
             End If
-            contour.ID = task.grid.gridMap.Get(Of Single)(contour.maxDstable.Y, contour.maxDstable.X)
+
+            contourLookup(contour.rect).SetTo(contour.ID, contour.mask)
+            contourIDs.Add(contour.ID)
             Select Case task.redOptions.trackingLabel
                 Case "Mean Color"
-                    If colorMean(0) = -1 Then dst2.SetTo(0) ' signal that we need to empty dst2
                     cv.Cv2.MeanStdDev(task.color(contour.rect), colorMean, colorStdev, contour.mask)
                     dst2(contour.rect).SetTo(colorMean, contour.mask)
                 Case "Tracking Color"
-                    contourMap(contour.rect).SetTo((contour.index + 1) Mod 255, contour.mask)
+                    contourMap(contour.rect).SetTo(contour.ID Mod 255, contour.mask)
             End Select
         Next
 
-        If colorMean(0) = -1 Then dst2 = ShowPalette(contourMap) ' cheap way to signal run showpalette.
-
-        For Each contour In contourList
-            Dim index = contourMap.Get(Of Single)(contour.maxDist.Y, contour.maxDist.X)
-            Dim indexStable = contourMap.Get(Of Single)(contour.maxDstable.Y, contour.maxDstable.X)
-            If indexStable <> index Then contour.maxDstable = contour.maxDist
-        Next
+        dst2 = ShowPalette(contourMap) ' cheap way to signal run showpalette.
 
         If task.heartBeat Then
-            labels(2) = "FindContours found the " + CStr(contourList.Count) + " that are big enough of the " +
-                        CStr(allContours.Count) + " found.  " + CStr(matched) + " matched to the previous generation."
+            labels(2) = "Found " + CStr(contourList.Count) + " contours  and " + CStr(matched) +
+                        " matched the previous generation."
         End If
-
     End Sub
 End Class
 
@@ -1232,18 +1251,3 @@ End Class
 
 
 
-Public Class Contour_Depth : Inherits TaskParent
-    Dim prep As New RedPrep_Depth ' only interested in XY reduction.
-    Dim contours As New Contour_Basics
-    Public Sub New()
-        OptionParent.findRadio("FloodFill").Checked = True
-        desc = "Find the contours in the cloud data."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(src)
-
-        contours.Run(prep.dst2)
-        dst2 = contours.dst2
-        labels(2) = contours.labels(2)
-    End Sub
-End Class

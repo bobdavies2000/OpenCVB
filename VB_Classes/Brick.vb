@@ -116,7 +116,7 @@ Public Class Brick_Basics : Inherits TaskParent
         Next
 
         If task.heartBeat Then labels(2) = CStr(task.bricks.brickList.Count) + " bricks and " + CStr(brickDepthCount) + " had depth"
-        dst3 = ShowPalette(task.contours.contourMap)
+        dst3 = task.contours.dst2
         labels(3) = task.contours.labels(2)
     End Sub
 End Class

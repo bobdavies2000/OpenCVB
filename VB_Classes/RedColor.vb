@@ -30,9 +30,10 @@ Public Class RedColor_Basics : Inherits TaskParent
 
         dst2 = cellGen.dst2
 
+        For Each rc In task.redC.rcList
+            dst2.Circle(rc.maxDStable, task.DotSize, task.highlight, -1, task.lineType)
+        Next
         labels(2) = cellGen.labels(2)
-
-        dst3.SetTo(0)
         labels(3) = ""
         SetTrueText("", newPoint, 1)
         task.setSelectedCell()

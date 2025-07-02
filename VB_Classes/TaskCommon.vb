@@ -582,11 +582,9 @@ Public Class contourData
     Public rect As New cv.Rect(0, 0, 1, 1)
     Public mask As New cv.Mat(1, 1, cv.MatType.CV_8U)
     Public pixels As Integer
-    Public index As Integer
     Public depth As Single
     Public mm As mmData
     Public maxDist As cv.Point
-    Public maxDstable As cv.Point
     Public ID As Integer
     Public points As New List(Of cv.Point)
     Public hull As New List(Of cv.Point)

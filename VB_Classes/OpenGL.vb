@@ -1869,7 +1869,8 @@ Public Class OpenGL_ContourPlaneOnly : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim quadData As New List(Of cv.Point3f)
         For Each contour In task.contours.contourList
-            Dim c = task.scalarColors(contour.index)
+            Dim index = task.contours.contourList.IndexOf(contour)
+            Dim c = task.scalarColors(index)
             Dim color As cv.Point3f = New cv.Point3f(c(0), c(1), c(2))
 
             Dim p0 = getWorldCoordinates(contour.rect.TopLeft, contour.depth)

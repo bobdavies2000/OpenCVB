@@ -81,7 +81,7 @@ Public Class BackProject_FeatureLess : Inherits TaskParent
         desc = "Create a histogram of the featureless regions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        bProject.Run(task.contours.contourMap)
+        bProject.Run(task.contours.contourLookup)
         dst2 = bProject.dst2
         dst3 = bProject.dst3
         labels(2) = "Bins = " + CStr(task.histogramBins)
