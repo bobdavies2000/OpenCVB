@@ -132,6 +132,7 @@ Public Class Main_UI
     Dim magIndex As Integer
     Dim motionLabel As String
 
+    Dim depthAndCorrelationText As String
 #End Region
 #Region "Non-volatile"
     Public Sub jsonRead()
@@ -474,6 +475,8 @@ Public Class Main_UI
             camLabel(2).Location = New Point(padX, camPic(2).Top - camLabel(2).Height)
             camLabel(3).Location = New Point(padX + camPic(0).Width, padY + camPic(0).Height + camLabel(0).Height)
         End If
+
+        If depthAndCorrelationText <> "" Then camLabel(1).Text = depthAndCorrelationText
 
         XYLoc.Location = New Point(camPic(2).Left, camPic(2).Top + camPic(2).Height)
         AlgorithmDesc.Visible = settings.snap640
@@ -1739,15 +1742,17 @@ Public Class Main_UI
                             trueData.Clear()
                             saveObjectName = task.displayObjectName
                         End If
-                        'If trueData.Count > 0 Then trueData.RemoveAt(trueData.Count - 1)
                         If task.trueData.Count Then
                             trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                         End If
+                        trueData.Add(New TrueText(task.depthAndCorrelationText, New cv.Point(ptM.X, ptM.Y - 24), 1))
                         task.trueData.Clear()
                     End SyncLock
                 End If
 
                 If task.displayDst1 = False Or task.labels(1) = "" Then picLabels(1) = "DepthRGB"
+                picLabels(1) = task.depthAndCorrelationText.Replace(vbCrLf, "")
+
                 If task.dst0 IsNot Nothing Then
                     SyncLock cameraLock
                         dst(0) = task.dst0.Clone

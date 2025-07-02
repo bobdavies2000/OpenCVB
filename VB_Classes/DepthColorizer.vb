@@ -57,40 +57,38 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
         desc = "Create a traditional depth color scheme."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        'If task.gOptions.GridDepth.Checked Then
-        '    task.depthRGB = task.bricks.dst2
-        'Else
-        '    dst1.SetTo(0)
-        '    If task.gOptions.DepthCorrelations.Checked Then
-        '        For Each brick In task.bricks.brickList
-        '            If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
-        '        Next
-        '    Else
-        '        For Each brick In task.bricks.brickList
-        '            If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.depth) * 255 / task.MaxZmeters)
-        '        Next
-        '    End If
+        If task.gOptions.DepthCorrelations.Checked Then
+            Static bricks As New Brick_Basics
+            bricks.Run(src)
 
-        '    If task.gOptions.DepthCorrelations.Checked Then
-        '        task.depthRGB = ShowPaletteCorrelation(dst1)
-        '    Else
-        '        task.depthRGB = ShowPaletteDepth(dst1)
-        '    End If
-        '    task.depthRGB.SetTo(0, task.noDepthMask)
-        'End If
-        'labels(2) = task.bricks.labels(2)
+            dst1.SetTo(0)
+            For Each brick In task.bricks.brickList
+                If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
+            Next
+            task.depthRGB = ShowPaletteCorrelation(dst1)
+            labels(2) = task.bricks.labels(2)
+            Static brickText As New Brick_CorrelationMap
+            brickText.Run(src)
+        Else
+            Dim depthData(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1) As Byte
+            Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
+            Marshal.Copy(task.pcSplit(2).Data, depthData, 0, depthData.Length)
+            Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
+            handleSrc.Free()
 
-        'If standaloneTest() Then dst2 = task.depthRGB
+            If imagePtr <> 0 Then task.depthRGB = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
 
-        Dim depthData(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1) As Byte
-        Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
-        Marshal.Copy(task.pcSplit(2).Data, depthData, 0, depthData.Length)
-        Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
-        handleSrc.Free()
-
-        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
-
-        task.depthRGB = dst2
+            Dim gridIndex = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            Dim depthGrid = task.pcSplit(2)(task.gridRects(gridIndex))
+            ' Dim mask = depthGrid.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            Dim mask = task.depthMask(task.gridRects(gridIndex))
+            Dim depth = depthGrid.Mean(mask)(0)
+            Dim mm = GetMinMax(depthGrid, mask)
+            task.depthAndCorrelationText = "Depth = " + Format(depth, fmt1) + "m " + vbCrLf + "Depth range = " + Format(mm.minVal, fmt1) +
+                                            "m to " + Format(mm.maxVal, fmt1) + "m"
+        End If
+        task.depthRGB.SetTo(0, task.noDepthMask)
+        If standaloneTest() Then dst2 = task.depthRGB
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Depth_Colorizer_Close(cPtr)

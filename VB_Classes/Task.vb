@@ -324,6 +324,7 @@ Public Class VBtask : Implements IDisposable
     Public OpenGL_Left As Integer
     Public OpenGL_Top As Integer
     Public displayDst1 As Boolean
+    Public depthAndCorrelationText As String
     Public Structure inBuffer
         Dim color As cv.Mat
         Dim leftView As cv.Mat
@@ -895,6 +896,7 @@ Public Class VBtask : Implements IDisposable
             displayObject.trueData.Clear()
             labels = displayObject.labels
             If displayDst1 Then labels(1) = displayObject.labels(1)
+            depthAndCorrelationText = task.depthAndCorrelationText
         Else
             dst1 = depthRGB
         End If

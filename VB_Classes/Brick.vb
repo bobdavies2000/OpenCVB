@@ -599,7 +599,7 @@ End Class
 
 
 
-Public Class Brick_Correlation : Inherits TaskParent
+Public Class Brick_CorrelationInput : Inherits TaskParent
     Dim LRMeanSub As New MeanSubtraction_LeftRight
     Public Sub New()
         task.brickRunFlag = True
@@ -832,7 +832,7 @@ End Class
 
 
 
-Public Class Brick_Map : Inherits TaskParent
+Public Class Brick_CorrelationMap : Inherits TaskParent
     Public Sub New()
         task.brickRunFlag = True
         labels(3) = "The map to identify each brick's depth."
@@ -841,21 +841,24 @@ Public Class Brick_Map : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
-        Dim depthAndCorrelationText As String = ""
+        task.depthAndCorrelationText = ""
         For Each brick In task.bricks.brickList
             If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
         Next
-        dst2 = ShowPaletteCorrelation(dst1)
-        dst2.SetTo(0, task.noDepthMask)
+
+        If standaloneTest() Then
+            dst2 = ShowPaletteCorrelation(dst1)
+            dst2.SetTo(0, task.noDepthMask)
+        End If
 
         Dim ptM = task.mouseMovePoint, w = task.workingRes.Width, h = task.workingRes.Height
         If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
             Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             task.brickD = task.bricks.brickList(index)
-            depthAndCorrelationText = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
-                                      CStr(task.brickD.index) + vbCrLf + "range " + Format(task.brickD.mm.minVal, fmt1) + "-" +
-                                      Format(task.brickD.mm.maxVal, fmt1) + "m, age = " + CStr(task.brickD.age) + vbCrLf +
-                                      "correlation = " + Format(task.brickD.correlation, fmt3)
+            task.depthAndCorrelationText = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
+                                           CStr(task.brickD.index) + vbCrLf + " range " + Format(task.brickD.mm.minVal, fmt1) + "-" +
+                                           Format(task.brickD.mm.maxVal, fmt1) + "m, age = " + CStr(task.brickD.age) + vbCrLf +
+                                           " correlation = " + Format(task.brickD.correlation, fmt3)
 
             Dim ptTextLoc = task.brickD.rect.TopLeft
             If ptTextLoc.X > w * 0.85 Or (ptTextLoc.Y < h * 0.15 And ptTextLoc.X > w * 0.15) Then
@@ -864,8 +867,8 @@ Public Class Brick_Map : Inherits TaskParent
                 ptTextLoc.Y -= task.brickD.rect.Height * 3
             End If
 
-            SetTrueText(depthAndCorrelationText, ptTextLoc, 2)
-            SetTrueText(depthAndCorrelationText, 3)
+            SetTrueText(task.depthAndCorrelationText, ptTextLoc, 2)
+            SetTrueText(task.depthAndCorrelationText, 3)
         End If
         labels(2) = task.bricks.labels(2)
     End Sub

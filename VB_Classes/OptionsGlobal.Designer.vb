@@ -381,13 +381,12 @@ Partial Class OptionsGlobal
         Me.DepthGroupBox.Controls.Add(Me.GridDepth)
         Me.DepthGroupBox.Controls.Add(Me.DepthCorrelations)
         Me.DepthGroupBox.Controls.Add(Me.ColorizedDepth)
-        Me.DepthGroupBox.Location = New System.Drawing.Point(334, 265)
+        Me.DepthGroupBox.Location = New System.Drawing.Point(332, 265)
         Me.DepthGroupBox.Name = "DepthGroupBox"
         Me.DepthGroupBox.Size = New System.Drawing.Size(194, 153)
         Me.DepthGroupBox.TabIndex = 78
         Me.DepthGroupBox.TabStop = False
         Me.DepthGroupBox.Text = "Depth Display"
-        Me.DepthGroupBox.Visible = False
         '
         'GridDepth
         '
