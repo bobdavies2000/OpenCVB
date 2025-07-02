@@ -325,6 +325,7 @@ Public Class VBtask : Implements IDisposable
     Public OpenGL_Top As Integer
     Public displayDst1 As Boolean
     Public depthAndCorrelationText As String
+    Public closeRequest As Boolean
     Public Structure inBuffer
         Dim color As cv.Mat
         Dim leftView As cv.Mat

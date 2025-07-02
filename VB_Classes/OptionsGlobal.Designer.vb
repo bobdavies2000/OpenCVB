@@ -47,7 +47,6 @@ Partial Class OptionsGlobal
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.DepthGroupBox = New System.Windows.Forms.GroupBox()
-        Me.GridDepth = New System.Windows.Forms.RadioButton()
         Me.DepthCorrelations = New System.Windows.Forms.RadioButton()
         Me.ColorizedDepth = New System.Windows.Forms.RadioButton()
         Me.TruncateDepth = New System.Windows.Forms.CheckBox()
@@ -378,25 +377,14 @@ Partial Class OptionsGlobal
         '
         'DepthGroupBox
         '
-        Me.DepthGroupBox.Controls.Add(Me.GridDepth)
         Me.DepthGroupBox.Controls.Add(Me.DepthCorrelations)
         Me.DepthGroupBox.Controls.Add(Me.ColorizedDepth)
         Me.DepthGroupBox.Location = New System.Drawing.Point(332, 265)
         Me.DepthGroupBox.Name = "DepthGroupBox"
-        Me.DepthGroupBox.Size = New System.Drawing.Size(194, 153)
+        Me.DepthGroupBox.Size = New System.Drawing.Size(194, 118)
         Me.DepthGroupBox.TabIndex = 78
         Me.DepthGroupBox.TabStop = False
         Me.DepthGroupBox.Text = "Depth Display"
-        '
-        'GridDepth
-        '
-        Me.GridDepth.AutoSize = True
-        Me.GridDepth.Location = New System.Drawing.Point(16, 103)
-        Me.GridDepth.Name = "GridDepth"
-        Me.GridDepth.Size = New System.Drawing.Size(112, 24)
-        Me.GridDepth.TabIndex = 3
-        Me.GridDepth.Text = "Grid Depth"
-        Me.GridDepth.UseVisualStyleBackColor = True
         '
         'DepthCorrelations
         '
@@ -880,5 +868,4 @@ Partial Class OptionsGlobal
     Friend WithEvents DepthGroupBox As Windows.Forms.GroupBox
     Friend WithEvents DepthCorrelations As Windows.Forms.RadioButton
     Friend WithEvents ColorizedDepth As Windows.Forms.RadioButton
-    Friend WithEvents GridDepth As Windows.Forms.RadioButton
 End Class

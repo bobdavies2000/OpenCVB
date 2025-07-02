@@ -1780,6 +1780,7 @@ Public Class Main_UI
                 ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
                 ' Each image will represent the one just finished by the algorithm.
                 If task.debugSyncUI Then Thread.Sleep(100)
+                If task.closeRequest Then End
             End While
 
             Debug.WriteLine(parms.algName + " ending.  Thread closing...")

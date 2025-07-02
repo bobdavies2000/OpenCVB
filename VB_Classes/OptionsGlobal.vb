@@ -360,4 +360,8 @@ Public Class OptionsGlobal
     Private Sub showMotionMask_CheckedChanged(sender As Object, e As EventArgs) Handles showMotionMask.CheckedChanged
         task.optionsChanged = True
     End Sub
+
+    Private Sub OptionsGlobal_Closed(sender As Object, e As EventArgs) Handles Me.Closed
+        task.closeRequest = True
+    End Sub
 End Class
