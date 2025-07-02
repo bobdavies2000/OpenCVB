@@ -33,14 +33,17 @@ Public Class Disparity_Basics : Inherits TaskParent
         matchRect = match.matchRect
 
         dst3.Rectangle(searchRect, black, task.lineWidth)
-        dst3.Rectangle(match.matchRect, black, task.lineWidth)
+        '  dst3.Rectangle(match.matchRect, black, task.lineWidth)
         saveCorrelations.Add(match.correlation)
 
         Dim min = saveCorrelations.Min
         Dim max = saveCorrelations.Max
 
-        If max = match.correlation And max > 0.8 Then bestRect = match.matchRect
-        dst3.Rectangle(bestRect, black, task.lineWidth)
+        If max = match.correlation And max > 0.8 Then
+            bestRect = match.matchRect
+            bestRect.Y = searchRect.Y
+        End If
+        dst3.Rectangle(bestRect, white, task.lineWidth)
 
         If saveCorrelations.Count > 100 Then saveCorrelations.RemoveAt(0)
 
