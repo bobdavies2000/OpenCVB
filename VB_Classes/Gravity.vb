@@ -1,9 +1,10 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows.Media.TextFormatting
+Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
     Public options As New Options_GravityLines
     Dim gravityRaw As New Gravity_BasicsRaw
-    Public gravityRGB As lpData
     Public gravityMatch As New LineRGB_MatchGravity
+    Public gravityRGB As lpData
     Public Sub New()
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
     End Sub
@@ -19,49 +20,33 @@ Public Class Gravity_Basics : Inherits TaskParent
     Public Shared Sub showVectors(dst As cv.Mat)
         dst.Line(task.gravityVec.p1, task.gravityVec.p2, white, task.lineWidth, task.lineType)
         dst.Line(task.horizonVec.p1, task.horizonVec.p2, white, task.lineWidth, task.lineType)
-        showVec(dst, task.gravityBasics.gravityRGB)
+        If task.gravityBasics.gravityRGB IsNot Nothing Then showVec(dst, task.gravityBasics.gravityRGB)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         gravityRaw.Run(emptyMat)
-        If task.gravityVec IsNot Nothing Then
-            gravityMatch.Run(src)
-            If gravityMatch.gLines.Count > 2 Then gravityRGB = gravityMatch.gLines(0)
+        gravityMatch.Run(src)
+        labels(2) = CStr(gravityMatch.gLines.Count) + " of the lines found were parallel to gravity."
+
+        Static gravityRGBCandidate = task.gravityVec
+        If gravityMatch.gLines.Count > 0 Then gravityRGBCandidate = gravityMatch.gLines(0)
+
+        ' the gravity vector will always intersect the top and bottom of the image unless the aspect ratio changes.
+        Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - gravityRGBCandidate.ep1.X)
+        Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - gravityRGBCandidate.ep2.X)
+        If Math.Abs(deltaX1 - deltaX2) > task.gravityBasics.options.pixelThreshold Or task.lineRGB.lpList.Count = 0 Then
+            task.gravityVec = gravityRaw.gravityVec
         End If
-
         task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
 
-        If standaloneTest() Then showVectors(dst3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Gravity_BasicsKalman : Inherits TaskParent
-    Dim kalman As New Kalman_Basics
-    Dim gravity As New Gravity_BasicsRaw
-    Public Sub New()
-        desc = "Use kalman to smooth gravity and horizon vectors."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        gravity.Run(src)
-
-        kalman.kInput = {task.gravityVec.ep1.X, task.gravityVec.ep1.Y, task.gravityVec.ep2.X, task.gravityVec.ep2.Y}
-        kalman.Run(emptyMat)
-        task.gravityVec = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
-                                     New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3)))
-
-        task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
+        gravityRGB = gravityRGBCandidate
 
         If standaloneTest() Then
             dst2.SetTo(0)
-            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.highlight)
-            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
+            showVectors(dst2)
+            dst3 = task.lineRGB.dst3
+            labels(3) = task.lineRGB.labels(3)
         End If
     End Sub
 End Class
@@ -76,6 +61,8 @@ Public Class Gravity_BasicsRaw : Inherits TaskParent
     Public xTop As Single, xBot As Single
     Dim sampleSize As Integer = 25
     Dim ptList As New List(Of Integer)
+    Public gravityVecCandidate As lpData
+    Public gravityVec As lpData
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(2) = "Horizon and Gravity Vectors"
@@ -116,23 +103,44 @@ Public Class Gravity_BasicsRaw : Inherits TaskParent
         If gPoints.Rows = 0 Then Exit Sub ' no point cloud data to get the gravity line in the image coordinates.
         xTop = findFirst(gPoints)
         xBot = findLast(gPoints)
-        task.gravityVec = New lpData(New cv.Point2f(xTop, 0), New cv.Point2f(xBot, dst2.Height))
+        gravityVec = New lpData(New cv.Point2f(xTop, 0), New cv.Point2f(xBot, dst2.Height))
+
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.highlight)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Gravity_BasicsKalman : Inherits TaskParent
+    Dim kalman As New Kalman_Basics
+    Dim gravity As New Gravity_BasicsRaw
+    Public Sub New()
+        desc = "Use kalman to smooth gravity and horizon vectors."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        gravity.Run(src)
+
+        kalman.kInput = {task.gravityVec.ep1.X, task.gravityVec.ep1.Y, task.gravityVec.ep2.X, task.gravityVec.ep2.Y}
+        kalman.Run(emptyMat)
+        task.gravityVec = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
+                                     New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3)))
+
+        task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
 
         If standaloneTest() Then
             dst2.SetTo(0)
             DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.highlight)
-        End If
-
-        If task.gravityBasics.gravityRGB IsNot Nothing Then
-            Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - task.gravityBasics.gravityRGB.ep1.X)
-            Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - task.gravityBasics.gravityRGB.ep2.X)
-            If Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold Then
-                task.gravityVec.ep1 = task.gravityBasics.gravityRGB.ep1
-                task.gravityVec.ep2 = task.gravityBasics.gravityRGB.ep2
-            End If
+            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
         End If
     End Sub
 End Class
+
 
 
 
