@@ -127,7 +127,6 @@ Public Class MotionCam_SideApproach : Inherits TaskParent
                         pt = New cv.Point2f(ele.Key, dst2.Height - 10 - offset1)
                 End Select
 
-                'SetTrueText(CStr(ptIndex), pt)
                 dst2.Circle(pt, task.DotSize, color, -1, task.lineType)
                 ptIndex += 1
             Next

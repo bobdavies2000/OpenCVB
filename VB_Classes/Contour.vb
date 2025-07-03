@@ -760,7 +760,6 @@ End Class
 
 Public Class Contour_Lines : Inherits TaskParent
     Dim hulls As New Contour_Hulls
-    Dim lines As New LineRGB_Basics
     Public Sub New()
         desc = "Build a list of the lines in the output of Contour_Hulls"
     End Sub
@@ -769,12 +768,11 @@ Public Class Contour_Lines : Inherits TaskParent
         dst3 = hulls.dst3
         labels(3) = hulls.labels(3)
 
-        lines.Run(dst3)
         dst2 = src
-        For Each lp In lines.lpList
+        For Each lp In task.lineRGB.lpList
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
-        labels(2) = lines.labels(2)
+        labels(2) = task.lineRGB.labels(2)
     End Sub
 End Class
 

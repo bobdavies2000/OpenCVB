@@ -188,7 +188,6 @@ End Class
 Public Class BrickPoint_KNN : Inherits TaskParent
     Dim ptBrick As New BrickPoint_Best
     Dim knn As New KNN_Basics
-    Dim lines As New LineRGB_Basics
     Public Sub New()
         desc = "Join the 2 nearest points to each grid point to help find lines."
     End Sub
@@ -208,9 +207,8 @@ Public Class BrickPoint_KNN : Inherits TaskParent
             dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(2)), 255, task.lineWidth, task.lineType)
         Next
 
-        lines.Run(dst3)
         dst2 = src.Clone
-        For Each lp In lines.lpList
+        For Each lp In task.lineRGB.lpList
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
     End Sub

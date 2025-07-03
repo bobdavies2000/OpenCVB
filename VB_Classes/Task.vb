@@ -806,6 +806,7 @@ Public Class VBtask : Implements IDisposable
         End If
 
         gravityBasics.Run(src.Clone)
+        lineRGB.Run(grayStable)
         histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
 
         Dim saveOptionsChanged = task.optionsChanged
@@ -876,11 +877,8 @@ Public Class VBtask : Implements IDisposable
 
             If gOptions.CrossHairs.Checked And gravityBasics.gravityRGB IsNot Nothing Then
                 Gravity_Basics.showVectors(dst0)
-                Dim p1 = gravityBasics.cameraMotionProxy.center
-                displayObject.trueData.Add(New TrueText("Camera Motion Proxy", p1, 0))
-
                 Dim p2 = gravityBasics.gravityRGB.center
-                p2 = New cv.Point(p2.X, p2.Y + 10)
+                p2 = New cv.Point(p2.X, p2.Y)
                 displayObject.trueData.Add(New TrueText("Gravity Line Match", p2, 0))
             End If
 

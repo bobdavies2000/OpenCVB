@@ -60,12 +60,12 @@ Public Class LineRect_CenterNeighbor : Inherits TaskParent
             Dim nabeList = task.gridNeighbors(index)
             Dim foundObjectLine As Boolean = False
             For i = 1 To nabeList.Count - 1
-                Dim gc1 = task.bricks.brickList(nabeList(i))
-                If gc1.depth = 0 Then Continue For
+                Dim brick1 = task.bricks.brickList(nabeList(i))
+                If brick1.depth = 0 Then Continue For
                 For j = i + 1 To nabeList.Count - 1
-                    Dim gc2 = task.bricks.brickList(nabeList(j))
-                    If gc2.depth = 0 Then Continue For
-                    If Math.Abs(gc1.depth - gc2.depth) > depthThreshold Then
+                    Dim brick2 = task.bricks.brickList(nabeList(j))
+                    If brick2.depth = 0 Then Continue For
+                    If Math.Abs(brick1.depth - brick2.depth) > depthThreshold Then
                         foundObjectLine = True
                         Exit For
                     End If

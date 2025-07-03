@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Line3D_Basics : Inherits TaskParent
-    Dim lines As New LineRGB_Basics
     Public lines3D As New List(Of cv.Point3f)
     Public lines3DMat As New cv.Mat
     Public Sub New()
@@ -11,9 +10,8 @@ Public Class Line3D_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
 
-        lines.Run(src)
-        dst2 = lines.dst2
-        labels(2) = lines.labels(2)
+        dst2 = task.lineRGB.dst2
+        labels(2) = task.lineRGB.labels(2)
 
         Static brickList As New List(Of brickData)(task.bricks.brickList)
 

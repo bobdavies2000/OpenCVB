@@ -2,7 +2,6 @@
 Public Class FeatureLine_Basics : Inherits TaskParent
     Public cameraMotionProxy As New lpData
     Dim matchRuns As Integer, lineRuns As Integer, totalLineRuns As Integer
-    Public runOnEachFrame As Boolean
     Dim match As New Match_Line
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -31,8 +30,7 @@ Public Class FeatureLine_Basics : Inherits TaskParent
                         "line detection runs = " + CStr(totalLineRuns)
         End If
 
-        If task.heartBeatLT Or task.lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Or
-            runOnEachFrame Or task.frameCount < 10 Then
+        If task.lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Or task.frameCount < 10 Then
             task.motionMask.SetTo(255) ' force a complete line detection
             task.lineRGB.Run(src.Clone)
             If task.lineRGB.lpList.Count = 0 Then Exit Sub

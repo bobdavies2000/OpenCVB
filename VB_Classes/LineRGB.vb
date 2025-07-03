@@ -1,54 +1,63 @@
-Imports System.Text.RegularExpressions
 Imports cv = OpenCvSharp
 Public Class LineRGB_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public lpLastList As New List(Of lpData)
     Public rawLines As New LineRGB_Raw
-    Public minAge As Integer = 5 ' line has to be around for a little while before it is recorded as a line.
+    Dim lineAges As New LineRGB_OrderByAge
     Public Sub New()
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
+    Private Function lpMotionCheck(lp As lpData) As Boolean
+        Dim gridIndex As Integer, pt As cv.Point
+
+        gridIndex = task.grid.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X)
+        pt = task.gridRects(gridIndex).TopLeft
+        If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then Return False
+
+        gridIndex = task.grid.gridMap.Get(Of Single)(lp.p2.Y, lp.p2.X)
+        pt = task.gridRects(gridIndex).TopLeft
+        If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then Return False
+        Return True
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub ' only run as a task algorithm.
         If task.optionsChanged Then
-            lpLastList.Clear()
             lpList.Clear()
             task.motionMask.SetTo(255)
         End If
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        For Each lp In lpList
+            If lpMotionCheck(lp) Then
+                lp.age += 1
+                sortlines.Add(lp.length, lp)
+            End If
+        Next
 
-        rawLines.Run(src)
+        rawLines.Run(task.grayStable)
         dst3 = rawLines.dst2
         labels(3) = rawLines.labels(2)
 
         For Each lp In rawLines.lpList
-            sortlines.Add(lp.length, lp)
+            If lpMotionCheck(lp) = False Then sortlines.Add(lp.length, lp)
         Next
 
         lpList.Clear()
-        dst2 = src
-        lpMap.SetTo(0)
         For Each lp In sortlines.Values
             lpList.Add(lp)
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            lpMap.Line(lp.p1, lp.p2, sortlines.Values.IndexOf(lp) + 1, task.lineWidth * 3, cv.LineTypes.Link8)
-
-            If standaloneTest() Then
-                For i As Integer = 0 To 3
-                    dst2.Line(lp.vertices(i), lp.vertices((i + 1) Mod 4), task.highlight, task.lineWidth)
-                Next
-            End If
             If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
 
-        If standaloneTest() Then dst1 = ShowPalette(lpMap)
-        lpLastList = New List(Of lpData)(lpList)
-        labels(2) = "Of the " + CStr(rawLines.lpList.Count) + " raw lines found, shown below are the " + CStr(lpList.Count) + " longest."
+        lineAges.Run(task.color.Clone)
+        dst2 = lineAges.dst2
+        If standaloneTest() Then
+            For Each lp In lpList
+                SetTrueText("Age: " + CStr(lp.age), lp.p1)
+            Next
+        End If
+
+        labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count)
     End Sub
 End Class
-
-
 
 
 
@@ -91,6 +100,55 @@ Public Class LineRGB_Raw : Inherits TaskParent
         Next
 
         labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LineRGB_BasicsNoAging : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public rawLines As New LineRGB_Raw
+    Public Sub New()
+        desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then
+            lpList.Clear()
+            task.motionMask.SetTo(255)
+        End If
+
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+
+        rawLines.Run(src)
+        dst3 = rawLines.dst2
+        labels(3) = rawLines.labels(2)
+
+        For Each lp In rawLines.lpList
+            sortlines.Add(lp.length, lp)
+        Next
+
+        lpList.Clear()
+        dst2 = src
+        lpMap.SetTo(0)
+        For Each lp In sortlines.Values
+            lpList.Add(lp)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            lpMap.Line(lp.p1, lp.p2, sortlines.Values.IndexOf(lp) + 1, task.lineWidth * 3, cv.LineTypes.Link8)
+
+            If standaloneTest() Then
+                For i As Integer = 0 To 3
+                    dst2.Line(lp.vertices(i), lp.vertices((i + 1) Mod 4), task.highlight, task.lineWidth)
+                Next
+            End If
+            If lpList.Count >= task.FeatureSampleSize Then Exit For
+        Next
+
+        If standaloneTest() Then dst1 = ShowPalette(lpMap)
+        labels(2) = "Of the " + CStr(rawLines.lpList.Count) + " raw lines found, shown below are the " + CStr(lpList.Count) + " longest."
     End Sub
 End Class
 
@@ -560,12 +618,10 @@ End Class
 
 Public Class LineRGB_HorizontalTrig : Inherits TaskParent
     Public horizList As New List(Of lpData)
-    Dim lines As New LineRGB_Basics
     Public Sub New()
         desc = "Find all the Horizontal lines with horizon vector"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
         dst2 = src
 
         Dim p1 = task.horizonVec.p1, p2 = task.horizonVec.p2
@@ -574,7 +630,7 @@ Public Class LineRGB_HorizontalTrig : Inherits TaskParent
         Dim hAngle = Math.Atan(sideOpposite / dst2.Width) * 57.2958
 
         horizList.Clear()
-        For Each lp In lines.rawLines.lpList
+        For Each lp In task.lineRGB.lpList
             If lp.p1.X > lp.p2.X Then lp = New lpData(lp.p2, lp.p1)
 
             sideOpposite = lp.p2.Y - lp.p1.Y
@@ -595,12 +651,10 @@ End Class
 
 Public Class LineRGB_VerticalTrig : Inherits TaskParent
     Public vertList As New List(Of lpData)
-    Dim lines As New LineRGB_Basics
     Public Sub New()
         desc = "Find all the vertical lines with gravity vector"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
         dst2 = src
 
         Dim p1 = task.gravityVec.p1, p2 = task.gravityVec.p2
@@ -609,7 +663,7 @@ Public Class LineRGB_VerticalTrig : Inherits TaskParent
         Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * 57.2958
 
         vertList.Clear()
-        For Each lp In lines.lpList
+        For Each lp In task.lineRGB.rawLines.lpList
             If lp.p1.Y > lp.p2.Y Then lp = New lpData(lp.p2, lp.p1)
 
             sideOpposite = lp.p2.X - lp.p1.X
@@ -636,12 +690,10 @@ End Class
 Public Class LineRGB_GravityToAverage : Inherits TaskParent
     Public vertList As New List(Of lpData)
     Dim kalman As New Kalman_Basics
-    Dim lines As New LineRGB_Basics
     Public Sub New()
         desc = "Highlight both vertical and horizontal lines - not terribly good..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
         Dim gravityDelta As Single = task.gravityVec.ep1.X - task.gravityVec.ep2.X
 
         kalman.kInput = {gravityDelta}
@@ -649,9 +701,9 @@ Public Class LineRGB_GravityToAverage : Inherits TaskParent
         gravityDelta = kalman.kOutput(0)
 
         dst2 = src
-        If standalone Then dst3 = lines.rawLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If standalone Then dst3 = task.lineRGB.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim deltaList As New List(Of Single)
-        For Each lp In lines.rawLines.lpList
+        For Each lp In task.lineRGB.rawLines.lpList
             If lp.vertical And Math.Sign(task.gravityVec.slope) = Math.Sign(lp.slope) Then
                 Dim delta = lp.ep1.X - lp.ep2.X
                 If Math.Abs(gravityDelta - delta) < 3 Then
@@ -686,13 +738,10 @@ End Class
 Public Class LineRGB_GravityToLongest : Inherits TaskParent
     Dim kalman As New Kalman_Basics
     Dim matchLine As New MatchLine_Basics
-    Dim lines As New LineRGB_Basics
     Public Sub New()
         desc = "Highlight both vertical and horizontal lines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-
         Dim gravityDelta As Single = task.gravityVec.ep1.X - task.gravityVec.ep2.X
 
         kalman.kInput = {gravityDelta}
@@ -700,7 +749,7 @@ Public Class LineRGB_GravityToLongest : Inherits TaskParent
         gravityDelta = kalman.kOutput(0)
 
         matchLine.lpInput = Nothing
-        For Each lp In lines.rawLines.lpList
+        For Each lp In task.lineRGB.rawLines.lpList
             If lp.vertical Then
                 matchLine.lpInput = lp
                 Exit For
@@ -709,7 +758,7 @@ Public Class LineRGB_GravityToLongest : Inherits TaskParent
         If matchLine.lpInput Is Nothing Then Exit Sub
         matchLine.Run(src)
         dst2 = matchLine.dst2
-        dst3 = lines.rawLines.dst2
+        dst3 = task.lineRGB.rawLines.dst2
     End Sub
 End Class
 
@@ -743,5 +792,30 @@ Public Class LineRGB_MatchGravity : Inherits TaskParent
             labels(2) = "Of the " + CStr(gLines.Count) + " lines found, the best line parallel to gravity was " +
                        CStr(CInt(gLines(0).length)) + " pixels in length."
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class LineRGB_OrderByAge : Inherits TaskParent
+    Dim lpListAge As New List(Of lpData)
+    Public Sub New()
+        desc = "Show the lines which have been around the longest"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim sortAge As New SortedList(Of Integer, lpData)(New compareAllowIdenticalIntegerInverted)
+        For Each lp In task.lineRGB.lpList
+            sortAge.Add(lp.age, lp)
+        Next
+
+        lpListAge.Clear()
+        dst2 = src
+        For Each lp In sortAge.Values
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            SetTrueText("Age: " + CStr(lp.age), lp.p1)
+            lpListAge.Add(lp)
+        Next
     End Sub
 End Class
