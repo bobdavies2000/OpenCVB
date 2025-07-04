@@ -3,7 +3,7 @@ Imports sl
 Public Class CameraZED2 : Inherits GenericCamera
     Dim zed As sl.Camera
     Dim init_params As New InitParameters()
-    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
         init_params.sensorsRequired = True
         init_params.depthMode = sl.DEPTH_MODE.ULTRA
@@ -33,7 +33,7 @@ Public Class CameraZED2 : Inherits GenericCamera
         calibData.h_fov = camInfo.cameraConfiguration.calibrationParameters.leftCam.hFOV
         calibData.v_fov = camInfo.cameraConfiguration.calibrationParameters.leftCam.vFOV
 
-        Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
+        Dim ratio = CInt(captureRes.Width / workRes.Width)
         calibData.rgbIntrinsics.fx /= ratio
         calibData.rgbIntrinsics.fy /= ratio
         calibData.rgbIntrinsics.ppx /= ratio
@@ -43,10 +43,10 @@ Public Class CameraZED2 : Inherits GenericCamera
         posTrack.enableAreaMemory = True
         zed.EnablePositionalTracking(posTrack)
     End Sub
-    Public Sub GetNextFrame(WorkingRes As cv.Size)
+    Public Sub GetNextFrame(workRes As cv.Size)
         Static RuntimeParameters = New RuntimeParameters()
         Dim rows = captureRes.Height, cols = captureRes.Width
-        Dim w = WorkingRes.Width, h = WorkingRes.Height
+        Dim w = workRes.Width, h = workRes.Height
         While 1
             Dim rc = zed.Grab(RuntimeParameters)
             If rc = 0 Then Exit While
@@ -86,11 +86,11 @@ Public Class CameraZED2 : Inherits GenericCamera
                 Static IMU_StartTime = sensordata.imu.timestamp
                 IMU_TimeStamp = (sensordata.imu.timestamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
             End If
-            If WorkingRes <> captureRes Then
-                uiColor = color.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-                uiLeft = leftView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-                uiRight = rightView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-                uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
+            If workRes <> captureRes Then
+                uiColor = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiLeft = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiRight = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiPointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
             Else
                 uiColor = color.Clone
                 uiLeft = leftView.Clone

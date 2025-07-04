@@ -688,7 +688,7 @@ Public Class Motion_FPolyRect : Inherits TaskParent
         match.template = srcSave(ValidateRect(fRect.lpRect)).Clone
         match.Run(src)
         dst3 = src
-        dst3.Rectangle(match.matchRect, task.highlight, task.lineWidth)
+        dst3.Rectangle(match.newRect, task.highlight, task.lineWidth)
         labels(3) = "Correlation Coefficient = " + Format(match.correlation * 100, fmt1)
     End Sub
 End Class
@@ -983,8 +983,8 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
             Dim roi = featureRects(i)
             match.template = saveMat(roi)
             match.Run(src(searchRects(i)))
-            dst3.Rectangle(match.matchRect, task.highlight, task.lineWidth)
-            matchRects.Add(match.matchRect)
+            dst3.Rectangle(match.newRect, task.highlight, task.lineWidth)
+            matchRects.Add(match.newRect)
         Next
 
         saveMat = src.Clone
@@ -1050,8 +1050,8 @@ Public Class Motion_TopFeatures : Inherits TaskParent
             Dim roi = featureRects(i)
             match.template = dst1(roi)
             match.Run(src(searchRects(i)))
-            dst3.Rectangle(match.matchRect, task.highlight, task.lineWidth)
-            matchRects.Add(match.matchRect)
+            dst3.Rectangle(match.newRect, task.highlight, task.lineWidth)
+            matchRects.Add(match.newRect)
         Next
 
         searchRects.Clear()

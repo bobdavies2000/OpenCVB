@@ -30,8 +30,8 @@ Namespace jsonClass
         Public snap320 As Boolean
         Public snapCustom As Boolean
 
-        Public WorkingRes As cv.Size
-        Public WorkingResIndex As Integer
+        Public workRes As cv.Size
+        Public workResIndex As Integer
         Public captureRes As cv.Size
         Public displayRes As cv.Size
 
@@ -66,7 +66,7 @@ Namespace jsonClass
             Dim emptyApp As New ApplicationStorage
             emptyApp.cameraName = ""
             emptyApp.cameraIndex = 0
-            emptyApp.WorkingRes = New cv.Size(320, 180)
+            emptyApp.workRes = New cv.Size(320, 180)
             emptyApp.snap640 = True
             emptyApp.testAllDuration = 5
             emptyApp.showConsoleLog = False

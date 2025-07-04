@@ -80,7 +80,7 @@ Public Class VBtask : Implements IDisposable
     Public optionsChanged As Boolean = True ' global or local options changed.
     Public rows As Integer
     Public cols As Integer
-    Public workingRes As cv.Size
+    Public workRes As cv.Size
     Public TaskTimer As New System.Timers.Timer(1000)
 
     ' if true, algorithm prep means algorithm tasks will run.  If false, they have already been run...
@@ -385,7 +385,7 @@ Public Class VBtask : Implements IDisposable
 
         Public fpsRate As Integer
         Public fpsHostCamera As Integer
-        Public workingRes As cv.Size
+        Public workRes As cv.Size
         Public captureRes As cv.Size ' DisparityIn-verted_Basics needs the full resolution to compute disparity.
         Public displayRes As cv.Size
 
@@ -496,9 +496,9 @@ Public Class VBtask : Implements IDisposable
 
         mainFormLocation = parms.mainFormLocation
         displayRes = parms.displayRes
-        rows = parms.workingRes.Height
-        cols = parms.workingRes.Width
-        workingRes = parms.workingRes
+        rows = parms.workRes.Height
+        cols = parms.workRes.Width
+        workRes = parms.workRes
         optionsChanged = True
 
         dst0 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
@@ -647,7 +647,7 @@ Public Class VBtask : Implements IDisposable
         If src.Size <> New cv.Size(dst3.Cols, dst3.Rows) Then dst3 = dst3.Resize(src.Size)
         bins2D = {dst2.Height, dst2.Width}
 
-        ' If the WorkingRes changes, the previous generation of images needs to be reset.
+        ' If the workRes changes, the previous generation of images needs to be reset.
         If pointCloud.Size <> New cv.Size(cols, rows) Or task.color.Size <> dst2.Size Then
             pointCloud = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, cv.Scalar.All(0))
             noDepthMask = New cv.Mat(rows, cols, cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -852,17 +852,17 @@ Public Class VBtask : Implements IDisposable
             dst3 = Check8uC3(displayObject.dst3)
 
             ' make sure that any outputs from the algorithm are the right size.nearest
-            If dst0.Size <> workingRes And dst0.Width > 0 Then
-                dst0 = dst0.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst0.Size <> workRes And dst0.Width > 0 Then
+                dst0 = dst0.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
-            If dst1.Size <> workingRes And dst1.Width > 0 Then
-                dst1 = dst1.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst1.Size <> workRes And dst1.Width > 0 Then
+                dst1 = dst1.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
-            If dst2.Size <> workingRes And dst2.Width > 0 Then
-                dst2 = dst2.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst2.Size <> workRes And dst2.Width > 0 Then
+                dst2 = dst2.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
-            If dst3.Size <> workingRes And dst3.Width > 0 Then
-                dst3 = dst3.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If dst3.Size <> workRes And dst3.Width > 0 Then
+                dst3 = dst3.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
 
             If gOptions.ShowGrid.Checked Then dst2.SetTo(cv.Scalar.White, gridMask)

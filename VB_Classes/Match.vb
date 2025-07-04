@@ -4,8 +4,8 @@ Imports System.Windows.Forms
 Public Class Match_Basics : Inherits TaskParent
     Public template As cv.Mat ' Provide this
     Public correlation As Single ' Resulting Correlation coefficient
-    Public matchCenter As cv.Point
-    Public matchRect As New cv.Rect
+    Public newCenter As cv.Point
+    Public newRect As New cv.Rect
     Public Sub New()
         If standalone Then task.gOptions.DebugCheckBox.Checked = True
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
@@ -25,12 +25,13 @@ Public Class Match_Basics : Inherits TaskParent
         Dim mm = GetMinMax(dst0)
 
         correlation = mm.maxVal
-        labels(2) = "Template (at right) has " + Format(correlation, "#,##0.000") + " Correlation to the src input"
+        labels(2) = "Template (at right) has " + Format(correlation,) + " Correlation to the src input"
         Dim w = template.Width, h = template.Height
-        matchCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
-        matchRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
+        newCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
+        newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
         If standaloneTest() Then
             dst2 = src
+            dst2.Circle(newCenter, task.DotSize, task.highlight, -1, task.lineType)
             dst3 = template
         End If
         labels(3) = "Template to compare the src input to"
@@ -78,9 +79,9 @@ Public Class Match_BasicsTest : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            DrawCircle(dst2, match.matchCenter, task.DotSize, white)
+            DrawCircle(dst2, match.newCenter, task.DotSize, white)
             dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
-            SetTrueText(Format(match.correlation, fmt3), match.matchCenter)
+            SetTrueText(Format(match.correlation, fmt3), match.newCenter)
         End If
     End Sub
 End Class
@@ -345,11 +346,11 @@ Public Class Match_DrawRect : Inherits TaskParent
             dst2 = src
         End If
 
-        SetTrueText("maxLoc = " + CStr(match.matchCenter.X) + ", " + CStr(match.matchCenter.Y), New cv.Point(1, 1), 3)
+        SetTrueText("maxLoc = " + CStr(match.newCenter.X) + ", " + CStr(match.newCenter.Y), New cv.Point(1, 1), 3)
 
         If standaloneTest() Then
-            DrawCircle(dst2, match.matchCenter, task.DotSize, cv.Scalar.Red)
-            SetTrueText(Format(match.correlation, fmt3), match.matchCenter, 2)
+            DrawCircle(dst2, match.newCenter, task.DotSize, cv.Scalar.Red)
+            SetTrueText(Format(match.correlation, fmt3), match.newCenter, 2)
         End If
         lastImage = src
     End Sub
@@ -611,29 +612,70 @@ End Class
 Public Class Match_Line : Inherits TaskParent
     Public lpInput As lpData
     Dim match As New Match_Basics
-    Public correlation As Single
+    Public correlation1 As Single
+    Public correlation2 As Single
+    Public lpNew As lpData
     Public Sub New()
         match.template = New cv.Mat
         desc = "Match the endpoints of a line to make sure it is still there before line detection runs."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone And task.algorithmPrep = False Then lpInput = task.gravityVec
-        If lpInput Is Nothing Then Exit Sub
-        If lpInput.length = 0 Then Exit Sub
 
-        match.template = lpInput.template
-        Dim matchInput As New cv.Mat
-        cv.Cv2.HConcat(src(lpInput.matchRect1), src(lpInput.matchRect2), matchInput)
+        match.template = lpInput.template1
+        match.Run(src(lpInput.nabeRect1))
+        correlation1 = match.correlation
+        Dim p1 = match.newRect.TopLeft
+        Debug.WriteLine("p1 newCenter = " + match.newCenter.ToString)
 
-        match.Run(matchInput)
-        correlation = match.correlation
-
-        labels(2) = "Camera Motion Proxy Correlation = " + Format(correlation, fmt3)
+        match.template = lpInput.template2
+        match.Run(src(lpInput.nabeRect2))
+        correlation2 = match.correlation
+        Dim p2 = match.newRect.TopLeft
+        Debug.WriteLine("p2 newCenter = " + match.newCenter.ToString)
 
         Dim tmp As New cv.Mat
-        cv.Cv2.HConcat(matchInput, match.template, tmp)
+        cv.Cv2.HConcat(lpInput.template1, lpInput.template2, tmp)
         Dim sz = New cv.Size(dst2.Width, tmp.Height * dst2.Width / tmp.Width)
         tmp = tmp.Resize(sz)
         tmp.CopyTo(dst2(New cv.Rect(0, 0, sz.Width, sz.Height)))
+    End Sub
+End Class
+
+
+
+
+
+Public Class Match_Lines : Inherits TaskParent
+    Public cameraMotionProxy As New lpData
+    Dim match As New Match_Line
+    Public correlations As New List(Of Single)
+    Public Sub New()
+        task.featureOptions.MatchCorrSlider.Value = 90
+        desc = "Track each of the lines found in LineRGB_Basics"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+        correlations.Clear()
+        For Each lp In task.lineRGB.lpList
+            match.lpInput = lp
+            match.Run(src)
+            correlations.Add(match.correlation1)
+            correlations.Add(match.correlation2)
+            If match.correlation1 > task.fCorrThreshold And match.correlation2 > task.fCorrThreshold Then
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            End If
+            dst2.Rectangle(lp.gridRect1, task.highlight, task.lineWidth)
+            dst2.Rectangle(lp.gridRect2, task.highlight, task.lineWidth)
+            dst2.Rectangle(lp.nabeRect1, task.highlight, task.lineWidth)
+            dst2.Rectangle(lp.nabeRect2, task.highlight, task.lineWidth)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            labels(2) = "Left rect has correlation " + Format(match.correlation1, fmt3) +
+                              " and right rect has " + Format(match.correlation2, fmt3)
+            Exit For
+        Next
+
+        dst3 = task.lineRGB.dst3
+        labels(3) = task.lineRGB.labels(3)
     End Sub
 End Class

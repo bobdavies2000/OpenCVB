@@ -313,12 +313,12 @@ Public Class XO_Horizon_Validate : Inherits TaskParent
             Dim r = ValidateRect(New cv.Rect(ptLeft.X - templatePad, ptLeft.Y - templatePad, templateSize, templateSize))
             match.template = leftTemplate
             match.Run(src)
-            ptLeft = match.matchCenter
+            ptLeft = match.newCenter
 
             r = ValidateRect(New cv.Rect(ptRight.X - templatePad, ptRight.Y - templatePad, templateSize, templateSize))
             match.template = leftTemplate
             match.Run(src)
-            ptLeft = match.matchCenter
+            ptLeft = match.newCenter
         End If
     End Sub
 End Class
@@ -3687,10 +3687,10 @@ Public Class XO_FeatureLine_Longest : Inherits TaskParent
         End If
 
         match1.Run(src)
-        p1 = match1.matchCenter
+        p1 = match1.newCenter
 
         match2.Run(src)
-        p2 = match2.matchCenter
+        p2 = match2.newCenter
 
         gline = glines.updateGLine(src, gline, p1, p2)
         DrawLine(dst2, p1, p2, task.highlight)

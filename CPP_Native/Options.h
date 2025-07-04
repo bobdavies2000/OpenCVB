@@ -1065,7 +1065,7 @@ class Options_EmaxInputClusters {
 public:
 	int samplesPerRegion =  10;
 	int sigma =  10;
-	int emaxCellSize =  CInt(task.workingRes.Width / 3);
+	int emaxCellSize =  CInt(task.workRes.Width / 3);
 	void Run() {}
 	Options_EmaxInputClusters() {
 	}

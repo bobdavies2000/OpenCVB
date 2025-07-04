@@ -54,7 +54,7 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
         output.fy = input(4) / ratio
         Return output
     End Function
-    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
         If templateX IsNot Nothing Then Return ' we have already been initialized.
         cameraName = deviceName
@@ -62,7 +62,7 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
 
         Dim intrin = OakDintrinsics(cPtr, 2)
         Dim leftIntrinsicsArray(9 - 1) As Single
-        Dim ratio = captureRes.Width / WorkingRes.Width
+        Dim ratio = captureRes.Width / workRes.Width
         Marshal.Copy(intrin, leftIntrinsicsArray, 0, leftIntrinsicsArray.Length)
         calibData.leftIntrinsics = copyOakIntrinsics(leftIntrinsicsArray, ratio)
 
@@ -119,7 +119,7 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
         fxTemplate = calibData.rgbIntrinsics.fx * ratio
         fyTemplate = calibData.rgbIntrinsics.fy * ratio
     End Sub
-    Public Sub GetNextFrame(WorkingRes As cv.Size)
+    Public Sub GetNextFrame(workRes As cv.Size)
         If cPtr = 0 Then Exit Sub
         OakDWaitForFrame(cPtr)
 
@@ -141,20 +141,20 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
         depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
 
         SyncLock cameraLock
-            If captureRes <> WorkingRes Then
+            If captureRes <> workRes Then
                 Dim tmp As cv.Mat
                 tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, OakDColor(cPtr))
-                uiColor = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiColor = tmp.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
 
                 tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, OakDLeftImage(cPtr))
-                uiLeft = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiLeft = tmp.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
 
                 tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, OakDRightImage(cPtr))
-                uiRight = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiRight = tmp.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             Else
-                uiColor = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3, OakDColor(cPtr)).Clone
-                uiLeft = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8U, OakDLeftImage(cPtr))
-                uiRight = cv.Mat.FromPixelData(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8U, OakDRightImage(cPtr))
+                uiColor = cv.Mat.FromPixelData(workRes.Height, workRes.Width, cv.MatType.CV_8UC3, OakDColor(cPtr)).Clone
+                uiLeft = cv.Mat.FromPixelData(workRes.Height, workRes.Width, cv.MatType.CV_8U, OakDLeftImage(cPtr))
+                uiRight = cv.Mat.FromPixelData(workRes.Height, workRes.Width, cv.MatType.CV_8U, OakDRightImage(cPtr))
             End If
 
             ' the Oak-D cameras do not produce a point cloud - update if that changes.
@@ -169,10 +169,10 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
 
             Dim pc As New cv.Mat
             cv.Cv2.Merge({worldX, worldY, d32f}, pc)
-            If WorkingRes = captureRes Then
+            If workRes = captureRes Then
                 uiPointCloud = pc
             Else
-                uiPointCloud = pc.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiPointCloud = pc.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
         End SyncLock
 

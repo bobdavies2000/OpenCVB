@@ -9,45 +9,45 @@ Public Class FeatureLine_Basics : Inherits TaskParent
         desc = "Find and track the longest line by matching line bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then task.lineRGB.lpList.Clear()
+        'If task.optionsChanged Then task.lineRGB.lpList.Clear()
 
-        If matchRuns > 500 Then
-            Dim percent = lineRuns / matchRuns
-            lineRuns = 10
-            matchRuns = lineRuns / percent
-        End If
+        'If matchRuns > 500 Then
+        '    Dim percent = lineRuns / matchRuns
+        '    lineRuns = 10
+        '    matchRuns = lineRuns / percent
+        'End If
 
-        dst2 = src.Clone
-        If task.lineRGB.lpList.Count > 0 Then
-            cameraMotionProxy = task.lineRGB.lpList(0)
-            matchRuns += 1
-            match.lpInput = cameraMotionProxy
-            match.Run(src)
-            dst1 = match.dst2
+        'dst2 = src.Clone
+        'If task.lineRGB.lpList.Count > 0 Then
+        '    cameraMotionProxy = task.lineRGB.lpList(0)
+        '    matchRuns += 1
+        '    match.lpInput = cameraMotionProxy
+        '    match.Run(src)
+        '    dst1 = match.dst2
 
-            labels(2) = "Line end point correlation:  " + Format(match.correlation, fmt3) + " / " +
-                        " with " + Format(lineRuns / matchRuns, "0%") + " requiring line detection.  " +
-                        "line detection runs = " + CStr(totalLineRuns)
-        End If
+        '    labels(2) = "Line end point correlation:  " + Format(match.correlation, fmt3) + " / " +
+        '                " with " + Format(lineRuns / matchRuns, "0%") + " requiring line detection.  " +
+        '                "line detection runs = " + CStr(totalLineRuns)
+        'End If
 
-        If task.lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Or task.frameCount < 10 Then
-            task.motionMask.SetTo(255) ' force a complete line detection
-            task.lineRGB.Run(src.Clone)
-            If task.lineRGB.lpList.Count = 0 Then Exit Sub
+        'If task.lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Or task.frameCount < 10 Then
+        '    task.motionMask.SetTo(255) ' force a complete line detection
+        '    task.lineRGB.Run(src.Clone)
+        '    If task.lineRGB.lpList.Count = 0 Then Exit Sub
 
-            match.lpInput = task.lineRGB.lpList(0)
-            lineRuns += 1
-            totalLineRuns += 1
-            match.Run(src)
-        End If
+        '    match.lpInput = task.lineRGB.lpList(0)
+        '    lineRuns += 1
+        '    totalLineRuns += 1
+        '    match.Run(src)
+        'End If
 
-        labels(3) = "Currently available lines."
-        dst3 = task.lineRGB.dst3
-        labels(3) = task.lineRGB.labels(3)
+        'labels(3) = "Currently available lines."
+        'dst3 = task.lineRGB.dst3
+        'labels(3) = task.lineRGB.labels(3)
 
-        dst2.Rectangle(match.lpInput.matchRect1, task.highlight, task.lineWidth)
-        dst2.Rectangle(match.lpInput.matchRect2, task.highlight, task.lineWidth)
-        dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, task.highlight, task.lineWidth, task.lineType)
+        'dst2.Rectangle(match.lpInput.matchRect1, task.highlight, task.lineWidth)
+        'dst2.Rectangle(match.lpInput.matchRect2, task.highlight, task.lineWidth)
+        'dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, task.highlight, task.lineWidth, task.lineType)
     End Sub
 End Class
 

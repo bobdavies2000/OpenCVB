@@ -32,7 +32,6 @@ Public Class Gravity_Basics : Inherits TaskParent
         Static gravityRGBCandidate = task.gravityVec
         If gravityMatch.gLines.Count > 0 Then gravityRGBCandidate = gravityMatch.gLines(0)
 
-        ' the gravity vector will always intersect the top and bottom of the image unless the aspect ratio changes.
         Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - gravityRGBCandidate.ep1.X)
         Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - gravityRGBCandidate.ep2.X)
         If Math.Abs(deltaX1 - deltaX2) > task.gravityBasics.options.pixelThreshold Or task.lineRGB.lpList.Count = 0 Then

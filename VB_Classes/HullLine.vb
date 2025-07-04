@@ -53,10 +53,10 @@ Public Class HullLine_EdgePoints : Inherits TaskParent
         If lp.ep1.Y <= 1 Then lp.ep1.Y += offset
         If lp.ep2.X <= 1 Then lp.ep2.X += offset
         If lp.ep2.Y <= 1 Then lp.ep2.Y += offset
-        If lp.ep1.X >= task.workingRes.Width - 1 Then lp.ep1.X -= offset
-        If lp.ep1.Y >= task.workingRes.Height - 1 Then lp.ep1.Y -= offset
-        If lp.ep2.X >= task.workingRes.Width - 1 Then lp.ep2.X -= offset
-        If lp.ep2.Y >= task.workingRes.Height - 1 Then lp.ep2.Y -= offset
+        If lp.ep1.X >= task.workRes.Width - 1 Then lp.ep1.X -= offset
+        If lp.ep1.Y >= task.workRes.Height - 1 Then lp.ep1.Y -= offset
+        If lp.ep2.X >= task.workRes.Width - 1 Then lp.ep2.X -= offset
+        If lp.ep2.Y >= task.workRes.Height - 1 Then lp.ep2.Y -= offset
         Return lp
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)

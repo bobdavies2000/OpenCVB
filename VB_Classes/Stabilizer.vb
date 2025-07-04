@@ -40,7 +40,7 @@ Public Class Stabilizer_Basics : Inherits TaskParent
             match.Run(src(templateRect))
 
             If match.correlation > options.corrThreshold Then
-                Dim maxLoc = New cv.Point(match.matchCenter.X, match.matchCenter.Y)
+                Dim maxLoc = New cv.Point(match.newCenter.X, match.newCenter.Y)
                 shiftX = templateRect.X - maxLoc.X - searchRect.X
                 shiftY = templateRect.Y - maxLoc.Y - searchRect.Y
                 Dim x1 = If(shiftX < 0, Math.Abs(shiftX), 0)

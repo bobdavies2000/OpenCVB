@@ -311,11 +311,11 @@ Public Class Grid_TrackCenter : Inherits TaskParent
         Dim templateSize = options.templateSize
         Dim searchRect = ValidateRect(New cv.Rect(center.X - templatePad, center.Y - templatePad, templateSize, templateSize))
         match.Run(src(searchRect))
-        center = match.matchCenter
+        center = match.newCenter
 
         If standaloneTest() Then
             dst2 = src
-            dst2.Rectangle(match.matchRect, task.highlight, task.lineWidth + 1, task.lineType)
+            dst2.Rectangle(match.newRect, task.highlight, task.lineWidth + 1, task.lineType)
             DrawCircle(dst2, center, task.DotSize, white)
 
             If task.heartBeat Then dst3.SetTo(0)

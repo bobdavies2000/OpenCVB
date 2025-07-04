@@ -438,7 +438,7 @@
     <Compile Include="Sound.vb" />
     <Compile Include="Stitch.vb" />
     <Compile Include="SuperPixels.vb" />
-    <Compile Include="Tracker.vb" />
+    <Compile Include="Track.vb" />
     <Compile Include="TransformationMatrix.vb" />
     <Compile Include="TaskParent.vb" />
     <Compile Include="Task.vb" />

@@ -3720,7 +3720,7 @@ int* SemiGlobalMatching_Run(SemiGlobalMatching* SemiGlobalMatchingPtr, int* left
 
 using namespace std;
 using namespace  cv;
-class Tracker_Basics
+class Track_Basics
 {
 private:
 public:
@@ -3728,7 +3728,7 @@ public:
 	bool bboxInitialized = false;
 	Mat src;
 	Rect tRect; // tracker output box.
-	Tracker_Basics(int trackType)
+	Track_Basics(int trackType)
 	{
 		// switch is based on the older tracking alternatives.  Some are disabled in the user interface for now.
 		switch (trackType)
@@ -3773,20 +3773,20 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-Tracker_Basics* Tracker_Basics_Open(int trackType) {
-	Tracker_Basics* cPtr = new Tracker_Basics(trackType);
+Track_Basics* Track_Basics_Open(int trackType) {
+	Track_Basics* cPtr = new Track_Basics(trackType);
 	return cPtr;
 }
 
 extern "C" __declspec(dllexport)
-int* Tracker_Basics_Close(Tracker_Basics* cPtr)
+int* Track_Basics_Close(Track_Basics* cPtr)
 {
 	delete cPtr;
 	return (int*)0;
 }
 
 extern "C" __declspec(dllexport)
-int* Tracker_Basics_Run(Tracker_Basics* cPtr, int* bgrPtr, int rows, int cols, int x, int y, int w, int h)
+int* Track_Basics_Run(Track_Basics* cPtr, int* bgrPtr, int rows, int cols, int x, int y, int w, int h)
 {
 	cPtr->src = Mat(rows, cols, CV_8UC1, bgrPtr);
 	Rect bbox(x, y, w, h);

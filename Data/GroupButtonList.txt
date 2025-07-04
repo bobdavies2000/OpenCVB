@@ -236,7 +236,7 @@ Texture
 TextureFlow
 Thickness
 Threshold
-Tracker
+Track
 Transform
 TransformationMatrix
 Triangle

@@ -221,7 +221,7 @@ Partial Class OptionsFeatures
         Me.FeatureSampleSize.Name = "FeatureSampleSize"
         Me.FeatureSampleSize.Size = New System.Drawing.Size(476, 69)
         Me.FeatureSampleSize.TabIndex = 33
-        Me.FeatureSampleSize.Value = 25
+        Me.FeatureSampleSize.Value = 50
         '
         'GrayGroup
         '

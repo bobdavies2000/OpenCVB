@@ -364,7 +364,7 @@ Public Class Edge_Matching : Inherits TaskParent
             match.template = dst3(roi)
             match.Run(dst2(searchROI))
 
-            maxLocs(i) = match.matchRect.X
+            maxLocs(i) = match.newRect.X
             If match.correlation > options.threshold Or redRects.Contains(i) Then
                 highlights.Add(i)
                 SetTrueText(Format(match.correlation, fmt2), New cv.Point(roi.X, roi.Y), 3)

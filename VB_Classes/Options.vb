@@ -4323,12 +4323,12 @@ End Class
 Public Class Options_EmaxInputClusters : Inherits OptionParent
     Public samplesPerRegion As Integer = 10
     Public sigma As Integer = 10
-    Public emaxCellSize As Integer = CInt(task.workingRes.Width / 3)
+    Public emaxCellSize As Integer = CInt(task.workRes.Width / 3)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("EMax Number of Samples per region", 1, 20, samplesPerRegion)
             sliders.setupTrackBar("EMax Sigma (spread)", 1, 100, sigma)
-            sliders.setupTrackBar("EMax Cell Size", 1, task.workingRes.Width, emaxCellSize)
+            sliders.setupTrackBar("EMax Cell Size", 1, task.workRes.Width, emaxCellSize)
         End If
     End Sub
     Public Sub Run()
@@ -7879,7 +7879,7 @@ Public Class Options_GravityLines : Inherits OptionParent
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Threshold for gravity test", 0, 10, 4)
-            sliders.setupTrackBar("Minimum Length", 1, task.workingRes.Height / 2, task.workingRes.Height / 10)
+            sliders.setupTrackBar("Minimum Length", 1, task.workRes.Height / 2, task.workRes.Height / 10)
         End If
     End Sub
     Public Sub Run()

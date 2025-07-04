@@ -21,7 +21,7 @@ Module MyntD_Interface
     End Function
 End Module
 Public Class CameraMyntD : Inherits GenericCamera
-    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
         cPtr = MyntDOpen(captureRes.Width, captureRes.Height)
         cameraName = deviceName
@@ -35,10 +35,10 @@ Public Class CameraMyntD : Inherits GenericCamera
     Private Sub IMUdataCollection()
         MyntDtaskIMU(cPtr)
     End Sub
-    Public Sub GetNextFrame(WorkingRes As cv.Size)
+    Public Sub GetNextFrame(workRes As cv.Size)
         If cPtr = 0 Then Exit Sub
 
-        Dim imagePtr = MyntDWaitFrame(cPtr, WorkingRes.Width, WorkingRes.Height)
+        Dim imagePtr = MyntDWaitFrame(cPtr, workRes.Width, workRes.Height)
         Dim acc = MyntDAcceleration(cPtr)
         IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
         IMU_Acceleration.Y *= -1 ' make it consistent with the other cameras.
@@ -54,27 +54,27 @@ Public Class CameraMyntD : Inherits GenericCamera
         Dim pcPtr = MyntDPointCloud(cPtr)
 
         'If imagePtr <> 0 And rightPtr <> 0 And pcPtr <> 0 Then
-        '    color = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3, imagePtr)
+        '    color = New cv.Mat(workRes.Height, workRes.Width, cv.MatType.CV_8UC3, imagePtr)
         '    leftView = color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        '    rightView = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        '    pointCloud = New cv.Mat(WorkingRes.Height, WorkingRes.Width, cv.MatType.CV_32FC3, pcPtr)
+        '    rightView = New cv.Mat(workRes.Height, workRes.Width, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        '    pointCloud = New cv.Mat(workRes.Height, workRes.Width, cv.MatType.CV_32FC3, pcPtr)
         'End If
 
         'MyBase.GetNextFrameCounts(IMU_FrameTime)
 
         If imagePtr <> 0 And rightPtr <> 0 And pcPtr <> 0 Then
             SyncLock cameraLock
-                If captureRes <> WorkingRes Then
+                If captureRes <> workRes Then
                     Dim tmp As cv.Mat
                     tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, imagePtr)
-                    uiColor = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    uiColor = tmp.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     uiLeft = uiColor.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
                     tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                    uiRight = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    uiRight = tmp.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
 
                     tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_32FC3, pcPtr)
-                    uiPointCloud = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    uiPointCloud = tmp.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 Else
                     uiColor = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, imagePtr).Clone
                     uiLeft = uiColor.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

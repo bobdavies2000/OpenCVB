@@ -705,8 +705,8 @@ End Class
 Public Class PointCloud_Templates : Inherits TaskParent
     Public templateX As New cv.Mat, templateY As New cv.Mat
     Public Sub New()
-        templateX = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
-        templateY = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
+        templateX = New cv.Mat(task.workRes, cv.MatType.CV_32F)
+        templateY = New cv.Mat(task.workRes, cv.MatType.CV_32F)
         For i = 0 To templateX.Width - 1
             templateX.Set(Of Single)(0, i, i)
         Next

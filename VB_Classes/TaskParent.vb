@@ -54,10 +54,10 @@ Public Class TaskParent : Implements IDisposable
             End If
         Next
 
-        dst0 = New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
-        dst1 = New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
-        dst2 = New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
-        dst3 = New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
+        dst0 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+        dst1 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+        dst3 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
 
         standalone = traceName = task.algName
         task.callTrace.Add(callStack)
@@ -348,10 +348,10 @@ Public Class TaskParent : Implements IDisposable
     Public Shared Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X + r.Width >= task.workingRes.Width * ratio Then r.Width = task.workingRes.Width * ratio - r.X - 1
-        If r.Y + r.Height >= task.workingRes.Height * ratio Then r.Height = task.workingRes.Height * ratio - r.Y - 1
-        If r.X >= task.workingRes.Width * ratio Then r.X = task.workingRes.Width - 1
-        If r.Y >= task.workingRes.Height * ratio Then r.Y = task.workingRes.Height - 1
+        If r.X + r.Width >= task.workRes.Width * ratio Then r.Width = task.workRes.Width * ratio - r.X - 1
+        If r.Y + r.Height >= task.workRes.Height * ratio Then r.Height = task.workRes.Height * ratio - r.Y - 1
+        If r.X >= task.workRes.Width * ratio Then r.X = task.workRes.Width - 1
+        If r.Y >= task.workRes.Height * ratio Then r.Y = task.workRes.Height - 1
         If r.Width <= 0 Then r.Width = 1
         If r.Height <= 0 Then r.Height = 1
         Return r

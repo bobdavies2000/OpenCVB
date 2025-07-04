@@ -851,7 +851,7 @@ Public Class Brick_CorrelationMap : Inherits TaskParent
             dst2.SetTo(0, task.noDepthMask)
         End If
 
-        Dim ptM = task.mouseMovePoint, w = task.workingRes.Width, h = task.workingRes.Height
+        Dim ptM = task.mouseMovePoint, w = task.workRes.Width, h = task.workRes.Height
         If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
             Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             task.brickD = task.bricks.brickList(index)

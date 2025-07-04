@@ -356,10 +356,10 @@ Public Class LineRGB_Perpendicular : Inherits TaskParent
         Dim m = If(lp.slope = 0, 100000, -1 / lp.slope)
         Dim b = midPoint.Y - m * midPoint.X
         Dim p1 = New cv.Point2f(-b / m, 0)
-        Dim p2 = New cv.Point2f((task.workingRes.Height - b) / m, task.workingRes.Height)
+        Dim p2 = New cv.Point2f((task.workRes.Height - b) / m, task.workRes.Height)
 
-        Dim w = task.workingRes.Width
-        Dim h = task.workingRes.Height
+        Dim w = task.workRes.Width
+        Dim h = task.workRes.Height
 
         If p1.X < 0 Then p1 = New cv.Point2f(0, b)
         If p1.X > w Then p1 = New cv.Point2f(w, m * w + b)

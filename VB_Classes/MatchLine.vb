@@ -52,8 +52,8 @@ Public Class MatchLine_Basics : Inherits TaskParent
         match.Run(src)
         If match.correlation >= task.fCorrThreshold Then
             If standaloneTest() Then dst3 = match.dst0.Resize(dst3.Size)
-            Dim p1 = cornerToPoint(corner1, match.matchRect)
-            Dim p2 = cornerToPoint(corner2, match.matchRect)
+            Dim p1 = cornerToPoint(corner1, match.newRect)
+            Dim p2 = cornerToPoint(corner2, match.newRect)
             dst2.Line(p1, p2, task.highlight, task.lineWidth + 2, task.lineType)
             lpOutput = New lpData(p1, p2)
         End If

@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Options
     Public cameraRadioButton(Main_UI.cameraNames.Count - 1) As RadioButton
-    Public WorkingResRadio(resolutionList.Count - 1) As RadioButton
-    Public cameraWorkingRes As cv.Size
+    Public workResRadio(resolutionList.Count - 1) As RadioButton
+    Public cameraworkRes As cv.Size
     Public cameraDisplayRes As cv.Size
     Public cameraName As String
     Public cameraIndex As Integer
@@ -23,16 +23,16 @@ Public Class Options
 
         For Each radio In Resolutions.Controls
             If radio.Checked Then
-                Main_UI.settings.WorkingResIndex = radio.Tag
+                Main_UI.settings.workResIndex = radio.Tag
                 Dim strRes = radio.text.split(" ")
                 Dim resText = strRes(0)
                 Dim strVals = resText.split("x")
-                cameraWorkingRes = New cv.Size(CInt(strVals(0)), CInt(strVals(1)))
+                cameraworkRes = New cv.Size(CInt(strVals(0)), CInt(strVals(1)))
                 Exit For
             End If
         Next
 
-        Main_UI.settings.WorkingRes = cameraWorkingRes
+        Main_UI.settings.workRes = cameraworkRes
         Main_UI.settings.displayRes = cameraDisplayRes
 
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
@@ -117,13 +117,13 @@ Public Class Options
 
         defineCameraResolutions(cameraIndex)
 
-        For i = 0 To WorkingResRadio.Count - 1
-            WorkingResRadio(i).Enabled = Main_UI.settings.resolutionsSupported(i)
+        For i = 0 To workResRadio.Count - 1
+            workResRadio(i).Enabled = Main_UI.settings.resolutionsSupported(i)
         Next
 
-        WorkingResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
+        workResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         If cameraName.StartsWith("StereoLabs") Then
-            WorkingResRadio(resolutionList.IndexOf("336x188 - Quarter resolution")).Checked = True
+            workResRadio(resolutionList.IndexOf("336x188 - Quarter resolution")).Checked = True
         End If
     End Sub
     Public Sub MainOptions_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -139,11 +139,11 @@ Public Class Options
                 AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
             Next
 
-            For i = 0 To WorkingResRadio.Count - 1
-                WorkingResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i,
+            For i = 0 To workResRadio.Count - 1
+                workResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i,
                                      .AutoSize = True, .Visible = True}
-                WorkingResRadio(i).Enabled = Main_UI.settings.resolutionsSupported(i)
-                Resolutions.Controls.Add(WorkingResRadio(i))
+                workResRadio(i).Enabled = Main_UI.settings.resolutionsSupported(i)
+                Resolutions.Controls.Add(workResRadio(i))
             Next
         End If
 
@@ -178,12 +178,12 @@ Public Class Options
     End Sub
     Public Sub Snap320_CheckedChanged(sender As Object, e As EventArgs) Handles Snap320.CheckedChanged
         Dim height = 180
-        If cameraWorkingRes.Height = 120 Or cameraWorkingRes.Height = 240 Or cameraWorkingRes.Height = 480 Then height = 240
+        If cameraworkRes.Height = 120 Or cameraworkRes.Height = 240 Or cameraworkRes.Height = 480 Then height = 240
         cameraDisplayRes = New cv.Size(320, height)
     End Sub
     Public Sub Snap640_CheckedChanged(sender As Object, e As EventArgs) Handles Snap640.CheckedChanged
         Dim height = 360
-        If cameraWorkingRes.Height = 120 Or cameraWorkingRes.Height = 240 Or cameraWorkingRes.Height = 480 Then height = 480
+        If cameraworkRes.Height = 120 Or cameraworkRes.Height = 240 Or cameraworkRes.Height = 480 Then height = 480
         cameraDisplayRes = New cv.Size(640, height)
     End Sub
     Public Sub SnapCustom_CheckedChanged(sender As Object, e As EventArgs) Handles SnapCustom.CheckedChanged

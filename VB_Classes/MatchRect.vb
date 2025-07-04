@@ -22,7 +22,7 @@ Public Class MatchRect_Basics : Inherits TaskParent
         End If
 
         match.Run(src)
-        rectOutput = match.matchRect
+        rectOutput = match.newRect
 
         If standalone Then
             If task.heartBeat Then dst3.SetTo(0)

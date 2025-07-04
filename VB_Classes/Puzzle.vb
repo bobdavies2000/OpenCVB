@@ -68,7 +68,7 @@ Public Class Puzzle_Solver : Inherits TaskParent
             Dim rect = puzzle.scrambled(puzzleIndex)
             match.template = grayMat(rect)
             match.Run(grayMat)
-            Dim bestRect = ValidateRect(New cv.Rect(match.matchCenter.X, match.matchCenter.Y, rect.Width, rect.Height))
+            Dim bestRect = ValidateRect(New cv.Rect(match.newCenter.X, match.newCenter.Y, rect.Width, rect.Height))
             puzzle.unscrambled.Add(bestRect)
             puzzleIndex += 1
             dst3(bestRect) = puzzle.image(bestRect)

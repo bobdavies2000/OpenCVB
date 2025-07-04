@@ -486,7 +486,7 @@ public:
     std::vector<std::vector<cv::Point>> facetlist;
     Delaunay_Basics_CC() : CPP_Parent() {
         randEnum = new Random_Enumerable_CC();
-        lastColor = Mat(task->WorkingRes, CV_8UC3);
+        lastColor = Mat(task->workRes, CV_8UC3);
         lastColor.setTo(0);
         facet32s = cv::Mat::zeros(dst2.size(), CV_32SC1);
         desc = "Subdivide an image based on the points provided.";
@@ -2887,11 +2887,11 @@ public:
             task->mousePicTag = 2;
         }
         if (task->mouseClickFlag && task->mousePicTag == 2) {
-            if (task->ClickPoint.y < task->WorkingRes.height / 2) {
-                quadrant = (task->ClickPoint.x < task->WorkingRes.width / 2) ? 0 : 1;
+            if (task->ClickPoint.y < task->workRes.height / 2) {
+                quadrant = (task->ClickPoint.x < task->workRes.width / 2) ? 0 : 1;
             }
             else {
-                quadrant = (task->ClickPoint.x < task->WorkingRes.width / 2) ? 2 : 3;
+                quadrant = (task->ClickPoint.x < task->workRes.width / 2) ? 2 : 3;
             }
         }
         mats->Run(empty);

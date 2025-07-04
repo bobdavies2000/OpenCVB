@@ -8,7 +8,7 @@ Public Class CameraORB : Inherits GenericCamera
     Dim gyroSensor As Sensor
     Dim orbMutex As New Mutex(True, "orbMutex")
     Dim acceleration As cv.Point3f, angularVelocity As cv.Point3f, timeStamp As Int64
-    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
         Dim ctx As New Context
         Dim devList = ctx.QueryDeviceList()
@@ -62,7 +62,7 @@ Public Class CameraORB : Inherits GenericCamera
         output.fy = input.fy / ratio
         Return output
     End Function
-    Public Sub GetNextFrame(WorkingRes As cv.Size)
+    Public Sub GetNextFrame(workRes As cv.Size)
         Dim rows = captureRes.Height, cols = captureRes.Width
         Static PtCloud As New PointCloudFilter
         ' turning on the right view overworks the camera processor.  Reduce the work and get 30 fps reliably.  Otherwise 5 fps.
@@ -75,7 +75,7 @@ Public Class CameraORB : Inherits GenericCamera
 
         If cameraFrameCount = 0 Then
             Dim param As CameraParam = pipe.GetCameraParam()
-            Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
+            Dim ratio = CInt(captureRes.Width / workRes.Width)
             calibData.rgbIntrinsics = copyIntrinsics(param.rgbIntrinsic, ratio)
             calibData.baseline = 0.095 ' the RGB and left image provided are aligned so depth is easily found.
             PtCloud.SetCameraParam(param)
@@ -114,22 +114,22 @@ Public Class CameraORB : Inherits GenericCamera
             IMU_FrameTime = timeStamp - initialTime
         End SyncLock
 
-        If color Is Nothing Then color = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3, 0)
-        If leftView Is Nothing Then leftView = New cv.Mat(WorkingRes, cv.MatType.CV_8UC1, 0)
-        If rightView Is Nothing Then rightView = New cv.Mat(WorkingRes, cv.MatType.CV_8UC1, 0)
-        If pointCloud Is Nothing Then pointCloud = New cv.Mat(WorkingRes, cv.MatType.CV_32FC3, 0)
+        If color Is Nothing Then color = New cv.Mat(workRes, cv.MatType.CV_8UC3, 0)
+        If leftView Is Nothing Then leftView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
+        If rightView Is Nothing Then rightView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
+        If pointCloud Is Nothing Then pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
 
         SyncLock cameraLock
-            If WorkingRes.Width = captureRes.Width Then
+            If workRes.Width = captureRes.Width Then
                 uiColor = color.Clone
                 uiLeft = leftView * 4 ' brighten it to help with correlations.
                 uiRight = rightView * 4
                 uiPointCloud = pointCloud.Clone
             Else
-                uiColor = color.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-                uiLeft = leftView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
-                uiRight = rightView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
-                uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiColor = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiLeft = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
+                uiRight = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
+                uiPointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
         End SyncLock
 
@@ -176,7 +176,7 @@ Public Class CameraORB_CPP : Inherits GenericCamera
     Public deviceNum As Integer
     Public deviceName As String
     Public cPtrOpen As IntPtr
-    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
 
         cPtr = ORBOpen(captureRes.Width, captureRes.Height)
@@ -188,7 +188,7 @@ Public Class CameraORB_CPP : Inherits GenericCamera
         calibData.rgbIntrinsics.fx = intrinInfo(2)
         calibData.rgbIntrinsics.fy = intrinInfo(3)
     End Sub
-    Public Sub GetNextFrame(WorkingRes As cv.Size)
+    Public Sub GetNextFrame(workRes As cv.Size)
         Static color As cv.Mat, leftView As cv.Mat, rightView As cv.Mat, pointCloud As cv.Mat
 
         If cPtr = 0 Then Exit Sub
@@ -199,14 +199,14 @@ Public Class CameraORB_CPP : Inherits GenericCamera
         If colorData <> 0 Then
             color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorData).Clone
         Else
-            color = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3, New cv.Scalar(0))
+            color = New cv.Mat(workRes, cv.MatType.CV_8UC3, New cv.Scalar(0))
         End If
 
         Dim pcData = ORBPointCloud(cPtr)
         If pcData <> 0 Then
             pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcData) * 0.001
         Else
-            pointCloud = New cv.Mat(WorkingRes, cv.MatType.CV_32FC3, New cv.Scalar(0))
+            pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, New cv.Scalar(0))
         End If
 
         Dim leftData = ORBLeftImage(cPtr)
@@ -214,7 +214,7 @@ Public Class CameraORB_CPP : Inherits GenericCamera
             leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8U, leftData).
                                              CvtColor(cv.ColorConversionCodes.GRAY2BGR) * 3
         Else
-            leftView = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3, New cv.Scalar(0))
+            leftView = New cv.Mat(workRes, cv.MatType.CV_8UC3, New cv.Scalar(0))
 
         End If
 
@@ -223,7 +223,7 @@ Public Class CameraORB_CPP : Inherits GenericCamera
             rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8U, rightData).
                                               CvtColor(cv.ColorConversionCodes.GRAY2BGR) * 3
         Else
-            rightView = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3, New cv.Scalar(0))
+            rightView = New cv.Mat(workRes, cv.MatType.CV_8UC3, New cv.Scalar(0))
         End If
 
         Dim accelFrame = ORBAccel(cPtr)
@@ -234,10 +234,10 @@ Public Class CameraORB_CPP : Inherits GenericCamera
             If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
             IMU_TimeStamp = ORBIMUTimeStamp(cPtr) - imuStartTime
 
-            uiColor = color.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-            uiLeft = leftView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-            uiRight = rightView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-            uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            uiColor = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            uiLeft = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            uiRight = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            uiPointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
         End SyncLock
 
         MyBase.GetNextFrameCounts(IMU_FrameTime)

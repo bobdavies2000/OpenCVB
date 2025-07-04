@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class CameraK4A : Inherits GenericCamera
-    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
 
         cPtr = A4KOpen(captureRes.Width, captureRes.Height)
@@ -14,7 +14,7 @@ Public Class CameraK4A : Inherits GenericCamera
 
             Dim ptr = A4KRGBIntrinsics(cPtr)
             Dim intrinsicsRGB = Marshal.PtrToStructure(Of intrinsicsData)(ptr)
-            Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
+            Dim ratio = CInt(captureRes.Width / workRes.Width)
             calibData.rgbIntrinsics.ppx = intrinsicsRGB.cx / ratio
             calibData.rgbIntrinsics.ppy = intrinsicsRGB.cy / ratio
             calibData.rgbIntrinsics.fx = intrinsicsRGB.fx / ratio
@@ -72,7 +72,7 @@ Public Class CameraK4A : Inherits GenericCamera
         Dim p1 As Single            ' Tangential distortion coefficient 1 */
         Dim metric_radius As Single ' Metric radius */
     End Structure
-    Public Sub GetNextFrame(WorkingRes As cv.Size)
+    Public Sub GetNextFrame(workRes As cv.Size)
         Try
             Dim imuFrame As IntPtr
             If cPtr = 0 Then Exit Sub
@@ -104,18 +104,18 @@ Public Class CameraK4A : Inherits GenericCamera
 
             Dim brightness As Single = 0.4
             SyncLock cameraLock
-                If captureRes <> WorkingRes Then
+                If captureRes <> workRes Then
                     uiColor = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width,
-                                               cv.MatType.CV_8UC3, A4KColor(cPtr)).Resize(WorkingRes)
+                                               cv.MatType.CV_8UC3, A4KColor(cPtr)).Resize(workRes)
 
                     ' so depth data fits into 0-255 (approximately)
                     uiLeft = (cv.Mat.FromPixelData(captureRes.Height, captureRes.Width,
                                                cv.MatType.CV_16U, A4KLeftView(cPtr)) * brightness).ToMat.
-                                               ConvertScaleAbs().Resize(WorkingRes)
+                                               ConvertScaleAbs().Resize(workRes)
                     Dim ptr = A4KPointCloud(cPtr)
                     Dim tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width,
                                                    cv.MatType.CV_32FC3, ptr)
-                    uiPointCloud = tmp.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    uiPointCloud = tmp.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 Else
                     uiColor = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width,
                                                cv.MatType.CV_8UC3, A4KColor(cPtr))

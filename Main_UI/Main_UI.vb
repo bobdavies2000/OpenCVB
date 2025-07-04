@@ -243,12 +243,13 @@ Public Class Main_UI
             If settings.testAllDuration < 5 Then settings.testAllDuration = 5
             If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
 
-            Select Case .WorkingRes.Height
+            If .workRes = New cv.Size Then .workRes = New cv.Size(640, 480)
+            Select Case .workRes.Height
                 Case 270, 540, 1080
                     .captureRes = New cv.Size(1920, 1080)
                     If .camera1920x1080Support(.cameraIndex) = False Then
                         .captureRes = New cv.Size(1280, 720)
-                        .WorkingRes = New cv.Size(320, 180)
+                        .workRes = New cv.Size(320, 180)
                     End If
                 Case 180, 360, 720
                     .captureRes = New cv.Size(1280, 720)
@@ -266,11 +267,11 @@ Public Class Main_UI
                     .captureRes = New cv.Size(640, 480)
                     If .camera640x480Support(.cameraIndex) = False Then
                         .captureRes = New cv.Size(1280, 720)
-                        .WorkingRes = New cv.Size(320, 180)
+                        .workRes = New cv.Size(320, 180)
                     End If
             End Select
 
-            Dim wh = .WorkingRes.Height
+            Dim wh = .workRes.Height
             ' desktop style is the default
             If .snap320 = False And .snap640 = False And .snapCustom = False Then .snap640 = True
             If .snap640 Then
@@ -286,8 +287,8 @@ Public Class Main_UI
             End If
 
             Dim border As Integer = 6
-            Dim defaultWidth = .WorkingRes.Width * 2 + border * 7
-            Dim defaultHeight = .WorkingRes.Height * 2 + ToolStrip1.Height + border * 12
+            Dim defaultWidth = .workRes.Width * 2 + border * 7
+            Dim defaultHeight = .workRes.Height * 2 + ToolStrip1.Height + border * 12
             If Me.Height < 50 Then
                 Me.Width = defaultWidth
                 Me.Height = defaultHeight
@@ -297,10 +298,10 @@ Public Class Main_UI
             If settings.groupComboText = "" Then settings.groupComboText = "< All >"
 
             If testAllRunning = False Then
-                Dim resStr = CStr(.WorkingRes.Width) + "x" + CStr(.WorkingRes.Height)
+                Dim resStr = CStr(.workRes.Width) + "x" + CStr(.workRes.Height)
                 For i = 0 To Options.resolutionList.Count - 1
                     If Options.resolutionList(i).StartsWith(resStr) Then
-                        .WorkingResIndex = i
+                        .workResIndex = i
                         Exit For
                     End If
                 Next
@@ -350,9 +351,9 @@ Public Class Main_UI
     End Function
     Public Function validatePoint(pt As cv.Point2f) As cv.Point
         If pt.X < 0 Then pt.X = 0
-        If pt.X > task.workingRes.Width Then pt.X = task.workingRes.Width - 1
+        If pt.X > task.workRes.Width Then pt.X = task.workRes.Width - 1
         If pt.Y < 0 Then pt.Y = 0
-        If pt.Y > task.workingRes.Height Then pt.Y = task.workingRes.Height - 1
+        If pt.Y > task.workRes.Height Then pt.Y = task.workRes.Height - 1
         Return pt
     End Function
     Public Function USBenumeration() As List(Of String)
@@ -451,7 +452,7 @@ Public Class Main_UI
         Dim padX = 12
         Dim padY = 60
         If settings.snapCustom Then ' custom size - neither snap320 or snap640
-            Dim ratio = settings.WorkingRes.Height / settings.WorkingRes.Width
+            Dim ratio = settings.workRes.Height / settings.workRes.Width
             imgWidth = Me.Width / 2 - padX * 2
             imgHeight = CInt(imgWidth * ratio)
         End If
@@ -573,7 +574,7 @@ Public Class Main_UI
             mousePicTag = pic.Tag
             mouseDisplayPoint.X = e.X
             mouseDisplayPoint.Y = e.Y
-            mouseDisplayPoint *= settings.WorkingRes.Width / camPic(0).Width
+            mouseDisplayPoint *= settings.workRes.Width / camPic(0).Width
 
             XYLoc.Text = mouseDisplayPoint.ToString + ", last click point at: " + ClickPoint.ToString
 
@@ -613,7 +614,7 @@ Public Class Main_UI
                 AddHandler camPic(i).MouseUp, AddressOf CamPic_MouseUp
                 AddHandler camPic(i).MouseMove, AddressOf CamPic_MouseMove
                 camPic(i).Tag = i
-                camPic(i).Size = New Size(settings.WorkingRes.Width, settings.WorkingRes.Height)
+                camPic(i).Size = New Size(settings.workRes.Width, settings.workRes.Height)
                 Me.Controls.Add(camPic(i))
             Next
         End If
@@ -642,13 +643,13 @@ Public Class Main_UI
     End Sub
     Private Sub ComplexityTimer_Tick(sender As Object, e As EventArgs) Handles ComplexityTimer.Tick
         While 1
-            If Main_UI.settings.resolutionsSupported(settings.WorkingResIndex) Then
-                setWorkingRes()
+            If Main_UI.settings.resolutionsSupported(settings.workResIndex) Then
+                setworkRes()
                 Exit While
             Else
-                settings.WorkingResIndex -= 1
-                If settings.WorkingResIndex < 0 Then
-                    settings.WorkingResIndex = Main_UI.settings.resolutionsSupported.Count - 1
+                settings.workResIndex -= 1
+                If settings.workResIndex < 0 Then
+                    settings.workResIndex = Main_UI.settings.resolutionsSupported.Count - 1
                 End If
             End If
         End While
@@ -661,8 +662,8 @@ Public Class Main_UI
             complexityStartTime = Now
         End If
         complexityResults.Add("-------------------")
-        complexityResults.Add("Image" + vbTab + CStr(settings.WorkingRes.Width) + vbTab +
-                                          CStr(settings.WorkingRes.Height))
+        complexityResults.Add("Image" + vbTab + CStr(settings.workRes.Width) + vbTab +
+                                          CStr(settings.workRes.Height))
         jsonWrite()
         jsonRead()
         LineUpCamPics()
@@ -674,9 +675,9 @@ Public Class Main_UI
 
         StartTask()
 
-        settings.WorkingResIndex -= 1
-        If settings.WorkingResIndex < 0 Then
-            settings.WorkingResIndex = Main_UI.settings.resolutionsSupported.Count - 1
+        settings.workResIndex -= 1
+        If settings.workResIndex < 0 Then
+            settings.workResIndex = Main_UI.settings.resolutionsSupported.Count - 1
         End If
     End Sub
     Private Sub setupTestAll()
@@ -688,43 +689,43 @@ Public Class Main_UI
             If settings.resolutionsSupported(i) Then testAllEndingRes = i
         Next
     End Sub
-    Private Sub setWorkingRes()
-        Select Case settings.WorkingResIndex
+    Private Sub setworkRes()
+        Select Case settings.workResIndex
             Case 0
-                settings.WorkingRes = New cv.Size(1920, 1080)
+                settings.workRes = New cv.Size(1920, 1080)
                 settings.captureRes = New cv.Size(1920, 1080)
             Case 1
-                settings.WorkingRes = New cv.Size(960, 540)
+                settings.workRes = New cv.Size(960, 540)
                 settings.captureRes = New cv.Size(1920, 1080)
             Case 2
-                settings.WorkingRes = New cv.Size(480, 270)
+                settings.workRes = New cv.Size(480, 270)
                 settings.captureRes = New cv.Size(1920, 1080)
             Case 3
-                settings.WorkingRes = New cv.Size(1280, 720)
+                settings.workRes = New cv.Size(1280, 720)
                 settings.captureRes = New cv.Size(1280, 720)
             Case 4
-                settings.WorkingRes = New cv.Size(640, 360)
+                settings.workRes = New cv.Size(640, 360)
                 settings.captureRes = New cv.Size(1280, 720)
             Case 5
-                settings.WorkingRes = New cv.Size(320, 180)
+                settings.workRes = New cv.Size(320, 180)
                 settings.captureRes = New cv.Size(1280, 720)
             Case 6
-                settings.WorkingRes = New cv.Size(640, 480)
+                settings.workRes = New cv.Size(640, 480)
                 settings.captureRes = New cv.Size(640, 480)
             Case 7
-                settings.WorkingRes = New cv.Size(320, 240)
+                settings.workRes = New cv.Size(320, 240)
                 settings.captureRes = New cv.Size(640, 480)
             Case 8
-                settings.WorkingRes = New cv.Size(160, 120)
+                settings.workRes = New cv.Size(160, 120)
                 settings.captureRes = New cv.Size(640, 480)
             Case 9
-                settings.WorkingRes = New cv.Size(672, 376)
+                settings.workRes = New cv.Size(672, 376)
                 settings.captureRes = New cv.Size(672, 376)
             Case 10
-                settings.WorkingRes = New cv.Size(336, 188)
+                settings.workRes = New cv.Size(336, 188)
                 settings.captureRes = New cv.Size(672, 376)
             Case 11
-                settings.WorkingRes = New cv.Size(168, 94)
+                settings.workRes = New cv.Size(168, 94)
                 settings.captureRes = New cv.Size(672, 376)
         End Select
     End Sub
@@ -1136,10 +1137,10 @@ Public Class Main_UI
 
         optionsForm.MainOptions_Load(sender, e)
         optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True
-        Dim resStr = CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height)
+        Dim resStr = CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height)
         For i = 0 To Options.resolutionList.Count - 1
             If Options.resolutionList(i).StartsWith(resStr) Then
-                optionsForm.WorkingResRadio(i).Checked = True
+                optionsForm.workResRadio(i).Checked = True
             End If
         Next
 
@@ -1149,7 +1150,7 @@ Public Class Main_UI
             task.optionsChanged = True
             If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
             saveAlgorithmName = ""
-            settings.WorkingRes = optionsForm.cameraWorkingRes
+            settings.workRes = optionsForm.cameraworkRes
             settings.displayRes = optionsForm.cameraDisplayRes
             settings.cameraName = optionsForm.cameraName
             settings.cameraIndex = optionsForm.cameraIndex
@@ -1268,7 +1269,7 @@ Public Class Main_UI
         TestAllTimer.Interval = settings.testAllDuration * 1000
         Static startingAlgorithm = AvailableAlgorithms.Text
         If AvailableAlgorithms.Text = startingAlgorithm And AlgorithmTestAllCount > 1 Then
-            If settings.WorkingResIndex > testAllEndingRes Then
+            If settings.workResIndex > testAllEndingRes Then
                 While 1
                     settings.cameraIndex += 1
                     If settings.cameraIndex >= cameraNames.Count - 1 Then settings.cameraIndex = 0
@@ -1276,7 +1277,7 @@ Public Class Main_UI
                     If settings.cameraPresent(settings.cameraIndex) Then
                         Options.defineCameraResolutions(settings.cameraIndex)
                         setupTestAll()
-                        settings.WorkingResIndex = testAllStartingRes
+                        settings.workResIndex = testAllStartingRes
                         Exit While
                     End If
                 End While
@@ -1284,7 +1285,7 @@ Public Class Main_UI
                 TestAllTimer.Interval = settings.testAllDuration * 1000 * 3
             End If
 
-            setWorkingRes()
+            setworkRes()
 
             jsonWrite()
             jsonRead()
@@ -1298,7 +1299,7 @@ Public Class Main_UI
 
         Static saveLastAlgorithm = AvailableAlgorithms.Text
         If saveLastAlgorithm <> AvailableAlgorithms.Text Then
-            settings.WorkingResIndex += 1
+            settings.workResIndex += 1
             saveLastAlgorithm = AvailableAlgorithms.Text
         End If
         StartTask()
@@ -1306,7 +1307,7 @@ Public Class Main_UI
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
         Dim g As Graphics = e.Graphics
         Dim pic = DirectCast(sender, PictureBox)
-        Dim ratio = camPic(2).Width / settings.WorkingRes.Width
+        Dim ratio = camPic(2).Width / settings.workRes.Width
         g.ScaleTransform(1, 1)
         g.DrawImage(pic.Image, 0, 0)
 
@@ -1362,10 +1363,10 @@ Public Class Main_UI
             Next
         End SyncLock
 
-        Dim WorkingRes = settings.WorkingRes
+        Dim workRes = settings.workRes
         Dim cres = settings.captureRes
         Dim dres = settings.displayRes
-        Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", WorkingRes " + CStr(WorkingRes.Width) + "x" + CStr(WorkingRes.Height)
+        Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", workRes " + CStr(workRes.Width) + "x" + CStr(workRes.Height)
         resolutionDetails += " - Motion: " + motionLabel
         If picLabels(0) <> "" Then
             If camLabel(0).Text <> picLabels(0) + " - RGB " + resolutionDetails Then
@@ -1395,37 +1396,37 @@ Public Class Main_UI
         Select Case settings.cameraName
 #If AZURE_SUPPORT Then
             Case "Azure Kinect 4K"
-                Return New CameraK4A(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Return New CameraK4A(settings.workRes, settings.captureRes, settings.cameraName)
 #End If
             Case "Intel(R) RealSense(TM) Depth Camera 455"
-                Return New CameraRS2(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
-                Return New CameraRS2(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
             Case "Oak-D camera"
-                Return New CameraOakD_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Return New CameraOakD_CPP(settings.workRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
-                Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Return New CameraZED2(settings.workRes, settings.captureRes, settings.cameraName)
             Case "MYNT-EYE-D1000"
-                Return New CameraMyntD(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Return New CameraMyntD(settings.workRes, settings.captureRes, settings.cameraName)
             Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
-                Return New CameraORB(settings.WorkingRes, settings.captureRes, settings.cameraName)
-                ' Return New CameraORB_CPP(settings.WorkingRes, settings.captureRes, settings.cameraName)
+                Return New CameraORB(settings.workRes, settings.captureRes, settings.cameraName)
+                ' Return New CameraORB_CPP(settings.workRes, settings.captureRes, settings.cameraName)
         End Select
-        Return New CameraZED2(settings.WorkingRes, settings.captureRes, settings.cameraName)
+        Return New CameraZED2(settings.workRes, settings.captureRes, settings.cameraName)
     End Function
     Private Sub CameraTask()
         restartCameraRequest = True
 
-        Static saveWorkingRes As cv.Size, saveCameraName As String = settings.cameraName
+        Static saveworkRes As cv.Size, saveCameraName As String = settings.cameraName
 
-        uiColor = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
-        uiLeft = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
-        uiRight = New cv.Mat(settings.WorkingRes, cv.MatType.CV_8UC3)
-        uiPointCloud = New cv.Mat(settings.WorkingRes, cv.MatType.CV_32FC3)
+        uiColor = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
+        uiLeft = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
+        uiRight = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
+        uiPointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3)
 
         While 1
-            If restartCameraRequest Or settings.cameraName <> saveCameraName Or settings.WorkingRes <> saveWorkingRes Then
-                saveWorkingRes = settings.WorkingRes
+            If restartCameraRequest Or settings.cameraName <> saveCameraName Or settings.workRes <> saveworkRes Then
+                saveworkRes = settings.workRes
                 saveCameraName = settings.cameraName
                 If camera IsNot Nothing Then camera.stopCamera()
                 camera = getCamera()
@@ -1435,7 +1436,7 @@ Public Class Main_UI
                 Continue While ' transition from one camera to another.  Problem showed up once.
             End If
             If restartCameraRequest = False Then
-                camera.GetNextFrame(settings.WorkingRes)
+                camera.GetNextFrame(settings.workRes)
 
                 ' The first few frames from the camera are junk.  Skip them.
                 SyncLock cameraLock
@@ -1445,7 +1446,7 @@ Public Class Main_UI
                         uiRight = camera.uiRight.clone
                         ' a problem with the K4A interface was corrected here...
                         If camera.uipointcloud Is Nothing Then
-                            camera.uipointcloud = New cv.Mat(settings.WorkingRes, cv.MatType.CV_32FC3)
+                            camera.uipointcloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3)
                         End If
                         uiPointCloud = camera.uiPointCloud.clone
 
@@ -1483,7 +1484,7 @@ Public Class Main_UI
         parms.main_hwnd = Me.Handle
         parms.mainFormLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
 
-        parms.workingRes = settings.WorkingRes
+        parms.workRes = settings.workRes
         parms.captureRes = settings.captureRes
         parms.displayRes = settings.displayRes
         parms.algName = AvailableAlgorithms.Text
@@ -1524,8 +1525,8 @@ Public Class Main_UI
                 trueData = New List(Of TrueText)
             End SyncLock
 
-            task.lowResDepth = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
-            task.lowResColor = New cv.Mat(task.workingRes, cv.MatType.CV_32F)
+            task.lowResDepth = New cv.Mat(task.workRes, cv.MatType.CV_32F)
+            task.lowResColor = New cv.Mat(task.workRes, cv.MatType.CV_32F)
 
             task.MainUI_Algorithm = algolist.createAlgorithm(parms.algName)
 
@@ -1547,10 +1548,10 @@ Public Class Main_UI
 
                 Debug.WriteLine(vbTab + "Active camera = " + settings.cameraName + ", Input resolution " +
                                       CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) + " and working resolution of " +
-                                      CStr(settings.WorkingRes.Width) + "x" + CStr(settings.WorkingRes.Height) + vbCrLf)
+                                      CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height) + vbCrLf)
             End If
 
-            ' Adjust drawrect for the ratio of the actual size and WorkingRes.
+            ' Adjust drawrect for the ratio of the actual size and workRes.
             If task.drawRect <> New cv.Rect Then
                 ' relative size of algorithm size image to displayed image
                 Dim ratio = camPic(0).Width / task.dst2.Width
@@ -1558,23 +1559,23 @@ Public Class Main_UI
                                         task.drawRect.Width * ratio, task.drawRect.Height * ratio)
             End If
 
-            Dim saveWorkingRes = settings.WorkingRes
+            Dim saveworkRes = settings.workRes
             task.labels = {"", "", "", ""}
             mouseDisplayPoint = New cv.Point(task.dst2.Width / 2, task.dst2.Height / 2) ' mouse click point default = center of the image
 
             Dim saveDrawRect As cv.Rect
-            task.motionMask = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 255)
-            task.depthMaskRaw = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
+            task.motionMask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 255)
+            task.depthMaskRaw = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
             While 1
                 Dim waitTime = Now
                 ' relative size of displayed image and algorithm size image.
                 While 1
                     ' camera has exited or resolution is changed.
                     If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or
-                            saveWorkingRes <> settings.WorkingRes Then Exit While
+                            saveworkRes <> settings.workRes Then Exit While
                     If saveAlgorithmName <> task.algName Then Exit While
                     ' switching camera resolution means stopping the current algorithm
-                    If saveWorkingRes <> settings.WorkingRes Then Exit While
+                    If saveworkRes <> settings.workRes Then Exit While
 
                     If pauseAlgorithmThread Then
                         task.paused = True
@@ -1643,10 +1644,10 @@ Public Class Main_UI
                 ' word "task" for the main OpenCVB variable. It only shows up here.  If you carefully change "task" to "aTask"
                 ' throughout VB_Classes, it will make it easier to debug this while loop.  "task" is not a reserved work in VB.Net
                 ' but is seems to act like it in main_UI.vb.  Using "task" instead of "aTask" is to be preferred - just simpler to type.
-                If task.color.Size <> saveWorkingRes Then Exit While
+                If task.color.Size <> saveworkRes Then Exit While
 
                 ' camera has exited or resolution is changed.
-                If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveWorkingRes <> settings.WorkingRes Or
+                If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveworkRes <> settings.workRes Or
                     saveAlgorithmName <> task.algName Then
                     Exit While
                 End If
@@ -1664,7 +1665,7 @@ Public Class Main_UI
                         End If
                         task.mouseMovePoint = validatePoint(task.mouseMovePoint)
                         task.mousePicTag = mousePicTag
-                        If task.ClickPoint = New cv.Point Then task.ClickPoint = New cv.Point(task.workingRes.Width / 2, task.workingRes.Height / 2)
+                        If task.ClickPoint = New cv.Point Then task.ClickPoint = New cv.Point(task.workRes.Width / 2, task.workRes.Height / 2)
                         If mouseClickFlag Then
                             task.mouseClickFlag = mouseClickFlag
                             task.ClickPoint = mouseDisplayPoint
@@ -1733,7 +1734,7 @@ Public Class Main_UI
                 End If
 
                 Dim ptCursor As New cv.Point
-                Dim ptM = task.mouseMovePoint, w = task.workingRes.Width, h = task.workingRes.Height
+                Dim ptM = task.mouseMovePoint, w = task.workRes.Width, h = task.workRes.Height
                 If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
                     ptCursor = validatePoint(task.mouseMovePoint)
                     SyncLock trueTextLock
@@ -1745,7 +1746,9 @@ Public Class Main_UI
                         If task.trueData.Count Then
                             trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                         End If
-                        trueData.Add(New TrueText(task.depthAndCorrelationText, New cv.Point(ptM.X, ptM.Y - 24), 1))
+                        If task.paused = False Then
+                            trueData.Add(New TrueText(task.depthAndCorrelationText, New cv.Point(ptM.X, ptM.Y - 24), 1))
+                        End If
                         task.trueData.Clear()
                     End SyncLock
                 End If

@@ -38,7 +38,7 @@ Public Module vbc
         Return New cv.Scalar(c(0), c(1), c(2))
     End Function
     Public Function DisplayCells() As cv.Mat
-        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
+        Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
 
         For Each rc In task.redC.rcList
             dst(rc.rect).SetTo(rc.color, rc.mask)
@@ -74,7 +74,7 @@ Public Module vbc
     End Function
     Public Function RebuildRCMap(rcList As List(Of rcData)) As cv.Mat
         task.redC.rcMap.SetTo(0)
-        Dim dst As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
+        Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
         For Each rc In rcList
             task.redC.rcMap(rc.rect).SetTo(rc.index, rc.mask)
             dst(rc.rect).SetTo(rc.color, rc.mask)
@@ -602,7 +602,7 @@ End Class
 
 
 
-Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this was built...
+Public Class lpData
     Public age As Integer = 1
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
@@ -616,9 +616,12 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
     Public yIntercept As Single
     Public center As cv.Point2f
     Public thickness As Single = 3
-    Public matchRect1 As cv.Rect
-    Public matchRect2 As cv.Rect
-    Public template As New cv.Mat
+    Public nabeRect1 As cv.Rect
+    Public nabeRect2 As cv.Rect
+    Public gridRect1 As cv.Rect
+    Public gridRect2 As cv.Rect
+    Public template1 As New cv.Mat
+    Public template2 As New cv.Mat
     Public correlation As Single
     Public gravityProxy As Boolean
     Public Function perpendicularPoints(pt As cv.Point2f) As lpData
@@ -686,36 +689,49 @@ Public Class lpData ' LineSegmentPoint in OpenCV does not use Point2f so this wa
             If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then vertical = False
         End If
 
-        matchRect1 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(p1.Y, p1.X))
-        matchRect2 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(p2.Y, p2.X))
-        cv.Cv2.HConcat(task.color(matchRect1), task.color(matchRect2), template)
+        gridRect1 = task.gridRects(task.grid.gridMap.Get(Of Single)(p1.Y, p1.X))
+        gridRect2 = task.gridRects(task.grid.gridMap.Get(Of Single)(p2.Y, p2.X))
+        If gridRect1.Width <> gridRect2.Width Or gridRect1.Height <> gridRect2.Height Then
+            If gridRect1.Width < gridRect2.Width Then gridRect1.X = task.workRes.Width - task.cellSize
+            If gridRect1.Height < gridRect2.Height Then gridRect1.Y = task.workRes.Height - task.cellSize
+            If gridRect2.Width < gridRect1.Width Then gridRect2.X = task.workRes.Width - task.cellSize
+            If gridRect2.Height < gridRect1.Height Then gridRect2.Y = task.workRes.Height - task.cellSize
+            gridRect1.Width = task.cellSize
+            gridRect2.Width = task.cellSize
+            gridRect1.Height = task.cellSize
+            gridRect2.Height = task.cellSize
+        End If
+        nabeRect1 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(p1.Y, p1.X))
+        nabeRect2 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(p2.Y, p2.X))
+        template1 = task.color(gridRect1)
+        template2 = task.color(gridRect2)
 
         If p1.X <> p2.X Then
             Dim b = p1.Y - p1.X * slope
             If p1.Y = p2.Y Then
                 ep1 = New cv.Point2f(0, p1.Y)
-                ep2 = New cv.Point2f(task.workingRes.Width, p1.Y)
+                ep2 = New cv.Point2f(task.workRes.Width, p1.Y)
             Else
                 Dim x1 = -b / slope
-                Dim x2 = (task.workingRes.Height - b) / slope
+                Dim x2 = (task.workRes.Height - b) / slope
                 Dim y1 = b
-                Dim y2 = slope * task.workingRes.Width + b
+                Dim y2 = slope * task.workRes.Width + b
 
                 Dim pts As New List(Of cv.Point2f)
-                If x1 >= 0 And x1 <= task.workingRes.Width Then pts.Add(New cv.Point2f(x1, 0))
-                If x2 >= 0 And x2 <= task.workingRes.Width Then pts.Add(New cv.Point2f(x2, task.workingRes.Height))
-                If y1 >= 0 And y1 <= task.workingRes.Height Then pts.Add(New cv.Point2f(0, y1))
-                If y2 >= 0 And y2 <= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, y2))
+                If x1 >= 0 And x1 <= task.workRes.Width Then pts.Add(New cv.Point2f(x1, 0))
+                If x2 >= 0 And x2 <= task.workRes.Width Then pts.Add(New cv.Point2f(x2, task.workRes.Height))
+                If y1 >= 0 And y1 <= task.workRes.Height Then pts.Add(New cv.Point2f(0, y1))
+                If y2 >= 0 And y2 <= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width, y2))
                 ep1 = pts(0)
                 If pts.Count < 2 Then
-                    If CInt(x2) >= task.workingRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workingRes.Height))
-                    If CInt(y2) >= task.workingRes.Height Then pts.Add(New cv.Point2f(task.workingRes.Width, CInt(y2)))
+                    If CInt(x2) >= task.workRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workRes.Height))
+                    If CInt(y2) >= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width, CInt(y2)))
                 End If
                 ep2 = pts(1)
             End If
         Else
             ep1 = New cv.Point2f(p1.X, 0)
-            ep2 = New cv.Point2f(p1.X, task.workingRes.Height)
+            ep2 = New cv.Point2f(p1.X, task.workRes.Height)
         End If
 
         If vertical And length >= task.gravityBasics.options.minLength Then

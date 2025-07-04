@@ -12,7 +12,7 @@ Public Class CameraRS2 : Inherits GenericCamera
         output.fy = input.fy / ratio
         Return output
     End Function
-    Public Sub New(WorkingRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
+    Public Sub New(workRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
         Dim serialNumber As String = ""
         Dim ctx As New Context()
         Dim searchName As String = If(devName.EndsWith("455"), "D455", "D435i")
@@ -38,7 +38,7 @@ Public Class CameraRS2 : Inherits GenericCamera
         Dim rgbIntrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
         Dim rgbExtrinsics = StreamColor.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamLeft)
 
-        Dim ratio = CInt(captureRes.Width / WorkingRes.Width)
+        Dim ratio = CInt(captureRes.Width / workRes.Width)
         calibData.rgbIntrinsics = copyIntrinsics(rgbIntrinsics, ratio)
 
         Dim leftIntrinsics = streamLeft.As(Of VideoStreamProfile)().GetIntrinsics()
@@ -69,7 +69,7 @@ Public Class CameraRS2 : Inherits GenericCamera
                                               System.Math.Pow(calibData.ColorToLeft_translation(1), 2) +
                                               System.Math.Pow(calibData.ColorToLeft_translation(2), 2))
     End Sub
-    Public Sub GetNextFrame(WorkingRes As cv.Size)
+    Public Sub GetNextFrame(workRes As cv.Size)
         Dim alignToColor = New Align(Stream.Color)
         Dim ptcloud = New PointCloud()
         Dim cols = captureRes.Width, rows = captureRes.Height
@@ -101,16 +101,16 @@ Public Class CameraRS2 : Inherits GenericCamera
             Dim pcFrame = ptcloud.Process(alignedFrames.DepthFrame)
             pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcFrame.Data)
 
-            If color Is Nothing Then color = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3)
-            If leftView Is Nothing Then leftView = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3)
-            If rightView Is Nothing Then rightView = New cv.Mat(WorkingRes, cv.MatType.CV_8UC3)
-            If pointCloud Is Nothing Then pointCloud = New cv.Mat(WorkingRes, cv.MatType.CV_32FC3)
+            If color Is Nothing Then color = New cv.Mat(workRes, cv.MatType.CV_8UC3)
+            If leftView Is Nothing Then leftView = New cv.Mat(workRes, cv.MatType.CV_8UC3)
+            If rightView Is Nothing Then rightView = New cv.Mat(workRes, cv.MatType.CV_8UC3)
+            If pointCloud Is Nothing Then pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3)
 
             SyncLock cameraLock
-                uiColor = color.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
-                uiLeft = leftView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
-                uiRight = rightView.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
-                uiPointCloud = pointCloud.Resize(WorkingRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiColor = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                uiLeft = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
+                uiRight = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
+                uiPointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             End SyncLock
 
             GC.Collect() ' do you think this is unnecessary?  Remove it and check...
