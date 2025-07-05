@@ -1117,7 +1117,7 @@ Public Class Main_UI
             cameraName = cameraName.Replace("Intel(R) RealSense(TM) Depth ", "Intel D")
 
             algorithmFPSrate = fpsListA.Average
-            fpsCamera = fpsListC.Average
+            fpsCamera = CInt(fpsListC.Average)
             If algorithmFPSrate >= 100 Then algorithmFPSrate = 99
             If fpsCamera >= 100 Then fpsCamera = 99
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " +
