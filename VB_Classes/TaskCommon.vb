@@ -737,8 +737,8 @@ Public Class lpData
         End If
 
         If vertical And length >= task.gravityBasics.options.minLength Then
-            Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - ep1.X)
-            Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - ep2.X)
+            Dim deltaX1 = Math.Abs(task.gravityIMU.ep1.X - ep1.X)
+            Dim deltaX2 = Math.Abs(task.gravityIMU.ep2.X - ep2.X)
             If Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold Then
                 If length >= task.gravityBasics.options.minLength Then gravityProxy = True
             End If

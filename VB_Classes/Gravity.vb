@@ -28,23 +28,22 @@ Public Class Gravity_Basics : Inherits TaskParent
         gravityMatch.Run(src)
         labels(2) = CStr(gravityMatch.gLines.Count) + " of the lines found were parallel to gravity."
 
-        Static gravityRGBCandidate = task.gravityVec
+        Static gravityRGBCandidate = task.gravityIMU
 
-        If gravityRGBCandidate.length >= task.gravityBasics.options.minLength And gravityMatch.gLines.Count > 0 Then
+        If gravityMatch.gLines.Count > 0 Then
+            gravityRGBCandidate = gravityMatch.gLines(0) ' the longest line matching gravity
+
+            If gravityRGBCandidate.length = 0 Then Dim k = 0
+
             Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - gravityRGBCandidate.ep1.X)
             Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - gravityRGBCandidate.ep2.X)
             If Math.Abs(deltaX1 - deltaX2) > task.gravityBasics.options.pixelThreshold Then
-                task.gravityVec = gravityRaw.gravityVec
-                If gravityMatch.gLines.Count > 0 Then
-                    gravityRGBCandidate = gravityMatch.gLines(0)
-                Else
-                    gravityRGBCandidate = gravityMatch.gLines(0) ' the longest line matching gravity
-                End If
+                task.gravityVec = task.gravityIMU
             End If
         Else
-            task.gravityVec = gravityRaw.gravityVec
-            gravityRGBCandidate = task.gravityVec
+            task.gravityVec = task.gravityIMU
         End If
+
         task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
 
         gravityRGB = gravityRGBCandidate
@@ -68,7 +67,6 @@ Public Class Gravity_BasicsRaw : Inherits TaskParent
     Public xTop As Single, xBot As Single
     Dim sampleSize As Integer = 25
     Dim ptList As New List(Of Integer)
-    Public gravityVec As lpData
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(2) = "Horizon and Gravity Vectors"
@@ -109,11 +107,11 @@ Public Class Gravity_BasicsRaw : Inherits TaskParent
         If gPoints.Rows = 0 Then Exit Sub ' no point cloud data to get the gravity line in the image coordinates.
         xTop = findFirst(gPoints)
         xBot = findLast(gPoints)
-        gravityVec = New lpData(New cv.Point2f(xTop, 0), New cv.Point2f(xBot, dst2.Height))
+        task.gravityIMU = New lpData(New cv.Point2f(xTop, 0), New cv.Point2f(xBot, dst2.Height))
 
         If standaloneTest() Then
             dst2.SetTo(0)
-            DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.highlight)
+            DrawLine(dst2, task.gravityIMU.p1, task.gravityIMU.p2, task.highlight)
         End If
     End Sub
 End Class
