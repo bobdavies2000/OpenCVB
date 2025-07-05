@@ -2877,7 +2877,7 @@ End Class
 
 
 Public Class XO_FCSLine_Vertical : Inherits TaskParent
-    Dim verts As New LineRGB_VerticalTrig
+    Dim verts As New LineRGB_TrigVertical
     Dim minRect As New LineRect_Basics
     Dim options As New Options_FCSLine
     Public Sub New()

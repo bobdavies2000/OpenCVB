@@ -47,6 +47,7 @@ Public Class Entropy_Highest : Inherits TaskParent
     Dim entropy As New Entropy_Rectangle
     Public eMaxRect As cv.Rect
     Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         If standalone Then
             Dim val As Integer = dst2.Width / 10
             If task.gOptions.GridSlider.Maximum < val Then task.gOptions.GridSlider.Maximum = val
@@ -55,17 +56,17 @@ Public Class Entropy_Highest : Inherits TaskParent
         desc = "Find the highest entropy section of the color image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Dim entropyMap = New cv.Mat(src.Size(), cv.MatType.CV_32F)
         Dim entropyList(task.gridRects.Count - 1) As Single
         Dim maxEntropy As Single = Single.MinValue
         Dim minEntropy As Single = Single.MaxValue
         trueData.Clear()
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1.SetTo(0)
         For Each roi In task.gridRects
             If roi.Width = roi.Height Then
                 entropy.Run(src(roi))
-                entropyMap(roi).SetTo(entropy.entropyVal)
+                dst1(roi).SetTo(entropy.entropyVal)
 
                 If entropy.entropyVal > maxEntropy Or task.optionsChanged Then
                     maxEntropy = entropy.entropyVal
@@ -80,7 +81,7 @@ Public Class Entropy_Highest : Inherits TaskParent
             End If
         Next
 
-        dst2 = entropyMap.ConvertScaleAbs(255 / (maxEntropy - minEntropy), minEntropy)
+        dst2 = dst1.ConvertScaleAbs(255 / (maxEntropy - minEntropy), minEntropy)
         dst2 = ShowAddweighted(src, dst2, labels(3))
 
         If standaloneTest() Then

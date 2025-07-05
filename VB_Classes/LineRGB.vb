@@ -576,8 +576,8 @@ End Class
 
 
 Public Class LineRGB_VerticalHorizontalRaw : Inherits TaskParent
-    Dim verts As New LineRGB_VerticalTrig
-    Dim horiz As New LineRGB_HorizontalTrig
+    Dim verts As New LineRGB_TrigVertical
+    Dim horiz As New LineRGB_TrigHorizontal
     Public vertList As New List(Of lpData)
     Public horizList As New List(Of lpData)
     Public Sub New()
@@ -616,7 +616,7 @@ End Class
 
 
 
-Public Class LineRGB_HorizontalTrig : Inherits TaskParent
+Public Class LineRGB_TrigHorizontal : Inherits TaskParent
     Public horizList As New List(Of lpData)
     Public Sub New()
         desc = "Find all the Horizontal lines with horizon vector"
@@ -649,7 +649,7 @@ End Class
 
 
 
-Public Class LineRGB_VerticalTrig : Inherits TaskParent
+Public Class LineRGB_TrigVertical : Inherits TaskParent
     Public vertList As New List(Of lpData)
     Public Sub New()
         desc = "Find all the vertical lines with gravity vector"
@@ -689,27 +689,23 @@ End Class
 
 Public Class LineRGB_GravityToAverage : Inherits TaskParent
     Public vertList As New List(Of lpData)
-    Dim kalman As New Kalman_Basics
     Public Sub New()
         desc = "Highlight both vertical and horizontal lines - not terribly good..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim gravityDelta As Single = task.gravityVec.ep1.X - task.gravityVec.ep2.X
 
-        kalman.kInput = {gravityDelta}
-        kalman.Run(emptyMat)
-        gravityDelta = kalman.kOutput(0)
-
         dst2 = src
-        If standalone Then dst3 = task.lineRGB.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If standalone Then dst3 = task.lineRGB.dst2
         Dim deltaList As New List(Of Single)
+        vertList.Clear()
         For Each lp In task.lineRGB.rawLines.lpList
             If lp.vertical And Math.Sign(task.gravityVec.slope) = Math.Sign(lp.slope) Then
                 Dim delta = lp.ep1.X - lp.ep2.X
-                If Math.Abs(gravityDelta - delta) < 3 Then
+                If Math.Abs(gravityDelta - delta) < task.gravityBasics.options.pixelThreshold Then
                     deltaList.Add(delta)
                     vertList.Add(lp)
-                    DrawLine(dst2, lp.ep1, lp.ep2, task.highlight)
+                    dst2.Line(lp.ep1, lp.ep2, task.highlight, task.lineWidth, task.lineType)
                     If standalone Then DrawLine(dst3, lp.p1, lp.p2, task.highlight)
                 End If
             End If

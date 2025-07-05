@@ -691,11 +691,13 @@ Public Class lpData
 
         gridRect1 = task.gridRects(task.grid.gridMap.Get(Of Single)(p1.Y, p1.X))
         gridRect2 = task.gridRects(task.grid.gridMap.Get(Of Single)(p2.Y, p2.X))
-        If gridRect1.Width <> gridRect2.Width Or gridRect1.Height <> gridRect2.Height Then
-            If gridRect1.Width < gridRect2.Width Then gridRect1.X = task.workRes.Width - task.cellSize
-            If gridRect1.Height < gridRect2.Height Then gridRect1.Y = task.workRes.Height - task.cellSize
-            If gridRect2.Width < gridRect1.Width Then gridRect2.X = task.workRes.Width - task.cellSize
-            If gridRect2.Height < gridRect1.Height Then gridRect2.Y = task.workRes.Height - task.cellSize
+        If gridRect1.Width <> task.cellSize Or gridRect1.Height <> task.cellSize Or
+           gridRect2.Width <> task.cellSize Or gridRect2.Height <> task.cellSize Then
+
+            If gridRect1.Width < task.cellSize Then gridRect1.X = task.workRes.Width - task.cellSize
+            If gridRect1.Height < task.cellSize Then gridRect1.Y = task.workRes.Height - task.cellSize
+            If gridRect2.Width < task.cellSize Then gridRect2.X = task.workRes.Width - task.cellSize
+            If gridRect2.Height < task.cellSize Then gridRect2.Y = task.workRes.Height - task.cellSize
             gridRect1.Width = task.cellSize
             gridRect2.Width = task.cellSize
             gridRect1.Height = task.cellSize
@@ -737,7 +739,9 @@ Public Class lpData
         If vertical And length >= task.gravityBasics.options.minLength Then
             Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - ep1.X)
             Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - ep2.X)
-            If Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold Then gravityProxy = True
+            If Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold Then
+                If length >= task.gravityBasics.options.minLength Then gravityProxy = True
+            End If
         End If
 
         If p1.X < 0 Or p1.Y < 0 Or p2.X < 0 Or p2.Y < 0 Then Dim k = 0
