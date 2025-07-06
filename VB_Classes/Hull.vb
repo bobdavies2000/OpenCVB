@@ -81,6 +81,17 @@ Public Class Hull_Defect : Inherits TaskParent
         End If
 
         Dim hullIndices = cv.Cv2.ConvexHullIndices(contour, False)
+        For i = 0 To contour.Count - 1
+            Dim p1 = contour(i)
+            For j = i + 1 To contour.Count - 1
+                Dim p2 = contour(j)
+                If p1 = p2 Then
+                    SetTrueText("Contour is self-intersecting and convexityDefects will fail.")
+                    Exit Sub
+                End If
+            Next
+        Next
+
         Dim defects = cv.Cv2.ConvexityDefects(contour, hullIndices.ToList)
 
         Dim lastV As Integer = -1
