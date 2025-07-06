@@ -72,6 +72,7 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             labels(2) = task.bricks.labels(2)
             Static brickText As New Brick_CorrelationMap
             brickText.Run(src)
+            task.depthRGB.SetTo(0, task.noDepthMask)
         Else
             Dim depthData(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1) As Byte
             Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
@@ -90,7 +91,6 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             task.depthAndCorrelationText = "Depth = " + Format(depth, fmt1) + "m " + vbCrLf + "Depth range = " + Format(mm.minVal, fmt1) +
                                             "m to " + Format(mm.maxVal, fmt1) + "m"
         End If
-        task.depthRGB.SetTo(0, task.noDepthMask)
         If standaloneTest() Then dst2 = task.depthRGB
     End Sub
     Public Sub Close()

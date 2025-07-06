@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 Imports System.Windows.Forms
+Imports System.Web.UI
 Public Class Match_Basics : Inherits TaskParent
     Public template As cv.Mat ' Provide this
     Public correlation As Single ' Resulting Correlation coefficient
@@ -429,7 +430,7 @@ Public Class Match_LinePairTest : Inherits TaskParent
     Public correlation(ptx.Count - 1)
     Dim options As New Options_Features
     Public Sub New()
-        desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided."
+        desc = "Use MatchTemplate to find the new location of the template and update the point provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static cellSlider = OptionParent.FindSlider("MatchTemplate Cell Size")
@@ -617,28 +618,34 @@ Public Class Match_Line : Inherits TaskParent
     Public lpNew As lpData
     Public Sub New()
         match.template = New cv.Mat
-        desc = "Match the endpoints of a line to make sure it is still there before line detection runs."
+        desc = "Get the end points of the gravity RGB vector and compare them to the original template."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone And task.algorithmPrep = False Then lpInput = task.gravityVec
+        If standalone And task.algorithmPrep = False Then
+            lpInput = task.gravityBasics.gravityRGB
+            If lpInput.template1.Width = 0 Then
+                SetTrueText("lpInput template was not found.", 3)
+                Exit Sub
+            End If
+        End If
 
         match.template = lpInput.template1
         match.Run(src(lpInput.nabeRect1))
         correlation1 = match.correlation
         Dim p1 = match.newRect.TopLeft
-        Debug.WriteLine("p1 newCenter = " + match.newCenter.ToString)
 
         match.template = lpInput.template2
         match.Run(src(lpInput.nabeRect2))
         correlation2 = match.correlation
         Dim p2 = match.newRect.TopLeft
-        Debug.WriteLine("p2 newCenter = " + match.newCenter.ToString)
 
         Dim tmp As New cv.Mat
         cv.Cv2.HConcat(lpInput.template1, lpInput.template2, tmp)
         Dim sz = New cv.Size(dst2.Width, tmp.Height * dst2.Width / tmp.Width)
         tmp = tmp.Resize(sz)
         tmp.CopyTo(dst2(New cv.Rect(0, 0, sz.Width, sz.Height)))
+
+        labels(2) = "Correlation1 = " + Format(correlation1, fmt3) + " and correlation2 = " + Format(correlation2, fmt3)
     End Sub
 End Class
 
@@ -677,5 +684,60 @@ Public Class Match_Lines : Inherits TaskParent
 
         dst3 = task.lineRGB.dst3
         labels(3) = task.lineRGB.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Match_GravityRGB : Inherits TaskParent
+    Public lpInput As lpData
+    Public template As cv.Mat
+    Dim match As New Match_Basics
+    Public Sub New()
+        task.featureOptions.MatchCorrSlider.Value = 90
+        desc = "Track one of the end points of the Gravity RGB vector"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If template Is Nothing Then
+            lpInput = task.gravityBasics.gravityRGB
+            template = lpInput.template1
+            If template.Width = 0 Then
+                template = Nothing
+                SetTrueText("lpInput template was not found.", 3)
+                Exit Sub
+            End If
+        End If
+
+        Dim correlations As New SortedList(Of Single, cv.Point)(New compareAllowIdenticalSingleInverted)
+        Dim rect = lpInput.nabeRect1
+        For y = 4 To 12
+            For x = 4 To 12
+                Dim r = New cv.Rect(rect.X + x, rect.Y + y, task.cellSize, task.cellSize)
+                match.template = lpInput.template1
+                match.Run(src(r))
+                correlations.Add(match.correlation, New cv.Point(x, y))
+            Next
+        Next
+
+        Dim correlation = correlations.ElementAt(0).Key
+        Dim pt = correlations.ElementAt(0).Value
+        labels(2) = "There were " + CStr(correlations.Count) + " attempts to match the template in the neighborhood.  " +
+                    "Best correlation was " + Format(correlation, fmt3) + " at " + pt.ToString
+
+        rect = New cv.Rect(rect.X + pt.X, rect.Y + pt.Y, task.cellSize, task.cellSize)
+        Dim tmp As New cv.Mat
+        cv.Cv2.HConcat(lpInput.template1, src(rect), tmp)
+        Dim sz = New cv.Size(dst2.Width, tmp.Height * dst2.Width / tmp.Width)
+        tmp = tmp.Resize(sz)
+        tmp.CopyTo(dst2(New cv.Rect(0, 0, sz.Width, sz.Height)))
+
+        If correlation > task.fCorrThreshold Then template = src(rect) Else template = Nothing
+
+        If task.heartBeat Then strOut = "correlations (List): " & String.Join(" | " + vbCrLf, correlations)
+        SetTrueText(strOut, 3)
     End Sub
 End Class

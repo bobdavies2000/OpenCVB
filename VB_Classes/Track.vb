@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Windows
 ' https://learnopencvb.com/object-tracking-using-opencv-cpp-python/
 Public Class Track_Basics : Inherits TaskParent
     Public outputRect As cv.Rect
@@ -12,6 +13,7 @@ Public Class Track_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+        If standalone Then inputRect = task.drawRect
 
         track.inputRect = inputRect
         track.trackerIndex = options.trackType

@@ -7874,19 +7874,15 @@ End Class
 
 
 Public Class Options_GravityLines : Inherits OptionParent
-    Public pixelThreshold As Integer = 4
-    Public minLength As Integer
+    Public pixelThreshold As Integer = 8
     Public Sub New()
         If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Threshold for gravity test", 0, 10, pixelThreshold)
-            sliders.setupTrackBar("Minimum Length", 1, task.workRes.Height / 2, 1)
+            sliders.setupTrackBar("Threshold for gravity test", 0, 20, pixelThreshold)
         End If
     End Sub
     Public Sub Run()
         Static thresholdSlider = FindSlider("Threshold for gravity test")
-        Static lenSlider = FindSlider("Minimum Length")
         pixelThreshold = thresholdSlider.value
-        minLength = lenSlider.value
     End Sub
 End Class
 

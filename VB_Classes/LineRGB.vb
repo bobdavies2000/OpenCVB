@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class LineRGB_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
+    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public rawLines As New LineRGB_Raw
     Dim lineAges As New LineRGB_OrderByAge
     Public Sub New()
@@ -54,6 +55,11 @@ Public Class LineRGB_Basics : Inherits TaskParent
                 SetTrueText("Age: " + CStr(lp.age), lp.p1)
             Next
         End If
+
+        lpMap.SetTo(0)
+        For i = lpList.Count - 1 To 0 Step -1
+            lpMap.Line(lpList(i).p1, lpList(i).p2, 255, 5, task.lineType)
+        Next
 
         labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count)
     End Sub
@@ -813,5 +819,87 @@ Public Class LineRGB_OrderByAge : Inherits TaskParent
             SetTrueText("Age: " + CStr(lp.age), lp.p1)
             lpListAge.Add(lp)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LineRGB_FindNearest : Inherits TaskParent
+    Public lpInput As lpData
+    Public lpOutput As lpData
+    Public distance As Single
+    Public Sub New()
+        desc = "Find the line that is closest to the input line"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then lpInput = task.gravityBasics.gravityRGB
+        Dim lpList = task.lineRGB.lpList
+        If lpList.Count = 0 Then Exit Sub
+
+        Dim sortDistance As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
+        For Each lp In lpList
+            sortDistance.Add(lpInput.center.DistanceTo(lp.center), lpList.IndexOf(lp))
+        Next
+
+        lpOutput = lpList(sortDistance.ElementAt(0).Value)
+
+        If standaloneTest() Then
+            dst2 = src
+            dst2.Line(lpOutput.p1, lpOutput.p2, task.highlight, task.lineWidth, task.lineType)
+            labels(2) = "Distance = " + Format(sortDistance.ElementAt(0).Key, fmt1)
+            SetTrueText("Age = " + CStr(lpOutput.age), lpOutput.p1)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LineRGB_KNN : Inherits TaskParent
+    Dim knn As New KNN_Basics
+    Public Sub New()
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "For each line in the current lpList, find the nearest center in the previous lpList."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lpList = task.lineRGB.lpList
+
+        knn.queries.Clear()
+        For Each lp In lpList
+            knn.queries.Add(lp.center)
+        Next
+
+        Static lastQueries As New List(Of cv.Point2f)(knn.queries)
+        Static lpLastList As New List(Of lpData)(lpList)
+        knn.trainInput = New List(Of cv.Point2f)(lastQueries)
+
+        knn.Run(emptyMat)
+
+        For i = 0 To lpList.Count - 1
+            Dim lp = lpList(i)
+            Dim index = knn.neighbors(i)(0)
+            Dim lpLast = lpLastList(index)
+
+            If lp.center.DistanceTo(lpLast.center) < 3 Then
+                lp.ID = lpLast.ID
+                lp.age = lpLast.age + 1
+            End If
+        Next
+
+        lastQueries = New List(Of cv.Point2f)(knn.queries)
+        lpLastList = New List(Of lpData)(lpList)
+
+        dst3.SetTo(0)
+        For Each lp In lpList
+            dst3.Line(lp.p1, lp.p2, task.scalarColors(lp.ID Mod 255 + 1), task.lineWidth * 3, cv.LineTypes.Link8)
+            SetTrueText(CStr(lp.age), lp.center, 3)
+        Next
+
+        dst2 = ShowPaletteNoZero(dst3)
     End Sub
 End Class

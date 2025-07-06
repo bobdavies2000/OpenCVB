@@ -4,6 +4,7 @@ Public Class Gravity_Basics : Inherits TaskParent
     Dim gravityRaw As New Gravity_BasicsRaw
     Public gravityMatch As New LineRGB_MatchGravity
     Public gravityRGB As lpData
+    Dim nearest As New LineRGB_FindNearest
     Public Sub New()
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
     End Sub
@@ -28,25 +29,35 @@ Public Class Gravity_Basics : Inherits TaskParent
         gravityMatch.Run(src)
         labels(2) = CStr(gravityMatch.gLines.Count) + " of the lines found were parallel to gravity."
 
-        Static gravityRGBCandidate = task.gravityIMU
+        Static RGBcandidate As New lpData
 
-        If gravityMatch.gLines.Count > 0 Then
-            gravityRGBCandidate = gravityMatch.gLines(0) ' the longest line matching gravity
+        Dim stillPresent As Integer
+        If RGBcandidate.length = 0 Then
+            If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
+        Else
+            stillPresent = task.lineRGB.lpMap.Get(Of Byte)(RGBcandidate.center.Y, RGBcandidate.center.X)
+        End If
 
-            If gravityRGBCandidate.length = 0 Then Dim k = 0
-
-            Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - gravityRGBCandidate.ep1.X)
-            Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - gravityRGBCandidate.ep2.X)
+        If stillPresent Then
+            nearest.lpInput = RGBcandidate
+            nearest.Run(src)
+            RGBcandidate = nearest.lpOutput
+            Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - RGBcandidate.ep1.X)
+            Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - RGBcandidate.ep2.X)
             If Math.Abs(deltaX1 - deltaX2) > task.gravityBasics.options.pixelThreshold Then
                 task.gravityVec = task.gravityIMU
+                RGBcandidate = New lpData
+                If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
             End If
         Else
             task.gravityVec = task.gravityIMU
+            RGBcandidate = New lpData
+            If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
         End If
 
         task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
 
-        gravityRGB = gravityRGBCandidate
+        gravityRGB = RGBcandidate
 
         If standaloneTest() Then
             dst2.SetTo(0)

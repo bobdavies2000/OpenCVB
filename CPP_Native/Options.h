@@ -2154,7 +2154,7 @@ public:
 };
 class Options_GravityLines {
 public:
-	int pixelThreshold =  4;
+	int pixelThreshold =  8;
 	void Run() {}
 	Options_GravityLines() {
 	}

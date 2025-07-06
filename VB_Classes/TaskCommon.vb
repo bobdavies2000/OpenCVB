@@ -624,6 +624,7 @@ Public Class lpData
     Public template2 As New cv.Mat
     Public correlation As Single
     Public gravityProxy As Boolean
+    Public ID As Integer
     Public Function perpendicularPoints(pt As cv.Point2f) As lpData
         Dim perpSlope = -1 / slope
         Dim angleRadians As Double = Math.Atan(perpSlope)
@@ -665,6 +666,7 @@ Public Class lpData
         p1 = validatePoint(_p1)
         p2 = validatePoint(_p2)
         center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
+        ID = task.grid.gridMap.Get(Of Single)(center.Y, center.X)
 
         If p1.X > p2.X Then
             Dim ptTemp = p1
@@ -736,12 +738,10 @@ Public Class lpData
             ep2 = New cv.Point2f(p1.X, task.workRes.Height)
         End If
 
-        If vertical And length >= task.gravityBasics.options.minLength Then
+        If vertical And length > 0 Then
             Dim deltaX1 = Math.Abs(task.gravityIMU.ep1.X - ep1.X)
             Dim deltaX2 = Math.Abs(task.gravityIMU.ep2.X - ep2.X)
-            If Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold Then
-                If length >= task.gravityBasics.options.minLength Then gravityProxy = True
-            End If
+            If Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold Then gravityProxy = True
         End If
 
         If p1.X < 0 Or p1.Y < 0 Or p2.X < 0 Or p2.Y < 0 Then Dim k = 0
