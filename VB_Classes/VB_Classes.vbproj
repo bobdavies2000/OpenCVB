@@ -242,6 +242,7 @@
     <Compile Include="Profile.vb" />
     <Compile Include="Spectrum.vb" />
     <Compile Include="Thickness.vb" />
+    <Compile Include="TrackLine.vb" />
     <Compile Include="TreeviewForm.Designer.vb">
       <DependentUpon>TreeviewForm.vb</DependentUpon>
     </Compile>

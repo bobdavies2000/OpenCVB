@@ -704,6 +704,7 @@ Partial Class OptionsGlobal
         'DotSizeSlider
         '
         Me.DotSizeSlider.Location = New System.Drawing.Point(207, 98)
+        Me.DotSizeSlider.Maximum = 16
         Me.DotSizeSlider.Minimum = 1
         Me.DotSizeSlider.Name = "DotSizeSlider"
         Me.DotSizeSlider.Size = New System.Drawing.Size(506, 69)

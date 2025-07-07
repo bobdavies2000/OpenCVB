@@ -9,7 +9,7 @@ Public Class BrickPoint_Basics : Inherits TaskParent
         desc = "Find the max Sobel point in each brick"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
+        dst2 = src
 
         sobel.Run(task.grayStable.Clone)
         dst3 = sobel.dst2
@@ -35,6 +35,7 @@ Public Class BrickPoint_Basics : Inherits TaskParent
                     " had brickpoint intensity >= " + CStr(sobel.options.sobelThreshold)
     End Sub
 End Class
+
 
 
 
@@ -373,5 +374,48 @@ Public Class BrickPoint_FeatureLess : Inherits TaskParent
         labels(2) = task.contours.labels(2)
         labels(3) = "Of the " + CStr(task.contours.contourList.Count) + " contours " + CStr(classCount) +
                     " have complete bricks inside them."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class BrickPoint_VetLines : Inherits TaskParent
+    Dim bPoint As New BrickPoint_Basics
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        desc = "Vet the lines - make sure there are at least 2 brickpoints in the line."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+        dst3 = src
+
+        bPoint.Run(src.Clone)
+
+        Dim pointsPerLine(task.gridRects.Count) As List(Of Integer)
+        For Each pt In bPoint.bpList
+            Dim index = task.lineRGB.lpMap.Get(Of Byte)(pt.Y, pt.X)
+            If index > 0 And index < task.lineRGB.lpList.Count Then
+                Dim lp = task.lineRGB.lpList(index)
+                If pointsPerLine(lp.ID) Is Nothing Then pointsPerLine(lp.ID) = New List(Of Integer)
+                pointsPerLine(lp.ID).Add(task.lineRGB.lpList.IndexOf(lp))
+                dst2.Circle(pt, task.DotSize * 3, task.scalarColors(lp.ID Mod 255), -1, task.lineType)
+            End If
+        Next
+
+        lpList.Clear()
+        For Each ppl In pointsPerLine
+            If ppl Is Nothing Then Continue For
+            If ppl.Count > 1 Then lpList.Add(task.lineRGB.lpList(ppl(0)))
+        Next
+
+        dst3 = src
+        For Each lp In lpList
+            dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        Next
+        labels(3) = CStr(lpList.Count) + " lines were confirmed with brickpoints"
     End Sub
 End Class

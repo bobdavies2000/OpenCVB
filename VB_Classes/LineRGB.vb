@@ -52,13 +52,17 @@ Public Class LineRGB_Basics : Inherits TaskParent
         dst2 = lineAges.dst2
         If standaloneTest() Then
             For Each lp In lpList
-                SetTrueText("Age: " + CStr(lp.age), lp.p1)
+                If task.toggleOn Then
+                    SetTrueText("Age: " + CStr(lp.age) + vbCrLf + "ID: " + CStr(lp.ID), lp.p1)
+                Else
+                    SetTrueText("Age: " + CStr(lp.age) + vbCrLf + "ID: " + CStr(lp.ID), lp.p2)
+                End If
             Next
         End If
 
         lpMap.SetTo(0)
         For i = lpList.Count - 1 To 0 Step -1
-            lpMap.Line(lpList(i).p1, lpList(i).p2, 255, 5, task.lineType)
+            lpMap.Line(lpList(i).p1, lpList(i).p2, i + 1, 3, task.lineType)
         Next
 
         labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count)
@@ -100,12 +104,46 @@ Public Class LineRGB_Raw : Inherits TaskParent
             End If
         Next
 
-        dst2.SetTo(0)
-        For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        ' remove lines that are close and parallel - close is defined as with task.cellsize.
+        Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        Dim removelist As New List(Of Integer)
+        For i = 0 To lpList.Count - 1
+            Dim lp = lpList(i)
+            Dim rect1 = lp.roRect.BoundingRect
+            For j = i + 1 To lpList.Count - 1
+                Dim lpTmp = lpList(j)
+                Dim rect2 = lpTmp.roRect.BoundingRect
+                If rect1.IntersectsWith(rect2) Then
+                    Dim deltaX1 = Math.Abs(lp.ep1.X - lpTmp.ep1.X)
+                    Dim deltaX2 = Math.Abs(lp.ep2.X - lpTmp.ep2.X)
+                    If Math.Abs(deltaX1 - deltaX2) < task.cellSize Then
+                        Dim index As Integer
+                        If lp.length > lpTmp.length Then
+                            index = lpList.IndexOf(lpTmp)
+                        Else
+                            index = lpList.IndexOf(lp)
+                        End If
+                        If removelist.Contains(index) = False Then
+                            sortedList.Add(index, index)
+                            removelist.Add(index)
+                        End If
+                    End If
+                End If
+            Next
         Next
 
-        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
+        dst2.SetTo(0)
+        For Each index In sortedList.Values
+            Dim lp = lpList(index)
+            dst2.Line(lp.p1, lp.p2, 128, task.lineWidth, task.lineType)
+            lpList.RemoveAt(index)
+        Next
+
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth + 1, task.lineType)
+        Next
+
+        labels(2) = CStr(lpList.Count) + " highlighted lines were detected in the current frame. Others were too similar."
     End Sub
 End Class
 
@@ -212,60 +250,6 @@ Public Class LineRGB_RawSorted : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class LineRGB_RawSubset : Inherits TaskParent
-    Dim ld As cv.XImgProc.FastLineDetector
-    Public lpList As New List(Of lpData)
-    Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
-               "rectangle (provided externally)"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
-
-        Dim lines = ld.Detect(src(ValidateRect(subsetRect)))
-
-        Dim lpDataList As New List(Of lpData)
-        For Each v In lines
-            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
-               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
-                Dim p1 = New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y))
-                Dim p2 = New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y))
-                If p1.X >= 0 And p1.X < dst2.Width And p1.Y >= 0 And p1.Y < dst2.Height And
-                   p2.X >= 0 And p2.X < dst2.Width And p2.Y >= 0 And p2.Y < dst2.Height Then
-                    lpDataList.Add(New lpData(p1, p2))
-                End If
-            End If
-        Next
-
-        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
-        For Each lp In lpDataList
-            sortlines.Add(lp.length, lp)
-        Next
-
-        lpList.Clear()
-        For Each lp In sortlines.Values
-            lpList.Add(lp)
-        Next
-
-        If standaloneTest() Then
-            dst2.SetTo(0)
-            For Each lp In lpList
-                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            Next
-        End If
-        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
-    End Sub
-End Class
 
 
 
@@ -901,5 +885,98 @@ Public Class LineRGB_KNN : Inherits TaskParent
         Next
 
         dst2 = ShowPaletteNoZero(dst3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LineRGB_Points : Inherits TaskParent
+    Dim knn As New KNN_Basics
+    Public Sub New()
+        desc = "Display end points of the lines and map them."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.lineRGB.dst2
+
+        knn.queries.Clear()
+        For Each lp In task.lineRGB.lpList
+            Dim rect = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+            dst2.Rectangle(rect, task.highlight, task.lineWidth)
+            knn.queries.Add(lp.center)
+        Next
+
+        Static lastQueries As New List(Of cv.Point2f)(knn.queries)
+        knn.trainInput = lastQueries
+
+        knn.Run(emptyMat)
+
+        dst3 = task.lineRGB.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        For i = 0 To knn.neighbors.Count - 1
+            Dim p1 = knn.queries(i)
+            Dim p2 = knn.trainInput(knn.neighbors(i)(0))
+            dst3.Line(p1, p2, task.highlight, task.lineWidth + 3, task.lineType)
+        Next
+
+        lastQueries = New List(Of cv.Point2f)(knn.queries)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class LineRGB_RawSubset : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+    Public rawLines As New LineRGB_Raw
+    Public Sub New()
+        task.drawRect = New cv.Rect(25, 25, 25, 25)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
+               "rectangle (provided externally)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then subsetRect = task.drawRect
+        rawLines.Run(src(subsetRect))
+
+        lpList.Clear()
+        dst2 = task.lineRGB.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        For Each lp In rawLines.lpList
+            dst2(subsetRect).Line(lp.p1, lp.p2, task.highlight, task.lineWidth * 3, task.lineType)
+            lpList.Add(lp)
+        Next
+        labels(2) = CStr(lpList.Count) + " lines were detected in src(subsetRect)"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class LineRGB_Grid : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Public rawLines As New LineRGB_Raw
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "find the lines in each grid rectangle"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3 = src
+        dst2.SetTo(0)
+        For Each rect In task.gridNabeRects
+            rawLines.Run(src(rect))
+            For Each lp In rawLines.lpList
+                dst2(rect).Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+                dst3(rect).Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                lpList.Add(lp)
+            Next
+        Next
     End Sub
 End Class

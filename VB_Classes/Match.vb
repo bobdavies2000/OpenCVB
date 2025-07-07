@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 Imports System.Windows.Forms
-Imports System.Web.UI
 Public Class Match_Basics : Inherits TaskParent
     Public template As cv.Mat ' Provide this
     Public correlation As Single ' Resulting Correlation coefficient
@@ -615,13 +614,20 @@ Public Class Match_Line : Inherits TaskParent
     Dim match As New Match_Basics
     Public correlation1 As Single
     Public correlation2 As Single
-    Public lpNew As lpData
+    Public nabeRect1 As cv.Rect
+    Public nabeRect2 As cv.Rect
+    Public gridRect1 As cv.Rect
+    Public gridRect2 As cv.Rect
+    Public offsetX1 As Integer
+    Public offsetX2 As Integer
+    Public offsetY1 As Integer
+    Public offsetY2 As Integer
     Public Sub New()
         match.template = New cv.Mat
         desc = "Get the end points of the gravity RGB vector and compare them to the original template."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone And task.algorithmPrep = False Then
+        If standalone Then
             lpInput = task.gravityBasics.gravityRGB
             If lpInput.template1.Width = 0 Then
                 SetTrueText("lpInput template was not found.", 3)
@@ -633,19 +639,31 @@ Public Class Match_Line : Inherits TaskParent
         match.Run(src(lpInput.nabeRect1))
         correlation1 = match.correlation
         Dim p1 = match.newRect.TopLeft
+        offsetX1 = lpInput.gridRect1.TopLeft.X - p1.X
+        offsetY1 = lpInput.gridRect1.TopLeft.Y - p1.Y
+        Dim index1 = task.grid.gridMap.Get(Of Single)(p1.Y, p1.X)
+        gridRect1 = task.gridRects(index1)
+        nabeRect1 = task.gridNabeRects(index1)
 
         match.template = lpInput.template2
         match.Run(src(lpInput.nabeRect2))
         correlation2 = match.correlation
         Dim p2 = match.newRect.TopLeft
+        offsetX2 = lpInput.gridRect2.TopLeft.X - p2.X
+        offsetY2 = lpInput.gridRect2.TopLeft.Y - p2.Y
+        Dim index2 = task.grid.gridMap.Get(Of Single)(p2.Y, p2.X)
+        gridRect2 = task.gridRects(index2)
+        nabeRect2 = task.gridNabeRects(index2)
 
-        Dim tmp As New cv.Mat
-        cv.Cv2.HConcat(lpInput.template1, lpInput.template2, tmp)
-        Dim sz = New cv.Size(dst2.Width, tmp.Height * dst2.Width / tmp.Width)
-        tmp = tmp.Resize(sz)
-        tmp.CopyTo(dst2(New cv.Rect(0, 0, sz.Width, sz.Height)))
+        If standaloneTest() Then
+            Dim tmp As New cv.Mat
+            cv.Cv2.HConcat(lpInput.template1, lpInput.template2, tmp)
+            Dim sz = New cv.Size(dst2.Width, tmp.Height * dst2.Width / tmp.Width)
+            tmp = tmp.Resize(sz)
+            tmp.CopyTo(dst2(New cv.Rect(0, 0, sz.Width, sz.Height)))
 
-        labels(2) = "Correlation1 = " + Format(correlation1, fmt3) + " and correlation2 = " + Format(correlation2, fmt3)
+            labels(2) = "Correlation1 = " + Format(correlation1, fmt3) + " and correlation2 = " + Format(correlation2, fmt3)
+        End If
     End Sub
 End Class
 
