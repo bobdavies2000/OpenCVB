@@ -62,7 +62,7 @@ Public Class LineRGB_Basics : Inherits TaskParent
 
         lpMap.SetTo(0)
         For i = lpList.Count - 1 To 0 Step -1
-            lpMap.Line(lpList(i).p1, lpList(i).p2, i + 1, 3, task.lineType)
+            lpMap.Line(lpList(i).p1, lpList(i).p2, i + 1, 10, cv.LineTypes.Link8)
         Next
 
         labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count)
@@ -184,9 +184,7 @@ Public Class LineRGB_BasicsNoAging : Inherits TaskParent
             lpMap.Line(lp.p1, lp.p2, sortlines.Values.IndexOf(lp) + 1, task.lineWidth * 3, cv.LineTypes.Link8)
 
             If standaloneTest() Then
-                For i As Integer = 0 To 3
-                    dst2.Line(lp.vertices(i), lp.vertices((i + 1) Mod 4), task.highlight, task.lineWidth)
-                Next
+                dst2.Line(lp.p1, lp.p2, task.highlight, 10, cv.LineTypes.Link8)
             End If
             If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next

@@ -610,12 +610,10 @@ Public Class lpData
     Public ep2 As cv.Point2f ' extended line endpoints - goes to the edge of the image.
     Public length As Single
     Public roRect As cv.RotatedRect
-    Public vertices(3) As cv.Point2f
     Public vertical As Boolean ' false is horizontal
     Public slope As Single
     Public yIntercept As Single
     Public center As cv.Point2f
-    Public thickness As Single = 3
     Public nabeRect1 As cv.Rect
     Public nabeRect2 As cv.Rect
     Public gridRect1 As cv.Rect
@@ -646,6 +644,7 @@ Public Class lpData
     Public Sub CalculateRotatedRectFromLine()
         Dim deltaX As Single = p2.X - p1.X
         Dim deltaY As Single = p2.Y - p1.Y
+        Dim thickness As Single = 3
         Dim outSize = New cv.Size2f(length, thickness)
 
         Dim angleRadians As Double = Math.Atan2(deltaY, deltaX)
@@ -653,7 +652,6 @@ Public Class lpData
         If outAngle >= 90.0 Then outAngle -= 180.0
         If outAngle < -90.0 Then outAngle += 180.0
         roRect = New cv.RotatedRect(center, outSize, outAngle)
-        vertices = roRect.Points()
     End Sub
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
         If pt.X < 0 Then pt.X = 0

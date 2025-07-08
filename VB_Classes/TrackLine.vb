@@ -5,6 +5,7 @@ Public Class TrackLine_Basics : Inherits TaskParent
     Public rawLines As New LineRGB_Raw
     Dim matchRect As cv.Rect
     Public Sub New()
+        task.gOptions.highlight.SelectedItem = "Yellow"
         desc = "Track an individual line as best as possible."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -12,8 +13,11 @@ Public Class TrackLine_Basics : Inherits TaskParent
         If lplist.Count = 0 Then Exit Sub
 
         If standalone Then
-            If lplist(0).length > lp.length Then
-                lp = lplist(0)
+            If match.correlation < task.fCorrThreshold Or task.heartBeatLT Then
+                If match.correlation < task.fCorrThreshold Then Debug.WriteLine("Switching lines based on correlation")
+                For Each lp In lplist
+                    If lp.gravityProxy Then Exit For
+                Next
                 matchRect = ValidateRect(lp.roRect.BoundingRect)
                 match.template = src(matchRect)
             End If
@@ -22,25 +26,33 @@ Public Class TrackLine_Basics : Inherits TaskParent
         If matchRect.Width <= 1 Then Exit Sub ' nothing yet...
 
         match.Run(src)
-        matchRect = match.newRect
-
-        If match.correlation < task.fCorrThreshold Then
-            rawLines.Run(src(matchRect))
-            If rawLines.lpList.Count > 0 Then lp = rawLines.lpList(0)
-            dst2(matchRect).Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 2, task.lineType)
-        Else
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-
+        Dim index = task.lineRGB.lpMap.Get(Of Byte)(match.newCenter.Y, match.newCenter.X)
+        If index > 0 Then
+            Dim len = task.lineRGB.lpList(index - 1).length
+            If Math.Abs(len - lp.length) > len / 10 Then
+                Debug.WriteLine("testing")
+            End If
+            lp = task.lineRGB.lpList(index - 1)
+            matchRect = ValidateRect(lp.roRect.BoundingRect)
             match.template = src(matchRect)
+        Else
+            Debug.WriteLine("Switching lines based on index")
         End If
 
         If standaloneTest() Then
-            dst2 = src
+            dst2 = src.Clone
             DrawCircle(dst2, match.newCenter, task.DotSize, white)
-            dst2.Rectangle(matchRect, task.highlight, task.lineWidth)
+            dst2.Rectangle(lp.roRect.BoundingRect, task.highlight, task.lineWidth)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
             SetTrueText(Format(match.correlation, fmt3), match.newCenter)
         End If
+
+        Static lastAge As Integer = lp.age
+        If lp.age < lastAge Then
+            If standaloneTest() Then dst2.Rectangle(matchRect, red, task.lineWidth)
+        End If
+        labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
     End Sub
 End Class
 
