@@ -5,7 +5,9 @@ Public Class Match_Basics : Inherits TaskParent
     Public template As cv.Mat ' Provide this
     Public correlation As Single ' Resulting Correlation coefficient
     Public newCenter As cv.Point
+    Public newCenter2F As cv.Point2f
     Public newRect As New cv.Rect
+    Dim rFit As New Rectangle_Fit
     Public Sub New()
         If standalone Then task.gOptions.DebugCheckBox.Checked = True
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
@@ -28,11 +30,16 @@ Public Class Match_Basics : Inherits TaskParent
         labels(2) = "Template (at right) has " + Format(correlation,) + " Correlation to the src input"
         Dim w = template.Width, h = template.Height
         newCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
+        newCenter2F = New cv.Point2f(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
         newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
         If standaloneTest() Then
+            rFit.Run(template)
+            dst3.SetTo(0)
+            dst3 = rFit.dst2
+
             dst2 = src
-            dst2.Circle(newCenter, task.DotSize, task.highlight, -1, task.lineType)
-            dst3 = template
+            dst2.Circle(newCenter2F, task.DotSize, white, -1, task.lineType)
+            dst2.Rectangle(newRect, task.highlight, task.lineWidth)
         End If
         labels(3) = "Template to compare the src input to"
     End Sub
@@ -64,22 +71,26 @@ End Class
 
 Public Class Match_BasicsTest : Inherits TaskParent
     Public match As New Match_Basics
+    Dim matchRect As cv.Rect
     Public Sub New()
         labels = {"", "", "Draw a rectangle to be tracked", "Highest probability of a match at the brightest point below"}
         desc = "Test the Match_Basics algorithm"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If (task.firstPass Or (task.mouseClickFlag And task.drawRect.Width <> 0)) And standaloneTest() Then
-            Dim r = If(task.firstPass, New cv.Rect(25, 25, 25, 25), ValidateRect(task.drawRect))
-            match.template = src(r)
-            task.drawRectClear = True
+        If standalone Then
+            If task.heartBeatLT Then
+                matchRect = ValidateRect(task.gravityBasics.gravityRGB.roRect.BoundingRect)
+                match.template = src(matchRect)
+            End If
         End If
 
         match.Run(src)
+        matchRect = match.newRect
 
         If standaloneTest() Then
             dst2 = src
             DrawCircle(dst2, match.newCenter, task.DotSize, white)
+            dst2.Rectangle(matchRect, task.highlight, task.lineWidth)
             dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
             SetTrueText(Format(match.correlation, fmt3), match.newCenter)
         End If
@@ -611,17 +622,10 @@ End Class
 
 Public Class Match_Line : Inherits TaskParent
     Public lpInput As lpData
+    Public lpOutput As lpData
     Dim match As New Match_Basics
     Public correlation1 As Single
     Public correlation2 As Single
-    Public nabeRect1 As cv.Rect
-    Public nabeRect2 As cv.Rect
-    Public gridRect1 As cv.Rect
-    Public gridRect2 As cv.Rect
-    Public offsetX1 As Integer
-    Public offsetX2 As Integer
-    Public offsetY1 As Integer
-    Public offsetY2 As Integer
     Public Sub New()
         match.template = New cv.Mat
         desc = "Get the end points of the gravity RGB vector and compare them to the original template."
@@ -638,22 +642,18 @@ Public Class Match_Line : Inherits TaskParent
         match.template = lpInput.template1
         match.Run(src(lpInput.nabeRect1))
         correlation1 = match.correlation
-        Dim p1 = match.newRect.TopLeft
-        offsetX1 = lpInput.gridRect1.TopLeft.X - p1.X
-        offsetY1 = lpInput.gridRect1.TopLeft.Y - p1.Y
-        Dim index1 = task.grid.gridMap.Get(Of Single)(p1.Y, p1.X)
-        gridRect1 = task.gridRects(index1)
-        nabeRect1 = task.gridNabeRects(index1)
+        Dim offsetx1 = match.newRect.TopLeft.X - task.cellSize
+        Dim offsety1 = match.newRect.TopLeft.Y - task.cellSize
+        Dim p1 = New cv.Point(lpInput.p1.X + offsetx1, lpInput.p1.Y + offsety1)
 
         match.template = lpInput.template2
         match.Run(src(lpInput.nabeRect2))
         correlation2 = match.correlation
-        Dim p2 = match.newRect.TopLeft
-        offsetX2 = lpInput.gridRect2.TopLeft.X - p2.X
-        offsetY2 = lpInput.gridRect2.TopLeft.Y - p2.Y
-        Dim index2 = task.grid.gridMap.Get(Of Single)(p2.Y, p2.X)
-        gridRect2 = task.gridRects(index2)
-        nabeRect2 = task.gridNabeRects(index2)
+        Dim offsetX2 = match.newRect.TopLeft.X - task.cellSize
+        Dim offsetY2 = match.newRect.TopLeft.Y - task.cellSize
+        Dim p2 = New cv.Point(lpInput.p2.X + offsetX2, lpInput.p2.Y + offsetY2)
+
+        lpOutput = New lpData(p1, p2)
 
         If standaloneTest() Then
             Dim tmp As New cv.Mat
@@ -661,8 +661,12 @@ Public Class Match_Line : Inherits TaskParent
             Dim sz = New cv.Size(dst2.Width, tmp.Height * dst2.Width / tmp.Width)
             tmp = tmp.Resize(sz)
             tmp.CopyTo(dst2(New cv.Rect(0, 0, sz.Width, sz.Height)))
-
             labels(2) = "Correlation1 = " + Format(correlation1, fmt3) + " and correlation2 = " + Format(correlation2, fmt3)
+
+            dst3 = src
+            dst3.Line(lpInput.p1, lpInput.p2, task.highlight, task.lineWidth, task.lineType)
+            labels(3) = "OffsetX1 = " + CStr(offsetx1) + " OffsetY1 = " + CStr(offsety1) + " OffsetX2 = " + CStr(offsetX2) +
+                       " OffsetY2 = " + CStr(offsetY2)
         End If
     End Sub
 End Class

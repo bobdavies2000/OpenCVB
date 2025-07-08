@@ -310,3 +310,33 @@ Public Class Rectangle_EnclosingPoints : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class Rectangle_Fit : Inherits TaskParent
+    Public Sub New()
+        If standalone Then task.drawRect = New cv.Rect(25, 25, 25, 35)
+        desc = "Fit a rectangle into dst2 that maximizes the width or height of the rectangle"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then dst2.SetTo(0)
+
+        If src.Width = dst2.Width Then dst1 = src(task.drawRect) Else dst1 = src
+
+        Dim w = dst2.Width / dst1.Width
+        Dim h = dst2.Height / dst1.Height
+
+        Dim sz As cv.Size
+        If h < w Then
+            sz = New cv.Size(h * dst1.Width, h * dst1.Height)
+        Else
+            sz = New cv.Size(w * dst1.Width, w * dst1.Height)
+        End If
+        Dim tmp = dst1.Resize(sz)
+        If tmp.Channels = 1 Then tmp = tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        tmp.CopyTo(dst2(New cv.Rect(0, 0, sz.Width, sz.Height)))
+    End Sub
+End Class
