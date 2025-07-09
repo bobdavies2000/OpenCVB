@@ -401,7 +401,7 @@ Public Class BrickPoint_VetLines : Inherits TaskParent
             If index > 0 And index < task.lineRGB.lpList.Count Then
                 Dim lp = task.lineRGB.lpList(index)
                 If pointsPerLine(lp.ID) Is Nothing Then pointsPerLine(lp.ID) = New List(Of Integer)
-                pointsPerLine(lp.ID).Add(task.lineRGB.lpList.IndexOf(lp))
+                pointsPerLine(lp.ID).Add(lp.index)
                 dst2.Circle(pt, task.DotSize * 3, task.scalarColors(lp.ID Mod 255), -1, task.lineType)
             End If
         Next

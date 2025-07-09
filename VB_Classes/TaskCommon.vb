@@ -609,6 +609,7 @@ Public Class lpData
     Public ep1 As cv.Point2f ' extended line endpoints - goes to the edge of the image.
     Public ep2 As cv.Point2f ' extended line endpoints - goes to the edge of the image.
     Public length As Single
+    Public rect As cv.Rect
     Public roRect As cv.RotatedRect
     Public vertical As Boolean ' false is horizontal
     Public slope As Single
@@ -620,9 +621,9 @@ Public Class lpData
     Public gridRect2 As cv.Rect
     Public template1 As New cv.Mat
     Public template2 As New cv.Mat
-    Public correlation As Single
     Public gravityProxy As Boolean
     Public ID As Integer
+    Public index As Integer
     Public Function perpendicularPoints(pt As cv.Point2f) As lpData
         Dim perpSlope = -1 / slope
         Dim angleRadians As Double = Math.Atan(perpSlope)
@@ -652,6 +653,7 @@ Public Class lpData
         If outAngle >= 90.0 Then outAngle -= 180.0
         If outAngle < -90.0 Then outAngle += 180.0
         roRect = New cv.RotatedRect(center, outSize, outAngle)
+        rect = ValidateRect(roRect.BoundingRect)
     End Sub
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
         If pt.X < 0 Then pt.X = 0

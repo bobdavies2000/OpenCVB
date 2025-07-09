@@ -44,6 +44,7 @@ Public Class LineRGB_Basics : Inherits TaskParent
 
         lpList.Clear()
         For Each lp In sortlines.Values
+            lp.index = lpList.Count
             lpList.Add(lp)
             If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
@@ -62,7 +63,7 @@ Public Class LineRGB_Basics : Inherits TaskParent
 
         lpMap.SetTo(0)
         For i = lpList.Count - 1 To 0 Step -1
-            lpMap.Line(lpList(i).p1, lpList(i).p2, i + 1, 10, cv.LineTypes.Link8)
+            lpMap.Rectangle(lpList(i).rect, i + 1, -1)
         Next
 
         labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count)
@@ -119,9 +120,9 @@ Public Class LineRGB_Raw : Inherits TaskParent
                     If Math.Abs(deltaX1 - deltaX2) < task.cellSize Then
                         Dim index As Integer
                         If lp.length > lpTmp.length Then
-                            index = lpList.IndexOf(lpTmp)
+                            index = lpTmp.index
                         Else
-                            index = lpList.IndexOf(lp)
+                            index = lp.index
                         End If
                         If removelist.Contains(index) = False Then
                             sortedList.Add(index, index)
@@ -404,7 +405,7 @@ Public Class LineRGB_Info : Inherits TaskParent
 
         dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
-        Dim index = task.lineRGB.lpList.IndexOf(task.lpD)
+        Dim index = task.lpD.index
         strOut += "Line ID = " + CStr(index) + vbCrLf + vbCrLf
         strOut += "index = " + CStr(index) + vbCrLf
         strOut += "Age = " + CStr(task.lpD.age) + vbCrLf
@@ -823,7 +824,7 @@ Public Class LineRGB_FindNearest : Inherits TaskParent
 
         Dim sortDistance As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
         For Each lp In lpList
-            sortDistance.Add(lpInput.center.DistanceTo(lp.center), lpList.IndexOf(lp))
+            sortDistance.Add(lpInput.center.DistanceTo(lp.center), lp.index)
         Next
 
         lpOutput = lpList(sortDistance.ElementAt(0).Value)

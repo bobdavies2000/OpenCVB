@@ -1635,7 +1635,7 @@ Public Class XO_Line_Basics : Inherits TaskParent
         dst3.SetTo(0)
         dst2.SetTo(cv.Scalar.White, lineCore.dst2)
         For Each lp In lineCore.lpList
-            lpMap.Line(lp.p1, lp.p2, lineCore.lpList.IndexOf(lp), task.lineWidth + 1, cv.LineTypes.Link8)
+            lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
@@ -2862,7 +2862,7 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
 
         Dim index = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         task.lpD = task.lineRGB.lpList(index)
-        Dim facetsD = delaunay.facetList(task.lineRGB.lpList.IndexOf(task.lpD))
+        Dim facetsD = delaunay.facetList(task.lpD.index)
         DrawContour(dst2, facetsD, white, task.lineWidth)
 
         labels(2) = task.lineRGB.labels(2)
@@ -5137,7 +5137,7 @@ Public Class XO_LineRGB_BasicsAlternative : Inherits TaskParent
             Dim histogram As New cv.Mat
             dst1.SetTo(0)
             For Each lp In lpList
-                dst1.Line(lp.p1, lp.p2, lpList.IndexOf(lp) + 1, task.lineWidth, cv.LineTypes.Link4)
+                dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
             Next
 
             cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lpList.Count)})

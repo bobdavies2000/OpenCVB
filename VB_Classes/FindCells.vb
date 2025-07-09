@@ -168,7 +168,7 @@ Public Class FindCells_LineGaps : Inherits TaskParent
 
         dst1.SetTo(0)
         For Each lp In task.lineRGB.lpList
-            dst1.Line(lp.p1, lp.p2, task.lineRGB.lpList.IndexOf(lp), task.lineWidth, cv.LineTypes.Link8)
+            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
         Next
 
         findCells.Run(dst1)
@@ -296,7 +296,7 @@ Public Class FindCells_Lines : Inherits TaskParent
 
         dst1.SetTo(0)
         For Each lp In task.lineRGB.lpList
-            dst1.Line(lp.p1, lp.p2, task.lineRGB.lpList.IndexOf(lp), task.lineWidth, cv.LineTypes.Link8)
+            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
         Next
 
         findCells.Run(dst1)

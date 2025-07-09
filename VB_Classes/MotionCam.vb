@@ -144,16 +144,15 @@ Public Class MotionCam_SideApproach : Inherits TaskParent
 
         Dim lpList = task.lineRGB.lpList
         For Each lp In lpList
-            Dim index = task.lineRGB.lpList.IndexOf(lp)
-            If lp.ep1.X = 0 Then left.Add(lp.ep1.Y, index)
-            If lp.ep1.Y = 0 Then top.Add(lp.ep1.X, index)
-            If lp.ep2.X = 0 Then left.Add(lp.ep2.Y, index)
-            If lp.ep2.Y = 0 Then top.Add(lp.ep2.X, index)
+            If lp.ep1.X = 0 Then left.Add(lp.ep1.Y, lp.index)
+            If lp.ep1.Y = 0 Then top.Add(lp.ep1.X, lp.index)
+            If lp.ep2.X = 0 Then left.Add(lp.ep2.Y, lp.index)
+            If lp.ep2.Y = 0 Then top.Add(lp.ep2.X, lp.index)
 
-            If lp.ep1.X = dst2.Width Then right.Add(lp.ep1.X, index)
-            If lp.ep1.Y = dst2.Height Then bottom.Add(lp.ep1.X, index)
-            If lp.ep2.X = dst2.Width Then right.Add(lp.ep2.Y, index)
-            If lp.ep2.Y = dst2.Height Then bottom.Add(lp.ep2.X, index)
+            If lp.ep1.X = dst2.Width Then right.Add(lp.ep1.X, lp.index)
+            If lp.ep1.Y = dst2.Height Then bottom.Add(lp.ep1.X, lp.index)
+            If lp.ep2.X = dst2.Width Then right.Add(lp.ep2.Y, lp.index)
+            If lp.ep2.Y = dst2.Height Then bottom.Add(lp.ep2.X, lp.index)
         Next
 
         edgeList.Clear()

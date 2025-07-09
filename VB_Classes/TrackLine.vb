@@ -1,56 +1,70 @@
 ﻿Imports cv = OpenCvSharp
 Public Class TrackLine_Basics : Inherits TaskParent
-    Dim lp As New lpData
     Dim match As New Match_Basics
-    Public rawLines As New LineRGB_Raw
     Dim matchRect As cv.Rect
+    Public rawLines As New LineRGB_Raw
+    Dim lplist As List(Of lpData)
     Public Sub New()
         task.gOptions.highlight.SelectedItem = "Yellow"
         desc = "Track an individual line as best as possible."
     End Sub
+    Private Function restartLine(src As cv.Mat) As lpData
+        For Each lpTemp In lplist
+            If lpTemp.gravityProxy Then
+                matchRect = ValidateRect(lpTemp.rect)
+                match.template = src(matchRect)
+                Return lpTemp
+            End If
+        Next
+        Return New lpData
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lplist = task.lineRGB.lpList
+        lplist = task.lineRGB.lpList
         If lplist.Count = 0 Then Exit Sub
 
-        If standalone Then
-            If match.correlation < task.fCorrThreshold Or task.heartBeatLT Then
-                If match.correlation < task.fCorrThreshold Then Debug.WriteLine("Switching lines based on correlation")
-                For Each lp In lplist
-                    If lp.gravityProxy Then Exit For
-                Next
-                matchRect = ValidateRect(lp.roRect.BoundingRect)
-                match.template = src(matchRect)
-            End If
-        End If
+        Static lp As New lpData, lpLast As lpData
+        lpLast = lp
 
-        If matchRect.Width <= 1 Then Exit Sub ' nothing yet...
+        If match.correlation < task.fCorrThreshold Or matchRect.Width <= 1 Then ' Or task.heartBeatLT 
+            If match.correlation < task.fCorrThreshold Then Debug.WriteLine("correlation switch")
+            lp = restartLine(src)
+        End If
 
         match.Run(src)
-        Dim index = task.lineRGB.lpMap.Get(Of Byte)(match.newCenter.Y, match.newCenter.X)
-        If index > 0 Then
-            Dim len = task.lineRGB.lpList(index - 1).length
-            If Math.Abs(len - lp.length) > len / 10 Then
-                Debug.WriteLine("testing")
-            End If
-            lp = task.lineRGB.lpList(index - 1)
-            matchRect = ValidateRect(lp.roRect.BoundingRect)
-            match.template = src(matchRect)
-        Else
-            Debug.WriteLine("Switching lines based on index")
-        End If
+
+        Static knn As New KNN_N3Basics
+        knn.trainInput.Clear()
+        For Each nextlp In task.lineRGB.lpList
+            ' knn.trainInput.Add(New cv.Point3f(nextlp.slope, nextlp.length, nextlp.yIntercept))
+            knn.trainInput.Add(New cv.Point3f(nextlp.slope, nextlp.length, nextlp.yIntercept))
+        Next
+        knn.queries.Clear()
+        knn.queries.Add(New cv.Point3f(lp.slope, lp.length, lp.yIntercept))
+        knn.Run(emptyMat)
+
+        lp = task.lineRGB.lpList(knn.result(0, 0))
 
         If standaloneTest() Then
             dst2 = src.Clone
             DrawCircle(dst2, match.newCenter, task.DotSize, white)
-            dst2.Rectangle(lp.roRect.BoundingRect, task.highlight, task.lineWidth)
+            dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
             SetTrueText(Format(match.correlation, fmt3), match.newCenter)
+
+            If Math.Abs(lp.age - lpLast.age) <= 1 Then
+                dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
+            Else
+                dst2.Rectangle(matchRect, red, task.lineWidth)
+            End If
         End If
 
-        Static lastAge As Integer = lp.age
-        If lp.age < lastAge Then
-            If standaloneTest() Then dst2.Rectangle(matchRect, red, task.lineWidth)
+        Dim r = lpLast.rect
+        If lp.rect.IntersectsWith(r) = False Then
+            Dim k = 0
+            If k = 1 Then
+                lp = lpLast
+            End If
         End If
         labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
     End Sub
@@ -76,7 +90,7 @@ Public Class TrackLine_BasicsSimple : Inherits TaskParent
         If standalone Then
             If lplist(0).length > lp.length Then
                 lp = lplist(0)
-                matchRect = ValidateRect(lp.roRect.BoundingRect)
+                matchRect = lp.rect
                 match.template = src(matchRect)
             End If
         End If
@@ -116,7 +130,7 @@ Public Class TrackLine_BasicsOld : Inherits TaskParent
         If lplist.Count = 0 Then Exit Sub
         If standalone And foundLine = False Then lpInput = task.gravityBasics.gravityRGB
 
-        Static subsetrect = ValidateRect(lpInput.roRect.BoundingRect)
+        Static subsetrect = lpInput.rect
         If subsetrect.width <= dst2.Height / 10 Then
             lpInput = task.gravityBasics.gravityRGB
             subsetrect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
@@ -137,7 +151,7 @@ Public Class TrackLine_BasicsOld : Inherits TaskParent
                 foundLine = match.correlation1 >= task.fCorrThreshold And match.correlation2 >= task.fCorrThreshold
                 If foundLine Then
                     lpInput = match.lpOutput
-                    subsetrect = ValidateRect(lpInput.roRect.BoundingRect)
+                    subsetrect = lpInput.rect
                 End If
             End If
         Else
@@ -156,7 +170,7 @@ Public Class TrackLine_BasicsOld : Inherits TaskParent
             If Math.Abs(deltaX1 - deltaX2) > task.gravityBasics.options.pixelThreshold Then
                 lpInput = task.gravityBasics.gravityRGB
             End If
-            subsetrect = ValidateRect(lpInput.roRect.BoundingRect)
+            subsetrect = lpInput.rect
         End If
 
         dst2 = src
