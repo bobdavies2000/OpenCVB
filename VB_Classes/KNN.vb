@@ -1252,7 +1252,7 @@ Public Class KNN_LongestLine : Inherits TaskParent
         labels(3) = task.lineRGB.labels(3)
         labels(2) = "Found line with age = " + CStr(lp.age)
 
-        dst1 = ShowPaletteNoZero(task.lineRGB.lpMap)
+        dst1 = ShowPaletteNoZero(task.lineRGB.lpRectMap)
     End Sub
 End Class
 
@@ -1277,13 +1277,13 @@ Public Class KNN_BoundingRect : Inherits TaskParent
             For Each lpNext In lplist
                 sortRects.Add(lpNext.rect.Width * lpNext.rect.Height, lpNext.index)
             Next
-            lp = lplist(sortRects.ElementAt(0).value)
+            lp = lplist(sortRects.ElementAt(0).Value)
         End If
 
-        dst1 = ShowPaletteNoZero(task.lineRGB.lpMap)
+        dst1 = ShowPaletteNoZero(task.lineRGB.lpRectMap)
         dst1.Circle(lp.center, task.DotSize, task.highlight, task.lineWidth, task.lineType)
 
-        Dim index = task.lineRGB.lpMap.Get(Of Byte)(lp.center.Y, lp.center.X)
+        Dim index = task.lineRGB.lpRectMap.Get(Of Byte)(lp.center.Y, lp.center.X)
         If index > 0 Then lp = lplist(index - 1)
         dst2 = src
         dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)

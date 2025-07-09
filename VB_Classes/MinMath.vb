@@ -14,7 +14,7 @@ Public Class MinMath_Line : Inherits TaskParent
         Dim linesFound As New List(Of Byte)
         Dim bpList(task.lineRGB.lpList.Count) As List(Of cv.Point)
         For Each bp In bPoints.bpList
-            Dim val = task.lineRGB.lpMap.Get(Of Byte)(bp.Y, bp.X)
+            Dim val = task.lineRGB.lpRectMap.Get(Of Byte)(bp.Y, bp.X)
             If val = 0 Then Continue For
             If linesFound.Contains(val) = False Then
                 linesFound.Add(val)

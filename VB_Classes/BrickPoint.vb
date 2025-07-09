@@ -397,7 +397,7 @@ Public Class BrickPoint_VetLines : Inherits TaskParent
 
         Dim pointsPerLine(task.gridRects.Count) As List(Of Integer)
         For Each pt In bPoint.bpList
-            Dim index = task.lineRGB.lpMap.Get(Of Byte)(pt.Y, pt.X)
+            Dim index = task.lineRGB.lpRectMap.Get(Of Byte)(pt.Y, pt.X)
             If index > 0 And index < task.lineRGB.lpList.Count Then
                 Dim lp = task.lineRGB.lpList(index)
                 If pointsPerLine(lp.ID) Is Nothing Then pointsPerLine(lp.ID) = New List(Of Integer)

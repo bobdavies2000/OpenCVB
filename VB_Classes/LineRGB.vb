@@ -1,10 +1,12 @@
 Imports cv = OpenCvSharp
 Public Class LineRGB_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public lpLineMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public rawLines As New LineRGB_Raw
     Dim lineAges As New LineRGB_OrderByAge
     Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
     Private Function lpMotionCheck(lp As lpData) As Boolean
@@ -61,11 +63,14 @@ Public Class LineRGB_Basics : Inherits TaskParent
             Next
         End If
 
-        lpMap.SetTo(0)
+        lpRectMap.SetTo(0)
+        lpLineMap.SetTo(0)
         For i = lpList.Count - 1 To 0 Step -1
-            lpMap.Rectangle(lpList(i).rect, i + 1, -1)
+            lpRectMap.Rectangle(lpList(i).rect, i + 1, -1)
+            lpLineMap.Line(lpList(i).p1, lpList(i).p2, lpList(i).index + 1, task.lineWidth, cv.LineTypes.Link8)
         Next
 
+        dst1 = ShowPaletteNoZero(lpLineMap)
         labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count)
     End Sub
 End Class
@@ -155,7 +160,7 @@ End Class
 
 Public Class LineRGB_BasicsNoAging : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public rawLines As New LineRGB_Raw
     Public Sub New()
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
@@ -178,11 +183,11 @@ Public Class LineRGB_BasicsNoAging : Inherits TaskParent
 
         lpList.Clear()
         dst2 = src
-        lpMap.SetTo(0)
+        lpRectMap.SetTo(0)
         For Each lp In sortlines.Values
             lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            lpMap.Line(lp.p1, lp.p2, sortlines.Values.IndexOf(lp) + 1, task.lineWidth * 3, cv.LineTypes.Link8)
+            lpRectMap.Line(lp.p1, lp.p2, sortlines.Values.IndexOf(lp) + 1, task.lineWidth * 3, cv.LineTypes.Link8)
 
             If standaloneTest() Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, 10, cv.LineTypes.Link8)
@@ -190,7 +195,7 @@ Public Class LineRGB_BasicsNoAging : Inherits TaskParent
             If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
 
-        If standaloneTest() Then dst1 = ShowPalette(lpMap)
+        If standaloneTest() Then dst1 = ShowPalette(lpRectMap)
         labels(2) = "Of the " + CStr(rawLines.lpList.Count) + " raw lines found, shown below are the " + CStr(lpList.Count) + " longest."
     End Sub
 End Class

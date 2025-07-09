@@ -935,7 +935,7 @@ End Class
 
 Public Class XO_Line_Matching : Inherits TaskParent
     Public options As New Options_Line
-    Dim lineMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Dim lpLineMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim lpList As New List(Of lpData)
     Public Sub New()
         labels(2) = "Highlighted lines were combined from 2 lines.  Click on LineRGB_Core in Treeview to see."
@@ -972,7 +972,7 @@ Public Class XO_Line_Matching : Inherits TaskParent
             Dim lpRemove As Boolean = False
             For j = 0 To 1
                 Dim pt = Choose(j + 1, lp.p1, lp.p2)
-                Dim val = lineMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim val = lpLineMap.Get(Of Integer)(pt.Y, pt.X)
                 If val = 0 Then Continue For
                 Dim mp = lpList(val - 1)
                 If Math.Abs(mp.slope - lp.slope) < tolerance Then
@@ -999,12 +999,12 @@ Public Class XO_Line_Matching : Inherits TaskParent
             task.lineRGB.lpList.Add(lp)
         Next
         lpList = New List(Of lpData)(task.lineRGB.lpList)
-        lineMap.SetTo(0)
+        lpLineMap.SetTo(0)
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
-            If lp.length > options.minLength Then lineMap.Line(lp.p1, lp.p2, i + 1, 2, cv.LineTypes.Link8)
+            If lp.length > options.minLength Then lpLineMap.Line(lp.p1, lp.p2, i + 1, 2, cv.LineTypes.Link8)
         Next
-        lineMap.ConvertTo(dst3, cv.MatType.CV_8U)
+        lpLineMap.ConvertTo(dst3, cv.MatType.CV_8U)
         dst3 = dst3.Threshold(0, cv.Scalar.White, cv.ThresholdTypes.Binary)
         If task.heartBeat Then
             labels(2) = CStr(task.lineRGB.lpList.Count) + " lines were input and " + CStr(combineCount) +
@@ -1566,7 +1566,7 @@ End Class
 Public Class XO_Line_Core : Inherits TaskParent
     Dim lines As New XO_Line_Core
     Public lpList As New List(Of lpData)
-    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Collect lines as always but don't update lines where there was no motion."
@@ -1579,8 +1579,8 @@ Public Class XO_Line_Core : Inherits TaskParent
         lpList.Clear()
         lpList.Add(New lpData) ' placeholder to allow us to build a map.
         If lastList.Count > 0 Then
-            lpMap.SetTo(0, Not task.motionMask)
-            cv.Cv2.CalcHist({lpMap}, {0}, emptyMat, histogram, 1, {lastList.Count}, New cv.Rangef() {New cv.Rangef(0, lastList.Count)})
+            lpRectMap.SetTo(0, Not task.motionMask)
+            cv.Cv2.CalcHist({lpRectMap}, {0}, emptyMat, histogram, 1, {lastList.Count}, New cv.Rangef() {New cv.Rangef(0, lastList.Count)})
             Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
             For i = 1 To histarray.Count - 1
@@ -1591,7 +1591,7 @@ Public Class XO_Line_Core : Inherits TaskParent
         lines.Run(src.Clone)
         ReDim histarray(lines.lpList.Count - 1)
 
-        Dim tmp = lines.lpMap.Clone
+        Dim tmp = lines.lpRectMap.Clone
         tmp.SetTo(0, Not task.motionMask)
         cv.Cv2.CalcHist({tmp}, {0}, emptyMat, histogram, 1, {lines.lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lines.lpList.Count)})
         Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
@@ -1601,11 +1601,11 @@ Public Class XO_Line_Core : Inherits TaskParent
         Next
 
         dst2.SetTo(0)
-        lpMap.SetTo(0)
+        lpRectMap.SetTo(0)
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            lpMap.Line(lp.p1, lp.p2, i, task.lineWidth, task.lineType)
+            lpRectMap.Line(lp.p1, lp.p2, i, task.lineWidth, task.lineType)
         Next
 
         If task.heartBeat Then
@@ -1620,7 +1620,7 @@ End Class
 
 
 Public Class XO_Line_Basics : Inherits TaskParent
-    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+    Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public lpList As New List(Of lpData)
     Dim lineCore As New XO_Line_Core
     Public Sub New()
@@ -1630,12 +1630,12 @@ Public Class XO_Line_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         lineCore.Run(src)
 
-        lpMap.SetTo(0)
+        lpRectMap.SetTo(0)
         dst2 = src
         dst3.SetTo(0)
         dst2.SetTo(cv.Scalar.White, lineCore.dst2)
         For Each lp In lineCore.lpList
-            lpMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
+            lpRectMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 

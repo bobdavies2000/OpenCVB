@@ -79,11 +79,13 @@ Public Class Track_LongestLine : Inherits TaskParent
         desc = "Track the longest RGB line"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lineRGB.lpList.Count = 0 Then Exit Sub
+        Dim lpList = task.lineRGB.lpList
+        If lpList.Count = 0 Then Exit Sub
 
         If task.heartBeatLT Then
             task.optionsChanged = True
-            track.inputRect = task.lineRGB.lpList(0).nabeRect1
+            Dim gridIndex = task.grid.gridMap.Get(Of Single)(lpList(0).p1.Y, lpList(0).p1.X)
+            track.inputRect = task.gridNabeRects(gridIndex)
             dst3.SetTo(0)
             dst3(track.inputRect) = src(track.inputRect).Clone
         End If
@@ -103,12 +105,14 @@ Public Class Track_GridRect : Inherits TaskParent
         desc = "Track the gravity RGB vector"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lineRGB.lpList.Count = 0 Then Exit Sub
+        Dim lpList = task.lineRGB.lpList
+        If lpList.Count = 0 Then Exit Sub
 
         Static searchRect As cv.Rect, originalRect As cv.Rect
         If task.heartBeatLT Then
-            originalRect = task.lineRGB.lpList(0).gridRect1
-            searchRect = task.lineRGB.lpList(0).nabeRect1
+            Dim gridIndex = task.grid.gridMap.Get(Of Single)(lpList(0).p1.Y, lpList(0).p1.X)
+            originalRect = task.gridRects(gridIndex)
+            searchRect = task.gridNabeRects(gridIndex)
             Dim x = originalRect.X - searchRect.X
             Dim y = originalRect.Y - searchRect.Y
             track.inputRect = New cv.Rect(x, y, task.cellSize, task.cellSize)
@@ -138,13 +142,15 @@ Public Class Track_Lines : Inherits TaskParent
         desc = "Track the top X lines using Track_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lineRGB.lpList.Count = 0 Then Exit Sub
+        Dim lpList = task.lineRGB.lpList
+        If lpList.Count = 0 Then Exit Sub
 
-        Dim trackCount = Math.Min(track.Length, task.lineRGB.lpList.Count)
+        Dim trackCount = Math.Min(track.Length, lpList.Count)
         dst2 = src
         For i = 0 To trackCount - 1
             If task.heartBeat Then
-                track(i).inputRect = task.lineRGB.lpList(i).nabeRect1
+                Dim gridIndex = task.grid.gridMap.Get(Of Single)(lpList(i).p1.Y, lpList(i).p1.X)
+                track(i).inputRect = task.gridNabeRects(gridIndex)
             End If
             track(i).Run(task.gray)
             dst2.Rectangle(track(i).outputRect, task.highlight, task.lineWidth)

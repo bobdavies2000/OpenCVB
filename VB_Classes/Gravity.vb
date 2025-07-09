@@ -35,7 +35,7 @@ Public Class Gravity_Basics : Inherits TaskParent
         If RGBcandidate.length = 0 Then
             If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
         Else
-            stillPresent = task.lineRGB.lpMap.Get(Of Byte)(RGBcandidate.center.Y, RGBcandidate.center.X)
+            stillPresent = task.lineRGB.lpRectMap.Get(Of Byte)(RGBcandidate.center.Y, RGBcandidate.center.X)
         End If
 
         If stillPresent Then

@@ -615,10 +615,6 @@ Public Class lpData
     Public slope As Single
     Public yIntercept As Single
     Public center As cv.Point2f
-    Public nabeRect1 As cv.Rect
-    Public nabeRect2 As cv.Rect
-    Public gridRect1 As cv.Rect
-    Public gridRect2 As cv.Rect
     Public template1 As New cv.Mat
     Public template2 As New cv.Mat
     Public gravityProxy As Boolean
@@ -654,6 +650,12 @@ Public Class lpData
         If outAngle < -90.0 Then outAngle += 180.0
         roRect = New cv.RotatedRect(center, outSize, outAngle)
         rect = ValidateRect(roRect.BoundingRect)
+        If rect.Width <= 15 Then
+            rect = ValidateRect(New cv.Rect(rect.X - (20 - rect.Width) / 2, rect.Y, 20, rect.Height))
+        End If
+        If rect.Height <= 15 Then
+            rect = ValidateRect(New cv.Rect(rect.X, rect.Y - (20 - rect.Height) / 2, rect.Width, 20))
+        End If
     End Sub
     Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
         If pt.X < 0 Then pt.X = 0
@@ -691,8 +693,8 @@ Public Class lpData
             If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then vertical = False
         End If
 
-        gridRect1 = task.gridRects(task.grid.gridMap.Get(Of Single)(p1.Y, p1.X))
-        gridRect2 = task.gridRects(task.grid.gridMap.Get(Of Single)(p2.Y, p2.X))
+        Dim gridRect1 = task.gridRects(task.grid.gridMap.Get(Of Single)(p1.Y, p1.X))
+        Dim gridRect2 = task.gridRects(task.grid.gridMap.Get(Of Single)(p2.Y, p2.X))
         If gridRect1.Width <> task.cellSize Or gridRect1.Height <> task.cellSize Or
            gridRect2.Width <> task.cellSize Or gridRect2.Height <> task.cellSize Then
 
@@ -705,8 +707,8 @@ Public Class lpData
             gridRect1.Height = task.cellSize
             gridRect2.Height = task.cellSize
         End If
-        nabeRect1 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(p1.Y, p1.X))
-        nabeRect2 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(p2.Y, p2.X))
+        Dim nabeRect1 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(p1.Y, p1.X))
+        Dim nabeRect2 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(p2.Y, p2.X))
         template1 = task.color(gridRect1)
         template2 = task.color(gridRect2)
 

@@ -254,11 +254,14 @@ Public Class Match_LinesKNN : Inherits TaskParent
         desc = "Use the 2 points from a line as input to a 4-dimension KNN"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lineRGB.dst2
-        Static lastPt As New List(Of lpData)(task.lineRGB.lpList)
+        Dim lplist = task.lineRGB.lpList
+        If lplist.Count = 0 Then Exit Sub
+
+        dst2 = dst2
+        Static lastPt As New List(Of lpData)(lplist)
 
         knn.queries.Clear()
-        For Each lp In task.lineRGB.lpList
+        For Each lp In lplist
             knn.queries.Add(New cv.Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
         Next
         If task.optionsChanged Then knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
@@ -267,8 +270,8 @@ Public Class Match_LinesKNN : Inherits TaskParent
         If knn.queries.Count = 0 Then Exit Sub
 
         For Each i In knn.result
-            If i >= task.lineRGB.lpList.Count Then Continue For
-            Dim lp = task.lineRGB.lpList(i)
+            If i >= lplist.Count Then Continue For
+            Dim lp = lplist(i)
 
             Dim index = knn.result(i, 0)
             If index >= 0 And index < lastPt.Count Then
@@ -278,7 +281,7 @@ Public Class Match_LinesKNN : Inherits TaskParent
         Next
 
         knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
-        lastPt = New List(Of lpData)(task.lineRGB.lpList)
+        lastPt = New List(Of lpData)(lplist)
     End Sub
 End Class
 
@@ -640,14 +643,17 @@ Public Class Match_Line : Inherits TaskParent
         End If
 
         match.template = lpInput.template1
-        match.Run(src(lpInput.nabeRect1))
+        Dim nabeRect1 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lpInput.p1.Y, lpInput.p1.X))
+        Dim nabeRect2 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lpInput.p2.Y, lpInput.p2.X))
+
+        match.Run(src(nabeRect1))
         correlation1 = match.correlation
         Dim offsetx1 = match.newRect.TopLeft.X - task.cellSize
         Dim offsety1 = match.newRect.TopLeft.Y - task.cellSize
         Dim p1 = New cv.Point(lpInput.p1.X + offsetx1, lpInput.p1.Y + offsety1)
 
         match.template = lpInput.template2
-        match.Run(src(lpInput.nabeRect2))
+        match.Run(src(nabeRect2))
         correlation2 = match.correlation
         Dim offsetX2 = match.newRect.TopLeft.X - task.cellSize
         Dim offsetY2 = match.newRect.TopLeft.Y - task.cellSize
@@ -694,10 +700,10 @@ Public Class Match_Lines : Inherits TaskParent
             If match.correlation1 > task.fCorrThreshold And match.correlation2 > task.fCorrThreshold Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             End If
-            dst2.Rectangle(lp.gridRect1, task.highlight, task.lineWidth)
-            dst2.Rectangle(lp.gridRect2, task.highlight, task.lineWidth)
-            dst2.Rectangle(lp.nabeRect1, task.highlight, task.lineWidth)
-            dst2.Rectangle(lp.nabeRect2, task.highlight, task.lineWidth)
+            dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
+            'dst2.Rectangle(lp.gridRect2, task.highlight, task.lineWidth)
+            'dst2.Rectangle(lp.nabeRect1, task.highlight, task.lineWidth)
+            'dst2.Rectangle(lp.nabeRect2, task.highlight, task.lineWidth)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             labels(2) = "Left rect has correlation " + Format(match.correlation1, fmt3) +
                               " and right rect has " + Format(match.correlation2, fmt3)
@@ -735,10 +741,10 @@ Public Class Match_GravityRGB : Inherits TaskParent
         End If
 
         Dim correlations As New SortedList(Of Single, cv.Point)(New compareAllowIdenticalSingleInverted)
-        Dim rect = lpInput.nabeRect1
+        Dim nabeRect1 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lpInput.p1.Y, lpInput.p1.X))
         For y = 4 To 12
             For x = 4 To 12
-                Dim r = New cv.Rect(rect.X + x, rect.Y + y, task.cellSize, task.cellSize)
+                Dim r = New cv.Rect(nabeRect1.X + x, nabeRect1.Y + y, task.cellSize, task.cellSize)
                 match.template = lpInput.template1
                 match.Run(src(r))
                 correlations.Add(match.correlation, New cv.Point(x, y))
@@ -750,14 +756,14 @@ Public Class Match_GravityRGB : Inherits TaskParent
         labels(2) = "There were " + CStr(correlations.Count) + " attempts to match the template in the neighborhood.  " +
                     "Best correlation was " + Format(correlation, fmt3) + " at " + pt.ToString
 
-        rect = New cv.Rect(rect.X + pt.X, rect.Y + pt.Y, task.cellSize, task.cellSize)
+        Dim nabeRect2 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lpInput.p2.Y, lpInput.p2.X))
         Dim tmp As New cv.Mat
-        cv.Cv2.HConcat(lpInput.template1, src(rect), tmp)
+        cv.Cv2.HConcat(lpInput.template1, src(nabeRect2), tmp)
         Dim sz = New cv.Size(dst2.Width, tmp.Height * dst2.Width / tmp.Width)
         tmp = tmp.Resize(sz)
         tmp.CopyTo(dst2(New cv.Rect(0, 0, sz.Width, sz.Height)))
 
-        If correlation > task.fCorrThreshold Then template = src(rect) Else template = Nothing
+        If correlation > task.fCorrThreshold Then template = src(nabeRect2) Else template = Nothing
 
         If task.heartBeat Then strOut = "correlations (List): " & String.Join(" | " + vbCrLf, correlations)
         SetTrueText(strOut, 3)
