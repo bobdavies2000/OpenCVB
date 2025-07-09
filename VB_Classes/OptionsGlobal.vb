@@ -45,7 +45,7 @@ Public Class OptionsGlobal
         highlight.Items.Add("Black")
         highlight.Items.Add("White")
         highlight.Items.Add("Red")
-        highlight.SelectedIndex = 2
+        highlight.SelectedIndex = 0
 
         ShowAllOptions.Checked = GetSetting("Opencv", "ShowAllOptions", "ShowAllOptions", False)
 

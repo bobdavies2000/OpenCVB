@@ -4,20 +4,32 @@ Public Class TrackLine_Basics : Inherits TaskParent
     Dim matchRect As cv.Rect
     Public rawLines As New LineRGB_Raw
     Dim lplist As List(Of lpData)
+    Dim knn As New KNN_NNBasics
     Public Sub New()
-        task.gOptions.highlight.SelectedItem = "Yellow"
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        OptionParent.FindSlider("KNN Dimension").Value = 6
         desc = "Track an individual line as best as possible."
     End Sub
     Private Function restartLine(src As cv.Mat) As lpData
         For Each lpTemp In lplist
             If lpTemp.gravityProxy Then
-                matchRect = ValidateRect(lpTemp.rect)
+                matchRect = lpTemp.rect
                 match.template = src(matchRect)
                 Return lpTemp
             End If
         Next
         Return New lpData
     End Function
+    Private Sub prepEntry(knnList As List(Of Single), lpNext As lpData)
+        Dim brick1 = task.grid.gridMap.Get(Of Single)(lpNext.p1.Y, lpNext.p1.X)
+        Dim brick2 = task.grid.gridMap.Get(Of Single)(lpNext.p2.Y, lpNext.p2.X)
+        knnList.Add(lpNext.p1.X)
+        knnList.Add(lpNext.p1.Y)
+        knnList.Add(lpNext.p2.X)
+        knnList.Add(lpNext.p2.Y)
+        knnList.Add(brick1)
+        knnList.Add(brick2)
+    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lplist = task.lineRGB.lpList
         If lplist.Count = 0 Then Exit Sub
@@ -26,20 +38,18 @@ Public Class TrackLine_Basics : Inherits TaskParent
         lpLast = lp
 
         If match.correlation < task.fCorrThreshold Or matchRect.Width <= 1 Then ' Or task.heartBeatLT 
-            If match.correlation < task.fCorrThreshold Then Debug.WriteLine("correlation switch")
             lp = restartLine(src)
         End If
 
         match.Run(src)
 
-        Static knn As New KNN_N3Basics
         knn.trainInput.Clear()
         For Each nextlp In task.lineRGB.lpList
-            ' knn.trainInput.Add(New cv.Point3f(nextlp.slope, nextlp.length, nextlp.yIntercept))
-            knn.trainInput.Add(New cv.Point3f(nextlp.slope, nextlp.length, nextlp.yIntercept))
+            prepEntry(knn.trainInput, nextlp)
         Next
+
         knn.queries.Clear()
-        knn.queries.Add(New cv.Point3f(lp.slope, lp.length, lp.yIntercept))
+        prepEntry(knn.queries, lp)
         knn.Run(emptyMat)
 
         lp = task.lineRGB.lpList(knn.result(0, 0))
@@ -59,13 +69,9 @@ Public Class TrackLine_Basics : Inherits TaskParent
             End If
         End If
 
-        Dim r = lpLast.rect
-        If lp.rect.IntersectsWith(r) = False Then
-            Dim k = 0
-            If k = 1 Then
-                lp = lpLast
-            End If
-        End If
+        dst1 = ShowPaletteNoZero(task.lineRGB.lpMap)
+        dst1.Circle(lp.center, task.DotSize, task.highlight, task.lineWidth, task.lineType)
+
         labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
     End Sub
 End Class
