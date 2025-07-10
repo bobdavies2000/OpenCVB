@@ -616,7 +616,6 @@ Public Class lpData
     Public template1 As New cv.Mat
     Public template2 As New cv.Mat
     Public gravityProxy As Boolean
-    Public ID As Integer
     Public index As Integer
     Public Function perpendicularPoints(pt As cv.Point2f) As lpData
         Dim perpSlope = -1 / slope
@@ -633,7 +632,6 @@ Public Class lpData
         If p2.X >= task.color.Width Then p2.X = task.color.Width - 1
         If p2.Y < 0 Then p2.Y = 0
         If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
-
         Return New lpData(p1, p2)
     End Function
     Public Sub CalculateRotatedRectFromLine()
@@ -666,7 +664,6 @@ Public Class lpData
         p1 = validatePoint(_p1)
         p2 = validatePoint(_p2)
         center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
-        ID = task.grid.gridMap.Get(Of Single)(center.Y, center.X)
 
         If p1.X > p2.X Then
             Dim ptTemp = p1

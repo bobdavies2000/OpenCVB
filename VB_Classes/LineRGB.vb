@@ -867,10 +867,7 @@ Public Class LineRGB_KNN : Inherits TaskParent
             Dim index = knn.neighbors(i)(0)
             Dim lpLast = lpLastList(index)
 
-            If lp.center.DistanceTo(lpLast.center) < 3 Then
-                lp.ID = lpLast.ID
-                lp.age = lpLast.age + 1
-            End If
+            If lp.center.DistanceTo(lpLast.center) < 3 Then lp.age = lpLast.age + 1
         Next
 
         lastQueries = New List(Of cv.Point2f)(knn.queries)
@@ -878,7 +875,7 @@ Public Class LineRGB_KNN : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each lp In lpList
-            dst3.Line(lp.p1, lp.p2, task.scalarColors(lp.ID Mod 255 + 1), task.lineWidth * 3, cv.LineTypes.Link8)
+            dst3.Line(lp.p1, lp.p2, task.scalarColors(lp.index), task.lineWidth * 3, cv.LineTypes.Link8)
             SetTrueText(CStr(lp.age), lp.center, 3)
         Next
 

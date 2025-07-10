@@ -5824,7 +5824,7 @@ Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
         Dim index = task.lineRGB.lpRectMap.Get(Of Byte)(lpInput.center.Y, lpInput.center.X)
         If index > 0 Then
             Dim lp = lplist(index - 1)
-            If lpInput.ID = lp.ID Then
+            If lpInput.index = lp.index Then
                 foundLine = True
             Else
                 match.lpInput = lpInput
@@ -5965,9 +5965,9 @@ Public Class XO_BrickPoint_VetLines : Inherits TaskParent
             Dim index = task.lineRGB.lpRectMap.Get(Of Byte)(pt.Y, pt.X)
             If index > 0 And index < task.lineRGB.lpList.Count Then
                 Dim lp = task.lineRGB.lpList(index)
-                If pointsPerLine(lp.ID) Is Nothing Then pointsPerLine(lp.ID) = New List(Of Integer)
-                pointsPerLine(lp.ID).Add(lp.index)
-                dst2.Circle(pt, task.DotSize * 3, task.scalarColors(lp.ID Mod 255), -1, task.lineType)
+                If pointsPerLine(lp.index) Is Nothing Then pointsPerLine(lp.index) = New List(Of Integer)
+                pointsPerLine(lp.index).Add(lp.index)
+                dst2.Circle(pt, task.DotSize * 3, task.scalarColors(lp.index Mod 255), -1, task.lineType)
             End If
         Next
 
