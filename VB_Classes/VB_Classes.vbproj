@@ -138,12 +138,6 @@
     <Compile Include="OptionsFeatures.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OptionsRedColor.Designer.vb">
-      <DependentUpon>OptionsRedColor.vb</DependentUpon>
-    </Compile>
-    <Compile Include="OptionsRedColor.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="RedPrep.vb" />
     <Compile Include="Regions.vb" />
     <Compile Include="DepthColorizer.vb" />
@@ -501,9 +495,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsRadioButtons.resx">
       <DependentUpon>OptionsRadioButtons.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OptionsRedColor.resx">
-      <DependentUpon>OptionsRedColor.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsSliders.resx">
       <DependentUpon>OptionsSliders.vb</DependentUpon>

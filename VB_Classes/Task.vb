@@ -29,7 +29,6 @@ Public Class VBtask : Implements IDisposable
 
     Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
     Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
-    Public rcPrepReductionName As String
 
     Public fpList As New List(Of fpData)
     Public regionList As New List(Of rcData)

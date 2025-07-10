@@ -49,7 +49,7 @@ Public Class OptionsContainer
                     Dim sidelineOptions As Boolean = True
                     Dim displayTheseOptions As New List(Of String)({"Image_Basics OpenFile Options"})
                     If displayTheseOptions.Contains(frm.Text) Then sidelineOptions = False
-                    If (normalRequest And sidelineOptions) And showAllOptions = False Then
+                    If normalRequest And sidelineOptions And showAllOptions = False Then
                         If frm Is Nothing Then Continue For
                         frm.SetDesktopLocation(Me.Width - 2 * offset, sliderOffset.Y + indexHide * offset)
                         indexHide += 1
