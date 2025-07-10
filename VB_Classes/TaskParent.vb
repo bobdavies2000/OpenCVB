@@ -515,6 +515,12 @@ Public Class TaskParent : Implements IDisposable
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar, lineWidth As Integer)
         dst.Line(p1, p2, color, lineWidth, task.lineType)
     End Sub
+    Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f)
+        dst.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+    End Sub
+    Public Sub DrawRect(dst As cv.Mat, rect As cv.Rect, color As cv.Scalar)
+        dst.Rectangle(rect, color, task.lineWidth, task.lineType)
+    End Sub
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
         Dim pt1 = New cv.Point(p1.X, p1.Y)
         Dim pt2 = New cv.Point(p2.X, p2.Y)
@@ -694,7 +700,7 @@ Public Class TaskParent : Implements IDisposable
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim faces() = cascade.DetectMultiScale(gray, 1.08, 3, cv.HaarDetectionTypes.ScaleImage, New cv.Size(30, 30))
         For Each fface In faces
-            src.Rectangle(fface, cv.Scalar.Red, task.lineWidth, task.lineType)
+            DrawRect(src, fface, cv.Scalar.Red)
         Next
     End Sub
     Public Sub houghShowLines(dst As cv.Mat, segments() As cv.LineSegmentPolar, desiredCount As Integer)

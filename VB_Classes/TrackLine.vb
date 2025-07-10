@@ -49,7 +49,7 @@ Public Class TrackLine_Basics : Inherits TaskParent
         If standaloneTest() Then
             dst2 = src
             dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst2, lp.p1, lp.p2)
         End If
 
         labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."

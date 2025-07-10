@@ -231,7 +231,7 @@ Public Class Contour_LineRGB : Inherits TaskParent
         labels(2) = task.contours.labels(2)
 
         For Each lp In task.lineRGB.lpList
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst2, lp.p1, lp.p2)
         Next
     End Sub
 End Class
@@ -770,7 +770,7 @@ Public Class Contour_Lines : Inherits TaskParent
 
         dst2 = src
         For Each lp In task.lineRGB.lpList
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst2, lp.p1, lp.p2)
         Next
         labels(2) = task.lineRGB.labels(2)
     End Sub

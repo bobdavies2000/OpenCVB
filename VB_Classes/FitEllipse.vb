@@ -144,7 +144,7 @@ Public Class FitEllipse_RedCloud : Inherits TaskParent
         fitE.Run(src)
         dst3.SetTo(0)
         dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
-        dst3.Rectangle(task.rcD.rect, white, task.lineWidth, task.lineType)
+        DrawRect(dst3, task.rcD.rect, white)
         dst3(task.rcD.rect).Ellipse(fitE.box, cv.Scalar.Yellow, task.lineWidth, task.lineType)
     End Sub
 End Class

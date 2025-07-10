@@ -473,7 +473,7 @@ Public Class FCS_Motion : Inherits TaskParent
             Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
             If fpIndex >= 0 Then
                 linkedCount += 1
-                dst3.Line(fp.pt, fp.ptLast, task.highlight, task.lineWidth, task.lineType)
+                DrawLine(dst3, fp.pt, fp.ptLast)
             End If
             If fp.ptLast <> newPoint Then
                 motionCount += 1

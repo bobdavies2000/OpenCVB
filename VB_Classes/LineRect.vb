@@ -23,8 +23,8 @@ Public Class LineRect_Basics : Inherits TaskParent
             For Each pt In inputPoints
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)
             Next
-            dst2.Line(lpInput1.p1, lpInput1.p2, task.highlight, task.lineWidth, task.lineType)
-            dst2.Line(lpInput2.p1, lpInput2.p2, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst2, lpInput1.p1, lpInput1.p2)
+            DrawLine(dst2, lpInput2.p1, lpInput2.p2)
             SetTrueText("Line 1", lpInput1.p1, 2)
             SetTrueText("Line 2", lpInput2.p1, 2)
             DrawRotatedOutline(rotatedRect, dst2, cv.Scalar.Yellow)

@@ -327,8 +327,8 @@ Public Class WarpAffine_Repeated : Inherits TaskParent
         For i = 0 To 2
             cv.Cv2.WarpAffine(dst3(rect), dst3(rect), m2, New cv.Size(bound_w, bound_h))
         Next
-        dst2.Rectangle(rect, white, task.lineWidth, task.lineType)
-        dst3.Rectangle(rect, white, task.lineWidth, task.lineType)
+        DrawRect(dst2, rect, white)
+        DrawRect(dst3, rect, white)
     End Sub
 End Class
 

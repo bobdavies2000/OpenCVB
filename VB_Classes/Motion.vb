@@ -455,7 +455,7 @@ Public Class Motion_RectTest : Inherits TaskParent
             diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             diff.Run(dst2)
             dst3 = diff.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst3.Rectangle(r, task.highlight, task.lineWidth, task.lineType)
+            DrawRect(dst3, r, task.highlight)
         End If
     End Sub
 End Class
@@ -524,7 +524,7 @@ Public Class Motion_Enclosing : Inherits TaskParent
         If motionRect.Width > dst2.Width / 2 And motionRect.Height > dst2.Height / 2 Then
             motionRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         End If
-        dst2.Rectangle(motionRect, 255, task.lineWidth, task.lineType)
+        DrawRect(dst2, motionRect, 255)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)

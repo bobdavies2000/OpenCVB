@@ -10,7 +10,7 @@ Public Class MotionCam_Basics : Inherits TaskParent
         If task.lineRGB.lpList.Count = 0 Then Exit Sub
 
         Dim lp1 = task.lineRGB.lpList(0)
-        dst2.Line(lp1.p1, lp1.p2, task.highlight, task.lineWidth, task.lineType)
+        DrawLine(dst2, lp1.p1, lp1.p2)
         dst1.Line(lp1.ep1, lp1.ep2, 255, task.lineWidth, cv.LineTypes.Link4)
 
         Dim center = New cv.Point(CInt((lp1.p1.X + lp1.p2.X) / 2), CInt((lp1.p1.Y + lp1.p2.Y) / 2))
@@ -166,5 +166,64 @@ Public Class MotionCam_SideApproach : Inherits TaskParent
 
         labels(2) = CStr(task.lineRGB.lpList.Count * 2) + " edge points of the top " + CStr(task.lineRGB.lpList.Count) +
                     " longest lines in the image are shown."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class MotionCam_Measure : Inherits TaskParent
+    Public deltaX1 As Single, deltaX2 As Single, deltaY1 As Single, deltaY2 As Single
+    Public Sub New()
+        desc = "Measure how much the camera has moved."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static vecLast = task.gravityBasics.gravityRGB
+        Dim vec = task.gravityBasics.gravityRGB
+
+        deltaX1 = vec.ep1.X - vecLast.ep1.x
+        deltaY1 = vec.ep1.Y - vecLast.ep1.Y
+
+        deltaX2 = vec.ep2.X - vecLast.ep2.x
+        deltaY2 = vec.ep2.Y - vecLast.ep2.Y
+
+        Static strList As New List(Of String)
+        strList.Add(Format(deltaX1, fmt1) + " " + Format(deltaX2, fmt1) + " " +
+                    Format(deltaY1, fmt1) + " " + Format(deltaY2, fmt1) +
+                    If(task.frameCount Mod 6 = 0, vbCrLf, vbTab))
+        If strList.Count >= 132 Then strList.RemoveAt(0)
+
+        strOut = ""
+        For Each nextStr In strList
+            strOut += nextStr
+        Next
+        SetTrueText(strOut, 3)
+
+        vecLast = vec
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class MotionCam_Plot : Inherits TaskParent
+    Dim plot As New Plot_OverTime
+    Dim measure As New MotionCam_Measure
+    Public Sub New()
+        plot.minScale = -10
+        plot.maxScale = 10
+        desc = "Plot the variables describing the camera motion."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        measure.Run(src)
+
+        plot.plotData = New cv.Scalar(measure.deltaX1, measure.deltaY1, measure.deltaX2, measure.deltaY2)
+        plot.Run(src)
+        dst2 = plot.dst2
+        dst3 = plot.dst3
     End Sub
 End Class

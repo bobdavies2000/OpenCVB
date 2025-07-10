@@ -27,7 +27,7 @@ Public Class HullLine_Basics : Inherits TaskParent
 
                 lpList.Add(lp)
                 ptLast = pt
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                DrawLine(dst2, lp.p1, lp.p2)
                 If lpList.Count >= maxLines Then Exit For
             Next
             If lpList.Count >= maxLines Then Exit For

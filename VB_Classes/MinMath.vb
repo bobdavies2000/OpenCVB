@@ -29,10 +29,10 @@ Public Class MinMath_Line : Inherits TaskParent
             If bpList(i) Is Nothing Then Continue For
             Dim p1 = bpList(i)(0)
             Dim p2 = bpList(i)(bpList(i).Count - 1)
-            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst2, p1, p2)
             Dim lp = New lpData(p1, p2)
             lpList.Add(lp)
-            dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst3, p1, p2)
         Next
 
         For Each index In linesFound
@@ -145,9 +145,9 @@ Public Class MinMath_KNN : Inherits TaskParent
         For i = 0 To knn.neighbors.Count - 1
             Dim p1 = knn.queries(i)
             Dim p2 = knn.queries(knn.neighbors(i)(1))
-            dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst2, p1, p2)
             Dim p3 = knn.queries(knn.neighbors(i)(2))
-            dst2.Line(p1, p3, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst3, p1, p2)
         Next
     End Sub
 End Class

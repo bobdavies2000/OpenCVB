@@ -289,7 +289,7 @@ Public Class OEX_MeanShift : Inherits TaskParent
         cv.Cv2.CalcBackProject({hsv}, {0}, histogram, dst3, ranges)
         If trackWindow.Width <> 0 Then
             cv.Cv2.MeanShift(dst3, trackWindow, cv.TermCriteria.Both(10, 1))
-            src.Rectangle(trackWindow, white, task.lineWidth, task.lineType)
+            DrawRect(src, trackWindow, white)
         End If
     End Sub
 End Class

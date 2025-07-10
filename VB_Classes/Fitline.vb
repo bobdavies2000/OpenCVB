@@ -141,7 +141,7 @@ Public Class FitLine_Simple3D : Inherits TaskParent
         Dim p2 = New cv.Point(dst2.Width, -dst2.Width * line.Vy / line.Vx + center.Y)
         Dim lp = New lpData(center, p2)
         lpResult = findEdgePoints(lp)
-        dst2.Line(lpResult.p1, lpResult.p2, task.highlight, task.lineWidth, task.lineType)
+        DrawLine(dst2, lpResult.p1, lpResult.p2)
         dst2.Circle(center, task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class
@@ -168,7 +168,7 @@ Public Class FitLine_Example2D : Inherits TaskParent
         Next
         fitLine.Run(src)
 
-        dst2.Line(fitLine.lp.p1, fitLine.lp.p2, task.highlight, task.lineWidth, task.lineType)
+        DrawLine(dst2, fitLine.lp.p1, fitLine.lp.p2)
         dst2.Circle(fitLine.center, task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class
@@ -206,7 +206,7 @@ Public Class FitLine_Basics3D : Inherits TaskParent
         Dim p2 = New cv.Point(src.Width, line.Vy / line.Vx * src.Width + bb)
 
         lp = findEdgePoints(New lpData(p1, p2))
-        dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+        DrawLine(dst2, lp.p1, lp.p2)
         dst2.Circle(New cv.Point2f(line.X1, line.Y1), task.DotSize + 2, cv.Scalar.Blue, -1)
     End Sub
 End Class

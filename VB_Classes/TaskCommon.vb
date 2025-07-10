@@ -606,8 +606,8 @@ Public Class lpData
     Public age As Integer = 1
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
-    Public ep1 As cv.Point2f ' extended line endpoints - goes to the edge of the image.
-    Public ep2 As cv.Point2f ' extended line endpoints - goes to the edge of the image.
+    Public ep1 As cv.Point2f ' end points - goes to the edge of the image.
+    Public ep2 As cv.Point2f ' end points - goes to the edge of the image.
     Public length As Single
     Public rect As cv.Rect
     Public vertical As Boolean ' false is horizontal

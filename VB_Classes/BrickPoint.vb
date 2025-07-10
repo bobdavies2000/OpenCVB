@@ -175,7 +175,7 @@ Public Class BrickPoint_DistanceAbove : Inherits TaskParent
         For Each brick In task.bricks.brickList
             Dim lp = lpList(brick.index)
             If lp.length < min Or lp.length > max Then Continue For
-            dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst3, lp.p1, lp.p2)
         Next
     End Sub
 End Class
@@ -210,7 +210,7 @@ Public Class BrickPoint_KNN : Inherits TaskParent
 
         dst2 = src.Clone
         For Each lp In task.lineRGB.lpList
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst2, lp.p1, lp.p2)
         Next
     End Sub
 End Class

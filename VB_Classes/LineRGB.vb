@@ -180,7 +180,7 @@ Public Class LineRGB_BasicsNoAging : Inherits TaskParent
         lpRectMap.SetTo(0)
         For Each lp In sortlines.Values
             lpList.Add(lp)
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst2, lp.p1, lp.p2)
             lpRectMap.Line(lp.p1, lp.p2, sortlines.Values.IndexOf(lp) + 1, task.lineWidth * 3, cv.LineTypes.Link8)
 
             If standaloneTest() Then
@@ -626,7 +626,7 @@ Public Class LineRGB_TrigHorizontal : Inherits TaskParent
             Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.X - lp.p2.X)) * 57.2958
 
             If Math.Abs(angle - hAngle) < 2 Then
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                DrawLine(dst2, lp.p1, lp.p2)
                 horizList.Add(lp)
             End If
         Next
@@ -659,7 +659,7 @@ Public Class LineRGB_TrigVertical : Inherits TaskParent
             Dim angle = Math.Atan(sideOpposite / Math.Abs(lp.p1.Y - lp.p2.Y)) * 57.2958
 
             If Math.Abs(angle - gAngle) < 2 Then
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                DrawLine(dst2, lp.p1, lp.p2)
                 vertList.Add(lp)
             End If
         Next
@@ -693,7 +693,7 @@ Public Class LineRGB_GravityToAverage : Inherits TaskParent
                 If Math.Abs(gravityDelta - delta) < task.gravityBasics.options.pixelThreshold Then
                     deltaList.Add(delta)
                     vertList.Add(lp)
-                    dst2.Line(lp.ep1, lp.ep2, task.highlight, task.lineWidth, task.lineType)
+                    DrawLine(dst2, lp.ep1, lp.ep2)
                     If standalone Then DrawLine(dst3, lp.p1, lp.p2, task.highlight)
                 End If
             End If
@@ -797,7 +797,7 @@ Public Class LineRGB_OrderByAge : Inherits TaskParent
         lpListAge.Clear()
         dst2 = src
         For Each lp In sortAge.Values
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst2, lp.p1, lp.p2)
             SetTrueText("Age: " + CStr(lp.age), lp.p1)
             lpListAge.Add(lp)
         Next
@@ -830,7 +830,7 @@ Public Class LineRGB_FindNearest : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            dst2.Line(lpOutput.p1, lpOutput.p2, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst2, lpOutput.p1, lpOutput.p2)
             labels(2) = "Distance = " + Format(sortDistance.ElementAt(0).Key, fmt1)
             SetTrueText("Age = " + CStr(lpOutput.age), lpOutput.p1)
         End If
@@ -969,7 +969,7 @@ Public Class LineRGB_Grid : Inherits TaskParent
             rawLines.Run(src(rect))
             For Each lp In rawLines.lpList
                 dst2(rect).Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-                dst3(rect).Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                DrawLine(dst3, lp.p1, lp.p2)
                 lpList.Add(lp)
             Next
         Next

@@ -350,7 +350,7 @@ Public Class Match_DrawRect : Inherits TaskParent
             dst0 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
             dst3.SetTo(0)
             dst0.CopyTo(dst3(New cv.Rect(inputRect.Width / 2, inputRect.Height / 2, dst0.Width, dst0.Height)))
-            dst3.Rectangle(inputRect, white, task.lineWidth, task.lineType)
+            DrawRect(dst3, inputRect, white)
             dst2 = src
         End If
 
@@ -664,7 +664,7 @@ Public Class Match_Line : Inherits TaskParent
             labels(2) = "Correlation1 = " + Format(correlation1, fmt3) + " and correlation2 = " + Format(correlation2, fmt3)
 
             dst3 = src
-            dst3.Line(lpInput.p1, lpInput.p2, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst3, lpInput.p1, lpInput.p2)
             labels(3) = "OffsetX1 = " + CStr(offsetx1) + " OffsetY1 = " + CStr(offsety1) + " OffsetX2 = " + CStr(offsetX2) +
                        " OffsetY2 = " + CStr(offsetY2)
         End If
@@ -692,13 +692,13 @@ Public Class Match_Lines : Inherits TaskParent
             correlations.Add(match.correlation1)
             correlations.Add(match.correlation2)
             If match.correlation1 > task.fCorrThreshold And match.correlation2 > task.fCorrThreshold Then
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                DrawLine(dst2, lp.p1, lp.p2)
             End If
             dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
             'dst2.Rectangle(lp.gridRect2, task.highlight, task.lineWidth)
             'dst2.Rectangle(lp.nabeRect1, task.highlight, task.lineWidth)
             'dst2.Rectangle(lp.nabeRect2, task.highlight, task.lineWidth)
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst2, lp.p1, lp.p2)
             labels(2) = "Left rect has correlation " + Format(match.correlation1, fmt3) +
                               " and right rect has " + Format(match.correlation2, fmt3)
             Exit For

@@ -30,7 +30,7 @@ Public Class FPoly_Basics : Inherits TaskParent
 
         For i = 0 To sides.currPoly.Count - 1
             SetTrueText(CStr(i), sides.currPoly(i), 3)
-            dst2.Line(sides.currPoly(i), sides.currPoly((i + 1) Mod sides.currPoly.Count), task.highlight, task.lineWidth, task.lineType)
+            DrawLine(dst2, sides.currPoly(i), sides.currPoly((i + 1) Mod sides.currPoly.Count))
         Next
 
         Dim causes As String = ""

@@ -16,7 +16,7 @@ Public Class BackProject2D_Basics : Inherits TaskParent
         hist2d.Run(colorFmt.dst2)
         dst2 = hist2d.dst2
 
-        If standaloneTest() Then dst2.Rectangle(roi, white, task.lineWidth, task.lineType)
+        If standaloneTest() Then DrawRect(dst2, roi, white)
 
         Dim histogram As New cv.Mat
         If backProjectByGrid Then

@@ -14,7 +14,7 @@ Public Class MotionLine_Basics : Inherits TaskParent
         lineHistory.Add(task.lineRGB.lpList)
         For Each lplist In lineHistory
             For Each lp In lplist
-                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                DrawLine(dst3, lp.p1, lp.p2)
             Next
         Next
         If lineHistory.Count > task.gOptions.FrameHistory.Value Then lineHistory.RemoveAt(0)
