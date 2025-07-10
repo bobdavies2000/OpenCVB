@@ -7,7 +7,6 @@ Public Class TrackLine_Basics : Inherits TaskParent
     Dim lplist As List(Of lpData)
     Public lp As New lpData
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Track an individual line."
     End Sub
     Private Function restartLine(src As cv.Mat) As lpData
@@ -22,28 +21,30 @@ Public Class TrackLine_Basics : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         lplist = task.lineRGB.lpList
-        If lplist.Count = 0 Then Exit Sub
-
-        If match.correlation < task.fCorrThreshold Then
-            lp = restartLine(src)
+        If lplist.Count = 0 Then
+            SetTrueText("There are no lines present in the image.", 3)
+            Exit Sub
         End If
 
+        If match.correlation < task.fCorrThreshold Then lp = restartLine(src)
         match.Run(src)
 
         If match.correlation < task.fCorrThreshold Then
-            Dim histogram As New cv.Mat
-            cv.Cv2.CalcHist({task.lineRGB.lpLineMap(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
+            If lplist.Count > 1 Then
+                Dim histogram As New cv.Mat
+                cv.Cv2.CalcHist({task.lineRGB.lpLineMap(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
                              New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
 
-            Dim histArray(histogram.Total - 1) As Single
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-            Dim histList = histArray.ToList
-            lp = lplist(histList.IndexOf(histList.Max))
-            matchRect = lp.rect
-            match.template = src(matchRect)
-            match.correlation = 1
-
-            labels(3) = "Index of the current lp = " + CStr(lp.index - 1)
+                Dim histArray(histogram.Total - 1) As Single
+                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+                Dim histList = histArray.ToList
+                lp = lplist(histList.IndexOf(histList.Max))
+                matchRect = lp.rect
+                match.template = src(matchRect)
+                match.correlation = 1
+            Else
+                match.correlation = 0 ' force a restart
+            End If
         Else
             Dim deltaX = match.newRect.X - lp.rect.X
             Dim deltaY = match.newRect.Y - lp.rect.Y
@@ -56,7 +57,6 @@ Public Class TrackLine_Basics : Inherits TaskParent
             dst2 = src
             dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-            SetTrueText(Format(match.correlation, fmt3), match.newCenter)
         End If
 
         labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
