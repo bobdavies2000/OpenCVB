@@ -1226,7 +1226,7 @@ Public Class Contour_Sort : Inherits TaskParent
 
             contourLookup(contour.rect).SetTo(contour.ID, contour.mask)
             contourIDs.Add(contour.ID)
-            Select Case task.redOptions.trackingLabel
+            Select Case task.gOptions.TrackingLabel
                 Case "Mean Color"
                     cv.Cv2.MeanStdDev(task.color(contour.rect), colorMean, colorStdev, contour.mask)
                     dst2(contour.rect).SetTo(colorMean, contour.mask)

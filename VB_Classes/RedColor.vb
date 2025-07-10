@@ -1407,7 +1407,7 @@ Public Class RedColor_Flippers : Inherits TaskParent
     Public flipCells As New List(Of rcData)
     Public nonFlipCells As New List(Of rcData)
     Public Sub New()
-        task.redOptions.TrackingColor.Checked = True
+        task.gOptions.TrackingColor.Checked = True
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
         desc = "Identify the cells that are changing color because they were split or lost."
     End Sub
@@ -1491,7 +1491,7 @@ End Class
 
 Public Class RedColor_Contour : Inherits TaskParent
     Public Sub New()
-        task.redOptions.TrackingColor.Checked = True
+        task.gOptions.TrackingColor.Checked = True
         desc = "Add the contour to the cell mask in the RedColor_Basics output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1567,7 +1567,7 @@ End Class
 
 Public Class RedColor_Motion : Inherits TaskParent
     Public Sub New()
-        task.redOptions.TrackingColor.Checked = True
+        task.gOptions.TrackingColor.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "If a RedCloud cell has no motion, it is preserved."
     End Sub

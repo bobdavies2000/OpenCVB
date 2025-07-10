@@ -76,7 +76,6 @@ Public Class OptionsRedColor
         End Select
 
         task.redOptions.setBitReductionBar(5)
-        TrackingColor.Checked = True
 
         Me.Left = 0
         Me.Top = 30
@@ -152,17 +151,4 @@ Public Class OptionsRedColor
     Public Function getBitReductionBar() As Integer
         Return BitwiseReductionBar.Value
     End Function
-
-
-
-
-
-
-
-    Private Sub TrackingMeanColor_CheckedChanged(sender As Object, e As EventArgs) Handles TrackingMeanColor.CheckedChanged
-        trackingLabel = TrackingMeanColor.Text
-    End Sub
-    Private Sub TrackingColor_CheckedChanged(sender As Object, e As EventArgs) Handles TrackingColor.CheckedChanged
-        trackingLabel = TrackingColor.Text
-    End Sub
 End Class

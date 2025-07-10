@@ -46,6 +46,8 @@ Partial Class OptionsGlobal
         Me.MaxDepthBar = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.ColorSource = New System.Windows.Forms.ComboBox()
+        Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.DepthGroupBox = New System.Windows.Forms.GroupBox()
         Me.DepthCorrelations = New System.Windows.Forms.RadioButton()
         Me.ColorizedDepth = New System.Windows.Forms.RadioButton()
@@ -84,8 +86,9 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.ColorSource = New System.Windows.Forms.ComboBox()
-        Me.ColorSourceLabel = New System.Windows.Forms.Label()
+        Me.ColoringGroup = New System.Windows.Forms.GroupBox()
+        Me.TrackingColor = New System.Windows.Forms.RadioButton()
+        Me.TrackingMeanColor = New System.Windows.Forms.RadioButton()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DepthDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -101,6 +104,7 @@ Partial Class OptionsGlobal
         Me.GeometrySettings.SuspendLayout()
         CType(Me.DotSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LineWidth, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.ColoringGroup.SuspendLayout()
         Me.SuspendLayout()
         '
         'MinMaxDepth
@@ -348,6 +352,7 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.ColoringGroup)
         Me.GroupBox2.Controls.Add(Me.ColorSource)
         Me.GroupBox2.Controls.Add(Me.ColorSourceLabel)
         Me.GroupBox2.Controls.Add(Me.DepthGroupBox)
@@ -379,11 +384,28 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
         '
+        'ColorSource
+        '
+        Me.ColorSource.FormattingEnabled = True
+        Me.ColorSource.Location = New System.Drawing.Point(528, 55)
+        Me.ColorSource.Name = "ColorSource"
+        Me.ColorSource.Size = New System.Drawing.Size(222, 28)
+        Me.ColorSource.TabIndex = 80
+        '
+        'ColorSourceLabel
+        '
+        Me.ColorSourceLabel.AutoSize = True
+        Me.ColorSourceLabel.Location = New System.Drawing.Point(384, 58)
+        Me.ColorSourceLabel.Name = "ColorSourceLabel"
+        Me.ColorSourceLabel.Size = New System.Drawing.Size(131, 20)
+        Me.ColorSourceLabel.TabIndex = 79
+        Me.ColorSourceLabel.Text = "RedColor Source"
+        '
         'DepthGroupBox
         '
         Me.DepthGroupBox.Controls.Add(Me.DepthCorrelations)
         Me.DepthGroupBox.Controls.Add(Me.ColorizedDepth)
-        Me.DepthGroupBox.Location = New System.Drawing.Point(332, 265)
+        Me.DepthGroupBox.Location = New System.Drawing.Point(332, 219)
         Me.DepthGroupBox.Name = "DepthGroupBox"
         Me.DepthGroupBox.Size = New System.Drawing.Size(194, 118)
         Me.DepthGroupBox.TabIndex = 78
@@ -774,22 +796,38 @@ Partial Class OptionsGlobal
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'ColorSource
+        'ColoringGroup
         '
-        Me.ColorSource.FormattingEnabled = True
-        Me.ColorSource.Location = New System.Drawing.Point(528, 55)
-        Me.ColorSource.Name = "ColorSource"
-        Me.ColorSource.Size = New System.Drawing.Size(222, 28)
-        Me.ColorSource.TabIndex = 80
+        Me.ColoringGroup.Controls.Add(Me.TrackingColor)
+        Me.ColoringGroup.Controls.Add(Me.TrackingMeanColor)
+        Me.ColoringGroup.Location = New System.Drawing.Point(332, 363)
+        Me.ColoringGroup.Name = "ColoringGroup"
+        Me.ColoringGroup.Size = New System.Drawing.Size(205, 103)
+        Me.ColoringGroup.TabIndex = 81
+        Me.ColoringGroup.TabStop = False
+        Me.ColoringGroup.Text = "RedCloud Output Color"
         '
-        'ColorSourceLabel
+        'TrackingColor
         '
-        Me.ColorSourceLabel.AutoSize = True
-        Me.ColorSourceLabel.Location = New System.Drawing.Point(384, 58)
-        Me.ColorSourceLabel.Name = "ColorSourceLabel"
-        Me.ColorSourceLabel.Size = New System.Drawing.Size(131, 20)
-        Me.ColorSourceLabel.TabIndex = 79
-        Me.ColorSourceLabel.Text = "RedColor Source"
+        Me.TrackingColor.AutoSize = True
+        Me.TrackingColor.Location = New System.Drawing.Point(15, 59)
+        Me.TrackingColor.Name = "TrackingColor"
+        Me.TrackingColor.Size = New System.Drawing.Size(135, 24)
+        Me.TrackingColor.TabIndex = 3
+        Me.TrackingColor.TabStop = True
+        Me.TrackingColor.Text = "Tracking Color"
+        Me.TrackingColor.UseVisualStyleBackColor = True
+        '
+        'TrackingMeanColor
+        '
+        Me.TrackingMeanColor.AutoSize = True
+        Me.TrackingMeanColor.Location = New System.Drawing.Point(15, 29)
+        Me.TrackingMeanColor.Name = "TrackingMeanColor"
+        Me.TrackingMeanColor.Size = New System.Drawing.Size(115, 24)
+        Me.TrackingMeanColor.TabIndex = 0
+        Me.TrackingMeanColor.TabStop = True
+        Me.TrackingMeanColor.Text = "Mean Color"
+        Me.TrackingMeanColor.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
         '
@@ -823,6 +861,8 @@ Partial Class OptionsGlobal
         Me.GeometrySettings.PerformLayout()
         CType(Me.DotSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LineWidth, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ColoringGroup.ResumeLayout(False)
+        Me.ColoringGroup.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -892,4 +932,7 @@ Partial Class OptionsGlobal
     Friend WithEvents ColorizedDepth As Windows.Forms.RadioButton
     Friend WithEvents ColorSource As Windows.Forms.ComboBox
     Friend WithEvents ColorSourceLabel As Windows.Forms.Label
+    Friend WithEvents ColoringGroup As Windows.Forms.GroupBox
+    Friend WithEvents TrackingColor As Windows.Forms.RadioButton
+    Friend WithEvents TrackingMeanColor As Windows.Forms.RadioButton
 End Class

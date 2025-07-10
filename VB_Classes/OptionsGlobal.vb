@@ -4,6 +4,7 @@ Public Class OptionsGlobal
     Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
     Public heartBeatSeconds = 1
+    Public trackingLabel As String
     Public colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions",
                                            "Binarize_DepthTiers", "EdgeLine_Basics", "Hist3DColor_Basics",
                                            "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
@@ -143,6 +144,7 @@ Public Class OptionsGlobal
             ColorSource.Items.Add(method)
         Next
         ColorSource.SelectedItem = "EdgeLine_Basics"
+        TrackingColor.Checked = True
 
         Me.Left = 0
         Me.Top = 60
@@ -379,6 +381,17 @@ Public Class OptionsGlobal
 
 
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ColorSource.SelectedIndexChanged
+        task.optionsChanged = True
+    End Sub
+
+
+
+    Private Sub TrackingMeanColor_CheckedChanged(sender As Object, e As EventArgs) Handles TrackingMeanColor.CheckedChanged
+        trackingLabel = TrackingMeanColor.Text
+        task.optionsChanged = True
+    End Sub
+    Private Sub TrackingColor_CheckedChanged_1(sender As Object, e As EventArgs) Handles TrackingColor.CheckedChanged
+        trackingLabel = TrackingColor.Text
         task.optionsChanged = True
     End Sub
 End Class

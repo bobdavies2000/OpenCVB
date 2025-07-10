@@ -331,7 +331,7 @@ Public Class RedCell_Generate : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            labels(2) = CStr(task.redC.rcList.Count) + " total cells (shown with '" + task.redOptions.trackingLabel + "' and " +
+            labels(2) = CStr(task.redC.rcList.Count) + " total cells (shown with '" + task.gOptions.TrackingLabel + "' and " +
                         CStr(task.redC.rcList.Count - rcNewCount) + " matched to previous frame"
         End If
         dst2 = RebuildRCMap(sortedCells)

@@ -5689,7 +5689,7 @@ End Class
 Public Class XO_TrackLine_Basics : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        task.redOptions.TrackingColor.Checked = True
+        task.gOptions.TrackingColor.Checked = True
         desc = "Track the line regions with RedCloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

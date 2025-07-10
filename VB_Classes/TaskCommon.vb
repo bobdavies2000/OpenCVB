@@ -50,12 +50,12 @@ Public Module vbc
         task.redC.rcList.Clear()
         task.redC.rcList.Add(New rcData) ' placeholder rcData so map is correct.
         task.redC.rcMap.SetTo(0)
-        Static saveColorSetting = task.redOptions.trackingLabel
+        Static saveColorSetting = task.gOptions.TrackingLabel
         For Each rc In sortedCells.Values
             rc.index = task.redC.rcList.Count
 
-            If saveColorSetting <> task.redOptions.trackingLabel Then rc.color = black
-            Select Case task.redOptions.trackingLabel
+            If saveColorSetting <> task.gOptions.TrackingLabel Then rc.color = black
+            Select Case task.gOptions.TrackingLabel
                 Case "Mean Color"
                     Dim colorStdev As cv.Scalar
                     cv.Cv2.MeanStdDev(task.color(rc.rect), rc.color, colorStdev, rc.mask)
@@ -68,7 +68,7 @@ Public Module vbc
             DisplayCells.Circle(rc.maxDStable, task.DotSize, task.highlight, -1)
             If rc.index >= 255 Then Exit For
         Next
-        saveColorSetting = task.redOptions.trackingLabel
+        saveColorSetting = task.gOptions.TrackingLabel
         task.redC.rcMap.SetTo(0, task.noDepthMask)
         Return DisplayCells()
     End Function
