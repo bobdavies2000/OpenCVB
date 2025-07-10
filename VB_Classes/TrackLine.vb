@@ -16,14 +16,12 @@ Public Class TrackLine_Basics : Inherits TaskParent
         If match.correlation < task.fCorrThreshold Then
             lp = lplist(0)
             For Each lp In lplist
-                If lp.gravityProxy Then
-                    match.template = src(lp.rect)
-                    Exit For
-                End If
+                If lp.gravityProxy Then Exit For
             Next
+            match.template = src(lp.rect)
         End If
 
-        match.Run(src)
+        match.Run(src.Clone)
 
         If match.correlation < task.fCorrThreshold Then
             If lplist.Count > 1 Then

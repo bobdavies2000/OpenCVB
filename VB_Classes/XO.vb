@@ -311,12 +311,12 @@ Public Class XO_Horizon_Validate : Inherits TaskParent
             rightTemplate = src(r)
         Else
             Dim r = ValidateRect(New cv.Rect(ptLeft.X - templatePad, ptLeft.Y - templatePad, templateSize, templateSize))
-            match.template = leftTemplate
+            match.template = leftTemplate.Clone
             match.Run(src)
             ptLeft = match.newCenter
 
             r = ValidateRect(New cv.Rect(ptRight.X - templatePad, ptRight.Y - templatePad, templateSize, templateSize))
-            match.template = leftTemplate
+            match.template = leftTemplate.Clone
             match.Run(src)
             ptLeft = match.newCenter
         End If
@@ -3632,7 +3632,7 @@ Public Class XO_FeatureLine_LongestKNN : Inherits TaskParent
         gline = glines.updateGLine(src, gline, p1, p2)
 
         Dim rect = ValidateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
-        match.template = src(rect)
+        match.template = src(rect).Clone
         match.Run(src)
         If match.correlation >= options.correlationThreshold Then
             dst3 = match.dst0.Resize(dst3.Size)
@@ -5251,7 +5251,7 @@ Public Class XO_FeatureLine_Basics : Inherits TaskParent
 
             Dim matchTemplate As New cv.Mat
             cv.Cv2.HConcat(src(firstRect), src(lastRect), matchTemplate)
-            match.template = matchTemplate
+            match.template = matchTemplate.Clone
         End If
 
         labels(3) = "Currently available lines."
@@ -5773,7 +5773,7 @@ Public Class XO_TrackLine_BasicsSimple : Inherits TaskParent
             If lplist(0).length > lp.length Then
                 lp = lplist(0)
                 matchRect = lp.rect
-                match.template = src(matchRect)
+                match.template = src(matchRect).Clone
             End If
         End If
 
@@ -5880,7 +5880,7 @@ Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
         For Each lpTemp In lplist
             If lpTemp.gravityProxy Then
                 matchRect = lpTemp.rect
-                match.template = src(matchRect)
+                match.template = src(matchRect).Clone
                 Return lpTemp
             End If
         Next

@@ -2,44 +2,38 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 Imports System.Windows.Forms
 Public Class Match_Basics : Inherits TaskParent
-    Public template As cv.Mat ' Provide this
-    Public correlation As Single ' Resulting Correlation coefficient
+    Public template As cv.Mat ' must provide this!
+    Public correlation As Single
     Public newCenter As cv.Point
     Public newCenter2F As cv.Point2f
     Public newRect As New cv.Rect
-    Dim rFit As New Rectangle_Fit
     Public Sub New()
-        If standalone Then task.gOptions.DebugCheckBox.Checked = True
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         desc = "Find the requested template in an image.  Managing template is responsibility of caller " +
                "(allows multiple targets per image.)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone And task.algorithmPrep = False Then
-            If task.gOptions.DebugCheckBox.Checked Then
-                task.gOptions.DebugCheckBox.Checked = False
-                Dim inputRect = If(task.firstPass, New cv.Rect(25, 25, 25, 25), ValidateRect(task.drawRect))
-                template = src(inputRect)
-            End If
+            SetTrueText("Match is called often so no need for standalone test.")
+            Exit Sub
         End If
 
         cv.Cv2.MatchTemplate(template, src, dst0, cv.TemplateMatchModes.CCoeffNormed)
         Dim mm = GetMinMax(dst0)
 
         correlation = mm.maxVal
-        labels(2) = "Template (at right) has " + Format(correlation,) + " Correlation to the src input"
+        labels(2) = "Template (at right) has " + Format(correlation, fmt3) + " Correlation to the src input"
         Dim w = template.Width, h = template.Height
         newCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
         newCenter2F = New cv.Point2f(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
         newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
         If standaloneTest() Then
-            rFit.Run(template)
-            dst3.SetTo(0)
-            dst3 = rFit.dst2
-
             dst2 = src
             dst2.Circle(newCenter2F, task.DotSize, white, -1, task.lineType)
             dst2.Rectangle(newRect, task.highlight, task.lineWidth)
+            If standalone Then
+                Dim lp = task.gravityBasics.gravityRGB
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
+            End If
         End If
         labels(3) = "Template to compare the src input to"
     End Sub
@@ -58,7 +52,7 @@ Public Class Match_Duplicate : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         If task.drawRect.Width = 0 Then task.drawRect = New cv.Rect(10, 10, 50, 50)
-        If task.optionsChanged Then match.template = src(task.drawRect)
+        If task.optionsChanged Then match.template = src(task.drawRect).Clone
         match.Run(src(task.drawRect))
         labels(2) = "Correlation coefficient = " + Format(match.correlation, fmt3)
     End Sub
@@ -642,7 +636,7 @@ Public Class Match_Line : Inherits TaskParent
             End If
         End If
 
-        match.template = lpInput.template1
+        match.template = lpInput.template1.Clone
         Dim nabeRect1 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lpInput.p1.Y, lpInput.p1.X))
         Dim nabeRect2 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lpInput.p2.Y, lpInput.p2.X))
 
@@ -652,7 +646,7 @@ Public Class Match_Line : Inherits TaskParent
         Dim offsety1 = match.newRect.TopLeft.Y - task.cellSize
         Dim p1 = New cv.Point(lpInput.p1.X + offsetx1, lpInput.p1.Y + offsety1)
 
-        match.template = lpInput.template2
+        match.template = lpInput.template2.Clone
         match.Run(src(nabeRect2))
         correlation2 = match.correlation
         Dim offsetX2 = match.newRect.TopLeft.X - task.cellSize
@@ -712,60 +706,5 @@ Public Class Match_Lines : Inherits TaskParent
 
         dst3 = task.lineRGB.dst3
         labels(3) = task.lineRGB.labels(3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Match_GravityRGB : Inherits TaskParent
-    Public lpInput As lpData
-    Public template As cv.Mat
-    Dim match As New Match_Basics
-    Public Sub New()
-        task.featureOptions.MatchCorrSlider.Value = 90
-        desc = "Track one of the end points of the Gravity RGB vector"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If template Is Nothing Then
-            lpInput = task.gravityBasics.gravityRGB
-            template = lpInput.template1
-            If template.Width = 0 Then
-                template = Nothing
-                SetTrueText("lpInput template was not found.", 3)
-                Exit Sub
-            End If
-        End If
-
-        Dim correlations As New SortedList(Of Single, cv.Point)(New compareAllowIdenticalSingleInverted)
-        Dim nabeRect1 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lpInput.p1.Y, lpInput.p1.X))
-        For y = 4 To 12
-            For x = 4 To 12
-                Dim r = New cv.Rect(nabeRect1.X + x, nabeRect1.Y + y, task.cellSize, task.cellSize)
-                match.template = lpInput.template1
-                match.Run(src(r))
-                correlations.Add(match.correlation, New cv.Point(x, y))
-            Next
-        Next
-
-        Dim correlation = correlations.ElementAt(0).Key
-        Dim pt = correlations.ElementAt(0).Value
-        labels(2) = "There were " + CStr(correlations.Count) + " attempts to match the template in the neighborhood.  " +
-                    "Best correlation was " + Format(correlation, fmt3) + " at " + pt.ToString
-
-        Dim nabeRect2 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lpInput.p2.Y, lpInput.p2.X))
-        Dim tmp As New cv.Mat
-        cv.Cv2.HConcat(lpInput.template1, src(nabeRect2), tmp)
-        Dim sz = New cv.Size(dst2.Width, tmp.Height * dst2.Width / tmp.Width)
-        tmp = tmp.Resize(sz)
-        tmp.CopyTo(dst2(New cv.Rect(0, 0, sz.Width, sz.Height)))
-
-        If correlation > task.fCorrThreshold Then template = src(nabeRect2) Else template = Nothing
-
-        If task.heartBeat Then strOut = "correlations (List): " & String.Join(" | " + vbCrLf, correlations)
-        SetTrueText(strOut, 3)
     End Sub
 End Class

@@ -335,8 +335,8 @@ Public Class Rectangle_Fit : Inherits TaskParent
         Else
             sz = New cv.Size(w * dst1.Width, w * dst1.Height)
         End If
-        Dim tmp = dst1.Resize(sz)
-        If tmp.Channels = 1 Then tmp = tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        tmp.CopyTo(dst2(New cv.Rect(0, 0, sz.Width, sz.Height)))
+        dst0 = dst1.Resize(sz)
+        If dst0.Channels = 1 Then dst0 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2(New cv.Rect(0, 0, sz.Width, sz.Height)) = dst0.Clone
     End Sub
 End Class

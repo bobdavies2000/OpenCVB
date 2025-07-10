@@ -116,7 +116,7 @@ Public Class Math_RGBCorrelation : Inherits TaskParent
         match.Run(split(1))
         Dim blueGreenCorrelation = "Blue-Green " + match.labels(2)
 
-        match.template = split(2)
+        match.template = split(1)
         match.Run(split(1))
         Dim redGreenCorrelation = "Red-Green " + match.labels(2)
 

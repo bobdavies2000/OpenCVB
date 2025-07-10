@@ -981,7 +981,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
         Dim matchRects As New List(Of cv.Rect)
         For i = 0 To featureRects.Count - 1
             Dim roi = featureRects(i)
-            match.template = saveMat(roi)
+            match.template = saveMat(roi).Clone
             match.Run(src(searchRects(i)))
             dst3.Rectangle(match.newRect, task.highlight, task.lineWidth)
             matchRects.Add(match.newRect)
@@ -1048,7 +1048,7 @@ Public Class Motion_TopFeatures : Inherits TaskParent
         Dim matchRects As New List(Of cv.Rect)
         For i = 0 To featureRects.Count - 1
             Dim roi = featureRects(i)
-            match.template = dst1(roi)
+            match.template = dst1(roi).Clone
             match.Run(src(searchRects(i)))
             dst3.Rectangle(match.newRect, task.highlight, task.lineWidth)
             matchRects.Add(match.newRect)
