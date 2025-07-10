@@ -610,10 +610,8 @@ Public Class lpData
     Public ep2 As cv.Point2f ' extended line endpoints - goes to the edge of the image.
     Public length As Single
     Public rect As cv.Rect
-    Public roRect As cv.RotatedRect
     Public vertical As Boolean ' false is horizontal
     Public slope As Single
-    Public yIntercept As Single
     Public center As cv.Point2f
     Public template1 As New cv.Mat
     Public template2 As New cv.Mat
@@ -648,7 +646,7 @@ Public Class lpData
         Dim outAngle = CType(angleRadians * (180.0 / Math.PI), Single)
         If outAngle >= 90.0 Then outAngle -= 180.0
         If outAngle < -90.0 Then outAngle += 180.0
-        roRect = New cv.RotatedRect(center, outSize, outAngle)
+        Dim roRect = New cv.RotatedRect(center, outSize, outAngle)
         rect = ValidateRect(roRect.BoundingRect)
         If rect.Width <= 15 Then
             rect = ValidateRect(New cv.Rect(rect.X - (20 - rect.Width) / 2, rect.Y, 20, rect.Height))
@@ -681,7 +679,7 @@ Public Class lpData
         Else
             slope = (p1.Y - p2.Y) / (p1.X - p2.X)
         End If
-        yIntercept = -p1.X * slope + p1.Y
+        ' yIntercept = -p1.X * slope + p1.Y
 
         length = p1.DistanceTo(p2)
         CalculateRotatedRectFromLine()

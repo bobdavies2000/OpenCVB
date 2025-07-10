@@ -6,7 +6,6 @@ Public Class LineRGB_Basics : Inherits TaskParent
     Public rawLines As New LineRGB_Raw
     Dim lineAges As New LineRGB_OrderByAge
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
     Private Function lpMotionCheck(lp As lpData) As Boolean
@@ -55,11 +54,7 @@ Public Class LineRGB_Basics : Inherits TaskParent
         dst2 = lineAges.dst2
         If standaloneTest() Then
             For Each lp In lpList
-                If task.toggleOn Then
-                    SetTrueText("Age: " + CStr(lp.age) + vbCrLf + "ID: " + CStr(lp.ID), lp.p1)
-                Else
-                    SetTrueText("Age: " + CStr(lp.age) + vbCrLf + "ID: " + CStr(lp.ID), lp.p2)
-                End If
+                SetTrueText("Age: " + CStr(lp.age) + vbCrLf, lp.center)
             Next
         End If
 
@@ -70,7 +65,6 @@ Public Class LineRGB_Basics : Inherits TaskParent
             lpMap.Line(lpList(i).p1, lpList(i).p2, lpList(i).index + 1, task.lineWidth, cv.LineTypes.Link8)
         Next
 
-        dst1 = ShowPaletteNoZero(lpMap)
         labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count)
     End Sub
 End Class
@@ -115,10 +109,10 @@ Public Class LineRGB_Raw : Inherits TaskParent
         Dim removelist As New List(Of Integer)
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
-            Dim rect1 = lp.roRect.BoundingRect
+            Dim rect1 = lp.rect
             For j = i + 1 To lpList.Count - 1
                 Dim lpTmp = lpList(j)
-                Dim rect2 = lpTmp.roRect.BoundingRect
+                Dim rect2 = lpTmp.rect
                 If rect1.IntersectsWith(rect2) Then
                     Dim deltaX1 = Math.Abs(lp.ep1.X - lpTmp.ep1.X)
                     Dim deltaX2 = Math.Abs(lp.ep2.X - lpTmp.ep2.X)

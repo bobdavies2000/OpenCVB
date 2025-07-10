@@ -4,23 +4,13 @@ Public Class Gravity_Basics : Inherits TaskParent
     Dim gravityRaw As New Gravity_BasicsRaw
     Public trackLine As New TrackLine_Basics
     Public gravityRGB As lpData
-    Dim nearest As New LineRGB_FindNearest
     Public Sub New()
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
-    End Sub
-    Private Shared Sub showVec(dst As cv.Mat, vec As lpData)
-        dst.Line(vec.p1, vec.p2, task.highlight, task.lineWidth * 2, task.lineType)
-        Dim gIndex = task.grid.gridMap.Get(Of Single)(vec.p1.Y, vec.p1.X)
-        Dim firstRect = task.gridNabeRects(gIndex)
-        gIndex = task.grid.gridMap.Get(Of Single)(vec.p2.Y, vec.p2.X)
-        Dim lastRect = task.gridNabeRects(gIndex)
-        dst.Rectangle(firstRect, task.highlight, task.lineWidth)
-        dst.Rectangle(lastRect, task.highlight, task.lineWidth)
     End Sub
     Public Shared Sub showVectors(dst As cv.Mat)
         dst.Line(task.gravityVec.p1, task.gravityVec.p2, white, task.lineWidth, task.lineType)
         dst.Line(task.horizonVec.p1, task.horizonVec.p2, white, task.lineWidth, task.lineType)
-        If task.gravityBasics.gravityRGB IsNot Nothing Then showVec(dst, task.gravityBasics.gravityRGB)
+        dst.Line(task.gravityBasics.gravityRGB.p1, task.gravityBasics.gravityRGB.p2, task.highlight, task.lineWidth + 1, task.lineType)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
