@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Public Class LineRGB_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public lpLineMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public rawLines As New LineRGB_Raw
     Dim lineAges As New LineRGB_OrderByAge
     Public Sub New()
@@ -64,13 +64,13 @@ Public Class LineRGB_Basics : Inherits TaskParent
         End If
 
         lpRectMap.SetTo(0)
-        lpLineMap.SetTo(0)
+        lpMap.SetTo(0)
         For i = lpList.Count - 1 To 0 Step -1
             lpRectMap.Rectangle(lpList(i).rect, i + 1, -1)
-            lpLineMap.Line(lpList(i).p1, lpList(i).p2, lpList(i).index + 1, task.lineWidth, cv.LineTypes.Link8)
+            lpMap.Line(lpList(i).p1, lpList(i).p2, lpList(i).index + 1, task.lineWidth, cv.LineTypes.Link8)
         Next
 
-        dst1 = ShowPaletteNoZero(lpLineMap)
+        dst1 = ShowPaletteNoZero(lpMap)
         labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count)
     End Sub
 End Class
