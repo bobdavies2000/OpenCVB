@@ -1706,13 +1706,6 @@ public:
 	Options_RedTrack() {
 	}
 };
-class Options_Reduction {
-public:
-	bool reduceXYZ[3] = {true, true, true};
-	void Run() {}
-	Options_Reduction() {
-	}
-};
 class Options_Retina {
 public:
 	bool useLogSampling = false;
@@ -2198,5 +2191,18 @@ class Options_RedCloud {
 public:
 	void Run() {}
 	Options_RedCloud() {
+	}
+};
+class Options_ReductionXYZ {
+public:
+	bool reduceXYZ[3] = {true, true, true};
+	void Run() {}
+	Options_ReductionXYZ() {
+	}
+};
+class Options_Reduction {
+public:
+	void Run() {}
+	Options_Reduction() {
 	}
 };

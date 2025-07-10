@@ -22,10 +22,6 @@ Partial Class OptionsRedColor
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.ReductionTypeGroup = New System.Windows.Forms.GroupBox()
-        Me.NoReduction = New System.Windows.Forms.RadioButton()
-        Me.BitwiseReduction = New System.Windows.Forms.RadioButton()
-        Me.UseSimpleReduction = New System.Windows.Forms.RadioButton()
         Me.ReductionSliders = New System.Windows.Forms.GroupBox()
         Me.bitwiseLabel = New System.Windows.Forms.Label()
         Me.BitwiseReductionBar = New System.Windows.Forms.TrackBar()
@@ -38,57 +34,11 @@ Partial Class OptionsRedColor
         Me.ColoringGroup = New System.Windows.Forms.GroupBox()
         Me.TrackingColor = New System.Windows.Forms.RadioButton()
         Me.TrackingMeanColor = New System.Windows.Forms.RadioButton()
-        Me.ReductionTypeGroup.SuspendLayout()
         Me.ReductionSliders.SuspendLayout()
         CType(Me.BitwiseReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ColoringGroup.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'ReductionTypeGroup
-        '
-        Me.ReductionTypeGroup.Controls.Add(Me.NoReduction)
-        Me.ReductionTypeGroup.Controls.Add(Me.BitwiseReduction)
-        Me.ReductionTypeGroup.Controls.Add(Me.UseSimpleReduction)
-        Me.ReductionTypeGroup.Location = New System.Drawing.Point(36, 321)
-        Me.ReductionTypeGroup.Name = "ReductionTypeGroup"
-        Me.ReductionTypeGroup.Size = New System.Drawing.Size(220, 129)
-        Me.ReductionTypeGroup.TabIndex = 5
-        Me.ReductionTypeGroup.TabStop = False
-        Me.ReductionTypeGroup.Text = "Reduction Options"
-        '
-        'NoReduction
-        '
-        Me.NoReduction.AutoSize = True
-        Me.NoReduction.Location = New System.Drawing.Point(15, 89)
-        Me.NoReduction.Name = "NoReduction"
-        Me.NoReduction.Size = New System.Drawing.Size(131, 24)
-        Me.NoReduction.TabIndex = 4
-        Me.NoReduction.TabStop = True
-        Me.NoReduction.Text = "No Reduction"
-        Me.NoReduction.UseVisualStyleBackColor = True
-        '
-        'BitwiseReduction
-        '
-        Me.BitwiseReduction.AutoSize = True
-        Me.BitwiseReduction.Location = New System.Drawing.Point(15, 60)
-        Me.BitwiseReduction.Name = "BitwiseReduction"
-        Me.BitwiseReduction.Size = New System.Drawing.Size(194, 24)
-        Me.BitwiseReduction.TabIndex = 3
-        Me.BitwiseReduction.TabStop = True
-        Me.BitwiseReduction.Text = "Use Bitwise Reduction"
-        Me.BitwiseReduction.UseVisualStyleBackColor = True
-        '
-        'UseSimpleReduction
-        '
-        Me.UseSimpleReduction.AutoSize = True
-        Me.UseSimpleReduction.Location = New System.Drawing.Point(15, 29)
-        Me.UseSimpleReduction.Name = "UseSimpleReduction"
-        Me.UseSimpleReduction.Size = New System.Drawing.Size(192, 24)
-        Me.UseSimpleReduction.TabIndex = 0
-        Me.UseSimpleReduction.TabStop = True
-        Me.UseSimpleReduction.Text = "Use Simple Reduction"
-        Me.UseSimpleReduction.UseVisualStyleBackColor = True
         '
         'ReductionSliders
         '
@@ -220,11 +170,8 @@ Partial Class OptionsRedColor
         Me.Controls.Add(Me.ColorSource)
         Me.Controls.Add(Me.ColorSourceLabel)
         Me.Controls.Add(Me.ReductionSliders)
-        Me.Controls.Add(Me.ReductionTypeGroup)
         Me.Name = "OptionsRedColor"
         Me.Text = "OptionsRedCloud"
-        Me.ReductionTypeGroup.ResumeLayout(False)
-        Me.ReductionTypeGroup.PerformLayout()
         Me.ReductionSliders.ResumeLayout(False)
         Me.ReductionSliders.PerformLayout()
         CType(Me.BitwiseReductionBar, System.ComponentModel.ISupportInitialize).EndInit()
@@ -235,9 +182,6 @@ Partial Class OptionsRedColor
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents ReductionTypeGroup As System.Windows.Forms.GroupBox
-    Friend WithEvents BitwiseReduction As System.Windows.Forms.RadioButton
-    Friend WithEvents UseSimpleReduction As System.Windows.Forms.RadioButton
     Friend WithEvents ReductionSliders As System.Windows.Forms.GroupBox
     Friend WithEvents bitwiseLabel As System.Windows.Forms.Label
     Friend WithEvents BitwiseReductionBar As System.Windows.Forms.TrackBar
@@ -245,7 +189,6 @@ Partial Class OptionsRedColor
     Friend WithEvents ColorLabel As System.Windows.Forms.Label
     Friend WithEvents SimpleReductionBar As System.Windows.Forms.TrackBar
     Friend WithEvents SimpleReduceLabel As System.Windows.Forms.Label
-    Friend WithEvents NoReduction As System.Windows.Forms.RadioButton
     Friend WithEvents ColorSourceLabel As System.Windows.Forms.Label
     Friend WithEvents ColorSource As System.Windows.Forms.ComboBox
     Friend WithEvents ColoringGroup As Windows.Forms.GroupBox

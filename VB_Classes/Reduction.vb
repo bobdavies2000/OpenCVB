@@ -2,19 +2,22 @@ Imports cv = OpenCvSharp
 Public Class Reduction_Basics : Inherits TaskParent
     Public classCount As Integer
     Public alwaysDisplay As Boolean
+    Public options As New Options_Reduction
     Public Sub New()
         desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        If task.redOptions.reductionType = "Use Bitwise Reduction" Then
+        If options.bitwiseReduction Then
             Dim bits = task.redOptions.getBitReductionBar()
             classCount = 255 / Math.Pow(2, bits)
             Dim zeroBits = Math.Pow(2, bits) - 1
             dst1 = src And New cv.Mat(src.Size(), src.Type, cv.Scalar.All(255 - zeroBits))
             dst1 = dst1 / zeroBits
-        ElseIf task.redOptions.reductionType = "Use Simple Reduction" Then
+        ElseIf options.simpleReduction Then
             Dim reductionVal = task.redOptions.SimpleReductionBar.Value
             classCount = Math.Ceiling(255 / reductionVal)
 
@@ -88,35 +91,10 @@ End Class
 
 
 
-Public Class Reduction_PointCloud : Inherits TaskParent
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        task.redOptions.checkSimpleReduction(True)
-        task.redOptions.setBitReductionBar(20)
-        labels = {"", "", "8-bit reduced depth", "Palettized output of the different depth levels found"}
-        desc = "Use reduction to smooth depth data"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pcSplit(2)
-
-        src *= 255 / task.MaxZmeters
-        src.ConvertTo(dst0, cv.MatType.CV_32S)
-        reduction.Run(dst0)
-        reduction.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
-
-        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst3 = ShowPalette(dst2 + 1)
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Reduction_XYZ : Inherits TaskParent
     Dim reduction As New Reduction_Basics
-    Dim options As New Options_Reduction
+    Dim options As New Options_ReductionXYZ
     Public Sub New()
         task.redOptions.SimpleReductionBar.Maximum = 1000
         task.redOptions.setBitReductionBar(400)
@@ -142,38 +120,6 @@ Public Class Reduction_XYZ : Inherits TaskParent
         SetTrueText("Task.PointCloud (or 32fc3 input) has been reduced and is in dst3")
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-Public Class Reduction_Edges : Inherits TaskParent
-    Dim edges As New Edge_Laplacian
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        task.redOptions.checkSimpleReduction(True)
-        desc = "Get the edges after reducing the image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        reduction.Run(src)
-        dst2 = reduction.dst2 * 255 / reduction.classCount
-
-        Dim reductionRequested = True
-        If task.redOptions.reductionType = "No Reduction" Then reductionRequested = False
-        labels(2) = If(reductionRequested, "Reduced image", "Original image")
-        labels(3) = If(reductionRequested, "Laplacian edges of reduced image", "Laplacian edges of original image")
-        edges.Run(dst2)
-        dst3 = edges.dst2
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -255,5 +201,52 @@ Public Class Reduction_MotionTest : Inherits TaskParent
             diff.Run(dst3)
             dst1 = diff.dst2
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Reduction_PointCloud : Inherits TaskParent
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        OptionParent.findRadio("Use Simple Reduction").Checked = True
+        task.redOptions.setBitReductionBar(20)
+        labels = {"", "", "8-bit reduced depth", "Palettized output of the different depth levels found"}
+        desc = "Use reduction to smooth depth data"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pcSplit(2)
+
+        src *= 255 / task.MaxZmeters
+        src.ConvertTo(dst0, cv.MatType.CV_32S)
+        reduction.Run(dst0)
+        reduction.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
+
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst3 = ShowPalette(dst2 + 1)
+    End Sub
+End Class
+
+
+
+
+Public Class Reduction_Edges : Inherits TaskParent
+    Dim edges As New Edge_Laplacian
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        OptionParent.findRadio("Use Simple Reduction").Checked = True
+        desc = "Get the edges after reducing the image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        reduction.Run(src)
+        dst2 = reduction.dst2 * 255 / reduction.classCount
+
+        labels(2) = If(reduction.options.noReduction, "Reduced image", "Original image")
+        labels(3) = If(reduction.options.noReduction, "Laplacian edges of reduced image", "Laplacian edges of original image")
+        edges.Run(dst2)
+        dst3 = edges.dst2
     End Sub
 End Class

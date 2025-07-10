@@ -6398,30 +6398,6 @@ End Class
 
 
 
-
-Public Class Options_Reduction : Inherits OptionParent
-    Public reduceXYZ() As Boolean = {True, True, True}
-    Public Sub New()
-        If check.Setup(traceName) Then
-            check.addCheckBox("Reduce point cloud in X direction")
-            check.addCheckBox("Reduce point cloud in Y direction")
-            check.addCheckBox("Reduce point cloud in Z direction")
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
-            check.Box(2).Checked = True
-        End If
-    End Sub
-    Public Sub Run()
-        For i = 0 To 2
-            reduceXYZ(i) = check.Box(i).Checked
-        Next
-    End Sub
-End Class
-
-
-
-
-
 Public Class Options_Retina : Inherits OptionParent
     Public useLogSampling As Boolean = False
     Public sampleFactor As Integer = 2
@@ -8066,5 +8042,55 @@ Public Class Options_RedCloud : Inherits OptionParent
                 task.channelIndex = 2
                 task.histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
         End Select
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_ReductionXYZ : Inherits OptionParent
+    Public reduceXYZ() As Boolean = {True, True, True}
+    Public Sub New()
+        If check.Setup(traceName) Then
+            check.addCheckBox("Reduce point cloud in X direction")
+            check.addCheckBox("Reduce point cloud in Y direction")
+            check.addCheckBox("Reduce point cloud in Z direction")
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+            check.Box(2).Checked = True
+        End If
+    End Sub
+    Public Sub Run()
+        For i = 0 To 2
+            reduceXYZ(i) = check.Box(i).Checked
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_Reduction : Inherits OptionParent
+    Public simpleReduction As Boolean
+    Public bitwiseReduction As Boolean
+    Public noReduction As Boolean
+    Public Sub New()
+
+        If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Use Simple Reduction")
+            radio.addRadio("Use Bitwise Reduction")
+            radio.addRadio("No Reduction")
+            radio.check(0).Checked = True
+        End If
+    End Sub
+    Public Sub Run()
+        Static simpleRadio = findRadio("Use Simple Reduction")
+        Static bitwiseRadio = findRadio("Use Bitwise Reduction")
+        bitwiseReduction = bitwiseRadio.checked
+        simpleReduction = simpleRadio.checked
+        noReduction = simpleReduction = False And bitwiseReduction = False
     End Sub
 End Class

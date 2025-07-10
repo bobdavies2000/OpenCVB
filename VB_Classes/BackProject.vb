@@ -54,7 +54,7 @@ Public Class BackProject_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim bProject As New BackProject_Basics
     Public Sub New()
-        task.redOptions.checkSimpleReduction(True)
+        OptionParent.findRadio("Use Simple Reduction").Checked = True
         labels(3) = "Backprojection of highlighted histogram bin"
         desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
     End Sub

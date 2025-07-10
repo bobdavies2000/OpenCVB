@@ -1187,7 +1187,7 @@ Public Class XO_Line_RegionsVB : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Const lineMatch = 254
     Public Sub New()
-        task.redOptions.BitwiseReduction.Checked = True
+        OptionParent.findRadio("Use Bitwise Reduction").Checked = True
         task.redOptions.setBitReductionBar(6)
 
         If OptionParent.FindFrm(traceName + " CheckBoxes") Is Nothing Then

@@ -2,7 +2,6 @@
 Public Class OptionsRedColor
     Public colorInputName As String
     Public colorInputIndex As Integer
-    Public reductionType As String = "Use Simple Reduction"
     Public depthInputIndex As Integer = 0 ' guidedBP is the default.
 
     Public SimpleReduction As Integer
@@ -73,7 +72,6 @@ Public Class OptionsRedColor
         task.channelsTop = {2, 0}
         task.channelsSide = {1, 2}
 
-        UseSimpleReduction.Checked = True
         PointCloudReductionLabel = "XY Reduction"
 
         For i = 0 To colorMethods.Count - 1
@@ -103,27 +101,6 @@ Public Class OptionsRedColor
 
         task.sideCameraPoint = New cv.Point(0, CInt(task.dst2.Height / 2))
         task.topCameraPoint = New cv.Point(CInt(task.dst2.Width / 2), 0)
-
-        SimpleReductionBar.Enabled = Not BitwiseReduction.Checked
-        BitwiseReductionBar.Enabled = BitwiseReduction.Checked
-    End Sub
-
-
-
-
-    Private Sub SimpleReduction_CheckedChanged(sender As Object, e As EventArgs) Handles UseSimpleReduction.CheckedChanged
-        task.optionsChanged = True
-        SimpleReductionChecked = UseSimpleReduction.Checked
-        reductionType = UseSimpleReduction.Text
-    End Sub
-    Private Sub BitwiseReduction_CheckedChanged(sender As Object, e As EventArgs) Handles BitwiseReduction.CheckedChanged
-        task.optionsChanged = True
-        bitReductionChecked = BitwiseReduction.Checked
-        reductionType = BitwiseReduction.Text
-    End Sub
-    Private Sub NoReduction_CheckedChanged(sender As Object, e As EventArgs) Handles NoReduction.CheckedChanged
-        task.optionsChanged = True
-        reductionType = NoReduction.Text
     End Sub
 
 
@@ -189,16 +166,9 @@ Public Class OptionsRedColor
         task.optionsChanged = True
         colorInputName = ColorSource.Text
         colorInputIndex = ColorSource.SelectedIndex
-        If colorInputName = "Reduction_Basics" Then
-            SimpleReductionBar.Enabled = reductionType = "Use Simple Reduction"
-            BitwiseReductionBar.Enabled = reductionType = "Use Bitwise Reduction"
-        End If
     End Sub
 
 
-    Public Sub checkSimpleReduction(newVal As Boolean)
-        UseSimpleReduction.Checked = newVal
-    End Sub
     Public Sub setBitReductionBar(newVal As Integer)
         If newVal > BitwiseReductionBar.Maximum Then BitwiseReductionBar.Maximum = newVal
         BitwiseReductionBar.Value = newVal
@@ -206,9 +176,7 @@ Public Class OptionsRedColor
     Public Function getBitReductionBar() As Integer
         Return BitwiseReductionBar.Value
     End Function
-    Public Sub checkBitReduction(newVal As Boolean)
-        BitwiseReduction.Checked = newVal
-    End Sub
+
 
 
 
