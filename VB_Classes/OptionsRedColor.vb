@@ -68,15 +68,6 @@ Public Class OptionsRedColor
 
         PointCloudReductionLabel = "XY Reduction"
 
-        Select Case task.cameraName
-            Case "Oak-D camera"
-                task.redOptions.setBitReductionBar(80)
-            Case Else
-                task.redOptions.setBitReductionBar(40)
-        End Select
-
-        task.redOptions.setBitReductionBar(5)
-
         Me.Left = 0
         Me.Top = 30
     End Sub
@@ -90,15 +81,6 @@ Public Class OptionsRedColor
         task.topCameraPoint = New cv.Point(CInt(task.dst2.Width / 2), 0)
     End Sub
 
-
-
-
-
-    Private Sub BitwiseReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles BitwiseReductionBar.ValueChanged
-        task.optionsChanged = True
-        bitReduction = BitwiseReductionBar.Value
-        bitwiseLabel.Text = CStr(BitwiseReductionBar.Value)
-    End Sub
 
 
 
@@ -141,14 +123,4 @@ Public Class OptionsRedColor
         task.optionsChanged = True
         depthInputIndex = 1
     End Sub
-
-
-
-    Public Sub setBitReductionBar(newVal As Integer)
-        If newVal > BitwiseReductionBar.Maximum Then BitwiseReductionBar.Maximum = newVal
-        BitwiseReductionBar.Value = newVal
-    End Sub
-    Public Function getBitReductionBar() As Integer
-        Return BitwiseReductionBar.Value
-    End Function
 End Class

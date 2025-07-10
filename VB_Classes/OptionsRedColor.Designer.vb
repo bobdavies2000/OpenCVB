@@ -22,13 +22,22 @@ Partial Class OptionsRedColor
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.ReductionSliders = New System.Windows.Forms.GroupBox()
         Me.bitwiseLabel = New System.Windows.Forms.Label()
+        Me.ReductionSliders = New System.Windows.Forms.GroupBox()
         Me.BitwiseReductionBar = New System.Windows.Forms.TrackBar()
         Me.reduceXbits = New System.Windows.Forms.Label()
         Me.ReductionSliders.SuspendLayout()
         CType(Me.BitwiseReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
+        '
+        'bitwiseLabel
+        '
+        Me.bitwiseLabel.AutoSize = True
+        Me.bitwiseLabel.Location = New System.Drawing.Point(668, 91)
+        Me.bitwiseLabel.Name = "bitwiseLabel"
+        Me.bitwiseLabel.Size = New System.Drawing.Size(98, 20)
+        Me.bitwiseLabel.TabIndex = 11
+        Me.bitwiseLabel.Text = "BitwiseLabel"
         '
         'ReductionSliders
         '
@@ -41,15 +50,6 @@ Partial Class OptionsRedColor
         Me.ReductionSliders.TabIndex = 6
         Me.ReductionSliders.TabStop = False
         Me.ReductionSliders.Text = "Reduction Sliders"
-        '
-        'bitwiseLabel
-        '
-        Me.bitwiseLabel.AutoSize = True
-        Me.bitwiseLabel.Location = New System.Drawing.Point(668, 91)
-        Me.bitwiseLabel.Name = "bitwiseLabel"
-        Me.bitwiseLabel.Size = New System.Drawing.Size(98, 20)
-        Me.bitwiseLabel.TabIndex = 11
-        Me.bitwiseLabel.Text = "BitwiseLabel"
         '
         'BitwiseReductionBar
         '
@@ -84,8 +84,9 @@ Partial Class OptionsRedColor
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents ReductionSliders As System.Windows.Forms.GroupBox
-    Friend WithEvents bitwiseLabel As System.Windows.Forms.Label
-    Friend WithEvents BitwiseReductionBar As System.Windows.Forms.TrackBar
-    Friend WithEvents reduceXbits As System.Windows.Forms.Label
+
+    Friend WithEvents bitwiseLabel As Windows.Forms.Label
+    Friend WithEvents ReductionSliders As Windows.Forms.GroupBox
+    Friend WithEvents BitwiseReductionBar As Windows.Forms.TrackBar
+    Friend WithEvents reduceXbits As Windows.Forms.Label
 End Class

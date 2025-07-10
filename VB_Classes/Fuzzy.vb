@@ -9,7 +9,6 @@ Public Class Fuzzy_Basics : Inherits TaskParent
         Dim floodRadio = OptionParent.findRadio("FloodFill")
         If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
         If standalone Then task.gOptions.displaydst1.checked = True
-        task.redOptions.setBitReductionBar(32)
         cPtr = Fuzzy_Open()
         OptionParent.findRadio("CComp").Checked = True
         labels = {"", "Solid regions", "8-Bit output of Fuzzy_Basics", "Fuzzy edges"}

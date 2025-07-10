@@ -29,6 +29,7 @@ Public Class VBtask : Implements IDisposable
 
     Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
     Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
+    Public rcPrepReductionName As String
 
     Public fpList As New List(Of fpData)
     Public regionList As New List(Of rcData)
@@ -210,7 +211,6 @@ Public Class VBtask : Implements IDisposable
     Public histogramBins As Integer
 
     Public gOptions As OptionsGlobal
-    Public redOptions As OptionsRedColor
     Public featureOptions As OptionsFeatures
     Public treeView As TreeviewForm
 
@@ -516,7 +516,6 @@ Public Class VBtask : Implements IDisposable
         allOptions.Show()
 
         gOptions = New OptionsGlobal
-        redOptions = New OptionsRedColor
         featureOptions = New OptionsFeatures
         treeView = New TreeviewForm
 
@@ -543,9 +542,8 @@ Public Class VBtask : Implements IDisposable
         Next
 
         updateSettings()
-        featureOptions.Show() ' behind redOptions
-        redOptions.Show()     ' behind gOptions
-        gOptions.Show()       ' In front of both...
+        featureOptions.Show()
+        gOptions.Show()       
 
         treeView.Show()
         centerRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
@@ -639,8 +637,6 @@ Public Class VBtask : Implements IDisposable
         algorithm_ms(2) += returnCopyTime
         algorithmTimes(3) = Now  ' starting the main algorithm
         If useRecordedData Then recordedData.Run(task.color.Clone)
-
-        redOptions.Sync() ' update the task with redCloud variables
 
         Dim src = task.color
 

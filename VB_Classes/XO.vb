@@ -1188,7 +1188,6 @@ Public Class XO_Line_RegionsVB : Inherits TaskParent
     Const lineMatch = 254
     Public Sub New()
         OptionParent.findRadio("Use Bitwise Reduction").Checked = True
-        task.redOptions.setBitReductionBar(6)
 
         If OptionParent.FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
@@ -5580,14 +5579,17 @@ End Class
 
 
 Public Class XO_RedPrep_BasicsCalcHist : Inherits TaskParent
+    Dim options As New Options_RedCloud
     Public Sub New()
         desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         Dim histogram As New cv.Mat
 
         Dim channels() As Integer = {0}
-        Select Case task.redOptions.PointCloudReductionLabel
+        Select Case options.reductionName
             Case "X Reduction"
                 dst0 = task.pcSplit(0)
             Case "Y Reduction"

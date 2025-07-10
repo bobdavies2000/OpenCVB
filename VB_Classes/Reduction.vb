@@ -12,7 +12,7 @@ Public Class Reduction_Basics : Inherits TaskParent
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If options.bitwiseReduction Then
-            Dim bits = task.redOptions.getBitReductionBar()
+            Dim bits = options.bitwiseValue
             classCount = 255 / Math.Pow(2, bits)
             Dim zeroBits = Math.Pow(2, bits) - 1
             dst1 = src And New cv.Mat(src.Size(), src.Type, cv.Scalar.All(255 - zeroBits))
@@ -42,7 +42,6 @@ Public Class Reduction_Floodfill : Inherits TaskParent
     Public reduction As New Reduction_Basics
     Public Sub New()
         labels(2) = "Reduced input to floodfill"
-        task.redOptions.setBitReductionBar(32)
         desc = "Use the reduction output as input to floodfill to get masks of cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -212,7 +211,6 @@ Public Class Reduction_PointCloud : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Public Sub New()
         OptionParent.findRadio("Use Simple Reduction").Checked = True
-        task.redOptions.setBitReductionBar(20)
         labels = {"", "", "8-bit reduced depth", "Palettized output of the different depth levels found"}
         desc = "Use reduction to smooth depth data"
     End Sub

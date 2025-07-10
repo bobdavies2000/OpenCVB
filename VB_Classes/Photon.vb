@@ -45,8 +45,7 @@ Public Class Photon_Test : Inherits TaskParent
         desc = ""
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        task.redOptions.setBitReductionBar(64) ' for now...
-        Dim reduce = 64
+        Dim reduce = reduction.options.bitwiseReduction
 
         reduction.Run(src)
         dst1 = reduction.dst2

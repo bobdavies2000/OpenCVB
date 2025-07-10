@@ -61,7 +61,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
         End If
         dst3 = ShowPalette(dst2)
 
-        labels(2) = task.redOptions.PointCloudReductionLabel + " with reduction factor = " + CStr(reduceAmt)
+        labels(2) = "Using reduction factor = " + CStr(reduceAmt)
     End Sub
 End Class
 
