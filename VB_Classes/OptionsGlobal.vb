@@ -4,6 +4,10 @@ Public Class OptionsGlobal
     Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
     Public heartBeatSeconds = 1
+    Public colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions",
+                                           "Binarize_DepthTiers", "EdgeLine_Basics", "Hist3DColor_Basics",
+                                           "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
+                                           "PCA_NColor_CPP", "MeanSubtraction_Gray"}
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
 
@@ -133,6 +137,12 @@ Public Class OptionsGlobal
         task.gOptions.LineWidth.Value = task.DotSize
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
         DepthDiffSlider.Value = 100
+
+        For i = 0 To colorMethods.Count - 1
+            Dim method = colorMethods(i)
+            ColorSource.Items.Add(method)
+        Next
+        ColorSource.SelectedItem = "EdgeLine_Basics"
 
         Me.Left = 0
         Me.Top = 60
@@ -363,5 +373,12 @@ Public Class OptionsGlobal
 
     Private Sub OptionsGlobal_Closed(sender As Object, e As EventArgs) Handles Me.Closed
         task.closeRequest = True
+    End Sub
+
+
+
+
+    Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ColorSource.SelectedIndexChanged
+        task.optionsChanged = True
     End Sub
 End Class

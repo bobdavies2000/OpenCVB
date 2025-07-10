@@ -1153,7 +1153,7 @@ public:
     int reduceAmt = 250;
     RedCloud_Basics_CC() : CPP_Parent() {
         //if (standalone) {
-        //    task.redOptions.RedCloud_Basics.Checked = true;
+        //    task.gOptions.RedCloud_Basics.Checked = true;
         //}
         desc = "Reduction transform for the point cloud";
     }

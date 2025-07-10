@@ -7043,7 +7043,7 @@ Public Class Options_ColorMethod : Inherits OptionParent
     Public Sub New()
         If FindFrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
-            For Each alg In task.redOptions.colorMethods
+            For Each alg In task.gOptions.colorMethods
                 check.addCheckBox(alg)
             Next
             check.Box(4).Checked = True

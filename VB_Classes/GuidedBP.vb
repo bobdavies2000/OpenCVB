@@ -211,7 +211,7 @@ Public Class GuidedBP_Depth : Inherits TaskParent
         cv.Cv2.CalcBackProject({src}, task.channels, hist.histogram, dst2, task.ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        labels(3) = "Use task.redOptions.PointCloudReduction to select different cloud combinations."
+        labels(3) = "Use task.gOptions.PointCloudReduction to select different cloud combinations."
         If standaloneTest() Then dst3 = ShowPalette(dst2 + 1)
 
         Dim depthCount = task.depthMask.CountNonZero

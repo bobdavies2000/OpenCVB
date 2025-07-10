@@ -1,7 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Public Class OptionsRedColor
-    Public colorInputName As String
-    Public colorInputIndex As Integer
     Public depthInputIndex As Integer = 0 ' guidedBP is the default.
 
     Public SimpleReduction As Integer
@@ -12,10 +10,6 @@ Public Class OptionsRedColor
 
     Public PointCloudReductionLabel As String
     Public trackingLabel As String
-    Public colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions",
-                                       "Binarize_DepthTiers", "EdgeLine_Basics", "Hist3DColor_Basics",
-                                       "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
-                                       "PCA_NColor_CPP", "MeanSubtraction_Gray"}
     Private Sub OptionsRedColor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
         Me.Text = "Options RedColor, RedCloud, RedMask and related algorithms"
@@ -73,12 +67,6 @@ Public Class OptionsRedColor
         task.channelsSide = {1, 2}
 
         PointCloudReductionLabel = "XY Reduction"
-
-        For i = 0 To colorMethods.Count - 1
-            Dim method = colorMethods(i)
-            ColorSource.Items.Add(method)
-        Next
-        ColorSource.SelectedItem = "EdgeLine_Basics"
 
         Select Case task.cameraName
             Case "Oak-D camera"
@@ -155,14 +143,6 @@ Public Class OptionsRedColor
         depthInputIndex = 1
     End Sub
 
-
-
-
-    Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ColorSource.SelectedIndexChanged
-        task.optionsChanged = True
-        colorInputName = ColorSource.Text
-        colorInputIndex = ColorSource.SelectedIndex
-    End Sub
 
 
     Public Sub setBitReductionBar(newVal As Integer)

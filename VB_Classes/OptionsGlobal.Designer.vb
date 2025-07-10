@@ -84,6 +84,8 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.ColorSource = New System.Windows.Forms.ComboBox()
+        Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DepthDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -346,6 +348,8 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.ColorSource)
+        Me.GroupBox2.Controls.Add(Me.ColorSourceLabel)
         Me.GroupBox2.Controls.Add(Me.DepthGroupBox)
         Me.GroupBox2.Controls.Add(Me.TruncateDepth)
         Me.GroupBox2.Controls.Add(Me.MotionBox)
@@ -770,6 +774,23 @@ Partial Class OptionsGlobal
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
+        'ColorSource
+        '
+        Me.ColorSource.FormattingEnabled = True
+        Me.ColorSource.Location = New System.Drawing.Point(528, 55)
+        Me.ColorSource.Name = "ColorSource"
+        Me.ColorSource.Size = New System.Drawing.Size(222, 28)
+        Me.ColorSource.TabIndex = 80
+        '
+        'ColorSourceLabel
+        '
+        Me.ColorSourceLabel.AutoSize = True
+        Me.ColorSourceLabel.Location = New System.Drawing.Point(384, 58)
+        Me.ColorSourceLabel.Name = "ColorSourceLabel"
+        Me.ColorSourceLabel.Size = New System.Drawing.Size(131, 20)
+        Me.ColorSourceLabel.TabIndex = 79
+        Me.ColorSourceLabel.Text = "RedColor Source"
+        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -869,4 +890,6 @@ Partial Class OptionsGlobal
     Friend WithEvents DepthGroupBox As Windows.Forms.GroupBox
     Friend WithEvents DepthCorrelations As Windows.Forms.RadioButton
     Friend WithEvents ColorizedDepth As Windows.Forms.RadioButton
+    Friend WithEvents ColorSource As Windows.Forms.ComboBox
+    Friend WithEvents ColorSourceLabel As Windows.Forms.Label
 End Class

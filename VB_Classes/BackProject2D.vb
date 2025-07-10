@@ -79,7 +79,7 @@ End Class
 '        maxY = (bpCol + 1) * yRange / task.cellSize
 
 '        Dim ranges() = New cv.Rangef() {New cv.Rangef(minX, maxX), New cv.Rangef(minY, maxY)}
-'        cv.Cv2.CalcBackProject({src}, task.redOptions.channels, hist2d.histogram, dst0, ranges)
+'        cv.Cv2.CalcBackProject({src}, task.gOptions.channels, hist2d.histogram, dst0, ranges)
 '        Dim bpCount = hist2d.histogram.Get(Of Single)(bpRow, bpCol)
 
 '        dst3.SetTo(0)
@@ -87,7 +87,7 @@ End Class
 '        If task.heartBeat Then
 '            labels(2) = colorFmt.options.colorFormat + ": Cell minX/maxX " + Format(minX, "0") + "/" + Format(maxX, "0") + " minY/maxY " +
 '                                Format(minY, "0") + "/" + Format(maxY, "0")
-'            Dim c1 = task.redOptions.channels(0), c2 = task.redOptions.channels(1)
+'            Dim c1 = task.gOptions.channels(0), c2 = task.gOptions.channels(1)
 '            labels(3) = "That combination of channel " + CStr(c1) + "/" + CStr(c2) + " has " + CStr(bpCount) +
 '                        " pixels while image total is " + Format(dst0.Total, "0")
 '        End If

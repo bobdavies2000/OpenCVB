@@ -1408,7 +1408,7 @@ Public Class XO_Line_FromContours : Inherits TaskParent
     Dim contours As New XO_Contour_Gray
     Dim lines As New LineRGB_RawSorted
     Public Sub New()
-        task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
+        task.gOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
         task.gOptions.highlight.SelectedIndex = 3
         desc = "Find the lines in the contours."
     End Sub
@@ -3729,7 +3729,7 @@ Public Class XO_Swarm_Flood2 : Inherits TaskParent
         dst3 = lines.dst3.Clone
 
         task.setSelectedCell()
-        labels(1) = "Color8U_Basics input = " + task.redOptions.ColorSource.Text
+        labels(1) = "Color8U_Basics input = " + task.gOptions.ColorSource.Text
         labels(2) = flood.cellGen.labels(2)
         labels(3) = lines.labels(2)
     End Sub
@@ -4411,7 +4411,7 @@ Public Class XO_Contour_Gray : Inherits TaskParent
         End If
 
         If standalone Then
-            task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
+            task.gOptions.ColorSource.SelectedItem() = "Reduction_Basics"
             reduction.Run(src)
             src = reduction.dst2
         End If
@@ -5476,10 +5476,10 @@ Public Class XO_OpAuto_XRange : Inherits TaskParent
             Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
             Dim leftGap = histogram.Col(0).CountNonZero
             Dim rightGap = histogram.Col(histogram.Width - 1).CountNonZero
-            'If leftGap = 0 And rightGap = 0 And task.redOptions.XRangeBar.Value > 3 Then
-            '    task.redOptions.XRangeBar.Value -= 1
+            'If leftGap = 0 And rightGap = 0 And task.gOptions.XRangeBar.Value > 3 Then
+            '    task.gOptions.XRangeBar.Value -= 1
             'Else
-            '    If adjustedCount < expectedCount Then task.redOptions.XRangeBar.Value += 1 Else task.redOptions.XRangeBar.Value -= 1
+            '    If adjustedCount < expectedCount Then task.gOptions.XRangeBar.Value += 1 Else task.gOptions.XRangeBar.Value -= 1
             'End If
             task.optionsChanged = saveOptionState
         End If
@@ -5525,10 +5525,10 @@ Public Class XO_OpAuto_YRange : Inherits TaskParent
             Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
             Dim topGap = histogram.Row(0).CountNonZero
             Dim botGap = histogram.Row(histogram.Height - 1).CountNonZero
-            'If topGap = 0 And botGap = 0 And task.redOptions.YRangeSlider.Value > 3 Then
-            '    task.redOptions.YRangeSlider.Value -= 1
+            'If topGap = 0 And botGap = 0 And task.gOptions.YRangeSlider.Value > 3 Then
+            '    task.gOptions.YRangeSlider.Value -= 1
             'Else
-            '    If adjustedCount < expectedCount Then task.redOptions.YRangeSlider.Value += 1 Else task.redOptions.YRangeSlider.Value -= 1
+            '    If adjustedCount < expectedCount Then task.gOptions.YRangeSlider.Value += 1 Else task.gOptions.YRangeSlider.Value -= 1
             'End If
             task.optionsChanged = saveOptionState
         End If

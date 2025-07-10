@@ -26,11 +26,9 @@ Partial Class OptionsRedColor
         Me.bitwiseLabel = New System.Windows.Forms.Label()
         Me.BitwiseReductionBar = New System.Windows.Forms.TrackBar()
         Me.reduceXbits = New System.Windows.Forms.Label()
-        Me.ColorSourceLabel = New System.Windows.Forms.Label()
-        Me.ColorSource = New System.Windows.Forms.ComboBox()
-        Me.ColoringGroup = New System.Windows.Forms.GroupBox()
-        Me.TrackingColor = New System.Windows.Forms.RadioButton()
         Me.TrackingMeanColor = New System.Windows.Forms.RadioButton()
+        Me.TrackingColor = New System.Windows.Forms.RadioButton()
+        Me.ColoringGroup = New System.Windows.Forms.GroupBox()
         Me.ReductionSliders.SuspendLayout()
         CType(Me.BitwiseReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ColoringGroup.SuspendLayout()
@@ -76,33 +74,16 @@ Partial Class OptionsRedColor
         Me.reduceXbits.TabIndex = 9
         Me.reduceXbits.Text = "Reduce X bits"
         '
-        'ColorSourceLabel
+        'TrackingMeanColor
         '
-        Me.ColorSourceLabel.AutoSize = True
-        Me.ColorSourceLabel.Location = New System.Drawing.Point(259, 134)
-        Me.ColorSourceLabel.Name = "ColorSourceLabel"
-        Me.ColorSourceLabel.Size = New System.Drawing.Size(271, 20)
-        Me.ColorSourceLabel.TabIndex = 10
-        Me.ColorSourceLabel.Text = "Color Source when running RedColor"
-        '
-        'ColorSource
-        '
-        Me.ColorSource.FormattingEnabled = True
-        Me.ColorSource.Location = New System.Drawing.Point(263, 157)
-        Me.ColorSource.Name = "ColorSource"
-        Me.ColorSource.Size = New System.Drawing.Size(222, 28)
-        Me.ColorSource.TabIndex = 11
-        '
-        'ColoringGroup
-        '
-        Me.ColoringGroup.Controls.Add(Me.TrackingColor)
-        Me.ColoringGroup.Controls.Add(Me.TrackingMeanColor)
-        Me.ColoringGroup.Location = New System.Drawing.Point(263, 12)
-        Me.ColoringGroup.Name = "ColoringGroup"
-        Me.ColoringGroup.Size = New System.Drawing.Size(220, 103)
-        Me.ColoringGroup.TabIndex = 78
-        Me.ColoringGroup.TabStop = False
-        Me.ColoringGroup.Text = "RedCloud Output Color"
+        Me.TrackingMeanColor.AutoSize = True
+        Me.TrackingMeanColor.Location = New System.Drawing.Point(15, 29)
+        Me.TrackingMeanColor.Name = "TrackingMeanColor"
+        Me.TrackingMeanColor.Size = New System.Drawing.Size(115, 24)
+        Me.TrackingMeanColor.TabIndex = 0
+        Me.TrackingMeanColor.TabStop = True
+        Me.TrackingMeanColor.Text = "Mean Color"
+        Me.TrackingMeanColor.UseVisualStyleBackColor = True
         '
         'TrackingColor
         '
@@ -115,16 +96,16 @@ Partial Class OptionsRedColor
         Me.TrackingColor.Text = "Tracking Color"
         Me.TrackingColor.UseVisualStyleBackColor = True
         '
-        'TrackingMeanColor
+        'ColoringGroup
         '
-        Me.TrackingMeanColor.AutoSize = True
-        Me.TrackingMeanColor.Location = New System.Drawing.Point(15, 29)
-        Me.TrackingMeanColor.Name = "TrackingMeanColor"
-        Me.TrackingMeanColor.Size = New System.Drawing.Size(115, 24)
-        Me.TrackingMeanColor.TabIndex = 0
-        Me.TrackingMeanColor.TabStop = True
-        Me.TrackingMeanColor.Text = "Mean Color"
-        Me.TrackingMeanColor.UseVisualStyleBackColor = True
+        Me.ColoringGroup.Controls.Add(Me.TrackingColor)
+        Me.ColoringGroup.Controls.Add(Me.TrackingMeanColor)
+        Me.ColoringGroup.Location = New System.Drawing.Point(263, 12)
+        Me.ColoringGroup.Name = "ColoringGroup"
+        Me.ColoringGroup.Size = New System.Drawing.Size(220, 103)
+        Me.ColoringGroup.TabIndex = 78
+        Me.ColoringGroup.TabStop = False
+        Me.ColoringGroup.Text = "RedCloud Output Color"
         '
         'OptionsRedColor
         '
@@ -132,8 +113,6 @@ Partial Class OptionsRedColor
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(950, 604)
         Me.Controls.Add(Me.ColoringGroup)
-        Me.Controls.Add(Me.ColorSource)
-        Me.Controls.Add(Me.ColorSourceLabel)
         Me.Controls.Add(Me.ReductionSliders)
         Me.Name = "OptionsRedColor"
         Me.Text = "OptionsRedCloud"
@@ -143,16 +122,13 @@ Partial Class OptionsRedColor
         Me.ColoringGroup.ResumeLayout(False)
         Me.ColoringGroup.PerformLayout()
         Me.ResumeLayout(False)
-        Me.PerformLayout()
 
     End Sub
     Friend WithEvents ReductionSliders As System.Windows.Forms.GroupBox
     Friend WithEvents bitwiseLabel As System.Windows.Forms.Label
     Friend WithEvents BitwiseReductionBar As System.Windows.Forms.TrackBar
     Friend WithEvents reduceXbits As System.Windows.Forms.Label
-    Friend WithEvents ColorSourceLabel As System.Windows.Forms.Label
-    Friend WithEvents ColorSource As System.Windows.Forms.ComboBox
-    Friend WithEvents ColoringGroup As Windows.Forms.GroupBox
-    Friend WithEvents TrackingColor As Windows.Forms.RadioButton
     Friend WithEvents TrackingMeanColor As Windows.Forms.RadioButton
+    Friend WithEvents TrackingColor As Windows.Forms.RadioButton
+    Friend WithEvents ColoringGroup As Windows.Forms.GroupBox
 End Class

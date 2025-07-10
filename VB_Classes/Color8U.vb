@@ -2,7 +2,7 @@
 Public Class Color8U_Basics : Inherits TaskParent
     Public classCount As Integer
     Public classifier As Object
-    Dim colorMethods(10) As Object
+    Dim colorMethods(task.gOptions.colorMethods.Count) As Object
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         labels(3) = "Input to Color8U_Basics"
@@ -10,35 +10,35 @@ Public Class Color8U_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Or classifier Is Nothing Then
-            Dim index = task.redOptions.colorInputIndex
-            Select Case index
-                Case 0
+            Dim index = task.gOptions.ColorSource.SelectedIndex
+            Select Case task.gOptions.ColorSource.Text
+                Case "BackProject_Full"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New BackProject_Full
-                Case 1
+                Case "Bin4Way_Regions"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Bin4Way_Regions
-                Case 2
+                Case "Binarize_DepthTiers"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Binarize_DepthTiers
-                Case 3
+                Case "EdgeLine_Basics"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = task.edges ' New EdgeLine_Basics
-                Case 4
+                Case "Hist3DColor_Basics"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Hist3Dcolor_Basics
-                Case 5
+                Case "KMeans_Basics"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New KMeans_Basics
-                Case 6
+                Case "LUT_Basics"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New LUT_Basics
-                Case 7
+                Case "Reduction_Basics"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Reduction_Basics
-                Case 8
+                Case "PCA_NColor_CPP"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New PCA_NColor_CPP
-                Case 9
+                Case "MeanSubtraction_Gray"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New MeanSubtraction_Gray
             End Select
             classifier = colorMethods(index)
         End If
 
         ' EdgeLine_Basics is already running on each frame so it may not need to be run...
-        If task.redOptions.colorInputName <> "EdgeLine_Basics" And src.Type <> cv.MatType.CV_8U Then
-            If task.redOptions.colorInputName = "PCA_NColor_CPP" Then ' requires RGB input.
+        If task.gOptions.ColorSource.Text <> "EdgeLine_Basics" And src.Type <> cv.MatType.CV_8U Then
+            If task.gOptions.ColorSource.Text = "PCA_NColor_CPP" Then ' requires RGB input.
                 classifier.Run(src.Clone)
             Else
                 If src.Type = cv.MatType.CV_8U Then
@@ -72,17 +72,16 @@ Public Class Color8U_Sweep : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeatLT Then
-            Dim index = task.redOptions.ColorSource.SelectedIndex + 1
-            If index >= task.redOptions.ColorSource.Items.Count Then index = 0
-            task.redOptions.ColorSource.SelectedIndex = index
-            task.redOptions.Sync()
+            Static index As Integer = task.gOptions.ColorSource.SelectedIndex + 1
+            If index >= task.gOptions.ColorSource.Items.Count Then index = 0
+            task.gOptions.ColorSource.SelectedIndex = index
         End If
 
         color8u.Run(src)
         classCount = color8u.classCount
         dst2 = ShowPalette(color8u.dst2)
 
-        strOut = "Current color source = " + task.redOptions.colorInputName
+        strOut = "Current color source = " + task.gOptions.ColorSource.Text
         SetTrueText(strOut, 2)
     End Sub
 End Class

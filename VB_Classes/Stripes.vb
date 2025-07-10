@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Stripes_Basics : Inherits TaskParent
-    Dim classCount As Integer
+    Public classCount As Integer
     Dim options As New Options_Reduction
     Public Sub New()
         desc = "Create stripes throughout the image with reduction"

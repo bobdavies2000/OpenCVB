@@ -12,7 +12,7 @@ Public Class RedColor_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_8U Then
-            If standalone Or task.redOptions.ColorSource.SelectedItem = "EdgeLine_Basics" Then
+            If standalone Or task.gOptions.ColorSource.SelectedItem = "EdgeLine_Basics" Then
                 dst1 = task.contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Else
                 dst1 = srcMustBe8U(src)
@@ -1907,7 +1907,7 @@ End Class
 
 Public Class RedColor_Reduction : Inherits TaskParent
     Public Sub New()
-        task.redOptions.ColorSource.SelectedItem() = "Reduction_Basics"
+        task.gOptions.ColorSource.SelectedItem() = "Reduction_Basics"
         task.gOptions.setHistogramBins(20)
         desc = "Segment the image based On both the reduced color"
     End Sub
