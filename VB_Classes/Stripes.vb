@@ -1,14 +1,12 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
-
 Public Class Stripes_Basics : Inherits TaskParent
     Dim classCount As Integer
+    Dim options As New Options_Reduction
     Public Sub New()
-        task.redOptions.ReductionSliders.Enabled = True
         desc = "Create stripes throughout the image with reduction"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Dim reductionVal = task.redOptions.SimpleReductionBar.Value
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
 
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(0)
         Dim depth32f As cv.Mat = src * 1000
@@ -16,10 +14,10 @@ Public Class Stripes_Basics : Inherits TaskParent
         depth32f.ConvertTo(depth32S, cv.MatType.CV_32S)
 
         Dim mm = GetMinMax(depth32S, task.depthMask)
-        dst2 = cv.Cv2.Abs(depth32S) / reductionVal
+        dst2 = cv.Cv2.Abs(depth32S) / options.simpleReductionValue
         Dim maxVal = Math.Min(Math.Abs(mm.minVal), mm.maxVal) ' symmetric around 0
         If maxVal = 0 Then maxVal = mm.maxVal ' symmetric around 0 except for Z where all values are above 0
-        classCount = CInt(maxVal / reductionVal)
+        classCount = CInt(maxVal / options.simpleReductionValue)
 
         dst3 = ShowPalette(dst2)
         mm = GetMinMax(dst2, task.depthMask)

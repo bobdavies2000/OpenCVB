@@ -106,11 +106,7 @@ Public Class OptionsRedColor
 
 
 
-    Private Sub ColorReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles SimpleReductionBar.ValueChanged
-        task.optionsChanged = True
-        SimpleReduction = SimpleReductionBar.Value
-        ColorLabel.Text = CStr(SimpleReductionBar.Value)
-    End Sub
+
     Private Sub BitwiseReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles BitwiseReductionBar.ValueChanged
         task.optionsChanged = True
         bitReduction = BitwiseReductionBar.Value

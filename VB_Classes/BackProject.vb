@@ -64,7 +64,7 @@ Public Class BackProject_Reduction : Inherits TaskParent
         bProject.Run(reduction.dst2)
         dst2 = bProject.dst2
         dst3 = bProject.dst3
-        labels(2) = "Reduction = " + CStr(task.redOptions.SimpleReductionBar.Value) + " and bins = " + CStr(task.histogramBins)
+        labels(2) = "Reduction = " + CStr(reduction.options.simpleReductionValue) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 

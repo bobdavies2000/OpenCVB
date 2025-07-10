@@ -26,9 +26,6 @@ Partial Class OptionsRedColor
         Me.bitwiseLabel = New System.Windows.Forms.Label()
         Me.BitwiseReductionBar = New System.Windows.Forms.TrackBar()
         Me.reduceXbits = New System.Windows.Forms.Label()
-        Me.ColorLabel = New System.Windows.Forms.Label()
-        Me.SimpleReductionBar = New System.Windows.Forms.TrackBar()
-        Me.SimpleReduceLabel = New System.Windows.Forms.Label()
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
         Me.ColoringGroup = New System.Windows.Forms.GroupBox()
@@ -36,7 +33,6 @@ Partial Class OptionsRedColor
         Me.TrackingMeanColor = New System.Windows.Forms.RadioButton()
         Me.ReductionSliders.SuspendLayout()
         CType(Me.BitwiseReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.ColoringGroup.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -45,9 +41,6 @@ Partial Class OptionsRedColor
         Me.ReductionSliders.Controls.Add(Me.bitwiseLabel)
         Me.ReductionSliders.Controls.Add(Me.BitwiseReductionBar)
         Me.ReductionSliders.Controls.Add(Me.reduceXbits)
-        Me.ReductionSliders.Controls.Add(Me.ColorLabel)
-        Me.ReductionSliders.Controls.Add(Me.SimpleReductionBar)
-        Me.ReductionSliders.Controls.Add(Me.SimpleReduceLabel)
         Me.ReductionSliders.Location = New System.Drawing.Point(36, 456)
         Me.ReductionSliders.Name = "ReductionSliders"
         Me.ReductionSliders.Size = New System.Drawing.Size(779, 140)
@@ -82,34 +75,6 @@ Partial Class OptionsRedColor
         Me.reduceXbits.Size = New System.Drawing.Size(109, 20)
         Me.reduceXbits.TabIndex = 9
         Me.reduceXbits.Text = "Reduce X bits"
-        '
-        'ColorLabel
-        '
-        Me.ColorLabel.AutoSize = True
-        Me.ColorLabel.Location = New System.Drawing.Point(668, 25)
-        Me.ColorLabel.Name = "ColorLabel"
-        Me.ColorLabel.Size = New System.Drawing.Size(85, 20)
-        Me.ColorLabel.TabIndex = 8
-        Me.ColorLabel.Text = "ColorLabel"
-        '
-        'SimpleReductionBar
-        '
-        Me.SimpleReductionBar.Location = New System.Drawing.Point(156, 18)
-        Me.SimpleReductionBar.Maximum = 255
-        Me.SimpleReductionBar.Minimum = 1
-        Me.SimpleReductionBar.Name = "SimpleReductionBar"
-        Me.SimpleReductionBar.Size = New System.Drawing.Size(506, 69)
-        Me.SimpleReductionBar.TabIndex = 7
-        Me.SimpleReductionBar.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.SimpleReductionBar.Value = 200
-        '
-        'SimpleReduceLabel
-        '
-        Me.SimpleReduceLabel.Location = New System.Drawing.Point(8, 25)
-        Me.SimpleReduceLabel.Name = "SimpleReduceLabel"
-        Me.SimpleReduceLabel.Size = New System.Drawing.Size(152, 45)
-        Me.SimpleReduceLabel.TabIndex = 6
-        Me.SimpleReduceLabel.Text = "Simple Reduction"
         '
         'ColorSourceLabel
         '
@@ -175,7 +140,6 @@ Partial Class OptionsRedColor
         Me.ReductionSliders.ResumeLayout(False)
         Me.ReductionSliders.PerformLayout()
         CType(Me.BitwiseReductionBar, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.SimpleReductionBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ColoringGroup.ResumeLayout(False)
         Me.ColoringGroup.PerformLayout()
         Me.ResumeLayout(False)
@@ -186,9 +150,6 @@ Partial Class OptionsRedColor
     Friend WithEvents bitwiseLabel As System.Windows.Forms.Label
     Friend WithEvents BitwiseReductionBar As System.Windows.Forms.TrackBar
     Friend WithEvents reduceXbits As System.Windows.Forms.Label
-    Friend WithEvents ColorLabel As System.Windows.Forms.Label
-    Friend WithEvents SimpleReductionBar As System.Windows.Forms.TrackBar
-    Friend WithEvents SimpleReduceLabel As System.Windows.Forms.Label
     Friend WithEvents ColorSourceLabel As System.Windows.Forms.Label
     Friend WithEvents ColorSource As System.Windows.Forms.ComboBox
     Friend WithEvents ColoringGroup As Windows.Forms.GroupBox

@@ -21,7 +21,7 @@ Public Class Reduction_Basics : Inherits TaskParent
             classCount = Math.Ceiling(255 / options.simpleReductionValue)
 
             dst1 = src / options.simpleReductionValue
-            labels(2) = "Reduced image - factor = " + CStr(task.redOptions.SimpleReductionBar.Value)
+            labels(2) = "Reduced image - factor = " + CStr(options.simpleReductionValue)
         Else
             dst1 = src
             labels(2) = "No reduction requested"
@@ -95,8 +95,8 @@ Public Class Reduction_XYZ : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim options As New Options_ReductionXYZ
     Public Sub New()
-        task.redOptions.SimpleReductionBar.Maximum = 1000
-        task.redOptions.setBitReductionBar(400)
+        OptionParent.FindSlider("Simple Reduction").Maximum = 1000
+        OptionParent.FindSlider("Simple Reduction").Value = 400
         desc = "Use reduction to slice the point cloud in 3 dimensions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

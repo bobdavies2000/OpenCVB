@@ -620,7 +620,7 @@ Public Class Edge_Reduction : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim edge As New Edge_Basics
     Public Sub New()
-        task.redOptions.SimpleReductionBar.Value = 1
+        OptionParent.FindSlider("Simple Reduction").Value = 1
         labels = {"", "", "Edges in the Reduction output", "Reduction_Basics output"}
         desc = "Find edges in the reduction image."
     End Sub
