@@ -8076,8 +8076,8 @@ Public Class Options_Reduction : Inherits OptionParent
     Public simpleReduction As Boolean
     Public bitwiseReduction As Boolean
     Public noReduction As Boolean
+    Public simpleReductionValue As Integer
     Public Sub New()
-
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("Use Simple Reduction")
@@ -8085,12 +8085,18 @@ Public Class Options_Reduction : Inherits OptionParent
             radio.addRadio("No Reduction")
             radio.check(0).Checked = True
         End If
+
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Simple Reduction", 1, 255, 60)
+        End If
     End Sub
     Public Sub Run()
+        Static simpleSlider = FindSlider("Simple Reduction")
         Static simpleRadio = findRadio("Use Simple Reduction")
         Static bitwiseRadio = findRadio("Use Bitwise Reduction")
         bitwiseReduction = bitwiseRadio.checked
         simpleReduction = simpleRadio.checked
         noReduction = simpleReduction = False And bitwiseReduction = False
+        simpleReductionValue = simpleSlider.value
     End Sub
 End Class
