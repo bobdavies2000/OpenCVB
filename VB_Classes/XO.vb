@@ -5988,7 +5988,7 @@ End Class
 
 
 Public Class XO_Gravity_Basics1 : Inherits TaskParent
-    Public options As New Options_GravityLines
+    Public options As New Options_Features
     Dim gravityRaw As New Gravity_BasicsRaw
     Public gravityMatch As New LineRGB_MatchGravity
     Public gravityRGB As lpData
@@ -6032,7 +6032,7 @@ Public Class XO_Gravity_Basics1 : Inherits TaskParent
             RGBcandidate = nearest.lpOutput
             Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - RGBcandidate.ep1.X)
             Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - RGBcandidate.ep2.X)
-            If Math.Abs(deltaX1 - deltaX2) > task.gravityBasics.options.pixelThreshold Then
+            If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
                 task.gravityVec = task.gravityIMU
                 RGBcandidate = New lpData
                 If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)

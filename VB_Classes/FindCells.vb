@@ -2,23 +2,25 @@
 Public Class FindCells_Basics : Inherits TaskParent
     Dim hist As New Hist_GridCell
     Public edgeRequest As Boolean
+    Public options As New Options_Features
     Public Sub New()
         task.brickRunFlag = True
-        If standalone Then task.featureOptions.SelectedFeature.Value = 1
-        labels(2) = "Use the 'Feature' option 'Selected Feature' to highlight different edges."
+        labels(2) = "Use 'Selected Feature' in 'Options_Features' to highlight different edges."
         desc = "Given lines or edges, build a grid of cells that cover them."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         If standalone Or edgeRequest Then
             Static contour As New FindContours_Basics
             contour.Run(task.grayStable)
             src = contour.dst1.Clone
         End If
 
-        dst2 = ShowPalette(src)
+        dst2 = ShowPaletteNoZero(src)
         dst3 = dst2.Clone
 
-        Dim debugMode = task.selectedFeature > 0
+        Dim debugMode = options.selectedFeature > 0
 
         Dim mm = GetMinMax(src)
         Dim featList As New List(Of List(Of Integer))
@@ -45,7 +47,7 @@ Public Class FindCells_Basics : Inherits TaskParent
             If featList(index).Count > 0 Then task.featList.Add(featList(index))
         Next
 
-        Dim edgeIndex = task.selectedFeature
+        Dim edgeIndex = options.selectedFeature
         If edgeIndex <> 0 And edgeIndex < task.featList.Count Then
             For Each index In task.featList(edgeIndex)
                 Dim brick = task.bricks.brickList(index)
@@ -55,7 +57,7 @@ Public Class FindCells_Basics : Inherits TaskParent
 
         If debugMode Then
             For i = 0 To task.featList.Count - 1
-                If debugMode Then If i <> task.selectedFeature Then Continue For
+                If debugMode Then If i <> options.selectedFeature Then Continue For
                 Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
                 For Each index In task.featList(i)
                     Dim brick = task.bricks.brickList(index)
@@ -85,7 +87,6 @@ End Class
 Public Class FindCells_Edges : Inherits TaskParent
     Dim findCells As New FindCells_Basics
     Public Sub New()
-        If standalone Then task.featureOptions.SelectedFeature.Value = 1
         findCells.edgeRequest = True
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different edges."
         desc = "Find the cells containing edges."
@@ -107,7 +108,6 @@ End Class
 Public Class FindCells_Gaps : Inherits TaskParent
     Dim findCells As New FindCells_Basics
     Public Sub New()
-        task.featureOptions.SelectedFeature.Value = 0
         labels(2) = "Cells highlighted below have a significant gap in depth from their neighbors."
         desc = "Find cells mapping the edges/lines which are not near any other cell - they are neighboring edges/lines but not in depth."
     End Sub
@@ -137,12 +137,12 @@ Public Class FindCells_Gaps : Inherits TaskParent
 
         If task.heartBeat Then
             dst2 = findCells.dst2.Clone
-            Dim debugMode = task.selectedFeature <> 0
+            Dim debugMode = findCells.options.selectedFeature <> 0
             For i = 0 To gapCells.Count - 1
-                If debugMode Then If i <> task.selectedFeature Then Continue For
+                If debugMode Then If i <> findCells.options.selectedFeature Then Continue For
                 Dim brick = task.bricks.brickList(gapCells(i))
                 dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
-                If i = task.selectedFeature Then
+                If i = findCells.options.selectedFeature Then
                     SetTrueText(Format(brick.depth, fmt1), brick.rect.BottomRight)
                 End If
             Next
@@ -287,7 +287,6 @@ Public Class FindCells_Lines : Inherits TaskParent
     Dim findCells As New FindCells_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        If standalone Then task.featureOptions.SelectedFeature.Value = 1
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
         desc = "Find the cells containing lines."
     End Sub

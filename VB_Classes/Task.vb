@@ -283,7 +283,7 @@ Public Class VBtask : Implements IDisposable
     Public featureSource As Integer ' which Feature_Basics method...
     Public fCorrThreshold As Single ' feature correlation threshold
     Public colorDiffThreshold As Integer ' this is vital to motion detection - lower to be more sensitive, higher for less.
-    Public selectedFeature As Integer ' index of the feature to display.
+    Dim selectedFeature As Integer ' index of the feature to display.
     Public edgeMethod As String
     Public verticalLines As Boolean
 

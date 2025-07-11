@@ -35,9 +35,6 @@ Partial Class OptionsFeatures
         Me.ColorDiffLabel = New System.Windows.Forms.Label()
         Me.Label7 = New System.Windows.Forms.Label()
         Me.ColorDiffSlider = New System.Windows.Forms.TrackBar()
-        Me.SelectedLabel = New System.Windows.Forms.Label()
-        Me.Label8 = New System.Windows.Forms.Label()
-        Me.SelectedFeature = New System.Windows.Forms.TrackBar()
         Me.FeatureSampleSizeLabel = New System.Windows.Forms.Label()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.FeatureSampleSize = New System.Windows.Forms.TrackBar()
@@ -46,7 +43,6 @@ Partial Class OptionsFeatures
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MatchCorrSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.SelectedFeature, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.FeatureSampleSize, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -168,33 +164,6 @@ Partial Class OptionsFeatures
         Me.ColorDiffSlider.TabIndex = 27
         Me.ColorDiffSlider.Value = 75
         '
-        'SelectedLabel
-        '
-        Me.SelectedLabel.AutoSize = True
-        Me.SelectedLabel.Location = New System.Drawing.Point(507, 255)
-        Me.SelectedLabel.Name = "SelectedLabel"
-        Me.SelectedLabel.Size = New System.Drawing.Size(175, 20)
-        Me.SelectedLabel.TabIndex = 32
-        Me.SelectedLabel.Text = "Selected Feature Index"
-        '
-        'Label8
-        '
-        Me.Label8.AutoSize = True
-        Me.Label8.Location = New System.Drawing.Point(32, 222)
-        Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(132, 20)
-        Me.Label8.TabIndex = 31
-        Me.Label8.Text = "Selected Feature"
-        '
-        'SelectedFeature
-        '
-        Me.SelectedFeature.Location = New System.Drawing.Point(28, 245)
-        Me.SelectedFeature.Maximum = 100
-        Me.SelectedFeature.Name = "SelectedFeature"
-        Me.SelectedFeature.Size = New System.Drawing.Size(476, 69)
-        Me.SelectedFeature.TabIndex = 30
-        Me.SelectedFeature.Value = 1
-        '
         'FeatureSampleSizeLabel
         '
         Me.FeatureSampleSizeLabel.AutoSize = True
@@ -250,9 +219,6 @@ Partial Class OptionsFeatures
         Me.Controls.Add(Me.FeatureSampleSizeLabel)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.FeatureSampleSize)
-        Me.Controls.Add(Me.SelectedLabel)
-        Me.Controls.Add(Me.Label8)
-        Me.Controls.Add(Me.SelectedFeature)
         Me.Controls.Add(Me.ColorDiffLabel)
         Me.Controls.Add(Me.Label7)
         Me.Controls.Add(Me.ColorDiffSlider)
@@ -272,7 +238,6 @@ Partial Class OptionsFeatures
         CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.MatchCorrSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.SelectedFeature, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.FeatureSampleSize, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
@@ -291,9 +256,6 @@ Partial Class OptionsFeatures
     Friend WithEvents ColorDiffLabel As Windows.Forms.Label
     Friend WithEvents Label7 As Windows.Forms.Label
     Friend WithEvents ColorDiffSlider As Windows.Forms.TrackBar
-    Friend WithEvents SelectedLabel As Windows.Forms.Label
-    Friend WithEvents Label8 As Windows.Forms.Label
-    Friend WithEvents SelectedFeature As Windows.Forms.TrackBar
     Friend WithEvents FeatureSampleSizeLabel As Windows.Forms.Label
     Friend WithEvents Label5 As Windows.Forms.Label
     Friend WithEvents FeatureSampleSize As Windows.Forms.TrackBar

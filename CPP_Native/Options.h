@@ -2128,43 +2128,11 @@ vector<cv::Point2f> srcPoints;
 	Options_MinArea() {
 	}
 };
-class Options_FeaturesEx {
-public:
-	int templatePad =  10;
-	int templateSize =  0;
-	double resyncThreshold =  0.95;
-	int agastThreshold =  20;
-	void Run() {}
-	Options_FeaturesEx() {
-	}
-};
 class Options_FAST {
 public:
 	bool useNonMax = true;
 	void Run() {}
 	Options_FAST() {
-	}
-};
-class Options_GravityLines {
-public:
-	int pixelThreshold =  8;
-	void Run() {}
-	Options_GravityLines() {
-	}
-};
-class Options_Features {
-public:
-	double quality =  0.01;
-	int matchOption =  cv::TemplateMatchModes::TM_CCOEFF_NORMED;
-	string matchText =  "";
-	double k =  0.04;
-	int blockSize =  3;
-	int templatePad =  10;
-	int templateSize =  0;
-	double resyncThreshold =  0.95;
-	int agastThreshold =  20;
-	void Run() {}
-	Options_Features() {
 	}
 };
 class Options_Sobel {
@@ -2204,5 +2172,31 @@ class Options_Reduction {
 public:
 	void Run() {}
 	Options_Reduction() {
+	}
+};
+class Options_Features {
+public:
+	double quality =  0.01;
+	int matchOption =  cv::TemplateMatchModes::TM_CCOEFF_NORMED;
+	string matchText =  "";
+	double k =  0.04;
+	int blockSize =  3;
+	int templatePad =  10;
+	int templateSize =  0;
+	double resyncThreshold =  0.95;
+	int agastThreshold =  20;
+	int pixelThreshold =  8;
+	void Run() {}
+	Options_Features() {
+	}
+};
+class Options_FeaturesEx {
+public:
+	int templatePad =  10;
+	int templateSize =  0;
+	double resyncThreshold =  0.95;
+	int agastThreshold =  20;
+	void Run() {}
+	Options_FeaturesEx() {
 	}
 };

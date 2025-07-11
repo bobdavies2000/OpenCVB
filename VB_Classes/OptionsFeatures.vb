@@ -33,7 +33,6 @@ Public Class OptionsFeatures
 
         ColorDiffSlider.Value = 10
         MatchCorrSlider.Value = 90
-        SelectedFeature.Value = 0
 
         ReDim grayCheckbox(task.rgbFilter.grayFilter.filterList.Count - 1)
         For i = 0 To task.rgbFilter.grayFilter.filterList.Count - 1
@@ -99,11 +98,6 @@ Public Class OptionsFeatures
         task.colorDiffThreshold = ColorDiffSlider.Value
         task.optionsChanged = True
         ColorDiffLabel.Text = CStr(task.colorDiffThreshold)
-    End Sub
-    Private Sub SelectedFeature_ValueChanged(sender As Object, e As EventArgs) Handles SelectedFeature.ValueChanged
-        task.selectedFeature = SelectedFeature.Value
-        task.optionsChanged = True
-        SelectedLabel.Text = CStr(task.selectedFeature)
     End Sub
     Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FeatureSampleSize.ValueChanged
         task.FeatureSampleSize = FeatureSampleSize.Value

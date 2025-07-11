@@ -1,6 +1,7 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports VB_Classes.Options_Reduction
+Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
-    Public options As New Options_GravityLines
+    Public options As New Options_Features
     Dim gravityRaw As New Gravity_BasicsRaw
     Public trackLine As New TrackLine_Basics
     Public gravityRGB As lpData
@@ -21,7 +22,7 @@ Public Class Gravity_Basics : Inherits TaskParent
 
         Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - gravityRGB.ep1.X)
         Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - gravityRGB.ep2.X)
-        If Math.Abs(deltaX1 - deltaX2) > task.gravityBasics.options.pixelThreshold Then
+        If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
             task.gravityVec = task.gravityIMU
         End If
 
