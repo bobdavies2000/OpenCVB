@@ -2920,7 +2920,7 @@ End Class
 
 
 Public Class XO_FeatureLine_VerticalVerify : Inherits TaskParent
-    Dim linesVH As New FeatureLine_VH
+    Dim linesVH As New MatchLine_VH
     Public verify As New IMU_VerticalVerify
     Public Sub New()
         desc = "Select a line or group of lines and track the result"
@@ -5801,7 +5801,7 @@ End Class
 Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
     Public lpInput As lpData
     Public foundLine As Boolean
-    Dim match As New Match_Line
+    Dim match As New MatchLine_Basics
     Public rawLines As New LineRGB_Raw
     Public Sub New()
         desc = "Track an individual line as best as possible."
