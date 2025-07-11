@@ -53,7 +53,7 @@ Public Class RedColor_FindCells : Inherits TaskParent
     Public bricks As New List(Of Integer)
     Public Sub New()
         task.gOptions.pixelDiffThreshold = 25
-        cPtr = RedColor_FindCells_Open()
+        cPtr = RedColor_FindBricks_Open()
         desc = "Find all the RedCloud cells touched by the mask created by the Motion_History rectangle"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -64,10 +64,10 @@ Public Class RedColor_FindCells : Inherits TaskParent
         Dim cppData(task.redC.rcMap.Total - 1) As Byte
         Marshal.Copy(task.redC.rcMap.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = RedColor_FindCells_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+        Dim imagePtr = RedColor_FindBricks_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
         handleSrc.Free()
 
-        Dim count = RedColor_FindCells_TotalCount(cPtr)
+        Dim count = RedColor_FindBricks_TotalCount(cPtr)
         If count = 0 Then Exit Sub
 
         Dim cellsFound(count - 1) As Integer
@@ -86,7 +86,7 @@ Public Class RedColor_FindCells : Inherits TaskParent
         labels(3) = CStr(count) + " cells were found using the motion mask"
     End Sub
     Public Sub Close()
-        RedColor_FindCells_Close(cPtr)
+        RedColor_FindBricks_Close(cPtr)
     End Sub
 End Class
 

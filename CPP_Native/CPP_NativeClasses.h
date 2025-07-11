@@ -1852,18 +1852,18 @@ public:
     }
 };
 extern "C" __declspec(dllexport)
-RedColor_FindCells* RedColor_FindCells_Open() {
+RedColor_FindCells* RedColor_FindBricks_Open() {
     RedColor_FindCells* cPtr = new RedColor_FindCells();
     return cPtr;
 }
 extern "C" __declspec(dllexport)
-void RedColor_FindCells_Close(RedColor_FindCells* cPtr)
+void RedColor_FindBricks_Close(RedColor_FindCells* cPtr)
 {
     delete cPtr;
 }
-extern "C" __declspec(dllexport) int RedColor_FindCells_TotalCount(RedColor_FindCells* cPtr) { return int(cPtr->bricks.size()); }
+extern "C" __declspec(dllexport) int RedColor_FindBricks_TotalCount(RedColor_FindCells* cPtr) { return int(cPtr->bricks.size()); }
 extern "C" __declspec(dllexport)
-int* RedColor_FindCells_RunCPP(RedColor_FindCells* cPtr, int* dataPtr, int rows, int cols)
+int* RedColor_FindBricks_RunCPP(RedColor_FindCells* cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->RunCPP(Mat(rows, cols, CV_8UC1, dataPtr));
     if (cPtr->bricks.size() == 0) return 0;

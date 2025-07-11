@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class FindCells_Basics : Inherits TaskParent
+Public Class FindBricks_Basics : Inherits TaskParent
     Dim hist As New Hist_GridCell
     Public edgeRequest As Boolean
     Public options As New Options_Features
@@ -84,8 +84,8 @@ End Class
 
 
 
-Public Class FindCells_Edges : Inherits TaskParent
-    Dim findCells As New FindCells_Basics
+Public Class FindBricks_Edges : Inherits TaskParent
+    Dim findCells As New FindBricks_Basics
     Public Sub New()
         findCells.edgeRequest = True
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different edges."
@@ -105,8 +105,8 @@ End Class
 
 
 
-Public Class FindCells_Gaps : Inherits TaskParent
-    Dim findCells As New FindCells_Basics
+Public Class FindBricks_Gaps : Inherits TaskParent
+    Dim findCells As New FindBricks_Basics
     Public Sub New()
         labels(2) = "Cells highlighted below have a significant gap in depth from their neighbors."
         desc = "Find cells mapping the edges/lines which are not near any other cell - they are neighboring edges/lines but not in depth."
@@ -156,8 +156,8 @@ End Class
 
 
 
-Public Class FindCells_LineGaps : Inherits TaskParent
-    Dim findCells As New FindCells_Gaps
+Public Class FindBricks_LineGaps : Inherits TaskParent
+    Dim findCells As New FindBricks_Gaps
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
@@ -184,8 +184,8 @@ End Class
 
 
 
-Public Class FindCells_FeatureLess : Inherits TaskParent
-    Dim findCells As New FindCells_Basics
+Public Class FindBricks_FeatureLess : Inherits TaskParent
+    Dim findCells As New FindBricks_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -266,8 +266,8 @@ End Class
 
 
 
-Public Class FindCells_RedCloud : Inherits TaskParent
-    Dim findCells As New FindCells_FeatureLess
+Public Class FindBricks_RedCloud : Inherits TaskParent
+    Dim findCells As New FindBricks_FeatureLess
     Public Sub New()
         desc = "Run RedCloud after identifying all the featureless regions."
     End Sub
@@ -283,8 +283,8 @@ End Class
 
 
 
-Public Class FindCells_Lines : Inherits TaskParent
-    Dim findCells As New FindCells_Basics
+Public Class FindBricks_Lines : Inherits TaskParent
+    Dim findCells As New FindBricks_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
