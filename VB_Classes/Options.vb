@@ -7998,13 +7998,72 @@ Public Class Options_RedCloud : Inherits OptionParent
 
         reductionName = frm.check(findRadioIndex(frm.check)).Text
 
+        ' The specification for each camera spells out the FOV angle
+        ' The sliders adjust the depth data histogram to fill the frustrum which is built from the specification FOV
+        If task.cameraName.StartsWith("Azure Kinect 4K") Then
+            task.xRange = 4.4
+            task.yRange = 1.5
+        ElseIf task.cameraName.StartsWith("StereoLabs ZED 2/2i") Then
+            task.xRange = 4
+            task.yRange = 1.5
+        Else
+            Select Case task.cameraName
+                Case "Intel(R) RealSense(TM) Depth Camera 435i"
+                    If task.dst2.Height = 480 Or task.dst2.Height = 240 Or task.dst2.Height = 120 Then
+                        task.xRange = 1.38
+                        task.yRange = 1.0
+                    Else
+                        task.xRange = 2.5
+                        task.yRange = 0.8
+                    End If
+                Case "Intel(R) RealSense(TM) Depth Camera 455", ""
+                    If task.dst2.Height = 480 Or task.dst2.Height = 240 Or task.dst2.Height = 120 Then
+                        task.xRange = 2.04
+                        task.yRange = 2.14
+                    Else
+                        task.xRange = 3.22
+                        task.yRange = 1.39
+                    End If
+                Case "Oak-D camera"
+                    task.xRange = 4.07
+                    task.yRange = 1.32
+                Case "MYNT-EYE-D1000"
+                    task.xRange = 3.5
+                    task.yRange = 1.5
+                Case "Orbbec Gemini 335L"
+                    task.xRange = 3.5
+                    task.yRange = 1.5
+            End Select
+        End If
+
+        task.xRangeDefault = task.xRange
+        task.yRangeDefault = task.yRange
+
+        task.sideCameraPoint = New cv.Point(0, CInt(task.dst2.Height / 2))
+        task.topCameraPoint = New cv.Point(CInt(task.dst2.Width / 2), 0)
+
+        task.channelsTop = {2, 0}
+        task.channelsSide = {1, 2}
+
+        task.rangesTop = New cv.Rangef() {New cv.Rangef(0.1, task.MaxZmeters + 0.1),
+                                          New cv.Rangef(-task.xRange, task.xRange)}
+        task.rangesSide = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange),
+                                           New cv.Rangef(0.1, task.MaxZmeters + 0.1)}
+
+        task.sideCameraPoint = New cv.Point(0, CInt(task.dst2.Height / 2))
+        task.topCameraPoint = New cv.Point(CInt(task.dst2.Width / 2), 0)
+
+        task.projectionThreshold = 3 ' ProjectionThresholdBar.Value
+        task.channelCount = 1
+        task.channelIndex = 0
+
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
         Dim rz = New cv.Vec2f(0, task.MaxZmeters)
         task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1),
                                             New cv.Rangef(rz.Item0, rz.Item1)}
-        task.channelCount = 1
-        task.channelIndex = 0
+
+
         Select Case reductionName
             Case "X Reduction"
                 task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}

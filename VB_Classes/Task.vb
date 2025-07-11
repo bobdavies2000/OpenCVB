@@ -211,6 +211,7 @@ Public Class VBtask : Implements IDisposable
 
     Public gOptions As OptionsGlobal
     Public featureOptions As OptionsFeatures
+    Public redOptions As Options_RedCloud
     Public treeView As TreeviewForm
 
     ' RedCloud variables
@@ -515,6 +516,7 @@ Public Class VBtask : Implements IDisposable
         allOptions.Show()
 
         gOptions = New OptionsGlobal
+        redOptions = New Options_RedCloud
         featureOptions = New OptionsFeatures
         treeView = New TreeviewForm
 
@@ -542,8 +544,8 @@ Public Class VBtask : Implements IDisposable
 
         updateSettings()
         featureOptions.Show()
-        gOptions.Show()       
-
+        gOptions.Show()
+        redOptions.Run()
         treeView.Show()
         centerRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
 

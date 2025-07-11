@@ -1730,7 +1730,7 @@ Public Class RedColor_GridCells : Inherits TaskParent
         Dim rcList As New List(Of rcData)
         For Each rc In task.redC.rcList
             If task.motionMask(rc.rect).CountNonZero = 0 Then
-                If rc.indexLast > 0 Then rc = lastList(rc.indexLast)
+                If rc.indexLast > 0 And rc.indexLast < lastList.Count Then rc = lastList(rc.indexLast)
             End If
             Dim index = rcList.Count
             Dim cTest = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)

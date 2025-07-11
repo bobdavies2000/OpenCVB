@@ -238,14 +238,11 @@ End Class
 
 Public Class BackProject_Side : Inherits TaskParent
     Dim histSide As New Projection_HistSide
-    Dim options As New Options_RedCloud
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Back projection of the hotspots in the Side View"}
         desc = "Display the back projection of the hotspots in the Side View"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
         histSide.Run(src)
         dst2 = histSide.dst2
 
