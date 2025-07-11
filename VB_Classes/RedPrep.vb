@@ -2,18 +2,21 @@
 Imports System.Runtime.InteropServices
 Public Class RedPrep_Basics : Inherits TaskParent
     Dim plot As New Plot_Histogram
+    Public options As New Options_RedCloud
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Reduction transform for the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
-        Dim reduceAmt = task.redOptions.reductionTarget
+        Dim reduceAmt = options.reductionTarget
         task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
         task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
         task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
 
-        Select Case task.redOptions.reductionName
+        Select Case task.reductionName
             Case "X Reduction"
                 dst0 = (split(0) * reduceAmt).ToMat
             Case "Y Reduction"

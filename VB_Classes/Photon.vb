@@ -69,7 +69,7 @@ Public Class Photon_Test : Inherits TaskParent
             Dim colTop = 0
             For j = 0 To counts.Length - 1
                 Dim h = CInt((dst2.Height - 1) * (counts(j)(i) / dst2.Total)) ' extra parens to avoid overflow at high res.
-                Dim r = New cv.Rect(colWidth * i, colTop, colWidth, h)
+                Dim r = ValidateRect(New cv.Rect(colWidth * i, colTop, colWidth, h))
                 If h > 0 Then dst3(r).SetTo(Choose(j + 1, cv.Scalar.Red, cv.Scalar.LightGreen, cv.Scalar.Blue, cv.Scalar.Yellow))
                 colTop += h
             Next

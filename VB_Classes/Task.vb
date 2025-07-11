@@ -211,7 +211,6 @@ Public Class VBtask : Implements IDisposable
 
     Public gOptions As OptionsGlobal
     Public featureOptions As OptionsFeatures
-    Public redOptions As Options_RedCloud
     Public treeView As TreeviewForm
 
     ' RedCloud variables
@@ -317,6 +316,7 @@ Public Class VBtask : Implements IDisposable
     Public projectionThreshold As Integer ' In heatmap views, this defines what is hot in a heatmap.
 
     Public useXYRange As Boolean ' OpenGL applications don't need to adjust the ranges.
+    Public reductionName As String
     Public xRange As Single
     Public yRange As Single
     Public xRangeDefault As Single
@@ -516,7 +516,6 @@ Public Class VBtask : Implements IDisposable
         allOptions.Show()
 
         gOptions = New OptionsGlobal
-        redOptions = New Options_RedCloud
         featureOptions = New OptionsFeatures
         treeView = New TreeviewForm
 
@@ -545,7 +544,7 @@ Public Class VBtask : Implements IDisposable
         updateSettings()
         featureOptions.Show()
         gOptions.Show()
-        redOptions.Run()
+        Options_RedCloud.setupCalcHist()
         treeView.Show()
         centerRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
 

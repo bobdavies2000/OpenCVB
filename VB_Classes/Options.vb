@@ -7974,10 +7974,8 @@ End Class
 
 
 Public Class Options_RedCloud : Inherits OptionParent
-    Public reductionName As String
     Public reductionTarget As Integer ' how many classes will there be in the resulting reduced cloud data.
     Public Sub New()
-
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Reduction Target", 1, 255, 200)
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -7990,13 +7988,55 @@ Public Class Options_RedCloud : Inherits OptionParent
             radio.addRadio("XYZ Reduction")
             radio.check(3).Checked = True
         End If
+        Run()
     End Sub
-    Public Sub Run()
-        Static frm = FindFrm(traceName + " Radio Buttons")
-        Static redSlider = FindSlider("Reduction Target")
-        reductionTarget = redSlider.value
+    Public Shared Sub setupCalcHist()
+        ' The specification for each camera spells out the FOV angle
+        ' The sliders adjust the depth data histogram to fill the frustrum which is built from the specification FOV
+        If task.cameraName.StartsWith("Azure Kinect 4K") Then
+            task.xRange = 4.4
+            task.yRange = 1.5
+        ElseIf task.cameraName.StartsWith("StereoLabs ZED 2/2i") Then
+            task.xRange = 4
+            task.yRange = 1.5
+        Else
+            Select Case task.cameraName
+                Case "Intel(R) RealSense(TM) Depth Camera 435i"
+                    If task.dst2.Height = 480 Or task.dst2.Height = 240 Or task.dst2.Height = 120 Then
+                        task.xRange = 1.38
+                        task.yRange = 1.0
+                    Else
+                        task.xRange = 2.5
+                        task.yRange = 0.8
+                    End If
+                Case "Intel(R) RealSense(TM) Depth Camera 455", ""
+                    If task.dst2.Height = 480 Or task.dst2.Height = 240 Or task.dst2.Height = 120 Then
+                        task.xRange = 2.04
+                        task.yRange = 2.14
+                    Else
+                        task.xRange = 3.22
+                        task.yRange = 1.39
+                    End If
+                Case "Oak-D camera"
+                    task.xRange = 4.07
+                    task.yRange = 1.32
+                Case "MYNT-EYE-D1000"
+                    task.xRange = 3.5
+                    task.yRange = 1.5
+                Case "Orbbec Gemini 335L"
+                    task.xRange = 3.5
+                    task.yRange = 1.5
+            End Select
+        End If
 
-        reductionName = frm.check(findRadioIndex(frm.check)).Text
+        task.xRangeDefault = task.xRange
+        task.yRangeDefault = task.yRange
+
+        task.sideCameraPoint = New cv.Point(0, CInt(task.dst2.Height / 2))
+        task.topCameraPoint = New cv.Point(CInt(task.dst2.Width / 2), 0)
+
+        task.channelsTop = {2, 0}
+        task.channelsSide = {1, 2}
 
         ' The specification for each camera spells out the FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the specification FOV
@@ -8063,8 +8103,7 @@ Public Class Options_RedCloud : Inherits OptionParent
         task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1),
                                             New cv.Rangef(rz.Item0, rz.Item1)}
 
-
-        Select Case reductionName
+        Select Case task.reductionName
             Case "X Reduction"
                 task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
                 task.channels = {0}
@@ -8101,6 +8140,15 @@ Public Class Options_RedCloud : Inherits OptionParent
                 task.channelIndex = 2
                 task.histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
         End Select
+    End Sub
+    Public Sub Run()
+        Static frm = FindFrm(traceName + " Radio Buttons")
+        Static redSlider = FindSlider("Reduction Target")
+        reductionTarget = redSlider.value
+
+        task.reductionName = frm.check(findRadioIndex(frm.check)).Text
+
+        setupCalcHist()
     End Sub
 End Class
 

@@ -5586,7 +5586,7 @@ Public Class XO_RedPrep_BasicsCalcHist : Inherits TaskParent
         Dim histogram As New cv.Mat
 
         Dim channels() As Integer = {0}
-        Select Case task.redOptions.reductionName
+        Select Case task.reductionName
             Case "X Reduction"
                 dst0 = task.pcSplit(0)
             Case "Y Reduction"
