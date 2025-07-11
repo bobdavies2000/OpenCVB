@@ -1,75 +1,74 @@
-# 2025 June (1) – FindContours, ReadMe.md, RedCloud Review, Gravity Vector, and Improved Line_Info.
+# 2025 July 11th – RGB Line Tracking, Options Close, EdgeLine, DepthRGB, Hull Lines, OpenGL Testing, and Options Changes.
 
 -   Over 1800 algorithms are included, averaging 37 lines of code per algorithm.
--   Each retrieval mode in FindContours now has its own algorithm.
-    -   The default retrieval mode is “List” since it has stable results and is fast.
-    -   A general purpose Contour_Basics allows selecting all retrieval modes.
--   The “OpenCVB Layout” section of this document was completely rewritten.
-    -   Accumulated changes to the user interface were updated and explained.
-    -   There are fewer icons in the main toolbar – only the high-use icons remain.
-    -   The ‘Recent’ button in the toolbar makes it easy to switch between algorithms.
-    -   The ‘A-Z’ button is faster than navigating a combo box with so many entries.
--   Backprojection algorithms were reviewed and updated.
-    -   BackProject_Basics_Depth shows each of the depth levels in the histogram.
--   The “RedCloud” algorithms segment an image using a reduced point cloud.
-    -   “RedColor” algorithms segment an image using the RGB data.
-    -   RedCloud algorithms define segments that have cohesive XY values.
--   The gravity vector from the IMU acceleration vector is slightly unstable.
-    -   The first attempt at stabilizing was to use a Kalman filter. Results: not bad.
-    -   The second attempt uses the longest RGB line as a proxy for gravity.
-        -   If the RGB line end points are not stable, capture the IMU gravity vector.
-        -   If the RGB line end points are stable, the gravity vector is unchanged.
-    -   The second attempt is currently the active method on each frame.
--   The lpMap (line pointer map) was removed – lines are not easily clickable.
-    -   Instead, use the global option debug slider to identify a line for display.
-    -   See the “LineRGB_Info” algorithm to display the characteristics of a line.
+-   The “Gravity RGB Vector” is identified and tracked in the RGB image
+    -   The line is parallel to the gravity vector if one is available.
+    -   The gravity RGB vector is also used to stabilize the gravity IMU vector.
+    -   With door or picture frames, nearly identical lines may show instability.
+-   OpenCVB will close the app if the algorithm options container is closed.
+    -   This was just a convenience feature that felt correct.
+-   EdgeLine was reworked to keep track of individual lines and edges.
+    -   Lines and edges are identified and loosely tracked.
+-   Improved DepthRGB display in dst1 – Depth is shown for the grid rect.
+    -   Mouse over DepthRGB (dst1) to see the benefit.
+    -   DepthRGB may be displayed as “Colorized Depth” and “Depth Correlations”.
+-   Hull lines are lines defined by the edges of a hull.
+    -   Simple way to get more feature lines for testing.
+-   OpenGL algorithms are exempted from the overnight testing.
+    -   Every OpenGL algorithm is a leaf – no algorithms depend on its output.
+    -   The goal of the algorithm is simply to visualize the data involved.
+    -   Other interactive applications can run during testing runs.
+-   RedCloud options are no longer always visible in the algorithm options
+    -   The same options appear in algorithm specific forms (typically offset.)
 -   A log of previous changes is included at the bottom of this document.
 
-**![](media/58382b8918581bfb06ad7ea4a17fd803.gif)Gravity Vector:** *This output shows the typical subtle jitter for the gravity vector. The camera was not moving during this test and shows that the IMU captures the gravity vector but with slight variations from frame to frame. The new Gravity_Basics algorithm in OpenCVB uses the longest line in the RGB image to remove this variability. If the RGB line shows motion, the IMU gravity values are used.*
+![A collage of images of a room AI-generated content may be incorrect.](media/62150eb1904b9faf9d77b56958341e17.png)
 
-\----------------------------------------------------------------------------------------------------------
+**LineRGB_Basics:** *The presentation of the gravity vector has been updated. In the upper left image, the longest RGB line - the “Gravity RGB Vector” - is shown in yellow. The longest line parallel to gravity is preferred if available. The lower right image shows all the lines detected in the image while the lower left image shows the longest RGB lines and their age in frames. The upper right image shows the DepthRGB with the depth and depth range under the mouse.*
 
-NOTE: OpenCVB has evolved away from implementing algorithms in multiple languages because AI has made it convenient to translate the algorithms into any language. While C\#, C++, and Python are often discussed below, the algorithms are now exclusively written in VB.Net because it is the most convenient to type in and the simplest to read. Translate to any language using CodeConvert.ai.
+\-----------------------------------------------------------------------------------------------
 
-\----------------------------------------------------------------------------------------------------------
+NOTE: OpenCVB has evolved away from implementing algorithms in multiple languages because AI has made it convenient to translate the algorithms into any language. While C\#, C++, and Python are discussed below, the algorithms are now exclusively written in VB.Net because it is the most convenient to type in and the simplest to read. Translate to any language using CodeConvert.ai or similar alternative.
+
+\-----------------------------------------------------------------------------------------------
 
 # Introduction
 
 There is no better documentation of an algorithm than a working example, especially in computer vision where the output is often self-explanatory. Imagine having 1000’s of OpenCV examples in a single app, where each algorithm is less than a page of code and written in a familiar language. Each algorithm is designed to be reused in other algorithms, so variations can be easily built. Moreover, each algorithm is free of any baggage from a user interface or environment.
 
-A full installation can take about 30-50 minutes using the 1-step “Update_All.bat” file discussed in the “Installation” section below. But there is no obligation to install needed libraries just to read the code for an algorithm. Open the OpenCVB.sln file after downloading and inspect the code in the C++, C\#, VB.Net or Python. Each algorithm gets a standardized presentation of all the data from any of the RGBD cameras listed below.
+A full installation can take about 30-50 minutes using the 1-step “Update_All.bat” file discussed in the “Installation” section below. But there is no obligation to install needed libraries just to read the code for an algorithm. Open the OpenCVB.sln file after downloading and inspect the code. Each algorithm is presented a standardized input of all the data from any of the RGBD cameras listed below.
 
-However, a full installation is recommended. An algorithm may fit in one page of code and reading is one way to review the code but understanding the algorithms is a lot faster and easier when the output is visualized. The output is often self-documenting or a natural representation of the algorithm’s intent.
+However, a full installation is recommended. An algorithm may fit in one page of code and reading is one way to review the code but understanding the algorithms is a lot faster and easier when the output is visualized by running it. The output is often self-documenting or a natural representation of the algorithm’s intent.
 
-The basic layout of OpenCVB is shown below. Any of the algorithms can be selected from the first combo box at the top of the form. The second combo box is used to select an algorithm group. The default grouping is “\<All but Python\>”. There are a variety of other special groupings that select, for example, all Python or all C++ algorithms.
+The basic layout of OpenCVB is shown below. Any of the algorithms can be selected from the first combo box at the top of the form. The second combo box is used to select an algorithm group. The default grouping is “\< All \>”. There is a group for each algorithm. Select any group and the first combo box will contain all the algorithms that call that algorithm.
 
 # OpenCVB Layout
 
-![A collage of images of a person working on a computer AI-generated content may be incorrect.](media/99f8a694c5eace2b69f015640caca332.png)
+![A collage of images AI-generated content may be incorrect.](media/dc4af39634b70fc7788d6ac462e4aedb.png)
 
-**OpenCVB Layout:** *A typical layout of the OpenCVB application is shown above. The upper left contains the RGB camera output with lines for gravity and the horizon. The upper right contains several different displays of the depth information – see “Global Options”. Here, left/right correlation coefficients are shown with red highlighting the grid “bricks” with high correlation. Alternatively, it may show a conventional depth representation of yellow (close) to blue (far). The algorithm outputs in the bottom left and right. This algorithm (Segmented Linear Regression or SLR_Trends) has only one output in the lower left. Labels above the bottom images are controlled by the algorithm.*
+**OpenCVB Layout:** *A typical layout of the OpenCVB application is shown above. The upper left contains the RGB camera output with lines for gravity and the horizon. The upper right contains several different displays of the depth information – see “Global Options”. Here, left/right correlation coefficients are shown – the brighter the red, the higher the correlation. Alternatively, it may show a conventional depth representation of yellow (close) to blue (far). The algorithm outputs are in the bottom left and right. This algorithm (Segmented Linear Regression or SLR_Trends) has only one output in the lower left. Labels above all images are controlled by the algorithm.*
 
 ![](media/62125113f320d08576258e7ea28bc8bb.png)
 
 **OpenCVB ToolBar:** *The first combo box selects the algorithm – here “SLR_Trends” while the second combo box selects the group of algorithms – here “(1832) \< All \>” which controls what algorithms are available in the first combo box. The “(1832) \< All \>” group includes all algorithms.  The number in the group describes how many algorithms are in that group.*
 
-**Run and Pause:** *The ![](media/8a0dfa720460a53afbcd56d30b78e238.png)button will start and pause the algorithm.*
+**Run and Pause:** *The ![](media/8a0dfa720460a53afbcd56d30b78e238.png)button will pause the algorithm. Algorithms start automatically but may be restarted if paused.*
 
-**OpenCVB Settings:** *The ![](media/0def428cb54dbed05a6172556f0be44f.png)button will start and pause the algorithm.*
+**OpenCVB Settings:** *The ![](media/0def428cb54dbed05a6172556f0be44f.png)button will open the settings for the OpenCVB app.*
 
 **Regression Testing:** *The ![](media/f604bfdff224ebf4eadac1d9379a3b91.png) button will start and stop the overnight testing of each algorithm at various resolutions.*
 
-**Magnify:** *The ![](media/d3475bdf6e3afa8ae87003ed8aafefcf.png) button will magnify the selected portion of the image. To select a portion of the image just click and hold while dragging the mouse over a portion of the image. Select the “DrawRect” and then click the magnify button.*
+**Magnify:** *The ![](media/d3475bdf6e3afa8ae87003ed8aafefcf.png) button will magnify the selected portion of the image. To select a portion of an image just click anywhere in the image and hold while dragging the mouse to create the “DrawRect”. Then click the magnify button to open a window with the 5X magnification of the drawn rectangle.*
 
-**Pixel Viewer:** *The ![](media/b5c54b9b31c1c9e4aabb65640ba92463.png) button will display a separate form showing the pixel values for any of the 4 images. The pixel viewer is aware of the image type so if the image is 32 bit, it will show the floating point values.*
+**Pixel Viewer:** *The ![](media/b5c54b9b31c1c9e4aabb65640ba92463.png) button will display a separate form showing the integer or float values for each pixel. Any of the 4 images may be selected. The pixel viewer is aware of the image type so if the image is 32-bit, it will show the floating point values.*
 
-**Recently Used Algorithms:** *The ![](media/2b0c572c8fc421c071cf13aa57437abc.png)button is a pulldown that displays the last 50 algorithms that were run. The “Test All” button (“Regression Testing”) does NOT update the recent list.*
+**Recently Used Algorithms:** *The ![](media/2b0c572c8fc421c071cf13aa57437abc.png)button is a pulldown that displays the last 50 algorithms that were run. The “Test All” button (“Regression Testing”) does NOT update the recent list. The “Recent” list is updated only when there is a change in the algorithm combo box.*
 
 **A-Z Button:** *The ![](media/fa9f33e3289db7e485b06594e2204c4c.png)button displays a list of all the algorithm categories. Click on any entry to open the first algorithm in that category. Using “A-Z” is faster than using the complete list of algorithms.*
 
 **Algorithm Description:** *Every algorithm provides a simple description of the algorithm. It is always at the right edge of the main form and may be multiple lines.*
 
-**OpenCVB Main Form Caption:** *The caption at the top requires some further explanation. The number of lines of code in OpenCVB is shown along with the number of algorithms. The average number of lines per algorithm is computed from the count. Also, the name of the current camera is shown next to the frame rate for the camera and the frame rate for the algorithm. The camera is in its own thread so its frame rate may be higher than the rate at which the frames are processed in the algorithm thread.*
+**OpenCVB Main Form Caption:** *The caption for the main OpenCVB form requires some further explanation. The number of lines of code in OpenCVB is shown along with the number of algorithms. The average number of lines per algorithm is computed from the count. Also, the name of the current camera is shown next to the frame rate for the camera and the frame rate for the algorithm. The camera is in its own thread so its frame rate may be higher than the rate at which the frames are processed in the algorithm thread.*
 
 # The Objective
 
@@ -2029,3 +2028,32 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A collage of images of hands typing on a computer AI-generated content may be incorrect.](media/136a1ba998770c8ce43cb4b2fd8c0080.png)
 
 **Brick_LeftRightMouse:** *This algorithm is the same as the one above but uses the StereoLabs ZED 2 camera. Here the color image is aligned with the left image while the RealSense example shows that the left camera is not aligned with the color image. For both sample outputs, the lower right image shows the selected cells that match those in the lower left confirming that the translation between left and right cameras is working properly. There are other considerations though but that is TBD.*
+
+# 2025 June (1) – FindContours, ReadMe.md, RedCloud Review, Gravity Vector, and Improved Line_Info.
+
+-   Over 1800 algorithms are included, averaging 37 lines of code per algorithm.
+-   Each retrieval mode in FindContours now has its own algorithm.
+    -   The default retrieval mode is “List” since it has stable results and is fast.
+    -   A general purpose Contour_Basics allows selecting all retrieval modes.
+-   The “OpenCVB Layout” section of this document was completely rewritten.
+    -   Accumulated changes to the user interface were updated and explained.
+    -   There are fewer icons in the main toolbar – only the high-use icons remain.
+    -   The ‘Recent’ button in the toolbar makes it easy to switch between algorithms.
+    -   The ‘A-Z’ button is faster than navigating a combo box with so many entries.
+-   Backprojection algorithms were reviewed and updated.
+    -   BackProject_Basics_Depth shows each of the depth levels in the histogram.
+-   The “RedCloud” algorithms segment an image using a reduced point cloud.
+    -   “RedColor” algorithms segment an image using the RGB data.
+    -   RedCloud algorithms define segments that have cohesive XY values.
+-   The gravity vector from the IMU acceleration vector is slightly unstable.
+    -   The first attempt at stabilizing was to use a Kalman filter. Results: not bad.
+    -   The second attempt uses the longest RGB line as a proxy for gravity.
+        -   If the RGB line end points are not stable, capture the IMU gravity vector.
+        -   If the RGB line end points are stable, the gravity vector is unchanged.
+    -   The second attempt is currently the active method on each frame.
+-   The lpMap (line pointer map) was removed – lines are not easily clickable.
+    -   Instead, use the global option debug slider to identify a line for display.
+    -   See the “LineRGB_Info” algorithm to display the characteristics of a line.
+-   A log of previous changes is included at the bottom of this document.
+
+**![A red and yellow lines on a black background AI-generated content may be incorrect.](media/58382b8918581bfb06ad7ea4a17fd803.gif)Gravity Vector:** *This output shows the typical subtle jitter for the gravity vector. The camera was not moving during this test and shows that the IMU captures the gravity vector but with slight variations from frame to frame. The new Gravity_Basics algorithm in OpenCVB uses the longest line in the RGB image to remove this variability. If the RGB line shows motion, the IMU gravity values are used.*
