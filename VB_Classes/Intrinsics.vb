@@ -43,7 +43,7 @@ Public Class Intrinsics_Basics : Inherits TaskParent
             Dim vec = New cv.Vec3b(0, 255, 255) ' yellow
             If task.rgbLeftAligned Then
                 For Each brick In task.bricks.brickList
-                    If brick.depth > 0 Then dst2.Circle(brick.rect.TopLeft, task.DotSize, task.highlight, -1)
+                    If brick.depth > 0 Then DrawCircle(dst2, brick.rect.TopLeft)
                 Next
             Else
                 For Each brick In task.bricks.brickList
@@ -51,7 +51,7 @@ Public Class Intrinsics_Basics : Inherits TaskParent
                     If Single.IsNaN(pt.X) Or Single.IsNaN(pt.Y) Then Continue For
                     If Single.IsInfinity(pt.X) Or Single.IsInfinity(pt.Y) Then Continue For
                     pt = validatePoint(pt)
-                    dst2.Circle(pt, task.DotSize, task.highlight, -1)
+                    DrawCircle(dst2, pt)
                 Next
             End If
         End If

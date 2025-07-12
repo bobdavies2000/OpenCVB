@@ -31,7 +31,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         dst2 = cellGen.dst2
 
         For Each rc In task.redC.rcList
-            dst2.Circle(rc.maxDStable, task.DotSize, task.highlight, -1, task.lineType)
+            DrawCircle(dst2, rc.maxDStable)
         Next
         labels(2) = cellGen.labels(2)
         labels(3) = ""
@@ -1651,7 +1651,7 @@ Public Class RedColor_Largest : Inherits TaskParent
         dst3.SetTo(0)
         dst3(rc.rect).SetTo(rc.color, rc.mask)
         dst3.Circle(rc.maxDStable, task.DotSize + 2, cv.Scalar.Black)
-        dst3.Circle(rc.maxDStable, task.DotSize, task.highlight)
+        DrawCircle(dst3, rc.maxDStable)
         labels(3) = "MaxDStable was the same for " + CStr(stableCount) + " frames"
     End Sub
 End Class
@@ -1741,7 +1741,7 @@ Public Class RedColor_GridCells : Inherits TaskParent
             rc.index = rcList.Count
             rc.color = color
             dst2(rc.rect).SetTo(rc.color, rc.mask)
-            dst2.Circle(rc.maxDStable, task.DotSize, task.highlight, -1)
+            DrawCircle(dst2, rc.maxDStable)
             rcList.Add(rc)
         Next
 

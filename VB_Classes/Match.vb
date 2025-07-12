@@ -28,11 +28,13 @@ Public Class Match_Basics : Inherits TaskParent
         newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
         If standaloneTest() Then
             dst2 = src
-            dst2.Circle(newCenter2F, task.DotSize, white, -1, task.lineType)
+            DrawCircle(dst2, newCenter2F, white)
+
             dst2.Rectangle(newRect, task.highlight, task.lineWidth)
             If standalone Then
                 Dim lp = task.gravityBasics.gravityRGB
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
+                If lp Is Nothing Then lp = task.lineRGB.lpList(0)
+                DrawLine(dst2, lp.p1, lp.p2)
             End If
         End If
         labels(3) = "Template to compare the src input to"

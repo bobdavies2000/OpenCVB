@@ -67,8 +67,8 @@ Public Class HullLine_EdgePoints : Inherits TaskParent
         dst2 = src.Clone
         For Each lpIn In hullLines.lpList
             Dim lp = EdgePointOffset(lpIn, 1)
-            dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, task.highlight, -1, task.lineType)
-            dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, task.highlight, -1, task.lineType)
+            DrawCircle(dst2, New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)))
+            DrawCircle(dst2, New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)))
         Next
         labels(2) = hullLines.labels(2)
     End Sub

@@ -181,7 +181,7 @@ Public Class Gravity_BrickRotate : Inherits TaskParent
 
         dst1 = src
         For Each brick In task.bricks.brickList
-            If brick.pt.Y = brick.rect.Y Then dst1.Circle(brick.pt, task.DotSize, task.highlight, -1, task.lineType)
+            If brick.pt.Y = brick.rect.Y Then DrawCircle(dst1, brick.pt)
         Next
 
         Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)

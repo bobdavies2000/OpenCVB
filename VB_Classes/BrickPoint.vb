@@ -28,7 +28,7 @@ Public Class BrickPoint_Basics : Inherits TaskParent
         Next
 
         For Each pt In intensityFeatures
-            dst2.Circle(pt, task.DotSize, task.highlight, -1)
+            DrawCircle(dst2, pt)
         Next
 
         labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(intensityFeatures.Count) +
@@ -54,7 +54,7 @@ Public Class BrickPoint_Plot : Inherits TaskParent
         desc = "Plot the distribution of Sobel values for each ptBrick cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ptBrick.Run(task.grayStable)
+        ptBrick.Run(task.gray)
 
         Dim sobelValues As New List(Of Byte)
         For Each brick In task.bricks.brickList
@@ -71,7 +71,9 @@ Public Class BrickPoint_Plot : Inherits TaskParent
 
         dst3 = src
         For Each brick In task.bricks.brickList
-            If brick.intensity <= maxVal And brick.intensity >= minVal Then dst3.Circle(brick.feature, task.DotSize, task.highlight, -1)
+            If brick.intensity <= maxVal And brick.intensity >= minVal Then
+                DrawCircle(dst3, brick.feature)
+            End If
         Next
         labels(2) = "There were " + CStr(sobelValues.Count) + " points found.  Cursor over each bar to see where they originated from"
     End Sub
@@ -115,8 +117,8 @@ Public Class BrickPoint_TopRow : Inherits TaskParent
             If brick.feature = newPoint Then Continue For
             If brick.intensity <> 255 Then Continue For
             If brick.feature.Y = brick.rect.Y Then
-                dst2.Circle(brick.feature, task.DotSize, task.highlight, -1, task.lineType)
-                dst3.Circle(brick.rect.TopLeft, task.DotSize, task.highlight, -1, task.lineType)
+                DrawCircle(dst2, brick.feature)
+                DrawCircle(dst3, brick.rect.TopLeft)
                 count += 1
             End If
         Next
@@ -230,7 +232,7 @@ Public Class BrickPoint_Best : Inherits TaskParent
         desc = "Display the grid points that have the highest possible max val - indicating the quality of the point."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ptBrick.Run(task.grayStable)
+        ptBrick.Run(task.gray)
         labels(2) = ptBrick.labels(2)
 
         dst2 = src.Clone
@@ -238,8 +240,8 @@ Public Class BrickPoint_Best : Inherits TaskParent
         bestBricks.Clear()
         For Each pt In ptBrick.intensityFeatures
             bestBricks.Add(pt)
-            dst2.Circle(pt, task.DotSize, task.highlight, -1)
-            dst3.Circle(pt, task.DotSize, 255, -1)
+            DrawCircle(dst2, pt)
+            DrawCircle(dst3, pt, 255)
         Next
     End Sub
 End Class
@@ -295,7 +297,7 @@ Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
         desc = "Monitor the location of each brick point in a brick."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ptBrick.Run(task.grayStable)
+        ptBrick.Run(task.gray)
 
         dst1 = ptBrick.dst2
         dst3 = src
@@ -315,7 +317,9 @@ Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
         dst2 = cv.Mat.FromPixelData(task.cellSize, task.cellSize, cv.MatType.CV_32F, results)
 
         For Each brick In task.bricks.brickList
-            If brick.feature.X = col And brick.feature.Y = row Then dst3.Circle(brick.pt, task.DotSize, task.highlight, -1)
+            If brick.feature.X = col And brick.feature.Y = row Then
+                DrawCircle(dst3, brick.pt)
+            End If
         Next
 
         For y = 0 To task.cellSize - 1

@@ -514,7 +514,7 @@ Public Class Distance_DepthBricks : Inherits TaskParent
             Dim mm = GetMinMax(dst2(brick.rect))
             If mm.maxVal >= threshold Then
                 Dim pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
-                dst3.Circle(pt, task.DotSize, task.highlight, -1)
+                DrawCircle(dst3, pt)
             End If
         Next
     End Sub

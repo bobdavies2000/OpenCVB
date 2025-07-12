@@ -52,7 +52,7 @@ Public Class Random_Point2d : Inherits TaskParent
             If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each pt In PointList
-                    dst2.Circle(pt, task.DotSize, cv.Scalar.Yellow, -1, task.lineType)
+                    DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y))
                 Next
             End If
         End If

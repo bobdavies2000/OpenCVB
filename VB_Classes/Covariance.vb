@@ -34,7 +34,7 @@ Public Class Covariance_Basics : Inherits TaskParent
         If standaloneTest() Then
             Static lastCenter As cv.Point2f = center
             DrawCircle(dst3,center, 5, cv.Scalar.Red)
-            dst3.Circle(lastCenter, 5, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+            dst3.Circle(lastCenter, 5, task.highlight, task.lineWidth + 1, task.lineType)
             dst3.Line(center, lastCenter, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
             lastCenter = center
             strOut += "Yellow is last center, red is the current center"

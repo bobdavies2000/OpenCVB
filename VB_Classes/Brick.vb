@@ -686,9 +686,8 @@ Public Class Brick_LeftToColor : Inherits TaskParent
         For Each brick In task.bricks.brickList
             If brick.depth > 0 Then
                 count += 1
-                task.color.Circle(brick.rect.TopLeft, task.DotSize, task.highlight, -1)
-                dst2.Circle(brick.lRect.TopLeft, task.DotSize, task.highlight, -1)
-                dst3.Circle(brick.lRect.TopLeft, task.DotSize, task.highlight, -1)
+                DrawCircle(task.color, brick.rect.TopLeft)
+                DrawCircle(dst2, brick.lRect.TopLeft)
             End If
         Next
         labels(2) = CStr(count) + " bricks have depth and therefore an equivalent in the left and right views."

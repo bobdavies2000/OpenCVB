@@ -539,6 +539,12 @@ Public Class TaskParent : Implements IDisposable
                           Optional fillFlag As Integer = -1)
         dst.Circle(pt, radius, color, fillFlag, task.lineType)
     End Sub
+    Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f)
+        dst.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+    End Sub
+    Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, color As cv.Scalar)
+        dst.Circle(pt, task.DotSize, color, -1, task.lineType)
+    End Sub
     Public Sub DrawPolkaDot(pt As cv.Point2f, dst As cv.Mat)
         dst.Circle(pt, task.DotSize + 2, white, -1, task.lineType)
         DrawCircle(dst, pt, task.DotSize, cv.Scalar.Black)

@@ -375,7 +375,7 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
             classCount += 1
             Dim p1 = segment(0)
             For Each p2 In segment
-                dst3.Circle(p2, task.DotSize, task.highlight, -1, task.lineType)
+                DrawCircle(dst3, p2)
                 ' DrawLine(dst3, lp.p1, lp.p2)
                 p1 = p2
             Next

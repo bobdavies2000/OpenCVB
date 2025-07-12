@@ -154,8 +154,8 @@ Public Class Contour_Features : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each pt In task.features
-            dst2.Circle(pt, task.DotSize, task.highlight, -1)
-            dst3.Circle(pt, task.DotSize, task.highlight, -1)
+            DrawCircle(dst2, pt)
+            DrawCircle(dst3, pt)
             Dim index = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
             Dim brick = task.bricks.brickList(index)
             SetTrueText(Format(brick.correlation, fmt1), pt, 3)
@@ -181,7 +181,7 @@ Public Class Contour_BrickPoints : Inherits TaskParent
         ptBrick.Run(task.grayStable)
 
         For Each pt In ptBrick.intensityFeatures
-            dst2.Circle(pt, task.DotSize, task.highlight, -1)
+            DrawCircle(dst2, pt)
         Next
     End Sub
 End Class
@@ -211,7 +211,7 @@ Public Class Contour_Delaunay : Inherits TaskParent
         dst2 = delaunay.dst2.Clone
 
         For Each pt In maxList
-            dst2.Circle(pt, task.DotSize, task.highlight, -1)
+            DrawCircle(dst2, pt)
         Next
     End Sub
 End Class
@@ -743,8 +743,8 @@ Public Class Contour_InfoDepth : Inherits TaskParent
         strOut += "Range (m) = " + Format(contour.mm.range, fmt1) + vbCrLf
         strOut += "Number of pixels in the mask: " + CStr(contour.pixels) + vbCrLf
 
-        dst2.Rectangle(contour.rect, task.highlight, task.lineWidth)
-        dst2.Circle(contour.maxDist, task.DotSize, task.highlight, -1)
+        DrawRect(dst2, contour.rect)
+        DrawCircle(dst2, contour.maxDist)
 
         SetTrueText(strOut, 3)
     End Sub
@@ -802,7 +802,7 @@ Public Class Contour_Isolate : Inherits TaskParent
         dst3 = ShowPalette(dst1)
 
         For Each contour In task.contours.contourList
-            dst3.Circle(contour.maxDist, task.DotSize, task.highlight, -1, task.lineType)
+            DrawCircle(dst3, contour.maxDist)
         Next
     End Sub
 End Class
@@ -894,7 +894,7 @@ Public Class Contour_EdgePoints : Inherits TaskParent
             For i = 0 To 1
                 Dim pt = ptList(ptIndex - i)
                 dst1.Set(Of Single)(pt.Y, pt.X, index + 1)
-                dst2.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
+                DrawCircle(dst2, pt)
             Next
             If ptList.Count >= maxLines Then Exit For
         Next

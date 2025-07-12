@@ -1104,8 +1104,8 @@ Public Class KNN_EdgePoints : Inherits TaskParent
         dst2 = src.Clone
         For Each lp In task.lineRGB.lpList
             HullLine_EdgePoints.EdgePointOffset(lp, 1)
-            dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, task.highlight, -1, task.lineType)
-            dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, task.highlight, -1, task.lineType)
+            DrawCircle(dst2, New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)))
+            DrawCircle(dst2, New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)))
         Next
 
         knn.queries.Clear()
@@ -1144,66 +1144,6 @@ Public Class KNN_EdgePoints : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-'Public Class KNN_EndPoints : Inherits TaskParent
-'    Public lpList As New List(Of lpData)
-'    Dim knn As New KNN_N2Basics
-'    Public distances() As Single
-'    Public minDistance As Integer = dst2.Width * 0.2
-'    Public Sub New()
-'        desc = "Match edgepoints from the current and previous frames."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        If standalone Then lpList = task.lineRGB.lpList
-'        If lpList.Count = 0 Then Exit Sub
-
-'        dst2 = src.Clone
-'        knn.trainInput.Clear()
-
-'        For Each lp In lpList
-'            knn.add
-'            dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, task.highlight, -1, task.lineType)
-'            dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, task.highlight, -1, task.lineType)
-'        Next
-
-'        knn.queries.Clear()
-'        For Each lp In lpList
-'            knn.queries.Add(lp.ep1)
-'            knn.queries.Add(lp.ep2)
-'        Next
-
-'        knn.Run(emptyMat)
-'        knn.trainInput = New List(Of cv.Point2f)(knn.queries) ' for the next iteration.
-
-'        ReDim distances(minDistance - 1)
-'        For i = 0 To knn.queries.Count - 1
-'            Dim p1 = knn.queries(i)
-'            Dim index = knn.result(i, 0)
-'            If index >= knn.trainInput.Count Then Continue For
-'            Dim p2 = knn.trainInput(index)
-
-'            Dim intDistance = CInt(p1.DistanceTo(p2))
-'            If intDistance >= minDistance Then intDistance = distances.Length - 1
-'            distances(intDistance) += 1
-'        Next
-
-'        If distances.Count > 0 Then
-'            Dim distList = distances.ToList
-'            Dim maxIndex = distList.IndexOf(distList.Max)
-'            labels(2) = CStr(lpInput.Count * 2) + " edge points found.  Peak distance at " + CStr(maxIndex) + " pixels"
-
-'            If standalone Then
-'                Static plot As New Plot_OverTimeSingle
-'                plot.plotData = maxIndex
-'                plot.Run(src)
-'                dst3 = plot.dst2
-'            End If
-'        End If
-'    End Sub
-'End Class
 
 
 
@@ -1281,7 +1221,7 @@ Public Class KNN_BoundingRect : Inherits TaskParent
         End If
 
         dst1 = ShowPaletteNoZero(task.lineRGB.lpRectMap)
-        dst1.Circle(lp.center, task.DotSize, task.highlight, task.lineWidth, task.lineType)
+        DrawCircle(dst1, lp.center)
 
         Dim index = task.lineRGB.lpRectMap.Get(Of Byte)(lp.center.Y, lp.center.X)
         If index > 0 Then lp = lplist(index - 1)

@@ -15,15 +15,15 @@ Public Class MotionCam_MultiLine : Inherits TaskParent
 
         For Each lpIn In task.lineRGB.lpList
             Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 1)
-            dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, task.highlight, -1, task.lineType)
-            dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, task.highlight, -1, task.lineType)
+            DrawCircle(dst2, New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)))
+            DrawCircle(dst2, New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)))
         Next
 
         Static lpLast As New List(Of lpData)(task.lineRGB.lpList)
         For Each lpIn In lpLast
             Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 5)
-            dst2.Circle(New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), task.DotSize, white, -1, task.lineType)
-            dst2.Circle(New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), task.DotSize, white, -1, task.lineType)
+            DrawCircle(dst2, New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), white)
+            DrawCircle(dst2, New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), white)
         Next
 
         lpLast = New List(Of lpData)(task.lineRGB.lpList)
@@ -102,7 +102,7 @@ Public Class MotionCam_SideApproach : Inherits TaskParent
                         pt = New cv.Point2f(ele.Key, dst2.Height - 10 - offset1)
                 End Select
 
-                dst2.Circle(pt, task.DotSize, color, -1, task.lineType)
+                DrawCircle(dst2, pt, color)
                 ptIndex += 1
             Next
             index += 1

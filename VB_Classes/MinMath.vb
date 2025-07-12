@@ -64,7 +64,7 @@ Public Class MinMath_Edges : Inherits TaskParent
         labels(3) = edges.labels(2)
 
         For Each bp In bPoints.bpList
-            dst3.Circle(bp, task.DotSize, task.highlight, -1, task.lineType)
+            DrawCircle(dst3, bp)
         Next
     End Sub
 End Class
@@ -91,7 +91,7 @@ Public Class MinMath_EdgeLine : Inherits TaskParent
         For Each bp In bPoints.bpList
             Dim val = dst3.Get(Of Byte)(bp.Y, bp.X)
             If val = 0 Then Continue For
-            dst3.Circle(bp, task.DotSize, 255, -1, task.lineType)
+            DrawCircle(dst3, bp, 255)
         Next
     End Sub
 End Class
