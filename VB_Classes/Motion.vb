@@ -455,7 +455,7 @@ Public Class Motion_RectTest : Inherits TaskParent
             diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             diff.Run(dst2)
             dst3 = diff.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            DrawRect(dst3, r, task.highlight)
+            DrawRect(dst3, r)
         End If
     End Sub
 End Class

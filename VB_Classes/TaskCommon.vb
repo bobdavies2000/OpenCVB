@@ -688,8 +688,10 @@ Public Class lpData
             If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then vertical = False
         End If
 
-        Dim gridRect1 = task.gridRects(task.grid.gridMap.Get(Of Single)(p1.Y, p1.X))
-        Dim gridRect2 = task.gridRects(task.grid.gridMap.Get(Of Single)(p2.Y, p2.X))
+        Dim gridIndex1 = task.grid.gridMap.Get(Of Single)(p1.Y, p1.X)
+        Dim gridIndex2 = task.grid.gridMap.Get(Of Single)(p2.Y, p2.X)
+        Dim gridRect1 = task.gridRects(gridIndex1)
+        Dim gridRect2 = task.gridRects(gridIndex2)
         If gridRect1.Width <> task.cellSize Or gridRect1.Height <> task.cellSize Or
            gridRect2.Width <> task.cellSize Or gridRect2.Height <> task.cellSize Then
 
@@ -702,10 +704,11 @@ Public Class lpData
             gridRect1.Height = task.cellSize
             gridRect2.Height = task.cellSize
         End If
-        Dim nabeRect1 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(p1.Y, p1.X))
-        Dim nabeRect2 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(p2.Y, p2.X))
-        template1 = task.color(gridRect1)
-        template2 = task.color(gridRect2)
+
+        Dim nabeRect1 = task.gridNabeRects(gridIndex1)
+        Dim nabeRect2 = task.gridNabeRects(gridIndex2)
+        template1 = task.color(nabeRect1)
+        template2 = task.color(nabeRect2)
 
         If p1.X <> p2.X Then
             Dim b = p1.Y - p1.X * slope

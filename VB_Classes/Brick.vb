@@ -617,13 +617,14 @@ Public Class Brick_CorrelationInput : Inherits TaskParent
         task.brickD = task.bricks.brickList(index)
 
         Dim corr = task.brickD.correlation
-        dst2.Circle(task.brickD.lRect.TopLeft, task.DotSize, 255, -1)
-        SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, task.brickD.rect.TopLeft, 2)
+        DrawCircle(dst2, task.brickD.lRect.TopLeft, task.DotSize, 255)
+        Dim pt = New cv.Point(task.brickD.rect.TopLeft.X, task.brickD.rect.TopLeft.Y - 10)
+        SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)
         labels(3) = "Correlation of the left brick to the right is " + Format(corr, fmt3)
 
         Dim grayScale As Integer = 128
-        dst2.Rectangle(task.brickD.lRect, grayScale, task.lineWidth)
-        dst3.Rectangle(task.brickD.rRect, grayScale, task.lineWidth)
+        DrawRect(dst2, task.brickD.lRect, grayScale)
+        DrawRect(dst3, task.brickD.rRect, grayScale)
         labels(2) = "The correlation coefficient at " + task.brickD.rect.TopLeft.ToString + " is " + Format(corr, fmt3)
     End Sub
 End Class

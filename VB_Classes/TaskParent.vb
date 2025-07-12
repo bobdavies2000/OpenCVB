@@ -406,8 +406,8 @@ Public Class TaskParent : Implements IDisposable
             For i = 0 To binCount - 2
                 Dim h = img.Height * (hist.Get(Of Single)(i, 0)) / mm.maxVal
                 If h = 0 Then h = 5 ' show the color range in the plot
-                cv.Cv2.Rectangle(img, New cv.Rect(i * binWidth, img.Height - h, binWidth, h),
-                                 New cv.Scalar(CInt(180.0 * i / binCount), 255, 255), -1)
+                img.Rectangle(New cv.Rect(i * binWidth, img.Height - h, binWidth, h),
+                              New cv.Scalar(CInt(180.0 * i / binCount), 255, 255), -1)
             Next
         End If
         Return img
@@ -535,7 +535,8 @@ Public Class TaskParent : Implements IDisposable
             DrawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
         Next
     End Sub
-    Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, radius As Integer, color As cv.Scalar, Optional fillFlag As Integer = -1)
+    Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, radius As Integer, color As cv.Scalar,
+                          Optional fillFlag As Integer = -1)
         dst.Circle(pt, radius, color, fillFlag, task.lineType)
     End Sub
     Public Sub DrawPolkaDot(pt As cv.Point2f, dst As cv.Mat)

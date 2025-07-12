@@ -104,7 +104,7 @@ Public Class Blob_RenderBlobs : Inherits TaskParent
             dst3.SetTo(0)
             cc.FilterByBlob(dst2, dst3, maxBlob)
 
-            dst3.Circle(New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize + 3, cv.Scalar.Blue, -1, task.lineType)
+            DrawCircle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize + 3, cv.Scalar.Blue)
             DrawCircle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize, cv.Scalar.Yellow)
         End If
     End Sub
