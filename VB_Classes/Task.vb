@@ -802,8 +802,8 @@ Public Class VBtask : Implements IDisposable
             End If
         End If
 
-        gravityBasics.Run(src.Clone)
         lineRGB.Run(grayStable)
+        gravityBasics.Run(src.Clone)
         histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
 
         Dim saveOptionsChanged = task.optionsChanged
