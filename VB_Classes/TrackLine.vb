@@ -13,7 +13,8 @@ Public Class TrackLine_Basics : Inherits TaskParent
             Exit Sub
         End If
 
-        If match.correlation < task.fCorrThreshold Then
+        ' camera is often warming up for the first few images.
+        If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or task.heartBeatLT Then
             lp = lplist(0)
             For Each lp In lplist
                 If lp.gravityProxy Then Exit For

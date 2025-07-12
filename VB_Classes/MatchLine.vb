@@ -322,48 +322,46 @@ End Class
 
 
 
-'Public Class MatchLine_EndPoints : Inherits TaskParent
-'    Public lpInput As lpData
-'    Dim match As New Match_Basics
-'    Public correlation As Single
-'    Public Sub New()
-'        match.template = New cv.Mat
-'        desc = "Concatenate the end point templates to return a single correlation."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        If standalone Then lpInput = task.gravityBasics.gravityRGB
+Public Class MatchLine_EndPoints : Inherits TaskParent
+    Public lpInput As lpData
+    Dim lp As lpData
+    Dim match As New Match_Basics
+    Public correlation As Single
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(3) = "Correlation measures how similar the previous template is to the current one."
+        desc = "Concatenate the end point templates to return a single correlation to the previous frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+        End If
 
-'        match.template = lpInput.template1.Clone
-'        Dim nabeRect1 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lpInput.p1.Y, lpInput.p1.X))
-'        Dim nabeRect2 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lpInput.p2.Y, lpInput.p2.X))
+        If standalone Then lpInput = task.gravityBasics.gravityRGB
 
-'        match.Run(src(nabeRect1))
-'        correlation1 = match.correlation
-'        Dim offsetx1 = match.newRect.TopLeft.X - task.cellSize
-'        Dim offsety1 = match.newRect.TopLeft.Y - task.cellSize
-'        Dim p1 = New cv.Point(lpInput.p1.X + offsetx1, lpInput.p1.Y + offsety1)
+        Dim nabeRect1 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lpInput.p1.Y, lpInput.p1.X))
+        Dim nabeRect2 = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lpInput.p2.Y, lpInput.p2.X))
+        cv.Cv2.HConcat(src(nabeRect1), src(nabeRect2), match.template)
+        Static templateLast = match.template.Clone
 
-'        match.template = lpInput.template2.Clone
-'        match.Run(src(nabeRect2))
-'        correlation2 = match.correlation
-'        Dim offsetX2 = match.newRect.TopLeft.X - task.cellSize
-'        Dim offsetY2 = match.newRect.TopLeft.Y - task.cellSize
-'        Dim p2 = New cv.Point(lpInput.p2.X + offsetX2, lpInput.p2.Y + offsetY2)
+        match.Run(templateLast)
+        correlation = match.correlation
 
-'        lpOutput = New lpData(p1, p2)
+        If standaloneTest() Then
+            Static rFit As New Rectangle_Fit
+            rFit.Run(match.template)
+            dst2 = rFit.dst2.Clone
+            labels(2) = "Correlation = " + Format(correlation, fmt3)
 
-'        If standaloneTest() Then
-'            Dim tmp As New cv.Mat
-'            cv.Cv2.HConcat(lpInput.template1, lpInput.template2, tmp)
-'            Dim sz = New cv.Size(dst2.Width, tmp.Height * dst2.Width / tmp.Width)
-'            tmp = tmp.Resize(sz)
-'            tmp.CopyTo(dst2(New cv.Rect(0, 0, sz.Width, sz.Height)))
-'            labels(2) = "Correlation1 = " + Format(correlation1, fmt3) + " and correlation2 = " + Format(correlation2, fmt3)
+            rFit.Run(templateLast)
+            dst3 = rFit.dst2
 
-'            dst3 = src
-'            DrawLine(dst3, lpInput.p1, lpInput.p2)
-'            labels(3) = "OffsetX1 = " + CStr(offsetx1) + "  OffsetY1 = " + CStr(offsety1) + "  " +
-'                        "OffsetX2 = " + CStr(offsetX2) + "  OffsetY2 = " + CStr(offsetY2)
-'        End If
-'    End Sub
-'End Class
+            dst1 = src.Clone
+            DrawRect(dst1, nabeRect1)
+            DrawRect(dst1, nabeRect2)
+        End If
+
+        templateLast = match.template.Clone
+    End Sub
+End Class

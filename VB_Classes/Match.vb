@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 Imports System.Windows.Forms
 Public Class Match_Basics : Inherits TaskParent
-    Public template As cv.Mat ' must provide this!
+    Public template As New cv.Mat ' must provide this!
     Public correlation As Single
     Public newCenter As cv.Point
     Public newCenter2F As cv.Point2f
