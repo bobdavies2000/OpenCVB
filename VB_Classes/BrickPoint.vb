@@ -206,8 +206,8 @@ Public Class BrickPoint_KNN : Inherits TaskParent
         knn.Run(emptyMat)
 
         For i = 0 To knn.neighbors.Count - 1
-            dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(1)), 255, task.lineWidth, task.lineType)
-            dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(2)), 255, task.lineWidth, task.lineType)
+            DrawLine(dst3, knn.trainInput(i), knn.trainInput(knn.neighbors(i)(1)), 255)
+            DrawLine(dst3, knn.trainInput(i), knn.trainInput(knn.neighbors(i)(2)), 255)
         Next
 
         dst2 = src.Clone

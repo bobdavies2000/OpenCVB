@@ -521,6 +521,12 @@ Public Class TaskParent : Implements IDisposable
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar, lineWidth As Integer)
         dst.Line(p1, p2, color, lineWidth, task.lineType)
     End Sub
+    Public Sub DrawLine(dst As cv.Mat, lp As lpData)
+        dst.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+    End Sub
+    Public Sub DrawLine(dst As cv.Mat, lp As lpData, color As cv.Scalar)
+        dst.Line(lp.p1, lp.p2, color, task.lineWidth, task.lineType)
+    End Sub
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f)
         dst.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
     End Sub

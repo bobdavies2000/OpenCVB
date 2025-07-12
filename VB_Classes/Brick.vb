@@ -893,9 +893,9 @@ Public Class Brick_RegionLines : Inherits TaskParent
             Dim c1 = dst2.Get(Of cv.Vec3b)(lp.p1.Y, lp.p1.X)
             Dim c2 = dst2.Get(Of cv.Vec3b)(lp.p2.Y, lp.p2.X)
             If c1 <> c2 Then
-                dst3.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
+                DrawLine(dst3, lp, white)
             Else
-                dst2.Line(lp.p1, lp.p2, cv.Scalar.White, task.lineWidth)
+                DrawLine(dst2, lp, white)
             End If
         Next
     End Sub
