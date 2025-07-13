@@ -7939,6 +7939,9 @@ Public Class Options_RedCloud : Inherits OptionParent
             Case "Orbbec Gemini 335L"
                 task.xRange = 3.5
                 task.yRange = 1.5
+            Case "Orbbec Gemini 335"
+                task.xRange = 3.5
+                task.yRange = 1.5
         End Select
 
         task.xRangeDefault = task.xRange

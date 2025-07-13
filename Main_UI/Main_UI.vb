@@ -156,10 +156,23 @@ Public Class Main_UI
             .camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True, True})
             .camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False, False})
             Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
+            Dim stereoLabsDefineIsOff As Boolean
             Dim sr = New StreamReader(defines.FullName)
-            If Trim(sr.ReadLine).StartsWith("//#define MYNTD_1000") = False Then
-                .cameraSupported(6) = True
-            End If
+            Dim zedIndex = cameraNames.IndexOf("StereoLabs ZED 2/2i")
+            Dim myntIndex = cameraNames.IndexOf("MYNT-EYE-D1000")
+            While sr.EndOfStream = False
+                Dim nextLine = sr.ReadLine
+                If nextLine.StartsWith("#define MYNTD_1000") Then
+                    .cameraSupported(myntIndex) = True
+                End If
+                If nextLine.Contains("STEREOLAB") Then
+                    If nextLine.StartsWith("//") Then
+                        .cameraSupported(zedIndex) = False
+                        stereoLabsDefineIsOff = True
+                    End If
+                End If
+            End While
+
             sr.Close()
 
             ' checking the list for specific missing device here...
@@ -174,7 +187,9 @@ Public Class Main_UI
                 Dim searchname = cameraNames(i)
                 Dim present As Boolean = False
                 If searchname.Contains("Oak-D") Then searchname = "Movidius MyriadX"
-                If searchname.StartsWith("StereoLabs ZED 2/2i") Then searchname = "ZED 2"
+                If stereoLabsDefineIsOff = False Then
+                    If searchname.StartsWith("StereoLabs ZED 2/2i") Then searchname = "ZED 2"
+                End If
 
                 Dim subsetList As New List(Of String)
                 For Each usbDevice In usbList
@@ -212,7 +227,6 @@ Public Class Main_UI
                 Next
             End If
 
-            Dim myntIndex = cameraNames.IndexOf("MYNT-EYE-D1000")
             If .cameraPresent(myntIndex) And .cameraSupported(myntIndex) = False Then
                 MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
                        "Cam_MyntD.dll has not been built." + vbCrLf + vbCrLf +
@@ -220,12 +234,11 @@ Public Class Main_UI
                        "and run AddMynt.bat in OpenCVB's home directory.")
             End If
 
-            Dim zedIndex = cameraNames.IndexOf("StereoLabs ZED 2/2i")
-            If .cameraPresent(zedIndex) And .cameraSupported(zedIndex) = False Then
+            If .cameraPresent(zedIndex) And .cameraSupported(zedIndex) = False And stereoLabsDefineIsOff = False Then
                 MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
                        "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
                        "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-                       "and rebuild OpenCVB with the StereoLabs SDK.")
+                       "and rerun Update_All.bat to get the StereoLabs SDK.")
             End If
 
             settings.cameraFound = False
@@ -903,7 +916,8 @@ Public Class Main_UI
         updatePath(HomeDir.FullName + "opencv\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
         Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
-        If cudaPath IsNot Nothing Then
+        Dim zedIndex = cameraNames.IndexOf("StereoLabs ZED 2/2i")
+        If cudaPath IsNot Nothing And settings.cameraPresent(zedIndex) And settings.cameraSupported(zedIndex) = True Then
             updatePath(cudaPath, "Cuda - needed for StereoLabs")
             updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
             updatePath(HomeDir.FullName + "zed-c-api/Build/Release", "StereoLabs Zed 2i camera support of C# interface.")

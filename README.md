@@ -20,6 +20,10 @@
     -   Other interactive applications can run during testing runs.
 -   RedCloud options are no longer always visible in the algorithm options
     -   The same options appear in algorithm specific forms (typically offset.)
+-   StereoLabs support was always present by default but needn’t be.
+    -   Use CameraDefines.h to enable support for StereoLabs cameras.
+-   Support for Orbbec Gemini 335L is present but Gemini 335 needed an update.
+-   OpenCV 4.13 (the current version) was added (PragmaLibs.h updated.)
 -   A log of previous changes is included at the bottom of this document.
 
 ![A collage of images of a room AI-generated content may be incorrect.](media/62150eb1904b9faf9d77b56958341e17.png)
