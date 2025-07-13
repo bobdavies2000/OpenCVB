@@ -24,6 +24,7 @@
     -   Use CameraDefines.h to enable support for StereoLabs cameras.
 -   Support for Orbbec Gemini 335L is present but Gemini 335 needed an update.
 -   OpenCV 4.13 (the current version) was added (PragmaLibs.h updated.)
+-   Kinect 4 Azure camera interface dropped – no longer needed.
 -   A log of previous changes is included at the bottom of this document.
 
 ![A collage of images of a room AI-generated content may be incorrect.](media/62150eb1904b9faf9d77b56958341e17.png)
