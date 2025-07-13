@@ -206,7 +206,7 @@ Public Class Main_UI
                         Exit For
                     End If
                 Else
-                    If cameraNames(i).Contains(.cameraName) Then
+                    If cameraNames(i).Contains(.cameraName) And .cameraName <> "" Then
                         .cameraIndex = i
                         Exit For
                     End If
@@ -215,7 +215,7 @@ Public Class Main_UI
 
             If .cameraName = "" Or .cameraPresent(.cameraIndex) = False Then
                 For i = 0 To cameraNames.Count - 1
-                    If .cameraPresent(i) And .cameraSupported(i) Then
+                    If .cameraPresent(i) Then
                         .cameraIndex = i
                         .cameraName = cameraNames(i)
                         Exit For
