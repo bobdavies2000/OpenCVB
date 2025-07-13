@@ -50,7 +50,7 @@ Public Class Intrinsics_Basics : Inherits TaskParent
                     Dim pt = translate_ColorToLeft(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
                     If Single.IsNaN(pt.X) Or Single.IsNaN(pt.Y) Then Continue For
                     If Single.IsInfinity(pt.X) Or Single.IsInfinity(pt.Y) Then Continue For
-                    pt = validatePoint(pt)
+                    pt = lpData.validatePoint(pt)
                     DrawCircle(dst2, pt)
                 Next
             End If

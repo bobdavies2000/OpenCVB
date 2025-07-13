@@ -27,7 +27,7 @@ Public Class KNN_Basics : Inherits TaskParent
         result = knn2.result
 
         If standaloneTest() Then
-            dst2 = src
+            dst2 = task.color
             For Each pt In trainInput
                 DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Red)
                 dst2.Circle(pt, task.DotSize, task.highlight)

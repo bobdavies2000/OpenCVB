@@ -716,8 +716,8 @@ Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
             If task.motionBasics.motionFlags(i) Then
                 Dim ptmin = New cv.Point2f(task.kalman.kOutput(i * 4) + rect.X, task.kalman.kOutput(i * 4 + 1) + rect.Y)
                 Dim ptmax = New cv.Point2f(task.kalman.kOutput(i * 4 + 2) + rect.X, task.kalman.kOutput(i * 4 + 3) + rect.Y)
-                ptmin = validatePoint(ptmin)
-                ptmax = validatePoint(ptmax)
+                ptmin = lpData.validatePoint(ptmin)
+                ptmax = lpData.validatePoint(ptmax)
                 minList(i) = ptmin
                 maxList(i) = ptmax
             End If
@@ -879,8 +879,8 @@ Public Class XO_Line_BasicsRawOld : Inherits TaskParent
         For Each v In lines
             If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
                    v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
-                Dim p1 = validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
-                Dim p2 = validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
+                Dim p1 = lpData.validatePoint(New cv.Point(CInt(v(0) + subsetRect.X), CInt(v(1) + subsetRect.Y)))
+                Dim p2 = lpData.validatePoint(New cv.Point(CInt(v(2) + subsetRect.X), CInt(v(3) + subsetRect.Y)))
                 Dim lp = New lpData(p1, p2)
                 lpList.Add(lp)
                 ptList.Add(New cv.Point(CInt(lp.p1.X), CInt(lp.p1.Y)))

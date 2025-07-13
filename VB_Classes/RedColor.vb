@@ -1506,7 +1506,7 @@ Public Class RedColor_Contour : Inherits TaskParent
                 For Each pt In rc.contour
                     pt.X += deltaX
                     pt.Y += deltaY
-                    pt = validatePoint(pt)
+                    pt = lpData.validatePoint(pt)
                     contour.Add(pt)
                 Next
                 If i < 8 Then

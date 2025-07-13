@@ -11,7 +11,7 @@ Public Class BrickPoint_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
 
-        sobel.Run(task.grayStable.Clone)
+        sobel.Run(task.gray.Clone)
         dst3 = sobel.dst2
 
         intensityFeatures.Clear()
@@ -188,42 +188,6 @@ End Class
 
 
 
-Public Class BrickPoint_KNN : Inherits TaskParent
-    Dim ptBrick As New BrickPoint_Best
-    Dim knn As New KNN_Basics
-    Public Sub New()
-        desc = "Join the 2 nearest points to each grid point to help find lines."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        ptBrick.Run(task.grayStable)
-        dst3 = ptBrick.dst3
-
-        knn.trainInput.Clear()
-        For Each pt In ptBrick.bestBricks
-            knn.trainInput.Add(New cv.Point2f(pt.X, pt.Y))
-        Next
-        knn.queries = New List(Of cv.Point2f)(knn.trainInput)
-        knn.Run(emptyMat)
-
-        For i = 0 To knn.neighbors.Count - 1
-            DrawLine(dst3, knn.trainInput(i), knn.trainInput(knn.neighbors(i)(1)), 255)
-            DrawLine(dst3, knn.trainInput(i), knn.trainInput(knn.neighbors(i)(2)), 255)
-        Next
-
-        dst2 = src.Clone
-        For Each lp In task.lineRGB.lpList
-            DrawLine(dst2, lp.p1, lp.p2)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class BrickPoint_Best : Inherits TaskParent
     Dim ptBrick As New BrickPoint_Basics
     Public bestBricks As New List(Of cv.Point)
@@ -259,7 +223,7 @@ Public Class BrickPoint_Busiest : Inherits TaskParent
         desc = "Identify the bricks with the best edge counts - indicating the quality of the brick."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ptBrick.Run(task.grayStable)
+        ptBrick.Run(task.gray)
 
         dst2 = src.Clone
         dst3.SetTo(0)
@@ -378,6 +342,86 @@ Public Class BrickPoint_FeatureLess : Inherits TaskParent
         labels(2) = task.contours.labels(2)
         labels(3) = "Of the " + CStr(task.contours.contourList.Count) + " contours " + CStr(classCount) +
                     " have complete bricks inside them."
+    End Sub
+End Class
+
+
+
+
+
+Public Class BrickPoint_KNN : Inherits TaskParent
+    Public ptBrick As New BrickPoint_Basics
+    Dim knn As New KNN_Basics
+    Public lplist As New List(Of lpData)
+    Public Sub New()
+        desc = "Join the 2 nearest points to each brick point to help find lines."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        ptBrick.Run(task.gray)
+        dst3 = ptBrick.dst3
+        If ptBrick.bpList.Count < 3 Then Exit Sub
+
+        knn.trainInput.Clear()
+        For Each pt In ptBrick.bpList
+            knn.trainInput.Add(New cv.Point2f(pt.X, pt.Y))
+        Next
+        knn.queries = New List(Of cv.Point2f)(knn.trainInput)
+        knn.Run(emptyMat)
+
+        lplist.Clear()
+        For i = 0 To knn.neighbors.Count - 1
+            Dim p1 = knn.trainInput(i)
+            Dim p2 = knn.trainInput(knn.neighbors(i)(1))
+            DrawLine(dst3, p1, p2, 255)
+            lplist.Add(New lpData(p1, p2))
+        Next
+
+        dst2 = src.Clone
+        For Each lp In task.lineRGB.lpList
+            DrawLine(dst2, lp.p1, lp.p2)
+        Next
+    End Sub
+End Class
+
+
+
+
+Public Class BrickPoint_EndPoints : Inherits TaskParent
+    Dim brickKNN As New BrickPoint_KNN
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        desc = "Use the lp end points to find lines in the brick points"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        brickKNN.Run(src)
+        dst2 = src.Clone
+        Dim lplist = brickKNN.lplist
+
+        dst1.SetTo(0)
+        Dim lineList As New List(Of Single)
+        For Each lp In lplist
+            Dim p1 = lpData.validatePoint(New cv.Point(CInt(lp.ep1.Y), CInt(lp.ep1.X)))
+            Dim p2 = lpData.validatePoint(New cv.Point(CInt(lp.ep2.Y), CInt(lp.ep2.X)))
+            Dim index1 = dst1.Get(Of Single)(p1.Y, p1.X)
+            Dim index2 = dst1.Get(Of Single)(p2.Y, p2.X)
+            If index1 = 0 And index2 = 0 Then
+                dst1.Set(Of Single)(p1.Y, p1.X, lp.index + 1)
+                dst1.Set(Of Single)(p2.Y, p2.X, lp.index + 1)
+            Else
+                If index1 = index2 Then
+                    If lineList.Contains(lp.index) = False Then
+                        lineList.Add(lp.index)
+                        If lineList.Contains(index1 - 1) = False Then lineList.Add(index1 - 1)
+                    End If
+                End If
+            End If
+        Next
+
+        For Each index In lineList
+            Dim lp = lplist(index)
+            DrawLine(dst2, lp.ep1, lp.ep2)
+        Next
     End Sub
 End Class
 

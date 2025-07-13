@@ -653,7 +653,7 @@ Public Class lpData
             rect = ValidateRect(New cv.Rect(rect.X, rect.Y - (20 - rect.Height) / 2, rect.Width, 20))
         End If
     End Sub
-    Private Function validatePoint(pt As cv.Point2f) As cv.Point2f
+    Public Shared Function validatePoint(pt As cv.Point2f) As cv.Point2f
         If pt.X < 0 Then pt.X = 0
         If pt.X > task.color.Width - 1 Then pt.X = task.color.Width - 1
         If pt.Y < 0 Then pt.Y = 0

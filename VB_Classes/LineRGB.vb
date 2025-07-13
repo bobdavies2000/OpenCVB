@@ -96,8 +96,8 @@ Public Class LineRGB_Raw : Inherits TaskParent
                 Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
                 If p1.X >= 0 And p1.X < dst2.Width And p1.Y >= 0 And p1.Y < dst2.Height And
                    p2.X >= 0 And p2.X < dst2.Width And p2.Y >= 0 And p2.Y < dst2.Height Then
-                    p1 = validatePoint(p1)
-                    p2 = validatePoint(p2)
+                    p1 = lpData.validatePoint(p1)
+                    p2 = lpData.validatePoint(p2)
                     Dim lp = New lpData(p1, p2)
                     lpList.Add(lp)
                 End If
@@ -232,8 +232,8 @@ Public Class LineRGB_RawSorted : Inherits TaskParent
 
         lpList.Clear()
         For Each lp In sortlines.Values
-            lp.p1 = validatePoint(lp.p1)
-            lp.p2 = validatePoint(lp.p2)
+            lp.p1 = lpData.validatePoint(lp.p1)
+            lp.p2 = lpData.validatePoint(lp.p2)
             lpList.Add(lp)
         Next
 

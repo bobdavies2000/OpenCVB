@@ -72,8 +72,8 @@ Public Class LongLine_Point : Inherits TaskParent
         Dim lp = task.lineRGB.lpList(0)
         task.kalman.kInput = {lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y}
         task.kalman.Run(emptyMat)
-        lp.p1 = validatePoint(New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)))
-        lp.p2 = validatePoint(New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3)))
+        lp.p1 = lpData.validatePoint(New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)))
+        lp.p2 = lpData.validatePoint(New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3)))
 
         dst2.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth)
     End Sub
