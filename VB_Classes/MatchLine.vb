@@ -366,39 +366,49 @@ End Class
 
 
 
-Public Class MatchLine_LinePoints : Inherits TaskParent
-    Public lp1 As lpData
-    Public lp2 As lpData
+Public Class MatchLine_GravityRGB : Inherits TaskParent
     Dim match As New Match_Basics
-    Public correlation As Single
+    Public rgbLast As lpData
     Public Sub New()
         labels(3) = traceName + " measures the correlation of the end points of the 2 lines provided."
-        desc = "Compute a correlation for the 2 lp's provided."
+        desc = "Check if the gravity RGB vector is still present using correlations.  If so, keep the current gravity RGB vector."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim rgbVec = task.gravityBasics.gravityRGB
+
         If task.optionsChanged Then
             dst2.SetTo(0)
             dst3.SetTo(0)
-        End If
-
-        If standalone Then
-            If task.lineRGB.lpList.Count = 0 Then Exit Sub ' 
-            lp1 = task.gravityBasics.gravityRGB
-            lp2 = task.lineRGB.lpList(0)
+            rgbLast = rgbVec
         End If
 
         Dim template As New cv.Mat
-        cv.Cv2.HConcat(lp1.template1, lp1.template2, match.template)
-        cv.Cv2.HConcat(lp2.template1, lp2.template2, template)
+        Dim gridIndex1 = task.grid.gridMap.Get(Of Single)(rgbLast.p1.Y, rgbLast.p1.X)
+        Dim gridIndex2 = task.grid.gridMap.Get(Of Single)(rgbLast.p2.Y, rgbLast.p2.X)
+        Dim nabeRect1 = task.gridNabeRects(gridIndex1)
+        Dim nabeRect2 = task.gridNabeRects(gridIndex2)
+        cv.Cv2.HConcat(rgbLast.template1, rgbLast.template2, match.template)
+        cv.Cv2.HConcat(src(nabeRect1), src(nabeRect2), template)
 
         match.Run(template)
-        correlation = match.correlation
+        If rgbVec.gravityProxy Then
+            If rgbVec.length = rgbLast.length Then match.correlation = 0 ' use the new one as it is longer and gravity aligned.
+        End If
+        If match.correlation >= task.fCorrThreshold And task.frameCount > 10 And task.heartBeatLT = False Then
+            task.gravityBasics.gravityRGB = rgbLast
+        End If
 
         If standaloneTest() Then
             Static rFit As New Rectangle_Fit
             rFit.Run(match.template)
             dst2 = rFit.dst2.Clone
-            labels(2) = "Correlation = " + Format(correlation, fmt3)
+            labels(2) = "Correlation = " + Format(match.correlation, fmt3)
+
+            rFit.Run(template)
+            dst3 = rFit.dst2.Clone
+
         End If
+
+        rgbLast = task.gravityBasics.gravityRGB
     End Sub
 End Class

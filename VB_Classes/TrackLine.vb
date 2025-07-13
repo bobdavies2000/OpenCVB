@@ -2,7 +2,7 @@
 Imports cv = OpenCvSharp
 Public Class TrackLine_Basics : Inherits TaskParent
     Dim match As New Match_Basics
-    Dim lpCheck As New MatchLine_LinePoints
+    Dim rgbCheck As New MatchLine_GravityRGB
     Public lp As New lpData
     Public Sub New()
         desc = "Identify and track the longest line, preferably a gravityproxy if available."
@@ -36,29 +36,22 @@ Public Class TrackLine_Basics : Inherits TaskParent
 
                 Dim histList = histArray.ToList
 #If 0 Then
-                Dim correlations As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-                lpCheck.lp1 = lp ' the current gravity RGB vector
+                ' pick the lp that is closest to the last rgbVec
+                Dim p1 = task.gravityBasics.gravityRGB.center
+                Dim minDistance As Single = Single.MaxValue
+                Dim minIndex As Integer
                 For i = 0 To histList.Count - 1
                     If histList(i) > 0 Then
-                        lpCheck.lp2 = lplist(i)
-                        lpCheck.Run(src)
-                        correlations.Add(lpCheck.correlation, i)
+                        Dim distance = p1.DistanceTo(lplist(i).center)
+                        If distance < minDistance Then
+                            minIndex = i
+                            minDistance = distance
+                        End If
                     End If
                 Next
-
-                strOut = ""
-                For Each ele In correlations
-                    strOut += Format(ele.Key, fmt3) + " index = " + CStr(ele.Value) + vbCrLf
-                Next
-                SetTrueText(strOut, 3)
-                If correlations.Count > 0 Then
-                    lp = lplist(correlations.ElementAt(0).Value)
-                    match.template = src(lp.rect)
-                    match.correlation = 1
-                Else
-                    match.correlation = 0
-                End If
+                lp = lplist(minIndex)
 #Else
+                ' pick the lp that has the most pixels in the lp.rect.
                 lp = lplist(histList.IndexOf(histList.Max))
                 match.template = src(lp.rect)
                 match.correlation = 1

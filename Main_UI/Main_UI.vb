@@ -1752,11 +1752,7 @@ Public Class Main_UI
                 If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
                     ptCursor = validatePoint(task.mouseMovePoint)
                     SyncLock trueTextLock
-                        Static saveObjectName = task.displayObjectName
-                        If saveObjectName <> task.displayObjectName Then
-                            trueData.Clear()
-                            saveObjectName = task.displayObjectName
-                        End If
+                        trueData.Clear()
                         If task.trueData.Count Then
                             trueData = New List(Of VB_Classes.TrueText)(task.trueData)
                         End If

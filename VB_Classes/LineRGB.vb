@@ -105,39 +105,39 @@ Public Class LineRGB_Raw : Inherits TaskParent
         Next
 
         ' remove lines that are close and parallel - close is defined as with task.cellsize.
-        Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        Dim removelist As New List(Of Integer)
-        For i = 0 To lpList.Count - 1
-            Dim lp = lpList(i)
-            Dim rect1 = lp.rect
-            For j = i + 1 To lpList.Count - 1
-                Dim lpTmp = lpList(j)
-                Dim rect2 = lpTmp.rect
-                If rect1.IntersectsWith(rect2) Then
-                    Dim deltaX1 = Math.Abs(lp.ep1.X - lpTmp.ep1.X)
-                    Dim deltaX2 = Math.Abs(lp.ep2.X - lpTmp.ep2.X)
-                    If Math.Abs(deltaX1 - deltaX2) < task.cellSize Then
-                        Dim index As Integer
-                        If lp.length > lpTmp.length Then
-                            index = lpTmp.index
-                        Else
-                            index = lp.index
-                        End If
-                        If removelist.Contains(index) = False Then
-                            sortedList.Add(index, index)
-                            removelist.Add(index)
-                        End If
-                    End If
-                End If
-            Next
-        Next
+        'Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        'Dim removelist As New List(Of Integer)
+        'For i = 0 To lpList.Count - 1
+        '    Dim lp = lpList(i)
+        '    Dim rect1 = lp.rect
+        '    For j = i + 1 To lpList.Count - 1
+        '        Dim lpTmp = lpList(j)
+        '        Dim rect2 = lpTmp.rect
+        '        If rect1.IntersectsWith(rect2) Then
+        '            Dim deltaX1 = Math.Abs(lp.ep1.X - lpTmp.ep1.X)
+        '            Dim deltaX2 = Math.Abs(lp.ep2.X - lpTmp.ep2.X)
+        '            If Math.Abs(deltaX1 - deltaX2) < task.cellSize Then
+        '                Dim index As Integer
+        '                If lp.length > lpTmp.length Then
+        '                    index = lpTmp.index
+        '                Else
+        '                    index = lp.index
+        '                End If
+        '                If removelist.Contains(index) = False Then
+        '                    sortedList.Add(index, index)
+        '                    removelist.Add(index)
+        '                End If
+        '            End If
+        '        End If
+        '    Next
+        'Next
 
-        dst2.SetTo(0)
-        For Each index In sortedList.Values
-            Dim lp = lpList(index)
-            dst2.Line(lp.p1, lp.p2, 128, task.lineWidth, task.lineType)
-            lpList.RemoveAt(index)
-        Next
+        'dst2.SetTo(0)
+        'For Each index In sortedList.Values
+        '    Dim lp = lpList(index)
+        '    dst2.Line(lp.p1, lp.p2, 128, task.lineWidth, task.lineType)
+        '    lpList.RemoveAt(index)
+        'Next
 
         For Each lp In lpList
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth + 1, task.lineType)
@@ -796,11 +796,23 @@ Public Class LineRGB_OrderByAge : Inherits TaskParent
 
         lpListAge.Clear()
         dst2 = src
+        Dim count As Integer
         For Each lp In sortAge.Values
             DrawLine(dst2, lp.p1, lp.p2)
-            SetTrueText("Age: " + CStr(lp.age), lp.p1)
+            If lp.gravityProxy Then count += 1
+            If task.toggleOn Then
+                If lp.gravityProxy Then SetTrueText("Age: " + CStr(lp.age), lp.p1)
+            Else
+                If lp.gravityProxy Then SetTrueText("Age: " + CStr(lp.age), lp.p2)
+            End If
             lpListAge.Add(lp)
         Next
+
+        If task.toggleOn Then
+            labels(2) = CStr(sortAge.Values.Count) + " lines were found.  Below the " + CStr(count) + " marked lines are parallel to gravity (bot)"
+        Else
+            labels(2) = CStr(sortAge.Values.Count) + " lines were found.  Below the " + CStr(count) + " marked lines are parallel to gravity (top)"
+        End If
     End Sub
 End Class
 
@@ -905,6 +917,7 @@ Public Class LineRGB_Points : Inherits TaskParent
 
         Static lastQueries As New List(Of cv.Point2f)(knn.queries)
         knn.trainInput = lastQueries
+
 
         knn.Run(emptyMat)
 

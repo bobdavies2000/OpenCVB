@@ -5989,7 +5989,7 @@ End Class
 
 Public Class XO_Gravity_Basics1 : Inherits TaskParent
     Public options As New Options_Features
-    Dim gravityRaw As New Gravity_BasicsRaw
+    Dim gravityRaw As New Gravity_Raw
     Public gravityMatch As New LineRGB_MatchGravity
     Public gravityRGB As lpData
     Dim nearest As New LineRGB_FindNearest

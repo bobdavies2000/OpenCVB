@@ -2,16 +2,21 @@
 Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
     Public options As New Options_Features
-    Dim gravityRaw As New Gravity_BasicsRaw
+    Dim gravityRaw As New Gravity_Raw
     Public trackLine As New TrackLine_Basics
     Public gravityRGB As lpData
     Public Sub New()
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
     End Sub
     Public Shared Sub showVectors(dst As cv.Mat)
-        dst.Line(task.gravityVec.p1, task.gravityVec.p2, white, task.lineWidth, task.lineType)
-        dst.Line(task.horizonVec.p1, task.horizonVec.p2, white, task.lineWidth, task.lineType)
-        dst.Line(task.gravityBasics.gravityRGB.p1, task.gravityBasics.gravityRGB.p2, task.highlight, task.lineWidth + 1, task.lineType)
+        dst.Line(task.gravityVec.ep1, task.gravityVec.ep2, white, task.lineWidth, task.lineType)
+        dst.Line(task.horizonVec.ep1, task.horizonVec.ep2, white, task.lineWidth, task.lineType)
+        Dim rgbVec = task.gravityBasics.gravityRGB
+        If rgbVec.gravityProxy Then
+            dst.Line(rgbVec.ep1, rgbVec.ep2, task.highlight, task.lineWidth + 1, task.lineType)
+        Else
+            dst.Line(rgbVec.p1, rgbVec.p2, task.highlight, task.lineWidth + 1, task.lineType)
+        End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -23,7 +28,21 @@ Public Class Gravity_Basics : Inherits TaskParent
         Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - gravityRGB.ep1.X)
         Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - gravityRGB.ep2.X)
         If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
-            task.gravityVec = task.gravityIMU
+            If gravityRGB.gravityProxy Then
+                Dim p1 = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
+                Dim x = (dst2.Height - gravityRGB.yIntercept) / gravityRGB.slope
+                Dim p2 = New cv.Point2f(x, dst2.Height)
+                Dim lp = New lpData(p1, p2)
+                deltaX1 = Math.Abs(lp.ep1.X - gravityRGB.ep1.X)
+                deltaX2 = Math.Abs(lp.ep2.X - gravityRGB.ep2.X)
+                If Math.Abs(deltaX1 - deltaX2) < options.pixelThreshold Then
+                    task.gravityVec = lp
+                Else
+                    task.gravityVec = task.gravityIMU
+                End If
+            Else
+                task.gravityVec = task.gravityIMU
+            End If
         End If
 
         task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
@@ -43,7 +62,7 @@ End Class
 
 
 
-Public Class Gravity_BasicsRaw : Inherits TaskParent
+Public Class Gravity_Raw : Inherits TaskParent
     Public xTop As Single, xBot As Single
     Dim sampleSize As Integer = 25
     Dim ptList As New List(Of Integer)
@@ -103,7 +122,7 @@ End Class
 
 Public Class Gravity_BasicsKalman : Inherits TaskParent
     Dim kalman As New Kalman_Basics
-    Dim gravity As New Gravity_BasicsRaw
+    Dim gravity As New Gravity_Raw
     Public Sub New()
         desc = "Use kalman to smooth gravity and horizon vectors."
     End Sub

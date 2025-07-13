@@ -617,6 +617,7 @@ Public Class lpData
     Public template2 As New cv.Mat
     Public gravityProxy As Boolean
     Public index As Integer
+    Public yIntercept As Single
     Public Function perpendicularPoints(pt As cv.Point2f) As lpData
         Dim perpSlope = -1 / slope
         Dim angleRadians As Double = Math.Atan(perpSlope)
@@ -676,7 +677,7 @@ Public Class lpData
         Else
             slope = (p1.Y - p2.Y) / (p1.X - p2.X)
         End If
-        ' yIntercept = -p1.X * slope + p1.Y
+        yIntercept = -p1.X * slope + p1.Y
 
         length = p1.DistanceTo(p2)
         CalculateRotatedRectFromLine()

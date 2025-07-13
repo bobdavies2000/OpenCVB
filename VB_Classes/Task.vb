@@ -872,11 +872,13 @@ Public Class VBtask : Implements IDisposable
                 Next
             End If
 
-            If gOptions.CrossHairs.Checked And gravityBasics.gravityRGB IsNot Nothing Then
+            If gOptions.CrossHairs.Checked Then
                 Gravity_Basics.showVectors(dst0)
                 Dim p2 = gravityBasics.gravityRGB.center
                 p2 = New cv.Point(p2.X + 5, p2.Y)
-                displayObject.trueData.Add(New TrueText("Gravity RGB Vector", p2, 0))
+                If gravityBasics.gravityRGB.gravityProxy Then
+                    displayObject.trueData.Add(New TrueText("Gravity RGB Vector", p2, 0))
+                End If
             End If
 
             ' if there were no cycles spent on this routine, then it was inactive.
