@@ -46,6 +46,9 @@ Partial Class OptionsGlobal
         Me.MaxDepthBar = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.ColoringGroup = New System.Windows.Forms.GroupBox()
+        Me.TrackingColor = New System.Windows.Forms.RadioButton()
+        Me.TrackingMeanColor = New System.Windows.Forms.RadioButton()
         Me.ColorSource = New System.Windows.Forms.ComboBox()
         Me.ColorSourceLabel = New System.Windows.Forms.Label()
         Me.DepthGroupBox = New System.Windows.Forms.GroupBox()
@@ -58,17 +61,10 @@ Partial Class OptionsGlobal
         Me.Label1 = New System.Windows.Forms.Label()
         Me.highlight = New System.Windows.Forms.ComboBox()
         Me.CrossHairs = New System.Windows.Forms.CheckBox()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
-        Me.MotionFilteredColorOnly = New System.Windows.Forms.RadioButton()
-        Me.MotionFilteredColorAndCloud = New System.Windows.Forms.RadioButton()
-        Me.UseHistoryCloud = New System.Windows.Forms.RadioButton()
-        Me.MotionFilteredCloudOnly = New System.Windows.Forms.RadioButton()
-        Me.unFiltered = New System.Windows.Forms.RadioButton()
         Me.ShowGrid = New System.Windows.Forms.CheckBox()
         Me.debugSyncUI = New System.Windows.Forms.CheckBox()
         Me.UseMultiThreading = New System.Windows.Forms.CheckBox()
         Me.ShowAllOptions = New System.Windows.Forms.CheckBox()
-        Me.OpenGLCapture = New System.Windows.Forms.CheckBox()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.CreateGif = New System.Windows.Forms.CheckBox()
         Me.Palettes = New System.Windows.Forms.ComboBox()
@@ -86,9 +82,6 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
-        Me.ColoringGroup = New System.Windows.Forms.GroupBox()
-        Me.TrackingColor = New System.Windows.Forms.RadioButton()
-        Me.TrackingMeanColor = New System.Windows.Forms.RadioButton()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.DepthDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DebugSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -98,13 +91,12 @@ Partial Class OptionsGlobal
         CType(Me.GridSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MaxDepthBar, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
+        Me.ColoringGroup.SuspendLayout()
         Me.DepthGroupBox.SuspendLayout()
         Me.MotionBox.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
         Me.GeometrySettings.SuspendLayout()
         CType(Me.DotSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LineWidth, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.ColoringGroup.SuspendLayout()
         Me.SuspendLayout()
         '
         'MinMaxDepth
@@ -273,7 +265,7 @@ Partial Class OptionsGlobal
         'HistBinBar
         '
         Me.HistBinBar.Location = New System.Drawing.Point(185, 171)
-        Me.HistBinBar.Maximum = 1000
+        Me.HistBinBar.Maximum = 32
         Me.HistBinBar.Minimum = 3
         Me.HistBinBar.Name = "HistBinBar"
         Me.HistBinBar.Size = New System.Drawing.Size(506, 69)
@@ -361,12 +353,9 @@ Partial Class OptionsGlobal
         Me.GroupBox2.Controls.Add(Me.Label1)
         Me.GroupBox2.Controls.Add(Me.highlight)
         Me.GroupBox2.Controls.Add(Me.CrossHairs)
-        Me.GroupBox2.Controls.Add(Me.GroupBox1)
         Me.GroupBox2.Controls.Add(Me.ShowGrid)
         Me.GroupBox2.Controls.Add(Me.debugSyncUI)
-        Me.GroupBox2.Controls.Add(Me.UseMultiThreading)
         Me.GroupBox2.Controls.Add(Me.ShowAllOptions)
-        Me.GroupBox2.Controls.Add(Me.OpenGLCapture)
         Me.GroupBox2.Controls.Add(Me.Label2)
         Me.GroupBox2.Controls.Add(Me.CreateGif)
         Me.GroupBox2.Controls.Add(Me.Palettes)
@@ -383,6 +372,40 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabIndex = 3
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
+        '
+        'ColoringGroup
+        '
+        Me.ColoringGroup.Controls.Add(Me.TrackingColor)
+        Me.ColoringGroup.Controls.Add(Me.TrackingMeanColor)
+        Me.ColoringGroup.Controls.Add(Me.UseMultiThreading)
+        Me.ColoringGroup.Location = New System.Drawing.Point(332, 363)
+        Me.ColoringGroup.Name = "ColoringGroup"
+        Me.ColoringGroup.Size = New System.Drawing.Size(205, 103)
+        Me.ColoringGroup.TabIndex = 81
+        Me.ColoringGroup.TabStop = False
+        Me.ColoringGroup.Text = "RedCloud Output Color"
+        '
+        'TrackingColor
+        '
+        Me.TrackingColor.AutoSize = True
+        Me.TrackingColor.Location = New System.Drawing.Point(15, 59)
+        Me.TrackingColor.Name = "TrackingColor"
+        Me.TrackingColor.Size = New System.Drawing.Size(135, 24)
+        Me.TrackingColor.TabIndex = 3
+        Me.TrackingColor.TabStop = True
+        Me.TrackingColor.Text = "Tracking Color"
+        Me.TrackingColor.UseVisualStyleBackColor = True
+        '
+        'TrackingMeanColor
+        '
+        Me.TrackingMeanColor.AutoSize = True
+        Me.TrackingMeanColor.Location = New System.Drawing.Point(15, 29)
+        Me.TrackingMeanColor.Name = "TrackingMeanColor"
+        Me.TrackingMeanColor.Size = New System.Drawing.Size(115, 24)
+        Me.TrackingMeanColor.TabIndex = 0
+        Me.TrackingMeanColor.TabStop = True
+        Me.TrackingMeanColor.Text = "Mean Color"
+        Me.TrackingMeanColor.UseVisualStyleBackColor = True
         '
         'ColorSource
         '
@@ -506,76 +529,6 @@ Partial Class OptionsGlobal
         Me.CrossHairs.Text = "Show crosshairs"
         Me.CrossHairs.UseVisualStyleBackColor = True
         '
-        'GroupBox1
-        '
-        Me.GroupBox1.Controls.Add(Me.MotionFilteredColorOnly)
-        Me.GroupBox1.Controls.Add(Me.MotionFilteredColorAndCloud)
-        Me.GroupBox1.Controls.Add(Me.UseHistoryCloud)
-        Me.GroupBox1.Controls.Add(Me.MotionFilteredCloudOnly)
-        Me.GroupBox1.Controls.Add(Me.unFiltered)
-        Me.GroupBox1.Enabled = False
-        Me.GroupBox1.Location = New System.Drawing.Point(532, 256)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(306, 186)
-        Me.GroupBox1.TabIndex = 69
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Color and PointCloud Input"
-        '
-        'MotionFilteredColorOnly
-        '
-        Me.MotionFilteredColorOnly.AutoSize = True
-        Me.MotionFilteredColorOnly.Location = New System.Drawing.Point(22, 83)
-        Me.MotionFilteredColorOnly.Name = "MotionFilteredColorOnly"
-        Me.MotionFilteredColorOnly.Size = New System.Drawing.Size(215, 24)
-        Me.MotionFilteredColorOnly.TabIndex = 4
-        Me.MotionFilteredColorOnly.TabStop = True
-        Me.MotionFilteredColorOnly.Text = "Motion Filtered Color Only"
-        Me.MotionFilteredColorOnly.UseVisualStyleBackColor = True
-        '
-        'MotionFilteredColorAndCloud
-        '
-        Me.MotionFilteredColorAndCloud.AutoSize = True
-        Me.MotionFilteredColorAndCloud.Location = New System.Drawing.Point(22, 112)
-        Me.MotionFilteredColorAndCloud.Name = "MotionFilteredColorAndCloud"
-        Me.MotionFilteredColorAndCloud.Size = New System.Drawing.Size(256, 24)
-        Me.MotionFilteredColorAndCloud.TabIndex = 3
-        Me.MotionFilteredColorAndCloud.TabStop = True
-        Me.MotionFilteredColorAndCloud.Text = "Motion Filtered Color and Cloud"
-        Me.MotionFilteredColorAndCloud.UseVisualStyleBackColor = True
-        '
-        'UseHistoryCloud
-        '
-        Me.UseHistoryCloud.AutoSize = True
-        Me.UseHistoryCloud.Location = New System.Drawing.Point(22, 145)
-        Me.UseHistoryCloud.Name = "UseHistoryCloud"
-        Me.UseHistoryCloud.Size = New System.Drawing.Size(244, 24)
-        Me.UseHistoryCloud.TabIndex = 2
-        Me.UseHistoryCloud.TabStop = True
-        Me.UseHistoryCloud.Text = "History PointCloud (averaged)"
-        Me.UseHistoryCloud.UseVisualStyleBackColor = True
-        '
-        'MotionFilteredCloudOnly
-        '
-        Me.MotionFilteredCloudOnly.AutoSize = True
-        Me.MotionFilteredCloudOnly.Location = New System.Drawing.Point(21, 52)
-        Me.MotionFilteredCloudOnly.Name = "MotionFilteredCloudOnly"
-        Me.MotionFilteredCloudOnly.Size = New System.Drawing.Size(219, 24)
-        Me.MotionFilteredCloudOnly.TabIndex = 1
-        Me.MotionFilteredCloudOnly.TabStop = True
-        Me.MotionFilteredCloudOnly.Text = "Motion Filtered Cloud Only"
-        Me.MotionFilteredCloudOnly.UseVisualStyleBackColor = True
-        '
-        'unFiltered
-        '
-        Me.unFiltered.AutoSize = True
-        Me.unFiltered.Location = New System.Drawing.Point(21, 23)
-        Me.unFiltered.Name = "unFiltered"
-        Me.unFiltered.Size = New System.Drawing.Size(142, 24)
-        Me.unFiltered.TabIndex = 0
-        Me.unFiltered.TabStop = True
-        Me.unFiltered.Text = "Unfiltered (raw)"
-        Me.unFiltered.UseVisualStyleBackColor = True
-        '
         'ShowGrid
         '
         Me.ShowGrid.AutoSize = True
@@ -599,7 +552,7 @@ Partial Class OptionsGlobal
         'UseMultiThreading
         '
         Me.UseMultiThreading.AutoSize = True
-        Me.UseMultiThreading.Location = New System.Drawing.Point(748, 172)
+        Me.UseMultiThreading.Location = New System.Drawing.Point(196, -383)
         Me.UseMultiThreading.Name = "UseMultiThreading"
         Me.UseMultiThreading.Size = New System.Drawing.Size(253, 24)
         Me.UseMultiThreading.TabIndex = 65
@@ -616,17 +569,6 @@ Partial Class OptionsGlobal
         Me.ShowAllOptions.TabIndex = 64
         Me.ShowAllOptions.Text = "Show All Options on Open"
         Me.ShowAllOptions.UseVisualStyleBackColor = True
-        '
-        'OpenGLCapture
-        '
-        Me.OpenGLCapture.AutoSize = True
-        Me.OpenGLCapture.Location = New System.Drawing.Point(748, 202)
-        Me.OpenGLCapture.Name = "OpenGLCapture"
-        Me.OpenGLCapture.Size = New System.Drawing.Size(211, 24)
-        Me.OpenGLCapture.TabIndex = 58
-        Me.OpenGLCapture.Text = "Capture OpenGL output "
-        Me.OpenGLCapture.UseVisualStyleBackColor = True
-        Me.OpenGLCapture.Visible = False
         '
         'Label2
         '
@@ -796,39 +738,6 @@ Partial Class OptionsGlobal
     "See OptionsGlobal.vb to change any default value."
         Me.Label8.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'ColoringGroup
-        '
-        Me.ColoringGroup.Controls.Add(Me.TrackingColor)
-        Me.ColoringGroup.Controls.Add(Me.TrackingMeanColor)
-        Me.ColoringGroup.Location = New System.Drawing.Point(332, 363)
-        Me.ColoringGroup.Name = "ColoringGroup"
-        Me.ColoringGroup.Size = New System.Drawing.Size(205, 103)
-        Me.ColoringGroup.TabIndex = 81
-        Me.ColoringGroup.TabStop = False
-        Me.ColoringGroup.Text = "RedCloud Output Color"
-        '
-        'TrackingColor
-        '
-        Me.TrackingColor.AutoSize = True
-        Me.TrackingColor.Location = New System.Drawing.Point(15, 59)
-        Me.TrackingColor.Name = "TrackingColor"
-        Me.TrackingColor.Size = New System.Drawing.Size(135, 24)
-        Me.TrackingColor.TabIndex = 3
-        Me.TrackingColor.TabStop = True
-        Me.TrackingColor.Text = "Tracking Color"
-        Me.TrackingColor.UseVisualStyleBackColor = True
-        '
-        'TrackingMeanColor
-        '
-        Me.TrackingMeanColor.AutoSize = True
-        Me.TrackingMeanColor.Location = New System.Drawing.Point(15, 29)
-        Me.TrackingMeanColor.Name = "TrackingMeanColor"
-        Me.TrackingMeanColor.Size = New System.Drawing.Size(115, 24)
-        Me.TrackingMeanColor.TabIndex = 0
-        Me.TrackingMeanColor.TabStop = True
-        Me.TrackingMeanColor.Text = "Mean Color"
-        Me.TrackingMeanColor.UseVisualStyleBackColor = True
-        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -851,18 +760,16 @@ Partial Class OptionsGlobal
         CType(Me.MaxDepthBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
+        Me.ColoringGroup.ResumeLayout(False)
+        Me.ColoringGroup.PerformLayout()
         Me.DepthGroupBox.ResumeLayout(False)
         Me.DepthGroupBox.PerformLayout()
         Me.MotionBox.ResumeLayout(False)
         Me.MotionBox.PerformLayout()
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
         Me.GeometrySettings.ResumeLayout(False)
         Me.GeometrySettings.PerformLayout()
         CType(Me.DotSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LineWidth, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.ColoringGroup.ResumeLayout(False)
-        Me.ColoringGroup.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -903,7 +810,6 @@ Partial Class OptionsGlobal
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents Palettes As System.Windows.Forms.ComboBox
     Friend WithEvents DebugCheckBox As System.Windows.Forms.CheckBox
-    Friend WithEvents OpenGLCapture As System.Windows.Forms.CheckBox
     Friend WithEvents ShowAllOptions As System.Windows.Forms.CheckBox
     Friend WithEvents UseMultiThreading As System.Windows.Forms.CheckBox
     Friend WithEvents DebugSliderLabel As System.Windows.Forms.Label
@@ -911,12 +817,6 @@ Partial Class OptionsGlobal
     Friend WithEvents Label11 As System.Windows.Forms.Label
     Friend WithEvents debugSyncUI As System.Windows.Forms.CheckBox
     Friend WithEvents ShowGrid As System.Windows.Forms.CheckBox
-    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
-    Friend WithEvents UseHistoryCloud As System.Windows.Forms.RadioButton
-    Friend WithEvents MotionFilteredCloudOnly As System.Windows.Forms.RadioButton
-    Friend WithEvents unFiltered As System.Windows.Forms.RadioButton
-    Friend WithEvents MotionFilteredColorOnly As System.Windows.Forms.RadioButton
-    Friend WithEvents MotionFilteredColorAndCloud As System.Windows.Forms.RadioButton
     Friend WithEvents showMotionMask As System.Windows.Forms.CheckBox
     Friend WithEvents CrossHairs As System.Windows.Forms.CheckBox
     Friend WithEvents Label1 As System.Windows.Forms.Label

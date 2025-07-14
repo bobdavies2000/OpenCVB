@@ -916,7 +916,6 @@ Public Class Depth_StableMin : Inherits TaskParent
     Public stableMin As cv.Mat
     Dim colorize As New DepthColorizer_CPP
     Public Sub New()
-        task.gOptions.unFiltered.Checked = True
         labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
         desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable"
     End Sub
@@ -951,7 +950,6 @@ Public Class Depth_StableMinMax : Inherits TaskParent
     Public dMax As New Depth_StableMax
     Public options As New Options_MinMaxNone
     Public Sub New()
-        task.gOptions.unFiltered.Checked = True
         labels(2) = "Depth map colorized"
         labels(3) = "32-bit StableDepth"
         desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
@@ -1148,7 +1146,6 @@ Public Class Depth_StableMax : Inherits TaskParent
     Public stableMax As cv.Mat
     Dim colorize As New DepthColorizer_CPP
     Public Sub New()
-        task.gOptions.unFiltered.Checked = True
         labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
         desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
     End Sub

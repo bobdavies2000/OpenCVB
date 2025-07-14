@@ -900,3 +900,25 @@ Public Class Brick_RegionLines : Inherits TaskParent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Brick_Cloud : Inherits TaskParent
+    Public Sub New()
+        task.brickRunFlag = True
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        desc = "Use RGB motion bricks to determine if depth has changed in any brick."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        task.pointCloud.CopyTo(dst2, task.motionMask)
+        For Each brick In task.bricks.brickList
+            Dim mask = dst2(brick.rect).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
+            If brick.age > 1 Then task.pointCloud(brick.rect).CopyTo(dst2(brick.rect), mask)
+        Next
+
+        If standaloneTest() Then dst3 = task.pointCloud
+    End Sub
+End Class

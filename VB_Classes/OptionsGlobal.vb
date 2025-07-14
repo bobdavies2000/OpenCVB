@@ -22,7 +22,6 @@ Public Class OptionsGlobal
             LineWidth.Value = 2
         End If
         FrameHistory.Value = 5
-        MotionFilteredColorAndCloud.Checked = True
         gravityPointCloud.Checked = True
 
         labelBinsCount.Text = CStr(HistBinBar.Value)
@@ -232,7 +231,7 @@ Public Class OptionsGlobal
     Private Sub DebugCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles DebugCheckBox.CheckedChanged
         task.optionsChanged = True
     End Sub
-    Private Sub OpenGLCapture_Click(sender As Object, e As EventArgs) Handles OpenGLCapture.Click
+    Private Sub OpenGLCapture_Click(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
     Private Sub useMotion_CheckedChanged(sender As Object, e As EventArgs)
@@ -257,19 +256,19 @@ Public Class OptionsGlobal
 
 
 
-    Private Sub unFiltered_CheckedChanged(sender As Object, e As EventArgs) Handles unFiltered.CheckedChanged
+    Private Sub unFiltered_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
-    Private Sub MotionFilteredCloudOnly_CheckedChanged(sender As Object, e As EventArgs) Handles MotionFilteredCloudOnly.CheckedChanged
+    Private Sub MotionFilteredCloudOnly_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
-    Private Sub MotionFilteredColorOnly_CheckedChanged(sender As Object, e As EventArgs) Handles MotionFilteredColorOnly.CheckedChanged
+    Private Sub MotionFilteredColorOnly_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
-    Private Sub MotionFilteredColorAndCloud_CheckedChanged(sender As Object, e As EventArgs) Handles MotionFilteredColorAndCloud.CheckedChanged
+    Private Sub MotionFilteredColorAndCloud_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
-    Private Sub UseHistoryCloud_CheckedChanged(sender As Object, e As EventArgs) Handles UseHistoryCloud.CheckedChanged
+    Private Sub UseHistoryCloud_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
     Private Sub DustFree_CheckedChanged(sender As Object, e As EventArgs)
@@ -293,19 +292,10 @@ Public Class OptionsGlobal
     Public Sub setMaxDepth(val As Integer)
         MaxDepthBar.Value = val
     End Sub
-    Public Function getMaxDepthBar() As Integer
-        Return MaxDepthBar.Value
-    End Function
     Public Sub setHistogramBins(val As Integer)
+        If HistBinBar.Maximum < val Then HistBinBar.Maximum = val * 2
         HistBinBar.Value = val
     End Sub
-    Public Sub setHistBinBarMax(val As Integer)
-        HistBinBar.Maximum = val
-    End Sub
-    Public Function getHistBinBarMax() As Integer
-        Return HistBinBar.Maximum
-    End Function
-
     Public Sub setPixelDifference(val As Integer)
         PixelDiffBar.Value = val
     End Sub
@@ -327,12 +317,6 @@ Public Class OptionsGlobal
     Public Sub setPalette(val As String)
         Palettes.SelectedItem() = val
     End Sub
-    Public Function getOpenGLCapture() As Boolean
-        Return OpenGLCapture.Checked
-    End Function
-    Public Sub setOpenGLCapture(val As Boolean)
-        OpenGLCapture.Checked = val
-    End Sub
     Public Sub setGravityUsage(val As Boolean)
         gravityPointCloud.Checked = val
     End Sub
@@ -342,12 +326,6 @@ Public Class OptionsGlobal
     Public Sub setLineWidth(val As Integer)
         LineWidth.Value = val
     End Sub
-    Public Sub setUnfiltered(val As Boolean)
-        unFiltered.Checked = val
-    End Sub
-    Public Function getUnfiltered() As Boolean
-        Return unFiltered.Checked
-    End Function
     Public Sub SetUseKalman(val As Boolean)
         UseKalman.Checked = val
     End Sub

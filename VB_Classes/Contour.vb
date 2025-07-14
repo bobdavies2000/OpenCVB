@@ -923,44 +923,6 @@ End Class
 
 
 
-
-
-Public Class Contour_RedCloud : Inherits TaskParent
-    Dim prep As New RedCloud_PrepOutline
-    Public options As New Options_Contours
-    Public contourList As New List(Of contourData)
-    Public contourLookup As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
-    Public contourIDs As New List(Of Integer)
-    Dim sortContours As New Contour_Sort
-    Public Sub New()
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Use the RedPrep_Basics as input to contours_basics."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        prep.Run(src)
-        prep.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        labels(2) = prep.labels(2)
-
-        Dim mode = options.options2.ApproximationMode
-        cv.Cv2.FindContours(dst2, sortContours.allContours, Nothing, cv.RetrievalModes.List, mode)
-        If sortContours.allContours.Count <= 1 Then Exit Sub
-
-        sortContours.Run(src)
-
-        contourList = sortContours.contourList
-        contourLookup = sortContours.contourLookup
-        contourIDs = sortContours.contourIDs
-        labels(2) = sortContours.labels(2)
-        dst2 = sortContours.dst2
-    End Sub
-End Class
-
-
-
-
-
 Public Class Contour_Basics_FloodFill : Inherits TaskParent
     Public options As New Options_Contours
     Public contourList As New List(Of contourData)
@@ -1235,7 +1197,7 @@ Public Class Contour_Sort : Inherits TaskParent
             End Select
         Next
 
-        dst2 = ShowPalette(contourMap) ' cheap way to signal run showpalette.
+        dst2 = ShowPaletteNoZero(contourMap)
 
         If task.heartBeat Then
             labels(2) = "Found " + CStr(contourList.Count) + " contours  and " + CStr(matched) +
@@ -1249,3 +1211,61 @@ End Class
 
 
 
+Public Class Contour_RedCloud : Inherits TaskParent
+    Dim prep As New RedCloud_PrepOutline
+    Public options As New Options_Contours
+    Public contourList As New List(Of contourData)
+    Public contourLookup As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
+    Public contourIDs As New List(Of Integer)
+    Dim sortContours As New Contour_Sort
+    Public Sub New()
+        desc = "Use the RedPrep_Basics as input to contours_basics."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        prep.Run(src)
+        prep.dst2.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst3 = prep.prep.dst3
+        labels(3) = prep.labels(2)
+
+        Dim mode = options.options2.ApproximationMode
+        cv.Cv2.FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.List, mode)
+        If sortContours.allContours.Count <= 1 Then Exit Sub
+
+        sortContours.Run(src)
+
+        contourList = sortContours.contourList
+        contourLookup = sortContours.contourLookup
+        contourIDs = sortContours.contourIDs
+        If task.heartBeat Then labels(2) = sortContours.labels(2)
+        dst2 = sortContours.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Contour_RedCloudCompare : Inherits TaskParent
+    Dim prep As New RedCloud_PrepOutline
+    Public options As New Options_Contours
+    Public contourList As New List(Of contourData)
+    Public contourLookup As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
+    Public contourIDs As New List(Of Integer)
+    Dim sortContours As New Contour_Sort
+    Public Sub New()
+        desc = "Use the RedPrep_Basics as input to contours_basics."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        dst2 = task.contours.dst2
+        labels(2) = task.contours.labels(2)
+
+        prep.Run(src)
+        prep.dst2.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst3 = prep.prep.dst3
+        labels(3) = prep.labels(2)
+    End Sub
+End Class

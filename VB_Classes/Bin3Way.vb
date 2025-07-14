@@ -4,7 +4,7 @@ Public Class Bin3Way_Basics : Inherits TaskParent
     Public mats As New Mat_4Click
     Dim firstThird As Integer, lastThird As Integer
     Public Sub New()
-        task.gOptions.setHistogramBins(256)
+        task.gOptions.setHistogramBins(255)
         labels = {"", "", "Image separated into three segments from darkest to lightest and 'Other' (between)", "Histogram Of grayscale image"}
         desc = "Split an image into 3 parts - darkest, lightest, and in-between the 2"
     End Sub

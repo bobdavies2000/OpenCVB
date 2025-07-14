@@ -327,7 +327,7 @@ Public Class Bin4Way_UnstablePixels1 : Inherits TaskParent
     Public gapValues As New List(Of Byte)
     Dim boundaries(4) As Byte
     Public Sub New()
-        task.gOptions.setHistogramBins(256)
+        task.gOptions.setHistogramBins(255)
         desc = "Identify the unstable grayscale pixel values "
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

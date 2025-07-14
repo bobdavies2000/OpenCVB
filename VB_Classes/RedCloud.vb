@@ -122,7 +122,7 @@ End Class
 
 
 Public Class RedCloud_PrepOutline : Inherits TaskParent
-    Dim prep As New RedPrep_Depth
+    Public prep As New RedPrep_Depth
     Public Sub New()
         desc = "Remove corners of RedCloud cells in the prep data."
     End Sub

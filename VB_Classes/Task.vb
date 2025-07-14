@@ -690,8 +690,6 @@ Public Class VBtask : Implements IDisposable
             If useGravityPointcloud Then pointCloud = gravityCloud
 
             If pcSplit Is Nothing Then pcSplit = pointCloud.Split
-
-            gOptions.unFiltered.Checked = True
         End If
 
         pcSplit = pointCloud.Split

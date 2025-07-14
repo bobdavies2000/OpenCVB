@@ -70,7 +70,7 @@ Public Class FitEllipse_AMS_CPP : Inherits TaskParent
         Marshal.Copy(boxPtr, ellipse, 0, ellipse.Length)
 
         Dim angle = ellipse(0)
-        Dim center As New cv.Point2f(ellipse(1), ellipse(2))
+        Dim center = lpData.validatePoint(New cv.Point2f(ellipse(1), ellipse(2)))
         Dim size As New cv.Size2f(ellipse(3), ellipse(4))
         If size.Width < task.lineWidth + 1 Or size.Height < task.lineWidth + 1 Then Exit Sub
 

@@ -6,7 +6,7 @@ Public Class Bin2Way_Basics : Inherits TaskParent
     Dim halfSplit As Integer
     Public Sub New()
         fraction = dst2.Total / 2
-        task.gOptions.setHistogramBins(256)
+        task.gOptions.setHistogramBins(255)
         labels = {"", "", "Image separated into 2 segments from darkest and lightest", "Histogram Of grayscale image"}
         desc = "Split an image into 2 parts - darkest and lightest,"
     End Sub

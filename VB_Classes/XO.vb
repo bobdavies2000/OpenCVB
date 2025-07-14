@@ -2290,7 +2290,6 @@ Public Class XO_OpenGL_PClinesFirstLast : Inherits TaskParent
         If lines.pcLinesMat.Rows = 0 Then task.ogl.dataInput = New cv.Mat Else task.ogl.dataInput = lines.pcLinesMat
         'task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(New cv.Mat)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
         labels(2) = "OpenGL_PClines found " + CStr(lines.pcLinesMat.Rows / 3) + " lines"
     End Sub
 End Class
@@ -2314,7 +2313,6 @@ Public Class XO_OpenGL_PCLineCandidates : Inherits TaskParent
 
         task.ogl.dataInput = cv.Mat.FromPixelData(pts.allPointsH.Count, 1, cv.MatType.CV_32FC3, pts.allPointsH.ToArray)
         task.ogl.Run(New cv.Mat)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
         labels(2) = "Point cloud points found = " + CStr(pts.actualCount / 2)
     End Sub
 End Class
@@ -2536,7 +2534,6 @@ Public Class OpenGL_PCpoints : Inherits TaskParent
 
         task.ogl.dataInput = cv.Mat.FromPixelData(pts.pcPoints.Count, 1, cv.MatType.CV_32FC3, pts.pcPoints.ToArray)
         task.ogl.Run(New cv.Mat)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
         labels(2) = "Point cloud points found = " + CStr(pts.pcPoints.Count / 2)
     End Sub
 End Class
@@ -2628,7 +2625,7 @@ Public Class XO_Sort_FeatureLess : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
-        task.gOptions.setHistogramBins(256)
+        task.gOptions.setHistogramBins(255)
         task.gOptions.GridSlider.Value = 8
         desc = "Sort all the featureless grayscale pixels."
     End Sub
@@ -3470,7 +3467,6 @@ Public Class XO_OpenGL_VerticalOrHorizontal : Inherits TaskParent
         'Next
         'task.ogl.dataInput = cv.Mat.FromPixelData(lines3D.Count, 1, cv.MatType.CV_32FC3, lines3D.ToArray)
         'task.ogl.Run(task.color)
-        'If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -3866,7 +3862,6 @@ Public Class XO_OpenGL_StructuredCloud : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
         task.ogl.pointCloudInput = sCloud.dst2
         task.ogl.Run(dst2)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -3886,7 +3881,6 @@ Public Class XO_OpenGL_PCpointsPlane : Inherits TaskParent
 
         task.ogl.dataInput = cv.Mat.FromPixelData(pts.pcPoints.Count, 1, cv.MatType.CV_32FC3, pts.pcPoints.ToArray)
         task.ogl.Run(New cv.Mat)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
         labels(2) = "Point cloud points found = " + CStr(pts.pcPoints.Count / 2)
     End Sub
 End Class
@@ -4313,7 +4307,6 @@ Public Class XO_OpenGL_Rebuilt : Inherits TaskParent
         dst2 = rebuild.dst2
         task.ogl.pointCloudInput = rebuild.pointcloud
         task.ogl.Run(task.color)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -4385,7 +4378,6 @@ Public Class XO_OpenGL_Tiles : Inherits TaskParent
 
         task.ogl.dataInput = cv.Mat.FromPixelData(sCloud.oglData.Count, 1, cv.MatType.CV_32FC3, sCloud.oglData.ToArray)
         task.ogl.Run(src)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -4867,7 +4859,6 @@ Public Class XO_OpenGL_QuadBricks : Inherits TaskParent
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -4890,7 +4881,6 @@ Public Class XO_OpenGL_QuadGridTiles : Inherits TaskParent
         task.ogl.dataInput = cv.Mat.FromPixelData(tiles.quadData.Count, 1, cv.MatType.CV_32FC3,
                                                   tiles.quadData.ToArray)
         task.ogl.Run(src)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
         labels = tiles.labels
     End Sub
 End Class
@@ -4916,7 +4906,6 @@ Public Class XO_OpenGL_QuadMinMax : Inherits TaskParent
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(dst3)
-        If task.gOptions.getOpenGLCapture() Then dst3 = task.ogl.dst3
     End Sub
 End Class
 

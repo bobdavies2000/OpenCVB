@@ -1277,6 +1277,18 @@ Public Class Main_UI
             AvailableAlgorithms.SelectedIndex += 1
         Next
 
+        ' skip testing the Fractal_ algorithms.  They are only for visualizations - not for other algorithms to use.
+        For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
+            If AvailableAlgorithms.Text.StartsWith("Fractal_") = False Then Exit For
+            AvailableAlgorithms.SelectedIndex += 1
+        Next
+
+        ' skip testing the GIF_ algorithms.  They are only for visualizations - not for other algorithms to use.
+        For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
+            If AvailableAlgorithms.Text.StartsWith("GIF_") = False Then Exit For
+            AvailableAlgorithms.SelectedIndex += 1
+        Next
+
         ' skip testing the XO_ algorithms.  They are obsolete.
         If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
 
