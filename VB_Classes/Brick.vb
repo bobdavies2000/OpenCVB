@@ -890,6 +890,7 @@ End Class
 
 
 Public Class Brick_Cloud : Inherits TaskParent
+    Dim template As New Math_Template
     Public Sub New()
         task.brickRunFlag = True
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)

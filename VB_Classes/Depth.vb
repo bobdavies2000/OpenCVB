@@ -1402,7 +1402,6 @@ Public Class Depth_World : Inherits TaskParent
     Dim template As New Math_Template
     Dim colorizer As New DepthColorizer_CPP
     Public Sub New()
-        template.Run(emptyMat) ' intrinsics arrive with the first buffers.
         labels = {"", "", "Merged templates and depth32f - should be similar to upper right image", ""}
         desc = "Build the (approximate) point cloud using camera intrinsics - see CameraOakD.vb for comparable calculations"
     End Sub
