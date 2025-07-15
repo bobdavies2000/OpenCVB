@@ -25,7 +25,6 @@
   <ItemGroup>
     <ClCompile Include="CPP_Algorithms.cpp" />
     <ClCompile Include="CPP_IncludeOnly.cpp" />
-    <ClCompile Include="CPP_Unused.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

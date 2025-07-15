@@ -61,8 +61,8 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.DepthCorrelations.Checked Then
-            Static bricks As New Brick_Basics
-            bricks.Run(src)
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            task.bricks.Run(src)
 
             dst1.SetTo(0)
             For Each brick In task.bricks.brickList

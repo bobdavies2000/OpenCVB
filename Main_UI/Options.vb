@@ -121,9 +121,10 @@ Public Class Options
             workResRadio(i).Enabled = Main_UI.settings.resolutionsSupported(i)
         Next
 
-        workResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         If cameraName.StartsWith("StereoLabs") Then
             workResRadio(resolutionList.IndexOf("336x188 - Quarter resolution")).Checked = True
+        Else
+            workResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         End If
     End Sub
     Public Sub MainOptions_Load(sender As Object, e As EventArgs) Handles MyBase.Load

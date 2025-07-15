@@ -30,7 +30,6 @@ Partial Class Main_UI
         Me.TestAllButton = New System.Windows.Forms.ToolStripButton()
         Me.Magnify = New System.Windows.Forms.ToolStripButton()
         Me.PixelViewerButton = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         Me.RecentList = New System.Windows.Forms.ToolStripDropDownButton()
         Me.AvailableAlgorithms = New System.Windows.Forms.ToolStripComboBox()
         Me.GroupButtonList = New System.Windows.Forms.ToolStripButton()
@@ -58,7 +57,7 @@ Partial Class Main_UI
         'ToolStrip1
         '
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.Magnify, Me.PixelViewerButton, Me.ToolStripButton1, Me.RecentList, Me.AvailableAlgorithms, Me.GroupButtonList, Me.GroupCombo})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.Magnify, Me.PixelViewerButton, Me.RecentList, Me.AvailableAlgorithms, Me.GroupButtonList, Me.GroupCombo})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
@@ -111,17 +110,6 @@ Partial Class Main_UI
         Me.PixelViewerButton.Name = "PixelViewerButton"
         Me.PixelViewerButton.Size = New System.Drawing.Size(34, 29)
         Me.PixelViewerButton.Text = "PixelViewer to see pixels under the cursor"
-        '
-        'ToolStripButton1
-        '
-        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
-        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(34, 29)
-        Me.ToolStripButton1.Text = "ToolStripButton1"
-        Me.ToolStripButton1.ToolTipText = "Bring Task forms to the front."
-        Me.ToolStripButton1.Visible = False
         '
         'RecentList
         '
@@ -193,6 +181,7 @@ Partial Class Main_UI
         '
         'MenuStrip1
         '
+        Me.MenuStrip1.GripMargin = New System.Windows.Forms.Padding(2, 2, 0, 2)
         Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.AboutToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
@@ -212,7 +201,7 @@ Partial Class Main_UI
         'ExitToolStripMenuItem
         '
         Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(270, 34)
+        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(141, 34)
         Me.ExitToolStripMenuItem.Text = "E&xit"
         '
         'AboutToolStripMenuItem
@@ -305,5 +294,4 @@ Partial Class Main_UI
     Friend WithEvents CamSwitchProgress As PictureBox
     Friend WithEvents CamSwitchTimer As Timer
     Friend WithEvents GroupButtonList As ToolStripButton
-    Friend WithEvents ToolStripButton1 As ToolStripButton
 End Class

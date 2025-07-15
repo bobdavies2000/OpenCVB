@@ -196,8 +196,8 @@ End Class
 
 Public Class Math_Template : Inherits TaskParent
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, 0)
         labels = {"", "", "Input Template showing columns", "Input Template showing rows"}
         desc = "Build a template for use with computing the point cloud"
     End Sub
@@ -208,9 +208,6 @@ Public Class Math_Template : Inherits TaskParent
 
         For i = 1 To dst2.Height - 1
             dst2.Row(0).CopyTo(dst2.Row(i)) ' duplicate above row
-        Next
-
-        For i = 0 To dst2.Height - 1
             dst3.Set(Of Single)(i, 0, i) ' col with 0, 1, 2, 3...
         Next
 

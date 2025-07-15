@@ -937,10 +937,6 @@ Public Class Main_UI
 #End If
 
         If settings.cameraPresent(3) Then ' OakD is the 3rd element in cameraPresent but it is not defined explicitly.
-            updatePath(HomeDir.FullName + "OakD\build\depthai-core\Debug\", "LibUsb for Luxonis")
-            updatePath(HomeDir.FullName + "OakD\build\depthai-core\Release\", "LibUsb for Luxonis")
-
-            updatePath(HomeDir.FullName + "OakD\build\Debug\", "Luxonis Oak-D camera support.")
             updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
         End If
         ' the K4A depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.

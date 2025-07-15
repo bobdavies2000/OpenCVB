@@ -63,7 +63,6 @@ Partial Class OptionsGlobal
         Me.CrossHairs = New System.Windows.Forms.CheckBox()
         Me.ShowGrid = New System.Windows.Forms.CheckBox()
         Me.debugSyncUI = New System.Windows.Forms.CheckBox()
-        Me.UseMultiThreading = New System.Windows.Forms.CheckBox()
         Me.ShowAllOptions = New System.Windows.Forms.CheckBox()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.CreateGif = New System.Windows.Forms.CheckBox()
@@ -377,10 +376,9 @@ Partial Class OptionsGlobal
         '
         Me.ColoringGroup.Controls.Add(Me.TrackingColor)
         Me.ColoringGroup.Controls.Add(Me.TrackingMeanColor)
-        Me.ColoringGroup.Controls.Add(Me.UseMultiThreading)
-        Me.ColoringGroup.Location = New System.Drawing.Point(332, 363)
+        Me.ColoringGroup.Location = New System.Drawing.Point(532, 189)
         Me.ColoringGroup.Name = "ColoringGroup"
-        Me.ColoringGroup.Size = New System.Drawing.Size(205, 103)
+        Me.ColoringGroup.Size = New System.Drawing.Size(218, 111)
         Me.ColoringGroup.TabIndex = 81
         Me.ColoringGroup.TabStop = False
         Me.ColoringGroup.Text = "RedCloud Output Color"
@@ -388,7 +386,7 @@ Partial Class OptionsGlobal
         'TrackingColor
         '
         Me.TrackingColor.AutoSize = True
-        Me.TrackingColor.Location = New System.Drawing.Point(15, 59)
+        Me.TrackingColor.Location = New System.Drawing.Point(7, 62)
         Me.TrackingColor.Name = "TrackingColor"
         Me.TrackingColor.Size = New System.Drawing.Size(135, 24)
         Me.TrackingColor.TabIndex = 3
@@ -399,18 +397,19 @@ Partial Class OptionsGlobal
         'TrackingMeanColor
         '
         Me.TrackingMeanColor.AutoSize = True
-        Me.TrackingMeanColor.Location = New System.Drawing.Point(15, 29)
+        Me.TrackingMeanColor.Location = New System.Drawing.Point(7, 30)
         Me.TrackingMeanColor.Name = "TrackingMeanColor"
         Me.TrackingMeanColor.Size = New System.Drawing.Size(115, 24)
         Me.TrackingMeanColor.TabIndex = 0
         Me.TrackingMeanColor.TabStop = True
         Me.TrackingMeanColor.Text = "Mean Color"
         Me.TrackingMeanColor.UseVisualStyleBackColor = True
+
         '
         'ColorSource
         '
         Me.ColorSource.FormattingEnabled = True
-        Me.ColorSource.Location = New System.Drawing.Point(528, 55)
+        Me.ColorSource.Location = New System.Drawing.Point(528, 25)
         Me.ColorSource.Name = "ColorSource"
         Me.ColorSource.Size = New System.Drawing.Size(222, 28)
         Me.ColorSource.TabIndex = 80
@@ -418,7 +417,7 @@ Partial Class OptionsGlobal
         'ColorSourceLabel
         '
         Me.ColorSourceLabel.AutoSize = True
-        Me.ColorSourceLabel.Location = New System.Drawing.Point(384, 58)
+        Me.ColorSourceLabel.Location = New System.Drawing.Point(384, 28)
         Me.ColorSourceLabel.Name = "ColorSourceLabel"
         Me.ColorSourceLabel.Size = New System.Drawing.Size(131, 20)
         Me.ColorSourceLabel.TabIndex = 79
@@ -428,7 +427,7 @@ Partial Class OptionsGlobal
         '
         Me.DepthGroupBox.Controls.Add(Me.DepthCorrelations)
         Me.DepthGroupBox.Controls.Add(Me.ColorizedDepth)
-        Me.DepthGroupBox.Location = New System.Drawing.Point(332, 219)
+        Me.DepthGroupBox.Location = New System.Drawing.Point(332, 182)
         Me.DepthGroupBox.Name = "DepthGroupBox"
         Me.DepthGroupBox.Size = New System.Drawing.Size(194, 118)
         Me.DepthGroupBox.TabIndex = 78
@@ -471,7 +470,7 @@ Partial Class OptionsGlobal
         '
         Me.MotionBox.Controls.Add(Me.showMotionMask)
         Me.MotionBox.Controls.Add(Me.UseMotionMask)
-        Me.MotionBox.Location = New System.Drawing.Point(6, 352)
+        Me.MotionBox.Location = New System.Drawing.Point(11, 330)
         Me.MotionBox.Name = "MotionBox"
         Me.MotionBox.Size = New System.Drawing.Size(245, 89)
         Me.MotionBox.TabIndex = 76
@@ -503,7 +502,7 @@ Partial Class OptionsGlobal
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(408, 172)
+        Me.Label1.Location = New System.Drawing.Point(408, 142)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(112, 20)
         Me.Label1.TabIndex = 73
@@ -512,7 +511,7 @@ Partial Class OptionsGlobal
         'highlight
         '
         Me.highlight.FormattingEnabled = True
-        Me.highlight.Location = New System.Drawing.Point(528, 168)
+        Me.highlight.Location = New System.Drawing.Point(528, 138)
         Me.highlight.Name = "highlight"
         Me.highlight.Size = New System.Drawing.Size(120, 28)
         Me.highlight.TabIndex = 72
@@ -549,17 +548,6 @@ Partial Class OptionsGlobal
         Me.debugSyncUI.Text = "Synchronize Debug with Display"
         Me.debugSyncUI.UseVisualStyleBackColor = True
         '
-        'UseMultiThreading
-        '
-        Me.UseMultiThreading.AutoSize = True
-        Me.UseMultiThreading.Location = New System.Drawing.Point(196, -383)
-        Me.UseMultiThreading.Name = "UseMultiThreading"
-        Me.UseMultiThreading.Size = New System.Drawing.Size(253, 24)
-        Me.UseMultiThreading.TabIndex = 65
-        Me.UseMultiThreading.Text = "Use Multi-threading (if present)"
-        Me.UseMultiThreading.UseVisualStyleBackColor = True
-        Me.UseMultiThreading.Visible = False
-        '
         'ShowAllOptions
         '
         Me.ShowAllOptions.AutoSize = True
@@ -573,7 +561,7 @@ Partial Class OptionsGlobal
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(460, 95)
+        Me.Label2.Location = New System.Drawing.Point(460, 65)
         Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(59, 20)
@@ -593,7 +581,7 @@ Partial Class OptionsGlobal
         'Palettes
         '
         Me.Palettes.FormattingEnabled = True
-        Me.Palettes.Location = New System.Drawing.Point(528, 91)
+        Me.Palettes.Location = New System.Drawing.Point(528, 61)
         Me.Palettes.Name = "Palettes"
         Me.Palettes.Size = New System.Drawing.Size(146, 28)
         Me.Palettes.TabIndex = 54
@@ -611,7 +599,7 @@ Partial Class OptionsGlobal
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(441, 134)
+        Me.Label5.Location = New System.Drawing.Point(441, 104)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(77, 20)
         Me.Label5.TabIndex = 15
@@ -620,7 +608,7 @@ Partial Class OptionsGlobal
         'LineType
         '
         Me.LineType.FormattingEnabled = True
-        Me.LineType.Location = New System.Drawing.Point(528, 129)
+        Me.LineType.Location = New System.Drawing.Point(528, 99)
         Me.LineType.Name = "LineType"
         Me.LineType.Size = New System.Drawing.Size(120, 28)
         Me.LineType.TabIndex = 14
@@ -811,7 +799,6 @@ Partial Class OptionsGlobal
     Friend WithEvents Palettes As System.Windows.Forms.ComboBox
     Friend WithEvents DebugCheckBox As System.Windows.Forms.CheckBox
     Friend WithEvents ShowAllOptions As System.Windows.Forms.CheckBox
-    Friend WithEvents UseMultiThreading As System.Windows.Forms.CheckBox
     Friend WithEvents DebugSliderLabel As System.Windows.Forms.Label
     Friend WithEvents DebugSlider As System.Windows.Forms.TrackBar
     Friend WithEvents Label11 As System.Windows.Forms.Label

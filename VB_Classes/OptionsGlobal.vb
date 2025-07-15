@@ -32,7 +32,6 @@ Public Class OptionsGlobal
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
 
         UseKalman.Checked = True
-        UseMultiThreading.Checked = False ' too many times it is just not faster.
 
         Palettes.Items.Clear()
         For Each mapName In mapNames
@@ -172,9 +171,6 @@ Public Class OptionsGlobal
         task.optionsChanged = True
     End Sub
     Private Sub UseKalman_CheckedChanged(sender As Object, e As EventArgs) Handles UseKalman.CheckedChanged
-        task.optionsChanged = True
-    End Sub
-    Private Sub UseMultiThreading_CheckedChanged(sender As Object, e As EventArgs) Handles UseMultiThreading.CheckedChanged
         task.optionsChanged = True
     End Sub
     Private Sub displayDst0_CheckedChanged(sender As Object, e As EventArgs) Handles displayDst0.CheckedChanged
@@ -331,9 +327,6 @@ Public Class OptionsGlobal
     End Sub
     Public Function GetUseKalman() As Boolean
         Return UseKalman.Checked
-    End Function
-    Public Function getMultiThreading() As Boolean
-        Return UseMultiThreading.Checked
     End Function
     Public Sub SetDotSize(val As Integer)
         DotSizeSlider.Value = val

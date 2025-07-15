@@ -1396,41 +1396,6 @@ End Class
 
 
 
-
-Public Class OpenGL_World : Inherits TaskParent
-    Dim world As New Depth_World
-    Public Sub New()
-        task.ogl.oglFunction = oCase.drawPointCloudRGB
-        If OptionParent.findFrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Use Generated Pointcloud")
-            radio.addRadio("Use Pointcloud from camera")
-            radio.check(0).Checked = True
-        End If
-
-        labels = {"", "", "Generated Pointcloud", ""}
-        desc = "Display the generated point cloud in OpenGL"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static generatedRadio = OptionParent.findRadio("Use Generated Pointcloud")
-
-        If generatedRadio.checked Then
-            world.Run(src)
-            task.ogl.pointCloudInput = world.dst2
-        Else
-            task.ogl.pointCloudInput = If(src.Type = cv.MatType.CV_32FC3, src, task.pointCloud)
-        End If
-
-        task.ogl.Run(task.color)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class OpenGL_Grid : Inherits TaskParent
     Dim lowRes As New Brick_Edges
     Public Sub New()
@@ -1874,6 +1839,34 @@ End Class
 
 
 
+
+
+
+Public Class OpenGL_World : Inherits TaskParent
+    Dim world As New Depth_World
+    Public Sub New()
+        task.ogl.oglFunction = oCase.drawPointCloudRGB
+        labels = {"", "", "Generated Pointcloud", ""}
+        desc = "Display the generated point cloud in OpenGL.  Use debug checkbox to toggle!"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.gOptions.DebugCheckBox.Checked = False Then
+            world.Run(src)
+            task.ogl.pointCloudInput = world.dst2
+            dst2 = world.dst2
+            dst3 = task.pointCloud
+        Else
+            task.ogl.pointCloudInput = If(src.Type = cv.MatType.CV_32FC3, src, task.pointCloud)
+        End If
+
+        task.ogl.Run(task.color)
+    End Sub
+End Class
+
+
+
+
+
 Public Class OpenGL_BrickCloud : Inherits TaskParent
     Dim bCloud As New Brick_Cloud
     Public Sub New()
@@ -1881,14 +1874,13 @@ Public Class OpenGL_BrickCloud : Inherits TaskParent
         desc = "Display the Brick_Cloud and alternate with the original point cloud."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.toggleOn Then
-            bCloud.Run(src)
+        bCloud.Run(src)
+        If task.gOptions.DebugCheckBox.Checked = False Then
             dst2 = bCloud.dst2
-            SetTrueText("Brick enhanced point cloud", 3)
         Else
             dst2 = task.pointCloud
-            SetTrueText("Original pointcloud", 3)
         End If
+        labels(2) = bCloud.labels(2)
 
         task.ogl.pointCloudInput = dst2
         task.ogl.Run(task.color)

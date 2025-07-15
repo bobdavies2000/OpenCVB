@@ -499,7 +499,6 @@ Public Class brickData
 
     Public center As cv.Point ' center of the brick
     Public depth As Single
-    Public depthRanges As New List(Of Single)
 
     Public mm As mmData ' min and max values of the depth data.
     Public corners As New List(Of cv.Point3f)

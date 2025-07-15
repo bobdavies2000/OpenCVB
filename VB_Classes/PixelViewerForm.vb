@@ -1,13 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Windows.Forms
-Imports System.ComponentModel
-
 Public Class PixelViewerForm
     Public mousePoint As cv.Point
     Public saveText As String
     Private Sub PixelShow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Left = task.mainFormLocation.X - 20
-        Me.Top = task.mainFormLocation.Y - 20
+        Me.Left = task.mainFormLocation.X
+        Me.Top = task.mainFormLocation.Y - 40
 
         Me.Width = task.mainFormLocation.Width
         Me.Height = task.mainFormLocation.Height

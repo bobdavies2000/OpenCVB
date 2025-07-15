@@ -1131,7 +1131,7 @@ Public Class Contour_Sort : Inherits TaskParent
         Dim mask = contour.mask.Clone
         mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
         Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-        Dim mm As mmData = GetMinMaxShared(distance32f)
+        Dim mm As mmData = GetMinMax(distance32f)
         mm.maxLoc.X += contour.rect.X
         mm.maxLoc.Y += contour.rect.Y
         Return mm.maxLoc
@@ -1159,7 +1159,7 @@ Public Class Contour_Sort : Inherits TaskParent
             cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
             contour.mask = tourMat(contour.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
             contour.depth = task.pcSplit(2)(contour.rect).Mean(task.depthMask(contour.rect))(0)
-            contour.mm = GetMinMaxShared(task.pcSplit(2)(contour.rect), contour.mask)
+            contour.mm = GetMinMax(task.pcSplit(2)(contour.rect), contour.mask)
             contour.maxDist = GetMaxDistContour(contour)
             contour.ID = task.grid.gridMap.Get(Of Single)(contour.maxDist.Y, contour.maxDist.X)
             sortedList.Add(contour.pixels, contour)

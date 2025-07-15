@@ -37,11 +37,7 @@ Public Class Brick_Basics : Inherits TaskParent
             brick.depth = task.pcSplit(2)(brick.rect).Mean(task.depthMask(brick.rect))
             If brick.depth > Single.MaxValue Or brick.depth < Single.MinValue Then brick.depth = 0
 
-            If brick.depth > 0 Then
-                task.pcSplit(2)(brick.rect).MinMaxLoc(brick.mm.minVal, brick.mm.maxVal, brick.mm.minLoc, brick.mm.maxLoc,
-                                                      task.depthMask(brick.rect))
-                brick.mm.range = brick.mm.maxVal - brick.mm.minVal
-            End If
+            If brick.depth > 0 Then brick.mm = GetMinMax(task.pcSplit(2)(brick.rect), task.depthMask(brick.rect))
             brick.age = task.motionBasics.cellAge(brick.index)
             brick.color = task.motionBasics.lastColor(brick.index) ' the last color is actually the current color - motion basics runs first.
             brick.center = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
@@ -49,9 +45,7 @@ Public Class Brick_Basics : Inherits TaskParent
             If brick.depth > 0 Then
                 brickDepthCount += 1
 
-                ' motion mask does not include depth shadow so if there is depth shadow, we must recompute brick.
-                Dim lastCorrelation = If(i < brickLast.Count, brickLast(i).correlation, 0)
-                If brick.age > 1 And instantUpdate = False And lastCorrelation > 0 Then
+                If brick.age > 1 And instantUpdate = False And brickLast.Count > 0 Then
                     ' no need to recompute everything when there is no motion in the cell.
                     brick = brickLast(i)
                     brick.age = task.motionBasics.cellAge(i)
@@ -102,16 +96,10 @@ Public Class Brick_Basics : Inherits TaskParent
                         brick.corners.Add(New cv.Point3f(p0.X, p1.Y, brick.depth))
                     End If
                 End If
-                brick.depthRanges.Add(brick.mm.range)
             End If
 
             dst2(brick.rect).SetTo(brick.color)
-
             If brick.depth > 0 Then depthCount += 1
-            If brick.depthRanges.Count > task.historyCount Then
-                brick.depthRanges.RemoveAt(0)
-            End If
-
             task.bricks.brickList.Add(brick)
         Next
 
@@ -658,11 +646,6 @@ Public Class Brick_Info : Inherits TaskParent
         strOut += Format(brick.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
         strOut += Format(brick.mm.range, fmt3) + vbTab + "Depth mm.range" + vbCrLf
 
-        strOut += "Depth range history: " + vbTab
-        For Each ele In brick.depthRanges
-            strOut += Format(ele, fmt3) + vbTab
-        Next
-
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -913,12 +896,20 @@ Public Class Brick_Cloud : Inherits TaskParent
         desc = "Use RGB motion bricks to determine if depth has changed in any brick."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.pointCloud.CopyTo(dst2, task.motionMask)
+        If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
+
+        Dim splitCount As Integer, newRange = cv.Scalar.All(0.05) ' Assumption: the brick depth values are within 5 cm's.
         For Each brick In task.bricks.brickList
-            Dim mask = dst2(brick.rect).Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
-            If brick.age > 1 Then task.pointCloud(brick.rect).CopyTo(dst2(brick.rect), mask)
+            If brick.depth > 0 Then
+                If brick.age = 1 And brick.mm.range > 0.1 Then
+                    Dim split() As cv.Mat = task.pointCloud(brick.rect).Split
+                    split(2).SetTo(brick.depth, task.depthMask(brick.rect))
+                    cv.Cv2.Merge(split, dst2(brick.rect))
+                End If
+            End If
         Next
 
+        labels(2) = CStr(splitCount) + " bricks of " + CStr(task.gridRects.Count) + " were modified."
         If standaloneTest() Then dst3 = task.pointCloud
     End Sub
 End Class

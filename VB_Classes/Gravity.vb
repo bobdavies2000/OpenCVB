@@ -24,22 +24,15 @@ Public Class Gravity_Basics : Inherits TaskParent
         gravityRaw.Run(emptyMat)
         trackLine.Run(src)
         gravityRGB = trackLine.lp
+        Dim rgbVec = gravityRGB
 
-        Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - gravityRGB.ep1.X)
-        Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - gravityRGB.ep2.X)
+        Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - rgbVec.ep1.X)
+        Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - rgbVec.ep2.X)
         If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
-            If gravityRGB.gravityProxy Then
-                Dim p1 = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
-                Dim x = (dst2.Height - gravityRGB.yIntercept) / gravityRGB.slope
-                Dim p2 = New cv.Point2f(x, dst2.Height)
-                Dim lp = New lpData(p1, p2)
-                deltaX1 = Math.Abs(lp.ep1.X - gravityRGB.ep1.X)
-                deltaX2 = Math.Abs(lp.ep2.X - gravityRGB.ep2.X)
-                If Math.Abs(deltaX1 - deltaX2) < options.pixelThreshold Then
-                    task.gravityVec = lp
-                Else
-                    task.gravityVec = task.gravityIMU
-                End If
+            If rgbVec.gravityProxy Then
+                Dim shift = dst2.Width / 2 - (rgbVec.ep1.X + rgbVec.ep2.X) / 2
+                task.gravityVec = New lpData(New cv.Point2f(rgbVec.ep1.X + shift, rgbVec.ep1.Y),
+                                             New cv.Point2f(rgbVec.ep2.X + shift, rgbVec.ep2.Y))
             Else
                 task.gravityVec = task.gravityIMU
             End If

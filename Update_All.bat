@@ -75,8 +75,8 @@ rem )
 
 if not exist OakD\Build (
 	cmake -S OakD -B OakD\Build -DOpenCV_DIR='%CD%/opencv/Build/'
-	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Release
-	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Debug
+	msbuild.exe OakD/depthai-core/Build/Cam_Oak-D.sln /p:Configuration=Release
+	msbuild.exe OakD/depthai-core/Build/Cam_Oak-D.sln /p:Configuration=Debug
 )
 
 if not exist zed-c-api\Build (

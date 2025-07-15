@@ -57,36 +57,15 @@ Public Class HeatMap_Grid : Inherits TaskParent
         dst3.SetTo(0)
         Dim maxCount1 As Integer, maxCount2 As Integer
         Dim sync1 As New Object, sync2 As New Object
-        If task.gOptions.UseMultiThreading.Checked Then
-            Parallel.ForEach(task.gridRects,
-            Sub(roi)
-                Dim count1 = heat.histogramTop(roi).CountNonZero
-                dst2(roi).SetTo(count1)
-                If count1 > maxCount1 Then
-                    SyncLock sync1
-                        maxCount1 = count1
-                    End SyncLock
-                End If
+        For Each roi In task.gridRects
+            Dim count1 = heat.histogramTop(roi).CountNonZero
+            dst2(roi).SetTo(count1)
+            If count1 > maxCount1 Then maxCount1 = count1
 
-                Dim count2 = heat.histogramSide(roi).CountNonZero
-                dst3(roi).SetTo(count2)
-                If count2 > maxCount2 Then
-                    SyncLock sync2
-                        maxCount2 = count2
-                    End SyncLock
-                End If
-            End Sub)
-        Else
-            For Each roi In task.gridRects
-                Dim count1 = heat.histogramTop(roi).CountNonZero
-                dst2(roi).SetTo(count1)
-                If count1 > maxCount1 Then maxCount1 = count1
-
-                Dim count2 = heat.histogramSide(roi).CountNonZero
-                dst3(roi).SetTo(count2)
-                If count2 > maxCount2 Then maxCount2 = count2
-            Next
-        End If
+            Dim count2 = heat.histogramSide(roi).CountNonZero
+            dst3(roi).SetTo(count2)
+            If count2 > maxCount2 Then maxCount2 = count2
+        Next
         dst2 *= 255 / maxCount1
         dst3 *= 255 / maxCount2
     End Sub

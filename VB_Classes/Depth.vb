@@ -983,111 +983,6 @@ End Class
 
 
 
-Public Class Depth_WorldXYMT : Inherits TaskParent
-    Public depthUnitsMeters = False
-    Public Sub New()
-        labels(3) = "dst3 = pointcloud"
-        desc = "Create OpenGL point cloud from depth data (slow)"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
-
-        dst3 = New cv.Mat(src.Size(), cv.MatType.CV_32FC3, 0)
-        If depthUnitsMeters = False Then src = (src * 0.001).ToMat
-        Dim multX = task.pointCloud.Width / src.Width
-        Dim multY = task.pointCloud.Height / src.Height
-        Parallel.ForEach(task.gridRects,
-              Sub(roi)
-                  Dim xy As New cv.Point3f
-                  For y = roi.Y To roi.Y + roi.Height - 1
-                      For x = roi.X To roi.X + roi.Width - 1
-                          xy.X = x * multX
-                          xy.Y = y * multY
-                          xy.Z = src.Get(Of Single)(y, x)
-                          If xy.Z <> 0 Then
-                              Dim xyz = getWorldCoordinates(xy)
-                              dst3.Set(Of cv.Point3f)(y, x, xyz)
-                          End If
-                      Next
-                  Next
-              End Sub)
-        SetTrueText("OpenGL data prepared.")
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-Public Class Depth_WorldXYZ : Inherits TaskParent
-    Public depthUnitsMeters = False
-    Public Sub New()
-        labels(3) = "dst3 = pointcloud"
-        desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
-        If depthUnitsMeters = False Then src = (src * 0.001).ToMat
-        dst2 = New cv.Mat(src.Size(), cv.MatType.CV_32FC3, 0)
-        Dim xy As New cv.Point3f
-        For xy.Y = 0 To dst2.Height - 1
-            For xy.X = 0 To dst2.Width - 1
-                xy.Z = src.Get(Of Single)(xy.Y, xy.X)
-                If xy.Z <> 0 Then
-                    Dim xyz = getWorldCoordinates(xy)
-                    dst2.Set(Of cv.Point3f)(xy.Y, xy.X, xyz)
-                End If
-            Next
-        Next
-        SetTrueText("OpenGL data prepared and in dst2.", 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Depth_World : Inherits TaskParent
-    Dim template As New Math_Template
-    Public Sub New()
-        labels = {"", "", "Merged templates and depth32f - should be similar to upper right image", ""}
-        desc = "Build the (approximate) point cloud using camera intrinsics - see CameraOakD.vb for comparable calculations"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.firstPass Then template.Run(src) ' intrinsics arrive with the first buffers.
-
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-
-        cv.Cv2.Multiply(template.dst2, src, dst0)
-        dst0 *= 1 / task.calibData.rgbIntrinsics.fx
-
-        cv.Cv2.Multiply(template.dst3, src, dst1)
-        dst1 *= 1 / task.calibData.rgbIntrinsics.fy
-
-        cv.Cv2.Merge({dst0, dst1, src}, dst2)
-        If standaloneTest() Then
-            Static colorizer As New DepthColorizer_CPP
-            colorizer.Run(dst2)
-            dst2 = colorizer.dst2
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Depth_Tiers : Inherits TaskParent
     Public classCount As Integer
     Dim options As New Options_DepthTiers
@@ -1146,7 +1041,7 @@ Public Class Depth_StableMax : Inherits TaskParent
     Public stableMax As cv.Mat
     Dim colorize As New DepthColorizer_CPP
     Public Sub New()
-        labels = {"", "", "InRange depth with low quality depth removed.", "Motion in the BGR image. Depth updated in rectangle."}
+        labels = {"", "", "InRange depth with low quality depth removed.", ""}
         desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1154,7 +1049,6 @@ Public Class Depth_StableMax : Inherits TaskParent
 
         If task.heartBeat Then
             stableMax = src.Clone
-            dst3.SetTo(0)
         Else
             src.CopyTo(stableMax, task.motionMask)
             If src.Type <> stableMax.Type Then src.ConvertTo(src, stableMax.Type)
@@ -1421,5 +1315,108 @@ Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
             dst3.FillConvexPoly(ifacet, task.scalarColors(i Mod task.scalarColors.Length), task.lineType)
             cv.Cv2.Polylines(dst3, ifacets, True, cv.Scalar.Black, task.lineWidth, task.lineType, 0)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Depth_WorldXYMT : Inherits TaskParent
+    Public depthUnitsMeters = False
+    Public Sub New()
+        labels(3) = "dst3 = pointcloud"
+        desc = "Create OpenGL point cloud from depth data (slow)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
+
+        dst3 = New cv.Mat(src.Size(), cv.MatType.CV_32FC3, 0)
+        If depthUnitsMeters = False Then src = (src * 0.001).ToMat
+        Dim multX = task.pointCloud.Width / src.Width
+        Dim multY = task.pointCloud.Height / src.Height
+        Parallel.ForEach(task.gridRects,
+              Sub(roi)
+                  Dim xy As New cv.Point3f
+                  For y = roi.Y To roi.Y + roi.Height - 1
+                      For x = roi.X To roi.X + roi.Width - 1
+                          xy.X = x * multX
+                          xy.Y = y * multY
+                          xy.Z = src.Get(Of Single)(y, x)
+                          If xy.Z <> 0 Then
+                              Dim xyz = getWorldCoordinates(xy)
+                              dst3.Set(Of cv.Point3f)(y, x, xyz)
+                          End If
+                      Next
+                  Next
+              End Sub)
+        SetTrueText("OpenGL data prepared.")
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class Depth_WorldXYZ : Inherits TaskParent
+    Public depthUnitsMeters = False
+    Public Sub New()
+        labels(3) = "dst3 = pointcloud"
+        desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
+        If depthUnitsMeters = False Then src = (src * 0.001).ToMat
+        dst2 = New cv.Mat(src.Size(), cv.MatType.CV_32FC3, 0)
+        Dim xy As New cv.Point3f
+        For xy.Y = 0 To dst2.Height - 1
+            For xy.X = 0 To dst2.Width - 1
+                xy.Z = src.Get(Of Single)(xy.Y, xy.X)
+                If xy.Z <> 0 Then
+                    Dim xyz = getWorldCoordinates(xy)
+                    dst2.Set(Of cv.Point3f)(xy.Y, xy.X, xyz)
+                End If
+            Next
+        Next
+        SetTrueText("OpenGL data prepared and in dst2.", 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Depth_World : Inherits TaskParent
+    Dim template As New Math_Template
+    Dim colorizer As New DepthColorizer_CPP
+    Public Sub New()
+        template.Run(emptyMat) ' intrinsics arrive with the first buffers.
+        labels = {"", "", "Merged templates and depth32f - should be similar to upper right image", ""}
+        desc = "Build the (approximate) point cloud using camera intrinsics - see CameraOakD.vb for comparable calculations"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+
+        cv.Cv2.Multiply(template.dst2, src, dst0)
+        dst0 *= 1 / task.calibData.rgbIntrinsics.fx
+
+        cv.Cv2.Multiply(template.dst3, src, dst1)
+        dst1 *= 1 / task.calibData.rgbIntrinsics.fy
+
+        cv.Cv2.Merge({dst0, dst1, src}, dst2)
+        colorizer.Run(dst2)
+        dst3 = colorizer.dst2
     End Sub
 End Class
