@@ -194,7 +194,7 @@ End Class
 
 
 
-Public Class Math_Template : Inherits TaskParent
+Public Class Math_Intrinsics : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, 0)
@@ -212,13 +212,13 @@ Public Class Math_Template : Inherits TaskParent
             dst3.Col(0).CopyTo(dst3.Col(i)) ' duplicate above col
         Next
 
-        dst2 -= task.calibData.leftIntrinsics.ppx
-        dst3 -= task.calibData.leftIntrinsics.ppy
+        dst2 -= task.calibData.rgbIntrinsics.ppx
+        dst3 -= task.calibData.rgbIntrinsics.ppy
 
         labels = {"", "", "Input Template showing columns", "Input Template showing rows"}
         desc = "Build a template for use with computing the point cloud"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         labels(2) = "All the work for " + traceName + " is completed in the constructor"
     End Sub
 End Class

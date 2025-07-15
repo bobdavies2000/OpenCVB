@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Web.UI
+Imports cv = OpenCvSharp
 Public Class Brick_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Public brickDepthCount As Integer
@@ -889,8 +890,8 @@ End Class
 
 
 
-Public Class Brick_Cloud : Inherits TaskParent
-    Dim template As New Math_Template
+Public Class Brick_CloudMaxVal : Inherits TaskParent
+    Dim template As New Math_Intrinsics
     Public Sub New()
         task.brickRunFlag = True
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
@@ -899,13 +900,144 @@ Public Class Brick_Cloud : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
 
-        Dim splitCount As Integer, newRange = cv.Scalar.All(0.05) ' Assumption: the brick depth values are within 5 cm's.
+        Dim splitCount As Integer
         For Each brick In task.bricks.brickList
             If brick.depth > 0 Then
-                If brick.age = 1 And brick.mm.range > 0.1 Then
+                If brick.age < 10 Then
                     Dim split() As cv.Mat = task.pointCloud(brick.rect).Split
-                    split(2).SetTo(brick.depth, task.depthMask(brick.rect))
-                    cv.Cv2.Merge(split, dst2(brick.rect))
+                    split(2).SetTo(brick.mm.maxVal, task.depthMask(brick.rect))
+
+                    cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
+                    split(0) *= 1 / task.calibData.rgbIntrinsics.fx
+
+                    cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
+                    split(1) *= 1 / task.calibData.rgbIntrinsics.fy
+
+                    cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
+                    splitCount += 1
+                End If
+            End If
+        Next
+
+        labels(2) = CStr(splitCount) + " bricks of " + CStr(task.gridRects.Count) + " were modified."
+        If standaloneTest() Then dst3 = task.pointCloud
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Brick_CloudMean : Inherits TaskParent
+    Dim template As New Math_Intrinsics
+    Public Sub New()
+        task.brickRunFlag = True
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        desc = "Use RGB motion bricks to determine if depth has changed in any brick."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
+
+        Dim splitCount As Integer
+        For Each brick In task.bricks.brickList
+            If brick.depth > 0 Then
+                Dim split() As cv.Mat = task.pointCloud(brick.rect).Split
+                split(2).SetTo(brick.depth, task.depthMask(brick.rect))
+
+                cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
+                split(0) *= 1 / task.calibData.rgbIntrinsics.fx
+
+                cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
+                split(1) *= 1 / task.calibData.rgbIntrinsics.fy
+
+                cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
+                splitCount += 1
+            End If
+        Next
+
+        labels(2) = CStr(splitCount) + " bricks of " + CStr(task.gridRects.Count) + " were modified."
+        If standaloneTest() Then dst3 = task.pointCloud
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Brick_CloudRange : Inherits TaskParent
+    Dim template As New Math_Intrinsics
+    Public Sub New()
+        task.brickRunFlag = True
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        desc = "Use RGB motion bricks to determine if depth has changed in any brick."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
+
+        Dim splitCount As Integer
+        Dim newRange As Single = 0.1
+        For Each brick In task.bricks.brickList
+            If brick.depth > 0 And brick.age = 1 Then
+                If brick.mm.range > newRange Then ' if the range within a brick is > 10 cm's, fit it within 10 cm's.
+                    Dim split() As cv.Mat = task.pointCloud(brick.rect).Split
+                    split(2) -= brick.mm.minVal
+                    split(2) *= newRange / brick.mm.range
+                    split(2) += brick.depth
+
+                    cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
+                    split(0) *= 1 / task.calibData.rgbIntrinsics.fx
+
+                    cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
+                    split(1) *= 1 / task.calibData.rgbIntrinsics.fy
+
+                    cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
+                    dst2(brick.rect).SetTo(0, task.noDepthMask(brick.rect))
+                    splitCount += 1
+                End If
+            End If
+        Next
+
+        labels(2) = CStr(splitCount) + " bricks of " + CStr(task.gridRects.Count) + " were modified."
+        If standaloneTest() Then dst3 = task.pointCloud
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Brick_Cloud : Inherits TaskParent
+    Dim template As New Math_Intrinsics
+    Public Sub New()
+        task.brickRunFlag = True
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        desc = "Use RGB motion bricks to determine if depth has changed in any brick."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
+
+        Dim splitCount As Integer
+        Dim newRange As Single = 0.01
+        For Each brick In task.bricks.brickList
+            If brick.depth > 0 And brick.age = 1 Then
+                If brick.mm.range > newRange Then ' if the range within a brick is > 10 cm's, fit it within 10 cm's.
+                    Dim split() As cv.Mat = task.pointCloud(brick.rect).Split
+                    split(2) -= brick.mm.minVal
+                    split(2) *= newRange / brick.mm.range
+                    split(2) += brick.mm.minVal
+
+                    cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
+                    split(0) *= 1 / task.calibData.rgbIntrinsics.fx
+
+                    cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
+                    split(1) *= 1 / task.calibData.rgbIntrinsics.fy
+
+                    cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
+                    dst2(brick.rect).SetTo(0, task.noDepthMask(brick.rect))
+                    splitCount += 1
                 End If
             End If
         Next

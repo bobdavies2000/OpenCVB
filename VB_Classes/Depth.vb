@@ -1399,7 +1399,7 @@ End Class
 
 
 Public Class Depth_World : Inherits TaskParent
-    Dim template As New Math_Template
+    Dim template As New Math_Intrinsics
     Dim colorizer As New DepthColorizer_CPP
     Public Sub New()
         labels = {"", "", "Merged templates and depth32f - should be similar to upper right image", ""}
