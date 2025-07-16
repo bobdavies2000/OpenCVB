@@ -1572,7 +1572,7 @@ Public Class RedColor_Motion : Inherits TaskParent
         desc = "If a RedCloud cell has no motion, it is preserved."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.fullImageStable Then Exit Sub ' full image stable means nothing needs to be done...
+        If task.motionPercent = 0 Then Exit Sub ' full image stable means nothing needs to be done...
         runRedC(src, labels(2))
 
         Static rcLastList As New List(Of rcData)(task.redC.rcList)

@@ -1017,32 +1017,36 @@ Public Class Brick_Cloud : Inherits TaskParent
         desc = "Use RGB motion bricks to determine if depth has changed in any brick."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
+        If task.heartBeatLT Or task.frameCount < 3 Or task.motionPercent = 100 Then task.pointCloud.CopyTo(dst2)
+        If task.motionPercent = 0 Then Exit Sub ' no change...
 
-        Dim splitCount As Integer
+        Dim updateCount As Integer
         Dim newRange As Single = 0.01
+
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        cv.Cv2.ExtractChannel(dst2, dst1, 2)
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
+
         For Each brick In task.bricks.brickList
-            If brick.depth > 0 And brick.age = 1 Then
-                If brick.mm.range > newRange Then ' if the range within a brick is > 10 cm's, fit it within 10 cm's.
-                    Dim split() As cv.Mat = task.pointCloud(brick.rect).Split
-                    split(2) -= brick.mm.minVal
-                    split(2) *= newRange / brick.mm.range
-                    split(2) += brick.mm.minVal
-
-                    cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
-                    split(0) *= 1 / task.calibData.rgbIntrinsics.fx
-
-                    cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
-                    split(1) *= 1 / task.calibData.rgbIntrinsics.fy
-
-                    cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
-                    dst2(brick.rect).SetTo(0, task.noDepthMask(brick.rect))
-                    splitCount += 1
+            If brick.depth > 0 Then
+                If brick.age = 1 Then
+                    task.pointCloud(brick.rect).CopyTo(dst2(brick.rect))
+                    Continue For
                 End If
+                If task.depthMask.CountNonZero = 0 Then Continue For
+                'If brick.mm.range >= 1 Then
+                '    dst2(brick.rect).SetTo(0) ' an 8x8 block spread over a meter?  Can't be real data...
+                '    Continue For
+                'End If
+
+                ' check for any new depth pixels (not updates to existing as those come only with motion (age = 1)
+                Dim mask As cv.Mat = dst1(brick.rect) And task.depthMask(brick.rect)
+                If mask.CountNonZero = 0 Then Continue For ' nothing to update.
+                task.pointCloud(brick.rect).CopyTo(dst2(brick.rect), mask) ' update any newly arrived depth data.
+                updateCount += 1
             End If
         Next
 
-        labels(2) = CStr(splitCount) + " bricks of " + CStr(task.gridRects.Count) + " were modified."
-        If standaloneTest() Then dst3 = task.pointCloud
+        labels(2) = CStr(updateCount) + " bricks of " + CStr(task.gridRects.Count) + " were reviewed for changes."
     End Sub
 End Class

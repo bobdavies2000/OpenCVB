@@ -73,7 +73,6 @@ Public Class VBtask : Implements IDisposable
     Public lowResDepth As New cv.Mat
 
     Public motionMask As New cv.Mat
-    Public fullImageStable As Boolean ' True if the current image has no changes from the previous.
     Public motionPercent As Single
     Public motionLabel As String = " "
 
@@ -786,7 +785,7 @@ Public Class VBtask : Implements IDisposable
                 Next
 
                 gifImages.Clear()
-                Dim dirInfo As New DirectoryInfo(HomeDir + "GifBuilder\bin\x64\Debug\")
+                Dim dirInfo As New DirectoryInfo(HomeDir + "GifBuilder\bin\Debug\net8.0\")
                 Dim dirData = dirInfo.GetDirectories()
                 Dim gifExe As New FileInfo(dirInfo.FullName + "GifBuilder.exe")
                 If gifExe.Exists = False Then
@@ -794,7 +793,6 @@ Public Class VBtask : Implements IDisposable
                 Else
                     Dim gifProcess As New Process
                     gifProcess.StartInfo.FileName = gifExe.FullName
-                    gifProcess.StartInfo.WorkingDirectory = HomeDir + "Temp/"
                     gifProcess.Start()
                 End If
             End If

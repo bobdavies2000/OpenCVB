@@ -105,8 +105,8 @@ if not exist zed-csharp-api\StereoLabs.zed\Build (
 )
 
 msbuild.exe UI_Generator/UI_Generator.vcxproj /p:Configuration=Release
-msbuild.exe GifBuilder/GifBuilder.sln /p:Configuration=Debug
-msbuild.exe GifBuilder/GifBuilder.sln /p:Configuration=Release
+msbuild.exe GifBuilder/GifBuilder.sln /p:Configuration=Debug /p:Platform="Any CPU"
+msbuild.exe GifBuilder/GifBuilder.sln /p:Configuration=Release /p:Platform="Any CPU"
 
 echo "Goto: https://download.stereolabs.com/zedsdk/4.1/cu121/win and install Stereolabs SDK with CUDA 12"
 echo "To turn off StereoLabs support, edit OpenCVB's 'camera/cameraDefines.hpp' and comment out StereoLabs."

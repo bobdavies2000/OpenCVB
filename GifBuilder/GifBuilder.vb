@@ -1,9 +1,12 @@
-﻿Imports System.IO
+Imports System.IO
 Imports AnimatedGif
-Module GifBuilder
+Module GIFBuilder
+    Dim imgDir As DirectoryInfo
     Sub Main()
+        Console.WriteLine("Current directory = " + CurDir())
         Dim strFileSize As String = ""
-        Dim imgDir As New DirectoryInfo(CurDir)
+        imgDir = New DirectoryInfo(CurDir() + "/Temp")
+
         Dim imgList As FileInfo() = imgDir.GetFiles("*.bmp")
         Dim imageFiles As New List(Of String)
         For Each img In imgList
@@ -13,12 +16,12 @@ Module GifBuilder
         Dim outputGifPath As String = "myGif.gif"
 
         If imgList.Count = 0 Then
-            MsgBox("Use the Global Option 'Create GIF of current algorithm' to create input images to GifBuilder.")
+            Console.WriteLine("Use the Global Option 'Create GIF of current algorithm' to create input images to GifBuilder.")
             End
         End If
 
         Try
-            CreateAnimatedGif(imageFiles, outputGifPath, 1000) ' 1 seconds delay
+            CreateAnimatedGif(imageFiles, imgDir.FullName + "/" + outputGifPath, 1000) ' 1 seconds delay
         Catch ex As Exception
             Console.WriteLine("Error creating GIF: " & ex.Message)
         End Try
@@ -54,6 +57,7 @@ Module GifBuilder
             ' Finalize the GIF encoding (important to close the stream properly)
             encoder.Dispose()
         End Try
-        MsgBox("The myGif.gif file should be present in " + CurDir())
+        Console.WriteLine("The myGif.gif file can be found in " + imgDir.FullName)
+        Dim noop = Console.ReadLine() ' give them a chance to read the message.
     End Sub
 End Module

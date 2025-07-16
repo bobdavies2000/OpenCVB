@@ -6,7 +6,7 @@ Public Class Motion_Basics : Inherits TaskParent
     Public cellAge(0) As Integer
     Public motionFlags(0) As Boolean
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        task.motionMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Below is the difference between the current image and the dst2 at left which is composed using the motion mask."
         desc = "Isolate all motion in the scene"
     End Sub
@@ -39,19 +39,18 @@ Public Class Motion_Basics : Inherits TaskParent
             End If
         Next
 
-        dst1.SetTo(0)
+        task.motionMask.SetTo(0)
         For Each i In motionList
-            dst1(task.gridRects(i)).SetTo(255)
+            task.motionMask(task.gridRects(i)).SetTo(255)
             motionFlags(i) = True
         Next
 
-        task.fullImageStable = motionList.Count = 0
-        labels(2) = "There were " + CStr(motionList.Count) + " bricks with motion."
+        task.motionPercent = motionList.Count / task.gridRects.Count
+        If task.motionPercent > 0.8 Then task.motionPercent = 1
+        labels(2) = Format(task.motionPercent, "00%") + " of bricks had motion."
 
         ' some cameras have low light images for the first few frames.
-        If task.gOptions.UseMotionMask.Checked = False Or task.frameCount < 3 Then dst1.SetTo(255)
-
-        task.motionMask = dst1
+        If task.gOptions.UseMotionMask.Checked = False Or task.frameCount < 3 Or task.motionPercent = 1 Then task.motionMask.SetTo(255)
 
         If standaloneTest() Then
             If task.gOptions.UseMotionMask.Checked Then src.CopyTo(dst2, task.motionMask)

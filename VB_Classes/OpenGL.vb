@@ -1876,7 +1876,9 @@ Public Class OpenGL_BrickCloud : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         bCloud.Run(src)
         If task.gOptions.DebugCheckBox.Checked = False Then
+            dst1 = bCloud.dst1
             dst2 = bCloud.dst2
+            dst3 = task.pointCloud
         Else
             dst2 = task.pointCloud
         End If
