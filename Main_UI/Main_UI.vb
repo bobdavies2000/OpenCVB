@@ -25,13 +25,13 @@ Module opencv_module
     End Structure
 End Module
 Public Class Main_UI
+    Public HomeDir As DirectoryInfo
     Public Shared settings As jsonClass.ApplicationStorage
     Public Shared cameraNames As List(Of String)
     Public groupButtonSelection As String
     Dim jsonfs As New jsonClass.FileOperations
     Dim upArrow As Boolean, downArrow As Boolean
 
-    Dim threadStartTime As DateTime
     Dim pathList As New List(Of String)
 
     Dim optionsForm As Options
@@ -49,7 +49,6 @@ Public Class Main_UI
     Dim restartCameraRequest As Boolean
 
     Dim cameraTaskHandle As Thread
-    Dim detectorObj As CameraDetector
     Public DevicesChanged As Boolean
     Dim camPic(4 - 1) As PictureBox
     Dim camLabel(camPic.Count - 1) As Label
@@ -66,7 +65,6 @@ Public Class Main_UI
     Dim externalPythonInvocation As Boolean
     Dim frameCount As Integer
     Dim GrabRectangleData As Boolean
-    Public HomeDir As DirectoryInfo
 
     Dim LastX As Integer
     Dim LastY As Integer
@@ -965,8 +963,6 @@ Public Class Main_UI
         Directory.SetCurrentDirectory(HomeDir.FullName)
         HomeDir = New DirectoryInfo("./")
 
-        threadStartTime = DateTime.Now
-
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
         Dim args() = Environment.GetCommandLineArgs()
 
@@ -1014,8 +1010,8 @@ Public Class Main_UI
         pythonPresent = InStr(systemPath.ToLower, "python")
         If pythonPresent = False Then
             MsgBox("Python needs to be in the path in order to run all the algorithms written in python." + vbCrLf +
-                   "That is how you control which version of python is active for OpenCVB." + vbCrLf +
-                   "All Python algorithms will be disabled for now...")
+                       "That is how you control which version of python is active for OpenCVB." + vbCrLf +
+                       "All Python algorithms will be disabled for now...")
         End If
 
         Me.Show()
@@ -1043,7 +1039,7 @@ Public Class Main_UI
 
         If AvailableAlgorithms.Items.Count = 0 Then
             MsgBox("There were no algorithms listed for the " + GroupCombo.Text + vbCrLf +
-                       "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
+                           "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
         Else
             If settings.MainUI_AlgName Is Nothing Then
                 AvailableAlgorithms.SelectedIndex = 0
@@ -1066,8 +1062,6 @@ Public Class Main_UI
         fpsTimer.Enabled = True
         XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
         XYLoc.Visible = True
-        'detectorObj = New CameraDetector
-        'detectorObj.StartDetector()
 
         If settings.cameraFound Then
             startCamera()
@@ -1081,7 +1075,6 @@ Public Class Main_UI
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         saveAlgorithmName = "" ' this will close the current algorithm.
-        If detectorObj IsNot Nothing Then detectorObj.StopDetector()
         jsonWrite()
 
         cameraTaskHandle = Nothing

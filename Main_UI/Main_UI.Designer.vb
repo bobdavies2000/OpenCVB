@@ -80,7 +80,7 @@ Partial Class Main_UI
         Me.OptionsButton.Image = CType(resources.GetObject("OptionsButton.Image"), System.Drawing.Image)
         Me.OptionsButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.OptionsButton.Name = "OptionsButton"
-        Me.OptionsButton.Size = New System.Drawing.Size(34, 29)
+        Me.OptionsButton.Size = New System.Drawing.Size(34, 33)
         Me.OptionsButton.Text = "OpenCVB Settings"
         '
         'TestAllButton
@@ -89,7 +89,7 @@ Partial Class Main_UI
         Me.TestAllButton.Image = CType(resources.GetObject("TestAllButton.Image"), System.Drawing.Image)
         Me.TestAllButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.TestAllButton.Name = "TestAllButton"
-        Me.TestAllButton.Size = New System.Drawing.Size(34, 29)
+        Me.TestAllButton.Size = New System.Drawing.Size(34, 33)
         Me.TestAllButton.Text = "Test All Algorithms"
         '
         'Magnify
@@ -98,7 +98,7 @@ Partial Class Main_UI
         Me.Magnify.Image = CType(resources.GetObject("Magnify.Image"), System.Drawing.Image)
         Me.Magnify.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.Magnify.Name = "Magnify"
-        Me.Magnify.Size = New System.Drawing.Size(34, 29)
+        Me.Magnify.Size = New System.Drawing.Size(34, 33)
         Me.Magnify.Text = "Magnify - click then draw a rectangle"
         Me.Magnify.ToolTipText = "Magnify - draw a rectangle then click here."
         '
@@ -108,7 +108,7 @@ Partial Class Main_UI
         Me.PixelViewerButton.Image = CType(resources.GetObject("PixelViewerButton.Image"), System.Drawing.Image)
         Me.PixelViewerButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.PixelViewerButton.Name = "PixelViewerButton"
-        Me.PixelViewerButton.Size = New System.Drawing.Size(34, 29)
+        Me.PixelViewerButton.Size = New System.Drawing.Size(34, 33)
         Me.PixelViewerButton.Text = "PixelViewer to see pixels under the cursor"
         '
         'RecentList
@@ -119,7 +119,7 @@ Partial Class Main_UI
         Me.RecentList.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.RecentList.Name = "RecentList"
         Me.RecentList.ShowDropDownArrow = False
-        Me.RecentList.Size = New System.Drawing.Size(68, 29)
+        Me.RecentList.Size = New System.Drawing.Size(68, 33)
         Me.RecentList.Text = "Recent"
         '
         'AvailableAlgorithms
@@ -139,7 +139,7 @@ Partial Class Main_UI
         Me.GroupButtonList.Image = CType(resources.GetObject("GroupButtonList.Image"), System.Drawing.Image)
         Me.GroupButtonList.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.GroupButtonList.Name = "GroupButtonList"
-        Me.GroupButtonList.Size = New System.Drawing.Size(45, 29)
+        Me.GroupButtonList.Size = New System.Drawing.Size(45, 33)
         Me.GroupButtonList.Text = "A-Z"
         Me.GroupButtonList.ToolTipText = "Jump to Algorithm Group"
         '
@@ -148,7 +148,7 @@ Partial Class Main_UI
         Me.GroupCombo.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest
         Me.GroupCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
         Me.GroupCombo.Name = "GroupCombo"
-        Me.GroupCombo.Size = New System.Drawing.Size(270, 34)
+        Me.GroupCombo.Size = New System.Drawing.Size(270, 38)
         '
         'AlgorithmDesc
         '
@@ -195,7 +195,7 @@ Partial Class Main_UI
         '
         Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ExitToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
-        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(54, 29)
+        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(54, 32)
         Me.FileToolStripMenuItem.Text = "&File"
         '
         'ExitToolStripMenuItem
@@ -207,7 +207,7 @@ Partial Class Main_UI
         'AboutToolStripMenuItem
         '
         Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(78, 29)
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(78, 32)
         Me.AboutToolStripMenuItem.Text = "About"
         '
         'RefreshTimer
