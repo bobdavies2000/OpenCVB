@@ -1050,3 +1050,18 @@ Public Class Brick_Cloud : Inherits TaskParent
         labels(2) = CStr(updateCount) + " bricks of " + CStr(task.gridRects.Count) + " were reviewed for changes."
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class newClass_Basics : Inherits TaskParent
+    Public Sub New()
+        desc = "description"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    End Sub
+End Class

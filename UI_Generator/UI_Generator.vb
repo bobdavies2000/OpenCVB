@@ -1,4 +1,4 @@
-﻿Imports System.IO
+Imports System.IO
 Imports System.Text.RegularExpressions
 Imports System.Threading
 Module UI_Generator
@@ -15,12 +15,12 @@ Module UI_Generator
 
         Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
         Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
-        Dim HomeDir = New DirectoryInfo(exeDir.FullName + "../../../")
+        Dim HomeDir = New DirectoryInfo(exeDir.FullName + "../../../../../../")
         Directory.SetCurrentDirectory(HomeDir.FullName)
 
         Dim PythonProjFile As New FileInfo(HomeDir.FullName + "/Python/Python.pyproj")
         If PythonProjFile.Exists = False Then
-            HomeDir = New DirectoryInfo(exeDir.FullName + "../../../../")
+            HomeDir = New DirectoryInfo(exeDir.FullName + "../../../../../../")
             PythonProjFile = New FileInfo(HomeDir.FullName + "/Python/Python.pyproj")
         End If
 

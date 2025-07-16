@@ -162,6 +162,7 @@ Mouse
 MSER
 MultiDimensionScaling
 Neighbor
+newClass
 OEX
 OilPaint
 OpAuto
