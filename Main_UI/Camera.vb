@@ -1,5 +1,5 @@
 ﻿Imports System.Numerics
-Imports VB_Classes.VBtask
+Imports VBClasses.VBtask
 Imports cv = OpenCvSharp
 Public Class GenericCamera
     Public transformationMatrix() As Single
@@ -20,7 +20,7 @@ Public Class GenericCamera
     Public captureRes As cv.Size
 
     Public deviceCount As Integer
-    Public calibData As VB_Classes.VBtask.cameraInfo
+    Public calibData As VBClasses.VBtask.cameraInfo
     Public colorBytes() As Byte
     Public vertices() As Byte
     Public depthBytes() As Byte

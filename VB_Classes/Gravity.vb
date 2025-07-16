@@ -1,5 +1,4 @@
-﻿Imports VB_Classes.Options_Reduction
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
     Public options As New Options_Features
     Dim gravityRaw As New Gravity_Raw

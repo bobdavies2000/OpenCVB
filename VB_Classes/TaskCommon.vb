@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Imports VB_Classes.TaskParent
+Imports VBClasses.TaskParent
 Imports System.Windows.Shapes
 Public Module vbc
     Public task As VBtask

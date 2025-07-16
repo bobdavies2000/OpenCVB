@@ -54,8 +54,8 @@ Public Class CameraORB : Inherits GenericCamera
         pipe.EnableFrameSync()
         pipe.Start(config)
     End Sub
-    Private Function copyIntrinsics(input As CameraIntrinsic, ratio As Single) As VB_Classes.VBtask.intrinsicData
-        Dim output As New VB_Classes.VBtask.intrinsicData
+    Private Function copyIntrinsics(input As CameraIntrinsic, ratio As Single) As VBClasses.VBtask.intrinsicData
+        Dim output As New VBClasses.VBtask.intrinsicData
         output.ppx = input.cx / ratio
         output.ppy = input.cy / ratio
         output.fx = input.fx / ratio

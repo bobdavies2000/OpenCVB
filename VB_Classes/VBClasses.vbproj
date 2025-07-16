@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{735A2264-8A36-4D0A-ADE0-2BFAD6734401}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>VB_Classes</RootNamespace>
-    <AssemblyName>VB_Classes</AssemblyName>
+    <RootNamespace>VBClasses</RootNamespace>
+    <AssemblyName>VBClasses</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
@@ -22,7 +22,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\bin\Debug\</OutputPath>
-    <DocumentationFile>VB_Classes.xml</DocumentationFile>
+    <DocumentationFile>VBClasses.xml</DocumentationFile>
     <NoWarn>002,003,010,41999,42016,42017,42018,42019,42020,42021,42022,42030,42032,42036,42104,42108,42109</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>
@@ -34,7 +34,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Release\</OutputPath>
-    <DocumentationFile>VB_Classes.xml</DocumentationFile>
+    <DocumentationFile>VBClasses.xml</DocumentationFile>
     <NoWarn>002,003,010,41999,42016,42017,42018,42019,42020,42021,42022,42030,42032,42036,42104,42108,42109</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>
@@ -57,7 +57,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\bin\Release\</OutputPath>
-    <DocumentationFile>VB_Classes.xml</DocumentationFile>
+    <DocumentationFile>VBClasses.xml</DocumentationFile>
     <NoWarn>002,003,010,41999,42016,42017,42018,42019,42020,42021,42022,42030,42032,42036,42104,42108,42109</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -70,7 +70,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <DefineTrace>true</DefineTrace>
     <OutputPath>..\bin\Debug\</OutputPath>
-    <DocumentationFile>VB_Classes.xml</DocumentationFile>
+    <DocumentationFile>VBClasses.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <NoWarn>002,003,010,41999,42016,42017,42018,42019,42020,42021,42022,42030,42032,42036,42104,42108,42109</NoWarn>
     <DebugType>pdbonly</DebugType>

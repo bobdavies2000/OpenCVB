@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports VB_Classes.OptionParent
+Imports VBClasses.OptionParent
 Public Class Feature_Basics : Inherits TaskParent
     Public options As New Options_Features
     Public Sub New()

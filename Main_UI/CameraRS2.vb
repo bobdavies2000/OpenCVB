@@ -4,8 +4,8 @@ Imports Intel.RealSense
 Imports System.Text
 Public Class CameraRS2 : Inherits GenericCamera
     Dim pipe As New Pipeline()
-    Private Function copyIntrinsics(input As Intrinsics, ratio As Single) As VB_Classes.VBtask.intrinsicData
-        Dim output As New VB_Classes.VBtask.intrinsicData
+    Private Function copyIntrinsics(input As Intrinsics, ratio As Single) As VBClasses.VBtask.intrinsicData
+        Dim output As New VBClasses.VBtask.intrinsicData
         output.ppx = input.ppx / ratio
         output.ppy = input.ppy / ratio
         output.fx = input.fx / ratio
