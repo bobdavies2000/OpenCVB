@@ -331,7 +331,7 @@ Public Class Main_UI
     Public Sub jsonWrite()
         If TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if "Test All" is running.
             settings.MainUI_AlgName = AvailableAlgorithms.Text
-            settings.groupComboText = GroupCombo.Text
+            settings.groupComboText = GroupComboBox.Text
         End If
 
         settings.locationMain = New cv.Vec4f(Me.Left, Me.Top, Me.Width, Me.Height)
@@ -405,18 +405,18 @@ Public Class Main_UI
         End If
         Return usblist
     End Function
-    Private Sub groupName_SelectedIndexChanged(sender As Object, e As EventArgs) Handles GroupCombo.SelectedIndexChanged
-        If GroupCombo.Text = "" Then
+    Private Sub groupName_SelectedIndexChanged(sender As Object, e As EventArgs) Handles GroupComboBox.SelectedIndexChanged
+        If GroupComboBox.Text = "" Then
             Dim incr = 1
             If upArrow Then incr = -1
             upArrow = False
             downArrow = False
-            GroupCombo.Text = GroupCombo.Items(GroupCombo.SelectedIndex + incr)
+            GroupComboBox.Text = GroupComboBox.Items(GroupComboBox.SelectedIndex + incr)
             Exit Sub
         End If
 
         AvailableAlgorithms.Enabled = False
-        Dim keyIndex = GroupCombo.Items.IndexOf(GroupCombo.Text)
+        Dim keyIndex = GroupComboBox.Items.IndexOf(GroupComboBox.Text)
         Dim groupings = groupList(keyIndex)
         Dim split = Regex.Split(groupings, ",")
         AvailableAlgorithms.Items.Clear()
@@ -433,7 +433,7 @@ Public Class Main_UI
         Next
         AvailableAlgorithms.Enabled = True
 
-        If GroupCombo.Text.Contains("All") = False Then algHistory.Clear()
+        If GroupComboBox.Text.Contains("All") = False Then algHistory.Clear()
 
         ' if the fpstimer is enabled, then OpenCVB is running - not initializing.
         If fpsTimer.Enabled Then
@@ -492,7 +492,7 @@ Public Class Main_UI
 
         XYLoc.Location = New Point(camPic(2).Left, camPic(2).Top + camPic(2).Height)
         AlgorithmDesc.Visible = settings.snap640
-        GroupCombo.Visible = settings.snap640
+        GroupComboBox.Visible = settings.snap640
         If settings.snap320 Then Me.Width = 720 ' expose the list of available algorithms.
     End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
@@ -634,7 +634,7 @@ Public Class Main_UI
     Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
         TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTest, testAllToolbarBitmap)
         If TestAllButton.Text = "Test All" Then
-            Debug.WriteLine("Starting 'TestAll' overnight run.")
+            Console.WriteLine("Starting 'TestAll' overnight run.")
             AlgorithmTestAllCount = 0
 
             setupTestAll()
@@ -860,16 +860,16 @@ Public Class Main_UI
             MsgBox("The groupFileInfo.txt file is missing.  Run 'UI_Generator' or Clean/Rebuild to get the user interface.")
         End If
         sr = New StreamReader(groupFileInfo.FullName)
-        GroupCombo.Items.Clear()
+        GroupComboBox.Items.Clear()
         While sr.EndOfStream = False
             infoLine = sr.ReadLine
             Split = infoLine.Split(",")
             groupList.Add(infoLine)
-            GroupCombo.Items.Add(Split(0))
+            GroupComboBox.Items.Add(Split(0))
         End While
         sr.Close()
     End Sub
-    Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
+    Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs)
         MsgBox("The objective is to solve many small computer vision problems " + vbCrLf +
                "and do so in a way that enables any of the solutions to be reused." + vbCrLf +
                "The result is a toolkit for solving ever bigger and more difficult" + vbCrLf +
@@ -877,7 +877,7 @@ Public Class Main_UI
                "is not computationally intensive but is built on many almost trivial" + vbCrLf +
                "algorithms working together." + vbCrLf)
     End Sub
-    Private Sub ExitToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExitToolStripMenuItem.Click
+    Private Sub ExitToolStripMenuItem_Click(sender As Object, e As EventArgs)
         Me.Close()
     End Sub
 #End Region
@@ -1020,25 +1020,25 @@ Public Class Main_UI
 
         loadAlgorithmComboBoxes()
 
-        GroupCombo.Text = settings.groupComboText
+        GroupComboBox.Text = settings.groupComboText
 
-        If GroupCombo.SelectedItem() Is Nothing Then
-            Dim group = GroupCombo.Text
+        If GroupComboBox.SelectedItem() Is Nothing Then
+            Dim group = GroupComboBox.Text
             If InStr(group, ") ") Then
                 Dim offset = InStr(group, ") ")
                 group = group.Substring(offset + 2)
             End If
-            For i = 0 To GroupCombo.Items.Count - 1
-                If GroupCombo.Items(i).contains(group) Then
-                    GroupCombo.SelectedItem() = GroupCombo.Items(i)
-                    settings.groupComboText = GroupCombo.Text
+            For i = 0 To GroupComboBox.Items.Count - 1
+                If GroupComboBox.Items(i).contains(group) Then
+                    GroupComboBox.SelectedItem() = GroupComboBox.Items(i)
+                    settings.groupComboText = GroupComboBox.Text
                     Exit For
                 End If
             Next
         End If
 
         If AvailableAlgorithms.Items.Count = 0 Then
-            MsgBox("There were no algorithms listed for the " + GroupCombo.Text + vbCrLf +
+            MsgBox("There were no algorithms listed for the " + GroupComboBox.Text + vbCrLf +
                            "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
         Else
             If settings.MainUI_AlgName Is Nothing Then
@@ -1055,7 +1055,7 @@ Public Class Main_UI
 
         AvailableAlgorithms.ComboBox.Select()
         AlgorithmDesc.Top = ToolStrip1.Top
-        AlgorithmDesc.Left = ToolStrip1.Left + GroupCombo.Bounds.Right
+        AlgorithmDesc.Left = ToolStrip1.Left + GroupComboBox.Bounds.Right
         AlgorithmDesc.Width = ToolStrip1.Left + ToolStrip1.Width - AlgorithmDesc.Left
         AlgorithmDesc.Height = ToolStrip1.Height
 
@@ -1413,16 +1413,12 @@ Public Class Main_UI
             Case "Azure Kinect 4K"
                 Return New CameraK4A(settings.workRes, settings.captureRes, settings.cameraName)
 #End If
-            Case "Intel(R) RealSense(TM) Depth Camera 455"
-                Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
-            Case "Intel(R) RealSense(TM) Depth Camera 435i"
+            Case "Intel(R) RealSense(TM) Depth Camera 455", "Intel(R) RealSense(TM) Depth Camera 435i"
                 Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
             Case "Oak-D camera"
                 Return New CameraOakD_CPP(settings.workRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
                 Return New CameraZED2(settings.workRes, settings.captureRes, settings.cameraName)
-            Case "MYNT-EYE-D1000"
-                Return New CameraMyntD(settings.workRes, settings.captureRes, settings.cameraName)
             Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
                 Return New CameraORB(settings.workRes, settings.captureRes, settings.cameraName)
                 ' Return New CameraORB_CPP(settings.workRes, settings.captureRes, settings.cameraName)
@@ -1486,7 +1482,7 @@ Public Class Main_UI
         Dim parms As New VB_Classes.VBtask.algParms
         parms.fpsRate = settings.desiredFPS
 
-        parms.useRecordedData = GroupCombo.Text = "<All using recorded data>"
+        parms.useRecordedData = GroupComboBox.Text = "<All using recorded data>"
         parms.testAllRunning = testAllRunning
 
         parms.externalPythonInvocation = externalPythonInvocation

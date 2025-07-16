@@ -31,7 +31,6 @@ Partial Class Options
         Me.fontInfo = New System.Windows.Forms.Label()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.showConsoleLog = New System.Windows.Forms.CheckBox()
-        Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.OKButton = New System.Windows.Forms.Button()
         Me.Cancel_Button = New System.Windows.Forms.Button()
         Me.FontDialog1 = New System.Windows.Forms.FontDialog()
@@ -142,10 +141,6 @@ Partial Class Options
         Me.showConsoleLog.TabIndex = 2
         Me.showConsoleLog.Text = "Show Console Log for external processes"
         Me.showConsoleLog.UseVisualStyleBackColor = True
-        '
-        'OpenFileDialog1
-        '
-        Me.OpenFileDialog1.FileName = "OpenFileDialog1"
         '
         'OKButton
         '
@@ -309,7 +304,6 @@ Partial Class Options
 
     End Sub
     Friend WithEvents GroupBox2 As GroupBox
-    Friend WithEvents OpenFileDialog1 As OpenFileDialog
     Friend WithEvents showConsoleLog As CheckBox
     Friend WithEvents OKButton As Button
     Friend WithEvents Cancel_Button As Button

@@ -1,6 +1,29 @@
-﻿Imports System.Numerics
-Imports VB_Classes.VBtask
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
+Imports System.Numerics
+Public Structure intrinsicData
+    Public ppx As Single
+    Public ppy As Single
+    Public fx As Single
+    Public fy As Single
+End Structure
+Public Structure cameraInfo
+    Public baseline As Single ' this is the baseline of the left to right cameras
+
+    Public rgbIntrinsics As intrinsicData
+    Public leftIntrinsics As intrinsicData
+    Public rightIntrinsics As intrinsicData
+
+    Public ColorToLeft_translation() As Single
+    Public ColorToLeft_rotation() As Single
+
+    Public LtoR_translation() As Single
+    Public LtoR_rotation() As Single
+
+    Public v_fov As Single ' vertical field of view in degrees.
+    Public h_fov As Single ' horizontal field of view in degrees.
+    Public d_fov As Single ' diagonal field of view in degrees.
+
+End Structure
 Public Class GenericCamera
     Public transformationMatrix() As Single
     Public IMU_TimeStamp As Double
@@ -20,7 +43,7 @@ Public Class GenericCamera
     Public captureRes As cv.Size
 
     Public deviceCount As Integer
-    Public calibData As VB_Classes.VBtask.cameraInfo
+    Public calibData As cameraInfo
     Public colorBytes() As Byte
     Public vertices() As Byte
     Public depthBytes() As Byte

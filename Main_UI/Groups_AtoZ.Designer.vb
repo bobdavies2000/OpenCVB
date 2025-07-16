@@ -34,6 +34,7 @@ Partial Class Groups_AtoZ
         Me.GroupDataView.Dock = System.Windows.Forms.DockStyle.Fill
         Me.GroupDataView.Location = New System.Drawing.Point(0, 0)
         Me.GroupDataView.Name = "GroupDataView"
+        Me.GroupDataView.ReadOnly = True
         Me.GroupDataView.RowHeadersWidth = 62
         Me.GroupDataView.RowTemplate.Height = 28
         Me.GroupDataView.Size = New System.Drawing.Size(1994, 1358)

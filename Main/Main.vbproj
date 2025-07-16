@@ -24,6 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\zed-c-api\Build\sl_zed_c.vcxproj" />
+    <ProjectReference Include="..\zed-csharp-api\Stereolabs.zed\Build\Stereolabs.zed.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="My Project\Application.Designer.vb">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

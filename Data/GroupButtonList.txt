@@ -218,7 +218,6 @@ SLR
 Smoothing
 Solve
 Sort
-Sound
 Spectrum
 Stabilizer
 Stable

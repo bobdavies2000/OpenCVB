@@ -33,16 +33,12 @@ Partial Class Main_UI
         Me.RecentList = New System.Windows.Forms.ToolStripDropDownButton()
         Me.AvailableAlgorithms = New System.Windows.Forms.ToolStripComboBox()
         Me.GroupButtonList = New System.Windows.Forms.ToolStripButton()
-        Me.GroupCombo = New System.Windows.Forms.ToolStripComboBox()
+        Me.GroupComboBox = New System.Windows.Forms.ToolStripComboBox()
         Me.AlgorithmDesc = New System.Windows.Forms.TextBox()
         Me.fpsTimer = New System.Windows.Forms.Timer(Me.components)
         Me.TestAllTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ComplexityTimer = New System.Windows.Forms.Timer(Me.components)
         Me.XYLoc = New System.Windows.Forms.Label()
-        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
-        Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RefreshTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.MagnifyTimer = New System.Windows.Forms.Timer(Me.components)
@@ -50,15 +46,14 @@ Partial Class Main_UI
         Me.CamSwitchProgress = New System.Windows.Forms.PictureBox()
         Me.CamSwitchTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1.SuspendLayout()
-        Me.MenuStrip1.SuspendLayout()
         CType(Me.CamSwitchProgress, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'ToolStrip1
         '
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.Magnify, Me.PixelViewerButton, Me.RecentList, Me.AvailableAlgorithms, Me.GroupButtonList, Me.GroupCombo})
-        Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.Magnify, Me.PixelViewerButton, Me.RecentList, Me.AvailableAlgorithms, Me.GroupButtonList, Me.GroupComboBox})
+        Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
         Me.ToolStrip1.Size = New System.Drawing.Size(1582, 34)
@@ -80,7 +75,7 @@ Partial Class Main_UI
         Me.OptionsButton.Image = CType(resources.GetObject("OptionsButton.Image"), System.Drawing.Image)
         Me.OptionsButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.OptionsButton.Name = "OptionsButton"
-        Me.OptionsButton.Size = New System.Drawing.Size(34, 33)
+        Me.OptionsButton.Size = New System.Drawing.Size(34, 29)
         Me.OptionsButton.Text = "OpenCVB Settings"
         '
         'TestAllButton
@@ -89,7 +84,7 @@ Partial Class Main_UI
         Me.TestAllButton.Image = CType(resources.GetObject("TestAllButton.Image"), System.Drawing.Image)
         Me.TestAllButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.TestAllButton.Name = "TestAllButton"
-        Me.TestAllButton.Size = New System.Drawing.Size(34, 33)
+        Me.TestAllButton.Size = New System.Drawing.Size(34, 29)
         Me.TestAllButton.Text = "Test All Algorithms"
         '
         'Magnify
@@ -98,7 +93,7 @@ Partial Class Main_UI
         Me.Magnify.Image = CType(resources.GetObject("Magnify.Image"), System.Drawing.Image)
         Me.Magnify.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.Magnify.Name = "Magnify"
-        Me.Magnify.Size = New System.Drawing.Size(34, 33)
+        Me.Magnify.Size = New System.Drawing.Size(34, 29)
         Me.Magnify.Text = "Magnify - click then draw a rectangle"
         Me.Magnify.ToolTipText = "Magnify - draw a rectangle then click here."
         '
@@ -108,18 +103,16 @@ Partial Class Main_UI
         Me.PixelViewerButton.Image = CType(resources.GetObject("PixelViewerButton.Image"), System.Drawing.Image)
         Me.PixelViewerButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.PixelViewerButton.Name = "PixelViewerButton"
-        Me.PixelViewerButton.Size = New System.Drawing.Size(34, 33)
+        Me.PixelViewerButton.Size = New System.Drawing.Size(34, 29)
         Me.PixelViewerButton.Text = "PixelViewer to see pixels under the cursor"
         '
         'RecentList
         '
-        Me.RecentList.AutoToolTip = False
         Me.RecentList.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
         Me.RecentList.Image = CType(resources.GetObject("RecentList.Image"), System.Drawing.Image)
         Me.RecentList.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.RecentList.Name = "RecentList"
-        Me.RecentList.ShowDropDownArrow = False
-        Me.RecentList.Size = New System.Drawing.Size(68, 33)
+        Me.RecentList.Size = New System.Drawing.Size(82, 29)
         Me.RecentList.Text = "Recent"
         '
         'AvailableAlgorithms
@@ -139,16 +132,16 @@ Partial Class Main_UI
         Me.GroupButtonList.Image = CType(resources.GetObject("GroupButtonList.Image"), System.Drawing.Image)
         Me.GroupButtonList.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.GroupButtonList.Name = "GroupButtonList"
-        Me.GroupButtonList.Size = New System.Drawing.Size(45, 33)
+        Me.GroupButtonList.Size = New System.Drawing.Size(45, 29)
         Me.GroupButtonList.Text = "A-Z"
         Me.GroupButtonList.ToolTipText = "Jump to Algorithm Group"
         '
-        'GroupCombo
+        'GroupComboBox
         '
-        Me.GroupCombo.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest
-        Me.GroupCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
-        Me.GroupCombo.Name = "GroupCombo"
-        Me.GroupCombo.Size = New System.Drawing.Size(270, 38)
+        Me.GroupComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest
+        Me.GroupComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
+        Me.GroupComboBox.Name = "GroupComboBox"
+        Me.GroupComboBox.Size = New System.Drawing.Size(270, 34)
         '
         'AlgorithmDesc
         '
@@ -178,37 +171,6 @@ Partial Class Main_UI
         Me.XYLoc.TabIndex = 3
         Me.XYLoc.Text = "XYLoc"
         Me.XYLoc.Visible = False
-        '
-        'MenuStrip1
-        '
-        Me.MenuStrip1.GripMargin = New System.Windows.Forms.Padding(2, 2, 0, 2)
-        Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FileToolStripMenuItem, Me.AboutToolStripMenuItem})
-        Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
-        Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Padding = New System.Windows.Forms.Padding(4, 2, 0, 2)
-        Me.MenuStrip1.Size = New System.Drawing.Size(1582, 33)
-        Me.MenuStrip1.TabIndex = 4
-        Me.MenuStrip1.Text = "MenuStrip1"
-        '
-        'FileToolStripMenuItem
-        '
-        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ExitToolStripMenuItem})
-        Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
-        Me.FileToolStripMenuItem.Size = New System.Drawing.Size(54, 32)
-        Me.FileToolStripMenuItem.Text = "&File"
-        '
-        'ExitToolStripMenuItem
-        '
-        Me.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem"
-        Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(141, 34)
-        Me.ExitToolStripMenuItem.Text = "E&xit"
-        '
-        'AboutToolStripMenuItem
-        '
-        Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(78, 32)
-        Me.AboutToolStripMenuItem.Text = "About"
         '
         'RefreshTimer
         '
@@ -252,17 +214,13 @@ Partial Class Main_UI
         Me.Controls.Add(Me.XYLoc)
         Me.Controls.Add(Me.AlgorithmDesc)
         Me.Controls.Add(Me.ToolStrip1)
-        Me.Controls.Add(Me.MenuStrip1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
-        Me.MainMenuStrip = Me.MenuStrip1
         Me.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.Name = "Main_UI"
         Me.Text = "OpenCVB Main Form"
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
-        Me.MenuStrip1.ResumeLayout(False)
-        Me.MenuStrip1.PerformLayout()
         CType(Me.CamSwitchProgress, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
@@ -275,18 +233,13 @@ Partial Class Main_UI
     Friend WithEvents TestAllButton As ToolStripButton
     Friend WithEvents PixelViewerButton As ToolStripButton
     Friend WithEvents AvailableAlgorithms As ToolStripComboBox
-    Friend WithEvents GroupCombo As ToolStripComboBox
+    Friend WithEvents GroupComboBox As ToolStripComboBox
     Friend WithEvents AlgorithmDesc As TextBox
     Friend WithEvents fpsTimer As Timer
     Friend WithEvents TestAllTimer As Timer
     Friend WithEvents ComplexityTimer As Timer
     Friend WithEvents XYLoc As Label
-    Friend WithEvents MenuStrip1 As MenuStrip
-    Friend WithEvents FileToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents ExitToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents AboutToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents RefreshTimer As Timer
-    Friend WithEvents RecentList As ToolStripDropDownButton
     Friend WithEvents ToolTip1 As ToolTip
     Friend WithEvents Magnify As ToolStripButton
     Friend WithEvents MagnifyTimer As Timer
@@ -294,4 +247,5 @@ Partial Class Main_UI
     Friend WithEvents CamSwitchProgress As PictureBox
     Friend WithEvents CamSwitchTimer As Timer
     Friend WithEvents GroupButtonList As ToolStripButton
+    Friend WithEvents RecentList As ToolStripDropDownButton
 End Class

@@ -22,21 +22,29 @@ Partial Class Main
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        components = New ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Main))
         ToolStrip1 = New ToolStrip()
         PausePlayButton = New ToolStripButton()
-        ToolStripButton1 = New ToolStripButton()
-        ToolStripButton2 = New ToolStripButton()
-        ToolStripButton3 = New ToolStripButton()
-        ToolStripButton4 = New ToolStripButton()
-        ToolStripButton5 = New ToolStripButton()
-        ToolStripComboBox1 = New ToolStripComboBox()
-        ToolStripButton6 = New ToolStripButton()
-        ToolStripComboBox2 = New ToolStripComboBox()
+        OptionsButton = New ToolStripButton()
+        TestAllButton = New ToolStripButton()
+        MagnifyButton = New ToolStripButton()
+        PixelViewerButton = New ToolStripButton()
+        RecentList = New ToolStripDropDownButton()
+        AvailableAlgorithms = New ToolStripComboBox()
+        AtoZButton = New ToolStripButton()
+        GroupComboBox = New ToolStripComboBox()
         AlgDescription = New ToolStripLabel()
         XYLoc = New Label()
         CameraSwitching = New Label()
         CamSwitchProgress = New PictureBox()
+        fpsTimer = New Timer(components)
+        TestAllTimer = New Timer(components)
+        CamSwitchTimer = New Timer(components)
+        ComplexityTimer = New Timer(components)
+        RefreshTimer = New Timer(components)
+        MagnifyTimer = New Timer(components)
+        ToolTip1 = New ToolTip(components)
         ToolStrip1.SuspendLayout()
         CType(CamSwitchProgress, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
@@ -44,7 +52,7 @@ Partial Class Main
         ' ToolStrip1
         ' 
         ToolStrip1.ImageScalingSize = New Size(24, 24)
-        ToolStrip1.Items.AddRange(New ToolStripItem() {PausePlayButton, ToolStripButton1, ToolStripButton2, ToolStripButton3, ToolStripButton4, ToolStripButton5, ToolStripComboBox1, ToolStripButton6, ToolStripComboBox2, AlgDescription})
+        ToolStrip1.Items.AddRange(New ToolStripItem() {PausePlayButton, OptionsButton, TestAllButton, MagnifyButton, PixelViewerButton, RecentList, AvailableAlgorithms, AtoZButton, GroupComboBox, AlgDescription})
         ToolStrip1.Location = New Point(0, 0)
         ToolStrip1.Name = "ToolStrip1"
         ToolStrip1.Size = New Size(1582, 34)
@@ -60,69 +68,69 @@ Partial Class Main
         PausePlayButton.Size = New Size(34, 29)
         PausePlayButton.Text = "Run Pause Button"
         ' 
-        ' ToolStripButton1
+        ' OptionsButton
         ' 
-        ToolStripButton1.DisplayStyle = ToolStripItemDisplayStyle.Image
-        ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), Image)
-        ToolStripButton1.ImageTransparentColor = Color.Magenta
-        ToolStripButton1.Name = "ToolStripButton1"
-        ToolStripButton1.Size = New Size(34, 29)
-        ToolStripButton1.Text = "ToolStripButton1"
+        OptionsButton.DisplayStyle = ToolStripItemDisplayStyle.Image
+        OptionsButton.Image = CType(resources.GetObject("OptionsButton.Image"), Image)
+        OptionsButton.ImageTransparentColor = Color.Magenta
+        OptionsButton.Name = "OptionsButton"
+        OptionsButton.Size = New Size(34, 29)
+        OptionsButton.Text = "ToolStripButton1"
         ' 
-        ' ToolStripButton2
+        ' TestAllButton
         ' 
-        ToolStripButton2.DisplayStyle = ToolStripItemDisplayStyle.Image
-        ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), Image)
-        ToolStripButton2.ImageTransparentColor = Color.Magenta
-        ToolStripButton2.Name = "ToolStripButton2"
-        ToolStripButton2.Size = New Size(34, 29)
-        ToolStripButton2.Text = "ToolStripButton2"
+        TestAllButton.DisplayStyle = ToolStripItemDisplayStyle.Image
+        TestAllButton.Image = CType(resources.GetObject("TestAllButton.Image"), Image)
+        TestAllButton.ImageTransparentColor = Color.Magenta
+        TestAllButton.Name = "TestAllButton"
+        TestAllButton.Size = New Size(34, 29)
+        TestAllButton.Text = "ToolStripButton2"
         ' 
-        ' ToolStripButton3
+        ' MagnifyButton
         ' 
-        ToolStripButton3.DisplayStyle = ToolStripItemDisplayStyle.Image
-        ToolStripButton3.Image = CType(resources.GetObject("ToolStripButton3.Image"), Image)
-        ToolStripButton3.ImageTransparentColor = Color.Magenta
-        ToolStripButton3.Name = "ToolStripButton3"
-        ToolStripButton3.Size = New Size(34, 29)
-        ToolStripButton3.Text = "ToolStripButton3"
+        MagnifyButton.DisplayStyle = ToolStripItemDisplayStyle.Image
+        MagnifyButton.Image = CType(resources.GetObject("MagnifyButton.Image"), Image)
+        MagnifyButton.ImageTransparentColor = Color.Magenta
+        MagnifyButton.Name = "MagnifyButton"
+        MagnifyButton.Size = New Size(34, 29)
+        MagnifyButton.Text = "ToolStripButton3"
         ' 
-        ' ToolStripButton4
+        ' PixelViewerButton
         ' 
-        ToolStripButton4.DisplayStyle = ToolStripItemDisplayStyle.Image
-        ToolStripButton4.Image = CType(resources.GetObject("ToolStripButton4.Image"), Image)
-        ToolStripButton4.ImageTransparentColor = Color.Magenta
-        ToolStripButton4.Name = "ToolStripButton4"
-        ToolStripButton4.Size = New Size(34, 29)
-        ToolStripButton4.Text = "ToolStripButton4"
+        PixelViewerButton.DisplayStyle = ToolStripItemDisplayStyle.Image
+        PixelViewerButton.Image = CType(resources.GetObject("PixelViewerButton.Image"), Image)
+        PixelViewerButton.ImageTransparentColor = Color.Magenta
+        PixelViewerButton.Name = "PixelViewerButton"
+        PixelViewerButton.Size = New Size(34, 29)
+        PixelViewerButton.Text = "ToolStripButton4"
         ' 
-        ' ToolStripButton5
+        ' RecentList
         ' 
-        ToolStripButton5.DisplayStyle = ToolStripItemDisplayStyle.Text
-        ToolStripButton5.Image = CType(resources.GetObject("ToolStripButton5.Image"), Image)
-        ToolStripButton5.ImageTransparentColor = Color.Magenta
-        ToolStripButton5.Name = "ToolStripButton5"
-        ToolStripButton5.Size = New Size(68, 29)
-        ToolStripButton5.Text = "Recent"
+        RecentList.DisplayStyle = ToolStripItemDisplayStyle.Text
+        RecentList.Image = CType(resources.GetObject("RecentList.Image"), Image)
+        RecentList.ImageTransparentColor = Color.Magenta
+        RecentList.Name = "RecentList"
+        RecentList.Size = New Size(82, 29)
+        RecentList.Text = "Recent"
         ' 
-        ' ToolStripComboBox1
+        ' AvailableAlgorithms
         ' 
-        ToolStripComboBox1.Name = "ToolStripComboBox1"
-        ToolStripComboBox1.Size = New Size(300, 34)
+        AvailableAlgorithms.Name = "AvailableAlgorithms"
+        AvailableAlgorithms.Size = New Size(300, 34)
         ' 
-        ' ToolStripButton6
+        ' AtoZButton
         ' 
-        ToolStripButton6.DisplayStyle = ToolStripItemDisplayStyle.Text
-        ToolStripButton6.Image = CType(resources.GetObject("ToolStripButton6.Image"), Image)
-        ToolStripButton6.ImageTransparentColor = Color.Magenta
-        ToolStripButton6.Name = "ToolStripButton6"
-        ToolStripButton6.Size = New Size(45, 29)
-        ToolStripButton6.Text = "A-Z"
+        AtoZButton.DisplayStyle = ToolStripItemDisplayStyle.Text
+        AtoZButton.Image = CType(resources.GetObject("AtoZButton.Image"), Image)
+        AtoZButton.ImageTransparentColor = Color.Magenta
+        AtoZButton.Name = "AtoZButton"
+        AtoZButton.Size = New Size(45, 29)
+        AtoZButton.Text = "A-Z"
         ' 
-        ' ToolStripComboBox2
+        ' GroupComboBox
         ' 
-        ToolStripComboBox2.Name = "ToolStripComboBox2"
-        ToolStripComboBox2.Size = New Size(200, 34)
+        GroupComboBox.Name = "GroupComboBox"
+        GroupComboBox.Size = New Size(200, 34)
         ' 
         ' AlgDescription
         ' 
@@ -158,6 +166,12 @@ Partial Class Main
         CamSwitchProgress.TabIndex = 3
         CamSwitchProgress.TabStop = False
         ' 
+        ' fpsTimer
+        ' 
+        ' 
+        ' CamSwitchTimer
+        ' 
+        ' 
         ' Main
         ' 
         AutoScaleDimensions = New SizeF(10F, 25F)
@@ -178,17 +192,24 @@ Partial Class Main
 
     Friend WithEvents ToolStrip1 As ToolStrip
     Friend WithEvents PausePlayButton As ToolStripButton
-    Friend WithEvents ToolStripButton1 As ToolStripButton
-    Friend WithEvents ToolStripButton2 As ToolStripButton
-    Friend WithEvents ToolStripButton3 As ToolStripButton
-    Friend WithEvents ToolStripButton4 As ToolStripButton
-    Friend WithEvents ToolStripButton5 As ToolStripButton
-    Friend WithEvents ToolStripComboBox1 As ToolStripComboBox
-    Friend WithEvents ToolStripButton6 As ToolStripButton
-    Friend WithEvents ToolStripComboBox2 As ToolStripComboBox
+    Friend WithEvents OptionsButton As ToolStripButton
+    Friend WithEvents TestAllButton As ToolStripButton
+    Friend WithEvents MagnifyButton As ToolStripButton
+    Friend WithEvents PixelViewerButton As ToolStripButton
+    Friend WithEvents AvailableAlgorithms As ToolStripComboBox
+    Friend WithEvents AtoZButton As ToolStripButton
+    Friend WithEvents GroupComboBox As ToolStripComboBox
     Friend WithEvents AlgDescription As ToolStripLabel
     Friend WithEvents XYLoc As Label
     Friend WithEvents CameraSwitching As Label
     Friend WithEvents CamSwitchProgress As PictureBox
+    Friend WithEvents fpsTimer As Timer
+    Friend WithEvents TestAllTimer As Timer
+    Friend WithEvents CamSwitchTimer As Timer
+    Friend WithEvents ComplexityTimer As Timer
+    Friend WithEvents RefreshTimer As Timer
+    Friend WithEvents MagnifyTimer As Timer
+    Friend WithEvents ToolTip1 As ToolTip
+    Friend WithEvents RecentList As ToolStripDropDownButton
 
 End Class

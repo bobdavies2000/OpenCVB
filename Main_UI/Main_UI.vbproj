@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <Compile Remove="CameraK4A.vb" />
+    <Compile Remove="CameraMyntD.vb" />
     <Compile Remove="CameraZED2_CPP.vb" />
     <Compile Remove="Translator.Designer.vb" />
     <Compile Remove="Translator.vb" />
