@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports NAudio.Gui
 Public Class HistValley_Basics : Inherits TaskParent
     Dim hist As New Hist_Basics
     Dim options As New Options_Boundary

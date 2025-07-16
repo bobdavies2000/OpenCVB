@@ -1,6 +1,4 @@
-﻿Imports System.Windows.Markup
-Imports NAudio
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/d3/dc0/group__imgproc__shape.html
 ' https://docs.opencvb.org/3.4/d5/d45/tutorial_py_contours_more_functions.html
 ' https://stackoverflow.com/questions/55529371/opencv-shape-matching-between-two-similar-shapes
