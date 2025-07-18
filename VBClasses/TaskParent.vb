@@ -42,7 +42,7 @@ Public Class TaskParent : Implements IDisposable
         Dim callStack As String
         For i = 0 To lines.Count - 1
             lines(i) = Trim(lines(i))
-            Dim offset = InStr(lines(i), "VB_Classes.")
+            Dim offset = InStr(lines(i), "VBClasses.")
             If offset > 0 Then
                 Dim partLine = Mid(lines(i), offset + 11)
                 If partLine.StartsWith("AlgorithmList.createVBAlgorithm") Then Exit For

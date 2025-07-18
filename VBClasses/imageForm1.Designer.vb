@@ -42,7 +42,7 @@ Friend Class imageForm
     Friend Shared ReadOnly Property ResourceManager() As Global.System.Resources.ResourceManager
         Get
             If Object.ReferenceEquals(resourceMan, Nothing) Then
-                Dim temp As Global.System.Resources.ResourceManager = New Global.System.Resources.ResourceManager("VB_Classes.imageForm", GetType(imageForm).Assembly)
+                Dim temp As Global.System.Resources.ResourceManager = New Global.System.Resources.ResourceManager("VBClasses.imageForm", GetType(imageForm).Assembly)
                 resourceMan = temp
             End If
             Return resourceMan

@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>VB_Classes</RootNamespace>
-    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
+    <RootNamespace>VBClasses</RootNamespace>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
 	  <ImplicitUsings>enable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
 	  <MyType>WindowsForms</MyType>
-	  <StartupObject>VB_Classes.My.MyApplication</StartupObject>
+	  <StartupObject>VBClasses.My.MyApplication</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
