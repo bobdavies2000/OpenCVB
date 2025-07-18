@@ -807,7 +807,7 @@ Public Class KNN_NNBasics : Inherits TaskParent
         End If
 
         If options.knnDimension = 0 Then
-            If messageSent = False Then MsgBox("The KNN dimension needs to be set for the general purpose KNN_Basics to start")
+            If messageSent = False Then MessageBox.Show("The KNN dimension needs to be set for the general purpose KNN_Basics to start")
             Exit Sub
         End If
 

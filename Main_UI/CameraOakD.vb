@@ -183,7 +183,7 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
             Try
                 OakDStop(cPtr)
             Catch ex As Exception
-                MsgBox("OakD failure " + ex.Message)
+                MessageBox.Show("OakD failure " + ex.Message)
             End Try
             cPtr = 0
             Thread.Sleep(100)

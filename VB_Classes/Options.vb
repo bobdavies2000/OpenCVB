@@ -32,7 +32,7 @@ Public Class Options_Quaternion : Inherits OptionParent
 
         q1 = New Quaternion(CSng(axSlider.Value / 100), CSng(aySlider.Value / 100),
                                 CSng(azSlider.Value / 100), CSng(athetaSlider.Value / 100))
-        q2 = New Quaternion(CSng(bxSlider.Value / 100), CSng(bySlider.Value / 100),
+        q2 = New Quaternion(CSng(bxSlider.Value / 100), CSng(bySlider.ValueOptions_AddWeighted / 100),
                                     CSng(bzSlider.Value / 100), CSng(bthetaSlider.Value / 100))
     End Sub
 End Class
@@ -4941,7 +4941,7 @@ Public Class Options_DNN : Inherits OptionParent
             superResMultiplier = CInt(split(1).Substring(1, 1))
             Dim testFile As New FileInfo(superResModelFileName)
             If testFile.Exists = False Then
-                MsgBox("The " + radio.check(index).Text + " super res model file is missing!")
+                MessageBox.Show("The " + radio.check(index).Text + " super res model file is missing!")
                 superResModelFileName = ""
             End If
         End If
@@ -6933,7 +6933,7 @@ Public Class Options_Video : Inherits OptionParent
             currFrame = 0
             If fileNameForm.newFileName Then fileInfo = New FileInfo(fileNameForm.filename.Text)
             If fileInfo.Exists = False Then
-                MsgBox("File not found: " + fileInfo.FullName)
+                MessageBox.Show("File not found: " + fileInfo.FullName)
                 Exit Sub
             End If
         End If

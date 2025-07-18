@@ -224,14 +224,14 @@ Public Class Main
             End If
 
             If .cameraPresent(myntIndex) And .cameraSupported(myntIndex) = False Then
-                MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
+                MessageBox.Show("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
                        "Cam_MyntD.dll has not been built." + vbCrLf + vbCrLf +
                        "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
                        "and run AddMynt.bat in OpenCVB's home directory.")
             End If
 
             If .cameraPresent(zedIndex) And .cameraSupported(zedIndex) = False And stereoLabsDefineIsOff = False Then
-                MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
+                MessageBox.Show("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
                        "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
                        "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
                        "and rerun Update_All.bat to get the StereoLabs SDK.")
@@ -246,7 +246,7 @@ Public Class Main
             Next
             If settings.cameraFound = False Then
                 settings.cameraName = ""
-                MsgBox("There are no supported cameras present!" + vbCrLf + vbCrLf)
+                MessageBox.Show("There are no supported cameras present!" + vbCrLf + vbCrLf)
             End If
 
             If settings.testAllDuration < 5 Then settings.testAllDuration = 5
@@ -264,7 +264,7 @@ Public Class Main
                     .captureRes = New cv.Size(1280, 720)
                 Case 376, 188, 94
                     If settings.cameraName <> "StereoLabs ZED 2/2i" Then
-                        MsgBox("The json settings don't appear to be correct!" + vbCrLf +
+                        MessageBox.Show("The json settings don't appear to be correct!" + vbCrLf +
                                 "The 'settings.json' file will be removed" + vbCrLf +
                                 "and rebuilt with default settings upon restart.")
                         Dim fileinfo As New FileInfo(jsonfs.jsonFileName)
@@ -548,7 +548,7 @@ Public Class Main
         End If
 
         If foundDirectory = False And notFoundMessage.Length > 0 Then
-            MsgBox(neededDirectory + " was not found.  " + notFoundMessage)
+            MessageBox.Show(neededDirectory + " was not found.  " + notFoundMessage)
         End If
         Environment.SetEnvironmentVariable("Path", systemPath)
     End Sub
@@ -627,7 +627,7 @@ Public Class Main
 
         jsonWrite()
         StartTask()
-        UpdateAlgorithmHistory()
+        updateAlgorithmHistory()
         groupButtonSelection = ""
     End Sub
     Public Sub jumpToAlgorithm(algName As String)
@@ -643,7 +643,7 @@ Public Class Main
         arrowIndex = 0
         Dim item = TryCast(sender, ToolStripMenuItem)
         If AvailableAlgorithms.Items.Contains(item.Text) = False Then
-            MsgBox("That algorithm was not found" + vbCrLf + vbCrLf + "The name may have changed or " + vbCrLf +
+            MessageBox.Show("That algorithm was not found" + vbCrLf + vbCrLf + "The name may have changed or " + vbCrLf +
                        "The currently selected group does not contain " + item.Text + vbCrLf + "Change the group to <All> to guarantee access.")
         Else
             jumpToAlgorithm(item.Text)

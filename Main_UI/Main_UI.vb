@@ -226,14 +226,14 @@ Public Class Main_UI
             End If
 
             If .cameraPresent(myntIndex) And .cameraSupported(myntIndex) = False Then
-                MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
+                MessageBox.Show("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
                        "Cam_MyntD.dll has not been built." + vbCrLf + vbCrLf +
                        "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
                        "and run AddMynt.bat in OpenCVB's home directory.")
             End If
 
             If .cameraPresent(zedIndex) And .cameraSupported(zedIndex) = False And stereoLabsDefineIsOff = False Then
-                MsgBox("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
+                MessageBox.Show("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
                        "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
                        "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
                        "and rerun Update_All.bat to get the StereoLabs SDK.")
@@ -248,7 +248,7 @@ Public Class Main_UI
             Next
             If settings.cameraFound = False Then
                 settings.cameraName = ""
-                MsgBox("There are no supported cameras present!" + vbCrLf + vbCrLf)
+                MessageBox.Show("There are no supported cameras present!" + vbCrLf + vbCrLf)
             End If
 
             If settings.testAllDuration < 5 Then settings.testAllDuration = 5
@@ -266,7 +266,7 @@ Public Class Main_UI
                     .captureRes = New cv.Size(1280, 720)
                 Case 376, 188, 94
                     If settings.cameraName <> "StereoLabs ZED 2/2i" Then
-                        MsgBox("The json settings don't appear to be correct!" + vbCrLf +
+                        MessageBox.Show("The json settings don't appear to be correct!" + vbCrLf +
                                 "The 'settings.json' file will be removed" + vbCrLf +
                                 "and rebuilt with default settings upon restart.")
                         Dim fileinfo As New FileInfo(jsonfs.jsonFileName)
@@ -753,7 +753,7 @@ Public Class Main_UI
         arrowIndex = 0
         Dim item = TryCast(sender, ToolStripMenuItem)
         If AvailableAlgorithms.Items.Contains(item.Text) = False Then
-            MsgBox("That algorithm was not found" + vbCrLf + vbCrLf + "The name may have changed or " + vbCrLf +
+            MessageBox.Show("That algorithm was not found" + vbCrLf + vbCrLf + "The name may have changed or " + vbCrLf +
                        "The currently selected group does not contain " + item.Text + vbCrLf + "Change the group to <All> to guarantee access.")
         Else
             jumpToAlgorithm(item.Text)
@@ -842,7 +842,7 @@ Public Class Main_UI
     Private Sub loadAlgorithmComboBoxes()
         Dim countFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmCounts.txt")
         If countFileInfo.Exists = False Then
-            MsgBox("The AlgorithmCounts.txt file is missing.  Run 'UI_Generator' or rebuild all to rebuild the user interface.")
+            MessageBox.Show("The AlgorithmCounts.txt file is missing.  Run 'UI_Generator' or rebuild all to rebuild the user interface.")
         End If
         Dim sr = New StreamReader(countFileInfo.FullName)
 
@@ -857,7 +857,7 @@ Public Class Main_UI
 
         Dim groupFileInfo = New FileInfo(HomeDir.FullName + "Data/GroupComboBox.txt")
         If groupFileInfo.Exists = False Then
-            MsgBox("The groupFileInfo.txt file is missing.  Run 'UI_Generator' or Clean/Rebuild to get the user interface.")
+            MessageBox.Show("The groupFileInfo.txt file is missing.  Run 'UI_Generator' or Clean/Rebuild to get the user interface.")
         End If
         sr = New StreamReader(groupFileInfo.FullName)
         GroupComboBox.Items.Clear()
@@ -870,7 +870,7 @@ Public Class Main_UI
         sr.Close()
     End Sub
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs)
-        MsgBox("The objective is to solve many small computer vision problems " + vbCrLf +
+        MessageBox.Show("The objective is to solve many small computer vision problems " + vbCrLf +
                "and do so in a way that enables any of the solutions to be reused." + vbCrLf +
                "The result is a toolkit for solving ever bigger and more difficult" + vbCrLf +
                "problems.  The hypothesis behind this approach is that human vision" + vbCrLf +
@@ -891,7 +891,7 @@ Public Class Main_UI
         End If
 
         If foundDirectory = False And notFoundMessage.Length > 0 Then
-            MsgBox(neededDirectory + " was not found.  " + notFoundMessage)
+            MessageBox.Show(neededDirectory + " was not found.  " + notFoundMessage)
         End If
         Environment.SetEnvironmentVariable("Path", systemPath)
     End Sub
@@ -943,7 +943,7 @@ Public Class Main_UI
 #If AZURE_SUPPORT Then
         Dim K4ADLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.4.1\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
         If K4ADLL.Exists = False Then
-            MsgBox("The Microsoft installer for the Kinect 4 Azure camera proprietary portion" + vbCrLf +
+            MessageBox.Show("The Microsoft installer for the Kinect 4 Azure camera proprietary portion" + vbCrLf +
                        "was not installed in:" + vbCrLf + vbCrLf + K4ADLL.FullName + vbCrLf + vbCrLf +
                        "Did a new Version get installed?" + vbCrLf +
                        "Support for the K4A camera may not work until you update the code near this message.")
@@ -1009,7 +1009,7 @@ Public Class Main_UI
         Dim systemPath = Environment.GetEnvironmentVariable("Path")
         pythonPresent = InStr(systemPath.ToLower, "python")
         If pythonPresent = False Then
-            MsgBox("Python needs to be in the path in order to run all the algorithms written in python." + vbCrLf +
+            MessageBox.Show("Python needs to be in the path in order to run all the algorithms written in python." + vbCrLf +
                        "That is how you control which version of python is active for OpenCVB." + vbCrLf +
                        "All Python algorithms will be disabled for now...")
         End If
@@ -1038,7 +1038,7 @@ Public Class Main_UI
         End If
 
         If AvailableAlgorithms.Items.Count = 0 Then
-            MsgBox("There were no algorithms listed for the " + GroupComboBox.Text + vbCrLf +
+            MessageBox.Show("There were no algorithms listed for the " + GroupComboBox.Text + vbCrLf +
                            "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
         Else
             If settings.MainUI_AlgName Is Nothing Then

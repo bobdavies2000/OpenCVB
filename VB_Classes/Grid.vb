@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Threading
+Imports System.Windows.Forms
 Public Class Grid_Basics : Inherits TaskParent
     Public gridMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Public brickList As New List(Of brickData)
@@ -175,7 +176,7 @@ Public Class Grid_List : Inherits TaskParent
             Next thread
             SetTrueText("There were " + CStr(threadCount) + " threads in OpenCVB with " + CStr(notIdle) + " of them not idle when traversing the gridRects" + vbCrLf + str)
         Catch e As Exception
-            MsgBox(e.Message)
+            MessageBox.Show(e.Message)
         End Try
     End Sub
 End Class

@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Windows.Forms
 
 ' You can find the main direction of a series of points using principal component analysis ‘(PCA).
 ' PCA is a statistical technique that can be used to find the directions of greatest variance in a dataset.
@@ -298,7 +299,7 @@ Public Class PCA_Palettize : Inherits TaskParent
         options.Run()
         If src.Channels <> 3 Then
             Static sendMsg As Boolean = True
-            If sendMsg Then MsgBox("PCA algorithms need rgb data - not grayscale")
+            If sendMsg Then MessageBox.Show("PCA algorithms need rgb data - not grayscale")
             sendMsg = False
             Exit Sub
         End If
@@ -881,7 +882,7 @@ Public Class PCA_NColor_CPP : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 3 Then
             Static sendMsg As Boolean = True
-            If sendMsg Then MsgBox("PCA algorithms need rgb data - not grayscale")
+            If sendMsg Then MessageBox.Show("PCA algorithms need rgb data - not grayscale")
             sendMsg = False
             Exit Sub
         End If

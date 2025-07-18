@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports  System.IO
+Imports System.IO
+Imports System.Windows.Forms
 'https://docs.opencvb.org/3.4/d3/d86/tutorial_bioinspired_retina_model.html
 Public Class Retina_Basics_CPP : Inherits TaskParent
     Dim startInfo As New ProcessStartInfo
@@ -25,7 +26,7 @@ Public Class Retina_Basics_CPP : Inherits TaskParent
                 startInfo.Arguments = task.HomeDir + "Data/RetinaDefaultParameters.xml"
                 Process.Start(startInfo)
             Else
-                MsgBox("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?")
+                MessageBox.Show("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?")
             End If
         End If
         If saveUseLogSampling <> options.useLogSampling Or samplingFactor <> options.sampleFactor Then

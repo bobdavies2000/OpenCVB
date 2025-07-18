@@ -1,8 +1,9 @@
-Imports  System.IO
-Imports System.Runtime.InteropServices
-Imports  System.IO.MemoryMappedFiles
-Imports  System.IO.Pipes
 Imports cv = OpenCvSharp
+Imports System.IO
+Imports System.Runtime.InteropServices
+Imports System.IO.MemoryMappedFiles
+Imports System.IO.Pipes
+Imports System.Windows.Forms
 Public Class Python_Basics : Inherits TaskParent
     Public Function StartPython(arguments As String) As Boolean
         Dim pythonApp = New FileInfo(task.pythonTaskName)
@@ -21,7 +22,7 @@ Public Class Python_Basics : Inherits TaskParent
             Try
                 task.pythonProcess.Start()
             Catch ex As Exception
-                MsgBox("The python algorithm " + pythonApp.Name + " failed.  Is python in the path?")
+                MessageBox.Show("The python algorithm " + pythonApp.Name + " failed.  Is python in the path?")
             End Try
         Else
             If pythonApp.Name.EndsWith("Python_MemMap") Or pythonApp.Name.EndsWith("Python_Run") Then
@@ -36,7 +37,7 @@ Public Class Python_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Access Python from OpenCVB - contains the startPython interface"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         SetTrueText("There is no output from " + traceName + ".  It contains the interface to python.")
     End Sub
 End Class

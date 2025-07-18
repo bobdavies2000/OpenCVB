@@ -1,4 +1,5 @@
 Imports cv = OpenCvSharp
+Imports System.Windows.Forms
 Imports System.Threading
 ' https://answers.opencvb.org/question/122331/how-to-subtract-a-constant-from-a-3-channel-mat/
 Public Class Math_Subtract : Inherits TaskParent
@@ -20,7 +21,7 @@ Public Class Math_Subtract : Inherits TaskParent
 End Class
 Module Math_Functions
     Public Sub CPP_Test()
-        MsgBox("testing")
+        MessageBox.Show("testing")
     End Sub
     Public Function computeMedian(src As cv.Mat, mask As cv.Mat, totalPixels As Integer, bins As Integer, rangeMin As Single, rangeMax As Single) As Double
         Dim hist As New cv.Mat()

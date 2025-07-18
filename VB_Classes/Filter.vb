@@ -1,4 +1,5 @@
 Imports cv = OpenCvSharp
+Imports System.Windows.Forms
 Public Class Filter_Basics : Inherits TaskParent
     Public filterList As String() = {"Original", "PhotoShop_HSV", "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance"
                                      }
@@ -83,7 +84,7 @@ Public Class Filter_BasicsGray : Inherits TaskParent
             filters(filterIndex).run(dst2)
             dst2 = filters(filterIndex).dst2
             If dst2.Channels <> 1 Then
-                MsgBox("Filter_BasicsGray failure - " + filterList(filterIndex) + " needs to return " + vbCrLf +
+                MessageBox.Show("Filter_BasicsGray failure - " + filterList(filterIndex) + " needs to return " + vbCrLf +
                        "an 8UC1 image, not 8UC3.  Reevaluate any new filters added above!")
                 Dim k = 0 ' if you set a breakpoint here when you get this message, you can debug it more easily.
             End If

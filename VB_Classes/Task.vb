@@ -789,7 +789,7 @@ Public Class VBtask : Implements IDisposable
                 Dim dirData = dirInfo.GetDirectories()
                 Dim gifExe As New FileInfo(dirInfo.FullName + "GifBuilder.exe")
                 If gifExe.Exists = False Then
-                    MsgBox("GifBuilder.exe was not found!")
+                    MessageBox.Show("GifBuilder.exe was not found!")
                 Else
                     Dim gifProcess As New Process
                     gifProcess.StartInfo.FileName = gifExe.FullName

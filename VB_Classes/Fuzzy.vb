@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Windows.Forms
 Public Class Fuzzy_Basics : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim options As New Options_Contours
@@ -8,13 +9,13 @@ Public Class Fuzzy_Basics : Inherits TaskParent
     Public Sub New()
         Dim floodRadio = OptionParent.findRadio("FloodFill")
         If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
-        If standalone Then task.gOptions.displaydst1.checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         cPtr = Fuzzy_Open()
         OptionParent.findRadio("CComp").Checked = True
         labels = {"", "Solid regions", "8-Bit output of Fuzzy_Basics", "Fuzzy edges"}
         desc = "That which is not solid is fuzzy"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         reduction.Run(src)
@@ -176,7 +177,7 @@ Public Class Fuzzy_NeighborProof : Inherits TaskParent
                             Dim val = dst2.Get(Of Byte)(y, x)
                             If val <> 0 Then maskID = val
                             If maskID <> 0 And val <> 0 And maskID <> val Then
-                                MsgBox("Proof has failed!  There is more than one mask ID identified by this contour point.")
+                                MessageBox.Show("Proof has failed!  There is more than one mask ID identified by this contour point.")
                                 proofFailed = True
                                 Exit Sub
                             End If
