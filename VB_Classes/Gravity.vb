@@ -25,8 +25,8 @@ Public Class Gravity_Basics : Inherits TaskParent
         gravityRGB = trackLine.lp
         Dim rgbVec = gravityRGB
 
-        Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - rgbVec.ep1.X)
-        Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - rgbVec.ep2.X)
+        Dim deltaX1 = task.gravityVec.ep1.X - rgbVec.ep1.X
+        Dim deltaX2 = task.gravityVec.ep2.X - rgbVec.ep2.X
         If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
             If rgbVec.gravityProxy Then
                 Dim shift = dst2.Width / 2 - (rgbVec.ep1.X + rgbVec.ep2.X) / 2

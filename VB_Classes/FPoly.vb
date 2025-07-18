@@ -216,8 +216,8 @@ Public Class FPoly_Sides : Inherits TaskParent
 
         DrawFPoly(dst2, prevPoly, white)
         DrawFPoly(dst2, currPoly, cv.Scalar.Yellow)
-        DrawFatLine(mpPrev.p1, mpPrev.p2, dst2, white)
-        DrawFatLine(mpCurr.p1, mpCurr.p2, dst2, cv.Scalar.Yellow)
+        DrawFatLine(dst2, mpPrev, white)
+        DrawFatLine(dst2, mpCurr, task.highlight)
     End Sub
 End Class
 
@@ -479,7 +479,9 @@ Public Class FPoly_Stablizer : Inherits TaskParent
 
         dst1.SetTo(0)
         dst1(rect) = syncImage(rect)
-        DrawFatLine(fGrid.startAnchor, fGrid.anchor, dst1, white)
+        Dim lp As New lpData(fGrid.startAnchor, fGrid.anchor)
+        DrawFatLine(dst1, lp, white)
+
         DrawPolkaDot(fGrid.anchor, dst1)
 
         Dim r = New cv.Rect(0, 0, rect.Width, rect.Height)

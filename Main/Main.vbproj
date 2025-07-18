@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\VBClasses\VBClasses.vbproj" />
     <ProjectReference Include="..\zed-c-api\Build\sl_zed_c.vcxproj" />
     <ProjectReference Include="..\zed-csharp-api\Stereolabs.zed\Build\Stereolabs.zed.csproj" />
   </ItemGroup>

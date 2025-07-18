@@ -1,9 +1,4 @@
 @echo off
-:: Check for Python Installation
-python --version 2>NUL
-if errorlevel 1 goto errorNoPython
-
-:: Reaching here means Python is installed.
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64
 
 rem echo "OpenCVB requires that .Net Framework 3.5 or later to be installed."

@@ -6,7 +6,7 @@ Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 Imports System.Threading
 Imports cv = OpenCvSharp
-'Imports VB_Classes
+Imports VBClasses
 Imports System.Management
 Imports cvext = OpenCvSharp.Extensions
 #Region "Globals and stable code"
@@ -27,8 +27,8 @@ End Module
 #End Region
 
 Public Class Main
-    'Dim trueData As New List(Of TrueText)
-    'Dim algolist As algorithmList = New algorithmList
+    Dim trueData As New List(Of TrueText)
+    Dim algolist As algorithmList = New algorithmList
     Public Shared settings As jsonClass.ApplicationStorage
     Dim jsonfs As New jsonClass.FileOperations
     Dim optionsForm As Options
