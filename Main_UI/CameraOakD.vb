@@ -46,8 +46,8 @@ Public Class CameraOakD_CPP : Inherits GenericCamera
     Dim templateY As cv.Mat
     Dim fxTemplate As Single
     Dim fyTemplate As Single
-    Private Function copyOakIntrinsics(input() As Single, ratio As Single) As VBClasses.VBtask.intrinsicData
-        Dim output As New VBClasses.VBtask.intrinsicData
+    Private Function copyOakIntrinsics(input() As Single, ratio As Single) As VB_Classes.VBtask.intrinsicData
+        Dim output As New VB_Classes.VBtask.intrinsicData
         output.ppx = input(2) / ratio
         output.ppy = input(5) / ratio
         output.fx = input(0) / ratio

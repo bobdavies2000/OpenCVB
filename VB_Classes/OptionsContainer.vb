@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.ComponentModel
 Imports System.Windows.Forms
 Imports System.Drawing
 Public Class OptionsContainer
@@ -96,8 +95,9 @@ Public Class OptionsContainer
             ' Optionally, you might want to move the form back onto the screen
             ' For example, move it to the center of the primary screen
             Me.StartPosition = FormStartPosition.Manual
-            Me.Location = New Point(screenBounds.Left + (screenBounds.Width - Me.Width) \ 2,
-                                    screenBounds.Top + (screenBounds.Height - Me.Height) \ 2)
+            Me.Location = New Point(0, 0)
+            SaveSetting("Opencv", "gOptionsLeft", "gOptionsLeft", 0)
+            SaveSetting("Opencv", "gOptionsTop", "gOptionsTop", 0)
         End If
     End Sub
     Private Sub OptionsContainer_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing

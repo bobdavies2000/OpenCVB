@@ -1,6 +1,4 @@
 ﻿Imports System.Runtime.InteropServices
-Imports System.Windows
-Imports System.Windows.Documents
 Imports cv = OpenCvSharp
 Public Class XO_Gravity_HorizonRawOld : Inherits TaskParent
     Public yLeft As Integer, yRight As Integer, xTop As Integer, xBot As Integer

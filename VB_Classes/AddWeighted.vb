@@ -30,10 +30,6 @@ End Class
 
 
 
-
-
-
-
 Public Class AddWeighted_DepthAccumulate : Inherits TaskParent
     Dim options As New Options_AddWeighted
     Public Sub New()

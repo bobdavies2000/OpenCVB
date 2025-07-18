@@ -104,6 +104,7 @@ Public Class LineRGB_Raw : Inherits TaskParent
             End If
         Next
 
+        dst2.SetTo(0)
         ' remove lines that are close and parallel - close is defined as with task.cellsize.
         'Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         'Dim removelist As New List(Of Integer)
@@ -132,7 +133,6 @@ Public Class LineRGB_Raw : Inherits TaskParent
         '    Next
         'Next
 
-        'dst2.SetTo(0)
         'For Each index In sortedList.Values
         '    Dim lp = lpList(index)
         '    dst2.Line(lp.p1, lp.p2, 128, task.lineWidth, task.lineType)

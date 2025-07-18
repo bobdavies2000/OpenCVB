@@ -63,7 +63,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\VB_Classes\VBClasses.vbproj" />
+    <ProjectReference Include="..\VB_Classes\VB_Classes.vbproj" />
+    <ProjectReference Include="..\VB_Classes\VB_Classes.vbproj" />
     <ProjectReference Include="..\zed-csharp-api\Stereolabs.zed\Build\Stereolabs.zed.csproj" />
   </ItemGroup>
 

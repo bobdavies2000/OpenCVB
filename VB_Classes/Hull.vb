@@ -1,5 +1,4 @@
-﻿Imports System.Windows.Documents
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Hull_Basics : Inherits TaskParent
     Dim random As New Random_Basics
     Public inputPoints As New List(Of cv.Point2f)
