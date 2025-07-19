@@ -4,7 +4,6 @@ Public Module vbc
     Public task As VBtask
     Public taskReady As Boolean
     Public allOptions As OptionsContainer
-    Public recordedData As Replay_Play
     Public Const fmt0 = "0"
     Public Const fmt1 = "0.0"
     Public Const fmt2 = "0.00"

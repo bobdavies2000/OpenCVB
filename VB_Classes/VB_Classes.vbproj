@@ -418,7 +418,6 @@
     <Compile Include="QRcode.vb" />
     <Compile Include="Quaternion.vb" />
     <Compile Include="Reduction.vb" />
-    <Compile Include="Replay.vb" />
     <Compile Include="RecursiveBilateralFilter.vb" />
     <Compile Include="Resize.vb" />
     <Compile Include="Retina.vb" />

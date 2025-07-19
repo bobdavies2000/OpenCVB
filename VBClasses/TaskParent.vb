@@ -20,10 +20,10 @@ Public Class TrueText
     End Sub
 End Class
 Public Class TaskParent : Implements IDisposable
-    Public check As New OptionsCheckbox
-    Public combo As New OptionsCombo
-    Public radio As New OptionsRadioButtons
-    Public sliders As New OptionsSliders
+    'Public check As New OptionsCheckbox
+    'Public combo As New OptionsCombo
+    'Public radio As New OptionsRadioButtons
+    'Public sliders As New OptionsSliders
     Public standalone As Boolean
     Public dst0 As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat
     Public labels() As String = {"", "", "", ""}
@@ -39,7 +39,7 @@ Public Class TaskParent : Implements IDisposable
         labels = {"", "", traceName, ""}
         Dim stackTrace = Environment.StackTrace
         Dim lines() = stackTrace.Split(vbCrLf)
-        Dim callStack As String
+        Dim callStack As String = ""
         For i = 0 To lines.Count - 1
             lines(i) = Trim(lines(i))
             Dim offset = InStr(lines(i), "VB_Classes.")

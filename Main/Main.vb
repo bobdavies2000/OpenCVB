@@ -684,7 +684,6 @@ Public Class Main
         'Dim parms As New VB_Classes.VBtask.algParms
         'parms.fpsRate = settings.desiredFPS
 
-        'parms.useRecordedData = GroupComboBox.Text = "<All using recorded data>"
         'parms.testAllRunning = testAllRunning
 
         'parms.externalPythonInvocation = externalPythonInvocation

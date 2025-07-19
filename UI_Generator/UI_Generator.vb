@@ -139,7 +139,7 @@ Module UI_Generator
             ' Enable code here to get python back.
             For Each nextName In allList.Keys
                 If nextName.StartsWith("CPP_Basics") Or nextName.StartsWith("cpp_Task") Then Continue For
-                sw.WriteLine(vbTab + "If algorithmName = """ + nextName + """ Then return new " + nextName)
+                sw.WriteLine(vbTab + "If algorithmName = """ + nextName + """ Then return New " + nextName)
             Next
             swNet8.WriteLine(vbTab + "If algorithmName = """ + "AddWeighted_Basics" + """ Then return new AddWeighted_Basics")
             swNet8.WriteLine(vbTab + vbTab + "Return Nothing")

@@ -205,7 +205,6 @@ Reduction
 Region
 Reliable
 Remap
-Replay
 Resize
 Retina
 ROI

@@ -287,7 +287,6 @@ Public Class VBtask : Implements IDisposable
     Public verticalLines As Boolean
 
     Public externalPythonInvocation As Boolean
-    Public useRecordedData As Boolean
     Public testAllRunning As Boolean
     Public showConsoleLog As Boolean
 
@@ -373,7 +372,6 @@ Public Class VBtask : Implements IDisposable
         Public cameraIndex As Integer
 
         Public HomeDir As String
-        Public useRecordedData As Boolean
         Public externalPythonInvocation As Boolean ' Opencv was initialized remotely...
         Public showConsoleLog As Boolean
         Public testAllRunning As Boolean
@@ -478,7 +476,6 @@ Public Class VBtask : Implements IDisposable
         calibData = parms.calibData
         HomeDir = parms.HomeDir
         main_hwnd = parms.main_hwnd
-        useRecordedData = parms.useRecordedData
         externalPythonInvocation = parms.externalPythonInvocation
 
         ' set options for specific cameras here.
@@ -548,8 +545,6 @@ Public Class VBtask : Implements IDisposable
         centerRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst1.Height / 2)
 
         fpList.Clear()
-
-        If parms.useRecordedData Then recordedData = New Replay_Play()
 
         ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
         ' https://www.intelrealsense.com/depth-camera-d435i/
@@ -635,7 +630,6 @@ Public Class VBtask : Implements IDisposable
         algorithm_ms(1) += inputBufferCopy
         algorithm_ms(2) += returnCopyTime
         algorithmTimes(3) = Now  ' starting the main algorithm
-        If useRecordedData Then recordedData.Run(task.color.Clone)
 
         Dim src = task.color
 
