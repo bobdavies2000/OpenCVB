@@ -46,6 +46,15 @@ Public Class LineRGB_Basics : Inherits TaskParent
         lpList.Clear()
         For Each lp In sortlines.Values
             lp.index = lpList.Count
+            If lp.vertical Then
+                ' this was inserted to verify gravity proxy while debugging.  It is not technically needed (lpData sets gravityProxy.)
+                Dim deltaX1 = Math.Abs(task.gravityIMU.ep1.X - lp.ep1.X)
+                Dim deltaX2 = Math.Abs(task.gravityIMU.ep2.X - lp.ep2.X)
+                If Math.Sign(deltaX1) = Math.Sign(deltaX2) Then
+                    lp.gravityProxy = Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold
+                End If
+            End If
+
             lpList.Add(lp)
             If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
@@ -53,9 +62,16 @@ Public Class LineRGB_Basics : Inherits TaskParent
         lineAges.Run(task.color.Clone)
         dst2 = lineAges.dst2
         If standaloneTest() Then
-            For Each lp In lpList
-                SetTrueText("Age: " + CStr(lp.age) + vbCrLf, lp.center)
+            dst3.SetTo(0)
+            Dim count As Integer
+            For Each lp In task.lineRGB.lpList
+                If lp.gravityProxy Then
+                    DrawLine(dst3, lp, white)
+                    SetTrueText("Age: " + CStr(lp.age) + vbCrLf, lp.center)
+                    count += 1
+                End If
             Next
+            labels(3) = CStr(count) + " lines are proxies for gravity."
         End If
 
         lpRectMap.SetTo(0)

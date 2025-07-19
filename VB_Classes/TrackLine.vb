@@ -2,8 +2,7 @@
 Imports cv = OpenCvSharp
 Public Class TrackLine_Basics : Inherits TaskParent
     Dim match As New Match_Basics
-    Dim rgbCheck As New MatchLine_GravityRGB
-    Public lp As New lpData
+    Public lp As lpData
     Public Sub New()
         desc = "Identify and track the longest line, preferably a gravityproxy if available."
     End Sub
@@ -15,12 +14,17 @@ Public Class TrackLine_Basics : Inherits TaskParent
         End If
 
         ' camera is often warming up for the first few images.
-        If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or task.heartBeatLT Then
+        If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or lp Is Nothing Then
             lp = lplist(0)
             For Each lp In lplist
                 If lp.gravityProxy Then Exit For
             Next
             match.template = src(lp.rect)
+        End If
+
+        If lp.gravityProxy = False Then
+            lp = Nothing
+            Exit Sub
         End If
 
         match.Run(src.Clone)

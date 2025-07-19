@@ -524,7 +524,7 @@ Public Class TaskParent : Implements IDisposable
     Public Sub DrawFatLine(p1 As cv.Point2f, p2 As cv.Point2f, dst As cv.Mat, color As cv.Scalar)
         dst.Line(p1, p2, task.highlight, task.lineWidth * 3, task.lineType)
     End Sub
-    Public Sub DrawLine(ByRef dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
+    Public Shared Sub DrawLine(ByRef dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
         Dim pt1 = New cv.Point(p1.X, p1.Y)
         Dim pt2 = New cv.Point(p2.X, p2.Y)
         dst.Line(pt1, pt2, color, task.lineWidth, task.lineType)
