@@ -111,7 +111,7 @@ Public Class Main
 
     Dim PausePlay As Bitmap
     Dim runPlay As Bitmap
-    Dim stopTest As Bitmap
+    Dim stopTestAll As Bitmap
     Dim complexityTest As Bitmap
     Dim complexityResults As New List(Of String)
     Dim complexityStartTime As DateTime
@@ -518,7 +518,7 @@ Public Class Main
         Next
     End Sub
     Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
-        TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTest, testAllToolbarBitmap)
+        TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTestAll, testAllToolbarBitmap)
         If TestAllButton.Text = "Test All" Then
             Debug.WriteLine("Starting 'TestAll' overnight run.")
             AlgorithmTestAllCount = 0

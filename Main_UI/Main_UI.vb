@@ -109,7 +109,7 @@ Public Class Main_UI
 
     Dim PausePlay As Bitmap
     Dim runPlay As Bitmap
-    Dim stopTest As Bitmap
+    Dim stopTestAll As Bitmap
     Dim complexityTest As Bitmap
     Dim complexityResults As New List(Of String)
     Dim complexityStartTime As DateTime
@@ -632,7 +632,7 @@ Public Class Main_UI
         LineUpCamPics()
     End Sub
     Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
-        TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTest, testAllToolbarBitmap)
+        TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTestAll, testAllToolbarBitmap)
         If TestAllButton.Text = "Test All" Then
             Console.WriteLine("Starting 'TestAll' overnight run.")
             AlgorithmTestAllCount = 0
@@ -987,7 +987,7 @@ Public Class Main_UI
         End If
 
         PausePlay = New Bitmap(HomeDir.FullName + "Main_UI/Data/PauseButton.png")
-        stopTest = New Bitmap(HomeDir.FullName + "Main_UI/Data/StopTest.png")
+        stopTestAll = New Bitmap(HomeDir.FullName + "Main_UI/Data/stopTestAll.png")
         testAllToolbarBitmap = New Bitmap(HomeDir.FullName + "Main_UI/Data/testall.png")
         runPlay = New Bitmap(HomeDir.FullName + "Main_UI/Data/PauseButtonRun.png")
 
