@@ -251,7 +251,6 @@ Partial Class Options
         Me.Resolutions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.Resolutions.Location = New System.Drawing.Point(24, 185)
         Me.Resolutions.Name = "Resolutions"
-        Me.Resolutions.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.Resolutions.Size = New System.Drawing.Size(821, 201)
         Me.Resolutions.TabIndex = 15
         '

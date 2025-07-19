@@ -134,14 +134,14 @@ Public Class Options
         If radioButtonsPresent = False Then
             radioButtonsPresent = True
             For i = 0 To cameraRadioButton.Count - 1
-                cameraRadioButton(i) = New RadioButton With {.Visible = True, .AutoSize = True,
+                cameraRadioButton(i) = New RadioButton With {.Visible = True, .AutoSize = True, .RightToLeft = RightToLeft.Yes,
                                        .Enabled = Main_UI.settings.cameraPresent(i), .Text = Main_UI.cameraNames(i)}
                 CameraGroup.Controls.Add(cameraRadioButton(i))
                 AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
             Next
 
             For i = 0 To workResRadio.Count - 1
-                workResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i,
+                workResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i, .RightToLeft = RightToLeft.Yes,
                                      .AutoSize = True, .Visible = True}
                 workResRadio(i).Enabled = Main_UI.settings.resolutionsSupported(i)
                 Resolutions.Controls.Add(workResRadio(i))

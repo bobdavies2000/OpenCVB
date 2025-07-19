@@ -27,14 +27,22 @@ Public Class Gravity_Basics : Inherits TaskParent
 
         Dim deltaX1 = task.gravityVec.ep1.X - rgbVec.ep1.X
         Dim deltaX2 = task.gravityVec.ep2.X - rgbVec.ep2.X
-        If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
-            If rgbVec.gravityProxy Then
-                Dim shift = dst2.Width / 2 - (rgbVec.ep1.X + rgbVec.ep2.X) / 2
-                task.gravityVec = New lpData(New cv.Point2f(rgbVec.ep1.X + shift, rgbVec.ep1.Y),
+        If Math.Sign(deltaX1) = Math.Sign(deltaX2) Then
+            If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
+                If rgbVec.gravityProxy Then
+                    Dim shift = dst2.Width / 2 - (rgbVec.ep1.X + rgbVec.ep2.X) / 2
+                    task.gravityVec = New lpData(New cv.Point2f(rgbVec.ep1.X + shift, rgbVec.ep1.Y),
                                              New cv.Point2f(rgbVec.ep2.X + shift, rgbVec.ep2.Y))
-            Else
-                task.gravityVec = task.gravityIMU
+                Else
+                    task.gravityVec = task.gravityIMU
+                End If
             End If
+        End If
+
+        deltaX1 = task.gravityIMU.ep1.X - task.gravityVec.ep1.X
+        deltaX2 = task.gravityIMU.ep2.X - task.gravityVec.ep2.X
+        If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
+            task.gravityVec = task.gravityIMU
         End If
 
         task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
