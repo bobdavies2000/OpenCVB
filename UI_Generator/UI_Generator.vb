@@ -140,8 +140,8 @@ Module UI_Generator
             For Each nextName In allList.Keys
                 If nextName.StartsWith("CPP_Basics") Or nextName.StartsWith("cpp_Task") Then Continue For
                 sw.WriteLine(vbTab + "If algorithmName = """ + nextName + """ Then return New " + nextName)
+                swNet8.WriteLine(vbTab + "If algorithmName = """ + nextName + """ Then return New " + nextName)
             Next
-            swNet8.WriteLine(vbTab + "If algorithmName = """ + "AddWeighted_Basics" + """ Then return new AddWeighted_Basics")
             swNet8.WriteLine(vbTab + vbTab + "Return Nothing")
             swNet8.WriteLine(vbTab + "End Function")
             swNet8.WriteLine("End Class")

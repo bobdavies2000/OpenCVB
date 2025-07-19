@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Imports VBClasses.TaskParent
+Imports VB_Classes.TaskParent
 Public Module vbc
     Public task As VBtask
     Public taskReady As Boolean
@@ -739,7 +739,9 @@ Public Class lpData
         If vertical And length > 0 Then
             Dim deltaX1 = Math.Abs(task.gravityIMU.ep1.X - ep1.X)
             Dim deltaX2 = Math.Abs(task.gravityIMU.ep2.X - ep2.X)
-            If Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold Then gravityProxy = True
+            If Math.Sign(deltaX1) = Math.Sign(deltaX2) Then
+                If Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold Then gravityProxy = True
+            End If
         End If
 
         If p1.X < 0 Or p1.Y < 0 Or p2.X < 0 Or p2.Y < 0 Then Dim k = 0

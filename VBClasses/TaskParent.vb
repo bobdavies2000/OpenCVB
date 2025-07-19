@@ -20,10 +20,10 @@ Public Class TrueText
     End Sub
 End Class
 Public Class TaskParent : Implements IDisposable
-    'Public check As New OptionsCheckbox
-    'Public combo As New OptionsCombo
-    'Public radio As New OptionsRadioButtons
-    'Public sliders As New OptionsSliders
+    Public check As New OptionsCheckbox
+    Public combo As New OptionsCombo
+    Public radio As New OptionsRadioButtons
+    Public sliders As New OptionsSliders
     Public standalone As Boolean
     Public dst0 As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat
     Public labels() As String = {"", "", "", ""}
@@ -39,7 +39,7 @@ Public Class TaskParent : Implements IDisposable
         labels = {"", "", traceName, ""}
         Dim stackTrace = Environment.StackTrace
         Dim lines() = stackTrace.Split(vbCrLf)
-        Dim callStack As String = ""
+        Dim callStack As String
         For i = 0 To lines.Count - 1
             lines(i) = Trim(lines(i))
             Dim offset = InStr(lines(i), "VB_Classes.")
@@ -524,7 +524,7 @@ Public Class TaskParent : Implements IDisposable
     Public Sub DrawFatLine(p1 As cv.Point2f, p2 As cv.Point2f, dst As cv.Mat, color As cv.Scalar)
         dst.Line(p1, p2, task.highlight, task.lineWidth * 3, task.lineType)
     End Sub
-    Public Sub DrawLine(ByRef dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
+    Public Shared Sub DrawLine(ByRef dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
         Dim pt1 = New cv.Point(p1.X, p1.Y)
         Dim pt2 = New cv.Point(p2.X, p2.Y)
         dst.Line(pt1, pt2, color, task.lineWidth, task.lineType)

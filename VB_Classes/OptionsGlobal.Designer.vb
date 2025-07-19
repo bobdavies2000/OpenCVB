@@ -147,7 +147,7 @@ Partial Class OptionsGlobal
         Me.DepthDiffSlider.Size = New System.Drawing.Size(506, 69)
         Me.DepthDiffSlider.TabIndex = 58
         Me.DepthDiffSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.DepthDiffSlider.Value = 100
+        Me.DepthDiffSlider.Value = 5
         '
         'Label6
         '
@@ -198,7 +198,7 @@ Partial Class OptionsGlobal
         'FrameHistory
         '
         Me.FrameHistory.Location = New System.Drawing.Point(185, 363)
-        Me.FrameHistory.Maximum = 30
+        Me.FrameHistory.Maximum = 25
         Me.FrameHistory.Minimum = 1
         Me.FrameHistory.Name = "FrameHistory"
         Me.FrameHistory.Size = New System.Drawing.Size(506, 69)
@@ -232,7 +232,7 @@ Partial Class OptionsGlobal
         Me.PixelDiffBar.Size = New System.Drawing.Size(506, 69)
         Me.PixelDiffBar.TabIndex = 49
         Me.PixelDiffBar.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.PixelDiffBar.Value = 25
+        Me.PixelDiffBar.Value = 5
         '
         'Label7
         '
@@ -404,7 +404,6 @@ Partial Class OptionsGlobal
         Me.TrackingMeanColor.TabStop = True
         Me.TrackingMeanColor.Text = "Mean Color"
         Me.TrackingMeanColor.UseVisualStyleBackColor = True
-
         '
         'ColorSource
         '
@@ -660,13 +659,12 @@ Partial Class OptionsGlobal
         'DotSizeSlider
         '
         Me.DotSizeSlider.Location = New System.Drawing.Point(207, 98)
-        Me.DotSizeSlider.Maximum = 16
         Me.DotSizeSlider.Minimum = 1
         Me.DotSizeSlider.Name = "DotSizeSlider"
         Me.DotSizeSlider.Size = New System.Drawing.Size(506, 69)
         Me.DotSizeSlider.TabIndex = 7
         Me.DotSizeSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.DotSizeSlider.Value = 1
+        Me.DotSizeSlider.Value = 5
         '
         'Label3
         '

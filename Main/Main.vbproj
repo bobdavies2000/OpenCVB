@@ -26,6 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\VBClasses\VBClasses.vbproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Intel.RealSense">
       <HintPath>..\librealsense\Build\wrappers\csharp\Intel.RealSense\obj\x64\Release\Intel.RealSense.dll</HintPath>
     </Reference>

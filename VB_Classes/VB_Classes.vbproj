@@ -287,10 +287,10 @@
     <Compile Include="Photon.vb" />
     <Compile Include="PhaseCorrelate.vb" />
     <Compile Include="PhotoShop.vb" />
-    <Compile Include="PixelViewerForm.Designer.vb">
-      <DependentUpon>PixelViewerForm.vb</DependentUpon>
+    <Compile Include="PixelViewer.Designer.vb">
+      <DependentUpon>PixelViewer.vb</DependentUpon>
     </Compile>
-    <Compile Include="PixelViewerForm.vb">
+    <Compile Include="PixelViewer.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Rectangle.vb" />
@@ -496,8 +496,8 @@
     <EmbeddedResource Include="OptionsSliders.resx">
       <DependentUpon>OptionsSliders.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PixelViewerForm.resx">
-      <DependentUpon>PixelViewerForm.vb</DependentUpon>
+    <EmbeddedResource Include="PixelViewer.resx">
+      <DependentUpon>PixelViewer.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="TreeviewForm.resx">
