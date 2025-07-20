@@ -77,9 +77,9 @@ Partial Class OptionsFeatures
         Me.Label2.AutoSize = True
         Me.Label2.Location = New System.Drawing.Point(32, 75)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(229, 20)
+        Me.Label2.Size = New System.Drawing.Size(282, 20)
         Me.Label2.TabIndex = 17
-        Me.Label2.Text = "Min Distance between features"
+        Me.Label2.Text = "Min Distance between features (pixels)"
         '
         'DistanceSlider
         '
@@ -134,16 +134,16 @@ Partial Class OptionsFeatures
         Me.MatchCorrSlider.Name = "MatchCorrSlider"
         Me.MatchCorrSlider.Size = New System.Drawing.Size(476, 69)
         Me.MatchCorrSlider.TabIndex = 24
-        Me.MatchCorrSlider.Value = 75
+        Me.MatchCorrSlider.Value = 90
         '
         'ColorDiffLabel
         '
         Me.ColorDiffLabel.AutoSize = True
         Me.ColorDiffLabel.Location = New System.Drawing.Point(499, 343)
         Me.ColorDiffLabel.Name = "ColorDiffLabel"
-        Me.ColorDiffLabel.Size = New System.Drawing.Size(146, 20)
+        Me.ColorDiffLabel.Size = New System.Drawing.Size(110, 20)
         Me.ColorDiffLabel.TabIndex = 29
-        Me.ColorDiffLabel.Text = "Feature Correlation"
+        Me.ColorDiffLabel.Text = "ColorDiffLabel"
         '
         'Label7
         '
@@ -169,9 +169,9 @@ Partial Class OptionsFeatures
         Me.FeatureSampleSizeLabel.AutoSize = True
         Me.FeatureSampleSizeLabel.Location = New System.Drawing.Point(507, 160)
         Me.FeatureSampleSizeLabel.Name = "FeatureSampleSizeLabel"
-        Me.FeatureSampleSizeLabel.Size = New System.Drawing.Size(175, 20)
+        Me.FeatureSampleSizeLabel.Size = New System.Drawing.Size(98, 20)
         Me.FeatureSampleSizeLabel.TabIndex = 35
-        Me.FeatureSampleSizeLabel.Text = "Selected Feature Index"
+        Me.FeatureSampleSizeLabel.Text = "Sample Size"
         '
         'Label5
         '

@@ -48,7 +48,7 @@ Partial Class OptionsGlobal
         Label2 = New Label()
         GroupBox2 = New GroupBox()
         GroupBox3 = New GroupBox()
-        CheckBox1 = New CheckBox()
+        UseMotionMask = New CheckBox()
         showMotionMask = New CheckBox()
         TruncateDepth = New CheckBox()
         gravityPointCloud = New CheckBox()
@@ -361,7 +361,7 @@ Partial Class OptionsGlobal
         ' 
         ' GroupBox3
         ' 
-        GroupBox3.Controls.Add(CheckBox1)
+        GroupBox3.Controls.Add(UseMotionMask)
         GroupBox3.Controls.Add(showMotionMask)
         GroupBox3.Location = New Point(15, 342)
         GroupBox3.Name = "GroupBox3"
@@ -370,17 +370,17 @@ Partial Class OptionsGlobal
         GroupBox3.TabStop = False
         GroupBox3.Text = "Motion"
         ' 
-        ' CheckBox1
+        ' UseMotionMask
         ' 
-        CheckBox1.AutoSize = True
-        CheckBox1.Checked = True
-        CheckBox1.CheckState = CheckState.Checked
-        CheckBox1.Location = New Point(18, 52)
-        CheckBox1.Name = "CheckBox1"
-        CheckBox1.Size = New Size(172, 29)
-        CheckBox1.TabIndex = 1
-        CheckBox1.Text = "Use MotionMask"
-        CheckBox1.UseVisualStyleBackColor = True
+        UseMotionMask.AutoSize = True
+        UseMotionMask.Checked = True
+        UseMotionMask.CheckState = CheckState.Checked
+        UseMotionMask.Location = New Point(18, 52)
+        UseMotionMask.Name = "UseMotionMask"
+        UseMotionMask.Size = New Size(172, 29)
+        UseMotionMask.TabIndex = 1
+        UseMotionMask.Text = "Use MotionMask"
+        UseMotionMask.UseVisualStyleBackColor = True
         ' 
         ' showMotionMask
         ' 
@@ -780,7 +780,7 @@ Partial Class OptionsGlobal
     Friend WithEvents debugSyncUI As CheckBox
     Friend WithEvents GroupBox3 As GroupBox
     Friend WithEvents showMotionMask As CheckBox
-    Friend WithEvents CheckBox1 As CheckBox
+    Friend WithEvents UseMotionMask As CheckBox
     Friend WithEvents Geometry As GroupBox
     Friend WithEvents LineWidth As TrackBar
     Friend WithEvents LineThicknessAmount As Label

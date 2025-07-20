@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
 Partial Class OptionsFeatures
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()>
+    <System.Diagnostics.DebuggerNonUserCode()> _
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,245 +20,243 @@ Partial Class OptionsFeatures
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()>
+    <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.EdgeMethods = New System.Windows.Forms.ComboBox()
-        Me.DistanceLabel = New System.Windows.Forms.Label()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.DistanceSlider = New System.Windows.Forms.TrackBar()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.FeatureMethod = New System.Windows.Forms.ComboBox()
-        Me.FeatureCorrelationLabel = New System.Windows.Forms.Label()
-        Me.Label6 = New System.Windows.Forms.Label()
-        Me.MatchCorrSlider = New System.Windows.Forms.TrackBar()
-        Me.ColorDiffLabel = New System.Windows.Forms.Label()
-        Me.Label7 = New System.Windows.Forms.Label()
-        Me.ColorDiffSlider = New System.Windows.Forms.TrackBar()
-        Me.FeatureSampleSizeLabel = New System.Windows.Forms.Label()
-        Me.Label5 = New System.Windows.Forms.Label()
-        Me.FeatureSampleSize = New System.Windows.Forms.TrackBar()
-        Me.GrayGroup = New System.Windows.Forms.GroupBox()
-        Me.ColorGroup = New System.Windows.Forms.GroupBox()
-        CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.MatchCorrSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.FeatureSampleSize, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.SuspendLayout()
-        '
-        'Label3
-        '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(284, 11)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(105, 20)
-        Me.Label3.TabIndex = 23
-        Me.Label3.Text = "Edge Method"
-        '
-        'EdgeMethods
-        '
-        Me.EdgeMethods.FormattingEnabled = True
-        Me.EdgeMethods.Location = New System.Drawing.Point(280, 35)
-        Me.EdgeMethods.Name = "EdgeMethods"
-        Me.EdgeMethods.Size = New System.Drawing.Size(246, 28)
-        Me.EdgeMethods.TabIndex = 22
-        '
-        'DistanceLabel
-        '
-        Me.DistanceLabel.AutoSize = True
-        Me.DistanceLabel.Location = New System.Drawing.Point(499, 108)
-        Me.DistanceLabel.Name = "DistanceLabel"
-        Me.DistanceLabel.Size = New System.Drawing.Size(72, 20)
-        Me.DistanceLabel.TabIndex = 18
-        Me.DistanceLabel.Text = "Distance"
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(32, 75)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(229, 20)
-        Me.Label2.TabIndex = 17
-        Me.Label2.Text = "Min Distance between features"
-        '
-        'DistanceSlider
-        '
-        Me.DistanceSlider.Location = New System.Drawing.Point(28, 98)
-        Me.DistanceSlider.Maximum = 100
-        Me.DistanceSlider.Minimum = 1
-        Me.DistanceSlider.Name = "DistanceSlider"
-        Me.DistanceSlider.Size = New System.Drawing.Size(476, 69)
-        Me.DistanceSlider.TabIndex = 16
-        Me.DistanceSlider.Value = 25
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(32, 11)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(123, 20)
-        Me.Label1.TabIndex = 15
-        Me.Label1.Text = "Feature Method"
-        '
-        'FeatureMethod
-        '
-        Me.FeatureMethod.FormattingEnabled = True
-        Me.FeatureMethod.Location = New System.Drawing.Point(28, 35)
-        Me.FeatureMethod.Name = "FeatureMethod"
-        Me.FeatureMethod.Size = New System.Drawing.Size(246, 28)
-        Me.FeatureMethod.TabIndex = 14
-        '
-        'FeatureCorrelationLabel
-        '
-        Me.FeatureCorrelationLabel.AutoSize = True
-        Me.FeatureCorrelationLabel.Location = New System.Drawing.Point(499, 441)
-        Me.FeatureCorrelationLabel.Name = "FeatureCorrelationLabel"
-        Me.FeatureCorrelationLabel.Size = New System.Drawing.Size(146, 20)
-        Me.FeatureCorrelationLabel.TabIndex = 26
-        Me.FeatureCorrelationLabel.Text = "Feature Correlation"
-        '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(32, 408)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(208, 20)
-        Me.Label6.TabIndex = 25
-        Me.Label6.Text = "Match Correlation Threshold"
-        '
-        'MatchCorrSlider
-        '
-        Me.MatchCorrSlider.Location = New System.Drawing.Point(28, 431)
-        Me.MatchCorrSlider.Maximum = 100
-        Me.MatchCorrSlider.Minimum = 1
-        Me.MatchCorrSlider.Name = "MatchCorrSlider"
-        Me.MatchCorrSlider.Size = New System.Drawing.Size(476, 69)
-        Me.MatchCorrSlider.TabIndex = 24
-        Me.MatchCorrSlider.Value = 75
-        '
-        'ColorDiffLabel
-        '
-        Me.ColorDiffLabel.AutoSize = True
-        Me.ColorDiffLabel.Location = New System.Drawing.Point(499, 343)
-        Me.ColorDiffLabel.Name = "ColorDiffLabel"
-        Me.ColorDiffLabel.Size = New System.Drawing.Size(146, 20)
-        Me.ColorDiffLabel.TabIndex = 29
-        Me.ColorDiffLabel.Text = "Feature Correlation"
-        '
-        'Label7
-        '
-        Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(32, 310)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(260, 20)
-        Me.Label7.TabIndex = 28
-        Me.Label7.Text = "LowRes Color Difference Threshold"
-        '
-        'ColorDiffSlider
-        '
-        Me.ColorDiffSlider.Location = New System.Drawing.Point(28, 336)
-        Me.ColorDiffSlider.Maximum = 100
-        Me.ColorDiffSlider.Minimum = 1
-        Me.ColorDiffSlider.Name = "ColorDiffSlider"
-        Me.ColorDiffSlider.Size = New System.Drawing.Size(476, 69)
-        Me.ColorDiffSlider.TabIndex = 27
-        Me.ColorDiffSlider.Value = 75
-        '
-        'FeatureSampleSizeLabel
-        '
-        Me.FeatureSampleSizeLabel.AutoSize = True
-        Me.FeatureSampleSizeLabel.Location = New System.Drawing.Point(507, 160)
-        Me.FeatureSampleSizeLabel.Name = "FeatureSampleSizeLabel"
-        Me.FeatureSampleSizeLabel.Size = New System.Drawing.Size(175, 20)
-        Me.FeatureSampleSizeLabel.TabIndex = 35
-        Me.FeatureSampleSizeLabel.Text = "Selected Feature Index"
-        '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(32, 127)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(158, 20)
-        Me.Label5.TabIndex = 34
-        Me.Label5.Text = "Feature Sample Size"
-        '
-        'FeatureSampleSize
-        '
-        Me.FeatureSampleSize.Location = New System.Drawing.Point(28, 150)
-        Me.FeatureSampleSize.Maximum = 400
-        Me.FeatureSampleSize.Minimum = 1
-        Me.FeatureSampleSize.Name = "FeatureSampleSize"
-        Me.FeatureSampleSize.Size = New System.Drawing.Size(476, 69)
-        Me.FeatureSampleSize.TabIndex = 33
-        Me.FeatureSampleSize.Value = 50
-        '
-        'GrayGroup
-        '
-        Me.GrayGroup.Location = New System.Drawing.Point(749, 12)
-        Me.GrayGroup.Name = "GrayGroup"
-        Me.GrayGroup.Size = New System.Drawing.Size(284, 393)
-        Me.GrayGroup.TabIndex = 2
-        Me.GrayGroup.TabStop = False
-        Me.GrayGroup.Text = "Grayscale source inputs"
-        '
-        'ColorGroup
-        '
-        Me.ColorGroup.Location = New System.Drawing.Point(1049, 11)
-        Me.ColorGroup.Name = "ColorGroup"
-        Me.ColorGroup.Size = New System.Drawing.Size(284, 393)
-        Me.ColorGroup.TabIndex = 3
-        Me.ColorGroup.TabStop = False
-        Me.ColorGroup.Text = "Color source inputs"
-        '
-        'OptionsFeatures
-        '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1419, 615)
-        Me.Controls.Add(Me.ColorGroup)
-        Me.Controls.Add(Me.FeatureSampleSizeLabel)
-        Me.Controls.Add(Me.Label5)
-        Me.Controls.Add(Me.FeatureSampleSize)
-        Me.Controls.Add(Me.ColorDiffLabel)
-        Me.Controls.Add(Me.Label7)
-        Me.Controls.Add(Me.ColorDiffSlider)
-        Me.Controls.Add(Me.FeatureCorrelationLabel)
-        Me.Controls.Add(Me.Label6)
-        Me.Controls.Add(Me.MatchCorrSlider)
-        Me.Controls.Add(Me.Label3)
-        Me.Controls.Add(Me.EdgeMethods)
-        Me.Controls.Add(Me.DistanceLabel)
-        Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.DistanceSlider)
-        Me.Controls.Add(Me.Label1)
-        Me.Controls.Add(Me.FeatureMethod)
-        Me.Controls.Add(Me.GrayGroup)
-        Me.Name = "OptionsFeatures"
-        Me.Text = "Important Options for Features, Edges, Lines, and Masks"
-        CType(Me.DistanceSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.MatchCorrSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.ColorDiffSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.FeatureSampleSize, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.ResumeLayout(False)
-        Me.PerformLayout()
-
+        FeatureMethod = New ComboBox()
+        EdgeMethods = New ComboBox()
+        Label1 = New Label()
+        Label2 = New Label()
+        Label3 = New Label()
+        DistanceSlider = New TrackBar()
+        DistanceLabel = New Label()
+        FeatureSampleSizeLabel = New Label()
+        FeatureSampleSize = New TrackBar()
+        Label5 = New Label()
+        ColorDiffLabel = New Label()
+        ColorDiffSlider = New TrackBar()
+        Label7 = New Label()
+        FeatureCorrelationLabel = New Label()
+        MatchCorrSlider = New TrackBar()
+        Label9 = New Label()
+        GrayGroup = New GroupBox()
+        ColorGroup = New GroupBox()
+        CType(DistanceSlider, ComponentModel.ISupportInitialize).BeginInit()
+        CType(FeatureSampleSize, ComponentModel.ISupportInitialize).BeginInit()
+        CType(ColorDiffSlider, ComponentModel.ISupportInitialize).BeginInit()
+        CType(MatchCorrSlider, ComponentModel.ISupportInitialize).BeginInit()
+        SuspendLayout()
+        ' 
+        ' FeatureMethod
+        ' 
+        FeatureMethod.FormattingEnabled = True
+        FeatureMethod.Location = New Point(26, 45)
+        FeatureMethod.Name = "FeatureMethod"
+        FeatureMethod.Size = New Size(246, 33)
+        FeatureMethod.TabIndex = 0
+        ' 
+        ' EdgeMethods
+        ' 
+        EdgeMethods.FormattingEnabled = True
+        EdgeMethods.Location = New Point(303, 45)
+        EdgeMethods.Name = "EdgeMethods"
+        EdgeMethods.Size = New Size(246, 33)
+        EdgeMethods.TabIndex = 1
+        ' 
+        ' Label1
+        ' 
+        Label1.AutoSize = True
+        Label1.Location = New Point(303, 9)
+        Label1.Name = "Label1"
+        Label1.Size = New Size(120, 25)
+        Label1.TabIndex = 2
+        Label1.Text = "Edge Method"
+        ' 
+        ' Label2
+        ' 
+        Label2.AutoSize = True
+        Label2.Location = New Point(26, 9)
+        Label2.Name = "Label2"
+        Label2.Size = New Size(138, 25)
+        Label2.TabIndex = 3
+        Label2.Text = "Feature Method"
+        ' 
+        ' Label3
+        ' 
+        Label3.AutoSize = True
+        Label3.Location = New Point(26, 85)
+        Label3.Name = "Label3"
+        Label3.Size = New Size(254, 25)
+        Label3.TabIndex = 4
+        Label3.Text = "Min Distance between features"
+        ' 
+        ' DistanceSlider
+        ' 
+        DistanceSlider.Location = New Point(26, 113)
+        DistanceSlider.Maximum = 100
+        DistanceSlider.Name = "DistanceSlider"
+        DistanceSlider.Size = New Size(523, 69)
+        DistanceSlider.TabIndex = 5
+        DistanceSlider.Value = 25
+        ' 
+        ' DistanceLabel
+        ' 
+        DistanceLabel.AutoSize = True
+        DistanceLabel.Location = New Point(555, 113)
+        DistanceLabel.Name = "DistanceLabel"
+        DistanceLabel.Size = New Size(79, 25)
+        DistanceLabel.TabIndex = 6
+        DistanceLabel.Text = "Distance"
+        ' 
+        ' FeatureSampleSizeLabel
+        ' 
+        FeatureSampleSizeLabel.AutoSize = True
+        FeatureSampleSizeLabel.Location = New Point(555, 179)
+        FeatureSampleSizeLabel.Name = "FeatureSampleSizeLabel"
+        FeatureSampleSizeLabel.Size = New Size(107, 25)
+        FeatureSampleSizeLabel.TabIndex = 9
+        FeatureSampleSizeLabel.Text = "Sample Size"
+        ' 
+        ' FeatureSampleSize
+        ' 
+        FeatureSampleSize.Location = New Point(26, 179)
+        FeatureSampleSize.Maximum = 400
+        FeatureSampleSize.Minimum = 1
+        FeatureSampleSize.Name = "FeatureSampleSize"
+        FeatureSampleSize.Size = New Size(523, 69)
+        FeatureSampleSize.TabIndex = 8
+        FeatureSampleSize.Value = 50
+        ' 
+        ' Label5
+        ' 
+        Label5.AutoSize = True
+        Label5.Location = New Point(26, 151)
+        Label5.Name = "Label5"
+        Label5.Size = New Size(170, 25)
+        Label5.TabIndex = 7
+        Label5.Text = "Feature Sample Size"
+        ' 
+        ' ColorDiffLabel
+        ' 
+        ColorDiffLabel.AutoSize = True
+        ColorDiffLabel.Location = New Point(555, 263)
+        ColorDiffLabel.Name = "ColorDiffLabel"
+        ColorDiffLabel.Size = New Size(125, 25)
+        ColorDiffLabel.TabIndex = 12
+        ColorDiffLabel.Text = "ColorDiffLabel"
+        ' 
+        ' ColorDiffSlider
+        ' 
+        ColorDiffSlider.Location = New Point(26, 263)
+        ColorDiffSlider.Maximum = 100
+        ColorDiffSlider.Minimum = 1
+        ColorDiffSlider.Name = "ColorDiffSlider"
+        ColorDiffSlider.Size = New Size(523, 69)
+        ColorDiffSlider.TabIndex = 11
+        ColorDiffSlider.Value = 75
+        ' 
+        ' Label7
+        ' 
+        Label7.AutoSize = True
+        Label7.Location = New Point(26, 235)
+        Label7.Name = "Label7"
+        Label7.Size = New Size(287, 25)
+        Label7.TabIndex = 10
+        Label7.Text = "LowRes Color Difference Threshold"
+        ' 
+        ' FeatureCorrelationLabel
+        ' 
+        FeatureCorrelationLabel.AutoSize = True
+        FeatureCorrelationLabel.Location = New Point(555, 338)
+        FeatureCorrelationLabel.Name = "FeatureCorrelationLabel"
+        FeatureCorrelationLabel.Size = New Size(162, 25)
+        FeatureCorrelationLabel.TabIndex = 15
+        FeatureCorrelationLabel.Text = "Feature Correlation"
+        ' 
+        ' MatchCorrSlider
+        ' 
+        MatchCorrSlider.Location = New Point(26, 338)
+        MatchCorrSlider.Maximum = 100
+        MatchCorrSlider.Name = "MatchCorrSlider"
+        MatchCorrSlider.Size = New Size(523, 69)
+        MatchCorrSlider.TabIndex = 14
+        MatchCorrSlider.Value = 90
+        ' 
+        ' Label9
+        ' 
+        Label9.AutoSize = True
+        Label9.Location = New Point(26, 310)
+        Label9.Name = "Label9"
+        Label9.Size = New Size(236, 25)
+        Label9.TabIndex = 13
+        Label9.Text = "Match Correlation Threshold"
+        ' 
+        ' GrayGroup
+        ' 
+        GrayGroup.Location = New Point(723, 9)
+        GrayGroup.Name = "GrayGroup"
+        GrayGroup.Size = New Size(283, 426)
+        GrayGroup.TabIndex = 16
+        GrayGroup.TabStop = False
+        GrayGroup.Text = "Grayscale source inputs"
+        ' 
+        ' ColorGroup
+        ' 
+        ColorGroup.Location = New Point(1029, 14)
+        ColorGroup.Name = "ColorGroup"
+        ColorGroup.Size = New Size(289, 415)
+        ColorGroup.TabIndex = 17
+        ColorGroup.TabStop = False
+        ColorGroup.Text = "Color source inputs"
+        ' 
+        ' OptionsFeatures
+        ' 
+        AutoScaleDimensions = New SizeF(10F, 25F)
+        AutoScaleMode = AutoScaleMode.Font
+        ClientSize = New Size(1420, 575)
+        Controls.Add(ColorGroup)
+        Controls.Add(GrayGroup)
+        Controls.Add(FeatureCorrelationLabel)
+        Controls.Add(MatchCorrSlider)
+        Controls.Add(Label9)
+        Controls.Add(ColorDiffLabel)
+        Controls.Add(ColorDiffSlider)
+        Controls.Add(Label7)
+        Controls.Add(FeatureSampleSizeLabel)
+        Controls.Add(FeatureSampleSize)
+        Controls.Add(Label5)
+        Controls.Add(DistanceLabel)
+        Controls.Add(DistanceSlider)
+        Controls.Add(Label3)
+        Controls.Add(Label2)
+        Controls.Add(Label1)
+        Controls.Add(EdgeMethods)
+        Controls.Add(FeatureMethod)
+        Name = "OptionsFeatures"
+        Text = "Important Options for Features, Edges, Lines, and Masks"
+        CType(DistanceSlider, ComponentModel.ISupportInitialize).EndInit()
+        CType(FeatureSampleSize, ComponentModel.ISupportInitialize).EndInit()
+        CType(ColorDiffSlider, ComponentModel.ISupportInitialize).EndInit()
+        CType(MatchCorrSlider, ComponentModel.ISupportInitialize).EndInit()
+        ResumeLayout(False)
+        PerformLayout()
     End Sub
-    Friend WithEvents Label3 As Windows.Forms.Label
-    Friend WithEvents EdgeMethods As Windows.Forms.ComboBox
-    Friend WithEvents DistanceLabel As Windows.Forms.Label
-    Friend WithEvents Label2 As Windows.Forms.Label
-    Friend WithEvents DistanceSlider As Windows.Forms.TrackBar
-    Friend WithEvents Label1 As Windows.Forms.Label
-    Friend WithEvents FeatureMethod As Windows.Forms.ComboBox
-    Friend WithEvents FeatureCorrelationLabel As Windows.Forms.Label
-    Friend WithEvents Label6 As Windows.Forms.Label
-    Friend WithEvents MatchCorrSlider As Windows.Forms.TrackBar
-    Friend WithEvents ColorDiffLabel As Windows.Forms.Label
-    Friend WithEvents Label7 As Windows.Forms.Label
-    Friend WithEvents ColorDiffSlider As Windows.Forms.TrackBar
-    Friend WithEvents FeatureSampleSizeLabel As Windows.Forms.Label
-    Friend WithEvents Label5 As Windows.Forms.Label
-    Friend WithEvents FeatureSampleSize As Windows.Forms.TrackBar
-    Friend WithEvents GrayGroup As Windows.Forms.GroupBox
-    Friend WithEvents ColorGroup As Windows.Forms.GroupBox
+
+    Friend WithEvents FeatureMethod As ComboBox
+    Friend WithEvents EdgeMethods As ComboBox
+    Friend WithEvents Label1 As Label
+    Friend WithEvents Label2 As Label
+    Friend WithEvents Label3 As Label
+    Friend WithEvents DistanceSlider As TrackBar
+    Friend WithEvents DistanceLabel As Label
+    Friend WithEvents FeatureSampleSizeLabel As Label
+    Friend WithEvents FeatureSampleSize As TrackBar
+    Friend WithEvents Label5 As Label
+    Friend WithEvents ColorDiffLabel As Label
+    Friend WithEvents ColorDiffSlider As TrackBar
+    Friend WithEvents Label7 As Label
+    Friend WithEvents FeatureCorrelationLabel As Label
+    Friend WithEvents MatchCorrSlider As TrackBar
+    Friend WithEvents Label9 As Label
+    Friend WithEvents GrayGroup As GroupBox
+    Friend WithEvents ColorGroup As GroupBox
 End Class

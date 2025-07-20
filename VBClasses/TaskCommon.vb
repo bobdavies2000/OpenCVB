@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Imports VB_Classes.TaskParent
+Imports VBClasses.TaskParent
 Public Module vbc
     Public task As VBtask
     Public taskReady As Boolean
