@@ -160,7 +160,7 @@ Public Class RedPrep_VB : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim histogram As New cv.Mat
 
-        Dim ranges As cv.Rangef(), zeroCount As Integer
+        Dim ranges As cv.Rangef() = Nothing, zeroCount As Integer
         For i = 0 To 1
             Select Case i
                 Case 0 ' X Reduction

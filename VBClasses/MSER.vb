@@ -396,8 +396,8 @@ Public Class MSER_TestExample : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim regions()() As cv.Point
-        Dim boxes() As cv.Rect
+        Dim regions()() As cv.Point = Nothing
+        Dim boxes() As cv.Rect = Nothing
 
         dst0 = image.Clone
         dst2 = image.Clone

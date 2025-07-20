@@ -107,7 +107,7 @@ Public Class Delaunay_SubDiv : Inherits TaskParent
         Next
 
         Dim facets = New cv.Point2f()() {Nothing}
-        Dim centers() As cv.Point2f
+        Dim centers() As cv.Point2f = Nothing
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, centers)
 
         Dim ifacet() As cv.Point
@@ -154,8 +154,8 @@ Public Class Delaunay_Subdiv2D : Inherits TaskParent
         subdiv.Insert(points)
 
         ' draw voronoi diagram
-        Dim facetList()() As cv.Point2f
-        Dim facetCenters() As cv.Point2f
+        Dim facetList()() As cv.Point2f = Nothing
+        Dim facetCenters() As cv.Point2f = Nothing
         subdiv.GetVoronoiFacetList(Nothing, facetList, facetCenters)
 
         For Each list In facetList

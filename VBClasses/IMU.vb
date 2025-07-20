@@ -279,7 +279,7 @@ Public Class IMU_Stabilize : Inherits TaskParent
         dst2 = smoothedFrame.Resize(src.Size())
         cv.Cv2.Subtract(src, dst2, dst3)
 
-        Dim Text = "dx = " + Format(dx, fmt2) + vbNewLine + "dy = " + Format(dy, fmt2) + vbNewLine + "dz = " + Format(dz, fmt2)
+        Dim Text = "dx = " + Format(dx, fmt2) + vbCrLf + "dy = " + Format(dy, fmt2) + vbCrLf + "dz = " + Format(dz, fmt2)
         SetTrueText(Text, New cv.Point(10, 10), 3)
     End Sub
 End Class

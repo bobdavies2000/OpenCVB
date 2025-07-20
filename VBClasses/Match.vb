@@ -378,14 +378,14 @@ Public Class Match_tCell : Inherits TaskParent
     Dim options As New Options_Features
     Dim lineDisp As New XO_Line_DisplayInfoOld
     Public Sub New()
-        Dim tc As tCell
+        Dim tc As New tCell
         tCells.Add(tc)
         cellSlider = OptionParent.FindSlider("MatchTemplate Cell Size")
         desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided."
     End Sub
     Public Function createCell(src As cv.Mat, correlation As Single, pt As cv.Point2f) As tCell
         Dim rSize = cellSlider.Value
-        Dim tc As tCell
+        Dim tc As New tCell
 
         tc.rect = ValidateRect(New cv.Rect(pt.X - rSize, pt.Y - rSize, rSize * 2, rSize * 2))
         tc.correlation = correlation

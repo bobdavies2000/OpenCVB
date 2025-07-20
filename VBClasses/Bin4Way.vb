@@ -46,7 +46,7 @@ Public Class Bin4Way_Basics : Inherits TaskParent
         Dim contourCounts As New List(Of List(Of Integer))
         Dim means As New List(Of List(Of Single))
 
-        Dim allContours As cv.Point()()
+        Dim allContours As cv.Point()() = Nothing
         For i = 0 To counts.GetUpperBound(0)
             For j = 0 To task.gridRects.Count - 1
                 Dim roi = task.gridRects(j)

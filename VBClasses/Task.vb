@@ -394,7 +394,7 @@ Public Class VBtask : Implements IDisposable
 
 #End Region
     Private Function findDisplayObject(lookupName As String) As TaskParent
-        Dim saveObject As Object
+        Dim saveObject As Object = Nothing
         For Each obj In activeObjects
             If obj.tracename = lookupName Then
                 saveObject = obj
@@ -425,7 +425,7 @@ Public Class VBtask : Implements IDisposable
 
             If optionsChanged = True And treeView IsNot Nothing Then ' treeview is not active during 'TestAll'.
                 treeView.optionsChanged = True
-                Dim sender As Object, e As EventArgs
+                Dim sender As Object = Nothing, e As EventArgs = Nothing
                 treeView.Timer2_Tick(sender, e)
                 treeView.optionsChanged = False
             End If

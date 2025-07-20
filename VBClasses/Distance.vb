@@ -161,7 +161,7 @@ Public Class Distance_BinaryImage : Inherits TaskParent
             distance.Run(dst2)
         End If
         dst3 = distance.dst2
-        dst1 = dst3.Threshold(task.gOptions.DebugSliderText.Value, 255, cv.ThresholdTypes.Binary)
+        dst1 = dst3.Threshold(task.gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -426,7 +426,7 @@ End Class
 Public Class Distance_Depth : Inherits TaskParent
     Dim options As New Options_Distance
     Public Sub New()
-        task.gOptions.DebugSliderText.Value = 3
+        task.gOptions.DebugSlider.Value = 3
         desc = "Apply the distance transform to the depth data and clip values below specified threshold."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -437,7 +437,7 @@ Public Class Distance_Depth : Inherits TaskParent
         dst1 = src * 255 / mm.maxVal
         dst1.ConvertTo(dst1, cv.MatType.CV_8U)
         dst2 = dst1.DistanceTransform(options.distanceType, 0)
-        dst3 = dst2.Threshold(task.gOptions.DebugSliderText.Value, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst2.Threshold(task.gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
         mm = GetMinMax(dst2)
         labels(2) = "Distance results of 32F input data (usually Depth data).  Min = " + CStr(CInt(mm.minVal)) + " and max = " + CStr(CInt(mm.maxVal))
     End Sub
@@ -459,7 +459,7 @@ Public Class Distance_DepthPeaks : Inherits TaskParent
         dist.Run(src)
         dst2 = dist.dst2
 
-        Dim threshold = Math.Abs(task.gOptions.DebugSliderText.Value)
+        Dim threshold = Math.Abs(task.gOptions.DebugSlider.Value)
         Dim mask = dst2.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         dst3.SetTo(0)
         dst2.CopyTo(dst3, mask)
@@ -501,7 +501,7 @@ Public Class Distance_DepthBricks : Inherits TaskParent
     Dim dist As New Distance_Depth
     Public Sub New()
         task.brickRunFlag = True
-        task.gOptions.DebugSliderText.Value = 20
+        task.gOptions.DebugSlider.Value = 20
         desc = "Threshold the maxDist in each brick to highlight centers for key objects.  Use the 'DebugSlider' to provide the value."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -509,7 +509,7 @@ Public Class Distance_DepthBricks : Inherits TaskParent
         dst2 = dist.dst2
         dst3 = src.Clone
 
-        Dim threshold = Math.Abs(task.gOptions.DebugSliderText.Value)
+        Dim threshold = Math.Abs(task.gOptions.DebugSlider.Value)
         For Each brick In task.bricks.brickList
             Dim mm = GetMinMax(dst2(brick.rect))
             If mm.maxVal >= threshold Then

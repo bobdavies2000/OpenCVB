@@ -487,7 +487,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
 
         If diffX.Count = 0 Or diffY.Count = 0 Then Exit Sub
 
-        Dim xLabel As String, yLabel As String
+        Dim xLabel As String = Nothing, yLabel As String = Nothing
         shiftX = multiplier * plotDiff(diffX, " X ", 3, xLabel)
         dst3 = plot.dst2.Clone
         dst3.Line(New cv.Point(plot.plotCenter, 0), New cv.Point(plot.plotCenter, dst2.Height), white, 1)

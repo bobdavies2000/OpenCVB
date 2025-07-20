@@ -6,7 +6,7 @@ Public Class EdgeLine_Basics : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         cPtr = EdgeLineRaw_Open()
-        task.gOptions.DebugSliderText.Value = 1
+        task.gOptions.DebugSlider.Value = 1
         labels(3) = "Highlighting the individual segments one by one."
         desc = "Use EdgeLines to find edges/lines but without using motionMask"
     End Sub
@@ -92,7 +92,7 @@ End Class
 Public Class EdgeLine_BasicsList : Inherits TaskParent
     Public nrclist As New List(Of nrcData)
     Public Sub New()
-        task.gOptions.DebugSliderText.Value = 1
+        task.gOptions.DebugSlider.Value = 1
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Create an entry for each segment"
     End Sub
@@ -353,7 +353,7 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
         dst3 = ShowPalette(task.edges.dst2)
 
         Dim segments(task.edges.classCount) As List(Of cv.Point2f)
-        Dim brickCount As Integer, segmentCount
+        Dim brickCount As Integer, segmentCount As Integer
         For Each pt In ptBrick.bpList
             Dim val = task.edges.dst2.Get(Of Byte)(pt.Y, pt.X)
             If val > 0 And val < 255 Then

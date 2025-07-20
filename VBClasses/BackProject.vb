@@ -569,7 +569,7 @@ Public Class BackProject_MaskList : Inherits TaskParent
         plotHist.addLabels = False
         plotHist.removeZeroEntry = True
         task.gOptions.setHistogramBins(40)
-        task.gOptions.DebugSliderText.Minimum = 0
+        task.gOptions.DebugSlider.Minimum = 0
         labels(2) = "Use the debug slider (global options) to test various depth levels."
         labels(3) = "Depth mask used to build the depth histogram at left"
         desc = "Create masks for each histogram bin backprojection"
@@ -577,9 +577,9 @@ Public Class BackProject_MaskList : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim bins = If(task.histogramBins <= 255, task.histogramBins - 1, 255)
         Dim incr = 255 / bins
-        If bins <> task.gOptions.DebugSliderText.Maximum Then
-            task.gOptions.DebugSliderText.Value = 0
-            task.gOptions.DebugSliderText.Maximum = bins
+        If bins <> task.gOptions.DebugSlider.Maximum Then
+            task.gOptions.DebugSlider.Value = 0
+            task.gOptions.DebugSlider.Maximum = bins
         End If
 
         If standalone Then
@@ -587,7 +587,7 @@ Public Class BackProject_MaskList : Inherits TaskParent
             If task.heartBeat Then
                 depthIndex += 1
                 If depthIndex > 10 Then depthIndex = 0
-                task.gOptions.DebugSliderText.Value = depthIndex
+                task.gOptions.DebugSlider.Value = depthIndex
             End If
         End If
         histList.Clear()
@@ -603,7 +603,7 @@ Public Class BackProject_MaskList : Inherits TaskParent
             histogramList.Add(histS.histogram.Clone)
             inputMatList.Add(histS.inputOnlyMask.Clone)
         Next
-        Dim index = Math.Min(bins, task.gOptions.DebugSliderText.Value)
+        Dim index = Math.Min(bins, task.gOptions.DebugSlider.Value)
         If index >= inputMatList.Count Then index = inputMatList.Count - 1
         Dim tmp = inputMatList(index)
         If task.heartBeat Then strOut = CStr(tmp.CountNonZero) + " mask pixels between " + CStr(incr * index) + " and " +
@@ -844,7 +844,7 @@ Public Class BackProject_DepthSlider : Inherits TaskParent
         dst2.SetTo(0, task.noDepthMask)
         labels(2) = bpDepth.labels(2)
 
-        Dim index = Math.Abs(task.gOptions.DebugSliderText.Value)
+        Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
         If index >= bpDepth.classCount Then index = bpDepth.classCount - 1
         dst3 = bpDepth.dst2.InRange(index, index)
         Dim count = dst3.CountNonZero

@@ -60,8 +60,8 @@ Public Class Profile_Basics : Inherits TaskParent
         cornersRaw.Add(rc.contour(0)) ' show the first contour point...
         corners3D.Add(task.pointCloud.Get(Of cv.Point3f)(rc.rect.Y + rc.contour(0).Y, rc.rect.X + rc.contour(0).X))
 
-        For i = 0 To 6 - 1
-            Dim index = Choose(i + 1, 0, sortLeft.Count - 1, 0, sortTop.Count - 1, 0, sortFront.Count - 1)
+        For i As Integer = 0 To 6 - 1
+            Dim index As Integer = Choose(i + 1, 0, sortLeft.Count - 1, 0, sortTop.Count - 1, 0, sortFront.Count - 1)
             Dim ptList As SortedList(Of Integer, Integer) = Choose(i + 1, sortLeft, sortLeft, sortTop, sortTop, sortFront, sortFront)
             If ptList.Count > 0 Then
                 Dim pt = rc.contour(ptList.ElementAt(index).Value)

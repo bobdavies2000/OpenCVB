@@ -1706,7 +1706,7 @@ Public Class OpenGL_QuadConnected : Inherits TaskParent
         dst3 = connect.dst3
 
         Dim quadData As New List(Of cv.Point3f)
-        Dim brick1 As brickData, brick2 As brickData
+        Dim brick1 As brickData = Nothing, brick2 As brickData = Nothing
         For Each tup In connect.hTuples
             brick1 = task.bricks.brickList(tup.Item1)
             brick2 = task.bricks.brickList(tup.Item2)

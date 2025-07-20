@@ -253,7 +253,7 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
 
         If ranges.Count = 0 Then Exit Sub ' all the counts were too small - rare but it happens.
 
-        Dim maxRange As rangeData, maxPixels As Integer
+        Dim maxRange As rangeData = Nothing, maxPixels As Integer
         For Each r In ranges
             If r.pixels > maxPixels Then
                 maxPixels = r.pixels

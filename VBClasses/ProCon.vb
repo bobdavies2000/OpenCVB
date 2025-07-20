@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
+Imports System.Windows.Forms
 ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
 Public Class ProCon_Basics : Inherits TaskParent
     Public mutex = New Mutex(True, "BufferMutex")
@@ -40,7 +41,7 @@ Public Class ProCon_Basics : Inherits TaskParent
                 End If
             End SyncLock
             If terminateConsumer Then Exit While
-            Windows.Forms.Application.DoEvents()
+            Application.DoEvents()
         End While
     End Sub
     Private Sub Producer()
@@ -55,7 +56,7 @@ Public Class ProCon_Basics : Inherits TaskParent
                 End If
             End SyncLock
             If terminateProducer Then Exit While
-            Windows.Forms.Application.DoEvents()
+            Application.DoEvents()
         End While
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

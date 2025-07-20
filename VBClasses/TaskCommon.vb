@@ -258,15 +258,18 @@ End Structure
 
 
 
-Public Structure tCell
-    Dim template As cv.Mat
-    Dim searchRect As cv.Rect
-    Dim rect As cv.Rect
-    Dim center As cv.Point2f
-    Dim correlation As Single
-    Dim depth As Single
-    Dim strOut As String
-End Structure
+Public Class tCell
+    Public template As cv.Mat
+    Public searchRect As cv.Rect
+    Public rect As cv.Rect
+    Public center As cv.Point2f
+    Public correlation As Single
+    Public depth As Single
+    Public strOut As String
+    Public Sub New()
+        strOut = ""
+    End Sub
+End Class
 
 
 

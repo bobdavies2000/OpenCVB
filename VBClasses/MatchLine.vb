@@ -300,8 +300,9 @@ Public Class MatchLine_VH : Inherits TaskParent
 
         dst2 = src
         dst3.SetTo(0)
+
         For i = 0 To brickCells.Count - 1
-            Dim tc As tCell
+            Dim tc As New tCell
             brick = brickCells(i)
             Dim p1 As cv.Point2f, p2 As cv.Point2f
             For j = 0 To 2 - 1

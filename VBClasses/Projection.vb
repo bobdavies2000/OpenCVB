@@ -161,7 +161,7 @@ Public Class Projection_Object : Inherits TaskParent
     Dim top As New Projection_ViewTop
     Dim side As New Projection_ViewSide
     Public Sub New()
-        task.gOptions.DebugSliderText.Value = 0 ' pick the biggest object...
+        task.gOptions.DebugSlider.Value = 0 ' pick the biggest object...
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
         top.objects.showRectangles = False
@@ -172,13 +172,13 @@ Public Class Projection_Object : Inherits TaskParent
         dst3 = top.dst2
         labels(3) = top.labels(2)
 
-        Dim index = task.gOptions.DebugSliderText.Value
+        Dim index = task.gOptions.DebugSlider.Value
         If index < top.objects.objectList.Count Then
             Dim lower = New cv.Scalar(top.objects.objectList(index)(0), -100, top.objects.objectList(index)(2))
             Dim upper = New cv.Scalar(top.objects.objectList(index)(1), +100, top.objects.objectList(index)(3))
             Dim mask = task.pointCloud.InRange(lower, upper)
 
-            Dim rc = top.objects.rcList(task.gOptions.DebugSliderText.Value + 1) ' the biggest by default...
+            Dim rc = top.objects.rcList(task.gOptions.DebugSlider.Value + 1) ' the biggest by default...
             dst0.SetTo(0)
             dst0(rc.rect) = top.histTop.dst2(rc.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
             dst0.SetTo(0, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))

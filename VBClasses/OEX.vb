@@ -235,7 +235,7 @@ Public Class OEX_delaunay2 : Inherits TaskParent
                 dst1 = dst2.Clone
 
                 Dim facets = New cv.Point2f()() {Nothing}
-                Dim centers() As cv.Point2f
+                Dim centers() As cv.Point2f = Nothing
                 subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, centers)
 
                 Dim ifacet As New List(Of cv.Point)
@@ -310,7 +310,7 @@ Public Class OEX_PointPolygon : Inherits TaskParent
         End If
 
         dst2 = src.Clone
-        Dim contours As cv.Point()()
+        Dim contours As cv.Point()() = Nothing
         cv.Cv2.FindContours(src, contours, Nothing, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))

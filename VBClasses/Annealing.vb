@@ -137,7 +137,7 @@ Public Class Annealing_MT_CPP : Inherits TaskParent
 
         ' copy the top half of the solutions to the bottom half (worst solutions)
         If options.copyBestFlag Then
-            For i = 0 To anneal.Length / 2 - 1
+            For i As Integer = 0 To anneal.Length / 2 - 1
                 anneal(bestList.ElementAt(bestList.Count - 1 - i).Value).cityOrder = anneal(bestList.ElementAt(i).Value).cityOrder
             Next
         End If

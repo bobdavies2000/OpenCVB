@@ -120,7 +120,7 @@ Public Class Flood_Tiers : Inherits TaskParent
         desc = "Subdivide the Flood_Basics cells using depth tiers."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim tier = task.gOptions.DebugSliderText.Value
+        Dim tier = task.gOptions.DebugSlider.Value
 
         tiers.Run(src)
         If tier >= tiers.classCount Then tier = 0

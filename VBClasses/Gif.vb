@@ -119,7 +119,7 @@ Public Class Gif_OpenCVB : Inherits TaskParent
     Public Sub createNextGifImage()
         Static snapCheck = OptionParent.findCheckBox("Step 1: Check this box when ready to capture the desired snapshot.")
         If snapCheck.checked Then
-            Dim nextBMP As Bitmap
+            Dim nextBMP As Bitmap = Nothing
             Dim rect As RECT
             Select Case task.gifCaptureIndex
                 Case gifTypes.gifdst0

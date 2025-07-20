@@ -1224,7 +1224,7 @@ Public Class Depth_CellTiers : Inherits TaskParent
             depthData.SetTo(0, Not rc.mask)
 
             valley.Run(depthData)
-            If i = task.gOptions.DebugSliderText.Value And standalone Then
+            If i = task.gOptions.DebugSlider.Value And standalone Then
                 dst3 = valley.dst2.Clone
                 labels(3) = valley.strOut
                 task.ClickPoint = rc.maxDist
@@ -1300,7 +1300,7 @@ Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
         If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
 
         Dim facets = New cv.Point2f()() {Nothing}
-        Dim centers() As cv.Point2f
+        Dim centers() As cv.Point2f = Nothing
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, centers)
 
         Dim ifacet() As cv.Point

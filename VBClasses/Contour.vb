@@ -102,7 +102,7 @@ Public Class Contour_Regions : Inherits TaskParent
 
         dst3 = srcMustBe8U(src)
 
-        Dim allContours As cv.Point()()
+        Dim allContours As cv.Point()() = Nothing
         Dim mode = options.options2.ApproximationMode
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then
             dst3.ConvertTo(dst1, cv.MatType.CV_32SC1)
@@ -551,7 +551,7 @@ Public Class Contour_Compare : Inherits TaskParent
 
         Dim tmp = task.rcD.mask.Clone
 
-        Dim allContours As cv.Point()()
+        Dim allContours As cv.Point()() = Nothing
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then tmp.ConvertTo(tmp, cv.MatType.CV_32SC1)
         cv.Cv2.FindContours(tmp, allContours, Nothing, options.retrievalMode, options.ApproximationMode)
 
@@ -860,7 +860,7 @@ Public Class Contour_EdgePoints : Inherits TaskParent
         plot.useFixedRange = True
         plot.max = rangeVal
         plot.min = -rangeVal
-        task.gOptions.DebugSliderText.Value = 50
+        task.gOptions.DebugSlider.Value = 50
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Find the edge points for each contour rect"
     End Sub

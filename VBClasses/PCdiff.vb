@@ -46,12 +46,12 @@ End Class
 Public Class PCdiff_Edges : Inherits TaskParent
     Dim pcDiff As New PCdiff_Basics
     Public Sub New()
-        task.gOptions.DebugSliderText.Value = 0
-        task.gOptions.DebugSliderText.Minimum = 0
-        task.gOptions.DebugSliderText.Maximum = 2
+        task.gOptions.DebugSlider.Value = 0
+        task.gOptions.DebugSlider.Minimum = 0
+        task.gOptions.DebugSlider.Maximum = 2
         desc = "Find any significant differences in neighboring pixels of the pointcloud."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static index As Integer = -1
 
         If task.heartBeatLT Then
@@ -59,7 +59,7 @@ Public Class PCdiff_Edges : Inherits TaskParent
             If index > 2 Then index = 0
         End If
 
-        index = task.gOptions.DebugSliderText.Value
+        index = task.gOptions.DebugSlider.Value
         pcDiff.Run(task.pcSplit(index))
 
         strOut = "Index = " + CStr(index) + "  Difference in the pointcloud "

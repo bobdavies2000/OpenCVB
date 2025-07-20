@@ -18,8 +18,8 @@ Public Class FLANN_Test : Inherits TaskParent
             ' knnSearch
             Using nnIndex As New cv.Flann.Index(features, New cv.Flann.KDTreeIndexParams(4))
                 Dim knn As Integer = 1
-                Dim indices() As Integer
-                Dim dists() As Single
+                Dim indices() As Integer = Nothing
+                Dim dists() As Single = Nothing
                 nnIndex.KnnSearch(queries, indices, dists, knn, New cv.Flann.SearchParams(32))
 
                 Dim output = ""
@@ -79,8 +79,8 @@ Public Class FLANN_Basics : Inherits TaskParent
         Dim queries As cv.Mat = cv.Mat.FromPixelData(options.queryCount, 2, cv.MatType.CV_32F, qArray)
 
         Using nnIndex As New cv.Flann.Index(features, New cv.Flann.KDTreeIndexParams(matchCount))
-            Dim indices() As Integer
-            Dim distances() As Single
+            Dim indices() As Integer = Nothing
+            Dim distances() As Single = Nothing
             For i = 0 To options.queryCount - 1
                 Dim pt1 = queries.Get(Of cv.Point2f)(i)
                 Dim query As New cv.Mat(1, 2, cv.MatType.CV_32F, pt1)

@@ -414,7 +414,7 @@ Public Class XO_CameraMotion_Basics : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.gOptions.DebugSliderText.Value = 3
+        task.gOptions.DebugSlider.Value = 3
         desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -423,8 +423,8 @@ Public Class XO_CameraMotion_Basics : Inherits TaskParent
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        translationX = task.gOptions.DebugSliderText.Value ' Math.Round(gravityVec.p1.X - task.gravityVec.p1.X)
-        translationY = task.gOptions.DebugSliderText.Value ' Math.Round(horizonVec.p1.Y - task.horizonVec.p1.Y)
+        translationX = task.gOptions.DebugSlider.Value ' Math.Round(gravityVec.p1.X - task.gravityVec.p1.X)
+        translationY = task.gOptions.DebugSlider.Value ' Math.Round(horizonVec.p1.Y - task.horizonVec.p1.Y)
         If Math.Abs(translationX) >= dst2.Width / 2 Then translationX = 0
         If horizonVec.p1.Y >= dst2.Height Or horizonVec.p2.Y >= dst2.Height Or Math.Abs(translationY) >= dst2.Height / 2 Then
             horizonVec = New lpData(New cv.Point2f, New cv.Point2f(336, 0))
@@ -734,7 +734,7 @@ Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
         If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
 
         Dim facets = New cv.Point2f()() {Nothing}
-        Dim centers() As cv.Point2f
+        Dim centers() As cv.Point2f = Nothing
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, centers)
 
         Dim ifacet() As cv.Point
@@ -1054,7 +1054,7 @@ Public Class XO_Line_DisplayInfoOld : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
         If standaloneTest() And task.heartBeat Then
-            Dim tc As tCell
+            Dim tc As New tCell
             tcells.Clear()
             For i = 0 To 2 - 1
                 tc.center = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -3480,7 +3480,7 @@ Public Class XO_FeatureLine_BasicsRaw : Inherits TaskParent
     Dim match As New Match_tCell
     Public tcells As List(Of tCell)
     Public Sub New()
-        Dim tc As tCell
+        Dim tc As New tCell
         tcells = New List(Of tCell)({tc, tc})
         labels = {"", "", "Longest line present.", ""}
         desc = "Find and track a line using the end points"
@@ -4405,7 +4405,7 @@ Public Class XO_Contour_Gray : Inherits TaskParent
             src = reduction.dst2
         End If
 
-        Dim allContours As cv.Point()()
+        Dim allContours As cv.Point()() = Nothing
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.FindContours(src, allContours, Nothing, cv.RetrievalModes.External, options.ApproximationMode)
         If allContours.Count = 0 Then Exit Sub
@@ -4736,7 +4736,7 @@ Public Class XO_LeftRight_Markers : Inherits TaskParent
 
         ' find combinations in the left image - they are markers.
         Dim impList As New List(Of List(Of Integer))
-        Dim lineLen = task.gOptions.DebugSliderText.Value
+        Dim lineLen = task.gOptions.DebugSlider.Value
         For y = 0 To left.Height - 1
             Dim important As New List(Of Integer)
             Dim impCounts As New List(Of Integer)
@@ -4792,7 +4792,7 @@ Public Class XO_LeftRight_Markers1 : Inherits TaskParent
 
         ' find combinations in the left image - they are markers.
         Dim impList As New List(Of List(Of Integer))
-        Dim lineLen = task.gOptions.DebugSliderText.Value
+        Dim lineLen = task.gOptions.DebugSlider.Value
         For y = 0 To dst2.Height - 1
             Dim important As New List(Of Integer)
             Dim impCounts As New List(Of Integer)

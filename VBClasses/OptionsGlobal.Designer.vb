@@ -26,7 +26,6 @@ Partial Class OptionsGlobal
         GroupBox1 = New GroupBox()
         DebugSlider = New TrackBar()
         DebugSliderLabel = New Label()
-        DebugSliderText = New Label()
         DebugCheckBox = New CheckBox()
         FrameHistory = New TrackBar()
         fHist = New Label()
@@ -81,6 +80,7 @@ Partial Class OptionsGlobal
         ColoringGroup = New GroupBox()
         TrackingColor = New RadioButton()
         TrackingMeanColor = New RadioButton()
+        Label3 = New Label()
         GroupBox1.SuspendLayout()
         CType(DebugSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(FrameHistory, ComponentModel.ISupportInitialize).BeginInit()
@@ -109,9 +109,9 @@ Partial Class OptionsGlobal
         ' 
         ' GroupBox1
         ' 
+        GroupBox1.Controls.Add(Label3)
         GroupBox1.Controls.Add(DebugSlider)
         GroupBox1.Controls.Add(DebugSliderLabel)
-        GroupBox1.Controls.Add(DebugSliderText)
         GroupBox1.Controls.Add(DebugCheckBox)
         GroupBox1.Controls.Add(FrameHistory)
         GroupBox1.Controls.Add(fHist)
@@ -154,15 +154,6 @@ Partial Class OptionsGlobal
         DebugSliderLabel.Size = New Size(151, 25)
         DebugSliderLabel.TabIndex = 21
         DebugSliderLabel.Text = "DebugSliderLabel"
-        ' 
-        ' DebugSliderText
-        ' 
-        DebugSliderText.AutoSize = True
-        DebugSliderText.Location = New Point(62, 517)
-        DebugSliderText.Name = "DebugSliderText"
-        DebugSliderText.Size = New Size(140, 25)
-        DebugSliderText.TabIndex = 20
-        DebugSliderText.Text = "DebugSliderText"
         ' 
         ' DebugCheckBox
         ' 
@@ -697,9 +688,18 @@ Partial Class OptionsGlobal
         TrackingMeanColor.Text = "Mean Color"
         TrackingMeanColor.UseVisualStyleBackColor = True
         ' 
+        ' Label3
+        ' 
+        Label3.AutoSize = True
+        Label3.Location = New Point(28, 527)
+        Label3.Name = "Label3"
+        Label3.Size = New Size(115, 25)
+        Label3.TabIndex = 23
+        Label3.Text = "Debug Slider"
+        ' 
         ' OptionsGlobal
         ' 
-        AutoScaleDimensions = New SizeF(10F, 25F)
+        AutoScaleDimensions = New SizeF(10.0F, 25.0F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1629, 643)
         Controls.Add(ColoringGroup)
@@ -766,7 +766,6 @@ Partial Class OptionsGlobal
     Friend WithEvents DebugCheckBox As CheckBox
     Friend WithEvents DebugSlider As TrackBar
     Friend WithEvents DebugSliderLabel As Label
-    Friend WithEvents DebugSliderText As Label
     Friend WithEvents GroupBox2 As GroupBox
     Friend WithEvents ShowGrid As CheckBox
     Friend WithEvents ShowAllOptions As CheckBox
@@ -802,4 +801,5 @@ Partial Class OptionsGlobal
     Friend WithEvents ColorizedDepth As RadioButton
     Friend WithEvents TrackingColor As RadioButton
     Friend WithEvents TrackingMeanColor As RadioButton
+    Friend WithEvents Label3 As Label
 End Class

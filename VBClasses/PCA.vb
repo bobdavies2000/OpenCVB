@@ -197,8 +197,8 @@ Public Class PCA_DrawImage : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = image.Resize(dst2.Size())
         Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
-        Dim hierarchy() As cv.HierarchyIndex
-        Dim contours As cv.Point()()
+        Dim hierarchy() As cv.HierarchyIndex = Nothing
+        Dim contours As cv.Point()() = Nothing
         cv.Cv2.FindContours(gray, contours, hierarchy, cv.RetrievalModes.List, cv.ContourApproximationModes.ApproxNone)
 
         dst3.SetTo(0)

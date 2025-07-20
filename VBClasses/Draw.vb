@@ -341,26 +341,6 @@ End Class
 
 
 
-' http://www3.psych.purdue.edu/~zpizlo/GestaltCube
-Public Class Draw_Hexagon : Inherits TaskParent
-    Dim alpha As New ImageForm
-    Public Sub New()
-        alpha.imagePic.Image = Image.FromFile(task.HomeDir + "Data/GestaltCube.gif")
-        alpha.Show()
-        alpha.Size = New Size(512, 512)
-        alpha.Text = "Perception is the key"
-        desc = "What it means to recognize a cube.  Zygmunt Pizlo - UC Irvine"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class Draw_Line : Inherits TaskParent
     Public p1 As cv.Point, p2 As cv.Point

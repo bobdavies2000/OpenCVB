@@ -30,7 +30,7 @@ Public Class QRcode_Basics : Inherits TaskParent
             src(roi) = qrInput2
         End If
 
-        Dim box() As cv.Point2f
+        Dim box() As cv.Point2f = Nothing
         Dim rectifiedImage As New cv.Mat
         Dim refersTo = qrDecoder.DetectAndDecode(src, box, rectifiedImage)
 

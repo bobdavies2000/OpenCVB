@@ -209,7 +209,7 @@ Public Class Hist3Dcolor_Select : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         hColor.Run(src)
 
-        Dim selection = task.gOptions.DebugSliderText.Value
+        Dim selection = task.gOptions.DebugSlider.Value
         dst2 = hColor.dst2.InRange(selection, selection)
         Dim saveCount = dst2.CountNonZero
 

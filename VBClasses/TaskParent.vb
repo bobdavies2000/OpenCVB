@@ -39,7 +39,7 @@ Public Class TaskParent : Implements IDisposable
         labels = {"", "", traceName, ""}
         Dim stackTrace = Environment.StackTrace
         Dim lines() = stackTrace.Split(vbCrLf)
-        Dim callStack As String
+        Dim callStack As String = ""
         For i = 0 To lines.Count - 1
             lines(i) = Trim(lines(i))
             Dim offset = InStr(lines(i), "VB_Classes.")
@@ -194,7 +194,7 @@ Public Class TaskParent : Implements IDisposable
                          (p1(2) - p2(2)) * (p1(2) - p2(2)))
     End Function
     Public Function ContourBuild(mask As cv.Mat, approxMode As cv.ContourApproximationModes) As List(Of cv.Point)
-        Dim allContours As cv.Point()()
+        Dim allContours As cv.Point()() = Nothing
         cv.Cv2.FindContours(mask, allContours, Nothing, cv.RetrievalModes.External, approxMode)
 
         Dim maxCount As Integer, maxIndex As Integer

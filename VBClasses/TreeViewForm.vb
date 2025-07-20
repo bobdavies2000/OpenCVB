@@ -113,7 +113,7 @@ Public Class TreeviewForm
 
         Dim saveWaitTime As String = ""
         PercentTimes.Clear()
-        Dim percentStr As String
+        Dim percentStr As String = ""
         For i = 0 To algorithm_ms.Count - 1
             algorithm_ms(i) /= sumTime
             If algorithm_ms(i) < 0 Then algorithm_ms(i) = 0

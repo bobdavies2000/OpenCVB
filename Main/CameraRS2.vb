@@ -4,14 +4,6 @@ Imports Intel.RealSense
 Imports System.Text
 Public Class CameraRS2 : Inherits GenericCamera
     Dim pipe As New Pipeline()
-    Private Function copyIntrinsics(input As Intrinsics, ratio As Single) As VB_Classes.VBtask.intrinsicData
-        Dim output As New VB_Classes.VBtask.intrinsicData
-        output.ppx = input.ppx / ratio
-        output.ppy = input.ppy / ratio
-        output.fx = input.fx / ratio
-        output.fy = input.fy / ratio
-        Return output
-    End Function
     Public Sub New(workRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
         Dim serialNumber As String = ""
         Dim ctx As New Context()
@@ -35,15 +27,21 @@ Public Class CameraRS2 : Inherits GenericCamera
         Dim streamLeft = profiles.GetStream(Stream.Infrared, 1)
         Dim streamRight = profiles.GetStream(Stream.Infrared, 2)
         Dim StreamColor = profiles.GetStream(Stream.Color)
-        Dim rgbIntrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
-        Dim rgbExtrinsics = StreamColor.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamLeft)
+        Dim rgb As Intrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
+        Dim rgbExtrinsics As Extrinsics = StreamColor.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamLeft)
 
         Dim ratio = CInt(captureRes.Width / workRes.Width)
-        calibData.rgbIntrinsics = copyIntrinsics(rgbIntrinsics, ratio)
+        calibData.rgbIntrinsics.ppx = rgb.ppx
+        calibData.rgbIntrinsics.ppy = rgb.ppy
+        calibData.rgbIntrinsics.fx = rgb.fx
+        calibData.rgbIntrinsics.fy = rgb.fy
 
-        Dim leftIntrinsics = streamLeft.As(Of VideoStreamProfile)().GetIntrinsics()
-        Dim leftExtrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamRight)
-        calibData.leftIntrinsics = copyIntrinsics(leftIntrinsics, ratio)
+        Dim leftIntrinsics As Intrinsics = streamLeft.As(Of VideoStreamProfile)().GetIntrinsics()
+        Dim leftExtrinsics As Extrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamRight)
+        calibData.leftIntrinsics.ppx = rgb.ppx
+        calibData.leftIntrinsics.ppy = rgb.ppy
+        calibData.leftIntrinsics.fx = rgb.fx
+        calibData.leftIntrinsics.fy = rgb.fy
 
         ReDim calibData.LtoR_translation(3 - 1)
         ReDim calibData.LtoR_rotation(9 - 1)

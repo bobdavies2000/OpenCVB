@@ -1,32 +1,30 @@
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.Dnn
-Imports System.Net
 Imports System.IO
 Imports OpenCvSharp.DnnSuperres
 Public Class DNN_Test : Inherits TaskParent
     Dim net As Net
     Dim classnames() As String
     Public Sub New()
+        'Dim modelFile As New FileInfo(task.HomeDir + "Data/bvlc_googlenet.caffemodel")
+        'If File.Exists(modelFile.FullName) = False Then
+        '    ' this site is apparently gone.  caffemodel is in the Data directory in OpenCVB_HomeDir
+        '    Dim client = HttpWebRequest.CreateHttp("http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel")
+        '    Dim response = client.GetResponse()
+        '    Dim responseStream = response.GetResponseStream()
+        '    Dim memory As New MemoryStream()
+        '    responseStream.CopyTo(memory)
+        '    File.WriteAllBytes(modelFile.FullName, memory.ToArray)
+        'End If
+        'Dim protoTxt = task.HomeDir + "Data/bvlc_googlenet.prototxt"
+        'net = CvDnn.ReadNetFromCaffe(protoTxt, modelFile.FullName)
+        'Dim synsetWords = task.HomeDir + "Data/synset_words.txt"
+        'classnames = File.ReadAllLines(synsetWords) ' .Select(line >= line.Split(' ').Last()).ToArray()
+        'For i = 0 To classnames.Count - 1
+        '    classnames(i) = classnames(i).Split(" ").Last
+        'Next
 
-        Dim modelFile As New FileInfo(task.HomeDir + "Data/bvlc_googlenet.caffemodel")
-        If File.Exists(modelFile.FullName) = False Then
-            ' this site is apparently gone.  caffemodel is in the Data directory in OpenCVB_HomeDir
-            Dim client = HttpWebRequest.CreateHttp("http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel")
-            Dim response = client.GetResponse()
-            Dim responseStream = response.GetResponseStream()
-            Dim memory As New MemoryStream()
-            responseStream.CopyTo(memory)
-            File.WriteAllBytes(modelFile.FullName, memory.ToArray)
-        End If
-        Dim protoTxt = task.HomeDir + "Data/bvlc_googlenet.prototxt"
-        net = CvDnn.ReadNetFromCaffe(protoTxt, modelFile.FullName)
-        Dim synsetWords = task.HomeDir + "Data/synset_words.txt"
-        classnames = File.ReadAllLines(synsetWords) ' .Select(line >= line.Split(' ').Last()).ToArray()
-        For i = 0 To classnames.Count - 1
-            classnames(i) = classnames(i).Split(" ").Last
-        Next
-
-        labels(3) = "Input Image"
+        'labels(3) = "Input Image"
         desc = "Download and use a Caffe database"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

@@ -68,7 +68,7 @@ Public Class Duster_MaskZ : Inherits TaskParent
 
         Dim incr = task.MaxZmeters / options.bins
         classCount = 0
-        For i = 0 To Math.Min(clusters.Count, options.maxClusters) - 1
+        For i As Integer = 0 To Math.Min(clusters.Count, options.maxClusters) - 1
             Dim vec = clusters.ElementAt(i).Value
             classCount += 1
             For j = vec(0) To vec(1)

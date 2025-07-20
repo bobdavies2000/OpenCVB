@@ -223,7 +223,7 @@ Public Class Stabilizer_OpticalFlow : Inherits TaskParent
             Dim ds_y = affine.Get(Of Double)(1, 1) / Math.Cos(da)
             Dim saveDX = dx, saveDY = dy, saveDA = da
 
-            Dim text = "Original dx = " + Format(dx, fmt2) + vbNewLine + " dy = " + Format(dy, fmt2) + vbNewLine + " da = " + Format(da, fmt2)
+            Dim text = "Original dx = " + Format(dx, fmt2) + vbCrLf + " dy = " + Format(dy, fmt2) + vbCrLf + " da = " + Format(da, fmt2)
             SetTrueText(text)
 
             Dim sx = ds_x, sy = ds_y
@@ -241,7 +241,7 @@ Public Class Stabilizer_OpticalFlow : Inherits TaskParent
             If Math.Abs(dy) > 50 Then dy = saveDY
             If Math.Abs(da) > 50 Then da = saveDA
 
-            text = "dx = " + Format(dx, fmt2) + vbNewLine + " dy = " + Format(dy, fmt2) + vbNewLine + " da = " + Format(da, fmt2)
+            text = "dx = " + Format(dx, fmt2) + vbCrLf + " dy = " + Format(dy, fmt2) + vbCrLf + " da = " + Format(da, fmt2)
             SetTrueText(text, New cv.Point(10, 100))
 
             Dim smoothedMat = New cv.Mat(2, 3, cv.MatType.CV_64F)
