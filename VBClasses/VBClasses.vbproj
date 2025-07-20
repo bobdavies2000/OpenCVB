@@ -8,6 +8,7 @@
 	  <Nullable>enable</Nullable>
 	  <MyType>WindowsForms</MyType>
 	  <StartupObject>VBClasses.My.MyApplication</StartupObject>
+	  <Platforms>x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

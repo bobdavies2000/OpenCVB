@@ -931,13 +931,13 @@ Public Class Main
         XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
         XYLoc.Visible = True
 
-        If settings.cameraFound Then
-            startCamera()
-            While camera Is Nothing ' wait for camera to start...
-                Application.DoEvents()
-                Thread.Sleep(100)
-            End While
-        End If
+        'If settings.cameraFound Then
+        '    startCamera()
+        '    While camera Is Nothing ' wait for camera to start...
+        '        Application.DoEvents()
+        '        Thread.Sleep(100)
+        '    End While
+        'End If
 
         Debug.WriteLine("Main_UI_Load complete.")
     End Sub

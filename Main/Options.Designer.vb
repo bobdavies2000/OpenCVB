@@ -24,8 +24,6 @@ Partial Class Options
     Private Sub InitializeComponent()
         OKButton = New Button()
         Cancel_Button = New Button()
-        CameraGroup = New GroupBox()
-        Resolutions = New GroupBox()
         DisplayResolution = New GroupBox()
         Label3 = New Label()
         Label2 = New Label()
@@ -43,6 +41,8 @@ Partial Class Options
         Button1 = New Button()
         showConsoleLog = New CheckBox()
         FontDialog1 = New FontDialog()
+        CameraGroup = New FlowLayoutPanel()
+        Resolutions = New FlowLayoutPanel()
         DisplayResolution.SuspendLayout()
         GroupBox1.SuspendLayout()
         CType(TestAllDuration, ComponentModel.ISupportInitialize).BeginInit()
@@ -65,24 +65,6 @@ Partial Class Options
         Cancel_Button.TabIndex = 1
         Cancel_Button.Text = "Cancel"
         Cancel_Button.UseVisualStyleBackColor = True
-        ' 
-        ' CameraGroup
-        ' 
-        CameraGroup.Location = New Point(14, 2)
-        CameraGroup.Name = "CameraGroup"
-        CameraGroup.Size = New Size(821, 150)
-        CameraGroup.TabIndex = 2
-        CameraGroup.TabStop = False
-        CameraGroup.Text = "Camera Selection"
-        ' 
-        ' Resolutions
-        ' 
-        Resolutions.Location = New Point(14, 158)
-        Resolutions.Name = "Resolutions"
-        Resolutions.Size = New Size(984, 201)
-        Resolutions.TabIndex = 3
-        Resolutions.TabStop = False
-        Resolutions.Text = "Working Size Resolution"
         ' 
         ' DisplayResolution
         ' 
@@ -255,15 +237,30 @@ Partial Class Options
         showConsoleLog.Text = "Show Console Log for external processes"
         showConsoleLog.UseVisualStyleBackColor = True
         ' 
+        ' CameraGroup
+        ' 
+        CameraGroup.FlowDirection = FlowDirection.TopDown
+        CameraGroup.Location = New Point(13, 25)
+        CameraGroup.Name = "CameraGroup"
+        CameraGroup.Size = New Size(827, 159)
+        CameraGroup.TabIndex = 6
+        ' 
+        ' Resolutions
+        ' 
+        Resolutions.Location = New Point(12, 190)
+        Resolutions.Name = "Resolutions"
+        Resolutions.Size = New Size(828, 173)
+        Resolutions.TabIndex = 7
+        ' 
         ' Options
         ' 
         AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1008, 720)
-        Controls.Add(GroupBox1)
-        Controls.Add(DisplayResolution)
         Controls.Add(Resolutions)
         Controls.Add(CameraGroup)
+        Controls.Add(GroupBox1)
+        Controls.Add(DisplayResolution)
         Controls.Add(Cancel_Button)
         Controls.Add(OKButton)
         Name = "Options"
@@ -278,8 +275,6 @@ Partial Class Options
 
     Friend WithEvents OKButton As Button
     Friend WithEvents Cancel_Button As Button
-    Friend WithEvents CameraGroup As GroupBox
-    Friend WithEvents Resolutions As GroupBox
     Friend WithEvents DisplayResolution As GroupBox
     Friend WithEvents SnapCustom As RadioButton
     Friend WithEvents Snap320 As RadioButton
@@ -297,4 +292,6 @@ Partial Class Options
     Friend WithEvents TestAllDuration As NumericUpDown
     Friend WithEvents Label7 As Label
     Friend WithEvents FontDialog1 As FontDialog
+    Friend WithEvents CameraGroup As FlowLayoutPanel
+    Friend WithEvents Resolutions As FlowLayoutPanel
 End Class
