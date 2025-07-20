@@ -151,7 +151,7 @@ Partial Class Main
         ' 
         CameraSwitching.AutoSize = True
         CameraSwitching.Font = New Font("Microsoft Sans Serif", 12F)
-        CameraSwitching.Location = New Point(33, 66)
+        CameraSwitching.Location = New Point(33, 133)
         CameraSwitching.Name = "CameraSwitching"
         CameraSwitching.Size = New Size(202, 29)
         CameraSwitching.TabIndex = 2
@@ -160,7 +160,7 @@ Partial Class Main
         ' CamSwitchProgress
         ' 
         CamSwitchProgress.BackColor = SystemColors.MenuHighlight
-        CamSwitchProgress.Location = New Point(33, 98)
+        CamSwitchProgress.Location = New Point(33, 165)
         CamSwitchProgress.Name = "CamSwitchProgress"
         CamSwitchProgress.Size = New Size(202, 27)
         CamSwitchProgress.TabIndex = 3

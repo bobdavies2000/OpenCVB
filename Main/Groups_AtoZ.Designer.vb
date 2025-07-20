@@ -32,11 +32,12 @@ Partial Class Groups_AtoZ
         GroupDataView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
         GroupDataView.BackgroundColor = SystemColors.ActiveCaption
         GroupDataView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        GroupDataView.Location = New Point(544, 247)
+        GroupDataView.Dock = DockStyle.Fill
+        GroupDataView.Location = New Point(0, 0)
         GroupDataView.Name = "GroupDataView"
         GroupDataView.ReadOnly = True
         GroupDataView.RowHeadersWidth = 62
-        GroupDataView.Size = New Size(979, 676)
+        GroupDataView.Size = New Size(1972, 1302)
         GroupDataView.TabIndex = 0
         ' 
         ' Groups_AtoZ

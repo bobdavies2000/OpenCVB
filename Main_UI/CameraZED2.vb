@@ -19,7 +19,6 @@ Public Class CameraZED2 : Inherits GenericCamera
 
         zed = New sl.Camera(0)
         Dim errCode = zed.Open(init_params)
-
         Dim camInfo As sl.CameraInformation = zed.GetCameraInformation
 
         ' stereolabs left camera is the RGB camera so alignment to depth and left camera is already done.
