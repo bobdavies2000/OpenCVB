@@ -1,0 +1,69 @@
+﻿Imports cv = OpenCvSharp
+Imports CamZedClass
+Public Class CameraZED2 : Inherits GenericCamera
+    Dim zedCam As CamZedClass
+    Public Sub New(workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+        zedCam = New CamZedClass(workRes, _captureRes, deviceName)
+    End Sub
+    Public Sub GetNextFrame(workRes As cv.Size)
+        'Static RuntimeParameters = New RuntimeParameters()
+        'Dim rows = captureRes.Height, cols = captureRes.Width
+        'Dim w = workRes.Width, h = workRes.Height
+        'While 1
+        '    Dim rc = zed.Grab(RuntimeParameters)
+        '    If rc = 0 Then Exit While
+        'End While
+
+        'Dim color As New cv.Mat, leftView As New cv.Mat, rightView As New cv.Mat, pointCloud As New cv.Mat
+        'Static colorSL As New sl.Mat(New sl.ResolutionStruct(rows, cols), sl.MAT_TYPE.MAT_8U_C3)
+        'Static rightSL As New sl.Mat(New sl.ResolutionStruct(rows, cols), sl.MAT_TYPE.MAT_8U_C3)
+        'Static pointCloudSL As New sl.Mat(New sl.ResolutionStruct(rows, cols), sl.MAT_TYPE.MAT_8U_C4)
+
+        'zed.RetrieveImage(colorSL, sl.VIEW.LEFT)
+        'color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC4, colorSL.GetPtr).
+        '                              CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+        'leftView = color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        'zed.RetrieveImage(rightSL, sl.VIEW.RIGHT)
+        'rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC4, rightSL.GetPtr).
+        '                                 CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+        'rightView = rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        'zed.RetrieveMeasure(pointCloudSL, sl.MEASURE.XYZBGRA) ' tried XYZ but it still comes with BGRA
+        'pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC4,
+        '                                   pointCloudSL.GetPtr).CvtColor(cv.ColorConversionCodes.BGRA2BGR)
+        'cv.Cv2.PatchNaNs(pointCloud) ' This should not be necessary!  What is going on with StereoLabs interface?
+
+        'Dim zed_pose As New sl.Pose
+        'zed.GetPosition(zed_pose, REFERENCE_FRAME.WORLD)
+        'Dim sensordata As New sl.SensorsData
+        'zed.GetSensorsData(sensordata, TIME_REFERENCE.CURRENT)
+
+        'SyncLock cameraLock
+        '    Dim acc = sensordata.imu.linearAcceleration
+        '    If acc.X <> 0 And acc.Y <> 0 And acc.Z <> 0 Then
+        '        IMU_Acceleration = New cv.Point3f(acc.X, acc.Y, -acc.Z)
+        '        Dim gyro = sensordata.imu.angularVelocity
+        '        IMU_AngularVelocity = New cv.Point3f(gyro.X, gyro.Y, gyro.Z) * 0.0174533 ' Zed 2 gyro is in degrees/sec 
+        '        Static IMU_StartTime = sensordata.imu.timestamp
+        '        IMU_TimeStamp = (sensordata.imu.timestamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
+        '    End If
+        '    If workRes <> captureRes Then
+        '        uiColor = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        '        uiLeft = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        '        uiRight = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        '        uiPointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
+        '    Else
+        '        uiColor = color.Clone
+        '        uiLeft = leftView.Clone
+        '        uiRight = rightView.Clone
+        '        uiPointCloud = pointCloud.Clone
+        '    End If
+        'End SyncLock
+
+        MyBase.GetNextFrameCounts(IMU_FrameTime)
+    End Sub
+    Public Sub stopCamera()
+        ' zed.Close()
+    End Sub
+End Class

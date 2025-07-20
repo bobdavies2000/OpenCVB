@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+	  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	  <PublishSingleFile>true</PublishSingleFile>
+	  <PublishReadyToRun>true</PublishReadyToRun>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108" />
+    <PackageReference Include="Stereolabs.zed" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="C:\Users\bobda\.nuget\packages\stereolabs.zed\5.0.1\build\..\runtimes\win10-x64\native\sl_zed_c.dll" />
+  </ItemGroup>
+
+</Project>
