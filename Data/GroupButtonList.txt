@@ -1,5 +1,4 @@
 AddWeighted
-AlphaChannel
 Annealing
 ApproxPoly
 AsciiArt

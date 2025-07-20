@@ -22,4 +22,8 @@
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.10.0.20241108" />
   </ItemGroup>
 
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="&quot;$(SolutionDir)UI_Generator\bin\x64\Release\net8.0\UI_Generator.exe&quot;" />
+  </Target>
+
 </Project>

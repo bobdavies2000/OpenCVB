@@ -44,7 +44,7 @@ Module UI_Generator
                                             HomeDir.FullName + "CS_Classes/Non_AI.cs"})          ' all the old-style native code.
 
         Try
-            Dim VBcodeDir As New DirectoryInfo(HomeDir.FullName + "VB_Classes/") ' all the vb algorithms are here.
+            Dim VBcodeDir As New DirectoryInfo(HomeDir.FullName + "VBClasses/") ' all the vb algorithms are here.
 
             Dim OptionsFile = New FileInfo(VBcodeDir.FullName + "Options.vb")
             Dim includeOptions = New FileInfo(HomeDir.FullName + "CPP_Native/Options.h")
