@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports CamZed
-Public Class CameraZED2 : Inherits GenericCamera
+Public Class CameraZed2 : Inherits GenericCamera
     Dim zed As CamZed
     Public Sub New(workRes As cv.Size, captureRes As cv.Size, deviceName As String)
         zed = New CamZed(workRes, captureRes, deviceName)
@@ -29,6 +29,6 @@ Public Class CameraZED2 : Inherits GenericCamera
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
-        zed.StopCamera()
+        zed.stopCamera()
     End Sub
 End Class
