@@ -1,39 +1,24 @@
-# 2025 July 11th – RGB Line Tracking, Options Close, EdgeLine, DepthRGB, Hull Lines, OpenGL Testing, and Options Changes.
+# 2025 July 20th – Gravity Vector, Net8.0 changes, CamZed, Update_All.bat, and Menus.
 
 -   Over 1800 algorithms are included, averaging 37 lines of code per algorithm.
--   The “Gravity RGB Vector” is identified and tracked in the RGB image
-    -   The line is parallel to the gravity vector if one is available.
-    -   The gravity RGB vector is also used to stabilize the gravity IMU vector.
-    -   With door or picture frames, nearly identical lines may show instability.
--   OpenCVB will close the app if the algorithm options container is closed.
-    -   This was just a convenience feature that felt correct.
--   EdgeLine was reworked to keep track of individual lines and edges.
-    -   Lines and edges are identified and loosely tracked.
--   Improved DepthRGB display in dst1 – Depth is shown for the grid rect.
-    -   Mouse over DepthRGB (dst1) to see the benefit.
-    -   DepthRGB may be displayed as “Colorized Depth” and “Depth Correlations”.
--   Hull lines are lines defined by the edges of a hull.
-    -   Simple way to get more feature lines for testing.
--   OpenGL algorithms are exempted from the overnight testing.
-    -   Every OpenGL algorithm is a leaf – no algorithms depend on its output.
-    -   The goal of the algorithm is simply to visualize the data involved.
-    -   Other interactive applications can run during testing runs.
--   RedCloud options are no longer always visible in the algorithm options
-    -   The same options appear in algorithm specific forms (typically offset.)
--   StereoLabs support was always present by default but needn’t be.
-    -   Use CameraDefines.h to enable support for StereoLabs cameras.
--   Support for Orbbec Gemini 335L is present but Gemini 335 needed an update.
--   OpenCV 4.13 (the current version) was added (PragmaLibs.h updated.)
--   Kinect 4 Azure camera interface dropped – no longer needed.
+-   The gravity RGB vector is always shown full-length to allow accurate comparisons.
+-   The main form for OpenCVB was rebuilt using .Net 8.0.
+    -   All the libraries and interfaces were rebuilt as well
+    -   This change required a complete review of the OpenCVB’s infrastructure.
+-   GIFBuilder has been converted to a .Net 8.0 console application. Update_All.bat fixed.
+-   UI_Generator converted to .Net 8.0 console application. VB_Classes project updated.
+-   The ZED camera support is using the NuGet package instead of a custom VB interface.
+    -   The new CamZed C\# class library was able to use NuGet but VB.Net could not.
+-   Install script (Update_All.bat) is a one-page file for the SDK and OpenCV downloads.
+    -   No more complicated .Net Framework or StereoLabs requirements.
+-   GIF algorithms are skipped during overnight testing – only leaf code for visualization.
+-   Better default setting for Histogram Bins with an override mechanism if needed.
+-   The main form will no longer have menus – they were never being used.
 -   A log of previous changes is included at the bottom of this document.
-
-![A collage of images of a room AI-generated content may be incorrect.](media/62150eb1904b9faf9d77b56958341e17.png)
-
-**LineRGB_Basics:** *The presentation of the gravity vector has been updated. In the upper left image, the longest RGB line - the “Gravity RGB Vector” - is shown in yellow. The longest line parallel to gravity is preferred if available. The lower right image shows all the lines detected in the image while the lower left image shows the longest RGB lines and their age in frames. The upper right image shows the DepthRGB with the depth and depth range under the mouse.*
 
 \-----------------------------------------------------------------------------------------------
 
-NOTE: OpenCVB has evolved away from implementing algorithms in multiple languages because AI has made it convenient to translate the algorithms into any language. While C\#, C++, and Python are discussed below, the algorithms are now exclusively written in VB.Net because it is the most convenient to type in and the simplest to read. Translate to any language using CodeConvert.ai or similar alternative.
+NOTE: OpenCVB has evolved away from implementing algorithms in multiple languages because AI has made it convenient to translate the algorithms into any language. While C\#, C++, and Python examples were included in earlier versions of OpenCVB, the algorithms are now exclusively written in VB.Net. It is the most convenient to type in and the simplest to read. Translate to any language using CodeConvert.ai or similar alternative.
 
 \-----------------------------------------------------------------------------------------------
 
@@ -51,7 +36,7 @@ The basic layout of OpenCVB is shown below. Any of the algorithms can be selecte
 
 ![A collage of images AI-generated content may be incorrect.](media/dc4af39634b70fc7788d6ac462e4aedb.png)
 
-**OpenCVB Layout:** *A typical layout of the OpenCVB application is shown above. The upper left contains the RGB camera output with lines for gravity and the horizon. The upper right contains several different displays of the depth information – see “Global Options”. Here, left/right correlation coefficients are shown – the brighter the red, the higher the correlation. Alternatively, it may show a conventional depth representation of yellow (close) to blue (far). The algorithm outputs are in the bottom left and right. This algorithm (Segmented Linear Regression or SLR_Trends) has only one output in the lower left. Labels above all images are controlled by the algorithm.*
+**OpenCVB Layout:** *A typical layout of the OpenCVB application is shown above. The upper left contains the RGB camera output with lines for gravity and the horizon. The upper right contains several different displays of the depth information – see “Global Options”. Here, left/right correlation coefficients are shown – the brighter the red, the higher the correlation. The algorithm outputs are in the bottom left and right. This algorithm (Segmented Linear Regression or SLR_Trends) has only one output in the lower left. Labels above all images are controlled by the algorithm.*
 
 ![](media/62125113f320d08576258e7ea28bc8bb.png)
 
@@ -65,11 +50,11 @@ The basic layout of OpenCVB is shown below. Any of the algorithms can be selecte
 
 **Magnify:** *The ![](media/d3475bdf6e3afa8ae87003ed8aafefcf.png) button will magnify the selected portion of the image. To select a portion of an image just click anywhere in the image and hold while dragging the mouse to create the “DrawRect”. Then click the magnify button to open a window with the 5X magnification of the drawn rectangle.*
 
-**Pixel Viewer:** *The ![](media/b5c54b9b31c1c9e4aabb65640ba92463.png) button will display a separate form showing the integer or float values for each pixel. Any of the 4 images may be selected. The pixel viewer is aware of the image type so if the image is 32-bit, it will show the floating point values.*
+**Pixel Viewer:** *The ![](media/b5c54b9b31c1c9e4aabb65640ba92463.png) button will display a separate form showing the integer or float values for each pixel. Any of the 4 images may be selected. The pixel viewer is aware of the image type so if the image is 32-bit float, it will show the floating point values.*
 
 **Recently Used Algorithms:** *The ![](media/2b0c572c8fc421c071cf13aa57437abc.png)button is a pulldown that displays the last 50 algorithms that were run. The “Test All” button (“Regression Testing”) does NOT update the recent list. The “Recent” list is updated only when there is a change in the algorithm combo box.*
 
-**A-Z Button:** *The ![](media/fa9f33e3289db7e485b06594e2204c4c.png)button displays a list of all the algorithm categories. Click on any entry to open the first algorithm in that category. Using “A-Z” is faster than using the complete list of algorithms.*
+**A-Z Button:** *The ![](media/fa9f33e3289db7e485b06594e2204c4c.png)button displays a list of all the algorithm groups. Click on any entry to open the first algorithm in that category. Using “A-Z” is faster than using the combo box with the complete list of algorithms.*
 
 **Algorithm Description:** *Every algorithm provides a simple description of the algorithm. It is always at the right edge of the main form and may be multiple lines.*
 
@@ -93,7 +78,7 @@ There are other objectives. Convolutions combined with neural nets (CNN’s) are
 
 # What If?
 
-And what if all cameras had depth and an IMU? Making this assumption explains why only a few cameras from StereoLabs, Intel, Orbbec, and others are currently supported. The data from each camera – color, depth, point cloud, and IMU data - is presented to all the algorithms in the same standardized format. More cameras with depth are expected to arrive and integration with OpenCVB is likely to follow. OpenCVB is an opportunity to experiment with the features of these cameras and apply the same algorithm to all of them.
+And what if all cameras had depth and an IMU? Making this assumption explains why only a few cameras from StereoLabs, Intel, Orbbec, Luxonis, and others are currently supported. The data from each camera – color, depth, point cloud, and IMU data - is presented to all the algorithms in the same standardized format. More cameras with depth are expected to arrive and integration with OpenCVB is likely to follow. OpenCVB is an opportunity to experiment with the features of these cameras and apply the same algorithm to all of them.
 
 The algorithms are notably short, almost always less than a page of code, labelled reasonably well, easily searched, and easily combined, while often providing links in the code to online documentation and versions for other platforms. Many existing algorithms on the web have environmental considerations that can obscure the meaning or context of an algorithm and complicate downloading. All the algorithms here contain just the algorithm separate from any camera dependencies and will work with each of the supported cameras. Isolating just the algorithm functionality enables easy adaptation to other environments or platforms.
 
@@ -103,18 +88,14 @@ Here are the pre-install requirements:
 
 -   Windows 10 or Windows 11
 -   Visual Studio Community Edition (free)
--   Install Python from <https://www.python.org/downloads/>
-    -   Be sure to click the option to add Python to the path.
 -   Any one of the following RGBD cameras:
-    -   Microsoft Kinect for Azure
-    -   Intel RealSense D435i
     -   StereoLabs ZED2
-    -   Mynt Eye D 1000
+    -   Intel RealSense D435i
     -   Intel RealSense D455 – the latest in the series of Intel RealSense cameras
     -   Luxonis Oak-D Pro or Oak-D Series 2. (Oak-D Lite will work but has no IMU.)
-    -   Orbbec Gemini 335L
+    -   Orbbec Gemini 335L and Gemini 335
 
-All of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft Kinect for Azure has the best depth accuracy but requires more power and is not as portable as StereoLabs or Intel cameras. All the cameras use USB-C to provide data to the host platform.
+All of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft Kinect for Azure (no longer supported) has the best depth accuracy but requires more power and is not as portable as StereoLabs or Intel cameras. All the cameras use USB-C to provide data to the host platform.
 
 Download and install the following software. Each is free and easily downloaded for Windows 10:
 
@@ -132,15 +113,12 @@ Installation is not as simple as opening the OpenCVB.sln file but it is not much
 
 -   Run the “Update_All.bat” script that comes with OpenCVB. It will download and run CMake for the needed libraries.
     -   The OpenCVB tree will occupy about 25Gb of disk space – plan accordingly. The process can take 30-50 minutes.
--   Download the Kinect4Azure proprietary binaries (needed even if you don’t have the Microsoft camera):
-    -   <https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md>
 -   Download and install the OrbbecSDK proprietary binaries.
     -   https://github.com/orbbec/OrbbecSDK/releases
 -   Open the OpenCVB.sln.
 -   The “Update_All.bat” script can be used to update each component downloaded by OpenCVB:
     -   Remove **“\<OpenCVB Dir\>/OakD/Build”** to update the Oak-D camera support
     -   Remove **“\<OpenCVB Dir\>/librealsense”** to update the Realsense camera support
-    -   Remove **“\<OpenCVB Dir\>/Azure-Kinect-Sensor-SDK”** to update Microsoft Kinect for Azure support
     -   Remove **“\<OpenCVB Dir\>/opencv”** to update both OpenCV and OpenCV contributions.
     -   Remove **“\<OpenCVB Dir\>/OrbbecSDK”** to update the latest Orbbec code.
     -   Use Visual Studio’s NuGet Package Manager for any other updates.
@@ -167,7 +145,6 @@ Some typical problems with new installations:
 
 -   If OpenCVB installation fails, there are simple ways to determine what needs to be changed.
     -   Each “Build” directory will have a .sln file. If any of the files below are missing, run CMake-gui to find out why:
-        -   \<OpenCVB Dir\>/Azure-Kinect-Sensor-SDK/Build/K4A.sln
         -   \<OpenCVB Dir\>/librealsense/Build/librealsense2.sln
         -   \<OpenCVB Dir\>/opencv/Build/opencv.sln
         -   \<OpenCVB Dir\>/OrbbecSDK/Build/ OrbbecSDK.sln
@@ -175,7 +152,7 @@ Some typical problems with new installations:
     -   Figure out which component is failing:
         -   Review the output of the “Update_All.bat” run. Which component didn’t complete?
     -   Post any problems encountered. Install problems have the highest priority.
--   Camera Failure: check the camera installation by testing the examples provided by the camera vendor. Did the Kinect4Azure support get upgraded recently? Post if some configuration problems prevent the camera from working in OpenCVB.
+-   Camera Failure: check the camera installation by testing the examples provided by the camera vendor. Post if some configuration problems prevent the camera from working in OpenCVB.
 -   Link problems: the C++ code in OpenCVB relies on PragmaLibs.h which is automatically created as part of the build process. “PragmaLibs.h” defines the names of the OpenCV libraries. It should be updated automatically with the current OpenCV version that is in use. If not, run the “VersionUpdates” application included in the OpenCVB tree. “VersionUpdates” will update the names of the files from OpenCV to be linked into the OpenCVB interfaces. Open the “PragmaLibs.h” file to see the current version of OpenCV that is expected to be present.
 
 # Building New Experiments with Snippets
@@ -186,19 +163,12 @@ Code snippets are installed using the Tools/Code Snippets Manager menu entry. Fo
 
 \<OpenCVB HomeDir\>/OpenCVB.snippets \>
 
-For C++ and VB.Net writing a new experiment requires a new class to be added in the “VB_Classes” project. OpenCVB will automatically detect the new class and present it in the user interface. The UI_Generator project is invoked in a pre-compile step for the VB_Classes project and the CS_Classes project. Just add code for a new algorithm and it will automatically appear in the user interface. Similarly, for C\# algorithms, add a code snippet to the “Non_AI.cs” file and the recompile will add the algorithm to the user interface. If you are using CodeConvert.ai to translate a VB.Net algorithm to C\#, place the translated C\# version in “CS_AI_Generated.cs”.
-
-Python examples don’t even require a VB.Net wrapper. But they do need to be added to the Python_Classes Project. Python algorithms, once added to the Python_Classes project, will appear in the user interface.
-
-There are several VB.Net examples that demonstrate how to move images to Python and get results back into the OpenCVB user interface (see “AddWeighted_PS.py” as an example that is only a few lines of code.)
-
 To install OpenCVB’s snippets in Visual Studio:
 
 -   Click the menu “Tools/Code Snippets Manager”.
 -   Select “Basic” or “CSharp” as the Language.
 -   Add the “\<OpenCVB Dir\>/OpenCVB.snippets” directory.
 -   Access the code snippets with a right-click in the VB.Net or C\# code, select “Snippet/Insert Snippet” and select “OpenCVB.snippets”.
--   Even C++ algorithms can use snippets, but each C++ algorithm has a VB.Net entry that includes both the C++ and the VB.Net code in the snippet. The C++ portion can be cut and pasted anywhere in OpenCVB’s “CPP_Managed” Visual Studio project.
 
 An alternate way to add projects is also available in OpenCVB. To see the complete list of algorithm types that can be added to OpenCVB, click on the “Blue Plus” button*![](media/0dede74f225b8e19e8f4fd5a50ba9f28.png)* in OpenCVB’s main toolbar. A dialog box will guide the selection of the type of algorithm to be added.
 
@@ -293,7 +263,7 @@ The plan is to continue adding more algorithms. There are numerous published alg
 
 # Acknowledgements
 
-The list of people who have made OpenCVB possible is long but starts with the OpenCV contributors – particularly Intel employees Gary Bradski, Victor Erukhimov, and Vadim Pisarevsky - and Intel’s decision to contribute the code to the open source community. Also, this code would not exist without OpenCVSharp’s managed code interface to OpenCV provided by user “shimat”. There is a further Intel contribution to this software in the form of RealSense cameras – low-cost 3D cameras for the maker community as well as robotics developers and others. RealSense developers Sterling Orsten and Leo Keselman were exceptionally helpful in educating this author. While others may disagree, there is no better platform for developing computer vision software than the one provided by Microsoft Visual Studio and VB.Net. And Microsoft’s Kinect for Azure camera is a valuable addition to the 3D camera effort as is CodeConverter.ai that has enabled improving the code through translating it to other languages. And lastly, Google’s contribution to this effort was invaluable. Thanks to all the computer vision developers who posted algorithms where Google could find them. From this author’s perspective, the work of all these individuals and organizations is like catnip and feathers to a kitten.
+The list of people who have made OpenCVB possible is long but starts with the OpenCV contributors – particularly Intel employees Gary Bradski, Victor Erukhimov, and Vadim Pisarevsky - and Intel’s decision to contribute the code to the open source community. Also, this code would not exist without OpenCVSharp’s managed code interface to OpenCV provided by user “shimat”. There is a further Intel contribution to this software in the form of RealSense cameras – low-cost 3D cameras for the maker community as well as robotics developers and others. RealSense developers Sterling Orsten and Leo Keselman were exceptionally helpful in educating this author. While others may disagree, there is no better platform for developing computer vision software than the one provided by Microsoft Visual Studio and VB.Net. And Microsoft’s Kinect for Azure camera is (was?) a valuable addition to the 3D camera effort as is CodeConverter.ai that has enabled improving the code through translating it to other languages. And lastly, Google’s contribution to this effort was invaluable. Thanks to all the computer vision developers who posted algorithms where Google could find them. From this author’s perspective, the work of all these individuals and organizations is like catnip and feathers to a kitten.
 
 # MIT License
 
@@ -1678,8 +1648,8 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   Ideal depth is clearly visible from both the left and right cameras.
     -   See example output below showing cells covering the depth image.
 -   TreeView form was moved into the VB_Classes where the data is produced.
-    -   Allowed code to be simpler in the Main_UI form.
-    -   TreeView button is no longer needed in Main_UI
+    -   Allowed code to be simpler in the Main form.
+    -   TreeView button is no longer needed in Main
 -   A log of previous changes is included at the bottom of this document.
 
 **![A collage of a person using a computer Description automatically generated](media/1c85b62195b05f1695bd32287f38eac8.gif)Depth_Ideal :** *The cells marked in the lower left image have ideal depth data with a high percentage of the cell’s pixels containing a depth value. By definition, they are the cells which are fully visible in both the left and right cameras. The lower right image is the point cloud containing only the cells that have ideal depth. The lower right image is filtered by motion – only the cells in the motion mask are updated on each frame.*
@@ -2062,3 +2032,36 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   A log of previous changes is included at the bottom of this document.
 
 **![A red and yellow lines on a black background AI-generated content may be incorrect.](media/58382b8918581bfb06ad7ea4a17fd803.gif)Gravity Vector:** *This output shows the typical subtle jitter for the gravity vector. The camera was not moving during this test and shows that the IMU captures the gravity vector but with slight variations from frame to frame. The new Gravity_Basics algorithm in OpenCVB uses the longest line in the RGB image to remove this variability. If the RGB line shows motion, the IMU gravity values are used.*
+
+# 2025 July 11th – RGB Line Tracking, Options Close, EdgeLine, DepthRGB, Hull Lines, OpenGL Testing, and Options Changes.
+
+-   Over 1800 algorithms are included, averaging 37 lines of code per algorithm.
+-   The “Gravity RGB Vector” is identified and tracked in the RGB image
+    -   The line is parallel to the gravity vector if one is available.
+    -   The gravity RGB vector is also used to stabilize the gravity IMU vector.
+    -   With door or picture frames, nearly identical lines may show instability.
+-   OpenCVB will close the app if the algorithm options container is closed.
+    -   This was just a convenience feature that felt correct.
+-   EdgeLine was reworked to keep track of individual lines and edges.
+    -   Lines and edges are identified and loosely tracked.
+-   Improved DepthRGB display in dst1 – Depth is shown for the grid rect.
+    -   Mouse over DepthRGB (dst1) to see the benefit.
+    -   DepthRGB may be displayed as “Colorized Depth” and “Depth Correlations”.
+-   Hull lines are lines defined by the edges of a hull.
+    -   Simple way to get more feature lines for testing.
+-   OpenGL algorithms are exempted from the overnight testing.
+    -   Every OpenGL algorithm is a leaf – no algorithms depend on its output.
+    -   The goal of the algorithm is simply to visualize the data involved.
+    -   Other interactive applications can run during testing runs.
+-   RedCloud options are no longer always visible in the algorithm options
+    -   The same options appear in algorithm specific forms (typically offset.)
+-   StereoLabs support was always present by default but needn’t be.
+    -   Use CameraDefines.h to enable support for StereoLabs cameras.
+-   Support for Orbbec Gemini 335L is present but Gemini 335 needed an update.
+-   OpenCV 4.13 (the current version) was added (PragmaLibs.h updated.)
+-   Kinect 4 Azure camera interface dropped – no longer needed.
+-   A log of previous changes is included at the bottom of this document.
+
+![A collage of images of a room AI-generated content may be incorrect.](media/62150eb1904b9faf9d77b56958341e17.png)
+
+**LineRGB_Basics:** *The presentation of the gravity vector has been updated. In the upper left image, the longest RGB line - the “Gravity RGB Vector” - is shown in yellow. The longest line parallel to gravity is preferred if available. The lower right image shows all the lines detected in the image while the lower left image shows the longest RGB lines and their age in frames. The upper right image shows the DepthRGB with the depth and depth range under the mouse.*
