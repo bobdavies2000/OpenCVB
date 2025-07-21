@@ -133,13 +133,11 @@ Public Class Main
 
     Dim depthAndCorrelationText As String
     Public Shared cameraNames As New List(Of String)({"StereoLabs ZED 2/2i",
-                                                      "Orbbec Gemini 335L",
+                                                      "Orbbec Gemini 335",
                                                       "Orbbec Gemini 336L",
                                                       "Oak-D camera",
                                                       "Intel(R) RealSense(TM) Depth Camera 435i",
-                                                      "Intel(R) RealSense(TM) Depth Camera 455",
-                                                      "MYNT-EYE-D1000",
-                                                      "Orbbec Gemini 335"})
+                                                      "Intel(R) RealSense(TM) Depth Camera 455"})
     Public Sub jsonRead()
         jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
         settings = jsonfs.Load()(0)
@@ -154,12 +152,8 @@ Public Class Main
             Dim stereoLabsDefineIsOff As Boolean
             Dim sr = New StreamReader(defines.FullName)
             Dim zedIndex = cameraNames.IndexOf("StereoLabs ZED 2/2i")
-            Dim myntIndex = cameraNames.IndexOf("MYNT-EYE-D1000")
             While sr.EndOfStream = False
                 Dim nextLine = sr.ReadLine
-                If nextLine.StartsWith("#define MYNTD_1000") Then
-                    .cameraSupported(myntIndex) = True
-                End If
                 If nextLine.Contains("STEREOLAB") Then
                     If nextLine.StartsWith("//") Then
                         .cameraSupported(zedIndex) = False
@@ -220,13 +214,6 @@ Public Class Main
                 For i = 0 To cameraNames.Count - 1
                     If cameraNames(i) = .cameraName Then .cameraIndex = i
                 Next
-            End If
-
-            If .cameraPresent(myntIndex) And .cameraSupported(myntIndex) = False Then
-                MessageBox.Show("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
-                       "Cam_MyntD.dll has not been built." + vbCrLf + vbCrLf +
-                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-                       "and run AddMynt.bat in OpenCVB's home directory.")
             End If
 
             If .cameraPresent(zedIndex) And .cameraSupported(zedIndex) = False And stereoLabsDefineIsOff = False Then
@@ -1319,9 +1306,9 @@ Public Class Main
                 '    Return New CameraOakD_CPP(settings.workRes, settings.captureRes, settings.cameraName)
             Case "StereoLabs ZED 2/2i"
                 Return New CameraZED2(settings.workRes, settings.captureRes, settings.cameraName)
-                'Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
-                '    Return New CameraORB(settings.workRes, settings.captureRes, settings.cameraName)
-                ' Return New CameraORB_CPP(settings.workRes, settings.captureRes, settings.cameraName)
+            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
+                Return New CameraORB(settings.workRes, settings.captureRes, settings.cameraName)
+                'Return New CameraORB_CPP(settings.workRes, settings.captureRes, settings.cameraName)
         End Select
         Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
     End Function

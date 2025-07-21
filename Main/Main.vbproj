@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Cameras\Orb335L\Orb335L.vcxproj" />
     <ProjectReference Include="..\CamZed\CamZed.csproj" />
     <ProjectReference Include="..\VBClasses\VBClasses.vbproj" />
   </ItemGroup>
@@ -32,6 +33,9 @@
   <ItemGroup>
     <Reference Include="Intel.RealSense">
       <HintPath>..\librealsense\Build\wrappers\csharp\Intel.RealSense\obj\x64\Release\Intel.RealSense.dll</HintPath>
+    </Reference>
+    <Reference Include="ob_csharp">
+      <HintPath>..\OrbbecSDK_CSharp\Build\Release\ob_csharp.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp">
       <HintPath>..\..\opencvsharp_samples\packages\OpenCvSharp4.4.9.0.20240103\lib\net48\OpenCvSharp.dll</HintPath>
