@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CamZedClass\CamZedClass.csproj" />
+    <ProjectReference Include="..\CamZedClass\CamZed.csproj" />
     <ProjectReference Include="..\VBClasses\VBClasses.vbproj" />
   </ItemGroup>
 

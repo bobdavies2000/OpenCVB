@@ -18,7 +18,7 @@ public class RgbIntrinsics
 }
 
 
-public class CamZedClass
+public class CamZed
 {
     public Cv.Mat color, rightView, leftView, pointCloud;
     public Cv.Point3f IMU_Acceleration, IMU_AngularVelocity;
@@ -38,7 +38,7 @@ public class CamZedClass
     private static ulong IMU_StartTime = 0; // Use ulong for timestamps
 
     // Constructor
-    public CamZedClass(Cv.Size workRes, Cv.Size captureRes, string deviceName)
+    public CamZed(Cv.Size workRes, Cv.Size captureRes, string deviceName)
     {
         init_params = new sl.InitParameters(); // Instantiate here
         init_params.sensorsRequired = true;
