@@ -133,19 +133,11 @@ Public Class Main
     Dim motionLabel As String
 
     Dim depthAndCorrelationText As String
-    'Public Shared cameraNames As New List(Of String)({"StereoLabs ZED 2/2i",
-    '                                                  "Orbbec Gemini 335L",
-    '                                                  "Orbbec Gemini 336L",
-    '                                                  "Oak-D camera",
-    '                                                  "Intel(R) RealSense(TM) Depth Camera 435i",
-    '                                                  "Intel(R) RealSense(TM) Depth Camera 455",
-    '                                                  "MYNT-EYE-D1000",
-    '                                                  "Orbbec Gemini 335"})
-    Public Shared cameraNames As New List(Of String)({"Intel(R) RealSense(TM) Depth Camera 435i",
-                                                      "StereoLabs ZED 2/2i",
+    Public Shared cameraNames As New List(Of String)({"StereoLabs ZED 2/2i",
                                                       "Orbbec Gemini 335L",
                                                       "Orbbec Gemini 336L",
                                                       "Oak-D camera",
+                                                      "Intel(R) RealSense(TM) Depth Camera 435i",
                                                       "Intel(R) RealSense(TM) Depth Camera 455",
                                                       "MYNT-EYE-D1000",
                                                       "Orbbec Gemini 335"})
@@ -293,7 +285,7 @@ Public Class Main
             If .snap320 = False And .snap640 = False And .snapCustom = False Then .snap640 = True
             If .snap640 Then
                 .locationMain.Item2 = 1321
-                .locationMain.Item3 = 870
+                .locationMain.Item3 = 845
                 If wh = 240 Or wh = 480 Or wh = 120 Then .locationMain.Item3 = 1096
                 If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cv.Size(640, 480) Else .displayRes = New cv.Size(640, 360)
             ElseIf .snap320 Then
@@ -588,7 +580,8 @@ Public Class Main
         camLabel(3).Text = picLabels(3)
     End Sub
     Private Sub setupCamPics()
-        Dim goodPoint = Screen.GetWorkingArea(New Point(Me.Left, Me.Top)) ' when they change the primary monitor, old coordinates can go way off the screen.
+        ' when you change the primary monitor, old coordinates can go way off the screen.
+        Dim goodPoint = Screen.GetWorkingArea(New Point(Me.Left, Me.Top))
         If goodPoint.X > Me.Left Then Me.Left = goodPoint.X
         If goodPoint.Y > Me.Top Then Me.Top = goodPoint.Y
 
@@ -630,7 +623,7 @@ Public Class Main
         If settings.snap640 Then imgWidth = 640
         If settings.snap320 Then imgWidth = 320
         Dim padX = 12
-        Dim padY = 60
+        Dim padY = 35
         If settings.snapCustom Then ' custom size - neither snap320 or snap640
             Dim ratio = settings.workRes.Height / settings.workRes.Width
             imgWidth = Me.Width / 2 - padX * 2
@@ -1271,12 +1264,6 @@ Public Class Main
         Next
         Return foundCamera
     End Function
-    Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        saveAlgorithmName = "" ' this will close the current algorithm.
-        jsonWrite()
-
-        cameraTaskHandle = Nothing
-    End Sub
     Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
         If AvailableAlgorithms.Items.Count = 0 Then Exit Sub
         If (paintNewImages Or algorithmRefresh) And AvailableAlgorithms.Text.StartsWith(saveAlgorithmName) Then
@@ -1328,19 +1315,23 @@ Public Class Main
         CameraSwitching.Text = settings.cameraName + " starting"
     End Sub
     Private Function getCamera() As Object
-        'Select Case settings.cameraName
-        '    Case "Intel(R) RealSense(TM) Depth Camera 455", "Intel(R) RealSense(TM) Depth Camera 435i"
-        '        Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
-        '        'Case "Oak-D camera"
-        '        '    Return New CameraOakD_CPP(settings.workRes, settings.captureRes, settings.cameraName)
-        '        'Case "StereoLabs ZED 2/2i"
-        '        '    Return New CameraZED2(settings.workRes, settings.captureRes, settings.cameraName)
-        '        'Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
-        '        '    Return New CameraORB(settings.workRes, settings.captureRes, settings.cameraName)
-        '        ' Return New CameraORB_CPP(settings.workRes, settings.captureRes, settings.cameraName)
-        'End Select
+        Select Case settings.cameraName
+            Case "Intel(R) RealSense(TM) Depth Camera 455", "Intel(R) RealSense(TM) Depth Camera 435i"
+                Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
+                'Case "Oak-D camera"
+                '    Return New CameraOakD_CPP(settings.workRes, settings.captureRes, settings.cameraName)
+            Case "StereoLabs ZED 2/2i"
+                Return New CameraZED2(settings.workRes, settings.captureRes, settings.cameraName)
+                'Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
+                '    Return New CameraORB(settings.workRes, settings.captureRes, settings.cameraName)
+                ' Return New CameraORB_CPP(settings.workRes, settings.captureRes, settings.cameraName)
+        End Select
         Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
     End Function
+    Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        jsonWrite()
+        saveAlgorithmName = "" ' this will close the current algorithm and the camera.
+    End Sub
     Private Sub CameraTask()
         restartCameraRequest = True
 
@@ -1382,7 +1373,7 @@ Public Class Main
                 End SyncLock
 
             End If
-            If cameraTaskHandle Is Nothing Then
+            If saveAlgorithmName = "" Then
                 camera.stopCamera()
                 Exit Sub
             End If

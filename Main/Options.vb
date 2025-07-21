@@ -70,7 +70,6 @@ Public Class Options
     End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
         Dim index = Main.cameraNames.IndexOf(sender.text)
-        If sender.checked = False Then Exit Sub
         cameraName = Main.cameraNames(index)
         cameraIndex = index
 
