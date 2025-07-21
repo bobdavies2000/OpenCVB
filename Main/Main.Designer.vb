@@ -28,7 +28,7 @@ Partial Class Main
         PausePlayButton = New ToolStripButton()
         OptionsButton = New ToolStripButton()
         TestAllButton = New ToolStripButton()
-        MagnifyButton = New ToolStripButton()
+        Magnify = New ToolStripButton()
         PixelViewerButton = New ToolStripButton()
         RecentList = New ToolStripDropDownButton()
         AvailableAlgorithms = New ToolStripComboBox()
@@ -52,7 +52,7 @@ Partial Class Main
         ' ToolStrip1
         ' 
         ToolStrip1.ImageScalingSize = New Size(24, 24)
-        ToolStrip1.Items.AddRange(New ToolStripItem() {PausePlayButton, OptionsButton, TestAllButton, MagnifyButton, PixelViewerButton, RecentList, AvailableAlgorithms, AtoZButton, GroupComboBox, AlgDescription})
+        ToolStrip1.Items.AddRange(New ToolStripItem() {PausePlayButton, OptionsButton, TestAllButton, Magnify, PixelViewerButton, RecentList, AvailableAlgorithms, AtoZButton, GroupComboBox, AlgDescription})
         ToolStrip1.Location = New Point(0, 0)
         ToolStrip1.Name = "ToolStrip1"
         ToolStrip1.Size = New Size(1582, 34)
@@ -86,14 +86,14 @@ Partial Class Main
         TestAllButton.Size = New Size(34, 29)
         TestAllButton.Text = "ToolStripButton2"
         ' 
-        ' MagnifyButton
+        ' Magnify
         ' 
-        MagnifyButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-        MagnifyButton.Image = CType(resources.GetObject("MagnifyButton.Image"), Image)
-        MagnifyButton.ImageTransparentColor = Color.Magenta
-        MagnifyButton.Name = "MagnifyButton"
-        MagnifyButton.Size = New Size(34, 29)
-        MagnifyButton.Text = "ToolStripButton3"
+        Magnify.DisplayStyle = ToolStripItemDisplayStyle.Image
+        Magnify.Image = CType(resources.GetObject("Magnify.Image"), Image)
+        Magnify.ImageTransparentColor = Color.Magenta
+        Magnify.Name = "Magnify"
+        Magnify.Size = New Size(34, 29)
+        Magnify.Text = "ToolStripButton3"
         ' 
         ' PixelViewerButton
         ' 
@@ -169,7 +169,17 @@ Partial Class Main
         ' fpsTimer
         ' 
         ' 
+        ' TestAllTimer
+        ' 
+        ' 
         ' CamSwitchTimer
+        ' 
+        ' 
+        ' RefreshTimer
+        ' 
+        RefreshTimer.Enabled = True
+        ' 
+        ' MagnifyTimer
         ' 
         ' 
         ' Main
@@ -194,7 +204,7 @@ Partial Class Main
     Friend WithEvents PausePlayButton As ToolStripButton
     Friend WithEvents OptionsButton As ToolStripButton
     Friend WithEvents TestAllButton As ToolStripButton
-    Friend WithEvents MagnifyButton As ToolStripButton
+    Friend WithEvents Magnify As ToolStripButton
     Friend WithEvents PixelViewerButton As ToolStripButton
     Friend WithEvents AvailableAlgorithms As ToolStripComboBox
     Friend WithEvents AtoZButton As ToolStripButton

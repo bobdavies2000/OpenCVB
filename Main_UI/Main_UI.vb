@@ -797,13 +797,6 @@ Public Class Main_UI
             SaveSetting("OpenCVB", "algHistory" + CStr(i), "algHistory" + CStr(i), algHistory(i))
         Next
     End Sub
-    Public Class compareAllowIdenticalString : Implements IComparer(Of String)
-        Public Function Compare(ByVal a As String, ByVal b As String) As Integer Implements IComparer(Of String).Compare
-            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
-            If a >= b Then Return 1
-            Return -1
-        End Function
-    End Class
     Private Function killThread(threadName As String) As Boolean
         Dim proc = Process.GetProcesses()
         Dim foundCamera As Boolean
@@ -1174,7 +1167,7 @@ Public Class Main_UI
             settings.cameraIndex = saveCameraIndex
         End If
     End Sub
-    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles Magnify.Click
+    Private Sub Magnify_Click(sender As Object, e As EventArgs) Handles Magnify.Click
         MagnifyTimer.Enabled = True
         magIndex += 1
     End Sub

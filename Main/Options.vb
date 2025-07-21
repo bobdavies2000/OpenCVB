@@ -108,7 +108,6 @@ Public Class Options
         End If
 
         cameraRadioButton(Main.settings.cameraIndex).Checked = True
-        cameraRadioButton(4).Checked = True
 
         Snap640.Checked = Main.settings.snap640
         Snap320.Checked = Main.settings.snap320

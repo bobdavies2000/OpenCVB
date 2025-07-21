@@ -75,7 +75,7 @@ Partial Class Main_UI
         Me.OptionsButton.Image = CType(resources.GetObject("OptionsButton.Image"), System.Drawing.Image)
         Me.OptionsButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.OptionsButton.Name = "OptionsButton"
-        Me.OptionsButton.Size = New System.Drawing.Size(34, 29)
+        Me.OptionsButton.Size = New System.Drawing.Size(34, 33)
         Me.OptionsButton.Text = "OpenCVB Settings"
         '
         'TestAllButton
@@ -84,8 +84,8 @@ Partial Class Main_UI
         Me.TestAllButton.Image = CType(resources.GetObject("TestAllButton.Image"), System.Drawing.Image)
         Me.TestAllButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.TestAllButton.Name = "TestAllButton"
-        Me.TestAllButton.Size = New System.Drawing.Size(34, 29)
-        Me.TestAllButton.Text = "Test All Algorithms"
+        Me.TestAllButton.Size = New System.Drawing.Size(34, 33)
+        Me.TestAllButton.Text = "Test All"
         '
         'Magnify
         '
@@ -93,7 +93,7 @@ Partial Class Main_UI
         Me.Magnify.Image = CType(resources.GetObject("Magnify.Image"), System.Drawing.Image)
         Me.Magnify.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.Magnify.Name = "Magnify"
-        Me.Magnify.Size = New System.Drawing.Size(34, 29)
+        Me.Magnify.Size = New System.Drawing.Size(34, 33)
         Me.Magnify.Text = "Magnify - click then draw a rectangle"
         Me.Magnify.ToolTipText = "Magnify - draw a rectangle then click here."
         '
@@ -103,7 +103,7 @@ Partial Class Main_UI
         Me.PixelViewerButton.Image = CType(resources.GetObject("PixelViewerButton.Image"), System.Drawing.Image)
         Me.PixelViewerButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.PixelViewerButton.Name = "PixelViewerButton"
-        Me.PixelViewerButton.Size = New System.Drawing.Size(34, 29)
+        Me.PixelViewerButton.Size = New System.Drawing.Size(34, 33)
         Me.PixelViewerButton.Text = "PixelViewer to see pixels under the cursor"
         '
         'RecentList
@@ -132,7 +132,7 @@ Partial Class Main_UI
         Me.GroupButtonList.Image = CType(resources.GetObject("GroupButtonList.Image"), System.Drawing.Image)
         Me.GroupButtonList.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.GroupButtonList.Name = "GroupButtonList"
-        Me.GroupButtonList.Size = New System.Drawing.Size(45, 29)
+        Me.GroupButtonList.Size = New System.Drawing.Size(45, 33)
         Me.GroupButtonList.Text = "A-Z"
         Me.GroupButtonList.ToolTipText = "Jump to Algorithm Group"
         '
@@ -141,7 +141,7 @@ Partial Class Main_UI
         Me.GroupComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest
         Me.GroupComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
         Me.GroupComboBox.Name = "GroupComboBox"
-        Me.GroupComboBox.Size = New System.Drawing.Size(270, 34)
+        Me.GroupComboBox.Size = New System.Drawing.Size(270, 38)
         '
         'AlgorithmDesc
         '
