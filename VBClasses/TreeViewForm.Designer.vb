@@ -38,6 +38,7 @@ Partial Class TreeViewForm
         ' PercentTime
         ' 
         PercentTime.Location = New Point(450, 0)
+        PercentTime.Multiline = True
         PercentTime.Name = "PercentTime"
         PercentTime.Size = New Size(151, 31)
         PercentTime.TabIndex = 1
@@ -47,14 +48,14 @@ Partial Class TreeViewForm
         Timer2.Enabled = True
         Timer2.Interval = 1000
         ' 
-        ' TreeviewForm
+        ' TreeViewForm
         ' 
         AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(613, 950)
         Controls.Add(PercentTime)
         Controls.Add(TreeView1)
-        Name = "TreeviewForm"
+        Name = "TreeViewForm"
         Text = "TreeViewForm"
         ResumeLayout(False)
         PerformLayout()

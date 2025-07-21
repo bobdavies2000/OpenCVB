@@ -41,17 +41,14 @@ Public Class TaskParent : Implements IDisposable
         Dim lines() = stackTrace.Split(vbCrLf)
         Dim callStack As String = ""
         For i = 0 To lines.Count - 1
+            If lines(i).Contains("System.Environment") Then Continue For
+            If lines(i).Contains("TaskParent") Then Continue For
             lines(i) = Trim(lines(i))
-            Dim offset = InStr(lines(i), "VB_Classes.")
-            If offset > 0 Then
-                Dim partLine = Mid(lines(i), offset + 11)
-                If partLine.StartsWith("AlgorithmList.createVBAlgorithm") Then Exit For
-                Dim split() = partLine.Split("\")
-                partLine = Mid(partLine, 1, InStr(partLine, ".") - 1)
-                If Not (partLine.StartsWith("TaskParent") Or partLine.StartsWith("VBtask")) Then
-                    callStack = partLine + "\" + callStack
-                End If
-            End If
+            lines(i) = lines(i).Replace("at VBClasses.", "")
+            lines(i) = lines(i).Replace(" at VBClasses.", "")
+            lines(i) = lines(i).Substring(0, InStr(lines(i), ".") - 1)
+            If lines(i).StartsWith("VBtask") Then Exit For
+            callStack = lines(i) + "\" + callStack
         Next
 
         dst0 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
