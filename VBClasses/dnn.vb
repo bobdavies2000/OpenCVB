@@ -2,50 +2,6 @@ Imports cv = OpenCvSharp
 Imports OpenCvSharp.Dnn
 Imports System.IO
 Imports OpenCvSharp.DnnSuperres
-Public Class DNN_Test : Inherits TaskParent
-    Dim net As Net
-    Dim classnames() As String
-    Public Sub New()
-        'Dim modelFile As New FileInfo(task.HomeDir + "Data/bvlc_googlenet.caffemodel")
-        'If File.Exists(modelFile.FullName) = False Then
-        '    ' this site is apparently gone.  caffemodel is in the Data directory in OpenCVB_HomeDir
-        '    Dim client = HttpWebRequest.CreateHttp("http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel")
-        '    Dim response = client.GetResponse()
-        '    Dim responseStream = response.GetResponseStream()
-        '    Dim memory As New MemoryStream()
-        '    responseStream.CopyTo(memory)
-        '    File.WriteAllBytes(modelFile.FullName, memory.ToArray)
-        'End If
-        'Dim protoTxt = task.HomeDir + "Data/bvlc_googlenet.prototxt"
-        'net = CvDnn.ReadNetFromCaffe(protoTxt, modelFile.FullName)
-        'Dim synsetWords = task.HomeDir + "Data/synset_words.txt"
-        'classnames = File.ReadAllLines(synsetWords) ' .Select(line >= line.Split(' ').Last()).ToArray()
-        'For i = 0 To classnames.Count - 1
-        '    classnames(i) = classnames(i).Split(" ").Last
-        'Next
-
-        'labels(3) = "Input Image"
-        desc = "Download and use a Caffe database"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-
-        Dim image = cv.Cv2.ImRead(task.HomeDir + "Data/space_shuttle.jpg")
-        dst3 = image.Resize(dst3.Size())
-        Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
-        net.SetInput(inputBlob, "data")
-        Dim prob = net.Forward("prob")
-
-        Dim mm As mmData = GetMinMax(prob.Reshape(1, 1))
-        SetTrueText("Best classification: index = " + CStr(mm.maxLoc.X) + " which is for '" + classnames(mm.maxLoc.X) + "' with Probability " +
-                    Format(mm.maxVal, "#0.00%"), New cv.Point(40, 200))
-    End Sub
-End Class
-
-
-
-
-
-
 ' https://github.com/twMr7/rscvdnn
 Public Class DNN_Basics : Inherits TaskParent
     Dim net As Net
@@ -227,3 +183,44 @@ Public Class DNN_SuperResize : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+'Public Class DNN_Test : Inherits TaskParent
+'    Dim net As Net
+'    Dim classnames() As String
+'    Public Sub New()
+'        Dim modelFile As New FileInfo(task.HomeDir + "Data/bvlc_googlenet.caffemodel")
+'        If File.Exists(modelFile.FullName) = False Then
+'            ' this site is apparently gone.  caffemodel is in the Data directory in OpenCVB_HomeDir
+'            Dim client = HttpWebRequest.CreateHttp("http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel")
+'            Dim response = client.GetResponse()
+'            Dim responseStream = response.GetResponseStream()
+'            Dim memory As New MemoryStream()
+'            responseStream.CopyTo(memory)
+'            File.WriteAllBytes(modelFile.FullName, memory.ToArray)
+'        End If
+'        Dim protoTxt = task.HomeDir + "Data/bvlc_googlenet.prototxt"
+'        net = CvDnn.ReadNetFromCaffe(protoTxt, modelFile.FullName)
+'        Dim synsetWords = task.HomeDir + "Data/synset_words.txt"
+'        classnames = File.ReadAllLines(synsetWords) ' .Select(line >= line.Split(' ').Last()).ToArray()
+'        For i = 0 To classnames.Count - 1
+'            classnames(i) = classnames(i).Split(" ").Last
+'        Next
+
+'        labels(3) = "Input Image"
+'        desc = "Download and use a Caffe database"
+'    End Sub
+'    Public Overrides sub RunAlg(src As cv.Mat)
+
+'        Dim image = cv.Cv2.ImRead(task.HomeDir + "Data/space_shuttle.jpg")
+'        dst3 = image.Resize(dst3.Size())
+'        Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
+'        net.SetInput(inputBlob, "data")
+'        Dim prob = net.Forward("prob")
+
+'        Dim mm As mmData = GetMinMax(prob.Reshape(1, 1))
+'        SetTrueText("Best classification: index = " + CStr(mm.maxLoc.X) + " which is for '" + classnames(mm.maxLoc.X) + "' with Probability " +
+'                    Format(mm.maxVal, "#0.00%"), New cv.Point(40, 200))
+'    End Sub
+'End Class

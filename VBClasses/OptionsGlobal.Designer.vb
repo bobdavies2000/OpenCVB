@@ -668,7 +668,7 @@ Partial Class OptionsGlobal
         ' 
         ColoringGroup.Controls.Add(TrackingColor)
         ColoringGroup.Controls.Add(TrackingMeanColor)
-        ColoringGroup.Location = New Point(1220, 328)
+        ColoringGroup.Location = New Point(1220, 361)
         ColoringGroup.Name = "ColoringGroup"
         ColoringGroup.Size = New Size(202, 108)
         ColoringGroup.TabIndex = 26
@@ -678,7 +678,7 @@ Partial Class OptionsGlobal
         ' TrackingColor
         ' 
         TrackingColor.AutoSize = True
-        TrackingColor.Location = New Point(20, 66)
+        TrackingColor.Location = New Point(15, 66)
         TrackingColor.Name = "TrackingColor"
         TrackingColor.Size = New Size(149, 29)
         TrackingColor.TabIndex = 2
@@ -689,7 +689,7 @@ Partial Class OptionsGlobal
         ' TrackingMeanColor
         ' 
         TrackingMeanColor.AutoSize = True
-        TrackingMeanColor.Location = New Point(20, 30)
+        TrackingMeanColor.Location = New Point(13, 30)
         TrackingMeanColor.Name = "TrackingMeanColor"
         TrackingMeanColor.Size = New Size(129, 29)
         TrackingMeanColor.TabIndex = 1

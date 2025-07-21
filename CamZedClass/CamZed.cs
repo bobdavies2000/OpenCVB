@@ -98,9 +98,12 @@ public class CamZed
     }
     public void GetNextFrame(Cv.Size workRes)
     {
-        sl.Mat colorSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C3);
-        sl.Mat rightSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C3);
-        sl.Mat pointCloudSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C4); // Note: BGRA is 4 channels
+        if (colorSL.MatPtr == 0)
+        {
+            colorSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C3);
+            rightSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C3);
+            pointCloudSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C4); // Note: BGRA is 4 channels
+        }
 
         while (true) 
         {

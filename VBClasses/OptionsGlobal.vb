@@ -292,6 +292,10 @@ Public Class OptionsGlobal
         If HistBinBar.Maximum < val Then HistBinBar.Maximum = val * 2
         HistBinBar.Value = val
     End Sub
+    Public Sub setFrameHistory(val As Integer)
+        If FrameHistory.Maximum < val Then FrameHistory.Maximum = val * 2
+        FrameHistory.Value = val
+    End Sub
     Public Sub setPixelDifference(val As Integer)
         PixelDiffBar.Value = val
     End Sub
