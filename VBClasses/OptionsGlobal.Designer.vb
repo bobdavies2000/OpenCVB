@@ -24,6 +24,7 @@ Partial Class OptionsGlobal
     Private Sub InitializeComponent()
         Label1 = New Label()
         GroupBox1 = New GroupBox()
+        Label3 = New Label()
         DebugSlider = New TrackBar()
         DebugSliderLabel = New Label()
         DebugCheckBox = New CheckBox()
@@ -80,7 +81,6 @@ Partial Class OptionsGlobal
         ColoringGroup = New GroupBox()
         TrackingColor = New RadioButton()
         TrackingMeanColor = New RadioButton()
-        Label3 = New Label()
         GroupBox1.SuspendLayout()
         CType(DebugSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(FrameHistory, ComponentModel.ISupportInitialize).BeginInit()
@@ -136,6 +136,15 @@ Partial Class OptionsGlobal
         GroupBox1.Size = New Size(829, 609)
         GroupBox1.TabIndex = 1
         GroupBox1.TabStop = False
+        ' 
+        ' Label3
+        ' 
+        Label3.AutoSize = True
+        Label3.Location = New Point(28, 527)
+        Label3.Name = "Label3"
+        Label3.Size = New Size(115, 25)
+        Label3.TabIndex = 23
+        Label3.Text = "Debug Slider"
         ' 
         ' DebugSlider
         ' 
@@ -559,7 +568,7 @@ Partial Class OptionsGlobal
         ColorSource.FormattingEnabled = True
         ColorSource.Location = New Point(1379, 50)
         ColorSource.Name = "ColorSource"
-        ColorSource.Size = New Size(211, 33)
+        ColorSource.Size = New Size(157, 33)
         ColorSource.TabIndex = 4
         ' 
         ' Palettes
@@ -567,7 +576,7 @@ Partial Class OptionsGlobal
         Palettes.FormattingEnabled = True
         Palettes.Location = New Point(1379, 89)
         Palettes.Name = "Palettes"
-        Palettes.Size = New Size(211, 33)
+        Palettes.Size = New Size(157, 33)
         Palettes.TabIndex = 5
         ' 
         ' LineType
@@ -575,7 +584,7 @@ Partial Class OptionsGlobal
         LineType.FormattingEnabled = True
         LineType.Location = New Point(1379, 129)
         LineType.Name = "LineType"
-        LineType.Size = New Size(211, 33)
+        LineType.Size = New Size(157, 33)
         LineType.TabIndex = 6
         ' 
         ' highlight
@@ -583,7 +592,7 @@ Partial Class OptionsGlobal
         highlight.FormattingEnabled = True
         highlight.Location = New Point(1379, 168)
         highlight.Name = "highlight"
-        highlight.Size = New Size(211, 33)
+        highlight.Size = New Size(157, 33)
         highlight.TabIndex = 7
         ' 
         ' Label9
@@ -659,9 +668,9 @@ Partial Class OptionsGlobal
         ' 
         ColoringGroup.Controls.Add(TrackingColor)
         ColoringGroup.Controls.Add(TrackingMeanColor)
-        ColoringGroup.Location = New Point(1436, 217)
+        ColoringGroup.Location = New Point(1220, 328)
         ColoringGroup.Name = "ColoringGroup"
-        ColoringGroup.Size = New Size(186, 108)
+        ColoringGroup.Size = New Size(202, 108)
         ColoringGroup.TabIndex = 26
         ColoringGroup.TabStop = False
         ColoringGroup.Text = "RedCloud Display"
@@ -688,20 +697,11 @@ Partial Class OptionsGlobal
         TrackingMeanColor.Text = "Mean Color"
         TrackingMeanColor.UseVisualStyleBackColor = True
         ' 
-        ' Label3
-        ' 
-        Label3.AutoSize = True
-        Label3.Location = New Point(28, 527)
-        Label3.Name = "Label3"
-        Label3.Size = New Size(115, 25)
-        Label3.TabIndex = 23
-        Label3.Text = "Debug Slider"
-        ' 
         ' OptionsGlobal
         ' 
-        AutoScaleDimensions = New SizeF(10.0F, 25.0F)
+        AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1629, 643)
+        ClientSize = New Size(1542, 643)
         Controls.Add(ColoringGroup)
         Controls.Add(DepthGroupBox)
         Controls.Add(Label14)
