@@ -1,4 +1,27 @@
 Imports cv = OpenCvSharp
+Public Class AddWeighted_Accumulate : Inherits TaskParent
+    Dim options As New Options_AddWeighted
+    Public Sub New()
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        labels(3) = "Instantaneous gray scale image"
+        desc = "Update a running average of the image"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        task.gray.ConvertTo(dst3, cv.MatType.CV_32F)
+        cv.Cv2.AccumulateWeighted(dst3, dst1, options.accumWeighted, New cv.Mat)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+        labels(2) = "Accumulated gray scale image"
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class AddWeighted_Basics : Inherits TaskParent
     Public src2 As cv.Mat  ' user normally provides src2! 
     Public options As New Options_AddWeighted
@@ -7,7 +30,7 @@ Public Class AddWeighted_Basics : Inherits TaskParent
         If standalone Then task.gOptions.ColorizedDepth.Checked = True
         desc = "Add 2 images with specified weights."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         If standalone Then src2 = task.depthRGB
@@ -44,28 +67,6 @@ Public Class AddWeighted_DepthAccumulate : Inherits TaskParent
 End Class
 
 
-
-
-
-
-
-
-Public Class AddWeighted_Accumulate : Inherits TaskParent
-    Dim options As New Options_AddWeighted
-    Public Sub New()
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-        labels(3) = "Instantaneous gray scale image"
-        desc = "Update a running average of the image"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        task.gray.ConvertTo(dst3, cv.MatType.CV_32F)
-        cv.Cv2.AccumulateWeighted(dst3, dst1, options.accumWeighted, New cv.Mat)
-        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
-        labels(2) = "Accumulated gray scale image"
-    End Sub
-End Class
 
 
 
