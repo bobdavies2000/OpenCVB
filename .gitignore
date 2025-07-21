@@ -352,9 +352,8 @@ README.docx
 Data/nextScheme.jpg
 Data/GroupComboBox.txt
 Data/AlgorithmList.txt
-Main_UI/ZListOfAlgorithms/*
-VB_Classes/Python/model_compiler/downloads/*s
-VB_Classes/Python/resources/nn/
+VBClasses/Python/model_compiler/downloads/*s
+VBClasses/Python/resources/nn/
 svm_data.dat
 Data/ibug_300W_large_face_landmark_dataset/s
 Data/faster_rcnn_inception_v2_coco_2018_01_28/
@@ -365,7 +364,7 @@ Data/ssd_mobilenet_v1_coco_2017_11_17/
 Data/ssd_mobilenet_v1_ppn_shared_box_predictor_300x300_coco14_sync_2018_07_03/
 Data/ssd_mobilenet_v2_coco_2018_03_29/
 Data/ssd_mobilenet_v3_large_coco_2020_01_14/
-VB_Classes/Share/
+VBClasses/Share/
 Hunter/
 OrbbecSDK/
 OrbbecSDK_v1.10.5/
@@ -376,7 +375,7 @@ Temp/*.ply
 depthai-core/
 PythonDebug/env/
 PythonDebug/env1/
-VB_Classes/env/
+VBClasses/env/
 .vs/OpenCVB/FileContentIndex/
 IncludeOnlyCPPExample/.vs/
 VersionUpdates/.vs/

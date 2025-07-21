@@ -187,6 +187,7 @@ Projection
 Puzzle
 Pyramid
 PyrFilter
+Python
 QRcode
 Quad
 Quadrant

@@ -965,8 +965,6 @@ Public Class Main
         If cudaPath IsNot Nothing And settings.cameraPresent(zedIndex) And settings.cameraSupported(zedIndex) = True Then
             updatePath(cudaPath, "Cuda - needed for StereoLabs")
             updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
-            updatePath(HomeDir.FullName + "zed-c-api/Build/Release", "StereoLabs Zed 2i camera support of C# interface.")
-            updatePath(HomeDir.FullName + "zed-c-api/Build/Debug", "StereoLabs Zed 2i camera support of C# interface.")
         End If
         updatePath(HomeDir.FullName + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")
         updatePath(HomeDir.FullName + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
@@ -1010,10 +1008,10 @@ Public Class Main
             externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
         End If
 
-        PausePlay = New Bitmap(HomeDir.FullName + "Main_UI/Data/PauseButton.png")
-        stopTestAll = New Bitmap(HomeDir.FullName + "Main_UI/Data/stopTestAll.png")
-        testAllToolbarBitmap = New Bitmap(HomeDir.FullName + "Main_UI/Data/testall.png")
-        runPlay = New Bitmap(HomeDir.FullName + "Main_UI/Data/PauseButtonRun.png")
+        PausePlay = New Bitmap(HomeDir.FullName + "Main/Data/PauseButton.png")
+        stopTestAll = New Bitmap(HomeDir.FullName + "Main/Data/stopTestAll.png")
+        testAllToolbarBitmap = New Bitmap(HomeDir.FullName + "Main/Data/testall.png")
+        runPlay = New Bitmap(HomeDir.FullName + "Main/Data/PauseButtonRun.png")
 
         setupAlgorithmHistory()
 
@@ -1091,7 +1089,7 @@ Public Class Main
             End While
         End If
 
-        Debug.WriteLine("Main_UI_Load complete.")
+        Debug.WriteLine("Main_Load complete.")
     End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If Trim(AvailableAlgorithms.Text) = "" Then
@@ -1415,7 +1413,7 @@ Public Class Main
         algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
         algorithmTaskHandle.Start(parms)
 
-        Debug.WriteLine("Main_UI.StartTask completed.")
+        Debug.WriteLine("Main.StartTask completed.")
     End Sub
     Private Function setCalibData(cb As Object) As VBtask.cameraInfo
         Dim cbNew As New VBtask.cameraInfo
@@ -1573,7 +1571,7 @@ Public Class Main
                 ' BTW: if you are ever stuck debugging this code, there is a conflict deep in the compiler with using the
                 ' word "task" for the main OpenCVB variable. It only shows up here.  If you carefully change "task" to "aTask"
                 ' throughout VB_Classes, it will make it easier to debug this while loop.  "task" is not a reserved work in VB.Net
-                ' but is seems to act like it in main_UI.vb.  Using "task" instead of "aTask" is to be preferred - just simpler to type.
+                ' but is seems to act like it in Main.vb.  Using "task" instead of "aTask" is to be preferred - just simpler to type.
                 If task.color.Size <> saveworkRes Then Exit While
 
                 ' camera has exited or resolution is changed.
