@@ -18,6 +18,7 @@ Blur
 BlurMotion
 Boundary
 Brick
+BrickLine
 BrickPoint
 Brightness
 BRISK
@@ -74,7 +75,6 @@ FeatureFlow
 FeatureLess
 Fibonacci
 Filter
-FindBricks
 FindContours
 FindMinRect
 FindNonZero

@@ -8087,7 +8087,6 @@ Public Class Options_Features : Inherits OptionParent
     Public matchText As String = ""
     Public k As Double = 0.04
     Public blockSize As Integer = 3
-    Public selectedFeature As Integer
 
     Dim options As New Options_FeaturesEx
 
@@ -8102,7 +8101,6 @@ Public Class Options_Features : Inherits OptionParent
             sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
             sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
             sliders.setupTrackBar("Brick Correlation Threshold", 0, 100, 50)
-            sliders.setupTrackBar("Selected Feature", 1, 100, 1)
             sliders.setupTrackBar("Threshold for EndPoint comparisons", 0, 20, pixelThreshold)
         End If
     End Sub
@@ -8122,9 +8120,6 @@ Public Class Options_Features : Inherits OptionParent
         quality = qualitySlider.Value / 100
         Static corrSlider = FindSlider("Brick Correlation Threshold")
         correlationThreshold = corrSlider.value / 100
-
-        Static selectionSlider = FindSlider("Selected Feature")
-        selectedFeature = selectionSlider.value
 
         Static thresholdSlider = FindSlider("Threshold for EndPoint comparisons")
         pixelThreshold = thresholdSlider.value

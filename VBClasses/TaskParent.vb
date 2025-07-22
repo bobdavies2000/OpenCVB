@@ -48,6 +48,9 @@ Public Class TaskParent : Implements IDisposable
             lines(i) = lines(i).Replace(" at VBClasses.", "")
             lines(i) = lines(i).Substring(0, InStr(lines(i), ".") - 1)
             If lines(i).StartsWith("VBtask") Then Exit For
+            If lines(i).StartsWith("at Microsoft") Then Continue For
+            If lines(i).StartsWith("at System") Then Continue For
+            If lines(i).StartsWith("at Main") Then Continue For
             callStack = lines(i) + "\" + callStack
         Next
 

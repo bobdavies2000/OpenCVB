@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class FindBricks_Basics : Inherits TaskParent
+Public Class BrickLine_Basics : Inherits TaskParent
     Dim hist As New Hist_GridCell
     Public edgeRequest As Boolean
     Public options As New Options_Features
@@ -20,7 +20,7 @@ Public Class FindBricks_Basics : Inherits TaskParent
         dst2 = ShowPaletteNoZero(src)
         dst3 = dst2.Clone
 
-        Dim debugMode = options.selectedFeature > 0
+        Dim debugMode = task.gOptions.DebugSlider.Value <> 0
 
         Dim mm = GetMinMax(src)
         Dim featList As New List(Of List(Of Integer))
@@ -47,7 +47,7 @@ Public Class FindBricks_Basics : Inherits TaskParent
             If featList(index).Count > 0 Then task.featList.Add(featList(index))
         Next
 
-        Dim edgeIndex = options.selectedFeature
+        Dim edgeIndex = task.gOptions.DebugSlider.Value
         If edgeIndex <> 0 And edgeIndex < task.featList.Count Then
             For Each index In task.featList(edgeIndex)
                 Dim brick = task.bricks.brickList(index)
@@ -57,7 +57,7 @@ Public Class FindBricks_Basics : Inherits TaskParent
 
         If debugMode Then
             For i = 0 To task.featList.Count - 1
-                If debugMode Then If i <> options.selectedFeature Then Continue For
+                If debugMode Then If i <> task.gOptions.DebugSlider.Value Then Continue For
                 Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
                 For Each index In task.featList(i)
                     Dim brick = task.bricks.brickList(index)
@@ -84,8 +84,8 @@ End Class
 
 
 
-Public Class FindBricks_Edges : Inherits TaskParent
-    Dim findCells As New FindBricks_Basics
+Public Class BrickLine_Edges : Inherits TaskParent
+    Dim findCells As New BrickLine_Basics
     Public Sub New()
         findCells.edgeRequest = True
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different edges."
@@ -105,8 +105,8 @@ End Class
 
 
 
-Public Class FindBricks_Gaps : Inherits TaskParent
-    Dim findCells As New FindBricks_Basics
+Public Class BrickLine_DepthGap : Inherits TaskParent
+    Dim findCells As New BrickLine_Basics
     Public Sub New()
         labels(2) = "Cells highlighted below have a significant gap in depth from their neighbors."
         desc = "Find cells mapping the edges/lines which are not near any other cell - they are neighboring edges/lines but not in depth."
@@ -137,12 +137,12 @@ Public Class FindBricks_Gaps : Inherits TaskParent
 
         If task.heartBeat Then
             dst2 = findCells.dst2.Clone
-            Dim debugMode = findCells.options.selectedFeature <> 0
+            Dim debugMode = task.gOptions.DebugSlider.Value <> 0
             For i = 0 To gapCells.Count - 1
-                If debugMode Then If i <> findCells.options.selectedFeature Then Continue For
+                If debugMode Then If i <> task.gOptions.DebugSlider.Value Then Continue For
                 Dim brick = task.bricks.brickList(gapCells(i))
                 dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
-                If i = findCells.options.selectedFeature Then
+                If i = task.gOptions.DebugSlider.Value Then
                     SetTrueText(Format(brick.depth, fmt1), brick.rect.BottomRight)
                 End If
             Next
@@ -156,8 +156,8 @@ End Class
 
 
 
-Public Class FindBricks_LineGaps : Inherits TaskParent
-    Dim findCells As New FindBricks_Gaps
+Public Class BrickLine_DepthGaps : Inherits TaskParent
+    Dim findCells As New BrickLine_DepthGap
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
@@ -184,8 +184,8 @@ End Class
 
 
 
-Public Class FindBricks_FeatureLess : Inherits TaskParent
-    Dim findCells As New FindBricks_Basics
+Public Class BrickLine_FeatureLess : Inherits TaskParent
+    Dim findCells As New BrickLine_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -264,27 +264,8 @@ End Class
 
 
 
-
-
-Public Class FindBricks_RedCloud : Inherits TaskParent
-    Dim findCells As New FindBricks_FeatureLess
-    Public Sub New()
-        desc = "Run RedCloud after identifying all the featureless regions."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        findCells.Run(task.grayStable)
-
-        dst2 = runRedC(src, labels(2), findCells.dst1)
-
-    End Sub
-End Class
-
-
-
-
-
-Public Class FindBricks_Lines : Inherits TaskParent
-    Dim findCells As New FindBricks_Basics
+Public Class BrickLine_Lines : Inherits TaskParent
+    Dim findCells As New BrickLine_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
@@ -301,5 +282,21 @@ Public Class FindBricks_Lines : Inherits TaskParent
         findCells.Run(dst1)
         dst2 = findCells.dst2
         dst3 = findCells.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class BrickLine_LeftRight : Inherits TaskParent
+    Dim bricklines As New BrickLine_Lines
+    Public Sub New()
+        desc = "Display a line in both the left and right images using the bricks that contain the line"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        bricklines.Run(src)
+
     End Sub
 End Class
