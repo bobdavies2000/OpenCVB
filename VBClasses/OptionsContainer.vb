@@ -1,6 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Windows.Forms
-Imports System.Drawing
 Public Class OptionsContainer
     Dim optionsTitle As New List(Of String)
     Public hiddenOptions As New List(Of String)
@@ -42,7 +40,7 @@ Public Class OptionsContainer
             Dim indexO = 1
             Dim indexHide As Integer
             For Each title In optionsTitle
-                Dim frm = OptionParent.findFrm(title)
+                Dim frm = OptionParent.FindFrm(title)
                 If frm IsNot Nothing Then
                     frm.BringToFront()
                     Dim sidelineOptions As Boolean = True
@@ -70,7 +68,7 @@ Public Class OptionsContainer
                 End If
             Next
         Catch ex As Exception
-            debug.writeline("Error in layoutOptions: " + ex.Message)
+            Debug.WriteLine("Error in layoutOptions: " + ex.Message)
         End Try
         hiddenOptions.Clear()
     End Sub

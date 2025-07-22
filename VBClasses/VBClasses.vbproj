@@ -9,6 +9,7 @@
 	  <MyType>WindowsForms</MyType>
 	  <StartupObject>VBClasses.My.MyApplication</StartupObject>
 	  <Platforms>x64</Platforms>
+	  <ImportedNamespaces>System.Data=False,System.Drawing=False,System.Windows.Forms=False,Microsoft.VisualBasic=True,System=True,System.Collections=True,System.Collections.Generic=True,System.Diagnostics=True,System.Linq=True,System.Xml.Linq=True,System.Threading.Tasks=True,VBClasses=True</ImportedNamespaces>
   </PropertyGroup>
 
   <ItemGroup>

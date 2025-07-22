@@ -1315,6 +1315,7 @@ Public Class Main
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         jsonWrite()
         saveAlgorithmName = "" ' this will close the current algorithm and the camera.
+        End
     End Sub
     Private Sub CameraTask()
         restartCameraRequest = True
@@ -1411,6 +1412,11 @@ Public Class Main
         cbNew.leftIntrinsics.ppy = cb.leftIntrinsics.ppy
         cbNew.leftIntrinsics.fx = cb.leftIntrinsics.fx
         cbNew.leftIntrinsics.fy = cb.leftIntrinsics.fy
+        cbNew.ColorToLeft_rotation = cb.ColorToLeft_rotation
+        cbNew.ColorToLeft_translation = cb.ColorToLeft_translation
+        cbNew.baseline = cb.baseline
+        cbNew.LtoR_translation = cb.LtoR_translation
+        cbNew.LtoR_rotation = cb.LtoR_rotation
         Return cbNew
     End Function
     Private Sub AlgorithmTask(ByVal parms As VBClasses.VBtask.algParms)

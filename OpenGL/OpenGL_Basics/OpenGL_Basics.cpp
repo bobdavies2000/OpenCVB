@@ -10,7 +10,7 @@ int main(int argc, char * argv[])
 	glfwInit();
 	win = glfwCreateWindow(windowWidth, windowHeight, windowTitle.str().c_str(), 0, 0);
 
-	app_state = { 0, 0, 0, 0, false, 0 };
+	state app_state = { 0, 0, 0, 0, false, 0 };
 	glfwSetWindowUserPointer(win, &app_state);
 	glfwMakeContextCurrent(win);
 
