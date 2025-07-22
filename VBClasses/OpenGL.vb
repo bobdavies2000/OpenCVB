@@ -2,10 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
-Imports System.Drawing
 Imports System.Threading
-Imports cvext = OpenCvSharp.Extensions
-Imports System.Security.Cryptography
 Public Class OpenGL_Basics : Inherits TaskParent
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim startInfo As New ProcessStartInfo
