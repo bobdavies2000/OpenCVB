@@ -15,11 +15,8 @@
 -   Better default setting for Histogram Bins with an override mechanism if needed.
 -   The main form will no longer have menus – they were never being used.
 -   For that first build after a download, build the UI_Generate project by itself.
-    -   The VBClasses project uses UI_Generate in a pre-build event.
+    -   The VBClasses build process uses UI_Generate in a pre-build event.
     -   Alternatively, just build that first build again and UI_Generate will work.
--   The OpenGL interface is being reworked without librealsense.
-    -   This only affects the OpenGL algorithms which are for display only.
-    -   The dependency on librealsense is unnecessary but not easily extracted.
 -   A log of previous changes is included at the bottom of this document.
 
 \-----------------------------------------------------------------------------------------------
