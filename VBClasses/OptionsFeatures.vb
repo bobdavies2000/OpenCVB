@@ -32,7 +32,7 @@ Public Class OptionsFeatures
         task.edgeMethod = "Canny"
 
         ColorDiffSlider.Value = 10
-        MatchCorrSlider.Value = 90
+        MatchCorrSlider.Value = 95
 
         ReDim grayCheckbox(task.rgbFilter.grayFilter.filterList.Count - 1)
         For i = 0 To task.rgbFilter.grayFilter.filterList.Count - 1

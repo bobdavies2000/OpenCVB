@@ -1014,8 +1014,6 @@ End Class
 
 
 
-
-
 Public Class Line_Gravity : Inherits TaskParent
     Dim match As New Match_Basics
     Public lp As lpData
@@ -1100,6 +1098,76 @@ End Class
 
 
 
+
+
+
+Public Class Line_GravityBad : Inherits TaskParent
+    Dim match As New Match_Basics
+    Public lp As lpData
+    Public Sub New()
+        desc = "Identify each line in the lpMap."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lplist = task.lines.lpList
+        If lplist.Count = 0 Then
+            SetTrueText("There are no lines present in the image.", 3)
+            Exit Sub
+        End If
+
+        ' camera is often warming up for the first few images.
+        If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or lp Is Nothing Then
+            lp = lplist(0)
+            For Each lp In lplist
+                If lp.gravityProxy Then Exit For
+            Next
+        End If
+        match.template = task.gray(lp.rect)
+
+        match.Run(task.gray.Clone)
+        Debug.WriteLine("correlation = " + Format(match.correlation, fmt3))
+
+        If match.correlation < task.fCorrThreshold Then
+            If lplist.Count > 1 Then
+                Dim histogram As New cv.Mat
+                cv.Cv2.CalcHist({task.lines.lpMap(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
+                                 New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
+
+                Dim histArray(histogram.Total - 1) As Single
+                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+                Dim histList = histArray.ToList
+                ' pick the lp that has the most pixels in the lp.rect.
+                lp = lplist(histList.IndexOf(histList.Max))
+                match.template = task.gray(lp.rect)
+                match.correlation = 1
+            Else
+                match.correlation = 0 ' force a restart
+            End If
+        Else
+            Dim deltaX = match.newRect.X - lp.rect.X
+            Dim deltaY = match.newRect.Y - lp.rect.Y
+            Dim p1 = New cv.Point(lp.p1.X + deltaX, lp.p1.Y + deltaY)
+            Dim p2 = New cv.Point(lp.p2.X + deltaX, lp.p2.Y + deltaY)
+            lp = New lpData(p1, p2)
+        End If
+
+        If standaloneTest() Then
+            dst2 = src
+            dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
+            DrawLine(dst2, lp.p1, lp.p2)
+            dst3 = task.gray
+            For Each lp In task.lines.lpList
+                If lp.gravityProxy Then DrawLine(dst3, lp, white)
+            Next
+        End If
+
+        labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
+    End Sub
+End Class
+
+
+
+
 Public Class Line_Identify : Inherits TaskParent
     Public gridList As New List(Of List(Of Integer))
     Public Sub New()
@@ -1175,5 +1243,96 @@ Public Class Line_Identify : Inherits TaskParent
         '        End If
 
         '        labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_GravityLongest : Inherits TaskParent
+    Dim match As New Match_Basics
+    Public lp As New lpData
+    Public gravityAngleToLongest As Single
+    Public Sub New()
+        desc = "Identify each line in the lpMap."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lplist = task.lines.lpList
+        If lplist.Count = 0 Then
+            SetTrueText("There are no lines present in the image.", 3)
+            Exit Sub
+        End If
+
+        ' camera is often warming up for the first few images.
+        If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or lp.length < lplist(0).length / 2 Then
+            lp = lplist(0)
+            match.template = task.gray(lp.rect)
+        End If
+
+        match.Run(task.gray.Clone)
+        Debug.WriteLine("correlation = " + Format(match.correlation, fmt3) + " angle = " + Format(gravityAngleToLongest, fmt3))
+        Dim p1Distance = task.gravityVec.ep1.X - lp.ep1.X, p2Distance = task.gravityVec.ep2.X - lp.ep2.X
+        Debug.WriteLine("p1distance = " + CStr(p1Distance) + " p2distance = " + CStr(p2Distance))
+
+        If match.correlation < task.fCorrThreshold Then
+            If lplist.Count > 1 Then
+                Dim histogram As New cv.Mat
+                cv.Cv2.CalcHist({task.lines.lpMap(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
+                                 New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
+
+                Dim histArray(histogram.Total - 1) As Single
+                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+                Dim histList = histArray.ToList
+#If 0 Then
+                ' pick the lp that is closest to the last rgbVec
+                Dim p1 = task.gravityBasics.gravityRGB.center
+                Dim minDistance As Single = Single.MaxValue
+                Dim minIndex As Integer
+                For i = 0 To histList.Count - 1
+                    If histList(i) > 0 Then
+                        Dim distance = p1.DistanceTo(lplist(i).center)
+                        If distance < minDistance Then
+                            minIndex = i
+                            minDistance = distance
+                        End If
+                    End If
+                Next
+                lp = lplist(minIndex)
+#Else
+                ' pick the lp that has the most pixels in the lp.rect.
+                lp = lplist(histList.IndexOf(histList.Max))
+                match.template = task.gray(lp.rect)
+                match.correlation = 1
+#End If
+            Else
+                match.correlation = 0 ' force a restart
+            End If
+        Else
+            Dim deltaX = match.newRect.X - lp.rect.X
+            Dim deltaY = match.newRect.Y - lp.rect.Y
+            Dim p1 = New cv.Point(lp.p1.X + deltaX, lp.p1.Y + deltaY)
+            Dim p2 = New cv.Point(lp.p2.X + deltaX, lp.p2.Y + deltaY)
+            lp = New lpData(p1, p2)
+        End If
+
+        If standaloneTest() Then
+            dst2 = src
+            dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
+            DrawLine(dst2, lp.p1, lp.p2)
+
+            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
+            dst3 = task.lines.dst2
+
+            dst1 = src.Clone
+            For Each lp In lplist
+                If lp.gravityProxy Then
+                    DrawLine(dst1, lp.ep1, lp.ep2, task.highlight)
+                End If
+            Next
+        End If
+
+        labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
     End Sub
 End Class
