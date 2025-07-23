@@ -11,7 +11,7 @@ Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
     Public redC As RedColor_Basics
     Public gmat As IMU_GMatrix
-    Public lineRGB As LineRGB_Basics
+    Public lines As Line_Basics
     Public contours As Contour_Basics_List
     Public edges As EdgeLine_Basics
     Public grid As Grid_Basics
@@ -524,7 +524,7 @@ Public Class VBtask : Implements IDisposable
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
         grid = New Grid_Basics
-        lineRGB = New LineRGB_Basics
+        lines = New Line_Basics
         edges = New EdgeLine_Basics
         contours = New Contour_Basics_List
         rgbFilter = New Filter_Basics
@@ -792,7 +792,7 @@ Public Class VBtask : Implements IDisposable
             End If
         End If
 
-        lineRGB.Run(grayStable)
+        lines.Run(grayStable)
         gravityBasics.Run(src.Clone)
         histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
 

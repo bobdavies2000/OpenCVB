@@ -529,13 +529,13 @@ Public Class KNN_ClosestTracker : Inherits TaskParent
 
         Dim p1 As cv.Point2f, p2 As cv.Point2f
         If trainInput.Count = 0 Then
-            dst3 = task.lineRGB.dst2
+            dst3 = task.lines.dst2
         Else
             p1 = lastPair.p1
             p2 = lastPair.p2
         End If
 
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             If trainInput.Count = 0 Then
                 p1 = lp.p1
                 p2 = lp.p2
@@ -1099,10 +1099,10 @@ Public Class KNN_EdgePoints : Inherits TaskParent
         desc = "Match edgepoints from the current and previous frames."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then lpInput = task.lineRGB.lpList
+        If standalone Then lpInput = task.lines.lpList
 
         dst2 = src.Clone
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             HullLine_EdgePoints.EdgePointOffset(lp, 1)
             DrawCircle(dst2, New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)))
             DrawCircle(dst2, New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)))
@@ -1169,7 +1169,7 @@ Public Class KNN_LongestLine : Inherits TaskParent
         knnList.Add(brick2)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lplist = task.lineRGB.lpList
+        Dim lplist = task.lines.lpList
         If lplist.Count = 0 Then Exit Sub
 
         If standalone And task.heartBeatLT Then lp = lplist(0)
@@ -1188,11 +1188,11 @@ Public Class KNN_LongestLine : Inherits TaskParent
         dst2 = src
         dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
-        dst3 = task.lineRGB.dst3
-        labels(3) = task.lineRGB.labels(3)
+        dst3 = task.lines.dst3
+        labels(3) = task.lines.labels(3)
         labels(2) = "Found line with age = " + CStr(lp.age)
 
-        dst1 = ShowPaletteNoZero(task.lineRGB.lpRectMap)
+        dst1 = ShowPaletteNoZero(task.lines.lpRectMap)
     End Sub
 End Class
 
@@ -1203,13 +1203,13 @@ End Class
 
 Public Class KNN_BoundingRect : Inherits TaskParent
     Public lp As lpData
-    Dim rawlines As New LineRGB_Raw
+    Dim rawlines As New Line_Raw
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Find the line with the largest bounding rectangle."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lplist = task.lineRGB.lpList
+        Dim lplist = task.lines.lpList
         If lplist.Count = 0 Then Exit Sub
 
         If standalone And task.heartBeatLT Then
@@ -1220,16 +1220,16 @@ Public Class KNN_BoundingRect : Inherits TaskParent
             lp = lplist(sortRects.ElementAt(0).Value)
         End If
 
-        dst1 = ShowPaletteNoZero(task.lineRGB.lpRectMap)
+        dst1 = ShowPaletteNoZero(task.lines.lpRectMap)
         DrawCircle(dst1, lp.center)
 
-        Dim index = task.lineRGB.lpRectMap.Get(Of Byte)(lp.center.Y, lp.center.X)
+        Dim index = task.lines.lpRectMap.Get(Of Byte)(lp.center.Y, lp.center.X)
         If index > 0 Then lp = lplist(index - 1)
         dst2 = src
         dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
-        dst3 = task.lineRGB.dst3
-        labels(3) = task.lineRGB.labels(3)
+        dst3 = task.lines.dst3
+        labels(3) = task.lines.labels(3)
         labels(2) = "Found largest bounding rect with age = " + CStr(lp.age)
     End Sub
 End Class

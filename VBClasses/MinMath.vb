@@ -12,9 +12,9 @@ Public Class MinMath_Line : Inherits TaskParent
         labels(2) = bPoints.labels(2)
 
         Dim linesFound As New List(Of Byte)
-        Dim bpList(task.lineRGB.lpList.Count) As List(Of cv.Point)
+        Dim bpList(task.lines.lpList.Count) As List(Of cv.Point)
         For Each bp In bPoints.bpList
-            Dim val = task.lineRGB.lpRectMap.Get(Of Byte)(bp.Y, bp.X)
+            Dim val = task.lines.lpRectMap.Get(Of Byte)(bp.Y, bp.X)
             If val = 0 Then Continue For
             If linesFound.Contains(val) = False Then
                 linesFound.Add(val)
@@ -36,7 +36,7 @@ Public Class MinMath_Line : Inherits TaskParent
         Next
 
         For Each index In linesFound
-            Dim lp = task.lineRGB.lpList(index - 1)
+            Dim lp = task.lines.lpList(index - 1)
         Next
         labels(3) = CStr(linesFound.Count) + " lines were confirmed by brick points."
     End Sub

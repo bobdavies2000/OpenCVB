@@ -202,13 +202,13 @@ End Class
 Public Class LeftRight_Lines : Inherits TaskParent
     Public leftLines As New List(Of lpData)
     Public rightLines As New List(Of lpData)
-    Dim lines As New LineRGB_RawSorted
+    Dim lines As New Line_RawSorted
     Public Sub New()
         labels = {"", "", "Left image lines", "Right image lines"}
         desc = "Find the lines in the Left and Right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        leftLines = New List(Of lpData)(task.lineRGB.lpList)
+        leftLines = New List(Of lpData)(task.lines.lpList)
         dst2 = task.leftView.Clone
         For Each lp In leftLines
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)

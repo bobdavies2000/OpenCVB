@@ -21,7 +21,7 @@ Public Class CameraORB : Inherits GenericCamera
         Dim depthProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_DEPTH).
                                             GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y16, fps)
         Dim leftProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_LEFT).
-                                            GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, fps)
+                                           GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, fps)
         Dim rightProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_RIGHT). ' USE_RIGHT_IMAGE
                                             GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, fps)
         Dim config As New Config()

@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
     Public options As New Options_Features
     Dim gravityRaw As New Gravity_Raw
-    Public trackLine As New LineRGB_Gravity
+    Public trackLine As New Line_Gravity
     Public gravityRGB As lpData
     Public Sub New()
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
@@ -50,16 +50,16 @@ Public Class Gravity_Basics : Inherits TaskParent
             gravityRGB = Nothing
         End If
 
-        task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
+        task.horizonVec = Line_Perpendicular.computePerp(task.gravityVec)
 
         If standaloneTest() Then
             dst2.SetTo(0)
             showVectors(dst2)
             dst3.SetTo(0)
-            For Each lp In task.lineRGB.lpList
+            For Each lp In task.lines.lpList
                 If lp.gravityProxy Then DrawLine(dst3, lp, white)
             Next
-            labels(3) = task.lineRGB.labels(3)
+            labels(3) = task.lines.labels(3)
         End If
     End Sub
 End Class
@@ -142,7 +142,7 @@ Public Class Gravity_BasicsKalman : Inherits TaskParent
         task.gravityVec = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
                                      New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3)))
 
-        task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
+        task.horizonVec = Line_Perpendicular.computePerp(task.gravityVec)
 
         If standaloneTest() Then
             dst2.SetTo(0)
@@ -288,7 +288,7 @@ Public Class Gravity_BasicsOld : Inherits TaskParent
             If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
         End If
 
-        task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
+        task.horizonVec = Line_Perpendicular.computePerp(task.gravityVec)
         SetTrueText(strOut, 3)
     End Sub
 End Class

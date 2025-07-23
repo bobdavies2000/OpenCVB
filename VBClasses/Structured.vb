@@ -2,8 +2,8 @@ Imports cv = OpenCvSharp
 Public Class Structured_Basics : Inherits TaskParent
     Public lpListX As New List(Of lpData)
     Public lpListY As New List(Of lpData)
-    Public linesX As New LineRGB_Basics
-    Public linesY As New LineRGB_Basics
+    Public linesX As New Line_Basics
+    Public linesY As New Line_Basics
     Dim struct As New Structured_Core
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -86,7 +86,7 @@ End Class
 
 Public Class Structured_MultiSliceLines : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
-    Dim lines As New LineRGB_RawSorted
+    Dim lines As New Line_RawSorted
     Public Sub New()
         desc = "Detect lines in the multiSlice output"
     End Sub

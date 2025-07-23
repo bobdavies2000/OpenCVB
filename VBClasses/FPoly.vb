@@ -779,8 +779,8 @@ Public Class FPoly_Perpendiculars : Inherits TaskParent
             Exit Sub
         End If
 
-        Static perp1 As New LineRGB_Perpendicular
-        Static perp2 As New LineRGB_Perpendicular
+        Static perp1 As New Line_Perpendicular
+        Static perp2 As New Line_Perpendicular
 
         dst2.SetTo(0)
         perp1.input = New lpData(fPD.currPoly(fPD.polyPrevSideIndex),

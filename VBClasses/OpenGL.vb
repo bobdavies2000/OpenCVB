@@ -1615,7 +1615,7 @@ Public Class OpenGL_Lines3D : Inherits TaskParent
     Dim lines As New Line3D_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pcLines
-        desc = "Draw the 3D lines found using the task.lineRGB.lpList and the accompanying bricks."
+        desc = "Draw the 3D lines found using the task.lines.lpList and the accompanying bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lines.Run(src)

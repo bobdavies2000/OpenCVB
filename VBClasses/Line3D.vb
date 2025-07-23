@@ -10,8 +10,8 @@ Public Class Line3D_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
 
-        dst2 = task.lineRGB.dst2
-        labels(2) = task.lineRGB.labels(2)
+        dst2 = task.lines.dst2
+        labels(2) = task.lines.labels(2)
 
         Static brickList As New List(Of brickData)(task.bricks.brickList)
 
@@ -23,7 +23,7 @@ Public Class Line3D_Basics : Inherits TaskParent
 
         lines3D.Clear()
 
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             Dim gc1 = brickList(task.grid.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
             If gc1.depth = 0 Then Continue For
 
@@ -44,7 +44,7 @@ Public Class Line3D_Basics : Inherits TaskParent
 
         If task.heartBeat Then
             strOut = CStr(lines3D.Count / 3) + " 3D lines are prepared in lines3D." + vbCrLf +
-                     CStr(task.lineRGB.lpList.Count - lines3D.Count / 3) + " lines occurred in areas with no depth and were skipped."
+                     CStr(task.lines.lpList.Count - lines3D.Count / 3) + " lines occurred in areas with no depth and were skipped."
         End If
         SetTrueText(strOut, 3)
     End Sub

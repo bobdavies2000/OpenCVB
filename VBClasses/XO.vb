@@ -164,7 +164,7 @@ End Class
 
 
 Public Class XO_Horizon_Perpendicular : Inherits TaskParent
-    Dim perp As New LineRGB_Perpendicular
+    Dim perp As New Line_Perpendicular
     Public Sub New()
         labels(2) = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU."
         desc = "Find the gravity vector using the perpendicular to the horizon."
@@ -398,7 +398,7 @@ Public Class XO_Gravity_Basics : Inherits TaskParent
             If standaloneTest() Then displayResults(p1, p2)
         End If
 
-        task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
+        task.horizonVec = Line_Perpendicular.computePerp(task.gravityVec)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -906,8 +906,8 @@ Public Class XO_Line_LeftRight : Inherits TaskParent
         desc = "Show lines in both the right and left images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lineRGB.dst2.Clone
-        labels(2) = "Left view" + task.lineRGB.labels(2)
+        dst2 = task.lines.dst2.Clone
+        labels(2) = "Left view" + task.lines.labels(2)
 
         dst1 = task.rightView
         lineCore.Run(task.rightView)
@@ -936,7 +936,7 @@ Public Class XO_Line_Matching : Inherits TaskParent
     Dim lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Dim lpList As New List(Of lpData)
     Public Sub New()
-        labels(2) = "Highlighted lines were combined from 2 lines.  Click on LineRGB_Core in Treeview to see."
+        labels(2) = "Highlighted lines were combined from 2 lines.  Click on Line_Core in Treeview to see."
         desc = "Combine lines that are approximately the same line."
     End Sub
     Private Function combine2Lines(lp1 As lpData, lp2 As lpData) As lpData
@@ -965,8 +965,8 @@ Public Class XO_Line_Matching : Inherits TaskParent
         Dim removeList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Dim addList As New List(Of lpData)
         Dim combineCount As Integer
-        For i = 0 To task.lineRGB.lpList.Count - 1
-            Dim lp = task.lineRGB.lpList(i)
+        For i = 0 To task.lines.lpList.Count - 1
+            Dim lp = task.lines.lpList(i)
             Dim lpRemove As Boolean = False
             For j = 0 To 1
                 Dim pt = Choose(j + 1, lp.p1, lp.p2)
@@ -990,13 +990,13 @@ Public Class XO_Line_Matching : Inherits TaskParent
         Next
 
         For i = 0 To removeList.Count - 1
-            task.lineRGB.lpList.RemoveAt(removeList.ElementAt(i).Value)
+            task.lines.lpList.RemoveAt(removeList.ElementAt(i).Value)
         Next
 
         For Each lp In addList
-            task.lineRGB.lpList.Add(lp)
+            task.lines.lpList.Add(lp)
         Next
-        lpList = New List(Of lpData)(task.lineRGB.lpList)
+        lpList = New List(Of lpData)(task.lines.lpList)
         lpMap.SetTo(0)
         For i = 0 To lpList.Count - 1
             Dim lp = lpList(i)
@@ -1005,7 +1005,7 @@ Public Class XO_Line_Matching : Inherits TaskParent
         lpMap.ConvertTo(dst3, cv.MatType.CV_8U)
         dst3 = dst3.Threshold(0, cv.Scalar.White, cv.ThresholdTypes.Binary)
         If task.heartBeat Then
-            labels(2) = CStr(task.lineRGB.lpList.Count) + " lines were input and " + CStr(combineCount) +
+            labels(2) = CStr(task.lines.lpList.Count) + " lines were input and " + CStr(combineCount) +
                             " lines were matched to the previous frame"
         End If
     End Sub
@@ -1022,12 +1022,12 @@ Public Class XO_Line_TopX : Inherits TaskParent
         desc = "Isolate the top X lines by length - lines are already sorted by length."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lineRGB.dst2
-        labels(2) = task.lineRGB.labels(2)
+        dst2 = task.lines.dst2
+        labels(2) = task.lines.labels(2)
 
         dst3.SetTo(0)
         For i = 0 To 9
-            Dim lp = task.lineRGB.lpList(i)
+            Dim lp = task.lines.lpList(i)
             dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
     End Sub
@@ -1100,7 +1100,7 @@ End Class
 
 Public Class XO_Line_Cells : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Dim lines As New LineRGB_RawSorted
+    Dim lines As New Line_RawSorted
     Public Sub New()
         desc = "Identify all lines in the RedColor_Basics cell boundaries"
     End Sub
@@ -1124,9 +1124,9 @@ End Class
 Public Class XO_Line_Canny : Inherits TaskParent
     Dim canny As New Edge_Basics
     Public lpList As New List(Of lpData)
-    Dim lines As New LineRGB_RawSorted
+    Dim lines As New Line_RawSorted
     Public Sub New()
-        labels(3) = "Input to LineRGB_Basics"
+        labels(3) = "Input to Line_Basics"
         OptionParent.FindSlider("Canny Aperture").Value = 7
         OptionParent.FindSlider("Min Line Length").Value = 30
         desc = "Find lines in the Canny output"
@@ -1157,11 +1157,11 @@ Public Class XO_Line_KNN : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         swarm.options.Run()
-        dst2 = task.lineRGB.dst2
+        dst2 = task.lines.dst2
 
         dst3.SetTo(0)
         swarm.knn.queries.Clear()
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             swarm.knn.queries.Add(lp.p1)
             swarm.knn.queries.Add(lp.p2)
             DrawLine(dst3, lp.p1, lp.p2, 255)
@@ -1170,7 +1170,7 @@ Public Class XO_Line_KNN : Inherits TaskParent
         swarm.knn.Run(src)
 
         dst3 = swarm.DrawLines().Clone
-        labels(2) = task.lineRGB.labels(2)
+        labels(2) = task.lines.labels(2)
     End Sub
 End Class
 
@@ -1347,7 +1347,7 @@ Public Class XO_Line_TimeView : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then frameList.Clear()
-        Dim nextMpList = New List(Of lpData)(task.lineRGB.lpList)
+        Dim nextMpList = New List(Of lpData)(task.lines.lpList)
         frameList.Add(nextMpList)
 
         dst2 = src
@@ -1377,7 +1377,7 @@ End Class
 
 Public Class XO_Line_ColorClass : Inherits TaskParent
     Dim color8U As New Color8U_Basics
-    Dim lines As New LineRGB_RawSorted
+    Dim lines As New Line_RawSorted
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Lines for the current color class", "Color Class input"}
@@ -1391,7 +1391,7 @@ Public Class XO_Line_ColorClass : Inherits TaskParent
         dst2 = lines.dst2
         dst3 = lines.dst2
 
-        labels(1) = "Input to LineRGB_Basics"
+        labels(1) = "Input to Line_Basics"
         labels(2) = "Lines found in the " + color8U.classifier.traceName + " output"
     End Sub
 End Class
@@ -1403,7 +1403,7 @@ End Class
 Public Class XO_Line_FromContours : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim contours As New XO_Contour_Gray
-    Dim lines As New LineRGB_RawSorted
+    Dim lines As New Line_RawSorted
     Public Sub New()
         task.gOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
         task.gOptions.highlight.SelectedIndex = 3
@@ -1432,7 +1432,7 @@ End Class
 Public Class XO_Line_ViewSide : Inherits TaskParent
     Public autoY As New XO_OpAuto_YRange
     Dim histSide As New Projection_HistSide
-    Dim lines As New LineRGB_RawSorted
+    Dim lines As New Line_RawSorted
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Lines found in the hotspots of the Side View."}
         desc = "Find lines in the hotspots for the side view."
@@ -1510,8 +1510,8 @@ Public Class XO_Line_InDepthAndBGR : Inherits TaskParent
         desc = "Find the BGR lines and confirm they are present in the cloud data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lineRGB.dst2
-        If task.lineRGB.lpList.Count = 0 Then Exit Sub
+        dst2 = task.lines.dst2
+        If task.lines.lpList.Count = 0 Then Exit Sub
 
         Dim lineList = New List(Of cv.Rect)
         If task.optionsChanged Then dst3.SetTo(0)
@@ -1520,7 +1520,7 @@ Public Class XO_Line_InDepthAndBGR : Inherits TaskParent
         p2List.Clear()
         z1List.Clear()
         z2List.Clear()
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             Dim rect = findRectFromLine(lp)
             Dim mask = New cv.Mat(New cv.Size(rect.Width, rect.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
             mask.Line(New cv.Point(CInt(lp.p1.X - rect.X), CInt(lp.p1.Y - rect.Y)),
@@ -1606,7 +1606,7 @@ Public Class XO_Line_Core : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            labels(2) = CStr(lines.lpList.Count) + " lines found in LineRGB_RawSorted in the current image with " +
+            labels(2) = CStr(lines.lpList.Count) + " lines found in Line_RawSorted in the current image with " +
                             CStr(lpList.Count) + " after filtering with the motion mask."
         End If
     End Sub
@@ -1637,7 +1637,7 @@ Public Class XO_Line_Basics : Inherits TaskParent
         Next
 
         lpList = New List(Of lpData)(lineCore.lpList)
-        task.lineRGB.lpList = New List(Of lpData)(lineCore.lpList)
+        task.lines.lpList = New List(Of lpData)(lineCore.lpList)
         labels(2) = lineCore.labels(2)
     End Sub
 End Class
@@ -1662,7 +1662,7 @@ Public Class XO_BackProject_LineSide : Inherits TaskParent
         dst2.SetTo(0)
         Dim w = task.lineWidth + 5
         lpList.Clear()
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             If Math.Abs(lp.slope) < 0.1 Then
                 lp = findEdgePoints(lp)
                 dst2.Line(lp.p1, lp.p2, 255, w, task.lineType)
@@ -1739,7 +1739,7 @@ End Class
 
 
 Public Class XO_Hough_Sudoku1 : Inherits TaskParent
-    Dim lines As New LineRGB_RawSorted
+    Dim lines As New Line_RawSorted
     Public Sub New()
         desc = "FastLineDetect version for finding lines in the Sudoku input."
     End Sub
@@ -1759,7 +1759,7 @@ End Class
 
 
 Public Class XO_Line_InterceptsUI : Inherits TaskParent
-    Dim lines As New LineRGB_Intercepts
+    Dim lines As New Line_Intercepts
     Dim p2 As cv.Point
     Dim redRadio As System.Windows.Forms.RadioButton
     Dim greenRadio As System.Windows.Forms.RadioButton
@@ -2828,13 +2828,13 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lastMap = task.fpMap.Clone
-        Dim lastCount = task.lineRGB.lpList.Count
+        Dim lastCount = task.lines.lpList.Count
 
-        dst2 = task.lineRGB.dst2
+        dst2 = task.lines.dst2
 
         delaunay.inputPoints.Clear()
 
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
             delaunay.inputPoints.Add(center)
         Next
@@ -2844,22 +2844,22 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
         task.fpMap.SetTo(0)
         dst1.SetTo(0)
         For i = 0 To delaunay.facetList.Count - 1
-            Dim lp = task.lineRGB.lpList(i)
+            Dim lp = task.lines.lpList(i)
             Dim facets = delaunay.facetList(i)
 
             DrawContour(dst1, facets, 255, task.lineWidth)
             DrawContour(task.fpMap, facets, i)
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
             Dim brick = task.bricks.brickList(task.grid.gridMap.Get(Of Single)(center.Y, center.X))
-            task.lineRGB.lpList(i) = lp
+            task.lines.lpList(i) = lp
         Next
 
         Dim index = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
-        task.lpD = task.lineRGB.lpList(index)
+        task.lpD = task.lines.lpList(index)
         Dim facetsD = delaunay.facetList(task.lpD.index)
         DrawContour(dst2, facetsD, white, task.lineWidth)
 
-        labels(2) = task.lineRGB.labels(2)
+        labels(2) = task.lines.labels(2)
         labels(3) = delaunay.labels(2)
     End Sub
 End Class
@@ -2871,7 +2871,7 @@ End Class
 
 
 Public Class XO_FCSLine_Vertical : Inherits TaskParent
-    Dim verts As New LineRGB_TrigVertical
+    Dim verts As New Line_TrigVertical
     Dim minRect As New LineRect_Basics
     Dim options As New Options_FCSLine
     Public Sub New()
@@ -2956,11 +2956,11 @@ Public Class XO_FeatureLine_Finder3D : Inherits TaskParent
         sortedVerticals.Clear()
         sortedHorizontals.Clear()
 
-        dst2 = task.lineRGB.dst2
+        dst2 = task.lines.dst2
 
         Dim raw2D As New List(Of lpData)
         Dim raw3D As New List(Of cv.Point3f)
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             Dim pt1 As cv.Point3f, pt2 As cv.Point3f
             For j = 0 To 1
                 Dim pt = Choose(j + 1, lp.p1, lp.p2)
@@ -3019,7 +3019,7 @@ Public Class XO_FeatureLine_Finder3D : Inherits TaskParent
                 End If
             Next
         End If
-        labels(2) = "Starting with " + Format(task.lineRGB.lpList.Count, "000") + " lines, there are " +
+        labels(2) = "Starting with " + Format(task.lines.lpList.Count, "000") + " lines, there are " +
                                        Format(lines3D.Count / 2, "000") + " with depth data."
         labels(3) = "There were " + CStr(sortedVerticals.Count) + " vertical lines (blue) and " + CStr(sortedHorizontals.Count) + " horizontal lines (yellow)"
     End Sub
@@ -3064,10 +3064,10 @@ Public Class XO_FeatureLine_Tutorial2 : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst2 = task.lineRGB.dst2
+        dst2 = task.lines.dst2
 
         Dim raw3D As New List(Of cv.Point3f)
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             Dim pt1 As cv.Point3f, pt2 As cv.Point3f
             For j = 0 To 1
                 Dim pt = Choose(j + 1, lp.p1, lp.p2)
@@ -3081,7 +3081,7 @@ Public Class XO_FeatureLine_Tutorial2 : Inherits TaskParent
             End If
         Next
 
-        If task.heartBeat Then labels(2) = "Starting with " + Format(task.lineRGB.lpList.Count, "000") +
+        If task.heartBeat Then labels(2) = "Starting with " + Format(task.lines.lpList.Count, "000") +
                                " lines, there are " + Format(raw3D.Count, "000") + " with depth data."
         If raw3D.Count = 0 Then
             SetTrueText("No vertical or horizontal lines were found")
@@ -3101,7 +3101,7 @@ End Class
 
 
 Public Class XO_FeatureLine_LongestVerticalKNN : Inherits TaskParent
-    Dim gLines As New LineRGB_GCloud
+    Dim gLines As New Line_GCloud
     Dim longest As New XO_FeatureLine_Longest
     Public Sub New()
         labels(3) = "All vertical lines.  The numbers: index and Arc-Y for the longest X vertical lines."
@@ -3380,11 +3380,11 @@ Public Class XO_Line_VerticalHorizontal1 : Inherits TaskParent
         Dim pixelDiff = task.gOptions.pixelDiffThreshold
 
         dst2 = src.Clone
-        If standaloneTest() Then dst3 = task.lineRGB.dst2
+        If standaloneTest() Then dst3 = task.lines.dst2
 
         nearest.lp = task.gravityVec
         DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             Dim ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2)
             If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then
                 Continue For
@@ -3405,7 +3405,7 @@ Public Class XO_Line_VerticalHorizontal1 : Inherits TaskParent
 
         DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
         nearest.lp = task.horizonVec
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             Dim ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2)
             If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
 
@@ -3474,7 +3474,7 @@ End Class
 
 
 Public Class XO_FeatureLine_BasicsRaw : Inherits TaskParent
-    Dim lines As New LineRGB_RawSubset
+    Dim lines As New Line_RawSubset
     Dim lineDisp As New XO_Line_DisplayInfoOld
     Dim options As New Options_Features
     Dim match As New Match_tCell
@@ -3606,7 +3606,7 @@ End Class
 
 
 Public Class XO_FeatureLine_LongestKNN : Inherits TaskParent
-    Dim glines As New LineRGB_GCloud
+    Dim glines As New Line_GCloud
     Public knn As New KNN_ClosestTracker
     Public options As New Options_Features
     Public gline As gravityLine
@@ -3648,7 +3648,7 @@ End Class
 
 
 Public Class XO_FeatureLine_Longest : Inherits TaskParent
-    Dim glines As New LineRGB_GCloud
+    Dim glines As New Line_GCloud
     Public knn As New KNN_ClosestTracker
     Public gline As gravityLine
     Public match1 As New Match_Basics
@@ -4040,7 +4040,7 @@ Public Class XO_LineRect_CenterDepth : Inherits TaskParent
 
         Dim depthThreshold = options.depthThreshold
         Dim depthLines As Integer, colorLines As Integer
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
             Dim lpPerp = lp.perpendicularPoints(center)
@@ -4317,7 +4317,7 @@ End Class
 
 Public Class XO_tructured_MouseSlice : Inherits TaskParent
     Dim slice As New Structured_SliceEither
-    Dim lines As New LineRGB_RawSorted
+    Dim lines As New Line_RawSorted
     Public Sub New()
         labels(2) = "Center Slice in yellow"
         labels(3) = "White = SliceV output, Red Dot is avgPt"
@@ -4332,9 +4332,9 @@ Public Class XO_tructured_MouseSlice : Inherits TaskParent
         Dim bots As New List(Of Integer)
         Dim topsList As New List(Of cv.Point)
         Dim botsList As New List(Of cv.Point)
-        If task.lineRGB.lpList.Count > 0 Then
+        If task.lines.lpList.Count > 0 Then
             dst3 = lines.dst2
-            For Each lp In task.lineRGB.lpList
+            For Each lp In task.lines.lpList
                 dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 3, task.lineType)
                 tops.Add(If(lp.p1.Y < lp.p2.Y, lp.p1.Y, lp.p2.Y))
                 bots.Add(If(lp.p1.Y > lp.p2.Y, lp.p1.Y, lp.p2.Y))
@@ -5110,12 +5110,12 @@ End Class
 
 
 
-Public Class XO_LineRGB_BasicsAlternative : Inherits TaskParent
-    Public lines As New LineRGB_RawSorted
+Public Class XO_Line_BasicsAlternative : Inherits TaskParent
+    Public lines As New Line_RawSorted
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Collect lines across frames using the motion mask.  Results are in task.lineRGB.lpList."
+        desc = "Collect lines across frames using the motion mask.  Results are in task.lines.lpList."
     End Sub
     Private Function getLineCounts(lpList As List(Of lpData)) As Single()
         Dim histarray(lpList.Count - 1) As Single
@@ -5134,7 +5134,7 @@ Public Class XO_LineRGB_BasicsAlternative : Inherits TaskParent
         Return histarray
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then task.lineRGB.lpList.Clear()
+        If task.optionsChanged Then task.lines.lpList.Clear()
 
         Dim histArray = getLineCounts(lines.lpList)
         Dim newList As New List(Of lpData)
@@ -5148,10 +5148,10 @@ Public Class XO_LineRGB_BasicsAlternative : Inherits TaskParent
 
         If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable.Clone)
 
-        histArray = getLineCounts(task.lineRGB.lpList)
+        histArray = getLineCounts(task.lines.lpList)
         For i = histArray.Count - 1 To 1 Step -1
             If histArray(i) Then
-                newList.Add(task.lineRGB.lpList(i)) ' Add the lines in the motion mask.
+                newList.Add(task.lines.lpList(i)) ' Add the lines in the motion mask.
             End If
         Next
 
@@ -5165,17 +5165,17 @@ Public Class XO_LineRGB_BasicsAlternative : Inherits TaskParent
             If lp.length > 0 Then sortlines.Add(lp.length, lp)
         Next
 
-        task.lineRGB.lpList.Clear()
+        task.lines.lpList.Clear()
         ' placeholder for zero so we can distinguish line 1 from the background which is 0.
-        task.lineRGB.lpList.Add(New lpData(New cv.Point, New cv.Point))
+        task.lines.lpList.Add(New lpData(New cv.Point, New cv.Point))
 
         dst2 = src
         For Each lp In sortlines.Values
-            task.lineRGB.lpList.Add(lp)
+            task.lines.lpList.Add(lp)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
 
-        labels(2) = CStr(task.lineRGB.lpList.Count) + " lines were found."
+        labels(2) = CStr(task.lines.lpList.Count) + " lines were found."
         labels(3) = CStr(lines.lpList.Count) + " lines were in the motion mask."
     End Sub
 End Class
@@ -5191,14 +5191,14 @@ Public Class XO_FeatureLine_Basics : Inherits TaskParent
     Public gravityRGB As lpData
     Dim matchRuns As Integer, lineRuns As Integer, totalLineRuns As Integer
     Public runOnEachFrame As Boolean
-    Public gravityMatch As New LineRGB_MatchGravity
+    Public gravityMatch As New Line_MatchGravity
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find and track the longest line by matching line bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then task.lineRGB.lpList.Clear()
+        If task.optionsChanged Then task.lines.lpList.Clear()
 
         If matchRuns > 500 Then
             Dim percent = lineRuns / matchRuns
@@ -5212,9 +5212,9 @@ Public Class XO_FeatureLine_Basics : Inherits TaskParent
         Dim lastRect = task.gridNabeRects(index)
 
         dst2 = src.Clone
-        If task.lineRGB.lpList.Count > 0 Then
+        If task.lines.lpList.Count > 0 Then
             matchRuns += 1
-            cameraMotionProxy = task.lineRGB.lpList(0)
+            cameraMotionProxy = task.lines.lpList(0)
 
             Dim matchInput As New cv.Mat
             cv.Cv2.HConcat(src(firstRect), src(lastRect), matchInput)
@@ -5226,12 +5226,12 @@ Public Class XO_FeatureLine_Basics : Inherits TaskParent
                         "line detection runs = " + CStr(totalLineRuns)
         End If
 
-        If task.heartBeatLT Or task.lineRGB.lpList.Count = 0 Or match.correlation < 0.98 Or runOnEachFrame Then
+        If task.heartBeatLT Or task.lines.lpList.Count = 0 Or match.correlation < 0.98 Or runOnEachFrame Then
             task.motionMask.SetTo(255) ' force a complete line detection
-            task.lineRGB.Run(src.Clone)
-            If task.lineRGB.lpList.Count = 0 Then Exit Sub
+            task.lines.Run(src.Clone)
+            If task.lines.lpList.Count = 0 Then Exit Sub
 
-            cameraMotionProxy = task.lineRGB.lpList(0)
+            cameraMotionProxy = task.lines.lpList(0)
             lineRuns += 1
             totalLineRuns += 1
 
@@ -5241,8 +5241,8 @@ Public Class XO_FeatureLine_Basics : Inherits TaskParent
         End If
 
         labels(3) = "Currently available lines."
-        dst3 = task.lineRGB.dst3
-        labels(3) = task.lineRGB.labels(3)
+        dst3 = task.lines.dst3
+        labels(3) = task.lines.labels(3)
 
         gravityMatch.Run(src)
         If gravityMatch.gLines.Count > 0 Then gravityRGB = gravityMatch.gLines(0)
@@ -5680,14 +5680,14 @@ Public Class XO_TrackLine_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             dst1.Line(lp.p1, lp.p2, 255, task.lineWidth + 1, cv.LineTypes.Link8)
         Next
 
         dst2 = runRedC(dst1, labels(2), Not dst1)
 
         dst3.SetTo(0)
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             DrawLine(dst3, lp.p1, lp.p2, white, task.lineWidth)
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
             DrawCircle(dst3, center, task.DotSize, task.highlight, -1)
@@ -5746,13 +5746,13 @@ End Class
 Public Class XO_TrackLine_BasicsSimple : Inherits TaskParent
     Dim lp As New lpData
     Dim match As New Match_Basics
-    Public rawLines As New LineRGB_Raw
+    Public rawLines As New Line_Raw
     Dim matchRect As cv.Rect
     Public Sub New()
         desc = "Track an individual line as best as possible."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lplist = task.lineRGB.lpList
+        Dim lplist = task.lines.lpList
         If lplist.Count = 0 Then Exit Sub
 
         If standalone Then
@@ -5789,12 +5789,12 @@ Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
     Public lpInput As lpData
     Public foundLine As Boolean
     Dim match As New MatchLine_Basics
-    Public rawLines As New LineRGB_Raw
+    Public rawLines As New Line_Raw
     Public Sub New()
         desc = "Track an individual line as best as possible."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lplist = task.lineRGB.lpList
+        Dim lplist = task.lines.lpList
         If lplist.Count = 0 Then Exit Sub
         If standalone And foundLine = False Then lpInput = task.gravityBasics.gravityRGB
 
@@ -5807,7 +5807,7 @@ Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
 
         Dim lpLast = lpInput
 
-        Dim index = task.lineRGB.lpRectMap.Get(Of Byte)(lpInput.center.Y, lpInput.center.X)
+        Dim index = task.lines.lpRectMap.Get(Of Byte)(lpInput.center.Y, lpInput.center.X)
         If index > 0 Then
             Dim lp = lplist(index - 1)
             If lpInput.index = lp.index Then
@@ -5854,7 +5854,7 @@ End Class
 Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
     Dim match As New Match_Basics
     Dim matchRect As cv.Rect
-    Public rawLines As New LineRGB_Raw
+    Public rawLines As New Line_Raw
     Dim lplist As List(Of lpData)
     Dim knn As New KNN_NNBasics
     Public Sub New()
@@ -5883,7 +5883,7 @@ Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
         knnList.Add(brick2)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lplist = task.lineRGB.lpList
+        lplist = task.lines.lpList
         If lplist.Count = 0 Then Exit Sub
 
         Static lp As New lpData, lpLast As lpData
@@ -5896,7 +5896,7 @@ Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
         match.Run(src)
 
         knn.trainInput.Clear()
-        For Each nextlp In task.lineRGB.lpList
+        For Each nextlp In task.lines.lpList
             prepEntry(knn.trainInput, nextlp)
         Next
 
@@ -5904,7 +5904,7 @@ Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
         prepEntry(knn.queries, lp)
         knn.Run(emptyMat)
 
-        lp = task.lineRGB.lpList(knn.result(0, 0))
+        lp = task.lines.lpList(knn.result(0, 0))
         labels(3) = "Index of the current lp = " + CStr(lp.index - 1)
 
         If standaloneTest() Then
@@ -5922,7 +5922,7 @@ Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
             End If
         End If
 
-        dst1 = ShowPaletteNoZero(task.lineRGB.lpRectMap)
+        dst1 = ShowPaletteNoZero(task.lines.lpRectMap)
         dst1.Circle(lp.center, task.DotSize, task.highlight, task.lineWidth, task.lineType)
 
         labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
@@ -5948,9 +5948,9 @@ Public Class XO_BrickPoint_VetLines : Inherits TaskParent
 
         Dim pointsPerLine(task.gridRects.Count) As List(Of Integer)
         For Each pt In bPoint.bpList
-            Dim index = task.lineRGB.lpRectMap.Get(Of Byte)(pt.Y, pt.X)
-            If index > 0 And index < task.lineRGB.lpList.Count Then
-                Dim lp = task.lineRGB.lpList(index)
+            Dim index = task.lines.lpRectMap.Get(Of Byte)(pt.Y, pt.X)
+            If index > 0 And index < task.lines.lpList.Count Then
+                Dim lp = task.lines.lpList(index)
                 If pointsPerLine(lp.index) Is Nothing Then pointsPerLine(lp.index) = New List(Of Integer)
                 pointsPerLine(lp.index).Add(lp.index)
                 dst2.Circle(pt, task.DotSize * 3, task.scalarColors(lp.index Mod 255), -1, task.lineType)
@@ -5960,7 +5960,7 @@ Public Class XO_BrickPoint_VetLines : Inherits TaskParent
         lpList.Clear()
         For Each ppl In pointsPerLine
             If ppl Is Nothing Then Continue For
-            If ppl.Count > 1 Then lpList.Add(task.lineRGB.lpList(ppl(0)))
+            If ppl.Count > 1 Then lpList.Add(task.lines.lpList(ppl(0)))
         Next
 
         dst3 = src
@@ -5977,9 +5977,9 @@ End Class
 Public Class XO_Gravity_Basics1 : Inherits TaskParent
     Public options As New Options_Features
     Dim gravityRaw As New Gravity_Raw
-    Public gravityMatch As New LineRGB_MatchGravity
+    Public gravityMatch As New Line_MatchGravity
     Public gravityRGB As lpData
-    Dim nearest As New LineRGB_FindNearest
+    Dim nearest As New Line_FindNearest
     Public Sub New()
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
     End Sub
@@ -6010,7 +6010,7 @@ Public Class XO_Gravity_Basics1 : Inherits TaskParent
         If RGBcandidate.length = 0 Then
             If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
         Else
-            stillPresent = task.lineRGB.lpRectMap.Get(Of Byte)(RGBcandidate.center.Y, RGBcandidate.center.X)
+            stillPresent = task.lines.lpRectMap.Get(Of Byte)(RGBcandidate.center.Y, RGBcandidate.center.X)
         End If
 
         If stillPresent Then
@@ -6030,15 +6030,15 @@ Public Class XO_Gravity_Basics1 : Inherits TaskParent
             If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
         End If
 
-        task.horizonVec = LineRGB_Perpendicular.computePerp(task.gravityVec)
+        task.horizonVec = Line_Perpendicular.computePerp(task.gravityVec)
 
         gravityRGB = RGBcandidate
 
         If standaloneTest() Then
             dst2.SetTo(0)
             showVectors(dst2)
-            dst3 = task.lineRGB.dst3
-            labels(3) = task.lineRGB.labels(3)
+            dst3 = task.lines.dst3
+            labels(3) = task.lines.labels(3)
         End If
     End Sub
 End Class

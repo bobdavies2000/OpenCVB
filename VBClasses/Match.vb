@@ -33,7 +33,7 @@ Public Class Match_Basics : Inherits TaskParent
             dst2.Rectangle(newRect, task.highlight, task.lineWidth)
             If standalone Then
                 Dim lp = task.gravityBasics.gravityRGB
-                If lp Is Nothing Then lp = task.lineRGB.lpList(0)
+                If lp Is Nothing Then lp = task.lines.lpList(0)
                 DrawLine(dst2, lp.p1, lp.p2)
             End If
         End If
@@ -250,7 +250,7 @@ Public Class Match_LinesKNN : Inherits TaskParent
         desc = "Use the 2 points from a line as input to a 4-dimension KNN"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lplist = task.lineRGB.lpList
+        Dim lplist = task.lines.lpList
         If lplist.Count = 0 Then Exit Sub
 
         dst2 = dst2

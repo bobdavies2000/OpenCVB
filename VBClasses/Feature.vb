@@ -78,7 +78,7 @@ Public Class Feature_Basics : Inherits TaskParent
                 labels(2) = "FAST produced " + CStr(features.Count) + " features"
             Case FeatureSrc.LineInput
                 task.logicalLines.Clear()
-                For Each lp In task.lineRGB.lpList
+                For Each lp In task.lines.lpList
                     features.Add(lp.p1)
                     features.Add(lp.p2)
                     task.logicalLines.Add(lp)

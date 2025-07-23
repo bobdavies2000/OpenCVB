@@ -11,7 +11,7 @@ Public Class MotionLine_Basics : Inherits TaskParent
         dst2 = diff.dst2
 
         If task.heartBeat Then dst3 = src
-        lineHistory.Add(task.lineRGB.lpList)
+        lineHistory.Add(task.lines.lpList)
         For Each lplist In lineHistory
             For Each lp In lplist
                 DrawLine(dst3, lp.p1, lp.p2)
@@ -19,6 +19,6 @@ Public Class MotionLine_Basics : Inherits TaskParent
         Next
         If lineHistory.Count > task.gOptions.FrameHistory.Value Then lineHistory.RemoveAt(0)
 
-        labels(2) = CStr(task.lineRGB.lpList.Count) + " lines were found in the diff output"
+        labels(2) = CStr(task.lines.lpList.Count) + " lines were found in the diff output"
     End Sub
 End Class

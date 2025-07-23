@@ -79,7 +79,7 @@ Public Class Track_LongestLine : Inherits TaskParent
         desc = "Track the longest RGB line"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lpList = task.lineRGB.lpList
+        Dim lpList = task.lines.lpList
         If lpList.Count = 0 Then Exit Sub
 
         If task.heartBeatLT Then
@@ -105,7 +105,7 @@ Public Class Track_GridRect : Inherits TaskParent
         desc = "Track the gravity RGB vector"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lpList = task.lineRGB.lpList
+        Dim lpList = task.lines.lpList
         If lpList.Count = 0 Then Exit Sub
 
         Static searchRect As cv.Rect, originalRect As cv.Rect
@@ -142,7 +142,7 @@ Public Class Track_Lines : Inherits TaskParent
         desc = "Track the top X lines using Track_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lpList = task.lineRGB.lpList
+        Dim lpList = task.lines.lpList
         If lpList.Count = 0 Then Exit Sub
 
         Dim trackCount = Math.Min(track.Length, lpList.Count)

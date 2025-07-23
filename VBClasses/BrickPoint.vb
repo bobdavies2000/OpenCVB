@@ -377,7 +377,7 @@ Public Class BrickPoint_KNN : Inherits TaskParent
         Next
 
         dst2 = src.Clone
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             DrawLine(dst2, lp.p1, lp.p2)
         Next
     End Sub

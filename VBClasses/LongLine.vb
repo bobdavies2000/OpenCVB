@@ -6,8 +6,8 @@ Public Class LongLine_Depth : Inherits TaskParent
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lineRGB.lpList.Count <= 1 Then Exit Sub
-        Dim lp = task.lineRGB.lpList(0)
+        If task.lines.lpList.Count <= 1 Then Exit Sub
+        Dim lp = task.lines.lpList(0)
         dst2 = src
 
         dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
@@ -68,8 +68,8 @@ Public Class LongLine_Point : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeatLT Then dst2 = src
-        If task.lineRGB.lpList.Count = 0 Then Exit Sub
-        Dim lp = task.lineRGB.lpList(0)
+        If task.lines.lpList.Count = 0 Then Exit Sub
+        Dim lp = task.lines.lpList(0)
         task.kalman.kInput = {lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y}
         task.kalman.Run(emptyMat)
         lp.p1 = lpData.validatePoint(New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)))
@@ -115,15 +115,15 @@ End Class
 Public Class LongLine_ExtendAll : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public Sub New()
-        labels = {"", "", "Image output from LineRGB_Core", "The extended line for each line found in LineRGB_Core"}
+        labels = {"", "", "Image output from Line_Core", "The extended line for each line found in Line_Core"}
         desc = "Create a list of all the extended lines in an image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lineRGB.dst2
+        dst2 = task.lines.dst2
 
         dst3 = src.Clone
         lpList.Clear()
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             DrawLine(dst3, lp.ep1, lp.ep2, task.highlight)
             lpList.Add(New lpData(lp.ep1, lp.ep2))
         Next
@@ -139,7 +139,7 @@ Public Class LongLine_ExtendParallel : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public parList As New List(Of coinPoints)
     Public Sub New()
-        labels = {"", "", "Image output from LineRGB_Core", "Parallel extended lines"}
+        labels = {"", "", "Image output from Line_Core", "Parallel extended lines"}
         desc = "Use KNN to find which lines are near each other and parallel"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -176,11 +176,11 @@ Public Class LongLine_ExtendParallel : Inherits TaskParent
                 If distance1 < distanceMid * 2 And distance2 < distanceMid * 2 Then
                     Dim cp As coinPoints
 
-                    Dim mps = task.lineRGB.lpList(index)
+                    Dim mps = task.lines.lpList(index)
                     cp.p1 = mps.p1
                     cp.p2 = mps.p2
 
-                    mps = task.lineRGB.lpList(i)
+                    mps = task.lines.lpList(i)
                     cp.p3 = mps.p1
                     cp.p4 = mps.p2
 

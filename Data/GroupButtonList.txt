@@ -132,11 +132,11 @@ KNNorm
 LaneFinder
 Laplacian
 LeftRight
+Line
 Line3D
 Linear
 LinearRegression
 LineRect
-LineRGB
 LongLine
 LUT
 Magnify

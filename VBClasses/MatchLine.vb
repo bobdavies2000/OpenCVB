@@ -55,12 +55,12 @@ Public Class MatchLine_BasicsAll : Inherits TaskParent
     Public correlations As New List(Of Single)
     Public Sub New()
         task.featureOptions.MatchCorrSlider.Value = 90
-        desc = "Track each of the lines found in LineRGB_Basics"
+        desc = "Track each of the lines found in Line_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         correlations.Clear()
-        For Each lp In task.lineRGB.lpList
+        For Each lp In task.lines.lpList
             match.lpInput = lp
             match.Run(src)
             correlations.Add(match.correlation1)
@@ -78,8 +78,8 @@ Public Class MatchLine_BasicsAll : Inherits TaskParent
             Exit For
         Next
 
-        dst3 = task.lineRGB.dst3
-        labels(3) = task.lineRGB.labels(3)
+        dst3 = task.lines.dst3
+        labels(3) = task.lines.labels(3)
     End Sub
 End Class
 
@@ -114,7 +114,7 @@ Public Class MatchLine_BasicsOriginal : Inherits TaskParent
         If match.correlation < task.fCorrThreshold Or lpSave.p1 <> lpInput.p1 Or lpSave.p2 <> lpInput.p2 Then
             lpSave = lpInput
             ' default to longest line
-            If standalone Then lpInput = task.lineRGB.lpList(0)
+            If standalone Then lpInput = task.lines.lpList(0)
 
             Dim r = ValidateRect(New cv.Rect(Math.Min(lpInput.p1.X, lpInput.p2.X), Math.Min(lpInput.p1.Y, lpInput.p2.Y),
                                              Math.Abs(lpInput.p1.X - lpInput.p2.X), Math.Abs(lpInput.p1.Y - lpInput.p2.Y)))
@@ -215,11 +215,11 @@ Public Class MatchLine_Test : Inherits TaskParent
         desc = "Find and track the longest line by matching line bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then task.lineRGB.lpList.Clear()
+        If task.optionsChanged Then task.lines.lpList.Clear()
 
         dst2 = src.Clone
-        If task.lineRGB.lpList.Count > 0 Then
-            cameraMotionProxy = task.lineRGB.lpList(0)
+        If task.lines.lpList.Count > 0 Then
+            cameraMotionProxy = task.lines.lpList(0)
             match.lpInput = cameraMotionProxy
             match.Run(src)
             dst1 = match.dst2
@@ -231,16 +231,16 @@ Public Class MatchLine_Test : Inherits TaskParent
                match.correlation2 < task.fCorrThreshold Then
 
                 task.motionMask.SetTo(255) ' force a complete line detection
-                task.lineRGB.Run(src.Clone)
-                If task.lineRGB.lpList.Count = 0 Then Exit Sub
+                task.lines.Run(src.Clone)
+                If task.lines.lpList.Count = 0 Then Exit Sub
 
-                match.lpInput = task.lineRGB.lpList(0)
+                match.lpInput = task.lines.lpList(0)
                 match.Run(src)
             End If
         End If
 
-        dst3 = task.lineRGB.dst3
-        labels(3) = task.lineRGB.labels(3)
+        dst3 = task.lines.dst3
+        labels(3) = task.lines.labels(3)
 
         dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, task.highlight, task.lineWidth, task.lineType)
     End Sub
@@ -254,7 +254,7 @@ End Class
 Public Class MatchLine_VH : Inherits TaskParent
     Public brickCells As New List(Of gravityLine)
     Dim match As New Match_tCell
-    Dim gLines As New LineRGB_GCloud
+    Dim gLines As New Line_GCloud
     Dim options As New Options_Features
     Public Sub New()
         labels(3) = "More readable than dst1 - index, correlation, length (meters), and ArcY"

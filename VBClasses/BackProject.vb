@@ -97,7 +97,7 @@ End Class
 
 Public Class BackProject_FullLines : Inherits TaskParent
     Dim backP As New BackProject_DisplayColor
-    Dim lines As New LineRGB_RawSorted
+    Dim lines As New Line_RawSorted
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         labels = {"", "", "Lines found in the back projection", "Backprojection results"}
@@ -483,7 +483,7 @@ End Class
 
 Public Class BackProject_MaskLines : Inherits TaskParent
     Dim masks As New BackProject_Masks
-    Dim lines As New LineRGB_RawSorted
+    Dim lines As New Line_RawSorted
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
