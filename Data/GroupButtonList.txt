@@ -75,7 +75,6 @@ FeatureFlow
 FeatureLess
 Fibonacci
 Filter
-FindContours
 FindMinRect
 FindNonZero
 FindTriangle
@@ -233,7 +232,6 @@ TextureFlow
 Thickness
 Threshold
 Track
-TrackLine
 Transform
 TransformationMatrix
 Triangle

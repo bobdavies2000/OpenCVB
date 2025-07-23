@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
     Public options As New Options_Features
     Dim gravityRaw As New Gravity_Raw
-    Public trackLine As New TrackLine_Basics
+    Public trackLine As New LineRGB_Gravity
     Public gravityRGB As lpData
     Public Sub New()
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."

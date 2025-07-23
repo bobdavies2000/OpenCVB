@@ -616,6 +616,7 @@ Public Class lpData
     Public template1 As New cv.Mat
     Public template2 As New cv.Mat
     Public gravityProxy As Boolean
+    Public brickList As New List(Of Integer)
     Public index As Integer
     Public yIntercept As Single
     Public Function perpendicularPoints(pt As cv.Point2f) As lpData
