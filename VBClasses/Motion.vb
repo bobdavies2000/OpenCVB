@@ -721,7 +721,7 @@ Public Class Motion_CenterRect : Inherits TaskParent
         If task.heartBeatLT Or gravitySnap.p1.X = 0 Or correlation < correlationThreshold Then
             If inputRect.Width <> 0 Then task.centerRect = inputRect
             template = src(task.centerRect).Clone
-            gravitySnap = task.gravityVec
+            gravitySnap = task.lineGravity
         End If
 
         cv.Cv2.MatchTemplate(template, src, dst3, options.matchOption)
@@ -746,7 +746,7 @@ Public Class Motion_CenterRect : Inherits TaskParent
         Dim yDisp = matchCenter.Y - dst2.Height / 2
         translation = New cv.Point2f(xDisp, yDisp)
 
-        Dim mp = task.gravityVec
+        Dim mp = task.lineGravity
         dst2.Line(mp.p1, mp.p2, black, task.lineWidth, task.lineType)
 
         Dim sideAdjacent = dst2.Height / 2

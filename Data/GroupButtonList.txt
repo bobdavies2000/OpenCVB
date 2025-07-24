@@ -136,8 +136,8 @@ Line
 Line3D
 Linear
 LinearRegression
+LineDepth
 LineRect
-LongLine
 LUT
 Magnify
 Mat

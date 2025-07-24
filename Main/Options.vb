@@ -39,34 +39,33 @@ Public Class Options
         Me.Close()
     End Sub
     Public Sub defineCameraResolutions(index As Integer)
-        If Main.cameraNames(index).StartsWith("StereoLabs ZED 2/2i") Then
-            Main.settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
-                                                        True, True, True, False, False, False,
-                                                        True, True, True, True, True, True})
-        Else
-            Select Case Main.cameraNames(index)
-                Case "Intel(R) RealSense(TM) Depth Camera 435i"
-                    Main.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-                                                        True, True, True, True, True, True,
-                                                        False, False, False, False, False, False})
-                Case "Intel(R) RealSense(TM) Depth Camera 455"
-                    Main.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-                                                        True, True, True, True, True, True,
-                                                        False, False, False, False, False, False})
-                Case "Oak-D camera"
-                    Main.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-                                                        True, True, True, False, False, False,
-                                                        False, False, False, False, False, False})
-                Case "MYNT-EYE-D1000"
-                    Main.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-                                                        True, True, True, False, False, False,
-                                                        False, False, False, False, False, False})
-                Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
-                    Main.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-                                                        True, True, True, True, True, True,
-                                                        False, False, False, False, False, False})
-            End Select
-        End If
+        ' see resolutionList above - helps to see how code maps to layout of the resolutions.
+        Select Case Main.cameraNames(index)
+            Case "StereoLabs ZED 2/2i"
+                Main.settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
+                                                                           True, True, True,
+                                                                           False, False, False,
+                                                                           True, True, True,
+                                                                           True, True, True})
+            Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
+                Main.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                                                                           True, True, True,
+                                                                           True, True, True,
+                                                                           False, False, False,
+                                                                           False, False, False})
+            Case "Oak-D camera"
+                Main.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                                                                           True, True, True,
+                                                                           False, False, False,
+                                                                           False, False, False,
+                                                                           False, False, False})
+            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
+                Main.settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                                                                           True, True, True,
+                                                                           True, True, True,
+                                                                           False, False, False,
+                                                                           False, False, False})
+        End Select
     End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
         Dim index = Main.cameraNames.IndexOf(sender.text)

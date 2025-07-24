@@ -73,18 +73,18 @@ Public Class XO_Gravity_HorizonRawOld : Inherits TaskParent
         xBot = findLast(gPoints, False, sampleUnused)
 
         If standaloneTest() Then
-            Dim horizonVec As lpData, gravityVec As lpData
+            Dim lineHorizon As lpData, lineGravity As lpData
             If hPoints.Total > 0 Then
-                horizonVec = New lpData(New cv.Point(0, yLeft), New cv.Point(dst2.Width, yRight))
+                lineHorizon = New lpData(New cv.Point(0, yLeft), New cv.Point(dst2.Width, yRight))
             Else
-                horizonVec = New lpData
+                lineHorizon = New lpData
             End If
 
-            gravityVec = New lpData(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
+            lineGravity = New lpData(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
 
             dst2.SetTo(0)
-            DrawLine(dst2, gravityVec.p1, gravityVec.p2, task.highlight)
-            DrawLine(dst2, horizonVec.p1, horizonVec.p2, cv.Scalar.Red)
+            DrawLine(dst2, lineGravity.p1, lineGravity.p2, task.highlight)
+            DrawLine(dst2, lineHorizon.p1, lineHorizon.p2, cv.Scalar.Red)
         End If
     End Sub
 End Class
@@ -97,10 +97,10 @@ Public Class XO_Horizon_FindNonZero : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.gravityVec = New lpData(New cv.Point2f(dst2.Width / 2, 0),
+        task.lineGravity = New lpData(New cv.Point2f(dst2.Width / 2, 0),
                                              New cv.Point2f(dst2.Width / 2, dst2.Height))
-        task.horizonVec = New lpData(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
-        labels = {"", "Horizon vector mask", "Crosshairs - gravityVec (vertical) and horizonVec (horizontal)", "Gravity vector mask"}
+        task.lineHorizon = New lpData(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
+        labels = {"", "Horizon vector mask", "Crosshairs - lineGravity (vertical) and lineHorizon (horizontal)", "Gravity vector mask"}
         desc = "Create lines for the gravity vector and horizon vector in the camera image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -128,8 +128,8 @@ Public Class XO_Horizon_FindNonZero : Inherits TaskParent
             Dim p2 = points(xVals.IndexOf(xVals.Max()))
 
             Dim lp = findEdgePoints(New lpData(p1, p2))
-            task.horizonVec = New lpData(lp.p1, lp.p2)
-            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, 255)
+            task.lineHorizon = New lpData(lp.p1, lp.p2)
+            DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, 255)
         End If
 
         dst3 = split(0).InRange(-0.01, 0.01)
@@ -147,12 +147,12 @@ Public Class XO_Horizon_FindNonZero : Inherits TaskParent
             Dim p1 = points(yVals.IndexOf(yVals.Min()))
             Dim p2 = points(yVals.IndexOf(yVals.Max()))
             If Math.Abs(p1.X - p2.X) < 2 Then
-                task.gravityVec = New lpData(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
+                task.lineGravity = New lpData(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
             Else
                 Dim lp = findEdgePoints(New lpData(p1, p2))
-                task.gravityVec = New lpData(lp.p1, lp.p2)
+                task.lineGravity = New lpData(lp.p1, lp.p2)
             End If
-            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, 255)
+            DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, 255)
         End If
     End Sub
 End Class
@@ -171,13 +171,13 @@ Public Class XO_Horizon_Perpendicular : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
+        DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, white)
 
-        perp.input = task.horizonVec
+        perp.input = task.lineHorizon
         perp.Run(src)
         DrawLine(dst2, perp.output.p1, perp.output.p2, cv.Scalar.Yellow)
 
-        Dim gVec = task.gravityVec
+        Dim gVec = task.lineGravity
         gVec.p1.X += 10
         gVec.p2.X += 10
         DrawLine(dst2, gVec.p1, gVec.p2, white)
@@ -300,8 +300,8 @@ Public Class XO_Horizon_Validate : Inherits TaskParent
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Then
-            ptLeft = task.gravityVec.p1
-            ptRight = task.gravityVec.p2
+            ptLeft = task.lineGravity.p1
+            ptRight = task.lineGravity.p2
             Dim r = ValidateRect(New cv.Rect(ptLeft.X - templatePad, ptLeft.Y - templatePad, templateSize, templateSize))
             leftTemplate = src(r)
 
@@ -359,8 +359,8 @@ Public Class XO_Gravity_Basics : Inherits TaskParent
             DrawCircle(dst2, pt, task.DotSize, white)
         Next
 
-        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
-        DrawLine(dst3, task.gravityVec.p1, task.gravityVec.p2, white)
+        DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, white)
+        DrawLine(dst3, task.lineGravity.p1, task.lineGravity.p2, white)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then dst0 = task.gravitySplit(0) Else dst0 = src
@@ -394,11 +394,11 @@ Public Class XO_Gravity_Basics : Inherits TaskParent
             strOut += "Using the previous value for the gravity vector."
         Else
             Dim lp = findEdgePoints(New lpData(p1, p2))
-            task.gravityVec = New lpData(lp.p1, lp.p2)
+            task.lineGravity = New lpData(lp.p1, lp.p2)
             If standaloneTest() Then displayResults(p1, p2)
         End If
 
-        task.horizonVec = Line_Perpendicular.computePerp(task.gravityVec)
+        task.lineHorizon = Line_Perpendicular.computePerp(task.lineGravity)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -418,16 +418,16 @@ Public Class XO_CameraMotion_Basics : Inherits TaskParent
         desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gravityVec = New lpData(task.gravityVec.p1, task.gravityVec.p2)
-        Dim horizonVec = New lpData(task.horizonVec.p1, task.horizonVec.p2)
+        Dim lineGravity = New lpData(task.lineGravity.p1, task.lineGravity.p2)
+        Dim lineHorizon = New lpData(task.lineHorizon.p1, task.lineHorizon.p2)
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        translationX = task.gOptions.DebugSlider.Value ' Math.Round(gravityVec.p1.X - task.gravityVec.p1.X)
-        translationY = task.gOptions.DebugSlider.Value ' Math.Round(horizonVec.p1.Y - task.horizonVec.p1.Y)
+        translationX = task.gOptions.DebugSlider.Value ' Math.Round(lineGravity.p1.X - task.lineGravity.p1.X)
+        translationY = task.gOptions.DebugSlider.Value ' Math.Round(lineHorizon.p1.Y - task.lineHorizon.p1.Y)
         If Math.Abs(translationX) >= dst2.Width / 2 Then translationX = 0
-        If horizonVec.p1.Y >= dst2.Height Or horizonVec.p2.Y >= dst2.Height Or Math.Abs(translationY) >= dst2.Height / 2 Then
-            horizonVec = New lpData(New cv.Point2f, New cv.Point2f(336, 0))
+        If lineHorizon.p1.Y >= dst2.Height Or lineHorizon.p2.Y >= dst2.Height Or Math.Abs(translationY) >= dst2.Height / 2 Then
+            lineHorizon = New lpData(New cv.Point2f, New cv.Point2f(336, 0))
             translationY = 0
         End If
 
@@ -471,12 +471,12 @@ Public Class XO_CameraMotion_Basics : Inherits TaskParent
             End If
         End If
 
-        gravityVec = New lpData(task.gravityVec.p1, task.gravityVec.p2)
-        horizonVec = New lpData(task.horizonVec.p1, task.horizonVec.p2)
+        lineGravity = New lpData(task.lineGravity.p1, task.lineGravity.p2)
+        lineHorizon = New lpData(task.lineHorizon.p1, task.lineHorizon.p2)
         SetTrueText(strOut, 3)
 
         labels(2) = "Translation (X, Y) = (" + CStr(translationX) + ", " + CStr(translationY) + ")" +
-                        If(horizonVec.p1.Y = 0 And horizonVec.p2.Y = 0, " there is no horizon present", "")
+                        If(lineHorizon.p1.Y = 0 And lineHorizon.p2.Y = 0, " there is no horizon present", "")
         labels(3) = "Camera direction (radians) = " + Format(task.camDirection, fmt1) + " with distance = " + Format(task.camMotionPixels, fmt1)
     End Sub
 End Class
@@ -492,8 +492,8 @@ Public Class XO_CameraMotion_WithRotation : Inherits TaskParent
     Public rotationY As Single
     Public centerY As cv.Point2f
     Public rotate As New Rotate_BasicsQT
-    Dim gravityVec As lpData
-    Dim horizonVec As lpData
+    Dim lineGravity As lpData
+    Dim lineHorizon As lpData
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -501,13 +501,13 @@ Public Class XO_CameraMotion_WithRotation : Inherits TaskParent
     End Sub
     Public Sub translateRotateX(x1 As Integer, x2 As Integer)
         rotationX = Math.Atan(Math.Abs((x1 - x2)) / dst2.Height) * 57.2958
-        centerX = New cv.Point2f((task.gravityVec.p1.X + task.gravityVec.p2.X) / 2, (task.gravityVec.p1.Y + task.gravityVec.p2.Y) / 2)
+        centerX = New cv.Point2f((task.lineGravity.p1.X + task.lineGravity.p2.X) / 2, (task.lineGravity.p1.Y + task.lineGravity.p2.Y) / 2)
         If x1 >= 0 And x2 > 0 Then
             translationX = If(x1 > x2, x1 - x2, x2 - x1)
-            centerX = task.gravityVec.p2
+            centerX = task.lineGravity.p2
         ElseIf x1 <= 0 And x2 < 0 Then
             translationX = If(x1 > x2, x1 - x2, x2 - x1)
-            centerX = task.gravityVec.p1
+            centerX = task.lineGravity.p1
         ElseIf x1 < 0 And x2 > 0 Then
             translationX = 0
         Else
@@ -517,13 +517,13 @@ Public Class XO_CameraMotion_WithRotation : Inherits TaskParent
     End Sub
     Public Sub translateRotateY(y1 As Integer, y2 As Integer)
         rotationY = Math.Atan(Math.Abs((y1 - y2)) / dst2.Width) * 57.2958
-        centerY = New cv.Point2f((task.horizonVec.p1.X + task.horizonVec.p2.X) / 2, (task.horizonVec.p1.Y + task.horizonVec.p2.Y) / 2)
+        centerY = New cv.Point2f((task.lineHorizon.p1.X + task.lineHorizon.p2.X) / 2, (task.lineHorizon.p1.Y + task.lineHorizon.p2.Y) / 2)
         If y1 > 0 And y2 > 0 Then
             translationY = If(y1 > y2, y1 - y2, y2 - y1)
-            centerY = task.horizonVec.p2
+            centerY = task.lineHorizon.p2
         ElseIf y1 < 0 And y2 < 0 Then
             translationY = If(y1 > y2, y1 - y2, y2 - y1)
-            centerY = task.horizonVec.p1
+            centerY = task.lineHorizon.p1
         ElseIf y1 < 0 And y2 > 0 Then
             translationY = 0
         Else
@@ -533,17 +533,17 @@ Public Class XO_CameraMotion_WithRotation : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.firstPass Then
-            gravityVec = task.gravityVec
-            horizonVec = task.horizonVec
+            lineGravity = task.lineGravity
+            lineHorizon = task.lineHorizon
         End If
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim x1 = gravityVec.p1.X - task.gravityVec.p1.X
-        Dim x2 = gravityVec.p2.X - task.gravityVec.p2.X
+        Dim x1 = lineGravity.p1.X - task.lineGravity.p1.X
+        Dim x2 = lineGravity.p2.X - task.lineGravity.p2.X
 
-        Dim y1 = horizonVec.p1.Y - task.horizonVec.p1.Y
-        Dim y2 = horizonVec.p2.Y - task.horizonVec.p2.Y
+        Dim y1 = lineHorizon.p1.Y - task.lineHorizon.p1.Y
+        Dim y2 = lineHorizon.p2.Y - task.lineHorizon.p2.Y
 
         translateRotateX(x1, x2)
         translateRotateY(y1, y2)
@@ -563,8 +563,8 @@ Public Class XO_CameraMotion_WithRotation : Inherits TaskParent
             dst2 = src
         End If
 
-        gravityVec = task.gravityVec
-        horizonVec = task.horizonVec
+        lineGravity = task.lineGravity
+        lineHorizon = task.lineHorizon
 
         labels(2) = "Translation X = " + Format(translationX, fmt1) + " rotation X = " + Format(rotationX, fmt1) + " degrees " +
                         " center of rotation X = " + Format(centerX.X, fmt0) + ", " + Format(centerX.Y, fmt0)
@@ -608,16 +608,16 @@ Public Class XO_Rotate_Horizon : Inherits TaskParent
         dst2 = rotate.dst2.Clone
         dst1 = dst2.Clone
 
-        Dim horizonVec = New lpData(task.horizonVec.p1, task.horizonVec.p2)
+        Dim lineHorizon = New lpData(task.lineHorizon.p1, task.lineHorizon.p2)
 
-        horizonVec.p1 = RotatePoint(task.horizonVec.p1, rotate.rotateCenter, -rotate.rotateAngle)
-        horizonVec.p2 = RotatePoint(task.horizonVec.p2, rotate.rotateCenter, -rotate.rotateAngle)
+        lineHorizon.p1 = RotatePoint(task.lineHorizon.p1, rotate.rotateCenter, -rotate.rotateAngle)
+        lineHorizon.p2 = RotatePoint(task.lineHorizon.p2, rotate.rotateCenter, -rotate.rotateAngle)
 
-        DrawLine(dst2, horizonVec.p1, horizonVec.p2, task.highlight)
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
+        DrawLine(dst2, lineHorizon.p1, lineHorizon.p2, task.highlight)
+        DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, white)
 
-        Dim y1 = horizonVec.p1.Y - task.horizonVec.p1.Y
-        Dim y2 = horizonVec.p2.Y - task.horizonVec.p2.Y
+        Dim y1 = lineHorizon.p1.Y - task.lineHorizon.p1.Y
+        Dim y2 = lineHorizon.p2.Y - task.lineHorizon.p2.Y
         edges.translateRotateY(y1, y2)
 
         rotate.rotateAngle = edges.rotationY
@@ -3382,10 +3382,10 @@ Public Class XO_Line_VerticalHorizontal1 : Inherits TaskParent
         dst2 = src.Clone
         If standaloneTest() Then dst3 = task.lines.dst2
 
-        nearest.lp = task.gravityVec
-        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
+        nearest.lp = task.lineGravity
+        DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, white)
         For Each lp In task.lines.lpList
-            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.gravityVec.p1, task.gravityVec.p2)
+            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.lineGravity.p1, task.lineGravity.p2)
             If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then
                 Continue For
             End If
@@ -3403,10 +3403,10 @@ Public Class XO_Line_VerticalHorizontal1 : Inherits TaskParent
             End If
         Next
 
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, white)
-        nearest.lp = task.horizonVec
+        DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, white)
+        nearest.lp = task.lineHorizon
         For Each lp In task.lines.lpList
-            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.horizonVec.p1, task.horizonVec.p2)
+            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.lineHorizon.p1, task.lineHorizon.p2)
             If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
 
             nearest.pt = lp.p1
@@ -3421,8 +3421,8 @@ Public Class XO_Line_VerticalHorizontal1 : Inherits TaskParent
                 DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
             End If
         Next
-        labels(2) = "Slope for gravity is " + Format(task.gravityVec.slope, fmt1) + ".  Slope for horizon is " +
-                    Format(task.horizonVec.slope, fmt1)
+        labels(2) = "Slope for gravity is " + Format(task.lineGravity.slope, fmt1) + ".  Slope for horizon is " +
+                    Format(task.lineHorizon.slope, fmt1)
     End Sub
 End Class
 
@@ -4069,7 +4069,7 @@ End Class
 
 
 Public Class XO_LineCoin_Parallel : Inherits TaskParent
-    Dim parallel As New LongLine_ExtendParallel
+    Dim parallel As New Line_Parallel
     Dim near As New XO_Line_Nearest
     Public coinList As New List(Of coinPoints)
     Public Sub New()
@@ -5250,7 +5250,7 @@ Public Class XO_FeatureLine_Basics : Inherits TaskParent
         dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
         dst2.Rectangle(lastRect, task.highlight, task.lineWidth)
         dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, task.highlight, task.lineWidth, task.lineType)
-        dst2.Line(task.gravityVec.ep1, task.gravityVec.ep2, task.highlight, task.lineWidth, task.lineType)
+        dst2.Line(task.lineGravity.ep1, task.lineGravity.ep2, task.highlight, task.lineWidth, task.lineType)
     End Sub
 End Class
 
@@ -5993,8 +5993,8 @@ Public Class XO_Gravity_Basics1 : Inherits TaskParent
         dst.Rectangle(lastRect, task.highlight, task.lineWidth)
     End Sub
     Public Shared Sub showVectors(dst As cv.Mat)
-        dst.Line(task.gravityVec.p1, task.gravityVec.p2, white, task.lineWidth, task.lineType)
-        dst.Line(task.horizonVec.p1, task.horizonVec.p2, white, task.lineWidth, task.lineType)
+        dst.Line(task.lineGravity.p1, task.lineGravity.p2, white, task.lineWidth, task.lineType)
+        dst.Line(task.lineHorizon.p1, task.lineHorizon.p2, white, task.lineWidth, task.lineType)
         If task.gravityBasics.gravityRGB IsNot Nothing Then showVec(dst, task.gravityBasics.gravityRGB)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -6017,20 +6017,20 @@ Public Class XO_Gravity_Basics1 : Inherits TaskParent
             nearest.lpInput = RGBcandidate
             nearest.Run(src)
             RGBcandidate = nearest.lpOutput
-            Dim deltaX1 = Math.Abs(task.gravityVec.ep1.X - RGBcandidate.ep1.X)
-            Dim deltaX2 = Math.Abs(task.gravityVec.ep2.X - RGBcandidate.ep2.X)
+            Dim deltaX1 = Math.Abs(task.lineGravity.ep1.X - RGBcandidate.ep1.X)
+            Dim deltaX2 = Math.Abs(task.lineGravity.ep2.X - RGBcandidate.ep2.X)
             If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
-                task.gravityVec = task.gravityIMU
+                task.lineGravity = task.gravityIMU
                 RGBcandidate = New lpData
                 If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
             End If
         Else
-            task.gravityVec = task.gravityIMU
+            task.lineGravity = task.gravityIMU
             RGBcandidate = New lpData
             If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
         End If
 
-        task.horizonVec = Line_Perpendicular.computePerp(task.gravityVec)
+        task.lineHorizon = Line_Perpendicular.computePerp(task.lineGravity)
 
         gravityRGB = RGBcandidate
 

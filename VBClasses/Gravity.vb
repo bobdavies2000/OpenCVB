@@ -8,8 +8,8 @@ Public Class Gravity_Basics : Inherits TaskParent
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
     End Sub
     Public Shared Sub showVectors(dst As cv.Mat)
-        dst.Line(task.gravityVec.ep1, task.gravityVec.ep2, white, task.lineWidth, task.lineType)
-        dst.Line(task.horizonVec.ep1, task.horizonVec.ep2, white, task.lineWidth, task.lineType)
+        dst.Line(task.lineGravity.ep1, task.lineGravity.ep2, white, task.lineWidth, task.lineType)
+        dst.Line(task.lineHorizon.ep1, task.lineHorizon.ep2, white, task.lineWidth, task.lineType)
         Dim rgbVec = task.gravityBasics.gravityRGB
         Static lastGoodRGBvector As lpData
         If rgbVec IsNot Nothing Then
@@ -27,8 +27,8 @@ Public Class Gravity_Basics : Inherits TaskParent
             gravityRGB = trackLine.lp
             Dim rgbVec = gravityRGB
 
-            Dim deltaX1 = task.gravityVec.ep1.X - rgbVec.ep1.X
-            Dim deltaX2 = task.gravityVec.ep2.X - rgbVec.ep2.X
+            Dim deltaX1 = task.lineGravity.ep1.X - rgbVec.ep1.X
+            Dim deltaX2 = task.lineGravity.ep2.X - rgbVec.ep2.X
             ' if the rgb vec isn't one side or the other of the gravity vec, then it is no good.
             ' There is a possible way the signs won't match - when the the rgb vec is almost the same as the gravity vec
             ' but that is ignored for now.
@@ -37,7 +37,7 @@ Public Class Gravity_Basics : Inherits TaskParent
                 ' This will smooth the perturbations of the IMU vector.
                 If Math.Abs(deltaX1 - deltaX2) < options.pixelThreshold Then
                     Dim shift = dst2.Width / 2 - (rgbVec.ep1.X + rgbVec.ep2.X) / 2
-                    task.gravityVec = New lpData(New cv.Point2f(rgbVec.ep1.X + shift, rgbVec.ep1.Y),
+                    task.lineGravity = New lpData(New cv.Point2f(rgbVec.ep1.X + shift, rgbVec.ep1.Y),
                                                  New cv.Point2f(rgbVec.ep2.X + shift, rgbVec.ep2.Y))
                     useIMUVector = False
                 End If
@@ -45,11 +45,11 @@ Public Class Gravity_Basics : Inherits TaskParent
         End If
 
         If useIMUVector Then
-            task.gravityVec = task.gravityIMU
+            task.lineGravity = task.gravityIMU
             gravityRGB = Nothing
         End If
 
-        task.horizonVec = Line_Perpendicular.computePerp(task.gravityVec)
+        task.lineHorizon = Line_Perpendicular.computePerp(task.lineGravity)
 
         If standaloneTest() Then
             dst2.SetTo(0)
@@ -136,17 +136,17 @@ Public Class Gravity_BasicsKalman : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         gravity.Run(src)
 
-        kalman.kInput = {task.gravityVec.ep1.X, task.gravityVec.ep1.Y, task.gravityVec.ep2.X, task.gravityVec.ep2.Y}
+        kalman.kInput = {task.lineGravity.ep1.X, task.lineGravity.ep1.Y, task.lineGravity.ep2.X, task.lineGravity.ep2.Y}
         kalman.Run(emptyMat)
-        task.gravityVec = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
+        task.lineGravity = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
                                      New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3)))
 
-        task.horizonVec = Line_Perpendicular.computePerp(task.gravityVec)
+        task.lineHorizon = Line_Perpendicular.computePerp(task.lineGravity)
 
         If standaloneTest() Then
             dst2.SetTo(0)
-            DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, task.highlight)
-            DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
+            DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, task.highlight)
+            DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, cv.Scalar.Red)
         End If
     End Sub
 End Class
@@ -248,8 +248,8 @@ Public Class Gravity_BasicsOld : Inherits TaskParent
             DrawCircle(dst2, pt, task.DotSize, white)
         Next
 
-        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, white)
-        DrawLine(dst3, task.gravityVec.p1, task.gravityVec.p2, white)
+        DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, white)
+        DrawLine(dst3, task.lineGravity.p1, task.lineGravity.p2, white)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(0) Else dst0 = src
@@ -283,11 +283,11 @@ Public Class Gravity_BasicsOld : Inherits TaskParent
             strOut += "Using the previous value for the gravity vector."
         Else
             Dim lp = New lpData(p1, p2)
-            task.gravityVec = New lpData(lp.ep1, lp.ep2)
+            task.lineGravity = New lpData(lp.ep1, lp.ep2)
             If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
         End If
 
-        task.horizonVec = Line_Perpendicular.computePerp(task.gravityVec)
+        task.lineHorizon = Line_Perpendicular.computePerp(task.lineGravity)
         SetTrueText(strOut, 3)
     End Sub
 End Class

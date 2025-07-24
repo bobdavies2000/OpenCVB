@@ -113,7 +113,7 @@ Module UI_Generator
         End Try
         Console.WriteLine("AlgorithmList.vb prepared." + vbCrLf +
                           "Next check to see if cross-reference needs update." + vbCrLf +
-                          "If you really need an X-Ref, use the button in the Main options." + vbCrLf +
+                          "If you really need an X-Ref, use the button in the OpenCVB options." + vbCrLf +
                           "It can take a minute to update the cross-reference for all the algorithms." +
                           vbCrLf + "That is why the cross-reference is run selectively.")
 

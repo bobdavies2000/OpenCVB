@@ -175,10 +175,11 @@ Public Class VBtask : Implements IDisposable
 
     Public disparityAdjustment As Single ' adjusts for resolution and some hidden elements.
 
-    Public gravityVec As New lpData
-    Public gravityIMU As New lpData
-    Public horizonVec As New lpData
+    Public lineGravity As New lpData
+    Public lineHorizon As New lpData
+    Public lineLongest As New lpData
 
+    Public gravityIMU As New lpData
     Public IMU_RawAcceleration As cv.Point3f
     Public IMU_Acceleration As cv.Point3f
     Public IMU_AverageAcceleration As cv.Point3f

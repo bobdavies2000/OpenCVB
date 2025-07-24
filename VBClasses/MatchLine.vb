@@ -182,11 +182,11 @@ Public Class MatchLine_Horizon : Inherits TaskParent
         desc = "Verify the horizon using MatchTemplate."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        'If matchLine.match.correlation < matchLine.match.options.correlationThreshold Then matchLine.lpInput = task.horizonVec
-        If task.quarterBeat Then matchLine.lpInput = task.horizonVec
+        'If matchLine.match.correlation < matchLine.match.options.correlationThreshold Then matchLine.lpInput = task.lineHorizon
+        If task.quarterBeat Then matchLine.lpInput = task.lineHorizon
         matchLine.Run(src)
         dst2 = matchLine.dst2
-        DrawLine(dst2, task.horizonVec.p1, task.horizonVec.p2, cv.Scalar.Red)
+        DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, cv.Scalar.Red)
         labels(2) = "MatchLine correlation = " + Format(matchLine.match.correlation, fmt3) + " - Red = current horizon, yellow is matchLine output"
     End Sub
 End Class
@@ -200,10 +200,10 @@ Public Class MatchLine_Gravity : Inherits TaskParent
         desc = "Verify the gravity vector using MatchTemplate."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        matchLine.lpInput = task.gravityVec
+        matchLine.lpInput = task.lineGravity
         matchLine.Run(src)
         dst2 = matchLine.dst2
-        DrawLine(dst2, task.gravityVec.p1, task.gravityVec.p2, cv.Scalar.Red)
+        DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, cv.Scalar.Red)
         labels(2) = "MatchLine correlation = " + Format(matchLine.match.correlation, fmt3) +
                     " - Red = current gravity vector, yellow is matchLine output"
     End Sub

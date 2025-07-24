@@ -74,7 +74,7 @@ Partial Class Options
         DisplayResolution.Controls.Add(SnapCustom)
         DisplayResolution.Controls.Add(Snap320)
         DisplayResolution.Controls.Add(Snap640)
-        DisplayResolution.Location = New Point(13, 378)
+        DisplayResolution.Location = New Point(12, 438)
         DisplayResolution.Name = "DisplayResolution"
         DisplayResolution.Size = New Size(982, 107)
         DisplayResolution.TabIndex = 4
@@ -157,7 +157,7 @@ Partial Class Options
         GroupBox1.Controls.Add(Label4)
         GroupBox1.Controls.Add(Button1)
         GroupBox1.Controls.Add(showConsoleLog)
-        GroupBox1.Location = New Point(15, 502)
+        GroupBox1.Location = New Point(12, 551)
         GroupBox1.Name = "GroupBox1"
         GroupBox1.Size = New Size(977, 187)
         GroupBox1.TabIndex = 5
@@ -249,14 +249,14 @@ Partial Class Options
         ' 
         Resolutions.Location = New Point(12, 190)
         Resolutions.Name = "Resolutions"
-        Resolutions.Size = New Size(828, 173)
+        Resolutions.Size = New Size(828, 242)
         Resolutions.TabIndex = 7
         ' 
         ' Options
         ' 
         AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1008, 720)
+        ClientSize = New Size(1008, 750)
         Controls.Add(Resolutions)
         Controls.Add(CameraGroup)
         Controls.Add(GroupBox1)
