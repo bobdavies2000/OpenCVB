@@ -92,7 +92,6 @@ End Class
 
 
 
-
 Public Class Line_Raw : Inherits TaskParent
     Dim ld As cv.XImgProc.FastLineDetector
     Public lpList As New List(Of lpData)
@@ -124,45 +123,79 @@ Public Class Line_Raw : Inherits TaskParent
         Next
 
         dst2.SetTo(0)
-        ' remove lines that are close and parallel - close is defined as with task.cellsize.
-        'Dim sortedList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        'Dim removelist As New List(Of Integer)
-        'For i = 0 To lpList.Count - 1
-        '    Dim lp = lpList(i)
-        '    Dim rect1 = lp.rect
-        '    For j = i + 1 To lpList.Count - 1
-        '        Dim lpTmp = lpList(j)
-        '        Dim rect2 = lpTmp.rect
-        '        If rect1.IntersectsWith(rect2) Then
-        '            Dim deltaX1 = Math.Abs(lp.ep1.X - lpTmp.ep1.X)
-        '            Dim deltaX2 = Math.Abs(lp.ep2.X - lpTmp.ep2.X)
-        '            If Math.Abs(deltaX1 - deltaX2) < task.cellSize Then
-        '                Dim index As Integer
-        '                If lp.length > lpTmp.length Then
-        '                    index = lpTmp.index
-        '                Else
-        '                    index = lp.index
-        '                End If
-        '                If removelist.Contains(index) = False Then
-        '                    sortedList.Add(index, index)
-        '                    removelist.Add(index)
-        '                End If
-        '            End If
-        '        End If
-        '    Next
-        'Next
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
 
-        'For Each index In sortedList.Values
-        '    Dim lp = lpList(index)
-        '    dst2.Line(lp.p1, lp.p2, 128, task.lineWidth, task.lineType)
-        '    lpList.RemoveAt(index)
-        'Next
+        labels(2) = CStr(lpList.Count) + " highlighted lines were detected in the current frame. Others were too similar."
+    End Sub
+End Class
 
+
+
+
+
+Public Class Line_RawEPLines : Inherits TaskParent
+    Dim ld As cv.XImgProc.FastLineDetector
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
+               "rectangle (provided externally)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
+
+        Dim lines = ld.Detect(src)
+        Dim tmplist As New List(Of lpData)
+        dst3.SetTo(0)
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
+               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
+                Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
+                Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
+                If p1.X >= 0 And p1.X < dst2.Width And p1.Y >= 0 And p1.Y < dst2.Height And
+                   p2.X >= 0 And p2.X < dst2.Width And p2.Y >= 0 And p2.Y < dst2.Height Then
+                    p1 = lpData.validatePoint(p1)
+                    p2 = lpData.validatePoint(p2)
+                    Dim lp = New lpData(p1, p2)
+                    lp.index = tmplist.Count
+                    tmplist.Add(lp)
+                    DrawLine(dst3, lp, white)
+                End If
+            End If
+        Next
+
+        Dim removeList As New List(Of Integer)
+        For Each lp In tmplist
+            Dim x1 = CInt(lp.ep1.X)
+            Dim y1 = CInt(lp.ep1.Y)
+            Dim x2 = CInt(lp.ep2.X)
+            Dim y2 = CInt(lp.ep2.Y)
+            For j = lp.index + 1 To tmplist.Count - 1
+                If CInt(tmplist(j).ep1.X) <> x1 Then Continue For
+                If CInt(tmplist(j).ep1.Y) <> y1 Then Continue For
+                If CInt(tmplist(j).ep2.X) <> x2 Then Continue For
+                If CInt(tmplist(j).ep2.Y) <> y2 Then Continue For
+                If removeList.Contains(tmplist(j).index) = False Then removeList.Add(tmplist(j).index)
+            Next
+        Next
+
+        lpList.Clear()
+        For Each lp In tmplist
+            If removeList.Contains(lp.index) = False Then lpList.Add(New lpData(lp.ep1, lp.ep2))
+        Next
+
+        dst2.SetTo(0)
         For Each lp In lpList
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth + 1, task.lineType)
         Next
 
         labels(2) = CStr(lpList.Count) + " highlighted lines were detected in the current frame. Others were too similar."
+        labels(3) = "There were " + CStr(removeList.Count) + " coincident lines"
     End Sub
 End Class
 
@@ -1252,7 +1285,8 @@ Public Class Line_Longest : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            DrawLine(dst2, lp.ep1, lp.ep2)
+            DrawLine(dst2, lp)
+            DrawRect(dst2, lp.rect)
             dst3 = task.lines.dst2
         End If
 
