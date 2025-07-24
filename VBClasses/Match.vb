@@ -31,11 +31,7 @@ Public Class Match_Basics : Inherits TaskParent
             DrawCircle(dst2, newCenter2F, white)
 
             dst2.Rectangle(newRect, task.highlight, task.lineWidth)
-            If standalone Then
-                Dim lp = task.gravityBasics.gravityRGB
-                If lp Is Nothing Then lp = task.lines.lpList(0)
-                DrawLine(dst2, lp.p1, lp.p2)
-            End If
+            DrawLine(dst2, task.lineLongest.p1, task.lineLongest.p2)
         End If
         labels(3) = "Template to compare the src input to"
     End Sub
@@ -75,7 +71,7 @@ Public Class Match_BasicsTest : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             If task.heartBeatLT Then
-                matchRect = ValidateRect(task.gravityBasics.gravityRGB.rect)
+                matchRect = ValidateRect(task.lineLongest.rect)
                 match.template = src(matchRect)
             End If
         End If

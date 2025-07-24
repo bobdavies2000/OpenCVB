@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Drawing
 Imports cvext = OpenCvSharp.Extensions
 Imports System.IO
 
@@ -31,7 +30,7 @@ Public Class Gif_Basics : Inherits TaskParent
 
         dst2 = src
 
-        If options.restartCheck.Checked Then
+        If options.restartRequest Then
             task.gifImages.Clear()
             clearTempDir()
         End If
@@ -112,7 +111,7 @@ End Class
 
 
 Public Class Gif_OpenCVB : Inherits TaskParent
-    Dim gifC As New Gif_Basics
+    Public gifC As New Gif_Basics
     Public Sub New()
         desc = "Create a GIF of the OpenCVB main screen for any algorithm."
     End Sub
@@ -123,32 +122,31 @@ Public Class Gif_OpenCVB : Inherits TaskParent
             Dim rect As RECT
             Select Case task.gifCaptureIndex
                 Case gifTypes.gifdst0
-                    If task.dst0.Channels() = 1 Then
-                        task.dst0 = task.dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    If task.gOptions.CrossHairs.Checked Then Gravity_Basics.showVectors(task.color)
+                    Dim dst = If(task.gOptions.displayDst0.Checked, dst0, task.color)
+                    If dst.Channels() = 1 Then
+                        dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     End If
-                    nextBMP = New Bitmap(task.dst0.Width, task.dst0.Height,
-                                         Imaging.PixelFormat.Format24bppRgb)
-                    cvext.BitmapConverter.ToBitmap(task.dst0, nextBMP)
+                    nextBMP = New Bitmap(dst.Width, dst.Height, Imaging.PixelFormat.Format24bppRgb)
+                    cvext.BitmapConverter.ToBitmap(dst, nextBMP)
                 Case gifTypes.gifdst1
-                    If task.dst1.Channels() = 1 Then
-                        task.dst1 = task.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    Dim dst = If(task.gOptions.displayDst1.Checked, dst1, task.depthRGB)
+                    If dst.Channels() = 1 Then
+                        dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     End If
-                    nextBMP = New Bitmap(task.dst1.Width, task.dst1.Height,
-                                         Imaging.PixelFormat.Format24bppRgb)
-                    cvext.BitmapConverter.ToBitmap(task.dst1, nextBMP)
+                    nextBMP = New Bitmap(dst.Width, dst.Height, Imaging.PixelFormat.Format24bppRgb)
+                    cvext.BitmapConverter.ToBitmap(dst, nextBMP)
                 Case gifTypes.gifdst2
                     If task.dst2.Channels() = 1 Then
                         task.dst2 = task.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     End If
-                    nextBMP = New Bitmap(task.dst2.Width, task.dst2.Height,
-                                         Imaging.PixelFormat.Format24bppRgb)
+                    nextBMP = New Bitmap(task.dst2.Width, task.dst2.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(task.dst2, nextBMP)
                 Case gifTypes.gifdst3
                     If task.dst3.Channels() = 1 Then
                         task.dst3 = task.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     End If
-                    nextBMP = New Bitmap(task.dst3.Width, task.dst3.Height,
-                                         Imaging.PixelFormat.Format24bppRgb)
+                    nextBMP = New Bitmap(task.dst3.Width, task.dst3.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(task.dst3, nextBMP)
                 Case gifTypes.openCVBwindow
                     Dim r = New cv.Rect(0, 0, task.mainFormLocation.Width - 20,

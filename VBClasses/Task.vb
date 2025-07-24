@@ -772,8 +772,8 @@ Public Class VBtask : Implements IDisposable
         If gOptions.CreateGif.Checked Then
             If gifCreator Is Nothing Then gifCreator = New Gif_OpenCVB
             gifCreator.Run(src.Clone)
-            If gifBuild Then
-                gifBuild = False
+            If task.gifCreator.gifC.options.buildCheck.Checked Then
+                task.gifCreator.gifC.options.buildCheck.Checked = False
                 For i = 0 To gifImages.Count - 1
                     Dim fileName As New FileInfo(HomeDir + "Temp/image" + Format(i, "000") + ".bmp")
                     gifImages(i).Save(fileName.FullName)
@@ -865,13 +865,9 @@ Public Class VBtask : Implements IDisposable
 
             If gOptions.CrossHairs.Checked Then
                 Gravity_Basics.showVectors(dst0)
-                If gravityBasics.gravityRGB IsNot Nothing Then
-                    Dim p2 = gravityBasics.gravityRGB.center
-                    p2 = New cv.Point(p2.X + 5, p2.Y)
-                    If gravityBasics.gravityRGB.gravityProxy Then
-                        displayObject.trueData.Add(New TrueText("Gravity RGB Vector", p2, 0))
-                    End If
-                End If
+                Dim lp = lineLongest
+                Dim pt = New cv.Point2f((lp.ep1.X + lp.ep2.X) / 2 + 5, (lp.ep1.Y + lp.ep2.Y) / 2)
+                displayObject.trueData.Add(New TrueText("Longest", pt, 0))
             End If
 
             ' if there were no cycles spent on this routine, then it was inactive.

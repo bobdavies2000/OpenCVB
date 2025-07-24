@@ -2670,7 +2670,7 @@ End Class
 
 Public Class Options_Gif : Inherits OptionParent
     Public buildCheck As CheckBox
-    Public restartCheck As CheckBox
+    Public restartRequest As Boolean
     Public dst0Radio As RadioButton
     Public dst1Radio As RadioButton
     Public dst2Radio As RadioButton
@@ -2698,7 +2698,6 @@ Public Class Options_Gif : Inherits OptionParent
             radio.check(4).Checked = True
         End If
         buildCheck = FindCheckBox("Step 2: Build GIF file in <Opencv Home Directory>\Temp\myGIF.gif")
-        restartCheck = FindCheckBox("Optional: Restart - clear all previous images.")
 
         dst0Radio = findRadio("Capture dst0")
         dst1Radio = findRadio("Capture dst1")
@@ -2726,15 +2725,13 @@ Public Class Options_Gif : Inherits OptionParent
         If OpenGLwindow.Checked Then task.gifCaptureIndex = 5
         If EntireScreen.Checked Then task.gifCaptureIndex = 6
 
-        task.gifBuild = buildCheck.Checked
-
-        buildCheck.Checked = False
-        restartCheck.Checked = False
+        Static restartCheck = FindCheckBox("Optional: Restart - clear all previous images.")
+        restartRequest = restartCheck.checked
+        restartCheck.checked = False
 
         task.optionsChanged = False
     End Sub
 End Class
-
 
 
 

@@ -2,55 +2,29 @@
 Public Class Gravity_Basics : Inherits TaskParent
     Public options As New Options_Features
     Dim gravityRaw As New Gravity_Raw
-    Public trackLine As New Line_Gravity
-    Public gravityRGB As lpData
+    Public longLine As New Line_Longest
     Public Sub New()
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
     End Sub
     Public Shared Sub showVectors(dst As cv.Mat)
         dst.Line(task.lineGravity.ep1, task.lineGravity.ep2, white, task.lineWidth, task.lineType)
         dst.Line(task.lineHorizon.ep1, task.lineHorizon.ep2, white, task.lineWidth, task.lineType)
-        Dim rgbVec = task.gravityBasics.gravityRGB
-        Static lastGoodRGBvector As lpData
-        If rgbVec IsNot Nothing Then
-            lastGoodRGBvector = rgbVec
-            DrawLine(dst, rgbVec.ep1, rgbVec.ep2, task.highlight)
+        If task.lineLongest IsNot Nothing Then
+            DrawLine(dst, task.lineLongest.ep1, task.lineLongest.ep2, task.highlight)
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         gravityRaw.Run(emptyMat)
-        trackLine.Run(src)
+        longLine.Run(src)
         Dim useIMUVector As Boolean = True
-        If trackLine.lp IsNot Nothing Then
-            gravityRGB = trackLine.lp
-            Dim rgbVec = gravityRGB
-
-            Dim deltaX1 = task.lineGravity.ep1.X - rgbVec.ep1.X
-            Dim deltaX2 = task.lineGravity.ep2.X - rgbVec.ep2.X
-            ' if the rgb vec isn't one side or the other of the gravity vec, then it is no good.
-            ' There is a possible way the signs won't match - when the the rgb vec is almost the same as the gravity vec
-            ' but that is ignored for now.
-            If Math.Sign(deltaX1) = Math.Sign(deltaX2) Then
-                ' if the rgb vec isn't much different than the gravity vec, the get the angle from the rgb vec and update the gravity vec.
-                ' This will smooth the perturbations of the IMU vector.
-                If Math.Abs(deltaX1 - deltaX2) < options.pixelThreshold Then
-                    Dim shift = dst2.Width / 2 - (rgbVec.ep1.X + rgbVec.ep2.X) / 2
-                    task.lineGravity = New lpData(New cv.Point2f(rgbVec.ep1.X + shift, rgbVec.ep1.Y),
-                                                 New cv.Point2f(rgbVec.ep2.X + shift, rgbVec.ep2.Y))
-                    useIMUVector = False
-                End If
-            End If
-        End If
-
-        If useIMUVector Then
+        Static lastLongest = task.lineLongest
+        If task.lineLongest.length <> lastLongest.length Or task.lineGravity.length = 0 Or task.frameCount < 5 Then
             task.lineGravity = task.gravityIMU
-            gravityRGB = Nothing
+            task.lineHorizon = Line_Perpendicular.computePerp(task.lineGravity)
+            lastLongest = task.lineLongest
         End If
-
-        task.lineHorizon = Line_Perpendicular.computePerp(task.lineGravity)
-
         If standaloneTest() Then
             dst2.SetTo(0)
             showVectors(dst2)

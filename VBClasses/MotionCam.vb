@@ -155,8 +155,8 @@ Public Class MotionCam_Measure : Inherits TaskParent
         desc = "Measure how much the camera has moved."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static vecLast = task.gravityBasics.gravityRGB
-        Dim vec = task.gravityBasics.gravityRGB
+        Static vecLast = task.lineLongest
+        Dim vec = task.lineLongest
 
         deltaX1 = vec.ep1.X - vecLast.ep1.x
         deltaY1 = vec.ep1.Y - vecLast.ep1.Y

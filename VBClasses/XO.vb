@@ -5796,11 +5796,11 @@ Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lplist = task.lines.lpList
         If lplist.Count = 0 Then Exit Sub
-        If standalone And foundLine = False Then lpInput = task.gravityBasics.gravityRGB
+        If standalone And foundLine = False Then lpInput = task.lineLongest
 
         Static subsetrect = lpInput.rect
         If subsetrect.width <= dst2.Height / 10 Then
-            lpInput = task.gravityBasics.gravityRGB
+            lpInput = task.lineLongest
             subsetrect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
             Exit Sub
         End If
@@ -5836,7 +5836,7 @@ Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
             Dim deltaX1 = Math.Abs(task.gravityIMU.ep1.X - lpInput.ep1.X)
             Dim deltaX2 = Math.Abs(task.gravityIMU.ep2.X - lpInput.ep2.X)
             If Math.Abs(deltaX1 - deltaX2) > task.gravityBasics.options.pixelThreshold Then
-                lpInput = task.gravityBasics.gravityRGB
+                lpInput = task.lineLongest
             End If
             subsetrect = lpInput.rect
         End If
@@ -5995,7 +5995,7 @@ Public Class XO_Gravity_Basics1 : Inherits TaskParent
     Public Shared Sub showVectors(dst As cv.Mat)
         dst.Line(task.lineGravity.p1, task.lineGravity.p2, white, task.lineWidth, task.lineType)
         dst.Line(task.lineHorizon.p1, task.lineHorizon.p2, white, task.lineWidth, task.lineType)
-        If task.gravityBasics.gravityRGB IsNot Nothing Then showVec(dst, task.gravityBasics.gravityRGB)
+        showVec(dst, task.lineLongest)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
