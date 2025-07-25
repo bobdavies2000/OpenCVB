@@ -1305,10 +1305,9 @@ End Class
 Public Class Line_LongestTest : Inherits TaskParent
     Public match As New Match_Basics
     Dim intersect As New Line_Intersection
-    Public deltaX1 As Single, deltaY1 As Single
-    Public deltaX2 As Single, deltaY2 As Single
-    Dim lp As New lpData
+    Public trackPoint As cv.Point2f
     Public Sub New()
+        labels(2) = "White line is the last longest line and yellow is the current perpendicular to the longest line."
         desc = "Identify each line in the lpMap."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1322,8 +1321,8 @@ Public Class Line_LongestTest : Inherits TaskParent
         Dim linePerp = Line_Perpendicular.computePerp(task.lineLongest)
 
         dst2 = src
-        DrawLine(dst2, lpLast)
-        DrawLine(dst2, linePerp)
+        DrawLine(dst2, lpLast, white)
+        DrawLine(dst2, linePerp, task.highlight)
 
         intersect.p1 = lpLast.ep1
         intersect.p2 = lpLast.ep2
@@ -1332,30 +1331,11 @@ Public Class Line_LongestTest : Inherits TaskParent
         intersect.Run(emptyMat)
 
         If task.heartBeatLT Then dst3.SetTo(0)
-        DrawCircle(dst3, intersect.intersectionPoint)
-
-        'deltaX1 = lp.ep1.X - lpLast.ep1.X
-        'deltaY1 = lp.ep1.Y - lpLast.ep1.Y
-        'deltaX2 = lp.ep2.X - lpLast.ep2.X
-        'deltaY2 = lp.ep2.Y - lpLast.ep2.Y
-        'Dim p1 = New cv.Point(lp.ep1.X + deltaX1, lp.ep1.Y + deltaY1)
-        'Dim p2 = New cv.Point(lp.ep2.X + deltaX2, lp.ep2.Y + deltaY2)
-        'lp = New lpData(p1, p2)
-
-        'If standaloneTest() Then
-        '    dst2 = src
-        '    DrawLine(dst2, lp)
-        '    DrawRect(dst2, lp.rect)
-        '    dst3 = task.lines.dst2
-        'End If
-
-        'task.lineLongest = lp
-        'labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
-        'labels(3) = "Delta X1 = " + Format(deltaX1, fmt3) + " delta Y1 = " + Format(deltaY1, fmt3) + " " +
-        '            "Delta X2 = " + Format(deltaX2, fmt3) + " delta Y2 = " + Format(deltaY2, fmt3)
+        trackPoint = intersect.intersectionPoint
+        DrawCircle(dst3, trackPoint)
+        DrawCircle(dst3, trackPoint)
 
         lpLast = New lpData(task.lineLongest.ep1, task.lineLongest.ep2)
-
     End Sub
 End Class
 
