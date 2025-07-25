@@ -610,15 +610,13 @@ Public Class lpData
     Public ep2 As cv.Point2f ' end points - goes to the edge of the image.
     Public length As Single
     Public rect As cv.Rect
-    Public vertical As Boolean ' false is horizontal
+    Public vertical As Boolean ' false = < 45 degrees
     Public slope As Single
     Public center As cv.Point2f
     Public template1 As New cv.Mat
     Public template2 As New cv.Mat
     Public gravityProxy As Boolean
-    Public brickList As New List(Of Integer)
     Public index As Integer
-    Public yIntercept As Single
     Public Function perpendicularPoints(pt As cv.Point2f) As lpData
         Dim perpSlope = -1 / slope
         Dim angleRadians As Double = Math.Atan(perpSlope)
@@ -678,7 +676,6 @@ Public Class lpData
         Else
             slope = (p1.Y - p2.Y) / (p1.X - p2.X)
         End If
-        yIntercept = -p1.X * slope + p1.Y
 
         length = p1.DistanceTo(p2)
         CalculateRotatedRectFromLine()

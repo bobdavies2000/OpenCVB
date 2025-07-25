@@ -20,8 +20,6 @@ Public Class Gravity_Basics : Inherits TaskParent
         longLine.Run(src)
         Dim useIMUVector As Boolean = True
         Static lastLongest = task.lineLongest
-        Dim p1 = New cv.Point2f(task.lineGravity.ep1.X + longLine.deltaX, task.lineGravity.ep1.Y + longLine.deltaY)
-        Dim p2 = New cv.Point2f(task.lineGravity.ep2.X + longLine.deltaX, task.lineGravity.ep2.Y + longLine.deltaY)
         If task.lineLongest.length <> lastLongest.length Or task.lineGravity.length = 0 Or task.frameCount < 5 Then
             task.lineGravity = task.gravityIMU
             task.lineHorizon = Line_Perpendicular.computePerp(task.lineGravity)

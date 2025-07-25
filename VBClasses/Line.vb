@@ -77,8 +77,8 @@ Public Class Line_Basics : Inherits TaskParent
             labels(3) = CStr(count) + " lines are proxies for gravity."
         End If
 
-        lpRectMap.SetTo(0)
         lpMap.SetTo(0)
+        lpRectMap.SetTo(0)
         For i = lpList.Count - 1 To 0 Step -1
             lpRectMap.Rectangle(lpList(i).rect, i + 1, -1)
             lpMap.Line(lpList(i).p1, lpList(i).p2, lpList(i).index + 1, task.lineWidth, cv.LineTypes.Link8)
@@ -1236,6 +1236,8 @@ End Class
 
 
 
+
+
 Public Class Line_Longest : Inherits TaskParent
     Public match As New Match_Basics
     Public deltaX As Single, deltaY As Single
@@ -1292,5 +1294,94 @@ Public Class Line_Longest : Inherits TaskParent
 
         task.lineLongest = lp
         labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_LongestTest : Inherits TaskParent
+    Public match As New Match_Basics
+    Dim intersect As New Line_Intersection
+    Public deltaX1 As Single, deltaY1 As Single
+    Public deltaX2 As Single, deltaY2 As Single
+    Dim lp As New lpData
+    Public Sub New()
+        desc = "Identify each line in the lpMap."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lplist = task.lines.lpList
+        If lplist.Count = 0 Then
+            SetTrueText("There are no lines present in the image.", 3)
+            Exit Sub
+        End If
+
+        Static lpLast = New lpData(task.lineLongest.ep1, task.lineLongest.ep2)
+        Dim linePerp = Line_Perpendicular.computePerp(task.lineLongest)
+
+        dst2 = src
+        DrawLine(dst2, lpLast)
+        DrawLine(dst2, linePerp)
+
+        intersect.p1 = lpLast.ep1
+        intersect.p2 = lpLast.ep2
+        intersect.p3 = linePerp.ep1
+        intersect.p4 = linePerp.ep2
+        intersect.Run(emptyMat)
+
+        If task.heartBeatLT Then dst3.SetTo(0)
+        DrawCircle(dst3, intersect.intersectionPoint)
+
+        'deltaX1 = lp.ep1.X - lpLast.ep1.X
+        'deltaY1 = lp.ep1.Y - lpLast.ep1.Y
+        'deltaX2 = lp.ep2.X - lpLast.ep2.X
+        'deltaY2 = lp.ep2.Y - lpLast.ep2.Y
+        'Dim p1 = New cv.Point(lp.ep1.X + deltaX1, lp.ep1.Y + deltaY1)
+        'Dim p2 = New cv.Point(lp.ep2.X + deltaX2, lp.ep2.Y + deltaY2)
+        'lp = New lpData(p1, p2)
+
+        'If standaloneTest() Then
+        '    dst2 = src
+        '    DrawLine(dst2, lp)
+        '    DrawRect(dst2, lp.rect)
+        '    dst3 = task.lines.dst2
+        'End If
+
+        'task.lineLongest = lp
+        'labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
+        'labels(3) = "Delta X1 = " + Format(deltaX1, fmt3) + " delta Y1 = " + Format(deltaY1, fmt3) + " " +
+        '            "Delta X2 = " + Format(deltaX2, fmt3) + " delta Y2 = " + Format(deltaY2, fmt3)
+
+        lpLast = New lpData(task.lineLongest.ep1, task.lineLongest.ep2)
+
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Matching : Inherits TaskParent
+    Public match As New Match_Basics
+    Public Sub New()
+        desc = "For each line from the last frame, find its correlation to the current frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim correlations As New List(Of Single)
+        Static lpLast = New List(Of lpData)(task.lines.lpList)
+        For Each lp In lpLast
+            match.template = task.gray(lp.rect)
+            match.Run(task.gray.Clone)
+            correlations.Add(match.correlation)
+        Next
+
+        dst2 = task.lines.dst2
+
+        labels(2) = "Mean correlation of all the lines is " + Format(correlations.Average, fmt3)
+        labels(3) = "Min/Max correlation = " + Format(correlations.Min, fmt3) + "/" + Format(correlations.Max, fmt3)
+        lpLast = New List(Of lpData)(task.lines.lpList)
     End Sub
 End Class
