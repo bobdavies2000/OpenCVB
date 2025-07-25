@@ -308,3 +308,41 @@ Public Class BrickLine_FeatureLess : Inherits TaskParent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+Public Class BrickLine_EdgesNoEdges : Inherits TaskParent
+    Public edges As New List(Of Integer)
+    Public noEdges As New List(Of Integer)
+    Public Sub New()
+        desc = "Define each brick according to whether it has edges or not.  Ignore peripheral bricks..."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+        dst3 = src.Clone
+        edges.Clear()
+        noEdges.Clear()
+        For i = 0 To task.gridRects.Count - 1
+            Dim r = task.gridRects(i)
+            If r.X = 0 Then Continue For
+            If r.X + r.Width = dst2.Width Then Continue For
+            If r.Y = 0 Then Continue For
+            If r.Y + r.Height = dst2.Height Then Continue For
+            If task.edges.dst2(r).CountNonZero Then edges.Add(i) Else noEdges.Add(i)
+        Next
+
+        If standaloneTest() Then
+            For Each index In edges
+                DrawRect(dst2, task.gridRects(index), white)
+            Next
+            For Each index In noEdges
+                DrawRect(dst3, task.gridRects(index), white)
+            Next
+        End If
+        labels(2) = CStr(edges.Count) + " bricks had edges"
+        labels(3) = CStr(noEdges.Count) + " bricks were featureless"
+    End Sub
+End Class
