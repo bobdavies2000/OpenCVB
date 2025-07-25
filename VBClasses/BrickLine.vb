@@ -179,6 +179,59 @@ End Class
 
 
 
+Public Class BrickLine_Lines : Inherits TaskParent
+    Dim findCells As New BrickLine_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
+        desc = "Find the cells containing lines."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.lines.lpList.Count = 0 Then Exit Sub
+
+        dst1.SetTo(0)
+        For Each lp In task.lines.lpList
+            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
+        Next
+
+        findCells.Run(dst1)
+        dst2 = findCells.dst2
+        dst3 = findCells.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class BrickLine_LeftRight : Inherits TaskParent
+    Public Sub New()
+        desc = "Display a line in both the left and right images using the bricks that contain the line"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        'For i = 0 To task.featList.Count - 1
+        '    Dim color = task.scalarColors(i)
+        '    If task.gOptions.DebugSlider.Value = i Then
+        '        For Each index In task.featList(i)
+        '            Dim brick = task.bricks.brickList(index)
+        '            dst2.Rectangle(brick.rect, color, task.lineWidth)
+        '        Next
+        '        Exit For
+        '    End If
+        'Next
+    End Sub
+End Class
+
+
+
+
+
+
+
 
 Public Class BrickLine_FeatureLess : Inherits TaskParent
     Dim findCells As New BrickLine_Basics
@@ -253,56 +306,5 @@ Public Class BrickLine_FeatureLess : Inherits TaskParent
             Dim brick = task.bricks.brickList(task.fLess(i)(0))
             SetTrueText(CStr(task.fLess(i).Count), brick.pt)
         Next
-    End Sub
-End Class
-
-
-
-
-
-Public Class BrickLine_Lines : Inherits TaskParent
-    Dim findCells As New BrickLine_Basics
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
-        desc = "Find the cells containing lines."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub
-
-        dst1.SetTo(0)
-        For Each lp In task.lines.lpList
-            dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
-        Next
-
-        findCells.Run(dst1)
-        dst2 = findCells.dst2
-        dst3 = findCells.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class BrickLine_LeftRight : Inherits TaskParent
-    Public Sub New()
-        desc = "Display a line in both the left and right images using the bricks that contain the line"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        'For i = 0 To task.featList.Count - 1
-        '    Dim color = task.scalarColors(i)
-        '    If task.gOptions.DebugSlider.Value = i Then
-        '        For Each index In task.featList(i)
-        '            Dim brick = task.bricks.brickList(index)
-        '            dst2.Rectangle(brick.rect, color, task.lineWidth)
-        '        Next
-        '        Exit For
-        '    End If
-        'Next
     End Sub
 End Class
