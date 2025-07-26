@@ -31,17 +31,17 @@ Public Class CameraRS2 : Inherits GenericCamera
         Dim rgbExtrinsics As Extrinsics = StreamColor.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamLeft)
 
         Dim ratio = CInt(captureRes.Width / workRes.Width)
-        calibData.rgbIntrinsics.ppx = rgb.ppx
-        calibData.rgbIntrinsics.ppy = rgb.ppy
-        calibData.rgbIntrinsics.fx = rgb.fx
-        calibData.rgbIntrinsics.fy = rgb.fy
+        calibData.rgbIntrinsics.ppx = rgb.ppx / ratio
+        calibData.rgbIntrinsics.ppy = rgb.ppy / ratio
+        calibData.rgbIntrinsics.fx = rgb.fx / ratio
+        calibData.rgbIntrinsics.fy = rgb.fy / ratio
 
         Dim leftIntrinsics As Intrinsics = streamLeft.As(Of VideoStreamProfile)().GetIntrinsics()
         Dim leftExtrinsics As Extrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamRight)
-        calibData.leftIntrinsics.ppx = rgb.ppx
-        calibData.leftIntrinsics.ppy = rgb.ppy
-        calibData.leftIntrinsics.fx = rgb.fx
-        calibData.leftIntrinsics.fy = rgb.fy
+        calibData.leftIntrinsics.ppx = rgb.ppx / ratio
+        calibData.leftIntrinsics.ppy = rgb.ppy / ratio
+        calibData.leftIntrinsics.fx = rgb.fx / ratio
+        calibData.leftIntrinsics.fy = rgb.fy / ratio
 
         ReDim calibData.LtoR_translation(3 - 1)
         ReDim calibData.LtoR_rotation(9 - 1)

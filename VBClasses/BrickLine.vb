@@ -205,115 +205,6 @@ End Class
 
 
 
-Public Class BrickLine_LeftRight : Inherits TaskParent
-    Public Sub New()
-        desc = "Display a line in both the left and right images using the bricks that contain the line"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        'For i = 0 To task.featList.Count - 1
-        '    Dim color = task.scalarColors(i)
-        '    If task.gOptions.DebugSlider.Value = i Then
-        '        For Each index In task.featList(i)
-        '            Dim brick = task.bricks.brickList(index)
-        '            dst2.Rectangle(brick.rect, color, task.lineWidth)
-        '        Next
-        '        Exit For
-        '    End If
-        'Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class BrickLine_FeatureLess : Inherits TaskParent
-    Dim findCells As New BrickLine_Basics
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        findCells.edgeRequest = True
-        labels(3) = "Mask of featureless regions."
-        desc = "Use the edge/line cells to isolate the featureless regions."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        findCells.Run(src)
-        labels = findCells.labels
-
-        dst3.SetTo(0)
-        For i = 0 To task.featList.Count - 1
-            For Each index In task.featList(i)
-                Dim brick = task.bricks.brickList(index)
-                dst3.Rectangle(brick.rect, 255, -1)
-            Next
-        Next
-
-        Dim regionCount As Integer = 1
-        For Each brick In task.bricks.brickList
-            If dst3.Get(Of Byte)(brick.pt.Y, brick.pt.X) = 0 Then
-                dst3.FloodFill(New cv.Point(brick.pt.X, brick.pt.Y), regionCount)
-                regionCount += 1
-            End If
-        Next
-
-        Dim fless As New List(Of List(Of Integer))
-        For i = 0 To regionCount - 1
-            fless.Add(New List(Of Integer))
-        Next
-
-        dst1.SetTo(0)
-        For Each brick In task.bricks.brickList
-            Dim val = dst3.Get(Of Byte)(brick.pt.Y, brick.pt.X)
-            If val = 255 Then Continue For
-            If val Then
-                fless(val).Add(brick.index)
-                dst1(brick.rect).SetTo(val)
-            End If
-        Next
-
-        Dim regionSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To fless.Count - 1
-            If fless(i).Count = 1 Then
-                Dim brick = task.bricks.brickList(fless(i)(0))
-                dst1(brick.rect).SetTo(0)
-            Else
-                regionSorted.Add(fless(i).Count, i)
-            End If
-        Next
-
-        task.fLess.Clear()
-        For Each ele In regionSorted
-            If ele.Key > 1 Then task.fLess.Add(fless(ele.Value))
-        Next
-
-        dst1.SetTo(0)
-        For i = 0 To task.fLess.Count - 1
-            For Each index In task.fLess(i)
-                Dim brick = task.bricks.brickList(index)
-                dst1(brick.rect).SetTo(i + 1)
-            Next
-        Next
-
-        dst2 = ShowPalette(dst1)
-
-        For i = 0 To task.fLess.Count - 2
-            Dim brick = task.bricks.brickList(task.fLess(i)(0))
-            SetTrueText(CStr(task.fLess(i).Count), brick.pt)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class BrickLine_EdgesNoEdges : Inherits TaskParent
     Public edges As New List(Of Integer)
     Public noEdges As New List(Of Integer)
@@ -342,7 +233,84 @@ Public Class BrickLine_EdgesNoEdges : Inherits TaskParent
                 DrawRect(dst3, task.gridRects(index), white)
             Next
         End If
+
         labels(2) = CStr(edges.Count) + " bricks had edges"
         labels(3) = CStr(noEdges.Count) + " bricks were featureless"
+    End Sub
+End Class
+
+
+
+
+
+Public Class BrickLine_LeftRight : Inherits TaskParent
+    Dim edges As New EdgeLine_LeftRight
+    Dim fLess As New BrickLine_EdgesNoEdges
+    Dim mats As New Mat_4Click
+    Public brickLines As New List(Of Integer)
+    Public Sub New()
+        task.gOptions.displayDst1.Checked = True
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(2) = "Left edges, right edges, bricks with left image edges, bricks with right image edges"
+        desc = "Display a line in both the left and right images using the bricks that contain the line"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(src)
+        mats.mat(0) = edges.dst2
+        mats.mat(1) = edges.dst3
+
+        fLess.Run(edges.dst2)
+        mats.mat(2) = fLess.dst2.Clone
+        Dim leftEdges As New List(Of Integer)(fLess.edges)
+        For Each index In leftEdges
+            DrawRect(mats.mat(2), task.gridRects(index), white)
+        Next
+
+        task.edges.Run(edges.dst3)
+        fLess.Run(task.edges.dst2)
+        mats.mat(3) = fLess.dst2
+        Dim rightEdges As New List(Of Integer)(fLess.edges)
+        For Each index In rightEdges
+            DrawRect(mats.mat(3), task.gridRects(index), white)
+        Next
+
+        mats.Run(emptyMat)
+        dst2 = mats.dst2
+
+        dst1.SetTo(0)
+        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim correlationMat As New cv.Mat
+        brickLines.Clear()
+
+        For Each index In leftEdges
+            DrawRect(dst1, task.gridRects(index), white)
+            Dim brick As New brickData
+            brick.rect = task.gridRects(index)
+            brick.lRect = brick.rect
+            brick.depth = task.pcSplit(2)(brick.rect).Mean()(0)
+            If brick.depth > 0 Then
+                brick.rRect = brick.rect
+                brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
+                If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then Continue For
+
+                If task.rgbLeftAligned Then
+                    brick = Brick_Basics.RealSenseAlign(brick)
+                End If
+
+                'If task.toggleOn Then
+                If Math.Abs(brick.rect.X - brick.rRect.X) > 32 Then Continue For
+                'End If
+
+                DrawRect(dst3, brick.rRect, red)
+
+                    cv.Cv2.MatchTemplate(task.leftView(brick.lRect), task.rightView(brick.rRect),
+                                         correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                    brick.correlation = correlationMat.Get(Of Single)(0, 0)
+                    If brick.correlation >= task.fCorrThreshold Then brickLines.Add(index)
+                End If
+        Next
+
+        labels(3) = CStr(brickLines.Count) + " bricks had lines and good correlation (>" + Format(task.fCorrThreshold, fmt2) +
+                    ") or " + Format(brickLines.Count / task.gridRects.Count, "00%") + " of all the bricks"
     End Sub
 End Class

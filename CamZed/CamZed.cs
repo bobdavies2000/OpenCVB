@@ -17,27 +17,35 @@ public class RgbIntrinsics
     public float ppy;
 }
 
-
+public struct intrinsicData
+    {
+        public float ppx;
+        public float ppy;
+        public float fx;
+        public float fy;
+    }
 public class CamZed
 {
     public Cv.Mat color, rightView, leftView, pointCloud;
     public Cv.Point3f IMU_Acceleration, IMU_AngularVelocity;
     public double IMU_TimeStamp, IMU_FrameTime;
 
+    public intrinsicData rgbIntrinsics;
+    public intrinsicData leftIntrinsics;
+    public intrinsicData rightIntrinsics;
+    public float baseline;
+
     private int captureRows;
     private int captureCols;
     private sl.Camera zed;
     private sl.InitParameters init_params; 
 
-    // Static fields (equivalent to VB.NET's method-scoped Static for these)
-    // These will be initialized once when the class is first accessed.
     private static sl.RuntimeParameters RuntimeParameters = new sl.RuntimeParameters();
     private static sl.Mat colorSL = new sl.Mat();
     private static sl.Mat rightSL = new sl.Mat();
     private static sl.Mat pointCloudSL = new sl.Mat();
     private static ulong IMU_StartTime = 0; // Use ulong for timestamps
 
-    // Constructor
     public CamZed(Cv.Size workRes, Cv.Size captureRes, string deviceName)
     {
         init_params = new sl.InitParameters(); // Instantiate here
@@ -67,7 +75,20 @@ public class CamZed
 
         // stereolabs left camera is the RGB camera so alignment to depth and left camera is already done.
         // all we need to translate from left to right image is the baseline
-        //base.calibData.baseline = camInfo.cameraConfiguration.calibrationParameters.Trans.x; 
+        baseline = camInfo.cameraConfiguration.calibrationParameters.Trans.X;
+
+        rgbIntrinsics.fx = camInfo.cameraConfiguration.calibrationParameters.leftCam.fx;
+        rgbIntrinsics.fy = camInfo.cameraConfiguration.calibrationParameters.leftCam.fy;
+        rgbIntrinsics.ppx = camInfo.cameraConfiguration.calibrationParameters.leftCam.cx;
+        rgbIntrinsics.ppy = camInfo.cameraConfiguration.calibrationParameters.leftCam.cy;
+
+        leftIntrinsics = rgbIntrinsics;
+
+        rightIntrinsics.fx = camInfo.cameraConfiguration.calibrationParameters.rightCam.fx;
+        rightIntrinsics.fy = camInfo.cameraConfiguration.calibrationParameters.rightCam.fy;
+        rightIntrinsics.ppx = camInfo.cameraConfiguration.calibrationParameters.rightCam.cx;
+        rightIntrinsics.ppy = camInfo.cameraConfiguration.calibrationParameters.rightCam.cy;
+
         // C# uses .x for coordinate access
         // Dim translation = camInfo.cameraConfiguration.calibrationParameters.Trans; // Not used, so can remove
 

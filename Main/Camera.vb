@@ -34,6 +34,7 @@ Public Class GenericCamera
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
     Public cameraFrameCount As Integer
+    Public baseline As Single
 
     Public uiColor As cv.Mat
     Public uiLeft As cv.Mat
@@ -44,17 +45,7 @@ Public Class GenericCamera
 
     Public deviceCount As Integer
     Public calibData As cameraInfo
-    Public colorBytes() As Byte
-    Public vertices() As Byte
-    Public depthBytes() As Byte
-    Public leftViewBytes() As Byte
-    Public rightViewBytes() As Byte
-    Public pointCloudBytes() As Byte
 
-    Public serialNumber As String
-    Public deviceIndex As Integer
-    Public failedImageCount As Integer
-    Public modelInverse As Boolean
     Public cameraName As String = ""
     Public cPtr As IntPtr
     Public Structure imuDataStruct
