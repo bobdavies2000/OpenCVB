@@ -482,14 +482,13 @@ Public Class VBtask : Implements IDisposable
         ' set options for specific cameras here.
         Select Case task.cameraName
             Case "StereoLabs ZED 2/2i"
+                task.rgbLeftAligned = True
             Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
-            Case "Intel(R) RealSense(TM) Depth Camera 435i"
-            Case "Intel(R) RealSense(TM) Depth Camera 455"
+                task.rgbLeftAligned = True
+            Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
+                task.rgbLeftAligned = False
             Case "Oak-D camera"
-            Case "MYNT-EYE-D1000"
-#If AZURE_SUPPORT Then
-            Case "Azure Kinect 4K"
-#End If
+                task.rgbLeftAligned = True
         End Select
 
         mainFormLocation = parms.mainFormLocation

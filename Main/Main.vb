@@ -29,6 +29,9 @@ Public Class Main
     Dim trueData As New List(Of TrueText)
     Dim algolist As algorithmList = New algorithmList
     Public Shared settings As jsonClass.ApplicationStorage
+    Dim saveworkRes As cv.Size
+    Dim pauseCameraTask As Boolean
+
     Dim jsonfs As New jsonClass.FileOperations
     Dim optionsForm As Options
     Dim groupList As New List(Of String)
@@ -45,12 +48,12 @@ Public Class Main
     Dim algorithmQueueCount As Integer
 
     Dim saveAlgorithmName As String
+    Dim cameraShutdown As Boolean
     Dim shuttingDown As Boolean
 
     Dim BothFirstAndLastReady As Boolean
 
     Dim camera As Object
-    Dim restartCameraRequest As Boolean
 
     Dim cameraTaskHandle As Thread
     Public DevicesChanged As Boolean
@@ -372,6 +375,64 @@ Public Class Main
         End If
         Return usblist
     End Function
+    Private Function getCamera() As Object
+        Select Case settings.cameraName
+            Case "Intel(R) RealSense(TM) Depth Camera 455", "Intel(R) RealSense(TM) Depth Camera 435i"
+                Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
+                'Case "Oak-D camera"
+                '    Return New CameraOakD_CPP(settings.workRes, settings.captureRes, settings.cameraName)
+            Case "StereoLabs ZED 2/2i"
+                Return New CameraZed2(settings.workRes, settings.captureRes, settings.cameraName)
+            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
+                Return New CameraORB(settings.workRes, settings.captureRes, settings.cameraName)
+                'Return New CameraORB_CPP(settings.workRes, settings.captureRes, settings.cameraName)
+        End Select
+        Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
+    End Function
+    Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        jsonWrite()
+        cameraShutdown = True
+        Application.DoEvents()
+        End
+    End Sub
+    Private Sub CameraTask()
+        uiColor = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
+        uiLeft = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
+        uiRight = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
+        uiPointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3)
+
+        While 1
+            If settings.workRes <> saveworkRes Then
+                saveworkRes = settings.workRes
+                If camera IsNot Nothing Then camera.stopCamera()
+                camera = getCamera()
+                newCameraImages = False
+            ElseIf pauseCameraTask = False Then
+                camera.GetNextFrame(settings.workRes)
+
+                ' The first few frames from the camera are junk.  Skip them.
+                SyncLock cameraLock
+                    If camera.uicolor IsNot Nothing Then
+                        uiColor = camera.uiColor.clone
+                        uiLeft = camera.uiLeft.clone
+                        uiRight = camera.uiRight.clone
+                        ' a problem with the K4A interface was corrected here...
+                        If camera.uipointcloud Is Nothing Then
+                            camera.uipointcloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3)
+                        End If
+                        uiPointCloud = camera.uiPointCloud.clone
+
+                        newCameraImages = True ' trigger the algorithm task
+                    End If
+                End SyncLock
+
+            End If
+            If cameraShutdown Then
+                camera.stopCamera()
+                Exit Sub
+            End If
+        End While
+    End Sub
     Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
         If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
         Dim saveCameraIndex = settings.cameraIndex
@@ -388,9 +449,9 @@ Public Class Main
         Dim OKcancel = optionsForm.ShowDialog()
 
         If OKcancel = DialogResult.OK Then
+            pauseCameraTask = True
             task.optionsChanged = True
             If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
-            saveAlgorithmName = ""
             settings.workRes = optionsForm.cameraworkRes
             settings.displayRes = optionsForm.cameraDisplayRes
             settings.cameraName = optionsForm.cameraName
@@ -404,10 +465,11 @@ Public Class Main
 
             jsonWrite()
             jsonRead() ' this will apply all the changes...
-            restartCameraRequest = True
             Application.DoEvents()
+            saveworkRes = New cv.Size
 
-            StartTask()
+            StartAlgorithm()
+            pauseCameraTask = False
         Else
             settings.cameraIndex = saveCameraIndex
         End If
@@ -825,7 +887,7 @@ Public Class Main
             settings.workResIndex += 1
             saveLastAlgorithm = AvailableAlgorithms.Text
         End If
-        StartTask()
+        StartAlgorithm()
     End Sub
     Private Sub setworkRes()
         Select Case settings.workResIndex
@@ -1068,7 +1130,14 @@ Public Class Main
         XYLoc.Visible = True
 
         If settings.cameraFound Then
-            startCamera()
+            paintNewImages = False
+            newCameraImages = False
+            If cameraTaskHandle Is Nothing Then
+                cameraTaskHandle = New Thread(AddressOf CameraTask)
+                cameraTaskHandle.Name = "Camera Task"
+                cameraTaskHandle.Start()
+            End If
+            CameraSwitching.Text = settings.cameraName + " starting"
             While camera Is Nothing ' wait for camera to start...
                 Application.DoEvents()
                 Thread.Sleep(100)
@@ -1089,7 +1158,7 @@ Public Class Main
         If AvailableAlgorithms.Enabled Then
             If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
             jsonWrite()
-            StartTask()
+            StartAlgorithm()
             updateAlgorithmHistory()
         End If
     End Sub
@@ -1176,7 +1245,7 @@ Public Class Main
         Next
 
         jsonWrite()
-        StartTask()
+        StartAlgorithm()
         updateAlgorithmHistory()
         groupButtonSelection = ""
     End Sub
@@ -1288,85 +1357,8 @@ Public Class Main
             End If
         Next
     End Sub
-    Private Sub startCamera()
-        paintNewImages = False
-        newCameraImages = False
-        If cameraTaskHandle Is Nothing Then
-            cameraTaskHandle = New Thread(AddressOf CameraTask)
-            cameraTaskHandle.Name = "Camera Task"
-            cameraTaskHandle.Start()
-        End If
-        CameraSwitching.Text = settings.cameraName + " starting"
-    End Sub
-    Private Function getCamera() As Object
-        Select Case settings.cameraName
-            Case "Intel(R) RealSense(TM) Depth Camera 455", "Intel(R) RealSense(TM) Depth Camera 435i"
-                Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
-                'Case "Oak-D camera"
-                '    Return New CameraOakD_CPP(settings.workRes, settings.captureRes, settings.cameraName)
-            Case "StereoLabs ZED 2/2i"
-                Return New CameraZED2(settings.workRes, settings.captureRes, settings.cameraName)
-            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
-                Return New CameraORB(settings.workRes, settings.captureRes, settings.cameraName)
-                'Return New CameraORB_CPP(settings.workRes, settings.captureRes, settings.cameraName)
-        End Select
-        Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
-    End Function
-    Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        jsonWrite()
-        saveAlgorithmName = "" ' this will close the current algorithm and the camera.
-        End
-    End Sub
-    Private Sub CameraTask()
-        restartCameraRequest = True
 
-        Static saveworkRes As cv.Size, saveCameraName As String = settings.cameraName
-
-        uiColor = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
-        uiLeft = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
-        uiRight = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
-        uiPointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3)
-
-        While 1
-            If restartCameraRequest Or settings.cameraName <> saveCameraName Or settings.workRes <> saveworkRes Then
-                saveworkRes = settings.workRes
-                saveCameraName = settings.cameraName
-                If camera IsNot Nothing Then camera.stopCamera()
-                camera = getCamera()
-                newCameraImages = False
-            End If
-            If camera Is Nothing Then
-                Continue While ' transition from one camera to another.  Problem showed up once.
-            End If
-            If restartCameraRequest = False Then
-                camera.GetNextFrame(settings.workRes)
-
-                ' The first few frames from the camera are junk.  Skip them.
-                SyncLock cameraLock
-                    If camera.uicolor IsNot Nothing Then
-                        uiColor = camera.uiColor.clone
-                        uiLeft = camera.uiLeft.clone
-                        uiRight = camera.uiRight.clone
-                        ' a problem with the K4A interface was corrected here...
-                        If camera.uipointcloud Is Nothing Then
-                            camera.uipointcloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3)
-                        End If
-                        uiPointCloud = camera.uiPointCloud.clone
-
-                        newCameraImages = True ' trigger the algorithm task
-                    End If
-                End SyncLock
-
-            End If
-            If saveAlgorithmName = "" Then
-                camera.stopCamera()
-                Exit Sub
-            End If
-
-            restartCameraRequest = False
-        End While
-    End Sub
-    Private Sub StartTask()
+    Private Sub StartAlgorithm()
         Debug.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
         testAllRunning = TestAllButton.Text = "Stop Test"
         saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
@@ -1400,7 +1392,7 @@ Public Class Main
         algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
         algorithmTaskHandle.Start(parms)
 
-        Debug.WriteLine("Main.StartTask completed.")
+        Debug.WriteLine("Main.StartAlgorithm completed.")
     End Sub
     Private Function setCalibData(cb As Object) As VBtask.cameraInfo
         Dim cbNew As New VBtask.cameraInfo

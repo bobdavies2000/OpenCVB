@@ -6,8 +6,6 @@ Public Class Brick_Basics : Inherits TaskParent
     Public options As New Options_Features
     Public Sub New()
         task.bricks = Me
-        If task.cameraName.StartsWith("Orbbec Gemini") Then task.rgbLeftAligned = True
-        If task.cameraName.StartsWith("StereoLabs") Then task.rgbLeftAligned = True
         desc = "Create the grid of bricks that reduce depth volatility"
     End Sub
     Public Function setBrickD() As brickData

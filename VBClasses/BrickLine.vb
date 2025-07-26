@@ -293,7 +293,7 @@ Public Class BrickLine_LeftRight : Inherits TaskParent
                 brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
                 If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then Continue For
 
-                If task.rgbLeftAligned Then
+                If task.rgbLeftAligned = False Then
                     brick = Brick_Basics.RealSenseAlign(brick)
                 End If
 
@@ -303,11 +303,11 @@ Public Class BrickLine_LeftRight : Inherits TaskParent
 
                 DrawRect(dst3, brick.rRect, red)
 
-                    cv.Cv2.MatchTemplate(task.leftView(brick.lRect), task.rightView(brick.rRect),
-                                         correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-                    brick.correlation = correlationMat.Get(Of Single)(0, 0)
-                    If brick.correlation >= task.fCorrThreshold Then brickLines.Add(index)
-                End If
+                cv.Cv2.MatchTemplate(task.leftView(brick.lRect), task.rightView(brick.rRect),
+                                             correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                brick.correlation = correlationMat.Get(Of Single)(0, 0)
+                If brick.correlation >= task.fCorrThreshold Then brickLines.Add(index)
+            End If
         Next
 
         labels(3) = CStr(brickLines.Count) + " bricks had lines and good correlation (>" + Format(task.fCorrThreshold, fmt2) +
