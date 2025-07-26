@@ -275,17 +275,21 @@ End Class
 
 
 
-Public Structure gravityLine
-    Dim pt1 As cv.Point3f
-    Dim pt2 As cv.Point3f
-    Dim len3D As Single
-    Dim imageAngle As Single
-    Dim arcX As Single
-    Dim arcY As Single
-    Dim arcZ As Single
-    Dim tc1 As tCell
-    Dim tc2 As tCell
-End Structure
+Public Class gravityLine
+    Public pt1 As cv.Point3f
+    Public pt2 As cv.Point3f
+    Public len3D As Single
+    Public imageAngle As Single
+    Public arcX As Single
+    Public arcY As Single
+    Public arcZ As Single
+    Public tc1 As tCell
+    Public tc2 As tCell
+    Public Sub New()
+        tc1 = New tCell
+        tc2 = New tCell
+    End Sub
+End Class
 
 
 
