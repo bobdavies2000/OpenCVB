@@ -287,45 +287,6 @@ End Class
 
 
 
-Public Class Profile_OpenGL : Inherits TaskParent
-    Dim sides As New Profile_Basics
-    Public rotate As New Profile_Rotation
-    Dim heat As New HeatMap_Basics
-    Public Sub New()
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32FC3, 0)
-        If standalone Then task.gOptions.setGravityUsage(False)
-        task.ogl = New OpenGL_Basics
-        OptionParent.FindSlider("OpenGL Point Size").Value = 10
-        task.ogl.oglFunction = oCase.pcPointsAlone
-        desc = "Visualize just the RedCloud cell contour in OpenGL"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        sides.Run(src)
-        dst2 = sides.dst2
-        dst3 = sides.dst3
-        Dim rc = task.rcD
-
-        If rc.contour3D.Count > 0 Then
-            Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
-            rotate.Run(src)
-            Dim output As cv.Mat = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * task.gmat.gMatrix  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
-            task.ogl.dataInput = output.Reshape(3, vecMat.Rows)
-            task.ogl.pointCloudInput = New cv.Mat
-
-            task.ogl.Run(New cv.Mat)
-            heat.Run(vecMat)
-            dst1 = heat.dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        End If
-        SetTrueText("Select a RedCloud Cell to display the contour in OpenGL." + vbCrLf + rotate.strMsg, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class Profile_Kalman : Inherits TaskParent

@@ -17,25 +17,6 @@ End Class
 
 
 
-Public Class Model_OpenGL_Sliders : Inherits TaskParent
-    Dim model As New Model_Basics
-    Public Sub New()
-        task.OpenGLTitle = "OpenGL_Basics"
-        labels = {"", "", "Captured OpenGL output", ""}
-        desc = "Capture the output of the OpenGL window"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        task.ogl.pointCloudInput = task.pointCloud
-        If standaloneTest() Then task.ogl.Run(src)
-        model.Run(src)
-        dst2 = model.dst2
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class Model_FlatSurfaces : Inherits TaskParent

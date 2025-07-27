@@ -647,57 +647,6 @@ End Class
 
 
 
-Public Class OpenGL_Profile : Inherits TaskParent
-    Public sides As New Profile_Basics
-    Public rotate As New Profile_Rotation
-    Dim heat As New HeatMap_Basics
-    Dim ogl As New OpenGL_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        If standalone Then task.gOptions.setGravityUsage(False)
-        ogl.oglFunction = oCase.pcPointsAlone
-        labels(3) = "Contour of selected cell is shown below.  Blue dot represents the minimum X (leftmost) point and red the maximum X (rightmost)"
-        desc = "Visualize a RedCloud Cell and rotate it using the Options_IMU Sliders"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        sides.Run(src)
-        dst2 = sides.dst2
-
-        Dim rc = task.rcD
-        Dim contourMat As cv.Mat = cv.Mat.FromPixelData(rc.contour.Count, 1, cv.MatType.CV_32SC2, rc.contour.ToArray)
-        If rc.contour.Count = 0 Then Exit Sub
-        Dim split = contourMat.Split()
-        Dim mm As mmData = GetMinMax(split(0))
-        Dim p1 = rc.contour.ElementAt(mm.minLoc.Y)
-        Dim p2 = rc.contour.ElementAt(mm.maxLoc.Y)
-
-        dst3.SetTo(0)
-        DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
-        DrawCircle(dst3, New cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.DotSize + 2, cv.Scalar.Blue)
-        DrawCircle(dst3, New cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.DotSize + 2, cv.Scalar.Red)
-        If rc.contour3D.Count > 0 Then
-            Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
-
-            rotate.Run(src)
-            Dim output As cv.Mat = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * task.gmat.gMatrix ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
-            vecMat = output.Reshape(3, vecMat.Rows)
-
-            ogl.pointCloudInput = New cv.Mat
-            ogl.dataInput = vecMat
-
-            heat.Run(vecMat)
-            dst1 = heat.dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        End If
-
-        ogl.Run(New cv.Mat)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class OpenGL_ProfileSweep : Inherits TaskParent
     Dim visuals As New OpenGL_Profile
     Dim options As New Options_IMU
@@ -1886,3 +1835,162 @@ Public Class OpenGL_BrickCloud : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+Public Class OpenGL_GIF : Inherits TaskParent
+    Dim input As New Model_RedCloud
+    Dim gifC As New Gif_Basics
+    Public Sub New()
+        desc = "Create a GIF for the Model_RedCloud output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        input.Run(src)
+
+        dst2 = input.dst3
+        Dim r = New cv.Rect(0, 0, dst2.Height, dst2.Height)
+        gifC.Run(dst2(r))
+
+        SetTrueText("Select 'Gif_Basics CheckBox Options' form (see 'OpenCVB Algorithm Options')" + vbCrLf +
+                    "Click the check box for each frame to be included" + vbCrLf + "Then click 'Build GIF file...' when done." +
+                    vbCrLf + vbCrLf + "To adjust the GIF size, change the working size in the OpenCVB options.", 3)
+        labels(2) = gifC.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class OpenGL_GIFwithColor : Inherits TaskParent
+    Dim input As New Model_RedCloud
+    Dim gifC As New Gif_Basics
+    Public Sub New()
+        desc = "Create a GIF for the Model_RedCloud output and color image at the same time."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        input.Run(src)
+
+        Dim r = New cv.Rect(0, 0, dst2.Height, dst2.Height)
+        dst2 = input.dst3(r)
+        Dim tmp As New cv.Mat
+        cv.Cv2.HConcat(src, dst2(r), tmp)
+
+        gifC.Run(tmp)
+
+        SetTrueText("Select 'Gif_Basics CheckBox Options' form (see 'OpenCVB Algorithm Options')" + vbCrLf +
+                    "Click the check box for each frame to be included" + vbCrLf + "Then click 'Build GIF file...' when done.", 3)
+        labels(2) = gifC.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_ModelwithSliders : Inherits TaskParent
+    Dim model As New Model_Basics
+    Public Sub New()
+        task.OpenGLTitle = "OpenGL_Basics"
+        labels = {"", "", "Captured OpenGL output", ""}
+        desc = "Capture the output of the OpenGL window"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        task.ogl.pointCloudInput = task.pointCloud
+        If standaloneTest() Then task.ogl.Run(src)
+        model.Run(src)
+        dst2 = model.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenGL_Profile : Inherits TaskParent
+    Public sides As New Profile_Basics
+    Public rotate As New Profile_Rotation
+    Dim heat As New HeatMap_Basics
+    Dim ogl As New OpenGL_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.setGravityUsage(False)
+        ogl.oglFunction = oCase.pcPointsAlone
+        labels(3) = "Contour of selected cell is shown below.  Blue dot represents the minimum X (leftmost) point and red the maximum X (rightmost)"
+        desc = "Visualize a RedCloud Cell and rotate it using the Options_IMU Sliders"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        sides.Run(src)
+        dst2 = sides.dst2
+
+        Dim rc = task.rcD
+        Dim contourMat As cv.Mat = cv.Mat.FromPixelData(rc.contour.Count, 1, cv.MatType.CV_32SC2, rc.contour.ToArray)
+        If rc.contour.Count = 0 Then Exit Sub
+        Dim split = contourMat.Split()
+        Dim mm As mmData = GetMinMax(split(0))
+        Dim p1 = rc.contour.ElementAt(mm.minLoc.Y)
+        Dim p2 = rc.contour.ElementAt(mm.maxLoc.Y)
+
+        dst3.SetTo(0)
+        DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+        DrawCircle(dst3, New cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.DotSize + 2, cv.Scalar.Blue)
+        DrawCircle(dst3, New cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.DotSize + 2, cv.Scalar.Red)
+        If rc.contour3D.Count > 0 Then
+            Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
+
+            rotate.Run(src)
+            Dim output As cv.Mat = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * task.gmat.gMatrix ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
+            vecMat = output.Reshape(3, vecMat.Rows)
+
+            ogl.pointCloudInput = New cv.Mat
+            ogl.dataInput = vecMat
+
+            heat.Run(vecMat)
+            dst1 = heat.dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        End If
+
+        ogl.Run(New cv.Mat)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_ProfileRC : Inherits TaskParent
+    Dim sides As New Profile_Basics
+    Public rotate As New Profile_Rotation
+    Dim heat As New HeatMap_Basics
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32FC3, 0)
+        If standalone Then task.gOptions.setGravityUsage(False)
+        task.ogl = New OpenGL_Basics
+        OptionParent.FindSlider("OpenGL Point Size").Value = 10
+        task.ogl.oglFunction = oCase.pcPointsAlone
+        desc = "Visualize just the RedCloud cell contour in OpenGL"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        sides.Run(src)
+        dst2 = sides.dst2
+        dst3 = sides.dst3
+        Dim rc = task.rcD
+
+        If rc.contour3D.Count > 0 Then
+            Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
+            rotate.Run(src)
+            Dim output As cv.Mat = vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * task.gmat.gMatrix  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
+            task.ogl.dataInput = output.Reshape(3, vecMat.Rows)
+            task.ogl.pointCloudInput = New cv.Mat
+
+            task.ogl.Run(New cv.Mat)
+            heat.Run(vecMat)
+            dst1 = heat.dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        End If
+        SetTrueText("Select a RedCloud Cell to display the contour in OpenGL." + vbCrLf + rotate.strMsg, 3)
+    End Sub
+End Class

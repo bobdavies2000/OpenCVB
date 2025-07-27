@@ -52,64 +52,6 @@ End Class
 
 
 
-Public Class Gif_OpenGL : Inherits TaskParent
-    Dim input As New Model_RedCloud
-    Dim gifC As New Gif_Basics
-    Public Sub New()
-        desc = "Create a GIF for the Model_RedCloud output"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        input.Run(src)
-
-        dst2 = input.dst3
-        Dim r = New cv.Rect(0, 0, dst2.Height, dst2.Height)
-        gifC.Run(dst2(r))
-
-        SetTrueText("Select 'Gif_Basics CheckBox Options' form (see 'OpenCVB Algorithm Options')" + vbCrLf +
-                    "Click the check box for each frame to be included" + vbCrLf + "Then click 'Build GIF file...' when done." +
-                    vbCrLf + vbCrLf + "To adjust the GIF size, change the working size in the OpenCVB options.", 3)
-        labels(2) = gifC.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Gif_OpenGLwithColor : Inherits TaskParent
-    Dim input As New Model_RedCloud
-    Dim gifC As New Gif_Basics
-    Public Sub New()
-        desc = "Create a GIF for the Model_RedCloud output and color image at the same time."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        input.Run(src)
-
-        Dim r = New cv.Rect(0, 0, dst2.Height, dst2.Height)
-        dst2 = input.dst3(r)
-        Dim tmp As New cv.Mat
-        cv.Cv2.HConcat(src, dst2(r), tmp)
-
-        gifC.Run(tmp)
-
-        SetTrueText("Select 'Gif_Basics CheckBox Options' form (see 'OpenCVB Algorithm Options')" + vbCrLf +
-                    "Click the check box for each frame to be included" + vbCrLf + "Then click 'Build GIF file...' when done.", 3)
-        labels(2) = gifC.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Gif_OpenCVB : Inherits TaskParent
     Public gifC As New Gif_Basics
     Public Sub New()

@@ -32,7 +32,7 @@ Public Class Options_Quaternion : Inherits OptionParent
 
         q1 = New Quaternion(CSng(axSlider.Value / 100), CSng(aySlider.Value / 100),
                                 CSng(azSlider.Value / 100), CSng(athetaSlider.Value / 100))
-        q2 = New Quaternion(CSng(bxSlider.Value / 100), CSng(bySlider.ValueOptions_AddWeighted / 100),
+        q2 = New Quaternion(CSng(bxSlider.Value / 100), CSng(bySlider.Value / 100),
                                     CSng(bzSlider.Value / 100), CSng(bthetaSlider.Value / 100))
     End Sub
 End Class
