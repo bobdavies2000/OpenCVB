@@ -1,27 +1,29 @@
-# 2025 July 20th – Gravity Vector, Net8.0 changes, CamZed, Update_All.bat, and Menus.
+# 2025 July 26th – Longest Line, 100 FPS
 
--   Over 1800 algorithms are included, averaging 37 lines of code per algorithm.
--   The gravity RGB vector is always shown full-length to allow accurate comparisons.
--   The main form for OpenCVB was rebuilt using .Net 8.0.
-    -   All the libraries and interfaces were rebuilt as well
-    -   This change required a complete review of the OpenCVB’s infrastructure.
--   GIFBuilder has been converted to a .Net 8.0 console application. Update_All.bat fixed.
--   UI_Generator converted to .Net 8.0 console application. VB_Classes project updated.
--   The ZED camera support is using the NuGet package instead of a custom VB interface.
-    -   The new CamZed C\# class library was able to use NuGet but VB.Net could not.
--   Install script (Update_All.bat) is a one-page file for the SDK and OpenCV downloads.
-    -   No more complicated .Net Framework or StereoLabs requirements.
--   GIF algorithms are skipped during overnight testing – only leaf code for visualization.
--   Better default setting for Histogram Bins with an override mechanism if needed.
--   The main form will no longer have menus – they were never being used.
--   For that first build after a download, build the UI_Generate project by itself.
-    -   The VBClasses build process uses UI_Generate in a pre-build event.
-    -   Alternatively, just build that first build again and UI_Generate will work.
+-   Over 1800 algorithms are included, averaging 38 lines of code per algorithm.
+-   The algorithm for the gravity vector, horizon vector, and longest vector changed.
+    -   Longest vector is found for every frame (more work still needed.)
+    -   If the longest vector changes, the gravity and horizon vectors change as well.
+    -   Otherwise, the gravity and horizon vectors are unchanged, eliminating wobble.
+    -   Only the IMU controls the gravity vector.
+    -   Tracking the longest line is visualized below.
+        -   But running Line_Basics provides a more realistic demonstration.
+-   GIF image creation was reviewed and improved for single “dst” image captures.
+-   Support for 100 fps on the StereoLabs cameras was restored.
+-   Camera intrinsics were overlooked with the Net8.0 conversion – now corrected.
+    -   Missing intrinsics data doesn’t impact overnight testing. Zeros work too.
+-   Switching cameras during a run is simpler and faster and hopefully bug-free.
+-   Oak 4D Pro camera (released June 2025) is not working for me – device not found.
+    -   Any suggestions would be gratefully received. Even better: a pull request.
 -   A log of previous changes is included at the bottom of this document.
+
+![](media/fb9e21f35bdf318623a18eb0598fa9c5.gif)
+
+**Line_Basics:** *The longest line in each frame is presented whenever the crosshairs are requested. The result is shown in the upper left image (dst0 or task.color.) If the longest line is unchanged, the gravity and horizon vectors are also unchanged.*
 
 \-----------------------------------------------------------------------------------------------
 
-NOTE: OpenCVB has evolved away from implementing algorithms in multiple languages because AI has made it convenient to translate the algorithms into any language. While C\#, C++, and Python examples were included in earlier versions of OpenCVB, the algorithms are now exclusively written in VB.Net. It is the most convenient to type in and the simplest to read. Translate to any language using CodeConvert.ai or similar alternative.
+NOTE: OpenCVB has evolved away from implementing algorithms in multiple languages because AI has made it convenient to translate the algorithms into any language. While C\#, C++, and Python examples were included in earlier versions of OpenCVB, the algorithms are now exclusively written in VB.Net. It is the most convenient to type in and the simplest to read. Translate to any language using any available ChatBot.
 
 \-----------------------------------------------------------------------------------------------
 
@@ -98,7 +100,7 @@ Here are the pre-install requirements:
     -   Luxonis Oak-D Pro or Oak-D Series 2. (Oak-D Lite will work but has no IMU.)
     -   Orbbec Gemini 335L and Gemini 335
 
-All of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft Kinect for Azure (no longer supported) has the best depth accuracy but requires more power and is not as portable as StereoLabs or Intel cameras. All the cameras use USB-C to provide data to the host platform.
+All of the above cameras have an IMU (Inertial Measurement Unit) and all the cameras use USB-C to provide data to the host platform.
 
 Download and install the following software. Each is free and easily downloaded for Windows 10:
 
@@ -2031,7 +2033,7 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   The second attempt is currently the active method on each frame.
 -   The lpMap (line pointer map) was removed – lines are not easily clickable.
     -   Instead, use the global option debug slider to identify a line for display.
-    -   See the “LineRGB_Info” algorithm to display the characteristics of a line.
+    -   See the “Line_Info” algorithm to display the characteristics of a line.
 -   A log of previous changes is included at the bottom of this document.
 
 **![A red and yellow lines on a black background AI-generated content may be incorrect.](media/58382b8918581bfb06ad7ea4a17fd803.gif)Gravity Vector:** *This output shows the typical subtle jitter for the gravity vector. The camera was not moving during this test and shows that the IMU captures the gravity vector but with slight variations from frame to frame. The new Gravity_Basics algorithm in OpenCVB uses the longest line in the RGB image to remove this variability. If the RGB line shows motion, the IMU gravity values are used.*
@@ -2067,4 +2069,25 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![A collage of images of a room AI-generated content may be incorrect.](media/62150eb1904b9faf9d77b56958341e17.png)
 
-**LineRGB_Basics:** *The presentation of the gravity vector has been updated. In the upper left image, the longest RGB line - the “Gravity RGB Vector” - is shown in yellow. The longest line parallel to gravity is preferred if available. The lower right image shows all the lines detected in the image while the lower left image shows the longest RGB lines and their age in frames. The upper right image shows the DepthRGB with the depth and depth range under the mouse.*
+**Line_Basics:** *The presentation of the gravity vector has been updated. In the upper left image, the longest RGB line - the “Gravity RGB Vector” - is shown in yellow. The longest line parallel to gravity is preferred if available. The lower right image shows all the lines detected in the image while the lower left image shows the longest RGB lines and their age in frames. The upper right image shows the DepthRGB with the depth and depth range under the mouse.*
+
+# 2025 July 20th – Gravity Vector, Net8.0 changes, CamZed, Update_All.bat, and Menus.
+
+-   Over 1800 algorithms are included, averaging 37 lines of code per algorithm.
+-   The gravity RGB vector is always shown full-length to allow accurate comparisons.
+-   The main form for OpenCVB was rebuilt using .Net 8.0.
+    -   All the libraries and interfaces were rebuilt as well
+    -   This change required a complete review of the OpenCVB’s infrastructure.
+-   GIFBuilder has been converted to a .Net 8.0 console application. Update_All.bat fixed.
+-   UI_Generator converted to .Net 8.0 console application. VB_Classes project updated.
+-   The ZED camera support is using the NuGet package instead of a custom VB interface.
+    -   The new CamZed C\# class library was able to use NuGet but VB.Net could not.
+-   Install script (Update_All.bat) is a one-page file for the SDK and OpenCV downloads.
+    -   No more complicated .Net Framework or StereoLabs requirements.
+-   GIF algorithms are skipped during overnight testing – only leaf code for visualization.
+-   Better default setting for Histogram Bins with an override mechanism if needed.
+-   The main form will no longer have menus – they were never being used.
+-   For that first build after a download, build the UI_Generate project by itself.
+    -   The VBClasses build process uses UI_Generate in a pre-build event.
+    -   Alternatively, just build that first build again and UI_Generate will work.
+-   A log of previous changes is included at the bottom of this document.
