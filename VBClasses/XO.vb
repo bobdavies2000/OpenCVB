@@ -6182,7 +6182,7 @@ Public Class XO_FPoly_Sides : Inherits TaskParent
 
     Public options As New Options_FPoly
     Dim near As New XO_Line_Nearest
-    Public rotatePoly As New Rotate_PolyQT
+    Public rotatePoly As New XO_Rotate_PolyQT
     Dim newPoly As New List(Of cv.Point2f)
     Dim random As New Random_Basics
     Public Sub New()
@@ -6641,7 +6641,7 @@ End Class
 
 
 Public Class XO_FPoly_WarpAffinePoly : Inherits TaskParent
-    Dim rotatePoly As New Rotate_PolyQT
+    Dim rotatePoly As New XO_Rotate_PolyQT
     Dim warp As New WarpAffine_BasicsQT
     Dim fPoly As New XO_FPoly_BasicsOriginal
     Public Sub New()
@@ -6703,7 +6703,7 @@ End Class
 
 
 Public Class XO_FPoly_RotatePoints : Inherits TaskParent
-    Dim rotatePoly As New Rotate_PolyQT
+    Dim rotatePoly As New XO_Rotate_PolyQT
     Public poly As New List(Of cv.Point2f)
     Public polyPrev As New List(Of cv.Point2f)
     Public rotateAngle As Single
@@ -7050,7 +7050,7 @@ End Class
 
 
 Public Class XO_FPoly_Center : Inherits TaskParent
-    Public rotatePoly As New Rotate_PolyQT
+    Public rotatePoly As New XO_Rotate_PolyQT
     Dim near As New XO_Line_Nearest
     Public fPD As fPolyData
     Dim newPoly As List(Of cv.Point2f)
@@ -7578,5 +7578,107 @@ Public Class XO_Motion_TopFeatures : Inherits TaskParent
             featureRects.Add(roi)
             searchRects.Add(task.gridNabeRects(index))
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+' https://academo.org/demos/rotation-about-point/
+Public Class XO_Rotate_PolyQT : Inherits TaskParent
+    Public poly As New List(Of cv.Point2f)
+    Public rotateCenter As cv.Point2f
+    Public rotateAngle As Single
+    Public Sub New()
+        labels = {"", "", "Polygon before rotation", ""}
+        desc = "Rotate a triangle around a center of rotation"
+    End Sub
+    Private Sub drawPolygon(dst As cv.Mat, color As cv.Scalar)
+        Dim minMod = Math.Min(poly.Count, task.polyCount)
+        For i = 0 To minMod - 1
+            DrawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
+        Next
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat Then
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+        End If
+
+        drawPolygon(dst2, red)
+
+        If standaloneTest() Then
+            SetTrueText(traceName + " has no output when run standaloneTest().")
+            Exit Sub
+        End If
+
+        labels(3) = "White is the original polygon, yellow has been rotated " + Format(rotateAngle * 57.2958) + " degrees"
+
+        ' translate so the center of rotation is 0,0
+        Dim translated As New List(Of cv.Point2f)
+        For i = 0 To poly.Count - 1
+            Dim pt = poly(i)
+            translated.Add(New cv.Point2f(poly(i).X - rotateCenter.X, poly(i).Y - rotateCenter.Y))
+        Next
+
+        Dim rotated As New List(Of cv.Point2f)
+        For i = 0 To poly.Count - 1
+            Dim pt = translated(i)
+            Dim x = pt.X * Math.Cos(rotateAngle) - pt.Y * Math.Sin(rotateAngle)
+            Dim y = pt.Y * Math.Cos(rotateAngle) + pt.X * Math.Sin(rotateAngle)
+            rotated.Add(New cv.Point2f(x, y))
+        Next
+
+        drawPolygon(dst3, white)
+
+        poly.Clear()
+        For Each pt In rotated
+            poly.Add(New cv.Point2f(pt.X + rotateCenter.X, pt.Y + rotateCenter.Y))
+        Next
+
+        drawPolygon(dst3, task.highlight)
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://academo.org/demos/rotation-about-point/
+Public Class XO_Rotate_Poly : Inherits TaskParent
+    Dim optionsFPoly As New Options_FPoly
+    Public options As New Options_RotatePoly
+    Public rotateQT As New XO_Rotate_PolyQT
+    Dim rPoly As New List(Of cv.Point2f)
+    Public Sub New()
+        labels = {"", "", "Triangle before rotation", "Triangle after rotation"}
+        desc = "Rotate a triangle around a center of rotation"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        optionsFPoly.Run()
+
+        If options.changeCheck.Checked Or task.firstPass Then
+            rPoly.Clear()
+            For i = 0 To task.polyCount - 1
+                rPoly.Add(New cv.Point2f(msRNG.Next(dst2.Width / 4, dst2.Width * 3 / 4), msRNG.Next(dst2.Height / 4, dst2.Height * 3 / 4)))
+            Next
+            rotateQT.rotateCenter = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            options.changeCheck.Checked = False
+        End If
+
+        rotateQT.poly = New List(Of cv.Point2f)(rPoly)
+        rotateQT.rotateAngle = options.angleSlider.Value
+        rotateQT.Run(src)
+        dst2 = rotateQT.dst3
+
+        DrawCircle(dst2, rotateQT.rotateCenter, task.DotSize + 2, cv.Scalar.Yellow)
+        SetTrueText("center of rotation", rotateQT.rotateCenter)
+        labels(3) = rotateQT.labels(3)
     End Sub
 End Class

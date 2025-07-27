@@ -69,7 +69,6 @@ Public Class Line_Basics : Inherits TaskParent
 
                 If lp.gravityProxy Then
                     DrawLine(dst3, lp, white)
-                    Debug.WriteLine("slope = " + Format(lp.slope, fmt3))
                     SetTrueText("Age: " + CStr(lp.age) + vbCrLf, lp.center)
                     count += 1
                 End If
@@ -1323,6 +1322,8 @@ Public Class Line_Longest : Inherits TaskParent
             Exit Sub
         End If
 
+        If match.correlation < task.fCorrThreshold Then Debug.WriteLine("last correlation too low.")
+
         ' camera is often warming up for the first few images.
         If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or task.heartBeat Then
             lp = lplist(0)
@@ -1330,6 +1331,9 @@ Public Class Line_Longest : Inherits TaskParent
         End If
 
         match.Run(task.gray.Clone)
+        If match.correlation < task.fCorrThreshold Then
+            Debug.WriteLine("curr correlation too low at " + Format(match.correlation, fmt3))
+        End If
 
         If match.correlation < task.fCorrThreshold Then
             If lplist.Count > 1 Then
@@ -1346,6 +1350,7 @@ Public Class Line_Longest : Inherits TaskParent
                 match.template = task.gray(lp.rect)
                 match.correlation = 1
             Else
+                Debug.WriteLine("Only 1 line present or less in the image..")
                 match.correlation = 0 ' force a restart
             End If
         Else
