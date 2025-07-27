@@ -8154,3 +8154,4 @@ Public Class Options_FeaturesEx : Inherits OptionParent
         agastThreshold = agastslider.value
     End Sub
 End Class
+

@@ -247,11 +247,11 @@ Public Class BrickLine_LeftRight : Inherits TaskParent
     Dim edges As New EdgeLine_LeftRight
     Dim fLess As New BrickLine_EdgesNoEdges
     Dim mats As New Mat_4Click
-    Public brickLines As New List(Of Integer)
+    Public bestBricks As New List(Of Integer)
     Public Sub New()
-        task.gOptions.displayDst1.Checked = True
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels(2) = "Left edges, right edges, bricks with left image edges, bricks with right image edges"
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(1) = "Left edges, right edges, bricks with left image edges, bricks with right image edges"
+        labels(2) = "The cells below have depth and good correlation left to right"
         desc = "Display a line in both the left and right images using the bricks that contain the line"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -275,19 +275,23 @@ Public Class BrickLine_LeftRight : Inherits TaskParent
         Next
 
         mats.Run(emptyMat)
-        dst2 = mats.dst2
+        dst1 = mats.dst2
 
-        dst1.SetTo(0)
+        dst2 = task.leftView
         dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim correlationMat As New cv.Mat
-        brickLines.Clear()
-
+        bestBricks.Clear()
         For Each index In leftEdges
-            DrawRect(dst1, task.gridRects(index), white)
             Dim brick As New brickData
             brick.rect = task.gridRects(index)
+
+            ' too close to the edges of the image
+            If task.gridNabeRects(index).Width + brick.rect.X + task.cellSize * 2 > dst2.Width Then Continue For
+            If task.gridNabeRects(index).Height + brick.rect.Y + task.cellSize * 2 > dst2.Height Then Continue For
+
             brick.lRect = brick.rect
             brick.depth = task.pcSplit(2)(brick.rect).Mean()(0)
+            brick.age = task.motionBasics.cellAge(index)
             If brick.depth > 0 Then
                 brick.rRect = brick.rect
                 brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
@@ -297,20 +301,19 @@ Public Class BrickLine_LeftRight : Inherits TaskParent
                     brick = Brick_Basics.RealSenseAlign(brick)
                 End If
 
-                'If task.toggleOn Then
-                If Math.Abs(brick.rect.X - brick.rRect.X) > 32 Then Continue For
-                'End If
+                cv.Cv2.MatchTemplate(task.leftView(brick.lRect), task.rightView(brick.rRect), correlationMat,
+                                     cv.TemplateMatchModes.CCoeffNormed)
 
-                DrawRect(dst3, brick.rRect, red)
-
-                cv.Cv2.MatchTemplate(task.leftView(brick.lRect), task.rightView(brick.rRect),
-                                             correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 brick.correlation = correlationMat.Get(Of Single)(0, 0)
-                If brick.correlation >= task.fCorrThreshold Then brickLines.Add(index)
+                If brick.correlation >= task.fCorrThreshold Then
+                    DrawRect(dst2, brick.rect, white)
+                    DrawRect(dst3, brick.rRect, red)
+                    bestBricks.Add(index)
+                End If
             End If
         Next
 
-        labels(3) = CStr(brickLines.Count) + " bricks had lines and good correlation (>" + Format(task.fCorrThreshold, fmt2) +
-                    ") or " + Format(brickLines.Count / task.gridRects.Count, "00%") + " of all the bricks"
+        labels(3) = CStr(bestBricks.Count) + " bricks had lines and correlation >" + Format(task.fCorrThreshold, fmt2) + ") or " +
+                  Format(bestBricks.Count / task.gridRects.Count, "00%") + " of all the bricks"
     End Sub
 End Class

@@ -1109,3 +1109,43 @@ Public Class Motion_BlobGray : Inherits TaskParent
         lastGray = task.gray.Clone
     End Sub
 End Class
+
+
+
+
+
+Public Class Motion_BestBricks : Inherits TaskParent
+    Dim match As New Match_Basics
+    Dim brickLine As New BrickLine_LeftRight
+    Public Sub New()
+        labels(2) = "Best bricks are shown below and their match offsets show in dst3 - X/Y"
+        desc = "Identify the motion for each of the 'Best' bricks"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        brickLine.Run(src)
+        dst2 = brickLine.dst2
+        Static lastGray = task.gray.Clone
+
+        Dim offsetX As New List(Of Single)
+        Dim offsetY As New List(Of Single)
+        dst3 = lastGray.clone
+        For Each index In brickLine.bestBricks
+            Dim nabeRect = task.gridNabeRects(index)
+            match.template = lastGray(task.gridRects(index))
+            match.Run(task.gray(nabeRect))
+
+            Dim x = match.newCenter.X - nabeRect.Width / 2
+            Dim y = match.newCenter.Y - nabeRect.Height / 2
+            offsetX.Add(x)
+            offsetY.Add(y)
+
+            Dim rect = match.newRect
+            rect.X += nabeRect.X
+            rect.Y += nabeRect.Y
+            SetTrueText(Format(x, fmt0) + "/" + Format(y, fmt0), rect.TopLeft, 3)
+        Next
+
+        lastGray = task.gray.Clone
+        labels(3) = "Average offset X/Y = " + Format(offsetX.Average(), fmt3) + "/" + Format(offsetY.Average(), fmt3)
+    End Sub
+End Class

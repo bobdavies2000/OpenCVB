@@ -5,7 +5,6 @@ Public Class Match_Basics : Inherits TaskParent
     Public template As New cv.Mat ' caller provides this!
     Public correlation As Single
     Public newCenter As cv.Point
-    Public newCenter2F As cv.Point2f
     Public newRect As New cv.Rect
     Public Sub New()
         desc = "Find the requested template in an image.  Managing template is responsibility of caller " +
@@ -24,11 +23,10 @@ Public Class Match_Basics : Inherits TaskParent
         labels(2) = "Template (at right) has " + Format(correlation, fmt3) + " Correlation to the src input"
         Dim w = template.Width, h = template.Height
         newCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
-        newCenter2F = New cv.Point2f(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
         newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
         If standaloneTest() Then
             dst2 = src
-            DrawCircle(dst2, newCenter2F, white)
+            DrawCircle(dst2, newCenter, white)
 
             dst2.Rectangle(newRect, task.highlight, task.lineWidth)
             DrawLine(dst2, task.lineLongest.p1, task.lineLongest.p2)
