@@ -459,32 +459,6 @@ End Class
 
 
 
-Public Class OpenGL_FPolyCloud : Inherits TaskParent
-    Dim fpolyPC As New FPoly_PointCloud
-    Public Sub New()
-        task.ogl.oglFunction = oCase.drawPointCloudRGB
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Display the pointcloud after FPoly_PointCloud identifies the changes depth pixels"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fpolyPC.Run(src)
-        dst1 = fpolyPC.dst1
-        dst2 = fpolyPC.dst2
-        dst3 = fpolyPC.dst3
-        SetTrueText(fpolyPC.fMask.fImage.strOut, 1)
-        labels = fpolyPC.labels
-
-        task.ogl.pointCloudInput = fpolyPC.fPolyCloud
-        task.ogl.Run(src)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 ' https://cs.lmu.edu/~ray/notes/openglexamples/
 Public Class OpenGL_Sierpinski : Inherits TaskParent

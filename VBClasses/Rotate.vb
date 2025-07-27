@@ -1,5 +1,6 @@
-Imports cv = OpenCvSharp
 Imports System.Math
+Imports System.Security.Cryptography
+Imports cv = OpenCvSharp
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class Rotate_Basics : Inherits TaskParent
     Public M As cv.Mat
@@ -12,7 +13,7 @@ Public Class Rotate_Basics : Inherits TaskParent
         rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
         desc = "Rotate a rectangle by a specified angle"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         optionsRotate.Run()
 
@@ -99,7 +100,7 @@ Public Class Rotate_Poly : Inherits TaskParent
         rotateQT.Run(src)
         dst2 = rotateQT.dst3
 
-        DrawCircle(dst2,rotateQT.rotateCenter, task.DotSize + 2, cv.Scalar.Yellow)
+        DrawCircle(dst2, rotateQT.rotateCenter, task.DotSize + 2, cv.Scalar.Yellow)
         SetTrueText("center of rotation", rotateQT.rotateCenter)
         labels(3) = rotateQT.labels(3)
     End Sub
@@ -121,18 +122,24 @@ Public Class Rotate_PolyQT : Inherits TaskParent
         labels = {"", "", "Polygon before rotation", ""}
         desc = "Rotate a triangle around a center of rotation"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Private Sub drawPolygon(dst As cv.Mat, color As cv.Scalar)
+        Dim minMod = Math.Min(poly.Count, task.polyCount)
+        For i = 0 To minMod - 1
+            DrawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
+        Next
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             dst2.SetTo(0)
             dst3.SetTo(0)
         End If
 
+        drawPolygon(dst2, red)
+
         If standaloneTest() Then
             SetTrueText(traceName + " has no output when run standaloneTest().")
             Exit Sub
         End If
-
-        DrawFPoly(dst2, poly, cv.Scalar.Red)
 
         labels(3) = "White is the original polygon, yellow has been rotated " + Format(rotateAngle * 57.2958) + " degrees"
 
@@ -151,13 +158,14 @@ Public Class Rotate_PolyQT : Inherits TaskParent
             rotated.Add(New cv.Point2f(x, y))
         Next
 
-        DrawFPoly(dst3, poly, white)
+        drawPolygon(dst3, white)
+
         poly.Clear()
         For Each pt In rotated
             poly.Add(New cv.Point2f(pt.X + rotateCenter.X, pt.Y + rotateCenter.Y))
         Next
 
-        DrawFPoly(dst3, poly, cv.Scalar.Yellow)
+        drawPolygon(dst3, task.highlight)
     End Sub
 End Class
 

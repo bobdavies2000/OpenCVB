@@ -529,12 +529,6 @@ Public Class TaskParent : Implements IDisposable
         Dim pt2 = New cv.Point(p2.X, p2.Y)
         dst.Line(pt1, pt2, color, task.lineWidth, task.lineType)
     End Sub
-    Public Sub DrawFPoly(ByRef dst As cv.Mat, poly As List(Of cv.Point2f), color As cv.Scalar)
-        Dim minMod = Math.Min(poly.Count, task.polyCount)
-        For i = 0 To minMod - 1
-            DrawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
-        Next
-    End Sub
     Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, radius As Integer, color As cv.Scalar,
                           Optional fillFlag As Integer = -1)
         dst.Circle(pt, radius, color, fillFlag, task.lineType)

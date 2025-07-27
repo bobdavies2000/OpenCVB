@@ -402,12 +402,6 @@ Public Class fPolyData
         If polyPrevSideIndex >= currPoly.Count - 1 Then polyPrevSideIndex = 0
         Return New lpData(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount))
     End Function
-    Public Sub DrawPolys(dst As cv.Mat, currPoly As List(Of cv.Point2f), parent As Object)
-        parent.DrawFPoly(dst, prevPoly, cv.Scalar.White)
-        parent.DrawFPoly(dst, currPoly, cv.Scalar.Yellow)
-        parent.DrawFatLine(currPoly(polyPrevSideIndex), currPoly((polyPrevSideIndex + 1) Mod task.polyCount), dst, cv.Scalar.Yellow)
-        parent.DrawFatLine(prevPoly(polyPrevSideIndex), prevPoly((polyPrevSideIndex + 1) Mod task.polyCount), dst, cv.Scalar.White)
-    End Sub
     Public Sub jitterTest(dst As cv.Mat, parent As Object) ' return true if there is nothing to change
         If jitterCheck Is Nothing Then jitterCheck = New cv.Mat(dst.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         Dim polymp = currmp()
@@ -667,7 +661,6 @@ Public Class lpData
     Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
         p1 = validatePoint(_p1)
         p2 = validatePoint(_p2)
-        center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 
         If p1.X > p2.X Then
             Dim ptTemp = p1
@@ -682,7 +675,6 @@ Public Class lpData
         End If
 
         length = p1.DistanceTo(p2)
-        CalculateRotatedRectFromLine()
 
         vertical = True
         If Math.Abs(p1.X - p2.X) <= 2 Then
@@ -740,6 +732,8 @@ Public Class lpData
             ep1 = New cv.Point2f(p1.X, 0)
             ep2 = New cv.Point2f(p1.X, task.workRes.Height)
         End If
+        center = New cv.Point2f((ep1.X + ep2.X) / 2, (ep1.Y + ep2.Y) / 2)
+        CalculateRotatedRectFromLine()
 
         If vertical And length > 0 Then
             Dim deltaX1 = Math.Abs(task.gravityIMU.ep1.X - ep1.X)

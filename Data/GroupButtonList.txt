@@ -85,7 +85,6 @@ Flip
 Flood
 Font
 Foreground
-FPoly
 Fractal
 FrameRate
 FREAK

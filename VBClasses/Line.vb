@@ -1237,71 +1237,6 @@ End Class
 
 
 
-
-Public Class Line_Longest : Inherits TaskParent
-    Public match As New Match_Basics
-    Public deltaX As Single, deltaY As Single
-    Dim lp As New lpData
-    Public Sub New()
-        desc = "Identify each line in the lpMap."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lplist = task.lines.lpList
-        If lplist.Count = 0 Then
-            SetTrueText("There are no lines present in the image.", 3)
-            Exit Sub
-        End If
-
-        ' camera is often warming up for the first few images.
-        If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or task.heartBeat Then
-            lp = lplist(0)
-            match.template = task.gray(lp.rect)
-        End If
-
-        match.Run(task.gray.Clone)
-
-        If match.correlation < task.fCorrThreshold Then
-            If lplist.Count > 1 Then
-                Dim histogram As New cv.Mat
-                cv.Cv2.CalcHist({task.lines.lpMap(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
-                                 New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
-
-                Dim histArray(histogram.Total - 1) As Single
-                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-
-                Dim histList = histArray.ToList
-                ' pick the lp that has the most pixels in the lp.rect.
-                lp = lplist(histList.IndexOf(histList.Max))
-                match.template = task.gray(lp.rect)
-                match.correlation = 1
-            Else
-                match.correlation = 0 ' force a restart
-            End If
-        Else
-            deltaX = match.newRect.X - lp.rect.X
-            deltaY = match.newRect.Y - lp.rect.Y
-            Dim p1 = New cv.Point(lp.p1.X + deltaX, lp.p1.Y + deltaY)
-            Dim p2 = New cv.Point(lp.p2.X + deltaX, lp.p2.Y + deltaY)
-            lp = New lpData(p1, p2)
-        End If
-
-        If standaloneTest() Then
-            dst2 = src
-            DrawLine(dst2, lp)
-            DrawRect(dst2, lp.rect)
-            dst3 = task.lines.dst2
-        End If
-
-        task.lineLongest = lp
-        labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Line_LongestTest : Inherits TaskParent
     Public match As New Match_Basics
     Dim intersect As New Line_Intersection
@@ -1363,5 +1298,72 @@ Public Class Line_Matching : Inherits TaskParent
         labels(2) = "Mean correlation of all the lines is " + Format(correlations.Average, fmt3)
         labels(3) = "Min/Max correlation = " + Format(correlations.Min, fmt3) + "/" + Format(correlations.Max, fmt3)
         lpLast = New List(Of lpData)(task.lines.lpList)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Line_Longest : Inherits TaskParent
+    Public match As New Match_Basics
+    Public deltaX As Single, deltaY As Single
+    Dim lp As New lpData
+    Public Sub New()
+        desc = "Identify each line in the lpMap."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lplist = task.lines.lpList
+        If lplist.Count = 0 Then
+            SetTrueText("There are no lines present in the image.", 3)
+            Exit Sub
+        End If
+
+        ' camera is often warming up for the first few images.
+        If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or task.heartBeat Then
+            lp = lplist(0)
+            match.template = task.gray(lp.rect)
+        End If
+
+        match.Run(task.gray.Clone)
+
+        If match.correlation < task.fCorrThreshold Then
+            If lplist.Count > 1 Then
+                Dim histogram As New cv.Mat
+                cv.Cv2.CalcHist({task.lines.lpMap(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
+                                 New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
+
+                Dim histArray(histogram.Total - 1) As Single
+                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+                Dim histList = histArray.ToList
+                ' pick the lp that has the most pixels in the lp.rect.
+                lp = lplist(histList.IndexOf(histList.Max))
+                match.template = task.gray(lp.rect)
+                match.correlation = 1
+            Else
+                match.correlation = 0 ' force a restart
+            End If
+        Else
+            deltaX = match.newRect.X - lp.rect.X
+            deltaY = match.newRect.Y - lp.rect.Y
+            Dim p1 = New cv.Point(lp.p1.X + deltaX, lp.p1.Y + deltaY)
+            Dim p2 = New cv.Point(lp.p2.X + deltaX, lp.p2.Y + deltaY)
+            lp = New lpData(p1, p2)
+        End If
+
+        If standaloneTest() Then
+            dst2 = src
+            DrawLine(dst2, lp)
+            DrawRect(dst2, lp.rect)
+            dst3 = task.lines.dst2
+        End If
+
+        task.lineLongest = lp
+        labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
     End Sub
 End Class

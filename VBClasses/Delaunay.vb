@@ -342,37 +342,3 @@ Public Class Delaunay_ConsistentColor : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Public Class Delaunay_Points : Inherits TaskParent
-    Dim delaunay As New Delaunay_Basics
-    Dim fPoly As New FPoly_TopFeatures
-    Public Sub New()
-        OptionParent.FindSlider("Points to use in Feature Poly").Value = 2
-        desc = "This algorithm explores what happens when Delaunay is used on 2 points"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            Static ptBest As New BrickPoint_Basics
-            ptBest.Run(src)
-            task.features = ptBest.intensityFeatures
-        End If
-        Static ptSlider = OptionParent.FindSlider("Points to use in Feature Poly")
-
-        fPoly.Run(src)
-        dst3 = fPoly.dst3
-
-        delaunay.inputPoints.Clear()
-        For i = 0 To Math.Min(ptSlider.value, task.topFeatures.Count) - 1
-            delaunay.inputPoints.Add(task.topFeatures(i))
-        Next
-        delaunay.Run(src)
-        dst2 = delaunay.dst2
-    End Sub
-End Class

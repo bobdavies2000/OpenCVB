@@ -11,6 +11,7 @@ Public Class Gravity_Basics : Inherits TaskParent
         dst.Line(task.lineHorizon.ep1, task.lineHorizon.ep2, white, task.lineWidth, task.lineType)
         If task.lineLongest IsNot Nothing Then
             DrawLine(dst, task.lineLongest.ep1, task.lineLongest.ep2, task.highlight)
+            DrawLine(dst, task.lineLongest.p1, task.lineLongest.p2, white)
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

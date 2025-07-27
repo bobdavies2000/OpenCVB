@@ -670,32 +670,6 @@ End Class
 
 
 
-Public Class Motion_FPolyRect : Inherits TaskParent
-    Dim fRect As New FPoly_LineRect
-    Public match As New Match_Basics
-    Dim srcSave As New cv.Mat
-    Public Sub New()
-        desc = "Confirm the FPoly_LineRect matched the previous image."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        fRect.Run(src)
-
-        If task.heartBeatLT Or match.correlation < 0.5 Then
-            srcSave = src.Clone
-            dst2 = fRect.dst2.Clone()
-        End If
-        match.template = srcSave(ValidateRect(fRect.lpRect)).Clone
-        match.Run(src)
-        dst3 = src
-        dst3.Rectangle(match.newRect, task.highlight, task.lineWidth)
-        labels(3) = "Correlation Coefficient = " + Format(match.correlation * 100, fmt1)
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class Motion_CenterRect : Inherits TaskParent
     Dim gravitySnap As New lpData
@@ -941,7 +915,7 @@ End Class
 
 
 Public Class Motion_TopFeatureFail : Inherits TaskParent
-    Dim fPoly As New FPoly_TopFeatures
+    Dim fPoly As New XO_FPoly_TopFeatures
     Public featureRects As New List(Of cv.Rect)
     Public searchRects As New List(Of cv.Rect)
     Dim match As New Match_Basics
@@ -999,70 +973,6 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class Motion_TopFeatures : Inherits TaskParent
-    Dim fPoly As New FPoly_TopFeatures
-    Public featureRects As New List(Of cv.Rect)
-    Public searchRects As New List(Of cv.Rect)
-    Dim match As New Match_Basics
-    Dim half As Integer
-    Public Sub New()
-        labels(2) = "Track the feature rect (small one) in each larger rectangle"
-        desc = "Find the top feature cells and track them in the next frame."
-    End Sub
-    Private Sub snapShotFeatures()
-        searchRects.Clear()
-        featureRects.Clear()
-        For Each pt In task.topFeatures
-            Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-            Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
-            roi = ValidateRect(roi)
-            featureRects.Add(roi)
-            searchRects.Add(task.gridNabeRects(index))
-        Next
-
-        dst2 = dst1.Clone
-        For Each pt In task.topFeatures
-            Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-            Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
-            roi = ValidateRect(roi)
-            dst2.Rectangle(roi, task.highlight, task.lineWidth)
-            dst2.Rectangle(task.gridNabeRects(index), task.highlight, task.lineWidth)
-        Next
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        half = CInt(task.cellSize / 2)
-
-        dst1 = src.Clone
-        fPoly.Run(src)
-
-        If task.heartBeatLT Then
-            snapShotFeatures()
-        End If
-
-        dst3 = src.Clone
-        Dim matchRects As New List(Of cv.Rect)
-        For i = 0 To featureRects.Count - 1
-            Dim roi = featureRects(i)
-            match.template = dst1(roi).Clone
-            match.Run(src(searchRects(i)))
-            dst3.Rectangle(match.newRect, task.highlight, task.lineWidth)
-            matchRects.Add(match.newRect)
-        Next
-
-        searchRects.Clear()
-        featureRects.Clear()
-        For Each roi In matchRects
-            Dim pt = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
-            Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-            featureRects.Add(roi)
-            searchRects.Add(task.gridNabeRects(index))
-        Next
-    End Sub
-End Class
 
 
 
@@ -1149,3 +1059,21 @@ Public Class Motion_BestBricks : Inherits TaskParent
         labels(3) = "Average offset X/Y = " + Format(offsetX.Average(), fmt3) + "/" + Format(offsetY.Average(), fmt3)
     End Sub
 End Class
+
+
+
+
+
+Public Class Motion_Longest : Inherits TaskParent
+    Public Sub New()
+        desc = "Determine the motion of the end points of the longest line."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.gray
+
+        Dim lp = New lpData(task.lineLongest.ep1, task.lineLongest.ep2)
+        DrawLine(dst2, lp, white)
+
+    End Sub
+End Class
+
