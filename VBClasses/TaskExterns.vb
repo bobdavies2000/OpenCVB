@@ -1,8 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text
-Imports System.Drawing
-
 Module TaskExterns
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function SemiGlobalMatching_Open(rows As Integer, cols As Integer, disparityRange As Integer) As IntPtr
@@ -19,54 +17,11 @@ Module TaskExterns
 
 
 
-
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Annealing_Basics_Open(cityPositions As IntPtr, numberOfCities As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Annealing_Basics_Close(saPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Annealing_Basics_Run(saPtr As IntPtr, cityOrder As IntPtr, numberOfCities As Integer) As IntPtr
-    End Function
-
-
-
-
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub MinTriangle_Run(inputPtr As IntPtr, numberOfPoints As Integer, outputTriangle As IntPtr)
     End Sub
 
 
-
-
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_BGFG_Open(currMethod As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_BGFG_Close(bgfs As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_BGFG_Run(bgfs As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer,
-                                        learnRate As Double) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_Synthetic_Open(bgrPtr As IntPtr, rows As Integer, cols As Integer, fgFilename As String, amplitude As Double,
-                                          magnitude As Double, wavespeed As Double, objectspeed As Double) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_Synthetic_Close(synthPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_Synthetic_Run(synthPtr As IntPtr) As IntPtr
-    End Function
-
-
-
-
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Corners_ShiTomasi(grayPtr As IntPtr, rows As Integer, cols As Integer, blocksize As Integer, aperture As Integer) As IntPtr
-    End Function
 
 
 
@@ -226,96 +181,6 @@ Module TaskExterns
 
 
 
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_Colorizer_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_Colorizer_Close(Depth_ColorizerPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_Colorizer_Run(Depth_ColorizerPtr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer,
-                                        maxDepth As Single) As IntPtr
-    End Function
-
-
-
-
-
-
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayer16(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayer8(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayer4(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayer3(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayer2(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayerRgbNbpp(pixels As IntPtr, width As Integer, height As Integer, nColors As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayerRgb3bpp(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayerRgb6bpp(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayerRgb9bpp(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayerRgb12bpp(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayerRgb15bpp(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherBayerRgb18bpp(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFSRgbNbpp(pixels As IntPtr, width As Integer, height As Integer, nColors As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFS(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFSRgb3bpp(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFSRgb6bpp(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFSRgb9bpp(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFSRgb12bpp(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFSRgb15bpp(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherFSRgb18bpp(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherSierraLiteRgbNbpp(pixels As IntPtr, width As Integer, height As Integer, nColors As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherSierraLite(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherSierraRgbNbpp(pixels As IntPtr, width As Integer, height As Integer, nColors As Integer)
-    End Sub
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub ditherSierra(pixels As IntPtr, width As Integer, height As Integer)
-    End Sub
-
 
 
 
@@ -407,43 +272,6 @@ Module TaskExterns
 
 
 
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineRaw_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineRaw_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineRaw_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineRaw_Rects(cPtr As IntPtr) As IntPtr
-    End Function
-
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineRaw_NextLength(cPtr As IntPtr) As Integer
-    End Function
-
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineRaw_GetSegCount(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineRaw_NextSegment(cPtr As IntPtr) As IntPtr
-    End Function
-
-
-
-
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function EdgeLine_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_GetEdgeLength(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_GetSegCount(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_UnchangedCount(cPtr As IntPtr) As Integer
-    End Function
-
-
-
-
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineSimple_Open() As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineSimple_Close(cPtr As IntPtr) As IntPtr
@@ -463,21 +291,6 @@ Module TaskExterns
                                  clusters As Integer, stepSize As Integer, covarianceMatrixType As Integer) As IntPtr
     End Function
 
-
-
-
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Agast_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function Agast_Count(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Agast_Close(Harris_FeaturesPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Agast_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer,
-                              threshold As Integer) As IntPtr
-    End Function
 
 
 
@@ -578,11 +391,6 @@ Module TaskExterns
 
 
 
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BackProjectCloud_Run(pcPtr As IntPtr, rows As Integer, cols As Integer, bins As Integer, threshold As Single,
-                                         minX As Single, minY As Single, minZ As Single,
-                                         maxX As Single, maxY As Single, maxZ As Single) As IntPtr
-    End Function
 
 
 
@@ -1195,11 +1003,6 @@ Module TaskExterns
     End Function
 
 
-    <DllImport("gdi32.dll")>
-    Public Function BitBlt(ByVal hdc As IntPtr, ByVal nXDest As Integer, ByVal nYDest As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer,
-                        ByVal hdcSrc As IntPtr, ByVal nXSrc As Integer, ByVal nYSrc As Integer, ByVal dwRop As CopyPixelOperation) As Boolean
-    End Function
-
     <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
     Public Function FindWindow(ByVal lpClassName As String, ByVal lpWindowName As String) As IntPtr
     End Function
@@ -1316,5 +1119,227 @@ Module TaskExterns
     Public Function RedCloud_Run(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, minSize As Integer) As IntPtr
     End Function
 
-End Module
 
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Agast_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function Agast_Count(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Agast_Close(Harris_FeaturesPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Agast_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer,
+                                  threshold As Integer) As IntPtr
+    End Function
+
+
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Annealing_Basics_Open(cityPositions As IntPtr, numberOfCities As Integer) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Annealing_Basics_Close(saPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Annealing_Basics_Run(saPtr As IntPtr, cityOrder As IntPtr, numberOfCities As Integer) As IntPtr
+    End Function
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function BackProjectCloud_Run(pcPtr As IntPtr, rows As Integer, cols As Integer, bins As Integer, threshold As Single,
+                                         minX As Single, minY As Single, minZ As Single,
+                                         maxX As Single, maxY As Single, maxZ As Single) As IntPtr
+    End Function
+
+
+
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function BGSubtract_BGFG_Open(currMethod As Integer) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function BGSubtract_BGFG_Close(bgfs As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function BGSubtract_BGFG_Run(bgfs As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer,
+                                        learnRate As Double) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function BGSubtract_Synthetic_Open(bgrPtr As IntPtr, rows As Integer, cols As Integer, fgFilename As String, amplitude As Double,
+                                          magnitude As Double, wavespeed As Double, objectspeed As Double) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function BGSubtract_Synthetic_Close(synthPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function BGSubtract_Synthetic_Run(synthPtr As IntPtr) As IntPtr
+    End Function
+
+
+
+
+    <DllImport("gdi32.dll")>
+    Public Function BitBlt(ByVal hdc As IntPtr, ByVal nXDest As Integer, ByVal nYDest As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer,
+                        ByVal hdcSrc As IntPtr, ByVal nXSrc As Integer, ByVal nYSrc As Integer, ByVal dwRop As CopyPixelOperation) As Boolean
+    End Function
+
+
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Corners_ShiTomasi(grayPtr As IntPtr, rows As Integer, cols As Integer, blocksize As Integer, aperture As Integer) As IntPtr
+    End Function
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Depth_Colorizer_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Depth_Colorizer_Close(Depth_ColorizerPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Depth_Colorizer_Run(Depth_ColorizerPtr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer,
+                                        maxDepth As Single) As IntPtr
+    End Function
+
+
+
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherBayer16(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherBayer8(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherBayer4(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherBayer3(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherBayer2(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherBayerRgbNbpp(pixels As IntPtr, width As Integer, height As Integer, nColors As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherBayerRgb3bpp(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherBayerRgb6bpp(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherBayerRgb9bpp(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherBayerRgb12bpp(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherBayerRgb15bpp(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherBayerRgb18bpp(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherFSRgbNbpp(pixels As IntPtr, width As Integer, height As Integer, nColors As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherFS(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherFSRgb3bpp(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherFSRgb6bpp(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherFSRgb9bpp(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherFSRgb12bpp(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherFSRgb15bpp(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherFSRgb18bpp(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherSierraLiteRgbNbpp(pixels As IntPtr, width As Integer, height As Integer, nColors As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherSierraLite(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherSierraRgbNbpp(pixels As IntPtr, width As Integer, height As Integer, nColors As Integer)
+    End Sub
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub ditherSierra(pixels As IntPtr, width As Integer, height As Integer)
+    End Sub
+
+
+
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineRaw_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineRaw_Close(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineRaw_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineRaw_Rects(cPtr As IntPtr) As IntPtr
+    End Function
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineRaw_NextLength(cPtr As IntPtr) As Integer
+    End Function
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineRaw_GetSegCount(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLineRaw_NextSegment(cPtr As IntPtr) As IntPtr
+    End Function
+
+
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_Close(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function EdgeLine_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr, rows As Int32, cols As Int32, lineWidth As Integer) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_GetEdgeLength(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_GetSegCount(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function EdgeLine_UnchangedCount(cPtr As IntPtr) As Integer
+    End Function
+
+
+End Module

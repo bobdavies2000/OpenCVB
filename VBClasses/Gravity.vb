@@ -1,5 +1,4 @@
-﻿Imports OpenCvSharp
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
     Public options As New Options_Features
     Dim gravityRaw As New Gravity_Raw
@@ -11,8 +10,8 @@ Public Class Gravity_Basics : Inherits TaskParent
         dst.Line(task.lineGravity.ep1, task.lineGravity.ep2, white, task.lineWidth, task.lineType)
         dst.Line(task.lineHorizon.ep1, task.lineHorizon.ep2, white, task.lineWidth, task.lineType)
         If task.lineLongest IsNot Nothing Then
-            DrawLine(dst, task.lineLongest.ep1, task.lineLongest.ep2, task.highlight)
-            dst.Line(task.lineLongest.p1, task.lineLongest.p2, white, task.lineWidth + 1, task.lineType)
+            dst.Line(task.lineLongest.p1, task.lineLongest.p2, task.highlight, task.lineWidth + 1, task.lineType)
+            DrawLine(dst, task.lineLongest.ep1, task.lineLongest.ep2, white)
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

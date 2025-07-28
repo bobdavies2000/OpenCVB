@@ -891,6 +891,9 @@ Public Class XO_Line_BasicsRawOld : Inherits TaskParent
         Next
         labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
     End Sub
+    Public Sub Close()
+        ld.Dispose()
+    End Sub
 End Class
 
 

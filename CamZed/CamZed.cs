@@ -89,23 +89,6 @@ public class CamZed
         rightIntrinsics.ppx = camInfo.cameraConfiguration.calibrationParameters.rightCam.cx;
         rightIntrinsics.ppy = camInfo.cameraConfiguration.calibrationParameters.rightCam.cy;
 
-        // C# uses .x for coordinate access
-        // Dim translation = camInfo.cameraConfiguration.calibrationParameters.Trans; // Not used, so can remove
-
-        //base.calibData.rgbIntrinsics.fx = camInfo.cameraConfiguration.calibrationParameters.LeftCam.fx;
-        //base.calibData.rgbIntrinsics.fy = camInfo.cameraConfiguration.calibrationParameters.LeftCam.fy;
-        //base.calibData.rgbIntrinsics.ppx = camInfo.cameraConfiguration.calibrationParameters.LeftCam.cx;
-        //base.calibData.rgbIntrinsics.ppy = camInfo.cameraConfiguration.calibrationParameters.LeftCam.cy;
-        //base.calibData.h_fov = camInfo.cameraConfiguration.calibrationParameters.LeftCam.hFOV;
-        //base.calibData.v_fov = camInfo.cameraConfiguration.calibrationParameters.LeftCam.vFOV;
-
-        //// Integer division in C# works like VB.NET's CInt(x / y) for positive numbers
-        //int ratio = captureRes.Width / workRes.Width;
-        //base.calibData.rgbIntrinsics.fx /= ratio;
-        //base.calibData.rgbIntrinsics.fy /= ratio;
-        //base.calibData.rgbIntrinsics.ppx /= ratio;
-        //base.calibData.rgbIntrinsics.ppy /= ratio;
-
         sl.PositionalTrackingParameters posTrack = new sl.PositionalTrackingParameters();
         posTrack.enableAreaMemory = true; // C# uses camelCase
         zed.EnablePositionalTracking(ref posTrack);
@@ -169,6 +152,10 @@ public class CamZed
     }
     public void StopCamera()
     {
+        color.Dispose();
+        rightView.Dispose();
+        leftView.Dispose();
+        pointCloud.Dispose();
         zed.Close();
     }
 }

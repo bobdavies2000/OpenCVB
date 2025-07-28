@@ -128,6 +128,9 @@ Public Class Line_Raw : Inherits TaskParent
 
         labels(2) = CStr(lpList.Count) + " highlighted lines were detected in the current frame. Others were too similar."
     End Sub
+    Public Sub Close()
+        ld.Dispose()
+    End Sub
 End Class
 
 
@@ -195,6 +198,9 @@ Public Class Line_RawEPLines : Inherits TaskParent
 
         labels(2) = CStr(lpList.Count) + " highlighted lines were detected in the current frame. Others were too similar."
         labels(3) = "There were " + CStr(removeList.Count) + " coincident lines"
+    End Sub
+    Public Sub Close()
+        ld.Dispose()
     End Sub
 End Class
 
@@ -296,6 +302,9 @@ Public Class Line_RawSorted : Inherits TaskParent
         End If
 
         labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
+    End Sub
+    Public Sub Close()
+        ld.Dispose()
     End Sub
 End Class
 
