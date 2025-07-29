@@ -5,8 +5,8 @@ Public Class Line_Basics : Inherits TaskParent
     Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public rawLines As New Line_Raw
-    Dim lineAges As New Line_OrderByAge
     Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
     Private Function lpMotionCheck(lp As lpData) As Boolean
@@ -37,7 +37,6 @@ Public Class Line_Basics : Inherits TaskParent
         Next
 
         rawLines.Run(task.grayStable)
-        dst3 = rawLines.dst2
         labels(3) = rawLines.labels(2)
 
         For Each lp In rawLines.lpList
@@ -51,30 +50,6 @@ Public Class Line_Basics : Inherits TaskParent
             lpList.Add(lp)
             If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
-
-        lineAges.Run(task.color.Clone)
-        dst2 = lineAges.dst2
-        If standaloneTest() Then
-            dst3.SetTo(0)
-            Dim count As Integer
-            For Each lp In task.lines.lpList
-                If lp.vertical Then
-                    ' this was inserted to verify gravity proxy while debugging.  It is not technically needed (lpData sets gravityProxy.)
-                    Dim deltaX1 = Math.Abs(task.gravityIMU.ep1.X - lp.ep1.X)
-                    Dim deltaX2 = Math.Abs(task.gravityIMU.ep2.X - lp.ep2.X)
-                    If Math.Sign(deltaX1) = Math.Sign(deltaX2) Then
-                        lp.gravityProxy = Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold
-                    End If
-                End If
-
-                If lp.gravityProxy Then
-                    DrawLine(dst3, lp, white)
-                    SetTrueText("Age: " + CStr(lp.age) + vbCrLf, lp.center)
-                    count += 1
-                End If
-            Next
-            labels(3) = CStr(count) + " lines are proxies for gravity."
-        End If
 
         lpMap.SetTo(0)
         lpRectMap.SetTo(0)
@@ -1408,8 +1383,6 @@ Public Class Line_Longest : Inherits TaskParent
         If match.correlation < task.fCorrThreshold Then
             task.lineLongestChanged = True
             If lplist.Count > 1 Then
-                Dim testMat As New cv.Mat(lp.rect.Size, cv.MatType.CV_8U, 0)
-
                 Dim histogram As New cv.Mat
                 cv.Cv2.CalcHist({task.lines.lpMap(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
                                  New cv.Rangef() {New cv.Rangef(1, lplist.Count)})

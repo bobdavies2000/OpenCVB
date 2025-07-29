@@ -747,7 +747,7 @@ Public Class lpData
             ep1 = New cv.Point2f(p1.X, 0)
             ep2 = New cv.Point2f(p1.X, task.workRes.Height)
         End If
-        center = New cv.Point2f((ep1.X + ep2.X) / 2, (ep1.Y + ep2.Y) / 2)
+        center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 
         rect = New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y))
         Const minSize = 15
