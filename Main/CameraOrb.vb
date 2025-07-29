@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 Imports Orbbec
 Public Class CameraORB : Inherits GenericCamera
-    Dim pipe As New Pipeline()
+    Dim pipe As Pipeline
     Dim accelSensor As Sensor
     Dim gyroSensor As Sensor
     Dim orbMutex As New Mutex(True, "orbMutex")
@@ -16,6 +16,7 @@ Public Class CameraORB : Inherits GenericCamera
 
         Dim fps = 0
         Dim w = captureRes.Width, h = captureRes.Height
+        pipe = New Pipeline()
         Dim colorProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_COLOR).
                                             GetVideoStreamProfile(w, h, Format.OB_FORMAT_BGR, fps)
         Dim depthProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_DEPTH).
@@ -52,7 +53,10 @@ Public Class CameraORB : Inherits GenericCamera
                                           End SyncLock
                                       End Sub)
         pipe.EnableFrameSync()
-        pipe.Start(config)
+        Try
+            pipe.Start(config)
+        Catch ex As Exception
+        End Try
     End Sub
     Public Sub GetNextFrame(workRes As cv.Size)
         Dim rows = captureRes.Height, cols = captureRes.Width
@@ -238,6 +242,7 @@ Public Class CameraORB_CPP : Inherits GenericCamera
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
+        If cPtr = 0 Then Exit Sub
         Application.DoEvents()
         Try
             ORBClose(cPtr)

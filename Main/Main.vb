@@ -30,6 +30,7 @@ Public Class Main
     Dim algolist As algorithmList = New algorithmList
     Public Shared settings As jsonClass.ApplicationStorage
     Dim saveworkRes As cv.Size
+    Dim saveCameraName As String
     Dim pauseCameraTask As Boolean
 
     Dim jsonfs As New jsonClass.FileOperations
@@ -400,11 +401,11 @@ Public Class Main
         uiLeft = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
         uiRight = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
         uiPointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3)
-
         While 1
-            If settings.workRes <> saveworkRes Then
+            If settings.workRes <> saveworkRes Or saveCameraName <> settings.cameraName Then
+                If saveCameraName = settings.cameraName And camera IsNot Nothing Then camera.stopCamera()
                 saveworkRes = settings.workRes
-                If camera IsNot Nothing Then camera.stopCamera()
+                saveCameraName = settings.cameraName
                 camera = getCamera()
                 newCameraImages = False
             ElseIf pauseCameraTask = False Then
@@ -466,7 +467,6 @@ Public Class Main
             jsonWrite()
             jsonRead() ' this will apply all the changes...
             Application.DoEvents()
-            saveworkRes = New cv.Size
 
             StartAlgorithm()
             pauseCameraTask = False
@@ -1481,12 +1481,11 @@ Public Class Main
                 Dim waitTime = Now
                 ' relative size of displayed image and algorithm size image.
                 While 1
-                    ' camera has exited or resolution is changed.
-                    If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or
-                            saveworkRes <> settings.workRes Then Exit While
-                    If saveAlgorithmName <> task.algName Then Exit While
-                    ' switching camera resolution means stopping the current algorithm
+                    ' exit the inner while if any of these change.
+                    If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Then Exit While
                     If saveworkRes <> settings.workRes Then Exit While
+                    If saveCameraName <> settings.cameraName Then Exit While
+                    If saveAlgorithmName <> task.algName Then Exit While
 
                     If pauseAlgorithmThread Then
                         task.paused = True
@@ -1513,16 +1512,16 @@ Public Class Main
                             task.pointCloud = camera.uiPointCloud
 
                             ' there might be a delay in the camera task so set it again here....
-                            If frameCount < 10 Then task.calibData = setCalibData(camera.calibData)
+                            If frameCount <10 Then task.calibData= setCalibData(camera.calibData)
 
-                            task.transformationMatrix = camera.transformationMatrix
-                            task.IMU_TimeStamp = camera.IMU_TimeStamp
-                            task.IMU_Acceleration = camera.IMU_Acceleration
-                            task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
-                            task.IMU_AngularVelocity = camera.IMU_AngularVelocity
-                            task.IMU_FrameTime = camera.IMU_FrameTime
-                            task.CPU_TimeStamp = camera.CPU_TimeStamp
-                            task.CPU_FrameTime = camera.CPU_FrameTime
+                            task.transformationMatrix= camera.transformationMatrix
+                            task.IMU_TimeStamp= camera.IMU_TimeStamp
+                            task.IMU_Acceleration= camera.IMU_Acceleration
+                            task.IMU_AngularAcceleration= camera.IMU_AngularAcceleration
+                            task.IMU_AngularVelocity= camera.IMU_AngularVelocity
+                            task.IMU_FrameTime= camera.IMU_FrameTime
+                            task.CPU_TimeStamp= camera.CPU_TimeStamp
+                            task.CPU_FrameTime= camera.CPU_FrameTime
                         End SyncLock
 
                         Dim endCopyTime = Now
@@ -1550,19 +1549,11 @@ Public Class Main
                     End If
                 End While
 
-                ' when "testAll" is running and switching resolutions, the camera task may have switched to the new
-                ' resolution but the task has not.  This catches that and will rebuild the task structure and start fresh.
-                ' BTW: if you are ever stuck debugging this code, there is a conflict deep in the compiler with using the
-                ' word "task" for the main OpenCVB variable. It only shows up here.  If you carefully change "task" to "aTask"
-                ' throughout VB_Classes, it will make it easier to debug this while loop.  "task" is not a reserved work in VB.Net
-                ' but is seems to act like it in Main.vb.  Using "task" instead of "aTask" is to be preferred - just simpler to type.
-                If task.color.Size <> saveworkRes Then Exit While
-
-                ' camera has exited or resolution is changed.
-                If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or saveworkRes <> settings.workRes Or
-                    saveAlgorithmName <> task.algName Then
-                    Exit While
-                End If
+                ' exit the outer while if any of these change.
+                If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Then Exit While
+                If saveworkRes <> settings.workRes Then Exit While
+                If saveCameraName <> settings.cameraName Then Exit While
+                If saveAlgorithmName <> task.algName Then Exit While
 
                 If activeMouseDown = False Then
                     SyncLock mouseLock

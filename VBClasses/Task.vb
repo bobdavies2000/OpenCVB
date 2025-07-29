@@ -178,6 +178,7 @@ Public Class VBtask : Implements IDisposable
     Public lineGravity As New lpData
     Public lineHorizon As New lpData
     Public lineLongest As New lpData
+    Public lineLongestChanged As Boolean
 
     Public gravityIMU As New lpData
     Public IMU_RawAcceleration As cv.Point3f

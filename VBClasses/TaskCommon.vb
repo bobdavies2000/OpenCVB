@@ -600,6 +600,21 @@ End Class
 
 
 
+Public Class nrcData
+    Public rect As cv.Rect
+    Public mask As cv.Mat
+    Public ID As Integer
+    Public pixels As Integer
+    Public age As Integer
+    Public depth As Single
+    Public segment As New List(Of cv.Point)
+    Public Sub New()
+    End Sub
+End Class
+
+
+
+
 Public Class lpData
     Public age As Integer = 1
     Public p1 As cv.Point2f
@@ -733,7 +748,13 @@ Public Class lpData
             ep2 = New cv.Point2f(p1.X, task.workRes.Height)
         End If
         center = New cv.Point2f((ep1.X + ep2.X) / 2, (ep1.Y + ep2.Y) / 2)
-        CalculateRotatedRectFromLine()
+
+        rect = New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y))
+        Const minSize = 15
+        If rect.Width = 0 Then rect.Width = minSize
+        If rect.Height = 0 Then rect.Height = minSize
+        If rect.Width < minSize And rect.X + minSize < task.color.Width Then rect.Width = minSize
+        If rect.Height < minSize And rect.Y + minSize < task.color.Height Then rect.Height = minSize
 
         If vertical And length > 0 Then
             Dim deltaX1 = Math.Abs(task.gravityIMU.ep1.X - ep1.X)
@@ -753,19 +774,4 @@ Public Class lpData
         If lp.p1.X = p1.X And lp.p1.Y = p1.Y And lp.p2.X = p2.X And p2.Y = p2.Y Then Return True
         Return False
     End Function
-End Class
-
-
-
-
-Public Class nrcData
-    Public rect As cv.Rect
-    Public mask As cv.Mat
-    Public ID As Integer
-    Public pixels As Integer
-    Public age As Integer
-    Public depth As Single
-    Public segment As New List(Of cv.Point)
-    Public Sub New()
-    End Sub
 End Class

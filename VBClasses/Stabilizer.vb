@@ -1,7 +1,6 @@
 Imports System.Windows.Forms.Design.AxImporter
 Imports cv = OpenCvSharp
 Public Class Stabilizer_Basics : Inherits TaskParent
-    Dim rotate As New Rotate_Basics
     Public Sub New()
         desc = "Use task.lineLongest to find the angle needed to stabilize the image."
     End Sub
@@ -46,8 +45,9 @@ Public Class Stabilizer_Basics : Inherits TaskParent
         Static lpLast As lpData = task.lineLongest
 
         Dim lp = task.lineLongest
-        If lp.ep1 = lpLast.ep1 And lp.ep2 = lpLast.ep2 Then
+        If lp.ep1 = lpLast.ep1 And lp.ep2 = lpLast.ep2 Or task.lineLongestChanged Then
             dst2 = src
+            If task.lineLongestChanged Then lpLast = task.lineLongest
         Else
             Dim rotateAngle = GetAngleBetweenLinesBySlopes(lp.slope, lpLast.slope)
 
@@ -55,8 +55,7 @@ Public Class Stabilizer_Basics : Inherits TaskParent
             Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
             dst2 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Cubic)
 
-            labels(2) = "Image after rotation by " + Format(rotateAngle, fmt3)
+            labels(2) = "Image after rotation by " + Format(rotateAngle, fmt3) + " degrees"
         End If
-        ' lpLast = task.lineLongest
     End Sub
 End Class
