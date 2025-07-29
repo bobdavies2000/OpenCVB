@@ -717,8 +717,8 @@ Public Class lpData
 
         Dim nabeRect1 = task.gridNabeRects(gridIndex1)
         Dim nabeRect2 = task.gridNabeRects(gridIndex2)
-        template1 = task.color(nabeRect1)
-        template2 = task.color(nabeRect2)
+        template1 = task.gray(nabeRect1)
+        template2 = task.gray(nabeRect2)
 
         If p1.X <> p2.X Then
             Dim b = p1.Y - p1.X * slope
