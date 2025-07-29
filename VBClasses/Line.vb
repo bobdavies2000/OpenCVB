@@ -1209,7 +1209,7 @@ End Class
 
 Public Class Line_LongestTest : Inherits TaskParent
     Public match As New Match_Basics
-    Dim intersect As New Line_Intersection
+    Dim intersect As New Line_IntersectionPT
     Public trackPoint As cv.Point2f
     Public Sub New()
         labels(2) = "White line is the last longest line and yellow is the current perpendicular to the longest line."
@@ -1345,8 +1345,48 @@ End Class
 
 
 ' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
-Public Class Line_Intersection : Inherits TaskParent
+Public Class Line_IntersectionPT : Inherits TaskParent
     Public p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f
+    Public intersectionPoint As cv.Point2f
+    Public Sub New()
+        desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image."
+    End Sub
+
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat Then
+            p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            p3 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+            p4 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
+        End If
+
+        intersectionPoint = Line_Intersection.IntersectTest(p1, p2, p3, p4)
+        intersectionPoint = Line_Intersection.IntersectTest(New lpData(p1, p2), New lpData(p3, p4))
+
+        dst2.SetTo(0)
+        dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        dst2.Line(p3, p4, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        If intersectionPoint <> New cv.Point2f Then
+            DrawCircle(dst2, intersectionPoint, task.DotSize + 4, white)
+            labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
+        Else
+            labels(2) = "Parallel!!!"
+        End If
+        If intersectionPoint.X < 0 Or intersectionPoint.X > dst2.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst2.Height Then
+            labels(2) += " (off screen)"
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
+Public Class Line_Intersection : Inherits TaskParent
+    Public lp1 As lpData, lp2 As lpData
     Public intersectionPoint As cv.Point2f
     Public Sub New()
         desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image."
@@ -1372,67 +1412,30 @@ Public Class Line_Intersection : Inherits TaskParent
         Return pt
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
-            p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            p3 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-            p4 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
-        End If
-
-        intersectionPoint = IntersectTest(p1, p2, p3, p4)
-        intersectionPoint = IntersectTest(New lpData(p1, p2), New lpData(p3, p4))
-
-        dst2.SetTo(0)
-        dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-        dst2.Line(p3, p4, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-        If intersectionPoint <> New cv.Point2f Then
-            DrawCircle(dst2, intersectionPoint, task.DotSize + 4, white)
-            labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
-        Else
-            labels(2) = "Parallel!!!"
-        End If
-        If intersectionPoint.X < 0 Or intersectionPoint.X > dst2.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst2.Height Then
-            labels(2) += " (off screen)"
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
-Public Class Line_Intersectionlp : Inherits TaskParent
-    Public lp1 As lpData, lp2 As lpData
-    Public intersectionPoint As cv.Point2f
-    Public Sub New()
-        desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image."
-    End Sub
-
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
-            lp1 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
+        If standalone Then
+            If task.heartBeat Then
+                lp1 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
                              New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
-            lp2 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
+                lp2 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
                              New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
+            End If
         End If
 
-        intersectionPoint = Line_Intersection.IntersectTest(lp1.p1, lp1.p2, lp2.p1, lp2.p2)
         intersectionPoint = Line_Intersection.IntersectTest(lp1, lp2)
 
-        dst2.SetTo(0)
-        dst2.Line(lp1.p1, lp1.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-        dst2.Line(lp2.p1, lp2.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-        If intersectionPoint <> New cv.Point2f Then
-            DrawCircle(dst2, intersectionPoint, task.DotSize + 4, white)
-            labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
-        Else
-            labels(2) = "Parallel!!!"
-        End If
-        If intersectionPoint.X < 0 Or intersectionPoint.X > dst2.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst2.Height Then
-            labels(2) += " (off screen)"
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            dst2.Line(lp1.p1, lp1.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            dst2.Line(lp2.p1, lp2.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            If intersectionPoint <> New cv.Point2f Then
+                DrawCircle(dst2, intersectionPoint, task.DotSize + 4, white)
+                labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
+            Else
+                labels(2) = "Parallel!!!"
+            End If
+            If intersectionPoint.X < 0 Or intersectionPoint.X > dst2.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst2.Height Then
+                labels(2) += " (off screen)"
+            End If
         End If
     End Sub
 End Class

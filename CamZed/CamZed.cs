@@ -98,6 +98,10 @@ public class CamZed
         captureRows = captureRes.Height; // Use class-level field
         captureCols = captureRes.Width;
 
+        color = new Cv.Mat();
+        rightView = new Cv.Mat();
+        leftView = new Cv.Mat();
+        pointCloud = new Cv.Mat();
     }
     public void GetNextFrame(Cv.Size workRes)
     {
@@ -106,11 +110,6 @@ public class CamZed
             colorSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C3);
             rightSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C3);
             pointCloudSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C4); // Note: BGRA is 4 channels
-
-            color = new Cv.Mat();
-            rightView = new Cv.Mat();
-            leftView = new Cv.Mat();
-            pointCloud = new Cv.Mat();
         }
 
         while (true) 

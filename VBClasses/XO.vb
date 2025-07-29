@@ -2893,7 +2893,7 @@ Public Class XO_FCSLine_Vertical : Inherits TaskParent
                 Dim lp2 = verts.vertList(j)
                 Dim center = New cv.Point(CInt((lp1.p1.X + lp1.p2.X) / 2), CInt((lp1.p1.Y + lp1.p2.Y) / 2))
                 Dim lpPerp = lp1.perpendicularPoints(center)
-                Dim intersectionPoint = IntersectTest(lp1, lpPerp)
+                Dim intersectionPoint = Line_Intersection.IntersectTest(lp1, lpPerp)
                 Dim distance = intersectionPoint.DistanceTo(center)
                 If distance <= options.proximity Then
                     minRect.lpInput1 = lp1
@@ -3388,7 +3388,7 @@ Public Class XO_Line_VerticalHorizontal1 : Inherits TaskParent
         nearest.lp = task.lineGravity
         DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, white)
         For Each lp In task.lines.lpList
-            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.lineGravity.p1, task.lineGravity.p2)
+            Dim ptInter = Line_Intersection.IntersectTest(lp.p1, lp.p2, task.lineGravity.p1, task.lineGravity.p2)
             If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then
                 Continue For
             End If
@@ -3409,7 +3409,7 @@ Public Class XO_Line_VerticalHorizontal1 : Inherits TaskParent
         DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, white)
         nearest.lp = task.lineHorizon
         For Each lp In task.lines.lpList
-            Dim ptInter = IntersectTest(lp.p1, lp.p2, task.lineHorizon.p1, task.lineHorizon.p2)
+            Dim ptInter = Line_Intersection.IntersectTest(lp.p1, lp.p2, task.lineHorizon.p1, task.lineHorizon.p2)
             If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
 
             nearest.pt = lp.p1
@@ -6858,7 +6858,7 @@ Public Class XO_FPoly_Perpendiculars : Inherits TaskParent
         perp2.Run(src)
         DrawLine(dst2, perp2.output.p1, perp2.output.p2, white)
 
-        fPD.rotateCenter = IntersectTest(perp2.output.p1, perp2.output.p2, perp1.output.p1, perp1.output.p2)
+        fPD.rotateCenter = Line_Intersection.IntersectTest(perp2.output.p1, perp2.output.p2, perp1.output.p1, perp1.output.p2)
         If fPD.rotateCenter = New cv.Point2f Then
             fPD.rotateAngle = 0
         Else

@@ -6,8 +6,7 @@ Public Class Stabilizer_Basics : Inherits TaskParent
         desc = "Use task.lineLongest to find the angle needed to stabilize the image."
     End Sub
     Public Function GetAngleBetweenLinesBySlopes(ByVal slope1 As Double, ByVal slope2 As Double) As Double
-        ' Define a small epsilon for floating-point comparisons
-        Const EPSILON As Double = 0.000000001 ' 0.000000001 - adjust as needed for precision
+        Const EPSILON As Double = 0.000000001
 
         ' --- Handle Vertical Lines (Infinite Slope) ---
         Dim isSlope1Vertical As Boolean = Double.IsInfinity(slope1)
@@ -52,7 +51,7 @@ Public Class Stabilizer_Basics : Inherits TaskParent
         Else
             Dim rotateAngle = GetAngleBetweenLinesBySlopes(lp.slope, lpLast.slope)
 
-            Dim rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
+            Dim rotateCenter = Line_Intersection.IntersectTest(lp, lpLast)
             Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
             dst2 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Cubic)
 
