@@ -175,6 +175,60 @@ End Class
 
 
 
+
+
+Public Class IMU_Vertical : Inherits TaskParent
+    Public stableTest As Boolean
+    Public stableStr As String
+    Dim angleXValue As New List(Of Single)
+    Dim angleYValue As New List(Of Single)
+    Dim stableCount As New List(Of Integer)
+    Dim lastAngleX As Single, lastAngleY As Single
+    Public Sub New()
+        desc = "Use the IMU angular velocity to determine if the camera is moving or stable."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        angleXValue.Add(task.accRadians.X)
+        angleYValue.Add(task.accRadians.Y)
+
+        strOut = "IMU X" + vbTab + "IMU Y" + vbTab + "IMU Z" + vbCrLf
+        strOut += Format(task.accRadians.X * 57.2958, fmt3) + vbTab + Format(task.accRadians.Y * 57.2958, fmt3) + vbTab +
+                  Format(task.accRadians.Z * 57.2958, fmt3) + vbCrLf
+        Dim avgX = angleXValue.Average
+        Dim avgY = angleYValue.Average
+        If task.firstPass Then
+            lastAngleX = avgX
+            lastAngleY = avgY
+        End If
+        strOut += "Angle X" + vbTab + "Angle Y" + vbCrLf
+        strOut += Format(avgX, fmt3) + vbTab + Format(avgY, fmt3) + vbCrLf
+
+        Dim angle = 90 - avgY * 57.2958
+        If avgX < 0 Then angle *= -1
+        labels(2) = "stabilizer_Vertical Angle = " + Format(angle, fmt1)
+
+        stableTest = Math.Abs(lastAngleX - avgX) < 0.001 And Math.Abs(lastAngleY - avgY) < 0.01
+        stableCount.Add(If(stableTest, 1, 0))
+        If task.heartBeat Then
+            Dim avgStable = stableCount.Average
+            stableStr = "IMU stable = " + Format(avgStable, "0.0%") + " of the time"
+            stableCount.Clear()
+        End If
+        SetTrueText(strOut + vbCrLf + stableStr, 2)
+
+        lastAngleX = avgX
+        lastAngleY = avgY
+
+        If angleXValue.Count >= task.frameHistoryCount Then angleXValue.RemoveAt(0)
+        If angleYValue.Count >= task.frameHistoryCount Then angleYValue.RemoveAt(0)
+    End Sub
+End Class
+
+
+
+
+
+
 ' https://www.codeproject.com/Articles/1247960/3D-graphics-engine-with-basic-math-on-CPU
 Public Class IMU_GMatrix : Inherits TaskParent
     Public cx As Single = 1, sx As Single = 0, cy As Single = 1, sy As Single = 0, cz As Single = 1, sz As Single = 0

@@ -1,5 +1,6 @@
-﻿using Cv = OpenCvSharp;
-using sl;
+﻿using sl;
+using System.Drawing;
+using Cv = OpenCvSharp;
 
 public class CalibData
 {
@@ -41,10 +42,12 @@ public class CamZed
     private sl.InitParameters init_params; 
 
     private static sl.RuntimeParameters RuntimeParameters = new sl.RuntimeParameters();
-    private static sl.Mat colorSL = new sl.Mat();
-    private static sl.Mat rightSL = new sl.Mat();
-    private static sl.Mat pointCloudSL = new sl.Mat();
     private static ulong IMU_StartTime = 0; // Use ulong for timestamps
+
+    sl.Mat colorSL = new sl.Mat();
+    sl.Mat rightSL = new sl.Mat();
+    sl.Mat pointCloudSL = new sl.Mat();
+    sl.CameraInformation camInfo;
 
     public CamZed(Cv.Size workRes, Cv.Size captureRes, string deviceName)
     {
@@ -71,7 +74,7 @@ public class CamZed
             // Handle error, e.g., throw new Exception($"Failed to open ZED camera: {errCode}");
         }
 
-        sl.CameraInformation camInfo = zed.GetCameraInformation();
+        camInfo = zed.GetCameraInformation();
 
         // stereolabs left camera is the RGB camera so alignment to depth and left camera is already done.
         // all we need to translate from left to right image is the baseline
@@ -95,10 +98,6 @@ public class CamZed
         captureRows = captureRes.Height; // Use class-level field
         captureCols = captureRes.Width;
 
-        color = new Cv.Mat();
-        rightView = new Cv.Mat();
-        leftView = new Cv.Mat();
-        pointCloud = new Cv.Mat();
     }
     public void GetNextFrame(Cv.Size workRes)
     {
@@ -107,6 +106,11 @@ public class CamZed
             colorSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C3);
             rightSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C3);
             pointCloudSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C4); // Note: BGRA is 4 channels
+
+            color = new Cv.Mat();
+            rightView = new Cv.Mat();
+            leftView = new Cv.Mat();
+            pointCloud = new Cv.Mat();
         }
 
         while (true) 
@@ -152,10 +156,17 @@ public class CamZed
     }
     public void StopCamera()
     {
-        color.Dispose();
-        rightView.Dispose();
-        leftView.Dispose();
-        pointCloud.Dispose();
-        zed.Close();
+        if (color != null)
+        {
+            colorSL.Free();
+            rightSL.Free();
+            pointCloudSL.Free();
+
+            color.Dispose();
+            rightView.Dispose();
+            leftView.Dispose();
+            pointCloud.Dispose();
+            zed.Close();
+        }
     }
 }

@@ -15,19 +15,22 @@ Public Class CameraZed2 : Inherits GenericCamera
             IMU_AngularVelocity = zed.IMU_AngularVelocity
             Static IMU_StartTime = zed.IMU_TimeStamp
             IMU_TimeStamp = (zed.IMU_TimeStamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
-            calibData.baseline = zed.baseline
 
-            calibData.rgbIntrinsics.fx = zed.rgbIntrinsics.fx / ratio
-            calibData.rgbIntrinsics.fy = zed.rgbIntrinsics.fy / ratio
-            calibData.rgbIntrinsics.ppx = zed.rgbIntrinsics.ppx / ratio
-            calibData.rgbIntrinsics.ppy = zed.rgbIntrinsics.ppy / ratio
+            If calibData.baseline = 0 Then
+                calibData.baseline = zed.baseline
 
-            calibData.leftIntrinsics = calibData.rgbIntrinsics
+                calibData.rgbIntrinsics.fx = zed.rgbIntrinsics.fx / ratio
+                calibData.rgbIntrinsics.fy = zed.rgbIntrinsics.fy / ratio
+                calibData.rgbIntrinsics.ppx = zed.rgbIntrinsics.ppx / ratio
+                calibData.rgbIntrinsics.ppy = zed.rgbIntrinsics.ppy / ratio
 
-            calibData.rightIntrinsics.fx = zed.rightIntrinsics.fx / ratio
-            calibData.rightIntrinsics.fy = zed.rightIntrinsics.fy / ratio
-            calibData.rightIntrinsics.ppx = zed.rightIntrinsics.ppx / ratio
-            calibData.rightIntrinsics.ppy = zed.rightIntrinsics.ppy / ratio
+                calibData.leftIntrinsics = calibData.rgbIntrinsics
+
+                calibData.rightIntrinsics.fx = zed.rightIntrinsics.fx / ratio
+                calibData.rightIntrinsics.fy = zed.rightIntrinsics.fy / ratio
+                calibData.rightIntrinsics.ppx = zed.rightIntrinsics.ppx / ratio
+                calibData.rightIntrinsics.ppy = zed.rightIntrinsics.ppy / ratio
+            End If
 
             If workRes <> captureRes Then
                 uiColor = zed.color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
@@ -36,7 +39,7 @@ Public Class CameraZed2 : Inherits GenericCamera
                 uiPointCloud = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
             Else
                 uiColor = zed.color.Clone
-                uiLeft = zed.leftView.Clone
+                uiLeft = uiColor
                 uiRight = zed.rightView.Clone
                 uiPointCloud = zed.pointCloud.Clone
             End If

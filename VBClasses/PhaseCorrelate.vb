@@ -76,14 +76,14 @@ End Class
 
 
 Public Class PhaseCorrelate_BasicsTest : Inherits TaskParent
-    Dim random As New Stabilizer_BasicsRandomInput
+    Dim random As New PhaseCorrelate_RandomInput
     Dim stable As New PhaseCorrelate_Basics
     Public Sub New()
         labels(2) = "Unstable input to PhaseCorrelate_Basics"
         labels(3) = "Stabilized output from Phase_Correlate_Basics"
         desc = "Test the PhaseCorrelate_Basics with random movement"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         random.Run(src)
 
         stable.Run(random.dst3.Clone)
@@ -96,6 +96,56 @@ End Class
 
 
 
+
+
+
+
+Public Class PhaseCorrelate_RandomInput : Inherits TaskParent
+    Dim options As New Options_FAST
+    Dim lastShiftX As Integer
+    Dim lastShiftY As Integer
+
+    Public Sub New()
+        labels(2) = "Current frame (before)"
+        labels(3) = "Image after shift"
+        desc = "Generate images that have been arbitrarily shifted"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        Dim input = src
+        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Dim shiftX = msRNG.Next(-task.FASTthreshold, task.FASTthreshold)
+        Dim shiftY = msRNG.Next(-task.FASTthreshold, task.FASTthreshold)
+
+        If task.firstPass Then
+            lastShiftX = shiftX
+            lastShiftY = shiftY
+        End If
+        If task.frameCount Mod 2 = 0 Then
+            shiftX = lastShiftX
+            shiftY = lastShiftY
+        End If
+        lastShiftX = shiftX
+        lastShiftY = shiftY
+
+        dst2 = input.Clone
+        If shiftX <> 0 Or shiftY <> 0 Then
+            Dim x = If(shiftX < 0, Math.Abs(shiftX), 0)
+            Dim y = If(shiftY < 0, Math.Abs(shiftY), 0)
+
+            Dim x2 = If(shiftX < 0, 0, shiftX)
+            Dim y2 = If(shiftY < 0, 0, shiftY)
+
+            Dim srcRect = New cv.Rect(x, y, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY))
+            Dim dstRect = New cv.Rect(x2, y2, srcRect.Width, srcRect.Height)
+            dst2(srcRect).CopyTo(input(dstRect))
+        End If
+
+        dst3 = input
+    End Sub
+End Class
 
 
 

@@ -41,21 +41,23 @@ Public Class Benford_Basics : Inherits TaskParent
         ReDim counts(expectedDistribution.Count - 1)
         If use99 = False Then
             For i = 0 To src.Rows - 1
-                Dim val = indexer(i).ToString
+                Dim val = indexer(i)
+                Dim valstr = val.ToString
                 If val <> 0 And Single.IsNaN(val) = False Then
-                    Dim firstInt = Regex.Match(val, "[1-9]{1}")
+                    Dim firstInt = Regex.Match(valstr, "[1-9]{1}")
                     If firstInt.Length > 0 Then counts(firstInt.Value) += 1
                 End If
             Next
         Else
             ' this is for the distribution 10-99
             For i = 0 To src.Rows - 1
-                Dim val = indexer(i).ToString
+                Dim val = indexer(i)
                 If val <> 0 And Single.IsNaN(val) = False Then
-                    Dim firstInt = Regex.Match(val, "[1-9]{1}").ToString
-                    Dim index = val.IndexOf(firstInt)
-                    If index < Len(val - 2) And index > 0 Then
-                        Dim val99 = Mid(val, index + 1, 2)
+                    Dim valstr = val.ToString
+                    Dim firstInt = Regex.Match(valstr, "[1-9]{1}").ToString
+                    Dim index = valstr.IndexOf(firstInt)
+                    If index < Len(valstr - 2) And index > 0 Then
+                        Dim val99 = Mid(valstr, index + 1, 2)
                         If IsNumeric(val99) Then counts(val99) += 1
                     End If
                 End If

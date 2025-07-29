@@ -23,6 +23,7 @@ Public Class Rotate_Basics : Inherits TaskParent
         If options.warpFlag = cv.InterpolationFlags.WarpInverseMap Then
             Mflip = cv.Cv2.GetRotationMatrix2D(rotateCenter, rotateAngle, 1)
         End If
+        labels(2) = "Image after rotation by " + Format(rotateAngle, fmt3)
     End Sub
 End Class
 

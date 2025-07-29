@@ -65,7 +65,7 @@ Public Class CameraORB : Inherits GenericCamera
             frames = pipe.WaitForFrames(100)
         End While
 
-        If cameraFrameCount = 0 Then
+        If calibData.baseline = 0 Then
             Dim param As CameraParam = pipe.GetCameraParam()
             Dim ratio = CInt(captureRes.Width / workRes.Width)
             calibData.rgbIntrinsics.ppx = param.rgbIntrinsic.cx / ratio
@@ -128,7 +128,7 @@ Public Class CameraORB : Inherits GenericCamera
             End If
         End SyncLock
 
-        GC.Collect() ' this GC seems to be necessary to get the color image in the VB.Net interface.
+        'GC.Collect() ' this GC seems to be necessary to get the color image in the VB.Net interface.
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
