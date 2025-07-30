@@ -291,15 +291,12 @@ End Class
 Public Class Grid_TrackCenter : Inherits TaskParent
     Public center As cv.Point
     Dim match As New Match_Basics
-    Dim options As New Options_Features
     Public Sub New()
         If standalone Then task.gOptions.ShowGrid.Checked = True
 
         desc = "Track a cell near the center of the grid"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
         If match.correlation < task.fCorrThreshold Or task.gOptions.DebugCheckBox.Checked Then
             task.gOptions.DebugCheckBox.Checked = False
             Dim index As Integer = task.grid.gridMap.Get(Of Single)(dst2.Height / 2, dst2.Width / 2)
@@ -308,9 +305,8 @@ Public Class Grid_TrackCenter : Inherits TaskParent
             center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
         End If
 
-        Dim templatePad = options.templatePad
-        Dim templateSize = options.templateSize
-        Dim searchRect = ValidateRect(New cv.Rect(center.X - templatePad, center.Y - templatePad, templateSize, templateSize))
+        Dim pad = task.cellSize / 2
+        Dim searchRect = ValidateRect(New cv.Rect(center.X - pad, center.Y - pad, task.cellSize, task.cellSize))
         match.Run(src(searchRect))
         center = match.newCenter
 

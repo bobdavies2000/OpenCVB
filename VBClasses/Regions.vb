@@ -300,7 +300,7 @@ Public Class Region_DepthCorrelation : Inherits TaskParent
         dst1.SetTo(0)
         Dim count As Integer
         For Each brick In task.bricks.brickList
-            If brick.correlation > task.bricks.options.correlationThreshold Then
+            If brick.correlation > task.fCorrThreshold Then
                 dst0.Rectangle(brick.rRect, 255, -1)
                 dst1.Rectangle(brick.rect, 255, -1)
                 count += 1
@@ -314,6 +314,6 @@ Public Class Region_DepthCorrelation : Inherits TaskParent
         task.rightView.CopyTo(dst3, dst0)
 
         labels(2) = Format(count / task.bricks.brickList.Count, "0%") + " of bricks had color correlation of " +
-                    Format(task.bricks.options.correlationThreshold, "0.0%") + " or better"
+                    Format(task.fCorrThreshold, "0.0%") + " or better"
     End Sub
 End Class

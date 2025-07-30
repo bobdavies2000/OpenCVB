@@ -207,7 +207,6 @@ End Class
 Public Class Feature_PointTracker : Inherits TaskParent
     Dim flow As New Font_FlowText
     Dim mPoints As New Match_Points
-    Dim options As New Options_Features
     Public Sub New()
         flow.parentData = Me
         flow.dst = 3
@@ -215,17 +214,13 @@ Public Class Feature_PointTracker : Inherits TaskParent
         desc = "Use the top X goodFeatures and then use matchTemplate to find track them."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        Dim templatePad = options.templatePad
-        Dim templateSize = options.templateSize
-
+        Dim pad = task.cellSize / 2
         strOut = ""
         If mPoints.ptx.Count <= 3 Then
             mPoints.ptx.Clear()
             For Each pt In task.features
                 mPoints.ptx.Add(pt)
-                Dim rect = ValidateRect(New cv.Rect(pt.X - templatePad, pt.Y - templatePad, templateSize, templateSize))
+                Dim rect = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.cellSize, task.cellSize))
             Next
             strOut = "Restart tracking -----------------------------------------------------------------------------" + vbCrLf
         End If
@@ -233,7 +228,7 @@ Public Class Feature_PointTracker : Inherits TaskParent
 
         dst2 = src.Clone
         For i = mPoints.ptx.Count - 1 To 0 Step -1
-            If mPoints.correlation(i) > options.correlationThreshold Then
+            If mPoints.correlation(i) > task.fCorrThreshold Then
                 DrawCircle(dst2, mPoints.ptx(i), task.DotSize, task.highlight)
                 strOut += Format(mPoints.correlation(i), fmt3) + ", "
             Else
@@ -246,7 +241,7 @@ Public Class Feature_PointTracker : Inherits TaskParent
         End If
 
         labels(2) = "Of the " + CStr(task.features.Count) + " input points, " + CStr(mPoints.ptx.Count) +
-                    " points were tracked with correlation above " + Format(options.correlationThreshold, fmt2)
+                    " points were tracked with correlation above " + Format(task.fCorrThreshold, fmt2)
     End Sub
 End Class
 
@@ -640,7 +635,7 @@ Public Class Feature_Matching : Inherits TaskParent
                 Dim r = task.gridRects(index)
                 match.template = fpLastSrc(r)
                 match.Run(src(r))
-                If match.correlation > feat.options.correlationThreshold Then matched.Add(pt)
+                If match.correlation > task.fCorrThreshold Then matched.Add(pt)
             Else
                 motionPoints.Add(pt)
             End If
@@ -698,7 +693,7 @@ Public Class Feature_SteadyCam : Inherits TaskParent
             Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
             Dim r = task.gridRects(index)
             cv.Cv2.MatchTemplate(src(r), lastSrc(r), correlationMat, mode)
-            If correlationMat.Get(Of Single)(0, 0) >= options.correlationThreshold Then
+            If correlationMat.Get(Of Single)(0, 0) >= task.fCorrThreshold Then
                 features.Add(pt)
             End If
         Next

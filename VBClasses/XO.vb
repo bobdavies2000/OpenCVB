@@ -295,25 +295,24 @@ Public Class XO_Horizon_Validate : Inherits TaskParent
         desc = "Validate the horizon points using Match_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim templatePad = options.templatePad
-        Dim templateSize = options.templateSize
+        Dim pad = task.cellSize / 2
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Then
             ptLeft = task.lineGravity.p1
             ptRight = task.lineGravity.p2
-            Dim r = ValidateRect(New cv.Rect(ptLeft.X - templatePad, ptLeft.Y - templatePad, templateSize, templateSize))
+            Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, task.cellSize, task.cellSize))
             leftTemplate = src(r)
 
-            r = ValidateRect(New cv.Rect(ptRight.X - templatePad, ptRight.Y - templatePad, templateSize, templateSize))
+            r = ValidateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, task.cellSize, task.cellSize))
             rightTemplate = src(r)
         Else
-            Dim r = ValidateRect(New cv.Rect(ptLeft.X - templatePad, ptLeft.Y - templatePad, templateSize, templateSize))
+            Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, task.cellSize, task.cellSize))
             match.template = leftTemplate.Clone
             match.Run(src)
             ptLeft = match.newCenter
 
-            r = ValidateRect(New cv.Rect(ptRight.X - templatePad, ptRight.Y - templatePad, templateSize, templateSize))
+            r = ValidateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, task.cellSize, task.cellSize))
             match.template = leftTemplate.Clone
             match.Run(src)
             ptLeft = match.newCenter
@@ -3493,12 +3492,13 @@ Public Class XO_FeatureLine_BasicsRaw : Inherits TaskParent
         Dim distanceThreshold = 50 ' pixels - arbitrary but realistically needs some value
         Dim linePercentThreshold = 0.7 ' if less than 70% of the pixels in the line are edges, then find a better line.  Again, arbitrary but realistic.
 
-        Dim correlationTest = tcells(0).correlation <= options.correlationThreshold Or
-                              tcells(1).correlation <= options.correlationThreshold
+        Dim correlationTest = tcells(0).correlation <= task.fCorrThreshold Or tcells(1).correlation <= task.fCorrThreshold
         lineDisp.distance = tcells(0).center.DistanceTo(tcells(1).center)
-        If task.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or lineDisp.distance < distanceThreshold Then
-            Dim templatePad = options.templatePad
-            lines.subsetRect = New cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6)
+        If task.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or
+           lineDisp.distance < distanceThreshold Then
+
+            Dim pad = task.cellSize / 2
+            lines.subsetRect = New cv.Rect(pad * 3, pad * 3, src.Width - pad * 6, src.Height - pad * 6)
             lines.Run(src.Clone)
 
             If lines.lpList.Count = 0 Then
@@ -3611,7 +3611,6 @@ End Class
 Public Class XO_FeatureLine_LongestKNN : Inherits TaskParent
     Dim glines As New Line_GCloud
     Public knn As New KNN_ClosestTracker
-    Public options As New Options_Features
     Public gline As gravityLine
     Public match As New Match_Basics
     Dim p1 As cv.Point, p2 As cv.Point
@@ -3619,7 +3618,6 @@ Public Class XO_FeatureLine_LongestKNN : Inherits TaskParent
         desc = "Find and track the longest line in the BGR image with a lightweight KNN."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
         dst2 = src
 
         knn.Run(src.Clone)
@@ -3630,7 +3628,7 @@ Public Class XO_FeatureLine_LongestKNN : Inherits TaskParent
         Dim rect = ValidateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
         match.template = src(rect).Clone
         match.Run(src)
-        If match.correlation >= options.correlationThreshold Then
+        If match.correlation >= task.fCorrThreshold Then
             dst3 = match.dst0.Resize(dst3.Size)
             DrawLine(dst2, p1, p2, task.highlight)
             DrawCircle(dst2, p1, task.DotSize, task.highlight)
@@ -3656,29 +3654,25 @@ Public Class XO_FeatureLine_Longest : Inherits TaskParent
     Public gline As gravityLine
     Public match1 As New Match_Basics
     Public match2 As New Match_Basics
-    Dim options As New Options_Features
     Public Sub New()
         labels(2) = "Longest line end points are highlighted "
         desc = "Find and track the longest line in the BGR image with a lightweight KNN."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
         dst2 = src.Clone
-        Dim templatePad = options.templatePad
-        Dim templateSize = options.templateSize
+        Dim pad = task.cellSize / 2
 
         Static p1 As cv.Point, p2 As cv.Point
-        If task.heartBeat Or match1.correlation < options.correlationThreshold And
-                             match2.correlation < options.correlationThreshold Then
+        If task.heartBeat Or match1.correlation < task.fCorrThreshold And
+                             match2.correlation < task.fCorrThreshold Then
             knn.Run(src.Clone)
 
             p1 = knn.lastPair.p1
-            Dim r1 = ValidateRect(New cv.Rect(p1.X - templatePad, p1.Y - templatePad, templateSize, templateSize))
+            Dim r1 = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.cellSize, task.cellSize))
             match1.template = src(r1).Clone
 
             p2 = knn.lastPair.p2
-            Dim r2 = ValidateRect(New cv.Rect(p2.X - templatePad, p2.Y - templatePad, templateSize, templateSize))
+            Dim r2 = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, task.cellSize, task.cellSize))
             match2.template = src(r2).Clone
         End If
 

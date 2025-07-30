@@ -204,7 +204,7 @@ Public Class Match_Motion : Inherits TaskParent
             If stdev > optionsMatch.stdevThreshold Then
                 cv.Cv2.MatchTemplate(dst2(roi), lastFrame(roi), correlation, options.matchOption)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                If correlation.Get(Of Single)(0, 0) < options.correlationThreshold Then
+                If correlation.Get(Of Single)(0, 0) < task.fCorrThreshold Then
                     Interlocked.Increment(updateCount)
                 Else
                     mask(roi).SetTo(255)
@@ -220,9 +220,10 @@ Public Class Match_Motion : Inherits TaskParent
         dst3.SetTo(0)
         saveFrame.CopyTo(dst3, mask)
         lastFrame = saveFrame
-        Dim corrPercent = Format(options.correlationThreshold, "0.0%") + " correlation"
-        labels(2) = "Correlation value for each cell is shown. " + CStr(updateCount) + " of " + CStr(task.gridRects.Count) + " with < " + corrPercent +
-                    " or stdev < " + Format(optionsMatch.stdevThreshold, fmt0)
+        Dim corrPercent = Format(task.fCorrThreshold, "0.0%") + " correlation"
+        labels(2) = "Correlation value for each cell is shown. " + CStr(updateCount) + " of " +
+                     CStr(task.gridRects.Count) + " with < " + corrPercent + " or stdev < " +
+                     Format(optionsMatch.stdevThreshold, fmt0)
         labels(3) = CStr(task.gridRects.Count - updateCount) + " segments out of " + CStr(task.gridRects.Count) + " had > " + corrPercent
     End Sub
 End Class
@@ -431,7 +432,6 @@ Public Class Match_LinePairTest : Inherits TaskParent
     Public ptx(2 - 1) As cv.Point2f
     Public target(ptx.Count - 1) As cv.Mat
     Public correlation(ptx.Count - 1)
-    Dim options As New Options_Features
     Public Sub New()
         desc = "Use MatchTemplate to find the new location of the template and update the point provided."
     End Sub
@@ -442,9 +442,7 @@ Public Class Match_LinePairTest : Inherits TaskParent
 
         Dim rect As cv.Rect
 
-        options.Run()
-
-        If (target(0) IsNot Nothing And correlation(0) < options.correlationThreshold) Then target(0) = Nothing
+        If target(0) IsNot Nothing And correlation(0) < task.fCorrThreshold Then target(0) = Nothing
         If task.mouseClickFlag Then
             ptx(0) = task.ClickPoint
             ptx(1) = New cv.Point2f(msRNG.Next(rSize, dst2.Width - 2 * rSize), msRNG.Next(rSize, dst2.Height - 2 * rSize))
@@ -473,7 +471,7 @@ Public Class Match_LinePairTest : Inherits TaskParent
             correlation(i) = mmData.maxVal
             If i = 0 Then
                 dst0.CopyTo(dst2(New cv.Rect(0, 0, dst0.Width, dst0.Height)))
-                dst2 = dst2.Threshold(options.correlationThreshold, 255, cv.ThresholdTypes.Binary)
+                dst2 = dst2.Threshold(task.fCorrThreshold, 255, cv.ThresholdTypes.Binary)
             End If
             ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
             DrawCircle(dst3, ptx(i), task.DotSize, task.highlight)
@@ -548,7 +546,7 @@ Public Class Match_Point : Inherits TaskParent
     Dim options As New Options_Features
     Public Sub New()
         labels(2) = "Rectangle shown is the search rectangle."
-        desc = "Track the selected point"
+        desc = "Track the changes for the selected point"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then

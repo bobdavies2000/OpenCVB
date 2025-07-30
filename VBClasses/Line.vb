@@ -1476,8 +1476,6 @@ Public Class Line_LongestNew : Inherits TaskParent
     Public Sub New()
         desc = "Identify each line in the lpMap."
     End Sub
-    Private Sub lpUpdate(r As cv.Rect)
-    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim threshold = task.fCorrThreshold
         Dim lplist = task.lines.lpList
@@ -1497,7 +1495,6 @@ Public Class Line_LongestNew : Inherits TaskParent
         matchPoints.Run(emptyMat)
 
         If matchPoints.correlation1 >= threshold And matchPoints.correlation2 >= threshold Then
-            labels(2) = matchPoints.labels(2)
             Dim p1 = New cv.Point(lp.p1.X + matchPoints.deltaX1, lp.p1.Y + matchPoints.deltaY1)
             Dim p2 = New cv.Point(lp.p2.X + matchPoints.deltaX2, lp.p2.Y + matchPoints.deltaY2)
             lp = New lpData(p1, p2)
@@ -1514,6 +1511,6 @@ Public Class Line_LongestNew : Inherits TaskParent
         End If
 
         task.lineLongest = lp
-        labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
+        labels(2) = matchPoints.labels(2)
     End Sub
 End Class

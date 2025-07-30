@@ -11,7 +11,7 @@ Public Class MatchLine_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then lpInput = task.lineLongest
 
-        match.template = src(task.gridRects(task.grid.gridMap.Get(Of Single)(lpInput.p1.Y, lpInput.p1.X)))
+        match.template = task.gray(task.gridRects(task.grid.gridMap.Get(Of Single)(lpInput.p1.Y, lpInput.p1.X)))
 
         match.Run(lpInput.template1)
         correlation1 = match.correlation
@@ -19,7 +19,7 @@ Public Class MatchLine_Basics : Inherits TaskParent
         Dim offsety1 = match.newRect.TopLeft.Y - task.cellSize
         Dim p1 = New cv.Point(lpInput.p1.X + offsetx1, lpInput.p1.Y + offsety1)
 
-        match.template = src(task.gridRects(task.grid.gridMap.Get(Of Single)(lpInput.p2.Y, lpInput.p2.X)))
+        match.template = task.gray(task.gridRects(task.grid.gridMap.Get(Of Single)(lpInput.p2.Y, lpInput.p2.X)))
         match.Run(lpInput.template2)
         correlation2 = match.correlation
         Dim offsetX2 = match.newRect.TopLeft.X - task.cellSize
@@ -255,16 +255,11 @@ Public Class MatchLine_VH : Inherits TaskParent
     Public brickCells As New List(Of gravityLine)
     Dim match As New Match_tCell
     Dim gLines As New Line_GCloud
-    Dim options As New Options_Features
     Public Sub New()
         labels(3) = "More readable than dst1 - index, correlation, length (meters), and ArcY"
         desc = "Find and track all the horizontal or vertical lines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        Dim templatePad = options.templatePad
-        ' gLines.lines.subsetRect = New cv.Rect(templatePad * 3, templatePad * 3, src.Width - templatePad * 6, src.Height - templatePad * 6)
         gLines.Run(src)
 
         Dim sortedLines = If(task.verticalLines, gLines.sortedVerticals, gLines.sortedHorizontals)
@@ -290,7 +285,8 @@ Public Class MatchLine_VH : Inherits TaskParent
             match.tCells.Add(brick.tc2)
 
             match.Run(src)
-            If match.tCells(0).correlation >= options.correlationThreshold And match.tCells(1).correlation >= options.correlationThreshold Then
+            Dim threshold = task.fCorrThreshold
+            If match.tCells(0).correlation >= threshold And match.tCells(1).correlation >= threshold Then
                 brick.tc1 = match.tCells(0)
                 brick.tc2 = match.tCells(1)
                 brick = gLines.updateGLine(src, brick, brick.tc1.center, brick.tc2.center)

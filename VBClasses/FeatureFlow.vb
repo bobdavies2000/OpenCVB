@@ -12,17 +12,18 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         Dim correlationmat As New cv.Mat
         lpList.Clear()
         mpCorrelation.Clear()
-        Dim pad = feat.options.templatePad, size = feat.options.templateSize
+        Dim pad = task.cellSize / 2
         For Each p1 In prevFeatures
-            Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, size, size))
+            Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.cellSize, task.cellSize))
             Dim correlations As New List(Of Single)
             For Each p2 In currFeatures
-                Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, size), Math.Min(size, rect.Height)))
+                Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, task.cellSize),
+                                                                         Math.Min(task.cellSize, rect.Height)))
                 cv.Cv2.MatchTemplate(dst2(rect), dst3(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
                 correlations.Add(correlationmat.Get(Of Single)(0, 0))
             Next
             Dim maxCorrelation = correlations.Max
-            If maxCorrelation >= feat.options.correlationThreshold Then
+            If maxCorrelation >= task.fCorrThreshold Then
                 Dim index = correlations.IndexOf(maxCorrelation)
                 lpList.Add(New lpData(p1, currFeatures(index)))
                 mpCorrelation.Add(maxCorrelation)
