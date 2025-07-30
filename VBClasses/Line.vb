@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports System.Text.RegularExpressions
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
@@ -1426,8 +1427,10 @@ End Class
 
 Public Class Line_MatchPoints : Inherits TaskParent
     Public match As New Match_Basics
-    Dim lp As lpData ' provide this 
-
+    Public lp As lpData ' provide this 
+    Public correlation1 As Single, correlation2 As Single
+    Public deltaX1 As Single, deltaY1 As Single
+    Public deltaX2 As Single, deltaY2 As Single
     Public Sub New()
         desc = "Match the points of a line"
     End Sub
@@ -1435,7 +1438,6 @@ Public Class Line_MatchPoints : Inherits TaskParent
         If standalone Then lp = task.lineLongest
         Static lastImage As cv.Mat = task.gray.Clone
 
-        Dim correlation1 As Single, correlation2 As Single
         match.template = lp.template1
         Dim gridIndex1 = task.grid.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X)
         match.Run(lastImage(task.gridRects(gridIndex1)))
@@ -1450,7 +1452,8 @@ Public Class Line_MatchPoints : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = lastImage
-
+            DrawRect(dst2, task.gridRects(gridIndex1), white)
+            DrawRect(dst2, task.gridRects(gridIndex2), white)
         End If
 
         lastImage = task.gray.Clone
@@ -1467,52 +1470,40 @@ End Class
 
 
 Public Class Line_LongestNew : Inherits TaskParent
-    Public match As New Match_Basics
+    Public matchPoints As New Line_MatchPoints
     Public deltaX As Single, deltaY As Single
     Dim lp As New lpData
     Public Sub New()
         desc = "Identify each line in the lpMap."
     End Sub
+    Private Sub lpUpdate(r As cv.Rect)
+    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim threshold = task.fCorrThreshold
         Dim lplist = task.lines.lpList
         If lplist.Count = 0 Then
             SetTrueText("There are no lines present in the image.", 3)
             Exit Sub
         End If
+
         task.lineLongestChanged = False
         ' camera is often warming up for the first few images.
-        If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or task.heartBeat Then
+        If task.frameCount < 10 Or task.heartBeat Then
             lp = lplist(0)
-            match.template = task.gray(lp.rect)
             task.lineLongestChanged = True
         End If
 
-        match.Run(task.gray.Clone)
+        matchPoints.lp = lp
+        matchPoints.Run(emptyMat)
 
-        If match.correlation < task.fCorrThreshold Then
-            task.lineLongestChanged = True
-            If lplist.Count > 1 Then
-                Dim histogram As New cv.Mat
-                cv.Cv2.CalcHist({task.lines.lpMap(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
-                                 New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
-
-                Dim histArray(histogram.Total - 1) As Single
-                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-
-                Dim histList = histArray.ToList
-                ' pick the lp that has the most pixels in the lp.rect.
-                lp = lplist(histList.IndexOf(histList.Max))
-                match.template = task.gray(lp.rect)
-                match.correlation = 1
-            Else
-                match.correlation = 0 ' force a restart
-            End If
-        Else
-            deltaX = match.newRect.X - lp.rect.X
-            deltaY = match.newRect.Y - lp.rect.Y
-            Dim p1 = New cv.Point(lp.p1.X + deltaX, lp.p1.Y + deltaY)
-            Dim p2 = New cv.Point(lp.p2.X + deltaX, lp.p2.Y + deltaY)
+        If matchPoints.correlation1 >= threshold And matchPoints.correlation2 >= threshold Then
+            labels(2) = matchPoints.labels(2)
+            Dim p1 = New cv.Point(lp.p1.X + matchPoints.deltaX1, lp.p1.Y + matchPoints.deltaY1)
+            Dim p2 = New cv.Point(lp.p2.X + matchPoints.deltaX2, lp.p2.Y + matchPoints.deltaY2)
             lp = New lpData(p1, p2)
+        Else
+            task.lineLongestChanged = True
+            matchPoints.correlation1 = 0 ' force a restart
         End If
 
         If standaloneTest() Then
