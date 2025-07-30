@@ -714,41 +714,6 @@ End Class
 
 
 
-
-
-Public Class Line_GravityToLongest : Inherits TaskParent
-    Dim kalman As New Kalman_Basics
-    Dim matchLine As New MatchLine_Basics
-    Public Sub New()
-        desc = "Highlight both vertical and horizontal lines"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gravityDelta As Single = task.lineGravity.ep1.X - task.lineGravity.ep2.X
-
-        kalman.kInput = {gravityDelta}
-        kalman.Run(emptyMat)
-        gravityDelta = kalman.kOutput(0)
-
-        matchLine.lpInput = Nothing
-        For Each lp In task.lines.rawLines.lpList
-            If lp.vertical Then
-                matchLine.lpInput = lp
-                Exit For
-            End If
-        Next
-        If matchLine.lpInput Is Nothing Then Exit Sub
-        matchLine.Run(src)
-        dst2 = matchLine.dst2
-        dst3 = task.lines.rawLines.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Line_MatchGravity : Inherits TaskParent
     Public gLines As New List(Of lpData)
     Public Sub New()
@@ -1424,54 +1389,8 @@ End Class
 
 
 
-
-Public Class Line_MatchPoints : Inherits TaskParent
-    Public match As New Match_Basics
-    Public lp As lpData ' provide this 
-    Public correlation1 As Single, correlation2 As Single
-    Public deltaX1 As Single, deltaY1 As Single
-    Public deltaX2 As Single, deltaY2 As Single
-    Public Sub New()
-        desc = "Match the points of a line"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then lp = task.lineLongest
-        Static lastImage As cv.Mat = task.gray.Clone
-
-        match.template = lp.template1
-        Dim gridIndex1 = task.grid.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X)
-        match.Run(lastImage(task.gridRects(gridIndex1)))
-        correlation1 = match.correlation
-
-        match.template = lp.template2
-        Dim gridIndex2 = task.grid.gridMap.Get(Of Single)(lp.p2.Y, lp.p2.X)
-        match.Run(lastImage(task.gridRects(gridIndex2)))
-        correlation2 = match.correlation
-
-        labels(2) = "Correlation 1 = " + Format(correlation1, fmt3) + " Correlation 2 = " + Format(correlation2, fmt3)
-
-        If standaloneTest() Then
-            dst2 = lastImage
-            DrawRect(dst2, task.gridRects(gridIndex1), white)
-            DrawRect(dst2, task.gridRects(gridIndex2), white)
-        End If
-
-        lastImage = task.gray.Clone
-        lp = task.lineLongest
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Line_LongestNew : Inherits TaskParent
-    Public matchPoints As New Line_MatchPoints
-    Public deltaX As Single, deltaY As Single
+    Public matchBrick As New Match_Brick
     Dim lp As New lpData
     Public Sub New()
         desc = "Identify each line in the lpMap."
@@ -1491,16 +1410,21 @@ Public Class Line_LongestNew : Inherits TaskParent
             task.lineLongestChanged = True
         End If
 
-        matchPoints.lp = lp
-        matchPoints.Run(emptyMat)
+        matchBrick.gridIndex = lp.gridIndex1
+        matchBrick.Run(task.gray)
+        Dim correlation1 = matchBrick.correlation
+        Dim p1 = New cv.Point(lp.p1.X + matchBrick.deltaX, lp.p1.Y + matchBrick.deltaY)
 
-        If matchPoints.correlation1 >= threshold And matchPoints.correlation2 >= threshold Then
-            Dim p1 = New cv.Point(lp.p1.X + matchPoints.deltaX1, lp.p1.Y + matchPoints.deltaY1)
-            Dim p2 = New cv.Point(lp.p2.X + matchPoints.deltaX2, lp.p2.Y + matchPoints.deltaY2)
+        matchBrick.gridIndex = lp.gridIndex2
+        matchBrick.Run(task.gray)
+        Dim correlation2 = matchBrick.correlation
+        Dim p2 = New cv.Point(lp.p2.X + matchBrick.deltaX, lp.p2.Y + matchBrick.deltaY)
+
+        If correlation1 >= threshold And correlation2 >= threshold Then
             lp = New lpData(p1, p2)
+            task.lineLongestChanged = False
         Else
             task.lineLongestChanged = True
-            matchPoints.correlation1 = 0 ' force a restart
         End If
 
         If standaloneTest() Then
@@ -1511,6 +1435,6 @@ Public Class Line_LongestNew : Inherits TaskParent
         End If
 
         task.lineLongest = lp
-        labels(2) = matchPoints.labels(2)
+        labels(2) = matchBrick.labels(2)
     End Sub
 End Class

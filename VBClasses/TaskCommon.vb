@@ -626,8 +626,8 @@ Public Class lpData
     Public vertical As Boolean ' false = < 45 degrees
     Public slope As Single
     Public center As cv.Point2f
-    Public template1 As New cv.Mat
-    Public template2 As New cv.Mat
+    Public gridIndex1 As Integer
+    Public gridIndex2 As Integer
     Public gravityProxy As Boolean
     Public index As Integer
     Public Function perpendicularPoints(pt As cv.Point2f) As lpData
@@ -698,27 +698,8 @@ Public Class lpData
             If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then vertical = False
         End If
 
-        Dim gridIndex1 = task.grid.gridMap.Get(Of Single)(p1.Y, p1.X)
-        Dim gridIndex2 = task.grid.gridMap.Get(Of Single)(p2.Y, p2.X)
-        Dim gridRect1 = task.gridRects(gridIndex1)
-        Dim gridRect2 = task.gridRects(gridIndex2)
-        If gridRect1.Width <> task.cellSize Or gridRect1.Height <> task.cellSize Or
-           gridRect2.Width <> task.cellSize Or gridRect2.Height <> task.cellSize Then
-
-            If gridRect1.Width < task.cellSize Then gridRect1.X = task.workRes.Width - task.cellSize
-            If gridRect1.Height < task.cellSize Then gridRect1.Y = task.workRes.Height - task.cellSize
-            If gridRect2.Width < task.cellSize Then gridRect2.X = task.workRes.Width - task.cellSize
-            If gridRect2.Height < task.cellSize Then gridRect2.Y = task.workRes.Height - task.cellSize
-            gridRect1.Width = task.cellSize
-            gridRect2.Width = task.cellSize
-            gridRect1.Height = task.cellSize
-            gridRect2.Height = task.cellSize
-        End If
-
-        Dim nabeRect1 = task.gridNabeRects(gridIndex1)
-        Dim nabeRect2 = task.gridNabeRects(gridIndex2)
-        template1 = task.gray(nabeRect1)
-        template2 = task.gray(nabeRect2)
+        gridIndex1 = task.grid.gridMap.Get(Of Single)(p1.Y, p1.X)
+        gridIndex2 = task.grid.gridMap.Get(Of Single)(p2.Y, p2.X)
 
         If p1.X <> p2.X Then
             Dim b = p1.Y - p1.X * slope

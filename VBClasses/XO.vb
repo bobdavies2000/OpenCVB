@@ -5785,7 +5785,7 @@ End Class
 Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
     Public lpInput As lpData
     Public foundLine As Boolean
-    Dim match As New MatchLine_Basics
+    Dim match As New XO_MatchLine_Basics
     Public rawLines As New Line_Raw
     Public Sub New()
         desc = "Track an individual line as best as possible."
@@ -7938,5 +7938,267 @@ Public Class XO_Stabilizer_CornerPoints : Inherits TaskParent
             DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
         Next
         labels(2) = "There were " + CStr(features.Count) + " key points detected"
+    End Sub
+End Class
+
+
+
+
+Public Class XO_MatchRect_Basics : Inherits TaskParent
+    Public match As New Match_Basics
+    Public rectInput As New cv.Rect
+    Public rectOutput As New cv.Rect
+    Dim rectSave As New cv.Rect
+    Public Sub New()
+        desc = "Track a RedCloud rectangle using MatchTemplate.  Click on a cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then match.correlation = 0
+        If match.correlation < task.fCorrThreshold Or rectSave <> rectInput Or task.mouseClickFlag Then
+            If standalone Then
+                dst2 = runRedC(src, labels(2)).Clone
+                rectInput = task.rcD.rect
+            End If
+            rectSave = rectInput
+            match.template = src(rectInput).Clone
+        End If
+
+        match.Run(src)
+        rectOutput = match.newRect
+
+        If standalone Then
+            If task.heartBeat Then dst3.SetTo(0)
+            DrawRect(dst3, rectOutput)
+        End If
+    End Sub
+End Class
+
+
+
+
+Public Class XO_MatchRect_RedCloud : Inherits TaskParent
+    Dim matchRect As New XO_MatchRect_Basics
+    Public Sub New()
+        desc = "Track a RedCloud cell using MatchTemplate."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+        task.ClickPoint = task.rcD.maxDist
+
+        If task.heartBeat Then matchRect.rectInput = task.rcD.rect
+
+        matchRect.Run(src)
+        If standalone Then
+            If task.heartBeat Then dst3.SetTo(0)
+            DrawRect(dst3, matchRect.rectOutput)
+        End If
+        labels(2) = "MatchLine correlation = " + Format(matchRect.match.correlation, fmt3) +
+                    " - Red = current gravity vector, yellow is matchLine output"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_MatchLine_Basics : Inherits TaskParent
+    Public lpInput As lpData
+    Public lpOutput As lpData
+    Dim match As New Match_Basics
+    Public correlation1 As Single
+    Public correlation2 As Single
+    Public Sub New()
+        desc = "Get the end points of the gravity RGB vector and compare them to the original template."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then lpInput = task.lineLongest
+        Static lastImage = task.gray.Clone
+
+        Dim rect = task.gridRects(lpInput.gridIndex1)
+        match.template = task.gray(rect)
+        match.Run(lastImage(task.gridNabeRects(lpInput.gridIndex1)))
+        correlation1 = match.correlation
+        Dim offsetX = match.newRect.TopLeft.X - rect.TopLeft.X
+        Dim offsetY = match.newRect.TopLeft.Y - rect.TopLeft.Y
+        Dim p1 = New cv.Point(lpInput.p1.X + offsetX, lpInput.p1.Y + offsetY)
+
+        rect = task.gridRects(lpInput.gridIndex2)
+        match.template = task.gray(rect)
+        match.Run(lastImage(task.gridNabeRects(lpInput.gridIndex2)))
+        correlation2 = match.correlation
+        offsetX = match.newRect.TopLeft.X - rect.TopLeft.X
+        offsetY = match.newRect.TopLeft.Y - rect.TopLeft.Y
+        Dim p2 = New cv.Point(lpInput.p1.X + offsetX, lpInput.p1.Y + offsetY)
+
+        lpOutput = New lpData(p1, p2)
+
+        If standaloneTest() Then
+            dst2 = src.Clone
+            DrawLine(dst2, lpInput, task.highlight)
+            DrawLine(dst2, lpOutput, task.highlight)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_MatchLine_Test : Inherits TaskParent
+    Public cameraMotionProxy As New lpData
+    Dim match As New XO_MatchLine_Basics
+    Public Sub New()
+        desc = "Find and track the longest line by matching line bricks."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then task.lines.lpList.Clear()
+
+        dst2 = src.Clone
+        If task.lines.lpList.Count > 0 Then
+            cameraMotionProxy = task.lines.lpList(0)
+            match.lpInput = cameraMotionProxy
+            match.Run(src)
+            dst1 = match.dst2
+
+            labels(2) = "EndPoint1 correlation:  " + Format(match.correlation1, fmt3) + vbTab +
+                        "EndPoint2 correlation:  " + Format(match.correlation1, fmt3)
+
+            If match.correlation1 < task.fCorrThreshold Or task.frameCount < 10 Or
+               match.correlation2 < task.fCorrThreshold Then
+
+                task.motionMask.SetTo(255) ' force a complete line detection
+                task.lines.Run(src.Clone)
+                If task.lines.lpList.Count = 0 Then Exit Sub
+
+                match.lpInput = task.lines.lpList(0)
+                match.Run(src)
+            End If
+        End If
+
+        dst3 = task.lines.dst3
+        labels(3) = task.lines.labels(3)
+
+        dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, task.highlight, task.lineWidth, task.lineType)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Line_GravityToLongest : Inherits TaskParent
+    Dim kalman As New Kalman_Basics
+    Dim matchLine As New XO_MatchLine_Basics
+    Public Sub New()
+        desc = "Highlight both vertical and horizontal lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim gravityDelta As Single = task.lineGravity.ep1.X - task.lineGravity.ep2.X
+
+        kalman.kInput = {gravityDelta}
+        kalman.Run(emptyMat)
+        gravityDelta = kalman.kOutput(0)
+
+        matchLine.lpInput = Nothing
+        For Each lp In task.lines.rawLines.lpList
+            If lp.vertical Then
+                matchLine.lpInput = lp
+                Exit For
+            End If
+        Next
+        If matchLine.lpInput Is Nothing Then Exit Sub
+        matchLine.Run(src)
+        dst2 = matchLine.dst2
+        dst3 = task.lines.rawLines.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class XO_Match_Points : Inherits TaskParent
+    Public ptx As New List(Of cv.Point2f)
+    Public correlation As New List(Of Single)
+    Public mPoint As New Match_Point
+    Public Sub New()
+        labels(2) = "Rectangle shown is the search rectangle."
+        desc = "Track the selected points"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.firstPass Then mPoint.target = src.Clone
+
+        If standaloneTest() Then
+            ptx = New List(Of cv.Point2f)(task.features)
+            SetTrueText("Move camera around to watch the point being tracked", 3)
+        End If
+
+        dst2 = src.Clone
+        correlation.Clear()
+        For i = 0 To ptx.Count - 1
+            mPoint.pt = ptx(i)
+            mPoint.Run(src)
+            correlation.Add(mPoint.correlation)
+            ptx(i) = mPoint.pt
+            DrawPolkaDot(ptx(i), dst2)
+        Next
+        mPoint.target = src.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Feature_PointTracker : Inherits TaskParent
+    Dim flow As New Font_FlowText
+    Dim mPoints As New XO_Match_Points
+    Public Sub New()
+        flow.parentData = Me
+        flow.dst = 3
+        labels(3) = "Correlation coefficients for each remaining cell"
+        desc = "Use the top X goodFeatures and then use matchTemplate to find track them."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim pad = task.cellSize / 2
+        strOut = ""
+        If mPoints.ptx.Count <= 3 Then
+            mPoints.ptx.Clear()
+            For Each pt In task.features
+                mPoints.ptx.Add(pt)
+                Dim rect = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.cellSize, task.cellSize))
+            Next
+            strOut = "Restart tracking -----------------------------------------------------------------------------" + vbCrLf
+        End If
+        mPoints.Run(src)
+
+        dst2 = src.Clone
+        For i = mPoints.ptx.Count - 1 To 0 Step -1
+            If mPoints.correlation(i) > task.fCorrThreshold Then
+                DrawCircle(dst2, mPoints.ptx(i), task.DotSize, task.highlight)
+                strOut += Format(mPoints.correlation(i), fmt3) + ", "
+            Else
+                mPoints.ptx.RemoveAt(i)
+            End If
+        Next
+        If standaloneTest() Then
+            flow.nextMsg = strOut
+            flow.Run(src)
+        End If
+
+        labels(2) = "Of the " + CStr(task.features.Count) + " input points, " + CStr(mPoints.ptx.Count) +
+                    " points were tracked with correlation above " + Format(task.fCorrThreshold, fmt2)
     End Sub
 End Class

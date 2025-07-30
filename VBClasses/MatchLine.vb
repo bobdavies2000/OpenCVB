@@ -1,48 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class MatchLine_Basics : Inherits TaskParent
-    Public lpInput As lpData
-    Public lpOutput As lpData
-    Dim match As New Match_Basics
-    Public correlation1 As Single
-    Public correlation2 As Single
-    Public Sub New()
-        desc = "Get the end points of the gravity RGB vector and compare them to the original template."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then lpInput = task.lineLongest
 
-        match.template = task.gray(task.gridRects(task.grid.gridMap.Get(Of Single)(lpInput.p1.Y, lpInput.p1.X)))
-
-        match.Run(lpInput.template1)
-        correlation1 = match.correlation
-        Dim offsetx1 = match.newRect.TopLeft.X - task.cellSize
-        Dim offsety1 = match.newRect.TopLeft.Y - task.cellSize
-        Dim p1 = New cv.Point(lpInput.p1.X + offsetx1, lpInput.p1.Y + offsety1)
-
-        match.template = task.gray(task.gridRects(task.grid.gridMap.Get(Of Single)(lpInput.p2.Y, lpInput.p2.X)))
-        match.Run(lpInput.template2)
-        correlation2 = match.correlation
-        Dim offsetX2 = match.newRect.TopLeft.X - task.cellSize
-        Dim offsetY2 = match.newRect.TopLeft.Y - task.cellSize
-        Dim p2 = New cv.Point(lpInput.p2.X + offsetX2, lpInput.p2.Y + offsetY2)
-
-        lpOutput = New lpData(p1, p2)
-
-        If standaloneTest() Then
-            Dim tmp As New cv.Mat
-            cv.Cv2.HConcat(lpInput.template1, lpInput.template2, tmp)
-            Dim sz = New cv.Size(dst2.Width, tmp.Height * dst2.Width / tmp.Width)
-            tmp = tmp.Resize(sz)
-            tmp.CopyTo(dst2(New cv.Rect(0, 0, sz.Width, sz.Height)))
-            labels(2) = "Correlation1 = " + Format(correlation1, fmt3) + " and correlation2 = " + Format(correlation2, fmt3)
-
-            dst3 = src
-            DrawLine(dst3, lpInput.p1, lpInput.p2)
-            labels(3) = "OffsetX1 = " + CStr(offsetx1) + "  OffsetY1 = " + CStr(offsety1) + "  " +
-                        "OffsetX2 = " + CStr(offsetX2) + "  OffsetY2 = " + CStr(offsetY2)
-        End If
-    End Sub
-End Class
 
 
 
@@ -51,7 +8,7 @@ End Class
 
 Public Class MatchLine_BasicsAll : Inherits TaskParent
     Public cameraMotionProxy As New lpData
-    Dim match As New MatchLine_Basics
+    Dim match As New XO_MatchLine_Basics
     Public correlations As New List(Of Single)
     Public Sub New()
         task.featureOptions.MatchCorrSlider.Value = 90
@@ -199,7 +156,7 @@ Public Class MatchLine_Gravity : Inherits TaskParent
     Public Sub New()
         desc = "Verify the gravity vector using MatchTemplate."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         matchLine.lpInput = task.lineGravity
         matchLine.Run(src)
         dst2 = matchLine.dst2
@@ -208,43 +165,7 @@ Public Class MatchLine_Gravity : Inherits TaskParent
                     " - Red = current gravity vector, yellow is matchLine output"
     End Sub
 End Class
-Public Class MatchLine_Test : Inherits TaskParent
-    Public cameraMotionProxy As New lpData
-    Dim match As New MatchLine_Basics
-    Public Sub New()
-        desc = "Find and track the longest line by matching line bricks."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then task.lines.lpList.Clear()
 
-        dst2 = src.Clone
-        If task.lines.lpList.Count > 0 Then
-            cameraMotionProxy = task.lines.lpList(0)
-            match.lpInput = cameraMotionProxy
-            match.Run(src)
-            dst1 = match.dst2
-
-            labels(2) = "EndPoint1 correlation:  " + Format(match.correlation1, fmt3) + vbTab +
-                        "EndPoint2 correlation:  " + Format(match.correlation1, fmt3)
-
-            If match.correlation1 < task.fCorrThreshold Or task.frameCount < 10 Or
-               match.correlation2 < task.fCorrThreshold Then
-
-                task.motionMask.SetTo(255) ' force a complete line detection
-                task.lines.Run(src.Clone)
-                If task.lines.lpList.Count = 0 Then Exit Sub
-
-                match.lpInput = task.lines.lpList(0)
-                match.Run(src)
-            End If
-        End If
-
-        dst3 = task.lines.dst3
-        labels(3) = task.lines.labels(3)
-
-        dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, task.highlight, task.lineWidth, task.lineType)
-    End Sub
-End Class
 
 
 

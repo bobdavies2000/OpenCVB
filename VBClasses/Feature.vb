@@ -202,56 +202,6 @@ End Class
 
 
 
-
-
-Public Class Feature_PointTracker : Inherits TaskParent
-    Dim flow As New Font_FlowText
-    Dim mPoints As New Match_Points
-    Public Sub New()
-        flow.parentData = Me
-        flow.dst = 3
-        labels(3) = "Correlation coefficients for each remaining cell"
-        desc = "Use the top X goodFeatures and then use matchTemplate to find track them."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim pad = task.cellSize / 2
-        strOut = ""
-        If mPoints.ptx.Count <= 3 Then
-            mPoints.ptx.Clear()
-            For Each pt In task.features
-                mPoints.ptx.Add(pt)
-                Dim rect = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.cellSize, task.cellSize))
-            Next
-            strOut = "Restart tracking -----------------------------------------------------------------------------" + vbCrLf
-        End If
-        mPoints.Run(src)
-
-        dst2 = src.Clone
-        For i = mPoints.ptx.Count - 1 To 0 Step -1
-            If mPoints.correlation(i) > task.fCorrThreshold Then
-                DrawCircle(dst2, mPoints.ptx(i), task.DotSize, task.highlight)
-                strOut += Format(mPoints.correlation(i), fmt3) + ", "
-            Else
-                mPoints.ptx.RemoveAt(i)
-            End If
-        Next
-        If standaloneTest() Then
-            flow.nextMsg = strOut
-            flow.Run(src)
-        End If
-
-        labels(2) = "Of the " + CStr(task.features.Count) + " input points, " + CStr(mPoints.ptx.Count) +
-                    " points were tracked with correlation above " + Format(task.fCorrThreshold, fmt2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Feature_Delaunay : Inherits TaskParent
     Dim delaunay As New Delaunay_Contours
     Dim feat As New Feature_Basics

@@ -25,13 +25,42 @@ Public Class Match_Basics : Inherits TaskParent
         newCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
         newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
         If standaloneTest() Then
-            dst2 = src
-            DrawCircle(dst2, newCenter, white)
-
-            dst2.Rectangle(newRect, task.highlight, task.lineWidth)
-            DrawLine(dst2, task.lineLongest.p1, task.lineLongest.p2)
+            dst2 = task.gray.Clone
+            dst2.Rectangle(newRect, white, task.lineWidth)
+            DrawLine(dst2, task.lineLongest.p1, task.lineLongest.p2, white)
         End If
-        labels(3) = "Template to compare the src input to"
+    End Sub
+End Class
+
+
+
+
+
+Public Class Match_Basics1 : Inherits TaskParent
+    Public template As New cv.Mat ' caller provides this!
+    Public correlation As Single
+    Public newRect As New cv.Rect
+    Public Sub New()
+        desc = "Find the requested template in an image.  Managing template is responsibility of caller " +
+               "(allows multiple targets per image.)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone And task.algorithmPrep = False Then
+            SetTrueText("Match is called often so no need for standalone test.")
+            Exit Sub
+        End If
+
+        cv.Cv2.MatchTemplate(template, src, dst0, cv.TemplateMatchModes.CCoeffNormed)
+        Dim mm = GetMinMax(dst0)
+
+        correlation = mm.maxVal
+        labels(2) = "Template has " + Format(correlation, fmt3) + " Correlation to the src input"
+        newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, template.Width, template.Height)
+        If standaloneTest() Then
+            dst2 = task.gray.Clone
+            dst2.Rectangle(newRect, white, task.lineWidth)
+            DrawLine(dst2, task.lineLongest.p1, task.lineLongest.p2, white)
+        End If
     End Sub
 End Class
 
@@ -578,31 +607,49 @@ End Class
 
 
 
-Public Class Match_Points : Inherits TaskParent
-    Public ptx As New List(Of cv.Point2f)
-    Public correlation As New List(Of Single)
-    Public mPoint As New Match_Point
+
+Public Class Match_Brick : Inherits TaskParent
+    Public match As New Match_Basics1
+    Public gridIndex As Integer ' provide this - it identifies the brick 
+    Public correlation As Single
+    Public deltaX As Single, deltaY As Single
     Public Sub New()
-        labels(2) = "Rectangle shown is the search rectangle."
-        desc = "Track the selected points"
+        desc = "Match a brick's movement from the previous frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.firstPass Then mPoint.target = src.Clone
+        If standalone Then gridIndex = task.lineLongest.gridIndex1
+        Static lastImage As cv.Mat = task.gray.Clone
+
+        Dim rect = task.gridRects(gridIndex)
+        match.template = task.gray(rect)
+        Dim searchrect = task.gridNabeRects(gridIndex)
+
+        match.Run(lastImage(searchrect))
+        correlation = match.correlation
+
+        Dim offsetX = rect.X - searchrect.X
+        Dim offsetY = rect.Y - searchrect.Y
+
+        deltaX = match.newRect.X - offsetX
+        deltaY = match.newRect.Y - offsetY
+
+        labels(2) = "Correlation = " + Format(correlation, fmt3)
 
         If standaloneTest() Then
-            ptx = New List(Of cv.Point2f)(task.features)
-            SetTrueText("Move camera around to watch the point being tracked", 3)
+            Dim newRect = rect
+            newRect.X += deltaX
+            newRect.Y += deltaY
+
+            dst2 = task.gray.Clone
+            DrawRect(dst2, newRect, white)
+            DrawRect(dst2, task.gridNabeRects(gridIndex), white)
+
+            dst3 = lastImage
+            DrawRect(dst3, newRect, white)
+            labels(2) = "Delta X/Y = " + Format(deltaX, fmt3) + "/" + Format(deltaY, fmt3) + " with correlation = " +
+                        Format(correlation, fmt3)
         End If
 
-        dst2 = src.Clone
-        correlation.Clear()
-        For i = 0 To ptx.Count - 1
-            mPoint.pt = ptx(i)
-            mPoint.Run(src)
-            correlation.Add(mPoint.correlation)
-            ptx(i) = mPoint.pt
-            DrawPolkaDot(ptx(i), dst2)
-        Next
-        mPoint.target = src.Clone
+        lastImage = task.gray.Clone
     End Sub
 End Class
