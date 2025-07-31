@@ -15,7 +15,7 @@ Public Class Grid_Basics : Inherits TaskParent
 
         Dim cellSize = task.gOptions.GridSlider.Value
         If task.optionsChanged Then
-            Dim cellsPerCol As Integer, cellsPerRow As Integer
+            Dim bricksPerCol As Integer, bricksPerRow As Integer
             task.gridNabeRects.Clear()
             task.gridNeighbors.Clear()
 
@@ -29,8 +29,8 @@ Public Class Grid_Basics : Inherits TaskParent
                     If roi.BottomRight.X = dst2.Width - 1 Then roi.Width += 1
 
                     If roi.Width > 0 And roi.Height > 0 Then
-                        If x = 0 Then cellsPerCol += 1
-                        If y = 0 Then cellsPerRow += 1
+                        If x = 0 Then bricksPerCol += 1
+                        If y = 0 Then bricksPerRow += 1
                         task.gridRects.Add(roi)
                         index += 1
                     End If
@@ -93,15 +93,15 @@ Public Class Grid_Basics : Inherits TaskParent
                 task.gridNabeRects.Add(r)
             Next
 
-            task.cellSize = cellSize
-            task.cellsPerCol = cellsPerCol
-            task.cellsPerRow = cellsPerRow
+            task.brickSize = cellSize
+            task.bricksPerCol = bricksPerCol
+            task.bricksPerRow = bricksPerRow
         End If
         If standaloneTest() Then
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
             task.color.CopyTo(dst2)
             dst2.SetTo(white, task.gridMask)
-            labels(2) = "Grid_Basics " + CStr(task.gridRects.Count) + " (" + CStr(task.cellsPerCol) + "X" + CStr(task.cellsPerRow) + ") " +
+            labels(2) = "Grid_Basics " + CStr(task.gridRects.Count) + " (" + CStr(task.bricksPerCol) + "X" + CStr(task.bricksPerRow) + ") " +
                                          CStr(cellSize) + "X" + CStr(cellSize) + " regions"
         End If
     End Sub
@@ -305,8 +305,8 @@ Public Class Grid_TrackCenter : Inherits TaskParent
             center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
         End If
 
-        Dim pad = task.cellSize / 2
-        Dim searchRect = ValidateRect(New cv.Rect(center.X - pad, center.Y - pad, task.cellSize, task.cellSize))
+        Dim pad = task.brickSize / 2
+        Dim searchRect = ValidateRect(New cv.Rect(center.X - pad, center.Y - pad, task.brickSize, task.brickSize))
         match.Run(src(searchRect))
         center = match.newCenter
 
@@ -335,8 +335,8 @@ Public Class Grid_Rectangles : Inherits TaskParent
     Public gridHeight As Integer = 10
     Public gridRects As New List(Of cv.Rect)
     Public gridMap As New cv.Mat
-    Public cellsPerCol As Integer
-    Public cellsPerRow As Integer
+    Public bricksPerCol As Integer
+    Public bricksPerRow As Integer
     Public gridMask As cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
     Public Sub New()
@@ -348,16 +348,16 @@ Public Class Grid_Rectangles : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then
             gridRects.Clear()
-            cellsPerCol = 0
-            cellsPerRow = 0
+            bricksPerCol = 0
+            bricksPerRow = 0
             For y = 0 To dst2.Height - 1 Step gridHeight
                 For x = 0 To dst2.Width - 1 Step gridWidth
                     Dim roi = New cv.Rect(x, y, gridWidth, gridHeight)
                     If x + roi.Width >= dst2.Width Then roi.Width = dst2.Width - x
                     If y + roi.Height >= dst2.Height Then roi.Height = dst2.Height - y
                     If roi.Width > 0 And roi.Height > 0 Then
-                        If x = 0 Then cellsPerCol += 1
-                        If y = 0 Then cellsPerRow += 1
+                        If x = 0 Then bricksPerCol += 1
+                        If y = 0 Then bricksPerRow += 1
                         gridRects.Add(roi)
                     End If
                 Next
@@ -396,7 +396,7 @@ Public Class Grid_Rectangles : Inherits TaskParent
         If standaloneTest() Then
             task.color.CopyTo(dst2)
             dst2.SetTo(white, gridMask)
-            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(cellsPerCol) + "X" + CStr(cellsPerRow) + ") " +
+            labels(2) = "Grid_Basics " + CStr(gridRects.Count) + " (" + CStr(bricksPerCol) + "X" + CStr(bricksPerRow) + ") " +
                           CStr(gridWidth) + "X" + CStr(gridHeight) + " regions"
         End If
     End Sub

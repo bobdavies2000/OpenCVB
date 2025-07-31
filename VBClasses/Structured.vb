@@ -49,7 +49,7 @@ Public Class Structured_Core : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
         Dim depthMask As New cv.Mat
-        For yCoordinate = 0 To src.Height - 1 Step task.cellSize
+        For yCoordinate = 0 To src.Height - 1 Step task.brickSize
             Dim sliceY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
             If yCoordinate > task.sideCameraPoint.Y Then
                 sliceY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
@@ -62,7 +62,7 @@ Public Class Structured_Core : Inherits TaskParent
         Next
 
         dst3.SetTo(0)
-        For xCoordinate = 0 To src.Width - 1 Step task.cellSize
+        For xCoordinate = 0 To src.Width - 1 Step task.brickSize
             Dim sliceX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
             If xCoordinate > task.topCameraPoint.X Then
                 sliceX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
@@ -73,7 +73,7 @@ Public Class Structured_Core : Inherits TaskParent
             dst3.SetTo(255, depthMask)
             If minVal < 0 And maxVal > 0 Then dst3.SetTo(0, task.noDepthMask)
         Next
-        labels = {"", "", "Horizontal depth lines with cell size = " + CStr(task.cellSize), "Vertical depth lines with cell size = " + CStr(task.cellSize)}
+        labels = {"", "", "Horizontal depth lines with cell size = " + CStr(task.brickSize), "Vertical depth lines with cell size = " + CStr(task.brickSize)}
     End Sub
 End Class
 

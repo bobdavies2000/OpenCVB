@@ -387,7 +387,7 @@ Public Class PointCloud_GridInspector : Inherits TaskParent
         DrawLine(dst2, topPt, botPt, 255)
 
         SetTrueText("Values show brick.pt3d values at the blue line.", New cv.Point(dst2.Width / 2, 0), 3)
-        For i = 0 To dst2.Height - 1 Step task.cellSize
+        For i = 0 To dst2.Height - 1 Step task.brickSize
             Dim pt = New cv.Point2f(cLine, i)
             Dim index = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
             Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(task.bricks.brickList(index).pt.Y, task.bricks.brickList(index).pt.X)
@@ -678,9 +678,9 @@ Public Class PointCloud_Continuous_GridXY : Inherits TaskParent
 
         dst2.SetTo(0)
         Dim gcPrev = task.bricks.brickList(0)
-        Dim cellMat As New cv.Mat(task.cellSize, task.cellSize, cv.MatType.CV_8U, cv.Scalar.All(127))
+        Dim cellMat As New cv.Mat(task.brickSize, task.brickSize, cv.MatType.CV_8U, cv.Scalar.All(127))
         For Each brick In task.bricks.brickList
-            Dim gcAbove = task.bricks.brickList(CInt(brick.index Mod task.cellsPerRow))
+            Dim gcAbove = task.bricks.brickList(CInt(brick.index Mod task.bricksPerRow))
             If brick.correlation > task.fCorrThreshold Then
                 If brick.rect.Y = 0 Or brick.rect.X = 0 Then Continue For
                 If Math.Abs(brick.depth - gcPrev.depth) <= task.depthDiffMeters Then dst2(brick.rect).SetTo(128)

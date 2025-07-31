@@ -88,7 +88,7 @@ Public Class Density_Mask : Inherits TaskParent
         If src.Channels() <> 1 Then src = task.gray
         src.SetTo(0, task.noDepthMask)
 
-        Dim threshold = task.cellSize * task.cellSize / 2
+        Dim threshold = task.brickSize * task.brickSize / 2
         Dim activeList(task.gridRects.Count - 1) As Boolean
         dst3.SetTo(0)
         Parallel.For(0, task.gridRects.Count,

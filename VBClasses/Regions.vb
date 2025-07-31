@@ -21,7 +21,7 @@ Public Class Region_Basics : Inherits TaskParent
             Dim brick1 = task.bricks.brickList(tuple.Item1)
             Dim brick2 = task.bricks.brickList(tuple.Item2)
             If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
-            If brick1.center.DistanceTo(brick2.center) > task.cellSize Then
+            If brick1.center.DistanceTo(brick2.center) > task.brickSize Then
                 Dim r = brick1.rect
                 For i = brick1.index + 1 To brick2.index - 1
                     r = r.Union(task.bricks.brickList(i).rect)
@@ -29,7 +29,7 @@ Public Class Region_Basics : Inherits TaskParent
                 hRects.Add(r)
                 dst0(r).SetTo(hRects.Count)
 
-                Dim color = task.scalarColors(CInt(task.cellsPerCol * r.Y / dst2.Height) Mod 255)
+                Dim color = task.scalarColors(CInt(task.bricksPerCol * r.Y / dst2.Height) Mod 255)
                 dst2(r).SetTo(color)
             End If
         Next
@@ -41,15 +41,15 @@ Public Class Region_Basics : Inherits TaskParent
             Dim brick1 = task.bricks.brickList(tuple.Item1)
             Dim brick2 = task.bricks.brickList(tuple.Item2)
             If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
-            If brick1.center.DistanceTo(brick2.center) > task.cellSize Then
+            If brick1.center.DistanceTo(brick2.center) > task.brickSize Then
                 Dim r = brick1.rect
-                For i = brick1.index + task.cellsPerRow To brick2.index - 1 Step task.cellsPerRow
+                For i = brick1.index + task.bricksPerRow To brick2.index - 1 Step task.bricksPerRow
                     r = r.Union(task.bricks.brickList(i).rect)
                 Next
                 vRects.Add(r)
                 dst1(r).SetTo(vRects.Count)
 
-                Dim color = task.scalarColors(CInt(task.cellsPerRow * r.X / dst2.Width) Mod 255)
+                Dim color = task.scalarColors(CInt(task.bricksPerRow * r.X / dst2.Width) Mod 255)
                 dst3(r).SetTo(color)
             End If
         Next
@@ -164,10 +164,10 @@ Public Class Region_Core : Inherits TaskParent
         dst2.SetTo(0)
         dst3.SetTo(0)
 
-        width = dst2.Width / task.cellSize
-        If width * task.cellSize <> dst2.Width Then width += 1
-        height = Math.Floor(dst2.Height / task.cellSize)
-        If height * task.cellSize <> dst2.Height Then height += 1
+        width = dst2.Width / task.brickSize
+        If width * task.brickSize <> dst2.Width Then width += 1
+        height = Math.Floor(dst2.Height / task.brickSize)
+        If height * task.brickSize <> dst2.Height Then height += 1
         hTuples.Clear()
         colorIndex = 0
         For i = 0 To height - 1
@@ -221,7 +221,7 @@ Public Class Region_Contours : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         connect.Run(src.Clone)
-        task.rcPixelThreshold = task.cellSize * task.cellSize ' eliminate singles...
+        task.rcPixelThreshold = task.brickSize * task.brickSize ' eliminate singles...
         redM.Run(Not connect.dst2)
 
         dst1.SetTo(0)
@@ -254,7 +254,7 @@ Public Class Region_Depth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         connect.Run(src.Clone)
-        task.rcPixelThreshold = task.cellSize * task.cellSize ' eliminate singles...
+        task.rcPixelThreshold = task.brickSize * task.brickSize ' eliminate singles...
         redM.Run(Not connect.dst2)
 
         dst1.SetTo(0)

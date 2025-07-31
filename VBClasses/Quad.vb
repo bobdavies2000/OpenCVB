@@ -350,8 +350,8 @@ Public Class Quad_Boundaries : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.bricks.dst2.Clone
-        Dim width = dst2.Width / task.cellSize
-        Dim height = dst2.Height / task.cellSize
+        Dim width = dst2.Width / task.brickSize
+        Dim height = dst2.Height / task.brickSize
         For i = 0 To task.bricks.brickList.Count - width Step width
             For j = i + 1 To i + width - 1
                 Dim d1 = task.bricks.brickList(j).depth

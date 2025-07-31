@@ -286,8 +286,8 @@ Public Class BrickLine_LeftRight : Inherits TaskParent
             brick.rect = task.gridRects(index)
 
             ' too close to the edges of the image
-            If task.gridNabeRects(index).Width + brick.rect.X + task.cellSize * 2 > dst2.Width Then Continue For
-            If task.gridNabeRects(index).Height + brick.rect.Y + task.cellSize * 2 > dst2.Height Then Continue For
+            If task.gridNabeRects(index).Width + brick.rect.X + task.brickSize * 2 > dst2.Width Then Continue For
+            If task.gridNabeRects(index).Height + brick.rect.Y + task.brickSize * 2 > dst2.Height Then Continue For
 
             brick.lRect = brick.rect
             brick.depth = task.pcSplit(2)(brick.rect).Mean()(0)

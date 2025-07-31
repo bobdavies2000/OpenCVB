@@ -186,16 +186,16 @@ Public Class OptionsGlobal
     End Sub
     Private Sub GridSlider_Scroll(sender As Object, e As EventArgs) Handles GridSlider.Scroll
         task.optionsChanged = True
-        task.cellSize = GridSlider.Value
+        task.brickSize = GridSlider.Value
 
-        'If task.cellSize <= 2 Then task.cellSize = 2
-        'If task.cellSize > 2 And task.cellSize <= 4 Then task.cellSize = 4
-        'If task.cellSize > 4 And task.cellSize <= 8 Then task.cellSize = 8
-        'If task.cellSize > 8 And task.cellSize <= 16 Then task.cellSize = 16
-        'If task.cellSize > 16 And task.cellSize <= 32 Then task.cellSize = 32
-        'If task.cellSize > 32 And task.cellSize <= 64 Then task.cellSize = 64
-        'If task.cellSize > 64 And task.cellSize <= 128 Then task.cellSize = 128
-        'GridSlider.Value = task.cellSize
+        'If task.brickSize <= 2 Then task.brickSize = 2
+        'If task.brickSize > 2 And task.brickSize <= 4 Then task.brickSize = 4
+        'If task.brickSize > 4 And task.brickSize <= 8 Then task.brickSize = 8
+        'If task.brickSize > 8 And task.brickSize <= 16 Then task.brickSize = 16
+        'If task.brickSize > 16 And task.brickSize <= 32 Then task.brickSize = 32
+        'If task.brickSize > 32 And task.brickSize <= 64 Then task.brickSize = 64
+        'If task.brickSize > 64 And task.brickSize <= 128 Then task.brickSize = 128
+        'GridSlider.Value = task.brickSize
 
         GridSizeLabel.Text = CStr(GridSlider.Value)
     End Sub

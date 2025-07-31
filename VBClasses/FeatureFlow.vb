@@ -12,13 +12,13 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         Dim correlationmat As New cv.Mat
         lpList.Clear()
         mpCorrelation.Clear()
-        Dim pad = task.cellSize / 2
+        Dim pad = task.brickSize / 2
         For Each p1 In prevFeatures
-            Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.cellSize, task.cellSize))
+            Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.brickSize, task.brickSize))
             Dim correlations As New List(Of Single)
             For Each p2 In currFeatures
-                Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, task.cellSize),
-                                                                         Math.Min(task.cellSize, rect.Height)))
+                Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, task.brickSize),
+                                                                         Math.Min(task.brickSize, rect.Height)))
                 cv.Cv2.MatchTemplate(dst2(rect), dst3(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
                 correlations.Add(correlationmat.Get(Of Single)(0, 0))
             Next

@@ -148,7 +148,7 @@ Public Class BrickPoint_DistanceAbove : Inherits TaskParent
             If brick.rect.Y = 0 Then
                 lpList.Add(lpZero)
             Else
-                Dim gc1 = task.bricks.brickList(brick.index - task.cellsPerRow)
+                Dim gc1 = task.bricks.brickList(brick.index - task.bricksPerRow)
                 Dim lp = New lpData(brick.pt, gc1.pt)
                 lpList.Add(lp)
             End If
@@ -160,7 +160,7 @@ Public Class BrickPoint_DistanceAbove : Inherits TaskParent
         Next
 
         Dim minLen = lengths.Min, maxLen = lengths.Max
-        If maxLen = task.cellSize And minLen = task.cellSize Then Exit Sub
+        If maxLen = task.brickSize And minLen = task.brickSize Then Exit Sub
 
         plotHist.Run(cv.Mat.FromPixelData(lengths.Count, 1, cv.MatType.CV_32F, lengths.ToArray))
         dst2 = plotHist.dst2
@@ -266,19 +266,19 @@ Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
         dst1 = ptBrick.dst2
         dst3 = src
 
-        ReDim results(task.cellSize - 1, task.cellSize - 1)
+        ReDim results(task.brickSize - 1, task.brickSize - 1)
         For Each pt In ptBrick.intensityFeatures
             Dim index = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
             Dim brick = task.bricks.brickList(index)
             results(brick.feature.X - brick.rect.X, brick.feature.Y - brick.rect.Y) += 1
         Next
 
-        Dim incrX = dst1.Width / task.cellSize
-        Dim incrY = dst1.Height / task.cellSize
+        Dim incrX = dst1.Width / task.brickSize
+        Dim incrY = dst1.Height / task.brickSize
         Dim row = Math.Floor(task.mouseMovePoint.Y / incrY)
         Dim col = Math.Floor(task.mouseMovePoint.X / incrX)
 
-        dst2 = cv.Mat.FromPixelData(task.cellSize, task.cellSize, cv.MatType.CV_32F, results)
+        dst2 = cv.Mat.FromPixelData(task.brickSize, task.brickSize, cv.MatType.CV_32F, results)
 
         For Each brick In task.bricks.brickList
             If brick.feature.X = col And brick.feature.Y = row Then
@@ -286,8 +286,8 @@ Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
             End If
         Next
 
-        For y = 0 To task.cellSize - 1
-            For x = 0 To task.cellSize - 1
+        For y = 0 To task.brickSize - 1
+            For x = 0 To task.brickSize - 1
                 SetTrueText(CStr(results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
             Next
         Next

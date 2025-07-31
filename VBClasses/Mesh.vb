@@ -60,12 +60,12 @@ Public Class Mesh_Features : Inherits TaskParent
         dst2 = mesh.dst2
         dst3 = mesh.dst3
 
-        Dim pad = task.cellSize / 2
+        Dim pad = task.brickSize / 2
         Dim depthMiss As Integer
         For Each pt In task.features
             Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
             If depth = 0 Then
-                Dim r = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.cellSize, task.cellSize))
+                Dim r = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.brickSize, task.brickSize))
                 depth = task.pcSplit(2)(r).Mean(task.depthMask(r))(0)
                 depthMiss += 1
             End If

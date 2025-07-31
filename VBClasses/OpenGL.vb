@@ -1651,7 +1651,7 @@ Public Class OpenGL_QuadConnected : Inherits TaskParent
             End If
         Next
 
-        Dim width = dst2.Width / task.cellSize
+        Dim width = dst2.Width / task.brickSize
         For Each tup In connect.vTuples
             For i = tup.Item1 To tup.Item2 - width Step width
                 brick1 = task.bricks.brickList(i)

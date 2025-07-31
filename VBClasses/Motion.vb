@@ -191,15 +191,15 @@ Public Class Motion_ThruCorrelation : Inherits TaskParent
                 cv.Cv2.MatchTemplate(lastFrame(roi), input(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                 Dim mm As mmData = GetMinMax(correlation)
                 If mm.maxVal < ccThreshold / 1000 Then
-                    If (i Mod task.cellsPerCol) <> 0 Then dst3(task.gridRects(i - 1)).SetTo(255)
-                    If (i Mod task.cellsPerCol) < task.cellsPerCol And i < task.gridRects.Count - 1 Then dst3(task.gridRects(i + 1)).SetTo(255)
-                    If i > task.cellsPerCol Then
-                        dst3(task.gridRects(i - task.cellsPerCol)).SetTo(255)
-                        dst3(task.gridRects(i - task.cellsPerCol + 1)).SetTo(255)
+                    If (i Mod task.bricksPerCol) <> 0 Then dst3(task.gridRects(i - 1)).SetTo(255)
+                    If (i Mod task.bricksPerCol) < task.bricksPerCol And i < task.gridRects.Count - 1 Then dst3(task.gridRects(i + 1)).SetTo(255)
+                    If i > task.bricksPerCol Then
+                        dst3(task.gridRects(i - task.bricksPerCol)).SetTo(255)
+                        dst3(task.gridRects(i - task.bricksPerCol + 1)).SetTo(255)
                     End If
-                    If i < (task.gridRects.Count - task.cellsPerCol - 1) Then
-                        dst3(task.gridRects(i + task.cellsPerCol)).SetTo(255)
-                        dst3(task.gridRects(i + task.cellsPerCol + 1)).SetTo(255)
+                    If i < (task.gridRects.Count - task.bricksPerCol - 1) Then
+                        dst3(task.gridRects(i + task.bricksPerCol)).SetTo(255)
+                        dst3(task.gridRects(i + task.bricksPerCol + 1)).SetTo(255)
                     End If
                     dst3(roi).SetTo(255)
                 End If
@@ -925,7 +925,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
         desc = "Find the top feature cells and track them in the next frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim half As Integer = CInt(task.cellSize / 2)
+        Dim half As Integer = CInt(task.brickSize / 2)
         Dim pt As cv.Point
         If task.heartBeatLT Then
             fPoly.Run(src)
@@ -934,7 +934,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
             saveMat = src.Clone
             For Each pt In task.topFeatures
                 Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
+                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickSize, task.brickSize)
                 roi = ValidateRect(roi) ' stub bricks are fixed here 
                 featureRects.Add(roi)
                 searchRects.Add(task.gridNabeRects(index))
@@ -943,7 +943,7 @@ Public Class Motion_TopFeatureFail : Inherits TaskParent
             dst2 = saveMat.Clone
             For Each pt In task.topFeatures
                 Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
+                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickSize, task.brickSize)
                 roi = ValidateRect(roi) ' stub bricks are fixed here 
                 dst2.Rectangle(roi, task.highlight, task.lineWidth)
                 dst2.Rectangle(task.gridNabeRects(index), task.highlight, task.lineWidth)

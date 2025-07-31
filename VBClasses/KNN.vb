@@ -474,7 +474,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
         Dim diffY As New List(Of Integer)
         Dim correlationMat As New cv.Mat
         dst2 = src.Clone
-        Dim sz = task.cellSize
+        Dim sz = task.brickSize
         For Each mps In knn.matches
             Dim currRect = ValidateRect(New cv.Rect(mps.p1.X - sz, mps.p1.Y - sz, sz * 2, sz * 2))
             Dim prevRect = ValidateRect(New cv.Rect(mps.p2.X - sz, mps.p2.Y - sz, currRect.Width, currRect.Height))

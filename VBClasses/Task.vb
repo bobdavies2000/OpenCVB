@@ -44,9 +44,9 @@ Public Class VBtask : Implements IDisposable
     Public fpD As New fpData ' the currently selected feature point.
     Public contourD As New contourData ' the currently selected contour
 
-    Public cellSize As Integer
-    Public cellsPerCol As Integer
-    Public cellsPerRow As Integer
+    Public brickSize As Integer
+    Public bricksPerCol As Integer
+    Public bricksPerRow As Integer
     Public gridRects As List(Of cv.Rect)
     Public gridMask As New cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
@@ -425,10 +425,9 @@ Public Class VBtask : Implements IDisposable
             ' MSER mistakenly can have 1 cell - just ignore it.
             setSelectedCell()
 
-            If optionsChanged = True And treeView IsNot Nothing Then ' treeview is not active during 'TestAll'.
+            If optionsChanged = True And treeView IsNot Nothing Then
                 treeView.optionsChanged = True
                 Dim sender As Object = Nothing, e As EventArgs = Nothing
-                treeView.Timer2_Tick(sender, e)
                 treeView.optionsChanged = False
             End If
             optionsChanged = False

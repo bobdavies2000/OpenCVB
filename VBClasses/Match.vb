@@ -398,29 +398,26 @@ End Class
 
 Public Class Match_tCell : Inherits TaskParent
     Public tCells As New List(Of tCell)
-    Dim cellSlider As TrackBar
     Dim options As New Options_Features
     Dim lineDisp As New XO_Line_DisplayInfoOld
     Public Sub New()
-        Dim tc As New tCell
-        tCells.Add(tc)
-        cellSlider = OptionParent.FindSlider("MatchTemplate Cell Size")
+        tCells.Add(New tCell)
         desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided."
     End Sub
     Public Function createCell(src As cv.Mat, correlation As Single, pt As cv.Point2f) As tCell
-        Dim rSize = cellSlider.Value
         Dim tc As New tCell
 
-        tc.rect = ValidateRect(New cv.Rect(pt.X - rSize, pt.Y - rSize, rSize * 2, rSize * 2))
+        tc.rect = ValidateRect(New cv.Rect(pt.X - task.brickSize, pt.Y - task.brickSize, task.brickSize * 2, task.brickSize * 2))
         tc.correlation = correlation
         tc.depth = task.pcSplit(2)(tc.rect).Mean(task.depthMask(tc.rect))(0) / 1000
         tc.center = pt
-        tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - rSize * 3, tc.center.Y - rSize * 3, rSize * 6, rSize * 6))
+        tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - task.brickSize * 3, tc.center.Y - task.brickSize * 3,
+                                                 task.brickSize * 6, task.brickSize * 6))
         If tc.template Is Nothing Then tc.template = src(tc.rect).Clone
         Return tc
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim rSize = cellSlider.Value
+        Dim rSize = task.brickSize
         If standaloneTest() And task.heartBeat Then
             options.Run()
             tCells.Clear()
@@ -465,21 +462,20 @@ Public Class Match_LinePairTest : Inherits TaskParent
         desc = "Use MatchTemplate to find the new location of the template and update the point provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static cellSlider = OptionParent.FindSlider("MatchTemplate Cell Size")
-        Dim rSize = cellSlider.Value
-        Dim radius = rSize / 2
+        Dim radius = task.brickSize / 2
 
         Dim rect As cv.Rect
 
         If target(0) IsNot Nothing And correlation(0) < task.fCorrThreshold Then target(0) = Nothing
         If task.mouseClickFlag Then
             ptx(0) = task.ClickPoint
-            ptx(1) = New cv.Point2f(msRNG.Next(rSize, dst2.Width - 2 * rSize), msRNG.Next(rSize, dst2.Height - 2 * rSize))
+            ptx(1) = New cv.Point2f(msRNG.Next(task.brickSize, dst2.Width - 2 * task.brickSize),
+                                    msRNG.Next(task.brickSize, dst2.Height - 2 * task.brickSize))
 
-            rect = ValidateRect(New cv.Rect(ptx(0).X - radius, ptx(0).Y - radius, rSize, rSize))
+            rect = ValidateRect(New cv.Rect(ptx(0).X - radius, ptx(0).Y - radius, task.brickSize, task.brickSize))
             target(0) = src(rect)
 
-            rect = ValidateRect(New cv.Rect(ptx(1).X - radius, ptx(1).Y - radius, rSize, rSize))
+            rect = ValidateRect(New cv.Rect(ptx(1).X - radius, ptx(1).Y - radius, task.brickSize, task.brickSize))
             target(1) = src(rect)
         End If
 
@@ -493,8 +489,9 @@ Public Class Match_LinePairTest : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC1, 0)
 
         For i = 0 To ptx.Count - 1
-            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, rSize, rSize))
-            Dim searchRect = ValidateRect(New cv.Rect(rect.X - rSize, rect.Y - rSize, rSize * 3, rSize * 3))
+            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.brickSize, task.brickSize))
+            Dim searchRect = ValidateRect(New cv.Rect(rect.X - task.brickSize, rect.Y - task.brickSize,
+                                                      task.brickSize * 3, task.brickSize * 3))
             cv.Cv2.MatchTemplate(target(i), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
             Dim mmData = GetMinMax(dst0)
             correlation(i) = mmData.maxVal
@@ -505,7 +502,7 @@ Public Class Match_LinePairTest : Inherits TaskParent
             ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
             DrawCircle(dst3, ptx(i), task.DotSize, task.highlight)
             dst3.Rectangle(searchRect, cv.Scalar.Yellow, 1)
-            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, rSize, rSize))
+            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.brickSize, task.brickSize))
             target(i) = task.color(rect)
         Next
 
@@ -585,12 +582,11 @@ Public Class Match_Point : Inherits TaskParent
             Exit Sub
         End If
 
-        Static cellSlider = OptionParent.FindSlider("MatchTemplate Cell Size")
-        Dim rSize = cellSlider.Value
-        Dim radius = rSize / 2
+        Dim radius = task.brickSize / 2
 
-        Dim rect = ValidateRect(New cv.Rect(pt.X - radius, pt.Y - radius, rSize, rSize))
-        searchRect = ValidateRect(New cv.Rect(rect.X - rSize, rect.Y - rSize, rSize * 3, rSize * 3))
+        Dim rect = ValidateRect(New cv.Rect(pt.X - radius, pt.Y - radius, task.brickSize, task.brickSize))
+        searchRect = ValidateRect(New cv.Rect(rect.X - task.brickSize, rect.Y - task.brickSize,
+                                              task.brickSize * 3, task.brickSize * 3))
         cv.Cv2.MatchTemplate(target(rect), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
         Dim mmData = GetMinMax(dst0)
         correlation = mmData.maxVal
@@ -646,10 +642,10 @@ Public Class Match_Brick : Inherits TaskParent
 
             dst3 = lastImage
             DrawRect(dst3, newRect, white)
-            labels(2) = "Delta X/Y = " + Format(deltaX, fmt3) + "/" + Format(deltaY, fmt3) + " with correlation = " +
-                        Format(correlation, fmt3)
         End If
+        labels(2) = "Delta X/Y = " + Format(deltaX, fmt3) + "/" + Format(deltaY, fmt3) + " with correlation = " +
+                     Format(correlation, fmt3)
 
-        lastImage = task.gray.Clone
+        If correlation < task.fCorrThreshold Then lastImage = task.gray.Clone
     End Sub
 End Class

@@ -295,24 +295,24 @@ Public Class XO_Horizon_Validate : Inherits TaskParent
         desc = "Validate the horizon points using Match_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim pad = task.cellSize / 2
+        Dim pad = task.brickSize / 2
 
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Then
             ptLeft = task.lineGravity.p1
             ptRight = task.lineGravity.p2
-            Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, task.cellSize, task.cellSize))
+            Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, task.brickSize, task.brickSize))
             leftTemplate = src(r)
 
-            r = ValidateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, task.cellSize, task.cellSize))
+            r = ValidateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, task.brickSize, task.brickSize))
             rightTemplate = src(r)
         Else
-            Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, task.cellSize, task.cellSize))
+            Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, task.brickSize, task.brickSize))
             match.template = leftTemplate.Clone
             match.Run(src)
             ptLeft = match.newCenter
 
-            r = ValidateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, task.cellSize, task.cellSize))
+            r = ValidateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, task.brickSize, task.brickSize))
             match.template = leftTemplate.Clone
             match.Run(src)
             ptLeft = match.newCenter
@@ -2453,14 +2453,14 @@ Public Class XO_PointCloud_PCpointsMask : Inherits TaskParent
         desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then pcPoints = New cv.Mat(task.cellsPerCol, task.cellsPerRow, cv.MatType.CV_32FC3, cv.Scalar.All(0))
+        If task.optionsChanged Then pcPoints = New cv.Mat(task.bricksPerCol, task.bricksPerRow, cv.MatType.CV_32FC3, cv.Scalar.All(0))
 
         dst2.SetTo(0)
         actualCount = 0
         Dim lastMeanZ As Single
-        For y = 0 To task.cellsPerCol - 1
-            For x = 0 To task.cellsPerRow - 1
-                Dim roi = task.gridRects(y * task.cellsPerRow + x)
+        For y = 0 To task.bricksPerCol - 1
+            For x = 0 To task.bricksPerRow - 1
+                Dim roi = task.gridRects(y * task.bricksPerRow + x)
                 Dim mean = task.pointCloud(roi).Mean(task.depthMask(roi))
                 If Single.IsNaN(mean(0)) Then Continue For
                 If Single.IsNaN(mean(1)) Then Continue For
@@ -3497,7 +3497,7 @@ Public Class XO_FeatureLine_BasicsRaw : Inherits TaskParent
         If task.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or
            lineDisp.distance < distanceThreshold Then
 
-            Dim pad = task.cellSize / 2
+            Dim pad = task.brickSize / 2
             lines.subsetRect = New cv.Rect(pad * 3, pad * 3, src.Width - pad * 6, src.Height - pad * 6)
             lines.Run(src.Clone)
 
@@ -3660,7 +3660,7 @@ Public Class XO_FeatureLine_Longest : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        Dim pad = task.cellSize / 2
+        Dim pad = task.brickSize / 2
 
         Static p1 As cv.Point, p2 As cv.Point
         If task.heartBeat Or match1.correlation < task.fCorrThreshold And
@@ -3668,11 +3668,11 @@ Public Class XO_FeatureLine_Longest : Inherits TaskParent
             knn.Run(src.Clone)
 
             p1 = knn.lastPair.p1
-            Dim r1 = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.cellSize, task.cellSize))
+            Dim r1 = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.brickSize, task.brickSize))
             match1.template = src(r1).Clone
 
             p2 = knn.lastPair.p2
-            Dim r2 = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, task.cellSize, task.cellSize))
+            Dim r2 = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, task.brickSize, task.brickSize))
             match2.template = src(r2).Clone
         End If
 
@@ -4941,7 +4941,7 @@ Public Class XO_Brick_FitLeftInColor : Inherits TaskParent
         Dim p1 = task.bricks.brickList(0).lRect.TopLeft
         Dim p2 = task.bricks.brickList(task.bricks.brickList.Count - 1).lRect.BottomRight
 
-        ' Dim rect = ValidateRect(New cv.Rect(p1.X - task.cellSize, p1.Y - task.cellSize, task.cellSize * 2, task.cellSize * 2))
+        ' Dim rect = ValidateRect(New cv.Rect(p1.X - task.brickSize, p1.Y - task.brickSize, task.brickSize * 2, task.brickSize * 2))
         cv.Cv2.MatchTemplate(task.gray(task.drawRect), task.leftView, dst2, cv.TemplateMatchModes.CCoeffNormed)
         Dim mm = GetMinMax(dst2)
         dst3 = src(ValidateRect(New cv.Rect(mm.maxLoc.X / 2, mm.maxLoc.Y / 2, dst2.Width, dst2.Height)))
@@ -7532,7 +7532,7 @@ Public Class XO_Motion_TopFeatures : Inherits TaskParent
         featureRects.Clear()
         For Each pt In task.topFeatures
             Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-            Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
+            Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickSize, task.brickSize)
             roi = ValidateRect(roi)
             featureRects.Add(roi)
             searchRects.Add(task.gridNabeRects(index))
@@ -7541,14 +7541,14 @@ Public Class XO_Motion_TopFeatures : Inherits TaskParent
         dst2 = dst1.Clone
         For Each pt In task.topFeatures
             Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-            Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.cellSize, task.cellSize)
+            Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickSize, task.brickSize)
             roi = ValidateRect(roi)
             dst2.Rectangle(roi, task.highlight, task.lineWidth)
             dst2.Rectangle(task.gridNabeRects(index), task.highlight, task.lineWidth)
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        half = CInt(task.cellSize / 2)
+        half = CInt(task.brickSize / 2)
 
         dst1 = src.Clone
         fPoly.Run(src)
@@ -7919,7 +7919,7 @@ Public Class XO_Stabilizer_CornerPoints : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Then
-            Dim size = task.cellSize
+            Dim size = task.brickSize
             ul = New cv.Rect(0, 0, size, size)
             ur = New cv.Rect(dst2.Width - size, 0, size, size)
             ll = New cv.Rect(0, dst2.Height - size, size, size)
@@ -8172,13 +8172,13 @@ Public Class Feature_PointTracker : Inherits TaskParent
         desc = "Use the top X goodFeatures and then use matchTemplate to find track them."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim pad = task.cellSize / 2
+        Dim pad = task.brickSize / 2
         strOut = ""
         If mPoints.ptx.Count <= 3 Then
             mPoints.ptx.Clear()
             For Each pt In task.features
                 mPoints.ptx.Add(pt)
-                Dim rect = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.cellSize, task.cellSize))
+                Dim rect = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.brickSize, task.brickSize))
             Next
             strOut = "Restart tracking -----------------------------------------------------------------------------" + vbCrLf
         End If

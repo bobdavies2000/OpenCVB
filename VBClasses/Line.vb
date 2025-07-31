@@ -59,6 +59,7 @@ Public Class Line_Basics : Inherits TaskParent
             lpMap.Line(lpList(i).p1, lpList(i).p2, lpList(i).index + 1, task.lineWidth, cv.LineTypes.Link8)
         Next
 
+        If standaloneTest() Then dst2 = ShowPaletteNoZero(lpMap)
         labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count)
     End Sub
 End Class
@@ -1393,7 +1394,7 @@ Public Class Line_LongestNew : Inherits TaskParent
     Public matchBrick As New Match_Brick
     Dim lp As New lpData
     Public Sub New()
-        desc = "Identify each line in the lpMap."
+        desc = "Identify a line by matching each of the points to the previous image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim threshold = task.fCorrThreshold
@@ -1411,14 +1412,18 @@ Public Class Line_LongestNew : Inherits TaskParent
         End If
 
         matchBrick.gridIndex = lp.gridIndex1
-        matchBrick.Run(task.gray)
+        matchBrick.Run(emptyMat)
         Dim correlation1 = matchBrick.correlation
         Dim p1 = New cv.Point(lp.p1.X + matchBrick.deltaX, lp.p1.Y + matchBrick.deltaY)
 
+        strout = matchBrick.labels(2) + vbCrLf
+
         matchBrick.gridIndex = lp.gridIndex2
-        matchBrick.Run(task.gray)
+        matchBrick.Run(emptyMat)
         Dim correlation2 = matchBrick.correlation
         Dim p2 = New cv.Point(lp.p2.X + matchBrick.deltaX, lp.p2.Y + matchBrick.deltaY)
+
+        strOut += matchBrick.labels(2) + vbCrLf
 
         If correlation1 >= threshold And correlation2 >= threshold Then
             lp = New lpData(p1, p2)
@@ -1434,7 +1439,16 @@ Public Class Line_LongestNew : Inherits TaskParent
             dst3 = task.lines.dst2
         End If
 
-        task.lineLongest = lp
-        labels(2) = matchBrick.labels(2)
+        ' task.lineLongest = lp
+        labels(2) = strOut
+
+        Static strList As New List(Of String)
+        strList.Add(strout)
+        If strList.Count > 15 Then strList.RemoveAt(0)
+        strOut = ""
+        For Each strNext In strList
+            strOut += strNext
+        Next
+        SetTrueText(strout, 3)
     End Sub
 End Class

@@ -66,17 +66,17 @@ End Class
 '        desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed."
 '    End Sub
 '    Public Overrides sub RunAlg(src As cv.Mat)
-'        bpCol = Math.Floor(task.mouseMovePoint.X / task.cellsPerRow)
-'        bpRow = Math.Floor(task.mouseMovePoint.Y / task.cellsPerCol)
+'        bpCol = Math.Floor(task.mouseMovePoint.X / task.bricksPerRow)
+'        bpRow = Math.Floor(task.mouseMovePoint.Y / task.bricksPerCol)
 
 '        colorFmt.Run(src)
 '        hist2d.Run(colorFmt.dst2)
 '        dst2 = hist2d.dst2
 
-'        minX = bpRow * xRange / task.cellSize
-'        maxX = (bpRow + 1) * xRange / task.cellSize
-'        minY = bpCol * yRange / task.cellSize
-'        maxY = (bpCol + 1) * yRange / task.cellSize
+'        minX = bpRow * xRange / task.brickSize
+'        maxX = (bpRow + 1) * xRange / task.brickSize
+'        minY = bpCol * yRange / task.brickSize
+'        maxY = (bpCol + 1) * yRange / task.brickSize
 
 '        Dim ranges() = New cv.Rangef() {New cv.Rangef(minX, maxX), New cv.Rangef(minY, maxY)}
 '        cv.Cv2.CalcBackProject({src}, task.gOptions.channels, hist2d.histogram, dst0, ranges)

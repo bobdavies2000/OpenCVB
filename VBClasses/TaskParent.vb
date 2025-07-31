@@ -472,8 +472,8 @@ Public Class TaskParent : Implements IDisposable
     End Sub
     Public Sub SetTrueTextBase(text As String, pt As cv.Point, picTag As Integer)
         If text Is Nothing Then Return
-        Dim str As New TrueText(text, pt, picTag)
-        trueData.Add(str)
+        Dim strnext As New TrueText(text, pt, picTag)
+        trueData.Add(strnext)
     End Sub
     Public Function standaloneTest() As Boolean
         If standalone Or task.displayObjectName = traceName Then Return True

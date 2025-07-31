@@ -46,7 +46,7 @@ Public Class Brick_Basics : Inherits TaskParent
         Dim correlationMat As New cv.Mat
         Dim brickLast As New List(Of brickData)(task.bricks.brickList)
 
-        Dim maxPixels = task.cellSize * task.cellSize
+        Dim maxPixels = task.brickSize * task.brickSize
         task.bricks.brickList.Clear()
         Dim depthCount As Integer
         brickDepthCount = 0
@@ -178,19 +178,19 @@ Public Class Brick_FullDepth : Inherits TaskParent
         End If
         dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        Dim col As Integer, cellsPerRow = task.cellsPerRow
-        Static whiteCol As Integer = cellsPerRow / 2
+        Dim col As Integer, bricksPerRow = task.bricksPerRow
+        Static whiteCol As Integer = bricksPerRow / 2
         If task.mouseClickFlag Then
-            whiteCol = Math.Round(cellsPerRow * (task.ClickPoint.X - task.cellSize / 2) / dst2.Width)
+            whiteCol = Math.Round(bricksPerRow * (task.ClickPoint.X - task.brickSize / 2) / dst2.Width)
         End If
         For Each brick In task.bricks.brickList
             If brick.depth > 0 Then
-                Dim color = If(col = whiteCol, cv.Scalar.Black, task.scalarColors(255 * (col / cellsPerRow)))
+                Dim color = If(col = whiteCol, cv.Scalar.Black, task.scalarColors(255 * (col / bricksPerRow)))
                 dst2.Rectangle(brick.rect, color, task.lineWidth)
                 dst3.Rectangle(brick.rRect, color, task.lineWidth)
             End If
             col += 1
-            If col >= cellsPerRow Then col = 0
+            If col >= bricksPerRow Then col = 0
         Next
     End Sub
 End Class
@@ -281,8 +281,8 @@ Public Class Brick_Edges : Inherits TaskParent
         Next
 
         For Each r In task.fLessRects
-            Dim x = CInt(r.X / task.cellSize)
-            Dim y = CInt(r.Y / task.cellSize)
+            Dim x = CInt(r.X / task.brickSize)
+            Dim y = CInt(r.Y / task.brickSize)
             task.lowResDepth.Set(Of Single)(y, x, lastDepth.Get(Of Single)(y, x))
         Next
         lastDepth = task.lowResDepth.Clone
@@ -331,8 +331,8 @@ Public Class Brick_MLColor : Inherits TaskParent
 
             For j = 1 To nList.Count - 1
                 Dim roiA = task.gridRects(nList(j))
-                Dim x As Integer = Math.Floor(roiA.X * task.cellsPerRow / task.cols)
-                Dim y As Integer = Math.Floor(roiA.Y * task.cellsPerCol / task.rows)
+                Dim x As Integer = Math.Floor(roiA.X * task.bricksPerRow / task.cols)
+                Dim y As Integer = Math.Floor(roiA.Y * task.bricksPerCol / task.rows)
                 Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
                 trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
                 ml.trainResponse.Set(Of Single)(j - 1, 0, 1)
@@ -405,8 +405,8 @@ Public Class Brick_MLColorDepth : Inherits TaskParent
 
             For j = 1 To nList.Count - 1
                 Dim roiA = task.gridRects(nList(j))
-                Dim x As Integer = Math.Floor(roiA.X * task.cellsPerRow / task.cols)
-                Dim y As Integer = Math.Floor(roiA.Y * task.cellsPerCol / task.rows)
+                Dim x As Integer = Math.Floor(roiA.X * task.bricksPerRow / task.cols)
+                Dim y As Integer = Math.Floor(roiA.Y * task.bricksPerCol / task.rows)
                 Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
                 trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
                 trainDepth.Set(Of Single)(j - 1, 0, task.lowResDepth.Get(Of Single)(y, x))
@@ -796,8 +796,8 @@ Public Class Brick_LeftRight : Inherits TaskParent
         dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        For i = 0 To task.cellsPerRow - 1 Step 2
-            For j = i To task.gridRects.Count - task.cellsPerRow - 1 Step task.cellsPerRow
+        For i = 0 To task.bricksPerRow - 1 Step 2
+            For j = i To task.gridRects.Count - task.bricksPerRow - 1 Step task.bricksPerRow
                 Dim brick = task.bricks.brickList(j)
                 If brick.depth > 0 Then
                     dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth)
