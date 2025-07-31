@@ -1417,6 +1417,7 @@ Public Class Line_LongestNew : Inherits TaskParent
         Dim p1 = New cv.Point(lp.p1.X + matchBrick.deltaX, lp.p1.Y + matchBrick.deltaY)
 
         strout = matchBrick.labels(2) + vbCrLf
+        labels(2) = matchBrick.labels(2) + vbTab
 
         matchBrick.gridIndex = lp.gridIndex2
         matchBrick.Run(emptyMat)
@@ -1424,6 +1425,7 @@ Public Class Line_LongestNew : Inherits TaskParent
         Dim p2 = New cv.Point(lp.p2.X + matchBrick.deltaX, lp.p2.Y + matchBrick.deltaY)
 
         strOut += matchBrick.labels(2) + vbCrLf
+        labels(2) += ", " + matchBrick.labels(2)
 
         If correlation1 >= threshold And correlation2 >= threshold Then
             lp = New lpData(p1, p2)
@@ -1440,15 +1442,41 @@ Public Class Line_LongestNew : Inherits TaskParent
         End If
 
         ' task.lineLongest = lp
-        labels(2) = strOut
-
         Static strList As New List(Of String)
         strList.Add(strout)
-        If strList.Count > 15 Then strList.RemoveAt(0)
+        If strList.Count > 10 Then strList.RemoveAt(0)
         strOut = ""
         For Each strNext In strList
             strOut += strNext
         Next
         SetTrueText(strout, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Tracer : Inherits TaskParent
+    Public Sub New()
+        labels(2) = "Move camera to see the impact"
+        desc = "Trace the longestline to visualize the line over time"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat Then dst2.SetTo(0)
+        DrawLine(dst2, task.lineLongest, task.highlight)
+        labels(2) = "Longest line is " + Format(task.lineLongest.length, fmt1) + " pixels, slope = " +
+                     Format(task.lineLongest.slope, fmt1)
+
+        Static strList = New List(Of String)
+        strList.Add(labels(2))
+        strOut = ""
+        For Each strNext In strList
+            strOut += strNext + vbCrLf
+        Next
+
+        If strList.Count > 20 Then strList.RemoveAt(0)
+        SetTrueText(strOut, 3)
     End Sub
 End Class

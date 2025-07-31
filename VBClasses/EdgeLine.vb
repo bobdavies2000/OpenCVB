@@ -10,22 +10,6 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         labels(3) = "Highlighting the individual segments one by one."
         desc = "Use EdgeLines to find edges/lines but without using motionMask"
     End Sub
-    Public Shared Sub showSegment(dst As cv.Mat)
-        If task.quarterBeat Then
-            Static debugSegment = 0
-            debugSegment += 1
-            If debugSegment >= task.edges.segments.Count Then
-                debugSegment = 0
-                dst.SetTo(0)
-            End If
-            If debugSegment >= task.edges.segments.Count Then debugSegment = 0
-            If debugSegment Then
-                task.edges.dst1 = task.edges.dst2.InRange(debugSegment, debugSegment)
-                task.edges.dst1.CopyTo(dst, task.edges.dst1)
-            End If
-            debugSegment += 1
-        End If
-    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -70,14 +54,7 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         Next
         labels(2) = CStr(classCount) + " segments were found using " + CStr(pointCount) + " points."
 
-        'Dim index = Math.Abs(task.gOptions.DebugSlider.Value)
-        'If index <> 0 Then
-        '    dst3 = task.edges.dst2.InRange(index, index)
-        '    Dim rect = rectList(index - 1)
-        '    dst3.Rectangle(rect, 255, task.lineWidth)
-        'End If
-
-        If standaloneTest() Then showSegment(dst3)
+        If standaloneTest() Then dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
     Public Sub Close()
         EdgeLineRaw_Close(cPtr)
@@ -345,6 +322,22 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Find lines using the brick points"
     End Sub
+    Public Shared Sub showSegment(dst As cv.Mat)
+        If task.quarterBeat Then
+            Static debugSegment = 0
+            debugSegment += 1
+            If debugSegment >= task.edges.segments.Count Then
+                debugSegment = 0
+                dst.SetTo(0)
+            End If
+            If debugSegment >= task.edges.segments.Count Then debugSegment = 0
+            If debugSegment Then
+                task.edges.dst1 = task.edges.dst2.InRange(debugSegment, debugSegment)
+                task.edges.dst1.CopyTo(dst, task.edges.dst1)
+            End If
+            debugSegment += 1
+        End If
+    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         ptBrick.Run(src)
         labels(2) = ptBrick.labels(2)
@@ -381,7 +374,7 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
             Next
         Next
 
-        If standaloneTest() Then EdgeLine_Basics.showSegment(dst1)
+        If standaloneTest() Then showSegment(dst1)
     End Sub
 End Class
 

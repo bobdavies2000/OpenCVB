@@ -629,8 +629,6 @@ Public Class Match_Brick : Inherits TaskParent
         deltaX = match.newRect.X - offsetX
         deltaY = match.newRect.Y - offsetY
 
-        labels(2) = "Correlation = " + Format(correlation, fmt3)
-
         If standaloneTest() Then
             Dim newRect = rect
             newRect.X += deltaX
@@ -643,7 +641,7 @@ Public Class Match_Brick : Inherits TaskParent
             dst3 = lastImage
             DrawRect(dst3, newRect, white)
         End If
-        labels(2) = "Delta X/Y = " + Format(deltaX, fmt3) + "/" + Format(deltaY, fmt3) + " with correlation = " +
+        labels(2) = "Delta X/Y = " + Format(deltaX, fmt2) + "/" + Format(deltaY, fmt2) + ", corr: " +
                      Format(correlation, fmt3)
 
         If correlation < task.fCorrThreshold Then lastImage = task.gray.Clone
