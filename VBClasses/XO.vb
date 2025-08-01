@@ -1102,7 +1102,7 @@ End Class
 
 Public Class XO_Line_Cells : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Dim lines As New Line_RawSorted
+    Dim lines As New XO_Line_RawSorted
     Public Sub New()
         desc = "Identify all lines in the RedColor_Basics cell boundaries"
     End Sub
@@ -1126,7 +1126,7 @@ End Class
 Public Class XO_Line_Canny : Inherits TaskParent
     Dim canny As New Edge_Basics
     Public lpList As New List(Of lpData)
-    Dim lines As New Line_RawSorted
+    Dim lines As New XO_Line_RawSorted
     Public Sub New()
         labels(3) = "Input to Line_Basics"
         OptionParent.FindSlider("Canny Aperture").Value = 7
@@ -1349,7 +1349,7 @@ End Class
 
 Public Class XO_Line_ColorClass : Inherits TaskParent
     Dim color8U As New Color8U_Basics
-    Dim lines As New Line_RawSorted
+    Dim lines As New XO_Line_RawSorted
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Lines for the current color class", "Color Class input"}
@@ -1375,7 +1375,7 @@ End Class
 Public Class XO_Line_FromContours : Inherits TaskParent
     Dim reduction As New Reduction_Basics
     Dim contours As New XO_Contour_Gray
-    Dim lines As New Line_RawSorted
+    Dim lines As New XO_Line_RawSorted
     Public Sub New()
         task.gOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
         task.gOptions.highlight.SelectedIndex = 3
@@ -1404,7 +1404,7 @@ End Class
 Public Class XO_Line_ViewSide : Inherits TaskParent
     Public autoY As New XO_OpAuto_YRange
     Dim histSide As New Projection_HistSide
-    Dim lines As New Line_RawSorted
+    Dim lines As New XO_Line_RawSorted
     Public Sub New()
         labels = {"", "", "Hotspots in the Side View", "Lines found in the hotspots of the Side View."}
         desc = "Find lines in the hotspots for the side view."
@@ -1578,7 +1578,7 @@ Public Class XO_Line_Core : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            labels(2) = CStr(lines.lpList.Count) + " lines found in Line_RawSorted in the current image with " +
+            labels(2) = CStr(lines.lpList.Count) + " lines found in XO_Line_RawSorted in the current image with " +
                             CStr(lpList.Count) + " after filtering with the motion mask."
         End If
     End Sub
@@ -1711,7 +1711,7 @@ End Class
 
 
 Public Class XO_Hough_Sudoku1 : Inherits TaskParent
-    Dim lines As New Line_RawSorted
+    Dim lines As New XO_Line_RawSorted
     Public Sub New()
         desc = "FastLineDetect version for finding lines in the Sudoku input."
     End Sub
@@ -4229,7 +4229,7 @@ End Class
 
 Public Class XO_tructured_MouseSlice : Inherits TaskParent
     Dim slice As New Structured_SliceEither
-    Dim lines As New Line_RawSorted
+    Dim lines As New XO_Line_RawSorted
     Public Sub New()
         labels(2) = "Center Slice in yellow"
         labels(3) = "White = SliceV output, Red Dot is avgPt"
@@ -5023,7 +5023,7 @@ End Class
 
 
 Public Class XO_Line_BasicsAlternative : Inherits TaskParent
-    Public lines As New Line_RawSorted
+    Public lines As New XO_Line_RawSorted
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -8968,5 +8968,175 @@ Public Class XO_Line_Parallel : Inherits TaskParent
         Next
         labels(2) = CStr(parList.Count) + " parallel lines were found in the image"
         labels(3) = CStr(extendAll.lpList.Count) + " lines were found in the image before finding the parallel lines"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class XO_Line_Points : Inherits TaskParent
+    Dim knn As New KNN_Basics
+    Public Sub New()
+        desc = "Display end points of the lines and map them."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.lines.dst2
+
+        knn.queries.Clear()
+        For Each lp In task.lines.lpList
+            Dim rect = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+            dst2.Rectangle(rect, task.highlight, task.lineWidth)
+            knn.queries.Add(lp.center)
+        Next
+
+        Static lastQueries As New List(Of cv.Point2f)(knn.queries)
+        knn.trainInput = lastQueries
+
+
+        knn.Run(emptyMat)
+
+        dst3 = task.lines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        For i = 0 To knn.neighbors.Count - 1
+            Dim p1 = knn.queries(i)
+            Dim p2 = knn.trainInput(knn.neighbors(i)(0))
+            dst3.Line(p1, p2, task.highlight, task.lineWidth + 3, task.lineType)
+        Next
+
+        lastQueries = New List(Of cv.Point2f)(knn.queries)
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Line_RawEPLines : Inherits TaskParent
+    Dim ld As cv.XImgProc.FastLineDetector
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
+               "rectangle (provided externally)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
+
+        Dim lines = ld.Detect(src)
+        Dim tmplist As New List(Of lpData)
+        dst3.SetTo(0)
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
+               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
+                Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
+                Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
+                If p1.X >= 0 And p1.X < dst2.Width And p1.Y >= 0 And p1.Y < dst2.Height And
+                   p2.X >= 0 And p2.X < dst2.Width And p2.Y >= 0 And p2.Y < dst2.Height Then
+                    p1 = lpData.validatePoint(p1)
+                    p2 = lpData.validatePoint(p2)
+                    Dim lp = New lpData(p1, p2)
+                    lp.index = tmplist.Count
+                    tmplist.Add(lp)
+                    DrawLine(dst3, lp, white)
+                End If
+            End If
+        Next
+
+        Dim removeList As New List(Of Integer)
+        For Each lp In tmplist
+            Dim x1 = CInt(lp.ep1.X)
+            Dim y1 = CInt(lp.ep1.Y)
+            Dim x2 = CInt(lp.ep2.X)
+            Dim y2 = CInt(lp.ep2.Y)
+            For j = lp.index + 1 To tmplist.Count - 1
+                If CInt(tmplist(j).ep1.X) <> x1 Then Continue For
+                If CInt(tmplist(j).ep1.Y) <> y1 Then Continue For
+                If CInt(tmplist(j).ep2.X) <> x2 Then Continue For
+                If CInt(tmplist(j).ep2.Y) <> y2 Then Continue For
+                If removeList.Contains(tmplist(j).index) = False Then removeList.Add(tmplist(j).index)
+            Next
+        Next
+
+        lpList.Clear()
+        For Each lp In tmplist
+            If removeList.Contains(lp.index) = False Then lpList.Add(New lpData(lp.ep1, lp.ep2))
+        Next
+
+        dst2.SetTo(0)
+        For Each lp In lpList
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth + 1, task.lineType)
+        Next
+
+        labels(2) = CStr(lpList.Count) + " highlighted lines were detected in the current frame. Others were too similar."
+        labels(3) = "There were " + CStr(removeList.Count) + " coincident lines"
+    End Sub
+    Public Sub Close()
+        ld.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class XO_Line_RawSorted : Inherits TaskParent
+    Dim ld As cv.XImgProc.FastLineDetector
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
+               "rectangle (provided externally)"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
+
+        Dim lines = ld.Detect(src)
+
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        For Each v In lines
+            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
+               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
+                Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
+                Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
+                If p1.X >= 0 And p1.X < dst2.Width And p1.Y >= 0 And p1.Y < dst2.Height And
+                   p2.X >= 0 And p2.X < dst2.Width And p2.Y >= 0 And p2.Y < dst2.Height Then
+                    Dim lp = New lpData(p1, p2)
+                    sortlines.Add(lp.length, lp)
+                End If
+            End If
+        Next
+
+        lpList.Clear()
+        For Each lp In sortlines.Values
+            lp.p1 = lpData.validatePoint(lp.p1)
+            lp.p2 = lpData.validatePoint(lp.p2)
+            lpList.Add(lp)
+        Next
+
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            For Each lp In lpList
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            Next
+        End If
+
+        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
+    End Sub
+    Public Sub Close()
+        ld.Dispose()
     End Sub
 End Class

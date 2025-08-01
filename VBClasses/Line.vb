@@ -110,134 +110,6 @@ End Class
 
 
 
-Public Class Line_RawEPLines : Inherits TaskParent
-    Dim ld As cv.XImgProc.FastLineDetector
-    Public lpList As New List(Of lpData)
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
-               "rectangle (provided externally)"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
-
-        Dim lines = ld.Detect(src)
-        Dim tmplist As New List(Of lpData)
-        dst3.SetTo(0)
-        For Each v In lines
-            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
-               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
-                Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
-                Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                If p1.X >= 0 And p1.X < dst2.Width And p1.Y >= 0 And p1.Y < dst2.Height And
-                   p2.X >= 0 And p2.X < dst2.Width And p2.Y >= 0 And p2.Y < dst2.Height Then
-                    p1 = lpData.validatePoint(p1)
-                    p2 = lpData.validatePoint(p2)
-                    Dim lp = New lpData(p1, p2)
-                    lp.index = tmplist.Count
-                    tmplist.Add(lp)
-                    DrawLine(dst3, lp, white)
-                End If
-            End If
-        Next
-
-        Dim removeList As New List(Of Integer)
-        For Each lp In tmplist
-            Dim x1 = CInt(lp.ep1.X)
-            Dim y1 = CInt(lp.ep1.Y)
-            Dim x2 = CInt(lp.ep2.X)
-            Dim y2 = CInt(lp.ep2.Y)
-            For j = lp.index + 1 To tmplist.Count - 1
-                If CInt(tmplist(j).ep1.X) <> x1 Then Continue For
-                If CInt(tmplist(j).ep1.Y) <> y1 Then Continue For
-                If CInt(tmplist(j).ep2.X) <> x2 Then Continue For
-                If CInt(tmplist(j).ep2.Y) <> y2 Then Continue For
-                If removeList.Contains(tmplist(j).index) = False Then removeList.Add(tmplist(j).index)
-            Next
-        Next
-
-        lpList.Clear()
-        For Each lp In tmplist
-            If removeList.Contains(lp.index) = False Then lpList.Add(New lpData(lp.ep1, lp.ep2))
-        Next
-
-        dst2.SetTo(0)
-        For Each lp In lpList
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth + 1, task.lineType)
-        Next
-
-        labels(2) = CStr(lpList.Count) + " highlighted lines were detected in the current frame. Others were too similar."
-        labels(3) = "There were " + CStr(removeList.Count) + " coincident lines"
-    End Sub
-    Public Sub Close()
-        ld.Dispose()
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Line_RawSorted : Inherits TaskParent
-    Dim ld As cv.XImgProc.FastLineDetector
-    Public lpList As New List(Of lpData)
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
-               "rectangle (provided externally)"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
-
-        Dim lines = ld.Detect(src)
-
-        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
-        For Each v In lines
-            If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
-               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
-                Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
-                Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                If p1.X >= 0 And p1.X < dst2.Width And p1.Y >= 0 And p1.Y < dst2.Height And
-                   p2.X >= 0 And p2.X < dst2.Width And p2.Y >= 0 And p2.Y < dst2.Height Then
-                    Dim lp = New lpData(p1, p2)
-                    sortlines.Add(lp.length, lp)
-                End If
-            End If
-        Next
-
-        lpList.Clear()
-        For Each lp In sortlines.Values
-            lp.p1 = lpData.validatePoint(lp.p1)
-            lp.p2 = lpData.validatePoint(lp.p2)
-            lpList.Add(lp)
-        Next
-
-        If standaloneTest() Then
-            dst2.SetTo(0)
-            For Each lp In lpList
-                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            Next
-        End If
-
-        labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
-    End Sub
-    Public Sub Close()
-        ld.Dispose()
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -246,7 +118,7 @@ Public Class Line_Perpendicular : Inherits TaskParent
     Public output As lpData
     Dim midPoint As cv.Point2f
     Public Sub New()
-        labels = {"", "", "White is the original line, red dot is midpoint, yellow is perpendicular line", ""}
+        labels = {"", "", "White is the line selected for display and yellow is perpendicular line", ""}
         desc = "Find the line perpendicular to the line created by the points provided."
     End Sub
     Public Shared Function computePerp(lp As lpData) As lpData
@@ -335,7 +207,7 @@ Public Class Line_GCloud : Inherits TaskParent
     Public options As New Options_LineFinder
     Dim match As New Match_tCell
     Dim angleSlider As System.Windows.Forms.TrackBar
-    Dim lines As New Line_RawSorted
+    Dim lines As New Line_Raw
     Public Sub New()
         angleSlider = OptionParent.FindSlider("Angle tolerance in degrees")
         labels(2) = "Line_GCloud - Blue are vertical lines using the angle thresholds."
@@ -397,45 +269,6 @@ Public Class Line_GCloud : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Public Class Line_Points : Inherits TaskParent
-    Dim knn As New KNN_Basics
-    Public Sub New()
-        desc = "Display end points of the lines and map them."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lines.dst2
-
-        knn.queries.Clear()
-        For Each lp In task.lines.lpList
-            Dim rect = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
-            dst2.Rectangle(rect, task.highlight, task.lineWidth)
-            knn.queries.Add(lp.center)
-        Next
-
-        Static lastQueries As New List(Of cv.Point2f)(knn.queries)
-        knn.trainInput = lastQueries
-
-
-        knn.Run(emptyMat)
-
-        dst3 = task.lines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        For i = 0 To knn.neighbors.Count - 1
-            Dim p1 = knn.queries(i)
-            Dim p2 = knn.trainInput(knn.neighbors(i)(0))
-            dst3.Line(p1, p2, task.highlight, task.lineWidth + 3, task.lineType)
-        Next
-
-        lastQueries = New List(Of cv.Point2f)(knn.queries)
-    End Sub
-End Class
 
 
 
@@ -648,22 +481,19 @@ Public Class Line_Degrees : Inherits TaskParent
         desc = "Find similar lines using the angle variable."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static degrees As Integer = -90
-
+        Dim degrees = task.gOptions.DebugSlider.Value
         dst2 = src
         Dim count As Integer
         For Each lp In task.lines.lpList
-            If Math.Abs(lp.angle - degrees) <= 1 Then
-                DrawLine(dst2, lp, task.highlight)
+            If Math.Abs(lp.angle - degrees) < 2 Then
+                DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth * 2)
                 count += 1
             Else
-                DrawLine(dst2, lp, black)
+                DrawLine(dst2, lp, task.highlight)
             End If
         Next
 
-        If task.heartBeat Or count = 0 Then degrees += 1
-        If degrees >= 90 Then degrees = -90
-
+        SetTrueText("Use the debug slider to identify which lines to display (value indicates degrees.)")
         labels(2) = CStr(count) + " lines were found with angle " + CStr(degrees) + " degrees"
     End Sub
 End Class
@@ -735,7 +565,7 @@ Public Class Line_Parallel : Inherits TaskParent
     Public Sub New()
         labels(2) = "Yellow lines are the original lines found.  White lines connect the centers of roughly parallel lines."
         labels(3) = "Red lines are those that have no parallel."
-        desc = "Identify lines that are parallel (or nearly so.)"
+        desc = "Identify lines that are parallel (or nearly so), perpendicular, and not parallel."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
@@ -743,9 +573,9 @@ Public Class Line_Parallel : Inherits TaskParent
         Dim usedList As New List(Of Integer)
         For Each lp In task.lines.lpList
             For i = lp.index + 1 To task.lines.lpList.Count - 1
-                If Math.Abs(Math.Abs(lp.angle) - Math.Abs(task.lines.lpList(i).angle)) < 2 Then
+                If Math.Abs(Math.Abs(lp.angle) - task.lines.lpList(i).angle) < 2 Then
                     If usedList.Contains(lp.gridIndex1) = False Then
-                        parallels.Add(Math.Abs(lp.angle), lp.gridIndex1)
+                        parallels.Add(lp.angle, lp.gridIndex1)
                         DrawLine(dst2, lp, task.highlight)
                         usedList.Add(lp.gridIndex1)
                         SetTrueText(CStr(lp.gridIndex1), lp.center)
@@ -753,7 +583,7 @@ Public Class Line_Parallel : Inherits TaskParent
 
                     If usedList.Contains(task.lines.lpList(i).gridIndex1) = False Then
                         DrawLine(dst2, task.lines.lpList(i), task.highlight)
-                        parallels.Add(Math.Abs(task.lines.lpList(i).angle), task.lines.lpList(i).gridIndex1)
+                        parallels.Add(task.lines.lpList(i).angle, task.lines.lpList(i).gridIndex1)
                         'DrawLine(dst2, lp.center, task.lines.lpList(i).center, white)
                         usedList.Add(task.lines.lpList(i).gridIndex1)
                         SetTrueText(CStr(task.lines.lpList(i).gridIndex1), task.lines.lpList(i).center)
