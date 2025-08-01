@@ -83,6 +83,7 @@ Public Class MSER_Detect : Inherits TaskParent
         dst2 = src.Clone
 
         If task.optionsChanged Then
+            If mser IsNot Nothing Then mser.dispose()
             mser = cv.MSER.Create(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                                   options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize)
             mser.Pass2Only = options.pass2Setting
@@ -391,10 +392,10 @@ Public Class MSER_TestExample : Inherits TaskParent
     Public Sub New()
         labels(2) = "Contour regions from MSER"
         labels(3) = "Box regions from MSER"
-        If standalone Then task.gOptions.displaydst1.checked = true
-        desc = "Maximally Stable Extremal Regions example - still image"
+        If standalone Then task.gOptions.displaydst1.checked = True
         image = cv.Cv2.ImRead(task.HomeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         mser = cv.MSER.Create()
+        desc = "Maximally Stable Extremal Regions example - still image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()

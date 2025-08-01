@@ -506,7 +506,7 @@ Public Class Feature_AKaze : Inherits TaskParent
         If src.Channels() <> 1 Then
             src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
-        kaze = cv.AKAZE.Create()
+        If kaze Is Nothing Then kaze = cv.AKAZE.Create()
         Dim kazeDescriptors As New cv.Mat()
         kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
         For i As Integer = 0 To kazeKeyPoints.Length - 1

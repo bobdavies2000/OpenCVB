@@ -12,7 +12,7 @@ Public Class FREAK_Basics : Inherits TaskParent
         orb.Run(src)
         dst1 = orb.dst2
 
-        freak = cv.XFeatures2D.FREAK.Create()
+        If freak Is Nothing Then freak = cv.XFeatures2D.FREAK.Create()
         Dim fdesc = New cv.Mat
         Dim keypoints = orb.keypoints.ToList
         freak.Compute(src.CvtColor(cv.ColorConversionCodes.BGR2Gray), orb.keypoints, fDesc)

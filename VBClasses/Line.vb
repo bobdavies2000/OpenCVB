@@ -733,14 +733,42 @@ End Class
 
 Public Class Line_Parallel : Inherits TaskParent
     Public Sub New()
+        labels(2) = "Yellow lines are the original lines found.  White lines connect the centers of roughly parallel lines."
+        labels(3) = "Red lines are those that have no parallel."
         desc = "Identify lines that are parallel (or nearly so.)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src
+        dst2 = src.Clone
+        Dim parallels As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
+        Dim usedList As New List(Of Integer)
         For Each lp In task.lines.lpList
             For i = lp.index + 1 To task.lines.lpList.Count - 1
-                If Math.Abs(lp.angle - task.lines.lpList(i).angle) < 2 Then DrawLine(dst2, lp, task.highlight)
+                If Math.Abs(Math.Abs(lp.angle) - Math.Abs(task.lines.lpList(i).angle)) < 2 Then
+                    If usedList.Contains(lp.gridIndex1) = False Then
+                        parallels.Add(Math.Abs(lp.angle), lp.gridIndex1)
+                        DrawLine(dst2, lp, task.highlight)
+                        usedList.Add(lp.gridIndex1)
+                        SetTrueText(CStr(lp.gridIndex1), lp.center)
+                    End If
+
+                    If usedList.Contains(task.lines.lpList(i).gridIndex1) = False Then
+                        DrawLine(dst2, task.lines.lpList(i), task.highlight)
+                        parallels.Add(Math.Abs(task.lines.lpList(i).angle), task.lines.lpList(i).gridIndex1)
+                        'DrawLine(dst2, lp.center, task.lines.lpList(i).center, white)
+                        usedList.Add(task.lines.lpList(i).gridIndex1)
+                        SetTrueText(CStr(task.lines.lpList(i).gridIndex1), task.lines.lpList(i).center)
+                    End If
+                End If
             Next
+        Next
+
+        dst3 = src
+        For Each lp In task.lines.lpList
+            If usedList.Contains(lp.gridIndex1) Then
+                DrawLine(dst3, lp, task.highlight)
+            Else
+                DrawLine(dst3, lp.p1, lp.p2, red, task.lineWidth * 3)
+            End If
         Next
     End Sub
 End Class

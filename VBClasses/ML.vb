@@ -1,5 +1,4 @@
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 Imports OpenCvSharp.ML
 Imports cv = OpenCvSharp
 Public Class ML_Basics : Inherits TaskParent
@@ -9,6 +8,15 @@ Public Class ML_Basics : Inherits TaskParent
     Public predictions As New cv.Mat
     Public options As New Options_ML
     Public buildEveryPass As Boolean
+    Dim classifier As Object
+    Dim normalBayes As NormalBayesClassifier
+    Dim knearest As KNearest
+    Dim svm As SVM
+    Dim dtrees As DTrees
+    Dim boost As Boost
+    Dim ann_mlp As ANN_MLP
+    Dim logistic As LogisticRegression
+    Dim rtrees As RTrees
     Public Sub New()
         desc = "Simplify the prep for ML data train and test data and run with ML algorithms."
     End Sub
@@ -32,73 +40,79 @@ Public Class ML_Basics : Inherits TaskParent
         trainMat = cv.Mat.FromPixelData(trainMat.Total, varCount, cv.MatType.CV_32F, trainMat.Data)
         Dim responseMat = cv.Mat.FromPixelData(trainMats(0).Total, 1, cv.MatType.CV_32F, trainResponse.Data)
 
-        Static classifier As Object
         Dim respFormat = cv.MatType.CV_32F
         If task.heartBeat Or buildEveryPass Then
             Select Case options.ML_Name
                 Case "NormalBayesClassifier"
-                    classifier = cv.ML.NormalBayesClassifier.Create()
+                    normalBayes = cv.ML.NormalBayesClassifier.Create()
                     respFormat = cv.MatType.CV_32S
+                    classifier = normalBayes
                 Case "KNearest"
-                    classifier = cv.ML.KNearest.Create()
-                    classifier.DefaultK = 15
-                    classifier.IsClassifier = True
+                    knearest = cv.ML.KNearest.Create()
+                    knearest.DefaultK = 15
+                    knearest.IsClassifier = True
+                    classifier = knearest
                 Case "SVM"
-                    classifier = cv.ML.SVM.Create()
-                    classifier.C = 1
-                    classifier.TermCriteria = cv.TermCriteria.Both(1000, 0.01)
-                    classifier.P = 0
-                    classifier.Nu = 0.5
-                    classifier.Coef0 = 1
-                    classifier.Gamma = 1
-                    classifier.Degree = 0.5
-                    classifier.KernelType = SVM.KernelTypes.Poly
-                    classifier.Type = SVM.Types.CSvc
+                    svm = cv.ML.SVM.Create()
+                    svm.C = 1
+                    svm.TermCriteria = cv.TermCriteria.Both(1000, 0.01)
+                    svm.P = 0
+                    svm.Nu = 0.5
+                    svm.Coef0 = 1
+                    svm.Gamma = 1
+                    svm.Degree = 0.5
+                    svm.KernelType = SVM.KernelTypes.Poly
+                    svm.Type = SVM.Types.CSvc
                     respFormat = cv.MatType.CV_32S
+                    classifier = svm
                 Case "DTrees"
-                    classifier = cv.ML.DTrees.Create()
-                    classifier.CVFolds = 0
-                    classifier.TruncatePrunedTree = False
-                    classifier.UseSurrogates = False
-                    classifier.MinSampleCount = 2
-                    classifier.MaxDepth = 8
-                    classifier.Use1SERule = False
+                    dtrees = cv.ML.DTrees.Create()
+                    dtrees.CVFolds = 0
+                    dtrees.TruncatePrunedTree = False
+                    dtrees.UseSurrogates = False
+                    dtrees.MinSampleCount = 2
+                    dtrees.MaxDepth = 8
+                    dtrees.Use1SERule = False
+                    classifier = dtrees
                 Case "Boost"
-                    classifier = cv.ML.Boost.Create()
+                    boost = cv.ML.Boost.Create()
                     respFormat = cv.MatType.CV_32S
-                    classifier.BoostType = Boost.Types.Discrete
-                    classifier.WeakCount = 100
-                    classifier.WeightTrimRate = 0.95
-                    classifier.MaxDepth = 2
-                    classifier.UseSurrogates = False
-                    classifier.Priors = New cv.Mat()
+                    boost.BoostType = Boost.Types.Discrete
+                    boost.WeakCount = 100
+                    boost.WeightTrimRate = 0.95
+                    boost.MaxDepth = 2
+                    boost.UseSurrogates = False
+                    boost.Priors = New cv.Mat()
+                    classifier = boost
 
                 Case "ANN_MLP" ' artificial neural net with multi-layer perceptron
-                    classifier = cv.ML.ANN_MLP.Create()
+                    ann_mlp = cv.ML.ANN_MLP.Create()
 
                     ' input layer, hidden layer, output layer
-                    classifier.SetLayerSizes(cv.Mat.FromPixelData(1, 3, cv.MatType.CV_32SC1, {varCount, 5, 1}))
+                    ann_mlp.SetLayerSizes(cv.Mat.FromPixelData(1, 3, cv.MatType.CV_32SC1, {varCount, 5, 1}))
 
-                    classifier.SetActivationFunction(cv.ML.ANN_MLP.ActivationFunctions.SigmoidSym, 1, 1)
-                    classifier.TermCriteria = cv.TermCriteria.Both(1000, 0.000001)
-                    classifier.SetTrainMethod(cv.ML.ANN_MLP.TrainingMethods.BackProp, 0.1, 0.1)
+                    ann_mlp.SetActivationFunction(cv.ML.ANN_MLP.ActivationFunctions.SigmoidSym, 1, 1)
+                    ann_mlp.TermCriteria = cv.TermCriteria.Both(1000, 0.000001)
+                    ann_mlp.SetTrainMethod(cv.ML.ANN_MLP.TrainingMethods.BackProp, 0.1, 0.1)
+                    classifier = ann_mlp
                 Case "LogisticRegression"
-                    classifier = cv.ML.LogisticRegression.Create()
+                    If logistic Is Nothing Then logistic = cv.ML.LogisticRegression.Create()
+                    classifier = logistic
                 Case Else
-                    classifier = cv.ML.RTrees.Create()
-                    classifier.MinSampleCount = 2
-                    classifier.MaxDepth = 4
-                    classifier.RegressionAccuracy = 0.0
-                    classifier.UseSurrogates = False
-                    classifier.MaxCategories = 16
-                    classifier.Priors = New cv.Mat
-                    classifier.CalculateVarImportance = False
-                    classifier.ActiveVarCount = varCount
-                    classifier.TermCriteria = cv.TermCriteria.Both(5, 0)
+                    If rtrees Is Nothing Then rtrees = cv.ML.RTrees.Create()
+                    rtrees.MinSampleCount = 2
+                    rtrees.MaxDepth = 4
+                    rtrees.RegressionAccuracy = 0.0
+                    rtrees.UseSurrogates = False
+                    rtrees.MaxCategories = 16
+                    rtrees.Priors = New cv.Mat
+                    rtrees.CalculateVarImportance = False
+                    rtrees.ActiveVarCount = varCount
+                    rtrees.TermCriteria = cv.TermCriteria.Both(5, 0)
+                    classifier = rtrees
             End Select
 
             If responseMat.Type <> respFormat Then responseMat.ConvertTo(responseMat, respFormat)
-
             classifier.Train(trainMat, cv.ML.SampleTypes.RowSample, responseMat)
         End If
         Dim testMat As New cv.Mat
@@ -110,8 +124,16 @@ Public Class ML_Basics : Inherits TaskParent
         If predictions.Type <> cv.MatType.CV_32F Then
             predictions.ConvertTo(predictions, cv.MatType.CV_32F)
         End If
-        Dim test = cv.ML.ANN_MLP.Create
-        classifier.Dispose
+    End Sub
+    Public Sub close()
+        If normalBayes IsNot Nothing Then normalBayes.Dispose()
+        If knearest IsNot Nothing Then knearest.Dispose()
+        If svm IsNot Nothing Then svm.Dispose()
+        If dtrees IsNot Nothing Then dtrees.Dispose()
+        If boost IsNot Nothing Then boost.Dispose()
+        If ann_mlp IsNot Nothing Then ann_mlp.Dispose()
+        If logistic IsNot Nothing Then logistic.Dispose()
+        If rtrees IsNot Nothing Then rtrees.Dispose()
     End Sub
 End Class
 
