@@ -23,7 +23,7 @@ Public Class Gravity_Basics : Inherits TaskParent
         Static lastLongest = task.lineLongest
         If task.lineLongest.length <> lastLongest.length Or task.lineGravity.length = 0 Or task.frameCount < 5 Then
             task.lineGravity = task.gravityIMU
-            task.lineHorizon = Line_Perpendicular.computePerp(task.lineGravity)
+            task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
             lastLongest = task.lineLongest
         End If
         If standaloneTest() Then
@@ -116,7 +116,7 @@ Public Class Gravity_BasicsKalman : Inherits TaskParent
         task.lineGravity = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
                                      New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3)))
 
-        task.lineHorizon = Line_Perpendicular.computePerp(task.lineGravity)
+        task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
 
         If standaloneTest() Then
             dst2.SetTo(0)
@@ -262,7 +262,7 @@ Public Class Gravity_BasicsOld : Inherits TaskParent
             If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
         End If
 
-        task.lineHorizon = Line_Perpendicular.computePerp(task.lineGravity)
+        task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
         SetTrueText(strOut, 3)
     End Sub
 End Class

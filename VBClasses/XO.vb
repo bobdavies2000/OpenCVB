@@ -164,7 +164,7 @@ End Class
 
 
 Public Class XO_Horizon_Perpendicular : Inherits TaskParent
-    Dim perp As New Line_Perpendicular
+    Dim perp As New Line_PerpendicularTest
     Public Sub New()
         labels(2) = "Yellow line is the perpendicular to the horizon.  White is gravity vector from the IMU."
         desc = "Find the gravity vector using the perpendicular to the horizon."
@@ -397,7 +397,7 @@ Public Class XO_Gravity_Basics : Inherits TaskParent
             If standaloneTest() Then displayResults(p1, p2)
         End If
 
-        task.lineHorizon = Line_Perpendicular.computePerp(task.lineGravity)
+        task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -5934,7 +5934,7 @@ Public Class XO_Gravity_Basics1 : Inherits TaskParent
             If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
         End If
 
-        task.lineHorizon = Line_Perpendicular.computePerp(task.lineGravity)
+        task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
 
         gravityRGB = RGBcandidate
 
@@ -6744,8 +6744,8 @@ Public Class XO_FPoly_Perpendiculars : Inherits TaskParent
             Exit Sub
         End If
 
-        Static perp1 As New Line_Perpendicular
-        Static perp2 As New Line_Perpendicular
+        Static perp1 As New Line_PerpendicularTest
+        Static perp2 As New Line_PerpendicularTest
 
         dst2.SetTo(0)
         perp1.input = New lpData(fPD.currPoly(fPD.polyPrevSideIndex),

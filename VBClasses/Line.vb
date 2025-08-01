@@ -113,7 +113,7 @@ End Class
 
 
 
-Public Class Line_Perpendicular : Inherits TaskParent
+Public Class Line_PerpendicularTest : Inherits TaskParent
     Public input As lpData
     Public output As lpData
     Dim midPoint As cv.Point2f
@@ -424,7 +424,7 @@ Public Class Line_TraceCenter : Inherits TaskParent
         End If
 
         Static lpLast = New lpData(task.lineLongest.ep1, task.lineLongest.ep2)
-        Dim linePerp = Line_Perpendicular.computePerp(task.lineLongest)
+        Dim linePerp = Line_PerpendicularTest.computePerp(task.lineLongest)
 
         dst2 = src
         DrawLine(dst2, lpLast, white)
@@ -562,79 +562,58 @@ End Class
 
 
 Public Class Line_Parallel : Inherits TaskParent
-    Public parallels As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
+    Public classes() As List(Of Integer) ' groups of lines that are parallel
+    Public unParallel As New List(Of Integer) ' lines which are not parallel
     Public Sub New()
-        labels(2) = "Yellow lines are the original lines found.  White lines connect the centers of roughly parallel lines."
-        labels(3) = "Red lines are those that have no parallel."
+        labels(2) = "Text shows the parallel class with 0 being unparallel."
         desc = "Identify lines that are parallel (or nearly so), perpendicular, and not parallel."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        Dim usedList As New List(Of Integer)
-        parallels.Clear()
+        Dim parallels As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
         For Each lp In task.lines.lpList
-            For i = lp.index + 1 To task.lines.lpList.Count - 1
-                If Math.Abs(Math.Abs(lp.angle) - task.lines.lpList(i).angle) < 2 Then
-                    If usedList.Contains(lp.gridIndex1) = False Then
-                        parallels.Add(lp.angle, lp.index)
-                        DrawLine(dst2, lp, task.highlight)
-                        usedList.Add(lp.gridIndex1)
-                        SetTrueText(CStr(lp.gridIndex1), lp.center)
-                    End If
-
-                    If usedList.Contains(task.lines.lpList(i).gridIndex1) = False Then
-                        DrawLine(dst2, task.lines.lpList(i), task.highlight)
-                        parallels.Add(task.lines.lpList(i).angle, task.lines.lpList(i).index)
-                        'DrawLine(dst2, lp.center, task.lines.lpList(i).center, white)
-                        usedList.Add(task.lines.lpList(i).gridIndex1)
-                        SetTrueText(CStr(task.lines.lpList(i).gridIndex1), task.lines.lpList(i).center)
-                    End If
-                End If
-            Next
+            parallels.Add(lp.angle, lp.index)
         Next
 
-        dst3 = src
-        For Each lp In task.lines.lpList
-            If usedList.Contains(lp.gridIndex1) Then
-                DrawLine(dst3, lp, task.highlight)
-            Else
-                DrawLine(dst3, lp.p1, lp.p2, red, task.lineWidth * 3)
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Line_ParallelClasses : Inherits TaskParent
-    Dim lines As New Line_Parallel
-    Public Sub New()
-        labels(2) = "Narrow lines are not parallel/perpendicular.  Text shows the group ID of parallel lines."
-        desc = "Identify groups of lines that are parallel."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-
-        Dim colorIndex As Integer = 1, j As Integer
-        dst2 = src
-        For i = 0 To lines.parallels.Count - 1
-            Dim lp1 = task.lines.lpList(lines.parallels.ElementAt(i).Value)
-            dst2.Line(lp1.p1, lp1.p2, task.scalarColors(colorIndex), task.lineWidth * 2, task.lineType)
-            SetTrueText(CStr(colorIndex), lp1.center)
-            For j = i + 1 To lines.parallels.Count - 1
-                Dim lp2 = task.lines.lpList(lines.parallels.ElementAt(j).Value)
+        ReDim classes(task.lines.lpList.Count - 1)
+        Dim index As Integer, j As Integer
+        unParallel.Clear()
+        For i = 0 To parallels.Count - 1
+            Dim lp1 = task.lines.lpList(parallels.ElementAt(i).Value)
+            For j = i + 1 To parallels.Count - 1
+                Dim lp2 = task.lines.lpList(parallels.ElementAt(j).Value)
                 If Math.Abs(lp1.angle - lp2.angle) < 2 Then
-                    dst2.Line(lp2.p1, lp2.p2, task.scalarColors(colorIndex), task.lineWidth * 2, task.lineType)
-                    SetTrueText(CStr(colorIndex), lp2.center)
+                    If classes(index) Is Nothing Then classes(index) = New List(Of Integer)({lp1.index})
+                    classes(index).Add(lp2.index)
                 Else
-                    colorIndex += 1
                     Exit For
                 End If
             Next
+            If classes(index) Is Nothing Then unParallel.Add(lp1.index)
+            If j > i + 1 Then index += 1
             i = j - 1
         Next
+
+        dst2 = src
+        Dim colorIndex As Integer = 1
+        For i = 0 To classes.Count - 1
+            If classes(i) Is Nothing Then Exit For
+            For j = 0 To classes(i).Count - 1
+                Dim lp = task.lines.lpList(classes(i).ElementAt(j))
+                dst2.Line(lp.p1, lp.p2, task.scalarColors(colorIndex), task.lineWidth * 2, task.lineType)
+                SetTrueText(CStr(colorIndex), lp.center)
+            Next
+            colorIndex += 1
+        Next
+
+        For Each index In unParallel
+            Dim lp = task.lines.lpList(index)
+            DrawLine(dst2, lp)
+            SetTrueText("0", lp.center)
+        Next
+
+        dst3 = task.lines.dst2
+        labels(3) = task.lines.labels(2)
     End Sub
 End Class
+
