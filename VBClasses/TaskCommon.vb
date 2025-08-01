@@ -623,7 +623,6 @@ Public Class lpData
     Public length As Single
     Public rect As cv.Rect
     Public roRect As cv.RotatedRect
-    Public vertical As Boolean ' false = < 45 degrees
     Public slope As Single
     Public angle As Single ' varies from -90 to 90 degrees
     Public center As cv.Point2f
@@ -692,12 +691,7 @@ Public Class lpData
 
         length = p1.DistanceTo(p2)
 
-        vertical = True
-        If Math.Abs(p1.X - p2.X) <= 2 Then
-            slope = 100000 ' a big number for slope 
-        Else
-            If Math.Abs(p1.X - p2.X) > Math.Abs(p1.Y - p2.Y) Then vertical = False
-        End If
+        If Math.Abs(p1.X - p2.X) < 2 Then slope = 100000 ' a big number for slope 
 
         gridIndex1 = task.grid.gridMap.Get(Of Single)(p1.Y, p1.X)
         gridIndex2 = task.grid.gridMap.Get(Of Single)(p2.Y, p2.X)

@@ -8836,7 +8836,7 @@ Public Class XO_Line_GravityToLongest : Inherits TaskParent
 
         matchLine.lpInput = Nothing
         For Each lp In task.lines.rawLines.lpList
-            If lp.vertical Then
+            If Math.Abs(lp.angle) > 45 Then
                 matchLine.lpInput = lp
                 Exit For
             End If
@@ -8871,7 +8871,7 @@ Public Class XO_Line_GravityToAverage : Inherits TaskParent
         Dim deltaList As New List(Of Single)
         vertList.Clear()
         For Each lp In task.lines.rawLines.lpList
-            If lp.vertical And Math.Sign(task.lineGravity.slope) = Math.Sign(lp.slope) Then
+            If Math.Abs(lp.angle) > 45 And Math.Sign(task.lineGravity.slope) = Math.Sign(lp.slope) Then
                 Dim delta = lp.ep1.X - lp.ep2.X
                 If Math.Abs(gravityDelta - delta) < task.gravityBasics.options.pixelThreshold Then
                     deltaList.Add(delta)
