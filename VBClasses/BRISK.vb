@@ -7,7 +7,7 @@ Public Class BRISK_Basics : Inherits TaskParent
         brisk = cv.BRISK.Create()
         desc = "Detect features with BRISK"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         src.CopyTo(dst2)
@@ -22,5 +22,8 @@ Public Class BRISK_Basics : Inherits TaskParent
             End If
         Next
         labels(2) = CStr(features.Count) + " features found with BRISK"
+    End Sub
+    Public Sub Close()
+        brisk.Dispose()
     End Sub
 End Class

@@ -12,7 +12,7 @@ Public Class SuperRes_Basics : Inherits TaskParent
         labels(3) = "SuperRes output"
         desc = "Create superres version of the video input"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If warningMessage > 0 Then
             SetTrueText("The first frame takes a while when iterations are over 50 or so")
             warningMessage -= 1
@@ -54,6 +54,9 @@ Public Class SuperRes_Basics : Inherits TaskParent
             dst3 = dst2.Clone
             optFlow = Nothing ' start over...
         End If
+    End Sub
+    Public Sub Close()
+        If optFlow IsNot Nothing Then optFlow.Dispose()
     End Sub
 End Class
 

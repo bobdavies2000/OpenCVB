@@ -95,34 +95,6 @@ End Class
 
 
 
-Public Class BackProject_FullLines : Inherits TaskParent
-    Dim backP As New BackProject_DisplayColor
-    Dim lines As New Line_RawSorted
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        labels = {"", "", "Lines found in the back projection", "Backprojection results"}
-        desc = "Find lines in the back projection"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        backP.Run(src)
-
-        lines.Run(backP.dst2)
-        labels(2) = lines.labels(2)
-        dst2 = src
-        dst3.SetTo(0)
-        For Each lp In lines.lpList
-            DrawLine(dst2, lp.p1, lp.p2, task.highlight)
-            DrawLine(dst3, lp.p1, lp.p2, 255)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class BackProject_PointCloud : Inherits TaskParent
@@ -483,7 +455,7 @@ End Class
 
 Public Class BackProject_MaskLines : Inherits TaskParent
     Dim masks As New BackProject_Masks
-    Dim lines As New Line_RawSorted
+    Dim lines As New Line_Raw
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

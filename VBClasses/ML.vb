@@ -1,6 +1,7 @@
-Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Imports OpenCvSharp.ML
+Imports cv = OpenCvSharp
 Public Class ML_Basics : Inherits TaskParent
     Public trainMats() As cv.Mat ' all entries are 32FCx
     Public trainResponse As cv.Mat ' 32FC1 format
@@ -11,7 +12,7 @@ Public Class ML_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Simplify the prep for ML data train and test data and run with ML algorithms."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             SetTrueText("ML_BasicsRTree has no output when run standalone." + vbCrLf + "Use LowResOld_Depth to test.")
             Exit Sub
@@ -120,12 +121,13 @@ End Class
 
 
 Public Class ML_BasicsOld : Inherits TaskParent
+    Dim rtree As RTrees
     Public Sub New()
         If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "depth32f - 32fc3 format with missing depth filled with predicted depth based on color (brighter is farther)", "", "Color used for roi prediction"}
         desc = "Predict depth from color to fill in the depth shadow areas"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim noDepthCount(task.gridRects.Count - 1) As Integer
         Dim roiColor(task.gridRects.Count - 1) As cv.Vec3b
 
@@ -138,7 +140,7 @@ Public Class ML_BasicsOld : Inherits TaskParent
             noDepthCount(i) = task.noDepthMask(roi).CountNonZero
         End Sub)
 
-        Dim rtree = cv.ML.RTrees.Create()
+        If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
         Dim mlInput As New List(Of mlData)
         Dim mResponse As New List(Of Single)
         For i = 0 To task.gridRects.Count - 1
@@ -201,6 +203,9 @@ Public Class ML_BasicsOld : Inherits TaskParent
 
         labels(2) = CStr(task.gridRects.Count) + " regions with " + CStr(mlInput.Count) + " used for learning and " + CStr(predictList.Count) + " were predicted"
     End Sub
+    Public Sub Close()
+        If rtree IsNot Nothing Then rtree.Dispose()
+    End Sub
 End Class
 
 
@@ -213,12 +218,13 @@ Public Class ML_DepthFromColor : Inherits TaskParent
     Dim colorPal As New DepthColorizer_Basics
     Dim mats As New Mat_4Click
     Dim resizer As New Resize_Smaller
+    Dim rtree As RTrees
     Public Sub New()
        OptionParent.FindSlider("LowRes %").Value = 2 ' 2% of the image.
         labels(3) = "Click any quadrant at left to view it below"
         desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         mats.mat(1) = task.noDepthMask.Clone
 
         Dim color32f As New cv.Mat
@@ -247,7 +253,7 @@ Public Class ML_DepthFromColor : Inherits TaskParent
         Dim depthResponse = depth.Reshape(1, depth.Total)
 
         ' now learn what depths are associated with which colors.
-        Dim rtree = cv.ML.RTrees.Create()
+        If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
         rtree.Train(learnInput, cv.ML.SampleTypes.RowSample, depthResponse)
 
         src.ConvertTo(color32f, cv.MatType.CV_32FC3)
@@ -264,6 +270,9 @@ Public Class ML_DepthFromColor : Inherits TaskParent
         labels(2) = "prediction, shadow, Depth Mask < " + CStr(task.MaxZmeters) + ", Learn Input"
         dst3 = mats.dst3
     End Sub
+    Public Sub Close()
+        If rtree IsNot Nothing Then rtree.Dispose()
+    End Sub
 End Class
 
 
@@ -272,12 +281,13 @@ Public Class ML_DepthFromXYColor : Inherits TaskParent
     Dim mats As New Mat_4to1
     Dim resizer As New Resize_Smaller
     Dim colorizer As New DepthColorizer_CPP
+    Dim rtree As RTrees
     Public Sub New()
         labels(2) = "Predicted Depth"
-       OptionParent.FindSlider("LowRes %").Value = 2 ' 2% of the image.
+        OptionParent.FindSlider("LowRes %").Value = 2 ' 2% of the image.
         ' desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         mats.mat(0) = task.noDepthMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat
@@ -317,7 +327,7 @@ Public Class ML_DepthFromXYColor : Inherits TaskParent
         Next
 
         ' Now learn what depths are associated with which colors.
-        Dim rtree = cv.ML.RTrees.Create()
+        If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
         rtree.Train(learnInput, cv.ML.SampleTypes.RowSample, depthResponse)
 
         src.ConvertTo(color32f, cv.MatType.CV_32FC3)
@@ -341,6 +351,9 @@ Public Class ML_DepthFromXYColor : Inherits TaskParent
         dst3 = mats.dst2
         labels(3) = "shadow, empty, Depth Mask < " + CStr(task.MaxZmeters) + ", Learn Input"
     End Sub
+    Public Sub Close()
+        If rtree IsNot Nothing Then rtree.Dispose()
+    End Sub
 End Class
 
 
@@ -358,6 +371,7 @@ End Structure
 Public Class ML_Color2Depth : Inherits TaskParent
     Dim minMax As New Grid_MinMaxDepth
     Dim color8U As New Color8U_Basics
+    Dim rtree As RTrees
     Public Sub New()
         task.gOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
@@ -367,7 +381,7 @@ Public Class ML_Color2Depth : Inherits TaskParent
         dst2 = color8U.dst3
         labels(2) = "Output of Color8U_Basics running " + task.gOptions.ColorSource.Text
 
-        Dim rtree = cv.ML.RTrees.Create()
+        If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
         Dim mlInput As New List(Of mlColor)
         Dim mResponse As New List(Of Single)
         Dim predictList As New List(Of mlColor)
@@ -410,6 +424,9 @@ Public Class ML_Color2Depth : Inherits TaskParent
         Next
 
     End Sub
+    Public Sub Close()
+        If rtree IsNot Nothing Then rtree.Dispose()
+    End Sub
 End Class
 
 
@@ -428,6 +445,7 @@ End Structure
 
 Public Class ML_ColorInTier2Depth : Inherits TaskParent
     Dim color8U As New Color8U_Basics
+    Dim rtree As RTrees
     Public Sub New()
         task.gOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
@@ -437,7 +455,7 @@ Public Class ML_ColorInTier2Depth : Inherits TaskParent
         dst2 = color8U.dst3
         labels(2) = "Output of Color8U_Basics running " + task.gOptions.ColorSource.Text
 
-        Dim rtree = cv.ML.RTrees.Create()
+        If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
         Dim mlInput As New List(Of mlColorInTier)
         Dim mResponse As New List(Of Single)
         Dim predictList As New List(Of mlColorInTier)
@@ -478,7 +496,9 @@ Public Class ML_ColorInTier2Depth : Inherits TaskParent
             Dim depth = output.Get(Of Single)(i, 0)
             dst3(roi).SetTo(depth, task.noDepthMask(roi))
         Next
-
+    End Sub
+    Public Sub Close()
+        If rtree IsNot Nothing Then rtree.Dispose()
     End Sub
 End Class
 
@@ -491,10 +511,11 @@ End Class
 
 Public Class ML_LearnZfromXGray : Inherits TaskParent
     Dim regions As New GuidedBP_Regions
+    Dim rtree As RTrees
     Public Sub New()
         desc = "This runs and is helpful to understanding how to use rtree.  Learn Z from X, Y, and grayscale of the RedCloud cells."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) ' input to ML
 
         regions.Run(src)
@@ -515,7 +536,7 @@ Public Class ML_LearnZfromXGray : Inherits TaskParent
             Next
         Next
 
-        Dim rtree = cv.ML.RTrees.Create()
+        If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
         Dim mLearn As cv.Mat = cv.Mat.FromPixelData(mlInput.Count, 3, cv.MatType.CV_32F, mlInput.ToArray)
         Dim response As cv.Mat = cv.Mat.FromPixelData(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
         rtree.Train(mLearn, cv.ML.SampleTypes.RowSample, response)
@@ -523,6 +544,9 @@ Public Class ML_LearnZfromXGray : Inherits TaskParent
         Dim predMat = cv.Mat.FromPixelData(ptList.Count, 3, cv.MatType.CV_32F, ptList.ToArray)
         Dim output = New cv.Mat(ptList.Count, 1, cv.MatType.CV_32FC1, cv.Scalar.All(0))
         rtree.Predict(predMat, output)
+    End Sub
+    Public Sub Close()
+        If rtree IsNot Nothing Then rtree.Dispose()
     End Sub
 End Class
 
@@ -535,6 +559,7 @@ End Class
 Public Class ML_LearnRegions : Inherits TaskParent
     Dim regions As New GuidedBP_Regions
     Dim color8U As New Color8U_Basics
+    Dim rtree As RTrees
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Entire image after ML", "ML Predictions where no region was defined."}
@@ -566,7 +591,7 @@ Public Class ML_LearnRegions : Inherits TaskParent
             Next
         Next
 
-        Dim rtree = cv.ML.RTrees.Create()
+        If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
         Dim mLearn As cv.Mat = cv.Mat.FromPixelData(mlInput.Count, 3, cv.MatType.CV_32F, mlInput.ToArray)
         Dim response As cv.Mat = cv.Mat.FromPixelData(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
         rtree.Train(mLearn, cv.ML.SampleTypes.RowSample, response)
@@ -587,6 +612,9 @@ Public Class ML_LearnRegions : Inherits TaskParent
                 dst3.Set(Of cv.Vec3b)(pt.Y, pt.X, color)
             End If
         Next
+    End Sub
+    Public Sub Close()
+        If rtree IsNot Nothing Then rtree.Dispose()
     End Sub
 End Class
 

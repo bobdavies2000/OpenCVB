@@ -10,7 +10,7 @@ Public Class SVM_Basics : Inherits TaskParent
         If standalone Then task.gOptions.GridSlider.Value = 8
         labels = {"", "", "SVM_Basics input data", "Results - white line is ground truth"}
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run() ' update any options specified in the interface.
 
         If standaloneTest() Then
@@ -24,7 +24,10 @@ Public Class SVM_Basics : Inherits TaskParent
         Dim resMat = cv.Mat.FromPixelData(options.sampleCount, 1, cv.MatType.CV_32SC1, response.ToArray)
         dataMat *= 1 / src.Height
 
-        If task.optionsChanged Then svm = options.createSVM()
+        If task.optionsChanged Then
+            If svm IsNot Nothing Then svm.Dispose()
+            svm = options.createSVM()
+        End If
         svm.Train(dataMat, cv.ML.SampleTypes.RowSample, resMat)
 
         dst3.SetTo(0)
@@ -46,6 +49,9 @@ Public Class SVM_Basics : Inherits TaskParent
                 DrawLine(dst3, New cv.Point2f(x - 1, y1), New cv.Point2f(x, y2), white)
             Next
         End If
+    End Sub
+    Public Sub Close()
+        If svm IsNot Nothing Then svm.Dispose()
     End Sub
 End Class
 
@@ -103,7 +109,7 @@ Public Class SVM_TestCase : Inherits TaskParent
         labels = {"", "", "Input points - color is the category label", "Predictions"}
         desc = "Text book example on SVM"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         dst2.SetTo(white)
@@ -124,7 +130,10 @@ Public Class SVM_TestCase : Inherits TaskParent
         Dim labelsMat = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32SC1, responses.ToArray)
         Dim dataMat = trainMat * 1 / src.Height
 
-        If task.optionsChanged Then svm = options.createSVM()
+        If task.optionsChanged Then
+            If svm IsNot Nothing Then svm.Dispose()
+            svm = options.createSVM()
+        End If
         svm.Train(dataMat, cv.ML.SampleTypes.RowSample, labelsMat)
 
         Dim sampleMat As New cv.Mat(1, 2, cv.MatType.CV_32F)
@@ -134,16 +143,19 @@ Public Class SVM_TestCase : Inherits TaskParent
                 sampleMat.Set(Of Single)(0, 1, y / src.Height)
                 Dim response = svm.Predict(sampleMat)
                 Dim color = If(response >= 0, cv.Scalar.Blue, cv.Scalar.Red)
-                DrawCircle(dst3,New cv.Point(CInt(x), CInt(y)), task.DotSize + 1, color)
+                DrawCircle(dst3, New cv.Point(CInt(x), CInt(y)), task.DotSize + 1, color)
             Next
         Next
 
         For i = 0 To trainMat.Rows - 1
             Dim color = If(labelsMat.Get(Of Integer)(i) = 1, cv.Scalar.Blue, cv.Scalar.Red)
             Dim pt = New cv.Point(trainMat.Get(Of Single)(i, 0), trainMat.Get(Of Single)(i, 1))
-            DrawCircle(dst2,pt, task.DotSize + 2, color)
-            DrawCircle(dst3,pt, task.DotSize + 2, color)
+            DrawCircle(dst2, pt, task.DotSize + 2, color)
+            DrawCircle(dst3, pt, task.DotSize + 2, color)
         Next
+    End Sub
+    Public Sub Close()
+        If svm IsNot Nothing Then svm.Dispose()
     End Sub
 End Class
 

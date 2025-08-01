@@ -98,6 +98,9 @@ Public Class Classifier_Bayesian : Inherits TaskParent
         dst2 = ShowPalette(dst0)
         imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize)
     End Sub
+    Public Sub Close()
+        OEX_Points_Classifier_Close(cPtr)
+    End Sub
 End Class
 
 

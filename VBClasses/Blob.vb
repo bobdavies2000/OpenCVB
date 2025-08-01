@@ -1,15 +1,15 @@
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Blob_Basics : Inherits TaskParent
     Dim options As Options_Blob
     Dim input As Blob_Input
-
+    Dim simpleBlob As SimpleBlobDetector
     Public Sub New()
         options = New Options_Blob
         input = New Blob_Input
         desc = "Isolate and list blobs with specified options"
     End Sub
-
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         If standaloneTest() Then
@@ -22,7 +22,9 @@ Public Class Blob_Basics : Inherits TaskParent
         Dim binaryImage = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.Threshold(binaryImage, binaryImage, thresh:=0, maxval:=255, type:=cv.ThresholdTypes.Binary)
 
-        Dim simpleBlob = cv.SimpleBlobDetector.Create(CType(options.blobParams, cv.SimpleBlobDetector.Params))
+        If simpleBlob Is Nothing Then
+            simpleBlob = cv.SimpleBlobDetector.Create(CType(options.blobParams, cv.SimpleBlobDetector.Params))
+        End If
         Dim keypoint = simpleBlob.Detect(dst2)
 
         cv.Cv2.DrawKeypoints(image:=binaryImage,
@@ -30,6 +32,9 @@ Public Class Blob_Basics : Inherits TaskParent
                               outImage:=dst3,
                               color:=cv.Scalar.FromRgb(255, 0, 0),
                               flags:=cv.DrawMatchesFlags.DrawRichKeypoints)
+    End Sub
+    Public Sub Close()
+        If simpleBlob IsNot Nothing Then simpleBlob.Dispose()
     End Sub
 End Class
 
@@ -46,7 +51,7 @@ Public Class Blob_Input : Inherits TaskParent
     Public Mats As New Mat_4Click
     Public updateFrequency = 30
     Public Sub New()
-       OptionParent.FindSlider("DrawCount").Value = 5
+        OptionParent.FindSlider("DrawCount").Value = 5
         OptionParent.FindCheckBox("Draw filled (unchecked draw an outline)").Checked = True
 
         Mats.mats.lineSeparators = False
@@ -83,7 +88,7 @@ Public Class Blob_RenderBlobs : Inherits TaskParent
         labels(3) = "Largest blob, centroid in yellow"
         desc = "Use connected components to find blobs."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If task.frameCount Mod input.updateFrequency = 0 Then
             input.Run(src)
             dst2 = input.dst2

@@ -22,6 +22,7 @@ Public Class PhotoShop_Clahe : Inherits TaskParent
         claheObj.TilesGridSize() = New cv.Size(CInt(gridSlider.Value), CInt(gridSlider.Value))
         claheObj.ClipLimit = clipSlider.Value
         claheObj.Apply(src, dst3)
+        claheObj.Dispose()
     End Sub
 End Class
 

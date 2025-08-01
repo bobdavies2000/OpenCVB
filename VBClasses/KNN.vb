@@ -1,6 +1,7 @@
-Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
+Imports OpenCvSharp.XFeatures2D
+Imports cv = OpenCvSharp
 Public Class KNN_Basics : Inherits TaskParent
     Public knn2 As New KNN_N2Basics
     Public trainInput As New List(Of cv.Point2f)
@@ -125,6 +126,9 @@ Public Class KNN_N2Basics : Inherits TaskParent
         Next
         If standaloneTest() Then displayResults()
     End Sub
+    Public Sub Close()
+        If knn IsNot Nothing Then knn.Dispose()
+    End Sub
 End Class
 
 
@@ -218,6 +222,9 @@ Public Class KNN_N3Basics : Inherits TaskParent
             Next
         Next
     End Sub
+    Public Sub Close()
+        If knn IsNot Nothing Then knn.Dispose()
+    End Sub
 End Class
 
 
@@ -266,6 +273,9 @@ Public Class KNN_N4Basics : Inherits TaskParent
                 If test < nData.Length And test >= 0 Then result(i, j) = CInt(nData(i * dm + j))
             Next
         Next
+    End Sub
+    Public Sub Close()
+        If knn IsNot Nothing Then knn.Dispose()
     End Sub
 End Class
 
@@ -836,6 +846,9 @@ Public Class KNN_NNBasics : Inherits TaskParent
             Next
         Next
     End Sub
+    Public Sub Close()
+        If knn IsNot Nothing Then knn.Dispose()
+    End Sub
 End Class
 
 
@@ -891,6 +904,9 @@ Public Class KNN_NNearest : Inherits TaskParent
                 If test < trainData.Rows And test >= 0 Then result(i, j) = neighbors.Get(Of Single)(i, j)
             Next
         Next
+    End Sub
+    Public Sub Close()
+        If knn IsNot Nothing Then knn.Dispose()
     End Sub
 End Class
 
@@ -1144,92 +1160,3 @@ Public Class KNN_EdgePoints : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class KNN_LongestLine : Inherits TaskParent
-    Public lp As lpData
-    Dim knn As New KNN_NNBasics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        OptionParent.FindSlider("KNN Dimension").Value = 6
-        desc = "Track the longest line"
-    End Sub
-    Private Sub prepEntry(knnList As List(Of Single), lpNext As lpData)
-        Dim brick1 = task.grid.gridMap.Get(Of Single)(lpNext.p1.Y, lpNext.p1.X)
-        Dim brick2 = task.grid.gridMap.Get(Of Single)(lpNext.p2.Y, lpNext.p2.X)
-        knnList.Add(lpNext.p1.X)
-        knnList.Add(lpNext.p1.Y)
-        knnList.Add(lpNext.p2.X)
-        knnList.Add(lpNext.p2.Y)
-        knnList.Add(brick1)
-        knnList.Add(brick2)
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lplist = task.lines.lpList
-        If lplist.Count = 0 Then Exit Sub
-
-        If standalone And task.heartBeatLT Then lp = lplist(0)
-
-        knn.trainInput.Clear()
-        For Each lpNext In lplist
-            prepEntry(knn.trainInput, lpNext)
-        Next
-
-        knn.queries.Clear()
-        prepEntry(knn.queries, lp)
-
-        knn.Run(emptyMat)
-
-        lp = lplist(knn.result(0, 0))
-        dst2 = src
-        dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
-
-        dst3 = task.lines.dst3
-        labels(3) = task.lines.labels(3)
-        labels(2) = "Found line with age = " + CStr(lp.age)
-
-        dst1 = ShowPaletteNoZero(task.lines.lpRectMap)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class KNN_BoundingRect : Inherits TaskParent
-    Public lp As lpData
-    Dim rawlines As New Line_Raw
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Find the line with the largest bounding rectangle."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lplist = task.lines.lpList
-        If lplist.Count = 0 Then Exit Sub
-
-        If standalone And task.heartBeatLT Then
-            Dim sortRects As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-            For Each lpNext In lplist
-                sortRects.Add(lpNext.rect.Width * lpNext.rect.Height, lpNext.index)
-            Next
-            lp = lplist(sortRects.ElementAt(0).Value)
-        End If
-
-        dst1 = ShowPaletteNoZero(task.lines.lpRectMap)
-        DrawCircle(dst1, lp.center)
-
-        Dim index = task.lines.lpRectMap.Get(Of Byte)(lp.center.Y, lp.center.X)
-        If index > 0 Then lp = lplist(index - 1)
-        dst2 = src
-        dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
-
-        dst3 = task.lines.dst3
-        labels(3) = task.lines.labels(3)
-        labels(2) = "Found largest bounding rect with age = " + CStr(lp.age)
-    End Sub
-End Class

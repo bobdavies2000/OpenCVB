@@ -1,5 +1,6 @@
-Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports Microsoft.VisualBasic.Logging
+Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
 Public Class EMax_Basics : Inherits TaskParent
@@ -160,10 +161,11 @@ Public Class EMax_VB_Failing : Inherits TaskParent
     Public eSamples As New List(Of cv.Point2f)
     Public dimension = 2 ' point2f for the basics...
     Public regionCount As Integer
+    Dim em_model As cv.EM
     Public Sub New()
         desc = "OpenCV expectation maximization example."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         emaxInput.Run(src)
         eLabels = New List(Of Integer)(emaxInput.eLabels.ToList)
         eSamples = New List(Of cv.Point2f)(emaxInput.eSamples)
@@ -173,7 +175,7 @@ Public Class EMax_VB_Failing : Inherits TaskParent
 
         Exit Sub ' comment this line to see the bug in the VB.Net version of this Predict2 below.  Any answers would be gratefully received.
 
-        Dim em_model = cv.EM.Create()
+        If em_model Is Nothing Then em_model = cv.EM.Create()
         em_model.ClustersNumber = regionCount
         em_model.CovarianceMatrixType = cv.EMTypes.CovMatSpherical
         em_model.TermCriteria = New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 300, 1.0)
@@ -194,6 +196,9 @@ Public Class EMax_VB_Failing : Inherits TaskParent
                 DrawCircle(dst2, New cv.Point(j, i), task.DotSize, c)
             Next
         Next
+    End Sub
+    Public Sub Close()
+        If em_model IsNot Nothing Then em_model.Dispose()
     End Sub
 End Class
 

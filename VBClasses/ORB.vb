@@ -7,7 +7,7 @@ Public Class ORB_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Find keypoints using ORB - Oriented Fast and Rotated BRIEF"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -18,6 +18,9 @@ Public Class ORB_Basics : Inherits TaskParent
             DrawCircle(dst2, kpt.Pt, task.DotSize + 1, cv.Scalar.Yellow)
         Next
         labels(2) = CStr(keypoints.Count) + " key points were identified"
+    End Sub
+    Public Sub Close()
+        If orb IsNot Nothing Then orb.Dispose()
     End Sub
 End Class
 

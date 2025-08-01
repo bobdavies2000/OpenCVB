@@ -1,6 +1,7 @@
-Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 Imports System.IO
+Imports System.Runtime.InteropServices
+Imports Microsoft.VisualBasic.Logging
+Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
 Public Class BGSubtract_Basics : Inherits TaskParent
     Public options As New Options_BGSubtract
@@ -76,6 +77,9 @@ Public Class BGSubtract_MOG2 : Inherits TaskParent
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOG2.Apply(src, dst2, options.learnRate)
     End Sub
+    Public Sub Close()
+        If MOG2 IsNot Nothing Then MOG2.Dispose()
+    End Sub
 End Class
 
 
@@ -94,6 +98,9 @@ Public Class BGSubtract_MOG2_QT : Inherits TaskParent
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim learnRate = If(dst2.Width >= 1280, 0.5, 0.1) ' learn faster with large images (slower frame rate)
         MOG2.Apply(src, dst2, learnRate)
+    End Sub
+    Public Sub Close()
+        If MOG2 IsNot Nothing Then MOG2.Dispose()
     End Sub
 End Class
 
@@ -156,6 +163,9 @@ Public Class BGSubtract_MOG : Inherits TaskParent
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOG.Apply(src, dst2, options.learnRate)
     End Sub
+    Public Sub Close()
+        If MOG IsNot Nothing Then MOG.Dispose()
+    End Sub
 End Class
 
 
@@ -183,6 +193,10 @@ Public Class BGSubtract_GMG_KNN : Inherits TaskParent
         gmg.Apply(task.gray, dst2, options.learnRate)
         knn.Apply(dst2, dst2, options.learnRate)
     End Sub
+    Public Sub Close()
+        If gmg IsNot Nothing Then gmg.Dispose()
+        If knn IsNot Nothing Then knn.Dispose()
+    End Sub
 End Class
 
 
@@ -201,13 +215,17 @@ Public Class BGSubtract_MOG_RGBDepth : Inherits TaskParent
         labels = {"", "", "Unstable depth", "Unstable color (if there is motion)"}
         desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         grayMat = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOGDepth.Apply(grayMat, grayMat, options.learnRate)
         dst2 = grayMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         MOGRGB.Apply(task.gray, dst3, options.learnRate)
+    End Sub
+    Public Sub Close()
+        If MOGDepth IsNot Nothing Then MOGDepth.Dispose()
+        If MOGRGB IsNot Nothing Then MOGRGB.Dispose()
     End Sub
 End Class
 

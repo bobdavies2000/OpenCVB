@@ -616,19 +616,19 @@ End Class
 
 
 Public Class lpData
-    Public age As Integer = 1
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
     Public ep1 As cv.Point2f ' end points - goes to the edge of the image.
     Public ep2 As cv.Point2f ' end points - goes to the edge of the image.
     Public length As Single
     Public rect As cv.Rect
+    Public roRect As cv.RotatedRect
     Public vertical As Boolean ' false = < 45 degrees
     Public slope As Single
+    Public angle As Single ' varies from -90 to 90 degrees
     Public center As cv.Point2f
     Public gridIndex1 As Integer
     Public gridIndex2 As Integer
-    Public gravityProxy As Boolean
     Public index As Integer
     Public Function perpendicularPoints(pt As cv.Point2f) As lpData
         Dim perpSlope = -1 / slope
@@ -654,10 +654,11 @@ Public Class lpData
         Dim outSize = New cv.Size2f(length, thickness)
 
         Dim angleRadians As Double = Math.Atan2(deltaY, deltaX)
-        Dim outAngle = CType(angleRadians * (180.0 / Math.PI), Single)
-        If outAngle >= 90.0 Then outAngle -= 180.0
-        If outAngle < -90.0 Then outAngle += 180.0
-        Dim roRect = New cv.RotatedRect(center, outSize, outAngle)
+        angle = CType(angleRadians * (180.0 / Math.PI), Single)
+        If angle >= 90.0 Then angle -= 180.0
+        If angle < -90.0 Then angle += 180.0
+        Dim roRect = New cv.RotatedRect(center, outSize, angle)
+        angle *= -1
         rect = ValidateRect(roRect.BoundingRect)
         If rect.Width <= 15 Then
             rect = ValidateRect(New cv.Rect(rect.X - (20 - rect.Width) / 2, rect.Y, 20, rect.Height))
@@ -730,20 +731,7 @@ Public Class lpData
         End If
         center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 
-        rect = New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y))
-        Const minSize = 15
-        If rect.Width = 0 Then rect.Width = minSize
-        If rect.Height = 0 Then rect.Height = minSize
-        If rect.Width < minSize And rect.X + minSize < task.color.Width Then rect.Width = minSize
-        If rect.Height < minSize And rect.Y + minSize < task.color.Height Then rect.Height = minSize
-
-        If vertical And length > 0 Then
-            Dim deltaX1 = Math.Abs(task.gravityIMU.ep1.X - ep1.X)
-            Dim deltaX2 = Math.Abs(task.gravityIMU.ep2.X - ep2.X)
-            If Math.Sign(deltaX1) = Math.Sign(deltaX2) Then
-                If Math.Abs(deltaX1 - deltaX2) < task.gravityBasics.options.pixelThreshold Then gravityProxy = True
-            End If
-        End If
+        CalculateRotatedRectFromLine()
 
         If p1.X < 0 Or p1.Y < 0 Or p2.X < 0 Or p2.Y < 0 Then Dim k = 0
     End Sub

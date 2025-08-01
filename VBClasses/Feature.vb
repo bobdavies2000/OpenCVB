@@ -1,6 +1,7 @@
-Imports cv = OpenCvSharp
-Imports VBClasses.OptionParent
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
+Imports VBClasses.OptionParent
+Imports cv = OpenCvSharp
 Public Class Feature_Basics : Inherits TaskParent
     Public options As New Options_Features
     Public Sub New()
@@ -495,6 +496,7 @@ End Class
 
 Public Class Feature_AKaze : Inherits TaskParent
     Dim kazeKeyPoints As cv.KeyPoint() = Nothing
+    Dim kaze As AKAZE
     Public Sub New()
         labels(2) = "AKAZE key points"
         desc = "Find keypoints using AKAZE algorithm."
@@ -504,12 +506,15 @@ Public Class Feature_AKaze : Inherits TaskParent
         If src.Channels() <> 1 Then
             src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
-        Dim kaze = cv.AKAZE.Create()
+        kaze = cv.AKAZE.Create()
         Dim kazeDescriptors As New cv.Mat()
         kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
         For i As Integer = 0 To kazeKeyPoints.Length - 1
             DrawCircle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.highlight)
         Next
+    End Sub
+    Public Sub Close()
+        If kaze IsNot Nothing Then kaze.Dispose()
     End Sub
 End Class
 
@@ -758,6 +763,9 @@ Public Class Feature_Agast : Inherits TaskParent
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
         labels(2) = $"Found {keypoints.Length} features with agast"
+    End Sub
+    Public Sub Close()
+        If agastFD IsNot Nothing Then agastFD.Dispose()
     End Sub
 End Class
 

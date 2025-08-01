@@ -1,3 +1,4 @@
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/phase_corr.cpp
 ' https://docs.opencvb.org/master/d7/df3/group__imgproc__motion.html
@@ -16,8 +17,8 @@ Public Class PhaseCorrelate_Basics : Inherits TaskParent
         cv.Cv2.CreateHanningWindow(hanning, dst2.Size(), cv.MatType.CV_64F)
         desc = "Look for a shift between the current frame and the previous"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Static thresholdSlider =OptionParent.FindSlider("Threshold shift to cause reset of lastFrame")
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static thresholdSlider = OptionParent.FindSlider("Threshold shift to cause reset of lastFrame")
 
         Dim input = src
         If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2Gray)

@@ -1,11 +1,13 @@
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp/blob/master/test/OpenCvSharp.Tests/stitching/StitchingTest.cs
 Public Class Stitch_Basics : Inherits TaskParent
     Dim options As New Options_Stitch
+    Dim sticherObj As Stitcher
     Public Sub New()
         desc = "Stitch together random parts of a color image."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         Dim mats As New List(Of cv.Mat)
@@ -25,11 +27,11 @@ Public Class Stitch_Basics : Inherits TaskParent
             Exit Sub
         End If
 
-        Dim stitcher = cv.Stitcher.Create(cv.Stitcher.Mode.Scans)
+        If sticherObj IsNot Nothing Then sticherObj = cv.Stitcher.Create(cv.Stitcher.Mode.Scans)
         Dim pano As New cv.Mat
 
         ' stitcher may fail with an external exception if you make width and height too small.
-        Dim status = stitcher.Stitch(mats, pano)
+        Dim status = sticherObj.Stitch(mats, pano)
 
         dst3.SetTo(0)
         If status = cv.Stitcher.Status.OK Then
@@ -40,5 +42,8 @@ Public Class Stitch_Basics : Inherits TaskParent
         Else
             If status = cv.Stitcher.Status.ErrorNeedMoreImgs Then SetTrueText("Need more images", 3)
         End If
+    End Sub
+    Public Sub Close()
+        If sticherObj IsNot Nothing Then sticherObj.Dispose()
     End Sub
 End Class

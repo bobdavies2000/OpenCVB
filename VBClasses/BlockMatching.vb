@@ -1,3 +1,4 @@
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/stereo_match.cpp
 Public Class BlockMatching_Basics : Inherits TaskParent
@@ -5,12 +6,13 @@ Public Class BlockMatching_Basics : Inherits TaskParent
     Dim options As New Options_BlockMatching
     Public leftView As cv.Mat, rightView As cv.Mat
     Dim LRMeanSub As New MeanSubtraction_LeftRight
+    Dim blockMatch As StereoBM
     Public Sub New()
         labels(2) = "Block matching disparity colorized like depth"
         labels(3) = "Right Image (used with left image)"
         desc = "Use OpenCV's block matching on left and right views"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Options.Run()
         LRMeanSub.Run(src)
 
@@ -20,7 +22,7 @@ Public Class BlockMatching_Basics : Inherits TaskParent
         End If
 #End If
 
-        Static blockMatch = cv.StereoBM.Create()
+        If blockMatch Is Nothing Then blockMatch = cv.StereoBM.Create()
         blockMatch.BlockSize = options.blockSize
         blockMatch.MinDisparity = 0
         blockMatch.ROI1 = New cv.Rect(0, 0, task.leftview.Width, task.leftview.Height)
@@ -44,5 +46,8 @@ Public Class BlockMatching_Basics : Inherits TaskParent
         colorizer.Run(dst1)
         dst2(rect) = colorizer.dst2(rect)
         dst3 = task.rightview.Resize(src.Size())
+    End Sub
+    Public Sub Close()
+        If blockMatch IsNot Nothing Then blockMatch.Dispose()
     End Sub
 End Class

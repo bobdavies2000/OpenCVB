@@ -1,6 +1,7 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.IO
 Imports System.Runtime.InteropServices
-Imports System.IO
+Imports OpenCvSharp
+Imports cv = OpenCvSharp
 ' all examples in this file are from https://github.com/opencv/opencv/tree/4.x/samples
 Public Class OEX_CalcBackProject_Demo1 : Inherits TaskParent
     Public histogram As New cv.Mat
@@ -113,10 +114,11 @@ Public Class OEX_bgSub : Inherits TaskParent
     Public Sub New()
         desc = "OpenCV example bgSub"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         If task.optionsChanged Then
+            If pBackSub IsNot Nothing Then pBackSub.Dispose()
             Select Case options.methodDesc
                 Case "GMG"
                     pBackSub = cv.BackgroundSubtractorGMG.Create()
@@ -129,6 +131,9 @@ Public Class OEX_bgSub : Inherits TaskParent
             End Select
         End If
         pBackSub.Apply(src, dst2, options.learnRate)
+    End Sub
+    Public Sub Close()
+        If pBackSub IsNot Nothing Then pBackSub.Dispose()
     End Sub
 End Class
 

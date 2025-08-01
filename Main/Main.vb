@@ -842,9 +842,21 @@ Public Class Main
             AvailableAlgorithms.SelectedIndex += 1
         Next
 
+        ' skip testing the Benfor_ algorithms.  They are only for visualizations - not for other algorithms to use.
+        For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
+            If AvailableAlgorithms.Text.StartsWith("Benford_") = False Then Exit For
+            AvailableAlgorithms.SelectedIndex += 1
+        Next
+
         ' skip testing the GIF_ algorithms.  They are only for visualizations - not for other algorithms to use.
         For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
             If AvailableAlgorithms.Text.StartsWith("GIF_") = False Then Exit For
+            AvailableAlgorithms.SelectedIndex += 1
+        Next
+
+        ' skip testing the Bitmap_ algorithms.  They are only for visualizations - not for other algorithms to use.
+        For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
+            If AvailableAlgorithms.Text.StartsWith("Bitmap_") = False Then Exit For
             AvailableAlgorithms.SelectedIndex += 1
         Next
 
