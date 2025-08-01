@@ -562,6 +562,7 @@ End Class
 
 
 Public Class Line_Parallel : Inherits TaskParent
+    Public parallels As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
         labels(2) = "Yellow lines are the original lines found.  White lines connect the centers of roughly parallel lines."
         labels(3) = "Red lines are those that have no parallel."
@@ -569,13 +570,13 @@ Public Class Line_Parallel : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        Dim parallels As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
         Dim usedList As New List(Of Integer)
+        parallels.Clear()
         For Each lp In task.lines.lpList
             For i = lp.index + 1 To task.lines.lpList.Count - 1
                 If Math.Abs(Math.Abs(lp.angle) - task.lines.lpList(i).angle) < 2 Then
                     If usedList.Contains(lp.gridIndex1) = False Then
-                        parallels.Add(lp.angle, lp.gridIndex1)
+                        parallels.Add(lp.angle, lp.index)
                         DrawLine(dst2, lp, task.highlight)
                         usedList.Add(lp.gridIndex1)
                         SetTrueText(CStr(lp.gridIndex1), lp.center)
@@ -583,7 +584,7 @@ Public Class Line_Parallel : Inherits TaskParent
 
                     If usedList.Contains(task.lines.lpList(i).gridIndex1) = False Then
                         DrawLine(dst2, task.lines.lpList(i), task.highlight)
-                        parallels.Add(task.lines.lpList(i).angle, task.lines.lpList(i).gridIndex1)
+                        parallels.Add(task.lines.lpList(i).angle, task.lines.lpList(i).index)
                         'DrawLine(dst2, lp.center, task.lines.lpList(i).center, white)
                         usedList.Add(task.lines.lpList(i).gridIndex1)
                         SetTrueText(CStr(task.lines.lpList(i).gridIndex1), task.lines.lpList(i).center)
@@ -599,6 +600,41 @@ Public Class Line_Parallel : Inherits TaskParent
             Else
                 DrawLine(dst3, lp.p1, lp.p2, red, task.lineWidth * 3)
             End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_ParallelClasses : Inherits TaskParent
+    Dim lines As New Line_Parallel
+    Public Sub New()
+        labels(2) = "Narrow lines are not parallel/perpendicular.  Text shows the group ID of parallel lines."
+        desc = "Identify groups of lines that are parallel."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lines.Run(src)
+
+        Dim colorIndex As Integer = 1, j As Integer
+        dst2 = src
+        For i = 0 To lines.parallels.Count - 1
+            Dim lp1 = task.lines.lpList(lines.parallels.ElementAt(i).Value)
+            dst2.Line(lp1.p1, lp1.p2, task.scalarColors(colorIndex), task.lineWidth * 2, task.lineType)
+            SetTrueText(CStr(colorIndex), lp1.center)
+            For j = i + 1 To lines.parallels.Count - 1
+                Dim lp2 = task.lines.lpList(lines.parallels.ElementAt(j).Value)
+                If Math.Abs(lp1.angle - lp2.angle) < 2 Then
+                    dst2.Line(lp2.p1, lp2.p2, task.scalarColors(colorIndex), task.lineWidth * 2, task.lineType)
+                    SetTrueText(CStr(colorIndex), lp2.center)
+                Else
+                    colorIndex += 1
+                    Exit For
+                End If
+            Next
+            i = j - 1
         Next
     End Sub
 End Class
