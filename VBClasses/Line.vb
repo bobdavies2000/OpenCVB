@@ -51,7 +51,7 @@ Public Class Line_Basics : Inherits TaskParent
         lpMap.SetTo(0)
         lpRectMap.SetTo(0)
         For i = lpList.Count - 1 To 0 Step -1
-            lpRectMap.Rectangle(lpList(i).rect, i + 1, -1)
+            lpRectMap.Rectangle(lpList(i).roRect.BoundingRect, i + 1, -1)
             lpMap.Line(lpList(i).p1, lpList(i).p2, lpList(i).index + 1, task.lineWidth, cv.LineTypes.Link8)
         Next
 
@@ -359,7 +359,7 @@ Public Class Line_Longest : Inherits TaskParent
         ' camera is often warming up for the first few images.
         If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or task.heartBeat Then
             lp = lplist(0)
-            match.template = task.gray(lp.rect)
+            match.template = task.gray(lp.roRect.BoundingRect)
             task.lineLongestChanged = True
         End If
 
@@ -369,23 +369,23 @@ Public Class Line_Longest : Inherits TaskParent
             task.lineLongestChanged = True
             If lplist.Count > 1 Then
                 Dim histogram As New cv.Mat
-                cv.Cv2.CalcHist({task.lines.lpMap(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
+                cv.Cv2.CalcHist({task.lines.lpMap(lp.roRect.BoundingRect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
                                  New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
 
                 Dim histArray(histogram.Total - 1) As Single
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
                 Dim histList = histArray.ToList
-                ' pick the lp that has the most pixels in the lp.rect.
+                ' pick the lp that has the most pixels in the lp.roRect.BoundingRect.
                 lp = lplist(histList.IndexOf(histList.Max))
-                match.template = task.gray(lp.rect)
+                match.template = task.gray(lp.roRect.BoundingRect)
                 match.correlation = 1
             Else
                 match.correlation = 0 ' force a restart
             End If
         Else
-            deltaX = match.newRect.X - lp.rect.X
-            deltaY = match.newRect.Y - lp.rect.Y
+            deltaX = match.newRect.X - lp.roRect.BoundingRect.X
+            deltaY = match.newRect.Y - lp.roRect.BoundingRect.Y
             Dim p1 = New cv.Point(lp.p1.X + deltaX, lp.p1.Y + deltaY)
             Dim p2 = New cv.Point(lp.p2.X + deltaX, lp.p2.Y + deltaY)
             lp = New lpData(p1, p2)
@@ -394,7 +394,7 @@ Public Class Line_Longest : Inherits TaskParent
         If standaloneTest() Then
             dst2 = src
             DrawLine(dst2, lp)
-            DrawRect(dst2, lp.rect)
+            DrawRect(dst2, lp.roRect.BoundingRect)
             dst3 = task.lines.dst2
         End If
 

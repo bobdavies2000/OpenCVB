@@ -25,7 +25,7 @@ Public Class MatchLine_BasicsAll : Inherits TaskParent
             If match.correlation1 > task.fCorrThreshold And match.correlation2 > task.fCorrThreshold Then
                 DrawLine(dst2, lp.p1, lp.p2)
             End If
-            dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
+            dst2.Rectangle(lp.roRect.BoundingRect, task.highlight, task.lineWidth)
             'dst2.Rectangle(lp.gridRect2, task.highlight, task.lineWidth)
             'dst2.Rectangle(lp.nabeRect1, task.highlight, task.lineWidth)
             'dst2.Rectangle(lp.nabeRect2, task.highlight, task.lineWidth)

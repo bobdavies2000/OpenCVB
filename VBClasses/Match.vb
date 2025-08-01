@@ -98,7 +98,7 @@ Public Class Match_BasicsTest : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             If task.heartBeatLT Then
-                matchRect = ValidateRect(task.lineLongest.rect)
+                matchRect = ValidateRect(task.lineLongest.roRect.BoundingRect)
                 match.template = src(matchRect)
             End If
         End If

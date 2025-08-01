@@ -621,9 +621,8 @@ Public Class lpData
     Public ep1 As cv.Point2f ' end points - goes to the edge of the image.
     Public ep2 As cv.Point2f ' end points - goes to the edge of the image.
     Public length As Single
-    Public rect As cv.Rect
     Public roRect As cv.RotatedRect
-    Public slope As Single
+    Public slope As Single ' max is 100000 for vertical lines - adequate for use here.
     Public angle As Single ' varies from -90 to 90 degrees
     Public center As cv.Point2f
     Public gridIndex1 As Integer
@@ -658,7 +657,7 @@ Public Class lpData
         If angle < -90.0 Then angle += 180.0
         Dim roRect = New cv.RotatedRect(center, outSize, angle)
         angle *= -1
-        rect = ValidateRect(roRect.BoundingRect)
+        Dim rect = ValidateRect(roRect.BoundingRect)
         If rect.Width <= 15 Then
             rect = ValidateRect(New cv.Rect(rect.X - (20 - rect.Width) / 2, rect.Y, 20, rect.Height))
         End If
