@@ -1,5 +1,6 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp
 Imports VBClasses.TaskParent
+Imports cv = OpenCvSharp
 Public Module vbc
     Public task As VBtask
     Public taskReady As Boolean
@@ -621,6 +622,7 @@ Public Class lpData
     Public ep1 As cv.Point2f ' end points - goes to the edge of the image.
     Public ep2 As cv.Point2f ' end points - goes to the edge of the image.
     Public length As Single
+    Public rect As cv.Rect
     Public roRect As cv.RotatedRect
     Public slope As Single ' max is 100000 for vertical lines - adequate for use here.
     Public angle As Single ' varies from -90 to 90 degrees
@@ -645,6 +647,20 @@ Public Class lpData
         If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
         Return New lpData(p1, p2)
     End Function
+    Public Function drawRoRect(dst As cv.Mat)
+        Dim vertices = roRect.Points
+        For i = 0 To vertices.Count - 1
+            DrawLine(dst, vertices(i), vertices((i + 1) Mod 4), task.highlight)
+        Next
+    End Function
+    Public Function drawRoRectMask(dst As cv.Mat)
+        Dim vertices2f = roRect.Points
+        Dim vertices As New List(Of cv.Point)
+        For Each pt In vertices2f
+            vertices.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
+        Next
+        Cv2.FillConvexPoly(dst, vertices, 255)
+    End Function
     Public Sub CalculateRotatedRectFromLine()
         Dim deltaX As Single = p2.X - p1.X
         Dim deltaY As Single = p2.Y - p1.Y
@@ -655,9 +671,9 @@ Public Class lpData
         angle = CType(angleRadians * (180.0 / Math.PI), Single)
         If angle >= 90.0 Then angle -= 180.0
         If angle < -90.0 Then angle += 180.0
-        Dim roRect = New cv.RotatedRect(center, outSize, angle)
+        roRect = New cv.RotatedRect(center, outSize, angle)
         angle *= -1
-        Dim rect = ValidateRect(roRect.BoundingRect)
+        rect = ValidateRect(roRect.BoundingRect)
         If rect.Width <= 15 Then
             rect = ValidateRect(New cv.Rect(rect.X - (20 - rect.Width) / 2, rect.Y, 20, rect.Height))
         End If

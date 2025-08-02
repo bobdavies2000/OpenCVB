@@ -51,7 +51,7 @@ Public Class Line_Basics : Inherits TaskParent
         lpMap.SetTo(0)
         lpRectMap.SetTo(0)
         For i = lpList.Count - 1 To 0 Step -1
-            lpRectMap.Rectangle(lpList(i).roRect.BoundingRect, i + 1, -1)
+            lpRectMap.Rectangle(lpList(i).rect, i + 1, -1)
             lpMap.Line(lpList(i).p1, lpList(i).p2, lpList(i).index + 1, task.lineWidth, cv.LineTypes.Link8)
         Next
 
@@ -359,7 +359,7 @@ Public Class Line_Longest : Inherits TaskParent
         ' camera is often warming up for the first few images.
         If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or task.heartBeat Then
             lp = lplist(0)
-            match.template = task.gray(lp.roRect.BoundingRect)
+            match.template = task.gray(lp.rect)
             task.lineLongestChanged = True
         End If
 
@@ -369,23 +369,23 @@ Public Class Line_Longest : Inherits TaskParent
             task.lineLongestChanged = True
             If lplist.Count > 1 Then
                 Dim histogram As New cv.Mat
-                cv.Cv2.CalcHist({task.lines.lpMap(lp.roRect.BoundingRect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
+                cv.Cv2.CalcHist({task.lines.lpMap(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
                                  New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
 
                 Dim histArray(histogram.Total - 1) As Single
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
                 Dim histList = histArray.ToList
-                ' pick the lp that has the most pixels in the lp.roRect.BoundingRect.
+                ' pick the lp that has the most pixels in the lp.rect.
                 lp = lplist(histList.IndexOf(histList.Max))
-                match.template = task.gray(lp.roRect.BoundingRect)
+                match.template = task.gray(lp.rect)
                 match.correlation = 1
             Else
                 match.correlation = 0 ' force a restart
             End If
         Else
-            deltaX = match.newRect.X - lp.roRect.BoundingRect.X
-            deltaY = match.newRect.Y - lp.roRect.BoundingRect.Y
+            deltaX = match.newRect.X - lp.rect.X
+            deltaY = match.newRect.Y - lp.rect.Y
             Dim p1 = New cv.Point(lp.p1.X + deltaX, lp.p1.Y + deltaY)
             Dim p2 = New cv.Point(lp.p2.X + deltaX, lp.p2.Y + deltaY)
             lp = New lpData(p1, p2)
@@ -394,7 +394,7 @@ Public Class Line_Longest : Inherits TaskParent
         If standaloneTest() Then
             dst2 = src
             DrawLine(dst2, lp)
-            DrawRect(dst2, lp.roRect.BoundingRect)
+            DrawRect(dst2, lp.rect)
             dst3 = task.lines.dst2
         End If
 
@@ -617,3 +617,95 @@ Public Class Line_Parallel : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Line_BrickList : Inherits TaskParent
+    Public lp As lpData ' set this input
+    Public lpOutput As lpData ' this is the result lp
+    Public sobel As New Edge_Sobel
+    Public ptList As New List(Of cv.Point)
+    Dim mask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public Sub New()
+        mask = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Add a bricklist to the requested lp"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            If lp Is Nothing Then lp = task.lineLongest
+        End If
+
+        Dim r = lp.rect
+        dst1.SetTo(0)
+        sobel.Run(task.gray)
+        mask.SetTo(0)
+        lp.drawRoRectMask(mask)
+        sobel.dst2(r).CopyTo(dst1(r), mask(r))
+        DrawRect(dst1, r, black)
+
+
+
+        dst3 = mask
+
+
+
+        Dim allPoints As New List(Of cv.Point)
+        For Each rect In task.gridRects
+            Dim brick = dst1(rect)
+            If brick.CountNonZero = 0 Then Continue For
+            Dim mm = GetMinMax(brick)
+            Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
+            If mm.maxVal = 255 Then allPoints.Add(pt)
+        Next
+
+        ptList.Clear()
+        Dim angles As New List(Of Single)
+        Dim epListX1 As New List(Of Single)
+        Dim epListY1 As New List(Of Single)
+        Dim epListX2 As New List(Of Single)
+        Dim epListY2 As New List(Of Single)
+        For i = 0 To allPoints.Count - 1
+            Dim pt = allPoints(i)
+            For j = i + 1 To allPoints.Count - 1
+                Dim lpTest = New lpData(pt, allPoints(j))
+                If Math.Abs(lp.angle - lpTest.angle) < 2 Then
+                    angles.Add(lpTest.angle)
+                    ptList.Add(pt)
+                    ptList.Add(allPoints(j))
+                    epListX1.Add(lpTest.ep1.X)
+                    epListY1.Add(lpTest.ep1.Y)
+                    epListX2.Add(lpTest.ep2.X)
+                    epListY2.Add(lpTest.ep2.Y)
+                End If
+            Next
+        Next
+
+        If ptList.Count < 2 Then
+            SetTrueText("No brick points were found in the area.", 3)
+            lp = Nothing
+            Exit Sub
+        End If
+        dst2 = src
+        For Each pt In ptList
+            DrawCircle(dst2, pt)
+        Next
+
+        Dim x1 = epListX1.Average
+        Dim y1 = epListY1.Average
+        Dim x2 = epListX2.Average
+        Dim y2 = epListY2.Average
+        lpOutput = New lpData(New cv.Point2f(x1, y1), New cv.Point2f(x2, y2))
+        DrawLine(dst2, lpOutput)
+        ' DrawRect(dst2, lpOutput.rect)
+        lpOutput.drawRoRect(dst2)
+
+        If standalone Then lp = lpOutput
+        If task.gOptions.DebugCheckBox.Checked Then
+            lp = task.lineLongest
+            task.gOptions.DebugCheckBox.Checked = False
+        End If
+    End Sub
+End Class

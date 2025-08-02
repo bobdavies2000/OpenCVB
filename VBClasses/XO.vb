@@ -5666,7 +5666,7 @@ Public Class XO_TrackLine_BasicsSimple : Inherits TaskParent
         If standalone Then
             If lplist(0).length > lp.length Then
                 lp = lplist(0)
-                matchRect = lp.roRect.BoundingRect
+                matchRect = lp.rect
                 match.template = src(matchRect).Clone
             End If
         End If
@@ -5706,7 +5706,7 @@ Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
         If lplist.Count = 0 Then Exit Sub
         If standalone And foundLine = False Then lpInput = task.lineLongest
 
-        Static subsetrect = lpInput.roRect.BoundingRect
+        Static subsetrect = lpInput.rect
         If subsetrect.width <= dst2.Height / 10 Then
             lpInput = task.lineLongest
             subsetrect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
@@ -5727,7 +5727,7 @@ Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
                 foundLine = match.correlation1 >= task.fCorrThreshold And match.correlation2 >= task.fCorrThreshold
                 If foundLine Then
                     lpInput = match.lpOutput
-                    subsetrect = lpInput.roRect.BoundingRect
+                    subsetrect = lpInput.rect
                 End If
             End If
         Else
@@ -5746,7 +5746,7 @@ Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
             If Math.Abs(deltaX1 - deltaX2) > task.gravityBasics.options.pixelThreshold Then
                 lpInput = task.lineLongest
             End If
-            subsetrect = lpInput.roRect.BoundingRect
+            subsetrect = lpInput.rect
         End If
 
         dst2 = src
@@ -5773,7 +5773,7 @@ Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
     Private Function restartLine(src As cv.Mat) As lpData
         For Each lpTemp In lplist
             If Math.Abs(task.lineGravity.angle - lpTemp.angle) < 2 Then
-                matchRect = lpTemp.roRect.BoundingRect
+                matchRect = lpTemp.rect
                 match.template = src(matchRect).Clone
                 Return lpTemp
             End If
@@ -5818,12 +5818,12 @@ Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
         If standaloneTest() Then
             dst2 = src.Clone
             DrawCircle(dst2, match.newCenter, task.DotSize, white)
-            dst2.Rectangle(lp.roRect.BoundingRect, task.highlight, task.lineWidth)
+            dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
             SetTrueText(Format(match.correlation, fmt3), match.newCenter)
 
-            dst2.Rectangle(lp.roRect.BoundingRect, task.highlight, task.lineWidth)
+            dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
         End If
 
         dst1 = ShowPaletteNoZero(task.lines.lpRectMap)
@@ -8127,7 +8127,7 @@ Public Class XO_Line_LongestTest : Inherits TaskParent
         If standaloneTest() Then
             dst2 = src
             DrawLine(dst2, lp)
-            DrawRect(dst2, lp.roRect.BoundingRect)
+            DrawRect(dst2, lp.rect)
             dst3 = task.lines.dst2
         End If
 
@@ -8195,7 +8195,7 @@ Public Class XO_Line_Gravity : Inherits TaskParent
             For Each lp In lplist
                 If Math.Abs(task.lineGravity.angle - lp.angle) < 2 Then Exit For
             Next
-            match.template = src(lp.roRect.BoundingRect)
+            match.template = src(lp.rect)
         End If
 
         If Math.Abs(task.lineGravity.angle - lp.angle) >= 2 Then
@@ -8208,23 +8208,23 @@ Public Class XO_Line_Gravity : Inherits TaskParent
         If match.correlation < task.fCorrThreshold Then
             If lplist.Count > 1 Then
                 Dim histogram As New cv.Mat
-                cv.Cv2.CalcHist({task.lines.lpMap(lp.roRect.BoundingRect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
+                cv.Cv2.CalcHist({task.lines.lpMap(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
                                  New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
 
                 Dim histArray(histogram.Total - 1) As Single
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
                 Dim histList = histArray.ToList
-                ' pick the lp that has the most pixels in the lp.roRect.BoundingRect.
+                ' pick the lp that has the most pixels in the lp.rect.
                 lp = lplist(histList.IndexOf(histList.Max))
-                match.template = src(lp.roRect.BoundingRect)
+                match.template = src(lp.rect)
                 match.correlation = 1
             Else
                 match.correlation = 0 ' force a restart
             End If
         Else
-            Dim deltaX = match.newRect.X - lp.roRect.BoundingRect.X
-            Dim deltaY = match.newRect.Y - lp.roRect.BoundingRect.Y
+            Dim deltaX = match.newRect.X - lp.rect.X
+            Dim deltaY = match.newRect.Y - lp.rect.Y
             Dim p1 = New cv.Point(lp.p1.X + deltaX, lp.p1.Y + deltaY)
             Dim p2 = New cv.Point(lp.p2.X + deltaX, lp.p2.Y + deltaY)
             lp = New lpData(p1, p2)
@@ -8232,7 +8232,7 @@ Public Class XO_Line_Gravity : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            dst2.Rectangle(lp.roRect.BoundingRect, task.highlight, task.lineWidth)
+            dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
             DrawLine(dst2, lp.p1, lp.p2)
         End If
 
@@ -8727,7 +8727,7 @@ Public Class XO_KNN_BoundingRect : Inherits TaskParent
         If standalone And task.heartBeatLT Then
             Dim sortRects As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
             For Each lpNext In lplist
-                sortRects.Add(lpNext.roRect.BoundingRect.Width * lpNext.roRect.BoundingRect.Height, lpNext.index)
+                sortRects.Add(lpNext.rect.Width * lpNext.rect.Height, lpNext.index)
             Next
             lp = lplist(sortRects.ElementAt(0).Value)
         End If

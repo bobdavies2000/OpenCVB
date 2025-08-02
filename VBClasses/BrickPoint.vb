@@ -11,7 +11,7 @@ Public Class BrickPoint_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src
 
-        sobel.Run(task.gray.Clone)
+        sobel.Run(src)
         dst3 = sobel.dst2
 
         intensityFeatures.Clear()
