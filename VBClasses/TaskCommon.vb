@@ -647,20 +647,20 @@ Public Class lpData
         If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
         Return New lpData(p1, p2)
     End Function
-    Public Function drawRoRect(dst As cv.Mat)
+    Public Sub drawRoRect(dst As cv.Mat)
         Dim vertices = roRect.Points
         For i = 0 To vertices.Count - 1
             DrawLine(dst, vertices(i), vertices((i + 1) Mod 4), task.highlight)
         Next
-    End Function
-    Public Function drawRoRectMask(dst As cv.Mat)
+    End Sub
+    Public Sub drawRoRectMask(dst As cv.Mat)
         Dim vertices2f = roRect.Points
         Dim vertices As New List(Of cv.Point)
         For Each pt In vertices2f
             vertices.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
         Next
-        Cv2.FillConvexPoly(dst, vertices, 255)
-    End Function
+        Cv2.FillConvexPoly(dst, vertices, 255, cv.LineTypes.AntiAlias)
+    End Sub
     Public Sub CalculateRotatedRectFromLine()
         Dim deltaX As Single = p2.X - p1.X
         Dim deltaY As Single = p2.Y - p1.Y

@@ -1056,7 +1056,9 @@ Public Class Motion_BestBricks : Inherits TaskParent
         Next
 
         lastGray = task.gray.Clone
-        labels(3) = "Average offset X/Y = " + Format(offsetX.Average(), fmt3) + "/" + Format(offsetY.Average(), fmt3)
+        If offsetX.Count > 0 Then
+            labels(3) = "Average offset X/Y = " + Format(offsetX.Average(), fmt3) + "/" + Format(offsetY.Average(), fmt3)
+        End If
     End Sub
 End Class
 

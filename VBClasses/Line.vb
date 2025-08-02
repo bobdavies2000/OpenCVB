@@ -627,9 +627,8 @@ Public Class Line_BrickList : Inherits TaskParent
     Public lpOutput As lpData ' this is the result lp
     Public sobel As New Edge_Sobel
     Public ptList As New List(Of cv.Point)
-    Dim mask As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
-        mask = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Add a bricklist to the requested lp"
     End Sub
@@ -641,16 +640,10 @@ Public Class Line_BrickList : Inherits TaskParent
         Dim r = lp.rect
         dst1.SetTo(0)
         sobel.Run(task.gray)
-        mask.SetTo(0)
-        lp.drawRoRectMask(mask)
-        sobel.dst2(r).CopyTo(dst1(r), mask(r))
+        dst3.SetTo(0)
+        lp.drawRoRectMask(dst3)
+        sobel.dst2(r).CopyTo(dst1(r), dst3(r))
         DrawRect(dst1, r, black)
-
-
-
-        dst3 = mask
-
-
 
         Dim allPoints As New List(Of cv.Point)
         For Each rect In task.gridRects
