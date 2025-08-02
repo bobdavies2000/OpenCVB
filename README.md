@@ -1,25 +1,30 @@
-# 2025 July 26th – Longest Line, 100 FPS
+# 2025 August 2nd – Camera Lineup, Parallel Lines, Angle Property.
 
--   Over 1800 algorithms are included, averaging 38 lines of code per algorithm.
--   The algorithm for the gravity vector, horizon vector, and longest vector changed.
-    -   Longest vector is found for every frame (more work still needed.)
-    -   If the longest vector changes, the gravity and horizon vectors change as well.
-    -   Otherwise, the gravity and horizon vectors are unchanged, eliminating wobble.
-    -   Only the IMU controls the gravity vector.
-    -   Tracking the longest line is visualized below.
-        -   But running Line_Basics provides a more realistic demonstration.
--   GIF image creation was reviewed and improved for single “dst” image captures.
--   Support for 100 fps on the StereoLabs cameras was restored.
--   Camera intrinsics were overlooked with the Net8.0 conversion – now corrected.
-    -   Missing intrinsics data doesn’t impact overnight testing. Zeros work too.
--   Switching cameras during a run is simpler and faster and hopefully bug-free.
--   Oak 4D Pro camera (released June 2025) is not working for me – device not found.
-    -   Any suggestions would be gratefully received. Even better: a pull request.
+-   Over 1800 algorithms are included, averaging 36 lines of code per algorithm.
+-   OpenCVB supports the following cameras:
+    -   Intel RealSense cameras – D435i and D455.
+    -   StereoLabs ZED 2/2i cameras
+    -   Orbbec Gemini series – Gemini 335 and Gemini 336L
+-   Support is dropped for the following cameras:
+    -   Kinect for Azure – no left/right images and Microsoft stopped production.
+    -   Orbbec’s Femto series because they lack left and right images.
+    -   Mynt cameras – went out of production and SDK is no longer working.
+    -   Intel produced several other cameras that lack an IMU.
+-   Luxonis Oak D cameras are in development and should be supported again soon.
+-   The TreeView would update rapidly when options changed. The correction is in place.
+-   Parallel lines have a useful property in common.
+    -   Finding lines which are not parallel to any other is potentially useful as well.
+    -   The value of such “unparallel” lines is distinctly lower than those that are.
+    -   See Line_Parallel for more on how lines may be classified using parallel.
+-   The “angle” property of lines varies from -90 degrees to 90 degrees.
+    -   All lines can be mapped into a linear spectrum based on their angle.
+    -   Negative angles correspond to negative slopes and positive to positive slopes.
+    -   Slope is quite useful but non-linear as a classifier in comparison.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/fb9e21f35bdf318623a18eb0598fa9c5.gif)
+![](media/122a37f63e6a1e574e5117f07d87a2bd.jpeg)
 
-**Line_Basics:** *The longest line in each frame is presented whenever the crosshairs are requested. The result is shown in the upper left image (dst0 or task.color.) If the longest line is unchanged, the gravity and horizon vectors are also unchanged.*
+**Line_Parallel:** *A group of parallel lines has the same color and group ID (the text at the center of the line.) The “0” group designation is for “unparallel” lines that are of lower value are yellow. No other lines are parallel to them.  Lines that are close together and parallel have higher value. The group 4 lines in blue are one such example above but there are several other examples in the image as well.*
 
 \-----------------------------------------------------------------------------------------------
 
@@ -2091,3 +2096,26 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   The VBClasses build process uses UI_Generate in a pre-build event.
     -   Alternatively, just build that first build again and UI_Generate will work.
 -   A log of previous changes is included at the bottom of this document.
+
+# 2025 July 26th – Longest Line, 100 FPS
+
+-   Over 1800 algorithms are included, averaging 38 lines of code per algorithm.
+-   The algorithm for the gravity vector, horizon vector, and longest vector changed.
+    -   Longest vector is found for every frame (more work still needed.)
+    -   If the longest vector changes, the gravity and horizon vectors change as well.
+    -   Otherwise, the gravity and horizon vectors are unchanged, eliminating wobble.
+    -   Only the IMU controls the gravity vector.
+    -   Tracking the longest line is visualized below.
+        -   But running Line_Basics provides a more realistic demonstration.
+-   GIF image creation was reviewed and improved for single “dst” image captures.
+-   Support for 100 fps on the StereoLabs cameras was restored.
+-   Camera intrinsics were overlooked with the Net8.0 conversion – now corrected.
+    -   Missing intrinsics data doesn’t impact overnight testing. Zeros work too.
+-   Switching cameras during a run is simpler and faster and hopefully bug-free.
+-   Oak 4D Pro camera (released June 2025) is not working for me – device not found.
+    -   Any suggestions would be gratefully received. Even better: a pull request.
+-   A log of previous changes is included at the bottom of this document.
+
+![A shelf and a shelf AI-generated content may be incorrect.](media/fb9e21f35bdf318623a18eb0598fa9c5.gif)
+
+**Line_Basics:** *The longest line in each frame is presented whenever the crosshairs are requested. The result is shown in the upper left image (dst0 or task.color.) If the longest line is unchanged, the gravity and horizon vectors are also unchanged.*
