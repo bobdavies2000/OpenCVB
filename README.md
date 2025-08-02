@@ -24,7 +24,7 @@
 
 ![](media/122a37f63e6a1e574e5117f07d87a2bd.jpeg)
 
-**Line_Parallel:** *A group of parallel lines has the same color and group ID (the text at the center of the line.) The “0” group designation is for “unparallel” lines that are of lower value are yellow. No other lines are parallel to them.  Lines that are close together and parallel have higher value. The group 4 lines in blue are one such example above but there are several other examples in the image as well.*
+**Line_Parallel:** *Each group of parallel lines has the same color and group ID (the text at the center of the line.) The “0” group designation is for “unparallel” lines that are of lower value because no other lines are parallel to them.  Lines that are close together and parallel have higher value. The group 4 lines in blue are one such example above but there are several other examples in the image as well.*
 
 \-----------------------------------------------------------------------------------------------
 
