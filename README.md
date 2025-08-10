@@ -1,4 +1,4 @@
-# 2025 August 2nd – Python support, HomeDir, Brick Points.
+# 2025 August 10 – Python support, HomeDir, Brick Points.
 
 -   Over 1900 algorithms are included, averaging 36 lines of code per algorithm.
 -   Python support retired to the XO.vb module – obsolete.
