@@ -1373,7 +1373,6 @@ End Class
 
 
 
-
 'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edge_Sobel : Inherits TaskParent
     Public options As New Options_Sobel

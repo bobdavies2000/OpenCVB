@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Public Class FeatureFlow_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public mpCorrelation As New List(Of Single)
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_General
     Public Sub New()
         task.gOptions.MaxDepthBar.Value = 20
         labels(1) = "NOTE: matching right point is always to the left of the left point"
@@ -84,7 +84,7 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
     Public features As New List(Of cv.Point2f)
     Public lastFeatures As New List(Of cv.Point2f)
     Dim options As New Options_OpticalFlowSparse
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_General
     Public Sub New()
         desc = "Show the optical flow of a sparse matrix."
     End Sub

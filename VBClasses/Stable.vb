@@ -1,51 +1,66 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Stable_Basics : Inherits TaskParent
-    Public facetGen As New Delaunay_Generations
-    Public ptList As New List(Of cv.Point2f)
-    Public anchorPoint As cv.Point2f
-    Dim good As New Feature_KNN
+    Public lp As lpData
+    Public lpLast As lpData
     Public Sub New()
-        desc = "Maintain the generation counts around the feature points."
+        desc = "Use task.lineLongest to find the angle needed to stabilize the image."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then
-            good.Run(src)
-            facetGen.inputPoints = New List(Of cv.Point2f)(good.featurePoints)
+    Public Function GetAngleBetweenLinesBySlopes(ByVal slope1 As Double, ByVal slope2 As Double) As Double
+        Const EPSILON As Double = 0.000000001
+
+        ' --- Handle Vertical Lines (Infinite Slope) ---
+        Dim isSlope1Vertical As Boolean = Double.IsInfinity(slope1)
+        Dim isSlope2Vertical As Boolean = Double.IsInfinity(slope2)
+
+        If isSlope1Vertical AndAlso isSlope2Vertical Then
+            ' Both lines are vertical, so they are parallel.
+            Return 0.0 ' Angle is 0 degrees
+        ElseIf isSlope1Vertical Then
+            ' Line 1 is vertical (angle 90 degrees).
+            ' Angle of line 2 is Atan(slope2).
+            Dim angle2Degrees As Double = Math.Atan(slope2) * 180 / cv.Cv2.PI
+            Dim angleDiff As Double = Math.Abs(90.0 - angle2Degrees)
+            Return angleDiff
+        ElseIf isSlope2Vertical Then
+            ' Line 2 is vertical (angle 90 degrees).
+            ' Angle of line 1 is Atan(slope1).
+            Dim angle1Degrees As Double = Math.Atan(slope1) * 180 / cv.Cv2.PI
+            Dim angleDiff As Double = Math.Abs(90.0 - angle1Degrees)
+            Return angleDiff
         End If
 
-        facetGen.Run(src)
-        If facetGen.inputPoints.Count = 0 Then Exit Sub ' nothing to work on ...
-
-        ptList.Clear()
-        Dim generations As New List(Of Integer)
-        For Each pt In facetGen.inputPoints
-            Dim fIndex = facetGen.facet.dst3.Get(Of Integer)(pt.Y, pt.X)
-            If fIndex >= facetGen.facet.facetList.Count Then Continue For ' new point
-            Dim g = facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
-            generations.Add(g)
-            ptList.Add(pt)
-            SetTrueText(CStr(g), pt)
-        Next
-
-        If generations.Count = 0 Then Exit Sub
-
-        Dim maxGens = generations.Max()
-        Dim index = generations.IndexOf(maxGens)
-        anchorPoint = ptList(index)
-        If index < facetGen.facet.facetList.Count Then
-            Dim bestFacet = facetGen.facet.facetList(index)
-            dst2.FillConvexPoly(bestFacet, cv.Scalar.Black, task.lineType)
-            DrawContour(dst2, bestFacet, task.highlight)
+        ' --- Handle Perpendicular Lines (Product of slopes is -1) ---
+        ' Check if 1 + m1*m2 is very close to zero, indicating perpendicularity.
+        If Math.Abs(1 + slope1 * slope2) < EPSILON Then
+            Return 90.0 ' Lines are perpendicular (90 degrees)
         End If
 
-        dst2 = facetGen.dst2
-        dst3 = src.Clone
-        For i = 0 To ptList.Count - 1
-            Dim pt = ptList(i)
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
-            DrawCircle(dst3, pt, task.DotSize, task.highlight)
-        Next
-        labels(2) = CStr(ptList.Count) + " stable points were identified with " + CStr(maxGens) + " generations at the anchor point"
+        ' --- General Case: Use the tangent formula ---
+        Dim tanTheta As Double = (slope2 - slope1) / (1 + slope1 * slope2)
+        Dim angleRadians As Double = Math.Atan(tanTheta) ' Result is in (-PI/2, PI/2)
+        Dim angleDegrees As Double = angleRadians * 180 / cv.Cv2.PI
+
+        Return angleDegrees
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            lp = task.lineLongest
+            If task.firstPass Then lpLast = lp
+        End If
+
+        Dim rotateAngle = GetAngleBetweenLinesBySlopes(lp.slope, lpLast.slope)
+        If rotateAngle <> 0 Then
+            Dim rotateCenter = Line_Intersection.IntersectTest(lp, lpLast)
+            Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
+            dst2 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Cubic)
+            lpLast = lp
+        Else
+            If task.heartBeat Then dst2 = src.Clone
+        End If
+
+        If task.heartBeat Then lpLast = lp
+
+        labels(2) = "Image after rotation by " + Format(rotateAngle, fmt3) + " degrees.  Move camera to see impact."
     End Sub
 End Class
 
@@ -55,12 +70,8 @@ End Class
 
 
 
-
-
-
-
 Public Class Stable_BasicsCount : Inherits TaskParent
-    Public basics As New Stable_Basics
+    Public basics As New FCS_StablePoints
     Public goodCounts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Dim ptBest As New BrickPoint_Basics
     Public Sub New()
@@ -71,7 +82,7 @@ Public Class Stable_BasicsCount : Inherits TaskParent
             basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.features)
         Else
             ptBest.Run(src)
-            basics.facetGen.inputPoints = ptBest.intensityFeatures
+            basics.facetGen.inputPoints = ptBest.features
         End If
         basics.Run(src)
         dst2 = basics.dst2
@@ -98,7 +109,7 @@ End Class
 
 
 Public Class Stable_Lines : Inherits TaskParent
-    Public basics As New Stable_Basics
+    Public basics As New FCS_StablePoints
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Track the line end points found in the BGR image and keep those that are stable."
@@ -134,12 +145,12 @@ End Class
 
 
 Public Class Stable_FAST : Inherits TaskParent
-    Public basics As New Stable_Basics
+    Public basics As New FCS_StablePoints
     Dim fast As New Corners_Basics
     Public Sub New()
         desc = "Track the FAST feature points found in the BGR image and track those that appear stable."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         fast.Run(src)
 
         basics.facetGen.inputPoints.Clear()
@@ -148,7 +159,7 @@ Public Class Stable_FAST : Inherits TaskParent
         dst3 = basics.dst3
         dst2 = basics.dst2
         For Each pt In basics.ptList
-            DrawCircle(dst2,pt, task.DotSize + 1, task.highlight)
+            DrawCircle(dst2, pt, task.DotSize + 1, task.highlight)
             If standaloneTest() Then
                 Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 SetTrueText(CStr(g), pt)
@@ -156,47 +167,5 @@ Public Class Stable_FAST : Inherits TaskParent
         Next
         labels(2) = basics.labels(2)
         labels(3) = CStr(task.features.Count) + " features were found and " + CStr(basics.ptList.Count) + " were stable"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-Public Class Stable_GoodFeatures : Inherits TaskParent
-    Public basics As New Stable_Basics
-    Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Track the stable good features found in the BGR image."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        dst3 = basics.dst3
-        If task.features.Count = 0 Then Exit Sub ' nothing to work on...
-
-        basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.features)
-        basics.Run(src)
-        dst2 = basics.dst2
-
-        dst1.SetTo(0)
-        genSorted.Clear()
-        For i = 0 To basics.ptList.Count - 1
-            Dim pt = basics.ptList(i)
-            If standaloneTest() Then DrawCircle(dst2,pt, task.DotSize + 1, cv.Scalar.Yellow)
-            dst1.Set(Of Byte)(pt.Y, pt.X, 255)
-
-            Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
-            genSorted.Add(g, i)
-            SetTrueText(CStr(g), pt)
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
-        Next
-        labels(2) = basics.labels(2)
-        labels(3) = CStr(task.features.Count) + " good features were found and " + CStr(basics.ptList.Count) + " were stable"
     End Sub
 End Class

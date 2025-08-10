@@ -8,7 +8,7 @@ Public Class Swarm_Basics : Inherits TaskParent
     Public options As New Options_Swarm
     Public optionsEx As New Options_Features
     Dim cornerHistory As New List(Of List(Of cv.Point2f))
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_General
     Public Sub New()
         task.featureOptions.FeatureSampleSize.Value = task.featureOptions.FeatureSampleSize.Maximum
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

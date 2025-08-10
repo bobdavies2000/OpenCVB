@@ -3,7 +3,7 @@ Public Class Mesh_Basics : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public ptList As New List(Of cv.Point2f)
     Dim options As New Options_Mesh
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_General
     Public Sub New()
         desc = "Build triangles from the ptList input of points."
     End Sub
@@ -46,7 +46,7 @@ End Class
 
 Public Class Mesh_Features : Inherits TaskParent
     Dim mesh As New Mesh_Basics
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_General
     Public Sub New()
         labels(2) = "Triangles built with each feature point and the specified number of nearest neighbors."
         desc = "Build triangles from feature points"

@@ -17,7 +17,8 @@ Public Class OptionsFeatures
         FeatureMethod.Items.Add("Harris")
         FeatureMethod.Items.Add("FAST")
         FeatureMethod.Items.Add("LineInput")
-        FeatureMethod.SelectedItem() = "LineInput"
+        FeatureMethod.Items.Add("BrickPoint")
+        FeatureMethod.SelectedItem() = "BrickPoint"
 
         EdgeMethods.Items.Add("Canny")
         EdgeMethods.Items.Add("Scharr")

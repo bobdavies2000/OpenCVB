@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Threading
-Imports System.Windows.Forms
 Public Class Grid_Basics : Inherits TaskParent
-    Public gridMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public gridMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public brickList As New List(Of brickData)
+    Public gridNeighbors As New List(Of List(Of Integer))
     Public Sub New()
         task.gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         desc = "Create a grid of squares covering the entire image."
@@ -17,7 +17,7 @@ Public Class Grid_Basics : Inherits TaskParent
         If task.optionsChanged Then
             Dim bricksPerCol As Integer, bricksPerRow As Integer
             task.gridNabeRects.Clear()
-            task.gridNeighbors.Clear()
+            gridNeighbors.Clear()
 
             task.gridRects.Clear()
             Dim index As Integer
@@ -40,11 +40,11 @@ Public Class Grid_Basics : Inherits TaskParent
             task.gridMask.SetTo(0)
             For x = cellSize To dst2.Width - 1 Step cellSize
                 Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, dst2.Height)
-                task.gridMask.Line(p1, p2, 255, task.lineWidth)
+                task.gridMask.Line(p1, p2, 255, 1)
             Next
             For y = cellSize To dst2.Height - 1 Step cellSize
                 Dim p1 = New cv.Point(0, y), p2 = New cv.Point(dst2.Width, y)
-                task.gridMask.Line(p1, p2, 255, task.lineWidth)
+                task.gridMask.Line(p1, p2, 255, 1)
             Next
 
             For i = 0 To task.gridRects.Count - 1
@@ -54,8 +54,7 @@ Public Class Grid_Basics : Inherits TaskParent
 
             For j = 0 To task.gridRects.Count - 1
                 Dim roi = task.gridRects(j)
-                Dim nextList As New List(Of Integer)
-                nextList.Add(j)
+                Dim nextList As New List(Of Integer)({j})
                 For i = 0 To 8
                     Dim x = Choose(i + 1, roi.X - 1, roi.X, roi.X + roi.Width + 1,
                                               roi.X - 1, roi.X, roi.X + roi.Width + 1,
@@ -67,10 +66,10 @@ Public Class Grid_Basics : Inherits TaskParent
                         If nextList.Contains(nextIndex) = False Then nextList.Add(nextIndex)
                     End If
                 Next
-                task.gridNeighbors.Add(nextList)
+                gridNeighbors.Add(nextList)
             Next
 
-            For Each nabeList In task.gridNeighbors
+            For Each nabeList In gridNeighbors
                 Dim xList As New List(Of Integer), yList As New List(Of Integer)
                 For Each index In nabeList
                     Dim roi = task.gridRects(index)
@@ -234,10 +233,10 @@ Public Class Grid_Neighbors : Inherits TaskParent
         SetTrueText("Click any grid entry to see its neighbors", 3)
         dst2.SetTo(white, task.gridMask)
 
-        Dim roiIndex As Integer = task.grid.gridMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim roiIndex As Integer = task.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
 
         dst3.SetTo(0)
-        For Each index In task.gridNeighbors(roiIndex)
+        For Each index In task.grid.gridNeighbors(roiIndex)
             Dim roi = task.gridRects(index)
             dst2.Rectangle(roi, white, task.lineWidth)
             dst3.Rectangle(roi, 255, task.lineWidth)
@@ -299,7 +298,7 @@ Public Class Grid_TrackCenter : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If match.correlation < task.fCorrThreshold Or task.gOptions.DebugCheckBox.Checked Then
             task.gOptions.DebugCheckBox.Checked = False
-            Dim index As Integer = task.grid.gridMap.Get(Of Single)(dst2.Height / 2, dst2.Width / 2)
+            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
             Dim roi = task.gridRects(index)
             match.template = src(roi).Clone
             center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)

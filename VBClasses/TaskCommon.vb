@@ -1,5 +1,4 @@
-﻿Imports OpenCvSharp
-Imports VBClasses.TaskParent
+﻿Imports VBClasses.TaskParent
 Imports cv = OpenCvSharp
 Public Module vbc
     Public task As VBtask
@@ -615,8 +614,8 @@ End Class
 
 
 
-
 Public Class lpData
+    Public age As Integer
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
     Public ep1 As cv.Point2f ' end points - goes to the edge of the image.
@@ -627,8 +626,11 @@ Public Class lpData
     Public slope As Single ' max is 100000 for vertical lines - adequate for use here.
     Public angle As Single ' varies from -90 to 90 degrees
     Public center As cv.Point2f
+    Public ID As Integer
     Public gridIndex1 As Integer
     Public gridIndex2 As Integer
+    Public nabeIndex1 As Integer
+    Public nabeIndex2 As Integer
     Public index As Integer
     Public Function perpendicularPoints(pt As cv.Point2f) As lpData
         Dim perpSlope = -1 / slope
@@ -647,19 +649,19 @@ Public Class lpData
         If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
         Return New lpData(p1, p2)
     End Function
-    Public Sub drawRoRect(dst As cv.Mat)
-        Dim vertices = roRect.Points
-        For i = 0 To vertices.Count - 1
-            DrawLine(dst, vertices(i), vertices((i + 1) Mod 4), task.highlight)
-        Next
-    End Sub
     Public Sub drawRoRectMask(dst As cv.Mat)
         Dim vertices2f = roRect.Points
         Dim vertices As New List(Of cv.Point)
         For Each pt In vertices2f
             vertices.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
         Next
-        Cv2.FillConvexPoly(dst, vertices, 255, cv.LineTypes.AntiAlias)
+        cv.Cv2.FillConvexPoly(dst, vertices, 255, cv.LineTypes.AntiAlias)
+    End Sub
+    Public Sub drawRoRect(dst As cv.Mat)
+        Dim vertices = roRect.Points
+        For i = 0 To vertices.Count - 1
+            DrawLine(dst, vertices(i), vertices((i + 1) Mod 4), task.highlight)
+        Next
     End Sub
     Public Sub CalculateRotatedRectFromLine()
         Dim deltaX As Single = p2.X - p1.X
@@ -708,8 +710,9 @@ Public Class lpData
 
         If Math.Abs(p1.X - p2.X) < 2 Then slope = 100000 ' a big number for slope 
 
-        gridIndex1 = task.grid.gridMap.Get(Of Single)(p1.Y, p1.X)
-        gridIndex2 = task.grid.gridMap.Get(Of Single)(p2.Y, p2.X)
+        gridIndex1 = task.grid.gridMap.Get(Of Integer)(p1.Y, p1.X)
+        gridIndex2 = task.grid.gridMap.Get(Of Integer)(p2.Y, p2.X)
+        ID = If(gridIndex1 <= gridIndex2, gridIndex1, gridIndex2)
 
         If p1.X <> p2.X Then
             Dim b = p1.Y - p1.X * slope

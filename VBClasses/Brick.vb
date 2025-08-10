@@ -11,7 +11,7 @@ Public Class Brick_Basics : Inherits TaskParent
     Public Function setBrickD() As brickData
         Static pt As cv.Point2f = brickList(0).rect.TopLeft
         If task.mouseClickFlag Then pt = task.ClickPoint
-        Dim index = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
+        Dim index = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
         Return brickList(index)
     End Function
     Public Shared Function RealSenseAlign(brick As brickData) As brickData
@@ -37,6 +37,43 @@ Public Class Brick_Basics : Inherits TaskParent
             End If
         End If
         Return brick
+    End Function
+    Public Shared Function getCorrelation(rect As cv.Rect) As Single
+        Dim correlationMat As New cv.Mat
+        Dim lRect = rect, rRect As cv.Rect
+        Dim depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))
+        If depth = 0 Then Return 0 ' no correlation if there is no depth...
+        If task.rgbLeftAligned Then
+            rRect = rect
+            rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / depth.Val0
+            If rRect.X < 0 Or rRect.X + rRect.Width >= task.color.Width Then
+                Return 0 ' no correlation if there is no depth...
+            End If
+        Else
+            Dim irPt = Intrinsics_Basics.translate_ColorToLeft(task.pointCloud.Get(Of cv.Point3f)(rect.Y, rect.X))
+            Dim badTranslation As Boolean = False
+            If Single.IsNaN(irPt.X) Or Single.IsNaN(irPt.Y) Then badTranslation = True
+            If irPt.X = 0 And irPt.Y = 0 Then badTranslation = True
+            If irPt.X < 0 Or irPt.X >= task.color.Width Or irPt.Y >= task.color.Height Or badTranslation Then
+                Return 0 ' no correlation if there is no depth..
+            Else
+                lRect = New cv.Rect(irPt.X, irPt.Y, rect.Width, rect.Height)
+                lRect = ValidateRect(lRect)
+
+                Dim LtoR_Pt = Intrinsics_Basics.translate_LeftToRight(task.pointCloud.Get(Of cv.Point3f)(lRect.Y, lRect.X))
+                If LtoR_Pt.X < 0 Or (LtoR_Pt.X = 0 And LtoR_Pt.Y = 0) Or
+                                (LtoR_Pt.X >= task.color.Width Or
+                                 LtoR_Pt.Y >= task.color.Height) Then
+                    Return 0 ' no correlation if there is no depth..
+                Else
+                    rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, rect.Width, rect.Height)
+                    rRect = ValidateRect(rRect)
+                End If
+            End If
+        End If
+
+        cv.Cv2.MatchTemplate(task.leftView(lRect), task.rightView(rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+        Return correlationMat.Get(Of Single)(0, 0)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -128,7 +165,7 @@ Public Class Brick_Plot : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.bricks.dst2
 
-        Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.bricks.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
 
         Dim brick As brickData
@@ -228,9 +265,13 @@ End Class
 
 Public Class Brick_Edges : Inherits TaskParent
     Public edges As New Edge_Basics
+    Public featureRects As New List(Of cv.Rect)
+    Public featureMask As New cv.Mat
+    Public fLessMask As New cv.Mat
+    Public fLessRects As New List(Of cv.Rect)
     Public Sub New()
-        task.featureMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        task.fLessMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+        featureMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+        fLessMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.featureOptions.EdgeMethods.SelectedItem() = "Laplacian"
         desc = "Add edges to features"
     End Sub
@@ -240,10 +281,10 @@ Public Class Brick_Edges : Inherits TaskParent
 
         edges.Run(src)
 
-        task.featureRects.Clear()
-        task.fLessRects.Clear()
-        task.featureMask.SetTo(0)
-        task.fLessMask.SetTo(0)
+        featureRects.Clear()
+        fLessRects.Clear()
+        featureMask.SetTo(0)
+        fLessMask.SetTo(0)
         Dim flist As New List(Of Single)
         For Each r In task.gridRects
             flist.Add(If(edges.dst2(r).CountNonZero <= 1, 1, 2))
@@ -261,11 +302,11 @@ Public Class Brick_Edges : Inherits TaskParent
             stateList(i) = (stateList(i) + flist(i)) / 2
             Dim r = task.gridRects(i)
             If stateList(i) >= 1.95 Then
-                task.featureRects.Add(r)
-                task.featureMask(r).SetTo(255)
+                featureRects.Add(r)
+                featureMask(r).SetTo(255)
             ElseIf stateList(i) <= 1.05 Then
-                task.fLessRects.Add(r)
-                task.fLessMask(r).SetTo(255)
+                fLessRects.Add(r)
+                fLessMask(r).SetTo(255)
             Else
                 flipRects.Add(r)
             End If
@@ -273,99 +314,26 @@ Public Class Brick_Edges : Inherits TaskParent
 
         dst2.SetTo(0)
         dst3.SetTo(0)
-        src.CopyTo(dst2, task.featureMask)
-        src.CopyTo(dst3, task.featureMask)
+        src.CopyTo(dst2, featureMask)
+        src.CopyTo(dst3, featureMask)
 
         For Each r In flipRects
             dst2.Rectangle(r, task.highlight, task.lineWidth)
         Next
 
-        For Each r In task.fLessRects
+        For Each r In fLessRects
             Dim x = CInt(r.X / task.brickSize)
             Dim y = CInt(r.Y / task.brickSize)
             task.lowResDepth.Set(Of Single)(y, x, lastDepth.Get(Of Single)(y, x))
         Next
         lastDepth = task.lowResDepth.Clone
         If task.heartBeat Then
-            labels(2) = CStr(task.fLessRects.Count) + " cells without features were found.  " +
+            labels(2) = CStr(fLessRects.Count) + " cells without features were found.  " +
                         "Cells that are flipping (with and without edges) are highlighted"
         End If
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Brick_MLColor : Inherits TaskParent
-    Dim ml As New ML_Basics
-    Dim bounds As New Brick_FeaturesAndEdges
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        ml.buildEveryPass = True
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        desc = "Train an ML tree to predict each pixel of the boundary cells using only color from boundary neighbors."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bounds.Run(src)
-        Dim edgeMask = bounds.feat.edges.dst2
-
-        Dim rgb32f As New cv.Mat, tmp As New cv.Mat
-        src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
-
-        dst1 = task.fLessMask
-        Dim trainRGB As cv.Mat
-        For i = 0 To bounds.boundaryCells.Count - 1
-            Dim nList = bounds.boundaryCells(i)
-
-            ' the first roi is the center one and the only roi with edges.  The rest are featureless.
-            Dim roi = task.gridRects(nList(0))
-            Dim edgePixels = edgeMask(roi).FindNonZero()
-
-            ' mark the edge pixels as class 2 - others will be updated next
-            ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
-                                           cv.MatType.CV_32F, New cv.Scalar(2))
-            trainRGB = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32FC3)
-
-            For j = 1 To nList.Count - 1
-                Dim roiA = task.gridRects(nList(j))
-                Dim x As Integer = Math.Floor(roiA.X * task.bricksPerRow / task.cols)
-                Dim y As Integer = Math.Floor(roiA.Y * task.bricksPerCol / task.rows)
-                Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
-                trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
-                ml.trainResponse.Set(Of Single)(j - 1, 0, 1)
-            Next
-
-            ' next, add the edge pixels in the target cell - they are the feature identifiers.
-            Dim index = nList.Count - 1
-            For j = 0 To edgePixels.Rows - 1
-                Dim pt = edgePixels.Get(Of cv.Point)(j, 0)
-                Dim val = rgb32f.Get(Of cv.Vec3f)(roi.Y + pt.Y, roi.X + pt.X)
-                trainRGB.Set(Of cv.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
-            Next
-
-            ml.trainMats = {trainRGB}
-
-            Dim roiB = task.gridRects(nList(0))
-            ml.testMats = {rgb32f(roiB)}
-            ml.Run(src)
-
-            dst1(roiB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
-                                        ConvertScaleAbs.Reshape(1, roiB.Height)
-        Next
-
-        dst2.SetTo(0)
-        src.CopyTo(dst2, dst1)
-
-        dst3.SetTo(0)
-        src.CopyTo(dst3, Not dst1)
-
-        labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
-                  " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
-    End Sub
-End Class
 
 
 
@@ -388,7 +356,7 @@ Public Class Brick_MLColorDepth : Inherits TaskParent
         Dim rgb32f As New cv.Mat, tmp As New cv.Mat
         src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
 
-        dst1 = task.fLessMask
+        dst1 = bounds.feat.fLessMask
         Dim trainRGB As cv.Mat, trainDepth As cv.Mat
         For i = 0 To bounds.boundaryCells.Count - 1
             Dim nList = bounds.boundaryCells(i)
@@ -450,121 +418,6 @@ End Class
 
 
 
-
-Public Class Brick_FeaturesAndEdges : Inherits TaskParent
-    Public feat As New Brick_Edges
-    Public boundaryCells As New List(Of List(Of Integer))
-    Public Sub New()
-        labels(2) = "Gray and black regions are featureless while white has features..."
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        desc = "Find the boundary cells between feature and featureless cells."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(src)
-        dst1 = task.featureMask.Clone
-
-        boundaryCells.Clear()
-        For Each nList In task.gridNeighbors
-            Dim roiA = task.gridRects(nList(0))
-            Dim centerType = task.featureMask.Get(Of Byte)(roiA.Y, roiA.X)
-            If centerType <> 0 Then
-                Dim boundList = New List(Of Integer)
-                Dim addFirst As Boolean = True
-                For i = 1 To nList.Count - 1
-                    Dim roiB = task.gridRects(nList(i))
-                    Dim val = task.featureMask.Get(Of Byte)(roiB.Y, roiB.X)
-                    If centerType <> val Then
-                        If addFirst Then boundList.Add(nList(0)) ' first element is the center point (has features)
-                        addFirst = False
-                        boundList.Add(nList(i))
-                    End If
-                Next
-                If boundList.Count > 0 Then boundaryCells.Add(boundList)
-            End If
-        Next
-
-        dst2.SetTo(0)
-        For Each nlist In boundaryCells
-            For Each n In nlist
-                Dim mytoggle As Integer
-                Dim roi = task.gridRects(n)
-                Dim val = task.featureMask.Get(Of Byte)(roi.Y, roi.X)
-                If val > 0 Then mytoggle = 255 Else mytoggle = 128
-                dst2(task.gridRects(n)).SetTo(mytoggle)
-            Next
-        Next
-    End Sub
-End Class
-
-
-
-
-Public Class Brick_Features : Inherits TaskParent
-    Dim feat As New Feature_Basics
-    Public features() As List(Of cv.Point)
-    Public Sub New()
-        task.brickRunFlag = True
-        task.featureOptions.DistanceSlider.Value = 3
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Featureless areas"
-        desc = "Identify the cells with features"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(src)
-
-        dst2 = task.bricks.dst2
-
-        ReDim features(task.gridRects.Count - 1)
-
-        task.featurePoints.Clear()
-        Dim rects As New List(Of cv.Rect)
-        For Each pt In task.features
-            Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-            Dim brick = task.bricks.brickList(index)
-            If features(index) Is Nothing Then features(index) = New List(Of cv.Point)
-            features(index).Add(pt)
-            DrawCircle(dst2, brick.rect.TopLeft, task.DotSize, task.highlight)
-
-            rects.Add(brick.rect)
-            task.bricks.brickList(index) = brick
-        Next
-
-        task.featureRects.Clear()
-        task.fLessRects.Clear()
-        For i = 0 To features.Count - 1
-            Dim ptlist = features(i)
-            If ptlist Is Nothing Then
-                task.fLessRects.Add(task.bricks.brickList(i).rect)
-            Else
-                task.featureRects.Add(task.bricks.brickList(i).rect)
-            End If
-        Next
-
-        If task.gOptions.DebugCheckBox.Checked Then
-            For Each pt In task.features
-                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Black)
-            Next
-        End If
-        If standaloneTest() Then
-            dst3.SetTo(0)
-            For Each r In rects
-                dst3.Rectangle(r, white, -1)
-            Next
-            dst3 = Not dst3
-        End If
-        If task.heartBeat Then
-            labels(2) = CStr(task.featureRects.Count) + " cells had features while " + CStr(task.fLessRects.Count) + " had none"
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Brick_EdgeDraw : Inherits TaskParent
     Dim regions As New Region_Contours
     Public Sub New()
@@ -602,7 +455,7 @@ Public Class Brick_CorrelationInput : Inherits TaskParent
         dst2 = LRMeanSub.dst2
         dst3 = LRMeanSub.dst3
 
-        Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If index < 0 Or index > task.bricks.brickList.Count Then Exit Sub
         task.brickD = task.bricks.brickList(index)
 
@@ -631,7 +484,7 @@ Public Class Brick_Info : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         labels(2) = task.bricks.labels(2)
 
-        Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
         Dim brick As brickData = task.bricks.brickList(index)
         dst2 = src
@@ -701,12 +554,12 @@ Public Class Brick_LeftRightMouse : Inherits TaskParent
 
         Static myBricks As New List(Of Integer)
         If standalone And task.testAllRunning Then
-            Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
             For i = index To index + 10
                 If myBricks.Contains(i) = False Then myBricks.Add(i)
             Next
         Else
-            Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             If myBricks.Contains(index) = False Then myBricks.Add(index)
         End If
 
@@ -734,7 +587,7 @@ Public Class Brick_RGBtoLeft : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
-        Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim brick As brickData
         If index > 0 And index < task.bricks.brickList.Count Then
             brick = task.bricks.brickList(index)
@@ -838,7 +691,7 @@ Public Class Brick_CorrelationMap : Inherits TaskParent
 
         Dim ptM = task.mouseMovePoint, w = task.workRes.Width, h = task.workRes.Height
         If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
-            Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             task.brickD = task.bricks.brickList(index)
             task.depthAndCorrelationText = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
                                            CStr(task.brickD.index) + vbCrLf + " range " + Format(task.brickD.mm.minVal, fmt1) + "-" +
@@ -1049,5 +902,173 @@ Public Class Brick_Cloud : Inherits TaskParent
         Next
 
         labels(2) = CStr(updateCount) + " bricks of " + CStr(task.gridRects.Count) + " were reviewed for changes."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Brick_Features : Inherits TaskParent
+    Public featureBricks As New List(Of cv.Rect)
+    Public Sub New()
+        task.gOptions.LineWidth.Value = 3
+        task.featureRunFlag = True
+        labels(3) = "Featureless areas"
+        desc = "Identify the cells with features"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.feat.dst2
+
+        featureBricks.Clear()
+        Dim featList As New List(Of cv.Point)(task.feat.features)
+        For Each pt In featList
+            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            featureBricks.Add(task.gridRects(index))
+        Next
+
+        If task.gOptions.DebugCheckBox.Checked Then
+            For Each pt In featList
+                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Black)
+            Next
+        End If
+
+        If standaloneTest() Then
+            dst3.SetTo(0)
+            For Each r In featureBricks
+                dst3.Rectangle(r, white, -1)
+            Next
+            dst3 = Not dst3
+        End If
+
+        If task.heartBeat Then
+            Dim flessCount = task.gridRects.Count - featureBricks.Count
+            labels(2) = CStr(featureBricks.Count) + " cells had features while " + CStr(flessCount) + " had none"
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Brick_FeaturesAndEdges : Inherits TaskParent
+    Public feat As New Brick_Edges
+    Public boundaryCells As New List(Of List(Of Integer))
+    Public Sub New()
+        labels(2) = "Gray and black regions are featureless while white has features..."
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        desc = "Find the boundary cells between feature and featureless cells."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        feat.Run(src)
+        dst1 = feat.featureMask.Clone
+
+        boundaryCells.Clear()
+        For Each nList In task.grid.gridNeighbors
+            Dim roiA = task.gridRects(nList(0))
+            Dim centerType = feat.featureMask.Get(Of Byte)(roiA.Y, roiA.X)
+            If centerType <> 0 Then
+                Dim boundList = New List(Of Integer)
+                Dim addFirst As Boolean = True
+                For i = 1 To nList.Count - 1
+                    Dim roiB = task.gridRects(nList(i))
+                    Dim val = feat.featureMask.Get(Of Byte)(roiB.Y, roiB.X)
+                    If centerType <> val Then
+                        If addFirst Then boundList.Add(nList(0)) ' first element is the center point (has features)
+                        addFirst = False
+                        boundList.Add(nList(i))
+                    End If
+                Next
+                If boundList.Count > 0 Then boundaryCells.Add(boundList)
+            End If
+        Next
+
+        dst2.SetTo(0)
+        For Each nlist In boundaryCells
+            For Each n In nlist
+                Dim mytoggle As Integer
+                Dim roi = task.gridRects(n)
+                Dim val = feat.featureMask.Get(Of Byte)(roi.Y, roi.X)
+                If val > 0 Then mytoggle = 255 Else mytoggle = 128
+                dst2(task.gridRects(n)).SetTo(mytoggle)
+            Next
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Brick_MLColor : Inherits TaskParent
+    Dim ml As New ML_Basics
+    Dim bounds As New Brick_FeaturesAndEdges
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        ml.buildEveryPass = True
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        desc = "Train an ML tree to predict each pixel of the boundary cells using only color from boundary neighbors."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        bounds.Run(src)
+        Dim edgeMask = bounds.feat.edges.dst2
+
+        Dim rgb32f As New cv.Mat, tmp As New cv.Mat
+        src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
+
+        dst1 = bounds.feat.fLessMask
+        Dim trainRGB As cv.Mat
+        For i = 0 To bounds.boundaryCells.Count - 1
+            Dim nList = bounds.boundaryCells(i)
+
+            ' the first roi is the center one and the only roi with edges.  The rest are featureless.
+            Dim roi = task.gridRects(nList(0))
+            Dim edgePixels = edgeMask(roi).FindNonZero()
+
+            ' mark the edge pixels as class 2 - others will be updated next
+            ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
+                                           cv.MatType.CV_32F, New cv.Scalar(2))
+            trainRGB = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32FC3)
+
+            For j = 1 To nList.Count - 1
+                Dim roiA = task.gridRects(nList(j))
+                Dim x As Integer = Math.Floor(roiA.X * task.bricksPerRow / task.cols)
+                Dim y As Integer = Math.Floor(roiA.Y * task.bricksPerCol / task.rows)
+                Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
+                trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
+                ml.trainResponse.Set(Of Single)(j - 1, 0, 1)
+            Next
+
+            ' next, add the edge pixels in the target cell - they are the feature identifiers.
+            Dim index = nList.Count - 1
+            For j = 0 To edgePixels.Rows - 1
+                Dim pt = edgePixels.Get(Of cv.Point)(j, 0)
+                Dim val = rgb32f.Get(Of cv.Vec3f)(roi.Y + pt.Y, roi.X + pt.X)
+                trainRGB.Set(Of cv.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
+            Next
+
+            ml.trainMats = {trainRGB}
+
+            Dim roiB = task.gridRects(nList(0))
+            ml.testMats = {rgb32f(roiB)}
+            ml.Run(src)
+
+            dst1(roiB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
+                                        ConvertScaleAbs.Reshape(1, roiB.Height)
+        Next
+
+        dst2.SetTo(0)
+        src.CopyTo(dst2, dst1)
+
+        dst3.SetTo(0)
+        src.CopyTo(dst3, Not dst1)
+
+        labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
+                  " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
     End Sub
 End Class

@@ -1,5 +1,101 @@
 ﻿Imports cv = OpenCvSharp
 Public Class FCS_Basics : Inherits TaskParent
+    Public basics As New FCS_StablePoints
+    Public genSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Track the stable good features found in the BGR image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        basics.Run(src)
+        dst3 = basics.dst3
+        labels(3) = basics.labels(3)
+        If basics.ptList.Count = 0 Then Exit Sub ' nothing to work on...
+
+        basics.facetGen.inputPoints = New List(Of cv.Point2f)(basics.ptList)
+        basics.Run(src)
+        dst2 = basics.dst2
+
+        dst1.SetTo(0)
+        genSorted.Clear()
+        For i = 0 To basics.ptList.Count - 1
+            Dim pt = basics.ptList(i)
+            If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize + 1, cv.Scalar.Yellow)
+            dst1.Set(Of Byte)(pt.Y, pt.X, 255)
+
+            Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
+            genSorted.Add(g, i)
+            SetTrueText(CStr(g), pt)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+        Next
+        labels(2) = basics.labels(2)
+        labels(3) = CStr(basics.ptList.Count) + " stable good features were found"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_StablePoints : Inherits TaskParent
+    Public facetGen As New Delaunay_Generations
+    Public ptList As New List(Of cv.Point2f)
+    Public anchorPoint As cv.Point2f
+    Dim good As New Feature_KNN
+    Public Sub New()
+        desc = "Maintain the generation counts around the feature points."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        good.Run(src)
+        facetGen.inputPoints = New List(Of cv.Point2f)(good.featurePoints)
+
+        facetGen.Run(src)
+        If facetGen.inputPoints.Count = 0 Then
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            Exit Sub ' nothing to work on ...
+        End If
+
+        ptList.Clear()
+        Dim generations As New List(Of Integer)
+        For Each pt In facetGen.inputPoints
+            Dim fIndex = facetGen.facet.dst3.Get(Of Integer)(pt.Y, pt.X)
+            If fIndex >= facetGen.facet.facetList.Count Then Continue For ' new point
+            Dim g = facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
+            generations.Add(g)
+            ptList.Add(pt)
+            SetTrueText(CStr(g), pt)
+        Next
+
+        If generations.Count = 0 Then Exit Sub
+
+        Dim maxGens = generations.Max()
+        Dim index = generations.IndexOf(maxGens)
+        anchorPoint = ptList(index)
+        If index < facetGen.facet.facetList.Count Then
+            Dim bestFacet = facetGen.facet.facetList(index)
+            dst2.FillConvexPoly(bestFacet, cv.Scalar.Black, task.lineType)
+            DrawContour(dst2, bestFacet, task.highlight)
+        End If
+
+        dst2 = facetGen.dst2
+        dst3 = src.Clone
+        For i = 0 To ptList.Count - 1
+            Dim pt = ptList(i)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            DrawCircle(dst3, pt, task.DotSize, task.highlight)
+        Next
+        labels(2) = CStr(ptList.Count) + " stable points were identified with a max of " + CStr(maxGens) +
+                    " generations."
+    End Sub
+End Class
+
+
+
+
+
+Public Class FCS_BasicsOld : Inherits TaskParent
     Dim fcs As New FCS_Core
     Public desiredMapCount As Integer = 5
     Public Sub New()
@@ -66,7 +162,7 @@ End Class
 
 Public Class FCS_CreateList : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_General
     Public Sub New()
         task.brickRunFlag = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -92,7 +188,7 @@ Public Class FCS_CreateList : Inherits TaskParent
             fp.ptHistory.Add(fp.pt)
             fp.index = i
 
-            Dim brickIndex = task.grid.gridMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
+            Dim brickIndex = task.grid.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
             Dim brick = task.bricks.brickList(brickIndex)
             Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
             If fpIndex >= 0 Then
@@ -128,7 +224,7 @@ Public Class FCS_CreateList : Inherits TaskParent
         If task.features.Count <> facets.Length Then
             task.fpFromGridCell.Clear()
             For Each fp In task.fpList
-                Dim nextIndex = task.grid.gridMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
+                Dim nextIndex = task.grid.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
                 task.fpFromGridCell.Add(nextIndex)
             Next
         End If
@@ -469,7 +565,7 @@ Public Class FCS_Motion : Inherits TaskParent
         yDist.Add(0)
         dst3.SetTo(0)
         For Each fp In task.fpList
-            Dim brickIndex = task.grid.gridMap.Get(Of Single)(fp.pt.Y, fp.pt.X)
+            Dim brickIndex = task.grid.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
             Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
             If fpIndex >= 0 Then
                 linkedCount += 1
@@ -679,7 +775,7 @@ Public Class FCS_ByDepth : Inherits TaskParent
         If standalone Then
             Static ptBest As New BrickPoint_Basics
             ptBest.Run(src)
-            task.features = ptBest.intensityFeatures
+            task.features = ptBest.features
         End If
         fcs.Run(src)
         dst2 = fcs.dst2
@@ -795,5 +891,63 @@ Public Class FCS_PeripheryNot : Inherits TaskParent
         Next
         fpDSet()
         labels = perif.labels
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FCS_BrickPoints : Inherits TaskParent
+    Public facetGen As New Delaunay_Generations
+    Public ptList As New List(Of cv.Point2f)
+    Public anchorPoint As cv.Point2f
+    Dim good As New Feature_KNN
+    Public Sub New()
+        desc = "Maintain the generation counts around the feature points."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        good.Run(src)
+        facetGen.inputPoints = New List(Of cv.Point2f)(good.featurePoints)
+
+        facetGen.Run(src)
+        If facetGen.inputPoints.Count = 0 Then
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            Exit Sub ' nothing to work on ...
+        End If
+
+        ptList.Clear()
+        Dim generations As New List(Of Integer)
+        For Each pt In facetGen.inputPoints
+            Dim fIndex = facetGen.facet.dst3.Get(Of Integer)(pt.Y, pt.X)
+            If fIndex >= facetGen.facet.facetList.Count Then Continue For ' new point
+            Dim g = facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
+            generations.Add(g)
+            ptList.Add(pt)
+            SetTrueText(CStr(g), pt)
+        Next
+
+        If generations.Count = 0 Then Exit Sub
+
+        Dim maxGens = generations.Max()
+        Dim index = generations.IndexOf(maxGens)
+        anchorPoint = ptList(index)
+        If index < facetGen.facet.facetList.Count Then
+            Dim bestFacet = facetGen.facet.facetList(index)
+            dst2.FillConvexPoly(bestFacet, cv.Scalar.Black, task.lineType)
+            DrawContour(dst2, bestFacet, task.highlight)
+        End If
+
+        dst2 = facetGen.dst2
+        dst3 = src.Clone
+        For i = 0 To ptList.Count - 1
+            Dim pt = ptList(i)
+            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            DrawCircle(dst3, pt, task.DotSize, task.highlight)
+        Next
+        labels(2) = CStr(ptList.Count) + " stable points were identified with a max of " + CStr(maxGens) +
+                    " generations."
     End Sub
 End Class

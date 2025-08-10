@@ -31,7 +31,7 @@ Public Class Gravity_Basics : Inherits TaskParent
             showVectors(dst2)
             dst3.SetTo(0)
             For Each lp In task.lines.lpList
-                If Math.Abs(task.lineGravity.angle - lp.angle) < 2 Then DrawLine(dst3, lp, white)
+                If Math.Abs(task.lineGravity.angle - lp.angle) < task.angleThreshold Then DrawLine(dst3, lp, white)
             Next
             labels(3) = task.lines.labels(3)
         End If

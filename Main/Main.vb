@@ -70,7 +70,6 @@ Public Class Main
     Dim DrawingRectangle As Boolean
     Dim drawRect As New cv.Rect
     Dim drawRectPic As Integer
-    Dim externalPythonInvocation As Boolean
     Dim frameCount As Integer
     Dim GrabRectangleData As Boolean
 
@@ -842,7 +841,7 @@ Public Class Main
             AvailableAlgorithms.SelectedIndex += 1
         Next
 
-        ' skip testing the Benfor_ algorithms.  They are only for visualizations - not for other algorithms to use.
+        ' skip testing the Benford_ algorithms.  They are only for visualizations - not for other algorithms to use.
         For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
             If AvailableAlgorithms.Text.StartsWith("Benford_") = False Then Exit For
             AvailableAlgorithms.SelectedIndex += 1
@@ -851,6 +850,12 @@ Public Class Main
         ' skip testing the GIF_ algorithms.  They are only for visualizations - not for other algorithms to use.
         For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
             If AvailableAlgorithms.Text.StartsWith("GIF_") = False Then Exit For
+            AvailableAlgorithms.SelectedIndex += 1
+        Next
+
+        ' skip testing the ML_ algorithms.  Trying to fix a bug in memory mgmt
+        For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
+            If AvailableAlgorithms.Text.StartsWith("ML_") = False Then Exit For
             AvailableAlgorithms.SelectedIndex += 1
         Next
 
@@ -1039,34 +1044,17 @@ Public Class Main
         End If
     End Sub
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Dim args() = Environment.GetCommandLineArgs()
+        HomeDir = New DirectoryInfo(args(1))
         Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
         Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
-        HomeDir = New DirectoryInfo(exeDir.FullName + "/../../../../../")
         Directory.SetCurrentDirectory(HomeDir.FullName)
-        HomeDir = New DirectoryInfo("./")
 
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
-        Dim args() = Environment.GetCommandLineArgs()
 
         jsonRead()
         setupPath()
         camSwitch()
-
-        ' currently the only commandline arg is the name of the algorithm to run.  Save it and continue...
-        If args.Length > 1 Then
-            Dim algorithm As String = "AddWeighted_PS.py"
-            settings.groupComboText = "< All >"
-            If args.Length > 2 Then ' arguments from python os.spawnv are passed as wide characters.  
-                For i = 0 To args.Length - 1
-                    algorithm += args(i)
-                Next
-            Else
-                algorithm = args(1)
-            End If
-            Debug.WriteLine("'" + algorithm + "' was provided in the command line arguments to OpenCVB")
-            If algorithm = "Pyglet_Image_PS.py" Then End
-            externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
-        End If
 
         PausePlay = New Bitmap(HomeDir.FullName + "Main/Data/PauseButton.png")
         stopTestAll = New Bitmap(HomeDir.FullName + "Main/Data/stopTestAll.png")
@@ -1087,14 +1075,6 @@ Public Class Main
                 End If
             End If
         Next
-
-        Dim systemPath = Environment.GetEnvironmentVariable("Path")
-        pythonPresent = InStr(systemPath.ToLower, "python")
-        If pythonPresent = False Then
-            MessageBox.Show("Python needs to be in the path in order to run all the algorithms written in python." + vbCrLf +
-                       "That is how you control which version of python is active for OpenCVB." + vbCrLf +
-                       "All Python algorithms will be disabled for now...")
-        End If
 
         Me.Show()
         frameCount = 0
@@ -1380,7 +1360,6 @@ Public Class Main
 
         parms.testAllRunning = testAllRunning
 
-        parms.externalPythonInvocation = externalPythonInvocation
         parms.showConsoleLog = settings.showConsoleLog
 
         parms.HomeDir = HomeDir.FullName

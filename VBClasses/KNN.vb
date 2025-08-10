@@ -17,7 +17,7 @@ Public Class KNN_Basics : Inherits TaskParent
         If standalone Then
             Static ptBest As New BrickPoint_Basics
             ptBest.Run(src)
-            trainInput = ptBest.intensityFeatures
+            trainInput = ptBest.features
             queries = trainInput
         End If
         knn2.trainInput = trainInput
@@ -435,7 +435,7 @@ Public Class KNN_TrackMean : Inherits TaskParent
     Dim lastImage As cv.Mat
     Dim dotSlider As TrackBar
     Dim options As New Options_KNN
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_General
     Public Sub New()
         task.featureOptions.FeatureSampleSize.Value = 200
         dotSlider = OptionParent.FindSlider("Average distance multiplier")
@@ -1047,7 +1047,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
     Public outputPoints2f As New List(Of cv.Point2f)
     Public outputPoints As New List(Of cv.Point)
     Dim options As New Options_Features
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_General
     Public Sub New()
         If standalone Then task.featureOptions.FeatureMethod.SelectedItem = "AGAST"
         desc = "Enforce a minimum distance to the next feature threshold"

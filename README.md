@@ -1,30 +1,17 @@
-# 2025 August 2nd – Camera Lineup, Parallel Lines, Angle Property.
+# 2025 August 2nd – Python support, HomeDir, Brick Points.
 
--   Over 1800 algorithms are included, averaging 36 lines of code per algorithm.
--   OpenCVB supports the following cameras:
-    -   Intel RealSense cameras – D435i and D455.
-    -   StereoLabs ZED 2/2i cameras
-    -   Orbbec Gemini series – Gemini 335 and Gemini 336L
--   Support is dropped for the following cameras:
-    -   Kinect for Azure – no left/right images and Microsoft stopped production.
-    -   Orbbec’s Femto series because they lack left and right images.
-    -   Mynt cameras – went out of production and SDK is no longer working.
-    -   Intel produced several other cameras that lack an IMU.
--   Luxonis Oak D cameras are in development and should be supported again soon.
--   The TreeView would update rapidly when options changed. The correction is in place.
--   Detecting whether a line is parallel to others in the image is a useful property.
-    -   Finding lines which are not parallel to any other is also potentially useful.
-    -   The value of such “unparallel” lines is different from those that are.
-    -   See “Line_Parallel” for more on how group lines based on their parallelism.
--   The “angle” property of lines varies from -90 degrees to 90 degrees.
-    -   All lines can be mapped into a linear spectrum based on their angle.
-    -   Negative angles correspond to negative slopes and positive to positive slopes.
-    -   Slope is quite useful but non-linear as a classifier in comparison.
+-   Over 1900 algorithms are included, averaging 36 lines of code per algorithm.
+-   Python support retired to the XO.vb module – obsolete.
+-   Home directory now passed in from Visual Studio.
+    -   It means that support for standalone execution is removed.
+    -   This change was prompted by the Runtime-Identifier change with Net8.0.
+    -   OpenCVB’s binary is never invoked by itself – it is always part of Visual Studio.
+-   Brick points are now a possible Feature source – see Feature_Basics example below.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/122a37f63e6a1e574e5117f07d87a2bd.jpeg)
+![](media/1c33c86ceee205402f23c9035987ebad.gif)
 
-**Line_Parallel:** *Each group of parallel lines has the same color and group ID (the text at the center of the line.) The “0” group designation is for “unparallel” lines that are of different value because no other lines are parallel to them.  Lines that are close together and parallel may have more value. The group 4 lines in blue above are one such example but there are several other examples in the image as well.*
+**Feature_Basics:** *Essentially this is just Sobel output but on a “brick” basis where the bricks define a grid covering the entire image. The highlighted points are the location that has the highest intensity in the Sobel output for that brick.*
 
 \-----------------------------------------------------------------------------------------------
 
@@ -1089,7 +1076,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
 ![A colorful pattern with dots Description automatically generated with medium confidence](media/db52b0115273726a6ff2d1aa986c0817.gif)
 
-**RedCloud_Basics:** *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
+**RedCloud_Basics:**  *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
 
 ![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
 
@@ -2119,3 +2106,31 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A shelf and a shelf AI-generated content may be incorrect.](media/fb9e21f35bdf318623a18eb0598fa9c5.gif)
 
 **Line_Basics:** *The longest line in each frame is presented whenever the crosshairs are requested. The result is shown in the upper left image (dst0 or task.color.) If the longest line is unchanged, the gravity and horizon vectors are also unchanged.*
+
+# 2025 August 2nd – Camera Lineup, Parallel Lines, Angle Property.
+
+-   Over 1800 algorithms are included, averaging 36 lines of code per algorithm.
+-   OpenCVB supports the following cameras:
+    -   Intel RealSense cameras – D435i and D455.
+    -   StereoLabs ZED 2/2i cameras
+    -   Orbbec Gemini series – Gemini 335 and Gemini 336L
+-   Support is dropped for the following cameras:
+    -   Kinect for Azure – no left/right images and Microsoft stopped production.
+    -   Orbbec’s Femto series because they lack left and right images.
+    -   Mynt cameras – went out of production and SDK is no longer working.
+    -   Intel produced several other cameras that lack an IMU.
+-   Luxonis Oak D cameras are in development and should be supported again soon.
+-   The TreeView would update rapidly when options changed. The correction is in place.
+-   Detecting whether a line is parallel to others in the image is a useful property.
+    -   Finding lines which are not parallel to any other is also potentially useful.
+    -   The value of such “unparallel” lines is different from those that are.
+    -   See “Line_Parallel” for more on how to group lines based on their parallelism.
+-   The “angle” property of lines varies from -90 degrees to 90 degrees.
+    -   All lines can be mapped into a linear spectrum based on their angle.
+    -   Negative angles correspond to negative slopes and positive to positive slopes.
+    -   Slope is quite useful but non-linear as a classifier in comparison.
+-   A log of previous changes is included at the bottom of this document.
+
+![A hand reaching out to a shelf AI-generated content may be incorrect.](media/122a37f63e6a1e574e5117f07d87a2bd.jpeg)
+
+**Line_Parallel:** *Each group of parallel lines has the same color and group ID (the text at the center of the line.) The “0” group designation is for “unparallel” lines that are of different value because no other lines are parallel to them. Lines that are close together and parallel may have more value. The group 4 lines in blue above are one such example but there are several other examples in the image as well.*

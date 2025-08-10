@@ -28,7 +28,7 @@ Public Class Motion_Basics : Inherits TaskParent
             If colorChange > task.colorDiffThreshold Then
                 lastColor(i) = colorVec
                 cellAge(i) = 1
-                For Each index In task.gridNeighbors(i)
+                For Each index In task.grid.gridNeighbors(i)
                     If motionList.Contains(index) = False Then
                         motionFlags(index) = True
                         motionList.Add(index)
@@ -634,8 +634,8 @@ Public Class Motion_EdgeStability : Inherits TaskParent
 
         Dim popSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Dim pops As New List(Of Integer)
-        For i = 0 To task.featureRects.Count - 1
-            Dim roi = task.featureRects(i)
+        For i = 0 To gEdges.featureRects.Count - 1
+            Dim roi = gEdges.featureRects(i)
             Dim pop = dst2(roi).CountNonZero
             pops.Add(pop)
             popSorted.Add(pop, i)
@@ -645,20 +645,20 @@ Public Class Motion_EdgeStability : Inherits TaskParent
         Dim popAverage = If(pops.Count > 0, pops.Average, 0)
         Dim popMin = If(pops.Count > 0, pops.Min, 0)
         Dim popMax = If(pops.Count > 0, pops.Min, 0)
-        labels(2) = CStr(task.featureRects.Count) + " feature rects with an average population of " +
+        labels(2) = CStr(gEdges.featureRects.Count) + " feature rects with an average population of " +
                          Format(popAverage, fmt1) + " and with min = " + CStr(popMin) +
                          " and max = " + CStr(popMax) + ".  Circled cell has max features."
 
         Dim index = pops.IndexOf(pops.Max)
         Dim gSize = task.gOptions.GridSlider.Value
-        Dim pt = New cv.Point(task.featureRects(index).X + gSize / 2, task.featureRects(index).Y + gSize / 2)
+        Dim pt = New cv.Point(gEdges.featureRects(index).X + gSize / 2, gEdges.featureRects(index).Y + gSize / 2)
         dst2.Circle(pt, gSize * 1.5, 255, task.lineWidth * 2)
 
         dst3.SetTo(0)
         dst3.Circle(pt, gSize * 1.5, 255, task.lineWidth * 2)
         Dim count As Integer
         For Each index In popSorted.Values
-            dst3.Rectangle(task.featureRects(index), white, task.lineWidth)
+            dst3.Rectangle(gEdges.featureRects(index), white, task.lineWidth)
             count += 1
             If count >= 20 Then Exit For
         Next
@@ -908,71 +908,6 @@ Public Class Motion_CenterRotation : Inherits TaskParent
         labels(3) = motion.labels(2)
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Motion_TopFeatureFail : Inherits TaskParent
-    Dim fPoly As New XO_FPoly_TopFeatures
-    Public featureRects As New List(Of cv.Rect)
-    Public searchRects As New List(Of cv.Rect)
-    Dim match As New Match_Basics
-    Dim saveMat As New cv.Mat
-    Public Sub New()
-        labels(2) = "Track the feature rect (small one) in each larger rectangle"
-        desc = "Find the top feature cells and track them in the next frame."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim half As Integer = CInt(task.brickSize / 2)
-        Dim pt As cv.Point
-        If task.heartBeatLT Then
-            fPoly.Run(src)
-            searchRects.Clear()
-            featureRects.Clear()
-            saveMat = src.Clone
-            For Each pt In task.topFeatures
-                Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickSize, task.brickSize)
-                roi = ValidateRect(roi) ' stub bricks are fixed here 
-                featureRects.Add(roi)
-                searchRects.Add(task.gridNabeRects(index))
-            Next
-
-            dst2 = saveMat.Clone
-            For Each pt In task.topFeatures
-                Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickSize, task.brickSize)
-                roi = ValidateRect(roi) ' stub bricks are fixed here 
-                dst2.Rectangle(roi, task.highlight, task.lineWidth)
-                dst2.Rectangle(task.gridNabeRects(index), task.highlight, task.lineWidth)
-            Next
-        End If
-
-        dst3 = src.Clone
-        Dim matchRects As New List(Of cv.Rect)
-        For i = 0 To featureRects.Count - 1
-            Dim roi = featureRects(i)
-            match.template = saveMat(roi).Clone
-            match.Run(src(searchRects(i)))
-            dst3.Rectangle(match.newRect, task.highlight, task.lineWidth)
-            matchRects.Add(match.newRect)
-        Next
-
-        saveMat = src.Clone
-        searchRects.Clear()
-        featureRects.Clear()
-        For Each roi In matchRects
-            half = CInt(roi.Width / 2) ' stubby bricks are those at the bottom or right side of the image.
-            pt = New cv.Point(roi.X + half, roi.Y + half)
-            Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
-            featureRects.Add(roi)
-            searchRects.Add(task.gridNabeRects(index))
-        Next
-    End Sub
-End Class
-
 
 
 

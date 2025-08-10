@@ -1,7 +1,8 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Corners_Basics : Inherits TaskParent
-    Dim fast As New Corners_Core
+    Public fast As New Corners_Core
+    Public features As New List(Of cv.Point2f)
     Public Sub New()
         labels = {"", "", "", "FAST stable points without context"}
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -22,13 +23,14 @@ Public Class Corners_Basics : Inherits TaskParent
             If featurePoints.Contains(pt) Then
                 DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
                 newPts.Add(pt)
-                new2f.Add(task.features(i))
+                new2f.Add(fast.features(i))
                 dst3.Set(Of Byte)(pt.Y, pt.X, 255)
             End If
         Next
 
+
         task.featurePoints = If(newPts.Count <= threshold, task.featurePoints, New List(Of cv.Point)(newPts))
-        task.features = If(new2f.Count <= threshold, task.features, New List(Of cv.Point2f)(new2f))
+        features = If(new2f.Count <= threshold, fast.features, New List(Of cv.Point2f)(new2f))
         labels(2) = Format(task.featurePoints.Count, "000") + " identified FAST stable points - slider adjusts threshold"
     End Sub
 End Class
@@ -41,6 +43,7 @@ End Class
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
 Public Class Corners_Core : Inherits TaskParent
     Dim options As New Options_FAST
+    Public features As New List(Of cv.Point2f)
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U)
         desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
@@ -51,11 +54,11 @@ Public Class Corners_Core : Inherits TaskParent
         dst2 = src.Clone
         Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(task.gray, task.FASTthreshold, options.useNonMax)
 
-        task.features.Clear()
+        features.Clear()
         task.featurePoints.Clear()
         For Each kp As cv.KeyPoint In kpoints
             task.featurePoints.Add(New cv.Point(kp.Pt.X, kp.Pt.Y))
-            task.features.Add(kp.Pt)
+            features.Add(kp.Pt)
         Next
 
         If standaloneTest() Then
@@ -65,7 +68,7 @@ Public Class Corners_Core : Inherits TaskParent
                 dst3.Set(Of Byte)(kp.Pt.Y, kp.Pt.X, 255)
             Next
         End If
-        labels(2) = "There were " + CStr(task.features.Count) + " key points detected using FAST"
+        labels(2) = "There were " + CStr(features.Count) + " key points detected using FAST"
     End Sub
 End Class
 
@@ -181,6 +184,7 @@ Public Class Corners_BasicsCentroid : Inherits TaskParent
     Dim fast As New Corners_Basics
     Public Sub New()
         task.kalman = New Kalman_Basics
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         ReDim task.kalman.kInput(1) ' 2 elements - cv.point
         desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
@@ -188,15 +192,15 @@ Public Class Corners_BasicsCentroid : Inherits TaskParent
         fast.Run(src)
         dst2 = fast.dst2
         dst3.SetTo(0)
-        For Each pt In task.features
+        For Each pt In fast.features
             DrawCircle(dst3, pt, task.DotSize + 2, white)
         Next
-        Dim m = cv.Cv2.Moments(task.gray, True)
-        If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
+        Dim m = cv.Cv2.Moments(dst3, True)
+        If m.M00 > 500 Then ' if more than x pixels are present (avoiding a zero area!)
             task.kalman.kInput(0) = m.M10 / m.M00
             task.kalman.kInput(1) = m.M01 / m.M00
-            task.kalman.Run(task.gray)
-            DrawCircle(dst3, New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), 10, cv.Scalar.Red)
+            task.kalman.Run(emptyMat)
+            DrawCircle(dst2, New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), 10, cv.Scalar.Red)
         End If
     End Sub
 End Class
@@ -351,11 +355,12 @@ Public Class Corners_SubPix : Inherits TaskParent
 
         fast.Run(src)
 
-        If task.features.Count = 0 Then Exit Sub ' completely dark?  No features...
-        cv.Cv2.CornerSubPix(task.gray, task.features, New cv.Size(options.subpixSize, options.subpixSize), New cv.Size(-1, -1), term)
+        If fast.features.Count = 0 Then Exit Sub ' completely dark?  No features...
+        cv.Cv2.CornerSubPix(task.gray, fast.features, New cv.Size(options.subpixSize, options.subpixSize),
+                            New cv.Size(-1, -1), term)
 
         dst2 = src
-        For Each pt In task.featurePoints
+        For Each pt In fast.features
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
     End Sub

@@ -35,6 +35,7 @@ Public Class TaskParent : Implements IDisposable
     Public emptyRect As New cv.Rect
     Public Sub New()
         traceName = Me.GetType.Name
+
         If task.callTrace.Count = 0 Then task.callTrace.Add(task.algName + "\")
         labels = {"", "", traceName, ""}
         Dim stackTrace = Environment.StackTrace

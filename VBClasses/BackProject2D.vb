@@ -9,7 +9,7 @@ Public Class BackProject2D_Basics : Inherits TaskParent
         desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim index As Integer = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim roi = task.gridRects(index)
 
         colorFmt.Run(task.color)
@@ -328,7 +328,7 @@ Public Class BackProject2D_RowCol : Inherits TaskParent
         backp.Run(task.color)
         dst2 = Convert32f_To_8UC3(backp.dst2) * 255
 
-        Dim roi = task.gridRects(task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X))
+        Dim roi = task.gridRects(task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X))
         Dim rect As cv.Rect
         If options.backProjectRow Then
             rect = New cv.Rect(0, roi.Y, dst2.Width, roi.Height)

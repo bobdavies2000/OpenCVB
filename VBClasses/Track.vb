@@ -84,7 +84,7 @@ Public Class Track_LongestLine : Inherits TaskParent
 
         If task.heartBeatLT Then
             task.optionsChanged = True
-            Dim gridIndex = task.grid.gridMap.Get(Of Single)(lpList(0).p1.Y, lpList(0).p1.X)
+            Dim gridIndex = task.grid.gridMap.Get(Of Integer)(lpList(0).p1.Y, lpList(0).p1.X)
             track.inputRect = task.gridNabeRects(gridIndex)
             dst3.SetTo(0)
             dst3(track.inputRect) = src(track.inputRect).Clone
@@ -110,7 +110,7 @@ Public Class Track_GridRect : Inherits TaskParent
 
         Static searchRect As cv.Rect, originalRect As cv.Rect
         If task.heartBeatLT Then
-            Dim gridIndex = task.grid.gridMap.Get(Of Single)(lpList(0).p1.Y, lpList(0).p1.X)
+            Dim gridIndex = task.grid.gridMap.Get(Of Integer)(lpList(0).p1.Y, lpList(0).p1.X)
             originalRect = task.gridRects(gridIndex)
             searchRect = task.gridNabeRects(gridIndex)
             Dim x = originalRect.X - searchRect.X
@@ -149,7 +149,7 @@ Public Class Track_Lines : Inherits TaskParent
         dst2 = src
         For i = 0 To trackCount - 1
             If task.heartBeat Then
-                Dim gridIndex = task.grid.gridMap.Get(Of Single)(lpList(i).p1.Y, lpList(i).p1.X)
+                Dim gridIndex = task.grid.gridMap.Get(Of Integer)(lpList(i).p1.Y, lpList(i).p1.X)
                 track(i).inputRect = task.gridNabeRects(gridIndex)
             End If
             track(i).Run(task.gray)

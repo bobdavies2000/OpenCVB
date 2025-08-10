@@ -1,5 +1,3 @@
-Imports System.Math
-Imports System.Security.Cryptography
 Imports cv = OpenCvSharp
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
 Public Class Rotate_Basics : Inherits TaskParent

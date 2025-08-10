@@ -142,7 +142,7 @@ End Class
 Public Class Image_Icon : Inherits TaskParent
     Dim inputImage As Bitmap
     Public Sub New()
-        inputImage = New Bitmap(task.HomeDir + "/Main/Data/OpenCVB.bmp")
+        inputImage = New Bitmap(task.HomeDir + "/Main/Data/OpenCVB.png")
         desc = "Create an icon from an image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -151,7 +151,7 @@ Public Class Image_Icon : Inherits TaskParent
         Dim icon As Icon = Icon.FromHandle(iconHandle)
 
         ' Save the icon to a file
-        Using fs As New FileStream(task.HomeDir + "/Main/Data/OpenCVB.ico", FileMode.OpenOrCreate)
+        Using fs As New FileStream(task.HomeDir + "/Main/Data/test.ico", FileMode.OpenOrCreate)
             icon.Save(fs)
         End Using
         inputImage = Nothing

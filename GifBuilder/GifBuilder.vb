@@ -57,7 +57,8 @@ Module GIFBuilder
             ' Finalize the GIF encoding (important to close the stream properly)
             encoder.Dispose()
         End Try
-        Console.WriteLine("The myGif.gif file can be found in " + imgDir.FullName)
+        Console.WriteLine("The myGif.gif file can be found in " + imgDir.FullName + vbCrLf +
+                          "Close this window or hit enter after reading the message above...")
         Dim noop = Console.ReadLine() ' give them a chance to read the message.
     End Sub
 End Module

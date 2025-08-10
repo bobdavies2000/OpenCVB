@@ -383,7 +383,7 @@ End Class
 
 
 Public Class OpenGL_FlatFloor : Inherits TaskParent
-    Dim flatness As New Model_FlatSurfaces
+    Dim flatness As New XO_Model_FlatSurfaces
     Public Sub New()
         task.ogl.oglFunction = oCase.floorStudy
         desc = "Using minimal cost, create an OpenGL display where the floor is built as a quad"
@@ -406,7 +406,7 @@ End Class
 
 
 Public Class OpenGL_FlatCeiling : Inherits TaskParent
-    Dim flatness As New Model_FlatSurfaces
+    Dim flatness As New XO_Model_FlatSurfaces
     Public Sub New()
         task.ogl.oglFunction = oCase.floorStudy
         desc = "Using minimal cost, create an OpenGL display where the ceiling is built as a quad"
@@ -1330,7 +1330,7 @@ Public Class OpenGL_Grid : Inherits TaskParent
         Dim depth = task.lowResDepth.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
         Dim pc As New cv.Mat
         cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), depth}, pc)
-        If task.toggleOn Then pc.SetTo(0, task.fLessMask)
+        If task.toggleOn Then pc.SetTo(0, lowRes.fLessMask)
         task.ogl.pointCloudInput = pc
         task.ogl.Run(dst2)
     End Sub
@@ -1814,10 +1814,10 @@ End Class
 
 
 Public Class OpenGL_GIF : Inherits TaskParent
-    Dim input As New Model_RedCloud
+    Dim input As New XO_Model_RedCloud
     Dim gifC As New Gif_Basics
     Public Sub New()
-        desc = "Create a GIF for the Model_RedCloud output"
+        desc = "Create a GIF for the XO_Model_RedCloud output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         input.Run(src)
@@ -1838,10 +1838,10 @@ End Class
 
 
 Public Class OpenGL_GIFwithColor : Inherits TaskParent
-    Dim input As New Model_RedCloud
+    Dim input As New XO_Model_RedCloud
     Dim gifC As New Gif_Basics
     Public Sub New()
-        desc = "Create a GIF for the Model_RedCloud output and color image at the same time."
+        desc = "Create a GIF for the XO_Model_RedCloud output and color image at the same time."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         input.Run(src)
@@ -1865,7 +1865,7 @@ End Class
 
 
 Public Class OpenGL_ModelwithSliders : Inherits TaskParent
-    Dim model As New Model_Basics
+    Dim model As New XO_Model_Basics
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Basics"
         labels = {"", "", "Captured OpenGL output", ""}

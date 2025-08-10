@@ -1,9 +1,8 @@
-Imports OpenCvSharp
 Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp/blob/master/test/OpenCvSharp.Tests/stitching/StitchingTest.cs
 Public Class Stitch_Basics : Inherits TaskParent
     Dim options As New Options_Stitch
-    Dim sticherObj As Stitcher
+    Dim sticherObj As cv.Stitcher
     Public Sub New()
         desc = "Stitch together random parts of a color image."
     End Sub

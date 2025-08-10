@@ -4,10 +4,16 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <StartupObject>Main.My.MyApplication</StartupObject>
+	  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <UseWindowsForms>true</UseWindowsForms>
     <MyType>WindowsForms</MyType>
     <Platforms>x64</Platforms>
+    <ApplicationIcon>Data\OpenCVB.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Data\OpenCVB.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <Import Include="System.Data" />

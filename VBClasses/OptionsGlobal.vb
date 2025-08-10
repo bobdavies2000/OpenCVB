@@ -144,6 +144,8 @@ Public Class OptionsGlobal
         ColorSource.SelectedItem = "EdgeLine_Basics"
         TrackingColor.Checked = True
 
+        task.gOptions.ColorizedDepth.Checked = True
+
         Me.Left = 0
         Me.Top = 30
     End Sub

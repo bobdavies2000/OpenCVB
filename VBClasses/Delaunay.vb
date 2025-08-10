@@ -44,19 +44,16 @@ End Class
 
 Public Class Delaunay_Contours : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
-    Dim ptBest As New BrickPoint_Basics
+    Public ptBest As New BrickPoint_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels(3) = "CV_8U map of Delaunay cells"
         desc = "Subdivide an image based on the points provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            ptBest.Run(src)
-            task.features = ptBest.intensityFeatures
-        End If
+        If standalone Then ptBest.Run(src)
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-        subdiv.Insert(task.features)
+        subdiv.Insert(ptBest.features)
 
         Dim facets = New cv.Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
@@ -70,7 +67,7 @@ Public Class Delaunay_Contours : Inherits TaskParent
 
             DrawContour(dst2, ptList, 255, 1)
         Next
-        labels(2) = traceName + ": " + Format(task.features.Count, "000") + " cells were present."
+        labels(2) = traceName + ": " + Format(ptBest.features.Count, "000") + " cells were present."
     End Sub
 End Class
 

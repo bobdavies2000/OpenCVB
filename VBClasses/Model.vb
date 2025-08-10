@@ -1,11 +1,11 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Model_Basics : Inherits TaskParent
+Public Class XO_Model_Basics : Inherits TaskParent
     Dim oglM As New OpenGL_BasicsMouse
     Public Sub New()
         labels = {"", "", "Captured OpenGL output", ""}
         desc = "Capture the output of the OpenGL window"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then oglM.Run(src)
         dst2 = oglM.dst2
         dst3 = oglM.dst3
@@ -19,14 +19,14 @@ End Class
 
 
 
-Public Class Model_FlatSurfaces : Inherits TaskParent
+Public Class XO_Model_FlatSurfaces : Inherits TaskParent
     Public totalPixels As Integer
     Dim floorList As New List(Of Single)
     Dim ceilingList As New List(Of Single)
     Public Sub New()
         desc = "Minimalist approach to find a flat surface that is oriented to gravity (floor or ceiling)"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.MaxZmeters)}
         cv.Cv2.CalcHist({task.pointCloud}, {1, 2}, New cv.Mat, dst0, 2,
                         {dst2.Height, dst2.Width}, ranges)
@@ -83,13 +83,13 @@ End Class
 
 
 
-Public Class Model_RedCloud : Inherits TaskParent
+Public Class XO_Model_RedCloud : Inherits TaskParent
     Public oglD As New OpenGL_DrawHulls
     Public Sub New()
         labels = {"", "", "OpenGL output", "RedCloud Output"}
         desc = "Capture the OpenGL output of the drawn cells"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         oglD.Run(src)
         dst2 = oglD.dst2
     End Sub
@@ -102,14 +102,14 @@ End Class
 
 
 
-Public Class Model_CellZoom : Inherits TaskParent
-    Dim oglData As New Model_RedCloud
+Public Class XO_Model_CellZoom : Inherits TaskParent
+    Dim oglData As New XO_Model_RedCloud
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "RedColor_Hull output", "Selected cell in 3D"}
         desc = "Zoom in on the selected RedCloud cell in the OpenGL output"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         oglData.Run(src)
         dst2 = oglData.dst2
         dst3 = oglData.oglD.dst3

@@ -6,17 +6,16 @@ Public Class Line_Basics : Inherits TaskParent
     Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public rawLines As New Line_Raw
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
     Private Function lpMotionCheck(lp As lpData) As Boolean
         Dim gridIndex As Integer, pt As cv.Point
 
-        gridIndex = task.grid.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X)
+        gridIndex = task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
         pt = task.gridRects(gridIndex).TopLeft
         If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then Return False
 
-        gridIndex = task.grid.gridMap.Get(Of Single)(lp.p2.Y, lp.p2.X)
+        gridIndex = task.grid.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
         pt = task.gridRects(gridIndex).TopLeft
         If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then Return False
         Return True
@@ -43,19 +42,20 @@ Public Class Line_Basics : Inherits TaskParent
         lpList.Clear()
         For Each lp In sortlines.Values
             lp.index = lpList.Count
-
             lpList.Add(lp)
             If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
 
         lpMap.SetTo(0)
         lpRectMap.SetTo(0)
+        dst2.SetTo(0)
         For i = lpList.Count - 1 To 0 Step -1
-            lpRectMap.Rectangle(lpList(i).rect, i + 1, -1)
-            lpMap.Line(lpList(i).p1, lpList(i).p2, lpList(i).index + 1, task.lineWidth, cv.LineTypes.Link8)
+            Dim lp = lpList(i)
+            lpRectMap.Rectangle(lp.rect, i + 1, -1)
+            lpMap.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link8)
+            DrawLine(dst2, lp, task.scalarColors(lp.ID Mod 255))
         Next
 
-        If standaloneTest() Then dst2 = ShowPaletteNoZero(lpMap)
         labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count)
     End Sub
 End Class
@@ -154,6 +154,33 @@ Public Class Line_PerpendicularTest : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+Public Class Line_Motion : Inherits TaskParent
+    Dim diff As New Diff_RGBAccum
+    Dim lineHistory As New List(Of List(Of lpData))
+    Public Sub New()
+        labels(3) = "Wave at the camera to see results - "
+        desc = "Track lines that are the result of motion."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        diff.Run(src)
+        dst2 = diff.dst2
+
+        If task.heartBeat Then dst3 = src
+        lineHistory.Add(task.lines.lpList)
+        For Each lplist In lineHistory
+            For Each lp In lplist
+                DrawLine(dst3, lp.p1, lp.p2)
+            Next
+        Next
+        If lineHistory.Count > task.gOptions.FrameHistory.Value Then lineHistory.RemoveAt(0)
+
+        labels(2) = CStr(task.lines.lpList.Count) + " lines were found in the diff output"
+    End Sub
+End Class
 
 
 
@@ -269,70 +296,6 @@ Public Class Line_GCloud : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-
-' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
-Public Class Line_Intersection : Inherits TaskParent
-    Public lp1 As lpData, lp2 As lpData
-    Public intersectionPoint As cv.Point2f
-    Public Sub New()
-        desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image."
-    End Sub
-    Public Shared Function IntersectTest(p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f) As cv.Point2f
-        Dim x = p3 - p1
-        Dim d1 = p2 - p1
-        Dim d2 = p4 - p3
-        Dim cross = d1.X * d2.Y - d1.Y * d2.X
-        If Math.Abs(cross) < 0.000001 Then Return New cv.Point2f
-        Dim t1 = (x.X * d2.Y - x.Y * d2.X) / cross
-        Dim pt = p1 + d1 * t1
-        Return pt
-    End Function
-    Public Shared Function IntersectTest(lp1 As lpData, lp2 As lpData) As cv.Point2f
-        Dim x = lp2.p1 - lp1.p1
-        Dim d1 = lp1.p2 - lp1.p1
-        Dim d2 = lp2.p2 - lp2.p1
-        Dim cross = d1.X * d2.Y - d1.Y * d2.X
-        If Math.Abs(cross) < 0.000001 Then Return New cv.Point2f
-        Dim t1 = (x.X * d2.Y - x.Y * d2.X) / cross
-        Dim pt = lp1.p1 + d1 * t1
-        Return pt
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            If task.heartBeat Then
-                lp1 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
-                             New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
-                lp2 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
-                             New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
-            End If
-        End If
-
-        intersectionPoint = Line_Intersection.IntersectTest(lp1, lp2)
-
-        If standaloneTest() Then
-            dst2.SetTo(0)
-            dst2.Line(lp1.p1, lp1.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-            dst2.Line(lp2.p1, lp2.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-            If intersectionPoint <> New cv.Point2f Then
-                DrawCircle(dst2, intersectionPoint, task.DotSize + 4, white)
-                labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
-            Else
-                labels(2) = "Parallel!!!"
-            End If
-            If intersectionPoint.X < 0 Or intersectionPoint.X > dst2.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst2.Height Then
-                labels(2) += " (off screen)"
-            End If
-        End If
-    End Sub
-End Class
 
 
 
@@ -485,7 +448,7 @@ Public Class Line_Degrees : Inherits TaskParent
         dst2 = src
         Dim count As Integer
         For Each lp In task.lines.lpList
-            If Math.Abs(lp.angle - degrees) < 2 Then
+            If Math.Abs(lp.angle - degrees) < task.angleThreshold Then
                 DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth * 2)
                 count += 1
             Else
@@ -529,38 +492,6 @@ End Class
 
 
 
-
-
-Public Class Line_LeftRight : Inherits TaskParent
-    Public leftLines As New List(Of lpData)
-    Public rightLines As New List(Of lpData)
-    Dim lines As New Line_Raw
-    Public Sub New()
-        labels = {"", "", "Left image lines", "Right image lines"}
-        desc = "Find the lines in the Left and Right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        leftLines = New List(Of lpData)(task.lines.lpList)
-        dst2 = task.leftView.Clone
-        For Each lp In leftLines
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
-        labels(2) = "There were " + CStr(leftLines.Count) + " lines found in the left view"
-
-        lines.Run(task.rightView.Clone)
-        rightLines = New List(Of lpData)(lines.lpList)
-        dst3 = task.rightView.Clone
-        For Each lp In rightLines
-            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-        Next
-        labels(3) = "There were " + CStr(rightLines.Count) + " lines found in the right view"
-    End Sub
-End Class
-
-
-
-
-
 Public Class Line_Parallel : Inherits TaskParent
     Public classes() As List(Of Integer) ' groups of lines that are parallel
     Public unParallel As New List(Of Integer) ' lines which are not parallel
@@ -582,7 +513,7 @@ Public Class Line_Parallel : Inherits TaskParent
             Dim lp1 = task.lines.lpList(parallels.ElementAt(i).Value)
             For j = i + 1 To parallels.Count - 1
                 Dim lp2 = task.lines.lpList(parallels.ElementAt(j).Value)
-                If Math.Abs(lp1.angle - lp2.angle) < 2 Then
+                If Math.Abs(lp1.angle - lp2.angle) < task.angleThreshold Then
                     If classes(index) Is Nothing Then classes(index) = New List(Of Integer)({lp1.index})
                     classes(index).Add(lp2.index)
                 Else
@@ -628,6 +559,7 @@ Public Class Line_BrickList : Inherits TaskParent
     Public sobel As New Edge_Sobel
     Public ptList As New List(Of cv.Point)
     Public Sub New()
+        labels(3) = "The line's rotated rect and the bricks containing the line."
         dst3 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Add a bricklist to the requested lp"
@@ -637,21 +569,26 @@ Public Class Line_BrickList : Inherits TaskParent
             If lp Is Nothing Then lp = task.lineLongest
         End If
 
+        dst3.SetTo(0)
+        lp.drawRoRectMask(dst3)
+
         Dim r = lp.rect
         dst1.SetTo(0)
         sobel.Run(task.gray)
-        dst3.SetTo(0)
-        lp.drawRoRectMask(dst3)
         sobel.dst2(r).CopyTo(dst1(r), dst3(r))
         DrawRect(dst1, r, black)
 
         Dim allPoints As New List(Of cv.Point)
+        Dim brickList As New List(Of cv.Rect)
         For Each rect In task.gridRects
             Dim brick = dst1(rect)
             If brick.CountNonZero = 0 Then Continue For
             Dim mm = GetMinMax(brick)
             Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
-            If mm.maxVal = 255 Then allPoints.Add(pt)
+            If mm.maxVal = 255 Then
+                allPoints.Add(pt)
+                brickList.Add(rect)
+            End If
         Next
 
         ptList.Clear()
@@ -664,7 +601,7 @@ Public Class Line_BrickList : Inherits TaskParent
             Dim pt = allPoints(i)
             For j = i + 1 To allPoints.Count - 1
                 Dim lpTest = New lpData(pt, allPoints(j))
-                If Math.Abs(lp.angle - lpTest.angle) < 2 Then
+                If Math.Abs(lp.angle - lpTest.angle) < task.angleThreshold Then
                     angles.Add(lpTest.angle)
                     ptList.Add(pt)
                     ptList.Add(allPoints(j))
@@ -692,7 +629,6 @@ Public Class Line_BrickList : Inherits TaskParent
         Dim y2 = epListY2.Average
         lpOutput = New lpData(New cv.Point2f(x1, y1), New cv.Point2f(x2, y2))
         DrawLine(dst2, lpOutput)
-        ' DrawRect(dst2, lpOutput.rect)
         lpOutput.drawRoRect(dst2)
 
         If standalone Then lp = lpOutput
@@ -700,5 +636,407 @@ Public Class Line_BrickList : Inherits TaskParent
             lp = task.lineLongest
             task.gOptions.DebugCheckBox.Checked = False
         End If
+
+        For Each r In brickList
+            DrawRect(dst3, r, white)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
+Public Class Line_Intersection : Inherits TaskParent
+    Public lp1 As lpData, lp2 As lpData
+    Public intersectionPoint As cv.Point2f
+    Public Sub New()
+        desc = "Determine if 2 lines intersect, where the point is, and if that point is in the image."
+    End Sub
+    Public Shared Function IntersectTest(p1 As cv.Point2f, p2 As cv.Point2f, p3 As cv.Point2f, p4 As cv.Point2f) As cv.Point2f
+        Dim x = p3 - p1
+        Dim d1 = p2 - p1
+        Dim d2 = p4 - p3
+        Dim cross = d1.X * d2.Y - d1.Y * d2.X
+        If Math.Abs(cross) < 0.000001 Then Return New cv.Point2f
+        Dim t1 = (x.X * d2.Y - x.Y * d2.X) / cross
+        Dim pt = p1 + d1 * t1
+        Return pt
+    End Function
+    Public Shared Function IntersectTest(lp1 As lpData, lp2 As lpData) As cv.Point2f
+        Dim x = lp2.p1 - lp1.p1
+        Dim d1 = lp1.p2 - lp1.p1
+        Dim d2 = lp2.p2 - lp2.p1
+        Dim cross = d1.X * d2.Y - d1.Y * d2.X
+        If Math.Abs(cross) < 0.000001 Then Return New cv.Point2f
+        Dim t1 = (x.X * d2.Y - x.Y * d2.X) / cross
+        Dim pt = lp1.p1 + d1 * t1
+        Return pt
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            If task.heartBeat Then
+                lp1 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
+                             New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
+                lp2 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
+                             New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
+            End If
+        End If
+
+        intersectionPoint = Line_Intersection.IntersectTest(lp1, lp2)
+
+        If standaloneTest() Then
+            dst2.SetTo(0)
+            dst2.Line(lp1.p1, lp1.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            dst2.Line(lp2.p1, lp2.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            If intersectionPoint <> New cv.Point2f Then
+                DrawCircle(dst2, intersectionPoint, task.DotSize + 4, white)
+                labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
+            Else
+                labels(2) = "Parallel!!!"
+            End If
+            If intersectionPoint.X < 0 Or intersectionPoint.X > dst2.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst2.Height Then
+                labels(2) += " (off screen)"
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Intersects : Inherits TaskParent
+    Public intersects As New List(Of cv.Point2f)
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Find any intersects in the image and track them."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        intersects.Clear()
+
+        For i = 0 To task.lines.lpList.Count - 1
+            Dim lp1 = task.lines.lpList(i)
+            For j = i + 1 To task.lines.lpList.Count - 1
+                Dim lp2 = task.lines.lpList(j)
+                Dim intersectionPoint = Line_Intersection.IntersectTest(lp1, lp2)
+                If intersectionPoint.X >= 0 And intersectionPoint.X < dst2.Width Then
+                    If intersectionPoint.Y >= 0 And intersectionPoint.Y < dst2.Height Then
+                        intersects.Add(intersectionPoint)
+                        If intersects.Count >= task.FeatureSampleSize Then Exit For
+                    End If
+                End If
+            Next
+            If intersects.Count >= task.FeatureSampleSize Then Exit For
+        Next
+
+        dst2 = src
+        If dst3.CountNonZero > task.FeatureSampleSize * 10 Then dst3.SetTo(0)
+        For Each pt In intersects
+            DrawCircle(dst2, pt, task.highlight)
+            DrawCircle(dst3, pt, white)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Line_LeftRight : Inherits TaskParent
+    Public leftLines As New List(Of lpData)
+    Public rightLines As New List(Of lpData)
+    Dim lines As New Line_Raw
+    Public Sub New()
+        labels = {"", "", "Left image lines", "Right image lines"}
+        desc = "Find the lines in the Left and Right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        leftLines = New List(Of lpData)(task.lines.lpList)
+        dst2 = task.leftView.Clone
+        For Each lp In leftLines
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+        labels(2) = "There were " + CStr(leftLines.Count) + " lines found in the left view"
+
+        lines.Run(task.rightView.Clone)
+        rightLines = New List(Of lpData)(lines.lpList)
+        dst3 = task.rightView.Clone
+        For Each lp In rightLines
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+        labels(3) = "There were " + CStr(rightLines.Count) + " lines found in the right view"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_LeftRightMatch : Inherits TaskParent
+    Dim lrLines As New Line_LeftRight
+    Public lp As New lpData
+    Public lpOutput As New lpData
+    Public Sub New()
+        desc = "Identify a line that is a match in the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lp = task.lineLongest
+
+        lrLines.Run(emptyMat)
+        dst2 = lrLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = lrLines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        Dim r1 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+        Dim r2 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.center.Y, lp.center.X))
+        Dim r3 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+        Dim depth1 = task.pcSplit(2)(r1).Mean().Val0
+        Dim depth2 = task.pcSplit(2)(r2).Mean().Val0
+        Dim depth3 = task.pcSplit(2)(r3).Mean().Val0
+        Dim disp1 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth1
+        Dim disp2 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth2
+        Dim disp3 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth3
+
+        Dim lp1 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y), New cv.Point2f(lp.center.X - disp2, lp.center.Y))
+        Dim lp2 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y), New cv.Point2f(lp.p2.X - disp3, lp.p2.Y))
+        If Math.Abs(lp1.angle - lp2.angle) < task.angleThreshold Then lpOutput = lp2
+        DrawLine(dst3, lpOutput.p1, lpOutput.p2, task.highlight, task.lineWidth + 1)
+        DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_LeftRightMatch3 : Inherits TaskParent
+    Dim lrLines As New Line_LeftRight
+    Public lp As New lpData
+    Public lpOutput As New List(Of lpData)
+    Public Sub New()
+        desc = "Identify a line that is a match in the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lrLines.Run(emptyMat)
+        dst2 = lrLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = lrLines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        Dim lplist As New List(Of lpData)(task.lines.lpList)
+        If lplist.Count = 0 Then
+            dst2.SetTo(0)
+            SetTrueText("No lines were found in the image.")
+            Exit Sub
+        End If
+
+        lpOutput.Clear()
+        For i = 0 To lplist.Count - 1
+            lp = lplist(i)
+            Dim r1 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim r2 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.center.Y, lp.center.X))
+            Dim r3 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+
+            Dim depth1 = task.pcSplit(2)(r1).Mean().Val0
+            Dim depth2 = task.pcSplit(2)(r2).Mean().Val0
+            Dim depth3 = task.pcSplit(2)(r3).Mean().Val0
+
+            If depth1 = 0 Then Continue For
+            If depth2 = 0 Then Continue For
+            If depth3 = 0 Then Continue For
+
+            Dim disp1 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth1
+            Dim disp2 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth2
+            Dim disp3 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth3
+
+            Dim lp1 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y), New cv.Point2f(lp.center.X - disp2, lp.center.Y))
+            Dim lp2 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y), New cv.Point2f(lp.p2.X - disp3, lp.p2.Y))
+            If Math.Abs(lp1.angle - lp2.angle) >= task.angleThreshold Then Continue For
+
+            Dim lpOut = lp2
+            lp.index = lpOutput.Count
+            lpOutput.Add(lp)
+            DrawLine(dst3, lpOut.p1, lpOut.p2, task.highlight, task.lineWidth + 1)
+            DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
+        Next
+        labels(2) = CStr(lpOutput.Count) + " left image lines were matched in the right image and confirmed with the center point."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_KNN : Inherits TaskParent
+    Dim knn As New KNN_Basics
+    Dim match3 As New Line_LeftRightMatch3
+    Public lpOutput As New List(Of lpData)
+    Public Sub New()
+        desc = "Identify any lines in both the current and the previous frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        match3.Run(emptyMat)
+        dst2 = match3.dst2
+        labels(2) = match3.labels(2)
+
+        If match3.lpOutput.Count = 0 Then Exit Sub ' nothing was matched...
+
+        Static lplast As New List(Of lpData)(match3.lpOutput)
+
+        knn.queries.Clear()
+        For Each lp In match3.lpOutput
+            Dim pt As New cv.Point(lp.gridIndex1, lp.gridIndex2)
+            knn.queries.Add(pt)
+        Next
+
+        If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+
+        knn.Run(emptyMat)
+
+        If lplast.Count = 0 Then lplast = New List(Of lpData)(match3.lpOutput)
+
+        lpOutput.Clear()
+        For Each lp In match3.lpOutput
+            Dim index = knn.result(lp.index, 0)
+            If index >= match3.lpOutput.Count Then Continue For
+            If index >= lplast.Count And lplast.Count > 0 Then Continue For
+            Dim age As Integer = 1
+            If Math.Abs(lplast(index).angle - match3.lpOutput(index).angle) < task.angleThreshold Then
+                Dim index1 = match3.lpOutput(index).gridIndex1
+                Dim index2 = match3.lpOutput(index).gridIndex2
+                If task.grid.gridNeighbors(index1).Contains(lplast(index).gridIndex1) And
+                    task.grid.gridNeighbors(index2).Contains(lplast(index).gridIndex2) Then
+                    age = lplast(index).age + 1
+                End If
+            End If
+            lp.age = age
+            lpOutput.Add(lp)
+            SetTrueText(CStr(lp.age), lp.center, 2)
+            SetTrueText(CStr(lp.age), lp.center, 3)
+        Next
+
+        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        lplast = New List(Of lpData)(lpOutput)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_TestAge : Inherits TaskParent
+    Dim knnLine As New Line_KNN
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Are there ever frames where no line is connected to a line on a previous frame?"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        knnLine.Run(src)
+        dst2 = knnLine.dst2
+        labels(2) = knnLine.labels(2)
+
+        Dim matched As New List(Of Integer)
+        For Each lp In knnLine.lpOutput
+            If lp.age > 1 Then matched.Add(lp.index)
+            SetTrueText(CStr(lp.age), lp.center, 3)
+        Next
+
+        Static strList As New List(Of String)
+        Dim stepSize = 10
+        If matched.Count > 0 Then
+            strList.Add(CStr(matched.Count) + ", ")
+        Else
+            strList.Add("    ")
+        End If
+        If strList.Count > 200 Then
+            For i = 0 To stepSize - 1
+                strList.RemoveAt(0)
+            Next
+        End If
+
+        strOut = ""
+        Dim missingCount As Integer
+        For i = 0 To strList.Count - 1 Step stepSize
+            For j = i To Math.Min(strList.Count, i + stepSize) - 1
+                If strList(j) = "    " Then missingCount += 1
+                strOut += vbTab + strList(j)
+            Next
+            strOut += vbCrLf
+        Next
+        SetTrueText(strOut, 1)
+        SetTrueText("In the last 200 frames there were " + CStr(missingCount) +
+                    " frames without a matched line to the previous frame.", 3)
+
+        labels(3) = "Of the " + CStr(knnLine.lpOutput.Count) + " lines found " + CStr(matched.Count) +
+                    " were matched to the previous frame"
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_Stabilize : Inherits TaskParent
+    Dim knnLine As New Line_KNN
+    Dim stable As New Stable_Basics
+    Public Sub New()
+        desc = "Stabilize the image by identifying a line in both the current frame and the previous."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        knnLine.Run(src)
+        labels(2) = knnLine.labels(2)
+
+        If task.firstPass Then
+            stable.lpLast = knnLine.lpOutput(0)
+            stable.lp = stable.lpLast
+        Else
+            For Each stable.lp In knnLine.lpOutput
+                If stable.lp.age > 1 Then Exit For
+            Next
+        End If
+
+        stable.Run(src)
+        dst2 = stable.dst2
+        DrawLine(dst2, stable.lp)
+        SetTrueText("Age = " + CStr(stable.lp.age), stable.lp.center)
+
+        stable.lpLast = stable.lp
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_BrickPoints : Inherits TaskParent
+    Public sortLines As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public Sub New()
+        task.featureRunFlag = True
+        desc = "Assign brick points to each of the lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.lines.dst2
+
+        sortLines.Clear()
+        dst3.SetTo(0)
+        For Each pt In task.features
+            Dim lineIndex = task.lines.lpMap.Get(Of Byte)(pt.Y, pt.X)
+            If lineIndex = 0 Then Continue For
+            Dim color = vecToScalar(task.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
+            Dim index As Integer = sortLines.Keys.Contains(lineIndex)
+            Dim gridindex = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            sortLines.Add(lineIndex, gridindex)
+            DrawCircle(dst3, pt, color)
+        Next
     End Sub
 End Class

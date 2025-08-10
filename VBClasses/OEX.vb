@@ -1,6 +1,5 @@
 ﻿Imports System.IO
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 Imports cv = OpenCvSharp
 ' all examples in this file are from https://github.com/opencv/opencv/tree/4.x/samples
 Public Class OEX_CalcBackProject_Demo1 : Inherits TaskParent

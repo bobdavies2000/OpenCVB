@@ -1,9 +1,8 @@
-Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Blob_Basics : Inherits TaskParent
     Dim options As Options_Blob
     Dim input As Blob_Input
-    Dim simpleBlob As SimpleBlobDetector
+    Dim simpleBlob As cv.SimpleBlobDetector
     Public Sub New()
         options = New Options_Blob
         input = New Blob_Input

@@ -1,6 +1,5 @@
-﻿Imports OpenCvSharp
-Imports cv = OpenCvSharp
-Public Class MinMath_Line : Inherits TaskParent
+﻿Imports cv = OpenCvSharp
+Public Class XO_MinMath_Line : Inherits TaskParent
     Dim bPoints As New BrickPoint_Basics
     Public lpList As New List(Of lpData) ' lines after being checked with brick points.
     Public Sub New()
@@ -12,23 +11,23 @@ Public Class MinMath_Line : Inherits TaskParent
         labels(2) = bPoints.labels(2)
 
         Dim linesFound As New List(Of Byte)
-        Dim bpList(task.lines.lpList.Count) As List(Of cv.Point)
-        For Each bp In bPoints.bpList
+        Dim ptList(task.lines.lpList.Count - 1) As List(Of cv.Point)
+        For Each bp In bPoints.ptList
             Dim val = task.lines.lpRectMap.Get(Of Byte)(bp.Y, bp.X)
             If val = 0 Then Continue For
             If linesFound.Contains(val) = False Then
                 linesFound.Add(val)
-                bpList(val) = New List(Of cv.Point)
+                ptList(val) = New List(Of cv.Point)
             End If
-            bpList(val).Add(bp)
+            ptList(val).Add(bp)
         Next
 
         dst3.SetTo(0)
         lpList.Clear()
-        For i = 0 To bpList.Count - 1
-            If bpList(i) Is Nothing Then Continue For
-            Dim p1 = bpList(i)(0)
-            Dim p2 = bpList(i)(bpList(i).Count - 1)
+        For i = 0 To ptList.Count - 1
+            If ptList(i) Is Nothing Then Continue For
+            Dim p1 = ptList(i)(0)
+            Dim p2 = ptList(i)(ptList(i).Count - 1)
             DrawLine(dst2, p1, p2)
             Dim lp = New lpData(p1, p2)
             lpList.Add(lp)
@@ -63,7 +62,7 @@ Public Class MinMath_Edges : Inherits TaskParent
         dst3 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         labels(3) = edges.labels(2)
 
-        For Each bp In bPoints.bpList
+        For Each bp In bPoints.ptList
             DrawCircle(dst3, bp)
         Next
     End Sub
@@ -88,7 +87,7 @@ Public Class MinMath_EdgeLine : Inherits TaskParent
         dst3 = task.edges.dst2
         labels(3) = task.edges.labels(2)
 
-        For Each bp In bPoints.bpList
+        For Each bp In bPoints.ptList
             Dim val = dst3.Get(Of Byte)(bp.Y, bp.X)
             If val = 0 Then Continue For
             DrawCircle(dst3, bp, 255)
@@ -134,7 +133,7 @@ Public Class MinMath_KNN : Inherits TaskParent
         labels(3) = bPoint.labels(2)
 
         knn.queries.Clear()
-        For Each pt In bPoint.bpList
+        For Each pt In bPoint.ptList
             knn.queries.Add(New cv.Point2f(pt.X, pt.Y))
         Next
 

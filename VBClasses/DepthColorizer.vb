@@ -82,7 +82,7 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
 
             If imagePtr <> 0 Then task.depthRGB = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
 
-            Dim gridIndex = task.grid.gridMap.Get(Of Single)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            Dim gridIndex = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             Dim depthGrid = task.pcSplit(2)(task.gridRects(gridIndex))
             ' Dim mask = depthGrid.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
             Dim mask = task.depthMask(task.gridRects(gridIndex))

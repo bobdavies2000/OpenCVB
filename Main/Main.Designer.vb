@@ -191,6 +191,7 @@ Partial Class Main
         Controls.Add(CameraSwitching)
         Controls.Add(XYLoc)
         Controls.Add(ToolStrip1)
+        Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Name = "Main"
         Text = "OpenCVB Main Form"
         ToolStrip1.ResumeLayout(False)

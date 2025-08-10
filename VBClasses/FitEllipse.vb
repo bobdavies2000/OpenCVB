@@ -26,8 +26,9 @@ Public Class FitEllipse_Basics : Inherits TaskParent
             box = cv.Cv2.FitEllipse(inputPoints)
             vertices = box.Points()
             If standaloneTest() Then
-                For j = 0 To vertices.Count - 1
-                    DrawLine(dst2, vertices(j), vertices((j + 1) Mod 4), cv.Scalar.Green)
+                For i = 0 To vertices.Count - 1
+                    If Single.IsNaN(vertices(i).X) Or Single.IsNaN(vertices(i).Y) Then Exit Sub ' can't draw the result...
+                    DrawLine(dst2, vertices(i), vertices((i + 1) Mod 4), cv.Scalar.Green)
                 Next
                 dst2.Ellipse(box, cv.Scalar.Green, task.lineWidth, task.lineType)
             End If

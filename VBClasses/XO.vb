@@ -1,4 +1,7 @@
-﻿Imports System.Runtime.InteropServices
+﻿Imports System.IO
+Imports System.IO.MemoryMappedFiles
+Imports System.IO.Pipes
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class XO_Gravity_HorizonRawOld : Inherits TaskParent
     Public yLeft As Integer, yRight As Integer, xTop As Integer, xBot As Integer
@@ -2822,7 +2825,7 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
             DrawContour(dst1, facets, 255, task.lineWidth)
             DrawContour(task.fpMap, facets, i)
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-            Dim brick = task.bricks.brickList(task.grid.gridMap.Get(Of Single)(center.Y, center.X))
+            Dim brick = task.bricks.brickList(task.grid.gridMap.Get(Of Integer)(center.Y, center.X))
             task.lines.lpList(i) = lp
         Next
 
@@ -3956,8 +3959,8 @@ Public Class XO_LineRect_CenterDepth : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
             Dim lpPerp = lp.perpendicularPoints(center)
-            Dim index1 As Integer = task.grid.gridMap.Get(Of Single)(lpPerp.p1.Y, lpPerp.p1.X)
-            Dim index2 As Integer = task.grid.gridMap.Get(Of Single)(lpPerp.p2.Y, lpPerp.p2.X)
+            Dim index1 As Integer = task.grid.gridMap.Get(Of Integer)(lpPerp.p1.Y, lpPerp.p1.X)
+            Dim index2 As Integer = task.grid.gridMap.Get(Of Integer)(lpPerp.p2.Y, lpPerp.p2.X)
             Dim brick1 = task.bricks.brickList(index1)
             Dim brick2 = task.bricks.brickList(index2)
             If Math.Abs(brick1.depth - brick2.depth) > depthThreshold Then
@@ -5114,9 +5117,9 @@ Public Class XO_FeatureLine_Basics : Inherits TaskParent
             matchRuns = lineRuns / percent
         End If
 
-        Dim index = task.grid.gridMap.Get(Of Single)(cameraMotionProxy.p1.Y, cameraMotionProxy.p1.X)
+        Dim index = task.grid.gridMap.Get(Of Integer)(cameraMotionProxy.p1.Y, cameraMotionProxy.p1.X)
         Dim firstRect = task.gridNabeRects(index)
-        index = task.grid.gridMap.Get(Of Single)(cameraMotionProxy.p2.Y, cameraMotionProxy.p2.X)
+        index = task.grid.gridMap.Get(Of Integer)(cameraMotionProxy.p2.Y, cameraMotionProxy.p2.X)
         Dim lastRect = task.gridNabeRects(index)
 
         dst2 = src.Clone
@@ -5531,7 +5534,7 @@ End Class
 Public Class XO_Contour_Depth : Inherits TaskParent
     Dim options As New Options_Contours
     Public depthContourList As New List(Of contourData)
-    Public depthcontourLookup As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public depthcontourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Dim sortContours As New Contour_Sort
     Dim prep As New RedPrep_Basics
     Public Sub New()
@@ -5551,7 +5554,7 @@ Public Class XO_Contour_Depth : Inherits TaskParent
         sortContours.Run(src)
 
         depthContourList = sortContours.contourList
-        depthcontourLookup = sortContours.contourLookup
+        depthcontourMap = sortContours.contourMap
         labels(2) = sortContours.labels(2)
         dst2 = sortContours.dst2
 
@@ -5772,7 +5775,7 @@ Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
     End Sub
     Private Function restartLine(src As cv.Mat) As lpData
         For Each lpTemp In lplist
-            If Math.Abs(task.lineGravity.angle - lpTemp.angle) < 2 Then
+            If Math.Abs(task.lineGravity.angle - lpTemp.angle) < task.angleThreshold Then
                 matchRect = lpTemp.rect
                 match.template = src(matchRect).Clone
                 Return lpTemp
@@ -5781,8 +5784,8 @@ Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
         Return New lpData
     End Function
     Private Sub prepEntry(knnList As List(Of Single), lpNext As lpData)
-        Dim brick1 = task.grid.gridMap.Get(Of Single)(lpNext.p1.Y, lpNext.p1.X)
-        Dim brick2 = task.grid.gridMap.Get(Of Single)(lpNext.p2.Y, lpNext.p2.X)
+        Dim brick1 = task.grid.gridMap.Get(Of Integer)(lpNext.p1.Y, lpNext.p1.X)
+        Dim brick2 = task.grid.gridMap.Get(Of Integer)(lpNext.p2.Y, lpNext.p2.X)
         knnList.Add(lpNext.p1.X)
         knnList.Add(lpNext.p1.Y)
         knnList.Add(lpNext.p2.X)
@@ -5851,7 +5854,7 @@ Public Class XO_BrickPoint_VetLines : Inherits TaskParent
         bPoint.Run(src.Clone)
 
         Dim pointsPerLine(task.gridRects.Count) As List(Of Integer)
-        For Each pt In bPoint.bpList
+        For Each pt In bPoint.ptList
             Dim index = task.lines.lpRectMap.Get(Of Byte)(pt.Y, pt.X)
             If index > 0 And index < task.lines.lpList.Count Then
                 Dim lp = task.lines.lpList(index)
@@ -5889,9 +5892,9 @@ Public Class XO_Gravity_Basics1 : Inherits TaskParent
     End Sub
     Private Shared Sub showVec(dst As cv.Mat, vec As lpData)
         dst.Line(vec.p1, vec.p2, task.highlight, task.lineWidth * 2, task.lineType)
-        Dim gIndex = task.grid.gridMap.Get(Of Single)(vec.p1.Y, vec.p1.X)
+        Dim gIndex = task.grid.gridMap.Get(Of Integer)(vec.p1.Y, vec.p1.X)
         Dim firstRect = task.gridNabeRects(gIndex)
-        gIndex = task.grid.gridMap.Get(Of Single)(vec.p2.Y, vec.p2.X)
+        gIndex = task.grid.gridMap.Get(Of Integer)(vec.p2.Y, vec.p2.X)
         Dim lastRect = task.gridNabeRects(gIndex)
         dst.Rectangle(firstRect, task.highlight, task.lineWidth)
         dst.Rectangle(lastRect, task.highlight, task.lineWidth)
@@ -5955,7 +5958,7 @@ Public Class XO_FPoly_Basics : Inherits TaskParent
     Public resyncCause As String
     Public resyncFrames As Integer
     Public maskChangePercent As Single
-    Dim topFeatures As New XO_FPoly_TopFeatures
+    Dim feat As New XO_FPoly_TopFeatures
     Public sides As New XO_FPoly_Sides
     Dim options As New Options_Features
     Public Sub New()
@@ -5986,9 +5989,9 @@ Public Class XO_FPoly_Basics : Inherits TaskParent
         If task.firstPass Then sides.prevImage = src.Clone
         sides.options.Run()
 
-        topFeatures.Run(src)
+        feat.Run(src)
         dst2 = src.Clone
-        sides.currPoly = New List(Of cv.Point2f)(task.topFeatures)
+        sides.currPoly = New List(Of cv.Point2f)(feat.topFeatures)
         If sides.currPoly.Count < task.polyCount Then Exit Sub
         sides.Run(src)
         dst3 = sides.dst2
@@ -6046,10 +6049,10 @@ Public Class XO_FPoly_Basics : Inherits TaskParent
         strOut += "Resync last caused by: " + vbCrLf + resyncCause
 
         For Each pt In sides.currPoly ' topFeatures.stable.goodCounts
-            Dim index = topFeatures.stable.basics.ptList.IndexOf(pt)
+            Dim index = feat.stable.basics.ptList.IndexOf(pt)
             If index >= 0 Then
-                pt = topFeatures.stable.basics.ptList(index)
-                Dim g = topFeatures.stable.basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
+                pt = feat.stable.basics.ptList(index)
+                Dim g = feat.stable.basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 SetTrueText(CStr(g), pt)
             End If
         Next
@@ -6203,7 +6206,7 @@ Public Class XO_FPoly_BasicsOriginal : Inherits TaskParent
     Public resyncFrames As Integer
     Public maskChangePercent As Single
 
-    Dim topFeatures As New XO_FPoly_TopFeatures
+    Dim feat As New XO_FPoly_TopFeatures
     Public options As New Options_FPoly
     Public center As Object
     Dim optionsEx As New Options_Features
@@ -6222,10 +6225,10 @@ Public Class XO_FPoly_BasicsOriginal : Inherits TaskParent
         options.Run()
         optionsEx.Run()
 
-        topFeatures.Run(src)
-        dst2 = topFeatures.dst2
-        dst1 = topFeatures.dst3
-        fPD.currPoly = New List(Of cv.Point2f)(task.topFeatures)
+        feat.Run(src)
+        dst2 = feat.dst2
+        dst1 = feat.dst3
+        fPD.currPoly = New List(Of cv.Point2f)(feat.topFeatures)
 
         If task.optionsChanged Then fPD = New fPolyData(fPD.currPoly)
         If fPD.currPoly.Count < task.polyCount Then Exit Sub
@@ -6302,9 +6305,9 @@ Public Class XO_FPoly_BasicsOriginal : Inherits TaskParent
         strOut += "Frames since last resync: " + Format(resyncFrames, "000") + vbCrLf
         strOut += "Last resync cause(s): " + vbCrLf + resyncCause
 
-        For Each keyval In topFeatures.stable.goodCounts
-            Dim pt = topFeatures.stable.basics.ptList(keyval.Value)
-            Dim g = topFeatures.stable.basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
+        For Each keyval In feat.stable.goodCounts
+            Dim pt = feat.stable.basics.ptList(keyval.Value)
+            Dim g = feat.stable.basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
             SetTrueText(CStr(g), pt)
         Next
 
@@ -7173,7 +7176,7 @@ End Class
 
 
 Public Class XO_FPoly_Core : Inherits TaskParent
-    Public stable As New Stable_GoodFeatures
+    Public stable As New FCS_Basics
     Public anchor As cv.Point2f
     Public startAnchor As cv.Point2f
     Public goodPoints As New List(Of cv.Point2f)
@@ -7237,7 +7240,8 @@ End Class
 Public Class XO_FPoly_TopFeatures : Inherits TaskParent
     Public stable As New Stable_BasicsCount
     Public options As New Options_FPoly
-    Dim feat As New Feature_Basics
+    Dim feat As New Feature_General
+    Public topFeatures As New List(Of cv.Point2f)
     Public Sub New()
         desc = "Get the top features and validate them using Delaunay regions."
     End Sub
@@ -7247,17 +7251,17 @@ Public Class XO_FPoly_TopFeatures : Inherits TaskParent
 
         stable.Run(src)
         dst2 = stable.dst2
-        task.topFeatures.Clear()
+        topFeatures.Clear()
         Dim showText = standaloneTest()
         For Each keyVal In stable.goodCounts
             Dim pt = stable.basics.ptList(keyVal.Value)
             Dim g = stable.basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
             If showText Then SetTrueText(CStr(g), pt)
-            If task.topFeatures.Count < task.polyCount Then task.topFeatures.Add(pt)
+            If topFeatures.Count < task.polyCount Then topFeatures.Add(pt)
         Next
 
-        For i = 0 To task.topFeatures.Count - 2
-            DrawLine(dst2, task.topFeatures(i), task.topFeatures(i + 1), white)
+        For i = 0 To topFeatures.Count - 2
+            DrawLine(dst2, topFeatures(i), topFeatures(i + 1), white)
         Next
     End Sub
 End Class
@@ -7268,20 +7272,20 @@ End Class
 
 
 Public Class XO_FPoly_Line : Inherits TaskParent
-    Dim topFeatures As New XO_FPoly_TopFeatures
+    Dim feat As New XO_FPoly_TopFeatures
     Public lp As New lpData
     Dim ptBest As New BrickPoint_Basics
     Public Sub New()
-        labels = {"", "", "Points found with FPoly_TopFeatures", "Longest line in task.topFeatures"}
-        desc = "Identify the longest line in task.topFeatures"
+        labels = {"", "", "Points found with FPoly_TopFeatures", "Longest line in feat.topFeatures"}
+        desc = "Identify the longest line in topFeatures"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         ptBest.Run(src)
-        task.features = ptBest.intensityFeatures
+        task.features = ptBest.features
 
-        topFeatures.Run(src)
+        feat.Run(src)
         dst2.SetTo(0)
-        Dim pts = task.topFeatures
+        Dim pts = feat.topFeatures
         Dim distances As New List(Of Single)
         For i = 0 To pts.Count - 2
             DrawLine(dst2, pts(i), pts(i + 1), task.highlight)
@@ -7333,7 +7337,7 @@ End Class
 
 Public Class XO_Delaunay_Points : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
-    Dim fPoly As New XO_FPoly_TopFeatures
+    Dim feat As New XO_FPoly_TopFeatures
     Public Sub New()
         OptionParent.FindSlider("Points to use in Feature Poly").Value = 2
         desc = "This algorithm explores what happens when Delaunay is used on 2 points"
@@ -7342,16 +7346,16 @@ Public Class XO_Delaunay_Points : Inherits TaskParent
         If standalone Then
             Static ptBest As New BrickPoint_Basics
             ptBest.Run(src)
-            task.features = ptBest.intensityFeatures
+            task.features = ptBest.features
         End If
         Static ptSlider = OptionParent.FindSlider("Points to use in Feature Poly")
 
-        fPoly.Run(src)
-        dst3 = fPoly.dst3
+        feat.Run(src)
+        dst3 = feat.dst3
 
         delaunay.inputPoints.Clear()
-        For i = 0 To Math.Min(ptSlider.value, task.topFeatures.Count) - 1
-            delaunay.inputPoints.Add(task.topFeatures(i))
+        For i = 0 To Math.Min(ptSlider.value, feat.topFeatures.Count) - 1
+            delaunay.inputPoints.Add(feat.topFeatures(i))
         Next
         delaunay.Run(src)
         dst2 = delaunay.dst2
@@ -7425,7 +7429,7 @@ End Class
 
 
 Public Class XO_Motion_TopFeatures : Inherits TaskParent
-    Dim fPoly As New XO_FPoly_TopFeatures
+    Dim feat As New XO_FPoly_TopFeatures
     Public featureRects As New List(Of cv.Rect)
     Public searchRects As New List(Of cv.Rect)
     Dim match As New Match_Basics
@@ -7437,8 +7441,8 @@ Public Class XO_Motion_TopFeatures : Inherits TaskParent
     Private Sub snapShotFeatures()
         searchRects.Clear()
         featureRects.Clear()
-        For Each pt In task.topFeatures
-            Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
+        For Each pt In feat.topFeatures
+            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickSize, task.brickSize)
             roi = ValidateRect(roi)
             featureRects.Add(roi)
@@ -7446,8 +7450,8 @@ Public Class XO_Motion_TopFeatures : Inherits TaskParent
         Next
 
         dst2 = dst1.Clone
-        For Each pt In task.topFeatures
-            Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
+        For Each pt In feat.topFeatures
+            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickSize, task.brickSize)
             roi = ValidateRect(roi)
             dst2.Rectangle(roi, task.highlight, task.lineWidth)
@@ -7458,7 +7462,7 @@ Public Class XO_Motion_TopFeatures : Inherits TaskParent
         half = CInt(task.brickSize / 2)
 
         dst1 = src.Clone
-        fPoly.Run(src)
+        feat.Run(src)
 
         If task.heartBeatLT Then
             snapShotFeatures()
@@ -7478,7 +7482,7 @@ Public Class XO_Motion_TopFeatures : Inherits TaskParent
         featureRects.Clear()
         For Each roi In matchRects
             Dim pt = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
-            Dim index As Integer = task.grid.gridMap.Get(Of Single)(pt.Y, pt.X)
+            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
             featureRects.Add(roi)
             searchRects.Add(task.gridNabeRects(index))
         Next
@@ -8193,12 +8197,12 @@ Public Class XO_Line_Gravity : Inherits TaskParent
         If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or lp Is Nothing Then
             lp = lplist(0)
             For Each lp In lplist
-                If Math.Abs(task.lineGravity.angle - lp.angle) < 2 Then Exit For
+                If Math.Abs(task.lineGravity.angle - lp.angle) < task.angleThreshold Then Exit For
             Next
             match.template = src(lp.rect)
         End If
 
-        If Math.Abs(task.lineGravity.angle - lp.angle) >= 2 Then
+        If Math.Abs(task.lineGravity.angle - lp.angle) >= task.angleThreshold Then
             lp = Nothing
             Exit Sub
         End If
@@ -8544,7 +8548,7 @@ Public Class XO_Line_TrigHorizontal : Inherits TaskParent
 
         horizList.Clear()
         For Each lp In task.lines.lpList
-            If Math.Abs(task.lineHorizon.angle - lp.angle) < 2 Then
+            If Math.Abs(task.lineHorizon.angle - lp.angle) < task.angleThreshold Then
                 DrawLine(dst2, lp.p1, lp.p2)
                 horizList.Add(lp)
             End If
@@ -8571,7 +8575,7 @@ Public Class XO_Line_TrigVertical : Inherits TaskParent
 
         vertList.Clear()
         For Each lp In task.lines.rawLines.lpList
-            If Math.Abs(task.lineGravity.angle - lp.angle) < 2 Then
+            If Math.Abs(task.lineGravity.angle - lp.angle) < task.angleThreshold Then
                 DrawLine(dst2, lp.p1, lp.p2)
                 vertList.Add(lp)
             End If
@@ -8671,8 +8675,8 @@ Public Class XO_KNN_LongestLine : Inherits TaskParent
         desc = "Track the longest line"
     End Sub
     Private Sub prepEntry(knnList As List(Of Single), lpNext As lpData)
-        Dim brick1 = task.grid.gridMap.Get(Of Single)(lpNext.p1.Y, lpNext.p1.X)
-        Dim brick2 = task.grid.gridMap.Get(Of Single)(lpNext.p2.Y, lpNext.p2.X)
+        Dim brick1 = task.grid.gridMap.Get(Of Integer)(lpNext.p1.Y, lpNext.p1.X)
+        Dim brick2 = task.grid.gridMap.Get(Of Integer)(lpNext.p2.Y, lpNext.p2.X)
         knnList.Add(lpNext.p1.X)
         knnList.Add(lpNext.p1.Y)
         knnList.Add(lpNext.p2.X)
@@ -8990,7 +8994,7 @@ Public Class XO_Line_Points : Inherits TaskParent
 
         knn.queries.Clear()
         For Each lp In task.lines.lpList
-            Dim rect = task.gridNabeRects(task.grid.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+            Dim rect = task.gridNabeRects(task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
             dst2.Rectangle(rect, task.highlight, task.lineWidth)
             knn.queries.Add(lp.center)
         Next
@@ -9138,5 +9142,469 @@ Public Class XO_Line_RawSorted : Inherits TaskParent
     End Sub
     Public Sub Close()
         ld.Dispose()
+    End Sub
+End Class
+
+Public Class XO_Python_Basics : Inherits TaskParent
+    Public Function StartPython(arguments As String) As Boolean
+        Dim pythonApp = New FileInfo(task.pythonTaskName)
+
+        If pythonApp.Exists Then
+            task.pythonProcess = New Process
+            task.pythonProcess.StartInfo.FileName = "python"
+            task.pythonProcess.StartInfo.WorkingDirectory = pythonApp.DirectoryName
+            If arguments = "" Then
+                task.pythonProcess.StartInfo.Arguments = """" + pythonApp.Name + """"
+            Else
+                task.pythonProcess.StartInfo.Arguments = """" + pythonApp.Name + """" + " " + arguments
+            End If
+            Debug.WriteLine("Starting Python with the following command:" + vbCrLf + task.pythonProcess.StartInfo.Arguments + vbCrLf)
+            If task.showConsoleLog = False Then task.pythonProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
+            Try
+                task.pythonProcess.Start()
+            Catch ex As Exception
+                MessageBox.Show("The python algorithm " + pythonApp.Name + " failed.  Is python in the path?")
+            End Try
+        Else
+            If pythonApp.Name.EndsWith("Python_MemMap") Or pythonApp.Name.EndsWith("Python_Run") Then
+                strOut = pythonApp.Name + " is a support algorithm for PyStream apps."
+            Else
+                strOut = pythonApp.FullName + " is missing."
+            End If
+            Return False
+        End If
+        Return True
+    End Function
+    Public Sub New()
+        desc = "Access Python from OpenCVB - contains the startPython interface"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        SetTrueText("There is no output from " + traceName + ".  It contains the interface to python.")
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Python_Run : Inherits TaskParent
+    Dim python As New XO_Python_Basics
+    Public pyStream As New XO_Python_Stream
+    Dim pythonApp As FileInfo
+    Public Sub New()
+        pythonApp = New FileInfo(task.pythonTaskName)
+        If pythonApp.Name.EndsWith("_PS.py") Then
+            pyStream = New XO_Python_Stream()
+        Else
+            python.StartPython("")
+            If python.strOut <> "" Then SetTrueText(python.strOut)
+        End If
+        desc = "Run Python app: " + pythonApp.Name
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If pyStream IsNot Nothing Then
+            pyStream.Run(src)
+            dst2 = pyStream.dst2
+            dst3 = pyStream.dst3
+            labels(2) = "Output of Python Backend"
+            labels(3) = "Second Output of Python Backend"
+        Else
+            If pythonApp.Name = "PyStream.py" Then
+                SetTrueText("The PyStream.py algorithm is used by a wide variety of apps but has no output when run by itself.")
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Python_MemMap : Inherits TaskParent
+    Dim python As New XO_Python_Basics
+    Dim memMapWriter As MemoryMappedViewAccessor
+    Dim memMapFile As MemoryMappedFile
+    Dim memMapPtr As IntPtr
+    Public memMapValues(50 - 1) As Double ' more than we need - buffer for growth.  PyStream assumes 400 bytes length!  Do not change without changing everywhere.
+    Public memMapbufferSize As Integer
+    Public Sub New()
+        memMapbufferSize = System.Runtime.InteropServices.Marshal.SizeOf(GetType(Double)) * memMapValues.Length
+        memMapPtr = Marshal.AllocHGlobal(memMapbufferSize)
+        memMapFile = MemoryMappedFile.CreateOrOpen("Python_MemMap", memMapbufferSize)
+        memMapWriter = memMapFile.CreateViewAccessor(0, memMapbufferSize)
+        Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
+        memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length)
+
+        If standaloneTest() Then
+            python.StartPython("--MemMapLength=" + CStr(memMapbufferSize))
+            If python.strOut <> "" Then SetTrueText(python.strOut)
+            Dim pythonApp = New FileInfo(task.pythonTaskName)
+            SetTrueText("No output for Python_MemMap - see Python console log (see Options/'Show Console Log for external processes' in the main form)")
+            desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
+        End If
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standaloneTest() Then
+            SetTrueText(traceName + " has no output when run standaloneTest().")
+            Exit Sub
+        End If
+
+        memMapValues(0) = task.frameCount
+        Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
+        memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class XO_Python_Stream : Inherits TaskParent
+    Dim python As New XO_Python_Basics
+    Dim rgbBuffer(1) As Byte
+    Dim depthBuffer(1) As Byte
+    Dim dst1Buffer(1) As Byte
+    Dim dst2Buffer(1) As Byte
+    Dim memMap As XO_Python_MemMap
+    Public Sub New()
+        If standalone Then Exit Sub
+        task.pipeName = "PyStream2Way" + CStr(task.pythonPipeIndex)
+        task.pythonPipeIndex += 1
+        Try
+            task.pythonPipeOut = New NamedPipeServerStream(task.pipeName, PipeDirection.Out)
+        Catch ex As Exception
+            SetTrueText("Python_Stream: pipeOut NamedPipeServerStream failed to open.")
+            Exit Sub
+        End Try
+        task.pythonPipeIn = New NamedPipeServerStream(task.pipeName + "Results", PipeDirection.In)
+
+        ' Was this class invoked standaloneTest()?  Then just run something that works with BGR and depth...
+        If task.pythonTaskName.EndsWith("Python_Stream") Then
+            task.pythonTaskName = task.HomeDir + "Python/Python_Stream_PS.py"
+        End If
+
+        memMap = New XO_Python_MemMap()
+
+        task.pythonReady = python.StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + task.pipeName)
+        If python.strOut <> "" Then SetTrueText(python.strOut)
+        If task.pythonReady Then
+            task.pythonPipeOut.WaitForConnection()
+            task.pythonPipeIn.WaitForConnection()
+        End If
+        labels(2) = "Output of Python Backend"
+        desc = "General purpose class to pipe BGR and Depth to Python scripts."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            SetTrueText(traceName + " has no output when run standaloneTest().")
+            Exit Sub
+        End If
+
+        If task.pythonReady And task.pcSplit(2).Width > 0 Then
+            Dim depth32f As cv.Mat = task.pcSplit(2) * 1000
+            For i = 0 To memMap.memMapValues.Length - 1
+                memMap.memMapValues(i) = Choose(i + 1, task.frameCount, src.Total * src.ElemSize,
+                                                depth32f.Total * depth32f.ElemSize, src.Rows, src.Cols,
+                                                task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height)
+            Next
+            memMap.Run(src)
+
+            If rgbBuffer.Length <> src.Total * src.ElemSize Then ReDim rgbBuffer(src.Total * src.ElemSize - 1)
+            If depthBuffer.Length <> depth32f.Total * depth32f.ElemSize Then ReDim depthBuffer(depth32f.Total * depth32f.ElemSize - 1)
+            If dst1Buffer.Length <> dst2.Total * dst2.ElemSize Then ReDim dst1Buffer(dst2.Total * dst2.ElemSize - 1)
+            If dst2Buffer.Length <> dst3.Total * dst3.ElemSize Then ReDim dst2Buffer(dst3.Total * dst3.ElemSize - 1)
+            Marshal.Copy(src.Data, rgbBuffer, 0, src.Total * src.ElemSize)
+            Marshal.Copy(depth32f.Data, depthBuffer, 0, depthBuffer.Length)
+            If task.pythonPipeOut.IsConnected Then
+                On Error Resume Next
+                task.pythonPipeOut.Write(rgbBuffer, 0, rgbBuffer.Length)
+                task.pythonPipeOut.Write(depthBuffer, 0, depthBuffer.Length)
+                task.pythonPipeIn.Read(dst1Buffer, 0, dst1Buffer.Length)
+                task.pythonPipeIn.Read(dst2Buffer, 0, dst2Buffer.Length)
+                Marshal.Copy(dst1Buffer, 0, dst2.Data, dst1Buffer.Length)
+                Marshal.Copy(dst2Buffer, 0, dst3.Data, dst2Buffer.Length)
+            End If
+        End If
+    End Sub
+    Public Sub Close()
+        If task.pythonPipeOut IsNot Nothing Then task.pythonPipeOut.Close()
+        If task.pythonPipeIn IsNot Nothing Then task.pythonPipeIn.Close()
+    End Sub
+End Class
+
+
+
+
+Public Class XO_MotionCam_MultiLine : Inherits TaskParent
+    Public edgeList As New List(Of SortedList(Of Single, Integer))
+    Public minDistance As Integer = dst2.Width * 0.02
+    Dim knn As New KNN_EdgePoints
+    Public Sub New()
+        desc = "Find all the line edge points and display them."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.lines.dst2
+        labels(3) = "The top " + CStr(task.lines.lpList.Count) + " longest lines in the image."
+
+        knn.lpInput = task.lines.lpList
+        knn.Run(emptyMat)
+
+        For Each lpIn In task.lines.lpList
+            Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 1)
+            DrawCircle(dst2, New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)))
+            DrawCircle(dst2, New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)))
+        Next
+
+        Static lpLast As New List(Of lpData)(task.lines.lpList)
+        For Each lpIn In lpLast
+            Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 5)
+            DrawCircle(dst2, New cv.Point(CInt(lp.ep1.X), CInt(lp.ep1.Y)), white)
+            DrawCircle(dst2, New cv.Point(CInt(lp.ep2.X), CInt(lp.ep2.Y)), white)
+        Next
+
+        lpLast = New List(Of lpData)(task.lines.lpList)
+
+        labels(2) = knn.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_MotionCam_MatchLast : Inherits TaskParent
+    Dim motion As New XO_MotionCam_SideApproach
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Find the common trends in the image edge points of the top, left, right, and bottom."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        motion.Run(src)
+        dst1 = motion.dst1
+        labels(1) = motion.labels(1)
+
+        Static edgeList As New List(Of SortedList(Of Single, Integer))(motion.edgeList)
+        Static lpLastList As New List(Of lpData)(task.lines.lpList)
+
+        For i = 0 To edgeList.Count - 1
+            If edgeList(i).Count = motion.edgeList(i).Count Then
+                For j = 0 To edgeList(i).Count - 1
+                    If edgeList(i).ElementAt(j).Key <> motion.edgeList(i).ElementAt(j).Key Then Dim k = 0
+                Next
+            Else
+                Dim k = 0
+            End If
+        Next
+
+        motion.buildDisplay(edgeList, lpLastList, 20, white)
+        dst2 = motion.dst2
+        trueData = motion.trueData
+
+        edgeList = New List(Of SortedList(Of Single, Integer))(motion.edgeList)
+        lpLastList = New List(Of lpData)(task.lines.lpList)
+
+        labels(2) = motion.labels(2) + "  White points are for the previous frame"
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_MotionCam_SideApproach : Inherits TaskParent
+    Public edgeList As New List(Of SortedList(Of Single, Integer))
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Find all the line edge points and display them."
+    End Sub
+    Public Sub buildDisplay(edgePoints As List(Of SortedList(Of Single, Integer)), lpList As List(Of lpData),
+                            offset1 As Integer, color As cv.Scalar)
+        Dim pt As cv.Point2f
+        Dim index As Integer
+        For Each sortlist In edgePoints
+            Dim ptIndex As Integer = 0
+            For Each ele In sortlist
+                Dim lp = lpList(ele.Value)
+
+                Select Case index
+                    Case 0 ' top
+                        pt = New cv.Point2f(ele.Key, offset1)
+                    Case 1 ' left
+                        pt = New cv.Point2f(offset1, ele.Key)
+                    Case 2 ' right
+                        pt = New cv.Point2f(dst2.Width - 10 - offset1, ele.Key)
+                    Case 3 ' bottom
+                        pt = New cv.Point2f(ele.Key, dst2.Height - 10 - offset1)
+                End Select
+
+                DrawCircle(dst2, pt, color)
+                ptIndex += 1
+            Next
+            index += 1
+        Next
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1 = task.lines.dst2
+        labels(1) = "The top " + CStr(task.lines.lpList.Count) + " longest lines in the image."
+
+        Dim top As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
+        Dim left As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
+        Dim right As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
+        Dim bottom As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
+
+        Dim lpList = task.lines.lpList
+        For Each lp In lpList
+            If lp.ep1.X = 0 Then left.Add(lp.ep1.Y, lp.index)
+            If lp.ep1.Y = 0 Then top.Add(lp.ep1.X, lp.index)
+            If lp.ep2.X = 0 Then left.Add(lp.ep2.Y, lp.index)
+            If lp.ep2.Y = 0 Then top.Add(lp.ep2.X, lp.index)
+
+            If lp.ep1.X = dst2.Width Then right.Add(lp.ep1.X, lp.index)
+            If lp.ep1.Y = dst2.Height Then bottom.Add(lp.ep1.X, lp.index)
+            If lp.ep2.X = dst2.Width Then right.Add(lp.ep2.Y, lp.index)
+            If lp.ep2.Y = dst2.Height Then bottom.Add(lp.ep2.X, lp.index)
+        Next
+
+        edgeList.Clear()
+        For i = 0 To 3
+            Dim sortList = Choose(i + 1, top, left, right, bottom)
+            edgeList.Add(sortList)
+        Next
+
+        dst2 = src.Clone
+        buildDisplay(edgeList, lpList, 0, task.highlight)
+
+        labels(2) = CStr(task.lines.lpList.Count * 2) + " edge points of the top " + CStr(task.lines.lpList.Count) +
+                    " longest lines in the image are shown."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_MotionCam_Measure : Inherits TaskParent
+    Public deltaX1 As Single, deltaX2 As Single, deltaY1 As Single, deltaY2 As Single
+    Public Sub New()
+        desc = "Measure how much the camera has moved."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static vecLast = task.lineLongest
+        Dim vec = task.lineLongest
+
+        deltaX1 = vec.ep1.X - vecLast.ep1.x
+        deltaY1 = vec.ep1.Y - vecLast.ep1.Y
+
+        deltaX2 = vec.ep2.X - vecLast.ep2.x
+        deltaY2 = vec.ep2.Y - vecLast.ep2.Y
+
+        Static strList As New List(Of String)
+        strList.Add(Format(deltaX1, fmt1) + " " + Format(deltaX2, fmt1) + " " +
+                    Format(deltaY1, fmt1) + " " + Format(deltaY2, fmt1) +
+                    If(task.frameCount Mod 6 = 0, vbCrLf, vbTab))
+        If strList.Count >= 132 Then strList.RemoveAt(0)
+
+        strOut = ""
+        For Each nextStr In strList
+            strOut += nextStr
+        Next
+        SetTrueText(strOut, 3)
+
+        vecLast = vec
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_MotionCam_Plot : Inherits TaskParent
+    Dim plot As New Plot_OverTime
+    Dim measure As New XO_MotionCam_Measure
+    Public Sub New()
+        plot.minScale = -10
+        plot.maxScale = 10
+        desc = "Plot the variables describing the camera motion."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        measure.Run(src)
+
+        plot.plotData = New cv.Scalar(measure.deltaX1, measure.deltaY1, measure.deltaX2, measure.deltaY2)
+        plot.Run(src)
+        dst2 = plot.dst2
+        dst3 = plot.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Motion_TopFeatureFail : Inherits TaskParent
+    Dim features As New Feature_General
+    Public featureRects As New List(Of cv.Rect)
+    Public searchRects As New List(Of cv.Rect)
+    Dim match As New Match_Basics
+    Dim saveMat As New cv.Mat
+    Public Sub New()
+        labels(2) = "Track the feature in the brick in the neighbors"
+        desc = "Find the top feature cells and track them in the next frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim half As Integer = CInt(task.brickSize / 2)
+        Dim pt As cv.Point
+        If task.heartBeatLT Then
+            features.Run(src)
+            searchRects.Clear()
+            featureRects.Clear()
+            saveMat = src.Clone
+            For Each pt In task.features
+                Dim index As Integer = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickSize, task.brickSize)
+                roi = ValidateRect(roi) ' stub bricks are fixed here 
+                featureRects.Add(roi)
+                searchRects.Add(task.gridNabeRects(index))
+            Next
+
+            dst2 = saveMat.Clone
+            For Each pt In task.features
+                Dim index As Integer = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickSize, task.brickSize)
+                roi = ValidateRect(roi) ' stub bricks are fixed here 
+                dst2.Rectangle(roi, task.highlight, task.lineWidth)
+                dst2.Rectangle(task.gridNabeRects(index), task.highlight, task.lineWidth)
+            Next
+        End If
+
+        dst3 = src.Clone
+        Dim matchRects As New List(Of cv.Rect)
+        For i = 0 To featureRects.Count - 1
+            Dim roi = featureRects(i)
+            match.template = saveMat(roi).Clone
+            match.Run(src(searchRects(i)))
+            dst3.Rectangle(match.newRect, task.highlight, task.lineWidth)
+            matchRects.Add(match.newRect)
+        Next
+
+        saveMat = src.Clone
+        searchRects.Clear()
+        featureRects.Clear()
+        For Each roi In matchRects
+            half = CInt(roi.Width / 2) ' stubby bricks are those at the bottom or right side of the image.
+            pt = New cv.Point(roi.X + half, roi.Y + half)
+            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            featureRects.Add(roi)
+            searchRects.Add(task.gridNabeRects(index))
+        Next
     End Sub
 End Class

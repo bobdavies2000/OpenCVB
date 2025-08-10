@@ -28,6 +28,7 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, EdgeLineRaw_Rects(cPtr))
 
         classCount = EdgeLineRaw_GetSegCount(cPtr)
+        If classCount = 0 Then Exit Sub ' nothing to work with....
         Dim rects(classCount * 4) As Integer
         Marshal.Copy(rectData.Data, rects, 0, rects.Length)
 
@@ -92,7 +93,7 @@ Public Class EdgeLine_BasicsList : Inherits TaskParent
         Dim sortGridID As New SortedList(Of Integer, nrcData)(New compareAllowIdenticalInteger)
         Dim duplicatePixels As Integer
         For Each nrc In sortList.Values
-            nrc.ID = task.grid.gridMap.Get(Of Single)(nrc.segment(0).Y, nrc.segment(0).X)
+            nrc.ID = task.grid.gridMap.Get(Of Integer)(nrc.segment(0).Y, nrc.segment(0).X)
             Dim takenFlag = nrcMap.Get(Of Byte)(nrc.segment(0).Y, nrc.segment(0).X)
             If takenFlag <> 0 Then
                 duplicatePixels += nrc.pixels
@@ -347,7 +348,7 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
 
         Dim segments(task.edges.classCount) As List(Of cv.Point2f)
         Dim brickCount As Integer, segmentCount As Integer
-        For Each pt In ptBrick.bpList
+        For Each pt In ptBrick.ptList
             Dim val = task.edges.dst2.Get(Of Byte)(pt.Y, pt.X)
             If val > 0 And val < 255 Then
                 If segments(val) Is Nothing Then

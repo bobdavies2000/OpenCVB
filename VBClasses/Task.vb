@@ -1,7 +1,5 @@
 Imports cv = OpenCvSharp
-Imports System.Windows.Forms
 Imports System.IO.Pipes
-Imports System.Drawing
 Imports System.IO
 Imports System.Runtime.InteropServices
 
@@ -24,8 +22,10 @@ Public Class VBtask : Implements IDisposable
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
     Public colorizer As DepthColorizer_Basics
+    Public feat As Feature_Basics
 
     Public brickRunFlag As Boolean
+    Public featureRunFlag As Boolean
 
     Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
     Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
@@ -49,7 +49,6 @@ Public Class VBtask : Implements IDisposable
     Public bricksPerRow As Integer
     Public gridRects As List(Of cv.Rect)
     Public gridMask As New cv.Mat
-    Public gridNeighbors As New List(Of List(Of Integer))
     Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
     Public gridROIclicked As Integer
     Public depthDiffMeters As Single ' bricks > than this value are depth edges - in meters
@@ -57,17 +56,12 @@ Public Class VBtask : Implements IDisposable
 
     Public fpMotion As cv.Point2f
 
-    Public topFeatures As New List(Of cv.Point2f)
     Public features As New List(Of cv.Point2f)
     Public fpFromGridCell As New List(Of Integer)
     Public fpFromGridCellLast As New List(Of Integer)
     Public fpLastList As New List(Of fpData)
     Public featurePoints As New List(Of cv.Point)
 
-    Public featureMask As New cv.Mat
-    Public fLessMask As New cv.Mat
-    Public featureRects As New List(Of cv.Rect)
-    Public fLessRects As New List(Of cv.Rect)
     Public flessBoundary As New cv.Mat
     Public lowResColor As New cv.Mat
     Public lowResDepth As New cv.Mat
@@ -179,6 +173,7 @@ Public Class VBtask : Implements IDisposable
     Public lineHorizon As New lpData
     Public lineLongest As New lpData
     Public lineLongestChanged As Boolean
+    Public angleThreshold = 2
 
     Public gravityIMU As New lpData
     Public IMU_RawAcceleration As cv.Point3f
@@ -288,7 +283,6 @@ Public Class VBtask : Implements IDisposable
     Public edgeMethod As String
     Public verticalLines As Boolean
 
-    Public externalPythonInvocation As Boolean
     Public testAllRunning As Boolean
     Public showConsoleLog As Boolean
 
@@ -374,7 +368,6 @@ Public Class VBtask : Implements IDisposable
         Public cameraIndex As Integer
 
         Public HomeDir As String
-        Public externalPythonInvocation As Boolean ' Opencv was initialized remotely...
         Public showConsoleLog As Boolean
         Public testAllRunning As Boolean
         Public RotationMatrix() As Single
@@ -420,7 +413,10 @@ Public Class VBtask : Implements IDisposable
             End If
 
             Dim displayObject = findDisplayObject(displayObjectName)
-            If gifCreator IsNot Nothing Then gifCreator.createNextGifImage()
+            If gifCreator IsNot Nothing Then
+                If gOptions.ShowGrid.Checked Then dst2.SetTo(cv.Scalar.White, gridMask)
+                gifCreator.createNextGifImage()
+            End If
 
             ' MSER mistakenly can have 1 cell - just ignore it.
             setSelectedCell()
@@ -477,7 +473,6 @@ Public Class VBtask : Implements IDisposable
         calibData = parms.calibData
         HomeDir = parms.HomeDir
         main_hwnd = parms.main_hwnd
-        externalPythonInvocation = parms.externalPythonInvocation
 
         ' set options for specific cameras here.
         Select Case task.cameraName
@@ -528,6 +523,7 @@ Public Class VBtask : Implements IDisposable
         edges = New EdgeLine_Basics
         contours = New Contour_Basics_List
         rgbFilter = New Filter_Basics
+        feat = New Feature_Basics
 
         If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
         If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
@@ -755,8 +751,9 @@ Public Class VBtask : Implements IDisposable
         colorizer.Run(src)
         contours.Run(src.Clone)
 
-        If task.brickRunFlag Then
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+        If featureRunFlag Then task.feat.Run(src.Clone)
+        If brickRunFlag Then
+            If bricks Is Nothing Then bricks = New Brick_Basics
             bricks.Run(src.Clone)
         End If
 
