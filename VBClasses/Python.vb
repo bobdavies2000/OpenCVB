@@ -97,10 +97,8 @@ Public Class Python_MemMap : Inherits TaskParent
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length)
 
         If standaloneTest() Then
-            If task.externalPythonInvocation = False Then
-                python.StartPython("--MemMapLength=" + CStr(memMapbufferSize))
-                If python.strOut <> "" Then SetTrueText(python.strOut)
-            End If
+            python.StartPython("--MemMapLength=" + CStr(memMapbufferSize))
+            If python.strOut <> "" Then SetTrueText(python.strOut)
             Dim pythonApp = New FileInfo(task.pythonTaskName)
             SetTrueText("No output for Python_MemMap - see Python console log (see Options/'Show Console Log for external processes' in the main form)")
             desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
@@ -152,12 +150,8 @@ Public Class Python_Stream : Inherits TaskParent
 
         memMap = New Python_MemMap()
 
-        If task.externalPythonInvocation Then
-            task.pythonReady = True ' python was already running and invoked OpenCVB.
-        Else
-            task.pythonReady = python.StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + task.pipeName)
-            If python.strOut <> "" Then SetTrueText(python.strOut)
-        End If
+        task.pythonReady = python.StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + task.pipeName)
+        If python.strOut <> "" Then SetTrueText(python.strOut)
         If task.pythonReady Then
             task.pythonPipeOut.WaitForConnection()
             task.pythonPipeIn.WaitForConnection()

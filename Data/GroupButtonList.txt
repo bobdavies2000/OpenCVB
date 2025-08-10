@@ -135,6 +135,7 @@ Line
 Line3D
 Linear
 LinearRegression
+LineDepth
 LineRect
 LUT
 Magnify
@@ -150,6 +151,8 @@ MinMath
 ML
 Moments
 Motion
+MotionCam
+MotionLine
 Mouse
 MSER
 MultiDimensionScaling
@@ -180,6 +183,7 @@ Projection
 Puzzle
 Pyramid
 PyrFilter
+Python
 QRcode
 Quad
 Quadrant
@@ -210,6 +214,7 @@ Smoothing
 Solve
 Sort
 Spectrum
+Stabilizer
 Stable
 Stitch
 Stripes
