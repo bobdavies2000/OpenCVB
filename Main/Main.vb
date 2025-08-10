@@ -1045,7 +1045,11 @@ Public Class Main
     End Sub
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim args() = Environment.GetCommandLineArgs()
-        HomeDir = New DirectoryInfo(args(1))
+
+        Dim exePath As String = AppDomain.CurrentDomain.BaseDirectory
+        Dim solutionDir As String = Path.GetFullPath(Path.Combine(exePath, "..\..\..\..\..\.."))
+        HomeDir = New DirectoryInfo(solutionDir)
+
         Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
         Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
         Directory.SetCurrentDirectory(HomeDir.FullName)
