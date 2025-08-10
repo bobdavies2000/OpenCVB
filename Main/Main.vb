@@ -1047,7 +1047,7 @@ Public Class Main
         Dim args() = Environment.GetCommandLineArgs()
 
         Dim exePath As String = AppDomain.CurrentDomain.BaseDirectory
-        Dim solutionDir As String = Path.GetFullPath(Path.Combine(exePath, "..\..\..\..\..\.."))
+        Dim solutionDir As String = Path.GetFullPath(Path.Combine(exePath, "..\..\..\..\..\..\"))
         HomeDir = New DirectoryInfo(solutionDir)
 
         Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
