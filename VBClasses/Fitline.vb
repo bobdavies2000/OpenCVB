@@ -1,4 +1,4 @@
-Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class FitLine_Basics : Inherits TaskParent
     Dim fitE As New FitEllipse_Rectangle
@@ -72,7 +72,8 @@ Public Class FitLine_Lines : Inherits TaskParent
         OptionParent.FindSlider("DrawCount").Value = 2
         labels(2) = "If the contours overlap, then one line the trendline for both is found.  Otherwise, 2 lines are found."
         labels(3) = "FitLine_Basics contour input - if they overlap, a trendline will be found."
-        desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
+        desc = "Show how Fitline API works.  When the lines overlap the image has a single contour " +
+               "and the lines are occasionally not found."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If Not task.heartBeatLT Then Exit Sub
@@ -221,7 +222,6 @@ Public Class FitLine_Grid : Inherits TaskParent
     Dim edges As New Edge_Basics
     Dim fitline As New FitLine_Basics
     Public Sub New()
-        task.brickRunFlag = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find lines within each brick."
     End Sub
@@ -230,18 +230,63 @@ Public Class FitLine_Grid : Inherits TaskParent
         dst2 = edges.dst2
 
         dst3.SetTo(0)
-        For Each brick In task.bricks.brickList
-            If dst2(brick.rect).CountNonZero >= 5 Then
-                nZero.Run(dst2(brick.rect))
+        For Each rect In task.gridRects
+            If dst2(rect).CountNonZero >= 5 Then
+                nZero.Run(dst2(rect))
 
                 fitline.ptList.Clear()
                 For i = 0 To nZero.ptMat.Rows - 1
                     fitline.ptList.Add(nZero.ptMat.Get(Of cv.Point)(i, 0))
                 Next
 
-                fitline.Run(dst2(brick.rect))
-                dst3(brick.rect).Line(fitline.lp.p1, fitline.lp.p2, 255, task.lineWidth, task.lineType)
+                fitline.Run(dst2(rect))
+                dst3(rect).Line(fitline.lp.p1, fitline.lp.p2, 255, task.lineWidth, task.lineType)
             End If
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FitLine_Simple : Inherits TaskParent
+    Public Sub New()
+        desc = "Simple test of the Fitline interface"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim points As New List(Of Point2f) From {
+             New Point2f(1, 1.1F),
+             New Point2f(2, 2.0F),
+             New Point2f(3, 2.9F),
+             New Point2f(4, 4.1F),
+             New Point2f(5, 5.0F),
+             New Point2f(6, 6.1F),
+             New Point2f(7, 7.2F),
+             New Point2f(8, 8.1F),
+             New Point2f(9, 20.0F) ' Outlier
+         }
+
+        ' Convert to Mat
+        Dim pointMat As Mat = New Mat(points.Count, 1, MatType.CV_32FC2)
+        For i = 0 To points.Count - 1
+            pointMat.Set(Of Point2f)(i, 0, points(i))
+        Next
+
+        ' Fit line using CV_DIST_L2 (least squares), with robust method
+        Dim lineParams = cv.Cv2.FitLine(points.ToArray, DistanceTypes.L2, 0, 0.01, 0.01)
+
+        ' Extract line parameters
+        Dim vx As Single = lineParams.Vx
+        Dim vy As Single = lineParams.Vy
+        Dim x1 As Single = lineParams.X1
+        Dim y1 As Single = lineParams.Y1
+
+        'Compute slope And intercept
+        Dim slope As Single = vy / vx
+        Dim intercept As Single = y1 - slope * x1
+
+        SetTrueText($"Line equation: y = {slope:F2}x + {intercept:F2}")
     End Sub
 End Class
