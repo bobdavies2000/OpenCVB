@@ -385,7 +385,6 @@ Public Class Main
                 Return New CameraZed2(settings.workRes, settings.captureRes, settings.cameraName)
             Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
                 Return New CameraORB(settings.workRes, settings.captureRes, settings.cameraName)
-                'Return New CameraORB_CPP(settings.workRes, settings.captureRes, settings.cameraName)
         End Select
         Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
     End Function
