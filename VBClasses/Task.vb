@@ -322,6 +322,7 @@ Public Class VBtask : Implements IDisposable
     Public displayDst1 As Boolean
     Public depthAndCorrelationText As String
     Public closeRequest As Boolean
+    Private sharpGL As VBClasses.sgl
     Public Structure inBuffer
         Dim color As cv.Mat
         Dim leftView As cv.Mat
@@ -451,6 +452,9 @@ Public Class VBtask : Implements IDisposable
             openGLPipe.Close()
         End If
     End Sub
+    Public Sub sharpGLShow()
+        sharpGL.showPointCloud()
+    End Sub
     Public Sub New()
     End Sub
     Public Sub New(parms As algParms)
@@ -506,8 +510,8 @@ Public Class VBtask : Implements IDisposable
         allOptions = New OptionsContainer
         allOptions.Show()
 
-        'sharpGL = New GLSharp
-        'sharpGL.Show()
+        sharpGL = New sgl
+        If algName.StartsWith("GL_") Then sharpGL.Show()
 
         gOptions = New OptionsGlobal
         featureOptions = New OptionsFeatures
@@ -892,6 +896,10 @@ Public Class VBtask : Implements IDisposable
     End Function
     Public Sub Dispose() Implements IDisposable.Dispose
         allOptions.Close()
+        If sharpGL IsNot Nothing Then
+            sharpGL.saveLocation()
+            sharpGL.Close()
+        End If
         If openGL_hwnd <> 0 Then OpenGLClose()
         TaskTimer.Enabled = False
         For Each algorithm In task.activeObjects

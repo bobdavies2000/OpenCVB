@@ -1476,7 +1476,7 @@ Public Class Main
                 ' relative size of displayed image and algorithm size image.
                 While 1
                     ' exit the inner while if any of these change.
-                    If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Then Exit While
+                    If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or cameraShutdown Then Exit While
                     If saveworkRes <> settings.workRes Then Exit While
                     If saveCameraName <> settings.cameraName Then Exit While
                     If saveAlgorithmName <> task.algName Then Exit While
@@ -1544,7 +1544,7 @@ Public Class Main
                 End While
 
                 ' exit the outer while if any of these change.
-                If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Then Exit While
+                If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or cameraShutdown Then Exit While
                 If saveworkRes <> settings.workRes Then Exit While
                 If saveCameraName <> settings.cameraName Then Exit While
                 If saveAlgorithmName <> task.algName Then Exit While
@@ -1676,13 +1676,14 @@ Public Class Main
                 ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
                 ' Each image will represent the one just finished by the algorithm.
                 If task.debugSyncUI Then Thread.Sleep(100)
-                If task.closeRequest Then End
+                If task.closeRequest Then Exit While
             End While
 
             Debug.WriteLine(parms.algName + " ending.  Thread closing...")
             task.frameCount = -1
-            Application.DoEvents()
             task.Dispose()
+            Application.DoEvents()
+            If task.closeRequest Then End
         End SyncLock
 
         If parms.algName.EndsWith(".py") Then killThread("python")

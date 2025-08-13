@@ -92,6 +92,7 @@ Fuzzy
 Gabor
 GeneticDrawing
 Gif
+GL
 GrabCut
 Gradient
 Gravity

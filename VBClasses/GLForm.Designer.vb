@@ -28,14 +28,15 @@ Partial Class sgl
         ' 
         ' OpenglControl1
         ' 
-        OpenglControl1.DrawFPS = False
-        OpenglControl1.Location = New Point(230, 103)
+        OpenglControl1.DrawFPS = True
+        OpenglControl1.FrameRate = 60
+        OpenglControl1.Location = New Point(13, 12)
         OpenglControl1.Margin = New Padding(4, 3, 4, 3)
         OpenglControl1.Name = "OpenglControl1"
         OpenglControl1.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1
-        OpenglControl1.RenderContextType = SharpGL.RenderContextType.DIBSection
+        OpenglControl1.RenderContextType = SharpGL.RenderContextType.FBO
         OpenglControl1.RenderTrigger = SharpGL.RenderTrigger.TimerBased
-        OpenglControl1.Size = New Size(229, 69)
+        OpenglControl1.Size = New Size(774, 426)
         OpenglControl1.TabIndex = 0
         ' 
         ' sgl
