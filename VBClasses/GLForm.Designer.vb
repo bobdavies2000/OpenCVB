@@ -28,8 +28,8 @@ Partial Class sgl
         ' 
         ' OpenglControl1
         ' 
-        OpenglControl1.DrawFPS = True
-        OpenglControl1.FrameRate = 60
+        OpenglControl1.DrawFPS = False
+        OpenglControl1.FrameRate = 30
         OpenglControl1.Location = New Point(13, 12)
         OpenglControl1.Margin = New Padding(4, 3, 4, 3)
         OpenglControl1.Name = "OpenglControl1"

@@ -1679,11 +1679,11 @@ Public Class Main
                 If task.closeRequest Then Exit While
             End While
 
-            Debug.WriteLine(parms.algName + " ending.  Thread closing...")
             task.frameCount = -1
             task.Dispose()
+            Debug.WriteLine(parms.algName + " ending.  Thread closing...")
             Application.DoEvents()
-            If task.closeRequest Then End
+            'If task.closeRequest Then End
         End SyncLock
 
         If parms.algName.EndsWith(".py") Then killThread("python")

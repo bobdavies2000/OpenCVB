@@ -102,7 +102,9 @@ Public Class CameraORB : Inherits GenericCamera
             PtCloud.SetPositionDataScaled(depthValueScale)
             PtCloud.SetPointFormat(Format.OB_FORMAT_POINT)
             Dim pcData = PtCloud.Process(dFrame)
-            pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcData.GetDataPtr) / 1000
+            If pcData IsNot Nothing Then
+                pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcData.GetDataPtr) / 1000
+            End If
         End If
 
         SyncLock orbMutex

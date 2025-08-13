@@ -453,6 +453,10 @@ Public Class VBtask : Implements IDisposable
         End If
     End Sub
     Public Sub sharpGLShow()
+        If task.gOptions.DebugCheckBox.Checked Then
+            task.gOptions.DebugCheckBox.Checked = False
+            sharpGL.resetView()
+        End If
         sharpGL.showPointCloud()
     End Sub
     Public Sub New()
@@ -803,6 +807,7 @@ Public Class VBtask : Implements IDisposable
         Dim saveOptionsChanged = task.optionsChanged
         If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True
         If activateTaskForms Then
+            sharpGL.Activate()
             treeView.Activate()
             allOptions.Activate()
             activateTaskForms = False

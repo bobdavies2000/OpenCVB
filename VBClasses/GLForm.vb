@@ -8,12 +8,12 @@ Public Class sgl
     Dim lastMousePos As cv.Point
     Dim rotationX As Single = 0.0F
     Dim rotationY As Single = 0.0F
+    Private zoomZ As Single = -5.0F
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.Left = GetSetting("Opencv", "sglLeft", "sglLeft", task.mainFormLocation.X + task.mainFormLocation.Width)
         Me.Top = GetSetting("Opencv", "sglTop", "sglTop", task.mainFormLocation.Y)
         Me.Width = GetSetting("Opencv", "sglWidth", "sglWidth", task.mainFormLocation.Width)
         Me.Height = GetSetting("Opencv", "sglHeight", "sglHeight", task.mainFormLocation.Height)
-        gl = OpenglControl1.OpenGL
 
     End Sub
     Public Sub saveLocation()
@@ -42,20 +42,28 @@ Public Class sgl
     Private Sub OpenGLControl_MouseUp(sender As Object, e As MouseEventArgs) Handles OpenglControl1.MouseUp
         If e.Button = MouseButtons.Left Then isDragging = False
     End Sub
+    Public Sub resetView()
+        rotationX = 0.0
+        rotationY = 0.0
+        zoomZ = -5.0F
+    End Sub
+    Private Sub OpenGLControl_MouseWheel(sender As Object, e As MouseEventArgs) Handles OpenglControl1.MouseWheel
+        Dim delta As Integer = e.Delta
+        zoomZ += If(delta > 0, 0.5F, -0.5F)
+        OpenglControl1.Invalidate() ' Force redraw
+    End Sub
     Public Sub showPointCloud()
-        ' Clear screen and depth buffer
+        gl = OpenglControl1.OpenGL
         gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
         gl.LoadIdentity()
 
         ' Move the camera back
-        gl.Translate(0.0F, 0.0F, -5.0F)
+        gl.Translate(0.0F, 0.0F, zoomZ)
         gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
 
-        ' Set point size
-        gl.PointSize(5.0F)
+        gl.PointSize(2.0F)
 
-        ' Draw the point cloud
         gl.Begin(OpenGL.GL_POINTS)
 
         For y = 0 To task.pointCloud.Height - 1
@@ -63,7 +71,7 @@ Public Class sgl
                 Dim vec3b = task.color.Get(Of cv.Vec3b)(y, x)
                 gl.Color(vec3b(0) / 255, vec3b(1) / 255, vec3b(2) / 255)
                 Dim vec As Vec3f = task.pointCloud.At(Of Vec3f)(y, x)
-                gl.Vertex(vec.Item0, vec.Item1, vec.Item2)
+                gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
             Next
         Next
 
