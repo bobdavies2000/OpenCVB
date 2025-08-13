@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class GLSharp
+Partial Class sgl
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -22,15 +22,33 @@ Partial Class GLSharp
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        OpenglControl1 = New SharpGL.OpenGLControl()
+        CType(OpenglControl1, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
-        ' GLSharp
+        ' OpenglControl1
+        ' 
+        OpenglControl1.DrawFPS = False
+        OpenglControl1.Location = New Point(230, 103)
+        OpenglControl1.Margin = New Padding(4, 3, 4, 3)
+        OpenglControl1.Name = "OpenglControl1"
+        OpenglControl1.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1
+        OpenglControl1.RenderContextType = SharpGL.RenderContextType.DIBSection
+        OpenglControl1.RenderTrigger = SharpGL.RenderTrigger.TimerBased
+        OpenglControl1.Size = New Size(229, 69)
+        OpenglControl1.TabIndex = 0
+        ' 
+        ' sgl
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(800, 450)
-        Name = "GLSharp"
-        Text = "GLSharp"
+        Controls.Add(OpenglControl1)
+        Name = "sgl"
+        Text = "sgl"
+        CType(OpenglControl1, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
     End Sub
+
+    Friend WithEvents OpenglControl1 As SharpGL.OpenGLControl
 End Class

@@ -506,6 +506,9 @@ Public Class VBtask : Implements IDisposable
         allOptions = New OptionsContainer
         allOptions.Show()
 
+        'sharpGL = New GLSharp
+        'sharpGL.Show()
+
         gOptions = New OptionsGlobal
         featureOptions = New OptionsFeatures
         treeView = New TreeviewForm
