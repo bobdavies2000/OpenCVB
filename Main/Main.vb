@@ -391,7 +391,7 @@ Public Class Main
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         jsonWrite()
         cameraShutdown = True
-        Application.DoEvents()
+        Thread.Sleep(1000)
         End
     End Sub
     Private Sub CameraTask()
@@ -428,7 +428,7 @@ Public Class Main
             End If
             If cameraShutdown Then
                 camera.stopCamera()
-                Exit Sub
+                End
             End If
         End While
     End Sub
@@ -1506,16 +1506,16 @@ Public Class Main
                             task.pointCloud = camera.uiPointCloud
 
                             ' there might be a delay in the camera task so set it again here....
-                            If frameCount <10 Then task.calibData= setCalibData(camera.calibData)
+                            If frameCount < 10 Then task.calibData = setCalibData(camera.calibData)
 
-                            task.transformationMatrix= camera.transformationMatrix
-                            task.IMU_TimeStamp= camera.IMU_TimeStamp
-                            task.IMU_Acceleration= camera.IMU_Acceleration
-                            task.IMU_AngularAcceleration= camera.IMU_AngularAcceleration
-                            task.IMU_AngularVelocity= camera.IMU_AngularVelocity
-                            task.IMU_FrameTime= camera.IMU_FrameTime
-                            task.CPU_TimeStamp= camera.CPU_TimeStamp
-                            task.CPU_FrameTime= camera.CPU_FrameTime
+                            task.transformationMatrix = camera.transformationMatrix
+                            task.IMU_TimeStamp = camera.IMU_TimeStamp
+                            task.IMU_Acceleration = camera.IMU_Acceleration
+                            task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
+                            task.IMU_AngularVelocity = camera.IMU_AngularVelocity
+                            task.IMU_FrameTime = camera.IMU_FrameTime
+                            task.CPU_TimeStamp = camera.CPU_TimeStamp
+                            task.CPU_FrameTime = camera.CPU_FrameTime
                         End SyncLock
 
                         Dim endCopyTime = Now
@@ -1580,7 +1580,12 @@ Public Class Main
                 Dim endWaitTime = Now
                 Dim elapsedWaitTicks = endWaitTime.Ticks - waitTime.Ticks
                 Dim spanWait = New TimeSpan(elapsedWaitTicks)
-                task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
+                Dim spanTime = TimeSpan.TicksPerMillisecond - task.inputBufferCopy
+                If spanTime = 0 Then
+                    task.waitingForInput = 0
+                Else
+                    task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
+                End If
                 Dim updatedDrawRect = task.drawRect
                 task.fpsCamera = fpsCamera
 
@@ -1676,14 +1681,15 @@ Public Class Main
                 ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
                 ' Each image will represent the one just finished by the algorithm.
                 If task.debugSyncUI Then Thread.Sleep(100)
-                If task.closeRequest Then Exit While
+                If task.closeRequest Then
+                    cameraShutdown = True
+                    Exit While
+                End If
             End While
 
             task.frameCount = -1
             task.Dispose()
             Debug.WriteLine(parms.algName + " ending.  Thread closing...")
-            Application.DoEvents()
-            'If task.closeRequest Then End
         End SyncLock
 
         If parms.algName.EndsWith(".py") Then killThread("python")

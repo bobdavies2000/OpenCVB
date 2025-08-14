@@ -23,54 +23,55 @@ Partial Class OptionsContainer
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OptionsContainer))
-        Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
-        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStrip1.SuspendLayout()
-        Me.SuspendLayout()
-        '
-        'ToolStrip1
-        '
-        Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2})
-        Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
-        Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
-        Me.ToolStrip1.Size = New System.Drawing.Size(1742, 38)
-        Me.ToolStrip1.TabIndex = 1
-        Me.ToolStrip1.Text = "ToolStrip1"
-        '
-        'ToolStripButton1
-        '
-        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
-        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
-        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(147, 33)
-        Me.ToolStripButton1.Text = "Reorder Options"
-        '
-        'ToolStripButton2
-        '
-        Me.ToolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
-        Me.ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), System.Drawing.Image)
-        Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton2.Name = "ToolStripButton2"
-        Me.ToolStripButton2.Size = New System.Drawing.Size(85, 33)
-        Me.ToolStripButton2.Text = "Show All"
-        '
-        'OptionsContainer
-        '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1742, 865)
-        Me.Controls.Add(Me.ToolStrip1)
-        Me.IsMdiContainer = True
-        Me.Name = "OptionsContainer"
-        Me.Text = "Opencv Algorithm Options"
-        Me.ToolStrip1.ResumeLayout(False)
-        Me.ToolStrip1.PerformLayout()
-        Me.ResumeLayout(False)
-        Me.PerformLayout()
+        ToolStrip1 = New ToolStrip()
+        ToolStripButton1 = New ToolStripButton()
+        ToolStripButton2 = New ToolStripButton()
+        ToolStrip1.SuspendLayout()
+        SuspendLayout()
+        ' 
+        ' ToolStrip1
+        ' 
+        ToolStrip1.ImageScalingSize = New Size(24, 24)
+        ToolStrip1.Items.AddRange(New ToolStripItem() {ToolStripButton1, ToolStripButton2})
+        ToolStrip1.Location = New Point(0, 0)
+        ToolStrip1.Name = "ToolStrip1"
+        ToolStrip1.Padding = New Padding(0, 0, 2, 0)
+        ToolStrip1.Size = New Size(1355, 25)
+        ToolStrip1.TabIndex = 1
+        ToolStrip1.Text = "ToolStrip1"
+        ' 
+        ' ToolStripButton1
+        ' 
+        ToolStripButton1.DisplayStyle = ToolStripItemDisplayStyle.Text
+        ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), Image)
+        ToolStripButton1.ImageTransparentColor = Color.Magenta
+        ToolStripButton1.Name = "ToolStripButton1"
+        ToolStripButton1.Size = New Size(97, 22)
+        ToolStripButton1.Text = "Reorder Options"
+        ' 
+        ' ToolStripButton2
+        ' 
+        ToolStripButton2.DisplayStyle = ToolStripItemDisplayStyle.Text
+        ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), Image)
+        ToolStripButton2.ImageTransparentColor = Color.Magenta
+        ToolStripButton2.Name = "ToolStripButton2"
+        ToolStripButton2.Size = New Size(57, 22)
+        ToolStripButton2.Text = "Show All"
+        ' 
+        ' OptionsContainer
+        ' 
+        AutoScaleDimensions = New SizeF(7F, 15F)
+        AutoScaleMode = AutoScaleMode.Font
+        ClientSize = New Size(1355, 649)
+        Controls.Add(ToolStrip1)
+        IsMdiContainer = True
+        Margin = New Padding(2, 2, 2, 2)
+        Name = "OptionsContainer"
+        Text = "Opencv Algorithm Options"
+        ToolStrip1.ResumeLayout(False)
+        ToolStrip1.PerformLayout()
+        ResumeLayout(False)
+        PerformLayout()
 
     End Sub
 

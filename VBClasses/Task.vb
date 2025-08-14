@@ -459,6 +459,9 @@ Public Class VBtask : Implements IDisposable
         End If
         sharpGL.showPointCloud()
     End Sub
+    Public Sub sharpGLClose()
+        If sgl IsNot Nothing Then sgl.Dispose()
+    End Sub
     Public Sub New()
     End Sub
     Public Sub New(parms As algParms)

@@ -8,13 +8,15 @@ Public Class sgl
     Dim lastMousePos As cv.Point
     Dim rotationX As Single = 0.0F
     Dim rotationY As Single = 0.0F
-    Private zoomZ As Single = -5.0F
+    Dim zoomZ As Single = -5.0F
+    Dim isPanning As Boolean = False
+    Dim panX As Single = 0.0F
+    Dim panY As Single = 0.0F
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.Left = GetSetting("Opencv", "sglLeft", "sglLeft", task.mainFormLocation.X + task.mainFormLocation.Width)
         Me.Top = GetSetting("Opencv", "sglTop", "sglTop", task.mainFormLocation.Y)
         Me.Width = GetSetting("Opencv", "sglWidth", "sglWidth", task.mainFormLocation.Width)
         Me.Height = GetSetting("Opencv", "sglHeight", "sglHeight", task.mainFormLocation.Height)
-
     End Sub
     Public Sub saveLocation()
         SaveSetting("Opencv", "sglLeft", "sglLeft", Math.Abs(Me.Left))
@@ -23,6 +25,10 @@ Public Class sgl
         SaveSetting("Opencv", "sglHeight", "sglHeight", Me.Height)
     End Sub
     Private Sub OpenGLControl_MouseDown(sender As Object, e As MouseEventArgs) Handles OpenglControl1.MouseDown
+        If e.Button = MouseButtons.Right Then
+            isPanning = True
+            lastMousePos = New cv.Point(e.Location.X, e.Location.Y)
+        End If
         If e.Button = MouseButtons.Left Then
             isDragging = True
             lastMousePos = New cv.Point(e.Location.X, e.Location.Y)
@@ -38,9 +44,20 @@ Public Class sgl
 
             lastMousePos = New cv.Point(e.Location.X, e.Location.Y)
         End If
+        If isPanning Then
+            Dim dx = e.X - lastMousePos.X
+            Dim dy = e.Y - lastMousePos.Y
+
+            panX += dx * 0.01F ' Adjust sensitivity as needed
+            panY -= dy * 0.01F
+
+            lastMousePos = New cv.Point(e.Location.X, e.Location.Y)
+            OpenglControl1.Invalidate()
+        End If
     End Sub
     Private Sub OpenGLControl_MouseUp(sender As Object, e As MouseEventArgs) Handles OpenglControl1.MouseUp
         If e.Button = MouseButtons.Left Then isDragging = False
+        If e.Button = MouseButtons.Right Then isPanning = False
     End Sub
     Public Sub resetView()
         rotationX = 0.0
@@ -58,7 +75,7 @@ Public Class sgl
         gl.LoadIdentity()
 
         ' Move the camera back
-        gl.Translate(0.0F, 0.0F, zoomZ)
+        gl.Translate(panX, panY, zoomZ)
         gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
 
@@ -77,5 +94,8 @@ Public Class sgl
 
         gl.End()
         gl.Flush()
+    End Sub
+    Private Sub sgl_Closed(sender As Object, e As EventArgs) Handles Me.Closed
+        task.closeRequest = True
     End Sub
 End Class
