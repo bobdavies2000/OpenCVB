@@ -452,13 +452,14 @@ Public Class VBtask : Implements IDisposable
             openGLPipe.Close()
         End If
     End Sub
-    Public Sub sharpGLShow()
+
+    Public Function sharpGLShow(func As Integer) As String
         If task.gOptions.DebugCheckBox.Checked Then
             task.gOptions.DebugCheckBox.Checked = False
             sharpGL.resetView()
         End If
-        sharpGL.showPointCloud()
-    End Sub
+        Return sharpGL.showSharpGL(func)
+    End Function
     Public Sub sharpGLClose()
         If sgl IsNot Nothing Then sgl.Dispose()
     End Sub

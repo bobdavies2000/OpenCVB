@@ -1,4 +1,5 @@
-﻿Imports OpenCvSharp
+﻿Imports System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar
+Imports OpenCvSharp
 Imports SharpGL
 Imports SharpGL.WinForms
 Imports cv = OpenCvSharp
@@ -17,6 +18,7 @@ Public Class sgl
         Me.Top = GetSetting("Opencv", "sglTop", "sglTop", task.mainFormLocation.Y)
         Me.Width = GetSetting("Opencv", "sglWidth", "sglWidth", task.mainFormLocation.Width)
         Me.Height = GetSetting("Opencv", "sglHeight", "sglHeight", task.mainFormLocation.Height)
+        gl = OpenglControl1.OpenGL
     End Sub
     Public Sub saveLocation()
         SaveSetting("Opencv", "sglLeft", "sglLeft", Math.Abs(Me.Left))
@@ -69,32 +71,62 @@ Public Class sgl
         zoomZ += If(delta > 0, 0.5F, -0.5F)
         OpenglControl1.Invalidate() ' Force redraw
     End Sub
-    Public Sub showPointCloud()
-        gl = OpenglControl1.OpenGL
+    Public Function getWorldCoordinates(p As cv.Point, depth As Single) As cv.Point3f
+        Dim x = (p.X - task.calibData.rgbIntrinsics.ppx) / task.calibData.rgbIntrinsics.fx
+        Dim y = (p.Y - task.calibData.rgbIntrinsics.ppy) / task.calibData.rgbIntrinsics.fy
+        Return New cv.Point3f(-x * depth, y * depth, depth)
+    End Function
+    Public Function showSharpGL(func As Integer) As String
         gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
         gl.LoadIdentity()
 
-        ' Move the camera back
         gl.Translate(panX, panY, zoomZ)
         gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
-
         gl.PointSize(2.0F)
 
-        gl.Begin(OpenGL.GL_POINTS)
+        Dim label = ""
+        Select Case func
+            Case oCase.drawPointCloudRGB
+                gl.Begin(OpenGL.GL_POINTS)
 
-        For y = 0 To task.pointCloud.Height - 1
-            For x = 0 To task.pointCloud.Width - 1
-                Dim vec3b = task.color.Get(Of cv.Vec3b)(y, x)
-                gl.Color(vec3b(0) / 255, vec3b(1) / 255, vec3b(2) / 255)
-                Dim vec As Vec3f = task.pointCloud.At(Of Vec3f)(y, x)
-                gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
-            Next
-        Next
+                For y = 0 To task.pointCloud.Height - 1
+                    For x = 0 To task.pointCloud.Width - 1
+                        Dim vec3b = task.color.Get(Of cv.Vec3b)(y, x)
+                        gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
+                        Dim vec As Vec3f = task.pointCloud.At(Of Vec3f)(y, x)
+                        gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
+                    Next
+                Next
+                gl.End()
+                label = CStr(task.pointCloud.Total) + " points were rendered."
+            Case oCase.quadBasics
+                gl.Begin(OpenGL.GL_QUADS)
 
-        gl.End()
+                Dim count As Integer
+                For i = 0 To task.gridRects.Count - 1
+                    Dim rect = task.gridRects(i)
+                    Dim depth = -task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
+                    If depth = 0 Then Continue For
+                    count += 1
+                    Dim color = task.color(rect).Mean()
+
+                    gl.Color(CSng(color(2) / 255), CSng(color(1) / 255), CSng(color(0) / 255))
+                    Dim p0 = getWorldCoordinates(rect.TopLeft, depth)
+                    Dim p1 = getWorldCoordinates(rect.BottomRight, depth)
+                    gl.Vertex(p0.X, p0.Y, depth)
+                    gl.Vertex(p1.X, p0.Y, depth)
+                    gl.Vertex(p1.X, p1.Y, depth)
+                    gl.Vertex(p0.X, p1.Y, depth)
+                Next
+
+                gl.End()
+                label = CStr(count) + " grid rects had depth."
+        End Select
+
         gl.Flush()
-    End Sub
+        Return label
+    End Function
     Private Sub sgl_Closed(sender As Object, e As EventArgs) Handles Me.Closed
         task.closeRequest = True
     End Sub
