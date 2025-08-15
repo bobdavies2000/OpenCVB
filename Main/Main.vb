@@ -391,7 +391,7 @@ Public Class Main
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         jsonWrite()
         cameraShutdown = True
-        Thread.Sleep(1000)
+        Thread.Sleep(200)
         End
     End Sub
     Private Sub CameraTask()

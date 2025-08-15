@@ -17,7 +17,7 @@ Public Class VBtask : Implements IDisposable
     Public palette As Palette_LoadColorMap
     Public PixelViewer As Pixel_Viewer
     Public rgbFilter As Filter_Basics
-    Public ogl As OpenGL_Basics
+    Public ogl As XO_OpenGL_Basics
     Public gravityBasics As Gravity_Basics
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
@@ -98,6 +98,8 @@ Public Class VBtask : Implements IDisposable
     Public rightView As New cv.Mat
     Public leftRightMode As Boolean ' dst0 and dst1 are the left and right images.
     Public pointCloud As New cv.Mat
+    Public sharpDepth As cv.Mat
+    Public sharpRGB As cv.Mat
     Public splitOriginalCloud() As cv.Mat
     Public gravityCloud As New cv.Mat
     Public pcSplit() As cv.Mat
@@ -539,9 +541,6 @@ Public Class VBtask : Implements IDisposable
         contours = New Contour_Basics_List
         rgbFilter = New Filter_Basics
         feat = New Feature_Basics
-
-        If algName.StartsWith("OpenGL_") Then ogl = New OpenGL_Basics
-        If algName.StartsWith("Model_") Then ogl = New OpenGL_Basics
 
         ' all the algorithms in the list are task algorithms that are children of the algname.
         For i = 1 To callTrace.Count - 1

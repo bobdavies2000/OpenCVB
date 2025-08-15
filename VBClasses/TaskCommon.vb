@@ -239,6 +239,7 @@ Public Enum oCase
     pcPointsAlone = 18
     drawLines = 19
     drawAvgPointCloudRGB = 20
+    readPointCloud = 21
 End Enum
 
 

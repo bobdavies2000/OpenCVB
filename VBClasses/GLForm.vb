@@ -76,6 +76,29 @@ Public Class sgl
         Dim y = (p.Y - task.calibData.rgbIntrinsics.ppy) / task.calibData.rgbIntrinsics.fy
         Return New cv.Point3f(-x * depth, y * depth, depth)
     End Function
+    Private Function displayQuads() As String
+        gl.Begin(OpenGL.GL_QUADS)
+
+        Dim count As Integer
+        For i = 0 To task.gridRects.Count - 1
+            Dim rect = task.gridRects(i)
+            Dim depth = -task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
+            If depth = 0 Then Continue For
+            count += 1
+            Dim color = task.color(rect).Mean()
+
+            gl.Color(CSng(color(2) / 255), CSng(color(1) / 255), CSng(color(0) / 255))
+            Dim p0 = getWorldCoordinates(rect.TopLeft, depth)
+            Dim p1 = getWorldCoordinates(rect.BottomRight, depth)
+            gl.Vertex(p0.X, p0.Y, depth)
+            gl.Vertex(p1.X, p0.Y, depth)
+            gl.Vertex(p1.X, p1.Y, depth)
+            gl.Vertex(p0.X, p1.Y, depth)
+        Next
+
+        gl.End()
+        Return CStr(count) + " grid rects had depth."
+    End Function
     Public Function showSharpGL(func As Integer) As String
         gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
         gl.LoadIdentity()
@@ -101,27 +124,16 @@ Public Class sgl
                 gl.End()
                 label = CStr(task.pointCloud.Total) + " points were rendered."
             Case oCase.quadBasics
-                gl.Begin(OpenGL.GL_QUADS)
+                label = displayQuads()
+            Case oCase.readPointCloud
+                label = displayQuads()
+                task.sharpDepth = New cv.Mat(Height, Width, cv.MatType.CV_32F)
 
-                Dim count As Integer
-                For i = 0 To task.gridRects.Count - 1
-                    Dim rect = task.gridRects(i)
-                    Dim depth = -task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
-                    If depth = 0 Then Continue For
-                    count += 1
-                    Dim color = task.color(rect).Mean()
-
-                    gl.Color(CSng(color(2) / 255), CSng(color(1) / 255), CSng(color(0) / 255))
-                    Dim p0 = getWorldCoordinates(rect.TopLeft, depth)
-                    Dim p1 = getWorldCoordinates(rect.BottomRight, depth)
-                    gl.Vertex(p0.X, p0.Y, depth)
-                    gl.Vertex(p1.X, p0.Y, depth)
-                    gl.Vertex(p1.X, p1.Y, depth)
-                    gl.Vertex(p0.X, p1.Y, depth)
-                Next
-
-                gl.End()
-                label = CStr(count) + " grid rects had depth."
+                Dim depthBuffer(Width, Height) As Single
+                gl.ReadPixels(0, 0, Width, Height, OpenGL.GL_DEPTH_COMPONENT, OpenGL.GL_FLOAT,
+                              task.sharpDepth.Data)
+                gl.Flush()
+                gl.Finish()
         End Select
 
         gl.Flush()

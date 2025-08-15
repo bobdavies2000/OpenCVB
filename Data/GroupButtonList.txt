@@ -152,7 +152,6 @@ MinMath
 ML
 Moments
 Motion
-MotionCam
 MotionLine
 Mouse
 MSER
@@ -161,7 +160,6 @@ Neighbor
 OEX
 OilPaint
 OpAuto
-OpenGL
 ORB
 Palette
 ParticleFilter
@@ -184,7 +182,6 @@ Projection
 Puzzle
 Pyramid
 PyrFilter
-Python
 QRcode
 Quad
 Quadrant

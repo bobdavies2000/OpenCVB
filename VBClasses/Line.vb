@@ -632,10 +632,10 @@ Public Class Line_BrickList : Inherits TaskParent
         lpOutput.drawRoRect(dst2)
 
         If standalone Then lp = lpOutput
-        If task.gOptions.DebugCheckBox.Checked Then
-            lp = task.lineLongest
-            task.gOptions.DebugCheckBox.Checked = False
-        End If
+        'If task.gOptions.DebugCheckBox.Checked Then
+        '    lp = task.lineLongest
+        '    task.gOptions.DebugCheckBox.Checked = False
+        'End If
 
         For Each r In brickList
             DrawRect(dst3, r, white)
