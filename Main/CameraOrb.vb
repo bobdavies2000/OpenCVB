@@ -134,7 +134,8 @@ Public Class CameraORB : Inherits GenericCamera
             End If
         End SyncLock
 
-        'GC.Collect() ' this GC seems to be necessary to get the color image in the VB.Net interface.
+        ' without this GC.Collect, there are occasional memory footprint problems.  It will blow 4 Gb....
+        If cameraFrameCount Mod 10 = 0 Then GC.Collect()
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
