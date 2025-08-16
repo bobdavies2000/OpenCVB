@@ -5,7 +5,7 @@ Public Class GL_Basics : Inherits TaskParent
         desc = "Display the pointcloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        SetTrueText(task.sharpGLShow(oCase.drawPointCloudRGB), 2)
+        SetTrueText(task.RunSharp(oCase.drawPointCloudRGB), 2)
     End Sub
 End Class
 
@@ -19,7 +19,7 @@ Public Class GL_Bricks : Inherits TaskParent
         desc = "Display the bricks in SharpGL"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        SetTrueText(task.sharpGLShow(oCase.quadBasics), 2)
+        SetTrueText(task.RunSharp(oCase.quadBasics), 2)
     End Sub
 End Class
 
@@ -36,7 +36,7 @@ Public Class GL_ReadPointCloud : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim mm = GetMinMax(task.pcSplit(2))
-        SetTrueText(task.sharpGLShow(oCase.readPointCloud), 2)
+        SetTrueText(task.RunSharp(oCase.readPointCloud), 2)
         Dim count As Integer
         'labels(2) = Format(mm.minVal, fmt1) + "m (min) to " + Format(mm.maxVal, fmt1) + "m (max)"
 

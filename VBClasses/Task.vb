@@ -455,12 +455,12 @@ Public Class VBtask : Implements IDisposable
         End If
     End Sub
 
-    Public Function sharpGLShow(func As Integer) As String
+    Public Function RunSharp(func As Integer) As String
         If task.gOptions.DebugCheckBox.Checked Then
             task.gOptions.DebugCheckBox.Checked = False
             sharpGL.resetView()
         End If
-        Return sharpGL.showSharpGL(func)
+        Return sharpGL.runSharp(func)
     End Function
     Public Sub sharpGLClose()
         If sgl IsNot Nothing Then sgl.Dispose()

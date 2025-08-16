@@ -13,6 +13,7 @@ Public Class sgl
     Dim isPanning As Boolean = False
     Dim panX As Single = 0.0F
     Dim panY As Single = 0.0F
+    Dim options As New Options_SharpGL
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.Left = GetSetting("Opencv", "sglLeft", "sglLeft", task.mainFormLocation.X + task.mainFormLocation.Width)
         Me.Top = GetSetting("Opencv", "sglTop", "sglTop", task.mainFormLocation.Y)
@@ -76,6 +77,9 @@ Public Class sgl
         Dim y = (p.Y - task.calibData.rgbIntrinsics.ppy) / task.calibData.rgbIntrinsics.fy
         Return New cv.Point3f(-x * depth, y * depth, depth)
     End Function
+    Private Sub sgl_Closed(sender As Object, e As EventArgs) Handles Me.Closed
+        task.closeRequest = True
+    End Sub
     Private Function displayQuads() As String
         gl.Begin(OpenGL.GL_QUADS)
 
@@ -99,14 +103,23 @@ Public Class sgl
         gl.End()
         Return CStr(count) + " grid rects had depth."
     End Function
-    Public Function showSharpGL(func As Integer) As String
+    Public Function RunSharp(func As Integer) As String
+        options.Run()
+
+        gl.MatrixMode(OpenGL.GL_PROJECTION)
+        gl.LoadIdentity()
+        gl.Perspective(options.perspective, OpenglControl1.Width / OpenglControl1.Height,
+                       options.zNear, options.zFar)
+
+        gl.MatrixMode(OpenGL.GL_MODELVIEW)
+
         gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
         gl.LoadIdentity()
 
         gl.Translate(panX, panY, zoomZ)
         gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
-        gl.PointSize(2.0F)
+        gl.PointSize(1.0F)
 
         Dim label = ""
         Select Case func
@@ -139,7 +152,4 @@ Public Class sgl
         gl.Flush()
         Return label
     End Function
-    Private Sub sgl_Closed(sender As Object, e As EventArgs) Handles Me.Closed
-        task.closeRequest = True
-    End Sub
 End Class
