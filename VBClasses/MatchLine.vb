@@ -1,11 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-
-
-
-
-
-
-
 Public Class MatchLine_BasicsAll : Inherits TaskParent
     Public cameraMotionProxy As New lpData
     Dim match As New XO_MatchLine_Basics
