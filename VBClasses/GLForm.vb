@@ -13,8 +13,9 @@ Public Class sgl
     Dim isPanning As Boolean = False
     Dim panX As Single = 0.0F
     Dim panY As Single = 0.0F
-    Dim options As New Options_SharpGL
+    Dim options As Options_SharpGL
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
+        options = New Options_SharpGL
         Me.Left = GetSetting("Opencv", "sglLeft", "sglLeft", task.mainFormLocation.X + task.mainFormLocation.Width)
         Me.Top = GetSetting("Opencv", "sglTop", "sglTop", task.mainFormLocation.Y)
         Me.Width = GetSetting("Opencv", "sglWidth", "sglWidth", task.mainFormLocation.Width)
