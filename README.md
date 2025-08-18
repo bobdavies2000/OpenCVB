@@ -1,17 +1,28 @@
-# 2025 August 10 – Python support, HomeDir, Brick Points.
+# 2025 August 17th – Solution Changes,
 
 -   Over 1900 algorithms are included, averaging 36 lines of code per algorithm.
--   Python support retired to the XO.vb module – obsolete.
--   Home directory now passed in from Visual Studio.
-    -   It means that support for standalone execution is removed.
-    -   This change was prompted by the Runtime-Identifier change with Net8.0.
-    -   OpenCVB’s binary is never invoked by itself – it is always part of Visual Studio.
--   Brick points are now a possible Feature source – see Feature_Basics example below.
+-   The OpenCVB solution is simplified. The projects included are:
+    -   C\# interface for StereoLabs Gemini cameras - CamZed.
+    -   C++ algorithms running native C++ - CPP_Native.
+    -   Main project for the user interface (includes the camera task.)
+    -   VBCLasses project containing all the VB.Net algorithms.
+-   Projects removed from the OpenCVB solution:
+    -   OpenGL, Orbbec SDK, C++ camera interfaces for OakD, StereoLabs, Orbbec.
+    -   OakD project will return soon – Oak-D Pro 4 (pre-order) not yet working.
+-   SharpGL interface to OpenGL is now available and working.
+    -   SharpGL is a C\# interface to OpenGL included as NuGet package.
+    -   SharpGL replaces the existing interface OpenGL C++ project.
+    -   OpenGL C++ project has been removed but the project is still preserved.
+    -   The OpenGL algorithms are all still present but now reside in XO.vb (obsolete.)
+    -   SharpGL algorithm added to read the point cloud.
+-   Orbbec C\# interface memory overflow is now fixed with a garbage collection
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/1c33c86ceee205402f23c9035987ebad.gif)
+![](media/87f60f3939519c014790037a7221476f.png)
 
-**Feature_Basics:** *Essentially this is just Sobel output but on a “brick” basis where the bricks define a grid covering the entire image. The highlighted points are the location that has the highest intensity in the Sobel output for that brick.*
+![](media/0171c12d9eb57fa5bef168563b3769f6.png)
+
+**GL_Basics:** *The top image is the RGB image while the bottom image is the SharpGL output.*
 
 \-----------------------------------------------------------------------------------------------
 
@@ -1308,7 +1319,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 
     -   The Orbbec SDK is automatically installed with the Update_All.bat install run.
     -   It is a small thrill to see all 2000 algorithms suddenly working with the 335L.
--   Python_Classes added to separate Python algorithms from the VB_Classes
+-   Python_Classes added to separate Python algorithms from the VBClasses
     -   Default group name is \<All VB.Net\> to get only VB.Net classes
     -   Other group names added were: “\<All Python\>” and “\<All C\#\>” classes.
 -   The code to find and track features was reorganized. New features added for ROI’s.
@@ -1644,7 +1655,7 @@ The heat map is a well-known method to display populations – blue is cool or l
 -   Cells with “ideal” depth are those filled with depth pixels.
     -   Ideal depth is clearly visible from both the left and right cameras.
     -   See example output below showing cells covering the depth image.
--   TreeView form was moved into the VB_Classes where the data is produced.
+-   TreeView form was moved into the VBClasses where the data is produced.
     -   Allowed code to be simpler in the Main form.
     -   TreeView button is no longer needed in Main
 -   A log of previous changes is included at the bottom of this document.
@@ -2071,7 +2082,7 @@ The heat map is a well-known method to display populations – blue is cool or l
     -   All the libraries and interfaces were rebuilt as well
     -   This change required a complete review of the OpenCVB’s infrastructure.
 -   GIFBuilder has been converted to a .Net 8.0 console application. Update_All.bat fixed.
--   UI_Generator converted to .Net 8.0 console application. VB_Classes project updated.
+-   UI_Generator converted to .Net 8.0 console application. VBClasses project updated.
 -   The ZED camera support is using the NuGet package instead of a custom VB interface.
     -   The new CamZed C\# class library was able to use NuGet but VB.Net could not.
 -   Install script (Update_All.bat) is a one-page file for the SDK and OpenCV downloads.
@@ -2134,3 +2145,18 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A hand reaching out to a shelf AI-generated content may be incorrect.](media/122a37f63e6a1e574e5117f07d87a2bd.jpeg)
 
 **Line_Parallel:** *Each group of parallel lines has the same color and group ID (the text at the center of the line.) The “0” group designation is for “unparallel” lines that are of different value because no other lines are parallel to them. Lines that are close together and parallel may have more value. The group 4 lines in blue above are one such example but there are several other examples in the image as well.*
+
+# 2025 August 10th – Python support, HomeDir, Brick Points.
+
+-   Over 1900 algorithms are included, averaging 36 lines of code per algorithm.
+-   Python support retired to the XO.vb module – obsolete.
+-   Home directory now passed in from Visual Studio.
+    -   It means that support for standalone execution is removed.
+    -   This change was prompted by the Runtime-Identifier change with Net8.0.
+    -   OpenCVB’s binary is never invoked by itself – it is always part of Visual Studio.
+-   Brick points are now a possible Feature source – see Feature_Basics example below.
+-   A log of previous changes is included at the bottom of this document.
+
+![A hand reaching out to a room with yellow dots AI-generated content may be incorrect.](media/1c33c86ceee205402f23c9035987ebad.gif)
+
+**Feature_Basics:** *Essentially this is just Sobel output but on a “brick” basis where the bricks define a grid covering the entire image. The highlighted points are the location that has the highest intensity in the Sobel output for that brick.*
