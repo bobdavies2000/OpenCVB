@@ -27,7 +27,9 @@ Public Class BGSubtract_Basics : Inherits TaskParent
         labels(2) = options.methodDesc
     End Sub
     Public Sub Close()
-        If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)
+        If cPtr <> 0 Then
+            cPtr = BGSubtract_BGFG_Close(cPtr)
+        End If
     End Sub
 End Class
 
