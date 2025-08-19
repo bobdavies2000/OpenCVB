@@ -54,7 +54,7 @@ Public Class Feature_BrickLine : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim sortByGrid As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
         For Each pt In task.feat.features
-            Dim lineIndex = task.lines.lpMap.Get(Of Byte)(pt.Y, pt.X)
+            Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
             If lineIndex = 0 Then Continue For
             Dim gridindex = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
             sortByGrid.Add(gridindex, pt)
@@ -64,7 +64,7 @@ Public Class Feature_BrickLine : Inherits TaskParent
         dst3.SetTo(0)
         features.Clear()
         For Each pt In sortByGrid.Values
-            Dim lineIndex = task.lines.lpMap.Get(Of Byte)(pt.Y, pt.X) - 1
+            Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X) - 1
             If brickLines(lineIndex) Is Nothing Then
                 brickLines(lineIndex) = New List(Of cv.Point)({pt})
             Else

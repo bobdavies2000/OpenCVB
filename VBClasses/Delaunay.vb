@@ -1,3 +1,4 @@
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Delaunay_Basics : Inherits TaskParent
     Public inputPoints As New List(Of cv.Point2f)
@@ -344,18 +345,78 @@ End Class
 
 
 
+Public Class Delaunay_LinesNew : Inherits TaskParent
+    Dim subdiv As New cv.Subdiv2D
+    Dim info As New Line_Info
+    Public Sub New()
+        dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
+        dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_32SC1, 0)
+        desc = "Create a map for selecting lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+        For Each lp In task.lines.lpList
+            subdiv.Insert(lp.p1)
+            subdiv.Insert(lp.p2)
+        Next
+
+        Dim facets = New cv.Point2f()() {Nothing}
+        subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+
+        Dim facetList As New List(Of List(Of cv.Point))
+        For i = 0 To facets.Length - 1
+            Dim nextFacet As New List(Of cv.Point)
+            For j = 0 To facets(i).Length - 1
+                nextFacet.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
+            Next
+
+            dst0.FillConvexPoly(nextFacet, i, cv.LineTypes.Link4)
+            dst1.FillConvexPoly(nextFacet, task.lines.lpList(Math.Floor(i / 2)).index, cv.LineTypes.Link4)
+            facetList.Add(nextFacet)
+        Next
+
+        Dim pt = task.mouseMovePoint
+        task.lpD = task.lines.lpList(dst1.Get(Of Integer)(pt.Y, pt.X))
+
+        info.Run(emptyMat)
+        SetTrueText(info.strOut, 3)
+
+        Dim index1 = dst0.Get(Of Integer)(task.lpD.p1.Y, task.lpD.p1.X)
+        Dim index2 = dst0.Get(Of Integer)(task.lpD.p2.Y, task.lpD.p2.X)
+
+        dst3.SetTo(0)
+        dst3.FillConvexPoly(facetList(index1), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
+        dst3.FillConvexPoly(facetList(index2), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
+
+        DrawLine(dst3, task.lpD)
+
+        For Each lp In task.lines.lpList
+            index1 = dst0.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+            dst2.FillConvexPoly(facetList(index1), task.scalarColors(lp.ID Mod 255), cv.LineTypes.Link4)
+            index2 = dst0.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+            dst2.FillConvexPoly(facetList(index2), task.scalarColors(lp.ID Mod 255), cv.LineTypes.Link4)
+        Next
+
+        For Each lp In task.lines.lpList
+            DrawLine(dst2, lp)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class Delaunay_Lines : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
     Dim info As New Line_Info
-    Dim ptLines As New List(Of Integer)
     Public Sub New()
         desc = "Create a map for selecting lines"
     End Sub
-    Private Sub displayFacet(pt As cv.Point)
-    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         delaunay.inputPoints.Clear()
-        ptLines.Clear()
+        Dim ptLines As New List(Of Integer)
         For Each lp In task.lines.lpList
             ptLines.Add(lp.index)
             delaunay.inputPoints.Add(lp.p1)
@@ -366,22 +427,26 @@ Public Class Delaunay_Lines : Inherits TaskParent
         delaunay.Run(src)
         dst1 = delaunay.dst2
 
-        dst3.SetTo(0)
         Dim pt = task.mouseMovePoint
         task.lpD = task.lines.lpList(ptLines(delaunay.dst1.Get(Of Byte)(pt.Y, pt.X)))
+
+        Dim index1 = delaunay.dst1.Get(Of Byte)(task.lpD.p1.Y, task.lpD.p1.X)
+        Dim index2 = delaunay.dst1.Get(Of Byte)(task.lpD.p2.Y, task.lpD.p2.X)
+
+        dst3.SetTo(0)
+        dst3.FillConvexPoly(delaunay.facetList(index1), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
+        dst3.FillConvexPoly(delaunay.facetList(index2), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
         DrawLine(dst3, task.lpD)
-        DrawContour(dst3, delaunay.facetList(delaunay.dst1.Get(Of Byte)(task.lpD.p1.Y, task.lpD.p1.X)), white, 1)
-        DrawContour(dst3, delaunay.facetList(delaunay.dst1.Get(Of Byte)(task.lpD.p2.Y, task.lpD.p2.X)), white, 1)
 
         info.Run(emptyMat)
         SetTrueText(info.strOut, 3)
 
-        For i = 0 To task.lines.lpList.Count - 1
-            Dim lp = task.lines.lpList(i)
-            Dim index = delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            dst2.FillConvexPoly(delaunay.facetList(Index), task.scalarColors(lp.ID Mod 255), cv.LineTypes.Link4)
-            index = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
-            dst2.FillConvexPoly(delaunay.facetList(index), task.scalarColors(lp.ID Mod 255), cv.LineTypes.Link4)
+        For Each lp In task.lines.lpList
+            index1 = delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+            index2 = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+
+            dst2.FillConvexPoly(delaunay.facetList(index1), task.scalarColors(lp.ID Mod 255), cv.LineTypes.Link4)
+            dst2.FillConvexPoly(delaunay.facetList(index2), task.scalarColors(lp.ID Mod 255), cv.LineTypes.Link4)
         Next
 
         For Each lp In task.lines.lpList

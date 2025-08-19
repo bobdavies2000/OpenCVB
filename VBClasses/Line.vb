@@ -3,22 +3,23 @@ Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public lpMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public rawLines As New Line_Raw
     Public Sub New()
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
-    Private Function lpMotionCheck(lp As lpData) As Boolean
+    Private Function lpMotion(lp As lpData) As Boolean
+        ' return true if the line endpoints were in the motion mask.
         Dim gridIndex As Integer, pt As cv.Point
 
         gridIndex = task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
         pt = task.gridRects(gridIndex).TopLeft
-        If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then Return False
+        If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then Return True
 
         gridIndex = task.grid.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
         pt = task.gridRects(gridIndex).TopLeft
-        If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then Return False
-        Return True
+        If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then Return True
+        Return False
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' only run as a task algorithm.
@@ -29,14 +30,20 @@ Public Class Line_Basics : Inherits TaskParent
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
         For Each lp In lpList
-            If lpMotionCheck(lp) Then sortlines.Add(lp.length, lp)
+            If lpMotion(lp) = False Then
+                lp.age += 1
+                sortlines.Add(lp.length, lp)
+            End If
         Next
 
         rawLines.Run(task.grayStable)
         labels(3) = rawLines.labels(2)
 
         For Each lp In rawLines.lpList
-            If lpMotionCheck(lp) = False Then sortlines.Add(lp.length, lp)
+            If lpMotion(lp) Then
+                lp.age = 1
+                sortlines.Add(lp.length, lp)
+            End If
         Next
 
         lpList.Clear()
@@ -46,13 +53,13 @@ Public Class Line_Basics : Inherits TaskParent
             If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
 
-        lpMap.SetTo(0)
+        dst1.SetTo(0)
         lpRectMap.SetTo(0)
         dst2.SetTo(0)
         For i = lpList.Count - 1 To 0 Step -1
             Dim lp = lpList(i)
             lpRectMap.Rectangle(lp.rect, i + 1, -1)
-            lpMap.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link8)
+            dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link8)
             DrawLine(dst2, lp, task.scalarColors(lp.ID Mod 255))
         Next
 
@@ -207,12 +214,16 @@ Public Class Line_Info : Inherits TaskParent
 
         dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
-        Dim index = task.lpD.index
         strOut = ""
-        strOut += "Line ID = " + CStr(index) + vbCrLf + vbCrLf
-        strOut += "index = " + CStr(index) + vbCrLf
+        strOut += "Line ID = " + CStr(task.lpD.ID) + vbCrLf + vbCrLf
+        strOut += "age = " + CStr(task.lpD.age) + vbCrLf
+        strOut += "length = " + CStr(task.lpD.length) + vbCrLf
+        strOut += "index = " + CStr(task.lpD.index) + vbCrLf
+        strOut += "gridIndex1 = " + CStr(task.lpD.gridIndex1) + " gridIndex2 = " + CStr(task.lpD.gridIndex2) + vbCrLf
+        strOut += "nabeIndex1 = " + CStr(task.lpD.nabeIndex1) + " nabeIndex2 = " + CStr(task.lpD.nabeIndex2) + vbCrLf
 
         strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf + vbCrLf
+        strOut += "ep1 = " + task.lpD.ep1.ToString + ", ep2 = " + task.lpD.ep2.ToString + vbCrLf + vbCrLf
         strOut += "Angle = " + CStr(task.lpD.angle) + vbCrLf
         strOut += "Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
         strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
@@ -332,7 +343,7 @@ Public Class Line_Longest : Inherits TaskParent
             task.lineLongestChanged = True
             If lplist.Count > 1 Then
                 Dim histogram As New cv.Mat
-                cv.Cv2.CalcHist({task.lines.lpMap(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
+                cv.Cv2.CalcHist({task.lines.dst1(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
                                  New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
 
                 Dim histArray(histogram.Total - 1) As Single
@@ -1030,7 +1041,7 @@ Public Class Line_BrickPoints : Inherits TaskParent
         sortLines.Clear()
         dst3.SetTo(0)
         For Each pt In task.features
-            Dim lineIndex = task.lines.lpMap.Get(Of Byte)(pt.Y, pt.X)
+            Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
             If lineIndex = 0 Then Continue For
             Dim color = vecToScalar(task.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
             Dim index As Integer = sortLines.Keys.Contains(lineIndex)
