@@ -5,7 +5,8 @@ Public Class GL_Basics : Inherits TaskParent
         desc = "Display the pointcloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        SetTrueText(task.RunSharp(oCase.drawPointCloudRGB), 2)
+        strOut = task.sharpGL.RunSharp(oCase.drawPointCloudRGB)
+        SetTrueText(strOut, 2)
     End Sub
 End Class
 
@@ -19,7 +20,8 @@ Public Class GL_Bricks : Inherits TaskParent
         desc = "Display the bricks in SharpGL"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        SetTrueText(task.RunSharp(oCase.quadBasics), 2)
+        strOut = task.sharpGL.RunSharp(oCase.quadBasics)
+        SetTrueText(strOut, 2)
     End Sub
 End Class
 
@@ -36,7 +38,10 @@ Public Class GL_ReadPointCloud : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim mm = GetMinMax(task.pcSplit(2))
-        SetTrueText(task.RunSharp(oCase.readPointCloud), 2)
+
+        strOut = task.sharpGL.RunSharp(oCase.readPointCloud)
+        SetTrueText(strOut, 2)
+
         Dim count As Integer
         'labels(2) = Format(mm.minVal, fmt1) + "m (min) to " + Format(mm.maxVal, fmt1) + "m (max)"
 
@@ -45,5 +50,28 @@ Public Class GL_ReadPointCloud : Inherits TaskParent
 
         dst3 = task.pcSplit(2)
         labels(3) = CStr(count)
+    End Sub
+End Class
+
+
+
+
+
+Public Class GL_StructuredLines : Inherits TaskParent
+    Dim sMask = New Structured_Mask
+    Public Sub New()
+        desc = "Build a 3D model of the lines found in the structured depth data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        sMask.run(src)
+        dst2 = sMask.dst2
+        labels(2) = sMask.labels(2)
+
+        dst0 = task.pointCloud.Clone
+        dst0.SetTo(0, Not dst2)
+        dst1.SetTo(white)
+
+        strOut = task.sharpGL.RunSharp(oCase.pcLines, dst0, dst1)
+        SetTrueText(strOut, 2)
     End Sub
 End Class

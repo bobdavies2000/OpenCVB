@@ -116,7 +116,10 @@ Public Class OptionsContainer
         task.gOptions.Close()
         task.featureOptions.Close()
         task.treeView.Close()
-        If task.sharpGL IsNot Nothing Then task.sharpGL.Close()
+        If task.sharpGL IsNot Nothing Then
+            task.sharpGL.saveLocation()
+            task.sharpGL.Close()
+        End If
         GC.Collect()
     End Sub
 End Class

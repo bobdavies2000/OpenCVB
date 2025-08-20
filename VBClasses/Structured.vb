@@ -39,9 +39,6 @@ End Class
 
 
 
-
-
-
 Public Class Structured_Core : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -931,5 +928,27 @@ Public Class Structured_LinearizeFloor : Inherits TaskParent
 
             imuPC.CopyTo(task.pointCloud, sliceMask)
         End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Structured_Mask : Inherits TaskParent
+    Dim struct As New Structured_Basics
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        desc = "Create a depth mask using the lines in Structured_Basics"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        struct.Run(src)
+        dst2.SetTo(0)
+        For Each lp In struct.lpListX
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
+        Next
+        For Each lp In struct.lpListY
+            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
+        Next
     End Sub
 End Class

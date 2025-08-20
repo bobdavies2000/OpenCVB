@@ -10511,7 +10511,7 @@ End Class
 
 
 Public Class XO_Line_ViewLeftRight : Inherits TaskParent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_Core
     Dim linesRaw As New Line_Raw
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)

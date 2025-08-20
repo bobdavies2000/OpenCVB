@@ -101,8 +101,13 @@ Public Class sgl
         gl.End()
         Return CStr(count) + " grid rects had depth."
     End Function
-    Public Function RunSharp(func As Integer) As String
+    Public Function RunSharp(func As Integer, Optional src As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
         options.Run()
+
+        If task.gOptions.DebugCheckBox.Checked Then
+            task.gOptions.DebugCheckBox.Checked = False
+            task.sharpGL.resetView()
+        End If
 
         gl.MatrixMode(OpenGL.GL_PROJECTION)
         gl.LoadIdentity()
@@ -121,15 +126,32 @@ Public Class sgl
 
         Dim label = ""
         Select Case func
+            Case oCase.pcLines
+                gl.Begin(OpenGL.GL_POINTS)
+
+                For y = 0 To src.Height - 1
+                    For x = 0 To src.Width - 1
+                        Dim vec As cv.Vec3f = src.At(Of cv.Vec3f)(y, x)
+                        If vec(0) <> 0 Or vec(1) <> 0 Or vec(2) <> 0 Then
+                            Dim vec3b = RGB.Get(Of cv.Vec3b)(y, x)
+                            gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
+                            gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
+                        End If
+                    Next
+                Next
+                gl.End()
+                label = CStr(src.Total) + " points were rendered."
             Case oCase.drawPointCloudRGB
                 gl.Begin(OpenGL.GL_POINTS)
 
                 For y = 0 To task.pointCloud.Height - 1
                     For x = 0 To task.pointCloud.Width - 1
-                        Dim vec3b = task.color.Get(Of cv.Vec3b)(y, x)
-                        gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
                         Dim vec As cv.Vec3f = task.pointCloud.At(Of cv.Vec3f)(y, x)
-                        gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
+                        If vec(0) <> 0 Or vec(1) <> 0 Or vec(2) <> 0 Then
+                            Dim vec3b = task.color.Get(Of cv.Vec3b)(y, x)
+                            gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
+                            gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
+                        End If
                     Next
                 Next
                 gl.End()

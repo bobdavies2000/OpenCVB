@@ -442,28 +442,6 @@ Public Class VBtask : Implements IDisposable
             Debug.WriteLine("Warning: " + algName + " has not completed work on a frame in a second.")
         End If
     End Sub
-    Public Sub OpenGLClose()
-        If openGL_hwnd <> 0 Then
-            Dim r As RECT
-            GetWindowRect(openGL_hwnd, r)
-            Dim wRect = New cv.Rect(r.Left, r.Top, r.Right - r.Left, r.Bottom - r.Top)
-            SaveSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", wRect.X)
-            SaveSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", wRect.Y)
-            SaveSetting("Opencv", "OpenGLtaskWidth", "OpenGLtaskWidth", wRect.Width)
-            openGLPipe.Close()
-        End If
-    End Sub
-
-    Public Function RunSharp(func As Integer) As String
-        If task.gOptions.DebugCheckBox.Checked Then
-            task.gOptions.DebugCheckBox.Checked = False
-            sharpGL.resetView()
-        End If
-        Return sharpGL.runSharp(func)
-    End Function
-    Public Sub sharpGLClose()
-        If sgl IsNot Nothing Then sgl.Dispose()
-    End Sub
     Public Sub New()
     End Sub
     Public Sub New(parms As algParms)
@@ -905,11 +883,6 @@ Public Class VBtask : Implements IDisposable
     End Function
     Public Sub Dispose() Implements IDisposable.Dispose
         allOptions.Close()
-        If sharpGL IsNot Nothing Then
-            sharpGL.saveLocation()
-            sharpGL.Close()
-        End If
-        If openGL_hwnd <> 0 Then OpenGLClose()
         TaskTimer.Enabled = False
         For Each algorithm In task.activeObjects
             Dim type As Type = algorithm.GetType()

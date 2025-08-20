@@ -84,7 +84,6 @@ Public Class OptionParent : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         If allOptions IsNot Nothing Then allOptions.Close()
-        task.sharpGLClose()
         sliders.Dispose()
         check.Dispose()
         radio.Dispose()
