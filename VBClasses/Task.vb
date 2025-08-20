@@ -323,7 +323,7 @@ Public Class VBtask : Implements IDisposable
     Public displayDst1 As Boolean
     Public depthAndCorrelationText As String
     Public closeRequest As Boolean
-    Private sharpGL As VBClasses.sgl
+    Public sharpGL As VBClasses.sgl
     Public Structure inBuffer
         Dim color As cv.Mat
         Dim leftView As cv.Mat
@@ -519,8 +519,10 @@ Public Class VBtask : Implements IDisposable
         allOptions = New OptionsContainer
         allOptions.Show()
 
-        sharpGL = New sgl
-        If algName.StartsWith("GL_") Then sharpGL.Show()
+        If algName.StartsWith("GL_") Then
+            sharpGL = New sgl
+            sharpGL.Show()
+        End If
 
         gOptions = New OptionsGlobal
         featureOptions = New OptionsFeatures
@@ -809,7 +811,7 @@ Public Class VBtask : Implements IDisposable
         Dim saveOptionsChanged = task.optionsChanged
         If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True
         If activateTaskForms Then
-            sharpGL.Activate()
+            If sharpGL IsNot Nothing Then sharpGL.Activate()
             treeView.Activate()
             allOptions.Activate()
             activateTaskForms = False

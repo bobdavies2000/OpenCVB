@@ -1,4 +1,3 @@
-Imports OpenCvSharp.ML
 Imports OpenCvSharp.XFeatures2D
 Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/StarDetectorSample.vb

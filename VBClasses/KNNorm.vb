@@ -1,5 +1,4 @@
-﻿Imports OpenCvSharp.ML
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class KNNorm_Basics : Inherits TaskParent
     Public knn2 As New KNN_NNBasics
     Public queryInput As New List(Of Single)

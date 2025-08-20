@@ -91,6 +91,7 @@ Public Class TreeviewForm
         End Function
     End Class
     Public Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
+        If task.frameCount < 10 Then Exit Sub ' wait for times to accumulate...
         Dim algorithm_ms = New List(Of Single)(task.algorithm_ms)
         Static saveCount As Integer
         If task.callTrace.Count <> saveCount Or optionsChanged Then

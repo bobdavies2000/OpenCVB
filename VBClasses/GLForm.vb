@@ -1,7 +1,4 @@
-﻿Imports System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar
-Imports OpenCvSharp
-Imports SharpGL
-Imports SharpGL.WinForms
+﻿Imports SharpGL
 Imports cv = OpenCvSharp
 Public Class sgl
     Dim gl As OpenGL
@@ -131,7 +128,7 @@ Public Class sgl
                     For x = 0 To task.pointCloud.Width - 1
                         Dim vec3b = task.color.Get(Of cv.Vec3b)(y, x)
                         gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
-                        Dim vec As Vec3f = task.pointCloud.At(Of Vec3f)(y, x)
+                        Dim vec As cv.Vec3f = task.pointCloud.At(Of cv.Vec3f)(y, x)
                         gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
                     Next
                 Next

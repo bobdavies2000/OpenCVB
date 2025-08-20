@@ -1,7 +1,5 @@
-Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class FitLine_Basics : Inherits TaskParent
-    Dim fitE As New FitEllipse_Rectangle
     Public ptList As New List(Of cv.Point2f)
     Public lp As New lpData
     Public Sub New()
@@ -256,26 +254,26 @@ Public Class FitLine_Simple : Inherits TaskParent
         desc = "Simple test of the Fitline interface"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim points As New List(Of Point2f) From {
-             New Point2f(1, 1.1F),
-             New Point2f(2, 2.0F),
-             New Point2f(3, 2.9F),
-             New Point2f(4, 4.1F),
-             New Point2f(5, 5.0F),
-             New Point2f(6, 6.1F),
-             New Point2f(7, 7.2F),
-             New Point2f(8, 8.1F),
-             New Point2f(9, 20.0F) ' Outlier
+        Dim points As New List(Of cv.Point2f) From {
+             New cv.Point2f(1, 1.1F),
+             New cv.Point2f(2, 2.0F),
+             New cv.Point2f(3, 2.9F),
+             New cv.Point2f(4, 4.1F),
+             New cv.Point2f(5, 5.0F),
+             New cv.Point2f(6, 6.1F),
+             New cv.Point2f(7, 7.2F),
+             New cv.Point2f(8, 8.1F),
+             New cv.Point2f(9, 20.0F) ' Outlier
          }
 
         ' Convert to Mat
-        Dim pointMat As Mat = New Mat(points.Count, 1, MatType.CV_32FC2)
+        Dim pointMat As cv.Mat = New cv.Mat(points.Count, 1, cv.MatType.CV_32FC2)
         For i = 0 To points.Count - 1
-            pointMat.Set(Of Point2f)(i, 0, points(i))
+            pointMat.Set(Of cv.Point2f)(i, 0, points(i))
         Next
 
         ' Fit line using CV_DIST_L2 (least squares), with robust method
-        Dim lineParams = cv.Cv2.FitLine(points.ToArray, DistanceTypes.L2, 0, 0.01, 0.01)
+        Dim lineParams = cv.Cv2.FitLine(points.ToArray, cv.DistanceTypes.L2, 0, 0.01, 0.01)
 
         ' Extract line parameters
         Dim vx As Single = lineParams.Vx

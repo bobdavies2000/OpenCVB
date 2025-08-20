@@ -108,11 +108,15 @@ Public Class OptionsContainer
             Dim hideList As New List(Of Form)
             For Each frm In Application.OpenForms
                 If frm.text = title Then
-                    frm.Dispose()
+                    frm.close()
                     Exit For
                 End If
             Next
         Next
+        task.gOptions.Close()
+        task.featureOptions.Close()
+        task.treeView.Close()
+        If task.sharpGL IsNot Nothing Then task.sharpGL.Close()
         GC.Collect()
     End Sub
 End Class

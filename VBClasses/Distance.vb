@@ -26,7 +26,7 @@ Public Class Distance_Foreground : Inherits TaskParent
     Public useBackgroundAsInput As Boolean
     Public Sub New()
         labels(2) = "Distance results"
-        labels(3) = "Input mask to distance transformm"
+        labels(3) = "Input mask to distance transform"
         desc = "Distance algorithm basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

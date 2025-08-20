@@ -1,5 +1,3 @@
-Imports OpenCvSharp
-Imports SharpGL.SceneGraph
 Imports cv = OpenCvSharp
 Public Class Delaunay_Basics : Inherits TaskParent
     Public inputPoints As New List(Of cv.Point2f)
