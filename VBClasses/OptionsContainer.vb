@@ -113,8 +113,6 @@ Public Class OptionsContainer
                 End If
             Next
         Next
-        task.gOptions.Dispose()
-        task.featureOptions.Dispose()
         GC.Collect()
     End Sub
 End Class

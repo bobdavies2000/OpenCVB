@@ -1694,7 +1694,6 @@ Public Class Main
             Debug.WriteLine(parms.algName + " ending.  Thread closing...")
         End SyncLock
 
-        If parms.algName.EndsWith(".py") Then killThread("python")
         frameCount = 0
     End Sub
 End Class
