@@ -2,8 +2,8 @@ Imports cv = OpenCvSharp
 Public Class Structured_Basics : Inherits TaskParent
     Public lpListX As New List(Of lpData)
     Public lpListY As New List(Of lpData)
-    Public linesX As New Line_Basics
-    Public linesY As New Line_Basics
+    Public linesX As New Line_Core
+    Public linesY As New Line_Core
     Dim struct As New Structured_Core
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -14,11 +14,13 @@ Public Class Structured_Basics : Inherits TaskParent
         linesX.Run(struct.dst2)
 
         dst2 = src.Clone
+        task.FeatureSampleSize = 1000 ' want all the lines 
         lpListX = New List(Of lpData)(linesX.lpList)
         For Each lp In linesX.lpList
-            dst2.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+            DrawLine(dst2, lp)
         Next
 
+        task.FeatureSampleSize = 1000 ' want all the lines 
         linesY.Run(struct.dst3)
         If task.heartBeat Then
             labels(2) = linesX.labels(2)
@@ -28,7 +30,7 @@ Public Class Structured_Basics : Inherits TaskParent
         dst3 = src.Clone
         lpListY = New List(Of lpData)(linesY.lpList)
         For Each lp In linesY.lpList
-            dst3.Line(lp.p1, lp.p2, lp.index, task.lineWidth, task.lineType)
+            DrawLine(dst3, lp)
         Next
     End Sub
 End Class

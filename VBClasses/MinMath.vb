@@ -13,7 +13,7 @@ Public Class XO_MinMath_Line : Inherits TaskParent
         Dim linesFound As New List(Of Byte)
         Dim ptList(task.lines.lpList.Count - 1) As List(Of cv.Point)
         For Each bp In bPoints.ptList
-            Dim val = task.lines.lpRectMap.Get(Of Byte)(bp.Y, bp.X)
+            Dim val = task.lines.lineCore.lpRectMap.Get(Of Byte)(bp.Y, bp.X)
             If val = 0 Then Continue For
             If linesFound.Contains(val) = False Then
                 linesFound.Add(val)

@@ -7813,7 +7813,7 @@ Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
 
         Dim lpLast = lpInput
 
-        Dim index = task.lines.lpRectMap.Get(Of Byte)(lpInput.center.Y, lpInput.center.X)
+        Dim index = task.lines.lineCore.lpRectMap.Get(Of Byte)(lpInput.center.Y, lpInput.center.X)
         If index > 0 Then
             Dim lp = lplist(index - 1)
             If lpInput.index = lp.index Then
@@ -7924,7 +7924,7 @@ Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
             dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
         End If
 
-        dst1 = ShowPaletteNoZero(task.lines.lpRectMap)
+        dst1 = ShowPaletteNoZero(task.lines.lineCore.lpRectMap)
         dst1.Circle(lp.center, task.DotSize, task.highlight, task.lineWidth, task.lineType)
 
         labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
@@ -7950,7 +7950,7 @@ Public Class XO_BrickPoint_VetLines : Inherits TaskParent
 
         Dim pointsPerLine(task.gridRects.Count) As List(Of Integer)
         For Each pt In bPoint.ptList
-            Dim index = task.lines.lpRectMap.Get(Of Byte)(pt.Y, pt.X)
+            Dim index = task.lines.lineCore.lpRectMap.Get(Of Byte)(pt.Y, pt.X)
             If index > 0 And index < task.lines.lpList.Count Then
                 Dim lp = task.lines.lpList(index)
                 If pointsPerLine(lp.index) Is Nothing Then pointsPerLine(lp.index) = New List(Of Integer)
@@ -8012,7 +8012,7 @@ Public Class XO_Gravity_Basics1 : Inherits TaskParent
         If RGBcandidate.length = 0 Then
             If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
         Else
-            stillPresent = task.lines.lpRectMap.Get(Of Byte)(RGBcandidate.center.Y, RGBcandidate.center.X)
+            stillPresent = task.lines.lineCore.lpRectMap.Get(Of Byte)(RGBcandidate.center.Y, RGBcandidate.center.X)
         End If
 
         If stillPresent Then
@@ -10669,7 +10669,7 @@ Public Class XO_Line_TrigVertical : Inherits TaskParent
         Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * 57.2958
 
         vertList.Clear()
-        For Each lp In task.lines.rawLines.lpList
+        For Each lp In task.lines.lpList
             If Math.Abs(task.lineGravity.angle - lp.angle) < task.angleThreshold Then
                 DrawLine(dst2, lp.p1, lp.p2)
                 vertList.Add(lp)
@@ -10802,7 +10802,7 @@ Public Class XO_KNN_LongestLine : Inherits TaskParent
         dst3 = task.lines.dst3
         labels(3) = task.lines.labels(3)
 
-        dst1 = ShowPaletteNoZero(task.lines.lpRectMap)
+        dst1 = ShowPaletteNoZero(task.lines.lineCore.lpRectMap)
     End Sub
 End Class
 
@@ -10831,10 +10831,10 @@ Public Class XO_KNN_BoundingRect : Inherits TaskParent
             lp = lplist(sortRects.ElementAt(0).Value)
         End If
 
-        dst1 = ShowPaletteNoZero(task.lines.lpRectMap)
+        dst1 = ShowPaletteNoZero(task.lines.lineCore.lpRectMap)
         DrawCircle(dst1, lp.center)
 
-        Dim index = task.lines.lpRectMap.Get(Of Byte)(lp.center.Y, lp.center.X)
+        Dim index = task.lines.lineCore.lpRectMap.Get(Of Byte)(lp.center.Y, lp.center.X)
         If index > 0 Then lp = lplist(index - 1)
         dst2 = src
         dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
@@ -10934,7 +10934,7 @@ Public Class XO_Line_GravityToLongest : Inherits TaskParent
         gravityDelta = kalman.kOutput(0)
 
         matchLine.lpInput = Nothing
-        For Each lp In task.lines.rawLines.lpList
+        For Each lp In task.lines.lpList
             If Math.Abs(lp.angle) > 45 Then
                 matchLine.lpInput = lp
                 Exit For
@@ -10943,7 +10943,7 @@ Public Class XO_Line_GravityToLongest : Inherits TaskParent
         If matchLine.lpInput Is Nothing Then Exit Sub
         matchLine.Run(src)
         dst2 = matchLine.dst2
-        dst3 = task.lines.rawLines.dst2
+        dst3 = task.lines.lineCore.rawLines.dst2
     End Sub
 End Class
 
@@ -10969,7 +10969,7 @@ Public Class XO_Line_GravityToAverage : Inherits TaskParent
         If standalone Then dst3 = task.lines.dst2
         Dim deltaList As New List(Of Single)
         vertList.Clear()
-        For Each lp In task.lines.rawLines.lpList
+        For Each lp In task.lines.lpList
             If Math.Abs(lp.angle) > 45 And Math.Sign(task.lineGravity.slope) = Math.Sign(lp.slope) Then
                 Dim delta = lp.ep1.X - lp.ep2.X
                 If Math.Abs(gravityDelta - delta) < task.gravityBasics.options.pixelThreshold Then

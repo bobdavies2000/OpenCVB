@@ -1,12 +1,35 @@
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp.ML.DTrees
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Public lineCore As New Line_Core
+    Public Sub New()
+        desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
+    End Sub
+
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub ' only run as a task algorithm.
+        lineCore.Run(task.grayStable)
+        dst2 = lineCore.dst2
+        labels(2) = lineCore.labels(2)
+
+        lpList = New List(Of lpData)(lineCore.lpList)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Core : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public rawLines As New Line_Raw
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
+        desc = "The core algorithm to find lines.  Line_Basics is a task algorithm that exits when run as a normal algorithm."
     End Sub
     Private Function lpMotion(lp As lpData) As Boolean
         ' return true if the line endpoints were in the motion mask.
@@ -22,7 +45,6 @@ Public Class Line_Basics : Inherits TaskParent
         Return False
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False Then Exit Sub ' only run as a task algorithm.
         If task.optionsChanged Then
             lpList.Clear()
             task.motionMask.SetTo(255)
@@ -36,7 +58,7 @@ Public Class Line_Basics : Inherits TaskParent
             End If
         Next
 
-        rawLines.Run(task.grayStable)
+        rawLines.Run(src)
         labels(3) = rawLines.labels(2)
 
         For Each lp In rawLines.lpList
@@ -66,6 +88,7 @@ Public Class Line_Basics : Inherits TaskParent
         labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count)
     End Sub
 End Class
+
 
 
 

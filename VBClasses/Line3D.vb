@@ -3,90 +3,42 @@ Public Class Line3D_Basics : Inherits TaskParent
     Public lines3D As New List(Of cv.Point3f)
     Public lines3DMat As New cv.Mat
     Public Sub New()
-        task.brickRunFlag = True
-        desc = "Find all the lines in 3D using the structured slices through the bricks."
+        If standalone Then task.featureOptions.FeatureSampleSize.Value = 10
+        desc = "Find the end point depth for the top X longest lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
         labels(2) = task.lines.labels(2)
-
-        Static brickList As New List(Of brickData)(task.bricks.brickList)
-
-        For i = 0 To task.gridRects.Count - 1
-            Dim brick = task.bricks.brickList(i)
-            Dim val = task.motionMask.Get(Of Byte)(brick.center.Y, brick.center.X)
-            If val Then brickList(i) = brick
-        Next
 
         lines3D.Clear()
 
         For Each lp In task.lines.lpList
-            Dim gc1 = brickList(task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            If gc1.depth = 0 Then Continue For
+            Dim rect1 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim depth1 = task.pcSplit(2)(rect1).Mean(task.depthMask(rect1))(0)
+            If depth1 = 0 Then Continue For
 
-            Dim gc2 = brickList(task.grid.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
-            If gc2.depth = 0 Then Continue For
+            Dim rect2 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim depth2 = task.pcSplit(2)(rect2).Mean(task.depthMask(rect2))(0)
+            If depth2 = 0 Then Continue For
 
-            lines3D.Add(New cv.Point3f(0, 0.9, 0.9))
-            Dim p1 = getWorldCoordinates(gc1.center, gc1.depth)
-            Dim p2 = getWorldCoordinates(gc2.center, gc2.depth)
-            'p1.Z -= 0.5
-            'p2.Z -= 0.5 ' so the line will appear in front of the pointcloud data by 0.5 meter
+            Dim p1 = getWorldCoordinates(rect1.TopLeft, depth1)
+            Dim p2 = getWorldCoordinates(rect2.TopLeft, depth2)
             lines3D.Add(p1)
             lines3D.Add(p2)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
+            SetTrueText(Format(depth1, fmt1), lp.p1, 2)
+            SetTrueText(Format(depth2, fmt1), lp.p2, 2)
         Next
 
-        lines3DMat = cv.Mat.FromPixelData(lines3D.Count / 3, 1, cv.MatType.CV_32FC3, lines3D.ToArray)
+        lines3DMat = cv.Mat.FromPixelData(lines3D.Count / 2, 1, cv.MatType.CV_32FC3, lines3D.ToArray)
 
         If task.heartBeat Then
-            strOut = CStr(lines3D.Count / 3) + " 3D lines are prepared in lines3D." + vbCrLf +
-                     CStr(task.lines.lpList.Count - lines3D.Count / 3) + " lines occurred in areas with no depth and were skipped."
+            strOut = CStr(lines3D.Count / 2) + " 3D lines are prepared in lines3D." + vbCrLf +
+                     CStr(task.lines.lpList.Count - lines3D.Count / 2) + " lines occurred in areas with no depth and were skipped."
         End If
         SetTrueText(strOut, 3)
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Line3D_Depth : Inherits TaskParent
-    Public lpList As New List(Of lpData)
-    Public lpDepth As New List(Of Single) ' 2 depths for each lp
-    Public lines3DMat As New cv.Mat
-    Public Sub New()
-        If standalone Then task.featureOptions.FeatureSampleSize.Value = 10
-        desc = "Find all the lines in 3D using the depth data for the first and last brick."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
-        labels(2) = task.lines.labels(2)
-
-        lpList.Clear()
-        For Each lp In task.lines.lpList
-            Dim index = task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
-            Dim depth1 = task.pcSplit(2)(task.gridRects(index)).Mean(task.depthMask(task.gridRects(index))).Val0
-            If depth1 = 0 Then Continue For
-
-
-            index = task.grid.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
-            Dim depth2 = task.pcSplit(2)(task.gridRects(index)).Mean(task.depthMask(task.gridRects(index))).Val0
-            If depth2 = 0 Then Continue For
-
-            lpList.Add(lp)
-            lpDepth.Add(depth1)
-            lpDepth.Add(depth2)
-            SetTrueText(Format(depth1, fmt1), lp.p2)
-            SetTrueText(Format(depth2, fmt1), lp.p1)
-
-            If lpList.Count >= task.featureOptions.FeatureSampleSize.Value Then Exit For
-            DrawLine(dst2, lp)
-        Next
-    End Sub
-End Class
-
 
 
 
