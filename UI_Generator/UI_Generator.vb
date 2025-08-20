@@ -28,7 +28,6 @@ Module UI_Generator
         Dim cppList As New SortedList(Of String, String)
         Dim allButPython As New SortedList(Of String, String)
         Dim allList As New SortedList(Of String, String)
-        Dim opengl As New SortedList(Of String, String)
         Dim CodeLineCount As Integer
 
         Dim srcList As New List(Of String)({HomeDir.FullName + "CPP_Native/CPP_NativeClasses.h"})
@@ -68,7 +67,6 @@ Module UI_Generator
                         If line.EndsWith(" : Inherits TaskParent") Then
                             Dim split As String() = Regex.Split(line, "\W+")
                             classname = split(2)
-                            If classname.StartsWith("OpenGL_") Then opengl.Add(classname, line)
                             allButPython.Add(classname, line)
                             allList.Add(classname, line)
                         End If
@@ -234,12 +232,6 @@ Module UI_Generator
             sw.Write("(" + CStr(cppList.Count) + ") < All C++ >")
             For Each alg In allList.Keys
                 If alg.EndsWith("_CPP") Then sw.Write("," + alg)
-            Next
-            sw.WriteLine()
-
-            sw.Write("(" + CStr(opengl.Count) + ") < All OpenGL >")
-            For Each alg In opengl.Keys
-                sw.Write("," + alg)
             Next
             sw.WriteLine()
 

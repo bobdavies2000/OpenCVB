@@ -828,41 +828,35 @@ Public Class Main
             AvailableAlgorithms.SelectedIndex += 1
         End If
 
-        ' skip testing the OpenGL algorithms.  They are only for visualizations - not for other algorithms to use.
-        For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
-            If AvailableAlgorithms.Text.StartsWith("OpenGL_") = False Then Exit For
-            AvailableAlgorithms.SelectedIndex += 1
-        Next
+        '' skip testing the Fractal_ algorithms.  They are only for visualizations - not for other algorithms to use.
+        'For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
+        '    If AvailableAlgorithms.Text.StartsWith("Fractal_") = False Then Exit For
+        '    AvailableAlgorithms.SelectedIndex += 1
+        'Next
 
-        ' skip testing the Fractal_ algorithms.  They are only for visualizations - not for other algorithms to use.
-        For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
-            If AvailableAlgorithms.Text.StartsWith("Fractal_") = False Then Exit For
-            AvailableAlgorithms.SelectedIndex += 1
-        Next
+        '' skip testing the Benford_ algorithms.  They are only for visualizations - not for other algorithms to use.
+        'For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
+        '    If AvailableAlgorithms.Text.StartsWith("Benford_") = False Then Exit For
+        '    AvailableAlgorithms.SelectedIndex += 1
+        'Next
 
-        ' skip testing the Benford_ algorithms.  They are only for visualizations - not for other algorithms to use.
-        For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
-            If AvailableAlgorithms.Text.StartsWith("Benford_") = False Then Exit For
-            AvailableAlgorithms.SelectedIndex += 1
-        Next
+        '' skip testing the GIF_ algorithms.  They are only for visualizations - not for other algorithms to use.
+        'For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
+        '    If AvailableAlgorithms.Text.StartsWith("GIF_") = False Then Exit For
+        '    AvailableAlgorithms.SelectedIndex += 1
+        'Next
 
-        ' skip testing the GIF_ algorithms.  They are only for visualizations - not for other algorithms to use.
-        For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
-            If AvailableAlgorithms.Text.StartsWith("GIF_") = False Then Exit For
-            AvailableAlgorithms.SelectedIndex += 1
-        Next
+        '' skip testing the ML_ algorithms.  Trying to fix a bug in memory mgmt
+        'For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
+        '    If AvailableAlgorithms.Text.StartsWith("ML_") = False Then Exit For
+        '    AvailableAlgorithms.SelectedIndex += 1
+        'Next
 
-        ' skip testing the ML_ algorithms.  Trying to fix a bug in memory mgmt
-        For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
-            If AvailableAlgorithms.Text.StartsWith("ML_") = False Then Exit For
-            AvailableAlgorithms.SelectedIndex += 1
-        Next
-
-        ' skip testing the Bitmap_ algorithms.  They are only for visualizations - not for other algorithms to use.
-        For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
-            If AvailableAlgorithms.Text.StartsWith("Bitmap_") = False Then Exit For
-            AvailableAlgorithms.SelectedIndex += 1
-        Next
+        '' skip testing the Bitmap_ algorithms.  They are only for visualizations - not for other algorithms to use.
+        'For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
+        '    If AvailableAlgorithms.Text.StartsWith("Bitmap_") = False Then Exit For
+        '    AvailableAlgorithms.SelectedIndex += 1
+        'Next
 
         ' skip testing the XO_ algorithms.  They are obsolete.
         If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
@@ -878,7 +872,7 @@ Public Class Main
                     If settings.cameraPresent(settings.cameraIndex) Then
                         Options.defineCameraResolutions(settings.cameraIndex)
                         setupTestAll()
-                        settings.workResIndex = testAllStartingRes
+                        settings.workResIndex = testAllStartingRes + 3 ' skip highest res and try 1280x720
                         Exit While
                     End If
                 End While

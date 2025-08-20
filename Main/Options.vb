@@ -150,8 +150,8 @@ Public Class Options
 
     Public Sub UpdateXRef_Click(sender As Object, e As EventArgs) Handles UpdateXRef.Click
         Dim UIProcess As New Process
-        UIProcess.StartInfo.FileName = Main.HomeDir.FullName + "UI_Generator\bin\Release\UI_Generator.exe"
-        UIProcess.StartInfo.WorkingDirectory = Main.HomeDir.FullName + "UI_Generator\bin\Release\"
+        UIProcess.StartInfo.FileName = Main.HomeDir.FullName + "UI_Generator\bin\x64\Release\net8.0\UI_Generator.exe"
+        UIProcess.StartInfo.WorkingDirectory = Main.HomeDir.FullName + "UI_Generator\bin\x64\Release\net8.0\"
         UIProcess.StartInfo.Arguments = "All"
         UIProcess.Start()
     End Sub
