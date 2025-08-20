@@ -1379,6 +1379,8 @@ Public Class Main
 
         PausePlayButton.Image = PausePlay
 
+        GC.Collect()
+
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask) ' <<<<<<<<<<<<<<<<<<<<<<<<< This starts the VB_Classes algorithm.
         AlgDescription.Text = ""

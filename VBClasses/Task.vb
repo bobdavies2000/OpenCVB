@@ -298,7 +298,6 @@ Public Class VBtask : Implements IDisposable
     Public returnCopyTime As Single ' the amount of time returning buffers to the host.
 
     Public OpenGLTitle As String
-    Public oglRect As cv.Rect
     Public polyCount As Integer
 
     Public rangesTop() As cv.Rangef

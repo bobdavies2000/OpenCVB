@@ -274,14 +274,6 @@ Public Class XO_OpenGL_Basics : Inherits TaskParent
 
             Dim buff = System.Text.Encoding.UTF8.GetBytes(task.OpenGLTitle)
             task.openGLPipe.Write(buff, 0, task.OpenGLTitle.Length)
-
-            ' lose a lot of performance doing this!
-            'If task.gOptions.getOpenGLCapture() Then
-            '    Dim snapshot As Bitmap = GetWindowImage(task.openGL_hwnd, New cv.Rect(0, 0, task.oglRect.Width * 1.4, task.oglRect.Height * 1.4))
-            '    Dim snap = cvext.BitmapConverter.ToMat(snapshot)
-            '    snap = snap.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
-            '    dst3 = snap.Resize(New cv.Size(dst3.Width, dst3.Height), 0, 0, cv.InterpolationFlags.Nearest)
-            'End If
         Catch ex As Exception
             ' OpenGL window was likely closed.  
         End Try

@@ -104,5 +104,17 @@ Public Class OptionsContainer
         SaveSetting("Opencv", "gOptionsWidth", "gOptionsWidth", Me.Width)
         SaveSetting("Opencv", "gOptionsHeight", "gOptionsHeight", Me.Height)
         CheckIfOffScreen()
+        For Each title In hiddenOptions
+            Dim hideList As New List(Of Form)
+            For Each frm In Application.OpenForms
+                If frm.text = title Then
+                    frm.Dispose()
+                    Exit For
+                End If
+            Next
+        Next
+        task.gOptions.Dispose()
+        task.featureOptions.Dispose()
+        GC.Collect()
     End Sub
 End Class
