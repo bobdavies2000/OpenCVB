@@ -204,13 +204,11 @@ Public Class Line_Info : Inherits TaskParent
         labels(2) = task.lines.labels(2) + " - Use the global option 'DebugSlider' to select a line."
 
         If task.lines.lpList.Count <= 1 Then Exit Sub
-        If standaloneTest() Then
-            dst2.SetTo(0)
-            For Each lp In task.lines.lpList
-                dst2.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
-                DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
-            Next
-        End If
+        dst2.SetTo(0)
+        For Each lp In task.lines.lpList
+            dst2.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
+            DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
+        Next
 
         dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
@@ -885,10 +883,121 @@ End Class
 
 
 
+Public Class Line_TestAge : Inherits TaskParent
+    Dim knnLine As New Line_Generations
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Are there ever frames where no line is connected to a line on a previous frame?"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        knnLine.Run(src)
+        dst2 = knnLine.dst2
+        labels(2) = knnLine.labels(2)
+
+        Dim matched As New List(Of Integer)
+        For Each lp In knnLine.lpOutput
+            If lp.age > 1 Then matched.Add(lp.index)
+            SetTrueText(CStr(lp.age), lp.center, 3)
+        Next
+
+        Static strList As New List(Of String)
+        Dim stepSize = 10
+        If matched.Count > 0 Then
+            strList.Add(CStr(matched.Count) + ", ")
+        Else
+            strList.Add("    ")
+        End If
+        If strList.Count > 200 Then
+            For i = 0 To stepSize - 1
+                strList.RemoveAt(0)
+            Next
+        End If
+
+        strOut = ""
+        Dim missingCount As Integer
+        For i = 0 To strList.Count - 1 Step stepSize
+            For j = i To Math.Min(strList.Count, i + stepSize) - 1
+                If strList(j) = "    " Then missingCount += 1
+                strOut += vbTab + strList(j)
+            Next
+            strOut += vbCrLf
+        Next
+        SetTrueText(strOut, 1)
+        SetTrueText("In the last 200 frames there were " + CStr(missingCount) +
+                    " frames without a matched line to the previous frame.", 3)
+
+        labels(3) = "Of the " + CStr(knnLine.lpOutput.Count) + " lines found " + CStr(matched.Count) +
+                    " were matched to the previous frame"
+    End Sub
+End Class
 
 
 
-Public Class Line_KNN : Inherits TaskParent
+
+
+Public Class Line_Stabilize : Inherits TaskParent
+    Dim knnLine As New Line_Generations
+    Dim stable As New Stable_Basics
+    Public Sub New()
+        desc = "Stabilize the image by identifying a line in both the current frame and the previous."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        knnLine.Run(src)
+        labels(2) = knnLine.labels(2)
+
+        If task.firstPass Then
+            stable.lpLast = knnLine.lpOutput(0)
+            stable.lp = stable.lpLast
+        Else
+            For Each stable.lp In knnLine.lpOutput
+                If stable.lp.age > 1 Then Exit For
+            Next
+        End If
+
+        stable.Run(src)
+        dst2 = stable.dst2
+        DrawLine(dst2, stable.lp)
+        SetTrueText("Age = " + CStr(stable.lp.age), stable.lp.center)
+
+        stable.lpLast = stable.lp
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_BrickPoints : Inherits TaskParent
+    Public sortLines As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public Sub New()
+        task.featureRunFlag = True
+        desc = "Assign brick points to each of the lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.lines.dst2
+
+        sortLines.Clear()
+        dst3.SetTo(0)
+        For Each pt In task.features
+            Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
+            If lineIndex = 0 Then Continue For
+            Dim color = vecToScalar(task.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
+            Dim index As Integer = sortLines.Keys.Contains(lineIndex)
+            Dim gridindex = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            sortLines.Add(lineIndex, gridindex)
+            DrawCircle(dst3, pt, color)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_Generations : Inherits TaskParent
     Dim knn As New KNN_Basics
     Dim match3 As New Line_LeftRightMatch3
     Public lpOutput As New List(Of lpData)
@@ -945,109 +1054,28 @@ End Class
 
 
 
-Public Class Line_TestAge : Inherits TaskParent
-    Dim knnLine As New Line_KNN
+
+Public Class Line_KNN : Inherits TaskParent
+    Dim knn As New KNN_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Are there ever frames where no line is connected to a line on a previous frame?"
+        labels(2) = "The line's end points or center closest to the mouse is highlighted."
+        desc = "Use KNN to determine which line is being selected with mouse."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        knnLine.Run(src)
-        dst2 = knnLine.dst2
-        labels(2) = knnLine.labels(2)
-
-        Dim matched As New List(Of Integer)
-        For Each lp In knnLine.lpOutput
-            If lp.age > 1 Then matched.Add(lp.index)
-            SetTrueText(CStr(lp.age), lp.center, 3)
+        dst2 = task.lines.dst2.Clone
+        knn.trainInput.Clear()
+        knn.queries.Clear()
+        For Each lp In task.lines.lpList
+            knn.trainInput.Add(lp.p1)
+            knn.trainInput.Add(lp.center)
+            knn.trainInput.Add(lp.p2)
         Next
 
-        Static strList As New List(Of String)
-        Dim stepSize = 10
-        If matched.Count > 0 Then
-            strList.Add(CStr(matched.Count) + ", ")
-        Else
-            strList.Add("    ")
-        End If
-        If strList.Count > 200 Then
-            For i = 0 To stepSize - 1
-                strList.RemoveAt(0)
-            Next
-        End If
+        knn.queries.Add(task.mouseMovePoint)
+        knn.Run(emptyMat)
 
-        strOut = ""
-        Dim missingCount As Integer
-        For i = 0 To strList.Count - 1 Step stepSize
-            For j = i To Math.Min(strList.Count, i + stepSize) - 1
-                If strList(j) = "    " Then missingCount += 1
-                strOut += vbTab + strList(j)
-            Next
-            strOut += vbCrLf
-        Next
-        SetTrueText(strOut, 1)
-        SetTrueText("In the last 200 frames there were " + CStr(missingCount) +
-                    " frames without a matched line to the previous frame.", 3)
-
-        labels(3) = "Of the " + CStr(knnLine.lpOutput.Count) + " lines found " + CStr(matched.Count) +
-                    " were matched to the previous frame"
-    End Sub
-End Class
-
-
-
-
-
-Public Class Line_Stabilize : Inherits TaskParent
-    Dim knnLine As New Line_KNN
-    Dim stable As New Stable_Basics
-    Public Sub New()
-        desc = "Stabilize the image by identifying a line in both the current frame and the previous."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        knnLine.Run(src)
-        labels(2) = knnLine.labels(2)
-
-        If task.firstPass Then
-            stable.lpLast = knnLine.lpOutput(0)
-            stable.lp = stable.lpLast
-        Else
-            For Each stable.lp In knnLine.lpOutput
-                If stable.lp.age > 1 Then Exit For
-            Next
-        End If
-
-        stable.Run(src)
-        dst2 = stable.dst2
-        DrawLine(dst2, stable.lp)
-        SetTrueText("Age = " + CStr(stable.lp.age), stable.lp.center)
-
-        stable.lpLast = stable.lp
-    End Sub
-End Class
-
-
-
-
-
-Public Class Line_BrickPoints : Inherits TaskParent
-    Public sortLines As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
-    Public Sub New()
-        task.featureRunFlag = True
-        desc = "Assign brick points to each of the lines"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lines.dst2
-
-        sortLines.Clear()
-        dst3.SetTo(0)
-        For Each pt In task.features
-            Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
-            If lineIndex = 0 Then Continue For
-            Dim color = vecToScalar(task.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
-            Dim index As Integer = sortLines.Keys.Contains(lineIndex)
-            Dim gridindex = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            sortLines.Add(lineIndex, gridindex)
-            DrawCircle(dst3, pt, color)
-        Next
+        Dim index = Math.Floor(knn.result(0, 0) / 3)
+        Dim lpNext = task.lines.lpList(index)
+        dst2.Line(lpNext.p1, lpNext.p2, task.highlight, task.lineWidth * 3, cv.LineTypes.AntiAlias)
     End Sub
 End Class

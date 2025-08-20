@@ -150,10 +150,10 @@ Public Class TreeviewForm
         Next
 
         PercentTime.Text += saveWaitTime + vbCrLf
-        PercentTime.Text += "---------------- Tree order display: " + vbCrLf
-        For Each sn In timeDataTree
-            If sn.Contains("%") Then PercentTime.Text += sn + vbCrLf
-        Next
+        'PercentTime.Text += "---------------- Tree order display: " + vbCrLf
+        'For Each sn In timeDataTree
+        '    If sn.Contains("%") Then PercentTime.Text += sn + vbCrLf
+        'Next
 
         PercentTime.Text += vbCrLf + Format(otherTimes.Sum, "00.0%") + " " + CStr(otherTimes.Count) + " algorithms each < 1.0%" +
                             vbCrLf + vbCrLf + "Click an algorithm at left to see it below:" + vbCrLf + vbCrLf
