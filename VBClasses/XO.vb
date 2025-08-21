@@ -208,11 +208,11 @@ Public Class XO_OpenGL_Basics : Inherits TaskParent
                               task.pipeName
         If task.showConsoleLog = False Then startInfo.WindowStyle = ProcessWindowStyle.Hidden
         Dim proc = Process.Start(startInfo)
-        While task.openGL_hwnd = 0
-            task.openGL_hwnd = proc.MainWindowHandle
-            If task.openGL_hwnd <> 0 Then Exit While
-            Thread.Sleep(100)
-        End While
+        'While task.openGL_hwnd = 0
+        '    task.openGL_hwnd = proc.MainWindowHandle
+        '    If task.openGL_hwnd <> 0 Then Exit While
+        '    Thread.Sleep(100)
+        'End While
 
         memMapPtr = Marshal.AllocHGlobal(memMapbufferSize)
         Dim memMapFile As MemoryMappedFile = MemoryMappedFile.CreateOrOpen("OpenCVBControl", memMapbufferSize)

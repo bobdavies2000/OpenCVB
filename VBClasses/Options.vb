@@ -4114,12 +4114,6 @@ Public Class Options_BrightnessContrast : Inherits OptionParent
             alphaDefault = 500
             betaDefault = 0
         End If
-#If AZURE_SUPPORT Then
-        If task.cameraName = "Azure Kinect 4K" Then
-            alphaDefault = 600
-            betaDefault = 0
-        End If
-#End If
         If task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then alphaDefault = 1500
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Alpha (contrast)", 0, 10000, alphaDefault)
@@ -7943,24 +7937,13 @@ Public Class Options_RedCloud : Inherits OptionParent
                     task.xRange = 3.22
                     task.yRange = 1.39
                 End If
-#If AZURE_SUPPORT Then
-            Case "Azure Kinect 4K"
-                task.xRange = 4
-                task.yRange = 1.5
-#End If
             Case "StereoLabs ZED 2/2i"
                 task.xRange = 4
                 task.yRange = 1.5
             Case "Oak-D camera"
                 task.xRange = 4.07
                 task.yRange = 1.32
-            Case "MYNT-EYE-D1000"
-                task.xRange = 3.5
-                task.yRange = 1.5
-            Case "Orbbec Gemini 335L"
-                task.xRange = 3.5
-                task.yRange = 1.5
-            Case "Orbbec Gemini 335"
+            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
                 task.xRange = 3.5
                 task.yRange = 1.5
         End Select

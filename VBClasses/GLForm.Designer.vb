@@ -22,34 +22,35 @@ Partial Class sgl
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        OpenglControl1 = New SharpGL.OpenGLControl()
-        CType(OpenglControl1, ComponentModel.ISupportInitialize).BeginInit()
+        GLControl = New SharpGL.OpenGLControl()
+        CType(GLControl, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
-        ' OpenglControl1
+        ' GLControl
         ' 
-        OpenglControl1.DrawFPS = False
-        OpenglControl1.FrameRate = 30
-        OpenglControl1.Location = New Point(13, 12)
-        OpenglControl1.Margin = New Padding(4, 3, 4, 3)
-        OpenglControl1.Name = "OpenglControl1"
-        OpenglControl1.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1
-        OpenglControl1.RenderContextType = SharpGL.RenderContextType.FBO
-        OpenglControl1.RenderTrigger = SharpGL.RenderTrigger.TimerBased
-        OpenglControl1.Size = New Size(774, 426)
-        OpenglControl1.TabIndex = 0
+        GLControl.DrawFPS = False
+        GLControl.FrameRate = 30
+        GLControl.Location = New Point(19, 20)
+        GLControl.Margin = New Padding(6, 5, 6, 5)
+        GLControl.Name = "GLControl"
+        GLControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1
+        GLControl.RenderContextType = SharpGL.RenderContextType.FBO
+        GLControl.RenderTrigger = SharpGL.RenderTrigger.TimerBased
+        GLControl.Size = New Size(1106, 710)
+        GLControl.TabIndex = 0
         ' 
         ' sgl
         ' 
-        AutoScaleDimensions = New SizeF(7F, 15F)
+        AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(800, 450)
-        Controls.Add(OpenglControl1)
+        ClientSize = New Size(1143, 750)
+        Controls.Add(GLControl)
+        Margin = New Padding(4, 5, 4, 5)
         Name = "sgl"
         Text = "sgl"
-        CType(OpenglControl1, ComponentModel.ISupportInitialize).EndInit()
+        CType(GLControl, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
     End Sub
 
-    Friend WithEvents OpenglControl1 As SharpGL.OpenGLControl
+    Friend WithEvents GLControl As SharpGL.OpenGLControl
 End Class

@@ -1,28 +1,20 @@
-# 2025 August 17th – Solution Changes,
+# 2025 August 20th – SharpGL Testing, Memory Usage, SharpGL GIFs.
 
 -   Over 1900 algorithms are included, averaging 36 lines of code per algorithm.
--   The OpenCVB solution is simplified. The projects included are:
-    -   C\# interface for StereoLabs Gemini cameras - CamZed.
-    -   C++ algorithms running native C++ - CPP_Native.
-    -   Main project for the user interface (includes the camera task.)
-    -   VBCLasses project containing all the VB.Net algorithms.
--   Projects removed from the OpenCVB solution:
-    -   OpenGL, Orbbec SDK, C++ camera interfaces for OakD, StereoLabs, Orbbec.
-    -   OakD project will return soon – Oak-D Pro 4 (pre-order) not yet working.
--   SharpGL interface to OpenGL is now available and working.
-    -   SharpGL is a C\# interface to OpenGL included as NuGet package.
-    -   SharpGL replaces the existing interface OpenGL C++ project.
-    -   OpenGL C++ project has been removed but the project is still preserved.
-    -   The OpenGL algorithms are all still present but now reside in XO.vb (obsolete.)
-    -   SharpGL algorithm added to read the point cloud.
--   Orbbec C\# interface memory overflow is now fixed with a garbage collection
+-   More SharpGL testing and improvements.
+    -   GL_Lines algorithm displays only the lines found in the RGB image.
+    -   See below image for example usage.
+-   Memory usage on overnight runs was spinning out of control at larger resolutions.
+    -   SharpGL was created for each algorithm.
+    -   Neglected to remove the SharpGL form after each algorithm.
+    -   Now SharpGL form is only created for “GL_” algorithms.
+-   GIF create process now supports the SharpGL output (instead of OpenGL output.)
+    -   It is simpler to create a GIF from a VB.Net form than an external window.
 -   A log of previous changes is included at the bottom of this document.
 
-![](media/87f60f3939519c014790037a7221476f.png)
+![](media/12d32a7111eb4345058e76fbe94830b5.gif)
 
-![](media/0171c12d9eb57fa5bef168563b3769f6.png)
-
-**GL_Basics:** *The top image is the RGB image while the bottom image is the SharpGL output.*
+**GL_Lines:** *The SharpGL point cloud output for just the lines found in the RGB, ignoring the featureless regions where depth data fluctuates.*
 
 \-----------------------------------------------------------------------------------------------
 
@@ -2160,3 +2152,29 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A hand reaching out to a room with yellow dots AI-generated content may be incorrect.](media/1c33c86ceee205402f23c9035987ebad.gif)
 
 **Feature_Basics:** *Essentially this is just Sobel output but on a “brick” basis where the bricks define a grid covering the entire image. The highlighted points are the location that has the highest intensity in the Sobel output for that brick.*
+
+# 2025 August 17th – Solution Changes,
+
+-   Over 1900 algorithms are included, averaging 36 lines of code per algorithm.
+-   The OpenCVB solution is simplified. The projects included are:
+    -   C\# interface for StereoLabs Gemini cameras - CamZed.
+    -   C++ algorithms running native C++ - CPP_Native.
+    -   Main project for the user interface (includes the camera task.)
+    -   VBCLasses project containing all the VB.Net algorithms.
+-   Projects removed from the OpenCVB solution:
+    -   OpenGL, Orbbec SDK, C++ camera interfaces for OakD, StereoLabs, Orbbec.
+    -   OakD project will return soon – Oak-D Pro 4 (pre-order) not yet working.
+-   SharpGL interface to OpenGL is now available and working.
+    -   SharpGL is a C\# interface to OpenGL included as NuGet package.
+    -   SharpGL replaces the existing interface OpenGL C++ project.
+    -   OpenGL C++ project has been removed but the project is still preserved.
+    -   The OpenGL algorithms are all still present but now reside in XO.vb (obsolete.)
+    -   SharpGL algorithm added to read the point cloud.
+-   Orbbec C\# interface memory overflow is now fixed with a garbage collection
+-   A log of previous changes is included at the bottom of this document.
+
+![A computer screen shot of a room AI-generated content may be incorrect.](media/87f60f3939519c014790037a7221476f.png)
+
+![A computer screen shot of a room AI-generated content may be incorrect.](media/0171c12d9eb57fa5bef168563b3769f6.png)
+
+**GL_Basics:** *The top image is the RGB image while the bottom image is the SharpGL output.*

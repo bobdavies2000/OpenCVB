@@ -38,13 +38,7 @@ Public Class Guess_ImageEdges_CPP : Inherits TaskParent
         desc = "Replicate the nearest depth measurement at all the image edges"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-#If AZURE_SUPPORT Then
-        If task.cameraName = "Oak-D camera" Or task.cameraName = "Azure Kinect 4K" Then
-            SetTrueText("Only RealSense cameras are likely to benefit from enhanced depth at the image edges.")
-            Exit Sub
-        End If
-#End If
-        Static distSlider =OptionParent.FindSlider("Max Distance from edge")
+        Static distSlider = OptionParent.FindSlider("Max Distance from edge")
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 

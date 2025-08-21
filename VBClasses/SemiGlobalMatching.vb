@@ -9,12 +9,6 @@ Public Class SemiGlobalMatching_CPP : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If task.frameCount < 10 Then Exit Sub
-#If AZURE_SUPPORT Then
-        If task.cameraName = "Azure Kinect 4K" Then
-            SetTrueText("The left and right views are identical with the Microsoft K4A 4 Azure camera.")
-            Exit Sub
-        End If
-#End If
 
         'If leftData.Length <> src.Total Then
         '    ReDim leftData(src.Total - 1)

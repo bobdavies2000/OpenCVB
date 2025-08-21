@@ -137,7 +137,6 @@ Public Class VBtask : Implements IDisposable
     Public pythonReady As Boolean
     Public pythonPipeIndex As Integer
 
-    Public openGL_hwnd As IntPtr
     Public openGLPipe As NamedPipeServerStream
 
     Public gifCreator As Gif_OpenCVB
@@ -354,9 +353,6 @@ Public Class VBtask : Implements IDisposable
     End Structure
 
     Public Structure algParms
-#If AZURE_SUPPORT Then
-        "Azure Kinect 4K",
-#End If
         Public Shared cameraNames As New List(Of String)({"StereoLabs ZED 2/2i",
                                                           "Orbbec Gemini 335L",
                                                           "Orbbec Gemini 336L",

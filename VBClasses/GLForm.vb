@@ -17,7 +17,7 @@ Public Class sgl
         Me.Top = GetSetting("Opencv", "sglTop", "sglTop", task.mainFormLocation.Y)
         Me.Width = GetSetting("Opencv", "sglWidth", "sglWidth", task.mainFormLocation.Width)
         Me.Height = GetSetting("Opencv", "sglHeight", "sglHeight", task.mainFormLocation.Height)
-        gl = OpenglControl1.OpenGL
+        gl = GLControl.OpenGL
     End Sub
     Public Sub saveLocation()
         SaveSetting("Opencv", "sglLeft", "sglLeft", Math.Abs(Me.Left))
@@ -25,7 +25,7 @@ Public Class sgl
         SaveSetting("Opencv", "sglWidth", "sglWidth", Me.Width)
         SaveSetting("Opencv", "sglHeight", "sglHeight", Me.Height)
     End Sub
-    Private Sub OpenGLControl_MouseDown(sender As Object, e As MouseEventArgs) Handles OpenglControl1.MouseDown
+    Private Sub OpenGLControl_MouseDown(sender As Object, e As MouseEventArgs) Handles GLControl.MouseDown
         If e.Button = MouseButtons.Right Then
             isPanning = True
             lastMousePos = New cv.Point(e.Location.X, e.Location.Y)
@@ -35,7 +35,7 @@ Public Class sgl
             lastMousePos = New cv.Point(e.Location.X, e.Location.Y)
         End If
     End Sub
-    Private Sub OpenGLControl_MouseMove(sender As Object, e As MouseEventArgs) Handles OpenglControl1.MouseMove
+    Private Sub OpenGLControl_MouseMove(sender As Object, e As MouseEventArgs) Handles GLControl.MouseMove
         If isDragging Then
             Dim dx = e.X - lastMousePos.X
             Dim dy = e.Y - lastMousePos.Y
@@ -53,10 +53,10 @@ Public Class sgl
             panY -= dy * 0.01F
 
             lastMousePos = New cv.Point(e.Location.X, e.Location.Y)
-            OpenglControl1.Invalidate()
+            GLControl.Invalidate()
         End If
     End Sub
-    Private Sub OpenGLControl_MouseUp(sender As Object, e As MouseEventArgs) Handles OpenglControl1.MouseUp
+    Private Sub OpenGLControl_MouseUp(sender As Object, e As MouseEventArgs) Handles GLControl.MouseUp
         If e.Button = MouseButtons.Left Then isDragging = False
         If e.Button = MouseButtons.Right Then isPanning = False
     End Sub
@@ -65,10 +65,10 @@ Public Class sgl
         rotationY = 0.0
         zoomZ = -5.0F
     End Sub
-    Private Sub OpenGLControl_MouseWheel(sender As Object, e As MouseEventArgs) Handles OpenglControl1.MouseWheel
+    Private Sub OpenGLControl_MouseWheel(sender As Object, e As MouseEventArgs) Handles GLControl.MouseWheel
         Dim delta As Integer = e.Delta
         zoomZ += If(delta > 0, 0.5F, -0.5F)
-        OpenglControl1.Invalidate() ' Force redraw
+        GLControl.Invalidate() ' Force redraw
     End Sub
     Public Function getWorldCoordinates(p As cv.Point, depth As Single) As cv.Point3f
         Dim x = (p.X - task.calibData.rgbIntrinsics.ppx) / task.calibData.rgbIntrinsics.fx
@@ -111,7 +111,7 @@ Public Class sgl
 
         gl.MatrixMode(OpenGL.GL_PROJECTION)
         gl.LoadIdentity()
-        gl.Perspective(options.perspective, OpenglControl1.Width / OpenglControl1.Height,
+        gl.Perspective(options.perspective, GLControl.Width / GLControl.Height,
                        options.zNear, options.zFar)
 
         gl.MatrixMode(OpenGL.GL_MODELVIEW)

@@ -1,6 +1,7 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.IO
+Imports System.Runtime.Intrinsics
+Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
-Imports System.IO
 
 ' https://stackoverflow.com/questions/1196322/how-to-create-an-animated-gif-in-net
 ' https://stackoverflow.com/questions/18719302/net-creating-a-looping-gif-using-gifbitmapencoder
@@ -61,7 +62,6 @@ Public Class Gif_OpenCVB : Inherits TaskParent
         Static snapCheck = OptionParent.findCheckBox("Step 1: Check this box when ready to capture the desired snapshot.")
         If snapCheck.checked Then
             Dim nextBMP As Bitmap = Nothing
-            Dim rect As RECT
             Select Case task.gifCaptureIndex
                 Case gifTypes.gifdst0
                     If task.gOptions.CrossHairs.Checked Then Gravity_Basics.showVectors(task.color)
@@ -99,13 +99,11 @@ Public Class Gif_OpenCVB : Inherits TaskParent
                     snap = snap.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
                     cvext.BitmapConverter.ToBitmap(snap, nextBMP)
                 Case gifTypes.openGLwindow
-                    GetWindowRect(task.openGL_hwnd, rect)
-                    Dim r = New cv.Rect(0, 0, rect.Right - rect.Left + 330,
-                                              rect.Bottom - rect.Top + 200)
-                    nextBMP = New Bitmap(r.Width, r.Height, Imaging.PixelFormat.Format24bppRgb)
-                    Dim snapshot As Bitmap = GetWindowImage(task.openGL_hwnd, r)
+                    Dim r = New Rectangle(0, 0, task.sharpGL.Width, task.sharpGL.Height)
+                    nextBMP = New Bitmap(r.Width, r.Height, Imaging.PixelFormat.Format32bppArgb)
+                    Dim snapshot As Bitmap = New Bitmap(r.Width, r.Height, Imaging.PixelFormat.Format32bppArgb)
+                    task.sharpGL.DrawToBitmap(snapshot, r)
                     Dim snap = cvext.BitmapConverter.ToMat(snapshot)
-                    snap = snap.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
                     cvext.BitmapConverter.ToBitmap(snap, nextBMP)
                 Case gifTypes.EntireScreen
                     nextBMP = CaptureScreen()
