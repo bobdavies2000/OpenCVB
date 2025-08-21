@@ -36,13 +36,14 @@ Public Class CameraZed2 : Inherits GenericCamera
                 uiColor = zed.color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 uiLeft = zed.leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 uiRight = zed.rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                uiPointCloud = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
+                uiPointCloud = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             Else
-                uiColor = zed.color.Clone
+                uiColor = zed.color
                 uiLeft = uiColor
-                uiRight = zed.rightView.Clone
-                uiPointCloud = zed.pointCloud.Clone
+                uiRight = zed.rightView
+                uiPointCloud = zed.pointCloud
             End If
+            If cameraFrameCount < 100 Then GC.Collect()
         End SyncLock
 
         MyBase.GetNextFrameCounts(IMU_FrameTime)

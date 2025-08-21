@@ -8,6 +8,9 @@ Public Class CameraORB : Inherits GenericCamera
     Dim gyroSensor As Sensor
     Dim orbMutex As New Mutex(True, "orbMutex")
     Dim acceleration As cv.Point3f, angularVelocity As cv.Point3f, timeStamp As Int64
+    Dim color As cv.Mat, leftView As cv.Mat, pointCloud As cv.Mat, rightView As cv.Mat
+    Dim PtCloud As New PointCloudFilter
+    Dim initialTime As Int64 = timeStamp
     Public Sub New(workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
         Dim ctx As New Context
@@ -23,7 +26,7 @@ Public Class CameraORB : Inherits GenericCamera
                                             GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y16, fps)
         Dim leftProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_LEFT).
                                            GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, fps)
-        Dim rightProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_RIGHT). ' USE_RIGHT_IMAGE
+        Dim rightProfile As StreamProfile = pipe.GetStreamProfileList(SensorType.OB_SENSOR_IR_RIGHT).
                                             GetVideoStreamProfile(w, h, Format.OB_FORMAT_Y8, fps)
         Dim config As New Config()
         config.EnableStream(colorProfile)
@@ -60,9 +63,6 @@ Public Class CameraORB : Inherits GenericCamera
     End Sub
     Public Sub GetNextFrame(workRes As cv.Size)
         Dim rows = captureRes.Height, cols = captureRes.Width
-        Static PtCloud As New PointCloudFilter
-        ' turning on the right view overworks the camera processor.  Reduce the work and get 30 fps reliably.  Otherwise 5 fps.
-        Static color As cv.Mat, leftView As cv.Mat, pointCloud As cv.Mat, rightView As cv.Mat ' USE_RIGHT_IMAGE
 
         Dim frames As Frameset = Nothing
         While frames Is Nothing
@@ -93,7 +93,7 @@ Public Class CameraORB : Inherits GenericCamera
             leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, lFrame.GetDataPtr)
         End If
 
-        If rFrame IsNot Nothing Then ' USE_RIGHT_IMAGE
+        If rFrame IsNot Nothing Then
             rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rFrame.GetDataPtr)
         End If
 
@@ -111,7 +111,6 @@ Public Class CameraORB : Inherits GenericCamera
             IMU_AngularVelocity = angularVelocity
             IMU_Acceleration = acceleration
             IMU_Acceleration.Z *= -1
-            Static initialTime As Int64 = timeStamp
             IMU_FrameTime = timeStamp - initialTime
         End SyncLock
 
@@ -134,7 +133,7 @@ Public Class CameraORB : Inherits GenericCamera
             End If
         End SyncLock
 
-        ' without this GC.Collect, there are occasional memory footprint problems.  It will blow 4 Gb....
+        ' without this GC.Collect, there are occasional memory footprint problems.  
         If cameraFrameCount Mod 10 = 0 Then GC.Collect()
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub

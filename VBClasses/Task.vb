@@ -110,7 +110,6 @@ Public Class VBtask : Implements IDisposable
     Public IMU_Rotation As System.Numerics.Quaternion
     Public noDepthMask As New cv.Mat
     Public depthMask As New cv.Mat
-    Public depthMaskRaw As New cv.Mat
     Public maxDepthMask As New cv.Mat
     Public depthRGB As New cv.Mat
     Public srcThread As New cv.Mat
@@ -642,9 +641,9 @@ Public Class VBtask : Implements IDisposable
         imuBasics.Run(emptyMat)
         gmat.Run(emptyMat)
 
-        If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") = False Then
-            leftView = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        End If
+        'If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") = False Then
+        '    leftView = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        'End If
 
         If gOptions.CreateGif.Checked Then
             heartBeat = False

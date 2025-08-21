@@ -75,3 +75,27 @@ Public Class GL_StructuredLines : Inherits TaskParent
         SetTrueText(strOut, 2)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class GL_Lines : Inherits TaskParent
+    Public Sub New()
+        task.FeatureSampleSize = 1000 ' want all the lines 
+        desc = "Build a 3D model of the lines found in the rgb data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        labels(2) = task.lines.labels(2)
+
+        dst0 = task.pointCloud.Clone
+        dst0.SetTo(0, Not dst2)
+        dst1.SetTo(white)
+
+        strOut = task.sharpGL.RunSharp(oCase.pcLines, dst0, dst1)
+        SetTrueText(strOut, 2)
+    End Sub
+End Class

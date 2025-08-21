@@ -821,44 +821,15 @@ Public Class Main
 
         If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
             AvailableAlgorithms.SelectedIndex = 0
-        End If
-        If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = "" Then
-            AvailableAlgorithms.SelectedIndex += 2
         Else
-            AvailableAlgorithms.SelectedIndex += 1
+            If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = "" Then
+                AvailableAlgorithms.SelectedIndex += 2
+            Else
+                AvailableAlgorithms.SelectedIndex += 1
+            End If
         End If
 
-        '' skip testing the Fractal_ algorithms.  They are only for visualizations - not for other algorithms to use.
-        'For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
-        '    If AvailableAlgorithms.Text.StartsWith("Fractal_") = False Then Exit For
-        '    AvailableAlgorithms.SelectedIndex += 1
-        'Next
-
-        '' skip testing the Benford_ algorithms.  They are only for visualizations - not for other algorithms to use.
-        'For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
-        '    If AvailableAlgorithms.Text.StartsWith("Benford_") = False Then Exit For
-        '    AvailableAlgorithms.SelectedIndex += 1
-        'Next
-
-        '' skip testing the GIF_ algorithms.  They are only for visualizations - not for other algorithms to use.
-        'For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
-        '    If AvailableAlgorithms.Text.StartsWith("GIF_") = False Then Exit For
-        '    AvailableAlgorithms.SelectedIndex += 1
-        'Next
-
-        '' skip testing the ML_ algorithms.  Trying to fix a bug in memory mgmt
-        'For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
-        '    If AvailableAlgorithms.Text.StartsWith("ML_") = False Then Exit For
-        '    AvailableAlgorithms.SelectedIndex += 1
-        'Next
-
-        '' skip testing the Bitmap_ algorithms.  They are only for visualizations - not for other algorithms to use.
-        'For i = AvailableAlgorithms.SelectedIndex To AvailableAlgorithms.Items.Count - 1
-        '    If AvailableAlgorithms.Text.StartsWith("Bitmap_") = False Then Exit For
-        '    AvailableAlgorithms.SelectedIndex += 1
-        'Next
-
-        ' skip testing the XO_ algorithms.  They are obsolete.
+        ' skip testing the XO_ algorithms (XO.vb)  They are obsolete.
         If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
 
         TestAllTimer.Interval = settings.testAllDuration * 1000
@@ -1466,7 +1437,8 @@ Public Class Main
 
             Dim saveDrawRect As cv.Rect
             task.motionMask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 255)
-            task.depthMaskRaw = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+            task.leftView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+            task.rightView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
             While 1
                 Dim waitTime = Now
                 ' relative size of displayed image and algorithm size image.
@@ -1489,17 +1461,10 @@ Public Class Main
                         Dim copyTime = Now
 
                         SyncLock cameraLock
-                            task.color = camera.uiColor
-                            task.leftView = camera.uiLeft
-                            task.rightView = camera.uiRight
-                            ' make sure left and right views are present
-                            If task.leftView.Width = 0 Then
-                                task.leftView = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
-                            End If
-                            If task.rightView.Width = 0 Then
-                                task.rightView = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
-                            End If
-                            task.pointCloud = camera.uiPointCloud
+                            task.color = camera.uiColor.clone
+                            task.leftView = camera.uiLeft.clone
+                            task.rightView = camera.uiRight.clone
+                            task.pointCloud = camera.uiPointCloud.clone
 
                             ' there might be a delay in the camera task so set it again here....
                             If frameCount < 10 Then task.calibData = setCalibData(camera.calibData)
