@@ -82,27 +82,6 @@ End Class
 
 
 
-Public Class LeftRight_Edges : Inherits TaskParent
-    Dim edges As New Edge_Basics
-    Public Sub New()
-        desc = "Display the edges in the left and right views"
-        labels(2) = "Left Image"
-        labels(3) = "Right Image"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.leftView)
-        dst2 = edges.dst2
-
-        edges.Run(task.rightView)
-        dst3 = edges.dst2
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class LeftRight_Reduction : Inherits TaskParent
     Public reduction As New Reduction_Basics
     Public Sub New()
@@ -280,5 +259,53 @@ Public Class LeftRight_ContourLeft : Inherits TaskParent
         color8U.Run(task.leftView)
         contours.Run(color8U.dst2)
         dst2 = contours.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class LeftRight_Edges : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Public Sub New()
+        desc = "Display the edges in the left and right views"
+        labels(2) = "Left Image"
+        labels(3) = "Right Image"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.leftView)
+        dst2 = edges.dst2
+
+        edges.Run(task.rightView)
+        dst3 = edges.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class LeftRight_EdgesColor : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst0.Checked = True
+        desc = "Display the edges in the left, right, and color views"
+        labels(2) = "Left Image"
+        labels(3) = "Right Image"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.gray)
+        dst0 = edges.dst2.Clone
+
+        edges.Run(task.leftView)
+        dst2 = edges.dst2.Clone
+
+        edges.Run(task.rightView)
+        dst3 = edges.dst2
     End Sub
 End Class

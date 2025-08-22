@@ -60,7 +60,7 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
         desc = "Create a traditional depth color scheme."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.DepthCorrelations.Checked Then
+        If task.gOptions.LRCorrelations.Checked Then
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.bricks.Run(src)
 

@@ -673,7 +673,7 @@ Public Class Edge_Canny : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If src.Channels() <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
+        If src.Type() <> cv.MatType.CV_8UC1 Then src.ConvertTo(src, cv.MatType.CV_8U)
         dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, True)
 
         dst3.SetTo(0)
