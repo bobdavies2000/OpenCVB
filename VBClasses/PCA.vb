@@ -952,7 +952,7 @@ End Class
 
 Public Class PCA_LineMask : Inherits TaskParent
     Dim pca As New PCA_Basics
-    Dim lines As New Line_Select
+    Public lines As New Line_Select
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8UC1, 0)
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
@@ -988,5 +988,24 @@ Public Class PCA_LineMask : Inherits TaskParent
 
         labels(3) = CStr(vecList.Count) + " samples were found for the selected line."
         SetTrueText(strOut, 2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class PCA_LineSelect : Inherits TaskParent
+    Dim pcaLine As New PCA_LineMask
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Compute the principal component for the selected line."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        pcaLine.Run(src)
+        dst2 = pcaLine.lines.dst2
+        labels(2) = pcaLine.lines.labels(2)
+        SetTrueText(pcaLine.strOut, 1)
+        SetTrueText(pcaLine.lines.delaunay.info.strOut, 3)
     End Sub
 End Class

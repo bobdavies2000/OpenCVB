@@ -1104,7 +1104,7 @@ End Class
 
 
 Public Class Line_Select : Inherits TaskParent
-    Dim delaunay As New Delaunay_Lines
+    Public delaunay As New Delaunay_Lines
     Public Sub New()
         desc = "Select a line with mouse movement and put the selection into task.lpD."
     End Sub
