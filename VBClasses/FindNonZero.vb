@@ -76,6 +76,7 @@ End Class
 
 Public Class FindNonZero_Line3D : Inherits TaskParent
     Public lp As lpData
+    Public ptList As New List(Of cv.Point)
     Public vecMat As New cv.Mat
     Public veclist As New List(Of cv.Vec3f)
     Public Sub New()
@@ -91,16 +92,20 @@ Public Class FindNonZero_Line3D : Inherits TaskParent
         Dim tmp As New cv.Mat
         cv.Cv2.FindNonZero(dst2(lp.rect), tmp)
 
-        Dim ptList(tmp.Rows * 2 - 1) As Integer
-        Marshal.Copy(tmp.Data, ptList, 0, ptList.Length)
+        Dim points(tmp.Rows * 2 - 1) As Integer
+        Marshal.Copy(tmp.Data, points, 0, points.Length)
         veclist.Clear()
-        For i = 0 To ptList.Count - 1 Step 2
-            Dim vec = task.pointCloud(lp.rect).Get(Of cv.Vec3f)(ptList(i + 1), ptList(i))
+        ptList.Clear()
+        For i = 0 To points.Count - 1 Step 2
+            Dim vec = task.pointCloud(lp.rect).Get(Of cv.Vec3f)(points(i + 1), points(i))
             ' skip this point if the depth is zero
-            If vec(2) <> 0 Then veclist.Add(vec)
+            If vec(2) <> 0 Then
+                veclist.Add(vec)
+                ptList.Add(New cv.Point(points(i), points(i + 1)))
+            End If
         Next
 
-        If vecList.Count > 0 Then
+        If veclist.Count > 0 Then
             vecMat = cv.Mat.FromPixelData(veclist.Count, 3, cv.MatType.CV_32F, veclist.ToArray)
         End If
     End Sub

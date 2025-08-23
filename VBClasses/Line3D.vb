@@ -113,25 +113,6 @@ End Class
 
 
 
-
-
-Public Class Line3D_Constructed : Inherits TaskParent
-    Dim lines As New Line3D_Basics
-    Public Sub New()
-        desc = "Build the 3D lines found in Line3D_Basics"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src)
-        dst2 = lines.dst2
-        dst3 = lines.dst3
-        labels(2) = lines.labels(2)
-    End Sub
-End Class
-
-
-
-
-
 Public Class Line3D_Longest : Inherits TaskParent
     Public Sub New()
         task.brickRunFlag = True
@@ -183,5 +164,36 @@ Public Class Line3D_Longest : Inherits TaskParent
             SetTrueText(Format(depthMin, fmt1) + "m", New cv.Point(mm.minLoc.X + 5, mm.minLoc.Y - 15), 2)
             SetTrueText(Format(depthMax, fmt1) + "m", New cv.Point(mm.maxLoc.X + 5, mm.maxLoc.Y - 15), 2)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line3D_Reconstructed : Inherits TaskParent
+    Public vecMask As New FindNonZero_Line3D
+    Public selectLine As New Line_Select
+    Public Sub New()
+        desc = "Build the 3D lines found in Line_Basics"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        selectLine.Run(src)
+        dst2 = selectLine.dst2
+
+        vecMask.lp = task.lpD
+        vecMask.Run(src)
+
+        Dim veclist = vecMask.veclist
+        Dim depthInit = veclist(0)(2)
+        Dim incr = veclist(0)(2) - veclist(veclist.Count - 1)(2)
+
+        For Each pt In vecMask.ptList
+            Dim vec = getWorldCoordinates(pt, depthInit + incr)
+            task.pointCloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
+        Next
+        labels(2) = vecMask.labels(2)
     End Sub
 End Class

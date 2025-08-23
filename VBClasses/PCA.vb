@@ -1,7 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.Windows.Forms
-
 ' You can find the main direction of a series of points using principal component analysis ‘(PCA).
 ' PCA is a statistical technique that can be used to find the directions of greatest variance in a dataset.
 ' The main direction of a series of points is the direction of greatest variance in the dataset.
@@ -18,8 +16,27 @@ Imports System.Windows.Forms
 ' variance in the locations of the cities. ‘This direction could be used to represent the overall trend in the
 ' distribution of cities in ‘the United States.
 ' PCA is a powerful tool that can be used to find the main direction of a series of points.
-
 Public Class PCA_Basics : Inherits TaskParent
+    Dim pcaLine As New PCA_LineMask
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Compute the principal component for the selected line."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        pcaLine.Run(src)
+        dst2 = pcaLine.selectLine.dst2
+        labels(2) = pcaLine.selectLine.labels(2)
+        SetTrueText(pcaLine.strOut, 1)
+        SetTrueText(pcaLine.selectLine.delaunay.info.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class PCA_Mask : Inherits TaskParent
     Public pca_analysis As New cv.PCA
     Public runRedCloud As Boolean
     Public Sub New()
@@ -87,7 +104,7 @@ End Class
 
 
 Public Class PCA_CellMask : Inherits TaskParent
-    Dim pca As New PCA_Basics
+    Dim pca As New PCA_Mask
     Dim pcaPrep As New PCA_Prep_CPP
     Public Sub New()
         pca.runRedCloud = True
@@ -951,7 +968,7 @@ End Class
 
 
 Public Class PCA_LineMask : Inherits TaskParent
-    Dim pca As New PCA_Basics
+    Dim pca As New PCA_Mask
     Public selectLine As New Line_Select
     Public vecMask As New FindNonZero_Line3D
     Public Sub New()
@@ -976,24 +993,5 @@ Public Class PCA_LineMask : Inherits TaskParent
 
         labels(3) = CStr(vecMask.vecMat.Rows) + " samples were found for the selected line."
         SetTrueText(strOut, 2)
-    End Sub
-End Class
-
-
-
-
-
-Public Class PCA_LineSelect : Inherits TaskParent
-    Dim pcaLine As New PCA_LineMask
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Compute the principal component for the selected line."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        pcaLine.Run(src)
-        dst2 = pcaLine.selectLine.dst2
-        labels(2) = pcaLine.selectLine.labels(2)
-        SetTrueText(pcaLine.strOut, 1)
-        SetTrueText(pcaLine.selectLine.delaunay.info.strOut, 3)
     End Sub
 End Class
