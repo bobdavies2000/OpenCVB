@@ -314,10 +314,10 @@ End Class
 
 Public Class Delaunay_Lines : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
-    Dim info As New Line_Info
+    Public info As New Line_Info
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(2) = "The end points for each line defines a Delaunay cell that is used to select the line."
+        labels(2) = "Line is best selected near the end points or center that define a delaunay cells."
         labels(3) = "The mouse is hovering over the Delaunay cell for the end point of the line."
         desc = "Create a map for selecting lines"
     End Sub
@@ -325,18 +325,20 @@ Public Class Delaunay_Lines : Inherits TaskParent
         delaunay.inputPoints.Clear()
         For Each lp In task.lines.lpList
             delaunay.inputPoints.Add(lp.p1)
+            delaunay.inputPoints.Add(lp.center)
             delaunay.inputPoints.Add(lp.p2)
         Next
 
         delaunay.Run(src)
-        dst1 = delaunay.dst2
 
         Dim facetList As New List(Of Integer)
         Dim ptList As New List(Of Integer)
         For Each lp In task.lines.lpList
             facetList.Add(delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X))
+            facetList.Add(delaunay.dst1.Get(Of Byte)(lp.center.Y, lp.center.X))
             facetList.Add(delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X))
 
+            ptList.Add(lp.index)
             ptList.Add(lp.index)
             ptList.Add(lp.index)
         Next
@@ -346,34 +348,43 @@ Public Class Delaunay_Lines : Inherits TaskParent
         If facetIndex = -1 Then Exit Sub
         task.lpD = task.lines.lpList(ptList(facetIndex))
 
-        Dim index1 = delaunay.dst1.Get(Of Byte)(task.lpD.p1.Y, task.lpD.p1.X)
-        Dim index2 = delaunay.dst1.Get(Of Byte)(task.lpD.p2.Y, task.lpD.p2.X)
+        Dim index1 As Integer, index2 As Integer, index3 As Integer
+        If standaloneTest() Then
+            index1 = delaunay.dst1.Get(Of Byte)(task.lpD.p1.Y, task.lpD.p1.X)
+            index2 = delaunay.dst1.Get(Of Byte)(task.lpD.center.Y, task.lpD.center.X)
+            index3 = delaunay.dst1.Get(Of Byte)(task.lpD.p2.Y, task.lpD.p2.X)
 
-        dst3.SetTo(0)
-        dst3.FillConvexPoly(delaunay.facetList(index1), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
-        dst3.FillConvexPoly(delaunay.facetList(index2), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
-        DrawLine(dst3, task.lpD)
+            dst3.SetTo(0)
+            dst3.FillConvexPoly(delaunay.facetList(index1), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
+            dst3.FillConvexPoly(delaunay.facetList(index2), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
+            dst3.FillConvexPoly(delaunay.facetList(index3), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
+            DrawLine(dst3, task.lpD)
+        End If
 
         info.Run(emptyMat)
         dst1 = info.dst2
         SetTrueText(info.strOut, 3)
 
-        For Each lp In task.lines.lpList
-            index1 = delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            index2 = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+        If standaloneTest() Then
+            For Each lp In task.lines.lpList
+                index1 = delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+                index2 = delaunay.dst1.Get(Of Byte)(lp.center.Y, lp.center.X)
+                index3 = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
 
-            dst2.FillConvexPoly(delaunay.facetList(index1), task.scalarColors(lp.index), cv.LineTypes.Link4)
-            dst2.FillConvexPoly(delaunay.facetList(index2), task.scalarColors(lp.index), cv.LineTypes.Link4)
-        Next
+                dst2.FillConvexPoly(delaunay.facetList(index1), task.scalarColors(lp.index), cv.LineTypes.Link4)
+                dst2.FillConvexPoly(delaunay.facetList(index2), task.scalarColors(lp.index), cv.LineTypes.Link4)
+                dst2.FillConvexPoly(delaunay.facetList(index3), task.scalarColors(lp.index), cv.LineTypes.Link4)
+            Next
 
-        For Each lp In task.lines.lpList
-            DrawLine(dst2, lp)
-            DrawLine(dst1, lp)
-        Next
+            For Each lp In task.lines.lpList
+                DrawLine(dst2, lp)
+                DrawLine(dst1, lp)
+            Next
 
-        For Each pts In delaunay.facetList
-            DrawContour(dst2, pts, white, 1)
-        Next
+            For Each pts In delaunay.facetList
+                DrawContour(dst2, pts, white, 1)
+            Next
+        End If
     End Sub
 End Class
 

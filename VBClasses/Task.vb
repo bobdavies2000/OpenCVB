@@ -207,7 +207,7 @@ Public Class VBtask : Implements IDisposable
 
     Public gOptions As OptionsGlobal
     Public featureOptions As OptionsFeatures
-    Public treeView As TreeviewForm
+    Public treeView As TreeViewForm
 
     ' RedCloud variables
     Public channelCount As Integer = 2
@@ -499,7 +499,7 @@ Public Class VBtask : Implements IDisposable
 
         gOptions = New OptionsGlobal
         featureOptions = New OptionsFeatures
-        treeView = New TreeviewForm
+        treeView = New TreeViewForm
 
         callTrace = New List(Of String)
         task.pointCloud = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)

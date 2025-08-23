@@ -235,18 +235,14 @@ Public Class Line_Info : Inherits TaskParent
 
         dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
-        strOut = ""
-        strOut += "Line ID = " + CStr(task.lpD.ID) + vbCrLf + vbCrLf
-        strOut += "age = " + CStr(task.lpD.age) + vbCrLf
-        strOut += "length = " + CStr(task.lpD.length) + vbCrLf
-        strOut += "index = " + CStr(task.lpD.index) + vbCrLf
+        strOut = "Line ID = " + CStr(task.lpD.ID) + " Age = " + CStr(task.lpD.age) + vbCrLf
+        strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
         strOut += "gridIndex1 = " + CStr(task.lpD.gridIndex1) + " gridIndex2 = " + CStr(task.lpD.gridIndex2) + vbCrLf
-        strOut += "nabeIndex1 = " + CStr(task.lpD.nabeIndex1) + " nabeIndex2 = " + CStr(task.lpD.nabeIndex2) + vbCrLf
 
-        strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf + vbCrLf
+        strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
         strOut += "ep1 = " + task.lpD.ep1.ToString + ", ep2 = " + task.lpD.ep2.ToString + vbCrLf + vbCrLf
-        strOut += "Angle = " + CStr(task.lpD.angle) + vbCrLf
-        strOut += "Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
+        strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
+        strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
         strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
 
         SetTrueText(strOut, 3)
@@ -1100,5 +1096,23 @@ Public Class Line_KNN : Inherits TaskParent
         Dim index = Math.Floor(knn.result(0, 0) / 3)
         Dim lpNext = task.lines.lpList(index)
         dst2.Line(lpNext.p1, lpNext.p2, task.highlight, task.lineWidth * 3, cv.LineTypes.AntiAlias)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_Select : Inherits TaskParent
+    Dim delaunay As New Delaunay_Lines
+    Public Sub New()
+        desc = "Select a line with mouse movement and put the selection into task.lpD."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        delaunay.Run(src)
+        dst2 = delaunay.dst1
+        labels(2) = delaunay.labels(2)
+
+        SetTrueText(delaunay.info.strOut, 3) ' the line info is already prepped in strout in delaunay.
     End Sub
 End Class
