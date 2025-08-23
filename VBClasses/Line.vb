@@ -1116,3 +1116,20 @@ Public Class Line_Select : Inherits TaskParent
         SetTrueText(delaunay.info.strOut, 3) ' the line info is already prepped in strout in delaunay.
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Line_Select3D : Inherits TaskParent
+    Public delaunay As New Delaunay_Lines
+    Public Sub New()
+        desc = "Recompute each 3D pixel on the selected RGB line."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        delaunay.Run(src)
+        dst2 = delaunay.dst1
+        labels(2) = delaunay.labels(2)
+    End Sub
+End Class

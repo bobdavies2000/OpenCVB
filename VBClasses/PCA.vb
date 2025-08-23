@@ -952,41 +952,29 @@ End Class
 
 Public Class PCA_LineMask : Inherits TaskParent
     Dim pca As New PCA_Basics
-    Public lines As New Line_Select
+    Public selectLine As New Line_Select
+    Public vecMask As New FindNonZero_Line3D
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8UC1, 0)
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         desc = "Find the PCA for the pointcloud behind a line in RGB."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        lines.Run(src) ' this will select a line if not standalone
+        selectLine.Run(src) ' this will select a line if not standalone
         Dim lp = If(standalone, task.lineLongest, task.lpD)
 
-        dst3.SetTo(0)
-        dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
+        vecMask.lp = lp
+        vecMask.Run(src)
+        dst3 = vecMask.dst2
 
-        Dim tmp As New cv.Mat
-        cv.Cv2.FindNonZero(dst3(lp.rect), tmp)
-
-        Dim ptList(tmp.Rows * 2 - 1) As Integer
-        Marshal.Copy(tmp.Data, ptList, 0, ptList.Length)
-        Dim vecList As New List(Of cv.Vec3f)
-        For i = 0 To ptList.Count - 1 Step 2
-            Dim vec = task.pointCloud(lp.rect).Get(Of cv.Vec3f)(ptList(i + 1), ptList(i))
-            If vec(0) = 0 And vec(1) = 0 And vec(2) = 0 Then Continue For
-            vecList.Add(vec)
-        Next
-
-        If vecList.Count > 0 Then
-            Dim vecMat = cv.Mat.FromPixelData(vecList.Count, 3, cv.MatType.CV_32F, vecList.ToArray)
-            pca.pca_analysis = New cv.PCA(vecMat, New cv.Mat, cv.PCA.Flags.DataAsRow)
+        If vecMask.vecMat.Rows > 0 Then
+            pca.pca_analysis = New cv.PCA(vecMask.vecMat, New cv.Mat, cv.PCA.Flags.DataAsRow)
             strOut = pca.displayResults() + vbCrLf
             strOut += "Anchor point " + lp.center.ToString + vbCrLf
             DrawCircle(dst3, lp.center, 255)
             dst3.Circle(lp.center, task.DotSize * 2, 255, -1, task.lineType)
         End If
 
-        labels(3) = CStr(vecList.Count) + " samples were found for the selected line."
+        labels(3) = CStr(vecMask.vecMat.Rows) + " samples were found for the selected line."
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -1003,9 +991,9 @@ Public Class PCA_LineSelect : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         pcaLine.Run(src)
-        dst2 = pcaLine.lines.dst2
-        labels(2) = pcaLine.lines.labels(2)
+        dst2 = pcaLine.selectLine.dst2
+        labels(2) = pcaLine.selectLine.labels(2)
         SetTrueText(pcaLine.strOut, 1)
-        SetTrueText(pcaLine.lines.delaunay.info.strOut, 3)
+        SetTrueText(pcaLine.selectLine.delaunay.info.strOut, 3)
     End Sub
 End Class

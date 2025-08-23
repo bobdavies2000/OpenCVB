@@ -1,4 +1,6 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Runtime.InteropServices
+Imports OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class FindNonZero_Basics : Inherits TaskParent
     Public ptMat As cv.Mat
     Public Sub New()
@@ -65,5 +67,41 @@ Public Class FindNonZero_SoloPoints : Inherits TaskParent
         Next
 
         If task.heartBeat Then labels(2) = $"There were {soloPoints.Count} points found"
+    End Sub
+End Class
+
+
+
+
+
+Public Class FindNonZero_Line3D : Inherits TaskParent
+    Public lp As lpData
+    Public vecMat As New cv.Mat
+    Public veclist As New List(Of cv.Vec3f)
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
+        desc = "Find the non-zero 3D points behind an RGB line"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then lp = task.lineLongest
+
+        dst2.SetTo(0)
+        dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
+
+        Dim tmp As New cv.Mat
+        cv.Cv2.FindNonZero(dst2(lp.rect), tmp)
+
+        Dim ptList(tmp.Rows * 2 - 1) As Integer
+        Marshal.Copy(tmp.Data, ptList, 0, ptList.Length)
+        veclist.Clear()
+        For i = 0 To ptList.Count - 1 Step 2
+            Dim vec = task.pointCloud(lp.rect).Get(Of cv.Vec3f)(ptList(i + 1), ptList(i))
+            ' skip this point if the depth is zero
+            If vec(2) <> 0 Then veclist.Add(vec)
+        Next
+
+        If vecList.Count > 0 Then
+            vecMat = cv.Mat.FromPixelData(veclist.Count, 3, cv.MatType.CV_32F, veclist.ToArray)
+        End If
     End Sub
 End Class
