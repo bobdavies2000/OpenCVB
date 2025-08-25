@@ -119,7 +119,7 @@ Public Class Line_Raw : Inherits TaskParent
                     p1 = lpData.validatePoint(p1)
                     p2 = lpData.validatePoint(p2)
                     Dim lp = New lpData(p1, p2)
-                    lpList.Add(lp)
+                    If lp.depthP1 > 0 And lp.depthP2 > 0 Then lpList.Add(lp)
                 End If
             End If
         Next

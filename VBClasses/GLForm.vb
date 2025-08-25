@@ -128,19 +128,20 @@ Public Class sgl
         Select Case func
             Case oCase.pcLines
                 gl.Begin(OpenGL.GL_POINTS)
-
+                Dim count As Integer
                 For y = 0 To src.Height - 1
                     For x = 0 To src.Width - 1
                         Dim vec As cv.Vec3f = src.At(Of cv.Vec3f)(y, x)
-                        If vec(0) <> 0 Or vec(1) <> 0 Or vec(2) <> 0 Then
+                        If vec(2) <> 0 Then
                             Dim vec3b = RGB.Get(Of cv.Vec3b)(y, x)
                             gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
                             gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
+                            count += 1
                         End If
                     Next
                 Next
                 gl.End()
-                label = CStr(src.Total) + " points were rendered."
+                label = CStr(count) + " points were rendered."
             Case oCase.drawPointCloudRGB
                 gl.Begin(OpenGL.GL_POINTS)
 

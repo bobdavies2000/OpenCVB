@@ -7,6 +7,7 @@ Public Class TrueText
     Public text As String
     Public picTag = 2
     Public pt As cv.Point
+
     Private Sub setup(_text As String, _pt As cv.Point, camPicIndex As Integer)
         text = _text
         pt = _pt
@@ -33,6 +34,7 @@ Public Class TaskParent : Implements IDisposable
     Public trueData As New List(Of TrueText)
     Public strOut As String
     Public emptyRect As New cv.Rect
+    Public firstFramePass As Boolean
     Public Sub New()
         traceName = Me.GetType.Name
 
@@ -65,32 +67,30 @@ Public Class TaskParent : Implements IDisposable
 
         task.activeObjects.Add(Me)
 
-        If task.recordTimings Then
-            If standalone Then
-                task.algorithm_ms.Clear()
-                task.algorithmNames.Clear()
-                task.algorithmNames.Add("waitingForInput")
-                task.algorithmTimes.Add(Now)
-                task.algorithm_ms.Add(0)
+        If standalone Then
+            task.algorithm_ms.Clear()
+            task.algorithmNames.Clear()
+            task.algorithmNames.Add("waitingForInput")
+            task.algorithmTimes.Add(Now)
+            task.algorithm_ms.Add(0)
 
-                task.algorithmNames.Add("inputBufferCopy")
-                task.algorithmTimes.Add(Now)
-                task.algorithm_ms.Add(0)
+            task.algorithmNames.Add("inputBufferCopy")
+            task.algorithmTimes.Add(Now)
+            task.algorithm_ms.Add(0)
 
-                task.algorithmNames.Add("ReturnCopyTime")
-                task.algorithmTimes.Add(Now)
-                task.algorithm_ms.Add(0)
+            task.algorithmNames.Add("ReturnCopyTime")
+            task.algorithmTimes.Add(Now)
+            task.algorithm_ms.Add(0)
 
-                task.algorithmNames.Add(traceName)
-                task.algorithmTimes.Add(Now)
-                task.algorithm_ms.Add(0)
+            task.algorithmNames.Add(traceName)
+            task.algorithmTimes.Add(Now)
+            task.algorithm_ms.Add(0)
 
-                task.algorithmStack = New Stack()
-                task.algorithmStack.Push(0)
-                task.algorithmStack.Push(1)
-                task.algorithmStack.Push(2)
-                task.algorithmStack.Push(3)
-            End If
+            task.algorithmStack = New Stack()
+            task.algorithmStack.Push(0)
+            task.algorithmStack.Push(1)
+            task.algorithmStack.Push(2)
+            task.algorithmStack.Push(3)
         End If
     End Sub
     Public Shared Function CaptureScreen() As Bitmap
@@ -334,11 +334,6 @@ Public Class TaskParent : Implements IDisposable
         End If
         Return src
     End Function
-    Public Enum trackColor
-        meanColor = 0
-        tracking = 1
-        colorWithDepth = 2
-    End Enum
     Public Shared Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
         If mask Is Nothing Then
@@ -354,16 +349,6 @@ Public Class TaskParent : Implements IDisposable
         mm.range = mm.maxVal - mm.minVal
         Return mm
     End Function
-    'Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
-    '    Dim mm As mmData
-    '    If mask Is Nothing Then
-    '        mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
-    '    Else
-    '        mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
-    '    End If
-    '    mm.range = mm.maxVal - mm.minVal
-    '    Return mm
-    'End Function
     Public Function Show_HSV_Hist(hist As cv.Mat) As cv.Mat
         Dim img As New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         Dim binCount = hist.Height
@@ -626,18 +611,9 @@ Public Class TaskParent : Implements IDisposable
         If dst2.Size <> src.Size And task.frameCount < 10 Then Exit Sub
         task.MainUI_Algorithm.Run(src)
         task.labels = labels
-
-        ' C++/CLR apps have already put their results in task.dst...
-        If task.algName.EndsWith("_CPP") = False Then
-            task.dst0 = dst0
-            task.dst1 = dst1
-            task.dst2 = dst2
-            task.dst3 = dst3
-        End If
         task.trueData = New List(Of TrueText)(trueData)
     End Sub
     Public Sub measureStartRun(name As String)
-        If task.recordTimings = False Then Exit Sub
         Dim nextTime = Now
         If task.algorithmNames.Contains(name) = False Then
             task.algorithmNames.Add(name)
@@ -658,7 +634,6 @@ Public Class TaskParent : Implements IDisposable
     End Sub
     Public Sub measureEndRun(name As String)
         Try
-            If task.recordTimings = False Then Exit Sub
             Dim nextTime = Now
             Dim index = task.algorithmStack.Peek
             Dim elapsedTicks = nextTime.Ticks - task.algorithmTimes(index).Ticks

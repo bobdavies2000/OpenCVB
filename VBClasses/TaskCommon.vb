@@ -618,6 +618,8 @@ Public Class lpData
     Public age As Integer
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
+    Public depthP1 As Single
+    Public depthP2 As Single
     Public ep1 As cv.Point2f ' end points - goes to the edge of the image.
     Public ep2 As cv.Point2f ' end points - goes to the edge of the image.
     Public length As Single
@@ -699,6 +701,9 @@ Public Class lpData
             p1 = p2
             p2 = ptTemp
         End If
+
+        depthP1 = task.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
+        depthP2 = task.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
 
         If p1.X = p2.X Then
             slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)

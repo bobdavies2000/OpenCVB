@@ -970,7 +970,7 @@ End Class
 Public Class PCA_LineMask : Inherits TaskParent
     Dim pca As New PCA_Mask
     Public selectLine As New Line_Select
-    Public vecMask As New FindNonZero_Line3D
+    Public findLine3D As New FindNonZero_Line3D
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         desc = "Find the PCA for the pointcloud behind a line in RGB."
@@ -979,19 +979,19 @@ Public Class PCA_LineMask : Inherits TaskParent
         selectLine.Run(src) ' this will select a line if not standalone
         Dim lp = If(standalone, task.lineLongest, task.lpD)
 
-        vecMask.lp = lp
-        vecMask.Run(src)
-        dst3 = vecMask.dst2
+        findLine3D.lp = lp
+        findLine3D.Run(src)
+        dst3 = findLine3D.dst2
 
-        If vecMask.vecMat.Rows > 0 Then
-            pca.pca_analysis = New cv.PCA(vecMask.vecMat, New cv.Mat, cv.PCA.Flags.DataAsRow)
+        If findLine3D.vecMat.Rows > 0 Then
+            pca.pca_analysis = New cv.PCA(findLine3D.vecMat, New cv.Mat, cv.PCA.Flags.DataAsRow)
             strOut = pca.displayResults() + vbCrLf
             strOut += "Anchor point " + lp.center.ToString + vbCrLf
             DrawCircle(dst3, lp.center, 255)
             dst3.Circle(lp.center, task.DotSize * 2, 255, -1, task.lineType)
         End If
 
-        labels(3) = CStr(vecMask.vecMat.Rows) + " samples were found for the selected line."
+        labels(3) = CStr(findLine3D.vecMat.Rows) + " samples were found for the selected line."
         SetTrueText(strOut, 2)
     End Sub
 End Class
