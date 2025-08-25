@@ -24,10 +24,10 @@ Public Class PCA_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         pcaLine.Run(src)
-        dst2 = pcaLine.selectLine.dst2
+        dst2 = pcaLine.selectLine.info.dst2
         labels(2) = pcaLine.selectLine.labels(2)
         SetTrueText(pcaLine.strOut, 1)
-        SetTrueText(pcaLine.selectLine.delaunay.info.strOut, 3)
+        SetTrueText(pcaLine.selectLine.info.strOut, 3)
     End Sub
 End Class
 
@@ -969,7 +969,7 @@ End Class
 
 Public Class PCA_LineMask : Inherits TaskParent
     Dim pca As New PCA_Mask
-    Public selectLine As New Line_Select
+    Public selectLine As New Delaunay_LineSelect
     Public findLine3D As New FindNonZero_Line3D
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)

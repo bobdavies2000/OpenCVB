@@ -99,6 +99,7 @@ Public Class FCS_BasicsOld : Inherits TaskParent
     Dim fcs As New FCS_Core
     Public desiredMapCount As Integer = 5
     Public Sub New()
+        task.needContours = True
         desc = "Create the reference map for FCS. "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

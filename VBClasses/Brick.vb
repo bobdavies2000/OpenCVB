@@ -5,6 +5,7 @@ Public Class Brick_Basics : Inherits TaskParent
     Public brickList As New List(Of brickData)
     Public options As New Options_Features
     Public Sub New()
+        task.needContours = True
         task.bricks = Me
         desc = "Create the grid of bricks that reduce depth volatility"
     End Sub

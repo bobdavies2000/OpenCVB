@@ -7,6 +7,7 @@ Public Class Contour_Basics : Inherits TaskParent
     Public contourIDs As New List(Of Integer)
     Dim sortContours As New Contour_Sort
     Public Sub New()
+        task.needContours = True
         OptionParent.findRadio("List").Checked = True
         labels(3) = "Input to OpenCV's FindContours"
         desc = "General purpose contour finder"
@@ -143,6 +144,7 @@ End Class
 
 Public Class Contour_Features : Inherits TaskParent
     Public Sub New()
+        task.needContours = True
         task.featureRunFlag = True
         labels(3) = "Each of the feature points with their correlation coefficien"
         desc = "Show contours and features"
@@ -172,6 +174,7 @@ End Class
 Public Class Contour_BrickPoints : Inherits TaskParent
     Dim ptBrick As New BrickPoint_Basics
     Public Sub New()
+        task.needContours = True
         desc = "Show contours and Brick points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -192,6 +195,7 @@ End Class
 Public Class Contour_Delaunay : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
     Public Sub New()
+        task.needContours = True
         desc = "Use Delaunay to track maxDist point."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -222,6 +226,7 @@ End Class
 
 Public Class Contour_LineRGB : Inherits TaskParent
     Public Sub New()
+        task.needContours = True
         desc = "Identify contour by its Lines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -722,6 +727,7 @@ End Class
 
 Public Class Contour_InfoDepth : Inherits TaskParent
     Public Sub New()
+        task.needContours = True
         desc = "Provide details about the selected contour's contourList entry."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -780,6 +786,7 @@ End Class
 
 Public Class Contour_Isolate : Inherits TaskParent
     Public Sub New()
+        task.needContours = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Display the contours with and without the selected contour - determines if the contour is needed."
     End Sub
@@ -816,6 +823,7 @@ Public Class Contour_Hulls : Inherits TaskParent
     Public contourList As New List(Of contourData)
     Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
     Public Sub New()
+        task.needContours = True
         desc = "Add hulls and improved contours using ConvexityDefects to each contour cell"
     End Sub
     Public Function getSelectedHull() As contourData
@@ -852,6 +860,7 @@ Public Class Contour_EdgePoints : Inherits TaskParent
     Dim plot As New Plot_OverTimeSingle
     Dim rangeVal As Integer = 3
     Public Sub New()
+        task.needContours = True
         plot.useFixedRange = True
         plot.max = rangeVal
         plot.min = -rangeVal
@@ -1072,6 +1081,7 @@ End Class
 
 Public Class Contour_Info : Inherits TaskParent
     Public Sub New()
+        task.needContours = True
         If standalone Then task.gOptions.displayDst0.Checked = True
         desc = "Provide details about the selected contour's contourList entry."
     End Sub
@@ -1250,6 +1260,7 @@ Public Class Contour_RedCloudCompare : Inherits TaskParent
     Public contourIDs As New List(Of Integer)
     Dim sortContours As New Contour_Sort
     Public Sub New()
+        task.needContours = True
         desc = "Use the RedPrep_Basics as input to contours_basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

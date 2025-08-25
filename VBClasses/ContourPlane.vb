@@ -1,6 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class ContourPlane_Basics : Inherits TaskParent
     Public Sub New()
+        task.needContours = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Construct a simple plane at the average depth for each of the top contours"
     End Sub
@@ -25,6 +26,7 @@ End Class
 
 Public Class ContourPlane_MaxDist : Inherits TaskParent
     Public Sub New()
+        task.needContours = True
         desc = "Show the maxDist value in color (yellow) and in depth (blue)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -45,6 +47,7 @@ End Class
 
 Public Class ContourPlane_RectX : Inherits TaskParent
     Public Sub New()
+        task.needContours = True
         desc = "Assume the plane in a contour in X"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -89,6 +92,7 @@ End Class
 
 Public Class ContourPlane_X : Inherits TaskParent
     Public Sub New()
+        task.needContours = True
         desc = "Assume the plane in a contour in X"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

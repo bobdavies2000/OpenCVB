@@ -141,7 +141,7 @@ Public Class sgl
                     Next
                 Next
                 gl.End()
-                label = CStr(count) + " points were rendered."
+                label = CStr(count) + " points were rendered for the selected line."
             Case oCase.drawPointCloudRGB
                 gl.Begin(OpenGL.GL_POINTS)
 

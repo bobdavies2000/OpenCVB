@@ -312,7 +312,7 @@ End Class
 
 
 
-Public Class Delaunay_Lines : Inherits TaskParent
+Public Class Delaunay_LineSelect : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
     Public info As New Line_Info
     Public Sub New()
@@ -348,43 +348,45 @@ Public Class Delaunay_Lines : Inherits TaskParent
         If facetIndex = -1 Then Exit Sub
         task.lpD = task.lines.lpList(ptList(facetIndex))
 
-        Dim index1 As Integer, index2 As Integer, index3 As Integer
-        If standaloneTest() Then
-            index1 = delaunay.dst1.Get(Of Byte)(task.lpD.p1.Y, task.lpD.p1.X)
-            index2 = delaunay.dst1.Get(Of Byte)(task.lpD.center.Y, task.lpD.center.X)
-            index3 = delaunay.dst1.Get(Of Byte)(task.lpD.p2.Y, task.lpD.p2.X)
-
-            dst3.SetTo(0)
-            dst3.FillConvexPoly(delaunay.facetList(index1), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
-            dst3.FillConvexPoly(delaunay.facetList(index2), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
-            dst3.FillConvexPoly(delaunay.facetList(index3), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
-            DrawLine(dst3, task.lpD)
+        Static saveID As Integer = task.lpD.ID
+        If task.lpD.ID <> saveID Then
+            saveID = task.lpD.ID
+            task.optionsChanged = True
         End If
+
+        Dim index1 As Integer, index2 As Integer, index3 As Integer
+        index1 = delaunay.dst1.Get(Of Byte)(task.lpD.p1.Y, task.lpD.p1.X)
+        index2 = delaunay.dst1.Get(Of Byte)(task.lpD.center.Y, task.lpD.center.X)
+        index3 = delaunay.dst1.Get(Of Byte)(task.lpD.p2.Y, task.lpD.p2.X)
+
+        dst3.SetTo(0)
+        dst3.FillConvexPoly(delaunay.facetList(index1), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
+        dst3.FillConvexPoly(delaunay.facetList(index2), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
+        dst3.FillConvexPoly(delaunay.facetList(index3), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
+        DrawLine(dst3, task.lpD)
 
         info.Run(emptyMat)
-        dst1 = info.dst2
+        dst2 = info.dst2
         SetTrueText(info.strOut, 3)
 
-        If standaloneTest() Then
-            For Each lp In task.lines.lpList
-                index1 = delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-                index2 = delaunay.dst1.Get(Of Byte)(lp.center.Y, lp.center.X)
-                index3 = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+        For Each lp In task.lines.lpList
+            index1 = delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+            index2 = delaunay.dst1.Get(Of Byte)(lp.center.Y, lp.center.X)
+            index3 = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
 
-                dst2.FillConvexPoly(delaunay.facetList(index1), task.scalarColors(lp.index), cv.LineTypes.Link4)
-                dst2.FillConvexPoly(delaunay.facetList(index2), task.scalarColors(lp.index), cv.LineTypes.Link4)
-                dst2.FillConvexPoly(delaunay.facetList(index3), task.scalarColors(lp.index), cv.LineTypes.Link4)
-            Next
+            dst1.FillConvexPoly(delaunay.facetList(index1), task.scalarColors(lp.index), cv.LineTypes.Link4)
+            dst1.FillConvexPoly(delaunay.facetList(index2), task.scalarColors(lp.index), cv.LineTypes.Link4)
+            dst1.FillConvexPoly(delaunay.facetList(index3), task.scalarColors(lp.index), cv.LineTypes.Link4)
+        Next
 
-            For Each lp In task.lines.lpList
-                DrawLine(dst2, lp)
-                DrawLine(dst1, lp)
-            Next
+        For Each lp In task.lines.lpList
+            DrawLine(dst2, lp)
+            DrawLine(dst1, lp)
+        Next
 
-            For Each pts In delaunay.facetList
-                DrawContour(dst2, pts, white, 1)
-            Next
-        End If
+        For Each pts In delaunay.facetList
+            DrawContour(dst1, pts, white, 1)
+        Next
     End Sub
 End Class
 

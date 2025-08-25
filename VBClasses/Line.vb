@@ -1104,7 +1104,7 @@ End Class
 
 
 Public Class Line_Select : Inherits TaskParent
-    Public delaunay As New Delaunay_Lines
+    Public delaunay As New Delaunay_LineSelect
     Public Sub New()
         desc = "Select a line with mouse movement and put the selection into task.lpD."
     End Sub
@@ -1123,7 +1123,7 @@ End Class
 
 
 Public Class Line_Select3D : Inherits TaskParent
-    Public delaunay As New Delaunay_Lines
+    Public delaunay As New Delaunay_LineSelect
     Public Sub New()
         desc = "Recompute each 3D pixel on the selected RGB line."
     End Sub

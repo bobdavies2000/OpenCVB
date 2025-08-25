@@ -175,7 +175,7 @@ End Class
 
 Public Class Line3D_ReconstructLine : Inherits TaskParent
     Public findLine3D As New FindNonZero_Line3D
-    Public selectLine As New Line_Select
+    Public selectLine As New Delaunay_LineSelect
     Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
     Public Sub New()
         desc = "Build the 3D lines found in Line_Basics"
@@ -185,19 +185,22 @@ Public Class Line3D_ReconstructLine : Inherits TaskParent
         dst2 = selectLine.dst2
         labels(2) = selectLine.labels(2)
 
-        findLine3D.lp = task.lpD
-        findLine3D.Run(src)
+        If task.lpD.age = 1 Or task.optionsChanged Then
+            findLine3D.lp = task.lpD
+            findLine3D.Run(src)
 
-        Dim veclist = findLine3D.veclist
-        If veclist.Count = 0 Then Exit Sub ' nothing to display...
-        Dim depthInit = veclist(0)(2)
-        Dim incr = (depthInit - veclist(veclist.Count - 1)(2)) / veclist.Count
-        pointcloud.SetTo(0)
-        For i = 0 To veclist.Count - 1
-            Dim pt = findLine3D.ptList(i)
-            Dim vec = getWorldCoordinates(pt, depthInit + incr * i)
-            pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
-        Next
+            Dim veclist = findLine3D.veclist
+            If veclist.Count = 0 Then Exit Sub ' nothing to display...
+            Dim depthInit = veclist(0)(2)
+            Dim incr = (depthInit - veclist(veclist.Count - 1)(2)) / veclist.Count
+            pointcloud.SetTo(0)
+            For i = 0 To veclist.Count - 1
+                Dim pt = findLine3D.ptList(i)
+                Dim vec = getWorldCoordinates(pt, depthInit + incr * i)
+                pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
+            Next
+        End If
+
         labels(2) = findLine3D.labels(2)
     End Sub
 End Class
@@ -209,7 +212,7 @@ End Class
 
 
 Public Class Line3D_ReconstructLines : Inherits TaskParent
-    Public findLine3D As New FindNonZero_Line3D
+    Public findPoints As New FindNonZero_Line3D
     Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
     Public lines3DList As New List(Of List(Of cv.Vec3f))
     Public Sub New()
@@ -218,31 +221,30 @@ Public Class Line3D_ReconstructLines : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static totalPixels As Integer
         task.FeatureSampleSize = 1000 ' use as many lines as are available.
-        If task.heartBeat Then
-            lines3DList.Clear()
-            pointcloud.SetTo(0)
-            totalPixels = 0
-        End If
-        findLine3D.firstFramePass = True
+        lines3DList.Clear()
+        pointcloud.SetTo(0)
+        totalPixels = 0
         For Each lp In task.lines.lpList
             If lp.age > 1 And task.heartBeat = False Then Continue For
-            findLine3D.lp = lp
-            findLine3D.Run(src)
 
-            Dim veclist = findLine3D.veclist
+            If lp.age = 1 Then
+                findPoints.lp = lp
+                findPoints.Run(src)
+            End If
+
+            Dim veclist = findPoints.veclist
             If veclist.Count = 0 Then Continue For
 
             Dim depthInit = veclist(0)(2)
             Dim incr = (depthInit - veclist(veclist.Count - 1)(2)) / veclist.Count
             Dim newLine3D As New List(Of cv.Vec3f)
             For i = 0 To veclist.Count - 1
-                Dim pt = findLine3D.ptList(i)
+                Dim pt = findPoints.ptList(i)
                 Dim vec = getWorldCoordinates(pt, depthInit + incr * i)
                 newLine3D.Add(vec)
                 pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
             Next
             lines3DList.Add(newLine3D)
-            findLine3D.firstFramePass = False
             totalPixels += newLine3D.Count
         Next
 

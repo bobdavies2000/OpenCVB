@@ -86,7 +86,7 @@ Public Class FindNonZero_Line3D : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then lp = task.lineLongest
 
-        If firstFramePass Then dst2.SetTo(0)
+        dst2.SetTo(0)
         dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
 
         Dim tmp As New cv.Mat

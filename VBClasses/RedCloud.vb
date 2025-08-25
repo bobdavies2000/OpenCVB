@@ -162,39 +162,10 @@ End Class
 
 
 
-
-'Public Class RedCloud_RedColor : Inherits TaskParent
-'    Dim contours As New RedCloud_Contours
-'    Public Sub New()
-'        desc = "Show the output of the RedCloud and RedColor cells."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        contours.Run(src)
-'        dst2 = contours.dst3
-'        labels(2) = contours.labels(2)
-
-'        If task.heartBeat Then
-'            For Each contour In contours.contourList
-'                SetTrueText(CStr(contour.index), contour.maxDist, 2)
-'            Next
-'        End If
-
-'        dst3 = task.contours.dst2
-'        dst3(task.contourD.rect).SetTo(white, task.contourD.mask)
-'        task.contourD = Contour_Basics.selectContour()
-'        labels(3) = task.contours.labels(2)
-'    End Sub
-'End Class
-
-
-
-
-
-
-
 Public Class RedCloud_Contours : Inherits TaskParent
     Dim prep As New RedPrep_Depth
     Public Sub New()
+        task.needContours = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub

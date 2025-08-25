@@ -11,6 +11,7 @@ Public Class VBtask : Implements IDisposable
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public contours As Contour_Basics_List
+    Public needContours As Boolean
     Public edges As EdgeLine_Basics
     Public grid As Grid_Basics
     Public bricks As Brick_Basics
@@ -735,7 +736,7 @@ Public Class VBtask : Implements IDisposable
 
         edges.Run(task.grayStable)
         colorizer.Run(src)
-        contours.Run(src.Clone)
+        If needContours Then contours.Run(src.Clone)
 
         If featureRunFlag Then task.feat.Run(src.Clone)
         If brickRunFlag Then

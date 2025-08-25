@@ -34,7 +34,6 @@ Public Class TaskParent : Implements IDisposable
     Public trueData As New List(Of TrueText)
     Public strOut As String
     Public emptyRect As New cv.Rect
-    Public firstFramePass As Boolean
     Public Sub New()
         traceName = Me.GetType.Name
 

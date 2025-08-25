@@ -529,6 +529,7 @@ End Class
 Public Class Distance_Contour : Inherits TaskParent
     Dim options As New Options_Distance
     Public Sub New()
+        task.needContours = True
         If standalone Then task.gOptions.displayDst0.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

@@ -127,7 +127,7 @@ End Class
 
 
 
-Public Class GL_Lines3D : Inherits TaskParent
+Public Class GL_Line3Dall : Inherits TaskParent
     Dim line3D As New Line3D_ReconstructLines
     Public Sub New()
         desc = "Visualize all the reconstructed 3D lines found in the RGB image."
