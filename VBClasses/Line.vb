@@ -989,7 +989,7 @@ End Class
 Public Class Line_BrickPoints : Inherits TaskParent
     Public sortLines As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public Sub New()
-        task.featureRunFlag = True
+        task.needFeatures = True
         desc = "Assign brick points to each of the lines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

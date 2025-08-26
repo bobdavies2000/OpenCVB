@@ -4,7 +4,7 @@ Public Class BrickLine_Basics : Inherits TaskParent
     Public edgeRequest As Boolean
     Public options As New Options_Features
     Public Sub New()
-        task.brickRunFlag = True
+        task.needBricks = True
         labels(2) = "Use 'Selected Feature' in 'Options_Features' to highlight different edges."
         desc = "Given lines or edges, build a grid of cells that cover them."
     End Sub

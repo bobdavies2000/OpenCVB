@@ -6,7 +6,7 @@ Public Class Feature_Basics : Inherits TaskParent
     Public feature2f As New List(Of cv.Point2f)
     Dim ptBrick As New BrickPoint_Minimum
     Public Sub New()
-        task.featureRunFlag = True
+        task.needFeatures = True
         desc = "Gather features from the sobel brick points and preserve those representing lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -48,7 +48,7 @@ Public Class Feature_BrickLine : Inherits TaskParent
     Public features As New List(Of cv.Point)
     Public Sub New()
         task.gOptions.LineWidth.Value = 3
-        task.featureRunFlag = True
+        task.needFeatures = True
         desc = "Find the lines implied in the brick points."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -606,7 +606,7 @@ End Class
 Public Class Feature_WithDepth : Inherits TaskParent
     Dim feat As New Feature_General
     Public Sub New()
-        task.brickRunFlag = True
+        task.needBricks = True
         desc = "Show the feature points that have depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

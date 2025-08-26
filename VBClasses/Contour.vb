@@ -145,7 +145,7 @@ End Class
 Public Class Contour_Features : Inherits TaskParent
     Public Sub New()
         task.needContours = True
-        task.featureRunFlag = True
+        task.needFeatures = True
         labels(3) = "Each of the feature points with their correlation coefficien"
         desc = "Show contours and features"
     End Sub

@@ -11,7 +11,6 @@ Public Class VBtask : Implements IDisposable
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public contours As Contour_Basics_List
-    Public needContours As Boolean
     Public edges As EdgeLine_Basics
     Public grid As Grid_Basics
     Public bricks As Brick_Basics
@@ -25,8 +24,9 @@ Public Class VBtask : Implements IDisposable
     Public colorizer As DepthColorizer_Basics
     Public feat As Feature_Basics
 
-    Public brickRunFlag As Boolean
-    Public featureRunFlag As Boolean
+    Public needBricks As Boolean
+    Public needFeatures As Boolean
+    Public needContours As Boolean
 
     Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
     Public rcOtherPixelColor = cv.Scalar.Yellow ' color for the 'other' class of redcloud cells.
@@ -738,8 +738,8 @@ Public Class VBtask : Implements IDisposable
         colorizer.Run(src)
         If needContours Then contours.Run(src.Clone)
 
-        If featureRunFlag Then task.feat.Run(src.Clone)
-        If brickRunFlag Then
+        If needFeatures Then task.feat.Run(src.Clone)
+        If needBricks Then
             If bricks Is Nothing Then bricks = New Brick_Basics
             bricks.Run(src.Clone)
         End If

@@ -1245,7 +1245,7 @@ End Class
 
 Public Class Depth_ErrorEstimate : Inherits TaskParent
     Public Sub New()
-        task.brickRunFlag = True
+        task.needBricks = True
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F)
         labels(2) = "Colorized depth error estimate for the current image"
         desc = "Provide an estimate of the error based on the depth - a linear estimate based on the '2% at 2 meters' statement."
@@ -1279,7 +1279,7 @@ End Class
 
 Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
     Public Sub New()
-        task.brickRunFlag = True
+        task.needBricks = True
         task.kalman = New Kalman_Basics
         ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
         labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}

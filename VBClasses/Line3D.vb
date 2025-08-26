@@ -115,7 +115,7 @@ End Class
 
 Public Class Line3D_Longest : Inherits TaskParent
     Public Sub New()
-        task.brickRunFlag = True
+        task.needBricks = True
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
     End Sub
@@ -173,6 +173,56 @@ End Class
 
 
 
+
+Public Class Line3D_ReconstructLines : Inherits TaskParent
+    Public findPoints As New FindNonZero_Line3D
+    Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+    Public lines3DList As New List(Of List(Of cv.Vec3f))
+    Public Sub New()
+        desc = "Build the 3D lines found in Line_Basics if there has been motion at their endpoints"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static totalPixels As Integer
+        task.FeatureSampleSize = 1000 ' use as many lines as are available.
+        lines3DList.Clear()
+        pointcloud.SetTo(0)
+        totalPixels = 0
+        For Each lp In task.lines.lpList
+            findPoints.lp = lp
+            findPoints.Run(src)
+
+            Dim veclist = findPoints.veclist
+            If veclist.Count = 0 Then Continue For
+
+            Dim depthInit = veclist(0)(2)
+            Dim incr = (depthInit - veclist(veclist.Count - 1)(2)) / veclist.Count
+            Dim newLine3D As New List(Of cv.Vec3f)
+            For i = 0 To veclist.Count - 1
+                Dim pt = findPoints.ptList(i)
+                If task.toggleOn Then
+                    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X))
+                Else
+                    Dim vec = getWorldCoordinates(pt, depthInit + incr * i)
+                    newLine3D.Add(vec)
+                    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
+                End If
+            Next
+            lines3DList.Add(newLine3D)
+            totalPixels += newLine3D.Count
+        Next
+
+        dst2 = task.lines.dst2
+        labels(2) = CStr(lines3DList.Count) + " lines were found and " + CStr(totalPixels) +
+                    " pixels were updated in the point cloud."
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class Line3D_ReconstructLine : Inherits TaskParent
     Public findLine3D As New FindNonZero_Line3D
     Public selectLine As New Delaunay_LineSelect
@@ -202,54 +252,5 @@ Public Class Line3D_ReconstructLine : Inherits TaskParent
         End If
 
         labels(2) = findLine3D.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Line3D_ReconstructLines : Inherits TaskParent
-    Public findPoints As New FindNonZero_Line3D
-    Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-    Public lines3DList As New List(Of List(Of cv.Vec3f))
-    Public Sub New()
-        desc = "Build the 3D lines found in Line_Basics if there has been motion at their endpoints"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static totalPixels As Integer
-        task.FeatureSampleSize = 1000 ' use as many lines as are available.
-        lines3DList.Clear()
-        pointcloud.SetTo(0)
-        totalPixels = 0
-        For Each lp In task.lines.lpList
-            If lp.age > 1 And task.heartBeat = False Then Continue For
-
-            If lp.age = 1 Then
-                findPoints.lp = lp
-                findPoints.Run(src)
-            End If
-
-            Dim veclist = findPoints.veclist
-            If veclist.Count = 0 Then Continue For
-
-            Dim depthInit = veclist(0)(2)
-            Dim incr = (depthInit - veclist(veclist.Count - 1)(2)) / veclist.Count
-            Dim newLine3D As New List(Of cv.Vec3f)
-            For i = 0 To veclist.Count - 1
-                Dim pt = findPoints.ptList(i)
-                Dim vec = getWorldCoordinates(pt, depthInit + incr * i)
-                newLine3D.Add(vec)
-                pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
-            Next
-            lines3DList.Add(newLine3D)
-            totalPixels += newLine3D.Count
-        Next
-
-        dst2 = task.lines.dst2
-        labels(2) = CStr(lines3DList.Count) + " lines were found and " + CStr(totalPixels) +
-                    " pixels were updated in the point cloud."
     End Sub
 End Class

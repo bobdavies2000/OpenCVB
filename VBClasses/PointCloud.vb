@@ -370,7 +370,7 @@ End Class
 
 Public Class PointCloud_GridInspector : Inherits TaskParent
     Public Sub New()
-        task.brickRunFlag = True
+        task.needBricks = True
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         task.mouseMovePoint.X = dst2.Width / 2
         desc = "Inspect x, y, and z values by brick"
@@ -633,7 +633,7 @@ End Class
 
 Public Class PointCloud_Continuous_GridX : Inherits TaskParent
     Public Sub New()
-        task.brickRunFlag = True
+        task.needBricks = True
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Show where the pointcloud is continuous at the brick resolution"
@@ -668,7 +668,7 @@ End Class
 
 Public Class PointCloud_Continuous_GridXY : Inherits TaskParent
     Public Sub New()
-        task.brickRunFlag = True
+        task.needBricks = True
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Show where the pointcloud is continuous at the brick resolution"
     End Sub

@@ -4,7 +4,7 @@ Public Class BrickPoint_Basics : Inherits TaskParent
     Public features As New List(Of cv.Point2f)
     Public ptList As New List(Of cv.Point)
     Public Sub New()
-        task.brickRunFlag = True
+        task.needBricks = True
         labels(3) = "Sobel input to BrickPoint_Basics"
         desc = "Find the max Sobel point in each brick"
     End Sub
@@ -136,7 +136,7 @@ End Class
 Public Class BrickPoint_DistanceAbove : Inherits TaskParent
     Dim plotHist As New Plot_Histogram
     Public Sub New()
-        task.brickRunFlag = True
+        task.needBricks = True
         plotHist.createHistogram = True
         plotHist.removeZeroEntry = False
         desc = "Show grid points based on their distance to the grid point above."

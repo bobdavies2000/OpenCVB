@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Intrinsics_Basics : Inherits TaskParent
     Public Sub New()
-        If standalone Then task.brickRunFlag = True
+        If standalone Then task.needBricks = True
         If standalone Then task.useGravityPointcloud = False
         desc = "Some cameras don't provide aligned color and left images.  This algorithm tries to align the left and color image."
     End Sub
