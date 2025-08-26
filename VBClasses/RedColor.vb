@@ -1738,7 +1738,7 @@ Public Class RedColor_GridCells : Inherits TaskParent
             If cTest <> black Then Continue For
             Dim c = dst1.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
             Dim color = New cv.Scalar(c(0), c(1), c(2))
-            If color = black Then color = task.rcOtherPixelColor
+            If color = black Then color = yellow
             rc.index = rcList.Count
             rc.color = color
             dst2(rc.rect).SetTo(rc.color, rc.mask)

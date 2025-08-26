@@ -285,7 +285,7 @@ Public Class RedCell_Generate : Inherits TaskParent
                 rc.maxDStable = lrc.maxDStable
 
                 If rc.pixels < task.rcPixelThreshold Then
-                    rc.color = task.rcOtherPixelColor
+                    rc.color = yellow
                 Else
                     ' verify that the maxDStable is still good.
                     Dim v1 = task.redC.rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
