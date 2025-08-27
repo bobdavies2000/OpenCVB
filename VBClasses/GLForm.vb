@@ -128,7 +128,7 @@ Public Class sgl
         Select Case func
             Case oCase.pcLines
                 gl.Begin(OpenGL.GL_POINTS)
-                Dim count As Integer, all255 As Boolean
+                Dim count As Integer
                 If RGB Is Nothing Then all255 = True
                 For y = 0 To pointcloud.Height - 1
                     For x = 0 To pointcloud.Width - 1
