@@ -82,7 +82,7 @@ End Class
 
 
 
-Public Class GL_Lines : Inherits TaskParent
+Public Class GL_LinesNoMotion : Inherits TaskParent
     Public Sub New()
         task.FeatureSampleSize = 1000 ' want all the lines 
         desc = "Build a 3D model of the lines found in the rgb data."
@@ -108,7 +108,7 @@ End Class
 
 
 
-Public Class GL_Lines1 : Inherits TaskParent
+Public Class GL_Lines : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)

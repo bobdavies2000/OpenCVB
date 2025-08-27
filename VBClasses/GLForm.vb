@@ -130,11 +130,9 @@ Public Class sgl
                 gl.Begin(OpenGL.GL_POINTS)
                 Dim count As Integer, all255 As Boolean
                 If RGB Is Nothing Then all255 = True
-                Dim split = pointcloud.Split()
-                Dim test = split(2).CountNonZero
                 For y = 0 To pointcloud.Height - 1
                     For x = 0 To pointcloud.Width - 1
-                        Dim vec As cv.Vec3f = pointcloud.At(Of cv.Vec3f)(y, x)
+                        Dim vec = pointcloud.Get(Of cv.Vec3f)(y, x)
                         If vec(2) <> 0 Then
                             If all255 Then
                                 gl.Color(1, 1, 1)
