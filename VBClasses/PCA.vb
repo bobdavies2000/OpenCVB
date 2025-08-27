@@ -986,9 +986,9 @@ Public Class PCA_LineMask : Inherits TaskParent
         If findLine3D.vecMat.Rows > 0 Then
             pca.pca_analysis = New cv.PCA(findLine3D.vecMat, New cv.Mat, cv.PCA.Flags.DataAsRow)
             strOut = pca.displayResults() + vbCrLf
-            strOut += "Anchor point " + lp.center.ToString + vbCrLf
-            DrawCircle(dst3, lp.center, 255)
-            dst3.Circle(lp.center, task.DotSize * 2, 255, -1, task.lineType)
+            strOut += "Anchor point " + lp.ptCenter.ToString + vbCrLf
+            DrawCircle(dst3, lp.ptCenter, 255)
+            dst3.Circle(lp.ptCenter, task.DotSize * 2, 255, -1, task.lineType)
         End If
 
         labels(3) = CStr(findLine3D.vecMat.Rows) + " samples were found for the selected line."

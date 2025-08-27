@@ -128,14 +128,14 @@ Public Class sgl
         Select Case func
             Case oCase.pcLines
                 gl.Begin(OpenGL.GL_POINTS)
-                Dim count As Integer
+                Dim count As Integer, all255 As Boolean
                 If RGB Is Nothing Then all255 = True
                 For y = 0 To pointcloud.Height - 1
                     For x = 0 To pointcloud.Width - 1
                         Dim vec = pointcloud.Get(Of cv.Vec3f)(y, x)
                         If vec(2) <> 0 Then
                             If all255 Then
-                                gl.Color(1, 1, 1)
+                                gl.Color(1.0, 1.0, 1.0)
                             Else
                                 Dim vec3b = RGB.Get(Of cv.Vec3b)(y, x)
                                 gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
@@ -153,7 +153,7 @@ Public Class sgl
                 For y = 0 To task.pointCloud.Height - 1
                     For x = 0 To task.pointCloud.Width - 1
                         Dim vec As cv.Vec3f = task.pointCloud.At(Of cv.Vec3f)(y, x)
-                        If vec(0) <> 0 Or vec(1) <> 0 Or vec(2) <> 0 Then
+                        If vec(2) <> 0 Then
                             Dim vec3b = task.color.Get(Of cv.Vec3b)(y, x)
                             gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
                             gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
@@ -173,6 +173,54 @@ Public Class sgl
                               task.sharpDepth.Data)
                 gl.Flush()
                 gl.Finish()
+            Case oCase.draw3DLines
+                gl.Color(1.0F, 1.0F, 1.0F)
+                gl.Begin(OpenGL.GL_LINES)
+
+                For Each lp In task.lines.lpList
+                    gl.Vertex(lp.p1Vec(0), lp.p1Vec(1), lp.p1Vec(2))
+                    gl.Vertex(lp.p2Vec(0), lp.p2Vec(1), lp.p2Vec(2))
+                Next
+                gl.End()
+                label = task.lines.labels(2)
+            Case oCase.drawPointCloudRGB
+                gl.Begin(OpenGL.GL_POINTS)
+
+                For y = 0 To task.pointCloud.Height - 1
+                    For x = 0 To task.pointCloud.Width - 1
+                        Dim vec As cv.Vec3f = task.pointCloud.At(Of cv.Vec3f)(y, x)
+                        If vec(0) <> 0 Or vec(1) <> 0 Or vec(2) <> 0 Then
+                            Dim vec3b = task.color.Get(Of cv.Vec3b)(y, x)
+                            gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
+                            gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
+                        End If
+                    Next
+                Next
+                gl.End()
+                label = CStr(task.pointCloud.Total) + " points were rendered."
+
+            Case oCase.draw3DLinesAndCloud
+                gl.Begin(OpenGL.GL_POINTS)
+                For y = 0 To pointcloud.Height - 1
+                    For x = 0 To pointcloud.Width - 1
+                        Dim vec = pointcloud.Get(Of cv.Vec3f)(y, x)
+                        If vec(2) <> 0 Then
+                            gl.Color(1.0, 1.0, 1.0)
+                            gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
+                        End If
+                    Next
+                Next
+                gl.End()
+
+                gl.Color(1.0F, 1.0F, 1.0F)
+                gl.Begin(OpenGL.GL_LINES)
+
+                For Each lp In task.lines.lpList
+                    gl.Vertex(lp.p1Vec(0), lp.p1Vec(1), lp.p1Vec(2))
+                    gl.Vertex(lp.p2Vec(0), lp.p2Vec(1), lp.p2Vec(2))
+                Next
+                gl.End()
+                label = task.lines.labels(2)
         End Select
 
         gl.Flush()

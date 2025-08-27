@@ -7,11 +7,11 @@ Public Class Gravity_Basics : Inherits TaskParent
         desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
     End Sub
     Public Shared Sub showVectors(dst As cv.Mat)
-        dst.Line(task.lineGravity.ep1, task.lineGravity.ep2, white, task.lineWidth, task.lineType)
-        dst.Line(task.lineHorizon.ep1, task.lineHorizon.ep2, white, task.lineWidth, task.lineType)
+        dst.Line(task.lineGravity.p1Ex, task.lineGravity.p2Ex, white, task.lineWidth, task.lineType)
+        dst.Line(task.lineHorizon.p1Ex, task.lineHorizon.p2Ex, white, task.lineWidth, task.lineType)
         If task.lineLongest IsNot Nothing Then
             dst.Line(task.lineLongest.p1, task.lineLongest.p2, task.highlight, task.lineWidth * 2, task.lineType)
-            DrawLine(dst, task.lineLongest.ep1, task.lineLongest.ep2, white)
+            DrawLine(dst, task.lineLongest.p1Ex, task.lineLongest.p2Ex, white)
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -111,7 +111,7 @@ Public Class Gravity_BasicsKalman : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         gravity.Run(src)
 
-        kalman.kInput = {task.lineGravity.ep1.X, task.lineGravity.ep1.Y, task.lineGravity.ep2.X, task.lineGravity.ep2.Y}
+        kalman.kInput = {task.lineGravity.p1Ex.X, task.lineGravity.p1Ex.Y, task.lineGravity.p2Ex.X, task.lineGravity.p2Ex.Y}
         kalman.Run(emptyMat)
         task.lineGravity = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
                                      New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3)))
@@ -258,7 +258,7 @@ Public Class Gravity_BasicsOld : Inherits TaskParent
             strOut += "Using the previous value for the gravity vector."
         Else
             Dim lp = New lpData(p1, p2)
-            task.lineGravity = New lpData(lp.ep1, lp.ep2)
+            task.lineGravity = New lpData(lp.p1Ex, lp.p2Ex)
             If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
         End If
 
@@ -310,7 +310,7 @@ Public Class Gravity_BasicsOriginal : Inherits TaskParent
         Dim p1 = findTransition(0, dst0.Height - 1, 1)
         Dim p2 = findTransition(dst0.Height - 1, 0, -1)
         Dim lp = New lpData(p1, p2)
-        vec = New lpData(lp.ep1, lp.ep2)
+        vec = New lpData(lp.p1Ex, lp.p2Ex)
 
         If p1.X >= 1 Then
             strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf + "      val =  " +

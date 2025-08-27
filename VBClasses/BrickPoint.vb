@@ -404,8 +404,8 @@ Public Class BrickPoint_EndPoints : Inherits TaskParent
         dst1.SetTo(0)
         Dim lineList As New List(Of Single)
         For Each lp In lplist
-            Dim p1 = lpData.validatePoint(New cv.Point(CInt(lp.ep1.Y), CInt(lp.ep1.X)))
-            Dim p2 = lpData.validatePoint(New cv.Point(CInt(lp.ep2.Y), CInt(lp.ep2.X)))
+            Dim p1 = lpData.validatePoint(New cv.Point(CInt(lp.p1Ex.Y), CInt(lp.p1Ex.X)))
+            Dim p2 = lpData.validatePoint(New cv.Point(CInt(lp.p2Ex.Y), CInt(lp.p2Ex.X)))
             Dim index1 = dst1.Get(Of Single)(p1.Y, p1.X)
             Dim index2 = dst1.Get(Of Single)(p2.Y, p2.X)
             If index1 = 0 And index2 = 0 Then
@@ -423,7 +423,7 @@ Public Class BrickPoint_EndPoints : Inherits TaskParent
 
         For Each index In lineList
             Dim lp = lplist(index)
-            DrawLine(dst2, lp.ep1, lp.ep2)
+            DrawLine(dst2, lp.p1Ex, lp.p2Ex)
         Next
     End Sub
 End Class

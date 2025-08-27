@@ -119,7 +119,7 @@ Public Class Line_Raw : Inherits TaskParent
                     p1 = lpData.validatePoint(p1)
                     p2 = lpData.validatePoint(p2)
                     Dim lp = New lpData(p1, p2)
-                    If lp.depthP1 > 0 And lp.depthP2 > 0 Then lpList.Add(lp)
+                    If lp.p1Vec(2) > 0 And lp.P2Vec(2) > 0 Then lpList.Add(lp)
                 End If
             End If
         Next
@@ -240,7 +240,7 @@ Public Class Line_Info : Inherits TaskParent
         strOut += "gridIndex1 = " + CStr(task.lpD.gridIndex1) + " gridIndex2 = " + CStr(task.lpD.gridIndex2) + vbCrLf
 
         strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
-        strOut += "ep1 = " + task.lpD.ep1.ToString + ", ep2 = " + task.lpD.ep2.ToString + vbCrLf + vbCrLf
+        strOut += "p1Ex = " + task.lpD.p1Ex.ToString + ", p2Ex = " + task.lpD.p2Ex.ToString + vbCrLf + vbCrLf
         strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
         strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
         strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
@@ -414,7 +414,7 @@ Public Class Line_TraceCenter : Inherits TaskParent
             Exit Sub
         End If
 
-        Static lpLast = New lpData(task.lineLongest.ep1, task.lineLongest.ep2)
+        Static lpLast = New lpData(task.lineLongest.p1Ex, task.lineLongest.p2Ex)
         Dim linePerp = Line_PerpendicularTest.computePerp(task.lineLongest)
 
         dst2 = src
@@ -430,7 +430,7 @@ Public Class Line_TraceCenter : Inherits TaskParent
         DrawCircle(dst3, trackPoint)
         DrawCircle(dst3, trackPoint)
 
-        lpLast = New lpData(task.lineLongest.ep1, task.lineLongest.ep2)
+        lpLast = New lpData(task.lineLongest.p1Ex, task.lineLongest.p2Ex)
     End Sub
 End Class
 
@@ -560,7 +560,7 @@ Public Class Line_Parallel : Inherits TaskParent
             For j = 0 To classes(i).Count - 1
                 Dim lp = task.lines.lpList(classes(i).ElementAt(j))
                 dst2.Line(lp.p1, lp.p2, task.scalarColors(colorIndex), task.lineWidth * 2, task.lineType)
-                SetTrueText(CStr(colorIndex), lp.center)
+                SetTrueText(CStr(colorIndex), lp.ptCenter)
             Next
             colorIndex += 1
         Next
@@ -568,7 +568,7 @@ Public Class Line_Parallel : Inherits TaskParent
         For Each index In unParallel
             Dim lp = task.lines.lpList(index)
             DrawLine(dst2, lp)
-            SetTrueText("0", lp.center)
+            SetTrueText("0", lp.ptCenter)
         Next
 
         dst3 = task.lines.dst2
@@ -633,10 +633,10 @@ Public Class Line_BrickList : Inherits TaskParent
                     angles.Add(lpTest.angle)
                     ptList.Add(pt)
                     ptList.Add(allPoints(j))
-                    epListX1.Add(lpTest.ep1.X)
-                    epListY1.Add(lpTest.ep1.Y)
-                    epListX2.Add(lpTest.ep2.X)
-                    epListY2.Add(lpTest.ep2.Y)
+                    epListX1.Add(lpTest.p1Ex.X)
+                    epListY1.Add(lpTest.p1Ex.Y)
+                    epListX2.Add(lpTest.p2Ex.X)
+                    epListY2.Add(lpTest.p2Ex.Y)
                 End If
             Next
         Next
@@ -824,7 +824,7 @@ Public Class Line_LeftRightMatch : Inherits TaskParent
         dst3 = lrLines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim r1 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-        Dim r2 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.center.Y, lp.center.X))
+        Dim r2 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
         Dim r3 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
         Dim depth1 = task.pcSplit(2)(r1).Mean().Val0
         Dim depth2 = task.pcSplit(2)(r2).Mean().Val0
@@ -833,7 +833,8 @@ Public Class Line_LeftRightMatch : Inherits TaskParent
         Dim disp2 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth2
         Dim disp3 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth3
 
-        Dim lp1 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y), New cv.Point2f(lp.center.X - disp2, lp.center.Y))
+        Dim lp1 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y),
+                             New cv.Point2f(lp.ptCenter.X - disp2, lp.ptCenter.Y))
         Dim lp2 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y), New cv.Point2f(lp.p2.X - disp3, lp.p2.Y))
         If Math.Abs(lp1.angle - lp2.angle) < task.angleThreshold Then lpOutput = lp2
         DrawLine(dst3, lpOutput.p1, lpOutput.p2, task.highlight, task.lineWidth + 1)
@@ -870,7 +871,7 @@ Public Class Line_LeftRightMatch3 : Inherits TaskParent
         For i = 0 To lplist.Count - 1
             lp = lplist(i)
             Dim r1 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            Dim r2 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.center.Y, lp.center.X))
+            Dim r2 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
             Dim r3 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
 
             Dim depth1 = task.pcSplit(2)(r1).Mean().Val0
@@ -885,8 +886,10 @@ Public Class Line_LeftRightMatch3 : Inherits TaskParent
             Dim disp2 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth2
             Dim disp3 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth3
 
-            Dim lp1 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y), New cv.Point2f(lp.center.X - disp2, lp.center.Y))
-            Dim lp2 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y), New cv.Point2f(lp.p2.X - disp3, lp.p2.Y))
+            Dim lp1 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y),
+                                 New cv.Point2f(lp.ptCenter.X - disp2, lp.ptCenter.Y))
+            Dim lp2 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y),
+                                 New cv.Point2f(lp.p2.X - disp3, lp.p2.Y))
             If Math.Abs(lp1.angle - lp2.angle) >= task.angleThreshold Then Continue For
 
             Dim lpOut = lp2
@@ -916,7 +919,7 @@ Public Class Line_TestAge : Inherits TaskParent
         Dim matched As New List(Of Integer)
         For Each lp In knnLine.lpOutput
             If lp.age > 1 Then matched.Add(lp.index)
-            SetTrueText(CStr(lp.age), lp.center, 3)
+            SetTrueText(CStr(lp.age), lp.ptCenter, 3)
         Next
 
         Static strList As New List(Of String)
@@ -976,7 +979,7 @@ Public Class Line_Stabilize : Inherits TaskParent
         stable.Run(src)
         dst2 = stable.dst2
         DrawLine(dst2, stable.lp)
-        SetTrueText("Age = " + CStr(stable.lp.age), stable.lp.center)
+        SetTrueText("Age = " + CStr(stable.lp.age), stable.lp.ptCenter)
 
         stable.lpLast = stable.lp
     End Sub
@@ -1060,8 +1063,8 @@ Public Class Line_Generations : Inherits TaskParent
             End If
             lp.age = age
             lpOutput.Add(lp)
-            SetTrueText(CStr(lp.age), lp.center, 2)
-            SetTrueText(CStr(lp.age), lp.center, 3)
+            SetTrueText(CStr(lp.age), lp.ptCenter, 2)
+            SetTrueText(CStr(lp.age), lp.ptCenter, 3)
         Next
 
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
@@ -1086,7 +1089,7 @@ Public Class Line_KNN : Inherits TaskParent
         knn.queries.Clear()
         For Each lp In task.lines.lpList
             knn.trainInput.Add(lp.p1)
-            knn.trainInput.Add(lp.center)
+            knn.trainInput.Add(lp.ptCenter)
             knn.trainInput.Add(lp.p2)
         Next
 

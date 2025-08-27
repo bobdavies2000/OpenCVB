@@ -1,6 +1,4 @@
-﻿Imports System.Runtime.InteropServices
-Imports SharpGL.SceneGraph.Lighting
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class GL_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Display the pointcloud"
@@ -8,6 +6,28 @@ Public Class GL_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         strOut = task.sharpGL.RunSharp(oCase.drawPointCloudRGB)
         SetTrueText(strOut, 2)
+    End Sub
+End Class
+
+
+
+
+Public Class GL_LinesNoMotionInput : Inherits TaskParent
+    Public Sub New()
+        task.FeatureSampleSize = 1000 ' want all the lines 
+        desc = "Build a 3D model of the lines found in the rgb data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
+        dst2 = task.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        labels(2) = task.lines.labels(2)
+
+        dst0 = src
+        dst0.SetTo(0, Not dst2)
+
+        strOut = task.sharpGL.RunSharp(oCase.pcLines, dst0)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -82,38 +102,52 @@ End Class
 
 
 
-Public Class GL_LinesNoMotion : Inherits TaskParent
-    Public Sub New()
-        task.FeatureSampleSize = 1000 ' want all the lines 
-        desc = "Build a 3D model of the lines found in the rgb data."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
-        dst2 = task.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        labels(2) = task.lines.labels(2)
-
-        dst0 = src
-        dst0.SetTo(0, Not dst2)
-
-        If standalone Then
-            dst1.SetTo(white)
-            strOut = task.sharpGL.RunSharp(oCase.pcLines, dst0, dst1)
-            SetTrueText(strOut, 3)
-        End If
-    End Sub
-End Class
-
-
-
-
-
 Public Class GL_Lines : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
         task.FeatureSampleSize = 1000 ' want all the lines 
         desc = "Build a 3D model of the lines using the task.lines.lplist."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim pointcloud = src
+        If pointcloud.Type <> cv.MatType.CV_32FC3 Then pointcloud = task.pointCloud.Clone
+
+        Static count As Integer
+        If task.heartBeatLT Then
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            count = 0
+        End If
+
+        Dim mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        For Each lp In task.lines.lpList
+            If lp.age = 1 Or task.heartBeatLT Then
+                mask(lp.rect).SetTo(0)
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth)
+                pointcloud(lp.rect).CopyTo(dst3(lp.rect), dst2(lp.rect))
+                count += dst2(lp.rect).CountNonZero
+            End If
+        Next
+
+        labels(2) = task.lines.labels(2)
+        labels(3) = CStr(count) + " pixels from the point cloud were moved to the GL input. "
+
+        dst1.SetTo(white)
+        strOut = task.sharpGL.RunSharp(oCase.pcLines, dst3, dst1)
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+Public Class GL_LinesReconstructed : Inherits TaskParent
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
+        task.FeatureSampleSize = 1000 ' want all the lines 
+        desc = "Rework the point cloud data for lines to be linear in depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim pointcloud = src
@@ -149,6 +183,7 @@ End Class
 
 
 
+
 Public Class GL_Line3D : Inherits TaskParent
     Dim line3D As New Line3D_ReconstructLine
     Public Sub New()
@@ -162,7 +197,7 @@ Public Class GL_Line3D : Inherits TaskParent
         dst1.SetTo(white)
 
         strOut = task.sharpGL.RunSharp(oCase.pcLines, line3D.pointcloud, dst1)
-        SetTrueText(strOut, 2)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -183,5 +218,44 @@ Public Class GL_Line3Dall : Inherits TaskParent
 
         strOut = task.sharpGL.RunSharp(oCase.pcLines, line3D.pointcloud, dst1)
         SetTrueText(strOut, 2)
+    End Sub
+End Class
+
+
+
+
+Public Class GL_Draw3DLines : Inherits TaskParent
+    Public Sub New()
+        task.featureOptions.FeatureSampleSize.Value = task.featureOptions.FeatureSampleSize.Maximum
+        desc = "Draw the RGB lines in SharpGL"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.lines.dst2
+        strOut = task.sharpGL.RunSharp(oCase.draw3DLines)
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+Public Class GL_Draw3DLinesAndCloud : Inherits TaskParent
+    Dim line3D As New Line3D_ReconstructLines
+    Public Sub New()
+        task.featureOptions.FeatureSampleSize.Value = task.featureOptions.FeatureSampleSize.Maximum
+        desc = "Draw the RGB lines in SharpGL and include the line points."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
+        dst2 = task.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        labels(2) = task.lines.labels(2)
+
+        dst0 = src
+        dst0.SetTo(0, Not dst2)
+
+        strOut = task.sharpGL.RunSharp(oCase.draw3DLinesAndCloud, dst0)
+        SetTrueText(strOut, 3)
+
+        dst2 = task.lines.dst2
     End Sub
 End Class

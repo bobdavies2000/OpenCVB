@@ -459,17 +459,16 @@ Public Class VBtask : Implements IDisposable
         HomeDir = parms.HomeDir
         main_hwnd = parms.main_hwnd
 
+        task.rgbLeftAligned = True
+        If task.cameraName.Contains("RealSense") Then task.rgbLeftAligned = False
+
         ' set options for specific cameras here.
-        Select Case task.cameraName
-            Case "StereoLabs ZED 2/2i"
-                task.rgbLeftAligned = True
-            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
-                task.rgbLeftAligned = True
-            Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
-                task.rgbLeftAligned = False
-            Case "Oak-D camera"
-                task.rgbLeftAligned = True
-        End Select
+        'Select Case task.cameraName
+        '    Case "StereoLabs ZED 2/2i"
+        '    Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
+        '    Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
+        '    Case "Oak-D camera"
+        'End Select
 
         mainFormLocation = parms.mainFormLocation
         displayRes = parms.displayRes
@@ -850,7 +849,7 @@ Public Class VBtask : Implements IDisposable
             If gOptions.CrossHairs.Checked Then
                 Gravity_Basics.showVectors(dst0)
                 Dim lp = lineLongest
-                Dim pt = New cv.Point2f((lp.ep1.X + lp.ep2.X) / 2 + 5, (lp.ep1.Y + lp.ep2.Y) / 2)
+                Dim pt = New cv.Point2f((lp.p1Ex.X + lp.p2Ex.X) / 2 + 5, (lp.p1Ex.Y + lp.p2Ex.Y) / 2)
                 displayObject.trueData.Add(New TrueText("Longest", pt, 0))
             End If
 

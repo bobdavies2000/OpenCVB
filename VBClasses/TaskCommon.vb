@@ -217,29 +217,30 @@ End Enum
 
 
 Public Enum oCase
-    drawPointCloudRGB = 0
-    drawLineAndCloud = 1
-    drawFloor = 2
-    trianglesAndColor = 3
-    drawPyramid = 4
-    drawCube = 5
-    quadBasics = 6
-    minMaxBlocks = 7
-    drawTiles = 8
-    drawCell = 9
-    drawCells = 10
-    floorStudy = 11
-    data3D = 12
-    sierpinski = 13
-    polygonCell = 14
-    Histogram3D = 15
-    pcPoints = 16
-    pcLines = 17
-    pcPointsAlone = 18
-    drawLines = 19
-    drawAvgPointCloudRGB = 20
-    readPointCloud = 21
-    pcLines1 = 22
+    drawPointCloudRGB
+    drawLineAndCloud
+    drawFloor
+    trianglesAndColor
+    drawPyramid
+    drawCube
+    quadBasics
+    minMaxBlocks
+    drawTiles
+    drawCell
+    drawCells
+    floorStudy
+    data3D
+    sierpinski
+    polygonCell
+    Histogram3D
+    pcPoints
+    pcLines
+    pcPointsAlone
+    drawLines
+    drawAvgPointCloudRGB
+    readPointCloud
+    draw3DLines
+    draw3DLinesAndCloud
 End Enum
 
 
@@ -619,16 +620,16 @@ Public Class lpData
     Public age As Integer
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
-    Public depthP1 As Single
-    Public depthP2 As Single
-    Public ep1 As cv.Point2f ' end points - goes to the edge of the image.
-    Public ep2 As cv.Point2f ' end points - goes to the edge of the image.
+    Public p1Vec As cv.Vec3f
+    Public p2Vec As cv.Vec3f
+    Public p1Ex As cv.Point2f ' end points - goes to the edge of the image.
+    Public p2Ex As cv.Point2f ' end points - goes to the edge of the image.
     Public length As Single
     Public rect As cv.Rect
     Public roRect As cv.RotatedRect
     Public slope As Single ' max is 100000 for vertical lines - adequate for use here.
     Public angle As Single ' varies from -90 to 90 degrees
-    Public center As cv.Point2f
+    Public ptCenter As cv.Point2f
     Public ID As Integer
     Public gridIndex1 As Integer
     Public gridIndex2 As Integer
@@ -676,7 +677,7 @@ Public Class lpData
         angle = CType(angleRadians * (180.0 / Math.PI), Single)
         If angle >= 90.0 Then angle -= 180.0
         If angle < -90.0 Then angle += 180.0
-        roRect = New cv.RotatedRect(center, outSize, angle)
+        roRect = New cv.RotatedRect(ptCenter, outSize, angle)
         angle *= -1
         rect = ValidateRect(roRect.BoundingRect)
         If rect.Width <= 15 Then
@@ -703,8 +704,8 @@ Public Class lpData
             p2 = ptTemp
         End If
 
-        depthP1 = task.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
-        depthP2 = task.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
+        p1Vec = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
+        p2Vec = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
 
         If p1.X = p2.X Then
             slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
@@ -723,8 +724,8 @@ Public Class lpData
         If p1.X <> p2.X Then
             Dim b = p1.Y - p1.X * slope
             If p1.Y = p2.Y Then
-                ep1 = New cv.Point2f(0, p1.Y)
-                ep2 = New cv.Point2f(task.workRes.Width, p1.Y)
+                p1Ex = New cv.Point2f(0, p1.Y)
+                p2Ex = New cv.Point2f(task.workRes.Width, p1.Y)
             Else
                 Dim x1 = -b / slope
                 Dim x2 = (task.workRes.Height - b) / slope
@@ -736,18 +737,18 @@ Public Class lpData
                 If x2 >= 0 And x2 <= task.workRes.Width Then pts.Add(New cv.Point2f(x2, task.workRes.Height))
                 If y1 >= 0 And y1 <= task.workRes.Height Then pts.Add(New cv.Point2f(0, y1))
                 If y2 >= 0 And y2 <= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width, y2))
-                ep1 = pts(0)
+                p1Ex = pts(0)
                 If pts.Count < 2 Then
                     If CInt(x2) >= task.workRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workRes.Height))
                     If CInt(y2) >= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width, CInt(y2)))
                 End If
-                ep2 = pts(1)
+                p2Ex = pts(1)
             End If
         Else
-            ep1 = New cv.Point2f(p1.X, 0)
-            ep2 = New cv.Point2f(p1.X, task.workRes.Height)
+            p1Ex = New cv.Point2f(p1.X, 0)
+            p2Ex = New cv.Point2f(p1.X, task.workRes.Height)
         End If
-        center = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
+        ptCenter = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 
         CalculateRotatedRectFromLine()
 
