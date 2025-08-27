@@ -7,22 +7,23 @@ Imports System.Runtime.InteropServices
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
+    Public ogl As XO_OpenGL_Basics
     Public redC As RedColor_Basics
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
-    Public contours As Contour_Basics_List
     Public edges As EdgeLine_Basics
     Public grid As Grid_Basics
-    Public bricks As Brick_Basics
     Public palette As Palette_LoadColorMap
     Public PixelViewer As Pixel_Viewer
     Public rgbFilter As Filter_Basics
-    Public ogl As XO_OpenGL_Basics
     Public gravityBasics As Gravity_Basics
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
     Public colorizer As DepthColorizer_Basics
+
     Public feat As Feature_Basics
+    Public bricks As Brick_Basics
+    Public contours As Contour_Basics_List
 
     Public needBricks As Boolean
     Public needFeatures As Boolean
