@@ -215,9 +215,12 @@ Public Class sgl
                 gl.Color(1.0F, 1.0F, 1.0F)
                 gl.Begin(OpenGL.GL_LINES)
 
+                Dim factor = 1 / options.zFar - options.zNear
                 For Each lp In task.lines.lpList
                     gl.Vertex(lp.p1Vec(0), lp.p1Vec(1), lp.p1Vec(2))
                     gl.Vertex(lp.p2Vec(0), lp.p2Vec(1), lp.p2Vec(2))
+                    'gl.Vertex(lp.p2Vec(0), lp.p2Vec(1), lp.p2Vec(2) * factor + options.zNear)                    gl.Vertex(lp.p1Vec(0), lp.p1Vec(1), lp.p1Vec(2) * factor + options.zNear)
+                    'gl.Vertex(lp.p2Vec(0), lp.p2Vec(1), lp.p2Vec(2) * factor + options.zNear)
                 Next
                 gl.End()
                 label = task.lines.labels(2)
