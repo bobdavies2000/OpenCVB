@@ -1,20 +1,21 @@
-Imports cv = OpenCvSharp
 Imports System.Windows.Forms
+Imports SharpGL.SceneGraph.Raytracing
+Imports cv = OpenCvSharp
 Public Class Filter_Basics : Inherits TaskParent
     Public filterList As String() = {"Original", "PhotoShop_HSV", "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance"
                                      }
     Dim filters(filterList.Count - 1) As Object
     Public grayFilter As New Filter_BasicsGray
-    Public filterIndex As Integer = -1
     Public Sub New()
-        desc = "Demo the RGB Filters selected in 'FeatureOptions'.  If none selected, just the input is displayed."
+        desc = "Filter the input for algorithm or set the defaults."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.Clone
+        Dim filterIndex As Integer
         For Each cb In task.featureOptions.colorCheckbox
             If cb.Checked Then
                 Select Case cb.Text
                     Case "Original"
+                        dst2 = task.color
                     Case "PhotoShop_WhiteBalance"
                         If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New PhotoShop_WhiteBalance
                     Case "PhotoShop_SharpenDetail"
@@ -31,9 +32,13 @@ Public Class Filter_Basics : Inherits TaskParent
             filters(filterIndex).run(dst2)
             dst2 = filters(filterIndex).dst2
         End If
+
         grayFilter.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         labels(3) = grayFilter.labels(2)
         dst3 = grayFilter.dst2
+
+        task.color = dst2
+        task.gray = dst3
     End Sub
 End Class
 

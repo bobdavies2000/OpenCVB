@@ -710,18 +710,6 @@ Public Class VBtask : Implements IDisposable
         motionBasics.Run(src)
 
         rgbFilter.Run(task.color)
-        If rgbFilter.filterIndex > 0 Then
-            task.color = rgbFilter.dst2
-            src = rgbFilter.dst2
-            gray = rgbFilter.dst3
-        ElseIf rgbFilter.grayFilter.filterIndex > 0 Then
-            rgbFilter.grayFilter.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            gray = rgbFilter.grayFilter.dst2
-            src = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        Else
-            src = task.color
-            gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        End If
         If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
 
         edges.Run(task.grayStable)
