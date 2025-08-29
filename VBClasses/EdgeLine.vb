@@ -55,7 +55,7 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         Next
         labels(2) = CStr(classCount) + " segments were found using " + CStr(pointCount) + " points."
 
-        If standaloneTest() Then dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst3 = ShowPaletteNoZero(dst2)
     End Sub
     Public Sub Close()
         EdgeLineRaw_Close(cPtr)
