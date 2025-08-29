@@ -78,29 +78,6 @@ Public Class sgl
     Private Sub sgl_Closed(sender As Object, e As EventArgs) Handles Me.Closed
         task.closeRequest = True
     End Sub
-    Private Function displayQuads() As String
-        gl.Begin(OpenGL.GL_QUADS)
-
-        Dim count As Integer
-        For i = 0 To task.gridRects.Count - 1
-            Dim rect = task.gridRects(i)
-            Dim depth = -task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
-            If depth = 0 Then Continue For
-            count += 1
-            Dim color = task.color(rect).Mean()
-
-            gl.Color(CSng(color(2) / 255), CSng(color(1) / 255), CSng(color(0) / 255))
-            Dim p0 = getWorldCoordinates(rect.TopLeft, depth)
-            Dim p1 = getWorldCoordinates(rect.BottomRight, depth)
-            gl.Vertex(p0.X, p0.Y, depth)
-            gl.Vertex(p1.X, p0.Y, depth)
-            gl.Vertex(p1.X, p1.Y, depth)
-            gl.Vertex(p0.X, p1.Y, depth)
-        Next
-
-        gl.End()
-        Return CStr(count) + " grid rects had depth."
-    End Function
     Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
         options.Run()
 
@@ -126,7 +103,22 @@ Public Class sgl
 
         Dim label = ""
         Select Case func
-            Case oCase.pcLines
+            Case Comm.oCase.drawPointCloudRGB
+                gl.Begin(OpenGL.GL_POINTS)
+
+                For y = 0 To task.pointCloud.Height - 1
+                    For x = 0 To task.pointCloud.Width - 1
+                        Dim vec As cv.Vec3f = task.pointCloud.At(Of cv.Vec3f)(y, x)
+                        If vec(2) <> 0 Then
+                            Dim vec3b = task.color.Get(Of cv.Vec3b)(y, x)
+                            gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
+                            gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
+                        End If
+                    Next
+                Next
+                gl.End()
+                label = CStr(task.pointCloud.Total) + " points were rendered."
+            Case Comm.oCase.pcLines
                 gl.Begin(OpenGL.GL_POINTS)
                 Dim count As Integer, all255 As Boolean
                 If RGB Is Nothing Then all255 = True
@@ -147,33 +139,38 @@ Public Class sgl
                 Next
                 gl.End()
                 label = CStr(count) + " points were rendered for the selected line(s)."
-            Case oCase.drawPointCloudRGB
-                gl.Begin(OpenGL.GL_POINTS)
+            Case Comm.oCase.quadBasics, Comm.oCase.readPointCloud
+                gl.Begin(OpenGL.GL_QUADS)
 
-                For y = 0 To task.pointCloud.Height - 1
-                    For x = 0 To task.pointCloud.Width - 1
-                        Dim vec As cv.Vec3f = task.pointCloud.At(Of cv.Vec3f)(y, x)
-                        If vec(2) <> 0 Then
-                            Dim vec3b = task.color.Get(Of cv.Vec3b)(y, x)
-                            gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
-                            gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
-                        End If
-                    Next
+                Dim count As Integer
+                For i = 0 To task.gridRects.Count - 1
+                    Dim rect = task.gridRects(i)
+                    Dim depth = -task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
+                    If depth = 0 Then Continue For
+                    count += 1
+                    Dim color = task.color(rect).Mean()
+
+                    gl.Color(CSng(color(2) / 255), CSng(color(1) / 255), CSng(color(0) / 255))
+                    Dim p0 = getWorldCoordinates(rect.TopLeft, depth)
+                    Dim p1 = getWorldCoordinates(rect.BottomRight, depth)
+                    gl.Vertex(p0.X, p0.Y, depth)
+                    gl.Vertex(p1.X, p0.Y, depth)
+                    gl.Vertex(p1.X, p1.Y, depth)
+                    gl.Vertex(p0.X, p1.Y, depth)
                 Next
-                gl.End()
-                label = CStr(task.pointCloud.Total) + " points were rendered."
-            Case oCase.quadBasics
-                label = displayQuads()
-            Case oCase.readPointCloud
-                label = displayQuads()
-                task.sharpDepth = New cv.Mat(Height, Width, cv.MatType.CV_32F)
 
-                Dim depthBuffer(Width, Height) As Single
-                gl.ReadPixels(0, 0, Width, Height, OpenGL.GL_DEPTH_COMPONENT, OpenGL.GL_FLOAT,
-                              task.sharpDepth.Data)
-                gl.Flush()
-                gl.Finish()
-            Case oCase.draw3DLines
+                gl.End()
+                label = CStr(count) + " grid rects had depth."
+                If func = Comm.oCase.readPointCloud Then
+                    task.sharpDepth = New cv.Mat(Height, Width, cv.MatType.CV_32F)
+
+                    Dim depthBuffer(Width, Height) As Single
+                    gl.ReadPixels(0, 0, Width, Height, OpenGL.GL_DEPTH_COMPONENT, OpenGL.GL_FLOAT,
+                                  task.sharpDepth.Data)
+                    gl.Flush()
+                    gl.Finish()
+                End If
+            Case Comm.oCase.draw3DLines
                 gl.Color(1.0F, 1.0F, 1.0F)
                 gl.Begin(OpenGL.GL_LINES)
 
@@ -183,23 +180,7 @@ Public Class sgl
                 Next
                 gl.End()
                 label = task.lines.labels(2)
-            Case oCase.drawPointCloudRGB
-                gl.Begin(OpenGL.GL_POINTS)
-
-                For y = 0 To task.pointCloud.Height - 1
-                    For x = 0 To task.pointCloud.Width - 1
-                        Dim vec As cv.Vec3f = task.pointCloud.At(Of cv.Vec3f)(y, x)
-                        If vec(0) <> 0 Or vec(1) <> 0 Or vec(2) <> 0 Then
-                            Dim vec3b = task.color.Get(Of cv.Vec3b)(y, x)
-                            gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
-                            gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
-                        End If
-                    Next
-                Next
-                gl.End()
-                label = CStr(task.pointCloud.Total) + " points were rendered."
-
-            Case oCase.draw3DLinesAndCloud
+            Case Comm.oCase.draw3DLinesAndCloud
                 gl.Begin(OpenGL.GL_POINTS)
                 For y = 0 To pointcloud.Height - 1
                     For x = 0 To pointcloud.Width - 1

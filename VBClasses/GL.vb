@@ -4,8 +4,21 @@ Public Class GL_Basics : Inherits TaskParent
         desc = "Display the pointcloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(oCase.drawPointCloudRGB)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.drawPointCloudRGB)
         SetTrueText(strOut, 2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class GL_BasicsMain : Inherits TaskParent
+    Public Sub New()
+        desc = "Display the pointcloud in the main form"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        task.sharpGLRequest = Comm.oCase.drawPointCloudRGB
     End Sub
 End Class
 
@@ -26,7 +39,7 @@ Public Class GL_LinesNoMotionInput : Inherits TaskParent
         dst0 = src
         dst0.SetTo(0, Not dst2)
 
-        strOut = task.sharpGL.RunSharp(oCase.pcLines, dst0)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, dst0)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -41,7 +54,7 @@ Public Class GL_Bricks : Inherits TaskParent
         desc = "Display the bricks in SharpGL"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(oCase.quadBasics)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.quadBasics)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -60,7 +73,7 @@ Public Class GL_ReadPointCloud : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim mm = GetMinMax(task.pcSplit(2))
 
-        strOut = task.sharpGL.RunSharp(oCase.readPointCloud)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.readPointCloud)
         SetTrueText(strOut, 2)
 
         Dim count As Integer
@@ -92,7 +105,7 @@ Public Class GL_StructuredLines : Inherits TaskParent
         dst0.SetTo(0, Not dst2)
         dst1.SetTo(white)
 
-        strOut = task.sharpGL.RunSharp(oCase.pcLines, dst0, dst1)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, dst0, dst1)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -134,7 +147,7 @@ Public Class GL_Lines : Inherits TaskParent
         labels(3) = CStr(count) + " pixels from the point cloud were moved to the GL input. "
 
         dst1.SetTo(white)
-        strOut = task.sharpGL.RunSharp(oCase.pcLines, dst3, dst1)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, dst3, dst1)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -174,7 +187,7 @@ Public Class GL_LinesReconstructed : Inherits TaskParent
         labels(3) = CStr(count) + " pixels from the point cloud were moved to the GL input. "
 
         dst1.SetTo(white)
-        strOut = task.sharpGL.RunSharp(oCase.pcLines, dst3, dst1)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, dst3, dst1)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -196,7 +209,7 @@ Public Class GL_Line3D : Inherits TaskParent
 
         dst1.SetTo(white)
 
-        strOut = task.sharpGL.RunSharp(oCase.pcLines, line3D.pointcloud, dst1)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, line3D.pointcloud, dst1)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -216,7 +229,7 @@ Public Class GL_Line3Dall : Inherits TaskParent
 
         dst1.SetTo(white)
 
-        strOut = task.sharpGL.RunSharp(oCase.pcLines, line3D.pointcloud, dst1)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, line3D.pointcloud, dst1)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -231,7 +244,7 @@ Public Class GL_Draw3DLines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.lines.dst2
-        strOut = task.sharpGL.RunSharp(oCase.draw3DLines)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.draw3DLines)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -253,7 +266,7 @@ Public Class GL_Draw3DLinesAndCloud : Inherits TaskParent
         dst0 = src
         dst0.SetTo(0, Not dst2)
 
-        strOut = task.sharpGL.RunSharp(oCase.draw3DLinesAndCloud, dst0)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.draw3DLinesAndCloud, dst0)
         SetTrueText(strOut, 3)
 
         dst2 = task.lines.dst2

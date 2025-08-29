@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Options
-    Public cameraRadioButton(Main.cameraNames.Count - 1) As RadioButton
+    Public cameraRadioButton(Comm.cameraNames.Count - 1) As RadioButton
     Public workResRadio(resolutionList.Count - 1) As RadioButton
     Public cameraworkRes As cv.Size
     Public cameraDisplayRes As cv.Size
@@ -40,7 +40,7 @@ Public Class Options
     End Sub
     Public Sub defineCameraResolutions(index As Integer)
         ' see resolutionList above - helps to see how code maps to layout of the resolutions.
-        Select Case Main.cameraNames(index)
+        Select Case Comm.cameraNames(index)
             Case "StereoLabs ZED 2/2i"
                 Main.settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
                                                                            True, True, True,
@@ -68,8 +68,8 @@ Public Class Options
         End Select
     End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
-        Dim index = Main.cameraNames.IndexOf(sender.text)
-        cameraName = Main.cameraNames(index)
+        Dim index = Comm.cameraNames.IndexOf(sender.text)
+        cameraName = Comm.cameraNames(index)
         cameraIndex = index
 
         defineCameraResolutions(cameraIndex)
@@ -92,7 +92,7 @@ Public Class Options
             radioButtonsPresent = True
             For i = 0 To cameraRadioButton.Count - 1
                 cameraRadioButton(i) = New RadioButton With {.Visible = True, .AutoSize = True,
-                                       .Enabled = Main.settings.cameraPresent(i), .Text = Main.cameraNames(i)}
+                                       .Enabled = Main.settings.cameraPresent(i), .Text = Comm.cameraNames(i)}
                 CameraGroup.Controls.Add(cameraRadioButton(i))
                 AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
             Next

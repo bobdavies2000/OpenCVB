@@ -69,7 +69,6 @@ Public Class VBtask : Implements IDisposable
 
     Public motionMask As New cv.Mat
     Public motionPercent As Single
-    Public motionLabel As String = " "
 
     Public optionsChanged As Boolean = True ' global or local options changed.
     Public rows As Integer
@@ -321,6 +320,7 @@ Public Class VBtask : Implements IDisposable
     Public depthAndCorrelationText As String
     Public closeRequest As Boolean
     Public sharpGL As VBClasses.sgl
+    Public sharpGLRequest As Integer
     Public Structure inBuffer
         Dim color As cv.Mat
         Dim leftView As cv.Mat
@@ -352,14 +352,6 @@ Public Class VBtask : Implements IDisposable
     End Structure
 
     Public Structure algParms
-        Public Shared cameraNames As New List(Of String)({"StereoLabs ZED 2/2i",
-                                                          "Orbbec Gemini 335L",
-                                                          "Orbbec Gemini 336L",
-                                                          "Oak-D camera",
-                                                          "Intel(R) RealSense(TM) Depth Camera 435i",
-                                                          "Intel(R) RealSense(TM) Depth Camera 455",
-                                                          "MYNT-EYE-D1000",
-                                                          "Orbbec Gemini 335"})
         Public cameraName As String
         Public cameraIndex As Integer
 
@@ -382,7 +374,6 @@ Public Class VBtask : Implements IDisposable
 
         Public calibData As cameraInfo
     End Structure
-
 #End Region
     Private Function findDisplayObject(lookupName As String) As TaskParent
         Dim saveObject As Object = Nothing

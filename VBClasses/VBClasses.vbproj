@@ -13,6 +13,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Comm.vb" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Main\Comm.vb" Link="Comm.vb" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Import Include="System.Data" />
     <Import Include="System.Drawing" />
     <Import Include="System.Windows.Forms" />

@@ -216,38 +216,6 @@ End Enum
 
 
 
-Public Enum oCase
-    drawPointCloudRGB
-    drawLineAndCloud
-    drawFloor
-    trianglesAndColor
-    drawPyramid
-    drawCube
-    quadBasics
-    minMaxBlocks
-    drawTiles
-    drawCell
-    drawCells
-    floorStudy
-    data3D
-    sierpinski
-    polygonCell
-    Histogram3D
-    pcPoints
-    pcLines
-    pcPointsAlone
-    drawLines
-    drawAvgPointCloudRGB
-    readPointCloud
-    draw3DLines
-    draw3DLinesAndCloud
-End Enum
-
-
-
-
-
-
 Public Structure mmData
     Dim minVal As Double
     Dim maxVal As Double

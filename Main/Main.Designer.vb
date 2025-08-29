@@ -45,8 +45,10 @@ Partial Class Main
         RefreshTimer = New Timer(components)
         MagnifyTimer = New Timer(components)
         ToolTip1 = New ToolTip(components)
+        GLControl = New SharpGL.OpenGLControl()
         ToolStrip1.SuspendLayout()
         CType(CamSwitchProgress, ComponentModel.ISupportInitialize).BeginInit()
+        CType(GLControl, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' ToolStrip1
@@ -182,11 +184,25 @@ Partial Class Main
         ' MagnifyTimer
         ' 
         ' 
+        ' GLControl
+        ' 
+        GLControl.DrawFPS = False
+        GLControl.Location = New Point(710, 172)
+        GLControl.Margin = New Padding(5, 6, 5, 6)
+        GLControl.Name = "GLControl"
+        GLControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1
+        GLControl.RenderContextType = SharpGL.RenderContextType.DIBSection
+        GLControl.RenderTrigger = SharpGL.RenderTrigger.TimerBased
+        GLControl.Size = New Size(457, 346)
+        GLControl.TabIndex = 4
+        GLControl.Visible = False
+        ' 
         ' Main
         ' 
         AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1582, 748)
+        Controls.Add(GLControl)
         Controls.Add(CamSwitchProgress)
         Controls.Add(CameraSwitching)
         Controls.Add(XYLoc)
@@ -197,6 +213,7 @@ Partial Class Main
         ToolStrip1.ResumeLayout(False)
         ToolStrip1.PerformLayout()
         CType(CamSwitchProgress, ComponentModel.ISupportInitialize).EndInit()
+        CType(GLControl, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
     End Sub
@@ -222,5 +239,6 @@ Partial Class Main
     Friend WithEvents MagnifyTimer As Timer
     Friend WithEvents ToolTip1 As ToolTip
     Friend WithEvents RecentList As ToolStripDropDownButton
+    Friend WithEvents GLControl As SharpGL.OpenGLControl
 
 End Class

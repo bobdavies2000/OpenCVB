@@ -1,17 +1,19 @@
 ﻿Imports System.ComponentModel
 Imports System.Globalization
 Imports System.IO
+Imports System.Management
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 Imports System.Threading
-Imports cv = OpenCvSharp
+Imports SharpGL
 Imports VBClasses
-Imports System.Management
+Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 #Region "Globals and stable code"
 Module OpenCVB_module
     ' Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
-    Public mouseLock As New Mutex(True, "mouseLock") ' global lock for use with mouse clicks.
+    Public mouseLock As New Mutex(True, "mouseLock") ' global lock for use with mouse clicks. 
+    Public glLock As New Mutex(True, "GLlock") ' global lock for use with sharp GL
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraLock As New Mutex(True, "cameraLock")
     Public trueTextLock As New Mutex(True, "trueTextLock")
@@ -130,17 +132,125 @@ Public Class Main
     Dim testAllResolutionCount As Integer
     Dim testAllStartingRes As Integer
     Dim testAllEndingRes As Integer
-    Dim windowsVersion As Integer
-    Dim magIndex As Integer
-    Dim motionLabel As String
 
+    Dim magnifyIndex As Integer
     Dim depthAndCorrelationText As String
-    Public Shared cameraNames As New List(Of String)({"StereoLabs ZED 2/2i",
-                                                      "Orbbec Gemini 335",
-                                                      "Orbbec Gemini 336L",
-                                                      "Oak-D camera",
-                                                      "Intel(R) RealSense(TM) Depth Camera 435i",
-                                                      "Intel(R) RealSense(TM) Depth Camera 455"})
+
+    ' SharpGL variables.
+    Dim GLRequest As Integer = Comm.oCase.drawPointCloudRGB
+    Dim GLCloud As cv.Mat
+    Dim GLrgb As cv.Mat
+    Dim gl As OpenGL
+    Dim isDragging As Boolean = False
+    Dim lastMousePos As cv.Point
+    Dim rotationX As Single = 0.0F
+    Dim rotationY As Single = 0.0F
+    Dim zoomZ As Single = -5.0F
+    Dim isPanning As Boolean = False
+    Dim panX As Single = 0.0F
+    Dim panY As Single = 0.0F
+
+
+    Private Sub OpenGLControl_MouseDown(sender As Object, e As MouseEventArgs) Handles GLControl.MouseDown
+        If e.Button = MouseButtons.Right Then
+            isPanning = True
+            lastMousePos = New cv.Point(e.Location.X, e.Location.Y)
+        End If
+        If e.Button = MouseButtons.Left Then
+            isDragging = True
+            lastMousePos = New cv.Point(e.Location.X, e.Location.Y)
+        End If
+    End Sub
+    Private Sub OpenGLControl_MouseMove(sender As Object, e As MouseEventArgs) Handles GLControl.MouseMove
+        If isDragging Then
+            Dim dx = e.X - lastMousePos.X
+            Dim dy = e.Y - lastMousePos.Y
+
+            rotationY += dx * 0.5F
+            rotationX += dy * 0.5F
+
+            lastMousePos = New cv.Point(e.Location.X, e.Location.Y)
+        End If
+        If isPanning Then
+            Dim dx = e.X - lastMousePos.X
+            Dim dy = e.Y - lastMousePos.Y
+
+            panX += dx * 0.01F ' Adjust sensitivity as needed
+            panY -= dy * 0.01F
+
+            lastMousePos = New cv.Point(e.Location.X, e.Location.Y)
+            GLControl.Invalidate()
+        End If
+    End Sub
+    Private Sub OpenGLControl_MouseUp(sender As Object, e As MouseEventArgs) Handles GLControl.MouseUp
+        If e.Button = MouseButtons.Left Then isDragging = False
+        If e.Button = MouseButtons.Right Then isPanning = False
+    End Sub
+    Public Sub resetView()
+        rotationX = 0.0
+        rotationY = 0.0
+        zoomZ = -5.0F
+    End Sub
+    Private Sub OpenGLControl_MouseWheel(sender As Object, e As MouseEventArgs) Handles GLControl.MouseWheel
+        Dim delta As Integer = e.Delta
+        zoomZ += If(delta > 0, 0.5F, -0.5F)
+        GLControl.Invalidate() ' Force redraw
+    End Sub
+    Private Sub updateSharpGL()
+        If gl Is Nothing Then gl = GLControl.OpenGL
+
+        gl.MatrixMode(OpenGL.GL_PROJECTION)
+        gl.LoadIdentity()
+        gl.Perspective(45, GLControl.Width / GLControl.Height, 0.1, 100)
+        gl.MatrixMode(OpenGL.GL_MODELVIEW)
+
+        gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
+        gl.LoadIdentity()
+
+        gl.Translate(0.0F, 0.0F, -5.0F)
+        gl.Rotate(0.0F, 1.0F, 0.0F, 0.0F)
+        gl.Rotate(0.0F, 0.0F, 1.0F, 0.0F)
+        gl.PointSize(1.0F)
+
+
+        gl.MatrixMode(OpenGL.GL_PROJECTION)
+        gl.LoadIdentity()
+        'gl.Perspective(Options.perspective, GLControl.Width / GLControl.Height,
+        '               Options.zNear, Options.zFar)
+        gl.Perspective(45, GLControl.Width / GLControl.Height, 0.1, 100)
+
+        gl.MatrixMode(OpenGL.GL_MODELVIEW)
+
+        gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
+        gl.LoadIdentity()
+
+        gl.Translate(panX, panY, zoomZ)
+        gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
+        gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
+        gl.PointSize(1.0F)
+
+        Select Case GLRequest
+            Case Comm.oCase.drawPointCloudRGB
+                If GLCloud Is Nothing Then Exit Sub
+                gl.Begin(OpenGL.GL_POINTS)
+
+                SyncLock glLock
+                    For y = 0 To task.pointCloud.Height - 1
+                        For x = 0 To GLCloud.Width - 1
+                            Dim vec As cv.Vec3f = GLCloud.At(Of cv.Vec3f)(y, x)
+                            If vec(2) <> 0 Then
+                                Dim vec3b = GLrgb.Get(Of cv.Vec3b)(y, x)
+                                gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
+                                gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
+                            End If
+                        Next
+                    Next
+                End SyncLock
+                gl.End()
+        End Select
+
+        gl.Flush()
+    End Sub
     Public Sub jsonRead()
         jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
         settings = jsonfs.Load()(0)
@@ -154,7 +264,7 @@ Public Class Main
             Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
             Dim stereoLabsDefineIsOff As Boolean
             Dim sr = New StreamReader(defines.FullName)
-            Dim zedIndex = cameraNames.IndexOf("StereoLabs ZED 2/2i")
+            Dim zedIndex = Comm.cameraNames.IndexOf("StereoLabs ZED 2/2i")
             While sr.EndOfStream = False
                 Dim nextLine = sr.ReadLine
                 If nextLine.Contains("STEREOLAB") Then
@@ -175,8 +285,8 @@ Public Class Main
             Next
 
             .cameraPresent = New List(Of Boolean)
-            For i = 0 To cameraNames.Count - 1
-                Dim searchname = cameraNames(i)
+            For i = 0 To Comm.cameraNames.Count - 1
+                Dim searchname = Comm.cameraNames(i)
                 Dim present As Boolean = False
                 If searchname.Contains("Oak-D") Then searchname = "Movidius MyriadX"
                 If stereoLabsDefineIsOff = False Then
@@ -191,14 +301,14 @@ Public Class Main
                 .cameraPresent.Add(present <> False)
             Next
 
-            For i = 0 To cameraNames.Count - 1
-                If cameraNames(i).StartsWith("Orbbec") Then
-                    If cameraNames(i) = .cameraName Then
+            For i = 0 To Comm.cameraNames.Count - 1
+                If Comm.cameraNames(i).StartsWith("Orbbec") Then
+                    If Comm.cameraNames(i) = .cameraName Then
                         .cameraIndex = i
                         Exit For
                     End If
                 Else
-                    If cameraNames(i).Contains(.cameraName) And .cameraName <> "" Then
+                    If Comm.cameraNames(i).Contains(.cameraName) And .cameraName <> "" Then
                         .cameraIndex = i
                         Exit For
                     End If
@@ -206,16 +316,16 @@ Public Class Main
             Next
 
             If .cameraName = "" Or .cameraPresent(.cameraIndex) = False Then
-                For i = 0 To cameraNames.Count - 1
+                For i = 0 To Comm.cameraNames.Count - 1
                     If .cameraPresent(i) Then
                         .cameraIndex = i
-                        .cameraName = cameraNames(i)
+                        .cameraName = Comm.cameraNames(i)
                         Exit For
                     End If
                 Next
             Else
-                For i = 0 To cameraNames.Count - 1
-                    If cameraNames(i) = .cameraName Then .cameraIndex = i
+                For i = 0 To Comm.cameraNames.Count - 1
+                    If Comm.cameraNames(i) = .cameraName Then .cameraIndex = i
                 Next
             End If
 
@@ -609,8 +719,8 @@ Public Class Main
         Dim workRes = settings.workRes
         Dim cres = settings.captureRes
         Dim dres = settings.displayRes
-        Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", workRes " + CStr(workRes.Width) + "x" + CStr(workRes.Height)
-        resolutionDetails += " - Motion: " + motionLabel
+        Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", workRes " +
+                                           CStr(workRes.Width) + "x" + CStr(workRes.Height)
         If picLabels(0) <> "" Then
             If camLabel(0).Text <> picLabels(0) + " - RGB " + resolutionDetails Then
                 camLabel(0).Text = picLabels(0)
@@ -624,7 +734,21 @@ Public Class Main
         camLabel(1).Text = picLabels(1)
         camLabel(2).Text = picLabels(2)
         camLabel(3).Text = picLabels(3)
+
+        If AvailableAlgorithms.Text.StartsWith("GL_") Then
+            Static saveFrame = frameCount
+            If saveFrame <> frameCount Then
+                saveFrame = frameCount
+                updateSharpGL()
+                Application.DoEvents()
+            End If
+        End If
     End Sub
+
+
+
+
+
     Private Sub setupCamPics()
         ' when you change the primary monitor, old coordinates can go way off the screen.
         Dim goodPoint = Screen.GetWorkingArea(New Point(Me.Left, Me.Top))
@@ -705,7 +829,7 @@ Public Class Main
     End Sub
     Private Sub Magnify_Click(sender As Object, e As EventArgs) Handles Magnify.Click
         MagnifyTimer.Enabled = True
-        magIndex += 1
+        magnifyIndex += 1
     End Sub
     Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
         Dim ratio = task.dst2.Width / camPic(0).Width
@@ -713,7 +837,7 @@ Public Class Main
         r = validateRect(r, dst(drawRectPic).Width, dst(drawRectPic).Height)
         If r.Width = 0 Or r.Height = 0 Then Exit Sub
         Dim img = dst(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
-        cv.Cv2.ImShow("DrawRect Region " + CStr(magIndex), img)
+        cv.Cv2.ImShow("DrawRect Region " + CStr(magnifyIndex), img)
     End Sub
     Private Sub camSwitch()
         CameraSwitching.Visible = True
@@ -838,8 +962,8 @@ Public Class Main
             If settings.workResIndex > testAllEndingRes Then
                 While 1
                     settings.cameraIndex += 1
-                    If settings.cameraIndex >= cameraNames.Count - 1 Then settings.cameraIndex = 0
-                    settings.cameraName = cameraNames(settings.cameraIndex)
+                    If settings.cameraIndex >= Comm.cameraNames.Count - 1 Then settings.cameraIndex = 0
+                    settings.cameraName = Comm.cameraNames(settings.cameraIndex)
                     If settings.cameraPresent(settings.cameraIndex) Then
                         Options.defineCameraResolutions(settings.cameraIndex)
                         setupTestAll()
@@ -990,7 +1114,7 @@ Public Class Main
         updatePath(HomeDir.FullName + "opencv\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
         Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
-        Dim zedIndex = cameraNames.IndexOf("StereoLabs ZED 2/2i")
+        Dim zedIndex = Comm.cameraNames.IndexOf("StereoLabs ZED 2/2i")
         If cudaPath IsNot Nothing And settings.cameraPresent(zedIndex) And settings.cameraSupported(zedIndex) = True Then
             updatePath(cudaPath, "Cuda - needed for StereoLabs")
             updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
@@ -1344,6 +1468,15 @@ Public Class Main
 
         PausePlayButton.Image = PausePlay
 
+        If parms.algName.StartsWith("GL_") Then
+            GLControl.Visible = True
+            GLControl.Location = camPic(2).Location
+            GLControl.Width = camPic(2).Width
+            GLControl.Height = camPic(2).Height
+        Else
+            GLControl.Visible = False
+        End If
+
         GC.Collect()
 
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
@@ -1424,11 +1557,11 @@ Public Class Main
             End If
 
             ' Adjust drawrect for the ratio of the actual size and workRes.
+            Dim ratio = camPic(0).Width / task.dst2.Width
             If task.drawRect <> New cv.Rect Then
                 ' relative size of algorithm size image to displayed image
-                Dim ratio = camPic(0).Width / task.dst2.Width
                 drawRect = New cv.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
-                                        task.drawRect.Width * ratio, task.drawRect.Height * ratio)
+                                       task.drawRect.Width * ratio, task.drawRect.Height * ratio)
             End If
 
             Dim saveworkRes = settings.workRes
@@ -1486,9 +1619,8 @@ Public Class Main
 
                         If GrabRectangleData Then
                             GrabRectangleData = False
-                            ' relative size of algorithm size image to displayed image
-                            Dim ratio = task.dst2.Width / camPic(0).Width
-                            Dim tmpDrawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                            Dim tmpDrawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio,
+                                                          drawRect.Height / ratio)
                             task.drawRect = New cv.Rect
                             If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
                                 If saveDrawRect <> tmpDrawRect Then
@@ -1564,7 +1696,13 @@ Public Class Main
 
 
                 picLabels = task.labels
-                motionLabel = task.motionLabel
+                If parms.algName.StartsWith("GL_") Then
+                    GLRequest = task.sharpGLRequest
+                    SyncLock glLock
+                        GLCloud = task.pointCloud.Clone
+                        GLrgb = task.color.Clone
+                    End SyncLock
+                End If
 
                 SyncLock mouseLock
                     mouseDisplayPoint = validatePoint(mouseDisplayPoint)
@@ -1577,8 +1715,6 @@ Public Class Main
                 If task.mouseMovePointUpdated Then mouseDisplayPoint = task.mouseMovePoint
                 If updatedDrawRect <> task.drawRect Then
                     drawRect = task.drawRect
-                    ' relative size of algorithm size image to displayed image
-                    Dim ratio = camPic(0).Width / task.dst2.Width
                     drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
                 End If
                 If task.drawRectClear Then
