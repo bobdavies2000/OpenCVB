@@ -1,20 +1,12 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Options
     Public cameraRadioButton(Comm.cameraNames.Count - 1) As RadioButton
-    Public workResRadio(resolutionList.Count - 1) As RadioButton
+    Public workResRadio(Comm.resolutionList.Count - 1) As RadioButton
     Public cameraworkRes As cv.Size
     Public cameraDisplayRes As cv.Size
     Public cameraName As String
     Public cameraIndex As Integer
     Public testDuration As Integer
-    '     "1344x752 - Full resolution", "672x376 - Quarter resolution", "336x188 - Small resolution  ",
-    Public Shared resolutionList As New List(Of String)(
-        {"1920x1080 - Full resolution", "960x540 - Quarter resolution", "480x270 - Small resolution",
-         "1280x720 - Full resolution", "640x360 - Quarter resolution", "320x180 - Small resolution",
-         "640x480 - Full resolution", "320x240 - Quarter resolution", "160x120 - Small resolution",
-         "960x600 - Full resolution", "480x300 - Quarter resolution", "240x150 - Small resolution  ",
-         "672x376 - Full resolution", "336x188 - Quarter resolution", "168x94 - Small resolution    "})
-
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
         Main.settings.showConsoleLog = showConsoleLog.Checked
         Main.settings.snap640 = Snap640.Checked
@@ -79,9 +71,9 @@ Public Class Options
         Next
 
         If cameraName.StartsWith("StereoLabs") Then
-            workResRadio(resolutionList.IndexOf("336x188 - Quarter resolution")).Checked = True
+            workResRadio(Comm.resolutionList.IndexOf("336x188 - Quarter resolution")).Checked = True
         Else
-            workResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
+            workResRadio(Comm.resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         End If
     End Sub
     Public Sub MainOptions_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -98,7 +90,7 @@ Public Class Options
             Next
 
             For i = 0 To workResRadio.Count - 1
-                workResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i,
+                workResRadio(i) = New RadioButton With {.Text = Comm.resolutionList(i), .Tag = i,
                                      .AutoSize = True, .Visible = True}
                 workResRadio(i).Enabled = Main.settings.resolutionsSupported(i)
                 Resolutions.Controls.Add(workResRadio(i))

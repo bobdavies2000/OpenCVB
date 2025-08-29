@@ -407,8 +407,8 @@ Public Class Main
 
             If testAllRunning = False Then
                 Dim resStr = CStr(.workRes.Width) + "x" + CStr(.workRes.Height)
-                For i = 0 To Options.resolutionList.Count - 1
-                    If Options.resolutionList(i).StartsWith(resStr) Then
+                For i = 0 To Comm.resolutionList.Count - 1
+                    If Comm.resolutionList(i).StartsWith(resStr) Then
                         .workResIndex = i
                         Exit For
                     End If
@@ -549,8 +549,8 @@ Public Class Main
         optionsForm.MainOptions_Load(sender, e)
         optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True
         Dim resStr = CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height)
-        For i = 0 To Options.resolutionList.Count - 1
-            If Options.resolutionList(i).StartsWith(resStr) Then
+        For i = 0 To Comm.resolutionList.Count - 1
+            If Comm.resolutionList(i).StartsWith(resStr) Then
                 optionsForm.workResRadio(i).Checked = True
             End If
         Next
