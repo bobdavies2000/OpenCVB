@@ -47,26 +47,14 @@ Public Class Comm
          "960x600 - Full resolution", "480x300 - Quarter resolution", "240x150 - Small resolution  ",
          "672x376 - Full resolution", "336x188 - Quarter resolution", "168x94 - Small resolution    "})
 
-    Public Structure images
-        Public dstList() As cv.Mat
-    End Structure
-
-    Private Shared dsts As images
-    Public Shared imageLock As New Mutex(True, "imageLock")
+    Public Shared GLRequest As Integer
+    Public Shared resultLock As New Mutex(True, "imageLock")
     Public Shared ptCursor As cv.Point
+    Public Shared results As New imageData
 
-    Public Shared Property sharedDsts As images
-        Get
-            SyncLock imageLock
-                Return dsts
-            End SyncLock
-        End Get
-
-        Set(value As images)
-            SyncLock imageLock
-                dsts = value
-            End SyncLock
-        End Set
-
-    End Property
+    Public Class imageData
+        Public dstList() As cv.Mat
+        Public GLcloud As cv.Mat
+        Public GLrgb As cv.Mat
+    End Class
 End Class

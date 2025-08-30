@@ -146,9 +146,10 @@ Public Class BackProject2D_Top : Inherits TaskParent
         heat.Run(src)
         dst2 = heat.dst2
 
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, heat.histogramTop, dst3, task.rangesTop)
-        dst3 = Convert32f_To_8UC3(dst3)
-        dst3 = ShowPalette(dst3)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, heat.histogramTop, dst1, task.rangesTop)
+        dst1 = dst1.ConvertScaleAbs()
+        dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst3 = ShowPalette(dst1)
     End Sub
 End Class
 
@@ -166,9 +167,10 @@ Public Class BackProject2D_Side : Inherits TaskParent
         heat.Run(src)
         dst2 = heat.dst3
 
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, heat.histogramSide, dst3, task.rangesSide)
-        dst3 = Convert32f_To_8UC3(dst3)
-        dst3 = ShowPalette(dst3)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, heat.histogramSide, dst1, task.rangesSide)
+        dst1 = dst1.ConvertScaleAbs()
+        dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst3 = ShowPalette(dst1)
     End Sub
 End Class
 

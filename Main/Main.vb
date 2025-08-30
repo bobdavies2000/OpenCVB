@@ -13,7 +13,6 @@ Imports cvext = OpenCvSharp.Extensions
 Module OpenCVB_module
     ' Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
     Public mouseLock As New Mutex(True, "mouseLock") ' global lock for use with mouse clicks. 
-    Public glLock As New Mutex(True, "GLlock") ' global lock for use with sharp GL
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraLock As New Mutex(True, "cameraLock")
     Public trueTextLock As New Mutex(True, "trueTextLock")
@@ -136,9 +135,6 @@ Public Class Main
     Dim depthAndCorrelationText As String
 
     ' SharpGL variables.
-    Dim GLRequest As Integer = Comm.oCase.drawPointCloudRGB
-    Dim GLCloud As cv.Mat
-    Dim GLrgb As cv.Mat
     Dim gl As OpenGL
     Dim isDragging As Boolean = False
     Dim lastMousePos As cv.Point
@@ -228,17 +224,17 @@ Public Class Main
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
         gl.PointSize(1.0F)
 
-        Select Case GLRequest
+        Select Case Comm.GLRequest
             Case Comm.oCase.drawPointCloudRGB
-                If GLCloud Is Nothing Then Exit Sub
+                If Comm.results.GLcloud Is Nothing Then Exit Sub
                 gl.Begin(OpenGL.GL_POINTS)
 
-                SyncLock glLock
-                    For y = 0 To task.pointCloud.Height - 1
-                        For x = 0 To GLCloud.Width - 1
-                            Dim vec As cv.Vec3f = GLCloud.At(Of cv.Vec3f)(y, x)
+                SyncLock Comm.resultLock
+                    For y = 0 To task.workRes.Height - 1
+                        For x = 0 To task.workRes.Width - 1
+                            Dim vec As cv.Vec3f = Comm.results.GLcloud.At(Of cv.Vec3f)(y, x)
                             If vec(2) <> 0 Then
-                                Dim vec3b = GLrgb.Get(Of cv.Vec3b)(y, x)
+                                Dim vec3b = Comm.results.GLrgb.Get(Of cv.Vec3b)(y, x)
                                 gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
                                 gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
                             End If
@@ -690,15 +686,17 @@ Public Class Main
                     CamSwitchTimer.Enabled = False
                 End If
                 If uiColor.Width > 0 Then
-                    Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
-                    SyncLock Comm.imageLock
-                        Dim pt As New cv.Point(Comm.ptCursor.X * ratio, Comm.ptCursor.Y * ratio)
-                        For i = 0 To task.dsts.dstList.Count - 1
-                            Dim tmp = task.dsts.dstList(i).Resize(camSize)
-                            tmp.Circle(pt, 3, cv.Scalar.White, -1)
-                            cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
-                        Next
-                    End SyncLock
+                    If Comm.results.dstList IsNot Nothing Then
+                        Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
+                        SyncLock Comm.resultLock
+                            Dim pt As New cv.Point(Comm.ptCursor.X * ratio, Comm.ptCursor.Y * ratio)
+                            For i = 0 To Comm.results.dstList.Count - 1
+                                Dim tmp = Comm.results.dstList(i).Resize(camSize)
+                                tmp.Circle(pt, 3, cv.Scalar.White, -1)
+                                cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
+                            Next
+                        End SyncLock
+                    End If
                 End If
             End If
         End If
@@ -833,9 +831,9 @@ Public Class Main
     Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
         Dim ratio = saveworkRes.Width / camPic(0).Width
         Dim r = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-        r = validateRect(r, task.dsts.dstList(drawRectPic).Width, task.dsts.dstList(drawRectPic).Height)
+        r = validateRect(r, Comm.results.dstList(drawRectPic).Width, Comm.results.dstList(drawRectPic).Height)
         If r.Width = 0 Or r.Height = 0 Then Exit Sub
-        Dim img = task.dsts.dstList(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
+        Dim img = Comm.results.dstList(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
         cv.Cv2.ImShow("DrawRect Region " + CStr(magnifyIndex), img)
     End Sub
     Private Sub camSwitch()
@@ -1693,13 +1691,6 @@ Public Class Main
 
 
                 picLabels = task.labels
-                If parms.algName.StartsWith("GL_") Then
-                    GLRequest = task.sharpGLRequest
-                    SyncLock glLock
-                        GLCloud = task.pointCloud.Clone
-                        GLrgb = task.color.Clone
-                    End SyncLock
-                End If
 
                 SyncLock mouseLock
                     mouseDisplayPoint = validatePoint(mouseDisplayPoint)
