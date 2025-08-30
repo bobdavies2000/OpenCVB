@@ -1,4 +1,5 @@
-﻿Public Class Comm
+﻿Imports cv = OpenCvSharp
+Public Class Comm
     Public Enum oCase
         drawPointCloudRGB
         drawLineAndCloud
@@ -44,4 +45,30 @@
          "640x480 - Full resolution", "320x240 - Quarter resolution", "160x120 - Small resolution",
          "960x600 - Full resolution", "480x300 - Quarter resolution", "240x150 - Small resolution  ",
          "672x376 - Full resolution", "336x188 - Quarter resolution", "168x94 - Small resolution    "})
+
+    Public Structure dstMats
+        Public dsts() As cv.Mat
+        Public dst0 As cv.Mat
+        Public dst1 As cv.Mat
+        Public dst2 As cv.Mat
+        Public dst3 As cv.Mat
+    End Structure
+
+    Private Shared ReadOnly sharedMats As dstMats
+
+    Private Shared dsts As dstMats
+    Private Shared ReadOnly _lockObj As New Object()
+
+    Public Shared Property sharedDsts As dstMats
+        Get
+            SyncLock _lockObj
+                Return dsts
+            End SyncLock
+        End Get
+        Set(value As dstMats)
+            SyncLock _lockObj
+                dsts = value
+            End SyncLock
+        End Set
+    End Property
 End Class
