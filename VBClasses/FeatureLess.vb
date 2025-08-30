@@ -13,7 +13,6 @@ Public Class FeatureLess_Basics : Inherits TaskParent
         Else
             edges.Run(src)
             contours.Run(src)
-            cv.Cv2.ImShow("contours.dst2", contours.dst2)
             dst2 = contours.dst2
             labels = contours.labels
         End If

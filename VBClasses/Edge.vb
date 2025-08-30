@@ -866,7 +866,7 @@ End Class
 
 
 
-Public Class Edge_BackProjection : Inherits TaskParent
+Public Class Edge_Projection : Inherits TaskParent
     Dim valley As New HistValley_OptionsAuto
     Dim canny As New Edge_Basics
     Public Sub New()
@@ -1441,34 +1441,11 @@ End Class
 Public Class Edge_NoDepth : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        labels = {"", "", "All edges available", "Below - edges without depth, Above - edges with depth"}
+        labels = {"", "", "All edges available", "Below - edges without depth, Above - edges with depth (color from contour.)"}
         desc = "Find the edges where there is depth and no depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.edges.dst3
-
-        dst3.SetTo(0)
-        dst2.CopyTo(dst3, task.noDepthMask)
-
-        dst1.SetTo(0)
-        dst2.CopyTo(dst1, task.depthMask)
-    End Sub
-End Class
-
-
-
-
-
-Public Class Edge_NoDepthStable : Inherits TaskParent
-    Public Sub New()
-        task.needContours = True
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels = {"", "", "All edges available", "Below - edges without depth, Above - edges with depth"}
-        desc = "Identify edges by their contour thereby connecting them better."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2.SetTo(0)
-        task.contours.dst2.CopyTo(dst2, task.edges.dst2)
+        dst2 = task.edges.dst1
 
         dst3.SetTo(0)
         dst2.CopyTo(dst3, task.noDepthMask)

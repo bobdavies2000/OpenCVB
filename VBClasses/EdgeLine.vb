@@ -5,9 +5,11 @@ Public Class EdgeLine_Basics : Inherits TaskParent
     Public rectList As New List(Of cv.Rect)
     Public classCount As Integer
     Public Sub New()
+        task.needContours = True
         cPtr = EdgeLineRaw_Open()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         task.gOptions.DebugSlider.Value = 1
-        labels(3) = "Highlighting the individual segments one by one."
+        labels = {"", "", "8-bit identifiers for each segment", "Individual segments highlighted, Above segments colored from contour. "}
         desc = "Use EdgeLines to find edges/lines but without using motionMask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -56,6 +58,8 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         labels(2) = CStr(classCount) + " segments were found using " + CStr(pointCount) + " points."
 
         dst3 = ShowPaletteNoZero(dst2)
+        dst1.SetTo(0)
+        task.contours.dst2.CopyTo(dst1, task.edges.dst2)
     End Sub
     Public Sub Close()
         EdgeLineRaw_Close(cPtr)
