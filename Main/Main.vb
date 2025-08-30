@@ -16,6 +16,7 @@ Module OpenCVB_module
     Public glLock As New Mutex(True, "GLlock") ' global lock for use with sharp GL
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraLock As New Mutex(True, "cameraLock")
+    Public imageLock As New Mutex(True, "imageLock")
     Public trueTextLock As New Mutex(True, "trueTextLock")
     Public Declare Function GetWindowRect Lib "user32" (ByVal HWND As Integer, ByRef lpRect As RECT) As Integer
     <StructLayout(LayoutKind.Sequential)> Public Structure RECT
@@ -28,7 +29,7 @@ End Module
 #End Region
 
 Public Class Main
-    Public dsts As Comm.dstMats
+    Public dsts As Comm.images
 
     Dim trueData As New List(Of TrueText)
     Dim algolist As algorithmList = New algorithmList
@@ -64,7 +65,6 @@ Public Class Main
     Public DevicesChanged As Boolean
     Dim camPic(4 - 1) As PictureBox
     Dim camLabel(camPic.Count - 1) As Label
-    Dim dst(camPic.Count - 1) As cv.Mat
 
     Dim paintNewImages As Boolean
     Dim newCameraImages As Boolean
@@ -684,27 +684,24 @@ Public Class Main
             End If
         End If
 
-        SyncLock cameraLock
-            If paintNewImages Then
-                paintNewImages = False
-                If uiColor IsNot Nothing Then
-                    If CameraSwitching.Visible Then
-                        CameraSwitching.Visible = False
-                        CamSwitchProgress.Visible = False
-                        CamSwitchTimer.Enabled = False
-                    End If
-                    If uiColor.Width > 0 Then
-                        Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
-                        For i = 0 To dst.Count - 1
-                            If dst(i).Width > 0 Then
-                                Dim tmp = dst(i).Resize(camSize)
-                                cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
-                            End If
+        If paintNewImages Then
+            paintNewImages = False
+            If uiColor IsNot Nothing Then
+                If CameraSwitching.Visible Then
+                    CameraSwitching.Visible = False
+                    CamSwitchProgress.Visible = False
+                    CamSwitchTimer.Enabled = False
+                End If
+                If uiColor.Width > 0 Then
+                    Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
+                    SyncLock Comm.imageLock
+                        For i = 0 To dsts.dstList.Count - 1
+                            cvext.BitmapConverter.ToBitmap(dsts.dstList(i).Resize(camSize), camPic(i).Image)
                         Next
-                    End If
+                    End SyncLock
                 End If
             End If
-        End SyncLock
+        End If
 
         ' draw any TrueType font data on the image 
         SyncLock trueTextLock
@@ -745,13 +742,6 @@ Public Class Main
                 Application.DoEvents()
             End If
         End If
-
-
-
-        If dsts.dsts IsNot Nothing Then cv.Cv2.ImShow("test", dsts.dsts(0))
-
-
-
     End Sub
 
 
@@ -841,11 +831,11 @@ Public Class Main
         magnifyIndex += 1
     End Sub
     Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
-        Dim ratio = task.dst2.Width / camPic(0).Width
+        Dim ratio = saveworkRes.Width / camPic(0).Width
         Dim r = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-        r = validateRect(r, dst(drawRectPic).Width, dst(drawRectPic).Height)
+        r = validateRect(r, dsts.dstList(drawRectPic).Width, dsts.dstList(drawRectPic).Height)
         If r.Width = 0 Or r.Height = 0 Then Exit Sub
-        Dim img = dst(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
+        Dim img = dsts.dstList(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
         cv.Cv2.ImShow("DrawRect Region " + CStr(magnifyIndex), img)
     End Sub
     Private Sub camSwitch()
@@ -1520,11 +1510,7 @@ Public Class Main
         algorithmFPSrate = 0
         newCameraImages = False
 
-
-        ReDim dsts.dsts(3)
-        dsts.dsts(0) = New cv.Mat(parms.workRes.Height, parms.workRes.Width, cv.MatType.CV_8UC3, New cv.Scalar)
-
-
+        ReDim dsts.dstList(3)
         While 1
             If camera IsNot Nothing Then
                 parms.calibData = setCalibData(camera.calibData)
@@ -1708,8 +1694,6 @@ Public Class Main
 
 
 
-                dsts.dsts(0).SetTo(red)
-
                 picLabels = task.labels
                 If parms.algName.StartsWith("GL_") Then
                     GLRequest = task.sharpGLRequest
@@ -1766,22 +1750,6 @@ Public Class Main
                 If task.displayDst1 = False Or task.labels(1) = "" Then picLabels(1) = "DepthRGB"
                 picLabels(1) = task.depthAndCorrelationText.Replace(vbCrLf, "")
 
-                If task.dst0 IsNot Nothing Then
-                    SyncLock cameraLock
-                        dst(0) = task.dst0.Clone
-                        dst(1) = task.dst1.Clone
-                        dst(2) = task.dst2.Clone
-                        dst(3) = task.dst3.Clone
-                        paintNewImages = True ' trigger the paint 
-                    End SyncLock
-                    algorithmRefresh = True
-                End If
-
-                dst(0).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(1).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(2).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                dst(3).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-
                 If task.fpsAlgorithm = 0 Then task.fpsAlgorithm = 1
 
                 Dim elapsedTicks = Now.Ticks - returnTime.Ticks
@@ -1797,6 +1765,17 @@ Public Class Main
                     cameraShutdown = True
                     Exit While
                 End If
+
+                SyncLock Comm.imageLock
+                    dsts.dstList = {task.dst0.Clone, task.dst1.Clone, task.dst2.Clone, task.dst3.Clone}
+                    dsts.dstList(0).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                    dsts.dstList(1).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                    dsts.dstList(2).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                    dsts.dstList(3).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
+                End SyncLock
+
+                algorithmRefresh = True
+                paintNewImages = True ' trigger the paint 
             End While
 
             task.frameCount = -1

@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.Windows.Forms
 Public Class Pixel_Viewer : Inherits TaskParent
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm

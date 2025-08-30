@@ -77,7 +77,7 @@ Partial Class Main
         OptionsButton.ImageTransparentColor = Color.Magenta
         OptionsButton.Name = "OptionsButton"
         OptionsButton.Size = New Size(34, 29)
-        OptionsButton.Text = "ToolStripButton1"
+        OptionsButton.Text = "OpenCVB Settings"
         ' 
         ' TestAllButton
         ' 
@@ -86,7 +86,7 @@ Partial Class Main
         TestAllButton.ImageTransparentColor = Color.Magenta
         TestAllButton.Name = "TestAllButton"
         TestAllButton.Size = New Size(34, 29)
-        TestAllButton.Text = "ToolStripButton2"
+        TestAllButton.Text = "Test All (overnight testing)"
         ' 
         ' Magnify
         ' 
@@ -95,7 +95,7 @@ Partial Class Main
         Magnify.ImageTransparentColor = Color.Magenta
         Magnify.Name = "Magnify"
         Magnify.Size = New Size(34, 29)
-        Magnify.Text = "ToolStripButton3"
+        Magnify.Text = "Magnify selected rectangle"
         ' 
         ' PixelViewerButton
         ' 
@@ -104,7 +104,7 @@ Partial Class Main
         PixelViewerButton.ImageTransparentColor = Color.Magenta
         PixelViewerButton.Name = "PixelViewerButton"
         PixelViewerButton.Size = New Size(34, 29)
-        PixelViewerButton.Text = "ToolStripButton4"
+        PixelViewerButton.Text = "Display pixels as text"
         ' 
         ' RecentList
         ' 
@@ -114,6 +114,7 @@ Partial Class Main
         RecentList.Name = "RecentList"
         RecentList.Size = New Size(82, 29)
         RecentList.Text = "Recent"
+        RecentList.ToolTipText = "Recently selected algorithms"
         ' 
         ' AvailableAlgorithms
         ' 
@@ -128,6 +129,7 @@ Partial Class Main
         AtoZButton.Name = "AtoZButton"
         AtoZButton.Size = New Size(45, 29)
         AtoZButton.Text = "A-Z"
+        AtoZButton.ToolTipText = "Select an algorithm group"
         ' 
         ' GroupComboBox
         ' 
