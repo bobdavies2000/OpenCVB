@@ -28,6 +28,8 @@ End Module
 #End Region
 
 Public Class Main
+    Public dsts As Comm.dstMats
+
     Dim trueData As New List(Of TrueText)
     Dim algolist As algorithmList = New algorithmList
     Public Shared settings As jsonClass.ApplicationStorage
@@ -743,6 +745,13 @@ Public Class Main
                 Application.DoEvents()
             End If
         End If
+
+
+
+        If dsts.dsts IsNot Nothing Then cv.Cv2.ImShow("test", dsts.dsts(0))
+
+
+
     End Sub
 
 
@@ -1511,6 +1520,11 @@ Public Class Main
         algorithmFPSrate = 0
         newCameraImages = False
 
+
+        ReDim dsts.dsts(3)
+        dsts.dsts(0) = New cv.Mat(parms.workRes.Height, parms.workRes.Width, cv.MatType.CV_8UC3, New cv.Scalar)
+
+
         While 1
             If camera IsNot Nothing Then
                 parms.calibData = setCalibData(camera.calibData)
@@ -1694,6 +1708,7 @@ Public Class Main
 
 
 
+                dsts.dsts(0).SetTo(red)
 
                 picLabels = task.labels
                 If parms.algName.StartsWith("GL_") Then

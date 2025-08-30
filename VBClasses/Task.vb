@@ -84,7 +84,6 @@ Public Class VBtask : Implements IDisposable
     Public dst2 As New cv.Mat
     Public dst3 As New cv.Mat
 
-    Public dsts() As cv.Mat
 
     Public MainUI_Algorithm As Object
     Public myStopWatch As Stopwatch
@@ -475,12 +474,6 @@ Public Class VBtask : Implements IDisposable
         dst2 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
         dst3 = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
 
-        ReDim dsts(3)
-        dsts(0) = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
-        dsts(1) = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
-        dsts(2) = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
-        dsts(3) = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
-
         OpenGL_Left = CInt(GetSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", mainFormLocation.X))
         OpenGL_Top = CInt(GetSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", mainFormLocation.Y))
 
@@ -855,9 +848,6 @@ Public Class VBtask : Implements IDisposable
             labels = displayObject.labels
             If displayDst1 Then labels(1) = displayObject.labels(1)
             depthAndCorrelationText = task.depthAndCorrelationText
-
-
-            dsts(0).SetTo(red)
 
         Else
             dst1 = depthRGB
