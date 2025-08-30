@@ -239,8 +239,10 @@ Public Class BackProject_Top : Inherits TaskParent
         histTop.Run(src)
         dst2 = histTop.dst2
 
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst3, task.rangesTop)
-        dst3 = ShowPalette(dst3.ConvertScaleAbs)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst1, task.rangesTop)
+        dst1 = dst1.ConvertScaleAbs()
+        dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst3 = ShowPalette(dst1)
     End Sub
 End Class
 
