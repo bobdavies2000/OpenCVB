@@ -383,7 +383,7 @@ Public Class Mat_2to1 : Inherits TaskParent
         desc = "Fill a Mat with 2 images"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Dim nSize = New cv.Size(task.dst2.Width, task.dst2.Height / 2)
+        Dim nSize = New cv.Size(task.workRes.Width, task.workRes.Height / 2)
         Dim roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Dim roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         If standaloneTest() Then
@@ -435,9 +435,9 @@ Public Class Mat_4Click : Inherits TaskParent
 
         If task.mouseClickFlag And task.mousePicTag = 2 Then
             If task.ClickPoint.Y < dst2.Rows / 2 Then
-                quadrant = If(task.ClickPoint.X < task.dst2.Width / 2, 0, 1)
+                quadrant = If(task.ClickPoint.X < task.workRes.Width / 2, 0, 1)
             Else
-                quadrant = If(task.ClickPoint.X < task.dst2.Width / 2, 2, 3)
+                quadrant = If(task.ClickPoint.X < task.workRes.Width / 2, 2, 3)
             End If
         End If
         mats.Run(emptyMat)

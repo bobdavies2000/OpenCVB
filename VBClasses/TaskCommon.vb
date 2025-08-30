@@ -155,11 +155,11 @@ Public Module vbc
         task.lineWidth = task.gOptions.LineWidth.Value
         task.DotSize = task.gOptions.DotSizeSlider.Value
 
-        task.metersPerPixel = task.MaxZmeters / task.dst2.Height ' meters per pixel in projections - side and top.
+        task.metersPerPixel = task.MaxZmeters / task.workRes.Height ' meters per pixel in projections - side and top.
         task.debugSyncUI = task.gOptions.debugSyncUI.Checked
         task.depthDiffMeters = task.gOptions.DepthDiffSlider.Value / 1000
 
-        task.rcPixelThreshold = CInt(task.dst2.Total * 0.001)
+        task.rcPixelThreshold = CInt(task.workRes.Width * task.workRes.Height * 0.001)
         task.historyCount = task.gOptions.FrameHistory.Value
     End Sub
 

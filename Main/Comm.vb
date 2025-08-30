@@ -52,8 +52,8 @@ Public Class Comm
     End Structure
 
     Private Shared dsts As images
-    ' Public Shared ReadOnly imageLock As New Object()
     Public Shared imageLock As New Mutex(True, "imageLock")
+    Public Shared ptCursor As cv.Point
 
     Public Shared Property sharedDsts As images
         Get

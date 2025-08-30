@@ -400,7 +400,7 @@ Public Class Draw_Frustrum : Inherits TaskParent
         desc = "Draw a frustrum for a camera viewport"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        src = New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_32F, cv.Scalar.All(0))
+        src = New cv.Mat(New cv.Size(task.workRes.Width, task.workRes.Height), cv.MatType.CV_32F, cv.Scalar.All(0))
 
         Dim mid = src.Height / 2
         Dim zIncr = task.MaxZmeters / mid
@@ -410,7 +410,7 @@ Public Class Draw_Frustrum : Inherits TaskParent
             dst2(fRect).Rectangle(New cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), i * zIncr, 1)
         Next
         xyzDepth.Run(dst2)
-        dst3 = xyzDepth.dst2.Resize(New cv.Size(task.dst2.Width, task.dst2.Height))
+        dst3 = xyzDepth.dst2.Resize(New cv.Size(task.workRes.Width, task.workRes.Height))
     End Sub
 End Class
 

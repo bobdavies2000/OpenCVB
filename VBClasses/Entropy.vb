@@ -11,8 +11,8 @@ Public Class Entropy_Basics : Inherits TaskParent
         If r.Height <= 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X + r.Width >= task.dst2.Width Then r.X = task.dst2.Width - r.Width - 1
-        If r.Y + r.Height >= task.dst2.Height Then r.Y = task.dst2.Height - r.Height - 1
+        If r.X + r.Width >= task.workRes.Width Then r.X = task.workRes.Width - r.Width - 1
+        If r.Y + r.Height >= task.workRes.Height Then r.Y = task.workRes.Height - r.Height - 1
         Return r
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)

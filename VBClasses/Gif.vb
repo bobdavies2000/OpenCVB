@@ -79,17 +79,18 @@ Public Class Gif_OpenCVB : Inherits TaskParent
                     nextBMP = New Bitmap(dst.Width, dst.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(dst, nextBMP)
                 Case gifTypes.gifdst2
-                    If task.dst2.Channels() = 1 Then
-                        task.dst2 = task.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    If task.gOptions.ShowGrid.Checked Then task.dsts.dstList(2).SetTo(cv.Scalar.White, task.gridMask)
+                    If task.dsts.dstList(2).Channels() = 1 Then
+                        task.dsts.dstList(2) = task.dsts.dstList(2).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     End If
-                    nextBMP = New Bitmap(task.dst2.Width, task.dst2.Height, Imaging.PixelFormat.Format24bppRgb)
-                    cvext.BitmapConverter.ToBitmap(task.dst2, nextBMP)
+                    nextBMP = New Bitmap(task.workRes.Width, task.workRes.Height, Imaging.PixelFormat.Format24bppRgb)
+                    cvext.BitmapConverter.ToBitmap(task.dsts.dstList(2), nextBMP)
                 Case gifTypes.gifdst3
-                    If task.dst3.Channels() = 1 Then
-                        task.dst3 = task.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    If task.dsts.dstList(3).Channels() = 1 Then
+                        task.dsts.dstList(3) = task.dsts.dstList(3).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     End If
-                    nextBMP = New Bitmap(task.dst3.Width, task.dst3.Height, Imaging.PixelFormat.Format24bppRgb)
-                    cvext.BitmapConverter.ToBitmap(task.dst3, nextBMP)
+                    nextBMP = New Bitmap(task.workRes.Width, task.workRes.Height, Imaging.PixelFormat.Format24bppRgb)
+                    cvext.BitmapConverter.ToBitmap(task.dsts.dstList(3), nextBMP)
                 Case gifTypes.openCVBwindow
                     Dim r = New cv.Rect(0, 0, task.mainFormLocation.Width - 20,
                                               task.mainFormLocation.Height - 40)

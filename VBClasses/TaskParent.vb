@@ -189,9 +189,9 @@ Public Class TaskParent : Implements IDisposable
     End Function
     Public Sub setPointCloudGrid()
         task.gOptions.GridSlider.Value = 8
-        If task.dst2.Width = 640 Then
+        If task.workRes.Width = 640 Then
             task.gOptions.GridSlider.Value = 16
-        ElseIf task.dst2.Width = 1280 Then
+        ElseIf task.workres.width = 1280 Then
             task.gOptions.GridSlider.Value = 32
         End If
     End Sub
@@ -349,7 +349,7 @@ Public Class TaskParent : Implements IDisposable
         Return mm
     End Function
     Public Function Show_HSV_Hist(hist As cv.Mat) As cv.Mat
-        Dim img As New cv.Mat(New cv.Size(task.dst2.Width, task.dst2.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        Dim img As New cv.Mat(New cv.Size(task.workRes.Width, task.workRes.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         Dim binCount = hist.Height
         Dim binWidth = img.Width / hist.Height
         Dim mm As mmData = GetMinMax(hist)
@@ -598,8 +598,8 @@ Public Class TaskParent : Implements IDisposable
     End Function
     Public Function quickRandomPoints(howMany As Integer) As List(Of cv.Point2f)
         Dim srcPoints As New List(Of cv.Point2f)
-        Dim w = task.dst2.Width
-        Dim h = task.dst2.Height
+        Dim w = task.workRes.Width
+        Dim h = task.workRes.Height
         For i = 0 To howMany - 1
             Dim pt = New cv.Point2f(msRNG.Next(0, w), msRNG.Next(0, h))
             srcPoints.Add(pt)

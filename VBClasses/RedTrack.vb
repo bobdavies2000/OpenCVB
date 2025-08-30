@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedTrack_Basics : Inherits TaskParent
     Public Sub New()
-        If New cv.Size(task.dst2.Width, task.dst2.Height) <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
+        If New cv.Size(task.workRes.Width, task.workRes.Height) <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
         desc = "Get stats on each RedCloud cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -69,7 +69,7 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         track.Run(src)
-        dst2 = task.dst2
+        dst2 = track.dst2
         If task.redC.rcList.Count = 0 Then
             SetTrueText("No lines found to track.", 3)
             Exit Sub
@@ -195,7 +195,7 @@ Public Class RedTrack_Points : Inherits TaskParent
         Next
 
         track.Run(dst3)
-        dst2 = task.dst2
+        dst2 = track.dst2
     End Sub
 End Class
 

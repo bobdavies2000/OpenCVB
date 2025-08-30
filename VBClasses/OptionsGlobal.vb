@@ -14,10 +14,10 @@ Public Class OptionsGlobal
 
         DotSizeSlider.Value = 1
         LineWidth.Value = 1
-        If task.dst2.Width <= 320 Then
+        If task.workRes.Width <= 320 Then
             DotSizeSlider.Value = 1
             LineWidth.Value = 1
-        ElseIf task.dst2.Width = 640 Then
+        ElseIf task.workres.width = 640 Then
             DotSizeSlider.Value = 2
             LineWidth.Value = 2
         End If
@@ -55,7 +55,7 @@ Public Class OptionsGlobal
         task.DotSize = 1
         task.cvFontThickness = 1
         task.gOptions.GridSlider.Value = 8
-        Select Case task.dst2.Width
+        Select Case task.workRes.Width
             Case 1920
                 task.cvFontSize = 3.5
                 task.cvFontThickness = 4

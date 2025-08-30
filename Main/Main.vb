@@ -16,7 +16,6 @@ Module OpenCVB_module
     Public glLock As New Mutex(True, "GLlock") ' global lock for use with sharp GL
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraLock As New Mutex(True, "cameraLock")
-    Public imageLock As New Mutex(True, "imageLock")
     Public trueTextLock As New Mutex(True, "trueTextLock")
     Public Declare Function GetWindowRect Lib "user32" (ByVal HWND As Integer, ByRef lpRect As RECT) As Integer
     <StructLayout(LayoutKind.Sequential)> Public Structure RECT
@@ -29,8 +28,6 @@ End Module
 #End Region
 
 Public Class Main
-    Public dsts As Comm.images
-
     Dim trueData As New List(Of TrueText)
     Dim algolist As algorithmList = New algorithmList
     Public Shared settings As jsonClass.ApplicationStorage
@@ -695,8 +692,11 @@ Public Class Main
                 If uiColor.Width > 0 Then
                     Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
                     SyncLock Comm.imageLock
-                        For i = 0 To dsts.dstList.Count - 1
-                            cvext.BitmapConverter.ToBitmap(dsts.dstList(i).Resize(camSize), camPic(i).Image)
+                        Dim pt As New cv.Point(Comm.ptCursor.X * ratio, Comm.ptCursor.Y * ratio)
+                        For i = 0 To task.dsts.dstList.Count - 1
+                            Dim tmp = task.dsts.dstList(i).Resize(camSize)
+                            tmp.Circle(pt, 3, cv.Scalar.White, -1)
+                            cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
                         Next
                     End SyncLock
                 End If
@@ -833,9 +833,9 @@ Public Class Main
     Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
         Dim ratio = saveworkRes.Width / camPic(0).Width
         Dim r = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-        r = validateRect(r, dsts.dstList(drawRectPic).Width, dsts.dstList(drawRectPic).Height)
+        r = validateRect(r, task.dsts.dstList(drawRectPic).Width, task.dsts.dstList(drawRectPic).Height)
         If r.Width = 0 Or r.Height = 0 Then Exit Sub
-        Dim img = dsts.dstList(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
+        Dim img = task.dsts.dstList(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
         cv.Cv2.ImShow("DrawRect Region " + CStr(magnifyIndex), img)
     End Sub
     Private Sub camSwitch()
@@ -1510,7 +1510,6 @@ Public Class Main
         algorithmFPSrate = 0
         newCameraImages = False
 
-        ReDim dsts.dstList(3)
         While 1
             If camera IsNot Nothing Then
                 parms.calibData = setCalibData(camera.calibData)
@@ -1557,7 +1556,7 @@ Public Class Main
             End If
 
             ' Adjust drawrect for the ratio of the actual size and workRes.
-            Dim ratio = camPic(0).Width / task.dst2.Width
+            Dim ratio = camPic(0).Width / task.workRes.Width
             If task.drawRect <> New cv.Rect Then
                 ' relative size of algorithm size image to displayed image
                 drawRect = New cv.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
@@ -1566,7 +1565,7 @@ Public Class Main
 
             Dim saveworkRes = settings.workRes
             task.labels = {"", "", "", ""}
-            mouseDisplayPoint = New cv.Point(task.dst2.Width / 2, task.dst2.Height / 2) ' mouse click point default = center of the image
+            mouseDisplayPoint = New cv.Point(task.workRes.Width / 2, task.workRes.Height / 2) ' mouse click point default = center of the image
 
             Dim saveDrawRect As cv.Rect
             task.motionMask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 255)
@@ -1646,12 +1645,12 @@ Public Class Main
                     SyncLock mouseLock
                         If mouseDisplayPoint.X < 0 Then mouseDisplayPoint.X = 0
                         If mouseDisplayPoint.Y < 0 Then mouseDisplayPoint.Y = 0
-                        If mouseDisplayPoint.X >= task.dst2.Width Then mouseDisplayPoint.X = task.dst2.Width - 1
-                        If mouseDisplayPoint.Y >= task.dst2.Height Then mouseDisplayPoint.Y = task.dst2.Height - 1
+                        If mouseDisplayPoint.X >= task.workRes.Width Then mouseDisplayPoint.X = task.workRes.Width - 1
+                        If mouseDisplayPoint.Y >= task.workRes.Height Then mouseDisplayPoint.Y = task.workRes.Height - 1
 
                         task.mouseMovePoint = mouseDisplayPoint
                         If task.mouseMovePoint = New cv.Point(0, 0) Then
-                            task.mouseMovePoint = New cv.Point(task.dst2.Width / 2, task.dst2.Height / 2)
+                            task.mouseMovePoint = New cv.Point(task.workRes.Width / 2, task.workRes.Height / 2)
                         End If
                         task.mouseMovePoint = validatePoint(task.mouseMovePoint)
                         task.mousePicTag = mousePicTag
@@ -1731,10 +1730,9 @@ Public Class Main
                     task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
                 End If
 
-                Dim ptCursor As New cv.Point
                 Dim ptM = task.mouseMovePoint, w = task.workRes.Width, h = task.workRes.Height
                 If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
-                    ptCursor = validatePoint(task.mouseMovePoint)
+                    Comm.ptCursor = validatePoint(task.mouseMovePoint)
                     SyncLock trueTextLock
                         trueData.Clear()
                         If task.trueData.Count Then
@@ -1765,14 +1763,6 @@ Public Class Main
                     cameraShutdown = True
                     Exit While
                 End If
-
-                SyncLock Comm.imageLock
-                    dsts.dstList = {task.dst0.Clone, task.dst1.Clone, task.dst2.Clone, task.dst3.Clone}
-                    dsts.dstList(0).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                    dsts.dstList(1).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                    dsts.dstList(2).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                    dsts.dstList(3).Circle(ptCursor, task.DotSize + 1, cv.Scalar.White, -1)
-                End SyncLock
 
                 algorithmRefresh = True
                 paintNewImages = True ' trigger the paint 

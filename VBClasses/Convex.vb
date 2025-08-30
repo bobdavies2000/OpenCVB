@@ -78,7 +78,8 @@ End Class
 Public Class Convex_Defects : Inherits TaskParent
     Dim contours As New Contour_Largest
     Public Sub New()
-        dst2 = cv.Cv2.ImRead(task.HomeDir + "Data/star2.png").Threshold(200, 255, cv.ThresholdTypes.Binary).Resize(New cv.Size(task.dst2.Width, task.dst2.Height))
+        dst2 = cv.Cv2.ImRead(task.HomeDir + "Data/star2.png").Threshold(200, 255,
+                            cv.ThresholdTypes.Binary).Resize(New cv.Size(task.workRes.Width, task.workRes.Height))
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
         labels = {"", "", "Input to the ConvexHull and ConvexityDefects", "Yellow = ConvexHull, Red = ConvexityDefects, Yellow dots are convexityDefect 'Far' points"}

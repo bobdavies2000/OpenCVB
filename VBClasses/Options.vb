@@ -7922,7 +7922,7 @@ Public Class Options_RedCloud : Inherits OptionParent
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the specification FOV
         Select Case task.cameraName
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
-                If task.dst2.Height = 480 Or task.dst2.Height = 240 Or task.dst2.Height = 120 Then
+                If task.workRes.Height = 480 Or task.workRes.Height = 240 Or task.workRes.Height = 120 Then
                     task.xRange = 1.38
                     task.yRange = 1.0
                 Else
@@ -7930,7 +7930,7 @@ Public Class Options_RedCloud : Inherits OptionParent
                     task.yRange = 0.8
                 End If
             Case "Intel(R) RealSense(TM) Depth Camera 455", ""
-                If task.dst2.Height = 480 Or task.dst2.Height = 240 Or task.dst2.Height = 120 Then
+                If task.workRes.Height = 480 Or task.workRes.Height = 240 Or task.workRes.Height = 120 Then
                     task.xRange = 2.04
                     task.yRange = 2.14
                 Else
@@ -7951,8 +7951,8 @@ Public Class Options_RedCloud : Inherits OptionParent
         task.xRangeDefault = task.xRange
         task.yRangeDefault = task.yRange
 
-        task.sideCameraPoint = New cv.Point(0, CInt(task.dst2.Height / 2))
-        task.topCameraPoint = New cv.Point(CInt(task.dst2.Width / 2), 0)
+        task.sideCameraPoint = New cv.Point(0, CInt(task.workRes.Height / 2))
+        task.topCameraPoint = New cv.Point(CInt(task.workRes.Width / 2), 0)
 
         task.channelsTop = {2, 0}
         task.channelsSide = {1, 2}
@@ -7962,8 +7962,8 @@ Public Class Options_RedCloud : Inherits OptionParent
         task.rangesSide = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange),
                                            New cv.Rangef(0.1, task.MaxZmeters + 0.1)}
 
-        task.sideCameraPoint = New cv.Point(0, CInt(task.dst2.Height / 2))
-        task.topCameraPoint = New cv.Point(CInt(task.dst2.Width / 2), 0)
+        task.sideCameraPoint = New cv.Point(0, CInt(task.workRes.Height / 2))
+        task.topCameraPoint = New cv.Point(CInt(task.workRes.Width / 2), 0)
 
         task.projectionThreshold = 3 ' ProjectionThresholdBar.Value
         task.channelCount = 1

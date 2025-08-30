@@ -206,7 +206,7 @@ Public Class Plot_OverTime : Inherits TaskParent
     Public controlScale As Boolean ' Use this to programmatically control the scale (rather than let the automated way below keep the scale.)
     Public Sub New()
         desc = "Plot an input variable over time"
-        Select Case task.dst2.Width
+        Select Case task.workRes.Width
             Case 1920
                 task.gOptions.LineWidth.Value = 10
             Case 1280
@@ -372,7 +372,7 @@ Public Class Plot_OverTimeFixedScale : Inherits TaskParent
         Dim lineCount = CInt(maxScale - minScale - 1)
         If lineCount > 3 Or lineCount < 0 Then lineCount = 3
         If showScale Then AddPlotScale(plotOutput, minScale, maxScale, lineCount)
-        dst2 = plotOutput.Resize(New cv.Size(task.dst2.Width, task.dst2.Height))
+        dst2 = plotOutput.Resize(New cv.Size(task.workRes.Width, task.workRes.Height))
     End Sub
 End Class
 

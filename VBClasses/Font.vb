@@ -49,7 +49,7 @@ Public Class Font_FlowMsgs : Inherits TaskParent
         End If
 
         Dim maxLines = 31
-        If task.dst2.Height = 720 Or task.dst2.Height = 360 Or task.dst2.Height = 180 Then maxLines = 23
+        If task.workres.height = 720 Or task.workres.height = 360 Or task.workres.height = 180 Then maxLines = 23
         Dim clearRequested As Boolean
         If msgs.Count > maxLines Then
             If msgs.Count < maxLines * 2 Then
