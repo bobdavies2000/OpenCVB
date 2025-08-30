@@ -83,7 +83,6 @@ Public Class VBtask : Implements IDisposable
 
     Public MainUI_Algorithm As Object
     Public myStopWatch As Stopwatch
-    Public displayRes As cv.Size
 
     Public cvFontSize As Single = 0.8
     Public cvFontThickness As Integer = 1
@@ -364,7 +363,6 @@ Public Class VBtask : Implements IDisposable
         Public fpsHostCamera As Integer
         Public workRes As cv.Size
         Public captureRes As cv.Size ' DisparityIn-verted_Basics needs the full resolution to compute disparity.
-        Public displayRes As cv.Size
 
         Public algName As String
 
@@ -454,7 +452,6 @@ Public Class VBtask : Implements IDisposable
         'End Select
 
         mainFormLocation = parms.mainFormLocation
-        displayRes = parms.displayRes
         rows = parms.workRes.Height
         cols = parms.workRes.Width
         workRes = parms.workRes

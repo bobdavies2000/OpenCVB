@@ -1462,7 +1462,6 @@ Public Class Main
 
         parms.workRes = settings.workRes
         parms.captureRes = settings.captureRes
-        parms.displayRes = settings.displayRes
         parms.algName = AvailableAlgorithms.Text
 
         PausePlayButton.Image = PausePlay
