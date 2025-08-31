@@ -34,7 +34,6 @@ Namespace MyApp.UI
         Dim saveCameraName As String
         Dim pauseCameraTask As Boolean
 
-        Dim jsonfs As New jsonClass.FileOperations
         Dim optionsForm As Options
         Dim groupList As New List(Of String)
 
@@ -59,7 +58,7 @@ Namespace MyApp.UI
 
         Dim cameraTaskHandle As Thread
         Public DevicesChanged As Boolean
-        Dim camPic(4 - 1) As PictureBox
+        Public camPic(4 - 1) As PictureBox
         Dim camLabel(camPic.Count - 1) As Label
 
         Dim paintNewImages As Boolean
@@ -134,181 +133,8 @@ Namespace MyApp.UI
         Dim magnifyIndex As Integer
         Dim depthAndCorrelationText As String
         Dim results As New Comm.resultData
+        Public jsonfs As New jsonClass.jsonIO
 
-        Public Sub jsonRead()
-            jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
-            settings = jsonfs.Load()(0)
-            ' The camera names are defined in VBtask.algParms.cameraNames
-            ' the 3 lists below must have an entry for each camera - supported/640x480/1920...
-            '  cameraNames = New List(Of String)(VB_Classes.VBtask.algParms.cameraNames)  ' <<<<<<<<<<<< here is the list of supported cameras.
-            With settings
-                .cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True, True})
-                .camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True, True})
-                .camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False, False})
-                Dim defines = New FileInfo(HomeDir.FullName + "Cameras\CameraDefines.hpp")
-                Dim stereoLabsDefineIsOff As Boolean
-                Dim sr = New StreamReader(defines.FullName)
-                Dim zedIndex = Comm.cameraNames.IndexOf("StereoLabs ZED 2/2i")
-                While sr.EndOfStream = False
-                    Dim nextLine = sr.ReadLine
-                    If nextLine.Contains("STEREOLAB") Then
-                        If nextLine.StartsWith("//") Then
-                            .cameraSupported(zedIndex) = False
-                            stereoLabsDefineIsOff = True
-                        End If
-                    End If
-                End While
-
-                sr.Close()
-
-                ' checking the list for specific missing device here...
-                Dim usbList = USBenumeration()
-                Dim testlist As New List(Of String)
-                For Each usbDevice In usbList
-                    If LCase(usbDevice).Contains("orb") Then testlist.Add(usbDevice) ' debugging assistance...
-                Next
-
-                .cameraPresent = New List(Of Boolean)
-                For i = 0 To Comm.cameraNames.Count - 1
-                    Dim searchname = Comm.cameraNames(i)
-                    Dim present As Boolean = False
-                    If searchname.Contains("Oak-D") Then searchname = "Movidius MyriadX"
-                    If stereoLabsDefineIsOff = False Then
-                        If searchname.StartsWith("StereoLabs ZED 2/2i") Then searchname = "ZED 2"
-                    End If
-
-                    Dim subsetList As New List(Of String)
-                    For Each usbDevice In usbList
-                        If usbDevice.Contains("Orb") Then subsetList.Add(usbDevice)
-                        If usbDevice.Contains(searchname) Then present = True
-                    Next
-                    .cameraPresent.Add(present <> False)
-                Next
-
-                For i = 0 To Comm.cameraNames.Count - 1
-                    If Comm.cameraNames(i).StartsWith("Orbbec") Then
-                        If Comm.cameraNames(i) = .cameraName Then
-                            .cameraIndex = i
-                            Exit For
-                        End If
-                    Else
-                        If Comm.cameraNames(i).Contains(.cameraName) And .cameraName <> "" Then
-                            .cameraIndex = i
-                            Exit For
-                        End If
-                    End If
-                Next
-
-                If .cameraName = "" Or .cameraPresent(.cameraIndex) = False Then
-                    For i = 0 To Comm.cameraNames.Count - 1
-                        If .cameraPresent(i) Then
-                            .cameraIndex = i
-                            .cameraName = Comm.cameraNames(i)
-                            Exit For
-                        End If
-                    Next
-                Else
-                    For i = 0 To Comm.cameraNames.Count - 1
-                        If Comm.cameraNames(i) = .cameraName Then .cameraIndex = i
-                    Next
-                End If
-
-                If .cameraPresent(zedIndex) And .cameraSupported(zedIndex) = False And stereoLabsDefineIsOff = False Then
-                    MessageBox.Show("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
-                       "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
-                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-                       "and rerun Update_All.bat to get the StereoLabs SDK.")
-                End If
-
-                settings.cameraFound = False
-                For i = 0 To settings.cameraPresent.Count - 1
-                    If settings.cameraPresent(i) Then
-                        settings.cameraFound = True
-                        Exit For
-                    End If
-                Next
-                If settings.cameraFound = False Then
-                    settings.cameraName = ""
-                    MessageBox.Show("There are no supported cameras present!" + vbCrLf + vbCrLf)
-                End If
-
-                If settings.testAllDuration < 5 Then settings.testAllDuration = 5
-                If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
-
-                If .workRes = New cv.Size Then .workRes = New cv.Size(640, 480)
-                Select Case .workRes.Height
-                    Case 270, 540, 1080
-                        .captureRes = New cv.Size(1920, 1080)
-                        If .camera1920x1080Support(.cameraIndex) = False Then
-                            .captureRes = New cv.Size(1280, 720)
-                            .workRes = New cv.Size(320, 180)
-                        End If
-                    Case 180, 360, 720
-                        .captureRes = New cv.Size(1280, 720)
-                    Case 376, 188, 94
-                        If settings.cameraName <> "StereoLabs ZED 2/2i" Then
-                            MessageBox.Show("The json settings don't appear to be correct!" + vbCrLf +
-                                "The 'settings.json' file will be removed" + vbCrLf +
-                                "and rebuilt with default settings upon restart.")
-                            Dim fileinfo As New FileInfo(jsonfs.jsonFileName)
-                            fileinfo.Delete()
-                            End
-                        End If
-                        .captureRes = New cv.Size(672, 376)
-                    Case 120, 240, 480
-                        .captureRes = New cv.Size(640, 480)
-                        If .camera640x480Support(.cameraIndex) = False Then
-                            .captureRes = New cv.Size(1280, 720)
-                            .workRes = New cv.Size(320, 180)
-                        End If
-                End Select
-
-                Dim wh = .workRes.Height
-                ' desktop style is the default
-                If .snap320 = False And .snap640 = False And .snapCustom = False Then .snap640 = True
-                If .snap640 Then
-                    .locationMain.Item2 = 1321
-                    .locationMain.Item3 = 845
-                    If wh = 240 Or wh = 480 Or wh = 120 Then .locationMain.Item3 = 1096
-                    If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cv.Size(640, 480) Else .displayRes = New cv.Size(640, 360)
-                ElseIf .snap320 Then
-                    .locationMain.Item2 = 683
-                    .locationMain.Item3 = 510
-                    If wh = 240 Or wh = 480 Or wh = 120 Then .locationMain.Item3 = 616
-                    If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cv.Size(320, 240) Else .displayRes = New cv.Size(320, 180)
-                End If
-
-                Dim border As Integer = 6
-                Dim defaultWidth = .workRes.Width * 2 + border * 7
-                Dim defaultHeight = .workRes.Height * 2 + ToolStrip1.Height + border * 12
-                If Me.Height < 50 Then
-                    Me.Width = defaultWidth
-                    Me.Height = defaultHeight
-                End If
-
-                If .fontInfo Is Nothing Then .fontInfo = New Font("Tahoma", 9)
-                If settings.groupComboText = "" Then settings.groupComboText = "< All >"
-
-                If testAllRunning = False Then
-                    Dim resStr = CStr(.workRes.Width) + "x" + CStr(.workRes.Height)
-                    For i = 0 To Comm.resolutionList.Count - 1
-                        If Comm.resolutionList(i).StartsWith(resStr) Then
-                            .workResIndex = i
-                            Exit For
-                        End If
-                    Next
-                End If
-
-                .desiredFPS = 60
-                Me.Left = .locationMain.Item0
-                Me.Top = .locationMain.Item1
-                Me.Width = .locationMain.Item2
-                Me.Height = .locationMain.Item3
-
-                optionsForm = New Options
-                optionsForm.defineCameraResolutions(settings.cameraIndex)
-            End With
-        End Sub
         Private Sub OpenCVB_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
             If e.KeyValue = Keys.Up Then upArrow = True
             If e.KeyValue = Keys.Down Then downArrow = True
@@ -331,44 +157,6 @@ Namespace MyApp.UI
             If pt.Y > task.workRes.Height Then pt.Y = task.workRes.Height - 1
             Return pt
         End Function
-        Public Function USBenumeration() As List(Of String)
-            Static usblist As New List(Of String)
-            Dim info As ManagementObject
-            Dim search As ManagementObjectSearcher
-            search = New ManagementObjectSearcher("SELECT * From Win32_PnPEntity")
-            If usblist.Count = 0 Then
-                For Each info In search.Get()
-                    Dim Name = CType(info("Caption"), String)
-                    If Name IsNot Nothing Then
-                        usblist.Add(Name)
-                        ' This enumeration can tell us about the cameras present.  Built on first pass.
-                        If InStr(Name, "Xeon") Or InStr(Name, "Chipset") Or InStr(Name, "Generic") Or InStr(Name, "Bluetooth") Or
-                            InStr(Name, "Monitor") Or InStr(Name, "Mouse") Or InStr(Name, "NVIDIA") Or InStr(Name, "HID-compliant") Or
-                            InStr(Name, " CPU ") Or InStr(Name, "PCI Express") Or Name.StartsWith("USB ") Or
-                            Name.StartsWith("Microsoft") Or Name.StartsWith("Motherboard") Or InStr(Name, "SATA") Or
-                            InStr(Name, "Volume") Or Name.StartsWith("WAN") Or InStr(Name, "ACPI") Or
-                            Name.StartsWith("HID") Or InStr(Name, "OneNote") Or Name.StartsWith("Samsung") Or
-                            Name.StartsWith("System ") Or Name.StartsWith("HP") Or InStr(Name, "Wireless") Or
-                            Name.StartsWith("SanDisk") Or InStr(Name, "Wi-Fi") Or Name.StartsWith("Media ") Or
-                            Name.StartsWith("High precision") Or Name.StartsWith("High Definition ") Or
-                            InStr(Name, "Remote") Or InStr(Name, "Numeric") Or InStr(Name, "UMBus ") Or
-                            Name.StartsWith("Plug or Play") Or InStr(Name, "Print") Or Name.StartsWith("Direct memory") Or
-                            InStr(Name, "interrupt controller") Or Name.StartsWith("NVVHCI") Or Name.StartsWith("Plug and Play") Or
-                            Name.StartsWith("ASMedia") Or Name = "Fax" Or Name.StartsWith("Speakers") Or
-                            InStr(Name, "Host Controller") Or InStr(Name, "Management Engine") Or InStr(Name, "Legacy") Or
-                            Name.StartsWith("NDIS") Or Name.StartsWith("Logitech USB Input Device") Or
-                            Name.StartsWith("Simple Device") Or InStr(Name, "Ethernet") Or Name.StartsWith("WD ") Or
-                            InStr(Name, "Composite Bus Enumerator") Or InStr(Name, "Turbo Boost") Or Name.StartsWith("Realtek") Or
-                            Name.StartsWith("PCI-to-PCI") Or Name.StartsWith("Network Controller") Or Name.StartsWith("ATAPI ") Or
-                            Name.Contains("Gen Intel(R) ") Then
-                        Else
-                            Debug.WriteLine(Name) ' looking for new cameras 
-                        End If
-                    End If
-                Next
-            End If
-            Return usblist
-        End Function
         Private Function getCamera() As Object
             Select Case settings.cameraName
                 Case "Intel(R) RealSense(TM) Depth Camera 455", "Intel(R) RealSense(TM) Depth Camera 435i"
@@ -383,7 +171,7 @@ Namespace MyApp.UI
             Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
         End Function
         Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-            jsonWrite()
+            jsonfs.write()
             cameraShutdown = True
             Thread.Sleep(200)
             End
@@ -456,8 +244,8 @@ Namespace MyApp.UI
 
                 camSwitch()
 
-                jsonWrite()
-                jsonRead() ' this will apply all the changes...
+                jsonfs.write()
+                settings = jsonfs.Read() ' this will apply all the changes...
                 Application.DoEvents()
 
                 StartAlgorithm()
@@ -865,8 +653,8 @@ Namespace MyApp.UI
 
                 setworkRes()
 
-                jsonWrite()
-                jsonRead()
+                jsonfs.write()
+                settings = jsonfs.read()
                 LineUpCamPics()
 
                 ' when switching resolution, best to reset these as the move from higher to lower res
@@ -922,23 +710,6 @@ Namespace MyApp.UI
                     settings.captureRes = New cv.Size(672, 376)
             End Select
         End Sub
-        Public Sub jsonWrite()
-            If TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if "Test All" is running.
-                settings.MainUI_AlgName = AvailableAlgorithms.Text
-                settings.groupComboText = GroupComboBox.Text
-            End If
-
-            settings.locationMain = New cv.Vec4f(Me.Left, Me.Top, Me.Width, Me.Height)
-            If camPic(0) IsNot Nothing Then
-                ' used only when .snapCustom is true
-                settings.displayRes = New cv.Size(camPic(0).Width, camPic(0).Height)
-            End If
-            If settings.translatorMode = "" Then settings.translatorMode = "VB.Net to C#"
-
-            Dim setlist = New List(Of jsonClass.ApplicationStorage)
-            setlist.Add(settings)
-            jsonfs.Save(setlist)
-        End Sub
         Private Sub setupTestAll()
             testAllResolutionCount = 0
             testAllStartingRes = -1
@@ -958,8 +729,9 @@ Namespace MyApp.UI
 
                 TestAllButton.Text = "Stop Test"
                 AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
-                jsonWrite()
-                jsonRead()
+                jsonfs.write()
+                settings = jsonfs.read()
+
                 TestAllTimer.Interval = 1
                 TestAllTimer.Enabled = True
             Else
@@ -1032,7 +804,12 @@ Namespace MyApp.UI
 
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
 
-            jsonRead()
+            jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
+            settings = jsonfs.read()
+
+            optionsForm = New Options
+            optionsForm.defineCameraResolutions(settings.cameraIndex)
+
             setupPath()
             camSwitch()
             Application.DoEvents()
@@ -1093,7 +870,7 @@ Namespace MyApp.UI
                 Else
                     AvailableAlgorithms.SelectedIndex = 0
                 End If
-                jsonWrite()
+                jsonfs.write()
             End If
 
             AvailableAlgorithms.ComboBox.Select()
@@ -1130,7 +907,7 @@ Namespace MyApp.UI
             End If
             If AvailableAlgorithms.Enabled Then
                 If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
-                jsonWrite()
+                jsonfs.write()
                 StartAlgorithm()
                 updateAlgorithmHistory()
             End If
@@ -1217,7 +994,7 @@ Namespace MyApp.UI
                 End If
             Next
 
-            jsonWrite()
+            jsonfs.write()
             StartAlgorithm()
             updateAlgorithmHistory()
             groupButtonSelection = ""
@@ -1229,7 +1006,7 @@ Namespace MyApp.UI
                 AvailableAlgorithms.SelectedItem = algName
             End If
             settings.MainUI_AlgName = AvailableAlgorithms.Text
-            jsonWrite()
+            jsonfs.write()
         End Sub
         Private Sub algHistory_Clicked(sender As Object, e As EventArgs)
             arrowIndex = 0
