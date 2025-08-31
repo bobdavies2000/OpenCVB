@@ -237,16 +237,6 @@ Namespace jsonClass
                 If .fontInfo Is Nothing Then .fontInfo = New Font("Tahoma", 9)
                 If settings.groupComboText = "" Then settings.groupComboText = "< All >"
 
-                If MyApp.UI.Main.testAllRunning = False Then
-                    Dim resStr = CStr(.workRes.Width) + "x" + CStr(.workRes.Height)
-                    For i = 0 To Comm.resolutionList.Count - 1
-                        If Comm.resolutionList(i).StartsWith(resStr) Then
-                            .workResIndex = i
-                            Exit For
-                        End If
-                    Next
-                End If
-
                 .desiredFPS = 60
                 MyApp.UI.Main.Left = .locationMain.Item0
                 MyApp.UI.Main.Top = .locationMain.Item1

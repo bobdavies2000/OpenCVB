@@ -27,9 +27,15 @@ End Module
 
 Namespace MyApp.UI
     Partial Public Class Main : Inherits Form
+        Public camPic(4 - 1) As PictureBox
+        Public Shared settings As jsonClass.ApplicationStorage
+        Public HomeDir As DirectoryInfo
+        Public groupButtonSelection As String
+        Public algorithmFPSrate As Single
+        Public fpsCamera As Single
+
         Dim trueData As New List(Of TrueText)
         Dim algolist As algorithmList = New algorithmList
-        Public Shared settings As jsonClass.ApplicationStorage
         Dim saveworkRes As cv.Size
         Dim saveCameraName As String
         Dim pauseCameraTask As Boolean
@@ -37,8 +43,6 @@ Namespace MyApp.UI
         Dim optionsForm As Options
         Dim groupList As New List(Of String)
 
-        Public HomeDir As DirectoryInfo
-        Public groupButtonSelection As String
         Dim upArrow As Boolean, downArrow As Boolean
 
         Dim pathList As New List(Of String)
@@ -57,8 +61,6 @@ Namespace MyApp.UI
         Dim camera As Object
 
         Dim cameraTaskHandle As Thread
-        Public DevicesChanged As Boolean
-        Public camPic(4 - 1) As PictureBox
         Dim camLabel(camPic.Count - 1) As Label
 
         Dim paintNewImages As Boolean
@@ -84,10 +86,8 @@ Namespace MyApp.UI
         Dim activeMouseDown As Boolean
 
         Dim myBrush = New SolidBrush(Color.White)
-        Public algorithmFPSrate As Single
         Dim fpsListA As New List(Of Single)
         Dim fpsListC As New List(Of Single)
-        Public fpsCamera As Single
         Dim picLabels() = {"", "", "", ""}
         Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
         Dim textDesc As String = ""
@@ -120,7 +120,7 @@ Namespace MyApp.UI
 
         Dim testAllToolbarBitmap As Bitmap
 
-        Public testAllRunning As Boolean
+        Dim testAllRunning As Boolean
 
         Public colorTransitionCount As Integer
         Public colorScheme As String
@@ -651,11 +651,21 @@ Namespace MyApp.UI
                     TestAllTimer.Interval = settings.testAllDuration * 1000 * 3
                 End If
 
-                Options.setworkRes()
-
                 jsonfs.write()
                 settings = jsonfs.read()
                 LineUpCamPics()
+
+                If testAllRunning = False Then
+                    Dim resStr = CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height)
+                    For i = 0 To Comm.resolutionList.Count - 1
+                        If Comm.resolutionList(i).StartsWith(resStr) Then
+                            settings.workResIndex = i
+                            Exit For
+                        End If
+                    Next
+                End If
+
+                Options.setworkRes()
 
                 ' when switching resolution, best to reset these as the move from higher to lower res
                 ' could mean the point is no longer valid.

@@ -92,6 +92,9 @@ Namespace MyApp.UI
             Select Case results.GLRequest
                 Case Comm.oCase.drawPointCloudRGB
                     If results.GLcloud Is Nothing Then Exit Sub
+                    If results.GLcloud.Size <> MyApp.UI.Main.settings.workRes Then
+                        results.GLcloud = New cv.Mat(MyApp.UI.Main.settings.workRes, cv.MatType.CV_32FC3, 0)
+                    End If
                     gl.Begin(OpenGL.GL_POINTS)
 
                     For y = 0 To settings.workRes.Height - 1
