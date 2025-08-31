@@ -18,8 +18,6 @@ Public Class GL_BasicsMain : Inherits TaskParent
         desc = "Display the pointcloud in the main form"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.results.GLcloud = task.pointCloud.Clone
-        task.results.GLrgb = src.Clone
         task.results.GLRequest = Comm.oCase.drawPointCloudRGB
     End Sub
 End Class

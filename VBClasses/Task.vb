@@ -8,6 +8,7 @@ Imports cv = OpenCvSharp
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
     Public results As New Comm.resultData
+    Public resultLock As New Mutex(True, "resultLock")
 
     ' add any task algorithms here.
     Public ogl As XO_OpenGL_Basics
@@ -777,53 +778,54 @@ Public Class VBtask : Implements IDisposable
 
             Dim displayObject = findDisplayObject(task.displayObjectName)
 
-            If gOptions.displayDst0.Checked Then
-                results.dstList(0) = Check8uC3(displayObject.dst0)
-            Else
-                results.dstList(0) = task.color.Clone
-            End If
-            If gOptions.displayDst1.Checked Then
-                results.dstList(1) = Check8uC3(displayObject.dst1)
-                displayDst1 = True
-            Else
-                results.dstList(1) = depthRGB.Clone
-                displayDst1 = False
-            End If
+            SyncLock resultLock
+                If gOptions.displayDst0.Checked Then
+                    results.dstList(0) = Check8uC3(displayObject.dst0)
+                Else
+                    results.dstList(0) = task.color.Clone
+                End If
+                If gOptions.displayDst1.Checked Then
+                    results.dstList(1) = Check8uC3(displayObject.dst1)
+                    displayDst1 = True
+                Else
+                    results.dstList(1) = depthRGB.Clone
+                    displayDst1 = False
+                End If
 
-            results.dstList(2) = Check8uC3(displayObject.dst2)
-            results.dstList(3) = Check8uC3(displayObject.dst3)
+                results.dstList(2) = Check8uC3(displayObject.dst2)
+                results.dstList(3) = Check8uC3(displayObject.dst3)
 
-            ' make sure that any outputs from the algorithm are the right size.nearest
-            If results.dstList(0).Size <> workRes And results.dstList(0).Width > 0 Then
-                results.dstList(0) = results.dstList(0).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            End If
-            If results.dstList(1).Size <> workRes And results.dstList(1).Width > 0 Then
-                results.dstList(1) = results.dstList(1).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            End If
-            If results.dstList(2).Size <> workRes And results.dstList(2).Width > 0 Then
-                results.dstList(2) = results.dstList(2).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            End If
-            If results.dstList(3).Size <> workRes And results.dstList(3).Width > 0 Then
-                results.dstList(3) = results.dstList(3).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            End If
+                ' make sure that any outputs from the algorithm are the right size.nearest
+                If results.dstList(0).Size <> workRes And results.dstList(0).Width > 0 Then
+                    results.dstList(0) = results.dstList(0).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                End If
+                If results.dstList(1).Size <> workRes And results.dstList(1).Width > 0 Then
+                    results.dstList(1) = results.dstList(1).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                End If
+                If results.dstList(2).Size <> workRes And results.dstList(2).Width > 0 Then
+                    results.dstList(2) = results.dstList(2).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                End If
+                If results.dstList(3).Size <> workRes And results.dstList(3).Width > 0 Then
+                    results.dstList(3) = results.dstList(3).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                End If
 
-            If gOptions.ShowGrid.Checked Then results.dstList(2).SetTo(cv.Scalar.White, gridMask)
+                If gOptions.ShowGrid.Checked Then results.dstList(2).SetTo(cv.Scalar.White, gridMask)
 
-            If gOptions.showMotionMask.Checked Then
-                For i = 0 To gridRects.Count - 1
-                    If motionBasics.motionFlags(i) Then
-                        results.dstList(0).Rectangle(gridRects(i), cv.Scalar.White, lineWidth)
-                    End If
-                Next
-            End If
+                If gOptions.showMotionMask.Checked Then
+                    For i = 0 To gridRects.Count - 1
+                        If motionBasics.motionFlags(i) Then
+                            results.dstList(0).Rectangle(gridRects(i), cv.Scalar.White, lineWidth)
+                        End If
+                    Next
+                End If
 
-            If gOptions.CrossHairs.Checked Then
-                Gravity_Basics.showVectors(results.dstList(0))
-                Dim lp = lineLongest
-                Dim pt = New cv.Point2f((lp.p1Ex.X + lp.p2Ex.X) / 2 + 5, (lp.p1Ex.Y + lp.p2Ex.Y) / 2)
-                displayObject.trueData.Add(New TrueText("Longest", pt, 0))
-            End If
-
+                If gOptions.CrossHairs.Checked Then
+                    Gravity_Basics.showVectors(results.dstList(0))
+                    Dim lp = lineLongest
+                    Dim pt = New cv.Point2f((lp.p1Ex.X + lp.p2Ex.X) / 2 + 5, (lp.p1Ex.Y + lp.p2Ex.Y) / 2)
+                    displayObject.trueData.Add(New TrueText("Longest", pt, 0))
+                End If
+            End SyncLock
             ' if there were no cycles spent on this routine, then it was inactive.
             ' if any active algorithm has an index = -1, make sure it is running .Run, not .RunAlg
             Dim index = algorithmNames.IndexOf(displayObject.traceName)
