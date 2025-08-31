@@ -5,6 +5,7 @@ Imports System.Management
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 Imports System.Threading
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
@@ -31,8 +32,10 @@ Namespace OpenCVB
         Public Shared settings As jsonClass.ApplicationStorage
         Public HomeDir As DirectoryInfo
         Public groupButtonSelection As String
-        Public algorithmFPSrate As Single
+        Public fpsAlgorithm As Single
         Public fpsCamera As Single
+        Dim fpsListA As New List(Of Single)
+        Dim fpsListC As New List(Of Single)
 
         Dim trueData As New List(Of TrueText)
         Dim algolist As algorithmList = New algorithmList
@@ -86,8 +89,6 @@ Namespace OpenCVB
         Dim activeMouseDown As Boolean
 
         Dim myBrush = New SolidBrush(Color.White)
-        Dim fpsListA As New List(Of Single)
-        Dim fpsListC As New List(Of Single)
         Dim picLabels() = {"", "", "", ""}
         Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
         Dim textDesc As String = ""
@@ -646,7 +647,6 @@ Namespace OpenCVB
                 CameraSwitching.Visible = False
             End If
         End Sub
-
         Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
             Static lastTime As DateTime = Now
             Static lastAlgorithmFrame As Integer
@@ -687,18 +687,39 @@ Namespace OpenCVB
                 cameraName = cameraName.Replace(" Camera", "")
                 cameraName = cameraName.Replace("Intel(R) RealSense(TM) Depth ", "Intel D")
 
-                algorithmFPSrate = fpsListA.Average
+                fpsAlgorithm = fpsListA.Average
                 fpsCamera = CInt(fpsListC.Average)
-                If algorithmFPSrate >= 100 Then algorithmFPSrate = 99
+                If fpsAlgorithm >= 100 Then fpsAlgorithm = 99
                 If fpsCamera >= 100 Then fpsCamera = 99
                 Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " +
                           CStr(algorithmCount) + " algorithms = " +
                           CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " +
                           cameraName + " - Camera FPS/task FPS: " + Format(fpsCamera, "0") + "/" +
-                          Format(algorithmFPSrate, "0")
+                          Format(fpsAlgorithm, "0")
                 If fpsListA.Count > 5 Then
                     fpsListA.RemoveAt(0)
                     fpsListC.RemoveAt(0)
+                End If
+
+                If fpsAlgorithm = 0 Then
+                    fpsAlgorithm = 1
+                Else
+                    Static lastWriteTime = timeNow
+                    elapsedTime = timeNow.Ticks - lastWriteTime.Ticks
+                    spanCopy = New TimeSpan(elapsedTime)
+                    taskTimerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
+                    If taskTimerInterval > 5000 Then
+                        Static writeCount As Integer
+                        If writeCount = 0 Then Debug.Write(vbTab + "FPSAlg/FPSCam ")
+                        lastWriteTime = timeNow
+                        If writeCount = 3 Then
+                            Debug.WriteLine("")
+                            Debug.Write(vbTab + "FPSAlg/FPSCam ")
+                            writeCount = 0
+                        End If
+                        writeCount += 1
+                        Debug.Write(Format(fpsAlgorithm, fmt0) + "/" + Format(fpsCamera, fmt0) + ", ")
+                    End If
                 End If
             End If
         End Sub
@@ -1137,7 +1158,7 @@ Namespace OpenCVB
         Private Sub AlgorithmTask(ByVal parms As VBClasses.VBtask.algParms)
             If parms.algName = "" Then Exit Sub
             algorithmQueueCount += 1
-            algorithmFPSrate = 0
+            fpsAlgorithm = 0
             newCameraImages = False
 
             ReDim results.dstList(3)
@@ -1182,17 +1203,18 @@ Namespace OpenCVB
                 textDesc = task.MainUI_Algorithm.desc
 
                 If ComplexityTimer.Enabled = False Then
-                    Debug.WriteLine(CStr(Now))
-                    Debug.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + vbCrLf + vbTab +
-                                      CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
-                    Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
-                    totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
-                    Debug.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
-                                      parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
+                    Debug.WriteLine(vbTab + parms.algName + vbTab + "Algorithms tested: " + CStr(AlgorithmTestAllCount))
 
-                    Debug.WriteLine(vbTab + "Active camera = " + settings.cameraName + ", Input resolution " +
-                                      CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) + " and working resolution of " +
-                                      CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height) + vbCrLf)
+                    Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+                    totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
+
+                    Debug.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
+                                     parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
+                    Debug.WriteLine(vbTab + "Active camera = " + settings.cameraName)
+                    Debug.WriteLine(vbTab + "Input resolution " + CStr(settings.captureRes.Width) + "x" +
+                                                                  CStr(settings.captureRes.Height))
+                    Debug.WriteLine(vbTab + "Working resolution of " + CStr(settings.workRes.Width) + "x" +
+                                                                       CStr(settings.workRes.Height))
                 End If
 
                 ' Adjust drawrect for the ratio of the actual size and workRes.
@@ -1356,10 +1378,10 @@ Namespace OpenCVB
                     pixelViewerRect = task.pixelViewerRect
                     pixelViewTag = task.pixelViewTag
 
-                    If Single.IsNaN(algorithmFPSrate) Then
-                        task.fpsAlgorithm = 0
+                    If Single.IsNaN(fpsAlgorithm) Or fpsAlgorithm = 0 Then
+                        task.fpsAlgorithm = 1
                     Else
-                        task.fpsAlgorithm = If(algorithmFPSrate < 0.01, 0, algorithmFPSrate)
+                        task.fpsAlgorithm = If(fpsAlgorithm < 0.01, 0, fpsAlgorithm)
                     End If
 
                     Dim ptM = task.mouseMovePoint, w = task.workRes.Width, h = task.workRes.Height
@@ -1379,8 +1401,6 @@ Namespace OpenCVB
 
                     If task.displayDst1 = False Or task.labels(1) = "" Then picLabels(1) = "DepthRGB"
                     picLabels(1) = task.depthAndCorrelationText.Replace(vbCrLf, "")
-
-                    If task.fpsAlgorithm = 0 Then task.fpsAlgorithm = 1
 
                     Dim elapsedTicks = Now.Ticks - returnTime.Ticks
                     Dim span = New TimeSpan(elapsedTicks)
