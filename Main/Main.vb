@@ -25,7 +25,7 @@ Module OpenCVB_module
 End Module
 #End Region
 
-Namespace MyApp.UI
+Namespace OpenCVB
     Partial Public Class Main : Inherits Form
         Public camPic(4 - 1) As PictureBox
         Public Shared settings As jsonClass.ApplicationStorage
@@ -134,6 +134,111 @@ Namespace MyApp.UI
         Dim depthAndCorrelationText As String
         Dim results As New Comm.resultData
         Public jsonfs As New jsonClass.jsonIO
+        Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+            Dim args() = Environment.GetCommandLineArgs()
+
+            Dim exePath As String = AppDomain.CurrentDomain.BaseDirectory
+            Dim solutionDir As String = Path.GetFullPath(Path.Combine(exePath, "..\..\..\..\..\..\"))
+            HomeDir = New DirectoryInfo(solutionDir)
+
+            Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
+            Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
+            Directory.SetCurrentDirectory(HomeDir.FullName)
+
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
+
+            jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
+            settings = jsonfs.read()
+
+            optionsForm = New Options
+            optionsForm.defineCameraResolutions(settings.cameraIndex)
+
+            setupPath()
+            camSwitch()
+            Application.DoEvents()
+
+            PausePlay = New Bitmap(HomeDir.FullName + "Main/Data/PauseButton.png")
+            stopTestAll = New Bitmap(HomeDir.FullName + "Main/Data/stopTestAll.png")
+            testAllToolbarBitmap = New Bitmap(HomeDir.FullName + "Main/Data/testall.png")
+            runPlay = New Bitmap(HomeDir.FullName + "Main/Data/PauseButtonRun.png")
+
+            setupAlgorithmHistory()
+
+            Dim libraries = {"Cam_K4A.dll", "CPP_Native.dll", "Cam_MyntD.dll", "Cam_Zed2.dll", "Cam_ORB335L.dll"}
+            For i = 0 To libraries.Count - 1
+                Dim dllName = libraries(i)
+                Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
+                If dllFile.Exists Then
+                    ' if the debug dll exists, then remove the Release version because Release is ahead of Debug in the path for this app.
+                    Dim releaseDLL = New FileInfo(HomeDir.FullName + "\bin\Release\" + dllName)
+                    If releaseDLL.Exists Then
+                        If DateTime.Compare(dllFile.LastWriteTime, releaseDLL.LastWriteTime) > 0 Then releaseDLL.Delete() Else dllFile.Delete()
+                    End If
+                End If
+            Next
+
+            Me.Show()
+            frameCount = 0
+            setupCamPics()
+
+            loadAlgorithmComboBoxes()
+
+            GroupComboBox.Text = settings.groupComboText
+
+            If GroupComboBox.SelectedItem() Is Nothing Then
+                Dim group = GroupComboBox.Text
+                If InStr(group, ") ") Then
+                    Dim offset = InStr(group, ") ")
+                    group = group.Substring(offset + 2)
+                End If
+                For i = 0 To GroupComboBox.Items.Count - 1
+                    If GroupComboBox.Items(i).contains(group) Then
+                        GroupComboBox.SelectedItem() = GroupComboBox.Items(i)
+                        settings.groupComboText = GroupComboBox.Text
+                        Exit For
+                    End If
+                Next
+            End If
+
+            If AvailableAlgorithms.Items.Count = 0 Then
+                MessageBox.Show("There were no algorithms listed for the " + GroupComboBox.Text + vbCrLf +
+                           "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
+            Else
+                If settings.MainUI_AlgName Is Nothing Then
+                    AvailableAlgorithms.SelectedIndex = 0
+                    settings.MainUI_AlgName = AvailableAlgorithms.Text
+                End If
+                If AvailableAlgorithms.Items.Contains(settings.MainUI_AlgName) Then
+                    AvailableAlgorithms.Text = settings.MainUI_AlgName
+                Else
+                    AvailableAlgorithms.SelectedIndex = 0
+                End If
+                jsonfs.write()
+            End If
+
+            AvailableAlgorithms.ComboBox.Select()
+
+            fpsTimer.Enabled = True
+            XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
+            XYLoc.Visible = True
+
+            If settings.cameraFound Then
+                paintNewImages = False
+                newCameraImages = False
+                If cameraTaskHandle Is Nothing Then
+                    cameraTaskHandle = New Thread(AddressOf CameraTask)
+                    cameraTaskHandle.Name = "Camera Task"
+                    cameraTaskHandle.Start()
+                End If
+                CameraSwitching.Text = settings.cameraName + " starting"
+                While camera Is Nothing ' wait for camera to start...
+                    Application.DoEvents()
+                    Thread.Sleep(100)
+                End While
+            End If
+
+            Debug.WriteLine("Main_Load complete.")
+        End Sub
 
         Private Sub OpenCVB_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
             If e.KeyValue = Keys.Up Then upArrow = True
@@ -245,7 +350,7 @@ Namespace MyApp.UI
                 camSwitch()
 
                 jsonfs.write()
-                settings = jsonfs.Read() ' this will apply all the changes...
+                settings = jsonfs.read() ' this will apply all the changes...
                 Application.DoEvents()
 
                 StartAlgorithm()
@@ -420,11 +525,6 @@ Namespace MyApp.UI
                 End If
             End If
         End Sub
-
-
-
-
-
         Private Sub setupCamPics()
             ' when you change the primary monitor, old coordinates can go way off the screen.
             Dim goodPoint = Screen.GetWorkingArea(New Point(Me.Left, Me.Top))
@@ -760,111 +860,6 @@ Namespace MyApp.UI
             If settings.cameraPresent(3) Then ' OakD is the 3rd element in cameraPresent but it is not defined explicitly.
                 updatePath(HomeDir.FullName + "OakD\build\Release\", "Luxonis Oak-D camera support.")
             End If
-        End Sub
-        Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-            Dim args() = Environment.GetCommandLineArgs()
-
-            Dim exePath As String = AppDomain.CurrentDomain.BaseDirectory
-            Dim solutionDir As String = Path.GetFullPath(Path.Combine(exePath, "..\..\..\..\..\..\"))
-            HomeDir = New DirectoryInfo(solutionDir)
-
-            Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
-            Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
-            Directory.SetCurrentDirectory(HomeDir.FullName)
-
-            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
-
-            jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
-            settings = jsonfs.read()
-
-            optionsForm = New Options
-            optionsForm.defineCameraResolutions(settings.cameraIndex)
-
-            setupPath()
-            camSwitch()
-            Application.DoEvents()
-
-            PausePlay = New Bitmap(HomeDir.FullName + "Main/Data/PauseButton.png")
-            stopTestAll = New Bitmap(HomeDir.FullName + "Main/Data/stopTestAll.png")
-            testAllToolbarBitmap = New Bitmap(HomeDir.FullName + "Main/Data/testall.png")
-            runPlay = New Bitmap(HomeDir.FullName + "Main/Data/PauseButtonRun.png")
-
-            setupAlgorithmHistory()
-
-            Dim libraries = {"Cam_K4A.dll", "CPP_Native.dll", "Cam_MyntD.dll", "Cam_Zed2.dll", "Cam_ORB335L.dll"}
-            For i = 0 To libraries.Count - 1
-                Dim dllName = libraries(i)
-                Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
-                If dllFile.Exists Then
-                    ' if the debug dll exists, then remove the Release version because Release is ahead of Debug in the path for this app.
-                    Dim releaseDLL = New FileInfo(HomeDir.FullName + "\bin\Release\" + dllName)
-                    If releaseDLL.Exists Then
-                        If DateTime.Compare(dllFile.LastWriteTime, releaseDLL.LastWriteTime) > 0 Then releaseDLL.Delete() Else dllFile.Delete()
-                    End If
-                End If
-            Next
-
-            Me.Show()
-            frameCount = 0
-            setupCamPics()
-
-            loadAlgorithmComboBoxes()
-
-            GroupComboBox.Text = settings.groupComboText
-
-            If GroupComboBox.SelectedItem() Is Nothing Then
-                Dim group = GroupComboBox.Text
-                If InStr(group, ") ") Then
-                    Dim offset = InStr(group, ") ")
-                    group = group.Substring(offset + 2)
-                End If
-                For i = 0 To GroupComboBox.Items.Count - 1
-                    If GroupComboBox.Items(i).contains(group) Then
-                        GroupComboBox.SelectedItem() = GroupComboBox.Items(i)
-                        settings.groupComboText = GroupComboBox.Text
-                        Exit For
-                    End If
-                Next
-            End If
-
-            If AvailableAlgorithms.Items.Count = 0 Then
-                MessageBox.Show("There were no algorithms listed for the " + GroupComboBox.Text + vbCrLf +
-                           "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
-            Else
-                If settings.MainUI_AlgName Is Nothing Then
-                    AvailableAlgorithms.SelectedIndex = 0
-                    settings.MainUI_AlgName = AvailableAlgorithms.Text
-                End If
-                If AvailableAlgorithms.Items.Contains(settings.MainUI_AlgName) Then
-                    AvailableAlgorithms.Text = settings.MainUI_AlgName
-                Else
-                    AvailableAlgorithms.SelectedIndex = 0
-                End If
-                jsonfs.write()
-            End If
-
-            AvailableAlgorithms.ComboBox.Select()
-
-            fpsTimer.Enabled = True
-            XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
-            XYLoc.Visible = True
-
-            If settings.cameraFound Then
-                paintNewImages = False
-                newCameraImages = False
-                If cameraTaskHandle Is Nothing Then
-                    cameraTaskHandle = New Thread(AddressOf CameraTask)
-                    cameraTaskHandle.Name = "Camera Task"
-                    cameraTaskHandle.Start()
-                End If
-                CameraSwitching.Text = settings.cameraName + " starting"
-                While camera Is Nothing ' wait for camera to start...
-                    Application.DoEvents()
-                    Thread.Sleep(100)
-                End While
-            End If
-
-            Debug.WriteLine("Main_Load complete.")
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
             If Trim(AvailableAlgorithms.Text) = "" Then

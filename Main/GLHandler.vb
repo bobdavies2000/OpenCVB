@@ -1,6 +1,6 @@
 ﻿Imports SharpGL
 Imports cv = OpenCvSharp
-Namespace MyApp.UI
+Namespace OpenCVB
     Partial Class Main
         Dim gl As OpenGL
         Dim isDragging As Boolean = False
@@ -92,8 +92,8 @@ Namespace MyApp.UI
             Select Case results.GLRequest
                 Case Comm.oCase.drawPointCloudRGB
                     If results.GLcloud Is Nothing Then Exit Sub
-                    If results.GLcloud.Size <> MyApp.UI.Main.settings.workRes Then
-                        results.GLcloud = New cv.Mat(MyApp.UI.Main.settings.workRes, cv.MatType.CV_32FC3, 0)
+                    If results.GLcloud.Size <> OpenCVB.Main.settings.workRes Then
+                        results.GLcloud = New cv.Mat(OpenCVB.Main.settings.workRes, cv.MatType.CV_32FC3, 0)
                     End If
                     gl.Begin(OpenGL.GL_POINTS)
 

@@ -1,4 +1,4 @@
-﻿Namespace MyApp.UI
+﻿Namespace OpenCVB
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
     Partial Class Main
         Inherits System.Windows.Forms.Form
