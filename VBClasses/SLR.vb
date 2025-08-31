@@ -106,7 +106,7 @@ Public Class SLR_Plot : Inherits TaskParent
         Else
             dst2.SetTo(0)
             dst3.SetTo(0)
-            SetTrueText(labels(2) & " yielded no results...")
+            SetTrueText(labels(2) & " yielded no sharedResults.images....")
         End If
         If Not standaloneTest() Then
             dataX.Clear()

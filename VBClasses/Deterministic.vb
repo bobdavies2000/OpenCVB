@@ -36,7 +36,7 @@ Public Class Deterministic_MotionMask : Inherits TaskParent
     Dim diff As New Diff_Basics
     Public Sub New()
         labels(3) = "A mask of the differences between the original and motion-filtered color image output."
-        desc = "Run the algorithm with and without using the motion mask.  Can a motion-filtered color image get the same results."
+        desc = "Run the algorithm with and without using the motion mask.  Can a motion-filtered color image get the same sharedResults.images.."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         deter.Run(src.Clone) ' run with the unfiltered image.

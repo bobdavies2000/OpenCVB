@@ -115,7 +115,7 @@ Public Class Interpolate_Lines : Inherits TaskParent
     Public Sub New()
         OptionParent.FindSlider("Interpolation Resize %").Value = 80
         OptionParent.FindSlider("Interpolation threshold").Value = 100
-        desc = "Detect lines in interpolation results."
+        desc = "Detect lines in interpolation sharedResults.images.."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         inter.Run(src)

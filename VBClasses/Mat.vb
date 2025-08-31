@@ -79,11 +79,11 @@ End Class
 
 Public Class Mat_Transpose : Inherits TaskParent
     Public Sub New()
-        desc = "Transpose a Mat and show results."
+        desc = "Transpose a Mat and show sharedResults.images.."
         labels(2) = "Color Image Transposed"
         labels(3) = "Color Image Transposed back (artifacts)"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim trColor = src.T()
         dst2 = trColor.ToMat.Resize(New cv.Size(src.Cols, src.Rows))
         Dim trBack = dst2.T()
@@ -103,7 +103,7 @@ Public Class Mat_Tricks : Inherits TaskParent
         labels(3) = "Mat transposed around the diagonal"
         desc = "Show some Mat tricks."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim mat = src.Resize(New cv.Size(src.Height, src.Height))
         Dim roi = New cv.Rect(0, 0, mat.Width, mat.Height)
         dst2(roi) = mat
@@ -122,7 +122,7 @@ Public Class Mat_RowColRange : Inherits TaskParent
         labels(2) = "BitwiseNot of RowRange and ColRange"
         desc = "Perform operation on a range of cols and/or Rows."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim midX = src.Width / 2
         Dim midY = src.Height / 2
         dst2 = src
@@ -143,7 +143,7 @@ Public Class Mat_Managed : Inherits TaskParent
         labels(2) = "Color change is in the managed cv.vec3b array"
         desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
         If task.heartBeat Then
             If nextColor = New cv.Vec3b(0, 0, 255) Then nextColor = New cv.Vec3b(0, 255, 0) Else nextColor = New cv.Vec3b(0, 0, 255)
@@ -165,7 +165,7 @@ Public Class Mat_MultiplyReview : Inherits TaskParent
     Public Sub New()
         desc = "Review matrix multiplication"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim a(,) = {{1, 4, 2}, {2, 5, 1}}
         Dim b(,) = {{3, 4, 2}, {3, 5, 7}, {1, 2, 1}}
         strOut = "Matrix a" + vbCrLf
@@ -221,7 +221,7 @@ Public Class Mat_Inverse : Inherits TaskParent
     Public inverse As New cv.Mat
     Dim options As New Options_Mat
     Public Sub New()
-        desc = "Given a 3x3 matrix, invert it and present results."
+        desc = "Given a 3x3 matrix, invert it and present sharedResults.images.."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()

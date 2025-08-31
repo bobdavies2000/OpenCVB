@@ -15,6 +15,7 @@ Module OpenCVB_module
     Public mouseLock As New Mutex(True, "mouseLock") ' global lock for use with mouse clicks. 
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraLock As New Mutex(True, "cameraLock")
+    Public resultLock As New Mutex(True, "cameraLock")
     Public trueTextLock As New Mutex(True, "trueTextLock")
     Public Declare Function GetWindowRect Lib "user32" (ByVal HWND As Integer, ByRef lpRect As RECT) As Integer
     <StructLayout(LayoutKind.Sequential)> Public Structure RECT
@@ -144,7 +145,7 @@ Public Class Main
     Dim isPanning As Boolean = False
     Dim panX As Single = 0.0F
     Dim panY As Single = 0.0F
-
+    Dim results As New sharedResults.imageData
 
     Private Sub OpenGLControl_MouseDown(sender As Object, e As MouseEventArgs) Handles GLControl.MouseDown
         If e.Button = MouseButtons.Right Then
@@ -224,23 +225,21 @@ Public Class Main
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
         gl.PointSize(1.0F)
 
-        Select Case Comm.GLRequest
+        Select Case sharedResults.GLRequest
             Case Comm.oCase.drawPointCloudRGB
-                If Comm.results.GLcloud Is Nothing Then Exit Sub
+                If sharedResults.images.GLcloud Is Nothing Then Exit Sub
                 gl.Begin(OpenGL.GL_POINTS)
 
-                SyncLock Comm.resultLock
-                    For y = 0 To task.workRes.Height - 1
-                        For x = 0 To task.workRes.Width - 1
-                            Dim vec As cv.Vec3f = Comm.results.GLcloud.At(Of cv.Vec3f)(y, x)
-                            If vec(2) <> 0 Then
-                                Dim vec3b = Comm.results.GLrgb.Get(Of cv.Vec3b)(y, x)
-                                gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
-                                gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
-                            End If
-                        Next
+                For y = 0 To task.workRes.Height - 1
+                    For x = 0 To task.workRes.Width - 1
+                        Dim vec As cv.Vec3f = sharedResults.images.GLcloud.At(Of cv.Vec3f)(y, x)
+                        If vec(2) <> 0 Then
+                            Dim vec3b = sharedResults.images.GLrgb.Get(Of cv.Vec3b)(y, x)
+                            gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
+                            gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
+                        End If
                     Next
-                End SyncLock
+                Next
                 gl.End()
         End Select
 
@@ -686,16 +685,15 @@ Public Class Main
                     CamSwitchTimer.Enabled = False
                 End If
                 If uiColor.Width > 0 Then
-                    If Comm.results.dstList IsNot Nothing Then
-                        Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
-                        SyncLock Comm.resultLock
-                            Dim pt As New cv.Point(Comm.ptCursor.X * ratio, Comm.ptCursor.Y * ratio)
-                            For i = 0 To Comm.results.dstList.Count - 1
-                                Dim tmp = Comm.results.dstList(i).Resize(camSize)
-                                tmp.Circle(pt, 3, cv.Scalar.White, -1)
-                                cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
-                            Next
-                        End SyncLock
+                    Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
+                    Dim results = sharedResults.images
+                    If sharedResults.images.dstList IsNot Nothing Then
+                        Dim pt As New cv.Point(sharedResults.ptCursor.X * ratio, sharedResults.ptCursor.Y * ratio)
+                        For i = 0 To sharedResults.images.dstList.Count - 1
+                            Dim tmp = sharedResults.images.dstList(i).Resize(camSize)
+                            tmp.Circle(pt, 3, cv.Scalar.White, -1)
+                            cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
+                        Next
                     End If
                 End If
             End If
@@ -831,9 +829,9 @@ Public Class Main
     Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
         Dim ratio = saveworkRes.Width / camPic(0).Width
         Dim r = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-        r = validateRect(r, Comm.results.dstList(drawRectPic).Width, Comm.results.dstList(drawRectPic).Height)
+        r = validateRect(r, sharedResults.images.dstList(drawRectPic).Width, sharedResults.images.dstList(drawRectPic).Height)
         If r.Width = 0 Or r.Height = 0 Then Exit Sub
-        Dim img = Comm.results.dstList(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
+        Dim img = sharedResults.images.dstList(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
         cv.Cv2.ImShow("DrawRect Region " + CStr(magnifyIndex), img)
     End Sub
     Private Sub camSwitch()
@@ -1689,7 +1687,6 @@ Public Class Main
                 task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
 
 
-
                 picLabels = task.labels
 
                 SyncLock mouseLock
@@ -1722,7 +1719,7 @@ Public Class Main
 
                 Dim ptM = task.mouseMovePoint, w = task.workRes.Width, h = task.workRes.Height
                 If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
-                    Comm.ptCursor = validatePoint(task.mouseMovePoint)
+                    sharedResults.ptCursor = validatePoint(task.mouseMovePoint)
                     SyncLock trueTextLock
                         trueData.Clear()
                         If task.trueData.Count Then
@@ -1756,6 +1753,8 @@ Public Class Main
 
                 algorithmRefresh = True
                 paintNewImages = True ' trigger the paint 
+
+                SyncLock shared
             End While
 
             task.frameCount = -1

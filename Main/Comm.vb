@@ -46,15 +46,30 @@ Public Class Comm
          "640x480 - Full resolution", "320x240 - Quarter resolution", "160x120 - Small resolution",
          "960x600 - Full resolution", "480x300 - Quarter resolution", "240x150 - Small resolution  ",
          "672x376 - Full resolution", "336x188 - Quarter resolution", "168x94 - Small resolution    "})
+End Class
 
-    Public Shared GLRequest As Integer
-    Public Shared resultLock As New Mutex(True, "imageLock")
+Public Class sharedResults
+    Public Shared lock As New Mutex(True, "imageLock")
     Public Shared ptCursor As cv.Point
-    Public Shared results As New imageData
+    Public Shared images As New imageData
+    Public Shared GLRequest As Integer
 
     Public Class imageData
         Public dstList() As cv.Mat
         Public GLcloud As cv.Mat
         Public GLrgb As cv.Mat
     End Class
+
+    Public Shared Property sharedResults As imageData
+        Get
+            SyncLock lock
+                Return images
+            End SyncLock
+        End Get
+        Set(value As imageData)
+            SyncLock lock
+                images = value
+            End SyncLock
+        End Set
+    End Property
 End Class

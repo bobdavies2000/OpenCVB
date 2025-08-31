@@ -1221,7 +1221,7 @@ Public Class Hist_Kalman : Inherits TaskParent
     Public Sub New()
         task.kalman = New Kalman_Basics
         labels = {"", "", "With Kalman", "Without Kalman"}
-        desc = "Use Kalman to smooth the histogram results."
+        desc = "Use Kalman to smooth the histogram sharedResults.images.."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         hist.Run(src)
@@ -1257,7 +1257,7 @@ Public Class Hist_DepthSimple : Inherits TaskParent
     Public Sub New()
         labels(2) = "Histogram of depth from 0 to maxZMeters."
         plotHist.addLabels = False
-        desc = "Use Kalman to smooth the histogram results."
+        desc = "Use Kalman to smooth the histogram sharedResults.images.."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
@@ -1548,7 +1548,7 @@ Public Class Hist_PointCloud : Inherits TaskParent
                     grid.Run(src)
                     dst2.SetTo(0)
                 End If
-                histData(0) = 0 ' count of zero pixels - distorts results..
+                histData(0) = 0 ' count of zero pixels - distorts sharedResults.images...
 
                 Dim maxVal = histData.ToList.Max
                 For i = 0 To task.gridRects.Count - 1

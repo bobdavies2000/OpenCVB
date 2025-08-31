@@ -985,7 +985,7 @@ Public Class XO_OpenGL_Density2D : Inherits TaskParent
     Public Sub New()
         task.ogl.oglFunction = Comm.oCase.drawPointCloudRGB
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
-        desc = "Create a mask showing which pixels are close to each other and display the results."
+        desc = "Create a mask showing which pixels are close to each other and display the sharedResults.images.."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dense.Run(src)
@@ -3258,7 +3258,7 @@ Public Class XO_Line_RegionsVB : Inherits TaskParent
 
         If OptionParent.FindFrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)
-            check.addCheckBox("Show intermediate vertical step results.")
+            check.addCheckBox("Show intermediate vertical step sharedResults.images..")
             check.addCheckBox("Run horizontal without vertical step")
         End If
 
@@ -3266,7 +3266,7 @@ Public Class XO_Line_RegionsVB : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static noVertCheck = OptionParent.FindCheckBox("Run horizontal without vertical step")
-        Static verticalCheck = OptionParent.FindCheckBox("Show intermediate vertical step results.")
+        Static verticalCheck = OptionParent.FindCheckBox("Show intermediate vertical step sharedResults.images..")
         reduction.Run(src)
         dst2 = reduction.dst2
         dst3 = dst2.Clone
@@ -11746,6 +11746,6 @@ Public Class XO_OpenGL_TextureShuffle : Inherits TaskParent
         Dim alpha As New cv.Mat(split(0).Size(), cv.MatType.CV_8U, 1)
         Dim merged() As cv.Mat = {split(2), split(1), split(0), alpha}
         cv.Cv2.Merge(merged, rgbaTexture)
-        SetTrueText("Use mouse movement over the image to display results.", 3)
+        SetTrueText("Use mouse movement over the image to display sharedResults.images..", 3)
     End Sub
 End Class

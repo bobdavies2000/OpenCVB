@@ -111,7 +111,7 @@ Public Class Threshold_ByChannels : Inherits TaskParent
     Public Sub New()
         labels(3) = "Threshold Inverse"
         OptionParent.findRadio("Trunc").Checked = True
-        desc = "Threshold by channel - use red threshold slider to impact grayscale results."
+        desc = "Threshold by channel - use red threshold slider to impact grayscale sharedResults.images.."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()

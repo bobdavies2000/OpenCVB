@@ -237,7 +237,7 @@ Public Class Feature_NoMotionTest : Inherits TaskParent
     Public options As New Options_Features
     Dim method As New Feature_General
     Public Sub New()
-        desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent results."
+        desc = "Find good features to track in a BGR image without using correlation coefficients which produce more consistent sharedResults.images.."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()

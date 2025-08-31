@@ -1335,7 +1335,7 @@ Public Class RedColor_Gaps : Inherits TaskParent
     Dim frames As New History_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Find the gaps that are different in the RedColor_Basics results."
+        desc = "Find the gaps that are different in the RedColor_Basics sharedResults.images.."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
