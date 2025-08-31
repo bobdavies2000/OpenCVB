@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Runtime
+Imports cv = OpenCvSharp
 Public Class Options
     Public cameraRadioButton(Comm.cameraNames.Count - 1) As RadioButton
     Public workResRadio(Comm.resolutionList.Count - 1) As RadioButton
@@ -146,5 +147,45 @@ Public Class Options
         UIProcess.StartInfo.WorkingDirectory = MyApp.UI.Main.HomeDir.FullName + "UI_Generator\bin\x64\Release\net8.0\"
         UIProcess.StartInfo.Arguments = "All"
         UIProcess.Start()
+    End Sub
+    Public Sub setworkRes()
+        Select Case MyApp.UI.Main.settings.workResIndex
+            Case 0
+                MyApp.UI.Main.settings.workRes = New cv.Size(1920, 1080)
+                MyApp.UI.Main.settings.captureRes = New cv.Size(1920, 1080)
+            Case 1
+                MyApp.UI.Main.settings.workRes = New cv.Size(960, 540)
+                MyApp.UI.Main.settings.captureRes = New cv.Size(1920, 1080)
+            Case 2
+                MyApp.UI.Main.settings.workRes = New cv.Size(480, 270)
+                MyApp.UI.Main.settings.captureRes = New cv.Size(1920, 1080)
+            Case 3
+                MyApp.UI.Main.settings.workRes = New cv.Size(1280, 720)
+                MyApp.UI.Main.settings.captureRes = New cv.Size(1280, 720)
+            Case 4
+                MyApp.UI.Main.settings.workRes = New cv.Size(640, 360)
+                MyApp.UI.Main.settings.captureRes = New cv.Size(1280, 720)
+            Case 5
+                MyApp.UI.Main.settings.workRes = New cv.Size(320, 180)
+                MyApp.UI.Main.settings.captureRes = New cv.Size(1280, 720)
+            Case 6
+                MyApp.UI.Main.settings.workRes = New cv.Size(640, 480)
+                MyApp.UI.Main.settings.captureRes = New cv.Size(640, 480)
+            Case 7
+                MyApp.UI.Main.settings.workRes = New cv.Size(320, 240)
+                MyApp.UI.Main.settings.captureRes = New cv.Size(640, 480)
+            Case 8
+                MyApp.UI.Main.settings.workRes = New cv.Size(160, 120)
+                MyApp.UI.Main.settings.captureRes = New cv.Size(640, 480)
+            Case 9
+                MyApp.UI.Main.settings.workRes = New cv.Size(672, 376)
+                MyApp.UI.Main.settings.captureRes = New cv.Size(672, 376)
+            Case 10
+                MyApp.UI.Main.settings.workRes = New cv.Size(336, 188)
+                MyApp.UI.Main.settings.captureRes = New cv.Size(672, 376)
+            Case 11
+                MyApp.UI.Main.settings.workRes = New cv.Size(168, 94)
+                MyApp.UI.Main.settings.captureRes = New cv.Size(672, 376)
+        End Select
     End Sub
 End Class

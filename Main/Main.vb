@@ -651,7 +651,7 @@ Namespace MyApp.UI
                     TestAllTimer.Interval = settings.testAllDuration * 1000 * 3
                 End If
 
-                setworkRes()
+                Options.setworkRes()
 
                 jsonfs.write()
                 settings = jsonfs.read()
@@ -669,46 +669,6 @@ Namespace MyApp.UI
                 saveLastAlgorithm = AvailableAlgorithms.Text
             End If
             StartAlgorithm()
-        End Sub
-        Private Sub setworkRes()
-            Select Case settings.workResIndex
-                Case 0
-                    settings.workRes = New cv.Size(1920, 1080)
-                    settings.captureRes = New cv.Size(1920, 1080)
-                Case 1
-                    settings.workRes = New cv.Size(960, 540)
-                    settings.captureRes = New cv.Size(1920, 1080)
-                Case 2
-                    settings.workRes = New cv.Size(480, 270)
-                    settings.captureRes = New cv.Size(1920, 1080)
-                Case 3
-                    settings.workRes = New cv.Size(1280, 720)
-                    settings.captureRes = New cv.Size(1280, 720)
-                Case 4
-                    settings.workRes = New cv.Size(640, 360)
-                    settings.captureRes = New cv.Size(1280, 720)
-                Case 5
-                    settings.workRes = New cv.Size(320, 180)
-                    settings.captureRes = New cv.Size(1280, 720)
-                Case 6
-                    settings.workRes = New cv.Size(640, 480)
-                    settings.captureRes = New cv.Size(640, 480)
-                Case 7
-                    settings.workRes = New cv.Size(320, 240)
-                    settings.captureRes = New cv.Size(640, 480)
-                Case 8
-                    settings.workRes = New cv.Size(160, 120)
-                    settings.captureRes = New cv.Size(640, 480)
-                Case 9
-                    settings.workRes = New cv.Size(672, 376)
-                    settings.captureRes = New cv.Size(672, 376)
-                Case 10
-                    settings.workRes = New cv.Size(336, 188)
-                    settings.captureRes = New cv.Size(672, 376)
-                Case 11
-                    settings.workRes = New cv.Size(168, 94)
-                    settings.captureRes = New cv.Size(672, 376)
-            End Select
         End Sub
         Private Sub setupTestAll()
             testAllResolutionCount = 0
