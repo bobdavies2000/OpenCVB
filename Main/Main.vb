@@ -722,8 +722,9 @@ Namespace OpenCVB
                             writeCount = 0
                         End If
                         lastWriteTime = timeNow
-                        If writeCount = 10 Then
+                        If writeCount = 5 Then
                             Debug.WriteLine("")
+                            Debug.WriteLine(vbTab + "Pool thread count = " + CStr(Threading.ThreadPool.ThreadCount))
                             Debug.Write(vbTab + "MemUsage/FPSAlg/FPSCam ")
                             writeCount = 0
                         End If
@@ -1222,6 +1223,9 @@ Namespace OpenCVB
 
                     Debug.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
                                      parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " active threads")
+
+                    Debug.WriteLine(vbTab + "Pool thread count = " + CStr(Threading.ThreadPool.ThreadCount))
+
                     Debug.WriteLine(vbTab + "Active camera = " + settings.cameraName)
                     Debug.WriteLine(vbTab + "Input resolution " + CStr(settings.captureRes.Width) + "x" +
                                                                   CStr(settings.captureRes.Height))
