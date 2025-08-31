@@ -1,6 +1,8 @@
-﻿Imports Newtonsoft.Json
+﻿Imports System.IO
+Imports System.Runtime
+Imports Newtonsoft.Json
+Imports VBClasses
 Imports cv = OpenCvSharp
-Imports System.IO
 
 Namespace jsonClass
 
@@ -84,5 +86,6 @@ Namespace jsonClass
             empty.Add(emptyApp)
             Return empty
         End Function
+
     End Class
 End Namespace

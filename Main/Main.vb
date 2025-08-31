@@ -27,8 +27,6 @@ End Module
 
 Namespace MyApp.UI
     Partial Public Class Main : Inherits Form
-        Dim results As New Comm.resultData
-
         Dim trueData As New List(Of TrueText)
         Dim algolist As algorithmList = New algorithmList
         Public Shared settings As jsonClass.ApplicationStorage
@@ -135,6 +133,7 @@ Namespace MyApp.UI
 
         Dim magnifyIndex As Integer
         Dim depthAndCorrelationText As String
+        Dim results As New Comm.resultData
 
         Public Sub jsonRead()
             jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
@@ -624,6 +623,7 @@ Namespace MyApp.UI
             camLabel(2).Text = picLabels(2)
             camLabel(3).Text = picLabels(3)
 
+            ' why run all SharpGL algorithms here?  Because too much data has to move from task to main.
             If AvailableAlgorithms.Text = "GL_MainForm" Then
                 Static saveFrame = frameCount
                 If saveFrame <> frameCount Then
@@ -1402,8 +1402,11 @@ Namespace MyApp.UI
             For i = 0 To results.dstList.Count - 1
                 results.dstList(i) = New cv.Mat
             Next
-            results.GLcloud = New cv.Mat
-            results.GLrgb = New cv.Mat
+
+            If parms.algName = "GL_MainForm" Then
+                results.GLcloud = New cv.Mat
+                results.GLrgb = New cv.Mat
+            End If
 
             While 1
                 If camera IsNot Nothing Then
@@ -1658,12 +1661,11 @@ Namespace MyApp.UI
                         For i = 0 To task.results.dstList.Count - 1
                             results.dstList(i) = task.results.dstList(i).Clone
                         Next
-                        results.GLRequest = task.results.GLRequest
-                        Select Case results.GLRequest
-                            Case Comm.oCase.drawPointCloudRGB
-                                results.GLcloud = task.pointCloud.Clone
-                                results.GLrgb = task.color.Clone
-                        End Select
+                        If parms.algName = "GL_MainForm" Then
+                            results.GLRequest = task.results.GLRequest
+                            results.GLcloud = task.pointCloud.Clone
+                            results.GLrgb = task.color.Clone
+                        End If
                     End SyncLock
                 End While
 
