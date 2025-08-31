@@ -13,7 +13,7 @@ End Class
 
 
 
-Public Class GL_BasicsMain : Inherits TaskParent
+Public Class GL_MainForm : Inherits TaskParent
     Public Sub New()
         desc = "Display the pointcloud in the main form"
     End Sub

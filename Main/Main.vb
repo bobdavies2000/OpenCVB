@@ -578,14 +578,16 @@ Namespace MyApp.UI
                     If uiColor.Width > 0 Then
                         Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
                         If results.dstList IsNot Nothing Then
-                            SyncLock task.resultLock
-                                Dim pt As New cv.Point(results.ptCursor.X * ratio, results.ptCursor.Y * ratio)
-                                For i = 0 To results.dstList.Count - 1
-                                    Dim tmp = results.dstList(i).Resize(camSize)
-                                    tmp.Circle(pt, 3, cv.Scalar.White, -1)
-                                    cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
-                                Next
-                            End SyncLock
+                            If results.dstList(0).Width > 0 Then
+                                SyncLock task.resultLock
+                                    Dim pt As New cv.Point(results.ptCursor.X * ratio, results.ptCursor.Y * ratio)
+                                    For i = 0 To results.dstList.Count - 1
+                                        Dim tmp = results.dstList(i).Resize(camSize)
+                                        tmp.Circle(pt, 3, cv.Scalar.White, -1)
+                                        cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
+                                    Next
+                                End SyncLock
+                            End If
                         End If
                     End If
                 End If
@@ -622,7 +624,7 @@ Namespace MyApp.UI
             camLabel(2).Text = picLabels(2)
             camLabel(3).Text = picLabels(3)
 
-            If AvailableAlgorithms.Text.StartsWith("GL_BasicsMain") Then
+            If AvailableAlgorithms.Text = "GL_MainForm" Then
                 Static saveFrame = frameCount
                 If saveFrame <> frameCount Then
                     saveFrame = frameCount
@@ -1353,7 +1355,7 @@ Namespace MyApp.UI
 
             PausePlayButton.Image = PausePlay
 
-            If parms.algName.StartsWith("GL_") Then
+            If parms.algName = "GL_MainForm" Then
                 GLControl.Visible = True
                 GLControl.Location = camPic(2).Location
                 GLControl.Width = camPic(2).Width

@@ -472,7 +472,7 @@ Public Class VBtask : Implements IDisposable
         allOptions = New OptionsContainer
         allOptions.Show()
 
-        If algName.StartsWith("GL_") Then
+        If algName.StartsWith("GL_") And algName <> "GL_MainForm" Then
             sharpGL = New sgl
             sharpGL.Show()
         End If
