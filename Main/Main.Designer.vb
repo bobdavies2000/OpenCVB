@@ -24,7 +24,6 @@
         <System.Diagnostics.DebuggerStepThrough()>
         Private Sub InitializeComponent()
             components = New ComponentModel.Container()
-            Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Main))
             ToolStrip1 = New ToolStrip()
             PausePlayButton = New ToolStripButton()
             OptionsButton = New ToolStripButton()
@@ -65,7 +64,7 @@
             ' PausePlayButton
             ' 
             PausePlayButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-            PausePlayButton.Image = CType(resources.GetObject("PausePlayButton.Image"), Image)
+            PausePlayButton.Image = Global.Main.My.Resources.Resources.PauseButtonRun
             PausePlayButton.ImageTransparentColor = Color.Magenta
             PausePlayButton.Name = "PausePlayButton"
             PausePlayButton.Size = New Size(34, 29)
@@ -74,7 +73,7 @@
             ' OptionsButton
             ' 
             OptionsButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-            OptionsButton.Image = CType(resources.GetObject("OptionsButton.Image"), Image)
+            OptionsButton.Image = Global.Main.My.Resources.Resources.settings
             OptionsButton.ImageTransparentColor = Color.Magenta
             OptionsButton.Name = "OptionsButton"
             OptionsButton.Size = New Size(34, 29)
@@ -83,7 +82,7 @@
             ' TestAllButton
             ' 
             TestAllButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-            TestAllButton.Image = CType(resources.GetObject("TestAllButton.Image"), Image)
+            TestAllButton.Image = Global.Main.My.Resources.Resources.testall
             TestAllButton.ImageTransparentColor = Color.Magenta
             TestAllButton.Name = "TestAllButton"
             TestAllButton.Size = New Size(34, 29)
@@ -92,7 +91,7 @@
             ' Magnify
             ' 
             Magnify.DisplayStyle = ToolStripItemDisplayStyle.Image
-            Magnify.Image = CType(resources.GetObject("Magnify.Image"), Image)
+            Magnify.Image = Global.Main.My.Resources.Resources.magnify
             Magnify.ImageTransparentColor = Color.Magenta
             Magnify.Name = "Magnify"
             Magnify.Size = New Size(34, 29)
@@ -101,7 +100,7 @@
             ' PixelViewerButton
             ' 
             PixelViewerButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-            PixelViewerButton.Image = CType(resources.GetObject("PixelViewerButton.Image"), Image)
+            PixelViewerButton.Image = Global.Main.My.Resources.Resources.PixelViewer
             PixelViewerButton.ImageTransparentColor = Color.Magenta
             PixelViewerButton.Name = "PixelViewerButton"
             PixelViewerButton.Size = New Size(34, 29)
@@ -110,7 +109,6 @@
             ' RecentList
             ' 
             RecentList.DisplayStyle = ToolStripItemDisplayStyle.Text
-            RecentList.Image = CType(resources.GetObject("RecentList.Image"), Image)
             RecentList.ImageTransparentColor = Color.Magenta
             RecentList.Name = "RecentList"
             RecentList.Size = New Size(82, 29)
@@ -125,7 +123,6 @@
             ' AtoZButton
             ' 
             AtoZButton.DisplayStyle = ToolStripItemDisplayStyle.Text
-            AtoZButton.Image = CType(resources.GetObject("AtoZButton.Image"), Image)
             AtoZButton.ImageTransparentColor = Color.Magenta
             AtoZButton.Name = "AtoZButton"
             AtoZButton.Size = New Size(45, 29)
@@ -210,7 +207,6 @@
             Controls.Add(CameraSwitching)
             Controls.Add(XYLoc)
             Controls.Add(ToolStrip1)
-            Icon = CType(resources.GetObject("$this.Icon"), Icon)
             Name = "Main"
             Text = "OpenCVB Main Form"
             ToolStrip1.ResumeLayout(False)

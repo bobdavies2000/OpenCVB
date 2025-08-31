@@ -1033,6 +1033,7 @@ Namespace MyApp.UI
             jsonRead()
             setupPath()
             camSwitch()
+            Application.DoEvents()
 
             PausePlay = New Bitmap(HomeDir.FullName + "Main/Data/PauseButton.png")
             stopTestAll = New Bitmap(HomeDir.FullName + "Main/Data/stopTestAll.png")
