@@ -34,7 +34,7 @@ Namespace OpenCVB
         Public groupButtonSelection As String
         Public fpsAlgorithm As Single
         Public fpsCamera As Single
-        Public fpsRestartCounter As Boolean
+        Dim fpsWriteCount As Integer
         Dim fpsListA As New List(Of Single)
         Dim fpsListC As New List(Of Single)
 
@@ -338,7 +338,6 @@ Namespace OpenCVB
             Dim OKcancel = optionsForm.ShowDialog()
 
             If OKcancel = DialogResult.OK Then
-                fpsRestartCounter = True
                 pauseCameraTask = True
                 task.optionsChanged = True
                 If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
@@ -711,27 +710,45 @@ Namespace OpenCVB
                     elapsedTime = timeNow.Ticks - lastWriteTime.Ticks
                     spanCopy = New TimeSpan(elapsedTime)
                     taskTimerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
-                    If taskTimerInterval > 5000 Then
+                    If taskTimerInterval > If(testAllRunning, 1000, 5000) Then
                         Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
                         totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
 
-                        Static writeCount As Integer
-                        If fpsRestartCounter Then
-                            Debug.Write(vbTab + "MemUsage/FPSAlg/FPSCam ")
-                            fpsRestartCounter = False
-                            writeCount = 0
-                        End If
                         lastWriteTime = timeNow
-                        If writeCount = 5 Then
+                        If fpsWriteCount = 5 Then
                             Debug.WriteLine("")
-                            Debug.WriteLine(vbTab + "Pool thread count = " + CStr(Threading.ThreadPool.ThreadCount))
-                            Debug.Write(vbTab + "MemUsage/FPSAlg/FPSCam ")
-                            writeCount = 0
+                            fpsWriteCount = 0
                         End If
-                        writeCount += 1
-                        Debug.Write(Format(totalBytesOfMemoryUsed, "#,##0") + "/" + Format(fpsAlgorithm, fmt0) + "/" + Format(fpsCamera, fmt0) + ", ")
+                        fpsWriteCount += 1
+                        Debug.Write(vbTab + Format(totalBytesOfMemoryUsed, "###") + "/" + Format(fpsAlgorithm, fmt0) + "/" + Format(fpsCamera, fmt0) + ", ")
                     End If
                 End If
+            End If
+        End Sub
+        Private Sub setupTestAll()
+            testAllResolutionCount = 0
+            testAllStartingRes = -1
+            For i = 0 To settings.resolutionsSupported.Count - 1
+                If settings.resolutionsSupported(i) Then testAllResolutionCount += 1
+                If testAllStartingRes < 0 And settings.resolutionsSupported(i) Then testAllStartingRes = i
+                If settings.resolutionsSupported(i) Then testAllEndingRes = i
+            Next
+        End Sub
+        Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
+            Static saveTestAllState As Boolean
+            Static algorithmRunning = True
+            If PausePlayButton.Text = "Run" Then
+                PausePlayButton.Text = "Pause"
+                pauseAlgorithmThread = False
+                If saveTestAllState Then TestAllButton_Click(sender, e)
+                PausePlayButton.Image = PausePlay
+            Else
+                fpsWriteCount = 0
+                PausePlayButton.Text = "Run"
+                pauseAlgorithmThread = True
+                saveTestAllState = TestAllTimer.Enabled
+                If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
+                PausePlayButton.Image = runPlay
             End If
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
@@ -812,20 +829,12 @@ Namespace OpenCVB
             End If
             StartAlgorithm()
         End Sub
-        Private Sub setupTestAll()
-            testAllResolutionCount = 0
-            testAllStartingRes = -1
-            For i = 0 To settings.resolutionsSupported.Count - 1
-                If settings.resolutionsSupported(i) Then testAllResolutionCount += 1
-                If testAllStartingRes < 0 And settings.resolutionsSupported(i) Then testAllStartingRes = i
-                If settings.resolutionsSupported(i) Then testAllEndingRes = i
-            Next
-        End Sub
         Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
             TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTestAll, testAllToolbarBitmap)
             If TestAllButton.Text = "Test All" Then
+                Debug.WriteLine("")
                 Debug.WriteLine("Starting 'TestAll' overnight run.")
-                AlgorithmTestAllCount = 0
+                AlgorithmTestAllCount = 1
 
                 setupTestAll()
 
@@ -907,7 +916,6 @@ Namespace OpenCVB
                 jsonfs.write()
                 StartAlgorithm()
                 updateAlgorithmHistory()
-                fpsRestartCounter = True
             End If
         End Sub
         Private Sub groupName_SelectedIndexChanged(sender As Object, e As EventArgs) Handles GroupComboBox.SelectedIndexChanged
@@ -1078,23 +1086,6 @@ Namespace OpenCVB
             PixelViewerButton.Checked = Not PixelViewerButton.Checked
             pixelViewerOn = PixelViewerButton.Checked
         End Sub
-        Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
-            Static saveTestAllState As Boolean
-            Static algorithmRunning = True
-            If PausePlayButton.Text = "Run" Then
-                PausePlayButton.Text = "Pause"
-                pauseAlgorithmThread = False
-                If saveTestAllState Then TestAllButton_Click(sender, e)
-                PausePlayButton.Image = PausePlay
-            Else
-                fpsRestartCounter = True
-                PausePlayButton.Text = "Run"
-                pauseAlgorithmThread = True
-                saveTestAllState = TestAllTimer.Enabled
-                If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
-                PausePlayButton.Image = runPlay
-            End If
-        End Sub
         Private Sub setupAlgorithmHistory()
             For i = 0 To MAX_RECENT - 1
                 Dim nextA = GetSetting("OpenCVB", "algHistory" + CStr(i), "algHistory" + CStr(i), "recent algorithm " + CStr(i))
@@ -1107,7 +1098,10 @@ Namespace OpenCVB
             Next
         End Sub
         Private Sub StartAlgorithm()
+            Debug.WriteLine("")
+            Debug.WriteLine("")
             Debug.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
+            Debug.WriteLine(vbTab + CStr(AlgorithmTestAllCount) + " algorithms tested")
             testAllRunning = TestAllButton.Text = "Stop Test"
             saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
 
@@ -1148,8 +1142,6 @@ Namespace OpenCVB
             algorithmTaskHandle.Name = AvailableAlgorithms.Text
             algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
             algorithmTaskHandle.Start(parms)
-
-            Debug.WriteLine("Main.StartAlgorithm completed.")
         End Sub
         Private Function setCalibData(cb As Object) As VBtask.cameraInfo
             Dim cbNew As New VBtask.cameraInfo
@@ -1195,6 +1187,8 @@ Namespace OpenCVB
 
             ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
             SyncLock algorithmThreadLock
+                fpsWriteCount = 0
+
                 algorithmQueueCount -= 1
                 AlgorithmTestAllCount += 1
                 drawRect = New cv.Rect
@@ -1216,8 +1210,6 @@ Namespace OpenCVB
                 textDesc = task.MainUI_Algorithm.desc
 
                 If ComplexityTimer.Enabled = False Then
-                    Debug.WriteLine(vbTab + parms.algName + vbTab + "Algorithms tested: " + CStr(AlgorithmTestAllCount))
-
                     Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
                     totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
 
@@ -1231,6 +1223,10 @@ Namespace OpenCVB
                                                                   CStr(settings.captureRes.Height))
                     Debug.WriteLine(vbTab + "Working resolution of " + CStr(settings.workRes.Width) + "x" +
                                                                        CStr(settings.workRes.Height))
+                    Debug.WriteLine("")
+                    Debug.Write(vbTab + "MemUsage/FPSAlg/FPSCam ")
+                    Debug.WriteLine("")
+                    Debug.WriteLine("")
                 End If
 
                 ' Adjust drawrect for the ratio of the actual size and workRes.
@@ -1449,7 +1445,7 @@ Namespace OpenCVB
 
                 task.frameCount = -1
                 task.Dispose()
-                Debug.WriteLine(parms.algName + " ending.  Thread closing...")
+                fpsWriteCount = 0
             End SyncLock
 
             frameCount = 0
