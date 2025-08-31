@@ -118,7 +118,7 @@ Public Class WarpModel_ECC : Inherits TaskParent
         Next
 
         If options.useWarpAffine Or options.useWarpHomography Then
-            outStr += vbCrLf + "NOTE: Gradients may give better sharedResults.images.."
+            outStr += vbCrLf + "NOTE: Gradients may give better task.results.."
         End If
         SetTrueText(outStr, New cv.Point(aligned.Width + 10, 220))
     End Sub

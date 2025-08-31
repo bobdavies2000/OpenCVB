@@ -28,6 +28,8 @@ End Module
 #End Region
 
 Public Class Main
+    Dim results As New Comm.resultData
+
     Dim trueData As New List(Of TrueText)
     Dim algolist As algorithmList = New algorithmList
     Public Shared settings As jsonClass.ApplicationStorage
@@ -145,7 +147,6 @@ Public Class Main
     Dim isPanning As Boolean = False
     Dim panX As Single = 0.0F
     Dim panY As Single = 0.0F
-    Dim results As New sharedResults.imageData
 
     Private Sub OpenGLControl_MouseDown(sender As Object, e As MouseEventArgs) Handles GLControl.MouseDown
         If e.Button = MouseButtons.Right Then
@@ -225,16 +226,16 @@ Public Class Main
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
         gl.PointSize(1.0F)
 
-        Select Case sharedResults.GLRequest
+        Select Case results.GLRequest
             Case Comm.oCase.drawPointCloudRGB
-                If sharedResults.images.GLcloud Is Nothing Then Exit Sub
+                If results.GLcloud Is Nothing Then Exit Sub
                 gl.Begin(OpenGL.GL_POINTS)
 
                 For y = 0 To task.workRes.Height - 1
                     For x = 0 To task.workRes.Width - 1
-                        Dim vec As cv.Vec3f = sharedResults.images.GLcloud.At(Of cv.Vec3f)(y, x)
+                        Dim vec As cv.Vec3f = results.GLcloud.At(Of cv.Vec3f)(y, x)
                         If vec(2) <> 0 Then
-                            Dim vec3b = sharedResults.images.GLrgb.Get(Of cv.Vec3b)(y, x)
+                            Dim vec3b = results.GLrgb.Get(Of cv.Vec3b)(y, x)
                             gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
                             gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
                         End If
@@ -686,11 +687,10 @@ Public Class Main
                 End If
                 If uiColor.Width > 0 Then
                     Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
-                    Dim results = sharedResults.images
-                    If sharedResults.images.dstList IsNot Nothing Then
-                        Dim pt As New cv.Point(sharedResults.ptCursor.X * ratio, sharedResults.ptCursor.Y * ratio)
-                        For i = 0 To sharedResults.images.dstList.Count - 1
-                            Dim tmp = sharedResults.images.dstList(i).Resize(camSize)
+                    If results.dstList IsNot Nothing Then
+                        Dim pt As New cv.Point(results.ptCursor.X * ratio, results.ptCursor.Y * ratio)
+                        For i = 0 To results.dstList.Count - 1
+                            Dim tmp = results.dstList(i).Resize(camSize)
                             tmp.Circle(pt, 3, cv.Scalar.White, -1)
                             cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
                         Next
@@ -829,9 +829,9 @@ Public Class Main
     Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
         Dim ratio = saveworkRes.Width / camPic(0).Width
         Dim r = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-        r = validateRect(r, sharedResults.images.dstList(drawRectPic).Width, sharedResults.images.dstList(drawRectPic).Height)
+        r = validateRect(r, task.results.dstList(drawRectPic).Width, task.results.dstList(drawRectPic).Height)
         If r.Width = 0 Or r.Height = 0 Then Exit Sub
-        Dim img = sharedResults.images.dstList(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
+        Dim img = task.results.dstList(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
         cv.Cv2.ImShow("DrawRect Region " + CStr(magnifyIndex), img)
     End Sub
     Private Sub camSwitch()
@@ -1719,7 +1719,7 @@ Public Class Main
 
                 Dim ptM = task.mouseMovePoint, w = task.workRes.Width, h = task.workRes.Height
                 If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
-                    sharedResults.ptCursor = validatePoint(task.mouseMovePoint)
+                    Dim ptCursor = validatePoint(task.mouseMovePoint)
                     SyncLock trueTextLock
                         trueData.Clear()
                         If task.trueData.Count Then
@@ -1754,7 +1754,18 @@ Public Class Main
                 algorithmRefresh = True
                 paintNewImages = True ' trigger the paint 
 
-                SyncLock shared
+                If results.dstList Is Nothing Then
+                    ReDim results.dstList(3)
+                    For i = 0 To results.dstList.Count - 1
+                        results.dstList(i) = New cv.Mat
+                    Next
+                End If
+                For i = 0 To task.results.dstList.Count - 1
+                    results.dstList(i) = task.results.dstList(i).Clone
+                Next
+                results.GLcloud = task.results.GLcloud
+                results.GLrgb = task.results.GLrgb
+                results.GLRequest = task.results.GLRequest
             End While
 
             task.frameCount = -1

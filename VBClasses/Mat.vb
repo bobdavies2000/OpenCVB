@@ -79,7 +79,7 @@ End Class
 
 Public Class Mat_Transpose : Inherits TaskParent
     Public Sub New()
-        desc = "Transpose a Mat and show sharedResults.images.."
+        desc = "Transpose a Mat and show task.results.."
         labels(2) = "Color Image Transposed"
         labels(3) = "Color Image Transposed back (artifacts)"
     End Sub
@@ -221,7 +221,7 @@ Public Class Mat_Inverse : Inherits TaskParent
     Public inverse As New cv.Mat
     Dim options As New Options_Mat
     Public Sub New()
-        desc = "Given a 3x3 matrix, invert it and present sharedResults.images.."
+        desc = "Given a 3x3 matrix, invert it and present task.results.."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()

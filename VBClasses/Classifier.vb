@@ -171,7 +171,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
         '    Dim resultsPtr = Classifier_Bayesian_RunCPP(cPtr, handleQueryInput.AddrOfPinnedObject(), queries.Count)
         '    handleQueryInput.Free()
 
-        '    Marshal.Copy(resultsPtr, results, 0, sharedResults.images.Length)
+        '    Marshal.Copy(resultsPtr, results, 0, task.results.Length)
         'End If
         'dst3.SetTo(0)
         'Dim zeroOutput As Boolean = True

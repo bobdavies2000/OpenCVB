@@ -486,7 +486,7 @@ Public Class KMeans_SimKColor : Inherits TaskParent
     Public classCount As Integer
     Dim histogram As New cv.Mat
     Public Sub New()
-        desc = "Use the gaps in the 3D histogram of the color image to find 'k' and backproject the sharedResults.images.."
+        desc = "Use the gaps in the 3D histogram of the color image to find 'k' and backproject the task.results.."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")
@@ -516,7 +516,7 @@ Public Class KMeans_SimKDepth : Inherits TaskParent
     Dim simK As New Hist3D_BuildHistogram
     Public classCount As Integer
     Public Sub New()
-        desc = "Use the gaps in the 3D histogram of depth to find simK and backproject the sharedResults.images.."
+        desc = "Use the gaps in the 3D histogram of depth to find simK and backproject the task.results.."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static binSlider = OptionParent.FindSlider("Histogram 3D Bins")

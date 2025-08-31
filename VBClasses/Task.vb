@@ -7,6 +7,8 @@ Imports cv = OpenCvSharp
 #Region "taskProcess"
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
+    Public results As New Comm.resultData
+
     ' add any task algorithms here.
     Public ogl As XO_OpenGL_Basics
     Public redC As RedColor_Basics
@@ -314,6 +316,7 @@ Public Class VBtask : Implements IDisposable
     Public depthAndCorrelationText As String
     Public closeRequest As Boolean
     Public sharpGL As VBClasses.sgl
+
     Public Structure inBuffer
         Dim color As cv.Mat
         Dim leftView As cv.Mat
@@ -424,7 +427,7 @@ Public Class VBtask : Implements IDisposable
         Randomize() ' just in case anyone uses VB.Net's Rnd
 
         task = Me
-        useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve sharedResults.images..
+        useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve task.results..
         gridRects = New List(Of cv.Rect)
         firstPass = True
         algName = parms.algName
@@ -455,9 +458,9 @@ Public Class VBtask : Implements IDisposable
         workRes = parms.workRes
         optionsChanged = True
 
-        ReDim sharedResults.images.dstList(3)
-        For i = 0 To sharedResults.images.dstList.Count - 1
-            sharedResults.images.dstList(i) = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
+        ReDim task.results.dstList(3)
+        For i = 0 To task.results.dstList.Count - 1
+            task.results.dstList(i) = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
         Next
 
         OpenGL_Left = CInt(GetSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", mainFormLocation.X))
@@ -773,49 +776,49 @@ Public Class VBtask : Implements IDisposable
             postProcess(src)
 
             Dim displayObject = findDisplayObject(task.displayObjectName)
-            Dim images = sharedResults.images
+
             If gOptions.displayDst0.Checked Then
-                images.dstList(0) = Check8uC3(displayObject.dst0)
+                results.dstList(0) = Check8uC3(displayObject.dst0)
             Else
-                images.dstList(0) = task.color.Clone
+                results.dstList(0) = task.color.Clone
             End If
             If gOptions.displayDst1.Checked Then
-                images.dstList(1) = Check8uC3(displayObject.dst1)
+                results.dstList(1) = Check8uC3(displayObject.dst1)
                 displayDst1 = True
             Else
-                images.dstList(1) = depthRGB.Clone
+                results.dstList(1) = depthRGB.Clone
                 displayDst1 = False
             End If
 
-            images.dstList(2) = Check8uC3(displayObject.dst2)
-            images.dstList(3) = Check8uC3(displayObject.dst3)
+            results.dstList(2) = Check8uC3(displayObject.dst2)
+            results.dstList(3) = Check8uC3(displayObject.dst3)
 
             ' make sure that any outputs from the algorithm are the right size.nearest
-            If images.dstList(0).Size <> workRes And images.dstList(0).Width > 0 Then
-                images.dstList(0) = images.dstList(0).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If results.dstList(0).Size <> workRes And results.dstList(0).Width > 0 Then
+                results.dstList(0) = results.dstList(0).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
-            If images.dstList(1).Size <> workRes And images.dstList(1).Width > 0 Then
-                images.dstList(1) = images.dstList(1).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If results.dstList(1).Size <> workRes And results.dstList(1).Width > 0 Then
+                results.dstList(1) = results.dstList(1).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
-            If images.dstList(2).Size <> workRes And images.dstList(2).Width > 0 Then
-                images.dstList(2) = images.dstList(2).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If results.dstList(2).Size <> workRes And results.dstList(2).Width > 0 Then
+                results.dstList(2) = results.dstList(2).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
-            If images.dstList(3).Size <> workRes And images.dstList(3).Width > 0 Then
-                images.dstList(3) = images.dstList(3).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            If results.dstList(3).Size <> workRes And results.dstList(3).Width > 0 Then
+                results.dstList(3) = results.dstList(3).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
 
-            If gOptions.ShowGrid.Checked Then images.dstList(2).SetTo(cv.Scalar.White, gridMask)
+            If gOptions.ShowGrid.Checked Then results.dstList(2).SetTo(cv.Scalar.White, gridMask)
 
             If gOptions.showMotionMask.Checked Then
                 For i = 0 To gridRects.Count - 1
                     If motionBasics.motionFlags(i) Then
-                        images.dstList(0).Rectangle(gridRects(i), cv.Scalar.White, lineWidth)
+                        results.dstList(0).Rectangle(gridRects(i), cv.Scalar.White, lineWidth)
                     End If
                 Next
             End If
 
             If gOptions.CrossHairs.Checked Then
-                Gravity_Basics.showVectors(images.dstList(0))
+                Gravity_Basics.showVectors(results.dstList(0))
                 Dim lp = lineLongest
                 Dim pt = New cv.Point2f((lp.p1Ex.X + lp.p2Ex.X) / 2 + 5, (lp.p1Ex.Y + lp.p2Ex.Y) / 2)
                 displayObject.trueData.Add(New TrueText("Longest", pt, 0))
