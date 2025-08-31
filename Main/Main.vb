@@ -34,6 +34,7 @@ Namespace OpenCVB
         Public groupButtonSelection As String
         Public fpsAlgorithm As Single
         Public fpsCamera As Single
+        Public fpsRestartCounter As Boolean
         Dim fpsListA As New List(Of Single)
         Dim fpsListC As New List(Of Single)
 
@@ -238,6 +239,7 @@ Namespace OpenCVB
                 End While
             End If
 
+            Debug.WriteLine("")
             Debug.WriteLine("Main_Load complete.")
         End Sub
 
@@ -336,6 +338,7 @@ Namespace OpenCVB
             Dim OKcancel = optionsForm.ShowDialog()
 
             If OKcancel = DialogResult.OK Then
+                fpsRestartCounter = True
                 pauseCameraTask = True
                 task.optionsChanged = True
                 If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
@@ -709,16 +712,23 @@ Namespace OpenCVB
                     spanCopy = New TimeSpan(elapsedTime)
                     taskTimerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
                     If taskTimerInterval > 5000 Then
+                        Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+                        totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
+
                         Static writeCount As Integer
-                        If writeCount = 0 Then Debug.Write(vbTab + "FPSAlg/FPSCam ")
+                        If fpsRestartCounter Then
+                            Debug.Write(vbTab + "MemUsage/FPSAlg/FPSCam ")
+                            fpsRestartCounter = False
+                            writeCount = 0
+                        End If
                         lastWriteTime = timeNow
-                        If writeCount = 3 Then
+                        If writeCount = 10 Then
                             Debug.WriteLine("")
-                            Debug.Write(vbTab + "FPSAlg/FPSCam ")
+                            Debug.Write(vbTab + "MemUsage/FPSAlg/FPSCam ")
                             writeCount = 0
                         End If
                         writeCount += 1
-                        Debug.Write(Format(fpsAlgorithm, fmt0) + "/" + Format(fpsCamera, fmt0) + ", ")
+                        Debug.Write(Format(totalBytesOfMemoryUsed, "#,##0") + "/" + Format(fpsAlgorithm, fmt0) + "/" + Format(fpsCamera, fmt0) + ", ")
                     End If
                 End If
             End If
@@ -896,6 +906,7 @@ Namespace OpenCVB
                 jsonfs.write()
                 StartAlgorithm()
                 updateAlgorithmHistory()
+                fpsRestartCounter = True
             End If
         End Sub
         Private Sub groupName_SelectedIndexChanged(sender As Object, e As EventArgs) Handles GroupComboBox.SelectedIndexChanged
@@ -1075,6 +1086,7 @@ Namespace OpenCVB
                 If saveTestAllState Then TestAllButton_Click(sender, e)
                 PausePlayButton.Image = PausePlay
             Else
+                fpsRestartCounter = True
                 PausePlayButton.Text = "Run"
                 pauseAlgorithmThread = True
                 saveTestAllState = TestAllTimer.Enabled
@@ -1209,7 +1221,7 @@ Namespace OpenCVB
                     totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
 
                     Debug.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
-                                     parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
+                                     parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " active threads")
                     Debug.WriteLine(vbTab + "Active camera = " + settings.cameraName)
                     Debug.WriteLine(vbTab + "Input resolution " + CStr(settings.captureRes.Width) + "x" +
                                                                   CStr(settings.captureRes.Height))
