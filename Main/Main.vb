@@ -720,7 +720,8 @@ Namespace OpenCVB
                             fpsWriteCount = 0
                         End If
                         fpsWriteCount += 1
-                        Debug.Write(vbTab + Format(totalBytesOfMemoryUsed, "###") + "/" + Format(fpsAlgorithm, fmt0) + "/" + Format(fpsCamera, fmt0) + ", ")
+                        Debug.Write(" " + Format(totalBytesOfMemoryUsed, "###") + "/" + Format(fpsAlgorithm, fmt0) + "/" + 
+                                          Format(fpsCamera, fmt0))
                     End If
                 End If
             End If
@@ -1224,9 +1225,7 @@ Namespace OpenCVB
                     Debug.WriteLine(vbTab + "Working resolution of " + CStr(settings.workRes.Width) + "x" +
                                                                        CStr(settings.workRes.Height))
                     Debug.WriteLine("")
-                    Debug.Write(vbTab + "MemUsage/FPSAlg/FPSCam ")
-                    Debug.WriteLine("")
-                    Debug.WriteLine("")
+                    Debug.WriteLine(" MemUsage/FPSAlg/FPSCam ")
                 End If
 
                 ' Adjust drawrect for the ratio of the actual size and workRes.
