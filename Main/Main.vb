@@ -26,7 +26,6 @@ Namespace OpenCVB
         Dim algolist As algorithmList = New algorithmList
         Dim saveworkRes As cv.Size
         Dim saveCameraName As String
-        Dim pauseCameraTask As Boolean
 
         Dim optionsForm As Options
         Dim groupList As New List(Of String)
@@ -53,7 +52,7 @@ Namespace OpenCVB
         Dim DrawingRectangle As Boolean
         Dim drawRect As New cv.Rect
         Dim drawRectPic As Integer
-        Dim frameCount As Integer
+        Dim frameCount As Integer = -1
         Dim GrabRectangleData As Boolean
 
         Dim LastX As Integer
@@ -70,11 +69,6 @@ Namespace OpenCVB
         Dim myBrush = New SolidBrush(Color.White)
         Dim picLabels() = {"", "", "", ""}
         Dim totalBytesOfMemoryUsed As Integer
-
-        Dim uiColor As cv.Mat
-        Dim uiLeft As cv.Mat
-        Dim uiRight As cv.Mat
-        Dim uiPointCloud As cv.Mat
 
         Dim pauseAlgorithmThread As Boolean
         Dim logAlgorithms As StreamWriter
@@ -132,7 +126,7 @@ Namespace OpenCVB
             optionsForm.defineCameraResolutions(settings.cameraIndex)
 
             setupCameraPath()
-            camSwitch()
+            camSwitchAnnouncement()
             Application.DoEvents()
 
             PausePlay = New Bitmap(HomeDir.FullName + "Main/Data/PauseButton.png")
@@ -156,7 +150,6 @@ Namespace OpenCVB
             Next
 
             Me.Show()
-            frameCount = 0
             setupCamPics()
 
             loadAlgorithmComboBoxes()
@@ -237,6 +230,7 @@ Namespace OpenCVB
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
             Dim saveCameraIndex = settings.cameraIndex
+            task.paused = True
 
             optionsForm.MainOptions_Load(sender, e)
             optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True
@@ -250,27 +244,23 @@ Namespace OpenCVB
             Dim OKcancel = optionsForm.ShowDialog()
 
             If OKcancel = DialogResult.OK Then
-                pauseCameraTask = True
                 task.optionsChanged = True
                 If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
-                settings.workRes = optionsForm.cameraworkRes
-                settings.displayRes = optionsForm.cameraDisplayRes
+
                 settings.cameraName = optionsForm.cameraName
                 settings.cameraIndex = optionsForm.cameraIndex
                 settings.testAllDuration = optionsForm.testDuration
 
-                frameCount = 0
                 setupCamPics()
 
-                camSwitch()
+                camSwitchAnnouncement()
 
                 jsonfs.write()
                 settings = jsonfs.read() ' this will apply all the changes...
-                Application.DoEvents()
 
                 StartAlgorithm()
-                pauseCameraTask = False
             Else
+                task.paused = False
                 settings.cameraIndex = saveCameraIndex
             End If
         End Sub
@@ -374,15 +364,14 @@ Namespace OpenCVB
                 End If
             End If
 
-            If paintNewImages Then
-                paintNewImages = False
-                If uiColor IsNot Nothing Then
-                    If CameraSwitching.Visible Then
-                        CameraSwitching.Visible = False
-                        CamSwitchProgress.Visible = False
-                        CamSwitchTimer.Enabled = False
-                    End If
-                    If uiColor.Width > 0 Then
+            If results.dstList(0).Width = settings.workRes.Width And results.dstList(0).Width > 0 Then
+                If CameraSwitching.Visible Then
+                    CameraSwitching.Visible = False
+                    CamSwitchProgress.Visible = False
+                    CamSwitchTimer.Enabled = False
+                End If
+                Try
+                    If camera.camimages.Color.Width > 0 Then
                         Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
                         If results.dstList IsNot Nothing Then
                             If results.dstList(0).Width > 0 Then
@@ -400,7 +389,9 @@ Namespace OpenCVB
                             End If
                         End If
                     End If
-                End If
+                Catch ex As Exception
+                    Debug.WriteLine("camera.camImages.color width is still zero after resolution change.")
+                End Try
             End If
 
             ' draw any TrueType font data on the image 
@@ -660,37 +651,22 @@ Namespace OpenCVB
             TestAllTimer.Interval = settings.testAllDuration * 1000
             Static startingAlgorithm = AvailableAlgorithms.Text
             If AvailableAlgorithms.Text = startingAlgorithm And AlgorithmTestAllCount > 1 Then
-                If settings.workResIndex > testAllEndingRes Then
-                    While 1
-                        settings.cameraIndex += 1
-                        If settings.cameraIndex >= Comm.cameraNames.Count - 1 Then settings.cameraIndex = 0
-                        settings.cameraName = Comm.cameraNames(settings.cameraIndex)
-                        If settings.cameraPresent(settings.cameraIndex) Then
-                            Options.defineCameraResolutions(settings.cameraIndex)
-                            setupTestAll()
-                            settings.workResIndex = testAllStartingRes + 3 ' skip highest res and try 1280x720
-                            Exit While
-                        End If
-                    End While
-                    ' extra time for the camera to restart...
-                    TestAllTimer.Interval = settings.testAllDuration * 1000 * 3
-                End If
+                While 1
+                    settings.cameraIndex += 1
+                    If settings.cameraIndex >= Comm.cameraNames.Count - 1 Then settings.cameraIndex = 0
+                    settings.cameraName = Comm.cameraNames(settings.cameraIndex)
+                    If settings.cameraPresent(settings.cameraIndex) Then
+                        Options.defineCameraResolutions(settings.cameraIndex)
+                        setupTestAll()
+                        Exit While
+                    End If
+                End While
+                ' extra time for the camera to restart...
+                TestAllTimer.Interval = settings.testAllDuration * 1000 * 3
 
                 jsonfs.write()
                 settings = jsonfs.read()
                 LineUpCamPics()
-
-                If testAllRunning = False Then
-                    Dim resStr = CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height)
-                    For i = 0 To Comm.resolutionList.Count - 1
-                        If Comm.resolutionList(i).StartsWith(resStr) Then
-                            settings.workResIndex = i
-                            Exit For
-                        End If
-                    Next
-                End If
-
-                Options.setworkRes()
 
                 ' when switching resolution, best to reset these as the move from higher to lower res
                 ' could mean the point is no longer valid.
@@ -698,11 +674,6 @@ Namespace OpenCVB
                 mousePointCamPic = New cv.Point
             End If
 
-            Static saveLastAlgorithm = AvailableAlgorithms.Text
-            If saveLastAlgorithm <> AvailableAlgorithms.Text Then
-                settings.workResIndex += 1
-                saveLastAlgorithm = AvailableAlgorithms.Text
-            End If
             StartAlgorithm()
         End Sub
         Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
@@ -942,6 +913,17 @@ Namespace OpenCVB
             Next
         End Sub
         Private Sub StartAlgorithm()
+            ' changing resolution or camera requires shutting down the camera.  It is restarted automatically
+            If settings.workRes <> saveworkRes Or saveCameraName <> settings.cameraName Then
+                saveAlgorithmName = AvailableAlgorithms.Text ' this will shut down the algorithm task
+
+                ' wait for any current thread to stop...
+                While 1
+                    If frameCount = -1 Then Exit While
+                    Application.DoEvents()
+                End While
+            End If
+
             Debug.WriteLine("")
             Debug.WriteLine("")
             Debug.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)

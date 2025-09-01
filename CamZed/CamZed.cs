@@ -103,7 +103,7 @@ public class CamZed
         leftView = new Cv.Mat();
         pointCloud = new Cv.Mat();
     }
-    public void GetNextFrame(Cv.Size workRes)
+    public void GetNextFrame()
     {
         if (colorSL.MatPtr == 0)
         {

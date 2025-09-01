@@ -5,7 +5,7 @@ Namespace OpenCVB
     Partial Class Main : Inherits Form
         Dim camera As Object
         Dim cameraTaskHandle As Thread
-        Private Sub camSwitch()
+        Private Sub camSwitchAnnouncement()
             CameraSwitching.Visible = True
             CameraSwitching.Text = settings.cameraName + " initializing"
             CamSwitchProgress.Visible = True
@@ -14,7 +14,6 @@ Namespace OpenCVB
             CamSwitchProgress.Height = CameraSwitching.Height / 2
             CameraSwitching.BringToFront()
             CamSwitchProgress.BringToFront()
-            uiColor = Nothing
             CamSwitchTimer.Enabled = True
         End Sub
         Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
@@ -96,37 +95,24 @@ Namespace OpenCVB
             Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
         End Function
         Private Sub CameraTask()
-            uiColor = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
-            uiLeft = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
-            uiRight = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
-            uiPointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3)
             While 1
                 If settings.workRes <> saveworkRes Or saveCameraName <> settings.cameraName Then
                     If saveCameraName = settings.cameraName And camera IsNot Nothing Then camera.stopCamera()
                     saveworkRes = settings.workRes
                     saveCameraName = settings.cameraName
                     camera = getCamera()
-                ElseIf pauseCameraTask = False Then
-                    camera.GetNextFrame(settings.workRes)
-
-                    ' The first few frames from the camera are junk.  Skip them.
-                    If camera.uicolor IsNot Nothing Then
-                        uiColor = camera.uiColor.clone
-                        uiLeft = camera.uiLeft.clone
-                        uiRight = camera.uiRight.clone
-                        ' a problem with the K4A interface was corrected here...
-                        If camera.uipointcloud Is Nothing Then
-                            camera.uipointcloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3)
-                        End If
-                        uiPointCloud = camera.uiPointCloud.clone
-                    End If
-
+                Else
+                    camera.GetNextFrame()
                 End If
+
                 If cameraShutdown Then
                     camera.stopCamera()
-                    End
+                    Return
                 End If
             End While
+        End Sub
+        Public Sub cameraClose()
+
         End Sub
     End Class
 End Namespace

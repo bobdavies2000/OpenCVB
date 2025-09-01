@@ -35,6 +35,16 @@ Namespace OpenCVB
             End While
             Return True
         End Function
+        Private Sub initializeResultMats()
+            ReDim results.dstList(3)
+            For i = 0 To results.dstList.Count - 1
+                results.dstList(i) = New cv.Mat
+            Next
+            If algName = "GL_MainForm" Then
+                results.GLcloud = New cv.Mat
+                results.GLrgb = New cv.Mat
+            End If
+        End Sub
         Private Sub logAlgorithm()
             Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
             totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
@@ -52,21 +62,13 @@ Namespace OpenCVB
             Debug.WriteLine("")
             Debug.WriteLine(" MemUsage/FPSAlg/FPSCam ")
         End Sub
-        Private Sub waitForCamera()
-            ' exit the inner while if any of these change.
-            If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or cameraShutdown Then Return
-            If saveworkRes <> settings.workRes Then Return
-            If saveCameraName <> settings.cameraName Then Return
-            If saveAlgorithmName <> task.algName Then Return
-
+        Private Function waitForCamera() As Boolean
             If pauseAlgorithmThread Then
                 task.paused = True
-                Return ' this is useful because the pixelviewer can be used if paused.
+                Return False ' this is useful because the pixelviewer can be used if paused.
             Else
                 task.paused = False
             End If
-
-            Dim copyTime = Now
 
             Dim imageData = camera.camimages
             task.color = imageData.color
@@ -86,11 +88,6 @@ Namespace OpenCVB
             task.CPU_TimeStamp = camera.CPU_TimeStamp
             task.CPU_FrameTime = camera.CPU_FrameTime
 
-            Dim endCopyTime = Now
-            Dim elapsedCopyTicks = endCopyTime.Ticks - copyTime.Ticks
-            Dim spanCopy = New TimeSpan(elapsedCopyTicks)
-            task.inputBufferCopy = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
-
             If GrabRectangleData Then
                 GrabRectangleData = False
                 Dim tmpDrawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio,
@@ -105,17 +102,8 @@ Namespace OpenCVB
                 End If
                 BothFirstAndLastReady = False
             End If
-        End Sub
-        Private Sub initializeResultMats()
-            ReDim results.dstList(3)
-            For i = 0 To results.dstList.Count - 1
-                results.dstList(i) = New cv.Mat
-            Next
-            If algName = "GL_MainForm" Then
-                results.GLcloud = New cv.Mat
-                results.GLrgb = New cv.Mat
-            End If
-        End Sub
+            Return True
+        End Function
         Private Sub AlgorithmTask(ByVal parms As VBClasses.VBtask.algParms)
             If parms.algName = "" Then Exit Sub
             algName = parms.algName
@@ -127,7 +115,7 @@ Namespace OpenCVB
             If getCalibdata(parms.calibData) = False Then Exit Sub
 
             ' During overnight testing, the duration of any algorithm varies a lot.
-            ' Wait here if previous algorithm is not finished.
+            ' Wait here for the lock if previous algorithm is not finished.
             SyncLock algorithmThreadLock
                 fpsWriteCount = 0
 
@@ -162,17 +150,15 @@ Namespace OpenCVB
                 task.rightView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
                 While 1
                     Dim waitTime = Now
-                    waitForCamera()
+                    While 1
+                        If waitForCamera() Then Exit While
+                    End While
                     Dim endWaitTime = Now
 
                     Dim elapsedWaitTicks = endWaitTime.Ticks - waitTime.Ticks
                     Dim spanWait = New TimeSpan(elapsedWaitTicks)
-                    Dim spanTime = TimeSpan.TicksPerMillisecond - task.inputBufferCopy
-                    If spanTime = 0 Then
-                        task.waitingForInput = 0
-                    Else
-                        task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond - task.inputBufferCopy
-                    End If
+                    Dim spanTime = TimeSpan.TicksPerMillisecond
+                    task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
                     ' exit the outer while if any of these change.
                     If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or cameraShutdown Then Exit While
@@ -230,8 +216,6 @@ Namespace OpenCVB
                         mouseMovePoint = validatePoint(New cv.Point(task.mouseMovePoint.X * ratio, task.mouseMovePoint.Y * ratio))
                     End SyncLock
 
-                    Dim returnTime = Now
-
                     ' in case the algorithm has changed the mouse location...
                     If task.mouseMovePointUpdated Then mousePointCamPic = task.mouseMovePoint
                     If updatedDrawRect <> task.drawRect Then
@@ -265,10 +249,6 @@ Namespace OpenCVB
                     If task.displayDst1 = False Or task.labels(1) = "" Then picLabels(1) = "DepthRGB"
                     picLabels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")
 
-                    Dim elapsedTicks = Now.Ticks - returnTime.Ticks
-                    Dim span = New TimeSpan(elapsedTicks)
-                    task.returnCopyTime = span.Ticks / TimeSpan.TicksPerMillisecond
-
                     task.mouseClickFlag = False
                     frameCount = task.frameCount
                     ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
@@ -294,12 +274,12 @@ Namespace OpenCVB
                     End SyncLock
                 End While
 
-                task.frameCount = -1
+                frameCount = -1
                 task.Dispose()
                 fpsWriteCount = 0
+                Debug.WriteLine("")
+                Debug.WriteLine(algName + " closing...")
             End SyncLock
-
-            frameCount = 0
         End Sub
     End Class
 End Namespace

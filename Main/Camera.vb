@@ -31,6 +31,14 @@ Public Class CameraImages
         Public left As New cv.Mat
         Public right As New cv.Mat
         Public pointCloud As New cv.Mat
+        Public Sub New()
+        End Sub
+        Public Sub New(workRes As cv.Size)
+            color = New cv.Mat(workRes, cv.MatType.CV_8UC3, 0)
+            left = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
+            right = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
+            color = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
+        End Sub
     End Class
 
     Public Shared allImages As New images
@@ -61,14 +69,10 @@ Public Class GenericCamera
     Public CPU_FrameTime As Double
     Public cameraFrameCount As Integer
     Public baseline As Single
-    Public camImages As New CameraImages.images
-
-    Public uiColor As cv.Mat
-    Public uiLeft As cv.Mat
-    Public uiRight As cv.Mat
-    Public uiPointCloud As cv.Mat
+    Public camImages As CameraImages.images
 
     Public captureRes As cv.Size
+    Public workRes As cv.Size
 
     Public deviceCount As Integer
     Public calibData As cameraInfo

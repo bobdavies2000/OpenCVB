@@ -1,6 +1,5 @@
 ﻿Imports System.IO
 Imports System.Management
-Imports System.Runtime
 Imports Newtonsoft.Json
 Imports VBClasses
 Imports cv = OpenCvSharp
@@ -33,7 +32,6 @@ Namespace jsonClass
         Public snapCustom As Boolean
 
         Public workRes As cv.Size
-        Public workResIndex As Integer
         Public captureRes As cv.Size
         Public displayRes As cv.Size
 
@@ -181,34 +179,6 @@ Namespace jsonClass
 
                 If settings.testAllDuration < 5 Then settings.testAllDuration = 5
                 If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
-
-                If .workRes = New cv.Size Then .workRes = New cv.Size(640, 480)
-                Select Case .workRes.Height
-                    Case 270, 540, 1080
-                        .captureRes = New cv.Size(1920, 1080)
-                        If .camera1920x1080Support(.cameraIndex) = False Then
-                            .captureRes = New cv.Size(1280, 720)
-                            .workRes = New cv.Size(320, 180)
-                        End If
-                    Case 180, 360, 720
-                        .captureRes = New cv.Size(1280, 720)
-                    Case 376, 188, 94
-                        If settings.cameraName <> "StereoLabs ZED 2/2i" Then
-                            MessageBox.Show("The json settings don't appear to be correct!" + vbCrLf +
-                                "The 'settings.json' file will be removed" + vbCrLf +
-                                "and rebuilt with default settings upon restart.")
-                            Dim fileinfo As New FileInfo(OpenCVB.Main.jsonfs.jsonFileName)
-                            fileinfo.Delete()
-                            End
-                        End If
-                        .captureRes = New cv.Size(672, 376)
-                    Case 120, 240, 480
-                        .captureRes = New cv.Size(640, 480)
-                        If .camera640x480Support(.cameraIndex) = False Then
-                            .captureRes = New cv.Size(1280, 720)
-                            .workRes = New cv.Size(320, 180)
-                        End If
-                End Select
 
                 Dim wh = .workRes.Height
                 ' desktop style is the default

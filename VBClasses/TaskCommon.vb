@@ -129,7 +129,7 @@ Public Module vbc
         Next
         If task.heartBeat Then ReDim task.quarter(4)
 
-        If task.frameCount = 0 Then task.heartBeat = True
+        If task.frameCount <= 0 Then task.heartBeat = True
 
         Static heartBeatCount As Integer = 5
         If task.heartBeat Then

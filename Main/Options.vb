@@ -1,10 +1,8 @@
-﻿Imports System.Runtime
+﻿Imports System.IO
 Imports cv = OpenCvSharp
 Public Class Options
     Public cameraRadioButton(Comm.cameraNames.Count - 1) As RadioButton
     Public workResRadio(Comm.resolutionList.Count - 1) As RadioButton
-    Public cameraworkRes As cv.Size
-    Public cameraDisplayRes As cv.Size
     Public cameraName As String
     Public cameraIndex As Integer
     Public testDuration As Integer
@@ -14,20 +12,44 @@ Public Class Options
         OpenCVB.Main.settings.snap320 = Snap320.Checked
         OpenCVB.Main.settings.snapCustom = SnapCustom.Checked
 
-        For Each radio In Resolutions.Controls
-            If radio.Checked Then
-                OpenCVB.Main.settings.workResIndex = radio.Tag
-                Dim strRes = radio.text.split(" ")
-                Dim resText = strRes(0)
-                Dim strVals = resText.split("x")
-                cameraworkRes = New cv.Size(CInt(strVals(0)), CInt(strVals(1)))
-                Exit For
-            End If
-        Next
+        With OpenCVB.Main.settings
+            For Each radio In Resolutions.Controls
+                If radio.Checked Then
+                    Dim strRes = radio.text.split(" ")
+                    Dim resText = strRes(0)
+                    Dim strVals = resText.split("x")
+                    .workRes = New cv.Size(CInt(strVals(0)), CInt(strVals(1)))
+                    Exit For
+                End If
+            Next
 
-        OpenCVB.Main.settings.workRes = cameraworkRes
-        OpenCVB.Main.settings.displayRes = cameraDisplayRes
-
+            Select Case .workRes.Height
+                Case 270, 540, 1080
+                    .captureRes = New cv.Size(1920, 1080)
+                    If .camera1920x1080Support(.cameraIndex) = False Then
+                        .captureRes = New cv.Size(1280, 720)
+                        .workRes = New cv.Size(320, 180)
+                    End If
+                Case 180, 360, 720
+                    .captureRes = New cv.Size(1280, 720)
+                Case 376, 188, 94
+                    If .cameraName <> "StereoLabs ZED 2/2i" Then
+                        MessageBox.Show("The json settings don't appear to be correct!" + vbCrLf +
+                                    "The 'settings.json' file will be removed" + vbCrLf +
+                                    "and rebuilt with default settings upon restart.")
+                        Dim fileinfo As New FileInfo(OpenCVB.Main.jsonfs.jsonFileName)
+                        fileinfo.Delete()
+                        End
+                    End If
+                    .captureRes = New cv.Size(672, 376)
+                Case 120, 240, 480
+                    .captureRes = New cv.Size(640, 480)
+                    If .camera640x480Support(.cameraIndex) = False Then
+                        .captureRes = New cv.Size(1280, 720)
+                        .workRes = New cv.Size(320, 180)
+                    End If
+            End Select
+        End With
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
@@ -106,7 +128,6 @@ Public Class Options
 
         TestAllDuration.Value = OpenCVB.Main.settings.testAllDuration
         If TestAllDuration.Value < 5 Then TestAllDuration.Value = 5
-        cameraDisplayRes = OpenCVB.Main.settings.displayRes
         showConsoleLog.Checked = OpenCVB.Main.settings.showConsoleLog
     End Sub
     Private Sub MainOptions_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
@@ -129,63 +150,19 @@ Public Class Options
     End Sub
     Public Sub Snap320_CheckedChanged(sender As Object, e As EventArgs) Handles Snap320.CheckedChanged
         Dim height = 180
-        If cameraworkRes.Height = 120 Or cameraworkRes.Height = 240 Or cameraworkRes.Height = 480 Then height = 240
-        cameraDisplayRes = New cv.Size(320, height)
+        Dim h = OpenCVB.Main.settings.workRes.Height
+        If h = 120 Or h = 240 Or h = 480 Then OpenCVB.Main.settings.displayRes = New cv.Size(320, 240)
     End Sub
     Public Sub Snap640_CheckedChanged(sender As Object, e As EventArgs) Handles Snap640.CheckedChanged
         Dim height = 360
-        If cameraworkRes.Height = 120 Or cameraworkRes.Height = 240 Or cameraworkRes.Height = 480 Then height = 480
-        cameraDisplayRes = New cv.Size(640, height)
+        Dim h = OpenCVB.Main.settings.workRes.Height
+        If h = 120 Or h = 240 Or h = 480 Then OpenCVB.Main.settings.displayRes = New cv.Size(640, 480)
     End Sub
-    Public Sub SnapCustom_CheckedChanged(sender As Object, e As EventArgs) Handles SnapCustom.CheckedChanged
-        ' cameraDisplayRes = New cv.Size(0, 0) ' figure it out in Main.vb resizing...
-    End Sub
-
     Public Sub UpdateXRef_Click(sender As Object, e As EventArgs) Handles UpdateXRef.Click
         Dim UIProcess As New Process
         UIProcess.StartInfo.FileName = OpenCVB.Main.HomeDir.FullName + "UI_Generator\bin\x64\Release\net8.0\UI_Generator.exe"
         UIProcess.StartInfo.WorkingDirectory = OpenCVB.Main.HomeDir.FullName + "UI_Generator\bin\x64\Release\net8.0\"
         UIProcess.StartInfo.Arguments = "All"
         UIProcess.Start()
-    End Sub
-    Public Sub setworkRes()
-        Select Case OpenCVB.Main.settings.workResIndex
-            Case 0
-                OpenCVB.Main.settings.workRes = New cv.Size(1920, 1080)
-                OpenCVB.Main.settings.captureRes = New cv.Size(1920, 1080)
-            Case 1
-                OpenCVB.Main.settings.workRes = New cv.Size(960, 540)
-                OpenCVB.Main.settings.captureRes = New cv.Size(1920, 1080)
-            Case 2
-                OpenCVB.Main.settings.workRes = New cv.Size(480, 270)
-                OpenCVB.Main.settings.captureRes = New cv.Size(1920, 1080)
-            Case 3
-                OpenCVB.Main.settings.workRes = New cv.Size(1280, 720)
-                OpenCVB.Main.settings.captureRes = New cv.Size(1280, 720)
-            Case 4
-                OpenCVB.Main.settings.workRes = New cv.Size(640, 360)
-                OpenCVB.Main.settings.captureRes = New cv.Size(1280, 720)
-            Case 5
-                OpenCVB.Main.settings.workRes = New cv.Size(320, 180)
-                OpenCVB.Main.settings.captureRes = New cv.Size(1280, 720)
-            Case 6
-                OpenCVB.Main.settings.workRes = New cv.Size(640, 480)
-                OpenCVB.Main.settings.captureRes = New cv.Size(640, 480)
-            Case 7
-                OpenCVB.Main.settings.workRes = New cv.Size(320, 240)
-                OpenCVB.Main.settings.captureRes = New cv.Size(640, 480)
-            Case 8
-                OpenCVB.Main.settings.workRes = New cv.Size(160, 120)
-                OpenCVB.Main.settings.captureRes = New cv.Size(640, 480)
-            Case 9
-                OpenCVB.Main.settings.workRes = New cv.Size(672, 376)
-                OpenCVB.Main.settings.captureRes = New cv.Size(672, 376)
-            Case 10
-                OpenCVB.Main.settings.workRes = New cv.Size(336, 188)
-                OpenCVB.Main.settings.captureRes = New cv.Size(672, 376)
-            Case 11
-                OpenCVB.Main.settings.workRes = New cv.Size(168, 94)
-                OpenCVB.Main.settings.captureRes = New cv.Size(672, 376)
-        End Select
     End Sub
 End Class

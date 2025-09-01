@@ -143,7 +143,7 @@ Public Class VBtask : Implements IDisposable
 
     Public transformationMatrix() As Single
 
-    Public frameCount As Integer = 0
+    Public frameCount As Integer = -1
     Public heartBeat As Boolean
     Public heartBeatLT As Boolean = True ' long term heartbeat - every X seconds.
     Public quarterBeat As Boolean
@@ -287,8 +287,6 @@ Public Class VBtask : Implements IDisposable
     Public trueData As New List(Of TrueText)
 
     Public waitingForInput As Single ' the amount of time waiting for buffers.
-    Public inputBufferCopy As Single ' the amount of time copying the buffers.
-    Public returnCopyTime As Single ' the amount of time returning buffers to the host.
 
     Public OpenGLTitle As String
     Public polyCount As Integer
@@ -538,6 +536,16 @@ Public Class VBtask : Implements IDisposable
         Dim str As New TrueText(text, pt, picTag)
         trueData.Add(str)
     End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        allOptions.Close()
+        TaskTimer.Enabled = False
+        For Each algorithm In task.activeObjects
+            Dim type As Type = algorithm.GetType()
+            If type.GetMethod("Close") IsNot Nothing Then
+                algorithm.Close()  ' Close any unmanaged classes...
+            End If
+        Next
+    End Sub
     Public Sub setSelectedCell()
         If task.redC Is Nothing Then Exit Sub
         If task.redC.rcList.Count = 0 Then Exit Sub
@@ -572,14 +580,6 @@ Public Class VBtask : Implements IDisposable
             algorithmTimes.Add(Now)
             algorithm_ms.Add(0)
 
-            algorithmNames.Add("inputBufferCopy")
-            algorithmTimes.Add(Now)
-            algorithm_ms.Add(0)
-
-            algorithmNames.Add("ReturnCopyTime")
-            algorithmTimes.Add(Now)
-            algorithm_ms.Add(0)
-
             algorithmNames.Add(algName)
             algorithmTimes.Add(Now)
             algorithm_ms.Add(0)
@@ -587,13 +587,9 @@ Public Class VBtask : Implements IDisposable
             algorithmStack = New Stack()
             algorithmStack.Push(0)
             algorithmStack.Push(1)
-            algorithmStack.Push(2)
-            algorithmStack.Push(3)
         End If
 
         algorithm_ms(0) += waitingForInput
-        algorithm_ms(1) += inputBufferCopy
-        algorithm_ms(2) += returnCopyTime
         algorithmTimes(3) = Now  ' starting the main algorithm
 
         Dim src = task.color
@@ -843,15 +839,5 @@ Public Class VBtask : Implements IDisposable
             If displayDst1 Then labels(1) = displayObject.labels(1)
             depthAndDepthRange = task.depthAndDepthRange
         End If
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        allOptions.Close()
-        TaskTimer.Enabled = False
-        For Each algorithm In task.activeObjects
-            Dim type As Type = algorithm.GetType()
-            If type.GetMethod("Close") IsNot Nothing Then
-                algorithm.Close()  ' Close any unmanaged classes...
-            End If
-        Next
     End Sub
 End Class

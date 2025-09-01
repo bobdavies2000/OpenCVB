@@ -4,7 +4,9 @@ Imports Intel.RealSense
 Imports System.Text
 Public Class CameraRS2 : Inherits GenericCamera
     Dim pipe As New Pipeline()
-    Public Sub New(workRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
+    Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
+        captureRes = _captureRes
+        workRes = _workRes
         Dim serialNumber As String = ""
         Dim ctx As New Context()
         Dim searchName As String = If(devName.EndsWith("455"), "D455", "D435i")
@@ -15,7 +17,6 @@ Public Class CameraRS2 : Inherits GenericCamera
         Dim cfg As New Config()
         cfg.EnableDevice(serialNumber)
 
-        captureRes = _captureRes
         cfg.EnableStream(Stream.Color, captureRes.Width, captureRes.Height, Format.Bgr8, fps)
         cfg.EnableStream(Stream.Infrared, 1, captureRes.Width, captureRes.Height, Format.Y8, fps)
         cfg.EnableStream(Stream.Infrared, 2, captureRes.Width, captureRes.Height, Format.Y8, fps)
@@ -67,7 +68,7 @@ Public Class CameraRS2 : Inherits GenericCamera
                                               System.Math.Pow(calibData.ColorToLeft_translation(1), 2) +
                                               System.Math.Pow(calibData.ColorToLeft_translation(2), 2))
     End Sub
-    Public Sub GetNextFrame(workRes As cv.Size)
+    Public Sub GetNextFrame()
         Dim alignToColor = New Align(Stream.Color)
         Dim ptcloud = New PointCloud()
         Dim cols = captureRes.Width, rows = captureRes.Height
@@ -104,10 +105,10 @@ Public Class CameraRS2 : Inherits GenericCamera
             If rightView Is Nothing Then rightView = New cv.Mat(workRes, cv.MatType.CV_8UC3)
             If pointCloud Is Nothing Then pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3)
 
-            uiColor = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            uiLeft = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
-            uiRight = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
-            uiPointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            camImages.color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            camImages.left = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
+            camImages.right = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
+            camImages.pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
 
             GC.Collect() ' do you think this is unnecessary?  Remove it and check...
             MyBase.GetNextFrameCounts(IMU_FrameTime)

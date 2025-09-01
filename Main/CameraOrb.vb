@@ -11,8 +11,9 @@ Public Class CameraORB : Inherits GenericCamera
     Dim color As cv.Mat, leftView As cv.Mat, pointCloud As cv.Mat, rightView As cv.Mat
     Dim PtCloud As New PointCloudFilter
     Dim initialTime As Int64 = timeStamp
-    Public Sub New(workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
+        workRes = _workRes
         Dim ctx As New Context
         Dim devList = ctx.QueryDeviceList()
         Dim dev = devList.GetDevice(0)
@@ -61,7 +62,7 @@ Public Class CameraORB : Inherits GenericCamera
         Catch ex As Exception
         End Try
     End Sub
-    Public Sub GetNextFrame(workRes As cv.Size)
+    Public Sub GetNextFrame()
         Dim rows = captureRes.Height, cols = captureRes.Width
 
         Dim frames As Frameset = Nothing
@@ -120,15 +121,15 @@ Public Class CameraORB : Inherits GenericCamera
         If pointCloud Is Nothing Then pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
 
         If workRes.Width = captureRes.Width Then
-            uiColor = color.Clone
-            uiLeft = leftView * 4 ' brighten it to help with correlations.
-            uiRight = rightView * 4
-            uiPointCloud = pointCloud.Clone
+            camImages.color = color.Clone
+            camImages.left = leftView * 4 ' brighten it to help with correlations.
+            camImages.right = rightView * 4
+            camImages.pointCloud = pointCloud.Clone
         Else
-            uiColor = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            uiLeft = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
-            uiRight = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
-            uiPointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            camImages.color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            camImages.left = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
+            camImages.right = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
+            camImages.pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
         End If
 
         ' without this GC.Collect, there are occasional memory footprint problems.  
@@ -175,8 +176,9 @@ Public Class CameraORB_CPP : Inherits GenericCamera
     Public deviceNum As Integer
     Public deviceName As String
     Public cPtrOpen As IntPtr
-    Public Sub New(workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
+        workRes = _workRes
 
         cPtr = ORBOpen(captureRes.Width, captureRes.Height)
         Dim intrin = ORBIntrinsics(cPtr)
@@ -187,7 +189,7 @@ Public Class CameraORB_CPP : Inherits GenericCamera
         calibData.rgbIntrinsics.fx = intrinInfo(2)
         calibData.rgbIntrinsics.fy = intrinInfo(3)
     End Sub
-    Public Sub GetNextFrame(workRes As cv.Size)
+    Public Sub GetNextFrame()
         Static color As cv.Mat, leftView As cv.Mat, rightView As cv.Mat, pointCloud As cv.Mat
 
         If cPtr = 0 Then Exit Sub
@@ -232,10 +234,10 @@ Public Class CameraORB_CPP : Inherits GenericCamera
         If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
         IMU_TimeStamp = ORBIMUTimeStamp(cPtr) - imuStartTime
 
-        uiColor = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-        uiLeft = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-        uiRight = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-        uiPointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        camImages.color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        camImages.left = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        camImages.right = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        camImages.pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
 
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub

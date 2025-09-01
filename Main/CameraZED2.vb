@@ -3,13 +3,15 @@ Imports CamZed
 Public Class CameraZed2 : Inherits GenericCamera
     Dim zed As CamZed
     Dim ratio As Single
-    Public Sub New(workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+    Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
+        workRes = _workRes
         ratio = CInt(captureRes.Width / workRes.Width)
         zed = New CamZed(workRes, captureRes, deviceName)
+        camImages = New CameraImages.images(workRes)
     End Sub
-    Public Sub GetNextFrame(workRes As cv.Size)
-        zed.GetNextFrame(workRes)
+    Public Sub GetNextFrame()
+        zed.GetNextFrame()
 
         IMU_Acceleration = zed.IMU_Acceleration
         IMU_AngularVelocity = zed.IMU_AngularVelocity
@@ -39,7 +41,7 @@ Public Class CameraZed2 : Inherits GenericCamera
             camImages.pointCloud = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
         Else
             camImages.color = zed.color
-            camImages.left = uiColor
+            camImages.left = camImages.color
             camImages.right = zed.rightView
             camImages.pointCloud = zed.pointCloud
         End If
