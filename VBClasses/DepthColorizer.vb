@@ -88,8 +88,8 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             Dim mask = task.depthMask(task.gridRects(gridIndex))
             Dim depth = depthGrid.Mean(mask)(0)
             Dim mm = GetMinMax(depthGrid, mask)
-            task.depthAndCorrelationText = "Depth = " + Format(depth, fmt1) + "m " + vbCrLf + "Depth range = " + Format(mm.minVal, fmt1) +
-                                            "m to " + Format(mm.maxVal, fmt1) + "m"
+            task.depthAndDepthRange = "Depth = " + Format(depth, fmt1) + "m " + vbCrLf + "Depth range = " + Format(mm.minVal, fmt1) +
+                                      "m to " + Format(mm.maxVal, fmt1) + "m"
         End If
         If standaloneTest() Then dst2 = task.depthRGB
     End Sub

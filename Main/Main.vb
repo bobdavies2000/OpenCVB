@@ -36,7 +36,6 @@ Namespace OpenCVB
         Dim pathList As New List(Of String)
 
         Dim AlgorithmTestAllCount As Integer
-        Dim algorithmCount As Integer
         Dim algorithmTaskHandle As Thread
         Dim algorithmQueueCount As Integer
 
@@ -51,7 +50,6 @@ Namespace OpenCVB
         Dim paintNewImages As Boolean
 
         Dim algorithmRefresh As Boolean
-        Dim CodeLineCount As Integer
         Dim DrawingRectangle As Boolean
         Dim drawRect As New cv.Rect
         Dim drawRectPic As Integer
@@ -111,7 +109,7 @@ Namespace OpenCVB
         Dim testAllEndingRes As Integer
 
         Dim magnifyIndex As Integer
-        Dim depthAndCorrelationText As String
+        Dim depthAndDepthRange As String
         Dim results As New Comm.resultData
         Public jsonfs As New jsonClass.jsonIO
         Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -397,7 +395,7 @@ Namespace OpenCVB
                                     Next
                                 End SyncLock
 
-                                trueData.Add(New TrueText(task.depthAndCorrelationText,
+                                trueData.Add(New TrueText(task.depthAndDepthRange,
                                              New cv.Point(mousePointCamPic.X, mousePointCamPic.Y - 24), 1))
                             End If
                         End If
@@ -516,7 +514,7 @@ Namespace OpenCVB
                 camLabel(3).Location = New Point(padX + camPic(0).Width, padY + camPic(0).Height + camLabel(0).Height)
             End If
 
-            If depthAndCorrelationText <> "" Then camLabel(1).Text = depthAndCorrelationText
+            If depthAndDepthRange <> "" Then camLabel(1).Text = depthAndDepthRange
 
             XYLoc.Location = New Point(camPic(2).Left, camPic(2).Top + camPic(2).Height)
             AlgDescription.Visible = settings.snap640
@@ -575,11 +573,6 @@ Namespace OpenCVB
                 fpsCamera = CInt(fpsListC.Average)
                 If fpsAlgorithm >= 100 Then fpsAlgorithm = 99
                 If fpsCamera >= 100 Then fpsCamera = 99
-                Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " +
-                          CStr(algorithmCount) + " algorithms = " +
-                          CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " +
-                          cameraName + " - Camera FPS/task FPS: " + Format(fpsCamera, "0") + "/" +
-                          Format(fpsAlgorithm, "0")
                 If fpsListA.Count > 5 Then
                     fpsListA.RemoveAt(0)
                     fpsListC.RemoveAt(0)
@@ -813,13 +806,17 @@ Namespace OpenCVB
 
             Dim infoLine = sr.ReadLine
             Dim Split = Regex.Split(infoLine, "\W+")
-            CodeLineCount = Split(1)
+            Dim CodeLineCount = Split(1)
 
             infoLine = sr.ReadLine
             Split = Regex.Split(infoLine, "\W+")
-            algorithmCount = Split(1)
+            Dim algorithmCount = Split(1)
             sr.Close()
 
+            Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " +
+                          CStr(algorithmCount) + " algorithms = " +
+                          CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " +
+                          settings.cameraName
             Dim groupFileInfo = New FileInfo(HomeDir.FullName + "Data/GroupComboBox.txt")
             If groupFileInfo.Exists = False Then
                 MessageBox.Show("The groupFileInfo.txt file is missing.  Run 'UI_Generator' or Clean/Rebuild to get the user interface.")

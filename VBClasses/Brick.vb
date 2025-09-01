@@ -680,7 +680,7 @@ Public Class Brick_CorrelationMap : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1.SetTo(0)
-        task.depthAndCorrelationText = ""
+        task.depthAndDepthRange = ""
         For Each brick In task.bricks.brickList
             If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
         Next
@@ -694,7 +694,7 @@ Public Class Brick_CorrelationMap : Inherits TaskParent
         If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
             Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             task.brickD = task.bricks.brickList(index)
-            task.depthAndCorrelationText = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
+            task.depthAndDepthRange = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
                                            CStr(task.brickD.index) + vbCrLf + " range " + Format(task.brickD.mm.minVal, fmt1) + "-" +
                                            Format(task.brickD.mm.maxVal, fmt1) + "m, age = " + CStr(task.brickD.age) + vbCrLf +
                                            " correlation = " + Format(task.brickD.correlation, fmt3)
@@ -706,8 +706,8 @@ Public Class Brick_CorrelationMap : Inherits TaskParent
                 ptTextLoc.Y -= task.brickD.rect.Height * 3
             End If
 
-            SetTrueText(task.depthAndCorrelationText, ptTextLoc, 2)
-            SetTrueText(task.depthAndCorrelationText, 3)
+            SetTrueText(task.depthAndDepthRange, ptTextLoc, 2)
+            SetTrueText(task.depthAndDepthRange, 3)
         End If
         labels(2) = task.bricks.labels(2)
     End Sub

@@ -263,7 +263,7 @@ Namespace OpenCVB
                     End SyncLock
 
                     If task.displayDst1 = False Or task.labels(1) = "" Then picLabels(1) = "DepthRGB"
-                    picLabels(1) = task.depthAndCorrelationText.Replace(vbCrLf, "")
+                    picLabels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")
 
                     Dim elapsedTicks = Now.Ticks - returnTime.Ticks
                     Dim span = New TimeSpan(elapsedTicks)

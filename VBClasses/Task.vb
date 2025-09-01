@@ -314,7 +314,7 @@ Public Class VBtask : Implements IDisposable
     Public OpenGL_Left As Integer
     Public OpenGL_Top As Integer
     Public displayDst1 As Boolean
-    Public depthAndCorrelationText As String
+    Public depthAndDepthRange As String
     Public closeRequest As Boolean
     Public sharpGL As VBClasses.sgl
 
@@ -841,7 +841,7 @@ Public Class VBtask : Implements IDisposable
             displayObject.trueData.Clear()
             labels = displayObject.labels
             If displayDst1 Then labels(1) = displayObject.labels(1)
-            depthAndCorrelationText = task.depthAndCorrelationText
+            depthAndDepthRange = task.depthAndDepthRange
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
