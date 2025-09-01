@@ -1,5 +1,6 @@
-﻿Imports cv = OpenCvSharp
-Imports System.Numerics
+﻿Imports System.Numerics
+Imports System.Threading
+Imports cv = OpenCvSharp
 Public Structure intrinsicData
     Public ppx As Single
     Public ppy As Single
@@ -24,6 +25,31 @@ Public Structure cameraInfo
     Public d_fov As Single ' diagonal field of view in degrees.
 
 End Structure
+Public Class CameraImages
+    Public Class images
+        Public color As New cv.Mat
+        Public left As New cv.Mat
+        Public right As New cv.Mat
+        Public pointCloud As New cv.Mat
+    End Class
+
+    Public Shared allImages As New images
+    Private Shared camLock As New Mutex(True, "camLock")
+
+    Public Shared Property sharedImages As images
+        Get
+            SyncLock camLock
+                Return allImages
+            End SyncLock
+        End Get
+
+        Set(value As images)
+            SyncLock camLock
+                allImages = value
+            End SyncLock
+        End Set
+    End Property
+End Class
 Public Class GenericCamera
     Public transformationMatrix() As Single
     Public IMU_TimeStamp As Double
@@ -35,6 +61,7 @@ Public Class GenericCamera
     Public CPU_FrameTime As Double
     Public cameraFrameCount As Integer
     Public baseline As Single
+    Public camImages As New CameraImages.images
 
     Public uiColor As cv.Mat
     Public uiLeft As cv.Mat

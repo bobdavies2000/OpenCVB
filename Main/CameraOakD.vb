@@ -140,7 +140,6 @@
 '        Dim depth16 = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_16U, OakDRawDepth(cPtr))
 '        depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
 
-'        SyncLock cameraLock
 '            If captureRes <> workRes Then
 '                Dim tmp As cv.Mat
 '                tmp = cv.Mat.FromPixelData(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, OakDColor(cPtr))
@@ -174,7 +173,6 @@
 '            Else
 '                uiPointCloud = pc.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
 '            End If
-'        End SyncLock
 
 '        MyBase.GetNextFrameCounts(IMU_FrameTime)
 '    End Sub

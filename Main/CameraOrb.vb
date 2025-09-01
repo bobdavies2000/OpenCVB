@@ -119,19 +119,17 @@ Public Class CameraORB : Inherits GenericCamera
         If rightView Is Nothing Then rightView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
         If pointCloud Is Nothing Then pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
 
-        SyncLock cameraLock
-            If workRes.Width = captureRes.Width Then
-                uiColor = color.Clone
-                uiLeft = leftView * 4 ' brighten it to help with correlations.
-                uiRight = rightView * 4
-                uiPointCloud = pointCloud.Clone
-            Else
-                uiColor = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                uiLeft = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
-                uiRight = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
-                uiPointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            End If
-        End SyncLock
+        If workRes.Width = captureRes.Width Then
+            uiColor = color.Clone
+            uiLeft = leftView * 4 ' brighten it to help with correlations.
+            uiRight = rightView * 4
+            uiPointCloud = pointCloud.Clone
+        Else
+            uiColor = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            uiLeft = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
+            uiRight = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
+            uiPointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        End If
 
         ' without this GC.Collect, there are occasional memory footprint problems.  
         If cameraFrameCount Mod 10 = 0 Then GC.Collect()
@@ -229,17 +227,15 @@ Public Class CameraORB_CPP : Inherits GenericCamera
 
         Dim accelFrame = ORBAccel(cPtr)
         Dim gyroFrame = ORBGyro(cPtr)
-        SyncLock cameraLock
-            Static imuStartTime = ORBIMUTimeStamp(cPtr)
-            If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
-            If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
-            IMU_TimeStamp = ORBIMUTimeStamp(cPtr) - imuStartTime
+        Static imuStartTime = ORBIMUTimeStamp(cPtr)
+        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
+        If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
+        IMU_TimeStamp = ORBIMUTimeStamp(cPtr) - imuStartTime
 
-            uiColor = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            uiLeft = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            uiRight = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            uiPointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-        End SyncLock
+        uiColor = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        uiLeft = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        uiRight = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        uiPointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
 
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub

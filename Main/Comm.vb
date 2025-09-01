@@ -1,5 +1,4 @@
-﻿Imports System.Threading
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Comm
     Public Enum oCase
         drawPointCloudRGB
@@ -49,7 +48,6 @@ Public Class Comm
 
 
     Public Class resultData
-        Public ptCursor As cv.Point
         Public GLRequest As Integer
 
         Public dstList() As cv.Mat

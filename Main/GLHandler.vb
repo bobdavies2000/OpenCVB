@@ -1,7 +1,7 @@
 ﻿Imports SharpGL
 Imports cv = OpenCvSharp
 Namespace OpenCVB
-    Partial Class Main
+    Partial Class Main : Inherits Form
         Dim gl As OpenGL
         Dim isDragging As Boolean = False
         Dim lastMousePos As cv.Point

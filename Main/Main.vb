@@ -6,9 +6,6 @@ Imports System.Threading
 Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
-Module OpenCVB_module
-    Public cameraLock As New Mutex(True, "cameraLock")
-End Module
 Namespace OpenCVB
     Partial Public Class Main : Inherits Form
         Public trueTextLock As New Mutex(True, "trueTextLock")
@@ -52,7 +49,6 @@ Namespace OpenCVB
         Dim camLabel(camPic.Count - 1) As Label
 
         Dim paintNewImages As Boolean
-        Dim newCameraImages As Boolean
 
         Dim algorithmRefresh As Boolean
         Dim CodeLineCount As Integer

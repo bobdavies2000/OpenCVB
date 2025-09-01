@@ -104,12 +104,10 @@ Public Class CameraRS2 : Inherits GenericCamera
             If rightView Is Nothing Then rightView = New cv.Mat(workRes, cv.MatType.CV_8UC3)
             If pointCloud Is Nothing Then pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3)
 
-            SyncLock cameraLock
-                uiColor = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                uiLeft = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
-                uiRight = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
-                uiPointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            End SyncLock
+            uiColor = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            uiLeft = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
+            uiRight = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
+            uiPointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
 
             GC.Collect() ' do you think this is unnecessary?  Remove it and check...
             MyBase.GetNextFrameCounts(IMU_FrameTime)

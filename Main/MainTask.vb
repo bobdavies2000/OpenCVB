@@ -3,7 +3,7 @@ Imports System.Threading
 Imports VBClasses
 
 Namespace OpenCVB
-    Partial Class Main
+    Partial Class Main : Inherits Form
         Dim saveDrawRect As cv.Rect
         Dim ratio As Single
         Dim algName As String
@@ -53,66 +53,58 @@ Namespace OpenCVB
             Debug.WriteLine(" MemUsage/FPSAlg/FPSCam ")
         End Sub
         Private Sub waitForCamera()
-            While 1
-                ' exit the inner while if any of these change.
-                If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or cameraShutdown Then Exit While
-                If saveworkRes <> settings.workRes Then Exit While
-                If saveCameraName <> settings.cameraName Then Exit While
-                If saveAlgorithmName <> task.algName Then Exit While
+            ' exit the inner while if any of these change.
+            If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or cameraShutdown Then Return
+            If saveworkRes <> settings.workRes Then Return
+            If saveCameraName <> settings.cameraName Then Return
+            If saveAlgorithmName <> task.algName Then Return
 
-                If pauseAlgorithmThread Then
-                    task.paused = True
-                    Exit While ' this is useful because the pixelviewer can be used if paused.
-                Else
-                    task.paused = False
-                End If
+            If pauseAlgorithmThread Then
+                task.paused = True
+                Return ' this is useful because the pixelviewer can be used if paused.
+            Else
+                task.paused = False
+            End If
 
-                If newCameraImages Then
-                    newCameraImages = False
-                    Dim copyTime = Now
+            Dim copyTime = Now
 
-                    SyncLock cameraLock
-                        task.color = camera.uiColor.clone
-                        task.leftView = camera.uiLeft.clone
-                        task.rightView = camera.uiRight.clone
-                        task.pointCloud = camera.uiPointCloud.clone
+            Dim imageData = camera.camimages
+            task.color = imageData.color
+            task.leftView = imageData.left
+            task.rightView = imageData.right
+            task.pointCloud = imageData.pointcloud
 
-                        ' there might be a delay in the camera task so set it again here....
-                        If frameCount < 10 Then task.calibData = setCalibData(camera.calibData)
+            ' there might be a delay in the camera task so set it again here....
+            If frameCount < 10 Then task.calibData = setCalibData(camera.calibData)
 
-                        task.transformationMatrix = camera.transformationMatrix
-                        task.IMU_TimeStamp = camera.IMU_TimeStamp
-                        task.IMU_Acceleration = camera.IMU_Acceleration
-                        task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
-                        task.IMU_AngularVelocity = camera.IMU_AngularVelocity
-                        task.IMU_FrameTime = camera.IMU_FrameTime
-                        task.CPU_TimeStamp = camera.CPU_TimeStamp
-                        task.CPU_FrameTime = camera.CPU_FrameTime
-                    End SyncLock
+            task.transformationMatrix = camera.transformationMatrix
+            task.IMU_TimeStamp = camera.IMU_TimeStamp
+            task.IMU_Acceleration = camera.IMU_Acceleration
+            task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
+            task.IMU_AngularVelocity = camera.IMU_AngularVelocity
+            task.IMU_FrameTime = camera.IMU_FrameTime
+            task.CPU_TimeStamp = camera.CPU_TimeStamp
+            task.CPU_FrameTime = camera.CPU_FrameTime
 
-                    Dim endCopyTime = Now
-                    Dim elapsedCopyTicks = endCopyTime.Ticks - copyTime.Ticks
-                    Dim spanCopy = New TimeSpan(elapsedCopyTicks)
-                    task.inputBufferCopy = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
+            Dim endCopyTime = Now
+            Dim elapsedCopyTicks = endCopyTime.Ticks - copyTime.Ticks
+            Dim spanCopy = New TimeSpan(elapsedCopyTicks)
+            task.inputBufferCopy = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
 
-                    If GrabRectangleData Then
-                        GrabRectangleData = False
-                        Dim tmpDrawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio,
-                                              drawRect.Height / ratio)
-                        task.drawRect = New cv.Rect
-                        If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
-                            If saveDrawRect <> tmpDrawRect Then
-                                task.optionsChanged = True
-                                saveDrawRect = tmpDrawRect
-                            End If
-                            task.drawRect = tmpDrawRect
-                        End If
-                        BothFirstAndLastReady = False
+            If GrabRectangleData Then
+                GrabRectangleData = False
+                Dim tmpDrawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio,
+                                                          drawRect.Height / ratio)
+                task.drawRect = New cv.Rect
+                If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
+                    If saveDrawRect <> tmpDrawRect Then
+                        task.optionsChanged = True
+                        saveDrawRect = tmpDrawRect
                     End If
-
-                    Exit While
+                    task.drawRect = tmpDrawRect
                 End If
-            End While
+                BothFirstAndLastReady = False
+            End If
         End Sub
         Private Sub initializeResultMats()
             ReDim results.dstList(3)
@@ -129,7 +121,6 @@ Namespace OpenCVB
             algName = parms.algName
             algorithmQueueCount += 1
             fpsAlgorithm = 0
-            newCameraImages = False
 
             initializeResultMats()
 

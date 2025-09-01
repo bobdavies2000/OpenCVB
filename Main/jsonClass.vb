@@ -6,7 +6,6 @@ Imports VBClasses
 Imports cv = OpenCvSharp
 
 Namespace jsonClass
-
     Public Class ApplicationStorage
         Public MainUI_AlgName As String
         Public groupComboText As String

@@ -2,7 +2,7 @@
 Imports System.Threading
 Imports cv = OpenCvSharp
 Namespace OpenCVB
-    Partial Class Main
+    Partial Class Main : Inherits Form
         Dim camera As Object
         Dim cameraTaskHandle As Thread
         Private Sub camSwitch()
@@ -76,7 +76,6 @@ Namespace OpenCVB
             CameraSwitching.Text = settings.cameraName + " starting"
             Application.DoEvents()
             paintNewImages = False
-            newCameraImages = False
             If cameraTaskHandle Is Nothing Then
                 cameraTaskHandle = New Thread(AddressOf CameraTask)
                 cameraTaskHandle.Name = "Camera Task"
@@ -107,25 +106,20 @@ Namespace OpenCVB
                     saveworkRes = settings.workRes
                     saveCameraName = settings.cameraName
                     camera = getCamera()
-                    newCameraImages = False
                 ElseIf pauseCameraTask = False Then
                     camera.GetNextFrame(settings.workRes)
 
                     ' The first few frames from the camera are junk.  Skip them.
-                    SyncLock cameraLock
-                        If camera.uicolor IsNot Nothing Then
-                            uiColor = camera.uiColor.clone
-                            uiLeft = camera.uiLeft.clone
-                            uiRight = camera.uiRight.clone
-                            ' a problem with the K4A interface was corrected here...
-                            If camera.uipointcloud Is Nothing Then
-                                camera.uipointcloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3)
-                            End If
-                            uiPointCloud = camera.uiPointCloud.clone
-
-                            newCameraImages = True ' trigger the algorithm task
+                    If camera.uicolor IsNot Nothing Then
+                        uiColor = camera.uiColor.clone
+                        uiLeft = camera.uiLeft.clone
+                        uiRight = camera.uiRight.clone
+                        ' a problem with the K4A interface was corrected here...
+                        If camera.uipointcloud Is Nothing Then
+                            camera.uipointcloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3)
                         End If
-                    End SyncLock
+                        uiPointCloud = camera.uiPointCloud.clone
+                    End If
 
                 End If
                 If cameraShutdown Then
