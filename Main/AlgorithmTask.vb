@@ -7,18 +7,6 @@ Namespace OpenCVB
         Dim saveDrawRect As cv.Rect
         Dim ratio As Single
         Dim algName As String
-        Private Sub harvestResults()
-            SyncLock OpenCVB.Main.task.resultLock
-                For i = 0 To results.dstList.Count - 1
-                    results.dstList(i) = New cv.Mat
-                Next
-
-                If algName = "GL_MainForm" Then
-                    results.GLcloud = New cv.Mat
-                    results.GLrgb = New cv.Mat
-                End If
-            End SyncLock
-        End Sub
         Private Function setCalibData(cb As Object) As VBtask.cameraInfo
             Dim cbNew As New VBtask.cameraInfo
             cbNew.rgbIntrinsics.ppx = cb.rgbIntrinsics.ppx
@@ -126,6 +114,16 @@ Namespace OpenCVB
                 End If
             End While
         End Sub
+        Private Sub initializeResultMats()
+            ReDim results.dstList(3)
+            For i = 0 To results.dstList.Count - 1
+                results.dstList(i) = New cv.Mat
+            Next
+            If algName = "GL_MainForm" Then
+                results.GLcloud = New cv.Mat
+                results.GLrgb = New cv.Mat
+            End If
+        End Sub
         Private Sub AlgorithmTask(ByVal parms As VBClasses.VBtask.algParms)
             If parms.algName = "" Then Exit Sub
             algName = parms.algName
@@ -133,8 +131,8 @@ Namespace OpenCVB
             fpsAlgorithm = 0
             newCameraImages = False
 
-            ReDim results.dstList(3)
-            harvestResults()
+            initializeResultMats()
+
             If getCalibdata(parms.calibData) = False Then Exit Sub
 
             ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
@@ -303,7 +301,16 @@ Namespace OpenCVB
                     algorithmRefresh = True
                     paintNewImages = True ' trigger the paint 
 
-                    harvestResults()
+                    SyncLock task.resultLock
+                        For i = 0 To task.results.dstList.Count - 1
+                            results.dstList(i) = task.results.dstList(i).Clone
+                        Next
+                        If parms.algName = "GL_MainForm" Then
+                            results.GLRequest = task.results.GLRequest
+                            results.GLcloud = task.pointCloud.Clone
+                            results.GLrgb = task.color.Clone
+                        End If
+                    End SyncLock
                 End While
 
                 task.frameCount = -1
