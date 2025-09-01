@@ -84,8 +84,8 @@ Namespace OpenCVB
         Dim activateTaskForms As Boolean
         Dim ClickPoint As New cv.Point ' last place where mouse was clicked.
         Dim mousePicTag As Integer
-        Dim mouseDownPoint As New cv.Point
-        Dim mouseMovePoint As New cv.Point ' last place the mouse was located in any of the OpenCVB images.
+        Dim mouseDownPoint As cv.Point
+        Dim mouseMovePoint As cv.Point ' last place the mouse was located in any of the OpenCVB images.
         Dim mouseDisplayPoint As New cv.Point
         Dim activeMouseDown As Boolean
 
@@ -475,10 +475,10 @@ Namespace OpenCVB
                         If results.dstList IsNot Nothing Then
                             If results.dstList(0).Width > 0 Then
                                 SyncLock task.resultLock
-                                    Dim pt As New cv.Point(results.ptCursor.X * ratio, results.ptCursor.Y * ratio)
                                     For i = 0 To results.dstList.Count - 1
-                                        Dim tmp = results.dstList(i).Resize(camSize)
-                                        tmp.Circle(pt, 3, cv.Scalar.White, -1)
+                                        Dim tmp = results.dstList(i)
+                                        tmp.Circle(mouseDisplayPoint, task.DotSize + 1, cv.Scalar.White, -1)
+                                        tmp = tmp.Resize(camSize)
                                         cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
                                     Next
                                 End SyncLock
@@ -1369,7 +1369,7 @@ Namespace OpenCVB
 
                     SyncLock mouseLock
                         mouseDisplayPoint = validatePoint(mouseDisplayPoint)
-                        mouseMovePoint = mouseMovePoint
+                        mouseMovePoint = validatePoint(New cv.Point(task.mouseMovePoint.X * ratio, task.mouseMovePoint.Y * ratio))
                     End SyncLock
 
                     Dim returnTime = Now
@@ -1392,23 +1392,21 @@ Namespace OpenCVB
                     If Single.IsNaN(fpsAlgorithm) Or fpsAlgorithm = 0 Then
                         task.fpsAlgorithm = 1
                     Else
-                        task.fpsAlgorithm = If(fpsAlgorithm < 0.01, 0, fpsAlgorithm)
+                        task.fpsAlgorithm = If(fpsAlgorithm < 0.01, 1, fpsAlgorithm)
                     End If
 
-                    Dim ptM = task.mouseMovePoint, w = task.workRes.Width, h = task.workRes.Height
-                    If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
-                        Dim ptCursor = validatePoint(task.mouseMovePoint)
-                        SyncLock trueTextLock
-                            trueData.Clear()
-                            If task.trueData.Count Then
-                                trueData = New List(Of VBClasses.TrueText)(task.trueData)
-                            End If
-                            If task.paused = False Then
-                                trueData.Add(New TrueText(task.depthAndCorrelationText, New cv.Point(ptM.X, ptM.Y - 24), 1))
-                            End If
-                            task.trueData.Clear()
-                        End SyncLock
-                    End If
+                    Dim ptCursor = mouseMovePoint
+                    SyncLock trueTextLock
+                        trueData.Clear()
+                        If task.trueData.Count Then
+                            trueData = New List(Of VBClasses.TrueText)(task.trueData)
+                        End If
+                        If task.paused = False Then
+                            trueData.Add(New TrueText(task.depthAndCorrelationText,
+                                                      New cv.Point(ptCursor.X, ptCursor.Y - 24), 1))
+                        End If
+                        task.trueData.Clear()
+                    End SyncLock
 
                     If task.displayDst1 = False Or task.labels(1) = "" Then picLabels(1) = "DepthRGB"
                     picLabels(1) = task.depthAndCorrelationText.Replace(vbCrLf, "")
