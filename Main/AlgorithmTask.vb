@@ -135,7 +135,8 @@ Namespace OpenCVB
 
             If getCalibdata(parms.calibData) = False Then Exit Sub
 
-            ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
+            ' During overnight testing, the duration of any algorithm varies a lot.
+            ' Wait here if previous algorithm is not finished.
             SyncLock algorithmThreadLock
                 fpsWriteCount = 0
 
@@ -176,10 +177,9 @@ Namespace OpenCVB
                 task.rightView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
                 While 1
                     Dim waitTime = Now
-
                     waitForCamera()
-
                     Dim endWaitTime = Now
+
                     Dim elapsedWaitTicks = endWaitTime.Ticks - waitTime.Ticks
                     Dim spanWait = New TimeSpan(elapsedWaitTicks)
                     Dim spanTime = TimeSpan.TicksPerMillisecond - task.inputBufferCopy
@@ -268,15 +268,11 @@ Namespace OpenCVB
                         task.fpsAlgorithm = If(fpsAlgorithm < 0.01, 1, fpsAlgorithm)
                     End If
 
-                    Dim ptCursor = mouseMovePoint
+                    Dim ptCursor = New cv.Point(mouseMovePoint.X / ratio, mouseMovePoint.Y / ratio)
                     SyncLock trueTextLock
                         trueData.Clear()
                         If task.trueData.Count Then
                             trueData = New List(Of VBClasses.TrueText)(task.trueData)
-                        End If
-                        If task.paused = False Then
-                            trueData.Add(New TrueText(task.depthAndCorrelationText,
-                                                  New cv.Point(ptCursor.X, ptCursor.Y - 24), 1))
                         End If
                         task.trueData.Clear()
                     End SyncLock

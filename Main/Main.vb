@@ -15,19 +15,12 @@ Module OpenCVB_module
     Public mouseLock As New Mutex(True, "mouseLock") ' global lock for use with mouse clicks. 
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraLock As New Mutex(True, "cameraLock")
-    Public trueTextLock As New Mutex(True, "trueTextLock")
-    Public Declare Function GetWindowRect Lib "user32" (ByVal HWND As Integer, ByRef lpRect As RECT) As Integer
-    <StructLayout(LayoutKind.Sequential)> Public Structure RECT
-        Dim Left As Integer
-        Dim Top As Integer
-        Dim Right As Integer
-        Dim Bottom As Integer
-    End Structure
 End Module
 #End Region
 
 Namespace OpenCVB
     Partial Public Class Main : Inherits Form
+        Public trueTextLock As New Mutex(True, "trueTextLock")
         Public camPic(4 - 1) As PictureBox
         Public Shared settings As jsonClass.ApplicationStorage
         Public HomeDir As DirectoryInfo
@@ -482,6 +475,9 @@ Namespace OpenCVB
                                         cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
                                     Next
                                 End SyncLock
+
+                                trueData.Add(New TrueText(task.depthAndCorrelationText,
+                                             New cv.Point(mouseDisplayPoint.X, mouseDisplayPoint.Y - 24), 1))
                             End If
                         End If
                     End If
@@ -498,6 +494,7 @@ Namespace OpenCVB
                                      CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
                     End If
                 Next
+
             End SyncLock
 
             Dim workRes = settings.workRes
