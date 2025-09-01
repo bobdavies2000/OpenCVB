@@ -762,14 +762,15 @@ Public Class VBtask : Implements IDisposable
 
 
             algorithmPrep = False
-
-            MainUI_Algorithm.processFrame(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
-
+            task.MainUI_Algorithm.Run(src) ' <<<<<<<< This is where the VB algorithm runs...
             algorithmPrep = True
 
 
 
 
+            task.labels = task.MainUI_Algorithm.labels
+            Dim nextTrueData As List(Of TrueText) = task.MainUI_Algorithm.trueData
+            task.trueData = New List(Of TrueText)(nextTrueData)
 
             firstPass = False
             heartBeatLT = False

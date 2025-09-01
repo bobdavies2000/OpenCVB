@@ -606,12 +606,6 @@ Public Class TaskParent : Implements IDisposable
         Next
         Return srcPoints
     End Function
-    Public Sub processFrame(src As cv.Mat)
-        If dst2.Size <> src.Size And task.frameCount < 10 Then Exit Sub
-        task.MainUI_Algorithm.Run(src)
-        task.labels = labels
-        task.trueData = New List(Of TrueText)(trueData)
-    End Sub
     Public Sub measureStartRun(name As String)
         Dim nextTime = Now
         If task.algorithmNames.Contains(name) = False Then

@@ -151,13 +151,7 @@ Namespace OpenCVB
                 task.lowResDepth = New cv.Mat(task.workRes, cv.MatType.CV_32F)
                 task.lowResColor = New cv.Mat(task.workRes, cv.MatType.CV_32F)
                 task.MainUI_Algorithm = algolist.createAlgorithm(algName)
-
-                ' You may land here when the Group x-reference file has not been updated recently.
-                ' It is not updated on every run because it would make rerunning take too long.
-                ' if you land here and you were trying a subset group of algorithms,
-                ' then remove the json file and restart, click the OpenCVB options button,
-                ' and click 'Update Algorithm XRef' (it is toward the bottom of the options form.)
-                textDesc = task.MainUI_Algorithm.desc
+                AlgDescription.Text = task.MainUI_Algorithm.desc
 
                 If ComplexityTimer.Enabled = False Then logAlgorithm()
 
@@ -170,7 +164,7 @@ Namespace OpenCVB
                 End If
 
                 Dim saveworkRes = settings.workRes
-                mouseDisplayPoint = New cv.Point(task.workRes.Width / 2, task.workRes.Height / 2) ' mouse click point default = center of the image
+                mousePointCamPic = New cv.Point(task.workRes.Width / 2, task.workRes.Height / 2) ' mouse click point default = center of the image
 
                 task.motionMask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 255)
                 task.leftView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
@@ -197,12 +191,12 @@ Namespace OpenCVB
 
                     If activeMouseDown = False Then
                         SyncLock mouseLock
-                            If mouseDisplayPoint.X < 0 Then mouseDisplayPoint.X = 0
-                            If mouseDisplayPoint.Y < 0 Then mouseDisplayPoint.Y = 0
-                            If mouseDisplayPoint.X >= task.workRes.Width Then mouseDisplayPoint.X = task.workRes.Width - 1
-                            If mouseDisplayPoint.Y >= task.workRes.Height Then mouseDisplayPoint.Y = task.workRes.Height - 1
+                            If mousePointCamPic.X < 0 Then mousePointCamPic.X = 0
+                            If mousePointCamPic.Y < 0 Then mousePointCamPic.Y = 0
+                            If mousePointCamPic.X >= task.workRes.Width Then mousePointCamPic.X = task.workRes.Width - 1
+                            If mousePointCamPic.Y >= task.workRes.Height Then mousePointCamPic.Y = task.workRes.Height - 1
 
-                            task.mouseMovePoint = mouseDisplayPoint
+                            task.mouseMovePoint = mousePointCamPic
                             If task.mouseMovePoint = New cv.Point(0, 0) Then
                                 task.mouseMovePoint = New cv.Point(task.workRes.Width / 2, task.workRes.Height / 2)
                             End If
@@ -211,7 +205,7 @@ Namespace OpenCVB
                             If task.ClickPoint = New cv.Point Then task.ClickPoint = New cv.Point(task.workRes.Width / 2, task.workRes.Height / 2)
                             If mouseClickFlag Then
                                 task.mouseClickFlag = mouseClickFlag
-                                task.ClickPoint = mouseDisplayPoint
+                                task.ClickPoint = mousePointCamPic
                                 ClickPoint = task.ClickPoint
                                 mouseClickFlag = False
                             End If
@@ -241,14 +235,14 @@ Namespace OpenCVB
                     picLabels = task.labels
 
                     SyncLock mouseLock
-                        mouseDisplayPoint = validatePoint(mouseDisplayPoint)
+                        mousePointCamPic = validatePoint(mousePointCamPic)
                         mouseMovePoint = validatePoint(New cv.Point(task.mouseMovePoint.X * ratio, task.mouseMovePoint.Y * ratio))
                     End SyncLock
 
                     Dim returnTime = Now
 
                     ' in case the algorithm has changed the mouse location...
-                    If task.mouseMovePointUpdated Then mouseDisplayPoint = task.mouseMovePoint
+                    If task.mouseMovePointUpdated Then mousePointCamPic = task.mouseMovePoint
                     If updatedDrawRect <> task.drawRect Then
                         drawRect = task.drawRect
                         drawRect = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)

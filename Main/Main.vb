@@ -79,13 +79,11 @@ Namespace OpenCVB
         Dim mousePicTag As Integer
         Dim mouseDownPoint As cv.Point
         Dim mouseMovePoint As cv.Point ' last place the mouse was located in any of the OpenCVB images.
-        Dim mouseDisplayPoint As New cv.Point
+        Dim mousePointCamPic As New cv.Point ' mouse location in campics
         Dim activeMouseDown As Boolean
 
         Dim myBrush = New SolidBrush(Color.White)
         Dim picLabels() = {"", "", "", ""}
-        Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
-        Dim textDesc As String = ""
         Dim totalBytesOfMemoryUsed As Integer
 
         Dim uiColor As cv.Mat
@@ -411,11 +409,11 @@ Namespace OpenCVB
                 End If
 
                 mousePicTag = pic.Tag
-                mouseDisplayPoint.X = e.X
-                mouseDisplayPoint.Y = e.Y
-                mouseDisplayPoint *= settings.workRes.Width / camPic(0).Width
+                mousePointCamPic.X = e.X
+                mousePointCamPic.Y = e.Y
+                mousePointCamPic *= settings.workRes.Width / camPic(0).Width
 
-                XYLoc.Text = mouseDisplayPoint.ToString + ", last click point at: " + ClickPoint.ToString
+                XYLoc.Text = mousePointCamPic.ToString + ", last click point at: " + ClickPoint.ToString
 
             Catch ex As Exception
                 Debug.WriteLine("Error in camPic_MouseMove: " + ex.Message)
@@ -470,14 +468,14 @@ Namespace OpenCVB
                                 SyncLock task.resultLock
                                     For i = 0 To results.dstList.Count - 1
                                         Dim tmp = results.dstList(i)
-                                        tmp.Circle(mouseDisplayPoint, task.DotSize + 1, cv.Scalar.White, -1)
+                                        tmp.Circle(mousePointCamPic, task.DotSize + 1, cv.Scalar.White, -1)
                                         tmp = tmp.Resize(camSize)
                                         cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
                                     Next
                                 End SyncLock
 
                                 trueData.Add(New TrueText(task.depthAndCorrelationText,
-                                             New cv.Point(mouseDisplayPoint.X, mouseDisplayPoint.Y - 24), 1))
+                                             New cv.Point(mousePointCamPic.X, mousePointCamPic.Y - 24), 1))
                             End If
                         End If
                     End If
@@ -494,7 +492,6 @@ Namespace OpenCVB
                                      CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
                     End If
                 Next
-
             End SyncLock
 
             Dim workRes = settings.workRes
@@ -650,10 +647,6 @@ Namespace OpenCVB
             Static lastTime As DateTime = Now
             Static lastAlgorithmFrame As Integer
             Static lastCameraFrame As Integer
-            If textDesc <> "" Then
-                AlgDescription.Text = textDesc
-                textDesc = ""
-            End If
             If camera Is Nothing Then Exit Sub
             If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
             If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
@@ -717,7 +710,7 @@ Namespace OpenCVB
                             fpsWriteCount = 0
                         End If
                         fpsWriteCount += 1
-                        Debug.Write(" " + Format(totalBytesOfMemoryUsed, "###") + "/" + Format(fpsAlgorithm, fmt0) + "/" + 
+                        Debug.Write(" " + Format(totalBytesOfMemoryUsed, "###") + "/" + Format(fpsAlgorithm, fmt0) + "/" +
                                           Format(fpsCamera, fmt0))
                     End If
                 End If
@@ -817,7 +810,7 @@ Namespace OpenCVB
                 ' when switching resolution, best to reset these as the move from higher to lower res
                 ' could mean the point is no longer valid.
                 ClickPoint = New cv.Point
-                mouseDisplayPoint = New cv.Point
+                mousePointCamPic = New cv.Point
             End If
 
             Static saveLastAlgorithm = AvailableAlgorithms.Text
