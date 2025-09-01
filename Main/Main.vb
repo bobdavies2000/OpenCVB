@@ -1,26 +1,20 @@
 ﻿Imports System.ComponentModel
 Imports System.Globalization
 Imports System.IO
-Imports System.Management
-Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 Imports System.Threading
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
-#Region "Globals and stable code"
 Module OpenCVB_module
-    ' Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
-    Public mouseLock As New Mutex(True, "mouseLock") ' global lock for use with mouse clicks. 
-    Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraLock As New Mutex(True, "cameraLock")
 End Module
-#End Region
-
 Namespace OpenCVB
     Partial Public Class Main : Inherits Form
         Public trueTextLock As New Mutex(True, "trueTextLock")
+        Public mouseLock As New Mutex(True, "mouseLock") ' global lock for use with mouse clicks. 
+        Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
+
         Public camPic(4 - 1) As PictureBox
         Public Shared settings As jsonClass.ApplicationStorage
         Public HomeDir As DirectoryInfo
@@ -215,20 +209,7 @@ Namespace OpenCVB
             XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
             XYLoc.Visible = True
 
-            If settings.cameraFound Then
-                paintNewImages = False
-                newCameraImages = False
-                If cameraTaskHandle Is Nothing Then
-                    cameraTaskHandle = New Thread(AddressOf CameraTask)
-                    cameraTaskHandle.Name = "Camera Task"
-                    cameraTaskHandle.Start()
-                End If
-                CameraSwitching.Text = settings.cameraName + " starting"
-                While camera Is Nothing ' wait for camera to start...
-                    Application.DoEvents()
-                    Thread.Sleep(100)
-                End While
-            End If
+            If settings.cameraFound Then initCamera()
 
             Debug.WriteLine("")
             Debug.WriteLine("Main_Load complete.")
@@ -256,62 +237,11 @@ Namespace OpenCVB
             If pt.Y > task.workRes.Height Then pt.Y = task.workRes.Height - 1
             Return pt
         End Function
-        Private Function getCamera() As Object
-            Select Case settings.cameraName
-                Case "Intel(R) RealSense(TM) Depth Camera 455", "Intel(R) RealSense(TM) Depth Camera 435i"
-                    Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
-                'Case "Oak-D camera"
-                '    Return New CameraOakD_CPP(settings.workRes, settings.captureRes, settings.cameraName)
-                Case "StereoLabs ZED 2/2i"
-                    Return New CameraZed2(settings.workRes, settings.captureRes, settings.cameraName)
-                Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
-                    Return New CameraORB(settings.workRes, settings.captureRes, settings.cameraName)
-            End Select
-            Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
-        End Function
         Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
             jsonfs.write()
             cameraShutdown = True
             Thread.Sleep(200)
             End
-        End Sub
-        Private Sub CameraTask()
-            uiColor = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
-            uiLeft = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
-            uiRight = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3)
-            uiPointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3)
-            While 1
-                If settings.workRes <> saveworkRes Or saveCameraName <> settings.cameraName Then
-                    If saveCameraName = settings.cameraName And camera IsNot Nothing Then camera.stopCamera()
-                    saveworkRes = settings.workRes
-                    saveCameraName = settings.cameraName
-                    camera = getCamera()
-                    newCameraImages = False
-                ElseIf pauseCameraTask = False Then
-                    camera.GetNextFrame(settings.workRes)
-
-                    ' The first few frames from the camera are junk.  Skip them.
-                    SyncLock cameraLock
-                        If camera.uicolor IsNot Nothing Then
-                            uiColor = camera.uiColor.clone
-                            uiLeft = camera.uiLeft.clone
-                            uiRight = camera.uiRight.clone
-                            ' a problem with the K4A interface was corrected here...
-                            If camera.uipointcloud Is Nothing Then
-                                camera.uipointcloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3)
-                            End If
-                            uiPointCloud = camera.uiPointCloud.clone
-
-                            newCameraImages = True ' trigger the algorithm task
-                        End If
-                    End SyncLock
-
-                End If
-                If cameraShutdown Then
-                    camera.stopCamera()
-                    End
-                End If
-            End While
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
