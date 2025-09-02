@@ -127,6 +127,15 @@ Namespace OpenCVB
                     trueData = New List(Of TrueText)
                 End SyncLock
 
+                While 1
+                    ' wait for the camera to get the first images.
+                    If camera.cameraFrameCount > 1 Then
+                        camera.camImages = New CameraImages.images(task.workRes)
+                        Exit While
+                    End If
+                    Application.DoEvents()
+                End While
+
                 task.lowResDepth = New cv.Mat(task.workRes, cv.MatType.CV_32F)
                 task.lowResColor = New cv.Mat(task.workRes, cv.MatType.CV_32F)
                 task.MainUI_Algorithm = algolist.createAlgorithm(algName)
@@ -153,12 +162,6 @@ Namespace OpenCVB
                     While 1
                         If waitForCamera() Then Exit While
                     End While
-                    Dim endWaitTime = Now
-
-                    Dim elapsedWaitTicks = endWaitTime.Ticks - waitTime.Ticks
-                    Dim spanWait = New TimeSpan(elapsedWaitTicks)
-                    Dim spanTime = TimeSpan.TicksPerMillisecond
-                    task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
                     ' exit the outer while if any of these change.
                     If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or cameraShutdown Then Exit While
@@ -202,6 +205,13 @@ Namespace OpenCVB
                     Else
                         task.pixelViewerOn = pixelViewerOn
                     End If
+
+                    Dim endWaitTime = Now
+                    Dim elapsedWaitTicks = endWaitTime.Ticks - waitTime.Ticks
+                    Dim spanWait = New TimeSpan(elapsedWaitTicks)
+                    Dim spanTime = TimeSpan.TicksPerMillisecond
+                    task.waitingForInput = spanWait.Ticks / TimeSpan.TicksPerMillisecond
+
 
 
 
@@ -275,7 +285,6 @@ Namespace OpenCVB
                 End While
 
                 frameCount = -1
-                task.Dispose()
                 fpsWriteCount = 0
                 Debug.WriteLine("")
                 Debug.WriteLine(algName + " closing...")

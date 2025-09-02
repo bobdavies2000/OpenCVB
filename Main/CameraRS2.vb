@@ -7,6 +7,9 @@ Public Class CameraRS2 : Inherits GenericCamera
     Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
         captureRes = _captureRes
         workRes = _workRes
+        camImages = New CameraImages.images(workRes)
+        cameraFrameCount = 0
+
         Dim serialNumber As String = ""
         Dim ctx As New Context()
         Dim searchName As String = If(devName.EndsWith("455"), "D455", "D435i")

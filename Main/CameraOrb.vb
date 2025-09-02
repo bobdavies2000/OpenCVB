@@ -14,6 +14,8 @@ Public Class CameraORB : Inherits GenericCamera
     Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
         workRes = _workRes
+        camImages = New CameraImages.images(workRes)
+        cameraFrameCount = 0
         Dim ctx As New Context
         Dim devList = ctx.QueryDeviceList()
         Dim dev = devList.GetDevice(0)

@@ -143,7 +143,7 @@ Public Class VBtask : Implements IDisposable
 
     Public transformationMatrix() As Single
 
-    Public frameCount As Integer = -1
+    Public frameCount As Integer = 1
     Public heartBeat As Boolean
     Public heartBeatLT As Boolean = True ' long term heartbeat - every X seconds.
     Public quarterBeat As Boolean

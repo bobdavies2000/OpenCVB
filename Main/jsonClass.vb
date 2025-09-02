@@ -180,6 +180,33 @@ Namespace jsonClass
                 If settings.testAllDuration < 5 Then settings.testAllDuration = 5
                 If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
 
+                Select Case .workRes.Height
+                    Case 270, 540, 1080
+                        .captureRes = New cv.Size(1920, 1080)
+                        If .camera1920x1080Support(.cameraIndex) = False Then
+                            .captureRes = New cv.Size(1280, 720)
+                            .workRes = New cv.Size(320, 180)
+                        End If
+                    Case 180, 360, 720
+                        .captureRes = New cv.Size(1280, 720)
+                    Case 376, 188, 94
+                        If .cameraName <> "StereoLabs ZED 2/2i" Then
+                            MessageBox.Show("The json settings don't appear to be correct!" + vbCrLf +
+                                    "The 'settings.json' file will be removed" + vbCrLf +
+                                    "and rebuilt with default settings upon restart.")
+                            Dim fileinfo As New FileInfo(OpenCVB.Main.jsonfs.jsonFileName)
+                            fileinfo.Delete()
+                            End
+                        End If
+                        .captureRes = New cv.Size(672, 376)
+                    Case 120, 240, 480
+                        .captureRes = New cv.Size(640, 480)
+                        If .camera640x480Support(.cameraIndex) = False Then
+                            .captureRes = New cv.Size(1280, 720)
+                            .workRes = New cv.Size(320, 180)
+                        End If
+                End Select
+
                 Dim wh = .workRes.Height
                 ' desktop style is the default
                 If .snap320 = False And .snap640 = False And .snapCustom = False Then .snap640 = True

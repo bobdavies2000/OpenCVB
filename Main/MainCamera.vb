@@ -97,7 +97,7 @@ Namespace OpenCVB
         Private Sub CameraTask()
             While 1
                 If settings.workRes <> saveworkRes Or saveCameraName <> settings.cameraName Then
-                    If saveCameraName = settings.cameraName And camera IsNot Nothing Then camera.stopCamera()
+                    If camera IsNot Nothing Then camera.stopCamera()
                     saveworkRes = settings.workRes
                     saveCameraName = settings.cameraName
                     camera = getCamera()

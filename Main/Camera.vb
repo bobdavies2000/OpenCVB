@@ -37,7 +37,7 @@ Public Class CameraImages
             color = New cv.Mat(workRes, cv.MatType.CV_8UC3, 0)
             left = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
             right = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
-            color = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
+            pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
         End Sub
     End Class
 

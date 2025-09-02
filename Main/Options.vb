@@ -22,33 +22,6 @@ Public Class Options
                     Exit For
                 End If
             Next
-
-            Select Case .workRes.Height
-                Case 270, 540, 1080
-                    .captureRes = New cv.Size(1920, 1080)
-                    If .camera1920x1080Support(.cameraIndex) = False Then
-                        .captureRes = New cv.Size(1280, 720)
-                        .workRes = New cv.Size(320, 180)
-                    End If
-                Case 180, 360, 720
-                    .captureRes = New cv.Size(1280, 720)
-                Case 376, 188, 94
-                    If .cameraName <> "StereoLabs ZED 2/2i" Then
-                        MessageBox.Show("The json settings don't appear to be correct!" + vbCrLf +
-                                    "The 'settings.json' file will be removed" + vbCrLf +
-                                    "and rebuilt with default settings upon restart.")
-                        Dim fileinfo As New FileInfo(OpenCVB.Main.jsonfs.jsonFileName)
-                        fileinfo.Delete()
-                        End
-                    End If
-                    .captureRes = New cv.Size(672, 376)
-                Case 120, 240, 480
-                    .captureRes = New cv.Size(640, 480)
-                    If .camera640x480Support(.cameraIndex) = False Then
-                        .captureRes = New cv.Size(1280, 720)
-                        .workRes = New cv.Size(320, 180)
-                    End If
-            End Select
         End With
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
@@ -149,14 +122,16 @@ Public Class Options
         End If
     End Sub
     Public Sub Snap320_CheckedChanged(sender As Object, e As EventArgs) Handles Snap320.CheckedChanged
-        Dim height = 180
         Dim h = OpenCVB.Main.settings.workRes.Height
-        If h = 120 Or h = 240 Or h = 480 Then OpenCVB.Main.settings.displayRes = New cv.Size(320, 240)
+        If h = 120 Or h = 240 Or h = 480 Then
+            OpenCVB.Main.settings.displayRes = New cv.Size(320, 240)
+        End If
     End Sub
     Public Sub Snap640_CheckedChanged(sender As Object, e As EventArgs) Handles Snap640.CheckedChanged
-        Dim height = 360
         Dim h = OpenCVB.Main.settings.workRes.Height
-        If h = 120 Or h = 240 Or h = 480 Then OpenCVB.Main.settings.displayRes = New cv.Size(640, 480)
+        If h = 120 Or h = 240 Or h = 480 Then
+            OpenCVB.Main.settings.displayRes = New cv.Size(640, 480)
+        End If
     End Sub
     Public Sub UpdateXRef_Click(sender As Object, e As EventArgs) Handles UpdateXRef.Click
         Dim UIProcess As New Process

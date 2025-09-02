@@ -6,9 +6,10 @@ Public Class CameraZed2 : Inherits GenericCamera
     Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
         workRes = _workRes
+        camImages = New CameraImages.images(workRes)
+        cameraFrameCount = 0
         ratio = CInt(captureRes.Width / workRes.Width)
         zed = New CamZed(workRes, captureRes, deviceName)
-        camImages = New CameraImages.images(workRes)
     End Sub
     Public Sub GetNextFrame()
         zed.GetNextFrame()

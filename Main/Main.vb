@@ -193,7 +193,10 @@ Namespace OpenCVB
             XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
             XYLoc.Visible = True
 
-            If settings.cameraFound Then initCamera()
+            If settings.cameraFound Then
+                camSwitchAnnouncement()
+                initCamera()
+            End If
 
             Debug.WriteLine("")
             Debug.WriteLine("Main_Load complete.")
@@ -247,16 +250,19 @@ Namespace OpenCVB
                 task.optionsChanged = True
                 If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
 
+                If saveCameraName <> settings.cameraName Or task.workRes <> settings.workRes Then
+                    camSwitchAnnouncement()
+                End If
+
                 settings.cameraName = optionsForm.cameraName
                 settings.cameraIndex = optionsForm.cameraIndex
                 settings.testAllDuration = optionsForm.testDuration
-
-                setupCamPics()
 
                 camSwitchAnnouncement()
 
                 jsonfs.write()
                 settings = jsonfs.read() ' this will apply all the changes...
+                setupCamPics()
 
                 StartAlgorithm()
             Else
@@ -915,7 +921,7 @@ Namespace OpenCVB
         Private Sub StartAlgorithm()
             ' changing resolution or camera requires shutting down the camera.  It is restarted automatically
             If settings.workRes <> saveworkRes Or saveCameraName <> settings.cameraName Then
-                saveAlgorithmName = AvailableAlgorithms.Text ' this will shut down the algorithm task
+                saveAlgorithmName = "" ' this will shut down the algorithm task
 
                 ' wait for any current thread to stop...
                 While 1
@@ -924,14 +930,16 @@ Namespace OpenCVB
                 End While
             End If
 
+            Dim parms As New VBClasses.VBtask.algParms
+            parms.algName = AvailableAlgorithms.Text
+
             Debug.WriteLine("")
             Debug.WriteLine("")
-            Debug.WriteLine("Starting algorithm " + AvailableAlgorithms.Text)
+            Debug.WriteLine("Starting algorithm " + parms.algName)
             Debug.WriteLine(vbTab + CStr(AlgorithmTestAllCount) + " algorithms tested")
             testAllRunning = TestAllButton.Text = "Stop Test"
-            saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
+            saveAlgorithmName = parms.algName
 
-            Dim parms As New VBClasses.VBtask.algParms
             parms.fpsRate = settings.desiredFPS
 
             parms.testAllRunning = testAllRunning
@@ -947,7 +955,6 @@ Namespace OpenCVB
 
             parms.workRes = settings.workRes
             parms.captureRes = settings.captureRes
-            parms.algName = AvailableAlgorithms.Text
 
             PausePlayButton.Image = PausePlay
 
@@ -965,7 +972,7 @@ Namespace OpenCVB
             Thread.CurrentThread.Priority = ThreadPriority.Lowest
             algorithmTaskHandle = New Thread(AddressOf AlgorithmTask) ' <<<<<<<<<<<<<<<<<<<<<<<<< This starts the VB_Classes algorithm.
             AlgDescription.Text = ""
-            algorithmTaskHandle.Name = AvailableAlgorithms.Text
+            algorithmTaskHandle.Name = parms.algName
             algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
             algorithmTaskHandle.Start(parms)
         End Sub
