@@ -363,8 +363,8 @@ Public Class Color8U_Smoothing : Inherits TaskParent
         desc = "Merge that last X BGR frames to smooth out differences."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        frames.Run(src)
-        dst2 = frames.dst2
+        frames.Run(src.Clone)
+        frames.dst2.ConvertTo(dst2, cv.MatType.CV_8UC3)
         labels(2) = "The image below is the average of " + CStr(frames.saveFrames.Count) + " the last BGR frames"
     End Sub
 End Class

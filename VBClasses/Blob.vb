@@ -71,7 +71,8 @@ Public Class Blob_Input : Inherits TaskParent
 
         poly.Run(src)
         Mats.mat(3) = poly.dst3
-        mats.Run(emptyMat)
+
+        Mats.Run(emptyMat)
         dst2 = Mats.dst2
         dst3 = Mats.dst3
     End Sub
@@ -88,10 +89,10 @@ Public Class Blob_RenderBlobs : Inherits TaskParent
         desc = "Use connected components to find blobs."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        input.Run(src)
+        dst2 = input.dst2
         If task.frameCount Mod input.updateFrequency = 0 Then
-            input.Run(src)
-            dst2 = input.dst2
-            Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+            Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
             Dim labelView = dst2.EmptyClone
             Dim stats As New cv.Mat

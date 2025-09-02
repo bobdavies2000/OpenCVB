@@ -34,13 +34,18 @@ Public Class Benford_Basics : Inherits TaskParent
         use99 = True
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then task.gray.ConvertTo(src, cv.MatType.CV_32F)
+        Dim gray32f As New cv.Mat
+        If standalone Then
+            task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
+        Else
+            gray32f = src
+        End If
 
-        src = src.Reshape(1, src.Width * src.Height)
-        Dim indexer = src.GetGenericIndexer(Of Single)()
+        gray32f = gray32f.Reshape(1, gray32f.Width * gray32f.Height)
+        Dim indexer = gray32f.GetGenericIndexer(Of Single)()
         ReDim counts(expectedDistribution.Count - 1)
         If use99 = False Then
-            For i = 0 To src.Rows - 1
+            For i = 0 To gray32f.Rows - 1
                 Dim val = indexer(i)
                 Dim valstr = val.ToString
                 If val <> 0 And Single.IsNaN(val) = False Then
@@ -50,7 +55,7 @@ Public Class Benford_Basics : Inherits TaskParent
             Next
         Else
             ' this is for the distribution 10-99
-            For i = 0 To src.Rows - 1
+            For i = 0 To gray32f.Rows - 1
                 Dim val = indexer(i)
                 If val <> 0 And Single.IsNaN(val) = False Then
                     Dim valstr = val.ToString
@@ -69,7 +74,7 @@ Public Class Benford_Basics : Inherits TaskParent
         plotHist.Run(hist)
         dst3 = plotHist.dst2.Clone
         For i = 0 To counts.Count - 1
-            counts(i) = src.Rows * expectedDistribution(i)
+            counts(i) = gray32f.Rows * expectedDistribution(i)
         Next
 
         hist = cv.Mat.FromPixelData(counts.Length, 1, cv.MatType.CV_32F, counts)

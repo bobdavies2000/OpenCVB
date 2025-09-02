@@ -616,8 +616,14 @@ Namespace OpenCVB
             ' don't start another algorithm until the current one has finished 
             ' Give the algorithm a reasonable time to finish, then crash.
             Dim crash As Boolean = True
-            Thread.Sleep(10000)
-            If frameCount = -1 Then crash = False
+            saveAlgorithmName = ""
+            For i = 0 To 10
+                If frameCount = -1 Then
+                    crash = False
+                    Exit For
+                End If
+                Thread.Sleep(1000)
+            Next
             If crash Then
                 Throw New InvalidOperationException("Can't start the next algorithm because previous algorithm has not completed.")
             End If
