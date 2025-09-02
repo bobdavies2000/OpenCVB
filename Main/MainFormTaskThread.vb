@@ -81,10 +81,9 @@ Namespace OpenCVB
             task.rightView = imageData.right
             task.pointCloud = imageData.pointcloud
 
-            If task.color.Width = 0 Then Return False
-            If task.leftView.Width = 0 Then Return False
-            If task.rightView.Width = 0 Then Return False
-            If task.pointCloud.Width = 0 Then Return False
+            Static lastFrameNumber As Integer = camera.cameraFrameCount
+            If camera.cameraFrameCount = lastFrameNumber Then Return False
+            lastFrameNumber = frameCount
 
             ' there might be a delay in the camera task so set it again here....
             If frameCount < 10 Then task.calibData = setCalibData(camera.calibData)
