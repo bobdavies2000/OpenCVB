@@ -443,14 +443,6 @@ Public Class VBtask : Implements IDisposable
         task.rgbLeftAligned = True
         If task.cameraName.Contains("RealSense") Then task.rgbLeftAligned = False
 
-        ' set options for specific cameras here.
-        'Select Case task.cameraName
-        '    Case "StereoLabs ZED 2/2i"
-        '    Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
-        '    Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
-        '    Case "Oak-D camera"
-        'End Select
-
         mainFormLocation = parms.mainFormLocation
         rows = parms.workRes.Height
         cols = parms.workRes.Width
@@ -758,7 +750,7 @@ Public Class VBtask : Implements IDisposable
 
 
             algorithmPrep = False
-            task.MainUI_Algorithm.Run(src) ' <<<<<<<< This is where the VB algorithm runs...
+            task.MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
             algorithmPrep = True
 
 

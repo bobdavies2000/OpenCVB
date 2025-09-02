@@ -60,7 +60,7 @@ Namespace OpenCVB
             Debug.WriteLine(vbTab + "Working resolution of " + CStr(settings.workRes.Width) + "x" +
                                                            CStr(settings.workRes.Height))
             Debug.WriteLine("")
-            Debug.WriteLine(" MemUsage/FPSAlg/FPSCam ")
+            If testAllRunning Then Debug.WriteLine(" MemUsage/FPSAlg/FPSCam ")
         End Sub
         Private Function waitForCamera() As Boolean
             If pauseAlgorithmThread Then
@@ -137,7 +137,6 @@ Namespace OpenCVB
                 task.lowResDepth = New cv.Mat(task.workRes, cv.MatType.CV_32F)
                 task.lowResColor = New cv.Mat(task.workRes, cv.MatType.CV_32F)
                 task.MainUI_Algorithm = algolist.createAlgorithm(algName)
-                AlgDescription.Text = task.MainUI_Algorithm.desc
 
                 If ComplexityTimer.Enabled = False Then logAlgorithm()
 

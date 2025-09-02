@@ -525,6 +525,9 @@ Namespace OpenCVB
             If camera Is Nothing Then Exit Sub
             If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
             If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
+            'If AlgDescription.Text = "" And task.MainUI_Algorithm IsNot Nothing Then
+            '    AlgDescription.Text = task.MainUI_Algorithm.desc
+            'End If
 
             If pauseAlgorithmThread = False Then
                 Dim timeNow As DateTime = Now
@@ -566,22 +569,24 @@ Namespace OpenCVB
                 If fpsAlgorithm = 0 Then
                     fpsAlgorithm = 1
                 Else
-                    Static lastWriteTime = timeNow
-                    elapsedTime = timeNow.Ticks - lastWriteTime.Ticks
-                    spanCopy = New TimeSpan(elapsedTime)
-                    taskTimerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
-                    If taskTimerInterval > If(testAllRunning, 1000, 5000) Then
-                        Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
-                        totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
+                    If testAllRunning Then
+                        Static lastWriteTime = timeNow
+                        elapsedTime = timeNow.Ticks - lastWriteTime.Ticks
+                        spanCopy = New TimeSpan(elapsedTime)
+                        taskTimerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
+                        If taskTimerInterval > If(testAllRunning, 1000, 5000) Then
+                            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+                            totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
 
-                        lastWriteTime = timeNow
-                        If fpsWriteCount = 5 Then
-                            Debug.WriteLine("")
-                            fpsWriteCount = 0
-                        End If
-                        fpsWriteCount += 1
-                        Debug.Write(" " + Format(totalBytesOfMemoryUsed, "###") + "/" + Format(fpsAlgorithm, fmt0) + "/" +
+                            lastWriteTime = timeNow
+                            If fpsWriteCount = 5 Then
+                                Debug.WriteLine("")
+                                fpsWriteCount = 0
+                            End If
+                            fpsWriteCount += 1
+                            Debug.Write(" " + Format(totalBytesOfMemoryUsed, "###") + "/" + Format(fpsAlgorithm, fmt0) + "/" +
                                           Format(fpsCamera, fmt0))
+                        End If
                     End If
                 End If
             End If
@@ -956,6 +961,7 @@ Namespace OpenCVB
 
             GC.Collect()
 
+            AlgDescription.Text = ""
             Thread.CurrentThread.Priority = ThreadPriority.Lowest
             algorithmTaskHandle = New Thread(AddressOf AlgorithmTask) ' <<<<<<<<<<<<<<<<<<<<<<<<< This starts the VB_Classes algorithm.
             AlgDescription.Text = ""
