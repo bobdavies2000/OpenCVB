@@ -7,7 +7,7 @@ Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Namespace OpenCVB
-    Partial Public Class MainForm : Inherits Form
+    Partial Public Class MainUI : Inherits Form
         Public trueTextLock As New Mutex(True, "trueTextLock")
         Public mouseLock As New Mutex(True, "mouseLock") ' global lock for use with mouse clicks. 
         Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
@@ -72,7 +72,6 @@ Namespace OpenCVB
 
         Const MAX_RECENT = 50
         Dim algHistory As New List(Of String)
-        Dim arrowList As New List(Of String)
         Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
         Dim arrowIndex As Integer
 

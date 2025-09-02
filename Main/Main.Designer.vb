@@ -1,6 +1,6 @@
 ﻿Namespace OpenCVB
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-    Partial Class MainForm : Inherits Form
+    Partial Class MainUI : Inherits Form
 
         'Form overrides dispose to clean up the component list.
         <System.Diagnostics.DebuggerNonUserCode()>
@@ -194,7 +194,7 @@
             GLControl.TabIndex = 4
             GLControl.Visible = False
             ' 
-            ' MainForm
+            ' MainUI
             ' 
             AutoScaleDimensions = New SizeF(10.0F, 25.0F)
             AutoScaleMode = AutoScaleMode.Font
@@ -204,7 +204,7 @@
             Controls.Add(CameraSwitching)
             Controls.Add(XYLoc)
             Controls.Add(ToolStrip1)
-            Name = "MainForm"
+            Name = "MainUI"
             Text = "OpenCVB Main Form"
             ToolStrip1.ResumeLayout(False)
             ToolStrip1.PerformLayout()

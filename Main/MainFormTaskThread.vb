@@ -1,9 +1,14 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.ComponentModel
 Imports System.Threading
 Imports VBClasses
+Imports cv = OpenCvSharp
 
 Namespace OpenCVB
-    Partial Class MainForm : Inherits Form
+    ' this code prevents the designer from opening this as a designer and creating a .resx file.
+    <DesignerCategory("")>
+    Public Class Dummy2
+    End Class
+    Partial Class MainUI
         Dim saveDrawRect As cv.Rect
         Dim ratio As Single
         Dim algName As String
@@ -76,6 +81,11 @@ Namespace OpenCVB
             task.rightView = imageData.right
             task.pointCloud = imageData.pointcloud
 
+            If task.color.Width = 0 Then Return False
+            If task.leftView.Width = 0 Then Return False
+            If task.rightView.Width = 0 Then Return False
+            If task.pointCloud.Width = 0 Then Return False
+
             ' there might be a delay in the camera task so set it again here....
             If frameCount < 10 Then task.calibData = setCalibData(camera.calibData)
 
@@ -145,7 +155,7 @@ Namespace OpenCVB
                 If task.drawRect <> New cv.Rect Then
                     ' relative size of algorithm size image to displayed image
                     drawRect = New cv.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
-                                   task.drawRect.Width * ratio, task.drawRect.Height * ratio)
+                                           task.drawRect.Width * ratio, task.drawRect.Height * ratio)
                 End If
 
                 Dim saveworkRes = settings.workRes
@@ -284,6 +294,7 @@ Namespace OpenCVB
                 Debug.WriteLine("")
                 Debug.WriteLine(algName + " closing...")
             End SyncLock
+
         End Sub
     End Class
 End Namespace

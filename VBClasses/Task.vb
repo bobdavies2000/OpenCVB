@@ -78,7 +78,6 @@ Public Class VBtask : Implements IDisposable
     Public rows As Integer
     Public cols As Integer
     Public workRes As cv.Size
-    Public TaskTimer As New System.Timers.Timer(1000)
 
     ' if true, algorithm prep means algorithm tasks will run.  If false, they have already been run...
     Public algorithmPrep As Boolean = True
@@ -404,25 +403,15 @@ Public Class VBtask : Implements IDisposable
                 treeView.optionsChanged = False
             End If
             optionsChanged = False
-            TaskTimer.Enabled = False
             frameCount += 1
         Catch ex As Exception
             Debug.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
     End Sub
-    Private Sub VBTaskTimerPop(sender As Object, e As EventArgs)
-        Static WarningIssued As Boolean = False
-        If frameCount > 0 And WarningIssued = False Then
-            WarningIssued = True
-            Debug.WriteLine("Warning: " + algName + " has not completed work on a frame in a second.")
-        End If
-    End Sub
+
     Public Sub New()
     End Sub
     Public Sub New(parms As algParms)
-        AddHandler TaskTimer.Elapsed, New Timers.ElapsedEventHandler(AddressOf VBTaskTimerPop)
-        TaskTimer.AutoReset = True
-        TaskTimer.Enabled = True
         Randomize() ' just in case anyone uses VB.Net's Rnd
 
         task = Me
@@ -530,7 +519,6 @@ Public Class VBtask : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         allOptions.Close()
-        TaskTimer.Enabled = False
         For Each algorithm In task.activeObjects
             Dim type As Type = algorithm.GetType()
             If type.GetMethod("Close") IsNot Nothing Then
@@ -699,8 +687,6 @@ Public Class VBtask : Implements IDisposable
             If bricks Is Nothing Then bricks = New Brick_Basics
             bricks.Run(src.Clone)
         End If
-
-        TaskTimer.Enabled = True
 
         If pixelViewerOn And PixelViewer Is Nothing Then
             PixelViewer = New Pixel_Viewer

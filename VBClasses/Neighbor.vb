@@ -29,7 +29,9 @@ Public Class Neighbor_Basics : Inherits TaskParent
             task.setSelectedCell()
             dst3.SetTo(0)
             For Each index In task.rcD.nabs
-                DrawCircle(dst2, task.redC.rcList(index).maxDist, task.DotSize, task.highlight)
+                If index < task.redC.rcList.Count Then
+                    DrawCircle(dst2, task.redC.rcList(index).maxDist, task.DotSize, task.highlight)
+                End If
             Next
         End If
     End Sub

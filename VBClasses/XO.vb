@@ -2,6 +2,7 @@
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp.ML
 Imports cv = OpenCvSharp
 Public Class XO_Model_Basics : Inherits TaskParent
     Dim oglM As New XO_OpenGL_BasicsMouse
@@ -11747,5 +11748,97 @@ Public Class XO_OpenGL_TextureShuffle : Inherits TaskParent
         Dim merged() As cv.Mat = {split(2), split(1), split(0), alpha}
         cv.Cv2.Merge(merged, rgbaTexture)
         SetTrueText("Use mouse movement over the image to display task.results..", 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_ML_BasicsOld : Inherits TaskParent
+    Dim rtree As RTrees
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels = {"", "depth32f - 32fc3 format with missing depth filled with predicted depth based on color (brighter is farther)", "", "Color used for roi prediction"}
+        desc = "Predict depth from color to fill in the depth shadow areas"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim noDepthCount(task.gridRects.Count - 1) As Integer
+        Dim roiColor(task.gridRects.Count - 1) As cv.Vec3b
+
+        dst2.SetTo(0)
+        Parallel.For(0, task.gridRects.Count,
+        Sub(i)
+            Dim roi = task.gridRects(i)
+            roiColor(i) = src(roi).Get(Of cv.Vec3b)(roi.Height / 2, roi.Width / 2)
+            dst2(roi).SetTo(roiColor(i), task.depthMask(roi))
+            noDepthCount(i) = task.noDepthMask(roi).CountNonZero
+        End Sub)
+
+        If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
+        Dim mlInput As New List(Of mlData)
+        Dim mResponse As New List(Of Single)
+        For i = 0 To task.gridRects.Count - 1
+            If noDepthCount(i) = 0 Then Continue For
+            Dim ml As mlData
+            Dim roi = task.gridRects(i)
+            ml.row = roi.Y + roi.Height / 2
+            ml.col = roi.X + roi.Width / 2
+            Dim c = roiColor(i)
+            ml.blue = c(0)
+            ml.green = c(1)
+            ml.red = c(2)
+            mlInput.Add(ml)
+            mResponse.Add(task.pcSplit(2)(roi).Mean())
+        Next
+
+        If mlInput.Count = 0 Then
+            strOut = "No learning data was found or provided.  Exit..."
+            dst3.SetTo(0)
+            SetTrueText(strOut, 3)
+            Exit Sub
+        End If
+
+        Dim mLearn As cv.Mat = cv.Mat.FromPixelData(mlInput.Count, 5, cv.MatType.CV_32F, mlInput.ToArray)
+        Dim response As cv.Mat = cv.Mat.FromPixelData(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
+        rtree.Train(mLearn, cv.ML.SampleTypes.RowSample, response)
+
+        Dim predictList As New List(Of mlData)
+        Dim colors As New List(Of cv.Vec3b)
+        Dim saveRoi As New List(Of cv.Rect)
+        Dim depthMask As New List(Of cv.Mat)
+        For i = 0 To task.gridRects.Count - 1
+            If noDepthCount(i) = 0 Then Continue For
+            Dim roi = task.gridRects(i)
+            depthMask.Add(task.noDepthMask(roi))
+            Dim ml As mlData
+            ml.row = roi.Y + roi.Height / 2
+            ml.col = roi.X + roi.Width / 2
+            Dim c = roiColor(i)
+            ml.blue = c(0)
+            ml.green = c(1)
+            ml.red = c(2)
+            predictList.Add(ml)
+            colors.Add(c)
+            saveRoi.Add(roi)
+        Next
+
+        Dim predMat = cv.Mat.FromPixelData(predictList.Count, 5, cv.MatType.CV_32F, predictList.ToArray)
+        Dim output = New cv.Mat(predictList.Count, 1, cv.MatType.CV_32FC1, cv.Scalar.All(0))
+        rtree.Predict(predMat, output)
+
+        dst1 = task.pcSplit(2)
+        dst3.SetTo(0)
+        For i = 0 To predictList.Count - 1
+            Dim roi = saveRoi(i)
+            Dim depth = output.Get(Of Single)(i, 0)
+            dst1(roi).SetTo(depth, depthMask(i))
+            dst3(roi).SetTo(colors(i), depthMask(i))
+        Next
+
+        labels(2) = CStr(task.gridRects.Count) + " regions with " + CStr(mlInput.Count) + " used for learning and " + CStr(predictList.Count) + " were predicted"
+    End Sub
+    Public Sub Close()
+        If rtree IsNot Nothing Then rtree.Dispose()
     End Sub
 End Class

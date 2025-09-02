@@ -1,7 +1,12 @@
-﻿Imports SharpGL
+﻿Imports System.ComponentModel
+Imports SharpGL
 Imports cv = OpenCvSharp
 Namespace OpenCVB
-    Partial Class MainForm : Inherits Form
+    ' this code prevents the designer from opening this as a designer and creating a .resx file.
+    <DesignerCategory("")>
+    Public Class Dummy
+    End Class
+    Partial Class MainUI
         Dim gl As OpenGL
         Dim isDragging As Boolean = False
         Dim lastMousePos As cv.Point
@@ -92,8 +97,8 @@ Namespace OpenCVB
             Select Case results.GLRequest
                 Case Comm.oCase.drawPointCloudRGB
                     If results.GLcloud Is Nothing Then Exit Sub
-                    If results.GLcloud.Size <> OpenCVB.MainForm.settings.workRes Then
-                        results.GLcloud = New cv.Mat(OpenCVB.MainForm.settings.workRes, cv.MatType.CV_32FC3, 0)
+                    If results.GLcloud.Size <> OpenCVB.MainUI.settings.workRes Then
+                        results.GLcloud = New cv.Mat(OpenCVB.MainUI.settings.workRes, cv.MatType.CV_32FC3, 0)
                     End If
                     gl.Begin(OpenGL.GL_POINTS)
 
