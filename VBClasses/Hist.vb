@@ -1170,6 +1170,10 @@ Public Class Hist_Depth : Inherits TaskParent
     Public mm As mmData
     Public histogram As New cv.Mat
     Public Sub New()
+        plotHist.minRange = 0.1
+        plotHist.removeZeroEntry = True
+        task.gOptions.MaxDepthBar.Value = 10
+        task.gOptions.HistBinBar.Value = 10
         desc = "Show depth data as a histogram."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1191,6 +1195,7 @@ Public Class Hist_Depth : Inherits TaskParent
                         {New cv.Rangef(plotHist.minRange, plotHist.maxRange)})
 
         plotHist.histogram = histogram
+        plotHist.maxRange = task.MaxZmeters
         plotHist.Run(plotHist.histogram)
         dst2 = plotHist.dst2
 

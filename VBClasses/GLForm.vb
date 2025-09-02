@@ -1,4 +1,5 @@
-﻿Imports SharpGL
+﻿Imports OpenCvSharp
+Imports SharpGL
 Imports cv = OpenCvSharp
 Public Class sgl
     Dim gl As OpenGL
@@ -10,7 +11,7 @@ Public Class sgl
     Dim isPanning As Boolean = False
     Dim panX As Single = 0.0F
     Dim panY As Single = 0.0F
-    Dim options As Options_SharpGL
+    Public options As Options_SharpGL
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         options = New Options_SharpGL
         Me.Left = GetSetting("Opencv", "sglLeft", "sglLeft", task.mainFormLocation.X + task.mainFormLocation.Width)
@@ -78,6 +79,21 @@ Public Class sgl
     Private Sub sgl_Closed(sender As Object, e As EventArgs) Handles Me.Closed
         task.closeRequest = True
     End Sub
+    Private Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
+        Dim mm As mmData
+        If mask Is Nothing Then
+            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
+        Else
+            mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, mask)
+        End If
+
+        If Double.IsInfinity(mm.maxVal) Then
+            Console.WriteLine("IsInfinity encountered in getMinMax.")
+            mm.maxVal = 0 ' skip ...
+        End If
+        mm.range = mm.maxVal - mm.minVal
+        Return mm
+    End Function
     Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
         options.Run()
 
@@ -118,6 +134,8 @@ Public Class sgl
                 Next
                 gl.End()
                 label = CStr(task.pointCloud.Total) + " points were rendered."
+
+
             Case Comm.oCase.pcLines
                 gl.Begin(OpenGL.GL_POINTS)
                 Dim count As Integer, all255 As Boolean
@@ -139,6 +157,8 @@ Public Class sgl
                 Next
                 gl.End()
                 label = CStr(count) + " points were rendered for the selected line(s)."
+
+
             Case Comm.oCase.quadBasics, Comm.oCase.readPointCloud
                 gl.Begin(OpenGL.GL_QUADS)
 
@@ -164,12 +184,32 @@ Public Class sgl
                 If func = Comm.oCase.readPointCloud Then
                     task.sharpDepth = New cv.Mat(Height, Width, cv.MatType.CV_32F)
 
-                    Dim depthBuffer(Width, Height) As Single
                     gl.ReadPixels(0, 0, Width, Height, OpenGL.GL_DEPTH_COMPONENT, OpenGL.GL_FLOAT,
                                   task.sharpDepth.Data)
+
+                    Dim mm1 = GetMinMax(task.sharpDepth)
+
+                    Dim near = options.zNear
+                    Dim far = options.zFar
+                    Dim a As Single = 2.0F * near * far
+                    Dim b As Single = far + near
+                    Dim c As Single = far - near
+
+                    ' convert from (0 to 1) to (-1 to 1)
+                    task.sharpDepth = task.sharpDepth * 2.0F
+                    task.sharpDepth -= 1.0F
+                    Dim mm2 = GetMinMax(task.sharpDepth)
+
+                    Dim denom As New Mat()
+                    Cv2.Multiply(task.sharpDepth, c, denom)         ' denom = task.sharpDepth * c
+                    Cv2.Subtract(b, denom, denom)         ' denom = b - task.sharpDepth * c
+                    Cv2.Divide(a, denom, task.sharpDepth)
+
                     gl.Flush()
                     gl.Finish()
                 End If
+
+
             Case Comm.oCase.draw3DLines
                 gl.Color(1.0F, 1.0F, 1.0F)
                 gl.Begin(OpenGL.GL_LINES)
@@ -180,6 +220,8 @@ Public Class sgl
                 Next
                 gl.End()
                 label = task.lines.labels(2)
+
+
             Case Comm.oCase.draw3DLinesAndCloud
                 gl.Begin(OpenGL.GL_POINTS)
                 For y = 0 To pointcloud.Height - 1
@@ -205,6 +247,8 @@ Public Class sgl
                 Next
                 gl.End()
                 label = task.lines.labels(2)
+
+
         End Select
 
         gl.Flush()

@@ -65,33 +65,6 @@ End Class
 
 
 
-
-
-Public Class GL_ReadPointCloud : Inherits TaskParent
-    Public Sub New()
-        desc = "Read the point cloud from a rendered geometry"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim mm = GetMinMax(task.pcSplit(2))
-
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readPointCloud)
-        SetTrueText(strOut, 2)
-
-        Dim count As Integer
-        'labels(2) = Format(mm.minVal, fmt1) + "m (min) to " + Format(mm.maxVal, fmt1) + "m (max)"
-
-        dst2 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
-        dst2 *= task.gOptions.MaxDepthBar.Value
-
-        dst3 = task.pcSplit(2)
-        labels(3) = CStr(count)
-    End Sub
-End Class
-
-
-
-
-
 Public Class GL_StructuredLines : Inherits TaskParent
     Dim sMask = New Structured_Mask
     Public Sub New()
@@ -273,3 +246,114 @@ Public Class GL_Draw3DLinesAndCloud : Inherits TaskParent
         dst2 = task.lines.dst2
     End Sub
 End Class
+
+
+
+
+Public Class GL_ReadPointCloud : Inherits TaskParent
+    Public Sub New()
+        desc = "Read the point cloud from a rendered geometry"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.readPointCloud)
+        SetTrueText(strOut, 2)
+
+        dst1 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
+        dst2 = dst1.InRange(0.1, 20)
+        dst3 = dst2.ConvertScaleAbs(255)
+        dst1.CopyTo(dst2, dst3)
+    End Sub
+End Class
+
+
+
+
+Public Class GL_ReadPointCloudHist : Inherits TaskParent
+    Dim plotHist As New Plot_Histogram
+    Public Sub New()
+        plotHist.minRange = 0.1
+        plotHist.createHistogram = True
+        plotHist.removeZeroEntry = True
+        task.gOptions.MaxDepthBar.Value = 10
+        task.gOptions.HistBinBar.Value = 10
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        desc = "Read the point cloud from a rendered geometry"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.readPointCloud)
+        labels(2) = strOut
+
+        dst1 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
+        Dim tmp = dst1.InRange(0.1, task.MaxZmeters)
+        dst0 = tmp.ConvertScaleAbs(255)
+
+        dst2.SetTo(0)
+        dst1.CopyTo(dst2, dst0)
+
+        plotHist.maxRange = task.MaxZmeters
+        plotHist.Run(dst2)
+        dst3 = plotHist.dst2
+
+        Dim histList = plotHist.histArray.ToList
+        Dim maxBin = histList.IndexOf(histList.Max)
+        SetTrueText("Max bin at " + CStr(maxBin) + " meters", New cv.Point(dst2.Width / 2, 10), 3)
+        labels(3) = "Distances range from 0 to " + CStr(task.MaxZmeters) + " meters with 1m per bin (by default)"
+    End Sub
+End Class
+
+
+
+'Public Class GL_WorldCoordinates : Inherits TaskParent
+'    Dim invProjView As New cv.Mat(4, 4, cv.MatType.CV_32F, 0)
+'    Public Sub New()
+'        Dim worldPoints As New List(Of Vec3f)
+'        desc = "Read the point cloud from a rendered geometry and put it into the input's world coordinates."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        strOut = task.sharpGL.RunSharp(Comm.oCase.readPointCloud)
+'        SetTrueText(strOut, 2)
+'        dst1 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
+
+'        Dim fovY As Single = 45.0F
+'        Dim aspectRatio As Single = dst1.Width / dst1.Height
+'        Dim near As Single = task.sharpGL.options.zNear
+'        Dim far As Single = task.sharpGL.options.zNear
+
+'        Dim projection As Mat = CreatePerspectiveMatrix(fovY, aspectRatio, near, far)
+'        For y = 0 To dst2.Height - 1
+'            For x = 0 To dst2.Width - 1
+'                Dim depth As Single = dst1.At(Of Single)(y, x)
+'                If depth = 1.0F Then Continue For ' Skip far plane (background)
+
+'                ' Convert to NDC
+'                Dim x_ndc = (x / dst2.Width) * 2.0F - 1.0F
+'                Dim y_ndc = 1.0F - (y / dst2.Height) * 2.0F ' Flip Y
+'                Dim z_ndc = depth * 2.0F - 1.0F
+
+'                ' Clip-space position
+'                Dim clipPos As New Mat(4, 1, MatType.CV_32F)
+'                clipPos.Set(Of Single)(0, 0, x_ndc)
+'                clipPos.Set(Of Single)(1, 0, y_ndc)
+'                clipPos.Set(Of Single)(2, 0, z_ndc)
+'                clipPos.Set(Of Single)(3, 0, 1.0F)
+
+'                ' Multiply by inverse projection-view matrix
+'                Dim worldPos As Mat = invProjView * clipPos
+
+'                ' Convert from homogeneous to Cartesian
+'                Dim w As Single = worldPos.At(Of Single)(3, 0)
+'                If w <> 0 Then
+'                    Dim x_world = worldPos.At(Of Single)(0, 0) / w
+'                    Dim y_world = worldPos.At(Of Single)(1, 0) / w
+'                    Dim z_world = worldPos.At(Of Single)(2, 0) / w
+'                    worldPoints.Add(New Vec3f(x_world, y_world, z_world))
+'                End If
+'            Next
+'        Next
+
+
+'        dst2 = dst1.InRange(0.1, 20)
+'        dst3 = dst2.ConvertScaleAbs(255)
+'        dst1.CopyTo(dst2, dst3)
+'    End Sub
+'End Class

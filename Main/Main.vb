@@ -524,6 +524,7 @@ Namespace OpenCVB
             If camera Is Nothing Then Exit Sub
             If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
             If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
+            If task Is Nothing Then Exit Sub
             If task.MainUI_Algorithm Is Nothing Then Exit Sub
             If AlgDescription.Text = "" Then AlgDescription.Text = task.MainUI_Algorithm.desc
 
