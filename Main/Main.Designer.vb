@@ -1,7 +1,6 @@
 ﻿Namespace OpenCVB
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-    Partial Class Main
-        Inherits System.Windows.Forms.Form
+    Partial Class MainForm : Inherits Form
 
         'Form overrides dispose to clean up the component list.
         <System.Diagnostics.DebuggerNonUserCode()>
@@ -64,7 +63,7 @@
             ' PausePlayButton
             ' 
             PausePlayButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-            PausePlayButton.Image = Global.Main.My.Resources.Resources.PauseButtonRun
+            PausePlayButton.Image = My.Resources.Resources.PauseButtonRun
             PausePlayButton.ImageTransparentColor = Color.Magenta
             PausePlayButton.Name = "PausePlayButton"
             PausePlayButton.Size = New Size(34, 29)
@@ -73,7 +72,7 @@
             ' OptionsButton
             ' 
             OptionsButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-            OptionsButton.Image = Global.Main.My.Resources.Resources.settings
+            OptionsButton.Image = My.Resources.Resources.settings
             OptionsButton.ImageTransparentColor = Color.Magenta
             OptionsButton.Name = "OptionsButton"
             OptionsButton.Size = New Size(34, 29)
@@ -82,7 +81,7 @@
             ' TestAllButton
             ' 
             TestAllButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-            TestAllButton.Image = Global.Main.My.Resources.Resources.testall
+            TestAllButton.Image = My.Resources.Resources.testall
             TestAllButton.ImageTransparentColor = Color.Magenta
             TestAllButton.Name = "TestAllButton"
             TestAllButton.Size = New Size(34, 29)
@@ -91,7 +90,7 @@
             ' Magnify
             ' 
             Magnify.DisplayStyle = ToolStripItemDisplayStyle.Image
-            Magnify.Image = Global.Main.My.Resources.Resources.magnify
+            Magnify.Image = My.Resources.Resources.magnify
             Magnify.ImageTransparentColor = Color.Magenta
             Magnify.Name = "Magnify"
             Magnify.Size = New Size(34, 29)
@@ -100,7 +99,7 @@
             ' PixelViewerButton
             ' 
             PixelViewerButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-            PixelViewerButton.Image = Global.Main.My.Resources.Resources.PixelViewer
+            PixelViewerButton.Image = My.Resources.Resources.PixelViewer
             PixelViewerButton.ImageTransparentColor = Color.Magenta
             PixelViewerButton.Name = "PixelViewerButton"
             PixelViewerButton.Size = New Size(34, 29)
@@ -148,6 +147,7 @@
             XYLoc.Size = New Size(60, 25)
             XYLoc.TabIndex = 1
             XYLoc.Text = "XYLoc"
+            XYLoc.Visible = False
             ' 
             ' CameraSwitching
             ' 
@@ -174,9 +174,6 @@
             ' TestAllTimer
             ' 
             ' 
-            ' CamSwitchTimer
-            ' 
-            ' 
             ' RefreshTimer
             ' 
             RefreshTimer.Enabled = True
@@ -197,7 +194,7 @@
             GLControl.TabIndex = 4
             GLControl.Visible = False
             ' 
-            ' Main
+            ' MainForm
             ' 
             AutoScaleDimensions = New SizeF(10.0F, 25.0F)
             AutoScaleMode = AutoScaleMode.Font
@@ -207,7 +204,7 @@
             Controls.Add(CameraSwitching)
             Controls.Add(XYLoc)
             Controls.Add(ToolStrip1)
-            Name = "Main"
+            Name = "MainForm"
             Text = "OpenCVB Main Form"
             ToolStrip1.ResumeLayout(False)
             ToolStrip1.PerformLayout()

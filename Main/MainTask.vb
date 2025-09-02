@@ -3,7 +3,7 @@ Imports System.Threading
 Imports VBClasses
 
 Namespace OpenCVB
-    Partial Class Main : Inherits Form
+    Partial Class MainForm : Inherits Form
         Dim saveDrawRect As cv.Rect
         Dim ratio As Single
         Dim algName As String
@@ -107,7 +107,6 @@ Namespace OpenCVB
         Private Sub AlgorithmTask(ByVal parms As VBClasses.VBtask.algParms)
             If parms.algName = "" Then Exit Sub
             algName = parms.algName
-            algorithmQueueCount += 1
             fpsAlgorithm = 0
 
             initializeResultMats()
@@ -119,7 +118,6 @@ Namespace OpenCVB
             SyncLock algorithmThreadLock
                 fpsWriteCount = 0
 
-                algorithmQueueCount -= 1
                 AlgorithmTestAllCount += 1
                 drawRect = New cv.Rect
                 task = New VBtask(parms)
@@ -129,7 +127,7 @@ Namespace OpenCVB
 
                 While 1
                     ' wait for the camera to get the first images.
-                    If camera.cameraFrameCount > 1 Then
+                    If cameraReady Then
                         camera.camImages = New CameraImages.images(task.workRes)
                         Exit While
                     End If
@@ -164,7 +162,7 @@ Namespace OpenCVB
                     End While
 
                     ' exit the outer while if any of these change.
-                    If cameraTaskHandle Is Nothing Or algorithmQueueCount > 0 Or cameraShutdown Then Exit While
+                    If cameraTaskHandle Is Nothing Or cameraShutdown Then Exit While
                     If saveworkRes <> settings.workRes Then Exit While
                     If saveCameraName <> settings.cameraName Then Exit While
                     If saveAlgorithmName <> task.algName Then Exit While
@@ -269,9 +267,6 @@ Namespace OpenCVB
                         Exit While
                     End If
 
-                    algorithmRefresh = True
-                    paintNewImages = True ' trigger the paint 
-
                     SyncLock task.resultLock
                         For i = 0 To task.results.dstList.Count - 1
                             results.dstList(i) = task.results.dstList(i).Clone
@@ -281,6 +276,7 @@ Namespace OpenCVB
                             results.GLcloud = task.pointCloud.Clone
                             results.GLrgb = task.color.Clone
                         End If
+                        results.dstsReady = True ' this will trigger the paint
                     End SyncLock
                 End While
 

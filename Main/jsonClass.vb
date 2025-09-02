@@ -90,7 +90,7 @@ Namespace jsonClass
                 .cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True, True})
                 .camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True, True})
                 .camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False, False})
-                Dim defines = New FileInfo(OpenCVB.Main.HomeDir.FullName + "Cameras\CameraDefines.hpp")
+                Dim defines = New FileInfo(OpenCVB.MainForm.HomeDir.FullName + "Cameras\CameraDefines.hpp")
                 Dim stereoLabsDefineIsOff As Boolean
                 Dim sr = New StreamReader(defines.FullName)
                 Dim zedIndex = Comm.cameraNames.IndexOf("StereoLabs ZED 2/2i")
@@ -161,7 +161,7 @@ Namespace jsonClass
                 If .cameraPresent(zedIndex) And .cameraSupported(zedIndex) = False And stereoLabsDefineIsOff = False Then
                     MessageBox.Show("A StereoLabls ZED 2 camera is present but OpenCVB's" + vbCrLf +
                        "Cam_Zed2.dll has not been built with the SDK." + vbCrLf + vbCrLf +
-                       "Edit " + OpenCVB.Main.HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
+                       "Edit " + OpenCVB.MainForm.HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
                        "and rerun Update_All.bat to get the StereoLabs SDK.")
                 End If
 
@@ -194,7 +194,7 @@ Namespace jsonClass
                             MessageBox.Show("The json settings don't appear to be correct!" + vbCrLf +
                                     "The 'settings.json' file will be removed" + vbCrLf +
                                     "and rebuilt with default settings upon restart.")
-                            Dim fileinfo As New FileInfo(OpenCVB.Main.jsonfs.jsonFileName)
+                            Dim fileinfo As New FileInfo(OpenCVB.MainForm.jsonfs.jsonFileName)
                             fileinfo.Delete()
                             End
                         End If
@@ -224,39 +224,39 @@ Namespace jsonClass
 
                 Dim border As Integer = 6
                 Dim defaultWidth = .workRes.Width * 2 + border * 7
-                Dim defaultHeight = .workRes.Height * 2 + OpenCVB.Main.ToolStrip1.Height + border * 12
-                If OpenCVB.Main.Height < 50 Then
-                    OpenCVB.Main.Width = defaultWidth
-                    OpenCVB.Main.Height = defaultHeight
+                Dim defaultHeight = .workRes.Height * 2 + OpenCVB.MainForm.ToolStrip1.Height + border * 12
+                If OpenCVB.MainForm.Height < 50 Then
+                    OpenCVB.MainForm.Width = defaultWidth
+                    OpenCVB.MainForm.Height = defaultHeight
                 End If
 
                 If .fontInfo Is Nothing Then .fontInfo = New Font("Tahoma", 9)
                 If settings.groupComboText = "" Then settings.groupComboText = "< All >"
 
                 .desiredFPS = 60
-                OpenCVB.Main.Left = .locationMain.Item0
-                OpenCVB.Main.Top = .locationMain.Item1
-                OpenCVB.Main.Width = .locationMain.Item2
-                OpenCVB.Main.Height = .locationMain.Item3
+                OpenCVB.MainForm.Left = .locationMain.Item0
+                OpenCVB.MainForm.Top = .locationMain.Item1
+                OpenCVB.MainForm.Width = .locationMain.Item2
+                OpenCVB.MainForm.Height = .locationMain.Item3
             End With
             Return settings
         End Function
         Public Sub write()
-            If OpenCVB.Main.TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if "Test All" is running.
-                OpenCVB.Main.settings.MainUI_AlgName = OpenCVB.Main.AvailableAlgorithms.Text
-                OpenCVB.Main.settings.groupComboText = OpenCVB.Main.GroupComboBox.Text
+            If OpenCVB.MainForm.TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if "Test All" is running.
+                OpenCVB.MainForm.settings.MainUI_AlgName = OpenCVB.MainForm.AvailableAlgorithms.Text
+                OpenCVB.MainForm.settings.groupComboText = OpenCVB.MainForm.GroupComboBox.Text
             End If
 
-            OpenCVB.Main.settings.locationMain = New cv.Vec4f(OpenCVB.Main.Left, OpenCVB.Main.Top,
-                                                               OpenCVB.Main.Width, OpenCVB.Main.Height)
-            If OpenCVB.Main.camPic(0) IsNot Nothing Then
+            OpenCVB.MainForm.settings.locationMain = New cv.Vec4f(OpenCVB.MainForm.Left, OpenCVB.MainForm.Top,
+                                                               OpenCVB.MainForm.Width, OpenCVB.MainForm.Height)
+            If OpenCVB.MainForm.camPic(0) IsNot Nothing Then
                 ' used only when .snapCustom is true
-                OpenCVB.Main.settings.displayRes = New cv.Size(OpenCVB.Main.camPic(0).Width, OpenCVB.Main.camPic(0).Height)
+                OpenCVB.MainForm.settings.displayRes = New cv.Size(OpenCVB.MainForm.camPic(0).Width, OpenCVB.MainForm.camPic(0).Height)
             End If
-            If OpenCVB.Main.settings.translatorMode = "" Then OpenCVB.Main.settings.translatorMode = "VB.Net to C#"
+            If OpenCVB.MainForm.settings.translatorMode = "" Then OpenCVB.MainForm.settings.translatorMode = "VB.Net to C#"
 
             Dim setlist = New List(Of jsonClass.ApplicationStorage)
-            setlist.Add(OpenCVB.Main.settings)
+            setlist.Add(OpenCVB.MainForm.settings)
             Save(setlist)
         End Sub
         Public Function USBenumeration() As List(Of String)

@@ -1,39 +1,33 @@
 ﻿Imports System.IO
 Imports System.Threading
-Imports cv = OpenCvSharp
 Namespace OpenCVB
-    Partial Class Main : Inherits Form
+    Partial Class MainForm : Inherits Form
         Dim camera As Object
         Dim cameraTaskHandle As Thread
+        Public camSwitchCount As Integer
         Private Sub camSwitchAnnouncement()
             CameraSwitching.Visible = True
-            CameraSwitching.Text = settings.cameraName + " initializing"
+            CameraSwitching.Text = settings.cameraName + " starting"
             CamSwitchProgress.Visible = True
             CamSwitchProgress.Left = CameraSwitching.Left
             CamSwitchProgress.Top = CameraSwitching.Top + CameraSwitching.Height
             CamSwitchProgress.Height = CameraSwitching.Height / 2
             CameraSwitching.BringToFront()
             CamSwitchProgress.BringToFront()
+            results.dstsReady = False
             CamSwitchTimer.Enabled = True
+            camSwitchCount = 0
         End Sub
         Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
-            If settings Is Nothing Then
-                CamSwitchProgress.Visible = False
-                CameraSwitching.Visible = False
-                Exit Sub
+            If CamSwitchProgress.Visible Then
+                Static frames As Integer
+                Dim slideCount As Integer = 10
+                CamSwitchProgress.Width = CameraSwitching.Width * frames / slideCount
+                If frames >= slideCount Then frames = 0
+                frames += 1
             End If
-            If settings.cameraName <> "" Then
-                If CamSwitchProgress.Visible Then
-                    Static frames As Integer
-                    Dim slideCount As Integer = 10
-                    CamSwitchProgress.Width = CameraSwitching.Width * frames / slideCount
-                    If frames >= slideCount Then frames = 0
-                    frames += 1
-                End If
-            Else
-                CamSwitchProgress.Visible = False
-                CameraSwitching.Visible = False
-            End If
+            camSwitchCount += 1
+            Application.DoEvents()
         End Sub
         Private Sub setupCameraPath()
             ' Camera DLL's and OpenGL apps are built in Release mode even when configured for Debug (performance is much better).  
@@ -72,9 +66,7 @@ Namespace OpenCVB
             End If
         End Sub
         Private Sub initCamera()
-            CameraSwitching.Text = settings.cameraName + " starting"
             Application.DoEvents()
-            paintNewImages = False
             If cameraTaskHandle Is Nothing Then
                 cameraTaskHandle = New Thread(AddressOf CameraTask)
                 cameraTaskHandle.Name = "Camera Task"
@@ -82,6 +74,7 @@ Namespace OpenCVB
             End If
         End Sub
         Private Function getCamera() As Object
+            cameraReady = False
             Select Case settings.cameraName
                 Case "Intel(R) RealSense(TM) Depth Camera 455", "Intel(R) RealSense(TM) Depth Camera 435i"
                     Return New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
@@ -101,6 +94,7 @@ Namespace OpenCVB
                     saveworkRes = settings.workRes
                     saveCameraName = settings.cameraName
                     camera = getCamera()
+                    camera.cameraframecount = 0
                 Else
                     camera.GetNextFrame()
                 End If

@@ -1,7 +1,7 @@
 ﻿Imports SharpGL
 Imports cv = OpenCvSharp
 Namespace OpenCVB
-    Partial Class Main : Inherits Form
+    Partial Class MainForm : Inherits Form
         Dim gl As OpenGL
         Dim isDragging As Boolean = False
         Dim lastMousePos As cv.Point
@@ -92,8 +92,8 @@ Namespace OpenCVB
             Select Case results.GLRequest
                 Case Comm.oCase.drawPointCloudRGB
                     If results.GLcloud Is Nothing Then Exit Sub
-                    If results.GLcloud.Size <> OpenCVB.Main.settings.workRes Then
-                        results.GLcloud = New cv.Mat(OpenCVB.Main.settings.workRes, cv.MatType.CV_32FC3, 0)
+                    If results.GLcloud.Size <> OpenCVB.MainForm.settings.workRes Then
+                        results.GLcloud = New cv.Mat(OpenCVB.MainForm.settings.workRes, cv.MatType.CV_32FC3, 0)
                     End If
                     gl.Begin(OpenGL.GL_POINTS)
 

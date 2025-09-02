@@ -123,5 +123,6 @@ Public Class GenericCamera
         lastCPUTime = CPU_TimeStamp
 
         cameraFrameCount += 1
+        OpenCVB.MainForm.cameraReady = True
     End Sub
 End Class

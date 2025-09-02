@@ -40,7 +40,7 @@ Public Class Groups_AtoZ
     End Sub
     Private Sub GroupDataView_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles GroupDataView.CellContentClick
         Me.Hide()
-        OpenCVB.Main.groupButtonSelection = GroupDataView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
+        OpenCVB.MainForm.groupButtonSelection = GroupDataView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
     End Sub
     Private Sub Groups_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.Escape Then Me.Hide()

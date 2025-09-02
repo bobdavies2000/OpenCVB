@@ -33,7 +33,7 @@ Namespace My
         
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>  _
         Protected Overrides Sub OnCreateMainForm()
-            Me.MainForm = OpenCVB.Main
+            Me.MainForm = OpenCVB.MainForm
         End Sub
         
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>  _

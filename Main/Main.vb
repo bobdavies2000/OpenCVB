@@ -7,13 +7,14 @@ Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Namespace OpenCVB
-    Partial Public Class Main : Inherits Form
+    Partial Public Class MainForm : Inherits Form
         Public trueTextLock As New Mutex(True, "trueTextLock")
         Public mouseLock As New Mutex(True, "mouseLock") ' global lock for use with mouse clicks. 
         Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
 
         Public camPic(4 - 1) As PictureBox
         Public Shared settings As jsonClass.ApplicationStorage
+        Public Shared cameraReady As Boolean
         Public HomeDir As DirectoryInfo
         Public groupButtonSelection As String
         Public fpsAlgorithm As Single
@@ -36,7 +37,6 @@ Namespace OpenCVB
 
         Dim AlgorithmTestAllCount As Integer
         Dim algorithmTaskHandle As Thread
-        Dim algorithmQueueCount As Integer
 
         Dim saveAlgorithmName As String
         Dim cameraShutdown As Boolean
@@ -46,9 +46,6 @@ Namespace OpenCVB
 
         Dim camLabel(camPic.Count - 1) As Label
 
-        Dim paintNewImages As Boolean
-
-        Dim algorithmRefresh As Boolean
         Dim DrawingRectangle As Boolean
         Dim drawRect As New cv.Rect
         Dim drawRectPic As Integer
@@ -126,8 +123,6 @@ Namespace OpenCVB
             optionsForm.defineCameraResolutions(settings.cameraIndex)
 
             setupCameraPath()
-            camSwitchAnnouncement()
-            Application.DoEvents()
 
             PausePlay = New Bitmap(HomeDir.FullName + "Main/Data/PauseButton.png")
             stopTestAll = New Bitmap(HomeDir.FullName + "Main/Data/stopTestAll.png")
@@ -150,10 +145,12 @@ Namespace OpenCVB
             Next
 
             Me.Show()
+
+            camSwitchAnnouncement()
+            Application.DoEvents()
+
             setupCamPics()
-
             loadAlgorithmComboBoxes()
-
             GroupComboBox.Text = settings.groupComboText
 
             If GroupComboBox.SelectedItem() Is Nothing Then
@@ -193,10 +190,7 @@ Namespace OpenCVB
             XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
             XYLoc.Visible = True
 
-            If settings.cameraFound Then
-                camSwitchAnnouncement()
-                initCamera()
-            End If
+            If settings.cameraFound Then initCamera()
 
             Debug.WriteLine("")
             Debug.WriteLine("Main_Load complete.")
@@ -257,8 +251,6 @@ Namespace OpenCVB
                 settings.cameraName = optionsForm.cameraName
                 settings.cameraIndex = optionsForm.cameraIndex
                 settings.testAllDuration = optionsForm.testDuration
-
-                camSwitchAnnouncement()
 
                 jsonfs.write()
                 settings = jsonfs.read() ' this will apply all the changes...
@@ -370,34 +362,30 @@ Namespace OpenCVB
                 End If
             End If
 
-            If results.dstList(0).Width = settings.workRes.Width And results.dstList(0).Width > 0 Then
+            If results.dstList Is Nothing Or camera Is Nothing Then Exit Sub
+            If results.dstsReady And cameraReady Then
                 If CameraSwitching.Visible Then
                     CameraSwitching.Visible = False
                     CamSwitchProgress.Visible = False
                     CamSwitchTimer.Enabled = False
                 End If
-                Try
-                    If camera.camimages.Color.Width > 0 Then
-                        Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
-                        If results.dstList IsNot Nothing Then
-                            If results.dstList(0).Width > 0 Then
-                                SyncLock task.resultLock
-                                    For i = 0 To results.dstList.Count - 1
-                                        Dim tmp = results.dstList(i)
-                                        tmp.Circle(mousePointCamPic, task.DotSize + 1, cv.Scalar.White, -1)
-                                        tmp = tmp.Resize(camSize)
-                                        cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
-                                    Next
-                                End SyncLock
+                Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
+                If results.dstList IsNot Nothing Then
+                    If results.dstList(0).Width > 0 Then
+                        SyncLock task.resultLock
+                            For i = 0 To results.dstList.Count - 1
+                                Dim tmp = results.dstList(i)
+                                tmp.Circle(mousePointCamPic, task.DotSize + 1, cv.Scalar.White, -1)
+                                tmp = tmp.Resize(camSize)
+                                cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
+                            Next
+                        End SyncLock
 
-                                trueData.Add(New TrueText(task.depthAndDepthRange,
-                                             New cv.Point(mousePointCamPic.X, mousePointCamPic.Y - 24), 1))
-                            End If
-                        End If
+                        trueData.Add(New TrueText(task.depthAndDepthRange,
+                                         New cv.Point(mousePointCamPic.X, mousePointCamPic.Y - 24), 1))
                     End If
-                Catch ex As Exception
-                    Debug.WriteLine("camera.camImages.color width is still zero after resolution change.")
-                End Try
+                End If
+                results.dstsReady = False
             End If
 
             ' draw any TrueType font data on the image 
@@ -626,19 +614,12 @@ Namespace OpenCVB
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
             ' don't start another algorithm until the current one has finished 
-            If algorithmQueueCount <> 0 Then
-                ' Give the algorithm a reasonable time to finish, then crash.
-                Dim crash As Boolean = True
-                For i = 0 To 10
-                    Thread.Sleep(2000)
-                    If algorithmQueueCount = 0 Then
-                        crash = False
-                        Exit For
-                    End If
-                Next
-                If crash Then
-                    Throw New InvalidOperationException("Can't start the next algorithm because previous algorithm has not completed.")
-                End If
+            ' Give the algorithm a reasonable time to finish, then crash.
+            Dim crash As Boolean = True
+            Thread.Sleep(10000)
+            If frameCount = -1 Then crash = False
+            If crash Then
+                Throw New InvalidOperationException("Can't start the next algorithm because previous algorithm has not completed.")
             End If
 
             If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
@@ -896,7 +877,7 @@ Namespace OpenCVB
         End Function
         Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
             If AvailableAlgorithms.Items.Count = 0 Then Exit Sub
-            If (paintNewImages Or algorithmRefresh) And AvailableAlgorithms.Text.StartsWith(saveAlgorithmName) Then
+            If results.dstsReady Then
                 camPic(0).Refresh()
                 camPic(1).Refresh()
                 camPic(2).Refresh()

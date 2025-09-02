@@ -48,9 +48,10 @@ Public Class Comm
 
 
     Public Class resultData
-        Public GLRequest As Integer
-
+        Public dstsReady As Boolean
         Public dstList() As cv.Mat
+
+        Public GLRequest As Integer
         Public GLcloud As cv.Mat
         Public GLrgb As cv.Mat
     End Class
