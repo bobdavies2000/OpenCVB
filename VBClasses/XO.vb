@@ -206,7 +206,7 @@ Public Class XO_OpenGL_Basics : Inherits TaskParent
         Dim windowHeight = 720 * 240 / 320
         startInfo.Arguments = CStr(windowWidth) + " " + CStr(windowHeight) + " " + CStr(memMapbufferSize) + " " +
                               task.pipeName
-        If task.showConsoleLog = False Then startInfo.WindowStyle = ProcessWindowStyle.Hidden
+        If task.showBatchConsole = False Then startInfo.WindowStyle = ProcessWindowStyle.Hidden
         Dim proc = Process.Start(startInfo)
         'While task.openGL_hwnd = 0
         '    task.openGL_hwnd = proc.MainWindowHandle
@@ -11255,7 +11255,7 @@ Public Class XO_Python_Basics : Inherits TaskParent
                 task.pythonProcess.StartInfo.Arguments = """" + pythonApp.Name + """" + " " + arguments
             End If
             Debug.WriteLine("Starting Python with the following command:" + vbCrLf + task.pythonProcess.StartInfo.Arguments + vbCrLf)
-            If task.showConsoleLog = False Then task.pythonProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
+            If task.showBatchConsole = False Then task.pythonProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
             Try
                 task.pythonProcess.Start()
             Catch ex As Exception

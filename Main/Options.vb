@@ -7,7 +7,7 @@ Public Class Options
     Public cameraIndex As Integer
     Public testDuration As Integer
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
-        OpenCVB.MainUI.settings.showConsoleLog = showConsoleLog.Checked
+        OpenCVB.MainUI.settings.showBatchConsole = showBatchConsole.Checked
         OpenCVB.MainUI.settings.snap640 = Snap640.Checked
         OpenCVB.MainUI.settings.snap320 = Snap320.Checked
         OpenCVB.MainUI.settings.snapCustom = SnapCustom.Checked
@@ -101,7 +101,7 @@ Public Class Options
 
         TestAllDuration.Value = OpenCVB.MainUI.settings.testAllDuration
         If TestAllDuration.Value < 5 Then TestAllDuration.Value = 5
-        showConsoleLog.Checked = OpenCVB.MainUI.settings.showConsoleLog
+        showBatchConsole.Checked = OpenCVB.MainUI.settings.showBatchConsole
     End Sub
     Private Sub MainOptions_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.Escape Then Cancel_Button_Click(sender, e)

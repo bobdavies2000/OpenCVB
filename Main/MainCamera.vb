@@ -32,7 +32,6 @@ Namespace OpenCVB
                 frames += 1
             End If
             camSwitchCount += 1
-            Application.DoEvents()
         End Sub
         Private Sub setupCameraPath()
             ' Camera DLL's and OpenGL apps are built in Release mode even when configured for Debug (performance is much better).  

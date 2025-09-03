@@ -39,7 +39,7 @@ Partial Class Options
         UpdateXRef = New Button()
         Label4 = New Label()
         Button1 = New Button()
-        showConsoleLog = New CheckBox()
+        showBatchConsole = New CheckBox()
         FontDialog1 = New FontDialog()
         CameraGroup = New FlowLayoutPanel()
         Resolutions = New FlowLayoutPanel()
@@ -156,7 +156,7 @@ Partial Class Options
         GroupBox1.Controls.Add(UpdateXRef)
         GroupBox1.Controls.Add(Label4)
         GroupBox1.Controls.Add(Button1)
-        GroupBox1.Controls.Add(showConsoleLog)
+        GroupBox1.Controls.Add(showBatchConsole)
         GroupBox1.Location = New Point(12, 551)
         GroupBox1.Name = "GroupBox1"
         GroupBox1.Size = New Size(977, 187)
@@ -227,15 +227,15 @@ Partial Class Options
         Button1.Text = "..."
         Button1.UseVisualStyleBackColor = True
         ' 
-        ' showConsoleLog
+        ' showBatchConsole
         ' 
-        showConsoleLog.AutoSize = True
-        showConsoleLog.Location = New Point(12, 40)
-        showConsoleLog.Name = "showConsoleLog"
-        showConsoleLog.Size = New Size(363, 29)
-        showConsoleLog.TabIndex = 0
-        showConsoleLog.Text = "Show Console Log for external processes"
-        showConsoleLog.UseVisualStyleBackColor = True
+        showBatchConsole.AutoSize = True
+        showBatchConsole.Location = New Point(12, 40)
+        showBatchConsole.Name = "showBatchConsole"
+        showBatchConsole.Size = New Size(363, 29)
+        showBatchConsole.TabIndex = 0
+        showBatchConsole.Text = "Show Console Log for external processes"
+        showBatchConsole.UseVisualStyleBackColor = True
         ' 
         ' CameraGroup
         ' 
@@ -283,7 +283,7 @@ Partial Class Options
     Friend WithEvents Label3 As Label
     Friend WithEvents Label2 As Label
     Friend WithEvents GroupBox1 As GroupBox
-    Friend WithEvents showConsoleLog As CheckBox
+    Friend WithEvents showBatchConsole As CheckBox
     Friend WithEvents Button1 As Button
     Friend WithEvents Label4 As Label
     Friend WithEvents UpdateXRef As Button

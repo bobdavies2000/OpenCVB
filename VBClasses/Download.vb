@@ -43,7 +43,7 @@ Public Class Download_Databases : Inherits TaskParent
         '                    End If
 
         '                    If fileToDecompress.Name.EndsWith(".tar.gz") Then
-        '                        task.showConsoleLog = False
+        '                        task.showBatchConsole = False
         '                        pythonActive = True
         '                        Dim pyScript = task.HomeDir + "Data/extractTarFiles.py"
         '                        Dim fs = New StreamWriter(pyScript)

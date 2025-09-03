@@ -36,7 +36,7 @@ Namespace jsonClass
         Public displayRes As cv.Size
 
         Public testAllDuration As Integer
-        Public showConsoleLog As Boolean
+        Public showBatchConsole As Boolean
 
         Public treeButton As Boolean
         Public treeLocation As cv.Vec4f
@@ -69,7 +69,7 @@ Namespace jsonClass
             emptyApp.workRes = New cv.Size(320, 180)
             emptyApp.snap640 = True
             emptyApp.testAllDuration = 5
-            emptyApp.showConsoleLog = False
+            emptyApp.showBatchConsole = False
             emptyApp.treeButton = True
             emptyApp.treeLocation = New cv.Vec4f(20, 20, 500, 600)
             emptyApp.groupComboText = "< All >"

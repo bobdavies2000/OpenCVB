@@ -935,7 +935,7 @@ Namespace OpenCVB
 
             parms.testAllRunning = testAllRunning
 
-            parms.showConsoleLog = settings.showConsoleLog
+            parms.showBatchConsole = settings.showBatchConsole
 
             parms.HomeDir = HomeDir.FullName
             parms.cameraName = settings.cameraName

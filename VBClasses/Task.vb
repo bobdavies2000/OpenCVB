@@ -278,7 +278,7 @@ Public Class VBtask : Implements IDisposable
     Public verticalLines As Boolean
 
     Public testAllRunning As Boolean
-    Public showConsoleLog As Boolean
+    Public showBatchConsole As Boolean
 
     Public mainFormLocation As cv.Rect
     Public main_hwnd As IntPtr
@@ -350,7 +350,7 @@ Public Class VBtask : Implements IDisposable
         Public cameraIndex As Integer
 
         Public HomeDir As String
-        Public showConsoleLog As Boolean
+        Public showBatchConsole As Boolean
         Public testAllRunning As Boolean
         Public RotationMatrix() As Single
         Public RotationVector As cv.Point3f
@@ -422,7 +422,7 @@ Public Class VBtask : Implements IDisposable
         displayObjectName = algName
         cameraName = parms.cameraName
         testAllRunning = parms.testAllRunning
-        showConsoleLog = parms.showConsoleLog
+        showBatchConsole = parms.showBatchConsole
         fpsAlgorithm = parms.fpsRate
         fpsCamera = parms.fpsHostCamera
         calibData = parms.calibData
