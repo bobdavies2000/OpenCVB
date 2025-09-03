@@ -215,8 +215,8 @@ Public Class sgl
                 gl.Begin(OpenGL.GL_LINES)
 
                 For Each lp In task.lines.lpList
-                    gl.Vertex(lp.p1Vec(0), lp.p1Vec(1), lp.p1Vec(2))
-                    gl.Vertex(lp.p2Vec(0), lp.p2Vec(1), lp.p2Vec(2))
+                    gl.Vertex(lp.pVec1(0), lp.pVec1(1), lp.pVec1(2))
+                    gl.Vertex(lp.pVec2(0), lp.pVec2(1), lp.pVec2(2))
                 Next
                 gl.End()
                 label = task.lines.labels(2)
@@ -240,10 +240,10 @@ Public Class sgl
 
                 Dim factor = 1 / options.zFar - options.zNear
                 For Each lp In task.lines.lpList
-                    gl.Vertex(lp.p1Vec(0), lp.p1Vec(1), lp.p1Vec(2))
-                    gl.Vertex(lp.p2Vec(0), lp.p2Vec(1), lp.p2Vec(2))
-                    'gl.Vertex(lp.p2Vec(0), lp.p2Vec(1), lp.p2Vec(2) * factor + options.zNear)                    gl.Vertex(lp.p1Vec(0), lp.p1Vec(1), lp.p1Vec(2) * factor + options.zNear)
-                    'gl.Vertex(lp.p2Vec(0), lp.p2Vec(1), lp.p2Vec(2) * factor + options.zNear)
+                    gl.Vertex(lp.pVec1(0), lp.pVec1(1), lp.pVec1(2))
+                    gl.Vertex(lp.pVec2(0), lp.pVec2(1), lp.pVec2(2))
+                    'gl.Vertex(lp.pVec2(0), lp.pVec2(1), lp.pVec2(2) * factor + options.zNear)                    gl.Vertex(lp.pVec1(0), lp.pVec1(1), lp.pVec1(2) * factor + options.zNear)
+                    'gl.Vertex(lp.pVec2(0), lp.pVec2(1), lp.pVec2(2) * factor + options.zNear)
                 Next
                 gl.End()
                 label = task.lines.labels(2)

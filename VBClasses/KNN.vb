@@ -1,9 +1,9 @@
 Imports System.Runtime.InteropServices
-Imports System.Windows.Forms
-Imports OpenCvSharp.XFeatures2D
 Imports cv = OpenCvSharp
 Public Class KNN_Basics : Inherits TaskParent
     Public knn2 As New KNN_N2Basics
+    Public ptListTrain As New List(Of cv.Point)
+    Public ptListQuery As New List(Of cv.Point)
     Public trainInput As New List(Of cv.Point2f)
     Public queries As New List(Of cv.Point2f)
     Public neighbors As New List(Of List(Of Integer))
@@ -15,15 +15,28 @@ Public Class KNN_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static ptBest As New BrickPoint_Basics
-            ptBest.Run(src)
+            Static bPoint As New BrickPoint_Basics
+            bPoint.Run(src)
 
             trainInput.Clear()
-            For Each pt In ptBest.ptList
+            For Each pt In bPoint.ptList
                 trainInput.Add(New cv.Point2f(pt.X, pt.Y))
             Next
             queries = trainInput
         End If
+
+        If ptListTrain.Count > 0 Then
+            trainInput.Clear()
+            For Each pt In ptListTrain
+                trainInput.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
+
+            queries.Clear()
+            For Each pt In ptListQuery
+                queries.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
+        End If
+
         knn2.trainInput = trainInput
         knn2.queries = queries
         knn2.desiredMatches = desiredMatches
@@ -1361,14 +1374,14 @@ Public Class KNN_EdgePoints : Inherits TaskParent
         dst2 = src.Clone
         For Each lp In task.lines.lpList
             HullLine_EdgePoints.EdgePointOffset(lp, 1)
-            DrawCircle(dst2, New cv.Point(CInt(lp.p1Ex.X), CInt(lp.p1Ex.Y)))
-            DrawCircle(dst2, New cv.Point(CInt(lp.p2Ex.X), CInt(lp.p2Ex.Y)))
+            DrawCircle(dst2, New cv.Point(CInt(lp.pX1.X), CInt(lp.pX1.Y)))
+            DrawCircle(dst2, New cv.Point(CInt(lp.pX2.X), CInt(lp.pX2.Y)))
         Next
 
         knn.queries.Clear()
         For Each lp In lpInput
-            knn.queries.Add(lp.p1Ex)
-            knn.queries.Add(lp.p2Ex)
+            knn.queries.Add(lp.pX1)
+            knn.queries.Add(lp.pX2)
         Next
 
         knn.Run(emptyMat)

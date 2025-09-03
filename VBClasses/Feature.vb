@@ -4,18 +4,18 @@ Imports cv = OpenCvSharp
 Public Class Feature_Basics : Inherits TaskParent
     Public features As New List(Of cv.Point)
     Public feature2f As New List(Of cv.Point2f)
-    Dim ptBrick As New BrickPoint_Minimum
+    Dim bPoint As New BrickPoint_Minimum
     Public Sub New()
         desc = "Gather features from the sobel brick points and preserve those representing lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lastFeatures As New List(Of cv.Point)(ptBrick.features)
-        ptBrick.Run(src)
+        Dim lastFeatures As New List(Of cv.Point)(bPoint.features)
+        bPoint.Run(src)
 
         Dim count As Integer
         dst2 = src.Clone
         feature2f.Clear()
-        For Each pt In ptBrick.features
+        For Each pt In bPoint.features
             Dim index = lastFeatures.IndexOf(pt)
             If index >= 0 Then
                 feature2f.Add(New cv.Point2f(pt.X, pt.Y))
@@ -170,12 +170,12 @@ Public Class Feature_General : Inherits TaskParent
                     task.logicalLines.Add(lp)
                 Next
             Case FeatureSrc.BrickPoints
-                Static ptBrick As New BrickPoint_Minimum
-                ptBrick.Run(src)
-                For Each pt In ptBrick.features
+                Static bPoint As New BrickPoint_Minimum
+                bPoint.Run(src)
+                For Each pt In bPoint.features
                     ptLatest.Add(pt)
                 Next
-                strOut = ptBrick.labels(2)
+                strOut = bPoint.labels(2)
         End Select
 
         task.fpFromGridCellLast = New List(Of Integer)(task.fpFromGridCell)
@@ -274,7 +274,7 @@ Public Class Feature_Delaunay : Inherits TaskParent
 
         delaunay.Run(src)
         dst3 = delaunay.dst2
-        For Each pt In delaunay.ptBest.ptList
+        For Each pt In delaunay.bPoint.ptList
             DrawCircle(dst3, pt, task.DotSize, white)
         Next
         labels(3) = "There were " + CStr(task.features.Count) + " Delaunay contours"

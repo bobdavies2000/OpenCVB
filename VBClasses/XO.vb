@@ -7256,7 +7256,7 @@ Public Class XO_FeatureLine_Basics : Inherits TaskParent
         dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
         dst2.Rectangle(lastRect, task.highlight, task.lineWidth)
         dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, task.highlight, task.lineWidth, task.lineType)
-        dst2.Line(task.lineGravity.p1Ex, task.lineGravity.p2Ex, task.highlight, task.lineWidth, task.lineType)
+        dst2.Line(task.lineGravity.pX1, task.lineGravity.pX2, task.highlight, task.lineWidth, task.lineType)
     End Sub
 End Class
 
@@ -7839,8 +7839,8 @@ Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
                 lpInput = lplist(0)
             End If
 
-            Dim deltaX1 = Math.Abs(task.gravityIMU.p1Ex.X - lpInput.p1Ex.X)
-            Dim deltaX2 = Math.Abs(task.gravityIMU.p2Ex.X - lpInput.p2Ex.X)
+            Dim deltaX1 = Math.Abs(task.gravityIMU.pX1.X - lpInput.pX1.X)
+            Dim deltaX2 = Math.Abs(task.gravityIMU.pX2.X - lpInput.pX2.X)
             If Math.Abs(deltaX1 - deltaX2) > task.gravityBasics.options.pixelThreshold Then
                 lpInput = task.lineLongest
             End If
@@ -8020,8 +8020,8 @@ Public Class XO_Gravity_Basics1 : Inherits TaskParent
             nearest.lpInput = RGBcandidate
             nearest.Run(src)
             RGBcandidate = nearest.lpOutput
-            Dim deltaX1 = Math.Abs(task.lineGravity.p1Ex.X - RGBcandidate.p1Ex.X)
-            Dim deltaX2 = Math.Abs(task.lineGravity.p2Ex.X - RGBcandidate.p2Ex.X)
+            Dim deltaX1 = Math.Abs(task.lineGravity.pX1.X - RGBcandidate.pX1.X)
+            Dim deltaX2 = Math.Abs(task.lineGravity.pX2.X - RGBcandidate.pX2.X)
             If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
                 task.lineGravity = task.gravityIMU
                 RGBcandidate = New lpData
@@ -9370,16 +9370,16 @@ End Class
 Public Class XO_FPoly_Line : Inherits TaskParent
     Dim feat As New XO_FPoly_TopFeatures
     Public lp As New lpData
-    Dim ptBest As New BrickPoint_Basics
+    Dim bPoint As New BrickPoint_Basics
     Public Sub New()
         labels = {"", "", "Points found with FPoly_TopFeatures", "Longest line in feat.topFeatures"}
         desc = "Identify the longest line in topFeatures"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ptBest.Run(src)
+        bPoint.Run(src)
 
         task.features.Clear()
-        For Each pt In ptBest.ptList
+        For Each pt In bPoint.ptList
             task.features.Add(New cv.Point2f(pt.X, pt.Y))
         Next
 
@@ -9444,10 +9444,10 @@ Public Class XO_Delaunay_Points : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static ptBest As New BrickPoint_Basics
-            ptBest.Run(src)
+            Static bPoint As New BrickPoint_Basics
+            bPoint.Run(src)
             task.features.Clear()
-            For Each pt In ptBest.ptList
+            For Each pt In bPoint.ptList
                 task.features.Add(New cv.Point2f(pt.X, pt.Y))
             Next
         End If
@@ -10365,7 +10365,7 @@ Public Class XO_Line_ExtendLineTest : Inherits TaskParent
 
             Dim lp = New lpData(p1, p2)
             dst2 = src
-            DrawLine(dst2, lp.p1Ex, lp.p2Ex, task.highlight)
+            DrawLine(dst2, lp.pX1, lp.pX2, task.highlight)
             DrawCircle(dst2, p1, task.DotSize + 2, cv.Scalar.Red)
             DrawCircle(dst2, p2, task.DotSize + 2, cv.Scalar.Red)
         End If
@@ -10387,8 +10387,8 @@ Public Class XO_Line_ExtendAll : Inherits TaskParent
         dst3 = src.Clone
         lpList.Clear()
         For Each lp In task.lines.lpList
-            DrawLine(dst3, lp.p1Ex, lp.p2Ex, task.highlight)
-            lpList.Add(New lpData(lp.p1Ex, lp.p2Ex))
+            DrawLine(dst3, lp.pX1, lp.pX2, task.highlight)
+            lpList.Add(New lpData(lp.pX1, lp.pX2))
         Next
     End Sub
 End Class
@@ -10445,15 +10445,15 @@ Public Class XO_Line_Intercepts : Inherits TaskParent
 
             Dim saveP1 = lp.p1, saveP2 = lp.p2
 
-            If lp.p1Ex.X = 0 Then leftIntercepts.Add(saveP1.Y, index)
-            If lp.p1Ex.Y = 0 Then topIntercepts.Add(saveP1.X, index)
-            If lp.p1Ex.X = dst2.Width Then rightIntercepts.Add(saveP1.Y, index)
-            If lp.p1Ex.Y = dst2.Height Then botIntercepts.Add(saveP1.X, index)
+            If lp.pX1.X = 0 Then leftIntercepts.Add(saveP1.Y, index)
+            If lp.pX1.Y = 0 Then topIntercepts.Add(saveP1.X, index)
+            If lp.pX1.X = dst2.Width Then rightIntercepts.Add(saveP1.Y, index)
+            If lp.pX1.Y = dst2.Height Then botIntercepts.Add(saveP1.X, index)
 
-            If lp.p2Ex.X = 0 Then leftIntercepts.Add(saveP2.Y, index)
-            If lp.p2Ex.Y = 0 Then topIntercepts.Add(saveP2.X, index)
-            If lp.p2Ex.X = dst2.Width Then rightIntercepts.Add(saveP2.Y, index)
-            If lp.p2Ex.Y = dst2.Height Then botIntercepts.Add(saveP2.X, index)
+            If lp.pX2.X = 0 Then leftIntercepts.Add(saveP2.Y, index)
+            If lp.pX2.Y = 0 Then topIntercepts.Add(saveP2.X, index)
+            If lp.pX2.X = dst2.Width Then rightIntercepts.Add(saveP2.Y, index)
+            If lp.pX2.Y = dst2.Height Then botIntercepts.Add(saveP2.X, index)
             index += 1
         Next
 
@@ -10935,7 +10935,7 @@ Public Class XO_Line_GravityToLongest : Inherits TaskParent
         desc = "Highlight both vertical and horizontal lines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gravityDelta As Single = task.lineGravity.p1Ex.X - task.lineGravity.p2Ex.X
+        Dim gravityDelta As Single = task.lineGravity.pX1.X - task.lineGravity.pX2.X
 
         kalman.kInput = {gravityDelta}
         kalman.Run(emptyMat)
@@ -10971,7 +10971,7 @@ Public Class XO_Line_GravityToAverage : Inherits TaskParent
         desc = "Highlight both vertical and horizontal lines - not terribly good..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim gravityDelta As Single = task.lineGravity.p1Ex.X - task.lineGravity.p2Ex.X
+        Dim gravityDelta As Single = task.lineGravity.pX1.X - task.lineGravity.pX2.X
 
         dst2 = src
         If standalone Then dst3 = task.lines.dst2
@@ -10979,11 +10979,11 @@ Public Class XO_Line_GravityToAverage : Inherits TaskParent
         vertList.Clear()
         For Each lp In task.lines.lpList
             If Math.Abs(lp.angle) > 45 And Math.Sign(task.lineGravity.slope) = Math.Sign(lp.slope) Then
-                Dim delta = lp.p1Ex.X - lp.p2Ex.X
+                Dim delta = lp.pX1.X - lp.pX2.X
                 If Math.Abs(gravityDelta - delta) < task.gravityBasics.options.pixelThreshold Then
                     deltaList.Add(delta)
                     vertList.Add(lp)
-                    DrawLine(dst2, lp.p1Ex, lp.p2Ex)
+                    DrawLine(dst2, lp.pX1, lp.pX2)
                     If standalone Then DrawLine(dst3, lp.p1, lp.p2, task.highlight)
                 End If
             End If
@@ -11159,22 +11159,22 @@ Public Class XO_Line_RawEPLines : Inherits TaskParent
 
         Dim removeList As New List(Of Integer)
         For Each lp In tmplist
-            Dim x1 = CInt(lp.p1Ex.X)
-            Dim y1 = CInt(lp.p1Ex.Y)
-            Dim x2 = CInt(lp.p2Ex.X)
-            Dim y2 = CInt(lp.p2Ex.Y)
+            Dim x1 = CInt(lp.pX1.X)
+            Dim y1 = CInt(lp.pX1.Y)
+            Dim x2 = CInt(lp.pX2.X)
+            Dim y2 = CInt(lp.pX2.Y)
             For j = lp.index + 1 To tmplist.Count - 1
-                If CInt(tmplist(j).p1Ex.X) <> x1 Then Continue For
-                If CInt(tmplist(j).p1Ex.Y) <> y1 Then Continue For
-                If CInt(tmplist(j).p2Ex.X) <> x2 Then Continue For
-                If CInt(tmplist(j).p2Ex.Y) <> y2 Then Continue For
+                If CInt(tmplist(j).pX1.X) <> x1 Then Continue For
+                If CInt(tmplist(j).pX1.Y) <> y1 Then Continue For
+                If CInt(tmplist(j).pX2.X) <> x2 Then Continue For
+                If CInt(tmplist(j).pX2.Y) <> y2 Then Continue For
                 If removeList.Contains(tmplist(j).index) = False Then removeList.Add(tmplist(j).index)
             Next
         Next
 
         lpList.Clear()
         For Each lp In tmplist
-            If removeList.Contains(lp.index) = False Then lpList.Add(New lpData(lp.p1Ex, lp.p2Ex))
+            If removeList.Contains(lp.index) = False Then lpList.Add(New lpData(lp.pX1, lp.pX2))
         Next
 
         dst2.SetTo(0)
@@ -11460,15 +11460,15 @@ Public Class XO_MotionCam_MultiLine : Inherits TaskParent
 
         For Each lpIn In task.lines.lpList
             Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 1)
-            DrawCircle(dst2, New cv.Point(CInt(lp.p1Ex.X), CInt(lp.p1Ex.Y)))
-            DrawCircle(dst2, New cv.Point(CInt(lp.p2Ex.X), CInt(lp.p2Ex.Y)))
+            DrawCircle(dst2, New cv.Point(CInt(lp.pX1.X), CInt(lp.pX1.Y)))
+            DrawCircle(dst2, New cv.Point(CInt(lp.pX2.X), CInt(lp.pX2.Y)))
         Next
 
         Static lpLast As New List(Of lpData)(task.lines.lpList)
         For Each lpIn In lpLast
             Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 5)
-            DrawCircle(dst2, New cv.Point(CInt(lp.p1Ex.X), CInt(lp.p1Ex.Y)), white)
-            DrawCircle(dst2, New cv.Point(CInt(lp.p2Ex.X), CInt(lp.p2Ex.Y)), white)
+            DrawCircle(dst2, New cv.Point(CInt(lp.pX1.X), CInt(lp.pX1.Y)), white)
+            DrawCircle(dst2, New cv.Point(CInt(lp.pX2.X), CInt(lp.pX2.Y)), white)
         Next
 
         lpLast = New List(Of lpData)(task.lines.lpList)
@@ -11564,15 +11564,15 @@ Public Class XO_MotionCam_SideApproach : Inherits TaskParent
 
         Dim lpList = task.lines.lpList
         For Each lp In lpList
-            If lp.p1Ex.X = 0 Then left.Add(lp.p1Ex.Y, lp.index)
-            If lp.p1Ex.Y = 0 Then top.Add(lp.p1Ex.X, lp.index)
-            If lp.p2Ex.X = 0 Then left.Add(lp.p2Ex.Y, lp.index)
-            If lp.p2Ex.Y = 0 Then top.Add(lp.p2Ex.X, lp.index)
+            If lp.pX1.X = 0 Then left.Add(lp.pX1.Y, lp.index)
+            If lp.pX1.Y = 0 Then top.Add(lp.pX1.X, lp.index)
+            If lp.pX2.X = 0 Then left.Add(lp.pX2.Y, lp.index)
+            If lp.pX2.Y = 0 Then top.Add(lp.pX2.X, lp.index)
 
-            If lp.p1Ex.X = dst2.Width Then right.Add(lp.p1Ex.X, lp.index)
-            If lp.p1Ex.Y = dst2.Height Then bottom.Add(lp.p1Ex.X, lp.index)
-            If lp.p2Ex.X = dst2.Width Then right.Add(lp.p2Ex.Y, lp.index)
-            If lp.p2Ex.Y = dst2.Height Then bottom.Add(lp.p2Ex.X, lp.index)
+            If lp.pX1.X = dst2.Width Then right.Add(lp.pX1.X, lp.index)
+            If lp.pX1.Y = dst2.Height Then bottom.Add(lp.pX1.X, lp.index)
+            If lp.pX2.X = dst2.Width Then right.Add(lp.pX2.Y, lp.index)
+            If lp.pX2.Y = dst2.Height Then bottom.Add(lp.pX2.X, lp.index)
         Next
 
         edgeList.Clear()
@@ -11603,11 +11603,11 @@ Public Class XO_MotionCam_Measure : Inherits TaskParent
         Static vecLast = task.lineLongest
         Dim vec = task.lineLongest
 
-        deltaX1 = vec.p1Ex.X - vecLast.p1Ex.x
-        deltaY1 = vec.p1Ex.Y - vecLast.p1Ex.Y
+        deltaX1 = vec.pX1.X - vecLast.pX1.x
+        deltaY1 = vec.pX1.Y - vecLast.pX1.Y
 
-        deltaX2 = vec.p2Ex.X - vecLast.p2Ex.x
-        deltaY2 = vec.p2Ex.Y - vecLast.p2Ex.Y
+        deltaX2 = vec.pX2.X - vecLast.pX2.x
+        deltaY2 = vec.pX2.Y - vecLast.pX2.Y
 
         Static strList As New List(Of String)
         strList.Add(Format(deltaX1, fmt1) + " " + Format(deltaX2, fmt1) + " " +

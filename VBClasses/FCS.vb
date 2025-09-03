@@ -774,10 +774,10 @@ Public Class FCS_ByDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static ptBest As New BrickPoint_Basics
-            ptBest.Run(src)
+            Static bPoint As New BrickPoint_Basics
+            bPoint.Run(src)
             task.features.Clear()
-            For Each pt In ptBest.ptList
+            For Each pt In bPoint.ptList
                 task.features.Add(New cv.Point2f(pt.X, pt.Y))
             Next
         End If

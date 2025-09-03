@@ -66,7 +66,7 @@ End Class
 
 Public Class BrickPoint_Plot : Inherits TaskParent
     Dim plotHist As New Plot_Histogram
-    Dim ptBrick As New BrickPoint_Basics
+    Dim bPoint As New BrickPoint_Basics
     Public Sub New()
         task.gOptions.setHistogramBins(3)
         plotHist.maxRange = 255
@@ -76,7 +76,7 @@ Public Class BrickPoint_Plot : Inherits TaskParent
         desc = "Plot the distribution of Sobel values for each ptBrick cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ptBrick.Run(task.gray)
+        bPoint.Run(task.gray)
 
         Dim sobelValues As New List(Of Byte)
         For Each brick In task.bricks.brickList
@@ -124,13 +124,13 @@ End Class
 
 
 Public Class BrickPoint_TopRow : Inherits TaskParent
-    Dim ptBrick As New BrickPoint_Basics
+    Dim bPoint As New BrickPoint_Basics
     Public Sub New()
         labels(3) = "BrickPoint_Basics output of intensity = 255 - not necessarily in the top row of the brick."
         desc = "BackProject the top row of the survey results into the RGB image - might help identify vertical lines (see dst3)."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ptBrick.Run(src)
+        bPoint.Run(src)
         dst3 = src.Clone
         dst2 = src.Clone
 
@@ -145,7 +145,7 @@ Public Class BrickPoint_TopRow : Inherits TaskParent
             End If
         Next
 
-        labels(2) = "Of the " + CStr(ptBrick.ptList.Count) + " max intensity bricks " + CStr(count) +
+        labels(2) = "Of the " + CStr(bPoint.ptList.Count) + " max intensity bricks " + CStr(count) +
                     " had max intensity in the top row of the brick."
     End Sub
 End Class
@@ -212,20 +212,20 @@ End Class
 
 
 Public Class BrickPoint_Best : Inherits TaskParent
-    Dim ptBrick As New BrickPoint_Basics
+    Dim bPoint As New BrickPoint_Basics
     Public bestBricks As New List(Of cv.Point)
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Display the grid points that have the highest possible max val - indicating the quality of the point."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ptBrick.Run(task.gray)
-        labels(2) = ptBrick.labels(2)
+        bPoint.Run(task.gray)
+        labels(2) = bPoint.labels(2)
 
         dst2 = src.Clone
         dst3.SetTo(0)
         bestBricks.Clear()
-        For Each pt In ptBrick.ptList
+        For Each pt In bPoint.ptList
             bestBricks.Add(pt)
             DrawCircle(dst2, pt)
             DrawCircle(dst3, pt, 255)
@@ -239,26 +239,26 @@ End Class
 
 
 Public Class BrickPoint_Busiest : Inherits TaskParent
-    Dim ptBrick As New BrickPoint_Basics
+    Dim bPoint As New BrickPoint_Basics
     Public bestBricks As New List(Of cv.Point)
     Public sortedBricks As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
         desc = "Identify the bricks with the best edge counts - indicating the quality of the brick."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ptBrick.Run(task.gray)
+        bPoint.Run(task.gray)
 
         dst2 = src.Clone
         dst3.SetTo(0)
         bestBricks.Clear()
         sortedBricks.Clear()
-        For Each pt In ptBrick.ptList
+        For Each pt In bPoint.ptList
             Dim index = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim brick = task.bricks.brickList(index)
-            If brick.correlation > 0.9 And brick.depth < task.MaxZmeters Then sortedBricks.Add(ptBrick.sobel.dst2(brick.rect).CountNonZero, brick.rect)
+            If brick.correlation > 0.9 And brick.depth < task.MaxZmeters Then sortedBricks.Add(bPoint.sobel.dst2(brick.rect).CountNonZero, brick.rect)
         Next
 
-        dst3 = ptBrick.sobel.dst2
+        dst3 = bPoint.sobel.dst2
         For i = 0 To sortedBricks.Count - 1
             Dim ele = sortedBricks.ElementAt(i)
             dst2.Rectangle(ele.Value, task.highlight, task.lineWidth)
@@ -276,7 +276,7 @@ End Class
 
 
 Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
-    Dim ptBrick As New BrickPoint_Basics
+    Dim bPoint As New BrickPoint_Basics
     Public results(,) As Single
     Public Sub New()
         labels(2) = "Cursor over each brick to see where the grid points are."
@@ -284,13 +284,13 @@ Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
         desc = "Monitor the location of each brick point in a brick."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ptBrick.Run(task.gray)
+        bPoint.Run(task.gray)
 
-        dst1 = ptBrick.dst2
+        dst1 = bPoint.dst2
         dst3 = src
 
         ReDim results(task.brickSize - 1, task.brickSize - 1)
-        For Each pt In ptBrick.ptList
+        For Each pt In bPoint.ptList
             Dim index = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim brick = task.bricks.brickList(index)
             results(brick.feature.X - brick.rect.X, brick.feature.Y - brick.rect.Y) += 1
@@ -332,16 +332,16 @@ End Class
 
 
 Public Class BrickPoint_ContourCompare : Inherits TaskParent
-    Dim gpLess As New BrickPoint_FeatureLess
+    Dim fLess As New BrickPoint_FeatureLess
     Public Sub New()
         If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         desc = "Compare Contour_Basics to BrickPoint_FeatureLess"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        gpLess.Run(src)
+        fLess.Run(src)
 
-        dst2 = ShowAddweighted(task.contours.dst2, gpLess.dst3, labels(2)).Clone
-        dst3 = ShowAddweighted(src, gpLess.dst3, labels(2))
+        dst2 = ShowAddweighted(task.contours.dst2, fLess.dst3, labels(2)).Clone
+        dst3 = ShowAddweighted(src, fLess.dst3, labels(2))
     End Sub
 End Class
 
@@ -375,22 +375,19 @@ End Class
 
 
 Public Class BrickPoint_KNN : Inherits TaskParent
-    Public ptBrick As New BrickPoint_Basics
+    Public bPoint As New BrickPoint_Basics
     Dim knn As New KNN_Basics
     Public lplist As New List(Of lpData)
     Public Sub New()
         desc = "Join the 2 nearest points to each brick point to help find lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ptBrick.Run(task.gray)
-        dst3 = ptBrick.dst3
-        If ptBrick.ptList.Count < 3 Then Exit Sub
+        bPoint.Run(task.gray)
+        dst3 = bPoint.dst3
+        If bPoint.ptList.Count < 3 Then Exit Sub
 
-        knn.trainInput.Clear()
-        For Each pt In ptBrick.ptList
-            knn.trainInput.Add(New cv.Point2f(pt.X, pt.Y))
-        Next
-        knn.queries = New List(Of cv.Point2f)(knn.trainInput)
+        knn.ptListTrain = New List(Of cv.Point)(bPoint.ptList)
+        knn.ptListQuery = New List(Of cv.Point)(bPoint.ptList)
         knn.Run(emptyMat)
 
         lplist.Clear()
@@ -426,8 +423,8 @@ Public Class BrickPoint_EndPoints : Inherits TaskParent
         dst1.SetTo(0)
         Dim lineList As New List(Of Single)
         For Each lp In lplist
-            Dim p1 = lpData.validatePoint(New cv.Point(CInt(lp.p1Ex.Y), CInt(lp.p1Ex.X)))
-            Dim p2 = lpData.validatePoint(New cv.Point(CInt(lp.p2Ex.Y), CInt(lp.p2Ex.X)))
+            Dim p1 = lpData.validatePoint(New cv.Point(CInt(lp.pX1.Y), CInt(lp.pX1.X)))
+            Dim p2 = lpData.validatePoint(New cv.Point(CInt(lp.pX2.Y), CInt(lp.pX2.X)))
             Dim index1 = dst1.Get(Of Single)(p1.Y, p1.X)
             Dim index2 = dst1.Get(Of Single)(p2.Y, p2.X)
             If index1 = 0 And index2 = 0 Then
@@ -445,7 +442,7 @@ Public Class BrickPoint_EndPoints : Inherits TaskParent
 
         For Each index In lineList
             Dim lp = lplist(index)
-            DrawLine(dst2, lp.p1Ex, lp.p2Ex)
+            DrawLine(dst2, lp.pX1, lp.pX2)
         Next
     End Sub
 End Class

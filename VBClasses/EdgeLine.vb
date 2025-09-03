@@ -318,7 +318,7 @@ End Class
 
 
 Public Class EdgeLine_BrickPoints : Inherits TaskParent
-    Dim ptBrick As New BrickPoint_Basics
+    Dim bPoint As New BrickPoint_Basics
     Public classCount As Integer
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -342,15 +342,15 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        ptBrick.Run(src)
-        labels(2) = ptBrick.labels(2)
+        bPoint.Run(src)
+        labels(2) = bPoint.labels(2)
 
         dst2 = task.edges.dst2
         dst3 = ShowPalette(task.edges.dst2)
 
         Dim segments(task.edges.classCount) As List(Of cv.Point2f)
         Dim brickCount As Integer, segmentCount As Integer
-        For Each pt In ptBrick.ptList
+        For Each pt In bPoint.ptList
             Dim val = task.edges.dst2.Get(Of Byte)(pt.Y, pt.X)
             If val > 0 And val < 255 Then
                 If segments(val) Is Nothing Then

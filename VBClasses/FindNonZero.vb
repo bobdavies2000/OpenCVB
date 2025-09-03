@@ -103,12 +103,12 @@ Public Class FindNonZero_Line3DWorld : Inherits TaskParent
         Next
         If ptList.Count = 0 Then Exit Sub
 
-        Dim incr = (lp.p1Vec(2) - lp.P2Vec(2)) / ptList.Count
+        Dim incr = (lp.pVec1(2) - lp.pVec2(2)) / ptList.Count
         veclist.Clear()
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
             Dim testvec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-            Dim rVec = getWorldCoordinates(pt, lp.p1Vec(2) + incr * i)
+            Dim rVec = getWorldCoordinates(pt, lp.pVec1(2) + incr * i)
             veclist.Add(rVec)
         Next
 
@@ -148,16 +148,16 @@ Public Class FindNonZero_Line3D : Inherits TaskParent
         Next
         If ptList.Count = 0 Then Exit Sub
 
-        Dim incrX = (lp.p1Vec(0) - lp.p2Vec(0)) / ptList.Count
-        Dim incrY = (lp.p1Vec(1) - lp.p2Vec(1)) / ptList.Count
-        Dim incrZ = (lp.p1Vec(2) - lp.p2Vec(2)) / ptList.Count
+        Dim incrX = (lp.pVec1(0) - lp.pVec2(0)) / ptList.Count
+        Dim incrY = (lp.pVec1(1) - lp.pVec2(1)) / ptList.Count
+        Dim incrZ = (lp.pVec1(2) - lp.pVec2(2)) / ptList.Count
         veclist.Clear()
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
             Dim vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-            vec(0) = lp.p1Vec(0) + incrX * i
-            vec(1) = lp.p1Vec(1) + incrY * i
-            vec(2) = lp.p1Vec(2) + incrZ * i
+            vec(0) = lp.pVec1(0) + incrX * i
+            vec(1) = lp.pVec1(1) + incrY * i
+            vec(2) = lp.pVec1(2) + incrZ * i
             veclist.Add(vec)
         Next
 

@@ -588,10 +588,10 @@ Public Class lpData
     Public age As Integer
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
-    Public p1Vec As cv.Vec3f
-    Public p2Vec As cv.Vec3f
-    Public p1Ex As cv.Point2f ' end points - goes to the edge of the image.
-    Public p2Ex As cv.Point2f ' end points - goes to the edge of the image.
+    Public pVec1 As cv.Vec3f
+    Public pVec2 As cv.Vec3f
+    Public pX1 As cv.Point2f ' end points - goes to the edge of the image.
+    Public pX2 As cv.Point2f ' end points - goes to the edge of the image.
     Public length As Single
     Public rect As cv.Rect
     Public roRect As cv.RotatedRect
@@ -672,8 +672,10 @@ Public Class lpData
             p2 = ptTemp
         End If
 
-        p1Vec = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
-        p2Vec = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
+        pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
+        If Single.IsNaN(pVec1(0)) Then pVec1 = New cv.Vec3f
+        pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
+        If Single.IsNaN(pVec2(0)) Then pVec1 = New cv.Vec3f
 
         If p1.X = p2.X Then
             slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
@@ -692,8 +694,8 @@ Public Class lpData
         If p1.X <> p2.X Then
             Dim b = p1.Y - p1.X * slope
             If p1.Y = p2.Y Then
-                p1Ex = New cv.Point2f(0, p1.Y)
-                p2Ex = New cv.Point2f(task.workRes.Width, p1.Y)
+                pX1 = New cv.Point2f(0, p1.Y)
+                pX2 = New cv.Point2f(task.workRes.Width, p1.Y)
             Else
                 Dim x1 = -b / slope
                 Dim x2 = (task.workRes.Height - b) / slope
@@ -705,16 +707,16 @@ Public Class lpData
                 If x2 >= 0 And x2 <= task.workRes.Width Then pts.Add(New cv.Point2f(x2, task.workRes.Height))
                 If y1 >= 0 And y1 <= task.workRes.Height Then pts.Add(New cv.Point2f(0, y1))
                 If y2 >= 0 And y2 <= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width, y2))
-                p1Ex = pts(0)
+                pX1 = pts(0)
                 If pts.Count < 2 Then
                     If CInt(x2) >= task.workRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workRes.Height))
                     If CInt(y2) >= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width, CInt(y2)))
                 End If
-                p2Ex = pts(1)
+                pX2 = pts(1)
             End If
         Else
-            p1Ex = New cv.Point2f(p1.X, 0)
-            p2Ex = New cv.Point2f(p1.X, task.workRes.Height)
+            pX1 = New cv.Point2f(p1.X, 0)
+            pX2 = New cv.Point2f(p1.X, task.workRes.Height)
         End If
         ptCenter = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 

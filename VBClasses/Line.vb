@@ -119,7 +119,7 @@ Public Class Line_Raw : Inherits TaskParent
                     p1 = lpData.validatePoint(p1)
                     p2 = lpData.validatePoint(p2)
                     Dim lp = New lpData(p1, p2)
-                    If lp.p1Vec(2) > 0 And lp.P2Vec(2) > 0 Then lpList.Add(lp)
+                    If lp.pVec1(2) > 0 And lp.pVec2(2) > 0 Then lpList.Add(lp)
                 End If
             End If
         Next
@@ -240,7 +240,7 @@ Public Class Line_Info : Inherits TaskParent
         strOut += "gridIndex1 = " + CStr(task.lpD.gridIndex1) + " gridIndex2 = " + CStr(task.lpD.gridIndex2) + vbCrLf
 
         strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
-        strOut += "p1Ex = " + task.lpD.p1Ex.ToString + ", p2Ex = " + task.lpD.p2Ex.ToString + vbCrLf + vbCrLf
+        strOut += "pX1 = " + task.lpD.pX1.ToString + ", pX2 = " + task.lpD.pX2.ToString + vbCrLf + vbCrLf
         strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
         strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
         strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
@@ -414,7 +414,7 @@ Public Class Line_TraceCenter : Inherits TaskParent
             Exit Sub
         End If
 
-        Static lpLast = New lpData(task.lineLongest.p1Ex, task.lineLongest.p2Ex)
+        Static lpLast = New lpData(task.lineLongest.pX1, task.lineLongest.pX2)
         Dim linePerp = Line_PerpendicularTest.computePerp(task.lineLongest)
 
         dst2 = src
@@ -430,7 +430,7 @@ Public Class Line_TraceCenter : Inherits TaskParent
         DrawCircle(dst3, trackPoint)
         DrawCircle(dst3, trackPoint)
 
-        lpLast = New lpData(task.lineLongest.p1Ex, task.lineLongest.p2Ex)
+        lpLast = New lpData(task.lineLongest.pX1, task.lineLongest.pX2)
     End Sub
 End Class
 
@@ -633,10 +633,10 @@ Public Class Line_BrickList : Inherits TaskParent
                     angles.Add(lpTest.angle)
                     ptList.Add(pt)
                     ptList.Add(allPoints(j))
-                    epListX1.Add(lpTest.p1Ex.X)
-                    epListY1.Add(lpTest.p1Ex.Y)
-                    epListX2.Add(lpTest.p2Ex.X)
-                    epListY2.Add(lpTest.p2Ex.Y)
+                    epListX1.Add(lpTest.pX1.X)
+                    epListY1.Add(lpTest.pX1.Y)
+                    epListX2.Add(lpTest.pX2.X)
+                    epListY2.Add(lpTest.pX2.Y)
                 End If
             Next
         Next
@@ -1135,5 +1135,50 @@ Public Class Line_Select3D : Inherits TaskParent
         delaunay.Run(src)
         dst2 = delaunay.dst1
         labels(2) = delaunay.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Vertical : Inherits TaskParent
+    Dim vbPoints As New BrickPoint_Vertical
+    Dim knn As New KNN_Basics
+    Public Sub New()
+        desc = "Match points to the nearest that is also vertical"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        vbPoints.Run(src)
+        dst2 = vbPoints.dst2
+
+        knn.ptListTrain = New List(Of cv.Point)(vbPoints.ptList)
+        knn.ptListQuery = New List(Of cv.Point)(vbPoints.ptList)
+        knn.Run(dst2)
+        labels(3) = "There are " + CStr(knn.result.GetUpperBound(0)) + " input points to KNN."
+
+        Dim lineGroups(task.bricksPerRow - 1) As List(Of lpData)
+
+        Dim lpList As New List(Of lpData)
+        For i = 0 To knn.result.GetUpperBound(0) - 1
+            Dim deltaY As New List(Of Single)
+            Dim ptList As New List(Of cv.Point)
+            Dim p1 = vbPoints.ptList(i)
+            For j = 1 To Math.Min(knn.result.Length - 1, 5) - 1
+                Dim p2 = vbPoints.ptList(knn.result(i, j + 1))
+                deltaY.Add(Math.Abs(p1.X - p2.X))
+                ptList.Add(p2)
+            Next
+
+            Dim minVal = deltaY.Min
+            Dim index = deltaY.IndexOf(minVal)
+            If minVal < task.brickSize Then
+                lpList.Add(New lpData(p1, ptList(index)))
+                dst2.Line(p1, ptList(index), task.highlight, task.lineWidth, task.lineType)
+            End If
+        Next
+
+        labels(2) = "There were " + CStr(lpList.Count) + " neighbors that formed good lines."
     End Sub
 End Class

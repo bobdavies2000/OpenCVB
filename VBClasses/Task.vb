@@ -779,7 +779,7 @@ Public Class VBtask : Implements IDisposable
                 If gOptions.CrossHairs.Checked Then
                     Gravity_Basics.showVectors(results.dstList(0))
                     Dim lp = lineLongest
-                    Dim pt = New cv.Point2f((lp.p1Ex.X + lp.p2Ex.X) / 2 + 5, (lp.p1Ex.Y + lp.p2Ex.Y) / 2)
+                    Dim pt = New cv.Point2f((lp.pX1.X + lp.pX2.X) / 2 + 5, (lp.pX1.Y + lp.pX2.Y) / 2)
                     displayObject.trueData.Add(New TrueText("Longest", pt, 0))
                 End If
             End SyncLock
