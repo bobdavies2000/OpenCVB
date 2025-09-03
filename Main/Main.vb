@@ -924,10 +924,6 @@ Namespace OpenCVB
             Dim parms As New VBClasses.VBtask.algParms
             parms.algName = AvailableAlgorithms.Text
 
-            Debug.WriteLine("")
-            Debug.WriteLine("")
-            Debug.WriteLine("Starting algorithm " + parms.algName)
-            Debug.WriteLine(vbTab + CStr(AlgorithmTestAllCount) + " algorithms tested")
             testAllRunning = TestAllButton.Text = "Stop Test"
             saveAlgorithmName = parms.algName
 

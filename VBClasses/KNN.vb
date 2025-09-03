@@ -17,7 +17,11 @@ Public Class KNN_Basics : Inherits TaskParent
         If standalone Then
             Static ptBest As New BrickPoint_Basics
             ptBest.Run(src)
-            trainInput = ptBest.features
+
+            trainInput.Clear()
+            For Each pt In ptBest.ptList
+                trainInput.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
             queries = trainInput
         End If
         knn2.trainInput = trainInput

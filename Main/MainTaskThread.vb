@@ -125,6 +125,11 @@ Namespace OpenCVB
             ' During overnight testing, the duration of any algorithm varies a lot.
             ' Wait here for the lock if previous algorithm is not finished.
             SyncLock algorithmThreadLock
+                Debug.WriteLine("")
+                Debug.WriteLine("")
+                Debug.WriteLine("Starting algorithm " + parms.algName)
+                Debug.WriteLine(vbTab + CStr(AlgorithmTestAllCount) + " algorithms tested")
+
                 fpsWriteCount = 0
 
                 AlgorithmTestAllCount += 1
@@ -290,6 +295,7 @@ Namespace OpenCVB
 
                 frameCount = -1
                 fpsWriteCount = 0
+                task.Dispose()
                 Debug.WriteLine("")
                 Debug.WriteLine(algName + " closing...")
             End SyncLock

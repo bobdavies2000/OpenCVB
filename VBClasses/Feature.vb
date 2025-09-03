@@ -6,7 +6,6 @@ Public Class Feature_Basics : Inherits TaskParent
     Public feature2f As New List(Of cv.Point2f)
     Dim ptBrick As New BrickPoint_Minimum
     Public Sub New()
-        If task.feat Is Nothing Then task.feat = New Feature_Basics
         desc = "Gather features from the sobel brick points and preserve those representing lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -275,7 +274,7 @@ Public Class Feature_Delaunay : Inherits TaskParent
 
         delaunay.Run(src)
         dst3 = delaunay.dst2
-        For Each pt In delaunay.ptBest.features
+        For Each pt In delaunay.ptBest.ptList
             DrawCircle(dst3, pt, task.DotSize, white)
         Next
         labels(3) = "There were " + CStr(task.features.Count) + " Delaunay contours"

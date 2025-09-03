@@ -181,7 +181,7 @@ Public Class Contour_BrickPoints : Inherits TaskParent
         dst2 = task.contours.dst2.Clone
         ptBrick.Run(task.grayStable)
 
-        For Each pt In ptBrick.features
+        For Each pt In ptBrick.ptList
             DrawCircle(dst2, pt)
         Next
     End Sub

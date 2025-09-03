@@ -511,15 +511,6 @@ Public Class VBtask : Implements IDisposable
         Dim str As New TrueText(text, pt, picTag)
         trueData.Add(str)
     End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        allOptions.Close()
-        For Each algorithm In task.activeObjects
-            Dim type As Type = algorithm.GetType()
-            If type.GetMethod("Close") IsNot Nothing Then
-                algorithm.Close()  ' Close any unmanaged classes...
-            End If
-        Next
-    End Sub
     Public Sub setSelectedCell()
         If task.redC Is Nothing Then Exit Sub
         If task.redC.rcList.Count = 0 Then Exit Sub
@@ -808,5 +799,18 @@ Public Class VBtask : Implements IDisposable
             If displayDst1 Then labels(1) = displayObject.labels(1)
             depthAndDepthRange = task.depthAndDepthRange
         End If
+    End Sub
+    Public Sub Dispose() Implements IDisposable.Dispose
+        allOptions.Close()
+        For Each algorithm In task.activeObjects
+            Dim type As Type = algorithm.GetType()
+            If type.GetMethod("Close") IsNot Nothing Then
+                algorithm.Close()  ' Close any unmanaged classes...
+            End If
+        Next
+
+        For Each m In task.results.dstList
+            m.Dispose()
+        Next
     End Sub
 End Class

@@ -9377,7 +9377,11 @@ Public Class XO_FPoly_Line : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         ptBest.Run(src)
-        task.features = ptBest.features
+
+        task.features.Clear()
+        For Each pt In ptBest.ptList
+            task.features.Add(New cv.Point2f(pt.X, pt.Y))
+        Next
 
         feat.Run(src)
         dst2.SetTo(0)
@@ -9442,7 +9446,10 @@ Public Class XO_Delaunay_Points : Inherits TaskParent
         If standalone Then
             Static ptBest As New BrickPoint_Basics
             ptBest.Run(src)
-            task.features = ptBest.features
+            task.features.Clear()
+            For Each pt In ptBest.ptList
+                task.features.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
         End If
         Static ptSlider = OptionParent.FindSlider("Points to use in Feature Poly")
 

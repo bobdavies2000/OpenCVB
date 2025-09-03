@@ -776,7 +776,10 @@ Public Class FCS_ByDepth : Inherits TaskParent
         If standalone Then
             Static ptBest As New BrickPoint_Basics
             ptBest.Run(src)
-            task.features = ptBest.features
+            task.features.Clear()
+            For Each pt In ptBest.ptList
+                task.features.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
         End If
         fcs.Run(src)
         dst2 = fcs.dst2

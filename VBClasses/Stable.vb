@@ -82,7 +82,10 @@ Public Class Stable_BasicsCount : Inherits TaskParent
             basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.features)
         Else
             ptBest.Run(src)
-            basics.facetGen.inputPoints = ptBest.features
+            basics.facetGen.inputPoints.Clear()
+            For Each pt In ptBest.ptList
+                basics.facetGen.inputPoints.Add(New cv.Point2f(pt.X, pt.Y))
+            Next
         End If
         basics.Run(src)
         dst2 = basics.dst2

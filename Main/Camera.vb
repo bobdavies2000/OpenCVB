@@ -79,6 +79,7 @@ Public Class GenericCamera
 
     Public cameraName As String = ""
     Public cPtr As IntPtr
+    Public ratio As Single
     Public Structure imuDataStruct
         Dim r00 As Single
         Dim r01 As Single
@@ -108,6 +109,8 @@ Public Class GenericCamera
         Public mapperConfidence As Integer
     End Structure
     Public Sub New()
+        camImages = New CameraImages.images(workRes)
+        cameraFrameCount = 0
     End Sub
     Public Sub GetNextFrameCounts(frameTime As Double)
         Static lastFrameTime = IMU_TimeStamp

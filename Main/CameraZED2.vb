@@ -2,12 +2,9 @@
 Imports CamZed
 Public Class CameraZed2 : Inherits GenericCamera
     Dim zed As CamZed
-    Dim ratio As Single
     Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
         captureRes = _captureRes
         workRes = _workRes
-        camImages = New CameraImages.images(workRes)
-        cameraFrameCount = 0
         ratio = CInt(captureRes.Width / workRes.Width)
         zed = New CamZed(workRes, captureRes, deviceName)
     End Sub

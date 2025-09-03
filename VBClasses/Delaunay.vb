@@ -405,7 +405,7 @@ Public Class Delaunay_Contours : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then ptBest.Run(src)
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-        subdiv.Insert(ptBest.features)
+        subdiv.Insert(ptBest.ptList)
 
         Dim facets = New cv.Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
@@ -419,7 +419,7 @@ Public Class Delaunay_Contours : Inherits TaskParent
 
             DrawContour(dst2, ptList, 255, 1)
         Next
-        labels(2) = traceName + ": " + Format(ptBest.features.Count, "000") + " cells were present."
+        labels(2) = traceName + ": " + Format(ptBest.ptList.Count, "000") + " cells were present."
     End Sub
 End Class
 

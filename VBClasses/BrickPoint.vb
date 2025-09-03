@@ -1,10 +1,10 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Reflection.Emit
+Imports cv = OpenCvSharp
 Public Class BrickPoint_Basics : Inherits TaskParent
     Public sobel As New Edge_Sobel
-    Public features As New List(Of cv.Point2f)
+    Public bpCore As New BrickPoint_Core
     Public ptList As New List(Of cv.Point)
     Public Sub New()
-        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         labels(3) = "Sobel input to BrickPoint_Basics"
         desc = "Find the max Sobel point in each brick"
     End Sub
@@ -14,27 +14,49 @@ Public Class BrickPoint_Basics : Inherits TaskParent
         sobel.Run(src)
         dst3 = sobel.dst2
 
-        features.Clear()
+        bpCore.Run(dst3)
+        dst2 = bpCore.dst2
+        ptList = New List(Of cv.Point)(bpCore.ptList)
+        labels(2) = bpCore.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class BrickPoint_Core : Inherits TaskParent
+    Public ptList As New List(Of cv.Point)
+    Public Sub New()
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+        desc = "Identify the highest intensity point in each brick given the input image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
+        Dim threshold = thresholdSlider.value
+
         ptList.Clear()
+        dst2 = task.color.Clone
         For Each brick In task.bricks.brickList
-            Dim mm = GetMinMax(dst3(brick.rect))
+            Dim mm = GetMinMax(src(brick.rect))
             brick.pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
             brick.feature = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
             brick.intensity = mm.maxVal
-            If brick.intensity >= sobel.options.sobelThreshold Then
+            If brick.intensity >= threshold Then
                 ptList.Add(brick.feature)
-                features.Add(brick.feature)
             End If
         Next
 
-        For Each pt In features
+        For Each pt In ptList
             DrawCircle(dst2, pt)
         Next
 
-        labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(features.Count) +
-                    " had brickpoint intensity >= " + CStr(sobel.options.sobelThreshold)
+        labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(ptList.Count) +
+                    " had brickpoint intensity >= " + CStr(threshold)
     End Sub
 End Class
+
 
 
 
@@ -123,7 +145,7 @@ Public Class BrickPoint_TopRow : Inherits TaskParent
             End If
         Next
 
-        labels(2) = "Of the " + CStr(ptBrick.features.Count) + " max intensity bricks " + CStr(count) +
+        labels(2) = "Of the " + CStr(ptBrick.ptList.Count) + " max intensity bricks " + CStr(count) +
                     " had max intensity in the top row of the brick."
     End Sub
 End Class
@@ -203,7 +225,7 @@ Public Class BrickPoint_Best : Inherits TaskParent
         dst2 = src.Clone
         dst3.SetTo(0)
         bestBricks.Clear()
-        For Each pt In ptBrick.features
+        For Each pt In ptBrick.ptList
             bestBricks.Add(pt)
             DrawCircle(dst2, pt)
             DrawCircle(dst3, pt, 255)
@@ -230,7 +252,7 @@ Public Class BrickPoint_Busiest : Inherits TaskParent
         dst3.SetTo(0)
         bestBricks.Clear()
         sortedBricks.Clear()
-        For Each pt In ptBrick.features
+        For Each pt In ptBrick.ptList
             Dim index = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim brick = task.bricks.brickList(index)
             If brick.correlation > 0.9 And brick.depth < task.MaxZmeters Then sortedBricks.Add(ptBrick.sobel.dst2(brick.rect).CountNonZero, brick.rect)
@@ -268,7 +290,7 @@ Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
         dst3 = src
 
         ReDim results(task.brickSize - 1, task.brickSize - 1)
-        For Each pt In ptBrick.features
+        For Each pt In ptBrick.ptList
             Dim index = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim brick = task.bricks.brickList(index)
             results(brick.feature.X - brick.rect.X, brick.feature.Y - brick.rect.Y) += 1
@@ -456,5 +478,44 @@ Public Class BrickPoint_Minimum : Inherits TaskParent
 
         labels(2) = "Of the " + CStr(task.gridRects.Count) + " candidates, " + CStr(features.Count) +
                     " had brickpoint intensity >= " + CStr(sobel.options.sobelThreshold)
+    End Sub
+End Class
+
+
+
+
+
+Public Class BrickPoint_Vertical : Inherits TaskParent
+    Dim vertical As New Edge_SobelVertical
+    Public bpCore As New BrickPoint_Core
+    Public ptList As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Use the vertical Sobel to build brick points"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        vertical.Run(src)
+        bpCore.Run(vertical.dst2)
+        dst2 = bpCore.dst2
+        ptList = New List(Of cv.Point)(bpCore.ptList)
+        labels(2) = bpCore.labels(2)
+    End Sub
+End Class
+
+
+
+
+Public Class BrickPoint_Horizontal : Inherits TaskParent
+    Dim horizontal As New Edge_SobelHorizontal
+    Public bpCore As New BrickPoint_Core
+    Public ptList As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Use the horizontal Sobel to build brick points"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        horizontal.Run(src)
+        bpCore.Run(horizontal.dst2)
+        dst2 = bpCore.dst2
+        ptList = New List(Of cv.Point)(bpCore.ptList)
+        labels(2) = bpCore.labels(2)
     End Sub
 End Class
