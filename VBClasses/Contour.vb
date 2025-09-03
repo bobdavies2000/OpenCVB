@@ -156,7 +156,7 @@ Public Class Contour_Features : Inherits TaskParent
         For Each pt In task.feat.features
             DrawCircle(dst2, pt)
             DrawCircle(dst3, pt)
-            Dim rect = task.gridRects(task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X))
+            Dim rect = task.gridRects(task.gridMap.Get(Of Integer)(pt.Y, pt.X))
             Dim correlation = Brick_Basics.getCorrelation(rect)
             SetTrueText(Format(correlation, fmt1), pt, 3)
         Next
@@ -1165,7 +1165,7 @@ Public Class Contour_Sort : Inherits TaskParent
             contour.depth = task.pcSplit(2)(contour.rect).Mean(task.depthMask(contour.rect))(0)
             contour.mm = GetMinMax(task.pcSplit(2)(contour.rect), contour.mask)
             contour.maxDist = GetMaxDistContour(contour)
-            contour.ID = task.grid.gridMap.Get(Of Integer)(contour.maxDist.Y, contour.maxDist.X)
+            contour.ID = task.gridMap.Get(Of Integer)(contour.maxDist.Y, contour.maxDist.X)
             sortedList.Add(contour.pixels, contour)
         Next
 

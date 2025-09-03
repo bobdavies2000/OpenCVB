@@ -95,7 +95,7 @@ Public Class EdgeLine_BasicsList : Inherits TaskParent
         Dim sortGridID As New SortedList(Of Integer, nrcData)(New compareAllowIdenticalInteger)
         Dim duplicatePixels As Integer
         For Each nrc In sortList.Values
-            nrc.ID = task.grid.gridMap.Get(Of Integer)(nrc.segment(0).Y, nrc.segment(0).X)
+            nrc.ID = task.gridMap.Get(Of Integer)(nrc.segment(0).Y, nrc.segment(0).X)
             Dim takenFlag = nrcMap.Get(Of Byte)(nrc.segment(0).Y, nrc.segment(0).X)
             If takenFlag <> 0 Then
                 duplicatePixels += nrc.pixels

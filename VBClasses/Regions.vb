@@ -65,10 +65,10 @@ Public Class Region_Basics : Inherits TaskParent
             rect = vRects(index - 1)
         End If
 
-        Dim brickIndex = task.grid.gridMap.Get(Of Integer)(rect.Y, rect.X)
+        Dim brickIndex = task.gridMap.Get(Of Integer)(rect.Y, rect.X)
         If brickIndex > 0 Then
             labels(3) = "Depth = " + Format(task.bricks.brickList(brickIndex).depth, fmt1) + "m"
-            brickIndex = task.grid.gridMap.Get(Of Integer)(rect.BottomRight.Y, rect.BottomRight.X)
+            brickIndex = task.gridMap.Get(Of Integer)(rect.BottomRight.Y, rect.BottomRight.X)
             labels(3) += " to " + Format(task.bricks.brickList(brickIndex).depth, fmt1) + "m"
         Else
             labels(3) = "No depth region present..."
@@ -99,8 +99,8 @@ Public Class Region_Quads : Inherits TaskParent
 
         Dim quadData As New List(Of cv.Point3f)
         For Each rect In inputRects
-            Dim index1 = task.grid.gridMap.Get(Of Integer)(rect.Y, rect.X)
-            Dim index2 = task.grid.gridMap.Get(Of Integer)(rect.BottomRight.Y - 1, rect.BottomRight.X - 1)
+            Dim index1 = task.gridMap.Get(Of Integer)(rect.Y, rect.X)
+            Dim index2 = task.gridMap.Get(Of Integer)(rect.BottomRight.Y - 1, rect.BottomRight.X - 1)
             If index1 = 0 Or index2 = 0 Then Continue For
 
             Dim brick1 = task.bricks.brickList(index1)

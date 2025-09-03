@@ -1008,7 +1008,7 @@ Public Class Motion_Longest : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.gray
 
-        Dim lp = New lpData(task.lineLongest.pX1, task.lineLongest.pX2)
+        Dim lp = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
         DrawLine(dst2, lp, white)
 
     End Sub

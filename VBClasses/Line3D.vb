@@ -13,11 +13,11 @@ Public Class Line3D_Basics : Inherits TaskParent
         lines3D.Clear()
 
         For Each lp In task.lines.lpList
-            Dim rect1 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim rect1 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
             Dim depth1 = task.pcSplit(2)(rect1).Mean(task.depthMask(rect1))(0)
             If depth1 = 0 Then Continue For
 
-            Dim rect2 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim rect2 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
             Dim depth2 = task.pcSplit(2)(rect2).Mean(task.depthMask(rect2))(0)
             If depth2 = 0 Then Continue For
 
@@ -126,8 +126,8 @@ Public Class Line3D_Longest : Inherits TaskParent
 
         dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
 
-        Dim gcMin = task.bricks.brickList(task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-        Dim gcMax = task.bricks.brickList(task.grid.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+        Dim gcMin = task.bricks.brickList(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+        Dim gcMax = task.bricks.brickList(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
 
         dst0.SetTo(0)
         dst0.Line(lp.p1, lp.p2, 255, 3, task.lineType)

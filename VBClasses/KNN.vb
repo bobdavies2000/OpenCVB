@@ -1374,14 +1374,14 @@ Public Class KNN_EdgePoints : Inherits TaskParent
         dst2 = src.Clone
         For Each lp In task.lines.lpList
             HullLine_EdgePoints.EdgePointOffset(lp, 1)
-            DrawCircle(dst2, New cv.Point(CInt(lp.pX1.X), CInt(lp.pX1.Y)))
-            DrawCircle(dst2, New cv.Point(CInt(lp.pX2.X), CInt(lp.pX2.Y)))
+            DrawCircle(dst2, New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)))
+            DrawCircle(dst2, New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)))
         Next
 
         knn.queries.Clear()
         For Each lp In lpInput
-            knn.queries.Add(lp.pX1)
-            knn.queries.Add(lp.pX2)
+            knn.queries.Add(lp.pE1)
+            knn.queries.Add(lp.pE2)
         Next
 
         knn.Run(emptyMat)

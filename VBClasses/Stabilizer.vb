@@ -45,7 +45,7 @@ Public Class Stabilizer_Basics : Inherits TaskParent
         Static lpLast As lpData = task.lineLongest
 
         Dim lp = task.lineLongest
-        If lp.pX1 = lpLast.pX1 And lp.pX2 = lpLast.pX2 Or task.lineLongestChanged Then
+        If lp.pE1 = lpLast.pE1 And lp.pE2 = lpLast.pE2 Or task.lineLongestChanged Then
             dst2 = src
             If task.lineLongestChanged Then lpLast = task.lineLongest
         Else

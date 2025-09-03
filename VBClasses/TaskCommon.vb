@@ -590,12 +590,12 @@ Public Class lpData
     Public p2 As cv.Point2f
     Public pVec1 As cv.Vec3f
     Public pVec2 As cv.Vec3f
-    Public pX1 As cv.Point2f ' end points - goes to the edge of the image.
-    Public pX2 As cv.Point2f ' end points - goes to the edge of the image.
+    Public pE1 As cv.Point2f ' end points - goes to the edge of the image.
+    Public pE2 As cv.Point2f ' end points - goes to the edge of the image.
     Public length As Single
     Public rect As cv.Rect
     Public roRect As cv.RotatedRect
-    Public slope As Single ' max is 100000 for vertical lines - adequate for use here.
+    Public slope As Single
     Public angle As Single ' varies from -90 to 90 degrees
     Public ptCenter As cv.Point2f
     Public ID As Integer
@@ -675,7 +675,7 @@ Public Class lpData
         pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
         If Single.IsNaN(pVec1(0)) Then pVec1 = New cv.Vec3f
         pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
-        If Single.IsNaN(pVec2(0)) Then pVec1 = New cv.Vec3f
+        If Single.IsNaN(pVec2(0)) Then pVec2 = New cv.Vec3f
 
         If p1.X = p2.X Then
             slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
@@ -685,17 +685,15 @@ Public Class lpData
 
         length = p1.DistanceTo(p2)
 
-        If Math.Abs(p1.X - p2.X) < 2 Then slope = 100000 ' a big number for slope 
-
-        gridIndex1 = task.grid.gridMap.Get(Of Integer)(p1.Y, p1.X)
-        gridIndex2 = task.grid.gridMap.Get(Of Integer)(p2.Y, p2.X)
+        gridIndex1 = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
+        gridIndex2 = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
         ID = If(gridIndex1 <= gridIndex2, gridIndex1, gridIndex2)
 
         If p1.X <> p2.X Then
             Dim b = p1.Y - p1.X * slope
             If p1.Y = p2.Y Then
-                pX1 = New cv.Point2f(0, p1.Y)
-                pX2 = New cv.Point2f(task.workRes.Width, p1.Y)
+                pE1 = New cv.Point2f(0, p1.Y)
+                pE2 = New cv.Point2f(task.workRes.Width - 1, p1.Y)
             Else
                 Dim x1 = -b / slope
                 Dim x2 = (task.workRes.Height - b) / slope
@@ -704,19 +702,19 @@ Public Class lpData
 
                 Dim pts As New List(Of cv.Point2f)
                 If x1 >= 0 And x1 <= task.workRes.Width Then pts.Add(New cv.Point2f(x1, 0))
-                If x2 >= 0 And x2 <= task.workRes.Width Then pts.Add(New cv.Point2f(x2, task.workRes.Height))
+                If x2 >= 0 And x2 <= task.workRes.Width Then pts.Add(New cv.Point2f(x2, task.workRes.Height - 1))
                 If y1 >= 0 And y1 <= task.workRes.Height Then pts.Add(New cv.Point2f(0, y1))
-                If y2 >= 0 And y2 <= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width, y2))
-                pX1 = pts(0)
+                If y2 >= 0 And y2 <= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width - 1, y2))
+                pE1 = pts(0)
                 If pts.Count < 2 Then
-                    If CInt(x2) >= task.workRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workRes.Height))
-                    If CInt(y2) >= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width, CInt(y2)))
+                    If CInt(x2) >= task.workRes.Width Then pts.Add(New cv.Point2f(CInt(x2), task.workRes.Height - 1))
+                    If CInt(y2) >= task.workRes.Height Then pts.Add(New cv.Point2f(task.workRes.Width - 1, CInt(y2)))
                 End If
-                pX2 = pts(1)
+                pE2 = pts(1)
             End If
         Else
-            pX1 = New cv.Point2f(p1.X, 0)
-            pX2 = New cv.Point2f(p1.X, task.workRes.Height)
+            pE1 = New cv.Point2f(p1.X, 0)
+            pE2 = New cv.Point2f(p1.X, task.workRes.Height - 1)
         End If
         ptCenter = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
 

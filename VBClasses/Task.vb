@@ -49,6 +49,7 @@ Public Class VBtask : Implements IDisposable
     Public bricksPerCol As Integer
     Public bricksPerRow As Integer
     Public gridRects As List(Of cv.Rect)
+    Public gridMap As New cv.Mat
     Public gridMask As New cv.Mat
     Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
     Public gridROIclicked As Integer
@@ -779,7 +780,7 @@ Public Class VBtask : Implements IDisposable
                 If gOptions.CrossHairs.Checked Then
                     Gravity_Basics.showVectors(results.dstList(0))
                     Dim lp = lineLongest
-                    Dim pt = New cv.Point2f((lp.pX1.X + lp.pX2.X) / 2 + 5, (lp.pX1.Y + lp.pX2.Y) / 2)
+                    Dim pt = New cv.Point2f((lp.pE1.X + lp.pE2.X) / 2 + 5, (lp.pE1.Y + lp.pE2.Y) / 2)
                     displayObject.trueData.Add(New TrueText("Longest", pt, 0))
                 End If
             End SyncLock

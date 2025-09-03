@@ -248,8 +248,8 @@ Public Class MatchLine_EndPoints : Inherits TaskParent
 
         If standalone Then lpInput = task.lineLongest
 
-        Dim nabeRect1 = task.gridNabeRects(task.grid.gridMap.Get(Of Integer)(lpInput.p1.Y, lpInput.p1.X))
-        Dim nabeRect2 = task.gridNabeRects(task.grid.gridMap.Get(Of Integer)(lpInput.p2.Y, lpInput.p2.X))
+        Dim nabeRect1 = task.gridNabeRects(task.gridMap.Get(Of Integer)(lpInput.p1.Y, lpInput.p1.X))
+        Dim nabeRect2 = task.gridNabeRects(task.gridMap.Get(Of Integer)(lpInput.p2.Y, lpInput.p2.X))
         cv.Cv2.HConcat(src(nabeRect1), src(nabeRect2), match.template)
         Static templateLast = match.template.Clone
 

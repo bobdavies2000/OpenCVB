@@ -10,7 +10,7 @@ Public Class Disparity_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.color.Clone
 
-        Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Static saveIndex As Integer = index
         Static saveCorrelations As New List(Of Single)
         Static bestRect As cv.Rect
@@ -207,7 +207,7 @@ Public Class Disparity_Color8u : Inherits TaskParent
         task.color.Rectangle(disparity.rect, 255, task.lineWidth)
         dst1.Rectangle(disparity.matchRect, 255, task.lineWidth)
 
-        Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim index As Integer = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
         Dim rect = task.gridRects(index)
         dst2.Rectangle(rect, 255, task.lineWidth)
     End Sub

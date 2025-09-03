@@ -35,11 +35,11 @@ Public Class Line_Core : Inherits TaskParent
         ' return true if the line endpoints were in the motion mask.
         Dim gridIndex As Integer, pt As cv.Point
 
-        gridIndex = task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
+        gridIndex = task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
         pt = task.gridRects(gridIndex).TopLeft
         If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then Return True
 
-        gridIndex = task.grid.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
+        gridIndex = task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
         pt = task.gridRects(gridIndex).TopLeft
         If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then Return True
         Return False
@@ -240,7 +240,7 @@ Public Class Line_Info : Inherits TaskParent
         strOut += "gridIndex1 = " + CStr(task.lpD.gridIndex1) + " gridIndex2 = " + CStr(task.lpD.gridIndex2) + vbCrLf
 
         strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
-        strOut += "pX1 = " + task.lpD.pX1.ToString + ", pX2 = " + task.lpD.pX2.ToString + vbCrLf + vbCrLf
+        strOut += "pE1 = " + task.lpD.pE1.ToString + ", pE2 = " + task.lpD.pE2.ToString + vbCrLf + vbCrLf
         strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
         strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
         strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
@@ -414,7 +414,7 @@ Public Class Line_TraceCenter : Inherits TaskParent
             Exit Sub
         End If
 
-        Static lpLast = New lpData(task.lineLongest.pX1, task.lineLongest.pX2)
+        Static lpLast = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
         Dim linePerp = Line_PerpendicularTest.computePerp(task.lineLongest)
 
         dst2 = src
@@ -430,7 +430,7 @@ Public Class Line_TraceCenter : Inherits TaskParent
         DrawCircle(dst3, trackPoint)
         DrawCircle(dst3, trackPoint)
 
-        lpLast = New lpData(task.lineLongest.pX1, task.lineLongest.pX2)
+        lpLast = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
     End Sub
 End Class
 
@@ -633,10 +633,10 @@ Public Class Line_BrickList : Inherits TaskParent
                     angles.Add(lpTest.angle)
                     ptList.Add(pt)
                     ptList.Add(allPoints(j))
-                    epListX1.Add(lpTest.pX1.X)
-                    epListY1.Add(lpTest.pX1.Y)
-                    epListX2.Add(lpTest.pX2.X)
-                    epListY2.Add(lpTest.pX2.Y)
+                    epListX1.Add(lpTest.pE1.X)
+                    epListY1.Add(lpTest.pE1.Y)
+                    epListX2.Add(lpTest.pE2.X)
+                    epListY2.Add(lpTest.pE2.Y)
                 End If
             Next
         Next
@@ -823,9 +823,9 @@ Public Class Line_LeftRightMatch : Inherits TaskParent
         dst2 = lrLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst3 = lrLines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        Dim r1 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-        Dim r2 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
-        Dim r3 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+        Dim r1 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+        Dim r2 = task.gridRects(task.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
+        Dim r3 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
         Dim depth1 = task.pcSplit(2)(r1).Mean().Val0
         Dim depth2 = task.pcSplit(2)(r2).Mean().Val0
         Dim depth3 = task.pcSplit(2)(r3).Mean().Val0
@@ -870,9 +870,9 @@ Public Class Line_LeftRightMatch3 : Inherits TaskParent
         lpOutput.Clear()
         For i = 0 To lplist.Count - 1
             lp = lplist(i)
-            Dim r1 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            Dim r2 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
-            Dim r3 = task.gridRects(task.grid.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+            Dim r1 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim r2 = task.gridRects(task.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
+            Dim r3 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
 
             Dim depth1 = task.pcSplit(2)(r1).Mean().Val0
             Dim depth2 = task.pcSplit(2)(r2).Mean().Val0
@@ -1006,7 +1006,7 @@ Public Class Line_BrickPoints : Inherits TaskParent
             If lineIndex = 0 Then Continue For
             Dim color = vecToScalar(task.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
             Dim index As Integer = sortLines.Keys.Contains(lineIndex)
-            Dim gridindex = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim gridindex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             sortLines.Add(lineIndex, gridindex)
             DrawCircle(dst3, pt, color)
         Next
@@ -1158,27 +1158,50 @@ Public Class Line_Vertical : Inherits TaskParent
         knn.Run(dst2)
         labels(3) = "There are " + CStr(knn.result.GetUpperBound(0)) + " input points to KNN."
 
-        Dim lineGroups(task.bricksPerRow - 1) As List(Of lpData)
+        Dim topGroups(task.bricksPerRow - 1) As List(Of Integer)
 
         Dim lpList As New List(Of lpData)
         For i = 0 To knn.result.GetUpperBound(0) - 1
-            Dim deltaY As New List(Of Single)
+            Dim deltaX As New List(Of Single)
             Dim ptList As New List(Of cv.Point)
-            Dim p1 = vbPoints.ptList(i)
-            For j = 1 To Math.Min(knn.result.Length - 1, 5) - 1
-                Dim p2 = vbPoints.ptList(knn.result(i, j + 1))
-                deltaY.Add(Math.Abs(p1.X - p2.X))
+            Dim p1 = vbPoints.ptList(knn.result(i, 0))
+            For j = 1 To Math.Min(knn.result.Length - 1, 6) - 1
+                Dim p2 = vbPoints.ptList(knn.result(i, j))
+                deltaX.Add(Math.Abs(p1.X - p2.X))
                 ptList.Add(p2)
             Next
 
-            Dim minVal = deltaY.Min
-            Dim index = deltaY.IndexOf(minVal)
+            Dim minVal = deltaX.Min
+            Dim index = deltaX.IndexOf(minVal)
             If minVal < task.brickSize Then
-                lpList.Add(New lpData(p1, ptList(index)))
+                Dim lp = New lpData(p1, ptList(index))
+                lp.index = lpList.Count
+                lpList.Add(lp)
                 dst2.Line(p1, ptList(index), task.highlight, task.lineWidth, task.lineType)
             End If
         Next
 
+        For Each lp In lpList
+            Dim index = task.gridMap.Get(Of Integer)(lp.pE1.Y, lp.pE1.X)
+            If lp.pE1.Y > 0 Then
+                If lp.pE2.Y > 0 Then Continue For ' line is not vertical
+                index = task.gridMap.Get(Of Integer)(lp.pE2.Y, lp.pE2.X)
+            End If
+
+            If topGroups(index) Is Nothing Then topGroups(index) = New List(Of Integer)
+            topGroups(index).Add(lp.index)
+        Next
+
+        Dim topIndex = Math.Abs(task.gOptions.DebugSlider.Value)
+        dst3.SetTo(0)
+        If topIndex < topGroups.Count Then
+            If topGroups(topIndex) IsNot Nothing Then
+                For Each index In topGroups(topIndex)
+                    Dim lp = lpList(index)
+                    DrawLine(dst3, lp)
+                Next
+            End If
+        End If
         labels(2) = "There were " + CStr(lpList.Count) + " neighbors that formed good lines."
     End Sub
 End Class

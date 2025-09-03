@@ -389,7 +389,7 @@ Public Class PointCloud_GridInspector : Inherits TaskParent
         SetTrueText("Values show brick.pt3d values at the blue line.", New cv.Point(dst2.Width / 2, 0), 3)
         For i = 0 To dst2.Height - 1 Step task.brickSize
             Dim pt = New cv.Point2f(cLine, i)
-            Dim index = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(task.bricks.brickList(index).pt.Y, task.bricks.brickList(index).pt.X)
             SetTrueText("Row " + Format(i, "00") + vbTab + vbTab + Format(xyz(0), fmt2) + vbTab + Format(xyz(1), fmt2) + vbTab + Format(xyz(2), fmt2), New cv.Point(5, pt.Y), 3)
         Next

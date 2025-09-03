@@ -12,8 +12,8 @@ Public Class LineDepth_Basics : Inherits TaskParent
 
         dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
 
-        Dim gcMin = task.bricks.brickList(task.grid.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
-        Dim gcMax = task.bricks.brickList(task.grid.gridMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
+        Dim gcMin = task.bricks.brickList(task.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+        Dim gcMax = task.bricks.brickList(task.gridMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
 
         dst0.SetTo(0)
         dst0.Line(lp.p1, lp.p2, 255, 3, task.lineType)

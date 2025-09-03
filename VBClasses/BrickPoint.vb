@@ -253,7 +253,7 @@ Public Class BrickPoint_Busiest : Inherits TaskParent
         bestBricks.Clear()
         sortedBricks.Clear()
         For Each pt In bPoint.ptList
-            Dim index = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim brick = task.bricks.brickList(index)
             If brick.correlation > 0.9 And brick.depth < task.MaxZmeters Then sortedBricks.Add(bPoint.sobel.dst2(brick.rect).CountNonZero, brick.rect)
         Next
@@ -291,7 +291,7 @@ Public Class BrickPoint_PopulationSurvey : Inherits TaskParent
 
         ReDim results(task.brickSize - 1, task.brickSize - 1)
         For Each pt In bPoint.ptList
-            Dim index = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             Dim brick = task.bricks.brickList(index)
             results(brick.feature.X - brick.rect.X, brick.feature.Y - brick.rect.Y) += 1
         Next
@@ -423,8 +423,8 @@ Public Class BrickPoint_EndPoints : Inherits TaskParent
         dst1.SetTo(0)
         Dim lineList As New List(Of Single)
         For Each lp In lplist
-            Dim p1 = lpData.validatePoint(New cv.Point(CInt(lp.pX1.Y), CInt(lp.pX1.X)))
-            Dim p2 = lpData.validatePoint(New cv.Point(CInt(lp.pX2.Y), CInt(lp.pX2.X)))
+            Dim p1 = lpData.validatePoint(New cv.Point(CInt(lp.pE1.Y), CInt(lp.pE1.X)))
+            Dim p2 = lpData.validatePoint(New cv.Point(CInt(lp.pE2.Y), CInt(lp.pE2.X)))
             Dim index1 = dst1.Get(Of Single)(p1.Y, p1.X)
             Dim index2 = dst1.Get(Of Single)(p2.Y, p2.X)
             If index1 = 0 And index2 = 0 Then
@@ -442,7 +442,7 @@ Public Class BrickPoint_EndPoints : Inherits TaskParent
 
         For Each index In lineList
             Dim lp = lplist(index)
-            DrawLine(dst2, lp.pX1, lp.pX2)
+            DrawLine(dst2, lp.pE1, lp.pE2)
         Next
     End Sub
 End Class

@@ -1,16 +1,16 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Threading
 Public Class Grid_Basics : Inherits TaskParent
-    Public gridMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
     Public brickList As New List(Of brickData)
     Public gridNeighbors As New List(Of List(Of Integer))
     Public Sub New()
+        task.gridMap = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         task.gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         desc = "Create a grid of squares covering the entire image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.mouseClickFlag And Not task.firstPass Then
-            task.gridROIclicked = gridMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+            task.gridROIclicked = task.gridMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         End If
 
         Dim cellSize = task.gOptions.GridSlider.Value
@@ -49,7 +49,7 @@ Public Class Grid_Basics : Inherits TaskParent
 
             For i = 0 To task.gridRects.Count - 1
                 Dim roi = task.gridRects(i)
-                gridMap.Rectangle(roi, i, -1)
+                task.gridMap.Rectangle(roi, i, -1)
             Next
 
             For j = 0 To task.gridRects.Count - 1
@@ -62,7 +62,7 @@ Public Class Grid_Basics : Inherits TaskParent
                     Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
                                               roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
                     If x >= 0 And x < dst2.Width And y >= 0 And y < dst2.Height Then
-                        Dim nextIndex As Integer = gridMap.Get(Of Single)(y, x)
+                        Dim nextIndex As Integer = task.gridMap.Get(Of Single)(y, x)
                         If nextList.Contains(nextIndex) = False Then nextList.Add(nextIndex)
                     End If
                 Next
@@ -233,7 +233,7 @@ Public Class Grid_Neighbors : Inherits TaskParent
         SetTrueText("Click any grid entry to see its neighbors", 3)
         dst2.SetTo(white, task.gridMask)
 
-        Dim roiIndex As Integer = task.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim roiIndex As Integer = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
 
         dst3.SetTo(0)
         For Each index In task.grid.gridNeighbors(roiIndex)
@@ -298,7 +298,7 @@ Public Class Grid_TrackCenter : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If match.correlation < task.fCorrThreshold Or task.gOptions.DebugCheckBox.Checked Then
             task.gOptions.DebugCheckBox.Checked = False
-            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
+            Dim index As Integer = task.gridMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
             Dim roi = task.gridRects(index)
             match.template = src(roi).Clone
             center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)

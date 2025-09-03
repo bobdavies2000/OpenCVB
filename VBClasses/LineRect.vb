@@ -56,7 +56,7 @@ Public Class LineRect_CenterNeighbor : Inherits TaskParent
         Dim depthLines As Integer, colorLines As Integer
         For Each lp In task.lines.lpList
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(center.Y, center.X)
+            Dim index As Integer = task.gridMap.Get(Of Integer)(center.Y, center.X)
             Dim nabeList = task.grid.gridNeighbors(index)
             Dim foundObjectLine As Boolean = False
             For i = 1 To nabeList.Count - 1
@@ -111,7 +111,7 @@ Public Class LineRect_CenterRange : Inherits TaskParent
         Dim depthLines As Integer, colorLines As Integer
         For Each lp In task.lines.lpList
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(center.Y, center.X)
+            Dim index As Integer = task.gridMap.Get(Of Integer)(center.Y, center.X)
             Dim brick = task.bricks.brickList(index)
             If brick.mm.maxVal - brick.mm.minVal > depthThreshold Then
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)

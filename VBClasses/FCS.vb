@@ -189,7 +189,7 @@ Public Class FCS_CreateList : Inherits TaskParent
             fp.ptHistory.Add(fp.pt)
             fp.index = i
 
-            Dim brickIndex = task.grid.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
+            Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
             Dim brick = task.bricks.brickList(brickIndex)
             Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
             If fpIndex >= 0 Then
@@ -225,7 +225,7 @@ Public Class FCS_CreateList : Inherits TaskParent
         If task.features.Count <> facets.Length Then
             task.fpFromGridCell.Clear()
             For Each fp In task.fpList
-                Dim nextIndex = task.grid.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
+                Dim nextIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
                 task.fpFromGridCell.Add(nextIndex)
             Next
         End If
@@ -566,7 +566,7 @@ Public Class FCS_Motion : Inherits TaskParent
         yDist.Add(0)
         dst3.SetTo(0)
         For Each fp In task.fpList
-            Dim brickIndex = task.grid.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
+            Dim brickIndex = task.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
             Dim fpIndex = task.fpFromGridCellLast.IndexOf(brickIndex)
             If fpIndex >= 0 Then
                 linkedCount += 1

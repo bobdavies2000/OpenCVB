@@ -12,7 +12,7 @@ Public Class Brick_Basics : Inherits TaskParent
     Public Function setBrickD() As brickData
         Static pt As cv.Point2f = brickList(0).rect.TopLeft
         If task.mouseClickFlag Then pt = task.ClickPoint
-        Dim index = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
+        Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
         Return brickList(index)
     End Function
     Public Shared Function RealSenseAlign(brick As brickData) As brickData
@@ -166,7 +166,7 @@ Public Class Brick_Plot : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.bricks.dst2
 
-        Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If task.bricks.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
 
         Dim brick As brickData
@@ -456,7 +456,7 @@ Public Class Brick_CorrelationInput : Inherits TaskParent
         dst2 = LRMeanSub.dst2
         dst3 = LRMeanSub.dst3
 
-        Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         If index < 0 Or index > task.bricks.brickList.Count Then Exit Sub
         task.brickD = task.bricks.brickList(index)
 
@@ -485,7 +485,7 @@ Public Class Brick_Info : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         labels(2) = task.bricks.labels(2)
 
-        Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
         Dim brick As brickData = task.bricks.brickList(index)
         dst2 = src
@@ -555,12 +555,12 @@ Public Class Brick_LeftRightMouse : Inherits TaskParent
 
         Static myBricks As New List(Of Integer)
         If standalone And task.testAllRunning Then
-            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+            Dim index As Integer = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
             For i = index To index + 10
                 If myBricks.Contains(i) = False Then myBricks.Add(i)
             Next
         Else
-            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             If myBricks.Contains(index) = False Then myBricks.Add(index)
         End If
 
@@ -588,7 +588,7 @@ Public Class Brick_RGBtoLeft : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim camInfo = task.calibData, correlationMat As New cv.Mat
-        Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
         Dim brick As brickData
         If index > 0 And index < task.bricks.brickList.Count Then
             brick = task.bricks.brickList(index)
@@ -692,7 +692,7 @@ Public Class Brick_CorrelationMap : Inherits TaskParent
 
         Dim ptM = task.mouseMovePoint, w = task.workRes.Width, h = task.workRes.Height
         If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
-            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             task.brickD = task.bricks.brickList(index)
             task.depthAndDepthRange = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
                                            CStr(task.brickD.index) + vbCrLf + " range " + Format(task.brickD.mm.minVal, fmt1) + "-" +
@@ -924,7 +924,7 @@ Public Class Brick_Features : Inherits TaskParent
         featureBricks.Clear()
         Dim featList As New List(Of cv.Point)(task.feat.features)
         For Each pt In featList
-            Dim index As Integer = task.grid.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
             featureBricks.Add(task.gridRects(index))
         Next
 
