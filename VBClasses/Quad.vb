@@ -344,7 +344,7 @@ End Class
 
 Public Class Quad_Boundaries : Inherits TaskParent
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         labels(2) = "Depth differences large enough to label them boundaries"
         desc = "Find large differences in depth between cells that could provide boundaries."
     End Sub

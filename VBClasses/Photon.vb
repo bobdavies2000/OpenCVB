@@ -120,7 +120,7 @@ Public Class Photon_Distance3D : Inherits TaskParent
     Dim hist As New Hist_Basics
     Dim distances As New List(Of Single)
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         hist.plotHist.removeZeroEntry = False
         task.gOptions.setHistogramBins(10)
         task.gOptions.UseMotionMask.Checked = False

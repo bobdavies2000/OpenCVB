@@ -77,7 +77,7 @@ End Class
 Public Class BackProject_FeatureLess : Inherits TaskParent
     Dim bProject As New BackProject_Basics
     Public Sub New()
-        task.needContours = True
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         labels(3) = "Move mouse over the histogram to backproject a column"
         desc = "Create a histogram of the featureless regions"
     End Sub

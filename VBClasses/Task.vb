@@ -29,10 +29,6 @@ Public Class VBtask : Implements IDisposable
     Public bricks As Brick_Basics
     Public contours As Contour_Basics_List
 
-    Public needBricks As Boolean
-    Public needFeatures As Boolean
-    Public needContours As Boolean
-
     Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
 
     Public fpList As New List(Of fpData)
@@ -471,9 +467,7 @@ Public Class VBtask : Implements IDisposable
         grid = New Grid_Basics
         lines = New Line_Basics
         edges = New EdgeLine_Basics
-        contours = New Contour_Basics_List
         rgbFilter = New Filter_Basics
-        feat = New Feature_Basics
 
         ' all the algorithms in the list are task algorithms that are children of the algname.
         For i = 1 To callTrace.Count - 1
@@ -680,13 +674,10 @@ Public Class VBtask : Implements IDisposable
 
         edges.Run(task.grayStable)
         colorizer.Run(src)
-        If needContours Then contours.Run(src.Clone)
 
-        If needFeatures Then task.feat.Run(src.Clone)
-        If needBricks Then
-            If bricks Is Nothing Then bricks = New Brick_Basics
-            bricks.Run(src.Clone)
-        End If
+        If contours IsNot Nothing Then contours.Run(src)
+        If task.feat IsNot Nothing Then task.feat.Run(src)
+        If task.bricks IsNot Nothing Then bricks.Run(src)
 
         If pixelViewerOn And PixelViewer Is Nothing Then
             PixelViewer = New Pixel_Viewer

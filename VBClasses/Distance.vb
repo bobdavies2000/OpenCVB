@@ -500,7 +500,7 @@ End Class
 Public Class Distance_DepthBricks : Inherits TaskParent
     Dim dist As New Distance_Depth
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         task.gOptions.DebugSlider.Value = 20
         desc = "Threshold the maxDist in each brick to highlight centers for key objects.  Use the 'DebugSlider' to provide the value."
     End Sub
@@ -529,7 +529,7 @@ End Class
 Public Class Distance_Contour : Inherits TaskParent
     Dim options As New Options_Distance
     Public Sub New()
-        task.needContours = True
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         If standalone Then task.gOptions.displayDst0.Checked = True
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

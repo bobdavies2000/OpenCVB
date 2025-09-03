@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class LineDepth_Basics : Inherits TaskParent
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the longest line in BGR and use it to measure the average depth for the line"
     End Sub

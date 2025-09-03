@@ -165,7 +165,7 @@ End Class
 Public Class RedCloud_Contours : Inherits TaskParent
     Dim prep As New RedPrep_Depth
     Public Sub New()
-        task.needContours = True
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub

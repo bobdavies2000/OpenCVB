@@ -4,7 +4,7 @@ Public Class BrickPoint_Basics : Inherits TaskParent
     Public features As New List(Of cv.Point2f)
     Public ptList As New List(Of cv.Point)
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         labels(3) = "Sobel input to BrickPoint_Basics"
         desc = "Find the max Sobel point in each brick"
     End Sub
@@ -136,7 +136,7 @@ End Class
 Public Class BrickPoint_DistanceAbove : Inherits TaskParent
     Dim plotHist As New Plot_Histogram
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         plotHist.createHistogram = True
         plotHist.removeZeroEntry = False
         desc = "Show grid points based on their distance to the grid point above."
@@ -312,7 +312,7 @@ End Class
 Public Class BrickPoint_ContourCompare : Inherits TaskParent
     Dim gpLess As New BrickPoint_FeatureLess
     Public Sub New()
-        task.needContours = True
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         desc = "Compare Contour_Basics to BrickPoint_FeatureLess"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -333,7 +333,7 @@ End Class
 Public Class BrickPoint_FeatureLess : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
-        task.needContours = True
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)  ' mask for the featureless regions.
         desc = "Identify each brick as part of a contour or not."
     End Sub

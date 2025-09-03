@@ -99,7 +99,7 @@ Public Class FCS_BasicsOld : Inherits TaskParent
     Dim fcs As New FCS_Core
     Public desiredMapCount As Integer = 5
     Public Sub New()
-        task.needContours = True
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         desc = "Create the reference map for FCS. "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -165,7 +165,7 @@ Public Class FCS_CreateList : Inherits TaskParent
     Dim subdiv As New cv.Subdiv2D
     Dim feat As New Feature_General
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.fpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
         labels(3) = "CV_8U map of Delaunay cells."
@@ -660,7 +660,7 @@ End Class
 
 Public Class FCS_Info : Inherits TaskParent
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         desc = "Display the contents of the Feature Coordinate System (FCS) cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

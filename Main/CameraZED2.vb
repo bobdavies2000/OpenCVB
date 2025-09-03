@@ -47,7 +47,7 @@ Public Class CameraZed2 : Inherits GenericCamera
             camImages.pointCloud = zed.pointCloud
         End If
 
-        If cameraFrameCount Mod 10 Then GC.Collect()
+        If cameraFrameCount Mod 10 = 0 Then GC.Collect()
 
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub

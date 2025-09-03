@@ -169,7 +169,7 @@ End Class
 Public Class Gravity_BrickRotate : Inherits TaskParent
     Dim survey As New BrickPoint_PopulationSurvey
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         desc = "Rotate the grid point using the offset from gravity."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

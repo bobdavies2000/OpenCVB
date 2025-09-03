@@ -10,7 +10,7 @@ Public Class KNN_Basics : Inherits TaskParent
     Public result(,) As Integer ' Get results here...
     Public desiredMatches As Integer = -1 ' -1 indicates it is to use the number of queries.
     Public Sub New()
-        If standalone Then task.needBricks = True
+        If standalone Then If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         desc = "Default unnormalized KNN with dimension 2"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

@@ -1581,7 +1581,7 @@ End Class
 'https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_Examples.html
 Public Class XO_OpenGL_QuadDepth : Inherits TaskParent
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         OptionParent.FindSlider("OpenCVB OpenGL buffer count").Value = 1
         task.ogl.oglFunction = Comm.oCase.quadBasics
         desc = "Create a simple plane in each of bricks."
@@ -1745,7 +1745,7 @@ End Class
 Public Class XO_OpenGL_QuadConnected : Inherits TaskParent
     Dim connect As New Region_Core
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         task.ogl.oglFunction = Comm.oCase.quadBasics
         desc = "Build connected bricks and remove cells that are not connected."
     End Sub
@@ -2860,7 +2860,7 @@ End Class
 Public Class XO_Brick_GrayScaleTest : Inherits TaskParent
     Dim options As New Options_Stdev
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         labels(3) = "bricks where grayscale stdev and average of the 3 color stdev's"
         desc = "Is the average of the color stdev's the same as the stdev of the grayscale?"
     End Sub
@@ -4093,7 +4093,7 @@ End Class
 
 Public Class XO_Quad_Basics : Inherits TaskParent
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         desc = "Create a quad representation of the redCloud data"
     End Sub
@@ -4721,7 +4721,7 @@ Public Class XO_Region_RectsH : Inherits TaskParent
     Public hRects As New List(Of cv.Rect)
     Dim connect As New Region_Core
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Connect bricks with similar depth - horizontally scanning."
     End Sub
@@ -4760,7 +4760,7 @@ Public Class XO_Region_RectsV : Inherits TaskParent
     Public vRects As New List(Of cv.Rect)
     Dim connect As New Region_Core
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Connect bricks with similar depth - vertically scanning."
     End Sub
@@ -4839,7 +4839,7 @@ End Class
 Public Class XO_Region_Gaps : Inherits TaskParent
     Dim connect As New Region_Core
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         labels(2) = "bricks with single cells removed for both vertical and horizontal connected cells."
         labels(3) = "Vertical cells with single cells removed."
         desc = "Use the horizontal/vertical connected cells to find gaps in depth and the like featureless regions."
@@ -4892,7 +4892,7 @@ End Class
 Public Class XO_FCSLine_Basics : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Build a feature coordinate system (FCS) based on lines, not features."
     End Sub
@@ -6039,7 +6039,7 @@ End Class
 Public Class XO_LineRect_CenterDepth : Inherits TaskParent
     Public options As New Options_LineRect
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         desc = "Remove lines which have similar depth in bricks on either side of a line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -6943,7 +6943,7 @@ End Class
 
 Public Class XO_Brick_FitLeftInColor : Inherits TaskParent
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         task.drawRect = New cv.Rect(10, 10, 50, 50)
         labels(3) = "Draw a rectangle to update."
         desc = "Translate the left image into the same coordinates as the color image."
@@ -7709,7 +7709,7 @@ End Class
 Public Class XO_TrackLine_Map : Inherits TaskParent
     Dim lTrack As New XO_TrackLine_Basics
     Public Sub New()
-        task.needBricks = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         task.gOptions.CrossHairs.Checked = False
         desc = "Show the gridMap and fpMap (features points) "
     End Sub

@@ -7,7 +7,7 @@ Public Class RedColor_Basics : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat ' redColor map
     Public Sub New()
-        task.needContours = True
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
