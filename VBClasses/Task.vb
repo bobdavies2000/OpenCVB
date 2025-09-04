@@ -564,6 +564,9 @@ Public Class VBtask : Implements IDisposable
 
         ' If the workRes changes, the previous generation of images needs to be reset.
         If pointCloud.Size <> New cv.Size(cols, rows) Or task.color.Size <> task.workRes Then
+            task.motionMask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 255)
+            task.leftView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+            task.rightView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
             pointCloud = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, cv.Scalar.All(0))
             noDepthMask = New cv.Mat(rows, cols, cv.MatType.CV_8U, cv.Scalar.All(0))
             depthMask = New cv.Mat(rows, cols, cv.MatType.CV_8U, cv.Scalar.All(0))

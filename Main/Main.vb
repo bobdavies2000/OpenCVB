@@ -185,11 +185,11 @@ Namespace OpenCVB
 
             AvailableAlgorithms.ComboBox.Select()
 
+            If settings.cameraFound Then initCamera()
+
             fpsTimer.Enabled = True
             XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
             XYLoc.Visible = True
-
-            If settings.cameraFound Then initCamera()
 
             Debug.WriteLine("")
             Debug.WriteLine("Main_Load complete.")

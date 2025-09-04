@@ -39,7 +39,7 @@ Public Class CameraZed2 : Inherits GenericCamera
             camImages.pointCloud = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
         Else
             camImages.color = zed.color
-            camImages.left = camImages.color
+            camImages.left = zed.leftView
             camImages.right = zed.rightView
             camImages.pointCloud = zed.pointCloud
         End If

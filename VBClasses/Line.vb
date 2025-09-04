@@ -1158,8 +1158,6 @@ Public Class Line_Vertical : Inherits TaskParent
         knn.Run(dst2)
         labels(3) = "There are " + CStr(knn.result.GetUpperBound(0)) + " input points to KNN."
 
-        Dim topGroups(task.bricksPerRow - 1) As List(Of Integer)
-
         Dim lpList As New List(Of lpData)
         For i = 0 To knn.result.GetUpperBound(0) - 1
             Dim deltaX As New List(Of Single)
@@ -1167,7 +1165,8 @@ Public Class Line_Vertical : Inherits TaskParent
             Dim p1 = vbPoints.ptList(knn.result(i, 0))
             For j = 1 To Math.Min(knn.result.Length - 1, 6) - 1
                 Dim p2 = vbPoints.ptList(knn.result(i, j))
-                deltaX.Add(Math.Abs(p1.X - p2.X))
+                Dim delta = Math.Abs(p1.X - p2.X)
+                deltaX.Add(delta)
                 ptList.Add(p2)
             Next
 
@@ -1175,40 +1174,45 @@ Public Class Line_Vertical : Inherits TaskParent
             Dim index = deltaX.IndexOf(minVal)
             If minVal < task.brickSize Then
                 Dim lp = New lpData(p1, ptList(index))
+                If lp.indexVTop < 0 Or lp.indexVBot < 0 Then Continue For
                 lp.index = lpList.Count
                 lpList.Add(lp)
                 dst2.Line(p1, ptList(index), task.highlight, task.lineWidth, task.lineType)
             End If
         Next
 
+        Dim topGroups(task.bricksPerRow - 1) As List(Of Integer)
         For Each lp In lpList
-            Dim index = task.gridMap.Get(Of Integer)(lp.pE1.Y, lp.pE1.X)
-            If lp.pE1.Y > 0 Then
-                If lp.pE2.Y > 0 Then Continue For ' line is not vertical
-                index = task.gridMap.Get(Of Integer)(lp.pE2.Y, lp.pE2.X)
-            End If
-
-            If topGroups(index) Is Nothing Then topGroups(index) = New List(Of Integer)
-            topGroups(index).Add(lp.index)
+            If topGroups(lp.indexVTop) Is Nothing Then topGroups(lp.indexVTop) = New List(Of Integer)
+            topGroups(lp.indexVTop).Add(lp.index)
         Next
 
-        Dim topIndex = Math.Abs(task.gOptions.DebugSlider.Value)
+        Dim indexVTop = Math.Abs(task.gOptions.DebugSlider.Value)
         dst3.SetTo(0)
-        If topIndex < topGroups.Count Then
-            If topGroups(topIndex) IsNot Nothing Then
-                For Each index In topGroups(topIndex)
+        If indexVTop < topGroups.Count Then
+            If topGroups(indexVTop) IsNot Nothing Then
+                Dim botGroups(task.bricksPerRow - 1) As List(Of Integer)
+                For Each index In topGroups(indexVTop)
+                    Dim lp = lpList(index)
+                    If botGroups(lp.indexVBot) Is Nothing Then botGroups(lp.indexVBot) = New List(Of Integer)
+                    botGroups(lp.indexVBot).Add(lp.index)
+                Next
+
+                Dim maxIndex As Integer
+                Dim maxCount As Integer
+                For i = 0 To botGroups.Count - 1
+                    If botGroups(i) Is Nothing Then Continue For
+                    If maxCount < botGroups(i).Count Then
+                        maxCount = botGroups.Count
+                        maxIndex = i
+                    End If
+                Next
+                For Each index In botGroups(maxIndex)
                     Dim lp = lpList(index)
                     DrawLine(dst3, lp)
                 Next
             End If
         End If
-
-        'For i = 0 To topGroups.Count - 1
-        '    For Each index In topGroups(topIndex)
-        '        Dim lp = lpList(index)
-        '        DrawLine(dst3, lp)
-        '    Next
-        'Next
 
         labels(2) = "There were " + CStr(lpList.Count) + " neighbors that formed good lines."
     End Sub

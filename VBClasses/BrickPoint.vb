@@ -521,3 +521,30 @@ Public Class BrickPoint_Horizontal : Inherits TaskParent
         labels(2) = bpCore.labels(2)
     End Sub
 End Class
+
+
+
+
+
+Public Class BrickPoint_Blocks : Inherits TaskParent
+    Public threshold As Single
+    Public Sub New()
+        desc = "Use the bricks to portray the brickpoints"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            Static sobel As New Edge_Sobel
+            sobel.Run(src)
+            src = sobel.dst2
+            Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
+            threshold = thresholdSlider.value
+        End If
+
+        dst2 = task.color.Clone
+        For Each rect In task.gridRects
+            Dim mm = GetMinMax(src(rect))
+            Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
+            If mm.maxVal >= threshold Then DrawRect(dst2, rect)
+        Next
+    End Sub
+End Class

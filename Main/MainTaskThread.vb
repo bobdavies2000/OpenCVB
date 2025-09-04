@@ -165,9 +165,6 @@ Namespace OpenCVB
                 Dim saveworkRes = settings.workRes
                 mousePointCamPic = New cv.Point(task.workRes.Width / 2, task.workRes.Height / 2) ' mouse click point default = center of the image
 
-                task.motionMask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 255)
-                task.leftView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
-                task.rightView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
                 While 1
                     Dim waitTime = Now
                     While 1

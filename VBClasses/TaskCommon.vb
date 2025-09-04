@@ -603,6 +603,10 @@ Public Class lpData
     Public gridIndex2 As Integer
     Public nabeIndex1 As Integer
     Public nabeIndex2 As Integer
+    Public indexVTop As Integer = -1
+    Public indexVBot As Integer = -1
+    Public indexHLeft As Integer = -1
+    Public indexHRight As Integer = -1
     Public index As Integer
     Public Function perpendicularPoints(pt As cv.Point2f) As lpData
         Dim perpSlope = -1 / slope
@@ -717,6 +721,20 @@ Public Class lpData
             pE2 = New cv.Point2f(p1.X, task.workRes.Height - 1)
         End If
         ptCenter = New cv.Point2f((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2)
+
+        Dim bpRow = task.bricksPerRow - 1
+        Dim bpCol = task.bricksPerCol - 1
+        If pE1.Y = 0 Then indexVTop = pE1.X / task.workRes.Width * bpRow
+        If pE1.Y = task.workRes.Height - 1 Then indexVBot = pE1.X / task.workRes.Width * bpRow
+
+        If pE2.Y = 0 Then indexVTop = pE2.X / task.workRes.Width * bpRow
+        If pE2.Y = task.workRes.Height - 1 Then indexVBot = pE2.X / task.workRes.Width * bpRow
+
+        If pE1.X = 0 Then indexHLeft = pE1.Y / task.workRes.Height * bpCol
+        If pE1.X = task.workRes.Width - 1 Then indexHRight = pE1.Y / task.workRes.Height * bpCol
+
+        If pE2.X = 0 Then indexHLeft = pE2.Y / task.workRes.Height * bpCol
+        If pE2.X = task.workRes.Width - 1 Then indexHRight = pE2.Y / task.workRes.Height * bpCol
 
         CalculateRotatedRectFromLine()
 
