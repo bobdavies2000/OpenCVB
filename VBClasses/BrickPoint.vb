@@ -33,6 +33,11 @@ Public Class BrickPoint_Core : Inherits TaskParent
         desc = "Identify the highest intensity point in each brick given the input image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            Static sobel As New Edge_Sobel
+            sobel.Run(src)
+            src = sobel.dst2
+        End If
         Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
         Dim threshold = thresholdSlider.value
 

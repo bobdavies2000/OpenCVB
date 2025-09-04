@@ -265,8 +265,8 @@ Public Class RedColor_FPS : Inherits TaskParent
             dst0 = task.color.Clone
             dst1 = task.depthRGB.Clone
             dst2 = task.redC.dst2.Clone
+            labels(2) = task.redC.labels(2) + " " + fps.strOut
         End If
-        labels(2) = task.redC.labels(2) + " " + fps.strOut
     End Sub
 End Class
 

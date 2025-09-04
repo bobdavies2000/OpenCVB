@@ -317,7 +317,7 @@ Public Class Hist3Dcolor_Vector : Inherits TaskParent
         options.Run()
 
         If src.Channels() <> 3 Then src = task.color
-        If task.optionsChanged Then
+        If task.optionsChanged Or binArray Is Nothing Then
             binArray = {options.histogram3DBins, options.histogram3DBins, options.histogram3DBins}
         End If
 

@@ -1202,6 +1202,14 @@ Public Class Line_Vertical : Inherits TaskParent
                 Next
             End If
         End If
+
+        'For i = 0 To topGroups.Count - 1
+        '    For Each index In topGroups(topIndex)
+        '        Dim lp = lpList(index)
+        '        DrawLine(dst3, lp)
+        '    Next
+        'Next
+
         labels(2) = "There were " + CStr(lpList.Count) + " neighbors that formed good lines."
     End Sub
 End Class

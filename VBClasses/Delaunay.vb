@@ -405,7 +405,11 @@ Public Class Delaunay_Contours : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then bPoint.Run(src)
         subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
-        subdiv.Insert(bPoint.ptList)
+        Dim ptlist2f As New List(Of cv.Point2f)
+        For Each pt In bPoint.ptList
+            ptlist2f.Add(New cv.Point2f(pt.X, pt.Y))
+        Next
+        subdiv.Insert(ptlist2f)
 
         Dim facets = New cv.Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
