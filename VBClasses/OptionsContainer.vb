@@ -11,13 +11,16 @@ Public Class OptionsContainer
         Me.Height = GetSetting("Opencv", "gOptionsHeight", "gOptionsHeight", task.mainFormLocation.Height)
     End Sub
     Public Sub addTitle(frm As Object)
-        If optionsTitle.Contains(frm.Text) = False Then 
+        If optionsTitle.Contains(frm.Text) = False Then
             optionsTitle.Add(frm.Text)
         Else
             hiddenOptions.Add(frm.Text)
         End If
-        frm.show
-        titlesAdded = True
+        Try
+            frm.show
+            titlesAdded = True
+        Catch ex As Exception
+        End Try
     End Sub
     Public Sub layoutOptions(normalRequest As Boolean)
         Dim w = GetSetting("Opencv", "gOptionsWidth", "gOptionsWidth", task.mainFormLocation.Width)

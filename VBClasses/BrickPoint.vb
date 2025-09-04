@@ -17,6 +17,10 @@ Public Class BrickPoint_Basics : Inherits TaskParent
         bpCore.Run(dst3)
         dst2 = bpCore.dst2
         ptList = New List(Of cv.Point)(bpCore.ptList)
+
+        For Each pt In ptList
+            DrawCircle(dst3, pt, 255)
+        Next
         labels(2) = bpCore.labels(2)
     End Sub
 End Class
@@ -28,6 +32,7 @@ End Class
 
 Public Class BrickPoint_Core : Inherits TaskParent
     Public ptList As New List(Of cv.Point)
+    Public threshold As Single = 150
     Public Sub New()
         If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         desc = "Identify the highest intensity point in each brick given the input image."
@@ -37,21 +42,32 @@ Public Class BrickPoint_Core : Inherits TaskParent
             Static sobel As New Edge_Sobel
             sobel.Run(src)
             src = sobel.dst2
+            'Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
+            threshold = 255 ' thresholdSlider.value
         End If
-        Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
-        Dim threshold = thresholdSlider.value
 
-        ptList.Clear()
+        'Dim noMotionList As New List(Of cv.Point)
+        'For Each pt In ptList
+        '    If task.motionMask.Get(Of Byte)(pt.Y, pt.X) = 0 Then noMotionList.Add(pt)
+        'Next
+
         dst2 = task.color.Clone
+        ptList.Clear()
         For Each brick In task.bricks.brickList
             Dim mm = GetMinMax(src(brick.rect))
             brick.pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
             brick.feature = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
             brick.intensity = mm.maxVal
+            'If task.motionMask.Get(Of Byte)(brick.pt.Y, brick.pt.X) Then
             If brick.intensity >= threshold Then
-                ptList.Add(brick.feature)
-            End If
+                    ptList.Add(brick.feature)
+                End If
+            'End If
         Next
+
+        'For Each pt In noMotionList
+        '    ptList.Add(pt)
+        'Next
 
         For Each pt In ptList
             DrawCircle(dst2, pt)
