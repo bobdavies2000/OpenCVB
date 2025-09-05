@@ -235,13 +235,13 @@ Public Class Line3D_ReconstructLines : Inherits TaskParent
             Dim newLine3D As New List(Of cv.Vec3f)
             For i = 0 To veclist.Count - 1
                 Dim pt = findLine3D.ptList(i)
-                If task.toggleOn Then
-                    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X))
-                Else
-                    Dim vec = getWorldCoordinates(pt, depthInit + incr * i)
-                    newLine3D.Add(vec)
-                    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
-                End If
+                'If task.toggleOn Then
+                '    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X))
+                'Else
+                Dim vec = getWorldCoordinates(pt, depthInit + incr * i)
+                newLine3D.Add(vec)
+                pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
+                'End If
             Next
             lines3DList.Add(newLine3D)
             totalPixels += newLine3D.Count

@@ -221,8 +221,6 @@ Public Class sgl
                 For Each lp In task.lines.lpList
                     gl.Vertex(lp.pVec1(0), lp.pVec1(1), lp.pVec1(2))
                     gl.Vertex(lp.pVec2(0), lp.pVec2(1), lp.pVec2(2))
-                    'gl.Vertex(lp.pVec2(0), lp.pVec2(1), lp.pVec2(2) * factor + options.zNear)                    gl.Vertex(lp.pVec1(0), lp.pVec1(1), lp.pVec1(2) * factor + options.zNear)
-                    'gl.Vertex(lp.pVec2(0), lp.pVec2(1), lp.pVec2(2) * factor + options.zNear)
                 Next
                 gl.End()
                 label = task.lines.labels(2)
@@ -266,6 +264,33 @@ Public Class sgl
         Dim split = If(pointcloud Is Nothing, task.pointCloud.Split(), pointcloud.Split())
         If pointcloud Is Nothing Then pointcloud = New cv.Mat
         cv.Cv2.Merge({split(0), split(1), -split(2)}, pointcloud)
+        gl.MatrixMode(OpenGL.GL_PROJECTION)
+        gl.LoadIdentity()
+        gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, options.zNear, options.zFar)
+
+        gl.MatrixMode(OpenGL.GL_MODELVIEW)
+        gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
+        gl.LoadIdentity()
+        gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
+
+        gl.Translate(panX, panY, zoomZ)
+        gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
+        gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
+        gl.PointSize(1.0F)
+
+        Return runFunction(func, pointcloud, RGB)
+    End Function
+    Public Function RunSharpLinearFlipY(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
+        options.Run()
+
+        If task.gOptions.DebugCheckBox.Checked Then
+            task.gOptions.DebugCheckBox.Checked = False
+            task.sharpGL.resetView()
+        End If
+
+        Dim split = If(pointcloud Is Nothing, task.pointCloud.Split(), pointcloud.Split())
+        If pointcloud Is Nothing Then pointcloud = New cv.Mat
+        cv.Cv2.Merge({split(0), -split(1), -split(2)}, pointcloud)
         gl.MatrixMode(OpenGL.GL_PROJECTION)
         gl.LoadIdentity()
         gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, options.zNear, options.zFar)

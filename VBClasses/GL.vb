@@ -338,7 +338,7 @@ Public Class GL_Line3D : Inherits TaskParent
 
         dst1.SetTo(white)
 
-        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.pcLines, line3D.pointcloud, dst1)
+        strOut = task.sharpGL.RunSharpLinear(Comm.oCase.pcLines, line3D.pointcloud, dst1)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -358,7 +358,7 @@ Public Class GL_Line3Dall : Inherits TaskParent
 
         dst1.SetTo(white)
 
-        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.pcLines, line3D.pointcloud, dst1)
+        strOut = task.sharpGL.RunSharpLinear(Comm.oCase.pcLines, line3D.pointcloud, dst1)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -396,7 +396,8 @@ Public Class GL_Draw3DLinesAndCloud : Inherits TaskParent
         dst0 = src
         dst0.SetTo(0, Not dst2)
 
-        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.draw3DLinesAndCloud, dst0)
+        dst1.SetTo(red)
+        strOut = task.sharpGL.RunSharpLinearFlipY(Comm.oCase.draw3DLinesAndCloud, dst0, task.lines.dst2)
         SetTrueText(strOut, 3)
 
         dst2 = task.lines.dst2
