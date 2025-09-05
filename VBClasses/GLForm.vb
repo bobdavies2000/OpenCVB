@@ -1,4 +1,5 @@
-﻿Imports OpenCvSharp
+﻿Imports System.Windows.Forms.Design.AxImporter
+Imports OpenCvSharp
 Imports SharpGL
 Imports cv = OpenCvSharp
 Public Class sgl
@@ -94,29 +95,7 @@ Public Class sgl
         mm.range = mm.maxVal - mm.minVal
         Return mm
     End Function
-    Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
-        options.Run()
-
-        If task.gOptions.DebugCheckBox.Checked Then
-            task.gOptions.DebugCheckBox.Checked = False
-            task.sharpGL.resetView()
-        End If
-
-        gl.MatrixMode(OpenGL.GL_PROJECTION)
-        gl.LoadIdentity()
-        gl.Perspective(options.perspective, GLControl.Width / GLControl.Height,
-                       options.zNear, options.zFar)
-
-        gl.MatrixMode(OpenGL.GL_MODELVIEW)
-
-        gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
-        gl.LoadIdentity()
-
-        gl.Translate(panX, panY, zoomZ)
-        gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
-        gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
-        gl.PointSize(1.0F)
-
+    Private Function runFunction(func As Integer, pointCloud As cv.Mat, RGB As cv.Mat) As String
         Dim label = ""
         Select Case func
             Case Comm.oCase.drawPointCloudRGB
@@ -140,9 +119,9 @@ Public Class sgl
                 gl.Begin(OpenGL.GL_POINTS)
                 Dim count As Integer, all255 As Boolean
                 If RGB Is Nothing Then all255 = True
-                For y = 0 To pointcloud.Height - 1
-                    For x = 0 To pointcloud.Width - 1
-                        Dim vec = pointcloud.Get(Of cv.Vec3f)(y, x)
+                For y = 0 To pointCloud.Height - 1
+                    For x = 0 To pointCloud.Width - 1
+                        Dim vec = pointCloud.Get(Of cv.Vec3f)(y, x)
                         If vec(2) <> 0 Then
                             If all255 Then
                                 gl.Color(1.0, 1.0, 1.0)
@@ -224,9 +203,9 @@ Public Class sgl
 
             Case Comm.oCase.draw3DLinesAndCloud
                 gl.Begin(OpenGL.GL_POINTS)
-                For y = 0 To pointcloud.Height - 1
-                    For x = 0 To pointcloud.Width - 1
-                        Dim vec = pointcloud.Get(Of cv.Vec3f)(y, x)
+                For y = 0 To pointCloud.Height - 1
+                    For x = 0 To pointCloud.Width - 1
+                        Dim vec = pointCloud.Get(Of cv.Vec3f)(y, x)
                         If vec(2) <> 0 Then
                             gl.Color(1.0, 1.0, 1.0)
                             gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
@@ -247,11 +226,60 @@ Public Class sgl
                 Next
                 gl.End()
                 label = task.lines.labels(2)
-
-
         End Select
 
         gl.Flush()
         Return label
+    End Function
+    Public Function RunSharpNonLinear(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
+        options.Run()
+
+        If task.gOptions.DebugCheckBox.Checked Then
+            task.gOptions.DebugCheckBox.Checked = False
+            task.sharpGL.resetView()
+        End If
+
+        gl.MatrixMode(OpenGL.GL_PROJECTION)
+        gl.LoadIdentity()
+        gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
+
+        gl.MatrixMode(OpenGL.GL_MODELVIEW)
+
+        gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
+        gl.LoadIdentity()
+
+        gl.Translate(panX, panY, zoomZ)
+        gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
+        gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
+        gl.PointSize(1.0F)
+
+        Return runFunction(func, pointcloud, RGB)
+    End Function
+    Public Function RunSharpLinear(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
+        options.Run()
+
+        If task.gOptions.DebugCheckBox.Checked Then
+            task.gOptions.DebugCheckBox.Checked = False
+            task.sharpGL.resetView()
+        End If
+
+        Dim split = If(pointcloud Is Nothing, task.pointCloud.Split(), pointcloud.Split())
+        If pointcloud Is Nothing Then pointcloud = New cv.Mat
+        cv.Cv2.Merge({split(0), split(1), -split(2)}, pointcloud)
+        gl.MatrixMode(OpenGL.GL_PROJECTION)
+        gl.LoadIdentity()
+        gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, options.zNear, options.zFar)
+
+        gl.MatrixMode(OpenGL.GL_MODELVIEW)
+        gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
+        gl.LoadIdentity()
+        gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
+
+        gl.Translate(panX, panY, zoomZ)
+        gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
+        gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
+        gl.PointSize(1.0F)
+
+        Return runFunction(func, pointcloud, RGB)
     End Function
 End Class

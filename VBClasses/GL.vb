@@ -4,7 +4,7 @@ Public Class GL_Basics : Inherits TaskParent
         desc = "Display the pointcloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.drawPointCloudRGB)
+        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.drawPointCloudRGB)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -40,7 +40,7 @@ Public Class GL_LinesNoMotionInput : Inherits TaskParent
         dst0 = src
         dst0.SetTo(0, Not dst2)
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, dst0)
+        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.pcLines, dst0)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -55,7 +55,7 @@ Public Class GL_Bricks : Inherits TaskParent
         desc = "Display the bricks in SharpGL"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.quadBasics)
+        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.quadBasics)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -79,7 +79,7 @@ Public Class GL_StructuredLines : Inherits TaskParent
         dst0.SetTo(0, Not dst2)
         dst1.SetTo(white)
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, dst0, dst1)
+        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.pcLines, dst0, dst1)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -121,7 +121,7 @@ Public Class GL_Lines : Inherits TaskParent
         labels(3) = CStr(count) + " pixels from the point cloud were moved to the GL input. "
 
         dst1.SetTo(white)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, dst3, dst1)
+        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.pcLines, dst3, dst1)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -161,7 +161,7 @@ Public Class GL_LinesReconstructed : Inherits TaskParent
         labels(3) = CStr(count) + " pixels from the point cloud were moved to the GL input. "
 
         dst1.SetTo(white)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, dst3, dst1)
+        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.pcLines, dst3, dst1)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -183,7 +183,7 @@ Public Class GL_Line3D : Inherits TaskParent
 
         dst1.SetTo(white)
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, line3D.pointcloud, dst1)
+        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.pcLines, line3D.pointcloud, dst1)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -203,7 +203,7 @@ Public Class GL_Line3Dall : Inherits TaskParent
 
         dst1.SetTo(white)
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, line3D.pointcloud, dst1)
+        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.pcLines, line3D.pointcloud, dst1)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -218,7 +218,7 @@ Public Class GL_Draw3DLines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.lines.dst2
-        strOut = task.sharpGL.RunSharp(Comm.oCase.draw3DLines)
+        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.draw3DLines)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -240,7 +240,7 @@ Public Class GL_Draw3DLinesAndCloud : Inherits TaskParent
         dst0 = src
         dst0.SetTo(0, Not dst2)
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.draw3DLinesAndCloud, dst0)
+        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.draw3DLinesAndCloud, dst0)
         SetTrueText(strOut, 3)
 
         dst2 = task.lines.dst2
@@ -250,13 +250,15 @@ End Class
 
 
 
-Public Class GL_ReadPointCloud : Inherits TaskParent
+Public Class GL_ReadPCDisplay : Inherits TaskParent
     Public Sub New()
-        desc = "Read the point cloud from a rendered geometry"
+        desc = "Display the pointcloud read back from SharpGL and display it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readPointCloud)
-        SetTrueText(strOut, 2)
+        If standalone Then
+            strOut = task.sharpGL.RunSharpLinear(Comm.oCase.readPointCloud)
+            SetTrueText(strOut, 2)
+        End If
 
         dst1 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
         dst2 = dst1.InRange(0.1, 20)
@@ -268,22 +270,116 @@ End Class
 
 
 
-Public Class GL_ReadPointCloudHist : Inherits TaskParent
-    Dim plotHist As New Plot_Histogram
+
+Public Class GL_ReadPC : Inherits TaskParent
+    Dim displayPC As New GL_ReadPCDisplay
     Public Sub New()
-        plotHist.minRange = 0.1
-        plotHist.createHistogram = True
-        plotHist.removeZeroEntry = True
-        task.gOptions.MaxDepthBar.Value = 10
-        task.gOptions.HistBinBar.Value = 10
+        desc = "Read the point cloud from a rendered geometry"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.readPointCloud)
+        SetTrueText(strOut, 2)
+
+        displayPC.Run(emptyMat)
+        dst2 = displayPC.dst2
+    End Sub
+End Class
+
+
+
+
+Public Class GL_ReadPCHist : Inherits TaskParent
+    Dim plotHist As New GL_PlotHist
+    Dim displayPC As New GL_ReadPCDisplay
+    Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         desc = "Read the point cloud from a rendered geometry"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readPointCloud)
+        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.readPointCloud)
         labels(2) = strOut
 
-        dst1 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
+        plotHist.Run(task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest))
+        dst3 = plotHist.dst3
+        labels(2) = plotHist.labels(2)
+
+        displayPC.Run(emptyMat)
+        dst2 = displayPC.dst2
+    End Sub
+End Class
+
+
+
+
+
+Public Class GL_RunSharpLinear : Inherits TaskParent
+    Dim displayPC As New GL_ReadPCDisplay
+    Public Sub New()
+        desc = "Create a SharpGL view that uses the point cloud coordinates."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        strOut = task.sharpGL.RunSharpLinear(Comm.oCase.readPointCloud)
+        SetTrueText(strOut, 2)
+
+        displayPC.Run(emptyMat)
+        dst2 = displayPC.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GL_RunSharpLinearHist : Inherits TaskParent
+    Dim plotHist As New GL_PlotHist
+    Dim displayPC As New GL_ReadPCDisplay
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        desc = "Read the point cloud from a rendered geometry"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            strOut = task.sharpGL.RunSharpLinear(Comm.oCase.readPointCloud)
+            SetTrueText(strOut, 2)
+        End If
+
+        plotHist.Run(task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest))
+        dst3 = plotHist.dst3
+        labels(2) = plotHist.labels(2)
+
+        displayPC.Run(emptyMat)
+        dst2 = displayPC.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GL_PlotHist : Inherits TaskParent
+    Dim plotHist As New Plot_Histogram
+    Dim displayPC As New GL_ReadPCDisplay
+    Public Sub New()
+        task.gOptions.MaxDepthBar.Value = 10
+        task.gOptions.HistBinBar.Value = 10
+        plotHist.minRange = 0.1
+        plotHist.createHistogram = True
+        plotHist.removeZeroEntry = True
+        desc = "Read the pointcloud back from SharpGL and plot a histogram of the result."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            Static readCloud As New GL_RunSharpLinear
+            readCloud.Run(emptyMat)
+            strOut = task.sharpGL.RunSharpLinear(Comm.oCase.readPointCloud)
+            SetTrueText(strOut, 2)
+            dst1 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
+        Else
+            dst1 = src
+        End If
+
         Dim tmp = dst1.InRange(0.1, task.MaxZmeters)
         dst0 = tmp.ConvertScaleAbs(255)
 
@@ -298,62 +394,8 @@ Public Class GL_ReadPointCloudHist : Inherits TaskParent
         Dim maxBin = histList.IndexOf(histList.Max)
         SetTrueText("Max bin at " + CStr(maxBin) + " meters", New cv.Point(dst2.Width / 2, 10), 3)
         labels(3) = "Distances range from 0 to " + CStr(task.MaxZmeters) + " meters with 1m per bin (by default)"
+
+        displayPC.Run(emptyMat)
+        dst2 = displayPC.dst2
     End Sub
 End Class
-
-
-
-'Public Class GL_WorldCoordinates : Inherits TaskParent
-'    Dim invProjView As New cv.Mat(4, 4, cv.MatType.CV_32F, 0)
-'    Public Sub New()
-'        Dim worldPoints As New List(Of Vec3f)
-'        desc = "Read the point cloud from a rendered geometry and put it into the input's world coordinates."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        strOut = task.sharpGL.RunSharp(Comm.oCase.readPointCloud)
-'        SetTrueText(strOut, 2)
-'        dst1 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
-
-'        Dim fovY As Single = 45.0F
-'        Dim aspectRatio As Single = dst1.Width / dst1.Height
-'        Dim near As Single = task.sharpGL.options.zNear
-'        Dim far As Single = task.sharpGL.options.zNear
-
-'        Dim projection As Mat = CreatePerspectiveMatrix(fovY, aspectRatio, near, far)
-'        For y = 0 To dst2.Height - 1
-'            For x = 0 To dst2.Width - 1
-'                Dim depth As Single = dst1.At(Of Single)(y, x)
-'                If depth = 1.0F Then Continue For ' Skip far plane (background)
-
-'                ' Convert to NDC
-'                Dim x_ndc = (x / dst2.Width) * 2.0F - 1.0F
-'                Dim y_ndc = 1.0F - (y / dst2.Height) * 2.0F ' Flip Y
-'                Dim z_ndc = depth * 2.0F - 1.0F
-
-'                ' Clip-space position
-'                Dim clipPos As New Mat(4, 1, MatType.CV_32F)
-'                clipPos.Set(Of Single)(0, 0, x_ndc)
-'                clipPos.Set(Of Single)(1, 0, y_ndc)
-'                clipPos.Set(Of Single)(2, 0, z_ndc)
-'                clipPos.Set(Of Single)(3, 0, 1.0F)
-
-'                ' Multiply by inverse projection-view matrix
-'                Dim worldPos As Mat = invProjView * clipPos
-
-'                ' Convert from homogeneous to Cartesian
-'                Dim w As Single = worldPos.At(Of Single)(3, 0)
-'                If w <> 0 Then
-'                    Dim x_world = worldPos.At(Of Single)(0, 0) / w
-'                    Dim y_world = worldPos.At(Of Single)(1, 0) / w
-'                    Dim z_world = worldPos.At(Of Single)(2, 0) / w
-'                    worldPoints.Add(New Vec3f(x_world, y_world, z_world))
-'                End If
-'            Next
-'        Next
-
-
-'        dst2 = dst1.InRange(0.1, 20)
-'        dst3 = dst2.ConvertScaleAbs(255)
-'        dst1.CopyTo(dst2, dst3)
-'    End Sub
-'End Class
