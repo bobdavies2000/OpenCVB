@@ -405,7 +405,6 @@ Public Class VBtask : Implements IDisposable
             Debug.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try
     End Sub
-
     Public Sub New()
     End Sub
     Public Sub New(parms As algParms)

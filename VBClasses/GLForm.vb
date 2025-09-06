@@ -12,9 +12,17 @@ Public Class sgl
     Dim isPanning As Boolean = False
     Dim panX As Single = 0.0F
     Dim panY As Single = 0.0F
+    Dim centerX As Integer
+    Dim centerY As Integer
+    Dim centerZ As Integer
+    Dim upX As Integer
+    Dim upY As Integer = 1
+    Dim upZ As Integer
     Public options As Options_SharpGL
+    Public options2 As Options_SharpGL2
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         options = New Options_SharpGL
+        options2 = New Options_SharpGL2
         Me.Left = GetSetting("Opencv", "sglLeft", "sglLeft", task.mainFormLocation.X + task.mainFormLocation.Width)
         Me.Top = GetSetting("Opencv", "sglTop", "sglTop", task.mainFormLocation.Y)
         Me.Width = GetSetting("Opencv", "sglWidth", "sglWidth", task.mainFormLocation.Width)
@@ -63,6 +71,7 @@ Public Class sgl
         If e.Button = MouseButtons.Right Then isPanning = False
     End Sub
     Public Sub resetView()
+        Me.Text = "SharpGL - " + If(task.gOptions.GL_LinearMode.Checked, "", "Non") + "Linear mode (see Global Options)"
         rotationX = 0.0
         rotationY = 0.0
         zoomZ = -5.0F
@@ -220,22 +229,25 @@ Public Class sgl
             Dim color = task.scalarColors(lp.index)
             gl.Color(color(2) / 255, color(1) / 255, color(0) / 255)
             gl.Begin(OpenGL.GL_LINES)
-            gl.Vertex(lp.pVec1(0), lp.pVec1(1), lp.pVec1(2))
-            gl.Vertex(lp.pVec2(0), lp.pVec2(1), lp.pVec2(2))
+            gl.Vertex(lp.pVec1(0), -lp.pVec1(1), -lp.pVec1(2))
+            gl.Vertex(lp.pVec2(0), -lp.pVec2(1), -lp.pVec2(2))
             gl.End()
         Next
         Return task.lines.labels(2)
     End Function
     Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
         options.Run()
+        options2.Run()
 
         If task.gOptions.DebugCheckBox.Checked Then
             task.gOptions.DebugCheckBox.Checked = False
             task.sharpGL.resetView()
         End If
+        If task.firstPass Or task.optionsChanged Then task.sharpGL.resetView()
 
         gl.MatrixMode(OpenGL.GL_PROJECTION)
         gl.LoadIdentity()
+
 
         If task.gOptions.GL_LinearMode.Checked Then
             gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, options.zNear, options.zFar)
@@ -247,6 +259,7 @@ Public Class sgl
         gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
         gl.LoadIdentity()
 
+        gl.LookAt(options2.eye(0), options2.eye(1), options2.eye(2), 0, 0, -5, upX, upY, upZ)
         gl.Translate(panX, panY, zoomZ)
         gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)

@@ -142,6 +142,8 @@ Partial Class OptionsGlobal
         ' GL_LinearMode
         ' 
         GL_LinearMode.AutoSize = True
+        GL_LinearMode.Checked = True
+        GL_LinearMode.CheckState = CheckState.Checked
         GL_LinearMode.Location = New Point(17, 431)
         GL_LinearMode.Name = "GL_LinearMode"
         GL_LinearMode.Size = New Size(262, 29)

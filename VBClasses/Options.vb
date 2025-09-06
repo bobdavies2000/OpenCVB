@@ -31,6 +31,27 @@ End Class
 
 
 
+Public Class Options_SharpGL2 : Inherits OptionParent
+    Public eye As cv.Vec3f = New cv.Vec3f(0, -0.5, 0)
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("SharpGL Eye X X10", -180, 180, eye(0) * 10)
+            sliders.setupTrackBar("SharpGL Eye Y X10", -180, 180, eye(1) * 10)
+            sliders.setupTrackBar("SharpGL Eye Z X10", -180, 180, eye(2) * 10)
+        End If
+    End Sub
+    Public Sub Run()
+        Static eyeXSlider = OptionParent.FindSlider("SharpGL Eye X X10")
+        Static eyeYSlider = OptionParent.FindSlider("SharpGL Eye Y X10")
+        Static eyeZSlider = OptionParent.FindSlider("SharpGL Eye Z X10")
+
+        eye = New cv.Vec3f(eyeXSlider.Value / 10, eyeYSlider.Value / 10, eyeZSlider.Value / 10)
+    End Sub
+End Class
+
+
+
+
 Public Class Options_Quaternion : Inherits OptionParent
     Public q1 As Quaternion = New Quaternion
     Public q2 As Quaternion = New Quaternion

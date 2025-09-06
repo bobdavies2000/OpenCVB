@@ -100,6 +100,8 @@ Public Class GL_ReadPCDisplay : Inherits TaskParent
         End If
 
         dst1 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
+        Dim mm = GetMinMax(dst1)
+
         dst2 = dst1.InRange(0.1, 20)
         dst3 = dst2.ConvertScaleAbs(255)
         dst1.CopyTo(dst2, dst3)
@@ -354,7 +356,7 @@ Public Class GL_Line3Dall : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
         For Each lp In task.lines.lpList
-            DrawLine(dst2, lp, task.scalarColors(lp.index))
+            DrawLine(dst2, lp, task.scalarColors(lp.index + 1))
         Next
 
         strOut = task.sharpGL.RunSharp(Comm.oCase.drawPointCloudRGB, task.pointCloud, dst2)

@@ -43,7 +43,7 @@ Partial Class sgl
         ' 
         AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1143, 750)
+        ClientSize = New Size(1142, 746)
         Controls.Add(GLControl)
         Margin = New Padding(4, 5, 4, 5)
         Name = "sgl"
