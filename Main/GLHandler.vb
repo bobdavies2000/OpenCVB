@@ -80,8 +80,6 @@ Namespace OpenCVB
 
             gl.MatrixMode(OpenGL.GL_PROJECTION)
             gl.LoadIdentity()
-            'gl.Perspective(Options.perspective, GLControl.Width / GLControl.Height,
-            '               Options.zNear, Options.zFar)
             gl.Perspective(45, GLControl.Width / GLControl.Height, 0.1, 100)
 
             gl.MatrixMode(OpenGL.GL_MODELVIEW)

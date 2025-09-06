@@ -109,6 +109,7 @@ Namespace OpenCVB
             Dim solutionDir As String = Path.GetFullPath(Path.Combine(exePath, "..\..\..\..\..\..\"))
             HomeDir = New DirectoryInfo(solutionDir)
 
+            Me.Icon = New Icon(HomeDir.FullName + "Main\Data\OpenCVB.ico")
             Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
             Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
             Directory.SetCurrentDirectory(HomeDir.FullName)

@@ -12,6 +12,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="C:\Users\bobda\.nuget\packages\sharpgl.winforms\3.1.1\contentFiles\any\netcoreapp3.1\SharpGL.ico" />
+    <Content Remove="C:\Users\bobda\.nuget\packages\sharpgl.winforms\3.1.1\contentFiles\any\netcoreapp3.1\SharpGL.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="OpenCVB.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Data\OpenCVB.ico" />
   </ItemGroup>
 

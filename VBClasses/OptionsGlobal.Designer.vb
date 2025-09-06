@@ -24,6 +24,7 @@ Partial Class OptionsGlobal
     Private Sub InitializeComponent()
         Label1 = New Label()
         GroupBox1 = New GroupBox()
+        GL_LinearMode = New CheckBox()
         Label3 = New Label()
         DebugSlider = New TrackBar()
         DebugSliderLabel = New Label()
@@ -101,15 +102,15 @@ Partial Class OptionsGlobal
         ' Label1
         ' 
         Label1.AutoSize = True
-        Label1.Location = New Point(8, 0)
-        Label1.Margin = New Padding(2, 0, 2, 0)
+        Label1.Location = New Point(11, 0)
         Label1.Name = "Label1"
-        Label1.Size = New Size(669, 15)
+        Label1.Size = New Size(1010, 25)
         Label1.TabIndex = 0
         Label1.Text = "All values are restored to their default values at the start of each algorithm.  See OptionsGlobal.vb to change any default value."
         ' 
         ' GroupBox1
         ' 
+        GroupBox1.Controls.Add(GL_LinearMode)
         GroupBox1.Controls.Add(Label3)
         GroupBox1.Controls.Add(DebugSlider)
         GroupBox1.Controls.Add(DebugSliderLabel)
@@ -132,235 +133,221 @@ Partial Class OptionsGlobal
         GroupBox1.Controls.Add(MaxDepthBar)
         GroupBox1.Controls.Add(maxCount)
         GroupBox1.Controls.Add(Label2)
-        GroupBox1.Location = New Point(8, 17)
-        GroupBox1.Margin = New Padding(2, 2, 2, 2)
+        GroupBox1.Location = New Point(11, 28)
         GroupBox1.Name = "GroupBox1"
-        GroupBox1.Padding = New Padding(2, 2, 2, 2)
-        GroupBox1.Size = New Size(580, 365)
+        GroupBox1.Size = New Size(829, 608)
         GroupBox1.TabIndex = 1
         GroupBox1.TabStop = False
+        ' 
+        ' GL_LinearMode
+        ' 
+        GL_LinearMode.AutoSize = True
+        GL_LinearMode.Location = New Point(17, 431)
+        GL_LinearMode.Name = "GL_LinearMode"
+        GL_LinearMode.Size = New Size(262, 29)
+        GL_LinearMode.TabIndex = 24
+        GL_LinearMode.Text = "Run SharpGL in Linear mode"
+        GL_LinearMode.UseVisualStyleBackColor = True
         ' 
         ' Label3
         ' 
         Label3.AutoSize = True
-        Label3.Location = New Point(20, 316)
-        Label3.Margin = New Padding(2, 0, 2, 0)
+        Label3.Location = New Point(29, 527)
         Label3.Name = "Label3"
-        Label3.Size = New Size(74, 15)
+        Label3.Size = New Size(115, 25)
         Label3.TabIndex = 23
         Label3.Text = "Debug Slider"
         ' 
         ' DebugSlider
         ' 
-        DebugSlider.Location = New Point(134, 316)
-        DebugSlider.Margin = New Padding(2, 2, 2, 2)
+        DebugSlider.Location = New Point(191, 527)
         DebugSlider.Maximum = 100
         DebugSlider.Minimum = -100
         DebugSlider.Name = "DebugSlider"
-        DebugSlider.Size = New Size(320, 45)
+        DebugSlider.Size = New Size(457, 69)
         DebugSlider.TabIndex = 22
         ' 
         ' DebugSliderLabel
         ' 
         DebugSliderLabel.AutoSize = True
-        DebugSliderLabel.Location = New Point(468, 316)
-        DebugSliderLabel.Margin = New Padding(2, 0, 2, 0)
+        DebugSliderLabel.Location = New Point(669, 527)
         DebugSliderLabel.Name = "DebugSliderLabel"
-        DebugSliderLabel.Size = New Size(99, 15)
+        DebugSliderLabel.Size = New Size(151, 25)
         DebugSliderLabel.TabIndex = 21
         DebugSliderLabel.Text = "DebugSliderLabel"
         ' 
         ' DebugCheckBox
         ' 
         DebugCheckBox.AutoSize = True
-        DebugCheckBox.Location = New Point(12, 274)
-        DebugCheckBox.Margin = New Padding(2, 2, 2, 2)
+        DebugCheckBox.Location = New Point(17, 466)
         DebugCheckBox.Name = "DebugCheckBox"
-        DebugCheckBox.Size = New Size(424, 19)
+        DebugCheckBox.Size = New Size(639, 29)
         DebugCheckBox.TabIndex = 19
         DebugCheckBox.Text = "DebugCheckbox - task.gOptions.DebugChecked - use anywhere as a toggle"
         DebugCheckBox.UseVisualStyleBackColor = True
         ' 
         ' FrameHistory
         ' 
-        FrameHistory.Location = New Point(134, 223)
-        FrameHistory.Margin = New Padding(2, 2, 2, 2)
+        FrameHistory.Location = New Point(191, 372)
         FrameHistory.Maximum = 25
         FrameHistory.Minimum = 1
         FrameHistory.Name = "FrameHistory"
-        FrameHistory.Size = New Size(320, 45)
+        FrameHistory.Size = New Size(457, 69)
         FrameHistory.TabIndex = 18
         FrameHistory.Value = 5
         ' 
         ' fHist
         ' 
         fHist.AutoSize = True
-        fHist.Location = New Point(468, 223)
-        fHist.Margin = New Padding(2, 0, 2, 0)
+        fHist.Location = New Point(669, 372)
         fHist.Name = "fHist"
-        fHist.Size = New Size(32, 15)
+        fHist.Size = New Size(49, 25)
         fHist.TabIndex = 17
         fHist.Text = "fHist"
         ' 
         ' Label12
         ' 
         Label12.AutoSize = True
-        Label12.Location = New Point(43, 217)
-        Label12.Margin = New Padding(2, 0, 2, 0)
+        Label12.Location = New Point(61, 362)
         Label12.Name = "Label12"
-        Label12.Size = New Size(81, 15)
+        Label12.Size = New Size(123, 25)
         Label12.TabIndex = 16
         Label12.Text = "Frame History"
         ' 
         ' DepthDiffSlider
         ' 
-        DepthDiffSlider.Location = New Point(134, 182)
-        DepthDiffSlider.Margin = New Padding(2, 2, 2, 2)
+        DepthDiffSlider.Location = New Point(191, 303)
         DepthDiffSlider.Maximum = 1000
         DepthDiffSlider.Minimum = 1
         DepthDiffSlider.Name = "DepthDiffSlider"
-        DepthDiffSlider.Size = New Size(320, 45)
+        DepthDiffSlider.Size = New Size(457, 69)
         DepthDiffSlider.TabIndex = 15
         DepthDiffSlider.Value = 5
         ' 
         ' DepthDiffLabel
         ' 
         DepthDiffLabel.AutoSize = True
-        DepthDiffLabel.Location = New Point(468, 188)
-        DepthDiffLabel.Margin = New Padding(2, 0, 2, 0)
+        DepthDiffLabel.Location = New Point(669, 313)
         DepthDiffLabel.Name = "DepthDiffLabel"
-        DepthDiffLabel.Size = New Size(86, 15)
+        DepthDiffLabel.Size = New Size(131, 25)
         DepthDiffLabel.TabIndex = 14
         DepthDiffLabel.Text = "DepthDiffLabel"
         ' 
         ' Label10
         ' 
-        Label10.Location = New Point(12, 182)
-        Label10.Margin = New Padding(2, 0, 2, 0)
+        Label10.Location = New Point(17, 303)
         Label10.Name = "Label10"
-        Label10.Size = New Size(118, 35)
+        Label10.Size = New Size(169, 58)
         Label10.TabIndex = 13
         Label10.Text = "Depth Difference Threshold (mm's)"
         ' 
         ' PixelDiffBar
         ' 
-        PixelDiffBar.Location = New Point(134, 140)
-        PixelDiffBar.Margin = New Padding(2, 2, 2, 2)
+        PixelDiffBar.Location = New Point(191, 233)
         PixelDiffBar.Maximum = 50
         PixelDiffBar.Name = "PixelDiffBar"
-        PixelDiffBar.Size = New Size(320, 45)
+        PixelDiffBar.Size = New Size(457, 69)
         PixelDiffBar.TabIndex = 12
         PixelDiffBar.Value = 5
         ' 
         ' PixelDiff
         ' 
         PixelDiff.AutoSize = True
-        PixelDiff.Location = New Point(468, 140)
-        PixelDiff.Margin = New Padding(2, 0, 2, 0)
+        PixelDiff.Location = New Point(669, 233)
         PixelDiff.Name = "PixelDiff"
-        PixelDiff.Size = New Size(50, 15)
+        PixelDiff.Size = New Size(76, 25)
         PixelDiff.TabIndex = 11
         PixelDiff.Text = "PixelDiff"
         ' 
         ' Label8
         ' 
-        Label8.Location = New Point(12, 140)
-        Label8.Margin = New Padding(2, 0, 2, 0)
+        Label8.Location = New Point(17, 233)
         Label8.Name = "Label8"
-        Label8.Size = New Size(118, 33)
+        Label8.Size = New Size(169, 55)
         Label8.TabIndex = 10
         Label8.Text = "Color Difference Threshold"
         ' 
         ' HistBinBar
         ' 
-        HistBinBar.Location = New Point(134, 99)
-        HistBinBar.Margin = New Padding(2, 2, 2, 2)
+        HistBinBar.Location = New Point(191, 165)
         HistBinBar.Maximum = 32
         HistBinBar.Minimum = 3
         HistBinBar.Name = "HistBinBar"
-        HistBinBar.Size = New Size(320, 45)
+        HistBinBar.Size = New Size(457, 69)
         HistBinBar.TabIndex = 9
         HistBinBar.Value = 5
         ' 
         ' labelBinsCount
         ' 
         labelBinsCount.AutoSize = True
-        labelBinsCount.Location = New Point(468, 99)
-        labelBinsCount.Margin = New Padding(2, 0, 2, 0)
+        labelBinsCount.Location = New Point(669, 165)
         labelBinsCount.Name = "labelBinsCount"
-        labelBinsCount.Size = New Size(87, 15)
+        labelBinsCount.Size = New Size(129, 25)
         labelBinsCount.TabIndex = 8
         labelBinsCount.Text = "labelBinsCount"
         ' 
         ' Label6
         ' 
         Label6.AutoSize = True
-        Label6.Location = New Point(36, 99)
-        Label6.Margin = New Padding(2, 0, 2, 0)
+        Label6.Location = New Point(51, 165)
         Label6.Name = "Label6"
-        Label6.Size = New Size(88, 15)
+        Label6.Size = New Size(133, 25)
         Label6.TabIndex = 7
         Label6.Text = "Histogram Bins"
         ' 
         ' GridSlider
         ' 
-        GridSlider.Location = New Point(134, 58)
-        GridSlider.Margin = New Padding(2, 2, 2, 2)
+        GridSlider.Location = New Point(191, 97)
         GridSlider.Maximum = 64
         GridSlider.Minimum = 2
         GridSlider.Name = "GridSlider"
-        GridSlider.Size = New Size(320, 45)
+        GridSlider.Size = New Size(457, 69)
         GridSlider.TabIndex = 6
         GridSlider.Value = 5
         ' 
         ' GridSizeLabel
         ' 
         GridSizeLabel.AutoSize = True
-        GridSizeLabel.Location = New Point(468, 58)
-        GridSizeLabel.Margin = New Padding(2, 0, 2, 0)
+        GridSizeLabel.Location = New Point(669, 97)
         GridSizeLabel.Name = "GridSizeLabel"
-        GridSizeLabel.Size = New Size(77, 15)
+        GridSizeLabel.Size = New Size(117, 25)
         GridSizeLabel.TabIndex = 5
         GridSizeLabel.Text = "GridSizeLabel"
         ' 
         ' Label4
         ' 
         Label4.AutoSize = True
-        Label4.Location = New Point(31, 58)
-        Label4.Margin = New Padding(2, 0, 2, 0)
+        Label4.Location = New Point(44, 97)
         Label4.Name = "Label4"
-        Label4.Size = New Size(91, 15)
+        Label4.Size = New Size(141, 25)
         Label4.TabIndex = 4
         Label4.Text = "Grid Square Size"
         ' 
         ' MaxDepthBar
         ' 
-        MaxDepthBar.Location = New Point(134, 16)
-        MaxDepthBar.Margin = New Padding(2, 2, 2, 2)
+        MaxDepthBar.Location = New Point(191, 27)
         MaxDepthBar.Maximum = 25
         MaxDepthBar.Minimum = 1
         MaxDepthBar.Name = "MaxDepthBar"
-        MaxDepthBar.Size = New Size(320, 45)
+        MaxDepthBar.Size = New Size(457, 69)
         MaxDepthBar.TabIndex = 3
         MaxDepthBar.Value = 5
         ' 
         ' maxCount
         ' 
         maxCount.AutoSize = True
-        maxCount.Location = New Point(468, 16)
-        maxCount.Margin = New Padding(2, 0, 2, 0)
+        maxCount.Location = New Point(669, 27)
         maxCount.Name = "maxCount"
-        maxCount.Size = New Size(62, 15)
+        maxCount.Size = New Size(93, 25)
         maxCount.TabIndex = 2
         maxCount.Text = "maxCount"
         ' 
         ' Label2
         ' 
         Label2.AutoSize = True
-        Label2.Location = New Point(12, 16)
-        Label2.Margin = New Padding(2, 0, 2, 0)
+        Label2.Location = New Point(17, 27)
         Label2.Name = "Label2"
-        Label2.Size = New Size(111, 15)
+        Label2.Size = New Size(168, 25)
         Label2.TabIndex = 1
         Label2.Text = "Max Depth (meters)"
         ' 
@@ -377,11 +364,9 @@ Partial Class OptionsGlobal
         GroupBox2.Controls.Add(ShowAllOptions)
         GroupBox2.Controls.Add(displayDst1)
         GroupBox2.Controls.Add(displayDst0)
-        GroupBox2.Location = New Point(596, 24)
-        GroupBox2.Margin = New Padding(2, 2, 2, 2)
+        GroupBox2.Location = New Point(851, 40)
         GroupBox2.Name = "GroupBox2"
-        GroupBox2.Padding = New Padding(2, 2, 2, 2)
-        GroupBox2.Size = New Size(250, 257)
+        GroupBox2.Size = New Size(357, 428)
         GroupBox2.TabIndex = 2
         GroupBox2.TabStop = False
         GroupBox2.Text = "Miscellaneous Globals"
@@ -390,11 +375,9 @@ Partial Class OptionsGlobal
         ' 
         GroupBox3.Controls.Add(UseMotionMask)
         GroupBox3.Controls.Add(showMotionMask)
-        GroupBox3.Location = New Point(10, 205)
-        GroupBox3.Margin = New Padding(2, 2, 2, 2)
+        GroupBox3.Location = New Point(14, 342)
         GroupBox3.Name = "GroupBox3"
-        GroupBox3.Padding = New Padding(2, 2, 2, 2)
-        GroupBox3.Size = New Size(174, 52)
+        GroupBox3.Size = New Size(249, 87)
         GroupBox3.TabIndex = 10
         GroupBox3.TabStop = False
         GroupBox3.Text = "Motion"
@@ -404,10 +387,9 @@ Partial Class OptionsGlobal
         UseMotionMask.AutoSize = True
         UseMotionMask.Checked = True
         UseMotionMask.CheckState = CheckState.Checked
-        UseMotionMask.Location = New Point(13, 31)
-        UseMotionMask.Margin = New Padding(2, 2, 2, 2)
+        UseMotionMask.Location = New Point(19, 52)
         UseMotionMask.Name = "UseMotionMask"
-        UseMotionMask.Size = New Size(115, 19)
+        UseMotionMask.Size = New Size(172, 29)
         UseMotionMask.TabIndex = 1
         UseMotionMask.Text = "Use MotionMask"
         UseMotionMask.UseVisualStyleBackColor = True
@@ -415,10 +397,9 @@ Partial Class OptionsGlobal
         ' showMotionMask
         ' 
         showMotionMask.AutoSize = True
-        showMotionMask.Location = New Point(13, 15)
-        showMotionMask.Margin = New Padding(2, 2, 2, 2)
+        showMotionMask.Location = New Point(19, 25)
         showMotionMask.Name = "showMotionMask"
-        showMotionMask.Size = New Size(123, 19)
+        showMotionMask.Size = New Size(183, 29)
         showMotionMask.TabIndex = 0
         showMotionMask.Text = "Show motion cells"
         showMotionMask.UseVisualStyleBackColor = True
@@ -426,10 +407,9 @@ Partial Class OptionsGlobal
         ' TruncateDepth
         ' 
         TruncateDepth.AutoSize = True
-        TruncateDepth.Location = New Point(9, 184)
-        TruncateDepth.Margin = New Padding(2, 2, 2, 2)
+        TruncateDepth.Location = New Point(13, 307)
         TruncateDepth.Name = "TruncateDepth"
-        TruncateDepth.Size = New Size(176, 19)
+        TruncateDepth.Size = New Size(262, 29)
         TruncateDepth.TabIndex = 9
         TruncateDepth.Text = "Truncate depth at MaxDepth"
         TruncateDepth.UseVisualStyleBackColor = True
@@ -437,10 +417,9 @@ Partial Class OptionsGlobal
         ' gravityPointCloud
         ' 
         gravityPointCloud.AutoSize = True
-        gravityPointCloud.Location = New Point(8, 164)
-        gravityPointCloud.Margin = New Padding(2, 2, 2, 2)
+        gravityPointCloud.Location = New Point(11, 273)
         gravityPointCloud.Name = "gravityPointCloud"
-        gravityPointCloud.Size = New Size(229, 19)
+        gravityPointCloud.Size = New Size(345, 29)
         gravityPointCloud.TabIndex = 8
         gravityPointCloud.Text = "Apply gravity transform to point cloud"
         gravityPointCloud.UseVisualStyleBackColor = True
@@ -448,10 +427,9 @@ Partial Class OptionsGlobal
         ' UseKalman
         ' 
         UseKalman.AutoSize = True
-        UseKalman.Location = New Point(8, 146)
-        UseKalman.Margin = New Padding(2, 2, 2, 2)
+        UseKalman.Location = New Point(11, 243)
         UseKalman.Name = "UseKalman"
-        UseKalman.Size = New Size(132, 19)
+        UseKalman.Size = New Size(195, 29)
         UseKalman.TabIndex = 7
         UseKalman.Text = "Use Kalman filtering"
         UseKalman.UseVisualStyleBackColor = True
@@ -461,10 +439,9 @@ Partial Class OptionsGlobal
         CrossHairs.AutoSize = True
         CrossHairs.Checked = True
         CrossHairs.CheckState = CheckState.Checked
-        CrossHairs.Location = New Point(8, 128)
-        CrossHairs.Margin = New Padding(2, 2, 2, 2)
+        CrossHairs.Location = New Point(11, 213)
         CrossHairs.Name = "CrossHairs"
-        CrossHairs.Size = New Size(110, 19)
+        CrossHairs.Size = New Size(165, 29)
         CrossHairs.TabIndex = 6
         CrossHairs.Text = "Show crosshairs"
         CrossHairs.UseVisualStyleBackColor = True
@@ -472,10 +449,9 @@ Partial Class OptionsGlobal
         ' CreateGif
         ' 
         CreateGif.AutoSize = True
-        CreateGif.Location = New Point(8, 110)
-        CreateGif.Margin = New Padding(2, 2, 2, 2)
+        CreateGif.Location = New Point(11, 183)
         CreateGif.Name = "CreateGif"
-        CreateGif.Size = New Size(190, 19)
+        CreateGif.Size = New Size(283, 29)
         CreateGif.TabIndex = 5
         CreateGif.Text = "Create GIF of current algorithm"
         CreateGif.UseVisualStyleBackColor = True
@@ -483,10 +459,9 @@ Partial Class OptionsGlobal
         ' debugSyncUI
         ' 
         debugSyncUI.AutoSize = True
-        debugSyncUI.Location = New Point(8, 92)
-        debugSyncUI.Margin = New Padding(2, 2, 2, 2)
+        debugSyncUI.Location = New Point(11, 153)
         debugSyncUI.Name = "debugSyncUI"
-        debugSyncUI.Size = New Size(195, 19)
+        debugSyncUI.Size = New Size(292, 29)
         debugSyncUI.TabIndex = 4
         debugSyncUI.Text = "Synchronize Debug with Display"
         debugSyncUI.UseVisualStyleBackColor = True
@@ -494,10 +469,9 @@ Partial Class OptionsGlobal
         ' ShowGrid
         ' 
         ShowGrid.AutoSize = True
-        ShowGrid.Location = New Point(8, 74)
-        ShowGrid.Margin = New Padding(2, 2, 2, 2)
+        ShowGrid.Location = New Point(11, 123)
         ShowGrid.Name = "ShowGrid"
-        ShowGrid.Size = New Size(151, 19)
+        ShowGrid.Size = New Size(228, 29)
         ShowGrid.TabIndex = 3
         ShowGrid.Text = "Show grid mask overlay"
         ShowGrid.UseVisualStyleBackColor = True
@@ -505,10 +479,9 @@ Partial Class OptionsGlobal
         ' ShowAllOptions
         ' 
         ShowAllOptions.AutoSize = True
-        ShowAllOptions.Location = New Point(8, 56)
-        ShowAllOptions.Margin = New Padding(2, 2, 2, 2)
+        ShowAllOptions.Location = New Point(11, 93)
         ShowAllOptions.Name = "ShowAllOptions"
-        ShowAllOptions.Size = New Size(166, 19)
+        ShowAllOptions.Size = New Size(251, 29)
         ShowAllOptions.TabIndex = 2
         ShowAllOptions.Text = "Show All Options on Open"
         ShowAllOptions.UseVisualStyleBackColor = True
@@ -516,10 +489,9 @@ Partial Class OptionsGlobal
         ' displayDst1
         ' 
         displayDst1.AutoSize = True
-        displayDst1.Location = New Point(8, 38)
-        displayDst1.Margin = New Padding(2, 2, 2, 2)
+        displayDst1.Location = New Point(11, 63)
         displayDst1.Name = "displayDst1"
-        displayDst1.Size = New Size(119, 19)
+        displayDst1.Size = New Size(181, 29)
         displayDst1.TabIndex = 1
         displayDst1.Text = "Show dst1 output"
         displayDst1.UseVisualStyleBackColor = True
@@ -527,10 +499,9 @@ Partial Class OptionsGlobal
         ' displayDst0
         ' 
         displayDst0.AutoSize = True
-        displayDst0.Location = New Point(8, 20)
-        displayDst0.Margin = New Padding(2, 2, 2, 2)
+        displayDst0.Location = New Point(11, 33)
         displayDst0.Name = "displayDst0"
-        displayDst0.Size = New Size(119, 19)
+        displayDst0.Size = New Size(181, 29)
         displayDst0.TabIndex = 0
         displayDst0.Text = "Show dst0 output"
         displayDst0.UseVisualStyleBackColor = True
@@ -543,148 +514,132 @@ Partial Class OptionsGlobal
         Geometry.Controls.Add(LineWidth)
         Geometry.Controls.Add(LineThicknessAmount)
         Geometry.Controls.Add(Label5)
-        Geometry.Location = New Point(595, 281)
-        Geometry.Margin = New Padding(2, 2, 2, 2)
+        Geometry.Location = New Point(850, 468)
         Geometry.Name = "Geometry"
-        Geometry.Padding = New Padding(2, 2, 2, 2)
-        Geometry.Size = New Size(537, 96)
+        Geometry.Size = New Size(767, 160)
         Geometry.TabIndex = 3
         Geometry.TabStop = False
         Geometry.Text = "GroupBox4"
         ' 
         ' DotSizeSlider
         ' 
-        DotSizeSlider.Location = New Point(145, 55)
-        DotSizeSlider.Margin = New Padding(2, 2, 2, 2)
+        DotSizeSlider.Location = New Point(207, 92)
         DotSizeSlider.Minimum = 1
         DotSizeSlider.Name = "DotSizeSlider"
-        DotSizeSlider.Size = New Size(320, 45)
+        DotSizeSlider.Size = New Size(457, 69)
         DotSizeSlider.TabIndex = 9
         DotSizeSlider.Value = 5
         ' 
         ' DotSizeLabel
         ' 
         DotSizeLabel.AutoSize = True
-        DotSizeLabel.Location = New Point(465, 55)
-        DotSizeLabel.Margin = New Padding(2, 0, 2, 0)
+        DotSizeLabel.Location = New Point(664, 92)
         DotSizeLabel.Name = "DotSizeLabel"
-        DotSizeLabel.Size = New Size(74, 15)
+        DotSizeLabel.Size = New Size(114, 25)
         DotSizeLabel.TabIndex = 8
         DotSizeLabel.Text = "DotSizeLabel"
         ' 
         ' Label7
         ' 
         Label7.AutoSize = True
-        Label7.Location = New Point(9, 55)
-        Label7.Margin = New Padding(2, 0, 2, 0)
+        Label7.Location = New Point(13, 92)
         Label7.Name = "Label7"
-        Label7.Size = New Size(94, 15)
+        Label7.Size = New Size(146, 25)
         Label7.TabIndex = 7
         Label7.Text = "Dot Size in pixels"
         ' 
         ' LineWidth
         ' 
-        LineWidth.Location = New Point(145, 18)
-        LineWidth.Margin = New Padding(2, 2, 2, 2)
+        LineWidth.Location = New Point(207, 30)
         LineWidth.Minimum = 1
         LineWidth.Name = "LineWidth"
-        LineWidth.Size = New Size(320, 45)
+        LineWidth.Size = New Size(457, 69)
         LineWidth.TabIndex = 6
         LineWidth.Value = 5
         ' 
         ' LineThicknessAmount
         ' 
         LineThicknessAmount.AutoSize = True
-        LineThicknessAmount.Location = New Point(465, 18)
-        LineThicknessAmount.Margin = New Padding(2, 0, 2, 0)
+        LineThicknessAmount.Location = New Point(664, 30)
         LineThicknessAmount.Name = "LineThicknessAmount"
-        LineThicknessAmount.Size = New Size(125, 15)
+        LineThicknessAmount.Size = New Size(183, 25)
         LineThicknessAmount.TabIndex = 5
         LineThicknessAmount.Text = "LineThicknessAmount"
         ' 
         ' Label5
         ' 
         Label5.AutoSize = True
-        Label5.Location = New Point(9, 18)
-        Label5.Margin = New Padding(2, 0, 2, 0)
+        Label5.Location = New Point(13, 30)
         Label5.Name = "Label5"
-        Label5.Size = New Size(126, 15)
+        Label5.Size = New Size(188, 25)
         Label5.TabIndex = 4
         Label5.Text = "Line thickness in pixels"
         ' 
         ' ColorSource
         ' 
         ColorSource.FormattingEnabled = True
-        ColorSource.Location = New Point(965, 30)
-        ColorSource.Margin = New Padding(2, 2, 2, 2)
+        ColorSource.Location = New Point(1379, 50)
         ColorSource.Name = "ColorSource"
-        ColorSource.Size = New Size(111, 23)
+        ColorSource.Size = New Size(157, 33)
         ColorSource.TabIndex = 4
         ' 
         ' Palettes
         ' 
         Palettes.FormattingEnabled = True
-        Palettes.Location = New Point(965, 53)
-        Palettes.Margin = New Padding(2, 2, 2, 2)
+        Palettes.Location = New Point(1379, 88)
         Palettes.Name = "Palettes"
-        Palettes.Size = New Size(111, 23)
+        Palettes.Size = New Size(157, 33)
         Palettes.TabIndex = 5
         ' 
         ' LineType
         ' 
         LineType.FormattingEnabled = True
-        LineType.Location = New Point(965, 77)
-        LineType.Margin = New Padding(2, 2, 2, 2)
+        LineType.Location = New Point(1379, 128)
         LineType.Name = "LineType"
-        LineType.Size = New Size(111, 23)
+        LineType.Size = New Size(157, 33)
         LineType.TabIndex = 6
         ' 
         ' highlight
         ' 
         highlight.FormattingEnabled = True
-        highlight.Location = New Point(965, 101)
-        highlight.Margin = New Padding(2, 2, 2, 2)
+        highlight.Location = New Point(1379, 168)
         highlight.Name = "highlight"
-        highlight.Size = New Size(111, 23)
+        highlight.Size = New Size(157, 33)
         highlight.TabIndex = 7
         ' 
         ' Label9
         ' 
         Label9.AutoSize = True
-        Label9.Location = New Point(854, 30)
-        Label9.Margin = New Padding(2, 0, 2, 0)
+        Label9.Location = New Point(1220, 50)
         Label9.Name = "Label9"
-        Label9.Size = New Size(95, 15)
+        Label9.Size = New Size(144, 25)
         Label9.TabIndex = 21
         Label9.Text = "RedColor Source"
         ' 
         ' Label11
         ' 
         Label11.AutoSize = True
-        Label11.Location = New Point(910, 53)
-        Label11.Margin = New Padding(2, 0, 2, 0)
+        Label11.Location = New Point(1300, 88)
         Label11.Name = "Label11"
-        Label11.Size = New Size(43, 15)
+        Label11.Size = New Size(64, 25)
         Label11.TabIndex = 22
         Label11.Text = "Palette"
         ' 
         ' Label13
         ' 
         Label13.AutoSize = True
-        Label13.Location = New Point(902, 77)
-        Label13.Margin = New Padding(2, 0, 2, 0)
+        Label13.Location = New Point(1289, 128)
         Label13.Name = "Label13"
-        Label13.Size = New Size(57, 15)
+        Label13.Size = New Size(85, 25)
         Label13.TabIndex = 23
         Label13.Text = "Line Type"
         ' 
         ' Label14
         ' 
         Label14.AutoSize = True
-        Label14.Location = New Point(862, 99)
-        Label14.Margin = New Padding(2, 0, 2, 0)
+        Label14.Location = New Point(1231, 165)
         Label14.Name = "Label14"
-        Label14.Size = New Size(89, 15)
+        Label14.Size = New Size(133, 25)
         Label14.TabIndex = 24
         Label14.Text = "Highlight Color"
         ' 
@@ -692,11 +647,9 @@ Partial Class OptionsGlobal
         ' 
         DepthGroupBox.Controls.Add(LRCorrelations)
         DepthGroupBox.Controls.Add(ColorizedDepth)
-        DepthGroupBox.Location = New Point(856, 132)
-        DepthGroupBox.Margin = New Padding(2, 2, 2, 2)
+        DepthGroupBox.Location = New Point(1223, 220)
         DepthGroupBox.Name = "DepthGroupBox"
-        DepthGroupBox.Padding = New Padding(2, 2, 2, 2)
-        DepthGroupBox.Size = New Size(154, 64)
+        DepthGroupBox.Size = New Size(220, 107)
         DepthGroupBox.TabIndex = 25
         DepthGroupBox.TabStop = False
         DepthGroupBox.Text = "Depth Display"
@@ -704,10 +657,9 @@ Partial Class OptionsGlobal
         ' LRCorrelations
         ' 
         LRCorrelations.AutoSize = True
-        LRCorrelations.Location = New Point(6, 42)
-        LRCorrelations.Margin = New Padding(2, 2, 2, 2)
+        LRCorrelations.Location = New Point(9, 70)
         LRCorrelations.Name = "LRCorrelations"
-        LRCorrelations.Size = New Size(140, 19)
+        LRCorrelations.Size = New Size(207, 29)
         LRCorrelations.TabIndex = 1
         LRCorrelations.TabStop = True
         LRCorrelations.Text = "Left/Right Correlation"
@@ -716,10 +668,9 @@ Partial Class OptionsGlobal
         ' ColorizedDepth
         ' 
         ColorizedDepth.AutoSize = True
-        ColorizedDepth.Location = New Point(6, 21)
-        ColorizedDepth.Margin = New Padding(2, 2, 2, 2)
+        ColorizedDepth.Location = New Point(9, 35)
         ColorizedDepth.Name = "ColorizedDepth"
-        ColorizedDepth.Size = New Size(110, 19)
+        ColorizedDepth.Size = New Size(166, 29)
         ColorizedDepth.TabIndex = 0
         ColorizedDepth.TabStop = True
         ColorizedDepth.Text = "Colorized Depth"
@@ -729,11 +680,9 @@ Partial Class OptionsGlobal
         ' 
         ColoringGroup.Controls.Add(TrackingColor)
         ColoringGroup.Controls.Add(TrackingMeanColor)
-        ColoringGroup.Location = New Point(854, 217)
-        ColoringGroup.Margin = New Padding(2, 2, 2, 2)
+        ColoringGroup.Location = New Point(1220, 362)
         ColoringGroup.Name = "ColoringGroup"
-        ColoringGroup.Padding = New Padding(2, 2, 2, 2)
-        ColoringGroup.Size = New Size(156, 65)
+        ColoringGroup.Size = New Size(223, 108)
         ColoringGroup.TabIndex = 26
         ColoringGroup.TabStop = False
         ColoringGroup.Text = "RedCloud Display"
@@ -741,10 +690,9 @@ Partial Class OptionsGlobal
         ' TrackingColor
         ' 
         TrackingColor.AutoSize = True
-        TrackingColor.Location = New Point(10, 40)
-        TrackingColor.Margin = New Padding(2, 2, 2, 2)
+        TrackingColor.Location = New Point(14, 67)
         TrackingColor.Name = "TrackingColor"
-        TrackingColor.Size = New Size(102, 19)
+        TrackingColor.Size = New Size(149, 29)
         TrackingColor.TabIndex = 2
         TrackingColor.TabStop = True
         TrackingColor.Text = "Tracking Color"
@@ -753,10 +701,9 @@ Partial Class OptionsGlobal
         ' TrackingMeanColor
         ' 
         TrackingMeanColor.AutoSize = True
-        TrackingMeanColor.Location = New Point(9, 18)
-        TrackingMeanColor.Margin = New Padding(2, 2, 2, 2)
+        TrackingMeanColor.Location = New Point(13, 30)
         TrackingMeanColor.Name = "TrackingMeanColor"
-        TrackingMeanColor.Size = New Size(87, 19)
+        TrackingMeanColor.Size = New Size(129, 29)
         TrackingMeanColor.TabIndex = 1
         TrackingMeanColor.TabStop = True
         TrackingMeanColor.Text = "Mean Color"
@@ -764,9 +711,9 @@ Partial Class OptionsGlobal
         ' 
         ' OptionsGlobal
         ' 
-        AutoScaleDimensions = New SizeF(7F, 15F)
+        AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1079, 386)
+        ClientSize = New Size(1541, 643)
         Controls.Add(ColoringGroup)
         Controls.Add(DepthGroupBox)
         Controls.Add(Label14)
@@ -781,7 +728,6 @@ Partial Class OptionsGlobal
         Controls.Add(GroupBox2)
         Controls.Add(GroupBox1)
         Controls.Add(Label1)
-        Margin = New Padding(2, 2, 2, 2)
         Name = "OptionsGlobal"
         Text = "OptionsGlobal"
         GroupBox1.ResumeLayout(False)
@@ -868,4 +814,5 @@ Partial Class OptionsGlobal
     Friend WithEvents TrackingColor As RadioButton
     Friend WithEvents TrackingMeanColor As RadioButton
     Friend WithEvents Label3 As Label
+    Friend WithEvents GL_LinearMode As CheckBox
 End Class

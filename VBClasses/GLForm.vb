@@ -226,7 +226,7 @@ Public Class sgl
         Next
         Return task.lines.labels(2)
     End Function
-    Public Function RunSharpNonLinear(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
+    Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
         options.Run()
 
         If task.gOptions.DebugCheckBox.Checked Then
@@ -236,10 +236,14 @@ Public Class sgl
 
         gl.MatrixMode(OpenGL.GL_PROJECTION)
         gl.LoadIdentity()
-        gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
+
+        If task.gOptions.GL_LinearMode.Checked Then
+            gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, options.zNear, options.zFar)
+        Else
+            gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
+        End If
 
         gl.MatrixMode(OpenGL.GL_MODELVIEW)
-
         gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
         gl.LoadIdentity()
 
@@ -247,60 +251,6 @@ Public Class sgl
         gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
         gl.PointSize(options.pointSize)
-
-        Return runFunction(func, pointcloud, RGB)
-    End Function
-    Public Function RunSharpLinear(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
-        options.Run()
-
-        If task.gOptions.DebugCheckBox.Checked Then
-            task.gOptions.DebugCheckBox.Checked = False
-            task.sharpGL.resetView()
-        End If
-
-        Dim split = If(pointcloud Is Nothing, task.pointCloud.Split(), pointcloud.Split())
-        If pointcloud Is Nothing Then pointcloud = New cv.Mat
-        cv.Cv2.Merge({split(0), split(1), -split(2)}, pointcloud)
-        gl.MatrixMode(OpenGL.GL_PROJECTION)
-        gl.LoadIdentity()
-        gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, options.zNear, options.zFar)
-
-        gl.MatrixMode(OpenGL.GL_MODELVIEW)
-        gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
-        gl.LoadIdentity()
-        gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
-
-        gl.Translate(panX, panY, zoomZ)
-        gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
-        gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
-        gl.PointSize(options.pointSize)
-
-        Return runFunction(func, pointcloud, RGB)
-    End Function
-    Public Function RunSharpLinearFlipY(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
-        options.Run()
-
-        If task.gOptions.DebugCheckBox.Checked Then
-            task.gOptions.DebugCheckBox.Checked = False
-            task.sharpGL.resetView()
-        End If
-
-        Dim split = If(pointcloud Is Nothing, task.pointCloud.Split(), pointcloud.Split())
-        If pointcloud Is Nothing Then pointcloud = New cv.Mat
-        cv.Cv2.Merge({split(0), -split(1), -split(2)}, pointcloud)
-        gl.MatrixMode(OpenGL.GL_PROJECTION)
-        gl.LoadIdentity()
-        gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, options.zNear, options.zFar)
-
-        gl.MatrixMode(OpenGL.GL_MODELVIEW)
-        gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
-        gl.LoadIdentity()
-        gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
-
-        gl.Translate(panX, panY, zoomZ)
-        gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
-        gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
-        gl.PointSize(1.0F)
 
         Return runFunction(func, pointcloud, RGB)
     End Function

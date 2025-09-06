@@ -448,7 +448,8 @@ Public Class VBtask : Implements IDisposable
         allOptions = New OptionsContainer
         allOptions.Show()
 
-        If algName.StartsWith("GL_") And algName <> "GL_MainForm" Then
+        If algName.StartsWith("GL_") And algName <> "GL_MainForm" And task.optionsChanged Then
+            If sharpGL IsNot Nothing Then sharpGL.Dispose()
             sharpGL = New sgl
             sharpGL.Show()
         End If
