@@ -347,18 +347,16 @@ End Class
 
 
 Public Class GL_Line3Dall : Inherits TaskParent
-    Dim line3D As New Line3D_ReconstructLines
     Public Sub New()
         desc = "Visualize all the reconstructed 3D lines found in the RGB image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        line3D.Run(src)
-        dst2 = line3D.dst2
-        labels(2) = line3D.labels(2)
+        dst2.SetTo(0)
+        For Each lp In task.lines.lpList
+            DrawLine(dst2, lp, task.scalarColors(lp.index))
+        Next
 
-        dst1.SetTo(white)
-
-        strOut = task.sharpGL.RunSharpLinear(Comm.oCase.pcLines, line3D.pointcloud, dst1)
+        strOut = task.sharpGL.RunSharpLinear(Comm.oCase.drawPointCloudRGB, task.pointCloud, dst2)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -373,7 +371,7 @@ Public Class GL_Draw3DLines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.lines.dst2
-        strOut = task.sharpGL.RunSharpNonLinear(Comm.oCase.draw3DLines)
+        strOut = task.sharpGL.RunSharpLinear(Comm.oCase.draw3DLines)
         SetTrueText(strOut, 3)
     End Sub
 End Class

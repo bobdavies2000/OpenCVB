@@ -99,13 +99,14 @@ Public Class sgl
         Dim label = ""
         Select Case func
             Case Comm.oCase.drawPointCloudRGB
+                If RGB Is Nothing Then RGB = task.color
                 gl.Begin(OpenGL.GL_POINTS)
 
                 For y = 0 To task.pointCloud.Height - 1
                     For x = 0 To task.pointCloud.Width - 1
                         Dim vec As cv.Vec3f = task.pointCloud.At(Of cv.Vec3f)(y, x)
                         If vec(2) <> 0 Then
-                            Dim vec3b = task.color.Get(Of cv.Vec3b)(y, x)
+                            Dim vec3b = RGB.Get(Of cv.Vec3b)(y, x)
                             gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
                             gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
                         End If
@@ -190,15 +191,7 @@ Public Class sgl
 
 
             Case Comm.oCase.draw3DLines
-                gl.Color(1.0F, 1.0F, 1.0F)
-                gl.Begin(OpenGL.GL_LINES)
-
-                For Each lp In task.lines.lpList
-                    gl.Vertex(lp.pVec1(0), lp.pVec1(1), lp.pVec1(2))
-                    gl.Vertex(lp.pVec2(0), lp.pVec2(1), lp.pVec2(2))
-                Next
-                gl.End()
-                label = task.lines.labels(2)
+                label = draw3DLines()
 
 
             Case Comm.oCase.draw3DLinesAndCloud
@@ -214,20 +207,24 @@ Public Class sgl
                 Next
                 gl.End()
 
-                gl.Color(1.0F, 1.0F, 1.0F)
-                gl.Begin(OpenGL.GL_LINES)
-
-                Dim factor = 1 / options.zFar - options.zNear
-                For Each lp In task.lines.lpList
-                    gl.Vertex(lp.pVec1(0), lp.pVec1(1), lp.pVec1(2))
-                    gl.Vertex(lp.pVec2(0), lp.pVec2(1), lp.pVec2(2))
-                Next
-                gl.End()
-                label = task.lines.labels(2)
+                label = draw3DLines()
         End Select
 
         gl.Flush()
         Return label
+    End Function
+    Private Function draw3DLines()
+        gl.LineWidth(options.pointSize)
+
+        For Each lp In task.lines.lpList
+            Dim color = task.scalarColors(lp.index)
+            gl.Color(color(2) / 255, color(1) / 255, color(0) / 255)
+            gl.Begin(OpenGL.GL_LINES)
+            gl.Vertex(lp.pVec1(0), lp.pVec1(1), lp.pVec1(2))
+            gl.Vertex(lp.pVec2(0), lp.pVec2(1), lp.pVec2(2))
+            gl.End()
+        Next
+        Return task.lines.labels(2)
     End Function
     Public Function RunSharpNonLinear(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
         options.Run()
@@ -249,7 +246,7 @@ Public Class sgl
         gl.Translate(panX, panY, zoomZ)
         gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
-        gl.PointSize(1.0F)
+        gl.PointSize(options.pointSize)
 
         Return runFunction(func, pointcloud, RGB)
     End Function
@@ -276,7 +273,7 @@ Public Class sgl
         gl.Translate(panX, panY, zoomZ)
         gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
-        gl.PointSize(1.0F)
+        gl.PointSize(options.pointSize)
 
         Return runFunction(func, pointcloud, RGB)
     End Function

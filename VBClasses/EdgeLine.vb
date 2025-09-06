@@ -17,12 +17,12 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         Dim cppData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
+        Dim imageEdgeWidth = 2
+        Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, imageEdgeWidth)
         handleSrc.Free()
         If imagePtr <> 0 Then dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        Dim imageEdgeWidth = 2
         If dst2.Width >= 1280 Then imageEdgeWidth = 4
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth) ' prevent leaks at the image boundary...
 
