@@ -252,7 +252,7 @@ Public Class sgl
         If task.gOptions.GL_LinearMode.Checked Then
             gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, options.zNear, options.zFar)
         Else
-            gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
+            ' gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
         End If
 
         gl.MatrixMode(OpenGL.GL_MODELVIEW)

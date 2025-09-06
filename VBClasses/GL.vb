@@ -99,12 +99,10 @@ Public Class GL_ReadPCDisplay : Inherits TaskParent
             SetTrueText(strOut, 2)
         End If
 
-        dst1 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
-        Dim mm = GetMinMax(dst1)
-
-        dst2 = dst1.InRange(0.1, 20)
-        dst3 = dst2.ConvertScaleAbs(255)
-        dst1.CopyTo(dst2, dst3)
+        dst2 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
+        'dst2 = dst1.Threshold(254, 0, cv.ThresholdTypes.Binary)
+        'dst3 = dst1.ConvertScaleAbs(255)
+        '  dst1.CopyTo(dst2, dst3)
     End Sub
 End Class
 

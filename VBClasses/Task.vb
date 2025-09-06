@@ -75,6 +75,7 @@ Public Class VBtask : Implements IDisposable
     Public rows As Integer
     Public cols As Integer
     Public workRes As cv.Size
+    Public captureRes As cv.Size
 
     ' if true, algorithm prep means algorithm tasks will run.  If false, they have already been run...
     Public algorithmPrep As Boolean = True
@@ -432,6 +433,7 @@ Public Class VBtask : Implements IDisposable
         rows = parms.workRes.Height
         cols = parms.workRes.Width
         workRes = parms.workRes
+        captureRes = parms.captureRes
         optionsChanged = True
 
         ReDim task.results.dstList(3)
@@ -450,6 +452,8 @@ Public Class VBtask : Implements IDisposable
         If algName.StartsWith("GL_") And algName <> "GL_MainForm" And task.optionsChanged Then
             If sharpGL IsNot Nothing Then sharpGL.Dispose()
             sharpGL = New sgl
+            sharpGL.GLControl.Width = task.captureRes.Width
+            sharpGL.GLControl.Height = task.captureRes.Height
             sharpGL.Show()
         End If
 
