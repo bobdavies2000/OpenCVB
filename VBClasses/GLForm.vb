@@ -25,8 +25,10 @@ Public Class sgl
         options2 = New Options_SharpGL2
         Me.Left = GetSetting("Opencv", "sglLeft", "sglLeft", task.mainFormLocation.X + task.mainFormLocation.Width)
         Me.Top = GetSetting("Opencv", "sglTop", "sglTop", task.mainFormLocation.Y)
-        Me.Width = GetSetting("Opencv", "sglWidth", "sglWidth", task.mainFormLocation.Width)
-        Me.Height = GetSetting("Opencv", "sglHeight", "sglHeight", task.mainFormLocation.Height)
+        Me.Width = task.workRes.Width + 50
+        Me.Height = task.workRes.Height + 64
+        'Me.Width = GetSetting("Opencv", "sglWidth", "sglWidth", task.mainFormLocation.Width)
+        'Me.Height = GetSetting("Opencv", "sglHeight", "sglHeight", task.mainFormLocation.Height)
         gl = GLControl.OpenGL
     End Sub
     Public Sub saveLocation()
@@ -110,11 +112,11 @@ Public Class sgl
         If RGB Is Nothing Then RGB = task.color
         Select Case func
             Case Comm.oCase.drawPointCloudRGB
-                gl.Enable(OpenGL.GL_DEPTH_TEST)
-                gl.Enable(OpenGL.GL_STENCIL_TEST)
+                'gl.Enable(OpenGL.GL_DEPTH_TEST)
+                'gl.Enable(OpenGL.GL_STENCIL_TEST)
 
-                gl.ClearStencil(0)
-                gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT Or OpenGL.GL_STENCIL_BUFFER_BIT)
+                'gl.ClearStencil(0)
+                'gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT Or OpenGL.GL_STENCIL_BUFFER_BIT)
 
                 label = drawCloud(pointCloud, RGB)
 

@@ -69,6 +69,7 @@ Public Class Threshold_Definitions : Inherits TaskParent
 
         gradient.Run(src)
         dst0 = gradient.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst0 = dst0.Flip(cv.FlipMode.Y) ' start low and go to high
         dst1 = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary)
         mats.mat(0) = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv)
         mats.mat(1) = dst0.Threshold(options.threshold, 255, cv.ThresholdTypes.Trunc)
@@ -84,14 +85,15 @@ Public Class Threshold_Definitions : Inherits TaskParent
         SetTrueText("ToZero", New cv.Point(10, dst2.Height / 2 + 10), 2)
         SetTrueText("ToZeroInv", New cv.Point(dst2.Width / 2 + 5, dst2.Height / 2 + 10), 2)
         Dim thresh = CStr(options.threshold)
-        SetTrueText(
-            vbCrLf + "Upper left:  the input for all the tests below..." + vbCrLf +
-            vbCrLf + "Upper right: dst0.Threshold(" + thresh + ", 255, cv.ThresholdTypes.Binary)" + vbCrLf +
-            vbCrLf + "0: dst0.Threshold(" + thresh + ", 255, cv.ThresholdTypes.BinaryInv)" + vbCrLf +
-            vbCrLf + "1: dst0.Threshold(" + thresh + ", 255, cv.ThresholdTypes.Trunc)" + vbCrLf +
-            vbCrLf + "2: dst0.Threshold(" + thresh + ", 255, cv.ThresholdTypes.Tozero)" + vbCrLf +
-            vbCrLf + "1: dst0.Threshold(" + thresh + ", 255, cv.ThresholdTypes.TozeroInv)" + vbCrLf,
-        3)
+        strOut = "Upper left:  the input for all the tests below..." + vbCrLf
+        strOut += "Upper right: dst0.Threshold(" + thresh + ", 255, cv.ThresholdTypes.Binary)" + vbCrLf + vbCrLf
+        strOut += "For the 4 images at the left:" + vbCrLf + vbCrLf
+        strOut += "0: dst0.Threshold(" + thresh + ", 255, cv.ThresholdTypes.BinaryInv)" + vbCrLf
+        strOut += "1: dst0.Threshold(" + thresh + ", 255, cv.ThresholdTypes.Trunc)" + vbCrLf
+        strOut += "2: dst0.Threshold(" + thresh + ", 255, cv.ThresholdTypes.Tozero)" + vbCrLf
+        strOut += "3: dst0.Threshold(" + thresh + ", 255, cv.ThresholdTypes.TozeroInv)" + vbCrLf
+
+        SetTrueText(strOut, 3)
 
         labels(3) = "Current threshold is " + CStr(options.threshold)
     End Sub
