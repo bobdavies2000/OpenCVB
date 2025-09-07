@@ -378,12 +378,14 @@ Public Class VBtask : Implements IDisposable
         Next
         Return saveObject
     End Function
-    Private Sub postProcess(src As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat)
+    Private Sub postProcess(src As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat)
         Try
             If PixelViewer IsNot Nothing Then
                 If pixelViewerOn Then
                     PixelViewer.viewerForm.Visible = True
                     PixelViewer.viewerForm.Show()
+                    PixelViewer.dst0Input = src
+                    PixelViewer.dst1Input = dst1
                     PixelViewer.dst2Input = dst2
                     PixelViewer.dst3Input = dst3
                     PixelViewer.Run(src)
@@ -456,6 +458,7 @@ Public Class VBtask : Implements IDisposable
             sharpGL = New sgl
             sharpGL.GLControl.Width = task.workRes.Width
             sharpGL.GLControl.Height = task.workRes.Height
+
             sharpGL.Show()
         End If
 
@@ -742,7 +745,7 @@ Public Class VBtask : Implements IDisposable
             heartBeatLT = False
 
             Dim displayObject = findDisplayObject(task.displayObjectName)
-            postProcess(src, displayObject.dst2, displayObject.dst3)
+            postProcess(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
 
             SyncLock resultLock
                 If gOptions.displayDst0.Checked Then

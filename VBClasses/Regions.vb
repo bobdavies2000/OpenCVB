@@ -108,8 +108,8 @@ Public Class Region_Quads : Inherits TaskParent
 
             quadData.Add(brick1.color)
 
-            Dim p0 = getWorldCoordinates(rect.TopLeft, brick1.depth)
-            Dim p1 = getWorldCoordinates(rect.BottomRight, brick2.depth)
+            Dim p0 = worldCoordinates(rect.TopLeft, brick1.depth)
+            Dim p1 = worldCoordinates(rect.BottomRight, brick2.depth)
 
             quadData.Add(New cv.Point3f(p0.X, p0.Y, brick1.depth))
             quadData.Add(New cv.Point3f(p1.X, p0.Y, brick2.depth))

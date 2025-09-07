@@ -4,6 +4,8 @@ Public Class Pixel_Viewer : Inherits TaskParent
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm
     Dim mouseLoc = New cv.Point(10, 10) ' assume 
+    Public dst0Input As cv.Mat
+    Public dst1Input As cv.Mat
     Public dst2Input As cv.Mat
     Public dst3Input As cv.Mat
     Enum displayTypes
@@ -20,8 +22,8 @@ Public Class Pixel_Viewer : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            task.results.dstList(0) = task.color.Clone
-            task.results.dstList(1) = task.depthRGB.Clone
+            task.results.dstList(0) = dst0Input
+            task.results.dstList(1) = dst1Input
             task.results.dstList(2) = dst2Input
             task.results.dstList(3) = dst3Input
         End If

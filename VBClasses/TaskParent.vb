@@ -32,6 +32,10 @@ Public Class TaskParent : Implements IDisposable
     Public trueData As New List(Of TrueText)
     Public strOut As String
     Public emptyRect As New cv.Rect
+    Dim ppx = task.calibData.rgbIntrinsics.ppx
+    Dim ppy = task.calibData.rgbIntrinsics.ppy
+    Dim fx = task.calibData.rgbIntrinsics.fx
+    Dim fy = task.calibData.rgbIntrinsics.fy
     Public Sub New()
         traceName = Me.GetType.Name
 
@@ -294,17 +298,17 @@ Public Class TaskParent : Implements IDisposable
     Public Function dotProduct3D(v1 As cv.Point3f, v2 As cv.Point3f) As Single
         Return Math.Abs(v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z)
     End Function
-    Public Function getWorldCoordinates(p As cv.Point3f) As cv.Point3f
-        Dim x = (p.X - task.calibData.rgbIntrinsics.ppx) / task.calibData.rgbIntrinsics.fx
-        Dim y = (p.Y - task.calibData.rgbIntrinsics.ppy) / task.calibData.rgbIntrinsics.fy
+    Public Function WorldCoordinates(p As cv.Point3f) As cv.Point3f
+        Dim x = (p.X - ppx) / fx
+        Dim y = (p.Y - ppy) / fy
         Return New cv.Point3f(x * p.Z, y * p.Z, p.Z)
     End Function
-    Public Function getWorldCoordinates(p As cv.Point, depth As Single) As cv.Point3f
-        Dim x = (p.X - task.calibData.rgbIntrinsics.ppx) / task.calibData.rgbIntrinsics.fx
-        Dim y = (p.Y - task.calibData.rgbIntrinsics.ppy) / task.calibData.rgbIntrinsics.fy
+    Public Function WorldCoordinates(p As cv.Point, depth As Single) As cv.Point3f
+        Dim x = (p.X - ppx) / fx
+        Dim y = (p.Y - ppy) / fy
         Return New cv.Point3f(x * depth, y * depth, depth)
     End Function
-    Public Function getWorldCoordinatesD6(p As cv.Point3f) As cv.Vec6f
+    Public Function worldCoordinatesD6(p As cv.Point3f) As cv.Vec6f
         Dim x = CSng((p.X - task.calibData.rgbIntrinsics.ppx) / task.calibData.rgbIntrinsics.fx)
         Dim y = CSng((p.Y - task.calibData.rgbIntrinsics.ppy) / task.calibData.rgbIntrinsics.fy)
         Return New cv.Vec6f(x * p.Z, y * p.Z, p.Z, p.X, p.Y, 0)

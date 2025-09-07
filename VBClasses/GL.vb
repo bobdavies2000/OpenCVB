@@ -91,13 +91,10 @@ End Class
 
 Public Class GL_DisplayPC : Inherits TaskParent
     Public Sub New()
-        If standalone Then task.gOptions.DebugSlider.Maximum = 255
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
         desc = "Display the pointcloud read back from SharpGL and display it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static zfarSlider = OptionParent.FindSlider("zFar")
-        Dim zFar As Single = zfarSlider.value
         If standalone Then
             strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
             SetTrueText(strOut, 2)
@@ -105,9 +102,15 @@ Public Class GL_DisplayPC : Inherits TaskParent
 
         dst1 = task.sharpDepth(New cv.Rect(0, 0, task.sharpDepth.Width - 50, task.sharpDepth.Height - 64))
         dst1 = dst1.Flip(cv.FlipMode.X) ' with windows y increases down.
-        dst2 = dst1.InRange(0.1F, zFar)
-        dst3.SetTo(0)
-        dst1.CopyTo(dst3, dst2)
+        dst3 = dst1.InRange(task.sharpGL.options.zNear, task.sharpGL.options.zFar)
+
+        task.sharpGL.ppx = task.calibData.rgbIntrinsics.ppx
+        task.sharpGL.ppy = task.calibData.rgbIntrinsics.ppy
+        task.sharpGL.fx = task.calibData.rgbIntrinsics.fx
+        task.sharpGL.fy = task.calibData.rgbIntrinsics.fy
+
+        dst1.SetTo(0, Not dst3)
+        dst2 = task.sharpGL.worldCoordinateInverse(dst3, dst1)
     End Sub
 End Class
 

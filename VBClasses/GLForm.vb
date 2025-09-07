@@ -20,6 +20,10 @@ Public Class sgl
     Dim upZ As Integer
     Public options As Options_SharpGL
     Public options2 As Options_SharpGL2
+    Public ppx = task.calibData.rgbIntrinsics.ppx
+    Public ppy = task.calibData.rgbIntrinsics.ppy
+    Public fx = task.calibData.rgbIntrinsics.fx
+    Public fy = task.calibData.rgbIntrinsics.fy
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         options = New Options_SharpGL
         options2 = New Options_SharpGL2
@@ -83,10 +87,15 @@ Public Class sgl
         zoomZ += If(delta > 0, 0.5F, -0.5F)
         GLControl.Invalidate() ' Force redraw
     End Sub
-    Public Function getWorldCoordinates(p As cv.Point, depth As Single) As cv.Point3f
-        Dim x = (p.X - task.calibData.rgbIntrinsics.ppx) / task.calibData.rgbIntrinsics.fx
-        Dim y = (p.Y - task.calibData.rgbIntrinsics.ppy) / task.calibData.rgbIntrinsics.fy
-        Return New cv.Point3f(-x * depth, y * depth, depth)
+    Public Function WorldCoordinates(p As cv.Point3f) As cv.Point3f
+        Dim x = (p.X - ppx) / fx
+        Dim y = (p.Y - ppy) / fy
+        Return New cv.Point3f(x * p.Z, y * p.Z, p.Z)
+    End Function
+    Public Function WorldCoordinates(p As cv.Point, depth As Single) As cv.Point3f
+        Dim x = (p.X - ppx) / fx
+        Dim y = (p.Y - ppy) / fy
+        Return New cv.Point3f(x * depth, y * depth, depth)
     End Function
     Private Sub sgl_Closed(sender As Object, e As EventArgs) Handles Me.Closed
         task.closeRequest = True
@@ -148,8 +157,9 @@ Public Class sgl
                 drawQuads()
 
             Case Comm.oCase.readPC
+                task.sharpDepth = New cv.Mat(Height, Width, cv.MatType.CV_32F)
                 label = drawCloud(pointCloud, RGB)
-                readPointCloud()
+                gl.ReadPixels(0, 0, Width, Height, OpenGL.GL_DEPTH_COMPONENT, OpenGL.GL_FLOAT, task.sharpDepth.Data)
 
             Case Comm.oCase.draw3DLines
                 label = draw3DLines()
@@ -164,24 +174,21 @@ Public Class sgl
         Return label
     End Function
     Private Sub readPointCloud()
-        task.sharpDepth = New cv.Mat(Height, Width, cv.MatType.CV_32F)
 
-        gl.ReadPixels(0, 0, Width, Height, OpenGL.GL_DEPTH_COMPONENT, OpenGL.GL_FLOAT, task.sharpDepth.Data)
+        'Dim near = options.zNear
+        'Dim far = options.zFar
+        'Dim a As Single = 2.0F * near * far
+        'Dim b As Single = far + near
+        'Dim c As Single = far - near
 
-        Dim near = options.zNear
-        Dim far = options.zFar
-        Dim a As Single = 2.0F * near * far
-        Dim b As Single = far + near
-        Dim c As Single = far - near
+        '' convert from (0 to 1) to (-1 to 1)
+        'task.sharpDepth = task.sharpDepth * 2.0F
+        'task.sharpDepth -= 1.0F
 
-        ' convert from (0 to 1) to (-1 to 1)
-        task.sharpDepth = task.sharpDepth * 2.0F
-        task.sharpDepth -= 1.0F
-
-        Dim denom As New Mat()
-        Cv2.Multiply(task.sharpDepth, c, denom)         ' denom = task.sharpDepth * c
-        Cv2.Subtract(b, denom, denom)         ' denom = b - task.sharpDepth * c
-        Cv2.Divide(a, denom, task.sharpDepth)
+        'Dim denom As New Mat()
+        'Cv2.Multiply(task.sharpDepth, c, denom)         ' denom = task.sharpDepth * c
+        'Cv2.Subtract(b, denom, denom)         ' denom = b - task.sharpDepth * c
+        'Cv2.Divide(a, denom, task.sharpDepth)
     End Sub
     Private Function drawQuads() As String
         gl.Begin(OpenGL.GL_QUADS)
@@ -195,8 +202,8 @@ Public Class sgl
             Dim color = task.color(rect).Mean()
 
             gl.Color(CSng(color(2) / 255), CSng(color(1) / 255), CSng(color(0) / 255))
-            Dim p0 = getWorldCoordinates(rect.TopLeft, depth)
-            Dim p1 = getWorldCoordinates(rect.BottomRight, depth)
+            Dim p0 = WorldCoordinates(rect.TopLeft, depth)
+            Dim p1 = WorldCoordinates(rect.BottomRight, depth)
             gl.Vertex(p0.X, p0.Y, depth)
             gl.Vertex(p1.X, p0.Y, depth)
             gl.Vertex(p1.X, p1.Y, depth)
@@ -209,8 +216,8 @@ Public Class sgl
     Private Function drawCloud(pc As cv.Mat, rgb As cv.Mat) As String
         gl.Begin(OpenGL.GL_POINTS)
         Dim count As Integer
-        gl.StencilFunc(CType(OpenGL.GL_ALWAYS, Enumerations.StencilFunction), CInt(1), &HFF) ' Always pass stencil test
-        gl.StencilOp(OpenGL.GL_KEEP, OpenGL.GL_KEEP, OpenGL.GL_REPLACE) ' Replace stencil with 1 on depth pass
+        'gl.StencilFunc(CType(OpenGL.GL_ALWAYS, Enumerations.StencilFunction), CInt(1), &HFF) ' Always pass stencil test
+        'gl.StencilOp(OpenGL.GL_KEEP, OpenGL.GL_KEEP, OpenGL.GL_REPLACE) ' Replace stencil with 1 on depth pass
         For y = 0 To pc.Height - 1
             For x = 0 To pc.Width - 1
                 If task.depthMask.Get(Of Byte)(y, x) <> 0 Then
@@ -237,6 +244,24 @@ Public Class sgl
             gl.End()
         Next
         Return task.lines.labels(2)
+    End Function
+    Public Function worldCoordinateInverse(mask As cv.Mat, depth As cv.Mat) As cv.Mat
+        Dim dst As New cv.Mat(depth.Size, cv.MatType.CV_32F, 0)
+        Dim znear = options.zNear
+        Dim zfar = options.zFar
+        For y = 0 To depth.Height - 1
+            For x = 0 To depth.Width - 1
+                If mask.Get(Of Byte)(y, x) = 0 Then Continue For
+                Dim d = znear + depth.Get(Of Single)(y, x) * (zfar - znear)
+                If d > 1 Then Dim k = 0
+                Dim u = CInt((x * fx / d) + ppx)
+                Dim v = CInt((y * fy / d) + ppy)
+                If u >= 0 And u < task.workRes.Width And v >= 0 And v < task.workRes.Height Then
+                    dst.Set(Of Single)(v, u, d)
+                End If
+            Next
+        Next
+        Return dst
     End Function
     Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
         options.Run()
