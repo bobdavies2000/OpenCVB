@@ -143,62 +143,14 @@ Public Class sgl
 
 
             Case Comm.oCase.quadBasics
-                gl.Begin(OpenGL.GL_QUADS)
-
-                Dim count As Integer
-                For i = 0 To task.gridRects.Count - 1
-                    Dim rect = task.gridRects(i)
-                    Dim depth = -task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
-                    If depth = 0 Then Continue For
-                    count += 1
-                    Dim color = task.color(rect).Mean()
-
-                    gl.Color(CSng(color(2) / 255), CSng(color(1) / 255), CSng(color(0) / 255))
-                    Dim p0 = getWorldCoordinates(rect.TopLeft, depth)
-                    Dim p1 = getWorldCoordinates(rect.BottomRight, depth)
-                    gl.Vertex(p0.X, p0.Y, depth)
-                    gl.Vertex(p1.X, p0.Y, depth)
-                    gl.Vertex(p1.X, p1.Y, depth)
-                    gl.Vertex(p0.X, p1.Y, depth)
-                Next
-
-                gl.End()
-                label = CStr(count) + " grid rects had depth."
-
+                drawQuads()
 
             Case Comm.oCase.readPC
                 label = drawCloud(pointCloud, RGB)
-
-                task.sharpDepth = New cv.Mat(Height, Width, cv.MatType.CV_32F)
-
-                gl.ReadPixels(0, 0, Width, Height, OpenGL.GL_DEPTH_COMPONENT, OpenGL.GL_FLOAT,
-                                      task.sharpDepth.Data)
-
-                Dim mm1 = GetMinMax(task.sharpDepth)
-
-                Dim near = options.zNear
-                Dim far = options.zFar
-                Dim a As Single = 2.0F * near * far
-                Dim b As Single = far + near
-                Dim c As Single = far - near
-
-                ' convert from (0 to 1) to (-1 to 1)
-                task.sharpDepth = task.sharpDepth * 2.0F
-                task.sharpDepth -= 1.0F
-                Dim mm2 = GetMinMax(task.sharpDepth)
-
-                Dim denom As New Mat()
-                Cv2.Multiply(task.sharpDepth, c, denom)         ' denom = task.sharpDepth * c
-                Cv2.Subtract(b, denom, denom)         ' denom = b - task.sharpDepth * c
-                Cv2.Divide(a, denom, task.sharpDepth)
-
-                gl.Flush()
-                gl.Finish()
-
+                readPointCloud()
 
             Case Comm.oCase.draw3DLines
                 label = draw3DLines()
-
 
             Case Comm.oCase.draw3DLinesAndCloud
                 label = drawCloud(pointCloud, RGB)
@@ -208,6 +160,49 @@ Public Class sgl
 
         gl.Flush()
         Return label
+    End Function
+    Private Sub readPointCloud()
+        task.sharpDepth = New cv.Mat(Height, Width, cv.MatType.CV_32F)
+
+        gl.ReadPixels(0, 0, Width, Height, OpenGL.GL_DEPTH_COMPONENT, OpenGL.GL_FLOAT, task.sharpDepth.Data)
+
+        Dim near = options.zNear
+        Dim far = options.zFar
+        Dim a As Single = 2.0F * near * far
+        Dim b As Single = far + near
+        Dim c As Single = far - near
+
+        ' convert from (0 to 1) to (-1 to 1)
+        task.sharpDepth = task.sharpDepth * 2.0F
+        task.sharpDepth -= 1.0F
+
+        Dim denom As New Mat()
+        Cv2.Multiply(task.sharpDepth, c, denom)         ' denom = task.sharpDepth * c
+        Cv2.Subtract(b, denom, denom)         ' denom = b - task.sharpDepth * c
+        Cv2.Divide(a, denom, task.sharpDepth)
+    End Sub
+    Private Function drawQuads() As String
+        gl.Begin(OpenGL.GL_QUADS)
+
+        Dim count As Integer
+        For i = 0 To task.gridRects.Count - 1
+            Dim rect = task.gridRects(i)
+            Dim depth = -task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
+            If depth = 0 Then Continue For
+            count += 1
+            Dim color = task.color(rect).Mean()
+
+            gl.Color(CSng(color(2) / 255), CSng(color(1) / 255), CSng(color(0) / 255))
+            Dim p0 = getWorldCoordinates(rect.TopLeft, depth)
+            Dim p1 = getWorldCoordinates(rect.BottomRight, depth)
+            gl.Vertex(p0.X, p0.Y, depth)
+            gl.Vertex(p1.X, p0.Y, depth)
+            gl.Vertex(p1.X, p1.Y, depth)
+            gl.Vertex(p0.X, p1.Y, depth)
+        Next
+
+        gl.End()
+        Return CStr(count) + " grid rects had depth."
     End Function
     Private Function drawCloud(pc As cv.Mat, rgb As cv.Mat) As String
         gl.Begin(OpenGL.GL_POINTS)

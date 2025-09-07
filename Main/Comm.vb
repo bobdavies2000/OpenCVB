@@ -23,6 +23,7 @@ Public Class Comm
         drawLines
         drawAvgPointCloudRGB
         readPC
+        readQuads
         draw3DLines
         draw3DLinesAndCloud
         test

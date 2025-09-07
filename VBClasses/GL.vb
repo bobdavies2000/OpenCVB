@@ -134,6 +134,24 @@ End Class
 
 
 
+
+Public Class GL_ReadQuads : Inherits TaskParent
+    Dim displayPC As New GL_DisplayPC
+    Public Sub New()
+        desc = "Read the quads back from a rendered geometry"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
+        SetTrueText(strOut, 2)
+
+        displayPC.Run(emptyMat)
+        dst2 = displayPC.dst2
+    End Sub
+End Class
+
+
+
+
 Public Class GL_ReadPCHist : Inherits TaskParent
     Dim plotHist As New GL_PlotHist
     Dim displayPC As New GL_DisplayPC
