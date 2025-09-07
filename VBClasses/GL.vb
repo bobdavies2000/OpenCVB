@@ -99,10 +99,7 @@ Public Class GL_DisplayPC : Inherits TaskParent
             strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
             SetTrueText(strOut, 2)
         End If
-
-        dst1 = task.sharpDepth(New cv.Rect(0, 0, task.sharpDepth.Width - 50, task.sharpDepth.Height - 64))
-        dst1 = dst1.Flip(cv.FlipMode.X) ' with windows y increases down.
-        dst3 = dst1.InRange(task.sharpGL.options.zNear, task.sharpGL.options.zFar)
+        dst3 = task.sharpDepth.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
 
         task.sharpGL.ppx = task.calibData.rgbIntrinsics.ppx
         task.sharpGL.ppy = task.calibData.rgbIntrinsics.ppy
@@ -110,7 +107,7 @@ Public Class GL_DisplayPC : Inherits TaskParent
         task.sharpGL.fy = task.calibData.rgbIntrinsics.fy
 
         dst1.SetTo(0, Not dst3)
-        dst2 = task.sharpGL.worldCoordinateInverse(dst3, dst1)
+        dst2 = task.sharpGL.worldCoordinateInverse(dst3, task.sharpDepth)
     End Sub
 End Class
 
@@ -161,15 +158,15 @@ Public Class GL_ReadPCHist : Inherits TaskParent
         desc = "Read the point cloud from a rendered geometry"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
-        labels(2) = strOut
+        'strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
+        'labels(2) = strOut
 
-        plotHist.Run(task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest))
-        dst3 = plotHist.dst3
-        labels(2) = plotHist.labels(2)
+        'plotHist.Run(task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest))
+        'dst3 = plotHist.dst3
+        'labels(2) = plotHist.labels(2)
 
-        displayPC.Run(emptyMat)
-        dst2 = displayPC.dst2
+        'displayPC.Run(emptyMat)
+        'dst2 = displayPC.dst2
     End Sub
 End Class
 
@@ -204,17 +201,17 @@ Public Class GL_RunSharpHist : Inherits TaskParent
         desc = "Read the point cloud from a rendered geometry"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
-            SetTrueText(strOut, 2)
-        End If
+        'If standalone Then
+        '    strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
+        '    SetTrueText(strOut, 2)
+        'End If
 
-        plotHist.Run(task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest))
-        dst3 = plotHist.dst3
-        labels(2) = plotHist.labels(2)
+        'plotHist.Run(task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest))
+        'dst3 = plotHist.dst3
+        'labels(2) = plotHist.labels(2)
 
-        displayPC.Run(emptyMat)
-        dst2 = displayPC.dst2
+        'displayPC.Run(emptyMat)
+        'dst2 = displayPC.dst2
     End Sub
 End Class
 
@@ -235,33 +232,33 @@ Public Class GL_PlotHist : Inherits TaskParent
         desc = "Read the pointcloud back from SharpGL and plot a histogram of the result."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            Static readCloud As New GL_RunSharp
-            readCloud.Run(emptyMat)
-            strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
-            SetTrueText(strOut, 2)
-            dst1 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
-        Else
-            dst1 = src
-        End If
+        'If standalone Then
+        '    Static readCloud As New GL_RunSharp
+        '    readCloud.Run(emptyMat)
+        '    strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
+        '    SetTrueText(strOut, 2)
+        '    dst1 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
+        'Else
+        '    dst1 = src
+        'End If
 
-        Dim tmp = dst1.InRange(0.1, task.MaxZmeters)
-        dst0 = tmp.ConvertScaleAbs(255)
+        'Dim tmp = dst1.InRange(0.1, task.MaxZmeters)
+        'dst0 = tmp.ConvertScaleAbs(255)
 
-        dst2.SetTo(0)
-        dst1.CopyTo(dst2, dst0)
+        'dst2.SetTo(0)
+        'dst1.CopyTo(dst2, dst0)
 
-        plotHist.maxRange = task.MaxZmeters
-        plotHist.Run(dst2)
-        dst3 = plotHist.dst2
+        'plotHist.maxRange = task.MaxZmeters
+        'plotHist.Run(dst2)
+        'dst3 = plotHist.dst2
 
-        Dim histList = plotHist.histArray.ToList
-        Dim maxBin = histList.IndexOf(histList.Max)
-        SetTrueText("Max bin at " + CStr(maxBin) + " meters", New cv.Point(dst2.Width / 2, 10), 3)
-        labels(3) = "Distances range from 0 to " + CStr(task.MaxZmeters) + " meters with 1m per bin (by default)"
+        'Dim histList = plotHist.histArray.ToList
+        'Dim maxBin = histList.IndexOf(histList.Max)
+        'SetTrueText("Max bin at " + CStr(maxBin) + " meters", New cv.Point(dst2.Width / 2, 10), 3)
+        'labels(3) = "Distances range from 0 to " + CStr(task.MaxZmeters) + " meters with 1m per bin (by default)"
 
-        displayPC.Run(emptyMat)
-        dst2 = displayPC.dst2
+        'displayPC.Run(emptyMat)
+        'dst2 = displayPC.dst2
     End Sub
 End Class
 

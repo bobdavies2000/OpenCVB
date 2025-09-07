@@ -115,81 +115,6 @@ Public Class sgl
         mm.range = mm.maxVal - mm.minVal
         Return mm
     End Function
-    Private Function runFunction(func As Integer, pointCloud As cv.Mat, RGB As cv.Mat) As String
-        Dim label = ""
-        If pointCloud Is Nothing Then pointCloud = task.pointCloud
-        If RGB Is Nothing Then RGB = task.color
-        Select Case func
-            Case Comm.oCase.drawPointCloudRGB
-                'gl.Enable(OpenGL.GL_DEPTH_TEST)
-                'gl.Enable(OpenGL.GL_STENCIL_TEST)
-
-                'gl.ClearStencil(0)
-                'gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT Or OpenGL.GL_STENCIL_BUFFER_BIT)
-
-                label = drawCloud(pointCloud, RGB)
-
-
-            Case Comm.oCase.line3D
-                gl.Begin(OpenGL.GL_POINTS)
-                Dim count As Integer, all255 As Boolean
-                If RGB Is Nothing Then all255 = True
-                For y = 0 To pointCloud.Height - 1
-                    For x = 0 To pointCloud.Width - 1
-                        Dim vec = pointCloud.Get(Of cv.Vec3f)(y, x)
-                        If vec(2) <> 0 Then
-                            If all255 Then
-                                gl.Color(1.0, 1.0, 1.0)
-                            Else
-                                Dim vec3b = RGB.Get(Of cv.Vec3b)(y, x)
-                                gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
-                            End If
-                            gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
-                            count += 1
-                        End If
-                    Next
-                Next
-                gl.End()
-                label = CStr(count) + " points were rendered for the selected line(s)."
-
-
-            Case Comm.oCase.quadBasics
-                drawQuads()
-
-            Case Comm.oCase.readPC
-                task.sharpDepth = New cv.Mat(Height, Width, cv.MatType.CV_32F)
-                label = drawCloud(pointCloud, RGB)
-                gl.ReadPixels(0, 0, Width, Height, OpenGL.GL_DEPTH_COMPONENT, OpenGL.GL_FLOAT, task.sharpDepth.Data)
-
-            Case Comm.oCase.draw3DLines
-                label = draw3DLines()
-
-            Case Comm.oCase.draw3DLinesAndCloud
-                label = drawCloud(pointCloud, RGB)
-
-                label += " " + draw3DLines()
-        End Select
-
-        gl.Flush()
-        Return label
-    End Function
-    Private Sub readPointCloud()
-
-        'Dim near = options.zNear
-        'Dim far = options.zFar
-        'Dim a As Single = 2.0F * near * far
-        'Dim b As Single = far + near
-        'Dim c As Single = far - near
-
-        '' convert from (0 to 1) to (-1 to 1)
-        'task.sharpDepth = task.sharpDepth * 2.0F
-        'task.sharpDepth -= 1.0F
-
-        'Dim denom As New Mat()
-        'Cv2.Multiply(task.sharpDepth, c, denom)         ' denom = task.sharpDepth * c
-        'Cv2.Subtract(b, denom, denom)         ' denom = b - task.sharpDepth * c
-        'Cv2.Divide(a, denom, task.sharpDepth)
-    End Sub
     Private Function drawQuads() As String
         gl.Begin(OpenGL.GL_QUADS)
 
@@ -263,6 +188,45 @@ Public Class sgl
         Next
         Return dst
     End Function
+    Private Sub readPointCloud()
+
+        'Dim near = options.zNear
+        'Dim far = options.zFar
+        'Dim a As Single = 2.0F * near * far
+        'Dim b As Single = far + near
+        'Dim c As Single = far - near
+
+        '' convert from (0 to 1) to (-1 to 1)
+        'task.sharpDepth = task.sharpDepth * 2.0F
+        'task.sharpDepth -= 1.0F
+
+        'Dim denom As New Mat()
+        'Cv2.Multiply(task.sharpDepth, c, denom)         ' denom = task.sharpDepth * c
+        'Cv2.Subtract(b, denom, denom)         ' denom = b - task.sharpDepth * c
+        'Cv2.Divide(a, denom, task.sharpDepth)
+    End Sub
+    Private Function ReadFilteredDepth() As cv.Mat
+        Dim sharpDepth As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
+        gl.ReadPixels(0, 0, sharpDepth.Width, sharpDepth.Height, OpenGL.GL_DEPTH_COMPONENT, OpenGL.GL_FLOAT, sharpDepth.Data)
+        Dim znear = options.zNear
+        Dim zfar = options.zFar
+        Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
+        Dim h = sharpDepth.Height
+        For y = 0 To sharpDepth.Height - 1
+            For x = 0 To sharpDepth.Width - 1
+                Dim depthValue = sharpDepth.Get(Of Single)(y, x)
+
+                ' Filter out untouched pixels (depth = 1.0 means zFar)
+                If depthValue < 1.0F Then
+                    ' Convert normalized depth to world-space Z (linear in ortho)
+                    Dim Z = znear + depthValue * (zfar - znear)
+                    dst.Set(Of Single)(h - 1 - y, x, Z)
+                End If
+            Next
+        Next
+
+        Return dst
+    End Function
     Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
         options.Run()
         options2.Run()
@@ -272,10 +236,9 @@ Public Class sgl
             task.sharpGL.resetView()
         End If
         If task.firstPass Or task.optionsChanged Then task.sharpGL.resetView()
-
+        gl.Viewport(0, 0, GLControl.Width, GLControl.Height)
         gl.MatrixMode(OpenGL.GL_PROJECTION)
         gl.LoadIdentity()
-
 
         If task.gOptions.GL_LinearMode.Checked Then
             gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, options.zNear, options.zFar)
@@ -284,6 +247,10 @@ Public Class sgl
         End If
 
         gl.MatrixMode(OpenGL.GL_MODELVIEW)
+
+        gl.Enable(OpenGL.GL_DEPTH_TEST)
+        gl.DepthFunc(OpenGL.GL_LESS)
+
         gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
         gl.LoadIdentity()
 
@@ -293,6 +260,60 @@ Public Class sgl
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
         gl.PointSize(options.pointSize)
 
-        Return runFunction(func, pointcloud, RGB)
+        Dim label = ""
+        If pointcloud Is Nothing Then pointcloud = task.pointCloud
+        If RGB Is Nothing Then RGB = task.color
+        Select Case func
+            Case Comm.oCase.drawPointCloudRGB
+                'gl.Enable(OpenGL.GL_DEPTH_TEST)
+                'gl.Enable(OpenGL.GL_STENCIL_TEST)
+
+                'gl.ClearStencil(0)
+                'gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT Or OpenGL.GL_STENCIL_BUFFER_BIT)
+
+                label = drawCloud(pointcloud, RGB)
+
+
+            Case Comm.oCase.line3D
+                gl.Begin(OpenGL.GL_POINTS)
+                Dim count As Integer, all255 As Boolean
+                If RGB Is Nothing Then all255 = True
+                For y = 0 To pointcloud.Height - 1
+                    For x = 0 To pointcloud.Width - 1
+                        Dim vec = pointcloud.Get(Of cv.Vec3f)(y, x)
+                        If vec(2) <> 0 Then
+                            If all255 Then
+                                gl.Color(1.0, 1.0, 1.0)
+                            Else
+                                Dim vec3b = RGB.Get(Of cv.Vec3b)(y, x)
+                                gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
+                            End If
+                            gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
+                            count += 1
+                        End If
+                    Next
+                Next
+                gl.End()
+                label = CStr(count) + " points were rendered for the selected line(s)."
+
+
+            Case Comm.oCase.quadBasics
+                drawQuads()
+
+            Case Comm.oCase.readPC
+                label = drawCloud(pointcloud, RGB)
+                task.sharpDepth = ReadFilteredDepth()
+
+            Case Comm.oCase.draw3DLines
+                label = draw3DLines()
+
+            Case Comm.oCase.draw3DLinesAndCloud
+                label = drawCloud(pointcloud, RGB)
+
+                label += " " + draw3DLines()
+        End Select
+
+        gl.Flush()
+        Return label
     End Function
 End Class
