@@ -378,12 +378,14 @@ Public Class VBtask : Implements IDisposable
         Next
         Return saveObject
     End Function
-    Private Sub postProcess(src As cv.Mat)
+    Private Sub postProcess(src As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat)
         Try
             If PixelViewer IsNot Nothing Then
                 If pixelViewerOn Then
                     PixelViewer.viewerForm.Visible = True
                     PixelViewer.viewerForm.Show()
+                    PixelViewer.dst2Input = dst2
+                    PixelViewer.dst3Input = dst3
                     PixelViewer.Run(src)
                 Else
                     PixelViewer.viewerForm.Visible = False
@@ -739,9 +741,8 @@ Public Class VBtask : Implements IDisposable
             firstPass = False
             heartBeatLT = False
 
-            postProcess(src)
-
             Dim displayObject = findDisplayObject(task.displayObjectName)
+            postProcess(src, displayObject.dst2, displayObject.dst3)
 
             SyncLock resultLock
                 If gOptions.displayDst0.Checked Then

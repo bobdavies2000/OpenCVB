@@ -1666,7 +1666,7 @@ End Class
 Public Class XO_OpenGL_Lines3D : Inherits TaskParent
     Dim lines As New Line3D_Basics
     Public Sub New()
-        task.ogl.oglFunction = Comm.oCase.pcLines
+        task.ogl.oglFunction = Comm.oCase.line3D
         desc = "Draw the 3D lines found using the task.lines.lpList and the accompanying bricks."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -4347,7 +4347,7 @@ End Class
 Public Class XO_OpenGL_PClinesFirstLast : Inherits TaskParent
     Dim lines As New XO_Line3D_CandidatesFirstLast
     Public Sub New()
-        task.ogl.oglFunction = Comm.oCase.pcLines
+        task.ogl.oglFunction = Comm.oCase.line3D
         OptionParent.FindSlider("OpenGL Point Size").Value = 10
         desc = "Draw the 3D lines found from the PCpoints"
     End Sub

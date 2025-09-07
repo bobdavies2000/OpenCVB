@@ -18,11 +18,11 @@ Public Class Comm
         polygonCell
         Histogram3D
         pcPoints
-        pcLines
+        line3D
         pcPointsAlone
         drawLines
         drawAvgPointCloudRGB
-        readPointCloud
+        readPC
         draw3DLines
         draw3DLinesAndCloud
         test

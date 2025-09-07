@@ -32,7 +32,7 @@ End Class
 
 
 Public Class Options_SharpGL2 : Inherits OptionParent
-    Public eye As cv.Vec3f = New cv.Vec3f(0, -1.2, 0)
+    Public eye As cv.Vec3f = New cv.Vec3f(0, -0.6, 0)
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("SharpGL Eye X X10", -180, 180, eye(0) * 10)

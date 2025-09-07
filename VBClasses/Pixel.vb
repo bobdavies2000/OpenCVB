@@ -4,6 +4,8 @@ Public Class Pixel_Viewer : Inherits TaskParent
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm
     Dim mouseLoc = New cv.Point(10, 10) ' assume 
+    Public dst2Input As cv.Mat
+    Public dst3Input As cv.Mat
     Enum displayTypes
         noType = -1
         type8uC3 = 0
@@ -20,12 +22,11 @@ Public Class Pixel_Viewer : Inherits TaskParent
         If standaloneTest() Then
             task.results.dstList(0) = task.color.Clone
             task.results.dstList(1) = task.depthRGB.Clone
-            task.results.dstList(2) = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, cv.Scalar.All(0))
-            task.results.dstList(3) = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+            task.results.dstList(2) = dst2Input
+            task.results.dstList(3) = dst3Input
         End If
 
-        Dim dst = Choose(task.mousePicTag + 1, task.results.dstList(0), task.results.dstList(1),
-                                               task.results.dstList(2), task.results.dstList(3))
+        Dim dst = Choose(task.mousePicTag + 1, task.results.dstList(0), task.results.dstList(1), dst2Input, dst3Input)
 
         Dim displayType = displayTypes.noType
         If dst.Type = cv.MatType.CV_8UC3 Then displayType = displayTypes.type8uC3

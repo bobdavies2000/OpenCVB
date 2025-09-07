@@ -106,26 +106,20 @@ Public Class sgl
     End Function
     Private Function runFunction(func As Integer, pointCloud As cv.Mat, RGB As cv.Mat) As String
         Dim label = ""
+        If pointCloud Is Nothing Then pointCloud = task.pointCloud
+        If RGB Is Nothing Then RGB = task.color
         Select Case func
             Case Comm.oCase.drawPointCloudRGB
-                If RGB Is Nothing Then RGB = task.color
-                gl.Begin(OpenGL.GL_POINTS)
+                gl.Enable(OpenGL.GL_DEPTH_TEST)
+                gl.Enable(OpenGL.GL_STENCIL_TEST)
 
-                For y = 0 To task.pointCloud.Height - 1
-                    For x = 0 To task.pointCloud.Width - 1
-                        Dim vec As cv.Vec3f = task.pointCloud.At(Of cv.Vec3f)(y, x)
-                        If vec(2) <> 0 Then
-                            Dim vec3b = RGB.Get(Of cv.Vec3b)(y, x)
-                            gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
-                            gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
-                        End If
-                    Next
-                Next
-                gl.End()
-                label = CStr(task.pointCloud.Total) + " points were rendered."
+                gl.ClearStencil(0)
+                gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT Or OpenGL.GL_STENCIL_BUFFER_BIT)
+
+                label = drawCloud(pointCloud, RGB)
 
 
-            Case Comm.oCase.pcLines
+            Case Comm.oCase.line3D
                 gl.Begin(OpenGL.GL_POINTS)
                 Dim count As Integer, all255 As Boolean
                 If RGB Is Nothing Then all255 = True
@@ -148,7 +142,7 @@ Public Class sgl
                 label = CStr(count) + " points were rendered for the selected line(s)."
 
 
-            Case Comm.oCase.quadBasics, Comm.oCase.readPointCloud
+            Case Comm.oCase.quadBasics
                 gl.Begin(OpenGL.GL_QUADS)
 
                 Dim count As Integer
@@ -170,33 +164,36 @@ Public Class sgl
 
                 gl.End()
                 label = CStr(count) + " grid rects had depth."
-                If func = Comm.oCase.readPointCloud Then
-                    task.sharpDepth = New cv.Mat(Height, Width, cv.MatType.CV_32F)
 
-                    gl.ReadPixels(0, 0, Width, Height, OpenGL.GL_DEPTH_COMPONENT, OpenGL.GL_FLOAT,
-                                  task.sharpDepth.Data)
 
-                    Dim mm1 = GetMinMax(task.sharpDepth)
+            Case Comm.oCase.readPC
+                label = drawCloud(pointCloud, RGB)
 
-                    Dim near = options.zNear
-                    Dim far = options.zFar
-                    Dim a As Single = 2.0F * near * far
-                    Dim b As Single = far + near
-                    Dim c As Single = far - near
+                task.sharpDepth = New cv.Mat(Height, Width, cv.MatType.CV_32F)
 
-                    ' convert from (0 to 1) to (-1 to 1)
-                    task.sharpDepth = task.sharpDepth * 2.0F
-                    task.sharpDepth -= 1.0F
-                    Dim mm2 = GetMinMax(task.sharpDepth)
+                gl.ReadPixels(0, 0, Width, Height, OpenGL.GL_DEPTH_COMPONENT, OpenGL.GL_FLOAT,
+                                      task.sharpDepth.Data)
 
-                    Dim denom As New Mat()
-                    Cv2.Multiply(task.sharpDepth, c, denom)         ' denom = task.sharpDepth * c
-                    Cv2.Subtract(b, denom, denom)         ' denom = b - task.sharpDepth * c
-                    Cv2.Divide(a, denom, task.sharpDepth)
+                Dim mm1 = GetMinMax(task.sharpDepth)
 
-                    gl.Flush()
-                    gl.Finish()
-                End If
+                Dim near = options.zNear
+                Dim far = options.zFar
+                Dim a As Single = 2.0F * near * far
+                Dim b As Single = far + near
+                Dim c As Single = far - near
+
+                ' convert from (0 to 1) to (-1 to 1)
+                task.sharpDepth = task.sharpDepth * 2.0F
+                task.sharpDepth -= 1.0F
+                Dim mm2 = GetMinMax(task.sharpDepth)
+
+                Dim denom As New Mat()
+                Cv2.Multiply(task.sharpDepth, c, denom)         ' denom = task.sharpDepth * c
+                Cv2.Subtract(b, denom, denom)         ' denom = b - task.sharpDepth * c
+                Cv2.Divide(a, denom, task.sharpDepth)
+
+                gl.Flush()
+                gl.Finish()
 
 
             Case Comm.oCase.draw3DLines
@@ -204,23 +201,32 @@ Public Class sgl
 
 
             Case Comm.oCase.draw3DLinesAndCloud
-                gl.Begin(OpenGL.GL_POINTS)
-                For y = 0 To pointCloud.Height - 1
-                    For x = 0 To pointCloud.Width - 1
-                        Dim vec = pointCloud.Get(Of cv.Vec3f)(y, x)
-                        If vec(2) <> 0 Then
-                            gl.Color(1.0, 1.0, 1.0)
-                            gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
-                        End If
-                    Next
-                Next
-                gl.End()
+                label = drawCloud(pointCloud, RGB)
 
-                label = draw3DLines()
+                label += " " + draw3DLines()
         End Select
 
         gl.Flush()
         Return label
+    End Function
+    Private Function drawCloud(pc As cv.Mat, rgb As cv.Mat) As String
+        gl.Begin(OpenGL.GL_POINTS)
+        Dim count As Integer
+        gl.StencilFunc(CType(OpenGL.GL_ALWAYS, Enumerations.StencilFunction), CInt(1), &HFF) ' Always pass stencil test
+        gl.StencilOp(OpenGL.GL_KEEP, OpenGL.GL_KEEP, OpenGL.GL_REPLACE) ' Replace stencil with 1 on depth pass
+        For y = 0 To pc.Height - 1
+            For x = 0 To pc.Width - 1
+                If task.depthMask.Get(Of Byte)(y, x) <> 0 Then
+                    Dim vec As cv.Vec3f = pc.At(Of cv.Vec3f)(y, x)
+                    Dim vec3b = rgb.Get(Of cv.Vec3b)(y, x)
+                    gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
+                    gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
+                    count += 1
+                End If
+            Next
+        Next
+        gl.End()
+        Return CStr(count) + " of " + CStr(pc.Total) + " points were rendered."
     End Function
     Private Function draw3DLines()
         gl.LineWidth(options.pointSize)

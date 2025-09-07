@@ -27,7 +27,7 @@ End Class
 
 
 
-Public Class GL_LinesNoMotionInput : Inherits TaskParent
+Public Class GL_Line3DNoMotionInput : Inherits TaskParent
     Public Sub New()
         task.FeatureSampleSize = 1000 ' want all the lines 
         desc = "Build a 3D model of the lines found in the rgb data."
@@ -41,7 +41,7 @@ Public Class GL_LinesNoMotionInput : Inherits TaskParent
         dst0 = src
         dst0.SetTo(0, Not dst2)
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, dst0)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.line3D, dst0)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -80,7 +80,7 @@ Public Class GL_StructuredLines : Inherits TaskParent
         dst0.SetTo(0, Not dst2)
         dst1.SetTo(white)
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, dst0, dst1)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.line3D, dst0, dst1)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -89,17 +89,24 @@ End Class
 
 
 
-Public Class GL_ReadPCDisplay : Inherits TaskParent
+Public Class GL_DisplayPC : Inherits TaskParent
     Public Sub New()
         desc = "Display the pointcloud read back from SharpGL and display it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            strOut = task.sharpGL.RunSharp(Comm.oCase.readPointCloud)
+            strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
             SetTrueText(strOut, 2)
         End If
 
-        dst2 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
+        ' Dim test = task.gOptions.DebugSlider.Value
+        dst1 = task.sharpDepth(New cv.Rect(0, 0, task.sharpDepth.Width - 50, task.sharpDepth.Height - 64))
+        dst2 = dst1.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
+
+
+        Dim test = task.gOptions.DebugSlider.Value
+
+        dst3 = dst2.ConvertScaleAbs(255).Threshold(test, 255, cv.ThresholdTypes.Tozero)
         'dst2 = dst1.Threshold(254, 0, cv.ThresholdTypes.Binary)
         'dst3 = dst1.ConvertScaleAbs(255)
         '  dst1.CopyTo(dst2, dst3)
@@ -111,12 +118,12 @@ End Class
 
 
 Public Class GL_ReadPC : Inherits TaskParent
-    Dim displayPC As New GL_ReadPCDisplay
+    Dim displayPC As New GL_DisplayPC
     Public Sub New()
         desc = "Read the point cloud from a rendered geometry"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readPointCloud)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
         SetTrueText(strOut, 2)
 
         displayPC.Run(emptyMat)
@@ -129,13 +136,13 @@ End Class
 
 Public Class GL_ReadPCHist : Inherits TaskParent
     Dim plotHist As New GL_PlotHist
-    Dim displayPC As New GL_ReadPCDisplay
+    Dim displayPC As New GL_DisplayPC
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         desc = "Read the point cloud from a rendered geometry"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readPointCloud)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
         labels(2) = strOut
 
         plotHist.Run(task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest))
@@ -152,12 +159,12 @@ End Class
 
 
 Public Class GL_RunSharp : Inherits TaskParent
-    Dim displayPC As New GL_ReadPCDisplay
+    Dim displayPC As New GL_DisplayPC
     Public Sub New()
         desc = "Create a SharpGL view that uses the point cloud coordinates."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readPointCloud)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
         SetTrueText(strOut, 2)
 
         displayPC.Run(emptyMat)
@@ -172,14 +179,14 @@ End Class
 
 Public Class GL_RunSharpHist : Inherits TaskParent
     Dim plotHist As New GL_PlotHist
-    Dim displayPC As New GL_ReadPCDisplay
+    Dim displayPC As New GL_DisplayPC
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         desc = "Read the point cloud from a rendered geometry"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            strOut = task.sharpGL.RunSharp(Comm.oCase.readPointCloud)
+            strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
             SetTrueText(strOut, 2)
         End If
 
@@ -199,7 +206,7 @@ End Class
 
 Public Class GL_PlotHist : Inherits TaskParent
     Dim plotHist As New Plot_Histogram
-    Dim displayPC As New GL_ReadPCDisplay
+    Dim displayPC As New GL_DisplayPC
     Public Sub New()
         task.gOptions.MaxDepthBar.Value = 10
         task.gOptions.HistBinBar.Value = 10
@@ -212,7 +219,7 @@ Public Class GL_PlotHist : Inherits TaskParent
         If standalone Then
             Static readCloud As New GL_RunSharp
             readCloud.Run(emptyMat)
-            strOut = task.sharpGL.RunSharp(Comm.oCase.readPointCloud)
+            strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
             SetTrueText(strOut, 2)
             dst1 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
         Else
@@ -245,7 +252,7 @@ End Class
 
 
 
-Public Class GL_Lines : Inherits TaskParent
+Public Class GL_Line3DWhite : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
@@ -277,7 +284,7 @@ Public Class GL_Lines : Inherits TaskParent
         labels(3) = CStr(count) + " pixels from the point cloud were moved to the GL input. "
 
         dst1.SetTo(white)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, dst3, dst1)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.line3D, dst3, dst1)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -285,7 +292,7 @@ End Class
 
 
 
-Public Class GL_LinesReconstructed : Inherits TaskParent
+Public Class GL_Line3DReconstructed : Inherits TaskParent
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
@@ -317,7 +324,7 @@ Public Class GL_LinesReconstructed : Inherits TaskParent
         labels(3) = CStr(count) + " pixels from the point cloud were moved to the GL input. "
 
         dst1.SetTo(white)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, dst3, dst1)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.line3D, dst3, dst1)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -339,7 +346,7 @@ Public Class GL_Line3D : Inherits TaskParent
 
         dst1.SetTo(white)
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.pcLines, line3D.pointcloud, dst1)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.line3D, line3D.pointcloud, dst1)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -347,7 +354,7 @@ End Class
 
 
 
-Public Class GL_Line3Dall : Inherits TaskParent
+Public Class GL_Line3DAll : Inherits TaskParent
     Public Sub New()
         desc = "Visualize all the reconstructed 3D lines found in the RGB image."
     End Sub
@@ -357,7 +364,7 @@ Public Class GL_Line3Dall : Inherits TaskParent
             DrawLine(dst2, lp, task.scalarColors(lp.index + 1))
         Next
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.drawPointCloudRGB, task.pointCloud, dst2)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.line3D, task.pointCloud, dst2)
         SetTrueText(strOut, 2)
     End Sub
 End Class
