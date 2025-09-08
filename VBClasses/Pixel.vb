@@ -4,10 +4,10 @@ Public Class Pixel_Viewer : Inherits TaskParent
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm
     Dim mouseLoc = New cv.Point(10, 10) ' assume 
-    Public dst0Input As cv.Mat
-    Public dst1Input As cv.Mat
-    Public dst2Input As cv.Mat
-    Public dst3Input As cv.Mat
+    Public dst0Input As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+    Public dst1Input As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+    Public dst2Input As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+    Public dst3Input As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
     Enum displayTypes
         noType = -1
         type8uC3 = 0

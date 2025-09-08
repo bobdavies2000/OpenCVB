@@ -73,6 +73,7 @@ Public Class FitEllipse_AMS_CPP : Inherits TaskParent
         Dim angle = ellipse(0)
         Dim center = lpData.validatePoint(New cv.Point2f(ellipse(1), ellipse(2)))
         Dim size As New cv.Size2f(ellipse(3), ellipse(4))
+        If Single.IsNaN(ellipse(3)) Or Single.IsNaN(ellipse(4)) Then Exit Sub ' one of the random points is the same
         If size.Width < task.lineWidth + 1 Or size.Height < task.lineWidth + 1 Then Exit Sub
 
         Dim box = New cv.RotatedRect(center, size, angle)

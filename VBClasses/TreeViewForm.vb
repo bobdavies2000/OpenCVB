@@ -118,6 +118,7 @@ Public Class TreeviewForm
         For i = 0 To algorithm_ms.Count - 1
             algorithm_ms(i) /= sumTime
             If algorithm_ms(i) < 0 Then algorithm_ms(i) = 0
+            If i >= task.algorithmNames.Count Then Exit For
             Dim str = Format(algorithm_ms(i), "00.0%") + " " + task.algorithmNames(i)
             If task.displayObjectName.Length > 0 Then
                 If str.Contains(task.displayObjectName) Then percentStr = str
