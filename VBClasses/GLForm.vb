@@ -162,65 +162,6 @@ Public Class sgl
         Next
         Return task.lines.labels(2)
     End Function
-    'Public Function worldCoordinateInverse(mask As cv.Mat, depth As cv.Mat) As cv.Mat
-    '    Dim dst As New cv.Mat(depth.Size, cv.MatType.CV_32F, 0)
-    '    Dim znear = options.zNear
-    '    Dim zfar = options.zFar
-    '    Dim mm = GetMinMax(task.pcSplit(0))
-    '    Dim worldWidth = mm.maxVal - mm.minVal
-    '    mm = GetMinMax(task.pcSplit(1))
-    '    Dim worldHeight = mm.maxVal - mm.minVal
-    '    For y = 0 To depth.Height - 1
-    '        For x = 0 To depth.Width - 1
-    '            If mask.Get(Of Byte)(y, x) = 0 Then Continue For
-    '            Dim d = znear + depth.Get(Of Single)(y, x) * (zfar - znear)
-    '            If d > 1 Then Dim k = 0
-    '            Dim u = CInt(((x * worldWidth) * fx / d) + ppx)
-    '            Dim v = CInt(((y * worldHeight) * fy / d) + ppy)
-    '            If u >= 0 And u < task.workRes.Width And v >= 0 And v < task.workRes.Height Then
-    '                dst.Set(Of Single)(v, u, d)
-    '            End If
-    '        Next
-    '    Next
-    '    Return dst
-    'End Function
-    Private Sub readPointCloud()
-
-        'Dim near = options.zNear
-        'Dim far = options.zFar
-        'Dim a As Single = 2.0F * near * far
-        'Dim b As Single = far + near
-        'Dim c As Single = far - near
-
-        '' convert from (0 to 1) to (-1 to 1)
-        'task.sharpDepth = task.sharpDepth * 2.0F
-        'task.sharpDepth -= 1.0F
-
-        'Dim denom As New Mat()
-        'Cv2.Multiply(task.sharpDepth, c, denom)         ' denom = task.sharpDepth * c
-        'Cv2.Subtract(b, denom, denom)         ' denom = b - task.sharpDepth * c
-        'Cv2.Divide(a, denom, task.sharpDepth)
-    End Sub
-    Private Function ReadFilteredDepth() As cv.Mat
-        Dim sharpDepth As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
-        gl.ReadPixels(0, 0, sharpDepth.Width, sharpDepth.Height, OpenGL.GL_DEPTH_COMPONENT, OpenGL.GL_FLOAT, sharpDepth.Data)
-        Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
-        Dim h = sharpDepth.Height
-        For y = 0 To sharpDepth.Height - 1
-            For x = 0 To sharpDepth.Width - 1
-                Dim depthValue = sharpDepth.Get(Of Single)(y, x)
-
-                ' Filter out untouched pixels (depth = 1.0 means zFar)
-                If depthValue < 1.0F Then
-                    ' Convert normalized depth to world-space Z (linear in ortho)
-                    Dim Z = znear + depthValue * (zfar - znear)
-                    dst.Set(Of Single)(h - 1 - y, x, Z)
-                End If
-            Next
-        Next
-
-        Return sharpDepth
-    End Function
     Public Function worldCoordinateInverse(depth As cv.Mat) As cv.Mat
         Dim dst As New cv.Mat(depth.Size, cv.MatType.CV_32F, 0)
         Dim count As Integer
@@ -241,7 +182,6 @@ Public Class sgl
                 End If
             Next
         Next
-        ' Debug.WriteLine("count = " + CStr(count))
         Return dst
     End Function
     Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String

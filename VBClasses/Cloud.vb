@@ -73,6 +73,7 @@ Public Class Cloud_Inverse : Inherits TaskParent
                 If y = 5 And x = 160 Then Dim k = 0
                 Dim vec As cv.Point3f = task.pointCloud.Get(Of cv.Point3f)(y, x)
                 If Single.IsNaN(vec.X) Or Single.IsNaN(vec.Y) Or Single.IsNaN(vec.Z) Then Continue For
+                If Single.IsInfinity(vec.X) Or Single.IsInfinity(vec.Y) Or Single.IsInfinity(vec.Z) Then Continue For
                 If vec.Z = 0 Then Continue For
                 vec = Cloud_Basics.invert(vec)
                 dst2.Set(Of Single)(vec.Y, vec.X, vec.Z)
