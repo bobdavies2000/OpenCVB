@@ -90,24 +90,44 @@ End Class
 
 
 Public Class GL_DisplayPC : Inherits TaskParent
+    Public Shared ppx = task.calibData.rgbIntrinsics.ppx
+    Public Shared ppy = task.calibData.rgbIntrinsics.ppy
+    Public Shared fx = task.calibData.rgbIntrinsics.fx
+    Public Shared fy = task.calibData.rgbIntrinsics.fy
     Public Sub New()
         task.sharpDepth = New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
         desc = "Display the pointcloud read back from SharpGL and display it."
     End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.firstPass Then
-            task.sharpGL.ppx = task.calibData.rgbIntrinsics.ppx
-            task.sharpGL.ppy = task.calibData.rgbIntrinsics.ppy
-            task.sharpGL.fx = task.calibData.rgbIntrinsics.fx
-            task.sharpGL.fy = task.calibData.rgbIntrinsics.fy
-        End If
+    Public Shared Function invertMat(glDepth As cv.Mat, mm As mmData) As cv.Mat
+        Dim dst As New cv.Mat(glDepth.Size, cv.MatType.CV_32F, 0)
+        Dim count As Integer
+        Dim depthvals As New List(Of Single)
+        For y = 0 To glDepth.Height - 1
+            For x = 0 To glDepth.Width - 1
+                Dim d = glDepth.Get(Of Single)(y, x)
+                If d = 0 Then Continue For
+                count += 1
 
+                Dim u = CInt((x * fx / d) + ppx)
+                Dim v = CInt((y * fy / d) + ppy)
+
+                depthvals.Add(d)
+
+                If u >= 0 And u < dst.Width And v >= 0 And v < dst.Height Then dst.Set(Of Single)(v, u, d)
+            Next
+        Next
+        Return dst
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
             SetTrueText(strOut, 2)
         End If
 
-        dst2 = task.sharpGL.worldCoordinateInverse(task.sharpDepth)
+        Dim mm = GetMinMax(task.pcSplit(2), task.depthMask)
+        dst3 = task.sharpDepth * (mm.maxVal - mm.minVal) + mm.minVal
+
+        dst2 = invertMat(dst3, mm)
     End Sub
 End Class
 

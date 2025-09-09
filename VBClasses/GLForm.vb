@@ -162,28 +162,6 @@ Public Class sgl
         Next
         Return task.lines.labels(2)
     End Function
-    Public Function worldCoordinateInverse(depth As cv.Mat) As cv.Mat
-        Dim dst As New cv.Mat(depth.Size, cv.MatType.CV_32F, 0)
-        Dim count As Integer
-        For yy = 0 To depth.Height - 1
-            For xx = 0 To depth.Width - 1
-                Dim d = depth.Get(Of Single)(yy, xx)
-                If d >= 1.0F Or d < 0.0001F Then Continue For
-                count += 1
-                'Dim x = mmX.minVal + xx * (mmX.maxVal - mmX.minVal)
-                'Dim y = mmY.minVal + yy * (mmY.maxVal - mmY.minVal)
-                d = mmZ.minVal + d * (mmZ.maxVal - mmZ.minVal)
-
-                Dim u = CInt((xx * fx / d) + ppx)
-                Dim v = CInt((yy * fy / d) + ppy)
-
-                If u >= 0 And u < dst.Width And v >= 0 And v < dst.Height Then
-                    dst.Set(Of Single)(dst.Height - 1 - v, u, d)
-                End If
-            Next
-        Next
-        Return dst
-    End Function
     Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
         options.Run()
         options2.Run()
@@ -201,10 +179,9 @@ Public Class sgl
 
         If task.gOptions.GL_LinearMode.Checked Then
             mmZ = GetMinMax(task.pcSplit(2), task.depthMask)
-            Dim zoomFactor As Single = 1.0F + zoomZ
-            gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, zNear * zoomFactor, zFar * zoomFactor)
+            gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, zNear, zFar)
         Else
-            ' gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, znear, zFar)
+            gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, zNear, zFar)
         End If
 
         gl.MatrixMode(OpenGL.GL_MODELVIEW)
@@ -232,11 +209,11 @@ Public Class sgl
                 gl.Flush()
                 gl.ReadPixels(0, 0, task.workRes.Width, task.workRes.Height, OpenGL.GL_DEPTH_COMPONENT,
                               OpenGL.GL_FLOAT, task.sharpDepth.Data)
+                task.sharpDepth = task.sharpDepth.Flip(cv.FlipMode.X)
+                Dim mask = task.sharpDepth.InRange(0.0F, 0.99F)
+                task.sharpDepth.SetTo(0, Not mask)
 
             Case Comm.oCase.drawPointCloudRGB
-                'gl.Enable(OpenGL.GL_DEPTH_TEST)
-                'gl.Enable(OpenGL.GL_STENCIL_TEST)
-
                 'gl.ClearStencil(0)
                 'gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT Or OpenGL.GL_STENCIL_BUFFER_BIT)
 

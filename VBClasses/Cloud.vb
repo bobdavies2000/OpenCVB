@@ -67,11 +67,12 @@ Public Class Cloud_Inverse : Inherits TaskParent
         desc = "Given a point cloud element, convert it to a depth image in image coordinates."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         dst2.SetTo(0)
-        For y = 0 To task.pointCloud.Height - 1
-            For x = 0 To task.pointCloud.Width - 1
+        For y = 0 To src.Height - 1
+            For x = 0 To src.Width - 1
                 If y = 5 And x = 160 Then Dim k = 0
-                Dim vec As cv.Point3f = task.pointCloud.Get(Of cv.Point3f)(y, x)
+                Dim vec As cv.Point3f = src.Get(Of cv.Point3f)(y, x)
                 If Single.IsNaN(vec.X) Or Single.IsNaN(vec.Y) Or Single.IsNaN(vec.Z) Then Continue For
                 If Single.IsInfinity(vec.X) Or Single.IsInfinity(vec.Y) Or Single.IsInfinity(vec.Z) Then Continue For
                 If vec.Z = 0 Then Continue For
