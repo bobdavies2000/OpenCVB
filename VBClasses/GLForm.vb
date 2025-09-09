@@ -1,5 +1,4 @@
-﻿Imports System.Windows.Forms.Design.AxImporter
-Imports OpenCvSharp
+﻿Imports OpenCvSharp
 Imports SharpGL
 Imports cv = OpenCvSharp
 Public Class sgl
@@ -24,6 +23,9 @@ Public Class sgl
     Public ppy = task.calibData.rgbIntrinsics.ppy
     Public fx = task.calibData.rgbIntrinsics.fx
     Public fy = task.calibData.rgbIntrinsics.fy
+    Dim mmZ As mmData
+    Dim zNear As Single
+    Dim zFar As Single
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         options = New Options_SharpGL
         options2 = New Options_SharpGL2
@@ -170,24 +172,28 @@ Public Class sgl
         Next
         Return task.lines.labels(2)
     End Function
-    Public Function worldCoordinateInverse(mask As cv.Mat, depth As cv.Mat) As cv.Mat
-        Dim dst As New cv.Mat(depth.Size, cv.MatType.CV_32F, 0)
-        Dim znear = options.zNear
-        Dim zfar = options.zFar
-        For y = 0 To depth.Height - 1
-            For x = 0 To depth.Width - 1
-                If mask.Get(Of Byte)(y, x) = 0 Then Continue For
-                Dim d = znear + depth.Get(Of Single)(y, x) * (zfar - znear)
-                If d > 1 Then Dim k = 0
-                Dim u = CInt((x * fx / d) + ppx)
-                Dim v = CInt((y * fy / d) + ppy)
-                If u >= 0 And u < task.workRes.Width And v >= 0 And v < task.workRes.Height Then
-                    dst.Set(Of Single)(v, u, d)
-                End If
-            Next
-        Next
-        Return dst
-    End Function
+    'Public Function worldCoordinateInverse(mask As cv.Mat, depth As cv.Mat) As cv.Mat
+    '    Dim dst As New cv.Mat(depth.Size, cv.MatType.CV_32F, 0)
+    '    Dim znear = options.zNear
+    '    Dim zfar = options.zFar
+    '    Dim mm = GetMinMax(task.pcSplit(0))
+    '    Dim worldWidth = mm.maxVal - mm.minVal
+    '    mm = GetMinMax(task.pcSplit(1))
+    '    Dim worldHeight = mm.maxVal - mm.minVal
+    '    For y = 0 To depth.Height - 1
+    '        For x = 0 To depth.Width - 1
+    '            If mask.Get(Of Byte)(y, x) = 0 Then Continue For
+    '            Dim d = znear + depth.Get(Of Single)(y, x) * (zfar - znear)
+    '            If d > 1 Then Dim k = 0
+    '            Dim u = CInt(((x * worldWidth) * fx / d) + ppx)
+    '            Dim v = CInt(((y * worldHeight) * fy / d) + ppy)
+    '            If u >= 0 And u < task.workRes.Width And v >= 0 And v < task.workRes.Height Then
+    '                dst.Set(Of Single)(v, u, d)
+    '            End If
+    '        Next
+    '    Next
+    '    Return dst
+    'End Function
     Private Sub readPointCloud()
 
         'Dim near = options.zNear
@@ -208,8 +214,6 @@ Public Class sgl
     Private Function ReadFilteredDepth() As cv.Mat
         Dim sharpDepth As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
         gl.ReadPixels(0, 0, sharpDepth.Width, sharpDepth.Height, OpenGL.GL_DEPTH_COMPONENT, OpenGL.GL_FLOAT, sharpDepth.Data)
-        Dim znear = options.zNear
-        Dim zfar = options.zFar
         Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
         Dim h = sharpDepth.Height
         For y = 0 To sharpDepth.Height - 1
@@ -225,11 +229,36 @@ Public Class sgl
             Next
         Next
 
+        Return sharpDepth
+    End Function
+    Public Function worldCoordinateInverse(depth As cv.Mat) As cv.Mat
+        Dim dst As New cv.Mat(depth.Size, cv.MatType.CV_32F, 0)
+        Dim count As Integer
+        For yy = 0 To depth.Height - 1
+            For xx = 0 To depth.Width - 1
+                Dim d = depth.Get(Of Single)(yy, xx)
+                If d >= 1.0F Or d < 0.0001F Then Continue For
+                count += 1
+                'Dim x = mmX.minVal + xx * (mmX.maxVal - mmX.minVal)
+                'Dim y = mmY.minVal + yy * (mmY.maxVal - mmY.minVal)
+                d = mmZ.minVal + d * (mmZ.maxVal - mmZ.minVal)
+
+                Dim u = CInt((xx * fx / d) + ppx)
+                Dim v = CInt((yy * fy / d) + ppy)
+
+                If u >= 0 And u < dst.Width And v >= 0 And v < dst.Height Then
+                    dst.Set(Of Single)(dst.Height - 1 - v, u, d)
+                End If
+            Next
+        Next
+        ' Debug.WriteLine("count = " + CStr(count))
         Return dst
     End Function
     Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
         options.Run()
         options2.Run()
+        zNear = options.zNear
+        zFar = options.zFar
 
         If task.gOptions.DebugCheckBox.Checked Then
             task.gOptions.DebugCheckBox.Checked = False
@@ -241,9 +270,11 @@ Public Class sgl
         gl.LoadIdentity()
 
         If task.gOptions.GL_LinearMode.Checked Then
-            gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, options.zNear, options.zFar)
+            mmZ = GetMinMax(task.pcSplit(2), task.depthMask)
+            Dim zoomFactor As Single = 1.0F + zoomZ
+            gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, zNear * zoomFactor, zFar * zoomFactor)
         Else
-            ' gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
+            ' gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, znear, zFar)
         End If
 
         gl.MatrixMode(OpenGL.GL_MODELVIEW)
@@ -254,8 +285,10 @@ Public Class sgl
         gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
         gl.LoadIdentity()
 
-        gl.LookAt(options2.eye(0), options2.eye(1), options2.eye(2), 0, 0, -5, upX, upY, upZ)
+        ' gl.LookAt(options2.eye(0), options2.eye(1), options2.eye(2), 0, 0, zoomZ, upX, upY, upZ)
+
         gl.Translate(panX, panY, zoomZ)
+        If task.heartBeat Then Debug.WriteLine("ZoomZ = " + Format(zoomZ, fmt3))
         gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
         gl.PointSize(options.pointSize)
@@ -264,6 +297,12 @@ Public Class sgl
         If pointcloud Is Nothing Then pointcloud = task.pointCloud
         If RGB Is Nothing Then RGB = task.color
         Select Case func
+            Case Comm.oCase.readPC
+                label = drawCloud(pointcloud, RGB)
+                gl.Flush()
+                gl.ReadPixels(0, 0, task.workRes.Width, task.workRes.Height, OpenGL.GL_DEPTH_COMPONENT,
+                              OpenGL.GL_FLOAT, task.sharpDepth.Data)
+
             Case Comm.oCase.drawPointCloudRGB
                 'gl.Enable(OpenGL.GL_DEPTH_TEST)
                 'gl.Enable(OpenGL.GL_STENCIL_TEST)
@@ -299,10 +338,6 @@ Public Class sgl
 
             Case Comm.oCase.quadBasics
                 drawQuads()
-
-            Case Comm.oCase.readPC
-                label = drawCloud(pointcloud, RGB)
-                task.sharpDepth = ReadFilteredDepth()
 
             Case Comm.oCase.draw3DLines
                 label = draw3DLines()

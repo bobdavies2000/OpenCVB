@@ -91,25 +91,26 @@ End Class
 
 Public Class GL_DisplayPC : Inherits TaskParent
     Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
+        task.sharpDepth = New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
         desc = "Display the pointcloud read back from SharpGL and display it."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.firstPass Then
+            task.sharpGL.ppx = task.calibData.rgbIntrinsics.ppx
+            task.sharpGL.ppy = task.calibData.rgbIntrinsics.ppy
+            task.sharpGL.fx = task.calibData.rgbIntrinsics.fx
+            task.sharpGL.fy = task.calibData.rgbIntrinsics.fy
+        End If
+
         If standalone Then
             strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
             SetTrueText(strOut, 2)
         End If
-        dst3 = task.sharpDepth.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
 
-        task.sharpGL.ppx = task.calibData.rgbIntrinsics.ppx
-        task.sharpGL.ppy = task.calibData.rgbIntrinsics.ppy
-        task.sharpGL.fx = task.calibData.rgbIntrinsics.fx
-        task.sharpGL.fy = task.calibData.rgbIntrinsics.fy
-
-        dst1.SetTo(0, Not dst3)
-        dst2 = task.sharpGL.worldCoordinateInverse(dst3, task.sharpDepth)
+        dst2 = task.sharpGL.worldCoordinateInverse(task.sharpDepth)
     End Sub
 End Class
+
 
 
 
