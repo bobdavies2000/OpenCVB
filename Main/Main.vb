@@ -146,20 +146,12 @@ Namespace OpenCVB
 
             Me.Show()
 
-            camSwitchAnnouncement()
-            If settings.cameraFound Then initCamera()
-
-            ' can't start until we have the calibration data.
-            While 1
-                If camera IsNot Nothing Then
-                    If camera.calibdata.baseline > 0 Then Exit While
-                End If
-                Application.DoEvents()
-            End While
-
             setupCamPics()
             loadAlgorithmComboBoxes()
             GroupComboBox.Text = settings.groupComboText
+
+            camSwitchAnnouncement()
+            If settings.cameraFound Then initCamera()
 
             If GroupComboBox.SelectedItem() Is Nothing Then
                 Dim group = GroupComboBox.Text
@@ -180,16 +172,7 @@ Namespace OpenCVB
                 MessageBox.Show("There were no algorithms listed for the " + GroupComboBox.Text + vbCrLf +
                            "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
             Else
-                If settings.MainUI_AlgName Is Nothing Then
-                    AvailableAlgorithms.SelectedIndex = 0
-                    settings.MainUI_AlgName = AvailableAlgorithms.Text
-                End If
-                If AvailableAlgorithms.Items.Contains(settings.MainUI_AlgName) Then
-                    AvailableAlgorithms.Text = settings.MainUI_AlgName
-                Else
-                    AvailableAlgorithms.SelectedIndex = 0
-                End If
-                jsonfs.write()
+                If settings.algorithm = "" Then settings.algorithm = AvailableAlgorithms.Text
             End If
 
             AvailableAlgorithms.ComboBox.Select()
@@ -197,6 +180,22 @@ Namespace OpenCVB
             fpsTimer.Enabled = True
             XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
             XYLoc.Visible = True
+
+            ' can't start until we have the calibration data.
+            While 1
+                Application.DoEvents()
+                If camera IsNot Nothing Then
+                    Application.DoEvents()
+                    CameraSwitching.Text = settings.algorithm + " awaiting first buffer"
+                    If camera.calibdata.baseline > 0 Then Exit While
+                End If
+            End While
+
+            If AvailableAlgorithms.Items.Contains(settings.algorithm) Then
+                AvailableAlgorithms.Text = settings.algorithm
+            Else
+                AvailableAlgorithms.SelectedIndex = 0
+            End If
 
             Debug.WriteLine("")
             Debug.WriteLine("Main_Load complete.")
@@ -228,6 +227,7 @@ Namespace OpenCVB
             jsonfs.write()
             cameraShutdown = True
             Thread.Sleep(200)
+            On Error Resume Next
             End
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
@@ -765,8 +765,8 @@ Namespace OpenCVB
 
             ' if the fpstimer is enabled, then OpenCVB is running - not initializing.
             If fpsTimer.Enabled Then
-                If AvailableAlgorithms.Items.Contains(settings.MainUI_AlgName) Then
-                    AvailableAlgorithms.Text = settings.MainUI_AlgName
+                If AvailableAlgorithms.Items.Contains(settings.algorithm) Then
+                    AvailableAlgorithms.Text = settings.algorithm
                 Else
                     AvailableAlgorithms.SelectedIndex = 0
                 End If
@@ -781,7 +781,7 @@ Namespace OpenCVB
 
             Dim infoLine = sr.ReadLine
             Dim Split = Regex.Split(infoLine, "\W+")
-            Dim CodeLineCount = Split(1)
+            Dim CodeLineCount As Integer = Split(1)
 
             infoLine = sr.ReadLine
             Split = Regex.Split(infoLine, "\W+")
@@ -789,9 +789,8 @@ Namespace OpenCVB
             sr.Close()
 
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " +
-                          CStr(algorithmCount) + " algorithms = " +
-                          CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " +
-                          settings.cameraName
+                       CStr(algorithmCount) + " algorithms = " +
+                       CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + settings.cameraName
             Dim groupFileInfo = New FileInfo(HomeDir.FullName + "Data/GroupComboBox.txt")
             If groupFileInfo.Exists = False Then
                 MessageBox.Show("The groupFileInfo.txt file is missing.  Run 'UI_Generator' or Clean/Rebuild to get the user interface.")
@@ -830,7 +829,7 @@ Namespace OpenCVB
             Else
                 AvailableAlgorithms.SelectedItem = algName
             End If
-            settings.MainUI_AlgName = AvailableAlgorithms.Text
+            settings.algorithm = AvailableAlgorithms.Text
             jsonfs.write()
         End Sub
         Private Sub algHistory_Clicked(sender As Object, e As EventArgs)

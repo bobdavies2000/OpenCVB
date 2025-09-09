@@ -370,7 +370,7 @@ End Class
 
 
 Public Class Plane_Histogram : Inherits TaskParent
-    Dim solo As New PointCloud_Solo
+    Dim solo As New Cloud_Solo
     Dim hist As New Hist_Basics
     Public peakCeiling As Single
     Public peakFloor As Single
@@ -503,7 +503,7 @@ End Class
 
 
 Public Class Plane_Verticals : Inherits TaskParent
-    Dim solo As New PointCloud_Solo
+    Dim solo As New Cloud_Solo
     Dim frames As New History_Basics
     Public Sub New()
         If standalone Then task.gOptions.displaydst1.checked = true
@@ -537,7 +537,7 @@ End Class
 
 
 Public Class Plane_Horizontals : Inherits TaskParent
-    Dim solo As New PointCloud_Solo
+    Dim solo As New Cloud_Solo
     Dim frames As New History_Basics
     Public Sub New()
         If standalone Then task.gOptions.displaydst1.checked = true

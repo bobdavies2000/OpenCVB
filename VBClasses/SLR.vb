@@ -204,9 +204,9 @@ End Class
 
 
 Public Class SLR_SurfaceH : Inherits TaskParent
-    Dim surface As New PointCloud_SurfaceH
+    Dim surface As New Cloud_SurfaceH
     Public Sub New()
-        desc = "Use the PointCloud_SurfaceH data to indicate valleys and peaks."
+        desc = "Use the Cloud_SurfaceH data to indicate valleys and peaks."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         surface.Run(src)

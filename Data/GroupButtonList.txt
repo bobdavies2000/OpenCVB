@@ -172,7 +172,6 @@ Pixel
 Plane
 Plot
 PlyFormat
-PointCloud
 PolyLine
 PongWars
 ProCon

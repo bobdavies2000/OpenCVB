@@ -126,8 +126,8 @@ Public Class Brick_Basics : Inherits TaskParent
                                              correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                         brick.correlation = correlationMat.Get(Of Single)(0, 0)
 
-                        Dim p0 = Cloud_Basics.WorldCoordinates(brick.rect.TopLeft, brick.depth)
-                        Dim p1 = Cloud_Basics.WorldCoordinates(brick.rect.BottomRight, brick.depth)
+                        Dim p0 = Cloud_Basics.worldCoordinates(brick.rect.TopLeft, brick.depth)
+                        Dim p1 = Cloud_Basics.worldCoordinates(brick.rect.BottomRight, brick.depth)
 
                         ' clockwise around starting in upper left.
                         brick.corners.Add(New cv.Point3f(p0.X, p0.Y, brick.depth))

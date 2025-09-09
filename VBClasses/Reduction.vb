@@ -61,8 +61,8 @@ End Class
 
 Public Class Reduction_HeatMapLines : Inherits TaskParent
     Dim heat As New HeatMap_Basics
-    Public setupSide As New PointCloud_SetupSide
-    Public setupTop As New PointCloud_SetupTop
+    Public setupSide As New Cloud_SetupSide
+    Public setupTop As New Cloud_SetupTop
     Dim reduction As New Reduction_PointCloud
     Dim lines As New Line_Raw
     Public Sub New()

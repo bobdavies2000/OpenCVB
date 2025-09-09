@@ -119,8 +119,8 @@ Public Class sgl
             Dim color = task.color(rect).Mean()
 
             gl.Color(CSng(color(2) / 255), CSng(color(1) / 255), CSng(color(0) / 255))
-            Dim p0 = Cloud_Basics.WorldCoordinates(rect.TopLeft, depth)
-            Dim p1 = Cloud_Basics.WorldCoordinates(rect.BottomRight, depth)
+            Dim p0 = Cloud_Basics.worldCoordinates(rect.TopLeft, depth)
+            Dim p1 = Cloud_Basics.worldCoordinates(rect.BottomRight, depth)
             gl.Vertex(p0.X, p0.Y, depth)
             gl.Vertex(p1.X, p0.Y, depth)
             gl.Vertex(p1.X, p1.Y, depth)

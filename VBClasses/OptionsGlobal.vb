@@ -22,7 +22,6 @@ Public Class OptionsGlobal
             LineWidth.Value = 2
         End If
         FrameHistory.Value = 5
-        gravityPointCloud.Checked = True
 
         labelBinsCount.Text = CStr(HistBinBar.Value)
         PixelDiff.Text = CStr(PixelDiffBar.Value)

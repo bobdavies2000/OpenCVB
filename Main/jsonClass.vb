@@ -6,7 +6,7 @@ Imports cv = OpenCvSharp
 
 Namespace jsonClass
     Public Class ApplicationStorage
-        Public MainUI_AlgName As String
+        Public algorithm As String
         Public groupComboText As String
 
         Public cameraIndex As Integer
@@ -239,14 +239,20 @@ Namespace jsonClass
                 OpenCVB.MainUI.Width = .locationMain.Item2
                 OpenCVB.MainUI.Height = .locationMain.Item3
             End With
+
             Return settings
         End Function
         Public Sub write()
             If OpenCVB.MainUI.TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if "Test All" is running.
-                OpenCVB.MainUI.settings.MainUI_AlgName = OpenCVB.MainUI.AvailableAlgorithms.Text
+                OpenCVB.MainUI.settings.algorithm = OpenCVB.MainUI.AvailableAlgorithms.Text
                 OpenCVB.MainUI.settings.groupComboText = OpenCVB.MainUI.GroupComboBox.Text
             End If
 
+            If OpenCVB.MainUI.AvailableAlgorithms IsNot Nothing Then
+                If OpenCVB.MainUI.AvailableAlgorithms.Items.Count > 0 And OpenCVB.MainUI.settings.algorithm = "" Then
+                    OpenCVB.MainUI.settings.algorithm = OpenCVB.MainUI.AvailableAlgorithms.Items(0)
+                End If
+            End If
             OpenCVB.MainUI.settings.locationMain = New cv.Vec4f(OpenCVB.MainUI.Left, OpenCVB.MainUI.Top,
                                                                OpenCVB.MainUI.Width, OpenCVB.MainUI.Height)
             If OpenCVB.MainUI.camPic(0) IsNot Nothing Then
