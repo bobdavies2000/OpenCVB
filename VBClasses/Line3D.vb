@@ -21,8 +21,8 @@ Public Class Line3D_Basics : Inherits TaskParent
             Dim depth2 = task.pcSplit(2)(rect2).Mean(task.depthMask(rect2))(0)
             If depth2 = 0 Then Continue For
 
-            Dim p1 = worldCoordinates(rect1.TopLeft, depth1)
-            Dim p2 = worldCoordinates(rect2.TopLeft, depth2)
+            Dim p1 = Cloud_Basics.WorldCoordinates(rect1.TopLeft, depth1)
+            Dim p2 = Cloud_Basics.WorldCoordinates(rect2.TopLeft, depth2)
             lines3D.Add(p1)
             lines3D.Add(p2)
             dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
@@ -238,7 +238,7 @@ Public Class Line3D_ReconstructLines : Inherits TaskParent
                 'If task.toggleOn Then
                 '    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X))
                 'Else
-                Dim vec = worldCoordinates(pt, depthInit + incr * i)
+                Dim vec = Cloud_Basics.WorldCoordinates(pt, depthInit + incr * i)
                 newLine3D.Add(vec)
                 pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
                 'End If
@@ -283,7 +283,7 @@ End Class
 '                'If task.toggleOn Then
 '                '    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X))
 '                'Else
-'                Dim vec = worldCoordinates(pt, depthInit + incr * i)
+'                Dim vec = Cloud_Basics.worldCoordinates(pt, depthInit + incr * i)
 '                newLine3D.Add(vec)
 '                pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
 '                'End If

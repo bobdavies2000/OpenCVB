@@ -2,6 +2,7 @@ Imports System.IO
 Imports System.IO.Pipes
 Imports System.Runtime.InteropServices
 Imports System.Threading
+Imports SharpGL.SceneGraph.Cameras
 Imports cv = OpenCvSharp
 
 #Region "taskProcess"
@@ -429,6 +430,11 @@ Public Class VBtask : Implements IDisposable
         calibData = parms.calibData
         HomeDir = parms.HomeDir
         main_hwnd = parms.main_hwnd
+
+        Cloud_Basics.ppx = task.calibData.rgbIntrinsics.ppx
+        Cloud_Basics.ppy = task.calibData.rgbIntrinsics.ppy
+        Cloud_Basics.fx = task.calibData.rgbIntrinsics.fx
+        Cloud_Basics.fy = task.calibData.rgbIntrinsics.fy
 
         task.rgbLeftAligned = True
         If task.cameraName.Contains("RealSense") Then task.rgbLeftAligned = False

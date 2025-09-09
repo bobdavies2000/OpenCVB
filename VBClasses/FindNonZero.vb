@@ -108,7 +108,7 @@ Public Class FindNonZero_Line3DWorld : Inherits TaskParent
         For i = 0 To ptList.Count - 1
             Dim pt = ptList(i)
             Dim testvec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-            Dim rVec = worldCoordinates(pt, lp.pVec1(2) + incr * i)
+            Dim rVec = Cloud_Basics.WorldCoordinates(pt, lp.pVec1(2) + incr * i)
             veclist.Add(rVec)
         Next
 

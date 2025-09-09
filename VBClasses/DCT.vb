@@ -183,7 +183,7 @@ Public Class DCT_Surfaces_debug : Inherits TaskParent
                             If minDepth > nextD Then minDepth = nextD
                             If maxDepth < nextD Then maxDepth = nextD
                             Dim wpt = New cv.Point3f(roi.X + i, roi.Y + j, nextD)
-                            fitPoints.Add(worldCoordinates(wpt))
+                            fitPoints.Add(Cloud_Basics.WorldCoordinates(wpt))
                         End If
                     Next
                 Next

@@ -28,6 +28,7 @@ CComp
 CellularAutomata
 Classifier
 Clone
+Cloud
 Cluster
 Coherence
 Color

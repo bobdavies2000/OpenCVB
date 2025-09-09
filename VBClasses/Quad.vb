@@ -48,16 +48,16 @@ Public Class Quad_GridTiles : Inherits TaskParent
             quadData.Add(New cv.Vec3f(c(0), c(1), c(2)))
 
             Dim v = task.pointCloud(roi).Mean(task.depthMask(roi))
-            vec = worldCoordinates(New cv.Point3f(roi.X, roi.Y, v(2))) + shift
+            vec = Cloud_Basics.WorldCoordinates(New cv.Point3f(roi.X, roi.Y, v(2))) + shift
             quadData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
 
-            vec = worldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y, v(2))) + shift
+            vec = Cloud_Basics.WorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y, v(2))) + shift
             quadData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
 
-            vec = worldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, v(2))) + shift
+            vec = Cloud_Basics.WorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, v(2))) + shift
             quadData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
 
-            vec = worldCoordinates(New cv.Point3f(roi.X, roi.Y + roi.Height, v(2))) + shift
+            vec = Cloud_Basics.WorldCoordinates(New cv.Point3f(roi.X, roi.Y + roi.Height, v(2))) + shift
             quadData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
             If standaloneTest() Then dst1(roi).SetTo(v)
         Next
@@ -135,8 +135,8 @@ Public Class Quad_MinMax : Inherits TaskParent
             Dim depthCount = If(d1 = d2, 1, 2)
             For j = 0 To depthCount - 1
                 Dim depth = Choose(j + 1, d1, d2)
-                Dim topLeft = worldCoordinates(New cv.Point3f(roi.X, roi.Y, depth))
-                Dim botRight = worldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, depth))
+                Dim topLeft = Cloud_Basics.WorldCoordinates(New cv.Point3f(roi.X, roi.Y, depth))
+                Dim botRight = Cloud_Basics.WorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, depth))
 
                 Dim color = rc.color
                 dst3(roi).SetTo(color)
@@ -216,8 +216,8 @@ Public Class Quad_Hulls : Inherits TaskParent
                 dst3(roi).SetTo(colorList(i))
 
                 Dim depth = depthList(i).Average
-                Dim topLeft = worldCoordinates(New cv.Point3f(roi.X, roi.Y, depth))
-                Dim botRight = worldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, depth))
+                Dim topLeft = Cloud_Basics.WorldCoordinates(New cv.Point3f(roi.X, roi.Y, depth))
+                Dim botRight = Cloud_Basics.WorldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, depth))
 
                 quadData.Add(New cv.Point3f(rc.color(0), rc.color(1), rc.color(2)))
                 quadData.Add(New cv.Point3f(topLeft.X + shift.X, topLeft.Y + shift.Y, depth + shift.Z))
@@ -293,8 +293,8 @@ Public Class Quad_Bricks : Inherits TaskParent
                     For j = 0 To 4 - 1
                         Dim x = Choose(j + 1, roi.X, roi.X + roi.Width, roi.X + roi.Width, roi.X)
                         Dim y = Choose(j + 1, roi.Y, roi.Y, roi.Y + roi.Height, roi.Y + roi.Height)
-                        min(j) = worldCoordinates(New cv.Point3f(x, y, depthMin))
-                        max(j) = worldCoordinates(New cv.Point3f(x, y, depthMax))
+                        min(j) = Cloud_Basics.WorldCoordinates(New cv.Point3f(x, y, depthMin))
+                        max(j) = Cloud_Basics.WorldCoordinates(New cv.Point3f(x, y, depthMax))
                         min(j) += shift
                         quadData.Add(min(j))
                     Next

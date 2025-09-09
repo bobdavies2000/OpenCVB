@@ -1825,8 +1825,8 @@ Public Class XO_OpenGL_ContourPlaneOnly : Inherits TaskParent
             Dim c = task.scalarColors(index)
             Dim color As cv.Point3f = New cv.Point3f(c(0), c(1), c(2))
 
-            Dim p0 = worldCoordinates(contour.rect.TopLeft, contour.depth)
-            Dim p1 = worldCoordinates(contour.rect.BottomRight, contour.depth)
+            Dim p0 = Cloud_Basics.WorldCoordinates(contour.rect.TopLeft, contour.depth)
+            Dim p1 = Cloud_Basics.WorldCoordinates(contour.rect.BottomRight, contour.depth)
 
             Dim corners As New List(Of cv.Point3f) From {New cv.Point3f(p0.X, p0.Y, contour.depth),
                                                          New cv.Point3f(p1.X, p0.Y, contour.depth),
@@ -4112,8 +4112,8 @@ Public Class XO_Quad_Basics : Inherits TaskParent
             If brick.depth > 0 Then
                 brick.corners.Clear()
 
-                Dim p0 = worldCoordinates(brick.rect.TopLeft, brick.depth)
-                Dim p1 = worldCoordinates(brick.rect.BottomRight, brick.depth)
+                Dim p0 = Cloud_Basics.WorldCoordinates(brick.rect.TopLeft, brick.depth)
+                Dim p1 = Cloud_Basics.WorldCoordinates(brick.rect.BottomRight, brick.depth)
 
                 ' clockwise around starting in upper left.
                 brick.corners.Add(New cv.Point3f(p0.X + shift.X, p0.Y + shift.Y, brick.depth))

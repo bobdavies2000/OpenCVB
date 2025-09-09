@@ -147,7 +147,15 @@ Namespace OpenCVB
             Me.Show()
 
             camSwitchAnnouncement()
-            Application.DoEvents()
+            If settings.cameraFound Then initCamera()
+
+            ' can't start until we have the calibration data.
+            While 1
+                If camera IsNot Nothing Then
+                    If camera.calibdata.baseline > 0 Then Exit While
+                End If
+                Application.DoEvents()
+            End While
 
             setupCamPics()
             loadAlgorithmComboBoxes()
@@ -185,8 +193,6 @@ Namespace OpenCVB
             End If
 
             AvailableAlgorithms.ComboBox.Select()
-
-            If settings.cameraFound Then initCamera()
 
             fpsTimer.Enabled = True
             XYLoc.Text = "(x:0, y:0) - last click point at: (x:0, y:0)"
@@ -943,6 +949,30 @@ Namespace OpenCVB
 
             parms.workRes = settings.workRes
             parms.captureRes = settings.captureRes
+
+            parms.calibData.rgbIntrinsics.fx = camera.calibData.rgbIntrinsics.fx
+            parms.calibData.rgbIntrinsics.fy = camera.calibData.rgbIntrinsics.fy
+            parms.calibData.rgbIntrinsics.ppx = camera.calibData.rgbIntrinsics.ppx
+            parms.calibData.rgbIntrinsics.ppy = camera.calibData.rgbIntrinsics.ppy
+
+            If parms.cameraName.StartsWith("Intel") Then
+                parms.calibData.leftIntrinsics.fx = camera.calibData.leftIntrinsics.fx
+                parms.calibData.leftIntrinsics.fy = camera.calibData.leftIntrinsics.fy
+                parms.calibData.leftIntrinsics.ppx = camera.calibData.leftIntrinsics.ppx
+                parms.calibData.leftIntrinsics.ppy = camera.calibData.leftIntrinsics.ppy
+            Else
+                parms.calibData.leftIntrinsics.fx = camera.calibData.rgbIntrinsics.fx
+                parms.calibData.leftIntrinsics.fy = camera.calibData.rgbIntrinsics.fy
+                parms.calibData.leftIntrinsics.ppx = camera.calibData.rgbIntrinsics.ppx
+                parms.calibData.leftIntrinsics.ppy = camera.calibData.rgbIntrinsics.ppy
+            End If
+
+            parms.calibData.rightIntrinsics.fx = camera.calibData.rightIntrinsics.fx
+            parms.calibData.rightIntrinsics.fy = camera.calibData.rightIntrinsics.fy
+            parms.calibData.rightIntrinsics.ppx = camera.calibData.rightIntrinsics.ppx
+            parms.calibData.rightIntrinsics.ppy = camera.calibData.rightIntrinsics.ppy
+
+            parms.calibData.baseline = camera.calibData.baseline
 
             PausePlayButton.Image = PausePlay
 

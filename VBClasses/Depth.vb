@@ -1348,7 +1348,7 @@ Public Class Depth_WorldXYMT : Inherits TaskParent
                           xy.Y = y * multY
                           xy.Z = src.Get(Of Single)(y, x)
                           If xy.Z <> 0 Then
-                              Dim xyz = worldCoordinates(xy)
+                              Dim xyz = Cloud_Basics.WorldCoordinates(xy)
                               dst3.Set(Of cv.Point3f)(y, x, xyz)
                           End If
                       Next
@@ -1382,7 +1382,7 @@ Public Class Depth_WorldXYZ : Inherits TaskParent
             For xy.X = 0 To dst2.Width - 1
                 xy.Z = src.Get(Of Single)(xy.Y, xy.X)
                 If xy.Z <> 0 Then
-                    Dim xyz = worldCoordinates(xy)
+                    Dim xyz = Cloud_Basics.WorldCoordinates(xy)
                     dst2.Set(Of cv.Point3f)(xy.Y, xy.X, xyz)
                 End If
             Next

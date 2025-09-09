@@ -7,6 +7,20 @@ Public Class CameraZed2 : Inherits GenericCamera
         workRes = _workRes
         ratio = CInt(captureRes.Width / workRes.Width)
         zed = New CamZed(workRes, captureRes, deviceName)
+
+        calibData.rgbIntrinsics.fx = zed.rgbIntrinsics.fx / ratio
+        calibData.rgbIntrinsics.fy = zed.rgbIntrinsics.fy / ratio
+        calibData.rgbIntrinsics.ppx = zed.rgbIntrinsics.ppx / ratio
+        calibData.rgbIntrinsics.ppy = zed.rgbIntrinsics.ppy / ratio
+
+        calibData.leftIntrinsics = calibData.rgbIntrinsics
+
+        calibData.rightIntrinsics.fx = zed.rightIntrinsics.fx / ratio
+        calibData.rightIntrinsics.fy = zed.rightIntrinsics.fy / ratio
+        calibData.rightIntrinsics.ppx = zed.rightIntrinsics.ppx / ratio
+        calibData.rightIntrinsics.ppy = zed.rightIntrinsics.ppy / ratio
+
+        calibData.baseline = zed.baseline
     End Sub
     Public Sub GetNextFrame()
         zed.GetNextFrame()
@@ -15,22 +29,6 @@ Public Class CameraZed2 : Inherits GenericCamera
         IMU_AngularVelocity = zed.IMU_AngularVelocity
         Static IMU_StartTime = zed.IMU_TimeStamp
         IMU_TimeStamp = (zed.IMU_TimeStamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
-
-        If calibData.baseline = 0 Then
-            calibData.baseline = zed.baseline
-
-            calibData.rgbIntrinsics.fx = zed.rgbIntrinsics.fx / ratio
-            calibData.rgbIntrinsics.fy = zed.rgbIntrinsics.fy / ratio
-            calibData.rgbIntrinsics.ppx = zed.rgbIntrinsics.ppx / ratio
-            calibData.rgbIntrinsics.ppy = zed.rgbIntrinsics.ppy / ratio
-
-            calibData.leftIntrinsics = calibData.rgbIntrinsics
-
-            calibData.rightIntrinsics.fx = zed.rightIntrinsics.fx / ratio
-            calibData.rightIntrinsics.fy = zed.rightIntrinsics.fy / ratio
-            calibData.rightIntrinsics.ppx = zed.rightIntrinsics.ppx / ratio
-            calibData.rightIntrinsics.ppy = zed.rightIntrinsics.ppy / ratio
-        End If
 
         If workRes <> captureRes Then
             camImages.color = zed.color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)

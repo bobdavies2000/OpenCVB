@@ -89,16 +89,6 @@ Public Class sgl
         zoomZ += If(delta > 0, 0.5F, -0.5F)
         GLControl.Invalidate() ' Force redraw
     End Sub
-    Public Function WorldCoordinates(p As cv.Point3f) As cv.Point3f
-        Dim x = (p.X - ppx) / fx
-        Dim y = (p.Y - ppy) / fy
-        Return New cv.Point3f(x * p.Z, y * p.Z, p.Z)
-    End Function
-    Public Function WorldCoordinates(p As cv.Point, depth As Single) As cv.Point3f
-        Dim x = (p.X - ppx) / fx
-        Dim y = (p.Y - ppy) / fy
-        Return New cv.Point3f(x * depth, y * depth, depth)
-    End Function
     Private Sub sgl_Closed(sender As Object, e As EventArgs) Handles Me.Closed
         task.closeRequest = True
     End Sub
@@ -129,8 +119,8 @@ Public Class sgl
             Dim color = task.color(rect).Mean()
 
             gl.Color(CSng(color(2) / 255), CSng(color(1) / 255), CSng(color(0) / 255))
-            Dim p0 = WorldCoordinates(rect.TopLeft, depth)
-            Dim p1 = WorldCoordinates(rect.BottomRight, depth)
+            Dim p0 = Cloud_Basics.WorldCoordinates(rect.TopLeft, depth)
+            Dim p1 = Cloud_Basics.WorldCoordinates(rect.BottomRight, depth)
             gl.Vertex(p0.X, p0.Y, depth)
             gl.Vertex(p1.X, p0.Y, depth)
             gl.Vertex(p1.X, p1.Y, depth)
