@@ -23,9 +23,6 @@ Public Class sgl
     Public ppy = task.calibData.rgbIntrinsics.ppy
     Public fx = task.calibData.rgbIntrinsics.fx
     Public fy = task.calibData.rgbIntrinsics.fy
-    Dim mmZ As mmData
-    Dim zNear As Single
-    Dim zFar As Single
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         options = New Options_SharpGL
         options2 = New Options_SharpGL2
@@ -165,8 +162,6 @@ Public Class sgl
     Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
         options.Run()
         options2.Run()
-        zNear = options.zNear
-        zFar = options.zFar
 
         If task.gOptions.DebugCheckBox.Checked Then
             task.gOptions.DebugCheckBox.Checked = False
@@ -178,10 +173,9 @@ Public Class sgl
         gl.LoadIdentity()
 
         If task.gOptions.GL_LinearMode.Checked Then
-            mmZ = GetMinMax(task.pcSplit(2), task.depthMask)
-            gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, zNear, zFar)
+            gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, options.zNear, options.zFar)
         Else
-            gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, zNear, zFar)
+            gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
         End If
 
         gl.MatrixMode(OpenGL.GL_MODELVIEW)
@@ -194,8 +188,7 @@ Public Class sgl
 
         ' gl.LookAt(options2.eye(0), options2.eye(1), options2.eye(2), 0, 0, zoomZ, upX, upY, upZ)
 
-        gl.Translate(panX, panY, zoomZ)
-        If task.heartBeat Then Debug.WriteLine("ZoomZ = " + Format(zoomZ, fmt3))
+        If task.gOptions.GL_LinearMode.Checked = False Then gl.Translate(panX, panY, zoomZ)
         gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
         gl.PointSize(options.pointSize)
@@ -210,8 +203,6 @@ Public Class sgl
                 gl.ReadPixels(0, 0, task.workRes.Width, task.workRes.Height, OpenGL.GL_DEPTH_COMPONENT,
                               OpenGL.GL_FLOAT, task.sharpDepth.Data)
                 task.sharpDepth = task.sharpDepth.Flip(cv.FlipMode.X)
-                Dim mask = task.sharpDepth.InRange(0.0F, 0.99F)
-                task.sharpDepth.SetTo(0, Not mask)
 
             Case Comm.oCase.drawPointCloudRGB
                 'gl.ClearStencil(0)

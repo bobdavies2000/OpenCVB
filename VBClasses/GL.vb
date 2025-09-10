@@ -90,17 +90,17 @@ End Class
 
 
 Public Class GL_DisplayPC : Inherits TaskParent
-    Public Shared ppx = task.calibData.rgbIntrinsics.ppx
-    Public Shared ppy = task.calibData.rgbIntrinsics.ppy
-    Public Shared fx = task.calibData.rgbIntrinsics.fx
-    Public Shared fy = task.calibData.rgbIntrinsics.fy
+    Public ppx = task.calibData.rgbIntrinsics.ppx
+    Public ppy = task.calibData.rgbIntrinsics.ppy
+    Public fx = task.calibData.rgbIntrinsics.fx
+    Public fy = task.calibData.rgbIntrinsics.fy
     Public Sub New()
         task.sharpDepth = New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
         desc = "Display the pointcloud read back from SharpGL and display it."
     End Sub
-    Public Shared Function invertMat(glDepth As cv.Mat, mm As mmData) As cv.Mat
+    Public Function invertMat(glDepth As cv.Mat) As cv.Mat
         Dim dst As New cv.Mat(glDepth.Size, cv.MatType.CV_32F, 0)
-        Dim count As Integer
+        Dim count As Integer, count1 As Integer
         Dim depthvals As New List(Of Single)
         For y = 0 To glDepth.Height - 1
             For x = 0 To glDepth.Width - 1
@@ -108,14 +108,20 @@ Public Class GL_DisplayPC : Inherits TaskParent
                 If d = 0 Then Continue For
                 count += 1
 
-                Dim u = CInt((x * fx / d) + ppx)
-                Dim v = CInt((y * fy / d) + ppy)
+                Dim pcX = task.pcSplit(0).Get(Of Single)(y, x)
+                Dim pcY = task.pcSplit(1).Get(Of Single)(y, x)
+                Dim u = CInt((pcX * fx / d) + ppx)
+                Dim v = CInt((pcY * fy / d) + ppy)
 
                 depthvals.Add(d)
 
-                If u >= 0 And u < dst.Width And v >= 0 And v < dst.Height Then dst.Set(Of Single)(v, u, d)
+                If u >= 0 And u < dst.Width And v >= 0 And v < dst.Height Then
+                    count1 += 1
+                    dst.Set(Of Single)(v, u, d)
+                End If
             Next
         Next
+        labels(2) = CStr(count) + " pixels had depth while " + CStr(count1) + " inverted pixels landed in the image."
         Return dst
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -125,9 +131,10 @@ Public Class GL_DisplayPC : Inherits TaskParent
         End If
 
         Dim mm = GetMinMax(task.pcSplit(2), task.depthMask)
+        Dim pcMask = task.sharpDepth.InRange(0.01F, 0.99F)
         dst3 = task.sharpDepth * (mm.maxVal - mm.minVal) + mm.minVal
-
-        dst2 = invertMat(dst3, mm)
+        dst3.SetTo(0, Not pcMask)
+        dst2 = invertMat(dst3)
     End Sub
 End Class
 
