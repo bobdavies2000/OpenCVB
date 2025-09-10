@@ -173,7 +173,8 @@ Public Class sgl
         gl.LoadIdentity()
 
         If task.gOptions.GL_LinearMode.Checked Then
-            gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, options.zNear, options.zFar)
+            ' gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, options.zNear, options.zFar)
+            gl.Ortho(-2, 2, -2, 2, options.zNear, options.zFar)
         Else
             gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
         End If

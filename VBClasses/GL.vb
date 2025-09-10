@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports SharpGL.SceneGraph.Lighting
+Imports cv = OpenCvSharp
 Public Class GL_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Display the pointcloud"
@@ -108,10 +109,10 @@ Public Class GL_DisplayPC : Inherits TaskParent
                 If d = 0 Then Continue For
                 count += 1
 
-                Dim pcX = task.pcSplit(0).Get(Of Single)(y, x)
-                Dim pcY = task.pcSplit(1).Get(Of Single)(y, x)
-                Dim u = CInt((pcX * fx / d) + ppx)
-                Dim v = CInt((pcY * fy / d) + ppy)
+                Dim x_ndc As Single = (x / glDepth.Width) * 2.0F - 1.0F
+                Dim y_ndc As Single = (y / glDepth.Height) * 2.0F - 1.0F
+                Dim u = CInt((x_ndc * fx / d) + ppx)
+                Dim v = CInt((y_ndc * fy / d) + ppy)
 
                 depthvals.Add(d)
 
