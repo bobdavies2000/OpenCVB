@@ -7,12 +7,16 @@ Public Class Options_SharpGL : Inherits OptionParent
     Public zNear As Single
     Public zFar As Single
     Public pointSize As Single
+    Public xRange As Single
+    Public yRange As Single
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Perspective", 1, 100, 45)
             sliders.setupTrackBar("zNear X100", 1, 100, 10)
             sliders.setupTrackBar("zFar", 1, 100, 100)
             sliders.setupTrackBar("Pointsize", 1, 10, 5)
+            sliders.setupTrackBar("SharpGL X range", 1, 10, 1)
+            sliders.setupTrackBar("SharpGL Y range", 1, 10, 1)
         End If
     End Sub
     Public Sub Run()
@@ -20,10 +24,14 @@ Public Class Options_SharpGL : Inherits OptionParent
         Static zNearSlider = FindSlider("zNear X100")
         Static zFarSlider = FindSlider("zFar")
         Static pointSlider = FindSlider("Pointsize")
+        Static xSlider = FindSlider("SharpGL X range")
+        Static ySlider = FindSlider("SharpGL Y range")
         perspective = perspectiveSlider.value
         zNear = zNearSlider.value / 100
         zFar = zFarSlider.value
         pointSize = pointSlider.value
+        xRange = xSlider.value
+        yRange = ySlider.value
     End Sub
 End Class
 

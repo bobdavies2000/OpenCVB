@@ -99,7 +99,9 @@ Public Class sgl
             'If mmZZ.maxVal < mmZ.maxVal Then mmZZ.maxVal = mmZ.maxVal
 
             'gl.Ortho(mmXX.minVal, mmXX.maxVal, mmYY.minVal, mmYY.maxVal, mmZZ.minVal, mmZZ.maxVal)
-            gl.Ortho(-1, 1, -1, 1, mmZ.minVal, mmZ.maxVal)
+            Dim xRange = options.xRange
+            Dim yRange = options.yRange
+            gl.Ortho(-xrange, xrange, -yRange, yrange, mmZ.minVal, mmZ.maxVal)
             '  gl.Ortho(0, task.workRes.Width, 0, task.workRes.Height, mmZ.minVal, mmZ.maxVal)
             'gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, mmZ.minVal, mmZ.maxVal)
         Else
@@ -116,7 +118,7 @@ Public Class sgl
 
         ' gl.LookAt(options2.eye(0), options2.eye(1), options2.eye(2), 0, 0, zoomZ, upX, upY, upZ)
 
-        If task.gOptions.GL_LinearMode.Checked = False Then gl.Translate(panX, panY, zoomZ)
+        gl.Translate(panX, panY, zoomZ)
         gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
         gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
         gl.PointSize(options.pointSize)
@@ -129,7 +131,7 @@ Public Class sgl
         Me.Text = "SharpGL - " + If(task.gOptions.GL_LinearMode.Checked, "", "Non") + "Linear mode (see Global Options)"
         rotationX = 0.0
         rotationY = 0.0
-        zoomZ = -5.0F
+        If task.gOptions.GL_LinearMode.Checked Then zoomZ = 0 Else zoomZ = -5.0F
     End Sub
     Private Sub OpenGLControl_MouseWheel(sender As Object, e As MouseEventArgs) Handles GLControl.MouseWheel
         Dim delta As Integer = e.Delta

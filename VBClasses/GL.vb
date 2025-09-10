@@ -460,15 +460,11 @@ Public Class GL_ReadLines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
-        'dst2 = task.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        'dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        'dst0 = src
-        'dst0.SetTo(0, Not dst2)
-
-        dst3.SetTo(white)
+        dst3 = task.color.Clone
         For Each lp In task.lines.lpList
-            DrawLine(dst3, lp, task.scalarColors(lp.index))
+            'DrawLine(dst3, lp, task.scalarColors(lp.index))
+            DrawLine(dst3, lp, white)
         Next
 
         strOut = task.sharpGL.RunSharp(Comm.oCase.readLines, task.pointCloud, dst3)
