@@ -173,8 +173,12 @@ Public Class sgl
         gl.LoadIdentity()
 
         If task.gOptions.GL_LinearMode.Checked Then
-            ' gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, options.zNear, options.zFar)
-            gl.Ortho(-2, 2, -2, 2, options.zNear, options.zFar)
+            'Dim mmX = GetMinMax(task.pcSplit(0))
+            'Dim mmY = GetMinMax(task.pcSplit(1))
+            Dim mmZ = GetMinMax(task.pcSplit(2))
+            'gl.Ortho(mmX.minVal, mmX.maxVal, mmY.minVal, mmY.maxVal, mmZ.minVal, mmZ.maxVal)
+            'gl.Ortho(-1, 1, -1, 1, mmZ.minVal, mmZ.maxVal)
+            gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, mmZ.minVal, mmZ.maxVal)
         Else
             gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
         End If

@@ -30,13 +30,13 @@ Partial Class sgl
         ' 
         GLControl.DrawFPS = False
         GLControl.FrameRate = 30
-        GLControl.Location = New Point(19, 20)
+        GLControl.Location = New Point(0, 0)
         GLControl.Margin = New Padding(6, 5, 6, 5)
         GLControl.Name = "GLControl"
         GLControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1
         GLControl.RenderContextType = SharpGL.RenderContextType.FBO
         GLControl.RenderTrigger = SharpGL.RenderTrigger.TimerBased
-        GLControl.Size = New Size(1106, 710)
+        GLControl.Size = New Size(1142, 746)
         GLControl.TabIndex = 0
         ' 
         ' sgl
