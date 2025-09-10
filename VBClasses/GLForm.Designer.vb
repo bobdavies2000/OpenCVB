@@ -28,6 +28,7 @@ Partial Class sgl
         ' 
         ' GLControl
         ' 
+        GLControl.Dock = DockStyle.Fill
         GLControl.DrawFPS = False
         GLControl.FrameRate = 30
         GLControl.Location = New Point(0, 0)
@@ -36,14 +37,14 @@ Partial Class sgl
         GLControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1
         GLControl.RenderContextType = SharpGL.RenderContextType.FBO
         GLControl.RenderTrigger = SharpGL.RenderTrigger.TimerBased
-        GLControl.Size = New Size(1142, 746)
+        GLControl.Size = New Size(1199, 785)
         GLControl.TabIndex = 0
         ' 
         ' sgl
         ' 
         AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1142, 746)
+        ClientSize = New Size(1199, 785)
         Controls.Add(GLControl)
         Margin = New Padding(4, 5, 4, 5)
         Name = "sgl"

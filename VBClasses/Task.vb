@@ -462,9 +462,6 @@ Public Class VBtask : Implements IDisposable
         If algName.StartsWith("GL_") And algName <> "GL_MainForm" And task.optionsChanged Then
             If sharpGL IsNot Nothing Then sharpGL.Dispose()
             sharpGL = New sgl
-            sharpGL.GLControl.Width = task.workRes.Width
-            sharpGL.GLControl.Height = task.workRes.Height
-
             sharpGL.Show()
         End If
 

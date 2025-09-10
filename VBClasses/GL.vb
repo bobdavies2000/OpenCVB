@@ -90,59 +90,6 @@ End Class
 
 
 
-Public Class GL_DisplayPC : Inherits TaskParent
-    Public ppx = task.calibData.rgbIntrinsics.ppx
-    Public ppy = task.calibData.rgbIntrinsics.ppy
-    Public fx = task.calibData.rgbIntrinsics.fx
-    Public fy = task.calibData.rgbIntrinsics.fy
-    Public Sub New()
-        task.sharpDepth = New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
-        desc = "Display the pointcloud read back from SharpGL and display it."
-    End Sub
-    Public Function invertMat(glDepth As cv.Mat) As cv.Mat
-        Dim dst As New cv.Mat(glDepth.Size, cv.MatType.CV_32F, 0)
-        Dim count As Integer, count1 As Integer
-        Dim depthvals As New List(Of Single)
-        For y = 0 To glDepth.Height - 1
-            For x = 0 To glDepth.Width - 1
-                Dim d = glDepth.Get(Of Single)(y, x)
-                If d = 0 Then Continue For
-                count += 1
-
-                Dim x_ndc As Single = (x / glDepth.Width) * 2.0F - 1.0F
-                Dim y_ndc As Single = (y / glDepth.Height) * 2.0F - 1.0F
-                Dim u = CInt((x_ndc * fx / d) + ppx)
-                Dim v = CInt((y_ndc * fy / d) + ppy)
-
-                depthvals.Add(d)
-
-                If u >= 0 And u < dst.Width And v >= 0 And v < dst.Height Then
-                    count1 += 1
-                    dst.Set(Of Single)(v, u, d)
-                End If
-            Next
-        Next
-        labels(2) = CStr(count) + " pixels had depth while " + CStr(count1) + " inverted pixels landed in the image."
-        Return dst
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
-            SetTrueText(strOut, 2)
-        End If
-
-        Dim mm = GetMinMax(task.pcSplit(2), task.depthMask)
-        Dim pcMask = task.sharpDepth.InRange(0.01F, 0.99F)
-        dst3 = task.sharpDepth * (mm.maxVal - mm.minVal) + mm.minVal
-        dst3.SetTo(0, Not pcMask)
-        dst2 = invertMat(dst3)
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class GL_ReadPC : Inherits TaskParent
     Dim displayPC As New GL_DisplayPC
@@ -158,23 +105,6 @@ Public Class GL_ReadPC : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class GL_ReadQuads : Inherits TaskParent
-    Dim displayPC As New GL_DisplayPC
-    Public Sub New()
-        desc = "Read the quads back from a rendered geometry"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
-        SetTrueText(strOut, 2)
-
-        displayPC.Run(emptyMat)
-        dst2 = displayPC.dst2
-    End Sub
-End Class
 
 
 
@@ -452,5 +382,115 @@ Public Class GL_Draw3DLinesAndCloud : Inherits TaskParent
         SetTrueText(strOut, 3)
 
         dst2 = task.lines.dst2
+    End Sub
+End Class
+
+
+
+
+
+Public Class GL_DisplayPC : Inherits TaskParent
+    Public Shared ppx = task.calibData.rgbIntrinsics.ppx
+    Public Shared ppy = task.calibData.rgbIntrinsics.ppy
+    Public Shared fx = task.calibData.rgbIntrinsics.fx
+    Public Shared fy = task.calibData.rgbIntrinsics.fy
+    Public Shared msg As String
+    Shared mm As mmData
+    Public Sub New()
+        task.sharpDepth = New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
+        desc = "Display the pointcloud read back from SharpGL and display it."
+    End Sub
+    Public Shared Function invertMat(glDepth As cv.Mat) As cv.Mat
+        Dim dst As New cv.Mat(glDepth.Size, cv.MatType.CV_32F, 0)
+        Dim count As Integer, count1 As Integer
+        Dim depthvals As New List(Of Single)
+        For y = 0 To glDepth.Height - 1
+            For x = 0 To glDepth.Width - 1
+                Dim d = glDepth.Get(Of Single)(y, x)
+                If d = 0 Then Continue For
+                count += 1
+
+                Dim x_ndc As Single = (x / glDepth.Width) * 2.0F - 1.0F
+                Dim y_ndc As Single = (y / glDepth.Height) * 2.0F - 1.0F
+                Dim u = CInt((x_ndc * fx / d) + ppx)
+                Dim v = CInt((y_ndc * fy / d) + ppy)
+
+                depthvals.Add(d)
+
+                If u >= 0 And u < dst.Width And v >= 0 And v < dst.Height Then
+                    count1 += 1
+                    dst.Set(Of Single)(v, u, d)
+                End If
+            Next
+        Next
+        msg = CStr(count) + " pixels had depth while " + CStr(count1) + " inverted pixels landed in the image."
+        Return dst
+    End Function
+    Public Shared Function reProject(glCloud As cv.Mat) As cv.Mat
+        mm = GetMinMax(task.pcSplit(2), task.depthMask)
+        Dim pcMask = glCloud.InRange(0.01F, 0.99F)
+        glCloud = glCloud * (mm.maxVal - mm.minVal) + mm.minVal
+        glCloud.SetTo(0, Not pcMask)
+        Return invertMat(glCloud)
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
+            SetTrueText(strOut, 2)
+        End If
+
+        dst2 = reProject(task.sharpDepth)
+        If standaloneTest() Then
+            Dim pcMask = task.sharpDepth.InRange(0.01F, 0.99F)
+            dst3 = task.sharpDepth * (mm.maxVal - mm.minVal) + mm.minVal
+            dst3.SetTo(0, Not pcMask)
+        End If
+        labels(2) = msg
+    End Sub
+End Class
+
+
+
+
+
+Public Class GL_ReadLines : Inherits TaskParent
+    Dim displayPC As New GL_DisplayPC
+    Public Sub New()
+        desc = "Draw lines in SharpGL and read them back."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
+        dst2 = task.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        labels(2) = task.lines.labels(2)
+
+        dst0 = src
+        dst0.SetTo(0, Not dst2)
+
+        dst1.SetTo(red)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.draw3DLinesAndCloud, dst0, task.lines.dst2)
+        SetTrueText(strOut, 3)
+
+        dst2 = task.lines.dst2
+
+        displayPC.Run(src)
+    End Sub
+End Class
+
+
+
+
+
+Public Class GL_ReadQuads : Inherits TaskParent
+    Dim displayPC As New GL_DisplayPC
+    Public Sub New()
+        desc = "Read the quads back from a rendered geometry"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.readQuads)
+        SetTrueText(strOut, 2)
+
+        displayPC.Run(emptyMat)
+        dst2 = displayPC.dst2
     End Sub
 End Class

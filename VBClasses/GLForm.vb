@@ -28,10 +28,8 @@ Public Class sgl
         options2 = New Options_SharpGL2
         Me.Left = GetSetting("Opencv", "sglLeft", "sglLeft", task.mainFormLocation.X + task.mainFormLocation.Width)
         Me.Top = GetSetting("Opencv", "sglTop", "sglTop", task.mainFormLocation.Y)
-        Me.Width = task.workRes.Width + 50
-        Me.Height = task.workRes.Height + 64
-        'Me.Width = GetSetting("Opencv", "sglWidth", "sglWidth", task.mainFormLocation.Width)
-        'Me.Height = GetSetting("Opencv", "sglHeight", "sglHeight", task.mainFormLocation.Height)
+        Me.Width = GetSetting("Opencv", "sglWidth", "sglWidth", task.mainFormLocation.Width)
+        Me.Height = GetSetting("Opencv", "sglHeight", "sglHeight", task.mainFormLocation.Height)
         gl = GLControl.OpenGL
     End Sub
     Public Sub saveLocation()
@@ -159,6 +157,13 @@ Public Class sgl
         Next
         Return task.lines.labels(2)
     End Function
+    Private Sub readPointCloud()
+        task.sharpDepth = New cv.Mat(New cv.Size(GLControl.Width, GLControl.Height), cv.MatType.CV_32F, 0)
+        gl.ReadPixels(0, 0, GLControl.Width, GLControl.Height, OpenGL.GL_DEPTH_COMPONENT,
+                      OpenGL.GL_FLOAT, task.sharpDepth.Data)
+        task.sharpDepth = task.sharpDepth.Resize(task.workRes)
+        task.sharpDepth = task.sharpDepth.Flip(cv.FlipMode.X)
+    End Sub
     Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
         options.Run()
         options2.Run()
@@ -173,12 +178,28 @@ Public Class sgl
         gl.LoadIdentity()
 
         If task.gOptions.GL_LinearMode.Checked Then
+            Dim mmZ = GetMinMax(task.pcSplit(2))
             'Dim mmX = GetMinMax(task.pcSplit(0))
             'Dim mmY = GetMinMax(task.pcSplit(1))
-            Dim mmZ = GetMinMax(task.pcSplit(2))
-            'gl.Ortho(mmX.minVal, mmX.maxVal, mmY.minVal, mmY.maxVal, mmZ.minVal, mmZ.maxVal)
-            'gl.Ortho(-1, 1, -1, 1, mmZ.minVal, mmZ.maxVal)
-            gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, mmZ.minVal, mmZ.maxVal)
+            'Static mmXX As mmData, mmYY As mmData, mmZZ As mmData
+            'If task.heartBeat Then
+            '    mmXX = mmX
+            '    mmYY = mmY
+            '    mmZZ = mmZ
+            'End If
+            'If mmXX.minVal > mmX.minVal Then mmXX.minVal = mmX.minVal
+            'If mmXX.maxVal < mmX.maxVal Then mmXX.maxVal = mmX.maxVal
+
+            'If mmYY.minVal > mmY.minVal Then mmYY.minVal = mmY.minVal
+            'If mmYY.maxVal < mmY.maxVal Then mmYY.maxVal = mmY.maxVal
+
+            'If mmZZ.minVal > mmZ.minVal Then mmZZ.minVal = mmZ.minVal
+            'If mmZZ.maxVal < mmZ.maxVal Then mmZZ.maxVal = mmZ.maxVal
+
+            'gl.Ortho(mmXX.minVal, mmXX.maxVal, mmYY.minVal, mmYY.maxVal, mmZZ.minVal, mmZZ.maxVal)
+            gl.Ortho(-1, 1, -1, 1, mmZ.minVal, mmZ.maxVal)
+            '  gl.Ortho(0, task.workRes.Width, 0, task.workRes.Height, mmZ.minVal, mmZ.maxVal)
+            'gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, mmZ.minVal, mmZ.maxVal)
         Else
             gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
         End If
@@ -204,10 +225,15 @@ Public Class sgl
         Select Case func
             Case Comm.oCase.readPC
                 label = drawCloud(pointcloud, RGB)
-                gl.Flush()
-                gl.ReadPixels(0, 0, task.workRes.Width, task.workRes.Height, OpenGL.GL_DEPTH_COMPONENT,
-                              OpenGL.GL_FLOAT, task.sharpDepth.Data)
-                task.sharpDepth = task.sharpDepth.Flip(cv.FlipMode.X)
+                readPointCloud()
+
+            Case Comm.oCase.readLines
+                label = draw3DLines()
+                readPointCloud()
+
+            Case Comm.oCase.readQuads
+                label = drawQuads()
+                readPointCloud()
 
             Case Comm.oCase.drawPointCloudRGB
                 'gl.ClearStencil(0)

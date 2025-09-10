@@ -152,7 +152,7 @@
             ' CameraSwitching
             ' 
             CameraSwitching.AutoSize = True
-            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12.0F)
+            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12F)
             CameraSwitching.Location = New Point(33, 133)
             CameraSwitching.Name = "CameraSwitching"
             CameraSwitching.Size = New Size(202, 29)
@@ -184,19 +184,19 @@
             ' GLControl
             ' 
             GLControl.DrawFPS = False
-            GLControl.Location = New Point(710, 172)
+            GLControl.Location = New Point(425, 182)
             GLControl.Margin = New Padding(5, 6, 5, 6)
             GLControl.Name = "GLControl"
             GLControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1
             GLControl.RenderContextType = SharpGL.RenderContextType.DIBSection
             GLControl.RenderTrigger = SharpGL.RenderTrigger.TimerBased
-            GLControl.Size = New Size(457, 346)
+            GLControl.Size = New Size(800, 367)
             GLControl.TabIndex = 4
             GLControl.Visible = False
             ' 
             ' MainUI
             ' 
-            AutoScaleDimensions = New SizeF(10.0F, 25.0F)
+            AutoScaleDimensions = New SizeF(10F, 25F)
             AutoScaleMode = AutoScaleMode.Font
             ClientSize = New Size(1582, 748)
             Controls.Add(GLControl)

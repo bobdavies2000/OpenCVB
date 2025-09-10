@@ -26,7 +26,7 @@ Public Class Comm
         readQuads
         draw3DLines
         draw3DLinesAndCloud
-        test
+        readLines
     End Enum
 
     Public Shared cameraNames As New List(Of String)({"StereoLabs ZED 2/2i",
