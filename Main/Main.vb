@@ -226,9 +226,9 @@ Namespace OpenCVB
         Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
             jsonfs.write()
             cameraShutdown = True
-            Thread.Sleep(200)
-            On Error Resume Next
-            End
+            Thread.Sleep(500)
+            'On Error Resume Next
+            'End
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)

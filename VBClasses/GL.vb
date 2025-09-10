@@ -445,7 +445,7 @@ Public Class GL_DisplayPC : Inherits TaskParent
             dst3 = task.sharpDepth * (mm.maxVal - mm.minVal) + mm.minVal
             dst3.SetTo(0, Not pcMask)
         End If
-        labels(2) = msg
+        If task.heartBeat Then labels(2) = msg
     End Sub
 End Class
 
@@ -460,20 +460,25 @@ Public Class GL_ReadLines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
-        dst2 = task.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        labels(2) = task.lines.labels(2)
+        'dst2 = task.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        'dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        dst0 = src
-        dst0.SetTo(0, Not dst2)
+        'dst0 = src
+        'dst0.SetTo(0, Not dst2)
 
-        dst1.SetTo(red)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.draw3DLinesAndCloud, dst0, task.lines.dst2)
+        dst3.SetTo(white)
+        For Each lp In task.lines.lpList
+            DrawLine(dst3, lp, task.scalarColors(lp.index))
+        Next
+
+        strOut = task.sharpGL.RunSharp(Comm.oCase.readLines, task.pointCloud, dst3)
         SetTrueText(strOut, 3)
 
-        dst2 = task.lines.dst2
+        labels(3) = task.lines.labels(2)
 
         displayPC.Run(src)
+        dst2 = displayPC.dst2
+        labels(2) = displayPC.labels(2)
     End Sub
 End Class
 

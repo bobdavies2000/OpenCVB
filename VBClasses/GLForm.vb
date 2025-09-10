@@ -69,6 +69,58 @@ Public Class sgl
             GLControl.Invalidate()
         End If
     End Sub
+    Private Sub prepareSharpGL()
+        If task.gOptions.DebugCheckBox.Checked Then
+            task.gOptions.DebugCheckBox.Checked = False
+            task.sharpGL.resetView()
+        End If
+        If task.firstPass Or task.optionsChanged Then task.sharpGL.resetView()
+        gl.Viewport(0, 0, GLControl.Width, GLControl.Height)
+        gl.MatrixMode(OpenGL.GL_PROJECTION)
+        gl.LoadIdentity()
+
+        If task.gOptions.GL_LinearMode.Checked Then
+            Dim mmZ = GetMinMax(task.pcSplit(2))
+            'Dim mmX = GetMinMax(task.pcSplit(0))
+            'Dim mmY = GetMinMax(task.pcSplit(1))
+            'Static mmXX As mmData, mmYY As mmData, mmZZ As mmData
+            'If task.heartBeat Then
+            '    mmXX = mmX
+            '    mmYY = mmY
+            '    mmZZ = mmZ
+            'End If
+            'If mmXX.minVal > mmX.minVal Then mmXX.minVal = mmX.minVal
+            'If mmXX.maxVal < mmX.maxVal Then mmXX.maxVal = mmX.maxVal
+
+            'If mmYY.minVal > mmY.minVal Then mmYY.minVal = mmY.minVal
+            'If mmYY.maxVal < mmY.maxVal Then mmYY.maxVal = mmY.maxVal
+
+            'If mmZZ.minVal > mmZ.minVal Then mmZZ.minVal = mmZ.minVal
+            'If mmZZ.maxVal < mmZ.maxVal Then mmZZ.maxVal = mmZ.maxVal
+
+            'gl.Ortho(mmXX.minVal, mmXX.maxVal, mmYY.minVal, mmYY.maxVal, mmZZ.minVal, mmZZ.maxVal)
+            gl.Ortho(-1, 1, -1, 1, mmZ.minVal, mmZ.maxVal)
+            '  gl.Ortho(0, task.workRes.Width, 0, task.workRes.Height, mmZ.minVal, mmZ.maxVal)
+            'gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, mmZ.minVal, mmZ.maxVal)
+        Else
+            gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
+        End If
+
+        gl.MatrixMode(OpenGL.GL_MODELVIEW)
+
+        gl.Enable(OpenGL.GL_DEPTH_TEST)
+        gl.DepthFunc(OpenGL.GL_LESS)
+
+        gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
+        gl.LoadIdentity()
+
+        ' gl.LookAt(options2.eye(0), options2.eye(1), options2.eye(2), 0, 0, zoomZ, upX, upY, upZ)
+
+        If task.gOptions.GL_LinearMode.Checked = False Then gl.Translate(panX, panY, zoomZ)
+        gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
+        gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
+        gl.PointSize(options.pointSize)
+    End Sub
     Private Sub OpenGLControl_MouseUp(sender As Object, e As MouseEventArgs) Handles GLControl.MouseUp
         If e.Button = MouseButtons.Left Then isDragging = False
         If e.Button = MouseButtons.Right Then isPanning = False
@@ -167,57 +219,7 @@ Public Class sgl
     Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
         options.Run()
         options2.Run()
-
-        If task.gOptions.DebugCheckBox.Checked Then
-            task.gOptions.DebugCheckBox.Checked = False
-            task.sharpGL.resetView()
-        End If
-        If task.firstPass Or task.optionsChanged Then task.sharpGL.resetView()
-        gl.Viewport(0, 0, GLControl.Width, GLControl.Height)
-        gl.MatrixMode(OpenGL.GL_PROJECTION)
-        gl.LoadIdentity()
-
-        If task.gOptions.GL_LinearMode.Checked Then
-            Dim mmZ = GetMinMax(task.pcSplit(2))
-            'Dim mmX = GetMinMax(task.pcSplit(0))
-            'Dim mmY = GetMinMax(task.pcSplit(1))
-            'Static mmXX As mmData, mmYY As mmData, mmZZ As mmData
-            'If task.heartBeat Then
-            '    mmXX = mmX
-            '    mmYY = mmY
-            '    mmZZ = mmZ
-            'End If
-            'If mmXX.minVal > mmX.minVal Then mmXX.minVal = mmX.minVal
-            'If mmXX.maxVal < mmX.maxVal Then mmXX.maxVal = mmX.maxVal
-
-            'If mmYY.minVal > mmY.minVal Then mmYY.minVal = mmY.minVal
-            'If mmYY.maxVal < mmY.maxVal Then mmYY.maxVal = mmY.maxVal
-
-            'If mmZZ.minVal > mmZ.minVal Then mmZZ.minVal = mmZ.minVal
-            'If mmZZ.maxVal < mmZ.maxVal Then mmZZ.maxVal = mmZ.maxVal
-
-            'gl.Ortho(mmXX.minVal, mmXX.maxVal, mmYY.minVal, mmYY.maxVal, mmZZ.minVal, mmZZ.maxVal)
-            gl.Ortho(-1, 1, -1, 1, mmZ.minVal, mmZ.maxVal)
-            '  gl.Ortho(0, task.workRes.Width, 0, task.workRes.Height, mmZ.minVal, mmZ.maxVal)
-            'gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, mmZ.minVal, mmZ.maxVal)
-        Else
-            gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
-        End If
-
-        gl.MatrixMode(OpenGL.GL_MODELVIEW)
-
-        gl.Enable(OpenGL.GL_DEPTH_TEST)
-        gl.DepthFunc(OpenGL.GL_LESS)
-
-        gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
-        gl.LoadIdentity()
-
-        ' gl.LookAt(options2.eye(0), options2.eye(1), options2.eye(2), 0, 0, zoomZ, upX, upY, upZ)
-
-        If task.gOptions.GL_LinearMode.Checked = False Then gl.Translate(panX, panY, zoomZ)
-        gl.Rotate(rotationX, 1.0F, 0.0F, 0.0F)
-        gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
-        gl.PointSize(options.pointSize)
+        prepareSharpGL()
 
         Dim label = ""
         If pointcloud Is Nothing Then pointcloud = task.pointCloud
@@ -228,7 +230,8 @@ Public Class sgl
                 readPointCloud()
 
             Case Comm.oCase.readLines
-                label = draw3DLines()
+                label = drawCloud(pointcloud, RGB)
+                label += draw3DLines()
                 readPointCloud()
 
             Case Comm.oCase.readQuads
