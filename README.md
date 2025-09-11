@@ -21,7 +21,8 @@
 -   SharpGL can be rendered while preserving the point cloud coordinate values.
     -   Normally SharpGL uses non-linear coordinates to improve presentation.
     -   With linear mode geometries can be rendered in SharpGL.
--   The default value – linear vs. non-linear mode – is still TBD.The log of previous changes has moved to be directly below the latest update.
+-   The default value – linear vs. non-linear mode – is still TBD.
+-   The log of previous changes has moved to be directly below the latest update.
 
 ![](media/747013ca4f3229c4862a1bf3437c1f3c.gif)
 
