@@ -1,4 +1,4 @@
-# 2025 September 1st – SharpGL, Memory, FPS.
+# 2025 September 11 – SharpGL, Memory, FPS.
 
 -   Over 1900 algorithms are included, averaging 36 lines of code per algorithm.
 -   SharpGL may be run as one of the 4 windows in the main form for OpenCVB.
