@@ -1,3 +1,40 @@
+# 2025 September 1st – SharpGL, Memory, FPS.
+
+-   Over 1900 algorithms are included, averaging 36 lines of code per algorithm.
+-   SharpGL may be run as one of the 4 windows in the main form for OpenCVB.
+    -   GL_MainForm demonstrates how to do this and what it costs (see below.)
+    -   The cost is the work to move the data in the task thread back to the main form.
+    -   There may be an opportunity for improved UI and performance.
+    -   Mouse control is the same for both Task and MainForm SharpGL.
+-   There are better diagnostics in the OpenCVB log – memory usage and threads.
+    -   This change permits finding which algorithm pushed the memory limits.
+    -   The change will also flag those algorithms which perform poorly.
+-   Main project source tree was reorganized to separate functionality.
+    -   GLHandler.vb contains all the code to handle the SharpGL.
+    -   The jsonClass.vb file now contains all the code related to json.
+    -   The NameSpace “OpenCVB” is now extant throughout the main modules.
+-   The mechanism to create “shared” algorithms was implemented in this version.
+    -   Shared algorithms improve performance when multiple algorithms need them.
+    -   The task structure contains the object – see task.contours or task.features.
+    -   Shared algorithms are run once for all algorithms using them.
+    -   Prior releases had to make sure algorithms were run once per frame.
+-   SharpGL can be rendered while preserving the point cloud coordinate values.
+    -   Normally SharpGL uses non-linear coordinates to improve presentation.
+    -   With linear mode geometries can be rendered in SharpGL.
+-   The default value – linear vs. non-linear mode – is still TBD.The log of previous changes has moved to be directly below the latest update.
+
+![](media/747013ca4f3229c4862a1bf3437c1f3c.gif)
+
+**GL_MainForm:**  *The image rendered in the main OpenCVB form is pretty small but the real problem with using the main form for SharpGL is that the data that resides in the algorithm task needs to be moved to main form which is in a separate thread.*
+
+![](media/207cdd8cf3f63d0aa1c33a92979b0ae4.gif)
+
+**GL_Basics:** *This shows the SharpGL output in non-linear mode. Non-linear mode is more realistic and allows better panning and zoom than linear mode but linear mode point clouds are more easily processed with ReadPointCloud.*
+
+![](media/98c46a1279cee8236171a31aae153b6d.gif)
+
+**GL_Basics:** *This shows the SharpGL output in linear mode. The dimensions are not the same as non-linear mode where the Z dimension is laid in a non-linear fashion to help render to a 2D surface.*
+
 # 2025 August 20th – SharpGL Testing, Memory Usage, SharpGL GIFs.
 
 -   Over 1900 algorithms are included, averaging 36 lines of code per algorithm.

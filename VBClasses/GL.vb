@@ -91,48 +91,6 @@ End Class
 
 
 
-Public Class GL_ReadPC : Inherits TaskParent
-    Dim displayPC As New GL_DisplayPC
-    Public Sub New()
-        desc = "Read the point cloud from a rendered geometry"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
-        SetTrueText(strOut, 2)
-
-        displayPC.Run(emptyMat)
-        dst2 = displayPC.dst2
-    End Sub
-End Class
-
-
-
-
-
-Public Class GL_ReadPCHist : Inherits TaskParent
-    Dim plotHist As New GL_PlotHist
-    Dim displayPC As New GL_DisplayPC
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-        desc = "Read the point cloud from a rendered geometry"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
-        labels(2) = strOut
-
-        plotHist.Run(task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest))
-        dst3 = plotHist.dst3
-        labels(2) = plotHist.labels(2)
-
-        displayPC.Run(emptyMat)
-        dst2 = displayPC.dst2
-    End Sub
-End Class
-
-
-
-
-
 Public Class GL_RunSharp : Inherits TaskParent
     Dim displayPC As New GL_DisplayPC
     Public Sub New()
@@ -173,54 +131,6 @@ Public Class GL_RunSharpHist : Inherits TaskParent
         dst2 = displayPC.dst2
     End Sub
 End Class
-
-
-
-
-
-
-Public Class GL_PlotHist : Inherits TaskParent
-    Dim plotHist As New Plot_Histogram
-    Dim displayPC As New GL_DisplayPC
-    Public Sub New()
-        task.gOptions.MaxDepthBar.Value = 10
-        task.gOptions.HistBinBar.Value = 10
-        plotHist.minRange = 0.1
-        plotHist.createHistogram = True
-        plotHist.removeZeroEntry = True
-        desc = "Read the pointcloud back from SharpGL and plot a histogram of the result."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            Static readCloud As New GL_RunSharp
-            readCloud.Run(emptyMat)
-            strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
-            SetTrueText(strOut, 2)
-            dst1 = task.sharpDepth.Resize(task.workRes, cv.MatType.CV_32F, cv.InterpolationFlags.Nearest)
-        Else
-            dst1 = src
-        End If
-
-        Dim tmp = dst1.InRange(0.1, task.MaxZmeters)
-        dst0 = tmp.ConvertScaleAbs(255)
-
-        dst2.SetTo(0)
-        dst1.CopyTo(dst2, dst0)
-
-        plotHist.maxRange = task.MaxZmeters
-        plotHist.Run(dst2)
-        dst3 = plotHist.dst2
-
-        Dim histList = plotHist.histArray.ToList
-        Dim maxBin = histList.IndexOf(histList.Max)
-        SetTrueText("Max bin at " + CStr(maxBin) + " meters", New cv.Point(dst2.Width / 2, 10), 3)
-        labels(3) = "Distances range from 0 to " + CStr(task.MaxZmeters) + " meters with 1m per bin (by default)"
-
-        displayPC.Run(emptyMat)
-        dst2 = displayPC.dst2
-    End Sub
-End Class
-
 
 
 
@@ -362,26 +272,81 @@ End Class
 
 
 
-Public Class GL_Draw3DLinesAndCloud : Inherits TaskParent
-    Dim line3D As New Line3D_ReconstructLines
+
+
+Public Class GL_ReadPC : Inherits TaskParent
+    Dim displayPC As New GL_DisplayPC
     Public Sub New()
-        task.featureOptions.FeatureSampleSize.Value = task.featureOptions.FeatureSampleSize.Maximum
-        desc = "Draw the RGB lines in SharpGL and include the line points."
+        desc = "Read the point cloud from a rendered geometry"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
-        dst2 = task.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        labels(2) = task.lines.labels(2)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
+        SetTrueText(strOut, 2)
 
-        dst0 = src
-        dst0.SetTo(0, Not dst2)
+        displayPC.Run(emptyMat)
+        dst2 = displayPC.dst2
+    End Sub
+End Class
 
-        dst1.SetTo(red)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.draw3DLinesAndCloud, dst0, task.lines.dst2)
-        SetTrueText(strOut, 3)
 
-        dst2 = task.lines.dst2
+
+
+
+
+Public Class GL_PlotHist : Inherits TaskParent
+    Dim plotHist As New Plot_Histogram
+    Dim displayPC As New GL_DisplayPC
+    Public Sub New()
+        task.gOptions.MaxDepthBar.Value = 10
+        task.gOptions.HistBinBar.Value = 10
+        plotHist.minRange = 0.0
+        plotHist.maxRange = 1.0
+        plotHist.createHistogram = True
+        plotHist.removeZeroEntry = True
+        desc = "Read the pointcloud back from SharpGL and plot a histogram of the result."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
+            SetTrueText(strOut, 2)
+        End If
+
+        Dim pcMask = task.sharpDepth.InRange(0.01F, 0.99F)
+        task.sharpDepth.SetTo(0, Not pcMask)
+        plotHist.Run(task.sharpDepth)
+        dst3 = plotHist.dst2
+
+        Dim histList = plotHist.histArray.ToList
+        Dim maxBin = histList.IndexOf(histList.Max)
+        SetTrueText("Max bin at " + CStr(maxBin) + " meters", New cv.Point(dst2.Width / 2, 10), 3)
+        labels(3) = "Distances range from 0 to " + CStr(task.MaxZmeters) + " meters with 1m per bin (by default)"
+
+        displayPC.Run(emptyMat)
+        dst2 = displayPC.dst2
+    End Sub
+End Class
+
+
+
+
+Public Class GL_ReadPCHist : Inherits TaskParent
+    Dim glPlot As New GL_PlotHist
+    Dim displayPC As New GL_DisplayPC
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        labels(3) = "The values returned by ReadPointCloud range from 0 to 1 and should have the same profile as Plot_Histogram."
+        desc = "Read the point cloud from a rendered geometry"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
+        labels(2) = strOut
+
+        glPlot.Run(task.sharpDepth)
+        dst3 = glPlot.dst3
+        labels(2) += glPlot.labels(2)
+
+        displayPC.Run(emptyMat)
+        dst2 = displayPC.dst2
     End Sub
 End Class
 

@@ -44,8 +44,102 @@ End Class
 
 
 
+Public Class Line3D_Longest : Inherits TaskParent
+    Public Sub New()
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Find the longest line in BGR and use it to measure the average depth for the line"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.lines.lpList.Count <= 1 Then Exit Sub
+        Dim lp = task.lines.lpList(0)
+        dst2 = src
 
-Public Class Line3D_Draw : Inherits TaskParent
+        dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
+
+        Dim gcMin = task.bricks.brickList(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+        Dim gcMax = task.bricks.brickList(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+
+        dst0.SetTo(0)
+        dst0.Line(lp.p1, lp.p2, 255, 3, task.lineType)
+        dst0.SetTo(0, task.noDepthMask)
+
+        Dim mm = GetMinMax(task.pcSplit(2), dst0)
+        If gcMin.pt.DistanceTo(mm.minLoc) > gcMin.pt.DistanceTo(mm.maxLoc) Then
+            Dim tmp = gcMin
+            gcMin = gcMax
+            gcMax = tmp
+        End If
+
+        Dim depthMin = If(gcMin.depth > 0, gcMin.depth, mm.minVal)
+        Dim depthMax = If(gcMax.depth > 0, gcMax.depth, mm.maxVal)
+
+        Dim depthMean = task.pcSplit(2).Mean(dst0)(0)
+        DrawCircle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Red)
+        DrawCircle(dst2, lp.p2, task.DotSize + 4, cv.Scalar.Blue)
+
+        If lp.p1.DistanceTo(mm.minLoc) < lp.p2.DistanceTo(mm.maxLoc) Then
+            mm.minLoc = lp.p1
+            mm.maxLoc = lp.p2
+        Else
+            mm.minLoc = lp.p2
+            mm.maxLoc = lp.p1
+        End If
+
+        SetTrueText("Average Depth = " + Format(depthMean, fmt1) + "m",
+                    New cv.Point((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2), 2)
+        labels(2) = "Min Distance = " + Format(depthMin, fmt1) + ", Max Distance = " + Format(depthMax, fmt1) +
+                  ", Mean Distance = " + Format(depthMean, fmt1) + " meters "
+
+        SetTrueText(Format(depthMin, fmt1) + "m", New cv.Point(mm.minLoc.X + 5, mm.minLoc.Y - 15), 2)
+        SetTrueText(Format(depthMax, fmt1) + "m", New cv.Point(mm.maxLoc.X + 5, mm.maxLoc.Y - 15), 2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line3D_ReconstructLine : Inherits TaskParent
+    Public findLine3D As New FindNonZero_Line3D
+    Public selectLine As New Delaunay_LineSelect
+    Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+    Public Sub New()
+        desc = "Build the 3D lines found in Line_Basics"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        selectLine.Run(src)
+        dst2 = selectLine.dst2
+        labels(2) = selectLine.labels(2)
+
+        If task.lpD.age = 1 Or task.optionsChanged Then
+            findLine3D.lp = task.lpD
+            findLine3D.Run(src)
+
+            If findLine3D.veclist.Count = 0 Then Exit Sub ' nothing to work on...
+
+            pointcloud.SetTo(0)
+            For i = 0 To findLine3D.veclist.Count - 1
+                Dim pt = findLine3D.ptList(i)
+                Dim vec = findLine3D.veclist(i)
+                pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
+            Next
+        End If
+
+        labels(2) = findLine3D.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line3D_DrawArbitrary : Inherits TaskParent
     Public p1 As cv.Point, p2 As cv.Point
     Dim plot As New Plot_OverTimeScalar
     Dim toggleFirstSecond As Boolean
@@ -113,186 +207,17 @@ End Class
 
 
 
-Public Class Line3D_Longest : Inherits TaskParent
+Public Class Line3D_Draw : Inherits TaskParent
     Public Sub New()
-        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-        dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Find the longest line in BGR and use it to measure the average depth for the line"
+        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Draw a 3D line - still under construction."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count <= 1 Then Exit Sub
-        Dim lp = task.lines.lpList(0)
-        dst2 = src
+        dst2.SetTo(0)
+        Dim lp = task.lineLongest
+        dst2.Line(lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
 
-        dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
+        Dim points = dst2.FindNonZero()
 
-        Dim gcMin = task.bricks.brickList(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-        Dim gcMax = task.bricks.brickList(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
-
-        dst0.SetTo(0)
-        dst0.Line(lp.p1, lp.p2, 255, 3, task.lineType)
-        dst0.SetTo(0, task.noDepthMask)
-
-        Dim mm = GetMinMax(task.pcSplit(2), dst0)
-        If gcMin.pt.DistanceTo(mm.minLoc) > gcMin.pt.DistanceTo(mm.maxLoc) Then
-            Dim tmp = gcMin
-            gcMin = gcMax
-            gcMax = tmp
-        End If
-
-        Dim depthMin = If(gcMin.depth > 0, gcMin.depth, mm.minVal)
-        Dim depthMax = If(gcMax.depth > 0, gcMax.depth, mm.maxVal)
-
-        Dim depthMean = task.pcSplit(2).Mean(dst0)(0)
-        DrawCircle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Red)
-        DrawCircle(dst2, lp.p2, task.DotSize + 4, cv.Scalar.Blue)
-
-        If lp.p1.DistanceTo(mm.minLoc) < lp.p2.DistanceTo(mm.maxLoc) Then
-            mm.minLoc = lp.p1
-            mm.maxLoc = lp.p2
-        Else
-            mm.minLoc = lp.p2
-            mm.maxLoc = lp.p1
-        End If
-
-        If task.heartBeat Then
-            SetTrueText("Average Depth = " + Format(depthMean, fmt1) + "m", New cv.Point((lp.p1.X + lp.p2.X) / 2,
-                                                                                     (lp.p1.Y + lp.p2.Y) / 2), 2)
-            labels(2) = "Min Distance = " + Format(depthMin, fmt1) + ", Max Distance = " + Format(depthMax, fmt1) +
-                    ", Mean Distance = " + Format(depthMean, fmt1) + " meters "
-
-            SetTrueText(Format(depthMin, fmt1) + "m", New cv.Point(mm.minLoc.X + 5, mm.minLoc.Y - 15), 2)
-            SetTrueText(Format(depthMax, fmt1) + "m", New cv.Point(mm.maxLoc.X + 5, mm.maxLoc.Y - 15), 2)
-        End If
     End Sub
 End Class
-
-
-
-
-
-
-
-
-Public Class Line3D_ReconstructLine : Inherits TaskParent
-    Public findLine3D As New FindNonZero_Line3D
-    Public selectLine As New Delaunay_LineSelect
-    Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-    Public Sub New()
-        desc = "Build the 3D lines found in Line_Basics"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        selectLine.Run(src)
-        dst2 = selectLine.dst2
-        labels(2) = selectLine.labels(2)
-
-        If task.lpD.age = 1 Or task.optionsChanged Then
-            findLine3D.lp = task.lpD
-            findLine3D.Run(src)
-
-            If findLine3D.veclist.Count = 0 Then Exit Sub ' nothing to work on...
-
-            pointcloud.SetTo(0)
-            For i = 0 To findLine3D.veclist.Count - 1
-                Dim pt = findLine3D.ptList(i)
-                Dim vec = findLine3D.veclist(i)
-                pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
-            Next
-        End If
-
-        labels(2) = findLine3D.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Line3D_ReconstructLines : Inherits TaskParent
-    Public findLine3D As New FindNonZero_Line3D
-    Public lines3DList As New List(Of List(Of cv.Vec3f))
-    Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-    Public Sub New()
-        desc = "Build the 3D lines found in Line_Basics if there has been motion at their endpoints"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static totalPixels As Integer
-        task.FeatureSampleSize = 1000 ' use as many lines as are available.
-        lines3DList.Clear()
-        pointcloud.SetTo(0)
-        totalPixels = 0
-        For Each lp In task.lines.lpList
-            findLine3D.lp = lp
-            findLine3D.Run(src)
-
-            Dim veclist = findLine3D.veclist
-            If veclist.Count = 0 Then Continue For
-
-            Dim depthInit = veclist(0)(2)
-            Dim incr = (depthInit - veclist(veclist.Count - 1)(2)) / veclist.Count
-            Dim newLine3D As New List(Of cv.Vec3f)
-            For i = 0 To veclist.Count - 1
-                Dim pt = findLine3D.ptList(i)
-                'If task.toggleOn Then
-                '    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X))
-                'Else
-                Dim vec = Cloud_Basics.worldCoordinates(pt, depthInit + incr * i)
-                newLine3D.Add(vec)
-                pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
-                'End If
-            Next
-            lines3DList.Add(newLine3D)
-            totalPixels += newLine3D.Count
-        Next
-
-        dst2 = task.lines.dst2
-        labels(2) = CStr(lines3DList.Count) + " lines were found and " + CStr(totalPixels) +
-                    " pixels were updated in the point cloud."
-    End Sub
-End Class
-
-
-
-
-
-
-
-'Public Class Line3D_ReconstructLinesNew : Inherits TaskParent
-'    Public lines3DList As New List(Of List(Of cv.Vec3f))
-'    Public Sub New()
-'        desc = "Build the 3D lines found in Line_Basics if there is 3D info at both end points."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        task.FeatureSampleSize = 1000 ' use as many lines as are available.
-'        lines3DList.Clear()
-'        For Each lp In task.lines.lpList
-
-'            findLine3D.lp = lp
-'            findLine3D.Run(src)
-
-'            Dim veclist = findLine3D.veclist
-'            If veclist.Count = 0 Then Continue For
-
-'            Dim depthInit = veclist(0)(2)
-'            Dim incr = (depthInit - veclist(veclist.Count - 1)(2)) / veclist.Count
-'            Dim newLine3D As New List(Of cv.Vec3f)
-'            For i = 0 To veclist.Count - 1
-'                Dim pt = findLine3D.ptList(i)
-'                'If task.toggleOn Then
-'                '    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X))
-'                'Else
-'                Dim vec = Cloud_Basics.worldCoordinates(pt, depthInit + incr * i)
-'                newLine3D.Add(vec)
-'                pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
-'                'End If
-'            Next
-'            lines3DList.Add(newLine3D)
-'        Next
-
-'        dst2 = task.lines.dst2
-'        labels(2) = CStr(lines3DList.Count) + " lines were found and " + CStr(totalPixels) +
-'                    " pixels were updated in the point cloud."
-'    End Sub
-'End Class

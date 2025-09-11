@@ -11849,3 +11849,124 @@ Public Class XO_ML_BasicsOld : Inherits TaskParent
         If rtree IsNot Nothing Then rtree.Dispose()
     End Sub
 End Class
+
+
+
+
+
+Public Class XO_Line3D_ReconstructLines : Inherits TaskParent
+    Public findLine3D As New FindNonZero_Line3D
+    Public lines3DList As New List(Of List(Of cv.Vec3f))
+    Public pointcloud As New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+    Public Sub New()
+        desc = "Build the 3D lines found in Line_Basics if there has been motion at their endpoints"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static totalPixels As Integer
+        task.FeatureSampleSize = 1000 ' use as many lines as are available.
+        lines3DList.Clear()
+        pointcloud.SetTo(0)
+        totalPixels = 0
+        For Each lp In task.lines.lpList
+            findLine3D.lp = lp
+            findLine3D.Run(src)
+
+            Dim veclist = findLine3D.veclist
+            If veclist.Count = 0 Then Continue For
+
+            Dim depthInit = veclist(0)(2)
+            Dim incr = (depthInit - veclist(veclist.Count - 1)(2)) / veclist.Count
+            Dim newLine3D As New List(Of cv.Vec3f)
+            For i = 0 To veclist.Count - 1
+                Dim pt = findLine3D.ptList(i)
+                'If task.toggleOn Then
+                '    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X))
+                'Else
+                Dim vec = Cloud_Basics.worldCoordinates(pt, depthInit + incr * i)
+                newLine3D.Add(vec)
+                pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
+                'End If
+            Next
+            lines3DList.Add(newLine3D)
+            totalPixels += newLine3D.Count
+        Next
+
+        dst2 = task.lines.dst2
+        labels(2) = CStr(lines3DList.Count) + " lines were found and " + CStr(totalPixels) +
+                    " pixels were updated in the point cloud."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_Line3D_ReconstructLinesNew : Inherits TaskParent
+    Public findLine3D As New FindNonZero_Line3D
+    Public lines3DList As New List(Of List(Of cv.Vec3f))
+    Public Sub New()
+        desc = "Build the 3D lines found in Line_Basics if there is 3D info at both end points."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        task.FeatureSampleSize = 1000 ' use as many lines as are available.
+        lines3DList.Clear()
+        Dim totalPixels As Integer
+        For Each lp In task.lines.lpList
+            findLine3D.lp = lp
+            findLine3D.Run(src)
+
+            Dim veclist = findLine3D.veclist
+            If veclist.Count = 0 Then Continue For
+
+            Dim depthInit = veclist(0)(2)
+            Dim incr = (depthInit - veclist(veclist.Count - 1)(2)) / veclist.Count
+            Dim newLine3D As New List(Of cv.Vec3f)
+            For i = 0 To veclist.Count - 1
+                Dim pt = findLine3D.ptList(i)
+                'If task.toggleOn Then
+                '    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X))
+                'Else
+                Dim vec = Cloud_Basics.worldCoordinates(pt, depthInit + incr * i)
+                newLine3D.Add(vec)
+                task.pointCloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
+                totalPixels += 1
+                'End If
+            Next
+            lines3DList.Add(newLine3D)
+        Next
+
+        dst2 = task.lines.dst2
+        labels(2) = CStr(lines3DList.Count) + " lines were found and " + CStr(totalPixels) +
+                    " pixels were updated in the point cloud."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_GL_Draw3DLinesAndCloud : Inherits TaskParent
+    Dim line3D As New XO_Line3D_ReconstructLines
+    Public Sub New()
+        task.featureOptions.FeatureSampleSize.Value = task.featureOptions.FeatureSampleSize.Maximum
+        desc = "Draw the RGB lines in SharpGL and include the line points."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
+        dst2 = task.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        labels(2) = task.lines.labels(2)
+
+        dst0 = src
+        dst0.SetTo(0, Not dst2)
+
+        dst1.SetTo(red)
+        strOut = task.sharpGL.RunSharp(Comm.oCase.draw3DLinesAndCloud, dst0, task.lines.dst2)
+        SetTrueText(strOut, 3)
+
+        dst2 = task.lines.dst2
+    End Sub
+End Class
