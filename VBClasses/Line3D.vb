@@ -208,23 +208,22 @@ End Class
 
 
 Public Class Line3D_Draw : Inherits TaskParent
-    Dim line3d As New Line3D_Basics
+    Public lp As lpData
     Public Sub New()
+        If standalone Then task.gOptions.LineWidth.Value = 3
         dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Create a 3D line where there is a detected line in 2D."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst3.SetTo(0)
-        Dim lp = task.lineLongest
+        If standalone Then lp = task.lineLongest
         dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
 
         Dim points = dst3.FindNonZero()
         Dim count As Integer = points.Rows
 
         Dim pt = points.Get(Of cv.Point)(0, 0)
-        If lp.p1 <> pt Then
-            lp = New lpData(lp.p2, lp.p1)
-        End If
+        If lp.p1 <> pt Then lp = New lpData(lp.p2, lp.p1)
         Dim depth1 = lp.pVec1(2)
         If depth1 = 0 Then
             Dim d1 = task.pcSplit(2)(task.gridRects(lp.gridIndex1)).Mean
@@ -237,11 +236,17 @@ Public Class Line3D_Draw : Inherits TaskParent
         End If
         Dim incr As Single = (depth1 - depth2) / count
 
-        dst2 = task.pointCloud.Clone
-        For i = 0 To points.Rows - 1
-            pt = points.Get(Of cv.Point)(i, 0)
-            dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depth1 + i * incr))
-        Next
-        labels(2) = "Point cloud with " + CStr(count) + " pixels updated with lineare results."
+        If standalone Then
+            dst2 = task.pointCloud.Clone
+            For i = 0 To points.Rows - 1
+                pt = points.Get(Of cv.Point)(i, 0)
+                dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depth1 + i * incr))
+            Next
+            labels(2) = "Point cloud with " + CStr(count) + " pixels updated with lineare results."
+        End If
     End Sub
 End Class
+
+
+
+
