@@ -12,7 +12,7 @@ Namespace OpenCVB
         Dim lastMousePos As cv.Point
         Dim rotationX As Single = 0.0F
         Dim rotationY As Single = 0.0F
-        Dim zoomZ As Single = -5.0F
+        Dim zoomZ As Single = -1.0F
         Dim isPanning As Boolean = False
         Dim panX As Single = 0.0F
         Dim panY As Single = 0.0F
@@ -54,7 +54,7 @@ Namespace OpenCVB
         Public Sub resetView()
             rotationX = 0.0
             rotationY = 0.0
-            zoomZ = -5.0F
+            zoomZ = -1.0F
         End Sub
         Public Sub OpenGLControl_MouseWheel(sender As Object, e As MouseEventArgs) Handles GLControl.MouseWheel
             Dim delta As Integer = e.Delta
@@ -71,12 +71,6 @@ Namespace OpenCVB
 
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT)
             gl.LoadIdentity()
-
-            gl.Translate(0.0F, 0.0F, -5.0F)
-            gl.Rotate(0.0F, 1.0F, 0.0F, 0.0F)
-            gl.Rotate(0.0F, 0.0F, 1.0F, 0.0F)
-            gl.PointSize(1.0F)
-
 
             gl.MatrixMode(OpenGL.GL_PROJECTION)
             gl.LoadIdentity()

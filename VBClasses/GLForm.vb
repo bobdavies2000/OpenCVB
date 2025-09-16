@@ -7,7 +7,8 @@ Public Class sgl
     Dim lastMousePos As cv.Point
     Dim rotationX As Single = 0.0F
     Dim rotationY As Single = 0.0F
-    Dim zoomZ As Single = -5.0F
+    Const zoomZInit = -1.0F
+    Dim zoomZ As Single = zoomZInit
     Dim isPanning As Boolean = False
     Dim panX As Single = 0.0F
     Dim panY As Single = 0.0F
@@ -26,8 +27,8 @@ Public Class sgl
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         options = New Options_SharpGL
         options2 = New Options_SharpGL2
-        Me.Left = GetSetting("Opencv", "sglLeft", "sglLeft", task.mainFormLocation.X + task.mainFormLocation.Width)
-        Me.Top = GetSetting("Opencv", "sglTop", "sglTop", task.mainFormLocation.Y)
+        Me.Left = 0 ' GetSetting("Opencv", "sglLeft", "sglLeft", task.mainFormLocation.X + task.mainFormLocation.Width)
+        Me.Top = 0 'GetSetting("Opencv", "sglTop", "sglTop", task.mainFormLocation.Y)
         Me.Width = GetSetting("Opencv", "sglWidth", "sglWidth", task.mainFormLocation.Width)
         Me.Height = GetSetting("Opencv", "sglHeight", "sglHeight", task.mainFormLocation.Height)
         gl = GLControl.OpenGL
@@ -131,7 +132,7 @@ Public Class sgl
         Me.Text = "SharpGL - " + If(task.gOptions.GL_LinearMode.Checked, "", "Non") + "Linear mode (see Global Options)"
         rotationX = 0.0
         rotationY = 0.0
-        If task.gOptions.GL_LinearMode.Checked Then zoomZ = 0 Else zoomZ = -5.0F
+        If task.gOptions.GL_LinearMode.Checked Then zoomZ = 0 Else zoomZ = zoomZInit
     End Sub
     Private Sub OpenGLControl_MouseWheel(sender As Object, e As MouseEventArgs) Handles GLControl.MouseWheel
         Dim delta As Integer = e.Delta

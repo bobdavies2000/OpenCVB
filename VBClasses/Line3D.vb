@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Line3D_Basics : Inherits TaskParent
     Public lines3D As New List(Of cv.Point3f)
     Public lines3DMat As New cv.Mat
@@ -209,6 +210,9 @@ End Class
 
 Public Class Line3D_Draw : Inherits TaskParent
     Public lp As lpData
+    Public depth1 As Single
+    Public incr As Single
+    Public points As cv.Mat
     Public Sub New()
         If standalone Then task.gOptions.LineWidth.Value = 3
         dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -217,24 +221,25 @@ Public Class Line3D_Draw : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst3.SetTo(0)
         If standalone Then lp = task.lineLongest
+        If lp.pVec1(2) = 0 Or lp.pVec2(2) = 0 Then
+            lp = Nothing ' no result...
+            Exit Sub
+        End If
+
         dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
 
-        Dim points = dst3.FindNonZero()
+        points = dst3.FindNonZero()
         Dim count As Integer = points.Rows
 
-        Dim pt = points.Get(Of cv.Point)(0, 0)
-        If lp.p1 <> pt Then lp = New lpData(lp.p2, lp.p1)
-        Dim depth1 = lp.pVec1(2)
-        If depth1 = 0 Then
-            Dim d1 = task.pcSplit(2)(task.gridRects(lp.gridIndex1)).Mean
-            depth1 = d1(0)
+        Dim pt = points.Get(Of cv.Point)(0, 0), depth2 As Single
+        If lp.p1.DistanceTo(pt) <= task.lineWidth Then
+            depth1 = lp.pVec1(2)
+            depth2 = lp.pVec2(2)
+        Else
+            depth1 = lp.pVec2(2)
+            depth2 = lp.pVec1(2)
         End If
-        Dim depth2 = lp.pVec2(2)
-        If depth2 = 0 Then
-            Dim d2 = task.pcSplit(2)(task.gridRects(lp.gridIndex2)).Mean
-            depth2 = d2(0)
-        End If
-        Dim incr As Single = (depth1 - depth2) / count
+        incr = (depth1 - depth2) / count
 
         If standalone Then
             dst2 = task.pointCloud.Clone
@@ -242,11 +247,40 @@ Public Class Line3D_Draw : Inherits TaskParent
                 pt = points.Get(Of cv.Point)(i, 0)
                 dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depth1 + i * incr))
             Next
-            labels(2) = "Point cloud with " + CStr(count) + " pixels updated with lineare results."
+            labels(2) = "Point cloud with " + CStr(count) + " pixels updated with linear results."
         End If
     End Sub
 End Class
 
+
+
+
+
+Public Class Line3D_DrawLines : Inherits TaskParent
+    Dim line3d As New Line3D_Draw
+    Public Sub New()
+        If standalone Then task.gOptions.LineWidth.Value = 3
+        desc = "Recompute the depth for the lines found."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.pointCloud.Clone
+        dst1 = task.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst3 = src
+        task.lines.dst2.CopyTo(dst3, dst1)
+        For Each line3d.lp In task.lines.lpList
+            line3d.Run(emptyMat)
+            Dim index As Integer = 0
+            If line3d.lp IsNot Nothing Then
+                For i = 0 To line3d.points.Rows - 1
+                    Dim pt = line3d.points.Get(Of cv.Point)(index, 0)
+                    dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, line3d.depth1 + index * line3d.incr))
+                    index += 1
+                Next
+            End If
+        Next
+        labels(2) = "Point cloud with " + CStr(task.lines.lpList.Count) + " lines updated in the pointcloud."
+    End Sub
+End Class
 
 
 

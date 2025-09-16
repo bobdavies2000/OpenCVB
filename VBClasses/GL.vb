@@ -219,7 +219,7 @@ End Class
 
 
 
-Public Class GL_Line3D : Inherits TaskParent
+Public Class GL_LinePoints3D : Inherits TaskParent
     Dim line3D As New Line3D_ReconstructLine
     Public Sub New()
         desc = "Visualize with OpenGL the reconstructed 3D line behind the RGB line selected."
@@ -239,7 +239,7 @@ End Class
 
 
 
-Public Class GL_Line3DAll : Inherits TaskParent
+Public Class GL_LinePointsAll : Inherits TaskParent
     Public Sub New()
         desc = "Visualize all the reconstructed 3D lines found in the RGB image."
     End Sub
@@ -458,5 +458,25 @@ Public Class GL_ReadQuads : Inherits TaskParent
 
         displayPC.Run(emptyMat)
         dst2 = displayPC.dst2
+    End Sub
+End Class
+
+
+
+
+
+Public Class GL_Line3D : Inherits TaskParent
+    Dim line3d As New Line3D_DrawLines
+    Public Sub New()
+        desc = "Display the point cloud with the 3D lines drawn"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        line3d.Run(src)
+        If task.toggleOn Then
+            strOut = task.sharpGL.RunSharp(Comm.oCase.drawPointCloudRGB, line3d.dst2, line3d.dst3)
+        Else
+            strOut = task.sharpGL.RunSharp(Comm.oCase.drawPointCloudRGB, line3d.dst2, task.lines.dst2)
+        End If
+        SetTrueText(strOut, 2)
     End Sub
 End Class

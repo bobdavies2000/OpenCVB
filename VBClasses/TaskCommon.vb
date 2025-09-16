@@ -670,16 +670,12 @@ Public Class lpData
         p1 = validatePoint(_p1)
         p2 = validatePoint(_p2)
 
+        ' trying a simple convention: p1 is leftmost point
         If p1.X > p2.X Then
             Dim ptTemp = p1
             p1 = p2
             p2 = ptTemp
         End If
-
-        pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
-        If Single.IsNaN(pVec1(0)) Then pVec1 = New cv.Vec3f
-        pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
-        If Single.IsNaN(pVec2(0)) Then pVec2 = New cv.Vec3f
 
         If p1.X = p2.X Then
             slope = (p1.Y - p2.Y) / (p1.X + 0.001 - p2.X)
@@ -692,6 +688,17 @@ Public Class lpData
         gridIndex1 = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
         gridIndex2 = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
         ID = If(gridIndex1 <= gridIndex2, gridIndex1, gridIndex2)
+
+        pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
+        If Single.IsNaN(pVec1(0)) Or pVec1(2) = 0 Then
+            Dim r = task.gridRects(gridIndex1)
+            pVec1 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthMask(r)).Item(0))
+        End If
+        pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
+        If Single.IsNaN(pVec2(0)) Or pVec2(2) = 0 Then
+            Dim r = task.gridRects(gridIndex2)
+            pVec2 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthMask(r)).Item(0))
+        End If
 
         If p1.X <> p2.X Then
             Dim b = p1.Y - p1.X * slope
