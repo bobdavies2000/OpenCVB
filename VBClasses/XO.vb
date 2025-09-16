@@ -11970,3 +11970,116 @@ Public Class XO_GL_Draw3DLinesAndCloud : Inherits TaskParent
         dst2 = task.lines.dst2
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class XO_Cloud_XRangeTest : Inherits TaskParent
+    Dim split2 As New Cloud_ReduceSplit2
+    Public Sub New()
+        desc = "Test adjusting the X-Range value to squeeze a histogram into dst2."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        split2.Run(src)
+
+        cv.Cv2.CalcHist({split2.dst3}, task.channelsTop, New cv.Mat, dst1, 2, task.bins2D, task.rangesTop)
+
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1 = dst1.Flip(cv.FlipMode.X)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
+    End Sub
+End Class
+
+
+
+
+Public Class XO_Cloud_YRangeTest : Inherits TaskParent
+    Dim split2 As New Cloud_ReduceSplit2
+    Public Sub New()
+        desc = "Test adjusting the Y-Range value to squeeze a histogram into dst2."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        split2.Run(src)
+
+        cv.Cv2.CalcHist({split2.dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
+
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
+    End Sub
+End Class
+
+
+
+
+Public Class XO_Cloud_Spin : Inherits TaskParent
+    Dim options As New Options_IMU
+    Dim gMat As New IMU_GMatrixWithOptions
+    Dim xBump = 1, yBump = 1, zBump = 1
+    Public Sub New()
+        If OptionParent.FindFrm(traceName + " CheckBoxes") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Spin pointcloud on X-axis")
+            check.addCheckBox("Spin pointcloud on Y-axis")
+            check.addCheckBox("Spin pointcloud on Z-axis")
+            check.Box(2).Checked = True
+        End If
+
+        task.gOptions.setGravityUsage(False)
+        desc = "Spin the point cloud exercise"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static xCheck = OptionParent.FindCheckBox("Spin pointcloud on X-axis")
+        Static yCheck = OptionParent.FindCheckBox("Spin pointcloud on Y-axis")
+        Static zCheck = OptionParent.FindCheckBox("Spin pointcloud on Z-axis")
+        Static xRotateSlider = OptionParent.FindSlider("Rotate pointcloud around X-axis (degrees)")
+        Static yRotateSlider = OptionParent.FindSlider("Rotate pointcloud around Y-axis (degrees)")
+        Static zRotateSlider = OptionParent.FindSlider("Rotate pointcloud around Z-axis (degrees)")
+
+        If xCheck.checked Then
+            If xRotateSlider.value = -90 Then xBump = 1
+            If xRotateSlider.value = 90 Then xBump = -1
+            xRotateSlider.value += xBump
+        End If
+
+        If yCheck.checked Then
+            If yRotateSlider.value = -90 Then yBump = 1
+            If yRotateSlider.value = 90 Then yBump = -1
+            yRotateSlider.value += yBump
+        End If
+
+        If zCheck.checked Then
+            If zRotateSlider.value = -90 Then zBump = 1
+            If zRotateSlider.value = 90 Then zBump = -1
+            zRotateSlider.value += zBump
+        End If
+
+        gMat.Run(src)
+
+        Dim gOutput = (task.pointCloud.Reshape(1, dst2.Rows * dst2.Cols) * gMat.gMatrix).ToMat  ' <<<<<<<<<<<<<<<<<<<<<<< this is the rotation...
+        dst2 = gOutput.Reshape(3, src.Rows)
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Cloud_Spin2 : Inherits TaskParent
+    Dim spin As New XO_Cloud_Spin
+    Dim redCSpin As New RedColor_Basics
+    Public Sub New()
+        labels = {"", "", "RedCloud output", "Spinning RedCloud output - use options to spin on different axes."}
+        desc = "Spin the RedCloud output exercise"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+
+        spin.Run(src)
+        task.pointCloud = spin.dst2
+        redCSpin.Run(src)
+        dst3 = redCSpin.dst2
+    End Sub
+End Class

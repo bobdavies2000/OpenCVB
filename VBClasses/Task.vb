@@ -650,6 +650,7 @@ Public Class VBtask : Implements IDisposable
             cv.Cv2.PatchNaNs(pcSplit(0))
             cv.Cv2.PatchNaNs(pcSplit(1))
             cv.Cv2.PatchNaNs(pcSplit(2))
+            cv.Cv2.Merge(pcSplit, task.pointCloud)
         End If
 
         depthMask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
