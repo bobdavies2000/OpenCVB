@@ -148,6 +148,7 @@ Partial Class OptionsGlobal
         GL_LinearMode.TabIndex = 24
         GL_LinearMode.Text = "Run SharpGL in Linear mode"
         GL_LinearMode.UseVisualStyleBackColor = True
+        GL_LinearMode.Visible = False
         ' 
         ' Label3
         ' 
@@ -181,9 +182,9 @@ Partial Class OptionsGlobal
         DebugCheckBox.AutoSize = True
         DebugCheckBox.Location = New Point(17, 466)
         DebugCheckBox.Name = "DebugCheckBox"
-        DebugCheckBox.Size = New Size(639, 29)
+        DebugCheckBox.Size = New Size(674, 29)
         DebugCheckBox.TabIndex = 19
-        DebugCheckBox.Text = "DebugCheckbox - task.gOptions.DebugChecked - use anywhere as a toggle"
+        DebugCheckBox.Text = "DebugCheckbox - task.gOptions.DebugChecked - use anywhere to inject a value"
         DebugCheckBox.UseVisualStyleBackColor = True
         ' 
         ' FrameHistory
@@ -437,8 +438,6 @@ Partial Class OptionsGlobal
         ' CrossHairs
         ' 
         CrossHairs.AutoSize = True
-        CrossHairs.Checked = True
-        CrossHairs.CheckState = CheckState.Checked
         CrossHairs.Location = New Point(11, 213)
         CrossHairs.Name = "CrossHairs"
         CrossHairs.Size = New Size(165, 29)

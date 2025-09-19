@@ -1,4 +1,5 @@
-﻿Imports OpenCvSharp
+﻿Imports System.ComponentModel.Design.ObjectSelectorEditor
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Line3D_Basics : Inherits TaskParent
     Public lines3D As New List(Of cv.Point3f)
@@ -257,17 +258,24 @@ End Class
 
 
 Public Class Line3D_DrawLines : Inherits TaskParent
-    Dim line3d As New Line3D_Draw
+    Public line3d As New Line3D_Draw
+    Public lpList As New List(Of lpData)
     Public Sub New()
         If standalone Then task.gOptions.LineWidth.Value = 3
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Recompute the depth for the lines found."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then lpList = New List(Of lpData)(task.lines.lpList)
         dst2 = task.pointCloud.Clone
-        dst1 = task.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1.SetTo(0)
+        For Each lp In lpList
+            dst1.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+        Next
+
         dst3 = src
         task.lines.dst2.CopyTo(dst3, dst1)
-        For Each line3d.lp In task.lines.lpList
+        For Each line3d.lp In lpList
             line3d.Run(emptyMat)
             Dim index As Integer = 0
             If line3d.lp IsNot Nothing Then
@@ -278,9 +286,49 @@ Public Class Line3D_DrawLines : Inherits TaskParent
                 Next
             End If
         Next
-        labels(2) = "Point cloud with " + CStr(task.lines.lpList.Count) + " lines updated in the pointcloud."
+        labels(2) = "At least one end of a line should fade into the surrounding (except where depth data is limited)"
+        labels(3) = task.lines.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Line3D_DrawLines_Debug : Inherits TaskParent
+    Dim line3d As New Line3D_DrawLines
+    Public Sub New()
+        If standalone Then task.gOptions.LineWidth.Value = 3
+        task.gOptions.DebugSlider.Value = 0
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Use the debug slider in Global Options to select which line to test."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim index As Integer = -1
+        Static lp As lpData
+        If task.lines.lpList.Count = 0 Then Exit Sub ' no lines found.
+
+        If task.gOptions.DebugSlider.Value <> index Then
+            If index < task.lines.lpList.Count Then
+                index = Math.Abs(task.gOptions.DebugSlider.Value)
+                If index >= task.lines.lpList.Count Then index = task.lines.lpList.Count - 1
+                lp = task.lines.lpList(index)
+                line3d.lpList.Clear()
+                line3d.lpList.Add(task.lines.lpList(index))
+            End If
+        End If
+        line3d.Run(src)
+        dst1 = line3d.dst1
+        dst2 = line3d.dst2
+        dst3 = line3d.dst3
+        labels(2) = "Point cloud with the selected line updated in the pointcloud.  Line end should fade into surroundings."
+        labels(3) = "Line " + CStr(lp.index) + " selected of " + CStr(task.lines.lpList.Count) + " top lines.  " +
+                    "Use Global Options debug slider to select other lines."
+        dst1 = task.lines.dst2
+    End Sub
+End Class
+
 
 
 
