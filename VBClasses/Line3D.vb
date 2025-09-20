@@ -237,7 +237,7 @@ Public Class Line3D_Selection : Inherits TaskParent
             End If
         End If
         dst3.Line(lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
-        If standaloneTest() Then allPoints = dst3(lp.rect).FindNonZero()
+        If standaloneTest() Or debugRequest Then allPoints = dst3(lp.rect).FindNonZero()
 
         task.pcSplit(2)(lp.rect).CopyTo(dst1(lp.rect), dst3(lp.rect))
         dst3(lp.rect).SetTo(0, task.noDepthMask(lp.rect))
@@ -293,7 +293,7 @@ Public Class Line3D_Selection : Inherits TaskParent
         lp.pVec1 = Cloud_Basics.worldCoordinates(ptList(0).X, ptList(0).Y, depth1)
         lp.pVec2 = Cloud_Basics.worldCoordinates(ptList.Last.X, ptList.Last.Y, depth2)
 
-        If standaloneTest() Then
+        If standaloneTest() Or debugRequest Then
             For i = 0 To allPoints.Rows - 1
                 Dim pt = allPoints.Get(Of cv.Point)(i, 0)
                 pt.X += lp.rect.X
@@ -325,32 +325,20 @@ Public Class Line3D_DrawLines : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Dim selection As New Line3D_Selection
     Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Recompute the depth for the lines found."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lpList.Clear()
 
         dst2 = task.pointCloud.Clone
+        dst3 = src.Clone
         For Each selection.lp In task.lines.lpList
             selection.run(emptyMat)
             lpList.Add(selection.lp)
+            dst3.Line(selection.lp.p1, selection.lp.p2, task.highlight, task.lineWidth)
         Next
-
-        'dst3 = src
-        'task.lines.dst2.CopyTo(dst3, dst1)
-        'For Each line3d.lp In lpList
-        '    line3d.Run(emptyMat)
-        '    Dim index As Integer = 0
-        '    If line3d.lp IsNot Nothing Then
-        '        For i = 0 To line3d.points.Rows - 1
-        '            Dim pt = line3d.points.Get(Of cv.Point)(index, 0)
-        '            dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, line3d.depth1 + index * line3d.incr))
-        '            index += 1
-        '        Next
-        '    End If
-        'Next
-        'labels(2) = "At least one end of a line should fade into the surrounding (except where depth data is limited)"
-        'labels(3) = task.lines.labels(2)
     End Sub
 End Class
 
@@ -380,5 +368,7 @@ Public Class Line3D_DrawLines_Debug : Inherits TaskParent
         labels(2) = "Line " + CStr(lp.index) + " selected of " + CStr(task.lines.lpList.Count) + " top lines.  " +
                     "Use Global Options debug slider to select other lines."
         labels(3) = "Mask of selected line - use debug slider to select other lines."
+
+        SetTrueText(Selection.strOut, 3)
     End Sub
 End Class
