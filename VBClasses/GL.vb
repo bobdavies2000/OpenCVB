@@ -503,3 +503,25 @@ Public Class GL_Line3D_Debug : Inherits TaskParent
         SetTrueText(strOut, 2)
     End Sub
 End Class
+
+
+
+Public Class GL_Line3D_DebugAlt : Inherits TaskParent
+    Dim line3d As New Line3D_DrawLineAlt
+    Public Sub New()
+        If standalone Then task.gOptions.LineWidth.Value = 3
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Display the selected line in 3D with the pointcloud."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        line3d.Run(src)
+        dst1 = line3d.dst1
+        dst2 = line3d.dst2
+        labels(2) = line3d.labels(2)
+        dst3 = line3d.dst3
+        labels(3) = line3d.labels(3)
+
+        strOut = task.sharpGL.RunSharp(Comm.oCase.drawPointCloudRGB, line3d.dst2, dst3)
+        SetTrueText(strOut, 2)
+    End Sub
+End Class

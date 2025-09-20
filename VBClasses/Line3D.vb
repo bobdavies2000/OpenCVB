@@ -251,43 +251,6 @@ End Class
 
 
 
-
-Public Class Line3D_DrawLines_Debug : Inherits TaskParent
-    Dim line3d As New Line3D_DrawLines
-    Public Sub New()
-        If standalone Then task.gOptions.LineWidth.Value = 3
-        task.gOptions.DebugSlider.Value = 0
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Use the debug slider in Global Options to select which line to test."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim index As Integer = -1
-        Static lp As lpData
-        If task.lines.lpList.Count = 0 Then Exit Sub ' no lines found.
-
-        If task.gOptions.DebugSlider.Value <> index Then
-            If index < task.lines.lpList.Count Then
-                index = Math.Abs(task.gOptions.DebugSlider.Value)
-                If index >= task.lines.lpList.Count Then index = task.lines.lpList.Count - 1
-                lp = task.lines.lpList(index)
-                line3d.lpList.Clear()
-                line3d.lpList.Add(task.lines.lpList(index))
-            End If
-        End If
-        line3d.Run(src)
-        dst1 = line3d.dst1
-        dst2 = line3d.dst2
-        dst3 = line3d.dst3
-        labels(2) = "Point cloud with the selected line updated in the pointcloud.  Line end should fade into surroundings."
-        labels(3) = "Line " + CStr(lp.index) + " selected of " + CStr(task.lines.lpList.Count) + " top lines.  " +
-                    "Use Global Options debug slider to select other lines."
-        dst1 = task.lines.dst2
-    End Sub
-End Class
-
-
-
-
 Public Class Line3D_DrawLine : Inherits TaskParent
     Public lp As lpData
     Public depth1 As Single
@@ -395,5 +358,64 @@ Public Class Line3D_DrawLineAlt : Inherits TaskParent
             Dim pt = ptList(i)
             dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depthAvg + dirSign * (i - indexMid) * incr))
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line3D_DrawLines_Debug : Inherits TaskParent
+    Dim line3d As New Line3D_DrawLines
+    Dim Selection As New Line3D_Select
+    Public Sub New()
+        If standalone Then task.gOptions.LineWidth.Value = 3
+        task.gOptions.DebugSlider.Value = 0
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Use the debug slider in Global Options to select which line to test."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Selection.Run(src)
+        line3d.lpList.Clear()
+        line3d.lpList.Add(Selection.lp)
+
+        line3d.Run(src)
+        dst1 = line3d.dst1
+        dst2 = line3d.dst2
+        dst3 = line3d.dst3
+        labels(2) = "Point cloud with the selected line updated in the pointcloud.  Line end should fade into surroundings."
+        labels(3) = "Line " + CStr(Selection.lp.index) + " selected of " + CStr(task.lines.lpList.Count) + " top lines.  " +
+                    "Use Global Options debug slider to select other lines."
+        dst1 = task.lines.dst2
+    End Sub
+End Class
+
+
+
+
+Public Class Line3D_Select : Inherits TaskParent
+    Public lp As lpData
+    Public depthAvg As Single
+    Public incr As Single
+    Public points As cv.Mat
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Select a line using the debug slider."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim index As Integer = -1
+        If task.lines.lpList.Count = 0 Then Exit Sub ' no lines found.
+
+        If task.gOptions.DebugSlider.Value <> index Then
+            If index < task.lines.lpList.Count Then
+                index = Math.Abs(task.gOptions.DebugSlider.Value)
+                If index >= task.lines.lpList.Count Then index = task.lines.lpList.Count - 1
+                lp = task.lines.lpList(index)
+            End If
+        End If
+
+        dst2.SetTo(0)
+        dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
     End Sub
 End Class
