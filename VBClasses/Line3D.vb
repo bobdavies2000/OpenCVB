@@ -395,27 +395,91 @@ End Class
 
 
 Public Class Line3D_Select : Inherits TaskParent
-    Public lp As lpData
-    Public depthAvg As Single
-    Public incr As Single
+    Public lp As New lpData
+    Public depth1 As Single
+    Public deltaZ As Single
     Public points As cv.Mat
+    Public ptList As New List(Of cv.Point)
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Select a line using the debug slider."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim index As Integer = -1
         If task.lines.lpList.Count = 0 Then Exit Sub ' no lines found.
 
-        If task.gOptions.DebugSlider.Value <> index Then
-            If index < task.lines.lpList.Count Then
-                index = Math.Abs(task.gOptions.DebugSlider.Value)
-                If index >= task.lines.lpList.Count Then index = task.lines.lpList.Count - 1
-                lp = task.lines.lpList(index)
-            End If
+        If task.firstPass = False Then
+            dst1(lp.rect).SetTo(0)
+            dst2(lp.rect).SetTo(0)
+            dst3(lp.rect).SetTo(0)
         End If
 
-        dst2.SetTo(0)
-        dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+        Dim index = lp.index
+        If standalone Then
+            If Math.Abs(task.gOptions.DebugSlider.Value) < task.lines.lpList.Count Then
+                lp = task.lines.lpList(Math.Abs(task.gOptions.DebugSlider.Value))
+            End If
+        End If
+        dst3.Line(lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
+
+        task.pcSplit(2)(lp.rect).CopyTo(dst1(lp.rect), dst3(lp.rect))
+        dst3(lp.rect).SetTo(0, task.noDepthMask(lp.rect))
+        Dim depthAvg = dst1(lp.rect).Mean(dst3(lp.rect)).Item(0)
+        points = dst3(lp.rect).FindNonZero()
+        If points.Rows = 0 Then Exit Sub ' no points with depth...
+
+        Dim ptArray(points.Total * 2 - 1) As Integer
+        Marshal.Copy(points.Data, ptArray, 0, ptArray.Length)
+
+        Dim indexMid As Integer = -1
+        ptList.Clear()
+        For i = 0 To ptArray.Count - 2 Step 2
+            Dim pt = New cv.Point(lp.rect.X + ptArray(i), lp.rect.Y + ptArray(i + 1))
+            If i >= ptArray.Count / 4 And indexMid < 0 Then indexMid = ptList.Count
+            ptList.Add(pt)
+        Next
+
+        Dim p1 As cv.Point, p2 As cv.Point
+        Dim d1 As Single, d2 As Single
+        Dim incrList As New List(Of Single)
+        For i = 1 To ptList.Count - 1
+            p1 = ptList(i - 1)
+            p2 = ptList(i)
+            If p1.DistanceTo(p2) > 2 Then Continue For ' too big a gap of missing depth.
+            d1 = task.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
+            d2 = task.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
+            Dim delta = d2 - d1
+            If Math.Abs(delta) < 0.1 Then incrList.Add(delta) ' if delta is less than 10 centimeters, then keep it.
+        Next
+        If incrList.Count = 0 Then Exit Sub ' no points found with depth...
+        deltaZ = Math.Abs(incrList.Average())
+
+        If lp.pVec1(2) < lp.pVec2(2) Then
+            depth1 = depthAvg - deltaZ * indexMid
+        Else
+            depth1 = depthAvg + deltaZ * indexMid
+            deltaZ = -deltaZ
+        End If
+
+        Dim pVec1 = Cloud_Basics.worldCoordinates(ptList(0).X, ptList(0).Y, depth1)
+        Dim pVec2 = Cloud_Basics.worldCoordinates(ptList.Last.X, ptList.Last.Y, depth1 + lp.length * deltaZ)
+        For i = 0 To ptList.Count - 1
+            Dim pt = ptList(i)
+            dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depth1 + i * deltaZ))
+        Next
+
+        If standaloneTest() Then
+            labels(2) = CStr(ptList.Count) + " pixels updated in the point cloud"
+            strOut = "Average depth = " + Format(depthAvg, fmt3) + vbCrLf
+            strOut += "depth1 = " + Format(depth1, fmt3) + vbCrLf
+            strOut += "depth2 = " + Format(depth1 + ptList.Count * deltaZ, fmt3) + vbCrLf
+            strOut += CStr(ptList.Count) + " points found with depth" + vbCrLf
+            strOut += Format(deltaZ, fmt4) + " deltaZ for each point." + vbCrLf
+            SetTrueText(strOut, 3)
+            SetTrueText("ptlist(0)", ptList(0))
+            SetTrueText("p1 " + Format(lp.pVec1(2), fmt1) + "m", lp.p1, 3)
+            SetTrueText("p2 " + Format(lp.pVec2(2), fmt1) + "m", lp.p2, 3)
+        End If
     End Sub
 End Class
