@@ -396,10 +396,7 @@ End Class
 
 Public Class Line3D_Select : Inherits TaskParent
     Public lp As New lpData
-    Public depth1 As Single
-    Public deltaZ As Single
-    Public points As cv.Mat
-    Public ptList As New List(Of cv.Point)
+    Dim allPoints As New cv.Mat
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
@@ -422,17 +419,18 @@ Public Class Line3D_Select : Inherits TaskParent
             End If
         End If
         dst3.Line(lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
+        If standaloneTest() Then allPoints = dst3(lp.rect).FindNonZero()
 
         task.pcSplit(2)(lp.rect).CopyTo(dst1(lp.rect), dst3(lp.rect))
         dst3(lp.rect).SetTo(0, task.noDepthMask(lp.rect))
         Dim depthAvg = dst1(lp.rect).Mean(dst3(lp.rect)).Item(0)
-        points = dst3(lp.rect).FindNonZero()
+        Dim points = dst3(lp.rect).FindNonZero()
         If points.Rows = 0 Then Exit Sub ' no points with depth...
 
         Dim ptArray(points.Total * 2 - 1) As Integer
         Marshal.Copy(points.Data, ptArray, 0, ptArray.Length)
 
-        ptList.Clear()
+        Dim ptList As New List(Of cv.Point)
         For i = 0 To ptArray.Count - 2 Step 2
             Dim pt = New cv.Point(lp.rect.X + ptArray(i), lp.rect.Y + ptArray(i + 1))
             ptList.Add(pt)
@@ -451,29 +449,37 @@ Public Class Line3D_Select : Inherits TaskParent
             If Math.Abs(delta) < 0.1 Then incrList.Add(delta) ' if delta is less than 10 centimeters, then keep it.
         Next
         If incrList.Count = 0 Then Exit Sub ' no points found with depth...
-        deltaZ = Math.Abs(incrList.Average())
+        Dim deltaZ = Math.Abs(incrList.Average())
 
+        Dim depth1 As Single, depth2 As Single
         If lp.pVec1(2) < lp.pVec2(2) Then
             depth1 = depthAvg - deltaZ * lp.length / 2
+            depth2 = depth1 + deltaZ * lp.length
         Else
             depth1 = depthAvg + deltaZ * lp.length / 2
+            depth2 = depth1 - deltaZ * lp.length
             deltaZ = -deltaZ
         End If
 
-        Dim pVec1 = Cloud_Basics.worldCoordinates(ptList(0).X, ptList(0).Y, depth1)
-        Dim pVec2 = Cloud_Basics.worldCoordinates(ptList.Last.X, ptList.Last.Y, depth1 + lp.length * deltaZ)
-        For i = 0 To ptList.Count - 1
-            Dim pt = ptList(i)
-            dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depth1 + i * deltaZ))
-        Next
+        ' This updates the lp so that it may be used to draw a line in 3D without further calculation.
+        lp.pVec1 = Cloud_Basics.worldCoordinates(ptList(0).X, ptList(0).Y, depth1)
+        lp.pVec2 = Cloud_Basics.worldCoordinates(ptList.Last.X, ptList.Last.Y, depth2)
 
         If standaloneTest() Then
-            labels(2) = CStr(ptList.Count) + " pixels updated in the point cloud"
+            For i = 0 To allPoints.Rows - 1
+                Dim pt = allPoints.Get(Of cv.Point)(i, 0)
+                pt.X += lp.rect.X
+                pt.Y += lp.rect.Y
+                dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depth1 + i * deltaZ))
+            Next
+
+            labels(2) = CStr(allPoints.Rows) + " pixels updated in the point cloud."
             strOut = "Average depth = " + Format(depthAvg, fmt3) + vbCrLf
             strOut += "depth1 = " + Format(depth1, fmt3) + vbCrLf
-            strOut += "depth2 = " + Format(depth1 + ptList.Count * deltaZ, fmt3) + vbCrLf
+            strOut += "depth2 = " + Format(depth2, fmt3) + vbCrLf
             strOut += CStr(ptList.Count) + " points found with depth" + vbCrLf
             strOut += Format(deltaZ, fmt4) + " deltaZ for each point." + vbCrLf
+            strOut += CStr(allPoints.Rows) + " points in the original line." + vbCrLf
             SetTrueText(strOut, 3)
             SetTrueText("ptlist(0)", ptList(0))
             SetTrueText("p1 " + Format(lp.pVec1(2), fmt1) + "m", lp.p1, 3)
