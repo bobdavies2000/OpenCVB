@@ -22,6 +22,7 @@ Partial Class Options
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Options))
         OKButton = New Button()
         Cancel_Button = New Button()
         DisplayResolution = New GroupBox()
@@ -263,6 +264,7 @@ Partial Class Options
         Controls.Add(DisplayResolution)
         Controls.Add(Cancel_Button)
         Controls.Add(OKButton)
+        Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Name = "Options"
         Text = "OpenCVB Global Settings"
         DisplayResolution.ResumeLayout(False)

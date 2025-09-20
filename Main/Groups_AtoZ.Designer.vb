@@ -22,6 +22,7 @@ Partial Class Groups_AtoZ
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Groups_AtoZ))
         GroupDataView = New DataGridView()
         CType(GroupDataView, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
@@ -46,6 +47,7 @@ Partial Class Groups_AtoZ
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1972, 1302)
         Controls.Add(GroupDataView)
+        Icon = CType(resources.GetObject("$this.Icon"), Icon)
         KeyPreview = True
         Name = "Groups_AtoZ"
         Text = "Groups_AtoZ"

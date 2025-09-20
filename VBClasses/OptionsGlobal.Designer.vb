@@ -22,6 +22,7 @@ Partial Class OptionsGlobal
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OptionsGlobal))
         Label1 = New Label()
         GroupBox1 = New GroupBox()
         GL_LinearMode = New CheckBox()
@@ -727,6 +728,7 @@ Partial Class OptionsGlobal
         Controls.Add(GroupBox2)
         Controls.Add(GroupBox1)
         Controls.Add(Label1)
+        Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Name = "OptionsGlobal"
         Text = "OptionsGlobal"
         GroupBox1.ResumeLayout(False)

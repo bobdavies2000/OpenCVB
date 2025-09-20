@@ -23,6 +23,7 @@
         <System.Diagnostics.DebuggerStepThrough()>
         Private Sub InitializeComponent()
             components = New ComponentModel.Container()
+            Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainUI))
             ToolStrip1 = New ToolStrip()
             PausePlayButton = New ToolStripButton()
             OptionsButton = New ToolStripButton()
@@ -204,6 +205,7 @@
             Controls.Add(CameraSwitching)
             Controls.Add(XYLoc)
             Controls.Add(ToolStrip1)
+            Icon = CType(resources.GetObject("$this.Icon"), Icon)
             Name = "MainUI"
             Text = "OpenCVB Main Form"
             ToolStrip1.ResumeLayout(False)

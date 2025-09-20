@@ -22,6 +22,7 @@ Partial Class OptionsFeatures
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OptionsFeatures))
         FeatureMethod = New ComboBox()
         EdgeMethods = New ComboBox()
         Label1 = New Label()
@@ -231,6 +232,7 @@ Partial Class OptionsFeatures
         Controls.Add(Label1)
         Controls.Add(EdgeMethods)
         Controls.Add(FeatureMethod)
+        Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Name = "OptionsFeatures"
         Text = "Important Options for Features, Edges, Lines, and Masks"
         CType(DistanceSlider, ComponentModel.ISupportInitialize).EndInit()

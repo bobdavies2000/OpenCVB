@@ -35,8 +35,8 @@ Partial Class OptionsContainer
         ToolStrip1.Items.AddRange(New ToolStripItem() {ToolStripButton1, ToolStripButton2})
         ToolStrip1.Location = New Point(0, 0)
         ToolStrip1.Name = "ToolStrip1"
-        ToolStrip1.Padding = New Padding(0, 0, 2, 0)
-        ToolStrip1.Size = New Size(1355, 25)
+        ToolStrip1.Padding = New Padding(0, 0, 3, 0)
+        ToolStrip1.Size = New Size(1936, 34)
         ToolStrip1.TabIndex = 1
         ToolStrip1.Text = "ToolStrip1"
         ' 
@@ -46,7 +46,7 @@ Partial Class OptionsContainer
         ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), Image)
         ToolStripButton1.ImageTransparentColor = Color.Magenta
         ToolStripButton1.Name = "ToolStripButton1"
-        ToolStripButton1.Size = New Size(97, 22)
+        ToolStripButton1.Size = New Size(147, 29)
         ToolStripButton1.Text = "Reorder Options"
         ' 
         ' ToolStripButton2
@@ -55,17 +55,17 @@ Partial Class OptionsContainer
         ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), Image)
         ToolStripButton2.ImageTransparentColor = Color.Magenta
         ToolStripButton2.Name = "ToolStripButton2"
-        ToolStripButton2.Size = New Size(57, 22)
+        ToolStripButton2.Size = New Size(85, 29)
         ToolStripButton2.Text = "Show All"
         ' 
         ' OptionsContainer
         ' 
-        AutoScaleDimensions = New SizeF(7F, 15F)
+        AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1355, 649)
+        ClientSize = New Size(1936, 1082)
         Controls.Add(ToolStrip1)
+        Icon = CType(resources.GetObject("$this.Icon"), Icon)
         IsMdiContainer = True
-        Margin = New Padding(2, 2, 2, 2)
         Name = "OptionsContainer"
         Text = "Opencv Algorithm Options"
         ToolStrip1.ResumeLayout(False)

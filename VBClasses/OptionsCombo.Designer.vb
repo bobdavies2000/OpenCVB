@@ -22,41 +22,42 @@ Partial Class OptionsCombo
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.Box = New System.Windows.Forms.ComboBox()
-        Me.ComboLabel = New System.Windows.Forms.Label()
-        Me.SuspendLayout()
-        '
-        'Box
-        '
-        Me.Box.FormattingEnabled = True
-        Me.Box.Location = New System.Drawing.Point(19, 57)
-        Me.Box.Margin = New System.Windows.Forms.Padding(2)
-        Me.Box.Name = "Box"
-        Me.Box.Size = New System.Drawing.Size(426, 21)
-        Me.Box.TabIndex = 0
-        '
-        'ComboLabel
-        '
-        Me.ComboLabel.AutoSize = True
-        Me.ComboLabel.Location = New System.Drawing.Point(19, 8)
-        Me.ComboLabel.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.ComboLabel.Name = "ComboLabel"
-        Me.ComboLabel.Size = New System.Drawing.Size(46, 13)
-        Me.ComboLabel.TabIndex = 1
-        Me.ComboLabel.Text = "labels(2)"
-        '
-        'OptionsCombo
-        '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(553, 172)
-        Me.Controls.Add(Me.ComboLabel)
-        Me.Controls.Add(Me.Box)
-        Me.Margin = New System.Windows.Forms.Padding(2)
-        Me.Name = "OptionsCombo"
-        Me.Text = "OptionsCombo"
-        Me.ResumeLayout(False)
-        Me.PerformLayout()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OptionsCombo))
+        Box = New ComboBox()
+        ComboLabel = New Label()
+        SuspendLayout()
+        ' 
+        ' Box
+        ' 
+        Box.FormattingEnabled = True
+        Box.Location = New Point(32, 110)
+        Box.Margin = New Padding(3, 4, 3, 4)
+        Box.Name = "Box"
+        Box.Size = New Size(707, 33)
+        Box.TabIndex = 0
+        ' 
+        ' ComboLabel
+        ' 
+        ComboLabel.AutoSize = True
+        ComboLabel.Location = New Point(32, 15)
+        ComboLabel.Name = "ComboLabel"
+        ComboLabel.Size = New Size(77, 25)
+        ComboLabel.TabIndex = 1
+        ComboLabel.Text = "labels(2)"
+        ' 
+        ' OptionsCombo
+        ' 
+        AutoScaleDimensions = New SizeF(10F, 25F)
+        AutoScaleMode = AutoScaleMode.Font
+        ClientSize = New Size(922, 331)
+        Controls.Add(ComboLabel)
+        Controls.Add(Box)
+        Icon = CType(resources.GetObject("$this.Icon"), Icon)
+        Margin = New Padding(3, 4, 3, 4)
+        Name = "OptionsCombo"
+        Text = "OptionsCombo"
+        ResumeLayout(False)
+        PerformLayout()
 
     End Sub
 

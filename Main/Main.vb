@@ -109,12 +109,6 @@ Namespace OpenCVB
             Dim solutionDir As String = Path.GetFullPath(Path.Combine(exePath, "..\..\..\..\..\..\"))
             HomeDir = New DirectoryInfo(solutionDir)
 
-            Me.Icon = New Icon(HomeDir.FullName + "Main\OpenCVB.ico")
-            Dim trayIcon As New NotifyIcon()
-            trayIcon.Icon = New Icon(HomeDir.FullName + "Main\OpenCVB.ico")
-            trayIcon.Text = "OpenCVB App"
-            trayIcon.Visible = True
-
             Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
             Dim exeDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
             Directory.SetCurrentDirectory(HomeDir.FullName)
@@ -150,6 +144,7 @@ Namespace OpenCVB
             Next
 
             Me.Show()
+            Application.DoEvents() ' the OpenCVB icon is not loaded properly if this line is not present.
 
             setupCamPics()
             loadAlgorithmComboBoxes()

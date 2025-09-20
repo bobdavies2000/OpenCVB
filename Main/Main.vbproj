@@ -17,12 +17,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="OpenCVB.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="OpenCVB.ico" />
   </ItemGroup>
+
+	<ItemGroup>
+		<None Update="OpenCVB.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
   <ItemGroup>
     <Import Include="System.Data" />
