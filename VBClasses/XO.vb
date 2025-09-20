@@ -12083,3 +12083,155 @@ Public Class XO_Cloud_Spin2 : Inherits TaskParent
         dst3 = redCSpin.dst2
     End Sub
 End Class
+
+
+
+
+
+Public Class XO_Line3D_DrawLines : Inherits TaskParent
+    Public line3d As New XO_Line3D_DrawLine
+    Public lpList As New List(Of lpData)
+    Public Sub New()
+        If standalone Then task.gOptions.LineWidth.Value = 3
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Recompute the depth for the lines found."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then lpList = New List(Of lpData)(task.lines.lpList)
+        dst2 = task.pointCloud.Clone
+        dst1.SetTo(0)
+        For Each lp In lpList
+            dst1.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+        Next
+
+        dst3 = src
+        task.lines.dst2.CopyTo(dst3, dst1)
+        For Each line3d.lp In lpList
+            line3d.Run(emptyMat)
+            Dim index As Integer = 0
+            If line3d.lp IsNot Nothing Then
+                For i = 0 To line3d.points.Rows - 1
+                    Dim pt = line3d.points.Get(Of cv.Point)(index, 0)
+                    dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, line3d.depth1 + index * line3d.incr))
+                    index += 1
+                Next
+            End If
+        Next
+        labels(2) = "At least one end of a line should fade into the surrounding (except where depth data is limited)"
+        labels(3) = task.lines.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Line3D_DrawLine : Inherits TaskParent
+    Public lp As lpData
+    Public depth1 As Single
+    Public incr As Single
+    Public points As cv.Mat
+    Public Sub New()
+        If standalone Then task.gOptions.LineWidth.Value = 3
+        dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Create a 3D line where there is a detected line in 2D."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3.SetTo(0)
+        If standalone Then lp = task.lineLongest
+        If lp.pVec1(2) = 0 Or lp.pVec2(2) = 0 Then
+            lp = Nothing ' no result...
+            Exit Sub
+        End If
+
+        dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+
+        points = dst3.FindNonZero()
+        Dim count As Integer = points.Rows
+
+        Dim pt = points.Get(Of cv.Point)(0, 0), depth2 As Single
+        If lp.p1.DistanceTo(pt) <= task.lineWidth Then
+            depth1 = lp.pVec1(2)
+            depth2 = lp.pVec2(2)
+        Else
+            depth1 = lp.pVec2(2)
+            depth2 = lp.pVec1(2)
+        End If
+        incr = (depth1 - depth2) / count
+
+        If standalone Then
+            dst2 = task.pointCloud.Clone
+            For i = 0 To points.Rows - 1
+                pt = points.Get(Of cv.Point)(i, 0)
+                dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depth1 + i * incr))
+            Next
+            labels(2) = "Point cloud with " + CStr(count) + " pixels updated with linear results."
+        End If
+    End Sub
+End Class
+
+
+
+
+Public Class XO_Line3D_DrawLineAlt : Inherits TaskParent
+    Public lp As lpData
+    Public depthAvg As Single
+    Public incr As Single
+    Public points As cv.Mat
+    Public Sub New()
+        If standalone Then task.gOptions.LineWidth.Value = 3
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Create a 3D line where there is a detected line in 2D."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then lp = task.lineLongest
+        If lp.pVec1(2) = 0 Or lp.pVec2(2) = 0 Then
+            lp = Nothing ' no result...
+            Exit Sub
+        End If
+
+        dst3.SetTo(0)
+        dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
+
+        dst1.SetTo(0)
+        task.pcSplit(2)(lp.rect).CopyTo(dst1(lp.rect), dst3(lp.rect))
+        depthAvg = dst1(lp.rect).Mean(dst3(lp.rect)).Item(0)
+        points = dst3.FindNonZero()
+
+        Dim ptArray(points.Total - 1) As Integer
+        Marshal.Copy(points.Data, ptArray, 0, ptArray.Length)
+
+        Dim ptList As New List(Of cv.Point)
+        Dim indexMid As Integer = -1
+        For i = 0 To ptArray.Count - 2 Step 2
+            Dim pt = New cv.Point(ptArray(i), ptArray(i + 1))
+            If i >= ptArray.Count / 4 And indexMid < 0 Then indexMid = ptList.Count
+            ptList.Add(pt)
+        Next
+
+        Dim p1 As cv.Point, p2 As cv.Point
+        Dim d1 As Single, d2 As Single
+        Dim incrList As New List(Of Single)
+        For i = 1 To ptList.Count - 1
+            p1 = ptList(i - 1)
+            p2 = ptList(i)
+            d1 = task.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
+            d2 = task.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
+            Dim delta = d2 - d1
+            If Math.Abs(delta) < 0.1 Then incrList.Add(delta) ' if delta is less than 10 centimeters, then keep it.
+        Next
+        incr = incrList.Average()
+
+        dst2 = task.pointCloud.Clone
+        Dim dirSign As Integer = If(lp.p1.DistanceTo(ptList(0)) < lp.p2.DistanceTo(ptList(0)), -1, 1)
+        For i = indexMid To 0 Step -1
+            Dim pt = ptList(i)
+            dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depthAvg + -dirSign * (i - indexMid) * incr))
+        Next
+        For i = indexMid To ptList.Count - 1
+            Dim pt = ptList(i)
+            dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depthAvg + dirSign * (i - indexMid) * incr))
+        Next
+    End Sub
+End Class

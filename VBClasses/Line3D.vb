@@ -212,190 +212,9 @@ End Class
 
 
 
-
-Public Class Line3D_DrawLines : Inherits TaskParent
-    Public line3d As New Line3D_DrawLine
-    Public lpList As New List(Of lpData)
-    Public Sub New()
-        If standalone Then task.gOptions.LineWidth.Value = 3
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Recompute the depth for the lines found."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then lpList = New List(Of lpData)(task.lines.lpList)
-        dst2 = task.pointCloud.Clone
-        dst1.SetTo(0)
-        For Each lp In lpList
-            dst1.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
-        Next
-
-        dst3 = src
-        task.lines.dst2.CopyTo(dst3, dst1)
-        For Each line3d.lp In lpList
-            line3d.Run(emptyMat)
-            Dim index As Integer = 0
-            If line3d.lp IsNot Nothing Then
-                For i = 0 To line3d.points.Rows - 1
-                    Dim pt = line3d.points.Get(Of cv.Point)(index, 0)
-                    dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, line3d.depth1 + index * line3d.incr))
-                    index += 1
-                Next
-            End If
-        Next
-        labels(2) = "At least one end of a line should fade into the surrounding (except where depth data is limited)"
-        labels(3) = task.lines.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-Public Class Line3D_DrawLine : Inherits TaskParent
-    Public lp As lpData
-    Public depth1 As Single
-    Public incr As Single
-    Public points As cv.Mat
-    Public Sub New()
-        If standalone Then task.gOptions.LineWidth.Value = 3
-        dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Create a 3D line where there is a detected line in 2D."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3.SetTo(0)
-        If standalone Then lp = task.lineLongest
-        If lp.pVec1(2) = 0 Or lp.pVec2(2) = 0 Then
-            lp = Nothing ' no result...
-            Exit Sub
-        End If
-
-        dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
-
-        points = dst3.FindNonZero()
-        Dim count As Integer = points.Rows
-
-        Dim pt = points.Get(Of cv.Point)(0, 0), depth2 As Single
-        If lp.p1.DistanceTo(pt) <= task.lineWidth Then
-            depth1 = lp.pVec1(2)
-            depth2 = lp.pVec2(2)
-        Else
-            depth1 = lp.pVec2(2)
-            depth2 = lp.pVec1(2)
-        End If
-        incr = (depth1 - depth2) / count
-
-        If standalone Then
-            dst2 = task.pointCloud.Clone
-            For i = 0 To points.Rows - 1
-                pt = points.Get(Of cv.Point)(i, 0)
-                dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depth1 + i * incr))
-            Next
-            labels(2) = "Point cloud with " + CStr(count) + " pixels updated with linear results."
-        End If
-    End Sub
-End Class
-
-
-
-
-Public Class Line3D_DrawLineAlt : Inherits TaskParent
-    Public lp As lpData
-    Public depthAvg As Single
-    Public incr As Single
-    Public points As cv.Mat
-    Public Sub New()
-        If standalone Then task.gOptions.LineWidth.Value = 3
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Create a 3D line where there is a detected line in 2D."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then lp = task.lineLongest
-        If lp.pVec1(2) = 0 Or lp.pVec2(2) = 0 Then
-            lp = Nothing ' no result...
-            Exit Sub
-        End If
-
-        dst3.SetTo(0)
-        dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
-
-        dst1.SetTo(0)
-        task.pcSplit(2)(lp.rect).CopyTo(dst1(lp.rect), dst3(lp.rect))
-        depthAvg = dst1(lp.rect).Mean(dst3(lp.rect)).Item(0)
-        points = dst3.FindNonZero()
-
-        Dim ptArray(points.Total - 1) As Integer
-        Marshal.Copy(points.Data, ptArray, 0, ptArray.Length)
-
-        Dim ptList As New List(Of cv.Point)
-        Dim indexMid As Integer = -1
-        For i = 0 To ptArray.Count - 2 Step 2
-            Dim pt = New cv.Point(ptArray(i), ptArray(i + 1))
-            If i >= ptArray.Count / 4 And indexMid < 0 Then indexMid = ptList.Count
-            ptList.Add(pt)
-        Next
-
-        Dim p1 As cv.Point, p2 As cv.Point
-        Dim d1 As Single, d2 As Single
-        Dim incrList As New List(Of Single)
-        For i = 1 To ptList.Count - 1
-            p1 = ptList(i - 1)
-            p2 = ptList(i)
-            d1 = task.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
-            d2 = task.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
-            Dim delta = d2 - d1
-            If Math.Abs(delta) < 0.1 Then incrList.Add(delta) ' if delta is less than 10 centimeters, then keep it.
-        Next
-        incr = incrList.Average()
-
-        dst2 = task.pointCloud.Clone
-        Dim dirSign As Integer = If(lp.p1.DistanceTo(ptList(0)) < lp.p2.DistanceTo(ptList(0)), -1, 1)
-        For i = indexMid To 0 Step -1
-            Dim pt = ptList(i)
-            dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depthAvg + -dirSign * (i - indexMid) * incr))
-        Next
-        For i = indexMid To ptList.Count - 1
-            Dim pt = ptList(i)
-            dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depthAvg + dirSign * (i - indexMid) * incr))
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Line3D_DrawLines_Debug : Inherits TaskParent
-    Dim line3d As New Line3D_DrawLines
-    Dim Selection As New Line3D_Select
-    Public Sub New()
-        If standalone Then task.gOptions.LineWidth.Value = 3
-        task.gOptions.DebugSlider.Value = 0
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Use the debug slider in Global Options to select which line to test."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Selection.Run(src)
-        line3d.lpList.Clear()
-        line3d.lpList.Add(Selection.lp)
-
-        line3d.Run(src)
-        dst1 = line3d.dst1
-        dst2 = line3d.dst2
-        dst3 = line3d.dst3
-        labels(2) = "Point cloud with the selected line updated in the pointcloud.  Line end should fade into surroundings."
-        labels(3) = "Line " + CStr(Selection.lp.index) + " selected of " + CStr(task.lines.lpList.Count) + " top lines.  " +
-                    "Use Global Options debug slider to select other lines."
-        dst1 = task.lines.dst2
-    End Sub
-End Class
-
-
-
-
-Public Class Line3D_Select : Inherits TaskParent
+Public Class Line3D_Selection : Inherits TaskParent
     Public lp As New lpData
+    Public debugRequest As Boolean
     Dim allPoints As New cv.Mat
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
@@ -412,8 +231,7 @@ Public Class Line3D_Select : Inherits TaskParent
             dst3(lp.rect).SetTo(0)
         End If
 
-        Dim index = lp.index
-        If standalone Then
+        If standalone Or debugRequest Then
             If Math.Abs(task.gOptions.DebugSlider.Value) < task.lines.lpList.Count Then
                 lp = task.lines.lpList(Math.Abs(task.gOptions.DebugSlider.Value))
             End If
@@ -425,16 +243,20 @@ Public Class Line3D_Select : Inherits TaskParent
         dst3(lp.rect).SetTo(0, task.noDepthMask(lp.rect))
         Dim depthAvg = dst1(lp.rect).Mean(dst3(lp.rect)).Item(0)
         Dim points = dst3(lp.rect).FindNonZero()
-        If points.Rows = 0 Then Exit Sub ' no points with depth...
-
-        Dim ptArray(points.Total * 2 - 1) As Integer
-        Marshal.Copy(points.Data, ptArray, 0, ptArray.Length)
-
         Dim ptList As New List(Of cv.Point)
-        For i = 0 To ptArray.Count - 2 Step 2
-            Dim pt = New cv.Point(lp.rect.X + ptArray(i), lp.rect.Y + ptArray(i + 1))
-            ptList.Add(pt)
-        Next
+        If points.Rows = 0 Then
+            ptList.Add(lp.p1)
+            ptList.Add(lp.p2) ' end points of a line will always have depth (or the line wouldn't be there.)
+        Else
+            Dim ptArray(points.Total * 2 - 1) As Integer
+            Marshal.Copy(points.Data, ptArray, 0, ptArray.Length)
+
+            For i = 0 To ptArray.Count - 2 Step 2
+                Dim pt = New cv.Point(lp.rect.X + ptArray(i), lp.rect.Y + ptArray(i + 1))
+                ptList.Add(pt)
+            Next
+        End If
+
 
         Dim p1 As cv.Point, p2 As cv.Point
         Dim d1 As Single, d2 As Single
@@ -448,8 +270,14 @@ Public Class Line3D_Select : Inherits TaskParent
             Dim delta = d2 - d1
             If Math.Abs(delta) < 0.1 Then incrList.Add(delta) ' if delta is less than 10 centimeters, then keep it.
         Next
-        If incrList.Count = 0 Then Exit Sub ' no points found with depth...
-        Dim deltaZ = Math.Abs(incrList.Average())
+
+        Dim deltaZ As Single
+        If incrList.Count Then
+            deltaZ = Math.Abs(incrList.Average())
+        Else
+            ' fallback method.
+            deltaZ = (lp.pVec1(2) - lp.pVec2(2)) / lp.length
+        End If
 
         Dim depth1 As Single, depth2 As Single
         If lp.pVec1(2) < lp.pVec2(2) Then
@@ -485,5 +313,72 @@ Public Class Line3D_Select : Inherits TaskParent
             SetTrueText("p1 " + Format(lp.pVec1(2), fmt1) + "m", lp.p1, 3)
             SetTrueText("p2 " + Format(lp.pVec2(2), fmt1) + "m", lp.p2, 3)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line3D_DrawLines : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Dim selection As New Line3D_Selection
+    Public Sub New()
+        desc = "Recompute the depth for the lines found."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        lpList.Clear()
+
+        dst2 = task.pointCloud.Clone
+        For Each selection.lp In task.lines.lpList
+            selection.run(emptyMat)
+            lpList.Add(selection.lp)
+        Next
+
+        'dst3 = src
+        'task.lines.dst2.CopyTo(dst3, dst1)
+        'For Each line3d.lp In lpList
+        '    line3d.Run(emptyMat)
+        '    Dim index As Integer = 0
+        '    If line3d.lp IsNot Nothing Then
+        '        For i = 0 To line3d.points.Rows - 1
+        '            Dim pt = line3d.points.Get(Of cv.Point)(index, 0)
+        '            dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, line3d.depth1 + index * line3d.incr))
+        '            index += 1
+        '        Next
+        '    End If
+        'Next
+        'labels(2) = "At least one end of a line should fade into the surrounding (except where depth data is limited)"
+        'labels(3) = task.lines.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line3D_DrawLines_Debug : Inherits TaskParent
+    Dim Selection As New Line3D_Selection
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        Selection.debugRequest = True
+        desc = "Use the debug slider in Global Options to select which line to test."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Selection.Run(emptyMat)
+        Dim lp = Selection.lp
+
+        dst3.SetTo(0)
+        dst3.Line(lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
+        dst1(lp.rect).SetTo(task.highlight, dst3(lp.rect))
+
+        dst2 = task.pointCloud.Clone
+        Selection.dst2.CopyTo(dst2, dst3)
+
+        labels(2) = "Line " + CStr(lp.index) + " selected of " + CStr(task.lines.lpList.Count) + " top lines.  " +
+                    "Use Global Options debug slider to select other lines."
+        labels(3) = "Mask of selected line - use debug slider to select other lines."
     End Sub
 End Class

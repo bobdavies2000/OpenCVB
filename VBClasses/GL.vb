@@ -507,7 +507,7 @@ End Class
 
 
 Public Class GL_Line3D_DebugAlt : Inherits TaskParent
-    Dim line3d As New Line3D_DrawLineAlt
+    Dim line3d As New Line3D_DrawLines_Debug
     Public Sub New()
         If standalone Then task.gOptions.LineWidth.Value = 3
         If standalone Then task.gOptions.displayDst1.Checked = True
