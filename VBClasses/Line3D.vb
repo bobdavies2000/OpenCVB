@@ -432,11 +432,9 @@ Public Class Line3D_Select : Inherits TaskParent
         Dim ptArray(points.Total * 2 - 1) As Integer
         Marshal.Copy(points.Data, ptArray, 0, ptArray.Length)
 
-        Dim indexMid As Integer = -1
         ptList.Clear()
         For i = 0 To ptArray.Count - 2 Step 2
             Dim pt = New cv.Point(lp.rect.X + ptArray(i), lp.rect.Y + ptArray(i + 1))
-            If i >= ptArray.Count / 4 And indexMid < 0 Then indexMid = ptList.Count
             ptList.Add(pt)
         Next
 
@@ -456,9 +454,9 @@ Public Class Line3D_Select : Inherits TaskParent
         deltaZ = Math.Abs(incrList.Average())
 
         If lp.pVec1(2) < lp.pVec2(2) Then
-            depth1 = depthAvg - deltaZ * indexMid
+            depth1 = depthAvg - deltaZ * lp.length / 2
         Else
-            depth1 = depthAvg + deltaZ * indexMid
+            depth1 = depthAvg + deltaZ * lp.length / 2
             deltaZ = -deltaZ
         End If
 
