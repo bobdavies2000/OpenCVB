@@ -199,19 +199,6 @@ Public Class sgl
         gl.End()
         Return CStr(count) + " of " + CStr(pc.Total) + " points were rendered."
     End Function
-    Private Function draw3DLines()
-        gl.LineWidth(options.pointSize)
-
-        For Each lp In task.lines.lpList
-            Dim color = task.scalarColors(lp.index)
-            gl.Color(color(2) / 255, color(1) / 255, color(0) / 255)
-            gl.Begin(OpenGL.GL_LINES)
-            gl.Vertex(lp.pVec1(0), -lp.pVec1(1), -lp.pVec1(2))
-            gl.Vertex(lp.pVec2(0), -lp.pVec2(1), -lp.pVec2(2))
-            gl.End()
-        Next
-        Return task.lines.labels(2)
-    End Function
     Private Sub readPointCloud()
         task.sharpDepth = New cv.Mat(New cv.Size(GLControl.Width, GLControl.Height), cv.MatType.CV_32F, 0)
         gl.ReadPixels(0, 0, GLControl.Width, GLControl.Height, OpenGL.GL_DEPTH_COMPONENT,
@@ -281,6 +268,33 @@ Public Class sgl
                 label = drawCloud(pointcloud, RGB)
 
                 label += " " + draw3DLines()
+        End Select
+
+        gl.Flush()
+        Return label
+    End Function
+    Private Function draw3DLines()
+        gl.LineWidth(options.pointSize)
+        gl.Begin(OpenGL.GL_LINES)
+        For Each lp In task.lines.lpList
+            If lp.pVec1(2) < 0.1 Or lp.pVec2(2) < 0.1 Then Continue For ' Lines that are impossibly close
+            Dim color = task.scalarColors(lp.index Mod 255)
+            gl.Color(color(2) / 255, color(1) / 255, color(0) / 255)
+            gl.Vertex(lp.pVec1(0), -lp.pVec1(1), -lp.pVec1(2))
+            gl.Vertex(lp.pVec2(0), -lp.pVec2(1), -lp.pVec2(2))
+        Next
+        gl.End()
+        Return task.lines.labels(2)
+    End Function
+    Public Function RunLogical(func As Integer, lpList As List(Of lpData)) As String
+        options.Run()
+        options2.Run()
+        prepareSharpGL()
+
+        Dim label = ""
+        Select Case func
+            Case Comm.oCase.draw3DLines
+                label = draw3DLines()
         End Select
 
         gl.Flush()

@@ -57,6 +57,7 @@ Public Class Line_Core : Inherits TaskParent
                 sortlines.Add(lp.length, lp)
             End If
         Next
+        Dim retainedLineCount = sortlines.Count
 
         rawLines.Run(src)
         labels(3) = rawLines.labels(2)
@@ -67,6 +68,7 @@ Public Class Line_Core : Inherits TaskParent
                 sortlines.Add(lp.length, lp)
             End If
         Next
+
 
         lpList.Clear()
         For Each lp In sortlines.Values
@@ -85,7 +87,8 @@ Public Class Line_Core : Inherits TaskParent
             DrawLine(dst2, lp, task.scalarColors(lp.ID Mod 255))
         Next
 
-        labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count)
+        labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count) + " RGB lines found."
+        labels(3) = CStr(retainedLineCount) + " lines retained.  " + CStr(sortlines.Count - retainedLineCount) + " new lines."
     End Sub
 End Class
 

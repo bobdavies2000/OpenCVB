@@ -257,20 +257,6 @@ End Class
 
 
 
-Public Class GL_Draw3DLines : Inherits TaskParent
-    Public Sub New()
-        task.featureOptions.FeatureSampleSize.Value = task.featureOptions.FeatureSampleSize.Maximum
-        desc = "Draw the RGB lines in SharpGL"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.lines.dst2
-        strOut = task.sharpGL.RunSharp(Comm.oCase.draw3DLines)
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
-
-
-
 
 
 
@@ -523,5 +509,35 @@ Public Class GL_Line3D_DebugAlt : Inherits TaskParent
 
         strOut = task.sharpGL.RunSharp(Comm.oCase.drawPointCloudRGB, line3d.dst2, dst3)
         SetTrueText(strOut, 2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class GL_Draw3DLines : Inherits TaskParent
+    Public Sub New()
+        desc = "Draw the RGB lines in SharpGL"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.lines.dst2
+        strOut = task.sharpGL.RunSharp(Comm.oCase.draw3DLines)
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+Public Class GL_LogicalLines : Inherits TaskParent
+    Dim logLines As New Line3D_LogicalLines
+    Public Sub New()
+        desc = "Draw the logical lines found in the point cloud with the RGB lines."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        logLines.Run(src)
+        strOut = task.sharpGL.RunLogical(Comm.oCase.draw3DLines, logLines.lpList)
+        SetTrueText(strOut, 3)
     End Sub
 End Class

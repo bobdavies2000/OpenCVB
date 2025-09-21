@@ -257,7 +257,6 @@ Public Class Line3D_Selection : Inherits TaskParent
             Next
         End If
 
-
         Dim p1 As cv.Point, p2 As cv.Point
         Dim d1 As Single, d2 As Single
         Dim incrList As New List(Of Single)
@@ -355,6 +354,7 @@ Public Class Line3D_DrawLines_Debug : Inherits TaskParent
         desc = "Use the debug slider in Global Options to select which line to test."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeatLT Then dst1.SetTo(0)
         Selection.Run(emptyMat)
         Dim lp = Selection.lp
 
@@ -370,5 +370,28 @@ Public Class Line3D_DrawLines_Debug : Inherits TaskParent
         labels(3) = "Mask of selected line - use debug slider to select other lines."
 
         SetTrueText(Selection.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line3D_LogicalLines : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Dim selection As New Line3D_Selection
+    Public Sub New()
+        desc = "Create logical lines for all the lines detected."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.lines.dst2
+        labels = task.lines.labels
+
+        For Each selection.lp In task.lines.lpList
+            If selection.lp.age = 1 Then selection.Run(src)
+            lpList.Add(selection.lp)
+        Next
+        SetTrueText("The complete list of logical 3D lines is in lpList")
     End Sub
 End Class
