@@ -117,6 +117,7 @@ Namespace OpenCVB
 
             jsonfs.jsonFileName = HomeDir.FullName + "settings.json"
             settings = jsonfs.read()
+            CameraSwitching.Text = settings.cameraName
 
             optionsForm = New Options
             optionsForm.defineCameraResolutions(settings.cameraIndex)

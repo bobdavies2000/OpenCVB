@@ -838,17 +838,15 @@ Public Class Contour_Hulls : Inherits TaskParent
 
         contourMap.SetTo(0)
         contourList.Clear()
-        For Each contour In task.contours.contourList
-            If contour.points.Count >= 5 Then
-                contour.hull = cv.Cv2.ConvexHull(contour.points.ToArray, True).ToList
-                Dim index = task.contours.contourList.IndexOf(contour)
-                DrawContour(contourMap, contour.hull, contour.ID Mod 255, -1)
-                contourList.Add(contour)
-            End If
+        For Each tour In task.contours.contourList
+            tour.hull = cv.Cv2.ConvexHull(tour.points.ToArray, True).ToList
+            Dim index = task.contours.contourList.IndexOf(tour)
+            DrawContour(contourMap, tour.hull, tour.ID Mod 255, -1)
+            contourList.Add(tour)
         Next
 
         dst3 = ShowPalette(contourMap)
-        labels(3) = CStr(contourList.Count) + " hulls"
+        If task.heartBeat Then labels(3) = CStr(contourList.Count) + " hulls"
     End Sub
 End Class
 
@@ -1140,99 +1138,6 @@ End Class
 
 
 
-Public Class Contour_Sort : Inherits TaskParent
-    Public allContours As cv.Point()()
-    Public contourList As New List(Of contourData)
-    Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
-    Public contourIDs As New List(Of Integer)
-    Public Sub New()
-        desc = "Sort the contours by size and prepare the contour map"
-    End Sub
-    Public Shared Function GetMaxDistContour(ByRef contour As contourData) As cv.Point
-        Dim mask = contour.mask.Clone
-        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-        Dim mm As mmData = GetMinMax(distance32f)
-        mm.maxLoc.X += contour.rect.X
-        mm.maxLoc.Y += contour.rect.Y
-        Return mm.maxLoc
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            SetTrueText(traceName + " is not run standalone.  Use the Contour_SortTest to see how to add " +
-                        traceName + " to another algorithm.")
-            Exit Sub
-        End If
-
-        Dim sortedList As New SortedList(Of Integer, contourData)(New compareAllowIdenticalIntegerInverted)
-        Dim tourMat As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
-        For Each tour In allContours
-            Dim contour = New contourData
-            contour.pixels = cv.Cv2.ContourArea(tour)
-            contour.points = New List(Of cv.Point)(tour)
-            If contour.pixels > task.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
-            'If tour.Count < 4 Then Continue For
-
-            contour.rect = contour.buildRect(tour)
-            If contour.rect.Width = 0 Or contour.rect.Height = 0 Then Continue For
-
-            tourMat(contour.rect).SetTo(0)
-            Dim listOfPoints = New List(Of List(Of cv.Point))({tour.ToList})
-            cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
-            contour.mask = tourMat(contour.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
-            contour.depth = task.pcSplit(2)(contour.rect).Mean(task.depthMask(contour.rect))(0)
-            contour.mm = GetMinMax(task.pcSplit(2)(contour.rect), contour.mask)
-            contour.maxDist = GetMaxDistContour(contour)
-            contour.ID = task.gridMap.Get(Of Integer)(contour.maxDist.Y, contour.maxDist.X)
-            sortedList.Add(contour.pixels, contour)
-        Next
-
-        Dim contourLast As New List(Of contourData)(contourList)
-        Dim contourIDsLast As New List(Of Integer)(contourIDs)
-        Dim contourMapLast = contourMap.Clone
-
-        contourList = New List(Of contourData)(sortedList.Values)
-
-        Dim matched As Integer
-        Dim colorStdev As cv.Scalar, colorMean = cv.Scalar.All(-1)
-        contourIDs.Clear()
-        contourMap.SetTo(0)
-        dst2.SetTo(0)
-        For Each contour In contourList
-            Dim idLast = CInt(contourMapLast.Get(Of Single)(contour.maxDist.Y, contour.maxDist.X))
-            If idLast >= 0 Then
-                Dim indexLast = contourIDsLast.IndexOf(idLast)
-                If indexLast >= 0 And contour.ID = idLast Then
-                    contour.ID = contourLast(indexLast).ID
-                    matched += 1
-                End If
-            End If
-
-            contourMap(contour.rect).SetTo(contour.ID, contour.mask)
-            contourIDs.Add(contour.ID)
-            Select Case task.gOptions.trackingLabel
-                Case "Mean Color"
-                    cv.Cv2.MeanStdDev(task.color(contour.rect), colorMean, colorStdev, contour.mask)
-                    dst2(contour.rect).SetTo(colorMean, contour.mask)
-                Case "Tracking Color"
-                    contourMap(contour.rect).SetTo(contour.ID Mod 255, contour.mask)
-            End Select
-        Next
-
-        dst2 = ShowPaletteNoZero(contourMap)
-
-        If task.heartBeat Then
-            labels(2) = "Found " + CStr(contourList.Count) + " contours  and " + CStr(matched) +
-                        " matched the previous generation."
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Contour_RedCloud : Inherits TaskParent
     Dim prep As New RedCloud_PrepOutline
     Public options As New Options_Contours
@@ -1336,5 +1241,98 @@ Public Class Contour_RotateRect : Inherits TaskParent
 
         dst3 = ShowPaletteNoZero(dst1)
         labels(2) = "There were " + CStr(sortedTours.Count) + " contours found with width and height greater than " + CStr(options.minSize)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Contour_Sort : Inherits TaskParent
+    Public allContours As cv.Point()()
+    Public contourList As New List(Of contourData)
+    Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
+    Public contourIDs As New List(Of Integer)
+    Public Sub New()
+        desc = "Sort the contours by size and prepare the contour map"
+    End Sub
+    Public Shared Function GetMaxDistContour(ByRef contour As contourData) As cv.Point
+        Dim mask = contour.mask.Clone
+        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+        Dim mm As mmData = GetMinMax(distance32f)
+        mm.maxLoc.X += contour.rect.X
+        mm.maxLoc.Y += contour.rect.Y
+        Return mm.maxLoc
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            SetTrueText(traceName + " is not run standalone.  Use the Contour_SortTest to see how to add " +
+                        traceName + " to another algorithm.")
+            Exit Sub
+        End If
+
+        Dim sortedList As New SortedList(Of Integer, contourData)(New compareAllowIdenticalIntegerInverted)
+        Dim tourMat As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+        For Each ptArray In allContours
+            Dim tour = New contourData
+            tour.pixels = cv.Cv2.ContourArea(ptArray)
+            If tour.pixels < 5 Then Continue For
+            tour.points = New List(Of cv.Point)(ptArray)
+            If tour.pixels > task.color.Total * 3 / 4 Then Continue For ' toss this contour - it covers everything...
+
+            tour.rect = tour.buildRect(ptArray)
+            If tour.rect.Width = 0 Or tour.rect.Height = 0 Then Continue For
+
+            tourMat(tour.rect).SetTo(0)
+            Dim listOfPoints = New List(Of List(Of cv.Point))({ptArray.ToList})
+            cv.Cv2.DrawContours(tourMat, listOfPoints, 0, New cv.Scalar(sortedList.Count), -1, cv.LineTypes.Link8)
+            tour.mask = tourMat(tour.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
+            tour.depth = task.pcSplit(2)(tour.rect).Mean(task.depthMask(tour.rect))(0)
+            tour.mm = GetMinMax(task.pcSplit(2)(tour.rect), tour.mask)
+            tour.maxDist = GetMaxDistContour(tour)
+            tour.ID = task.gridMap.Get(Of Integer)(tour.maxDist.Y, tour.maxDist.X)
+            sortedList.Add(tour.pixels, tour)
+        Next
+
+        Dim contourLast As New List(Of contourData)(contourList)
+        Dim contourIDsLast As New List(Of Integer)(contourIDs)
+        Dim contourMapLast = contourMap.Clone
+
+        contourList = New List(Of contourData)(sortedList.Values)
+
+        Dim matched As Integer
+        Dim colorStdev As cv.Scalar, colorMean = cv.Scalar.All(-1)
+        contourIDs.Clear()
+        contourMap.SetTo(0)
+        dst2.SetTo(0)
+        For Each tour In contourList
+            Dim idLast = CInt(contourMapLast.Get(Of Single)(tour.maxDist.Y, tour.maxDist.X))
+            If idLast >= 0 Then
+                Dim indexLast = contourIDsLast.IndexOf(idLast)
+                If indexLast >= 0 And tour.ID = idLast Then
+                    tour.ID = contourLast(indexLast).ID
+                    matched += 1
+                End If
+            End If
+
+            contourMap(tour.rect).SetTo(tour.ID, tour.mask)
+            contourIDs.Add(tour.ID)
+            Select Case task.gOptions.trackingLabel
+                Case "Mean Color"
+                    cv.Cv2.MeanStdDev(task.color(tour.rect), colorMean, colorStdev, tour.mask)
+                    dst2(tour.rect).SetTo(colorMean, tour.mask)
+                Case "Tracking Color"
+                    contourMap(tour.rect).SetTo(tour.ID Mod 255, tour.mask)
+            End Select
+        Next
+
+        dst2 = ShowPaletteNoZero(contourMap)
+
+        If task.heartBeat Then
+            labels(2) = "Found " + CStr(contourList.Count) + " contours  and " + CStr(matched) +
+                        " matched the previous generation."
+        End If
     End Sub
 End Class

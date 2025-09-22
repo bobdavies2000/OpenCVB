@@ -16,10 +16,7 @@ Public Class HullLine_Basics : Inherits TaskParent
         dst2 = dst3.Clone
         Dim maxLines = task.gOptions.DebugSlider.Value * 2
         For Each contour In hulls.contourList
-            If contour.hull.Count < 5 Then Continue For
-
             Dim ptLast As cv.Point = contour.hull(0)
-
             For Each pt In contour.hull
                 Dim lp = New lpData(pt, ptLast)
                 If lp.slope >= 100000 Then Continue For ' likely just the edge of the image.
