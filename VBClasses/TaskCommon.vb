@@ -547,15 +547,17 @@ End Class
 
 
 Public Class contourData
-    Public rect As New cv.Rect(0, 0, 1, 1)
-    Public mask As New cv.Mat(1, 1, cv.MatType.CV_8U)
-    Public pixels As Integer
+    Public age As Integer
     Public depth As Single
-    Public mm As mmData
-    Public maxDist As cv.Point
+    Public hull As List(Of cv.Point)
+    Public index As Integer
     Public ID As Integer
+    Public mask As cv.Mat
+    Public maxDist As cv.Point
+    Public mm As mmData
+    Public pixels As Integer
     Public points As New List(Of cv.Point)
-    Public hull As New List(Of cv.Point)
+    Public rect As New cv.Rect(0, 0, 1, 1)
     Public Function buildRect(tour As cv.Point()) As cv.Rect
         Dim minX As Single = tour.Min(Function(p) p.X)
         Dim maxX As Single = tour.Max(Function(p) p.X)

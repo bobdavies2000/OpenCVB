@@ -37,7 +37,7 @@ Partial Class OptionsCheckbox
         ' 
         ' OptionsCheckbox
         ' 
-        AutoScaleDimensions = New SizeF(10F, 25F)
+        AutoScaleDimensions = New SizeF(10.0F, 25.0F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(955, 352)
         Controls.Add(FlowLayoutPanel1)
@@ -49,7 +49,6 @@ Partial Class OptionsCheckbox
         Name = "OptionsCheckbox"
         Text = "OptionsCheckbox"
         ResumeLayout(False)
-
     End Sub
 
     Friend WithEvents FlowLayoutPanel1 As System.Windows.Forms.FlowLayoutPanel
