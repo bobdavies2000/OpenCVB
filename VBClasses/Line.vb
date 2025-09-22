@@ -1,5 +1,4 @@
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp.ML.DTrees
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
@@ -69,7 +68,6 @@ Public Class Line_Core : Inherits TaskParent
             End If
         Next
 
-
         lpList.Clear()
         For Each lp In sortlines.Values
             lp.index = lpList.Count
@@ -84,7 +82,7 @@ Public Class Line_Core : Inherits TaskParent
             Dim lp = lpList(i)
             lpRectMap.Rectangle(lp.rect, i + 1, -1)
             dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link8)
-            DrawLine(dst2, lp, task.scalarColors(lp.ID Mod 255))
+            DrawLine(dst2, lp, lp.color)
         Next
 
         labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count) + " RGB lines found."
@@ -238,7 +236,7 @@ Public Class Line_Info : Inherits TaskParent
 
         dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
-        strOut = "Line ID = " + CStr(task.lpD.ID) + " Age = " + CStr(task.lpD.age) + vbCrLf
+        strOut = "Line ID = " + CStr(task.lpD.gridIndex1) + " Age = " + CStr(task.lpD.age) + vbCrLf
         strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
         strOut += "gridIndex1 = " + CStr(task.lpD.gridIndex1) + " gridIndex2 = " + CStr(task.lpD.gridIndex2) + vbCrLf
 
@@ -562,7 +560,7 @@ Public Class Line_Parallel : Inherits TaskParent
             If classes(i) Is Nothing Then Exit For
             For j = 0 To classes(i).Count - 1
                 Dim lp = task.lines.lpList(classes(i).ElementAt(j))
-                dst2.Line(lp.p1, lp.p2, task.scalarColors(colorIndex), task.lineWidth * 2, task.lineType)
+                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth * 2, task.lineType)
                 SetTrueText(CStr(colorIndex), lp.ptCenter)
             Next
             colorIndex += 1

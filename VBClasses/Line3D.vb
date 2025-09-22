@@ -388,10 +388,17 @@ Public Class Line3D_LogicalLines : Inherits TaskParent
         dst2 = task.lines.dst2
         labels = task.lines.labels
 
+        Dim count As Integer
+        lpList.Clear()
+
         For Each selection.lp In task.lines.lpList
-            If selection.lp.age = 1 Then selection.Run(src)
+            If selection.lp.age = 1 Then
+                count += 1
+                selection.Run(src)
+            End If
             lpList.Add(selection.lp)
         Next
-        SetTrueText("The complete list of logical 3D lines is in lpList")
+
+        SetTrueText(CStr(count) + " new lines were found and there were " + CStr(lpList.Count - count) + " total lines.", 3)
     End Sub
 End Class

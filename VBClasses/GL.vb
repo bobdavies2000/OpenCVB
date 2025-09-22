@@ -246,7 +246,7 @@ Public Class GL_LinePointsAll : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
         For Each lp In task.lines.lpList
-            DrawLine(dst2, lp, task.scalarColors(lp.index + 1))
+            DrawLine(dst2, lp, lp.color)
         Next
 
         strOut = task.sharpGL.RunSharp(Comm.oCase.line3D, task.pointCloud, dst2)
@@ -414,7 +414,7 @@ Public Class GL_ReadLines : Inherits TaskParent
 
         dst3 = task.color.Clone
         For Each lp In task.lines.lpList
-            'DrawLine(dst3, lp, task.scalarColors(lp.index))
+            'DrawLine(dst3, lp, lp.color)
             DrawLine(dst3, lp, white)
         Next
 
@@ -532,12 +532,37 @@ End Class
 
 Public Class GL_LogicalLines : Inherits TaskParent
     Dim logLines As New Line3D_LogicalLines
+    Public drawRequest As Integer = Comm.oCase.draw3DLines
     Public Sub New()
         desc = "Draw the logical lines found in the point cloud with the RGB lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         logLines.Run(src)
-        strOut = task.sharpGL.RunLogical(Comm.oCase.draw3DLines, logLines.lpList)
-        SetTrueText(strOut, 3)
+        dst2 = logLines.dst2.Clone
+        If task.toggleOn Then
+            strOut = "Missing depth removed from lines in the image at left (dst2)"
+            SetTrueText(strOut, 3)
+            dst2.SetTo(0, task.noDepthMask)
+        End If
+
+        labels = logLines.labels
+        task.sharpGL.RunLogical(drawRequest, logLines.lpList)
+    End Sub
+End Class
+
+
+
+
+Public Class GL_LogicalCloud : Inherits TaskParent
+    Dim glTest As New GL_LogicalLines
+    Public Sub New()
+        glTest.drawRequest = Comm.oCase.draw3DLinesAndCloud
+        desc = "Draw the logical lines found and include the entire pointcloud."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        glTest.Run(src)
+        SetTrueText(glTest.strOut, 3)
+        dst2 = glTest.dst2
+        labels = glTest.labels
     End Sub
 End Class

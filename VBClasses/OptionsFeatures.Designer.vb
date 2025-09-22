@@ -125,7 +125,7 @@ Partial Class OptionsFeatures
         FeatureSampleSize.Name = "FeatureSampleSize"
         FeatureSampleSize.Size = New Size(523, 69)
         FeatureSampleSize.TabIndex = 8
-        FeatureSampleSize.Value = 50
+        FeatureSampleSize.Value = 100
         ' 
         ' Label5
         ' 

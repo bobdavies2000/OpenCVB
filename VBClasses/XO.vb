@@ -7955,7 +7955,7 @@ Public Class XO_BrickPoint_VetLines : Inherits TaskParent
                 Dim lp = task.lines.lpList(index)
                 If pointsPerLine(lp.index) Is Nothing Then pointsPerLine(lp.index) = New List(Of Integer)
                 pointsPerLine(lp.index).Add(lp.index)
-                dst2.Circle(pt, task.DotSize * 3, task.scalarColors(lp.index Mod 255), -1, task.lineType)
+                dst2.Circle(pt, task.DotSize * 3, lp.color, -1, task.lineType)
             End If
         Next
 

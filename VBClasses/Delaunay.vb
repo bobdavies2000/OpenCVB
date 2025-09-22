@@ -348,9 +348,9 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
         If facetIndex = -1 Then Exit Sub
         task.lpD = task.lines.lpList(ptList(facetIndex))
 
-        Static saveID As Integer = task.lpD.ID
-        If task.lpD.ID <> saveID Then
-            saveID = task.lpD.ID
+        Static saveID As Integer = task.lpD.gridIndex1
+        If task.lpD.gridIndex1 <> saveID Then
+            saveID = task.lpD.gridIndex1
             task.optionsChanged = True
         End If
 
@@ -360,9 +360,9 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
         index3 = delaunay.dst1.Get(Of Byte)(task.lpD.p2.Y, task.lpD.p2.X)
 
         dst3.SetTo(0)
-        dst3.FillConvexPoly(delaunay.facetList(index1), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
-        dst3.FillConvexPoly(delaunay.facetList(index2), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
-        dst3.FillConvexPoly(delaunay.facetList(index3), task.scalarColors(task.lpD.ID Mod 255), cv.LineTypes.Link4)
+        dst3.FillConvexPoly(delaunay.facetList(index1), task.lpD.color, cv.LineTypes.Link4)
+        dst3.FillConvexPoly(delaunay.facetList(index2), task.lpD.color, cv.LineTypes.Link4)
+        dst3.FillConvexPoly(delaunay.facetList(index3), task.lpD.color, cv.LineTypes.Link4)
         DrawLine(dst3, task.lpD)
 
         info.Run(emptyMat)
@@ -374,9 +374,9 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
             index2 = delaunay.dst1.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
             index3 = delaunay.dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
 
-            dst1.FillConvexPoly(delaunay.facetList(index1), task.scalarColors(lp.index), cv.LineTypes.Link4)
-            dst1.FillConvexPoly(delaunay.facetList(index2), task.scalarColors(lp.index), cv.LineTypes.Link4)
-            dst1.FillConvexPoly(delaunay.facetList(index3), task.scalarColors(lp.index), cv.LineTypes.Link4)
+            dst1.FillConvexPoly(delaunay.facetList(index1), lp.color, cv.LineTypes.Link4)
+            dst1.FillConvexPoly(delaunay.facetList(index2), lp.color, cv.LineTypes.Link4)
+            dst1.FillConvexPoly(delaunay.facetList(index3), lp.color, cv.LineTypes.Link4)
         Next
 
         For Each lp In task.lines.lpList

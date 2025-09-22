@@ -586,28 +586,35 @@ End Class
 
 Public Class lpData
     Public age As Integer
+    Public angle As Single ' varies from -90 to 90 degrees
+
+    Public color As cv.Scalar
+
+    Public gridIndex1 As Integer
+    Public gridIndex2 As Integer
+
+    Public index As Integer
+    Public indexVTop As Integer = -1
+    Public indexVBot As Integer = -1
+    Public indexHLeft As Integer = -1
+    Public indexHRight As Integer = -1
+
+    Public nabeIndex1 As Integer
+    Public nabeIndex2 As Integer
+
+    Public length As Single
+
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
     Public pVec1 As cv.Vec3f
     Public pVec2 As cv.Vec3f
     Public pE1 As cv.Point2f ' end points - goes to the edge of the image.
     Public pE2 As cv.Point2f ' end points - goes to the edge of the image.
-    Public length As Single
+    Public ptCenter As cv.Point2f
+
     Public rect As cv.Rect
     Public roRect As cv.RotatedRect
     Public slope As Single
-    Public angle As Single ' varies from -90 to 90 degrees
-    Public ptCenter As cv.Point2f
-    Public ID As Integer
-    Public gridIndex1 As Integer
-    Public gridIndex2 As Integer
-    Public nabeIndex1 As Integer
-    Public nabeIndex2 As Integer
-    Public indexVTop As Integer = -1
-    Public indexVBot As Integer = -1
-    Public indexHLeft As Integer = -1
-    Public indexHRight As Integer = -1
-    Public index As Integer
     Public Function perpendicularPoints(pt As cv.Point2f) As lpData
         Dim perpSlope = -1 / slope
         Dim angleRadians As Double = Math.Atan(perpSlope)
@@ -687,7 +694,7 @@ Public Class lpData
 
         gridIndex1 = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
         gridIndex2 = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
-        ID = If(gridIndex1 <= gridIndex2, gridIndex1, gridIndex2)
+        color = task.scalarColors(gridIndex1 Mod 255)
 
         pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
         If Single.IsNaN(pVec1(0)) Or pVec1(2) = 0 Then

@@ -1123,6 +1123,23 @@ End Class
 
 
 
+
+Public Class Contour_SortTest : Inherits TaskParent
+    Public Sub New()
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
+        desc = "Test the contour sort (by size) algorithm nearby. Contour_Sort standalone does nothing."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.contours.dst2
+        labels = task.contours.labels
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class Contour_Sort : Inherits TaskParent
     Public allContours As cv.Point()()
     Public contourList As New List(Of contourData)
@@ -1142,7 +1159,8 @@ Public Class Contour_Sort : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            SetTrueText(traceName + " is not run standalone as it is run on every frame for task.contours.")
+            SetTrueText(traceName + " is not run standalone.  Use the Contour_SortTest to see how to add " +
+                        traceName + " to another algorithm.")
             Exit Sub
         End If
 

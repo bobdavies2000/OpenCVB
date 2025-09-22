@@ -221,7 +221,7 @@ Public Class sgl
 
             Case Comm.oCase.readLines
                 label = drawCloud(pointcloud, RGB)
-                label += draw3DLines()
+                label += draw3DLines(task.lines.lpList)
                 readPointCloud()
 
             Case Comm.oCase.readQuads
@@ -262,24 +262,23 @@ Public Class sgl
                 drawQuads()
 
             Case Comm.oCase.draw3DLines
-                label = draw3DLines()
+                label = draw3DLines(task.lines.lpList)
 
             Case Comm.oCase.draw3DLinesAndCloud
                 label = drawCloud(pointcloud, RGB)
 
-                label += " " + draw3DLines()
+                label += " " + draw3DLines(task.lines.lpList)
         End Select
 
         gl.Flush()
         Return label
     End Function
-    Private Function draw3DLines()
+    Private Function draw3DLines(lplist As List(Of lpData))
         gl.LineWidth(options.pointSize)
         gl.Begin(OpenGL.GL_LINES)
-        For Each lp In task.lines.lpList
+        For Each lp In lplist
             If lp.pVec1(2) < 0.1 Or lp.pVec2(2) < 0.1 Then Continue For ' Lines that are impossibly close
-            Dim color = task.scalarColors(lp.index Mod 255)
-            gl.Color(color(2) / 255, color(1) / 255, color(0) / 255)
+            gl.Color(lp.color(2) / 255, lp.color(1) / 255, lp.color(0) / 255)
             gl.Vertex(lp.pVec1(0), -lp.pVec1(1), -lp.pVec1(2))
             gl.Vertex(lp.pVec2(0), -lp.pVec2(1), -lp.pVec2(2))
         Next
@@ -294,7 +293,11 @@ Public Class sgl
         Dim label = ""
         Select Case func
             Case Comm.oCase.draw3DLines
-                label = draw3DLines()
+                label = draw3DLines(lpList)
+            Case Comm.oCase.draw3DLinesAndCloud
+                label = drawCloud(task.pointCloud, task.color)
+                label += " " + draw3DLines(lpList)
+
         End Select
 
         gl.Flush()
