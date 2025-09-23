@@ -1,15 +1,15 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Linear_Basics : Inherits TaskParent
-    Dim inputX As New Linear_InputX
-    Dim inputY As New Linear_InputY
-    Dim inputZ As New Linear_InputZ
+Public Class DepthLinear_Basics : Inherits TaskParent
+    Dim inputX As New DepthLinear_InputX
+    Dim inputY As New DepthLinear_InputY
+    Dim inputZ As New DepthLinear_InputZ
     Public options As New Options_LinearInput
     Public cloud As New cv.Mat
     Public Sub New()
         desc = "Confine derivatives to linear values"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         inputZ.Run(src)
@@ -43,28 +43,6 @@ Public Class Linear_Basics : Inherits TaskParent
 
         inputY.Run(src)
         dst3 = inputY.dst2.Clone
-        'dst1 = task.pcSplit(1).Clone
-        'For y = 0 To mask.Height - 1
-        '    For x = 0 To mask.Width - 1
-        '        Dim val = dst1.Get(Of Single)(y, x) 
-        '        Dim mVal = mask.Get(Of Byte)(y, x)
-        '        If mval Then
-        '            Dim i = y + 1
-        '            Dim vNext As Single
-        '            For i = i To mask.Height - 1
-        '                vNext = dst1.Get(Of Single)(i, x)
-        '                If vNext > val Then Exit For
-        '            Next
-
-        '            Dim incr = (vNext - val) / (i - y)
-        '            For j = y + 1 To i
-        '                dst1.Set(Of Single)(j, x, val + incr)
-        '                incr += incr
-        '            Next
-        '        End If
-        '    Next
-        'Next
-
         cv.Cv2.Merge({dst2, dst3, task.pcSplit(2)}, cloud)
     End Sub
 End Class
@@ -73,7 +51,7 @@ End Class
 
 
 
-Public Class Linear_Visualize : Inherits TaskParent
+Public Class DepthLinear_Visualize : Inherits TaskParent
     Public plotHist As New Plot_Histogram
     Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
     Public pc As cv.Mat
@@ -89,7 +67,7 @@ Public Class Linear_Visualize : Inherits TaskParent
         labels(3) = "Histograms showing the range of pointcloud differences for X, Y, and Z"
         desc = "Provide a mask for pixels that are within x mm depth of its neighbor"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         Dim r1 As cv.Rect, r2 As cv.Rect
 
@@ -141,13 +119,13 @@ End Class
 
 
 
-Public Class Linear_Input : Inherits TaskParent
+Public Class DepthLinear_Input : Inherits TaskParent
     Public plotHist As New Plot_Histogram
     Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
     Public pc As cv.Mat
     Public options As New Options_LinearInput
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
 
         plotHist.createHistogram = True
         plotHist.removeZeroEntry = True
@@ -155,7 +133,7 @@ Public Class Linear_Input : Inherits TaskParent
         labels = {"", "Mask of differences > deltaX", "Point Cloud deltaX data", ""}
         desc = "Find pixels that are withing X mm's of a neighbor in the X direction"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         pc = task.pcSplit(options.dimension)(roi)
@@ -195,13 +173,13 @@ End Class
 
 
 
-Public Class Linear_InputX : Inherits TaskParent
-    Dim input As New Linear_Input
+Public Class DepthLinear_InputX : Inherits TaskParent
+    Dim input As New DepthLinear_Input
     Public Sub New()
         OptionParent.findRadio("X Direction").Checked = True
-        desc = "Find pixels that are withing X mm's of a neighbor in the X direction"
+        desc = "Find pixels that are withing <mm's> of a neighbor in the X direction"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         input.Run(src)
         dst2 = input.dst2
         labels = input.labels
@@ -211,13 +189,13 @@ End Class
 
 
 
-Public Class Linear_InputY : Inherits TaskParent
-    Dim input As New Linear_Input
+Public Class DepthLinear_InputY : Inherits TaskParent
+    Dim input As New DepthLinear_Input
     Public Sub New()
         OptionParent.findRadio("Y Direction").Checked = True
-        desc = "Find pixels that are withing X mm's of a neighbor in the Y direction"
+        desc = "Find pixels that are withing <mm's> of a neighbor in the Y direction"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         input.Run(src)
         dst2 = input.dst2
         labels = input.labels
@@ -228,13 +206,13 @@ End Class
 
 
 
-Public Class Linear_InputZ : Inherits TaskParent
-    Dim input As New Linear_Input
+Public Class DepthLinear_InputZ : Inherits TaskParent
+    Dim input As New DepthLinear_Input
     Public Sub New()
         OptionParent.findRadio("Z in X-Direction").Checked = True
-        desc = "Find pixels that are withing X mm's of a neighbor in the Z direction"
+        desc = "Find pixels that are withing <mm's> of a neighbor in the Z direction"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         input.Run(src)
         dst2 = input.dst2
         dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -247,7 +225,7 @@ End Class
 
 
 
-Public Class Linear_Slices : Inherits TaskParent
+Public Class DepthLinear_Slices : Inherits TaskParent
     Dim options As New Options_LinearInput
     Dim plotSLR As New SLR_Basics
     Public Sub New()
@@ -256,7 +234,7 @@ Public Class Linear_Slices : Inherits TaskParent
         labels(3) = "Move mouse in the depth image above to display line of data."
         desc = "Isolate and display a line segment through the point cloud data"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         Dim pt = task.mouseMovePoint
@@ -304,7 +282,7 @@ End Class
 
 
 
-Public Class Linear_ImageX : Inherits TaskParent
+Public Class DepthLinear_ImageX : Inherits TaskParent
     Dim options As New Options_SLR
     Dim inputX As New List(Of Double)
     Dim slr As New SLR()
@@ -314,7 +292,7 @@ Public Class Linear_ImageX : Inherits TaskParent
         Next
         desc = "Create SLR slices for the X dimension of an entire image"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         dst2 = task.pcSplit(0).Clone
@@ -351,7 +329,7 @@ End Class
 
 
 
-Public Class Linear_ImageY : Inherits TaskParent
+Public Class DepthLinear_ImageY : Inherits TaskParent
     Dim options As New Options_SLR
     Dim inputX As New List(Of Double)
     Dim slr As New SLR()
@@ -361,7 +339,7 @@ Public Class Linear_ImageY : Inherits TaskParent
         Next
         desc = "Create SLR slices for the Y dimension of an entire image"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         dst2 = task.pcSplit(1).Clone

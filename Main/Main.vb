@@ -534,7 +534,7 @@ Namespace OpenCVB
             If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
             If task Is Nothing Then Exit Sub
             If task.MainUI_Algorithm Is Nothing Then Exit Sub
-            If AlgDescription.Text = "" Then AlgDescription.Text = task.MainUI_Algorithm.desc
+            If frameCount < 10 Then AlgDescription.Text = task.MainUI_Algorithm.desc
 
             If pauseAlgorithmThread = False Then
                 Dim timeNow As DateTime = Now
@@ -986,11 +986,10 @@ Namespace OpenCVB
             ' could mean the point is no longer valid.
             ClickPoint = New cv.Point
             mousePointCamPic = New cv.Point
-
             AlgDescription.Text = ""
+
             Thread.CurrentThread.Priority = ThreadPriority.Lowest
             algorithmTaskHandle = New Thread(AddressOf AlgorithmTask) ' <<<<<<<<<<<<<<<<<<<<<<<<< This starts the VB_Classes algorithm.
-            AlgDescription.Text = ""
             algorithmTaskHandle.Name = parms.algName
             algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
             algorithmTaskHandle.Start(parms)

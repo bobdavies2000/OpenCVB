@@ -1470,7 +1470,7 @@ End Class
 
 
 Public Class XO_OpenGL_Neighbors : Inherits TaskParent
-    Dim inputZ As New Linear_InputZ
+    Dim inputZ As New DepthLinear_InputZ
     Public Sub New()
         task.ogl.oglFunction = Comm.oCase.drawPointCloudRGB
         desc = "Display only pixels which are near each other in the Z dimension"
@@ -1490,7 +1490,7 @@ End Class
 
 
 Public Class XO_OpenGL_LinearX : Inherits TaskParent
-    Dim linear As New Linear_ImageX
+    Dim linear As New DepthLinear_ImageX
     Public Sub New()
         task.ogl.oglFunction = Comm.oCase.drawPointCloudRGB
         desc = "Display the linear transform of the pointcloud"
@@ -1506,7 +1506,7 @@ End Class
 
 
 Public Class XO_OpenGL_LinearY : Inherits TaskParent
-    Dim linear As New Linear_ImageY
+    Dim linear As New DepthLinear_ImageY
     Public Sub New()
         task.ogl.oglFunction = Comm.oCase.drawPointCloudRGB
         desc = "Display the linear transform of the pointcloud"
@@ -1867,8 +1867,8 @@ End Class
 
 
 Public Class XO_OpenGL_LinearXY : Inherits TaskParent
-    Dim linearX As New Linear_ImageX
-    Dim linearY As New Linear_ImageY
+    Dim linearX As New DepthLinear_ImageX
+    Dim linearY As New DepthLinear_ImageY
     Public Sub New()
         task.ogl.oglFunction = Comm.oCase.drawPointCloudRGB
         desc = "Display the linear transform of the pointcloud"
