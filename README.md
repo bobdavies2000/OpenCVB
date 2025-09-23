@@ -1,3 +1,27 @@
+# 2025 September 23 – Logical Lines, OpenCVB icon, Better Defaults.
+
+-   Over 1900 algorithms are included, averaging 36 lines of code per algorithm.
+-   Logical Lines are RGB lines that are translated into 3D lines.
+    -   The assertion is that RGB lines will also have linear depth.
+        -   Not always true but often enough to be worth implementing.
+        -   Exceptions need to be detected and understood.
+    -   The depth for each pixel in a line is linearly connected to its neighbors.
+    -   Gaps in depth data are filled in with a computed linear depth.
+    -   Depth is the average of available depth pixels in the line.
+    -   The line center will be set to have average depth.
+    -   Linear increment is the average increment of neighboring depth pixels.
+    -   The end points are computed using the linear increment.
+    -   Line color is assigned using the grid index of the first point.
+-   The generic icon for OpenCVB was corrected (bug in .Net 8.0?)
+-   The default value for SharpGL is to use non-linear mode – more realistic.
+    -   If SharpGL’s ReadPointCloud is used, linear mode is recommended.
+-   It is no longer the default to transform the point cloud using the gravity vector.
+-   The log of previous changes has moved to be directly below the latest update.
+
+![A collage of images of a room AI-generated content may be incorrect.](media/747013ca4f3229c4862a1bf3437c1f3c.gif)
+
+**GL_MainForm:**  *The image rendered in the main OpenCVB form is pretty small but the real problem with using the main form for SharpGL is that the data that resides in the algorithm task needs to be moved to main form which is in a separate thread.*
+
 # 2025 September 11 – SharpGL, Memory, FPS.
 
 -   Over 1900 algorithms are included, averaging 36 lines of code per algorithm.
