@@ -550,7 +550,6 @@ Public Class contourData
     Public age As Integer
     Public depth As Single
     Public hull As List(Of cv.Point)
-    Public index As Integer
     Public ID As Integer
     Public mask As cv.Mat
     Public maxDist As cv.Point

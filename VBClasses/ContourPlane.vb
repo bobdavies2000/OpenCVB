@@ -65,6 +65,7 @@ Public Class ContourPlane_RectX : Inherits TaskParent
             If index = 1 Then
                 dst3 = src
                 If task.toggleOn Then
+                    rleft = ValidateRect(rleft)
                     dst2.Rectangle(rleft, task.highlight, task.lineWidth)
                     Dim maskLeft = contour.mask(New cv.Rect(0, 0, rleft.Width, rleft.Height))
                     maskLeft = maskLeft And task.depthMask(rleft)

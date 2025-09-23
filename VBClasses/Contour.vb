@@ -1179,7 +1179,7 @@ Public Class Contour_RotateRect : Inherits TaskParent
             DrawContour(dst1, contours(tuple.Item2).ToList, (i Mod 254) + 1, task.lineWidth, cv.LineTypes.Link4)
         Next
 
-        dst3 = ShowPaletteNoZero(dst1)
+        dst3 = ShowPalette254(dst1)
         labels(2) = "There were " + CStr(sortedTours.Count) + " contours found with width and height greater than " + CStr(options.minSize)
     End Sub
 End Class
@@ -1200,19 +1200,23 @@ Public Class Contour_Info : Inherits TaskParent
         Static pt = task.ClickPoint
         If task.mouseClickFlag Then pt = task.ClickPoint
         Dim id = contourMap.Get(Of Integer)(pt.Y, pt.X)
+        Dim idFound As Boolean
         For Each tour In contourList
-            If tour.ID = id Then Exit For
+            If tour.ID = id Then
+                idFound = True
+                Exit For
+            End If
         Next
+        If idFound = False Then tour = contourList(0)
         task.color(tour.rect).SetTo(cv.Scalar.White, tour.mask)
 
         Dim cDesc As String = ""
-        cDesc += "ID = " + CStr(tour.ID) + vbCrLf
-        cDesc += "Depth = " + Format(tour.depth, fmt1) + vbCrLf
-        cDesc += "Range (m) = " + Format(tour.mm.range, fmt1) + vbCrLf
+        cDesc += "ID = " + CStr(tour.ID) + " (grid index of maxDist)" + vbCrLf
+        cDesc += "Depth = " + Format(tour.depth, fmt1) + " m" + vbCrLf
+        cDesc += "Range = " + Format(tour.mm.range, fmt1) + " m" + vbCrLf
         cDesc += "Number of pixels in the mask: " + CStr(tour.pixels) + vbCrLf
 
         cDesc += "MaxDist point = " + CStr(tour.maxDist.X) + ", " + CStr(tour.maxDist.Y) + vbCrLf
-
         Return cDesc
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1258,6 +1262,7 @@ Public Class Contour_Sort : Inherits TaskParent
     Public contourIDs As New List(Of Integer)
     Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32S, 0)
     Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Sort the contours by size and prepare the contour map"
     End Sub
     Public Shared Function GetMaxDistContour(ByRef contour As contourData) As cv.Point
@@ -1296,6 +1301,7 @@ Public Class Contour_Sort : Inherits TaskParent
             tour.mm = GetMinMax(task.pcSplit(2)(tour.rect), tour.mask)
             tour.maxDist = GetMaxDistContour(tour)
             tour.ID = task.gridMap.Get(Of Integer)(tour.maxDist.Y, tour.maxDist.X)
+            If tour.ID = 0 Then tour.ID = 1 ' stay away from zero...
             tour.age = 1
             sortedList.Add(tour.pixels, tour)
         Next
@@ -1303,49 +1309,36 @@ Public Class Contour_Sort : Inherits TaskParent
         Dim contourLast As New List(Of contourData)(contourList)
         Dim contourMapLast = contourMap.Clone
 
-        Dim matched As Integer
-        Dim colorStdev As cv.Scalar, colorMean = cv.Scalar.All(-1)
-        contourMap.SetTo(0)
         dst2.SetTo(0)
+        contourList.Clear()
+        dst1.SetTo(0)
+        contourMap.SetTo(0)
         For i = sortedList.Values.Count - 1 To 0 Step -1
             Dim tour = sortedList.Values(i)
             Dim idLast = CInt(contourMapLast.Get(Of Integer)(tour.maxDist.Y, tour.maxDist.X))
-            If idLast >= 0 And idLast < contourLast.Count Then
-                If tour.ID = idLast Then
-                    tour.ID = contourLast(idLast).ID
-                    tour.age = contourLast(idLast).age + 1
-                    matched += 1
+            For Each tourLast In contourLast
+                If idLast = tourLast.ID And idLast > 0 Then
+                    tour.age = tourLast.age + 1
+                    Exit For
                 End If
-            End If
+            Next
 
+            contourList.Add(tour)
             contourMap(tour.rect).SetTo(tour.ID, tour.mask)
-            Select Case task.gOptions.trackingLabel
-                Case "Mean Color"
-                    cv.Cv2.MeanStdDev(task.color(tour.rect), colorMean, colorStdev, tour.mask)
-                    dst2(tour.rect).SetTo(colorMean, tour.mask)
-                Case "Tracking Color"
-                    contourMap(tour.rect).SetTo(tour.ID Mod 255, tour.mask)
-            End Select
+            dst1(tour.rect).SetTo(tour.ID Mod 255, tour.mask)
         Next
 
-        dst2 = ShowPaletteNoZero(contourMap)
-        Dim usedIDs As New List(Of Integer)
-        contourList.Clear()
-        For Each tour In sortedList.Values
-            Dim id = contourMap.Get(Of Integer)(tour.maxDist.Y, tour.maxDist.X)
-            If usedIDs.Contains(id) = False Then
-                DrawCircle(dst2, tour.maxDist)
-                usedIDs.Add(id)
-                contourList.Add(tour)
-            End If
+        dst2 = ShowPalette254(dst1)
+        Dim matched As Integer
+        For Each tour In contourList
+            If tour.age > 1 Then matched += 1
         Next
 
         strOut = Contour_Info.contourDesc(contourMap, contourList)
         If standaloneTest() Then SetTrueText(strOut, 3)
 
         If task.heartBeat Then
-            labels(2) = "Found " + CStr(contourList.Count) + " contours  and " + CStr(matched) +
-                        " matched the previous generation."
+            labels(2) = "Matched " + CStr(matched) + "/" + CStr(contourList.Count) + " contours to the previous generation"
         End If
     End Sub
 End Class

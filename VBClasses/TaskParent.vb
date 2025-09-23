@@ -541,7 +541,7 @@ Public Class TaskParent : Implements IDisposable
 
         Return output
     End Function
-    Public Shared Function ShowPaletteNoZero(input As cv.Mat) As cv.Mat
+    Public Shared Function ShowPalette254(input As cv.Mat) As cv.Mat
         Dim output As New cv.Mat
         If input.Type <> cv.MatType.CV_8U Then
             Dim input8u As New cv.Mat

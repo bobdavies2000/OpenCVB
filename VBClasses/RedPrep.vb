@@ -94,7 +94,7 @@ Public Class RedPrep_Depth : Inherits TaskParent
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         dst2.SetTo(0, task.noDepthMask)
 
-        dst3 = ShowPaletteNoZero(dst2)
+        dst3 = ShowPalette254(dst2)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)

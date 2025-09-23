@@ -7924,7 +7924,7 @@ Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
             dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
         End If
 
-        dst1 = ShowPaletteNoZero(task.lines.lineCore.lpRectMap)
+        dst1 = ShowPalette254(task.lines.lineCore.lpRectMap)
         dst1.Circle(lp.ptCenter, task.DotSize, task.highlight, task.lineWidth, task.lineType)
 
         labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
@@ -10810,7 +10810,7 @@ Public Class XO_KNN_LongestLine : Inherits TaskParent
         dst3 = task.lines.dst3
         labels(3) = task.lines.labels(3)
 
-        dst1 = ShowPaletteNoZero(task.lines.lineCore.lpRectMap)
+        dst1 = ShowPalette254(task.lines.lineCore.lpRectMap)
     End Sub
 End Class
 
@@ -10839,7 +10839,7 @@ Public Class XO_KNN_BoundingRect : Inherits TaskParent
             lp = lplist(sortRects.ElementAt(0).Value)
         End If
 
-        dst1 = ShowPaletteNoZero(task.lines.lineCore.lpRectMap)
+        dst1 = ShowPalette254(task.lines.lineCore.lpRectMap)
         DrawCircle(dst1, lp.ptCenter)
 
         Dim index = task.lines.lineCore.lpRectMap.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)

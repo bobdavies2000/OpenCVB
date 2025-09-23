@@ -17,7 +17,7 @@ Public Class BrickLine_Basics : Inherits TaskParent
             src = contour.dst1.Clone
         End If
 
-        dst2 = ShowPaletteNoZero(src)
+        dst2 = ShowPalette254(src)
         dst3 = dst2.Clone
 
         Dim mm = GetMinMax(src)

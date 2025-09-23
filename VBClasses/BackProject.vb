@@ -82,7 +82,8 @@ Public Class BackProject_FeatureLess : Inherits TaskParent
         desc = "Create a histogram of the featureless regions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        bProject.Run(task.contours.contourMap)
+        task.contours.contourMap.ConvertTo(dst1, cv.MatType.CV_32F)
+        bProject.Run(dst1) ' calcHist doesn't support 32S
         dst2 = bProject.dst2
         dst3 = bProject.dst3
         labels(2) = "Bins = " + CStr(task.histogramBins)

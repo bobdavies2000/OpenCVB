@@ -54,7 +54,7 @@ Public Class PolyLine_Basics : Inherits TaskParent
         Next
 
         dst1.ConvertTo(dst3, cv.MatType.CV_8U)
-        dst3 = ShowPaletteNoZero(dst3)
+        dst3 = ShowPalette254(dst3)
 
         If task.heartBeat Then
             labels(2) = CStr(eSeg.segments.Count) + " lines found in EdgeLines C++ in the latest image and " +

@@ -112,7 +112,7 @@ Public Class EdgeLine_BasicsList : Inherits TaskParent
             Dim nrc = nrclist(i)
             dst1(nrc.rect).SetTo(nrc.ID Mod 255, nrc.mask)
         Next
-        dst3 = ShowPaletteNoZero(dst1)
+        dst3 = ShowPalette254(dst1)
 
         labels(3) = CStr(nrclist.Count) + " segments are present.  " + CStr(duplicatePixels) +
                     " pixels were dropped because the segment hit an already occupied grid cell."
