@@ -58,17 +58,17 @@ End Class
 
 
 Public Class Disparity_Edges : Inherits TaskParent
-    Dim edges As New EdgeLine_Basics
     Dim disparity As New Disparity_Basics
     Public Sub New()
+        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
         desc = "Use features in bricks to confirm depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.leftView)
+        task.edges.Run(task.leftView)
         dst2 = task.edges.dst2.Clone
 
-        edges.Run(task.rightView)
-        dst3 = edges.dst2.Clone
+        task.edges.Run(task.rightView)
+        dst3 = task.edges.dst2.Clone
 
         disparity.rightView = dst3
         disparity.Run(dst2)

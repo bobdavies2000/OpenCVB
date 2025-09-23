@@ -77,6 +77,7 @@ End Class
 Public Class MinMath_EdgeLine : Inherits TaskParent
     Dim bPoints As New BrickPoint_Basics
     Public Sub New()
+        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
         desc = "Use brickpoints to find edgeLines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

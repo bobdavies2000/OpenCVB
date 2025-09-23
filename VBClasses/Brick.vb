@@ -422,6 +422,7 @@ End Class
 Public Class Brick_EdgeDraw : Inherits TaskParent
     Dim regions As New Region_Contours
     Public Sub New()
+        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
         desc = "Lines can mean cells are connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

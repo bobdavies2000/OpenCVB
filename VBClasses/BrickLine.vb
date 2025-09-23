@@ -209,6 +209,7 @@ Public Class BrickLine_EdgesNoEdges : Inherits TaskParent
     Public edges As New List(Of Integer)
     Public noEdges As New List(Of Integer)
     Public Sub New()
+        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
         desc = "Define each brick according to whether it has edges or not.  Ignore peripheral bricks..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -249,6 +250,7 @@ Public Class BrickLine_LeftRight : Inherits TaskParent
     Dim mats As New Mat_4Click
     Public bestBricks As New List(Of Integer)
     Public Sub New()
+        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(1) = "Left edges, right edges, bricks with left image edges, bricks with right image edges"
         labels(2) = "The cells below have depth and good correlation left to right"

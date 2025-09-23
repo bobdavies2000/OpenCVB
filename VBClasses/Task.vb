@@ -479,7 +479,6 @@ Public Class VBtask : Implements IDisposable
         motionBasics = New Motion_Basics
         grid = New Grid_Basics
         lines = New Line_Basics
-        edges = New EdgeLine_Basics
         rgbFilter = New Filter_Basics
 
         ' all the algorithms in the list are task algorithms that are children of the algname.
@@ -680,9 +679,9 @@ Public Class VBtask : Implements IDisposable
         rgbFilter.Run(task.color)
         If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
 
-        edges.Run(task.grayStable)
         colorizer.Run(src)
 
+        If edges IsNot Nothing Then edges.Run(task.grayStable)
         If contours IsNot Nothing Then contours.Run(src)
         If task.feat IsNot Nothing Then task.feat.Run(src)
         If task.bricks IsNot Nothing Then bricks.Run(src)

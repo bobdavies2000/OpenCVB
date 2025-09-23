@@ -1009,7 +1009,8 @@ Public Class Edge_Color8U : Inherits TaskParent
                         Case 2
                             colorMethods(i) = New Binarize_DepthTiers
                         Case 3
-                            colorMethods(i) = task.edges ' New EdgeLine_Basics
+                            If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
+                            colorMethods(i) = task.edges
                         Case 4
                             colorMethods(i) = New Hist3Dcolor_Basics
                         Case 5
@@ -1440,6 +1441,7 @@ End Class
 
 Public Class Edge_NoDepth : Inherits TaskParent
     Public Sub New()
+        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "All edges available", "Below - edges without depth, Above - edges with depth (color from contour.)"}
         desc = "Find the edges where there is depth and no depth."

@@ -59,7 +59,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
                 plot.histArray(i) = i
             Next
         End If
-        dst3 = ShowPalette(dst2)
+        dst3 = ShowPalette254(dst2)
 
         labels(2) = "Using reduction factor = " + CStr(reduceAmt)
     End Sub

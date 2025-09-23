@@ -72,6 +72,7 @@ End Class
 Public Class EdgeLine_BasicsList : Inherits TaskParent
     Public nrclist As New List(Of nrcData)
     Public Sub New()
+        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
         task.gOptions.DebugSlider.Value = 1
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Create an entry for each segment"
@@ -300,6 +301,7 @@ End Class
 Public Class EdgeLine_LeftRight : Inherits TaskParent
     Dim edges As New EdgeLine_Basics
     Public Sub New()
+        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
         labels(3) = "Right View: Note it is updated on every frame - it does not use the motion mask."
         desc = "Build the left and right edge lines."
     End Sub
@@ -321,6 +323,7 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
     Dim bPoint As New BrickPoint_Basics
     Public classCount As Integer
     Public Sub New()
+        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Find lines using the brick points"
@@ -388,6 +391,7 @@ End Class
 Public Class EdgeLine_DepthSegments : Inherits TaskParent
     Public segments As New List(Of List(Of cv.Point))
     Public Sub New()
+        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
         labels(3) = "Highlighting the individual segments one by one."
         desc = "Break up any edgeline segments that cross depth boundaries."
     End Sub

@@ -7,6 +7,7 @@ Public Class Contour_Basics : Inherits TaskParent
     Public contourIDs As New List(Of Integer)
     Dim sortContours As New Contour_Sort
     Public Sub New()
+        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
         If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         OptionParent.findRadio("List").Checked = True
         labels(3) = "Input to OpenCV's FindContours"
