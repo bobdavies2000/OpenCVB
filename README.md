@@ -18,9 +18,9 @@
 -   It is no longer the default to transform the point cloud using the gravity vector.
 -   The log of previous changes has moved to be directly below the latest update.
 
-![A collage of images of a room AI-generated content may be incorrect.](media/747013ca4f3229c4862a1bf3437c1f3c.gif)
+![](media/b52ca4c4a1e2f8e993985b1ca8518d72.gif)
 
-**GL_MainForm:**  *The image rendered in the main OpenCVB form is pretty small but the real problem with using the main form for SharpGL is that the data that resides in the algorithm task needs to be moved to main form which is in a separate thread.*
+**GL_LogicalCloud:**  *The point cloud above is enhanced with logical lines.*
 
 # 2025 September 11 – SharpGL, Memory, FPS.
 
