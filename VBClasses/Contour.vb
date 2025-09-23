@@ -1334,8 +1334,10 @@ Public Class Contour_Sort : Inherits TaskParent
             If tour.age > 1 Then matched += 1
         Next
 
-        strOut = Contour_Info.contourDesc(contourMap, contourList)
-        If standaloneTest() Then SetTrueText(strOut, 3)
+        If contourList.Count > 0 Then
+            strOut = Contour_Info.contourDesc(contourMap, contourList)
+            If standaloneTest() Then SetTrueText(strOut, 3)
+        End If
 
         If task.heartBeat Then
             labels(2) = "Matched " + CStr(matched) + "/" + CStr(contourList.Count) + " contours to the previous generation"

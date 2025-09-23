@@ -20,7 +20,7 @@ Public Class Neighbor_Basics : Inherits TaskParent
         knn.Run(src)
 
         For Each rc In task.redC.rcList
-            For i = 0 To options.neighbors - 1
+            For i = 0 To Math.Min(knn.neighbors.Count, options.neighbors) - 1
                 rc.nabs.Add(knn.neighbors(rc.index)(i))
             Next
         Next

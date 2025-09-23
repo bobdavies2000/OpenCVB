@@ -672,11 +672,6 @@ Namespace OpenCVB
                 jsonfs.write()
                 settings = jsonfs.read()
                 LineUpCamPics()
-
-                ' when switching resolution, best to reset these as the move from higher to lower res
-                ' could mean the point is no longer valid.
-                ClickPoint = New cv.Point
-                mousePointCamPic = New cv.Point
             End If
 
             StartAlgorithm()
@@ -986,6 +981,11 @@ Namespace OpenCVB
             End If
 
             GC.Collect()
+
+            ' when switching resolution, best to reset these as the move from higher to lower res
+            ' could mean the point is no longer valid.
+            ClickPoint = New cv.Point
+            mousePointCamPic = New cv.Point
 
             AlgDescription.Text = ""
             Thread.CurrentThread.Priority = ThreadPriority.Lowest
