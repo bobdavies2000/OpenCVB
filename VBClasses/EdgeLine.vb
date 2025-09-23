@@ -57,7 +57,7 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         labels(2) = CStr(classCount) + " segments were found using " + CStr(pointCount) + " points."
 
         dst3.SetTo(0)
-        task.contours.dst2.CopyTo(dst3, task.edges.dst2)
+        task.contours.dst2.CopyTo(dst3, task.edgeLine.dst2)
     End Sub
     Public Sub Close()
         EdgeLineRaw_Close(cPtr)
@@ -70,52 +70,52 @@ End Class
 
 
 Public Class EdgeLine_BasicsList : Inherits TaskParent
-    Public nrclist As New List(Of nrcData)
+    Public preplist As New List(Of prepData)
     Public Sub New()
-        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
+        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         task.gOptions.DebugSlider.Value = 1
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Create an entry for each segment"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.edges.dst2
-        labels(2) = task.edges.labels(2)
+        dst2 = task.edgeLine.dst2
+        labels(2) = task.edgeLine.labels(2)
 
-        Dim sortList As New SortedList(Of Integer, nrcData)(New compareAllowIdenticalIntegerInverted)
-        For Each seg In task.edges.segments
-            Dim nrc = New nrcData
+        Dim sortList As New SortedList(Of Integer, prepData)(New compareAllowIdenticalIntegerInverted)
+        For Each seg In task.edgeLine.segments
+            Dim nrc = New prepData
             Dim segIndex = sortList.Count + 1
-            nrc.rect = task.edges.rectList(segIndex - 1)
+            nrc.rect = task.edgeLine.rectList(segIndex - 1)
             nrc.mask = dst2(nrc.rect).InRange(segIndex, segIndex)
             nrc.pixels = seg.Count
             nrc.segment = seg
             sortList.Add(nrc.pixels, nrc)
         Next
 
-        Dim nrcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim sortGridID As New SortedList(Of Integer, nrcData)(New compareAllowIdenticalInteger)
+        Dim prepMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim sortGridID As New SortedList(Of Integer, prepData)(New compareAllowIdenticalInteger)
         Dim duplicatePixels As Integer
         For Each nrc In sortList.Values
             nrc.ID = task.gridMap.Get(Of Integer)(nrc.segment(0).Y, nrc.segment(0).X)
-            Dim takenFlag = nrcMap.Get(Of Byte)(nrc.segment(0).Y, nrc.segment(0).X)
+            Dim takenFlag = prepMap.Get(Of Byte)(nrc.segment(0).Y, nrc.segment(0).X)
             If takenFlag <> 0 Then
                 duplicatePixels += nrc.pixels
                 Continue For ' this id is already taken by a larger segment
             End If
-            nrcMap(task.gridRects(nrc.ID)).SetTo(255)
+            prepMap(task.gridRects(nrc.ID)).SetTo(255)
             sortGridID.Add(nrc.ID, nrc)
         Next
 
-        nrclist = New List(Of nrcData)(sortGridID.Values)
+        preplist = New List(Of prepData)(sortGridID.Values)
 
         dst1.SetTo(0)
-        For i = 0 To nrclist.Count - 1
-            Dim nrc = nrclist(i)
+        For i = 0 To preplist.Count - 1
+            Dim nrc = preplist(i)
             dst1(nrc.rect).SetTo(nrc.ID Mod 255, nrc.mask)
         Next
         dst3 = ShowPalette254(dst1)
 
-        labels(3) = CStr(nrclist.Count) + " segments are present.  " + CStr(duplicatePixels) +
+        labels(3) = CStr(preplist.Count) + " segments are present.  " + CStr(duplicatePixels) +
                     " pixels were dropped because the segment hit an already occupied grid cell."
     End Sub
 End Class
@@ -301,13 +301,13 @@ End Class
 Public Class EdgeLine_LeftRight : Inherits TaskParent
     Dim edges As New EdgeLine_Basics
     Public Sub New()
-        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
+        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         labels(3) = "Right View: Note it is updated on every frame - it does not use the motion mask."
         desc = "Build the left and right edge lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         edges.Run(task.leftView)
-        dst2 = task.edges.dst2.Clone
+        dst2 = task.edgeLine.dst2.Clone
 
         edges.Run(task.rightView)
         dst3 = edges.dst2.Clone
@@ -323,7 +323,7 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
     Dim bPoint As New BrickPoint_Basics
     Public classCount As Integer
     Public Sub New()
-        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
+        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Find lines using the brick points"
@@ -332,14 +332,14 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
         If task.quarterBeat Then
             Static debugSegment = 0
             debugSegment += 1
-            If debugSegment >= task.edges.segments.Count Then
+            If debugSegment >= task.edgeLine.segments.Count Then
                 debugSegment = 0
                 dst.SetTo(0)
             End If
-            If debugSegment >= task.edges.segments.Count Then debugSegment = 0
+            If debugSegment >= task.edgeLine.segments.Count Then debugSegment = 0
             If debugSegment Then
-                task.edges.dst1 = task.edges.dst2.InRange(debugSegment, debugSegment)
-                task.edges.dst1.CopyTo(dst, task.edges.dst1)
+                task.edgeLine.dst1 = task.edgeLine.dst2.InRange(debugSegment, debugSegment)
+                task.edgeLine.dst1.CopyTo(dst, task.edgeLine.dst1)
             End If
             debugSegment += 1
         End If
@@ -348,13 +348,13 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
         bPoint.Run(src)
         labels(2) = bPoint.labels(2)
 
-        dst2 = task.edges.dst2
-        dst3 = ShowPalette(task.edges.dst2)
+        dst2 = task.edgeLine.dst2
+        dst3 = ShowPalette(task.edgeLine.dst2)
 
-        Dim segments(task.edges.classCount) As List(Of cv.Point2f)
+        Dim segments(task.edgeLine.classCount) As List(Of cv.Point2f)
         Dim brickCount As Integer, segmentCount As Integer
         For Each pt In bPoint.ptList
-            Dim val = task.edges.dst2.Get(Of Byte)(pt.Y, pt.X)
+            Dim val = task.edgeLine.dst2.Get(Of Byte)(pt.Y, pt.X)
             If val > 0 And val < 255 Then
                 If segments(val) Is Nothing Then
                     segments(val) = New List(Of cv.Point2f)
@@ -365,7 +365,7 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
             End If
         Next
 
-        labels(3) = CStr(task.edges.classCount) + " segments were found and " + CStr(segmentCount) + " contained brick points"
+        labels(3) = CStr(task.edgeLine.classCount) + " segments were found and " + CStr(segmentCount) + " contained brick points"
         labels(3) += " " + CStr(brickCount) + " bricks were part of a segment"
 
         classCount = 0
@@ -391,15 +391,15 @@ End Class
 Public Class EdgeLine_DepthSegments : Inherits TaskParent
     Public segments As New List(Of List(Of cv.Point))
     Public Sub New()
-        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
+        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         labels(3) = "Highlighting the individual segments one by one."
         desc = "Break up any edgeline segments that cross depth boundaries."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.edges.dst2
+        dst2 = task.edgeLine.dst2
 
         segments.Clear()
-        For Each seg In task.edges.segments
+        For Each seg In task.edgeLine.segments
             Dim nextSeg As New List(Of cv.Point)
             Dim lastDepth = -1
             For Each pt In seg

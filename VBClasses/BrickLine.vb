@@ -209,7 +209,7 @@ Public Class BrickLine_EdgesNoEdges : Inherits TaskParent
     Public edges As New List(Of Integer)
     Public noEdges As New List(Of Integer)
     Public Sub New()
-        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
+        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         desc = "Define each brick according to whether it has edges or not.  Ignore peripheral bricks..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -223,7 +223,7 @@ Public Class BrickLine_EdgesNoEdges : Inherits TaskParent
             If r.X + r.Width = dst2.Width Then Continue For
             If r.Y = 0 Then Continue For
             If r.Y + r.Height = dst2.Height Then Continue For
-            If task.edges.dst2(r).CountNonZero Then edges.Add(i) Else noEdges.Add(i)
+            If task.edgeLine.dst2(r).CountNonZero Then edges.Add(i) Else noEdges.Add(i)
         Next
 
         If standaloneTest() Then
@@ -250,7 +250,7 @@ Public Class BrickLine_LeftRight : Inherits TaskParent
     Dim mats As New Mat_4Click
     Public bestBricks As New List(Of Integer)
     Public Sub New()
-        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
+        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(1) = "Left edges, right edges, bricks with left image edges, bricks with right image edges"
         labels(2) = "The cells below have depth and good correlation left to right"
@@ -268,8 +268,8 @@ Public Class BrickLine_LeftRight : Inherits TaskParent
             DrawRect(mats.mat(2), task.gridRects(index), white)
         Next
 
-        task.edges.Run(edges.dst3)
-        fLess.Run(task.edges.dst2)
+        task.edgeLine.Run(edges.dst3)
+        fLess.Run(task.edgeLine.dst2)
         mats.mat(3) = fLess.dst2
         Dim rightEdges As New List(Of Integer)(fLess.edges)
         For Each index In rightEdges

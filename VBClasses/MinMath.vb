@@ -77,7 +77,7 @@ End Class
 Public Class MinMath_EdgeLine : Inherits TaskParent
     Dim bPoints As New BrickPoint_Basics
     Public Sub New()
-        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
+        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         desc = "Use brickpoints to find edgeLines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -85,8 +85,8 @@ Public Class MinMath_EdgeLine : Inherits TaskParent
         dst2 = bPoints.dst2
         labels(2) = bPoints.labels(2)
 
-        dst3 = task.edges.dst2
-        labels(3) = task.edges.labels(2)
+        dst3 = task.edgeLine.dst2
+        labels(3) = task.edgeLine.labels(2)
 
         For Each bp In bPoints.ptList
             Dim val = dst3.Get(Of Byte)(bp.Y, bp.X)

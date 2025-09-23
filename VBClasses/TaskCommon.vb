@@ -571,15 +571,37 @@ End Class
 
 
 
-Public Class nrcData
-    Public rect As cv.Rect
-    Public mask As cv.Mat
-    Public ID As Integer
-    Public pixels As Integer
+Public Class prepData
     Public age As Integer
+    Public center As cv.Point
     Public depth As Single
+    Public ID As Integer
+    Public mask As cv.Mat
+    Public maxDist As cv.Point
+    Public pixels As Integer
+    Public color As cv.Scalar
+    Public rect As cv.Rect
     Public segment As New List(Of cv.Point)
     Public Sub New()
+    End Sub
+    Private Function getMaxDist(mask As cv.Mat, rect As cv.Rect) As cv.Point
+        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+        Dim mm As mmData = GetMinMax(distance32f)
+        mm.maxLoc.X += rect.X
+        mm.maxLoc.Y += rect.Y
+        Return mm.maxLoc
+    End Function
+    Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _pixels As Integer)
+        mask = _mask.Clone
+        rect = _rect
+        pixels = _pixels
+        age = 1
+        maxDist = getMaxDist(_mask, rect)
+        ID = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
+        depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
+        color = task.scalarColors(ID Mod 255)
+        center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
     End Sub
 End Class
 

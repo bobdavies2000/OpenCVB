@@ -1009,8 +1009,8 @@ Public Class Edge_Color8U : Inherits TaskParent
                         Case 2
                             colorMethods(i) = New Binarize_DepthTiers
                         Case 3
-                            If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
-                            colorMethods(i) = task.edges
+                            If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
+                            colorMethods(i) = task.edgeLine
                         Case 4
                             colorMethods(i) = New Hist3Dcolor_Basics
                         Case 5
@@ -1217,7 +1217,7 @@ End Class
 Public Class Edge_LaplacianColor : Inherits TaskParent
     Dim options As New Options_LaplacianKernels
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         If standalone Then labels(3) = "Laplacian of DepthRGB"
         desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
@@ -1240,7 +1240,7 @@ End Class
 Public Class Edge_Laplacian : Inherits TaskParent
     Dim options As New Options_LaplacianKernels
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1262,7 +1262,7 @@ Public Class Edge_Sweep : Inherits TaskParent
         desc = "Sweep through the various edge algorithms"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static frm = OptionParent.findFrm("Options_Edge_Basics Radio Buttons")
+        Static frm = OptionParent.FindFrm("Options_Edge_Basics Radio Buttons")
 
         If task.heartBeatLT Then
             Dim index = task.featureOptions.EdgeMethods.SelectedIndex + 1
@@ -1293,7 +1293,7 @@ Public Class Edge_Deriche_CPP : Inherits TaskParent
         labels(3) = "Image enhanced with Deriche results"
         desc = "Edge detection using the Deriche X and Y gradients"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         If src.Channels = 1 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -1321,7 +1321,7 @@ Public Class Edge_DericheFiltered : Inherits TaskParent
     Public Sub New()
         desc = "Filter the data from the Deriche algorithm to highlight the edges."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         deriche.Run(src)
         dst3 = deriche.dst2
         labels(3) = deriche.labels(2)
@@ -1441,13 +1441,13 @@ End Class
 
 Public Class Edge_NoDepth : Inherits TaskParent
     Public Sub New()
-        If task.edges Is Nothing Then task.edges = New EdgeLine_Basics
+        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "All edges available", "Below - edges without depth, Above - edges with depth (color from contour.)"}
         desc = "Find the edges where there is depth and no depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.edges.dst1
+        dst2 = task.edgeLine.dst1
 
         dst3.SetTo(0)
         dst2.CopyTo(dst3, task.noDepthMask)

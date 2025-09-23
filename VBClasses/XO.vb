@@ -6716,7 +6716,7 @@ Public Class XO_Contour_RedCloudEdges : Inherits TaskParent
             DrawContour(dst2(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
-        dst3 = task.edges.dst2 And dst2
+        dst3 = task.edgeLine.dst2 And dst2
     End Sub
 End Class
 
@@ -6928,11 +6928,11 @@ Public Class XO_Color8U_Edges : Inherits TaskParent
         desc = "Find edges in the Color8U_Basics output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.edges.dst2
+        dst2 = task.edgeLine.dst2
 
         edges.Run(dst2)
         dst3 = edges.dst2
-        labels(2) = task.edges.strOut
+        labels(2) = task.edgeLine.strOut
     End Sub
 End Class
 
