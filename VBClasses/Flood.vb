@@ -1,3 +1,4 @@
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits TaskParent
     Public Sub New()
@@ -188,5 +189,81 @@ Public Class Flood_Motion : Inherits TaskParent
             dst3 = flood.dst2
             labels(3) = flood.labels(2)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Flood_Minimal : Inherits TaskParent
+    Dim prep As New RedPrep_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(2) = "Output is from RedPrep_Basics. Click any region to floodfill it."
+        labels(3) = "Mask resulting region selected by the click."
+        desc = "Floodfill the selected segment of the RedPrep image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+        dst2 = prep.dst2
+
+        If task.mouseClickFlag Then
+            Dim rect As New cv.Rect
+            Dim pt = task.ClickPoint
+            Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+            Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
+            Dim count = cv.Cv2.FloodFill(dst2, mask, pt, 255, rect, 0, 0, flags)
+            dst1.SetTo(0)
+            dst3 = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height)).Clone
+            dst1.Rectangle(rect, 255, task.lineWidth)
+        End If
+    End Sub
+End Class
+
+
+
+
+Public Class Flood_PrepData : Inherits TaskParent
+    Dim prep As New RedPrep_Basics
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Floodfill each region of the RedPrep_Basics output."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+        dst2 = prep.dst2
+
+        Dim index As Integer = 1
+        Dim rect As New cv.Rect
+        Dim maskRect = New cv.Rect(1, 1, dst2.Width, dst2.Height)
+        Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
+        Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
+        Dim minCount As Integer = dst2.Total * 0.001
+        dst0.SetTo(0)
+        dst1.SetTo(0)
+        For y = 0 To dst2.Height - 1
+            For x = 0 To dst2.Width - 1
+                Dim pt = New cv.Point(x, y)
+                Dim val = dst2.Get(Of Byte)(pt.Y, pt.X) ' skip the regions with no depth
+                If val > 0 Then
+                    val = dst1.Get(Of Byte)(pt.Y, pt.X)
+                    If val = 0 Then
+                        Dim count = cv.Cv2.FloodFill(dst2, mask, pt, index, rect, 0, 0, flags)
+                        If count > minCount Then
+                            dst1.Rectangle(rect, 255, -1)
+                            dst0(rect).SetTo(index, mask(rect))
+                            index += 1
+                            ' mask(rect).SetTo(0)
+                        End If
+                    End If
+                End If
+            Next
+        Next
+
+        dst3 = ShowPalette254(dst0)
+        labels(2) = CStr(index) + " regions were identified"
     End Sub
 End Class

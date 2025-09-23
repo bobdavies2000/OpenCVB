@@ -1456,3 +1456,22 @@ Public Class Edge_NoDepth : Inherits TaskParent
         dst2.CopyTo(dst1, task.depthMask)
     End Sub
 End Class
+
+
+
+
+
+Public Class Edge_PrepData : Inherits TaskParent
+    Dim prep As New RedPrep_Basics
+    Dim edges As New Edge_Basics
+    Public Sub New()
+        desc = "Find the lines in the RedPrep_Basics output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+        dst2 = prep.dst2
+
+        edges.Run(dst2)
+        dst3 = edges.dst2
+    End Sub
+End Class

@@ -74,22 +74,25 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             brickText.Run(src)
             task.depthRGB.SetTo(0, task.noDepthMask)
         Else
-            Dim depthData(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1) As Byte
-            Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
-            Marshal.Copy(task.pcSplit(2).Data, depthData, 0, depthData.Length)
-            Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
-            handleSrc.Free()
+            If task.gOptions.displayDst1.Checked = False Or standaloneTest() Then
+                Dim depthData(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1) As Byte
+                Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
+                Marshal.Copy(task.pcSplit(2).Data, depthData, 0, depthData.Length)
+                Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
+                handleSrc.Free()
 
-            If imagePtr <> 0 Then task.depthRGB = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+                If imagePtr <> 0 Then task.depthRGB = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
 
-            Dim gridIndex = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            Dim depthGrid = task.pcSplit(2)(task.gridRects(gridIndex))
-            ' Dim mask = depthGrid.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-            Dim mask = task.depthMask(task.gridRects(gridIndex))
-            Dim depth = depthGrid.Mean(mask)(0)
-            Dim mm = GetMinMax(depthGrid, mask)
-            task.depthAndDepthRange = "Depth = " + Format(depth, fmt1) + "m grid = " + CStr(gridIndex) + " " + vbCrLf +
-                                      "Depth range = " + Format(mm.minVal, fmt1) + "m to " + Format(mm.maxVal, fmt1) + "m"
+                Dim gridIndex = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+                Dim depthGrid = task.pcSplit(2)(task.gridRects(gridIndex))
+                Dim mask = task.depthMask(task.gridRects(gridIndex))
+                Dim depth = depthGrid.Mean(mask)(0)
+                Dim mm = GetMinMax(depthGrid, mask)
+                task.depthAndDepthRange = "Depth = " + Format(depth, fmt1) + "m grid = " + CStr(gridIndex) + " " + vbCrLf +
+                                          "Depth range = " + Format(mm.minVal, fmt1) + "m to " + Format(mm.maxVal, fmt1) + "m"
+            Else
+                task.depthAndDepthRange = ""
+            End If
         End If
         If standaloneTest() Then dst2 = task.depthRGB
     End Sub

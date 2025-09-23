@@ -257,6 +257,7 @@ Public Class RedPrep_BasicsShow : Inherits TaskParent
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
         Dim mm = GetMinMax(dst2)
         dst3 = ShowPalette(dst2)
+        task.setSelectedCell()
 
         labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
     End Sub
