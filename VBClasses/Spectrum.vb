@@ -7,7 +7,7 @@ Public Class Spectrum_Basics : Inherits TaskParent
         desc = "Given a RedCloud cell, create a spectrum that contains the ranges of the depth and color."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedOld(src, labels(2))
         dSpec.Run(src)
         gSpec.Run(src)
 
@@ -34,7 +34,7 @@ Public Class Spectrum_X : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If standaloneTest() Then dst2 = runRedC(src, labels(2))
+        If standaloneTest() Then dst2 = runRedOld(src, labels(2))
 
         If task.heartBeat And task.rcD.index > 0 Then
             Dim ranges = options.buildDepthRanges(task.pcSplit(0)(task.rcD.rect).Clone, " pointcloud X ")
@@ -58,7 +58,7 @@ Public Class Spectrum_Y : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If standaloneTest() Then dst2 = runRedC(src, labels(2))
+        If standaloneTest() Then dst2 = runRedOld(src, labels(2))
 
         If task.heartBeat And task.rcD.index > 0 Then
             Dim ranges = options.buildDepthRanges(task.pcSplit(1)(task.rcD.rect).Clone, " pointcloud Y ")
@@ -81,7 +81,7 @@ Public Class Spectrum_Z : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
-        If standaloneTest() Then dst2 = runRedC(src, labels(2))
+        If standaloneTest() Then dst2 = runRedOld(src, labels(2))
 
         If task.heartBeat And task.rcD.index > 0 Then
             Dim ranges = options.buildDepthRanges(task.pcSplit(2)(task.rcD.rect).Clone, " pointcloud Z ")
@@ -110,7 +110,7 @@ Public Class Spectrum_Cloud : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If standaloneTest() Then dst2 = runRedC(src, labels(2))
+        If standaloneTest() Then dst2 = runRedOld(src, labels(2))
 
         If task.heartBeat Then
             specX.Run(src)
@@ -141,7 +141,7 @@ Public Class Spectrum_GrayAndCloud : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If standaloneTest() Then dst2 = runRedC(src, labels(2))
+        If standaloneTest() Then dst2 = runRedOld(src, labels(2))
 
         If task.heartBeat Then
             sCloud.Run(src)
@@ -168,7 +168,7 @@ Public Class Spectrum_RGB : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If standaloneTest() Then dst2 = runRedC(src, labels(2))
+        If standaloneTest() Then dst2 = runRedOld(src, labels(2))
 
         Dim split = src.Split()
         gSpec.typeSpec = " blue "
@@ -204,7 +204,7 @@ Public Class Spectrum_CellZoom : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         breakdown.options.Run()
 
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedOld(src, labels(2))
 
         If task.heartBeat Then
             breakdown.Run(src)
@@ -236,7 +236,7 @@ Public Class Spectrum_Breakdown : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             options.Run()
-            dst2 = runRedC(src, labels(2))
+            dst2 = runRedOld(src, labels(2))
         End If
 
         Dim rc = task.rcD
@@ -302,7 +302,7 @@ Public Class Spectrum_RedCloud : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         breakdown.options.Run()
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedOld(src, labels(2))
 
         dst3.SetTo(0)
         For i = 0 To task.redC.rcList.Count - 1
@@ -352,7 +352,7 @@ Public Class Spectrum_Gray : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedOld(src, labels(2))
 
         Dim input = src(task.rcD.rect)
         If input.Type <> cv.MatType.CV_8U Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

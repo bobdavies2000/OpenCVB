@@ -256,6 +256,6 @@ Public Class FeatureLess_RedColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(src)
         dst3 = fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = runRedC(dst3, labels(2))
+        dst2 = runRedOld(dst3, labels(2))
     End Sub
 End Class

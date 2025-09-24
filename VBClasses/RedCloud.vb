@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
     Dim prep As New RedPrep_Basics
-    Public prepList As New List(Of cloudData)
+    Public pcList As New List(Of cloudData)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Map of reduced point cloud - CV_8U"
@@ -18,14 +18,14 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
         dst1.SetTo(0)
         dst2.SetTo(0)
-        prepList.Clear()
+        pcList.Clear()
         Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
                 Dim pt = New cv.Point(x, y)
                 Dim val = dst3.Get(Of Byte)(pt.Y, pt.X) ' skip the regions with no depth
                 If val > 0 Then
-                    val = dst1.Get(Of Byte)(pt.Y, pt.X)
+                    val = dst1.Get(Of Byte)(pt.Y, pt.X) ' skip flooding need good chunks of depth data.
                     If val = 0 Then
                         Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                         If count >= minCount And count < maxCount Then
@@ -33,14 +33,14 @@ Public Class RedCloud_Basics : Inherits TaskParent
                             index += 1
                             Dim pd = New cloudData(mask(rect), rect, count)
                             dst2(rect).SetTo(pd.color, mask(rect))
-                            prepList.Add(pd)
+                            pcList.Add(pd)
                         End If
                     End If
                 End If
             Next
         Next
 
-        For Each pd In prepList
+        For Each pd In pcList
             dst2.Circle(pd.maxDist, task.DotSize, task.highlight, -1)
         Next
 
@@ -54,11 +54,9 @@ End Class
 
 Public Class RedCloud_XY : Inherits TaskParent
     Dim prep As New RedPrep_Basics
-    Dim stats As New RedCell_Basics
     Public Sub New()
         OptionParent.findRadio("XY Reduction").Checked = True
         labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
-        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build XY RedCloud cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -66,12 +64,14 @@ Public Class RedCloud_XY : Inherits TaskParent
 
         dst2 = runRedC(prep.dst2, labels(2))
         If standaloneTest() Then
+            Static stats As New RedCell_Basics
             stats.Run(src)
             dst1 = stats.dst3
             SetTrueText(stats.strOut, 3)
         End If
     End Sub
 End Class
+
 
 
 
@@ -87,7 +87,7 @@ Public Class RedCloud_Basics_CPP : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)
-        dst2 = runRedC(prep.dst2, labels(2))
+        dst2 = runRedOld(prep.dst2, labels(2))
         stats.Run(src)
         dst1 = stats.dst3
         SetTrueText(stats.strOut, 3)
@@ -115,7 +115,7 @@ Public Class RedCloud_XYZ : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)
 
-        dst2 = runRedC(prep.dst2, labels(2))
+        dst2 = runRedOld(prep.dst2, labels(2))
 
         If task.heartBeat Then strOut = ""
         For i = 0 To task.redC.rcList.Count - 1
@@ -161,7 +161,7 @@ Public Class RedCloud_YZ : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)
 
-        dst2 = runRedC(prep.dst2, labels(2))
+        dst2 = runRedOld(prep.dst2, labels(2))
 
         stats.Run(src)
         dst1 = stats.dst3
@@ -186,7 +186,7 @@ Public Class RedCloud_XZ : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)
 
-        dst2 = runRedC(prep.dst2, labels(2))
+        dst2 = runRedOld(prep.dst2, labels(2))
         stats.Run(src)
         dst1 = stats.dst3
         SetTrueText(stats.strOut, 3)
@@ -210,7 +210,7 @@ Public Class RedCloud_X : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)
 
-        dst2 = runRedC(prep.dst2, labels(2))
+        dst2 = runRedOld(prep.dst2, labels(2))
         stats.Run(src)
         dst1 = stats.dst3
         SetTrueText(stats.strOut, 3)
@@ -234,7 +234,7 @@ Public Class RedCloud_Y : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)
 
-        dst2 = runRedC(prep.dst2, labels(2))
+        dst2 = runRedOld(prep.dst2, labels(2))
         stats.Run(src)
         dst1 = stats.dst3
         SetTrueText(stats.strOut, 3)
@@ -257,7 +257,7 @@ Public Class RedCloud_Z : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)
 
-        dst2 = runRedC(prep.dst2, labels(2))
+        dst2 = runRedOld(prep.dst2, labels(2))
         stats.Run(src)
         dst1 = stats.dst3
         SetTrueText(stats.strOut, 3)

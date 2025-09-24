@@ -572,18 +572,24 @@ Public Class TaskParent : Implements IDisposable
         label = "AddWeighted: src1 = " + Format(wt, "0%") + " vs. src2 = " + Format(1 - wt, "0%")
         Return addw.dst2
     End Function
-    Public Function runRedC(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
+    Public Function runRedOld(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
         If task.redC Is Nothing Then task.redC = New RedColor_Basics
         task.redC.inputRemoved = removeMask
         task.redC.Run(src)
         label = task.redC.labels(2)
         Return task.redC.dst2
     End Function
-    Public Function runRedC(src As cv.Mat, ByRef label As String) As cv.Mat
+    Public Function runRedOld(src As cv.Mat, ByRef label As String) As cv.Mat
         If task.redC Is Nothing Then task.redC = New RedColor_Basics
         task.redC.Run(src)
         label = task.redC.labels(2)
         Return task.redC.dst2
+    End Function
+    Public Function runRedC(src As cv.Mat, ByRef label As String) As cv.Mat
+        If task.redCNew Is Nothing Then task.redCNew = New RedCloud_Basics
+        task.redCNew.Run(src)
+        label = task.redCNew.labels(2)
+        Return task.redCNew.dst2
     End Function
     Public Function InitRandomRect(margin As Integer) As cv.Rect
         Return New cv.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),

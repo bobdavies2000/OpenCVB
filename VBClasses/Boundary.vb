@@ -9,7 +9,7 @@ Public Class Boundary_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         color8U.Run(src)
-        dst2 = runRedC(color8U.dst2, labels(2))
+        dst2 = runRedOld(color8U.dst2, labels(2))
 
         redCPP.Run(dst1)
 
@@ -128,7 +128,7 @@ Public Class Boundary_RedCloud : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)
-        dst2 = runRedC(prep.dst2, labels(2))
+        dst2 = runRedOld(prep.dst2, labels(2))
 
         dst3.SetTo(0)
         For i = 1 To task.redC.rcList.Count - 1
@@ -153,7 +153,7 @@ Public Class Boundary_GuidedBP : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         guided.Run(src)
-        dst2 = runRedC(guided.dst2, labels(2))
+        dst2 = runRedOld(guided.dst2, labels(2))
 
         dst3.SetTo(0)
         For i = 1 To task.redC.rcList.Count - 1

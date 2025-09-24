@@ -57,7 +57,7 @@ Public Class Convex_RedColor : Inherits TaskParent
         desc = "Get lots of odd shapes from the RedColor_Basics output and use ConvexHull to simplify them."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedOld(src, labels(2))
         If task.rcD.contour IsNot Nothing Then
             convex.Run(src)
 
@@ -140,7 +140,7 @@ Public Class Convex_RedColorDefects : Inherits TaskParent
         Return newC
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = runRedC(src, labels(1))
+        dst1 = runRedOld(src, labels(1))
 
         Dim rc = task.rcD
         If rc.mask Is Nothing Then Exit Sub

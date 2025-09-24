@@ -510,7 +510,7 @@ Public Class Motion_Enclosing : Inherits TaskParent
 
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        dst3 = runRedC(dst2, labels(2), Not dst2)
+        dst3 = runRedOld(dst2, labels(2), Not dst2)
 
         motionRect = New cv.Rect
         If task.redC.rcList.Count < 2 Then Exit Sub

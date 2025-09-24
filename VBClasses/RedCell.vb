@@ -44,7 +44,7 @@ Public Class RedCell_Basics : Inherits TaskParent
         dst3 = plot.dst2
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Or runRedCloud Then dst2 = runRedC(src, labels(2))
+        If standalone Or runRedCloud Then dst2 = runRedOld(src, labels(2))
         statsString()
         SetTrueText(strOut, 1)
         labels(3) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.MaxZmeters)) + " meters"
@@ -65,7 +65,7 @@ Public Class RedCell_ValidateColor : Inherits TaskParent
         desc = "Validate that all the depthCells are correctly identified."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedOld(src, labels(2))
 
         dst1.SetTo(0)
         dst3.SetTo(0)
@@ -114,7 +114,7 @@ Public Class RedCell_Distance : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Or task.quarterBeat Then
-            dst2 = runRedC(src, labels(2))
+            dst2 = runRedOld(src, labels(2))
             dst0 = task.color
 
             Dim depthDistance As New List(Of Single)
@@ -157,7 +157,7 @@ Public Class RedCell_Binarize : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst0 = src
         If task.heartBeat Or task.quarterBeat Then
-            dst2 = runRedC(src, labels(2))
+            dst2 = runRedOld(src, labels(2))
 
             Dim grayMeans As New List(Of Single)
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -231,7 +231,7 @@ Public Class RedCell_BasicsPlot : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or runRedCloud Then
-            dst2 = runRedC(src, labels(2))
+            dst2 = runRedOld(src, labels(2))
             If task.ClickPoint = newPoint Then
                 If task.redC.rcList.Count > 1 Then
                     task.rcD = task.redC.rcList(1)

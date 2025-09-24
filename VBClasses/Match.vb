@@ -320,7 +320,7 @@ Public Class Match_TraceRedC : Inherits TaskParent
         desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = runRedC(src, labels(3))
+        dst3 = runRedOld(src, labels(3))
         If task.heartBeat Then dst2.SetTo(0)
         If task.optionsChanged Then frameList.Clear()
 

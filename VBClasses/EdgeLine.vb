@@ -71,7 +71,7 @@ End Class
 
 
 Public Class EdgeLine_BasicsList : Inherits TaskParent
-    Public preplist As New List(Of cloudData)
+    Public pcList As New List(Of cloudData)
     Public Sub New()
         If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         task.gOptions.DebugSlider.Value = 1
@@ -107,16 +107,16 @@ Public Class EdgeLine_BasicsList : Inherits TaskParent
             sortGridID.Add(nrc.ID, nrc)
         Next
 
-        preplist = New List(Of cloudData)(sortGridID.Values)
+        pcList = New List(Of cloudData)(sortGridID.Values)
 
         dst1.SetTo(0)
-        For i = 0 To preplist.Count - 1
-            Dim nrc = preplist(i)
+        For i = 0 To pcList.Count - 1
+            Dim nrc = pcList(i)
             dst1(nrc.rect).SetTo(nrc.ID Mod 255, nrc.mask)
         Next
         dst3 = ShowPalette254(dst1)
 
-        labels(3) = CStr(preplist.Count) + " segments are present.  " + CStr(duplicatePixels) +
+        labels(3) = CStr(pcList.Count) + " segments are present.  " + CStr(duplicatePixels) +
                     " pixels were dropped because the segment hit an already occupied grid cell."
     End Sub
 End Class

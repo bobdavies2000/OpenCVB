@@ -98,7 +98,7 @@ Public Class Hist3D_RedCloud : Inherits TaskParent
         dst2 = hist3D.dst3
         labels(2) = hist3D.labels(3)
 
-        dst3 = runRedC(hist3D.dst2, labels(3))
+        dst3 = runRedOld(hist3D.dst2, labels(3))
     End Sub
 End Class
 
@@ -118,7 +118,7 @@ Public Class Hist3D_RedColor : Inherits TaskParent
         hColor.Run(src)
         dst3 = hColor.dst3
         labels(3) = hColor.labels(3)
-        dst2 = runRedC(hColor.dst2, labels(2))
+        dst2 = runRedOld(hColor.dst2, labels(2))
         If task.redC.rcList.Count > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
     End Sub
 End Class
@@ -235,7 +235,7 @@ Public Class Hist3D_PixelClassify : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         pixel.Run(src)
 
-        dst2 = runRedC(pixel.dst2, labels(2))
+        dst2 = runRedOld(pixel.dst2, labels(2))
 
         If task.redC.rcList.Count > 0 Then
             dst2(task.rcD.rect).SetTo(white, task.rcD.mask)

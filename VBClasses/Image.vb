@@ -69,7 +69,7 @@ Public Class Image_RedCloudColor : Inherits TaskParent
         dst0 = images.dst2.Clone
         dst1 = images.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedOld(src, labels(2))
 
         Dim mask = task.redC.rcMap.InRange(0, 0)
         dst2.SetTo(cv.Scalar.Black, mask)

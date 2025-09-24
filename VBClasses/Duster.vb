@@ -131,6 +131,6 @@ Public Class Duster_RedCloud : Inherits TaskParent
         dst3.SetTo(0)
         src.CopyTo(dst3, dst1)
 
-        dst2 = runRedC(src, labels(2), Not dst1)
+        dst2 = runRedOld(src, labels(2), Not dst1)
     End Sub
 End Class

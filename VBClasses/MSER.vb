@@ -10,7 +10,7 @@ Public Class MSER_Basics : Inherits TaskParent
         desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = runRedC(src, labels(3))
+        dst3 = runRedOld(src, labels(3))
 
         detect.Run(src)
         Dim boxInput = New List(Of cv.Rect)(detect.boxes)
@@ -494,7 +494,7 @@ Public Class MSER_Mask_CPP : Inherits TaskParent
         labels(3) = CStr(classCount) + " regions identified"
 
         src.SetTo(white, dst3)
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedOld(src, labels(2))
     End Sub
     Public Sub Close()
         MSER_Close(cPtr)
@@ -534,7 +534,7 @@ Public Class MSER_Basics1 : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         detect.Run(src)
         dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedOld(src, labels(2))
     End Sub
 End Class
 

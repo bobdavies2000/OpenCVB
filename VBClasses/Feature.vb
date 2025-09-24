@@ -587,7 +587,7 @@ Public Class Feature_RedCloud : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(src)
 
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedOld(src, labels(2))
 
         For Each pt In task.featurePoints
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
@@ -734,7 +734,7 @@ Public Class Feature_FacetPoints : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(src)
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedOld(src, labels(2))
 
         delaunay.inputPoints = task.features
         delaunay.Run(src)

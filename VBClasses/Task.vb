@@ -14,6 +14,7 @@ Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
     Public ogl As XO_OpenGL_Basics
     Public redC As RedColor_Basics
+    Public redCNew As RedCloud_Basics
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public edgeLine As EdgeLine_Basics

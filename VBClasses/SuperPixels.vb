@@ -5,7 +5,7 @@ Public Class SuperPixel_Basics : Inherits TaskParent
         desc = "A Better superpixel algorithm"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedOld(src, labels(2))
 
         dst3 = src
         For Each rc In task.redC.rcList
