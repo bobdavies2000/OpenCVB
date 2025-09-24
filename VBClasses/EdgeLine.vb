@@ -8,6 +8,7 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         cPtr = EdgeLineRaw_Open()
         task.gOptions.DebugSlider.Value = 1
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Each line is highlighted with the color of the contour where it resides. "
         desc = "Use EdgeLines to find edges/lines but without using motionMask"
     End Sub

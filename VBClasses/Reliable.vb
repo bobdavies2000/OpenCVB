@@ -4,7 +4,6 @@ Public Class Reliable_Basics : Inherits TaskParent
     Dim relyDepth As New Reliable_Depth
     Dim diff
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Identify each grid element with unreliable data or motion."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

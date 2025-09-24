@@ -253,18 +253,13 @@ End Class
 Public Class RedColor_FPS : Inherits TaskParent
     Dim fps As New Grid_FPS
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Display RedCloud output at a fixed frame rate"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fps.Run(src)
 
         If fps.heartBeat Then
-            If task.redC Is Nothing Then task.redC = New RedColor_Basics
-            task.redC.Run(src)
-            dst0 = task.color.Clone
-            dst1 = task.depthRGB.Clone
-            dst2 = task.redC.dst2.Clone
+            dst2 = runRedC(src, labels(2)).Clone
             labels(2) = task.redC.labels(2) + " " + fps.strOut
         End If
     End Sub
@@ -1575,6 +1570,7 @@ Public Class RedColor_Motion : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.motionPercent = 0 Then Exit Sub ' full image stable means nothing needs to be done...
         runRedC(src, labels(2))
+        If task.redC.rcList.Count = 0 Then Exit Sub
 
         Static rcLastList As New List(Of rcData)(task.redC.rcList)
 
@@ -1639,6 +1635,7 @@ Public Class RedColor_Largest : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedC(src, labels(2))
+        If task.redC.rcList.Count = 0 Then Exit Sub ' next frame please...
 
         Dim rc = task.redC.rcList(1)
         Static rcSave As rcData = rc, stableCount As Integer

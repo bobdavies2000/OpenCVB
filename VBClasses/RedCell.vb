@@ -120,6 +120,7 @@ Public Class RedCell_Distance : Inherits TaskParent
             Dim depthDistance As New List(Of Single)
             Dim colorDistance As New List(Of Single)
             Dim selectedMean As cv.Scalar = src(task.rcD.rect).Mean(task.rcD.mask)
+            If task.redC.rcList.Count = 0 Then Exit Sub ' next frame please...
             For Each rc In task.redC.rcList
                 colorDistance.Add(distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
                 depthDistance.Add(distance3D(task.rcD.depth, rc.depth))
@@ -160,6 +161,7 @@ Public Class RedCell_Binarize : Inherits TaskParent
 
             Dim grayMeans As New List(Of Single)
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If task.redC.rcList.Count = 0 Then Exit Sub ' next frame please...
             For Each rc In task.redC.rcList
                 Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
                 cv.Cv2.MeanStdDev(gray(rc.rect), grayMean, grayStdev, rc.mask)
