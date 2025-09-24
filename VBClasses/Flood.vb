@@ -225,7 +225,7 @@ End Class
 
 
 
-Public Class Flood_PrepData : Inherits TaskParent
+Public Class Flood_cloudData : Inherits TaskParent
     Dim prep As New RedPrep_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)

@@ -1,11 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
     Dim prep As New RedPrep_Basics
-    Public prepList As New List(Of prepData)
+    Public prepList As New List(Of cloudData)
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Floodfill each region of the RedPrep_Basics output."
+        labels(3) = "Map of reduced point cloud - CV_8U"
+        desc = "Find the biggest chunks of consistent depth data "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)
@@ -16,7 +16,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
         Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
-        dst0.SetTo(0)
         dst1.SetTo(0)
         dst2.SetTo(0)
         prepList.Clear()
@@ -31,9 +30,8 @@ Public Class RedCloud_Basics : Inherits TaskParent
                         Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                         If count >= minCount And count < maxCount Then
                             dst1.Rectangle(rect, 255, -1)
-                            dst0(rect).SetTo(index, mask(rect))
                             index += 1
-                            Dim pd = New prepData(mask(rect), rect, count)
+                            Dim pd = New cloudData(mask(rect), rect, count)
                             dst2(rect).SetTo(pd.color, mask(rect))
                             prepList.Add(pd)
                         End If
@@ -43,14 +41,37 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Next
 
         For Each pd In prepList
-            dst2.Circle(pd.center, task.DotSize, task.highlight, -1)
+            dst2.Circle(pd.maxDist, task.DotSize, task.highlight, -1)
         Next
 
-        cv.Cv2.ImShow("mask", mask)
         labels(2) = CStr(index) + " regions were identified"
     End Sub
 End Class
 
+
+
+
+
+Public Class RedCloud_XY : Inherits TaskParent
+    Dim prep As New RedPrep_Basics
+    Dim stats As New RedCell_Basics
+    Public Sub New()
+        OptionParent.findRadio("XY Reduction").Checked = True
+        labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Build XY RedCloud cells."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+
+        dst2 = runRedC(prep.dst2, labels(2))
+        If standaloneTest() Then
+            stats.Run(src)
+            dst1 = stats.dst3
+            SetTrueText(stats.strOut, 3)
+        End If
+    End Sub
+End Class
 
 
 
@@ -232,29 +253,6 @@ Public Class RedCloud_Z : Inherits TaskParent
         labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build Z RedCloud cells."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(src)
-
-        dst2 = runRedC(prep.dst2, labels(2))
-        stats.Run(src)
-        dst1 = stats.dst3
-        SetTrueText(stats.strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-Public Class RedCloud_XY : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
-    Dim stats As New RedCell_Basics
-    Public Sub New()
-        OptionParent.findRadio("XY Reduction").Checked = True
-        labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Build XY RedCloud cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)

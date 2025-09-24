@@ -71,7 +71,7 @@ End Class
 
 
 Public Class EdgeLine_BasicsList : Inherits TaskParent
-    Public preplist As New List(Of prepData)
+    Public preplist As New List(Of cloudData)
     Public Sub New()
         If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         task.gOptions.DebugSlider.Value = 1
@@ -82,9 +82,9 @@ Public Class EdgeLine_BasicsList : Inherits TaskParent
         dst2 = task.edgeLine.dst2
         labels(2) = task.edgeLine.labels(2)
 
-        Dim sortList As New SortedList(Of Integer, prepData)(New compareAllowIdenticalIntegerInverted)
+        Dim sortList As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalIntegerInverted)
         For Each seg In task.edgeLine.segments
-            Dim nrc = New prepData
+            Dim nrc = New cloudData
             Dim segIndex = sortList.Count + 1
             nrc.rect = task.edgeLine.rectList(segIndex - 1)
             nrc.mask = dst2(nrc.rect).InRange(segIndex, segIndex)
@@ -94,7 +94,7 @@ Public Class EdgeLine_BasicsList : Inherits TaskParent
         Next
 
         Dim prepMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim sortGridID As New SortedList(Of Integer, prepData)(New compareAllowIdenticalInteger)
+        Dim sortGridID As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalInteger)
         Dim duplicatePixels As Integer
         For Each nrc In sortList.Values
             nrc.ID = task.gridMap.Get(Of Integer)(nrc.segment(0).Y, nrc.segment(0).X)
@@ -107,7 +107,7 @@ Public Class EdgeLine_BasicsList : Inherits TaskParent
             sortGridID.Add(nrc.ID, nrc)
         Next
 
-        preplist = New List(Of prepData)(sortGridID.Values)
+        preplist = New List(Of cloudData)(sortGridID.Values)
 
         dst1.SetTo(0)
         For i = 0 To preplist.Count - 1

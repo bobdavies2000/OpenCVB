@@ -12588,3 +12588,50 @@ Public Class XO_RedCloud_BasicsXY : Inherits TaskParent
         labels(2) = cellGen.labels(2)
     End Sub
 End Class
+
+
+
+
+Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
+    Dim redC As New RedCloud_Basics
+    Dim prep As New RedPrep_Basics
+    Public prepList As New List(Of cloudData)
+    Public Sub New()
+        desc = "Floodfill each region of the RedPrep_Basics output."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat Then
+            redC.Run(src)
+            dst2 = redC.dst2
+            dst3 = redC.dst3
+            Exit Sub
+        End If
+
+        prep.Run(src)
+        dst3 = prep.dst2
+
+        Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
+        Dim rect As New cv.Rect
+        Dim index As Integer = 1
+        Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
+        Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
+        prepList.Clear()
+        Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
+        For Each pc In redC.prepList
+            Dim count = cv.Cv2.FloodFill(dst3, mask, pc.maxDist, index, rect, 0, 0, flags)
+            If count >= minCount And count < maxCount Then
+                index += 1
+                Dim pd = New cloudData(mask(rect), rect, count)
+                pd.color = pc.color
+                dst2(rect).SetTo(pc.color, mask(rect))
+                prepList.Add(pd)
+            End If
+        Next
+
+        For Each pd In prepList
+            dst2.Circle(pd.center, task.DotSize, task.highlight, -1)
+        Next
+
+        labels(2) = CStr(index) + " regions were identified"
+    End Sub
+End Class

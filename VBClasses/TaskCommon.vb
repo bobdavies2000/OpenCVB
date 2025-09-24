@@ -571,7 +571,7 @@ End Class
 
 
 
-Public Class prepData
+Public Class cloudData
     Public age As Integer
     Public center As cv.Point
     Public depth As Single
