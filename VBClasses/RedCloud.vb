@@ -31,7 +31,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
                         If count >= minCount And count < maxCount Then
                             dst1.Rectangle(rect, 255, -1)
                             index += 1
-                            Dim pd = New cloudData(mask(rect), rect, count)
+                            Dim pd = New cloudData(mask(rect), rect, count, index)
                             dst2(rect).SetTo(pd.color, mask(rect))
                             pcList.Add(pd)
                         End If
@@ -45,6 +45,65 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Next
 
         labels(2) = CStr(index) + " regions were identified"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_BasicsNew : Inherits TaskParent
+    Dim prep As New RedPrep_Basics
+    Public pcList As New List(Of cloudData)
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Map of reduced point cloud - CV_8U"
+        desc = "Find the biggest chunks of consistent depth data "
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        'prep.Run(src)
+        'dst3 = prep.dst2
+
+        'Dim rect As New cv.Rect
+        'Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
+        'Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
+        'Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
+        'dst1.SetTo(0)
+        'dst2.SetTo(0)
+        'Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
+        'Dim newList As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalIntegerInverted)
+        'Dim index As Integer = 1
+        'For y = 0 To dst3.Height - 1
+        '    For x = 0 To dst3.Width - 1
+        '        Dim pt = New cv.Point(x, y)
+        '        Dim id = dst3.Get(Of Byte)(pt.Y, pt.X)
+        '        If id > 0 Then ' skip the regions with no depth
+        '            Dim rectVal = dst1.Get(Of Byte)(pt.Y, pt.X) ' just flood the good chunks of depth data.
+        '            If rectVal = 0 Then
+        '                Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
+        '                If count >= minCount And count < maxCount Then
+        '                    dst1.Rectangle(rect, index, -1)
+        '                    Dim pc = New cloudData(mask(rect), rect, count, id)
+        '                    dst2(rect).SetTo(pc.color, mask(rect))
+        '                    newList.Add(count, pc)
+        '                    index += 1
+        '                End If
+        '            End If
+        '        End If
+        '    Next
+        'Next
+
+        'pcList.Clear()
+        'For Each pc In newList.Values
+        '    pcList.Add(pc)
+        '    dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+        'Next
+
+        ''Dim pcID = pcList(mask.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X))
+        ''task.color(pcID.rect).SetTo(cv.Scalar.White, pcID.mask)
+
+        'labels(2) = CStr(pcList.Count) + " regions were identified"
     End Sub
 End Class
 
