@@ -1,6 +1,62 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 Public Class RedCloud_Basics : Inherits TaskParent
+    Dim prep As New RedPrep_Basics
+    Public prepList As New List(Of prepData)
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Floodfill each region of the RedPrep_Basics output."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+        dst3 = prep.dst2
+
+        Dim index As Integer = 1
+        Dim rect As New cv.Rect
+        Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
+        Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
+        Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
+        dst0.SetTo(0)
+        dst1.SetTo(0)
+        dst2.SetTo(0)
+        prepList.Clear()
+        Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
+        For y = 0 To dst3.Height - 1
+            For x = 0 To dst3.Width - 1
+                Dim pt = New cv.Point(x, y)
+                Dim val = dst3.Get(Of Byte)(pt.Y, pt.X) ' skip the regions with no depth
+                If val > 0 Then
+                    val = dst1.Get(Of Byte)(pt.Y, pt.X)
+                    If val = 0 Then
+                        Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
+                        If count >= minCount And count < maxCount Then
+                            dst1.Rectangle(rect, 255, -1)
+                            dst0(rect).SetTo(index, mask(rect))
+                            index += 1
+                            Dim pd = New prepData(mask(rect), rect, count)
+                            dst2(rect).SetTo(pd.color, mask(rect))
+                            prepList.Add(pd)
+                        End If
+                    End If
+                End If
+            Next
+        Next
+
+        For Each pd In prepList
+            dst2.Circle(pd.center, task.DotSize, task.highlight, -1)
+        Next
+
+        cv.Cv2.ImShow("mask", mask)
+        labels(2) = CStr(index) + " regions were identified"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_Basics_CPP : Inherits TaskParent
     Dim prep As New RedPrep_Basics
     Dim stats As New RedCell_Basics
     Public Sub New()
@@ -20,163 +76,6 @@ End Class
 
 
 
-
-Public Class RedCloud_BasicsXY : Inherits TaskParent
-    Dim prep As New RedPrep_Depth
-    Dim redMask As New RedMask_Basics
-    Dim cellGen As New RedCell_Generate
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(src)
-        redMask.Run(prep.dst2)
-
-        If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
-        cellGen.mdList = redMask.mdList
-        cellGen.Run(redMask.dst2)
-
-        dst2 = cellGen.dst2
-
-        labels(2) = cellGen.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedCloud_World : Inherits TaskParent
-    Dim world As New Depth_World
-    Dim prep As New RedPrep_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(3) = "Generated pointcloud"
-        desc = "Display the output of a generated pointcloud as RedCloud cells"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        world.Run(src)
-
-        prep.Run(world.dst2)
-
-        dst2 = runRedC(prep.dst2, labels(2))
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class RedCloud_Mats : Inherits TaskParent
-    Dim mats As New Mat_4Click
-    Public Sub New()
-        desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim histogram As New cv.Mat
-
-        For i = 0 To 2
-            Select Case i
-                Case 0 ' X Reduction
-                    dst0 = task.pcSplit(0)
-                Case 1 ' Y Reduction
-                    dst0 = task.pcSplit(1)
-                Case 2 ' Z Reduction
-                    dst0 = task.pcSplit(2)
-            End Select
-
-            Dim mm = GetMinMax(dst0)
-            Dim ranges = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
-            cv.Cv2.CalcHist({dst0}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
-
-            Dim histArray(histogram.Total - 1) As Single
-            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-
-            For j = 0 To histArray.Count - 1
-                histArray(j) = j
-            Next
-
-            histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
-            cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst0, ranges)
-            dst0.ConvertTo(dst1, cv.MatType.CV_8U)
-            mats.mat(i) = ShowPalette(dst1)
-            mats.mat(i).SetTo(0, task.noDepthMask)
-        Next
-
-        mats.Run(emptyMat)
-        dst2 = mats.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedCloud_PrepOutline : Inherits TaskParent
-    Public prep As New RedPrep_Depth
-    Public Sub New()
-        desc = "Remove corners of RedCloud cells in the prep data."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(src)
-        dst2 = prep.dst2.Clone
-
-        Dim val1 As Byte, val2 As Byte
-        For y = 0 To dst2.Height - 2
-            For x = 0 To dst2.Width - 2
-                Dim zipData As Boolean = False
-
-                val1 = dst2.Get(Of Byte)(y, x)
-                val2 = dst2.Get(Of Byte)(y, x + 1)
-                If val1 <> 0 And val2 <> 0 Then If val1 <> val2 Then zipData = True
-
-                val2 = dst2.Get(Of Byte)(y + 1, x)
-                If val1 <> 0 And val2 <> 0 Then If val1 <> val2 Then zipData = True
-
-                If zipData Then
-                    dst2.Set(Of Byte)(y, x, 0)
-                    dst2.Set(Of Byte)(y, x + 1, 0)
-                    dst2.Set(Of Byte)(y + 1, x, 0)
-                    dst2.Set(Of Byte)(y + 1, x + 1, 0)
-                End If
-            Next
-        Next
-
-        dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class RedCloud_Contours : Inherits TaskParent
-    Dim prep As New RedPrep_Depth
-    Public Sub New()
-        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(src)
-        dst3 = prep.dst3
-
-        dst2 = task.contours.dst2
-        labels(2) = task.contours.labels(2)
-    End Sub
-End Class
 
 
 
