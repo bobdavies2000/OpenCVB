@@ -15,11 +15,13 @@ Public Class Contour_Basics : Inherits TaskParent
     End Sub
     Public Shared Function selectContour() As contourData
         Dim tour As New contourData
-        Static pt = task.ClickPoint
-        If task.mouseClickFlag Then pt = task.ClickPoint
-        Dim id = task.contours.contourMap.Get(Of Single)(pt.Y, pt.X)
+        Dim id = task.contours.contourMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        For Each task.contourD In task.contours.contourList
+            If id = task.contourD.ID Then Exit For
+        Next
+
         For Each tour In task.contours.contourList
-            If tour.ID = id Then Exit For
+            If tour.ID = Id Then Exit For
         Next
         task.color(tour.rect).SetTo(cv.Scalar.White, tour.mask)
         Return task.contourD
@@ -1225,6 +1227,7 @@ Public Class Contour_Info : Inherits TaskParent
             dst2 = task.contours.dst2
             labels(2) = task.contours.labels(2)
         End If
+        If task.contours.contourList.Count = 0 Then Exit Sub
         strOut = contourDesc(task.contours.contourMap, task.contours.contourList)
         dst0 = src
         dst0(task.contourD.rect).SetTo(white, task.contourD.mask)

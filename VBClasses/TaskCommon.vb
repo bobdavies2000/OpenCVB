@@ -607,6 +607,7 @@ End Class
 
 
 
+
 Public Class lpData
     Public age As Integer
     Public angle As Single ' varies from -90 to 90 degrees

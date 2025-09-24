@@ -42,6 +42,7 @@ Public Class Hull_Contour : Inherits TaskParent
     Public contours As New Contour_General
     Public hull As New List(Of cv.Point)
     Public Sub New()
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Compare the hull to the contour of a contour cell"
     End Sub

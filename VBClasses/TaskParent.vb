@@ -319,7 +319,7 @@ Public Class TaskParent : Implements IDisposable
             If task.gOptions.ColorSource.SelectedItem() = "EdgeLine_Basics" Then
                 If task.edgeLine Is Nothing Then
                     task.edgeLine = New EdgeLine_Basics
-                    Return New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
+                    task.edgeLine.Run(src)
                 End If
                 Return task.edgeLine.dst2 ' already been run with each frame.
             End If

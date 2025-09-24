@@ -3,7 +3,7 @@ Public Class FeatureLess_Basics : Inherits TaskParent
     Dim contours As New Contour_Basics_List
     Dim edges As New EdgeLine_Basics
     Public Sub New()
-        desc = "Use Contour_Basics to get the contour data for the top X contours."
+        desc = "Use Contour_Basics to get the contour data for the top contours by size."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_8U Then
