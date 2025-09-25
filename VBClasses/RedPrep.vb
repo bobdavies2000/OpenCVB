@@ -1,5 +1,6 @@
-﻿Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
+Imports System.Windows.Forms.VisualStyles
+Imports cv = OpenCvSharp
 Public Class RedPrep_Basics : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public options As New Options_RedCloud
@@ -199,7 +200,7 @@ End Class
 
 
 
-Public Class RedPrep_Edges : Inherits TaskParent
+Public Class RedPrep_DepthEdges : Inherits TaskParent
     Dim prep As New RedPrep_Depth
     Dim edges As New Edge_Basics
     Public Sub New()
@@ -236,5 +237,71 @@ Public Class RedPrep_DepthTiers : Inherits TaskParent
         dst1 += tiers.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         dst2 = ShowPalette(dst1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedPrep_EdgeMask : Inherits TaskParent
+    Dim prep As New RedPrep_Basics
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Get the edges in the RedPrep_Basics output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+        dst2 = prep.dst2
+        labels(2) = prep.labels(2)
+
+        dst3.SetTo(0)
+        For y = 1 To dst2.Height - 2
+            For x = 1 To dst2.Width - 2
+                Dim pix1 = dst2.Get(Of Byte)(y, x)
+                Dim pix2 = dst2.Get(Of Byte)(y, x + 1)
+                If pix1 <> 0 And pix2 <> 0 And pix1 <> pix2 Then dst3.Set(Of Byte)(y, x, 255)
+
+                pix2 = dst2.Get(Of Byte)(y + 1, x)
+                If pix1 <> 0 And pix2 <> 0 And pix1 <> pix2 Then dst3.Set(Of Byte)(y, x, 255)
+
+                pix2 = dst2.Get(Of Byte)(y + 1, x + 1)
+                If pix1 <> 0 And pix2 <> 0 And pix1 <> pix2 Then dst3.Set(Of Byte)(y, x, 255)
+            Next
+        Next
+
+        dst2.SetTo(0, dst3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedPrep_Edges_CPP : Inherits TaskParent
+    Dim prep As New RedPrep_Basics
+    Public Sub New()
+        cPtr = RedPrep_CPP_Open()
+        desc = "Isolate each depth region"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prep.Run(src)
+        dst2 = prep.dst2
+        labels(2) = prep.labels(2)
+
+        Dim cppData(dst2.Total - 1) As Byte
+        Marshal.Copy(dst2.Data, cppData, 0, cppData.Length - 1)
+        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+        Dim imagePtr = RedPrep_CPP_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst2.Rows, dst2.Cols)
+        handleSrc.Free()
+
+        dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+        dst2.SetTo(0, dst3)
+    End Sub
+    Public Sub Close()
+        RedPrep_CPP_Close(cPtr)
     End Sub
 End Class

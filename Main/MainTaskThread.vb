@@ -171,6 +171,10 @@ Namespace OpenCVB
                         If waitForCamera() Then Exit While
                     End While
 
+                    ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
+                    ' Each image will represent the one just finished by the algorithm.
+                    If task.debugSyncUI Then Thread.Sleep(3000)
+
                     ' exit the outer while if any of these change.
                     If cameraTaskHandle Is Nothing Or cameraShutdown Then Exit While
                     If saveworkRes <> settings.workRes Then Exit While
@@ -258,9 +262,7 @@ Namespace OpenCVB
                     Dim ptCursor = New cv.Point(mouseMovePoint.X / ratio, mouseMovePoint.Y / ratio)
                     SyncLock trueTextLock
                         trueData.Clear()
-                        If task.trueData.Count Then
-                            trueData = New List(Of VBClasses.TrueText)(task.trueData)
-                        End If
+                        If task.trueData.Count Then trueData = New List(Of VBClasses.TrueText)(task.trueData)
                         task.trueData.Clear()
                     End SyncLock
 
@@ -269,9 +271,6 @@ Namespace OpenCVB
 
                     task.mouseClickFlag = False
                     frameCount = task.frameCount
-                    ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
-                    ' Each image will represent the one just finished by the algorithm.
-                    If task.debugSyncUI Then Thread.Sleep(100)
                     If task.closeRequest Then
                         cameraShutdown = True
                         Exit While

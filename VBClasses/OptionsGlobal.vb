@@ -245,9 +245,6 @@ Public Class OptionsGlobal
         task.optionsChanged = True
         DepthDiffLabel.Text = CStr(DepthDiffSlider.Value)
     End Sub
-    Private Sub debugSyncUI_CheckedChanged(sender As Object, e As EventArgs) Handles debugSyncUI.CheckedChanged
-        task.optionsChanged = True
-    End Sub
     Private Sub useCloudHistory_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub

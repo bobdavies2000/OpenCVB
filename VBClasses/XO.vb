@@ -12634,3 +12634,26 @@ Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
         labels(2) = CStr(index) + " regions were identified"
     End Sub
 End Class
+
+
+
+
+
+
+Public Class XO_RedCloud_Basics_CPP : Inherits TaskParent
+    Dim prep As New RedPrep_Basics
+    Dim stats As New RedCell_Basics
+    Public Sub New()
+        OptionParent.findRadio("XY Reduction").Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(prep.dst2, labels(2))
+        If standaloneTest() Then
+            stats.Run(src)
+            dst1 = stats.dst3
+            SetTrueText(stats.strOut, 3)
+        End If
+    End Sub
+End Class

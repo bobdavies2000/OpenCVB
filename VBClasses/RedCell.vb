@@ -4,7 +4,6 @@ Public Class RedCell_Basics : Inherits TaskParent
     Public runRedCloud As Boolean
     Public Sub New()
         If standalone Then task.gOptions.setHistogramBins(20)
-        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString()
@@ -46,7 +45,7 @@ Public Class RedCell_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Or runRedCloud Then dst2 = runRedOld(src, labels(2))
         statsString()
-        SetTrueText(strOut, 1)
+        SetTrueText(strOut, 3)
         labels(3) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.MaxZmeters)) + " meters"
     End Sub
 End Class
