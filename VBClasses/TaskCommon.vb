@@ -575,11 +575,10 @@ Public Class cloudData
     Public age As Integer
     Public center As cv.Point
     Public depth As Single
-    Public ID As Integer
+    Public index As Integer
     Public mask As cv.Mat
     Public maxDist As cv.Point
     Public pixels As Integer
-    Public color As cv.Scalar
     Public rect As cv.Rect
     Public Sub New()
     End Sub
@@ -591,15 +590,14 @@ Public Class cloudData
         mm.maxLoc.Y += rect.Y
         Return mm.maxLoc
     End Function
-    Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _pixels As Integer, _id As Integer)
+    Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _pixels As Integer, _index As Integer)
         mask = _mask.Clone
         rect = _rect
         pixels = _pixels
         age = 1
         maxDist = getMaxDist(mask, rect)
-        ID = _id
+        index = _index
         depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
-        color = task.scalarColors(ID Mod 255)
         center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
     End Sub
 End Class

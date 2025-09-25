@@ -12622,8 +12622,7 @@ Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
             If count >= minCount And count < maxCount Then
                 index += 1
                 Dim pd = New cloudData(mask(rect), rect, count, index)
-                pd.color = pc.color
-                dst2(rect).SetTo(pc.color, mask(rect))
+                dst2(rect).SetTo(task.scalarColors(index), mask(rect))
                 pcList.Add(pd)
             End If
         Next
