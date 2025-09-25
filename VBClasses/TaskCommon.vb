@@ -575,6 +575,7 @@ Public Class cloudData
     Public age As Integer
     Public center As cv.Point
     Public depth As Single
+    Public id As Integer
     Public index As Integer
     Public mask As cv.Mat
     Public maxDist As cv.Point
@@ -590,13 +591,14 @@ Public Class cloudData
         mm.maxLoc.Y += rect.Y
         Return mm.maxLoc
     End Function
-    Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _pixels As Integer, _index As Integer)
+    Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _pixels As Integer)
         mask = _mask.Clone
         rect = _rect
         pixels = _pixels
         age = 1
         maxDist = getMaxDist(mask, rect)
-        index = _index
+        id = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
+
         depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
         center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
     End Sub

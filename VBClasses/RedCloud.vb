@@ -2,8 +2,8 @@
 Public Class RedCloud_Basics : Inherits TaskParent
     Dim prep As New RedPrep_Basics
     Public pcList As New List(Of cloudData)
-    Public pcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Map of reduced point cloud - CV_8U"
         desc = "Find the biggest chunks of consistent depth data "
@@ -17,46 +17,44 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
         Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
-        dst1.SetTo(0)
-        dst2.SetTo(0)
+        dst0.SetTo(0)
         Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
-        Dim newList As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalIntegerInverted)
+        Dim newList As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalInteger)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
                 Dim pt = New cv.Point(x, y)
-                ' skip the regions with no depth
+                ' skip the regions with no depth 
                 If dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
                     ' skip flooding near good chunks of depth data.
-                    If dst1.Get(Of Byte)(pt.Y, pt.X) = 0 Then
+                    If dst0.Get(Of Byte)(pt.Y, pt.X) = 0 Then
                         Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                         If count >= minCount And count < maxCount Then
-                            dst1.Rectangle(rect, index, -1)
-                            Dim pc = New cloudData(mask(rect), rect, count, index)
-                            dst2(rect).SetTo(task.scalarColors(index), mask(rect))
+                            Dim r = ValidateRect(New cv.Rect(rect.X + 1, rect.Y + 1, rect.Width, rect.Height))
+                            Dim pc = New cloudData(mask(r), r, count)
+                            dst0.Rectangle(r, 255, -1)
                             index += 1
-                            newList.Add(task.gridMap.Get(Of Integer)(pc.maxDist.Y, pc.maxDist.X), pc)
+                            newList.Add(pc.id, pc)
                         End If
                     End If
                 End If
             Next
         Next
-        labels(2) = CStr(index) + " regions were identified"
 
         pcList.Clear()
-        For Each ele In newList
-            Dim pc = ele.Value
+        dst1.SetTo(0)
+        For Each pc In newList.Values
             pc.index = pcList.Count + 1
-            pcMap(pc.rect).SetTo(pc.index, pc.mask)
             pcList.Add(pc)
-            'dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
-
-
-            SetTrueText(CStr(pc.index), New cv.Point(pc.rect.X, pc.rect.Y))
-
+            dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
+            SetTrueText(CStr(pc.index) + ", " + CStr(pc.id), New cv.Point(pc.rect.X, pc.rect.Y))
         Next
+        dst2 = ShowPalette254(dst1)
 
-        index = pcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
-        If index > 0 Then task.color(pcList(index - 1).rect).SetTo(white, pcList(index - 1).mask)
+        Dim clickIndex = dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+        If clickIndex > 0 Then
+            If clickIndex < pcList.Count Then task.color(pcList(clickIndex - 1).rect).SetTo(white, pcList(clickIndex - 1).mask)
+        End If
+        labels(2) = CStr(newList.Count) + " regions were identified. Region " + CStr(clickIndex) + " was selected."
     End Sub
 End Class
 
@@ -73,8 +71,6 @@ Public Class RedCloud_XY : Inherits TaskParent
         desc = "Build XY RedCloud cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(src)
-
         dst2 = runRedC(prep.dst2, labels(2))
         If standaloneTest() Then
             Static stats As New RedCell_Basics

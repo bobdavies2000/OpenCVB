@@ -12621,7 +12621,7 @@ Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
             Dim count = cv.Cv2.FloodFill(dst3, mask, pc.maxDist, index, rect, 0, 0, flags)
             If count >= minCount And count < maxCount Then
                 index += 1
-                Dim pd = New cloudData(mask(rect), rect, count, index)
+                Dim pd = New cloudData(mask(rect), rect, count)
                 dst2(rect).SetTo(task.scalarColors(index), mask(rect))
                 pcList.Add(pd)
             End If
