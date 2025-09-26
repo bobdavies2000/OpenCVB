@@ -1,16 +1,15 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
-    Dim prepEdges As New RedPrep_EdgeMask
+    Dim prepEdges As New RedPrep_BasicsNew
     Public pcList As New List(Of cloudData)
     Public Sub New()
-        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Map of reduced point cloud - CV_8U"
         desc = "Find the biggest chunks of consistent depth data "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         prepEdges.Run(src)
-        dst3 = prepEdges.dst2
+        dst3 = Not prepEdges.dst2
 
         Dim index As Integer = 1
         Dim rect As New cv.Rect
@@ -28,7 +27,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
                     ' skip flooding near good chunks of depth data.
                     If maskUsed.Get(Of Byte)(pt.Y, pt.X) = 0 Then
                         Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
-                        Dim r = ValidateRect(New cv.Rect(rect.X + 1, rect.Y + 1, rect.Width, rect.Height))
+                        Dim r = New cv.Rect(rect.X + 1, rect.Y + 1, rect.Width - 1, rect.Height - 1)
                         maskUsed.Rectangle(r, 255, -1)
                         If count >= minCount And count < maxCount Then
                             Dim pc = New cloudData(mask(r), r, count)
@@ -53,6 +52,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Dim clickIndex = dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
         If clickIndex > 0 And clickIndex < pcList.Count Then
             task.color(pcList(clickIndex - 1).rect).SetTo(white, pcList(clickIndex - 1).mask)
+            task.color.Rectangle(pcList(clickIndex - 1).rect, white, task.lineWidth, task.lineType)
         End If
         labels(2) = CStr(newList.Count) + " regions were identified. Region " + CStr(clickIndex) + " was selected."
     End Sub

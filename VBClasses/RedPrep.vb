@@ -1,5 +1,4 @@
 ﻿Imports System.Runtime.InteropServices
-Imports System.Windows.Forms.VisualStyles
 Imports cv = OpenCvSharp
 Public Class RedPrep_Basics : Inherits TaskParent
     Dim plot As New Plot_Histogram
@@ -19,19 +18,19 @@ Public Class RedPrep_Basics : Inherits TaskParent
 
         Select Case task.reductionName
             Case "X Reduction"
-                dst0 = (split(0) * reduceAmt).ToMat
-            Case "Y Reduction"
-                dst0 = (split(1) * reduceAmt).ToMat
-            Case "Z Reduction"
-                dst0 = (split(2) * reduceAmt).ToMat
+                dst0 = split(0) * reduceAmt
+            Case "Y Redction"
+                dst0 = split(1) * reduceAmt
+            Case "Z Redction"
+                dst0 = split(2) * reduceAmt
             Case "XY Reduction"
-                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt).ToMat
+                dst0 = split(0) * reduceAmt + split(1) * reduceAmt
             Case "XZ Reduction"
-                dst0 = (split(0) * reduceAmt + split(2) * reduceAmt).ToMat
+                dst0 = split(0) * reduceAmt + split(2) * reduceAmt
             Case "YZ Reduction"
-                dst0 = (split(1) * reduceAmt + split(2) * reduceAmt).ToMat
+                dst0 = split(1) * reduceAmt + split(2) * reduceAmt
             Case "XYZ Reduction"
-                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt).ToMat
+                dst0 = split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt
         End Select
 
         Dim mm As mmData = GetMinMax(dst0)
@@ -288,9 +287,13 @@ Public Class RedPrep_Edges_CPP : Inherits TaskParent
         desc = "Isolate each depth region"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(src)
-        dst2 = prep.dst2
-        labels(2) = prep.labels(2)
+        If standalone Then
+            prep.Run(src)
+            dst2 = prep.dst2
+            labels(2) = prep.labels(2)
+        Else
+            dst2 = src
+        End If
 
         Dim cppData(dst2.Total - 1) As Byte
         Marshal.Copy(dst2.Data, cppData, 0, cppData.Length - 1)
@@ -299,9 +302,59 @@ Public Class RedPrep_Edges_CPP : Inherits TaskParent
         handleSrc.Free()
 
         dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+        dst3.SetTo(255, task.noDepthMask)
         dst2.SetTo(0, dst3)
     End Sub
     Public Sub Close()
         RedPrep_CPP_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedPrep_BasicsNew : Inherits TaskParent
+    Dim prepEdges As New RedPrep_Edges_CPP
+    Public options As New Options_RedCloud
+    Dim reduceAmt As Integer
+    Public Sub New()
+        desc = "Reduction transform for the point cloud"
+    End Sub
+    Private Function reduceChan(chan As cv.Mat) As cv.Mat
+        chan = chan * reduceAmt
+        Dim mm As mmData = GetMinMax(chan)
+        Dim dst32f As New cv.Mat
+        If Math.Abs(mm.minVal) > mm.maxVal Then
+            mm.minVal = -mm.maxVal
+            chan.ConvertTo(dst32f, cv.MatType.CV_32F)
+            Dim mask = dst32f.Threshold(mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
+            mask.ConvertTo(mask, cv.MatType.CV_8U)
+            dst32f.SetTo(mm.minVal, mask)
+        End If
+        chan = (chan - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+        chan.ConvertTo(chan, cv.MatType.CV_8U)
+        chan.SetTo(0, task.noDepthMask)
+        Return chan
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        Dim pc32S As New cv.Mat
+        reduceAmt = options.reductionTarget
+        task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / reduceAmt)
+        Dim split = pc32S.Split()
+
+        prepEdges.Run(reduceChan(split(0) * reduceAmt))
+        dst2 = prepEdges.dst3
+
+        prepEdges.Run(reduceChan(split(1) * reduceAmt))
+        dst2 = dst2 Or prepEdges.dst3
+
+        prepEdges.Run(reduceChan(split(2) * reduceAmt))
+        dst2 = dst2 Or prepEdges.dst3
+
+        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, task.lineWidth)
+        labels(2) = "Using reduction factor = " + CStr(reduceAmt)
     End Sub
 End Class

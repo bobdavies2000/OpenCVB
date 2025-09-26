@@ -7936,7 +7936,7 @@ End Class
 Public Class Options_RedCloud : Inherits OptionParent
     Public reductionTarget As Integer ' how many classes will there be in the resulting reduced cloud data.
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Reduction Target", 1, 255, 200)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Reduction Target", 1, 1000, 200)
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
             radio.addRadio("X Reduction")

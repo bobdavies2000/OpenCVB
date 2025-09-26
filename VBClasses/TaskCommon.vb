@@ -599,10 +599,10 @@ Public Class cloudData
         maxDist = getMaxDist(mask, rect)
         id = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
 
-        Dim tmp = New cv.Mat(mask.Size, cv.MatType.CV_32F, 0)
-        task.pcSplit(2)(rect).CopyTo(tmp, mask)
-        depth = tmp.Mean(task.depthMask(rect))(0)
-        ' depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
+        'Dim tmp = New cv.Mat(mask.Size, cv.MatType.CV_32F, 0)
+        'task.pcSplit(2)(rect).CopyTo(tmp, mask)
+        'depth = tmp.Mean(task.depthMask(rect))(0)
+        depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
         center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
     End Sub
 End Class
