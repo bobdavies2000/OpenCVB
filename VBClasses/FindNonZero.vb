@@ -1,5 +1,4 @@
 ﻿Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class FindNonZero_Basics : Inherits TaskParent
     Public ptMat As cv.Mat

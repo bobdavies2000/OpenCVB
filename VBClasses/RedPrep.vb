@@ -1,66 +1,46 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class RedPrep_Basics : Inherits TaskParent
-    Dim plot As New Plot_Histogram
+    Dim prepEdges As New RedPrep_Edges_CPP
     Public options As New Options_RedCloud
+    Dim reduceAmt As Integer
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Reduction transform for the point cloud"
     End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
-        Dim reduceAmt = options.reductionTarget
-        task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
-        task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
-        task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
-
-        Select Case task.reductionName
-            Case "X Reduction"
-                dst0 = split(0) * reduceAmt
-            Case "Y Redction"
-                dst0 = split(1) * reduceAmt
-            Case "Z Redction"
-                dst0 = split(2) * reduceAmt
-            Case "XY Reduction"
-                dst0 = split(0) * reduceAmt + split(1) * reduceAmt
-            Case "XZ Reduction"
-                dst0 = split(0) * reduceAmt + split(2) * reduceAmt
-            Case "YZ Reduction"
-                dst0 = split(1) * reduceAmt + split(2) * reduceAmt
-            Case "XYZ Reduction"
-                dst0 = split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt
-        End Select
-
-        Dim mm As mmData = GetMinMax(dst0)
+    Private Function reduceChan(chan As cv.Mat) As cv.Mat
+        chan = chan * reduceAmt
+        Dim mm As mmData = GetMinMax(chan)
         Dim dst32f As New cv.Mat
         If Math.Abs(mm.minVal) > mm.maxVal Then
             mm.minVal = -mm.maxVal
-            dst0.ConvertTo(dst32f, cv.MatType.CV_32F)
+            chan.ConvertTo(dst32f, cv.MatType.CV_32F)
             Dim mask = dst32f.Threshold(mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
             mask.ConvertTo(mask, cv.MatType.CV_8U)
             dst32f.SetTo(mm.minVal, mask)
         End If
-        dst2 = (dst0 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        chan = (chan - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+        chan.ConvertTo(chan, cv.MatType.CV_8U)
+        chan.SetTo(0, task.noDepthMask)
+        Return chan
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
 
-        dst2.SetTo(0, task.noDepthMask)
+        Dim pc32S As New cv.Mat
+        reduceAmt = options.reductionTarget
+        task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / reduceAmt)
+        Dim split = pc32S.Split()
 
-        If standaloneTest() Then
-            mm = GetMinMax(dst2)
-            plot.createHistogram = True
-            plot.removeZeroEntry = False
-            plot.maxRange = mm.maxVal
-            plot.Run(dst2)
-            dst1 = plot.dst2
+        prepEdges.Run(reduceChan(split(0) * reduceAmt))
+        dst2 = prepEdges.dst3
 
-            For i = 0 To plot.histArray.Count - 1
-                plot.histArray(i) = i
-            Next
-        End If
-        dst3 = ShowPalette254(dst2)
+        prepEdges.Run(reduceChan(split(1) * reduceAmt))
+        dst2 = dst2 Or prepEdges.dst3
 
+        prepEdges.Run(reduceChan(split(2) * reduceAmt))
+        dst2 = dst2 Or prepEdges.dst3
+
+        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, task.lineWidth)
         labels(2) = "Using reduction factor = " + CStr(reduceAmt)
     End Sub
 End Class
@@ -242,13 +222,80 @@ End Class
 
 
 
+Public Class RedPrep_ReductionChoices : Inherits TaskParent
+    Dim plot As New Plot_Histogram
+    Public options As New Options_RedCloud
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Reduction transform for the point cloud"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
+        Dim reduceAmt = options.reductionTarget
+        task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
+        task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
+        task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
+
+        Select Case task.reductionName
+            Case "X Reduction"
+                dst0 = split(0) * reduceAmt
+            Case "Y Redction"
+                dst0 = split(1) * reduceAmt
+            Case "Z Redction"
+                dst0 = split(2) * reduceAmt
+            Case "XY Reduction"
+                dst0 = split(0) * reduceAmt + split(1) * reduceAmt
+            Case "XZ Reduction"
+                dst0 = split(0) * reduceAmt + split(2) * reduceAmt
+            Case "YZ Reduction"
+                dst0 = split(1) * reduceAmt + split(2) * reduceAmt
+            Case "XYZ Reduction"
+                dst0 = split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt
+        End Select
+
+        Dim mm As mmData = GetMinMax(dst0)
+        Dim dst32f As New cv.Mat
+        If Math.Abs(mm.minVal) > mm.maxVal Then
+            mm.minVal = -mm.maxVal
+            dst0.ConvertTo(dst32f, cv.MatType.CV_32F)
+            Dim mask = dst32f.Threshold(mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
+            mask.ConvertTo(mask, cv.MatType.CV_8U)
+            dst32f.SetTo(mm.minVal, mask)
+        End If
+        dst2 = (dst0 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        dst2.SetTo(0, task.noDepthMask)
+
+        If standaloneTest() Then
+            mm = GetMinMax(dst2)
+            plot.createHistogram = True
+            plot.removeZeroEntry = False
+            plot.maxRange = mm.maxVal
+            plot.Run(dst2)
+            dst1 = plot.dst2
+
+            For i = 0 To plot.histArray.Count - 1
+                plot.histArray(i) = i
+            Next
+        End If
+        dst3 = ShowPalette254(dst2)
+
+        labels(2) = "Using reduction factor = " + CStr(reduceAmt)
+    End Sub
+End Class
+
+
+
 
 
 Public Class RedPrep_EdgeMask : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
+    Dim prep As New RedPrep_ReductionChoices
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Get the edges in the RedPrep_Basics output"
+        desc = "Get the edges in the RedPrep_ReductionChoices output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)
@@ -281,7 +328,7 @@ End Class
 
 
 Public Class RedPrep_Edges_CPP : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
+    Dim prep As New RedPrep_ReductionChoices
     Public Sub New()
         cPtr = RedPrep_CPP_Open()
         desc = "Isolate each depth region"
@@ -307,54 +354,5 @@ Public Class RedPrep_Edges_CPP : Inherits TaskParent
     End Sub
     Public Sub Close()
         RedPrep_CPP_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-Public Class RedPrep_BasicsNew : Inherits TaskParent
-    Dim prepEdges As New RedPrep_Edges_CPP
-    Public options As New Options_RedCloud
-    Dim reduceAmt As Integer
-    Public Sub New()
-        desc = "Reduction transform for the point cloud"
-    End Sub
-    Private Function reduceChan(chan As cv.Mat) As cv.Mat
-        chan = chan * reduceAmt
-        Dim mm As mmData = GetMinMax(chan)
-        Dim dst32f As New cv.Mat
-        If Math.Abs(mm.minVal) > mm.maxVal Then
-            mm.minVal = -mm.maxVal
-            chan.ConvertTo(dst32f, cv.MatType.CV_32F)
-            Dim mask = dst32f.Threshold(mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
-            mask.ConvertTo(mask, cv.MatType.CV_8U)
-            dst32f.SetTo(mm.minVal, mask)
-        End If
-        chan = (chan - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
-        chan.ConvertTo(chan, cv.MatType.CV_8U)
-        chan.SetTo(0, task.noDepthMask)
-        Return chan
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        Dim pc32S As New cv.Mat
-        reduceAmt = options.reductionTarget
-        task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / reduceAmt)
-        Dim split = pc32S.Split()
-
-        prepEdges.Run(reduceChan(split(0) * reduceAmt))
-        dst2 = prepEdges.dst3
-
-        prepEdges.Run(reduceChan(split(1) * reduceAmt))
-        dst2 = dst2 Or prepEdges.dst3
-
-        prepEdges.Run(reduceChan(split(2) * reduceAmt))
-        dst2 = dst2 Or prepEdges.dst3
-
-        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, task.lineWidth)
-        labels(2) = "Using reduction factor = " + CStr(reduceAmt)
     End Sub
 End Class

@@ -1,5 +1,4 @@
-﻿Imports OpenCvSharp
-Imports SharpGL
+﻿Imports SharpGL
 Imports cv = OpenCvSharp
 Public Class sgl
     Dim gl As OpenGL

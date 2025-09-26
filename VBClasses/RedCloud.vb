@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
-    Dim prepEdges As New RedPrep_BasicsNew
+    Dim prepEdges As New RedPrep_Basics
     Public pcList As New List(Of cloudData)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -64,7 +64,7 @@ End Class
 
 
 Public Class RedCloud_XY : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
+    Dim prep As New RedPrep_ReductionChoices
     Public Sub New()
         OptionParent.findRadio("XY Reduction").Checked = True
         labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
@@ -91,7 +91,7 @@ End Class
 
 
 Public Class RedCloud_XYZ : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
+    Dim prep As New RedPrep_ReductionChoices
     Public redMask As New RedMask_Basics
     Dim rcMask As cv.Mat
     Public Sub New()
@@ -137,7 +137,7 @@ End Class
 
 
 Public Class RedCloud_YZ : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
+    Dim prep As New RedPrep_ReductionChoices
     Dim stats As New RedCell_Basics
     Public Sub New()
         OptionParent.findRadio("YZ Reduction").Checked = True
@@ -162,7 +162,7 @@ End Class
 
 
 Public Class RedCloud_XZ : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
+    Dim prep As New RedPrep_ReductionChoices
     Dim stats As New RedCell_Basics
     Public Sub New()
         OptionParent.findRadio("XZ Reduction").Checked = True
@@ -186,7 +186,7 @@ End Class
 
 
 Public Class RedCloud_X : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
+    Dim prep As New RedPrep_ReductionChoices
     Dim stats As New RedCell_Basics
     Public Sub New()
         OptionParent.findRadio("X Reduction").Checked = True
@@ -210,7 +210,7 @@ End Class
 
 
 Public Class RedCloud_Y : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
+    Dim prep As New RedPrep_ReductionChoices
     Dim stats As New RedCell_Basics
     Public Sub New()
         OptionParent.findRadio("Y Reduction").Checked = True
@@ -233,7 +233,7 @@ End Class
 
 
 Public Class RedCloud_Z : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
+    Dim prep As New RedPrep_ReductionChoices
     Dim stats As New RedCell_Basics
     Public Sub New()
         OptionParent.findRadio("Z Reduction").Checked = True

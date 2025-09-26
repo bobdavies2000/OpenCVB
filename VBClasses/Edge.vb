@@ -1462,10 +1462,10 @@ End Class
 
 
 Public Class Edge_cloudData : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
+    Dim prep As New RedPrep_ReductionChoices
     Dim edges As New Edge_Basics
     Public Sub New()
-        desc = "Find the lines in the RedPrep_Basics output"
+        desc = "Find the lines in the RedPrep_ReductionChoices output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)

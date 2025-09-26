@@ -1,8 +1,4 @@
-﻿Imports System.ComponentModel.Design.ObjectSelectorEditor
-Imports System.Diagnostics.Metrics
-Imports System.Runtime.InteropServices
-Imports System.Runtime.InteropServices.JavaScript.JSType
-Imports OpenCvSharp
+﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Line3D_Basics : Inherits TaskParent
     Public lines3D As New List(Of cv.Point3f)

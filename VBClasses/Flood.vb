@@ -1,4 +1,3 @@
-Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits TaskParent
     Public Sub New()
@@ -198,10 +197,10 @@ End Class
 
 
 Public Class Flood_Minimal : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
+    Dim prep As New RedPrep_ReductionChoices
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels(2) = "Output is from RedPrep_Basics. Click any region to floodfill it."
+        labels(2) = "Output is from RedPrep_ReductionChoices. Click any region to floodfill it."
         labels(3) = "Mask resulting region selected by the click."
         desc = "Floodfill the selected segment of the RedPrep image."
     End Sub
@@ -229,11 +228,11 @@ Public Class Flood_CloudData : Inherits TaskParent
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Floodfill each region of the RedPrep_Basics output."
+        desc = "Floodfill each region of the RedPrep_ReductionChoices output."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static prep As New RedPrep_BasicsNew
+            Static prep As New RedPrep_Basics
             prep.Run(src)
             src = Not prep.dst2
         End If
