@@ -1,10 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
-    Dim prepEdges As New RedPrep_Basics
+    Public prepEdges As New RedPrep_Basics
     Public pcList As New List(Of cloudData)
     Public Sub New()
+        task.redCNew = Me
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Map of reduced point cloud - CV_8U"
+        labels(3) = "Reduced point cloud - use 'Reduction Target' option to increase/decrease cell sizes."
         desc = "Find the biggest chunks of consistent depth data "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -16,7 +17,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
         Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
-        Dim maskUsed As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
         Dim newList As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalInteger)
         For y = 1 To dst3.Height - 2
@@ -25,12 +25,12 @@ Public Class RedCloud_Basics : Inherits TaskParent
                 ' skip the regions with no depth 
                 If dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
                     ' skip flooding near good chunks of depth data.
-                    If maskUsed.Get(Of Byte)(pt.Y, pt.X) = 0 Then
-                        Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
-                        Dim r = New cv.Rect(rect.X + 1, rect.Y + 1, rect.Width - 1, rect.Height - 1)
-                        maskUsed.Rectangle(r, 255, -1)
+                    Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
+                    If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount And count < maxCount Then
-                            Dim pc = New cloudData(mask(r), r, count)
+                            Dim r = New cv.Rect(rect.X + 1, rect.Y + 1, rect.Width - 1, rect.Height - 1)
+                            dst3(rect).SetTo(0, mask(rect))
+                            Dim pc = New cloudData(mask(rect), rect, count)
                             index += 1
                             newList.Add(pc.id, pc)
                         End If
@@ -43,18 +43,21 @@ Public Class RedCloud_Basics : Inherits TaskParent
         dst1.SetTo(0)
         For Each pc In newList.Values
             pc.index = pcList.Count + 1
-            pcList.Add(pc)
+            Dim tmp = dst1(pc.rect)
+            pc.mask.SetTo(0, tmp)
             dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
-            SetTrueText(CStr(pc.index) + ", " + CStr(pc.id), New cv.Point(pc.rect.X, pc.rect.Y))
+            SetTrueText(CStr(pc.index), New cv.Point(pc.rect.X, pc.rect.Y))
+            pcList.Add(pc)
         Next
+
         dst2 = ShowPalette254(dst1)
 
-        Dim clickIndex = dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
-        If clickIndex > 0 And clickIndex < pcList.Count Then
-            task.color(pcList(clickIndex - 1).rect).SetTo(white, pcList(clickIndex - 1).mask)
-            task.color.Rectangle(pcList(clickIndex - 1).rect, white, task.lineWidth, task.lineType)
-        End If
-        labels(2) = CStr(newList.Count) + " regions were identified. Region " + CStr(clickIndex) + " was selected."
+        For Each pc In pcList
+            dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+        Next
+
+        RedCell_PCBasics.displayCell()
+        labels(2) = CStr(newList.Count) + " regions were identified."
     End Sub
 End Class
 
@@ -79,12 +82,6 @@ Public Class RedCloud_XY : Inherits TaskParent
         End If
     End Sub
 End Class
-
-
-
-
-
-
 
 
 
@@ -254,63 +251,14 @@ End Class
 
 
 
-Public Class RedCloud_BasicsNew : Inherits TaskParent
-    Dim prepEdges As New RedPrep_Edges_CPP
-    Public pcList As New List(Of cloudData)
+
+Public Class RedCloud_Contours : Inherits TaskParent
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Map of reduced point cloud - CV_8U"
-        desc = "Find the biggest chunks of consistent depth data "
+        desc = "Build contours for each cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        prepEdges.Run(src)
-        dst3 = prepEdges.dst2
+        'dst2 = runRedC(prep.dst2, labels(2))
 
-        Dim index As Integer = 1
-        Dim rect As New cv.Rect
-        Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
-        Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
-        Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
-        Dim maskUsed As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
-        Dim newList As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalInteger)
-        For y = 0 To dst3.Height - 1
-            For x = 0 To dst3.Width - 1
-                Dim pt = New cv.Point(x, y)
-                ' skip the regions with no depth 
-                If dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
-                    ' skip flooding near good chunks of depth data.
-                    If maskUsed.Get(Of Byte)(pt.Y, pt.X) = 0 Then
-                        Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
-                        Dim r = ValidateRect(New cv.Rect(rect.X + 1, rect.Y + 1, rect.Width, rect.Height))
-                        maskUsed.Rectangle(r, 255, -1)
-                        If count >= minCount And count < maxCount Then
-                            Dim pc = New cloudData(mask(r), r, count)
-                            index += 1
-                            newList.Add(pc.id, pc)
-                        End If
-                    End If
-                End If
-            Next
-        Next
-
-        pcList.Clear()
-        dst1.SetTo(0)
-        For Each pc In newList.Values
-            pc.index = pcList.Count + 1
-            pcList.Add(pc)
-            dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
-            SetTrueText(CStr(pc.index) + ", " + CStr(pc.id), New cv.Point(pc.rect.X, pc.rect.Y))
-        Next
-        dst2 = ShowPalette254(dst1)
-
-        Dim clickIndex = dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
-        If clickIndex > 0 And clickIndex < pcList.Count Then
-            task.color(pcList(clickIndex - 1).rect).SetTo(white, pcList(clickIndex - 1).mask)
-            maskUsed.SetTo(0)
-            maskUsed(pcList(clickIndex - 1).rect).SetTo(255, pcList(clickIndex - 1).mask)
-        End If
-        labels(2) = CStr(newList.Count) + " regions were identified. Region " + CStr(clickIndex) + " was selected."
+        'contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
     End Sub
 End Class
-

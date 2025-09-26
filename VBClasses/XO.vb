@@ -12719,3 +12719,51 @@ Public Class XO_RedCloud_Basics : Inherits TaskParent
         labels(2) = CStr(newList.Count) + " regions were identified. Region " + CStr(clickIndex) + " was selected."
     End Sub
 End Class
+
+
+
+
+
+Public Class XO_Flood_CloudData : Inherits TaskParent
+    Public Sub New()
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Floodfill each region of the RedPrep_Basics output."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            Static prep As New RedPrep_Basics
+            prep.Run(src)
+            src = Not prep.dst2
+        End If
+
+        Dim index As Integer = 1
+        Dim rect As New cv.Rect
+        Dim maskRect = New cv.Rect(1, 1, src.Width, src.Height)
+        Dim mask = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8U, 0)
+        Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
+        dst0.SetTo(0)
+        dst1.SetTo(0)
+        Dim minCount = src.Total * 0.001
+        For y = 0 To src.Height - 1
+            For x = 0 To src.Width - 1
+                Dim pt = New cv.Point(x, y)
+                Dim val = src.Get(Of Byte)(pt.Y, pt.X) ' skip the regions with no depth
+                If val > 0 Then
+                    val = dst1.Get(Of Byte)(pt.Y, pt.X)
+                    If val = 0 Then
+                        Dim count = cv.Cv2.FloodFill(src, mask, pt, index, rect, 0, 0, flags)
+                        If count >= minCount Then
+                            dst1.Rectangle(rect, 255, -1)
+                            dst0(rect).SetTo(index, mask(rect))
+                            index += 1
+                        End If
+                    End If
+                End If
+            Next
+        Next
+
+        dst3 = ShowPalette254(dst0)
+        labels(2) = CStr(index) + " regions were identified"
+    End Sub
+End Class

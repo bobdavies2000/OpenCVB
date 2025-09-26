@@ -1,4 +1,5 @@
-﻿Imports VBClasses.TaskParent
+﻿Imports SharpGL.SceneGraph.Primitives
+Imports VBClasses.TaskParent
 Imports cv = OpenCvSharp
 Public Module vbc
     Public task As VBtask
@@ -574,6 +575,7 @@ End Class
 Public Class cloudData
     Public age As Integer
     Public center As cv.Point
+    Public contour As List(Of cv.Point)
     Public depth As Single
     Public id As Integer
     Public index As Integer
@@ -584,8 +586,9 @@ Public Class cloudData
     Public Sub New()
     End Sub
     Private Function getMaxDist(mask As cv.Mat, rect As cv.Rect) As cv.Point
-        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+        Dim tmp = mask.Clone
+        tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+        Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
         Dim mm As mmData = GetMinMax(distance32f)
         mm.maxLoc.X += rect.X
         mm.maxLoc.Y += rect.Y
@@ -599,12 +602,25 @@ Public Class cloudData
         maxDist = getMaxDist(mask, rect)
         id = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
 
-        'Dim tmp = New cv.Mat(mask.Size, cv.MatType.CV_32F, 0)
-        'task.pcSplit(2)(rect).CopyTo(tmp, mask)
-        'depth = tmp.Mean(task.depthMask(rect))(0)
         depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
         center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
     End Sub
+    Public Function displayString() As String
+        Dim strOut = "pcList index = " + CStr(index) + vbCrLf
+        strOut += "age = " + CStr(age) + vbTab + "ID (also gridID) = " + CStr(id) + vbCrLf
+        strOut += "rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
+        strOut += ", width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
+        strOut += "maxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
+        strOut += "depth = " + Format(depth, fmt1) + vbCrLf
+        strOut += "pixel count = " + CStr(pixels)  + vbCrLf
+        strOut += "center = " + center.ToString() + vbCrLf
+        If contour Is Nothing Then
+            strOut += "No contour has been built yet."
+        Else
+            strOut += "contour count = " + CStr(contour.Count) + vbCrLf
+        End If
+        Return strOut
+    End Function
 End Class
 
 

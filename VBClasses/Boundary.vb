@@ -118,7 +118,33 @@ End Class
 
 
 
-Public Class Boundary_RedCloud : Inherits TaskParent
+Public Class Boundary_GuidedBP : Inherits TaskParent
+    Dim guided As New GuidedBP_Depth
+    Public Sub New()
+        task.gOptions.setHistogramBins(100)
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Create a mask of the RedCloud cell boundaries using Guided Backprojection"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        guided.Run(src)
+        dst2 = runRedOld(guided.dst2, labels(2))
+
+        dst3.SetTo(0)
+        For i = 1 To task.redC.rcList.Count - 1
+            Dim rc = task.redC.rcList(i)
+            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+        Next
+
+        labels(3) = $"{task.redC.rcList.Count} cells were found."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Boundary_RedColor : Inherits TaskParent
     Dim prep As New RedPrep_ReductionChoices
     Public Sub New()
         task.gOptions.MaxDepthBar.Value = 20
@@ -144,23 +170,25 @@ End Class
 
 
 
-Public Class Boundary_GuidedBP : Inherits TaskParent
-    Dim guided As New GuidedBP_Depth
+Public Class Boundary_RedCloud : Inherits TaskParent
+    Dim prep As New RedPrep_Basics
     Public Sub New()
-        task.gOptions.setHistogramBins(100)
+        task.gOptions.MaxDepthBar.Value = 20
+        task.gOptions.TrackingColor.Checked = True
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Create a mask of the RedCloud cell boundaries using Guided Backprojection"
+        desc = "Find the RedCloud cell contours"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        guided.Run(src)
-        dst2 = runRedOld(guided.dst2, labels(2))
+        prep.Run(src)
+        dst2 = runRedC(prep.dst2, labels(2))
 
         dst3.SetTo(0)
-        For i = 1 To task.redC.rcList.Count - 1
-            Dim rc = task.redC.rcList(i)
-            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+        For i = 1 To task.redCNew.pcList.Count - 1
+            Dim rc = task.redCNew.pcList(i)
+            Dim contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            DrawContour(dst3(rc.rect), contour, 255, task.lineWidth)
         Next
 
-        labels(3) = $"{task.redC.rcList.Count} cells were found."
+        labels(3) = $"{task.redCNew.pcList.Count} cells were found."
     End Sub
 End Class
