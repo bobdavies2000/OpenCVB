@@ -1,4 +1,6 @@
-﻿Imports OpenCvSharp
+﻿Imports System.Diagnostics.Metrics
+Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
     Public prepEdges As New RedPrep_Basics
@@ -25,7 +27,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
                 Dim pt = New cv.Point(x, y)
                 ' skip the regions with no depth 
                 If dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
-                    Dim count = cv.Cv2.FloodFill(dst3, mask, pt, 255, rect, 0, 0, flags)
+                    Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount And count < maxCount Then
                             Dim pc = New cloudData(mask(rect), rect, count)
@@ -253,13 +255,133 @@ End Class
 
 
 
+
+Public Class RedCloud_MotionSimple : Inherits TaskParent
+    Dim contours As New RedCloud_Contours
+    Public Sub New()
+        task.gOptions.HistBinBar.Maximum = 255
+        task.gOptions.HistBinBar.Value = 255
+        desc = "Use motion to identify which cells changed."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        contours.Run(src)
+        dst2 = contours.dst3
+        labels(2) = contours.labels(2)
+
+        dst1 = task.redCNew.dst1
+        dst1.SetTo(0, Not task.motionMask)
+
+        Dim histogram As New cv.Mat
+        Dim ranges = {New cv.Rangef(0, 256)}
+        cv.Cv2.CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
+
+        Dim histArray(histogram.Rows - 1) As Single
+        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+        Dim pcUsed As New List(Of Integer)
+        If task.heartBeatLT Then dst3 = dst2.Clone
+        For i = 1 To histArray.Count - 1
+            If histArray(i) > 0 And pcUsed.Contains(i) = False Then
+                Dim pc = task.redCNew.pcList(i)
+                dst3(pc.rect).SetTo(task.scalarColors(pc.index), pc.mask)
+                pcUsed.Add(i)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_Motion : Inherits TaskParent
+    Dim contours As New RedCloud_Contours
+    Public Sub New()
+        task.gOptions.HistBinBar.Maximum = 255
+        task.gOptions.HistBinBar.Value = 255
+        desc = "Use motion to identify which cells changed."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        contours.Run(src)
+        dst2 = contours.dst3
+        labels(2) = contours.labels(2)
+
+        Static pcListLast = New List(Of cloudData)(task.redCNew.pcList)
+        Static pcMap As cv.Mat = task.redCNew.dst1.Clone
+
+        For Each pc In task.redCNew.pcList
+            pc.color = task.vecColors(pc.index)
+            If task.firstPass Then pc.color = dst2.Get(Of cv.Vec3b)(pc.maxDist.Y, pc.maxDist.X)
+            pc.indexLast = pcMap.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X)
+        Next
+
+        pcMap = task.redCNew.dst1.Clone
+        pcMap.SetTo(0, Not task.motionMask)
+
+        Dim histogram As New cv.Mat
+        Dim ranges = {New cv.Rangef(0, 256)}
+        cv.Cv2.CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
+
+        Dim histArray(histogram.Rows - 1) As Single
+        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+        Dim pcUsed As New List(Of Integer)
+        If task.heartBeatLT Then dst3 = dst2.Clone
+        For i = 1 To histArray.Count - 1
+            If histArray(i) > 0 And pcUsed.Contains(i) = False Then
+                Dim pc = task.redCNew.pcList(i)
+
+                If pc.indexLast > 0 Then
+                    Dim pcLast = pcListLast(pc.indexLast)
+                    dst3(pcLast.rect).setto(0, pcLast.mask)
+                End If
+
+                dst3(pc.rect).SetTo(task.scalarColors(pc.index), pc.mask)
+                pcUsed.Add(i)
+            End If
+        Next
+
+        pcMap = task.redCNew.dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
 Public Class RedCloud_Contours : Inherits TaskParent
     Public Sub New()
+        labels(3) = "Contours of the cells identified in dst2"
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Build contours for each cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        'dst2 = runRedC(prep.dst2, labels(2))
+        dst2 = runRedC(src, labels(2))
 
-        'contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+        Static pcListLast = New List(Of cloudData)(task.redCNew.pcList)
+        Static pcMap As cv.Mat = task.redCNew.dst1.Clone
+
+        For Each pc In task.redCNew.pcList
+            pc.color = task.vecColors(pc.index)
+            If task.firstPass Then pc.color = dst2.Get(Of cv.Vec3b)(pc.maxDist.Y, pc.maxDist.X)
+            pc.indexLast = pcMap.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X)
+        Next
+
+        dst1.SetTo(0)
+        For Each pc In task.redCNew.pcList
+            pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            If task.firstPass Or pc.indexLast = 0 Then
+                DrawContour(dst1(pc.rect), pc.contour, pc.index)
+                pc.mask = dst1(pc.rect).InRange(pc.index, pc.index)
+            Else
+                DrawContour(dst1(pc.rect), pc.contour, pc.indexLast)
+                pc.mask = dst1(pc.rect).InRange(pc.index, pc.indexLast)
+            End If
+            SetTrueText(CStr(pc.index), pc.rect.TopLeft)
+        Next
+
+        dst3 = ShowPalette254(dst1)
+        pcMap = task.redCNew.dst1.Clone
     End Sub
 End Class

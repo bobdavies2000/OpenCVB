@@ -575,10 +575,12 @@ End Class
 Public Class cloudData
     Public age As Integer
     Public center As cv.Point
+    Public color As cv.Vec3b
     Public contour As List(Of cv.Point)
     Public depth As Single
     Public id As Integer
     Public index As Integer
+    Public indexLast As Integer
     Public mask As cv.Mat
     Public maxDist As cv.Point
     Public pixels As Integer

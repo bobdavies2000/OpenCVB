@@ -32,7 +32,7 @@ Public Class Hist_Basics : Inherits TaskParent
             ranges = fixedRanges
         End If
 
-        ' ranges are exclusive in OpenCV!!!
+        ' ranges are EXclusive in OpenCV!!!
         If bins = 0 Then
             cv.Cv2.CalcHist({src}, {splitIndex}, histMask, histogram, 1, {task.histogramBins}, ranges)
         Else
