@@ -37,8 +37,8 @@ Public Class RedPrep_Basics : Inherits TaskParent
         prepEdges.Run(reduceChan(split(1) * reduceAmt))
         dst2 = dst2 Or prepEdges.dst3
 
-        'prepEdges.Run(reduceChan(split(2) * reduceAmt))
-        'dst2 = dst2 Or prepEdges.dst3
+        prepEdges.Run(reduceChan(split(2) * reduceAmt))
+        dst2 = dst2 Or prepEdges.dst3
 
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, task.lineWidth)
         labels(2) = "Using reduction factor = " + CStr(reduceAmt)
