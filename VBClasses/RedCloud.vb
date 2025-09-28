@@ -28,7 +28,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount And count < maxCount Then
-                            Dim pc = New cloudData(mask(rect).Clone, rect, count)
+                            Dim pc = New cloudData(dst3(rect).InRange(index, index), rect, count)
                             index += 1
                             pc.index = index
                             newList.Add(pc.maxDist.Y, pc)
@@ -42,21 +42,20 @@ Public Class RedCloud_Basics : Inherits TaskParent
         dst1.SetTo(0)
         For Each pc In newList.Values
             pc.index = pcList.Count + 1
-            'Dim tmp = dst3(pc.rect).InRange(pc.index, pc.index)
-            Dim tmp = dst1(pc.rect)
-            pc.mask.SetTo(0, tmp)
             dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
             SetTrueText(CStr(pc.index), New cv.Point(pc.rect.X, pc.rect.Y))
             pcList.Add(pc)
         Next
 
-        dst2 = ShowPalette254(dst1)
+        If standaloneTest() Then
+            dst2 = ShowPalette254(dst1)
 
-        For Each pc In pcList
-            dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
-        Next
+            For Each pc In pcList
+                dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+            Next
 
-        RedCell_PCBasics.displayCell()
+            RedCell_PCBasics.displayCell()
+        End If
         labels(2) = CStr(newList.Count) + " regions were identified."
     End Sub
 End Class
