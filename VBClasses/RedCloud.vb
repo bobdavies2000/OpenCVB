@@ -21,15 +21,14 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Dim flags As FloodFillFlags = FloodFillFlags.Link4
         Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
         Dim newList As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalInteger)
-        For y = 1 To dst3.Height - 2
-            For x = 0 To dst3.Width - 2
+        For y = 0 To dst3.Height - 1
+            For x = 0 To dst3.Width - 1
                 Dim pt = New cv.Point(x, y)
                 ' skip the regions with no depth 
                 If dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index Mod 255, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount And count < maxCount Then
-                            Dim cellMask = mask(rect).InRange(index, index)
                             Dim pc = New cloudData(mask(rect), rect, count)
                             index += 1
                             newList.Add(pc.id, pc)
