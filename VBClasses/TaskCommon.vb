@@ -575,7 +575,6 @@ End Class
 Public Class cloudData
     Public age As Integer
     Public center As cv.Point
-    Public color As cv.Vec3b
     Public contour As List(Of cv.Point)
     Public depth As Single
     Public id As Integer

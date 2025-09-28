@@ -1,5 +1,4 @@
-﻿Imports System.Diagnostics.Metrics
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
@@ -27,16 +26,20 @@ Public Class RedCloud_Basics : Inherits TaskParent
                 Dim pt = New cv.Point(x, y)
                 ' skip the regions with no depth 
                 If dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
-                    Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
+                    Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index Mod 255, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount And count < maxCount Then
+                            Dim cellMask = mask(rect).InRange(index, index)
                             Dim pc = New cloudData(mask(rect), rect, count)
                             index += 1
                             newList.Add(pc.id, pc)
-
-                            dst3(rect).SetTo(0, mask(rect))
-                            mask(rect).SetTo(0)
                         End If
+
+                        dst3(rect).SetTo(0, mask(rect))
+                        mask(rect).SetTo(0)
+                    Else
+                        dst3.Set(Of Byte)(pt.Y, pt.X, 0)
+                        mask.Set(Of Byte)(pt.Y, pt.X, 0)
                     End If
                 End If
             Next
@@ -311,8 +314,8 @@ Public Class RedCloud_Motion : Inherits TaskParent
         Static pcMap As cv.Mat = task.redCNew.dst1.Clone
 
         For Each pc In task.redCNew.pcList
-            pc.color = task.vecColors(pc.index)
-            If task.firstPass Then pc.color = dst2.Get(Of cv.Vec3b)(pc.maxDist.Y, pc.maxDist.X)
+            'pc.color = task.vecColors(pc.index)
+            'If task.firstPass Then pc.color = dst2.Get(Of cv.Vec3b)(pc.maxDist.Y, pc.maxDist.X)
             pc.indexLast = pcMap.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X)
         Next
 
@@ -360,28 +363,33 @@ Public Class RedCloud_Contours : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         Static pcListLast = New List(Of cloudData)(task.redCNew.pcList)
-        Static pcMap As cv.Mat = task.redCNew.dst1.Clone
+        Static pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
 
         For Each pc In task.redCNew.pcList
-            pc.color = task.vecColors(pc.index)
-            If task.firstPass Then pc.color = dst2.Get(Of cv.Vec3b)(pc.maxDist.Y, pc.maxDist.X)
-            pc.indexLast = pcMap.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X)
+            Dim indexLast = pcMap.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
+            If indexLast > 0 Then
+                pc.age = pcListLast(indexLast).age + 1
+                If pc.age > 1000 Then pc.age = 2
+                pc.indexLast = indexLast
+            Else
+                pc.indexLast = pc.index
+            End If
         Next
 
         dst1.SetTo(0)
         For Each pc In task.redCNew.pcList
             pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            If task.firstPass Or pc.indexLast = 0 Then
-                DrawContour(dst1(pc.rect), pc.contour, pc.index)
-                pc.mask = dst1(pc.rect).InRange(pc.index, pc.index)
-            Else
-                DrawContour(dst1(pc.rect), pc.contour, pc.indexLast)
-                pc.mask = dst1(pc.rect).InRange(pc.index, pc.indexLast)
-            End If
-            SetTrueText(CStr(pc.index), pc.rect.TopLeft)
+            DrawContour(dst1(pc.rect), pc.contour, pc.indexLast + 1)
+            SetTrueText(CStr(pc.age), pc.rect.TopLeft)
         Next
 
         dst3 = ShowPalette254(dst1)
-        pcMap = task.redCNew.dst1.Clone
+
+        For Each pc In task.redCNew.pcList
+            SetTrueText(CStr(pc.age), pc.rect.TopLeft, 3)
+        Next
+
+        pcListLast = New List(Of cloudData)(task.redCNew.pcList)
+        pcMap = dst1.Clone
     End Sub
 End Class
