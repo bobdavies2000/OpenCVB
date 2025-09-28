@@ -76,7 +76,7 @@ Public Class FCS_StablePoints : Inherits TaskParent
         If index < facetGen.facet.facetList.Count Then
             Dim bestFacet = facetGen.facet.facetList(index)
             dst2.FillConvexPoly(bestFacet, cv.Scalar.Black, task.lineType)
-            DrawContour(dst2, bestFacet, task.highlight)
+            DrawTour(dst2, bestFacet, task.highlight)
         End If
 
         dst2 = facetGen.dst2
@@ -941,7 +941,7 @@ Public Class FCS_BrickPoints : Inherits TaskParent
         If index < facetGen.facet.facetList.Count Then
             Dim bestFacet = facetGen.facet.facetList(index)
             dst2.FillConvexPoly(bestFacet, cv.Scalar.Black, task.lineType)
-            DrawContour(dst2, bestFacet, task.highlight)
+            DrawTour(dst2, bestFacet, task.highlight)
         End If
 
         dst2 = facetGen.dst2

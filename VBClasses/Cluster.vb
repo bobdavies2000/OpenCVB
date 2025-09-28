@@ -105,7 +105,7 @@ Public Class Cluster_Hulls : Inherits TaskParent
             End If
 
             hulls.Add(hull)
-            If (hull.Count > 0) Then DrawContour(dst3, hull, white, task.lineWidth)
+            If (hull.Count > 0) Then DrawTour(dst3, hull, white, task.lineWidth)
         Next
         labels(3) = bPoint.labels(2)
     End Sub

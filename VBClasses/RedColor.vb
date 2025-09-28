@@ -81,7 +81,7 @@ Public Class RedColor_FindCells : Inherits TaskParent
         For Each index In bricks
             If task.redC.rcList.Count <= index Then Continue For
             Dim rc = task.redC.rcList(index)
-            DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+            DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
         labels(3) = CStr(count) + " cells were found using the motion mask"
@@ -210,8 +210,8 @@ Public Class RedColor_CellsAtDepth : Inherits TaskParent
         dst3.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst3.Height), cv.Scalar.Yellow, task.lineWidth)
         For i = 0 To slotList(histIndex).Count - 1
             Dim rc = task.redC.rcList(slotList(histIndex)(i))
-            DrawContour(dst2(rc.rect), rc.contour, cv.Scalar.Yellow)
-            DrawContour(task.color(rc.rect), rc.contour, cv.Scalar.Yellow)
+            DrawTour(dst2(rc.rect), rc.contour, cv.Scalar.Yellow)
+            DrawTour(task.color(rc.rect), rc.contour, cv.Scalar.Yellow)
         Next
     End Sub
 End Class
@@ -435,13 +435,13 @@ Public Class RedColor_LikelyFlatSurfaces : Inherits TaskParent
             If rc.depth >= task.MaxZmeters Then Continue For
             Dim tmp As cv.Mat = verts.dst2(rc.rect) And rc.mask
             If tmp.CountNonZero / rc.pixels > 0.5 Then
-                DrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+                DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
                 vCells.Add(rc)
             End If
             tmp = verts.dst3(rc.rect) And rc.mask
             Dim count = tmp.CountNonZero
             If count / rc.pixels > 0.5 Then
-                DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+                DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)
                 hCells.Add(rc)
             End If
         Next
@@ -474,7 +474,7 @@ Public Class RedColor_PlaneEq3D : Inherits TaskParent
         End If
 
         dst3.SetTo(0)
-        DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+        DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)
 
         SetTrueText(eq.strOut, 3)
     End Sub
@@ -529,9 +529,9 @@ Public Class RedColor_UnstableCells : Inherits TaskParent
         Dim currList As New List(Of cv.Point)
         For Each rc In task.redC.rcList
             If prevList.Contains(rc.maxDStable) = False Then
-                DrawContour(dst1(rc.rect), rc.contour, white, -1)
-                DrawContour(dst1(rc.rect), rc.contour, cv.Scalar.Black)
-                DrawContour(dst3(rc.rect), rc.contour, white, -1)
+                DrawTour(dst1(rc.rect), rc.contour, white, -1)
+                DrawTour(dst1(rc.rect), rc.contour, cv.Scalar.Black)
+                DrawTour(dst3(rc.rect), rc.contour, white, -1)
             End If
             currList.Add(rc.maxDStable)
         Next
@@ -565,9 +565,9 @@ Public Class RedColor_UnstableHulls : Inherits TaskParent
         For Each rc In task.redC.rcList
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             If prevList.Contains(rc.maxDStable) = False Then
-                DrawContour(dst1(rc.rect), rc.hull, white, -1)
-                DrawContour(dst1(rc.rect), rc.hull, cv.Scalar.Black)
-                DrawContour(dst3(rc.rect), rc.hull, white, -1)
+                DrawTour(dst1(rc.rect), rc.hull, white, -1)
+                DrawTour(dst1(rc.rect), rc.hull, cv.Scalar.Black)
+                DrawTour(dst3(rc.rect), rc.hull, white, -1)
             End If
             currList.Add(rc.maxDStable)
         Next
@@ -926,9 +926,9 @@ Public Class RedColor_ContourUpdate : Inherits TaskParent
         For i = 1 To rcList.Count - 1
             Dim rc = rcList(i)
             rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            DrawContour(rc.mask, rc.contour, 255, -1)
+            DrawTour(rc.mask, rc.contour, 255, -1)
             rcList(i) = rc
-            DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+            DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)
         Next
     End Sub
 End Class
@@ -1315,7 +1315,7 @@ Public Class RedColor_Features : Inherits TaskParent
             dst3(rc.rect).SetTo(vbNearFar(If(options.selection = 2, correlationXtoZ, correlationYtoZ) + 1), rc.mask)
             SetTrueText("(" + Format(correlationXtoZ, fmt3) + ", " + Format(correlationYtoZ, fmt3) + ")", New cv.Point(rc.rect.X, rc.rect.Y), 3)
         End If
-        DrawContour(dst0(rc.rect), rc.contour, cv.Scalar.Yellow)
+        DrawTour(dst0(rc.rect), rc.contour, cv.Scalar.Yellow)
         SetTrueText(labels(3), 3)
         labels(2) = "Highlighted feature = " + options.labelName
     End Sub
@@ -1506,9 +1506,9 @@ Public Class RedColor_Contour : Inherits TaskParent
                     contour.Add(pt)
                 Next
                 If i < 8 Then
-                    DrawContour(dst2(rc.rect), contour, rc.color, task.lineWidth)
+                    DrawTour(dst2(rc.rect), contour, rc.color, task.lineWidth)
                 Else
-                    DrawContour(dst2(rc.rect), contour, rc.color, -1)
+                    DrawTour(dst2(rc.rect), contour, rc.color, -1)
                 End If
             Next
         Next
@@ -1946,7 +1946,7 @@ Public Class RedColor_Hulls : Inherits TaskParent
                 Catch ex As Exception
                     defectCount += 1
                 End Try
-                DrawContour(rcMap(rc.rect), rc.hull, rc.index, -1)
+                DrawTour(rcMap(rc.rect), rc.hull, rc.index, -1)
                 rcList.Add(rc)
             End If
         Next

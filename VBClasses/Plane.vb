@@ -492,7 +492,7 @@ Public Class Plane_Equation : Inherits TaskParent
         If standaloneTest() Then
             SetTrueText(strOut, 3)
             dst3.SetTo(0)
-            DrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+            DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)
         End If
     End Sub
 End Class

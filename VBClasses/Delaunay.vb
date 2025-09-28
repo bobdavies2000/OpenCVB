@@ -385,7 +385,7 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
         Next
 
         For Each pts In delaunay.facetList
-            DrawContour(dst1, pts, white, 1)
+            DrawTour(dst1, pts, white, 1)
         Next
     End Sub
 End Class
@@ -421,7 +421,7 @@ Public Class Delaunay_Contours : Inherits TaskParent
                 ptList.Add(New cv.Point(facets(i)(j).X, facets(i)(j).Y))
             Next
 
-            DrawContour(dst2, ptList, 255, 1)
+            DrawTour(dst2, ptList, 255, 1)
         Next
         labels(2) = traceName + ": " + Format(bPoint.ptList.Count, "000") + " cells were present."
     End Sub

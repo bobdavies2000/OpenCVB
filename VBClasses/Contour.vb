@@ -132,7 +132,7 @@ Public Class Contour_Regions : Inherits TaskParent
             Dim ele = sortedList.ElementAt(i)
             contourList.Add(allContours(ele.Value))
             areaList.Add(ele.Key)
-            DrawContour(dst0, allContours(ele.Value).ToList, contourList.Count, -1, cv.LineTypes.Link8)
+            DrawTour(dst0, allContours(ele.Value).ToList, contourList.Count, -1, cv.LineTypes.Link8)
         Next
         dst2 = ShowPalette(dst0)
         labels(2) = $"Top {contourList.Count} contours in contourList from the " + CStr(sortedList.Count) + " found."
@@ -370,7 +370,7 @@ Public Class Contour_SidePoints : Inherits TaskParent
 
             If rc.contour.Count > 0 Then
                 dst3.SetTo(0)
-                DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+                DrawTour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
                 DrawLine(dst3, ptLeft, ptRight, white)
                 DrawLine(dst3, ptTop, ptBot, white)
             End If
@@ -408,7 +408,7 @@ Public Class Contour_Foreground : Inherits TaskParent
         contour.Run(dst2)
         dst3.SetTo(0)
         For Each ctr In contour.contourList
-            DrawContour(dst3, New List(Of cv.Point)(ctr), 255, -1)
+            DrawTour(dst3, New List(Of cv.Point)(ctr), 255, -1)
         Next
     End Sub
 End Class
@@ -463,7 +463,7 @@ Public Class Contour_SelfIntersect : Inherits TaskParent
         If standaloneTest() Then
             dst2 = runRedOld(src, labels(2))
             rc = task.rcD
-            DrawContour(dst2(rc.rect), rc.contour, white, -1)
+            DrawTour(dst2(rc.rect), rc.contour, white, -1)
         End If
 
         Dim selfInt As Boolean
@@ -534,7 +534,7 @@ Public Class Contour_Largest : Inherits TaskParent
         If standaloneTest() Then
             dst3.SetTo(0)
             If maxIndex >= 0 And maxCount >= 2 Then
-                DrawContour(dst3, allContours(maxIndex).ToList, white)
+                DrawTour(dst3, allContours(maxIndex).ToList, white)
             End If
         End If
     End Sub
@@ -588,10 +588,10 @@ Public Class Contour_Smoothing : Inherits TaskParent
         dst3.SetTo(0)
 
         Dim bestContour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone)
-        DrawContour(dst3(rc.rect), bestContour, white, task.lineWidth + 3)
+        DrawTour(dst3(rc.rect), bestContour, white, task.lineWidth + 3)
 
         Dim approxContour = ContourBuild(rc.mask, options.ApproximationMode)
-        DrawContour(dst3(rc.rect), approxContour, cv.Scalar.Red)
+        DrawTour(dst3(rc.rect), approxContour, cv.Scalar.Red)
 
         If task.heartBeat Then labels(2) = "Contour points count reduced from " + CStr(bestContour.Count) +
                                            " to " + CStr(approxContour.Count)
@@ -629,7 +629,7 @@ Public Class Contour_FromPoints : Inherits TaskParent
         Next
 
         dst3.SetTo(0)
-        DrawContour(dst3, hull, white, -1)
+        DrawTour(dst3, hull, white, -1)
     End Sub
 End Class
 
@@ -672,7 +672,7 @@ Public Class Contour_GeneralWithOptions : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each ctr In allContours.ToArray
-            DrawContour(dst3, ctr.ToList, cv.Scalar.Yellow)
+            DrawTour(dst3, ctr.ToList, cv.Scalar.Yellow)
         Next
     End Sub
 End Class
@@ -717,7 +717,7 @@ Public Class Contour_General : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each ctr In allContours.ToArray
-            DrawContour(dst3, ctr.ToList, cv.Scalar.Yellow)
+            DrawTour(dst3, ctr.ToList, cv.Scalar.Yellow)
         Next
     End Sub
 End Class
@@ -845,7 +845,7 @@ Public Class Contour_Hulls : Inherits TaskParent
         For Each tour In task.contours.contourList
             tour.hull = cv.Cv2.ConvexHull(tour.points.ToArray, True).ToList
             Dim index = task.contours.contourList.IndexOf(tour)
-            DrawContour(contourMap, tour.hull, tour.ID Mod 255, -1)
+            DrawTour(contourMap, tour.hull, tour.ID Mod 255, -1)
             contourList.Add(tour)
         Next
 
@@ -1113,8 +1113,8 @@ Public Class Contour_RotateRect : Inherits TaskParent
         For i = 0 To sortedTours.Values.Count - 1
             Dim tuple = sortedTours.Values(i)
             DrawRotatedRect(tuple.Item1, dst2, 255)
-            DrawContour(dst2, contours(tuple.Item2).ToList, 0, task.lineWidth, cv.LineTypes.Link4)
-            DrawContour(dst1, contours(tuple.Item2).ToList, (i Mod 254) + 1, task.lineWidth, cv.LineTypes.Link4)
+            DrawTour(dst2, contours(tuple.Item2).ToList, 0, task.lineWidth, cv.LineTypes.Link4)
+            DrawTour(dst1, contours(tuple.Item2).ToList, (i Mod 254) + 1, task.lineWidth, cv.LineTypes.Link4)
         Next
 
         dst3 = ShowPalette254(dst1)

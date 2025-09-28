@@ -24,7 +24,7 @@ Public Class ApproxPoly_Basics : Inherits TaskParent
             Dim nextContour As cv.Point()
             nextContour = cv.Cv2.ApproxPolyDP(contour.bestContour, options.epsilon, options.closedPoly)
             dst3.SetTo(0)
-            DrawContour(dst3, nextContour.ToList, cv.Scalar.Yellow)
+            DrawTour(dst3, nextContour.ToList, cv.Scalar.Yellow)
         Else
             labels(2) = "No contours found"
         End If

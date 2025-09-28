@@ -2039,7 +2039,7 @@ Public Class XO_OpenGL_Profile : Inherits TaskParent
         Dim p2 = rc.contour.ElementAt(mm.maxLoc.Y)
 
         dst3.SetTo(0)
-        DrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+        DrawTour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
         DrawCircle(dst3, New cv.Point(p1.X + rc.rect.X, p1.Y + rc.rect.Y), task.DotSize + 2, cv.Scalar.Blue)
         DrawCircle(dst3, New cv.Point(p2.X + rc.rect.X, p2.Y + rc.rect.Y), task.DotSize + 2, cv.Scalar.Red)
         If rc.contour3D.Count > 0 Then
@@ -4917,8 +4917,8 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
             Dim lp = task.lines.lpList(i)
             Dim facets = delaunay.facetList(i)
 
-            DrawContour(dst1, facets, 255, task.lineWidth)
-            DrawContour(task.fpMap, facets, i)
+            DrawTour(dst1, facets, 255, task.lineWidth)
+            DrawTour(task.fpMap, facets, i)
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
             Dim brick = task.bricks.brickList(task.gridMap.Get(Of Integer)(center.Y, center.X))
             task.lines.lpList(i) = lp
@@ -4927,7 +4927,7 @@ Public Class XO_FCSLine_Basics : Inherits TaskParent
         Dim index = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         task.lpD = task.lines.lpList(index)
         Dim facetsD = delaunay.facetList(task.lpD.index)
-        DrawContour(dst2, facetsD, white, task.lineWidth)
+        DrawTour(dst2, facetsD, white, task.lineWidth)
 
         labels(2) = task.lines.labels(2)
         labels(3) = delaunay.labels(2)
@@ -6422,7 +6422,7 @@ Public Class XO_Contour_Gray : Inherits TaskParent
 
         dst2 = src
         For Each tour In allContours
-            DrawContour(dst2, tour.ToList, white, task.lineWidth)
+            DrawTour(dst2, tour.ToList, white, task.lineWidth)
         Next
         labels(2) = $"There were {allContours.Count} contours found."
     End Sub
@@ -6468,7 +6468,7 @@ Public Class XO_Contour_RC_AddContour : Inherits TaskParent
         Next
         If contours.contourList.Count = 0 Then Exit Sub
         Dim contour = New List(Of cv.Point)(contours.contourList(maxIndex).ToList)
-        DrawContour(dst2, contour, task.highlight, task.lineWidth)
+        DrawTour(dst2, contour, task.highlight, task.lineWidth)
     End Sub
 End Class
 
@@ -6630,7 +6630,7 @@ Public Class XO_Contour_RedCloudCorners : Inherits TaskParent
             End If
         Next
 
-        DrawContour(dst3(rc.rect), rc.contour, white)
+        DrawTour(dst3(rc.rect), rc.contour, white)
         For i = 0 To corners.Count - 1
             DrawLine(dst3(rc.rect), center, corners(i), white)
         Next
@@ -6695,7 +6695,7 @@ Public Class XO_Contour_RedCloudEdges : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each rc In task.redC.rcList
-            DrawContour(dst2(rc.rect), rc.contour, 255, task.lineWidth)
+            DrawTour(dst2(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
         dst3 = task.edgeLine.dst2 And dst2
@@ -12445,7 +12445,7 @@ Public Class XO_Contour_RedCloud1 : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each rc In task.redC.rcList
-            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+            DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next
     End Sub
 End Class

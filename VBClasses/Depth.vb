@@ -96,7 +96,7 @@ Public Class Depth_HolesRect : Inherits TaskParent
             Dim minRect = cv.Cv2.MinAreaRect(contour)
             Dim nextColor = New cv.Scalar(task.vecColors(i Mod 256)(0), task.vecColors(i Mod 256)(1), task.vecColors(i Mod 256)(2))
             DrawRotatedRect(minRect, dst2, nextColor)
-            DrawContour(dst3, contour.ToList, white, task.lineWidth)
+            DrawTour(dst3, contour.ToList, white, task.lineWidth)
         Next
         cv.Cv2.AddWeighted(dst2, 0.5, task.depthRGB, 0.5, 0, dst2)
     End Sub
@@ -519,7 +519,7 @@ Public Class Depth_MaxMask : Inherits TaskParent
         dst3.SetTo(0)
         For Each c In contour.contourList
             Dim hull = cv.Cv2.ConvexHull(c, True).ToList
-            DrawContour(dst3, hull, white, -1)
+            DrawTour(dst3, hull, white, -1)
         Next
     End Sub
 End Class
@@ -560,8 +560,8 @@ Public Class Depth_ForegroundOverTime : Inherits TaskParent
         dst3.SetTo(0)
         For Each ctr In contours.allContours
             If ctr.Length >= options.minSizeContour Then
-                DrawContour(dst2, ctr.ToList, white, -1)
-                DrawContour(dst3, ctr.ToList, white)
+                DrawTour(dst2, ctr.ToList, white, -1)
+                DrawTour(dst3, ctr.ToList, white)
             End If
         Next
     End Sub
@@ -645,8 +645,8 @@ Public Class Depth_Foreground : Inherits TaskParent
         dst3.SetTo(0)
         For Each ctr In contours.allContours
             If ctr.Length >= options.minSizeContour Then
-                DrawContour(dst2, ctr.ToList, white, -1)
-                DrawContour(dst3, ctr.ToList, white)
+                DrawTour(dst2, ctr.ToList, white, -1)
+                DrawTour(dst3, ctr.ToList, white)
             End If
         Next
     End Sub
@@ -689,9 +689,9 @@ Public Class Depth_InRange : Inherits TaskParent
             contours.Run(regMats(i))
             For Each ctr In contours.allContours
                 If ctr.Length >= options.minSizeContour Then
-                    DrawContour(dst2, ctr.ToList, classCount, -1)
+                    DrawTour(dst2, ctr.ToList, classCount, -1)
                     classCount += 1
-                    DrawContour(dst3, ctr.ToList, white)
+                    DrawTour(dst3, ctr.ToList, white)
                 End If
             Next
         Next
@@ -841,7 +841,7 @@ Public Class Depth_Contour : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each tour In contour.contourList
-            DrawContour(dst2, tour.ToList, 255, -1)
+            DrawTour(dst2, tour.ToList, 255, -1)
         Next
     End Sub
 End Class
@@ -868,7 +868,7 @@ Public Class Depth_Outline : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each tour In contour.contourList
-            DrawContour(dst2, tour.ToList, 255, task.lineWidth)
+            DrawTour(dst2, tour.ToList, 255, task.lineWidth)
         Next
 
         If standaloneTest() Then

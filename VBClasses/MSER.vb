@@ -35,7 +35,7 @@ Public Class MSER_Basics : Inherits TaskParent
             rc.pixels = detect.maskCounts(index)
 
             rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            DrawContour(rc.mask, rc.contour, 255, -1)
+            DrawTour(rc.mask, rc.contour, 255, -1)
 
             rc.maxDist = GetMaxDist(rc)
 
@@ -234,7 +234,7 @@ Public Class MSER_Hulls : Inherits TaskParent
         For Each rc In task.redC.rcList
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             pixels += rc.pixels
-            DrawContour(dst3(rc.rect), rc.hull, rc.color, -1)
+            DrawTour(dst3(rc.rect), rc.hull, rc.color, -1)
         Next
 
         If task.heartBeat Then labels(2) = CStr(task.redC.rcList.Count) + " Regions with average size " +

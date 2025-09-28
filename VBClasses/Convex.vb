@@ -37,7 +37,7 @@ Public Class Convex_Basics : Inherits TaskParent
 
         Dim pMat As cv.Mat = cv.Mat.FromPixelData(hull.Count, 1, cv.MatType.CV_32SC2, hull)
         Dim sum = pMat.Sum()
-        DrawContour(dst2, hullList, white, -1)
+        DrawTour(dst2, hullList, white, -1)
 
         For i = 0 To hull.Count - 1
             DrawLine(dst2, hull(i), hull((i + 1) Mod hull.Count), white)
@@ -91,7 +91,7 @@ Public Class Convex_Defects : Inherits TaskParent
         dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim hull = cv.Cv2.ConvexHull(c, False)
         Dim hullIndices = cv.Cv2.ConvexHullIndices(c, False)
-        DrawContour(dst3, hull.ToList, task.highlight)
+        DrawTour(dst3, hull.ToList, task.highlight)
 
         Dim defects = cv.Cv2.ConvexityDefects(contours.bestContour, hullIndices.ToList)
         For Each v In defects
@@ -159,7 +159,7 @@ Public Class Convex_RedColorDefects : Inherits TaskParent
         Dim hull = cv.Cv2.ConvexHull(c, False)
         Dim hullIndices = cv.Cv2.ConvexHullIndices(c, False)
         dst2.SetTo(0)
-        DrawContour(dst2, hull.ToList, task.highlight, -1)
+        DrawTour(dst2, hull.ToList, task.highlight, -1)
 
         Try
             Dim defects = cv.Cv2.ConvexityDefects(c, hullIndices.ToList)
@@ -168,7 +168,7 @@ Public Class Convex_RedColorDefects : Inherits TaskParent
             SetTrueText("Convexity defects failed due to self-intersection.", 3)
         End Try
 
-        DrawContour(dst2, rc.contour, cv.Scalar.Red)
+        DrawTour(dst2, rc.contour, cv.Scalar.Red)
     End Sub
 End Class
 

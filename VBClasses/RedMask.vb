@@ -39,7 +39,7 @@ Public Class RedMask_Basics : Inherits TaskParent
             If md.rect.Width * md.rect.Height < task.rcPixelThreshold Then Continue For
             md.mask = dst2(md.rect).InRange(i + 1, i + 1)
             md.contour = ContourBuild(md.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            DrawContour(md.mask, md.contour, 255, -1)
+            DrawTour(md.mask, md.contour, 255, -1)
             md.pixels = md.mask.CountNonZero
             md.maxDist = GetMaxDist(md)
             md.mm = GetMinMax(task.pcSplit(2)(md.rect), task.depthMask(md.rect))

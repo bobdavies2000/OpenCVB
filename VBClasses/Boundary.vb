@@ -16,7 +16,7 @@ Public Class Boundary_Basics : Inherits TaskParent
         dst3.SetTo(0)
         For i = 1 To task.redC.rcList.Count - 1
             Dim rc = task.redC.rcList(i)
-            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+            DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
         labels(3) = $"{task.redC.rcList.Count} cells were found."
@@ -38,7 +38,7 @@ Public Class Boundary_Rectangles : Inherits TaskParent
     Public Sub New()
         desc = "Build the boundaries for rcList and remove interior rectangles"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         bounds.Run(src)
@@ -95,10 +95,10 @@ End Class
 Public Class Boundary_RemovedRects : Inherits TaskParent
     Public bRects As New Boundary_Rectangles
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build the boundaries for rcList and remove interior rectangles"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         bRects.Run(src)
         dst2 = bRects.bounds.dst2.Clone
         dst3 = bRects.dst2
@@ -106,7 +106,7 @@ Public Class Boundary_RemovedRects : Inherits TaskParent
         labels(3) = $"{task.redC.rcList.Count} cells before contain test"
 
         For i = 0 To bRects.smallRects.Count - 1
-            DrawContour(dst2(bRects.smallRects(i)), bRects.smallContours(i), cv.Scalar.Black, task.lineWidth)
+            DrawTour(dst2(bRects.smallRects(i)), bRects.smallContours(i), cv.Scalar.Black, task.lineWidth)
         Next
         labels(1) = labels(2)
         labels(2) = $"{task.redC.rcList.Count - bRects.smallRects.Count} cells after contain test"
@@ -132,7 +132,7 @@ Public Class Boundary_GuidedBP : Inherits TaskParent
         dst3.SetTo(0)
         For i = 1 To task.redC.rcList.Count - 1
             Dim rc = task.redC.rcList(i)
-            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+            DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
         labels(3) = $"{task.redC.rcList.Count} cells were found."
@@ -159,7 +159,7 @@ Public Class Boundary_RedColor : Inherits TaskParent
         dst3.SetTo(0)
         For i = 1 To task.redC.rcList.Count - 1
             Dim rc = task.redC.rcList(i)
-            DrawContour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
+            DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
         labels(3) = $"{task.redC.rcList.Count} cells were found."
@@ -186,7 +186,7 @@ Public Class Boundary_RedCloud : Inherits TaskParent
         For i = 1 To task.redCNew.pcList.Count - 1
             Dim rc = task.redCNew.pcList(i)
             Dim contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            DrawContour(dst3(rc.rect), contour, 255, task.lineWidth)
+            DrawTour(dst3(rc.rect), contour, 255, task.lineWidth)
         Next
 
         labels(3) = $"{task.redCNew.pcList.Count} cells were found."

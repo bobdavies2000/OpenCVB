@@ -512,7 +512,7 @@ Public Class TaskParent : Implements IDisposable
         Next
     End Sub
     Public Sub drawFeaturePoints(dst As cv.Mat, ptlist As List(Of cv.Point), color As cv.Scalar)
-        DrawContour(dst, ptlist, color, 1)
+        DrawTour(dst, ptlist, color, 1)
     End Sub
     Public Function ShowPaletteDepth(input As cv.Mat) As cv.Mat
         Dim output As New cv.Mat
@@ -636,7 +636,7 @@ Public Class TaskParent : Implements IDisposable
         Catch ex As Exception
         End Try
     End Sub
-    Public Sub DrawContour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
+    Public Sub DrawTour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
                            Optional lineType As cv.LineTypes = cv.LineTypes.AntiAlias)
         If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
         Dim listOfPoints = New List(Of List(Of cv.Point))({contour})

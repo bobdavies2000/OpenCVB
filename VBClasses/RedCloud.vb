@@ -1,10 +1,59 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
-    Public prepEdges As New RedPrep_Basics
+    Dim redCore As New RedCloud_Core
     Public pcList As New List(Of cloudData)
     Public Sub New()
         task.redCNew = Me
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Build contours for each cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redCore.Run(src)
+        labels(2) = redCore.labels(2) + "  Age of each cell is displayed as well."
+
+        Static pcListLast = New List(Of cloudData)(pcList)
+        Static pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+
+        pcList.Clear()
+        For Each pc In redCore.pcList
+            Dim indexLast = pcMap.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
+            If indexLast > 0 Then
+                pc.age = pcListLast(indexLast).age + 1
+                If pc.age > 1000 Then pc.age = 2
+                pc.indexLast = indexLast
+            Else
+                pc.indexLast = pc.index
+            End If
+            pc.index = pcList.Count + 1
+            pcList.Add(pc)
+        Next
+
+        dst1.SetTo(0)
+        For Each pc In pcList
+            pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
+            DrawTour(dst1(pc.rect), pc.contour, pc.index)
+            dst1(pc.rect).SetTo(0, Not pc.mask)
+            SetTrueText(CStr(pc.age), pc.rect.TopLeft)
+        Next
+
+        dst2 = ShowPalette254(dst1)
+        RedCell_PCBasics.displayCell()
+
+        pcListLast = New List(Of cloudData)(task.redCNew.pcList)
+        pcMap = dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_Core : Inherits TaskParent
+    Public prepEdges As New RedPrep_Basics
+    Public pcList As New List(Of cloudData)
+    Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Reduced point cloud - use 'Reduction Target' option to increase/decrease cell sizes."
         desc = "Find the biggest chunks of consistent depth data "
@@ -252,23 +301,23 @@ End Class
 
 
 
-Public Class RedCloud_MotionSimple : Inherits TaskParent
-    Dim contours As New RedCloud_Contours
+Public Class RedCloud_Motion : Inherits TaskParent
+    Dim redContours As New RedCloud_Basics
     Public Sub New()
         task.gOptions.HistBinBar.Maximum = 255
         task.gOptions.HistBinBar.Value = 255
         desc = "Use motion to identify which cells changed."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        contours.Run(src)
-        dst2 = contours.dst3
-        labels(2) = contours.labels(2)
+        redContours.Run(src)
+        dst1 = redContours.dst1
+        dst2 = redContours.dst2
+        labels(2) = redContours.labels(2)
 
-        dst1 = task.redCNew.dst1
         dst1.SetTo(0, Not task.motionMask)
 
         Dim histogram As New cv.Mat
-        Dim ranges = {New cv.Rangef(0, 256)}
+        Dim ranges = {New cv.Rangef(1, 256)}
         cv.Cv2.CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
 
         Dim histArray(histogram.Rows - 1) As Single
@@ -278,111 +327,10 @@ Public Class RedCloud_MotionSimple : Inherits TaskParent
         If task.heartBeatLT Then dst3 = dst2.Clone
         For i = 1 To histArray.Count - 1
             If histArray(i) > 0 And pcUsed.Contains(i) = False Then
-                Dim pc = task.redCNew.pcList(i)
+                Dim pc = redContours.pcList(i)
                 dst3(pc.rect).SetTo(task.scalarColors(pc.index), pc.mask)
                 pcUsed.Add(i)
             End If
         Next
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class RedCloud_Motion : Inherits TaskParent
-    Dim contours As New RedCloud_Contours
-    Public Sub New()
-        task.gOptions.HistBinBar.Maximum = 255
-        task.gOptions.HistBinBar.Value = 255
-        desc = "Use motion to identify which cells changed."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        contours.Run(src)
-        dst2 = contours.dst3
-        labels(2) = contours.labels(2)
-
-        Static pcListLast = New List(Of cloudData)(task.redCNew.pcList)
-        Static pcMap As cv.Mat = task.redCNew.dst1.Clone
-
-        For Each pc In task.redCNew.pcList
-            'pc.color = task.vecColors(pc.index)
-            'If task.firstPass Then pc.color = dst2.Get(Of cv.Vec3b)(pc.maxDist.Y, pc.maxDist.X)
-            pc.indexLast = pcMap.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X)
-        Next
-
-        pcMap = task.redCNew.dst1.Clone
-        pcMap.SetTo(0, Not task.motionMask)
-
-        Dim histogram As New cv.Mat
-        Dim ranges = {New cv.Rangef(0, 256)}
-        cv.Cv2.CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
-
-        Dim histArray(histogram.Rows - 1) As Single
-        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-
-        Dim pcUsed As New List(Of Integer)
-        If task.heartBeatLT Then dst3 = dst2.Clone
-        For i = 1 To histArray.Count - 1
-            If histArray(i) > 0 And pcUsed.Contains(i) = False Then
-                Dim pc = task.redCNew.pcList(i)
-
-                If pc.indexLast > 0 Then
-                    Dim pcLast = pcListLast(pc.indexLast)
-                    dst3(pcLast.rect).setto(0, pcLast.mask)
-                End If
-
-                dst3(pc.rect).SetTo(task.scalarColors(pc.index), pc.mask)
-                pcUsed.Add(i)
-            End If
-        Next
-
-        pcMap = task.redCNew.dst1.Clone
-    End Sub
-End Class
-
-
-
-
-
-Public Class RedCloud_Contours : Inherits TaskParent
-    Public Sub New()
-        labels(3) = "Contours of the cells identified in dst2"
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Build contours for each cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
-
-        Static pcListLast = New List(Of cloudData)(task.redCNew.pcList)
-        Static pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-
-        For Each pc In task.redCNew.pcList
-            Dim indexLast = pcMap.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
-            If indexLast > 0 Then
-                pc.age = pcListLast(indexLast).age + 1
-                If pc.age > 1000 Then pc.age = 2
-                pc.indexLast = indexLast
-            Else
-                pc.indexLast = pc.index
-            End If
-        Next
-
-        dst1.SetTo(0)
-        For Each pc In task.redCNew.pcList
-            pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            DrawContour(dst1(pc.rect), pc.contour, pc.index)
-            SetTrueText(CStr(pc.age), pc.rect.TopLeft)
-        Next
-
-        dst3 = ShowPalette254(dst1)
-
-        For Each pc In task.redCNew.pcList
-            SetTrueText(CStr(pc.age), pc.rect.TopLeft, 3)
-        Next
-
-        pcListLast = New List(Of cloudData)(task.redCNew.pcList)
-        pcMap = dst1.Clone
     End Sub
 End Class

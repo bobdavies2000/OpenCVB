@@ -27,7 +27,7 @@ Public Class Hull_Basics : Inherits TaskParent
         End If
         Dim hull2f = cv.Cv2.ConvexHull(inputPoints, True)
         hull = vbFloat2Int(hull2f.ToList)
-        DrawContour(dst2, hull, cv.Scalar.Yellow)
+        DrawTour(dst2, hull, cv.Scalar.Yellow)
     End Sub
 End Class
 
@@ -55,8 +55,8 @@ Public Class Hull_Contour : Inherits TaskParent
 
         dst3.SetTo(0)
         hull = cv.Cv2.ConvexHull(contours.allContours(0).ToArray, True).ToList
-        DrawContour(dst3, contours.allContours(0).ToList, white, -1)
-        DrawContour(dst3, hull, white, task.lineWidth)
+        DrawTour(dst3, contours.allContours(0).ToList, white, -1)
+        DrawTour(dst3, hull, white, task.lineWidth)
     End Sub
 End Class
 
@@ -108,7 +108,7 @@ Public Class Hull_Defect : Inherits TaskParent
             lastV = v(1)
         Next
         dst3.SetTo(0)
-        DrawContour(dst3, newC, white)
+        DrawTour(dst3, newC, white)
     End Sub
 End Class
 
