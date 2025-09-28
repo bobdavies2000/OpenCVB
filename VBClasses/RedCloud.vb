@@ -17,7 +17,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Dim rect As New cv.Rect
         Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
         Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
-        Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly
+        Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
         Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
         Dim newList As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalInteger)
         For y = 0 To dst3.Height - 1
@@ -28,9 +28,10 @@ Public Class RedCloud_Basics : Inherits TaskParent
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount And count < maxCount Then
-                            Dim pc = New cloudData(mask(rect), rect, count)
+                            Dim pc = New cloudData(mask(rect).Clone, rect, count)
                             index += 1
-                            newList.Add(pc.id, pc)
+                            pc.index = index
+                            newList.Add(pc.maxDist.Y, pc)
                         End If
                     End If
                 End If
@@ -41,10 +42,11 @@ Public Class RedCloud_Basics : Inherits TaskParent
         dst1.SetTo(0)
         For Each pc In newList.Values
             pc.index = pcList.Count + 1
+            'Dim tmp = dst3(pc.rect).InRange(pc.index, pc.index)
             Dim tmp = dst1(pc.rect)
             pc.mask.SetTo(0, tmp)
             dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
-            'SetTrueText(CStr(pc.index), New cv.Point(pc.rect.X, pc.rect.Y))
+            SetTrueText(CStr(pc.index), New cv.Point(pc.rect.X, pc.rect.Y))
             pcList.Add(pc)
         Next
 

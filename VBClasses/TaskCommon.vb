@@ -574,10 +574,8 @@ End Class
 
 Public Class cloudData
     Public age As Integer
-    Public center As cv.Point
     Public contour As List(Of cv.Point)
     Public depth As Single
-    Public id As Integer
     Public index As Integer
     Public indexLast As Integer
     Public mask As cv.Mat
@@ -596,25 +594,22 @@ Public Class cloudData
         Return mm.maxLoc
     End Function
     Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _pixels As Integer)
-        mask = _mask.Clone
+        mask = _mask
         rect = _rect
         pixels = _pixels
         age = 1
         maxDist = getMaxDist(mask, rect)
-        id = task.gridMap.Get(Of Integer)(maxDist.Y, maxDist.X)
 
         depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
-        center = New cv.Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2)
     End Sub
     Public Function displayString() As String
         Dim strOut = "pcList index = " + CStr(index) + vbCrLf
-        strOut += "age = " + CStr(age) + vbTab + "ID (also gridID) = " + CStr(id) + vbCrLf
+        strOut += "age = " + CStr(age) + vbTab + vbCrLf
         strOut += "rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
         strOut += ", width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
         strOut += "maxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
         strOut += "depth = " + Format(depth, fmt1) + vbCrLf
         strOut += "pixel count = " + CStr(pixels)  + vbCrLf
-        strOut += "center = " + center.ToString() + vbCrLf
         If contour Is Nothing Then
             strOut += "No contour has been built yet."
         Else

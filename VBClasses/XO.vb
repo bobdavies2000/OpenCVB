@@ -12628,7 +12628,7 @@ Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
         Next
 
         For Each pd In pcList
-            dst2.Circle(pd.center, task.DotSize, task.highlight, -1)
+            dst2.Circle(pd.maxDist, task.DotSize, task.highlight, -1)
         Next
 
         labels(2) = CStr(index) + " regions were identified"
@@ -12694,7 +12694,7 @@ Public Class XO_RedCloud_Basics : Inherits TaskParent
                         If count >= minCount And count < maxCount Then
                             Dim pc = New cloudData(mask(r), r, count)
                             index += 1
-                            newList.Add(pc.id, pc)
+                            newList.Add(pc.maxDist.Y, pc)
                         End If
                     End If
                 End If
@@ -12707,7 +12707,7 @@ Public Class XO_RedCloud_Basics : Inherits TaskParent
             pc.index = pcList.Count + 1
             pcList.Add(pc)
             dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
-            SetTrueText(CStr(pc.index) + ", " + CStr(pc.id), New cv.Point(pc.rect.X, pc.rect.Y))
+            SetTrueText(CStr(pc.index), New cv.Point(pc.rect.X, pc.rect.Y))
         Next
         dst2 = ShowPalette254(dst1)
 
