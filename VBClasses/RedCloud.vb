@@ -23,7 +23,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             Dim r1 = pc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect to trigger conditional below...
             If indexLast >= 0 Then r2 = pcListLast(indexLast).rect
-            If indexLast >= 0 And r1.IntersectsWith(r2) Then
+            If indexLast >= 0 And r1.IntersectsWith(r2) And task.heartBeatLT = False Then
                 pc.age = pcListLast(indexLast).age + 1
                 If pc.age > 1000 Then pc.age = 2
                 pc.indexLast = indexLast
@@ -372,8 +372,7 @@ Public Class RedCloud_Motion : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each pc In task.redCNew.pcList
-            If pc.age > 10 Then dst3(pc.rect).SetTo(pc.color, pc.mask)
-
+            If pc.age > 10 Then DrawTour(dst3(pc.rect), pc.contour, pc.color)
         Next
     End Sub
 End Class
