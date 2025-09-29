@@ -43,6 +43,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             DrawTour(dst1(pc.rect), pc.contour, pc.index)
             pc.maskContour = dst1(pc.rect).InRange(pc.index, pc.index)
             dst2(pc.rect).SetTo(pc.color, pc.maskContour)
+            dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
 
@@ -118,8 +119,6 @@ Public Class RedCloud_Core : Inherits TaskParent
             For Each pc In pcList
                 dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
             Next
-
-            RedCell_PCBasics.displayCell()
         End If
         labels(2) = CStr(newList.Count) + " regions were identified."
     End Sub
@@ -185,6 +184,26 @@ Public Class RedCloud_Motion : Inherits TaskParent
         dst3.SetTo(0)
         For Each pc In task.redC.pcList
             If pc.age > 10 Then DrawTour(dst3(pc.rect), pc.contour, pc.color)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_Hulls : Inherits TaskParent
+    Public Sub New()
+        desc = "Create a hull for each RedCloud cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+
+        dst3.SetTo(0)
+        For Each pc In task.redC.pcList
+            Dim hull = cv.Cv2.ConvexHull(pc.contour.ToArray, True).ToList
+            DrawTour(dst3(pc.rect), hull, pc.color, -1)
         Next
     End Sub
 End Class

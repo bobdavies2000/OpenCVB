@@ -7,6 +7,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
         desc = "Reduction transform for the point cloud"
     End Sub
     Private Function reduceChan(chan As cv.Mat) As cv.Mat
+        chan *= task.reductionTarget
         Dim mm As mmData = GetMinMax(chan)
         Dim dst32f As New cv.Mat
         If Math.Abs(mm.minVal) > mm.maxVal Then
@@ -28,14 +29,18 @@ Public Class RedPrep_Basics : Inherits TaskParent
         task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.reductionTarget)
         Dim split = pc32S.Split()
 
-        prepEdges.Run(reduceChan(split(0) * task.reductionTarget))
+        prepEdges.Run(reduceChan(split(0)))
         dst2 = prepEdges.dst3
 
-        prepEdges.Run(reduceChan(split(1) * task.reductionTarget))
+        prepEdges.Run(reduceChan(split(1)))
         dst2 = dst2 Or prepEdges.dst3
 
-        prepEdges.Run(reduceChan(split(2) * task.reductionTarget))
+        prepEdges.Run(reduceChan(split(2)))
         dst2 = dst2 Or prepEdges.dst3
+
+        ' this is not as good as the 3 operations above.
+        'prepEdges.Run(reduceChan(split(0) + split(1) + split(2)))
+        'dst2 = prepEdges.dst3
 
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, task.lineWidth)
         labels(2) = "Using reduction factor = " + CStr(task.reductionTarget)
@@ -248,13 +253,13 @@ Public Class RedPrep_ReductionChoices : Inherits TaskParent
             Case "Z Reduction"
                 dst0 = split(2) * reduceAmt
             Case "XY Reduction"
-                dst0 = split(0) * reduceAmt + split(1) * reduceAmt
+                dst0 = (split(0) + split(1)) * reduceAmt
             Case "XZ Reduction"
-                dst0 = split(0) * reduceAmt + split(2) * reduceAmt
+                dst0 = (split(0) + split(2)) * reduceAmt
             Case "YZ Reduction"
-                dst0 = split(1) * reduceAmt + split(2) * reduceAmt
+                dst0 = (split(1) + split(2)) * reduceAmt
             Case "XYZ Reduction"
-                dst0 = split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt
+                dst0 = (split(0) + split(1) + split(2)) * reduceAmt
         End Select
 
         Dim mm As mmData = GetMinMax(dst0)
