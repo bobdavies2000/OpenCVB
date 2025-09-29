@@ -327,10 +327,10 @@ Public Class Match_TraceRedC : Inherits TaskParent
         dst0.SetTo(0)
         Dim points As New List(Of cv.Point)
 
-        For Each rc In task.redCold.rcList
+        For Each rc In task.redColor.rcList
             dst0.Set(Of Byte)(rc.maxDist.Y, rc.maxDist.X, 1)
         Next
-        labels(2) = CStr(task.redCold.rcList.Count) + " cells added"
+        labels(2) = CStr(task.redColor.rcList.Count) + " cells added"
 
         frameList.Add(dst0.Clone)
         If frameList.Count >= task.frameHistoryCount Then

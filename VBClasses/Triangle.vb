@@ -8,8 +8,8 @@ Public Class Triangle_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = runRedOld(src, labels(2))
 
-        If task.redCold.rcList.Count <= 1 Then Exit Sub
-        task.rcD = task.redCold.rcList(1)
+        If task.redColor.rcList.Count <= 1 Then Exit Sub
+        task.rcD = task.redColor.rcList(1)
 
         dst3.SetTo(0)
         Dim pt3D As New List(Of cv.Point3f)
@@ -51,7 +51,7 @@ Public Class Triangle_HullContour : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         hulls.Run(src)
         dst2 = hulls.dst2
-        If task.redCold.rcList.Count <= 1 Then Exit Sub
+        If task.redColor.rcList.Count <= 1 Then Exit Sub
         Dim rc = task.rcD
 
         rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxTC89L1)
@@ -84,7 +84,7 @@ Public Class Triangle_Cell : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedOld(src, labels(2))
-        If task.redCold.rcList.Count <= 1 Then Exit Sub
+        If task.redColor.rcList.Count <= 1 Then Exit Sub
         Dim rc = task.rcD
         If rc.index = 0 Then Exit Sub
 
@@ -138,7 +138,7 @@ Public Class Triangle_Mask : Inherits TaskParent
 
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedOld(src, labels(2))
-        If task.redCold.rcList.Count <= 1 Then Exit Sub
+        If task.redColor.rcList.Count <= 1 Then Exit Sub
         Dim rc = task.rcD
         If rc.index = 0 Then Exit Sub
 
@@ -171,7 +171,7 @@ Public Class Triangle_Mask : Inherits TaskParent
         Dim newMaxDist = New cv.Point2f(xFactor * (rc.maxDist.X - rc.rect.X) / rc.rect.Width,
                                       yFactor * (rc.maxDist.Y - rc.rect.Y) / rc.rect.Height)
         DrawCircle(dst3, newMaxDist, task.DotSize + 2, cv.Scalar.Red)
-        labels(2) = task.redCold.labels(2)
+        labels(2) = task.redColor.labels(2)
     End Sub
 End Class
 
@@ -215,7 +215,7 @@ Public Class Triangle_Basics2D : Inherits TaskParent
         points.Clear()
         colors.Clear()
         Dim listOfPoints = New List(Of List(Of cv.Point))
-        For Each rc In task.redCold.rcList
+        For Each rc In task.redColor.rcList
             If rc.contour Is Nothing Then Continue For
             If rc.contour.Count < 5 Then Continue For
             Dim corners(4 - 1) As cv.Point
@@ -238,6 +238,6 @@ Public Class Triangle_Basics2D : Inherits TaskParent
         For i = 0 To colors.Count - 1
             cv.Cv2.DrawContours(dst3, listOfPoints, i, colors(i), -1)
         Next
-        labels(2) = CStr(colors.Count) + " triangles from " + CStr(task.redCold.rcList.Count) + " RedCloud cells"
+        labels(2) = CStr(colors.Count) + " triangles from " + CStr(task.redColor.rcList.Count) + " RedCloud cells"
     End Sub
 End Class

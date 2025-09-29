@@ -668,7 +668,7 @@ Public Class Pixel_Vector3D : Inherits TaskParent
         If task.heartBeat Then
             pixelVector.Clear()
             strOut = "3D histogram counts for each cell - " + CStr(maxRegion) + " largest only for readability..." + vbCrLf
-            For Each rc In task.redCold.rcList
+            For Each rc In task.redColor.rcList
                 hColor.inputMask = rc.mask
                 hColor.Run(src(rc.rect))
                 pixelVector.Add(hColor.histArray.ToList)
@@ -684,12 +684,12 @@ Public Class Pixel_Vector3D : Inherits TaskParent
 
         dst1.SetTo(0)
         dst2.SetTo(0)
-        For Each rc In task.redCold.rcList
+        For Each rc In task.redColor.rcList
             task.color(rc.rect).CopyTo(dst2(rc.rect), rc.mask)
             dst1(rc.rect).SetTo(rc.color, rc.mask)
             If rc.index <= maxRegion Then SetTrueText(CStr(rc.index), rc.maxDist, 2)
         Next
-        labels(1) = task.redCold.labels(3)
+        labels(1) = task.redColor.labels(3)
     End Sub
 End Class
 
@@ -709,12 +709,12 @@ Public Class Pixel_Vectors : Inherits TaskParent
         dst2 = runRedOld(src, labels(2))
 
         pixelVector.Clear()
-        For Each rc In task.redCold.rcList
+        For Each rc In task.redColor.rcList
             hVector.inputMask = rc.mask
             hVector.Run(src(rc.rect))
             pixelVector.Add(hVector.histArray)
         Next
-        rcList = task.redCold.rcList
+        rcList = task.redColor.rcList
 
         SetTrueText("3D color histograms were created for " + CStr(pixelVector.Count) + " cells", 3)
     End Sub

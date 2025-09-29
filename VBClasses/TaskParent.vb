@@ -573,17 +573,17 @@ Public Class TaskParent : Implements IDisposable
         Return addw.dst2
     End Function
     Public Function runRedOld(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
-        If task.redCold Is Nothing Then task.redCold = New RedColor_Basics
-        task.redCold.inputRemoved = removeMask
-        task.redCold.Run(src)
-        label = task.redCold.labels(2)
-        Return task.redCold.dst2
+        If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+        task.redColor.inputRemoved = removeMask
+        task.redColor.Run(src)
+        label = task.redColor.labels(2)
+        Return task.redColor.dst2
     End Function
     Public Function runRedOld(src As cv.Mat, ByRef label As String) As cv.Mat
-        If task.redCold Is Nothing Then task.redCold = New RedColor_Basics
-        task.redCold.Run(src)
-        label = task.redCold.labels(2)
-        Return task.redCold.dst2
+        If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+        task.redColor.Run(src)
+        label = task.redColor.labels(2)
+        Return task.redColor.dst2
     End Function
     Public Function runRedC(src As cv.Mat, ByRef label As String) As cv.Mat
         If task.redC Is Nothing Then task.redC = New RedCloud_Basics

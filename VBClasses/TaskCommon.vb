@@ -38,19 +38,19 @@ Public Module vbc
     Public Function DisplayCells() As cv.Mat
         Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
 
-        For Each rc In task.redCold.rcList
+        For Each rc In task.redColor.rcList
             dst(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
         Return dst
     End Function
     Public Function RebuildRCMap(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
-        task.redCold.rcList.Clear()
-        task.redCold.rcList.Add(New rcData) ' placeholder rcData so map is correct.
-        task.redCold.rcMap.SetTo(0)
+        task.redColor.rcList.Clear()
+        task.redColor.rcList.Add(New rcData) ' placeholder rcData so map is correct.
+        task.redColor.rcMap.SetTo(0)
         Static saveColorSetting = task.gOptions.trackingLabel
         For Each rc In sortedCells.Values
-            rc.index = task.redCold.rcList.Count
+            rc.index = task.redColor.rcList.Count
 
             If saveColorSetting <> task.gOptions.trackingLabel Then rc.color = black
             Select Case task.gOptions.trackingLabel
@@ -61,20 +61,20 @@ Public Module vbc
                     If rc.color = black Then rc.color = task.scalarColors(rc.index)
             End Select
 
-            task.redCold.rcList.Add(rc)
-            task.redCold.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            task.redColor.rcList.Add(rc)
+            task.redColor.rcMap(rc.rect).SetTo(rc.index, rc.mask)
             DisplayCells.Circle(rc.maxDStable, task.DotSize, task.highlight, -1)
             If rc.index >= 255 Then Exit For
         Next
         saveColorSetting = task.gOptions.trackingLabel
-        task.redCold.rcMap.SetTo(0, task.noDepthMask)
+        task.redColor.rcMap.SetTo(0, task.noDepthMask)
         Return DisplayCells()
     End Function
     Public Function RebuildRCMap(rcList As List(Of rcData)) As cv.Mat
-        task.redCold.rcMap.SetTo(0)
+        task.redColor.rcMap.SetTo(0)
         Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
         For Each rc In rcList
-            task.redCold.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            task.redColor.rcMap(rc.rect).SetTo(rc.index, rc.mask)
             dst(rc.rect).SetTo(rc.color, rc.mask)
             If rc.index >= 255 Then Exit For
         Next

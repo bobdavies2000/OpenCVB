@@ -195,8 +195,8 @@ Public Class Bin3Way_RedCloud1 : Inherits TaskParent
         bin3.Run(src)
 
         For i = options.startRegion To options.endRegion
-            task.redCold.rcMap = cellMaps(i)
-            task.redCold.rcList = rcList(i)
+            task.redColor.rcMap = cellMaps(i)
+            task.redColor.rcList = rcList(i)
             If i = 2 Then
                 flood.inputRemoved = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
                 color8U.Run(src)
@@ -205,8 +205,8 @@ Public Class Bin3Way_RedCloud1 : Inherits TaskParent
                 flood.inputRemoved = Not bin3.bin3.mats.mat(i)
                 flood.Run(bin3.bin3.mats.mat(i))
             End If
-            cellMaps(i) = task.redCold.rcMap.Clone
-            rcList(i) = New List(Of rcData)(task.redCold.rcList)
+            cellMaps(i) = task.redColor.rcMap.Clone
+            rcList(i) = New List(Of rcData)(task.redColor.rcList)
         Next
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
@@ -218,7 +218,7 @@ Public Class Bin3Way_RedCloud1 : Inherits TaskParent
 
         dst2 = RebuildRCMap(sortedCells)
 
-        If task.heartBeat Then labels(2) = CStr(task.redCold.rcList.Count) + " cells were identified and matched to the previous image"
+        If task.heartBeat Then labels(2) = CStr(task.redColor.rcList.Count) + " cells were identified and matched to the previous image"
     End Sub
 End Class
 
@@ -253,12 +253,12 @@ Public Class Bin3Way_RedCloud : Inherits TaskParent
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = options.startRegion To options.endRegion
-            task.redCold.rcMap = cellMaps(i)
-            task.redCold.rcList = rcList(i)
+            task.redColor.rcMap = cellMaps(i)
+            task.redColor.rcList = rcList(i)
             flood.inputRemoved = Not bin3.bin3.mats.mat(i)
             flood.Run(bin3.bin3.mats.mat(i))
-            cellMaps(i) = task.redCold.rcMap.Clone
-            rcList(i) = New List(Of rcData)(task.redCold.rcList)
+            cellMaps(i) = task.redColor.rcMap.Clone
+            rcList(i) = New List(Of rcData)(task.redColor.rcList)
             For Each rc In rcList(i)
                 If rc.index = 0 Then Continue For
                 sortedCells.Add(rc.pixels, rc)
@@ -267,7 +267,7 @@ Public Class Bin3Way_RedCloud : Inherits TaskParent
 
         dst2 = RebuildRCMap(sortedCells)
 
-        If task.heartBeat Then labels(2) = CStr(task.redCold.rcList.Count) + " cells were identified and matched to the previous image"
+        If task.heartBeat Then labels(2) = CStr(task.redColor.rcList.Count) + " cells were identified and matched to the previous image"
     End Sub
 End Class
 

@@ -13,7 +13,7 @@ Public Class VBtask : Implements IDisposable
 
     ' add any task algorithms here.
     Public ogl As XO_OpenGL_Basics
-    Public redCold As RedColor_Basics
+    Public redColor As RedColor_Basics
     Public redC As RedCloud_Basics
     Public reductionTarget As Integer = 200 ' specify how much reduction is needed using options_RedCloud.
     Public gmat As IMU_GMatrix
@@ -528,20 +528,20 @@ Public Class VBtask : Implements IDisposable
         trueData.Add(str)
     End Sub
     Public Sub setSelectedCell()
-        If task.redCold Is Nothing Then Exit Sub
-        If task.redCold.rcList.Count = 0 Then Exit Sub
-        If ClickPoint = newPoint And task.redCold.rcList.Count > 1 Then
-            ClickPoint = task.redCold.rcList(1).maxDist
+        If task.redColor Is Nothing Then Exit Sub
+        If task.redColor.rcList.Count = 0 Then Exit Sub
+        If ClickPoint = newPoint And task.redColor.rcList.Count > 1 Then
+            ClickPoint = task.redColor.rcList(1).maxDist
         End If
-        Dim index = task.redCold.rcMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
+        Dim index = task.redColor.rcMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
         If index = 0 Then Exit Sub
-        If index > 0 And index < task.redCold.rcList.Count Then
+        If index > 0 And index < task.redColor.rcList.Count Then
             ' ClickPoint = rcList(index).maxDist
-            task.rcD = task.redCold.rcList(index)
+            task.rcD = task.redColor.rcList(index)
             task.color(task.rcD.rect).SetTo(cv.Scalar.White, task.rcD.mask)
         Else
             ' the 0th cell is always the upper left corner with just 1 pixel.
-            If task.redCold.rcList.Count > 1 Then task.rcD = task.redCold.rcList(1)
+            If task.redColor.rcList.Count > 1 Then task.rcD = task.redColor.rcList(1)
         End If
     End Sub
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)

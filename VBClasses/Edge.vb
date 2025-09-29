@@ -964,7 +964,7 @@ Public Class Edge_RedCloud : Inherits TaskParent
 
         mats.mat(1) = runRedOld(src, labels(3))
 
-        canny.Run(task.redCold.dst2)
+        canny.Run(task.redColor.dst2)
         mats.mat(2) = canny.dst2
 
         mats.mat(3) = mats.mat(2).SetTo(0, Not mats.mat(0))

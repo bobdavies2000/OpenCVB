@@ -6,9 +6,9 @@ Public Class RedTrack_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst3 = runRedOld(src, labels(2))
-        labels(2) = task.redCold.labels(2)
+        labels(2) = task.redColor.labels(2)
         dst2.SetTo(0)
-        For Each rc As rcData In task.redCold.rcList
+        For Each rc As rcData In task.redColor.rcList
             DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
             If rc.index = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
         Next
@@ -58,7 +58,7 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
     Private Function findNearest(pt As cv.Point) As Integer
         Dim bestDistance As Single = Single.MaxValue
         Dim bestIndex As Integer
-        For Each rc In task.redCold.rcList
+        For Each rc In task.redColor.rcList
             Dim d = pt.DistanceTo(rc.maxDist)
             If d < bestDistance Then
                 bestDistance = d
@@ -70,12 +70,12 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         track.Run(src)
         dst2 = track.dst2
-        If task.redCold.rcList.Count = 0 Then
+        If task.redColor.rcList.Count = 0 Then
             SetTrueText("No lines found to track.", 3)
             Exit Sub
         End If
         Dim xList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For Each rc In task.redCold.rcList
+        For Each rc In task.redColor.rcList
             If rc.index = 0 Then Continue For
             xList.Add(rc.rect.X, rc.index)
         Next
@@ -89,21 +89,21 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
             While leftCenter.DistanceTo(rightCenter) < dst2.Width / 4
                 leftMost = msRNG.Next(minLeft, minRight)
                 rightmost = msRNG.Next(minLeft, minRight)
-                leftCenter = task.redCold.rcList(leftMost).maxDist
-                rightCenter = task.redCold.rcList(rightmost).maxDist
+                leftCenter = task.redColor.rcList(leftMost).maxDist
+                rightCenter = task.redColor.rcList(rightmost).maxDist
                 iterations += 1
                 If iterations > 10 Then Exit Sub
             End While
         End If
 
         leftMost = findNearest(leftCenter)
-        leftCenter = task.redCold.rcList(leftMost).maxDist
+        leftCenter = task.redColor.rcList(leftMost).maxDist
 
         rightmost = findNearest(rightCenter)
-        rightCenter = task.redCold.rcList(rightmost).maxDist
+        rightCenter = task.redColor.rcList(rightmost).maxDist
 
         DrawLine(dst2, leftCenter, rightCenter, white)
-        labels(2) = task.redCold.labels(2)
+        labels(2) = task.redColor.labels(2)
     End Sub
 End Class
 
@@ -207,7 +207,7 @@ End Class
 
 Public Class RedTrack_Features : Inherits TaskParent
     Public Sub New()
-        task.redCold = New RedColor_Basics
+        task.redColor = New RedColor_Basics
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Output of Feature_Stable - input to RedCloud",
                   "Value Is correlation of x to y in contour points (0 indicates circular.)"}
@@ -219,9 +219,9 @@ Public Class RedTrack_Features : Inherits TaskParent
             DrawCircle(dst2, pt, task.DotSize, 255)
         Next
 
-        task.redCold.Run(dst2)
+        task.redColor.Run(dst2)
         dst3.SetTo(0)
-        For Each rc In task.redCold.rcList
+        For Each rc In task.redColor.rcList
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
             DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)
             If rc.contour.Count > 0 Then SetTrueText(shapeCorrelation(rc.contour).ToString(fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
