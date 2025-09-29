@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class RedColor_Basics : Inherits TaskParent
     Public inputRemoved As cv.Mat
-    Public cellGen As New RedCell_Generate
+    Public cellGen As New XO_RedCell_Generate
     Public redMask As New RedMask_Basics
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat ' redColor map
@@ -615,7 +615,7 @@ End Class
 
 
 Public Class RedColor_CellStatsPlot : Inherits TaskParent
-    Dim cells As New RedCell_BasicsPlot
+    Dim cells As New XO_RedCell_BasicsPlot
     Public Sub New()
         If standaloneTest() Then task.gOptions.displayDst1.Checked = True
         cells.runRedCloud = True

@@ -165,8 +165,8 @@ Public Class Neighbor_Precise : Inherits TaskParent
         '    rcList(0).nabs.Clear() ' not interesting.
 
         '    If task.heartBeat And standaloneTest() Then
-        '        Static stats As New RedCell_Basics
-        '        If stats Is Nothing Then stats = New RedCell_Basics
+        '        Static stats As New XO_RedCell_Basics
+        '        If stats Is Nothing Then stats = New XO_RedCell_Basics
         '        stats.Run(task.color)
 
         '        strOut = stats.strOut

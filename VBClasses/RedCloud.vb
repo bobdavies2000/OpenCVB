@@ -47,12 +47,12 @@ Public Class RedCloud_Basics : Inherits TaskParent
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
 
-        Dim pcClick = RedCell_PCBasics.displayCell()
-        If pcClick IsNot Nothing Then
-            If pcClick.rect.Contains(task.ClickPoint) Then
-                task.color(pcClick.rect).SetTo(white, pcClick.maskContour)
-                SetTrueText(pcClick.displayString, 3)
-                SetTrueText(CStr(pcClick.index), pcClick.maxDist, 3)
+        task.pcD = RedCell_Basics.displayCell()
+        If task.pcD IsNot Nothing Then
+            If task.pcD.rect.Contains(task.ClickPoint) Then
+                task.color(task.pcD.rect).SetTo(white, task.pcD.maskContour)
+                SetTrueText(task.pcD.displayString, 3)
+                SetTrueText(CStr(task.pcD.index), task.pcD.maxDist, 3)
             End If
         End If
 
@@ -201,9 +201,64 @@ Public Class RedCloud_Hulls : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         dst3.SetTo(0)
+        Dim hullCounts As New List(Of Integer)
+        Dim contourCounts As New List(Of Integer)
         For Each pc In task.redC.pcList
             Dim hull = cv.Cv2.ConvexHull(pc.contour.ToArray, True).ToList
             DrawTour(dst3(pc.rect), hull, pc.color, -1)
+            hullCounts.Add(hull.Count)
+            contourCounts.Add(pc.contour.Count)
+            SetTrueText(CStr(pc.age), pc.maxDist)
+        Next
+        labels(3) = "Average hull length = " + Format(hullCounts.Average, fmt1) + " points.  " +
+                    "Average contour length = " + Format(contourCounts.Average, fmt1) + " points."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_Defect : Inherits TaskParent
+    Public hull As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Find defects in the RedCloud cells."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedC(src, labels(2))
+
+        dst3.SetTo(0)
+        For Each pc In task.redC.pcList
+            Dim hullIndices = cv.Cv2.ConvexHullIndices(pc.contour, False)
+            For i = 0 To pc.contour.Count - 1
+                Dim p1 = pc.contour(i)
+                For j = i + 1 To pc.contour.Count - 1
+                    Dim p2 = pc.contour(j)
+                    If p1 = p2 Then Continue For
+                Next
+            Next
+
+            Try
+                Dim defects = cv.Cv2.ConvexityDefects(pc.contour, hullIndices.ToList)
+                Dim lastV As Integer = -1
+                Dim newC As New List(Of cv.Point)
+                For Each v In defects
+                    If v(0) <> lastV And lastV >= 0 Then
+                        For i = lastV To v(0) - 1
+                            newC.Add(pc.contour(i))
+                        Next
+                    End If
+                    newC.Add(pc.contour(v(0)))
+                    newC.Add(pc.contour(v(2)))
+                    newC.Add(pc.contour(v(1)))
+                    lastV = v(1)
+                Next
+                DrawTour(dst3(pc.rect), newC, pc.color)
+            Catch ex As Exception
+                Continue For
+            End Try
         Next
     End Sub
 End Class

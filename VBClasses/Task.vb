@@ -43,7 +43,8 @@ Public Class VBtask : Implements IDisposable
     Public fpMap As New cv.Mat ' feature map
 
     Public brickD As brickData ' the currently selected brick
-    Public rcD As New rcData ' the currently selected red Cell
+    Public pcD As New cloudData ' the currently selected redCloud Cell
+    Public rcD As New rcData ' the currently selected redColor Cell
     Public lpD As New lpData ' the currently selected line pair
     Public fpD As New fpData ' the currently selected feature point.
     Public contourD As New contourData ' the currently selected contour

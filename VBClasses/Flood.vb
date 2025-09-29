@@ -21,7 +21,7 @@ End Class
 Public Class Flood_CellStatsPlot : Inherits TaskParent
     Public Sub New()
         task.gOptions.setHistogramBins(1000)
-        desc = "Provide cell stats on the flood_basics cells.  Identical to RedCell_FloodFill"
+        desc = "Provide cell stats on the flood_basics cells.  Identical to XO_RedCell_FloodFill"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedOld(src, labels(2))
@@ -77,7 +77,7 @@ End Class
 Public Class Flood_BasicsMask : Inherits TaskParent
     Public binarizedImage As cv.Mat
     Public inputRemoved As cv.Mat
-    Public cellGen As New RedCell_Generate
+    Public cellGen As New XO_RedCell_Generate
     Dim redMask As New RedMask_Basics
     Public buildinputRemoved As Boolean
     Public showSelected As Boolean = True
