@@ -13311,7 +13311,7 @@ Public Class XO_RedCell_ValidateColorCloud : Inherits TaskParent
         dst1.SetTo(0)
         dst3.SetTo(0)
         Dim percentDepth As New List(Of Single)
-        For Each pc In task.redC.pcList
+        For Each pc In task.redCloud.pcList
             If pc.pixels > 0 Then dst1(pc.rect).SetTo(255, pc.mask)
             If pc.pixels > 0 Then
                 Dim tmp As cv.Mat = task.depthMask(pc.rect) And pc.mask

@@ -4,7 +4,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Dim redCore As New RedCloud_Core
     Public pcList As New List(Of cloudData)
     Public Sub New()
-        task.redC = Me
+        task.redCloud = Me
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Build contours for each cell"
     End Sub
@@ -56,7 +56,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             End If
         End If
 
-        pcListLast = New List(Of cloudData)(task.redC.pcList)
+        pcListLast = New List(Of cloudData)(task.redCloud.pcList)
         pcMap = dst1.Clone
         depthLast = task.pcSplit(2)
     End Sub
@@ -182,7 +182,7 @@ Public Class RedCloud_Motion : Inherits TaskParent
         labels(2) = redContours.labels(2)
 
         dst3.SetTo(0)
-        For Each pc In task.redC.pcList
+        For Each pc In task.redCloud.pcList
             If pc.age > 10 Then DrawTour(dst3(pc.rect), pc.contour, pc.color)
         Next
     End Sub
@@ -203,7 +203,7 @@ Public Class RedCloud_Hulls : Inherits TaskParent
         dst3.SetTo(0)
         Dim hullCounts As New List(Of Integer)
         Dim contourCounts As New List(Of Integer)
-        For Each pc In task.redC.pcList
+        For Each pc In task.redCloud.pcList
             Dim hull = cv.Cv2.ConvexHull(pc.contour.ToArray, True).ToList
             DrawTour(dst3(pc.rect), hull, pc.color, -1)
             hullCounts.Add(hull.Count)
@@ -230,7 +230,7 @@ Public Class RedCloud_Defect : Inherits TaskParent
         dst2 = runRedC(src, labels(2))
 
         dst3.SetTo(0)
-        For Each pc In task.redC.pcList
+        For Each pc In task.redCloud.pcList
             Dim hullIndices = cv.Cv2.ConvexHullIndices(pc.contour, False)
             For i = 0 To pc.contour.Count - 1
                 Dim p1 = pc.contour(i)

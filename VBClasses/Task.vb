@@ -14,7 +14,7 @@ Public Class VBtask : Implements IDisposable
     ' add any task algorithms here.
     Public ogl As XO_OpenGL_Basics
     Public redColor As RedColor_Basics
-    Public redC As RedCloud_Basics
+    Public redCloud As RedCloud_Basics
     Public reductionTarget As Integer = 200 ' specify how much reduction is needed using options_RedCloud.
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics

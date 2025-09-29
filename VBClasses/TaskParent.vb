@@ -586,10 +586,10 @@ Public Class TaskParent : Implements IDisposable
         Return task.redColor.dst2
     End Function
     Public Function runRedC(src As cv.Mat, ByRef label As String) As cv.Mat
-        If task.redC Is Nothing Then task.redC = New RedCloud_Basics
-        task.redC.Run(src)
-        label = task.redC.labels(2)
-        Return task.redC.dst2
+        If task.redCloud Is Nothing Then task.redCloud = New RedCloud_Basics
+        task.redCloud.Run(src)
+        label = task.redCloud.labels(2)
+        Return task.redCloud.dst2
     End Function
     Public Function InitRandomRect(margin As Integer) As cv.Rect
         Return New cv.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),
