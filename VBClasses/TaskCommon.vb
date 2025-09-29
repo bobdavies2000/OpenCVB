@@ -574,8 +574,12 @@ End Class
 
 Public Class cloudData
     Public age As Integer
+    Public color As cv.Vec3b
     Public contour As List(Of cv.Point)
     Public depth As Single
+    Public depthLast As Single
+    Public depthMin As Single
+    Public depthMax As Single
     Public index As Integer
     Public indexLast As Integer
     Public mask As cv.Mat
@@ -604,12 +608,14 @@ Public Class cloudData
     End Sub
     Public Function displayString() As String
         Dim strOut = "pcList index = " + CStr(index) + vbCrLf
-        strOut += "age = " + CStr(age) + vbTab + vbCrLf
+        strOut += "indexLast = " + CStr(indexLast) + vbCrLf
+        strOut += "age = " + CStr(age) + vbCrLf
         strOut += "rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
         strOut += ", width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
         strOut += "maxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
         strOut += "depth = " + Format(depth, fmt1) + vbCrLf
-        strOut += "pixel count = " + CStr(pixels)  + vbCrLf
+        strOut += "color = " + color.ToString + vbCrLf
+        strOut += "pixel count = " + CStr(pixels) + vbCrLf
         If contour Is Nothing Then
             strOut += "No contour has been built yet."
         Else

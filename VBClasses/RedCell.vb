@@ -348,17 +348,24 @@ Public Class RedCell_PCBasics : Inherits TaskParent
     Public Sub New()
         desc = "Display the output of a cell for RedCloud_Basics."
     End Sub
-    Public Shared Function displayCell() As String
-        Dim clickIndex = task.redCNew.dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
-        If clickIndex >= 0 And clickIndex < task.redCNew.pcList.Count Then
-            task.color(task.redCNew.pcList(clickIndex).rect).SetTo(white, task.redCNew.pcList(clickIndex).mask)
-            ' task.color.Rectangle(task.redCNew.pcList(clickIndex).rect, white, task.lineWidth, task.lineType)
-            Return task.redCNew.pcList(clickIndex).displayString
+    Public Shared Function displayCellx() As cloudData
+        Static clickIndex As Integer
+        Static pcClick As cloudData
+        clickIndex = task.redCNew.dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
+        If clickIndex >= 0 Then pcClick = task.redCNew.pcList(clickIndex)
+        If task.mouseClickFlag Then
+
         End If
-        Return ""
+        Return pcClick
+    End Function
+    Public Shared Function displayCell() As cloudData
+        Dim clickIndex = task.redCNew.dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
+        If clickIndex >= 0 Then Return task.redCNew.pcList(clickIndex)
+        Return Nothing
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then dst2 = runRedC(src, labels(2))
-        SetTrueText(displayCell(), 3)
+        Dim pcClick = displayCell()
+        If pcClick IsNot Nothing Then SetTrueText(pcClick.displayString, 3)
     End Sub
 End Class

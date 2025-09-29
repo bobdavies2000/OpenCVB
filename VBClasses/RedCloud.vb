@@ -14,34 +14,51 @@ Public Class RedCloud_Basics : Inherits TaskParent
 
         Static pcListLast = New List(Of cloudData)(pcList)
         Static pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Static depthLast As cv.Mat = task.pcSplit(2)
 
         pcList.Clear()
-        For Each pc In redCore.pcList
+        Dim r2 As cv.Rect
+        For Each pc As cloudData In redCore.pcList
             Dim indexLast = pcMap.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
-            If indexLast > 0 Then
+            Dim r1 = pc.rect
+            r2 = New cv.Rect(0, 0, 1, 1) ' fake rect to trigger conditional below...
+            If indexLast >= 0 Then r2 = pcListLast(indexLast).rect
+            If indexLast >= 0 And r1.IntersectsWith(r2) Then
                 pc.age = pcListLast(indexLast).age + 1
                 If pc.age > 1000 Then pc.age = 2
                 pc.indexLast = indexLast
+                pc.depthLast = depthLast(pc.rect).Mean(pc.mask)
+                pc.maxDist = pcListLast(pc.indexLast).maxdist
+                pc.color = pcListLast(pc.indexLast).color
             Else
                 pc.indexLast = pc.index
+                pc.color = task.vecColors(pc.index)
             End If
             pc.index = pcList.Count + 1
             pcList.Add(pc)
         Next
 
         dst1.SetTo(0)
+        dst2.SetTo(0)
         For Each pc In pcList
             pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
             DrawTour(dst1(pc.rect), pc.contour, pc.index)
-            dst1(pc.rect).SetTo(0, Not pc.mask)
-            SetTrueText(CStr(pc.age), pc.rect.TopLeft)
+            DrawTour(dst2(pc.rect), pc.contour, pc.color)
+            SetTrueText(CStr(pc.age), pc.maxDist)
         Next
 
-        dst2 = ShowPalette254(dst1)
-        RedCell_PCBasics.displayCell()
+        Dim pcClick = RedCell_PCBasics.displayCell()
+        If pcClick IsNot Nothing Then
+            If pcClick.rect.Contains(task.ClickPoint) Then
+                task.color(pcClick.rect).SetTo(white, pcClick.mask)
+                SetTrueText(pcClick.displayString, 3)
+                SetTrueText(CStr(pcClick.index), pcClick.maxDist, 3)
+            End If
+        End If
 
         pcListLast = New List(Of cloudData)(task.redCNew.pcList)
         pcMap = dst1.Clone
+        depthLast = task.pcSplit(2)
     End Sub
 End Class
 
@@ -301,7 +318,7 @@ End Class
 
 
 
-Public Class RedCloud_Motion : Inherits TaskParent
+Public Class RedCloud_MotionSimple : Inherits TaskParent
     Dim redContours As New RedCloud_Basics
     Public Sub New()
         task.gOptions.HistBinBar.Maximum = 255
@@ -331,6 +348,32 @@ Public Class RedCloud_Motion : Inherits TaskParent
                 dst3(pc.rect).SetTo(task.scalarColors(pc.index), pc.mask)
                 pcUsed.Add(i)
             End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_Motion : Inherits TaskParent
+    Dim redContours As New RedCloud_Basics
+    Public Sub New()
+        task.gOptions.HistBinBar.Maximum = 255
+        task.gOptions.HistBinBar.Value = 255
+        desc = "Use motion to identify which cells changed."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redContours.Run(src)
+        dst1 = redContours.dst1
+        dst2 = redContours.dst2
+        labels(2) = redContours.labels(2)
+
+        dst3.SetTo(0)
+        For Each pc In task.redCNew.pcList
+            If pc.age > 10 Then dst3(pc.rect).SetTo(pc.color, pc.mask)
+
         Next
     End Sub
 End Class
