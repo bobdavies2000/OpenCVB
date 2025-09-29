@@ -26,17 +26,11 @@ Public Class RedCloud_Basics : Inherits TaskParent
             If indexLast >= 0 And r1.IntersectsWith(r2) And task.heartBeatLT = False Then
                 pc.age = pcListLast(indexLast).age + 1
                 If pc.age > 1000 Then pc.age = 2
-                pc.indexLast = indexLast
                 pc.depthLast = depthLast(pc.rect).Mean(pc.mask)
-                pc.maxDist = pcListLast(pc.indexLast).maxdist
-                pc.color = pcListLast(pc.indexLast).color
+                pc.maxDist = pcListLast(indexLast).maxdist
+                pc.color = pcListLast(indexLast).color
             Else
-                pc.indexLast = pc.index
                 pc.color = task.vecColors(pc.index)
-                If task.heartBeat Then
-                Else
-                    pc.color = dst2.Get(Of cv.Vec3b)(pc.maxDist.Y, pc.maxDist.X)
-                End If
             End If
             pc.index = pcList.Count + 1
             pcList.Add(pc)
@@ -47,14 +41,15 @@ Public Class RedCloud_Basics : Inherits TaskParent
         For Each pc In pcList
             pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
             DrawTour(dst1(pc.rect), pc.contour, pc.index)
-            DrawTour(dst2(pc.rect), pc.contour, pc.color)
+            pc.maskContour = dst1(pc.rect).InRange(pc.index, pc.index)
+            dst2(pc.rect).SetTo(pc.color, pc.maskContour)
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
 
         Dim pcClick = RedCell_PCBasics.displayCell()
         If pcClick IsNot Nothing Then
             If pcClick.rect.Contains(task.ClickPoint) Then
-                task.color(pcClick.rect).SetTo(white, pcClick.mask)
+                task.color(pcClick.rect).SetTo(white, pcClick.maskContour)
                 SetTrueText(pcClick.displayString, 3)
                 SetTrueText(CStr(pcClick.index), pcClick.maxDist, 3)
             End If

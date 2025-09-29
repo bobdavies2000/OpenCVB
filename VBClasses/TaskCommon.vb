@@ -576,61 +576,6 @@ End Class
 
 
 
-Public Class cloudData
-    Public age As Integer
-    Public color As cv.Vec3b
-    Public contour As List(Of cv.Point)
-    Public depth As Single
-    Public depthLast As Single
-    Public depthMin As Single
-    Public depthMax As Single
-    Public index As Integer
-    Public indexLast As Integer
-    Public mask As cv.Mat
-    Public maxDist As cv.Point
-    Public pixels As Integer
-    Public rect As cv.Rect
-    Public Sub New()
-    End Sub
-    Private Function getMaxDist(mask As cv.Mat, rect As cv.Rect) As cv.Point
-        Dim tmp = mask.Clone
-        tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-        Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
-        Dim mm As mmData = GetMinMax(distance32f)
-        mm.maxLoc.X += rect.X
-        mm.maxLoc.Y += rect.Y
-        Return mm.maxLoc
-    End Function
-    Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _pixels As Integer)
-        mask = _mask
-        rect = _rect
-        pixels = _pixels
-        age = 1
-        maxDist = getMaxDist(mask, rect)
-
-        depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
-    End Sub
-    Public Function displayString() As String
-        Dim strOut = "pcList index = " + CStr(index) + vbCrLf
-        strOut += "indexLast = " + CStr(indexLast) + vbCrLf
-        strOut += "age = " + CStr(age) + vbCrLf
-        strOut += "rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
-        strOut += ", width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
-        strOut += "maxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
-        strOut += "depth = " + Format(depth, fmt1) + vbCrLf
-        strOut += "color = " + color.ToString + vbCrLf
-        strOut += "pixel count = " + CStr(pixels) + vbCrLf
-        If contour Is Nothing Then
-            strOut += "No contour has been built yet."
-        Else
-            strOut += "contour count = " + CStr(contour.Count) + vbCrLf
-        End If
-        Return strOut
-    End Function
-End Class
-
-
-
 
 Public Class lpData
     Public age As Integer
@@ -809,5 +754,58 @@ Public Class lpData
     Public Function compare(lp As lpData) As Boolean
         If lp.p1.X = p1.X And lp.p1.Y = p1.Y And lp.p2.X = p2.X And p2.Y = p2.Y Then Return True
         Return False
+    End Function
+End Class
+
+
+
+
+Public Class cloudData
+    Public age As Integer
+    Public color As cv.Vec3b
+    Public contour As List(Of cv.Point)
+    Public depth As Single
+    Public depthLast As Single
+    Public index As Integer
+    Public mask As cv.Mat
+    Public maskContour As cv.Mat
+    Public maxDist As cv.Point
+    Public pixels As Integer
+    Public rect As cv.Rect
+    Public Sub New()
+    End Sub
+    Private Function getMaxDist(mask As cv.Mat, rect As cv.Rect) As cv.Point
+        Dim tmp = mask.Clone
+        tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+        Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
+        Dim mm As mmData = GetMinMax(distance32f)
+        mm.maxLoc.X += rect.X
+        mm.maxLoc.Y += rect.Y
+        Return mm.maxLoc
+    End Function
+    Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _pixels As Integer)
+        mask = _mask
+        rect = _rect
+        pixels = _pixels
+        age = 1
+        maxDist = getMaxDist(mask, rect)
+
+        depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
+    End Sub
+    Public Function displayString() As String
+        Dim strOut = "pcList index = " + CStr(index) + vbCrLf
+        strOut += "age = " + CStr(age) + vbCrLf
+        strOut += "rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
+        strOut += ", width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
+        strOut += "maxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
+        strOut += "depth = " + Format(depth, fmt1) + vbCrLf
+        strOut += "color = " + color.ToString + vbCrLf
+        strOut += "pixel count = " + CStr(pixels) + vbCrLf
+        If contour Is Nothing Then
+            strOut += "No contour has been built yet."
+        Else
+            strOut += "contour count = " + CStr(contour.Count) + vbCrLf
+        End If
+        Return strOut
     End Function
 End Class
