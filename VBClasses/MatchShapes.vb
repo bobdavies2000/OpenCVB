@@ -78,7 +78,7 @@ Public Class MatchShapes_NearbyHull : Inherits TaskParent
 
         If standaloneTest() Then
             hulls.Run(task.color)
-            If task.redC.rcList.Count = 0 Then Exit Sub
+            If task.redCold.rcList.Count = 0 Then Exit Sub
             dst2 = hulls.dst2
             rc = task.rcD
         End If
@@ -87,7 +87,7 @@ Public Class MatchShapes_NearbyHull : Inherits TaskParent
         similarCells.Clear()
 
         Dim minMatch As Single = Single.MaxValue
-        For Each rc2 In task.redC.rcList
+        For Each rc2 In task.redCold.rcList
             If rc2.hull Is Nothing Or rc.hull Is Nothing Then Continue For
             If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rc.hull, rc2.hull, options.matchOption)
@@ -133,8 +133,8 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
 
         If myStandalone Then
             dst2 = runRedOld(task.color, labels(2)).Clone
-            If task.redC.rcList.Count = 0 Then Exit Sub
-            addTour.rcList = New List(Of rcData)(task.redC.rcList)
+            If task.redCold.rcList.Count = 0 Then Exit Sub
+            addTour.rcList = New List(Of rcData)(task.redCold.rcList)
             addTour.Run(src)
             rc = task.rcD
         End If
@@ -195,7 +195,7 @@ Public Class MatchShapes_Hulls : Inherits TaskParent
 
         Dim rcX = task.rcD
 
-        For Each rc In task.redC.rcList
+        For Each rc In task.redCold.rcList
             If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rcX.hull, rc.hull, options.matchOption)
             If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.hull, white, -1)
@@ -228,7 +228,7 @@ Public Class MatchShapes_Contours : Inherits TaskParent
 
         Dim rcX = task.rcD
 
-        For Each rc In task.redC.rcList
+        For Each rc In task.redCold.rcList
             If rc.contour Is Nothing Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rcX.contour, rc.contour, options.matchOption)
             If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.contour, white, -1)

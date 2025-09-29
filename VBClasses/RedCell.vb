@@ -69,7 +69,7 @@ Public Class RedCell_ValidateColor : Inherits TaskParent
         dst1.SetTo(0)
         dst3.SetTo(0)
         Dim percentDepth As New List(Of Single)
-        For Each rc In task.redC.rcList
+        For Each rc In task.redCold.rcList
             If rc.depthPixels > 0 Then dst1(rc.rect).SetTo(255, rc.mask)
             If rc.depthPixels > 0 And rc.index > 0 Then
                 Dim pc = rc.depthPixels / rc.pixels
@@ -119,8 +119,8 @@ Public Class RedCell_Distance : Inherits TaskParent
             Dim depthDistance As New List(Of Single)
             Dim colorDistance As New List(Of Single)
             Dim selectedMean As cv.Scalar = src(task.rcD.rect).Mean(task.rcD.mask)
-            If task.redC.rcList.Count = 0 Then Exit Sub ' next frame please...
-            For Each rc In task.redC.rcList
+            If task.redCold.rcList.Count = 0 Then Exit Sub ' next frame please...
+            For Each rc In task.redCold.rcList
                 colorDistance.Add(distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
                 depthDistance.Add(distance3D(task.rcD.depth, rc.depth))
             Next
@@ -128,8 +128,8 @@ Public Class RedCell_Distance : Inherits TaskParent
             dst1.SetTo(0)
             dst3.SetTo(0)
             Dim maxColorDistance = colorDistance.Max()
-            For i = 0 To task.redC.rcList.Count - 1
-                Dim rc = task.redC.rcList(i)
+            For i = 0 To task.redCold.rcList.Count - 1
+                Dim rc = task.redCold.rcList(i)
                 dst1(rc.rect).SetTo(255 - depthDistance(i) * 255 / task.MaxZmeters, rc.mask)
                 dst3(rc.rect).SetTo(255 - colorDistance(i) * 255 / maxColorDistance, rc.mask)
             Next
@@ -160,8 +160,8 @@ Public Class RedCell_Binarize : Inherits TaskParent
 
             Dim grayMeans As New List(Of Single)
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            If task.redC.rcList.Count = 0 Then Exit Sub ' next frame please...
-            For Each rc In task.redC.rcList
+            If task.redCold.rcList.Count = 0 Then Exit Sub ' next frame please...
+            For Each rc In task.redCold.rcList
                 Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
                 cv.Cv2.MeanStdDev(gray(rc.rect), grayMean, grayStdev, rc.mask)
                 grayMeans.Add(grayMean(0))
@@ -171,7 +171,7 @@ Public Class RedCell_Binarize : Inherits TaskParent
             Dim avg = grayMeans.Average
 
             dst3.SetTo(0)
-            For Each rc In task.redC.rcList
+            For Each rc In task.redCold.rcList
                 Dim color = (grayMeans(rc.index) - min) * 255 / (max - min)
                 dst3(rc.rect).SetTo(color, rc.mask)
                 dst1(rc.rect).SetTo(If(grayMeans(rc.index) > avg, 255, 0), rc.mask)
@@ -232,8 +232,8 @@ Public Class RedCell_BasicsPlot : Inherits TaskParent
         If standaloneTest() Or runRedCloud Then
             dst2 = runRedOld(src, labels(2))
             If task.ClickPoint = newPoint Then
-                If task.redC.rcList.Count > 1 Then
-                    task.rcD = task.redC.rcList(1)
+                If task.redCold.rcList.Count > 1 Then
+                    task.rcD = task.redCold.rcList(1)
                     task.ClickPoint = task.rcD.maxDist
                 End If
             End If
@@ -259,7 +259,7 @@ Public Class RedCell_Generate : Inherits TaskParent
             SetTrueText("RedCell_Generate is run by numerous algorithms but generates no output when standalone. ", 2)
             Exit Sub
         End If
-        If task.redC Is Nothing Then task.redC = New RedColor_Basics
+        If task.redCold Is Nothing Then task.redCold = New RedColor_Basics
 
         Dim initialList As New List(Of rcData)
         For i = 0 To mdList.Count - 1
@@ -269,13 +269,13 @@ Public Class RedCell_Generate : Inherits TaskParent
             rc.mask = mdList(i).mask
             rc.maxDist = mdList(i).maxDist
             rc.maxDStable = rc.maxDist
-            rc.indexLast = task.redC.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            rc.indexLast = task.redCold.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             rc.contour = mdList(i).contour
             DrawTour(rc.mask, rc.contour, 255, -1)
             rc.pixels = mdList(i).mask.CountNonZero
-            If rc.indexLast >= task.redC.rcList.Count Then rc.indexLast = 0
+            If rc.indexLast >= task.redCold.rcList.Count Then rc.indexLast = 0
             If rc.indexLast > 0 Then
-                Dim lrc = task.redC.rcList(rc.indexLast)
+                Dim lrc = task.redCold.rcList(rc.indexLast)
                 rc.age = lrc.age + 1
                 rc.depth = lrc.depth
                 rc.depthMask = lrc.depthMask
@@ -289,7 +289,7 @@ Public Class RedCell_Generate : Inherits TaskParent
                     rc.color = yellow
                 Else
                     ' verify that the maxDStable is still good.
-                    Dim v1 = task.redC.rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                    Dim v1 = task.redCold.rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                     If v1 <> lrc.index Then
                         rc.maxDStable = rc.maxDist
 
@@ -332,8 +332,8 @@ Public Class RedCell_Generate : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            labels(2) = CStr(task.redC.rcList.Count) + " total cells (shown with '" + task.gOptions.TrackingLabel + "' and " +
-                        CStr(task.redC.rcList.Count - rcNewCount) + " matched to previous frame"
+            labels(2) = CStr(task.redCold.rcList.Count) + " total cells (shown with '" + task.gOptions.trackingLabel + "' and " +
+                        CStr(task.redCold.rcList.Count - rcNewCount) + " matched to previous frame"
         End If
         dst2 = RebuildRCMap(sortedCells)
     End Sub
@@ -351,16 +351,16 @@ Public Class RedCell_PCBasics : Inherits TaskParent
     Public Shared Function displayCellx() As cloudData
         Static clickIndex As Integer
         Static pcClick As cloudData
-        clickIndex = task.redCNew.dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
-        If clickIndex >= 0 Then pcClick = task.redCNew.pcList(clickIndex)
+        clickIndex = task.redC.dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
+        If clickIndex >= 0 Then pcClick = task.redC.pcList(clickIndex)
         If task.mouseClickFlag Then
 
         End If
         Return pcClick
     End Function
     Public Shared Function displayCell() As cloudData
-        Dim clickIndex = task.redCNew.dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
-        If clickIndex >= 0 Then Return task.redCNew.pcList(clickIndex)
+        Dim clickIndex = task.redC.dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
+        If clickIndex >= 0 Then Return task.redC.pcList(clickIndex)
         Return Nothing
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)

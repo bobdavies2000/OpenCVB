@@ -349,16 +349,16 @@ Public Class GuidedBP_RedCloud : Inherits TaskParent
         guide.Run(src)
 
         redCx.Run(guide.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        rcMapX = task.redC.rcMap.Clone
+        rcMapX = task.redCold.rcMap.Clone
         dst2 = redCx.dst2
-        rcListX = New List(Of rcData)(task.redC.rcList)
-        labels(2) = CStr(task.redC.rcList.Count) + " cells were found in vertical segments"
+        rcListX = New List(Of rcData)(task.redCold.rcList)
+        labels(2) = CStr(task.redCold.rcList.Count) + " cells were found in vertical segments"
 
         redCx.Run(guide.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        rcMapY = task.redC.rcMap.Clone
+        rcMapY = task.redCold.rcMap.Clone
         dst3 = redCx.dst2
-        rcListY = New List(Of rcData)(task.redC.rcList)
-        labels(3) = CStr(task.redC.rcList.Count) + " cells were found in horizontal segments"
+        rcListY = New List(Of rcData)(task.redCold.rcList)
+        labels(3) = CStr(task.redCold.rcList.Count) + " cells were found in horizontal segments"
     End Sub
 End Class
 
@@ -370,7 +370,7 @@ End Class
 
 
 Public Class GuidedBP_Regions : Inherits TaskParent
-    Public redC As New GuidedBP_RedCloud
+    Public redCold As New GuidedBP_RedCloud
     Public mats As New Mat_4Click
     Dim options As New Options_BP_Regions
     Public rcListX As New List(Of rcData)
@@ -386,17 +386,17 @@ Public Class GuidedBP_Regions : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        redC.Run(src)
+        redCold.Run(src)
 
-        rcMapX = redC.rcMapX.Threshold(options.cellCount - 1, 255, cv.ThresholdTypes.TozeroInv)
-        rcMapY = redC.rcMapY.Threshold(options.cellCount - 1, 255, cv.ThresholdTypes.TozeroInv)
+        rcMapX = redCold.rcMapX.Threshold(options.cellCount - 1, 255, cv.ThresholdTypes.TozeroInv)
+        rcMapY = redCold.rcMapY.Threshold(options.cellCount - 1, 255, cv.ThresholdTypes.TozeroInv)
         If standaloneTest() Then
             dst0 = ShowPalette(rcMapX)
             dst1 = ShowPalette(rcMapY)
         End If
 
-        mats.mat(0) = redC.dst2
-        mats.mat(1) = redC.dst3
+        mats.mat(0) = redCold.dst2
+        mats.mat(1) = redCold.dst3
 
         mats.mat(2).SetTo(0)
         mats.mat(3).SetTo(0)
@@ -404,13 +404,13 @@ Public Class GuidedBP_Regions : Inherits TaskParent
         rcListX.Clear()
         rcListY.Clear()
 
-        For i = 1 To Math.Min(options.cellCount, redC.rcListX.Count) - 1
-            Dim rc = redC.rcListX(i)
+        For i = 1 To Math.Min(options.cellCount, redCold.rcListX.Count) - 1
+            Dim rc = redCold.rcListX(i)
             mats.mat(2)(rc.rect).SetTo(rc.color, rc.mask)
             rcListX.Add(rc)
         Next
-        For i = 1 To Math.Min(options.cellCount, redC.rcListY.Count) - 1
-            Dim rc = redC.rcListY(i)
+        For i = 1 To Math.Min(options.cellCount, redCold.rcListY.Count) - 1
+            Dim rc = redCold.rcListY(i)
             mats.mat(3)(rc.rect).SetTo(rc.color, rc.mask)
             rcListY.Add(rc)
         Next

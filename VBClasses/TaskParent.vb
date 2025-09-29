@@ -573,23 +573,23 @@ Public Class TaskParent : Implements IDisposable
         Return addw.dst2
     End Function
     Public Function runRedOld(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
-        If task.redC Is Nothing Then task.redC = New RedColor_Basics
-        task.redC.inputRemoved = removeMask
-        task.redC.Run(src)
-        label = task.redC.labels(2)
-        Return task.redC.dst2
+        If task.redCold Is Nothing Then task.redCold = New RedColor_Basics
+        task.redCold.inputRemoved = removeMask
+        task.redCold.Run(src)
+        label = task.redCold.labels(2)
+        Return task.redCold.dst2
     End Function
     Public Function runRedOld(src As cv.Mat, ByRef label As String) As cv.Mat
-        If task.redC Is Nothing Then task.redC = New RedColor_Basics
+        If task.redCold Is Nothing Then task.redCold = New RedColor_Basics
+        task.redCold.Run(src)
+        label = task.redCold.labels(2)
+        Return task.redCold.dst2
+    End Function
+    Public Function runRedC(src As cv.Mat, ByRef label As String) As cv.Mat
+        If task.redC Is Nothing Then task.redC = New RedCloud_Basics
         task.redC.Run(src)
         label = task.redC.labels(2)
         Return task.redC.dst2
-    End Function
-    Public Function runRedC(src As cv.Mat, ByRef label As String) As cv.Mat
-        If task.redCNew Is Nothing Then task.redCNew = New RedCloud_Basics
-        task.redCNew.Run(src)
-        label = task.redCNew.labels(2)
-        Return task.redCNew.dst2
     End Function
     Public Function InitRandomRect(margin As Integer) As cv.Rect
         Return New cv.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),

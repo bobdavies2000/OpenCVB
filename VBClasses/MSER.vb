@@ -39,9 +39,9 @@ Public Class MSER_Basics : Inherits TaskParent
 
             rc.maxDist = GetMaxDist(rc)
 
-            rc.indexLast = task.redC.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If rc.indexLast <> 0 And rc.indexLast < task.redC.rcList.Count Then
-                Dim lrc = task.redC.rcList(rc.indexLast)
+            rc.indexLast = task.redCold.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If rc.indexLast <> 0 And rc.indexLast < task.redCold.rcList.Count Then
+                Dim lrc = task.redCold.rcList(rc.indexLast)
                 rc.maxDStable = lrc.maxDStable
                 rc.color = lrc.color
                 matched.Add(rc.indexLast, rc.indexLast)
@@ -55,10 +55,10 @@ Public Class MSER_Basics : Inherits TaskParent
             If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
         Next
 
-        task.redC.rcList = New List(Of rcData)(sortedCells.Values)
+        task.redCold.rcList = New List(Of rcData)(sortedCells.Values)
         dst2 = RebuildRCMap(sortedCells)
 
-        labels(2) = CStr(task.redC.rcList.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
+        labels(2) = CStr(task.redCold.rcList.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
     End Sub
 End Class
 
@@ -231,15 +231,15 @@ Public Class MSER_Hulls : Inherits TaskParent
 
         Dim pixels As Integer
         dst3.SetTo(0)
-        For Each rc In task.redC.rcList
+        For Each rc In task.redCold.rcList
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             pixels += rc.pixels
             DrawTour(dst3(rc.rect), rc.hull, rc.color, -1)
         Next
 
-        If task.heartBeat Then labels(2) = CStr(task.redC.rcList.Count) + " Regions with average size " +
-                                           If(task.redC.rcList.Count > 0,
-                                           CStr(CInt(pixels / task.redC.rcList.Count)), "0")
+        If task.heartBeat Then labels(2) = CStr(task.redCold.rcList.Count) + " Regions with average size " +
+                                           If(task.redCold.rcList.Count > 0,
+                                           CStr(CInt(pixels / task.redCold.rcList.Count)), "0")
     End Sub
 End Class
 
@@ -442,15 +442,15 @@ End Class
 Public Class MSER_RedCloud : Inherits TaskParent
     Dim mser As New MSER_Basics
     Public Sub New()
-        task.redC = New RedColor_Basics
+        task.redCold = New RedColor_Basics
         desc = "Use the MSER_Basics output as input to RedColor_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         mser.Run(src)
 
-        task.redC.Run(mser.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst2 = task.redC.dst2
-        labels(2) = task.redC.labels(2)
+        task.redCold.Run(mser.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst2 = task.redCold.dst2
+        labels(2) = task.redCold.labels(2)
     End Sub
 End Class
 

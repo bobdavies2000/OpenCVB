@@ -629,7 +629,7 @@ Public Class XO_OpenGL_DrawHulls : Inherits TaskParent
         Dim oglData As New List(Of cv.Point3f)
         oglData.Add(New cv.Point3f)
         Dim polygonCount As Integer
-        For Each rc In task.redC.rcList
+        For Each rc In task.redCold.rcList
             If rc.hull Is Nothing Then Continue For
             Dim hullIndex = oglData.Count
             oglData.Add(New cv.Point3f(rc.hull.Count, 0, 0))
@@ -688,7 +688,7 @@ Public Class XO_OpenGL_Contours : Inherits TaskParent
         Dim oglData As New List(Of cv.Point3f)
         Dim lastDepth As cv.Scalar
         oglData.Add(New cv.Point3f)
-        For Each rc In task.redC.rcList
+        For Each rc In task.redCold.rcList
             Dim d = rc.depth
             If d = 0 Then Continue For
 
@@ -1115,8 +1115,8 @@ Public Class XO_OpenGL_RedCloudCell : Inherits TaskParent
         specZ.Run(src)
         SetTrueText(specZ.strOut, 3)
 
-        If task.ClickPoint = newPoint And task.redC.rcList.Count > 1 Then
-            task.rcD = task.redC.rcList(1) ' pick the largest cell
+        If task.ClickPoint = newPoint And task.redCold.rcList.Count > 1 Then
+            task.rcD = task.redCold.rcList(1) ' pick the largest cell
             task.ClickPoint = task.rcD.maxDist
         End If
 
@@ -4825,7 +4825,7 @@ Public Class XO_Region_RedColor : Inherits TaskParent
         connect.Run(src)
 
         dst3 = runRedOld(src, labels(3))
-        For Each rc In task.redC.rcList
+        For Each rc In task.redCold.rcList
             Dim index = connect.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             dst2(rc.rect).SetTo(task.scalarColors(index), rc.mask)
         Next
@@ -6489,11 +6489,11 @@ Public Class XO_OpenGL_PlaneClusters3D : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedOld(src, labels(2))
-        dst3 = task.redC.dst3
+        dst3 = task.redCold.dst3
 
         Dim pcPoints As New List(Of cv.Point3f)
         Dim blue As New cv.Point3f(0, 0, 1), red As New cv.Point3f(1, 0, 0), green As New cv.Point3f(0, 1, 0) ' NOTE: RGB, not BGR...
-        For Each rc In task.redC.rcList
+        For Each rc In task.redCold.rcList
             If rc.mmZ.maxVal > 0 Then
                 eq.rc = rc
                 eq.Run(src)
@@ -6691,10 +6691,10 @@ Public Class XO_Contour_RedCloudEdges : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         runRedOld(src, labels(3))
-        labels(2) = task.redC.labels(2) + " - Contours only.  Click anywhere to select a cell"
+        labels(2) = task.redCold.labels(2) + " - Contours only.  Click anywhere to select a cell"
 
         dst2.SetTo(0)
-        For Each rc In task.redC.rcList
+        For Each rc In task.redCold.rcList
             DrawTour(dst2(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
@@ -7703,18 +7703,18 @@ Public Class XO_TrackLine_Map : Inherits TaskParent
 
         Dim count As Integer
         dst3.SetTo(0)
-        Dim histarray(task.redC.rcList.Count - 1) As Single
+        Dim histarray(task.redCold.rcList.Count - 1) As Single
         Dim histogram As New cv.Mat
         For Each brick In task.bricks.brickList
-            cv.Cv2.CalcHist({task.redC.rcMap(brick.rect)}, {0}, emptyMat, histogram, 1, {task.redC.rcList.Count},
-                             New cv.Rangef() {New cv.Rangef(1, task.redC.rcList.Count)})
+            cv.Cv2.CalcHist({task.redCold.rcMap(brick.rect)}, {0}, emptyMat, histogram, 1, {task.redCold.rcList.Count},
+                             New cv.Rangef() {New cv.Rangef(1, task.redCold.rcList.Count)})
 
             Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
             ' if multiple lines intersect a grid rect, choose the largest redcloud cell containing them.
             ' The largest will be the index of the first non-zero histogram entry.
             For j = 1 To histarray.Count - 1
                 If histarray(j) > 0 Then
-                    Dim rc = task.redC.rcList(j)
+                    Dim rc = task.redCold.rcList(j)
                     dst3(brick.rect).SetTo(rc.color)
                     ' dst3(brick.rect).SetTo(0, Not dst1(brick.rect))
                     count += 1
@@ -12444,7 +12444,7 @@ Public Class XO_Contour_RedCloud1 : Inherits TaskParent
         dst2 = runRedOld(src, labels(2))
 
         dst3.SetTo(0)
-        For Each rc In task.redC.rcList
+        For Each rc In task.redCold.rcList
             DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next
     End Sub
@@ -12593,7 +12593,7 @@ End Class
 
 
 Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redCold As New RedCloud_Basics
     Dim prep As New RedPrep_Basics
     Public pcList As New List(Of cloudData)
     Public Sub New()
@@ -12601,9 +12601,9 @@ Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
-            redC.Run(src)
-            dst2 = redC.dst2
-            dst3 = redC.dst3
+            redCold.Run(src)
+            dst2 = redCold.dst2
+            dst3 = redCold.dst3
             Exit Sub
         End If
 
@@ -12617,7 +12617,7 @@ Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
         Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
         pcList.Clear()
         Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
-        For Each pc In redC.pcList
+        For Each pc In redCold.pcList
             Dim count = cv.Cv2.FloodFill(dst3, mask, pc.maxDist, index, rect, 0, 0, flags)
             If count >= minCount And count < maxCount Then
                 index += 1

@@ -16,7 +16,7 @@ Public Class Projection_Basics : Inherits TaskParent
             src = histTop.dst2
 
             dst2 = runRedOld(histTop.dst3, labels(2), Not histTop.dst3)
-            redCellInput = task.redC.rcList
+            redCellInput = task.redCold.rcList
         End If
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
@@ -318,13 +318,13 @@ Public Class Projection_ViewTop : Inherits TaskParent
 
         dst2 = runRedOld(histTop.dst3, labels(2), Not histTop.dst3)
 
-        objects.redCellInput = task.redC.rcList
-        objects.dst2 = task.redC.dst2
-        objects.labels(2) = task.redC.labels(2)
+        objects.redCellInput = task.redCold.rcList
+        objects.dst2 = task.redCold.dst2
+        objects.labels(2) = task.redCold.labels(2)
         objects.Run(histTop.dst2)
 
         dst2 = objects.dst2
-        labels(2) = task.redC.labels(2)
+        labels(2) = task.redCold.labels(2)
         SetTrueText(objects.strOut, 3)
     End Sub
 End Class
@@ -348,13 +348,13 @@ Public Class Projection_ViewSide : Inherits TaskParent
 
         dst2 = runRedOld(histSide.dst3, labels(2), Not histSide.dst3)
 
-        objects.redCellInput = task.redC.rcList
-        objects.dst2 = task.redC.dst2
-        objects.labels(2) = task.redC.labels(2)
+        objects.redCellInput = task.redCold.rcList
+        objects.dst2 = task.redCold.dst2
+        objects.labels(2) = task.redCold.labels(2)
         objects.Run(histSide.dst2)
 
         dst2 = objects.dst2
-        labels(2) = task.redC.labels(2)
+        labels(2) = task.redCold.labels(2)
         SetTrueText(objects.strOut, 3)
     End Sub
 End Class

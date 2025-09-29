@@ -4,7 +4,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Dim redCore As New RedCloud_Core
     Public pcList As New List(Of cloudData)
     Public Sub New()
-        task.redCNew = Me
+        task.redC = Me
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Build contours for each cell"
     End Sub
@@ -33,6 +33,10 @@ Public Class RedCloud_Basics : Inherits TaskParent
             Else
                 pc.indexLast = pc.index
                 pc.color = task.vecColors(pc.index)
+                If task.heartBeat Then
+                Else
+                    pc.color = dst2.Get(Of cv.Vec3b)(pc.maxDist.Y, pc.maxDist.X)
+                End If
             End If
             pc.index = pcList.Count + 1
             pcList.Add(pc)
@@ -56,7 +60,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             End If
         End If
 
-        pcListLast = New List(Of cloudData)(task.redCNew.pcList)
+        pcListLast = New List(Of cloudData)(task.redC.pcList)
         pcMap = dst1.Clone
         depthLast = task.pcSplit(2)
     End Sub
@@ -167,8 +171,8 @@ Public Class RedCloud_XYZ : Inherits TaskParent
         dst2 = runRedOld(prep.dst2, labels(2))
 
         If task.heartBeat Then strOut = ""
-        For i = 0 To task.redC.rcList.Count - 1
-            Dim rc = task.redC.rcList(i)
+        For i = 0 To task.redCold.rcList.Count - 1
+            Dim rc = task.redCold.rcList(i)
             rcMask.SetTo(0)
             rcMask(rc.rect).SetTo(255, rc.mask)
             rc.mdList = New List(Of maskData)
@@ -183,7 +187,7 @@ Public Class RedCloud_XYZ : Inherits TaskParent
                     md.mask = rcMask(md.rect).Clone
                     rc.mdList(j) = md
                 Next
-                task.redC.rcList(i) = rc
+                task.redCold.rcList(i) = rc
             End If
         Next
 
@@ -371,7 +375,7 @@ Public Class RedCloud_Motion : Inherits TaskParent
         labels(2) = redContours.labels(2)
 
         dst3.SetTo(0)
-        For Each pc In task.redCNew.pcList
+        For Each pc In task.redC.pcList
             If pc.age > 10 Then DrawTour(dst3(pc.rect), pc.contour, pc.color)
         Next
     End Sub

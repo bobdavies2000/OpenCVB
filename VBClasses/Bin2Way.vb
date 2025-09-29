@@ -85,7 +85,7 @@ Public Class Bin2Way_RedCloudDarkest : Inherits TaskParent
         flood.inputRemoved = Not bin2.mats.mat(0)
         flood.Run(bin2.mats.mat(0))
         dst2 = flood.dst2
-        If task.heartBeat Then labels(2) = CStr(task.redC.rcList.Count) + " cells were identified"
+        If task.heartBeat Then labels(2) = CStr(task.redCold.rcList.Count) + " cells were identified"
     End Sub
 End Class
 
@@ -107,7 +107,7 @@ Public Class Bin2Way_RedCloudLightest : Inherits TaskParent
         flood.inputRemoved = Not bin2.mats.mat(3)
         flood.Run(bin2.mats.mat(3))
         dst2 = flood.dst2
-        If task.heartBeat Then labels(2) = CStr(task.redC.rcList.Count) + " cells were identified"
+        If task.heartBeat Then labels(2) = CStr(task.redCold.rcList.Count) + " cells were identified"
     End Sub
 End Class
 
@@ -175,14 +175,14 @@ Public Class Bin2Way_RedCloud : Inherits TaskParent
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = options.startRegion To options.endRegion
-            task.redC.rcMap = cellMaps(i)
+            task.redCold.rcMap = cellMaps(i)
 
-            task.redC.rcList = rcList(i)
+            task.redCold.rcList = rcList(i)
             flood.inputRemoved = Not bin2.mats.mat(i)
             flood.Run(bin2.mats.mat(i))
-            cellMaps(i) = task.redC.rcMap.Clone
-            rcList(i) = New List(Of rcData)(task.redC.rcList)
-            For Each rc In task.redC.rcList
+            cellMaps(i) = task.redCold.rcMap.Clone
+            rcList(i) = New List(Of rcData)(task.redCold.rcList)
+            For Each rc In task.redCold.rcList
                 If rc.index = 0 Then Continue For
                 sortedCells.Add(rc.pixels, rc)
             Next
@@ -190,6 +190,6 @@ Public Class Bin2Way_RedCloud : Inherits TaskParent
 
         dst2 = RebuildRCMap(sortedCells)
 
-        If task.heartBeat Then labels(2) = CStr(task.redC.rcList.Count) + " cells were identified and matched to the previous image"
+        If task.heartBeat Then labels(2) = CStr(task.redCold.rcList.Count) + " cells were identified and matched to the previous image"
     End Sub
 End Class
