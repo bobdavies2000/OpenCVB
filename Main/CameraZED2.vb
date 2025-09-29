@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports CamZed
 Public Class CameraZed2 : Inherits GenericCamera
     Dim zed As CamZed
     Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)

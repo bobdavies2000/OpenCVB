@@ -15,6 +15,7 @@ Public Class VBtask : Implements IDisposable
     Public ogl As XO_OpenGL_Basics
     Public redCold As RedColor_Basics
     Public redC As RedCloud_Basics
+    Public reductionTarget As Integer = 200 ' specify how much reduction is needed using options_RedCloud.
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public edgeLine As EdgeLine_Basics
@@ -491,7 +492,7 @@ Public Class VBtask : Implements IDisposable
         updateSettings()
         featureOptions.Show()
         gOptions.Show()
-        Options_RedCloud.setupCalcHist()
+        Options_HistPointCloud.setupCalcHist()
         treeView.Show()
         centerRect = New cv.Rect(task.workRes.Width / 4, task.workRes.Height / 4,
                                  task.workRes.Width / 2, task.workRes.Height / 2)

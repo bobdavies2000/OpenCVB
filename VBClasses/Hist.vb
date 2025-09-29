@@ -1505,7 +1505,7 @@ Public Class Hist_PointCloud : Inherits TaskParent
     Dim grid As New Grid_Basics
     Public histogram As New cv.Mat
     Public histArray() As Single
-    Dim options As New Options_RedCloud
+    Dim options As New Options_HistPointCloud
     Public Sub New()
         task.gOptions.setHistogramBins(9)
         labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}

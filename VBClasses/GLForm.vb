@@ -79,31 +79,11 @@ Public Class sgl
         gl.MatrixMode(OpenGL.GL_PROJECTION)
         gl.LoadIdentity()
 
-        If task.gOptions.GL_LinearMode.Checked Then
+        If task.gOptions.GL_LinearMode.Checked Then ' not being used anymore...
             Dim mmZ = GetMinMax(task.pcSplit(2))
-            'Dim mmX = GetMinMax(task.pcSplit(0))
-            'Dim mmY = GetMinMax(task.pcSplit(1))
-            'Static mmXX As mmData, mmYY As mmData, mmZZ As mmData
-            'If task.heartBeat Then
-            '    mmXX = mmX
-            '    mmYY = mmY
-            '    mmZZ = mmZ
-            'End If
-            'If mmXX.minVal > mmX.minVal Then mmXX.minVal = mmX.minVal
-            'If mmXX.maxVal < mmX.maxVal Then mmXX.maxVal = mmX.maxVal
-
-            'If mmYY.minVal > mmY.minVal Then mmYY.minVal = mmY.minVal
-            'If mmYY.maxVal < mmY.maxVal Then mmYY.maxVal = mmY.maxVal
-
-            'If mmZZ.minVal > mmZ.minVal Then mmZZ.minVal = mmZ.minVal
-            'If mmZZ.maxVal < mmZ.maxVal Then mmZZ.maxVal = mmZ.maxVal
-
-            'gl.Ortho(mmXX.minVal, mmXX.maxVal, mmYY.minVal, mmYY.maxVal, mmZZ.minVal, mmZZ.maxVal)
             Dim xRange = options.xRange
             Dim yRange = options.yRange
-            gl.Ortho(-xrange, xrange, -yRange, yrange, mmZ.minVal, mmZ.maxVal)
-            '  gl.Ortho(0, task.workRes.Width, 0, task.workRes.Height, mmZ.minVal, mmZ.maxVal)
-            'gl.Ortho(-task.xRange, task.xRange, -task.yRange, task.yRange, mmZ.minVal, mmZ.maxVal)
+            gl.Ortho(-xRange, xRange, -yRange, yRange, mmZ.minVal, mmZ.maxVal)
         Else
             gl.Perspective(options.perspective, GLControl.Width / GLControl.Height, options.zNear, options.zFar)
         End If

@@ -27,7 +27,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
         options.Run()
 
         Dim pc32S As New cv.Mat
-        reduceAmt = options.reductionTarget
+        reduceAmt = task.reductionTarget
         task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / reduceAmt)
         Dim split = pc32S.Split()
 
@@ -52,11 +52,14 @@ End Class
 
 
 Public Class RedPrep_Depth : Inherits TaskParent
+    Dim options As New Options_HistPointCloud
     Public Sub New()
         cPtr = PrepXY_Open()
         desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         Dim inputX(task.pcSplit(0).Total * task.pcSplit(0).ElemSize - 1) As Byte
         Dim inputY(task.pcSplit(1).Total * task.pcSplit(1).ElemSize - 1) As Byte
 
@@ -225,15 +228,17 @@ End Class
 Public Class RedPrep_ReductionChoices : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public options As New Options_RedCloud
+    Public options1 As New Options_HistPointCloud
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Reduction transform for the point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+        options1.Run()
 
         Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
-        Dim reduceAmt = options.reductionTarget
+        Dim reduceAmt = task.reductionTarget
         task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
         task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
         task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
@@ -241,9 +246,9 @@ Public Class RedPrep_ReductionChoices : Inherits TaskParent
         Select Case task.reductionName
             Case "X Reduction"
                 dst0 = split(0) * reduceAmt
-            Case "Y Redction"
+            Case "Y Reduction"
                 dst0 = split(1) * reduceAmt
-            Case "Z Redction"
+            Case "Z Reduction"
                 dst0 = split(2) * reduceAmt
             Case "XY Reduction"
                 dst0 = split(0) * reduceAmt + split(1) * reduceAmt
