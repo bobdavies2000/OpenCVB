@@ -6,7 +6,7 @@ Public Class Triangle_Basics : Inherits TaskParent
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = runRedOld(src, labels(2))
+        dst2 = runRedColor(src, labels(2))
 
         If task.redColor.rcList.Count <= 1 Then Exit Sub
         task.rcD = task.redColor.rcList(1)
@@ -83,7 +83,7 @@ Public Class Triangle_Cell : Inherits TaskParent
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedOld(src, labels(2))
+        dst2 = runRedColor(src, labels(2))
         If task.redColor.rcList.Count <= 1 Then Exit Sub
         Dim rc = task.rcD
         If rc.index = 0 Then Exit Sub
@@ -137,7 +137,7 @@ Public Class Triangle_Mask : Inherits TaskParent
     End Sub
 
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedOld(src, labels(2))
+        dst2 = runRedColor(src, labels(2))
         If task.redColor.rcList.Count <= 1 Then Exit Sub
         Dim rc = task.rcD
         If rc.index = 0 Then Exit Sub

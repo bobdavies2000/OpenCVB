@@ -198,7 +198,7 @@ Public Class RedCloud_Hulls : Inherits TaskParent
         desc = "Create a hull for each RedCloud cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedCloud(src, labels(2))
 
         dst3.SetTo(0)
         Dim hullCounts As New List(Of Integer)
@@ -227,7 +227,7 @@ Public Class RedCloud_Defect : Inherits TaskParent
         desc = "Find defects in the RedCloud cells."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedC(src, labels(2))
+        dst2 = runRedCloud(src, labels(2))
 
         dst3.SetTo(0)
         For Each pc In task.redCloud.pcList
@@ -260,5 +260,37 @@ Public Class RedCloud_Defect : Inherits TaskParent
                 Continue For
             End Try
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_BasicsHist : Inherits TaskParent
+    Dim plot As New Plot_Histogram
+    Public Sub New()
+        task.gOptions.setHistogramBins(100)
+        plot.createHistogram = True
+        desc = "Display the histogram of a selected RedColor cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedColor(src, labels(2))
+        If task.heartBeat Then
+            Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
+            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+            plot.minRange = 0
+            plot.maxRange = task.MaxZmeters
+            plot.Run(depth)
+            labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + "meters - vertical lines every meter"
+
+            Dim incr = dst2.Width / task.MaxZmeters
+            For i = 1 To CInt(task.MaxZmeters - 1)
+                Dim x = incr * i
+                DrawLine(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White)
+            Next
+        End If
+        dst3 = plot.dst2
     End Sub
 End Class

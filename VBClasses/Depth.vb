@@ -1215,7 +1215,7 @@ Public Class Depth_CellTiers : Inherits TaskParent
         desc = "Find the number of valleys (tiers) in a RedCloud cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedOld(src, labels(2))
+        dst2 = runRedColor(src, labels(2))
 
         valley.standaloneFlag = standalone
         For i = 1 To Math.Min(10, task.redColor.rcList.Count - 1)

@@ -572,20 +572,20 @@ Public Class TaskParent : Implements IDisposable
         label = "AddWeighted: src1 = " + Format(wt, "0%") + " vs. src2 = " + Format(1 - wt, "0%")
         Return addw.dst2
     End Function
-    Public Function runRedOld(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
+    Public Function runRedColor(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
         If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
         task.redColor.inputRemoved = removeMask
         task.redColor.Run(src)
         label = task.redColor.labels(2)
         Return task.redColor.dst2
     End Function
-    Public Function runRedOld(src As cv.Mat, ByRef label As String) As cv.Mat
+    Public Function runRedColor(src As cv.Mat, ByRef label As String) As cv.Mat
         If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
         task.redColor.Run(src)
         label = task.redColor.labels(2)
         Return task.redColor.dst2
     End Function
-    Public Function runRedC(src As cv.Mat, ByRef label As String) As cv.Mat
+    Public Function runRedCloud(src As cv.Mat, ByRef label As String) As cv.Mat
         If task.redCloud Is Nothing Then task.redCloud = New RedCloud_Basics
         task.redCloud.Run(src)
         label = task.redCloud.labels(2)

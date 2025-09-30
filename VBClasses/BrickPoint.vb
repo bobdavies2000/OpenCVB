@@ -134,7 +134,7 @@ Public Class BrickPoint_MaskRedColor : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(src)
-        dst2 = runRedOld(src, labels(2), fLess.dst2)
+        dst2 = runRedColor(src, labels(2), fLess.dst2)
     End Sub
 End Class
 

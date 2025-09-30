@@ -30,6 +30,6 @@ Public Class PyrFilter_RedCloud : Inherits TaskParent
 
         reduction.Run(dst3)
 
-        dst2 = runRedOld(reduction.dst2, labels(2))
+        dst2 = runRedColor(reduction.dst2, labels(2))
     End Sub
 End Class

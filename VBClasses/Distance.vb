@@ -306,7 +306,7 @@ Public Class Distance_RedDistance : Inherits TaskParent
         desc = "Combine the output of redColor_Basics and distance_basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedOld(src, labels(2))
+        dst2 = runRedColor(src, labels(2))
 
         distance.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
@@ -341,7 +341,7 @@ Public Class Distance_RedColor : Inherits TaskParent
         Return Math.Sqrt(result)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = runRedOld(src, labels(3))
+        dst3 = runRedColor(src, labels(3))
 
         pixelVector.Clear()
         distances.Clear()

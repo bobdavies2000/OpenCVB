@@ -15,7 +15,7 @@ Public Class Projection_Basics : Inherits TaskParent
             histTop.Run(src)
             src = histTop.dst2
 
-            dst2 = runRedOld(histTop.dst3, labels(2), Not histTop.dst3)
+            dst2 = runRedColor(histTop.dst3, labels(2), Not histTop.dst3)
             redCellInput = task.redColor.rcList
         End If
 
@@ -244,7 +244,7 @@ Public Class Projection_Cell : Inherits TaskParent
         desc = "Create a top and side projection of the selected cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedOld(src, labels(2))
+        dst2 = runRedColor(src, labels(2))
 
         heat.Run(src)
         dst1 = heat.dst2.Clone
@@ -316,7 +316,7 @@ Public Class Projection_ViewTop : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         histTop.Run(src)
 
-        dst2 = runRedOld(histTop.dst3, labels(2), Not histTop.dst3)
+        dst2 = runRedColor(histTop.dst3, labels(2), Not histTop.dst3)
 
         objects.redCellInput = task.redColor.rcList
         objects.dst2 = task.redColor.dst2
@@ -346,7 +346,7 @@ Public Class Projection_ViewSide : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         histSide.Run(src)
 
-        dst2 = runRedOld(histSide.dst3, labels(2), Not histSide.dst3)
+        dst2 = runRedColor(histSide.dst3, labels(2), Not histSide.dst3)
 
         objects.redCellInput = task.redColor.rcList
         objects.dst2 = task.redColor.dst2

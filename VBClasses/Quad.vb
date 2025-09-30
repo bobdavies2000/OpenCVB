@@ -29,7 +29,7 @@ Public Class Quad_GridTiles : Inherits TaskParent
         desc = "Simplify the OpenGL quads without using OpenGL's point size"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedOld(src, labels(2))
+        dst2 = runRedColor(src, labels(2))
 
         quadData.Clear()
         dst1.SetTo(0)
@@ -82,7 +82,7 @@ Public Class Quad_MinMax : Inherits TaskParent
         desc = "Create a representation of the point cloud with RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedOld(src, labels(2))
+        dst2 = runRedColor(src, labels(2))
 
         oglOptions.Run()
         Dim ptM = oglOptions.moveAmount
@@ -251,7 +251,7 @@ Public Class Quad_Bricks : Inherits TaskParent
         desc = "Create triangles from each brick in point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedOld(src, labels(2))
+        dst2 = runRedColor(src, labels(2))
 
         If task.optionsChanged Then
             depthMinList.Clear()
@@ -267,7 +267,7 @@ Public Class Quad_Bricks : Inherits TaskParent
         Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
         quadData.Clear()
-        dst2 = runRedOld(src, labels(2))
+        dst2 = runRedColor(src, labels(2))
 
         Dim min(4 - 1) As cv.Point3f, max(4 - 1) As cv.Point3f
         depths.Clear()
