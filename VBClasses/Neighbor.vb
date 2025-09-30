@@ -2,7 +2,7 @@
 Imports cv = OpenCvSharp
 Public Class Neighbor_Basics : Inherits TaskParent
     Dim knn As New KNN_Basics
-    Public runRedCloud As Boolean = False
+    Public runRedCflag As Boolean = False
     Public options As New Options_Neighbors
     Public Sub New()
         desc = "Find all the neighbors with KNN"
@@ -10,7 +10,7 @@ Public Class Neighbor_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If standalone Or runRedCloud Then dst2 = runRedColor(src, labels(2))
+        If standalone Or runRedCflag Then dst2 = runRedColor(src, labels(2))
 
         knn.queries.Clear()
         For Each rc In task.redColor.rcList
@@ -122,14 +122,14 @@ End Class
 Public Class Neighbor_Precise : Inherits TaskParent
     Public nabList As New List(Of List(Of Integer))
     Public rcList As List(Of rcData)
-    Public runRedCloud As Boolean = False
+    Public runRedCflag As Boolean = False
     Public Sub New()
         cPtr = Neighbor_Open()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Find the neighbors in a selected RedCell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Or runRedCloud Then
+        If standaloneTest() Or runRedCflag Then
             dst2 = runRedColor(src, labels(2))
 
             src = task.redColor.rcMap

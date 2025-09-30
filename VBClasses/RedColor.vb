@@ -2,10 +2,10 @@
 Imports System.Runtime.InteropServices
 Public Class RedColor_Basics : Inherits TaskParent
     Public inputRemoved As cv.Mat
-    Public cellGen As New RedCell_Generate
+    Public cellGen As New RedCell_Color
     Public redMask As New RedMask_Basics
     Public rcList As New List(Of rcData)
-    Public rcMap As cv.Mat ' redColor map
+    Public rcMap As cv.Mat ' redColor map 
     Public Sub New()
         If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -618,7 +618,7 @@ Public Class RedColor_CellStatsPlot : Inherits TaskParent
     Dim cells As New XO_RedCell_BasicsPlot
     Public Sub New()
         If standaloneTest() Then task.gOptions.displayDst1.Checked = True
-        cells.runRedCloud = True
+        cells.runRedCflag = True
         desc = "Display the stats for the requested cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1961,7 +1961,7 @@ End Class
 
 
 
-Public Class RedColor_BasicsHist : Inherits TaskParent
+Public Class RedColor_CellDepthHistogram : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public Sub New()
         task.gOptions.setHistogramBins(100)
@@ -1976,7 +1976,7 @@ Public Class RedColor_BasicsHist : Inherits TaskParent
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
             plot.Run(depth)
-            labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + "meters - vertical lines every meter"
+            labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + " meters - vertical lines every meter"
 
             Dim incr = dst2.Width / task.MaxZmeters
             For i = 1 To CInt(task.MaxZmeters - 1)

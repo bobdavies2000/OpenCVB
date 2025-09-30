@@ -10,7 +10,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         redCore.Run(src)
-        labels(2) = redCore.labels(2) + "  Age of each cell is displayed as well."
+        labels(2) = redCore.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
 
         Static pcListLast = New List(Of cloudData)(pcList)
         Static pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -41,8 +41,8 @@ Public Class RedCloud_Basics : Inherits TaskParent
         For Each pc In pcList
             pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
             DrawTour(dst1(pc.rect), pc.contour, pc.index)
-            pc.maskContour = dst1(pc.rect).InRange(pc.index, pc.index)
-            dst2(pc.rect).SetTo(pc.color, pc.maskContour)
+            pc.mask = dst1(pc.rect).InRange(pc.index, pc.index)
+            dst2(pc.rect).SetTo(pc.color, pc.mask)
             dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
@@ -50,7 +50,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         task.pcD = RedCell_Basics.displayCell()
         If task.pcD IsNot Nothing Then
             If task.pcD.rect.Contains(task.ClickPoint) Then
-                task.color(task.pcD.rect).SetTo(white, task.pcD.maskContour)
+                task.color(task.pcD.rect).SetTo(white, task.pcD.mask)
                 SetTrueText(task.pcD.displayString, 3)
                 SetTrueText(CStr(task.pcD.index), task.pcD.maxDist, 3)
             End If
@@ -268,22 +268,26 @@ End Class
 
 
 
-Public Class RedCloud_BasicsHist : Inherits TaskParent
+Public Class RedCloud_CellDepthHistogram : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public Sub New()
         task.gOptions.setHistogramBins(100)
         plot.createHistogram = True
-        desc = "Display the histogram of a selected RedColor cell."
+        desc = "Display the histogram of a selected RedCloud cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedCloud(src, labels(2))
         If task.heartBeat Then
-            Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
-            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+            If task.pcD Is Nothing Then
+                labels(3) = "Select a RedCloud cell to see the histogram"
+                Exit Sub
+            End If
+            Dim depth As cv.Mat = task.pcSplit(2)(task.pcD.rect)
+            depth.SetTo(0, task.noDepthMask(task.pcD.rect))
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
             plot.Run(depth)
-            labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + "meters - vertical lines every meter"
+            labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + " meters - vertical lines every meter"
 
             Dim incr = dst2.Width / task.MaxZmeters
             For i = 1 To CInt(task.MaxZmeters - 1)
@@ -294,3 +298,50 @@ Public Class RedCloud_BasicsHist : Inherits TaskParent
         dst3 = plot.dst2
     End Sub
 End Class
+
+
+
+
+Public Class RedCloud_WithRedColor : Inherits TaskParent
+    Public redMask As New RedMask_Basics
+    Public cellGen As New RedCell_Color
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Use RedColor for regions with no depth to add cells to RedCloud"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedCloud(src, labels(2))
+
+        If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+        task.redColor.inputRemoved = task.depthMask
+        dst3 = runRedColor(src, labels(2))
+
+
+        'If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
+        'cellGen.mdList = redMask.mdList
+        'cellGen.Run(redMask.dst2)
+        'dst3 = cellGen.dst2
+
+        For Each rc In task.redColor.rcList
+            Dim pc = New cloudData
+            pc.age = rc.age
+            pc.color = New cv.Vec3b(rc.color(0), rc.color(1), rc.color(2))
+            pc.contour = rc.contour
+            pc.depth = 0
+            pc.hull = rc.hull
+            pc.index = task.redCloud.pcList.Count
+            dst1(rc.rect).SetTo(0)
+            DrawTour(dst1(rc.rect), rc.contour, rc.index)
+            pc.mask = dst1(rc.rect).InRange(rc.index, rc.index)
+            pc.maxDist = rc.maxDist
+            pc.pixels = rc.pixels
+            pc.rect = rc.rect
+            task.redCloud.pcList.Add(pc)
+            dst2(pc.rect).SetTo(pc.color, pc.mask)
+            dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+        Next
+        labels(2) = CStr(task.redCloud.pcList.Count) + " regions were identified."
+        labels(3) = CStr(task.redColor.rcList.Count) + " cells were added from the RedColor output."
+    End Sub
+End Class
+

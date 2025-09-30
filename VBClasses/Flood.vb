@@ -77,7 +77,7 @@ End Class
 Public Class Flood_BasicsMask : Inherits TaskParent
     Public binarizedImage As cv.Mat
     Public inputRemoved As cv.Mat
-    Public cellGen As New RedCell_Generate
+    Public cellGen As New RedCell_Color
     Dim redMask As New RedMask_Basics
     Public buildinputRemoved As Boolean
     Public showSelected As Boolean = True

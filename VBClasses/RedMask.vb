@@ -10,7 +10,7 @@ Public Class RedMask_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1 = srcMustBe8U(src)
 
-        Dim inputData(dst1.Total * dst1.ElemSize - 1) As Byte
+        Dim inputData(dst1.Total - 1) As Byte
         Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 

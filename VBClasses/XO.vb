@@ -12570,7 +12570,7 @@ End Class
 Public Class XO_RedCloud_BasicsXY : Inherits TaskParent
     Dim prep As New RedPrep_Depth
     Dim redMask As New RedMask_Basics
-    Dim cellGen As New RedCell_Generate
+    Dim cellGen As New RedCell_Color
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
@@ -12793,51 +12793,6 @@ End Class
 
 
 
-Public Class XO_RedCloud_XYZ : Inherits TaskParent
-    Dim prep As New RedPrep_ReductionChoices
-    Public redMask As New RedMask_Basics
-    Dim rcMask As cv.Mat
-    Public Sub New()
-        OptionParent.findRadio("XYZ Reduction").Checked = True
-        rcMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(src)
-
-        dst2 = runRedColor(prep.dst2, labels(2))
-
-        If task.heartBeat Then strOut = ""
-        For i = 0 To task.redColor.rcList.Count - 1
-            Dim rc = task.redColor.rcList(i)
-            rcMask.SetTo(0)
-            rcMask(rc.rect).SetTo(255, rc.mask)
-            rc.mdList = New List(Of maskData)
-            For Each md In redMask.mdList
-                Dim index = rcMask.Get(Of Byte)(md.maxDist.Y, md.maxDist.X)
-                If index > 0 Then rc.mdList.Add(md)
-            Next
-            If rc.mdList.Count > 0 Then
-                For j = 0 To rc.mdList.Count - 1
-                    Dim md = rc.mdList(j)
-                    rcMask(md.rect) = rcMask(md.rect) And md.mask
-                    md.mask = rcMask(md.rect).Clone
-                    rc.mdList(j) = md
-                Next
-                task.redColor.rcList(i) = rc
-            End If
-        Next
-
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class XO_RedCloud_YZ : Inherits TaskParent
     Dim prep As New RedPrep_ReductionChoices
@@ -13006,7 +12961,7 @@ End Class
 
 Public Class XO_RedCell_Basics : Inherits TaskParent
     Dim plot As New Hist_Depth
-    Public runRedCloud As Boolean
+    Public runRedCflag As Boolean
     Public Sub New()
         If standalone Then task.gOptions.setHistogramBins(20)
         desc = "Display the statistics for the selected cell."
@@ -13048,7 +13003,7 @@ Public Class XO_RedCell_Basics : Inherits TaskParent
         dst3 = plot.dst2
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Or runRedCloud Then dst2 = runRedColor(src, labels(2))
+        If standalone Or runRedCflag Then dst2 = runRedColor(src, labels(2))
         statsString()
         SetTrueText(strOut, 3)
         labels(3) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.MaxZmeters)) + " meters"
@@ -13163,7 +13118,7 @@ End Class
 
 Public Class XO_RedCell_BasicsPlot : Inherits TaskParent
     Dim plot As New Hist_Depth
-    Public runRedCloud As Boolean
+    Public runRedCflag As Boolean
     Dim stats As New XO_RedCell_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -13181,7 +13136,7 @@ Public Class XO_RedCell_BasicsPlot : Inherits TaskParent
         strOut = stats.strOut
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Or runRedCloud Then
+        If standaloneTest() Or runRedCflag Then
             dst2 = runRedColor(src, labels(2))
             If task.ClickPoint = newPoint Then
                 If task.redColor.rcList.Count > 1 Then

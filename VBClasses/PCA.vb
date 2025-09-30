@@ -38,7 +38,7 @@ End Class
 
 Public Class PCA_Mask : Inherits TaskParent
     Public pca_analysis As New cv.PCA
-    Public runRedCloud As Boolean
+    Public runRedCflag As Boolean
     Public Sub New()
         desc = "Find the Principal Component Analysis vector for the 3D points in a RedCloud cell contour."
     End Sub
@@ -74,7 +74,7 @@ Public Class PCA_Mask : Inherits TaskParent
         Return pcaStr
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Or runRedCloud Then dst2 = runRedColor(src, labels(2))
+        If standaloneTest() Or runRedCflag Then dst2 = runRedColor(src, labels(2))
 
         Dim rc = task.rcD
         Dim inputPoints As New List(Of cv.Point3f)
@@ -107,7 +107,7 @@ Public Class PCA_CellMask : Inherits TaskParent
     Dim pca As New PCA_Mask
     Dim pcaPrep As New PCA_Prep_CPP
     Public Sub New()
-        pca.runRedCloud = True
+        pca.runRedCflag = True
         desc = "Find the Principal Component Analysis vector for all the 3D points in a RedCloud cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
