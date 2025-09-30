@@ -323,26 +323,17 @@ Public Class RedCloud_WithRedColor : Inherits TaskParent
         cellGen.Run(redMask.dst2)
         dst3 = cellGen.dst2
 
-        For Each rc In task.redColor.rcList
-            Dim pc = New cloudData
-            pc.age = rc.age
-            pc.color = New cv.Vec3b(rc.color(0), rc.color(1), rc.color(2))
-            pc.contour = rc.contour
-            pc.depth = 0
-            pc.hull = rc.hull
+        For Each pc In cellGen.pcList
             pc.index = task.redCloud.pcList.Count
-            dst1(rc.rect).SetTo(0)
-            DrawTour(dst1(rc.rect), rc.contour, rc.index)
-            pc.mask = dst1(rc.rect).InRange(rc.index, rc.index)
-            pc.maxDist = rc.maxDist
-            pc.pixels = rc.pixels
-            pc.rect = rc.rect
+            dst1(pc.rect).SetTo(0)
+            DrawTour(dst1(pc.rect), pc.contour, pc.index)
+            pc.mask = dst1(pc.rect).InRange(pc.index, pc.index)
             task.redCloud.pcList.Add(pc)
             dst2(pc.rect).SetTo(pc.color, pc.mask)
             dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
         Next
         labels(2) = CStr(task.redCloud.pcList.Count) + " regions were identified."
-        labels(3) = CStr(task.redColor.rcList.Count) + " cells were added from the RedColor output."
+        labels(3) = CStr(cellGen.pcList.Count) + " cells were added using color only (no depth)."
     End Sub
 End Class
 
