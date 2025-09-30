@@ -833,8 +833,7 @@ Public Class Contour_Hulls : Inherits TaskParent
         For Each task.contourD In task.contours.contourList
             If id = task.contourD.ID Then Exit For
         Next
-        If id > 0 Then Return task.contourD
-        Return contourList(1)
+        Return task.contourD
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         labels(2) = task.contours.labels(2)
