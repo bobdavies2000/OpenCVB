@@ -304,7 +304,8 @@ End Class
 
 Public Class RedCloud_WithRedColor : Inherits TaskParent
     Public redMask As New RedMask_Basics
-    Public cellGen As New RedCell_Color
+    Public cellGen As New RedCell_Cloud
+    Dim contours As New Contour_Basics_List
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Use RedColor for regions with no depth to add cells to RedCloud"
@@ -312,15 +313,15 @@ Public Class RedCloud_WithRedColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedCloud(src, labels(2))
 
-        If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
-        task.redColor.inputRemoved = task.depthMask
-        dst3 = runRedColor(src, labels(2))
+        contours.Run(src)
+        dst0 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst0.SetTo(0, task.depthMask)
+        redMask.Run(dst0)
 
-
-        'If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
-        'cellGen.mdList = redMask.mdList
-        'cellGen.Run(redMask.dst2)
-        'dst3 = cellGen.dst2
+        If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
+        cellGen.mdList = redMask.mdList
+        cellGen.Run(redMask.dst2)
+        dst3 = cellGen.dst2
 
         For Each rc In task.redColor.rcList
             Dim pc = New cloudData

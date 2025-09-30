@@ -354,14 +354,15 @@ End Class
 
 Public Class BrickPoint_ContourCompare : Inherits TaskParent
     Dim fLess As New BrickPoint_FeatureLess
+    Dim contours As New Contour_Basics_List
     Public Sub New()
-        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         desc = "Compare Contour_Basics to BrickPoint_FeatureLess"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(src)
 
-        dst2 = ShowAddweighted(task.contours.dst2, fLess.dst3, labels(2)).Clone
+        contours.Run(src)
+        dst2 = ShowAddweighted(contours.dst2, fLess.dst3, labels(2)).Clone
         dst3 = ShowAddweighted(src, fLess.dst3, labels(2))
     End Sub
 End Class
@@ -375,18 +376,19 @@ End Class
 
 Public Class BrickPoint_FeatureLess : Inherits TaskParent
     Public classCount As Integer
+    Dim contours As New Contour_Basics_List
     Public Sub New()
-        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)  ' mask for the featureless regions.
         desc = "Identify each brick as part of a contour or not."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
 
-        dst3 = ShowAddweighted(dst2, task.contours.dst2, labels(3))
-        classCount = task.contours.contourList.Count
-        labels(2) = task.contours.labels(2)
-        labels(3) = "Of the " + CStr(task.contours.contourList.Count) + " contours " + CStr(classCount) +
+        contours.Run(src)
+        dst3 = ShowAddweighted(dst2, contours.dst2, labels(3))
+        classCount = contours.contourList.Count
+        labels(2) = contours.labels(2)
+        labels(3) = "Of the " + CStr(contours.contourList.Count) + " contours " + CStr(classCount) +
                     " have complete bricks inside them."
     End Sub
 End Class

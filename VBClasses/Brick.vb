@@ -4,8 +4,8 @@ Public Class Brick_Basics : Inherits TaskParent
     Public brickDepthCount As Integer
     Public brickList As New List(Of brickData)
     Public options As New Options_Features
+    Dim contours As New Contour_Basics_List
     Public Sub New()
-        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         task.bricks = Me
         desc = "Create the grid of bricks that reduce depth volatility"
     End Sub
@@ -78,6 +78,7 @@ Public Class Brick_Basics : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+        contours.Run(src)
 
         If task.bricks.brickList.Count <> task.gridRects.Count Then task.bricks.brickList.Clear()
 
@@ -144,8 +145,8 @@ Public Class Brick_Basics : Inherits TaskParent
         Next
 
         If task.heartBeat Then labels(2) = CStr(task.bricks.brickList.Count) + " bricks and " + CStr(brickDepthCount) + " had depth"
-        dst3 = task.contours.dst2
-        labels(3) = task.contours.labels(2)
+        dst3 = contours.dst2
+        labels(3) = contours.labels(2)
     End Sub
 End Class
 

@@ -30,7 +30,6 @@ Public Class VBtask : Implements IDisposable
 
     Public feat As Feature_Basics
     Public bricks As Brick_Basics
-    Public contours As Contour_Basics_List
 
     Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
 
@@ -401,9 +400,6 @@ Public Class VBtask : Implements IDisposable
 
             If gifCreator IsNot Nothing Then gifCreator.createNextGifImage()
 
-            ' MSER mistakenly can have 1 cell - just ignore it.
-            setSelectedCell()
-
             If optionsChanged = True And treeView IsNot Nothing Then
                 treeView.optionsChanged = True
                 Dim sender As Object = Nothing, e As EventArgs = Nothing
@@ -686,7 +682,6 @@ Public Class VBtask : Implements IDisposable
         colorizer.Run(src)
 
         If edgeLine IsNot Nothing Then edgeLine.Run(task.grayStable)
-        If contours IsNot Nothing Then contours.Run(src)
         If task.feat IsNot Nothing Then task.feat.Run(src)
         If task.bricks IsNot Nothing Then bricks.Run(src)
 

@@ -37,34 +37,6 @@ End Class
 
 
 
-
-Public Class Hull_Contour : Inherits TaskParent
-    Public contours As New Contour_General
-    Public hull As New List(Of cv.Point)
-    Public Sub New()
-        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Compare the hull to the contour of a contour cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        task.contourD = Contour_Basics.selectContour()
-
-        dst2.SetTo(0)
-        dst2(task.contourD.rect).SetTo(255, task.contourD.mask)
-        contours.Run(dst2)
-
-        dst3.SetTo(0)
-        hull = cv.Cv2.ConvexHull(contours.allContours(0).ToArray, True).ToList
-        DrawTour(dst3, contours.allContours(0).ToList, white, -1)
-        DrawTour(dst3, hull, white, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Hull_Defect : Inherits TaskParent
     Public hull As New List(Of cv.Point)
     Public contour As cv.Point()
@@ -112,3 +84,34 @@ Public Class Hull_Defect : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+Public Class Hull_Contour : Inherits TaskParent
+    Public hull As New List(Of cv.Point)
+    Dim contours1 As New Contour_Basics_List
+    Dim contours2 As New Contour_Basics_List
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Compare the hull to the contour of a contour cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        contours1.Run(src)
+        task.contourD = Contour_Basics.selectContour(contours1)
+
+        dst2.SetTo(0)
+        dst2(task.contourD.rect).SetTo(255, task.contourD.mask)
+        contours2.Run(dst2)
+
+        dst3.SetTo(0)
+        If contours1.sortContours.allContours.Count > 0 Then
+            If contours1.sortContours.allContours(0).Count > 0 Then
+                hull = cv.Cv2.ConvexHull(contours1.sortContours.allContours(0), True).ToList
+
+                DrawTour(dst3, contours2.sortContours.allContours(0).ToList, white, -1)
+                DrawTour(dst3, hull, white, task.lineWidth)
+            End If
+        End If
+    End Sub
+End Class
