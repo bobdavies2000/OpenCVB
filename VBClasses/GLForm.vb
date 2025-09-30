@@ -1,5 +1,6 @@
 ﻿Imports SharpGL
 Imports cv = OpenCvSharp
+Imports OpenCvSharp.Extensions
 Public Class sgl
     Dim gl As OpenGL
     Dim isDragging As Boolean = False
@@ -264,7 +265,7 @@ Public Class sgl
         gl.End()
         Return task.lines.labels(2)
     End Function
-    Public Function RunLogical(func As Integer, lpList As List(Of lpData)) As String
+    Public Function RunLines(func As Integer, lpList As List(Of lpData)) As String
         options.Run()
         options2.Run()
         prepareSharpGL()
@@ -276,10 +277,92 @@ Public Class sgl
             Case Comm.oCase.draw3DLinesAndCloud
                 label = drawCloud(task.pointCloud, task.color)
                 label += " " + draw3DLines(lpList)
+        End Select
 
+        gl.Flush()
+        Return label
+    End Function
+    Public Function RunTriangles(func As Integer, dataBuffer As List(Of cv.Vec3f)) As String
+        options.Run()
+        options2.Run()
+        prepareSharpGL()
+        Dim vec As cv.Vec3f
+
+        Dim label = ""
+        Select Case func
+            Case Comm.oCase.drawTriangles
+                gl.Begin(OpenGL.GL_TRIANGLES)
+
+                For i = 0 To dataBuffer.Count - 1 Step 4
+                    vec = dataBuffer(i)
+                    gl.Color(CSng(vec(0) / 255), CSng(vec(1) / 255), CSng(vec(2) / 255))
+
+                    vec = dataBuffer(i + 1)
+                    gl.Vertex(vec(0), vec(1), -vec(2))
+
+                    vec = dataBuffer(i + 2)
+                    gl.Vertex(vec(0), vec(1), -vec(2))
+
+                    vec = dataBuffer(i + 3)
+                    gl.Vertex(vec(0), vec(1), -vec(2))
+                Next
+
+                gl.End()
+                label = CStr(dataBuffer.Count) + " triangles were sent to OpenGL."
+
+            Case Comm.oCase.drawTrianglesAndImage
+                Dim textureID As UInt32() = New UInt32(0) {} ' Array to hold the texture ID
+                Dim rgba As cv.Mat = task.color.CvtColor(cv.ColorConversionCodes.BGR2RGBA)
+                Dim bitmap As Bitmap = rgba.ToBitmap()
+
+                gl.GenTextures(1, textureID)
+                gl.BindTexture(OpenGL.GL_TEXTURE_2D, textureID(0))
+
+                gl.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MIN_FILTER, OpenGL.GL_LINEAR)
+                gl.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MAG_FILTER, OpenGL.GL_LINEAR)
+
+                gl.TexImage2D(OpenGL.GL_TEXTURE_2D, 0, OpenGL.GL_RGBA,
+                              bitmap.Width, bitmap.Height, 0,
+                              OpenGL.GL_RGBA, OpenGL.GL_UNSIGNED_BYTE,
+                              rgba.Data)
+
+                gl.Enable(OpenGL.GL_TEXTURE_2D)
+                gl.BindTexture(OpenGL.GL_TEXTURE_2D, textureID(0))
+
+                gl.Begin(OpenGL.GL_TRIANGLES)
+
+                Dim w = task.workRes.Width
+                Dim h = task.workRes.Height
+                Dim pt As cv.Point
+                For Each pc In task.redCloud.pcList
+                    Dim count As Single = pc.hull.Count
+                    For i = 0 To pc.hull.Count - 1
+                        pt = New cv.Point(pc.hull(i).X + pc.rect.X, pc.hull(i).Y + pc.rect.Y)
+                        vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+                        If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
+                        gl.TexCoord(pt.X / w, pt.Y / h)
+                        gl.Vertex(vec(0), -vec(1), -vec(2))
+
+                        vec = task.pointCloud.Get(Of cv.Vec3f)(pc.maxDist.Y, pc.maxDist.X)
+                        If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pc.maxDist.X, pc.maxDist.Y, pc.depth))
+                        gl.TexCoord(pc.maxDist.X / w, pc.maxDist.Y / h)
+                        gl.Vertex(vec(0), -vec(1), -vec(2))
+
+                        pt = New cv.Point(pc.hull((i + 1) Mod count).X + pc.rect.X, pc.hull((i + 1) Mod count).Y + pc.rect.Y)
+
+                        vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+                        If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
+                        gl.TexCoord(pt.X / w, pt.Y / h)
+                        gl.Vertex(vec(0), -vec(1), -vec(2))
+                    Next
+                Next
+
+                gl.End()
+                label = CStr(dataBuffer.Count) + " triangles were sent to OpenGL."
         End Select
 
         gl.Flush()
         Return label
     End Function
 End Class
+

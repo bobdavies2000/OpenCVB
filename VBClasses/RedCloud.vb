@@ -204,9 +204,9 @@ Public Class RedCloud_Hulls : Inherits TaskParent
         Dim hullCounts As New List(Of Integer)
         Dim contourCounts As New List(Of Integer)
         For Each pc In task.redCloud.pcList
-            Dim hull = cv.Cv2.ConvexHull(pc.contour.ToArray, True).ToList
-            DrawTour(dst3(pc.rect), hull, pc.color, -1)
-            hullCounts.Add(hull.Count)
+            pc.hull = cv.Cv2.ConvexHull(pc.contour.ToArray, True).ToList
+            DrawTour(dst3(pc.rect), pc.hull, pc.color, -1)
+            hullCounts.Add(pc.hull.Count)
             contourCounts.Add(pc.contour.Count)
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next

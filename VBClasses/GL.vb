@@ -1,4 +1,5 @@
-﻿Imports SharpGL.SceneGraph.Lighting
+﻿Imports OpenCvSharp
+Imports SharpGL.SceneGraph.Lighting
 Imports cv = OpenCvSharp
 Public Class GL_Basics : Inherits TaskParent
     Public Sub New()
@@ -546,7 +547,7 @@ Public Class GL_LogicalLines : Inherits TaskParent
         End If
 
         labels = logLines.labels
-        task.sharpGL.RunLogical(drawRequest, logLines.lpList)
+        task.sharpGL.RunLines(drawRequest, logLines.lpList)
     End Sub
 End Class
 
@@ -564,5 +565,78 @@ Public Class GL_LogicalCloud : Inherits TaskParent
         SetTrueText(glTest.strOut, 3)
         dst2 = glTest.dst2
         labels = glTest.labels
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GL_Triangles : Inherits TaskParent
+    Dim hulls As New RedCloud_Hulls
+    Public Sub New()
+        desc = "Prepare triangles from the RedCloud_Hulls output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        hulls.Run(src)
+        dst2 = hulls.dst3
+        labels(2) = hulls.labels(2)
+        labels(3) = hulls.labels(3)
+
+        Dim dataBuffer As New List(Of cv.Vec3f)
+        Dim vec As cv.Vec3f, pt As cv.Point
+        For Each pc In task.redCloud.pcList
+            Dim count As Single = pc.hull.Count
+            For i = 0 To pc.hull.Count - 1
+                If task.pcD Is Nothing Then
+                    dataBuffer.Add(New cv.Vec3f(pc.color(2), pc.color(1), pc.color(0)))
+                Else
+                    If task.pcD.index = pc.index Then
+                        dataBuffer.Add(New cv.Vec3f(255, 255, 255))
+                    Else
+                        dataBuffer.Add(New cv.Vec3f(pc.color(2), pc.color(1), pc.color(0)))
+                    End If
+                End If
+
+                pt = New cv.Point(pc.hull(i).X + pc.rect.X, pc.hull(i).Y + pc.rect.Y)
+                vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+                If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
+                dataBuffer.Add(New cv.Vec3f(vec(0), vec(1), vec(2)))
+
+                vec = task.pointCloud.Get(Of cv.Vec3f)(pc.maxDist.Y, pc.maxDist.X)
+                If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pc.maxDist.X, pc.maxDist.Y, pc.depth))
+                dataBuffer.Add(New cv.Vec3f(vec(0), vec(1), vec(2)))
+
+                pt = New cv.Point(pc.hull((i + 1) Mod count).X + pc.rect.X, pc.hull((i + 1) Mod count).Y + pc.rect.Y)
+
+                vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+                If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
+                dataBuffer.Add(New cv.Vec3f(vec(0), vec(1), vec(2)))
+            Next
+        Next
+        strOut = task.sharpGL.RunTriangles(Comm.oCase.drawTriangles, dataBuffer)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GL_TrianglesImage : Inherits TaskParent
+    Dim hulls As New RedCloud_Hulls
+    Public Sub New()
+        desc = "Prepare triangles from the RedCloud_Hulls output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        hulls.Run(src)
+        dst2 = hulls.dst3
+        labels(2) = hulls.labels(2)
+        labels(3) = hulls.labels(3)
+
+        Dim dataBuffer As New List(Of cv.Vec3f)
+
+        strOut = task.sharpGL.RunTriangles(Comm.oCase.drawTrianglesAndImage, dataBuffer)
     End Sub
 End Class

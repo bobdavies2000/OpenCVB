@@ -4,7 +4,6 @@ Public Class Comm
         drawPointCloudRGB
         drawLineAndCloud
         drawFloor
-        trianglesAndColor
         drawPyramid
         drawCube
         quadBasics
@@ -27,6 +26,8 @@ Public Class Comm
         draw3DLines
         draw3DLinesAndCloud
         readLines
+        drawTriangles
+        drawTrianglesAndImage
     End Enum
 
     Public Shared cameraNames As New List(Of String)({"StereoLabs ZED 2/2i",

@@ -766,6 +766,7 @@ Public Class cloudData
     Public contour As List(Of cv.Point)
     Public depth As Single
     Public depthLast As Single
+    Public hull As List(Of cv.Point)
     Public index As Integer
     Public mask As cv.Mat
     Public maskContour As cv.Mat

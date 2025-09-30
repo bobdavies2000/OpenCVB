@@ -15,6 +15,11 @@ Public Class Cloud_Basics : Inherits TaskParent
         Dim y = (p.Y - ppy) / fy
         Return New cv.Point3f(x * p.Z, y * p.Z, p.Z)
     End Function
+    Public Shared Function worldCoordinates(p As cv.Vec3f) As cv.Vec3f
+        Dim x = (p(0) - ppx) / fx
+        Dim y = (p(1) - ppy) / fy
+        Return New cv.Point3f(x * p(2), y * p(2), p(2))
+    End Function
     Public Shared Function worldCoordinates(p As cv.Point, depth As Single) As cv.Point3f
         Dim x = (p.X - ppx) / fx
         Dim y = (p.Y - ppy) / fy
