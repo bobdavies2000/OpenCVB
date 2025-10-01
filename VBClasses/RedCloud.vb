@@ -6,7 +6,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         task.redCloud = Me
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Build contours for each cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -23,7 +22,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             Dim r1 = pc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect to trigger conditional below...
             If indexLast >= 0 And indexLast < pcListLast.count Then r2 = pcListLast(indexLast).rect
-            If indexLast >= 0 And r1.IntersectsWith(r2) And task.heartBeatLT = False And task.optionsChanged = False Then
+            If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                 pc.age = pcListLast(indexLast).age + 1
                 If pc.age > 1000 Then pc.age = 2
                 pc.depthLast = depthLast(pc.rect).Mean(pc.mask)
@@ -36,28 +35,28 @@ Public Class RedCloud_Basics : Inherits TaskParent
             pcList.Add(pc)
         Next
 
-        dst1.SetTo(0)
         dst2.SetTo(0)
         For Each pc In pcList
             pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
-            DrawTour(dst1(pc.rect), pc.contour, pc.index)
-            pc.mask = dst1(pc.rect).InRange(pc.index, pc.index)
+            DrawTour(pcMap(pc.rect), pc.contour, pc.index)
+            pc.mask = pcMap(pc.rect).InRange(pc.index, pc.index)
             dst2(pc.rect).SetTo(pc.color, pc.mask)
             dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
 
-        task.pcD = RedCell_Basics.displayCell()
-        If task.pcD IsNot Nothing Then
-            If task.pcD.rect.Contains(task.ClickPoint) Then
-                task.color(task.pcD.rect).SetTo(white, task.pcD.mask)
-                SetTrueText(task.pcD.displayString, 3)
-                SetTrueText(CStr(task.pcD.index), task.pcD.maxDist, 3)
+        If standalone Then
+            task.pcD = RedCell_Basics.displayCell()
+            If task.pcD IsNot Nothing Then
+                If task.pcD.rect.Contains(task.ClickPoint) Then
+                    task.color(task.pcD.rect).SetTo(white, task.pcD.mask)
+                    SetTrueText(task.pcD.displayString, 3)
+                    SetTrueText(CStr(task.pcD.index), task.pcD.maxDist, 3)
+                End If
             End If
         End If
 
         pcListLast = New List(Of cloudData)(task.redCloud.pcList)
-        pcMap = dst1.Clone
         depthLast = task.pcSplit(2)
     End Sub
 End Class
@@ -95,8 +94,8 @@ Public Class RedCloud_Core : Inherits TaskParent
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount And count < maxCount Then
                             Dim pc = New cloudData(dst3(rect).InRange(index, index), rect, count)
-                            index += 1
                             pc.index = index
+                            index += 1
                             newList.Add(pc.maxDist.Y, pc)
                         End If
                     End If
@@ -302,29 +301,22 @@ End Class
 
 
 
-Public Class RedCloud_WithRedColor : Inherits TaskParent
+Public Class RedCloud_WithRedColorSimple : Inherits TaskParent
     Public redMask As New RedMask_Basics
     Public cellGen As New RedCell_Cloud
-    Dim reduction As New Reduction_Basics
+    Dim redSimple As New RedColor_Simple
     Public Sub New()
         If task.contours Is Nothing Then task.contours = New Contour_Basics_List
+        task.gOptions.ColorSource.SelectedItem() = "Reduction_Basics"
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Use RedColor for regions with no depth to add cells to RedCloud"
+        desc = "Use a simple version of RedCloud_Core to see if we can get lines for the floodfill.  Not working!"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedCloud(src, labels(1))
 
-        ' redMask.Run(src)
-        reduction.Run(src)
-        reduction.dst2.SetTo(0, task.depthMask)
-        redMask.Run(reduction.dst2)
+        redSimple.Run(src)
 
-        If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
-        cellGen.mdList = redMask.mdList
-        cellGen.Run(redMask.dst2)
-        dst3 = cellGen.dst2
-
-        For Each pc In cellGen.pcList
+        For Each pc In redSimple.pcList
             pc.index = task.redCloud.pcList.Count
             dst1(pc.rect).SetTo(0)
             DrawTour(dst1(pc.rect), pc.contour, pc.index)
@@ -339,3 +331,55 @@ Public Class RedCloud_WithRedColor : Inherits TaskParent
     End Sub
 End Class
 
+
+
+Public Class RedCloud_WithRedColor : Inherits TaskParent
+    Public redMask As New RedMask_Basics
+    Public cellGen As New RedCell_Cloud
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Use RedColor for regions with no depth to add cells to RedCloud"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedCloud(src, labels(1))
+
+        reduction.Run(task.grayStable)
+        reduction.dst2.SetTo(0, task.depthMask)
+        redMask.Run(reduction.dst2)
+
+        If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
+        cellGen.mdList = redMask.mdList
+        cellGen.Run(redMask.dst2)
+        dst3 = cellGen.dst2
+
+        For Each pc In cellGen.pcList
+            pc.index = task.redCloud.pcList.Count
+            dst1(pc.rect).SetTo(0)
+
+            pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
+            DrawTour(task.redCloud.pcMap(pc.rect), pc.contour, pc.index)
+            pc.mask = task.redCloud.pcMap(pc.rect).InRange(pc.index, pc.index)
+            pc.maxDist = pc.getMaxDist()
+
+            pc.color = task.vecColors(pc.index)
+
+            task.redCloud.pcList.Add(pc)
+            task.redCloud.pcMap(pc.rect).setto(pc.index, pc.mask)
+            dst2(pc.rect).SetTo(pc.color, pc.mask)
+            dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+        Next
+
+        task.pcD = RedCell_Basics.displayCell()
+        If task.pcD IsNot Nothing Then
+            If task.pcD.rect.Contains(task.ClickPoint) Then
+                task.color(task.pcD.rect).SetTo(white, task.pcD.mask)
+                SetTrueText(task.pcD.displayString, 3)
+                SetTrueText(CStr(task.pcD.index), task.pcD.maxDist, 3)
+            End If
+        End If
+
+        labels(2) = "Cells found = " + CStr(task.redCloud.pcList.Count) + " and " + CStr(cellGen.pcList.Count) + " were color only cells."
+    End Sub
+End Class

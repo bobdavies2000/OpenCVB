@@ -42,7 +42,8 @@ Public Class RedPrep_Basics : Inherits TaskParent
         'prepEdges.Run(reduceChan(split(0) + split(1) + split(2)))
         'dst2 = prepEdges.dst3
 
-        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, task.lineWidth)
+        ' this rectangle prevents bleeds at the image edges.  It is necessary.  Test without it to see the impact.
+        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), 255, 2)
         labels(2) = "Using reduction factor = " + CStr(task.reductionTarget)
     End Sub
 End Class
@@ -364,3 +365,55 @@ Public Class RedPrep_Edges_CPP : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+Public Class RedPrep_CloudAndColor : Inherits TaskParent
+    Dim prepEdges As New RedPrep_Edges_CPP
+    Public options As New Options_RedCloud
+    Dim redSimple As New RedColor_Simple
+    Dim edges As New EdgeLine_Basics
+    Public Sub New()
+        desc = "Reduction transform for the point cloud"
+    End Sub
+    Private Function reduceChan(chan As cv.Mat) As cv.Mat
+        chan *= task.reductionTarget
+        Dim mm As mmData = GetMinMax(chan)
+        Dim dst32f As New cv.Mat
+        If Math.Abs(mm.minVal) > mm.maxVal Then
+            mm.minVal = -mm.maxVal
+            chan.ConvertTo(dst32f, cv.MatType.CV_32F)
+            Dim mask = dst32f.Threshold(mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
+            mask.ConvertTo(mask, cv.MatType.CV_8U)
+            dst32f.SetTo(mm.minVal, mask)
+        End If
+        chan = (chan - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+        chan.ConvertTo(chan, cv.MatType.CV_8U)
+        chan.SetTo(0, task.noDepthMask)
+        Return chan
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        Dim pc32S As New cv.Mat
+        task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.reductionTarget)
+        Dim split = pc32S.Split()
+
+        prepEdges.Run(reduceChan(split(0)))
+        dst2 = prepEdges.dst3
+
+        prepEdges.Run(reduceChan(split(1)))
+        dst2 = dst2 Or prepEdges.dst3
+
+        prepEdges.Run(reduceChan(split(2)))
+        dst2 = dst2 Or prepEdges.dst3
+
+        redSimple.Run(src)
+        edges.Run(redSimple.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst3 = edges.dst2
+        dst3.CopyTo(dst2, task.noDepthMask)
+
+        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, task.lineWidth)
+        labels(2) = "Using reduction factor = " + CStr(task.reductionTarget)
+    End Sub
+End Class

@@ -772,7 +772,7 @@ Public Class cloudData
     Public rect As cv.Rect
     Public Sub New()
     End Sub
-    Private Function getMaxDist(mask As cv.Mat, rect As cv.Rect) As cv.Point
+    Public Function getMaxDist() As cv.Point
         Dim tmp = mask.Clone
         tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
         Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
@@ -786,7 +786,7 @@ Public Class cloudData
         rect = _rect
         pixels = _pixels
         age = 1
-        maxDist = getMaxDist(mask, rect)
+        maxDist = getMaxDist()
 
         depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
     End Sub

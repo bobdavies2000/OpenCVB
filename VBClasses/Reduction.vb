@@ -20,7 +20,7 @@ Public Class Reduction_Basics : Inherits TaskParent
         ElseIf options.simpleReduction Then
             classCount = Math.Ceiling(255 / options.simpleReductionValue)
 
-            dst1 = src / options.simpleReductionValue
+            dst1 = src / options.simpleReductionValue + 1
             labels(2) = "Reduced image - factor = " + CStr(options.simpleReductionValue)
         Else
             dst1 = src

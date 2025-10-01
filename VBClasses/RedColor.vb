@@ -1988,3 +1988,67 @@ Public Class RedColor_CellDepthHistogram : Inherits TaskParent
         dst3 = plot.dst2
     End Sub
 End Class
+
+
+
+
+
+
+Public Class RedColor_Simple : Inherits TaskParent
+    Public pcList As New List(Of cloudData)
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Reduced point cloud - use 'Reduction Target' option to increase/decrease cell sizes."
+        desc = "Find the biggest chunks of consistent depth data "
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        reduction.Run(task.gray)
+        dst3 = reduction.dst2 + 1
+        dst3.SetTo(0, task.depthMask)
+
+        Dim index As Integer = 1
+        Dim rect As New cv.Rect
+        Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
+        Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
+        Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
+        Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
+        Dim newList As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalInteger)
+        For y = 0 To dst3.Height - 1
+            For x = 0 To dst3.Width - 1
+                Dim pt = New cv.Point(x, y)
+                ' skip the regions with depth (already handled elsewhere) or those that were already floodfilled.
+                If dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
+                    Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
+                    If rect.Width > 0 And rect.Height > 0 Then
+                        If count >= minCount And count < maxCount Then
+                            Dim pc = New cloudData(dst3(rect).InRange(index, index), rect, count)
+                            index += 1
+                            pc.index = index
+                            pc.depth = 0 ' any non-zero value is a transient that is an unlikely value
+                            pc.color = task.vecColors(pc.maxDist.Y Mod 255)
+                            newList.Add(pc.maxDist.Y, pc)
+                        End If
+                    End If
+                End If
+            Next
+        Next
+
+        pcList.Clear()
+        dst1.SetTo(0)
+        For Each pc In newList.Values
+            pc.index = pcList.Count + 1
+            dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
+            SetTrueText(CStr(pc.index), New cv.Point(pc.rect.X, pc.rect.Y))
+            pcList.Add(pc)
+        Next
+
+        dst2 = ShowPalette254(dst1)
+        If standaloneTest() Then
+            For Each pc In pcList
+                dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+            Next
+        End If
+        labels(2) = CStr(newList.Count) + " regions were identified."
+    End Sub
+End Class

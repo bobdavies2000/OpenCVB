@@ -53,7 +53,7 @@ Public Class Color8U_Basics : Inherits TaskParent
         If task.optionsChanged Then dst2 = classifier.dst2.clone Else classifier.dst2.copyto(dst2, task.motionMask)
         classCount = classifier.classCount
 
-        dst3 = src
+        dst3 = classifier.dst3
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) +
                     " pixel classifications"
     End Sub

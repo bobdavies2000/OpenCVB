@@ -3,18 +3,13 @@ Public Class RedCell_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Display the output of a cell for RedCloud_Basics."
     End Sub
-    Public Shared Function displayCellx() As cloudData
-        Static clickIndex As Integer
-        Static pcClick As cloudData
-        clickIndex = task.redCloud.dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
-        If clickIndex >= 0 Then pcClick = task.redCloud.pcList(clickIndex)
-        If task.mouseClickFlag Then
-
-        End If
-        Return pcClick
-    End Function
     Public Shared Function displayCell() As cloudData
-        Dim clickIndex = task.redCloud.dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
+        Dim clickIndex = task.redCloud.pcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
+        'If clickIndex + 1 < task.redCloud.pcList.Count - 1 Then
+        '    If task.redCloud.pcList(clickIndex + 1).rect.Contains(task.redCloud.pcList(clickIndex + 1).maxDist) Then
+        '        Return task.redCloud.pcList(clickIndex + 1)
+        '    End If
+        'End If
         If clickIndex >= 0 Then Return task.redCloud.pcList(clickIndex)
         Return Nothing
     End Function
@@ -130,19 +125,15 @@ Public Class RedCell_Cloud : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            SetTrueText("RedCell_Color is run by numerous algorithms but generates no output when standalone. ", 2)
+            SetTrueText("Test RedCell_Cloud with RedCloud_WithColor but generates no output when standalone. ", 2)
             Exit Sub
         End If
 
-        Dim initialList As New List(Of cloudData)
-        For i = 0 To mdList.Count - 1
-            Dim val = task.pcSplit(2).Get(Of Single)(mdList(i).maxDist.Y, mdList(i).maxDist.X)
-            If val <> 0 Then Continue For
+        pcList.Clear()
+        For i = 1 To mdList.Count - 1
             Dim pc As New cloudData
             pc.rect = mdList(i).rect
             pc.mask = mdList(i).mask
-            pc.maxDist = mdList(i).maxDist
-            pc.contour = mdList(i).contour
             pc.pixels = pc.mask.CountNonZero
             DrawTour(pc.mask, pc.contour, 255, -1)
             pc.pixels = mdList(i).mask.CountNonZero
@@ -150,17 +141,9 @@ Public Class RedCell_Cloud : Inherits TaskParent
             Dim brickIndex = task.gridMap.Get(Of Integer)(pc.maxDist.Y, pc.maxDist.X)
             Dim color = task.scalarColors(brickIndex Mod 255)
             pc.color = New cv.Vec3b(color(0), color(1), color(2))
-            initialList.Add(pc)
+            pcList.Add(pc)
         Next
 
-        Dim sortedCells As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalIntegerInverted)
-
-        For Each pc In initialList
-            Dim depthMask = pc.mask.Clone
-            sortedCells.Add(pc.pixels, pc)
-        Next
-
-        pcList = New List(Of cloudData)(sortedCells.Values)
         If task.heartBeat Then labels(2) = CStr(pcList.Count) + " RedColor cells were found"
     End Sub
 End Class
