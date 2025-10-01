@@ -32,10 +32,6 @@ Public Class TaskParent : Implements IDisposable
     Public trueData As New List(Of TrueText)
     Public strOut As String
     Public emptyRect As New cv.Rect
-    Dim ppx = task.calibData.rgbIntrinsics.ppx
-    Dim ppy = task.calibData.rgbIntrinsics.ppy
-    Dim fx = task.calibData.rgbIntrinsics.fx
-    Dim fy = task.calibData.rgbIntrinsics.fy
     Public Sub New()
         traceName = Me.GetType.Name
 

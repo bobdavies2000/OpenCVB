@@ -3,6 +3,7 @@ Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
     Public redCore As New RedCloud_Core
     Public pcList As New List(Of cloudData)
+    Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         task.redCloud = Me
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -13,7 +14,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
         labels(2) = redCore.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
 
         Static pcListLast = New List(Of cloudData)(pcList)
-        Static pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Static depthLast As cv.Mat = task.pcSplit(2)
 
         pcList.Clear()
@@ -22,7 +22,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             Dim indexLast = pcMap.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
             Dim r1 = pc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect to trigger conditional below...
-            If indexLast >= 0 Then r2 = pcListLast(indexLast).rect
+            If indexLast >= 0 And indexLast < pcListLast.count Then r2 = pcListLast(indexLast).rect
             If indexLast >= 0 And r1.IntersectsWith(r2) And task.heartBeatLT = False Then
                 pc.age = pcListLast(indexLast).age + 1
                 If pc.age > 1000 Then pc.age = 2
@@ -305,19 +305,19 @@ End Class
 Public Class RedCloud_WithRedColor : Inherits TaskParent
     Public redMask As New RedMask_Basics
     Public cellGen As New RedCell_Cloud
-    Dim contours As New Contour_Basics_List
+    Dim reduction As New Reduction_Basics
     Public Sub New()
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Use RedColor for regions with no depth to add cells to RedCloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedCloud(src, labels(2))
+        dst2 = runRedCloud(src, labels(1))
 
         ' redMask.Run(src)
-        contours.Run(src)
-        dst0 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst0.SetTo(0, task.depthMask)
-        redMask.Run(dst0)
+        reduction.Run(src)
+        reduction.dst2.SetTo(0, task.depthMask)
+        redMask.Run(reduction.dst2)
 
         If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
         cellGen.mdList = redMask.mdList
@@ -330,11 +330,12 @@ Public Class RedCloud_WithRedColor : Inherits TaskParent
             DrawTour(dst1(pc.rect), pc.contour, pc.index)
             pc.mask = dst1(pc.rect).InRange(pc.index, pc.index)
             task.redCloud.pcList.Add(pc)
+            task.redCloud.pcMap(pc.rect).setto(pc.index, pc.mask)
             dst2(pc.rect).SetTo(pc.color, pc.mask)
             dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
         Next
-        labels(2) = CStr(task.redCloud.pcList.Count) + " regions were identified."
-        labels(3) = CStr(cellGen.pcList.Count) + " cells were added using color only (no depth)."
+
+        labels(2) = "Cells found = " + CStr(task.redCloud.pcList.Count) + " and " + CStr(cellGen.pcList.Count) + " were color only cells."
     End Sub
 End Class
 

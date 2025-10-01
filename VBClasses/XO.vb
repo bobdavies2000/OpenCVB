@@ -1814,17 +1814,17 @@ End Class
 
 
 Public Class XO_OpenGL_ContourPlaneOnly : Inherits TaskParent
-    Dim contours As New Contour_Basics_List
     Public Sub New()
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         task.ogl.oglFunction = Comm.oCase.quadBasics
         desc = "Display the rectangles of the contour planes in 3D"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        contours.Run(src)
+        task.contours.Run(src)
 
         Dim quadData As New List(Of cv.Point3f)
-        For Each contour In contours.contourList
-            Dim index = contours.contourList.IndexOf(contour)
+        For Each contour In task.contours.contourList
+            Dim index = task.contours.contourList.IndexOf(contour)
             Dim c = task.scalarColors(index)
             Dim color As cv.Point3f = New cv.Point3f(c(0), c(1), c(2))
 
@@ -1855,8 +1855,8 @@ Public Class XO_OpenGL_ContourPlaneOnly : Inherits TaskParent
                 quadData.Add(corners(3))
             End If
         Next
-        dst2 = contours.dst2
-        labels(2) = contours.labels(2)
+        dst2 = task.contours.dst2
+        labels(2) = task.contours.labels(2)
 
         task.ogl.dataInput = cv.Mat.FromPixelData(quadData.Count, 1, cv.MatType.CV_32FC3, quadData.ToArray)
         task.ogl.pointCloudInput = New cv.Mat()
@@ -12331,18 +12331,18 @@ End Class
 
 Public Class XO_RedCloud_Contours : Inherits TaskParent
     Dim prep As New RedPrep_Depth
-    Dim contours As New Contour_Basics_List
     Public Sub New()
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Run the reduced pointcloud output through the RedColor_CPP algorithm."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        contours.Run(src)
+        task.contours.Run(src)
         prep.Run(src)
         dst3 = prep.dst3
 
-        dst2 = contours.dst2
-        labels(2) = contours.labels(2)
+        dst2 = task.contours.dst2
+        labels(2) = task.contours.labels(2)
     End Sub
 End Class
 
@@ -12502,15 +12502,15 @@ Public Class XO_Contour_RedCloudCompare : Inherits TaskParent
     Public contourList As New List(Of contourData)
     Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
     Public contourIDs As New List(Of Integer)
-    Dim contours As New Contour_Basics_List
     Public Sub New()
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         desc = "Use the RedPrep_Basics as input to contours_basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        contours.Run(src)
-        dst2 = contours.dst2
-        labels(2) = contours.labels(2)
+        task.contours.Run(src)
+        dst2 = task.contours.dst2
+        labels(2) = task.contours.labels(2)
 
         prep.Run(src)
         prep.dst2.ConvertTo(dst1, cv.MatType.CV_8U)

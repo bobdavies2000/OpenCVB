@@ -27,6 +27,7 @@ Public Class VBtask : Implements IDisposable
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
     Public colorizer As DepthColorizer_Basics
+    Public contours As Contour_Basics_List
 
     Public feat As Feature_Basics
     Public bricks As Brick_Basics

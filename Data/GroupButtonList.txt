@@ -138,7 +138,6 @@ Line3D
 LinearRegression
 LineDepth
 LineRect
-LogicalDepth
 LUT
 Magnify
 Mat

@@ -4,8 +4,8 @@ Public Class EdgeLine_Basics : Inherits TaskParent
     Public segments As New List(Of List(Of cv.Point))
     Public rectList As New List(Of cv.Rect)
     Public classCount As Integer
-    Dim contours As New Contour_Basics_List
     Public Sub New()
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         task.edgeLine = Me
         cPtr = EdgeLineRaw_Open()
         task.gOptions.DebugSlider.Value = 1
@@ -14,7 +14,7 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         desc = "Use EdgeLines to find edges/lines but without using motionMask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        contours.Run(src)
+        task.contours.Run(src)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim cppData(src.Total - 1) As Byte
@@ -60,7 +60,7 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         labels(2) = CStr(classCount) + " segments were found using " + CStr(pointCount) + " points."
 
         dst3.SetTo(0)
-        contours.dst2.CopyTo(dst3, task.edgeLine.dst2)
+        task.contours.dst2.CopyTo(dst3, task.edgeLine.dst2)
     End Sub
     Public Sub Close()
         EdgeLineRaw_Close(cPtr)

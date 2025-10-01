@@ -29,7 +29,7 @@ Public Class Reduction_Basics : Inherits TaskParent
 
         dst1.CopyTo(dst2, task.motionMask)
 
-        If standaloneTest() Or alwaysDisplay Then dst3 = ShowPalette(dst2)
+        If standaloneTest() Or alwaysDisplay Then dst3 = ShowPalette254(dst2)
         labels(2) = CStr(classCount) + " colors after reduction"
     End Sub
 End Class

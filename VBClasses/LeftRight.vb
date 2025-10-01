@@ -250,15 +250,15 @@ End Class
 
 
 Public Class LeftRight_ContourLeft : Inherits TaskParent
-    Dim contours As New Contour_Basics_List
     Dim color8U As New Color8U_Basics
     Public Sub New()
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         desc = "Segment the left view with contour_basics_List"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         color8U.Run(task.leftView)
-        contours.Run(color8U.dst2)
-        dst2 = contours.dst2
+        task.contours.Run(color8U.dst2)
+        dst2 = task.contours.dst2
     End Sub
 End Class
 

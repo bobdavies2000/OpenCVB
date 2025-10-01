@@ -6,16 +6,16 @@ Public Class RedColor_Basics : Inherits TaskParent
     Public redMask As New RedMask_Basics
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat ' redColor map 
-    Dim contours As New Contour_Basics_List
     Public Sub New()
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find cells and then match them to the previous generation with minimum boundary"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        contours.Run(src)
+        task.contours.Run(src)
         If src.Type <> cv.MatType.CV_8U Then
             If standalone Or task.gOptions.ColorSource.SelectedItem = "EdgeLine_Basics" Then
-                dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                dst1 = task.contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Else
                 dst1 = srcMustBe8U(src)
             End If
