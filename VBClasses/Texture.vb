@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports System.Threading
 Public Class Texture_Basics : Inherits TaskParent
     Dim ellipse As New Draw_Ellipses
     Public texture As New cv.Mat
@@ -11,10 +10,10 @@ Public Class Texture_Basics : Inherits TaskParent
 
         desc = "find the best sample 256x256 texture of a mask"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or src.Channels() <> 1 Then
             ellipse.Run(src)
-            dst2 = ellipse.dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+            dst2 = ellipse.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst2 = dst2.ConvertScaleAbs(255)
             dst3 = ellipse.dst2.Clone
             dst3.SetTo(cv.Scalar.Yellow, task.gridMask)

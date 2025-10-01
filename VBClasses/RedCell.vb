@@ -136,8 +136,8 @@ Public Class RedCell_Cloud : Inherits TaskParent
 
         Dim initialList As New List(Of cloudData)
         For i = 0 To mdList.Count - 1
-            Dim val = src.Get(Of Byte)(mdList(i).maxDist.Y, mdList(i).maxDist.X)
-            If val = 0 Then Continue For
+            Dim val = task.pcSplit(2).Get(Of Single)(mdList(i).maxDist.Y, mdList(i).maxDist.X)
+            If val <> 0 Then Continue For
             Dim pc As New cloudData
             pc.rect = mdList(i).rect
             pc.mask = mdList(i).mask

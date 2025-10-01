@@ -1,7 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
-    Dim redCore As New RedCloud_Core
+    Public redCore As New RedCloud_Core
     Public pcList As New List(Of cloudData)
     Public Sub New()
         task.redCloud = Me
@@ -313,6 +313,7 @@ Public Class RedCloud_WithRedColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedCloud(src, labels(2))
 
+        ' redMask.Run(src)
         contours.Run(src)
         dst0 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst0.SetTo(0, task.depthMask)

@@ -6,6 +6,7 @@ Public Class EdgeLine_Basics : Inherits TaskParent
     Public classCount As Integer
     Dim contours As New Contour_Basics_List
     Public Sub New()
+        task.edgeLine = Me
         cPtr = EdgeLineRaw_Open()
         task.gOptions.DebugSlider.Value = 1
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -298,29 +299,6 @@ End Class
 
 
 
-
-
-Public Class EdgeLine_LeftRight : Inherits TaskParent
-    Dim edges As New EdgeLine_Basics
-    Public Sub New()
-        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
-        labels(3) = "Right View: Note it is updated on every frame - it does not use the motion mask."
-        desc = "Build the left and right edge lines."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.leftView)
-        dst2 = task.edgeLine.dst2.Clone
-
-        edges.Run(task.rightView)
-        dst3 = edges.dst2.Clone
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class EdgeLine_BrickPoints : Inherits TaskParent
     Dim bPoint As New BrickPoint_Basics
     Public classCount As Integer
@@ -429,5 +407,28 @@ Public Class EdgeLine_DepthSegments : Inherits TaskParent
             SetTrueText("Segments with depth removed.", 3)
         End If
         labels(3) = "After using depth to isolate segments there are " + CStr(segments.Count) + " segments"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class EdgeLine_LeftRight : Inherits TaskParent
+    Dim edges As New EdgeLine_Basics
+    Public Sub New()
+        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
+        labels(3) = "Right View: Note it is updated on every frame - it does not use the motion mask."
+        desc = "Build the left and right edge lines."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.leftView)
+        dst2 = edges.dst2.Clone
+
+        edges.Run(task.rightView)
+        dst3 = edges.dst2.Clone
     End Sub
 End Class
