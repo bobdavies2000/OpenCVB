@@ -23,7 +23,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             Dim r1 = pc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect to trigger conditional below...
             If indexLast >= 0 And indexLast < pcListLast.count Then r2 = pcListLast(indexLast).rect
-            If indexLast >= 0 And r1.IntersectsWith(r2) And task.heartBeatLT = False Then
+            If indexLast >= 0 And r1.IntersectsWith(r2) And task.heartBeatLT = False And task.optionsChanged = False Then
                 pc.age = pcListLast(indexLast).age + 1
                 If pc.age > 1000 Then pc.age = 2
                 pc.depthLast = depthLast(pc.rect).Mean(pc.mask)

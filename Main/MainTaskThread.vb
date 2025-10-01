@@ -165,6 +165,7 @@ Namespace OpenCVB
                 Dim saveworkRes = settings.workRes
                 mousePointCamPic = New cv.Point(task.workRes.Width / 2, task.workRes.Height / 2) ' mouse click point default = center of the image
 
+                Dim syncUI As Integer
                 While 1
                     Dim waitTime = Now
                     While 1
@@ -173,7 +174,7 @@ Namespace OpenCVB
 
                     ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
                     ' Each image will represent the one just finished by the algorithm.
-                    If task.debugSyncUI Then Thread.Sleep(3000)
+                    ' If task.debugSyncUI Then Thread.Sleep(3000)
 
                     ' exit the outer while if any of these change.
                     If cameraTaskHandle Is Nothing Or cameraShutdown Then Exit While
@@ -227,7 +228,16 @@ Namespace OpenCVB
 
 
 
-                    task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
+                    If task.debugSyncUI Then
+                        Static syncUICount = 10000 ' enough for X seconds - adjust if needed...
+                        If syncUI = 0 Then
+                            task.RunAlgorithm()
+                            syncUI = syncUICount
+                        End If
+                        syncUI -= 1
+                    Else
+                        task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
+                    End If
 
 
 
