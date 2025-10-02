@@ -83,7 +83,7 @@ Public Class RedCloud_Core : Inherits TaskParent
         Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
         Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
-        Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
+        Dim minCount = dst3.Total * 0.001
         Dim newList As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalInteger)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
@@ -92,7 +92,7 @@ Public Class RedCloud_Core : Inherits TaskParent
                 If dst3.Get(Of Byte)(pt.Y, pt.X) > index Then
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
-                        If count >= minCount And count < maxCount Then
+                        If count >= minCount Then
                             Dim pc = New cloudData(dst3(rect).InRange(index, index), rect, count)
                             pc.index = index
                             index += 1
