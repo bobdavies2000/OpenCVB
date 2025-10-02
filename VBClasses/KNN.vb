@@ -1420,9 +1420,46 @@ End Class
 
 
 Public Class KNN_Hulls : Inherits TaskParent
+    Dim knn As New KNN_Basics
+    Dim redC As New RedCloud_Basics
+    Public matchList As New List(Of cv.Point2f)
     Public Sub New()
+        knn.desiredMatches = 2
+        task.gOptions.DebugSlider.Value = 2
+        labels(2) = "Use the debugslider to define the maximum distance between 'close' points."
         desc = "Use KNN to connect hulls logically."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2.Clone
+
+        knn.ptListQuery.Clear()
+        dst3.SetTo(0)
+        For Each pc In redC.pcList
+            dst3(pc.rect).SetTo(pc.color, pc.mask)
+            For Each pt In pc.hull
+                dst2(pc.rect).Circle(pt, task.DotSize, task.highlight, -1)
+                knn.ptListQuery.Add(New cv.Point(CInt(pt.X) + pc.rect.X, CInt(pt.Y) + pc.rect.Y))
+            Next
+        Next
+
+        knn.ptListTrain = New List(Of cv.Point)(knn.ptListQuery)
+
+        knn.Run(src)
+        matchList.Clear()
+        Dim distanceMax = Math.Min(Math.Abs(task.gOptions.DebugSlider.Value), 10)
+        For i = 0 To knn.result.GetUpperBound(0) - 1
+            Dim p1 As cv.Point2f = knn.ptListQuery(knn.result(i, 0))
+            For j = 0 To knn.result.GetUpperBound(1) - 1
+                Dim p2 As cv.Point2f = knn.ptListQuery(knn.result(i, 1))
+                If p1.DistanceTo(p2) <= distanceMax Then
+                    matchList.Add(p1)
+                    matchList.Add(p2)
+                    dst3.Circle(p1, task.DotSize, task.highlight, -1)
+                    dst3.Circle(p2, task.DotSize, task.highlight, -1)
+                End If
+            Next
+        Next
+        labels(3) = CStr(matchList.Count / 2) + " points were within " + CStr(distanceMax) + " pixels of another cell's hull point"
     End Sub
 End Class

@@ -110,13 +110,11 @@ Public Class RedCloud_Core : Inherits TaskParent
             Next
         Next
 
-        If standalone Then
-            dst2 = ShowPalette254(dst1)
+        dst2 = ShowPalette254(dst1)
 
-            For Each pc In pcList
-                dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
-            Next
-        End If
+        For Each pc In pcList
+            dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+        Next
         labels(2) = CStr(pcList.Count) + " regions were identified.  Bright areas in dst3 are < " + CStr(CInt(minCount)) + " pixels (too small.)"
     End Sub
 End Class
