@@ -602,6 +602,8 @@ Public Class IMU_Lines : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         vert.Run(src)
         dst2 = vert.dst2
+        If vert.sortedVerticals.Count = 0 Then Exit Sub ' nothing to work on ...
+
         Dim gcell As New gravityLine
         Dim cells = vert.sortedVerticals
         If cells.Count > 0 Then gcell = cells.ElementAt(0).Value Else gcell = lastGcell

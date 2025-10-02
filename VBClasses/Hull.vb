@@ -45,11 +45,12 @@ Public Class Hull_Defect : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            Static hContour = New Hull_Contour
+            Static hContour As New Hull_Contour
             hContour.run(src)
             dst2 = hContour.dst2
             hull = hContour.hull
-            contour = hContour.contours.allContours(0)
+            If hContour.contours1.sortContours.allContours.Count = 0 Then Exit Sub ' nothing to work on yet...
+            contour = hContour.contours1.sortContours.allContours(0)
         End If
 
         Dim hullIndices = cv.Cv2.ConvexHullIndices(contour, False)
@@ -90,8 +91,8 @@ End Class
 
 Public Class Hull_Contour : Inherits TaskParent
     Public hull As New List(Of cv.Point)
-    Dim contours1 As New Contour_Basics_List
-    Dim contours2 As New Contour_Basics_List
+    Public contours1 As New Contour_Basics_List
+    Public contours2 As New Contour_Basics_List
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Compare the hull to the contour of a contour cell"
