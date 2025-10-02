@@ -354,10 +354,11 @@ Public Class RedCloud_WithRedColor : Inherits TaskParent
         cellGen.Run(redMask.dst2)
         dst3 = cellGen.dst2
 
-        For Each pc In cellGen.pcList
-            pc.index = task.redCloud.pcList.Count
-            dst1(pc.rect).SetTo(0)
+        For Each pcc In cellGen.pcList
+            Dim pc As New cloudData(pcc.mask, pcc.rect, pcc.pixels)
+            pc.index = task.redCloud.pcList.Count + 1
 
+            dst1(pc.rect).SetTo(0)
             pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
             DrawTour(task.redCloud.pcMap(pc.rect), pc.contour, pc.index)
             pc.mask = task.redCloud.pcMap(pc.rect).InRange(pc.index, pc.index)

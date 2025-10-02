@@ -5,11 +5,6 @@ Public Class RedCell_Basics : Inherits TaskParent
     End Sub
     Public Shared Function displayCell() As cloudData
         Dim clickIndex = task.redCloud.pcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
-        'If clickIndex + 1 < task.redCloud.pcList.Count - 1 Then
-        '    If task.redCloud.pcList(clickIndex + 1).rect.Contains(task.redCloud.pcList(clickIndex + 1).maxDist) Then
-        '        Return task.redCloud.pcList(clickIndex + 1)
-        '    End If
-        'End If
         If clickIndex >= 0 Then Return task.redCloud.pcList(clickIndex)
         Return Nothing
     End Function
