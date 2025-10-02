@@ -8,6 +8,16 @@ Public Class RedCloud_Basics : Inherits TaskParent
         task.redCloud = Me
         desc = "Build contours for each cell"
     End Sub
+    Public Shared Function selectCell() As String
+        task.pcD = RedCell_Basics.displayCell()
+        If task.pcD IsNot Nothing Then
+            If task.pcD.rect.Contains(task.ClickPoint) Then
+                task.color(task.pcD.rect).SetTo(white, task.pcD.mask)
+                Return task.pcD.displayCell
+            End If
+        End If
+        Return Nothing
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         redCore.Run(src)
         labels(2) = redCore.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
@@ -47,16 +57,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
 
-        If standalone Then
-            task.pcD = RedCell_Basics.displayCell()
-            If task.pcD IsNot Nothing Then
-                If task.pcD.rect.Contains(task.ClickPoint) Then
-                    task.color(task.pcD.rect).SetTo(white, task.pcD.mask)
-                    SetTrueText(task.pcD.displayCell, 3)
-                    SetTrueText(CStr(task.pcD.index), task.pcD.maxDist, 3)
-                End If
-            End If
-        End If
+        If standalone Then SetTrueText(selectCell(), 3)
 
         pcListLast = New List(Of cloudData)(task.redCloud.pcList)
         depthLast = task.pcSplit(2)
@@ -287,24 +288,24 @@ Public Class RedCloud_CellDepthHistogram : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedCloud(src, labels(2))
-        If task.heartBeat Then
-            If task.pcD Is Nothing Then
-                labels(3) = "Select a RedCloud cell to see the histogram"
-                Exit Sub
-            End If
-            Dim depth As cv.Mat = task.pcSplit(2)(task.pcD.rect)
-            depth.SetTo(0, task.noDepthMask(task.pcD.rect))
-            plot.minRange = 0
-            plot.maxRange = task.MaxZmeters
-            plot.Run(depth)
-            labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + " meters - vertical lines every meter"
-
-            Dim incr = dst2.Width / task.MaxZmeters
-            For i = 1 To CInt(task.MaxZmeters - 1)
-                Dim x = incr * i
-                DrawLine(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White)
-            Next
+        RedCloud_Basics.selectCell()
+        If task.pcD Is Nothing Then
+            labels(3) = "Select a RedCloud cell to see the histogram"
+            Exit Sub
         End If
+
+        Dim depth As cv.Mat = task.pcSplit(2)(task.pcD.rect)
+        depth.SetTo(0, task.noDepthMask(task.pcD.rect))
+        plot.minRange = 0
+        plot.maxRange = task.MaxZmeters
+        plot.Run(depth)
+        labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + " meters - vertical lines every meter"
+
+        Dim incr = dst2.Width / task.MaxZmeters
+        For i = 1 To CInt(task.MaxZmeters - 1)
+            Dim x = incr * i
+            DrawLine(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White)
+        Next
         dst3 = plot.dst2
     End Sub
 End Class
@@ -383,14 +384,7 @@ Public Class RedCloud_WithRedColor : Inherits TaskParent
             dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
         Next
 
-        task.pcD = RedCell_Basics.displayCell()
-        If task.pcD IsNot Nothing Then
-            If task.pcD.rect.Contains(task.ClickPoint) Then
-                task.color(task.pcD.rect).SetTo(white, task.pcD.mask)
-                SetTrueText(task.pcD.displayCell, 3)
-                SetTrueText(CStr(task.pcD.index), task.pcD.maxDist, 3)
-            End If
-        End If
+        SetTrueText(RedCloud_Basics.selectCell(), 3)
 
         labels(2) = "Cells found = " + CStr(task.redCloud.pcList.Count) + " and " + CStr(cellGen.pcList.Count) + " were color only cells."
     End Sub
