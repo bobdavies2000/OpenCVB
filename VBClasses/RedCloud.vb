@@ -98,7 +98,6 @@ Public Class RedCloud_Core : Inherits TaskParent
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount Then
                             Dim pc = New cloudData(dst3(rect).InRange(index, index), rect, count)
-                            pc.index = index
                             index += 1
                             newList.Add(pc.maxDist.Y, pc)
                         Else
@@ -131,7 +130,7 @@ Public Class RedCloud_Core : Inherits TaskParent
                 dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
             Next
         End If
-        labels(2) = CStr(newList.Count) + " regions were identified.  Bright areas in dst3 are < " + CStr(CInt(minCount)) + " pixels (too small.)"
+        labels(2) = CStr(pcList.Count) + " regions were identified.  Bright areas in dst3 are < " + CStr(CInt(minCount)) + " pixels (too small.)"
     End Sub
 End Class
 

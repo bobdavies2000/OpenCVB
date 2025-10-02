@@ -632,8 +632,8 @@ Public Class TaskParent : Implements IDisposable
         Catch ex As Exception
         End Try
     End Sub
-    Public Sub DrawTour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
-                           Optional lineType As cv.LineTypes = cv.LineTypes.AntiAlias)
+    Public Shared Sub DrawTour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
+                        Optional lineType As cv.LineTypes = cv.LineTypes.Link8)
         If contour Is Nothing Then Exit Sub
         If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
         Dim listOfPoints = New List(Of List(Of cv.Point))({contour})

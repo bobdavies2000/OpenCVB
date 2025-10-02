@@ -1,4 +1,6 @@
-﻿Imports SharpGL.SceneGraph.Primitives
+﻿Imports System.Security.Cryptography
+Imports OpenCvSharp
+Imports SharpGL.SceneGraph.Primitives
 Imports VBClasses.TaskParent
 Imports cv = OpenCvSharp
 Public Module vbc
@@ -781,6 +783,13 @@ Public Class cloudData
         mm.maxLoc.Y += rect.Y
         Return mm.maxLoc
     End Function
+    Public Sub DrawTour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
+                        Optional lineType As cv.LineTypes = cv.LineTypes.Link8)
+        If contour Is Nothing Then Exit Sub
+        If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
+        Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
+        cv.Cv2.DrawContours(dst, listOfPoints, 0, color, 1, cv.LineTypes.Link4)
+    End Sub
     Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _pixels As Integer)
         mask = _mask
         rect = _rect
@@ -788,7 +797,9 @@ Public Class cloudData
         age = 1
         maxDist = getMaxDist()
 
-        depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
+        contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
+        DrawTour(mask, contour, 0, 255)
+        ' depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
     End Sub
     Public Function displayCell() As String
         Dim strOut = "pcList index = " + CStr(index) + vbCrLf
