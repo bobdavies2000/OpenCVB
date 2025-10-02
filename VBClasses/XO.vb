@@ -12625,7 +12625,7 @@ Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
             Dim count = cv.Cv2.FloodFill(dst3, mask, pc.maxDist, index, rect, 0, 0, flags)
             If count >= minCount And count < maxCount Then
                 index += 1
-                Dim pd = New cloudData(mask(rect), rect, count)
+                Dim pd = New cloudData(mask(rect), rect)
                 dst2(rect).SetTo(task.scalarColors(index), mask(rect))
                 pcList.Add(pd)
             End If
@@ -12696,7 +12696,7 @@ Public Class XO_RedCloud_Basics : Inherits TaskParent
                         Dim r = New cv.Rect(rect.X + 1, rect.Y + 1, rect.Width - 1, rect.Height - 1)
                         maskUsed.Rectangle(r, 255, -1)
                         If count >= minCount And count < maxCount Then
-                            Dim pc = New cloudData(mask(r), r, count)
+                            Dim pc = New cloudData(mask(r), r)
                             index += 1
                             newList.Add(pc.maxDist.Y, pc)
                         End If
@@ -13203,5 +13203,33 @@ Public Class XO_RedCell_ValidateColorCloud : Inherits TaskParent
             strOut += "Percentage range " + Format(percentDepth.Min, "0%") + " to " + Format(percentDepth.Max, "0%")
         End If
         SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_RedCloud_Hulls : Inherits TaskParent
+    Public Sub New()
+        desc = "Create a hull for each RedCloud cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedCloud(src, labels(2))
+
+        dst3.SetTo(0)
+        Dim hullCounts As New List(Of Integer)
+        Dim contourCounts As New List(Of Integer)
+        For Each pc In task.redCloud.pcList
+            pc.hull = cv.Cv2.ConvexHull(pc.contour.ToArray, True).ToList
+            DrawTour(dst3(pc.rect), pc.hull, pc.color, -1)
+            hullCounts.Add(pc.hull.Count)
+            contourCounts.Add(pc.contour.Count)
+            SetTrueText(CStr(pc.age), pc.maxDist)
+        Next
+        labels(3) = "Average hull length = " + Format(hullCounts.Average, fmt1) + " points.  " +
+                    "Average contour length = " + Format(contourCounts.Average, fmt1) + " points."
     End Sub
 End Class

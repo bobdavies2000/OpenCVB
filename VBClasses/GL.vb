@@ -573,10 +573,10 @@ End Class
 
 
 
-Public Class GL_Triangles : Inherits TaskParent
-    Dim hulls As New RedCloud_Hulls
+Public Class GL_RedCloudHulls : Inherits TaskParent
+    Dim hulls As New RedCloud_Basics
     Public Sub New()
-        desc = "Prepare triangles from the RedCloud_Hulls output"
+        desc = "Prepare triangles from the RedCloud_Basics output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         hulls.Run(src)
@@ -624,10 +624,10 @@ End Class
 
 
 
-Public Class GL_TrianglesImage : Inherits TaskParent
-    Dim hulls As New RedCloud_Hulls
+Public Class GL_RedCloudHullsImage : Inherits TaskParent
+    Dim hulls As New RedCloud_Basics
     Public Sub New()
-        desc = "Prepare triangles from the RedCloud_Hulls output"
+        desc = "Prepare a texture map and project it onto the RedCloud_Basics hulls"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         hulls.Run(src)

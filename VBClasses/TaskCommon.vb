@@ -790,16 +790,17 @@ Public Class cloudData
         Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
         cv.Cv2.DrawContours(dst, listOfPoints, 0, color, 1, cv.LineTypes.Link4)
     End Sub
-    Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _pixels As Integer)
+    Public Sub New(_mask As cv.Mat, _rect As cv.Rect)
         mask = _mask
         rect = _rect
-        pixels = _pixels
         age = 1
         maxDist = getMaxDist()
 
         contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
-        DrawTour(mask, contour, 0, 255)
-        ' depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
+        hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
+
+        pixels = mask.CountNonZero
+        depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
     End Sub
     Public Function displayCell() As String
         Dim strOut = "pcList index = " + CStr(index) + vbCrLf

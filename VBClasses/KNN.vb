@@ -1414,3 +1414,15 @@ Public Class KNN_EdgePoints : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+Public Class KNN_Hulls : Inherits TaskParent
+    Public Sub New()
+        desc = "Use KNN to connect hulls logically."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+    End Sub
+End Class

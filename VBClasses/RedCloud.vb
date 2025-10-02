@@ -20,18 +20,23 @@ Public Class RedCloud_Basics : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         redCore.Run(src)
+        dst3 = redCore.dst3
+        labels(3) = redCore.labels(3)
         labels(2) = redCore.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
 
         Static pcListLast = New List(Of cloudData)(pcList)
         Static depthLast As cv.Mat = task.pcSplit(2)
+        Dim pcMapLast = pcMap.clone
 
         pcList.Clear()
         Dim r2 As cv.Rect
+        pcMap.setto(0)
+        dst2.SetTo(0)
         For Each pc As cloudData In redCore.pcList
-            Dim indexLast = pcMap.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
             Dim r1 = pc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect to trigger conditional below...
-            If indexLast >= 0 And indexLast < pcListLast.count Then r2 = pcListLast(indexLast).rect
+            Dim indexLast = pcMapLast.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
+            If indexLast > 0 Then r2 = pcListLast(indexLast).rect
             If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                 pc.age = pcListLast(indexLast).age + 1
                 If pc.age > 1000 Then pc.age = 2
@@ -42,22 +47,15 @@ Public Class RedCloud_Basics : Inherits TaskParent
                 pc.color = task.vecColors(pc.index)
             End If
             pc.index = pcList.Count + 1
-            pcList.Add(pc)
-        Next
-
-        dst2.SetTo(0)
-        pcMap.setto(0)
-        For Each pc In pcList
-            pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
             pcMap(pc.rect).setto(pc.index, pc.mask)
-            'DrawTour(pcMap(pc.rect), pc.contour, pc.index)
-            'pc.mask = pcMap(pc.rect).InRange(pc.index, pc.index)
+            DrawTour(pc.mask, pc.hull, 255)
             dst2(pc.rect).SetTo(pc.color, pc.mask)
             dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+            pcList.Add(pc)
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
 
-        If standalone Then SetTrueText(selectCell(), 3)
+        SetTrueText(selectCell(), 3)
 
         pcListLast = New List(Of cloudData)(task.redCloud.pcList)
         depthLast = task.pcSplit(2)
@@ -88,7 +86,8 @@ Public Class RedCloud_Core : Inherits TaskParent
         Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
         Dim minCount = dst3.Total * 0.001
-        Dim newList As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalInteger)
+        pcList.Clear()
+        dst1.SetTo(0)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
                 Dim pt = New cv.Point(x, y)
@@ -97,9 +96,12 @@ Public Class RedCloud_Core : Inherits TaskParent
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount Then
-                            Dim pc = New cloudData(dst3(rect).InRange(index, index), rect, count)
+                            Dim pc = New cloudData(dst3(rect).InRange(index, index), rect)
+                            pc.index = index
                             index += 1
-                            newList.Add(pc.maxDist.Y, pc)
+                            pcList.Add(pc)
+                            dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
+                            SetTrueText(CStr(pc.index), pc.rect.TopLeft)
                         Else
                             dst3(rect).SetTo(255, mask(rect))
                         End If
@@ -108,22 +110,7 @@ Public Class RedCloud_Core : Inherits TaskParent
             Next
         Next
 
-        pcList.Clear()
-        dst1.SetTo(0)
-        For Each pc In newList.Values
-            pc.index = pcList.Count + 1
-            dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
-            SetTrueText(CStr(pc.index), New cv.Point(pc.rect.X, pc.rect.Y))
-            pcList.Add(pc)
-        Next
-
         If standalone Then
-            'Dim clickIndex = dst3.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
-            'If clickIndex > 0 And clickIndex < pcList.Count Then
-            '    Dim pc = pcList(clickIndex)
-            '    task.color(pc.rect).SetTo(white, pc.mask)
-            '    SetTrueText(pc.displayCell(), 1)
-            'End If
             dst2 = ShowPalette254(dst1)
 
             For Each pc In pcList
@@ -197,34 +184,6 @@ Public Class RedCloud_Motion : Inherits TaskParent
         Next
     End Sub
 End Class
-
-
-
-
-
-
-Public Class RedCloud_Hulls : Inherits TaskParent
-    Public Sub New()
-        desc = "Create a hull for each RedCloud cell."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedCloud(src, labels(2))
-
-        dst3.SetTo(0)
-        Dim hullCounts As New List(Of Integer)
-        Dim contourCounts As New List(Of Integer)
-        For Each pc In task.redCloud.pcList
-            pc.hull = cv.Cv2.ConvexHull(pc.contour.ToArray, True).ToList
-            DrawTour(dst3(pc.rect), pc.hull, pc.color, -1)
-            hullCounts.Add(pc.hull.Count)
-            contourCounts.Add(pc.contour.Count)
-            SetTrueText(CStr(pc.age), pc.maxDist)
-        Next
-        labels(3) = "Average hull length = " + Format(hullCounts.Average, fmt1) + " points.  " +
-                    "Average contour length = " + Format(contourCounts.Average, fmt1) + " points."
-    End Sub
-End Class
-
 
 
 
@@ -366,7 +325,7 @@ Public Class RedCloud_WithRedColor : Inherits TaskParent
         dst3 = cellGen.dst2
 
         For Each pcc In cellGen.pcList
-            Dim pc As New cloudData(pcc.mask, pcc.rect, pcc.pixels)
+            Dim pc As New cloudData(pcc.mask, pcc.rect)
             pc.index = task.redCloud.pcList.Count + 1
 
             dst1(pc.rect).SetTo(0)

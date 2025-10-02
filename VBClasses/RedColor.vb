@@ -2022,7 +2022,7 @@ Public Class RedColor_Simple : Inherits TaskParent
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount And count < maxCount Then
-                            Dim pc = New cloudData(dst3(rect).InRange(index, index), rect, count)
+                            Dim pc = New cloudData(dst3(rect).InRange(index, index), rect)
                             index += 1
                             pc.index = index
                             pc.depth = 0 ' any non-zero value is a transient that is an unlikely value
