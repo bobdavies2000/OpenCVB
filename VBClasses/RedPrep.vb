@@ -35,10 +35,11 @@ Public Class RedPrep_Basics : Inherits TaskParent
         prepEdges.Run(reduceChan(split(1)))
         dst2 = dst2 Or prepEdges.dst3
 
+        '  Remove these lines and depth will vary too much within a cell.
         prepEdges.Run(reduceChan(split(2)))
         dst2 = dst2 Or prepEdges.dst3
 
-        ' this is not as good as the 3 operations above.
+        ' this is not as good as the operations above.
         'prepEdges.Run(reduceChan(split(0) + split(1) + split(2)))
         'dst2 = prepEdges.dst3
 

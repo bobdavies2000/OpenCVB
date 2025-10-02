@@ -36,10 +36,12 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Next
 
         dst2.SetTo(0)
+        pcMap.setto(0)
         For Each pc In pcList
             pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
-            DrawTour(pcMap(pc.rect), pc.contour, pc.index)
-            pc.mask = pcMap(pc.rect).InRange(pc.index, pc.index)
+            pcMap(pc.rect).setto(pc.index, pc.mask)
+            'DrawTour(pcMap(pc.rect), pc.contour, pc.index)
+            'pc.mask = pcMap(pc.rect).InRange(pc.index, pc.index)
             dst2(pc.rect).SetTo(pc.color, pc.mask)
             dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
             SetTrueText(CStr(pc.age), pc.maxDist)
@@ -50,7 +52,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             If task.pcD IsNot Nothing Then
                 If task.pcD.rect.Contains(task.ClickPoint) Then
                     task.color(task.pcD.rect).SetTo(white, task.pcD.mask)
-                    SetTrueText(task.pcD.displayString, 3)
+                    SetTrueText(task.pcD.displayCell, 3)
                     SetTrueText(CStr(task.pcD.index), task.pcD.maxDist, 3)
                 End If
             End If
@@ -70,6 +72,7 @@ Public Class RedCloud_Core : Inherits TaskParent
     Public prepEdges As New RedPrep_Basics
     Public pcList As New List(Of cloudData)
     Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Reduced point cloud - use 'Reduction Target' option to increase/decrease cell sizes."
         desc = "Find the biggest chunks of consistent depth data "
@@ -97,6 +100,8 @@ Public Class RedCloud_Core : Inherits TaskParent
                             pc.index = index
                             index += 1
                             newList.Add(pc.maxDist.Y, pc)
+                        Else
+                            dst3(rect).SetTo(255, mask(rect))
                         End If
                     End If
                 End If
@@ -112,14 +117,20 @@ Public Class RedCloud_Core : Inherits TaskParent
             pcList.Add(pc)
         Next
 
-        If standaloneTest() Then
+        If standalone Then
+            'Dim clickIndex = dst3.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+            'If clickIndex > 0 And clickIndex < pcList.Count Then
+            '    Dim pc = pcList(clickIndex)
+            '    task.color(pc.rect).SetTo(white, pc.mask)
+            '    SetTrueText(pc.displayCell(), 1)
+            'End If
             dst2 = ShowPalette254(dst1)
 
             For Each pc In pcList
                 dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
             Next
         End If
-        labels(2) = CStr(newList.Count) + " regions were identified."
+        labels(2) = CStr(newList.Count) + " regions were identified.  Bright areas in dst3 are < " + CStr(CInt(minCount)) + " pixels (too small.)"
     End Sub
 End Class
 
@@ -376,7 +387,7 @@ Public Class RedCloud_WithRedColor : Inherits TaskParent
         If task.pcD IsNot Nothing Then
             If task.pcD.rect.Contains(task.ClickPoint) Then
                 task.color(task.pcD.rect).SetTo(white, task.pcD.mask)
-                SetTrueText(task.pcD.displayString, 3)
+                SetTrueText(task.pcD.displayCell, 3)
                 SetTrueText(CStr(task.pcD.index), task.pcD.maxDist, 3)
             End If
         End If

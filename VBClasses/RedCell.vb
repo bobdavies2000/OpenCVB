@@ -5,13 +5,15 @@ Public Class RedCell_Basics : Inherits TaskParent
     End Sub
     Public Shared Function displayCell() As cloudData
         Dim clickIndex = task.redCloud.pcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
-        If clickIndex >= 0 Then Return task.redCloud.pcList(clickIndex)
+        If clickIndex >= 0 Then
+            Return task.redCloud.pcList(clickIndex)
+        End If
         Return Nothing
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then dst2 = runRedCloud(src, labels(2))
         Dim pcClick = displayCell()
-        If pcClick IsNot Nothing Then SetTrueText(pcClick.displayString, 3)
+        If pcClick IsNot Nothing Then SetTrueText(pcClick.displayCell, 3)
     End Sub
 End Class
 

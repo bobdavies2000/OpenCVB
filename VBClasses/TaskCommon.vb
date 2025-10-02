@@ -137,7 +137,7 @@ Public Module vbc
         lastHeartBeatLT = task.heartBeatLT
 
         Static heartBeatCount As Integer = 5
-            If task.heartBeat Then
+        If task.heartBeat Then
             heartBeatCount += 1
             If heartBeatCount >= 5 Then
                 task.heartBeatLT = True
@@ -790,7 +790,7 @@ Public Class cloudData
 
         depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
     End Sub
-    Public Function displayString() As String
+    Public Function displayCell() As String
         Dim strOut = "pcList index = " + CStr(index) + vbCrLf
         strOut += "age = " + CStr(age) + vbCrLf
         strOut += "rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
