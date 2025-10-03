@@ -14,7 +14,7 @@ Public Class RedColor_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         task.contours.Run(src)
         If src.Type <> cv.MatType.CV_8U Then
-            If standalone Or task.gOptions.ColorSource.SelectedItem = "EdgeLine_Basics" Then
+            If standalone And task.gOptions.ColorSource.SelectedItem = "EdgeLine_Basics" Then
                 dst1 = task.contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Else
                 dst1 = srcMustBe8U(src)
@@ -41,10 +41,6 @@ Public Class RedColor_Basics : Inherits TaskParent
         task.setSelectedCell()
     End Sub
 End Class
-
-
-
-
 
 
 
@@ -1997,9 +1993,8 @@ End Class
 Public Class RedColor_Simple : Inherits TaskParent
     Public pcList As New List(Of cloudData)
     Dim reduction As New Reduction_Basics
+    Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Reduced point cloud - use 'Reduction Target' option to increase/decrease cell sizes."
         desc = "Find the biggest chunks of consistent depth data "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2012,8 +2007,9 @@ Public Class RedColor_Simple : Inherits TaskParent
         Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
         Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
-        Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
-        Dim newList As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalInteger)
+        Dim minCount = dst3.Total * 0.0001
+        pcList.Clear()
+        pcMap.SetTo(0)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
                 Dim pt = New cv.Point(x, y)
@@ -2021,34 +2017,27 @@ Public Class RedColor_Simple : Inherits TaskParent
                 If dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
-                        If count >= minCount And count < maxCount Then
+                        If count >= minCount Then
                             Dim pc = New cloudData(dst3(rect).InRange(index, index), rect)
-                            index += 1
                             pc.index = index
-                            pc.depth = 0 ' any non-zero value is a transient that is an unlikely value
-                            pc.color = task.vecColors(pc.maxDist.Y Mod 255)
-                            newList.Add(pc.maxDist.Y, pc)
+                            index += 1
+                            pcList.Add(pc)
+                            pcMap(pc.rect).SetTo(pc.index Mod 255, pc.hullMask)
+                            SetTrueText(CStr(pc.index), pc.rect.TopLeft)
+                        Else
+                            dst3(rect).SetTo(255, mask(rect))
                         End If
                     End If
                 End If
             Next
         Next
 
-        pcList.Clear()
-        dst1.SetTo(0)
-        For Each pc In newList.Values
-            pc.index = pcList.Count + 1
-            dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
-            SetTrueText(CStr(pc.index), New cv.Point(pc.rect.X, pc.rect.Y))
-            pcList.Add(pc)
-        Next
-
-        dst2 = ShowPalette254(dst1)
+        dst2 = ShowPalette254(pcMap)
         If standaloneTest() Then
             For Each pc In pcList
                 dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
             Next
         End If
-        labels(2) = CStr(newList.Count) + " regions were identified."
+        labels(2) = CStr(pcList.Count) + " regions were identified."
     End Sub
 End Class

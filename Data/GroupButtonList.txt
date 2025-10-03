@@ -189,6 +189,7 @@ Rectangle
 RecursiveBilateralFilter
 RedCell
 RedCloud
+RedCloudAndColor
 RedColor
 RedMask
 RedPrep

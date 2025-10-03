@@ -109,38 +109,3 @@ Public Class RedCell_Color : Inherits TaskParent
         dst2 = RebuildRCMap(sortedCells)
     End Sub
 End Class
-
-
-
-
-
-Public Class RedCell_Cloud : Inherits TaskParent
-    Public mdList As New List(Of maskData)
-    Public pcList As New List(Of cloudData)
-    Public Sub New()
-        desc = "Generate the RedCloud cells from the rects, mask, and pixel counts."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            SetTrueText("Test RedCell_Cloud with RedCloud_WithColor but generates no output when standalone. ", 2)
-            Exit Sub
-        End If
-
-        pcList.Clear()
-        For i = 1 To mdList.Count - 1
-            Dim pc As New cloudData
-            pc.rect = mdList(i).rect
-            pc.mask = mdList(i).mask
-            pc.pixels = pc.mask.CountNonZero
-            DrawTour(pc.mask, pc.contour, 255, -1)
-            pc.pixels = mdList(i).mask.CountNonZero
-
-            Dim brickIndex = task.gridMap.Get(Of Integer)(pc.maxDist.Y, pc.maxDist.X)
-            Dim color = task.scalarColors(brickIndex Mod 255)
-            pc.color = New cv.Vec3b(color(0), color(1), color(2))
-            pcList.Add(pc)
-        Next
-
-        If task.heartBeat Then labels(2) = CStr(pcList.Count) + " RedColor cells were found"
-    End Sub
-End Class

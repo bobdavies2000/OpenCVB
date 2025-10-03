@@ -765,8 +765,8 @@ Public Class cloudData
     Public color As cv.Vec3b
     Public contour As List(Of cv.Point)
     Public depth As Single
-    Public depthLast As Single
     Public hull As List(Of cv.Point)
+    Public hullMask As cv.Mat
     Public index As Integer
     Public mask As cv.Mat
     Public maxDist As cv.Point
@@ -783,12 +783,12 @@ Public Class cloudData
         mm.maxLoc.Y += rect.Y
         Return mm.maxLoc
     End Function
-    Public Sub DrawTour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
+    Public Sub DrawHull(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
                         Optional lineType As cv.LineTypes = cv.LineTypes.Link8)
         If contour Is Nothing Then Exit Sub
         If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
         Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
-        cv.Cv2.DrawContours(dst, listOfPoints, 0, color, 1, cv.LineTypes.Link4)
+        cv.Cv2.DrawContours(dst, listOfPoints, 0, color, lineWidth, cv.LineTypes.Link4)
     End Sub
     Public Sub New(_mask As cv.Mat, _rect As cv.Rect)
         mask = _mask
@@ -798,6 +798,8 @@ Public Class cloudData
 
         contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
         hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
+        hullMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+        DrawHull(hullMask, hull, 255)
 
         pixels = mask.CountNonZero
         depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)

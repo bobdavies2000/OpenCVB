@@ -13233,3 +13233,4 @@ Public Class XO_RedCloud_Hulls : Inherits TaskParent
                     "Average contour length = " + Format(contourCounts.Average, fmt1) + " points."
     End Sub
 End Class
+
