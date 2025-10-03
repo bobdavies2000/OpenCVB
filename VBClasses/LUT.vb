@@ -30,6 +30,7 @@ Public Class LUT_Basics : Inherits TaskParent
         End If
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.LUT(myLut) * classCount / 255
+        dst2 += 1 ' stay away from zero...
 
         If standaloneTest() Then dst3 = ShowPalette(dst2)
         labels(2) = "Image segmented into " + CStr(classCount + 1) + " divisions (0-" + CStr(classCount) + ")"

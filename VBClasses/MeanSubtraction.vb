@@ -47,6 +47,7 @@ Public Class MeanSubtraction_Gray : Inherits TaskParent
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MeanSub.Run(src)
         dst2 = MeanSub.dst2
+        dst2 += 1 ' stay away from zero...
         labels(2) = "MeanSubtraction gray image "
 
         dst3 = 255 - dst2

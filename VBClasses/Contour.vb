@@ -1293,3 +1293,19 @@ Public Class Contour_Sort : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+
+Public Class Contour_NoDepth : Inherits TaskParent
+    Dim contours As New Contour_Basics_List
+    Public Sub New()
+        desc = "Find all the contours in the regions with no depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        contours.Run(src)
+        dst2 = contours.dst2
+        ' dst2.SetTo(0, task.depthMask)
+    End Sub
+End Class
+

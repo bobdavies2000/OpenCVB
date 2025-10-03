@@ -729,6 +729,7 @@ Public Class BackProject_Full : Inherits TaskParent
 
         cv.Cv2.CalcBackProject({src}, {0}, histogram, dst2, plotHist.ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst2 += 1 ' get away from zeros...
         labels(2) = "CV_8U backprojection of the " + CStr(classCount) + " histogram bins."
         If standaloneTest() Then
             If task.heartBeatLT Then index += 1

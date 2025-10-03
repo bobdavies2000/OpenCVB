@@ -113,7 +113,7 @@
             RecentList.Name = "RecentList"
             RecentList.Size = New Size(82, 29)
             RecentList.Text = "Recent"
-            RecentList.ToolTipText = "Recently selected algorithms"
+            RecentList.ToolTipText = " "
             ' 
             ' AvailableAlgorithms
             ' 

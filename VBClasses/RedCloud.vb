@@ -43,8 +43,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
                     pc.maxDist = pcListLast(indexLast).maxdist
                 End If
                 pc.color = pcListLast(indexLast).color
-            Else
-                pc.color = task.vecColors(pc.index)
             End If
             pc.index = pcList.Count + 1
             pcMap(pc.rect).setto(pc.index, pc.hullMask)
@@ -80,7 +78,6 @@ Public Class RedCloud_Core : Inherits TaskParent
 
         Dim index As Integer = 1
         Dim rect As New cv.Rect
-        Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
         Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
         Dim minCount = dst3.Total * 0.001
@@ -96,10 +93,11 @@ Public Class RedCloud_Core : Inherits TaskParent
                         If count >= minCount Then
                             Dim pc = New cloudData(dst3(rect).InRange(index, index), rect)
                             pc.index = index
-                            index += 1
+                            pc.color = task.vecColors(pc.index)
                             pcList.Add(pc)
                             dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
                             SetTrueText(CStr(pc.index), pc.rect.TopLeft)
+                            index += 1
                         Else
                             dst3(rect).SetTo(255, mask(rect))
                         End If

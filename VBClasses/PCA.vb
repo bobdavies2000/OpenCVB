@@ -892,6 +892,9 @@ Public Class PCA_NColor_CPP : Inherits TaskParent
         custom.Run(dst2)
 
         If standaloneTest() Then dst3 = custom.dst2
+
+        dst2 += 1 ' stay away from zero...
+
         labels(2) = "The CV_8U image is below.  Values range from 0 to " + CStr(classCount)
         labels(3) = "The upper left image is mapped to " + CStr(classCount) + " colors below.  "
     End Sub

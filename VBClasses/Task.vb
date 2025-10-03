@@ -678,7 +678,8 @@ Public Class VBtask : Implements IDisposable
         motionBasics.Run(src)
 
         rgbFilter.Run(task.color)
-        If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
+        ' If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
+        grayStable = gray
 
         colorizer.Run(src)
 

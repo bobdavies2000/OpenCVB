@@ -45,15 +45,16 @@ Public Class Color8U_Basics : Inherits TaskParent
                 If src.Type = cv.MatType.CV_8U Then
                     classifier.run(src)
                 Else
-                    classifier.Run(task.grayStable)
+                    classifier.Run(task.gray)
                 End If
             End If
         End If
 
-        If task.optionsChanged Then dst2 = classifier.dst2.clone Else classifier.dst2.copyto(dst2, task.motionMask)
+        ' If task.optionsChanged Then dst2 = classifier.dst2.clone Else classifier.dst2.copyto(dst2, task.motionMask)
+        dst2 = classifier.dst2.clone
         classCount = classifier.classCount
 
-        dst3 = classifier.dst3
+        dst3 = ShowPalette254(dst2)
         labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) +
                     " pixel classifications"
     End Sub

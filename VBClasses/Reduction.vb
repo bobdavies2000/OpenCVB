@@ -20,7 +20,7 @@ Public Class Reduction_Basics : Inherits TaskParent
         ElseIf options.simpleReduction Then
             classCount = Math.Ceiling(255 / options.simpleReductionValue)
 
-            dst1 = src / options.simpleReductionValue + 1
+            dst1 = src / options.simpleReductionValue + 1 ' map the input to values ranging from 1 to X - no zeros allowed.
             labels(2) = "Reduced image - factor = " + CStr(options.simpleReductionValue)
         Else
             dst1 = src
@@ -245,5 +245,22 @@ Public Class Reduction_Edges : Inherits TaskParent
         labels(3) = If(reduction.options.noReduction, "Laplacian edges of reduced image", "Laplacian edges of original image")
         edges.Run(dst2)
         dst3 = edges.dst2
+    End Sub
+End Class
+
+
+
+
+
+Public Class Reduction_NoDepth : Inherits TaskParent
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        desc = "Reduce the grayscale image where there is no depth."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3 = task.grayStable
+        dst3.SetTo(0, task.depthMask)
+        reduction.Run(dst3)
+        dst2 = reduction.dst3
     End Sub
 End Class
