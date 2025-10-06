@@ -52,7 +52,15 @@ Public Class RedCloud_Basics : Inherits TaskParent
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
 
-        SetTrueText(selectCell(), 3)
+        Dim cellsOnly = dst3.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
+        Dim percentImage = cellsOnly / task.depthMask.CountNonZero
+        Static targetSlider = OptionParent.FindSlider("Reduction Target")
+        If percentImage < 0.8 Then
+            If targetSlider.value + 1 < targetSlider.maximum Then targetSlider.value += 1
+        End If
+
+        SetTrueText(selectCell() + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf +
+                    CStr(pcList.Count) + " cells present", 3)
 
         pcListLast = New List(Of cloudData)(task.redCloud.pcList)
         pcMapLast = pcMap.clone
@@ -111,7 +119,7 @@ Public Class RedCloud_Core : Inherits TaskParent
         For Each pc In pcList
             dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
         Next
-        labels(2) = CStr(pcList.Count) + " regions were identified.  Bright areas in dst3 are < " + CStr(CInt(minCount)) + " pixels (too small.)"
+        labels(2) = CStr(pcList.Count) + " regions were identified.  Bright areas are < " + CStr(CInt(minCount)) + " pixels (too small.)"
     End Sub
 End Class
 

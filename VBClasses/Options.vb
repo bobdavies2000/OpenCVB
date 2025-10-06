@@ -8028,7 +8028,9 @@ Public Class Options_RedCloud : Inherits OptionParent
     End Sub
     Public Sub Run()
         Static redSlider = FindSlider("Reduction Target")
+        Dim lastTarget = task.reductionTarget
         task.reductionTarget = redSlider.value
+        If lastTarget <> task.reductionTarget Then task.optionsChanged = False
     End Sub
 End Class
 

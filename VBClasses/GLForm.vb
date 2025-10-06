@@ -1,6 +1,7 @@
 ﻿Imports SharpGL
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.Extensions
+Imports System.ComponentModel
 Public Class sgl
     Dim gl As OpenGL
     Dim isDragging As Boolean = False
@@ -27,13 +28,13 @@ Public Class sgl
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         options = New Options_SharpGL
         options2 = New Options_SharpGL2
-        Me.Left = 0 ' GetSetting("Opencv", "sglLeft", "sglLeft", task.mainFormLocation.X + task.mainFormLocation.Width)
-        Me.Top = 0 'GetSetting("Opencv", "sglTop", "sglTop", task.mainFormLocation.Y)
+        Me.Left = GetSetting("Opencv", "sglLeft", "sglLeft", task.mainFormLocation.X + task.mainFormLocation.Width)
+        Me.Top = GetSetting("Opencv", "sglTop", "sglTop", task.mainFormLocation.Y)
         Me.Width = GetSetting("Opencv", "sglWidth", "sglWidth", task.mainFormLocation.Width)
         Me.Height = GetSetting("Opencv", "sglHeight", "sglHeight", task.mainFormLocation.Height)
         gl = GLControl.OpenGL
     End Sub
-    Public Sub saveLocation()
+    Private Sub sgl_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         SaveSetting("Opencv", "sglLeft", "sglLeft", Math.Abs(Me.Left))
         SaveSetting("Opencv", "sglTop", "sglTop", Me.Top)
         SaveSetting("Opencv", "sglWidth", "sglWidth", Me.Width)
@@ -75,10 +76,10 @@ Public Class sgl
             task.gOptions.DebugCheckBox.Checked = False
             task.sharpGL.resetView()
         End If
-        If task.firstPass Or task.optionsChanged Then task.sharpGL.resetView()
+        'If task.firstPass Or task.optionsChanged Then task.sharpGL.resetView()
         gl.Viewport(0, 0, GLControl.Width, GLControl.Height)
-        gl.MatrixMode(OpenGL.GL_PROJECTION)
-        gl.LoadIdentity()
+        'gl.MatrixMode(OpenGL.GL_PROJECTION)
+        'gl.LoadIdentity()
 
         If task.gOptions.GL_LinearMode.Checked Then ' not being used anymore...
             Dim mmZ = GetMinMax(task.pcSplit(2))
@@ -358,6 +359,7 @@ Public Class sgl
                 Next
 
                 gl.End()
+                gl.DeleteTextures(1, textureID)
                 label = CStr(dataBuffer.Count) + " triangles were sent to OpenGL."
         End Select
 

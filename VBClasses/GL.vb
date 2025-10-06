@@ -636,7 +636,6 @@ Public Class GL_RedCloudHullsImage : Inherits TaskParent
         labels(3) = hulls.labels(3)
 
         Dim dataBuffer As New List(Of cv.Vec3f)
-
         strOut = task.sharpGL.RunTriangles(Comm.oCase.drawTrianglesAndImage, dataBuffer)
     End Sub
 End Class
