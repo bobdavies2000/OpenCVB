@@ -145,6 +145,7 @@ Match
 MatchLine
 MatchShapes
 Math
+MaxDist
 MeanShift
 MeanSubtraction
 Mesh

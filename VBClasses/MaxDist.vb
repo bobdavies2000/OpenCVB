@@ -1,0 +1,92 @@
+﻿Imports System.Security.Cryptography
+Imports cv = OpenCvSharp
+Public Class MaxDist_Basics : Inherits TaskParent
+    Public Sub New()
+        labels(3) = "Below left shows hullMask while below shows the contour mask."
+        desc = "Find the point farthest from the edges of a mask."
+    End Sub
+    Public Shared Function setCloudData(mask As cv.Mat, rect As cv.Rect) As cloudData
+        Dim pc As New cloudData
+        pc.mask = mask.Clone
+        pc.rect = rect
+        pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
+        If pc.contour.Count < 3 Then Return Nothing
+        Dim listOfPoints = New List(Of List(Of cv.Point))({pc.contour})
+        pc.contourMask = New cv.Mat(pc.mask.Size, cv.MatType.CV_8U, 0)
+        cv.Cv2.DrawContours(pc.contourMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
+
+        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1) ' see MaxDist_NoRectangle below to confirm this is not needed.
+        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+        Dim mm As mmData = GetMinMax(distance32f)
+        pc.maxDist.X = mm.maxLoc.X + pc.rect.X
+        pc.maxDist.Y = mm.maxLoc.Y + pc.rect.Y
+
+        pc.hull = cv.Cv2.ConvexHull(pc.contour.ToArray, True).ToList
+        pc.hullMask = New cv.Mat(pc.mask.Size, cv.MatType.CV_8U, 0)
+        listOfPoints = New List(Of List(Of cv.Point))({pc.hull})
+        cv.Cv2.DrawContours(pc.hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
+
+        pc.color = task.vecColors(pc.index)
+        pc.pixels = pc.mask.CountNonZero
+        Return pc
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedCloud(src, labels(2))
+
+        dst3.SetTo(0)
+        For Each pc In task.redCloud.pcList
+            Dim pcTest = setCloudData(pc.mask, pc.rect)
+            pcTest.color = pc.color
+            dst3(pcTest.rect).SetTo(pcTest.color, pcTest.mask)
+            dst3.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class MaxDist_NoRectangle : Inherits TaskParent
+    Public Sub New()
+        labels(3) = "Below left shows hullMask while below shows the contour mask."
+        desc = "Is it necessary to draw a rectangle of zeros at the edge of the mask?  Answer: no"
+    End Sub
+    Public Shared Function setCloudData(mask As cv.Mat, rect As cv.Rect) As cloudData
+        Dim pc As New cloudData
+        pc.mask = mask.Clone
+        pc.rect = rect
+        pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
+        If pc.contour.Count < 3 Then Return Nothing
+        Dim listOfPoints = New List(Of List(Of cv.Point))({pc.contour})
+        cv.Cv2.DrawContours(pc.mask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
+
+        ' mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1) 
+        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+        Dim mm As mmData = GetMinMax(distance32f)
+        pc.maxDist.X = mm.maxLoc.X + pc.rect.X
+        pc.maxDist.Y = mm.maxLoc.Y + pc.rect.Y
+
+        pc.hull = cv.Cv2.ConvexHull(pc.contour.ToArray, True).ToList
+        pc.hullMask = New cv.Mat(pc.mask.Size, cv.MatType.CV_8U, 0)
+        listOfPoints = New List(Of List(Of cv.Point))({pc.hull})
+        cv.Cv2.DrawContours(pc.hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
+
+        pc.color = task.vecColors(pc.index)
+        pc.pixels = pc.mask.CountNonZero
+        Return pc
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedCloud(src, labels(2)) ' task.redCloud.pcList uses the rectangle of zeros.
+
+        Dim pcList As New List(Of cloudData)
+        dst3.SetTo(0)
+        For Each pc In task.redCloud.pcList
+            Dim pcTest = setCloudData(pc.mask, pc.rect) ' This pcList will NOT use the rectangle of zeros.
+            pcTest.color = pc.color
+            dst3(pcTest.rect).SetTo(pcTest.color, pcTest.mask)
+            dst3.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+            pcList.Add(pcTest)
+        Next
+    End Sub
+End Class

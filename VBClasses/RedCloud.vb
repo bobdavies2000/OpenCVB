@@ -4,6 +4,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Public redCore As New RedCloud_Core
     Public pcList As New List(Of cloudData)
     Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public percentImage As Single
     Public Sub New()
         task.redCloud = Me
         desc = "Build contours for each cell"
@@ -33,7 +34,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         dst2.SetTo(0)
         For Each pc In redCore.pcList
             Dim r1 = pc.rect
-            r2 = New cv.Rect(0, 0, 1, 1) ' fake rect to trigger conditional below...
+            r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
             Dim indexLast = pcMapLast.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
             If indexLast > 0 Then r2 = pcListLast(indexLast).rect
             If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
@@ -53,7 +54,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Next
 
         Dim cellsOnly = dst3.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
-        Dim percentImage = cellsOnly / task.depthMask.CountNonZero
+        percentImage = cellsOnly / task.depthMask.CountNonZero
         Static targetSlider = OptionParent.FindSlider("Reduction Target")
         If percentImage < 0.8 Then
             If targetSlider.value + 1 < targetSlider.maximum Then targetSlider.value += 1
@@ -91,6 +92,7 @@ Public Class RedCloud_Core : Inherits TaskParent
         Dim minCount = dst3.Total * 0.001
         pcList.Clear()
         dst1.SetTo(0)
+        Dim pc As cloudData = Nothing
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
                 Dim pt = New cv.Point(x, y)
@@ -99,13 +101,24 @@ Public Class RedCloud_Core : Inherits TaskParent
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount Then
-                            Dim pc = New cloudData(dst3(rect).InRange(index, index), rect)
+                            ' pc = New cloudData(dst3(rect).InRange(index, index), rect)
+                            pc = MaxDist_Basics.setCloudData(dst3(rect).InRange(index, index), rect)
                             pc.index = index
                             pc.color = task.vecColors(pc.index)
                             pcList.Add(pc)
                             dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
                             SetTrueText(CStr(pc.index), pc.rect.TopLeft)
                             index += 1
+                            'pc = MaxDist_Basics.setCloudData(mask(rect), rect)
+                            'If pc Is Nothing Then
+                            '    'dst3(rect).SetTo(255, mask(rect))
+                            'Else
+                            '    pc.index = index
+                            '    pcList.Add(pc)
+                            '    dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
+                            '    SetTrueText(CStr(pc.index), pc.rect.TopLeft)
+                            '    index += 1
+                            'End If
                         Else
                             dst3(rect).SetTo(255, mask(rect))
                         End If

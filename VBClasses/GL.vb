@@ -631,8 +631,9 @@ Public Class GL_RedCloudHullsImage : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         hulls.Run(src)
-        dst2 = hulls.dst3
-        labels(2) = hulls.labels(2)
+        dst2 = hulls.dst2
+        dst3 = hulls.dst3
+        labels(2) = hulls.labels(2) + " " + Format(hulls.percentImage, "0.0%") + " of depth data used."
         labels(3) = hulls.labels(3)
 
         Dim dataBuffer As New List(Of cv.Vec3f)
