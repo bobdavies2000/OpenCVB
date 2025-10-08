@@ -39,7 +39,7 @@ Public Class RedCloudAndColor_Basics : Inherits TaskParent
                     Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         'If count >= minCount Then
-                        Dim pc = New cloudData(dst1(rect).InRange(index, index), rect)
+                        Dim pc = MaxDist_Basics.setCloudData(dst3(rect).InRange(index, index), rect)
                         pc.index = index
                         pc.color = task.vecColors(pc.index)
                         newList.Add(pc)

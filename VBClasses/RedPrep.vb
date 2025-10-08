@@ -4,6 +4,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
     Dim prepEdges As New RedPrep_Edges_CPP
     Public options As New Options_RedCloud
     Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Reduction transform for the point cloud"
     End Sub
     Private Function reduceChan(chan As cv.Mat) As cv.Mat
@@ -25,19 +26,27 @@ Public Class RedPrep_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
+
         Dim pc32S As New cv.Mat
-        task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.reductionTarget)
+        src.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.reductionTarget)
         Dim split = pc32S.Split()
 
-        prepEdges.Run(reduceChan(split(0)))
-        dst2 = prepEdges.dst3
+        dst2.SetTo(0)
+        If options.PrepX Then
+            prepEdges.Run(reduceChan(split(0)))
+            dst2 = dst2 Or prepEdges.dst3
+        End If
 
-        prepEdges.Run(reduceChan(split(1)))
-        dst2 = dst2 Or prepEdges.dst3
+        If options.PrepY Then
+            prepEdges.Run(reduceChan(split(1)))
+            dst2 = dst2 Or prepEdges.dst3
+        End If
 
-        '  Remove these lines and depth will vary too much within a cell.
-        prepEdges.Run(reduceChan(split(2)))
-        dst2 = dst2 Or prepEdges.dst3
+        If options.PrepZ Then
+            prepEdges.Run(reduceChan(split(2)))
+            dst2 = dst2 Or prepEdges.dst3
+        End If
 
         ' this is not as good as the operations above.
         'prepEdges.Run(reduceChan(split(0) + split(1) + split(2)))
@@ -372,9 +381,10 @@ End Class
 Public Class RedPrep_CloudAndColor : Inherits TaskParent
     Dim prepEdges As New RedPrep_Edges_CPP
     Public options As New Options_RedCloud
-    Dim redSimple As New RedColor_Simple
+    Dim redSimple As New XO_RedColor_Simple
     Dim edges As New EdgeLine_Basics
     Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Reduction transform for the point cloud"
     End Sub
     Private Function reduceChan(chan As cv.Mat) As cv.Mat
@@ -400,14 +410,21 @@ Public Class RedPrep_CloudAndColor : Inherits TaskParent
         task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.reductionTarget)
         Dim split = pc32S.Split()
 
-        prepEdges.Run(reduceChan(split(0)))
-        dst2 = prepEdges.dst3
+        dst2.SetTo(0)
+        If options.PrepX Then
+            prepEdges.Run(reduceChan(split(0)))
+            dst2 = dst2 Or prepEdges.dst3
+        End If
 
-        prepEdges.Run(reduceChan(split(1)))
-        dst2 = dst2 Or prepEdges.dst3
+        If options.PrepY Then
+            prepEdges.Run(reduceChan(split(1)))
+            dst2 = dst2 Or prepEdges.dst3
+        End If
 
-        prepEdges.Run(reduceChan(split(2)))
-        dst2 = dst2 Or prepEdges.dst3
+        If options.PrepZ Then
+            prepEdges.Run(reduceChan(split(2)))
+            dst2 = dst2 Or prepEdges.dst3
+        End If
 
         redSimple.Run(src)
         edges.Run(redSimple.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -416,5 +433,67 @@ Public Class RedPrep_CloudAndColor : Inherits TaskParent
 
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, task.lineWidth)
         labels(2) = "Using reduction factor = " + CStr(task.reductionTarget)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedPrep_EdgesX : Inherits TaskParent
+    Dim edges As New RedPrep_Basics
+    Public Sub New()
+        OptionParent.FindCheckBox("Prep Edges in Y").Checked = False
+        OptionParent.FindCheckBox("Prep Edges in Z").Checked = False
+        desc = "Find X depth edges in the pointcloud data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(src)
+        dst2 = edges.dst2
+        labels(2) = edges.labels(2)
+
+        dst2.SetTo(0, task.noDepthMask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedPrep_EdgesY : Inherits TaskParent
+    Dim edges As New RedPrep_Basics
+    Public Sub New()
+        OptionParent.FindCheckBox("Prep Edges in X").Checked = False
+        OptionParent.FindCheckBox("Prep Edges in Z").Checked = False
+        desc = "Find Y depth edges in the pointcloud data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(src)
+        dst2 = edges.dst2
+        labels(2) = edges.labels(2)
+
+        dst2.SetTo(0, task.noDepthMask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedPrep_EdgesZ : Inherits TaskParent
+    Dim edges As New RedPrep_Basics
+    Public Sub New()
+        OptionParent.FindCheckBox("Prep Edges in X").Checked = False
+        OptionParent.FindCheckBox("Prep Edges in Y").Checked = False
+        desc = "Find Z depth edges in the pointcloud data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(src)
+        dst2 = edges.dst2
+        dst2.SetTo(0, task.noDepthMask)
+
+        labels(2) = edges.labels(2)
     End Sub
 End Class

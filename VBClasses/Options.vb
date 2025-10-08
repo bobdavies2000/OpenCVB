@@ -8023,7 +8023,19 @@ End Class
 
 
 Public Class Options_RedCloud : Inherits OptionParent
-    Public Sub New()
+    Public PrepX As Boolean
+    Public PrepY As Boolean
+    Public PrepZ As Boolean
+    Sub New()
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Prep Edges in X")
+            check.addCheckBox("Prep Edges in Y")
+            check.addCheckBox("Prep Edges in Z")
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+            check.Box(2).Checked = True
+        End If
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Reduction Target", 1, 1000, 200)
     End Sub
     Public Sub Run()
@@ -8031,6 +8043,14 @@ Public Class Options_RedCloud : Inherits OptionParent
         Dim lastTarget = task.reductionTarget
         task.reductionTarget = redSlider.value
         If lastTarget <> task.reductionTarget Then task.optionsChanged = False
+
+
+        Static PrepXBox = FindCheckBox("Prep Edges in X")
+        Static PrepYBox = FindCheckBox("Prep Edges in Y")
+        Static PrepZBox = FindCheckBox("Prep Edges in Z")
+        PrepX = PrepXBox.checked
+        PrepY = PrepYBox.checked
+        PrepZ = PrepZBox.checked
     End Sub
 End Class
 

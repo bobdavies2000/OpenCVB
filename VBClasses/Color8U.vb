@@ -5,7 +5,7 @@ Public Class Color8U_Basics : Inherits TaskParent
     Dim colorMethods(task.gOptions.colorMethods.Count) As Object
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
-        labels(3) = "Input to Color8U_Basics"
+        labels(3) = "dst3 = ShowPalette254(dst2) - "
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

@@ -57,7 +57,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         percentImage = cellsOnly / task.depthMask.CountNonZero
         Static targetSlider = OptionParent.FindSlider("Reduction Target")
         If percentImage < 0.8 Then
-            If targetSlider.value + 1 < targetSlider.maximum Then targetSlider.value += 1
+            If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
         End If
 
         SetTrueText(selectCell() + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf +
@@ -101,7 +101,6 @@ Public Class RedCloud_Core : Inherits TaskParent
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount Then
-                            ' pc = New cloudData(dst3(rect).InRange(index, index), rect)
                             pc = MaxDist_Basics.setCloudData(dst3(rect).InRange(index, index), rect)
                             pc.index = index
                             pc.color = task.vecColors(pc.index)
@@ -264,21 +263,105 @@ End Class
 
 
 Public Class RedCloud_Motion : Inherits TaskParent
-    Dim redContours As New RedCloud_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.gOptions.HistBinBar.Maximum = 255
         task.gOptions.HistBinBar.Value = 255
         desc = "Use motion to identify which cells changed."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        redContours.Run(src)
-        dst1 = redContours.dst1
-        dst2 = redContours.dst2
-        labels(2) = redContours.labels(2)
+        redC.Run(src)
+        dst1 = redC.dst1
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
 
         dst3.SetTo(0)
         For Each pc In task.redCloud.pcList
             If pc.age > 10 Then DrawTour(dst3(pc.rect), pc.contour, pc.color)
         Next
+    End Sub
+End Class
+
+
+
+
+Public Class RedCloud_MotionNew : Inherits TaskParent
+    Public redCore As New RedCloud_Core
+    Public pcList As New List(Of cloudData)
+    Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public percentImage As Single
+    Public Sub New()
+        desc = "Build contours for each cell"
+    End Sub
+    Public Function motionDisplayCell() As cloudData
+        Dim clickIndex = pcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
+        If clickIndex >= 0 Then
+            Return pcList(clickIndex)
+        End If
+        Return Nothing
+    End Function
+    Public Function selectCell() As String
+        task.pcD = motionDisplayCell()
+        If task.pcD IsNot Nothing Then
+            If task.pcD.rect.Contains(task.ClickPoint) Then
+                task.color(task.pcD.rect).SetTo(white, task.pcD.mask)
+                Return task.pcD.displayCell
+            End If
+        End If
+        Return Nothing
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redCore.Run(src)
+        dst3 = redCore.dst3
+        labels(3) = redCore.labels(3)
+        labels(2) = redCore.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
+
+        Static pcListLast = New List(Of cloudData)(pcList)
+        Static pcMapLast As cv.Mat = pcMap.clone
+
+        pcList.Clear()
+        Dim r2 As cv.Rect
+        pcMap.setto(0)
+        dst2.SetTo(0)
+        Dim unchangedCount As Integer
+        For Each pc In redCore.pcList
+            Dim r1 = pc.rect
+            r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
+            Dim indexLast = pcMapLast.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
+            If indexLast > 0 Then r2 = pcListLast(indexLast).rect
+            If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
+                Dim tmp = task.motionMask(pc.rect)
+                tmp.SetTo(0, pc.mask)
+
+                If task.heartBeat = False And pc.rect.Contains(pcListLast(indexLast).maxdist) And tmp.CountNonZero = 0 Then
+                    ' pc.maxDist = pcListLast(indexLast).maxdist
+                    pc = pcListLast(indexLast)
+                    unchangedCount += 1
+                End If
+
+                pc.color = pcListLast(indexLast).color
+                pc.age = pcListLast(indexLast).age + 1
+                If pc.age > 1000 Then pc.age = 2
+            End If
+            pc.index = pcList.Count + 1
+            pcMap(pc.rect).setto(pc.index, pc.hullMask)
+            dst2(pc.rect).SetTo(pc.color, pc.hullMask)
+            dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+            pcList.Add(pc)
+            SetTrueText(CStr(pc.age), pc.maxDist)
+        Next
+
+        Dim cellsOnly = dst3.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
+        percentImage = cellsOnly / task.depthMask.CountNonZero
+        Static targetSlider = OptionParent.FindSlider("Reduction Target")
+        If percentImage < 0.8 Then
+            If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
+        End If
+
+        SetTrueText(selectCell() + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf +
+                    CStr(pcList.Count) + " cells present", 3)
+
+        pcListLast = New List(Of cloudData)(pcList)
+        pcMapLast = pcMap.clone
     End Sub
 End Class

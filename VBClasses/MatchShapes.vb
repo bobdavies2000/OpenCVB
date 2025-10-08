@@ -121,7 +121,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
     Public rc As New rcData
     Dim options As New Options_MatchShapes
     Public runStandalone As Boolean = False
-    Dim addTour As New RedColor_ContourUpdate
+    Dim addTour As New RedColor_Basics
     Public Sub New()
         labels = {"Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells"}
         desc = "MatchShapes: Find matches at similar latitude (controlled with slider)"

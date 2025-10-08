@@ -140,7 +140,7 @@ Public Class OptionsGlobal
             Dim method = colorMethods(i)
             ColorSource.Items.Add(method)
         Next
-        ColorSource.SelectedItem = "EdgeLine_Basics"
+        ColorSource.SelectedItem = "Reduction_Basics"
         TrackingColor.Checked = True
 
         task.gOptions.ColorizedDepth.Checked = True

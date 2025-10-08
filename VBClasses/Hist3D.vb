@@ -200,20 +200,19 @@ End Class
 
 Public Class Hist3D_PixelCells : Inherits TaskParent
     Dim pixel As New Hist3D_Pixel
-    Dim redCold As New Flood_Basics
+    Dim flood As New Flood_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Cell-by-cell backprojection of the Hist3D_Pixel algorithm", "Palette version of dst2"}
         desc = "After classifying each pixel, backproject each redCell using the same 3D histogram."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        redCold.Run(src)
+        flood.Run(src)
 
         pixel.Run(src)
 
         For Each rc In task.redColor.rcList
-            cv.Cv2.CalcBackProject({src(rc.rect)}, {0, 1, 2}, pixel.histogram, dst2(rc.rect),
-                                   task.rangesBGR)
+            cv.Cv2.CalcBackProject({src(rc.rect)}, {0, 1, 2}, pixel.histogram, dst2(rc.rect), task.rangesBGR)
         Next
 
         dst3 = ShowPalette(dst2)
