@@ -907,8 +907,8 @@ End Class
 
 
 Public Class RedColor_LeftRight : Inherits TaskParent
-    Dim redLeft As New RedColor_Gray
-    Dim redRight As New RedColor_Gray
+    Dim redLeft As New RedColor_PCSimple
+    Dim redRight As New RedColor_PCSimple
     Public Sub New()
         desc = "Display the RedColor_Basics output for both the left and right images."
     End Sub
@@ -931,12 +931,12 @@ End Class
 
 
 
-Public Class RedColor_Gray : Inherits TaskParent
+Public Class RedColor_PCSimple : Inherits TaskParent
     Public pcList As New List(Of cloudData)
     Dim reduction As New Reduction_Basics
     Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
-        desc = "Find the biggest chunks of consistent depth data "
+        desc = "Find RedColor cells in the reduced color image using a simple floodfill loop."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Type <> cv.MatType.CV_8U Then src = task.gray

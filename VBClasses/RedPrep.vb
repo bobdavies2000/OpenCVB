@@ -381,7 +381,7 @@ End Class
 Public Class RedPrep_CloudAndColor : Inherits TaskParent
     Dim prepEdges As New RedPrep_Edges_CPP
     Public options As New Options_RedCloud
-    Dim redSimple As New RedColor_Gray
+    Dim redSimple As New RedColor_PCSimple
     Dim edges As New EdgeLine_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
