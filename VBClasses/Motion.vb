@@ -118,7 +118,7 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
     Public bgSub As New BGSubtract_MOG2
     Dim rectList As New List(Of cv.Rect)
     Public Sub New()
-        task.redColor = New RedColor_Basics
+        task.redList = New RedList_Basics
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "The option-free version of Motion_BGSub"
     End Sub
@@ -130,20 +130,20 @@ Public Class Motion_BGSub_QT : Inherits TaskParent
 
         dst2 = src
 
-        task.redColor.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
-        If task.redColor.rcList.Count < 2 Then
+        task.redList.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
+        If task.redList.rcList.Count < 2 Then
             rectList.Clear()
         Else
-            Dim nextRect = task.redColor.rcList.ElementAt(1).rect
-            For i = 2 To task.redColor.rcList.Count - 1
-                Dim rc = task.redColor.rcList.ElementAt(i)
+            Dim nextRect = task.redList.rcList.ElementAt(1).rect
+            For i = 2 To task.redList.rcList.Count - 1
+                Dim rc = task.redList.rcList.ElementAt(i)
                 nextRect = nextRect.Union(rc.rect)
             Next
         End If
 
         If standaloneTest() Then
-            If task.redColor.rcList.Count > 1 Then
-                labels(2) = CStr(task.redColor.rcList.Count) + " RedMask cells had motion"
+            If task.redList.rcList.Count > 1 Then
+                labels(2) = CStr(task.redList.rcList.Count) + " RedMask cells had motion"
             Else
                 labels(2) = "No motion detected"
             End If
@@ -510,13 +510,13 @@ Public Class Motion_Enclosing : Inherits TaskParent
 
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        dst3 = runRedColor(dst2, labels(2), Not dst2)
+        dst3 = runRedList(dst2, labels(2), Not dst2)
 
         motionRect = New cv.Rect
-        If task.redColor.rcList.Count < 2 Then Exit Sub
-        motionRect = task.redColor.rcList.ElementAt(1).rect
-        For i = 2 To task.redColor.rcList.Count - 1
-            Dim rc = task.redColor.rcList.ElementAt(i)
+        If task.redList.rcList.Count < 2 Then Exit Sub
+        motionRect = task.redList.rcList.ElementAt(1).rect
+        For i = 2 To task.redList.rcList.Count - 1
+            Dim rc = task.redList.rcList.ElementAt(i)
             motionRect = motionRect.Union(rc.rect)
         Next
 

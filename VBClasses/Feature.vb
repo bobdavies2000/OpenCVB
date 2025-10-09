@@ -587,7 +587,7 @@ Public Class Feature_RedCloud : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(src)
 
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         For Each pt In task.featurePoints
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
@@ -734,7 +734,7 @@ Public Class Feature_FacetPoints : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         feat.Run(src)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         delaunay.inputPoints = task.features
         delaunay.Run(src)
@@ -749,23 +749,23 @@ Public Class Feature_FacetPoints : Inherits TaskParent
         Next
 
         For Each pt In ptList
-            Dim index = task.redColor.rcMap.Get(Of Byte)(pt.Y, pt.X)
+            Dim index = task.redList.rcMap.Get(Of Byte)(pt.Y, pt.X)
             If index = 0 Then Continue For
-            Dim rc = task.redColor.rcList(index)
+            Dim rc = task.redList.rcList(index)
             Dim val = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
             If val <> 0 Then
                 rc.ptFacets.Add(pt)
-                task.redColor.rcList(index) = rc
+                task.redList.rcList(index) = rc
             End If
         Next
 
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             For Each pt In rc.ptFacets
                 DrawCircle(dst2, pt, task.DotSize, task.highlight)
             Next
         Next
 
-        If standalone And task.redColor.rcList.Count > 0 Then
+        If standalone And task.redList.rcList.Count > 0 Then
             task.color.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
             For Each pt In task.rcD.ptFacets
                 DrawCircle(task.color, pt, task.DotSize, task.highlight)

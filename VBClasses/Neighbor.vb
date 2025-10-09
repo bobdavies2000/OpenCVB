@@ -10,16 +10,16 @@ Public Class Neighbor_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If standalone Or runRedCflag Then dst2 = runRedColor(src, labels(2))
+        If standalone Or runRedCflag Then dst2 = runRedList(src, labels(2))
 
         knn.queries.Clear()
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             knn.queries.Add(rc.maxDist)
         Next
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         knn.Run(src)
 
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             For i = 0 To Math.Min(knn.neighbors.Count, options.neighbors) - 1
                 rc.nabs.Add(knn.neighbors(rc.index)(i))
             Next
@@ -29,8 +29,8 @@ Public Class Neighbor_Basics : Inherits TaskParent
             task.setSelectedCell()
             dst3.SetTo(0)
             For Each index In task.rcD.nabs
-                If index < task.redColor.rcList.Count Then
-                    DrawCircle(dst2, task.redColor.rcList(index).maxDist, task.DotSize, task.highlight)
+                If index < task.redList.rcList.Count Then
+                    DrawCircle(dst2, task.redList.rcList(index).maxDist, task.DotSize, task.highlight)
                 End If
             Next
         End If
@@ -50,8 +50,8 @@ Public Class Neighbor_Intersects : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or src.Type <> cv.MatType.CV_8U Then
-            dst2 = runRedColor(src, labels(2))
-            src = task.redColor.rcMap
+            dst2 = runRedList(src, labels(2))
+            src = task.redList.rcMap
         End If
 
         Dim samples(src.Total - 1) As Byte
@@ -102,14 +102,14 @@ Public Class Neighbor_ColorOnly : Inherits TaskParent
         desc = "Find neighbors in a redColor cellMap"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
-        corners.Run(task.redColor.rcMap.Clone())
+        corners.Run(task.redList.rcMap.Clone())
         For Each pt In corners.nPoints
             DrawCircle(dst2, pt, task.DotSize, task.highlight)
         Next
 
-        labels(2) = task.redColor.labels(2) + " and " + CStr(corners.nPoints.Count) + " cell intersections"
+        labels(2) = task.redList.labels(2) + " and " + CStr(corners.nPoints.Count) + " cell intersections"
     End Sub
 End Class
 
@@ -130,10 +130,10 @@ Public Class Neighbor_Precise : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Or runRedCflag Then
-            dst2 = runRedColor(src, labels(2))
+            dst2 = runRedList(src, labels(2))
 
-            src = task.redColor.rcMap
-            rcList = task.redColor.rcList
+            src = task.redList.rcMap
+            rcList = task.redList.rcList
         End If
 
         Dim mapData(src.Total - 1) As Byte

@@ -54,10 +54,10 @@ Public Class Convex_RedColor : Inherits TaskParent
     Dim convex As New Convex_Basics
     Public Sub New()
         labels = {"", "", "Selected contour - line shows hull with white is contour.  Click to select another contour.", "RedCloud cells"}
-        desc = "Get lots of odd shapes from the RedColor_Basics output and use ConvexHull to simplify them."
+        desc = "Get lots of odd shapes from the RedList_Basics output and use ConvexHull to simplify them."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
         If task.rcD.contour IsNot Nothing Then
             convex.Run(src)
 
@@ -140,7 +140,7 @@ Public Class Convex_RedColorDefects : Inherits TaskParent
         Return newC
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = runRedColor(src, labels(1))
+        dst1 = runRedList(src, labels(1))
 
         Dim rc = task.rcD
         If rc.mask Is Nothing Then Exit Sub

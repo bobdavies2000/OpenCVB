@@ -5,10 +5,10 @@ Public Class SuperPixel_Basics : Inherits TaskParent
         desc = "A Better superpixel algorithm"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         dst3 = src
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             DrawTour(dst3(rc.rect), rc.contour, white, task.lineWidth)
         Next
     End Sub

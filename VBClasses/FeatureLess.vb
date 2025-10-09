@@ -199,7 +199,7 @@ End Class
 
 
 Public Class FeatureLess_Groups : Inherits TaskParent
-    Dim redCPP As New RedColor_CPP
+    Dim redCPP As New RedList_CPP
     Dim fless As New FeatureLess_Basics
     Public classCount As Integer
     Public Sub New()
@@ -251,11 +251,11 @@ End Class
 Public Class FeatureLess_RedColor : Inherits TaskParent
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
-        desc = "Use the featureLess_Basics output as input to RedColor_Basics"
+        desc = "Use the featureLess_Basics output as input to RedList_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         fLess.Run(src)
         dst3 = fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = runRedColor(dst3, labels(2))
+        dst2 = runRedList(dst3, labels(2))
     End Sub
 End Class

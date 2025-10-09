@@ -57,7 +57,7 @@ Public Class Resize_Proportional : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             options.Run()
-            dst2 = runRedColor(src, labels(2))
+            dst2 = runRedList(src, labels(2))
             src = src(task.rcD.rect)
         End If
 

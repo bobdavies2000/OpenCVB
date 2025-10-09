@@ -498,7 +498,7 @@ Public Class FCS_RedCloud1 : Inherits TaskParent
         desc = "Isolate FCS cells for each redCell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         fcs.Run(src)
         dst1 = fcs.dst2
@@ -702,7 +702,7 @@ End Class
 
 
 'Public Class FCS_RedCloud : Inherits TaskParent
-'    Dim redCombo As New RedColor_Basics
+'    Dim redCombo As New RedList_Basics
 '    Dim fcs As New FCS_CreateList
 '    Dim knnMin As New KNN_MinDistance
 '    Public Sub New()
@@ -714,7 +714,7 @@ End Class
 '        labels(2) = redCombo.labels(2)
 
 '        knnMin.inputPoints.Clear()
-'        For Each rc In task.redColor.rcList
+'        For Each rc In task.redList.rcList
 '            knnMin.inputPoints.Add(rc.maxDist)
 '        Next
 '        knnMin.Run(src)

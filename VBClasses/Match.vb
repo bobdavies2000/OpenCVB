@@ -320,17 +320,17 @@ Public Class Match_TraceRedC : Inherits TaskParent
         desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = runRedColor(src, labels(3))
+        dst3 = runRedList(src, labels(3))
         If task.heartBeat Then dst2.SetTo(0)
         If task.optionsChanged Then frameList.Clear()
 
         dst0.SetTo(0)
         Dim points As New List(Of cv.Point)
 
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             dst0.Set(Of Byte)(rc.maxDist.Y, rc.maxDist.X, 1)
         Next
-        labels(2) = CStr(task.redColor.rcList.Count) + " cells added"
+        labels(2) = CStr(task.redList.rcList.Count) + " cells added"
 
         frameList.Add(dst0.Clone)
         If frameList.Count >= task.frameHistoryCount Then

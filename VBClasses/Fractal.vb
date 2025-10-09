@@ -163,7 +163,7 @@ End Class
 Public Class Fractal_Dimension : Inherits TaskParent
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        labels = {"", "", "RedColor_Basics output - select any region.", "The selected region (as a square)"}
+        labels = {"", "", "RedList_Basics output - select any region.", "The selected region (as a square)"}
         desc = "Compute the fractal dimension of the provided (square) image.  Algorithm is incomplete."
     End Sub
     Public Function dimension(Input As cv.Mat) As Double
@@ -205,7 +205,7 @@ Public Class Fractal_Dimension : Inherits TaskParent
         Return d
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
         dst3.SetTo(0)
 
         Static rect = New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)

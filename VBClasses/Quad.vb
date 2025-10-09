@@ -29,7 +29,7 @@ Public Class Quad_GridTiles : Inherits TaskParent
         desc = "Simplify the OpenGL quads without using OpenGL's point size"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         quadData.Clear()
         dst1.SetTo(0)
@@ -82,7 +82,7 @@ Public Class Quad_MinMax : Inherits TaskParent
         desc = "Create a representation of the point cloud with RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         oglOptions.Run()
         Dim ptM = oglOptions.moveAmount
@@ -107,16 +107,16 @@ Public Class Quad_MinMax : Inherits TaskParent
             Dim roi = task.gridRects(i)
 
             Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
-            Dim index = task.redColor.rcMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = task.redList.rcMap.Get(Of Byte)(center.Y, center.X)
 
-            If index <= 0 Or index >= task.redColor.rcList.Count Then
+            If index <= 0 Or index >= task.redList.rcList.Count Then
                 depthList1(i).Clear()
                 depthList2(i).Clear()
                 colorList(i) = black
                 Continue For
             End If
 
-            Dim rc = task.redColor.rcList(index)
+            Dim rc = task.redList.rcList(index)
             If rc.depth = 0 Then Continue For
 
             If colorList(i) <> rc.color Then
@@ -168,7 +168,7 @@ Public Class Quad_Hulls : Inherits TaskParent
     Public depthList As New List(Of List(Of Single))
     Public colorList As New List(Of cv.Scalar)
     Public oglOptions As New Options_OpenGLFunctions
-    Dim hulls As New RedColor_Hulls
+    Dim hulls As New RedList_Hulls
     Const depthListMaxCount As Integer = 10
     Public Sub New()
         desc = "Create a triangle representation of the point cloud with RedCloud data"
@@ -196,7 +196,7 @@ Public Class Quad_Hulls : Inherits TaskParent
             Dim roi = task.gridRects(i)
 
             Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
-            Dim index = task.redColor.rcMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = task.redList.rcMap.Get(Of Byte)(center.Y, center.X)
 
             If index <= 0 Then
                 depthList(i).Clear()
@@ -204,7 +204,7 @@ Public Class Quad_Hulls : Inherits TaskParent
                 Continue For
             End If
 
-            Dim rc = task.redColor.rcList(index)
+            Dim rc = task.redList.rcList(index)
             If rc.depth = 0 Then Continue For
 
             If colorList(i) <> rc.color Then depthList(i).Clear()
@@ -251,7 +251,7 @@ Public Class Quad_Bricks : Inherits TaskParent
         desc = "Create triangles from each brick in point cloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         If task.optionsChanged Then
             depthMinList.Clear()
@@ -267,18 +267,18 @@ Public Class Quad_Bricks : Inherits TaskParent
         Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
         quadData.Clear()
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         Dim min(4 - 1) As cv.Point3f, max(4 - 1) As cv.Point3f
         depths.Clear()
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
             Dim center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
-            Dim index = task.redColor.rcMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = task.redList.rcMap.Get(Of Byte)(center.Y, center.X)
             Dim depthMin As Single = 0, depthMax As Single = 0, minLoc As cv.Point, maxLoc As cv.Point
-            If index >= 0 And task.redColor.rcList.Count > 0 Then
+            If index >= 0 And task.redList.rcList.Count > 0 Then
                 task.pcSplit(2)(roi).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthMask(roi))
-                Dim rc = task.redColor.rcList(index)
+                Dim rc = task.redList.rcList(index)
                 depthMin = If(depthMax > rc.depth, rc.depth, depthMin)
 
                 If depthMin > 0 And depthMax > 0 And depthMax < task.MaxZmeters Then

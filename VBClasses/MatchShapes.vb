@@ -68,17 +68,17 @@ Public Class MatchShapes_NearbyHull : Inherits TaskParent
     Public bestCell As Integer
     Dim rc As New rcData
     Dim options As New Options_MatchShapes
-    Dim hulls As New RedColor_Hulls
+    Dim hulls As New RedList_Hulls
     Public Sub New()
-        labels = {"", "", "Output of RedColor_Hulls", "Cells similar to selected cell"}
+        labels = {"", "", "Output of RedList_Hulls", "Cells similar to selected cell"}
         desc = "MatchShapes: Find all the reasonable matches (< 1.0 for matchVal)"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         If standaloneTest() Then
             hulls.Run(task.color)
-            If task.redColor.rcList.Count = 0 Then Exit Sub
+            If task.redList.rcList.Count = 0 Then Exit Sub
             dst2 = hulls.dst2
             rc = task.rcD
         End If
@@ -87,7 +87,7 @@ Public Class MatchShapes_NearbyHull : Inherits TaskParent
         similarCells.Clear()
 
         Dim minMatch As Single = Single.MaxValue
-        For Each rc2 In task.redColor.rcList
+        For Each rc2 In task.redList.rcList
             If rc2.hull Is Nothing Or rc.hull Is Nothing Then Continue For
             If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rc.hull, rc2.hull, options.matchOption)
@@ -121,20 +121,20 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
     Public rc As New rcData
     Dim options As New Options_MatchShapes
     Public runStandalone As Boolean = False
-    Dim addTour As New RedColor_Basics
+    Dim addTour As New RedList_Basics
     Public Sub New()
         labels = {"Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells"}
         desc = "MatchShapes: Find matches at similar latitude (controlled with slider)"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         Dim myStandalone = standaloneTest() Or runStandalone
 
         If myStandalone Then
-            dst2 = runRedColor(task.color, labels(2)).Clone
-            If task.redColor.rcList.Count = 0 Then Exit Sub
-            addTour.rcList = New List(Of rcData)(task.redColor.rcList)
+            dst2 = runRedList(task.color, labels(2)).Clone
+            If task.redList.rcList.Count = 0 Then Exit Sub
+            addTour.rcList = New List(Of rcData)(task.redList.rcList)
             addTour.Run(src)
             rc = task.rcD
         End If
@@ -165,7 +165,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
 
         If bestCell >= 0 Then
             Dim rc = similarCells(bestCell)
-            DrawCircle(dst3,rc.maxDist, task.DotSize, white)
+            DrawCircle(dst3, rc.maxDist, task.DotSize, white)
             SetTrueText("Best match", rc.maxDist, 3)
         End If
         If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
@@ -180,13 +180,13 @@ End Class
 
 Public Class MatchShapes_Hulls : Inherits TaskParent
     Dim options As New Options_MatchShapes
-    Dim hulls As New RedColor_Hulls
+    Dim hulls As New RedList_Hulls
     Public Sub New()
-       OptionParent.FindSlider("Match Threshold %").Value = 3
-        labels = {"", "", "Output of RedColor_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
+        OptionParent.FindSlider("Match Threshold %").Value = 3
+        labels = {"", "", "Output of RedList_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud hull shapes similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         hulls.Run(src)
@@ -195,7 +195,7 @@ Public Class MatchShapes_Hulls : Inherits TaskParent
 
         Dim rcX = task.rcD
 
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rcX.hull, rc.hull, options.matchOption)
             If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.hull, white, -1)
@@ -216,19 +216,19 @@ End Class
 Public Class MatchShapes_Contours : Inherits TaskParent
     Dim options As New Options_MatchShapes
     Public Sub New()
-       OptionParent.FindSlider("Match Threshold %").Value = 3
-        labels = {"", "", "Output of RedColor_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
+        OptionParent.FindSlider("Match Threshold %").Value = 3
+        labels = {"", "", "Output of RedList_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
         If task.heartBeat Then dst3.SetTo(0)
 
         Dim rcX = task.rcD
 
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             If rc.contour Is Nothing Then Continue For
             Dim matchVal = cv.Cv2.MatchShapes(rcX.contour, rc.contour, options.matchOption)
             If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.contour, white, -1)

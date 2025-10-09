@@ -430,7 +430,7 @@ Public Class Contour_Outline : Inherits TaskParent
         desc = "Create a simplified contour of the selected cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
         Dim ptList As List(Of cv.Point) = rc.contour
 
         dst3.SetTo(0)
@@ -466,7 +466,7 @@ Public Class Contour_SelfIntersect : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            dst2 = runRedColor(src, labels(2))
+            dst2 = runRedList(src, labels(2))
             rc = task.rcD
             DrawTour(dst2(rc.rect), rc.contour, white, -1)
         End If
@@ -559,7 +559,7 @@ Public Class Contour_Compare : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         Dim tmp = task.rcD.mask.Clone
 
@@ -585,7 +585,7 @@ Public Class Contour_Smoothing : Inherits TaskParent
         desc = "Compare contours of the selected cell. Cells are offset to help comparison."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         Dim rc = task.rcD
 

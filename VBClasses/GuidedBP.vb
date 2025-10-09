@@ -336,8 +336,8 @@ End Class
 
 Public Class GuidedBP_RedCloud : Inherits TaskParent
     Dim guide As New GuidedBP_MultiSlice
-    Public redCx As New RedColor_Basics
-    Public redCy As New RedColor_Basics
+    Public redCx As New RedList_Basics
+    Public redCy As New RedList_Basics
     Public rcListX As New List(Of rcData)
     Public rcListY As New List(Of rcData)
     Public rcMapX As New cv.Mat
@@ -349,16 +349,16 @@ Public Class GuidedBP_RedCloud : Inherits TaskParent
         guide.Run(src)
 
         redCx.Run(guide.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        rcMapX = task.redColor.rcMap.Clone
+        rcMapX = task.redList.rcMap.Clone
         dst2 = redCx.dst2
-        rcListX = New List(Of rcData)(task.redColor.rcList)
-        labels(2) = CStr(task.redColor.rcList.Count) + " cells were found in vertical segments"
+        rcListX = New List(Of rcData)(task.redList.rcList)
+        labels(2) = CStr(task.redList.rcList.Count) + " cells were found in vertical segments"
 
         redCx.Run(guide.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        rcMapY = task.redColor.rcMap.Clone
+        rcMapY = task.redList.rcMap.Clone
         dst3 = redCx.dst2
-        rcListY = New List(Of rcData)(task.redColor.rcList)
-        labels(3) = CStr(task.redColor.rcList.Count) + " cells were found in horizontal segments"
+        rcListY = New List(Of rcData)(task.redList.rcList)
+        labels(3) = CStr(task.redList.rcList.Count) + " cells were found in horizontal segments"
     End Sub
 End Class
 

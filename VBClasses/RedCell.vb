@@ -31,23 +31,23 @@ Public Class RedCell_Color : Inherits TaskParent
             SetTrueText("RedCell_Color is run by numerous algorithms but generates no output when standalone. ", 2)
             Exit Sub
         End If
-        If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+        If task.redList Is Nothing Then task.redList = New RedList_Basics
 
         Dim initialList As New List(Of rcData)
         For i = 0 To mdList.Count - 1
             Dim rc As New rcData
             rc.rect = mdList(i).rect
-            If rc.rect.Size = dst2.Size Then Continue For ' RedColor_Basics can find a cell this big.  
+            If rc.rect.Size = dst2.Size Then Continue For ' RedList_Basics can find a cell this big.  
             rc.mask = mdList(i).mask
             rc.maxDist = mdList(i).maxDist
             rc.maxDStable = rc.maxDist
-            rc.indexLast = task.redColor.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            rc.indexLast = task.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             rc.contour = mdList(i).contour
             DrawTour(rc.mask, rc.contour, 255, -1)
             rc.pixels = mdList(i).mask.CountNonZero
-            If rc.indexLast >= task.redColor.rcList.Count Then rc.indexLast = 0
+            If rc.indexLast >= task.redList.rcList.Count Then rc.indexLast = 0
             If rc.indexLast > 0 Then
-                Dim lrc = task.redColor.rcList(rc.indexLast)
+                Dim lrc = task.redList.rcList(rc.indexLast)
                 rc.age = lrc.age + 1
                 rc.depth = lrc.depth
                 rc.depthPixels = lrc.depthPixels
@@ -60,7 +60,7 @@ Public Class RedCell_Color : Inherits TaskParent
                     rc.color = yellow
                 Else
                     ' verify that the maxDStable is still good.
-                    Dim v1 = task.redColor.rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                    Dim v1 = task.redList.rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                     If v1 <> lrc.index Then
                         rc.maxDStable = rc.maxDist
 
@@ -103,8 +103,8 @@ Public Class RedCell_Color : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            labels(2) = CStr(task.redColor.rcList.Count) + " total cells (shown with '" + task.gOptions.trackingLabel + "' and " +
-                        CStr(task.redColor.rcList.Count - rcNewCount) + " matched to previous frame"
+            labels(2) = CStr(task.redList.rcList.Count) + " total cells (shown with '" + task.gOptions.trackingLabel + "' and " +
+                        CStr(task.redList.rcList.Count - rcNewCount) + " matched to previous frame"
         End If
         dst2 = RebuildRCMap(sortedCells)
     End Sub

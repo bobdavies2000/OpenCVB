@@ -85,7 +85,7 @@ Public Class Plane_FlatSurfaces : Inherits TaskParent
     Public Sub New()
         labels = {"RedCloud Cell contours", "", "RedCloud cells", ""}
         addW.src2 = dst2.Clone
-        desc = "Find all the cells from a RedColor_Basics output that are likely to be flat"
+        desc = "Find all the cells from a RedList_Basics output that are likely to be flat"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         plane.Run(src)
@@ -94,7 +94,7 @@ Public Class Plane_FlatSurfaces : Inherits TaskParent
         If task.heartBeat Then addW.src2.SetTo(0)
 
         Dim flatCount = 0
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             If rc.depth < 1.0 Then Continue For ' close objects look like planes.
             Dim RMSerror As Double = 0
             Dim pixelCount = 0
@@ -159,7 +159,7 @@ Public Class Plane_OnlyPlanes : Inherits TaskParent
         dst2 = plane.dst2
 
         dst3.SetTo(0)
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             If plane.options.reuseRawDepthData = False Then buildCloudPlane(rc)
         Next
         If plane.options.reuseRawDepthData Then dst3 = task.pointCloud
@@ -272,12 +272,12 @@ Public Class Plane_CellColor : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         dst3.SetTo(0)
         Dim newCells As New List(Of rcData)
         Dim rcX = task.rcD
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             rc.eq = New cv.Vec4f
             If options.useMaskPoints Then
                 rc.eq = fitDepthPlane(buildMaskPointEq(rc))
@@ -291,7 +291,7 @@ Public Class Plane_CellColor : Inherits TaskParent
                                               Math.Abs(255 * rc.eq(1)),
                                               Math.Abs(255 * rc.eq(2))), rc.mask)
         Next
-        task.redColor.rcList = New List(Of rcData)(newCells)
+        task.redList.rcList = New List(Of rcData)(newCells)
     End Sub
 End Class
 
@@ -313,7 +313,7 @@ Public Class Plane_Points : Inherits TaskParent
         desc = "Detect if a some or all points in a RedCloud cell are in a plane."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         Dim rc = task.rcD
         labels(2) = "Selected cell has " + CStr(rc.contour.Count) + " points."
@@ -435,7 +435,7 @@ Public Class Plane_Equation : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            dst2 = runRedColor(src, labels(2))
+            dst2 = runRedList(src, labels(2))
             rc = task.rcD
             If rc.index = 0 Then SetTrueText("Select a cell in the image at left.")
         End If

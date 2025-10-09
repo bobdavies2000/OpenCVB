@@ -1354,7 +1354,7 @@ Public Class Hist_RedCell : Inherits TaskParent
         desc = "Review depth data for a RedCloud Cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
         hist.rc = task.rcD
         If hist.rc.index = 0 Or hist.rc.mmZ.maxVal = 0 Then Exit Sub
 

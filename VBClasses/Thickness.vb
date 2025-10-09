@@ -7,7 +7,7 @@ Public Class Thickness_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            dst2 = runRedColor(src, labels(2))
+            dst2 = runRedList(src, labels(2))
             rc = task.rcD
         End If
 

@@ -10,7 +10,7 @@ Public Class MSER_Basics : Inherits TaskParent
         desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = runRedColor(src, labels(3))
+        dst3 = runRedList(src, labels(3))
 
         detect.Run(src)
         Dim boxInput = New List(Of cv.Rect)(detect.boxes)
@@ -39,9 +39,9 @@ Public Class MSER_Basics : Inherits TaskParent
 
             rc.maxDist = GetMaxDist(rc)
 
-            rc.indexLast = task.redColor.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If rc.indexLast <> 0 And rc.indexLast < task.redColor.rcList.Count Then
-                Dim lrc = task.redColor.rcList(rc.indexLast)
+            rc.indexLast = task.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If rc.indexLast <> 0 And rc.indexLast < task.redList.rcList.Count Then
+                Dim lrc = task.redList.rcList(rc.indexLast)
                 rc.maxDStable = lrc.maxDStable
                 rc.color = lrc.color
                 matched.Add(rc.indexLast, rc.indexLast)
@@ -55,10 +55,10 @@ Public Class MSER_Basics : Inherits TaskParent
             If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
         Next
 
-        task.redColor.rcList = New List(Of rcData)(sortedCells.Values)
+        task.redList.rcList = New List(Of rcData)(sortedCells.Values)
         dst2 = RebuildRCMap(sortedCells)
 
-        labels(2) = CStr(task.redColor.rcList.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
+        labels(2) = CStr(task.redList.rcList.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
     End Sub
 End Class
 
@@ -231,15 +231,15 @@ Public Class MSER_Hulls : Inherits TaskParent
 
         Dim pixels As Integer
         dst3.SetTo(0)
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             pixels += rc.pixels
             DrawTour(dst3(rc.rect), rc.hull, rc.color, -1)
         Next
 
-        If task.heartBeat Then labels(2) = CStr(task.redColor.rcList.Count) + " Regions with average size " +
-                                           If(task.redColor.rcList.Count > 0,
-                                           CStr(CInt(pixels / task.redColor.rcList.Count)), "0")
+        If task.heartBeat Then labels(2) = CStr(task.redList.rcList.Count) + " Regions with average size " +
+                                           If(task.redList.rcList.Count > 0,
+                                           CStr(CInt(pixels / task.redList.rcList.Count)), "0")
     End Sub
 End Class
 
@@ -442,15 +442,15 @@ End Class
 Public Class MSER_RedCloud : Inherits TaskParent
     Dim mser As New MSER_Basics
     Public Sub New()
-        task.redColor = New RedColor_Basics
-        desc = "Use the MSER_Basics output as input to RedColor_Basics"
+        task.redList = New RedList_Basics
+        desc = "Use the MSER_Basics output as input to RedList_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         mser.Run(src)
 
-        task.redColor.Run(mser.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst2 = task.redColor.dst2
-        labels(2) = task.redColor.labels(2)
+        task.redList.Run(mser.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst2 = task.redList.dst2
+        labels(2) = task.redList.labels(2)
     End Sub
 End Class
 
@@ -494,7 +494,7 @@ Public Class MSER_Mask_CPP : Inherits TaskParent
         labels(3) = CStr(classCount) + " regions identified"
 
         src.SetTo(white, dst3)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
     End Sub
     Public Sub Close()
         MSER_Close(cPtr)
@@ -534,7 +534,7 @@ Public Class MSER_Basics1 : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         detect.Run(src)
         dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
     End Sub
 End Class
 

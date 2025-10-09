@@ -91,14 +91,14 @@ End Class
 Public Class Hist3D_RedCloud : Inherits TaskParent
     Dim hist3D As New Hist3D_Basics
     Public Sub New()
-        desc = "Run RedColor_Basics on the combined Hist3D color/cloud output."
+        desc = "Run RedList_Basics on the combined Hist3D color/cloud output."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         hist3D.Run(src)
         dst2 = hist3D.dst3
         labels(2) = hist3D.labels(3)
 
-        dst3 = runRedColor(hist3D.dst2, labels(3))
+        dst3 = runRedList(hist3D.dst2, labels(3))
     End Sub
 End Class
 
@@ -112,14 +112,14 @@ End Class
 Public Class Hist3D_RedColor : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
-        desc = "Use the Hist3D color classes to segment the image with RedColor_Basics"
+        desc = "Use the Hist3D color classes to segment the image with RedList_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         hColor.Run(src)
         dst3 = hColor.dst3
         labels(3) = hColor.labels(3)
-        dst2 = runRedColor(hColor.dst2, labels(2))
-        If task.redColor.rcList.Count > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+        dst2 = runRedList(hColor.dst2, labels(2))
+        If task.redList.rcList.Count > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
     End Sub
 End Class
 
@@ -211,7 +211,7 @@ Public Class Hist3D_PixelCells : Inherits TaskParent
 
         pixel.Run(src)
 
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             cv.Cv2.CalcBackProject({src(rc.rect)}, {0, 1, 2}, pixel.histogram, dst2(rc.rect), task.rangesBGR)
         Next
 
@@ -229,14 +229,14 @@ End Class
 Public Class Hist3D_PixelClassify : Inherits TaskParent
     Dim pixel As New Hist3D_Pixel
     Public Sub New()
-        desc = "Classify each pixel with a 3D histogram backprojection and run RedColor_Basics on the output."
+        desc = "Classify each pixel with a 3D histogram backprojection and run RedList_Basics on the output."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         pixel.Run(src)
 
-        dst2 = runRedColor(pixel.dst2, labels(2))
+        dst2 = runRedList(pixel.dst2, labels(2))
 
-        If task.redColor.rcList.Count > 0 Then
+        If task.redList.rcList.Count > 0 Then
             dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
         End If
     End Sub
@@ -289,11 +289,11 @@ Public Class Hist3D_RedCloudGrid : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         pixels.Run(src)
-        dst2 = task.redColor.rcMap
+        dst2 = task.redList.rcMap
         dst3 = dst2.InRange(0, 0)
         If pixels.pixelVector.Count = 0 Then Exit Sub
         dst1.SetTo(0)
-        dst0 = task.redColor.rcMap
+        dst0 = task.redList.rcMap
         For Each roi In task.gridRects
             If dst3(roi).CountNonZero Then
                 Dim candidates As New List(Of Integer)

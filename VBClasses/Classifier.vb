@@ -116,28 +116,28 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
     Dim nabs As New Neighbor_Precise
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        labels = {"", "Mask of the neighbors to the selected cell", "RedColor_Basics output", "Classifier_Bayesian output"}
+        labels = {"", "Mask of the neighbors to the selected cell", "RedList_Basics output", "Classifier_Bayesian output"}
         If standalone Then task.gOptions.displaydst1.checked = true
         cPtr = Classifier_Bayesian_Open()
         desc = "Classify the neighbor cells to be similar to the selected cell or not."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         SetTrueText("Review the Neighbor_Precise algorithm")
-        'nabs.rcList = task.redColor.rcList
-        'nabs.Run(task.redColor.rcMap)
+        'nabs.rcList = task.redList.rcList
+        'nabs.Run(task.redList.rcMap)
 
         'Dim trainList As New List(Of cv.Scalar)
         'Dim responseList As New List(Of Integer)
-        'For Each rc In task.redColor.rcList
+        'For Each rc In task.redList.rcList
         '    trainList.Add(rc.depth)
         '    responseList.Add(0)
         'Next
 
         'dst1.SetTo(0)
         'For Each index In nabs.nabList(task.rcD.index)
-        '    Dim rc = task.redColor.rcList(index)
+        '    Dim rc = task.redList.rcList(index)
         '    dst1(rc.rect).SetTo(255, rc.mask)
         '    strOut += CStr(index) + ","
         '    responseList(index) = -1
@@ -177,7 +177,7 @@ Public Class Classifier_BayesianTest : Inherits TaskParent
         'Dim zeroOutput As Boolean = True
         'For i = 0 To maskList.Count - 1
         '    If results(i) > 0 Then
-        '        Dim rc = task.redColor.rcList(maskList(i))
+        '        Dim rc = task.redList.rcList(maskList(i))
         '        dst3(rc.rect).SetTo(rc.color, rc.mask)
         '        zeroOutput = False
         '    End If

@@ -114,7 +114,7 @@ End Class
 
 Public Class CComp_Hulls : Inherits TaskParent
     Dim ccomp As New CComp_Both
-    Dim hulls As New RedColor_Hulls
+    Dim hulls As New RedList_Hulls
     Public Sub New()
         desc = "Create connected components using RedCloud Hulls"
     End Sub

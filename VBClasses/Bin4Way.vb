@@ -619,7 +619,7 @@ Public Class Bin4Way_RedCloud : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
-        dst3 = runRedColor(src, labels(3))
+        dst3 = runRedList(src, labels(3))
 
         If task.optionsChanged Then
             For i = 0 To rcList.Count - 1
@@ -632,13 +632,13 @@ Public Class Bin4Way_RedCloud : Inherits TaskParent
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = options.startRegion To options.endRegion
-            task.redColor.rcMap = cellMaps(i)
-            task.redColor.rcList = rcList(i)
+            task.redList.rcMap = cellMaps(i)
+            task.redList.rcList = rcList(i)
             flood.inputRemoved = Not bin2.mats.mat(i)
             flood.Run(bin2.mats.mat(i))
-            cellMaps(i) = task.redColor.rcMap.Clone
-            rcList(i) = New List(Of rcData)(task.redColor.rcList)
-            For Each rc In task.redColor.rcList
+            cellMaps(i) = task.redList.rcMap.Clone
+            rcList(i) = New List(Of rcData)(task.redList.rcList)
+            For Each rc In task.redList.rcList
                 If rc.index = 0 Then Continue For
                 sortedCells.Add(rc.pixels, rc)
             Next
@@ -646,7 +646,7 @@ Public Class Bin4Way_RedCloud : Inherits TaskParent
 
         dst2 = RebuildRCMap(sortedCells)
 
-        If task.heartBeat Then labels(2) = CStr(task.redColor.rcList.Count) + " cells were identified and matched to the previous image"
+        If task.heartBeat Then labels(2) = CStr(task.redList.rcList.Count) + " cells were identified and matched to the previous image"
     End Sub
 End Class
 

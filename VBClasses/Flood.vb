@@ -6,12 +6,12 @@ Public Class Flood_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels = 1 Then
-            dst2 = runRedColor(src, labels(2), src)
+            dst2 = runRedList(src, labels(2), src)
         Else
-            dst2 = runRedColor(src, labels(2))
+            dst2 = runRedList(src, labels(2))
         End If
-        dst1 = task.redColor.dst1
-        SetTrueText(task.redColor.strOut, 3)
+        dst1 = task.redList.dst1
+        SetTrueText(task.redList.strOut, 3)
     End Sub
 End Class
 
@@ -25,8 +25,8 @@ Public Class Flood_CellStatsPlot : Inherits TaskParent
         desc = "Provide cell stats on the flood_basics cells.  Identical to XO_RedCell_FloodFill"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
-        SetTrueText(task.redColor.strOut, 3)
+        dst2 = runRedList(src, labels(2))
+        SetTrueText(task.redList.strOut, 3)
     End Sub
 End Class
 
@@ -42,15 +42,15 @@ Public Class Flood_ContainedCells : Inherits TaskParent
         desc = "Find cells that have only one neighbor.  They are likely to be contained in another cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then dst2 = runRedColor(src, labels(2))
+        If standalone Then dst2 = runRedList(src, labels(2))
 
         Dim removeCells As New List(Of Integer)
-        For i = task.redColor.rcList.Count - 1 To 0 Step -1
-            Dim rc = task.redColor.rcList(i)
+        For i = task.redList.rcList.Count - 1 To 0 Step -1
+            Dim rc = task.redList.rcList(i)
             Dim nabs As New List(Of Integer)
             Dim contains As New List(Of Integer)
-            For j = 0 To task.redColor.rcList.Count - 1
-                Dim rcBig = task.redColor.rcList(j)
+            For j = 0 To task.redList.rcList.Count - 1
+                Dim rcBig = task.redList.rcList(j)
                 If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.index)
                 If rcBig.rect.Contains(rc.rect) Then contains.Add(rcBig.index)
             Next
@@ -59,7 +59,7 @@ Public Class Flood_ContainedCells : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each index In removeCells
-            Dim rc = task.redColor.rcList(index)
+            Dim rc = task.redList.rcList(index)
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
@@ -103,7 +103,7 @@ Public Class Flood_BasicsMask : Inherits TaskParent
 
         dst2 = cellGen.dst2
 
-        If task.heartBeat Then labels(2) = $"{task.redColor.rcList.Count} cells identified"
+        If task.heartBeat Then labels(2) = $"{task.redList.rcList.Count} cells identified"
 
         If showSelected Then task.setSelectedCell()
     End Sub
@@ -165,8 +165,8 @@ Public Class Flood_Motion : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             flood.Run(src)
-            rcList = New List(Of rcData)(task.redColor.rcList)
-            cellMap = task.redColor.rcMap.Clone
+            rcList = New List(Of rcData)(task.redList.rcList)
+            cellMap = task.redList.rcMap.Clone
             dst2 = flood.dst2.Clone
             dst3 = flood.dst2.Clone
             labels(2) = flood.labels(2)
@@ -180,7 +180,7 @@ Public Class Flood_Motion : Inherits TaskParent
         Else
             flood.Run(src)
             dst1.SetTo(0)
-            For Each rc In task.redColor.rcList
+            For Each rc In task.redList.rcList
                 If maxDists.Contains(rc.maxDist) Then
                     Dim lrc = rcList(maxIndex(maxDists.IndexOf(rc.maxDist)))
                     dst1(lrc.rect).SetTo(lrc.color, lrc.mask)

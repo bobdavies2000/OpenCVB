@@ -658,17 +658,17 @@ Public Class Pixel_Vector3D : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         OptionParent.FindSlider("Histogram 3D Bins").Value = 3
-        labels = {"", "RedColor_Basics output", "3D Histogram counts for each of the cells at left", ""}
+        labels = {"", "RedList_Basics output", "3D Histogram counts for each of the cells at left", ""}
         desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        runRedColor(src, labels(2))
+        runRedList(src, labels(2))
         Dim maxRegion = 20
 
         If task.heartBeat Then
             pixelVector.Clear()
             strOut = "3D histogram counts for each cell - " + CStr(maxRegion) + " largest only for readability..." + vbCrLf
-            For Each rc In task.redColor.rcList
+            For Each rc In task.redList.rcList
                 hColor.inputMask = rc.mask
                 hColor.Run(src(rc.rect))
                 pixelVector.Add(hColor.histArray.ToList)
@@ -684,12 +684,12 @@ Public Class Pixel_Vector3D : Inherits TaskParent
 
         dst1.SetTo(0)
         dst2.SetTo(0)
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             task.color(rc.rect).CopyTo(dst2(rc.rect), rc.mask)
             dst1(rc.rect).SetTo(rc.color, rc.mask)
             If rc.index <= maxRegion Then SetTrueText(CStr(rc.index), rc.maxDist, 2)
         Next
-        labels(1) = task.redColor.labels(3)
+        labels(1) = task.redList.labels(3)
     End Sub
 End Class
 
@@ -702,19 +702,19 @@ Public Class Pixel_Vectors : Inherits TaskParent
     Public pixelVector As New List(Of Single())
     Public rcList As New List(Of rcData)
     Public Sub New()
-        labels = {"", "", "RedColor_Basics output", ""}
+        labels = {"", "", "RedList_Basics output", ""}
         desc = "Create a vector for each cell's 3D histogram."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         pixelVector.Clear()
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             hVector.inputMask = rc.mask
             hVector.Run(src(rc.rect))
             pixelVector.Add(hVector.histArray)
         Next
-        rcList = task.redColor.rcList
+        rcList = task.redList.rcList
 
         SetTrueText("3D color histograms were created for " + CStr(pixelVector.Count) + " cells", 3)
     End Sub

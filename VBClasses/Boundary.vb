@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Boundary_Basics : Inherits TaskParent
-    Public redCPP As New RedColor_CPP
+    Public redCPP As New RedList_CPP
     Dim color8U As New Color8U_Basics
     Public Sub New()
         task.gOptions.ColorSource.SelectedItem = "Bin4Way_Regions"
@@ -9,17 +9,17 @@ Public Class Boundary_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         color8U.Run(src)
-        dst2 = runRedColor(color8U.dst2, labels(2))
+        dst2 = runRedList(color8U.dst2, labels(2))
 
         redCPP.Run(dst1)
 
         dst3.SetTo(0)
-        For i = 1 To task.redColor.rcList.Count - 1
-            Dim rc = task.redColor.rcList(i)
+        For i = 1 To task.redList.rcList.Count - 1
+            Dim rc = task.redList.rcList(i)
             DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
-        labels(3) = $"{task.redColor.rcList.Count} cells were found."
+        labels(3) = $"{task.redList.rcList.Count} cells were found."
     End Sub
 End Class
 
@@ -44,23 +44,23 @@ Public Class Boundary_Rectangles : Inherits TaskParent
         bounds.Run(src)
 
         dst2.SetTo(0)
-        For Each rc In task.redColor.rcList
+        For Each rc In task.redList.rcList
             dst2.Rectangle(rc.rect, task.highlight, task.lineWidth)
         Next
-        labels(2) = $"{task.redColor.rcList.Count} rectangles before contain test"
+        labels(2) = $"{task.redList.rcList.Count} rectangles before contain test"
 
         rects.Clear()
-        For i = 0 To CInt(task.redColor.rcList.Count * options.percentRect) - 1
-            rects.Add(task.redColor.rcList(i).rect)
+        For i = 0 To CInt(task.redList.rcList.Count * options.percentRect) - 1
+            rects.Add(task.redList.rcList(i).rect)
         Next
 
         smallRects.Clear()
         smallContours.Clear()
-        For i = task.redColor.rcList.Count - 1 To CInt(task.redColor.rcList.Count * options.percentRect) Step -1
-            task.rcD = task.redColor.rcList(i)
+        For i = task.redList.rcList.Count - 1 To CInt(task.redList.rcList.Count * options.percentRect) Step -1
+            task.rcD = task.redList.rcList(i)
             Dim r = task.rcD.rect
             Dim contained As Boolean = False
-            For Each rc In task.redColor.rcList
+            For Each rc In task.redList.rcList
                 If r = rc.rect Then Continue For
                 If rc.rect.Contains(r) Then
                     contained = True
@@ -103,13 +103,13 @@ Public Class Boundary_RemovedRects : Inherits TaskParent
         dst2 = bRects.bounds.dst2.Clone
         dst3 = bRects.dst2
         dst1 = bRects.dst3
-        labels(3) = $"{task.redColor.rcList.Count} cells before contain test"
+        labels(3) = $"{task.redList.rcList.Count} cells before contain test"
 
         For i = 0 To bRects.smallRects.Count - 1
             DrawTour(dst2(bRects.smallRects(i)), bRects.smallContours(i), cv.Scalar.Black, task.lineWidth)
         Next
         labels(1) = labels(2)
-        labels(2) = $"{task.redColor.rcList.Count - bRects.smallRects.Count} cells after contain test"
+        labels(2) = $"{task.redList.rcList.Count - bRects.smallRects.Count} cells after contain test"
     End Sub
 End Class
 
@@ -127,15 +127,15 @@ Public Class Boundary_GuidedBP : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         guided.Run(src)
-        dst2 = runRedColor(guided.dst2, labels(2))
+        dst2 = runRedList(guided.dst2, labels(2))
 
         dst3.SetTo(0)
-        For i = 1 To task.redColor.rcList.Count - 1
-            Dim rc = task.redColor.rcList(i)
+        For i = 1 To task.redList.rcList.Count - 1
+            Dim rc = task.redList.rcList(i)
             DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
-        labels(3) = $"{task.redColor.rcList.Count} cells were found."
+        labels(3) = $"{task.redList.rcList.Count} cells were found."
     End Sub
 End Class
 
@@ -154,15 +154,15 @@ Public Class Boundary_RedColor : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         prep.Run(src)
-        dst2 = runRedColor(prep.dst2, labels(2))
+        dst2 = runRedList(prep.dst2, labels(2))
 
         dst3.SetTo(0)
-        For i = 1 To task.redColor.rcList.Count - 1
-            Dim rc = task.redColor.rcList(i)
+        For i = 1 To task.redList.rcList.Count - 1
+            Dim rc = task.redList.rcList(i)
             DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
-        labels(3) = $"{task.redColor.rcList.Count} cells were found."
+        labels(3) = $"{task.redList.rcList.Count} cells were found."
     End Sub
 End Class
 

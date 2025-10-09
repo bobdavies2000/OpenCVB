@@ -303,14 +303,14 @@ End Class
 Public Class Distance_RedDistance : Inherits TaskParent
     Dim distance As New Distance_Basics
     Public Sub New()
-        desc = "Combine the output of redColor_Basics and distance_basics."
+        desc = "Combine the output of RedList_Basics and distance_basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedColor(src, labels(2))
+        dst2 = runRedList(src, labels(2))
 
         distance.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
-        dst2 = ShowAddweighted(distance.dst2, task.redColor.dst2, labels(2))
+        dst2 = ShowAddweighted(distance.dst2, task.redList.dst2, labels(2))
     End Sub
 End Class
 
@@ -341,12 +341,12 @@ Public Class Distance_RedColor : Inherits TaskParent
         Return Math.Sqrt(result)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = runRedColor(src, labels(3))
+        dst3 = runRedList(src, labels(3))
 
         pixelVector.Clear()
         distances.Clear()
-        For i = 1 To task.redColor.rcList.Count - 1
-            Dim rc = task.redColor.rcList(i)
+        For i = 1 To task.redList.rcList.Count - 1
+            Dim rc = task.redList.rcList(i)
             hColor.inputMask = rc.mask
             hColor.Run(src(rc.rect))
 
@@ -384,17 +384,17 @@ Public Class Distance_RedColor : Inherits TaskParent
 
         dst2.SetTo(0)
         For i = 0 To distances.Count - 1
-            Dim rp = task.redColor.rcList(distances.ElementAt(i).Value)
+            Dim rp = task.redList.rcList(distances.ElementAt(i).Value)
             task.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
         Next
-        labels(2) = task.redColor.labels(3)
+        labels(2) = task.redList.labels(3)
 
         lastDistances.Clear()
         For Each el In distances
             lastDistances.Add(el.Key, el.Value)
         Next
 
-        lastrcList = New List(Of rcData)(task.redColor.rcList)
+        lastrcList = New List(Of rcData)(task.redList.rcList)
     End Sub
 End Class
 

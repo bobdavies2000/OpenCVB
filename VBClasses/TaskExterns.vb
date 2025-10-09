@@ -808,16 +808,16 @@ Module TaskExterns
 
 
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedColor_FindBricks_Open() As IntPtr
+    Public Function RedList_FindBricks_Open() As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub RedColor_FindBricks_Close(cPtr As IntPtr)
+    Public Sub RedList_FindBricks_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedColor_FindBricks_TotalCount(cPtr As IntPtr) As Integer
+    Public Function RedList_FindBricks_TotalCount(cPtr As IntPtr) As Integer
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedColor_FindBricks_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    Public Function RedList_FindBricks_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
     End Function
 
 
