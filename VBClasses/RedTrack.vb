@@ -224,9 +224,146 @@ Public Class RedTrack_Features : Inherits TaskParent
         For Each rc In task.redColor.rcList
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
             DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)
-            If rc.contour.Count > 0 Then SetTrueText(shapeCorrelation(rc.contour).ToString(fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
+            If rc.contour.Count > 0 Then SetTrueText(RedColor_ShapeCorrelation.shapeCorrelation(rc.contour).ToString(fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
         Next
         SetTrueText("Move camera to see the value of this algorithm", 2)
         SetTrueText("Values are correlation of x to y.  Leans left (negative) or right (positive) or circular (neutral correlation.)", 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_RedColor_Tiers : Inherits TaskParent
+    Dim tiers As New Depth_Tiers
+    Dim binar4 As New Bin4Way_Regions
+    Public Sub New()
+        desc = "Use the Depth_TierZ algorithm to create a color-based RedCloud"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        binar4.Run(src)
+        dst1 = ShowPalette(binar4.dst2)
+
+        tiers.Run(src)
+        dst3 = tiers.dst3
+
+        dst0 = tiers.dst2 + binar4.dst2
+        dst2 = runRedColor(dst0, labels(2))
+        labels(3) = tiers.labels(2)
+    End Sub
+End Class
+
+
+
+
+Public Class XO_RedColor_TiersBinarize : Inherits TaskParent
+    Dim tiers As New Depth_Tiers
+    Dim binar4 As New Bin4Way_Regions
+    Public Sub New()
+        desc = "Use the Depth_TierZ with Bin4Way_Regions algorithm to create a color-based RedCloud"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        binar4.Run(src)
+
+        tiers.Run(src)
+        dst2 = tiers.dst2 + binar4.dst2
+
+        dst2 = runRedColor(dst2, labels(2))
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_RedColor_TopX : Inherits TaskParent
+    Public topXcells As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Isolate the top X cells and use the rest of the image as an input mask."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3 = runRedColor(src, labels(2))
+        dst2.SetTo(0)
+
+        If task.heartBeat Or task.optionsChanged Then
+            topXcells.Clear()
+            For Each rc In task.redColor.rcList
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
+                topXcells.Add(rc.maxDist)
+            Next
+        Else
+            Dim maxList As New List(Of cv.Point)
+            For Each pt In topXcells
+                Dim index = task.redColor.rcMap.Get(Of Byte)(pt.Y, pt.X)
+                Dim rc = task.redColor.rcList(index)
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
+                DrawCircle(dst2, rc.maxDist, task.DotSize, task.highlight)
+                maxList.Add(rc.maxDist)
+            Next
+            topXcells = New List(Of cv.Point)(maxList)
+        End If
+        labels(2) = "The Top " + CStr(topXcells.Count) + " largest cells in rcList."
+
+        dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        task.redColor.inputRemoved = dst1
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_RedColor_UnmatchedCount : Inherits TaskParent
+    Dim myFrameCount As Integer
+    Dim changedCellCounts As New List(Of Integer)
+    Dim framecounts As New List(Of Integer)
+    Dim frameLoc As New List(Of cv.Point)
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Count the unmatched cells and display them."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        myFrameCount += 1
+        If standalone Then dst2 = runRedColor(src, labels(2))
+
+        Dim unMatchedCells As Integer
+        Dim mostlyColor As Integer
+        For i = 0 To task.redColor.rcList.Count - 1
+            Dim rc = task.redColor.rcList(i)
+            If task.redColor.rcList(i).depthPixels / task.redColor.rcList(i).pixels < 0.5 Then mostlyColor += 1
+            If rc.indexLast <> 0 Then
+                Dim val = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                If val = 0 Then
+                    dst3(rc.rect).SetTo(255, rc.mask)
+                    unMatchedCells += 1
+                    frameLoc.Add(rc.maxDist)
+                    framecounts.Add(myFrameCount)
+                End If
+            End If
+        Next
+        If standaloneTest() Then
+            For i = 0 To framecounts.Count - 1
+                SetTrueText(CStr(framecounts(i)), frameLoc(i), 2)
+            Next
+        End If
+        changedCellCounts.Add(unMatchedCells)
+
+        If task.heartBeat Then
+            dst3.SetTo(0)
+            framecounts.Clear()
+            frameLoc.Clear()
+            myFrameCount = 0
+            Dim sum = changedCellCounts.Sum(), avg = If(changedCellCounts.Count > 0, changedCellCounts.Average(), 0)
+            labels(3) = CStr(sum) + " new/moved cells in the last second " + Format(avg, fmt1) + " changed per frame"
+            labels(2) = CStr(task.redColor.rcList.Count) + " cells, unmatched cells = " + CStr(unMatchedCells) + "   " +
+                        CStr(mostlyColor) + " cells were mostly color and " + CStr(task.redColor.rcList.Count - mostlyColor) + " had depth."
+            changedCellCounts.Clear()
+        End If
     End Sub
 End Class

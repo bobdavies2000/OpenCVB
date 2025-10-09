@@ -842,18 +842,6 @@ Module TaskExterns
 
 
 
-    Public Function shapeCorrelation(points As List(Of cv.Point)) As Single
-        Dim pts As cv.Mat = cv.Mat.FromPixelData(points.Count, 1, cv.MatType.CV_32SC2, points.ToArray)
-        Dim pts32f As New cv.Mat
-        pts.ConvertTo(pts32f, cv.MatType.CV_32FC2)
-        Dim split = pts32f.Split()
-        Dim correlationMat As New cv.Mat
-        cv.Cv2.MatchTemplate(split(0), split(1), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-        Return correlationMat.Get(Of Single)(0, 0)
-    End Function
-
-
-
 
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Retina_Basics_Open(rows As Integer, cols As Integer, useLogSampling As Boolean, samplingFactor As Single) As IntPtr
