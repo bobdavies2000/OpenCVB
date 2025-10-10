@@ -8,7 +8,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         desc = "Run RedColor_Core on the heartbeat but just floodFill at maxDist otherwise."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
+        If task.heartBeat Or task.optionsChanged Then
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
@@ -33,7 +33,7 @@ Public Class RedColor_Basics : Inherits TaskParent
                 If pcMap.Get(Of Byte)(pt.Y, pt.X) = 0 Then
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
-                        Dim pcc = MaxDist_Basics.setCloudData(dst3(rect).InRange(index, index), rect)
+                        Dim pcc = MaxDist_Basics.setCloudData(dst3(rect).InRange(index, index), rect, index)
                         If pcc IsNot Nothing Then
                             pcc.index = pc.index
                             pcc.color = pc.color
@@ -89,14 +89,14 @@ Public Class RedColor_Match : Inherits TaskParent
                 pc.color = pcListLast(indexLast).color
             End If
             pc.index = pcList.Count + 1
-            pcMap(pc.rect).setto(pc.index, pc.hullMask)
-            dst2(pc.rect).SetTo(pc.color, pc.hullMask)
+            pcMap(pc.rect).SetTo(pc.index, pc.mask)
+            dst2(pc.rect).SetTo(pc.color, pc.mask)
             dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
             pcList.Add(pc)
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
 
-        pcListLast = New List(Of cloudData)(task.redCloud.pcList)
+        pcListLast = New List(Of cloudData)(pcList)
         pcMapLast = pcMap.clone
     End Sub
 End Class
@@ -134,11 +134,10 @@ Public Class RedColor_Core : Inherits TaskParent
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount Then
-                            Dim pc = MaxDist_Basics.setCloudData(dst3(rect).InRange(index, index), rect)
-                            pc.index = index
-                            index += 1
+                            Dim pc = MaxDist_Basics.setCloudData(dst3(rect).InRange(index, index), rect, index)
                             pcList.Add(pc)
                             pcMap(pc.rect).SetTo(pc.index Mod 255, pc.contourMask)
+                            index += 1
                         Else
                             dst3(rect).SetTo(255, mask(rect))
                         End If

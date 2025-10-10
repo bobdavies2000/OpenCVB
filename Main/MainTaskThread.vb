@@ -143,6 +143,11 @@ Namespace OpenCVB
                     ' wait for the camera to get the first images.
                     If cameraReady Then
                         camera.camImages = New CameraImages.images(task.workRes)
+                        ' when changing resolutions, these conditionals might be needed.
+                        If task.workRes <> camera.camImages.color.Size Then task.color = camera.camImages.color.Resize(task.workRes)
+                        If task.workRes <> camera.camImages.pointcloud.Size Then task.pointCloud = camera.camImages.pointcloud.Resize(task.workRes)
+                        If task.workRes <> camera.camImages.left.Size Then task.leftView = camera.camImages.left.Resize(task.workRes)
+                        If task.workRes <> camera.camImages.right.Size Then task.rightView = camera.camImages.right.Resize(task.workRes)
                         Exit While
                     End If
                     Application.DoEvents()

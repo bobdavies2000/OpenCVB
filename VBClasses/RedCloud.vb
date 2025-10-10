@@ -101,23 +101,12 @@ Public Class RedCloud_Core : Inherits TaskParent
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount Then
-                            pc = MaxDist_Basics.setCloudData(dst3(rect).InRange(index, index), rect)
-                            pc.index = index
+                            pc = MaxDist_Basics.setCloudData(dst3(rect).InRange(index, index), rect, index)
                             pc.color = task.vecColors(pc.index)
                             pcList.Add(pc)
                             dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
                             SetTrueText(CStr(pc.index), pc.rect.TopLeft)
                             index += 1
-                            'pc = MaxDist_Basics.setCloudData(mask(rect), rect)
-                            'If pc Is Nothing Then
-                            '    'dst3(rect).SetTo(255, mask(rect))
-                            'Else
-                            '    pc.index = index
-                            '    pcList.Add(pc)
-                            '    dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
-                            '    SetTrueText(CStr(pc.index), pc.rect.TopLeft)
-                            '    index += 1
-                            'End If
                         Else
                             dst3(rect).SetTo(255, mask(rect))
                         End If

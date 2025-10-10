@@ -5,10 +5,12 @@ Public Class MaxDist_Basics : Inherits TaskParent
         labels(3) = "Below left shows hullMask while below shows the contour mask."
         desc = "Find the point farthest from the edges of a mask."
     End Sub
-    Public Shared Function setCloudData(mask As cv.Mat, rect As cv.Rect, Optional zeroRectangle As Boolean = True) As cloudData
+    Public Shared Function setCloudData(mask As cv.Mat, rect As cv.Rect, index As Integer,
+                                        Optional zeroRectangle As Boolean = True) As cloudData
         Dim pc As New cloudData
         pc.mask = mask.Clone
         pc.rect = rect
+        pc.index = index
         pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
         If pc.contour.Count < 3 Then Return Nothing
         Dim listOfPoints = New List(Of List(Of cv.Point))({pc.contour})
@@ -36,11 +38,13 @@ Public Class MaxDist_Basics : Inherits TaskParent
         dst2 = runRedCloud(src, labels(2))
 
         dst3.SetTo(0)
+        Dim index As Integer = 1
         For Each pc In task.redCloud.pcList
-            Dim pcTest = setCloudData(pc.mask, pc.rect)
+            Dim pcTest = setCloudData(pc.mask, pc.rect, index)
             pcTest.color = pc.color
             dst3(pcTest.rect).SetTo(pcTest.color, pcTest.mask)
             dst3.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+            index += 1
         Next
     End Sub
 End Class
@@ -60,7 +64,7 @@ Public Class MaxDist_NoRectangle : Inherits TaskParent
         Dim pcList As New List(Of cloudData)
         dst3.SetTo(0)
         For Each pc In task.redCloud.pcList
-            Dim pcTest = MaxDist_Basics.setCloudData(pc.mask, pc.rect, False) ' This pcList will NOT use the rectangle of zeros.
+            Dim pcTest = MaxDist_Basics.setCloudData(pc.mask, pc.rect, pcList.Count + 1, False) ' This pcList will NOT use the rectangle of zeros.
             pcTest.color = pc.color
             dst3(pcTest.rect).SetTo(pcTest.color, pcTest.mask)
             dst3.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
