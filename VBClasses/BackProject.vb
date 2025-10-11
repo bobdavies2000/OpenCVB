@@ -145,7 +145,7 @@ Public Class BackProject_DisplayColor : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         backP.Run(src)
-        dst2 = ShowPalette(backP.dst2 + 1)
+        dst2 = PaletteFull(backP.dst2 + 1)
         labels(2) = backP.labels(2)
     End Sub
 End Class
@@ -166,7 +166,7 @@ Public Class BackProject_Unstable : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         backP.Run(src)
-        dst2 = ShowPalette(backP.dst2)
+        dst2 = PaletteFull(backP.dst2)
 
         diff.Run(dst2)
         dst3 = diff.dst2
@@ -193,13 +193,13 @@ Public Class BackProject_FullEqualized : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         backP.Run(src)
         backP.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst2 = ShowPalette(dst2)
+        dst2 = PaletteFull(dst2)
 
         equalize.Run(task.grayStable)
         backP.Run(equalize.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
         backP.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
-        dst3 = ShowPalette(dst3)
+        dst3 = PaletteFull(dst3)
     End Sub
 End Class
 
@@ -244,7 +244,7 @@ Public Class BackProject_Top : Inherits TaskParent
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst1, task.rangesTop)
         dst1 = dst1.ConvertScaleAbs()
         dst1.ConvertTo(dst1, cv.MatType.CV_8U)
-        dst3 = ShowPalette(dst1)
+        dst3 = PaletteFull(dst1)
     End Sub
 End Class
 
@@ -425,7 +425,7 @@ Public Class BackProject_MeterByMeter : Inherits TaskParent
         cv.Cv2.CalcBackProject({task.pcSplit(2)}, {0}, histogram, dst2, ranges)
 
         dst2.SetTo(0, task.noDepthMask)
-        dst3 = ShowPalette(dst2.ConvertScaleAbs)
+        dst3 = PaletteFull(dst2.ConvertScaleAbs)
         labels(2) = "CV_8U backprojection up to " + CStr(task.histogramBins) + " meters."
     End Sub
 End Class
@@ -447,7 +447,7 @@ Public Class BackProject_Hue : Inherits TaskParent
         hue.Run(src)
         classCount = hue.classCount
         dst2 = hue.dst2
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
     End Sub
 End Class
 
@@ -613,7 +613,7 @@ Public Class BackProject_FullOld : Inherits TaskParent
 
         cv.Cv2.CalcBackProject({src}, {0}, histogram, dst2, ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        If standaloneTest() Then dst3 = ShowPalette(dst2)
+        If standaloneTest() Then dst3 = PaletteFull(dst2)
     End Sub
 End Class
 
@@ -692,7 +692,7 @@ Public Class BackProject_InRangeDepth : Inherits TaskParent
         Next
         SetTrueText(strOut)
 
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
         labels(3) = "Below are the " + CStr(task.histogramBins) + " classes of depth data."
     End Sub
 End Class
@@ -798,7 +798,7 @@ Public Class BackProject_Basics_Depth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bpDepth.Run(src)
-        dst2 = ShowPalette(bpDepth.dst2)
+        dst2 = PaletteFull(bpDepth.dst2)
         dst2.SetTo(0, task.noDepthMask)
         labels(2) = bpDepth.labels(2)
     End Sub
@@ -818,7 +818,7 @@ Public Class BackProject_DepthSlider : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bpDepth.Run(src)
-        dst2 = ShowPalette(bpDepth.dst2)
+        dst2 = PaletteFull(bpDepth.dst2)
         dst2.SetTo(0, task.noDepthMask)
         labels(2) = bpDepth.labels(2)
 

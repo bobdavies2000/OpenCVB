@@ -113,7 +113,7 @@ Public Class History_BasicsDiff : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         frames.Run(src)
-        dst2 = ShowPalette(frames.dst2)
+        dst2 = PaletteFull(frames.dst2)
 
         diff.Run(frames.dst2)
         dst3 = diff.dst2

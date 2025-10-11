@@ -494,7 +494,7 @@ Public Class RedList_FourColor : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         binar4.Run(src)
-        dst3 = ShowPalette(binar4.dst2)
+        dst3 = PaletteFull(binar4.dst2)
 
         dst2 = runRedList(binar4.dst2, labels(2))
     End Sub
@@ -587,7 +587,7 @@ Public Class RedList_MaxDist_CPP : Inherits TaskParent
         imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, dst1.Rows, dst1.Cols)
         handleInput.Free()
         dst2 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
 
         classCount = RedCloudMaxDist_Count(cPtr)
         labels(2) = "CV_8U version with " + CStr(classCount) + " cells."
@@ -797,7 +797,7 @@ Public Class RedList_CPP : Inherits TaskParent
             rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
         Next
 
-        If standaloneTest() Then dst3 = ShowPalette(dst2)
+        If standaloneTest() Then dst3 = PaletteFull(dst2)
 
         If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
         If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
@@ -843,7 +843,7 @@ Public Class RedList_Hulls : Inherits TaskParent
                 rcList.Add(rc)
             End If
         Next
-        dst3 = ShowPalette(rcMap)
+        dst3 = PaletteFull(rcMap)
         labels(3) = CStr(rcList.Count) + " hulls identified below.  " + CStr(defectCount) +
                     " hulls failed to build the defect list."
     End Sub
@@ -915,12 +915,12 @@ Public Class RedList_LeftRight : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         redLeft.Run(task.leftView)
         dst0 = redLeft.dst2
-        dst2 = ShowPalette(dst0)
+        dst2 = PaletteFull(dst0)
         labels(2) = redLeft.labels(2) + " in the left image"
 
         redRight.Run(task.rightView)
         dst1 = redRight.dst2
-        dst3 = ShowPalette(dst1)
+        dst3 = PaletteFull(dst1)
         labels(3) = redRight.labels(2) + " in the right image"
     End Sub
 End Class

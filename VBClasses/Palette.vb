@@ -96,7 +96,7 @@ Public Class Palette_Reduction : Inherits TaskParent
         reduction.Run(src)
         dst3 = reduction.dst2
 
-        dst2 = ShowPalette(dst3)
+        dst2 = PaletteFull(dst3)
     End Sub
 End Class
 
@@ -110,7 +110,7 @@ Public Class Palette_DrawTest : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         draw.Run(src)
-        dst2 = ShowPalette(draw.dst2)
+        dst2 = PaletteFull(draw.dst2)
     End Sub
 End Class
 
@@ -262,8 +262,8 @@ Public Class Palette_LeftRightImages : Inherits TaskParent
         desc = "Use a palette with the left and right images."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = ShowPalette(task.leftView.ConvertScaleAbs)
-        dst3 = ShowPalette(task.rightView.ConvertScaleAbs)
+        dst2 = PaletteFull(task.leftView.ConvertScaleAbs)
+        dst3 = PaletteFull(task.rightView.ConvertScaleAbs)
     End Sub
 End Class
 Public Class Palette_TaskColors : Inherits TaskParent
@@ -529,7 +529,7 @@ Public Class Palette_Bin4Way : Inherits TaskParent
         dst2 += tiers.dst2
         classCount = tiers.classCount + 4
 
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
     End Sub
 End Class
 

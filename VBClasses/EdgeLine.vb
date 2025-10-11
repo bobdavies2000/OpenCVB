@@ -116,7 +116,7 @@ End Class
 '            Dim nrc = pcList(i)
 '            dst1(nrc.rect).SetTo(nrc.ID Mod 255, nrc.mask)
 '        Next
-'        dst3 = ShowPalette254(dst1)
+'        dst3 = PaletteBlackZero(dst1)
 
 '        labels(3) = CStr(pcList.Count) + " segments are present.  " + CStr(duplicatePixels) +
 '                    " pixels were dropped because the segment hit an already occupied grid cell."
@@ -329,7 +329,7 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
         labels(2) = bPoint.labels(2)
 
         dst2 = task.edgeLine.dst2
-        dst3 = ShowPalette(task.edgeLine.dst2)
+        dst3 = PaletteFull(task.edgeLine.dst2)
 
         Dim segments(task.edgeLine.classCount) As List(Of cv.Point2f)
         Dim brickCount As Integer, segmentCount As Integer

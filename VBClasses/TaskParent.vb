@@ -526,7 +526,7 @@ Public Class TaskParent : Implements IDisposable
         task.palette.Run(input)
         Return task.palette.dst2
     End Function
-    Public Shared Function ShowPalette(input As cv.Mat) As cv.Mat
+    Public Shared Function PaletteFull(input As cv.Mat) As cv.Mat
         Dim output As New cv.Mat
         If input.Type <> cv.MatType.CV_8U Then
             Dim input8u As New cv.Mat
@@ -538,14 +538,14 @@ Public Class TaskParent : Implements IDisposable
 
         Return output
     End Function
-    Public Shared Function ShowPalette254(input As cv.Mat) As cv.Mat
+    Public Shared Function PaletteBlackZero(input As cv.Mat) As cv.Mat
         Dim output As New cv.Mat
         If input.Type <> cv.MatType.CV_8U Then
             Dim input8u As New cv.Mat
             input.ConvertTo(input8u, cv.MatType.CV_8U)
-            cv.Cv2.ApplyColorMap(input8u, output, task.colorMapNoZero)
+            cv.Cv2.ApplyColorMap(input8u, output, task.colorMapZeroIsBlack)
         Else
-            cv.Cv2.ApplyColorMap(input, output, task.colorMapNoZero)
+            cv.Cv2.ApplyColorMap(input, output, task.colorMapZeroIsBlack)
         End If
 
         Return output

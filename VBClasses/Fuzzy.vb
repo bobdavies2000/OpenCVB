@@ -59,7 +59,7 @@ Public Class Fuzzy_Basics : Inherits TaskParent
             sortContours.Add(contours(i).Length, New cv.Point(i, maskID))
         Next
 
-        dst1 = ShowPalette(dst2)
+        dst1 = PaletteFull(dst2)
         dst1.SetTo(0, dst3)
         labels(1) = "There were " + CStr(sortContours.Count) + " contour > 100 points."
     End Sub
@@ -126,7 +126,7 @@ Public Class Fuzzy_Filter : Inherits TaskParent
             sortContours.Add(contours(i).Length, New cv.Point(i, maskID))
         Next
 
-        dst2 = ShowPalette(reduction.dst2)
+        dst2 = PaletteFull(reduction.dst2)
         dst2.SetTo(0, dst3)
     End Sub
 End Class

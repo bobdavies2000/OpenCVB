@@ -613,7 +613,7 @@ Public Class Motion_FromEdgeColorize : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         cAccum.Run(src)
         dst2 = cAccum.dst2
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
     End Sub
 End Class
 

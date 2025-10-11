@@ -90,7 +90,7 @@ Public Class RedPrep_Depth : Inherits TaskParent
         dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         dst2.SetTo(0, task.noDepthMask)
 
-        dst3 = ShowPalette254(dst2)
+        dst3 = PaletteBlackZero(dst2)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)
@@ -133,7 +133,7 @@ Public Class RedPrep_FloodFill : Inherits TaskParent
             rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
         Next
 
-        If standalone Then dst3 = ShowPalette(dst2)
+        If standalone Then dst3 = PaletteFull(dst2)
 
         If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
         If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
@@ -231,7 +231,7 @@ Public Class RedPrep_DepthTiers : Inherits TaskParent
         tiers.Run(src)
         dst1 += tiers.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        dst2 = ShowPalette(dst1)
+        dst2 = PaletteFull(dst1)
     End Sub
 End Class
 
@@ -299,7 +299,7 @@ Public Class RedPrep_ReductionChoices : Inherits TaskParent
                 plot.histArray(i) = i
             Next
         End If
-        dst3 = ShowPalette254(dst2)
+        dst3 = PaletteBlackZero(dst2)
 
         labels(2) = "Using reduction factor = " + CStr(reduceAmt)
     End Sub
@@ -699,6 +699,6 @@ Public Class XO_RedList_OnlyColorAlt : Inherits TaskParent
         labels(3) = CStr(task.redList.rcList.Count) + " cells were identified."
         labels(2) = task.redList.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
 
-        If task.redList.rcList.Count > 0 Then dst2 = ShowPalette(lastMap)
+        If task.redList.rcList.Count > 0 Then dst2 = PaletteFull(lastMap)
     End Sub
 End Class

@@ -1336,7 +1336,7 @@ Public Class Hist_CloudSegments : Inherits TaskParent
             dst1.SetTo(i + 1, mask)
         Next
         dst1.SetTo(0, task.noDepthMask)
-        dst3 = ShowPalette((dst1 + 1))
+        dst3 = PaletteFull((dst1 + 1))
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -1567,7 +1567,7 @@ Public Class Hist_PointCloud : Inherits TaskParent
                 labels(2) = "2D plot of the resulting 3D histogram."
         End Select
 
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
 
         Dim histArray(histogram.Total - 1) As Single
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)

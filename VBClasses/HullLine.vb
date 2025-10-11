@@ -92,6 +92,6 @@ Public Class HullLine_SelectHull : Inherits TaskParent
 
         dst1.SetTo(0)
         DrawTour(dst1, contour.hull, (contour.ID) Mod 255, -1)
-        dst3 = ShowPalette254(dst1)
+        dst3 = PaletteBlackZero(dst1)
     End Sub
 End Class

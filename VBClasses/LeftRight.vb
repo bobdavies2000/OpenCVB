@@ -47,8 +47,8 @@ Public Class LeftRight_Palettized : Inherits TaskParent
         labels(3) = "Right Image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = ShowPalette(task.leftView)
-        dst3 = ShowPalette(task.rightView)
+        dst2 = PaletteFull(task.leftView)
+        dst3 = PaletteFull(task.rightView)
     End Sub
 End Class
 
@@ -112,7 +112,7 @@ Public Class LeftRight_RedRightGray : Inherits TaskParent
         color8u.Run(task.rightView)
         redMask.Run(color8u.dst2)
         dst2 = redMask.dst2.Clone
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
         labels = redMask.labels
     End Sub
 End Class
@@ -131,7 +131,7 @@ Public Class LeftRight_RedLeftGray : Inherits TaskParent
         color8u.Run(task.leftView)
         redMask.Run(color8u.dst2)
         dst2 = redMask.dst2.Clone
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
         labels = redMask.labels
     End Sub
 End Class

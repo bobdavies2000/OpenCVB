@@ -188,7 +188,7 @@ Public Class Distance_Peaks : Inherits TaskParent
             If mm.maxVal > 0 Then ptList.Add(New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y))
             countList.Add(distance32f(rect).CountNonZero)
         Next
-        dst2 = ShowPalette(dst1)
+        dst2 = PaletteFull(dst1)
 
         If standalone Then
             dst0.SetTo(0)
@@ -229,7 +229,7 @@ Public Class Distance_Labels : Inherits TaskParent
         dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        dst3 = ShowPalette(dst1)
+        dst3 = PaletteFull(dst1)
         If standalone Then dst3.SetTo(0, task.depthMask)
     End Sub
 End Class

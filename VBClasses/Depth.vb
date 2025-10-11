@@ -210,7 +210,7 @@ Public Class Depth_ColorMap : Inherits TaskParent
 
         cv.Cv2.ConvertScaleAbs(task.pcSplit(2) * 1000, dst1, options.alpha, options.beta)
         dst1 += 1
-        dst2 = ShowPalette(dst1)
+        dst2 = PaletteFull(dst1)
         dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -699,7 +699,7 @@ Public Class Depth_InRange : Inherits TaskParent
         dst0 = src.Clone
         dst0.SetTo(white, dst3)
 
-        If standaloneTest() Then dst2 = ShowPalette(dst2)
+        If standaloneTest() Then dst2 = PaletteFull(dst2)
         If task.heartBeat Then labels(2) = Format(classCount, "000") + " regions were found"
     End Sub
 End Class
@@ -732,7 +732,7 @@ Public Class Depth_Regions : Inherits TaskParent
         dst0.ConvertTo(dst2, cv.MatType.CV_8U)
         dst2.SetTo(0, task.noDepthMask)
 
-        If standaloneTest() Then dst3 = ShowPalette(dst2)
+        If standaloneTest() Then dst3 = PaletteFull(dst2)
         labels(2) = CStr(classCount) + " regions defined in the depth data"
     End Sub
 End Class
@@ -1003,7 +1003,7 @@ Public Class Depth_Tiers : Inherits TaskParent
             End If
         End If
 
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
         labels(2) = $"{classCount} regions found."
     End Sub
 End Class
@@ -1262,7 +1262,7 @@ Public Class Depth_ErrorEstimate : Inherits TaskParent
         Next
 
         Dim mm = GetMinMax(dst1)
-        dst2 = ShowPalette(dst1)
+        dst2 = PaletteFull(dst1)
         ' dst2.SetTo(0, task.noDepthMask)
         labels(3) = "Error estimates vary from " + Format(mm.minVal, fmt3) + " to " + Format(mm.maxVal, fmt3)
         If task.brickD Is Nothing Then Exit Sub

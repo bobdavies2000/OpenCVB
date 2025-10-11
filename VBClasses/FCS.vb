@@ -151,7 +151,7 @@ Public Class FCS_Core : Inherits TaskParent
             fcsMap.FillConvexPoly(facetList, i, cv.LineTypes.Link8)
         Next
 
-        If standaloneTest() Then dst2 = ShowPalette(fcsMap)
+        If standaloneTest() Then dst2 = PaletteFull(fcsMap)
 
         If task.heartBeat Then labels(2) = traceName + ": " + CStr(inputFeatures.Count) + " cells found."
     End Sub
@@ -231,7 +231,7 @@ Public Class FCS_CreateList : Inherits TaskParent
             Next
         End If
 
-        dst2 = ShowPalette(dst1)
+        dst2 = PaletteFull(dst1)
         For Each fp In task.fpList
             If fp.depth > 0 Then DrawCircle(dst2, fp.pt, task.DotSize, task.highlight)
         Next
@@ -827,7 +827,7 @@ Public Class FCS_ByDepth : Inherits TaskParent
             SetTrueText(Format(fp.age, fmt0), fp.pt, 0)
             fpCellContour(fp, task.color, 0)
         Next
-        dst3 = ShowPalette(palInput)
+        dst3 = PaletteFull(palInput)
         dst3.SetTo(0, palInput.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
 
 

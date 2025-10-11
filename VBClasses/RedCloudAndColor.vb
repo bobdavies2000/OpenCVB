@@ -21,7 +21,7 @@ Public Class RedCloudAndColor_Basics : Inherits TaskParent
 
 
 
-        dst0 = ShowPalette254(dst1)
+        dst0 = PaletteBlackZero(dst1)
 
 
 

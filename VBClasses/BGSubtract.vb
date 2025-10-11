@@ -353,7 +353,7 @@ Public Class BGSubtract_Reduction : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         reduction.Run(src)
         Dim mm = GetMinMax(reduction.dst2)
-        dst2 = ShowPalette(reduction.dst2)
+        dst2 = PaletteFull(reduction.dst2)
 
         bgSub.Run(dst2)
         dst3 = bgSub.dst2.Clone

@@ -230,7 +230,7 @@ Public Class Region_Contours : Inherits TaskParent
             dst1(md.rect).SetTo(md.index, md.mask)
         Next
 
-        dst2 = ShowPalette(dst1)
+        dst2 = PaletteFull(dst1)
         dst2.SetTo(0, connect.dst2)
         dst3 = ShowAddweighted(src, dst2, labels(3))
         If task.heartBeat Then labels(2) = "There were " + CStr(redM.mdList.Count) + " connected contours found."

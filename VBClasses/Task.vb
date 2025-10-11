@@ -254,7 +254,7 @@ Public Class VBtask : Implements IDisposable
     Public vecColors(255) As cv.Vec3b
     Public depthColorMap As cv.Mat
     Public colorMap As cv.Mat
-    Public colorMapNoZero As cv.Mat
+    Public colorMapZeroIsBlack As cv.Mat
     Public correlationColorMap As cv.Mat
 
     Public topCameraPoint As cv.Point

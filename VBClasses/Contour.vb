@@ -135,7 +135,7 @@ Public Class Contour_Regions : Inherits TaskParent
             areaList.Add(ele.Key)
             DrawTour(dst0, allContours(ele.Value).ToList, contourList.Count, -1, cv.LineTypes.Link8)
         Next
-        dst2 = ShowPalette(dst0)
+        dst2 = PaletteFull(dst0)
         labels(2) = $"Top {contourList.Count} contours in contourList from the " + CStr(sortedList.Count) + " found."
     End Sub
 End Class
@@ -813,7 +813,7 @@ Public Class Contour_Isolate : Inherits TaskParent
             dst1(contour.rect).SetTo(index + 1, contour.mask)
         Next
 
-        dst3 = ShowPalette(dst1)
+        dst3 = PaletteFull(dst1)
 
         For Each contour In task.contours.contourList
             DrawCircle(dst3, contour.maxDist)
@@ -856,7 +856,7 @@ Public Class Contour_Hulls : Inherits TaskParent
             contourList.Add(tour)
         Next
 
-        dst3 = ShowPalette(contourMap)
+        dst3 = PaletteFull(contourMap)
         If task.heartBeat Then labels(3) = CStr(contourList.Count) + " hulls"
     End Sub
 End Class
@@ -1125,7 +1125,7 @@ Public Class Contour_RotateRect : Inherits TaskParent
             DrawTour(dst1, contours(tuple.Item2).ToList, (i Mod 254) + 1, task.lineWidth, cv.LineTypes.Link4)
         Next
 
-        dst3 = ShowPalette254(dst1)
+        dst3 = PaletteBlackZero(dst1)
         labels(2) = "There were " + CStr(sortedTours.Count) + " contours found with width and height greater than " + CStr(options.minSize)
     End Sub
 End Class
@@ -1277,7 +1277,7 @@ Public Class Contour_Sort : Inherits TaskParent
             dst1(tour.rect).SetTo(tour.ID Mod 255, tour.mask)
         Next
 
-        dst2 = ShowPalette254(dst1)
+        dst2 = PaletteBlackZero(dst1)
         Dim matched As Integer
         For Each tour In contourList
             If tour.age > 1 Then matched += 1

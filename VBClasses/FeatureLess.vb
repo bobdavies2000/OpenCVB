@@ -213,7 +213,7 @@ Public Class FeatureLess_Groups : Inherits TaskParent
         If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
         redCPP.Run(dst2 - 1)
         classCount = redCPP.classCount
-        dst3 = ShowPalette(redCPP.dst2)
+        dst3 = PaletteFull(redCPP.dst2)
         labels(3) = CStr(classCount) + " featureless regions were found."
     End Sub
 End Class

@@ -22,7 +22,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Return Nothing
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
+        If task.heartBeat Or task.optionsChanged Then
             redCore.Run(src)
             dst2 = redCore.dst2
             labels(2) = redCore.labels(2)
@@ -58,7 +58,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
                 End If
             Next
 
-            dst2 = ShowPalette254(pcMap)
+            dst2 = PaletteBlackZero(pcMap)
             labels(2) = CStr(pcList.Count) + " regions were identified "
 
             Dim cellsOnly = dst3.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
@@ -172,7 +172,7 @@ Public Class RedCloud_Sweep : Inherits TaskParent
             Next
         Next
 
-        dst2 = ShowPalette254(dst1)
+        dst2 = PaletteBlackZero(dst1)
 
         For Each pc In pcList
             dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)

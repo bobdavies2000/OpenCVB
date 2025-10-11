@@ -32,7 +32,7 @@ Public Class Delaunay_Basics : Inherits TaskParent
         Next
 
         dst3.ConvertTo(dst1, cv.MatType.CV_8U)
-        dst2 = ShowPalette(dst1)
+        dst2 = PaletteFull(dst1)
 
         labels(2) = traceName + ": " + Format(inputPoints.Count, "000") + " cells were present."
     End Sub

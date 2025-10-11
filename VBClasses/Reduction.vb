@@ -15,21 +15,21 @@ Public Class Reduction_Basics : Inherits TaskParent
             Dim bits = options.bitwiseValue
             classCount = 255 / Math.Pow(2, bits)
             Dim zeroBits = Math.Pow(2, bits) - 1
-            dst1 = src And New cv.Mat(src.Size(), src.Type, cv.Scalar.All(255 - zeroBits))
-            dst1 = dst1 / zeroBits
+            dst2 = src And New cv.Mat(src.Size(), src.Type, cv.Scalar.All(255 - zeroBits))
+            dst2 = dst2 / zeroBits
         ElseIf options.simpleReduction Then
             classCount = Math.Ceiling(255 / options.simpleReductionValue)
 
-            dst1 = src / options.simpleReductionValue + 1 ' map the input to values ranging from 1 to X - no zeros allowed.
+            dst2 = src / options.simpleReductionValue + 1 ' map the input to values ranging from 1 to X - no zeros allowed.
             labels(2) = "Reduced image - factor = " + CStr(options.simpleReductionValue)
         Else
-            dst1 = src
+            dst2 = src
             labels(2) = "No reduction requested"
         End If
 
-        dst1.CopyTo(dst2, task.motionMask)
+        ' dst1.CopyTo(dst2, task.motionMask)
 
-        If standaloneTest() Or alwaysDisplay Then dst3 = ShowPalette254(dst2)
+        If standaloneTest() Or alwaysDisplay Then dst3 = PaletteBlackZero(dst2)
         labels(2) = CStr(classCount) + " colors after reduction"
     End Sub
 End Class
@@ -46,7 +46,7 @@ Public Class Reduction_Floodfill : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         reduction.Run(src)
-        dst2 = ShowPalette(reduction.dst2)
+        dst2 = PaletteFull(reduction.dst2)
         dst3 = runRedList(reduction.dst2, labels(3))
     End Sub
 End Class
@@ -160,7 +160,7 @@ Public Class Reduction_BGR : Inherits TaskParent
         For i = 0 To 2
             reduction.Run(split(i))
             If standaloneTest() Then
-                mats.mat(i) = ShowPalette(reduction.dst2)
+                mats.mat(i) = PaletteFull(reduction.dst2)
             End If
         Next
 
@@ -223,7 +223,7 @@ Public Class Reduction_PointCloud : Inherits TaskParent
         reduction.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
 
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst3 = ShowPalette(dst2 + 1)
+        dst3 = PaletteFull(dst2 + 1)
     End Sub
 End Class
 

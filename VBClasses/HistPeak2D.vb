@@ -35,7 +35,7 @@ Public Class HistPeak2D_Basics : Inherits TaskParent
 
         Dim backProjection As New cv.Mat
         cv.Cv2.CalcBackProject({src}, task.channels, histogram, backProjection, ranges)
-        dst2 = ShowPalette(backProjection)
+        dst2 = PaletteFull(backProjection)
     End Sub
 End Class
 
@@ -68,7 +68,7 @@ Public Class HistPeak2D_TopAndSide : Inherits TaskParent
         End If
         peak.Run(task.pointCloud)
         dst1 = peak.dst2
-        dst2 = ShowPalette(dst1)
+        dst2 = PaletteFull(dst1)
     End Sub
 End Class
 

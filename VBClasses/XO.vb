@@ -1070,7 +1070,7 @@ Public Class XO_OpenGL_RedCloud : Inherits TaskParent
         dst2 = runRedList(src, labels(2))
 
         task.ogl.pointCloudInput = task.pointCloud
-        task.ogl.Run(ShowPalette(dst2))
+        task.ogl.Run(PaletteFull(dst2))
     End Sub
 End Class
 
@@ -4647,7 +4647,7 @@ Public Class XO_Region_Palette : Inherits TaskParent
                 End If
             End If
         Next
-        mats.mat(0) = ShowPalette(dst1)
+        mats.mat(0) = PaletteFull(dst1)
 
         mats.mat(1) = ShowAddweighted(src, mats.mat(0), labels(3))
 
@@ -4674,7 +4674,7 @@ Public Class XO_Region_Palette : Inherits TaskParent
                 End If
             End If
         Next
-        mats.mat(2) = ShowPalette(dst1)
+        mats.mat(2) = PaletteFull(dst1)
 
         mats.mat(3) = ShowAddweighted(src, mats.mat(2), labels(3))
         If task.heartBeat Then labels(2) = CStr(indexV + indexH) + " regions were found that were connected in depth."
@@ -6457,7 +6457,7 @@ Public Class XO_Contour_RC_AddContour : Inherits TaskParent
             src = reduction.dst2
         End If
         dst2 = src.Clone
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
 
         contours.Run(dst2)
 
@@ -7599,7 +7599,7 @@ Public Class XO_RedPrep_BasicsCalcHist : Inherits TaskParent
         histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
         cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst1, ranges)
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
         dst3.SetTo(0, task.noDepthMask)
 
         labels(2) = "Pointcloud data backprojection to " + CStr(task.histogramBins) + " classes."
@@ -7654,7 +7654,7 @@ Public Class XO_Contour_Depth : Inherits TaskParent
             trueData = New List(Of TrueText)(saveTrueData)
         End If
 
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
         labels(2) = "CV_8U format of the " + CStr(depthContourList.Count) + " depth contours"
     End Sub
 End Class
@@ -7909,7 +7909,7 @@ Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
             dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
         End If
 
-        dst1 = ShowPalette254(task.lines.lineCore.lpRectMap)
+        dst1 = PaletteBlackZero(task.lines.lineCore.lpRectMap)
         dst1.Circle(lp.ptCenter, task.DotSize, task.highlight, task.lineWidth, task.lineType)
 
         labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
@@ -10494,7 +10494,7 @@ Public Class XO_Line_BasicsNoAging : Inherits TaskParent
             If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
 
-        If standaloneTest() Then dst1 = ShowPalette(lpRectMap)
+        If standaloneTest() Then dst1 = PaletteFull(lpRectMap)
         labels(2) = "Of the " + CStr(rawLines.lpList.Count) + " raw lines found, shown below are the " + CStr(lpList.Count) + " longest."
     End Sub
 End Class
@@ -10795,7 +10795,7 @@ Public Class XO_KNN_LongestLine : Inherits TaskParent
         dst3 = task.lines.dst3
         labels(3) = task.lines.labels(3)
 
-        dst1 = ShowPalette254(task.lines.lineCore.lpRectMap)
+        dst1 = PaletteBlackZero(task.lines.lineCore.lpRectMap)
     End Sub
 End Class
 
@@ -10824,7 +10824,7 @@ Public Class XO_KNN_BoundingRect : Inherits TaskParent
             lp = lplist(sortRects.ElementAt(0).Value)
         End If
 
-        dst1 = ShowPalette254(task.lines.lineCore.lpRectMap)
+        dst1 = PaletteBlackZero(task.lines.lineCore.lpRectMap)
         DrawCircle(dst1, lp.ptCenter)
 
         Dim index = task.lines.lineCore.lpRectMap.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
@@ -12385,7 +12385,7 @@ Public Class XO_RedCloud_Mats : Inherits TaskParent
             histogram = cv.Mat.FromPixelData(histogram.Rows, 1, cv.MatType.CV_32F, histArray)
             cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst0, ranges)
             dst0.ConvertTo(dst1, cv.MatType.CV_8U)
-            mats.mat(i) = ShowPalette(dst1)
+            mats.mat(i) = PaletteFull(dst1)
             mats.mat(i).SetTo(0, task.noDepthMask)
         Next
 
@@ -12537,7 +12537,7 @@ Public Class XO_RedPrep_BasicsShow : Inherits TaskParent
         ' dst2.SetTo(0, task.noDepthMask)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
         Dim mm = GetMinMax(dst2)
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
         task.setSelectedCell()
 
         labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
@@ -12713,7 +12713,7 @@ Public Class XO_RedCloud_Basics : Inherits TaskParent
             dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
             SetTrueText(CStr(pc.index), New cv.Point(pc.rect.X, pc.rect.Y))
         Next
-        dst2 = ShowPalette254(dst1)
+        dst2 = PaletteBlackZero(dst1)
 
         Dim clickIndex = dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
         If clickIndex > 0 And clickIndex < pcList.Count Then
@@ -12767,7 +12767,7 @@ Public Class XO_Flood_CloudData : Inherits TaskParent
             Next
         Next
 
-        dst3 = ShowPalette254(dst0)
+        dst3 = PaletteBlackZero(dst0)
         labels(2) = CStr(index) + " regions were identified"
     End Sub
 End Class
@@ -13273,7 +13273,7 @@ Public Class XO_RedList_BasicsNoMask : Inherits TaskParent
             rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
         Next
 
-        If standalone Then dst3 = ShowPalette(dst2)
+        If standalone Then dst3 = PaletteFull(dst2)
 
         If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
         If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
@@ -13905,7 +13905,7 @@ Public Class XO_LeftRight_RedRight : Inherits TaskParent
         fLess.Run(task.rightView)
         dst2 = fLess.dst2
         redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst2 = ShowPalette(redMask.dst2)
+        dst2 = PaletteFull(redMask.dst2)
         labels(2) = redMask.labels(2)
     End Sub
 End Class
@@ -13926,7 +13926,7 @@ Public Class XO_LeftRight_RedLeft : Inherits TaskParent
         dst3 = task.leftView
         fLess.Run(src)
         redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst2 = ShowPalette(redMask.dst2)
+        dst2 = PaletteFull(redMask.dst2)
         labels(2) = redMask.labels(2)
     End Sub
 End Class
@@ -13967,7 +13967,7 @@ Public Class XO_RedList_OutlineColor : Inherits TaskParent
         color8U.Run(src)
         dst1 = color8U.dst2 + 1
         dst1.SetTo(0, outline.dst2)
-        dst3 = ShowPalette(dst1)
+        dst3 = PaletteFull(dst1)
 
         dst2 = runRedList(dst1, labels(2))
     End Sub

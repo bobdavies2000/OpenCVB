@@ -514,7 +514,7 @@ Public Class MSER_Binarize : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bin4.Run(src)
-        dst2 = ShowPalette(bin4.dst2)
+        dst2 = PaletteFull(bin4.dst2)
 
         mser.Run(dst2)
         dst3 = mser.dst2
@@ -689,7 +689,7 @@ Public Class MSER_CPP : Inherits TaskParent
             maskCounts.Add(maskData.Get(Of Integer)(index, 0))
         Next
 
-        dst2 = ShowPalette(dst0)
+        dst2 = PaletteFull(dst0)
         If standaloneTest() Then
             dst3 = src
             For i = 0 To boxes.Count - 1

@@ -32,7 +32,7 @@ Public Class BackProject2D_Basics : Inherits TaskParent
         If backProjectByGrid Then
             Dim mm = GetMinMax(dst0)
             classCount = mm.maxVal
-            dst3 = ShowPalette(dst0)
+            dst3 = PaletteFull(dst0)
         Else
             dst3.SetTo(0)
             dst3.SetTo(cv.Scalar.Yellow, dst0)
@@ -149,7 +149,7 @@ Public Class BackProject2D_Top : Inherits TaskParent
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, heat.histogramTop, dst1, task.rangesTop)
         dst1 = dst1.ConvertScaleAbs()
         dst1.ConvertTo(dst1, cv.MatType.CV_8U)
-        dst3 = ShowPalette(dst1)
+        dst3 = PaletteFull(dst1)
     End Sub
 End Class
 
@@ -170,7 +170,7 @@ Public Class BackProject2D_Side : Inherits TaskParent
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, heat.histogramSide, dst1, task.rangesSide)
         dst1 = dst1.ConvertScaleAbs()
         dst1.ConvertTo(dst1, cv.MatType.CV_8U)
-        dst3 = ShowPalette(dst1)
+        dst3 = PaletteFull(dst1)
     End Sub
 End Class
 

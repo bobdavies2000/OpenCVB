@@ -46,7 +46,7 @@ Public Class AsciiArt_Color : Inherits TaskParent
                 dst3(r).SetTo(asciiChar)
             Next
         Next
-        dst2 = ShowPalette(dst3)
+        dst2 = PaletteFull(dst3)
     End Sub
 End Class
 

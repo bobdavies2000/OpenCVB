@@ -245,7 +245,7 @@ Public Class XO_RedList_Tiers : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         binar4.Run(src)
-        dst1 = ShowPalette(binar4.dst2)
+        dst1 = PaletteFull(binar4.dst2)
 
         tiers.Run(src)
         dst3 = tiers.dst3

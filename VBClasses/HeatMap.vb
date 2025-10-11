@@ -25,8 +25,8 @@ Public Class HeatMap_Basics : Inherits TaskParent
         sideframes.Run(histogramSide)
         dst1 = sideframes.dst2
 
-        dst2 = ShowPalette254(dst0.ConvertScaleAbs()).Clone
-        dst3 = ShowPalette254(dst1.ConvertScaleAbs())
+        dst2 = PaletteBlackZero(dst0.ConvertScaleAbs()).Clone
+        dst3 = PaletteBlackZero(dst1.ConvertScaleAbs())
         labels(2) = "Top view of heat map with the last " + CStr(task.frameHistoryCount) + " frames"
         labels(3) = "Side view of heat map with the last " + CStr(task.frameHistoryCount) + " frames"
     End Sub

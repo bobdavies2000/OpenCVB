@@ -22,7 +22,7 @@ Public Class Hist3D_Basics : Inherits TaskParent
         hCloud.dst2.CopyTo(dst2, task.depthMask)
         classCount = hColor.classCount + hCloud.classCount
 
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
         labels(3) = CStr(classCount) + " classes "
     End Sub
 End Class
@@ -187,7 +187,7 @@ Public Class Hist3D_Pixel : Inherits TaskParent
         Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
 
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
     End Sub
 End Class
 
@@ -215,7 +215,7 @@ Public Class Hist3D_PixelCells : Inherits TaskParent
             cv.Cv2.CalcBackProject({src(rc.rect)}, {0, 1, 2}, pixel.histogram, dst2(rc.rect), task.rangesBGR)
         Next
 
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
     End Sub
 End Class
 

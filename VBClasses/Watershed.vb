@@ -37,7 +37,7 @@ Public Class Watershed_Basics : Inherits TaskParent
             markers *= Math.Truncate(255 / rects.Count)
             Dim tmp As New cv.Mat
             markers.ConvertTo(tmp, cv.MatType.CV_8U)
-            dst3 = ShowPalette(tmp)
+            dst3 = PaletteFull(tmp)
 
             dst2 = ShowAddweighted(dst3, src, labels(2))
         Else

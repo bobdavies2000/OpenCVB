@@ -41,7 +41,7 @@ Public Class Hist3Dcloud_Basics : Inherits TaskParent
 
         dst2.SetTo(0, task.noDepthMask)
         'dst2.SetTo(classCount, task.maxDepthMask)
-        dst3 = ShowPalette(dst2)
+        dst3 = PaletteFull(dst2)
 
         labels(2) = simK.labels(2) + " with " + CStr(bins) + " histogram bins"
         labels(3) = "LastClassCount/classCount = " + CStr(classCount) + "/" + CStr(classCount)
