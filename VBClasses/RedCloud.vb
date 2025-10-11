@@ -1,13 +1,15 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
-    Public redCore As New RedCloud_Core
+    Dim redCore As New RedCloud_Core
     Public pcList As New List(Of cloudData)
-    Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public percentImage As Single
+    Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public prepEdges As New RedPrep_Basics
     Public Sub New()
         task.redCloud = Me
-        desc = "Build contours for each cell"
+        redCore.redSweep.prepEdges = prepEdges
+        desc = "Run RedCloud_Map on the heartbeat but just floodFill at maxDist otherwise."
     End Sub
     Public Shared Function selectCell() As String
         task.pcD = RedCell_Basics.displayCell()
@@ -20,10 +22,75 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Return Nothing
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        redCore.Run(src)
-        dst3 = redCore.dst3
-        labels(3) = redCore.labels(3)
-        labels(2) = redCore.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
+        If task.heartBeat Then
+            redCore.Run(src)
+            dst2 = redCore.dst2
+            labels(2) = redCore.labels(2)
+        Else
+            Dim pcListLast = New List(Of cloudData)(redCore.pcList)
+
+            prepEdges.Run(src)
+            dst3 = Not prepEdges.dst2
+
+            Dim index As Integer = 1
+            Dim rect As New cv.Rect
+            Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
+            Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
+            Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
+            Dim minCount = dst3.Total * 0.001
+            pcList.Clear()
+            pcMap.SetTo(0)
+            For Each pc In pcListLast
+                Dim pt = pc.maxDist
+                If pcMap.Get(Of Byte)(pt.Y, pt.X) = 0 Then
+                    Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
+                    If rect.Width > 0 And rect.Height > 0 Then
+                        Dim pcc = MaxDist_Basics.setCloudData(dst3(rect).InRange(index, index), rect, index)
+                        If pcc IsNot Nothing Then
+                            pcc.index = pc.index
+                            pcc.color = pc.color
+                            pcc.age = pc.age + 1
+                            index += 1
+                            pcList.Add(pcc)
+                            pcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.contourMask)
+                        End If
+                    End If
+                End If
+            Next
+
+            dst2 = ShowPalette254(pcMap)
+            labels(2) = CStr(pcList.Count) + " regions were identified "
+
+            Dim cellsOnly = dst3.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
+            percentImage = cellsOnly / task.depthMask.CountNonZero
+            Static targetSlider = OptionParent.FindSlider("Reduction Target")
+            If percentImage < 0.8 Then
+                If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
+            End If
+
+            'SetTrueText(RedCloud_Basics.selectCell() + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf +
+            '        CStr(pcList.Count) + " cells present", 3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_Core : Inherits TaskParent
+    Public redSweep As New RedCloud_Sweep
+    Public pcList As New List(Of cloudData)
+    Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public Sub New()
+        desc = "Build contours for each cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redSweep.Run(src)
+        dst3 = redSweep.dst3
+        labels(3) = redSweep.labels(3)
+        labels(2) = redSweep.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
 
         Static pcListLast = New List(Of cloudData)(pcList)
         Static pcMapLast As cv.Mat = pcMap.clone
@@ -32,7 +99,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Dim r2 As cv.Rect
         pcMap.setto(0)
         dst2.SetTo(0)
-        For Each pc In redCore.pcList
+        For Each pc In redSweep.pcList
             Dim r1 = pc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
             Dim indexLast = pcMapLast.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
@@ -53,17 +120,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
 
-        Dim cellsOnly = dst3.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
-        percentImage = cellsOnly / task.depthMask.CountNonZero
-        Static targetSlider = OptionParent.FindSlider("Reduction Target")
-        If percentImage < 0.8 Then
-            If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
-        End If
-
-        SetTrueText(selectCell() + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf +
-                    CStr(pcList.Count) + " cells present", 3)
-
-        pcListLast = New List(Of cloudData)(task.redCloud.pcList)
+        pcListLast = New List(Of cloudData)(pcList)
         pcMapLast = pcMap.clone
     End Sub
 End Class
@@ -72,7 +129,7 @@ End Class
 
 
 
-Public Class RedCloud_Core : Inherits TaskParent
+Public Class RedCloud_Sweep : Inherits TaskParent
     Public prepEdges As New RedPrep_Basics
     Public pcList As New List(Of cloudData)
     Public Sub New()

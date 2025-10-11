@@ -338,7 +338,7 @@ Public Class sgl
                 For Each pc In task.redCloud.pcList
                     Dim count As Single = pc.hull.Count
                     For i = 0 To pc.hull.Count - 1
-                        pt = New cv.Point(pc.hull(i).X + pc.rect.X, pc.hull(i).Y + pc.rect.Y)
+                        pt = New cv.Point(CInt(pc.hull(i).X + pc.rect.X), CInt(pc.hull(i).Y + pc.rect.Y))
                         vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
                         If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
                         gl.TexCoord(pt.X / w, pt.Y / h)
@@ -349,7 +349,7 @@ Public Class sgl
                         gl.TexCoord(pc.maxDist.X / w, pc.maxDist.Y / h)
                         gl.Vertex(vec(0), -vec(1), -vec(2))
 
-                        pt = New cv.Point(pc.hull((i + 1) Mod count).X + pc.rect.X, pc.hull((i + 1) Mod count).Y + pc.rect.Y)
+                        pt = New cv.Point(CInt(pc.hull((i + 1) Mod count).X + pc.rect.X), CInt(pc.hull((i + 1) Mod count).Y + pc.rect.Y))
 
                         vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
                         If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))

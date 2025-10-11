@@ -1,7 +1,4 @@
-﻿Imports System.Security.Cryptography
-Imports OpenCvSharp
-Imports SharpGL.SceneGraph.Primitives
-Imports VBClasses.TaskParent
+﻿Imports VBClasses.TaskParent
 Imports cv = OpenCvSharp
 Public Module vbc
     Public task As VBtask

@@ -1,19 +1,20 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedColor_Basics : Inherits TaskParent
-    Dim redC As New RedColor_Core
-    Public pcList As New List(Of cloudData)
     Dim reduction As New Reduction_Basics
+    Dim redCore As New RedColor_Core
+    Public pcList As New List(Of cloudData)
     Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
+        task.redColor = Me
         desc = "Run RedColor_Core on the heartbeat but just floodFill at maxDist otherwise."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Or task.optionsChanged Then
-            redC.Run(src)
-            dst2 = redC.dst2
-            labels(2) = redC.labels(2)
+            redCore.Run(src)
+            dst2 = redCore.dst2
+            labels(2) = redCore.labels(2)
         Else
-            Dim pcListLast = New List(Of cloudData)(redC.pcList)
+            Dim pcListLast = New List(Of cloudData)(redCore.pcList)
 
             If src.Type <> cv.MatType.CV_8U Then src = task.gray
             reduction.Run(src)
@@ -56,8 +57,8 @@ End Class
 
 
 
-Public Class RedColor_Match : Inherits TaskParent
-    Public redCore As New RedColor_Core
+Public Class RedColor_Core : Inherits TaskParent
+    Public redSweep As New RedColor_Sweep
     Public pcList As New List(Of cloudData)
     Public pcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public percentImage As Single
@@ -65,17 +66,17 @@ Public Class RedColor_Match : Inherits TaskParent
         desc = "Track the RedColor cells from RedColor_Core"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        redCore.Run(src)
-        dst3 = redCore.dst3
+        redSweep.Run(src)
+        dst3 = redSweep.dst3
 
-        Static pcListLast = New List(Of cloudData)(redCore.pcList)
-        Static pcMapLast As cv.Mat = redCore.pcMap.clone
+        Static pcListLast = New List(Of cloudData)(redSweep.pcList)
+        Static pcMapLast As cv.Mat = redSweep.pcMap.clone
 
         pcList.Clear()
         Dim r2 As cv.Rect
         pcMap.SetTo(0)
         dst2.SetTo(0)
-        For Each pc In redCore.pcList
+        For Each pc In redSweep.pcList
             Dim r1 = pc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
             Dim indexLast = pcMapLast.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
@@ -105,7 +106,7 @@ End Class
 
 
 
-Public Class RedColor_Core : Inherits TaskParent
+Public Class RedColor_Sweep : Inherits TaskParent
     Public pcList As New List(Of cloudData)
     Dim reduction As New Reduction_Basics
     Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

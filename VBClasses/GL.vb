@@ -1,6 +1,4 @@
-﻿Imports OpenCvSharp
-Imports SharpGL.SceneGraph.Lighting
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class GL_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Display the pointcloud"
@@ -599,7 +597,7 @@ Public Class GL_RedCloudHulls : Inherits TaskParent
                     End If
                 End If
 
-                pt = New cv.Point(pc.hull(i).X + pc.rect.X, pc.hull(i).Y + pc.rect.Y)
+                pt = New cv.Point(CInt(pc.hull(i).X + pc.rect.X), CInt(pc.hull(i).Y + pc.rect.Y))
                 vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
                 If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
                 dataBuffer.Add(New cv.Vec3f(vec(0), vec(1), vec(2)))
@@ -608,7 +606,7 @@ Public Class GL_RedCloudHulls : Inherits TaskParent
                 If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pc.maxDist.X, pc.maxDist.Y, pc.depth))
                 dataBuffer.Add(New cv.Vec3f(vec(0), vec(1), vec(2)))
 
-                pt = New cv.Point(pc.hull((i + 1) Mod count).X + pc.rect.X, pc.hull((i + 1) Mod count).Y + pc.rect.Y)
+                pt = New cv.Point(CInt(pc.hull((i + 1) Mod count).X + pc.rect.X), CInt(pc.hull((i + 1) Mod count).Y + pc.rect.Y))
 
                 vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
                 If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
