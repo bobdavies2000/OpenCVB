@@ -6,7 +6,15 @@ Public Class RedCell_Basics : Inherits TaskParent
     Public Shared Function selectCell(pcMap As cv.Mat, pcList As List(Of cloudData)) As String
         If pcList.Count > 0 Then
             Dim clickIndex = pcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
-            If clickIndex >= 0 And clickIndex < pcList.Count Then task.pcD = pcList(clickIndex) Else task.pcD = pcList(0)
+            If clickIndex >= 0 And clickIndex < pcList.Count Then
+                task.pcD = pcList(clickIndex)
+            Else
+                Dim ages As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+                For Each pc In pcList
+                    ages.Add(pc.age, pc.index - 1)
+                Next
+                task.pcD = pcList(ages.ElementAt(0).Value)
+            End If
             If task.pcD.rect.Contains(task.ClickPoint) Then Return task.pcD.displayCell
         End If
         Return ""

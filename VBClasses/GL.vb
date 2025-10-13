@@ -576,44 +576,44 @@ Public Class GL_RedCloudHulls : Inherits TaskParent
     Public Sub New()
         desc = "Prepare triangles from the RedCloud_Basics output"
     End Sub
+    Public Shared Function buildBuffer() As List(Of cv.Vec3f)
+        Dim dataBuffer As New List(Of cv.Vec3f)
+        Dim vec(2) As cv.Vec3f, pt As cv.Point
+        For Each pc In task.redCloud.pcList
+            Dim count As Single = pc.hull.Count
+            For i = 0 To pc.hull.Count - 1
+                Dim goodDepth As Boolean = True
+                For j = 0 To vec.Length - 1
+                    Select Case j
+                        Case 0
+                            pt = New cv.Point(CInt(pc.hull(i).X + pc.rect.X), CInt(pc.hull(i).Y + pc.rect.Y))
+                        Case 1
+                            pt = pc.maxDist
+                        Case 2
+                            pt = New cv.Point(CInt(pc.hull((i + 1) Mod count).X + pc.rect.X), CInt(pc.hull((i + 1) Mod count).Y + pc.rect.Y))
+                    End Select
+
+                    vec(j) = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+                    If vec(j)(0) = 0 Or vec(j)(1) = 0 Or vec(j)(2) = 0 Then goodDepth = False
+                Next
+
+                If goodDepth Then
+                    dataBuffer.Add(New cv.Vec3f(pc.color(2), pc.color(1), pc.color(0)))
+                    For j = 0 To vec.Length - 1
+                        dataBuffer.Add(New cv.Vec3f(vec(j)(0), vec(j)(1), vec(j)(2)))
+                    Next
+                End If
+            Next
+        Next
+        Return dataBuffer
+    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         hulls.Run(src)
         dst2 = hulls.dst3
         labels(2) = hulls.labels(2)
         labels(3) = hulls.labels(3)
 
-        Dim dataBuffer As New List(Of cv.Vec3f)
-        Dim vec As cv.Vec3f, pt As cv.Point
-        For Each pc In task.redCloud.pcList
-            Dim count As Single = pc.hull.Count
-            For i = 0 To pc.hull.Count - 1
-                If task.pcD Is Nothing Then
-                    dataBuffer.Add(New cv.Vec3f(pc.color(2), pc.color(1), pc.color(0)))
-                Else
-                    If task.pcD.index = pc.index Then
-                        dataBuffer.Add(New cv.Vec3f(255, 255, 255))
-                    Else
-                        dataBuffer.Add(New cv.Vec3f(pc.color(2), pc.color(1), pc.color(0)))
-                    End If
-                End If
-
-                pt = New cv.Point(CInt(pc.hull(i).X + pc.rect.X), CInt(pc.hull(i).Y + pc.rect.Y))
-                vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-                If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
-                dataBuffer.Add(New cv.Vec3f(vec(0), vec(1), vec(2)))
-
-                vec = task.pointCloud.Get(Of cv.Vec3f)(pc.maxDist.Y, pc.maxDist.X)
-                If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pc.maxDist.X, pc.maxDist.Y, pc.depth))
-                dataBuffer.Add(New cv.Vec3f(vec(0), vec(1), vec(2)))
-
-                pt = New cv.Point(CInt(pc.hull((i + 1) Mod count).X + pc.rect.X), CInt(pc.hull((i + 1) Mod count).Y + pc.rect.Y))
-
-                vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-                If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
-                dataBuffer.Add(New cv.Vec3f(vec(0), vec(1), vec(2)))
-            Next
-        Next
-        strOut = task.sharpGL.RunTriangles(Comm.oCase.drawTriangles, dataBuffer)
+        strOut = task.sharpGL.RunTriangles(Comm.oCase.drawTriangles, buildBuffer())
     End Sub
 End Class
 
@@ -634,7 +634,6 @@ Public Class GL_RedCloudHullsImage : Inherits TaskParent
         labels(2) = hulls.labels(2) + " " + Format(hulls.percentImage, "0.0%") + " of depth data used."
         labels(3) = hulls.labels(3)
 
-        Dim dataBuffer As New List(Of cv.Vec3f)
-        strOut = task.sharpGL.RunTriangles(Comm.oCase.drawTrianglesAndImage, dataBuffer)
+        strOut = task.sharpGL.RunTriangles(Comm.oCase.drawTrianglesAndImage, New List(Of cv.Vec3f))
     End Sub
 End Class

@@ -38,9 +38,9 @@ Public Class RedCloud_Basics : Inherits TaskParent
                 If pcMap.Get(Of Byte)(pt.Y, pt.X) = 0 Then
                     Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 And rect.Width < dst2.Width And rect.Height < dst2.Height Then
-                        Dim pcc = MaxDist_Basics.setCloudData(dst1(rect).InRange(index, index), rect, index)
+                        Dim pcc = MaxDist_Basics.setCloudData(dst1(rect), rect, index)
                         If pcc IsNot Nothing Then
-                            pcc.index = pc.index
+                            pcc.index = index
                             pcc.color = pc.color
                             pcc.age = pc.age + 1
                             pcList.Add(pcc)
@@ -166,7 +166,7 @@ Public Class RedCloud_Sweep : Inherits TaskParent
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount Then
-                            pc = MaxDist_Basics.setCloudData(dst3(rect).InRange(index, index), rect, index)
+                            pc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
                             pc.color = task.vecColors(pc.index)
                             pcList.Add(pc)
                             dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)

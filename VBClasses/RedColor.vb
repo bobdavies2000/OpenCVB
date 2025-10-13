@@ -35,14 +35,14 @@ Public Class RedColor_Basics : Inherits TaskParent
                 If pcMap.Get(Of Byte)(pt.Y, pt.X) = 0 Then
                     Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
-                        Dim pcc = MaxDist_Basics.setCloudData(dst1(rect).InRange(index, index), rect, index)
+                        Dim pcc = MaxDist_Basics.setCloudData(dst1(rect), rect, index)
                         If pcc IsNot Nothing Then
-                            pcc.index = pc.index
                             pcc.color = pc.color
                             pcc.age = pc.age + 1
-                            index += 1
                             pcList.Add(pcc)
                             pcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.contourMask)
+
+                            index += 1
                         End If
                     End If
                 End If
@@ -137,7 +137,7 @@ Public Class RedColor_Sweep : Inherits TaskParent
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 And rect.Width < dst2.Width And rect.Height < dst2.Height Then
                         If count >= minCount Then
-                            Dim pc = MaxDist_Basics.setCloudData(dst3(rect).InRange(index, index), rect, index)
+                            Dim pc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
                             pcList.Add(pc)
                             pcMap(pc.rect).SetTo(pc.index Mod 255, pc.contourMask)
                             index += 1

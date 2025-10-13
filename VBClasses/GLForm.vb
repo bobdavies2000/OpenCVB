@@ -287,11 +287,11 @@ Public Class sgl
         options.Run()
         options2.Run()
         prepareSharpGL()
-        Dim vec As cv.Vec3f
 
         Dim label = ""
         Select Case func
             Case Comm.oCase.drawTriangles
+                Dim vec As cv.Vec3f
                 gl.Begin(OpenGL.GL_TRIANGLES)
 
                 For i = 0 To dataBuffer.Count - 1 Step 4
@@ -335,28 +335,28 @@ Public Class sgl
                 Dim w = task.workRes.Width
                 Dim h = task.workRes.Height
                 Dim pt As cv.Point
-                For Each pc In task.redCloud.pcList
-                    Dim count As Single = pc.hull.Count
-                    For i = 0 To pc.hull.Count - 1
-                        pt = New cv.Point(CInt(pc.hull(i).X + pc.rect.X), CInt(pc.hull(i).Y + pc.rect.Y))
-                        vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-                        If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
-                        gl.TexCoord(pt.X / w, pt.Y / h)
-                        gl.Vertex(vec(0), -vec(1), -vec(2))
+                dataBuffer = GL_RedCloudHulls.buildBuffer()
+                For i = 0 To dataBuffer.Count - 1
 
-                        vec = task.pointCloud.Get(Of cv.Vec3f)(pc.maxDist.Y, pc.maxDist.X)
-                        If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pc.maxDist.X, pc.maxDist.Y, pc.depth))
-                        gl.TexCoord(pc.maxDist.X / w, pc.maxDist.Y / h)
-                        gl.Vertex(vec(0), -vec(1), -vec(2))
+                    pt = New cv.Point(CInt(pc.hull(i).X + pc.rect.X), CInt(pc.hull(i).Y + pc.rect.Y))
+                    vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+                    If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
+                    gl.TexCoord(pt.X / w, pt.Y / h)
+                    gl.Vertex(vec(0), -vec(1), -vec(2))
 
-                        pt = New cv.Point(CInt(pc.hull((i + 1) Mod count).X + pc.rect.X), CInt(pc.hull((i + 1) Mod count).Y + pc.rect.Y))
+                    vec = task.pointCloud.Get(Of cv.Vec3f)(pc.maxDist.Y, pc.maxDist.X)
+                    If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pc.maxDist.X, pc.maxDist.Y, pc.depth))
+                    gl.TexCoord(pc.maxDist.X / w, pc.maxDist.Y / h)
+                    gl.Vertex(vec(0), -vec(1), -vec(2))
 
-                        vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-                        If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
-                        gl.TexCoord(pt.X / w, pt.Y / h)
-                        gl.Vertex(vec(0), -vec(1), -vec(2))
-                    Next
+                    pt = New cv.Point(CInt(pc.hull((i + 1) Mod Count).X + pc.rect.X), CInt(pc.hull((i + 1) Mod Count).Y + pc.rect.Y))
+
+                    vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+                    If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
+                    gl.TexCoord(pt.X / w, pt.Y / h)
+                    gl.Vertex(vec(0), -vec(1), -vec(2))
                 Next
+
 
                 gl.End()
                 gl.DeleteTextures(1, textureID)

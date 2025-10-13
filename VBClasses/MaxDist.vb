@@ -8,7 +8,7 @@ Public Class MaxDist_Basics : Inherits TaskParent
     Public Shared Function setCloudData(mask As cv.Mat, rect As cv.Rect, index As Integer,
                                         Optional zeroRectangle As Boolean = True) As cloudData
         Dim pc As New cloudData
-        pc.mask = mask
+        pc.mask = mask.InRange(index, index)
         pc.rect = rect
         pc.index = index
         pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
@@ -18,12 +18,13 @@ Public Class MaxDist_Basics : Inherits TaskParent
         cv.Cv2.DrawContours(pc.contourMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
 
         If zeroRectangle Then
-            mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1) ' see MaxDist_NoRectangle below to confirm this is not needed.
+            Dim tmp As cv.Mat = mask.Clone
+            tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1) ' see MaxDist_NoRectangle below to confirm this is not needed.
+            Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+            Dim mm As mmData = GetMinMax(distance32f)
+            pc.maxDist.X = mm.maxLoc.X + pc.rect.X
+            pc.maxDist.Y = mm.maxLoc.Y + pc.rect.Y
         End If
-        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-        Dim mm As mmData = GetMinMax(distance32f)
-        pc.maxDist.X = mm.maxLoc.X + pc.rect.X
-        pc.maxDist.Y = mm.maxLoc.Y + pc.rect.Y
 
         pc.hull = cv.Cv2.ConvexHull(pc.contour.ToArray, True).ToList
         pc.hullMask = New cv.Mat(pc.mask.Size, cv.MatType.CV_8U, 0)
