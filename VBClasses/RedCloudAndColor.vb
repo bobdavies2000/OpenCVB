@@ -70,7 +70,7 @@ Public Class RedCloudAndColor_Basics : Inherits TaskParent
         '    pc.index = pcList.Count + 1
         '    pcList.Add(pc)
         '    pcMap(pc.rect).setto(pc.index, pc.mask)
-        '    dst2(pc.rect).SetTo(pc.color, pc.hullMask)
+        '    dst2(pc.rect).SetTo(pc.color, pc.contourmask)
         '    dst2.Circle(pc.maxDist, task.DotSize, pc.color, -1)
         'Next
 

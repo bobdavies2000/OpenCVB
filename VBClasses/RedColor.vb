@@ -62,7 +62,6 @@ Public Class RedColor_Core : Inherits TaskParent
     Public redSweep As New RedColor_Sweep
     Public pcList As New List(Of cloudData)
     Public pcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public percentImage As Single
     Public Sub New()
         desc = "Track the RedColor cells from RedColor_Core"
     End Sub

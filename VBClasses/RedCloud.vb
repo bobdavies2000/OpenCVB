@@ -12,47 +12,48 @@ Public Class RedCloud_Basics : Inherits TaskParent
         desc = "Run RedCloud_Map on the heartbeat but just floodFill at maxDist otherwise."
     End Sub
     Public Shared Function selectCell() As String
-        task.pcD = RedCell_Basics.displayCell()
-        If task.pcD IsNot Nothing Then
-            If task.pcD.rect.Contains(task.ClickPoint) Then
-                task.color(task.pcD.rect).SetTo(white, task.pcD.mask)
-                Return task.pcD.displayCell
-            End If
-        End If
-        Return Nothing
+        Dim displayCell As cloudData = RedCell_Basics.displayCell()
+        If displayCell Is Nothing Then Return ""
+        task.pcD = displayCell
+        If task.pcD.rect.Contains(task.ClickPoint) Then Return task.pcD.displayCell
+        Return ""
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Or task.optionsChanged Then
             redCore.Run(src)
             dst2 = redCore.dst2
             labels(2) = redCore.labels(2)
+            pcList = New List(Of cloudData)(redCore.pcList)
+            dst3 = redCore.dst2
+            dst1 = redCore.redSweep.prepEdges.dst2
         Else
             Dim pcListLast = New List(Of cloudData)(redCore.pcList)
 
             prepEdges.Run(src)
-            dst3 = Not prepEdges.dst2
+            dst1 = prepEdges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
             Dim index As Integer = 1
             Dim rect As New cv.Rect
-            Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
-            Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
+            Dim maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
+            Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
             Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
-            Dim minCount = dst3.Total * 0.001
+            Dim minCount = dst1.Total * 0.001
             pcList.Clear()
             pcMap.SetTo(0)
             For Each pc In pcListLast
                 Dim pt = pc.maxDist
                 If pcMap.Get(Of Byte)(pt.Y, pt.X) = 0 Then
-                    Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
-                    If rect.Width > 0 And rect.Height > 0 Then
-                        Dim pcc = MaxDist_Basics.setCloudData(dst3(rect).InRange(index, index), rect, index)
+                    Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
+                    If rect.Width > 0 And rect.Height > 0 And rect.Width < dst2.Width And rect.Height < dst2.Height Then
+                        Dim pcc = MaxDist_Basics.setCloudData(dst1(rect).InRange(index, index), rect, index)
                         If pcc IsNot Nothing Then
                             pcc.index = pc.index
                             pcc.color = pc.color
                             pcc.age = pc.age + 1
-                            index += 1
                             pcList.Add(pcc)
                             pcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.contourMask)
+
+                            index += 1
                         End If
                     End If
                 End If
@@ -60,17 +61,21 @@ Public Class RedCloud_Basics : Inherits TaskParent
 
             dst2 = PaletteBlackZero(pcMap)
             labels(2) = CStr(pcList.Count) + " regions were identified "
-
-            Dim cellsOnly = dst3.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
-            percentImage = cellsOnly / task.depthMask.CountNonZero
-            Static targetSlider = OptionParent.FindSlider("Reduction Target")
-            If percentImage < 0.8 Then
-                If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
-            End If
-
-            'SetTrueText(RedCloud_Basics.selectCell() + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf +
-            '        CStr(pcList.Count) + " cells present", 3)
         End If
+
+        Dim cellsOnly = pcMap.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
+        percentImage = (percentImage + cellsOnly / task.depthMask.CountNonZero) / 2
+        Static targetSlider = OptionParent.FindSlider("Reduction Target")
+        If percentImage < 0.8 Then
+            If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
+        End If
+
+        Dim clickCell = RedCloud_Basics.selectCell()
+        If clickCell <> "" Then
+            strOut = RedCloud_Basics.selectCell()
+            task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+        End If
+        SetTrueText(strOut + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf + CStr(pcList.Count) + " cells present", 3)
     End Sub
 End Class
 
@@ -83,6 +88,7 @@ Public Class RedCloud_Core : Inherits TaskParent
     Public redSweep As New RedCloud_Sweep
     Public pcList As New List(Of cloudData)
     Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public percentImage As Single
     Public Sub New()
         desc = "Build contours for each cell"
     End Sub
@@ -113,12 +119,28 @@ Public Class RedCloud_Core : Inherits TaskParent
                 pc.color = pcListLast(indexLast).color
             End If
             pc.index = pcList.Count + 1
-            pcMap(pc.rect).setto(pc.index, pc.hullMask)
-            dst2(pc.rect).SetTo(pc.color, pc.hullMask)
+            pcMap(pc.rect).setto(pc.index, pc.contourMask)
+            dst2(pc.rect).SetTo(pc.color, pc.contourMask)
             dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
             pcList.Add(pc)
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
+
+
+        If standaloneTest() Then
+            Dim cellsOnly = pcMap.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
+            percentImage = (percentImage + cellsOnly / task.depthMask.CountNonZero) / 2
+            Static targetSlider = OptionParent.FindSlider("Reduction Target")
+            If percentImage < 0.8 Then
+                If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
+            End If
+        End If
+
+        Dim clickCell = RedCloud_Basics.selectCell()
+        If clickCell <> "" Then
+            strOut = RedCloud_Basics.selectCell()
+            task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+        End If
 
         pcListLast = New List(Of cloudData)(pcList)
         pcMapLast = pcMap.clone
@@ -135,7 +157,6 @@ Public Class RedCloud_Sweep : Inherits TaskParent
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Reduced point cloud - use 'Reduction Target' option to increase/decrease cell sizes."
         desc = "Find the biggest chunks of consistent depth data "
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -178,6 +199,8 @@ Public Class RedCloud_Sweep : Inherits TaskParent
             dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
         Next
         labels(2) = CStr(pcList.Count) + " regions were identified.  Bright areas are < " + CStr(CInt(minCount)) + " pixels (too small.)"
+        labels(3) = "Reduced point cloud - use 'Reduction Target' option to increase/decrease cell sizes.  White cells were to small (> " +
+                    CStr(minCount) + " pixels)"
     End Sub
 End Class
 
@@ -390,8 +413,8 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
                 If pc.age > 1000 Then pc.age = 2
             End If
             pc.index = pcList.Count + 1
-            pcMap(pc.rect).setto(pc.index, pc.hullMask)
-            dst2(pc.rect).SetTo(pc.color, pc.hullMask)
+            pcMap(pc.rect).setto(pc.index, pc.contourMask)
+            dst2(pc.rect).SetTo(pc.color, pc.contourMask)
             dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
             pcList.Add(pc)
             SetTrueText(CStr(pc.age), pc.maxDist)

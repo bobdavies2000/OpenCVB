@@ -8,7 +8,7 @@ Public Class MaxDist_Basics : Inherits TaskParent
     Public Shared Function setCloudData(mask As cv.Mat, rect As cv.Rect, index As Integer,
                                         Optional zeroRectangle As Boolean = True) As cloudData
         Dim pc As New cloudData
-        pc.mask = mask.Clone
+        pc.mask = mask
         pc.rect = rect
         pc.index = index
         pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
