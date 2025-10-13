@@ -11,13 +11,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
         redCore.redSweep.prepEdges = prepEdges
         desc = "Run RedCloud_Map on the heartbeat but just floodFill at maxDist otherwise."
     End Sub
-    Public Shared Function selectCell() As String
-        Dim displayCell As cloudData = RedCell_Basics.displayCell()
-        If displayCell Is Nothing Then Return ""
-        task.pcD = displayCell
-        If task.pcD.rect.Contains(task.ClickPoint) Then Return task.pcD.displayCell
-        Return ""
-    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Or task.optionsChanged Then
             redCore.Run(src)
@@ -70,11 +63,8 @@ Public Class RedCloud_Basics : Inherits TaskParent
             If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
         End If
 
-        Dim clickCell = RedCloud_Basics.selectCell()
-        If clickCell <> "" Then
-            strOut = RedCloud_Basics.selectCell()
-            task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
-        End If
+        strOut = RedCell_Basics.selectCell(pcMap, pcList)
+        If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
         SetTrueText(strOut + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf + CStr(pcList.Count) + " cells present", 3)
     End Sub
 End Class
@@ -126,7 +116,6 @@ Public Class RedCloud_Core : Inherits TaskParent
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
 
-
         If standaloneTest() Then
             Dim cellsOnly = pcMap.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
             percentImage = (percentImage + cellsOnly / task.depthMask.CountNonZero) / 2
@@ -134,12 +123,10 @@ Public Class RedCloud_Core : Inherits TaskParent
             If percentImage < 0.8 Then
                 If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
             End If
-        End If
 
-        Dim clickCell = RedCloud_Basics.selectCell()
-        If clickCell <> "" Then
-            strOut = RedCloud_Basics.selectCell()
-            task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+            strOut = RedCell_Basics.selectCell(pcMap, pcList)
+            If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+            SetTrueText(strOut, 3)
         End If
 
         pcListLast = New List(Of cloudData)(pcList)
@@ -266,7 +253,11 @@ Public Class RedCloud_CellDepthHistogram : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedCloud(src, labels(2))
-        RedCloud_Basics.selectCell()
+
+        strOut = RedCell_Basics.selectCell(task.redCloud.pcMap, task.redCloud.pcList)
+        If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+        SetTrueText(strOut, 3)
+
         If task.pcD Is Nothing Then
             labels(3) = "Select a RedCloud cell to see the histogram"
             Exit Sub
@@ -369,16 +360,6 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
         End If
         Return Nothing
     End Function
-    Public Function selectCell() As String
-        task.pcD = motionDisplayCell()
-        If task.pcD IsNot Nothing Then
-            If task.pcD.rect.Contains(task.ClickPoint) Then
-                task.color(task.pcD.rect).SetTo(white, task.pcD.mask)
-                Return task.pcD.displayCell
-            End If
-        End If
-        Return Nothing
-    End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         redCore.Run(src)
         dst3 = redCore.dst3
@@ -427,7 +408,10 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
             If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
         End If
 
-        SetTrueText(selectCell() + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf +
+        strOut = RedCell_Basics.selectCell(task.redCloud.pcMap, task.redCloud.pcList)
+        If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+
+        SetTrueText(strOut + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf +
                     CStr(pcList.Count) + " cells present", 3)
 
         pcListLast = New List(Of cloudData)(pcList)

@@ -19,12 +19,6 @@ Public Class RedCloudAndColor_Basics : Inherits TaskParent
         reduction.Run(dst3)
         dst1 = reduction.dst2 - 1
 
-
-
-        dst0 = PaletteBlackZero(dst1)
-
-
-
         Dim index = 1
         Dim rect As cv.Rect
         Dim minCount = dst2.Total * 0.001
@@ -53,32 +47,12 @@ Public Class RedCloudAndColor_Basics : Inherits TaskParent
             Next
         Next
 
-        'For Each pc In newList
-        '    Dim r1 = pc.rect
-        '    Dim r2 = New cv.Rect ' fake rect to trigger conditional below...
-        '    Dim indexLast = pcMapLast.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
-        '    If indexLast > 0 Then r2 = pcListLast(indexLast).rect
-        '    If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
-        '        pc.age = pcListLast(indexLast).age + 1
-        '        If pc.age > 1000 Then pc.age = 2
-        '        If task.heartBeat = False And pc.rect.Contains(pcListLast(indexLast).maxdist) Then
-        '            pc.maxDist = pcListLast(indexLast).maxdist
-        '        End If
-        '        pc.color = pcListLast(indexLast).color
-        '    End If
-
-        '    pc.index = pcList.Count + 1
-        '    pcList.Add(pc)
-        '    pcMap(pc.rect).setto(pc.index, pc.mask)
-        '    dst2(pc.rect).SetTo(pc.color, pc.contourmask)
-        '    dst2.Circle(pc.maxDist, task.DotSize, pc.color, -1)
-        'Next
-
-
-        pcListLast = New List(Of cloudData)(pcList)
-
-        SetTrueText(RedCloud_Basics.selectCell(), 3)
+        strOut = RedCell_Basics.selectCell(pcMap, pcList)
+        If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+        SetTrueText(strOut, 3)
 
         labels(2) = "Cells found = " + CStr(pcList.Count) + " and " + CStr(newList.Count) + " were color only cells."
+
+        pcListLast = New List(Of cloudData)(pcList)
     End Sub
 End Class

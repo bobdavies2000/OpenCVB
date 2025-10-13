@@ -3,24 +3,20 @@ Public Class RedCell_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Display the output of a cell for RedCloud_Basics."
     End Sub
-    Public Shared Function displayCell(pcMap As cv.Mat, pcList As List(Of cloudData)) As cloudData
-        Dim clickIndex = pcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
-        If clickIndex >= 0 And clickIndex < pcList.Count Then
-            Return task.redCloud.pcList(clickIndex)
+    Public Shared Function selectCell(pcMap As cv.Mat, pcList As List(Of cloudData)) As String
+        If pcList.Count > 0 Then
+            Dim clickIndex = pcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
+            If clickIndex >= 0 And clickIndex < pcList.Count Then task.pcD = pcList(clickIndex) Else task.pcD = pcList(0)
+            If task.pcD.rect.Contains(task.ClickPoint) Then Return task.pcD.displayCell
         End If
-        Return Nothing
+        Return ""
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then dst2 = runRedCloud(src, labels(2))
-        Dim pcClick = displayCell(task.redCloud.pcMap, task.redCloud.pcList)
+        strOut = selectCell(task.redCloud.pcMap, task.redCloud.pcList)
 
-        Dim clickCell = RedCloud_Basics.selectCell()
-        If clickCell <> "" Then
-            strOut = RedCloud_Basics.selectCell()
-            task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
-        End If
-
-        If pcClick IsNot Nothing Then SetTrueText(pcClick.displayCell, 3)
+        If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
