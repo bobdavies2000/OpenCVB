@@ -6,7 +6,7 @@ Public Class Plane_Basics : Inherits TaskParent
         labels = {"", "Top down mask after after thresholding heatmap", "Vertical regions", "Horizontal regions"}
         desc = "Find the regions that are mostly vertical and mostly horizontal."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim topHist As New cv.Mat, sideHist As New cv.Mat, topBackP As New cv.Mat, sideBackP As New cv.Mat
         cv.Cv2.CalcHist({task.pointCloud}, task.channelsTop, New cv.Mat, topHist, 2,
                         {dst2.Height, dst2.Width}, task.rangesTop)
@@ -49,7 +49,7 @@ Public Class Plane_From3Points : Inherits TaskParent
                                          Format(Math.Abs(eq(2)), fmt3) + "*z = " +
                                          Format(eq(3), fmt3) + vbCrLf
     End Function
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim v1 = input(1) - input(0)
         Dim v2 = input(1) - input(2)
         cross = crossProduct(v1, v2)
@@ -87,7 +87,7 @@ Public Class Plane_FlatSurfaces : Inherits TaskParent
         addW.src2 = dst2.Clone
         desc = "Find all the cells from a RedList_Basics output that are likely to be flat"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         plane.Run(src)
 
         dst2 = plane.dst2
@@ -140,7 +140,7 @@ Public Class Plane_OnlyPlanes : Inherits TaskParent
         labels = {"", "", "RedCloud Cells", "gCloud reworked with planes instead of depth data"}
         desc = "Replace the gCloud with planes in every RedCloud cell"
     End Sub
-    Public Sub buildCloudPlane(rc As rcData)
+    Public Sub buildCloudPlane(rc As oldrcData)
         For y = 0 To rc.rect.Height - 1
             For x = 0 To rc.rect.Width - 1
                 If rc.mask.Get(Of Byte)(y, x) > 0 Then
@@ -154,7 +154,7 @@ Public Class Plane_OnlyPlanes : Inherits TaskParent
             Next
         Next
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         plane.Run(src)
         dst2 = plane.dst2
 
@@ -183,7 +183,7 @@ Public Class Plane_EqCorrelation : Inherits TaskParent
     Public Sub New()
         desc = "Classify equations based on the correlation of their coefficients"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         plane.Run(src)
         dst2 = plane.dst2
 
@@ -251,7 +251,7 @@ Public Class Plane_CellColor : Inherits TaskParent
         labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"}
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
     End Sub
-    Public Function buildContourPoints(rc As rcData) As List(Of cv.Point3f)
+    Public Function buildContourPoints(rc As oldrcData) As List(Of cv.Point3f)
         Dim fitPoints As New List(Of cv.Point3f)
         For Each pt In rc.contour
             If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
@@ -260,7 +260,7 @@ Public Class Plane_CellColor : Inherits TaskParent
         Next
         Return fitPoints
     End Function
-    Public Function buildMaskPointEq(rc As rcData) As List(Of cv.Point3f)
+    Public Function buildMaskPointEq(rc As oldrcData) As List(Of cv.Point3f)
         Dim fitPoints As New List(Of cv.Point3f)
         For y = 0 To rc.rect.Height - 1
             For x = 0 To rc.rect.Width - 1
@@ -269,13 +269,13 @@ Public Class Plane_CellColor : Inherits TaskParent
         Next
         Return fitPoints
     End Function
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         dst2 = runRedList(src, labels(2))
 
         dst3.SetTo(0)
-        Dim newCells As New List(Of rcData)
+        Dim newCells As New List(Of oldrcData)
         Dim rcX = task.rcD
         For Each rc In task.redList.oldrclist
             rc.eq = New cv.Vec4f
@@ -291,7 +291,7 @@ Public Class Plane_CellColor : Inherits TaskParent
                                               Math.Abs(255 * rc.eq(1)),
                                               Math.Abs(255 * rc.eq(2))), rc.mask)
         Next
-        task.redList.oldrclist = New List(Of rcData)(newCells)
+        task.redList.oldrclist = New List(Of oldrcData)(newCells)
     End Sub
 End Class
 
@@ -312,7 +312,7 @@ Public Class Plane_Points : Inherits TaskParent
         labels = {"", "", "RedCloud Basics output - click to highlight a cell", ""}
         desc = "Detect if a some or all points in a RedCloud cell are in a plane."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedList(src, labels(2))
 
         Dim rc = task.rcD
@@ -380,7 +380,7 @@ Public Class Plane_Histogram : Inherits TaskParent
         labels = {"", "", "Histogram of Y-Values of the point cloud after masking", "Mask used to isolate histogram input"}
         desc = "Create a histogram plot of the Y-values in the backprojection of solo points."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         solo.Run(src)
         dst3 = solo.dst3
 
@@ -428,7 +428,7 @@ End Class
 
 ' https://stackoverflow.com/questions/33997220/plane-construction-from-3d-points-in-opencv
 Public Class Plane_Equation : Inherits TaskParent
-    Public rc As New rcData
+    Public rc As New oldrcData
     Public justEquation As String
     Public Sub New()
         desc = "Compute the coefficients for an estimated plane equation given the rc contour"

@@ -1,8 +1,7 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Windows.Forms
 Public Class Projection_Basics : Inherits TaskParent
-    Public redCellInput As New List(Of rcData)
-    Public oldrclist As New List(Of rcData)
+    Public redCellInput As New List(Of oldrcData)
+    Public oldrclist As New List(Of oldrcData)
     Public viewType As String = "Top"
     Public objectList As New List(Of cv.Vec4f)
     Public showRectangles As Boolean = True
@@ -10,7 +9,7 @@ Public Class Projection_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Find all the masks, rects, and counts in the input"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
             histTop.Run(src)
             src = histTop.dst2
@@ -19,7 +18,7 @@ Public Class Projection_Basics : Inherits TaskParent
             redCellInput = task.redList.oldrclist
         End If
 
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim sortedCells As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
         Dim check2 As Integer
         For i = 0 To redCellInput.Count - 1
             Dim rc = redCellInput(i)
@@ -31,7 +30,7 @@ Public Class Projection_Basics : Inherits TaskParent
         Next
 
         oldrclist.Clear()
-        oldrclist.Add(New rcData)
+        oldrclist.Add(New oldrcData)
         For Each rc In sortedCells.Values
             rc.index = oldrclist.Count
             oldrclist.Add(rc)

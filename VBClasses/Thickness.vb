@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Thickness_Basics : Inherits TaskParent
-    Public rc As New rcData
+    Public rc As New oldrcData
     Public volZ As New Volume_Basics
     Public Sub New()
         desc = "Determine the thickness of a RedCloud cell"

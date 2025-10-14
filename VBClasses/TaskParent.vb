@@ -209,7 +209,7 @@ Public Class TaskParent : Implements IDisposable
         ' trying to avoid extreme colors... 
         Return New cv.Scalar(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240))
     End Function
-    Public Function validContourPoint(rc As rcData, pt As cv.Point, offset As Integer) As cv.Point
+    Public Function validContourPoint(rc As oldrcData, pt As cv.Point, offset As Integer) As cv.Point
         If pt.X < rc.rect.Width And pt.Y < rc.rect.Height Then Return pt
         Dim count = rc.contour.Count
         For i = offset + 1 To rc.contour.Count - 1
@@ -218,7 +218,7 @@ Public Class TaskParent : Implements IDisposable
         Next
         Return New cv.Point
     End Function
-    Public Function build3PointEquation(rc As rcData) As cv.Vec4f
+    Public Function build3PointEquation(rc As oldrcData) As cv.Vec4f
         If rc.contour.Count < 3 Then Return New cv.Vec4f
         Dim offset = rc.contour.Count / 3
         Dim p1 = validContourPoint(rc, rc.contour(offset * 0), offset * 0)
@@ -401,7 +401,7 @@ Public Class TaskParent : Implements IDisposable
 
         Return mm.maxLoc
     End Function
-    Public Function GetMaxDist(ByRef rc As rcData) As cv.Point
+    Public Function GetMaxDist(ByRef rc As oldrcData) As cv.Point
         Dim mask = rc.mask.Clone
         mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
         Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)

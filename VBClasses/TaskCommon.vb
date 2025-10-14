@@ -43,9 +43,9 @@ Public Module vbc
 
         Return dst
     End Function
-    Public Function RebuildRCMap(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
+    Public Function RebuildRCMap(sortedCells As SortedList(Of Integer, oldrcData)) As cv.Mat
         task.redList.oldrclist.Clear()
-        task.redList.oldrclist.Add(New rcData) ' placeholder rcData so map is correct.
+        task.redList.oldrclist.Add(New oldrcData) ' placeholder oldrcData so map is correct.
         task.redList.rcMap.SetTo(0)
         Static saveColorSetting = task.gOptions.trackingLabel
         For Each rc In sortedCells.Values
@@ -69,7 +69,7 @@ Public Module vbc
         task.redList.rcMap.SetTo(0, task.noDepthMask)
         Return DisplayCells()
     End Function
-    Public Function RebuildRCMap(oldrclist As List(Of rcData)) As cv.Mat
+    Public Function RebuildRCMap(oldrclist As List(Of oldrcData)) As cv.Mat
         task.redList.rcMap.SetTo(0)
         Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
         For Each rc In oldrclist
@@ -712,7 +712,7 @@ End Class
 
 
 
-Public Class rcData
+Public Class oldrcData
     Public rect As cv.Rect
     Public mask As cv.Mat
     Public pixels As Integer
@@ -757,9 +757,9 @@ End Class
 
 
 
-Public Class cloudData
+Public Class rcData
     Public age As Integer
-    Public color As cv.Vec3b
+    Public color As cv.Scalar
     Public contour As List(Of cv.Point)
     Public contourMask As cv.Mat
     Public depth As Single
@@ -781,7 +781,7 @@ Public Class cloudData
         depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
     End Sub
     Public Function displayCell() As String
-        Dim strOut = "pcList index = " + CStr(index) + vbCrLf
+        Dim strOut = "rcList index = " + CStr(index) + vbCrLf
         strOut += "age = " + CStr(age) + vbCrLf
         strOut += "rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
         strOut += ", width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf

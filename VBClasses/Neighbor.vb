@@ -121,7 +121,7 @@ End Class
 
 Public Class Neighbor_Precise : Inherits TaskParent
     Public nabList As New List(Of List(Of Integer))
-    Public oldrclist As List(Of rcData)
+    Public oldrclist As List(Of oldrcData)
     Public runRedCflag As Boolean = False
     Public Sub New()
         cPtr = Neighbor_Open()

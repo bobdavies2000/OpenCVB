@@ -137,7 +137,7 @@ End Class
 
 Public Class Foreground_CellsFore : Inherits TaskParent
     Dim fore As New Foreground_Hist3D
-    Public oldrclist As New List(Of rcData)
+    Public oldrclist As New List(Of oldrcData)
     Public Sub New()
         desc = "Get the foreground cells"
     End Sub
@@ -158,7 +158,7 @@ End Class
 
 Public Class Foreground_CellsBack : Inherits TaskParent
     Dim fore As New Foreground_Hist3D
-    Public oldrclist As New List(Of rcData)
+    Public oldrclist As New List(Of oldrcData)
     Public Sub New()
         desc = "Get the background cells"
     End Sub

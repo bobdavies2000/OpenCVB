@@ -579,7 +579,7 @@ Public Class GL_RedCloudHulls : Inherits TaskParent
     Public Shared Function buildBuffer() As List(Of cv.Vec3f)
         Dim dataBuffer As New List(Of cv.Vec3f)
         Dim vec(2) As cv.Vec3f, pt As cv.Point
-        For Each pc In task.redCloud.pcList
+        For Each pc In task.redCloud.rcList
             Dim count As Single = pc.hull.Count
             For i = 0 To pc.hull.Count - 1
                 Dim goodDepth As Boolean = True

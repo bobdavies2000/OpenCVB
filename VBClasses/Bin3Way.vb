@@ -176,10 +176,10 @@ Public Class Bin3Way_RedCloud1 : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Dim color8U As New Color8U_Basics
-    Dim cellMaps(2) As cv.Mat, oldrclist(2) As List(Of rcData)
+    Dim cellMaps(2) As cv.Mat, oldrclist(2) As List(Of oldrcData)
     Dim options As New Options_Bin3WayRedCloud
     Public Sub New()
-        desc = "Identify the lightest, darkest, and 'Other' regions separately and then combine the rcData."
+        desc = "Identify the lightest, darkest, and 'Other' regions separately and then combine the oldrcData."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
@@ -187,7 +187,7 @@ Public Class Bin3Way_RedCloud1 : Inherits TaskParent
 
         If task.optionsChanged Then
             For i = 0 To oldrclist.Count - 1
-                oldrclist(i) = New List(Of rcData)
+                oldrclist(i) = New List(Of oldrcData)
                 cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Next
         End If
@@ -206,10 +206,10 @@ Public Class Bin3Way_RedCloud1 : Inherits TaskParent
                 flood.Run(bin3.bin3.mats.mat(i))
             End If
             cellMaps(i) = task.redList.rcMap.Clone
-            oldrclist(i) = New List(Of rcData)(task.redList.oldrclist)
+            oldrclist(i) = New List(Of oldrcData)(task.redList.oldrclist)
         Next
 
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim sortedCells As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To 2
             For Each rc In oldrclist(i)
                 sortedCells.Add(rc.pixels, rc)
@@ -232,11 +232,11 @@ End Class
 Public Class Bin3Way_RedCloud : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
-    Dim cellMaps(2) As cv.Mat, oldrclist(2) As List(Of rcData)
+    Dim cellMaps(2) As cv.Mat, oldrclist(2) As List(Of oldrcData)
     Dim options As New Options_Bin3WayRedCloud
     Public Sub New()
         flood.showSelected = False
-        desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
+        desc = "Identify the lightest, darkest, and other regions separately and then combine the oldrcData."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -244,21 +244,21 @@ Public Class Bin3Way_RedCloud : Inherits TaskParent
 
         If task.optionsChanged Then
             For i = 0 To oldrclist.Count - 1
-                oldrclist(i) = New List(Of rcData)
+                oldrclist(i) = New List(Of oldrcData)
                 cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Next
         End If
 
         bin3.Run(src)
 
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim sortedCells As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
         For i = options.startRegion To options.endRegion
             task.redList.rcMap = cellMaps(i)
             task.redList.oldrclist = oldrclist(i)
             flood.inputRemoved = Not bin3.bin3.mats.mat(i)
             flood.Run(bin3.bin3.mats.mat(i))
             cellMaps(i) = task.redList.rcMap.Clone
-            oldrclist(i) = New List(Of rcData)(task.redList.oldrclist)
+            oldrclist(i) = New List(Of oldrcData)(task.redList.oldrclist)
             For Each rc In oldrclist(i)
                 If rc.index = 0 Then Continue For
                 sortedCells.Add(rc.pixels, rc)

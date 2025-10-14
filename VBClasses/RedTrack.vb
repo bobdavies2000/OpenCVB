@@ -8,7 +8,7 @@ Public Class RedTrack_Basics : Inherits TaskParent
         dst3 = runRedList(src, labels(2))
         labels(2) = task.redList.labels(2)
         dst2.SetTo(0)
-        For Each rc As rcData In task.redList.oldrclist
+        For Each rc As oldrcData In task.redList.oldrclist
             DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
             If rc.index = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
         Next

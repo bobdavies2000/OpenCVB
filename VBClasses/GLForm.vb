@@ -342,7 +342,7 @@ Public Class sgl
                 Dim vec(2) As cv.Vec3f
                 Dim pts(2) As cv.Point
                 Dim triangleCount As Integer
-                For Each pc In hulls.pcList
+                For Each pc In hulls.rcList
                     Dim count As Single = pc.hull.Count
                     For i = 0 To pc.hull.Count - 1
                         Dim goodDepth As Boolean = True

@@ -36,7 +36,7 @@ Public Class VBtask : Implements IDisposable
     Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
 
     Public fpList As New List(Of fpData)
-    Public regionList As New List(Of rcData)
+    Public regionList As New List(Of oldrcData)
     Public featList As New List(Of List(Of Integer))
     Public fLess As New List(Of List(Of Integer))
     Public logicalLines As New List(Of lpData)
@@ -44,8 +44,8 @@ Public Class VBtask : Implements IDisposable
     Public fpMap As New cv.Mat ' feature map
 
     Public brickD As brickData ' the currently selected brick
-    Public pcD As New cloudData ' the currently selected redCloud Cell
-    Public rcD As New rcData ' the currently selected redColor Cell
+    Public pcD As New rcData ' the currently selected redCloud Cell
+    Public rcD As New oldrcData ' the currently selected redColor Cell
     Public lpD As New lpData ' the currently selected line pair
     Public fpD As New fpData ' the currently selected feature point.
     Public contourD As New contourData ' the currently selected contour

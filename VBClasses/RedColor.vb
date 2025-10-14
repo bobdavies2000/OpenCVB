@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedColor_Basics : Inherits TaskParent
     Dim redCore As New RedColor_Core
-    Public pcList As New List(Of cloudData)
+    Public rcList As New List(Of rcData)
     Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         task.redColor = Me
@@ -12,10 +12,10 @@ Public Class RedColor_Basics : Inherits TaskParent
             redCore.Run(src)
             dst2 = redCore.dst2
             labels(2) = redCore.labels(2)
-            pcList = New List(Of cloudData)(redCore.pcList)
+            rcList = New List(Of rcData)(redCore.rcList)
             dst3 = redCore.dst2
         Else
-            Dim pcListLast = New List(Of cloudData)(pcList)
+            Dim pcListLast = New List(Of rcData)(rcList)
 
             If src.Type <> cv.MatType.CV_8U Then src = task.gray
             redCore.redSweep.reduction.Run(src)
@@ -28,7 +28,7 @@ Public Class RedColor_Basics : Inherits TaskParent
             Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
             Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
             Dim minCount = dst1.Total * 0.001
-            pcList.Clear()
+            rcList.Clear()
             pcMap.SetTo(0)
             For Each pc In pcListLast
                 Dim pt = pc.maxDist
@@ -39,7 +39,7 @@ Public Class RedColor_Basics : Inherits TaskParent
                         If pcc IsNot Nothing Then
                             pcc.color = pc.color
                             pcc.age = pc.age + 1
-                            pcList.Add(pcc)
+                            rcList.Add(pcc)
                             pcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.contourMask)
 
                             index += 1
@@ -49,7 +49,7 @@ Public Class RedColor_Basics : Inherits TaskParent
             Next
 
             dst2 = PaletteBlackZero(pcMap)
-            labels(2) = CStr(pcList.Count) + " regions were identified "
+            labels(2) = CStr(rcList.Count) + " regions were identified "
         End If
     End Sub
 End Class
@@ -60,7 +60,7 @@ End Class
 
 Public Class RedColor_Core : Inherits TaskParent
     Public redSweep As New RedColor_Sweep
-    Public pcList As New List(Of cloudData)
+    Public rcList As New List(Of rcData)
     Public pcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         desc = "Track the RedColor cells from RedColor_Core"
@@ -69,14 +69,14 @@ Public Class RedColor_Core : Inherits TaskParent
         redSweep.Run(src)
         dst3 = redSweep.dst3
 
-        Static pcListLast = New List(Of cloudData)(redSweep.pcList)
+        Static pcListLast = New List(Of rcData)(redSweep.rcList)
         Static pcMapLast As cv.Mat = redSweep.pcMap.clone
 
-        pcList.Clear()
+        rcList.Clear()
         Dim r2 As cv.Rect
         pcMap.SetTo(0)
         dst2.SetTo(0)
-        For Each pc In redSweep.pcList
+        For Each pc In redSweep.rcList
             Dim r1 = pc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
             Dim indexLast = pcMapLast.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
@@ -89,17 +89,17 @@ Public Class RedColor_Core : Inherits TaskParent
                 End If
                 pc.color = pcListLast(indexLast).color
             End If
-            pc.index = pcList.Count + 1
+            pc.index = rcList.Count + 1
             pcMap(pc.rect).SetTo(pc.index, pc.mask)
             dst2(pc.rect).SetTo(pc.color, pc.mask)
             If standaloneTest() Then
                 dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
                 SetTrueText(CStr(pc.age), pc.maxDist)
             End If
-            pcList.Add(pc)
+            rcList.Add(pc)
         Next
 
-        pcListLast = New List(Of cloudData)(pcList)
+        pcListLast = New List(Of rcData)(rcList)
         pcMapLast = pcMap.Clone
     End Sub
 End Class
@@ -109,7 +109,7 @@ End Class
 
 
 Public Class RedColor_Sweep : Inherits TaskParent
-    Public pcList As New List(Of cloudData)
+    Public rcList As New List(Of rcData)
     Public reduction As New Reduction_Basics
     Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
@@ -127,7 +127,7 @@ Public Class RedColor_Sweep : Inherits TaskParent
         Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
         Dim minCount = dst3.Total * 0.001
-        pcList.Clear()
+        rcList.Clear()
         pcMap.SetTo(0)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
@@ -138,7 +138,7 @@ Public Class RedColor_Sweep : Inherits TaskParent
                     If rect.Width > 0 And rect.Height > 0 And rect.Width < dst2.Width And rect.Height < dst2.Height Then
                         If count >= minCount Then
                             Dim pc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
-                            pcList.Add(pc)
+                            rcList.Add(pc)
                             pcMap(pc.rect).SetTo(pc.index Mod 255, pc.contourMask)
                             index += 1
                         Else
@@ -150,6 +150,6 @@ Public Class RedColor_Sweep : Inherits TaskParent
         Next
 
         dst2 = PaletteBlackZero(pcMap)
-        labels(2) = CStr(pcList.Count) + " regions were identified "
+        labels(2) = CStr(rcList.Count) + " regions were identified "
     End Sub
 End Class

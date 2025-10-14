@@ -4,7 +4,7 @@ Public Class RedList_Basics : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public cellGen As New RedCell_Color
     Public redMask As New RedMask_Basics
-    Public oldrclist As New List(Of rcData)
+    Public oldrclist As New List(Of oldrcData)
     Public rcMap As cv.Mat ' redColor map 
     Public Sub New()
         If task.contours Is Nothing Then task.contours = New Contour_Basics_List
@@ -120,7 +120,7 @@ End Class
 
 Public Class RedList_Equations : Inherits TaskParent
     Dim eq As New Plane_Equation
-    Public oldrclist As New List(Of rcData)
+    Public oldrclist As New List(Of oldrcData)
     Public Sub New()
         labels(3) = "The estimated plane equations for the largest 20 RedCloud cells."
         desc = "Show the estimated plane equations for all the cells."
@@ -128,19 +128,19 @@ Public Class RedList_Equations : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             dst2 = runRedList(src, labels(2))
-            oldrclist = New List(Of rcData)(task.redList.oldrclist)
+            oldrclist = New List(Of oldrcData)(task.redList.oldrclist)
         End If
 
-        Dim newCells As New List(Of rcData)
-        For Each rc As rcData In oldrclist
-            If rc.contour.Count > 4 Then
-                eq.rc = rc
+        Dim newCells As New List(Of oldrcData)
+        For Each orc As oldrcData In oldrclist
+            If orc.contour.Count > 4 Then
+                eq.rc = orc
                 eq.Run(src)
                 newCells.Add(eq.rc)
             End If
         Next
 
-        oldrclist = New List(Of rcData)(newCells)
+        oldrclist = New List(Of oldrcData)(newCells)
 
         If task.heartBeat Then
             Dim index As Integer
@@ -534,7 +534,7 @@ End Class
 Public Class RedList_Consistent : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim cellmaps As New List(Of cv.Mat)
-    Dim cellLists As New List(Of List(Of rcData))
+    Dim cellLists As New List(Of List(Of oldrcData))
     Dim diffs As New List(Of cv.Mat)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -677,8 +677,8 @@ End Class
 
 
 Public Class RedList_Flippers : Inherits TaskParent
-    Public flipCells As New List(Of rcData)
-    Public nonFlipCells As New List(Of rcData)
+    Public flipCells As New List(Of oldrcData)
+    Public nonFlipCells As New List(Of oldrcData)
     Public Sub New()
         task.gOptions.TrackingColor.Checked = True
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
@@ -728,7 +728,7 @@ Public Class RedList_FlipTest : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1 = runRedList(src, labels(2))
-        Dim lastCells As New List(Of rcData)(task.redList.oldrclist)
+        Dim lastCells As New List(Of oldrcData)(task.redList.oldrclist)
         flipper.Run(src)
         dst3 = flipper.dst2
 
@@ -817,7 +817,7 @@ End Class
 
 
 Public Class RedList_Hulls : Inherits TaskParent
-    Public oldrclist As New List(Of rcData)
+    Public oldrclist As New List(Of oldrcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}

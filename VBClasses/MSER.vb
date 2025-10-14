@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Basics : Inherits TaskParent
     Dim detect As New MSER_CPP
-    Public mserCells As New List(Of rcData)
+    Public mserCells As New List(Of oldrcData)
     Public floodPoints As New List(Of cv.Point)
 
     Public Sub New()
@@ -21,14 +21,14 @@ Public Class MSER_Basics : Inherits TaskParent
         Next
         floodPoints = New List(Of cv.Point)(detect.floodPoints)
 
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim sortedCells As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
 
         Dim matched As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
 
         dst0 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         For i = 0 To boxes.Count - 1
             Dim index = boxes.ElementAt(i).Value
-            Dim rc As New rcData
+            Dim rc As New oldrcData
             rc.rect = boxInput(index)
             Dim val = dst0.Get(Of Byte)(floodPoints(index).Y, floodPoints(index).X)
             rc.mask = dst0(rc.rect).InRange(val, val)
@@ -55,7 +55,7 @@ Public Class MSER_Basics : Inherits TaskParent
             If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
         Next
 
-        task.redList.oldrclist = New List(Of rcData)(sortedCells.Values)
+        task.redList.oldrclist = New List(Of oldrcData)(sortedCells.Values)
         dst2 = RebuildRCMap(sortedCells)
 
         labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
@@ -596,14 +596,14 @@ Public Class MSER_Basics2 : Inherits TaskParent
             boxes.Add(r.Width * r.Height, i)
         Next
 
-        Dim oldrclist As New List(Of rcData)({New rcData})
+        Dim oldrclist As New List(Of oldrcData)({New oldrcData})
         dst1.SetTo(0)
         dst2.SetTo(0)
         Dim lastMap = cellMap.Clone
         cellMap.SetTo(0)
         Dim matchCount As Integer
         For i = 0 To floodPoints.Count - 1
-            Dim rc As New rcData
+            Dim rc As New oldrcData
             rc.index = oldrclist.Count
             Dim val = dst3.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
             rc.rect = boxInput(boxes.ElementAt(i).Value)

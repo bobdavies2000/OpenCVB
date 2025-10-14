@@ -183,12 +183,12 @@ Public Class Boundary_RedCloud : Inherits TaskParent
         dst2 = runRedCloud(prep.dst2, labels(2))
 
         dst3.SetTo(0)
-        For i = 1 To task.redCloud.pcList.Count - 1
-            Dim rc = task.redCloud.pcList(i)
+        For i = 1 To task.redCloud.rcList.Count - 1
+            Dim rc = task.redCloud.rcList(i)
             Dim contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             DrawTour(dst3(rc.rect), contour, 255, task.lineWidth)
         Next
 
-        labels(3) = $"{task.redCloud.pcList.Count} cells were found."
+        labels(3) = $"{task.redCloud.rcList.Count} cells were found."
     End Sub
 End Class

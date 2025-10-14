@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Volume_Basics : Inherits TaskParent
-    Public rc As New rcData
+    Public rc As New oldrcData
     Public volume As Single
     Public Sub New()
         desc = "Build a box containing all the 3D points of a RedCloud cell"

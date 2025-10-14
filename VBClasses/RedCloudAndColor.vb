@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedCloudAndColor_Basics : Inherits TaskParent
-    Public pcList As New List(Of cloudData)
+    Public rcList As New List(Of rcData)
     Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -10,9 +10,9 @@ Public Class RedCloudAndColor_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedCloud(src, labels(1))
 
-        Static pcListLast = New List(Of cloudData)
+        Static pcListLast = New List(Of rcData)
         Dim pcMapLast = pcMap.clone
-        pcList = New List(Of cloudData)(task.redCloud.pcList)
+        rcList = New List(Of rcData)(task.redCloud.rcList)
 
         dst3 = task.gray
         dst3.SetTo(0, task.depthMask)
@@ -24,7 +24,7 @@ Public Class RedCloudAndColor_Basics : Inherits TaskParent
         Dim minCount = dst2.Total * 0.001
         Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
-        Dim newList As New List(Of cloudData)
+        Dim newList As New List(Of rcData)
         For y = 0 To dst1.Height - 1
             For x = 0 To dst1.Width - 1
                 Dim pt = New cv.Point(x, y)
@@ -47,12 +47,12 @@ Public Class RedCloudAndColor_Basics : Inherits TaskParent
             Next
         Next
 
-        strOut = RedCell_Basics.selectCell(pcMap, pcList)
+        strOut = RedCell_Basics.selectCell(pcMap, rcList)
         If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
         SetTrueText(strOut, 3)
 
-        labels(2) = "Cells found = " + CStr(pcList.Count) + " and " + CStr(newList.Count) + " were color only cells."
+        labels(2) = "Cells found = " + CStr(rcList.Count) + " and " + CStr(newList.Count) + " were color only cells."
 
-        pcListLast = New List(Of cloudData)(pcList)
+        pcListLast = New List(Of rcData)(rcList)
     End Sub
 End Class

@@ -324,7 +324,7 @@ Public Class Distance_RedColor : Inherits TaskParent
     Public pixelVector As New List(Of List(Of Single))
     Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
     Dim lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
-    Dim lastrcList As New List(Of rcData)
+    Dim lastrcList As New List(Of oldrcData)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         OptionParent.FindSlider("Histogram 3D Bins").Value = 5
@@ -394,7 +394,7 @@ Public Class Distance_RedColor : Inherits TaskParent
             lastDistances.Add(el.Key, el.Value)
         Next
 
-        lastrcList = New List(Of rcData)(task.redList.oldrclist)
+        lastrcList = New List(Of oldrcData)(task.redList.oldrclist)
     End Sub
 End Class
 

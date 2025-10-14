@@ -6,8 +6,8 @@ Public Class MaxDist_Basics : Inherits TaskParent
         desc = "Find the point farthest from the edges of a mask."
     End Sub
     Public Shared Function setCloudData(mask As cv.Mat, rect As cv.Rect, index As Integer,
-                                        Optional zeroRectangle As Boolean = True) As cloudData
-        Dim pc As New cloudData
+                                        Optional zeroRectangle As Boolean = True) As rcData
+        Dim pc As New rcData
         pc.mask = mask.InRange(index, index)
         pc.rect = rect
         pc.index = index
@@ -40,7 +40,7 @@ Public Class MaxDist_Basics : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim index As Integer = 1
-        For Each pc In task.redCloud.pcList
+        For Each pc In task.redCloud.rcList
             Dim pcTest = setCloudData(pc.mask, pc.rect, index)
             pcTest.color = pc.color
             dst3(pcTest.rect).SetTo(pcTest.color, pcTest.mask)
@@ -60,16 +60,16 @@ Public Class MaxDist_NoRectangle : Inherits TaskParent
         desc = "Is it necessary to draw a rectangle of zeros at the edge of the mask?  Answer: no"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedCloud(src, labels(2)) ' task.redCloud.pcList uses the rectangle of zeros.
+        dst2 = runRedCloud(src, labels(2)) ' task.redCloud.rcList uses the rectangle of zeros.
 
-        Dim pcList As New List(Of cloudData)
+        Dim rcList As New List(Of rcData)
         dst3.SetTo(0)
-        For Each pc In task.redCloud.pcList
-            Dim pcTest = MaxDist_Basics.setCloudData(pc.mask, pc.rect, pcList.Count + 1, False) ' This pcList will NOT use the rectangle of zeros.
+        For Each pc In task.redCloud.rcList
+            Dim pcTest = MaxDist_Basics.setCloudData(pc.mask, pc.rect, rcList.Count + 1, False) ' This rcList will NOT use the rectangle of zeros.
             pcTest.color = pc.color
             dst3(pcTest.rect).SetTo(pcTest.color, pcTest.mask)
             dst3.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
-            pcList.Add(pcTest)
+            rcList.Add(pcTest)
         Next
     End Sub
 End Class

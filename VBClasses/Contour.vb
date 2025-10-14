@@ -425,7 +425,7 @@ End Class
 
 
 Public Class Contour_Outline : Inherits TaskParent
-    Public rc As New rcData
+    Public rc As New oldrcData
     Public Sub New()
         desc = "Create a simplified contour of the selected cell"
     End Sub
@@ -460,7 +460,7 @@ End Class
 
 
 Public Class Contour_SelfIntersect : Inherits TaskParent
-    Public rc As New rcData
+    Public rc As New oldrcData
     Public Sub New()
         desc = "Search the contour points for duplicates indicating the contour is self-intersecting."
     End Sub

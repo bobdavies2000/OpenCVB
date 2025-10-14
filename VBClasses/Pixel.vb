@@ -700,7 +700,7 @@ End Class
 Public Class Pixel_Vectors : Inherits TaskParent
     Dim hVector As New Hist3Dcolor_Vector
     Public pixelVector As New List(Of Single())
-    Public oldrclist As New List(Of rcData)
+    Public oldrclist As New List(Of oldrcData)
     Public Sub New()
         labels = {"", "", "RedList_Basics output", ""}
         desc = "Create a vector for each cell's 3D histogram."

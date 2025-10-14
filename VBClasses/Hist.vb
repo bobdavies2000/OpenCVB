@@ -889,7 +889,7 @@ End Class
 
 
 Public Class Hist_ShapeSide : Inherits TaskParent
-    Public rc As New rcData
+    Public rc As New oldrcData
     Public Sub New()
         task.gOptions.setHistogramBins(60)
         labels = {"", "", "ZY Side View", "ZY Side View Mask"}
@@ -918,7 +918,7 @@ End Class
 
 
 Public Class Hist_ShapeTop : Inherits TaskParent
-    Public rc As New rcData
+    Public rc As New oldrcData
     Public Sub New()
         task.gOptions.setHistogramBins(60)
         labels = {"", "", "ZY Side View", "ZY Side View Mask"}
@@ -1166,7 +1166,7 @@ End Class
 
 Public Class Hist_Depth : Inherits TaskParent
     Public plotHist As New Plot_Histogram
-    Public rc As rcData
+    Public rc As oldrcData
     Public mm As mmData
     Public histogram As New cv.Mat
     Public Sub New()

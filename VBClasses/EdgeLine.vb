@@ -73,7 +73,7 @@ End Class
 
 
 'Public Class EdgeLine_BasicsList : Inherits TaskParent
-'    Public pcList As New List(Of cloudData)
+'    Public rcList As New List(Of oldrcData)
 '    Public Sub New()
 '        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
 '        task.gOptions.DebugSlider.Value = 1
@@ -84,9 +84,9 @@ End Class
 '        dst2 = task.edgeLine.dst2
 '        labels(2) = task.edgeLine.labels(2)
 
-'        Dim sortList As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalIntegerInverted)
+'        Dim sortList As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
 '        For Each seg In task.edgeLine.segments
-'            Dim nrc = New cloudData
+'            Dim nrc = New oldrcData
 '            Dim segIndex = sortList.Count + 1
 '            nrc.rect = task.edgeLine.rectList(segIndex - 1)
 '            nrc.mask = dst2(nrc.rect).InRange(segIndex, segIndex)
@@ -96,7 +96,7 @@ End Class
 '        Next
 
 '        Dim prepMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-'        Dim sortGridID As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalInteger)
+'        Dim sortGridID As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalInteger)
 '        Dim duplicatePixels As Integer
 '        For Each nrc In sortList.Values
 '            nrc.ID = task.gridMap.Get(Of Integer)(nrc.segment(0).Y, nrc.segment(0).X)
@@ -109,16 +109,16 @@ End Class
 '            sortGridID.Add(nrc.ID, nrc)
 '        Next
 
-'        pcList = New List(Of cloudData)(sortGridID.Values)
+'        rcList = New List(Of oldrcData)(sortGridID.Values)
 
 '        dst1.SetTo(0)
-'        For i = 0 To pcList.Count - 1
-'            Dim nrc = pcList(i)
+'        For i = 0 To rcList.Count - 1
+'            Dim nrc = rcList(i)
 '            dst1(nrc.rect).SetTo(nrc.ID Mod 255, nrc.mask)
 '        Next
 '        dst3 = PaletteBlackZero(dst1)
 
-'        labels(3) = CStr(pcList.Count) + " segments are present.  " + CStr(duplicatePixels) +
+'        labels(3) = CStr(rcList.Count) + " segments are present.  " + CStr(duplicatePixels) +
 '                    " pixels were dropped because the segment hit an already occupied grid cell."
 '    End Sub
 'End Class

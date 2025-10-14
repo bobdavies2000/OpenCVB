@@ -3,17 +3,17 @@ Public Class RedCell_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Display the output of a cell for RedCloud_HeartBeat."
     End Sub
-    Public Shared Function selectCell(pcMap As cv.Mat, pcList As List(Of cloudData)) As String
-        If pcList.Count > 0 Then
+    Public Shared Function selectCell(pcMap As cv.Mat, rcList As List(Of rcData)) As String
+        If rcList.Count > 0 Then
             Dim clickIndex = pcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
-            If clickIndex >= 0 And clickIndex < pcList.Count Then
-                task.pcD = pcList(clickIndex)
+            If clickIndex >= 0 And clickIndex < rcList.Count Then
+                task.pcD = rcList(clickIndex)
             Else
                 Dim ages As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-                For Each pc In pcList
+                For Each pc In rcList
                     ages.Add(pc.age, pc.index - 1)
                 Next
-                task.pcD = pcList(ages.ElementAt(0).Value)
+                task.pcD = rcList(ages.ElementAt(0).Value)
             End If
             If task.pcD.rect.Contains(task.ClickPoint) Then Return task.pcD.displayCell
         End If
@@ -21,7 +21,7 @@ Public Class RedCell_Basics : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then dst2 = runRedCloud(src, labels(2))
-        strOut = selectCell(task.redCloud.pcMap, task.redCloud.pcList)
+        strOut = selectCell(task.redCloud.pcMap, task.redCloud.rcList)
 
         If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
         SetTrueText(strOut, 3)
@@ -44,9 +44,9 @@ Public Class RedCell_Color : Inherits TaskParent
         End If
         If task.redList Is Nothing Then task.redList = New RedList_Basics
 
-        Dim initialList As New List(Of rcData)
+        Dim initialList As New List(Of oldrcData)
         For i = 0 To mdList.Count - 1
-            Dim rc As New rcData
+            Dim rc As New oldrcData
             rc.rect = mdList(i).rect
             If rc.rect.Size = dst2.Size Then Continue For ' RedList_Basics can find a cell this big.  
             rc.mask = mdList(i).mask
@@ -87,7 +87,7 @@ Public Class RedCell_Color : Inherits TaskParent
             initialList.Add(rc)
         Next
 
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim sortedCells As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
 
         Dim rcNewCount As Integer
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar

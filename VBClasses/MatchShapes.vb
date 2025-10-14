@@ -64,9 +64,9 @@ End Class
 
 
 Public Class MatchShapes_NearbyHull : Inherits TaskParent
-    Public similarCells As New List(Of rcData)
+    Public similarCells As New List(Of oldrcData)
     Public bestCell As Integer
-    Dim rc As New rcData
+    Dim rc As New oldrcData
     Dim options As New Options_MatchShapes
     Dim hulls As New RedList_Hulls
     Public Sub New()
@@ -115,10 +115,10 @@ End Class
 
 
 Public Class MatchShapes_Nearby : Inherits TaskParent
-    Public oldrclist As New List(Of rcData)
-    Public similarCells As New List(Of rcData)
+    Public oldrclist As New List(Of oldrcData)
+    Public similarCells As New List(Of oldrcData)
     Public bestCell As Integer
-    Public rc As New rcData
+    Public rc As New oldrcData
     Dim options As New Options_MatchShapes
     Public runStandalone As Boolean = False
     Dim addTour As New RedList_Basics
@@ -134,7 +134,7 @@ Public Class MatchShapes_Nearby : Inherits TaskParent
         If myStandalone Then
             dst2 = runRedList(task.color, labels(2)).Clone
             If task.redList.oldrclist.Count = 0 Then Exit Sub
-            addTour.oldrclist = New List(Of rcData)(task.redList.oldrclist)
+            addTour.oldrclist = New List(Of oldrcData)(task.redList.oldrclist)
             addTour.Run(src)
             rc = task.rcD
         End If

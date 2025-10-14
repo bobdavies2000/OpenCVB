@@ -154,7 +154,7 @@ End Class
 
 Public Class Flood_Motion : Inherits TaskParent
     Dim flood As New Flood_Basics
-    Dim oldrclist As New List(Of rcData)
+    Dim oldrclist As New List(Of oldrcData)
     Dim cellMap As New cv.Mat
     Dim maxDists As New List(Of cv.Point2f)
     Dim maxIndex As New List(Of Integer)
@@ -165,7 +165,7 @@ Public Class Flood_Motion : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             flood.Run(src)
-            oldrclist = New List(Of rcData)(task.redList.oldrclist)
+            oldrclist = New List(Of oldrcData)(task.redList.oldrclist)
             cellMap = task.redList.rcMap.Clone
             dst2 = flood.dst2.Clone
             dst3 = flood.dst2.Clone

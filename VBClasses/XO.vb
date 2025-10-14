@@ -6601,7 +6601,7 @@ End Class
 
 Public Class XO_Contour_RedCloudCorners : Inherits TaskParent
     Public corners(4 - 1) As cv.Point
-    Public rc As New rcData
+    Public rc As New oldrcData
     Public Sub New()
         labels(2) = "The RedCloud Output with the highlighted contour to smooth"
         desc = "Find the point farthest from the center in each cell."
@@ -12599,7 +12599,7 @@ End Class
 Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
     Dim redCold As New RedCloud_HeartBeat
     Dim prep As New RedPrep_Basics
-    Public pcList As New List(Of cloudData)
+    Public rcList As New List(Of rcData)
     Public Sub New()
         desc = "Floodfill each region of the RedPrep_Basics output."
     End Sub
@@ -12619,19 +12619,19 @@ Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
         Dim index As Integer = 1
         Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
         Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
-        pcList.Clear()
+        rcList.Clear()
         Dim maskRect = New cv.Rect(1, 1, dst3.Width, dst3.Height)
-        For Each pc In redCold.pcList
+        For Each pc In redCold.rcList
             Dim count = cv.Cv2.FloodFill(dst3, mask, pc.maxDist, index, rect, 0, 0, flags)
             If count >= minCount And count < maxCount Then
                 index += 1
-                Dim pd = New cloudData(dst3(rect), rect)
+                Dim pd = New rcData(dst3(rect), rect)
                 dst2(rect).SetTo(task.scalarColors(index), mask(rect))
-                pcList.Add(pd)
+                rcList.Add(pd)
             End If
         Next
 
-        For Each pd In pcList
+        For Each pd In rcList
             dst2.Circle(pd.maxDist, task.DotSize, task.highlight, -1)
         Next
 
@@ -12667,7 +12667,7 @@ End Class
 
 Public Class XO_RedCloud_Basics : Inherits TaskParent
     Dim prepEdges As New RedPrep_EdgeMask
-    Public pcList As New List(Of cloudData)
+    Public rcList As New List(Of rcData)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Map of reduced point cloud - CV_8U"
@@ -12684,7 +12684,7 @@ Public Class XO_RedCloud_Basics : Inherits TaskParent
         Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
         Dim maskUsed As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim minCount = dst3.Total * 0.001, maxCount = dst3.Total * 3 / 4
-        Dim newList As New SortedList(Of Integer, cloudData)(New compareAllowIdenticalInteger)
+        Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalInteger)
         For y = 1 To dst3.Height - 2
             For x = 0 To dst3.Width - 2
                 Dim pt = New cv.Point(x, y)
@@ -12696,7 +12696,7 @@ Public Class XO_RedCloud_Basics : Inherits TaskParent
                         Dim r = New cv.Rect(rect.X + 1, rect.Y + 1, rect.Width - 1, rect.Height - 1)
                         maskUsed.Rectangle(r, 255, -1)
                         If count >= minCount And count < maxCount Then
-                            Dim pc = New cloudData(mask(r), r)
+                            Dim pc = New rcData(mask(r), r)
                             index += 1
                             newList.Add(pc.maxDist.Y, pc)
                         End If
@@ -12705,20 +12705,20 @@ Public Class XO_RedCloud_Basics : Inherits TaskParent
             Next
         Next
 
-        pcList.Clear()
+        rcList.Clear()
         dst1.SetTo(0)
         For Each pc In newList.Values
-            pc.index = pcList.Count + 1
-            pcList.Add(pc)
+            pc.index = rcList.Count + 1
+            rcList.Add(pc)
             dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
             SetTrueText(CStr(pc.index), New cv.Point(pc.rect.X, pc.rect.Y))
         Next
         dst2 = PaletteBlackZero(dst1)
 
         Dim clickIndex = dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
-        If clickIndex > 0 And clickIndex < pcList.Count Then
-            task.color(pcList(clickIndex - 1).rect).SetTo(white, pcList(clickIndex - 1).mask)
-            task.color.Rectangle(pcList(clickIndex - 1).rect, white, task.lineWidth, task.lineType)
+        If clickIndex > 0 And clickIndex < rcList.Count Then
+            task.color(rcList(clickIndex - 1).rect).SetTo(white, rcList(clickIndex - 1).mask)
+            task.color.Rectangle(rcList(clickIndex - 1).rect, white, task.lineWidth, task.lineType)
         End If
         labels(2) = CStr(newList.Count) + " regions were identified. Region " + CStr(clickIndex) + " was selected."
     End Sub
@@ -13177,7 +13177,7 @@ Public Class XO_RedCell_ValidateColorCloud : Inherits TaskParent
         dst1.SetTo(0)
         dst3.SetTo(0)
         Dim percentDepth As New List(Of Single)
-        For Each pc In task.redCloud.pcList
+        For Each pc In task.redCloud.rcList
             If pc.pixels > 0 Then dst1(pc.rect).SetTo(255, pc.mask)
             If pc.pixels > 0 Then
                 Dim tmp As cv.Mat = task.depthMask(pc.rect) And pc.mask
@@ -13222,7 +13222,7 @@ Public Class XO_RedCloud_Hulls : Inherits TaskParent
         dst3.SetTo(0)
         Dim hullCounts As New List(Of Integer)
         Dim contourCounts As New List(Of Integer)
-        For Each pc In task.redCloud.pcList
+        For Each pc In task.redCloud.rcList
             pc.hull = cv.Cv2.ConvexHull(pc.contour.ToArray, True).ToList
             DrawTour(dst3(pc.rect), pc.hull, pc.color, -1)
             hullCounts.Add(pc.hull.Count)
@@ -13358,7 +13358,7 @@ Public Class XO_RedList_Consistent : Inherits TaskParent
     Dim redCold As New Bin3Way_RedCloud
     Dim diff As New Diff_Basics
     Dim cellmaps As New List(Of cv.Mat)
-    Dim cellLists As New List(Of List(Of rcData))
+    Dim cellLists As New List(Of List(Of oldrcData))
     Dim diffs As New List(Of cv.Mat)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -13372,12 +13372,12 @@ Public Class XO_RedList_Consistent : Inherits TaskParent
         diff.Run(task.redList.rcMap)
         dst1 = diff.dst2
 
-        cellLists.Add(New List(Of rcData)(task.redList.oldrclist))
+        cellLists.Add(New List(Of oldrcData)(task.redList.oldrclist))
         cellmaps.Add(task.redList.rcMap And Not dst1)
         diffs.Add(dst1.Clone)
 
         task.redList.oldrclist.Clear()
-        task.redList.oldrclist.Add(New rcData)
+        task.redList.oldrclist.Add(New oldrcData)
         For i = 0 To cellLists.Count - 1
             For Each rc In cellLists(i)
                 Dim present As Boolean = True
@@ -13457,7 +13457,7 @@ End Class
 
 
 Public Class XO_RedList_ContourAdd : Inherits TaskParent
-    Public oldrclist As New List(Of rcData)
+    Public oldrclist As New List(Of oldrcData)
     Public Sub New()
 
         desc = "Add a contour for each RedColor cell."
@@ -13675,7 +13675,7 @@ Public Class XO_RedList_GridCellsOld : Inherits TaskParent
         Dim histogram As New cv.Mat
         Dim ranges = {New cv.Rangef(0, 255)}
         Dim histArray(254) As Single
-        Dim oldrclist As New List(Of rcData)
+        Dim oldrclist As New List(Of oldrcData)
         Dim usedList As New List(Of Integer)
         For Each md In mdList
             cv.Cv2.CalcHist({task.redList.rcMap(md.rect)}, {0}, md.mask, histogram, 1, {255}, ranges)
@@ -13720,11 +13720,11 @@ Public Class XO_RedList_GridCells : Inherits TaskParent
         dst1 = regions.dst2
 
         runRedList(src, labels(2))
-        Dim lastList As New List(Of rcData)(task.redList.oldrclist)
+        Dim lastList As New List(Of oldrcData)(task.redList.oldrclist)
 
         dst2.SetTo(0)
 
-        Dim oldrclist As New List(Of rcData)
+        Dim oldrclist As New List(Of oldrcData)
         For Each rc In task.redList.oldrclist
             If task.motionMask(rc.rect).CountNonZero = 0 Then
                 If rc.indexLast > 0 And rc.indexLast < lastList.Count Then rc = lastList(rc.indexLast)
@@ -13742,7 +13742,7 @@ Public Class XO_RedList_GridCells : Inherits TaskParent
             oldrclist.Add(rc)
         Next
 
-        task.redList.oldrclist = New List(Of rcData)(oldrclist)
+        task.redList.oldrclist = New List(Of oldrcData)(oldrclist)
         labels(3) = CStr(oldrclist.Count) + " redCloud cells were found"
     End Sub
 End Class
@@ -13766,12 +13766,12 @@ Public Class XO_RedList_GridCellsHist : Inherits TaskParent
         dst1 = regions.redM.dst2
 
         runRedList(src, labels(2))
-        Static rcLastList As New List(Of rcData)(task.redList.oldrclist)
+        Static rcLastList As New List(Of oldrcData)(task.redList.oldrclist)
 
         Dim mdList = New List(Of maskData)(regions.redM.mdList)
         Dim histogram As New cv.Mat
         Dim ranges = {New cv.Rangef(0, 255)}
-        Dim oldrclist As New List(Of rcData)
+        Dim oldrclist As New List(Of oldrcData)
         Dim lastCount As Integer
         Dim histArray(mdList.Count - 1) As Single
         For Each rc In task.redList.oldrclist
@@ -13796,8 +13796,8 @@ Public Class XO_RedList_GridCellsHist : Inherits TaskParent
             dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
-        task.redList.oldrclist = New List(Of rcData)(oldrclist)
-        rcLastList = New List(Of rcData)(oldrclist)
+        task.redList.oldrclist = New List(Of oldrcData)(oldrclist)
+        rcLastList = New List(Of oldrcData)(oldrclist)
         labels(3) = CStr(oldrclist.Count) + " redCloud cells were found and " + CStr(lastCount) + " cells had no motion."
     End Sub
 End Class
@@ -13838,7 +13838,7 @@ Public Class XO_RedList_Largest : Inherits TaskParent
         If task.redList.oldrclist.Count = 0 Then Exit Sub ' next frame please...
 
         Dim rc = task.redList.oldrclist(1)
-        Static rcSave As rcData = rc, stableCount As Integer
+        Static rcSave As oldrcData = rc, stableCount As Integer
         If rc.maxDStable <> rcSave.maxDStable Then
             rcSave = rc
             stableCount = 1
@@ -14023,7 +14023,7 @@ Public Class XO_RedList_CellChanges : Inherits TaskParent
 
         Dim changedPixels = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero
         Dim changedCells As Integer
-        For Each rc As rcData In task.redList.oldrclist
+        For Each rc As oldrcData In task.redList.oldrclist
             If rc.indexLast = 0 Then changedCells += 1
         Next
 
@@ -14043,11 +14043,11 @@ End Class
 Public Class XO_Bin2Way_RedCloud : Inherits TaskParent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim flood As New Flood_BasicsMask
-    Dim cellMaps(3) As cv.Mat, oldrclist(3) As List(Of rcData)
+    Dim cellMaps(3) As cv.Mat, oldrclist(3) As List(Of oldrcData)
     Dim options As New Options_Bin2WayRedCloud
     Public Sub New()
         flood.showSelected = False
-        desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
+        desc = "Identify the lightest, darkest, and other regions separately and then combine the oldrcData."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
@@ -14055,14 +14055,14 @@ Public Class XO_Bin2Way_RedCloud : Inherits TaskParent
 
         If task.optionsChanged Then
             For i = 0 To oldrclist.Count - 1
-                oldrclist(i) = New List(Of rcData)
+                oldrclist(i) = New List(Of oldrcData)
                 cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Next
         End If
 
         bin2.Run(src)
 
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        Dim sortedCells As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
         For i = options.startRegion To options.endRegion
             task.redList.rcMap = cellMaps(i)
 
@@ -14070,7 +14070,7 @@ Public Class XO_Bin2Way_RedCloud : Inherits TaskParent
             flood.inputRemoved = Not bin2.mats.mat(i)
             flood.Run(bin2.mats.mat(i))
             cellMaps(i) = task.redList.rcMap.Clone
-            oldrclist(i) = New List(Of rcData)(task.redList.oldrclist)
+            oldrclist(i) = New List(Of oldrcData)(task.redList.oldrclist)
             For Each orc In task.redList.oldrclist
                 If orc.index = 0 Then Continue For
                 sortedCells.Add(orc.pixels, orc)

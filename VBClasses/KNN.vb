@@ -1435,7 +1435,7 @@ Public Class KNN_Hulls : Inherits TaskParent
 
         knn.ptListQuery.Clear()
         dst3.SetTo(0)
-        For Each pc In redC.pcList
+        For Each pc In redC.rcList
             dst3(pc.rect).SetTo(pc.color, pc.mask)
             For Each pt In pc.hull
                 dst2(pc.rect).Circle(pt, task.DotSize, task.highlight, -1)

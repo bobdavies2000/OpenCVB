@@ -508,8 +508,8 @@ End Class
 
 Public Class XO_RedList_LikelyFlatSurfaces : Inherits TaskParent
     Dim verts As New Plane_Basics
-    Public vCells As New List(Of rcData)
-    Public hCells As New List(Of rcData)
+    Public vCells As New List(Of oldrcData)
+    Public hCells As New List(Of oldrcData)
     Public Sub New()
         labels(1) = "RedCloud output"
         desc = "Use the mask for vertical surfaces to identify RedCloud cells that appear to be flat."
@@ -580,13 +580,13 @@ Public Class XO_RedList_Motion : Inherits TaskParent
         runRedList(src, labels(2))
         If task.redList.oldrclist.Count = 0 Then Exit Sub
 
-        Static rcLastList As New List(Of rcData)(task.redList.oldrclist)
+        Static rcLastList As New List(Of oldrcData)(task.redList.oldrclist)
 
         Dim count As Integer
         dst1.SetTo(0)
         task.redList.oldrclist.RemoveAt(0)
-        'Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        Dim newList As New List(Of rcData), tmp As New cv.Mat
+        'Dim newList As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
+        Dim newList As New List(Of oldrcData), tmp As New cv.Mat
         Dim countMaxD As Integer, countMissedMaxD As Integer
         For Each rc In task.redList.oldrclist
             tmp = task.motionMask(rc.rect) And rc.mask
@@ -613,13 +613,13 @@ Public Class XO_RedList_Motion : Inherits TaskParent
                     "  There were " + CStr(countMaxD) + " maxDstable matches and " + CStr(countMissedMaxD) + " misses"
 
         task.redList.oldrclist.Clear()
-        task.redList.oldrclist.Add(New rcData)
+        task.redList.oldrclist.Add(New oldrcData)
         For Each rc In newList
             rc.index = task.redList.oldrclist.Count
             task.redList.oldrclist.Add(rc)
         Next
 
-        rcLastList = New List(Of rcData)(task.redList.oldrclist)
+        rcLastList = New List(Of oldrcData)(task.redList.oldrclist)
 
         dst3.SetTo(0)
         For Each rc In task.redList.oldrclist
@@ -665,11 +665,11 @@ Public Class XO_RedList_OnlyColorAlt : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         runRedList(src, labels(3))
 
-        Dim lastCells As New List(Of rcData)(task.redList.oldrclist)
+        Dim lastCells As New List(Of oldrcData)(task.redList.oldrclist)
         Dim lastMap As cv.Mat = task.redList.rcMap.Clone
         Dim lastColors As cv.Mat = dst3.Clone
 
-        Dim newCells As New List(Of rcData)
+        Dim newCells As New List(Of oldrcData)
         task.redList.rcMap.SetTo(0)
         dst3.SetTo(0)
         Dim usedColors = New List(Of cv.Scalar)({black})
@@ -695,7 +695,7 @@ Public Class XO_RedList_OnlyColorAlt : Inherits TaskParent
             End If
         Next
 
-        task.redList.oldrclist = New List(Of rcData)(newCells)
+        task.redList.oldrclist = New List(Of oldrcData)(newCells)
         labels(3) = CStr(task.redList.oldrclist.Count) + " cells were identified."
         labels(2) = task.redList.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
 
