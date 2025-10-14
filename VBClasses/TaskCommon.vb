@@ -37,19 +37,19 @@ Public Module vbc
     Public Function DisplayCells() As cv.Mat
         Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
 
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             dst(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
         Return dst
     End Function
     Public Function RebuildRCMap(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
-        task.redList.rcList.Clear()
-        task.redList.rcList.Add(New rcData) ' placeholder rcData so map is correct.
+        task.redList.oldrclist.Clear()
+        task.redList.oldrclist.Add(New rcData) ' placeholder rcData so map is correct.
         task.redList.rcMap.SetTo(0)
         Static saveColorSetting = task.gOptions.trackingLabel
         For Each rc In sortedCells.Values
-            rc.index = task.redList.rcList.Count
+            rc.index = task.redList.oldrclist.Count
 
             If saveColorSetting <> task.gOptions.trackingLabel Then rc.color = black
             Select Case task.gOptions.trackingLabel
@@ -60,7 +60,7 @@ Public Module vbc
                     If rc.color = black Then rc.color = task.scalarColors(rc.index)
             End Select
 
-            task.redList.rcList.Add(rc)
+            task.redList.oldrclist.Add(rc)
             task.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
             DisplayCells.Circle(rc.maxDStable, task.DotSize, task.highlight, -1)
             If rc.index >= 255 Then Exit For
@@ -69,10 +69,10 @@ Public Module vbc
         task.redList.rcMap.SetTo(0, task.noDepthMask)
         Return DisplayCells()
     End Function
-    Public Function RebuildRCMap(rcList As List(Of rcData)) As cv.Mat
+    Public Function RebuildRCMap(oldrclist As List(Of rcData)) As cv.Mat
         task.redList.rcMap.SetTo(0)
         Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
-        For Each rc In rcList
+        For Each rc In oldrclist
             task.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
             dst(rc.rect).SetTo(rc.color, rc.mask)
             If rc.index >= 255 Then Exit For

@@ -119,7 +119,7 @@ Public Class Hist3D_RedColor : Inherits TaskParent
         dst3 = hColor.dst3
         labels(3) = hColor.labels(3)
         dst2 = runRedList(hColor.dst2, labels(2))
-        If task.redList.rcList.Count > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+        If task.redList.oldrclist.Count > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
     End Sub
 End Class
 
@@ -211,7 +211,7 @@ Public Class Hist3D_PixelCells : Inherits TaskParent
 
         pixel.Run(src)
 
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             cv.Cv2.CalcBackProject({src(rc.rect)}, {0, 1, 2}, pixel.histogram, dst2(rc.rect), task.rangesBGR)
         Next
 
@@ -236,7 +236,7 @@ Public Class Hist3D_PixelClassify : Inherits TaskParent
 
         dst2 = runRedList(pixel.dst2, labels(2))
 
-        If task.redList.rcList.Count > 0 Then
+        If task.redList.oldrclist.Count > 0 Then
             dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
         End If
     End Sub
@@ -312,10 +312,10 @@ Public Class Hist3D_RedCloudGrid : Inherits TaskParent
                         Dim vec = pixels.pixelVector(index - 1)
                         distances.Add(distanceN(vec, hVector.histArray))
                     Next
-                    Dim cell = pixels.rcList(candidates(distances.IndexOf(distances.Min)) - 1)
+                    Dim cell = pixels.oldrclist(candidates(distances.IndexOf(distances.Min)) - 1)
                     dst1(roi).SetTo(cell.color, dst3(roi))
                 ElseIf candidates.Count = 1 Then
-                    Dim cell = pixels.rcList(candidates(0) - 1)
+                    Dim cell = pixels.oldrclist(candidates(0) - 1)
                     dst1(roi).SetTo(cell.color, dst3(roi))
                 End If
             End If

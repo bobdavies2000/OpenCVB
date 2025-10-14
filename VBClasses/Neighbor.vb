@@ -13,13 +13,13 @@ Public Class Neighbor_Basics : Inherits TaskParent
         If standalone Or runRedCflag Then dst2 = runRedList(src, labels(2))
 
         knn.queries.Clear()
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             knn.queries.Add(rc.maxDist)
         Next
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
         knn.Run(src)
 
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             For i = 0 To Math.Min(knn.neighbors.Count, options.neighbors) - 1
                 rc.nabs.Add(knn.neighbors(rc.index)(i))
             Next
@@ -29,8 +29,8 @@ Public Class Neighbor_Basics : Inherits TaskParent
             task.setSelectedCell()
             dst3.SetTo(0)
             For Each index In task.rcD.nabs
-                If index < task.redList.rcList.Count Then
-                    DrawCircle(dst2, task.redList.rcList(index).maxDist, task.DotSize, task.highlight)
+                If index < task.redList.oldrclist.Count Then
+                    DrawCircle(dst2, task.redList.oldrclist(index).maxDist, task.DotSize, task.highlight)
                 End If
             Next
         End If
@@ -121,7 +121,7 @@ End Class
 
 Public Class Neighbor_Precise : Inherits TaskParent
     Public nabList As New List(Of List(Of Integer))
-    Public rcList As List(Of rcData)
+    Public oldrclist As List(Of rcData)
     Public runRedCflag As Boolean = False
     Public Sub New()
         cPtr = Neighbor_Open()
@@ -133,7 +133,7 @@ Public Class Neighbor_Precise : Inherits TaskParent
             dst2 = runRedList(src, labels(2))
 
             src = task.redList.rcMap
-            rcList = task.redList.rcList
+            oldrclist = task.redList.oldrclist
         End If
 
         Dim mapData(src.Total - 1) As Byte
@@ -146,23 +146,23 @@ Public Class Neighbor_Precise : Inherits TaskParent
         'If nabCount > 0 Then
         '    Dim nabData = New cv.Mat(nabCount, 1, cv.MatType.CV_32SC2, Neighbor_NabList(cPtr))
         '    nabList.Clear()
-        '    For i = 0 To rcList.Count - 1
+        '    For i = 0 To oldrclist.Count - 1
         '        nabList.Add(New List(Of Integer))
         '    Next
-        '    rcList(i).nab = nabList.Min()
+        '    oldrclist(i).nab = nabList.Min()
         '    For i = 0 To nabCount - 1
         '        Dim pt = nabData.Get(Of cv.Point)(i, 0)
         '        If nabList(pt.X).Contains(pt.Y) = False And pt.Y <> 0 Then
         '            nabList(pt.X).Add(pt.Y)
-        '            rcList(pt.X).nabs.Add(pt.Y)
+        '            oldrclist(pt.X).nabs.Add(pt.Y)
         '        End If
         '        If nabList(pt.Y).Contains(pt.X) = False And pt.X <> 0 Then
         '            nabList(pt.Y).Add(pt.X)
-        '            rcList(pt.Y).nabs.Add(pt.X)
+        '            oldrclist(pt.Y).nabs.Add(pt.X)
         '        End If
         '    Next
         '    nabList(0).Clear() ' neighbors to zero are not interesting (yet?)
-        '    rcList(0).nabs.Clear() ' not interesting.
+        '    oldrclist(0).nabs.Clear() ' not interesting.
 
         '    If task.heartBeat And standaloneTest() Then
         '        Static stats As New XO_RedCell_Basics
@@ -175,7 +175,7 @@ Public Class Neighbor_Precise : Inherits TaskParent
         '            dst1.SetTo(0)
         '            dst1(task.rcD.rect).SetTo(task.rcD.color, task.rcD.mask)
         '            For Each index In nabList(task.rcD.index)
-        '                Dim rc = rcList(index)
+        '                Dim rc = oldrclist(index)
         '                dst1(rc.rect).SetTo(rc.color, rc.mask)
         '                strOut += CStr(index) + ","
         '            Next

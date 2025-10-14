@@ -8,7 +8,7 @@ Public Class RedTrack_Basics : Inherits TaskParent
         dst3 = runRedList(src, labels(2))
         labels(2) = task.redList.labels(2)
         dst2.SetTo(0)
-        For Each rc As rcData In task.redList.rcList
+        For Each rc As rcData In task.redList.oldrclist
             DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
             If rc.index = task.rcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
         Next
@@ -58,7 +58,7 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
     Private Function findNearest(pt As cv.Point) As Integer
         Dim bestDistance As Single = Single.MaxValue
         Dim bestIndex As Integer
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             Dim d = pt.DistanceTo(rc.maxDist)
             If d < bestDistance Then
                 bestDistance = d
@@ -70,12 +70,12 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         track.Run(src)
         dst2 = track.dst2
-        If task.redList.rcList.Count = 0 Then
+        If task.redList.oldrclist.Count = 0 Then
             SetTrueText("No lines found to track.", 3)
             Exit Sub
         End If
         Dim xList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             If rc.index = 0 Then Continue For
             xList.Add(rc.rect.X, rc.index)
         Next
@@ -89,18 +89,18 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
             While leftCenter.DistanceTo(rightCenter) < dst2.Width / 4
                 leftMost = msRNG.Next(minLeft, minRight)
                 rightmost = msRNG.Next(minLeft, minRight)
-                leftCenter = task.redList.rcList(leftMost).maxDist
-                rightCenter = task.redList.rcList(rightmost).maxDist
+                leftCenter = task.redList.oldrclist(leftMost).maxDist
+                rightCenter = task.redList.oldrclist(rightmost).maxDist
                 iterations += 1
                 If iterations > 10 Then Exit Sub
             End While
         End If
 
         leftMost = findNearest(leftCenter)
-        leftCenter = task.redList.rcList(leftMost).maxDist
+        leftCenter = task.redList.oldrclist(leftMost).maxDist
 
         rightmost = findNearest(rightCenter)
-        rightCenter = task.redList.rcList(rightmost).maxDist
+        rightCenter = task.redList.oldrclist(rightmost).maxDist
 
         DrawLine(dst2, leftCenter, rightCenter, white)
         labels(2) = task.redList.labels(2)
@@ -221,7 +221,7 @@ Public Class RedTrack_Features : Inherits TaskParent
 
         task.redList.Run(dst2)
         dst3.SetTo(0)
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
             DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)
             If rc.contour.Count > 0 Then SetTrueText(RedList_ShapeCorrelation.shapeCorrelation(rc.contour).ToString(fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
@@ -292,7 +292,7 @@ Public Class XO_RedList_TopX : Inherits TaskParent
 
         If task.heartBeat Or task.optionsChanged Then
             topXcells.Clear()
-            For Each rc In task.redList.rcList
+            For Each rc In task.redList.oldrclist
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 topXcells.Add(rc.maxDist)
             Next
@@ -300,14 +300,14 @@ Public Class XO_RedList_TopX : Inherits TaskParent
             Dim maxList As New List(Of cv.Point)
             For Each pt In topXcells
                 Dim index = task.redList.rcMap.Get(Of Byte)(pt.Y, pt.X)
-                Dim rc = task.redList.rcList(index)
+                Dim rc = task.redList.oldrclist(index)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 DrawCircle(dst2, rc.maxDist, task.DotSize, task.highlight)
                 maxList.Add(rc.maxDist)
             Next
             topXcells = New List(Of cv.Point)(maxList)
         End If
-        labels(2) = "The Top " + CStr(topXcells.Count) + " largest cells in rcList."
+        labels(2) = "The Top " + CStr(topXcells.Count) + " largest cells in oldrclist."
 
         dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
@@ -334,9 +334,9 @@ Public Class XO_RedList_UnmatchedCount : Inherits TaskParent
 
         Dim unMatchedCells As Integer
         Dim mostlyColor As Integer
-        For i = 0 To task.redList.rcList.Count - 1
-            Dim rc = task.redList.rcList(i)
-            If task.redList.rcList(i).depthPixels / task.redList.rcList(i).pixels < 0.5 Then mostlyColor += 1
+        For i = 0 To task.redList.oldrclist.Count - 1
+            Dim rc = task.redList.oldrclist(i)
+            If task.redList.oldrclist(i).depthPixels / task.redList.oldrclist(i).pixels < 0.5 Then mostlyColor += 1
             If rc.indexLast <> 0 Then
                 Dim val = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If val = 0 Then
@@ -361,8 +361,8 @@ Public Class XO_RedList_UnmatchedCount : Inherits TaskParent
             myFrameCount = 0
             Dim sum = changedCellCounts.Sum(), avg = If(changedCellCounts.Count > 0, changedCellCounts.Average(), 0)
             labels(3) = CStr(sum) + " new/moved cells in the last second " + Format(avg, fmt1) + " changed per frame"
-            labels(2) = CStr(task.redList.rcList.Count) + " cells, unmatched cells = " + CStr(unMatchedCells) + "   " +
-                        CStr(mostlyColor) + " cells were mostly color and " + CStr(task.redList.rcList.Count - mostlyColor) + " had depth."
+            labels(2) = CStr(task.redList.oldrclist.Count) + " cells, unmatched cells = " + CStr(unMatchedCells) + "   " +
+                        CStr(mostlyColor) + " cells were mostly color and " + CStr(task.redList.oldrclist.Count - mostlyColor) + " had depth."
             changedCellCounts.Clear()
         End If
     End Sub

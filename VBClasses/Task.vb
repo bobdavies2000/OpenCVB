@@ -527,19 +527,19 @@ Public Class VBtask : Implements IDisposable
     End Sub
     Public Sub setSelectedCell()
         If task.redList Is Nothing Then Exit Sub
-        If task.redList.rcList.Count = 0 Then Exit Sub
-        If ClickPoint = newPoint And task.redList.rcList.Count > 1 Then
-            ClickPoint = task.redList.rcList(1).maxDist
+        If task.redList.oldrclist.Count = 0 Then Exit Sub
+        If ClickPoint = newPoint And task.redList.oldrclist.Count > 1 Then
+            ClickPoint = task.redList.oldrclist(1).maxDist
         End If
         Dim index = task.redList.rcMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
         If index = 0 Then Exit Sub
-        If index > 0 And index < task.redList.rcList.Count Then
-            ' ClickPoint = rcList(index).maxDist
-            task.rcD = task.redList.rcList(index)
+        If index > 0 And index < task.redList.oldrclist.Count Then
+            ' ClickPoint = oldrclist(index).maxDist
+            task.rcD = task.redList.oldrclist(index)
             task.color(task.rcD.rect).SetTo(cv.Scalar.White, task.rcD.mask)
         Else
             ' the 0th cell is always the upper left corner with just 1 pixel.
-            If task.redList.rcList.Count > 1 Then task.rcD = task.redList.rcList(1)
+            If task.redList.oldrclist.Count > 1 Then task.rcD = task.redList.oldrclist(1)
         End If
     End Sub
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)

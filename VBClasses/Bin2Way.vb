@@ -85,7 +85,7 @@ Public Class Bin2Way_RedCloudDarkest : Inherits TaskParent
         flood.inputRemoved = Not bin2.mats.mat(0)
         flood.Run(bin2.mats.mat(0))
         dst2 = flood.dst2
-        If task.heartBeat Then labels(2) = CStr(task.redList.rcList.Count) + " cells were identified"
+        If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified"
     End Sub
 End Class
 
@@ -107,7 +107,7 @@ Public Class Bin2Way_RedCloudLightest : Inherits TaskParent
         flood.inputRemoved = Not bin2.mats.mat(3)
         flood.Run(bin2.mats.mat(3))
         dst2 = flood.dst2
-        If task.heartBeat Then labels(2) = CStr(task.redList.rcList.Count) + " cells were identified"
+        If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified"
     End Sub
 End Class
 
@@ -154,7 +154,7 @@ End Class
 Public Class Bin2Way_RedCloud : Inherits TaskParent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim flood As New Flood_BasicsMask
-    Dim cellMaps(3) As cv.Mat, rcList(3) As List(Of rcData)
+    Dim cellMaps(3) As cv.Mat, oldrclist(3) As List(Of rcData)
     Dim options As New Options_Bin2WayRedCloud
     Public Sub New()
         flood.showSelected = False
@@ -165,8 +165,8 @@ Public Class Bin2Way_RedCloud : Inherits TaskParent
         dst3 = runRedList(src, labels(3))
 
         If task.optionsChanged Then
-            For i = 0 To rcList.Count - 1
-                rcList(i) = New List(Of rcData)
+            For i = 0 To oldrclist.Count - 1
+                oldrclist(i) = New List(Of rcData)
                 cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Next
         End If
@@ -177,19 +177,19 @@ Public Class Bin2Way_RedCloud : Inherits TaskParent
         For i = options.startRegion To options.endRegion
             task.redList.rcMap = cellMaps(i)
 
-            task.redList.rcList = rcList(i)
+            task.redList.oldrclist = oldrclist(i)
             flood.inputRemoved = Not bin2.mats.mat(i)
             flood.Run(bin2.mats.mat(i))
             cellMaps(i) = task.redList.rcMap.Clone
-            rcList(i) = New List(Of rcData)(task.redList.rcList)
-            For Each rc In task.redList.rcList
-                If rc.index = 0 Then Continue For
-                sortedCells.Add(rc.pixels, rc)
+            oldrclist(i) = New List(Of rcData)(task.redList.oldrclist)
+            For Each orc In task.redList.oldrclist
+                If orc.index = 0 Then Continue For
+                sortedCells.Add(orc.pixels, orc)
             Next
         Next
 
         dst2 = RebuildRCMap(sortedCells)
 
-        If task.heartBeat Then labels(2) = CStr(task.redList.rcList.Count) + " cells were identified and matched to the previous image"
+        If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
     End Sub
 End Class

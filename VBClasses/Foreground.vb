@@ -125,7 +125,7 @@ Public Class Foreground_RedCloud : Inherits TaskParent
         back.Run(src)
         dst3 = back.dst2
         labels(3) = back.labels(2)
-        If task.redList.rcList.Count > 0 Then
+        If task.redList.oldrclist.Count > 0 Then
             dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
         End If
     End Sub
@@ -137,7 +137,7 @@ End Class
 
 Public Class Foreground_CellsFore : Inherits TaskParent
     Dim fore As New Foreground_Hist3D
-    Public rcList As New List(Of rcData)
+    Public oldrclist As New List(Of rcData)
     Public Sub New()
         desc = "Get the foreground cells"
     End Sub
@@ -146,7 +146,7 @@ Public Class Foreground_CellsFore : Inherits TaskParent
         fore.Run(src)
         dst3 = fore.dst3
         dst2.SetTo(0)
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
             If tmp.CountNonZero Then dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
@@ -158,7 +158,7 @@ End Class
 
 Public Class Foreground_CellsBack : Inherits TaskParent
     Dim fore As New Foreground_Hist3D
-    Public rcList As New List(Of rcData)
+    Public oldrclist As New List(Of rcData)
     Public Sub New()
         desc = "Get the background cells"
     End Sub
@@ -167,7 +167,7 @@ Public Class Foreground_CellsBack : Inherits TaskParent
         fore.Run(src)
         dst3 = Not fore.dst2 And task.depthMask
         dst2.SetTo(0)
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
             If tmp.CountNonZero Then dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next

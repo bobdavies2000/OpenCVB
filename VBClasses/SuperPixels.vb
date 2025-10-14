@@ -8,7 +8,7 @@ Public Class SuperPixel_Basics : Inherits TaskParent
         dst2 = runRedList(src, labels(2))
 
         dst3 = src
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             DrawTour(dst3(rc.rect), rc.contour, white, task.lineWidth)
         Next
     End Sub

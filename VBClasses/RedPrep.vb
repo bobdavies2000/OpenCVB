@@ -523,7 +523,7 @@ Public Class XO_RedList_LikelyFlatSurfaces : Inherits TaskParent
 
         vCells.Clear()
         hCells.Clear()
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             If rc.depth >= task.MaxZmeters Then Continue For
             Dim tmp As cv.Mat = verts.dst2(rc.rect) And rc.mask
             If tmp.CountNonZero / rc.pixels > 0.5 Then
@@ -556,7 +556,7 @@ Public Class XO_RedList_MostlyColor : Inherits TaskParent
         dst2 = runRedList(src, labels(2))
 
         dst3.SetTo(0)
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             If rc.depthPixels / rc.pixels > 0.5 Then dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
     End Sub
@@ -578,17 +578,17 @@ Public Class XO_RedList_Motion : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.motionPercent = 0 Then Exit Sub ' full image stable means nothing needs to be done...
         runRedList(src, labels(2))
-        If task.redList.rcList.Count = 0 Then Exit Sub
+        If task.redList.oldrclist.Count = 0 Then Exit Sub
 
-        Static rcLastList As New List(Of rcData)(task.redList.rcList)
+        Static rcLastList As New List(Of rcData)(task.redList.oldrclist)
 
         Dim count As Integer
         dst1.SetTo(0)
-        task.redList.rcList.RemoveAt(0)
+        task.redList.oldrclist.RemoveAt(0)
         'Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim newList As New List(Of rcData), tmp As New cv.Mat
         Dim countMaxD As Integer, countMissedMaxD As Integer
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             tmp = task.motionMask(rc.rect) And rc.mask
             If tmp.CountNonZero = 0 Then
                 If rc.indexLast <> 0 And rc.indexLast < rcLastList.Count Then
@@ -609,24 +609,24 @@ Public Class XO_RedList_Motion : Inherits TaskParent
             End If
             dst1(rc.rect).SetTo(255, rc.mask)
         Next
-        labels(3) = CStr(count) + " of " + CStr(task.redList.rcList.Count) + " redCloud cells had motion." +
+        labels(3) = CStr(count) + " of " + CStr(task.redList.oldrclist.Count) + " redCloud cells had motion." +
                     "  There were " + CStr(countMaxD) + " maxDstable matches and " + CStr(countMissedMaxD) + " misses"
 
-        task.redList.rcList.Clear()
-        task.redList.rcList.Add(New rcData)
+        task.redList.oldrclist.Clear()
+        task.redList.oldrclist.Add(New rcData)
         For Each rc In newList
-            rc.index = task.redList.rcList.Count
-            task.redList.rcList.Add(rc)
+            rc.index = task.redList.oldrclist.Count
+            task.redList.oldrclist.Add(rc)
         Next
 
-        rcLastList = New List(Of rcData)(task.redList.rcList)
+        rcLastList = New List(Of rcData)(task.redList.oldrclist)
 
         dst3.SetTo(0)
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
-        dst2 = RebuildRCMap(task.redList.rcList)
+        dst2 = RebuildRCMap(task.redList.oldrclist)
         task.setSelectedCell()
     End Sub
 End Class
@@ -665,7 +665,7 @@ Public Class XO_RedList_OnlyColorAlt : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         runRedList(src, labels(3))
 
-        Dim lastCells As New List(Of rcData)(task.redList.rcList)
+        Dim lastCells As New List(Of rcData)(task.redList.oldrclist)
         Dim lastMap As cv.Mat = task.redList.rcMap.Clone
         Dim lastColors As cv.Mat = dst3.Clone
 
@@ -674,7 +674,7 @@ Public Class XO_RedList_OnlyColorAlt : Inherits TaskParent
         dst3.SetTo(0)
         Dim usedColors = New List(Of cv.Scalar)({black})
         Dim unmatched As Integer
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             Dim index = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If index < lastCells.Count Then
                 rc.color = lastColors.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X).ToVec3f
@@ -688,17 +688,17 @@ Public Class XO_RedList_OnlyColorAlt : Inherits TaskParent
             usedColors.Add(rc.color)
 
             If task.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) = 0 Then
-                rc.index = task.redList.rcList.Count
+                rc.index = task.redList.oldrclist.Count
                 newCells.Add(rc)
                 task.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
             End If
         Next
 
-        task.redList.rcList = New List(Of rcData)(newCells)
-        labels(3) = CStr(task.redList.rcList.Count) + " cells were identified."
+        task.redList.oldrclist = New List(Of rcData)(newCells)
+        labels(3) = CStr(task.redList.oldrclist.Count) + " cells were identified."
         labels(2) = task.redList.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
 
-        If task.redList.rcList.Count > 0 Then dst2 = PaletteFull(lastMap)
+        If task.redList.oldrclist.Count > 0 Then dst2 = PaletteFull(lastMap)
     End Sub
 End Class

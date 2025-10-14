@@ -109,14 +109,14 @@ Public Class Quad_MinMax : Inherits TaskParent
             Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
             Dim index = task.redList.rcMap.Get(Of Byte)(center.Y, center.X)
 
-            If index <= 0 Or index >= task.redList.rcList.Count Then
+            If index <= 0 Or index >= task.redList.oldrclist.Count Then
                 depthList1(i).Clear()
                 depthList2(i).Clear()
                 colorList(i) = black
                 Continue For
             End If
 
-            Dim rc = task.redList.rcList(index)
+            Dim rc = task.redList.oldrclist(index)
             If rc.depth = 0 Then Continue For
 
             If colorList(i) <> rc.color Then
@@ -204,7 +204,7 @@ Public Class Quad_Hulls : Inherits TaskParent
                 Continue For
             End If
 
-            Dim rc = task.redList.rcList(index)
+            Dim rc = task.redList.oldrclist(index)
             If rc.depth = 0 Then Continue For
 
             If colorList(i) <> rc.color Then depthList(i).Clear()
@@ -276,9 +276,9 @@ Public Class Quad_Bricks : Inherits TaskParent
             Dim center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
             Dim index = task.redList.rcMap.Get(Of Byte)(center.Y, center.X)
             Dim depthMin As Single = 0, depthMax As Single = 0, minLoc As cv.Point, maxLoc As cv.Point
-            If index >= 0 And task.redList.rcList.Count > 0 Then
+            If index >= 0 And task.redList.oldrclist.Count > 0 Then
                 task.pcSplit(2)(roi).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthMask(roi))
-                Dim rc = task.redList.rcList(index)
+                Dim rc = task.redList.oldrclist(index)
                 depthMin = If(depthMax > rc.depth, rc.depth, depthMin)
 
                 If depthMin > 0 And depthMax > 0 And depthMax < task.MaxZmeters Then

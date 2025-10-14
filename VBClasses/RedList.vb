@@ -4,7 +4,7 @@ Public Class RedList_Basics : Inherits TaskParent
     Public inputRemoved As cv.Mat
     Public cellGen As New RedCell_Color
     Public redMask As New RedMask_Basics
-    Public rcList As New List(Of rcData)
+    Public oldrclist As New List(Of rcData)
     Public rcMap As cv.Mat ' redColor map 
     Public Sub New()
         If task.contours Is Nothing Then task.contours = New Contour_Basics_List
@@ -32,7 +32,7 @@ Public Class RedList_Basics : Inherits TaskParent
 
         dst2 = cellGen.dst2
 
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             DrawCircle(dst2, rc.maxDStable)
         Next
         labels(2) = cellGen.labels(2)
@@ -76,8 +76,8 @@ Public Class RedList_FindCells : Inherits TaskParent
         dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
         dst3.SetTo(0)
         For Each index In bricks
-            If task.redList.rcList.Count <= index Then Continue For
-            Dim rc = task.redList.rcList(index)
+            If task.redList.oldrclist.Count <= index Then Continue For
+            Dim rc = task.redList.oldrclist(index)
             DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
@@ -120,7 +120,7 @@ End Class
 
 Public Class RedList_Equations : Inherits TaskParent
     Dim eq As New Plane_Equation
-    Public rcList As New List(Of rcData)
+    Public oldrclist As New List(Of rcData)
     Public Sub New()
         labels(3) = "The estimated plane equations for the largest 20 RedCloud cells."
         desc = "Show the estimated plane equations for all the cells."
@@ -128,11 +128,11 @@ Public Class RedList_Equations : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             dst2 = runRedList(src, labels(2))
-            rcList = New List(Of rcData)(task.redList.rcList)
+            oldrclist = New List(Of rcData)(task.redList.oldrclist)
         End If
 
         Dim newCells As New List(Of rcData)
-        For Each rc As rcData In rcList
+        For Each rc As rcData In oldrclist
             If rc.contour.Count > 4 Then
                 eq.rc = rc
                 eq.Run(src)
@@ -140,12 +140,12 @@ Public Class RedList_Equations : Inherits TaskParent
             End If
         Next
 
-        rcList = New List(Of rcData)(newCells)
+        oldrclist = New List(Of rcData)(newCells)
 
         If task.heartBeat Then
             Dim index As Integer
             strOut = ""
-            For Each rc In rcList
+            For Each rc In oldrclist
                 If rc.contour.Count > 4 Then
                     Dim justEquation = Format(rc.eq(0), fmt3) + "*X + " + Format(rc.eq(1), fmt3) + "*Y + "
                     justEquation += Format(rc.eq(2), fmt3) + "*Z + " + Format(rc.eq(3), fmt3) + vbCrLf
@@ -185,7 +185,7 @@ Public Class RedList_CellsAtDepth : Inherits TaskParent
             slotList(i) = New List(Of Integer)
         Next
         Dim hist(histBins - 1) As Single
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             Dim slot As Integer
             If rc.depth > task.MaxZmeters Then rc.depth = task.MaxZmeters
             slot = CInt((rc.depth / task.MaxZmeters) * histBins)
@@ -206,7 +206,7 @@ Public Class RedList_CellsAtDepth : Inherits TaskParent
         If histIndex >= slotList.Count() Then histIndex = slotList.Count() - 1
         dst3.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst3.Height), cv.Scalar.Yellow, task.lineWidth)
         For i = 0 To slotList(histIndex).Count - 1
-            Dim rc = task.redList.rcList(slotList(histIndex)(i))
+            Dim rc = task.redList.oldrclist(slotList(histIndex)(i))
             DrawTour(dst2(rc.rect), rc.contour, cv.Scalar.Yellow)
             DrawTour(task.color(rc.rect), rc.contour, cv.Scalar.Yellow)
         Next
@@ -276,7 +276,7 @@ Public Class RedList_PlaneColor : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim fitPoints As New List(Of cv.Point3f)
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             If rc.eq = newVec4f Then
                 rc.eq = New cv.Vec4f
                 If options.useMaskPoints Then
@@ -407,7 +407,7 @@ Public Class RedList_UnstableCells : Inherits TaskParent
         End If
 
         Dim currList As New List(Of cv.Point)
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             If prevList.Contains(rc.maxDStable) = False Then
                 DrawTour(dst1(rc.rect), rc.contour, white, -1)
                 DrawTour(dst1(rc.rect), rc.contour, cv.Scalar.Black)
@@ -442,7 +442,7 @@ Public Class RedList_UnstableHulls : Inherits TaskParent
         End If
 
         Dim currList As New List(Of cv.Point)
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             If prevList.Contains(rc.maxDStable) = False Then
                 DrawTour(dst1(rc.rect), rc.hull, white, -1)
@@ -546,7 +546,7 @@ Public Class RedList_Consistent : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim count As Integer
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             If rc.age > 1 Then
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
                 count += 1
@@ -694,7 +694,7 @@ Public Class RedList_Flippers : Inherits TaskParent
         nonFlipCells.Clear()
         dst2.SetTo(0)
         Dim currMap = DisplayCells()
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             Dim lastColor = lastMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
             Dim currColor = currMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
             If lastColor <> currColor Then
@@ -710,7 +710,7 @@ Public Class RedList_Flippers : Inherits TaskParent
         lastMap = currMap.Clone
 
         If task.heartBeat Then
-            labels(2) = CStr(unMatched) + " of " + CStr(task.redList.rcList.Count) + " cells changed " +
+            labels(2) = CStr(unMatched) + " of " + CStr(task.redList.oldrclist.Count) + " cells changed " +
                         " tracking color, totaling " + CStr(unMatchedPixels) + " pixels."
         End If
     End Sub
@@ -728,7 +728,7 @@ Public Class RedList_FlipTest : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1 = runRedList(src, labels(2))
-        Dim lastCells As New List(Of rcData)(task.redList.rcList)
+        Dim lastCells As New List(Of rcData)(task.redList.oldrclist)
         flipper.Run(src)
         dst3 = flipper.dst2
 
@@ -817,7 +817,7 @@ End Class
 
 
 Public Class RedList_Hulls : Inherits TaskParent
-    Public rcList As New List(Of rcData)
+    Public oldrclist As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
@@ -828,8 +828,8 @@ Public Class RedList_Hulls : Inherits TaskParent
 
         Dim defectCount As Integer
         task.redList.rcMap.SetTo(0)
-        rcList.Clear()
-        For Each rc In task.redList.rcList
+        oldrclist.Clear()
+        For Each rc In task.redList.oldrclist
             If rc.contour.Count >= 5 Then
                 rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
                 Dim hullIndices = cv.Cv2.ConvexHullIndices(rc.hull.ToArray, False)
@@ -840,11 +840,11 @@ Public Class RedList_Hulls : Inherits TaskParent
                     defectCount += 1
                 End Try
                 DrawTour(rcMap(rc.rect), rc.hull, rc.index, -1)
-                rcList.Add(rc)
+                oldrclist.Add(rc)
             End If
         Next
         dst3 = PaletteFull(rcMap)
-        labels(3) = CStr(rcList.Count) + " hulls identified below.  " + CStr(defectCount) +
+        labels(3) = CStr(oldrclist.Count) + " hulls identified below.  " + CStr(defectCount) +
                     " hulls failed to build the defect list."
     End Sub
 End Class

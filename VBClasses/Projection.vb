@@ -2,7 +2,7 @@
 Imports System.Windows.Forms
 Public Class Projection_Basics : Inherits TaskParent
     Public redCellInput As New List(Of rcData)
-    Public rcList As New List(Of rcData)
+    Public oldrclist As New List(Of rcData)
     Public viewType As String = "Top"
     Public objectList As New List(Of cv.Vec4f)
     Public showRectangles As Boolean = True
@@ -16,7 +16,7 @@ Public Class Projection_Basics : Inherits TaskParent
             src = histTop.dst2
 
             dst2 = runRedList(histTop.dst3, labels(2), Not histTop.dst3)
-            redCellInput = task.redList.rcList
+            redCellInput = task.redList.oldrclist
         End If
 
         Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
@@ -30,11 +30,11 @@ Public Class Projection_Basics : Inherits TaskParent
             check2 += rc.pixels
         Next
 
-        rcList.Clear()
-        rcList.Add(New rcData)
+        oldrclist.Clear()
+        oldrclist.Add(New rcData)
         For Each rc In sortedCells.Values
-            rc.index = rcList.Count
-            rcList.Add(rc)
+            rc.index = oldrclist.Count
+            oldrclist.Add(rc)
         Next
 
         Dim meterDesc = "tall"
@@ -46,7 +46,7 @@ Public Class Projection_Basics : Inherits TaskParent
         objectList.Clear()
         Dim xy1 As Single, xy2 As Single, z1 As Single, z2 As Single
         If task.heartBeat Then strOut = ""
-        For Each rc In rcList
+        For Each rc In oldrclist
             If rc.index = 0 Then Continue For
             If viewType = "Side" Then
                 xy1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height + ranges(0).Start
@@ -75,11 +75,11 @@ Public Class Projection_Basics : Inherits TaskParent
         End If
         SetTrueText(strOut, 3)
         If showRectangles Then
-            For i = 0 To rcList.Count - 1
-                dst2.Rectangle(rcList(i).rect, task.highlight, task.lineWidth)
+            For i = 0 To oldrclist.Count - 1
+                dst2.Rectangle(oldrclist(i).rect, task.highlight, task.lineWidth)
             Next
         End If
-        labels(2) = CStr(rcList.Count) + " objects were found in the " + viewType + " view."
+        labels(2) = CStr(oldrclist.Count) + " objects were found in the " + viewType + " view."
     End Sub
 End Class
 
@@ -178,7 +178,7 @@ Public Class Projection_Object : Inherits TaskParent
             Dim upper = New cv.Scalar(top.objects.objectList(index)(1), +100, top.objects.objectList(index)(3))
             Dim mask = task.pointCloud.InRange(lower, upper)
 
-            Dim rc = top.objects.rcList(task.gOptions.DebugSlider.Value + 1) ' the biggest by default...
+            Dim rc = top.objects.oldrclist(task.gOptions.DebugSlider.Value + 1) ' the biggest by default...
             dst0.SetTo(0)
             dst0(rc.rect) = top.histTop.dst2(rc.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
             dst0.SetTo(0, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -211,8 +211,8 @@ Public Class Projection_Floor : Inherits TaskParent
         labels(2) = isolate.labels(2)
         labels(3) = isolate.labels(3)
 
-        If objSlider.Value + 1 >= isolate.side.objects.rcList.Count Then Exit Sub
-        Dim rc = isolate.top.objects.rcList(objSlider.Value + 1) ' the biggest by default...
+        If objSlider.Value + 1 >= isolate.side.objects.oldrclist.Count Then Exit Sub
+        Dim rc = isolate.top.objects.oldrclist(objSlider.Value + 1) ' the biggest by default...
         Dim rowList As New List(Of Integer)
         For y = 0 To rc.rect.Height - 1
             rowList.Add(dst2(rc.rect).Row(y).CountNonZero() + rc.rect.Y)
@@ -318,7 +318,7 @@ Public Class Projection_ViewTop : Inherits TaskParent
 
         dst2 = runRedList(histTop.dst3, labels(2), Not histTop.dst3)
 
-        objects.redCellInput = task.redList.rcList
+        objects.redCellInput = task.redList.oldrclist
         objects.dst2 = task.redList.dst2
         objects.labels(2) = task.redList.labels(2)
         objects.Run(histTop.dst2)
@@ -348,7 +348,7 @@ Public Class Projection_ViewSide : Inherits TaskParent
 
         dst2 = runRedList(histSide.dst3, labels(2), Not histSide.dst3)
 
-        objects.redCellInput = task.redList.rcList
+        objects.redCellInput = task.redList.oldrclist
         objects.dst2 = task.redList.dst2
         objects.labels(2) = task.redList.labels(2)
         objects.Run(histSide.dst2)

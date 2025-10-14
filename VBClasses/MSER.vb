@@ -40,8 +40,8 @@ Public Class MSER_Basics : Inherits TaskParent
             rc.maxDist = GetMaxDist(rc)
 
             rc.indexLast = task.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If rc.indexLast <> 0 And rc.indexLast < task.redList.rcList.Count Then
-                Dim lrc = task.redList.rcList(rc.indexLast)
+            If rc.indexLast <> 0 And rc.indexLast < task.redList.oldrclist.Count Then
+                Dim lrc = task.redList.oldrclist(rc.indexLast)
                 rc.maxDStable = lrc.maxDStable
                 rc.color = lrc.color
                 matched.Add(rc.indexLast, rc.indexLast)
@@ -55,10 +55,10 @@ Public Class MSER_Basics : Inherits TaskParent
             If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
         Next
 
-        task.redList.rcList = New List(Of rcData)(sortedCells.Values)
+        task.redList.oldrclist = New List(Of rcData)(sortedCells.Values)
         dst2 = RebuildRCMap(sortedCells)
 
-        labels(2) = CStr(task.redList.rcList.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
+        labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
     End Sub
 End Class
 
@@ -231,15 +231,15 @@ Public Class MSER_Hulls : Inherits TaskParent
 
         Dim pixels As Integer
         dst3.SetTo(0)
-        For Each rc In task.redList.rcList
+        For Each rc In task.redList.oldrclist
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             pixels += rc.pixels
             DrawTour(dst3(rc.rect), rc.hull, rc.color, -1)
         Next
 
-        If task.heartBeat Then labels(2) = CStr(task.redList.rcList.Count) + " Regions with average size " +
-                                           If(task.redList.rcList.Count > 0,
-                                           CStr(CInt(pixels / task.redList.rcList.Count)), "0")
+        If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " Regions with average size " +
+                                           If(task.redList.oldrclist.Count > 0,
+                                           CStr(CInt(pixels / task.redList.oldrclist.Count)), "0")
     End Sub
 End Class
 
@@ -596,7 +596,7 @@ Public Class MSER_Basics2 : Inherits TaskParent
             boxes.Add(r.Width * r.Height, i)
         Next
 
-        Dim rcList As New List(Of rcData)({New rcData})
+        Dim oldrclist As New List(Of rcData)({New rcData})
         dst1.SetTo(0)
         dst2.SetTo(0)
         Dim lastMap = cellMap.Clone
@@ -604,7 +604,7 @@ Public Class MSER_Basics2 : Inherits TaskParent
         Dim matchCount As Integer
         For i = 0 To floodPoints.Count - 1
             Dim rc As New rcData
-            rc.index = rcList.Count
+            rc.index = oldrclist.Count
             Dim val = dst3.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
             rc.rect = boxInput(boxes.ElementAt(i).Value)
             rc.mask = dst3(rc.rect).InRange(val, val)
@@ -617,7 +617,7 @@ Public Class MSER_Basics2 : Inherits TaskParent
             rc.color = task.scalarColors(i Mod 255)
             If rc.indexLast <> 0 Then matchCount += 1
 
-            rcList.Add(rc)
+            oldrclist.Add(rc)
             cellMap(rc.rect).SetTo(rc.index, rc.mask)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next

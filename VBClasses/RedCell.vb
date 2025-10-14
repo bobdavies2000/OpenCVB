@@ -56,9 +56,9 @@ Public Class RedCell_Color : Inherits TaskParent
             rc.contour = mdList(i).contour
             DrawTour(rc.mask, rc.contour, 255, -1)
             rc.pixels = mdList(i).mask.CountNonZero
-            If rc.indexLast >= task.redList.rcList.Count Then rc.indexLast = 0
+            If rc.indexLast >= task.redList.oldrclist.Count Then rc.indexLast = 0
             If rc.indexLast > 0 Then
-                Dim lrc = task.redList.rcList(rc.indexLast)
+                Dim lrc = task.redList.oldrclist(rc.indexLast)
                 rc.age = lrc.age + 1
                 rc.depth = lrc.depth
                 rc.depthPixels = lrc.depthPixels
@@ -114,8 +114,8 @@ Public Class RedCell_Color : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            labels(2) = CStr(task.redList.rcList.Count) + " total cells (shown with '" + task.gOptions.trackingLabel + "' and " +
-                        CStr(task.redList.rcList.Count - rcNewCount) + " matched to previous frame"
+            labels(2) = CStr(task.redList.oldrclist.Count) + " total cells (shown with '" + task.gOptions.trackingLabel + "' and " +
+                        CStr(task.redList.oldrclist.Count - rcNewCount) + " matched to previous frame"
         End If
         dst2 = RebuildRCMap(sortedCells)
     End Sub

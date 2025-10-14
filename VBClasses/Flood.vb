@@ -45,12 +45,12 @@ Public Class Flood_ContainedCells : Inherits TaskParent
         If standalone Then dst2 = runRedList(src, labels(2))
 
         Dim removeCells As New List(Of Integer)
-        For i = task.redList.rcList.Count - 1 To 0 Step -1
-            Dim rc = task.redList.rcList(i)
+        For i = task.redList.oldrclist.Count - 1 To 0 Step -1
+            Dim rc = task.redList.oldrclist(i)
             Dim nabs As New List(Of Integer)
             Dim contains As New List(Of Integer)
-            For j = 0 To task.redList.rcList.Count - 1
-                Dim rcBig = task.redList.rcList(j)
+            For j = 0 To task.redList.oldrclist.Count - 1
+                Dim rcBig = task.redList.oldrclist(j)
                 If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.index)
                 If rcBig.rect.Contains(rc.rect) Then contains.Add(rcBig.index)
             Next
@@ -59,7 +59,7 @@ Public Class Flood_ContainedCells : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each index In removeCells
-            Dim rc = task.redList.rcList(index)
+            Dim rc = task.redList.oldrclist(index)
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
@@ -103,7 +103,7 @@ Public Class Flood_BasicsMask : Inherits TaskParent
 
         dst2 = cellGen.dst2
 
-        If task.heartBeat Then labels(2) = $"{task.redList.rcList.Count} cells identified"
+        If task.heartBeat Then labels(2) = $"{task.redList.oldrclist.Count} cells identified"
 
         If showSelected Then task.setSelectedCell()
     End Sub
@@ -154,7 +154,7 @@ End Class
 
 Public Class Flood_Motion : Inherits TaskParent
     Dim flood As New Flood_Basics
-    Dim rcList As New List(Of rcData)
+    Dim oldrclist As New List(Of rcData)
     Dim cellMap As New cv.Mat
     Dim maxDists As New List(Of cv.Point2f)
     Dim maxIndex As New List(Of Integer)
@@ -165,7 +165,7 @@ Public Class Flood_Motion : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat Then
             flood.Run(src)
-            rcList = New List(Of rcData)(task.redList.rcList)
+            oldrclist = New List(Of rcData)(task.redList.oldrclist)
             cellMap = task.redList.rcMap.Clone
             dst2 = flood.dst2.Clone
             dst3 = flood.dst2.Clone
@@ -173,16 +173,16 @@ Public Class Flood_Motion : Inherits TaskParent
             labels(3) = flood.labels(2)
 
             maxDists.Clear()
-            For Each rc In rcList
+            For Each rc In oldrclist
                 maxDists.Add(rc.maxDist)
                 maxIndex.Add(rc.index)
             Next
         Else
             flood.Run(src)
             dst1.SetTo(0)
-            For Each rc In task.redList.rcList
+            For Each rc In task.redList.oldrclist
                 If maxDists.Contains(rc.maxDist) Then
-                    Dim lrc = rcList(maxIndex(maxDists.IndexOf(rc.maxDist)))
+                    Dim lrc = oldrclist(maxIndex(maxDists.IndexOf(rc.maxDist)))
                     dst1(lrc.rect).SetTo(lrc.color, lrc.mask)
                 End If
             Next
