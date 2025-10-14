@@ -149,7 +149,6 @@ End Class
 
 
 
-
 Public Class Bin2Way_RedColor : Inherits TaskParent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim redC As New RedColor_Core
@@ -177,6 +176,48 @@ Public Class Bin2Way_RedColor : Inherits TaskParent
             dst2(pc.rect).SetTo(pc.index, pc.mask)
         Next
 
-        dst3 = PaletteBlackZero(dst2)
+        dst3 = PaletteFull(dst2)
+    End Sub
+End Class
+
+
+
+
+Public Class Bin2Way_Gradations : Inherits TaskParent
+    Dim bin2 As New Bin2Way_Basics
+    Public mats(3) As cv.Mat
+    Public Sub New()
+        dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        For Each m In mats
+            m = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Next
+        desc = "Build 4 gradations of light and combine them."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        bin2.fraction = task.gray.Total / 2
+        bin2.hist.histMask = New cv.Mat
+        bin2.Run(task.gray)
+        Dim darkestMask = bin2.mats.mat(0).Clone
+        Dim lightestMask = bin2.mats.mat(1).Clone
+
+        bin2.fraction = task.gray.Total / 4
+        bin2.hist.histMask = darkestMask
+        bin2.Run(task.gray)
+
+        mats(0) = bin2.mats.mat(0)
+        mats(1) = bin2.mats.mat(1) And Not lightestMask
+
+        bin2.fraction = task.gray.Total / 4
+        bin2.hist.histMask = lightestMask
+        bin2.Run(task.gray)
+        mats(2) = bin2.mats.mat(0) And Not darkestMask
+        mats(3) = bin2.mats.mat(1)
+
+        For i = 0 To mats.Count - 1
+            Dim index = CInt(255 / (i + 1))
+            dst3.SetTo(index, mats(i))
+        Next
+
+        dst2 = PaletteFull(dst3)
     End Sub
 End Class
