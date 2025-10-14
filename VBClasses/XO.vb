@@ -12597,7 +12597,7 @@ End Class
 
 
 Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
-    Dim redCold As New RedCloud_Basics
+    Dim redCold As New RedCloud_HeartBeat
     Dim prep As New RedPrep_Basics
     Public pcList As New List(Of cloudData)
     Public Sub New()

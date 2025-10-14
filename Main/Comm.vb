@@ -26,8 +26,8 @@ Public Class Comm
         draw3DLines
         draw3DLinesAndCloud
         readLines
-        drawTriangles
-        drawTrianglesAndImage
+        colorTriangles
+        imageTriangles
     End Enum
 
     Public Shared cameraNames As New List(Of String)({"StereoLabs ZED 2/2i",

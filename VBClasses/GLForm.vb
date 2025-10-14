@@ -25,6 +25,7 @@ Public Class sgl
     Public ppy = task.calibData.rgbIntrinsics.ppy
     Public fx = task.calibData.rgbIntrinsics.fx
     Public fy = task.calibData.rgbIntrinsics.fy
+    Public hulls As RedCloud_Basics
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         options = New Options_SharpGL
         options2 = New Options_SharpGL2
@@ -290,7 +291,7 @@ Public Class sgl
 
         Dim label = ""
         Select Case func
-            Case Comm.oCase.drawTriangles
+            Case Comm.oCase.colorTriangles
                 Dim vec As cv.Vec3f
                 gl.Begin(OpenGL.GL_TRIANGLES)
 
@@ -311,7 +312,10 @@ Public Class sgl
                 gl.End()
                 label = CStr(dataBuffer.Count) + " triangles were sent to OpenGL."
 
-            Case Comm.oCase.drawTrianglesAndImage
+            Case Comm.oCase.imageTriangles
+                If hulls Is Nothing Then hulls = New RedCloud_Basics
+                hulls.Run(task.color)
+
                 Dim textureID As UInt32() = New UInt32(0) {} ' Array to hold the texture ID
                 Dim rgba As cv.Mat = task.color.CvtColor(cv.ColorConversionCodes.BGR2RGBA)
                 Dim bitmap As Bitmap = rgba.ToBitmap()
@@ -335,32 +339,41 @@ Public Class sgl
                 Dim w = task.workRes.Width
                 Dim h = task.workRes.Height
                 Dim pt As cv.Point
-                dataBuffer = GL_RedCloudHulls.buildBuffer()
-                For i = 0 To dataBuffer.Count - 1
+                Dim vec(2) As cv.Vec3f
+                Dim pts(2) As cv.Point
+                Dim triangleCount As Integer
+                For Each pc In hulls.pcList
+                    Dim count As Single = pc.hull.Count
+                    For i = 0 To pc.hull.Count - 1
+                        Dim goodDepth As Boolean = True
+                        For j = 0 To vec.Length - 1
+                            Select Case j
+                                Case 0
+                                    pt = New cv.Point(CInt(pc.hull(i).X + pc.rect.X), CInt(pc.hull(i).Y + pc.rect.Y))
+                                Case 1
+                                    pt = pc.maxDist
+                                Case 2
+                                    pt = New cv.Point(CInt(pc.hull((i + 1) Mod count).X + pc.rect.X), CInt(pc.hull((i + 1) Mod count).Y + pc.rect.Y))
+                            End Select
 
-                    pt = New cv.Point(CInt(pc.hull(i).X + pc.rect.X), CInt(pc.hull(i).Y + pc.rect.Y))
-                    vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-                    If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
-                    gl.TexCoord(pt.X / w, pt.Y / h)
-                    gl.Vertex(vec(0), -vec(1), -vec(2))
+                            pts(j) = pt
+                            vec(j) = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+                            If vec(j)(0) = 0 Or vec(j)(1) = 0 Or vec(j)(2) = 0 Then goodDepth = False
+                        Next
 
-                    vec = task.pointCloud.Get(Of cv.Vec3f)(pc.maxDist.Y, pc.maxDist.X)
-                    If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pc.maxDist.X, pc.maxDist.Y, pc.depth))
-                    gl.TexCoord(pc.maxDist.X / w, pc.maxDist.Y / h)
-                    gl.Vertex(vec(0), -vec(1), -vec(2))
-
-                    pt = New cv.Point(CInt(pc.hull((i + 1) Mod Count).X + pc.rect.X), CInt(pc.hull((i + 1) Mod Count).Y + pc.rect.Y))
-
-                    vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-                    If vec(2) = 0 Then vec = Cloud_Basics.worldCoordinates(New cv.Vec3f(pt.X, pt.Y, pc.depth))
-                    gl.TexCoord(pt.X / w, pt.Y / h)
-                    gl.Vertex(vec(0), -vec(1), -vec(2))
+                        If goodDepth Then
+                            triangleCount += 1
+                            For j = 0 To vec.Length - 1
+                                gl.TexCoord(pts(j).X / w, pts(j).Y / h)
+                                gl.Vertex(vec(j)(0), -vec(j)(1), -vec(j)(2))
+                            Next
+                        End If
+                    Next
                 Next
-
 
                 gl.End()
                 gl.DeleteTextures(1, textureID)
-                label = CStr(dataBuffer.Count) + " triangles were sent to OpenGL."
+                label = CStr(triangleCount) + " triangles were sent to OpenGL."
         End Select
 
         gl.Flush()

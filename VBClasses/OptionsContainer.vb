@@ -91,7 +91,7 @@ Public Class OptionsContainer
         ' Check if any part of the form is visible on the screen
         If Not screenBounds.IntersectsWith(formRect) Then
             ' The entire form is off the screen
-            MessageBox.Show("Form is completely off-screen!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            MessageBox.Show("Form is completely offscreen!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)
 
             ' Optionally, you might want to move the form back onto the screen
             ' For example, move it to the center of the primary screen

@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedCell_Basics : Inherits TaskParent
     Public Sub New()
-        desc = "Display the output of a cell for RedCloud_Basics."
+        desc = "Display the output of a cell for RedCloud_HeartBeat."
     End Sub
     Public Shared Function selectCell(pcMap As cv.Mat, pcList As List(Of cloudData)) As String
         If pcList.Count > 0 Then

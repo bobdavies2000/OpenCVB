@@ -1,13 +1,78 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
-    Dim redCore As New RedCloud_Core
+    Public redSweep As New RedCloud_Sweep
+    Public pcList As New List(Of cloudData)
+    Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public percentImage As Single
+    Public Sub New()
+        task.redCloud = Me
+        desc = "Build contours for each cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redSweep.Run(src)
+        dst3 = redSweep.dst3
+        labels(3) = redSweep.labels(3)
+        labels(2) = redSweep.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
+
+        Static pcListLast = New List(Of cloudData)(pcList)
+        Static pcMapLast As cv.Mat = pcMap.clone
+
+        pcList.Clear()
+        Dim r2 As cv.Rect
+        pcMap.setto(0)
+        dst2.SetTo(0)
+        For Each pc In redSweep.pcList
+            Dim r1 = pc.rect
+            r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
+            Dim indexLast = pcMapLast.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
+            If indexLast > 0 Then r2 = pcListLast(indexLast).rect
+            If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
+                pc.age = pcListLast(indexLast).age + 1
+                If pc.age > 1000 Then pc.age = 2
+                If task.heartBeat = False And pc.rect.Contains(pcListLast(indexLast).maxdist) Then
+                    pc.maxDist = pcListLast(indexLast).maxdist
+                End If
+                pc.color = pcListLast(indexLast).color
+            End If
+            pc.index = pcList.Count + 1
+            pcMap(pc.rect).setto(pc.index, pc.contourMask)
+            dst2(pc.rect).SetTo(pc.color, pc.contourMask)
+            dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+            pcList.Add(pc)
+            SetTrueText(CStr(pc.age), pc.maxDist)
+        Next
+
+        If standaloneTest() Then
+            Dim cellsOnly = pcMap.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
+            percentImage = (percentImage + cellsOnly / task.depthMask.CountNonZero) / 2
+            Static targetSlider = OptionParent.FindSlider("Reduction Target")
+            If percentImage < 0.8 Then
+                If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
+            End If
+
+            strOut = RedCell_Basics.selectCell(pcMap, pcList)
+            If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+            SetTrueText(strOut, 3)
+        End If
+
+        pcListLast = New List(Of cloudData)(pcList)
+        pcMapLast = pcMap.clone
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_HeartBeat : Inherits TaskParent
+    Dim redCore As New RedCloud_Basics
     Public pcList As New List(Of cloudData)
     Public percentImage As Single
     Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public prepEdges As New RedPrep_Basics
     Public Sub New()
-        task.redCloud = Me
         redCore.redSweep.prepEdges = prepEdges
         desc = "Run RedCloud_Map on the heartbeat but just floodFill at maxDist otherwise."
     End Sub
@@ -66,71 +131,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
         strOut = RedCell_Basics.selectCell(pcMap, pcList)
         If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
         SetTrueText(strOut + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf + CStr(pcList.Count) + " cells present", 3)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class RedCloud_Core : Inherits TaskParent
-    Public redSweep As New RedCloud_Sweep
-    Public pcList As New List(Of cloudData)
-    Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public percentImage As Single
-    Public Sub New()
-        desc = "Build contours for each cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        redSweep.Run(src)
-        dst3 = redSweep.dst3
-        labels(3) = redSweep.labels(3)
-        labels(2) = redSweep.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
-
-        Static pcListLast = New List(Of cloudData)(pcList)
-        Static pcMapLast As cv.Mat = pcMap.clone
-
-        pcList.Clear()
-        Dim r2 As cv.Rect
-        pcMap.setto(0)
-        dst2.SetTo(0)
-        For Each pc In redSweep.pcList
-            Dim r1 = pc.rect
-            r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
-            Dim indexLast = pcMapLast.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
-            If indexLast > 0 Then r2 = pcListLast(indexLast).rect
-            If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
-                pc.age = pcListLast(indexLast).age + 1
-                If pc.age > 1000 Then pc.age = 2
-                If task.heartBeat = False And pc.rect.Contains(pcListLast(indexLast).maxdist) Then
-                    pc.maxDist = pcListLast(indexLast).maxdist
-                End If
-                pc.color = pcListLast(indexLast).color
-            End If
-            pc.index = pcList.Count + 1
-            pcMap(pc.rect).setto(pc.index, pc.contourMask)
-            dst2(pc.rect).SetTo(pc.color, pc.contourMask)
-            dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
-            pcList.Add(pc)
-            SetTrueText(CStr(pc.age), pc.maxDist)
-        Next
-
-        If standaloneTest() Then
-            Dim cellsOnly = pcMap.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
-            percentImage = (percentImage + cellsOnly / task.depthMask.CountNonZero) / 2
-            Static targetSlider = OptionParent.FindSlider("Reduction Target")
-            If percentImage < 0.8 Then
-                If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
-            End If
-
-            strOut = RedCell_Basics.selectCell(pcMap, pcList)
-            If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
-            SetTrueText(strOut, 3)
-        End If
-
-        pcListLast = New List(Of cloudData)(pcList)
-        pcMapLast = pcMap.clone
     End Sub
 End Class
 
@@ -284,7 +284,7 @@ End Class
 
 
 Public Class RedCloud_MotionSimple : Inherits TaskParent
-    Dim redContours As New RedCloud_Basics
+    Dim redContours As New RedCloud_HeartBeat
     Public Sub New()
         task.gOptions.HistBinBar.Maximum = 255
         task.gOptions.HistBinBar.Value = 255
@@ -323,7 +323,7 @@ End Class
 
 
 Public Class RedCloud_Motion : Inherits TaskParent
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_HeartBeat
     Public Sub New()
         task.gOptions.HistBinBar.Maximum = 255
         task.gOptions.HistBinBar.Value = 255
@@ -346,7 +346,7 @@ End Class
 
 
 Public Class RedCloud_MotionNew : Inherits TaskParent
-    Public redCore As New RedCloud_Core
+    Public redCore As New RedCloud_Basics
     Public pcList As New List(Of cloudData)
     Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public percentImage As Single

@@ -572,9 +572,9 @@ End Class
 
 
 Public Class GL_RedCloudHulls : Inherits TaskParent
-    Dim hulls As New RedCloud_Basics
+    Dim hulls As New RedCloud_HeartBeat
     Public Sub New()
-        desc = "Prepare triangles from the RedCloud_Basics output"
+        desc = "Prepare triangles from the RedCloud_HeartBeat output"
     End Sub
     Public Shared Function buildBuffer() As List(Of cv.Vec3f)
         Dim dataBuffer As New List(Of cv.Vec3f)
@@ -613,7 +613,7 @@ Public Class GL_RedCloudHulls : Inherits TaskParent
         labels(2) = hulls.labels(2)
         labels(3) = hulls.labels(3)
 
-        strOut = task.sharpGL.RunTriangles(Comm.oCase.drawTriangles, buildBuffer())
+        strOut = task.sharpGL.RunTriangles(Comm.oCase.colorTriangles, buildBuffer())
     End Sub
 End Class
 
@@ -625,15 +625,15 @@ End Class
 Public Class GL_RedCloudHullsImage : Inherits TaskParent
     Dim hulls As New RedCloud_Basics
     Public Sub New()
-        desc = "Prepare a texture map and project it onto the RedCloud_Basics hulls"
+        desc = "Prepare a texture map and project it onto the RedCloud_HeartBeat hulls"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        hulls.Run(src)
-        dst2 = hulls.dst2
-        dst3 = hulls.dst3
-        labels(2) = hulls.labels(2) + " " + Format(hulls.percentImage, "0.0%") + " of depth data used."
-        labels(3) = hulls.labels(3)
+        strOut = task.sharpGL.RunTriangles(Comm.oCase.imageTriangles, Nothing)
 
-        strOut = task.sharpGL.RunTriangles(Comm.oCase.drawTrianglesAndImage, New List(Of cv.Vec3f))
+        dst2 = task.sharpGL.hulls.dst2
+        dst3 = task.sharpGL.hulls.dst3
+        labels(2) = task.sharpGL.hulls.labels(2) + " " + Format(task.sharpGL.hulls.percentImage, "0.0%") +
+                    " of depth data used."
+        labels(3) = task.sharpGL.hulls.labels(3)
     End Sub
 End Class

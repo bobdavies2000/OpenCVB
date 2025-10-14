@@ -1421,7 +1421,7 @@ End Class
 
 Public Class KNN_Hulls : Inherits TaskParent
     Dim knn As New KNN_Basics
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedCloud_HeartBeat
     Public matchList As New List(Of cv.Point2f)
     Public Sub New()
         knn.desiredMatches = 2
