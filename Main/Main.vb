@@ -41,6 +41,7 @@ Namespace OpenCVB
         Dim saveAlgorithmName As String
         Dim cameraShutdown As Boolean
         Dim shuttingDown As Boolean
+        Dim debugSyncUI As Boolean
 
         Dim BothFirstAndLastReady As Boolean
 
@@ -357,6 +358,21 @@ Namespace OpenCVB
             DrawingRectangle = False
         End Sub
         Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
+
+
+
+            'If task.debugSyncUI Then
+            '    Static syncUICount = 0 ' enough time - adjust if needed...
+            '    If syncUI = 0 Then
+            '        task.RunAlgorithm()
+            '        syncUI = syncUICount
+            '    End If
+            '    syncUI -= 1
+            'Else
+            'End If
+
+
+
             Dim g As Graphics = e.Graphics
             Dim pic = DirectCast(sender, PictureBox)
             Dim ratio = camPic(2).Width / settings.workRes.Width

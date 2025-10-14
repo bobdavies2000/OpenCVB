@@ -30,15 +30,15 @@ Public Class RedColor_Basics : Inherits TaskParent
             Dim minCount = dst1.Total * 0.001
             rcList.Clear()
             pcMap.SetTo(0)
-            For Each pc In pcListLast
-                Dim pt = pc.maxDist
+            For Each rc In pcListLast
+                Dim pt = rc.maxDist
                 If pcMap.Get(Of Byte)(pt.Y, pt.X) = 0 Then
                     Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         Dim pcc = MaxDist_Basics.setCloudData(dst1(rect), rect, index)
                         If pcc IsNot Nothing Then
-                            pcc.color = pc.color
-                            pcc.age = pc.age + 1
+                            pcc.color = rc.color
+                            pcc.age = rc.age + 1
                             rcList.Add(pcc)
                             pcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.contourMask)
 
@@ -76,27 +76,27 @@ Public Class RedColor_Core : Inherits TaskParent
         Dim r2 As cv.Rect
         pcMap.SetTo(0)
         dst2.SetTo(0)
-        For Each pc In redSweep.rcList
-            Dim r1 = pc.rect
+        For Each rc In redSweep.rcList
+            Dim r1 = rc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
-            Dim indexLast = pcMapLast.Get(Of Byte)(pc.maxDist.Y, pc.maxDist.X) - 1
+            Dim indexLast = pcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
             If indexLast > 0 Then r2 = pcListLast(indexLast).rect
             If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
-                pc.age = pcListLast(indexLast).age + 1
-                If pc.age >= 1000 Then pc.age = 2
-                If task.heartBeat = False And pc.rect.Contains(pcListLast(indexLast).maxdist) Then
-                    pc.maxDist = pcListLast(indexLast).maxdist
+                rc.age = pcListLast(indexLast).age + 1
+                If rc.age >= 1000 Then rc.age = 2
+                If task.heartBeat = False And rc.rect.Contains(pcListLast(indexLast).maxdist) Then
+                    rc.maxDist = pcListLast(indexLast).maxdist
                 End If
-                pc.color = pcListLast(indexLast).color
+                rc.color = pcListLast(indexLast).color
             End If
-            pc.index = rcList.Count + 1
-            pcMap(pc.rect).SetTo(pc.index, pc.mask)
-            dst2(pc.rect).SetTo(pc.color, pc.mask)
+            rc.index = rcList.Count + 1
+            pcMap(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
             If standaloneTest() Then
-                dst2.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
-                SetTrueText(CStr(pc.age), pc.maxDist)
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+                SetTrueText(CStr(rc.age), rc.maxDist)
             End If
-            rcList.Add(pc)
+            rcList.Add(rc)
         Next
 
         labels(2) = CStr(rcList.Count) + " regions were identified "
@@ -140,9 +140,9 @@ Public Class RedColor_Sweep : Inherits TaskParent
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 And rect.Width < dst2.Width And rect.Height < dst2.Height Then
                         If count >= minCount Then
-                            Dim pc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
-                            rcList.Add(pc)
-                            pcMap(pc.rect).SetTo(pc.index Mod 255, pc.contourMask)
+                            Dim rc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
+                            rcList.Add(rc)
+                            pcMap(rc.rect).SetTo(rc.index Mod 255, rc.contourMask)
                             index += 1
                         Else
                             dst3(rect).SetTo(255, mask(rect))

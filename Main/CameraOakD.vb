@@ -166,12 +166,12 @@
 '            cv.Cv2.Multiply(templateY, d32f, worldY)
 '            worldY *= 1 / fyTemplate
 
-'            Dim pc As New cv.Mat
-'            cv.Cv2.Merge({worldX, worldY, d32f}, pc)
+'            Dim rc As New cv.Mat
+'            cv.Cv2.Merge({worldX, worldY, d32f}, rc)
 '            If workRes = captureRes Then
-'                uiPointCloud = pc
+'                uiPointCloud = rc
 '            Else
-'                uiPointCloud = pc.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+'                uiPointCloud = rc.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
 '            End If
 
 '        MyBase.GetNextFrameCounts(IMU_FrameTime)

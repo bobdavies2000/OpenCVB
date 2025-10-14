@@ -1,5 +1,4 @@
 ﻿Imports System.ComponentModel
-Imports System.Threading
 Imports VBClasses
 Imports cv = OpenCvSharp
 
@@ -232,17 +231,7 @@ Namespace OpenCVB
 
 
 
-
-                    If task.debugSyncUI Then
-                        Static syncUICount = 10000 ' enough for X seconds - adjust if needed...
-                        If syncUI = 0 Then
-                            task.RunAlgorithm()
-                            syncUI = syncUICount
-                        End If
-                        syncUI -= 1
-                    Else
-                        task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
-                    End If
+                    task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
 
 
 
@@ -302,6 +291,23 @@ Namespace OpenCVB
                         End If
                         results.dstsReady = True ' this will trigger the paint
                     End SyncLock
+
+
+                    debugSyncUI = task.debugSyncUI
+
+                    If task.debugSyncUI Then
+                        Static syncUICount = 500 ' enough time - adjust if needed...
+                        If syncUI = 0 Then
+                            task.RunAlgorithm()
+                            syncUI = syncUICount
+                        End If
+                        syncUI -= 1
+                    Else
+                        task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
+                    End If
+
+
+
                 End While
 
                 frameCount = -1

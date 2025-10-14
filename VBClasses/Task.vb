@@ -244,7 +244,7 @@ Public Class VBtask : Implements IDisposable
 
     Public pipeName As String
 
-    Public labels(4 - 1) As String
+    Public labels() = {"", "", "", ""}
     Public desc As String
     Public displayObjectName As String
     Public activeObjects As New List(Of Object)
@@ -315,7 +315,7 @@ Public Class VBtask : Implements IDisposable
     Public OpenGL_Left As Integer
     Public OpenGL_Top As Integer
     Public displayDst1 As Boolean
-    Public depthAndDepthRange As String
+    Public depthAndDepthRange As String = ""
     Public closeRequest As Boolean
     Public sharpGL As VBClasses.sgl
 

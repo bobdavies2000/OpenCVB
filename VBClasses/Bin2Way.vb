@@ -163,8 +163,8 @@ Public Class Bin2Way_RedColor : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         dst2.SetTo(0)
-        For Each pc In redC.rcList
-            dst2(pc.rect).SetTo(pc.index, pc.mask)
+        For Each rc In redC.rcList
+            dst2(rc.rect).SetTo(rc.index, rc.mask)
         Next
 
         dst3 = PaletteFull(dst2)

@@ -65,7 +65,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
         ' this should be the only place where the target slider is adjusted for current conditions.
         Dim percentZero = (dst2.Total - dst2.CountNonZero) / dst2.Total
         Static targetSlider = OptionParent.FindSlider("Reduction Target")
-        If percentZero < 0.8 And targetSlider.value < targetSlider.maximum Then
+        If percentZero < 0.65 And targetSlider.value < targetSlider.maximum Then
             If targetSlider.value + 10 < targetSlider.maximum Then
                 targetSlider.value += 10
             Else
