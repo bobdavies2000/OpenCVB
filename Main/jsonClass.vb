@@ -18,7 +18,6 @@ Namespace jsonClass
         Public camera640x480Support As List(Of Boolean)
         Public camera1920x1080Support As List(Of Boolean)
 
-        Public locationMain As cv.Vec4f
         Public locationPixelViewer As cv.Vec4f
         Public locationOpenGL As cv.Vec4f
         Public locationOptions As cv.Vec4f
@@ -207,37 +206,10 @@ Namespace jsonClass
                         End If
                 End Select
 
-                Dim wh = .workRes.Height
-                ' desktop style is the default
-                If .snap320 = False And .snap640 = False And .snapCustom = False Then .snap640 = True
-                If .snap640 Then
-                    .locationMain.Item2 = 1321
-                    .locationMain.Item3 = 855
-                    If wh = 240 Or wh = 480 Or wh = 120 Then .locationMain.Item3 = 1096
-                    If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cv.Size(640, 480) Else .displayRes = New cv.Size(640, 360)
-                ElseIf .snap320 Then
-                    .locationMain.Item2 = 683
-                    .locationMain.Item3 = 510
-                    If wh = 240 Or wh = 480 Or wh = 120 Then .locationMain.Item3 = 616
-                    If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cv.Size(320, 240) Else .displayRes = New cv.Size(320, 180)
-                End If
-
-                Dim border As Integer = 6
-                Dim defaultWidth = .workRes.Width * 2 + border * 7
-                Dim defaultHeight = .workRes.Height * 2 + OpenCVB.MainUI.ToolStrip1.Height + border * 12
-                If OpenCVB.MainUI.Height < 50 Then
-                    OpenCVB.MainUI.Width = defaultWidth
-                    OpenCVB.MainUI.Height = defaultHeight
-                End If
-
                 If .fontInfo Is Nothing Then .fontInfo = New Font("Tahoma", 9)
                 If settings.groupComboText = "" Then settings.groupComboText = "< All >"
 
                 .desiredFPS = 60
-                OpenCVB.MainUI.Left = .locationMain.Item0
-                OpenCVB.MainUI.Top = .locationMain.Item1
-                OpenCVB.MainUI.Width = .locationMain.Item2
-                OpenCVB.MainUI.Height = .locationMain.Item3
             End With
 
             Return settings
@@ -253,8 +225,6 @@ Namespace jsonClass
                     OpenCVB.MainUI.settings.algorithm = OpenCVB.MainUI.AvailableAlgorithms.Items(0)
                 End If
             End If
-            OpenCVB.MainUI.settings.locationMain = New cv.Vec4f(OpenCVB.MainUI.Left, OpenCVB.MainUI.Top,
-                                                               OpenCVB.MainUI.Width, OpenCVB.MainUI.Height)
             If OpenCVB.MainUI.camPic(0) IsNot Nothing Then
                 ' used only when .snapCustom is true
                 OpenCVB.MainUI.settings.displayRes = New cv.Size(OpenCVB.MainUI.camPic(0).Width, OpenCVB.MainUI.camPic(0).Height)

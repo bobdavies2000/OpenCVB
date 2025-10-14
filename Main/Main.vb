@@ -119,6 +119,16 @@ Namespace OpenCVB
             settings = jsonfs.read()
             CameraSwitching.Text = settings.cameraName
 
+            Me.Left = GetSetting("Opencv", "mainFormLeft", "mainFormLeft", 0)
+            Me.Top = GetSetting("Opencv", "mainFormTop", "mainFormTop", 0)
+            If settings.snap640 Then
+                Me.Width = GetSetting("Opencv", "mainFormWidth", "mainFormWidth", 1321)
+                Me.Height = GetSetting("Opencv", "mainFormHeight", "mainFormHeight", 855)
+            Else
+                Me.Width = GetSetting("Opencv", "mainFormWidth", "mainFormWidth", 683)
+                Me.Height = GetSetting("Opencv", "mainFormHeight", "mainFormHeight", 510)
+            End If
+
             optionsForm = New Options
             optionsForm.defineCameraResolutions(settings.cameraIndex)
 
@@ -225,6 +235,8 @@ Namespace OpenCVB
             Return pt
         End Function
         Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+            setMainFormSize()
+
             jsonfs.write()
             cameraShutdown = True
             Thread.Sleep(500)
@@ -465,10 +477,17 @@ Namespace OpenCVB
             End If
             LineUpCamPics()
         End Sub
+        Private Sub setMainFormSize()
+            SaveSetting("Opencv", "mainFormLeft", "mainFormLeft", Math.Abs(Me.Left))
+            SaveSetting("Opencv", "mainFormTop", "mainFormTop", Me.Top)
+            SaveSetting("Opencv", "mainFormWidth", "mainFormWidth", Me.Width)
+            SaveSetting("Opencv", "mainFormHeight", "mainFormHeight", Me.Height)
+        End Sub
         Private Sub OpenCVB_Resize(sender As Object, e As EventArgs) Handles Me.Resize
             If camPic Is Nothing Then Exit Sub ' when first opening, campic may not be built yet
             If camPic(2) Is Nothing Then Exit Sub ' individual pictureboxes need to be ready as well.
             LineUpCamPics()
+            setMainFormSize()
         End Sub
         Private Sub LineUpCamPics()
             Dim imgHeight = settings.displayRes.Height
