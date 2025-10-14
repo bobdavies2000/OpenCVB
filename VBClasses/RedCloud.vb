@@ -43,13 +43,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
 
-        Dim cellsOnly = pcMap.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
-        percentImage = (percentImage + cellsOnly / task.depthMask.CountNonZero) / 2
-        Static targetSlider = OptionParent.FindSlider("Reduction Target")
-        If percentImage < 0.8 Then
-            If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
-        End If
-
         strOut = RedCell_Basics.selectCell(pcMap, rcList)
         If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
         SetTrueText(strOut, 3)
@@ -117,13 +110,6 @@ Public Class RedCloud_HeartBeat : Inherits TaskParent
 
             dst2 = PaletteBlackZero(pcMap)
             labels(2) = CStr(rcList.Count) + " regions were identified "
-        End If
-
-        Dim cellsOnly = pcMap.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
-        percentImage = (percentImage + cellsOnly / task.depthMask.CountNonZero) / 2
-        Static targetSlider = OptionParent.FindSlider("Reduction Target")
-        If percentImage < 0.8 Then
-            If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
         End If
 
         strOut = RedCell_Basics.selectCell(pcMap, rcList)
@@ -398,13 +384,6 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
             rcList.Add(pc)
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
-
-        Dim cellsOnly = dst3.Threshold(1, 255, cv.ThresholdTypes.Binary).CountNonZero
-        percentImage = cellsOnly / task.depthMask.CountNonZero
-        Static targetSlider = OptionParent.FindSlider("Reduction Target")
-        If percentImage < 0.8 Then
-            If targetSlider.value + 10 < targetSlider.maximum Then targetSlider.value += 10 Else targetSlider.value = targetSlider.maximum
-        End If
 
         strOut = RedCell_Basics.selectCell(task.redCloud.pcMap, task.redCloud.rcList)
         If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)

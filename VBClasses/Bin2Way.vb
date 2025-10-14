@@ -150,25 +150,16 @@ End Class
 
 
 Public Class Bin2Way_RedColor : Inherits TaskParent
-    Dim bin2 As New Bin2Way_RecurseOnce
+    Dim bin2 As New Bin2Way_Gradation
     Dim redC As New RedColor_Core
-    Dim rcList(3) As List(Of rcData)
     Public Sub New()
-        For i = 0 To rcList.Count - 1
-            rcList(i) = New List(Of rcData)
-        Next
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Identify 4 gradations of light and combine them for input to RedColor"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bin2.Run(src)
 
-        For i = 0 To bin2.mats.mat.Count - 1
-            Dim index = CInt(255 / (i + 1))
-            dst1.SetTo(index, bin2.mats.mat(i))
-        Next
-
-        redC.Run(dst1)
+        redC.Run(bin2.dst3)
         labels(2) = redC.labels(2)
 
         dst2.SetTo(0)
@@ -183,7 +174,7 @@ End Class
 
 
 
-Public Class Bin2Way_Gradations : Inherits TaskParent
+Public Class Bin2Way_Gradation : Inherits TaskParent
     Dim bin2 As New Bin2Way_Basics
     Public mats(3) As cv.Mat
     Public Sub New()
@@ -191,6 +182,9 @@ Public Class Bin2Way_Gradations : Inherits TaskParent
         For Each m In mats
             m = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Next
+
+        labels(2) = "4 gradations of light to dark - 8uC3"
+        labels(3) = "4 gradations of light to dark - 8uC1 - no zeros..."
         desc = "Build 4 gradations of light and combine them."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -219,5 +213,26 @@ Public Class Bin2Way_Gradations : Inherits TaskParent
         Next
 
         dst2 = PaletteFull(dst3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Bin2Way_GradationEdges : Inherits TaskParent
+    Dim grad As New Bin2Way_Gradation
+    Dim edges As New Edge_Basics
+    Public Sub New()
+        labels(2) = "4-way gradation of the color image with edges added."
+        desc = "Add edges to the 4-way gradation."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.gray)
+
+        grad.Run(src)
+        dst2 = grad.dst2
+        dst2.SetTo(0, edges.dst2)
     End Sub
 End Class

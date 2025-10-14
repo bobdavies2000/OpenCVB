@@ -2,6 +2,7 @@
 Imports cv = OpenCvSharp
 Public Class RedPrep_Basics : Inherits TaskParent
     Dim prepEdges As New RedPrep_Edges_CPP
+    Dim edges As New Edge_Basics
     Public options As New Options_RedCloud
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -48,13 +49,31 @@ Public Class RedPrep_Basics : Inherits TaskParent
             dst2 = dst2 Or prepEdges.dst3
         End If
 
+        If options.PrepNoDepthEdges Then
+            edges.Run(task.depthMask)
+            dst2.SetTo(0, task.noDepthMask)
+            dst2 = dst2 Or edges.dst2
+        End If
+
         ' this is not as good as the operations above.
         'prepEdges.Run(reduceChan(split(0) + split(1) + split(2)))
         'dst2 = prepEdges.dst3
 
         ' this rectangle prevents bleeds at the image edges.  It is necessary.  Test without it to see the impact.
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), 255, 2)
-        labels(2) = "Using reduction factor = " + CStr(task.reductionTarget)
+
+        ' this should be the only place where the target slider is adjusted for current conditions.
+        Dim percentZero = (dst2.Total - dst2.CountNonZero) / dst2.Total
+        Static targetSlider = OptionParent.FindSlider("Reduction Target")
+        If percentZero < 0.8 And targetSlider.value < targetSlider.maximum Then
+            If targetSlider.value + 10 < targetSlider.maximum Then
+                targetSlider.value += 10
+            Else
+                targetSlider.value = targetSlider.maximum
+            End If
+        End If
+        labels(2) = "Using reduction factor = " + CStr(task.reductionTarget) + ".  " +
+                    Format(percentZero, "0%") + " of the image available for floodfill."
     End Sub
 End Class
 
