@@ -14034,3 +14034,51 @@ Public Class XO_RedList_CellChanges : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+
+
+
+Public Class XO_Bin2Way_RedCloud : Inherits TaskParent
+    Dim bin2 As New Bin2Way_RecurseOnce
+    Dim flood As New Flood_BasicsMask
+    Dim cellMaps(3) As cv.Mat, oldrclist(3) As List(Of rcData)
+    Dim options As New Options_Bin2WayRedCloud
+    Public Sub New()
+        flood.showSelected = False
+        desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        dst3 = runRedList(src, labels(3))
+
+        If task.optionsChanged Then
+            For i = 0 To oldrclist.Count - 1
+                oldrclist(i) = New List(Of rcData)
+                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            Next
+        End If
+
+        bin2.Run(src)
+
+        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        For i = options.startRegion To options.endRegion
+            task.redList.rcMap = cellMaps(i)
+
+            task.redList.oldrclist = oldrclist(i)
+            flood.inputRemoved = Not bin2.mats.mat(i)
+            flood.Run(bin2.mats.mat(i))
+            cellMaps(i) = task.redList.rcMap.Clone
+            oldrclist(i) = New List(Of rcData)(task.redList.oldrclist)
+            For Each orc In task.redList.oldrclist
+                If orc.index = 0 Then Continue For
+                sortedCells.Add(orc.pixels, orc)
+            Next
+        Next
+
+        dst2 = RebuildRCMap(sortedCells)
+
+        If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
+    End Sub
+End Class
