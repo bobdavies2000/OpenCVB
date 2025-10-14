@@ -284,7 +284,7 @@ End Class
 
 
 Public Class RedCloud_MotionSimple : Inherits TaskParent
-    Dim redContours As New RedCloud_HeartBeat
+    Dim redContours As New RedCloud_Basics
     Public Sub New()
         task.gOptions.HistBinBar.Maximum = 255
         task.gOptions.HistBinBar.Value = 255
@@ -306,7 +306,7 @@ Public Class RedCloud_MotionSimple : Inherits TaskParent
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
         Dim pcUsed As New List(Of Integer)
-        If task.heartBeatLT Then dst3 = dst2.Clone
+        If task.heartBeat Then dst3 = dst2.Clone
         For i = 1 To histArray.Count - 1
             If histArray(i) > 0 And pcUsed.Contains(i) = False Then
                 Dim pc = redContours.rcList(i)
@@ -323,7 +323,7 @@ End Class
 
 
 Public Class RedCloud_Motion : Inherits TaskParent
-    Dim redC As New RedCloud_HeartBeat
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.gOptions.HistBinBar.Maximum = 255
         task.gOptions.HistBinBar.Value = 255

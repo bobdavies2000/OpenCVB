@@ -34,7 +34,8 @@ Public Class RedCloudAndColor_Basics : Inherits TaskParent
                     If rect.Width > 0 And rect.Height > 0 Then
                         'If count >= minCount Then
                         Dim pc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
-                        pc.color = task.vecColors(pc.index)
+                        If pc Is Nothing Then Continue For
+                        pc.color = task.scalarColors(pc.index)
                         newList.Add(pc)
                         'dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
                         SetTrueText(CStr(pc.index), pc.rect.TopLeft)

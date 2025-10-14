@@ -1831,12 +1831,12 @@ int* Random_DiscreteDistribution_Run(Random_DiscreteDistribution* cPtr, int rows
 
 
 
-class RedColor_FindCells
+class RedList_FindCells
 {
 private:
 public:
     vector <int> bricks;
-    RedColor_FindCells() {}
+    RedList_FindCells() {}
     void RunCPP(Mat src)
     {
         bricks.clear();
@@ -1852,18 +1852,18 @@ public:
     }
 };
 extern "C" __declspec(dllexport)
-RedColor_FindCells* RedColor_FindBricks_Open() {
-    RedColor_FindCells* cPtr = new RedColor_FindCells();
+RedList_FindCells* RedList_FindBricks_Open() {
+    RedList_FindCells* cPtr = new RedList_FindCells();
     return cPtr;
 }
 extern "C" __declspec(dllexport)
-void RedColor_FindBricks_Close(RedColor_FindCells* cPtr)
+void RedList_FindBricks_Close(RedList_FindCells* cPtr)
 {
     delete cPtr;
 }
-extern "C" __declspec(dllexport) int RedColor_FindBricks_TotalCount(RedColor_FindCells* cPtr) { return int(cPtr->bricks.size()); }
+extern "C" __declspec(dllexport) int RedList_FindBricks_TotalCount(RedList_FindCells* cPtr) { return int(cPtr->bricks.size()); }
 extern "C" __declspec(dllexport)
-int* RedColor_FindBricks_RunCPP(RedColor_FindCells* cPtr, int* dataPtr, int rows, int cols)
+int* RedList_FindBricks_RunCPP(RedList_FindCells* cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->RunCPP(Mat(rows, cols, CV_8UC1, dataPtr));
     if (cPtr->bricks.size() == 0) return 0;
