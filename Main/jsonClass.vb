@@ -212,7 +212,7 @@ Namespace jsonClass
                 If .snap320 = False And .snap640 = False And .snapCustom = False Then .snap640 = True
                 If .snap640 Then
                     .locationMain.Item2 = 1321
-                    .locationMain.Item3 = 845
+                    .locationMain.Item3 = 855
                     If wh = 240 Or wh = 480 Or wh = 120 Then .locationMain.Item3 = 1096
                     If wh = 240 Or wh = 480 Or wh = 120 Then .displayRes = New cv.Size(640, 480) Else .displayRes = New cv.Size(640, 360)
                 ElseIf .snap320 Then

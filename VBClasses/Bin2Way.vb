@@ -150,82 +150,6 @@ End Class
 
 
 
-
-Public Class Bin2Way_RedCloud : Inherits TaskParent
-    Dim bin2 As New Bin2Way_RecurseOnce
-    Dim flood As New Flood_BasicsMask
-    Dim cellMaps(3) As cv.Mat
-    Dim rcList(3) As List(Of rcData)
-    Dim options As New Options_Bin2WayRedCloud
-    Public Sub New()
-        flood.showSelected = False
-        desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
-    End Sub
-    Public Shared Function rebuildMap(sortedCells As SortedList(Of Integer, rcData)) As cv.Mat
-        task.redCloud.rcList.Clear()
-        task.redCloud.rcList.Add(New rcData) ' placeholder rcData so map is correct.
-        task.redList.rcMap.SetTo(0)
-        Static saveColorSetting = task.gOptions.trackingLabel
-        For Each pc In sortedCells.Values
-            pc.index = task.redCloud.rcList.Count
-
-            If saveColorSetting <> task.gOptions.trackingLabel Then pc.color = New cv.Scalar
-            Select Case task.gOptions.trackingLabel
-                Case "Mean Color"
-                    Dim colorStdev As cv.Scalar
-                    cv.Cv2.MeanStdDev(task.color(pc.rect), pc.color, colorStdev, pc.mask)
-                Case "Tracking Color"
-                    If pc.color = black Then pc.color = task.scalarColors(pc.index)
-            End Select
-
-            task.redCloud.rcList.Add(pc)
-            task.redList.rcMap(pc.rect).SetTo(pc.index, pc.mask)
-            DisplayCells.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
-            If pc.index >= 255 Then Exit For
-        Next
-        saveColorSetting = task.gOptions.trackingLabel
-        task.redList.rcMap.SetTo(0, task.noDepthMask)
-        Return DisplayCells()
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        dst3 = runRedCloud(src, labels(3))
-
-        If task.optionsChanged Then
-            For i = 0 To rcList.Count - 1
-                rcList(i) = New List(Of rcData)
-                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            Next
-        End If
-
-        bin2.Run(src)
-
-        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        For i = options.startRegion To options.endRegion
-            task.redCloud.pcMap = cellMaps(i)
-
-            task.redCloud.rcList = rcList(i)
-            flood.inputRemoved = Not bin2.mats.mat(i)
-            flood.Run(bin2.mats.mat(i))
-            cellMaps(i) = task.redList.rcMap.Clone
-            rcList(i) = New List(Of rcData)(task.redCloud.rcList)
-            For Each pc In task.redCloud.rcList
-                If pc.index = 0 Then Continue For
-                sortedCells.Add(pc.pixels, pc)
-            Next
-        Next
-
-        dst2 = rebuildMap(sortedCells)
-
-        If task.heartBeat Then labels(2) = CStr(task.redCloud.rcList.Count) + " cells were identified and matched to the previous image"
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Bin2Way_RedColor : Inherits TaskParent
     Dim bin2 As New Bin2Way_RecurseOnce
     Dim redC As New RedColor_Core
@@ -235,7 +159,7 @@ Public Class Bin2Way_RedColor : Inherits TaskParent
             rcList(i) = New List(Of rcData)
         Next
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Identify the lightest, darkest, and other regions separately and then combine the rcData."
+        desc = "Identify 4 gradations of light and combine them for input to RedColor"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         bin2.Run(src)
@@ -244,6 +168,7 @@ Public Class Bin2Way_RedColor : Inherits TaskParent
             Dim index = CInt(255 / (i + 1))
             dst1.SetTo(index, bin2.mats.mat(i))
         Next
+
         redC.Run(dst1)
         labels(2) = redC.labels(2)
 
@@ -253,24 +178,5 @@ Public Class Bin2Way_RedColor : Inherits TaskParent
         Next
 
         dst3 = PaletteBlackZero(dst2)
-
-        'Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        'For i = options.startRegion To options.endRegion
-        '    task.redColor.pcMap = cellMaps(i)
-
-        '    task.redColor.rcList = rcList(i)
-        '    flood.inputRemoved = Not bin2.mats.mat(i)
-        '    flood.Run(bin2.mats.mat(i))
-        '    cellMaps(i) = task.redList.rcMap.Clone
-        '    rcList(i) = New List(Of oldrcData)(task.redColor.rcList)
-        '    For Each pc In task.redColor.rcList
-        '        If pc.index = 0 Then Continue For
-        '        sortedCells.Add(pc.pixels, pc)
-        '    Next
-        'Next
-
-        'dst2 = rebuildMap(sortedCells)
-
-        'If task.heartBeat Then labels(2) = CStr(task.redColor.rcList.Count) + " cells were identified and matched to the previous image"
     End Sub
 End Class

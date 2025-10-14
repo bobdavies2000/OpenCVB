@@ -99,6 +99,9 @@ Public Class RedColor_Core : Inherits TaskParent
             rcList.Add(pc)
         Next
 
+        labels(2) = CStr(rcList.Count) + " regions were identified "
+        labels(3) = redSweep.labels(3)
+
         pcListLast = New List(Of rcData)(rcList)
         pcMapLast = pcMap.Clone
     End Sub

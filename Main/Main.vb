@@ -469,9 +469,6 @@ Namespace OpenCVB
             If camPic Is Nothing Then Exit Sub ' when first opening, campic may not be built yet
             If camPic(2) Is Nothing Then Exit Sub ' individual pictureboxes need to be ready as well.
             LineUpCamPics()
-            If settings.snap320 Or settings.snap640 Then
-                XYLoc.Text = "To resize OpenCVB's main window, first set the global option for 'Custom' size."
-            End If
         End Sub
         Private Sub LineUpCamPics()
             Dim imgHeight = settings.displayRes.Height
