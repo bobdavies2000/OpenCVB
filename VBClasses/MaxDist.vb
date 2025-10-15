@@ -18,9 +18,10 @@ Public Class MaxDist_Basics : Inherits TaskParent
         cv.Cv2.DrawContours(pc.contourMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
 
         If zeroRectangle Then
-            Dim tmp As cv.Mat = mask.Clone
-            tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1) ' see MaxDist_NoRectangle below to confirm this is not needed.
-            Dim distance32f = pc.contourMask.DistanceTransform(cv.DistanceTypes.L1, 0)
+            Dim tmp As cv.Mat = pc.contourMask.Clone
+            ' see MaxDist_NoRectangle below to confirm this is needed.
+            tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+            Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
             Dim mm As mmData = GetMinMax(distance32f)
             pc.maxDist.X = mm.maxLoc.X + pc.rect.X
             pc.maxDist.Y = mm.maxLoc.Y + pc.rect.Y
