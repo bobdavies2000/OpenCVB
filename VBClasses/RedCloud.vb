@@ -58,6 +58,61 @@ End Class
 
 
 
+Public Class RedCloud_Sweep : Inherits TaskParent
+    Public prepEdges As New RedPrep_Basics
+    Public rcList As New List(Of rcData)
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the biggest chunks of consistent depth data "
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prepEdges.Run(src)
+        dst3 = Not prepEdges.dst2
+
+        Dim index As Integer = 1
+        Dim rect As New cv.Rect
+        Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
+        Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
+        Dim minCount = dst3.Total * 0.001
+        rcList.Clear()
+        dst1.SetTo(0)
+        Dim rc As rcData = Nothing
+        For y = 0 To dst3.Height - 1
+            For x = 0 To dst3.Width - 1
+                Dim pt = New cv.Point(x, y)
+                ' skip the regions with no depth or those that were already floodfilled.
+                If dst3.Get(Of Byte)(pt.Y, pt.X) > index Then
+                    Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
+                    If rect.Width > 0 And rect.Height > 0 Then
+                        If count >= minCount Then
+                            rc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
+                            rc.color = task.vecColors(rc.index)
+                            rcList.Add(rc)
+                            dst1(rc.rect).SetTo(rc.index Mod 255, rc.mask)
+                            SetTrueText(CStr(rc.index), rc.rect.TopLeft)
+                            index += 1
+                        Else
+                            dst3(rect).SetTo(255, mask(rect))
+                        End If
+                    End If
+                End If
+            Next
+        Next
+
+        dst2 = PaletteBlackZero(dst1)
+
+        For Each rc In rcList
+            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+        Next
+        labels(2) = CStr(rcList.Count) + " regions were identified.  Bright areas are < " +
+                    CStr(CInt(minCount)) + " pixels (too small.)"
+        labels(3) = "Reduced point cloud - use 'Reduction Target' option to increase/decrease cell sizes.  White cells were to small (> " +
+                    CStr(minCount) + " pixels)"
+    End Sub
+End Class
+
+
 
 
 Public Class RedCloud_HeartBeat : Inherits TaskParent
@@ -120,66 +175,6 @@ Public Class RedCloud_HeartBeat : Inherits TaskParent
         SetTrueText(strOut + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf + CStr(rcList.Count) + " cells present", 3)
     End Sub
 End Class
-
-
-
-
-
-Public Class RedCloud_Sweep : Inherits TaskParent
-    Public prepEdges As New RedPrep_Basics
-    Public rcList As New List(Of rcData)
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Find the biggest chunks of consistent depth data "
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prepEdges.Run(src)
-        dst3 = Not prepEdges.dst2
-
-        Dim index As Integer = 1
-        Dim rect As New cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
-        Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
-        Dim minCount = dst3.Total * 0.001
-        rcList.Clear()
-        dst1.SetTo(0)
-        Dim rc As rcData = Nothing
-        For y = 0 To dst3.Height - 1
-            For x = 0 To dst3.Width - 1
-                Dim pt = New cv.Point(x, y)
-                ' skip the regions with no depth or those that were already floodfilled.
-                If dst3.Get(Of Byte)(pt.Y, pt.X) > index Then
-                    Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
-                    If rect.Width > 0 And rect.Height > 0 Then
-                        If count >= minCount Then
-                            rc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
-                            rc.color = task.vecColors(rc.index)
-                            rcList.Add(rc)
-                            dst1(rc.rect).SetTo(rc.index Mod 255, rc.mask)
-                            SetTrueText(CStr(rc.index), rc.rect.TopLeft)
-                            index += 1
-                        Else
-                            dst3(rect).SetTo(255, mask(rect))
-                        End If
-                    End If
-                End If
-            Next
-        Next
-
-        dst2 = PaletteBlackZero(dst1)
-
-        For Each rc In rcList
-            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-        Next
-        labels(2) = CStr(rcList.Count) + " regions were identified.  Bright areas are < " +
-                    CStr(CInt(minCount)) + " pixels (too small.)"
-        labels(3) = "Reduced point cloud - use 'Reduction Target' option to increase/decrease cell sizes.  White cells were to small (> " +
-                    CStr(minCount) + " pixels)"
-    End Sub
-End Class
-
-
 
 
 
@@ -397,5 +392,17 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
 
         rcListLast = New List(Of rcData)(rcList)
         pcMapLast = rcMap.clone
+    End Sub
+End Class
+
+
+
+
+Public Class RedCloud_CC : Inherits TaskParent
+    Dim color8u As New Color8U_Basics
+    Public Sub New()
+        desc = "Add the Color8U output to the RedPrep_Basics cloud data before running RedCloud."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
     End Sub
 End Class

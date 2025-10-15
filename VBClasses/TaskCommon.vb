@@ -760,6 +760,7 @@ End Class
 Public Class rcData
     Public age As Integer
     Public color As cv.Scalar
+    Public colorIDs As New List(Of Integer) ' this list of ID's for color8u output 
     Public contour As List(Of cv.Point)
     Public contourMask As cv.Mat
     Public depth As Single

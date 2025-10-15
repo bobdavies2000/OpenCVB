@@ -58,7 +58,7 @@ End Class
 
 
 
-Public Class RedColor_FastSimple : Inherits TaskParent
+Public Class RedColor_HeartBeat : Inherits TaskParent
     Dim redCore As New RedColor_Basics
     Public rcList As New List(Of rcData)
     Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

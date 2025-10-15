@@ -188,9 +188,9 @@ Quaterion
 Random
 Rectangle
 RecursiveBilateralFilter
+RedCC
 RedCell
 RedCloud
-RedCloudAndColor
 RedColor
 RedList
 RedMask
