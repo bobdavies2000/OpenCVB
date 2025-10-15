@@ -178,7 +178,7 @@ Public Class Distance_Peaks : Inherits TaskParent
         dst1 = task.noDepthMask
         Dim distance32f = dst1.DistanceTransform(cv.DistanceTypes.L1, 0)
 
-        Dim maxList As New List(Of Integer)
+        Dim maxList As New List(Of Double)
         Dim ptList As New List(Of cv.Point)
         Dim countList As New List(Of Integer)
         For Each rect In task.gridRects
@@ -188,7 +188,7 @@ Public Class Distance_Peaks : Inherits TaskParent
             If mm.maxVal > 0 Then ptList.Add(New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y))
             countList.Add(distance32f(rect).CountNonZero)
         Next
-        dst2 = PaletteFull(dst1)
+        dst2 = PaletteBlackZero(dst1)
 
         If standalone Then
             dst0.SetTo(0)
