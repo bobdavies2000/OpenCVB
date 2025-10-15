@@ -8,15 +8,15 @@ Public Class RedColor_Basics : Inherits TaskParent
         desc = "Run RedColor_Core on the heartbeat but just floodFill at maxDist otherwise."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Or task.optionsChanged Then
+        Static rcListLast As New List(Of rcData)
+        Dim rcUsed As New List(Of Integer)
+        If task.heartBeatLT Or task.optionsChanged Then
             redCore.Run(src)
             dst2 = redCore.dst2
             labels(2) = redCore.labels(2)
             rcList = New List(Of rcData)(redCore.rcList)
-            dst3 = redCore.dst2
+            rcListLast = New List(Of rcData)(rcList)
         Else
-            Dim rcListLast = New List(Of rcData)(rcList)
-
             If src.Type <> cv.MatType.CV_8U Then src = task.gray
             redCore.redSweep.reduction.Run(src)
             dst1 = redCore.redSweep.reduction.dst2 + 1
@@ -32,18 +32,26 @@ Public Class RedColor_Basics : Inherits TaskParent
             rcMap.SetTo(0)
             For Each rc In rcListLast
                 Dim pt = rc.maxDist
-                If rcMap.Get(Of Byte)(pt.Y, pt.X) = 0 Then
-                    Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
-                    If rect.Width > 0 And rect.Height > 0 Then
-                        Dim pcc = MaxDist_Basics.setCloudData(dst1(rect), rect, index)
-                        If pcc IsNot Nothing Then
-                            pcc.color = rc.color
-                            pcc.age = rc.age + 1
-                            rcList.Add(pcc)
-                            rcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.contourMask)
+                If rcMap.Get(Of Byte)(pt.Y, pt.X) > 0 Then
+                    For i = pt.X + 1 To dst2.Width - 1
+                        pt.X = i
+                        If rcMap.Get(Of Byte)(pt.Y, pt.X) = 0 Then Exit For
+                    Next
+                End If
 
-                            index += 1
-                        End If
+                If pt.X >= dst2.Width Then Continue For ' one of the cells has disappeared.
+
+                Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
+                If count > minCount Then
+                    Dim pcc = MaxDist_Basics.setCloudData(dst1(rect), rect, index)
+                    If pcc IsNot Nothing Then
+                        pcc.color = rc.color
+                        pcc.age = rc.age + 1
+                        rcList.Add(pcc)
+                        rcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.contourMask)
+
+                        rcUsed.Add(rc.index)
+                        index += 1
                     End If
                 End If
             Next
@@ -51,6 +59,18 @@ Public Class RedColor_Basics : Inherits TaskParent
             dst2 = PaletteBlackZero(rcMap)
             labels(2) = CStr(rcList.Count) + " regions were identified "
         End If
+
+        If standaloneTest() Then
+            For Each rc In rcList
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+            Next
+
+            strOut = RedCell_Basics.selectCell(rcMap, rcList)
+            If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+            SetTrueText(strOut, 3)
+        End If
+
+        rcListLast = New List(Of rcData)(rcList)
     End Sub
 End Class
 
@@ -104,6 +124,10 @@ Public Class RedColor_Core : Inherits TaskParent
 
         rcListLast = New List(Of rcData)(rcList)
         pcMapLast = rcMap.Clone
+
+        strOut = RedCell_Basics.selectCell(rcMap, rcList)
+        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -134,25 +158,35 @@ Public Class RedColor_Sweep : Inherits TaskParent
         rcMap.SetTo(0)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
+                If x > 180 Then Dim k = 0
                 Dim pt = New cv.Point(x, y)
-                ' skip the regions with depth (already handled elsewhere) or those that were already floodfilled.
                 If dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
-                    If rect.Width > 0 And rect.Height > 0 And rect.Width < dst2.Width And rect.Height < dst2.Height Then
-                        If count >= minCount Then
-                            Dim rc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
-                            rcList.Add(rc)
-                            rcMap(rc.rect).SetTo(rc.index Mod 255, rc.contourMask)
-                            index += 1
-                        Else
-                            dst3(rect).SetTo(255, mask(rect))
-                        End If
+                    If count > minCount Then
+                        Dim rc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
+                        rcList.Add(rc)
+                        rcMap(rc.rect).SetTo(rc.index Mod 255, rc.contourMask)
+
+                        index += 1
+                    Else
+                        If rect.Width > 0 And rect.Height > 0 Then dst3(rect).SetTo(255, mask(rect))
                     End If
                 End If
             Next
         Next
 
         dst2 = PaletteBlackZero(rcMap)
+
+        If standaloneTest() Then
+            For Each rc In rcList
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+            Next
+
+            strOut = RedCell_Basics.selectCell(rcMap, rcList)
+            If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+            SetTrueText(strOut, 3)
+        End If
+
         labels(2) = CStr(rcList.Count) + " regions were identified "
     End Sub
 End Class

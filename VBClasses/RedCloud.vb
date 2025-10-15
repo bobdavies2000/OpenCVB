@@ -42,7 +42,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Next
 
         For Each rc In rcList
-            dst2.Circle(rc.maxDist, task.DotSize, white, -1)
+            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
             SetTrueText(CStr(rc.age), rc.maxDist)
         Next
 
@@ -384,7 +384,7 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
             rc.index = rcList.Count + 1
             rcMap(rc.rect).setto(rc.index, rc.contourMask)
             dst2(rc.rect).SetTo(rc.color, rc.contourMask)
-            dst2.Circle(rc.maxDist, task.DotSize, white, -1)
+            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
             SetTrueText(CStr(rc.age), rc.maxDist)
             rcList.Add(rc)
         Next

@@ -27,10 +27,8 @@ Public Class Reduction_Basics : Inherits TaskParent
             labels(2) = "No reduction requested"
         End If
 
-        ' dst1.CopyTo(dst2, task.motionMask)
-
         If standaloneTest() Or alwaysDisplay Then dst3 = PaletteBlackZero(dst2)
-        labels(2) = CStr(classCount) + " colors after reduction"
+        labels(2) = CStr(classCount) + " colors after reduction - 8uC1 below"
     End Sub
 End Class
 
