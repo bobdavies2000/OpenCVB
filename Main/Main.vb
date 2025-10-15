@@ -358,110 +358,113 @@ Namespace OpenCVB
             DrawingRectangle = False
         End Sub
         Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
+            Dim gDrawFlag As Boolean = True
+            If debugSyncUI Then
+                Static lastTime As DateTime = Now
+                Dim timeNow As DateTime = Now
+                Dim elapsedTime = timeNow.Ticks - lastTime.Ticks
+                Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
+                Dim timerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
+                If timerInterval < 1000 Then ' adjust the debugSyncUI time here - in milliseconds.
+                    gDrawFlag = False
+                Else
+                    lastTime = timeNow
+                End If
+            End If
 
-
-
-            'If task.debugSyncUI Then
-            '    Static syncUICount = 0 ' enough time - adjust if needed...
-            '    If syncUI = 0 Then
-            '        task.RunAlgorithm()
-            '        syncUI = syncUICount
-            '    End If
-            '    syncUI -= 1
-            'Else
-            'End If
-
-
+            Dim ratio = camPic(2).Width / settings.workRes.Width
 
             Dim g As Graphics = e.Graphics
             Dim pic = DirectCast(sender, PictureBox)
-            Dim ratio = camPic(2).Width / settings.workRes.Width
             g.ScaleTransform(1, 1)
             g.DrawImage(pic.Image, 0, 0)
 
             Static myWhitePen As New Pen(Color.White)
             Static myBlackPen As New Pen(Color.Black)
 
-            If pixelViewerOn And mousePicTag = pic.Tag Then
-                Dim r = pixelViewerRect
-                Dim rect = New cv.Rect(CInt(r.X * ratio), CInt(r.Y * ratio),
-                                   CInt(r.Width * ratio), CInt(r.Height * ratio))
-                g.DrawRectangle(myWhitePen, rect.X, rect.Y, rect.Width, rect.Height)
-            End If
-
-            If drawRect.Width > 0 And drawRect.Height > 0 Then
-                g.DrawRectangle(myWhitePen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
-                If pic.Tag = 2 Then
-                    g.DrawRectangle(myWhitePen, drawRect.X + camPic(0).Width, drawRect.Y,
-                                drawRect.Width, drawRect.Height)
+            If gDrawFlag Then
+                If pixelViewerOn And mousePicTag = pic.Tag Then
+                    Dim r = pixelViewerRect
+                    Dim rect = New cv.Rect(CInt(r.X * ratio), CInt(r.Y * ratio),
+                                       CInt(r.Width * ratio), CInt(r.Height * ratio))
+                    g.DrawRectangle(myWhitePen, rect.X, rect.Y, rect.Width, rect.Height)
                 End If
-            End If
 
-            If results.dstList Is Nothing Or camera Is Nothing Then Exit Sub
-            If results.dstsReady And cameraReady Then
-                If CameraSwitching.Visible Then
-                    CameraSwitching.Visible = False
-                    CamSwitchProgress.Visible = False
-                    CamSwitchTimer.Enabled = False
-                End If
-                Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
-                If results.dstList IsNot Nothing Then
-                    If results.dstList(0).Width > 0 Then
-                        SyncLock task.resultLock
-                            For i = 0 To results.dstList.Count - 1
-                                Dim tmp = results.dstList(i)
-                                tmp.Circle(mousePointCamPic, task.DotSize + 1, cv.Scalar.White, -1)
-                                tmp = tmp.Resize(camSize)
-                                cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
-                            Next
-                        End SyncLock
-
-                        trueData.Add(New TrueText(task.depthAndDepthRange,
-                                         New cv.Point(mousePointCamPic.X, mousePointCamPic.Y - 24), 1))
+                If drawRect.Width > 0 And drawRect.Height > 0 Then
+                    g.DrawRectangle(myWhitePen, drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
+                    If pic.Tag = 2 Then
+                        g.DrawRectangle(myWhitePen, drawRect.X + camPic(0).Width, drawRect.Y,
+                                    drawRect.Width, drawRect.Height)
                     End If
                 End If
-                results.dstsReady = False
+
+                If results.dstList Is Nothing Or camera Is Nothing Then Exit Sub
+                If results.dstsReady And cameraReady Then
+                    If CameraSwitching.Visible Then
+                        CameraSwitching.Visible = False
+                        CamSwitchProgress.Visible = False
+                        CamSwitchTimer.Enabled = False
+                    End If
+                    Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
+                    If results.dstList IsNot Nothing Then
+                        If results.dstList(0).Width > 0 Then
+                            SyncLock task.resultLock
+                                For i = 0 To results.dstList.Count - 1
+                                    Dim tmp = results.dstList(i)
+                                    tmp.Circle(mousePointCamPic, task.DotSize + 1, cv.Scalar.White, -1)
+                                    tmp = tmp.Resize(camSize)
+                                    cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
+                                Next
+                            End SyncLock
+
+                            trueData.Add(New TrueText(task.depthAndDepthRange,
+                                             New cv.Point(mousePointCamPic.X, mousePointCamPic.Y - 24), 1))
+                        End If
+                    End If
+                    results.dstsReady = False
+                End If
+
+                Dim workRes = settings.workRes
+                Dim cres = settings.captureRes
+                Dim dres = settings.displayRes
+                Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", workRes " +
+                                               CStr(workRes.Width) + "x" + CStr(workRes.Height)
+                If picLabels(0) <> "" Then
+                    If camLabel(0).Text <> picLabels(0) + " - RGB " + resolutionDetails Then
+                        camLabel(0).Text = picLabels(0)
+                        camLabel(0).Text += " - RGB " + resolutionDetails
+                    End If
+                Else
+                    camLabel(0).Text = "RGB - " + resolutionDetails
+                End If
+
+                If picLabels(1) <> "" Then camLabel(1).Text = picLabels(1)
+                camLabel(1).Text = picLabels(1)
+                camLabel(2).Text = picLabels(2)
+                camLabel(3).Text = picLabels(3)
+
+                ' why run all SharpGL algorithms here?  Because too much data has to move from task to main.
+                If AvailableAlgorithms.Text = "GL_MainForm" Then
+                    Static saveFrame = frameCount
+                    If saveFrame <> frameCount Then
+                        saveFrame = frameCount
+                        updateSharpGL()
+                    End If
+                End If
             End If
 
             ' draw any TrueType font data on the image 
             SyncLock trueTextLock
-                For i = 0 To trueData.Count - 1
-                    Dim tt = trueData(i)
+                Static saveTrueData As List(Of TrueText)
+                If gDrawFlag Then saveTrueData = New List(Of TrueText)(trueData)
+                For Each tt In saveTrueData
                     If tt.text Is Nothing Then Continue For
                     If tt.text.Length > 0 And tt.picTag = pic.Tag Then
                         g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
-                                     CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
+                                             CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
                     End If
                 Next
             End SyncLock
-
-            Dim workRes = settings.workRes
-            Dim cres = settings.captureRes
-            Dim dres = settings.displayRes
-            Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", workRes " +
-                                           CStr(workRes.Width) + "x" + CStr(workRes.Height)
-            If picLabels(0) <> "" Then
-                If camLabel(0).Text <> picLabels(0) + " - RGB " + resolutionDetails Then
-                    camLabel(0).Text = picLabels(0)
-                    camLabel(0).Text += " - RGB " + resolutionDetails
-                End If
-            Else
-                camLabel(0).Text = "RGB - " + resolutionDetails
-            End If
-
-            If picLabels(1) <> "" Then camLabel(1).Text = picLabels(1)
-            camLabel(1).Text = picLabels(1)
-            camLabel(2).Text = picLabels(2)
-            camLabel(3).Text = picLabels(3)
-
-            ' why run all SharpGL algorithms here?  Because too much data has to move from task to main.
-            If AvailableAlgorithms.Text = "GL_MainForm" Then
-                Static saveFrame = frameCount
-                If saveFrame <> frameCount Then
-                    saveFrame = frameCount
-                    updateSharpGL()
-                End If
-            End If
         End Sub
         Private Sub setupCamPics()
             ' when you change the primary monitor, old coordinates can go way off the screen.

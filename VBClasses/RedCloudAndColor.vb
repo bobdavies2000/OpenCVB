@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedCloudAndColor_Basics : Inherits TaskParent
     Public rcList As New List(Of rcData)
-    Public pcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Dim reduction As New Reduction_Basics
     Public Sub New()
         task.gOptions.UseMotionMask.Checked = False
@@ -10,8 +10,8 @@ Public Class RedCloudAndColor_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedCloud(src, labels(1))
 
-        Static pcListLast = New List(Of rcData)
-        Dim pcMapLast = pcMap.clone
+        Static rcListLast = New List(Of rcData)
+        Dim pcMapLast = rcMap.clone
         rcList = New List(Of rcData)(task.redCloud.rcList)
 
         dst3 = task.gray
@@ -48,12 +48,12 @@ Public Class RedCloudAndColor_Basics : Inherits TaskParent
             Next
         Next
 
-        strOut = RedCell_Basics.selectCell(pcMap, rcList)
+        strOut = RedCell_Basics.selectCell(rcMap, rcList)
         If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
         SetTrueText(strOut, 3)
 
         labels(2) = "Cells found = " + CStr(rcList.Count) + " and " + CStr(newList.Count) + " were color only cells."
 
-        pcListLast = New List(Of rcData)(rcList)
+        rcListLast = New List(Of rcData)(rcList)
     End Sub
 End Class
