@@ -8,19 +8,16 @@ Public Class RedColor_Basics : Inherits TaskParent
         desc = "Run RedColor_Core on the heartbeat but just floodFill at maxDist otherwise."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static rcListLast As New List(Of rcData)
-        Dim rcUsed As New List(Of Integer)
+        Static rcLost As New List(Of rcData)
         If task.heartBeatLT Or task.optionsChanged Then
+            rcLost.Clear()
             redCore.Run(src)
             dst2 = redCore.dst2
             labels(2) = redCore.labels(2)
-            rcList = New List(Of rcData)(redCore.rcList)
-            rcListLast = New List(Of rcData)(rcList)
         Else
             If src.Type <> cv.MatType.CV_8U Then src = task.gray
             redCore.redSweep.reduction.Run(src)
             dst1 = redCore.redSweep.reduction.dst2 + 1
-            labels(3) = redCore.redSweep.reduction.labels(2)
 
             Dim index As Integer = 1
             Dim rect As New cv.Rect
@@ -30,7 +27,7 @@ Public Class RedColor_Basics : Inherits TaskParent
             Dim minCount = dst1.Total * 0.001
             rcList.Clear()
             rcMap.SetTo(0)
-            For Each rc In rcListLast
+            For Each rc In redCore.rcList
                 Dim pt = rc.maxDist
                 If rcMap.Get(Of Byte)(pt.Y, pt.X) > 0 Then
                     For i = pt.X + 1 To dst2.Width - 1
@@ -39,7 +36,10 @@ Public Class RedColor_Basics : Inherits TaskParent
                     Next
                 End If
 
-                If pt.X >= dst2.Width Then Continue For ' one of the cells has disappeared.
+                If pt.X >= dst2.Width Then
+                    rcLost.Add(rc)
+                    Continue For ' one of the cells has disappeared.
+                End If
 
                 Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
                 If count > minCount Then
@@ -50,7 +50,6 @@ Public Class RedColor_Basics : Inherits TaskParent
                         rcList.Add(pcc)
                         rcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.contourMask)
 
-                        rcUsed.Add(rc.index)
                         index += 1
                     End If
                 End If
@@ -65,12 +64,16 @@ Public Class RedColor_Basics : Inherits TaskParent
                 dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
             Next
 
+            dst3.SetTo(0)
+            For Each rc In rcLost
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+            Next
+            labels(3) = "There were " + CStr(rcLost.Count) + " cells lost in the last iteration."
+
             strOut = RedCell_Basics.selectCell(rcMap, rcList)
             If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
             SetTrueText(strOut, 3)
         End If
-
-        rcListLast = New List(Of rcData)(rcList)
     End Sub
 End Class
 
