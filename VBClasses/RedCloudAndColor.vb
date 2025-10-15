@@ -49,7 +49,7 @@ Public Class RedCloudAndColor_Basics : Inherits TaskParent
         Next
 
         strOut = RedCell_Basics.selectCell(rcMap, rcList)
-        If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
         SetTrueText(strOut, 3)
 
         labels(2) = "Cells found = " + CStr(rcList.Count) + " and " + CStr(newList.Count) + " were color only cells."

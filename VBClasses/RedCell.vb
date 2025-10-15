@@ -7,15 +7,15 @@ Public Class RedCell_Basics : Inherits TaskParent
         If rcList.Count > 0 Then
             Dim clickIndex = rcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
             If clickIndex >= 0 And clickIndex < rcList.Count Then
-                task.pcD = rcList(clickIndex)
+                task.rcD = rcList(clickIndex)
             Else
                 Dim ages As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
                 For Each pc In rcList
                     ages.Add(pc.age, pc.index - 1)
                 Next
-                task.pcD = rcList(ages.ElementAt(0).Value)
+                task.rcD = rcList(ages.ElementAt(0).Value)
             End If
-            If task.pcD.rect.Contains(task.ClickPoint) Then Return task.pcD.displayCell
+            If task.rcD.rect.Contains(task.ClickPoint) Then Return task.rcD.displayCell
         End If
         Return ""
     End Function
@@ -23,7 +23,7 @@ Public Class RedCell_Basics : Inherits TaskParent
         If standalone Then dst2 = runRedCloud(src, labels(2))
         strOut = selectCell(task.redCloud.rcMap, task.redCloud.rcList)
 
-        If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
         SetTrueText(strOut, 3)
     End Sub
 End Class

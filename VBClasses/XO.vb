@@ -119,7 +119,7 @@ Public Class XO_Model_CellZoom : Inherits TaskParent
         dst2 = oglData.dst2
         dst3 = oglData.oglD.dst3
 
-        Dim rcX = task.rcD
+        Dim rcX = task.oldrcD
 
         dst1.SetTo(0)
         Dim mask = dst3.InRange(white, white)
@@ -624,7 +624,7 @@ Public Class XO_OpenGL_DrawHulls : Inherits TaskParent
 
         hulls.Run(src)
         dst2 = hulls.dst2
-        Dim rcx = task.rcD
+        Dim rcx = task.oldrcD
 
         Dim oglData As New List(Of cv.Point3f)
         oglData.Add(New cv.Point3f)
@@ -682,7 +682,7 @@ Public Class XO_OpenGL_Contours : Inherits TaskParent
         options2.Run()
 
         dst2 = runRedList(src, labels(2))
-        Dim rcx = task.rcD
+        Dim rcx = task.oldrcD
 
         Dim polygonCount As Integer
         Dim oglData As New List(Of cv.Point3f)
@@ -1116,15 +1116,15 @@ Public Class XO_OpenGL_RedCloudCell : Inherits TaskParent
         SetTrueText(specZ.strOut, 3)
 
         If task.ClickPoint = newPoint And task.redList.oldrclist.Count > 1 Then
-            task.rcD = task.redList.oldrclist(1) ' pick the largest cell
-            task.ClickPoint = task.rcD.maxDist
+            task.oldrcD = task.redList.oldrclist(1) ' pick the largest cell
+            task.ClickPoint = task.oldrcD.maxDist
         End If
 
         breakdown.Run(src)
 
         task.ogl.pointCloudInput.SetTo(0)
 
-        task.pointCloud(task.rcD.rect).CopyTo(task.ogl.pointCloudInput(task.rcD.rect), task.rcD.mask)
+        task.pointCloud(task.oldrcD.rect).CopyTo(task.ogl.pointCloudInput(task.oldrcD.rect), task.oldrcD.mask)
         task.ogl.Run(dst2)
     End Sub
 End Class
@@ -1426,7 +1426,7 @@ Public Class XO_OpenGL_ColorBin4Way : Inherits TaskParent
         dst2 = runRedList(src, labels(2))
 
         dst1.SetTo(0)
-        task.color(task.rcD.rect).CopyTo(dst1(task.rcD.rect), task.rcD.mask)
+        task.color(task.oldrcD.rect).CopyTo(dst1(task.oldrcD.rect), task.oldrcD.mask)
 
         dst1.ConvertTo(dst3, cv.MatType.CV_32FC3)
         dst3 = dst3.Normalize(0, 1, cv.NormTypes.MinMax)
@@ -2033,7 +2033,7 @@ Public Class XO_OpenGL_Profile : Inherits TaskParent
         sides.Run(src)
         dst2 = sides.dst2
 
-        Dim rc = task.rcD
+        Dim rc = task.oldrcD
         Dim contourMat As cv.Mat = cv.Mat.FromPixelData(rc.contour.Count, 1, cv.MatType.CV_32SC2, rc.contour.ToArray)
         If rc.contour.Count = 0 Then Exit Sub
         Dim split = contourMat.Split()
@@ -2084,7 +2084,7 @@ Public Class XO_OpenGL_ProfileRC : Inherits TaskParent
         sides.Run(src)
         dst2 = sides.dst2
         dst3 = sides.dst3
-        Dim rc = task.rcD
+        Dim rc = task.oldrcD
 
         If rc.contour3D.Count > 0 Then
             Dim vecMat As cv.Mat = cv.Mat.FromPixelData(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
@@ -6586,7 +6586,7 @@ Public Class XO_Sides_Basics : Inherits TaskParent
         For i = 0 To corners.Count - 1
             Dim nextColor = sides.cornerColors(i)
             Dim nextLabel = sides.cornerNames(i)
-            DrawLine(dst3, task.rcD.maxDist, corners(i), white)
+            DrawLine(dst3, task.oldrcD.maxDist, corners(i), white)
             SetTrueText(nextLabel, New cv.Point(corners(i).X, corners(i).Y), 3)
         Next
 
@@ -6609,7 +6609,7 @@ Public Class XO_Contour_RedCloudCorners : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             dst2 = runRedList(src, labels(2))
-            rc = task.rcD
+            rc = task.oldrcD
         End If
 
         dst3.SetTo(0)
@@ -9956,7 +9956,7 @@ Public Class XO_MatchRect_Basics : Inherits TaskParent
         If match.correlation < task.fCorrThreshold Or rectSave <> rectInput Or task.mouseClickFlag Then
             If standalone Then
                 dst2 = runRedList(src, labels(2)).Clone
-                rectInput = task.rcD.rect
+                rectInput = task.oldrcD.rect
             End If
             rectSave = rectInput
             match.template = src(rectInput).Clone
@@ -9982,9 +9982,9 @@ Public Class XO_MatchRect_RedCloud : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedList(src, labels(2))
-        task.ClickPoint = task.rcD.maxDist
+        task.ClickPoint = task.oldrcD.maxDist
 
-        If task.heartBeat Then matchRect.rectInput = task.rcD.rect
+        If task.heartBeat Then matchRect.rectInput = task.oldrcD.rect
 
         matchRect.Run(src)
         If standalone Then
@@ -12971,7 +12971,7 @@ Public Class XO_RedCell_Basics : Inherits TaskParent
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString()
-        Dim rc = task.rcD
+        Dim rc = task.oldrcD
 
         Dim gridID As Integer = task.gridMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
         strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbTab
@@ -13000,9 +13000,9 @@ Public Class XO_RedCell_Basics : Inherits TaskParent
 
         strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.depth, fmt2) + vbCrLf
 
-        Dim tmp = New cv.Mat(task.rcD.mask.Rows, task.rcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
-        task.pcSplit(2)(task.rcD.rect).CopyTo(tmp, task.rcD.mask)
-        plot.rc = task.rcD
+        Dim tmp = New cv.Mat(task.oldrcD.mask.Rows, task.oldrcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
+        task.pcSplit(2)(task.oldrcD.rect).CopyTo(tmp, task.oldrcD.mask)
+        plot.rc = task.oldrcD
         plot.Run(tmp)
         dst3 = plot.dst2
     End Sub
@@ -13029,11 +13029,11 @@ Public Class XO_RedCell_Distance : Inherits TaskParent
 
             Dim depthDistance As New List(Of Single)
             Dim colorDistance As New List(Of Single)
-            Dim selectedMean As cv.Scalar = src(task.rcD.rect).Mean(task.rcD.mask)
+            Dim selectedMean As cv.Scalar = src(task.oldrcD.rect).Mean(task.oldrcD.mask)
             If task.redList.oldrclist.Count = 0 Then Exit Sub ' next frame please...
             For Each rc In task.redList.oldrclist
                 colorDistance.Add(distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
-                depthDistance.Add(distance3D(task.rcD.depth, rc.depth))
+                depthDistance.Add(distance3D(task.oldrcD.depth, rc.depth))
             Next
 
             dst1.SetTo(0)
@@ -13130,9 +13130,9 @@ Public Class XO_RedCell_BasicsPlot : Inherits TaskParent
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString(src As cv.Mat)
-        Dim tmp = New cv.Mat(task.rcD.mask.Rows, task.rcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
-        task.pcSplit(2)(task.rcD.rect).CopyTo(tmp, task.rcD.mask)
-        plot.rc = task.rcD
+        Dim tmp = New cv.Mat(task.oldrcD.mask.Rows, task.oldrcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
+        task.pcSplit(2)(task.oldrcD.rect).CopyTo(tmp, task.oldrcD.mask)
+        plot.rc = task.oldrcD
         plot.Run(tmp)
         dst3 = plot.dst2
 
@@ -13144,8 +13144,8 @@ Public Class XO_RedCell_BasicsPlot : Inherits TaskParent
             dst2 = runRedList(src, labels(2))
             If task.ClickPoint = newPoint Then
                 If task.redList.oldrclist.Count > 1 Then
-                    task.rcD = task.redList.oldrclist(1)
-                    task.ClickPoint = task.rcD.maxDist
+                    task.oldrcD = task.redList.oldrclist(1)
+                    task.ClickPoint = task.oldrcD.maxDist
                 End If
             End If
         End If
@@ -13611,7 +13611,7 @@ Public Class XO_RedList_Gaps : Inherits TaskParent
         dst3 = frames.dst2
 
         If task.redList.oldrclist.Count > 0 Then
-            dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+            dst2(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
         End If
 
         If task.redList.oldrclist.Count > 0 Then

@@ -57,8 +57,8 @@ Public Class Boundary_Rectangles : Inherits TaskParent
         smallRects.Clear()
         smallContours.Clear()
         For i = task.redList.oldrclist.Count - 1 To CInt(task.redList.oldrclist.Count * options.percentRect) Step -1
-            task.rcD = task.redList.oldrclist(i)
-            Dim r = task.rcD.rect
+            task.oldrcD = task.redList.oldrclist(i)
+            Dim r = task.oldrcD.rect
             Dim contained As Boolean = False
             For Each rc In task.redList.oldrclist
                 If r = rc.rect Then Continue For
@@ -69,7 +69,7 @@ Public Class Boundary_Rectangles : Inherits TaskParent
             Next
 
             If contained Then
-                smallContours.Add(task.rcD.contour)
+                smallContours.Add(task.oldrcD.contour)
                 smallRects.Add(r)
             Else
                 rects.Add(r)

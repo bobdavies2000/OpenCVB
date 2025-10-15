@@ -44,8 +44,8 @@ Public Class VBtask : Implements IDisposable
     Public fpMap As New cv.Mat ' feature map
 
     Public brickD As brickData ' the currently selected brick
-    Public pcD As New rcData ' the currently selected redCloud Cell
-    Public rcD As New oldrcData ' the currently selected redColor Cell
+    Public rcD As New rcData ' the currently selected redCloud Cell
+    Public oldrcD As New oldrcData ' the currently selected redColor Cell
     Public lpD As New lpData ' the currently selected line pair
     Public fpD As New fpData ' the currently selected feature point.
     Public contourD As New contourData ' the currently selected contour
@@ -535,11 +535,11 @@ Public Class VBtask : Implements IDisposable
         If index = 0 Then Exit Sub
         If index > 0 And index < task.redList.oldrclist.Count Then
             ' ClickPoint = oldrclist(index).maxDist
-            task.rcD = task.redList.oldrclist(index)
-            task.color(task.rcD.rect).SetTo(cv.Scalar.White, task.rcD.mask)
+            task.oldrcD = task.redList.oldrclist(index)
+            task.color(task.oldrcD.rect).SetTo(cv.Scalar.White, task.oldrcD.mask)
         Else
             ' the 0th cell is always the upper left corner with just 1 pixel.
-            If task.redList.oldrclist.Count > 1 Then task.rcD = task.redList.oldrclist(1)
+            If task.redList.oldrclist.Count > 1 Then task.oldrcD = task.redList.oldrclist(1)
         End If
     End Sub
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)

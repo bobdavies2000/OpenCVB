@@ -236,7 +236,7 @@ Public Class RedList_ShapeCorrelation : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedList(src, labels(2))
 
-        Dim rc = task.rcD
+        Dim rc = task.oldrcD
         If rc.contour.Count > 0 Then
             Dim shape = shapeCorrelation(rc.contour)
             strOut = "Contour correlation for selected cell contour X to Y = " + Format(shape, fmt3) + vbCrLf + vbCrLf +
@@ -309,7 +309,7 @@ Public Class RedList_PlaneFromContour : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then dst2 = runRedList(src, labels(2))
 
-        Dim rc = task.rcD
+        Dim rc = task.oldrcD
         Dim fitPoints As New List(Of cv.Point3f)
         For Each pt In rc.contour
             If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
@@ -340,7 +340,7 @@ Public Class RedList_PlaneFromMask : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then dst2 = runRedList(src, labels(2))
 
-        Dim rc = task.rcD
+        Dim rc = task.oldrcD
         Dim fitPoints As New List(Of cv.Point3f)
         For y = 0 To rc.rect.Height - 1
             For x = 0 To rc.rect.Width - 1
@@ -370,7 +370,7 @@ Public Class RedList_PlaneEq3D : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedList(src, labels(2))
 
-        Dim rc = task.rcD
+        Dim rc = task.oldrcD
         If rc.mmZ.maxVal Then
             eq.rc = rc
             eq.Run(src)
@@ -633,7 +633,7 @@ Public Class RedList_Features : Inherits TaskParent
 
         dst2 = runRedList(src, labels(2))
 
-        Dim rc = task.rcD
+        Dim rc = task.oldrcD
 
         dst0 = task.color
         Dim correlationMat As New cv.Mat, correlationXtoZ As Single, correlationYtoZ As Single
@@ -864,8 +864,8 @@ Public Class RedList_CellDepthHistogram : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedList(src, labels(2))
         If task.heartBeat Then
-            Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
-            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+            Dim depth As cv.Mat = task.pcSplit(2)(task.oldrcD.rect)
+            depth.SetTo(0, task.noDepthMask(task.oldrcD.rect))
             plot.minRange = 0
             plot.maxRange = task.MaxZmeters
             plot.Run(depth)

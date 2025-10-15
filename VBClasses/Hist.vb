@@ -1355,7 +1355,7 @@ Public Class Hist_RedCell : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedList(src, labels(2))
-        hist.rc = task.rcD
+        hist.rc = task.oldrcD
         If hist.rc.index = 0 Or hist.rc.mmZ.maxVal = 0 Then Exit Sub
 
         dst0.SetTo(0)

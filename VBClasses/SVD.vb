@@ -49,7 +49,7 @@ Public Class SVD_Example2 : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         dst2 = runRedList(src, labels(2))
 
-        Dim rc = task.rcD
+        Dim rc = task.oldrcD
 
         If task.heartBeat Then
             Dim m = cv.Cv2.Moments(rc.mask, True)

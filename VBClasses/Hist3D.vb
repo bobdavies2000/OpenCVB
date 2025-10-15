@@ -119,7 +119,7 @@ Public Class Hist3D_RedColor : Inherits TaskParent
         dst3 = hColor.dst3
         labels(3) = hColor.labels(3)
         dst2 = runRedList(hColor.dst2, labels(2))
-        If task.redList.oldrclist.Count > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+        If task.redList.oldrclist.Count > 0 Then dst2(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
     End Sub
 End Class
 
@@ -237,7 +237,7 @@ Public Class Hist3D_PixelClassify : Inherits TaskParent
         dst2 = runRedList(pixel.dst2, labels(2))
 
         If task.redList.oldrclist.Count > 0 Then
-            dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+            dst2(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
         End If
     End Sub
 End Class

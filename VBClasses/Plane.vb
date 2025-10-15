@@ -164,7 +164,7 @@ Public Class Plane_OnlyPlanes : Inherits TaskParent
         Next
         If plane.options.reuseRawDepthData Then dst3 = task.pointCloud
 
-        Dim rcX = task.rcD
+        Dim rcX = task.oldrcD
     End Sub
 End Class
 
@@ -276,7 +276,7 @@ Public Class Plane_CellColor : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim newCells As New List(Of oldrcData)
-        Dim rcX = task.rcD
+        Dim rcX = task.oldrcD
         For Each rc In task.redList.oldrclist
             rc.eq = New cv.Vec4f
             If options.useMaskPoints Then
@@ -315,7 +315,7 @@ Public Class Plane_Points : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedList(src, labels(2))
 
-        Dim rc = task.rcD
+        Dim rc = task.oldrcD
         labels(2) = "Selected cell has " + CStr(rc.contour.Count) + " points."
 
         ' this contour will have more depth data behind it.  Simplified contours will lose lots of depth data.
@@ -436,7 +436,7 @@ Public Class Plane_Equation : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             dst2 = runRedList(src, labels(2))
-            rc = task.rcD
+            rc = task.oldrcD
             If rc.index = 0 Then SetTrueText("Select a cell in the image at left.")
         End If
 

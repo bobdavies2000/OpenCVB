@@ -28,7 +28,7 @@ Public Class Neighbor_Basics : Inherits TaskParent
         If standalone Then
             task.setSelectedCell()
             dst3.SetTo(0)
-            For Each index In task.rcD.nabs
+            For Each index In task.oldrcD.nabs
                 If index < task.redList.oldrclist.Count Then
                     DrawCircle(dst2, task.redList.oldrclist(index).maxDist, task.DotSize, task.highlight)
                 End If
@@ -170,11 +170,11 @@ Public Class Neighbor_Precise : Inherits TaskParent
         '        stats.Run(task.color)
 
         '        strOut = stats.strOut
-        '        If nabList(task.rcD.index).Count > 0 Then
+        '        If nabList(task.oldrcD.index).Count > 0 Then
         '            strOut += "Neighbors: "
         '            dst1.SetTo(0)
-        '            dst1(task.rcD.rect).SetTo(task.rcD.color, task.rcD.mask)
-        '            For Each index In nabList(task.rcD.index)
+        '            dst1(task.oldrcD.rect).SetTo(task.oldrcD.color, task.oldrcD.mask)
+        '            For Each index In nabList(task.oldrcD.index)
         '                Dim rc = oldrclist(index)
         '                dst1(rc.rect).SetTo(rc.color, rc.mask)
         '                strOut += CStr(index) + ","

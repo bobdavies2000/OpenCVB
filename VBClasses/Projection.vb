@@ -249,7 +249,7 @@ Public Class Projection_Cell : Inherits TaskParent
         dst1 = heat.dst2.Clone
         dst3 = heat.dst3.Clone
 
-        Dim rc = task.rcD
+        Dim rc = task.oldrcD
 
         dst0.SetTo(0)
         task.pointCloud(rc.rect).CopyTo(dst0(rc.rect), rc.mask)

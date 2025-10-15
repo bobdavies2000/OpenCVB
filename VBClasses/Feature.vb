@@ -766,8 +766,8 @@ Public Class Feature_FacetPoints : Inherits TaskParent
         Next
 
         If standalone And task.redList.oldrclist.Count > 0 Then
-            task.color.Rectangle(task.rcD.rect, task.highlight, task.lineWidth)
-            For Each pt In task.rcD.ptFacets
+            task.color.Rectangle(task.oldrcD.rect, task.highlight, task.lineWidth)
+            For Each pt In task.oldrcD.ptFacets
                 DrawCircle(task.color, pt, task.DotSize, task.highlight)
             Next
         End If

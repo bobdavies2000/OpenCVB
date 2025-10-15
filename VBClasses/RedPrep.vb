@@ -557,7 +557,7 @@ Public Class XO_RedList_LikelyFlatSurfaces : Inherits TaskParent
             End If
         Next
 
-        Dim rcX = task.rcD
+        Dim rcX = task.oldrcD
         SetTrueText("mean depth = " + Format(rcX.depth, "0.0"), 3)
     End Sub
 End Class

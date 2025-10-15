@@ -208,13 +208,13 @@ Public Class Fractal_Dimension : Inherits TaskParent
         dst2 = runRedList(src, labels(2))
         dst3.SetTo(0)
 
-        Static rect = New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)
+        Static rect = New cv.Rect(0, 0, task.oldrcD.rect.Width, task.oldrcD.rect.Height)
         If task.optionsChanged Or task.mouseClickFlag Then
-            rect = New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)
+            rect = New cv.Rect(0, 0, task.oldrcD.rect.Width, task.oldrcD.rect.Height)
         End If
 
-        If task.rcD.rect.Width = 0 Or task.rcD.rect.Height = 0 Then Exit Sub
-        task.rcD.mask.CopyTo(dst3(New cv.Rect(0, 0, task.rcD.rect.Width, task.rcD.rect.Height)))
+        If task.oldrcD.rect.Width = 0 Or task.oldrcD.rect.Height = 0 Then Exit Sub
+        task.oldrcD.mask.CopyTo(dst3(New cv.Rect(0, 0, task.oldrcD.rect.Width, task.oldrcD.rect.Height)))
         If rect.Width < rect.Height Then rect.Width = rect.Height Else rect.Height = rect.Width
         DrawRect(dst3, rect, white)
     End Sub

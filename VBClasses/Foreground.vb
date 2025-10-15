@@ -126,7 +126,7 @@ Public Class Foreground_RedCloud : Inherits TaskParent
         dst3 = back.dst2
         labels(3) = back.labels(2)
         If task.redList.oldrclist.Count > 0 Then
-            dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+            dst2(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
         End If
     End Sub
 End Class

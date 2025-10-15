@@ -47,7 +47,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Next
 
         strOut = RedCell_Basics.selectCell(rcMap, rcList)
-        If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
         SetTrueText(strOut, 3)
 
         rcListLast = New List(Of rcData)(rcList)
@@ -116,7 +116,7 @@ Public Class RedCloud_HeartBeat : Inherits TaskParent
         End If
 
         strOut = RedCell_Basics.selectCell(rcMap, rcList)
-        If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
         SetTrueText(strOut + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf + CStr(rcList.Count) + " cells present", 3)
     End Sub
 End Class
@@ -243,16 +243,16 @@ Public Class RedCloud_CellDepthHistogram : Inherits TaskParent
         dst2 = runRedCloud(src, labels(2))
 
         strOut = RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-        If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
         SetTrueText(strOut, 3)
 
-        If task.pcD Is Nothing Then
+        If task.rcD Is Nothing Then
             labels(3) = "Select a RedCloud cell to see the histogram"
             Exit Sub
         End If
 
-        Dim depth As cv.Mat = task.pcSplit(2)(task.pcD.rect)
-        depth.SetTo(0, task.noDepthMask(task.pcD.rect))
+        Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
+        depth.SetTo(0, task.noDepthMask(task.rcD.rect))
         plot.minRange = 0
         plot.maxRange = task.MaxZmeters
         plot.Run(depth)
@@ -390,7 +390,7 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
         Next
 
         strOut = RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-        If task.pcD IsNot Nothing Then task.color(task.pcD.rect).SetTo(white, task.pcD.contourMask)
+        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
 
         SetTrueText(strOut + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf +
                     CStr(rcList.Count) + " cells present", 3)
