@@ -173,12 +173,8 @@ Namespace OpenCVB
                 While 1
                     Dim waitTime = Now
                     While 1
-                        If waitForCamera() Then Exit While
+                        If waitForCamera() Or cameraShutdown Then Exit While
                     End While
-
-                    ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
-                    ' Each image will represent the one just finished by the algorithm.
-                    ' If task.debugSyncUI Then Thread.Sleep(3000)
 
                     ' exit the outer while if any of these change.
                     If cameraTaskHandle Is Nothing Or cameraShutdown Then Exit While

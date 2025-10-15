@@ -2,7 +2,7 @@
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.Extensions
 Imports System.ComponentModel
-Public Class sgl
+Public Class SharpGLForm
     Dim gl As OpenGL
     Dim isDragging As Boolean = False
     Dim lastMousePos As cv.Point

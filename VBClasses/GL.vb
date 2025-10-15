@@ -571,7 +571,7 @@ End Class
 
 
 
-Public Class GL_RedCloudHulls : Inherits TaskParent
+Public Class GL_ImageHullsColor : Inherits TaskParent
     Dim hulls As New RedCloud_HeartBeat
     Public Sub New()
         desc = "Prepare triangles from the RedCloud_HeartBeat output"
@@ -622,8 +622,7 @@ End Class
 
 
 
-Public Class GL_RedCloudHullsImage : Inherits TaskParent
-    Dim hulls As New RedCloud_Basics
+Public Class GL_ImageHulls : Inherits TaskParent
     Public Sub New()
         desc = "Prepare a texture map and project it onto the RedCloud_HeartBeat hulls"
     End Sub

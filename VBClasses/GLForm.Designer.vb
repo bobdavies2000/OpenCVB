@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class sgl
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
+Partial Class SharpGLForm
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class sgl
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         GLControl = New SharpGL.OpenGLControl()
         CType(GLControl, ComponentModel.ISupportInitialize).BeginInit()
@@ -40,15 +40,15 @@ Partial Class sgl
         GLControl.Size = New Size(1199, 785)
         GLControl.TabIndex = 0
         ' 
-        ' sgl
+        ' SharpGLForm
         ' 
-        AutoScaleDimensions = New SizeF(10F, 25F)
+        AutoScaleDimensions = New SizeF(10.0F, 25.0F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1199, 785)
         Controls.Add(GLControl)
         Margin = New Padding(4, 5, 4, 5)
-        Name = "sgl"
-        Text = "sgl"
+        Name = "SharpGLForm"
+        Text = "SharpGLForm"
         CType(GLControl, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
     End Sub

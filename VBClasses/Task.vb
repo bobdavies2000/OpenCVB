@@ -317,7 +317,7 @@ Public Class VBtask : Implements IDisposable
     Public displayDst1 As Boolean
     Public depthAndDepthRange As String = ""
     Public closeRequest As Boolean
-    Public sharpGL As VBClasses.sgl
+    Public sharpGL As VBClasses.SharpGLForm
 
     Public Structure inBuffer
         Dim color As cv.Mat
@@ -463,7 +463,7 @@ Public Class VBtask : Implements IDisposable
 
         If algName.StartsWith("GL_") And algName <> "GL_MainForm" And task.optionsChanged Then
             If sharpGL IsNot Nothing Then sharpGL.Dispose()
-            sharpGL = New sgl
+            sharpGL = New SharpGLForm
             sharpGL.Show()
         End If
 
