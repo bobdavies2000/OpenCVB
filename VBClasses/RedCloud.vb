@@ -75,9 +75,8 @@ Public Class RedCloud_Sweep : Inherits TaskParent
         Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
         Dim minCount = dst3.Total * 0.001
-        rcList.Clear()
-        dst1.SetTo(0)
         Dim rc As rcData = Nothing
+        Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
                 Dim pt = New cv.Point(x, y)
@@ -87,24 +86,30 @@ Public Class RedCloud_Sweep : Inherits TaskParent
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount Then
                             rc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
-                            rc.color = task.vecColors(rc.index)
-                            rcList.Add(rc)
-                            dst1(rc.rect).SetTo(rc.index Mod 255, rc.mask)
-                            SetTrueText(CStr(rc.index), rc.rect.TopLeft)
+                            newList.Add(rc.pixels, rc)
+
                             index += 1
                         Else
-                            dst3(rect).SetTo(255, mask(rect))
+                            dst3(rect).SetTo(0, mask(rect))
                         End If
                     End If
                 End If
             Next
         Next
 
+        rcList.Clear()
+        dst1.SetTo(0)
+        For Each rc In newList.Values
+            rc.index = rcList.Count + 1
+            rc.color = task.vecColors(rc.index)
+            dst1(rc.rect).SetTo(rc.index Mod 255, rc.mask)
+            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+            SetTrueText(CStr(rc.age), rc.rect.TopLeft)
+            rcList.Add(rc)
+        Next
+
         dst2 = PaletteBlackZero(dst1)
 
-        For Each rc In rcList
-            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-        Next
         labels(2) = CStr(rcList.Count) + " regions were identified.  Bright areas are < " +
                     CStr(CInt(minCount)) + " pixels (too small.)"
         labels(3) = "Reduced point cloud - use 'Reduction Target' option to increase/decrease cell sizes.  White cells were to small (> " +
