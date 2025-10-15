@@ -427,8 +427,8 @@ Namespace OpenCVB
                 Dim workRes = settings.workRes
                 Dim cres = settings.captureRes
                 Dim dres = settings.displayRes
-                Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) + ", workRes " +
-                                               CStr(workRes.Width) + "x" + CStr(workRes.Height)
+                Dim resolutionDetails = "Input " + CStr(cres.Width) + "x" + CStr(cres.Height) +
+                                        ", workRes " + CStr(workRes.Width) + "x" + CStr(workRes.Height)
                 If picLabels(0) <> "" Then
                     If camLabel(0).Text <> picLabels(0) + " - RGB " + resolutionDetails Then
                         camLabel(0).Text = picLabels(0)

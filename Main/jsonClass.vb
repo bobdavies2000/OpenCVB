@@ -32,7 +32,7 @@ Namespace jsonClass
 
         Public workRes As cv.Size
         Public captureRes As cv.Size
-        Public displayRes As cv.Size
+        Public displayRes As New cv.Size(640, 360)
 
         Public testAllDuration As Integer
         Public showBatchConsole As Boolean
