@@ -17,6 +17,7 @@ Public Class RedCell_Basics : Inherits TaskParent
             End If
             If task.rcD.rect.Contains(task.ClickPoint) Then Return task.rcD.displayCell
         End If
+        task.rcD = Nothing
         Return ""
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)

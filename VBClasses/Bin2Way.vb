@@ -151,7 +151,7 @@ End Class
 
 Public Class Bin2Way_RedColor : Inherits TaskParent
     Dim bin2 As New Bin2Way_Gradation
-    Dim redC As New RedColor_Core
+    Dim redC As New RedColor_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Identify 4 gradations of light and combine them for input to RedColor"
