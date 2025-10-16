@@ -170,7 +170,8 @@ Public Class TaskParent : Implements IDisposable
                          (p1(1) - p2(1)) * (p1(1) - p2(1)) +
                          (p1(2) - p2(2)) * (p1(2) - p2(2)))
     End Function
-    Public Shared Function ContourBuild(mask As cv.Mat, approxMode As cv.ContourApproximationModes) As List(Of cv.Point)
+    ' alternative optional parameter: ApproxTC89L1 or ApproxNone
+    Public Shared Function ContourBuild(mask As cv.Mat, Optional approxMode As cv.ContourApproximationModes = cv.ContourApproximationModes.ApproxNone) As List(Of cv.Point)
         Dim allContours As cv.Point()() = Nothing
         cv.Cv2.FindContours(mask, allContours, Nothing, cv.RetrievalModes.External, approxMode)
 

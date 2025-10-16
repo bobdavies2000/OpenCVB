@@ -13471,7 +13471,7 @@ Public Class XO_RedList_ContourAdd : Inherits TaskParent
         dst3.SetTo(0)
         For i = 1 To oldrclist.Count - 1
             Dim rc = oldrclist(i)
-            rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            rc.contour = ContourBuild(rc.mask)
             DrawTour(rc.mask, rc.contour, 255, -1)
             oldrclist(i) = rc
             DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)

@@ -319,7 +319,7 @@ Public Class Plane_Points : Inherits TaskParent
         labels(2) = "Selected cell has " + CStr(rc.contour.Count) + " points."
 
         ' this contour will have more depth data behind it.  Simplified contours will lose lots of depth data.
-        rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone)
+        rc.contour = ContourBuild(rc.mask)
 
         Dim pt As cv.Point3f, list2D As New List(Of cv.Point)
         ptList.Clear()

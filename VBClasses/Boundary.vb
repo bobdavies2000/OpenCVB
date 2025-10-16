@@ -185,7 +185,7 @@ Public Class Boundary_RedCloud : Inherits TaskParent
         dst3.SetTo(0)
         For i = 1 To task.redCloud.rcList.Count - 1
             Dim rc = task.redCloud.rcList(i)
-            Dim contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            Dim contour = ContourBuild(rc.mask)
             DrawTour(dst3(rc.rect), contour, 255, task.lineWidth)
         Next
 

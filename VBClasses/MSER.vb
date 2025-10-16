@@ -34,7 +34,7 @@ Public Class MSER_Basics : Inherits TaskParent
             rc.mask = dst0(rc.rect).InRange(val, val)
             rc.pixels = detect.maskCounts(index)
 
-            rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            rc.contour = ContourBuild(rc.mask)
             DrawTour(rc.mask, rc.contour, 255, -1)
 
             rc.maxDist = GetMaxDist(rc)

@@ -774,9 +774,9 @@ Public Class rcData
     Public Sub New()
     End Sub
     Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer)
-        mask = _mask.InRange(index, index)
+        mask = _mask.InRange(index, index).Clone
         index = -1 ' assume it is not going to be valid...
-        contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
+        contour = ContourBuild(mask) 
         If contour.Count >= 3 Then
             rect = _rect
             index = _index

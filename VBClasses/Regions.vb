@@ -226,7 +226,7 @@ Public Class Region_Contours : Inherits TaskParent
 
         dst1.SetTo(0)
         For Each md In redM.mdList
-            md.contour = ContourBuild(md.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            md.contour = ContourBuild(md.mask) 
             dst1(md.rect).SetTo(md.index, md.mask)
         Next
 

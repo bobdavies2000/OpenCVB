@@ -87,7 +87,7 @@ Public Class RedCloud_Sweep : Inherits TaskParent
                         If count >= minCount Then
                             rc = New rcData(dst3(rect), rect, index)
                             If rc.index < 0 Then Continue For
-                            rc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
+                            'rc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
                             newList.Add(rc.pixels, rc)
 
                             index += 1

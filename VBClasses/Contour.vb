@@ -592,7 +592,7 @@ Public Class Contour_Smoothing : Inherits TaskParent
         dst1.SetTo(0)
         dst3.SetTo(0)
 
-        Dim bestContour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone)
+        Dim bestContour = ContourBuild(rc.mask)
         DrawTour(dst3(rc.rect), bestContour, white, task.lineWidth + 3)
 
         Dim approxContour = ContourBuild(rc.mask, options.ApproximationMode)

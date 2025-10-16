@@ -11,7 +11,7 @@ Public Class MaxDist_Basics : Inherits TaskParent
         pc.mask = mask.InRange(index, index)
         pc.rect = rect
         pc.index = index
-        pc.contour = ContourBuild(pc.mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
+        pc.contour = ContourBuild(pc.mask)
         If pc.contour.Count < 3 Then Return Nothing
         Dim listOfPoints = New List(Of List(Of cv.Point))({pc.contour})
         pc.contourMask = New cv.Mat(pc.mask.Size, cv.MatType.CV_8U, 0)
