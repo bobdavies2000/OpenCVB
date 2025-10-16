@@ -174,15 +174,13 @@ Public Class TaskParent : Implements IDisposable
         Dim allContours As cv.Point()() = Nothing
         cv.Cv2.FindContours(mask, allContours, Nothing, cv.RetrievalModes.External, approxMode)
 
-        Dim maxCount As Integer, maxIndex As Integer
-        For i = 0 To allContours.Count - 1
-            Dim len = CInt(allContours(i).Count)
-            If len > maxCount Then
-                maxCount = len
-                maxIndex = i
-            End If
+        Dim tourCount As New List(Of Integer)
+        For Each tour In allContours
+            tourCount.Add(tour.Count)
         Next
-        If allContours.Count > 0 Then Return New List(Of cv.Point)(allContours(maxIndex).ToList)
+        If tourCount.Count > 0 Then
+            Return New List(Of cv.Point)(allContours(tourCount.IndexOf(tourCount.Max)).ToList)
+        End If
         Return New List(Of cv.Point)
     End Function
     Public Sub setPointCloudGrid()

@@ -85,6 +85,8 @@ Public Class RedCloud_Sweep : Inherits TaskParent
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount Then
+                            rc = New rcData(dst3(rect), rect, index)
+                            If rc.index < 0 Then Continue For
                             rc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
                             newList.Add(rc.pixels, rc)
 
@@ -112,8 +114,7 @@ Public Class RedCloud_Sweep : Inherits TaskParent
 
         labels(2) = CStr(rcList.Count) + " regions were identified.  Bright areas are < " +
                     CStr(CInt(minCount)) + " pixels (too small.)"
-        labels(3) = "Reduced point cloud - use 'Reduction Target' option to increase/decrease cell sizes.  White cells were to small (> " +
-                    CStr(minCount) + " pixels)"
+        labels(3) = "Reduced point cloud - increase/decrease cell size with 'Reduction Target' option."
     End Sub
 End Class
 
@@ -157,8 +158,8 @@ Public Class RedCloud_HeartBeat : Inherits TaskParent
                 If rcMap.Get(Of Byte)(pt.Y, pt.X) = 0 Then
                     Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 And rect.Width < dst2.Width And rect.Height < dst2.Height Then
-                        Dim pcc = MaxDist_Basics.setCloudData(dst1(rect), rect, index)
-                        If pcc IsNot Nothing Then
+                        Dim pcc = New rcData(dst1(rect), rect, index)
+                        If pcc.index >= 0 Then
                             pcc.index = index
                             pcc.color = rc.color
                             pcc.age = rc.age + 1

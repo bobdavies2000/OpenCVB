@@ -15,11 +15,11 @@ Public Class MaxDist_Basics : Inherits TaskParent
         If pc.contour.Count < 3 Then Return Nothing
         Dim listOfPoints = New List(Of List(Of cv.Point))({pc.contour})
         pc.contourMask = New cv.Mat(pc.mask.Size, cv.MatType.CV_8U, 0)
-        cv.Cv2.DrawContours(pc.contourMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
+        cv.Cv2.DrawContours(pc.contourMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
 
         If zeroRectangle Then
             Dim tmp As cv.Mat = pc.contourMask.Clone
-            ' see MaxDist_NoRectangle below to confirm this is needed.
+            ' see MaxDist_NoRectangle below to confirm this is needed (it is.)
             tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
             Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
             Dim mm As mmData = GetMinMax(distance32f)
@@ -42,12 +42,13 @@ Public Class MaxDist_Basics : Inherits TaskParent
         dst3.SetTo(0)
         Dim index As Integer = 1
         For Each pc In task.redCloud.rcList
-            Dim pcTest = setCloudData(pc.mask, pc.rect, index)
-            If pcTest Is Nothing Then Continue For
-            pcTest.color = pc.color
-            dst3(pcTest.rect).SetTo(pcTest.color, pcTest.mask)
-            dst3.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
-            index += 1
+            Dim pcTest = New rcData(pc.mask, pc.rect, index)
+            If pcTest.index >= 0 Then
+                pcTest.color = pc.color
+                dst3(pcTest.rect).SetTo(pcTest.color, pcTest.mask)
+                dst3.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+                index += 1
+            End If
         Next
     End Sub
 End Class
@@ -67,12 +68,14 @@ Public Class MaxDist_NoRectangle : Inherits TaskParent
         Dim rcList As New List(Of rcData)
         dst3.SetTo(0)
         For Each pc In task.redCloud.rcList
-            Dim pcTest = MaxDist_Basics.setCloudData(pc.mask, pc.rect, rcList.Count + 1, False) ' This rcList will NOT use the rectangle of zeros.
-            If pcTest Is Nothing Then Continue For
-            pcTest.color = pc.color
-            dst3(pcTest.rect).SetTo(pcTest.color, pcTest.mask)
-            dst3.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
-            rcList.Add(pcTest)
+            ' This rcList will NOT use the rectangle of zeros (definitely need the rectangle!)
+            Dim pcTest = MaxDist_Basics.setCloudData(pc.mask, pc.rect, rcList.Count + 1, False)
+            If pcTest.index >= 0 Then
+                pcTest.color = pc.color
+                dst3(pcTest.rect).SetTo(pcTest.color, pcTest.mask)
+                dst3.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+                rcList.Add(pcTest)
+            End If
         Next
     End Sub
 End Class

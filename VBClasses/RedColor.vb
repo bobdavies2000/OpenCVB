@@ -90,18 +90,17 @@ Public Class RedColor_HeartBeat : Inherits TaskParent
                 If rcMap.Get(Of Byte)(pt.Y, pt.X) = 0 Then
                     Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
                     If count > minCount Then
-                        Dim pcc = MaxDist_Basics.setCloudData(dst1(rect), rect, index)
-                        If pcc IsNot Nothing Then
+                        Dim pcc = New rcData(dst1(rect), rect, index)
+                        If pcc.index >= 0 Then
                             pcc.color = rc.color
                             pcc.age = rc.age + 1
                             rcList.Add(pcc)
                             rcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.contourMask)
-
                             index += 1
                         End If
+                    Else
+                        If rcLost.Contains(rc.index - 1) = False Then rcLost.Add(rc.index - 1)
                     End If
-                Else
-                    If rcLost.Contains(rc.index - 1) = False Then rcLost.Add(rc.index - 1)
                 End If
             Next
 
@@ -159,11 +158,12 @@ Public Class RedColor_Sweep : Inherits TaskParent
                 If dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If count > minCount Then
-                        Dim rc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
-                        rcList.Add(rc)
-                        rcMap(rc.rect).SetTo(rc.index Mod 255, rc.contourMask)
-
-                        index += 1
+                        Dim rc = New rcData(dst3(rect), rect, index)
+                        If rc.index >= 0 Then
+                            rcList.Add(rc)
+                            rcMap(rc.rect).SetTo(rc.index Mod 255, rc.contourMask)
+                            index += 1
+                        End If
                     Else
                         If rect.Width > 0 And rect.Height > 0 Then dst3(rect).SetTo(255, mask(rect))
                     End If

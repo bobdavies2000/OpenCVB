@@ -760,7 +760,7 @@ End Class
 Public Class rcData
     Public age As Integer
     Public color As cv.Scalar
-    Public colorIDs As New List(Of Integer) ' this list of ID's for color8u output 
+    Public colorIDs As List(Of Integer) ' this list of ID's for color8u output 
     Public contour As List(Of cv.Point)
     Public contourMask As cv.Mat
     Public depth As Single
@@ -772,6 +772,34 @@ Public Class rcData
     Public pixels As Integer
     Public rect As cv.Rect
     Public Sub New()
+    End Sub
+    Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer)
+        mask = _mask.InRange(index, index)
+        index = -1 ' assume it is not going to be valid...
+        contour = ContourBuild(mask, cv.ContourApproximationModes.ApproxNone) ' ApproxTC89L1 or ApproxNone
+        If contour.Count >= 3 Then
+            rect = _rect
+            index = _index
+            Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
+            contourMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+            cv.Cv2.DrawContours(contourMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+
+            Dim tmp As cv.Mat = contourMask.Clone
+            ' Rectangle is definitely needed.  Test it with MaxDist_NoRectangle.
+            tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+            Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
+            Dim mm As mmData = GetMinMax(distance32f)
+            maxDist.X = mm.maxLoc.X + rect.X
+            maxDist.Y = mm.maxLoc.Y + rect.Y
+
+            hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
+            hullMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+            listOfPoints = New List(Of List(Of cv.Point))({hull})
+            cv.Cv2.DrawContours(hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
+
+            color = task.vecColors(index)
+            pixels = mask.CountNonZero
+        End If
     End Sub
     Public Sub New(_mask As cv.Mat, _rect As cv.Rect)
         mask = _mask
