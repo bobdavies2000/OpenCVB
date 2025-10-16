@@ -68,7 +68,7 @@ Public Class RedCloud_Sweep : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         prepEdges.Run(src)
-        dst3 = Not prepEdges.dst2
+        dst3 = prepEdges.dst2
 
         Dim index As Integer = 1
         Dim rect As New cv.Rect
@@ -81,18 +81,15 @@ Public Class RedCloud_Sweep : Inherits TaskParent
             For x = 0 To dst3.Width - 1
                 Dim pt = New cv.Point(x, y)
                 ' skip the regions with no depth or those that were already floodfilled.
-                If dst3.Get(Of Byte)(pt.Y, pt.X) > index Then
+                If dst3.Get(Of Byte)(pt.Y, pt.X) = 0 Then
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
                         If count >= minCount Then
                             rc = New rcData(dst3(rect), rect, index)
                             If rc.index < 0 Then Continue For
-                            'rc = MaxDist_Basics.setCloudData(dst3(rect), rect, index)
                             newList.Add(rc.pixels, rc)
 
                             index += 1
-                        Else
-                            dst3(rect).SetTo(0, mask(rect))
                         End If
                     End If
                 End If
@@ -104,7 +101,7 @@ Public Class RedCloud_Sweep : Inherits TaskParent
         For Each rc In newList.Values
             rc.index = rcList.Count + 1
             rc.color = task.vecColors(rc.index)
-            dst1(rc.rect).SetTo(rc.index Mod 255, rc.mask)
+            dst1(rc.rect).SetTo(rc.index Mod 255, rc.contourMask)
             dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
             SetTrueText(CStr(rc.age), rc.rect.TopLeft)
             rcList.Add(rc)

@@ -12624,10 +12624,10 @@ Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
         For Each pc In redCold.rcList
             Dim count = cv.Cv2.FloodFill(dst3, mask, pc.maxDist, index, rect, 0, 0, flags)
             If count >= minCount And count < maxCount Then
-                index += 1
-                Dim pd = New rcData(dst3(rect), rect)
+                Dim pd = New rcData(dst3(rect), rect, index)
                 dst2(rect).SetTo(task.scalarColors(index), mask(rect))
                 rcList.Add(pd)
+                index += 1
             End If
         Next
 
@@ -12696,7 +12696,7 @@ Public Class XO_RedCloud_Basics : Inherits TaskParent
                         Dim r = New cv.Rect(rect.X + 1, rect.Y + 1, rect.Width - 1, rect.Height - 1)
                         maskUsed.Rectangle(r, 255, -1)
                         If count >= minCount And count < maxCount Then
-                            Dim pc = New rcData(mask(r), r)
+                            Dim pc = New rcData(mask(r), r, index)
                             index += 1
                             newList.Add(pc.maxDist.Y, pc)
                         End If

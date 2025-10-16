@@ -774,7 +774,7 @@ Public Class rcData
     Public Sub New()
     End Sub
     Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer)
-        mask = _mask.InRange(index, index).Clone
+        mask = _mask.InRange(_index, _index)
         index = -1 ' assume it is not going to be valid...
         contour = ContourBuild(mask) 
         If contour.Count >= 3 Then
@@ -782,7 +782,7 @@ Public Class rcData
             index = _index
             Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
             contourMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-            cv.Cv2.DrawContours(contourMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+            cv.Cv2.DrawContours(contourMask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
 
             Dim tmp As cv.Mat = contourMask.Clone
             ' Rectangle is definitely needed.  Test it with MaxDist_NoRectangle.
@@ -799,15 +799,8 @@ Public Class rcData
 
             color = task.vecColors(index)
             pixels = mask.CountNonZero
+            depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
         End If
-    End Sub
-    Public Sub New(_mask As cv.Mat, _rect As cv.Rect)
-        mask = _mask
-        rect = _rect
-        age = 1
-
-        pixels = mask.CountNonZero
-        depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
     End Sub
     Public Function displayCell() As String
         Dim strOut = "rcList index = " + CStr(index) + vbCrLf

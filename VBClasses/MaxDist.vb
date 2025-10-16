@@ -5,12 +5,12 @@ Public Class MaxDist_Basics : Inherits TaskParent
         labels(3) = "Below left shows hullMask while below shows the contour mask."
         desc = "Find the point farthest from the edges of a mask."
     End Sub
-    Public Shared Function setCloudData(mask As cv.Mat, rect As cv.Rect, index As Integer,
+    Public Shared Function setCloudData(_mask As cv.Mat, _rect As cv.Rect, _index As Integer,
                                         Optional zeroRectangle As Boolean = True) As rcData
         Dim pc As New rcData
-        pc.mask = mask.InRange(index, index)
-        pc.rect = rect
-        pc.index = index
+        pc.mask = _mask.InRange(_index, _index)
+        pc.rect = _rect
+        pc.index = _index
         pc.contour = ContourBuild(pc.mask)
         If pc.contour.Count < 3 Then Return Nothing
         Dim listOfPoints = New List(Of List(Of cv.Point))({pc.contour})
@@ -20,7 +20,7 @@ Public Class MaxDist_Basics : Inherits TaskParent
         If zeroRectangle Then
             Dim tmp As cv.Mat = pc.contourMask.Clone
             ' see MaxDist_NoRectangle below to confirm this is needed (it is.)
-            tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+            tmp.Rectangle(New cv.Rect(0, 0, pc.mask.Width, pc.mask.Height), 0, 1)
             Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
             Dim mm As mmData = GetMinMax(distance32f)
             pc.maxDist.X = mm.maxLoc.X + pc.rect.X
