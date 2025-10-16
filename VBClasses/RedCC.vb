@@ -64,3 +64,33 @@ Public Class RedCC_Histograms : Inherits TaskParent
         Next
     End Sub
 End Class
+
+
+
+
+
+Public Class RedCC_Merge : Inherits TaskParent
+    Public redSweep As New RedCloud_Sweep
+    Public color8u As New Color8U_Basics
+    Public rcList As New List(Of rcData)
+    Public Sub New()
+        desc = "Merge the color and reduced depth data."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redSweep.Run(src)
+        dst1 = redSweep.dst3
+        dst1.SetTo(0, redSweep.prepEdges.dst2)
+
+        color8u.Run(task.gray)
+        dst3 = color8u.dst2 + dst1
+
+        dst2 = PaletteBlackZero(dst3)
+
+        rcList = RedCloud_Sweep.sweepImage(dst3)
+
+        'strOut = RedCell_Basics.selectCell(rcMap, rcList)
+        'If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+        'SetTrueText(strOut, 3)
+    End Sub
+End Class
+

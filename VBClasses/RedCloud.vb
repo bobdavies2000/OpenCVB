@@ -66,51 +66,54 @@ Public Class RedCloud_Sweep : Inherits TaskParent
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Find the biggest chunks of consistent depth data "
     End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prepEdges.Run(src)
-        dst3 = prepEdges.dst2
-
+    Public Shared Function sweepImage(input As cv.Mat) As List(Of rcData)
         Dim index As Integer = 1
         Dim rect As New cv.Rect
-        Dim mask = New cv.Mat(New cv.Size(dst3.Width + 2, dst3.Height + 2), cv.MatType.CV_8U, 0)
+        Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
-        Dim minCount = dst3.Total * 0.001
+        Dim minSize = input.Total * 0.001
         Dim rc As rcData = Nothing
         Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        For y = 0 To dst3.Height - 1
-            For x = 0 To dst3.Width - 1
+        Dim minCount As Integer
+        For y = 0 To input.Height - 1
+            For x = 0 To input.Width - 1
                 Dim pt = New cv.Point(x, y)
                 ' skip the regions with no depth or those that were already floodfilled.
-                If dst3.Get(Of Byte)(pt.Y, pt.X) = 0 Then
-                    Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)
+                If input.Get(Of Byte)(pt.Y, pt.X) = 0 Then
+                    Dim count = cv.Cv2.FloodFill(input, mask, pt, index, rect, 0, 0, flags)
                     If rect.Width > 0 And rect.Height > 0 Then
-                        If count >= minCount Then
-                            rc = New rcData(dst3(rect), rect, index)
+                        If count >= minSize Then
+                            rc = New rcData(input(rect), rect, index)
                             If rc.index < 0 Then Continue For
                             newList.Add(rc.pixels, rc)
 
                             index += 1
+                        Else
+                            minCount += 1
                         End If
                     End If
                 End If
             Next
         Next
+        Return New List(Of rcData)(newList.Values)
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        prepEdges.Run(src)
+        dst3 = prepEdges.dst2.Clone
 
-        rcList.Clear()
-        dst1.SetTo(0)
-        For Each rc In newList.Values
-            rc.index = rcList.Count + 1
-            rc.color = task.vecColors(rc.index)
-            dst1(rc.rect).SetTo(rc.index Mod 255, rc.contourMask)
+        rcList = sweepImage(dst3)
+
+        Dim index As Integer
+        dst2.SetTo(0)
+        For Each rc In rcList
+            index += 1
+            rc.index = index
+            rc.color = task.vecColors(rc.index Mod 255)
+            dst2(rc.rect).SetTo(rc.color, rc.contourMask)
             dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-            SetTrueText(CStr(rc.age), rc.rect.TopLeft)
-            rcList.Add(rc)
         Next
 
-        dst2 = PaletteBlackZero(dst1)
-
-        labels(2) = CStr(rcList.Count) + " regions were identified.  Bright areas are < " +
-                    CStr(CInt(minCount)) + " pixels (too small.)"
+        labels(2) = CStr(rcList.Count) + " regions were identified."
         labels(3) = "Reduced point cloud - increase/decrease cell size with 'Reduction Target' option."
     End Sub
 End Class
