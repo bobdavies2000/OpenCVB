@@ -761,10 +761,8 @@ Public Class rcData
     Public age As Integer
     Public color As cv.Scalar
     Public colorIDs As List(Of Integer) ' this list of ID's for color8u output 
-    Public contour As List(Of cv.Point)
     Public depth As Single
     Public hull As List(Of cv.Point)
-    Public hullMask As cv.Mat
     Public index As Integer
     Public mask As cv.Mat
     Public maxDist As cv.Point
@@ -772,16 +770,25 @@ Public Class rcData
     Public rect As cv.Rect
     Public Sub New()
     End Sub
+    Public Shared Function getHullMask(hull As List(Of cv.Point), mask As cv.Mat) As cv.Mat
+        Dim hullMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+        Dim listOfPoints = New List(Of List(Of cv.Point))({hull})
+        cv.Cv2.DrawContours(hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
+        Return hullMask
+    End Function
     Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer)
         mask = _mask.InRange(_index, _index)
         index = -1 ' assume it is not going to be valid...
-        contour = ContourBuild(mask) 
+        Dim contour = ContourBuild(mask)
         If contour.Count >= 3 Then
             rect = _rect
             index = _index
             Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
             mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
             cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
+
+            ' keep the hull points around (there aren't many of them.)
+            hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
 
             Dim tmp As cv.Mat = mask.Clone
             ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle.
@@ -791,11 +798,6 @@ Public Class rcData
             maxDist.X = mm.maxLoc.X + rect.X
             maxDist.Y = mm.maxLoc.Y + rect.Y
 
-            hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
-            hullMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-            listOfPoints = New List(Of List(Of cv.Point))({hull})
-            cv.Cv2.DrawContours(hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
-
             color = task.vecColors(index)
             pixels = mask.CountNonZero
             depth = task.pcSplit(2)(rect).Mean(task.depthMask(rect))(0)
@@ -803,18 +805,14 @@ Public Class rcData
     End Sub
     Public Function displayCell() As String
         Dim strOut = "rcList index = " + CStr(index) + vbCrLf
-        strOut += "age = " + CStr(age) + vbCrLf
-        strOut += "rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
+        strOut += "Age = " + CStr(age) + vbCrLf
+        strOut += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
         strOut += ", width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
-        strOut += "maxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
-        strOut += "depth = " + Format(depth, fmt1) + vbCrLf
-        strOut += "color = " + color.ToString + vbCrLf
-        strOut += "pixel count = " + CStr(pixels) + vbCrLf
-        If contour Is Nothing Then
-            strOut += "No contour has been built yet."
-        Else
-            strOut += "contour count = " + CStr(contour.Count) + vbCrLf
-        End If
+        strOut += "MaxDist = " + CStr(maxDist.X) + "," + CStr(maxDist.Y) + vbCrLf
+        strOut += "Depth = " + Format(depth, fmt1) + vbCrLf
+        strOut += "Color = " + color.ToString + vbCrLf
+        strOut += "Pixel count = " + CStr(pixels) + vbCrLf
+        strOut += "Hull count = " + CStr(hull.Count) + vbCrLf
         Return strOut
     End Function
 End Class

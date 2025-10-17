@@ -11,9 +11,9 @@ Public Class MaxDist_Basics : Inherits TaskParent
         pc.mask = _mask.InRange(_index, _index)
         pc.rect = _rect
         pc.index = _index
-        pc.contour = ContourBuild(pc.mask)
-        If pc.contour.Count < 3 Then Return Nothing
-        Dim listOfPoints = New List(Of List(Of cv.Point))({pc.contour})
+        Dim contour = ContourBuild(pc.mask)
+        If contour.Count < 3 Then Return Nothing
+        Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
         pc.mask = New cv.Mat(pc.mask.Size, cv.MatType.CV_8U, 0)
         cv.Cv2.DrawContours(pc.mask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
 
@@ -27,10 +27,7 @@ Public Class MaxDist_Basics : Inherits TaskParent
             pc.maxDist.Y = mm.maxLoc.Y + pc.rect.Y
         End If
 
-        pc.hull = cv.Cv2.ConvexHull(pc.contour.ToArray, True).ToList
-        pc.hullMask = New cv.Mat(pc.mask.Size, cv.MatType.CV_8U, 0)
-        listOfPoints = New List(Of List(Of cv.Point))({pc.hull})
-        cv.Cv2.DrawContours(pc.hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
+        pc.hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
 
         pc.color = task.vecColors(pc.index)
         pc.pixels = pc.mask.CountNonZero

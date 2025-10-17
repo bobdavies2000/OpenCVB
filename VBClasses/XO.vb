@@ -13221,16 +13221,13 @@ Public Class XO_RedCloud_Hulls : Inherits TaskParent
 
         dst3.SetTo(0)
         Dim hullCounts As New List(Of Integer)
-        Dim contourCounts As New List(Of Integer)
         For Each pc In task.redCloud.rcList
-            pc.hull = cv.Cv2.ConvexHull(pc.contour.ToArray, True).ToList
+            pc.hull = cv.Cv2.ConvexHull(pc.hull.ToArray, True).ToList
             DrawTour(dst3(pc.rect), pc.hull, pc.color, -1)
             hullCounts.Add(pc.hull.Count)
-            contourCounts.Add(pc.contour.Count)
             SetTrueText(CStr(pc.age), pc.maxDist)
         Next
-        labels(3) = "Average hull length = " + Format(hullCounts.Average, fmt1) + " points.  " +
-                    "Average contour length = " + Format(contourCounts.Average, fmt1) + " points."
+        labels(3) = "Average hull length = " + Format(hullCounts.Average, fmt1) + " points.  "
     End Sub
 End Class
 

@@ -199,28 +199,29 @@ Public Class RedCloud_Defect : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each rc In task.redCloud.rcList
-            Dim hullIndices = cv.Cv2.ConvexHullIndices(rc.contour, False)
-            For i = 0 To rc.contour.Count - 1
-                Dim p1 = rc.contour(i)
-                For j = i + 1 To rc.contour.Count - 1
-                    Dim p2 = rc.contour(j)
+            Dim contour = ContourBuild(rc.mask)
+            Dim hullIndices = cv.Cv2.ConvexHullIndices(contour, False)
+            For i = 0 To contour.Count - 1
+                Dim p1 = contour(i)
+                For j = i + 1 To contour.Count - 1
+                    Dim p2 = contour(j)
                     If p1 = p2 Then Continue For
                 Next
             Next
 
             Try
-                Dim defects = cv.Cv2.ConvexityDefects(rc.contour, hullIndices.ToList)
+                Dim defects = cv.Cv2.ConvexityDefects(contour, hullIndices.ToList)
                 Dim lastV As Integer = -1
                 Dim newC As New List(Of cv.Point)
                 For Each v In defects
                     If v(0) <> lastV And lastV >= 0 Then
                         For i = lastV To v(0) - 1
-                            newC.Add(rc.contour(i))
+                            newC.Add(contour(i))
                         Next
                     End If
-                    newC.Add(rc.contour(v(0)))
-                    newC.Add(rc.contour(v(2)))
-                    newC.Add(rc.contour(v(1)))
+                    newC.Add(contour(v(0)))
+                    newC.Add(contour(v(2)))
+                    newC.Add(contour(v(1)))
                     lastV = v(1)
                 Next
                 DrawTour(dst3(rc.rect), newC, rc.color)
@@ -329,7 +330,7 @@ Public Class RedCloud_Motion : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each rc In task.redCloud.rcList
-            If rc.age > 10 Then DrawTour(dst3(rc.rect), rc.contour, rc.color)
+            If rc.age > 10 Then dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
     End Sub
 End Class
