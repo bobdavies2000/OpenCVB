@@ -25,8 +25,11 @@ Public Class RedCloud_Basics : Inherits TaskParent
         For Each rc In redSweep.rcList
             Dim r1 = rc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
-            Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
-            If indexLast > 0 Then r2 = rcListLast(indexLast).rect
+            Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If indexLast > 0 Then
+                indexLast -= 1 ' index is 1 less than the rcMap value
+                r2 = rcListLast(indexLast).rect
+            End If
             If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                 rc.age = rcListLast(indexLast).age + 1
                 If rc.age > 1000 Then rc.age = 2
