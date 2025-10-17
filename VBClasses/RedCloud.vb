@@ -31,12 +31,22 @@ Public Class RedCloud_Basics : Inherits TaskParent
                 r2 = rcListLast(indexLast).rect
             End If
             If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
-                rc.age = rcListLast(indexLast).age + 1
-                If rc.age > 1000 Then rc.age = 2
-                If task.heartBeat = False And rc.rect.Contains(rcListLast(indexLast).maxdist) Then
-                    rc.maxDist = rcListLast(indexLast).maxdist
+                Dim lrc = rcListLast(indexLast)
+                If rc.rect.Contains(lrc.maxdist) Then
+                    Dim row = lrc.maxDist.Y - lrc.rect.y
+                    Dim col = lrc.maxDist.x - lrc.rect.x
+                    If row < rc.mask.Height And col < rc.mask.Width Then
+                        If rc.mask.Get(Of Byte)(row, col) Then ' more doublechecking...
+                            rc.maxDist = lrc.maxdist
+                            rc.depth = lrc.depth
+                        End If
+                    End If
                 End If
-                rc.color = rcListLast(indexLast).color
+
+                rc.age = lrc.age + 1
+                If rc.age > 1000 Then rc.age = 2
+
+                rc.color = lrc.color
             End If
             rc.index = rcList.Count + 1
             rcMap(rc.rect).SetTo(rc.index, rc.mask)
@@ -385,16 +395,11 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
             Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
             If indexLast > 0 Then r2 = rcListLast(indexLast).rect
             If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
-                Dim tmp = task.motionMask(rc.rect)
-                tmp.SetTo(0, rc.mask)
-
-                If task.heartBeat = False And rc.rect.Contains(rcListLast(indexLast).maxdist) And tmp.CountNonZero = 0 Then
-                    ' rc.maxDist = rcListLast(indexLast).maxdist
+                If rc.rect.Contains(rcListLast(indexLast).maxdist) Then
                     rc = rcListLast(indexLast)
                     unchangedCount += 1
                 End If
 
-                rc.color = rcListLast(indexLast).color
                 rc.age = rcListLast(indexLast).age + 1
                 If rc.age > 1000 Then rc.age = 2
             End If
@@ -414,17 +419,5 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
 
         rcListLast = New List(Of rcData)(rcList)
         rcMapLast = rcMap.clone
-    End Sub
-End Class
-
-
-
-
-Public Class RedCloud_CC : Inherits TaskParent
-    Dim color8u As New Color8U_Basics
-    Public Sub New()
-        desc = "Add the Color8U output to the RedPrep_Basics cloud data before running RedCloud."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
     End Sub
 End Class

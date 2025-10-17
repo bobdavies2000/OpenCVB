@@ -53,7 +53,7 @@ Public Class Color8U_Basics : Inherits TaskParent
         classCount = classifier.classCount
 
         dst3 = PaletteBlackZero(dst2)
-        labels(2) = "Color_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) +
+        labels(2) = "Color8U_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) +
                     " pixel classifications"
     End Sub
 End Class
