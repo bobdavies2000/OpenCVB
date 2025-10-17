@@ -48,7 +48,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         pcMapLast = rcMap.Clone
 
         strOut = RedCell_Basics.selectCell(rcMap, rcList)
-        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -95,7 +95,7 @@ Public Class RedColor_HeartBeat : Inherits TaskParent
                             pcc.color = rc.color
                             pcc.age = rc.age + 1
                             rcList.Add(pcc)
-                            rcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.contourMask)
+                            rcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.mask)
                             index += 1
                         End If
                     Else
@@ -121,7 +121,7 @@ Public Class RedColor_HeartBeat : Inherits TaskParent
             labels(3) = "There were " + CStr(rcLost.Count) + " cells temporarily lost."
 
             strOut = RedCell_Basics.selectCell(rcMap, rcList)
-            If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+            If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
             SetTrueText(strOut, 3)
         End If
     End Sub
@@ -161,7 +161,7 @@ Public Class RedColor_Sweep : Inherits TaskParent
                         Dim rc = New rcData(dst3(rect), rect, index)
                         If rc.index >= 0 Then
                             rcList.Add(rc)
-                            rcMap(rc.rect).SetTo(rc.index Mod 255, rc.contourMask)
+                            rcMap(rc.rect).SetTo(rc.index Mod 255, rc.mask)
                             index += 1
                         End If
                     Else
@@ -179,7 +179,7 @@ Public Class RedColor_Sweep : Inherits TaskParent
             Next
 
             strOut = RedCell_Basics.selectCell(rcMap, rcList)
-            If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+            If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
             SetTrueText(strOut, 3)
         End If
 

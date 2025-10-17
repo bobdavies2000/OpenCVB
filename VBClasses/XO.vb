@@ -14137,7 +14137,7 @@ Public Class XO_RedCloudAndColor_Basics : Inherits TaskParent
         Next
 
         strOut = RedCell_Basics.selectCell(rcMap, rcList)
-        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
         SetTrueText(strOut, 3)
 
         labels(2) = "Cells found = " + CStr(rcList.Count) + " and " + CStr(newList.Count) + " were color only cells."

@@ -14,11 +14,11 @@ Public Class MaxDist_Basics : Inherits TaskParent
         pc.contour = ContourBuild(pc.mask)
         If pc.contour.Count < 3 Then Return Nothing
         Dim listOfPoints = New List(Of List(Of cv.Point))({pc.contour})
-        pc.contourMask = New cv.Mat(pc.mask.Size, cv.MatType.CV_8U, 0)
-        cv.Cv2.DrawContours(pc.contourMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
+        pc.mask = New cv.Mat(pc.mask.Size, cv.MatType.CV_8U, 0)
+        cv.Cv2.DrawContours(pc.mask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link4)
 
         If zeroRectangle Then
-            Dim tmp As cv.Mat = pc.contourMask.Clone
+            Dim tmp As cv.Mat = pc.mask.Clone
             ' see MaxDist_NoRectangle below to confirm this is needed (it is.)
             tmp.Rectangle(New cv.Rect(0, 0, pc.mask.Width, pc.mask.Height), 0, 1)
             Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)

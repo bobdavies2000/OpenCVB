@@ -24,7 +24,7 @@ Public Class RedCell_Basics : Inherits TaskParent
         If standalone Then dst2 = runRedCloud(src, labels(2))
         strOut = selectCell(task.redCloud.rcMap, task.redCloud.rcList)
 
-        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
         SetTrueText(strOut, 3)
     End Sub
 End Class

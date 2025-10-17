@@ -762,7 +762,6 @@ Public Class rcData
     Public color As cv.Scalar
     Public colorIDs As List(Of Integer) ' this list of ID's for color8u output 
     Public contour As List(Of cv.Point)
-    Public contourMask As cv.Mat
     Public depth As Single
     Public hull As List(Of cv.Point)
     Public hullMask As cv.Mat
@@ -781,11 +780,11 @@ Public Class rcData
             rect = _rect
             index = _index
             Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
-            contourMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-            cv.Cv2.DrawContours(contourMask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
+            mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+            cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
 
-            Dim tmp As cv.Mat = contourMask.Clone
-            ' Rectangle is definitely needed.  Test it with MaxDist_NoRectangle.
+            Dim tmp As cv.Mat = mask.Clone
+            ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle.
             tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
             Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
             Dim mm As mmData = GetMinMax(distance32f)

@@ -48,7 +48,7 @@ Public Class RedCC_Histograms : Inherits TaskParent
 
         For Each rc In task.redCloud.rcList
             Dim input = dst1(rc.rect).Clone
-            input.SetTo(0, Not rc.contourMask)
+            input.SetTo(0, Not rc.mask)
             hist.Run(input)
             rc.colorIDs = New List(Of Integer)
             For i = 1 To hist.histArray.Count - 1 ' ignore zeros
@@ -87,8 +87,8 @@ Public Class RedCC_Merge : Inherits TaskParent
 
         strOut = RedCell_Basics.selectCell(redSweep.rcMap, redSweep.rcList)
         If task.rcD IsNot Nothing Then
-            dst3(task.rcD.rect).SetTo(white, task.rcD.contourMask)
-            task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+            dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
+            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
         End If
         SetTrueText(strOut, 3)
     End Sub

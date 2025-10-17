@@ -36,8 +36,8 @@ Public Class RedCloud_Basics : Inherits TaskParent
                 rc.color = rcListLast(indexLast).color
             End If
             rc.index = rcList.Count + 1
-            rcMap(rc.rect).setto(rc.index, rc.contourMask)
-            dst2(rc.rect).SetTo(rc.color, rc.contourMask)
+            rcMap(rc.rect).setto(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
             rcList.Add(rc)
         Next
 
@@ -47,7 +47,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         Next
 
         strOut = RedCell_Basics.selectCell(rcMap, rcList)
-        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
         SetTrueText(strOut, 3)
 
         rcListLast = New List(Of rcData)(rcList)
@@ -111,7 +111,7 @@ Public Class RedCloud_Sweep : Inherits TaskParent
             index += 1
             rc.index = index
             rc.color = task.vecColors(rc.index Mod 255)
-            dst2(rc.rect).SetTo(rc.color, rc.contourMask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
             rcMap(rc.rect).SetTo(rc.index, rc.mask)
             dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
         Next
@@ -167,7 +167,7 @@ Public Class RedCloud_HeartBeat : Inherits TaskParent
                             pcc.color = rc.color
                             pcc.age = rc.age + 1
                             rcList.Add(pcc)
-                            rcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.contourMask)
+                            rcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.mask)
 
                             index += 1
                         End If
@@ -180,7 +180,7 @@ Public Class RedCloud_HeartBeat : Inherits TaskParent
         End If
 
         strOut = RedCell_Basics.selectCell(rcMap, rcList)
-        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
         SetTrueText(strOut + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf + CStr(rcList.Count) + " cells present", 3)
     End Sub
 End Class
@@ -247,7 +247,7 @@ Public Class RedCloud_CellDepthHistogram : Inherits TaskParent
         dst2 = runRedCloud(src, labels(2))
 
         strOut = RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
         SetTrueText(strOut, 3)
 
         If task.rcD Is Nothing Then
@@ -386,15 +386,15 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
                 If rc.age > 1000 Then rc.age = 2
             End If
             rc.index = rcList.Count + 1
-            rcMap(rc.rect).setto(rc.index, rc.contourMask)
-            dst2(rc.rect).SetTo(rc.color, rc.contourMask)
+            rcMap(rc.rect).setto(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
             dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
             SetTrueText(CStr(rc.age), rc.maxDist)
             rcList.Add(rc)
         Next
 
         strOut = RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
 
         SetTrueText(strOut + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf +
                     CStr(rcList.Count) + " cells present", 3)
