@@ -49,9 +49,8 @@ Public Class RedPrep_Basics : Inherits TaskParent
             dst2 = dst2 Or prepEdges.dst3
         End If
 
-        If options.PrepNoDepthEdges Then
-            edges.Run(task.depthMask)
-            dst2.SetTo(0, task.noDepthMask)
+        If options.PrepAddEdges Then
+            edges.Run(task.gray)
             dst2 = dst2 Or edges.dst2
         End If
 
@@ -63,14 +62,21 @@ Public Class RedPrep_Basics : Inherits TaskParent
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), 255, 2)
 
         ' this should be the only place where the target slider is adjusted for current conditions.
-        Dim percentZero = (dst2.Total - dst2.CountNonZero) / dst2.Total
+        Dim depthCount = task.depthMask.CountNonZero
+
+        Dim tmp As cv.Mat = dst2.Clone
+        tmp.SetTo(0, task.noDepthMask)
+        Dim floodCountMax = tmp.CountNonZero
+        Dim percentZero = (depthCount - floodCountMax) / depthCount
         Static targetSlider = OptionParent.FindSlider("Reduction Target")
-        If percentZero < 0.65 And targetSlider.value < targetSlider.maximum Then
+        If percentZero < 0.75 Then
             If targetSlider.value + 10 < targetSlider.maximum Then
                 targetSlider.value += 10
             Else
                 targetSlider.value = targetSlider.maximum
             End If
+        ElseIf percentZero > 0.85 Then
+            targetSlider.value -= 10
         End If
         labels(2) = "Using reduction factor = " + CStr(task.reductionTarget) + ".  " +
                     Format(percentZero, "0%") + " of the image available for floodfill."

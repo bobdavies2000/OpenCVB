@@ -61,6 +61,7 @@ End Class
 Public Class RedCloud_Sweep : Inherits TaskParent
     Public prepEdges As New RedPrep_Basics
     Public rcList As New List(Of rcData)
+    Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -71,7 +72,7 @@ Public Class RedCloud_Sweep : Inherits TaskParent
         Dim rect As New cv.Rect
         Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
         Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
-        Dim minSize = input.Total * 0.001
+        Dim minSize As Integer = input.Total * 0.001
         Dim rc As rcData = Nothing
         Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim minCount As Integer
@@ -105,11 +106,13 @@ Public Class RedCloud_Sweep : Inherits TaskParent
 
         Dim index As Integer
         dst2.SetTo(0)
+        rcMap.SetTo(0)
         For Each rc In rcList
             index += 1
             rc.index = index
             rc.color = task.vecColors(rc.index Mod 255)
             dst2(rc.rect).SetTo(rc.color, rc.contourMask)
+            rcMap(rc.rect).SetTo(rc.index, rc.mask)
             dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
         Next
 

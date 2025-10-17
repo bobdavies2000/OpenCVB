@@ -39,7 +39,7 @@ Public Class RedCC_Histograms : Inherits TaskParent
 
         hist.Run(dst1)
         Dim actualClasses As Integer
-        For i = 0 To hist.histArray.Count - 1
+        For i = 1 To hist.histArray.Count - 1
             If hist.histArray(i) Then actualClasses += 1
         Next
         If task.gOptions.HistBinBar.Maximum >= actualClasses + 1 Then
@@ -72,7 +72,6 @@ End Class
 Public Class RedCC_Merge : Inherits TaskParent
     Public redSweep As New RedCloud_Sweep
     Public color8u As New Color8U_Basics
-    Public rcList As New List(Of rcData)
     Public Sub New()
         desc = "Merge the color and reduced depth data."
     End Sub
@@ -82,15 +81,16 @@ Public Class RedCC_Merge : Inherits TaskParent
         dst1.SetTo(0, redSweep.prepEdges.dst2)
 
         color8u.Run(task.gray)
-        dst3 = color8u.dst2 + dst1
+        dst3 = color8u.dst3
 
-        dst2 = PaletteBlackZero(dst3)
+        dst2 = PaletteBlackZero(color8u.dst2 + dst1)
 
-        rcList = RedCloud_Sweep.sweepImage(dst3)
-
-        'strOut = RedCell_Basics.selectCell(rcMap, rcList)
-        'If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
-        'SetTrueText(strOut, 3)
+        strOut = RedCell_Basics.selectCell(redSweep.rcMap, redSweep.rcList)
+        If task.rcD IsNot Nothing Then
+            dst3(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+            task.color(task.rcD.rect).SetTo(white, task.rcD.contourMask)
+        End If
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 

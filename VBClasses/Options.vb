@@ -8026,14 +8026,14 @@ Public Class Options_RedCloud : Inherits OptionParent
     Public PrepX As Boolean
     Public PrepY As Boolean
     Public PrepZ As Boolean
-    Public PrepNoDepthEdges As Boolean
+    Public PrepAddEdges As Boolean
     Sub New()
         If FindFrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Prep Edges in X")
             check.addCheckBox("Prep Edges in Y")
             check.addCheckBox("Prep Edges in Z")
-            check.addCheckBox("Prep NoDepth Edges")
+            check.addCheckBox("Add RGB Edges")
             check.Box(0).Checked = True
             check.Box(1).Checked = True
             check.Box(2).Checked = True
@@ -8050,11 +8050,11 @@ Public Class Options_RedCloud : Inherits OptionParent
         Static PrepXBox = FindCheckBox("Prep Edges in X")
         Static PrepYBox = FindCheckBox("Prep Edges in Y")
         Static PrepZBox = FindCheckBox("Prep Edges in Z")
-        Static PrepNoDepth = FindCheckBox("Prep NoDepth Edges")
+        Static PrepEdges = FindCheckBox("Add RGB Edges")
         PrepX = PrepXBox.checked
         PrepY = PrepYBox.checked
         PrepZ = PrepZBox.checked
-        PrepNoDepthEdges = PrepNoDepth.checked
+        PrepAddEdges = PrepEdges.checked
     End Sub
 End Class
 
