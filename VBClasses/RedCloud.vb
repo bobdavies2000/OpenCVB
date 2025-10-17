@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
     Public redSweep As New RedCloud_Sweep
     Public rcList As New List(Of rcData)
-    Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public percentImage As Single
     Public Sub New()
         task.redCloud = Me
@@ -16,16 +16,16 @@ Public Class RedCloud_Basics : Inherits TaskParent
         labels(2) = redSweep.labels(2) + If(standalone, "  Number is cell age", "")
 
         Static rcListLast = New List(Of rcData)(rcList)
-        Static pcMapLast As cv.Mat = rcMap.clone
+        Static rcMapLast As cv.Mat = rcMap.Clone
 
         rcList.Clear()
         Dim r2 As cv.Rect
-        rcMap.setto(0)
+        rcMap.SetTo(0)
         dst2.SetTo(0)
         For Each rc In redSweep.rcList
             Dim r1 = rc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
-            Dim indexLast = pcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
+            Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
             If indexLast > 0 Then r2 = rcListLast(indexLast).rect
             If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                 rc.age = rcListLast(indexLast).age + 1
@@ -36,7 +36,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
                 rc.color = rcListLast(indexLast).color
             End If
             rc.index = rcList.Count + 1
-            rcMap(rc.rect).setto(rc.index, rc.mask)
+            rcMap(rc.rect).SetTo(rc.index, rc.mask)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
             rcList.Add(rc)
         Next
@@ -51,7 +51,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         SetTrueText(strOut, 3)
 
         rcListLast = New List(Of rcData)(rcList)
-        pcMapLast = rcMap.clone
+        rcMapLast = rcMap.Clone
     End Sub
 End Class
 
@@ -329,9 +329,18 @@ Public Class RedCloud_Motion : Inherits TaskParent
         labels(2) = redC.labels(2)
 
         dst3.SetTo(0)
+        Dim count As Integer
         For Each rc In task.redCloud.rcList
-            If rc.age > 10 Then dst3(rc.rect).SetTo(rc.color, rc.mask)
+            If rc.age > 10 Then
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+                count += 1
+            Else
+                dst3(rc.rect).SetTo(white, rc.mask)
+            End If
+            dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+            SetTrueText(CStr(rc.age), rc.maxDist)
         Next
+        labels(3) = CStr(count) + " cells had no RGB motion... white cells had motion."
     End Sub
 End Class
 
@@ -341,7 +350,7 @@ End Class
 Public Class RedCloud_MotionNew : Inherits TaskParent
     Public redCore As New RedCloud_Basics
     Public rcList As New List(Of rcData)
-    Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public percentImage As Single
     Public Sub New()
         desc = "Build contours for each cell"
@@ -360,17 +369,17 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
         labels(2) = redCore.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
 
         Static rcListLast = New List(Of rcData)(rcList)
-        Static pcMapLast As cv.Mat = rcMap.clone
+        Static rcMapLast As cv.Mat = rcMap.clone
 
         rcList.Clear()
         Dim r2 As cv.Rect
-        rcMap.setto(0)
+        rcMap.SetTo(0)
         dst2.SetTo(0)
         Dim unchangedCount As Integer
         For Each rc In redCore.rcList
             Dim r1 = rc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
-            Dim indexLast = pcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
+            Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
             If indexLast > 0 Then r2 = rcListLast(indexLast).rect
             If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                 Dim tmp = task.motionMask(rc.rect)
@@ -387,7 +396,7 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
                 If rc.age > 1000 Then rc.age = 2
             End If
             rc.index = rcList.Count + 1
-            rcMap(rc.rect).setto(rc.index, rc.mask)
+            rcMap(rc.rect).SetTo(rc.index, rc.mask)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
             dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
             SetTrueText(CStr(rc.age), rc.maxDist)
@@ -401,7 +410,7 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
                     CStr(rcList.Count) + " cells present", 3)
 
         rcListLast = New List(Of rcData)(rcList)
-        pcMapLast = rcMap.clone
+        rcMapLast = rcMap.clone
     End Sub
 End Class
 

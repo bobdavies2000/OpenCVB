@@ -14096,7 +14096,7 @@ Public Class XO_RedCloudAndColor_Basics : Inherits TaskParent
         dst2 = runRedCloud(src, labels(1))
 
         Static rcListLast = New List(Of rcData)
-        Dim pcMapLast = rcMap.clone
+        Dim rcMapLast = rcMap.clone
         rcList = New List(Of rcData)(task.redCloud.rcList)
 
         dst3 = task.gray

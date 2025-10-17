@@ -12,7 +12,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         dst3 = redSweep.dst3
 
         Static rcListLast = New List(Of rcData)(redSweep.rcList)
-        Static pcMapLast As cv.Mat = redSweep.rcMap.clone
+        Static rcMapLast As cv.Mat = redSweep.rcMap.clone
 
         rcList.Clear()
         Dim r2 As cv.Rect
@@ -21,7 +21,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         For Each rc In redSweep.rcList
             Dim r1 = rc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
-            Dim indexLast = pcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
+            Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
             If indexLast > 0 Then r2 = rcListLast(indexLast).rect
             If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                 rc.age = rcListLast(indexLast).age + 1
@@ -45,7 +45,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         labels(3) = redSweep.labels(3)
 
         rcListLast = New List(Of rcData)(rcList)
-        pcMapLast = rcMap.Clone
+        rcMapLast = rcMap.Clone
 
         strOut = RedCell_Basics.selectCell(rcMap, rcList)
         If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
