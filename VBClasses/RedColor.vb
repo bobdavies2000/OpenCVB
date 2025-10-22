@@ -5,6 +5,7 @@ Public Class RedColor_Basics : Inherits TaskParent
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         task.redColor = Me
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Track the RedColor cells from RedColor_Core"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -49,7 +50,7 @@ Public Class RedColor_Basics : Inherits TaskParent
 
         strOut = RedCell_Basics.selectCell(rcMap, rcList)
         If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-        SetTrueText(strOut, 3)
+        SetTrueText(strOut, 1)
     End Sub
 End Class
 

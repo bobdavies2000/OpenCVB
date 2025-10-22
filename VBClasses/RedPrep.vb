@@ -2,7 +2,6 @@
 Imports cv = OpenCvSharp
 Public Class RedPrep_Basics : Inherits TaskParent
     Dim prepEdges As New RedPrep_Edges_CPP
-    Dim edges As New Edge_Basics
     Public options As New Options_RedCloud
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -50,6 +49,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
         End If
 
         If options.PrepAddEdges Then
+            Static edges As New Edge_Basics
             edges.Run(task.gray)
             dst2 = dst2 Or edges.dst2
         End If

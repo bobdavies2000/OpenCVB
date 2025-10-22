@@ -7,6 +7,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Public percentImage As Single
     Public Sub New()
         task.redCloud = Me
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build contours for each cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -61,7 +62,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
 
         strOut = RedCell_Basics.selectCell(rcMap, rcList)
         If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-        SetTrueText(strOut, 3)
+        SetTrueText(strOut, 1)
 
         rcListLast = New List(Of rcData)(rcList)
         rcMapLast = rcMap.Clone
@@ -130,7 +131,7 @@ Public Class RedCloud_Sweep : Inherits TaskParent
         Next
 
         labels(2) = CStr(rcList.Count) + " regions were identified."
-        labels(3) = "Reduced point cloud - increase/decrease cell size with 'Reduction Target' option."
+        labels(3) = "Reduced point cloud - adjust with 'Reduction Target'"
     End Sub
 End Class
 
