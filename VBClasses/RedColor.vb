@@ -48,8 +48,11 @@ Public Class RedColor_Basics : Inherits TaskParent
         rcListLast = New List(Of rcData)(rcList)
         rcMapLast = rcMap.Clone
 
-        strOut = RedCell_Basics.selectCell(rcMap, rcList)
-        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+        Dim testStr As String = RedCell_Basics.selectCell(rcMap, rcList)
+        If testStr <> "" Then
+            strOut = testStr
+            If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+        End If
         SetTrueText(strOut, 1)
     End Sub
 End Class
