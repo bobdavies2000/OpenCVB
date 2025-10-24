@@ -48,11 +48,8 @@ Public Class RedColor_Basics : Inherits TaskParent
         rcListLast = New List(Of rcData)(rcList)
         rcMapLast = rcMap.Clone
 
-        Dim testStr As String = RedCell_Basics.selectCell(rcMap, rcList)
-        If testStr <> "" Then
-            strOut = testStr
-            If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-        End If
+        RedCell_Basics.selectCell(rcMap, rcList)
+        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
         SetTrueText(strOut, 1)
     End Sub
 End Class
@@ -124,8 +121,8 @@ Public Class RedColor_HeartBeat : Inherits TaskParent
             Next
             labels(3) = "There were " + CStr(rcLost.Count) + " cells temporarily lost."
 
-            strOut = RedCell_Basics.selectCell(rcMap, rcList)
-            If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+            RedCell_Basics.selectCell(rcMap, rcList)
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
         End If
     End Sub
@@ -182,8 +179,8 @@ Public Class RedColor_Sweep : Inherits TaskParent
                 dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
             Next
 
-            strOut = RedCell_Basics.selectCell(rcMap, rcList)
-            If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+            RedCell_Basics.selectCell(rcMap, rcList)
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
         End If
 

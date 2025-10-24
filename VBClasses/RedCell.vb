@@ -3,7 +3,7 @@ Public Class RedCell_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Display the output of a cell for RedCloud_HeartBeat."
     End Sub
-    Public Shared Function selectCell(rcMap As cv.Mat, rcList As List(Of rcData)) As String
+    Public Shared Sub selectCell(rcMap As cv.Mat, rcList As List(Of rcData))
         If rcList.Count > 0 Then
             Dim clickIndex = rcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
             If clickIndex >= 0 And clickIndex < rcList.Count Then
@@ -15,16 +15,18 @@ Public Class RedCell_Basics : Inherits TaskParent
                 Next
                 task.rcD = rcList(ages.ElementAt(0).Value)
             End If
-            If task.rcD.rect.Contains(task.ClickPoint) Then Return task.rcD.displayCell
+            If task.rcD.rect.Contains(task.ClickPoint) Then
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                Exit Sub
+            End If
         End If
         task.rcD = Nothing
-        Return ""
-    End Function
+    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then dst2 = runRedCloud(src, labels(2))
-        strOut = selectCell(task.redCloud.rcMap, task.redCloud.rcList)
 
-        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+        selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
         SetTrueText(strOut, 3)
     End Sub
 End Class

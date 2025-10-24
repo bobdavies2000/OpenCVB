@@ -60,11 +60,8 @@ Public Class RedCloud_Basics : Inherits TaskParent
             SetTrueText(CStr(rc.age), rc.maxDist)
         Next
 
-        Dim testStr As String = RedCell_Basics.selectCell(rcMap, rcList)
-        If testStr <> "" Then
-            strOut = testStr
-            If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-        End If
+        RedCell_Basics.selectCell(rcMap, rcList)
+        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
         SetTrueText(strOut, 1)
 
         rcListLast = New List(Of rcData)(rcList)
@@ -148,6 +145,7 @@ Public Class RedCloud_HeartBeat : Inherits TaskParent
     Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public prepEdges As New RedPrep_Basics
     Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         redCore.redSweep.prepEdges = prepEdges
         desc = "Run RedCloud_Map on the heartbeat but just floodFill at maxDist otherwise."
     End Sub
@@ -159,6 +157,7 @@ Public Class RedCloud_HeartBeat : Inherits TaskParent
             rcList = New List(Of rcData)(redCore.rcList)
             dst3 = redCore.dst2
             dst1 = redCore.redSweep.prepEdges.dst2
+            labels(3) = redCore.labels(2)
         Else
             Dim rcListLast = New List(Of rcData)(redCore.rcList)
 
@@ -196,9 +195,12 @@ Public Class RedCloud_HeartBeat : Inherits TaskParent
             labels(2) = CStr(rcList.Count) + " regions were identified "
         End If
 
-        strOut = RedCell_Basics.selectCell(rcMap, rcList)
-        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-        SetTrueText(strOut + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf + CStr(rcList.Count) + " cells present", 3)
+        RedCell_Basics.selectCell(rcMap, rcList)
+        If task.rcD IsNot Nothing Then
+            strOut = task.rcD.displayCell + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf + CStr(rcList.Count) + " cells present"
+            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+        End If
+        SetTrueText(strOut, 1)
     End Sub
 End Class
 
@@ -258,15 +260,16 @@ Public Class RedCloud_CellDepthHistogram : Inherits TaskParent
     Dim plot As New Plot_Histogram
     Public Sub New()
         task.gOptions.setHistogramBins(100)
+        If standalone Then task.gOptions.displayDst1.Checked = True
         plot.createHistogram = True
         desc = "Display the histogram of a selected RedCloud cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedCloud(src, labels(2))
 
-        strOut = RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-        SetTrueText(strOut, 3)
+        RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell
+        SetTrueText(strOut, 1)
 
         If task.rcD Is Nothing Then
             labels(3) = "Select a RedCloud cell to see the histogram"
@@ -370,6 +373,7 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public percentImage As Single
     Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build contours for each cell"
     End Sub
     Public Function motionDisplayCell() As rcData
@@ -415,11 +419,12 @@ Public Class RedCloud_MotionNew : Inherits TaskParent
             rcList.Add(rc)
         Next
 
-        strOut = RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-        If task.rcD IsNot Nothing Then task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+        RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell + vbCrLf + vbCrLf +
+                    Format(percentImage, "0.0%") + " of image" + vbCrLf +
+                    CStr(rcList.Count) + " cells present"
 
-        SetTrueText(strOut + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf +
-                    CStr(rcList.Count) + " cells present", 3)
+        SetTrueText(strOut, 1)
 
         rcListLast = New List(Of rcData)(rcList)
         rcMapLast = rcMap.clone

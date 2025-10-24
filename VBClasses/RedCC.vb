@@ -29,6 +29,7 @@ Public Class RedCC_Merge : Inherits TaskParent
     Public redSweep As New RedCloud_Sweep
     Public color8u As New Color8U_Basics
     Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Merge the color and reduced depth data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -41,12 +42,11 @@ Public Class RedCC_Merge : Inherits TaskParent
 
         dst2 = PaletteBlackZero(color8u.dst2 + dst1)
 
-        strOut = RedCell_Basics.selectCell(redSweep.rcMap, redSweep.rcList)
-        If task.rcD IsNot Nothing Then
-            dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
-            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-        End If
-        SetTrueText(strOut, 3)
+        RedCell_Basics.selectCell(redSweep.rcMap, redSweep.rcList)
+        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+        SetTrueText(strOut, 1)
+
+        If task.rcD IsNot Nothing Then dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
     End Sub
 End Class
 
@@ -124,8 +124,9 @@ Public Class RedCC_UseHistIDs : Inherits TaskParent
             rc.mask = rc.mask Or colorMask
         Next
 
-        strOut = RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+        RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
         If task.rcD IsNot Nothing Then
+            strOut = task.rcD.displayCell
             dst3.SetTo(0)
             dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
