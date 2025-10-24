@@ -164,7 +164,6 @@ Public Module vbc
         task.depthDiffMeters = task.gOptions.DepthDiffSlider.Value / 1000
 
         task.rcPixelThreshold = CInt(task.workRes.Width * task.workRes.Height * 0.001)
-        task.historyCount = task.gOptions.FrameHistory.Value
     End Sub
 
     Public Function findRectFromLine(lp As lpData) As cv.Rect

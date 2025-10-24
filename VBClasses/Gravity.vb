@@ -273,6 +273,7 @@ End Class
 
 Public Class Gravity_BasicsOriginal : Inherits TaskParent
     Public vec As New lpData
+    Dim options As New Options_History
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Search for the transition from positive to negative to find the gravity vector."
@@ -298,13 +299,17 @@ Public Class Gravity_BasicsOriginal : Inherits TaskParent
                     Dim pt = New cv.Point2f(x + Math.Abs(val) / Math.Abs(val - lastVal), y)
                     ptX.Add(pt.X)
                     ptY.Add(pt.Y)
-                    If ptX.Count >= task.gOptions.FrameHistory.Value Then Return New cv.Point2f(ptX.Average, ptY.Average)
+                    If ptX.Count >= task.frameHistoryCount Then
+                        Return New cv.Point2f(ptX.Average, ptY.Average)
+                    End If
                 End If
             Next
         Next
         Return New cv.Point
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(0) Else dst0 = src
 
         Dim p1 = findTransition(0, dst0.Height - 1, 1)

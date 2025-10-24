@@ -156,7 +156,6 @@ Public Class VBtask : Implements IDisposable
     Public msWatch As Integer
     Public msLast As Integer
     Public firstPass As Boolean
-    Public historyCount As Integer ' task.goptions.framehistory.value
 
     Public toggleOn As Boolean ' toggles on the heartbeat.
     Public paused As Boolean

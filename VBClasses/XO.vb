@@ -13826,8 +13826,9 @@ End Class
 
 
 Public Class XO_RedList_Largest : Inherits TaskParent
+    Dim options As New Options_History
     Public Sub New()
-        task.gOptions.FrameHistory.Value = 1
+        OptionParent.FindSlider("Frame History").Value = 1
         desc = "Identify the largest redCloud cells and accumulate them by size - largest to smallest"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -14140,5 +14141,36 @@ Public Class XO_RedCloudAndColor_Basics : Inherits TaskParent
         labels(2) = "Cells found = " + CStr(rcList.Count) + " and " + CStr(newList.Count) + " were color only cells."
 
         rcListLast = New List(Of rcData)(rcList)
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Line_Motion : Inherits TaskParent
+    Dim diff As New Diff_RGBAccum
+    Dim lineHistory As New List(Of List(Of lpData))
+    Dim options As New Options_History
+    Public Sub New()
+        labels(3) = "Wave at the camera to see results - "
+        desc = "Track lines that are the result of motion."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        diff.Run(src)
+        dst2 = diff.dst2
+
+        If task.heartBeat Then dst3 = src
+        lineHistory.Add(task.lines.lpList)
+        For Each lplist In lineHistory
+            For Each lp In lplist
+                DrawLine(dst3, lp.p1, lp.p2)
+            Next
+        Next
+        If lineHistory.Count > task.frameHistoryCount Then lineHistory.RemoveAt(0)
+
+        labels(2) = CStr(task.lines.lpList.Count) + " lines were found in the diff output"
     End Sub
 End Class

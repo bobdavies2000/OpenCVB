@@ -77,14 +77,18 @@ End Class
 Public Class Diff_RGBAccum : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim history As New List(Of cv.Mat)
+    Dim options As New Options_History
     Public Sub New()
         labels = {"", "", "Accumulated BGR image", "Mask of changed pixels"}
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Run Diff_Basics and accumulate BGR diff data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        diff.Run(src)
+        options.Run()
+
         If task.optionsChanged Then history.Clear()
+
+        diff.Run(src)
         history.Add(diff.dst2)
         If history.Count > task.frameHistoryCount Then history.RemoveAt(0)
 

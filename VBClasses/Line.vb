@@ -6,7 +6,6 @@ Public Class Line_Basics : Inherits TaskParent
     Public Sub New()
         desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
     End Sub
-
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' only run as a task algorithm.
         lineCore.Run(task.grayStable)
@@ -31,16 +30,9 @@ Public Class Line_Core : Inherits TaskParent
         desc = "The core algorithm to find lines.  Line_Basics is a task algorithm that exits when run as a normal algorithm."
     End Sub
     Private Function lpMotion(lp As lpData) As Boolean
-        ' return true if the line endpoints were in the motion mask.
-        Dim gridIndex As Integer, pt As cv.Point
-
-        gridIndex = task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X)
-        pt = task.gridRects(gridIndex).TopLeft
-        If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then Return True
-
-        gridIndex = task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X)
-        pt = task.gridRects(gridIndex).TopLeft
-        If task.motionMask.Get(Of Byte)(pt.Y, pt.X) Then Return True
+        ' return true if either line endpoint was in the motion mask.
+        If task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
+        If task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
         Return False
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -56,7 +48,6 @@ Public Class Line_Core : Inherits TaskParent
                 sortlines.Add(lp.length, lp)
             End If
         Next
-        Dim retainedLineCount = sortlines.Count
 
         rawLines.Run(src)
         labels(3) = rawLines.labels(2)
@@ -65,6 +56,7 @@ Public Class Line_Core : Inherits TaskParent
             If lpMotion(lp) Then
                 lp.age = 1
                 sortlines.Add(lp.length, lp)
+                ' If lpList.Count >= task.FeatureSampleSize Then Exit For
             End If
         Next
 
@@ -72,7 +64,6 @@ Public Class Line_Core : Inherits TaskParent
         For Each lp In sortlines.Values
             lp.index = lpList.Count
             lpList.Add(lp)
-            If lpList.Count >= task.FeatureSampleSize Then Exit For
         Next
 
         dst1.SetTo(0)
@@ -85,8 +76,7 @@ Public Class Line_Core : Inherits TaskParent
             DrawLine(dst2, lp, lp.color)
         Next
 
-        labels(2) = "The " + CStr(lpList.Count) + " longest lines of the " + CStr(rawLines.lpList.Count) + " RGB lines found."
-        labels(3) = CStr(retainedLineCount) + " lines retained.  " + CStr(sortlines.Count - retainedLineCount) + " new lines."
+        labels(2) = "The " + CStr(lpList.Count) + " lines found"
     End Sub
 End Class
 
@@ -130,7 +120,8 @@ Public Class Line_Raw : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
-        labels(2) = CStr(lpList.Count) + " highlighted lines were detected in the current frame. Others were too similar."
+        labels(2) = CStr(lpList.Count) +
+                    " highlighted lines were detected in the current frame. Others were too similar."
     End Sub
     Public Sub Close()
         ld.Dispose()
@@ -197,6 +188,8 @@ Public Class Line_Motion : Inherits TaskParent
         desc = "Track lines that are the result of motion."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then lineHistory.Clear()
+
         diff.Run(src)
         dst2 = diff.dst2
 
@@ -207,7 +200,7 @@ Public Class Line_Motion : Inherits TaskParent
                 DrawLine(dst3, lp.p1, lp.p2)
             Next
         Next
-        If lineHistory.Count > task.gOptions.FrameHistory.Value Then lineHistory.RemoveAt(0)
+        If lineHistory.Count >= task.frameHistoryCount Then lineHistory.RemoveAt(0)
 
         labels(2) = CStr(task.lines.lpList.Count) + " lines were found in the diff output"
     End Sub
