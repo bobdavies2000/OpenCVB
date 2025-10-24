@@ -460,7 +460,7 @@ End Class
 
 Public Class BackProject_MaskLines : Inherits TaskParent
     Dim masks As New BackProject_Masks
-    Dim lines As New Line_Raw
+    Dim rawLines As New Line_Raw
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -476,9 +476,9 @@ Public Class BackProject_MaskLines : Inherits TaskParent
         Static saveHistIndex As Integer = masks.histIndex
         If masks.histIndex <> saveHistIndex Then dst1.SetTo(0)
 
-        lines.Run(masks.mask)
+        rawLines.Run(masks.mask)
 
-        For Each lp In lines.lpList
+        For Each lp In rawLines.lpList
             Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
             If val = 255 Then DrawLine(dst1, lp.p1, lp.p2, white)
         Next

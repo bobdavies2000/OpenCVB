@@ -21,11 +21,9 @@ Public Class OptionsGlobal
             DotSizeSlider.Value = 2
             LineWidth.Value = 2
         End If
-        FrameHistory.Value = 5
 
         labelBinsCount.Text = CStr(HistBinBar.Value)
         PixelDiff.Text = CStr(PixelDiffBar.Value)
-        fHist.Text = CStr(FrameHistory.Value)
         LineThicknessAmount.Text = CStr(LineWidth.Value)
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
@@ -218,10 +216,6 @@ Public Class OptionsGlobal
         pixelDiffThreshold = PixelDiffBar.Value
         task.optionsChanged = True
     End Sub
-    Private Sub FrameHistory_ValueChanged(sender As Object, e As EventArgs) Handles FrameHistory.ValueChanged
-        fHist.Text = CStr(FrameHistory.Value)
-        task.optionsChanged = True
-    End Sub
     Private Sub Palettes_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles Palettes.SelectedIndexChanged
         task.optionsChanged = True
         task.paletteIndex = mapNames.IndexOf(Palettes.Text)
@@ -290,10 +284,6 @@ Public Class OptionsGlobal
     Public Sub setHistogramBins(val As Integer)
         If HistBinBar.Maximum < val Then HistBinBar.Maximum = val * 2
         HistBinBar.Value = val
-    End Sub
-    Public Sub setFrameHistory(val As Integer)
-        If FrameHistory.Maximum < val Then FrameHistory.Maximum = val * 2
-        FrameHistory.Value = val
     End Sub
     Public Sub setPixelDifference(val As Integer)
         PixelDiffBar.Value = val

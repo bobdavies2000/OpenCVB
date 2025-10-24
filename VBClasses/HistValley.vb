@@ -5,14 +5,17 @@ Public Class HistValley_Basics : Inherits TaskParent
     Dim options As New Options_Boundary
     Public valleys(3) As Integer ' grayscale values for low points in the histogram.
     Dim scaleList As New List(Of Single)
+    Dim optionsHistory As New Options_History
     Public Sub New()
-        task.gOptions.setFrameHistory(30)
+        OptionParent.FindSlider("Frame History").Value = 30
         task.gOptions.setHistogramBins(255)
         labels(2) = "Histogram of the grayscale image.  White lines mark local minimum above threshold.  Yellow horizontal = histogram mean."
         desc = "Find the histogram valleys for a grayscale image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+        optionsHistory.Run()
+
         Dim vCount = options.desiredBoundaries
         Dim minDistance = options.peakDistance
 

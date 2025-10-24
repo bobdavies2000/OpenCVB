@@ -62,7 +62,7 @@ Public Class Reduction_HeatMapLines : Inherits TaskParent
     Public setupSide As New Cloud_SetupSide
     Public setupTop As New Cloud_SetupTop
     Dim reduction As New Reduction_PointCloud
-    Dim lines As New Line_Raw
+    Dim rawLines As New Line_Raw
     Public Sub New()
         labels(2) = "Gravity rotated Side View with detected lines"
         labels(3) = "Gravity rotated Top View width detected lines"
@@ -72,11 +72,11 @@ Public Class Reduction_HeatMapLines : Inherits TaskParent
         reduction.Run(src)
         heat.Run(src)
 
-        lines.Run(heat.dst2)
+        rawLines.Run(heat.dst2)
         setupTop.Run(heat.dst2)
         dst2 = setupTop.dst2
 
-        lines.Run(heat.dst3)
+        rawLines.Run(heat.dst3)
         setupSide.Run(heat.dst3)
         dst3 = setupSide.dst2
     End Sub

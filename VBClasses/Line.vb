@@ -26,7 +26,6 @@ Public Class Line_Core : Inherits TaskParent
     Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public rawLines As New Line_Raw
     Public Sub New()
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "The core algorithm to find lines.  Line_Basics is a task algorithm that exits when run as a normal algorithm."
     End Sub
     Private Function lpMotion(lp As lpData) As Boolean
@@ -50,7 +49,6 @@ Public Class Line_Core : Inherits TaskParent
         Next
 
         rawLines.Run(src)
-        labels(3) = rawLines.labels(2)
 
         For Each lp In rawLines.lpList
             If lpMotion(lp) Then
@@ -66,17 +64,15 @@ Public Class Line_Core : Inherits TaskParent
             lpList.Add(lp)
         Next
 
-        dst1.SetTo(0)
         lpRectMap.SetTo(0)
         dst2.SetTo(0)
         For i = lpList.Count - 1 To 0 Step -1
             Dim lp = lpList(i)
             lpRectMap.Rectangle(lp.rect, i + 1, -1)
-            dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link8)
             DrawLine(dst2, lp, lp.color)
         Next
 
-        labels(2) = "The " + CStr(lpList.Count) + " lines found"
+        labels(2) = CStr(lpList.Count) + " lines found"
     End Sub
 End Class
 
@@ -120,8 +116,7 @@ Public Class Line_Raw : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
         Next
 
-        labels(2) = CStr(lpList.Count) +
-                    " highlighted lines were detected in the current frame. Others were too similar."
+        labels(2) = CStr(lpList.Count) + " lines were detected."
     End Sub
     Public Sub Close()
         ld.Dispose()
@@ -256,7 +251,7 @@ Public Class Line_GCloud : Inherits TaskParent
     Public options As New Options_LineFinder
     Dim match As New Match_tCell
     Dim angleSlider As System.Windows.Forms.TrackBar
-    Dim lines As New Line_Raw
+    Dim rawLines As New Line_Raw
     Public Sub New()
         angleSlider = OptionParent.FindSlider("Angle tolerance in degrees")
         labels(2) = "Line_GCloud - Blue are vertical lines using the angle thresholds."
@@ -295,11 +290,11 @@ Public Class Line_GCloud : Inherits TaskParent
         Dim maxAngle = angleSlider.Value
 
         dst2 = src.Clone
-        lines.Run(src.Clone)
+        rawLines.Run(src.Clone)
 
         sortedVerticals.Clear()
         sortedHorizontals.Clear()
-        For Each lp In lines.lpList
+        For Each lp In rawLines.lpList
             Dim brick As New gravityLine
             brick = updateGLine(src, brick, lp.p1, lp.p2)
             allLines.Add(lp.p1.DistanceTo(lp.p2), brick)
@@ -489,7 +484,7 @@ End Class
 
 Public Class Line_Backprojection : Inherits TaskParent
     Dim backP As New BackProject_DisplayColor
-    Dim lines As New Line_Raw
+    Dim rawLines As New Line_Raw
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         labels = {"", "", "Lines found in the back projection", "Backprojection results"}
@@ -498,11 +493,11 @@ Public Class Line_Backprojection : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         backP.Run(src)
 
-        lines.Run(backP.dst2)
-        labels(2) = lines.labels(2)
+        rawLines.Run(backP.dst2)
+        labels(2) = rawLines.labels(2)
         dst2 = src
         dst3.SetTo(0)
-        For Each lp In lines.lpList
+        For Each lp In rawLines.lpList
             DrawLine(dst2, lp.p1, lp.p2, task.highlight)
             DrawLine(dst3, lp.p1, lp.p2, 255)
         Next

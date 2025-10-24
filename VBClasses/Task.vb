@@ -605,7 +605,7 @@ Public Class VBtask : Implements IDisposable
         End If
 
         If paused = False Then
-            frameHistoryCount = gOptions.FrameHistory.Value
+            frameHistoryCount = 3 ' default value.  Use Options_History to update this value.
 
             If pointCloud.Size <> src.Size Then
                 pointCloud = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)

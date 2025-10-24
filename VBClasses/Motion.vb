@@ -6,7 +6,7 @@ Public Class Motion_Basics : Inherits TaskParent
     Public cellAge(0) As Integer
     Public motionFlags(0) As Boolean
     Public Sub New()
-        task.motionMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Below is the difference between the current image and the dst2 at left which is composed using the motion mask."
         desc = "Isolate all motion in the scene"
     End Sub
@@ -16,7 +16,6 @@ Public Class Motion_Basics : Inherits TaskParent
             ReDim cellAge(task.gridRects.Count - 1)
         End If
 
-        If task.frameCount < 3 Then dst2 = src.Clone
         Dim colorstdev As cv.Scalar, colorMean As cv.Scalar
         ReDim motionFlags(task.gridRects.Count - 1)
         Dim motionList As New List(Of Integer)
@@ -39,9 +38,9 @@ Public Class Motion_Basics : Inherits TaskParent
             End If
         Next
 
-        task.motionMask.SetTo(0)
+        dst1.SetTo(0)
         For Each i In motionList
-            task.motionMask(task.gridRects(i)).SetTo(255)
+            dst1(task.gridRects(i)).SetTo(255)
             motionFlags(i) = True
         Next
 
@@ -50,10 +49,12 @@ Public Class Motion_Basics : Inherits TaskParent
         labels(2) = Format(task.motionPercent, "00%") + " of bricks had motion."
 
         ' some cameras have low light images for the first few frames.
-        If task.gOptions.UseMotionMask.Checked = False Or task.frameCount < 3 Or task.motionPercent = 1 Then task.motionMask.SetTo(255)
+        If task.gOptions.UseMotionMask.Checked = False Or task.motionPercent = 1 Then
+            dst1.SetTo(255)
+        End If
 
         If standaloneTest() Then
-            If task.gOptions.UseMotionMask.Checked Then src.CopyTo(dst2, task.motionMask)
+            If task.gOptions.UseMotionMask.Checked Then src.CopyTo(dst2, dst1)
             Static diff As New Diff_Basics
             diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             diff.Run(src)
@@ -62,6 +63,7 @@ Public Class Motion_Basics : Inherits TaskParent
                         "Any differences that persist should not be visible in the RGB image at left." + vbCrLf, 3)
         End If
         If task.heartBeatLT Then dst2 = src.Clone
+        task.motionMask = dst1.Clone
     End Sub
 End Class
 

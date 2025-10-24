@@ -10505,7 +10505,7 @@ End Class
 
 Public Class XO_Line_ViewLeftRight : Inherits TaskParent
     Dim lines As New Line_Core
-    Dim linesRaw As New Line_Raw
+    Dim rawLines As New Line_Raw
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Find lines in the left and right images."
@@ -10518,9 +10518,9 @@ Public Class XO_Line_ViewLeftRight : Inherits TaskParent
         Next
         labels(2) = lines.labels(2)
 
-        linesRaw.Run(task.rightView)
-        dst3 = linesRaw.dst2
-        labels(3) = linesRaw.labels(2)
+        rawLines.Run(task.rightView)
+        dst3 = rawLines.dst2
+        labels(3) = rawLines.labels(2)
     End Sub
 End Class
 
@@ -14172,5 +14172,52 @@ Public Class XO_Line_Motion : Inherits TaskParent
         If lineHistory.Count > task.frameHistoryCount Then lineHistory.RemoveAt(0)
 
         labels(2) = CStr(task.lines.lpList.Count) + " lines were found in the diff output"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_MinMath_Line : Inherits TaskParent
+    Dim bPoints As New BrickPoint_Basics
+    Public lpList As New List(Of lpData) ' lines after being checked with brick points.
+    Public Sub New()
+        desc = "Track lines with brickpoints."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        bPoints.Run(src)
+        dst2 = bPoints.dst2
+        labels(2) = bPoints.labels(2)
+
+        Dim linesFound As New List(Of Byte)
+        Dim ptList(task.lines.lpList.Count - 1) As List(Of cv.Point)
+        For Each bp In bPoints.ptList
+            Dim val = task.lines.lineCore.lpRectMap.Get(Of Byte)(bp.Y, bp.X)
+            If val = 0 Then Continue For
+            If linesFound.Contains(val) = False Then
+                linesFound.Add(val)
+                ptList(val) = New List(Of cv.Point)
+            End If
+            ptList(val).Add(bp)
+        Next
+
+        dst3.SetTo(0)
+        lpList.Clear()
+        For i = 0 To ptList.Count - 1
+            If ptList(i) Is Nothing Then Continue For
+            Dim p1 = ptList(i)(0)
+            Dim p2 = ptList(i)(ptList(i).Count - 1)
+            DrawLine(dst2, p1, p2)
+            Dim lp = New lpData(p1, p2)
+            lpList.Add(lp)
+            DrawLine(dst3, p1, p2)
+        Next
+
+        For Each index In linesFound
+            Dim lp = task.lines.lpList(index - 1)
+        Next
+        labels(3) = CStr(linesFound.Count) + " lines were confirmed by brick points."
     End Sub
 End Class
