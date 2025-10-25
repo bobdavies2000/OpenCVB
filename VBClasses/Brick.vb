@@ -100,7 +100,8 @@ Public Class Brick_Basics : Inherits TaskParent
 
             If brick.depth > 0 Then brick.mm = GetMinMax(task.pcSplit(2)(brick.rect), task.depthMask(brick.rect))
             brick.age = task.motionBasics.cellAge(brick.index)
-            brick.color = task.motionBasics.lastColor(brick.index) ' the last color is actually the current color - motion basics runs first.
+            ' the last color is actually the current color - motion basics runs first.
+            brick.color = task.motionBasics.lastColor(brick.index)
             brick.center = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
 
             If brick.depth > 0 Then

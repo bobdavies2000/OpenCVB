@@ -2809,16 +2809,20 @@ Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
 
         Static minList(task.gridRects.Count - 1) As cv.Point2f
         Static maxList(task.gridRects.Count - 1) As cv.Point2f
-        For i = 0 To task.gridRects.Count - 1
-            Dim rect = task.gridRects(i)
-            If task.motionBasics.motionFlags(i) Then
-                Dim ptmin = New cv.Point2f(task.kalman.kOutput(i * 4) + rect.X, task.kalman.kOutput(i * 4 + 1) + rect.Y)
-                Dim ptmax = New cv.Point2f(task.kalman.kOutput(i * 4 + 2) + rect.X, task.kalman.kOutput(i * 4 + 3) + rect.Y)
-                ptmin = lpData.validatePoint(ptmin)
-                ptmax = lpData.validatePoint(ptmax)
-                minList(i) = ptmin
-                maxList(i) = ptmax
-            End If
+        If task.optionsChanged Then
+            ReDim minList(task.gridRects.Count - 1)
+            ReDim maxList(task.gridRects.Count - 1)
+        End If
+        For Each index In task.motionBasics.motionList
+            Dim rect = task.gridRects(index)
+            Dim ptmin = New cv.Point2f(task.kalman.kOutput(index * 4) + rect.X,
+                                       task.kalman.kOutput(index * 4 + 1) + rect.Y)
+            Dim ptmax = New cv.Point2f(task.kalman.kOutput(index * 4 + 2) + rect.X,
+                                       task.kalman.kOutput(index * 4 + 3) + rect.Y)
+            ptmin = lpData.validatePoint(ptmin)
+            ptmax = lpData.validatePoint(ptmax)
+            minList(index) = ptmin
+            maxList(index) = ptmax
         Next
 
         dst1 = src.Clone()

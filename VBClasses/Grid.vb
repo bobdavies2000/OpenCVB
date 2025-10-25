@@ -48,24 +48,21 @@ Public Class Grid_Basics : Inherits TaskParent
             Next
 
             For i = 0 To task.gridRects.Count - 1
-                Dim roi = task.gridRects(i)
-                task.gridMap.Rectangle(roi, i, -1)
+                task.gridMap.Rectangle(task.gridRects(i), i, -1)
             Next
 
-            For j = 0 To task.gridRects.Count - 1
-                Dim roi = task.gridRects(j)
-                Dim nextList As New List(Of Integer)({j})
-                For i = 0 To 8
-                    Dim x = Choose(i + 1, roi.X - 1, roi.X, roi.X + roi.Width + 1,
-                                              roi.X - 1, roi.X, roi.X + roi.Width + 1,
-                                              roi.X - 1, roi.X, roi.X + roi.Width + 1)
-                    Dim y = Choose(i + 1, roi.Y - 1, roi.Y - 1, roi.Y - 1, roi.Y, roi.Y, roi.Y,
-                                              roi.Y + roi.Height + 1, roi.Y + roi.Height + 1, roi.Y + roi.Height + 1)
-                    If x >= 0 And x < dst2.Width And y >= 0 And y < dst2.Height Then
-                        Dim nextIndex As Integer = task.gridMap.Get(Of Single)(y, x)
-                        If nextList.Contains(nextIndex) = False Then nextList.Add(nextIndex)
-                    End If
-                Next
+            For i = 0 To task.gridRects.Count - 1
+                Dim rect = task.gridRects(i)
+                Dim p1 = rect.TopLeft
+                Dim p2 = rect.BottomRight
+                Dim nextList As New List(Of Integer)({i}) ' each neighbor list contains the rect.
+
+                If i = 1007 Then Dim k = 0
+                If p1.X > 0 Then nextList.Add(i - 1)
+                If p1.X < dst2.Width And p2.Y < dst2.Height Then nextList.Add(i + 1)
+                If p1.Y > 0 Then nextList.Add(i - bricksPerRow)
+                If p2.Y < dst2.Height Then nextList.Add(i + bricksPerRow)
+
                 gridNeighbors.Add(nextList)
             Next
 

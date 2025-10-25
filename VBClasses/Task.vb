@@ -675,7 +675,7 @@ Public Class VBtask : Implements IDisposable
 
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
-        motionBasics.Run(src)
+        motionBasics.Run(task.gray)
 
         rgbFilter.Run(task.color)
         ' If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
@@ -785,10 +785,8 @@ Public Class VBtask : Implements IDisposable
                 If gOptions.ShowGrid.Checked Then results.dstList(2).SetTo(cv.Scalar.White, gridMask)
 
                 If gOptions.showMotionMask.Checked Then
-                    For i = 0 To gridRects.Count - 1
-                        If motionBasics.motionFlags(i) Then
-                            results.dstList(0).Rectangle(gridRects(i), cv.Scalar.White, lineWidth)
-                        End If
+                    For Each mIndex In task.motionBasics.motionList
+                        results.dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
                     Next
                 End If
 

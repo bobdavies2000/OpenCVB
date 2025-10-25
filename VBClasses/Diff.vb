@@ -1,27 +1,25 @@
 Imports cv = OpenCvSharp
 Public Class Diff_Basics : Inherits TaskParent
     Public changedPixels As Integer
-    Public lastFrame As cv.Mat
+    Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
     Public Sub New()
-        labels = {"", "", "Unstable mask", ""}
         desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.firstPass Or lastFrame Is Nothing Then lastFrame = src.Clone
-        If task.optionsChanged Or lastFrame.Size <> src.Size Then lastFrame = src.Clone
+        If task.optionsChanged Then lastFrame = src.Clone
 
-        cv.Cv2.Absdiff(src, lastFrame, dst0)
-        dst2 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Absdiff(src, lastFrame, dst3)
+        dst2 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         changedPixels = dst2.CountNonZero
         If changedPixels > 0 Then
             lastFrame = src.Clone
-            strOut = "Motion detected - " + CStr(changedPixels) + " pixels changed with threshold " + CStr(task.gOptions.pixelDiffThreshold)
-            If task.heartBeat Then labels(3) = strOut
+            strOut = "Motion detected - " + CStr(changedPixels) + " pixels changed with threshold " +
+                     CStr(task.gOptions.pixelDiffThreshold)
         Else
             strOut = "No motion detected"
         End If
-        SetTrueText(strOut, 3)
+        If task.heartBeat Then labels(3) = strOut
     End Sub
 End Class
 

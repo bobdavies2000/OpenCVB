@@ -2188,17 +2188,28 @@ End Class
 
 
 Public Class Options_Motion : Inherits OptionParent
+    Public colorDiffPixels As Single
     Public motionThreshold As Integer = 0
     Public cumulativePercentThreshold As Double = 0.1
     Public Sub New()
         If sliders.Setup(traceName) Then
+            Dim rowSize = task.gOptions.GridSlider.Value
+            sliders.setupTrackBar("Total pixels changed", 1, rowSize, rowSize) ' updated below...
             sliders.setupTrackBar("Single frame motion threshold", 1, task.cols * task.rows / 4, task.cols * task.rows / 16)
             sliders.setupTrackBar("Cumulative motion threshold percent of image", 1, 100, cumulativePercentThreshold * 100)
         End If
     End Sub
     Public Sub Run()
+        Static diffSlider = OptionParent.FindSlider("Total pixels changed")
+        If task.optionsChanged Then
+            Dim gridSize = task.gOptions.GridSlider.Value * task.gOptions.GridSlider.Value
+            diffSlider.maximum = gridSize
+            Dim nextSize = task.gOptions.GridSlider.Value
+            If nextSize >= diffSlider.maximum Then diffSlider.value = nextSize
+        End If
         Static thresholdSlider = OptionParent.FindSlider("Single frame motion threshold")
         Static percentSlider = OptionParent.FindSlider("Cumulative motion threshold percent of image")
+        colorDiffPixels = diffSlider.value
         motionThreshold = thresholdSlider.value
         cumulativePercentThreshold = percentSlider.value / 100
     End Sub
