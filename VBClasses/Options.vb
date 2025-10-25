@@ -8225,7 +8225,7 @@ End Class
 
 Public Class Options_History : Inherits OptionParent
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Frame History", 1, 25, 3)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Frame History", 1, 35, 3)
     End Sub
     Public Sub Run()
         Static histSlider = FindSlider("Frame History")

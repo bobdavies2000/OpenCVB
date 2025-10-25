@@ -461,7 +461,7 @@ End Class
 
 Public Class brickData
     Public age As Integer
-    Public color As cv.Vec3f
+    Public color As cv.Scalar
     Public correlation As Single
     Public index As Integer
 

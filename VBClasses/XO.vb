@@ -2,6 +2,8 @@
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 Imports System.Runtime.InteropServices
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar
+Imports OpenCvSharp
 Imports OpenCvSharp.ML
 Imports cv = OpenCvSharp
 Public Class XO_Model_Basics : Inherits TaskParent
@@ -1593,7 +1595,9 @@ Public Class XO_OpenGL_QuadDepth : Inherits TaskParent
         Dim quadData As New List(Of cv.Point3f)
         For Each brick In task.bricks.brickList
             If brick.depth = 0 Then Continue For
-            If brick.corners.Count Then quadData.Add(brick.color)
+            If brick.corners.Count Then
+                quadData.Add(New cv.Point3f(brick.color(0), brick.color(1), brick.color(2)))
+            End If
             For Each pt In brick.corners
                 quadData.Add(pt)
             Next
@@ -1765,14 +1769,14 @@ Public Class XO_OpenGL_QuadConnected : Inherits TaskParent
                 If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
                 If brick1.corners.Count = 0 Or brick2.corners.Count = 0 Then Continue For
 
-                quadData.Add(brick1.color)
+                quadData.Add(New cv.Point3f(brick1.color(0), brick1.color(1), brick1.color(2)))
                 quadData.Add(brick1.corners(0))
                 quadData.Add(brick2.corners(0))
                 quadData.Add(brick2.corners(3))
                 quadData.Add(brick1.corners(3))
             Next
             If brick1.corners.Count > 0 And brick2.corners.Count > 0 Then
-                quadData.Add(brick2.color)
+                quadData.Add(New cv.Point3f(brick2.color(0), brick2.color(1), brick2.color(2)))
                 quadData.Add(brick2.corners(0))
                 quadData.Add(brick2.corners(1))
                 quadData.Add(brick2.corners(2))
@@ -1788,14 +1792,14 @@ Public Class XO_OpenGL_QuadConnected : Inherits TaskParent
                 If brick1.depth = 0 Or brick2.depth = 0 Then Continue For
                 If brick1.corners.Count = 0 Or brick2.corners.Count = 0 Then Continue For
 
-                quadData.Add(brick1.color)
+                quadData.Add(New cv.Point3f(brick1.color(0), brick1.color(1), brick1.color(2)))
                 quadData.Add(brick1.corners(0))
                 quadData.Add(brick1.corners(1))
                 quadData.Add(brick2.corners(1))
                 quadData.Add(brick2.corners(0))
             Next
             If brick1.corners.Count > 0 And brick2.corners.Count > 0 Then
-                quadData.Add(brick2.color)
+                quadData.Add(New cv.Point3f(brick2.color(0), brick2.color(1), brick2.color(2)))
                 quadData.Add(brick2.corners(0))
                 quadData.Add(brick2.corners(1))
                 quadData.Add(brick2.corners(2))

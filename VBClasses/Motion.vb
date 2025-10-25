@@ -8,12 +8,15 @@ Public Class Motion_Basics : Inherits TaskParent
     Public cellAge(0) As Integer
     Dim options As New Options_Motion
     Public Sub New()
+        task.motionBasics = Me
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Isolate all motion in the scene"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.gOptions.UseMotionMask.Checked = False Then Exit Sub
+
         If task.algorithmPrep = False Then Exit Sub ' it is run on every frame before the runAlg...
         options.Run()
         If src.Width = 0 Then ' first call has no data yet...
@@ -33,10 +36,12 @@ Public Class Motion_Basics : Inherits TaskParent
             Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
             If diffCount >= options.colorDiffPixels Then
                 For Each index In task.grid.gridNeighbors(i)
-                    motionList.Add(index)
-                    Dim rect = task.gridRects(index)
-                    src(rect).CopyTo(dst2(rect))
-                    dst1(rect).SetTo(255)
+                    If motionList.Contains(index) = False Then
+                        motionList.Add(index)
+                        Dim rect = task.gridRects(index)
+                        src(rect).CopyTo(dst2(rect))
+                        dst1(rect).SetTo(255)
+                    End If
                 Next
             End If
         Next
@@ -45,7 +50,6 @@ Public Class Motion_Basics : Inherits TaskParent
         dst3 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
 
         task.motionMask = dst1.Clone
-        cv.Cv2.ImShow("dst1", dst1)
 
         task.motionPercent = motionList.Count / task.gridRects.Count
         If task.motionPercent > 0.8 Then task.motionPercent = 1

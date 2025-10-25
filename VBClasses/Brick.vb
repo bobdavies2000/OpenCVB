@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Drawing.Imaging
+Imports cv = OpenCvSharp
 Public Class Brick_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Public brickDepthCount As Integer
@@ -89,6 +90,7 @@ Public Class Brick_Basics : Inherits TaskParent
         task.bricks.brickList.Clear()
         Dim depthCount As Integer
         brickDepthCount = 0
+        Dim colorstdev As cv.Scalar
         For i = 0 To task.gridRects.Count - 1
             Dim brick As New brickData
             brick.index = task.bricks.brickList.Count
@@ -99,18 +101,19 @@ Public Class Brick_Basics : Inherits TaskParent
             If brick.depth > Single.MaxValue Or brick.depth < Single.MinValue Then brick.depth = 0
 
             If brick.depth > 0 Then brick.mm = GetMinMax(task.pcSplit(2)(brick.rect), task.depthMask(brick.rect))
-            brick.age = task.motionBasics.cellAge(brick.index)
+            brick.age = 1
             ' the last color is actually the current color - motion basics runs first.
-            brick.color = task.motionBasics.lastColor(brick.index)
+            cv.Cv2.MeanStdDev(src(brick.rect), brick.color, colorstdev)
             brick.center = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
 
             If brick.depth > 0 Then
                 brickDepthCount += 1
 
-                If brick.age > 1 And instantUpdate = False And brickLast.Count > 0 Then
+                Dim testVal = task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X)
+                If testVal = 0 And instantUpdate = False And brickLast.Count > 0 Then
                     ' no need to recompute everything when there is no motion in the cell.
+                    brick.age += 1
                     brick = brickLast(i)
-                    brick.age = task.motionBasics.cellAge(i)
                 Else
                     If task.rgbLeftAligned Then
                         brick.rRect = brick.rect
@@ -698,8 +701,10 @@ Public Class Brick_CorrelationMap : Inherits TaskParent
             Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             task.brickD = task.bricks.brickList(index)
             task.depthAndDepthRange = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
-                                           CStr(task.brickD.index) + vbCrLf + " range " + Format(task.brickD.mm.minVal, fmt1) + "-" +
-                                           Format(task.brickD.mm.maxVal, fmt1) + "m, age = " + CStr(task.brickD.age) + vbCrLf +
+                                           CStr(task.brickD.index) + vbCrLf + " range " +
+                                           Format(task.brickD.mm.minVal, fmt1) + "-" +
+                                           Format(task.brickD.mm.maxVal, fmt1) + "m, age = " +
+                                           CStr(task.brickD.age) + vbCrLf +
                                            " correlation = " + Format(task.brickD.correlation, fmt3)
 
             Dim ptTextLoc = task.brickD.rect.TopLeft

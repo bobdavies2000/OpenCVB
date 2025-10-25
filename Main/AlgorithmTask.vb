@@ -288,22 +288,7 @@ Namespace OpenCVB
                         results.dstsReady = True ' this will trigger the paint
                     End SyncLock
 
-
                     debugSyncUI = task.debugSyncUI
-
-                    If task.debugSyncUI Then
-                        Static syncUICount = 500 ' enough time - adjust if needed...
-                        If syncUI = 0 Then
-                            task.RunAlgorithm()
-                            syncUI = syncUICount
-                        End If
-                        syncUI -= 1
-                    Else
-                        task.RunAlgorithm() ' <<<<<<<<<<< this is where the real work gets done.
-                    End If
-
-
-
                 End While
 
                 frameCount = -1

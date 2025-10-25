@@ -757,6 +757,7 @@ Public Class VBtask : Implements IDisposable
                 Else
                     results.dstList(0) = task.color.Clone
                 End If
+
                 If gOptions.displayDst1.Checked Then
                     results.dstList(1) = Check8uC3(displayObject.dst1)
                     displayDst1 = True
@@ -783,7 +784,6 @@ Public Class VBtask : Implements IDisposable
                 End If
 
                 If gOptions.ShowGrid.Checked Then results.dstList(2).SetTo(cv.Scalar.White, gridMask)
-
                 If gOptions.showMotionMask.Checked Then
                     For Each mIndex In task.motionBasics.motionList
                         results.dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)

@@ -106,7 +106,7 @@ Public Class Region_Quads : Inherits TaskParent
             Dim brick1 = task.bricks.brickList(index1)
             Dim brick2 = task.bricks.brickList(index2)
 
-            quadData.Add(brick1.color)
+            quadData.Add(New cv.Point3f(brick1.color(0), brick1.color(1), brick1.color(2)))
 
             Dim p0 = Cloud_Basics.worldCoordinates(rect.TopLeft, brick1.depth)
             Dim p1 = Cloud_Basics.worldCoordinates(rect.BottomRight, brick2.depth)
