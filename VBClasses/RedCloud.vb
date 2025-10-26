@@ -101,7 +101,6 @@ Public Class RedCloud_Sweep : Inherits TaskParent
                             rc = New rcData(input(rect), rect, index)
                             If rc.index < 0 Then Continue For
                             newList.Add(rc.pixels, rc)
-
                             index += 1
                         Else
                             minCount += 1

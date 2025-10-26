@@ -14293,3 +14293,62 @@ Public Class XO_Motion_Basics : Inherits TaskParent
         task.motionMask = dst1.Clone
     End Sub
 End Class
+
+
+
+
+
+
+Public Class XO_RedColor_BasicsFast : Inherits TaskParent
+    Public classCount As Integer
+    Public RectList As New List(Of cv.Rect)
+    Public maxList As New List(Of Integer)
+    Public Sub New()
+        cPtr = RedCloudMaxDist_Open()
+        desc = "Run the C++ RedCloudMaxDist interface without a mask"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1 = srcMustBe8U(src)
+
+        If task.heartBeat Then maxList.Clear() ' reevaluate all cells.
+        Dim maxArray = maxList.ToArray
+        Dim handleMaxList = GCHandle.Alloc(maxArray, GCHandleType.Pinned)
+        RedCloudMaxDist_SetPoints(cPtr, maxList.Count / 2, handleMaxList.AddrOfPinnedObject())
+        handleMaxList.Free()
+
+        Dim imagePtr As IntPtr
+        Dim inputData(dst1.Total - 1) As Byte
+        Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, dst1.Rows, dst1.Cols)
+        handleInput.Free()
+        dst2 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst3 = PaletteFull(dst2)
+
+        classCount = RedCloudMaxDist_Count(cPtr)
+        labels(2) = "CV_8U version with " + CStr(classCount) + " cells."
+
+        If classCount = 0 Then Exit Sub ' no data to process.
+
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr))
+
+        Dim rects(classCount * 4) As Integer
+        Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+
+        Dim minPixels = dst2.Total * 0.001
+        RectList.Clear()
+
+        For i = 0 To rects.Length - 4 Step 4
+            Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
+            If r.Width * r.Height >= minPixels Then
+                RectList.Add(r)
+                dst3.Rectangle(r, task.highlight, task.lineWidth)
+            End If
+        Next
+        labels(3) = CStr(RectList.Count) + " cells were found."
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedCloudMaxDist_Close(cPtr)
+    End Sub
+End Class
