@@ -575,7 +575,7 @@ Public Class VBtask : Implements IDisposable
         bins2D = {task.workRes.Height, task.workRes.Width}
 
         ' If the workRes changes, the previous generation of images needs to be reset.
-        If pointCloud.Size <> New cv.Size(cols, rows) Or task.color.Size <> task.workRes Then
+        If task.firstPass Then
             task.motionMask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 255)
             task.leftView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
             task.rightView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
@@ -675,7 +675,7 @@ Public Class VBtask : Implements IDisposable
 
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
-        motionBasics.Run(task.gray)
+        motionBasics.Run(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
         rgbFilter.Run(task.color)
         ' If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)

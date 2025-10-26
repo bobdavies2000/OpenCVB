@@ -293,7 +293,6 @@ Public Class BrickLine_LeftRight : Inherits TaskParent
 
             brick.lRect = brick.rect
             brick.depth = task.pcSplit(2)(brick.rect).Mean()(0)
-            brick.age = task.motionBasics.cellAge(index)
             If brick.depth > 0 Then
                 brick.rRect = brick.rect
                 brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth

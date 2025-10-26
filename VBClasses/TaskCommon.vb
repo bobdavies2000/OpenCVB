@@ -460,7 +460,7 @@ End Class
 
 
 Public Class brickData
-    Public age As Integer
+    Public age As Integer = 1
     Public color As cv.Scalar
     Public correlation As Single
     Public index As Integer

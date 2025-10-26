@@ -1,3 +1,4 @@
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Distance_Basics : Inherits TaskParent
     Dim distance As New Distance_Instant
@@ -170,37 +171,78 @@ End Class
 
 
 
-Public Class Distance_Peaks : Inherits TaskParent
+Public Class Distance_PeakDepth : Inherits TaskParent
     Public Sub New()
-        desc = "Find the points which are furthest from the zero depth"
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(2) = "The brightest grid rects are those farthest from zero depth"
+        desc = "Find the grid rects which are furthest from the zero depth"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = task.noDepthMask
-        Dim distance32f = dst1.DistanceTransform(cv.DistanceTypes.L1, 0)
+        If task.noDepthMask.CountNonZero = task.noDepthMask.Total Then Exit Sub ' startup issue 
+        Dim distance32f = task.depthMask.DistanceTransform(cv.DistanceTypes.L1, 0)
 
         Dim maxList As New List(Of Double)
         Dim ptList As New List(Of cv.Point)
-        Dim countList As New List(Of Integer)
         For Each rect In task.gridRects
             Dim mm = GetMinMax(distance32f(rect))
             maxList.Add(mm.maxVal)
-            dst1(rect).SetTo(CInt(mm.maxVal))
             If mm.maxVal > 0 Then ptList.Add(New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y))
-            countList.Add(distance32f(rect).CountNonZero)
         Next
-        dst2 = PaletteBlackZero(dst1)
+
 
         If standalone Then
-            dst0.SetTo(0)
+            dst3 = src.Clone
             For Each pt In ptList
-                DrawCircle(dst0, pt, task.DotSize, task.highlight)
+                DrawCircle(dst3, pt, task.DotSize, task.highlight)
             Next
+            labels(3) = CStr(ptList.Count) + " points selected"
         End If
 
-        Dim max = countList.Max
+        Dim max = maxList.Max
+        dst2.SetTo(0)
         For i = 0 To task.gridRects.Count - 1
             Dim rect = task.gridRects(i)
-            dst3(rect).SetTo(255 * countList(i) / max)
+            dst2(rect).SetTo(255 * maxList(i) / max)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Distance_PeakNoDepth : Inherits TaskParent
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(2) = "The brightest grid rects are those farthest from any depth"
+        desc = "Find the grid rects which are furthest from the zero depth"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.noDepthMask.CountNonZero = task.noDepthMask.Total Then Exit Sub ' startup issue 
+        Dim distance32f = task.noDepthMask.DistanceTransform(cv.DistanceTypes.L1, 0)
+
+        Dim maxList As New List(Of Double)
+        Dim ptList As New List(Of cv.Point)
+        For Each rect In task.gridRects
+            Dim mm = GetMinMax(distance32f(rect))
+            maxList.Add(mm.maxVal)
+            If mm.maxVal > 0 Then ptList.Add(New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y))
+        Next
+
+        If standalone Then
+            dst3 = src.Clone
+            For Each pt In ptList
+                DrawCircle(dst3, pt, task.DotSize, task.highlight)
+            Next
+            labels(3) = CStr(ptList.Count) + " points selected"
+        End If
+
+        Dim max = maxList.Max
+        dst2.SetTo(0)
+        For i = 0 To task.gridRects.Count - 1
+            Dim rect = task.gridRects(i)
+            dst2(rect).SetTo(255 * maxList(i) / max)
         Next
     End Sub
 End Class

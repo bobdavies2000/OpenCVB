@@ -4043,7 +4043,6 @@ Public Class XO_Brick_Basics : Inherits TaskParent
         For i = 0 To task.gridRects.Count - 1
             Dim brick As New brickData
             brick.rect = task.gridRects(i)
-            brick.age = task.motionBasics.cellAge(i)
             brick.rect = brick.rect
             brick.lRect = brick.rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
             brick.center = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
@@ -14227,5 +14226,70 @@ Public Class XO_MinMath_Line : Inherits TaskParent
             Dim lp = task.lines.lpList(index - 1)
         Next
         labels(3) = CStr(linesFound.Count) + " lines were confirmed by brick points."
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Motion_Basics : Inherits TaskParent
+    Public lastColor(0) As cv.Vec3f
+    Public cellAge(0) As Integer
+    Public motionFlags(0) As Boolean
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Below Is the difference between the current image And the dst2 at left which Is composed Using the motion mask."
+        desc = "Isolate all motion In the scene"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If lastColor.Count <> task.gridRects.Count Then
+            ReDim lastColor(task.gridRects.Count - 1)
+            ReDim cellAge(task.gridRects.Count - 1)
+        End If
+
+        Dim colorstdev As cv.Scalar, colorMean As cv.Scalar
+        ReDim motionFlags(task.gridRects.Count - 1)
+        Dim motionList As New List(Of Integer)
+        For i = 0 To task.gridRects.Count - 1
+            cv.Cv2.MeanStdDev(src(task.gridRects(i)), colorMean, colorstdev)
+            Dim colorVec = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
+            Dim colorChange = distance3D(colorVec, lastColor(i))
+            If colorChange > task.colorDiffThreshold Then
+                lastColor(i) = colorVec
+                For Each index In task.grid.gridNeighbors(i)
+                    If motionList.Contains(index) = False Then
+                        motionFlags(index) = True
+                        motionList.Add(index)
+                    End If
+                Next
+            End If
+        Next
+
+        dst1.SetTo(0)
+        For Each i In motionList
+            dst1(task.gridRects(i)).SetTo(255)
+            motionFlags(i) = True
+        Next
+
+        task.motionPercent = motionList.Count / task.gridRects.Count
+        If task.motionPercent > 0.8 Then task.motionPercent = 1
+        labels(2) = Format(task.motionPercent, "00%") + " Of bricks had motion."
+
+        ' some cameras have low light images for the first few frames.
+        If task.gOptions.UseMotionMask.Checked = False Or task.motionPercent = 1 Then dst1.SetTo(255)
+
+        If standaloneTest() Then
+            If task.gOptions.UseMotionMask.Checked Then src.CopyTo(dst2, dst3)
+            Static diff As New Diff_Basics
+            diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            diff.Run(src)
+            dst3 = diff.dst2
+            SetTrueText("NOTE: the differences below should be small - no artifacts should be present." + vbCrLf +
+                        "Any differences that persist should not be visible in the RGB image at left." + vbCrLf, 3)
+        End If
+        If task.heartBeat Then dst2 = src.Clone
+        task.motionMask = dst1.Clone
     End Sub
 End Class
