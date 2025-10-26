@@ -66,7 +66,7 @@ Public Class GuidedBP_HotPointsKNN : Inherits TaskParent
             knn.queries.Add(New cv.Point2f(CSng(r.X + r.Width / 2), CSng(r.Y + r.Height / 2)))
         Next
 
-        If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        If knn.trainInput.Count = 0 Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
 
         knn.Run(emptyMat)
 
@@ -90,8 +90,8 @@ Public Class GuidedBP_HotPointsKNN : Inherits TaskParent
         dst2 = ptHot.dst2
         dst3 = ptHot.dst3
 
-        runKNN(knnTop, ptHot.topRects, dst2, 2)
-        runKNN(knnSide, ptHot.sideRects, dst3, 3)
+        If ptHot.topRects.Count > 0 Then runKNN(knnTop, ptHot.topRects, dst2, 2)
+        If ptHot.sideRects.Count > 0 Then runKNN(knnSide, ptHot.sideRects, dst3, 3)
 
         labels(2) = CStr(ptHot.topRects.Count) + " objects found in the top view"
         labels(3) = CStr(ptHot.sideRects.Count) + " objects found in the Side view"
@@ -265,11 +265,11 @@ Public Class GuidedBP_HotPoints : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         histTop.Run(src.Clone)
         topRects = hotPoints(histTop.dst3)
-        dst2 = PaletteFull(histTop.dst3)
+        dst2 = PaletteBlackZero(histTop.dst3)
 
         histSide.Run(src)
         sideRects = hotPoints(histSide.dst3)
-        dst3 = PaletteFull(histSide.dst3)
+        dst3 = PaletteBlackZero(histSide.dst3)
 
         If task.heartBeat Then labels(2) = "Top " + CStr(topRects.Count) + " objects identified in the top view."
         If task.heartBeat Then labels(3) = "Top " + CStr(sideRects.Count) + " objects identified in the side view."
@@ -343,6 +343,7 @@ Public Class GuidedBP_RedCloud : Inherits TaskParent
     Public rcMapX As New cv.Mat
     Public rcMapY As New cv.Mat
     Public Sub New()
+        task.redList = New RedList_Basics
         desc = "Identify each segment in the X and Y point cloud data"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

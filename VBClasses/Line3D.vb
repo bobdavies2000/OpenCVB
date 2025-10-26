@@ -209,7 +209,7 @@ End Class
 
 
 Public Class Line3D_Selection : Inherits TaskParent
-    Public lp As New lpData
+    Public lp As lpData
     Public debugRequest As Boolean
     Dim allPoints As New cv.Mat
     Public Sub New()
@@ -220,6 +220,7 @@ Public Class Line3D_Selection : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.lines.lpList.Count = 0 Then Exit Sub ' no lines found.
+        If lp Is Nothing Then lp = task.lines.lpList(0)
 
         If task.firstPass = False Then
             dst1(lp.rect).SetTo(0)
@@ -350,6 +351,8 @@ Public Class Line3D_DrawLines_Debug : Inherits TaskParent
         desc = "Use the debug slider in Global Options to select which line to test."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.lines.lpList.Count = 0 Then Exit Sub
+
         If task.heartBeatLT Then dst1.SetTo(0)
         Selection.Run(emptyMat)
         Dim lp = Selection.lp
