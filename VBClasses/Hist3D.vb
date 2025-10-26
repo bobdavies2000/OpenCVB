@@ -45,6 +45,7 @@ Public Class Hist3D_BuildHistogram : Inherits TaskParent
         If standaloneTest() Then
             task.gOptions.setHistogramBins(100)
             plot.Run(src)
+            If plot.histogram.Rows = 0 Then Exit Sub
             src = plot.histogram
         End If
 

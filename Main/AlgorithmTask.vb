@@ -100,7 +100,6 @@ Namespace OpenCVB
                 GrabRectangleData = False
                 Dim tmpDrawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio,
                                                           drawRect.Height / ratio)
-                task.drawRect = New cv.Rect
                 If tmpDrawRect.Width > 0 And tmpDrawRect.Height > 0 Then
                     If saveDrawRect <> tmpDrawRect Then
                         task.optionsChanged = True
@@ -169,7 +168,6 @@ Namespace OpenCVB
                 Dim saveworkRes = settings.workRes
                 mousePointCamPic = New cv.Point(task.workRes.Width / 2, task.workRes.Height / 2) ' mouse click point default = center of the image
 
-                Dim syncUI As Integer
                 While 1
                     Dim waitTime = Now
                     While 1

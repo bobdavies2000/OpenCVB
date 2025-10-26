@@ -328,6 +328,7 @@ Public Class KNN_N3BasicsTest : Inherits TaskParent
                 End If
             Next
         End If
+        If knn.queries.Count = 0 Then Exit Sub
 
         knn.Run(src)
 
@@ -1421,7 +1422,7 @@ End Class
 
 Public Class KNN_Hulls : Inherits TaskParent
     Dim knn As New KNN_Basics
-    Dim redC As New RedCloud_HeartBeat
+    Dim redC As New RedCloud_Basics
     Public matchList As New List(Of cv.Point2f)
     Public Sub New()
         knn.desiredMatches = 2
@@ -1431,6 +1432,7 @@ Public Class KNN_Hulls : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         redC.Run(src)
+        If redC.rcList.Count = 0 Then Exit Sub
         dst2 = redC.dst2.Clone
 
         knn.ptListQuery.Clear()

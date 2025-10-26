@@ -38,7 +38,6 @@ Namespace OpenCVB
             ' OpenGL apps cannot be debugged from OpenCVB and the camera interfaces are not likely to need debugging.
             ' To debug a camera interface: change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
             updatePath(HomeDir.FullName + "bin\", "Debug/Release version of CPP_Native.dll")
-            updatePath(HomeDir.FullName + "bin\Release\", "Release Version of camera DLL's.")
             Dim testDebug As New DirectoryInfo(HomeDir.FullName + "bin\Debug\")
             If testDebug.Exists Then
                 updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")

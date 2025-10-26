@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class MatchLine_BasicsAll : Inherits TaskParent
+Public Class MatchLine_Basics : Inherits TaskParent
     Public cameraMotionProxy As New lpData
     Dim match As New XO_MatchLine_Basics
     Public correlations As New List(Of Single)
@@ -64,7 +64,10 @@ Public Class MatchLine_BasicsOriginal : Inherits TaskParent
         If match.correlation < task.fCorrThreshold Or lpSave.p1 <> lpInput.p1 Or lpSave.p2 <> lpInput.p2 Then
             lpSave = lpInput
             ' default to longest line
-            If standalone Then lpInput = task.lines.lpList(0)
+            If standalone Then
+                If task.lines.lpList.Count = 0 Then Exit Sub
+                lpInput = task.lines.lpList(0)
+            End If
 
             Dim r = ValidateRect(New cv.Rect(Math.Min(lpInput.p1.X, lpInput.p2.X), Math.Min(lpInput.p1.Y, lpInput.p2.Y),
                                              Math.Abs(lpInput.p1.X - lpInput.p2.X), Math.Abs(lpInput.p1.Y - lpInput.p2.Y)))

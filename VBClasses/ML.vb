@@ -468,6 +468,7 @@ Public Class ML_LearnZfromXGray : Inherits TaskParent
 
         If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
         Dim mLearn As cv.Mat = cv.Mat.FromPixelData(mlInput.Count, 3, cv.MatType.CV_32F, mlInput.ToArray)
+        If mResponse.Count = 0 Then Exit Sub
         Dim response As cv.Mat = cv.Mat.FromPixelData(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
         rtree.Train(mLearn, cv.ML.SampleTypes.RowSample, response)
 
@@ -523,6 +524,7 @@ Public Class ML_LearnRegions : Inherits TaskParent
 
         If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
         Dim mLearn As cv.Mat = cv.Mat.FromPixelData(mlInput.Count, 3, cv.MatType.CV_32F, mlInput.ToArray)
+        If mResponse.Count = 0 Then Exit Sub
         Dim response As cv.Mat = cv.Mat.FromPixelData(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
         rtree.Train(mLearn, cv.ML.SampleTypes.RowSample, response)
 

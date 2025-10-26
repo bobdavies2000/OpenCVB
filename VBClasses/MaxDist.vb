@@ -67,6 +67,7 @@ Public Class MaxDist_NoRectangle : Inherits TaskParent
         For Each pc In task.redCloud.rcList
             ' This rcList will NOT use the rectangle of zeros (definitely need the rectangle!)
             Dim pcTest = MaxDist_Basics.setCloudData(pc.mask, pc.rect, rcList.Count + 1, False)
+            If pcTest Is Nothing Then Continue For
             If pcTest.index >= 0 Then
                 pcTest.color = pc.color
                 dst3(pcTest.rect).SetTo(pcTest.color, pcTest.mask)

@@ -256,6 +256,7 @@ Public Class Region_Depth : Inherits TaskParent
         connect.Run(src.Clone)
         task.rcPixelThreshold = task.brickSize * task.brickSize ' eliminate singles...
         redM.Run(Not connect.dst2)
+        If redM.mdList.Count = 0 Then Exit Sub
 
         dst1.SetTo(0)
         For Each md In redM.mdList

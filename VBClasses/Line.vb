@@ -583,7 +583,8 @@ Public Class Line_BrickList : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            If lp Is Nothing Then lp = task.lineLongest
+            lp = task.lineLongest
+            If lp.length = 0 Then Exit Sub
         End If
 
         dst3.SetTo(0)
@@ -954,6 +955,7 @@ Public Class Line_Stabilize : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         knnLine.Run(src)
+        If knnLine.lpOutput.Count = 0 Then Exit Sub
         labels(2) = knnLine.labels(2)
 
         If task.firstPass Then
@@ -1074,6 +1076,7 @@ Public Class Line_KNN : Inherits TaskParent
         desc = "Use KNN to determine which line is being selected with mouse."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on yet.
         dst2 = task.lines.dst2.Clone
         knn.trainInput.Clear()
         knn.queries.Clear()

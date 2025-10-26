@@ -37,11 +37,13 @@ Public Class Track_BasicsQT : Inherits TaskParent
     Public inputRect As cv.Rect
     Public trackerIndex As Integer = 1 ' default is "MIL" 
     Public Sub New()
-        If standalone Then task.drawRect = New cv.Rect(25, 25, 25, 25)
+        If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then
+            task.drawRect = New cv.Rect(25, 25, 25, 25)
+        End If
         desc = "Use C++ to track objects.  Results are poor compared to Match_DrawRect"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then
+        If task.optionsChanged Or cPtr = 0 Then
             If cPtr <> 0 Then Track_Basics_Close(cPtr)
             cPtr = Track_Basics_Open(trackerIndex)
             If standalone Then inputRect = task.drawRect
@@ -51,6 +53,7 @@ Public Class Track_BasicsQT : Inherits TaskParent
         Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
         Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
         Dim r = inputRect
+        If r.Width = 0 Or r.Height = 0 Then r = task.drawRect
         Dim imagePtr = Track_Basics_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, r.X, r.Y, r.Width, r.Height)
         handleSrc.Free()
 
@@ -109,7 +112,7 @@ Public Class Track_GridRect : Inherits TaskParent
         If lpList.Count = 0 Then Exit Sub
 
         Static searchRect As cv.Rect, originalRect As cv.Rect
-        If task.heartBeatLT Then
+        If searchRect.Width = 0 Or searchRect.Height = 0 Then
             Dim gridIndex = task.gridMap.Get(Of Integer)(lpList(0).p1.Y, lpList(0).p1.X)
             originalRect = task.gridRects(gridIndex)
             searchRect = task.gridNabeRects(gridIndex)

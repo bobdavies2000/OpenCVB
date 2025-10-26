@@ -1186,6 +1186,7 @@ Public Class Hist_Depth : Inherits TaskParent
         Else
             If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
             mm = GetMinMax(src)
+            If mm.minVal = mm.maxVal Then Exit Sub
             plotHist.minRange = mm.minVal ' because OpenCV's histogram makes the ranges exclusive.
             plotHist.maxRange = mm.maxVal
         End If
@@ -1267,6 +1268,7 @@ Public Class Hist_DepthSimple : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             mm = GetMinMax(task.pcSplit(2))
+            If mm.minVal = mm.maxVal Then Exit Sub
             ranges = {New cv.Rangef(mm.minVal, mm.maxVal)}
         End If
 

@@ -43,10 +43,8 @@ Public Class Stable_Basics : Inherits TaskParent
         Return angleDegrees
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
-            lp = task.lineLongest
-            If task.firstPass Then lpLast = lp
-        End If
+        If standalone Then lp = task.lineLongest
+        If lpLast Is Nothing Then lpLast = lp
 
         Dim rotateAngle = GetAngleBetweenLinesBySlopes(lp.slope, lpLast.slope)
         If rotateAngle <> 0 Then
