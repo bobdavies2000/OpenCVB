@@ -30,6 +30,10 @@ Public Class RedColor_Basics : Inherits TaskParent
         Dim rects(classCount * 4) As Integer
         Marshal.Copy(rectData.Data, rects, 0, rects.Length)
 
+
+        Dim rcListLast = New List(Of rcData)(rcList)
+        Dim rcMapLast As cv.Mat = rcMap.Clone
+
         Dim minPixels As Integer = dst2.Total * 0.001
         rcList.Clear()
         Dim index As Integer = 1
@@ -44,9 +48,29 @@ Public Class RedColor_Basics : Inherits TaskParent
             index += 1
         Next
 
+        Dim r2 As cv.Rect
+        Dim count As Integer
         For Each rc In rcList
+            Dim r1 = rc.rect
+            r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
+            Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
+            If indexLast > 0 And indexLast < rcListLast.Count Then
+                r2 = rcListLast(indexLast).rect
+            Else
+                indexLast = -1
+            End If
+            If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
+                rc = rcListLast(indexLast)
+                rc.age += 1
+                If rc.age >= 1000 Then rc.age = 2
+                count += 1
+            End If
+            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+
             dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+            SetTrueText(CStr(rc.age), rc.maxDist)
         Next
+
         labels(2) = CStr(rcList.Count) + " cells found. CV_8U image had " + CStr(classCount) + " cells, " +
                     "excluding cells less than " + CStr(minPixels)
     End Sub
