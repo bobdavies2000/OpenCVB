@@ -4034,17 +4034,6 @@ extern "C" __declspec(dllexport) int* RedCloudMaxDist_Rects(RedCloudMaxDist* cPt
     return (int*)&cPtr->cellRects[0];
 }
 
-extern "C" __declspec(dllexport) void
-RedCloudMaxDist_SetPoints(RedCloudMaxDist* cPtr, int count, int* dataPtr)
-{
-    Mat maxList = Mat(count, 1, CV_32SC2, dataPtr);
-    cPtr->maxList.clear();
-    for (int i = 0; i < count; i++)
-    {
-        cPtr->maxList.push_back(maxList.at<Point>(i, 0));
-    }
-}
-
 extern "C" __declspec(dllexport) int* RedCloudMaxDist_Close(RedCloudMaxDist* cPtr) { delete cPtr; return (int*)0; }
 extern "C" __declspec(dllexport) int*
 RedCloudMaxDist_Run(RedCloudMaxDist* cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols)

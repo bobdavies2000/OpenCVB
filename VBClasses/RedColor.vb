@@ -1,11 +1,69 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class RedColor_Basics : Inherits TaskParent
-    Public redSweep As New RedColor_Sweep
+    Public classCount As Integer
     Public rcList As New List(Of rcData)
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         task.redColor = Me
+        cPtr = RedCloudMaxDist_Open()
+        desc = "Run the C++ RedCloudMaxDist interface without a mask"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1 = srcMustBe8U(src)
+
+        Dim imagePtr As IntPtr
+        Dim inputData(dst1.Total - 1) As Byte
+        Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, dst1.Rows, dst1.Cols)
+        handleInput.Free()
+        dst0 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
+
+        classCount = RedCloudMaxDist_Count(cPtr)
+
+        If classCount = 0 Then Exit Sub ' no data to process.
+
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr))
+
+        Dim rects(classCount * 4) As Integer
+        Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+
+        Dim minPixels As Integer = dst2.Total * 0.001
+        rcList.Clear()
+        Dim index As Integer = 1
+        dst2.SetTo(0)
+        For i = 0 To rects.Length - 4 Step 4
+            Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
+            Dim rc = New rcData(dst0(r), r, index)
+            If rc.index < 0 Or rc.pixels < minPixels Then Continue For
+            rcList.Add(rc)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            index += 1
+        Next
+
+        For Each rc In rcList
+            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+        Next
+        labels(2) = CStr(rcList.Count) + " cells found. CV_8U image had " + CStr(classCount) + " cells, " +
+                    "excluding cells less than " + CStr(minPixels)
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedCloudMaxDist_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedColor_BasicsSlow : Inherits TaskParent
+    Public redSweep As New RedColor_Sweep
+    Public rcList As New List(Of rcData)
+    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Track the RedColor cells from RedColor_Core"
     End Sub
@@ -52,65 +110,6 @@ Public Class RedColor_Basics : Inherits TaskParent
         RedCell_Basics.selectCell(rcMap, rcList)
         If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
         SetTrueText(strOut, 1)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class RedColor_BasicsNew : Inherits TaskParent
-    Public classCount As Integer
-    Public rcList As New List(Of rcData)
-    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public Sub New()
-        cPtr = RedCloudMaxDist_Open()
-        desc = "Run the C++ RedCloudMaxDist interface without a mask"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = srcMustBe8U(src)
-
-        Dim imagePtr As IntPtr
-        Dim inputData(dst1.Total - 1) As Byte
-        Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
-        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-        imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, dst1.Rows, dst1.Cols)
-        handleInput.Free()
-        dst3 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
-
-        classCount = RedCloudMaxDist_Count(cPtr)
-        labels(3) = "CV_8U version with " + CStr(classCount) + " cells."
-
-        If classCount = 0 Then Exit Sub ' no data to process.
-
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr))
-
-        Dim rects(classCount * 4) As Integer
-        Marshal.Copy(rectData.Data, rects, 0, rects.Length)
-
-        Dim minPixels = dst2.Total * 0.001
-        rcList.Clear()
-        Dim index As Integer = 1
-        For i = 0 To rects.Length - 4 Step 4
-            Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
-            If r.Width * r.Height >= minPixels Then
-                Dim rc = New rcData(dst3(r), r, index)
-                If rc.index < 0 Then Continue For
-                rcList.Add(rc)
-                index += 1
-            End If
-        Next
-
-        dst2.SetTo(0)
-        For Each rc In rcList
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-        Next
-        labels(2) = CStr(rcList.Count) + " cells were found.  "
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = RedCloudMaxDist_Close(cPtr)
     End Sub
 End Class
 
@@ -168,7 +167,7 @@ End Class
 
 
 Public Class RedColor_HeartBeat : Inherits TaskParent
-    Dim redCore As New RedColor_Basics
+    Dim redCore As New RedColor_BasicsSlow
     Public rcList As New List(Of rcData)
     Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
@@ -293,5 +292,31 @@ Public Class RedColor_Sweep : Inherits TaskParent
         End If
 
         labels(2) = CStr(rcList.Count) + " regions were identified "
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedColor_LeftRight : Inherits TaskParent
+    Dim redLeft As New RedColor_Basics
+    Dim redRight As New RedColor_Basics
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        desc = "Display the RedColor_Basics output for both the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        reduction.Run(task.leftView)
+
+        redLeft.Run(reduction.dst2)
+        dst2 = PaletteFull(redLeft.dst2)
+        labels(2) = redLeft.labels(2) + " in the left image"
+
+        reduction.Run(task.rightView)
+
+        redRight.Run(reduction.dst2)
+        dst3 = PaletteFull(redRight.dst2)
+        labels(3) = redRight.labels(2) + " in the right image"
     End Sub
 End Class

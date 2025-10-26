@@ -775,9 +775,6 @@ Module TaskExterns
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloudMaxDist_Sizes(cPtr As IntPtr) As IntPtr
     End Function
 
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub RedCloudMaxDist_SetPoints(cPtr As IntPtr, count As Integer, maxList As IntPtr)
-    End Sub
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloudMaxDist_Count(cPtr As IntPtr) As Integer
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloudMaxDist_Run(

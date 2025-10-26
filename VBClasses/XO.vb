@@ -14302,19 +14302,12 @@ End Class
 Public Class XO_RedColor_BasicsFast : Inherits TaskParent
     Public classCount As Integer
     Public RectList As New List(Of cv.Rect)
-    Public maxList As New List(Of Integer)
     Public Sub New()
         cPtr = RedCloudMaxDist_Open()
         desc = "Run the C++ RedCloudMaxDist interface without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1 = srcMustBe8U(src)
-
-        If task.heartBeat Then maxList.Clear() ' reevaluate all cells.
-        Dim maxArray = maxList.ToArray
-        Dim handleMaxList = GCHandle.Alloc(maxArray, GCHandleType.Pinned)
-        RedCloudMaxDist_SetPoints(cPtr, maxList.Count / 2, handleMaxList.AddrOfPinnedObject())
-        handleMaxList.Free()
 
         Dim imagePtr As IntPtr
         Dim inputData(dst1.Total - 1) As Byte

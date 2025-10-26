@@ -151,7 +151,6 @@ End Class
 
 Public Class Bin2Way_RedColor : Inherits TaskParent
     Dim bin2 As New Bin2Way_Gradation
-    Dim redC As New RedColor_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Identify 4 gradations of light and combine them for input to RedColor"
@@ -159,15 +158,14 @@ Public Class Bin2Way_RedColor : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         bin2.Run(src)
 
-        redC.Run(bin2.dst3)
-        labels(2) = redC.labels(2)
+        runRedColor(bin2.dst3, labels(2))
 
-        dst2.SetTo(0)
-        For Each rc In redC.rcList
-            dst2(rc.rect).SetTo(rc.index, rc.mask)
+        dst1.SetTo(0)
+        For Each rc In task.redColor.rcList
+            dst1(rc.rect).SetTo(rc.index, rc.mask)
         Next
 
-        dst3 = PaletteFull(dst2)
+        dst2 = PaletteFull(dst1)
     End Sub
 End Class
 

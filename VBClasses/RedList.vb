@@ -855,28 +855,5 @@ End Class
 
 
 
-Public Class RedList_LeftRight : Inherits TaskParent
-    Dim redLeft As New RedColor_Basics
-    Dim redRight As New RedColor_Basics
-    Public Sub New()
-        desc = "Display the RedList_Basics output for both the left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        redLeft.Run(task.leftView)
-        dst0 = redLeft.dst2
-        dst2 = PaletteFull(dst0)
-        labels(2) = redLeft.labels(2) + " in the left image"
-
-        redRight.Run(task.rightView)
-        dst1 = redRight.dst2
-        dst3 = PaletteFull(dst1)
-        labels(3) = redRight.labels(2) + " in the right image"
-    End Sub
-End Class
-
-
-
-
-
 
 
