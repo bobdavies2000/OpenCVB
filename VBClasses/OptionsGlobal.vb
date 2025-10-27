@@ -132,7 +132,6 @@ Public Class OptionsGlobal
         task.gOptions.DotSizeSlider.Value = task.DotSize
         task.gOptions.LineWidth.Value = task.DotSize
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
-        DepthDiffSlider.Value = 100
 
         For i = 0 To colorMethods.Count - 1
             Dim method = colorMethods(i)
@@ -234,10 +233,6 @@ Public Class OptionsGlobal
     End Sub
     Private Sub DebugSliderSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
-    End Sub
-    Private Sub DepthDiffSlider_ValueChanged(sender As Object, e As EventArgs) Handles DepthDiffSlider.ValueChanged
-        task.optionsChanged = True
-        DepthDiffLabel.Text = CStr(DepthDiffSlider.Value)
     End Sub
     Private Sub useCloudHistory_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True

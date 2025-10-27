@@ -30,9 +30,6 @@ Partial Class OptionsGlobal
         DebugSlider = New TrackBar()
         DebugSliderLabel = New Label()
         DebugCheckBox = New CheckBox()
-        DepthDiffSlider = New TrackBar()
-        DepthDiffLabel = New Label()
-        Label10 = New Label()
         PixelDiffBar = New TrackBar()
         PixelDiff = New Label()
         Label8 = New Label()
@@ -82,7 +79,6 @@ Partial Class OptionsGlobal
         TrackingMeanColor = New RadioButton()
         GroupBox1.SuspendLayout()
         CType(DebugSlider, ComponentModel.ISupportInitialize).BeginInit()
-        CType(DepthDiffSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(PixelDiffBar, ComponentModel.ISupportInitialize).BeginInit()
         CType(HistBinBar, ComponentModel.ISupportInitialize).BeginInit()
         CType(GridSlider, ComponentModel.ISupportInitialize).BeginInit()
@@ -113,9 +109,6 @@ Partial Class OptionsGlobal
         GroupBox1.Controls.Add(DebugSlider)
         GroupBox1.Controls.Add(DebugSliderLabel)
         GroupBox1.Controls.Add(DebugCheckBox)
-        GroupBox1.Controls.Add(DepthDiffSlider)
-        GroupBox1.Controls.Add(DepthDiffLabel)
-        GroupBox1.Controls.Add(Label10)
         GroupBox1.Controls.Add(PixelDiffBar)
         GroupBox1.Controls.Add(PixelDiff)
         GroupBox1.Controls.Add(Label8)
@@ -188,36 +181,6 @@ Partial Class OptionsGlobal
         DebugCheckBox.TabIndex = 19
         DebugCheckBox.Text = "DebugCheckbox - task.gOptions.DebugChecked - use anywhere to inject a value"
         DebugCheckBox.UseVisualStyleBackColor = True
-        ' 
-        ' DepthDiffSlider
-        ' 
-        DepthDiffSlider.Location = New Point(229, 364)
-        DepthDiffSlider.Margin = New Padding(4)
-        DepthDiffSlider.Maximum = 1000
-        DepthDiffSlider.Minimum = 1
-        DepthDiffSlider.Name = "DepthDiffSlider"
-        DepthDiffSlider.Size = New Size(548, 69)
-        DepthDiffSlider.TabIndex = 15
-        DepthDiffSlider.Value = 5
-        ' 
-        ' DepthDiffLabel
-        ' 
-        DepthDiffLabel.AutoSize = True
-        DepthDiffLabel.Location = New Point(803, 376)
-        DepthDiffLabel.Margin = New Padding(4, 0, 4, 0)
-        DepthDiffLabel.Name = "DepthDiffLabel"
-        DepthDiffLabel.Size = New Size(157, 30)
-        DepthDiffLabel.TabIndex = 14
-        DepthDiffLabel.Text = "DepthDiffLabel"
-        ' 
-        ' Label10
-        ' 
-        Label10.Location = New Point(20, 364)
-        Label10.Margin = New Padding(4, 0, 4, 0)
-        Label10.Name = "Label10"
-        Label10.Size = New Size(203, 70)
-        Label10.TabIndex = 13
-        Label10.Text = "Depth Difference Threshold (mm's)"
         ' 
         ' PixelDiffBar
         ' 
@@ -763,7 +726,6 @@ Partial Class OptionsGlobal
         GroupBox1.ResumeLayout(False)
         GroupBox1.PerformLayout()
         CType(DebugSlider, ComponentModel.ISupportInitialize).EndInit()
-        CType(DepthDiffSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(PixelDiffBar, ComponentModel.ISupportInitialize).EndInit()
         CType(HistBinBar, ComponentModel.ISupportInitialize).EndInit()
         CType(GridSlider, ComponentModel.ISupportInitialize).EndInit()
@@ -795,9 +757,6 @@ Partial Class OptionsGlobal
     Friend WithEvents GridSlider As TrackBar
     Friend WithEvents GridSizeLabel As Label
     Friend WithEvents Label4 As Label
-    Friend WithEvents DepthDiffSlider As TrackBar
-    Friend WithEvents DepthDiffLabel As Label
-    Friend WithEvents Label10 As Label
     Friend WithEvents PixelDiffBar As TrackBar
     Friend WithEvents PixelDiff As Label
     Friend WithEvents Label8 As Label

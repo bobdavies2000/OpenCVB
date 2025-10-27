@@ -7979,6 +7979,7 @@ Public Class Options_Features : Inherits OptionParent
     Public pixelThreshold As Integer = 8
     Public Sub New()
         If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Depth Difference Threshold", 1, 1000, 100)
             sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
             sliders.setupTrackBar("k X1000", 1, 1000, k * 1000)
             sliders.setupTrackBar("Threshold for EndPoint comparisons", 0, 20, pixelThreshold)
@@ -7990,6 +7991,7 @@ Public Class Options_Features : Inherits OptionParent
         resyncThreshold = options.resyncThreshold
         agastThreshold = options.agastThreshold
 
+        Static diffSlider = OptionParent.FindSlider("Depth Difference Threshold")
         Static qualitySlider = OptionParent.FindSlider("Quality Level")
         Static kSlider = OptionParent.FindSlider("k X1000")
         Static vertRadio = findRadio("Vertical lines")
@@ -7999,6 +8001,8 @@ Public Class Options_Features : Inherits OptionParent
 
         Static thresholdSlider = FindSlider("Threshold for EndPoint comparisons")
         pixelThreshold = thresholdSlider.value
+
+        task.depthDiffMeters = diffSlider.value / 1000
     End Sub
 End Class
 

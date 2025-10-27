@@ -343,12 +343,15 @@ End Class
 
 
 Public Class Quad_Boundaries : Inherits TaskParent
+    Dim options As New Options_Features
     Public Sub New()
         If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         labels(2) = "Depth differences large enough to label them boundaries"
         desc = "Find large differences in depth between cells that could provide boundaries."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         dst2 = task.bricks.dst2.Clone
         Dim width = dst2.Width / task.brickSize
         Dim height = dst2.Height / task.brickSize

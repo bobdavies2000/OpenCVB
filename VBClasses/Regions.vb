@@ -133,6 +133,7 @@ Public Class Region_Core : Inherits TaskParent
     Public width As Integer, height As Integer
     Dim colStart As Integer, colEnd As Integer, colorIndex As Integer
     Dim rowStart As Integer, bottomRight As cv.Point, topLeft As cv.Point
+    Dim options As New Options_Features
     Public Sub New()
         If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         desc = "Connect cells that are close in depth"
@@ -161,6 +162,8 @@ Public Class Region_Core : Inherits TaskParent
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         dst2.SetTo(0)
         dst3.SetTo(0)
 

@@ -586,12 +586,15 @@ End Class
 
 
 Public Class Cloud_Continuous_VB : Inherits TaskParent
+    Dim options As New Options_Features
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Show where the pointcloud is continuous"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         Dim input = src
         If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
 
@@ -607,8 +610,8 @@ Public Class Cloud_Continuous_VB : Inherits TaskParent
 
         dst3.SetTo(0, task.noDepthMask)
         dst2.SetTo(0, task.noDepthMask)
-        labels(2) = "White pixels: Z-values within " + CStr(task.depthDiffMeters) + " mm's of X neighbor"
-        labels(3) = "Mask showing discontinuities > " + CStr(task.depthDiffMeters) + " mm's of X neighbor"
+        labels(2) = "White pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of X neighbor"
+        labels(3) = "Mask showing discontinuities > " + CStr(task.depthDiffMeters) + " meters of X neighbor"
     End Sub
 End Class
 
@@ -618,6 +621,7 @@ End Class
 
 
 Public Class Cloud_Continuous_GridX : Inherits TaskParent
+    Dim options As New Options_Features
     Public Sub New()
         If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -625,6 +629,8 @@ Public Class Cloud_Continuous_GridX : Inherits TaskParent
         desc = "Show where the pointcloud is continuous at the brick resolution"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         Dim input = src
         If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
 
@@ -653,12 +659,15 @@ End Class
 
 
 Public Class Cloud_Continuous_GridXY : Inherits TaskParent
+    Dim options As New Options_Features
     Public Sub New()
         If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Show where the pointcloud is continuous at the brick resolution"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         Dim input = src
         If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
 
