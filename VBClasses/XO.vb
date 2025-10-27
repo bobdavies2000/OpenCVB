@@ -14314,7 +14314,7 @@ Public Class XO_RedColor_BasicsFast : Inherits TaskParent
         Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, dst1.Rows, dst1.Cols)
+        imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
         handleInput.Free()
         dst2 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
         dst3 = PaletteFull(dst2)

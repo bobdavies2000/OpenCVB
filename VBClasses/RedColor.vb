@@ -17,7 +17,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, dst1.Rows, dst1.Cols)
+        imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
         handleInput.Free()
         dst0 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
@@ -48,31 +48,40 @@ Public Class RedColor_Basics : Inherits TaskParent
             index += 1
         Next
 
-        Dim r2 As cv.Rect
-        Dim count As Integer
-        For Each rc In rcList
-            Dim r1 = rc.rect
-            r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
-            Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
-            If indexLast > 0 And indexLast < rcListLast.Count Then
-                r2 = rcListLast(indexLast).rect
-            Else
-                indexLast = -1
-            End If
-            If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
-                rc = rcListLast(indexLast)
-                rc.age += 1
-                If rc.age >= 1000 Then rc.age = 2
-                count += 1
-            End If
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+        'If task.firstPass = False Then
+        '    For Each rc In rcList
+        '        Dim c = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+        '        rc.color = New cv.Scalar(c(0), c(1), c(2))
+        '        dst2(rc.rect).SetTo(rc.color, rc.mask)
+        '        SetTrueText(CStr(rc.age), rc.maxDist)
+        '    Next
+        'End If
 
-            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-            SetTrueText(CStr(rc.age), rc.maxDist)
-        Next
+        'Dim r2 As cv.Rect
+        'Dim count As Integer
+        'For Each rc In rcList
+        '    Dim r1 = rc.rect
+        '    r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
+        '    Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
+        '    If indexLast > 0 And indexLast < rcListLast.Count Then
+        '        r2 = rcListLast(indexLast).rect
+        '    Else
+        '        indexLast = -1
+        '    End If
+        '    If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
+        '        rc = rcListLast(indexLast)
+        '        rc.age += 1
+        '        If rc.age >= 1000 Then rc.age = 2
+        '        count += 1
+        '    End If
+        '    rcMap(rc.rect).SetTo(rc.index, rc.mask)
 
-        labels(2) = CStr(rcList.Count) + " cells found. CV_8U image had " + CStr(classCount) + " cells, " +
-                    "excluding cells less than " + CStr(minPixels)
+        '    dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+        '    SetTrueText(CStr(rc.age), rc.maxDist)
+        'Next
+
+        'labels(2) = CStr(rcList.Count) + " cells found. CV_8U image had " + CStr(classCount) + " cells, " +
+        '            "excluding cells less than " + CStr(minPixels)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedCloudMaxDist_Close(cPtr)
@@ -157,7 +166,7 @@ Public Class RedColor_BasicsFast : Inherits TaskParent
         Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, dst1.Rows, dst1.Cols)
+        imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
         handleInput.Free()
         dst3 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
         dst2 = PaletteFull(dst3)
