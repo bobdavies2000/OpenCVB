@@ -25,7 +25,8 @@ Public Class RedColor_Basics : Inherits TaskParent
 
         If classCount = 0 Then Exit Sub ' no data to process.
 
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr))
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4,
+                                            RedCloudMaxDist_Rects(cPtr))
 
         Dim rects(classCount * 4) As Integer
         Marshal.Copy(rectData.Data, rects, 0, rects.Length)
@@ -36,14 +37,12 @@ Public Class RedColor_Basics : Inherits TaskParent
 
         Dim minPixels As Integer = dst2.Total * 0.001
         Dim index As Integer = 1
-        dst2.SetTo(0)
         Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To rects.Length - 4 Step 4
             Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
             Dim rc = New rcData(dst0(r), r, index)
             If rc.pixels < minPixels Then Continue For
             newList.Add(rc.pixels, rc)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
             index += 1
         Next
 
@@ -62,27 +61,30 @@ Public Class RedColor_Basics : Inherits TaskParent
             End If
             If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                 rc.age = rcListLast(indexLast).age + 1
+                rc.color = rcListLast(indexLast).color
                 If rc.age >= 1000 Then rc.age = 2
                 count += 1
             End If
 
-            Dim c = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-            rc.color = New cv.Scalar(c(0), c(1), c(2))
-
             rc.index = rcList.Count + 1
             rcList.Add(rc)
             rcMap(rc.rect).SetTo(rc.index, rc.mask)
-
-            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
             SetTrueText(CStr(rc.age), rc.maxDist)
+        Next
+
+        dst2.SetTo(0)
+        For Each rc In rcList
+            rc.mask = rcMap(rc.rect).InRange(rc.index, rc.index)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
         Next
 
         RedCell_Basics.selectCell(rcMap, rcList)
         If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
         SetTrueText(strOut, 3)
 
-        labels(2) = CStr(classCount) + " cells found. " + CStr(rcList.Count) + " > " + CStr(minPixels) +
-                    " pixels (" + Format(rcList.Count / classCount, "0%") + ").  " + CStr(count) +
+        labels(2) = CStr(classCount) + " cells found. " + CStr(rcList.Count) + " > " +
+                    " minpixels (" + Format(rcList.Count / classCount, "0%") + ").  " + CStr(count) +
                     " matched to previous generation"
     End Sub
     Public Sub Close()
