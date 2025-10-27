@@ -1,5 +1,30 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedCC_Basics : Inherits TaskParent
+    Public Sub New()
+        desc = "Map the colors in the point cloud."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedCloud(src, labels(2))
+        dst3 = runRedColor(src, labels(3))
+
+        If standaloneTest() Then
+            For Each rc In task.redCloud.rcList
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+                SetTrueText(CStr(rc.age), rc.maxDist)
+            Next
+
+            For Each rc In task.redColor.rcList
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+                SetTrueText(CStr(rc.age), rc.maxDist)
+            Next
+        End If
+    End Sub
+End Class
+
+
+
+
+Public Class RedCC_Color8U : Inherits TaskParent
     Public color8u As New Color8U_Basics
     Public Sub New()
         desc = "Map the colors in the point cloud."
@@ -56,7 +81,7 @@ End Class
 
 Public Class RedCC_Histograms : Inherits TaskParent
     Dim hist As New Hist_Basics
-    Public redCC As New RedCC_Basics
+    Public redCC As New RedCC_Color8U
     Public Sub New()
         desc = "Add Color8U id's to each RedCloud cell."
     End Sub
