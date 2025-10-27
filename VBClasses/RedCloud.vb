@@ -7,17 +7,15 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Public percentImage As Single
     Public Sub New()
         task.redCloud = Me
-        If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Build contours for each cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         redSweep.Run(src)
-        dst3 = redSweep.dst3
         labels(3) = redSweep.labels(3)
         labels(2) = redSweep.labels(2) + If(standalone, "  Number is cell age", "")
 
-        Static rcListLast = New List(Of rcData)(rcList)
-        Static rcMapLast As cv.Mat = rcMap.Clone
+        Dim rcListLast = New List(Of rcData)(rcList)
+        Dim rcMapLast As cv.Mat = rcMap.Clone
 
         rcList.Clear()
         Dim r2 As cv.Rect
@@ -60,12 +58,11 @@ Public Class RedCloud_Basics : Inherits TaskParent
             SetTrueText(CStr(rc.age), rc.maxDist)
         Next
 
-        RedCell_Basics.selectCell(rcMap, rcList)
-        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
-        SetTrueText(strOut, 1)
-
-        rcListLast = New List(Of rcData)(rcList)
-        rcMapLast = rcMap.Clone
+        If standaloneTest() Then
+            RedCell_Basics.selectCell(rcMap, rcList)
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            SetTrueText(strOut, 3)
+        End If
     End Sub
 End Class
 

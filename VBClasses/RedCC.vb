@@ -14,9 +14,19 @@ Public Class RedCC_Basics : Inherits TaskParent
             Next
 
             For Each rc In task.redColor.rcList
-                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-                SetTrueText(CStr(rc.age), rc.maxDist)
+                dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+                SetTrueText(CStr(rc.age), rc.maxDist, 3)
             Next
+        End If
+
+        Static picTag As Integer
+        If task.mouseClickFlag Then picTag = task.mousePicTag
+        If picTag = 2 Then
+            RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            If task.rcD IsNot Nothing Then dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
+        Else
+            RedCell_Basics.selectCell(task.redColor.rcMap, task.redColor.rcList)
+            If task.rcD IsNot Nothing Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
         End If
     End Sub
 End Class

@@ -775,6 +775,15 @@ Public Class rcData
         cv.Cv2.DrawContours(hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
         Return hullMask
     End Function
+    Public Sub buildMaxDist()
+        Dim tmp As cv.Mat = mask.Clone
+        ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle.
+        tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+        Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
+        Dim mm As mmData = GetMinMax(distance32f)
+        maxDist.X = mm.maxLoc.X + rect.X
+        maxDist.Y = mm.maxLoc.Y + rect.Y
+    End Sub
     Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer)
         mask = _mask.InRange(_index, _index)
         index = -1 ' assume it is not going to be valid...
@@ -789,13 +798,7 @@ Public Class rcData
             ' keep the hull points around (there aren't many of them.)
             hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
 
-            Dim tmp As cv.Mat = mask.Clone
-            ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle.
-            tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-            Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
-            Dim mm As mmData = GetMinMax(distance32f)
-            maxDist.X = mm.maxLoc.X + rect.X
-            maxDist.Y = mm.maxLoc.Y + rect.Y
+            buildMaxDist()
 
             color = task.vecColors(index)
             pixels = mask.CountNonZero

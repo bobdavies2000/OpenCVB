@@ -49,6 +49,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         Dim r2 As cv.Rect
         Dim count As Integer
         rcList.Clear()
+        Dim usedColor As New List(Of cv.Scalar)
         For Each rc In newList.Values
             Dim r1 = rc.rect
             r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
@@ -66,6 +67,12 @@ Public Class RedColor_Basics : Inherits TaskParent
                 count += 1
             End If
 
+            If usedColor.Contains(rc.color) Then
+                rc.color = randomCellColor()
+                rc.age = 1
+            End If
+            usedColor.Add(rc.color)
+
             rc.index = rcList.Count + 1
             rcList.Add(rc)
             rcMap(rc.rect).SetTo(rc.index, rc.mask)
@@ -75,15 +82,18 @@ Public Class RedColor_Basics : Inherits TaskParent
         dst2.SetTo(0)
         For Each rc In rcList
             rc.mask = rcMap(rc.rect).InRange(rc.index, rc.index)
+            rc.buildMaxDist()
             dst2(rc.rect).SetTo(rc.color, rc.mask)
             dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
         Next
 
-        RedCell_Basics.selectCell(rcMap, rcList)
-        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
-        SetTrueText(strOut, 3)
+        If standaloneTest() Then
+            RedCell_Basics.selectCell(rcMap, rcList)
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            SetTrueText(strOut, 3)
+        End If
 
-        labels(2) = CStr(classCount) + " cells found. " + CStr(rcList.Count) + " > " +
+        labels(2) = CStr(classCount) + " cells found. " + CStr(rcList.Count) + " >" +
                     " minpixels (" + Format(rcList.Count / classCount, "0%") + ").  " + CStr(count) +
                     " matched to previous generation"
     End Sub
