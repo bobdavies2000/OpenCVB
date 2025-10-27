@@ -35,53 +35,55 @@ Public Class RedColor_Basics : Inherits TaskParent
         Dim rcMapLast As cv.Mat = rcMap.Clone
 
         Dim minPixels As Integer = dst2.Total * 0.001
-        rcList.Clear()
         Dim index As Integer = 1
         dst2.SetTo(0)
+        Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To rects.Length - 4 Step 4
             Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
             Dim rc = New rcData(dst0(r), r, index)
-            If rc.index < 0 Or rc.pixels < minPixels Then Continue For
-            rcList.Add(rc)
+            If rc.pixels < minPixels Then Continue For
+            newList.Add(rc.pixels, rc)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
             index += 1
         Next
 
-        'If task.firstPass = False Then
-        '    For Each rc In rcList
-        '        Dim c = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-        '        rc.color = New cv.Scalar(c(0), c(1), c(2))
-        '        dst2(rc.rect).SetTo(rc.color, rc.mask)
-        '        SetTrueText(CStr(rc.age), rc.maxDist)
-        '    Next
-        'End If
+        Dim r2 As cv.Rect
+        Dim count As Integer
+        rcList.Clear()
+        For Each rc In newList.Values
+            Dim r1 = rc.rect
+            r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
+            Dim indexLast As Integer = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If indexLast > 0 And indexLast < rcListLast.Count Then
+                indexLast -= 1 ' index is 1 less than the rcMap value
+                r2 = rcListLast(indexLast).rect
+            Else
+                indexLast = -1
+            End If
+            If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
+                rc.age = rcListLast(indexLast).age + 1
+                If rc.age >= 1000 Then rc.age = 2
+                count += 1
+            End If
 
-        'Dim r2 As cv.Rect
-        'Dim count As Integer
-        'For Each rc In rcList
-        '    Dim r1 = rc.rect
-        '    r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
-        '    Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
-        '    If indexLast > 0 And indexLast < rcListLast.Count Then
-        '        r2 = rcListLast(indexLast).rect
-        '    Else
-        '        indexLast = -1
-        '    End If
-        '    If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
-        '        rc = rcListLast(indexLast)
-        '        rc.age += 1
-        '        If rc.age >= 1000 Then rc.age = 2
-        '        count += 1
-        '    End If
-        '    rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            Dim c = dst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+            rc.color = New cv.Scalar(c(0), c(1), c(2))
 
-        '    dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-        '    SetTrueText(CStr(rc.age), rc.maxDist)
-        'Next
+            rc.index = rcList.Count + 1
+            rcList.Add(rc)
+            rcMap(rc.rect).SetTo(rc.index, rc.mask)
 
-        'labels(2) = CStr(rcList.Count) + " cells found. CV_8U image had " + CStr(classCount) + " cells, " +
-        '            "excluding cells less than " + CStr(minPixels)
+            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+            SetTrueText(CStr(rc.age), rc.maxDist)
+        Next
+
+        RedCell_Basics.selectCell(rcMap, rcList)
+        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+        SetTrueText(strOut, 3)
+
+        labels(2) = CStr(classCount) + " cells found. " + CStr(rcList.Count) + " > " + CStr(minPixels) +
+                    " pixels (" + Format(rcList.Count / classCount, "0%") + ").  " + CStr(count) +
+                    " matched to previous generation"
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedCloudMaxDist_Close(cPtr)

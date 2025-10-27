@@ -757,7 +757,7 @@ End Class
 
 
 Public Class rcData
-    Public age As Integer
+    Public age As Integer = 1
     Public color As cv.Scalar
     Public colorIDs As List(Of Integer) ' this list of ID's for color8u output 
     Public depth As Single
