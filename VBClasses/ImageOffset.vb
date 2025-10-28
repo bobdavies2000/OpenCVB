@@ -1,18 +1,17 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 Public Class ImageOffset_Basics : Inherits TaskParent
     Public options As New Options_ImageOffset
     Public masks(2) As cv.Mat
     Public dst(2) As cv.Mat
     Public pcFiltered(2) As cv.Mat
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
         desc = "Compute various differences between neighboring pixels"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
@@ -44,7 +43,7 @@ Public Class ImageOffset_Basics : Inherits TaskParent
 
         dst = {dst1, dst2, dst3}
         For i = 0 To dst.Count - 1
-            masks(i) = dst(i).Threshold(task.gOptions.pixelDiffThreshold, 255,
+            masks(i) = dst(i).Threshold(options.pixelDiffThreshold, 255,
                                         cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
             pcFiltered(i) = New cv.Mat(src.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
             task.pcSplit(i).CopyTo(pcFiltered(i), masks(i))

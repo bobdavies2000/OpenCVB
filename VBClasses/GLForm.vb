@@ -20,6 +20,7 @@ Public Class SharpGLForm
     Dim upY As Integer = 1
     Dim upZ As Integer
     Public options As Options_SharpGL
+    Public options1 As Options_GL
     Public options2 As Options_SharpGL2
     Public ppx = task.calibData.rgbIntrinsics.ppx
     Public ppy = task.calibData.rgbIntrinsics.ppy
@@ -28,6 +29,7 @@ Public Class SharpGLForm
     Public hulls As RedCloud_Basics
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         options = New Options_SharpGL
+        options1 = New Options_GL
         options2 = New Options_SharpGL2
         Me.Left = GetSetting("Opencv", "sglLeft", "sglLeft", task.mainFormLocation.X + task.mainFormLocation.Width)
         Me.Top = GetSetting("Opencv", "sglTop", "sglTop", task.mainFormLocation.Y)
@@ -82,7 +84,7 @@ Public Class SharpGLForm
         'gl.MatrixMode(OpenGL.GL_PROJECTION)
         'gl.LoadIdentity()
 
-        If task.gOptions.GL_LinearMode.Checked Then ' not being used anymore...
+        If options1.GL_LinearMode Then
             Dim mmZ = GetMinMax(task.pcSplit(2))
             Dim xRange = options.xRange
             Dim yRange = options.yRange
@@ -111,10 +113,10 @@ Public Class SharpGLForm
         If e.Button = MouseButtons.Right Then isPanning = False
     End Sub
     Public Sub resetView()
-        Me.Text = "SharpGL - " + If(task.gOptions.GL_LinearMode.Checked, "", "Non") + "Linear mode (see Global Options)"
+        Me.Text = "SharpGL - " + If(options1.GL_LinearMode, "", "Non") + "Linear mode"
         rotationX = 0.0
         rotationY = 0.0
-        If task.gOptions.GL_LinearMode.Checked Then zoomZ = 0 Else zoomZ = zoomZInit
+        If options1.GL_LinearMode Then zoomZ = 0 Else zoomZ = zoomZInit
     End Sub
     Private Sub OpenGLControl_MouseWheel(sender As Object, e As MouseEventArgs) Handles GLControl.MouseWheel
         Dim delta As Integer = e.Delta
@@ -188,10 +190,14 @@ Public Class SharpGLForm
         task.sharpDepth = task.sharpDepth.Resize(task.workRes)
         task.sharpDepth = task.sharpDepth.Flip(cv.FlipMode.X)
     End Sub
-    Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
+    Private Sub optionsSetup()
         options.Run()
+        options1.Run()
         options2.Run()
         prepareSharpGL()
+    End Sub
+    Public Function RunSharp(func As Integer, Optional pointcloud As cv.Mat = Nothing, Optional RGB As cv.Mat = Nothing) As String
+        optionsSetup()
 
         Dim label = ""
         If pointcloud Is Nothing Then pointcloud = task.pointCloud
@@ -268,9 +274,7 @@ Public Class SharpGLForm
         Return task.lines.labels(2)
     End Function
     Public Function RunLines(func As Integer, lpList As List(Of lpData)) As String
-        options.Run()
-        options2.Run()
-        prepareSharpGL()
+        optionsSetup()
 
         Dim label = ""
         Select Case func
@@ -285,9 +289,7 @@ Public Class SharpGLForm
         Return label
     End Function
     Public Function RunTriangles(func As Integer, dataBuffer As List(Of cv.Vec3f)) As String
-        options.Run()
-        options2.Run()
-        prepareSharpGL()
+        optionsSetup()
 
         Dim label = ""
         Select Case func

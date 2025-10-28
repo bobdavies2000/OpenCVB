@@ -353,7 +353,4 @@ Public Class OptionsGlobal
         trackingLabel = TrackingColor.Text
         task.optionsChanged = True
     End Sub
-    Private Sub GL_LinearMode_CheckedChanged(sender As Object, e As EventArgs) Handles GL_LinearMode.CheckedChanged
-        task.optionsChanged = True
-    End Sub
 End Class

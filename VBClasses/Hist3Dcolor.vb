@@ -281,8 +281,9 @@ Public Class Hist3Dcolor_Diff : Inherits TaskParent
     Dim hColor As New Hist3Dcolor_Basics
     Dim diff As New Diff_Basics
     Public Sub New()
-        task.gOptions.pixelDiffThreshold = 0
+        OptionParent.FindSlider("Color Difference Threshold").Value = 0
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        labels(3) = "Unstable pixels in the backprojection below left"
         desc = "Create a mask for the color pixels that are changing with every frame of the Hist3Dcolor_basics."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

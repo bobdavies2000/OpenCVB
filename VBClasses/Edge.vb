@@ -720,6 +720,7 @@ End Class
 
 Public Class Edge_ResizeAdd : Inherits TaskParent
     Dim options As New Options_Edges4
+    Dim options1 As New Options_ImageOffset
     Public Sub New()
         desc = "Find edges using a resize, subtract, and threshold."
         labels(2) = "Edges found with just resizing"
@@ -727,6 +728,7 @@ Public Class Edge_ResizeAdd : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+        options1.Run()
 
         Dim gray = src
         If src.Channels() = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -734,7 +736,7 @@ Public Class Edge_ResizeAdd : Inherits TaskParent
                             New cv.Range(options.horizPixels, gray.Cols - options.horizPixels))
         newFrame = newFrame.Resize(gray.Size(), 0, 0, cv.InterpolationFlags.Nearest)
         cv.Cv2.Absdiff(gray, newFrame, dst2)
-        dst2 = dst2.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst2.Threshold(options1.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.Add(gray, dst2, dst3)
     End Sub
 End Class
@@ -924,12 +926,14 @@ End Class
 
 Public Class Edge_MotionOverlay : Inherits TaskParent
     Dim options As New Options_EdgeOverlay
+    Dim options1 As New Options_ImageOffset
     Public Sub New()
         labels(3) = "AbsDiff output of offset with original"
         desc = "Find edges by displacing the current BGR image in any direction and diff it with the original."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+        options1.Run()
 
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -939,7 +943,7 @@ Public Class Edge_MotionOverlay : Inherits TaskParent
         offsetImage(rect2) = src(rect1).Clone
 
         cv.Cv2.Absdiff(src, offsetImage, dst0)
-        dst2 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst0.Threshold(options1.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         labels(2) = "Src offset (x,y) = (" + CStr(options.xDisp) + "," + CStr(options.yDisp) + ")"
     End Sub
 End Class

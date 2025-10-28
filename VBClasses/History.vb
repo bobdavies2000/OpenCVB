@@ -108,7 +108,8 @@ Public Class History_BasicsDiff : Inherits TaskParent
     Dim frames As New History_BasicsNoSaturation
     Dim diff As New Diff_Basics
     Public Sub New()
-        task.gOptions.pixelDiffThreshold = 0
+        OptionParent.FindSlider("Color Difference Threshold").Value = 1
+        labels(3) = "Adjust 'Color Difference Thresold' to change trouble spots."
         desc = "Find the floodfill trouble spots."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -128,17 +129,19 @@ Public Class History_Basics8U : Inherits TaskParent
     Public saveFrames As New List(Of cv.Mat)
     Dim mats As New Mat_4to1
     Dim lastFrame As cv.Mat
+    Dim options As New Options_ImageOffset
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Create a frame history by Or'ing the last X frames of CV_8U data"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If standalone Then
+            options.Run()
             src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             If task.firstPass Then lastFrame = src.Clone
             cv.Cv2.Absdiff(src, lastFrame, dst3)
             lastFrame = src.Clone
-            src = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+            src = dst3.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         End If
 
         If task.frameHistoryCount = 1 Then

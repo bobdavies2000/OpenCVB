@@ -160,8 +160,8 @@ Public Class BackProject_Unstable : Inherits TaskParent
     Dim backP As New BackProject_Full
     Dim diff As New Diff_Basics
     Public Sub New()
-        task.gOptions.pixelDiffThreshold = 6
-        labels = {"", "", "Backprojection output", "Unstable pixels in the backprojection.  If flashing, set 'Color Difference Threshold' higher."}
+        labels = {"", "", "Backprojection output", "Unstable pixels in the backprojection. " +
+                  "If flashing, set option 'Color Difference Threshold' higher."}
         desc = "Highlight the unstable pixels in the backprojection."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

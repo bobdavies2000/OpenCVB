@@ -25,7 +25,6 @@ Partial Class OptionsGlobal
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OptionsGlobal))
         Label1 = New Label()
         GroupBox1 = New GroupBox()
-        GL_LinearMode = New CheckBox()
         Label3 = New Label()
         DebugSlider = New TrackBar()
         DebugSliderLabel = New Label()
@@ -104,7 +103,6 @@ Partial Class OptionsGlobal
         ' 
         ' GroupBox1
         ' 
-        GroupBox1.Controls.Add(GL_LinearMode)
         GroupBox1.Controls.Add(Label3)
         GroupBox1.Controls.Add(DebugSlider)
         GroupBox1.Controls.Add(DebugSliderLabel)
@@ -129,22 +127,10 @@ Partial Class OptionsGlobal
         GroupBox1.TabIndex = 1
         GroupBox1.TabStop = False
         ' 
-        ' GL_LinearMode
-        ' 
-        GL_LinearMode.AutoSize = True
-        GL_LinearMode.Location = New Point(20, 517)
-        GL_LinearMode.Margin = New Padding(4)
-        GL_LinearMode.Name = "GL_LinearMode"
-        GL_LinearMode.Size = New Size(313, 34)
-        GL_LinearMode.TabIndex = 24
-        GL_LinearMode.Text = "Run SharpGL in Linear mode"
-        GL_LinearMode.UseVisualStyleBackColor = True
-        GL_LinearMode.Visible = False
-        ' 
         ' Label3
         ' 
         Label3.AutoSize = True
-        Label3.Location = New Point(35, 632)
+        Label3.Location = New Point(35, 357)
         Label3.Margin = New Padding(4, 0, 4, 0)
         Label3.Name = "Label3"
         Label3.Size = New Size(139, 30)
@@ -153,7 +139,7 @@ Partial Class OptionsGlobal
         ' 
         ' DebugSlider
         ' 
-        DebugSlider.Location = New Point(229, 632)
+        DebugSlider.Location = New Point(229, 357)
         DebugSlider.Margin = New Padding(4)
         DebugSlider.Maximum = 100
         DebugSlider.Minimum = -100
@@ -164,7 +150,7 @@ Partial Class OptionsGlobal
         ' DebugSliderLabel
         ' 
         DebugSliderLabel.AutoSize = True
-        DebugSliderLabel.Location = New Point(803, 632)
+        DebugSliderLabel.Location = New Point(803, 357)
         DebugSliderLabel.Margin = New Padding(4, 0, 4, 0)
         DebugSliderLabel.Name = "DebugSliderLabel"
         DebugSliderLabel.Size = New Size(184, 30)
@@ -174,7 +160,7 @@ Partial Class OptionsGlobal
         ' DebugCheckBox
         ' 
         DebugCheckBox.AutoSize = True
-        DebugCheckBox.Location = New Point(20, 559)
+        DebugCheckBox.Location = New Point(35, 437)
         DebugCheckBox.Margin = New Padding(4)
         DebugCheckBox.Name = "DebugCheckBox"
         DebugCheckBox.Size = New Size(817, 34)
@@ -799,5 +785,4 @@ Partial Class OptionsGlobal
     Friend WithEvents TrackingColor As RadioButton
     Friend WithEvents TrackingMeanColor As RadioButton
     Friend WithEvents Label3 As Label
-    Friend WithEvents GL_LinearMode As CheckBox
 End Class

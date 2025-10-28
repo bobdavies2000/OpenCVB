@@ -18,10 +18,9 @@ Public Class Motion_Basics : Inherits TaskParent
         options.Run()
 
         If src.Channels <> 1 Then src = task.gray
+        ' If task.heartBeat Then dst2 = src.Clone
 
         diff.Run(src)
-
-        If task.heartBeat Then dst2 = src.Clone
 
         motionList.Clear()
         dst3.SetTo(0)
@@ -205,16 +204,19 @@ End Class
 Public Class Motion_PixelDiff : Inherits TaskParent
     Public changedPixels As Integer
     Dim changeCount As Integer, frames As Integer
+    Public options As New Options_ImageOffset
     Public Sub New()
         desc = "Count the number of changed pixels in the current frame and accumulate them.  If either exceeds thresholds, then set flag = true.  " +
                     "To get the Options Slider, use " + traceName + "QT"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static lastFrame As cv.Mat = src
         cv.Cv2.Absdiff(src, lastFrame, dst2)
-        dst2 = dst2.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst2.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         changedPixels = dst2.CountNonZero
         Dim motionTest = changedPixels > 0
 

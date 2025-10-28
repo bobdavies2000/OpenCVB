@@ -675,9 +675,8 @@ Public Class VBtask : Implements IDisposable
 
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
-        motionBasics.Run(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
         rgbFilter.Run(task.color)
+        motionBasics.Run(task.gray)
         ' If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
         grayStable = gray
 

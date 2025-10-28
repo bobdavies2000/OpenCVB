@@ -1,6 +1,5 @@
 ﻿Imports System.IO
 Imports System.Numerics
-Imports System.Runtime.Intrinsics
 Imports OpenCvSharp.ML
 Imports cv = OpenCvSharp
 Public Class Options_SharpGL : Inherits OptionParent
@@ -7247,6 +7246,7 @@ End Class
 Public Class Options_ImageOffset : Inherits OptionParent
     Public offsetDirection As String
     Public horizontalSlice As Boolean
+    Public pixelDiffThreshold As Integer
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -7261,14 +7261,18 @@ Public Class Options_ImageOffset : Inherits OptionParent
             radio.check(7).Checked = True
         End If
 
-
         If FindFrm(traceName + " CheckBox Options") Is Nothing Then
             check.Setup(traceName)
             check.addCheckBox("Slice Horizontally (off Vertically)")
             check.Box(0).Checked = True
         End If
+
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Color Difference Threshold", 0, 50, 5)
     End Sub
     Public Sub Run()
+        Static diffSlider = FindSlider("Color Difference Threshold")
+        pixelDiffThreshold = diffSlider.value
+
         Static frm = FindFrm(traceName + " Radio Buttons")
         offsetDirection = frm.check(findRadioIndex(frm.check)).Text
 
@@ -8234,5 +8238,23 @@ Public Class Options_History : Inherits OptionParent
     Public Sub Run()
         Static histSlider = FindSlider("Frame History")
         task.frameHistoryCount = histSlider.value
+    End Sub
+End Class
+
+
+
+
+
+Public Class Options_GL : Inherits OptionParent
+    Public GL_LinearMode As Boolean
+    Public Sub New()
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Run SharpGL in Linear mode")
+        End If
+    End Sub
+    Public Sub Run()
+        Static linearCheck = FindCheckBox("Run SharpGL in Linear mode")
+        GL_LinearMode = linearCheck.checked
     End Sub
 End Class
