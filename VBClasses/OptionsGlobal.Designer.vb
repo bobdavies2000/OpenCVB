@@ -29,9 +29,6 @@ Partial Class OptionsGlobal
         DebugSlider = New TrackBar()
         DebugSliderLabel = New Label()
         DebugCheckBox = New CheckBox()
-        PixelDiffBar = New TrackBar()
-        PixelDiff = New Label()
-        Label8 = New Label()
         HistBinBar = New TrackBar()
         labelBinsCount = New Label()
         Label6 = New Label()
@@ -78,7 +75,6 @@ Partial Class OptionsGlobal
         TrackingMeanColor = New RadioButton()
         GroupBox1.SuspendLayout()
         CType(DebugSlider, ComponentModel.ISupportInitialize).BeginInit()
-        CType(PixelDiffBar, ComponentModel.ISupportInitialize).BeginInit()
         CType(HistBinBar, ComponentModel.ISupportInitialize).BeginInit()
         CType(GridSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(MaxDepthBar, ComponentModel.ISupportInitialize).BeginInit()
@@ -107,9 +103,6 @@ Partial Class OptionsGlobal
         GroupBox1.Controls.Add(DebugSlider)
         GroupBox1.Controls.Add(DebugSliderLabel)
         GroupBox1.Controls.Add(DebugCheckBox)
-        GroupBox1.Controls.Add(PixelDiffBar)
-        GroupBox1.Controls.Add(PixelDiff)
-        GroupBox1.Controls.Add(Label8)
         GroupBox1.Controls.Add(HistBinBar)
         GroupBox1.Controls.Add(labelBinsCount)
         GroupBox1.Controls.Add(Label6)
@@ -167,35 +160,6 @@ Partial Class OptionsGlobal
         DebugCheckBox.TabIndex = 19
         DebugCheckBox.Text = "DebugCheckbox - task.gOptions.DebugChecked - use anywhere to inject a value"
         DebugCheckBox.UseVisualStyleBackColor = True
-        ' 
-        ' PixelDiffBar
-        ' 
-        PixelDiffBar.Location = New Point(229, 280)
-        PixelDiffBar.Margin = New Padding(4)
-        PixelDiffBar.Maximum = 50
-        PixelDiffBar.Name = "PixelDiffBar"
-        PixelDiffBar.Size = New Size(548, 69)
-        PixelDiffBar.TabIndex = 12
-        PixelDiffBar.Value = 5
-        ' 
-        ' PixelDiff
-        ' 
-        PixelDiff.AutoSize = True
-        PixelDiff.Location = New Point(803, 280)
-        PixelDiff.Margin = New Padding(4, 0, 4, 0)
-        PixelDiff.Name = "PixelDiff"
-        PixelDiff.Size = New Size(91, 30)
-        PixelDiff.TabIndex = 11
-        PixelDiff.Text = "PixelDiff"
-        ' 
-        ' Label8
-        ' 
-        Label8.Location = New Point(20, 280)
-        Label8.Margin = New Padding(4, 0, 4, 0)
-        Label8.Name = "Label8"
-        Label8.Size = New Size(203, 66)
-        Label8.TabIndex = 10
-        Label8.Text = "Color Difference Threshold"
         ' 
         ' HistBinBar
         ' 
@@ -688,7 +652,7 @@ Partial Class OptionsGlobal
         ' 
         ' OptionsGlobal
         ' 
-        AutoScaleDimensions = New SizeF(12F, 30F)
+        AutoScaleDimensions = New SizeF(12.0F, 30.0F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1849, 772)
         Controls.Add(ColoringGroup)
@@ -712,7 +676,6 @@ Partial Class OptionsGlobal
         GroupBox1.ResumeLayout(False)
         GroupBox1.PerformLayout()
         CType(DebugSlider, ComponentModel.ISupportInitialize).EndInit()
-        CType(PixelDiffBar, ComponentModel.ISupportInitialize).EndInit()
         CType(HistBinBar, ComponentModel.ISupportInitialize).EndInit()
         CType(GridSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(MaxDepthBar, ComponentModel.ISupportInitialize).EndInit()
@@ -743,9 +706,6 @@ Partial Class OptionsGlobal
     Friend WithEvents GridSlider As TrackBar
     Friend WithEvents GridSizeLabel As Label
     Friend WithEvents Label4 As Label
-    Friend WithEvents PixelDiffBar As TrackBar
-    Friend WithEvents PixelDiff As Label
-    Friend WithEvents Label8 As Label
     Friend WithEvents DebugCheckBox As CheckBox
     Friend WithEvents DebugSlider As TrackBar
     Friend WithEvents DebugSliderLabel As Label

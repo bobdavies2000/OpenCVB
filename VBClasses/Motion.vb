@@ -514,7 +514,7 @@ Public Class Motion_HistoryTest : Inherits TaskParent
     Dim diff As New Diff_Basics
     Dim frames As New History_Basics
     Public Sub New()
-        task.gOptions.pixelDiffThreshold = 10
+        OptionParent.FindSlider("Color Difference Threshold").Value = 10
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Detect motion using the last X images"
     End Sub
@@ -582,12 +582,15 @@ End Class
 
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Public Class Motion_Diff : Inherits TaskParent
+    Public options As New Options_ImageOffset
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Unstable mask", "Pixel difference"}
         desc = "Capture an image and use absDiff/threshold to compare it to the last snapshot"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If task.heartBeat Or dst1.Channels <> 1 Then
             dst1 = src.Clone
@@ -595,7 +598,7 @@ Public Class Motion_Diff : Inherits TaskParent
         End If
 
         cv.Cv2.Absdiff(src, dst1, dst3)
-        dst2 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst3.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         dst1 = src.Clone
     End Sub
 End Class

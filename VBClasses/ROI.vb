@@ -5,7 +5,7 @@ Public Class ROI_Basics : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Enclosing rectangle of all pixels that have changed", ""}
         dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
-        task.gOptions.pixelDiffThreshold = 30
+        OptionParent.FindSlider("Color Difference Threshold").Value = 30
         desc = "Find the motion ROI in the latest image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -37,7 +37,7 @@ Public Class ROI_FindNonZeroNoSingle : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Enclosing rectangle of all changed pixels (after removing single pixels)", ""}
         dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
-        task.gOptions.pixelDiffThreshold = 30
+        OptionParent.FindSlider("Color Difference Threshold").Value = 30
         desc = "Find the motion ROI in just the latest image - eliminate single pixels"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -84,7 +84,7 @@ Public Class ROI_AccumulateOld : Inherits TaskParent
         If standalone Then task.gOptions.displaydst1.checked = true
         labels = {"", "", "Area of Interest", ""}
         dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
-        task.gOptions.pixelDiffThreshold = 30
+        OptionParent.FindSlider("Color Difference Threshold").Value = 30
         desc = "Accumulate pixels in a motion ROI - all pixels that are different by X"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -135,7 +135,7 @@ Public Class ROI_Accumulate : Inherits TaskParent
     Public Sub New()
         labels = {"", "", "Area of Interest", ""}
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
-        task.gOptions.pixelDiffThreshold = 30
+        OptionParent.FindSlider("Color Difference Threshold").Value = 30
         desc = "Accumulate pixels in a motion ROI until the size is x% of the total image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)

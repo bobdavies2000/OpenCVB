@@ -2,7 +2,7 @@
 Public Class PCdiff_Basics : Inherits TaskParent
     Public options As New Options_ImageOffset
     Public Sub New()
-        task.gOptions.PixelDiffBar.Value = 10
+        OptionParent.FindSlider("Color Difference Threshold").Value = 10
         desc = "Find depth regions where neighboring pixels are close in depth"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -34,7 +34,7 @@ Public Class PCdiff_Basics : Inherits TaskParent
 
         dst2 = New cv.Mat(dst2.Size, src.Type, 0)
         cv.Cv2.Absdiff(src(r1), src(r2), dst2(r3))
-        dst3 = dst2.Threshold(task.gOptions.pixelDiffThreshold / 1000, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
+        dst3 = dst2.Threshold(options.pixelDiffThreshold / 1000, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -117,7 +117,7 @@ Public Class PCdiff_Basics1 : Inherits TaskParent
 
         dst = {dst1, dst2, dst3}
         For i = 0 To dst.Count - 1
-            masks(i) = dst(i).Threshold(task.gOptions.pixelDiffThreshold / 1000, 255,
+            masks(i) = dst(i).Threshold(options.pixelDiffThreshold / 1000, 255,
                                         cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
             pcFiltered(i) = New cv.Mat(src.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
             task.pcSplit(i).CopyTo(pcFiltered(i), masks(i))
@@ -140,7 +140,7 @@ Public Class PCdiff_Filter : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         pcDiff.Run(src)
 
-        Dim delta = task.gOptions.pixelDiffThreshold / 1000
+        Dim delta = pcDiff.options.pixelDiffThreshold / 1000
         dst2.SetTo(0)
         For y = 0 To dst2.Height - 1
             For x = 0 To dst2.Width - 1
@@ -167,7 +167,7 @@ Public Class PCdiff_Points : Inherits TaskParent
     Dim filter As New PCdiff_Filter
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        labels = {"", "", "Point cloud with clean breaks between objects",
+        labels = {"", "", "Use 'Color Difference' slider to adjust impact",
                           "Pixels removed to make clean breaks in the depth data"}
         desc = "Review the filtered PCdiff output."
     End Sub
@@ -177,7 +177,7 @@ Public Class PCdiff_Points : Inherits TaskParent
 
         dst2.SetTo(0)
         Dim countInf As Integer
-        Dim delta = task.gOptions.pixelDiffThreshold / 1000
+        Dim delta = filter.pcDiff.options.pixelDiffThreshold / 1000
         For y = 0 To task.pcSplit(2).Rows - 1
             Dim slice = task.pcSplit(2).Row(y)
             Dim lastVal As Single = 0

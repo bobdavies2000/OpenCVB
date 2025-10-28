@@ -2515,6 +2515,7 @@ Public Class XO_CameraMotion_Basics : Inherits TaskParent
     Public translationY As Integer
     Public secondOpinion As Boolean
     Dim feat As New Swarm_Basics
+    Dim options As New Options_ImageOffset
     Public Sub New()
         dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -2522,6 +2523,8 @@ Public Class XO_CameraMotion_Basics : Inherits TaskParent
         desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         Dim lineGravity = New lpData(task.lineGravity.p1, task.lineGravity.p2)
         Dim lineHorizon = New lpData(task.lineHorizon.p1, task.lineHorizon.p2)
 
@@ -2571,7 +2574,7 @@ Public Class XO_CameraMotion_Basics : Inherits TaskParent
                     task.camMotionPixels = 0
                     src.CopyTo(dst2)
                 End If
-                dst3 = (src - dst2).ToMat.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+                dst3 = (src - dst2).ToMat.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
             End If
         End If
 
@@ -2598,6 +2601,7 @@ Public Class XO_CameraMotion_WithRotation : Inherits TaskParent
     Public rotate As New Rotate_BasicsQT
     Dim lineGravity As lpData
     Dim lineHorizon As lpData
+    Dim options As New Options_ImageOffset
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -2636,6 +2640,8 @@ Public Class XO_CameraMotion_WithRotation : Inherits TaskParent
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         If task.firstPass Then
             lineGravity = task.lineGravity
             lineHorizon = task.lineHorizon
@@ -2662,7 +2668,7 @@ Public Class XO_CameraMotion_WithRotation : Inherits TaskParent
             rotate.rotateCenter = centerY
             rotate.Run(dst1)
             dst2 = rotate.dst2
-            dst3 = (src - dst2).ToMat.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+            dst3 = (src - dst2).ToMat.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         Else
             dst2 = src
         End If
@@ -3929,12 +3935,15 @@ End Class
 
 Public Class XO_Diff_Heartbeat : Inherits TaskParent
     Public cumulativePixels As Integer
+    Dim options As New Options_ImageOffset
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Unstable mask", "Pixel difference"}
         desc = "Diff an image with one from the last heartbeat."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         If task.heartBeat Then
             dst1 = task.gray.Clone
             dst2.SetTo(0)
@@ -3942,7 +3951,7 @@ Public Class XO_Diff_Heartbeat : Inherits TaskParent
 
         cv.Cv2.Absdiff(task.gray, dst1, dst3)
         cumulativePixels = dst3.CountNonZero
-        dst2 = dst2 Or dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst2 Or dst3.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -5452,12 +5461,15 @@ End Class
 
 Public Class XO_Line_VerticalHorizontal1 : Inherits TaskParent
     Dim nearest As New XO_Line_Nearest
+    Dim options As New Options_ImageOffset
     Public Sub New()
         task.gOptions.LineWidth.Value = 2
         desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim pixelDiff = task.gOptions.pixelDiffThreshold
+        options.Run()
+
+        Dim pixelDiff = options.pixelDiffThreshold
 
         dst2 = src.Clone
         If standaloneTest() Then dst3 = task.lines.dst2
@@ -8763,11 +8775,14 @@ End Class
 Public Class XO_FPoly_WarpAffineImage : Inherits TaskParent
     Dim warp As New WarpAffine_BasicsQT
     Dim fPoly As New XO_FPoly_BasicsOriginal
+    Dim options As New Options_ImageOffset
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use OpenCV's WarpAffine to rotate and translate the starting image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         fPoly.Run(src)
 
         warp.rotateCenter = fPoly.fPD.rotateCenter
@@ -8790,7 +8805,7 @@ Public Class XO_FPoly_WarpAffineImage : Inherits TaskParent
         dst3 = src - dst2
 
         Dim tmp = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim changed = tmp.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        Dim changed = tmp.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         Dim diffCount = changed.CountNonZero
         strOut = fPoly.strOut
         strOut += vbCrLf + Format(diffCount / 1000, fmt0) + "k pixels differ or " +
@@ -8887,6 +8902,7 @@ Public Class XO_FPoly_Image : Inherits TaskParent
     Public fpoly As New XO_FPoly_BasicsOriginal
     Dim rotate As New Rotate_BasicsQT
     Public resync As Boolean
+    Dim options As New Options_ImageOffset
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
@@ -8894,6 +8910,8 @@ Public Class XO_FPoly_Image : Inherits TaskParent
         desc = "Rotate and shift the image as indicated by XO_FPoly_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         Dim input = src.Clone
         fpoly.Run(src)
         dst1 = fpoly.dst1
@@ -8937,7 +8955,7 @@ Public Class XO_FPoly_Image : Inherits TaskParent
             End If
 
             Dim tmp = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            Dim changed = tmp.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+            Dim changed = tmp.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
             Dim diffCount = changed.CountNonZero
             resync = fpoly.resync
             fpoly.maskChangePercent = diffCount / dst3.Total
@@ -8962,16 +8980,19 @@ End Class
 
 Public Class XO_FPoly_ImageMask : Inherits TaskParent
     Public fImage As New XO_FPoly_Image
+    Dim options As New Options_ImageOffset
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        task.gOptions.pixelDiffThreshold = 10
+        OptionParent.FindSlider("Color Difference Threshold").Value = 10
         desc = "Build the image mask of the differences between the current frame and resync image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         fImage.Run(src)
         dst2 = fImage.dst3
         dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst3 = dst0.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst0.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         labels = fImage.labels
         dst1 = fImage.fpoly.dst1
         SetTrueText(fImage.strOut, 1)
@@ -9169,6 +9190,7 @@ Public Class XO_FPoly_ImageNew : Inherits TaskParent
     Public fpoly As New XO_FPoly_Basics
     Dim rotate As New Rotate_BasicsQT
     Public resync As Boolean
+    Dim options As New Options_ImageOffset
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
@@ -9176,6 +9198,8 @@ Public Class XO_FPoly_ImageNew : Inherits TaskParent
         desc = "Rotate and shift the image as indicated by XO_FPoly_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         Dim input = src.Clone
         fpoly.Run(src)
         dst1 = fpoly.dst3
@@ -9214,7 +9238,7 @@ Public Class XO_FPoly_ImageNew : Inherits TaskParent
             ' End If
 
             Dim tmp = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            Dim changed = tmp.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+            Dim changed = tmp.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
             Dim diffCount = changed.CountNonZero
             resync = fpoly.resync
             fpoly.maskChangePercent = diffCount / dst3.Total
@@ -12315,7 +12339,7 @@ Public Class XO_Reliable_RGB : Inherits TaskParent
             diff(i) = New Motion_Diff
             history(i) = New History_Basics8U
         Next
-        task.gOptions.setPixelDifference(10)
+        OptionParent.FindSlider("Color Difference Threshold").Value = 10
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "", "Mask of unreliable color data", "Color image after removing unreliable pixels"}
         desc = "Accumulate those color pixels that are volatile - different by more than the global options 'Color Difference threshold'"
@@ -13366,7 +13390,7 @@ Public Class XO_RedList_Consistent : Inherits TaskParent
     Dim diffs As New List(Of cv.Mat)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.gOptions.pixelDiffThreshold = 1
+        OptionParent.FindSlider("Color Difference Threshold").Value = 1
         desc = "Remove RedCloud results that are inconsistent with the previous frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

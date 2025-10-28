@@ -341,12 +341,15 @@ Public Class Pixel_Unstable : Inherits TaskParent
     Dim lastImage As cv.Mat
     Public unstablePixels As New cv.Mat
     Dim kSlider = OptionParent.FindSlider("KMeans k")
+    Dim options As New Options_ImageOffset
     Public Sub New()
-        task.gOptions.setPixelDifference(2)
+        OptionParent.FindSlider("Color Difference Threshold").Value = 2
         labels(2) = "KMeans_Basics output"
         desc = "Detect where pixels are unstable"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         k = kSlider.Value
 
         km.Run(src)
@@ -354,7 +357,7 @@ Public Class Pixel_Unstable : Inherits TaskParent
         dst2.ConvertTo(dst2, cv.MatType.CV_32F)
         If lastImage Is Nothing Then lastImage = dst2.Clone
         cv.Cv2.Subtract(dst2, lastImage, dst3)
-        dst3 = dst3.Threshold(task.gOptions.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst3.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
 
         unstable.Add(dst3)
         If unstable.Count > task.frameHistoryCount Then unstable.RemoveAt(0)

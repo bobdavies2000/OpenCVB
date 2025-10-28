@@ -23,7 +23,6 @@ Public Class OptionsGlobal
         End If
 
         labelBinsCount.Text = CStr(HistBinBar.Value)
-        PixelDiff.Text = CStr(PixelDiffBar.Value)
         LineThicknessAmount.Text = CStr(LineWidth.Value)
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
@@ -210,11 +209,6 @@ Public Class OptionsGlobal
         task.optionsChanged = True
         task.useGravityPointcloud = gravityPointCloud.Checked
     End Sub
-    Private Sub PixelDiffThreshold_ValueChanged(sender As Object, e As EventArgs) Handles PixelDiffBar.ValueChanged
-        PixelDiff.Text = CStr(PixelDiffBar.Value)
-        pixelDiffThreshold = PixelDiffBar.Value
-        task.optionsChanged = True
-    End Sub
     Private Sub Palettes_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles Palettes.SelectedIndexChanged
         task.optionsChanged = True
         task.paletteIndex = mapNames.IndexOf(Palettes.Text)
@@ -280,15 +274,6 @@ Public Class OptionsGlobal
         If HistBinBar.Maximum < val Then HistBinBar.Maximum = val * 2
         HistBinBar.Value = val
     End Sub
-    Public Sub setPixelDifference(val As Integer)
-        PixelDiffBar.Value = val
-    End Sub
-    Public Function getPixelDifference() As Integer
-        Return PixelDiffBar.Value
-    End Function
-    Public Function getPixelDifferenceMax() As Integer
-        Return PixelDiffBar.Maximum
-    End Function
     Public Sub setShowGrid(val As Boolean)
         ShowGrid.Checked = val
     End Sub

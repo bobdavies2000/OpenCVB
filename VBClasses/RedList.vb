@@ -50,7 +50,7 @@ End Class
 Public Class RedList_FindCells : Inherits TaskParent
     Public bricks As New List(Of Integer)
     Public Sub New()
-        task.gOptions.pixelDiffThreshold = 25
+        OptionParent.FindSlider("Color Difference Threshold").Value = 25
         cPtr = RedList_FindBricks_Open()
         desc = "Find all the RedCloud cells touched by the mask created by the Motion_History rectangle"
     End Sub
@@ -532,13 +532,9 @@ End Class
 
 
 Public Class RedList_Consistent : Inherits TaskParent
-    Dim diff As New Diff_Basics
-    Dim cellmaps As New List(Of cv.Mat)
-    Dim cellLists As New List(Of List(Of oldrcData))
-    Dim diffs As New List(Of cv.Mat)
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.gOptions.pixelDiffThreshold = 1
+        OptionParent.FindSlider("Color Difference Threshold").Value = 1
         desc = "Remove RedColor results that are inconsistent with the previous frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
