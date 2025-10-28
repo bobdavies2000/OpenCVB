@@ -308,7 +308,6 @@ Public Class RedColor_Sweep : Inherits TaskParent
         rcMap.SetTo(0)
         For y = 0 To dst3.Height - 1
             For x = 0 To dst3.Width - 1
-                If x > 180 Then Dim k = 0
                 Dim pt = New cv.Point(x, y)
                 If dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
                     Dim count = cv.Cv2.FloodFill(dst3, mask, pt, index, rect, 0, 0, flags)

@@ -8,7 +8,7 @@ Public Class Line_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' only run as a task algorithm.
-        lineCore.Run(task.grayStable)
+        lineCore.Run(task.gray)
         dst2 = lineCore.dst2
         labels(2) = lineCore.labels(2)
 
@@ -35,9 +35,10 @@ Public Class Line_Core : Inherits TaskParent
         Return False
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then
-            lpList.Clear()
+        If lpList.Count = 0 Then
             task.motionMask.SetTo(255)
+            rawLines.Run(src)
+            lpList = New List(Of lpData)(rawLines.lpList)
         End If
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)

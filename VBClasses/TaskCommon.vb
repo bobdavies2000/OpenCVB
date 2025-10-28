@@ -694,8 +694,6 @@ Public Class lpData
         If pE2.X = task.workRes.Width - 1 Then indexHRight = pE2.Y / task.workRes.Height * bpCol
 
         CalculateRotatedRectFromLine()
-
-        If p1.X < 0 Or p1.Y < 0 Or p2.X < 0 Or p2.Y < 0 Then Dim k = 0
     End Sub
     Sub New()
         p1 = New cv.Point2f()

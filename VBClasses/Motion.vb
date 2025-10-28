@@ -7,6 +7,7 @@ Public Class Motion_Basics : Inherits TaskParent
     Public lastColor(0) As cv.Vec3f
     Dim options As New Options_Motion
     Public Sub New()
+        If standalone Then task.gOptions.showMotionMask.Checked = True
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "The motion mask"
@@ -18,7 +19,7 @@ Public Class Motion_Basics : Inherits TaskParent
         options.Run()
 
         If src.Channels <> 1 Then src = task.gray
-        ' If task.heartBeat Then dst2 = src.Clone
+        If task.heartBeat Then dst2 = src.Clone
 
         diff.Run(src)
 
@@ -51,19 +52,17 @@ End Class
 
 
 
-
-
-
 Public Class Motion_BasicsValidate : Inherits TaskParent
     Dim diff As New Diff_Basics
     Public Sub New()
-        task.gOptions.showMotionMask.Checked = True
+        If standalone Then task.gOptions.showMotionMask.Checked = True
         desc = "Display the difference between task.color and src to verify Motion_Basics is working"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then dst3 = src.Clone Else src.CopyTo(dst3, task.motionMask)
+        src = task.gray
+        If task.heartBeat Then dst3 = src.Clone Else src.CopyTo(dst3, task.motionMask)
 
-        diff.lastFrame = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        diff.lastFrame = dst3
         diff.Run(src)
         dst2 = diff.dst2
 
@@ -73,6 +72,64 @@ Public Class Motion_BasicsValidate : Inherits TaskParent
     End Sub
 End Class
 
+
+
+
+
+
+Public Class Motion_BasicsHistory : Inherits TaskParent
+    Public motionList As New List(Of Integer)
+    Dim diff As New Diff_Basics
+    Dim options As New Options_Motion
+    Dim options1 As New Options_History
+    Public Sub New()
+        dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "The motion mask"
+        desc = "Isolate all motion in the scene"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.gOptions.UseMotionMask.Checked = False Then Exit Sub
+
+        options.Run()
+        options1.Run()
+
+        If src.Channels <> 1 Then src = task.gray
+        If task.heartBeat Then dst2 = src.Clone
+
+        diff.Run(src)
+
+        motionList.Clear()
+        dst3.SetTo(0)
+        For i = 0 To task.gridRects.Count - 1
+            Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
+            If diffCount >= options.colorDiffPixels Then
+                For Each index In task.grid.gridNeighbors(i)
+                    If motionList.Contains(index) = False Then
+                        motionList.Add(index)
+                    End If
+                Next
+            End If
+        Next
+
+        Static cellList As New List(Of List(Of Integer))
+        cellList.Add(motionList)
+        dst3.SetTo(0)
+        For Each lst In cellList
+            For Each index In lst
+                dst3(task.gridRects(index)).SetTo(255)
+            Next
+        Next
+
+        If cellList.Count >= task.frameHistoryCount Then cellList.RemoveAt(0)
+        src.CopyTo(dst2, dst3)
+        task.motionMask = dst3.Clone
+
+        task.motionPercent = motionList.Count / task.gridRects.Count
+        If task.motionPercent > 0.8 Then task.motionPercent = 1
+        labels(2) = CStr(motionList.Count) + " grid rect's or " + Format(task.motionPercent, "0.0%") +
+                    " of bricks had motion."
+    End Sub
+End Class
 
 
 

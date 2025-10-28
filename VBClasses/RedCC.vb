@@ -116,10 +116,8 @@ Public Class RedCC_Histograms : Inherits TaskParent
             tmp.SetTo(0, Not rc.mask)
 
             Dim mm = GetMinMax(tmp)
-            If mm.maxVal > 0 Then Dim k = 0
-            Dim test = tmp.CountNonZero()
-
             hist.Run(tmp)
+
             rc.colorIDs = New List(Of Integer)
             For i = 1 To hist.histArray.Count - 1 ' ignore zeros
                 If hist.histArray(i) Then rc.colorIDs.Add(i)
