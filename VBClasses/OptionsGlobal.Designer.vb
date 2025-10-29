@@ -56,11 +56,9 @@ Partial Class OptionsGlobal
         showMotionMask = New CheckBox()
         CrossHairs = New CheckBox()
         ShowGrid = New CheckBox()
-        ColorSource = New ComboBox()
         Palettes = New ComboBox()
         LineType = New ComboBox()
         highlight = New ComboBox()
-        Label9 = New Label()
         Label11 = New Label()
         Label13 = New Label()
         Label14 = New Label()
@@ -329,7 +327,7 @@ Partial Class OptionsGlobal
         GroupBox2.Margin = New Padding(4)
         GroupBox2.Name = "GroupBox2"
         GroupBox2.Padding = New Padding(4)
-        GroupBox2.Size = New Size(428, 398)
+        GroupBox2.Size = New Size(428, 352)
         GroupBox2.TabIndex = 2
         GroupBox2.TabStop = False
         GroupBox2.Text = "Miscellaneous Globals"
@@ -457,19 +455,10 @@ Partial Class OptionsGlobal
         ShowGrid.Text = "Show grid mask overlay"
         ShowGrid.UseVisualStyleBackColor = True
         ' 
-        ' ColorSource
-        ' 
-        ColorSource.FormattingEnabled = True
-        ColorSource.Location = New Point(1655, 60)
-        ColorSource.Margin = New Padding(4)
-        ColorSource.Name = "ColorSource"
-        ColorSource.Size = New Size(188, 38)
-        ColorSource.TabIndex = 4
-        ' 
         ' Palettes
         ' 
         Palettes.FormattingEnabled = True
-        Palettes.Location = New Point(1655, 106)
+        Palettes.Location = New Point(1477, 37)
         Palettes.Margin = New Padding(4)
         Palettes.Name = "Palettes"
         Palettes.Size = New Size(188, 38)
@@ -478,7 +467,7 @@ Partial Class OptionsGlobal
         ' LineType
         ' 
         LineType.FormattingEnabled = True
-        LineType.Location = New Point(1655, 154)
+        LineType.Location = New Point(1477, 80)
         LineType.Margin = New Padding(4)
         LineType.Name = "LineType"
         LineType.Size = New Size(188, 38)
@@ -487,26 +476,16 @@ Partial Class OptionsGlobal
         ' highlight
         ' 
         highlight.FormattingEnabled = True
-        highlight.Location = New Point(1655, 202)
+        highlight.Location = New Point(1477, 126)
         highlight.Margin = New Padding(4)
         highlight.Name = "highlight"
         highlight.Size = New Size(188, 38)
         highlight.TabIndex = 7
         ' 
-        ' Label9
-        ' 
-        Label9.AutoSize = True
-        Label9.Location = New Point(1464, 60)
-        Label9.Margin = New Padding(4, 0, 4, 0)
-        Label9.Name = "Label9"
-        Label9.Size = New Size(176, 30)
-        Label9.TabIndex = 21
-        Label9.Text = "RedColor Source"
-        ' 
         ' Label11
         ' 
         Label11.AutoSize = True
-        Label11.Location = New Point(1560, 106)
+        Label11.Location = New Point(1678, 37)
         Label11.Margin = New Padding(4, 0, 4, 0)
         Label11.Name = "Label11"
         Label11.Size = New Size(78, 30)
@@ -516,7 +495,7 @@ Partial Class OptionsGlobal
         ' Label13
         ' 
         Label13.AutoSize = True
-        Label13.Location = New Point(1547, 154)
+        Label13.Location = New Point(1678, 83)
         Label13.Margin = New Padding(4, 0, 4, 0)
         Label13.Name = "Label13"
         Label13.Size = New Size(105, 30)
@@ -526,7 +505,7 @@ Partial Class OptionsGlobal
         ' Label14
         ' 
         Label14.AutoSize = True
-        Label14.Location = New Point(1477, 198)
+        Label14.Location = New Point(1678, 134)
         Label14.Margin = New Padding(4, 0, 4, 0)
         Label14.Name = "Label14"
         Label14.Size = New Size(160, 30)
@@ -538,7 +517,7 @@ Partial Class OptionsGlobal
         DepthGroupBox.Controls.Add(ShowGrid)
         DepthGroupBox.Controls.Add(showMotionMask)
         DepthGroupBox.Controls.Add(CrossHairs)
-        DepthGroupBox.Location = New Point(1477, 248)
+        DepthGroupBox.Location = New Point(1477, 184)
         DepthGroupBox.Margin = New Padding(4)
         DepthGroupBox.Name = "DepthGroupBox"
         DepthGroupBox.Padding = New Padding(4)
@@ -556,11 +535,9 @@ Partial Class OptionsGlobal
         Controls.Add(Label14)
         Controls.Add(Label13)
         Controls.Add(Label11)
-        Controls.Add(Label9)
         Controls.Add(highlight)
         Controls.Add(LineType)
         Controls.Add(Palettes)
-        Controls.Add(ColorSource)
         Controls.Add(GroupBox2)
         Controls.Add(GroupBox1)
         Controls.Add(Label1)
@@ -616,11 +593,9 @@ Partial Class OptionsGlobal
     Friend WithEvents DotSizeSlider As TrackBar
     Friend WithEvents DotSizeLabel As Label
     Friend WithEvents Label7 As Label
-    Friend WithEvents ColorSource As ComboBox
     Friend WithEvents Palettes As ComboBox
     Friend WithEvents LineType As ComboBox
     Friend WithEvents highlight As ComboBox
-    Friend WithEvents Label9 As Label
     Friend WithEvents Label11 As Label
     Friend WithEvents Label13 As Label
     Friend WithEvents Label14 As Label

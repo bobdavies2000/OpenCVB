@@ -392,7 +392,7 @@ Public Class XO_OpenGL_QuadHulls : Inherits TaskParent
     Dim quad As New Quad_Hulls
     Public Sub New()
         task.ogl.oglFunction = Comm.oCase.quadBasics
-        If standalone Then task.gOptions.ColorSource.SelectedItem = "Reduction_Basics"
+        If standalone Then task.featureOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Create a simple plane in each roi of the RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1367,7 +1367,7 @@ Public Class XO_OpenGL_ColorReduced3D : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Public Sub New()
         task.ogl.oglFunction = Comm.oCase.drawPointCloudRGB
-        task.gOptions.ColorSource.SelectedItem = "LUT_Basics"
+        task.featureOptions.ColorSource.SelectedItem = "LUT_Basics"
         OptionParent.FindSlider("OpenGL Point Size").Value = 20
         desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
     End Sub
@@ -1375,7 +1375,8 @@ Public Class XO_OpenGL_ColorReduced3D : Inherits TaskParent
         color8U.Run(src)
         dst2 = color8U.dst3
         dst2.ConvertTo(dst1, cv.MatType.CV_32FC3)
-        labels(2) = "There are " + CStr(color8U.classCount) + " classes for " + task.gOptions.ColorSource.Text
+        labels(2) = "There are " + CStr(color8U.classCount) + " classes for " +
+                    task.featureOptions.ColorSource.Text
         dst1 = dst1.Normalize(0, 1, cv.NormTypes.MinMax)
         Dim split = dst1.Split()
         split(1) *= -1
@@ -3492,7 +3493,6 @@ Public Class XO_Line_FromContours : Inherits TaskParent
     Dim contours As New XO_Contour_Gray
     Dim lines As New XO_Line_RawSorted
     Public Sub New()
-        task.gOptions.ColorSource.SelectedItem() = "Reduction_Basics" ' to enable sliders.
         task.gOptions.highlight.SelectedIndex = 3
         desc = "Find the lines in the contours."
     End Sub
@@ -6432,7 +6432,6 @@ Public Class XO_Contour_Gray : Inherits TaskParent
         End If
 
         If standalone Then
-            task.gOptions.ColorSource.SelectedItem() = "Reduction_Basics"
             reduction.Run(src)
             src = reduction.dst2
         End If
@@ -13592,7 +13591,7 @@ End Class
 
 Public Class XO_RedList_NoDepth : Inherits TaskParent
     Public Sub New()
-        task.gOptions.ColorSource.SelectedItem = "Reduction_Basics"
+        task.featureOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Run RedList_Basics on just the regions with no depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -14022,7 +14021,6 @@ End Class
 
 Public Class XO_RedList_Reduction : Inherits TaskParent
     Public Sub New()
-        task.gOptions.ColorSource.SelectedItem() = "Reduction_Basics"
         task.gOptions.setHistogramBins(20)
         desc = "Segment the image based On both the reduced color"
     End Sub

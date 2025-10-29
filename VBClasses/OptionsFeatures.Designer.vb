@@ -41,6 +41,8 @@ Partial Class OptionsFeatures
         Label9 = New Label()
         GrayGroup = New GroupBox()
         ColorGroup = New GroupBox()
+        Label4 = New Label()
+        ColorSource = New ComboBox()
         CType(DistanceSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(FeatureSampleSize, ComponentModel.ISupportInitialize).BeginInit()
         CType(ColorDiffSlider, ComponentModel.ISupportInitialize).BeginInit()
@@ -50,170 +52,211 @@ Partial Class OptionsFeatures
         ' FeatureMethod
         ' 
         FeatureMethod.FormattingEnabled = True
-        FeatureMethod.Location = New Point(26, 45)
+        FeatureMethod.Location = New Point(31, 54)
+        FeatureMethod.Margin = New Padding(4, 4, 4, 4)
         FeatureMethod.Name = "FeatureMethod"
-        FeatureMethod.Size = New Size(246, 33)
+        FeatureMethod.Size = New Size(294, 38)
         FeatureMethod.TabIndex = 0
         ' 
         ' EdgeMethods
         ' 
         EdgeMethods.FormattingEnabled = True
-        EdgeMethods.Location = New Point(303, 45)
+        EdgeMethods.Location = New Point(364, 54)
+        EdgeMethods.Margin = New Padding(4, 4, 4, 4)
         EdgeMethods.Name = "EdgeMethods"
-        EdgeMethods.Size = New Size(246, 33)
+        EdgeMethods.Size = New Size(294, 38)
         EdgeMethods.TabIndex = 1
         ' 
         ' Label1
         ' 
         Label1.AutoSize = True
-        Label1.Location = New Point(303, 9)
+        Label1.Location = New Point(364, 11)
+        Label1.Margin = New Padding(4, 0, 4, 0)
         Label1.Name = "Label1"
-        Label1.Size = New Size(120, 25)
+        Label1.Size = New Size(145, 30)
         Label1.TabIndex = 2
         Label1.Text = "Edge Method"
         ' 
         ' Label2
         ' 
         Label2.AutoSize = True
-        Label2.Location = New Point(26, 9)
+        Label2.Location = New Point(31, 11)
+        Label2.Margin = New Padding(4, 0, 4, 0)
         Label2.Name = "Label2"
-        Label2.Size = New Size(138, 25)
+        Label2.Size = New Size(169, 30)
         Label2.TabIndex = 3
         Label2.Text = "Feature Method"
         ' 
         ' Label3
         ' 
         Label3.AutoSize = True
-        Label3.Location = New Point(26, 85)
+        Label3.Location = New Point(31, 102)
+        Label3.Margin = New Padding(4, 0, 4, 0)
         Label3.Name = "Label3"
-        Label3.Size = New Size(254, 25)
+        Label3.Size = New Size(311, 30)
         Label3.TabIndex = 4
         Label3.Text = "Min Distance between features"
         ' 
         ' DistanceSlider
         ' 
-        DistanceSlider.Location = New Point(26, 113)
+        DistanceSlider.Location = New Point(31, 136)
+        DistanceSlider.Margin = New Padding(4, 4, 4, 4)
         DistanceSlider.Maximum = 100
         DistanceSlider.Name = "DistanceSlider"
-        DistanceSlider.Size = New Size(523, 69)
+        DistanceSlider.Size = New Size(628, 69)
         DistanceSlider.TabIndex = 5
         DistanceSlider.Value = 25
         ' 
         ' DistanceLabel
         ' 
         DistanceLabel.AutoSize = True
-        DistanceLabel.Location = New Point(555, 113)
+        DistanceLabel.Location = New Point(666, 136)
+        DistanceLabel.Margin = New Padding(4, 0, 4, 0)
         DistanceLabel.Name = "DistanceLabel"
-        DistanceLabel.Size = New Size(79, 25)
+        DistanceLabel.Size = New Size(94, 30)
         DistanceLabel.TabIndex = 6
         DistanceLabel.Text = "Distance"
         ' 
         ' FeatureSampleSizeLabel
         ' 
         FeatureSampleSizeLabel.AutoSize = True
-        FeatureSampleSizeLabel.Location = New Point(555, 179)
+        FeatureSampleSizeLabel.Location = New Point(666, 215)
+        FeatureSampleSizeLabel.Margin = New Padding(4, 0, 4, 0)
         FeatureSampleSizeLabel.Name = "FeatureSampleSizeLabel"
-        FeatureSampleSizeLabel.Size = New Size(107, 25)
+        FeatureSampleSizeLabel.Size = New Size(130, 30)
         FeatureSampleSizeLabel.TabIndex = 9
         FeatureSampleSizeLabel.Text = "Sample Size"
         ' 
         ' FeatureSampleSize
         ' 
-        FeatureSampleSize.Location = New Point(26, 179)
+        FeatureSampleSize.Location = New Point(31, 215)
+        FeatureSampleSize.Margin = New Padding(4, 4, 4, 4)
         FeatureSampleSize.Maximum = 400
         FeatureSampleSize.Minimum = 1
         FeatureSampleSize.Name = "FeatureSampleSize"
-        FeatureSampleSize.Size = New Size(523, 69)
+        FeatureSampleSize.Size = New Size(628, 69)
         FeatureSampleSize.TabIndex = 8
         FeatureSampleSize.Value = 100
         ' 
         ' Label5
         ' 
         Label5.AutoSize = True
-        Label5.Location = New Point(26, 151)
+        Label5.Location = New Point(31, 181)
+        Label5.Margin = New Padding(4, 0, 4, 0)
         Label5.Name = "Label5"
-        Label5.Size = New Size(170, 25)
+        Label5.Size = New Size(209, 30)
         Label5.TabIndex = 7
         Label5.Text = "Feature Sample Size"
         ' 
         ' ColorDiffLabel
         ' 
         ColorDiffLabel.AutoSize = True
-        ColorDiffLabel.Location = New Point(555, 263)
+        ColorDiffLabel.Location = New Point(666, 316)
+        ColorDiffLabel.Margin = New Padding(4, 0, 4, 0)
         ColorDiffLabel.Name = "ColorDiffLabel"
-        ColorDiffLabel.Size = New Size(125, 25)
+        ColorDiffLabel.Size = New Size(151, 30)
         ColorDiffLabel.TabIndex = 12
         ColorDiffLabel.Text = "ColorDiffLabel"
         ' 
         ' ColorDiffSlider
         ' 
-        ColorDiffSlider.Location = New Point(26, 263)
+        ColorDiffSlider.Location = New Point(31, 316)
+        ColorDiffSlider.Margin = New Padding(4, 4, 4, 4)
         ColorDiffSlider.Maximum = 100
         ColorDiffSlider.Minimum = 1
         ColorDiffSlider.Name = "ColorDiffSlider"
-        ColorDiffSlider.Size = New Size(523, 69)
+        ColorDiffSlider.Size = New Size(628, 69)
         ColorDiffSlider.TabIndex = 11
         ColorDiffSlider.Value = 75
         ' 
         ' Label7
         ' 
         Label7.AutoSize = True
-        Label7.Location = New Point(26, 235)
+        Label7.Location = New Point(31, 282)
+        Label7.Margin = New Padding(4, 0, 4, 0)
         Label7.Name = "Label7"
-        Label7.Size = New Size(287, 25)
+        Label7.Size = New Size(352, 30)
         Label7.TabIndex = 10
         Label7.Text = "LowRes Color Difference Threshold"
         ' 
         ' FeatureCorrelationLabel
         ' 
         FeatureCorrelationLabel.AutoSize = True
-        FeatureCorrelationLabel.Location = New Point(555, 338)
+        FeatureCorrelationLabel.Location = New Point(666, 406)
+        FeatureCorrelationLabel.Margin = New Padding(4, 0, 4, 0)
         FeatureCorrelationLabel.Name = "FeatureCorrelationLabel"
-        FeatureCorrelationLabel.Size = New Size(162, 25)
+        FeatureCorrelationLabel.Size = New Size(200, 30)
         FeatureCorrelationLabel.TabIndex = 15
         FeatureCorrelationLabel.Text = "Feature Correlation"
         ' 
         ' MatchCorrSlider
         ' 
-        MatchCorrSlider.Location = New Point(26, 338)
+        MatchCorrSlider.Location = New Point(31, 406)
+        MatchCorrSlider.Margin = New Padding(4, 4, 4, 4)
         MatchCorrSlider.Maximum = 100
         MatchCorrSlider.Name = "MatchCorrSlider"
-        MatchCorrSlider.Size = New Size(523, 69)
+        MatchCorrSlider.Size = New Size(628, 69)
         MatchCorrSlider.TabIndex = 14
         MatchCorrSlider.Value = 90
         ' 
         ' Label9
         ' 
         Label9.AutoSize = True
-        Label9.Location = New Point(26, 310)
+        Label9.Location = New Point(31, 372)
+        Label9.Margin = New Padding(4, 0, 4, 0)
         Label9.Name = "Label9"
-        Label9.Size = New Size(236, 25)
+        Label9.Size = New Size(289, 30)
         Label9.TabIndex = 13
         Label9.Text = "Match Correlation Threshold"
         ' 
         ' GrayGroup
         ' 
-        GrayGroup.Location = New Point(723, 9)
+        GrayGroup.Location = New Point(868, 11)
+        GrayGroup.Margin = New Padding(4, 4, 4, 4)
         GrayGroup.Name = "GrayGroup"
-        GrayGroup.Size = New Size(283, 426)
+        GrayGroup.Padding = New Padding(4, 4, 4, 4)
+        GrayGroup.Size = New Size(340, 511)
         GrayGroup.TabIndex = 16
         GrayGroup.TabStop = False
         GrayGroup.Text = "Grayscale source inputs"
         ' 
         ' ColorGroup
         ' 
-        ColorGroup.Location = New Point(1029, 14)
+        ColorGroup.Location = New Point(1235, 17)
+        ColorGroup.Margin = New Padding(4, 4, 4, 4)
         ColorGroup.Name = "ColorGroup"
-        ColorGroup.Size = New Size(289, 415)
+        ColorGroup.Padding = New Padding(4, 4, 4, 4)
+        ColorGroup.Size = New Size(347, 498)
         ColorGroup.TabIndex = 17
         ColorGroup.TabStop = False
         ColorGroup.Text = "Color source inputs"
         ' 
+        ' Label4
+        ' 
+        Label4.AutoSize = True
+        Label4.Location = New Point(33, 535)
+        Label4.Margin = New Padding(4, 0, 4, 0)
+        Label4.Name = "Label4"
+        Label4.Size = New Size(176, 30)
+        Label4.TabIndex = 23
+        Label4.Text = "RedColor Source"
+        ' 
+        ' ColorSource
+        ' 
+        ColorSource.FormattingEnabled = True
+        ColorSource.Location = New Point(224, 535)
+        ColorSource.Margin = New Padding(4)
+        ColorSource.Name = "ColorSource"
+        ColorSource.Size = New Size(188, 38)
+        ColorSource.TabIndex = 22
+        ' 
         ' OptionsFeatures
         ' 
-        AutoScaleDimensions = New SizeF(10F, 25F)
+        AutoScaleDimensions = New SizeF(12F, 30F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1420, 575)
+        ClientSize = New Size(1704, 690)
+        Controls.Add(Label4)
+        Controls.Add(ColorSource)
         Controls.Add(ColorGroup)
         Controls.Add(GrayGroup)
         Controls.Add(FeatureCorrelationLabel)
@@ -233,6 +276,7 @@ Partial Class OptionsFeatures
         Controls.Add(EdgeMethods)
         Controls.Add(FeatureMethod)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
+        Margin = New Padding(4, 4, 4, 4)
         Name = "OptionsFeatures"
         Text = "Important Options for Features, Edges, Lines, and Masks"
         CType(DistanceSlider, ComponentModel.ISupportInitialize).EndInit()
@@ -261,4 +305,6 @@ Partial Class OptionsFeatures
     Friend WithEvents Label9 As Label
     Friend WithEvents GrayGroup As GroupBox
     Friend WithEvents ColorGroup As GroupBox
+    Friend WithEvents Label4 As Label
+    Friend WithEvents ColorSource As ComboBox
 End Class

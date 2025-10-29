@@ -2,7 +2,7 @@
 Public Class Color8U_Basics : Inherits TaskParent
     Public classCount As Integer
     Public classifier As Object
-    Dim colorMethods(task.gOptions.colorMethods.Count) As Object
+    Dim colorMethods(task.featureOptions.colorMethods.Count) As Object
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         labels(3) = "dst3 = PaletteBlackZero(dst2) - "
@@ -10,8 +10,8 @@ Public Class Color8U_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Or classifier Is Nothing Then
-            Dim index = task.gOptions.ColorSource.SelectedIndex
-            Select Case task.gOptions.ColorSource.Text
+            Dim index = task.featureOptions.ColorSource.SelectedIndex
+            Select Case task.featureOptions.ColorSource.Text
                 Case "BackProject_Full"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New BackProject_Full
                 Case "Bin4Way_Regions"
@@ -38,7 +38,7 @@ Public Class Color8U_Basics : Inherits TaskParent
         End If
 
         ' EdgeLine_Basics is already running on each frame so it may not need to be run...
-        If task.gOptions.ColorSource.Text = "PCA_NColor_CPP" Then ' requires RGB input.
+        If task.featureOptions.ColorSource.Text = "PCA_NColor_CPP" Then ' requires RGB input.
             classifier.Run(src.Clone)
         Else
             If src.Type = cv.MatType.CV_8U Then
@@ -72,16 +72,16 @@ Public Class Color8U_Sweep : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeatLT Then
-            Static index As Integer = task.gOptions.ColorSource.SelectedIndex + 1
-            If index >= task.gOptions.ColorSource.Items.Count Then index = 0
-            task.gOptions.ColorSource.SelectedIndex = index
+            Static index As Integer = task.featureOptions.ColorSource.SelectedIndex + 1
+            If index >= task.featureOptions.ColorSource.Items.Count Then index = 0
+            task.featureOptions.ColorSource.SelectedIndex = index
         End If
 
         color8u.Run(src)
         classCount = color8u.classCount
         dst2 = PaletteFull(color8u.dst2)
 
-        strOut = "Current color source = " + task.gOptions.ColorSource.Text
+        strOut = "Current color source = " + task.featureOptions.ColorSource.Text
         SetTrueText(strOut, 2)
     End Sub
 End Class

@@ -14,7 +14,7 @@ Public Class RedList_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         task.contours.Run(src)
         If src.Type <> cv.MatType.CV_8U Then
-            If standalone And task.gOptions.ColorSource.SelectedItem = "EdgeLine_Basics" Then
+            If standalone And task.featureOptions.ColorSource.SelectedItem = "EdgeLine_Basics" Then
                 dst1 = task.contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Else
                 dst1 = srcMustBe8U(src)

@@ -303,13 +303,13 @@ Public Class ML_Color2Depth : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Dim rtree As RTrees
     Public Sub New()
-        task.gOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
+        task.featureOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         color8U.Run(src)
         dst2 = color8U.dst3
-        labels(2) = "Output of Color8U_Basics running " + task.gOptions.ColorSource.Text
+        labels(2) = "Output of Color8U_Basics running " + task.featureOptions.ColorSource.Text
 
         If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
         Dim mlInput As New List(Of mlColor)
@@ -377,13 +377,13 @@ Public Class ML_ColorInTier2Depth : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Dim rtree As RTrees
     Public Sub New()
-        task.gOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
+        task.featureOptions.ColorSource.SelectedItem() = "Bin4Way_Regions"
         desc = "Prepare a grid of color and depth data."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         color8U.Run(src)
         dst2 = color8U.dst3
-        labels(2) = "Output of Color8U_Basics running " + task.gOptions.ColorSource.Text
+        labels(2) = "Output of Color8U_Basics running " + task.featureOptions.ColorSource.Text
 
         If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
         Dim mlInput As New List(Of mlColorInTier)

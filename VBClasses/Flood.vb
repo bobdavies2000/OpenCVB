@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits TaskParent
     Public Sub New()
-        task.gOptions.ColorSource.SelectedItem = "Reduction_Basics"
         desc = "Build the RedCloud cells with the grayscale input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

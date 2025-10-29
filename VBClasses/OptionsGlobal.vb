@@ -5,10 +5,6 @@ Public Class OptionsGlobal
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
     Public heartBeatSeconds = 1
     Public trackingLabel As String
-    Public colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions",
-                                       "Binarize_DepthTiers", "EdgeLine_Basics", "Hist3DColor_Basics",
-                                       "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
-                                       "PCA_NColor_CPP", "MeanSubtraction_Gray"}
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
 
@@ -17,7 +13,7 @@ Public Class OptionsGlobal
         If task.workRes.Width <= 320 Then
             DotSizeSlider.Value = 1
             LineWidth.Value = 1
-        ElseIf task.workres.width = 640 Then
+        ElseIf task.workRes.Width = 640 Then
             DotSizeSlider.Value = 2
             LineWidth.Value = 2
         End If
@@ -129,12 +125,6 @@ Public Class OptionsGlobal
         task.gOptions.DotSizeSlider.Value = task.DotSize
         task.gOptions.LineWidth.Value = task.DotSize
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
-
-        For i = 0 To colorMethods.Count - 1
-            Dim method = colorMethods(i)
-            ColorSource.Items.Add(method)
-        Next
-        ColorSource.SelectedItem = "Reduction_Basics"
 
         Me.Left = 0
         Me.Top = 30
@@ -313,7 +303,7 @@ Public Class OptionsGlobal
 
 
 
-    Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ColorSource.SelectedIndexChanged
+    Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
 End Class
