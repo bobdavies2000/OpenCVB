@@ -625,7 +625,6 @@ Public Class RedList_Flippers : Inherits TaskParent
     Public flipCells As New List(Of oldrcData)
     Public nonFlipCells As New List(Of oldrcData)
     Public Sub New()
-        task.gOptions.TrackingColor.Checked = True
         labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
         desc = "Identify the cells that are changing color because they were split or lost."
     End Sub

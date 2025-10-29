@@ -137,9 +137,6 @@ Public Class OptionsGlobal
             ColorSource.Items.Add(method)
         Next
         ColorSource.SelectedItem = "Reduction_Basics"
-        TrackingColor.Checked = True
-
-        task.gOptions.ColorizedDepth.Checked = True
 
         Me.Left = 0
         Me.Top = 30
@@ -325,17 +322,6 @@ Public Class OptionsGlobal
 
 
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ColorSource.SelectedIndexChanged
-        task.optionsChanged = True
-    End Sub
-
-
-
-    Private Sub TrackingMeanColor_CheckedChanged(sender As Object, e As EventArgs) Handles TrackingMeanColor.CheckedChanged
-        trackingLabel = TrackingMeanColor.Text
-        task.optionsChanged = True
-    End Sub
-    Private Sub TrackingColor_CheckedChanged_1(sender As Object, e As EventArgs) Handles TrackingColor.CheckedChanged
-        trackingLabel = TrackingColor.Text
         task.optionsChanged = True
     End Sub
 End Class

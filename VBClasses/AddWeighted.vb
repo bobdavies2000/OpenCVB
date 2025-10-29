@@ -27,7 +27,6 @@ Public Class AddWeighted_Basics : Inherits TaskParent
     Public options As New Options_AddWeighted
     Public weight As Double
     Public Sub New()
-        If standalone Then task.gOptions.ColorizedDepth.Checked = True
         desc = "Add 2 images with specified weights."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -76,7 +75,6 @@ End Class
 
 Public Class AddWeighted_InfraRed : Inherits TaskParent
     Public Sub New()
-        task.gOptions.ColorizedDepth.Checked = True
         desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image.  Some cameras are not close to aligned."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

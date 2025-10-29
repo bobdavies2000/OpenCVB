@@ -60,39 +60,24 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
         desc = "Create a traditional depth color scheme."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.LRCorrelations.Checked Then
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-            task.bricks.Run(src)
+        If task.gOptions.displayDst1.Checked = False Or standaloneTest() Then
+            Dim depthData(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1) As Byte
+            Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
+            Marshal.Copy(task.pcSplit(2).Data, depthData, 0, depthData.Length)
+            Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
+            handleSrc.Free()
 
-            dst1.SetTo(0)
-            For Each brick In task.bricks.brickList
-                If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
-            Next
-            task.depthRGB = ShowPaletteCorrelation(dst1)
-            labels(2) = task.bricks.labels(2)
-            Static brickText As New Brick_CorrelationMap
-            brickText.Run(src)
-            task.depthRGB.SetTo(0, task.noDepthMask)
+            If imagePtr <> 0 Then task.depthRGB = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+
+            Dim gridIndex = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            Dim depthGrid = task.pcSplit(2)(task.gridRects(gridIndex))
+            Dim mask = task.depthMask(task.gridRects(gridIndex))
+            Dim depth = depthGrid.Mean(mask)(0)
+            Dim mm = GetMinMax(depthGrid, mask)
+            task.depthAndDepthRange = "Depth = " + Format(depth, fmt1) + "m grid = " + CStr(gridIndex) + " " + vbCrLf +
+                                              "Depth range = " + Format(mm.minVal, fmt1) + "m to " + Format(mm.maxVal, fmt1) + "m"
         Else
-            If task.gOptions.displayDst1.Checked = False Or standaloneTest() Then
-                Dim depthData(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1) As Byte
-                Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
-                Marshal.Copy(task.pcSplit(2).Data, depthData, 0, depthData.Length)
-                Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
-                handleSrc.Free()
-
-                If imagePtr <> 0 Then task.depthRGB = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
-
-                Dim gridIndex = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-                Dim depthGrid = task.pcSplit(2)(task.gridRects(gridIndex))
-                Dim mask = task.depthMask(task.gridRects(gridIndex))
-                Dim depth = depthGrid.Mean(mask)(0)
-                Dim mm = GetMinMax(depthGrid, mask)
-                task.depthAndDepthRange = "Depth = " + Format(depth, fmt1) + "m grid = " + CStr(gridIndex) + " " + vbCrLf +
-                                          "Depth range = " + Format(mm.minVal, fmt1) + "m to " + Format(mm.maxVal, fmt1) + "m"
-            Else
-                task.depthAndDepthRange = ""
-            End If
+            task.depthAndDepthRange = ""
         End If
         If standaloneTest() Then dst2 = task.depthRGB
     End Sub

@@ -4,7 +4,6 @@ Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
     Public motionList As New List(Of Integer)
     Dim diff As New Diff_Basics
-    Public lastColor(0) As cv.Vec3f
     Dim options As New Options_Motion
     Public Sub New()
         If standalone Then task.gOptions.showMotionMask.Checked = True
@@ -19,7 +18,7 @@ Public Class Motion_Basics : Inherits TaskParent
         options.Run()
 
         If src.Channels <> 1 Then src = task.gray
-        If task.heartBeat Then dst2 = src.Clone
+        If task.heartBeat Or task.optionsChanged Then dst2 = src.Clone
 
         diff.Run(src)
 

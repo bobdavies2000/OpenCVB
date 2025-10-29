@@ -148,7 +148,6 @@ Public Class Boundary_RedColor : Inherits TaskParent
     Dim prep As New RedPrep_ReductionChoices
     Public Sub New()
         task.gOptions.MaxDepthBar.Value = 20
-        task.gOptions.TrackingColor.Checked = True
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the RedCloud cell contours"
     End Sub
@@ -174,7 +173,6 @@ Public Class Boundary_RedCloud : Inherits TaskParent
     Dim prep As New RedPrep_Basics
     Public Sub New()
         task.gOptions.MaxDepthBar.Value = 20
-        task.gOptions.TrackingColor.Checked = True
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Find the RedCloud cell contours"
     End Sub

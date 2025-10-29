@@ -52,13 +52,13 @@ Public Module vbc
             rc.index = task.redList.oldrclist.Count
 
             If saveColorSetting <> task.gOptions.trackingLabel Then rc.color = black
-            Select Case task.gOptions.trackingLabel
-                Case "Mean Color"
-                    Dim colorStdev As cv.Scalar
-                    cv.Cv2.MeanStdDev(task.color(rc.rect), rc.color, colorStdev, rc.mask)
-                Case "Tracking Color"
-                    If rc.color = black Then rc.color = task.scalarColors(rc.index)
-            End Select
+            'Select Case task.gOptions.trackingLabel
+            '    Case "Mean Color"
+            '        Dim colorStdev As cv.Scalar
+            '        cv.Cv2.MeanStdDev(task.color(rc.rect), rc.color, colorStdev, rc.mask)
+            ' Case "Tracking Color"
+            If rc.color = black Then rc.color = task.scalarColors(rc.index)
+            'End Select
 
             task.redList.oldrclist.Add(rc)
             task.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)

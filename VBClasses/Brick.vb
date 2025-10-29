@@ -83,8 +83,6 @@ Public Class Brick_Basics : Inherits TaskParent
         If task.bricks.brickList.Count <> task.gridRects.Count Then task.bricks.brickList.Clear()
 
         Dim correlationMat As New cv.Mat
-        Dim brickLast As New List(Of brickData)(task.bricks.brickList)
-
         Dim maxPixels = task.brickSize * task.brickSize
         task.bricks.brickList.Clear()
         Dim depthCount As Integer
@@ -93,51 +91,42 @@ Public Class Brick_Basics : Inherits TaskParent
         For i = 0 To task.gridRects.Count - 1
             Dim brick As New brickData
             brick.index = task.bricks.brickList.Count
+
             brick.rect = task.gridRects(brick.index)
             brick.lRect = brick.rect
 
             brick.depth = task.pcSplit(2)(brick.rect).Mean(task.depthMask(brick.rect))
             If brick.depth > Single.MaxValue Or brick.depth < Single.MinValue Then brick.depth = 0
 
-            If brick.depth > 0 Then brick.mm = GetMinMax(task.pcSplit(2)(brick.rect), task.depthMask(brick.rect))
-            ' the last color is actually the current color - motion basics runs first.
             cv.Cv2.MeanStdDev(src(brick.rect), brick.color, colorstdev)
             brick.center = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
 
             If brick.depth > 0 Then
+                brick.mm = GetMinMax(task.pcSplit(2)(brick.rect), task.depthMask(brick.rect))
                 brickDepthCount += 1
-
-                Dim testVal = task.motionMask.Get(Of Byte)(brick.rect.TopLeft.Y, brick.rect.TopLeft.X)
-                If testVal = 0 And instantUpdate = False And brickLast.Count > 0 Then
-                    ' no need to recompute everything when there is no motion in the cell.
-                    brick.age += 1
-                    brick = brickLast(i)
+                If task.rgbLeftAligned Then
+                    brick.rRect = brick.rect
+                    brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
+                    If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then
+                        brick.rRect.Width = 0 ' off the image
+                    End If
                 Else
-                    If task.rgbLeftAligned Then
-                        brick.rRect = brick.rect
-                        brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
-                        If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then
-                            brick.depth = 0 ' off the image
-                        End If
-                    Else
-                        If i > 0 Then brick = RealSenseAlign(brick)
-                    End If
+                    If i > 0 Then brick = RealSenseAlign(brick)
+                End If
 
-                    ' depth can be zero if the translation of color to left fails or left to right fails.
-                    If brick.depth > 0 And brick.lRect.Width = brick.rRect.Width Then
-                        cv.Cv2.MatchTemplate(task.leftView(brick.lRect), task.rightView(brick.rRect),
-                                             correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-                        brick.correlation = correlationMat.Get(Of Single)(0, 0)
+                If brick.lRect.Width = brick.rRect.Width Then
+                    cv.Cv2.MatchTemplate(task.leftView(brick.lRect), task.rightView(brick.rRect),
+                                                 correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                    brick.correlation = correlationMat.Get(Of Single)(0, 0)
 
-                        Dim p0 = Cloud_Basics.worldCoordinates(brick.rect.TopLeft, brick.depth)
-                        Dim p1 = Cloud_Basics.worldCoordinates(brick.rect.BottomRight, brick.depth)
+                    Dim p0 = Cloud_Basics.worldCoordinates(brick.rect.TopLeft, brick.depth)
+                    Dim p1 = Cloud_Basics.worldCoordinates(brick.rect.BottomRight, brick.depth)
 
-                        ' clockwise around starting in upper left.
-                        brick.corners.Add(New cv.Point3f(p0.X, p0.Y, brick.depth))
-                        brick.corners.Add(New cv.Point3f(p1.X, p0.Y, brick.depth))
-                        brick.corners.Add(New cv.Point3f(p1.X, p1.Y, brick.depth))
-                        brick.corners.Add(New cv.Point3f(p0.X, p1.Y, brick.depth))
-                    End If
+                    ' clockwise around starting in upper left.
+                    brick.corners.Add(New cv.Point3f(p0.X, p0.Y, brick.depth))
+                    brick.corners.Add(New cv.Point3f(p1.X, p0.Y, brick.depth))
+                    brick.corners.Add(New cv.Point3f(p1.X, p1.Y, brick.depth))
+                    brick.corners.Add(New cv.Point3f(p0.X, p1.Y, brick.depth))
                 End If
             End If
 
@@ -671,58 +660,6 @@ End Class
 
 
 
-
-
-
-
-Public Class Brick_CorrelationMap : Inherits TaskParent
-    Public Sub New()
-        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-        labels(3) = "The map to identify each brick's depth."
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Display a heatmap of the correlation of the left and right images for each brick."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1.SetTo(0)
-        task.depthAndDepthRange = ""
-        For Each brick In task.bricks.brickList
-            If brick.depth > 0 Then dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
-        Next
-
-        If standaloneTest() Then
-            dst2 = ShowPaletteCorrelation(dst1)
-            dst2.SetTo(0, task.noDepthMask)
-        End If
-
-        Dim ptM = task.mouseMovePoint, w = task.workRes.Width, h = task.workRes.Height
-        If ptM.X >= 0 And ptM.X < w And ptM.Y >= 0 And ptM.Y < h Then
-            Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            task.brickD = task.bricks.brickList(index)
-            task.depthAndDepthRange = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
-                                           CStr(task.brickD.index) + vbCrLf + " range " +
-                                           Format(task.brickD.mm.minVal, fmt1) + "-" +
-                                           Format(task.brickD.mm.maxVal, fmt1) + "m, age = " +
-                                           CStr(task.brickD.age) + vbCrLf +
-                                           " correlation = " + Format(task.brickD.correlation, fmt3)
-
-            Dim ptTextLoc = task.brickD.rect.TopLeft
-            If ptTextLoc.X > w * 0.85 Or (ptTextLoc.Y < h * 0.15 And ptTextLoc.X > w * 0.15) Then
-                ptTextLoc.X -= w * 0.15
-            Else
-                ptTextLoc.Y -= task.brickD.rect.Height * 3
-            End If
-
-            SetTrueText(task.depthAndDepthRange, ptTextLoc, 2)
-            SetTrueText(task.depthAndDepthRange, 3)
-        End If
-        labels(2) = task.bricks.labels(2)
-    End Sub
-End Class
-
-
-
-
-
 Public Class Brick_RegionLines : Inherits TaskParent
     Dim regions As New Region_Contours
     Public Sub New()
@@ -1077,5 +1014,52 @@ Public Class Brick_MLColor : Inherits TaskParent
 
         labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
                   " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Brick_CorrelationMap : Inherits TaskParent
+    Public Sub New()
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+        labels(3) = "The map to identify each brick's depth."
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Display a heatmap of the correlation of the left and right images for each brick."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1.SetTo(0)
+        task.depthAndDepthRange = ""
+        For Each brick In task.bricks.brickList
+            dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
+        Next
+
+        dst2 = ShowPaletteCorrelation(dst1)
+        dst2.SetTo(0, task.noDepthMask)
+
+        Dim pt = task.mouseMovePoint, w = task.workRes.Width, h = task.workRes.Height
+        If pt.X >= 0 And pt.X < w And pt.Y >= 0 And pt.Y < h Then
+            Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            task.brickD = task.bricks.brickList(index)
+            task.depthAndDepthRange = "depth = " + Format(task.brickD.depth, fmt3) + "m ID=" +
+                                      CStr(task.brickD.index) + vbCrLf + " range " +
+                                      Format(task.brickD.mm.minVal, fmt1) + "-" +
+                                      Format(task.brickD.mm.maxVal, fmt1) + "m, age = " +
+                                      CStr(task.brickD.age) + vbCrLf +
+                                      " correlation = " + Format(task.brickD.correlation, fmt3)
+
+            Dim ptTextLoc = task.brickD.rect.TopLeft
+            If ptTextLoc.X > w * 0.85 Or (ptTextLoc.Y < h * 0.15 And ptTextLoc.X > w * 0.15) Then
+                ptTextLoc.X -= w * 0.15
+            Else
+                ptTextLoc.Y -= task.brickD.rect.Height * 3
+            End If
+
+            SetTrueText(task.depthAndDepthRange, ptTextLoc, 2)
+            SetTrueText(task.depthAndDepthRange, 3)
+        End If
+        labels(2) = task.bricks.labels(2)
     End Sub
 End Class

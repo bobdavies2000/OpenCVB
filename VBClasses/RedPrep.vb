@@ -596,7 +596,6 @@ End Class
 
 Public Class XO_RedList_Motion : Inherits TaskParent
     Public Sub New()
-        task.gOptions.TrackingColor.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "If a RedCloud cell has no motion, it is preserved."
     End Sub
