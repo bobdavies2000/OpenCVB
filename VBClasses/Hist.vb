@@ -259,12 +259,16 @@ End Class
 
 Public Class Hist_PeakMax : Inherits TaskParent
     Dim hist As New Hist_Basics
+    Dim options As New Options_Kalman
     Public Sub New()
+        OptionParent.FindCheckBox("Use Kalman").Checked = False
         desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
         labels(3) = "Grayscale Histogram"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.gOptions.UseKalman.Checked = False
+        options.Run()
+        options.useKalman = False
+
         If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
         dst3 = hist.dst2

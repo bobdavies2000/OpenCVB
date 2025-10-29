@@ -301,13 +301,14 @@ Public Class Draw_ClipLine : Inherits TaskParent
         pt1 = New cv.Point(r.X, r.Y)
         pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
         rect = InitRandomRect(25)
-        If task.gOptions.UseKalman.Checked Then flow.flowText.Add("--------------------------- setup ---------------------------")
+        flow.flowText.Add("--------------------------- setup ---------------------------")
     End Sub
     Public Sub New()
         task.kalman = New Kalman_Basics
         flow.parentData = Me
         setup()
-        desc = "Demonstrate the use of the ClipLine function in Opencvb. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
+        desc = "Demonstrate the use of the ClipLine function in Opencvb. " +
+               "NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst3 = src

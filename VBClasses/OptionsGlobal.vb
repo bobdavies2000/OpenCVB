@@ -27,8 +27,6 @@ Public Class OptionsGlobal
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
 
-        UseKalman.Checked = True
-
         Palettes.Items.Clear()
         For Each mapName In mapNames
             Palettes.Items.Add(mapName)
@@ -165,7 +163,7 @@ Public Class OptionsGlobal
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
         task.optionsChanged = True
     End Sub
-    Private Sub UseKalman_CheckedChanged(sender As Object, e As EventArgs) Handles UseKalman.CheckedChanged
+    Private Sub UseKalman_CheckedChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
     Private Sub displayDst0_CheckedChanged(sender As Object, e As EventArgs) Handles displayDst0.CheckedChanged
@@ -292,12 +290,6 @@ Public Class OptionsGlobal
     Public Sub setLineWidth(val As Integer)
         LineWidth.Value = val
     End Sub
-    Public Sub SetUseKalman(val As Boolean)
-        UseKalman.Checked = val
-    End Sub
-    Public Function GetUseKalman() As Boolean
-        Return UseKalman.Checked
-    End Function
     Public Sub SetDotSize(val As Integer)
         DotSizeSlider.Value = val
     End Sub

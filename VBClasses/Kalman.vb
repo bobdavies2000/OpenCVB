@@ -5,10 +5,13 @@ Public Class Kalman_Basics : Inherits TaskParent
     Public kInput(4 - 1) As Single
     Public kOutput(4 - 1) As Single
     Dim saveDimension = -1
+    Dim options As New Options_Kalman
     Public Sub New()
         desc = "Use Kalman to stabilize values (such as a cv.rect.)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         If saveDimension <> kInput.Length Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
@@ -25,7 +28,7 @@ Public Class Kalman_Basics : Inherits TaskParent
             ReDim kOutput(kInput.Count - 1)
         End If
 
-        If task.gOptions.UseKalman.Checked Then
+        If options.useKalman Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = kInput(i)
                 kalman(i).RunAlg(Nothing)
@@ -196,12 +199,15 @@ Public Class Kalman_CVMat : Inherits TaskParent
     Public output As cv.Mat
     Public input As cv.Mat
     Dim saveDimension = -1
+    Dim options As New Options_Kalman
     Public Sub New()
         input = New cv.Mat(4, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
         If standalone Then labels(2) = "Rectangle moves smoothly to random locations"
         desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         If saveDimension <> input.Rows Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
@@ -218,10 +224,10 @@ Public Class Kalman_CVMat : Inherits TaskParent
             output = New cv.Mat(input.Rows, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
         End If
 
-        If task.gOptions.UseKalman.Checked Then
+        If options.useKalman Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = input.Get(Of Single)(i, 0)
-                kalman(i).runAlg(src)
+                kalman(i).RunAlg(src)
                 output.Set(Of Single)(i, 0, kalman(i).stateResult)
             Next
         Else
@@ -563,7 +569,7 @@ Public Class Kalman_VB_Basics : Inherits TaskParent
         matrix(task.frameCount Mod saveAvgCount) = kInput
         kAverage = (cv.Mat.FromPixelData(saveAvgCount, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean()(0)
 
-        If task.gOptions.UseKalman.Checked Then
+        If options.useKalman Then
             'The Kalman Filter code comes from:
             'http://www.rotomotion.com/downloads/tilt.c
             State_Update(kInput)

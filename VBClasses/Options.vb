@@ -5655,7 +5655,14 @@ Public Class Options_Kalman : Inherits OptionParent
     Public pdotEntry As Double = 0.3
     Public processCovar As Double = 0.0001
     Public averageInputCount As Integer = 20
+    Public useKalman As Boolean
     Public Sub New()
+        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
+            check.Setup(traceName)
+            check.addCheckBox("Use Kalman")
+            check.Box(0).Checked = True
+        End If
+
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Delta Time X100", 1, 30, delta * 100)
             sliders.setupTrackBar("pDot entry X1000", 0, 1000, pdotEntry * 1000)
@@ -5672,6 +5679,9 @@ Public Class Options_Kalman : Inherits OptionParent
         pdotEntry = pDotSlider.Value / 1000
         processCovar = covarSlider.Value / 10000
         averageInputCount = avgSlider.value
+
+        Static kalmanCheck = FindCheckBox("Use Kalman")
+        useKalman = kalmanCheck.checked
     End Sub
 End Class
 

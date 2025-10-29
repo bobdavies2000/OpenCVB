@@ -46,17 +46,16 @@ Partial Class OptionsGlobal
         Label2 = New Label()
         GroupBox2 = New GroupBox()
         UseMotionMask = New CheckBox()
-        showMotionMask = New CheckBox()
         TruncateDepth = New CheckBox()
         gravityPointCloud = New CheckBox()
-        UseKalman = New CheckBox()
-        CrossHairs = New CheckBox()
         CreateGif = New CheckBox()
         debugSyncUI = New CheckBox()
-        ShowGrid = New CheckBox()
         ShowAllOptions = New CheckBox()
         displayDst1 = New CheckBox()
         displayDst0 = New CheckBox()
+        showMotionMask = New CheckBox()
+        CrossHairs = New CheckBox()
+        ShowGrid = New CheckBox()
         ColorSource = New ComboBox()
         Palettes = New ComboBox()
         LineType = New ComboBox()
@@ -321,7 +320,6 @@ Partial Class OptionsGlobal
         GroupBox2.Controls.Add(UseMotionMask)
         GroupBox2.Controls.Add(TruncateDepth)
         GroupBox2.Controls.Add(gravityPointCloud)
-        GroupBox2.Controls.Add(UseKalman)
         GroupBox2.Controls.Add(CreateGif)
         GroupBox2.Controls.Add(debugSyncUI)
         GroupBox2.Controls.Add(ShowAllOptions)
@@ -341,7 +339,7 @@ Partial Class OptionsGlobal
         UseMotionMask.AutoSize = True
         UseMotionMask.Checked = True
         UseMotionMask.CheckState = CheckState.Checked
-        UseMotionMask.Location = New Point(13, 344)
+        UseMotionMask.Location = New Point(13, 305)
         UseMotionMask.Margin = New Padding(4)
         UseMotionMask.Name = "UseMotionMask"
         UseMotionMask.Size = New Size(202, 34)
@@ -349,21 +347,10 @@ Partial Class OptionsGlobal
         UseMotionMask.Text = "Use MotionMask"
         UseMotionMask.UseVisualStyleBackColor = True
         ' 
-        ' showMotionMask
-        ' 
-        showMotionMask.AutoSize = True
-        showMotionMask.Location = New Point(9, 121)
-        showMotionMask.Margin = New Padding(4)
-        showMotionMask.Name = "showMotionMask"
-        showMotionMask.Size = New Size(214, 34)
-        showMotionMask.TabIndex = 0
-        showMotionMask.Text = "Show motion cells"
-        showMotionMask.UseVisualStyleBackColor = True
-        ' 
         ' TruncateDepth
         ' 
         TruncateDepth.AutoSize = True
-        TruncateDepth.Location = New Point(13, 306)
+        TruncateDepth.Location = New Point(13, 267)
         TruncateDepth.Margin = New Padding(4)
         TruncateDepth.Name = "TruncateDepth"
         TruncateDepth.Size = New Size(314, 34)
@@ -374,35 +361,13 @@ Partial Class OptionsGlobal
         ' gravityPointCloud
         ' 
         gravityPointCloud.AutoSize = True
-        gravityPointCloud.Location = New Point(13, 268)
+        gravityPointCloud.Location = New Point(13, 229)
         gravityPointCloud.Margin = New Padding(4)
         gravityPointCloud.Name = "gravityPointCloud"
         gravityPointCloud.Size = New Size(408, 34)
         gravityPointCloud.TabIndex = 8
         gravityPointCloud.Text = "Apply gravity transform to point cloud"
         gravityPointCloud.UseVisualStyleBackColor = True
-        ' 
-        ' UseKalman
-        ' 
-        UseKalman.AutoSize = True
-        UseKalman.Location = New Point(13, 230)
-        UseKalman.Margin = New Padding(4)
-        UseKalman.Name = "UseKalman"
-        UseKalman.Size = New Size(232, 34)
-        UseKalman.TabIndex = 7
-        UseKalman.Text = "Use Kalman filtering"
-        UseKalman.UseVisualStyleBackColor = True
-        ' 
-        ' CrossHairs
-        ' 
-        CrossHairs.AutoSize = True
-        CrossHairs.Location = New Point(9, 79)
-        CrossHairs.Margin = New Padding(4)
-        CrossHairs.Name = "CrossHairs"
-        CrossHairs.Size = New Size(192, 34)
-        CrossHairs.TabIndex = 6
-        CrossHairs.Text = "Show crosshairs"
-        CrossHairs.UseVisualStyleBackColor = True
         ' 
         ' CreateGif
         ' 
@@ -425,17 +390,6 @@ Partial Class OptionsGlobal
         debugSyncUI.TabIndex = 4
         debugSyncUI.Text = "Synchronize Debug with Display"
         debugSyncUI.UseVisualStyleBackColor = True
-        ' 
-        ' ShowGrid
-        ' 
-        ShowGrid.AutoSize = True
-        ShowGrid.Location = New Point(9, 37)
-        ShowGrid.Margin = New Padding(4)
-        ShowGrid.Name = "ShowGrid"
-        ShowGrid.Size = New Size(270, 34)
-        ShowGrid.TabIndex = 3
-        ShowGrid.Text = "Show grid mask overlay"
-        ShowGrid.UseVisualStyleBackColor = True
         ' 
         ' ShowAllOptions
         ' 
@@ -469,6 +423,39 @@ Partial Class OptionsGlobal
         displayDst0.TabIndex = 0
         displayDst0.Text = "Show dst0 output"
         displayDst0.UseVisualStyleBackColor = True
+        ' 
+        ' showMotionMask
+        ' 
+        showMotionMask.AutoSize = True
+        showMotionMask.Location = New Point(9, 121)
+        showMotionMask.Margin = New Padding(4)
+        showMotionMask.Name = "showMotionMask"
+        showMotionMask.Size = New Size(214, 34)
+        showMotionMask.TabIndex = 0
+        showMotionMask.Text = "Show motion cells"
+        showMotionMask.UseVisualStyleBackColor = True
+        ' 
+        ' CrossHairs
+        ' 
+        CrossHairs.AutoSize = True
+        CrossHairs.Location = New Point(9, 79)
+        CrossHairs.Margin = New Padding(4)
+        CrossHairs.Name = "CrossHairs"
+        CrossHairs.Size = New Size(192, 34)
+        CrossHairs.TabIndex = 6
+        CrossHairs.Text = "Show crosshairs"
+        CrossHairs.UseVisualStyleBackColor = True
+        ' 
+        ' ShowGrid
+        ' 
+        ShowGrid.AutoSize = True
+        ShowGrid.Location = New Point(9, 37)
+        ShowGrid.Margin = New Padding(4)
+        ShowGrid.Name = "ShowGrid"
+        ShowGrid.Size = New Size(270, 34)
+        ShowGrid.TabIndex = 3
+        ShowGrid.Text = "Show grid mask overlay"
+        ShowGrid.UseVisualStyleBackColor = True
         ' 
         ' ColorSource
         ' 
@@ -618,7 +605,6 @@ Partial Class OptionsGlobal
     Friend WithEvents displayDst0 As CheckBox
     Friend WithEvents TruncateDepth As CheckBox
     Friend WithEvents gravityPointCloud As CheckBox
-    Friend WithEvents UseKalman As CheckBox
     Friend WithEvents CrossHairs As CheckBox
     Friend WithEvents CreateGif As CheckBox
     Friend WithEvents debugSyncUI As CheckBox

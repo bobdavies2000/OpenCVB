@@ -45,11 +45,14 @@ Public Class Interpolate_Kalman : Inherits TaskParent
     Dim updatedFrames As Integer
     Dim myFrameCount As Integer
     Dim heartCount As Integer
+    Dim options As New Options_Kalman
     Public Sub New()
         task.kalman = New Kalman_Basics
         desc = "Use Kalman to smooth the grayscale results of interpolation"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         inter.Run(src)
 
         dst2 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -74,7 +77,7 @@ Public Class Interpolate_Kalman : Inherits TaskParent
         Next
         Marshal.Copy(results, 0, dst2.Data, task.kalman.kOutput.Length)
 
-        If task.gOptions.UseKalman.Checked Then
+        If options.useKalman Then
             labels(2) = "Kalman-smoothed output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)
         Else
             labels(2) = "Raw output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)
