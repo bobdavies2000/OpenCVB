@@ -2,6 +2,45 @@ Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
+    Public mGrid As New Motion_GridRects
+    Public Sub New()
+        If standalone Then task.gOptions.showMotionMask.Checked = True
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+        labels(3) = "Updated task.motionRect"
+        desc = "Use the motionlist of rects to create one motion rectangle."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        mGrid.Run(src)
+
+        If task.heartBeat Then dst2 = task.gray
+        If mGrid.motionList.Count = 0 Then
+            task.motionRect = New cv.Rect
+            Exit Sub
+        End If
+
+        task.motionRect = task.gridRects(mGrid.motionList(0))
+        For Each index In mGrid.motionList
+            task.motionRect = task.motionRect.Union(task.gridRects(index))
+        Next
+
+        If standaloneTest() Then
+            dst3.SetTo(0)
+            dst3(task.motionRect).SetTo(255)
+            task.gray(task.motionRect).CopyTo(dst2(task.motionRect))
+        End If
+
+        task.motionPercent = mGrid.motionList.Count / task.gridRects.Count
+        If task.motionPercent > 0.8 Then task.motionPercent = 1
+        labels(2) = CStr(mGrid.motionList.Count) + " grid rect's or " +
+                    Format(task.motionPercent, "0.0%") + " of bricks had motion."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Motion_GridRects : Inherits TaskParent
     Public motionList As New List(Of Integer)
     Dim diff As New Diff_Basics
     Dim options As New Options_Motion
@@ -10,7 +49,7 @@ Public Class Motion_Basics : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "The motion mask"
-        desc = "Isolate all motion in the scene"
+        desc = "Find all the grid rects that had motion since the last frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.UseMotionMask.Checked = False Then Exit Sub
@@ -23,27 +62,24 @@ Public Class Motion_Basics : Inherits TaskParent
         diff.Run(src)
 
         motionList.Clear()
-        dst3.SetTo(0)
         For i = 0 To task.gridRects.Count - 1
             Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
             If diffCount >= options.colorDiffPixels Then
                 For Each index In task.grid.gridNeighbors(i)
-                    If motionList.Contains(index) = False Then
-                        motionList.Add(index)
-                        Dim rect = task.gridRects(index)
-                        src(rect).CopyTo(dst2(rect))
-                        dst3(rect).SetTo(255)
-                    End If
+                    If motionList.Contains(index) = False Then motionList.Add(index)
                 Next
             End If
         Next
 
-        task.motionMask = dst3.Clone
+        dst3.SetTo(0)
+        For Each index In motionList
+            Dim rect = task.gridRects(index)
+            src(rect).CopyTo(dst2(rect))
+            dst3(rect).SetTo(255)
+        Next
 
-        task.motionPercent = motionList.Count / task.gridRects.Count
-        If task.motionPercent > 0.8 Then task.motionPercent = 1
-        labels(2) = CStr(motionList.Count) + " grid rect's or " + Format(task.motionPercent, "0.0%") +
-                    " of bricks had motion."
+        task.motionMask = dst3.Clone
+        labels(2) = CStr(motionList.Count) + " grid rects had motion."
     End Sub
 End Class
 
@@ -954,31 +990,5 @@ Public Class Motion_Longest : Inherits TaskParent
 
         Dim lp = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
         DrawLine(dst2, lp, white)
-    End Sub
-End Class
-
-
-
-
-Public Class Motion_Rectangle : Inherits TaskParent
-    Public Sub New()
-        If standalone Then task.gOptions.showMotionMask.Checked = True
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        desc = "Use the motionlist of rects to create one motion rectangle."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3.SetTo(0)
-        If task.heartBeat Then dst2 = task.gray
-
-        Dim indexList = task.motionBasics.motionList
-        If indexList.Count = 0 Then Exit Sub
-
-        Dim rect As cv.Rect = task.gridRects(indexList(0))
-        For Each index In indexList
-            rect = rect.Union(task.gridRects(index))
-        Next
-
-        dst3(rect).SetTo(255)
-        task.gray(rect).CopyTo(dst2(rect))
     End Sub
 End Class

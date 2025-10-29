@@ -74,6 +74,7 @@ Public Class VBtask : Implements IDisposable
     Public lowResDepth As New cv.Mat
 
     Public motionMask As New cv.Mat
+    Public motionRect As cv.Rect
     Public motionPercent As Single
 
     Public optionsChanged As Boolean = True ' global or local options changed.
@@ -677,8 +678,11 @@ Public Class VBtask : Implements IDisposable
 
         rgbFilter.Run(task.color)
         motionBasics.Run(task.gray)
-        ' If task.optionsChanged Then grayStable = gray.Clone Else gray.CopyTo(grayStable, motionMask)
-        grayStable = gray
+        If task.optionsChanged Then
+            grayStable = gray.Clone
+        Else
+            If motionRect.Width > 0 Then gray(motionRect).CopyTo(grayStable(motionRect))
+        End If
 
         colorizer.Run(src)
 
@@ -784,7 +788,7 @@ Public Class VBtask : Implements IDisposable
 
                 If gOptions.ShowGrid.Checked Then results.dstList(2).SetTo(cv.Scalar.White, gridMask)
                 If gOptions.showMotionMask.Checked Then
-                    For Each mIndex In task.motionBasics.motionList
+                    For Each mIndex In task.motionBasics.mGrid.motionList
                         results.dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
                     Next
                 End If

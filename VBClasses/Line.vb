@@ -42,10 +42,12 @@ Public Class Line_Core : Inherits TaskParent
         End If
 
         Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        Dim count As Integer
         For Each lp In lpList
             If lpMotion(lp) = False Then
                 lp.age += 1
                 sortlines.Add(lp.length, lp)
+                count += 1
             End If
         Next
 
@@ -55,7 +57,6 @@ Public Class Line_Core : Inherits TaskParent
             If lpMotion(lp) Then
                 lp.age = 1
                 sortlines.Add(lp.length, lp)
-                ' If lpList.Count >= task.FeatureSampleSize Then Exit For
             End If
         Next
 
@@ -73,7 +74,7 @@ Public Class Line_Core : Inherits TaskParent
             DrawLine(dst2, lp, lp.color)
         Next
 
-        labels(2) = CStr(lpList.Count) + " lines found"
+        labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
     End Sub
 End Class
 

@@ -2824,7 +2824,7 @@ Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
             ReDim minList(task.gridRects.Count - 1)
             ReDim maxList(task.gridRects.Count - 1)
         End If
-        For Each index In task.motionBasics.motionList
+        For Each index In task.motionBasics.mGrid.motionList
             Dim rect = task.gridRects(index)
             Dim ptmin = New cv.Point2f(task.kalman.kOutput(index * 4) + rect.X,
                                        task.kalman.kOutput(index * 4 + 1) + rect.Y)
