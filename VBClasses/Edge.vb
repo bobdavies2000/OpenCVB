@@ -1061,14 +1061,14 @@ End Class
 
 
 Public Class Edge_CannyAccum : Inherits TaskParent
-    Dim canny As New Edge_Basics
+    Dim canny As New Edge_Canny
     Dim accum As New AddWeighted_Accumulate
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Accumulate Canny edges to highlight all real edges better."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        canny.Run(src)
+        canny.Run(task.gray)
         accum.Run(canny.dst2)
         dst2 = accum.dst2
         labels(2) = "Accumulated canny edges."

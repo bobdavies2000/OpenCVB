@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
-    Public mGrid As New Motion_GridRects
+    Public mGrid As New Motion_Core
     Public Sub New()
         If standalone Then task.gOptions.showMotionMask.Checked = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
@@ -23,11 +23,9 @@ Public Class Motion_Basics : Inherits TaskParent
             task.motionRect = task.motionRect.Union(task.gridRects(index))
         Next
 
-        If standaloneTest() Then
-            dst3.SetTo(0)
-            dst3(task.motionRect).SetTo(255)
-            task.gray(task.motionRect).CopyTo(dst2(task.motionRect))
-        End If
+        dst3.SetTo(0)
+        dst3(task.motionRect).SetTo(255)
+        task.gray(task.motionRect).CopyTo(dst2(task.motionRect))
 
         task.motionPercent = mGrid.motionList.Count / task.gridRects.Count
         If task.motionPercent > 0.8 Then task.motionPercent = 1
@@ -40,7 +38,7 @@ End Class
 
 
 
-Public Class Motion_GridRects : Inherits TaskParent
+Public Class Motion_Core : Inherits TaskParent
     Public motionList As New List(Of Integer)
     Dim diff As New Diff_Basics
     Dim options As New Options_Motion
@@ -83,29 +81,6 @@ Public Class Motion_GridRects : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class Motion_BasicsValidate : Inherits TaskParent
-    Dim diff As New Diff_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.showMotionMask.Checked = True
-        desc = "Display the difference between task.color and src to verify Motion_Basics is working"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        src = task.gray
-        If task.heartBeat Then dst3 = src.Clone Else src.CopyTo(dst3, task.motionMask)
-
-        diff.lastFrame = dst3
-        diff.Run(src)
-        dst2 = diff.dst2
-
-        labels(2) = "The image below is a diff of the camera image and the task.color built" +
-                    " with the motion mask.  Difference in pixels = " + CStr(dst2.CountNonZero)
-        labels(3) = task.motionBasics.labels(2)
-    End Sub
-End Class
 
 
 
@@ -232,66 +207,6 @@ End Class
 
 
 
-Public Class Motion_ThruCorrelation : Inherits TaskParent
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Correlation threshold X1000", 0, 1000, 900)
-            sliders.setupTrackBar("Stdev threshold for using correlation", 0, 100, 15)
-            sliders.setupTrackBar("Pad size in pixels for the search area", 0, 100, 20)
-        End If
-
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Detect motion through the correlation coefficient"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static ccSlider = OptionParent.FindSlider("Correlation threshold X1000")
-        Static padSlider = OptionParent.FindSlider("Pad size in pixels for the search area")
-        Static stdevSlider = OptionParent.FindSlider("Stdev threshold for using correlation")
-        Dim pad = padSlider.Value
-        Dim ccThreshold = ccSlider.Value
-        Dim stdevThreshold = stdevSlider.Value
-
-        Dim input = src.Clone
-        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        Static lastFrame As cv.Mat = input.Clone
-        dst3.SetTo(0)
-        Parallel.For(0, task.gridRects.Count,
-        Sub(i)
-            Dim roi = task.gridRects(i)
-            Dim correlation As New cv.Mat
-            Dim mean As Single, stdev As Single
-            cv.Cv2.MeanStdDev(input(roi), mean, stdev)
-            If stdev > stdevThreshold Then
-                cv.Cv2.MatchTemplate(lastFrame(roi), input(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
-                Dim mm As mmData = GetMinMax(correlation)
-                If mm.maxVal < ccThreshold / 1000 Then
-                    If (i Mod task.bricksPerCol) <> 0 Then dst3(task.gridRects(i - 1)).SetTo(255)
-                    If (i Mod task.bricksPerCol) < task.bricksPerCol And i < task.gridRects.Count - 1 Then dst3(task.gridRects(i + 1)).SetTo(255)
-                    If i > task.bricksPerCol Then
-                        dst3(task.gridRects(i - task.bricksPerCol)).SetTo(255)
-                        dst3(task.gridRects(i - task.bricksPerCol + 1)).SetTo(255)
-                    End If
-                    If i < (task.gridRects.Count - task.bricksPerCol - 1) Then
-                        dst3(task.gridRects(i + task.bricksPerCol)).SetTo(255)
-                        dst3(task.gridRects(i + task.bricksPerCol + 1)).SetTo(255)
-                    End If
-                    dst3(roi).SetTo(255)
-                End If
-            End If
-        End Sub)
-
-        lastFrame = input.Clone
-
-        If task.heartBeat Then dst2 = src.Clone Else src.CopyTo(dst2, dst3)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Motion_PixelDiff : Inherits TaskParent
     Public changedPixels As Integer
@@ -332,9 +247,9 @@ End Class
 
 
 
-Public Class Motion_Grid_MP : Inherits TaskParent
+Public Class Motion_FromCorrelation_MP : Inherits TaskParent
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 950)
         desc = "Detect Motion in the color image using multi-threading - slower than single-threaded!"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -348,6 +263,7 @@ Public Class Motion_Grid_MP : Inherits TaskParent
         Dim updateCount As Integer
         Parallel.ForEach(Of cv.Rect)(task.gridRects,
             Sub(roi)
+                If roi = task.gridRects(606) Then Dim k = 0
                 Dim correlation As New cv.Mat
                 cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                 If correlation.Get(Of Single)(0, 0) < CCthreshold Then
@@ -366,9 +282,9 @@ End Class
 
 
 
-Public Class Motion_GridCorrelation : Inherits TaskParent
+Public Class Motion_FromCorrelation : Inherits TaskParent
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 990)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 950)
         desc = "Detect Motion in the color image.  Rectangles outlines didn't have high correlation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -395,49 +311,6 @@ Public Class Motion_GridCorrelation : Inherits TaskParent
                          Format(correlationSlider.Value / 1000, "0.0%") + " correlation. "
     End Sub
 End Class
-
-
-
-
-
-Public Class Motion_RectTest : Inherits TaskParent
-    Dim motion As New Motion_Enclosing
-    Dim diff As New Diff_Basics
-    Dim lastRects As New List(Of cv.Rect)
-    Public Sub New()
-        labels(3) = "The white spots show the difference of the constructed image from the current image."
-        desc = "Track the RGB image using Motion_Enclosing to isolate the motion"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        motion.Run(src)
-        Dim r = motion.motionRect
-        If task.heartBeat Or r.Width * r.Height > src.Total / 2 Or task.frameCount < 50 Then
-            dst2 = src.Clone
-            lastRects.Clear()
-        Else
-            If r.Width > 0 And r.Height > 0 Then
-                For Each rect In lastRects
-                    r = r.Union(rect)
-                Next
-                src(r).CopyTo(dst2(r))
-                lastRects.Add(r)
-                If lastRects.Count > task.frameHistoryCount Then lastRects.RemoveAt(0)
-            Else
-                lastRects.Clear()
-            End If
-        End If
-
-        If standaloneTest() Then
-            diff.lastFrame = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            diff.Run(dst2)
-            dst3 = diff.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            DrawRect(dst3, r)
-        End If
-    End Sub
-End Class
-
-
-
 
 
 
@@ -511,9 +384,6 @@ End Class
 
 
 
-
-
-
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Public Class Motion_Diff : Inherits TaskParent
     Public options As New Options_ImageOffset
@@ -566,16 +436,16 @@ End Class
 Public Class Motion_FromEdge : Inherits TaskParent
     Dim cAccum As New Edge_CannyAccum
     Public Sub New()
-        desc = "Detect motion from pixels less that max value in an accumulation."
+        desc = "Detect motion from pixels less than max value in an accumulation."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         cAccum.Run(src)
 
         Dim mm = GetMinMax(cAccum.dst2)
-        labels(3) = "Max value = " + CStr(mm.maxVal)
+        labels(3) = "Max value = " + CStr(mm.maxVal) + " min value = " + CStr(mm.minVal)
 
         dst2 = cAccum.dst2.Threshold(mm.maxVal, 255, cv.ThresholdTypes.TozeroInv)
-        dst3 = cAccum.dst2.InRange(0, mm.maxVal - 10)
+        dst3 = cAccum.dst2.InRange(1, 254)
     End Sub
 End Class
 
@@ -990,5 +860,60 @@ Public Class Motion_Longest : Inherits TaskParent
 
         Dim lp = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
         DrawLine(dst2, lp, white)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Motion_ValidateBasics : Inherits TaskParent
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.showMotionMask.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(2) = "Grayscale image constructed from previous image + motion rect of current image."
+        labels(1) = "Current grayscale image"
+        desc = "Compare task.gray to constructed image to verify Motion_Basics is working"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1 = task.motionBasics.dst2.Clone
+        dst2 = task.gray.Clone
+
+        diff.lastFrame = dst1
+        diff.Run(dst2)
+        dst3 = diff.dst3
+
+        dst3.Rectangle(task.motionRect, white, task.lineWidth)
+        labels(3) = "Diff of task.gray and the one built with the motion Rect.  " +
+                     CStr(diff.dst2.CountNonZero) + " pixels different."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Motion_ValidateCore : Inherits TaskParent
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.showMotionMask.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(2) = "Grayscale image constructed from previous image + motion rect of current image."
+        labels(1) = "Current grayscale image"
+        desc = "Compare task.gray to constructed image to verify Motion_Core is working"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1 = task.motionBasics.dst2.Clone
+        dst2 = task.gray.Clone
+
+        diff.lastFrame = dst1
+        diff.Run(dst2)
+        dst3 = diff.dst3
+
+        dst3.Rectangle(task.motionRect, white, task.lineWidth)
+        labels(3) = "Diff of task.gray and the one built with the motion Rect.  " +
+                     CStr(diff.dst2.CountNonZero) + " pixels different."
     End Sub
 End Class

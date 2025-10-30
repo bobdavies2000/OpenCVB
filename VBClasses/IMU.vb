@@ -745,10 +745,10 @@ Public Class IMU_Kalman : Inherits TaskParent
         desc = "Use Kalman Filter to stabilize the IMU acceleration and velocity"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.kalman = New Kalman_Basics
+        If task.kalman Is Nothing Then task.kalman = New Kalman_Basics
         With task.kalman
             .kInput = {task.IMU_RawAcceleration.X, task.IMU_RawAcceleration.Y, task.IMU_RawAcceleration.Z,
-                              task.IMU_RawAngularVelocity.X, task.IMU_RawAngularVelocity.Y, task.IMU_RawAngularVelocity.Z}
+                       task.IMU_RawAngularVelocity.X, task.IMU_RawAngularVelocity.Y, task.IMU_RawAngularVelocity.Z}
             .Run(src)
             task.kalmanIMUacc = New cv.Point3f(.kOutput(0), .kOutput(1), .kOutput(2))
             task.kalmanIMUvelocity = New cv.Point3f(.kOutput(3), .kOutput(4), .kOutput(5))

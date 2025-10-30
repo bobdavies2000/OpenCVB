@@ -730,6 +730,7 @@ Public Class VBtask : Implements IDisposable
             If sharpGL IsNot Nothing Then sharpGL.Activate()
             treeView.Activate()
             allOptions.Activate()
+            If PixelViewer IsNot Nothing Then PixelViewer.viewerForm.Activate()
             activateTaskForms = False
         End If
         If task.paused = False Then

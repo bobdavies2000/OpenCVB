@@ -39,6 +39,7 @@ Namespace OpenCVB
         Dim algorithmTaskHandle As Thread
 
         Dim saveAlgorithmName As String
+        Dim saveThreadID As Integer
         Dim cameraShutdown As Boolean
         Dim shuttingDown As Boolean
         Dim debugSyncUI As Boolean
@@ -672,7 +673,13 @@ Namespace OpenCVB
                 Thread.Sleep(1000)
             Next
             If crash Then
-                Throw New InvalidOperationException("Can't start the next algorithm because previous algorithm has not completed.")
+                Dim currentProcess As Process = Process.GetCurrentProcess()
+                For Each t As ProcessThread In currentProcess.Threads
+                    Debug.WriteLine($"Thread ID: {t.Id}, State: {t.ThreadState}")
+                Next
+                MsgBox("Review the algorithm that is running for threading problems." + vbCrLf +
+                       "Click 'OK' to continue testing...")
+                killThread(saveThreadID)
             End If
 
             If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
@@ -1028,6 +1035,7 @@ Namespace OpenCVB
             algorithmTaskHandle.Name = parms.algName
             algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
             algorithmTaskHandle.Start(parms)
+            saveThreadID = algorithmTaskHandle.ManagedThreadId
         End Sub
     End Class
 End Namespace

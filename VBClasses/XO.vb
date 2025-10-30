@@ -14365,3 +14365,97 @@ Public Class XO_RedColor_BasicsFast : Inherits TaskParent
         If cPtr <> 0 Then cPtr = RedCloudMaxDist_Close(cPtr)
     End Sub
 End Class
+
+
+
+
+Public Class XO_Motion_RectHistory : Inherits TaskParent
+    Dim motion As New Motion_Enclosing
+    Dim diff As New Diff_Basics
+    Dim lastRects As New List(Of cv.Rect)
+    Public Sub New()
+        labels(3) = "The white spots show the difference of the constructed image from the current image."
+        desc = "Track task.gray using Motion_Enclosing to isolate the motion"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        motion.Run(src)
+        Dim r = motion.motionRect
+        If task.heartBeat Then
+            dst2 = src.Clone
+            lastRects.Clear()
+        Else
+            For Each rect In lastRects
+                r = r.Union(rect)
+            Next
+            dst2 = task.motionBasics.dst2
+            lastRects.Add(r)
+            If lastRects.Count > task.frameHistoryCount Then lastRects.RemoveAt(0)
+        End If
+
+        If standaloneTest() Then
+            diff.lastFrame = task.gray
+            diff.Run(dst2)
+            dst3 = diff.dst3
+            dst3.Rectangle(r, white, task.lineWidth)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Motion_ThruCorrelation : Inherits TaskParent
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Correlation threshold X1000", 0, 1000, 900)
+            sliders.setupTrackBar("Stdev threshold for using correlation", 0, 100, 15)
+            sliders.setupTrackBar("Pad size in pixels for the search area", 0, 100, 20)
+        End If
+
+        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        desc = "Detect motion through the correlation coefficient"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static ccSlider = OptionParent.FindSlider("Correlation threshold X1000")
+        Static padSlider = OptionParent.FindSlider("Pad size in pixels for the search area")
+        Static stdevSlider = OptionParent.FindSlider("Stdev threshold for using correlation")
+        Dim pad = padSlider.Value
+        Dim ccThreshold = ccSlider.Value
+        Dim stdevThreshold = stdevSlider.Value
+
+        Dim input = src.Clone
+        If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static lastFrame As cv.Mat = input.Clone
+        dst3.SetTo(0)
+        Parallel.For(0, task.gridRects.Count,
+        Sub(i)
+            Dim roi = task.gridRects(i)
+            Dim correlation As New cv.Mat
+            Dim mean As Single, stdev As Single
+            cv.Cv2.MeanStdDev(input(roi), mean, stdev)
+            If stdev > stdevThreshold Then
+                cv.Cv2.MatchTemplate(lastFrame(roi), input(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+                Dim mm As mmData = GetMinMax(correlation)
+                If mm.maxVal < ccThreshold / 1000 Then
+                    If (i Mod task.bricksPerCol) <> 0 Then dst3(task.gridRects(i - 1)).SetTo(255)
+                    If (i Mod task.bricksPerCol) < task.bricksPerCol And i < task.gridRects.Count - 1 Then dst3(task.gridRects(i + 1)).SetTo(255)
+                    If i > task.bricksPerCol Then
+                        dst3(task.gridRects(i - task.bricksPerCol)).SetTo(255)
+                        dst3(task.gridRects(i - task.bricksPerCol + 1)).SetTo(255)
+                    End If
+                    If i < (task.gridRects.Count - task.bricksPerCol - 1) Then
+                        dst3(task.gridRects(i + task.bricksPerCol)).SetTo(255)
+                        dst3(task.gridRects(i + task.bricksPerCol + 1)).SetTo(255)
+                    End If
+                    dst3(roi).SetTo(255)
+                End If
+            End If
+        End Sub)
+
+        lastFrame = input.Clone
+
+        If task.heartBeat Then dst2 = src.Clone Else src.CopyTo(dst2, dst3)
+    End Sub
+End Class

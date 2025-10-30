@@ -264,8 +264,9 @@ Namespace OpenCVB
                         task.trueData.Clear()
                     End SyncLock
 
-                    If task.displayDst1 = False Or task.labels(1) = "" Then picLabels(1) = "DepthRGB"
-                    picLabels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")
+                    If task.displayDst1 = False Or task.labels(1) = "" Then
+                        picLabels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")
+                    End If
 
                     task.mouseClickFlag = False
                     frameCount = task.frameCount
