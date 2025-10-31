@@ -147,7 +147,7 @@ Public Class Cloud_SetupSide : Inherits TaskParent
         Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
         Dim offset = Math.Sin(task.accRadians.X) * marker.Y
-        If task.useGravityPointcloud Then
+        If task.gOptions.gravityPointCloud.Checked Then
             If task.accRadians.X > 0 Then
                 markerLeft.Y = markerLeft.Y - offset
                 markerRight.Y = markerRight.Y + offset
@@ -223,7 +223,7 @@ Public Class Cloud_SetupTop : Inherits TaskParent
         Dim markerRight = New cv.Point(cam.X + topLen, marker.Y)
 
         Dim offset = Math.Sin(task.accRadians.Z) * topLen
-        If task.useGravityPointcloud Then
+        If task.gOptions.gravityPointCloud.Checked Then
             If task.accRadians.Z > 0 Then
                 markerLeft.X = markerLeft.X - offset
                 markerRight.X = markerRight.X + offset

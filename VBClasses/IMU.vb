@@ -1037,7 +1037,7 @@ Public Class IMU_GMatrixWithOptions : Inherits TaskParent
         If ySlider Is Nothing Then ySlider = OptionParent.FindSlider("Rotate pointcloud around Y-axis (degrees)")
         If zSlider Is Nothing Then zSlider = OptionParent.FindSlider("Rotate pointcloud around Z-axis (degrees)")
 
-        If task.useGravityPointcloud Then
+        If task.gOptions.gravityPointCloud.Checked Then
             '[cos(a) -sin(a)    0]
             '[sin(a)  cos(a)    0]
             '[0       0         1] rotate the point cloud around the x-axis.

@@ -51,6 +51,7 @@ Public Class Gravity_Raw : Inherits TaskParent
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(2) = "Horizon and Gravity Vectors"
+        If standalone Then task.gOptions.gravityPointCloud.Checked = False
         desc = "Method to find gravity and horizon vectors from the IMU"
     End Sub
     Private Function findFirst(points As cv.Mat) As Single
@@ -82,7 +83,7 @@ Public Class Gravity_Raw : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim threshold As Single = 0.015 ' surround zero by 15 cm's
 
-        dst3 = task.splitOriginalCloud(0).InRange(-threshold, threshold)
+        dst3 = task.pcSplit(0).InRange(-threshold, threshold)
         dst3.SetTo(0, task.noDepthMask)
         Dim gPoints = dst3.FindNonZero()
         If gPoints.Rows = 0 Then Exit Sub ' no point cloud data to get the gravity line in the image coordinates.
@@ -279,7 +280,7 @@ Public Class Gravity_BasicsOriginal : Inherits TaskParent
         desc = "Search for the transition from positive to negative to find the gravity vector."
     End Sub
     Public Shared Function PrepareDepthInput(index As Integer) As cv.Mat
-        If task.useGravityPointcloud Then Return task.pcSplit(index) ' already oriented to gravity
+        If task.gOptions.gravityPointCloud.Checked Then Return task.pcSplit(index) ' already oriented to gravity
 
         ' rebuild the pointcloud so it is oriented to gravity.
         Dim pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)

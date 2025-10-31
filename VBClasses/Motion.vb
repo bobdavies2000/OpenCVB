@@ -1,5 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports System.Threading
+Imports System.Windows.Forms.Design.AxImporter
+Imports OpenCvSharp.ML.DTrees
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
     Public mGrid As New Motion_Core
@@ -178,36 +180,6 @@ End Class
 
 
 
-
-
-
-Public Class Motion_PointCloud : Inherits TaskParent
-    Public Sub New()
-        labels = {"", "", "Pointcloud updated only with motion Rect",
-                  "Diff of dst2 and latest pointcloud (there will always be differences.)"}
-        desc = "Update the pointcloud only with the motion Rect.  Resync heartbeatLT."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeatLT Or task.frameCount < 5 Or task.optionsChanged Then
-            dst2 = task.pointCloud.Clone
-        End If
-        If task.motionRect.Width = 0 Then Exit Sub ' nothing changed...
-        task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
-
-        If standaloneTest() Then
-            Static diff As New Diff_Depth32f
-            Dim split = dst2.Split()
-            diff.lastDepth32f = split(2)
-            diff.Run(task.pcSplit(2))
-            dst3 = diff.dst2
-        End If
-    End Sub
-End Class
-
-
-
-
-
 Public Class Motion_FromEdge : Inherits TaskParent
     Dim cAccum As New Edge_CannyAccum
     Public Sub New()
@@ -295,5 +267,96 @@ Public Class Motion_ValidateCore : Inherits TaskParent
         dst3.Rectangle(task.motionRect, white, task.lineWidth)
         labels(3) = "Diff of task.gray and the one built with the motion Rect.  " +
                      CStr(diff.dst2.CountNonZero) + " pixels different."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Motion_PointCloud : Inherits TaskParent
+    Public originalPointcloud As cv.Mat
+    Public Sub New()
+        labels = {"", "", "Pointcloud updated only with motion Rect",
+                  "Diff of camera depth and motion-updated depth (always different)"}
+        desc = "Update the pointcloud only with the motion Rect.  Resync heartbeatLT."
+    End Sub
+    Public Sub preparePointcloud()
+        If task.gOptions.gravityPointCloud.Checked Then
+            '******* this is the gravity rotation *******
+            task.gravityCloud = (task.pointCloud.Reshape(1,
+                            task.rows * task.cols) * task.gMatrix).ToMat.Reshape(3, task.rows)
+            task.pointCloud = task.gravityCloud
+        End If
+
+        task.pcSplit = task.pointCloud.Split
+
+        If task.optionsChanged Then
+            task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
+        End If
+        If task.gOptions.TruncateDepth.Checked Then
+            task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
+                                                        task.MaxZmeters, cv.ThresholdTypes.Trunc)
+            task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
+                                                        task.MaxZmeters).ConvertScaleAbs()
+            cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+        End If
+
+        ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+        ' with and without gravity transform.  
+        If task.cameraName = "StereoLabs ZED 2/2i" Then
+            cv.Cv2.PatchNaNs(task.pcSplit(0))
+            cv.Cv2.PatchNaNs(task.pcSplit(1))
+            cv.Cv2.PatchNaNs(task.pcSplit(2))
+            cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+        End If
+
+        task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        task.noDepthMask = Not task.depthMask
+
+        If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
+            Dim xRatio = task.xRangeDefault / task.xRange
+            Dim yRatio = task.yRangeDefault / task.yRange
+            task.pcSplit(0) *= xRatio
+            task.pcSplit(1) *= yRatio
+
+            cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+        End If
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
+
+        If task.optionsChanged Then
+            If task.rangesCloud Is Nothing Then
+                Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+                Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+                Dim rz = New cv.Vec2f(0, task.MaxZmeters)
+                task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1),
+                                                            New cv.Rangef(ry.Item0, ry.Item1),
+                                                            New cv.Rangef(rz.Item0, rz.Item1)}
+            End If
+        End If
+
+        If task.gOptions.UseMotionMask.Checked Then
+            If task.heartBeatLT Or task.frameCount < 5 Or task.optionsChanged Then
+                dst2 = task.pointCloud.Clone
+            End If
+
+            If task.motionRect.Width = 0 And task.optionsChanged = False Then Exit Sub ' nothing changed...
+            task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
+            task.pointCloud = dst2
+        End If
+
+        ' this will move the motion-updated pointcloud into production.
+        preparePointcloud()
+
+        If standaloneTest() Then
+            Static diff As New Diff_Depth32f
+            Dim split = originalPointcloud.Split()
+            diff.lastDepth32f = split(2)
+            diff.Run(task.pcSplit(2))
+            dst3 = diff.dst2
+            dst3.Rectangle(task.motionRect, white, task.lineWidth)
+        End If
     End Sub
 End Class

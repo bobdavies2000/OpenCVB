@@ -2,7 +2,7 @@
 Public Class Intrinsics_Basics : Inherits TaskParent
     Public Sub New()
         If standalone Then If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-        If standalone Then task.useGravityPointcloud = False
+        If standalone Then task.gOptions.gravityPointCloud.Checked = False
         desc = "Some cameras don't provide aligned color and left images.  This algorithm tries to align the left and color image."
     End Sub
     Public Shared Function translate_LeftToRight(pt As cv.Point3f) As cv.Point2f

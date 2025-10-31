@@ -192,7 +192,6 @@ Public Class OptionsGlobal
     End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
         task.optionsChanged = True
-        task.useGravityPointcloud = gravityPointCloud.Checked
     End Sub
     Private Sub Palettes_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles Palettes.SelectedIndexChanged
         task.optionsChanged = True

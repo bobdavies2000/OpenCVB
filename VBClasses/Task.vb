@@ -29,7 +29,7 @@ Public Class VBtask : Implements IDisposable
     Public motionBasics As Motion_Basics
     Public colorizer As DepthColorizer_Basics
     Public contours As Contour_Basics_List
-    'Public pcMotion As Motion_PointCloud
+    Public pcMotion As Motion_PointCloud
 
     Public feat As Feature_Basics
     Public bricks As Brick_Basics
@@ -98,12 +98,10 @@ Public Class VBtask : Implements IDisposable
     Public leftView As New cv.Mat
     Public rightView As New cv.Mat
     Public pointCloud As New cv.Mat
+    Public gravityCloud As New cv.Mat
     Public sharpDepth As cv.Mat
     Public sharpRGB As cv.Mat
-    Public splitOriginalCloud() As cv.Mat
-    Public gravityCloud As New cv.Mat
     Public pcSplit() As cv.Mat
-    Public gravitySplit() As cv.Mat
 
     ' transformation matrix to convert point cloud to be vertical according to gravity.
     Public gMatrix As New cv.Mat
@@ -196,8 +194,6 @@ Public Class VBtask : Implements IDisposable
     Public pitch As Single
     Public yaw As Single
     Public roll As Single
-
-    Public useGravityPointcloud As Boolean
 
     Public highlight As cv.Scalar ' color to use to highlight objects in an image.
 
@@ -319,12 +315,6 @@ Public Class VBtask : Implements IDisposable
     Public closeRequest As Boolean
     Public sharpGL As VBClasses.SharpGLForm
 
-    Public Structure inBuffer
-        Dim color As cv.Mat
-        Dim leftView As cv.Mat
-        Dim rightView As cv.Mat
-        Dim pointCloud As cv.Mat
-    End Structure
     Public Structure intrinsicData
         Public ppx As Single
         Public ppy As Single
@@ -473,13 +463,14 @@ Public Class VBtask : Implements IDisposable
 
         callTrace = New List(Of String)
         task.pointCloud = New cv.Mat(task.workRes, cv.MatType.CV_32FC3, 0)
+        task.gravityCloud = New cv.Mat(task.workRes, cv.MatType.CV_32FC3, 0)
 
         colorizer = New DepthColorizer_Basics
         gmat = New IMU_GMatrix
         gravityBasics = New Gravity_Basics
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
-        'pcMotion = New Motion_PointCloud
+        pcMotion = New Motion_PointCloud
         grid = New Grid_Basics
         lines = New Line_Basics
         rgbFilter = New Filter_Basics
@@ -595,10 +586,6 @@ Public Class VBtask : Implements IDisposable
         imuBasics.Run(emptyMat)
         gmat.Run(emptyMat)
 
-        'If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") = False Then
-        '    leftView = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        'End If
-
         If gOptions.CreateGif.Checked Then
             heartBeat = False
             optionsChanged = False
@@ -606,74 +593,7 @@ Public Class VBtask : Implements IDisposable
             heartBeat = heartBeat Or debugSyncUI Or optionsChanged Or mouseClickFlag
         End If
 
-        If paused = False Then
-            frameHistoryCount = 3 ' default value.  Use Options_History to update this value.
-
-            If pointCloud.Size <> src.Size Then
-                pointCloud = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
-                gravityCloud = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
-            End If
-
-
-
-            '******* this is the gravity rotation *******
-            gravityCloud = (pointCloud.Reshape(1, src.Rows * src.Cols) * gMatrix).ToMat.Reshape(3, src.Rows)
-
-
-
-            splitOriginalCloud = gravityCloud.Split
-            If useGravityPointcloud Then pointCloud = gravityCloud
-
-            If pcSplit Is Nothing Then pcSplit = pointCloud.Split
-        End If
-
-        pcSplit = pointCloud.Split
-        If useGravityPointcloud Then gravitySplit = pcSplit Else gravitySplit = gravityCloud.Split()
-
-        If optionsChanged Then maxDepthMask = New cv.Mat(pcSplit(2).Size, cv.MatType.CV_8U, 0)
-        If gOptions.TruncateDepth.Checked Then
-            pcSplit(2) = pcSplit(2).Threshold(MaxZmeters, MaxZmeters, cv.ThresholdTypes.Trunc)
-            task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
-            cv.Cv2.Merge(pcSplit, pointCloud)
-        End If
-
-        ' The stereolabs camera has some weird -inf and inf values in the Y-plane - with and without gravity transform.  
-        If cameraName = "StereoLabs ZED 2/2i" Then
-            Dim mask = pcSplit(0).InRange(-100, 100)
-            pcSplit(0).SetTo(0, Not mask)
-            mask = pcSplit(1).InRange(-100, 100)
-            pcSplit(1).SetTo(0, Not mask)
-            mask = pcSplit(2).InRange(-100, 100)
-            pcSplit(2).SetTo(0, Not mask)
-        End If
-
-        ' the gravity transformation apparently can introduce some NaNs - just for StereoLabs tho.
-        If cameraName.StartsWith("StereoLabs") Then
-            cv.Cv2.PatchNaNs(pcSplit(0))
-            cv.Cv2.PatchNaNs(pcSplit(1))
-            cv.Cv2.PatchNaNs(pcSplit(2))
-            cv.Cv2.Merge(pcSplit, task.pointCloud)
-        End If
-
-        depthMask = pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        noDepthMask = Not depthMask
-
-        If xRange <> xRangeDefault Or yRange <> yRangeDefault Then
-            Dim xRatio = xRangeDefault / xRange
-            Dim yRatio = yRangeDefault / yRange
-            pcSplit(0) *= xRatio
-            pcSplit(1) *= yRatio
-
-            cv.Cv2.Merge(pcSplit, pointCloud)
-        End If
-
-        If task.rangesCloud Is Nothing Then
-            Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
-            Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-            Dim rz = New cv.Vec2f(0, task.MaxZmeters)
-            task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1),
-                                                New cv.Rangef(rz.Item0, rz.Item1)}
-        End If
+        frameHistoryCount = 3 ' default value.  Use Options_History to update this value.
 
         If task.optionsChanged Then task.motionMask.SetTo(255)
 
@@ -681,10 +601,12 @@ Public Class VBtask : Implements IDisposable
         motionBasics.Run(task.gray)
         If task.optionsChanged Then
             grayStable = gray.Clone
+            task.motionRect = New cv.Rect(0, 0, task.workRes.Width, task.workRes.Height)
         Else
             If motionRect.Width > 0 Then gray(motionRect).CopyTo(grayStable(motionRect))
         End If
-        'pcMotion.Run(emptyMat) ' use pcMotion.dst2 to get the partially updated pointcloud.
+
+        pcMotion.Run(emptyMat) '******* this is the gravity rotation *******
 
         colorizer.Run(src)
 

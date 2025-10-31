@@ -2343,7 +2343,7 @@ Public Class XO_Horizon_Basics : Inherits TaskParent
         DrawLine(dst2, vec.p1, vec.p2, 255)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then dst0 = task.gravitySplit(1) Else dst0 = src
+        If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(1) Else dst0 = src
 
         dst0 = dst0.Abs()
         dst1 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -2437,7 +2437,7 @@ Public Class XO_Horizon_ExternalTest : Inherits TaskParent
         desc = "Supply the point cloud input to Horizon_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst0 = task.gravitySplit(1)
+        dst0 = task.pcSplit(1)
         horizon.Run(dst0)
         dst2 = horizon.dst2
     End Sub
@@ -2468,7 +2468,7 @@ Public Class XO_Gravity_Basics : Inherits TaskParent
         DrawLine(dst3, task.lineGravity.p1, task.lineGravity.p2, white)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then dst0 = task.gravitySplit(0) Else dst0 = src
+        If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(0) Else dst0 = src
 
         dst0 = dst0.Abs()
         dst1 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -2771,7 +2771,7 @@ Public Class XO_Gravity_BasicsOriginal : Inherits TaskParent
         Return New cv.Point
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then dst0 = task.gravitySplit(0) Else dst0 = src
+        If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(0) Else dst0 = src
 
         Dim p1 = findTransition(0, dst0.Height - 1, 1)
         Dim p2 = findTransition(dst0.Height - 1, 0, -1)

@@ -401,7 +401,7 @@ Public Class RedCloud_Motion : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.motionRect.Width = 0 Then Exit Sub ' nothing changed...
 
-        pcMotion.Run(src)
+        ' pcMotion.Run(src) ' now running in task.vb.
 
         dst2 = runRedCloud(pcMotion.dst2, labels(2))
     End Sub
