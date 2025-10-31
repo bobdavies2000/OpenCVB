@@ -1479,3 +1479,51 @@ Public Class Edge_cloudData : Inherits TaskParent
         dst3 = edges.dst2
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Edge_Stability : Inherits TaskParent
+    Dim gEdges As New Brick_Edges
+    Public Sub New()
+        desc = "Measure the stability of edges in each grid Rect"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        gEdges.Run(src)
+        dst2 = gEdges.edges.dst2
+
+        Dim popSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        Dim pops As New List(Of Integer)
+        For i = 0 To gEdges.featureRects.Count - 1
+            Dim roi = gEdges.featureRects(i)
+            Dim pop = dst2(roi).CountNonZero
+            pops.Add(pop)
+            popSorted.Add(pop, i)
+            dst2.Rectangle(roi, 255, task.lineWidth)
+        Next
+
+        Dim popAverage = If(pops.Count > 0, pops.Average, 0)
+        Dim popMin = If(pops.Count > 0, pops.Min, 0)
+        Dim popMax = If(pops.Count > 0, pops.Max, 0)
+        labels(2) = CStr(gEdges.featureRects.Count) + " feature rects with an average population of " +
+                         Format(popAverage, fmt1) + " and with min = " + CStr(popMin) +
+                         " and max = " + CStr(popMax) + ".  Circled cell has max features."
+
+        Dim index = pops.IndexOf(pops.Max)
+        Dim gSize = task.gOptions.GridSlider.Value
+        Dim pt = New cv.Point(gEdges.featureRects(index).X + gSize / 2, gEdges.featureRects(index).Y + gSize / 2)
+        dst2.Circle(pt, gSize * 1.5, 255, task.lineWidth * 2)
+
+        dst3.SetTo(0)
+        dst3.Circle(pt, gSize * 1.5, 255, task.lineWidth * 2)
+        Dim count As Integer
+        For Each index In popSorted.Values
+            dst3.Rectangle(gEdges.featureRects(index), white, task.lineWidth)
+            count += 1
+            If count >= 20 Then Exit For
+        Next
+    End Sub
+End Class

@@ -416,7 +416,7 @@ End Class
 Public Class Color8U_MotionFiltered : Inherits TaskParent
     Dim color8U As New Color8U_Sweep
     Public classCount As Integer
-    Dim motion As New Motion_BGSub
+    Dim motion As New XO_Motion_BGSub
     Public Sub New()
         desc = "Prepare a Color8U_Basics image using the task.motionMask"
     End Sub

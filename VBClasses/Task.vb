@@ -29,6 +29,7 @@ Public Class VBtask : Implements IDisposable
     Public motionBasics As Motion_Basics
     Public colorizer As DepthColorizer_Basics
     Public contours As Contour_Basics_List
+    'Public pcMotion As Motion_PointCloud
 
     Public feat As Feature_Basics
     Public bricks As Brick_Basics
@@ -75,7 +76,6 @@ Public Class VBtask : Implements IDisposable
 
     Public motionMask As New cv.Mat
     Public motionRect As cv.Rect
-    Public motionPercent As Single
 
     Public optionsChanged As Boolean = True ' global or local options changed.
     Public rows As Integer
@@ -479,6 +479,7 @@ Public Class VBtask : Implements IDisposable
         gravityBasics = New Gravity_Basics
         imuBasics = New IMU_Basics
         motionBasics = New Motion_Basics
+        'pcMotion = New Motion_PointCloud
         grid = New Grid_Basics
         lines = New Line_Basics
         rgbFilter = New Filter_Basics
@@ -683,6 +684,7 @@ Public Class VBtask : Implements IDisposable
         Else
             If motionRect.Width > 0 Then gray(motionRect).CopyTo(grayStable(motionRect))
         End If
+        'pcMotion.Run(emptyMat) ' use pcMotion.dst2 to get the partially updated pointcloud.
 
         colorizer.Run(src)
 
@@ -792,6 +794,7 @@ Public Class VBtask : Implements IDisposable
                     For Each mIndex In task.motionBasics.mGrid.motionList
                         results.dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
                     Next
+                    results.dstList(0).Rectangle(task.motionRect, white, task.lineWidth)
                 End If
 
                 If gOptions.CrossHairs.Checked Then
