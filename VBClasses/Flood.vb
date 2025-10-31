@@ -73,45 +73,6 @@ End Class
 
 
 
-
-Public Class Flood_BasicsMask : Inherits TaskParent
-    Public binarizedImage As cv.Mat
-    Public inputRemoved As cv.Mat
-    Public cellGen As New RedCell_Color
-    Dim redMask As New RedMask_Basics
-    Public buildinputRemoved As Boolean
-    Public showSelected As Boolean = True
-    Dim color8U As New Color8U_Basics
-    Public Sub New()
-        labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
-        desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Or buildinputRemoved Then
-            color8U.Run(src)
-            inputRemoved = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
-            src = color8U.dst2
-        End If
-
-        dst3 = inputRemoved
-        If inputRemoved IsNot Nothing Then src.SetTo(0, inputRemoved)
-        redMask.Run(src)
-
-        cellGen.mdList = redMask.mdList
-        cellGen.Run(redMask.dst2)
-
-        dst2 = cellGen.dst2
-
-        If task.heartBeat Then labels(2) = $"{task.redList.oldrclist.Count} cells identified"
-
-        If showSelected Then task.setSelectedCell()
-    End Sub
-End Class
-
-
-
-
-
 Public Class Flood_Tiers : Inherits TaskParent
     Dim flood As New Flood_BasicsMask
     Dim tiers As New Depth_Tiers
@@ -222,3 +183,67 @@ Public Class Flood_Minimal : Inherits TaskParent
 End Class
 
 
+
+
+
+Public Class Flood_BasicsMask : Inherits TaskParent
+    Public inputRemoved As cv.Mat
+    Public cellGen As New RedCell_Color
+    Dim redMask As New RedMask_Basics
+    Public buildinputRemoved As Boolean
+    Public showSelected As Boolean = True
+    Dim color8U As New Color8U_Basics
+    Public Sub New()
+        labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
+        desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Or buildinputRemoved Then
+            color8U.Run(src)
+            inputRemoved = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
+            src = color8U.dst2
+        End If
+
+        dst3 = inputRemoved
+        If inputRemoved IsNot Nothing Then src.SetTo(0, inputRemoved)
+        redMask.Run(src)
+
+        cellGen.mdList = redMask.mdList
+        cellGen.Run(redMask.dst2)
+
+        dst2 = cellGen.dst2
+
+        If task.heartBeat Then labels(2) = $"{task.redList.oldrclist.Count} cells identified"
+
+        If showSelected Then task.setSelectedCell()
+    End Sub
+End Class
+
+
+
+
+
+Public Class Flood_BasicsMaskNew : Inherits TaskParent
+    Public inputRemoved As cv.Mat
+    Public showSelected As Boolean = True
+    Public Sub New()
+        labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
+        desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then
+            Static color8U As New Color8U_Basics
+            color8U.Run(src)
+            inputRemoved = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
+            src = color8U.dst2
+        End If
+
+        dst3 = inputRemoved
+        If inputRemoved IsNot Nothing Then src.SetTo(0, inputRemoved)
+        dst2 = runRedColor(src, labels(2)).SetTo(0, inputRemoved)
+
+        If task.heartBeat Then labels(2) = $"{task.redColor.rcList.Count} cells identified"
+
+        If showSelected Then task.setSelectedCell()
+    End Sub
+End Class

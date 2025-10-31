@@ -76,7 +76,9 @@ Public Class RedPrep_Basics : Inherits TaskParent
                 targetSlider.value = targetSlider.maximum
             End If
         ElseIf percentZero > 0.85 Then
-            targetSlider.value -= 10
+            If targetSlider.value - 10 >= targetSlider.minimum Then
+                targetSlider.value -= 10
+            End If
         End If
         labels(2) = "Using reduction factor = " + CStr(task.reductionTarget) + ".  " +
                     Format(percentZero, "0%") + " of the image available for floodfill."

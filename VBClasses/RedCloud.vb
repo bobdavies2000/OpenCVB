@@ -45,6 +45,8 @@ Public Class RedCloud_Basics : Inherits TaskParent
                 rc.age = lrc.age + 1
                 If rc.age > 1000 Then rc.age = 2
 
+                If task.motionRect.Contains(rc.maxDist) Then rc.age = 1
+
                 rc.color = lrc.color
             End If
             rc.index = rcList.Count + 1
@@ -57,6 +59,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
             dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
             SetTrueText(CStr(rc.age), rc.maxDist)
         Next
+        dst2.Rectangle(task.motionRect, task.highlight, task.lineWidth)
 
         If standaloneTest() Then
             RedCell_Basics.selectCell(rcMap, rcList)
@@ -394,15 +397,25 @@ End Class
 
 
 Public Class RedCloud_Motion : Inherits TaskParent
-    Dim pcMotion As New Motion_PointCloud
     Public Sub New()
         desc = "Run RedCloud with the motion-updated version of the pointcloud."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.motionRect.Width = 0 Then Exit Sub ' nothing changed...
+        Static unchanged As Integer
+        If task.motionRect.Width Then
+            dst2 = runRedCloud(task.pointCloud, labels(2))
+        Else
+            unchanged += 1
+        End If
+        If task.heartBeatLT Then unchanged = 0
 
-        ' pcMotion.Run(src) ' now running in task.vb.
+        dst2.Rectangle(task.motionRect, task.highlight, task.lineWidth)
 
-        dst2 = runRedCloud(pcMotion.dst2, labels(2))
+        If standaloneTest() Then
+            For Each rc In task.redCloud.rcList
+                SetTrueText(CStr(rc.age), rc.maxDist)
+            Next
+        End If
+        labels(2) = "RedCloud cells were unchanged " + CStr(unchanged) + " times since last heartBeatLT"
     End Sub
 End Class

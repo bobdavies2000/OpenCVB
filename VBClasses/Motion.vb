@@ -324,6 +324,8 @@ Public Class Motion_PointCloud : Inherits TaskParent
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub ' this is a 'task' algorithm - run every frame.
+
         originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
 
         If task.optionsChanged Then
@@ -332,8 +334,8 @@ Public Class Motion_PointCloud : Inherits TaskParent
                 Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
                 Dim rz = New cv.Vec2f(0, task.MaxZmeters)
                 task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1),
-                                                            New cv.Rangef(ry.Item0, ry.Item1),
-                                                            New cv.Rangef(rz.Item0, rz.Item1)}
+                                                    New cv.Rangef(ry.Item0, ry.Item1),
+                                                    New cv.Rangef(rz.Item0, rz.Item1)}
             End If
         End If
 
