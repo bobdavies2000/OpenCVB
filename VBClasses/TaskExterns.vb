@@ -1080,7 +1080,31 @@ Module TaskExterns
     Public Function RedCloud_Count(cPtr As IntPtr) As Integer
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedCloud_Run(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
+    Public Function RedCloud_Run(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer,
+                                 cols As Integer) As IntPtr
+    End Function
+
+
+
+
+
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedCloudMask_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedCloudMask_Close(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedCloudMask_Rects(cPtr As IntPtr) As IntPtr
+    End Function
+
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedCloudMask_Count(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedCloudMask_Run(cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr,
+                                     rows As Integer, cols As Integer) As IntPtr
     End Function
 
 

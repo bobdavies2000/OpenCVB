@@ -47,7 +47,6 @@ public:
 
     RedCloud() {}
     void RunCPP() {
-        int minSize = src.total() * 0.001;
         Mat mask(cv::Size(src.cols + 2, src.rows + 2), CV_8U);
         mask.setTo(0);
         Rect rect;
@@ -77,7 +76,7 @@ public:
         {
             if (floodFill(src, mask, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
             {
-                if (rect.width * rect.height > minSize)
+                if (rect.width * rect.height > 0)
                 {
                     cellRects.push_back(rect);
                     floodPoints.push_back(it->second);
@@ -102,6 +101,82 @@ extern "C" __declspec(dllexport) int*
 RedCloud_Run(RedCloud* cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
+    cPtr->RunCPP();
+    return (int*)cPtr->result.data;
+}
+
+
+
+
+
+class RedCloudMask
+{
+private:
+public:
+    Mat src, result, inputMask;
+    vector<Rect>cellRects;
+    vector<Point> floodPoints;
+
+    RedCloudMask() {}
+    void RunCPP() {
+        Mat mask(cv::Size(src.cols + 2, src.rows + 2), CV_8U);
+        mask.setTo(0);
+      
+        Rect maskRect = Rect(1, 1, mask.cols - 2, mask.rows - 2);
+        inputMask.copyTo(mask(maskRect));
+
+        Rect rect; 
+
+        multimap<int, Point, greater<int>> sizeSorted;
+        int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
+        Point pt;
+        for (int y = 0; y < src.rows; y++)
+        {
+            for (int x = 0; x < src.cols; x++)
+            {
+                if (mask.at<unsigned char>(y, x) == 0)
+                {
+                    pt = Point(x, y);
+                    int count = floodFill(src, mask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
+                    if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
+                }
+
+            }
+        }
+
+        cellRects.clear();
+        floodPoints.clear();
+        mask.setTo(0);
+        int fill = 1;
+        for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
+        {
+            if (floodFill(src, mask, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
+            {
+                if (rect.width * rect.height > 0)
+                {
+                    cellRects.push_back(rect);
+                    floodPoints.push_back(it->second);
+
+                    if (fill >= 255)
+                        break; // just taking up to the top X largest objects found.
+                    fill++;
+                }
+            }
+        }
+        mask(maskRect).copyTo(result);
+    }
+};
+
+extern "C" __declspec(dllexport) RedCloudMask* RedCloudMask_Open() { return new RedCloudMask(); }
+extern "C" __declspec(dllexport) int RedCloudMask_Count(RedCloudMask* cPtr) { return (int)cPtr->cellRects.size(); }
+extern "C" __declspec(dllexport) int* RedCloudMask_Rects(RedCloudMask* cPtr) { return (int*)&cPtr->cellRects[0]; }
+extern "C" __declspec(dllexport) int* RedCloudMask_Close(RedCloudMask* cPtr) { delete cPtr; return (int*)0; }
+
+extern "C" __declspec(dllexport) int*
+RedCloudMask_Run(RedCloudMask* cPtr, int* dataPtr, int* maskPtr, int rows, int cols)
+{
+    cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
+    cPtr->inputMask = Mat(rows, cols, CV_8U, maskPtr);
     cPtr->RunCPP();
     return (int*)cPtr->result.data;
 }
