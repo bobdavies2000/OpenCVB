@@ -9,7 +9,6 @@ Public Class RedCloud_Basics : Inherits TaskParent
         desc = "Build contours for each cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pointCloud
         redSweep.Run(src)
         labels(3) = redSweep.labels(3)
         labels(2) = redSweep.labels(2) + If(standalone, "  Number is cell age", "")
@@ -132,7 +131,12 @@ Public Class RedCloud_Sweep : Inherits TaskParent
         dst1 = dst3.InRange(255, 255)
 
         labels(2) = CStr(rcList.Count) + " regions were identified."
-        labels(3) = "Reduced point cloud - adjust with 'Reduction Target'"
+
+        Static unchanged As Integer
+        If task.motionRect.Width = 0 Then
+            unchanged += 1
+            labels(3) = "RedCloud cells were unchanged " + CStr(unchanged) + " times since last heartBeatLT"
+        End If
     End Sub
 End Class
 
