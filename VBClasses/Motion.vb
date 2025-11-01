@@ -1,6 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports System.Windows.Forms.Design.AxImporter
+Imports OpenCvSharp
 Imports OpenCvSharp.ML.DTrees
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
@@ -289,6 +290,32 @@ Public Class Motion_PointCloud : Inherits TaskParent
             task.pointCloud = task.gravityCloud
         End If
 
+        ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+        ' with and without gravity transform.  Probably my fault but just fix it here.
+        If task.cameraName = "StereoLabs ZED 2/2i" Then
+
+            ' these don't work...Could this be a VB.Net failing?
+            ' cv.Cv2.PatchNaNs(task.pointCloud, 0.0) ' not working!
+            ' Dim mask As New cv.Mat
+            ' cv.Cv2.Compare(task.pointCloud, task.pointCloud, mask, cv.CmpType.EQ)
+
+            Dim vec As New cv.Vec3f, count As Integer
+            For y = 0 To task.pointCloud.Rows - 1
+                For x = 0 To task.pointCloud.Cols - 1
+                    Dim val = task.pointCloud.Get(Of cv.Vec3f)(y, x)
+                    If Single.IsNaN(val(0)) Then
+                        task.pointCloud.Set(Of cv.Vec3f)(y, x, vec)
+                        count += 1
+                    End If
+                Next
+            Next
+
+            'Dim mean As cv.Scalar, stdev As cv.Scalar
+            'cv.Cv2.MeanStdDev(task.pointCloud, mean, stdev)
+            'Debug.WriteLine("Before Motion mean " + mean.ToString() + " " + CStr(count) + " inf's removed.")
+
+        End If
+
         task.pcSplit = task.pointCloud.Split
 
         If task.optionsChanged Then
@@ -299,15 +326,6 @@ Public Class Motion_PointCloud : Inherits TaskParent
                                                         task.MaxZmeters, cv.ThresholdTypes.Trunc)
             task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
                                                         task.MaxZmeters).ConvertScaleAbs()
-            cv.Cv2.Merge(task.pcSplit, task.pointCloud)
-        End If
-
-        ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
-        ' with and without gravity transform.  
-        If task.cameraName = "StereoLabs ZED 2/2i" Then
-            cv.Cv2.PatchNaNs(task.pcSplit(0))
-            cv.Cv2.PatchNaNs(task.pcSplit(1))
-            cv.Cv2.PatchNaNs(task.pcSplit(2))
             cv.Cv2.Merge(task.pcSplit, task.pointCloud)
         End If
 

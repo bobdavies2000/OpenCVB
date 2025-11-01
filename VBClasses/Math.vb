@@ -78,13 +78,13 @@ Public Class Math_DepthMeanStdev : Inherits TaskParent
     Public Sub New()
         desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         minMax.Run(src)
-        Dim mean As Single = 0, stdev As Single = 0
+        Dim mean As Single, stdev As Single
         Dim mask = minMax.dst3 ' the mask for stable depth.
         dst3.SetTo(0)
         task.depthRGB.CopyTo(dst3, mask)
-        If mask.Type <> cv.MatType.CV_8U Then mask = mask.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        If mask.Type <> cv.MatType.CV_8U Then mask = mask.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.MeanStdDev(task.pcSplit(2), mean, stdev, mask)
         labels(3) = "stablized depth mean=" + Format(mean, fmt1) + " stdev=" + Format(stdev, fmt1)
 

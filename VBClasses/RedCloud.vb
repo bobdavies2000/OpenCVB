@@ -10,6 +10,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         desc = "Build contours for each cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pointCloud
         redSweep.Run(src)
         labels(3) = redSweep.labels(3)
         labels(2) = redSweep.labels(2) + If(standalone, "  Number is cell age", "")
@@ -31,12 +32,12 @@ Public Class RedCloud_Basics : Inherits TaskParent
             End If
             If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                 Dim lrc = rcListLast(indexLast)
-                If rc.rect.Contains(lrc.maxdist) Then
-                    Dim row = lrc.maxDist.Y - lrc.rect.y
-                    Dim col = lrc.maxDist.x - lrc.rect.x
+                If rc.rect.Contains(lrc.maxDist) Then
+                    Dim row = lrc.maxDist.Y - lrc.rect.Y
+                    Dim col = lrc.maxDist.X - lrc.rect.X
                     If row < rc.mask.Height And col < rc.mask.Width Then
                         If rc.mask.Get(Of Byte)(row, col) Then ' more doublechecking...
-                            rc.maxDist = lrc.maxdist
+                            rc.maxDist = lrc.maxDist
                             rc.depth = lrc.depth
                         End If
                     End If
