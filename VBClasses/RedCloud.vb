@@ -1,5 +1,4 @@
-﻿Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
     Public redSweep As New RedCloud_Sweep
     Public rcList As New List(Of rcData)
@@ -418,7 +417,12 @@ Public Class RedCloud_Motion : Inherits TaskParent
             For Each rc In task.redCloud.rcList
                 SetTrueText(CStr(rc.age), rc.maxDist)
             Next
+
+            RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            SetTrueText(strOut, 3)
         End If
+
         labels(2) = "RedCloud cells were unchanged " + CStr(unchanged) + " times since last heartBeatLT"
     End Sub
 End Class

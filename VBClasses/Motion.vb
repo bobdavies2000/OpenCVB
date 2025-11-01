@@ -1,8 +1,4 @@
-Imports System.Runtime.InteropServices
 Imports System.Threading
-Imports System.Windows.Forms.Design.AxImporter
-Imports OpenCvSharp
-Imports OpenCvSharp.ML.DTrees
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
     Public mGrid As New Motion_Core
@@ -282,6 +278,32 @@ Public Class Motion_PointCloud : Inherits TaskParent
                   "Diff of camera depth and motion-updated depth (always different)"}
         desc = "Update the pointcloud only with the motion Rect.  Resync heartbeatLT."
     End Sub
+    Public Shared Function checkNanInf(pc As cv.Mat) As cv.Mat
+        ' these don't work because there are NaN's and Infinity's (both are often present)
+        ' cv.Cv2.PatchNaNs(pc, 0.0) 
+        ' Dim mask As New cv.Mat
+        ' cv.Cv2.Compare(pc, pc, mask, cv.CmpType.EQ)
+
+        Dim count As Integer
+        Dim vec As New cv.Vec3f(0, 0, 0)
+        ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+        ' with and without gravity transform.  Probably my fault but just fix it here.
+        For y = 0 To pc.Rows - 1
+            For x = 0 To pc.Cols - 1
+                Dim val = pc.Get(Of cv.Vec3f)(y, x)
+                If Single.IsNaN(val(0)) Or Single.IsInfinity(val(0)) Then
+                    pc.Set(Of cv.Vec3f)(y, x, vec)
+                    count += 1
+                End If
+            Next
+        Next
+
+        'Dim mean As cv.Scalar, stdev As cv.Scalar
+        'cv.Cv2.MeanStdDev(originalPointcloud, mean, stdev)
+        'Debug.WriteLine("Before Motion mean " + mean.ToString())
+
+        Return pc
+    End Function
     Public Sub preparePointcloud()
         If task.gOptions.gravityPointCloud.Checked Then
             '******* this is the gravity rotation *******
@@ -293,27 +315,7 @@ Public Class Motion_PointCloud : Inherits TaskParent
         ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
         ' with and without gravity transform.  Probably my fault but just fix it here.
         If task.cameraName = "StereoLabs ZED 2/2i" Then
-
-            ' these don't work...Could this be a VB.Net failing?
-            ' cv.Cv2.PatchNaNs(task.pointCloud, 0.0) ' not working!
-            ' Dim mask As New cv.Mat
-            ' cv.Cv2.Compare(task.pointCloud, task.pointCloud, mask, cv.CmpType.EQ)
-
-            Dim vec As New cv.Vec3f, count As Integer
-            For y = 0 To task.pointCloud.Rows - 1
-                For x = 0 To task.pointCloud.Cols - 1
-                    Dim val = task.pointCloud.Get(Of cv.Vec3f)(y, x)
-                    If Single.IsNaN(val(0)) Then
-                        task.pointCloud.Set(Of cv.Vec3f)(y, x, vec)
-                        count += 1
-                    End If
-                Next
-            Next
-
-            'Dim mean As cv.Scalar, stdev As cv.Scalar
-            'cv.Cv2.MeanStdDev(task.pointCloud, mean, stdev)
-            'Debug.WriteLine("Before Motion mean " + mean.ToString() + " " + CStr(count) + " inf's removed.")
-
+            task.pointCloud = checkNanInf(task.pointCloud)
         End If
 
         task.pcSplit = task.pointCloud.Split
@@ -344,7 +346,11 @@ Public Class Motion_PointCloud : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.algorithmPrep = False Then Exit Sub ' this is a 'task' algorithm - run every frame.
 
-        originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
+        If task.cameraName = "StereoLabs ZED 2/2i" Then
+            originalPointcloud = checkNanInf(task.pointCloud).Clone
+        Else
+            originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
+        End If
 
         If task.optionsChanged Then
             If task.rangesCloud Is Nothing Then
@@ -362,7 +368,10 @@ Public Class Motion_PointCloud : Inherits TaskParent
                 dst2 = task.pointCloud.Clone
             End If
 
-            If task.motionRect.Width = 0 And task.optionsChanged = False Then Exit Sub ' nothing changed...
+            If task.motionRect.Width = 0 And task.optionsChanged = False Then
+                task.pointCloud = dst2
+                Exit Sub ' nothing changed...
+            End If
             task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
             task.pointCloud = dst2
         End If
