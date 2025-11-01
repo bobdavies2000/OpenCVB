@@ -383,3 +383,29 @@ Public Class RedColor_NWay : Inherits TaskParent
         dst2 = runRedColor(binN.dst2, labels(2))
     End Sub
 End Class
+
+
+
+
+
+Public Class RedColor_CloudMask : Inherits TaskParent
+    Dim redCell As New RedCloud_CellMask
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        desc = "Use the RedCloud_CellMask to build better RedColor cells."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redCell.Run(src)
+
+        reduction.Run(src)
+        reduction.dst2.SetTo(0, redCell.dst3)
+        dst2 = runRedColor(reduction.dst2, labels(2))
+
+        If standaloneTest() Then
+            RedCell_Basics.selectCell(task.redColor.rcMap, task.redColor.rcList)
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            SetTrueText(strOut, 3)
+        End If
+    End Sub
+End Class
+

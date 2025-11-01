@@ -129,6 +129,8 @@ Public Class RedCloud_Sweep : Inherits TaskParent
             dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
         Next
 
+        dst1 = dst3.InRange(255, 255)
+
         labels(2) = CStr(rcList.Count) + " regions were identified."
         labels(3) = "Reduced point cloud - adjust with 'Reduction Target'"
     End Sub
@@ -417,5 +419,27 @@ Public Class RedCloud_Motion : Inherits TaskParent
             Next
         End If
         labels(2) = "RedCloud cells were unchanged " + CStr(unchanged) + " times since last heartBeatLT"
+    End Sub
+End Class
+
+
+
+
+Public Class RedCloud_CellMask : Inherits TaskParent
+    Dim redMotion As New RedCloud_Motion
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Create a mask that outlines all the RedCloud cells."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redMotion.Run(src)
+
+        dst3.SetTo(0)
+        For Each rc In task.redCloud.rcList
+            Dim listOfPoints = New List(Of List(Of cv.Point))({rc.contour})
+            cv.Cv2.DrawContours(dst3(rc.rect), listOfPoints, 0, white, task.lineWidth, cv.LineTypes.Link8)
+        Next
+
+        dst2 = task.redCloud.redSweep.dst1
     End Sub
 End Class

@@ -757,6 +757,7 @@ Public Class rcData
     Public age As Integer = 1
     Public color As cv.Scalar
     Public colorIDs As List(Of Integer) ' this list of ID's for color8u output 
+    Public contour As List(Of cv.Point)
     Public depth As Single
     Public hull As List(Of cv.Point)
     Public index As Integer
@@ -784,7 +785,7 @@ Public Class rcData
     Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer)
         mask = _mask.InRange(_index, _index)
         index = -1 ' assume it is not going to be valid...
-        Dim contour = ContourBuild(mask)
+        contour = ContourBuild(mask)
         If contour.Count >= 3 Then
             rect = _rect
             index = _index
