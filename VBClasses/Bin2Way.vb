@@ -10,7 +10,7 @@ Public Class Bin2Way_Basics : Inherits TaskParent
         labels = {"", "", "Image separated into 2 segments from darkest and lightest", "Histogram Of grayscale image"}
         desc = "Split an image into 2 parts - darkest and lightest,"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Dim bins = task.histogramBins
         hist.Run(task.gray)
         dst3 = hist.dst2
@@ -287,56 +287,3 @@ Public Class Bin2Way_RedCloudLightToDark : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-Public Class Bin2Way_RedCloudLightToDark1 : Inherits TaskParent
-    Dim recurse As New Bin2Way_RecurseOnce
-    Dim redCs(3) As RedColor_Basics
-    Dim mats As New Mat_4to1
-    Dim rclist As New List(Of rcData)
-    Dim rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public Sub New()
-        For i = 0 To redCs.Count - 1
-            redCs(i) = New RedColor_Basics
-        Next
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(2) = "4 separate RedColor runs - darkest to lightest."
-        labels(3) = "All 4 gradations of light"
-        desc = "Run RedColor one each gradation of the colors - better separation?"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        recurse.Run(src)
-
-        Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To recurse.mats.mat.Count - 1
-            Dim m = recurse.mats.mat(i)
-
-            redCs(i).Run(m)
-            mats.mat(i) = redCs(i).dst2
-            mats.mat(i).SetTo(0, Not m)
-            For Each rc In redCs(i).rcList
-                newList.Add(rc.pixels, rc)
-            Next
-        Next
-
-        mats.Run(emptyMat)
-        dst2 = mats.dst2
-
-        rclist.Clear()
-        dst3.SetTo(0)
-        rcMap.setto(0)
-        For Each rc In newList.Values
-            rc.index = rclist.Count + 1
-            rclist.Add(rc)
-            rcMap(rc.rect).setto(rc.index, rc.mask)
-        Next
-
-        dst3 = PaletteFull(rcMap)
-
-        RedCell_Basics.selectCell(rcMap, rclist)
-        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
-        SetTrueText(strOut, 1)
-    End Sub
-End Class

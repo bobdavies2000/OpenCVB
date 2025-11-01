@@ -766,27 +766,6 @@ Module TaskExterns
 
 
 
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloudMaxDist_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloudMaxDist_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloudMaxDist_Rects(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloudMaxDist_Sizes(cPtr As IntPtr) As IntPtr
-    End Function
-
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloudMaxDist_Count(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function RedCloudMaxDist_Run(
-                cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
-    End Function
-
-
-
-
-
-
-
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function PlotOpenCV_Open() As IntPtr
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -1101,7 +1080,7 @@ Module TaskExterns
     Public Function RedCloud_Count(cPtr As IntPtr) As Integer
     End Function
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedCloud_Run(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, minSize As Integer) As IntPtr
+    Public Function RedCloud_Run(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
     End Function
 
 

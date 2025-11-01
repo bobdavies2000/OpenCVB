@@ -6,8 +6,8 @@ Public Class RedColor_Basics : Inherits TaskParent
     Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
         task.redColor = Me
-        cPtr = RedCloudMaxDist_Open()
-        desc = "Run the C++ RedCloudMaxDist interface without a mask"
+        cPtr = RedCloud_Open()
+        desc = "Run the C++ RedCloud interface without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1 = srcMustBe8U(src)
@@ -17,16 +17,16 @@ Public Class RedColor_Basics : Inherits TaskParent
         Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
         handleInput.Free()
         dst0 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
-        classCount = RedCloudMaxDist_Count(cPtr)
+        classCount = RedCloud_Count(cPtr)
 
         If classCount = 0 Then Exit Sub ' no data to process.
 
         Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4,
-                                            RedCloudMaxDist_Rects(cPtr))
+                                            RedCloud_Rects(cPtr))
 
         Dim rects(classCount * 4) As Integer
         Marshal.Copy(rectData.Data, rects, 0, rects.Length)
@@ -93,12 +93,11 @@ Public Class RedColor_Basics : Inherits TaskParent
             SetTrueText(strOut, 3)
         End If
 
-        labels(2) = CStr(classCount) + " cells found. " + CStr(rcList.Count) + " >" +
-                    " minpixels (" + Format(rcList.Count / classCount, "0%") + ").  " + CStr(count) +
-                    " matched to previous generation"
+        labels(2) = CStr(classCount) + " cells. " + CStr(rcList.Count) + " cells >" +
+                    " minpixels.  " + CStr(count) + " matched to previous generation"
     End Sub
     Public Sub Close()
-        If cPtr <> 0 Then cPtr = RedCloudMaxDist_Close(cPtr)
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
     End Sub
 End Class
 
@@ -169,8 +168,8 @@ Public Class RedColor_BasicsFast : Inherits TaskParent
     Public classCount As Integer
     Public RectList As New List(Of cv.Rect)
     Public Sub New()
-        cPtr = RedCloudMaxDist_Open()
-        desc = "Run the C++ RedCloudMaxDist interface without a mask"
+        cPtr = RedCloud_Open()
+        desc = "Run the C++ RedCloud interface without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1 = srcMustBe8U(src)
@@ -180,17 +179,17 @@ Public Class RedColor_BasicsFast : Inherits TaskParent
         Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
         handleInput.Free()
         dst3 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
         dst2 = PaletteFull(dst3)
 
-        classCount = RedCloudMaxDist_Count(cPtr)
+        classCount = RedCloud_Count(cPtr)
         labels(3) = "CV_8U version with " + CStr(classCount) + " cells."
 
         If classCount = 0 Then Exit Sub ' no data to process.
 
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr))
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
 
         Dim rects(classCount * 4) As Integer
         Marshal.Copy(rectData.Data, rects, 0, rects.Length)
@@ -205,7 +204,7 @@ Public Class RedColor_BasicsFast : Inherits TaskParent
         labels(2) = CStr(RectList.Count) + " cells were found."
     End Sub
     Public Sub Close()
-        If cPtr <> 0 Then cPtr = RedCloudMaxDist_Close(cPtr)
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
     End Sub
 End Class
 
@@ -364,5 +363,23 @@ Public Class RedColor_LeftRight : Inherits TaskParent
         redRight.Run(reduction.dst2)
         dst3 = PaletteFull(redRight.dst2)
         labels(3) = redRight.labels(2) + " in the right image"
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedColor_NWay : Inherits TaskParent
+    Dim binN As New BinNWay_Basics
+    Public Sub New()
+        desc = "Run RedColor on the output of the BinNWay_Basics"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        binN.Run(src)
+        dst3 = binN.dst3
+        labels(3) = binN.labels(3)
+
+        dst2 = runRedColor(binN.dst2, labels(2))
     End Sub
 End Class

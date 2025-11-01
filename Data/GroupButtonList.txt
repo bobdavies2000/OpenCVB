@@ -11,6 +11,7 @@ Bin2Way
 Bin3Way
 Bin4Way
 Binarize
+BinNWay
 Bitmap
 Blob
 BlockMatching

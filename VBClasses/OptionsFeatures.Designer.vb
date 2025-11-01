@@ -53,7 +53,7 @@ Partial Class OptionsFeatures
         ' 
         FeatureMethod.FormattingEnabled = True
         FeatureMethod.Location = New Point(31, 54)
-        FeatureMethod.Margin = New Padding(4, 4, 4, 4)
+        FeatureMethod.Margin = New Padding(4)
         FeatureMethod.Name = "FeatureMethod"
         FeatureMethod.Size = New Size(294, 38)
         FeatureMethod.TabIndex = 0
@@ -62,7 +62,7 @@ Partial Class OptionsFeatures
         ' 
         EdgeMethods.FormattingEnabled = True
         EdgeMethods.Location = New Point(364, 54)
-        EdgeMethods.Margin = New Padding(4, 4, 4, 4)
+        EdgeMethods.Margin = New Padding(4)
         EdgeMethods.Name = "EdgeMethods"
         EdgeMethods.Size = New Size(294, 38)
         EdgeMethods.TabIndex = 1
@@ -100,7 +100,7 @@ Partial Class OptionsFeatures
         ' DistanceSlider
         ' 
         DistanceSlider.Location = New Point(31, 136)
-        DistanceSlider.Margin = New Padding(4, 4, 4, 4)
+        DistanceSlider.Margin = New Padding(4)
         DistanceSlider.Maximum = 100
         DistanceSlider.Name = "DistanceSlider"
         DistanceSlider.Size = New Size(628, 69)
@@ -130,7 +130,7 @@ Partial Class OptionsFeatures
         ' FeatureSampleSize
         ' 
         FeatureSampleSize.Location = New Point(31, 215)
-        FeatureSampleSize.Margin = New Padding(4, 4, 4, 4)
+        FeatureSampleSize.Margin = New Padding(4)
         FeatureSampleSize.Maximum = 400
         FeatureSampleSize.Minimum = 1
         FeatureSampleSize.Name = "FeatureSampleSize"
@@ -161,7 +161,7 @@ Partial Class OptionsFeatures
         ' ColorDiffSlider
         ' 
         ColorDiffSlider.Location = New Point(31, 316)
-        ColorDiffSlider.Margin = New Padding(4, 4, 4, 4)
+        ColorDiffSlider.Margin = New Padding(4)
         ColorDiffSlider.Maximum = 100
         ColorDiffSlider.Minimum = 1
         ColorDiffSlider.Name = "ColorDiffSlider"
@@ -192,7 +192,7 @@ Partial Class OptionsFeatures
         ' MatchCorrSlider
         ' 
         MatchCorrSlider.Location = New Point(31, 406)
-        MatchCorrSlider.Margin = New Padding(4, 4, 4, 4)
+        MatchCorrSlider.Margin = New Padding(4)
         MatchCorrSlider.Maximum = 100
         MatchCorrSlider.Name = "MatchCorrSlider"
         MatchCorrSlider.Size = New Size(628, 69)
@@ -212,9 +212,9 @@ Partial Class OptionsFeatures
         ' GrayGroup
         ' 
         GrayGroup.Location = New Point(868, 11)
-        GrayGroup.Margin = New Padding(4, 4, 4, 4)
+        GrayGroup.Margin = New Padding(4)
         GrayGroup.Name = "GrayGroup"
-        GrayGroup.Padding = New Padding(4, 4, 4, 4)
+        GrayGroup.Padding = New Padding(4)
         GrayGroup.Size = New Size(340, 511)
         GrayGroup.TabIndex = 16
         GrayGroup.TabStop = False
@@ -223,9 +223,9 @@ Partial Class OptionsFeatures
         ' ColorGroup
         ' 
         ColorGroup.Location = New Point(1235, 17)
-        ColorGroup.Margin = New Padding(4, 4, 4, 4)
+        ColorGroup.Margin = New Padding(4)
         ColorGroup.Name = "ColorGroup"
-        ColorGroup.Padding = New Padding(4, 4, 4, 4)
+        ColorGroup.Padding = New Padding(4)
         ColorGroup.Size = New Size(347, 498)
         ColorGroup.TabIndex = 17
         ColorGroup.TabStop = False
@@ -276,7 +276,7 @@ Partial Class OptionsFeatures
         Controls.Add(EdgeMethods)
         Controls.Add(FeatureMethod)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
-        Margin = New Padding(4, 4, 4, 4)
+        Margin = New Padding(4)
         Name = "OptionsFeatures"
         Text = "Important Options for Features, Edges, Lines, and Masks"
         CType(DistanceSlider, ComponentModel.ISupportInitialize).EndInit()

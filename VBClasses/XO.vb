@@ -13282,7 +13282,7 @@ Public Class XO_RedList_BasicsNoMask : Inherits TaskParent
         Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, 0)
+        Dim imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
         handleInput.Free()
         dst2 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
 
@@ -14320,8 +14320,8 @@ Public Class XO_RedColor_BasicsFast : Inherits TaskParent
     Public classCount As Integer
     Public RectList As New List(Of cv.Rect)
     Public Sub New()
-        cPtr = RedCloudMaxDist_Open()
-        desc = "Run the C++ RedCloudMaxDist interface without a mask"
+        cPtr = RedCloud_Open()
+        desc = "Run the C++ RedCloud interface without a mask"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst1 = srcMustBe8U(src)
@@ -14331,17 +14331,17 @@ Public Class XO_RedColor_BasicsFast : Inherits TaskParent
         Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        imagePtr = RedCloudMaxDist_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
         handleInput.Free()
         dst2 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
         dst3 = PaletteFull(dst2)
 
-        classCount = RedCloudMaxDist_Count(cPtr)
+        classCount = RedCloud_Count(cPtr)
         labels(2) = "CV_8U version with " + CStr(classCount) + " cells."
 
         If classCount = 0 Then Exit Sub ' no data to process.
 
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloudMaxDist_Rects(cPtr))
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
 
         Dim rects(classCount * 4) As Integer
         Marshal.Copy(rectData.Data, rects, 0, rects.Length)
@@ -14359,7 +14359,7 @@ Public Class XO_RedColor_BasicsFast : Inherits TaskParent
         labels(3) = CStr(RectList.Count) + " cells were found."
     End Sub
     Public Sub Close()
-        If cPtr <> 0 Then cPtr = RedCloudMaxDist_Close(cPtr)
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
     End Sub
 End Class
 

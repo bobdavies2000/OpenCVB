@@ -114,7 +114,7 @@ Public Class OptionsFeatures
         task.optionsChanged = True
         FeatureSampleSizeLabel.Text = CStr(task.FeatureSampleSize)
     End Sub
-    Private Sub OptionsFeatures_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-
+    Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ColorSource.SelectedIndexChanged
+        task.optionsChanged = True
     End Sub
 End Class
