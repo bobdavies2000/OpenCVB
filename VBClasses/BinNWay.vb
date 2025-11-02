@@ -29,7 +29,7 @@ Public Class BinNWay_Basics : Inherits TaskParent
 
         If standalone Then
             dst2 = runRedColor(dst1, labels(2))
-            RedCell_Basics.selectCell(task.redColor.rcMap, task.redColor.rcList)
+            RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 1)
         End If

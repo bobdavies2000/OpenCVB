@@ -281,7 +281,7 @@ Public Class Bin2Way_RedCloudLightToDark : Inherits TaskParent
 
         dst3 = PaletteFull(rcMap)
 
-        RedCell_Basics.selectCell(rcMap, rclist)
+        RedCloud_Cell.selectCell(rcMap, rclist)
         If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
         SetTrueText(strOut, 1)
     End Sub

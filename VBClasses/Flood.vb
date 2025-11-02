@@ -188,7 +188,7 @@ End Class
 
 Public Class Flood_BasicsMask : Inherits TaskParent
     Public inputRemoved As cv.Mat
-    Public cellGen As New RedCell_Color
+    Public cellGen As New XO_RedCell_Color
     Dim redMask As New RedMask_Basics
     Public buildinputRemoved As Boolean
     Public showSelected As Boolean = True

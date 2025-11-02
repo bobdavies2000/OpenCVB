@@ -61,7 +61,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
         dst2.Rectangle(task.motionRect, task.highlight, task.lineWidth)
 
         If standaloneTest() Then
-            RedCell_Basics.selectCell(rcMap, rcList)
+            RedCloud_Cell.selectCell(rcMap, rcList)
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
         End If
@@ -203,7 +203,7 @@ Public Class RedCloud_CellDepthHistogram : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedCloud(src, labels(2))
 
-        RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+        RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
         If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell
         SetTrueText(strOut, 1)
 
@@ -252,7 +252,7 @@ Public Class RedCloud_Motion : Inherits TaskParent
                 SetTrueText(CStr(rc.age), rc.maxDist)
             Next
 
-            RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
         End If
@@ -280,5 +280,41 @@ Public Class RedCloud_CellMask : Inherits TaskParent
         Next
 
         dst2 = task.redCloud.redSweep.dst1
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_Cell : Inherits TaskParent
+    Public Sub New()
+        desc = "Display the output of a cell for RedCloud algorithms."
+    End Sub
+    Public Shared Sub selectCell(rcMap As cv.Mat, rcList As List(Of rcData))
+        If rcList.Count > 0 Then
+            Dim clickIndex = rcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
+            If clickIndex >= 0 And clickIndex < rcList.Count Then
+                task.rcD = rcList(clickIndex)
+            Else
+                Dim ages As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+                For Each pc In rcList
+                    ages.Add(pc.age, pc.index - 1)
+                Next
+                task.rcD = rcList(ages.ElementAt(0).Value)
+            End If
+            If task.rcD.rect.Contains(task.ClickPoint) Then
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                Exit Sub
+            End If
+        End If
+        task.rcD = Nothing
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then dst2 = runRedCloud(src, labels(2))
+
+        selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+        SetTrueText(strOut, 3)
     End Sub
 End Class

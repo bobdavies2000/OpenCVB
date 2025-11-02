@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class RedList_Basics : Inherits TaskParent
     Public inputRemoved As cv.Mat
-    Public cellGen As New RedCell_Color
+    Public cellGen As New XO_RedCell_Color
     Public redMask As New RedMask_Basics
     Public oldrclist As New List(Of oldrcData)
     Public rcMap As cv.Mat ' redColor map 

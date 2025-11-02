@@ -23,10 +23,10 @@ Public Class RedCC_Basics : Inherits TaskParent
         Static picTag As Integer
         If task.mouseClickFlag Then picTag = task.mousePicTag
         If picTag = 2 Then
-            RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
             If task.rcD IsNot Nothing Then dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
         Else
-            RedCell_Basics.selectCell(task.redColor.rcMap, task.redColor.rcList)
+            RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
             If task.rcD IsNot Nothing Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
         End If
     End Sub
@@ -78,7 +78,7 @@ Public Class RedCC_Merge : Inherits TaskParent
 
         dst2 = PaletteBlackZero(color8u.dst2 + dst1)
 
-        RedCell_Basics.selectCell(redSweep.rcMap, redSweep.rcList)
+        RedCloud_Cell.selectCell(redSweep.rcMap, redSweep.rcList)
         If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
         SetTrueText(strOut, 1)
 
@@ -158,7 +158,7 @@ Public Class RedCC_UseHistIDs : Inherits TaskParent
             rc.mask = rc.mask Or colorMask
         Next
 
-        RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+        RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
         If task.rcD IsNot Nothing Then
             strOut = task.rcD.displayCell
             dst3.SetTo(0)

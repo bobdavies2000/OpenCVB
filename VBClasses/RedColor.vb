@@ -88,7 +88,7 @@ Public Class RedColor_Basics : Inherits TaskParent
         Next
 
         If standaloneTest() Then
-            RedCell_Basics.selectCell(rcMap, rcList)
+            RedCloud_Cell.selectCell(rcMap, rcList)
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
         End If
@@ -153,7 +153,7 @@ Public Class RedColor_BasicsSlow : Inherits TaskParent
         rcListLast = New List(Of rcData)(rcList)
         rcMapLast = rcMap.Clone
 
-        RedCell_Basics.selectCell(rcMap, rcList)
+        RedCloud_Cell.selectCell(rcMap, rcList)
         If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
         SetTrueText(strOut, 1)
     End Sub
@@ -274,7 +274,7 @@ Public Class RedColor_HeartBeat : Inherits TaskParent
             Next
             labels(3) = "There were " + CStr(rcLost.Count) + " cells temporarily lost."
 
-            RedCell_Basics.selectCell(rcMap, rcList)
+            RedCloud_Cell.selectCell(rcMap, rcList)
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
         End If
@@ -331,7 +331,7 @@ Public Class RedColor_Sweep : Inherits TaskParent
                 dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
             Next
 
-            RedCell_Basics.selectCell(rcMap, rcList)
+            RedCloud_Cell.selectCell(rcMap, rcList)
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
         End If
@@ -402,7 +402,7 @@ Public Class RedColor_CloudMask : Inherits TaskParent
         dst2 = runRedColor(reduction.dst2, labels(2))
 
         If standaloneTest() Then
-            RedCell_Basics.selectCell(task.redColor.rcMap, task.redColor.rcList)
+            RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
         End If
@@ -434,7 +434,7 @@ Public Class RedColor_CloudCellsNoContour : Inherits TaskParent
         dst2 = runRedColor(reduction.dst2, labels(2))
 
         If standaloneTest() Then
-            RedCell_Basics.selectCell(task.redColor.rcMap, task.redColor.rcList)
+            RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
         End If
@@ -473,7 +473,7 @@ Public Class RedColor_CloudCells : Inherits TaskParent
         dst2 = runRedColor(reduction.dst2, labels(2))
 
         If standaloneTest() Then
-            RedCell_Basics.selectCell(task.redColor.rcMap, task.redColor.rcList)
+            RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
 
