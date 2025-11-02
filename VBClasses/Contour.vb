@@ -424,40 +424,6 @@ End Class
 
 
 
-Public Class Contour_Outline : Inherits TaskParent
-    Public rc As New oldrcData
-    Public Sub New()
-        desc = "Create a simplified contour of the selected cell"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedList(src, labels(2))
-        Dim ptList As List(Of cv.Point) = rc.contour
-
-        dst3.SetTo(0)
-
-        Dim newContour As New List(Of cv.Point)
-        rc = task.oldrcD
-        If rc.contour.Count = 0 Then Exit Sub
-        Dim p1 As cv.Point, p2 As cv.Point
-        newContour.Add(p1)
-        For i = 0 To rc.contour.Count - 2
-            p1 = rc.contour(i)
-            p2 = rc.contour(i + 1)
-            dst3(rc.rect).Line(p1, p2, white, task.lineWidth + 1)
-            newContour.Add(p2)
-        Next
-        rc.contour = New List(Of cv.Point)(newContour)
-        dst3(rc.rect).Line(rc.contour(rc.contour.Count - 1), rc.contour(0), white, task.lineWidth + 1)
-
-        labels(2) = "Input points = " + CStr(rc.contour.Count)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Contour_SelfIntersect : Inherits TaskParent
     Public rc As New oldrcData

@@ -572,7 +572,6 @@ End Class
 
 
 Public Class GL_ImageHullsColor : Inherits TaskParent
-    Dim hulls As New RedCloud_HeartBeat
     Public Sub New()
         desc = "Prepare triangles from the RedCloud_HeartBeat output"
     End Sub
@@ -608,10 +607,8 @@ Public Class GL_ImageHullsColor : Inherits TaskParent
         Return dataBuffer
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        hulls.Run(src)
-        dst2 = hulls.dst3
-        labels(2) = hulls.labels(2)
-        labels(3) = hulls.labels(3)
+        dst2 = runRedCloud(src, labels(2))
+        labels(3) = task.redCloud.labels(3)
 
         strOut = task.sharpGL.RunTriangles(Comm.oCase.colorTriangles, buildBuffer())
     End Sub

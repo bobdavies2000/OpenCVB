@@ -12626,7 +12626,7 @@ End Class
 
 
 Public Class XO_RedCloud_BasicsTest : Inherits TaskParent
-    Dim redCold As New RedCloud_HeartBeat
+    Dim redCold As New XO_RedCloud_HeartBeat
     Dim prep As New RedPrep_Basics
     Public rcList As New List(Of rcData)
     Public Sub New()
@@ -15100,5 +15100,203 @@ Public Class XO_RedPrep_FloodFill : Inherits TaskParent
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_Contour_Outline : Inherits TaskParent
+    Public rc As New oldrcData
+    Public Sub New()
+        desc = "Create a simplified contour of the selected cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedList(src, labels(2))
+        Dim ptList As List(Of cv.Point) = rc.contour
+
+        dst3.SetTo(0)
+
+        Dim newContour As New List(Of cv.Point)
+        rc = task.oldrcD
+        If rc.contour.Count = 0 Then Exit Sub
+        Dim p1 As cv.Point, p2 As cv.Point
+        newContour.Add(p1)
+        For i = 0 To rc.contour.Count - 2
+            p1 = rc.contour(i)
+            p2 = rc.contour(i + 1)
+            dst3(rc.rect).Line(p1, p2, white, task.lineWidth + 1)
+            newContour.Add(p2)
+        Next
+        rc.contour = New List(Of cv.Point)(newContour)
+        dst3(rc.rect).Line(rc.contour(rc.contour.Count - 1), rc.contour(0), white, task.lineWidth + 1)
+
+        labels(2) = "Input points = " + CStr(rc.contour.Count)
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_RedCloud_MotionTest : Inherits TaskParent
+    Public rcList As New List(Of rcData)
+    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public percentImage As Single
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Build contours for each cell"
+    End Sub
+    Public Function motionDisplayCell() As rcData
+        Dim clickIndex = rcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
+        If clickIndex >= 0 Then
+            Return rcList(clickIndex)
+        End If
+        Return Nothing
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst3 = runRedCloud(src, labels(3))
+        labels(2) = task.redCloud.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
+
+        Static rcListLast = New List(Of rcData)(rcList)
+        Static rcMapLast As cv.Mat = rcMap.Clone
+
+        rcList.Clear()
+        Dim r2 As cv.Rect
+        rcMap.SetTo(0)
+        dst2.SetTo(0)
+        Dim unchangedCount As Integer
+        For Each rc In task.redCloud.rcList
+            Dim r1 = rc.rect
+            r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
+            Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
+            If indexLast > 0 Then r2 = rcListLast(indexLast).rect
+            If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
+                If rc.rect.Contains(rcListLast(indexLast).maxdist) Then
+                    rc = rcListLast(indexLast)
+                    unchangedCount += 1
+                End If
+
+                rc.age = rcListLast(indexLast).age + 1
+                If rc.age > 1000 Then rc.age = 2
+            End If
+            rc.index = rcList.Count + 1
+            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+            SetTrueText(CStr(rc.age), rc.maxDist)
+            rcList.Add(rc)
+        Next
+
+        RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell + vbCrLf + vbCrLf +
+                    Format(percentImage, "0.0%") + " of image" + vbCrLf +
+                    CStr(rcList.Count) + " cells present"
+
+        SetTrueText(strOut, 1)
+
+        rcListLast = New List(Of rcData)(rcList)
+        rcMapLast = rcMap.Clone
+    End Sub
+End Class
+
+
+
+
+Public Class XO_RedCloud_MotionCells : Inherits TaskParent
+    Public Sub New()
+        task.gOptions.HistBinBar.Maximum = 255
+        task.gOptions.HistBinBar.Value = 255
+        desc = "Use motion to identify which cells changed."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedCloud(src, labels(2))
+        dst1 = task.redCloud.dst1
+
+        dst3.SetTo(0)
+        Dim count As Integer
+        For Each rc In task.redCloud.rcList
+            If rc.age > 10 Then
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+                count += 1
+            Else
+                dst3(rc.rect).SetTo(white, rc.mask)
+            End If
+            dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+            SetTrueText(CStr(rc.age), rc.maxDist)
+        Next
+        labels(3) = CStr(count) + " cells had no RGB motion... white cells had motion."
+    End Sub
+End Class
+
+
+
+
+Public Class XO_RedCloud_HeartBeat : Inherits TaskParent
+    Dim redCore As New RedCloud_Basics
+    Public rcList As New List(Of rcData)
+    Public percentImage As Single
+    Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public prepEdges As New RedPrep_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        redCore.redSweep.prepEdges = prepEdges
+        desc = "Run RedCloud_Map on the heartbeat but just floodFill at maxDist otherwise."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat Or task.optionsChanged Then
+            redCore.Run(src)
+            dst2 = redCore.dst2
+            labels(2) = redCore.labels(2)
+            rcList = New List(Of rcData)(redCore.rcList)
+            dst3 = redCore.dst2
+            dst1 = redCore.redSweep.prepEdges.dst2
+            labels(3) = redCore.labels(2)
+        Else
+            Dim rcListLast = New List(Of rcData)(redCore.rcList)
+
+            prepEdges.Run(src)
+            dst1 = prepEdges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+            Dim index As Integer = 1
+            Dim rect As New cv.Rect
+            Dim maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
+            Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
+            Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
+            Dim minCount = dst1.Total * 0.001
+            rcList.Clear()
+            rcMap.SetTo(0)
+            For Each rc In rcListLast
+                Dim pt = rc.maxDist
+                If rcMap.Get(Of Byte)(pt.Y, pt.X) = 0 Then
+                    Dim count = cv.Cv2.FloodFill(dst1, mask, pt, index, rect, 0, 0, flags)
+                    If rect.Width > 0 And rect.Height > 0 And rect.Width < dst2.Width And rect.Height < dst2.Height Then
+                        Dim pcc = New rcData(dst1(rect), rect, index)
+                        If pcc.index >= 0 Then
+                            pcc.index = index
+                            pcc.color = rc.color
+                            pcc.age = rc.age + 1
+                            rcList.Add(pcc)
+                            rcMap(pcc.rect).SetTo(pcc.index Mod 255, pcc.mask)
+
+                            index += 1
+                        End If
+                    End If
+                End If
+            Next
+
+            dst2 = PaletteBlackZero(rcMap)
+            labels(2) = CStr(rcList.Count) + " regions were identified "
+        End If
+
+        RedCell_Basics.selectCell(rcMap, rcList)
+        If task.rcD IsNot Nothing Then
+            strOut = task.rcD.displayCell + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf + CStr(rcList.Count) + " cells present"
+            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+        End If
+        SetTrueText(strOut, 1)
     End Sub
 End Class
