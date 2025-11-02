@@ -1,36 +1,39 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedCC_Basics : Inherits TaskParent
+    Dim reduction As New Reduction_Basics
     Public Sub New()
-        desc = "Show the image segmentation for both the point cloud and the color image."
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(1) = "Contours of each RedCloud cell - if missing some, CV_8U is the problem."
+        desc = "Insert the RedCloud cells into the RedColor_Basics input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pointCloud
-        dst2 = runRedCloud(src, labels(2))
-        dst3 = runRedColor(src, labels(3))
+        runRedCloud(src, labels(3))
+        reduction.Run(src)
+
+        Dim index = reduction.classCount + 1
+        For Each rc In task.redCloud.rcList
+            reduction.dst2(rc.rect).SetTo(index, rc.mask)
+            Dim listOfPoints = New List(Of List(Of cv.Point))({rc.contour})
+            cv.Cv2.DrawContours(reduction.dst2(rc.rect), listOfPoints, 0,
+                                cv.Scalar.All(255), 1, cv.LineTypes.Link8)
+            index += 1
+            If index >= 254 Then Exit For
+        Next
+
+        dst1 = reduction.dst2.InRange(255, 255)
+
+        dst2 = runRedColor(reduction.dst2, labels(2))
 
         If standaloneTest() Then
-            For Each rc In task.redCloud.rcList
-                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-                SetTrueText(CStr(rc.age), rc.maxDist)
-            Next
-
-            For Each rc In task.redColor.rcList
-                dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-                SetTrueText(CStr(rc.age), rc.maxDist, 3)
-            Next
-        End If
-
-        Static picTag As Integer
-        If task.mouseClickFlag Then picTag = task.mousePicTag
-        If picTag = 2 Then
-            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            If task.rcD IsNot Nothing Then dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
-        Else
             RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
-            If task.rcD IsNot Nothing Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            SetTrueText(strOut, 3)
+
+            dst2.Rectangle(task.motionRect, task.highlight, task.lineWidth)
         End If
     End Sub
 End Class
+
 
 
 
@@ -168,40 +171,3 @@ Public Class RedCC_UseHistIDs : Inherits TaskParent
         SetTrueText(strOut, 3)
     End Sub
 End Class
-
-
-
-
-
-'Public Class RedCC_Motion : Inherits TaskParent
-'    Dim redCC As New RedCC_Basics
-'    Public Sub New()
-'        desc = "Map point cloud and color but with the motion-updated version of the point cloud."
-'    End Sub
-'    Public Overrides Sub RunAlg(src As cv.Mat)
-'        redCC.Run(task.pcMotion.dst2)
-'        labels(2) = redCC.labels(2)
-
-'        dst3 = redCC.dst3
-'        labels(3) = redCC.labels(3)
-'        If standaloneTest() Then
-'            For Each rc In task.redCloud.rcList
-'                SetTrueText(CStr(rc.age), rc.maxDist)
-'            Next
-
-'            For Each rc In task.redColor.rcList
-'                SetTrueText(CStr(rc.age), rc.maxDist, 3)
-'            Next
-'        End If
-
-'        Static picTag As Integer
-'        If task.mouseClickFlag Then picTag = task.mousePicTag
-'        If picTag = 2 Then
-'            RedCell_Basics.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-'            If task.rcD IsNot Nothing Then dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
-'        Else
-'            RedCell_Basics.selectCell(task.redColor.rcMap, task.redColor.rcList)
-'            If task.rcD IsNot Nothing Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
-'        End If
-'    End Sub
-'End Class

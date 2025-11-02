@@ -15486,3 +15486,40 @@ Public Class XO_RedCell_Color1 : Inherits TaskParent
         dst2 = RebuildRCMap(sortedCells)
     End Sub
 End Class
+
+
+
+
+
+Public Class XO_RedCC_Basics : Inherits TaskParent
+    Public Sub New()
+        desc = "Show the image segmentation for both the point cloud and the color image."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pointCloud
+        dst2 = runRedCloud(src, labels(2))
+        dst3 = runRedColor(src, labels(3))
+
+        If standaloneTest() Then
+            For Each rc In task.redCloud.rcList
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+                SetTrueText(CStr(rc.age), rc.maxDist)
+            Next
+
+            For Each rc In task.redColor.rcList
+                dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+                SetTrueText(CStr(rc.age), rc.maxDist, 3)
+            Next
+        End If
+
+        Static picTag As Integer
+        If task.mouseClickFlag Then picTag = task.mousePicTag
+        If picTag = 2 Then
+            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            If task.rcD IsNot Nothing Then dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
+        Else
+            RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
+            If task.rcD IsNot Nothing Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
+        End If
+    End Sub
+End Class
