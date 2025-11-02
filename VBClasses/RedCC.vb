@@ -1,6 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedCC_Basics : Inherits TaskParent
     Dim reduction As New Reduction_Basics
+    Public rcList As List(Of rcData)
+    Public rcMap As cv.Mat
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(1) = "Contours of each RedCloud cell - if missing some, CV_8U is the problem."
@@ -23,9 +25,11 @@ Public Class RedCC_Basics : Inherits TaskParent
         dst1 = reduction.dst2.InRange(255, 255)
 
         dst2 = runRedColor(reduction.dst2, labels(2))
+        rcList = New List(Of rcData)(task.redColor.rcList)
+        rcMap = task.redColor.rcMap
 
         If standaloneTest() Then
-            RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
+            RedCloud_Cell.selectCell(rcMap, rcList)
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
 
@@ -169,5 +173,48 @@ Public Class RedCC_UseHistIDs : Inherits TaskParent
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
         End If
         SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCC_CellHistogram : Inherits TaskParent
+    Dim plot As New Plot_Histogram
+    Dim redCC As New RedCC_Basics
+    Public Sub New()
+        task.gOptions.setHistogramBins(100)
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        plot.createHistogram = True
+        desc = "Display the histogram of a selected RedCloud cell."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redCC.Run(src)
+        dst2 = redCC.dst2
+        labels(2) = redCC.labels(2)
+
+        RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell
+        SetTrueText(strOut, 1)
+
+        If task.rcD Is Nothing Then
+            labels(3) = "Select a RedCloud cell to see the histogram"
+            Exit Sub
+        End If
+
+        Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
+        depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+        plot.minRange = 0
+        plot.maxRange = task.MaxZmeters
+        plot.Run(depth)
+        labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + " meters - vertical lines every meter"
+
+        Dim incr = dst2.Width / task.MaxZmeters
+        For i = 1 To CInt(task.MaxZmeters - 1)
+            Dim x = incr * i
+            DrawLine(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White)
+        Next
+        dst3 = plot.dst2
     End Sub
 End Class

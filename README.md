@@ -1,3 +1,33 @@
+# November 2, 2025 – Global Options, Motion, Coherence.
+
+-   Over 2000 algorithms are included, averaging 36 lines of code per algorithm.
+    -   Over 350 obsolete algorithms are compiled just for reference use.
+-   The Global Options were reviewed and simplified.
+    -   Color and depth difference thresholds will appear only when needed.
+    -   Depth colorizer options to show correlations was removed.
+        -   Use Brick_CorrelationMap to see the left/right correlations.
+    -   RedCloud display to show mean color was removed – not useful.
+    -   The option to use Kalman filtering is now shown only when applicable.
+-   The motion mask is not typically used for maintaining an RGB image.
+    -   Flaws in the motion mask are visible in the accumulated grayscale image.
+    -   Line detection can use the motion mask to limit what lines changed.
+    -   Similarly, RedCloud algorithms use the motion mask to limit cell changes.
+    -   RGB motion may not detect all changes to depth shadow.
+        -   Cells in depth shadow are still valid because there was no motion.
+        -   Cells exposed by depth shadow changes may be missed.
+        -   Further experimentation will resolve this potential problem.
+-   RedCC_Basics runs both RedCloud and RedColor on the same image set.
+    -   Each cell in RedCC_Basics is coherent in both depth and color.
+    -   Use RedCC_CellHistogram to confirm the depth range is singular.
+-   RedCC_CellHistogram is used below to confirm each cell’s depth range.
+    -   Each histogram has a depth range that is contiguous.
+    -   Further experimentation is needed to validate the depth results.
+    -   Color can be confirmed using the RGB image in the upper left.
+
+**![](media/9f61236cc37ed9a3912de5e625010cab.gif)**
+
+**RedCC_CellHistogram:**  *RedCC_CellHistogram displays the results of RedCC_Basics in the lower left. Each RedCC cell is coherent in both depth and color meaning that the cell depth data is in a singular spike in the histogram and the color data is a single class in the reduced color image. The histogram in the lower right is for the selected cell. The selected cell is highlighted in the upper left RGB image. The cell details are in the upper right.*
+
 # October 27, 2025 – OpenCVB Docs, Depth Colorizer, Edge_Line, RedCloud, RedColor, OpenGL updates.
 
 -   Over 2000 algorithms are included, averaging 36 lines of code per algorithm.
@@ -29,6 +59,8 @@
 ![](media/ce6b4b56d0edafe998d3f1cdee0d35b4.gif)
 
 **RedCC_Basics:**  *RedCC_Basics displays both the segmented depth data and the segmented color data. The camera is moving left and right in this demonstration. The image in the lower left is the output of the RedCloud_Basics while the lower right is the output of the RedColor_Basics. RedCloud is short-hand for reduced point cloud while RedColor is short-hand for reduced color. Clicking a color segment in the lower right will display the RedColor segment in the lower left while clicking in the lower left will display the RedCloud segment in the lower right. This technique allows studying the overlap of RedColor segments in depth data and the overlap of RedCloud segments in color data.*
+
+# 
 
 # 2025 September 23 – Logical Lines, OpenCVB icon, Better Defaults.
 
