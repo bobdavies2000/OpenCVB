@@ -6,7 +6,7 @@ Public Class Bin3Way_Basics : Inherits TaskParent
     Public Sub New()
         task.gOptions.setHistogramBins(255)
         labels = {"", "", "Image separated into three segments from darkest to lightest and 'Other' (between)", "Histogram Of grayscale image"}
-        desc = "Split an image into 3 parts - darkest, lightest, and in-between the 2"
+        desc = "Split an image into 3 parts - darkest, lightest, and in-between (2)"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Dim bins = task.histogramBins
@@ -107,13 +107,13 @@ End Class
 
 
 
-Public Class Bin3Way_RedCloudDarkest : Inherits TaskParent
+Public Class Bin3Way_RedColorDarkest : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Public Sub New()
-        desc = "Use RedCloud with the darkest regions"
+        desc = "Use RedColor with the darkest regions"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then bin3.Run(src)
 
         flood.inputRemoved = Not bin3.bin3.mats.mat(0)
@@ -128,13 +128,13 @@ End Class
 
 
 
-Public Class Bin3Way_RedCloudLightest : Inherits TaskParent
+Public Class Bin3Way_RedColorLightest : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Public Sub New()
-        desc = "Use RedCloud with the lightest regions"
+        desc = "Use RedColor with the lightest regions"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then bin3.Run(src)
 
         flood.inputRemoved = Not bin3.bin3.mats.mat(2)
@@ -147,15 +147,15 @@ End Class
 
 
 
-Public Class Bin3Way_RedCloudOther : Inherits TaskParent
+Public Class Bin3Way_RedColorOther : Inherits TaskParent
     Dim bin3 As New Bin3Way_KMeans
     Dim flood As New Flood_BasicsMask
     Dim color8U As New Color8U_Basics
     Public Sub New()
         flood.inputRemoved = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Use RedCloud with the regions that are neither lightest or darkest"
+        desc = "Use RedColor with the regions that are neither lightest or darkest"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then bin3.Run(src)
 
         flood.inputRemoved = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
@@ -171,103 +171,17 @@ End Class
 
 
 
-
-Public Class Bin3Way_RedCloud1 : Inherits TaskParent
-    Dim bin3 As New Bin3Way_KMeans
-    Dim flood As New Flood_BasicsMask
-    Dim color8U As New Color8U_Basics
-    Dim cellMaps(2) As cv.Mat, oldrclist(2) As List(Of oldrcData)
-    Dim options As New Options_Bin3WayRedCloud
-    Public Sub New()
-        desc = "Identify the lightest, darkest, and 'Other' regions separately and then combine the oldrcData."
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        options.Run()
-        dst3 = runRedList(src, labels(3))
-
-        If task.optionsChanged Then
-            For i = 0 To oldrclist.Count - 1
-                oldrclist(i) = New List(Of oldrcData)
-                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            Next
-        End If
-
-        bin3.Run(src)
-
-        For i = options.startRegion To options.endRegion
-            task.redList.rcMap = cellMaps(i)
-            task.redList.oldrclist = oldrclist(i)
-            If i = 2 Then
-                flood.inputRemoved = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
-                color8U.Run(src)
-                flood.Run(color8U.dst2)
-            Else
-                flood.inputRemoved = Not bin3.bin3.mats.mat(i)
-                flood.Run(bin3.bin3.mats.mat(i))
-            End If
-            cellMaps(i) = task.redList.rcMap.Clone
-            oldrclist(i) = New List(Of oldrcData)(task.redList.oldrclist)
-        Next
-
-        Dim sortedCells As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To 2
-            For Each rc In oldrclist(i)
-                sortedCells.Add(rc.pixels, rc)
-            Next
-        Next
-
-        dst2 = RebuildRCMap(sortedCells)
-
-        If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Bin3Way_RedCloud : Inherits TaskParent
-    Dim bin3 As New Bin3Way_KMeans
+    Dim redC1 As New RedColor_Basics
+    Dim redC2 As New RedColor_Basics
+    Dim redC3 As New RedColor_Basics
     Dim flood As New Flood_BasicsMask
-    Dim cellMaps(2) As cv.Mat, oldrclist(2) As List(Of oldrcData)
-    Dim options As New Options_Bin3WayRedCloud
     Public Sub New()
-        flood.showSelected = False
-        desc = "Identify the lightest, darkest, and other regions separately and then combine the oldrcData."
+        desc = "Combine the results of the 3 different RedColor runs..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        dst3 = runRedList(src, labels(3))
+        Dim bin3 As New Bin3Way_KMeans
 
-        If task.optionsChanged Then
-            For i = 0 To oldrclist.Count - 1
-                oldrclist(i) = New List(Of oldrcData)
-                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            Next
-        End If
 
-        bin3.Run(src)
-
-        Dim sortedCells As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
-        For i = options.startRegion To options.endRegion
-            task.redList.rcMap = cellMaps(i)
-            task.redList.oldrclist = oldrclist(i)
-            flood.inputRemoved = Not bin3.bin3.mats.mat(i)
-            flood.Run(bin3.bin3.mats.mat(i))
-            cellMaps(i) = task.redList.rcMap.Clone
-            oldrclist(i) = New List(Of oldrcData)(task.redList.oldrclist)
-            For Each rc In oldrclist(i)
-                If rc.index = 0 Then Continue For
-                sortedCells.Add(rc.pixels, rc)
-            Next
-        Next
-
-        dst2 = RebuildRCMap(sortedCells)
-
-        If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
     End Sub
 End Class
-

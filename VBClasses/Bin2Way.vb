@@ -162,7 +162,7 @@ End Class
 
 Public Class Bin2Way_RedCloudDarkest : Inherits TaskParent
     Dim bin2 As New Bin2Way_RecurseOnce
-    Dim flood As New Flood_BasicsMaskNew
+    Dim flood As New Flood_BasicsMask
     Public Sub New()
         desc = "Use RedCloud with the darkest regions"
     End Sub
@@ -183,7 +183,7 @@ End Class
 
 Public Class Bin2Way_RedCloudLight : Inherits TaskParent
     Dim bin2 As New Bin2Way_RecurseOnce
-    Dim flood As New Flood_BasicsMaskNew
+    Dim flood As New Flood_BasicsMask
     Public Sub New()
         desc = "Use RedCloud with the lightest regions"
     End Sub

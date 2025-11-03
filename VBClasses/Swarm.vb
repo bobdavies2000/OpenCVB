@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports VBClasses.XO_Bin3Way_RedCloud
+Imports cv = OpenCvSharp
 Public Class Swarm_Basics : Inherits TaskParent
     Public knn As New KNN_Basics
     Public lpList As New List(Of lpData)
@@ -105,11 +106,11 @@ Public Class Swarm_LeftRight : Inherits TaskParent
     Public rightMax As Single
     Dim swarm As New Swarm_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Get direction and distance from the left and right images."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         swarm.Run(task.leftView)
         leftDistance = swarm.distanceAvg
         leftDirection = swarm.directionAvg
@@ -142,7 +143,7 @@ Public Class Swarm_Percentage : Inherits TaskParent
     Public Sub New()
         desc = "Use features to segment a percentage of the image then use RedCloud with a mask for the rest of the image."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
         swarm.Run(src)
@@ -169,7 +170,7 @@ End Class
 
 Public Class Swarm_Flood : Inherits TaskParent
     Dim swarm As New Swarm_Basics
-    Public flood As New Flood_BasicsMask
+    Public flood As New XO_Flood_BasicsMask
     Dim color8U As New Color8U_Basics
     Public Sub New()
         desc = "Floodfill the color image using the swarm outline as a mask"
@@ -187,4 +188,3 @@ Public Class Swarm_Flood : Inherits TaskParent
         labels(2) = flood.cellGen.labels(2)
     End Sub
 End Class
-

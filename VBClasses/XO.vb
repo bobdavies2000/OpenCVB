@@ -15523,3 +15523,141 @@ Public Class XO_RedCC_Basics : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+
+
+
+Public Class XO_Bin3Way_RedCloudNew : Inherits TaskParent
+    Dim bin3 As New Bin3Way_KMeans
+    Dim flood As New Flood_BasicsMask
+    Dim color8U As New Color8U_Basics
+    Dim cellMaps(2) As cv.Mat, rclist(2) As List(Of rcData)
+    Dim options As New Options_Bin3WayRedCloud
+    Public Sub New()
+        desc = "Identify the lightest, darkest, and 'Other' regions separately and then combine the oldrcData."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        dst3 = runRedColor(src, labels(3))
+
+        If task.optionsChanged Then
+            For i = 0 To rclist.Count - 1
+                rclist(i) = New List(Of rcData)
+                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+            Next
+        End If
+
+        bin3.Run(src)
+
+        For i = options.startRegion To options.endRegion
+            task.redColor.rcMap = cellMaps(i)
+            task.redColor.rcList = rclist(i)
+            If i = 2 Then
+                flood.inputRemoved = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
+                color8U.Run(src)
+                flood.Run(color8U.dst2)
+            Else
+                flood.inputRemoved = Not bin3.bin3.mats.mat(i)
+                flood.Run(bin3.bin3.mats.mat(i))
+            End If
+            cellMaps(i) = task.redColor.rcMap.Clone
+            rclist(i) = New List(Of rcData)(task.redColor.rcList)
+        Next
+
+        Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To 2
+            For Each rc In rclist(i)
+                sortedCells.Add(rc.pixels, rc)
+            Next
+        Next
+
+        'dst2 = RebuildRCMap(sortedCells)
+
+        If task.heartBeat Then labels(2) = CStr(task.redColor.rcList.Count) + " cells were identified and matched to the previous image"
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Bin3Way_RedCloud : Inherits TaskParent
+    Dim bin3 As New Bin3Way_KMeans
+    Dim flood As New Flood_BasicsMask
+    Dim cellMaps(2) As cv.Mat, oldrclist(2) As List(Of oldrcData)
+    Dim options As New Options_Bin3WayRedCloud
+    Public Sub New()
+        flood.showSelected = False
+        desc = "Identify the lightest, darkest, and other regions separately and then combine the oldrcData."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        dst3 = runRedList(src, labels(3))
+
+        If task.optionsChanged Then
+            For i = 0 To oldrclist.Count - 1
+                oldrclist(i) = New List(Of oldrcData)
+                cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            Next
+        End If
+
+        bin3.Run(src)
+
+        Dim sortedCells As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
+        For i = options.startRegion To options.endRegion
+            task.redList.rcMap = cellMaps(i)
+            task.redList.oldrclist = oldrclist(i)
+            flood.inputRemoved = Not bin3.bin3.mats.mat(i)
+            flood.Run(bin3.bin3.mats.mat(i))
+            cellMaps(i) = task.redList.rcMap.Clone
+            oldrclist(i) = New List(Of oldrcData)(task.redList.oldrclist)
+            For Each rc In oldrclist(i)
+                If rc.index = 0 Then Continue For
+                sortedCells.Add(rc.pixels, rc)
+            Next
+        Next
+
+        dst2 = RebuildRCMap(sortedCells)
+
+        If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Flood_BasicsMask : Inherits TaskParent
+    Public inputRemoved As cv.Mat
+    Public cellGen As New XO_RedCell_Color
+    Dim redMask As New RedMask_Basics
+    Public buildinputRemoved As Boolean
+    Public showSelected As Boolean = True
+    Dim color8U As New Color8U_Basics
+    Public Sub New()
+        labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
+        desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Or buildinputRemoved Then
+            color8U.Run(src)
+            inputRemoved = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
+            src = color8U.dst2
+        End If
+
+        dst3 = inputRemoved
+        If inputRemoved IsNot Nothing Then src.SetTo(0, inputRemoved)
+        redMask.Run(src)
+
+        cellGen.mdList = redMask.mdList
+        cellGen.Run(redMask.dst2)
+
+        dst2 = cellGen.dst2
+
+        If task.heartBeat Then labels(2) = $"{task.redList.oldrclist.Count} cells identified"
+
+        If showSelected Then task.setSelectedCell()
+    End Sub
+End Class
