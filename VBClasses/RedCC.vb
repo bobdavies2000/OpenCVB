@@ -28,13 +28,11 @@ Public Class RedCC_Basics : Inherits TaskParent
         rcList = New List(Of rcData)(task.redColor.rcList)
         rcMap = task.redColor.rcMap
 
-        If standaloneTest() Then
-            RedCloud_Cell.selectCell(rcMap, rcList)
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
-            SetTrueText(strOut, 3)
+        RedCloud_Cell.selectCell(rcMap, rcList)
+        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+        SetTrueText(strOut, 3)
 
-            dst2.Rectangle(task.motionRect, task.highlight, task.lineWidth)
-        End If
+        dst2.Rectangle(task.motionRect, task.highlight, task.lineWidth)
     End Sub
 End Class
 
@@ -195,13 +193,15 @@ Public Class RedCC_CellHistogram : Inherits TaskParent
         labels(2) = redCC.labels(2)
 
         RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell
-        SetTrueText(strOut, 1)
-
         If task.rcD Is Nothing Then
-            labels(3) = "Select a RedCloud cell to see the histogram"
-            Exit Sub
+            RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
+            If task.rcD Is Nothing Then
+                labels(3) = "Select a RedCloud cell to see the histogram"
+                Exit Sub
+            End If
         End If
+
+        SetTrueText(task.rcD.displayCell, 1)
 
         Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
         depth.SetTo(0, task.noDepthMask(task.rcD.rect))
