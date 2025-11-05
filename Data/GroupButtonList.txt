@@ -46,7 +46,6 @@ Covariance
 CSV
 DCT
 Delaunay
-Density
 Depth
 DepthColorizer
 DepthLinear

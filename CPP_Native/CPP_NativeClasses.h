@@ -337,7 +337,7 @@ public:
     {
         return sqrt((v1.x - v2.x) * (v1.x - v2.x) + (v1.y - v2.y) * (v1.y - v2.y) + (v1.z - v2.z) * (v1.z - v2.z));
     }
-    void RunCPP(float zDistance) {
+    void RunCPP() {
         dst.setTo(0);
         int offx[] = { -1, 0, 1, -1, 1, -1, 0, 1 };
         int offy[] = { -1, -1, -1, 0, 0, 1, 1, 1 };
@@ -354,7 +354,7 @@ public:
                     if (z2 == 0) continue;
                     d += abs(z1 - z2);
                 }
-                if (d < zDistance && d != 0.0f) dst.at<unsigned char>(y, x) = 255;
+                if (d != 0.0f) dst.at<unsigned char>(y, x) = 255;
             }
         }
     }
@@ -373,11 +373,11 @@ void Density_2D_Close(Density_2D* cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* Density_2D_RunCPP(Density_2D* cPtr, int* dataPtr, int rows, int cols, double zDistance)
+int* Density_2D_RunCPP(Density_2D* cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->dst = Mat(rows, cols, CV_8U);
     cPtr->src = Mat(rows, cols, CV_32F, dataPtr);
-    cPtr->RunCPP(zDistance);
+    cPtr->RunCPP();
     return (int*)cPtr->dst.data;
 }
 
@@ -500,7 +500,7 @@ private:
 public:
     Mat src, dst;
     Density_Count() {}
-    void RunCPP(int zCount) {
+    void RunCPP() {
         dst.setTo(0);
         int offx[] = { -1, 0, 1, -1, 1, -1, 0, 1 };
         int offy[] = { -1, -1, -1, 0, 0, 1, 1, 1 };
@@ -516,7 +516,7 @@ public:
                     float z2 = src.at<float>(y + offy[i], x + offx[i]);
                     if (z2 > 0) count += 1;
                 }
-                if (count >= zCount) dst.at<unsigned char>(y, x) = 255;
+                if (count > 0) dst.at<unsigned char>(y, x) = 255;
             }
         }
     }
@@ -535,11 +535,11 @@ void Density_Count_Close(Density_Count* cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* Density_Count_RunCPP(Density_Count* cPtr, int* dataPtr, int rows, int cols, int zCount)
+int* Density_Count_RunCPP(Density_Count* cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->dst = Mat(rows, cols, CV_8U);
     cPtr->src = Mat(rows, cols, CV_32F, dataPtr);
-    cPtr->RunCPP(zCount);
+    cPtr->RunCPP();
     return (int*)cPtr->dst.data;
 }
 

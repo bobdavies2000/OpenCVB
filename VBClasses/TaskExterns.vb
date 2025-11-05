@@ -165,7 +165,7 @@ Module TaskExterns
     Public Sub Density_2D_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Density_2D_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, distance As Double) As IntPtr
+    Public Function Density_2D_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
     End Function
 
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -175,7 +175,7 @@ Module TaskExterns
     Public Sub Density_Count_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Density_Count_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32, zCount As Integer) As IntPtr
+    Public Function Density_Count_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
     End Function
 
 
