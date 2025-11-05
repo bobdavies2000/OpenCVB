@@ -122,7 +122,6 @@ Public Class OptionsGlobal
 
         task.gOptions.DotSizeSlider.Value = task.DotSize
         task.gOptions.LineWidth.Value = task.DotSize
-        DotSizeLabel.Text = CStr(DotSizeSlider.Value)
 
         Me.Left = 0
         Me.Top = 30
@@ -139,16 +138,14 @@ Public Class OptionsGlobal
                 task.lineType = cv.LineTypes.Link8
         End Select
     End Sub
-    Private Sub LineWidth_Scroll(sender As Object, e As EventArgs) Handles LineWidth.Scroll
-        LineThicknessAmount.Text = CStr(LineWidth.Value)
-        task.optionsChanged = True
-    End Sub
     Private Sub LineWidth_ValueChanged(sender As Object, e As EventArgs) Handles LineWidth.ValueChanged
-        task.optionsChanged = True
         LineThicknessAmount.Text = CStr(LineWidth.Value)
+        task.lineWidth = LineWidth.Value
+        task.optionsChanged = True
     End Sub
     Private Sub DotSizeSlider_Scroll(sender As Object, e As EventArgs) Handles DotSizeSlider.Scroll
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
+        task.DotSize = DotSizeSlider.Value
         task.optionsChanged = True
     End Sub
     Private Sub UseKalman_CheckedChanged(sender As Object, e As EventArgs)
@@ -162,27 +159,14 @@ Public Class OptionsGlobal
     End Sub
     Private Sub MaxDepth_ValueChanged(sender As Object, e As EventArgs) Handles MaxDepthBar.ValueChanged
         maxCount.Text = CStr(MaxDepthBar.Value)
-        task.MaxZmeters = MaxDepthBar.Value + 0.01 ' why add anything?  Because histograms are exclusive on ranges.
+        ' why add anything?  Because histograms are exclusive on ranges.
+        task.MaxZmeters = MaxDepthBar.Value + 0.01
         task.optionsChanged = True
-    End Sub
-    Private Sub GridSlider_Scroll(sender As Object, e As EventArgs) Handles GridSlider.Scroll
-        task.optionsChanged = True
-        task.brickSize = GridSlider.Value
-
-        'If task.brickSize <= 2 Then task.brickSize = 2
-        'If task.brickSize > 2 And task.brickSize <= 4 Then task.brickSize = 4
-        'If task.brickSize > 4 And task.brickSize <= 8 Then task.brickSize = 8
-        'If task.brickSize > 8 And task.brickSize <= 16 Then task.brickSize = 16
-        'If task.brickSize > 16 And task.brickSize <= 32 Then task.brickSize = 32
-        'If task.brickSize > 32 And task.brickSize <= 64 Then task.brickSize = 64
-        'If task.brickSize > 64 And task.brickSize <= 128 Then task.brickSize = 128
-        'GridSlider.Value = task.brickSize
-
-        GridSizeLabel.Text = CStr(GridSlider.Value)
     End Sub
     Private Sub GridSlider_ValueChanged(sender As Object, e As EventArgs) Handles GridSlider.ValueChanged
-        task.optionsChanged = True
         GridSizeLabel.Text = CStr(GridSlider.Value)
+        task.brickSize = GridSlider.Value
+        task.optionsChanged = True
     End Sub
     Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar.ValueChanged
         task.optionsChanged = True

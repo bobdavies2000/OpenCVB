@@ -13,7 +13,6 @@ Public Class Grid_Basics : Inherits TaskParent
             task.gridROIclicked = task.gridMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
         End If
 
-        Dim cellSize = task.gOptions.GridSlider.Value
         If task.optionsChanged Then
             Dim bricksPerCol As Integer, bricksPerRow As Integer
             task.gridNabeRects.Clear()
@@ -21,9 +20,9 @@ Public Class Grid_Basics : Inherits TaskParent
 
             task.gridRects.Clear()
             Dim index As Integer
-            For y = 0 To dst2.Height - 1 Step cellSize
-                For x = 0 To dst2.Width - 1 Step cellSize
-                    Dim roi = ValidateRect(New cv.Rect(x, y, cellSize, cellSize))
+            For y = 0 To dst2.Height - 1 Step task.brickSize
+                For x = 0 To dst2.Width - 1 Step task.brickSize
+                    Dim roi = ValidateRect(New cv.Rect(x, y, task.brickSize, task.brickSize))
 
                     If roi.Bottom = dst2.Height - 1 Then roi.Height += 1
                     If roi.BottomRight.X = dst2.Width - 1 Then roi.Width += 1
@@ -38,11 +37,11 @@ Public Class Grid_Basics : Inherits TaskParent
             Next
 
             task.gridMask.SetTo(0)
-            For x = cellSize To dst2.Width - 1 Step cellSize
+            For x = task.brickSize To dst2.Width - 1 Step task.brickSize
                 Dim p1 = New cv.Point(x, 0), p2 = New cv.Point(x, dst2.Height)
                 task.gridMask.Line(p1, p2, 255, 1)
             Next
-            For y = cellSize To dst2.Height - 1 Step cellSize
+            For y = task.brickSize To dst2.Height - 1 Step task.brickSize
                 Dim p1 = New cv.Point(0, y), p2 = New cv.Point(dst2.Width, y)
                 task.gridMask.Line(p1, p2, 255, 1)
             Next
@@ -82,20 +81,20 @@ Public Class Grid_Basics : Inherits TaskParent
                     yList.Add(roi.BottomRight.Y)
                 Next
                 Dim r = New cv.Rect(xList.Min, yList.Min, xList.Max - xList.Min, yList.Max - yList.Min)
-                If r.Width < cellSize * 3 Then
-                    If r.X + r.Width >= dst2.Width Then r.X = dst2.Width - cellSize * 3
-                    r.Width = cellSize * 3
+                If r.Width < task.brickSize * 3 Then
+                    If r.X + r.Width >= dst2.Width Then r.X = dst2.Width - task.brickSize * 3
+                    r.Width = task.brickSize * 3
                 End If
-                If r.Height < cellSize * 3 Then
-                    If r.Y + r.Height >= dst2.Height Then r.Y = dst2.Height - cellSize * 3
-                    r.Height = cellSize * 3
+                If r.Height < task.brickSize * 3 Then
+                    If r.Y + r.Height >= dst2.Height Then r.Y = dst2.Height - task.brickSize * 3
+                    r.Height = task.brickSize * 3
                 End If
-                If r.Width <> cellSize * 3 Then r.Width = cellSize * 3
-                If r.Height <> cellSize * 3 Then r.Height = cellSize * 3
+                If r.Width <> task.brickSize * 3 Then r.Width = task.brickSize * 3
+                If r.Height <> task.brickSize * 3 Then r.Height = task.brickSize * 3
                 task.gridNabeRects.Add(r)
             Next
 
-            task.brickSize = cellSize
+            task.brickSize = task.brickSize
             task.bricksPerCol = bricksPerCol
             task.bricksPerRow = bricksPerRow
         End If
@@ -104,7 +103,7 @@ Public Class Grid_Basics : Inherits TaskParent
             task.color.CopyTo(dst2)
             dst2.SetTo(white, task.gridMask)
             labels(2) = "Grid_Basics " + CStr(task.gridRects.Count) + " (" + CStr(task.bricksPerCol) + "X" + CStr(task.bricksPerRow) + ") " +
-                                         CStr(cellSize) + "X" + CStr(cellSize) + " regions"
+                                         CStr(task.brickSize) + "X" + CStr(task.brickSize) + " regions"
         End If
     End Sub
 End Class

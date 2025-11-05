@@ -15,11 +15,10 @@ Public Class PhotoShop_Clahe : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Static clipSlider =OptionParent.FindSlider("Clip Limit")
-        Static gridSlider =OptionParent.FindSlider("Grid Size")
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
-        claheObj.TilesGridSize() = New cv.Size(CInt(gridSlider.Value), CInt(gridSlider.Value))
+        claheObj.TilesGridSize() = New cv.Size(CInt(task.brickSize), CInt(task.brickSize))
         claheObj.ClipLimit = clipSlider.Value
         claheObj.Apply(src, dst3)
         claheObj.Dispose()
