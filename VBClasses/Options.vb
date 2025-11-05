@@ -7045,30 +7045,6 @@ End Class
 
 
 
-
-Public Class Options_Density : Inherits OptionParent
-    Public zCount As Integer = 3
-    Public distance As Double = 0
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Distance in meters X10000", 1, 2000, task.densityMetric)
-            sliders.setupTrackBar("Neighboring Z count", 0, 8, zCount)
-        End If
-        distance = task.densityMetric
-    End Sub
-    Public Sub Run()
-        Static distSlider = OptionParent.FindSlider("Distance in meters X10000")
-        Static neighborSlider = OptionParent.FindSlider("Neighboring Z count")
-        zCount = neighborSlider.value
-        distance = distSlider.value / 10000
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Options_ColorMethod : Inherits OptionParent
     Public Sub New()
         If FindFrm(traceName + " CheckBox Options") Is Nothing Then
@@ -7836,19 +7812,23 @@ End Class
 
 Public Class Options_FAST : Inherits OptionParent
     Public useNonMax As Boolean = True
+    Public FASTthreshold As Integer = 10
     Public Sub New()
         If check.Setup(traceName) Then
             check.addCheckBox("Use Non-Max = True")
             check.Box(0).Checked = True
         End If
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Fast Threshold", 0, 100, 50)
+        If task.cols >= 640 Then FASTthreshold = 30
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Fast Threshold", 0, 100, FASTthreshold)
+        End If
     End Sub
     Public Sub Run()
         Static nonMaxCheck = FindCheckBox("Use Non-Max = True")
         useNonMax = nonMaxCheck.checked
 
         Static thresholdSlider = OptionParent.FindSlider("Fast Threshold")
-        task.FASTthreshold = thresholdSlider.Value
+        FASTthreshold = thresholdSlider.Value
     End Sub
 End Class
 
@@ -8067,7 +8047,10 @@ Public Class Options_RedCloud : Inherits OptionParent
             check.Box(1).Checked = True
             check.Box(2).Checked = True
         End If
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Reduction Target", 1, 1000, 200)
+        If sliders.Setup(traceName) Then
+            ' Reduction target depends on resolution.  Default is set in GlobalOptions.vb.
+            sliders.setupTrackBar("Reduction Target", 1, 1000, task.reductionTarget)
+        End If
     End Sub
     Public Sub Run()
         Static redSlider = FindSlider("Reduction Target")

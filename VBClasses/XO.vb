@@ -9935,17 +9935,20 @@ End Class
 Public Class XO_Stabilizer_CornerPoints : Inherits TaskParent
     Public basics As New Stable_Basics
     Public features As New List(Of cv.Point2f)
+    Dim options As New Options_FAST
     Dim ul As cv.Rect, ur As cv.Rect, ll As cv.Rect, lr As cv.Rect
     Public Sub New()
         desc = "Track the FAST feature points found in the corners of the BGR image."
     End Sub
     Private Sub getKeyPoints(src As cv.Mat, r As cv.Rect)
-        Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(src(r), task.FASTthreshold, True)
+        Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(src(r), options.FASTthreshold, True)
         For Each kp In kpoints
             features.Add(New cv.Point2f(kp.Pt.X + r.X, kp.Pt.Y + r.Y))
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         If task.optionsChanged Then
             Dim size = task.brickSize
             ul = New cv.Rect(0, 0, size, size)

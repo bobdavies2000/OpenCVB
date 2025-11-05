@@ -52,7 +52,7 @@ Public Class Corners_Core : Inherits TaskParent
         options.Run()
 
         dst2 = src.Clone
-        Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(task.gray, task.FASTthreshold, options.useNonMax)
+        Dim kpoints() As cv.KeyPoint = cv.Cv2.FAST(task.gray, options.FASTthreshold, options.useNonMax)
 
         features.Clear()
         task.featurePoints.Clear()

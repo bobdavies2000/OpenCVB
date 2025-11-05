@@ -104,7 +104,6 @@ Public Class PhaseCorrelate_RandomInput : Inherits TaskParent
     Dim options As New Options_FAST
     Dim lastShiftX As Integer
     Dim lastShiftY As Integer
-
     Public Sub New()
         labels(2) = "Current frame (before)"
         labels(3) = "Image after shift"
@@ -116,8 +115,8 @@ Public Class PhaseCorrelate_RandomInput : Inherits TaskParent
         Dim input = src
         If input.Channels() <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim shiftX = msRNG.Next(-task.FASTthreshold, task.FASTthreshold)
-        Dim shiftY = msRNG.Next(-task.FASTthreshold, task.FASTthreshold)
+        Dim shiftX = msRNG.Next(-options.FASTthreshold, options.FASTthreshold)
+        Dim shiftY = msRNG.Next(-options.FASTthreshold, options.FASTthreshold)
 
         If task.firstPass Then
             lastShiftX = shiftX

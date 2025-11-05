@@ -265,8 +265,6 @@ Public Class VBtask : Implements IDisposable
     Public HomeDir As String
     Public fpsAlgorithm As Integer
     Public fpsCamera As Integer
-    Public densityMetric As Integer ' how dense is the pointcloud in z - heuristic.
-    Public FASTthreshold As Integer
 
     Public minDistance As Integer ' minimum distance between features
     Public FeatureSampleSize As Integer ' how many features do you want...
