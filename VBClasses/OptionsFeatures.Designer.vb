@@ -234,7 +234,7 @@ Partial Class OptionsFeatures
         ' Label4
         ' 
         Label4.AutoSize = True
-        Label4.Location = New Point(33, 535)
+        Label4.Location = New Point(364, 538)
         Label4.Margin = New Padding(4, 0, 4, 0)
         Label4.Name = "Label4"
         Label4.Size = New Size(176, 30)
@@ -244,10 +244,10 @@ Partial Class OptionsFeatures
         ' ColorSource
         ' 
         ColorSource.FormattingEnabled = True
-        ColorSource.Location = New Point(224, 535)
+        ColorSource.Location = New Point(40, 530)
         ColorSource.Margin = New Padding(4)
         ColorSource.Name = "ColorSource"
-        ColorSource.Size = New Size(188, 38)
+        ColorSource.Size = New Size(285, 38)
         ColorSource.TabIndex = 22
         ' 
         ' OptionsFeatures

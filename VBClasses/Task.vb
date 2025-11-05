@@ -296,7 +296,6 @@ Public Class VBtask : Implements IDisposable
     Public channelsSide() As Integer
     Public bins2D() As Integer
     Public frameHistoryCount As Integer ' count of how much history to use for the point cloud.
-    Public depthThresholdPercent As Single
 
     Public projectionThreshold As Integer ' In heatmap views, this defines what is hot in a heatmap.
 

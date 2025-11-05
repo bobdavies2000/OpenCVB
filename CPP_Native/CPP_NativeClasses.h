@@ -4198,3 +4198,77 @@ int *RedPrep_CPP_RunCPP(RedPrep_CPP *cPtr, int *dataPtr, int rows, int cols)
 		cPtr->RunCPP();
 		return (int *) cPtr->dst.data; 
 }
+
+
+
+
+
+
+
+class RedCloud16
+{
+private:
+public:
+    Mat src, result;
+    vector<Rect>cellRects;
+    vector<Point> floodPoints;
+
+    RedCloud16() {}
+    void RunCPP() {
+        Mat mask(cv::Size(src.cols + 2, src.rows + 2), CV_16U);
+        mask.setTo(0);
+        Rect rect;
+
+        multimap<int, Point, greater<int>> sizeSorted;
+        int floodFlag = 4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE;
+        Point pt;
+        for (int y = 0; y < src.rows; y++)
+        {
+            for (int x = 0; x < src.cols; x++)
+            {
+                if (mask.at<unsigned char>(y, x) == 0)
+                {
+                    pt = Point(x, y);
+                    int count = floodFill(src, mask, pt, 255, &rect, 0, 0, 4 | floodFlag | (255 << 8));
+                    if (rect.width > 1 && rect.height > 1) sizeSorted.insert(make_pair(count, pt));
+                }
+
+            }
+        }
+
+        cellRects.clear();
+        floodPoints.clear();
+        mask.setTo(0);
+        int fill = 1;
+        for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
+        {
+            if (floodFill(src, mask, it->second, fill, &rect, 0, 0, 4 | floodFlag | (fill << 8)) >= 1)
+            {
+                if (rect.width * rect.height > 0)
+                {
+                    cellRects.push_back(rect);
+                    floodPoints.push_back(it->second);
+
+                    if (fill >= 255)
+                        break; // just taking up to the top X largest objects found.
+                    fill++;
+                }
+            }
+        }
+        Rect r = Rect(1, 1, mask.cols - 2, mask.rows - 2);
+        mask(r).copyTo(result);
+    }
+};
+
+extern "C" __declspec(dllexport) RedCloud16* RedCloud16_Open() { return new RedCloud16(); }
+extern "C" __declspec(dllexport) int RedCloud16_Count(RedCloud16* cPtr) { return (int)cPtr->cellRects.size(); }
+extern "C" __declspec(dllexport) int* RedCloud16_Rects(RedCloud16* cPtr) { return (int*)&cPtr->cellRects[0]; }
+extern "C" __declspec(dllexport) int* RedCloud16_Close(RedCloud16* cPtr) { delete cPtr; return (int*)0; }
+
+extern "C" __declspec(dllexport) int*
+RedCloud16_Run(RedCloud16* cPtr, int* dataPtr, int rows, int cols)
+{
+    cPtr->src = Mat(rows, cols, CV_16U, dataPtr);
+    cPtr->RunCPP();
+    return (int*)cPtr->result.data;
+}

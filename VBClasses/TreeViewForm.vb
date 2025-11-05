@@ -4,7 +4,8 @@
     Dim moduleList As New List(Of String) ' the list of all active algorithms.
     Dim PercentTimes As New SortedList(Of Single, String)(New compareAllowIdenticalSingle)
     Dim titleStr = " - Click on any node to review the algorithm's output."
-    Public optionsChanged As Boolean ' updated when task.optionschanged occurs - used in the timer so can't use task.optionschanged.
+    ' updated when task.optionschanged occurs - used in the timer so can't use task.optionschanged.
+    Public optionsChanged As Boolean
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         TreeView1.Height = Me.Height
         PercentTime.Height = TreeView1.Height
@@ -94,6 +95,7 @@
         If task.callTrace.Count <> saveCount Or optionsChanged Then
             saveCount = task.callTrace.Count
             updateTree(New List(Of String)(task.callTrace))
+            optionsChanged = False
         End If
 
         If algorithm_ms.Count = 0 Then

@@ -7,7 +7,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Reduction transform for the point cloud"
     End Sub
-    Private Function reduceChan(chan As cv.Mat) As cv.Mat
+    Private Function reduceChan(chan As cv.Mat, noDepthmask As cv.Mat) As cv.Mat
         chan *= task.reductionTarget
         Dim mm As mmData = GetMinMax(chan)
         Dim dst32f As New cv.Mat
@@ -20,7 +20,7 @@ Public Class RedPrep_Basics : Inherits TaskParent
         End If
         chan = (chan - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
         chan.ConvertTo(chan, cv.MatType.CV_8U)
-        chan.SetTo(0, task.noDepthMask)
+        chan.SetTo(0, noDepthmask)
         Return chan
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -33,18 +33,26 @@ Public Class RedPrep_Basics : Inherits TaskParent
         Dim split = pc32S.Split()
 
         dst2.SetTo(0)
+        Dim noDepthmask As cv.Mat = task.noDepthMask
+        If src.Size <> task.workRes Then noDepthmask = task.noDepthMask.Resize(src.Size)
         If options.PrepX Then
-            prepEdges.Run(reduceChan(split(0)))
-            dst2 = dst2 Or prepEdges.dst3
+            prepEdges.Run(reduceChan(split(0), noDepthmask))
+            If dst2.Size <> src.Size Then
+                dst2 = dst2.Resize(src.Size)
+                dst2 = dst2 Or prepEdges.dst3
+            Else
+                dst2 = dst2 Or prepEdges.dst3
+            End If
+
         End If
 
         If options.PrepY Then
-            prepEdges.Run(reduceChan(split(1)))
+            prepEdges.Run(reduceChan(split(1), noDepthmask))
             dst2 = dst2 Or prepEdges.dst3
         End If
 
         If options.PrepZ Then
-            prepEdges.Run(reduceChan(split(2)))
+            prepEdges.Run(reduceChan(split(2), noDepthmask))
             dst2 = dst2 Or prepEdges.dst3
         End If
 
@@ -65,21 +73,21 @@ Public Class RedPrep_Basics : Inherits TaskParent
         Dim depthCount = task.depthMask.CountNonZero
 
         Dim tmp As cv.Mat = dst2.Clone
-        tmp.SetTo(0, task.noDepthMask)
+        tmp.SetTo(0, noDepthmask)
         Dim floodCountMax = tmp.CountNonZero
         Dim percentZero = (depthCount - floodCountMax) / depthCount
-        Static targetSlider = OptionParent.FindSlider("Reduction Target")
-        If percentZero < 0.75 Then
-            If targetSlider.value + 10 < targetSlider.maximum Then
-                targetSlider.value += 10
-            Else
-                targetSlider.value = targetSlider.maximum
-            End If
-        ElseIf percentZero > 0.85 Then
-            If targetSlider.value - 10 >= targetSlider.minimum Then
-                targetSlider.value -= 10
-            End If
-        End If
+        'Static targetSlider = OptionParent.FindSlider("Reduction Target")
+        'If percentZero < 0.75 Then
+        '    If targetSlider.value + 10 < targetSlider.maximum Then
+        '        targetSlider.value += 10
+        '    Else
+        '        targetSlider.value = targetSlider.maximum
+        '    End If
+        'ElseIf percentZero > 0.85 Then
+        '    If targetSlider.value - 10 >= targetSlider.minimum Then
+        '        targetSlider.value -= 10
+        '    End If
+        'End If
         labels(2) = "Using reduction factor = " + CStr(task.reductionTarget) + ".  " +
                     Format(percentZero, "0%") + " of the image available for floodfill."
     End Sub
@@ -349,8 +357,14 @@ Public Class RedPrep_Edges_CPP : Inherits TaskParent
         handleSrc.Free()
 
         dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
-        dst3.SetTo(255, task.noDepthMask)
-        dst2.SetTo(0, dst3)
+        If src.Size <> task.noDepthMask.Size Then
+            dst3.SetTo(255, task.noDepthMask.Resize(src.Size))
+            dst2 = dst2.Resize(src.Size)
+            dst2.SetTo(0, dst3)
+        Else
+            dst3.SetTo(255, task.noDepthMask)
+            dst2.SetTo(0, dst3)
+        End If
     End Sub
     Public Sub Close()
         RedPrep_CPP_Close(cPtr)

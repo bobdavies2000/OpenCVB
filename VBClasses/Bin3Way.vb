@@ -172,16 +172,33 @@ End Class
 
 
 Public Class Bin3Way_RedCloud : Inherits TaskParent
+    Dim redC0 As New RedColor_Basics
     Dim redC1 As New RedColor_Basics
     Dim redC2 As New RedColor_Basics
-    Dim redC3 As New RedColor_Basics
-    Dim flood As New Flood_BasicsMask
+    Dim bin3 As New Bin3Way_KMeans
+    Dim mats As New Mat_4Click
     Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "The output of all 3 RedColor runs are combined below."
         desc = "Combine the results of the 3 different RedColor runs..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim bin3 As New Bin3Way_KMeans
+        bin3.Run(src)
+        labels(2) = bin3.labels(2)
 
+        Dim mat = bin3.bin3.mats.mat
+        Dim redC As Object = Nothing
+        For i = 0 To 2
+            If i = 0 Then redC = redC0
+            If i = 1 Then redC = redC1
+            If i = 2 Then redC = redC2
+            redC.run(mat(i))
+            mats.mat(i) = redC.dst2
+            mats.mat(i).SetTo(0, Not mat(i))
+            mats.mat(i).CopyTo(dst3, mat(i))
+        Next
 
+        mats.Run(emptyMat)
+        dst2 = mats.dst2
     End Sub
 End Class

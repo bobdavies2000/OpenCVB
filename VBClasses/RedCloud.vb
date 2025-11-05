@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Runtime.InteropServices
+Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
     Public redSweep As New RedCloud_Sweep
     Public rcList As New List(Of rcData)
@@ -54,11 +55,12 @@ Public Class RedCloud_Basics : Inherits TaskParent
             rcList.Add(rc)
         Next
 
-        For Each rc In rcList
-            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-            SetTrueText(CStr(rc.age), rc.maxDist)
-        Next
-        dst2.Rectangle(task.motionRect, task.highlight, task.lineWidth)
+        If standalone Then
+            For Each rc In rcList
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+                SetTrueText(CStr(rc.age), rc.maxDist)
+            Next
+        End If
 
         If standaloneTest() Then
             RedCloud_Cell.selectCell(rcMap, rcList)
@@ -289,7 +291,7 @@ End Class
 
 Public Class RedCloud_Cell : Inherits TaskParent
     Public Sub New()
-        desc = "Display the output of a cell for RedCloud algorithms."
+        desc = "Display the output of a RedCloud cell."
     End Sub
     Public Shared Sub selectCell(rcMap As cv.Mat, rcList As List(Of rcData))
         If rcList.Count > 0 Then
@@ -318,3 +320,140 @@ Public Class RedCloud_Cell : Inherits TaskParent
         SetTrueText(strOut, 3)
     End Sub
 End Class
+
+
+
+
+Public Class RedCloud_CPP : Inherits TaskParent
+    Public classCount As Integer
+    Public rcList As New List(Of rcData)
+    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+    Public Sub New()
+        cPtr = RedCloud_Open()
+        desc = "Run the C++ RedCloud interface without a mask"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1 = srcMustBe8U(src)
+
+        Dim imagePtr As IntPtr
+        Dim inputData(dst1.Total - 1) As Byte
+        Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+        handleInput.Free()
+        dst0 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
+
+        classCount = RedCloud_Count(cPtr)
+
+        If classCount = 0 Then Exit Sub ' no data to process.
+
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4,
+                                            RedCloud_Rects(cPtr))
+
+        Dim rects(classCount * 4) As Integer
+        Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+
+
+        Dim rcListLast = New List(Of rcData)(rcList)
+        Dim rcMapLast As cv.Mat = rcMap.Clone
+
+        Dim minPixels As Integer = dst2.Total * 0.001
+        Dim index As Integer = 1
+        Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To rects.Length - 4 Step 4
+            Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
+            Dim rc = New rcData(dst0(r), r, index)
+            If rc.pixels < minPixels Then Continue For
+            newList.Add(rc.pixels, rc)
+            index += 1
+        Next
+
+        Dim r2 As cv.Rect
+        Dim count As Integer
+        rcList.Clear()
+        Dim usedColor As New List(Of cv.Scalar)
+        For Each rc In newList.Values
+            Dim r1 = rc.rect
+            r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
+            Dim indexLast As Integer = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If indexLast > 0 And indexLast < rcListLast.Count Then
+                indexLast -= 1 ' index is 1 less than the rcMap value
+                r2 = rcListLast(indexLast).rect
+            Else
+                indexLast = -1
+            End If
+            If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
+                rc.age = rcListLast(indexLast).age + 1
+                rc.color = rcListLast(indexLast).color
+                If rc.age >= 1000 Then rc.age = 2
+                count += 1
+            End If
+
+            If usedColor.Contains(rc.color) Then
+                rc.color = randomCellColor()
+                rc.age = 1
+            End If
+            usedColor.Add(rc.color)
+
+            rc.index = rcList.Count + 1
+            rcList.Add(rc)
+            rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            SetTrueText(CStr(rc.age), rc.maxDist)
+        Next
+
+        dst2.SetTo(0)
+        For Each rc In rcList
+            rc.mask = rcMap(rc.rect).InRange(rc.index, rc.index)
+            rc.buildMaxDist()
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+        Next
+
+        If standaloneTest() Then
+            RedCloud_Cell.selectCell(rcMap, rcList)
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            SetTrueText(strOut, 3)
+        End If
+
+        labels(2) = CStr(classCount) + " cells. " + CStr(rcList.Count) + " cells >" +
+                    " minpixels.  " + CStr(count) + " matched to previous generation"
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_Small : Inherits TaskParent
+    Dim minRes As cv.Size
+    Public Sub New()
+        Dim str = CStr(task.cols) + "x" + CStr(task.rows)
+        Select Case str
+            Case "1920x1080", "960x540", "480x270"
+                minRes = New cv.Size(480, 270)
+            Case "1280x720", "640x360", "320x180"
+                minRes = New cv.Size(320, 180)
+            Case "640x480", "320x240", "160x120"
+                minRes = New cv.Size(160, 120)
+            Case "960x600", "480x300", "240x150"
+                minRes = New cv.Size(240, 150)
+            Case "672x376", "336x188", "168x94"
+                minRes = New cv.Size(168, 94)
+        End Select
+        desc = "Run RedCloud at the smallest resolution and floodFill using the maxDist points."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Size <> minRes Then src = task.pointCloud.Resize(minRes) Else src = task.pointCloud
+        dst3 = runRedCloud(src, labels(2))
+        dst2 = dst3(New cv.Rect(0, 0, minRes.Width, minRes.Height)).Resize(task.workRes)
+
+        If task.firstPass Then
+            OptionParent.FindSlider("Reduction Target").Value = 400
+        End If
+    End Sub
+End Class
+

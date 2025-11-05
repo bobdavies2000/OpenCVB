@@ -75,7 +75,7 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 40
             Case 672
                 task.cvFontSize = 1.5
-                task.DotSize = 1
+                task.DotSize = 2
                 task.disparityAdjustment = 4.4
                 task.densityMetric = 300
                 task.minDistance = 25
@@ -97,7 +97,6 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 10
             Case 336
                 task.cvFontSize = 1.0
-                task.DotSize = 1
                 task.disparityAdjustment = 8.8
                 task.minDistance = 25
                 task.FASTthreshold = 10
@@ -121,7 +120,6 @@ Public Class OptionsGlobal
                 task.FASTthreshold = 10
         End Select
 
-        task.depthThresholdPercent = 0.01
         task.gOptions.DotSizeSlider.Value = task.DotSize
         task.gOptions.LineWidth.Value = task.DotSize
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
