@@ -265,11 +265,9 @@ Public Class VBtask : Implements IDisposable
     Public fpsAlgorithm As Integer
     Public fpsCamera As Integer
 
-    Public minDistance As Integer ' minimum distance between features
     Public FeatureSampleSize As Integer ' how many features do you want...
     Public featureSource As Integer ' which Feature_Basics method...
     Public fCorrThreshold As Single ' feature correlation threshold
-    Dim selectedFeature As Integer ' index of the feature to display.
     Public edgeMethod As String
     Public verticalLines As Boolean
 

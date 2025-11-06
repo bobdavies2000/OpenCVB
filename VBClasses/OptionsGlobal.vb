@@ -46,7 +46,6 @@ Public Class OptionsGlobal
         task.cvFontThickness = 1
         task.brickSize = 8
         task.reductionTarget = 400
-        task.minDistance = 25
         Select Case task.workRes.Width
             Case 1920
                 task.cvFontSize = 3.5
@@ -97,7 +96,6 @@ Public Class OptionsGlobal
             Case 168
                 task.cvFontSize = 0.5
                 task.disparityAdjustment = 20.0
-                task.minDistance = 10
             Case 160
                 task.cvFontSize = 1.0
                 task.disparityAdjustment = 4.4

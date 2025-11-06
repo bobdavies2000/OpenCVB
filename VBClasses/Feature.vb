@@ -114,7 +114,7 @@ Public Class Feature_General : Inherits TaskParent
         Select Case task.featureSource
             Case FeatureSrc.GoodFeaturesFull
                 ptLatest = cv.Cv2.GoodFeaturesToTrack(task.gray, task.FeatureSampleSize, options.quality,
-                                                      task.minDistance, New cv.Mat,
+                                                      options.minDistance, New cv.Mat,
                                                       options.blockSize, True, options.k).ToList
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
             Case FeatureSrc.GoodFeaturesGrid
@@ -122,8 +122,8 @@ Public Class Feature_General : Inherits TaskParent
                 For i = 0 To task.gridRects.Count - 1
                     Dim roi = task.gridRects(i)
                     Dim tmpFeatures = cv.Cv2.GoodFeaturesToTrack(task.gray(roi), task.FeatureSampleSize, options.quality,
-                                                                 task.minDistance, New cv.Mat, options.blockSize,
-                                                                 True, options.k).ToList
+                                                            options.minDistance, New cv.Mat,
+                                                            options.blockSize, True, options.k).ToList
                     For j = 0 To tmpFeatures.Count - 1
                         ptLatest.Add(New cv.Point2f(tmpFeatures(j).X + roi.X, tmpFeatures(j).Y + roi.Y))
                     Next

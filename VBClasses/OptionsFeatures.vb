@@ -92,12 +92,6 @@ Public Class OptionsFeatures
 
 
 
-
-    Private Sub DistanceSlider_ValueChanged(sender As Object, e As EventArgs) Handles DistanceSlider.ValueChanged
-        DistanceLabel.Text = CStr(DistanceSlider.Value)
-        task.minDistance = DistanceSlider.Value
-        task.optionsChanged = True
-    End Sub
     Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles MatchCorrSlider.ValueChanged
         task.fCorrThreshold = MatchCorrSlider.Value / 100
         task.optionsChanged = True
