@@ -1,6 +1,7 @@
-Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 Imports System.IO
+Imports System.Runtime.InteropServices
+Imports OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Edge_Basics : Inherits TaskParent
     Dim canny As New Edge_Canny
     Dim scharr As Edge_Scharr
@@ -16,7 +17,7 @@ Public Class Edge_Basics : Inherits TaskParent
     Public Sub New()
         desc = "Use Radio Buttons to select the different edge algorithms."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         Static saveSelection As String = ""
         If saveSelection <> task.edgeMethod Then
             saveSelection = task.edgeMethod
@@ -1525,5 +1526,73 @@ Public Class Edge_Stability : Inherits TaskParent
             count += 1
             If count >= 20 Then Exit For
         Next
+    End Sub
+End Class
+
+
+
+
+Public Class Edge_LeftRight : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Public Sub New()
+        desc = "A general view of the different edge algorithms applied to the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.leftView)
+        dst2 = edges.dst2.Clone
+
+        edges.Run(task.rightView)
+        dst3 = edges.dst2.Clone
+    End Sub
+End Class
+
+
+
+
+
+Public Class Edge_LeftRightDepth : Inherits TaskParent
+    Dim edgesLR As New Edge_LeftRight
+    Public ptLeft As New List(Of cv.Point)
+    Public ptRight As New List(Of cv.Point)
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(2) = "Move mouse to confirm edges are in both images "
+        dst1 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        desc = "Confirm that any edges under the mouse is in both the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edgesLR.Run(emptyMat)
+        dst2 = edgesLR.dst2
+        dst3 = edgesLR.dst3
+
+        Dim lp = New lpData(New cv.Point(0, task.mouseMovePoint.Y),
+                            New cv.Point(dst2.Width, task.mouseMovePoint.Y))
+
+        Dim r = New cv.Rect(lp.p1.X, lp.p1.Y, dst2.Width, 1)
+        Dim tmp = dst2(r).FindNonZero()
+
+        ptLeft.clear()
+        For i = 0 To tmp.Rows - 1
+            Dim pt = tmp.Get(Of cv.Point)(i, 0)
+            Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+            If depth > 0 Then
+                ptLeft.Add(pt)
+                SetTrueText(Format(depth, fmt1), pt, 1)
+            End If
+        Next
+
+        tmp = dst2(r).FindNonZero()
+
+        ptRight.Clear()
+        For i = 0 To tmp.Rows - 1
+            Dim pt = tmp.Get(Of cv.Point)(i, 0)
+            Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+            If depth > 0 Then
+                ptRight.Add(pt)
+                SetTrueText(Format(depth, fmt1), New cv.Point(pt.X, task.mouseMovePoint.Y), 1)
+            End If
+        Next
+        labels(2) = CStr(ptLeft.Count) + " points were found in the left view"
+        labels(3) = CStr(ptRight.Count) + " points were found in the left view"
     End Sub
 End Class
