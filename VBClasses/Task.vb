@@ -164,8 +164,6 @@ Public Class VBtask : Implements IDisposable
 
     Public debugSyncUI As Boolean
 
-    Public disparityAdjustment As Single ' adjusts for resolution and some hidden elements.
-
     Public lineGravity As New lpData
     Public lineHorizon As New lpData
     Public lineLongest As New lpData

@@ -51,54 +51,43 @@ Public Class OptionsGlobal
                 task.cvFontSize = 3.5
                 task.cvFontThickness = 4
                 task.DotSize = 4
-                task.disparityAdjustment = 1.1
                 task.brickSize = 24
                 task.motionThreshold = 400
             Case 1280
                 task.cvFontSize = 2.5
                 task.cvFontThickness = 2
                 task.DotSize = 5
-                task.disparityAdjustment = 2.2
                 task.brickSize = 24
                 task.motionThreshold = 100
             Case 960
                 task.cvFontSize = 2.0
                 task.cvFontThickness = 2
                 task.DotSize = 2
-                task.disparityAdjustment = 2.2
                 task.brickSize = 16
                 task.motionThreshold = 100
             Case 672
                 task.cvFontSize = 1.5
                 task.DotSize = 2
-                task.disparityAdjustment = 4.4
                 task.brickSize = 16
                 task.motionThreshold = 100
             Case 640
                 task.cvFontSize = 1.5
                 task.DotSize = 2
-                task.disparityAdjustment = 4.2
                 task.brickSize = 16
             Case 480
                 task.cvFontSize = 1.2
-                task.disparityAdjustment = 4.4
                 task.brickSize = 8
                 task.motionThreshold = 20
             Case 240
                 task.cvFontSize = 1.2
-                task.disparityAdjustment = 4.4
             Case 336
                 task.cvFontSize = 1.0
-                task.disparityAdjustment = 8.8
             Case 320
                 task.cvFontSize = 1.0
-                task.disparityAdjustment = 8.4
             Case 168
                 task.cvFontSize = 0.5
-                task.disparityAdjustment = 20.0
             Case 160
                 task.cvFontSize = 1.0
-                task.disparityAdjustment = 4.4
         End Select
 
         task.gOptions.MotionThreshold.Value = task.motionThreshold
