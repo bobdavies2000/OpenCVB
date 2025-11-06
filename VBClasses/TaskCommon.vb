@@ -161,8 +161,6 @@ Public Module vbc
 
         task.metersPerPixel = task.MaxZmeters / task.workRes.Height ' meters per pixel in projections - side and top.
         task.debugSyncUI = task.gOptions.debugSyncUI.Checked
-
-        task.rcPixelThreshold = CInt(task.workRes.Width * task.workRes.Height * 0.001)
     End Sub
 
     Public Function findRectFromLine(lp As lpData) As cv.Rect

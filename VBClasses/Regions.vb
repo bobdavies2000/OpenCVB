@@ -224,7 +224,6 @@ Public Class Region_Contours : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         connect.Run(src.Clone)
-        task.rcPixelThreshold = task.brickSize * task.brickSize ' eliminate singles...
         redM.Run(Not connect.dst2)
 
         dst1.SetTo(0)
@@ -257,7 +256,6 @@ Public Class Region_Depth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         connect.Run(src.Clone)
-        task.rcPixelThreshold = task.brickSize * task.brickSize ' eliminate singles...
         redM.Run(Not connect.dst2)
         If redM.mdList.Count = 0 Then Exit Sub
 

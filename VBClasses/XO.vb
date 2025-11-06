@@ -2824,7 +2824,7 @@ Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
             ReDim minList(task.gridRects.Count - 1)
             ReDim maxList(task.gridRects.Count - 1)
         End If
-        For Each index In task.motionBasics.mGrid.motionList
+        For Each index In task.motionBasics.mCore.motionList
             Dim rect = task.gridRects(index)
             Dim ptmin = New cv.Point2f(task.kalman.kOutput(index * 4) + rect.X,
                                        task.kalman.kOutput(index * 4 + 1) + rect.Y)
@@ -11518,8 +11518,6 @@ Public Class XO_MotionCam_MatchLast : Inherits TaskParent
                 For j = 0 To edgeList(i).Count - 1
                     If edgeList(i).ElementAt(j).Key <> motion.edgeList(i).ElementAt(j).Key Then Dim k = 0
                 Next
-            Else
-                Dim k = 0
             End If
         Next
 
@@ -14279,7 +14277,7 @@ Public Class XO_Motion_Basics : Inherits TaskParent
             cv.Cv2.MeanStdDev(src(task.gridRects(i)), colorMean, colorstdev)
             Dim colorVec = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
             Dim colorChange = distance3D(colorVec, lastColor(i))
-            If colorChange > task.colorDiffThreshold Then
+            If colorChange > task.motionThreshold Then
                 lastColor(i) = colorVec
                 For Each index In task.grid.gridNeighbors(i)
                     If motionList.Contains(index) = False Then
@@ -14555,8 +14553,6 @@ End Class
 Public Class XO_Motion_BasicsHistory : Inherits TaskParent
     Public motionList As New List(Of Integer)
     Dim diff As New Diff_Basics
-    Dim options As New Options_Motion
-    Dim options1 As New Options_History
     Public Sub New()
         dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "The motion mask"
@@ -14564,9 +14560,6 @@ Public Class XO_Motion_BasicsHistory : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.gOptions.UseMotionMask.Checked = False Then Exit Sub
-
-        options.Run()
-        options1.Run()
 
         If src.Channels <> 1 Then src = task.gray
         If task.heartBeat Then dst2 = src.Clone
@@ -14577,7 +14570,7 @@ Public Class XO_Motion_BasicsHistory : Inherits TaskParent
         dst3.SetTo(0)
         For i = 0 To task.gridRects.Count - 1
             Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
-            If diffCount >= options.colorDiffPixels Then
+            If diffCount >= task.motionThreshold Then
                 For Each index In task.grid.gridNeighbors(i)
                     If motionList.Contains(index) = False Then
                         motionList.Add(index)
@@ -14685,7 +14678,7 @@ Public Class XO_Motion_BlobGray : Inherits TaskParent
 
         dst2 = task.gray.Clone
         dst2 -= lastGray
-        dst3 = dst2.Threshold(task.featureOptions.ColorDiffSlider.Value, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst2.Threshold(task.motionThreshold, 255, cv.ThresholdTypes.Binary)
 
         lastGray = task.gray.Clone
     End Sub
@@ -15343,7 +15336,7 @@ Public Class XO_RedCell_Color : Inherits TaskParent
                 rc.mmZ = lrc.mmZ
                 rc.maxDStable = lrc.maxDStable
 
-                If rc.pixels < task.rcPixelThreshold Then
+                If rc.pixels < dst2.Total * 0.001 Then
                     rc.color = yellow
                 Else
                     ' verify that the maxDStable is still good.
@@ -15436,7 +15429,7 @@ Public Class XO_RedCell_Color1 : Inherits TaskParent
                 rc.mmZ = lrc.mmZ
                 rc.maxDStable = lrc.maxDStable
 
-                If rc.pixels < task.rcPixelThreshold Then
+                If rc.pixels < dst2.Total * 0.001 Then
                     rc.color = yellow
                 Else
                     ' verify that the maxDStable is still good.

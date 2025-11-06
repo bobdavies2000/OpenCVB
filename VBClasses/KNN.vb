@@ -673,6 +673,7 @@ End Class
 Public Class KNN_TrackEach : Inherits TaskParent
     Dim knn As New KNN_OneToOne
     Dim trackAll As New List(Of List(Of lpData))
+    Public options As New Options_Features
     Public Sub New()
         desc = "Track each good feature with KNN and match the features from frame to frame"
     End Sub

@@ -1,5 +1,3 @@
-Imports System.Windows.Forms
-Imports SharpGL.SceneGraph.Raytracing
 Imports cv = OpenCvSharp
 Public Class Filter_Basics : Inherits TaskParent
     Public filterList As String() = {"Original", "PhotoShop_HSV", "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance"

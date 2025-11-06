@@ -11,12 +11,17 @@ Public Class VBtask : Implements IDisposable
     Public results As New Comm.resultData
     Public resultLock As New Mutex(True, "resultLock")
 
+    Public cvFontSize As Single = 0.8
+    Public cvFontThickness As Integer = 1
+    Public motionThreshold As Integer ' this is vital to motion detection - lower to be more sensitive, higher for less.
+    Public reductionTarget As Integer = 200 ' specify how much reduction is needed using options_RedCloud.
+    Public brickSize As Integer
+
     ' add any task algorithms here.
     Public ogl As XO_OpenGL_Basics
     Public redColor As RedColor_Basics
     Public redList As RedList_Basics
     Public redCloud As RedCloud_Basics
-    Public reductionTarget As Integer = 200 ' specify how much reduction is needed using options_RedCloud.
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
     Public edgeLine As EdgeLine_Basics
@@ -34,8 +39,6 @@ Public Class VBtask : Implements IDisposable
     Public feat As Feature_Basics
     Public bricks As Brick_Basics
 
-    Public rcPixelThreshold As Integer ' if pixel count < this, then make the color gray...
-
     Public fpList As New List(Of fpData)
     Public regionList As New List(Of oldrcData)
     Public featList As New List(Of List(Of Integer))
@@ -51,7 +54,6 @@ Public Class VBtask : Implements IDisposable
     Public fpD As New fpData ' the currently selected feature point.
     Public contourD As New contourData ' the currently selected contour
 
-    Public brickSize As Integer
     Public bricksPerCol As Integer
     Public bricksPerRow As Integer
     Public gridRects As List(Of cv.Rect)
@@ -88,9 +90,6 @@ Public Class VBtask : Implements IDisposable
 
     Public MainUI_Algorithm As Object
     Public myStopWatch As Stopwatch
-
-    Public cvFontSize As Single = 0.8
-    Public cvFontThickness As Integer = 1
 
     Public color As New cv.Mat
     Public gray As New cv.Mat
@@ -270,7 +269,6 @@ Public Class VBtask : Implements IDisposable
     Public FeatureSampleSize As Integer ' how many features do you want...
     Public featureSource As Integer ' which Feature_Basics method...
     Public fCorrThreshold As Single ' feature correlation threshold
-    Public colorDiffThreshold As Integer ' this is vital to motion detection - lower to be more sensitive, higher for less.
     Dim selectedFeature As Integer ' index of the feature to display.
     Public edgeMethod As String
     Public verticalLines As Boolean
@@ -710,7 +708,7 @@ Public Class VBtask : Implements IDisposable
 
                 If gOptions.ShowGrid.Checked Then results.dstList(2).SetTo(cv.Scalar.White, gridMask)
                 If gOptions.showMotionMask.Checked Then
-                    For Each mIndex In task.motionBasics.mGrid.motionList
+                    For Each mIndex In task.motionBasics.mCore.motionList
                         results.dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
                     Next
                     results.dstList(0).Rectangle(task.motionRect, white, task.lineWidth)

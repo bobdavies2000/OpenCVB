@@ -664,7 +664,7 @@ Namespace OpenCVB
             ' don't start another algorithm until the current one has finished 
             ' Give the algorithm a reasonable time to finish, then crash.
             Dim crash As Boolean = True
-            saveAlgorithmName = ""
+            saveAlgorithmName = "" ' this will shut down the current algorithm.
             For i = 0 To 10
                 If frameCount = -1 Then
                     crash = False
@@ -677,7 +677,7 @@ Namespace OpenCVB
                 For Each t As ProcessThread In currentProcess.Threads
                     Debug.WriteLine($"Thread ID: {t.Id}, State: {t.ThreadState}")
                 Next
-                MsgBox("Review the algorithm that is running for threading problems." + vbCrLf +
+                MsgBox(AvailableAlgorithms.Text + " is running too long." + vbCrLf +
                        "Click 'OK' to continue testing...")
                 killThread(saveThreadID)
             End If

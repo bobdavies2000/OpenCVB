@@ -14,7 +14,8 @@ Public Class RedMask_Basics : Inherits TaskParent
         Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols, task.rcPixelThreshold)
+        Dim imagePtr = RedMask_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols,
+                                   dst2.Total * 0.001)
         handleInput.Free()
         dst2 = cv.Mat.FromPixelData(dst1.Rows + 2, dst1.Cols + 2, cv.MatType.CV_8U, imagePtr).Clone
         dst2 = dst2(New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2))
@@ -36,7 +37,7 @@ Public Class RedMask_Basics : Inherits TaskParent
             Dim md As New maskData
             md.rect = rectlist(i)
             If md.rect.Size = dst2.Size Then Continue For
-            If md.rect.Width * md.rect.Height < task.rcPixelThreshold Then Continue For
+            If md.rect.Width * md.rect.Height < dst2.Total * 0.001 Then Continue For
             md.mask = dst2(md.rect).InRange(i + 1, i + 1)
             md.contour = ContourBuild(md.mask)
             DrawTour(md.mask, md.contour, 255, -1)

@@ -33,33 +33,29 @@ Public Class RedPrep_Basics : Inherits TaskParent
         Dim split = pc32S.Split()
 
         dst2.SetTo(0)
-        Dim noDepthmask As cv.Mat = task.noDepthMask
-        If src.Size <> task.workRes Then noDepthmask = task.noDepthMask.Resize(src.Size)
+        Dim saveNoDepth As cv.Mat = Nothing
+        If src.Size <> task.workRes Then
+            saveNoDepth = task.noDepthMask.Clone
+            task.noDepthMask = task.noDepthMask.Resize(src.Size)
+        End If
         If options.PrepX Then
-            prepEdges.Run(reduceChan(split(0), noDepthmask))
+            prepEdges.Run(reduceChan(split(0), task.noDepthMask))
             If dst2.Size <> src.Size Then
                 dst2 = dst2.Resize(src.Size)
                 dst2 = dst2 Or prepEdges.dst3
             Else
                 dst2 = dst2 Or prepEdges.dst3
             End If
-
         End If
 
         If options.PrepY Then
-            prepEdges.Run(reduceChan(split(1), noDepthmask))
+            prepEdges.Run(reduceChan(split(1), task.noDepthMask))
             dst2 = dst2 Or prepEdges.dst3
         End If
 
         If options.PrepZ Then
-            prepEdges.Run(reduceChan(split(2), noDepthmask))
+            prepEdges.Run(reduceChan(split(2), task.noDepthMask))
             dst2 = dst2 Or prepEdges.dst3
-        End If
-
-        If options.PrepAddEdges Then
-            Static edges As New Edge_Basics
-            edges.Run(task.gray)
-            dst2 = dst2 Or edges.dst2
         End If
 
         ' this is not as good as the operations above.
@@ -69,27 +65,8 @@ Public Class RedPrep_Basics : Inherits TaskParent
         ' this rectangle prevents bleeds at the image edges.  It is necessary.  Test without it to see the impact.
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), 255, 2)
 
-        ' this should be the only place where the target slider is adjusted for current conditions.
-        Dim depthCount = task.depthMask.CountNonZero
-
-        Dim tmp As cv.Mat = dst2.Clone
-        tmp.SetTo(0, noDepthmask)
-        Dim floodCountMax = tmp.CountNonZero
-        Dim percentZero = (depthCount - floodCountMax) / depthCount
-        'Static targetSlider = OptionParent.FindSlider("Reduction Target")
-        'If percentZero < 0.75 Then
-        '    If targetSlider.value + 10 < targetSlider.maximum Then
-        '        targetSlider.value += 10
-        '    Else
-        '        targetSlider.value = targetSlider.maximum
-        '    End If
-        'ElseIf percentZero > 0.85 Then
-        '    If targetSlider.value - 10 >= targetSlider.minimum Then
-        '        targetSlider.value -= 10
-        '    End If
-        'End If
-        labels(2) = "Using reduction factor = " + CStr(task.reductionTarget) + ".  " +
-                    Format(percentZero, "0%") + " of the image available for floodfill."
+        If src.Size <> task.workRes Then task.noDepthMask = saveNoDepth.Clone
+        labels(2) = "Using reduction factor = " + CStr(task.reductionTarget)
     End Sub
 End Class
 

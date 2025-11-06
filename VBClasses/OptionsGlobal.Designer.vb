@@ -25,15 +25,14 @@ Partial Class OptionsGlobal
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OptionsGlobal))
         Label1 = New Label()
         GroupBox1 = New GroupBox()
+        MotionThreshold = New TrackBar()
+        motionThresholdLabel = New Label()
+        Label9 = New Label()
         DotSizeSlider = New TrackBar()
         DotSizeLabel = New Label()
-        Label3 = New Label()
         Label7 = New Label()
-        DebugSlider = New TrackBar()
-        DebugSliderLabel = New Label()
         LineWidth = New TrackBar()
         LineThicknessAmount = New Label()
-        DebugCheckBox = New CheckBox()
         Label5 = New Label()
         HistBinBar = New TrackBar()
         labelBinsCount = New Label()
@@ -44,6 +43,10 @@ Partial Class OptionsGlobal
         MaxDepthBar = New TrackBar()
         maxCount = New Label()
         Label2 = New Label()
+        Label3 = New Label()
+        DebugSlider = New TrackBar()
+        DebugSliderLabel = New Label()
+        DebugCheckBox = New CheckBox()
         GroupBox2 = New GroupBox()
         UseMotionMask = New CheckBox()
         TruncateDepth = New CheckBox()
@@ -64,12 +67,13 @@ Partial Class OptionsGlobal
         Label14 = New Label()
         DepthGroupBox = New GroupBox()
         GroupBox1.SuspendLayout()
+        CType(MotionThreshold, ComponentModel.ISupportInitialize).BeginInit()
         CType(DotSizeSlider, ComponentModel.ISupportInitialize).BeginInit()
-        CType(DebugSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(LineWidth, ComponentModel.ISupportInitialize).BeginInit()
         CType(HistBinBar, ComponentModel.ISupportInitialize).BeginInit()
         CType(GridSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(MaxDepthBar, ComponentModel.ISupportInitialize).BeginInit()
+        CType(DebugSlider, ComponentModel.ISupportInitialize).BeginInit()
         GroupBox2.SuspendLayout()
         DepthGroupBox.SuspendLayout()
         SuspendLayout()
@@ -86,15 +90,14 @@ Partial Class OptionsGlobal
         ' 
         ' GroupBox1
         ' 
+        GroupBox1.Controls.Add(MotionThreshold)
+        GroupBox1.Controls.Add(motionThresholdLabel)
+        GroupBox1.Controls.Add(Label9)
         GroupBox1.Controls.Add(DotSizeSlider)
         GroupBox1.Controls.Add(DotSizeLabel)
-        GroupBox1.Controls.Add(Label3)
         GroupBox1.Controls.Add(Label7)
-        GroupBox1.Controls.Add(DebugSlider)
-        GroupBox1.Controls.Add(DebugSliderLabel)
         GroupBox1.Controls.Add(LineWidth)
         GroupBox1.Controls.Add(LineThicknessAmount)
-        GroupBox1.Controls.Add(DebugCheckBox)
         GroupBox1.Controls.Add(Label5)
         GroupBox1.Controls.Add(HistBinBar)
         GroupBox1.Controls.Add(labelBinsCount)
@@ -112,6 +115,38 @@ Partial Class OptionsGlobal
         GroupBox1.Size = New Size(995, 541)
         GroupBox1.TabIndex = 1
         GroupBox1.TabStop = False
+        ' 
+        ' MotionThreshold
+        ' 
+        MotionThreshold.Location = New Point(229, 374)
+        MotionThreshold.Margin = New Padding(4)
+        MotionThreshold.Maximum = 500
+        MotionThreshold.Minimum = 1
+        MotionThreshold.Name = "MotionThreshold"
+        MotionThreshold.Size = New Size(548, 69)
+        MotionThreshold.TabIndex = 12
+        MotionThreshold.TickStyle = TickStyle.None
+        MotionThreshold.Value = 5
+        ' 
+        ' motionThresholdLabel
+        ' 
+        motionThresholdLabel.AutoSize = True
+        motionThresholdLabel.Location = New Point(785, 374)
+        motionThresholdLabel.Margin = New Padding(4, 0, 4, 0)
+        motionThresholdLabel.Name = "motionThresholdLabel"
+        motionThresholdLabel.Size = New Size(76, 30)
+        motionThresholdLabel.TabIndex = 11
+        motionThresholdLabel.Text = "Label8"
+        ' 
+        ' Label9
+        ' 
+        Label9.AutoSize = True
+        Label9.Location = New Point(35, 374)
+        Label9.Margin = New Padding(4, 0, 4, 0)
+        Label9.Name = "Label9"
+        Label9.Size = New Size(185, 30)
+        Label9.TabIndex = 10
+        Label9.Text = "Motion Threshold"
         ' 
         ' DotSizeSlider
         ' 
@@ -134,16 +169,6 @@ Partial Class OptionsGlobal
         DotSizeLabel.TabIndex = 8
         DotSizeLabel.Text = "DotSizeLabel"
         ' 
-        ' Label3
-        ' 
-        Label3.AutoSize = True
-        Label3.Location = New Point(81, 392)
-        Label3.Margin = New Padding(4, 0, 4, 0)
-        Label3.Name = "Label3"
-        Label3.Size = New Size(139, 30)
-        Label3.TabIndex = 23
-        Label3.Text = "Debug Slider"
-        ' 
         ' Label7
         ' 
         Label7.AutoSize = True
@@ -153,27 +178,6 @@ Partial Class OptionsGlobal
         Label7.Size = New Size(176, 30)
         Label7.TabIndex = 7
         Label7.Text = "Dot Size in pixels"
-        ' 
-        ' DebugSlider
-        ' 
-        DebugSlider.Location = New Point(229, 392)
-        DebugSlider.Margin = New Padding(4)
-        DebugSlider.Maximum = 100
-        DebugSlider.Minimum = -100
-        DebugSlider.Name = "DebugSlider"
-        DebugSlider.Size = New Size(548, 69)
-        DebugSlider.TabIndex = 22
-        DebugSlider.TickStyle = TickStyle.None
-        ' 
-        ' DebugSliderLabel
-        ' 
-        DebugSliderLabel.AutoSize = True
-        DebugSliderLabel.Location = New Point(785, 392)
-        DebugSliderLabel.Margin = New Padding(4, 0, 4, 0)
-        DebugSliderLabel.Name = "DebugSliderLabel"
-        DebugSliderLabel.Size = New Size(184, 30)
-        DebugSliderLabel.TabIndex = 21
-        DebugSliderLabel.Text = "DebugSliderLabel"
         ' 
         ' LineWidth
         ' 
@@ -195,17 +199,6 @@ Partial Class OptionsGlobal
         LineThicknessAmount.Size = New Size(221, 30)
         LineThicknessAmount.TabIndex = 5
         LineThicknessAmount.Text = "LineThicknessAmount"
-        ' 
-        ' DebugCheckBox
-        ' 
-        DebugCheckBox.AutoSize = True
-        DebugCheckBox.Location = New Point(35, 472)
-        DebugCheckBox.Margin = New Padding(4)
-        DebugCheckBox.Name = "DebugCheckBox"
-        DebugCheckBox.Size = New Size(817, 34)
-        DebugCheckBox.TabIndex = 19
-        DebugCheckBox.Text = "DebugCheckbox - task.gOptions.DebugChecked - use anywhere to inject a value"
-        DebugCheckBox.UseVisualStyleBackColor = True
         ' 
         ' Label5
         ' 
@@ -312,6 +305,48 @@ Partial Class OptionsGlobal
         Label2.Size = New Size(206, 30)
         Label2.TabIndex = 1
         Label2.Text = "Max Depth (meters)"
+        ' 
+        ' Label3
+        ' 
+        Label3.AutoSize = True
+        Label3.Location = New Point(1034, 433)
+        Label3.Margin = New Padding(4, 0, 4, 0)
+        Label3.Name = "Label3"
+        Label3.Size = New Size(78, 30)
+        Label3.TabIndex = 23
+        Label3.Text = "Debug"
+        ' 
+        ' DebugSlider
+        ' 
+        DebugSlider.Location = New Point(1130, 433)
+        DebugSlider.Margin = New Padding(4)
+        DebugSlider.Maximum = 100
+        DebugSlider.Minimum = -100
+        DebugSlider.Name = "DebugSlider"
+        DebugSlider.Size = New Size(548, 69)
+        DebugSlider.TabIndex = 22
+        DebugSlider.TickStyle = TickStyle.None
+        ' 
+        ' DebugSliderLabel
+        ' 
+        DebugSliderLabel.AutoSize = True
+        DebugSliderLabel.Location = New Point(1686, 433)
+        DebugSliderLabel.Margin = New Padding(4, 0, 4, 0)
+        DebugSliderLabel.Name = "DebugSliderLabel"
+        DebugSliderLabel.Size = New Size(78, 30)
+        DebugSliderLabel.TabIndex = 21
+        DebugSliderLabel.Text = "Debug"
+        ' 
+        ' DebugCheckBox
+        ' 
+        DebugCheckBox.AutoSize = True
+        DebugCheckBox.Location = New Point(1034, 510)
+        DebugCheckBox.Margin = New Padding(4)
+        DebugCheckBox.Name = "DebugCheckBox"
+        DebugCheckBox.Size = New Size(665, 34)
+        DebugCheckBox.TabIndex = 19
+        DebugCheckBox.Text = "DebugCheckbox - task.gOptions.DebugChecked - use for testing"
+        DebugCheckBox.UseVisualStyleBackColor = True
         ' 
         ' GroupBox2
         ' 
@@ -533,8 +568,12 @@ Partial Class OptionsGlobal
         ClientSize = New Size(1849, 589)
         Controls.Add(DepthGroupBox)
         Controls.Add(Label14)
+        Controls.Add(Label3)
         Controls.Add(Label13)
+        Controls.Add(DebugSlider)
+        Controls.Add(DebugCheckBox)
         Controls.Add(Label11)
+        Controls.Add(DebugSliderLabel)
         Controls.Add(highlight)
         Controls.Add(LineType)
         Controls.Add(Palettes)
@@ -547,12 +586,13 @@ Partial Class OptionsGlobal
         Text = "OptionsGlobal"
         GroupBox1.ResumeLayout(False)
         GroupBox1.PerformLayout()
+        CType(MotionThreshold, ComponentModel.ISupportInitialize).EndInit()
         CType(DotSizeSlider, ComponentModel.ISupportInitialize).EndInit()
-        CType(DebugSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(LineWidth, ComponentModel.ISupportInitialize).EndInit()
         CType(HistBinBar, ComponentModel.ISupportInitialize).EndInit()
         CType(GridSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(MaxDepthBar, ComponentModel.ISupportInitialize).EndInit()
+        CType(DebugSlider, ComponentModel.ISupportInitialize).EndInit()
         GroupBox2.ResumeLayout(False)
         GroupBox2.PerformLayout()
         DepthGroupBox.ResumeLayout(False)
@@ -601,4 +641,7 @@ Partial Class OptionsGlobal
     Friend WithEvents Label14 As Label
     Friend WithEvents DepthGroupBox As GroupBox
     Friend WithEvents Label3 As Label
+    Friend WithEvents MotionThreshold As TrackBar
+    Friend WithEvents motionThresholdLabel As Label
+    Friend WithEvents Label9 As Label
 End Class

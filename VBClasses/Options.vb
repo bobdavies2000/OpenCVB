@@ -2181,46 +2181,6 @@ End Class
 
 
 
-
-
-
-
-
-Public Class Options_Motion : Inherits OptionParent
-    Public colorDiffPixels As Single
-    Public motionThreshold As Integer = 0
-    Public cumulativePercentThreshold As Double = 0.1
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            Dim rowSize = task.brickSize
-            sliders.setupTrackBar("Total pixels changed", 1, rowSize, rowSize) ' updated below...
-            sliders.setupTrackBar("Single frame motion threshold", 1, task.cols * task.rows / 4, task.cols * task.rows / 16)
-            sliders.setupTrackBar("Cumulative motion threshold percent of image", 1, 100, cumulativePercentThreshold * 100)
-        End If
-    End Sub
-    Public Sub Run()
-        Static diffSlider = OptionParent.FindSlider("Total pixels changed")
-        If task.optionsChanged Then
-            Dim gridSize = task.brickSize * task.brickSize
-            diffSlider.maximum = gridSize
-            Dim nextSize = task.brickSize
-            If nextSize >= diffSlider.maximum Then diffSlider.value = nextSize
-        End If
-        Static thresholdSlider = OptionParent.FindSlider("Single frame motion threshold")
-        Static percentSlider = OptionParent.FindSlider("Cumulative motion threshold percent of image")
-        colorDiffPixels = diffSlider.value
-        motionThreshold = thresholdSlider.value
-        cumulativePercentThreshold = percentSlider.value / 100
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Options_Emax : Inherits OptionParent
     Public predictionStepSize As Integer = 5
     Public covarianceType = cv.EMTypes.CovMatDefault

@@ -33,9 +33,6 @@ Partial Class OptionsFeatures
         FeatureSampleSizeLabel = New Label()
         FeatureSampleSize = New TrackBar()
         Label5 = New Label()
-        ColorDiffLabel = New Label()
-        ColorDiffSlider = New TrackBar()
-        Label7 = New Label()
         FeatureCorrelationLabel = New Label()
         MatchCorrSlider = New TrackBar()
         Label9 = New Label()
@@ -45,7 +42,6 @@ Partial Class OptionsFeatures
         ColorSource = New ComboBox()
         CType(DistanceSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(FeatureSampleSize, ComponentModel.ISupportInitialize).BeginInit()
-        CType(ColorDiffSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(MatchCorrSlider, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
@@ -148,37 +144,6 @@ Partial Class OptionsFeatures
         Label5.TabIndex = 7
         Label5.Text = "Feature Sample Size"
         ' 
-        ' ColorDiffLabel
-        ' 
-        ColorDiffLabel.AutoSize = True
-        ColorDiffLabel.Location = New Point(666, 316)
-        ColorDiffLabel.Margin = New Padding(4, 0, 4, 0)
-        ColorDiffLabel.Name = "ColorDiffLabel"
-        ColorDiffLabel.Size = New Size(151, 30)
-        ColorDiffLabel.TabIndex = 12
-        ColorDiffLabel.Text = "ColorDiffLabel"
-        ' 
-        ' ColorDiffSlider
-        ' 
-        ColorDiffSlider.Location = New Point(31, 316)
-        ColorDiffSlider.Margin = New Padding(4)
-        ColorDiffSlider.Maximum = 100
-        ColorDiffSlider.Minimum = 1
-        ColorDiffSlider.Name = "ColorDiffSlider"
-        ColorDiffSlider.Size = New Size(628, 69)
-        ColorDiffSlider.TabIndex = 11
-        ColorDiffSlider.Value = 75
-        ' 
-        ' Label7
-        ' 
-        Label7.AutoSize = True
-        Label7.Location = New Point(31, 282)
-        Label7.Margin = New Padding(4, 0, 4, 0)
-        Label7.Name = "Label7"
-        Label7.Size = New Size(352, 30)
-        Label7.TabIndex = 10
-        Label7.Text = "LowRes Color Difference Threshold"
-        ' 
         ' FeatureCorrelationLabel
         ' 
         FeatureCorrelationLabel.AutoSize = True
@@ -262,9 +227,6 @@ Partial Class OptionsFeatures
         Controls.Add(FeatureCorrelationLabel)
         Controls.Add(MatchCorrSlider)
         Controls.Add(Label9)
-        Controls.Add(ColorDiffLabel)
-        Controls.Add(ColorDiffSlider)
-        Controls.Add(Label7)
         Controls.Add(FeatureSampleSizeLabel)
         Controls.Add(FeatureSampleSize)
         Controls.Add(Label5)
@@ -281,7 +243,6 @@ Partial Class OptionsFeatures
         Text = "Important Options for Features, Edges, Lines, and Masks"
         CType(DistanceSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(FeatureSampleSize, ComponentModel.ISupportInitialize).EndInit()
-        CType(ColorDiffSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(MatchCorrSlider, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
@@ -297,9 +258,6 @@ Partial Class OptionsFeatures
     Friend WithEvents FeatureSampleSizeLabel As Label
     Friend WithEvents FeatureSampleSize As TrackBar
     Friend WithEvents Label5 As Label
-    Friend WithEvents ColorDiffLabel As Label
-    Friend WithEvents ColorDiffSlider As TrackBar
-    Friend WithEvents Label7 As Label
     Friend WithEvents FeatureCorrelationLabel As Label
     Friend WithEvents MatchCorrSlider As TrackBar
     Friend WithEvents Label9 As Label

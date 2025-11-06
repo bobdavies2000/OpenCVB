@@ -35,7 +35,6 @@ Public Class OptionsFeatures
         EdgeMethods.SelectedItem() = "Canny"
         task.edgeMethod = "Canny"
 
-        ColorDiffSlider.Value = 10
         MatchCorrSlider.Value = 95
 
         ReDim grayCheckbox(task.rgbFilter.grayFilter.filterList.Count - 1)
@@ -103,11 +102,6 @@ Public Class OptionsFeatures
         task.fCorrThreshold = MatchCorrSlider.Value / 100
         task.optionsChanged = True
         FeatureCorrelationLabel.Text = Format(task.fCorrThreshold, fmt2)
-    End Sub
-    Private Sub ColorDiffSlider_ValueChanged(sender As Object, e As EventArgs) Handles ColorDiffSlider.ValueChanged
-        task.colorDiffThreshold = ColorDiffSlider.Value
-        task.optionsChanged = True
-        ColorDiffLabel.Text = CStr(task.colorDiffThreshold)
     End Sub
     Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FeatureSampleSize.ValueChanged
         task.FeatureSampleSize = FeatureSampleSize.Value

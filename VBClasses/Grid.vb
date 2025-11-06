@@ -61,7 +61,6 @@ Public Class Grid_Basics : Inherits TaskParent
                 If p1.Y > 0 Then nextList.Add(i - bricksPerRow)
                 If p2.Y < dst2.Height Then nextList.Add(i + bricksPerRow)
 
-                If i = 965 Then Dim k = 0
                 If p1.X > 0 And p1.Y > 0 And p1.X < dst2.Width And p2.Y < dst2.Height Then
                     nextList.Add(i - bricksPerRow - 1)
                     nextList.Add(i - bricksPerRow + 1)
