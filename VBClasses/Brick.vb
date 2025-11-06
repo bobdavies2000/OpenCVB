@@ -135,9 +135,15 @@ Public Class Brick_Basics : Inherits TaskParent
             task.bricks.brickList.Add(brick)
         Next
 
+        Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim br = task.bricks.brickList(index)
+        SetTrueText(br.displayCell, 1)
+        dst2.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
+        dst3.SetTo(0)
+        dst3.Rectangle(br.rRect, task.highlight, task.lineWidth + 1)
+        task.color.Rectangle(br.lRect, task.highlight, task.lineWidth)
+
         If task.heartBeat Then labels(2) = CStr(task.bricks.brickList.Count) + " bricks and " + CStr(brickDepthCount) + " had depth"
-        dst3 = task.contours.dst2
-        labels(3) = task.contours.labels(2)
     End Sub
 End Class
 
@@ -628,38 +634,6 @@ End Class
 
 
 
-
-
-Public Class Brick_LeftRight : Inherits TaskParent
-    Public means As New List(Of Single)
-    Public Sub New()
-        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-        labels(2) = "Only every other colum is shown to make it clear which bricks are being translated (can get crowded otherwise.)"
-        labels(3) = "Right view with the translated bricks shown at left."
-        If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
-        desc = "Map the column of bricks in the color image into the left view and then to the right view."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        For i = 0 To task.bricksPerRow - 1 Step 2
-            For j = i To task.gridRects.Count - task.bricksPerRow - 1 Step task.bricksPerRow
-                Dim brick = task.bricks.brickList(j)
-                If brick.depth > 0 Then
-                    dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth)
-                    dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
-                End If
-            Next
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Brick_RegionLines : Inherits TaskParent
     Dim regions As New Region_Contours
     Public Sub New()
@@ -1061,5 +1035,34 @@ Public Class Brick_CorrelationMap : Inherits TaskParent
             SetTrueText(task.depthAndDepthRange, 3)
         End If
         labels(2) = task.bricks.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Brick_LeftRight : Inherits TaskParent
+    Public means As New List(Of Single)
+    Public Sub New()
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+        labels(2) = "Only every other colum is shown to make it clear which bricks are being translated (can get crowded otherwise.)"
+        labels(3) = "Right view with the translated bricks shown at left."
+        desc = "Map the column of bricks in the color image into the left view and then to the right view."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        For i = 0 To task.bricksPerRow - 1 Step 2
+            For j = i To task.gridRects.Count - task.bricksPerRow - 1 Step task.bricksPerRow
+                Dim brick = task.bricks.brickList(j)
+                If brick.depth > 0 Then
+                    dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth)
+                    dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
+                End If
+            Next
+        Next
     End Sub
 End Class

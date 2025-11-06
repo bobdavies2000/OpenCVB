@@ -1596,3 +1596,47 @@ Public Class Edge_LeftRightDepth : Inherits TaskParent
         labels(3) = CStr(ptRight.Count) + " points were found in the left view"
     End Sub
 End Class
+
+
+
+
+Public Class Edge_LeftRightBrick : Inherits TaskParent
+    Dim edgesLR As New Edge_LeftRight
+    Public means As New List(Of Single)
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+        task.gOptions.GridSlider.Value *= 2
+        desc = "Translate bricks with edges and depth from the left to the right view."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edgesLR.Run(emptyMat)
+        dst2 = edgesLR.dst2
+        dst3 = edgesLR.dst3
+
+        Dim count As Integer
+        For Each brick In task.bricks.brickList
+            If brick.depth = 0 Then Continue For
+            If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then Continue For
+            If dst2(brick.lRect).CountNonZero And dst3(brick.rRect).CountNonZero Then
+                dst2.Rectangle(brick.lRect, white, task.lineWidth)
+                dst3.Rectangle(brick.rRect, white, task.lineWidth)
+                count += 1
+            End If
+        Next
+
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+        Dim br = task.bricks.brickList(index)
+        SetTrueText(br.displayCell, 1)
+        dst2.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
+        dst3.Rectangle(br.rRect, task.highlight, task.lineWidth + 1)
+        task.color.Rectangle(br.lRect, task.highlight, task.lineWidth)
+
+        labels(2) = CStr(count) + " (of " + CStr(task.bricks.brickList.Count) +
+                    ") bricks had edges and depth in the left image.  " +
+                    "Move the mouse around to highlight partners.  Below right is right view."
+    End Sub
+End Class

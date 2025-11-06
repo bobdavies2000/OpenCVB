@@ -474,6 +474,15 @@ Public Class brickData
     Public feature As cv.Point ' the max grid output from the current image
     Public intensity As Integer ' sobel maximum intensity in this brick.
     Public pt As cv.Point ' Brick's Sobel maximum in absolute coordinates.
+    Public Function displayCell() As String
+        Dim strOut = "rcList index = " + CStr(index) + vbCrLf
+        strOut += "Age = " + CStr(age) + vbCrLf
+        strOut += "Rect: X = " + CStr(rect.X) + ", Y = " + CStr(rect.Y) + ", "
+        strOut += ", width = " + CStr(rect.Width) + ", height = " + CStr(rect.Height) + vbCrLf
+        strOut += "Depth = " + Format(depth, fmt1) + vbCrLf
+        strOut += "Correlation = " + Format(correlation, fmt1) + vbCrLf
+        Return strOut
+    End Function
     Sub New()
     End Sub
 End Class
