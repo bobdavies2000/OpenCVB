@@ -27,9 +27,6 @@ Partial Class OptionsFeatures
         EdgeMethods = New ComboBox()
         Label1 = New Label()
         Label2 = New Label()
-        Label3 = New Label()
-        DistanceSlider = New TrackBar()
-        DistanceLabel = New Label()
         FeatureSampleSizeLabel = New Label()
         FeatureSampleSize = New TrackBar()
         Label5 = New Label()
@@ -40,7 +37,6 @@ Partial Class OptionsFeatures
         ColorGroup = New GroupBox()
         Label4 = New Label()
         ColorSource = New ComboBox()
-        CType(DistanceSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(FeatureSampleSize, ComponentModel.ISupportInitialize).BeginInit()
         CType(MatchCorrSlider, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
@@ -82,36 +78,6 @@ Partial Class OptionsFeatures
         Label2.Size = New Size(169, 30)
         Label2.TabIndex = 3
         Label2.Text = "Feature Method"
-        ' 
-        ' Label3
-        ' 
-        Label3.AutoSize = True
-        Label3.Location = New Point(31, 102)
-        Label3.Margin = New Padding(4, 0, 4, 0)
-        Label3.Name = "Label3"
-        Label3.Size = New Size(311, 30)
-        Label3.TabIndex = 4
-        Label3.Text = "Min Distance between features"
-        ' 
-        ' DistanceSlider
-        ' 
-        DistanceSlider.Location = New Point(31, 136)
-        DistanceSlider.Margin = New Padding(4)
-        DistanceSlider.Maximum = 100
-        DistanceSlider.Name = "DistanceSlider"
-        DistanceSlider.Size = New Size(628, 69)
-        DistanceSlider.TabIndex = 5
-        DistanceSlider.Value = 25
-        ' 
-        ' DistanceLabel
-        ' 
-        DistanceLabel.AutoSize = True
-        DistanceLabel.Location = New Point(666, 136)
-        DistanceLabel.Margin = New Padding(4, 0, 4, 0)
-        DistanceLabel.Name = "DistanceLabel"
-        DistanceLabel.Size = New Size(94, 30)
-        DistanceLabel.TabIndex = 6
-        DistanceLabel.Text = "Distance"
         ' 
         ' FeatureSampleSizeLabel
         ' 
@@ -230,9 +196,6 @@ Partial Class OptionsFeatures
         Controls.Add(FeatureSampleSizeLabel)
         Controls.Add(FeatureSampleSize)
         Controls.Add(Label5)
-        Controls.Add(DistanceLabel)
-        Controls.Add(DistanceSlider)
-        Controls.Add(Label3)
         Controls.Add(Label2)
         Controls.Add(Label1)
         Controls.Add(EdgeMethods)
@@ -241,7 +204,6 @@ Partial Class OptionsFeatures
         Margin = New Padding(4)
         Name = "OptionsFeatures"
         Text = "Important Options for Features, Edges, Lines, and Masks"
-        CType(DistanceSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(FeatureSampleSize, ComponentModel.ISupportInitialize).EndInit()
         CType(MatchCorrSlider, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
@@ -252,9 +214,6 @@ Partial Class OptionsFeatures
     Friend WithEvents EdgeMethods As ComboBox
     Friend WithEvents Label1 As Label
     Friend WithEvents Label2 As Label
-    Friend WithEvents Label3 As Label
-    Friend WithEvents DistanceSlider As TrackBar
-    Friend WithEvents DistanceLabel As Label
     Friend WithEvents FeatureSampleSizeLabel As Label
     Friend WithEvents FeatureSampleSize As TrackBar
     Friend WithEvents Label5 As Label

@@ -63,11 +63,13 @@ Public Class LeftRight_BRISK : Inherits TaskParent
     Dim brisk As New BRISK_Basics
     Dim options As New Options_Features
     Public Sub New()
-        task.featureOptions.DistanceSlider.Value = 20
+        OptionParent.FindSlider("Min Distance").Value = 20
         labels = {"", "", "Left Image", "Right Image"}
-        desc = "Add color to the 8-bit infrared images."
+        desc = "Find BRISK features in the left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         brisk.Run(task.leftView)
         dst2 = brisk.dst2.Clone
 

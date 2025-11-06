@@ -736,13 +736,16 @@ End Class
 
 Public Class FCS_Lines : Inherits TaskParent
     Dim fcs As New FCS_CreateList
+    Dim options As New Options_Features
     Public Sub New()
-        task.featureOptions.DistanceSlider.Value = 60
+        OptionParent.FindSlider("Min Distance").Value = 60
         task.featureOptions.FeatureMethod.SelectedItem() = "LineInput"
         labels(3) = "Cell boundaries with the age (in frames) for each cell."
         desc = "Use lines as input to FCS."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         fcs.Run(task.grayStable)
         dst2 = fcs.dst2
 

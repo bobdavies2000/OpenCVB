@@ -259,11 +259,14 @@ End Class
 Public Class Feature_Delaunay : Inherits TaskParent
     Dim delaunay As New Delaunay_Contours
     Dim feat As New Feature_Basics
+    Dim options As New Options_Features
     Public Sub New()
-        task.featureOptions.DistanceSlider.Value = 10
+        OptionParent.FindSlider("Min Distance").Value = 10
         desc = "Divide the image into contours with Delaunay using features"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
         feat.Run(src)
         labels(2) = feat.labels(2)
 

@@ -12,7 +12,7 @@ Public Class BRISK_Basics : Inherits TaskParent
 
         src.CopyTo(dst2)
 
-        Dim keyPoints = brisk.Detect(task.gray)
+        Dim keyPoints = brisk.Detect(src)
 
         features.Clear()
         For Each pt In keyPoints

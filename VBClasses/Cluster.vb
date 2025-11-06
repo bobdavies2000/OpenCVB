@@ -1,5 +1,4 @@
-﻿Imports System.Windows
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Cluster_Basics : Inherits TaskParent
     Dim knn As New KNN_Basics
     Public ptInput As New List(Of cv.Point)
@@ -8,7 +7,7 @@ Public Class Cluster_Basics : Inherits TaskParent
     Public clusters As New SortedList(Of Integer, List(Of cv.Point))
     Dim options As New Options_Features
     Public Sub New()
-        task.featureOptions.DistanceSlider.Value = 10
+        OptionParent.FindSlider("Min Distance").Value = 10
         desc = "Group the points based on their proximity to each other."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
