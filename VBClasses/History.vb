@@ -9,21 +9,23 @@ Public Class History_Basics : Inherits TaskParent
             dst2 = src
             Exit Sub
         End If
-        If src.Type <> cv.MatType.CV_32F Then src.ConvertTo(src, cv.MatType.CV_32F)
 
-        If dst1.Type <> src.Type Or dst1.Channels() <> src.Channels() Or task.optionsChanged Then
-            dst1 = src
+        Dim input = src.Clone
+        If input.Type <> cv.MatType.CV_32F Then input.ConvertTo(input, cv.MatType.CV_32F)
+
+        If dst1.Type <> input.Type Or dst1.Channels() <> input.Channels() Or task.optionsChanged Then
+            dst1 = input
             saveFrames.Clear()
         End If
 
         If saveFrames.Count >= task.frameHistoryCount Then saveFrames.RemoveAt(0)
-        saveFrames.Add(src.Clone)
+        saveFrames.Add(input.Clone)
 
         For Each m In saveFrames
             dst1 += m
         Next
         dst1 *= 1 / (saveFrames.Count + 1)
-        If src.Channels() = 1 Then
+        If input.Channels() = 1 Then
             dst1.ConvertTo(dst2, cv.MatType.CV_8U)
         Else
             dst1.ConvertTo(dst2, cv.MatType.CV_8UC3)

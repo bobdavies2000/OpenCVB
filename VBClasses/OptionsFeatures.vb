@@ -13,25 +13,25 @@ Public Class OptionsFeatures
         Me.Left = 0
         Me.Top = 0
 
+        FeatureMethod.Items.Add("AGAST")
+        FeatureMethod.Items.Add("BrickPoint")
+        FeatureMethod.Items.Add("BRISK")
+        FeatureMethod.Items.Add("FAST")
         FeatureMethod.Items.Add("GoodFeatures Full Image")
         FeatureMethod.Items.Add("GoodFeatures using Grid")
-        FeatureMethod.Items.Add("AGAST")
-        FeatureMethod.Items.Add("BRISK")
         FeatureMethod.Items.Add("Harris")
-        FeatureMethod.Items.Add("FAST")
         FeatureMethod.Items.Add("LineInput")
-        FeatureMethod.Items.Add("BrickPoint")
         FeatureMethod.SelectedItem() = "BrickPoint"
 
-        EdgeMethods.Items.Add("Canny")
-        EdgeMethods.Items.Add("Scharr")
-        EdgeMethods.Items.Add("Sobel")
-        EdgeMethods.Items.Add("Resize and Add")
         EdgeMethods.Items.Add("Binarized Reduction")
         EdgeMethods.Items.Add("Binarized Sobel")
+        EdgeMethods.Items.Add("Canny")
         EdgeMethods.Items.Add("Color Gap")
         EdgeMethods.Items.Add("Deriche")
         EdgeMethods.Items.Add("Laplacian")
+        EdgeMethods.Items.Add("Resize and Add")
+        EdgeMethods.Items.Add("Scharr")
+        EdgeMethods.Items.Add("Sobel")
         EdgeMethods.SelectedItem() = "Canny"
         task.edgeMethod = "Canny"
 

@@ -1,6 +1,5 @@
 Imports System.IO
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Edge_Basics : Inherits TaskParent
     Dim canny As New Edge_Canny
@@ -528,7 +527,7 @@ End Class
 Public Class Edge_ColorGap_VB : Inherits TaskParent
     Dim options As New Options_Edges3
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displaydst1.checked = True
 
         labels = {"", "Vertical and Horizontal edges", "Vertical edges", "Horizontal edges"}
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -562,56 +561,6 @@ Public Class Edge_ColorGap_VB : Inherits TaskParent
         dst1 = dst2 Or dst3
     End Sub
 End Class
-
-
-
-
-
-
-
-Public Class Edge_CannyMin : Inherits TaskParent
-    Dim canny As New Edge_Canny
-    Public Sub New()
-        OptionParent.FindSlider("Canny threshold1").Value = 200
-        OptionParent.FindSlider("Canny threshold2").Value = 200
-        desc = "Set the max thresholds for Canny to get the minimum number of edge pixels"
-        labels(2) = "Essential lines in the image - minimum number of pixels in Canny output"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        canny.Run(src)
-        dst2 = canny.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-Public Class Edge_CannyLeftRight : Inherits TaskParent
-    Dim canny As New Edge_Canny
-    Public Sub New()
-        OptionParent.FindSlider("Canny threshold1").Value = 200
-        OptionParent.FindSlider("Canny threshold2").Value = 200
-        labels = {"", "", "Essential lines in the left image", "Essential lines in the right image"}
-        desc = "Set the max thresholds for Canny to get the minimum number of edge pixels for the left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        canny.Run(task.leftView)
-        dst2 = canny.dst2.Clone
-
-        canny.Run(task.rightView)
-        dst3 = canny.dst2
-    End Sub
-End Class
-
-
-
 
 
 
@@ -654,31 +603,6 @@ Public Class Edge_Regions : Inherits TaskParent
 
         edge.Run(dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = edge.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-'https://docs.opencvb.org/3.1.0/da/d22/tutorial_py_canny.html
-Public Class Edge_Canny : Inherits TaskParent
-    Dim options As New Options_Canny
-    Public Sub New()
-        labels = {"", "", "Canny using L1 Norm", "Canny using L2 Norm"}
-        desc = "Show canny edge detection with varying thresholds"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If src.Type() <> cv.MatType.CV_8UC1 Then src.ConvertTo(src, cv.MatType.CV_8U)
-        dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, True)
-
-        dst3.SetTo(0)
-        src.CopyTo(dst3, dst2)
     End Sub
 End Class
 
@@ -894,61 +818,6 @@ Public Class Edge_Projection : Inherits TaskParent
         labels(2) = valley.labels(3)
     End Sub
 End Class
-
-
-
-
-
-
-
-Public Class Edge_MotionFrames : Inherits TaskParent
-    Dim edges As New Edge_Basics
-    Dim frames As New History_Basics
-    Public Sub New()
-        labels = {"", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only"}
-        OptionParent.FindSlider("Canny threshold1").Value = 50
-        OptionParent.FindSlider("Canny threshold2").Value = 50
-        desc = "Collect edges over several frames controlled with global frame history"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(src)
-        dst3 = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-        frames.Run(edges.dst2)
-        dst2 = frames.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Edge_MotionOverlay : Inherits TaskParent
-    Dim options As New Options_EdgeOverlay
-    Dim options1 As New Options_ImageOffset
-    Public Sub New()
-        labels(3) = "AbsDiff output of offset with original"
-        desc = "Find edges by displacing the current BGR image in any direction and diff it with the original."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        options1.Run()
-
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        Static offsetImage As cv.Mat = src.Clone
-        Dim rect1 = New cv.Rect(options.xDisp, options.yDisp, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1)
-        Dim rect2 = New cv.Rect(0, 0, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1)
-        offsetImage(rect2) = src(rect1).Clone
-
-        cv.Cv2.Absdiff(src, offsetImage, dst0)
-        dst2 = dst0.Threshold(options1.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
-        labels(2) = "Src offset (x,y) = (" + CStr(options.xDisp) + "," + CStr(options.yDisp) + ")"
-    End Sub
-End Class
-
 
 
 
@@ -1532,22 +1401,6 @@ End Class
 
 
 
-Public Class Edge_LeftRight : Inherits TaskParent
-    Dim edges As New Edge_Basics
-    Public Sub New()
-        desc = "A general view of the different edge algorithms applied to the left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.leftView)
-        dst2 = edges.dst2.Clone
-
-        edges.Run(task.rightView)
-        dst3 = edges.dst2.Clone
-    End Sub
-End Class
-
-
-
 
 
 Public Class Edge_LeftRightDepth : Inherits TaskParent
@@ -1638,5 +1491,180 @@ Public Class Edge_LeftRightBrick : Inherits TaskParent
         labels(2) = CStr(count) + " (of " + CStr(task.bricks.brickList.Count) +
                     ") bricks had edges and depth in the left image.  " +
                     "Move the mouse around to highlight partners.  Below right is right view."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Edge_CannyMin : Inherits TaskParent
+    Dim canny As New Edge_Canny
+    Public Sub New()
+        OptionParent.FindSlider("Canny threshold1").Value = 200
+        OptionParent.FindSlider("Canny threshold2").Value = 200
+        desc = "Set the max thresholds for Canny to get the minimum number of edge pixels"
+        labels(2) = "Essential lines in the image - minimum number of pixels in Canny output"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        canny.Run(src)
+        dst2 = canny.dst2
+    End Sub
+End Class
+
+
+
+
+
+'https://docs.opencvb.org/3.1.0/da/d22/tutorial_py_canny.html
+Public Class Edge_Canny : Inherits TaskParent
+    Dim options As New Options_Canny
+    Public Sub New()
+        labels = {"", "", "Canny using L1 Norm", "Canny using L2 Norm"}
+        desc = "Show canny edge detection with varying thresholds"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type() <> cv.MatType.CV_8UC1 Then src.ConvertTo(src, cv.MatType.CV_8U)
+        dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, True)
+
+        If standaloneTest() Then
+            dst3.SetTo(0)
+            src.CopyTo(dst3, dst2)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Edge_CannyLeftRight : Inherits TaskParent
+    Dim canny As New Edge_Canny
+    Public Sub New()
+        OptionParent.FindSlider("Canny threshold1").Value = 200
+        OptionParent.FindSlider("Canny threshold2").Value = 200
+        labels = {"", "", "Essential lines in the left image", "Essential lines in the right image"}
+        desc = "Set the max thresholds for Canny to get the minimum number of edge pixels for the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        canny.Run(task.leftView)
+        dst2 = canny.dst2.Clone
+
+        canny.Run(task.rightView)
+        dst3 = canny.dst2
+    End Sub
+End Class
+
+
+
+
+Public Class Edge_LeftRight : Inherits TaskParent
+    Dim edges As New Edge_Basics
+    Public Sub New()
+        desc = "A general view of the different edge algorithms applied to the left and right images."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(task.leftView)
+        dst2 = edges.dst2.Clone
+        labels(2) = "Left image " + edges.labels(2)
+
+        edges.Run(task.rightView)
+        dst3 = edges.dst2.Clone
+        labels(2) = "Right image " + edges.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Edge_Motion : Inherits TaskParent
+    Dim canny As Edge_Canny
+    Dim scharr As Edge_Scharr
+    Dim binRed As Edge_BinarizedReduction
+    Dim binSobel As Bin4Way_Sobel
+    Dim sobel As Edge_Sobel
+    Dim colorGap As Edge_ColorGap_CPP
+    Dim deriche As Edge_Deriche_CPP
+    Dim Laplacian As Edge_Laplacian
+    Dim resizeAdd As Edge_ResizeAdd
+    Dim regions As Edge_Regions
+    Dim edges As Object
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Different edge algorithms but only after motion isolation."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static saveSelection As String = ""
+        If saveSelection <> task.edgeMethod Then
+            saveSelection = task.edgeMethod
+            Select Case task.edgeMethod
+                Case "Binarized Reduction"
+                    edges = New Edge_BinarizedReduction
+                Case "Binarized Sobel"
+                    edges = New Bin4Way_Sobel
+                Case "Canny"
+                    edges = New Edge_Canny
+                Case "Color Gap"
+                    edges = New Edge_ColorGap_CPP
+                Case "Deriche"
+                    edges = New Edge_Deriche_CPP
+                Case "Laplacian"
+                    edges = New Edge_Laplacian
+                Case "Resize and Add"
+                    edges = New Edge_ResizeAdd
+                Case "Scharr"
+                    edges = New Edge_Scharr
+                Case "Sobel"
+                    edges = New Edge_Sobel
+            End Select
+        End If
+
+        If src.Channels <> 1 Then src = task.gray
+
+        Dim rect = task.motionRect
+        If task.heartBeat Or task.optionsChanged Then rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+
+        If rect.Width > 0 Then
+            edges.run(src(rect))
+            If edges.dst2.Channels <> 1 Then edges.dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If edges.dst2.Type <> cv.MatType.CV_8UC1 Then edges.dst2.ConvertTo(edges.dst2, cv.MatType.CV_8U)
+            edges.dst2.CopyTo(dst2(rect))
+        End If
+        labels(2) = traceName + " - selection = " + task.edgeMethod
+    End Sub
+End Class
+
+
+
+
+
+Public Class Edge_MotionFrames : Inherits TaskParent
+    Dim edges As New Edge_Motion
+    Dim frames As New History_Basics
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(1) = "The Edge_Canny output for the current frame"
+        labels(3) = "The difference from the current edges and the accumulated edges"
+        desc = "Collect edges over several frames controlled with global frame history"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        edges.Run(src)
+        dst1 = edges.dst2
+
+        frames.Run(dst1)
+        dst2 = frames.dst2
+
+        diff.lastFrame = dst2
+        diff.Run(dst1)
+        diff.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
+
+        labels(2) = "Accumulated edges over " + CStr(task.frameHistoryCount) + " frames."
     End Sub
 End Class

@@ -15847,3 +15847,32 @@ Public Class XO_Download_Databases : Inherits TaskParent
         'End If
     End Sub
 End Class
+
+
+
+
+
+
+Public Class XO_Edge_MotionOverlay : Inherits TaskParent
+    Dim options As New Options_EdgeOverlay
+    Dim options1 As New Options_ImageOffset
+    Public Sub New()
+        labels(3) = "AbsDiff output of offset with original"
+        desc = "Find edges by displacing the current BGR image in any direction and diff it with the original."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        options1.Run()
+
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static offsetImage As cv.Mat = src.Clone
+        Dim rect1 = New cv.Rect(options.xDisp, options.yDisp, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1)
+        Dim rect2 = New cv.Rect(0, 0, dst2.Width - options.xDisp - 1, dst2.Height - options.yDisp - 1)
+        offsetImage(rect2) = src(rect1).Clone
+
+        cv.Cv2.Absdiff(src, offsetImage, dst0)
+        dst2 = dst0.Threshold(options1.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+        labels(2) = "Src offset (x,y) = (" + CStr(options.xDisp) + "," + CStr(options.yDisp) + ")"
+    End Sub
+End Class
