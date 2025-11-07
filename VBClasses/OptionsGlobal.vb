@@ -22,6 +22,7 @@ Public Class OptionsGlobal
         LineThicknessAmount.Text = CStr(LineWidth.Value)
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
+        motionThresholdLabel.Text = CStr(task.motionThreshold)
 
         Palettes.Items.Clear()
         For Each mapName In mapNames
@@ -263,5 +264,9 @@ Public Class OptionsGlobal
         task.motionThreshold = MotionThreshold.Value
         task.optionsChanged = True
         motionThresholdLabel.Text = CStr(task.motionThreshold)
+    End Sub
+
+    Private Sub MotionThreshold_Scroll(sender As Object, e As EventArgs) Handles MotionThreshold.Scroll
+
     End Sub
 End Class

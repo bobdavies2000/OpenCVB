@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows.Forms.VisualStyles
+Imports cv = OpenCvSharp
 Public Class Brick_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Public brickDepthCount As Integer
@@ -7,6 +8,7 @@ Public Class Brick_Basics : Inherits TaskParent
     Public Sub New()
         If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         task.bricks = Me
+        labels(3) = "Right camera image.  Highlighted rectangle matches the dst2 (left) rectangle."
         desc = "Create the grid of bricks that reduce depth volatility"
     End Sub
     Public Function setBrickD() As brickData
@@ -130,20 +132,28 @@ Public Class Brick_Basics : Inherits TaskParent
                 End If
             End If
 
-            dst2(brick.rect).SetTo(brick.color)
             If brick.depth > 0 Then depthCount += 1
             task.bricks.brickList.Add(brick)
         Next
 
-        Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-        Dim br = task.bricks.brickList(index)
-        SetTrueText(br.displayCell, 1)
-        dst2.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
-        dst3.SetTo(0)
-        dst3.Rectangle(br.rRect, task.highlight, task.lineWidth + 1)
-        task.color.Rectangle(br.lRect, task.highlight, task.lineWidth)
+        If standaloneTest() Then
+            Static edgesLR As New Edge_LeftRight
+            edgesLR.Run(emptyMat)
+            dst2 = edgesLR.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst3 = edgesLR.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        If task.heartBeat Then labels(2) = CStr(task.bricks.brickList.Count) + " bricks and " + CStr(brickDepthCount) + " had depth"
+            Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            Dim br = task.bricks.brickList(index)
+            SetTrueText(br.displayCell, 1)
+            dst2.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
+            dst3.Rectangle(br.rRect, task.highlight, task.lineWidth + 1)
+            task.color.Rectangle(br.lRect, task.highlight, task.lineWidth)
+        End If
+
+        If task.heartBeat Then
+            labels(2) = CStr(task.bricks.brickList.Count) + " bricks and " +
+                CStr(brickDepthCount) + " had depth.  Left camera image is below."
+        End If
     End Sub
 End Class
 
