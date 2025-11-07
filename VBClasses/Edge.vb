@@ -2,6 +2,67 @@ Imports System.IO
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Edge_Basics : Inherits TaskParent
+    Dim canny As Edge_Canny
+    Dim scharr As Edge_Scharr
+    Dim binRed As Edge_BinarizedReduction
+    Dim binSobel As Bin4Way_Sobel
+    Dim sobel As Edge_Sobel
+    Dim colorGap As Edge_ColorGap_CPP
+    Dim deriche As Edge_Deriche_CPP
+    Dim Laplacian As Edge_Laplacian
+    Dim resizeAdd As Edge_ResizeAdd
+    Dim regions As Edge_Regions
+    Dim edges As Object
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Different edge algorithms but only after motion isolation."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static saveSelection As String = ""
+        If saveSelection <> task.edgeMethod Then
+            saveSelection = task.edgeMethod
+            Select Case task.edgeMethod
+                Case "Binarized Reduction"
+                    edges = New Edge_BinarizedReduction
+                Case "Binarized Sobel"
+                    edges = New Bin4Way_Sobel
+                Case "Canny"
+                    edges = New Edge_Canny
+                Case "Color Gap"
+                    edges = New Edge_ColorGap_CPP
+                Case "Deriche"
+                    edges = New Edge_Deriche_CPP
+                Case "Laplacian"
+                    edges = New Edge_Laplacian
+                Case "Resize and Add"
+                    edges = New Edge_ResizeAdd
+                Case "Scharr"
+                    edges = New Edge_Scharr
+                Case "Sobel"
+                    edges = New Edge_Sobel
+            End Select
+        End If
+
+        If src.Channels <> 1 Then src = task.gray
+
+        Dim rect = task.motionRect
+        If task.heartBeat Or task.optionsChanged Then rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+
+        If rect.Width > 0 Then
+            edges.run(src(rect))
+            If edges.dst2.Channels <> 1 Then edges.dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If edges.dst2.Type <> cv.MatType.CV_8UC1 Then edges.dst2.ConvertTo(edges.dst2, cv.MatType.CV_8U)
+            edges.dst2.CopyTo(dst2(rect))
+        End If
+        labels(2) = traceName + " - selection = " + task.edgeMethod
+    End Sub
+End Class
+
+
+
+
+
+Public Class Edge_MotionFree : Inherits TaskParent
     Dim canny As New Edge_Canny
     Dim scharr As Edge_Scharr
     Dim binRed As Edge_BinarizedReduction
@@ -593,7 +654,6 @@ Public Class Edge_Regions : Inherits TaskParent
     Dim tiers As New Depth_Tiers
     Dim edge As New Edge_Basics
     Public Sub New()
-        OptionParent.FindSlider("Canny threshold2").Value = 30
         labels = {"", "", "Edge_Canny output for the depth regions", "Identified regions "}
         desc = "Find the edges for the depth tiers."
     End Sub
@@ -1583,69 +1643,8 @@ End Class
 
 
 
-Public Class Edge_Motion : Inherits TaskParent
-    Dim canny As Edge_Canny
-    Dim scharr As Edge_Scharr
-    Dim binRed As Edge_BinarizedReduction
-    Dim binSobel As Bin4Way_Sobel
-    Dim sobel As Edge_Sobel
-    Dim colorGap As Edge_ColorGap_CPP
-    Dim deriche As Edge_Deriche_CPP
-    Dim Laplacian As Edge_Laplacian
-    Dim resizeAdd As Edge_ResizeAdd
-    Dim regions As Edge_Regions
-    Dim edges As Object
-    Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Different edge algorithms but only after motion isolation."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static saveSelection As String = ""
-        If saveSelection <> task.edgeMethod Then
-            saveSelection = task.edgeMethod
-            Select Case task.edgeMethod
-                Case "Binarized Reduction"
-                    edges = New Edge_BinarizedReduction
-                Case "Binarized Sobel"
-                    edges = New Bin4Way_Sobel
-                Case "Canny"
-                    edges = New Edge_Canny
-                Case "Color Gap"
-                    edges = New Edge_ColorGap_CPP
-                Case "Deriche"
-                    edges = New Edge_Deriche_CPP
-                Case "Laplacian"
-                    edges = New Edge_Laplacian
-                Case "Resize and Add"
-                    edges = New Edge_ResizeAdd
-                Case "Scharr"
-                    edges = New Edge_Scharr
-                Case "Sobel"
-                    edges = New Edge_Sobel
-            End Select
-        End If
-
-        If src.Channels <> 1 Then src = task.gray
-
-        Dim rect = task.motionRect
-        If task.heartBeat Or task.optionsChanged Then rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-
-        If rect.Width > 0 Then
-            edges.run(src(rect))
-            If edges.dst2.Channels <> 1 Then edges.dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            If edges.dst2.Type <> cv.MatType.CV_8UC1 Then edges.dst2.ConvertTo(edges.dst2, cv.MatType.CV_8U)
-            edges.dst2.CopyTo(dst2(rect))
-        End If
-        labels(2) = traceName + " - selection = " + task.edgeMethod
-    End Sub
-End Class
-
-
-
-
-
 Public Class Edge_MotionFrames : Inherits TaskParent
-    Dim edges As New Edge_Motion
+    Dim edges As New Edge_Basics
     Dim frames As New History_Basics
     Dim diff As New Diff_Basics
     Public Sub New()
