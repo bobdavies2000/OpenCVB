@@ -789,20 +789,21 @@ Public Class rcData
         maxDist.X = mm.maxLoc.X + rect.X
         maxDist.Y = mm.maxLoc.Y + rect.Y
     End Sub
-    Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer)
+    Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer, Optional minContours As Integer = 3)
+        rect = _rect
         mask = _mask.InRange(_index, _index)
         index = -1 ' assume it is not going to be valid...
         contour = ContourBuild(mask)
-        If contour.Count >= 3 Then
-            rect = _rect
+        If contour.Count >= minContours Then
             index = _index
-            Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
-            mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-            cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
+            If contour.Count >= 3 Then
+                Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
+                mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+                cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
 
-            ' keep the hull points around (there aren't many of them.)
-            hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
-
+                ' keep the hull points around (there aren't many of them.)
+                hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
+            End If
             buildMaxDist()
 
             color = task.vecColors(index)

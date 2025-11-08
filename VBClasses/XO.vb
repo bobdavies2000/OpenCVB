@@ -15874,3 +15874,68 @@ Public Class XO_Edge_MotionOverlay : Inherits TaskParent
         labels(2) = "Src offset (x,y) = (" + CStr(options.xDisp) + "," + CStr(options.yDisp) + ")"
     End Sub
 End Class
+
+
+
+
+
+Public Class XO_EdgeLine_BasicsNoMotion : Inherits TaskParent
+    Public segments As New List(Of List(Of cv.Point))
+    Public rectList As New List(Of cv.Rect)
+    Public classCount As Integer
+    Public Sub New()
+        cPtr = EdgeLineRaw_Open()
+        labels(3) = "Each line is highlighted with the color of the contour where it resides. "
+        desc = "Use EdgeLines to find edges/lines but without using motionMask"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Dim cppData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
+        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+        Dim imageEdgeWidth = 2
+        Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, imageEdgeWidth)
+        handleSrc.Free()
+        If imagePtr <> 0 Then dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+
+        If dst2.Width >= 1280 Then imageEdgeWidth = 4
+        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth) ' prevent leaks at the image boundary...
+
+        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, EdgeLineRaw_Rects(cPtr))
+
+        classCount = EdgeLineRaw_GetSegCount(cPtr)
+        If classCount = 0 Then Exit Sub ' nothing to work with....
+        Dim rects(classCount * 4) As Integer
+        Marshal.Copy(rectData.Data, rects, 0, rects.Length)
+
+        rectList.Clear()
+        For i = 0 To classCount * 4 - 4 Step 4
+            rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
+        Next
+
+        segments.Clear()
+        Dim pointCount As Integer
+        For i = 0 To classCount - 1
+            Dim len = EdgeLineRaw_NextLength(cPtr)
+            If len < 2 Then Continue For
+            Dim nextSeg(len * 2 - 1) As Integer
+            Dim segPtr = EdgeLineRaw_NextSegment(cPtr)
+            Marshal.Copy(segPtr, nextSeg, 0, nextSeg.Length)
+
+            Dim segment As New List(Of cv.Point)
+            For j = 0 To nextSeg.Length - 2 Step 2
+                segment.Add(New cv.Point(nextSeg(j), nextSeg(j + 1)))
+                pointCount += 1
+            Next
+            segments.Add(segment)
+        Next
+        labels(2) = CStr(classCount) + " segments were found using " + CStr(pointCount) + " points."
+
+        dst3.SetTo(0)
+    End Sub
+    Public Sub Close()
+        EdgeLineRaw_Close(cPtr)
+    End Sub
+End Class

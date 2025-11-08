@@ -94,6 +94,7 @@ Public Class VBtask : Implements IDisposable
     Public color As New cv.Mat
     Public gray As New cv.Mat
     Public grayStable As New cv.Mat
+    Public leftViewStable As New cv.Mat
     Public leftView As New cv.Mat
     Public rightView As New cv.Mat
     Public pointCloud As New cv.Mat
@@ -590,11 +591,21 @@ Public Class VBtask : Implements IDisposable
 
         rgbFilter.Run(task.color)
         motionBasics.Run(task.gray)
-        If task.optionsChanged Then
-            grayStable = gray.Clone
-            task.motionRect = New cv.Rect(0, 0, task.workRes.Width, task.workRes.Height)
+        If task.gOptions.UseMotionMask.Checked Then
+            If task.optionsChanged Or frameCount < 5 Then
+                task.motionRect = New cv.Rect(0, 0, task.workRes.Width, task.workRes.Height)
+                grayStable = gray.Clone
+                leftViewStable = leftView.Clone
+            Else
+                If motionRect.Width > 0 Then
+                    gray(motionRect).CopyTo(grayStable(motionRect))
+                    leftView(motionRect).CopyTo(leftViewStable(motionRect))
+                End If
+            End If
         Else
-            If motionRect.Width > 0 Then gray(motionRect).CopyTo(grayStable(motionRect))
+            grayStable = gray
+            leftViewStable = gray
+            motionRect = New cv.Rect(0, 0, color.Width, color.Height)
         End If
 
         pcMotion.Run(emptyMat) '******* this is the gravity rotation *******
