@@ -4065,91 +4065,6 @@ int* EdgeLineSimple_RunCPP(EdgeLineSimple* cPtr, int* dataPtr, int rows, int col
 
 
 
-class EdgeDrawRaw
-{
-private:
-public:
-    Mat src, dst;
-    Ptr<EdgeLine_Image> eDraw;
-    vector<Vec4f> lines;
-    vector< vector<Point> > segments;
-    vector< Rect> rects;
-    int segmentIndex;
-    EdgeDrawRaw()
-    {
-        eDraw = new EdgeLine_Image();
-    }
-    void RunCPP(int lineWidth) {
-        segments.clear();
-
-        eDraw->ed->detectEdges(src);
-        eDraw->ed->detectLines(lines);
-        segments = eDraw->ed->getSegments();
-        rects.clear();
-
-        dst.setTo(0);
-        for (size_t i = 0; i < segments.size(); i++)
-        {
-            const Point* pts = &segments[i][0];
-            int size = (int)segments[i].size();
-            //float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
-            //bool drawClosed = distance < 10;
-            //polylines(dst, &pts, &n, 1, drawClosed, i + 1, lineWidth, LINE_4);
-            polylines(dst, &pts, &size, 1, false, i + 1, lineWidth, LINE_4);
-            rects.push_back(cv::boundingRect(segments[i]));
-        }
-    }
-};
-
-extern "C" __declspec(dllexport)
-EdgeDrawRaw* EdgeLineRaw_Open() {
-    EdgeDrawRaw* cPtr = new EdgeDrawRaw();
-    return cPtr;
-}
-
-extern "C" __declspec(dllexport)
-int* EdgeLineRaw_Close(EdgeDrawRaw* cPtr)
-{
-    delete cPtr;
-    return (int*)0;
-}
-
-extern "C" __declspec(dllexport)
-int* EdgeLineRaw_RunCPP(EdgeDrawRaw* cPtr, int* dataPtr, int rows, int cols, int lineWidth)
-{
-    if (cPtr->dst.rows == 0) cPtr->dst = Mat(rows, cols, CV_32S);
-    cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
-    cPtr->RunCPP(lineWidth);
-    cPtr->segmentIndex = 0;
-    return (int*)cPtr->dst.data;
-}
-
-extern "C" __declspec(dllexport)
-int EdgeLineRaw_GetSegCount(EdgeDrawRaw* cPtr)
-{
-    return (int)cPtr->segments.size();
-}
-
-extern "C" __declspec(dllexport) int* EdgeLineRaw_Rects(EdgeDrawRaw* cPtr)
-{
-    return (int*)&cPtr->rects[0];
-}
-
-extern "C" __declspec(dllexport)
-int EdgeLineRaw_NextLength(EdgeDrawRaw* cPtr)
-{
-    return (int)cPtr->segments[cPtr->segmentIndex].size();
-}
-
-extern "C" __declspec(dllexport)
-int* EdgeLineRaw_NextSegment(EdgeDrawRaw* cPtr)
-{
-    return (int*)&cPtr->segments[cPtr->segmentIndex++][0];
-}
-
-
-
-
 
 class RedPrep_CPP
 {
@@ -4271,4 +4186,186 @@ RedCloud16_Run(RedCloud16* cPtr, int* dataPtr, int rows, int cols)
     cPtr->src = Mat(rows, cols, CV_16U, dataPtr);
     cPtr->RunCPP();
     return (int*)cPtr->result.data;
+}
+
+
+
+
+
+
+class EdgeLineRawOld
+{
+private:
+public:
+    Mat src, dst;
+    Ptr<EdgeLine_Image> eDraw;
+    vector<Vec4f> lines;
+    vector< vector<Point> > segments;
+    vector< Rect> rects;
+    int segmentIndex;
+    EdgeLineRawOld()
+    {
+        eDraw = new EdgeLine_Image();
+    }
+    void RunCPP(int lineWidth) {
+        segments.clear();
+
+        eDraw->ed->detectEdges(src);
+        eDraw->ed->detectLines(lines);
+        segments = eDraw->ed->getSegments();
+        rects.clear();
+
+        dst.setTo(0);
+        for (size_t i = 0; i < segments.size(); i++)
+        {
+            const Point* pts = &segments[i][0];
+            int size = (int)segments[i].size();
+            //float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
+            //bool drawClosed = distance < 10;
+            //polylines(dst, &pts, &n, 1, drawClosed, i + 1, lineWidth, LINE_4);
+            polylines(dst, &pts, &size, 1, false, i + 1, lineWidth, LINE_4);
+            rects.push_back(cv::boundingRect(segments[i]));
+        }
+    }
+};
+
+extern "C" __declspec(dllexport)
+EdgeLineRawOld* EdgeLineRawOld_Open() {
+    EdgeLineRawOld* cPtr = new EdgeLineRawOld();
+    return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* EdgeLineRawOld_Close(EdgeLineRawOld* cPtr)
+{
+    delete cPtr;
+    return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* EdgeLineRawOld_RunCPP(EdgeLineRawOld* cPtr, int* dataPtr, int rows, int cols, int lineWidth)
+{
+    if (cPtr->dst.rows == 0) cPtr->dst = Mat(rows, cols, CV_32S);
+    cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
+    cPtr->RunCPP(lineWidth);
+    cPtr->segmentIndex = 0;
+    return (int*)cPtr->dst.data;
+}
+
+extern "C" __declspec(dllexport)
+int EdgeLineRawOld_GetSegCount(EdgeLineRawOld* cPtr)
+{
+    return (int)cPtr->segments.size();
+}
+
+extern "C" __declspec(dllexport) int* EdgeLineRawOld_Rects(EdgeLineRawOld* cPtr)
+{
+    return (int*)&cPtr->rects[0];
+}
+
+extern "C" __declspec(dllexport)
+int EdgeLineRawOld_NextLength(EdgeLineRawOld* cPtr)
+{
+    return (int)cPtr->segments[cPtr->segmentIndex].size();
+}
+
+extern "C" __declspec(dllexport)
+int* EdgeLineRawOld_NextSegment(EdgeLineRawOld* cPtr)
+{
+    return (int*)&cPtr->segments[cPtr->segmentIndex++][0];
+}
+
+
+
+
+
+
+class EdgeLineRaw
+{
+private:
+public:
+    Mat src, dst;
+    Ptr<EdgeLine_Image> eDraw;
+    vector<Vec4f> lines;
+    vector< vector<Point> > segments;
+    vector< Rect> rects;
+    int segmentIndex;
+    EdgeLineRaw()
+    {
+        eDraw = new EdgeLine_Image();
+    }
+    void RunCPP(int lineWidth) {
+        segments.clear();
+
+        eDraw->ed->detectEdges(src);
+        eDraw->ed->detectLines(lines);
+        segments = eDraw->ed->getSegments();
+        rects.clear();
+
+        dst.setTo(0);
+        multimap<int, int, greater<int>> sizeSorted;
+        for (size_t i = 0; i < segments.size(); i++)
+        {
+            sizeSorted.insert(make_pair(segments[i].size(), i));
+        }
+
+        int count = 1;
+        for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
+        {
+            int index = (int)(it->second);
+            const Point* pts = &segments[index][0];
+            int size = it->first;
+            polylines(dst, &pts, &size, 1, false, count, lineWidth, LINE_4);
+            rects.push_back(cv::boundingRect(segments[index]));
+            count += 1;
+
+            if (rects.size() >= 255) break;
+        }
+    }
+};
+
+extern "C" __declspec(dllexport)
+EdgeLineRaw* EdgeLineRaw_Open() {
+    EdgeLineRaw* cPtr = new EdgeLineRaw();
+    return cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* EdgeLineRaw_Close(EdgeLineRaw* cPtr)
+{
+    delete cPtr;
+    return (int*)0;
+}
+
+extern "C" __declspec(dllexport)
+int* EdgeLineRaw_RunCPP(EdgeLineRaw* cPtr, int* dataPtr, int rows, int cols, int lineWidth)
+{
+    if (cPtr->dst.rows == 0) cPtr->dst = Mat(rows, cols, CV_32S);
+    cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
+    cPtr->RunCPP(lineWidth);
+    cPtr->segmentIndex = 0;
+    return (int*)cPtr->dst.data;
+}
+
+extern "C" __declspec(dllexport)
+int EdgeLineRaw_GetSegCount(EdgeLineRaw* cPtr)
+{
+    return (int)cPtr->segments.size();
+}
+
+extern "C" __declspec(dllexport) int* EdgeLineRaw_Rects(EdgeLineRaw* cPtr)
+{
+    return (int*)&cPtr->rects[0];
+}
+
+extern "C" __declspec(dllexport)
+int EdgeLineRaw_NextLength(EdgeLineRaw* cPtr)
+{
+    return (int)cPtr->segments[cPtr->segmentIndex].size();
+}
+
+extern "C" __declspec(dllexport)
+int* EdgeLineRaw_NextSegment(EdgeLineRaw* cPtr)
+{
+    return (int*)&cPtr->segments[cPtr->segmentIndex++][0];
 }

@@ -385,6 +385,7 @@ Public Class EdgeLine_rcData : Inherits TaskParent
     Public classCount As Integer
     Public Sub New()
         cPtr = EdgeLineRaw_Open()
+        labels(3) = "Palette version of dst2"
         If standalone Then task.gOptions.showMotionMask.Checked = True
         desc = "Use EdgeLines to find edges/lines but without using motionMask"
     End Sub
@@ -394,41 +395,35 @@ Public Class EdgeLine_rcData : Inherits TaskParent
         Dim cppData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handlesrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imageEdgeWidth = 2
-        Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols, imageEdgeWidth)
+        Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                          task.lineWidth)
         handlesrc.Free()
         rcMap = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
         rcMap.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        If dst2.Width >= 1280 Then imageEdgeWidth = 4
+        Dim imageEdgeWidth = If(dst2.Width >= 1280, 4, 2)
         ' prevent leaks at the image boundary...
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth)
 
         Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, EdgeLineRaw_Rects(cPtr))
 
-        classCount = EdgeLineRaw_GetSegCount(cPtr)
+        classCount = Math.Min(EdgeLineRaw_GetSegCount(cPtr), 255)
         If classCount = 0 Then Exit Sub ' nothing to work with....
         Dim rects(classCount * 4) As Integer
         Marshal.Copy(rectData.Data, rects, 0, rects.Length)
 
-        Dim rectList As New List(Of cv.Rect)
         dst3.SetTo(0)
-        rectList.Clear()
-        For i = 0 To classCount * 4 - 4 Step 4
-            rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
-        Next
-
         rcList.Clear()
-        For Each r In rectList
-            If r.Width = 0 Then Continue For
+        For i = 0 To classCount * 4 - 4 Step 4
+            Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
             Dim index = rcList.Count + 1
             Dim mask = rcMap(r)
             Dim rc = New rcData(mask, r, index, 0)
-            rcList.Add(rc)
-        Next
 
-        For Each rc In rcList
-            dst3(rc.rect).SetTo(rc.color, rc.mask)
+            Dim gridIndex = task.gridMap.Get(Of Integer)(rc.rect.TopLeft.Y, rc.rect.TopLeft.X)
+            rc.color = task.scalarColors(gridIndex Mod 255)
+            rcList.Add(rc)
+            If standaloneTest() Then dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
         labels(2) = CStr(classCount) + " segments were found"
