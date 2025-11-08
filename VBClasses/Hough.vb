@@ -38,10 +38,8 @@ End Class
 Public Class Hough_Sudoku : Inherits TaskParent
     Dim hough As New Hough_Basics
     Public Sub New()
-       OptionParent.FindSlider("Canny threshold1").Value = 50
-       OptionParent.FindSlider("Canny threshold2").Value = 200
-       OptionParent.FindSlider("Hough rho").Value = 1
-       OptionParent.FindSlider("Hough theta").Value = 1000 * cv.Cv2.PI / 180
+        OptionParent.FindSlider("Hough rho").Value = 1
+        OptionParent.FindSlider("Hough theta").Value = 1000 * cv.Cv2.PI / 180
        OptionParent.FindSlider("Hough threshold").Value = 150
         desc = "Successful use of Hough to find lines in Sudoku grid."
     End Sub

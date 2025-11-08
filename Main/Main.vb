@@ -678,7 +678,10 @@ Namespace OpenCVB
                     Debug.WriteLine($"Thread ID: {t.Id}, State: {t.ThreadState}")
                 Next
                 MsgBox(AvailableAlgorithms.Text + " is running too long." + vbCrLf +
-                       "Click 'OK' to continue testing...")
+                       "Extend the time allotted to each algorithm." + vbCrLf +
+                       "Or simplify the algorithm - break into small steps." + vbCrLf +
+                       "See 'Duration in seconds of each test' - global option." + vbCrLf +
+                       "Click 'OK' once you have read this.")
                 killThread(saveThreadID)
             End If
 

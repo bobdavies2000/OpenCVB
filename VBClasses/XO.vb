@@ -12493,7 +12493,6 @@ Public Class XO_Contour_RedCloud : Inherits TaskParent
     Public options As New Options_Contours
     Public contourList As New List(Of contourData)
     Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
-    Public contourIDs As New List(Of Integer)
     Dim sortContours As New Contour_Sort
     Public Sub New()
         desc = "Use the RedPrep_Basics as input to contours_basics."
@@ -12514,7 +12513,6 @@ Public Class XO_Contour_RedCloud : Inherits TaskParent
 
         contourList = sortContours.contourList
         contourMap = sortContours.contourMap
-        contourIDs = sortContours.contourIDs
         If task.heartBeat Then labels(2) = sortContours.labels(2)
         dst2 = sortContours.dst2
     End Sub

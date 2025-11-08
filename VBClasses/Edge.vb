@@ -118,24 +118,21 @@ End Class
 
 Public Class Edge_DepthAndColor : Inherits TaskParent
     Dim shadow As New Depth_Holes
-    Dim canny As New Edge_Basics
+    Dim edges As New Edge_Basics
     Dim dilate As New Dilate_Basics
     Public Sub New()
         OptionParent.findRadio("Dilate shape: Rect").Checked = True
-
-        OptionParent.FindSlider("Canny threshold1").Value = 100
-        OptionParent.FindSlider("Canny threshold2").Value = 100
 
         desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
         labels(2) = "Edges in color and depth after dilate"
         labels(3) = "Edges in color and depth no dilate"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        canny.Run(src)
+        edges.Run(src)
         shadow.Run(src)
 
         dst3 = If(shadow.dst3.Channels() <> 1, shadow.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY), shadow.dst3)
-        dst3 += canny.dst2.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst3 += edges.dst2.Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         dilate.Run(dst3)
         dilate.dst2.SetTo(0, shadow.dst2)
