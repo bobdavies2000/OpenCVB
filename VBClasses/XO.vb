@@ -16010,3 +16010,157 @@ Public Class XO_EdgeLine_Basics : Inherits TaskParent
         EdgeLineRaw_Close(cPtr)
     End Sub
 End Class
+
+
+
+
+Public Class XO_Contour_Basics_List : Inherits TaskParent
+    Public contourList As New List(Of contourData)
+    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public sortContours As New Contour_SortNew
+    Public options As New Options_Contours
+    Public Sub New()
+        labels(3) = "Details for the selected contour."
+        task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
+        desc = "List retrieval mode contour finder"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        dst3 = srcMustBe8U(src)
+
+        sortContours.allContours = Contour_Basics.buildContours(dst3)
+        sortContours.Run(src)
+
+        contourList = sortContours.rcList
+        contourMap = sortContours.rcMap
+        labels(2) = sortContours.labels(2)
+        dst2 = sortContours.dst2
+        strOut = sortContours.strOut
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Contour_Basics_CComp : Inherits TaskParent
+    Public options As New Options_Contours
+    Public contourList As New List(Of contourData)
+    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Dim sortContours As New Contour_Sort
+    Public Sub New()
+        OptionParent.findRadio("CComp").Checked = True
+        task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
+        desc = "CComp retrieval mode contour finder"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        dst3 = srcMustBe8U(src)
+
+        sortContours.allContours = Contour_Basics.buildContours(dst3)
+        sortContours.Run(dst3)
+
+        contourList = sortContours.contourList
+        contourMap = sortContours.contourMap
+        labels(2) = sortContours.labels(2)
+        dst2 = sortContours.dst2
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Contour_Basics_FloodFill : Inherits TaskParent
+    Public options As New Options_Contours
+    Public contourList As New List(Of contourData)
+    Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
+    Dim sortContours As New Contour_Sort
+    Public Sub New()
+        desc = "FloodFill retrieval mode contour finder"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        dst3 = srcMustBe8U(src)
+
+        Dim mode = options.options2.ApproximationMode
+        dst3.ConvertTo(dst1, cv.MatType.CV_32SC1)
+        cv.Cv2.FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
+        If sortContours.allContours.Count <= 1 Then Exit Sub
+
+        sortContours.Run(src)
+
+        contourList = sortContours.contourList
+        contourMap = sortContours.contourMap
+        labels(2) = sortContours.labels(2)
+        dst2 = sortContours.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_Contour_Basics_External : Inherits TaskParent
+    Public options As New Options_Contours
+    Public contourList As New List(Of contourData)
+    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Dim sortContours As New Contour_Sort
+    Public Sub New()
+        desc = "External retrieval mode contour finder"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        dst1 = srcMustBe8U(src)
+
+        Dim mode = options.options2.ApproximationMode
+        cv.Cv2.FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.List, mode)
+        If sortContours.allContours.Count <= 1 Then Exit Sub
+
+        sortContours.Run(src)
+
+        contourList = sortContours.contourList
+        contourMap = sortContours.contourMap
+        labels(2) = sortContours.labels(2)
+        dst2 = sortContours.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Contour_Basics_Tree : Inherits TaskParent
+    Public options As New Options_Contours
+    Public contourList As New List(Of contourData)
+    Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Dim sortContours As New Contour_Sort
+    Public Sub New()
+        desc = "Tree retrieval mode contour finder"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        dst1 = srcMustBe8U(src)
+
+        Dim mode = options.options2.ApproximationMode
+        If dst1.Type <> cv.MatType.CV_8U Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.Tree, mode)
+        If sortContours.allContours.Count <= 1 Then Exit Sub
+
+        sortContours.Run(src)
+
+        contourList = sortContours.contourList
+        contourMap = sortContours.contourMap
+        labels(2) = sortContours.labels(2)
+        dst2 = sortContours.dst2
+    End Sub
+End Class
