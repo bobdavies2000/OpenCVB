@@ -24,7 +24,6 @@ Public Class VBtask : Implements IDisposable
     Public redCloud As RedCloud_Basics
     Public gmat As IMU_GMatrix
     Public lines As Line_Basics
-    Public edgeLine As EdgeLine_Basics
     Public grid As Grid_Basics
     Public palette As Palette_LoadColorMap
     Public PixelViewer As Pixel_Viewer
@@ -612,7 +611,6 @@ Public Class VBtask : Implements IDisposable
 
         colorizer.Run(src)
 
-        If edgeLine IsNot Nothing Then edgeLine.Run(task.grayStable)
         If task.feat IsNot Nothing Then task.feat.Run(src)
         If task.bricks IsNot Nothing Then bricks.Run(src)
 

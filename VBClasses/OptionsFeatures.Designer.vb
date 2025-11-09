@@ -36,7 +36,7 @@ Partial Class OptionsFeatures
         GrayGroup = New GroupBox()
         ColorGroup = New GroupBox()
         Label4 = New Label()
-        ColorSource = New ComboBox()
+        Color8USource = New ComboBox()
         CType(FeatureSampleSize, ComponentModel.ISupportInitialize).BeginInit()
         CType(MatchCorrSlider, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
@@ -172,14 +172,14 @@ Partial Class OptionsFeatures
         Label4.TabIndex = 23
         Label4.Text = "Color8U Source"
         ' 
-        ' ColorSource
+        ' Color8USource
         ' 
-        ColorSource.FormattingEnabled = True
-        ColorSource.Location = New Point(208, 94)
-        ColorSource.Margin = New Padding(4)
-        ColorSource.Name = "ColorSource"
-        ColorSource.Size = New Size(294, 38)
-        ColorSource.TabIndex = 22
+        Color8USource.FormattingEnabled = True
+        Color8USource.Location = New Point(208, 94)
+        Color8USource.Margin = New Padding(4)
+        Color8USource.Name = "Color8USource"
+        Color8USource.Size = New Size(294, 38)
+        Color8USource.TabIndex = 22
         ' 
         ' OptionsFeatures
         ' 
@@ -187,7 +187,7 @@ Partial Class OptionsFeatures
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1704, 690)
         Controls.Add(Label4)
-        Controls.Add(ColorSource)
+        Controls.Add(Color8USource)
         Controls.Add(ColorGroup)
         Controls.Add(GrayGroup)
         Controls.Add(FeatureCorrelationLabel)
@@ -223,5 +223,5 @@ Partial Class OptionsFeatures
     Friend WithEvents GrayGroup As GroupBox
     Friend WithEvents ColorGroup As GroupBox
     Friend WithEvents Label4 As Label
-    Friend WithEvents ColorSource As ComboBox
+    Friend WithEvents Color8USource As ComboBox
 End Class

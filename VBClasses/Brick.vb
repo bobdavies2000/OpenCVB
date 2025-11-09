@@ -439,7 +439,7 @@ Public Class Brick_EdgeDraw : Inherits TaskParent
         labels(2) = regions.labels(2)
 
         edgeline.Run(task.grayStable)
-        dst2.SetTo(cv.Scalar.White, edgeline.dst1)
+        dst2.SetTo(cv.Scalar.White, edgeline.dst2)
     End Sub
 End Class
 

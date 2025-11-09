@@ -43,17 +43,12 @@ Public Class Edge_Basics : Inherits TaskParent
             End Select
         End If
 
-        If src.Channels <> 1 Then src = task.gray
+        If src.Channels <> 1 Then src = task.grayStable
 
-        Dim rect = task.motionRect
-        If task.heartBeat Or task.optionsChanged Then rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-
-        If rect.Width > 0 Then
-            edges.run(src(rect))
-            If edges.dst2.Channels <> 1 Then edges.dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            If edges.dst2.Type <> cv.MatType.CV_8UC1 Then edges.dst2.ConvertTo(edges.dst2, cv.MatType.CV_8U)
-            edges.dst2.CopyTo(dst2(rect))
-        End If
+        edges.run(src)
+        If edges.dst2.Channels <> 1 Then edges.dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If edges.dst2.Type <> cv.MatType.CV_8UC1 Then edges.dst2.ConvertTo(edges.dst2, cv.MatType.CV_8U)
+        dst2 = edges.dst2
         labels(2) = traceName + " - selection = " + task.edgeMethod
     End Sub
 End Class
@@ -940,8 +935,7 @@ Public Class Edge_Color8U : Inherits TaskParent
                         Case 2
                             colorMethods(i) = New Binarize_DepthTiers
                         Case 3
-                            If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
-                            colorMethods(i) = task.edgeLine
+                            colorMethods(i) = New EdgeLine_Basics
                         Case 4
                             colorMethods(i) = New Hist3Dcolor_Basics
                         Case 5
@@ -1371,14 +1365,15 @@ End Class
 
 
 Public Class Edge_NoDepth : Inherits TaskParent
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
-        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "", "All edges available", "Below - edges without depth, Above - edges with depth (color from contour.)"}
         desc = "Find the edges where there is depth and no depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.edgeLine.dst1
+        edgeline.Run(task.grayStable)
+        dst2 = edgeline.dst2
 
         dst3.SetTo(0)
         dst2.CopyTo(dst3, task.noDepthMask)

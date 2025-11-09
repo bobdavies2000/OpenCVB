@@ -3918,9 +3918,9 @@ public:
         {
             const Point* pts = &segments[i][0];
             int n = (int)segments[i].size();
-            float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
-            bool drawClosed = distance < 10;
-            polylines(edgeMap, &pts, &n, 1, drawClosed, i + 1, lineWidth, LINE_4);
+            //float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
+            //bool drawClosed = distance < 10;
+            polylines(edgeMap, &pts, &n, 1, false, i + 1, lineWidth, LINE_4);
         }
 
         if (segments.size() == 0) return;
@@ -3947,9 +3947,9 @@ public:
             const Point* pts = &edgeList[i][0];
             int n = (int)edgeList[i].size();
             float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
-            bool drawClosed = distance < 10;
-            polylines(edgeMap, &pts, &n, 1, drawClosed, i + 1, lineWidth, LINE_4); // for the next iteration.
-            polylines(dst8U, &pts, &n, 1, drawClosed, 255, lineWidth, LINE_4);
+            //bool drawClosed = distance < 10;
+            //polylines(edgeMap, &pts, &n, 1, drawClosed, i + 1, lineWidth, LINE_4); // for the next iteration.
+            polylines(dst8U, &pts, &n, 1, false, 255, lineWidth, LINE_4);
             segments.push_back(edgeList[i]);
         }
     }

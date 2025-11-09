@@ -392,7 +392,7 @@ Public Class XO_OpenGL_QuadHulls : Inherits TaskParent
     Dim quad As New Quad_Hulls
     Public Sub New()
         task.ogl.oglFunction = Comm.oCase.quadBasics
-        If standalone Then task.featureOptions.ColorSource.SelectedItem = "Reduction_Basics"
+        If standalone Then task.featureOptions.Color8USource.SelectedItem = "Reduction_Basics"
         desc = "Create a simple plane in each roi of the RedCloud data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1367,7 +1367,7 @@ Public Class XO_OpenGL_ColorReduced3D : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Public Sub New()
         task.ogl.oglFunction = Comm.oCase.drawPointCloudRGB
-        task.featureOptions.ColorSource.SelectedItem = "LUT_Basics"
+        task.featureOptions.Color8USource.SelectedItem = "LUT_Basics"
         OptionParent.FindSlider("OpenGL Point Size").Value = 20
         desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
     End Sub
@@ -1376,7 +1376,7 @@ Public Class XO_OpenGL_ColorReduced3D : Inherits TaskParent
         dst2 = color8U.dst3
         dst2.ConvertTo(dst1, cv.MatType.CV_32FC3)
         labels(2) = "There are " + CStr(color8U.classCount) + " classes for " +
-                    task.featureOptions.ColorSource.Text
+                    task.featureOptions.Color8USource.Text
         dst1 = dst1.Normalize(0, 1, cv.NormTypes.MinMax)
         Dim split = dst1.Split()
         split(1) *= -1
@@ -6705,12 +6705,14 @@ End Class
 
 
 Public Class XO_Contour_RedCloudEdges : Inherits TaskParent
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "EdgeLine_Basics output", "", "Pixels below are both cell boundaries and edges."}
         desc = "Intersect the cell contours and the edges in the image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        edgeline.Run(task.grayStable)
         runRedList(src, labels(3))
         labels(2) = task.redList.labels(2) + " - Contours only.  Click anywhere to select a cell"
 
@@ -6719,7 +6721,7 @@ Public Class XO_Contour_RedCloudEdges : Inherits TaskParent
             DrawTour(dst2(rc.rect), rc.contour, 255, task.lineWidth)
         Next
 
-        dst3 = task.edgeLine.dst2 And dst2
+        dst3 = edgeline.dst2 And dst2
     End Sub
 End Class
 
@@ -6927,15 +6929,17 @@ End Class
 
 Public Class XO_Color8U_Edges : Inherits TaskParent
     Dim edges As New Edge_Canny
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         desc = "Find edges in the Color8U_Basics output"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.edgeLine.dst2
+        edgeline.Run(task.grayStable)
+        dst2 = edgeline.dst2
 
         edges.Run(dst2)
         dst3 = edges.dst2
-        labels(2) = task.edgeLine.strOut
+        labels(2) = edgeline.strOut
     End Sub
 End Class
 
@@ -13590,7 +13594,7 @@ End Class
 
 Public Class XO_RedList_NoDepth : Inherits TaskParent
     Public Sub New()
-        task.featureOptions.ColorSource.SelectedItem = "Reduction_Basics"
+        task.featureOptions.Color8USource.SelectedItem = "Reduction_Basics"
         desc = "Run RedList_Basics on just the regions with no depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

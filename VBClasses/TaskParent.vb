@@ -311,10 +311,6 @@ Public Class TaskParent : Implements IDisposable
     End Function
     Public Function srcMustBe8U(src As cv.Mat) As cv.Mat
         If src.Type <> cv.MatType.CV_8U Then
-            If task.featureOptions.ColorSource.SelectedItem() = "EdgeLine_Basics" Then
-                If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
-                Return task.edgeLine.dst1 ' already been run with each frame.
-            End If
             Static color8U As New Color8U_Basics
             color8U.Run(src)
             Return color8U.dst2

@@ -4,10 +4,9 @@ Public Class Contour_Basics : Inherits TaskParent
     Public contourList As New List(Of contourData)
     Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
     Dim sortContours As New Contour_Sort
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
         If task.contours Is Nothing Then task.contours = New Contour_Basics_List
-        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
-        OptionParent.findRadio("List").Checked = True
         labels(3) = "Input to OpenCV's FindContours"
         desc = "General purpose contour finder"
     End Sub
@@ -25,13 +24,14 @@ Public Class Contour_Basics : Inherits TaskParent
         Return task.contourD
     End Function
     Public Shared Function buildContours(input As cv.Mat) As cv.Point()()
-        Dim allContours As cv.Point()() = Nothing
         Static options As New Options_Contours
         options.Run()
 
-        Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+        Dim allContours As cv.Point()() = Nothing
+
         Dim mode = options.options2.ApproximationMode
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then
+            Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
             input.ConvertTo(dst, cv.MatType.CV_32SC1)
             cv.Cv2.FindContours(dst, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
         Else
@@ -40,7 +40,8 @@ Public Class Contour_Basics : Inherits TaskParent
         Return allContours
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type = cv.MatType.CV_8U Then dst3 = src Else dst3 = task.edgeLine.dst1
+        edgeline.Run(task.grayStable)
+        If src.Type = cv.MatType.CV_8U Then dst3 = src Else dst3 = edgeline.dst2
 
         sortContours.allContours = buildContours(dst3)
         If sortContours.allContours.Count <= 1 Then Exit Sub
@@ -1215,11 +1216,11 @@ End Class
 
 
 Public Class Contour_SortNew : Inherits TaskParent
-    Dim allContours As cv.Point()()
+    Public allContours As cv.Point()()
     Public rcList As New List(Of contourData)
     Public rcMap As New cv.Mat(task.workRes, cv.MatType.CV_32S, 0)
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
-        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Sort the contours by size and prepare the contour map"
     End Sub
@@ -1233,8 +1234,9 @@ Public Class Contour_SortNew : Inherits TaskParent
         Return mm.maxLoc
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
+        edgeline.Run(task.grayStable)
         If standalone Then
-            allContours = Contour_Basics.buildContours(task.edgeLine.dst2)
+            allContours = Contour_Basics.buildContours(edgeline.dst2)
         End If
 
         Dim sortedList As New SortedList(Of Integer, contourData)(New compareAllowIdenticalIntegerInverted)
@@ -1334,13 +1336,16 @@ End Class
 
 
 
+
+
 Public Class Contour_Basics_List : Inherits TaskParent
     Public contourList As New List(Of contourData)
     Public contourMap As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+    Public sortContours As New Contour_SortNew
     Public options As New Options_Contours
-    Public sortContours As New Contour_Sort
     Public Sub New()
         labels(3) = "Details for the selected contour."
+        task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
         desc = "List retrieval mode contour finder"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1348,14 +1353,11 @@ Public Class Contour_Basics_List : Inherits TaskParent
 
         dst3 = srcMustBe8U(src)
 
-        Dim mode = options.options2.ApproximationMode
-        cv.Cv2.FindContours(dst3, sortContours.allContours, Nothing, cv.RetrievalModes.List, mode)
-        If sortContours.allContours.Count <= 1 Then Exit Sub
-
+        sortContours.allContours = Contour_Basics.buildContours(dst3)
         sortContours.Run(src)
 
-        contourList = sortContours.contourList
-        contourMap = sortContours.contourMap
+        contourList = sortContours.rcList
+        contourMap = sortContours.rcMap
         labels(2) = sortContours.labels(2)
         dst2 = sortContours.dst2
         strOut = sortContours.strOut

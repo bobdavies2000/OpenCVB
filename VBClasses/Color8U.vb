@@ -9,8 +9,8 @@ Public Class Color8U_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.optionsChanged Or classifier Is Nothing Then
-            Dim index = task.featureOptions.ColorSource.SelectedIndex
-            Select Case task.featureOptions.ColorSource.Text
+            Dim index = task.featureOptions.Color8USource.SelectedIndex
+            Select Case task.featureOptions.Color8USource.Text
                 Case "BackProject_Full"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New BackProject_Full
                 Case "Bin4Way_Regions"
@@ -18,8 +18,7 @@ Public Class Color8U_Basics : Inherits TaskParent
                 Case "Binarize_DepthTiers"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Binarize_DepthTiers
                 Case "EdgeLine_Basics"
-                    If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
-                    If colorMethods(index) Is Nothing Then colorMethods(index) = task.edgeLine
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = New EdgeLine_Basics
                 Case "Hist3DColor_Basics"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Hist3Dcolor_Basics
                 Case "KMeans_Basics"
@@ -36,7 +35,7 @@ Public Class Color8U_Basics : Inherits TaskParent
             classifier = colorMethods(index)
         End If
 
-        If task.featureOptions.ColorSource.Text = "PCA_NColor_CPP" Then
+        If task.featureOptions.Color8USource.Text = "PCA_NColor_CPP" Then
             classifier.Run(src.Clone)
         Else
             If src.Type = cv.MatType.CV_8U Then
@@ -50,7 +49,7 @@ Public Class Color8U_Basics : Inherits TaskParent
         classCount = classifier.classCount
 
         dst3 = PaletteFull(dst2)
-        labels(3) = "dst3 = PaletteFull(dst2) - " + task.featureOptions.ColorSource.Text
+        labels(3) = "dst3 = PaletteFull(dst2) - " + task.featureOptions.Color8USource.Text
         labels(2) = "Color8U_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) +
                     " pixel classifications"
     End Sub
@@ -70,16 +69,16 @@ Public Class Color8U_Sweep : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeatLT Then
-            Static index As Integer = task.featureOptions.ColorSource.SelectedIndex + 1
-            If index >= task.featureOptions.ColorSource.Items.Count Then index = 0
-            task.featureOptions.ColorSource.SelectedIndex = index
+            Static index As Integer = task.featureOptions.Color8USource.SelectedIndex + 1
+            If index >= task.featureOptions.Color8USource.Items.Count Then index = 0
+            task.featureOptions.Color8USource.SelectedIndex = index
         End If
 
         color8u.Run(src)
         classCount = color8u.classCount
         dst2 = PaletteFull(color8u.dst2)
 
-        strOut = "Current color source = " + task.featureOptions.ColorSource.Text
+        strOut = "Current color source = " + task.featureOptions.Color8USource.Text
         SetTrueText(strOut, 2)
     End Sub
 End Class

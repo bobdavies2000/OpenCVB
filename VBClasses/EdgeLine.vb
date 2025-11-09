@@ -8,7 +8,7 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         cPtr = EdgeLineRaw_Open()
         labels(3) = "Palette version of dst2"
         If standalone Then task.gOptions.showMotionMask.Checked = True
-        desc = "Use EdgeLines to find edges/lines but without using motionMask"
+        desc = "Use EdgeLines to find edges/lines but without using motionMask directly"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If src.Channels <> 1 Then src = task.grayStable
@@ -310,39 +310,41 @@ End Class
 Public Class EdgeLine_BrickPoints : Inherits TaskParent
     Dim bPoint As New BrickPoint_Basics
     Public classCount As Integer
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
-        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Find lines using the brick points"
     End Sub
-    Public Shared Sub showSegment(dst As cv.Mat)
+    Public Sub showSegment(dst As cv.Mat)
         If task.quarterBeat Then
             Static debugSegment = 0
             debugSegment += 1
-            If debugSegment >= task.edgeLine.classCount Then
+            edgeline.Run(task.grayStable)
+            If debugSegment >= edgeline.classCount Then
                 debugSegment = 0
                 dst.SetTo(0)
             End If
-            If debugSegment >= task.edgeLine.classCount Then debugSegment = 0
+            If debugSegment >= edgeline.classCount Then debugSegment = 0
             If debugSegment Then
-                task.edgeLine.dst1 = task.edgeLine.dst2.InRange(debugSegment, debugSegment)
-                task.edgeLine.dst1.CopyTo(dst, task.edgeLine.dst1)
+                edgeline.dst1 = edgeline.dst2.InRange(debugSegment, debugSegment)
+                edgeline.dst1.CopyTo(dst, edgeline.dst1)
             End If
             debugSegment += 1
         End If
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        edgeline.Run(task.grayStable)
         bPoint.Run(src)
         labels(2) = bPoint.labels(2)
 
-        dst2 = task.edgeLine.dst2
-        dst3 = PaletteFull(task.edgeLine.dst2)
+        dst2 = edgeline.dst2
+        dst3 = PaletteFull(edgeline.dst2)
 
-        Dim segments(task.edgeLine.classCount) As List(Of cv.Point2f)
+        Dim segments(edgeline.classCount) As List(Of cv.Point2f)
         Dim brickCount As Integer, segmentCount As Integer
         For Each pt In bPoint.ptList
-            Dim val = task.edgeLine.dst2.Get(Of Byte)(pt.Y, pt.X)
+            Dim val = edgeline.dst2.Get(Of Byte)(pt.Y, pt.X)
             If val > 0 And val < 255 Then
                 If segments(val) Is Nothing Then
                     segments(val) = New List(Of cv.Point2f)
@@ -353,7 +355,7 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
             End If
         Next
 
-        labels(3) = CStr(task.edgeLine.classCount) + " segments were found and " + CStr(segmentCount) + " contained brick points"
+        labels(3) = CStr(edgeline.classCount) + " segments were found and " + CStr(segmentCount) + " contained brick points"
         labels(3) += " " + CStr(brickCount) + " bricks were part of a segment"
 
         classCount = 0
@@ -378,16 +380,17 @@ End Class
 
 Public Class EdgeLine_DepthSegments : Inherits TaskParent
     Public segments As New List(Of List(Of cv.Point))
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
-        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         labels(3) = "Highlighting the individual line segments one by one."
         desc = "Break up any edgeline segments that cross depth boundaries."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.edgeLine.dst2
+        edgeline.Run(task.grayStable)
+        dst2 = edgeline.dst2
 
         segments.Clear()
-        For Each rc In task.edgeLine.rcList
+        For Each rc In edgeline.rcList
             Dim nextSeg As New List(Of cv.Point)
             Dim lastDepth = -1
             For Each pt In rc.contour
@@ -428,7 +431,6 @@ End Class
 Public Class EdgeLine_LeftRight : Inherits TaskParent
     Dim edges As New EdgeLine_Basics
     Public Sub New()
-        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         labels(3) = "Right View: Note it is updated on every frame - it does not use the motion mask."
         desc = "Build the left and right edge lines."
     End Sub

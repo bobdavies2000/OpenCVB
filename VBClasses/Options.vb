@@ -204,7 +204,7 @@ Public Class Options_Contours : Inherits OptionParent
             radio.addRadio("FloodFill")
             radio.addRadio("List")
             radio.addRadio("Tree")
-            radio.check(1).Checked = True
+            radio.check(3).Checked = True
         End If
     End Sub
     Public Sub Run()

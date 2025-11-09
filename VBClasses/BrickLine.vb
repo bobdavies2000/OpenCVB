@@ -236,7 +236,7 @@ Public Class BrickLine_EdgesNoEdges : Inherits TaskParent
             Next
         End If
 
-        dst3.SetTo(white, task.edgeLine.dst1)
+        dst3.SetTo(white, edgeline.dst2)
         labels(2) = CStr(edges.Count) + " bricks had edges"
         labels(3) = CStr(noEdges.Count) + " bricks were featureless"
     End Sub
@@ -251,8 +251,8 @@ Public Class BrickLine_LeftRight : Inherits TaskParent
     Dim fLess As New BrickLine_EdgesNoEdges
     Dim mats As New Mat_4Click
     Public bestBricks As New List(Of Integer)
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
-        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         labels(1) = "Left edges, right edges, bricks with left image edges, bricks with right image edges"
         labels(2) = "The cells below have depth and good correlation left to right"
         desc = "Display a line in both the left and right images using the bricks that contain the line"
@@ -269,8 +269,8 @@ Public Class BrickLine_LeftRight : Inherits TaskParent
             DrawRect(mats.mat(2), task.gridRects(index), white)
         Next
 
-        task.edgeLine.Run(edges.dst3)
-        fLess.Run(task.edgeLine.dst2)
+        edgeline.Run(edges.dst3)
+        fLess.Run(edgeline.dst2)
         mats.mat(3) = fLess.dst2.Clone
         Dim rightEdges As New List(Of Integer)(fLess.edges)
         For Each index In rightEdges

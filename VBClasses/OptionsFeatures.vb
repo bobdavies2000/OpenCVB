@@ -65,9 +65,9 @@ Public Class OptionsFeatures
 
         For i = 0 To colorMethods.Count - 1
             Dim method = colorMethods(i)
-            ColorSource.Items.Add(method)
+            Color8USource.Items.Add(method)
         Next
-        ColorSource.SelectedItem = "Reduction_Basics"
+        Color8USource.SelectedItem = "Reduction_Basics"
     End Sub
 
 
@@ -102,7 +102,7 @@ Public Class OptionsFeatures
         task.optionsChanged = True
         FeatureSampleSizeLabel.Text = CStr(task.FeatureSampleSize)
     End Sub
-    Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ColorSource.SelectedIndexChanged
+    Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles Color8USource.SelectedIndexChanged
         task.optionsChanged = True
     End Sub
 End Class
