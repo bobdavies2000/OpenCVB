@@ -1,55 +1,62 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class PolyLine_Basics : Inherits TaskParent
-    Public edgeList As New List(Of List(Of cv.Point))
-    Dim eSeg As New EdgeLine_Basics
+    Dim edgeLine As New EdgeLine_Basics
+    Dim rcList As New List(Of rcData)
     Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Retain edges where there was no motion."
     End Sub
+    Private Sub rcDataDraw(rc As rcData)
+
+    End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim histogram As New cv.Mat
-        Dim lastList As New List(Of List(Of cv.Point))(edgeList)
-        Dim histarray(lastList.Count - 1) As Single
+        Dim histarray(edgeLine.classCount - 1) As Single
 
-        edgeList.Clear()
-        edgeList.Add(New List(Of cv.Point)) ' placeholder for zero
-        If lastList.Count > 0 Then
-            Dim ranges1 = New cv.Rangef() {New cv.Rangef(0, lastList.Count)}
-            cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {lastList.Count}, ranges1)
+        rcList.Clear()
+        dst1.SetTo(0)
+        If edgeLine.rcList.Count Then
+            Dim ranges1 = New cv.Rangef() {New cv.Rangef(0, edgeLine.rcList.Count)}
+            cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {edgeLine.rcList.Count}, ranges1)
             Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
             For i = 1 To histarray.Count - 1
-                If histarray(i) = 0 Then edgeList.Add(lastList(i))
+                If histarray(i) = 0 Then
+                    rcList.Add(edgeLine.rcList(i - 1))
+                End If
             Next
         End If
+        Dim removed = edgeLine.rcList.Count - rcList.Count
 
-        eSeg.Run(src)
+        edgeLine.Run(src)
 
-        ReDim histarray(eSeg.segments.Count - 1)
+        ReDim histarray(edgeLine.classCount - 1)
 
-        eSeg.dst3.ConvertTo(dst1, cv.MatType.CV_32F)
+        edgeLine.dst2.ConvertTo(dst1, cv.MatType.CV_32F)
 
-        Dim ranges2 = New cv.Rangef() {New cv.Rangef(0, eSeg.segments.Count)}
-        cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {eSeg.segments.Count}, ranges2)
+        Dim ranges2 = New cv.Rangef() {New cv.Rangef(0, edgeLine.classCount)}
+        cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {edgeLine.classCount}, ranges2)
         Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
-        For i = 1 To histarray.Count - 1
-            If histarray(i) > 0 Then edgeList.Add(eSeg.segments(i - 1))
-        Next
-
-        dst1.SetTo(0)
         dst2.SetTo(0)
-        For i = 1 To edgeList.Count - 1
-            Dim nextList = New List(Of List(Of cv.Point))
-            nextList.Add(edgeList(i))
-            Dim n = edgeList(i).Count
-            If n > 0 Then
-                Dim distance As Double = Math.Sqrt((edgeList(i)(0).X - edgeList(i)(n - 1).X) * (edgeList(i)(0).X - edgeList(i)(n - 1).X) +
-                                                   (edgeList(i)(0).Y - edgeList(i)(n - 1).Y) * (edgeList(i)(0).Y - edgeList(i)(n - 1).Y))
+        Dim count As Integer
+        Dim nextList = New List(Of List(Of cv.Point))
+        For Each rc In edgeLine.rcList
+            If histarray(rc.index - 1) > 0 And rc.contour.Count > 0 Then
+                count += 1
+                Dim n = rc.contour.Count - 1
+                nextList.Clear()
+                nextList.Add(rc.contour)
+                Dim distance As Double = Math.Sqrt((rc.contour(0).X - rc.contour(n).X) *
+                                                   (rc.contour(0).X - rc.contour(n).X) +
+                                                   (rc.contour(0).Y - rc.contour(n).Y) *
+                                                   (rc.contour(0).Y - rc.contour(n).Y))
                 Dim drawClosed = distance < 10
-                cv.Cv2.Polylines(dst1, nextList, drawClosed, i, task.lineWidth, cv.LineTypes.Link4)
-                cv.Cv2.Polylines(dst2, nextList, drawClosed, cv.Scalar.White, task.lineWidth, task.lineType)
+                cv.Cv2.Polylines(dst1(rc.rect), nextList, drawClosed, rc.index, task.lineWidth, cv.LineTypes.Link4)
+                cv.Cv2.Polylines(dst2(rc.rect), nextList, drawClosed, cv.Scalar.White, task.lineWidth, task.lineType)
+                rcList.Add(rc)
             End If
         Next
 
@@ -57,9 +64,9 @@ Public Class PolyLine_Basics : Inherits TaskParent
         dst3 = PaletteBlackZero(dst3)
 
         If task.heartBeat Then
-            labels(2) = CStr(eSeg.segments.Count) + " lines found in EdgeLines C++ in the latest image and " +
-                        CStr(edgeList.Count) + " resulted after filtering with the motion mask."
-            labels(3) = "The " + CStr(eSeg.segments.Count) + " segments found in the current image are colored with the index of each segment"
+            labels(2) = CStr(edgeLine.classCount) + " lines found in the latest image and " +
+                        CStr(removed) + " removed filtering for motion and " +
+                        CStr(count) + " added to rcList after filtereing for motion."
         End If
     End Sub
 End Class

@@ -1,11 +1,13 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class EdgeLine_Basics : Inherits TaskParent
-    Public segments As New List(Of List(Of cv.Point))
+    Public rcList As New List(Of rcData)
+    Public rcMap As New cv.Mat
     Public classCount As Integer
     Public Sub New()
         task.edgeLine = Me
         cPtr = EdgeLineRaw_Open()
+        labels(3) = "Palette version of dst2"
         If standalone Then task.gOptions.showMotionMask.Checked = True
         desc = "Use EdgeLines to find edges/lines but without using motionMask"
     End Sub
@@ -15,49 +17,38 @@ Public Class EdgeLine_Basics : Inherits TaskParent
         Dim cppData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length)
         Dim handlesrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imageEdgeWidth = 2
-        Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols, imageEdgeWidth)
+        Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                          task.lineWidth)
         handlesrc.Free()
-        dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
-        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+        rcMap = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
+        rcMap.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        If dst2.Width >= 1280 Then imageEdgeWidth = 4
+        Dim imageEdgeWidth = If(dst2.Width >= 1280, 4, 2)
         ' prevent leaks at the image boundary...
         dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth)
 
         Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, EdgeLineRaw_Rects(cPtr))
 
-        classCount = EdgeLineRaw_GetSegCount(cPtr)
+        classCount = Math.Min(EdgeLineRaw_GetSegCount(cPtr), 255)
         If classCount = 0 Then Exit Sub ' nothing to work with....
         Dim rects(classCount * 4) As Integer
         Marshal.Copy(rectData.Data, rects, 0, rects.Length)
 
-        Dim rectList As New List(Of cv.Rect)
-        rectList.Clear()
-        For i = 0 To classCount * 4 - 4 Step 4
-            rectList.Add(New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3)))
-        Next
-
-        segments.Clear()
-        Dim pointCount As Integer
-        For i = 0 To classCount - 1
-            Dim len = EdgeLineRaw_NextLength(cPtr)
-            If len < 2 Then Continue For
-            Dim nextSeg(len * 2 - 1) As Integer
-            Dim segPtr = EdgeLineRaw_NextSegment(cPtr)
-            Marshal.Copy(segPtr, nextSeg, 0, nextSeg.Length)
-
-            Dim segment As New List(Of cv.Point)
-            For j = 0 To nextSeg.Length - 2 Step 2
-                segment.Add(New cv.Point(nextSeg(j), nextSeg(j + 1)))
-                pointCount += 1
-            Next
-            segments.Add(segment)
-        Next
-        labels(2) = CStr(classCount) + " segments were found using " + CStr(pointCount) + " points. " +
-                    CStr(task.toggleOn)
-
         dst3.SetTo(0)
+        rcList.Clear()
+        For i = 0 To classCount * 4 - 4 Step 4
+            Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
+            Dim index = rcList.Count + 1
+            Dim mask = rcMap(r)
+            Dim rc = New rcData(mask, r, index, 0)
+
+            Dim gridIndex = task.gridMap.Get(Of Integer)(rc.rect.TopLeft.Y, rc.rect.TopLeft.X)
+            rc.color = task.scalarColors(gridIndex Mod 255)
+            rcList.Add(rc)
+            If standaloneTest() Then dst3(rc.rect).SetTo(rc.color, rc.mask)
+        Next
+
+        labels(2) = CStr(classCount) + " line segments were found"
     End Sub
     Public Sub Close()
         EdgeLineRaw_Close(cPtr)
@@ -252,11 +243,11 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
         If task.quarterBeat Then
             Static debugSegment = 0
             debugSegment += 1
-            If debugSegment >= task.edgeLine.segments.Count Then
+            If debugSegment >= task.edgeLine.classCount Then
                 debugSegment = 0
                 dst.SetTo(0)
             End If
-            If debugSegment >= task.edgeLine.segments.Count Then debugSegment = 0
+            If debugSegment >= task.edgeLine.classCount Then debugSegment = 0
             If debugSegment Then
                 task.edgeLine.dst1 = task.edgeLine.dst2.InRange(debugSegment, debugSegment)
                 task.edgeLine.dst1.CopyTo(dst, task.edgeLine.dst1)
@@ -312,17 +303,17 @@ Public Class EdgeLine_DepthSegments : Inherits TaskParent
     Public segments As New List(Of List(Of cv.Point))
     Public Sub New()
         If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
-        labels(3) = "Highlighting the individual segments one by one."
+        labels(3) = "Highlighting the individual line segments one by one."
         desc = "Break up any edgeline segments that cross depth boundaries."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.edgeLine.dst2
 
         segments.Clear()
-        For Each seg In task.edgeLine.segments
+        For Each rc In task.edgeLine.rcList
             Dim nextSeg As New List(Of cv.Point)
             Dim lastDepth = -1
-            For Each pt In seg
+            For Each pt In rc.contour
                 Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
                 If lastDepth > 0 And Math.Abs(lastDepth - depth) > 1 Then
                     If nextSeg.Count > 0 Then
@@ -370,65 +361,5 @@ Public Class EdgeLine_LeftRight : Inherits TaskParent
 
         edges.Run(task.rightView)
         dst3 = edges.dst2.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class EdgeLine_rcData : Inherits TaskParent
-    Public segments As New List(Of List(Of cv.Point))
-    Public rcList As New List(Of rcData)
-    Public rcMap As New cv.Mat
-    Public classCount As Integer
-    Public Sub New()
-        cPtr = EdgeLineRaw_Open()
-        labels(3) = "Palette version of dst2"
-        If standalone Then task.gOptions.showMotionMask.Checked = True
-        desc = "Use EdgeLines to find edges/lines but without using motionMask"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels <> 1 Then src = task.grayStable
-
-        Dim cppData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
-        Dim handlesrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                          task.lineWidth)
-        handlesrc.Free()
-        rcMap = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
-        rcMap.ConvertTo(dst2, cv.MatType.CV_8U)
-
-        Dim imageEdgeWidth = If(dst2.Width >= 1280, 4, 2)
-        ' prevent leaks at the image boundary...
-        dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth)
-
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, EdgeLineRaw_Rects(cPtr))
-
-        classCount = Math.Min(EdgeLineRaw_GetSegCount(cPtr), 255)
-        If classCount = 0 Then Exit Sub ' nothing to work with....
-        Dim rects(classCount * 4) As Integer
-        Marshal.Copy(rectData.Data, rects, 0, rects.Length)
-
-        dst3.SetTo(0)
-        rcList.Clear()
-        For i = 0 To classCount * 4 - 4 Step 4
-            Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
-            Dim index = rcList.Count + 1
-            Dim mask = rcMap(r)
-            Dim rc = New rcData(mask, r, index, 0)
-
-            Dim gridIndex = task.gridMap.Get(Of Integer)(rc.rect.TopLeft.Y, rc.rect.TopLeft.X)
-            rc.color = task.scalarColors(gridIndex Mod 255)
-            rcList.Add(rc)
-            If standaloneTest() Then dst3(rc.rect).SetTo(rc.color, rc.mask)
-        Next
-
-        labels(2) = CStr(classCount) + " segments were found"
-    End Sub
-    Public Sub Close()
-        EdgeLineRaw_Close(cPtr)
     End Sub
 End Class
