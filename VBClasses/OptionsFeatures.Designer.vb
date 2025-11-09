@@ -44,7 +44,7 @@ Partial Class OptionsFeatures
         ' FeatureMethod
         ' 
         FeatureMethod.FormattingEnabled = True
-        FeatureMethod.Location = New Point(31, 54)
+        FeatureMethod.Location = New Point(208, 3)
         FeatureMethod.Margin = New Padding(4)
         FeatureMethod.Name = "FeatureMethod"
         FeatureMethod.Size = New Size(294, 38)
@@ -53,7 +53,7 @@ Partial Class OptionsFeatures
         ' EdgeMethods
         ' 
         EdgeMethods.FormattingEnabled = True
-        EdgeMethods.Location = New Point(364, 54)
+        EdgeMethods.Location = New Point(208, 48)
         EdgeMethods.Margin = New Padding(4)
         EdgeMethods.Name = "EdgeMethods"
         EdgeMethods.Size = New Size(294, 38)
@@ -62,7 +62,7 @@ Partial Class OptionsFeatures
         ' Label1
         ' 
         Label1.AutoSize = True
-        Label1.Location = New Point(364, 11)
+        Label1.Location = New Point(55, 53)
         Label1.Margin = New Padding(4, 0, 4, 0)
         Label1.Name = "Label1"
         Label1.Size = New Size(145, 30)
@@ -165,20 +165,20 @@ Partial Class OptionsFeatures
         ' Label4
         ' 
         Label4.AutoSize = True
-        Label4.Location = New Point(364, 538)
+        Label4.Location = New Point(34, 94)
         Label4.Margin = New Padding(4, 0, 4, 0)
         Label4.Name = "Label4"
-        Label4.Size = New Size(176, 30)
+        Label4.Size = New Size(166, 30)
         Label4.TabIndex = 23
-        Label4.Text = "RedColor Source"
+        Label4.Text = "Color8U Source"
         ' 
         ' ColorSource
         ' 
         ColorSource.FormattingEnabled = True
-        ColorSource.Location = New Point(40, 530)
+        ColorSource.Location = New Point(208, 94)
         ColorSource.Margin = New Padding(4)
         ColorSource.Name = "ColorSource"
-        ColorSource.Size = New Size(285, 38)
+        ColorSource.Size = New Size(294, 38)
         ColorSource.TabIndex = 22
         ' 
         ' OptionsFeatures

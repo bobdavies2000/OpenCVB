@@ -19,7 +19,7 @@ Public Class Color8U_Basics : Inherits TaskParent
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Binarize_DepthTiers
                 Case "EdgeLine_Basics"
                     If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
-                    If colorMethods(index) Is Nothing Then colorMethods(index) = task.edgeLine ' New EdgeLine_Basics
+                    If colorMethods(index) Is Nothing Then colorMethods(index) = task.edgeLine
                 Case "Hist3DColor_Basics"
                     If colorMethods(index) Is Nothing Then colorMethods(index) = New Hist3Dcolor_Basics
                 Case "KMeans_Basics"

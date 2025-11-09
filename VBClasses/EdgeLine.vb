@@ -5,7 +5,6 @@ Public Class EdgeLine_Basics : Inherits TaskParent
     Public rcMap As New cv.Mat
     Public classCount As Integer
     Public Sub New()
-        task.edgeLine = Me
         cPtr = EdgeLineRaw_Open()
         labels(3) = "Palette version of dst2"
         If standalone Then task.gOptions.showMotionMask.Checked = True
@@ -52,6 +51,84 @@ Public Class EdgeLine_Basics : Inherits TaskParent
     End Sub
     Public Sub Close()
         EdgeLineRaw_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+Public Class EdgeLine_Motion : Inherits TaskParent
+    Dim edgeLine As New EdgeLine_Basics
+    Public rcList As New List(Of rcData)
+    Public classCount As Integer
+    Public Sub New()
+        If standalone Then task.gOptions.showMotionMask.Checked = True
+        labels(1) = "CV_8U edges - input to PalleteBlackZero"
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        desc = "Retain edges where there was no motion."
+    End Sub
+    Private Sub rcDataDraw(rc As rcData)
+        Static nextList = New List(Of List(Of cv.Point))
+        Dim n = rc.contour.Count - 1
+        nextList.Clear()
+        nextList.Add(rc.contour)
+        cv.Cv2.Polylines(dst2(rc.rect), nextList, False, cv.Scalar.All(rc.index), task.lineWidth, task.lineType)
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim histogram As New cv.Mat
+        Dim histarray(edgeLine.rcList.Count - 1) As Single
+        If task.motionRect.Width = 0 Then Exit Sub ' no change!
+
+        Dim newList As New List(Of rcData)
+        dst2.SetTo(0)
+        If edgeLine.rcList.Count Then
+            Dim ranges1 = New cv.Rangef() {New cv.Rangef(0, edgeLine.rcList.Count)}
+            cv.Cv2.CalcHist({dst2(task.motionRect)}, {0}, New cv.Mat, histogram,
+                            1, {edgeLine.rcList.Count}, ranges1)
+            Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+
+            For i = 1 To histarray.Count - 1
+                If histarray(i) = 0 Then
+                    Dim rc = edgeLine.rcList(i - 1)
+                    rc.index = newList.Count + 1
+                    newList.Add(rc)
+
+                    rcDataDraw(rc)
+                End If
+            Next
+        End If
+        Dim removed = edgeLine.rcList.Count - newList.Count
+
+        edgeLine.Run(src)
+        If edgeLine.classCount = 0 Then Exit Sub
+        ReDim histarray(edgeLine.classCount - 1)
+
+        Dim ranges2 = New cv.Rangef() {New cv.Rangef(0, edgeLine.classCount)}
+        cv.Cv2.CalcHist({edgeLine.dst2(task.motionRect)}, {0}, New cv.Mat, histogram,
+                        1, {edgeLine.classCount}, ranges2)
+        Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+
+        Dim count As Integer
+        For Each rc In edgeLine.rcList
+            If histarray(rc.index - 1) > 0 And rc.contour.Count > 0 Then
+                count += 1
+                rc.index = newList.Count + 1
+                newList.Add(rc)
+
+                rcDataDraw(rc)
+            End If
+        Next
+
+        dst2.ConvertTo(dst1, cv.MatType.CV_8U)
+        dst3 = PaletteBlackZero(dst1)
+
+        rcList = New List(Of rcData)(newList)
+        classCount = rcList.Count
+
+        labels(2) = CStr(edgeLine.classCount) + " lines found. " +
+                    CStr(removed) + " removed and " + CStr(count) + " added " +
+                    " to rcList after filtering for motion."
     End Sub
 End Class
 
@@ -361,5 +438,18 @@ Public Class EdgeLine_LeftRight : Inherits TaskParent
 
         edges.Run(task.rightView)
         dst3 = edges.dst2.Clone
+    End Sub
+End Class
+
+
+
+
+
+Public Class EdgeLine_ : Inherits TaskParent
+    Public Sub New()
+        desc = "description"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
 End Class

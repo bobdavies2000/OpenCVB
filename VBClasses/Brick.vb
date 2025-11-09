@@ -429,8 +429,8 @@ End Class
 
 Public Class Brick_EdgeDraw : Inherits TaskParent
     Dim regions As New Region_Contours
+    Dim edgeline As New EdgeLine_Basics
     Public Sub New()
-        If task.edgeLine Is Nothing Then task.edgeLine = New EdgeLine_Basics
         desc = "Lines can mean cells are connected."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -438,7 +438,8 @@ Public Class Brick_EdgeDraw : Inherits TaskParent
         dst2 = regions.dst3
         labels(2) = regions.labels(2)
 
-        dst2.SetTo(cv.Scalar.White, task.edgeLine.dst2) ' edgeLine has already been run
+        edgeline.Run(task.grayStable)
+        dst2.SetTo(cv.Scalar.White, edgeline.dst1)
     End Sub
 End Class
 
