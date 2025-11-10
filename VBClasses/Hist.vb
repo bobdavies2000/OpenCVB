@@ -1421,7 +1421,7 @@ Public Class Hist_ToggleFeatureLess : Inherits TaskParent
         desc = "Toggle between a histogram of the entire image and one of the featureless regions found with grid points."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(task.grayStable.Clone)
+        fLess.Run(src)
         dst3 = fLess.dst2
         labels(3) = fLess.labels(2)
 
@@ -1429,10 +1429,10 @@ Public Class Hist_ToggleFeatureLess : Inherits TaskParent
             plotHist.histMask = New cv.Mat
             labels(2) = "Histogram of the whole image."
         Else
-            plotHist.histMask = fLess.dst2.Clone
+            plotHist.histMask = fLess.dst1.Clone
             labels(2) = "Histogram of just the featureless regions."
         End If
-        plotHist.Run(task.grayStable.Clone)
+        plotHist.Run(task.grayStable)
         dst2 = plotHist.dst2
     End Sub
 End Class

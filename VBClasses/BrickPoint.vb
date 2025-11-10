@@ -133,8 +133,8 @@ Public Class BrickPoint_MaskRedColor : Inherits TaskParent
         desc = "Run RedColor with the featureless mask from BrickPoint_FeatureLess"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        fLess.Run(src)
-        dst2 = runRedList(src, labels(2), fLess.dst2)
+        fLess.Run(task.grayStable)
+        dst2 = runRedList(src, labels(2), fLess.dst1)
     End Sub
 End Class
 
@@ -376,13 +376,14 @@ End Class
 
 Public Class BrickPoint_FeatureLess : Inherits TaskParent
     Public classCount As Integer
-    Dim contours As New Contour_Basics
+    Public contours As New Contour_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)  ' mask for the featureless regions.
         desc = "Identify each brick as part of a contour or not."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         contours.Run(src)
+        dst1 = contours.dst3
         dst2 = contours.dst2
         dst3 = ShowAddweighted(dst2, src, labels(3))
         classCount = contours.contourList.Count

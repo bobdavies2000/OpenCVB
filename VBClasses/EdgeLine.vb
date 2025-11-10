@@ -442,16 +442,3 @@ Public Class EdgeLine_LeftRight : Inherits TaskParent
         dst3 = edges.dst2.Clone
     End Sub
 End Class
-
-
-
-
-
-Public Class EdgeLine_ : Inherits TaskParent
-    Public Sub New()
-        desc = "description"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-    End Sub
-End Class

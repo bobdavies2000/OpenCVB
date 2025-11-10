@@ -42,8 +42,12 @@ Public Class Contour_Basics : Inherits TaskParent
         Return allContours
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edgeline.Run(task.grayStable)
-        If src.Type = cv.MatType.CV_8U Then dst3 = src Else dst3 = edgeline.dst2
+        If src.Type = cv.MatType.CV_8U Then
+            dst3 = src
+        Else
+            edgeline.Run(task.grayStable)
+            dst3 = edgeline.dst2
+        End If
 
         sortContours.allContours = buildContours(dst3)
         If sortContours.allContours.Count <= 1 Then Exit Sub
