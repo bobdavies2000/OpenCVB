@@ -697,8 +697,8 @@ End Class
 
 Public Class Cloud_Templates : Inherits TaskParent
     Public templateX As New cv.Mat, templateY As New cv.Mat
+    Dim contours As New Contour_Basics
     Public Sub New()
-        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         templateX = New cv.Mat(task.workRes, cv.MatType.CV_32F)
         templateY = New cv.Mat(task.workRes, cv.MatType.CV_32F)
         For i = 0 To templateX.Width - 1
@@ -719,10 +719,10 @@ Public Class Cloud_Templates : Inherits TaskParent
         desc = "Prepare for injecting depth into the point cloud."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.contours.Run(src)
+        contours.Run(src)
         If standalone Then
             src = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-            For Each contour In task.contours.contourList
+            For Each contour In contours.contourList
                 If contour.depth = 0 Then Continue For
                 contour.depth = task.pcSplit(2)(contour.rect).Mean(contour.mask)
                 src(contour.rect).SetTo(contour.depth, contour.mask)

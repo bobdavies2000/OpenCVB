@@ -16164,3 +16164,21 @@ Public Class XO_Contour_Basics_Tree : Inherits TaskParent
         dst2 = sortContours.dst2
     End Sub
 End Class
+
+
+
+
+
+
+Public Class XO_Contour_SortTest : Inherits TaskParent
+    Public Sub New()
+        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
+        desc = "Test the contour sort (by size) algorithm nearby. Contour_Sort standalone does nothing."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        task.contours.Run(src)
+        dst2 = task.contours.dst2
+        labels = task.contours.labels
+        SetTrueText(task.contours.strOut, 3)
+    End Sub
+End Class

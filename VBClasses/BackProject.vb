@@ -76,14 +76,14 @@ End Class
 
 Public Class BackProject_FeatureLess : Inherits TaskParent
     Dim bProject As New BackProject_Basics
+    Dim contours As New Contour_Basics
     Public Sub New()
-        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         labels(3) = "Move mouse over the histogram to backproject a column"
         desc = "Create a histogram of the featureless regions"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.contours.Run(src)
-        task.contours.contourMap.ConvertTo(dst1, cv.MatType.CV_32F)
+        contours.Run(src)
+        contours.contourMap.ConvertTo(dst1, cv.MatType.CV_32F)
         bProject.Run(dst1) ' calcHist doesn't support 32S
         dst2 = bProject.dst2
         dst3 = bProject.dst3

@@ -91,15 +91,15 @@ End Class
 
 Public Class Hull_Contour : Inherits TaskParent
     Public hull As New List(Of cv.Point)
-    Public contours1 As New Contour_Basics_List
-    Public contours2 As New Contour_Basics_List
+    Public contours1 As New Contour_Basics
+    Public contours2 As New Contour_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Compare the hull to the contour of a contour cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         contours1.Run(src)
-        task.contourD = Contour_Basics.selectContour(contours1)
+        task.contourD = contours1.selectContour()
 
         dst2.SetTo(0)
         dst2(task.contourD.rect).SetTo(255, task.contourD.mask)

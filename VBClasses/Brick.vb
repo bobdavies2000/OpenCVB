@@ -6,7 +6,6 @@ Public Class Brick_Basics : Inherits TaskParent
     Public brickList As New List(Of brickData)
     Public options As New Options_Features
     Public Sub New()
-        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
         task.bricks = Me
         labels(3) = "Right camera image.  Highlighted rectangle matches the dst2 (left) rectangle."
         desc = "Create the grid of bricks that reduce depth volatility"
@@ -80,7 +79,6 @@ Public Class Brick_Basics : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        task.contours.Run(src)
 
         If task.bricks.brickList.Count <> task.gridRects.Count Then task.bricks.brickList.Clear()
 
