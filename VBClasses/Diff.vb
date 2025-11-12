@@ -107,7 +107,7 @@ End Class
 
 
 Public Class Diff_Depth32f : Inherits TaskParent
-    Public lastDepth32f As New cv.Mat
+    Public lastDepth32f As cv.Mat
     Dim options As New Options_DiffDepth
     Public Sub New()
         desc = "Where is the depth difference between frames greater than X centimeters."
@@ -115,14 +115,16 @@ Public Class Diff_Depth32f : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If task.optionsChanged Or lastDepth32f.Width = 0 Then lastDepth32f = task.pcSplit(2).Clone
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2).Clone
 
-        cv.Cv2.Absdiff(task.pcSplit(2), lastDepth32f, dst1)
+        If task.optionsChanged Or lastDepth32f Is Nothing Then lastDepth32f = task.pcSplit(2).Clone
+
+        cv.Cv2.Absdiff(src, lastDepth32f, dst1)
         Dim mm As mmData = GetMinMax(dst1)
 
         dst2 = dst1.Threshold(options.meters, 255, cv.ThresholdTypes.Binary)
 
-        lastDepth32f = task.pcSplit(2).Clone
+        lastDepth32f = src.Clone
         If task.heartBeat Then
             labels(2) = "Mask where depth difference between frames is more than " + CStr(options.millimeters) + " mm's"
             Dim count = dst2.CountNonZero()

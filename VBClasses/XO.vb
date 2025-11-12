@@ -16279,3 +16279,272 @@ Public Class Motion_CoreOld : Inherits TaskParent
         labels(2) = CStr(motionList.Count) + " grid rects had motion."
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+Public Class XO_Line_Generations : Inherits TaskParent
+    Dim knn As New KNN_Basics
+    Dim match3 As New Line_LeftRightMatch3
+    Public lpOutput As New List(Of lpData)
+    Public Sub New()
+        desc = "Identify any lines in both the current and the previous frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        match3.Run(emptyMat)
+        dst2 = match3.dst2
+        labels(2) = match3.labels(2)
+
+        If match3.lpOutput.Count = 0 Then Exit Sub ' nothing was matched...
+
+        Static lplast As New List(Of lpData)(match3.lpOutput)
+
+        knn.queries.Clear()
+        For Each lp In match3.lpOutput
+            Dim pt As New cv.Point(lp.gridIndex1, lp.gridIndex2)
+            knn.queries.Add(pt)
+        Next
+
+        If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+
+        knn.Run(emptyMat)
+
+        If lplast.Count = 0 Then lplast = New List(Of lpData)(match3.lpOutput)
+
+        lpOutput.Clear()
+        For Each lp In match3.lpOutput
+            Dim index = knn.result(lp.index, 0)
+            If index >= match3.lpOutput.Count Then Continue For
+            If index >= lplast.Count And lplast.Count > 0 Then Continue For
+            Dim age As Integer = 1
+            If Math.Abs(lplast(index).angle - match3.lpOutput(index).angle) < task.angleThreshold Then
+                Dim index1 = match3.lpOutput(index).gridIndex1
+                Dim index2 = match3.lpOutput(index).gridIndex2
+                If task.grid.gridNeighbors(index1).Contains(lplast(index).gridIndex1) And
+                    task.grid.gridNeighbors(index2).Contains(lplast(index).gridIndex2) Then
+                    age = lplast(index).age + 1
+                End If
+            End If
+            lp.age = age
+            lpOutput.Add(lp)
+            SetTrueText(CStr(lp.age), lp.ptCenter, 2)
+            SetTrueText(CStr(lp.age), lp.ptCenter, 3)
+        Next
+
+        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+        lplast = New List(Of lpData)(lpOutput)
+    End Sub
+End Class
+
+
+
+
+Public Class Line_TestAge : Inherits TaskParent
+    Dim knnLine As New XO_Line_Generations
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Are there ever frames where no line is connected to a line on a previous frame?"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        knnLine.Run(src)
+        dst2 = knnLine.dst2
+        labels(2) = knnLine.labels(2)
+
+        Dim matched As New List(Of Integer)
+        For Each lp In knnLine.lpOutput
+            If lp.age > 1 Then matched.Add(lp.index)
+            SetTrueText(CStr(lp.age), lp.ptCenter, 3)
+        Next
+
+        Static strList As New List(Of String)
+        Dim stepSize = 10
+        If matched.Count > 0 Then
+            strList.Add(CStr(matched.Count) + ", ")
+        Else
+            strList.Add("    ")
+        End If
+        If strList.Count > 200 Then
+            For i = 0 To stepSize - 1
+                strList.RemoveAt(0)
+            Next
+        End If
+
+        strOut = ""
+        Dim missingCount As Integer
+        For i = 0 To strList.Count - 1 Step stepSize
+            For j = i To Math.Min(strList.Count, i + stepSize) - 1
+                If strList(j) = "    " Then missingCount += 1
+                strOut += vbTab + strList(j)
+            Next
+            strOut += vbCrLf
+        Next
+        SetTrueText(strOut, 1)
+        SetTrueText("In the last 200 frames there were " + CStr(missingCount) +
+                    " frames without a matched line to the previous frame.", 3)
+
+        labels(3) = "Of the " + CStr(knnLine.lpOutput.Count) + " lines found " + CStr(matched.Count) +
+                    " were matched to the previous frame"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Stabilize : Inherits TaskParent
+    Dim knnLine As New XO_Line_Generations
+    Dim stable As New Stable_Basics
+    Public Sub New()
+        desc = "Stabilize the image by identifying a line in both the current frame and the previous."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        knnLine.Run(src)
+        If knnLine.lpOutput.Count = 0 Then Exit Sub
+        labels(2) = knnLine.labels(2)
+
+        If task.firstPass Then
+            stable.lpLast = knnLine.lpOutput(0)
+            stable.lp = stable.lpLast
+        Else
+            For Each stable.lp In knnLine.lpOutput
+                If stable.lp.age > 1 Then Exit For
+            Next
+        End If
+
+        stable.Run(src)
+        dst2 = stable.dst2
+        DrawLine(dst2, stable.lp)
+        SetTrueText("Age = " + CStr(stable.lp.age), stable.lp.ptCenter)
+
+        stable.lpLast = stable.lp
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Motion_PointCloud_MotionRect : Inherits TaskParent
+    Public originalPointcloud As cv.Mat
+    Public Sub New()
+        labels = {"", "", "Pointcloud updated only with motion Rect",
+                  "Diff of camera depth And motion-updated depth (always different)"}
+        desc = "Update the pointcloud only with the motion Rect.  Resync heartbeatLT."
+    End Sub
+    Public Shared Function checkNanInf(pc As cv.Mat) As cv.Mat
+        ' these don't work because there are NaN's and Infinity's (both are often present)
+        ' cv.Cv2.PatchNaNs(pc, 0.0) 
+        ' Dim mask As New cv.Mat
+        ' cv.Cv2.Compare(pc, pc, mask, cv.CmpType.EQ)
+
+        Dim count As Integer
+        Dim vec As New cv.Vec3f(0, 0, 0)
+        ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+        ' with and without gravity transform.  Probably my fault but just fix it here.
+        For y = 0 To pc.Rows - 1
+            For x = 0 To pc.Cols - 1
+                Dim val = pc.Get(Of cv.Vec3f)(y, x)
+                If Single.IsNaN(val(0)) Or Single.IsInfinity(val(0)) Then
+                    pc.Set(Of cv.Vec3f)(y, x, vec)
+                    count += 1
+                End If
+            Next
+        Next
+
+        'Dim mean As cv.Scalar, stdev As cv.Scalar
+        'cv.Cv2.MeanStdDev(originalPointcloud, mean, stdev)
+        'Debug.WriteLine("Before Motion mean " + mean.ToString())
+
+        Return pc
+    End Function
+    Public Sub preparePointcloud()
+        If task.gOptions.gravityPointCloud.Checked Then
+            '******* this is the gravity rotation *******
+            task.gravityCloud = (task.pointCloud.Reshape(1,
+                            task.rows * task.cols) * task.gMatrix).ToMat.Reshape(3, task.rows)
+            task.pointCloud = task.gravityCloud
+        End If
+
+        ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+        ' with and without gravity transform.  Probably my fault but just fix it here.
+        If task.cameraName = "StereoLabs ZED 2/2i" Then
+            task.pointCloud = checkNanInf(task.pointCloud)
+        End If
+
+        task.pcSplit = task.pointCloud.Split
+
+        If task.optionsChanged Then
+            task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
+        End If
+        If task.gOptions.TruncateDepth.Checked Then
+            task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
+                                                        task.MaxZmeters, cv.ThresholdTypes.Trunc)
+            task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
+                                                        task.MaxZmeters).ConvertScaleAbs()
+            cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+        End If
+
+        task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        task.noDepthMask = Not task.depthMask
+
+        If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
+            Dim xRatio = task.xRangeDefault / task.xRange
+            Dim yRatio = task.yRangeDefault / task.yRange
+            task.pcSplit(0) *= xRatio
+            task.pcSplit(1) *= yRatio
+
+            cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+        End If
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+
+        If task.cameraName = "StereoLabs ZED 2/2i" Then
+            originalPointcloud = checkNanInf(task.pointCloud).Clone
+        Else
+            originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
+        End If
+
+        If task.optionsChanged Then
+            If task.rangesCloud Is Nothing Then
+                Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+                Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+                Dim rz = New cv.Vec2f(0, task.MaxZmeters)
+                task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1),
+                                                    New cv.Rangef(ry.Item0, ry.Item1),
+                                                    New cv.Rangef(rz.Item0, rz.Item1)}
+            End If
+        End If
+
+        If task.gOptions.UseMotionMask.Checked Then
+            If task.heartBeatLT Or task.frameCount < 5 Or task.optionsChanged Then
+                dst2 = task.pointCloud.Clone
+            End If
+
+            If task.motionRect.Width = 0 And task.optionsChanged = False Then
+                task.pointCloud = dst2
+                Exit Sub ' nothing changed...
+            End If
+            task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
+            task.pointCloud = dst2
+        End If
+
+        ' this will move the motion-updated pointcloud into production.
+        preparePointcloud()
+
+        If standaloneTest() Then
+            Static diff As New Diff_Depth32f
+            Dim split = originalPointcloud.Split()
+            diff.lastDepth32f = split(2)
+            diff.Run(task.pcSplit(2))
+            dst3 = diff.dst2
+            dst3.Rectangle(task.motionRect, white, task.lineWidth)
+        End If
+    End Sub
+End Class
