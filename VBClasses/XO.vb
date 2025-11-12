@@ -2824,7 +2824,7 @@ Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
             ReDim minList(task.gridRects.Count - 1)
             ReDim maxList(task.gridRects.Count - 1)
         End If
-        For Each index In task.motionBasics.mCore.motionList
+        For Each index In task.motionBasics.motionList
             Dim rect = task.gridRects(index)
             Dim ptmin = New cv.Point2f(task.kalman.kOutput(index * 4) + rect.X,
                                        task.kalman.kOutput(index * 4 + 1) + rect.Y)
@@ -16180,5 +16180,102 @@ Public Class XO_Contour_SortTest : Inherits TaskParent
         dst2 = task.contours.dst2
         labels = task.contours.labels
         SetTrueText(task.contours.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Motion_FromEdgeColorize : Inherits TaskParent
+    Dim cAccum As New Edge_CannyAccum
+    Public Sub New()
+        labels = {"", "", "Canny edges accumulated", "Colorized version of dst2 - blue indicates motion."}
+        desc = "Colorize the output of Edge_CannyAccum to show values off the peak value which indicate motion."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        cAccum.Run(src)
+        dst2 = cAccum.dst2
+        dst3 = PaletteFull(dst2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Motion_BasicsOld : Inherits TaskParent
+    Public mCore As New Motion_CoreOld
+    Public Sub New()
+        If standalone Then task.gOptions.showMotionMask.Checked = True
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+        labels(3) = "Updated task.motionRect"
+        desc = "Use the motionlist of rects to create one motion rectangle."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub
+
+        mCore.Run(src)
+
+        If task.heartBeat Then dst2 = task.gray
+
+        dst3.SetTo(0)
+        If mCore.motionList.Count > 0 Then
+            task.motionRect = task.gridRects(mCore.motionList(0))
+            For Each index In mCore.motionList
+                task.motionRect = task.motionRect.Union(task.gridRects(index))
+            Next
+            dst3(task.motionRect).SetTo(255)
+            task.gray(task.motionRect).CopyTo(dst2(task.motionRect))
+        Else
+            task.motionRect = New cv.Rect
+        End If
+
+        labels(2) = CStr(mCore.motionList.Count) + " grid rect's or " +
+                    Format(mCore.motionList.Count / task.gridRects.Count, "0.0%") +
+                    " of bricks had motion."
+    End Sub
+End Class
+
+
+
+
+
+Public Class Motion_CoreOld : Inherits TaskParent
+    Public motionList As New List(Of Integer)
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.showMotionMask.Checked = True
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "The motion mask"
+        desc = "Find all the grid rects that had motion since the last frame."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If src.Channels <> 1 Then src = task.gray
+        If task.heartBeat Or task.optionsChanged Then dst2 = src.Clone
+
+        diff.Run(src)
+
+        motionList.Clear()
+        For i = 0 To task.gridRects.Count - 1
+            Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
+            If diffCount >= task.motionThreshold Then
+                For Each index In task.grid.gridNeighbors(i)
+                    If motionList.Contains(index) = False Then motionList.Add(index)
+                Next
+            End If
+        Next
+
+        dst3.SetTo(0)
+        For Each index In motionList
+            Dim rect = task.gridRects(index)
+            src(rect).CopyTo(dst2(rect))
+            dst3(rect).SetTo(255)
+        Next
+
+        task.motionMask = dst3.Clone
+        labels(2) = CStr(motionList.Count) + " grid rects had motion."
     End Sub
 End Class

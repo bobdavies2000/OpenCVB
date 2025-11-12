@@ -41,10 +41,8 @@ Public Class EdgeLine_Basics : Inherits TaskParent
             Dim mask = rcMap(r)
             Dim rc = New rcData(mask, r, index, 0)
 
-            Dim gridIndex = task.gridMap.Get(Of Integer)(rc.rect.TopLeft.Y, rc.rect.TopLeft.X)
-            rc.color = task.scalarColors(gridIndex Mod 255)
             rcList.Add(rc)
-            If standaloneTest() Then dst3(rc.rect).SetTo(rc.color, rc.mask)
+            If standaloneTest() Then dst3(rc.rect).SetTo(task.scalarColors(rc.gIndex), rc.mask)
         Next
 
         labels(2) = CStr(classCount) + " line segments were found"
@@ -114,6 +112,10 @@ Public Class EdgeLine_Motion : Inherits TaskParent
             If histarray(rc.index - 1) > 0 And rc.contour.Count > 0 Then
                 count += 1
                 rc.index = newList.Count + 1
+                If rc.contour.Count > 0 Then
+                    Dim gIndex = task.gridMap.Get(Of Integer)(rc.contour(0).Y, rc.contour(0).X)
+                    rc.color = task.vecColors(gIndex Mod 255)
+                End If
                 newList.Add(rc)
 
                 rcDataDraw(rc)

@@ -57,16 +57,17 @@ Public Class Grid_Basics : Inherits TaskParent
                 Dim nextList As New List(Of Integer)({i}) ' each neighbor list contains the rect.
 
                 If p1.X > 0 Then nextList.Add(i - 1)
-                If p1.X < dst2.Width And p2.Y < dst2.Height Then nextList.Add(i + 1)
+                If p2.X < dst2.Width And p2.Y <= dst2.Height Then nextList.Add(i + 1)
                 If p1.Y > 0 Then nextList.Add(i - bricksPerRow)
                 If p2.Y < dst2.Height Then nextList.Add(i + bricksPerRow)
 
-                If p1.X > 0 And p1.Y > 0 And p1.X < dst2.Width And p2.Y < dst2.Height Then
-                    nextList.Add(i - bricksPerRow - 1)
-                    nextList.Add(i - bricksPerRow + 1)
-                    nextList.Add(i + bricksPerRow - 1)
+                If p1.X > 0 And p1.Y > 0 Then nextList.Add(i - bricksPerRow - 1)
+                If p1.Y > 0 And p2.X < dst2.Width Then nextList.Add(i - bricksPerRow + 1)
+                If p1.X > 0 And p2.Y < dst2.Height Then nextList.Add(i + bricksPerRow - 1)
+                If p2.X < dst2.Width And p2.Y < dst2.Height Then
                     If i + bricksPerRow + 1 < task.gridRects.Count Then nextList.Add(i + bricksPerRow + 1)
                 End If
+
                 gridNeighbors.Add(nextList)
             Next
 

@@ -98,6 +98,7 @@ End Class
 Public Class RedCC_Histograms : Inherits TaskParent
     Dim hist As New Hist_Basics
     Public redCC As New RedCC_Color8U
+    Public colorIDList As New List(Of List(Of Integer))
     Public Sub New()
         desc = "Add Color8U id's to each RedCloud cell."
     End Sub
@@ -117,6 +118,7 @@ Public Class RedCC_Histograms : Inherits TaskParent
             task.gOptions.HistBinBar.Value = actualClasses + 1
         End If
 
+        colorIDList.Clear()
         For Each rc In task.redCloud.rcList
             Dim tmp = dst1(rc.rect)
             tmp.SetTo(0, Not rc.mask)
@@ -124,14 +126,16 @@ Public Class RedCC_Histograms : Inherits TaskParent
             Dim mm = GetMinMax(tmp)
             hist.Run(tmp)
 
-            rc.colorIDs = New List(Of Integer)
+            Dim colorIDs As New List(Of Integer)
             For i = 1 To hist.histArray.Count - 1 ' ignore zeros
-                If hist.histArray(i) Then rc.colorIDs.Add(i)
+                If hist.histArray(i) Then colorIDs.Add(i)
             Next
+            colorIDList.Add(colorIDs)
+
             If standaloneTest() Then
                 dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
                 strOut = ""
-                For Each index In rc.colorIDs
+                For Each index In colorIDs
                     strOut += CStr(index) + ","
                 Next
                 SetTrueText(strOut, rc.maxDist, 2)
@@ -148,7 +152,7 @@ End Class
 Public Class RedCC_UseHistIDs : Inherits TaskParent
     Dim histID As New RedCC_Histograms
     Public Sub New()
-        desc = "Add the colors to the cell mask if they are in the use rc.colorIDs"
+        desc = "Add the colors to the cell mask if they are in the use colorIDs"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         histID.Run(src)
@@ -157,7 +161,7 @@ Public Class RedCC_UseHistIDs : Inherits TaskParent
 
         For Each rc In task.redCloud.rcList
             Dim colorMask As New cv.Mat(rc.rect.Size, cv.MatType.CV_8U, 0)
-            For Each index In rc.colorIDs
+            For Each index In histID.colorIDList(rc.index - 1)
                 colorMask = colorMask Or histID.redCC.color8u.dst2(rc.rect).InRange(index, index)
             Next
             rc.mask = rc.mask Or colorMask

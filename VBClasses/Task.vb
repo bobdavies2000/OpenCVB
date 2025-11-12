@@ -591,14 +591,14 @@ Public Class VBtask : Implements IDisposable
         rgbFilter.Run(task.color)
         motionBasics.Run(task.gray)
         If task.gOptions.UseMotionMask.Checked Then
-            If task.optionsChanged Or frameCount < 5 Then
+            If task.optionsChanged Then
                 task.motionRect = New cv.Rect(0, 0, task.workRes.Width, task.workRes.Height)
                 grayStable = gray.Clone
                 leftViewStable = leftView.Clone
             Else
                 If motionRect.Width > 0 Then
-                    gray(motionRect).CopyTo(grayStable(motionRect))
-                    leftView(motionRect).CopyTo(leftViewStable(motionRect))
+                    gray.CopyTo(grayStable, task.motionMask)
+                    leftView.CopyTo(leftViewStable, task.motionMask)
                 End If
             End If
         Else
@@ -713,7 +713,7 @@ Public Class VBtask : Implements IDisposable
 
                 If gOptions.ShowGrid.Checked Then results.dstList(2).SetTo(cv.Scalar.White, gridMask)
                 If gOptions.showMotionMask.Checked Then
-                    For Each mIndex In task.motionBasics.mCore.motionList
+                    For Each mIndex In task.motionBasics.motionList
                         results.dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
                     Next
                     results.dstList(0).Rectangle(task.motionRect, white, task.lineWidth)

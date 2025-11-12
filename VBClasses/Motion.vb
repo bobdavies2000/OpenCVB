@@ -1,43 +1,6 @@
 Imports System.Threading
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits TaskParent
-    Public mCore As New Motion_Core
-    Public Sub New()
-        If standalone Then task.gOptions.showMotionMask.Checked = True
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        labels(3) = "Updated task.motionRect"
-        desc = "Use the motionlist of rects to create one motion rectangle."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False Then Exit Sub
-
-        mCore.Run(src)
-
-        If task.heartBeat Then dst2 = task.gray
-
-        dst3.SetTo(0)
-        If mCore.motionList.Count > 0 Then
-            task.motionRect = task.gridRects(mCore.motionList(0))
-            For Each index In mCore.motionList
-                task.motionRect = task.motionRect.Union(task.gridRects(index))
-            Next
-            dst3(task.motionRect).SetTo(255)
-            task.gray(task.motionRect).CopyTo(dst2(task.motionRect))
-        Else
-            task.motionRect = New cv.Rect
-        End If
-
-        labels(2) = CStr(mCore.motionList.Count) + " grid rect's or " +
-                    Format(mCore.motionList.Count / task.gridRects.Count, "0.0%") +
-                    " of bricks had motion."
-    End Sub
-End Class
-
-
-
-
-
-Public Class Motion_Core : Inherits TaskParent
     Public motionList As New List(Of Integer)
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -48,9 +11,12 @@ Public Class Motion_Core : Inherits TaskParent
         desc = "Find all the grid rects that had motion since the last frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub
+
         If src.Channels <> 1 Then src = task.gray
         If task.heartBeat Or task.optionsChanged Then dst2 = src.Clone
 
+        diff.lastFrame = dst2
         diff.Run(src)
 
         motionList.Clear()
@@ -148,30 +114,6 @@ End Class
 
 
 
-Public Class Motion_HistoryTest : Inherits TaskParent
-    Dim diff As New Diff_Basics
-    Dim frames As New History_Basics
-    Public Sub New()
-        OptionParent.FindSlider("Color Difference Threshold").Value = 10
-        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Detect motion using the last X images"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        diff.Run(src)
-        dst1 = diff.dst2.Threshold(0, 1, cv.ThresholdTypes.Binary)
-        frames.Run(dst1)
-
-        dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        labels(2) = "Cumulative diff for the last " + CStr(task.frameHistoryCount) + " frames"
-    End Sub
-End Class
-
-
-
-
-
 Public Class Motion_FromEdge : Inherits TaskParent
     Dim cAccum As New Edge_CannyAccum
     Public Sub New()
@@ -185,24 +127,6 @@ Public Class Motion_FromEdge : Inherits TaskParent
 
         dst2 = cAccum.dst2.Threshold(mm.maxVal, 255, cv.ThresholdTypes.TozeroInv)
         dst3 = cAccum.dst2.InRange(1, 254)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Motion_FromEdgeColorize : Inherits TaskParent
-    Dim cAccum As New Edge_CannyAccum
-    Public Sub New()
-        labels = {"", "", "Canny edges accumulated", "Colorized version of dst2 - blue indicates motion."}
-        desc = "Colorize the output of Edge_CannyAccum to show values off the peak value which indicate motion."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        cAccum.Run(src)
-        dst2 = cAccum.dst2
-        dst3 = PaletteFull(dst2)
     End Sub
 End Class
 
@@ -434,8 +358,6 @@ Public Class Motion_CoreAccum : Inherits TaskParent
         desc = "Accumulate grid rects that had motion in the last X frames."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.UseMotionMask.Checked = False Then Exit Sub
-
         If src.Channels <> 1 Then src = task.gray
         If task.heartBeat Or task.optionsChanged Then dst2 = src.Clone
 
@@ -468,3 +390,9 @@ Public Class Motion_CoreAccum : Inherits TaskParent
         labels(2) = CStr(motionList.Count) + " grid rects had motion."
     End Sub
 End Class
+
+
+
+
+
+

@@ -763,11 +763,11 @@ End Class
 Public Class rcData
     Public age As Integer = 1
     Public color As cv.Scalar
-    Public colorIDs As List(Of Integer) ' this list of ID's for color8u output 
     Public contour As List(Of cv.Point)
     Public depth As Single
     Public hull As List(Of cv.Point)
     Public index As Integer
+    Public gIndex As Integer
     Public mask As cv.Mat
     Public maxDist As cv.Point
     Public pixels As Integer
@@ -803,6 +803,10 @@ Public Class rcData
 
                 ' keep the hull points around (there aren't many of them.)
                 hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
+                gIndex = task.gridMap.Get(Of Integer)(rect.TopLeft.Y + contour(0).Y,
+                                                      rect.TopLeft.X + contour(0).X) Mod 255
+            Else
+                gIndex = task.gridMap.Get(Of Integer)(rect.TopLeft.Y, rect.TopLeft.X) Mod 255
             End If
             buildMaxDist()
 

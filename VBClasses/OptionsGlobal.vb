@@ -22,7 +22,6 @@ Public Class OptionsGlobal
         LineThicknessAmount.Text = CStr(LineWidth.Value)
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
-        motionThresholdLabel.Text = CStr(task.motionThreshold)
 
         Palettes.Items.Clear()
         For Each mapName In mapNames
@@ -92,6 +91,8 @@ Public Class OptionsGlobal
         End Select
 
         task.gOptions.MotionThreshold.Value = task.motionThreshold
+        motionThresholdLabel.Text = CStr(task.motionThreshold)
+
         task.gOptions.GridSlider.Value = task.brickSize
         task.gOptions.DotSizeSlider.Value = task.DotSize
         task.gOptions.LineWidth.Value = task.DotSize
