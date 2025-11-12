@@ -82,7 +82,7 @@ Public Class EdgeLine_Motion : Inherits TaskParent
         dst2.SetTo(0)
         If edgeLine.rcList.Count Then
             Dim ranges1 = New cv.Rangef() {New cv.Rangef(0, edgeLine.rcList.Count)}
-            cv.Cv2.CalcHist({dst2(task.motionRect)}, {0}, New cv.Mat, histogram,
+            cv.Cv2.CalcHist({dst2}, {0}, task.motionMask, histogram,
                             1, {edgeLine.rcList.Count}, ranges1)
             Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
@@ -103,7 +103,7 @@ Public Class EdgeLine_Motion : Inherits TaskParent
         ReDim histarray(edgeLine.classCount - 1)
 
         Dim ranges2 = New cv.Rangef() {New cv.Rangef(0, edgeLine.classCount)}
-        cv.Cv2.CalcHist({edgeLine.dst2(task.motionRect)}, {0}, New cv.Mat, histogram,
+        cv.Cv2.CalcHist({edgeLine.dst2}, {0}, task.motionMask, histogram,
                         1, {edgeLine.classCount}, ranges2)
         Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
