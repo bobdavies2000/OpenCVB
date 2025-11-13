@@ -6,7 +6,7 @@
 -   Which cells are replaced when a grid rect shows motion?
     -   There are 3 choices – cell, cell + link 4 cells, cell + link 8 cells.
     -   The choice “cell + link 4 cells” works but more testing needed.
--   Successful motion detection is validated with Motion_Validate (shown below.)
+-   Motion detection is validated with Motion_Validate (shown below.)
 -   Motion detection improves several other algorithms.
     -   Unchanged lines are detected in Line_Basics when using motion detection.
     -   Unchanged edges and lines are detected exactly in EdgeLine_Basics.
@@ -16,9 +16,9 @@
     -   Using a motion-updated image allows results to be matched exactly.
 -   Motion detection relies on options specified in “Options_Diff”.
     -   There is an option for the size of differences in individual pixel values.
-    -   There is also an option for the number of pixel differences in a grid rect.
+    -   There is also an option for pixel differences in a grid rect.
     -   Motion in the image is confined by the grid rectangles.
--   Motion detection can be turned off (see global option “Use Motion Mask”.)
+-   Motion detection can be turned off (global option “Use Motion Mask”.)
 -   The stable gray image (grayStable) contains the motion-updated image.
     -   A motion-updated point cloud is now the default for all algorithms.
 
