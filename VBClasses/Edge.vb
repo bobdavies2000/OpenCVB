@@ -697,7 +697,7 @@ End Class
 
 Public Class Edge_ResizeAdd : Inherits TaskParent
     Dim options As New Options_Edges4
-    Dim options1 As New Options_ImageOffset
+    Dim options1 As New Options_Diff
     Public Sub New()
         desc = "Find edges using a resize, subtract, and threshold."
         labels(2) = "Edges found with just resizing"

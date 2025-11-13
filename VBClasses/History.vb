@@ -131,7 +131,7 @@ Public Class History_Basics8U : Inherits TaskParent
     Public saveFrames As New List(Of cv.Mat)
     Dim mats As New Mat_4to1
     Dim lastFrame As cv.Mat
-    Dim options As New Options_ImageOffset
+    Dim options As New Options_Diff
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Create a frame history by Or'ing the last X frames of CV_8U data"

@@ -14,6 +14,7 @@ Public Class VBtask : Implements IDisposable
     Public cvFontSize As Single = 0.8
     Public cvFontThickness As Integer = 1
     Public motionThreshold As Integer ' this is vital to motion detection - lower to be more sensitive, higher for less.
+    Public colorDiffThreshold As Integer
     Public reductionTarget As Integer = 200 ' specify how much reduction is needed using options_RedCloud.
     Public brickSize As Integer
 
@@ -603,8 +604,8 @@ Public Class VBtask : Implements IDisposable
             End If
         Else
             grayStable = gray
-            leftViewStable = gray
-            motionRect = New cv.Rect(0, 0, color.Width, color.Height)
+            leftViewStable = leftView
+            motionRect = New cv.Rect(0, 0, gray.Width, gray.Height)
         End If
 
         pcMotion.Run(emptyMat) '******* this is the gravity rotation *******

@@ -1,6 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class ImageOffset_Basics : Inherits TaskParent
     Public options As New Options_ImageOffset
+    Dim options1 As New Options_Diff
     Public masks(2) As cv.Mat
     Public dst(2) As cv.Mat
     Public pcFiltered(2) As cv.Mat
@@ -13,6 +14,7 @@ Public Class ImageOffset_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
+        options1.Run()
 
         Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
         Dim r2 As cv.Rect
@@ -43,7 +45,7 @@ Public Class ImageOffset_Basics : Inherits TaskParent
 
         dst = {dst1, dst2, dst3}
         For i = 0 To dst.Count - 1
-            masks(i) = dst(i).Threshold(options.pixelDiffThreshold, 255,
+            masks(i) = dst(i).Threshold(options1.pixelDiffThreshold, 255,
                                         cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
             pcFiltered(i) = New cv.Mat(src.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
             task.pcSplit(i).CopyTo(pcFiltered(i), masks(i))

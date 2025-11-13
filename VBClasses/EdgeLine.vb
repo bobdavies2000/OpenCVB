@@ -45,7 +45,8 @@ Public Class EdgeLine_Basics : Inherits TaskParent
             If standaloneTest() Then dst3(rc.rect).SetTo(task.scalarColors(rc.gIndex), rc.mask)
         Next
 
-        labels(2) = CStr(classCount) + " line segments were found"
+        labels(2) = CStr(classCount) + " line segments were found with motion threshold of " +
+                    CStr(task.motionThreshold) + " pixels changed in a grid rect."
     End Sub
     Public Sub Close()
         EdgeLineRaw_Close(cPtr)

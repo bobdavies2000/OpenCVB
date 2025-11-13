@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.Windows.Forms
 Public Class PhotoShop_Clahe : Inherits TaskParent
     ' Contrast Limited Adaptive Histogram Equalization (CLAHE) : Inherits TaskParent
     Public Sub New()
@@ -13,8 +12,8 @@ Public Class PhotoShop_Clahe : Inherits TaskParent
         labels(3) = "CLAHE Result"
         desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Static clipSlider =OptionParent.FindSlider("Clip Limit")
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static clipSlider = OptionParent.FindSlider("Clip Limit")
         If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()

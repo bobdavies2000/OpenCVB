@@ -2,7 +2,8 @@ Imports cv = OpenCvSharp
 Public Class Diff_Basics : Inherits TaskParent
     Public changedPixels As Integer
     Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-    Public options As New Options_ImageOffset
+    Public options As New Options_Diff
+
     Public Sub New()
         desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub

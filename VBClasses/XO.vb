@@ -2516,7 +2516,7 @@ Public Class XO_CameraMotion_Basics : Inherits TaskParent
     Public translationY As Integer
     Public secondOpinion As Boolean
     Dim feat As New Swarm_Basics
-    Dim options As New Options_ImageOffset
+    Dim options As New Options_Diff
     Public Sub New()
         dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -2602,7 +2602,7 @@ Public Class XO_CameraMotion_WithRotation : Inherits TaskParent
     Public rotate As New Rotate_BasicsQT
     Dim lineGravity As lpData
     Dim lineHorizon As lpData
-    Dim options As New Options_ImageOffset
+    Dim options As New Options_Diff
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -3935,7 +3935,7 @@ End Class
 
 Public Class XO_Diff_Heartbeat : Inherits TaskParent
     Public cumulativePixels As Integer
-    Dim options As New Options_ImageOffset
+    Dim options As New Options_Diff
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Unstable mask", "Pixel difference"}
@@ -5461,7 +5461,7 @@ End Class
 
 Public Class XO_Line_VerticalHorizontal1 : Inherits TaskParent
     Dim nearest As New XO_Line_Nearest
-    Dim options As New Options_ImageOffset
+    Dim options As New Options_Diff
     Public Sub New()
         task.gOptions.LineWidth.Value = 2
         desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope."
@@ -8777,7 +8777,7 @@ End Class
 Public Class XO_FPoly_WarpAffineImage : Inherits TaskParent
     Dim warp As New WarpAffine_BasicsQT
     Dim fPoly As New XO_FPoly_BasicsOriginal
-    Dim options As New Options_ImageOffset
+    Dim options As New Options_Diff
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Use OpenCV's WarpAffine to rotate and translate the starting image."
@@ -8904,7 +8904,7 @@ Public Class XO_FPoly_Image : Inherits TaskParent
     Public fpoly As New XO_FPoly_BasicsOriginal
     Dim rotate As New Rotate_BasicsQT
     Public resync As Boolean
-    Dim options As New Options_ImageOffset
+    Dim options As New Options_Diff
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
@@ -8982,7 +8982,7 @@ End Class
 
 Public Class XO_FPoly_ImageMask : Inherits TaskParent
     Public fImage As New XO_FPoly_Image
-    Dim options As New Options_ImageOffset
+    Dim options As New Options_Diff
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         OptionParent.FindSlider("Color Difference Threshold").Value = 10
@@ -9192,7 +9192,7 @@ Public Class XO_FPoly_ImageNew : Inherits TaskParent
     Public fpoly As New XO_FPoly_Basics
     Dim rotate As New Rotate_BasicsQT
     Public resync As Boolean
-    Dim options As New Options_ImageOffset
+    Dim options As New Options_Diff
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
@@ -14465,7 +14465,7 @@ End Class
 
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Public Class XO_Motion_Diff : Inherits TaskParent
-    Public options As New Options_ImageOffset
+    Public options As New Options_Diff
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Unstable mask", "Pixel difference"}
@@ -14990,7 +14990,7 @@ End Class
 Public Class XO_Motion_PixelDiff : Inherits TaskParent
     Public changedPixels As Integer
     Dim changeCount As Integer, frames As Integer
-    Public options As New Options_ImageOffset
+    Public options As New Options_Diff
     Public Sub New()
         desc = "Count the number of changed pixels in the current frame and accumulate them.  If either exceeds thresholds, then set flag = true.  " +
                "To get the Options Slider, use " + traceName + "QT"
@@ -15857,7 +15857,7 @@ End Class
 
 Public Class XO_Edge_MotionOverlay : Inherits TaskParent
     Dim options As New Options_EdgeOverlay
-    Dim options1 As New Options_ImageOffset
+    Dim options1 As New Options_Diff
     Public Sub New()
         labels(3) = "AbsDiff output of offset with original"
         desc = "Find edges by displacing the current BGR image in any direction and diff it with the original."

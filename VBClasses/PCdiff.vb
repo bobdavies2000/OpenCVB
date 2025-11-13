@@ -1,12 +1,15 @@
 ﻿Imports cv = OpenCvSharp
 Public Class PCdiff_Basics : Inherits TaskParent
     Public options As New Options_ImageOffset
+    Public options1 As New Options_Diff
     Public Sub New()
         OptionParent.FindSlider("Color Difference Threshold").Value = 10
         desc = "Find depth regions where neighboring pixels are close in depth"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
+        options1.Run()
+
         If standalone Then src = task.pcSplit(2)
 
         Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
@@ -34,7 +37,7 @@ Public Class PCdiff_Basics : Inherits TaskParent
 
         dst2 = New cv.Mat(dst2.Size, src.Type, 0)
         cv.Cv2.Absdiff(src(r1), src(r2), dst2(r3))
-        dst3 = dst2.Threshold(options.pixelDiffThreshold / 1000, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
+        dst3 = dst2.Threshold(options1.pixelDiffThreshold / 1000, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -75,6 +78,7 @@ End Class
 
 Public Class PCdiff_Basics1 : Inherits TaskParent
     Public options As New Options_ImageOffset
+    Dim options1 As New Options_Diff
     Public masks(2) As cv.Mat
     Public dst(2) As cv.Mat
     Public pcFiltered(2) As cv.Mat
@@ -87,6 +91,7 @@ Public Class PCdiff_Basics1 : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
+        options1.Run()
 
         Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
         Dim r2 As cv.Rect
@@ -117,7 +122,7 @@ Public Class PCdiff_Basics1 : Inherits TaskParent
 
         dst = {dst1, dst2, dst3}
         For i = 0 To dst.Count - 1
-            masks(i) = dst(i).Threshold(options.pixelDiffThreshold / 1000, 255,
+            masks(i) = dst(i).Threshold(options1.pixelDiffThreshold / 1000, 255,
                                         cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
             pcFiltered(i) = New cv.Mat(src.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
             task.pcSplit(i).CopyTo(pcFiltered(i), masks(i))
@@ -140,7 +145,7 @@ Public Class PCdiff_Filter : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         pcDiff.Run(src)
 
-        Dim delta = pcDiff.options.pixelDiffThreshold / 1000
+        Dim delta = pcDiff.options1.pixelDiffThreshold / 1000
         dst2.SetTo(0)
         For y = 0 To dst2.Height - 1
             For x = 0 To dst2.Width - 1
@@ -177,7 +182,7 @@ Public Class PCdiff_Points : Inherits TaskParent
 
         dst2.SetTo(0)
         Dim countInf As Integer
-        Dim delta = filter.pcDiff.options.pixelDiffThreshold / 1000
+        Dim delta = filter.pcDiff.options1.pixelDiffThreshold / 1000
         For y = 0 To task.pcSplit(2).Rows - 1
             Dim slice = task.pcSplit(2).Row(y)
             Dim lastVal As Single = 0

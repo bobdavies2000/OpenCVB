@@ -25,9 +25,6 @@ Partial Class OptionsGlobal
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OptionsGlobal))
         Label1 = New Label()
         GroupBox1 = New GroupBox()
-        MotionThreshold = New TrackBar()
-        motionThresholdLabel = New Label()
-        Label9 = New Label()
         DotSizeSlider = New TrackBar()
         DotSizeLabel = New Label()
         Label7 = New Label()
@@ -67,7 +64,6 @@ Partial Class OptionsGlobal
         Label14 = New Label()
         DepthGroupBox = New GroupBox()
         GroupBox1.SuspendLayout()
-        CType(MotionThreshold, ComponentModel.ISupportInitialize).BeginInit()
         CType(DotSizeSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(LineWidth, ComponentModel.ISupportInitialize).BeginInit()
         CType(HistBinBar, ComponentModel.ISupportInitialize).BeginInit()
@@ -90,9 +86,6 @@ Partial Class OptionsGlobal
         ' 
         ' GroupBox1
         ' 
-        GroupBox1.Controls.Add(MotionThreshold)
-        GroupBox1.Controls.Add(motionThresholdLabel)
-        GroupBox1.Controls.Add(Label9)
         GroupBox1.Controls.Add(DotSizeSlider)
         GroupBox1.Controls.Add(DotSizeLabel)
         GroupBox1.Controls.Add(Label7)
@@ -115,38 +108,6 @@ Partial Class OptionsGlobal
         GroupBox1.Size = New Size(995, 541)
         GroupBox1.TabIndex = 1
         GroupBox1.TabStop = False
-        ' 
-        ' MotionThreshold
-        ' 
-        MotionThreshold.Location = New Point(229, 374)
-        MotionThreshold.Margin = New Padding(4)
-        MotionThreshold.Maximum = 500
-        MotionThreshold.Minimum = 1
-        MotionThreshold.Name = "MotionThreshold"
-        MotionThreshold.Size = New Size(548, 69)
-        MotionThreshold.TabIndex = 12
-        MotionThreshold.TickStyle = TickStyle.None
-        MotionThreshold.Value = 5
-        ' 
-        ' motionThresholdLabel
-        ' 
-        motionThresholdLabel.AutoSize = True
-        motionThresholdLabel.Location = New Point(785, 374)
-        motionThresholdLabel.Margin = New Padding(4, 0, 4, 0)
-        motionThresholdLabel.Name = "motionThresholdLabel"
-        motionThresholdLabel.Size = New Size(76, 30)
-        motionThresholdLabel.TabIndex = 11
-        motionThresholdLabel.Text = "Label8"
-        ' 
-        ' Label9
-        ' 
-        Label9.AutoSize = True
-        Label9.Location = New Point(35, 374)
-        Label9.Margin = New Padding(4, 0, 4, 0)
-        Label9.Name = "Label9"
-        Label9.Size = New Size(185, 30)
-        Label9.TabIndex = 10
-        Label9.Text = "Motion Threshold"
         ' 
         ' DotSizeSlider
         ' 
@@ -563,7 +524,7 @@ Partial Class OptionsGlobal
         ' 
         ' OptionsGlobal
         ' 
-        AutoScaleDimensions = New SizeF(12F, 30F)
+        AutoScaleDimensions = New SizeF(12.0F, 30.0F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1849, 589)
         Controls.Add(DepthGroupBox)
@@ -586,7 +547,6 @@ Partial Class OptionsGlobal
         Text = "OptionsGlobal"
         GroupBox1.ResumeLayout(False)
         GroupBox1.PerformLayout()
-        CType(MotionThreshold, ComponentModel.ISupportInitialize).EndInit()
         CType(DotSizeSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(LineWidth, ComponentModel.ISupportInitialize).EndInit()
         CType(HistBinBar, ComponentModel.ISupportInitialize).EndInit()
@@ -641,7 +601,4 @@ Partial Class OptionsGlobal
     Friend WithEvents Label14 As Label
     Friend WithEvents DepthGroupBox As GroupBox
     Friend WithEvents Label3 As Label
-    Friend WithEvents MotionThreshold As TrackBar
-    Friend WithEvents motionThresholdLabel As Label
-    Friend WithEvents Label9 As Label
 End Class

@@ -46,6 +46,7 @@ Public Class OptionsGlobal
         task.cvFontThickness = 1
         task.brickSize = 8
         task.reductionTarget = 400
+        task.motionThreshold = 5
         Select Case task.workRes.Width
             Case 1920
                 task.cvFontSize = 3.5
@@ -89,9 +90,6 @@ Public Class OptionsGlobal
             Case 160
                 task.cvFontSize = 1.0
         End Select
-
-        task.gOptions.MotionThreshold.Value = task.motionThreshold
-        motionThresholdLabel.Text = CStr(task.motionThreshold)
 
         task.gOptions.GridSlider.Value = task.brickSize
         task.gOptions.DotSizeSlider.Value = task.DotSize
@@ -260,14 +258,5 @@ Public Class OptionsGlobal
 
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
-    End Sub
-    Private Sub MotionThreshold_ValueChanged(sender As Object, e As EventArgs) Handles MotionThreshold.ValueChanged
-        task.motionThreshold = MotionThreshold.Value
-        task.optionsChanged = True
-        motionThresholdLabel.Text = CStr(task.motionThreshold)
-    End Sub
-
-    Private Sub MotionThreshold_Scroll(sender As Object, e As EventArgs) Handles MotionThreshold.Scroll
-
     End Sub
 End Class

@@ -341,7 +341,7 @@ Public Class Pixel_Unstable : Inherits TaskParent
     Dim lastImage As cv.Mat
     Public unstablePixels As New cv.Mat
     Dim kSlider = OptionParent.FindSlider("KMeans k")
-    Dim options As New Options_ImageOffset
+    Dim options As New Options_Diff
     Public Sub New()
         OptionParent.FindSlider("Color Difference Threshold").Value = 2
         labels(2) = "KMeans_Basics output"
