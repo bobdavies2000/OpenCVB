@@ -2,7 +2,7 @@
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 Imports System.Runtime.InteropServices
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar
+Imports System.Threading
 Imports OpenCvSharp
 Imports OpenCvSharp.ML
 Imports cv = OpenCvSharp
@@ -16205,8 +16205,8 @@ End Class
 
 
 
-Public Class Motion_BasicsOld : Inherits TaskParent
-    Public mCore As New Motion_CoreOld
+Public Class XO_Motion_BasicsOld : Inherits TaskParent
+    Public mCore As New XO_Motion_CoreOld
     Public Sub New()
         If standalone Then task.gOptions.showMotionMask.Checked = True
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
@@ -16242,7 +16242,7 @@ End Class
 
 
 
-Public Class Motion_CoreOld : Inherits TaskParent
+Public Class XO_Motion_CoreOld : Inherits TaskParent
     Public motionList As New List(Of Integer)
     Dim diff As New Diff_Basics
     Public Sub New()
@@ -16628,5 +16628,94 @@ Public Class XO_Motion_BasicsAccum : Inherits TaskParent
         labels(2) = CStr(mCore.motionList.Count) + " grid rect's or " +
                     Format(mCore.motionList.Count / task.gridRects.Count, "0.0%") +
                     " of bricks had motion."
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Motion_FromCorrelation_MP : Inherits TaskParent
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 950)
+        desc = "Detect Motion in the color image using multi-threading - slower than single-threaded!"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static correlationSlider = OptionParent.FindSlider("Correlation Threshold")
+        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.heartBeat Then dst3 = src.Clone
+
+        dst2 = src
+
+        Dim updateCount As Integer
+        Parallel.ForEach(Of cv.Rect)(task.gridRects,
+            Sub(roi)
+                Dim correlation As New cv.Mat
+                cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+                If correlation.Get(Of Single)(0, 0) < CCthreshold Then
+                    Interlocked.Increment(updateCount)
+                    src(roi).CopyTo(dst3(roi))
+                    dst2.Rectangle(roi, white, task.lineWidth)
+                End If
+            End Sub)
+        labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(task.gridRects.Count)
+        labels(3) = CStr(task.gridRects.Count - updateCount) + " segments out of " + CStr(task.gridRects.Count) + " had > " +
+                         Format(correlationSlider.Value / 1000, "0.0%") + " correlation. "
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Motion_FromCorrelation : Inherits TaskParent
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Correlation Threshold", 800, 1000, 950)
+        desc = "Detect Motion in the color image.  Rectangles outlines didn't have high correlation."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static correlationSlider = OptionParent.FindSlider("Correlation Threshold")
+        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
+        If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If task.heartBeat Then dst3 = src.Clone
+
+        Dim roiMotion As New List(Of cv.Rect)
+        For Each roi In task.gridRects
+            Dim correlation As New cv.Mat
+            cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+            If correlation.Get(Of Single)(0, 0) < CCthreshold Then
+                src(roi).CopyTo(dst3(roi))
+                roiMotion.Add(roi)
+            End If
+        Next
+        dst2 = src
+        For Each roi In roiMotion
+            dst2.Rectangle(roi, white, task.lineWidth)
+        Next
+        labels(2) = "Motion added to dst3 for " + CStr(roiMotion.Count) + " segments out of " + CStr(task.gridRects.Count)
+        labels(3) = CStr(task.gridRects.Count - roiMotion.Count) + " segments out of " + CStr(task.gridRects.Count) + " had > " +
+                         Format(correlationSlider.Value / 1000, "0.0%") + " correlation. "
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Motion_FromEdge : Inherits TaskParent
+    Dim cAccum As New Edge_CannyAccum
+    Public Sub New()
+        desc = "Detect motion from pixels less than max value in an accumulation."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        cAccum.Run(src)
+
+        Dim mm = GetMinMax(cAccum.dst2)
+        labels(3) = "Max value = " + CStr(mm.maxVal) + " min value = " + CStr(mm.minVal)
+
+        dst2 = cAccum.dst2.Threshold(mm.maxVal, 255, cv.ThresholdTypes.TozeroInv)
+        dst3 = cAccum.dst2.InRange(1, 254)
     End Sub
 End Class
