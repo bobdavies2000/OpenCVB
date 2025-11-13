@@ -46,31 +46,26 @@ Public Class OptionsGlobal
         task.cvFontThickness = 1
         task.brickSize = 8
         task.reductionTarget = 400
-        task.motionThreshold = 5
         Select Case task.workRes.Width
             Case 1920
                 task.cvFontSize = 3.5
                 task.cvFontThickness = 4
                 task.DotSize = 4
                 task.brickSize = 24
-                task.motionThreshold = 400
             Case 1280
                 task.cvFontSize = 2.5
                 task.cvFontThickness = 2
                 task.DotSize = 5
                 task.brickSize = 24
-                task.motionThreshold = 100
             Case 960
                 task.cvFontSize = 2.0
                 task.cvFontThickness = 2
                 task.DotSize = 2
                 task.brickSize = 16
-                task.motionThreshold = 100
             Case 672
                 task.cvFontSize = 1.5
                 task.DotSize = 2
                 task.brickSize = 16
-                task.motionThreshold = 100
             Case 640
                 task.cvFontSize = 1.5
                 task.DotSize = 2
@@ -78,7 +73,6 @@ Public Class OptionsGlobal
             Case 480
                 task.cvFontSize = 1.2
                 task.brickSize = 8
-                task.motionThreshold = 20
             Case 240
                 task.cvFontSize = 1.2
             Case 336

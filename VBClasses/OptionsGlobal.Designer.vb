@@ -336,9 +336,9 @@ Partial Class OptionsGlobal
         UseMotionMask.Location = New Point(13, 305)
         UseMotionMask.Margin = New Padding(4)
         UseMotionMask.Name = "UseMotionMask"
-        UseMotionMask.Size = New Size(202, 34)
+        UseMotionMask.Size = New Size(208, 34)
         UseMotionMask.TabIndex = 1
-        UseMotionMask.Text = "Use MotionMask"
+        UseMotionMask.Text = "Use Motion Mask"
         UseMotionMask.UseVisualStyleBackColor = True
         ' 
         ' TruncateDepth

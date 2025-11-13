@@ -1,3 +1,31 @@
+# November 13, 2025 – Motion.
+
+-   Over 2000 algorithms are included, averaging 36 lines of code per algorithm.
+    -   Over 400 algorithms are obsolete and are compiled for reference use.
+-   The Motion_Basics algorithm was reworked to use link 1, link 4, and link 8.
+-   Which cells are replaced when a grid rect shows motion?
+    -   There are 3 choices – cell, cell + link 4 cells, cell + link 8 cells.
+    -   The choice “cell + link 4 cells” works but more testing needed.
+-   Successful motion detection is validated with Motion_Validate (shown below.)
+-   Motion detection improves several other algorithms.
+    -   Unchanged lines are detected in Line_Basics when using motion detection.
+    -   Unchanged edges and lines are detected exactly in EdgeLine_Basics.
+    -   RedCloud and RedColor are improved with a motion-updated point cloud.
+        -   More testing is required to manage regions with no depth.
+-   These improvements are possible by removing slight pixel differences.
+    -   Using a motion-updated image allows results to be matched exactly.
+-   Motion detection relies on options specified in “Options_Diff”.
+    -   There is an option for the size of differences in individual pixel values.
+    -   There is also an option for the number of pixel differences in a grid rect.
+    -   Motion in the image is confined by the grid rectangles.
+-   Motion detection can be turned off (see global option “Use Motion Mask”.)
+-   The stable gray image (grayStable) contains the motion-updated image.
+    -   A motion-updated point cloud is now the default for all algorithms.
+
+**![](media/77c9976b5a0810a5e2671c395b9ca196.gif)**
+
+**Motion_Validate:** *This algorithm compares the motion-updated image with the camera image. The differences are highlighted in the lower right image. The lower left image is the motion-updated image while the upper right image is the original image from the camera. In the upper left image, the motion mask is shown on the RGB image. The text in the lower right image contains a count of the number of pixels that differ and the number of grid rectangles that contain motion. Note that there are plenty of differences between the current image and the motion-updated image but that these differences are small even where there is motion. The option for “cell + link 4 cells” is visible in the motion mask (upper left.)*
+
 # November 2, 2025 – Global Options, Motion, Coherence.
 
 -   Over 2000 algorithms are included, averaging 36 lines of code per algorithm.
@@ -24,7 +52,7 @@
     -   Further experimentation is needed to validate the depth results.
     -   Color can be confirmed using the RGB image in the upper left.
 
-**![](media/9f61236cc37ed9a3912de5e625010cab.gif)**
+**![A screenshot of a computer AI-generated content may be incorrect.](media/9f61236cc37ed9a3912de5e625010cab.gif)**
 
 **RedCC_CellHistogram:**  *RedCC_CellHistogram displays the results of RedCC_Basics in the lower left. Each RedCC cell is coherent in both depth and color meaning that the cell depth data is in a singular spike in the histogram and the color data is a single class in the reduced color image. The histogram in the lower right is for the selected cell. The selected cell is highlighted in the upper left RGB image. The cell details are in the upper right.*
 

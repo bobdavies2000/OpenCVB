@@ -8198,7 +8198,6 @@ End Class
 
 Public Class Options_ImageOffset : Inherits OptionParent
     Public offsetDirection As String
-    Public horizontalSlice As Boolean
     Public Sub New()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -8212,19 +8211,10 @@ Public Class Options_ImageOffset : Inherits OptionParent
             radio.addRadio("Below Right")
             radio.check(7).Checked = True
         End If
-
-        If FindFrm(traceName + " CheckBox Options") Is Nothing Then
-            check.Setup(traceName)
-            check.addCheckBox("Slice Horizontally (off Vertically)")
-            check.Box(0).Checked = True
-        End If
     End Sub
     Public Sub Run()
         Static frm = FindFrm(traceName + " Radio Buttons")
         offsetDirection = frm.check(findRadioIndex(frm.check)).Text
-
-        Static sliceDirection = FindCheckBox("Slice Horizontally (off Vertically)")
-        horizontalSlice = sliceDirection.checked
     End Sub
 End Class
 
@@ -8235,9 +8225,24 @@ End Class
 Public Class Options_Diff : Inherits OptionParent
     Public pixelDiffThreshold As Integer
     Public Sub New()
+        task.motionThreshold = 5
+        Select Case task.workRes.Width
+            Case 1920
+                task.motionThreshold = 400
+            Case 1280
+                task.motionThreshold = 100
+            Case 960
+                task.motionThreshold = 100
+            Case 672
+                task.motionThreshold = 100
+            Case 480
+                task.motionThreshold = 20
+            Case 640, 240, 336, 320, 168, 160
+                task.motionThreshold = 5
+        End Select
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Color Difference Threshold", 0, 50, 5)
-            sliders.setupTrackBar("Motion pixel threshold", 0, 50, 5)
+            sliders.setupTrackBar("Motion pixel threshold", 0, 400, task.motionThreshold)
         End If
     End Sub
     Public Sub Run()

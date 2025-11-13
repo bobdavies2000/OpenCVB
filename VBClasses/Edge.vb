@@ -580,7 +580,7 @@ End Class
 Public Class Edge_ColorGap_VB : Inherits TaskParent
     Dim options As New Options_Edges3
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
 
         labels = {"", "Vertical and Horizontal edges", "Vertical edges", "Horizontal edges"}
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -822,8 +822,8 @@ End Class
 Public Class Edge_SobelCustomLeftRight : Inherits TaskParent
     Dim custom As New Edge_SobelCustom
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels = {"Left Image Custom 1", "Left Image Custom 2", "Right Image Custom 1", "Right Image Custom 2"}
         desc = "Show Sobel edge detection for both left and right images"
     End Sub
@@ -919,7 +919,7 @@ Public Class Edge_Color8U : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.firstPass Then
-            Dim frmCheck = OptionParent.findFrm("Options_ColorMethod CheckBoxes")
+            Dim frmCheck = OptionParent.FindFrm("Options_ColorMethod CheckBoxes")
             frmCheck.Left = task.gOptions.Width / 2
         End If
         options.Run()
@@ -1476,7 +1476,7 @@ Public Class Edge_LeftRightDepth : Inherits TaskParent
         Dim r = New cv.Rect(lp.p1.X, lp.p1.Y, dst2.Width, 1)
         Dim tmp = dst2(r).FindNonZero()
 
-        ptLeft.clear()
+        ptLeft.Clear()
         For i = 0 To tmp.Rows - 1
             Dim pt = tmp.Get(Of cv.Point)(i, 0)
             Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)

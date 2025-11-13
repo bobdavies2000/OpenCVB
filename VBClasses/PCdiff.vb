@@ -6,7 +6,7 @@ Public Class PCdiff_Basics : Inherits TaskParent
         OptionParent.FindSlider("Color Difference Threshold").Value = 10
         desc = "Find depth regions where neighboring pixels are close in depth"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         options1.Run()
 
@@ -83,13 +83,13 @@ Public Class PCdiff_Basics1 : Inherits TaskParent
     Public dst(2) As cv.Mat
     Public pcFiltered(2) As cv.Mat
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
         desc = "Compute various differences between neighboring pixels"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         options1.Run()
 
@@ -142,7 +142,7 @@ Public Class PCdiff_Filter : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3)
         desc = "Filter the pointcloud to isolate only pixels within X mm's of it neighbor"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         pcDiff.Run(src)
 
         Dim delta = pcDiff.options1.pixelDiffThreshold / 1000
@@ -176,7 +176,7 @@ Public Class PCdiff_Points : Inherits TaskParent
                           "Pixels removed to make clean breaks in the depth data"}
         desc = "Review the filtered PCdiff output."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         filter.Run(src)
         task.pcSplit = filter.dst3.Split()
 
