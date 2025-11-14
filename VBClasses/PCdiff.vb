@@ -37,7 +37,8 @@ Public Class PCdiff_Basics : Inherits TaskParent
 
         dst2 = New cv.Mat(dst2.Size, src.Type, 0)
         cv.Cv2.Absdiff(src(r1), src(r2), dst2(r3))
-        dst3 = dst2.Threshold(options1.pixelDiffThreshold / 1000, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
+        dst1 = dst2.Threshold(options1.mmThreshold / 1000, 255, cv.ThresholdTypes.BinaryInv)
+        dst3 = dst1.ConvertScaleAbs
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -71,65 +72,6 @@ Public Class PCdiff_Edges : Inherits TaskParent
         dst2 = pcDiff.dst3
     End Sub
 End Class
-
-
-
-
-
-Public Class PCdiff_Basics1 : Inherits TaskParent
-    Public options As New Options_ImageOffset
-    Dim options1 As New Options_Diff
-    Public masks(2) As cv.Mat
-    Public dst(2) As cv.Mat
-    Public pcFiltered(2) As cv.Mat
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
-        desc = "Compute various differences between neighboring pixels"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-        options1.Run()
-
-        Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
-        Dim r2 As cv.Rect
-        Select Case options.offsetDirection
-            Case "Upper Left"
-                r2 = New cv.Rect(0, 0, r1.Width, r1.Height)
-            Case "Above"
-                r2 = New cv.Rect(1, 0, r1.Width, r1.Height)
-            Case "Upper Right"
-                r2 = New cv.Rect(2, 0, r1.Width, r1.Height)
-            Case "Left"
-                r2 = New cv.Rect(0, 1, r1.Width, r1.Height)
-            Case "Right"
-                r2 = New cv.Rect(2, 1, r1.Width, r1.Height)
-            Case "Lower Left"
-                r2 = New cv.Rect(0, 2, r1.Width, r1.Height)
-            Case "Below"
-                r2 = New cv.Rect(1, 2, r1.Width, r1.Height)
-            Case "Below Right"
-                r2 = New cv.Rect(2, 2, r1.Width, r1.Height)
-        End Select
-
-        Dim r3 = New cv.Rect(1, 1, r1.Width, r1.Height)
-
-        cv.Cv2.Absdiff(task.pcSplit(0)(r1), task.pcSplit(0)(r2), dst1(r3))
-        cv.Cv2.Absdiff(task.pcSplit(1)(r1), task.pcSplit(1)(r2), dst2(r3))
-        cv.Cv2.Absdiff(task.pcSplit(2)(r1), task.pcSplit(2)(r2), dst3(r3))
-
-        dst = {dst1, dst2, dst3}
-        For i = 0 To dst.Count - 1
-            masks(i) = dst(i).Threshold(options1.pixelDiffThreshold / 1000, 255,
-                                        cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
-            pcFiltered(i) = New cv.Mat(src.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
-            task.pcSplit(i).CopyTo(pcFiltered(i), masks(i))
-        Next
-    End Sub
-End Class
-
 
 
 

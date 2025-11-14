@@ -5,6 +5,36 @@ Public Class RedCC_Basics : Inherits TaskParent
     Public rcMap As cv.Mat
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Insert the RedCloud cells into the RedColor_Basics input."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = runRedCloud(src, labels(2))
+        reduction.Run(src)
+        dst3 = runRedColor(reduction.dst2, labels(3))
+
+        Static picTag As Integer = task.mousePicTag
+        If task.mouseClickFlag Then picTag = task.mousePicTag
+        If picTag = 2 Then
+            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+        Else
+            RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
+        End If
+
+        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+        SetTrueText(strOut, 1)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCC_BasicsOld : Inherits TaskParent
+    Dim reduction As New Reduction_Basics
+    Public rcList As List(Of rcData)
+    Public rcMap As cv.Mat
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
         labels(1) = "Contours of each RedCloud cell - if missing some, CV_8U is the problem."
         desc = "Insert the RedCloud cells into the RedColor_Basics input."
     End Sub
@@ -81,100 +111,13 @@ Public Class RedCC_Merge : Inherits TaskParent
         color8u.Run(task.gray)
         dst3 = color8u.dst3
 
-        dst2 = PaletteBlackZero(color8u.dst2 + dst1)
+        dst2 = PaletteFull(color8u.dst2 + dst1)
 
         RedCloud_Cell.selectCell(redSweep.rcMap, redSweep.rcList)
         If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
         SetTrueText(strOut, 1)
 
         If task.rcD IsNot Nothing Then dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
-    End Sub
-End Class
-
-
-
-
-
-Public Class RedCC_Histograms : Inherits TaskParent
-    Dim hist As New Hist_Basics
-    Public redCC As New RedCC_Color8U
-    Public colorIDList As New List(Of List(Of Integer))
-    Public Sub New()
-        desc = "Add Color8U id's to each RedCloud cell."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        redCC.Run(src)
-        dst2 = redCC.dst2
-        dst1 = redCC.color8u.dst2
-        dst3 = redCC.color8u.dst3
-        labels = redCC.labels
-
-        hist.Run(dst1)
-        Dim actualClasses As Integer
-        For i = 1 To hist.histArray.Count - 1
-            If hist.histArray(i) Then actualClasses += 1
-        Next
-        If task.gOptions.HistBinBar.Maximum >= actualClasses + 1 Then
-            task.gOptions.HistBinBar.Value = actualClasses + 1
-        End If
-
-        colorIDList.Clear()
-        For Each rc In task.redCloud.rcList
-            Dim tmp = dst1(rc.rect)
-            tmp.SetTo(0, Not rc.mask)
-
-            Dim mm = GetMinMax(tmp)
-            hist.Run(tmp)
-
-            Dim colorIDs As New List(Of Integer)
-            For i = 1 To hist.histArray.Count - 1 ' ignore zeros
-                If hist.histArray(i) Then colorIDs.Add(i)
-            Next
-            colorIDList.Add(colorIDs)
-
-            If standaloneTest() Then
-                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-                strOut = ""
-                For Each index In colorIDs
-                    strOut += CStr(index) + ","
-                Next
-                SetTrueText(strOut, rc.maxDist, 2)
-                SetTrueText(strOut, rc.maxDist, 3)
-            End If
-        Next
-        If task.rcD IsNot Nothing Then dst3.Rectangle(task.rcD.rect, white, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-Public Class RedCC_UseHistIDs : Inherits TaskParent
-    Dim histID As New RedCC_Histograms
-    Public Sub New()
-        desc = "Add the colors to the cell mask if they are in the use colorIDs"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        histID.Run(src)
-        dst2 = histID.dst2
-        labels(2) = histID.labels(2)
-
-        For Each rc In task.redCloud.rcList
-            Dim colorMask As New cv.Mat(rc.rect.Size, cv.MatType.CV_8U, 0)
-            For Each index In histID.colorIDList(rc.index - 1)
-                colorMask = colorMask Or histID.redCC.color8u.dst2(rc.rect).InRange(index, index)
-            Next
-            rc.mask = rc.mask Or colorMask
-        Next
-
-        RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-        If task.rcD IsNot Nothing Then
-            strOut = task.rcD.displayCell
-            dst3.SetTo(0)
-            dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
-            task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-        End If
-        SetTrueText(strOut, 3)
     End Sub
 End Class
 

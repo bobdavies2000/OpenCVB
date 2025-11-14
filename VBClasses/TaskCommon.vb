@@ -824,7 +824,7 @@ Public Class rcData
         strOut += "Depth = " + Format(depth, fmt1) + vbCrLf
         strOut += "Color = " + color.ToString + vbCrLf
         strOut += "Pixel count = " + CStr(pixels) + vbCrLf
-        strOut += "Hull count = " + CStr(hull.Count) + vbCrLf
+        If hull IsNot Nothing Then strOut += "Hull count = " + CStr(hull.Count) + vbCrLf
         Return strOut
     End Function
 End Class

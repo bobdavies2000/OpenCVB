@@ -8224,6 +8224,7 @@ End Class
 
 Public Class Options_Diff : Inherits OptionParent
     Public pixelDiffThreshold As Integer
+    Public mmThreshold As Integer
     Public Sub New()
         task.motionThreshold = 5
         Select Case task.workRes.Width
@@ -8243,12 +8244,15 @@ Public Class Options_Diff : Inherits OptionParent
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Color Difference Threshold", 0, 50, 5)
             sliders.setupTrackBar("Motion pixel threshold", 0, 400, task.motionThreshold)
+            sliders.setupTrackBar("Pointcloud threshold (mm)", 0, 1000, 100)
         End If
     End Sub
     Public Sub Run()
         Static motionSlider = FindSlider("Motion pixel threshold")
         Static diffSlider = FindSlider("Color Difference Threshold")
+        Static mmSlider = FindSlider("Pointcloud threshold (mm)")
         pixelDiffThreshold = diffSlider.value
         task.motionThreshold = motionSlider.value
+        mmThreshold = mmSlider.value
     End Sub
 End Class

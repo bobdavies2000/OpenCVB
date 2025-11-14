@@ -1,5 +1,4 @@
-﻿Imports System.Runtime.InteropServices
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits TaskParent
     Public redSweep As New RedCloud_Sweep
     Public rcList As New List(Of rcData)
@@ -78,8 +77,6 @@ Public Class RedCloud_Sweep : Inherits TaskParent
     Public rcList As New List(Of rcData)
     Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Find the biggest chunks of consistent depth data "
     End Sub
     Public Shared Function sweepImage(input As cv.Mat) As List(Of rcData)
@@ -130,64 +127,17 @@ Public Class RedCloud_Sweep : Inherits TaskParent
             dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
         Next
 
-        dst1 = dst3.InRange(255, 255)
-
-        labels(2) = CStr(rcList.Count) + " regions were identified."
+        labels(2) = CStr(rcList.Count) + " RedCloud cells were identified."
 
         Static unchanged As Integer
         If task.motionRect.Width = 0 Then
             unchanged += 1
             labels(3) = "RedCloud cells were unchanged " + CStr(unchanged) + " times since last heartBeatLT"
         End If
+        If task.heartBeatLT Then unchanged = 0
     End Sub
 End Class
 
-
-
-
-
-Public Class RedCloud_Defect : Inherits TaskParent
-    Public hull As New List(Of cv.Point)
-    Public Sub New()
-        desc = "Find defects in the RedCloud cells."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedCloud(src, labels(2))
-
-        dst3.SetTo(0)
-        For Each rc In task.redCloud.rcList
-            Dim contour = ContourBuild(rc.mask)
-            Dim hullIndices = cv.Cv2.ConvexHullIndices(contour, False)
-            For i = 0 To contour.Count - 1
-                Dim p1 = contour(i)
-                For j = i + 1 To contour.Count - 1
-                    Dim p2 = contour(j)
-                    If p1 = p2 Then Continue For
-                Next
-            Next
-
-            Try
-                Dim defects = cv.Cv2.ConvexityDefects(contour, hullIndices.ToList)
-                Dim lastV As Integer = -1
-                Dim newC As New List(Of cv.Point)
-                For Each v In defects
-                    If v(0) <> lastV And lastV >= 0 Then
-                        For i = lastV To v(0) - 1
-                            newC.Add(contour(i))
-                        Next
-                    End If
-                    newC.Add(contour(v(0)))
-                    newC.Add(contour(v(2)))
-                    newC.Add(contour(v(1)))
-                    lastV = v(1)
-                Next
-                DrawTour(dst3(rc.rect), newC, rc.color)
-            Catch ex As Exception
-                Continue For
-            End Try
-        Next
-    End Sub
-End Class
 
 
 
@@ -234,40 +184,8 @@ End Class
 
 
 
-Public Class RedCloud_Motion : Inherits TaskParent
-    Public Sub New()
-        desc = "Run RedCloud with the motion-updated version of the pointcloud."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static unchanged As Integer
-        If task.motionRect.Width Then
-            dst2 = runRedCloud(task.pointCloud, labels(2))
-        Else
-            unchanged += 1
-        End If
-        If task.heartBeatLT Then unchanged = 0
-
-        dst2.Rectangle(task.motionRect, task.highlight, task.lineWidth)
-
-        If standaloneTest() Then
-            For Each rc In task.redCloud.rcList
-                SetTrueText(CStr(rc.age), rc.maxDist)
-            Next
-
-            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
-            SetTrueText(strOut, 3)
-        End If
-
-        labels(2) = "RedCloud cells were unchanged " + CStr(unchanged) + " times since last heartBeatLT"
-    End Sub
-End Class
-
-
-
-
 Public Class RedCloud_CellMask : Inherits TaskParent
-    Dim redMotion As New RedCloud_Motion
+    Dim redMotion As New XO_RedCloud_Motion
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Create a mask that outlines all the RedCloud cells."
@@ -324,115 +242,12 @@ End Class
 
 
 
-Public Class RedCloud_CPP : Inherits TaskParent
-    Public classCount As Integer
-    Public rcList As New List(Of rcData)
-    Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public Sub New()
-        cPtr = RedCloud_Open()
-        desc = "Run the C++ RedCloud interface without a mask"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = srcMustBe8U(src)
-
-        Dim imagePtr As IntPtr
-        Dim inputData(dst1.Total - 1) As Byte
-        Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
-        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-        imagePtr = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
-        handleInput.Free()
-        dst0 = cv.Mat.FromPixelData(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, imagePtr).Clone
-
-        classCount = RedCloud_Count(cPtr)
-
-        If classCount = 0 Then Exit Sub ' no data to process.
-
-        Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4,
-                                            RedCloud_Rects(cPtr))
-
-        Dim rects(classCount * 4) As Integer
-        Marshal.Copy(rectData.Data, rects, 0, rects.Length)
-
-
-        Dim rcListLast = New List(Of rcData)(rcList)
-        Dim rcMapLast As cv.Mat = rcMap.Clone
-
-        Dim minPixels As Integer = dst2.Total * 0.001
-        Dim index As Integer = 1
-        Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To rects.Length - 4 Step 4
-            Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
-            Dim rc = New rcData(dst0(r), r, index)
-            If rc.pixels < minPixels Then Continue For
-            newList.Add(rc.pixels, rc)
-            index += 1
-        Next
-
-        Dim r2 As cv.Rect
-        Dim count As Integer
-        rcList.Clear()
-        Dim usedColor As New List(Of cv.Scalar)
-        For Each rc In newList.Values
-            Dim r1 = rc.rect
-            r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
-            Dim indexLast As Integer = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If indexLast > 0 And indexLast < rcListLast.Count Then
-                indexLast -= 1 ' index is 1 less than the rcMap value
-                r2 = rcListLast(indexLast).rect
-            Else
-                indexLast = -1
-            End If
-            If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
-                rc.age = rcListLast(indexLast).age + 1
-                rc.color = rcListLast(indexLast).color
-                If rc.age >= 1000 Then rc.age = 2
-                count += 1
-            End If
-
-            If usedColor.Contains(rc.color) Then
-                rc.color = randomCellColor()
-                rc.age = 1
-            End If
-            usedColor.Add(rc.color)
-
-            rc.index = rcList.Count + 1
-            rcList.Add(rc)
-            rcMap(rc.rect).SetTo(rc.index, rc.mask)
-            SetTrueText(CStr(rc.age), rc.maxDist)
-        Next
-
-        dst2.SetTo(0)
-        For Each rc In rcList
-            rc.mask = rcMap(rc.rect).InRange(rc.index, rc.index)
-            rc.buildMaxDist()
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-        Next
-
-        If standaloneTest() Then
-            RedCloud_Cell.selectCell(rcMap, rcList)
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
-            SetTrueText(strOut, 3)
-        End If
-
-        labels(2) = CStr(classCount) + " cells. " + CStr(rcList.Count) + " cells >" +
-                    " minpixels.  " + CStr(count) + " matched to previous generation"
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
-    End Sub
-End Class
-
-
-
 
 
 Public Class RedCloud_Small : Inherits TaskParent
     Dim minRes As cv.Size
     Public Sub New()
-        Dim str = CStr(task.cols) + "x" + CStr(task.rows)
-        Select Case str
+        Select Case CStr(task.cols) + "x" + CStr(task.rows)
             Case "1920x1080", "960x540", "480x270"
                 minRes = New cv.Size(480, 270)
             Case "1280x720", "640x360", "320x180"
@@ -444,16 +259,31 @@ Public Class RedCloud_Small : Inherits TaskParent
             Case "672x376", "336x188", "168x94"
                 minRes = New cv.Size(168, 94)
         End Select
-        desc = "Run RedCloud at the smallest resolution and floodFill using the maxDist points."
+        desc = "Run RedCloud at the smallest resolution and resize. NOT WORTH IT!"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim minRect = New cv.Rect(0, 0, minRes.Width, minRes.Height)
         If src.Size <> minRes Then src = task.pointCloud.Resize(minRes) Else src = task.pointCloud
-        dst3 = runRedCloud(src, labels(2))
-        dst2 = dst3(New cv.Rect(0, 0, minRes.Width, minRes.Height)).Resize(task.workRes)
+        dst1 = runRedCloud(src, labels(2))(minRect)
+        dst2 = dst1.Resize(task.workRes)
 
         If task.firstPass Then
             OptionParent.FindSlider("Reduction Target").Value = 400
         End If
+
+        Dim ratio = CInt(task.workRes.Width / minRes.Width)
+        task.redCloud.rcMap.SetTo(0)
+        For Each rc In task.redCloud.rcList
+            Dim r = rc.rect
+            rc.rect = New cv.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio)
+            Dim maskSize = New cv.Size(rc.rect.Width, rc.rect.Height)
+            rc.mask = rc.mask.Resize(maskSize)
+            task.redCloud.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+        Next
+
+        RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+        If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+        SetTrueText(strOut, 3)
     End Sub
 End Class
 
