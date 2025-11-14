@@ -2,31 +2,10 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Public lineCore As New Line_Core
-    Public Sub New()
-        desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.algorithmPrep = False Then Exit Sub ' only run as a task algorithm.
-        lineCore.Run(task.gray)
-        dst2 = lineCore.dst2
-        labels(2) = lineCore.labels(2)
-
-        lpList = New List(Of lpData)(lineCore.lpList)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Line_Core : Inherits TaskParent
-    Public lpList As New List(Of lpData)
-    Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
     Public rawLines As New Line_Raw
     Public Sub New()
-        desc = "The core algorithm to find lines.  Line_Basics is a task algorithm that exits when run as a normal algorithm."
+        If standalone Then task.gOptions.showMotionMask.Checked = True
+        desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
     End Sub
     Private Function lpMotion(lp As lpData) As Boolean
         ' return true if either line endpoint was in the motion mask.
@@ -35,6 +14,9 @@ Public Class Line_Core : Inherits TaskParent
         Return False
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.algorithmPrep = False Then Exit Sub ' only run as a task algorithm.
+
+        If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
         If lpList.Count = 0 Then
             task.motionMask.SetTo(255)
             rawLines.Run(src)
@@ -66,15 +48,35 @@ Public Class Line_Core : Inherits TaskParent
             lpList.Add(lp)
         Next
 
-        lpRectMap.SetTo(0)
         dst2.SetTo(0)
-        For i = lpList.Count - 1 To 0 Step -1
-            Dim lp = lpList(i)
-            lpRectMap.Rectangle(lp.rect, i + 1, -1)
+        For Each lp In lpList
             DrawLine(dst2, lp, lp.color)
         Next
 
+        dst3 = src
         labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_Core : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Public rawLines As New Line_Raw
+    Public Sub New()
+        desc = "The core algorithm to find lines.  Line_Basics is a task algorithm that exits when run as a normal algorithm."
+    End Sub
+    Private Function lpMotion(lp As lpData) As Boolean
+        ' return true if either line endpoint was in the motion mask.
+        If task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
+        If task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
+        Return False
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+
     End Sub
 End Class
 

@@ -415,13 +415,13 @@ Public Class VBtask : Implements IDisposable
         HomeDir = parms.HomeDir
         main_hwnd = parms.main_hwnd
 
-        Cloud_Basics.ppx = task.calibData.rgbIntrinsics.ppx
-        Cloud_Basics.ppy = task.calibData.rgbIntrinsics.ppy
-        Cloud_Basics.fx = task.calibData.rgbIntrinsics.fx
-        Cloud_Basics.fy = task.calibData.rgbIntrinsics.fy
+        Cloud_Basics.ppx = calibData.rgbIntrinsics.ppx
+        Cloud_Basics.ppy = calibData.rgbIntrinsics.ppy
+        Cloud_Basics.fx = calibData.rgbIntrinsics.fx
+        Cloud_Basics.fy = calibData.rgbIntrinsics.fy
 
-        task.rgbLeftAligned = True
-        If task.cameraName.Contains("RealSense") Then task.rgbLeftAligned = False
+        rgbLeftAligned = True
+        If cameraName.Contains("RealSense") Then rgbLeftAligned = False
 
         mainFormLocation = parms.mainFormLocation
         rows = parms.workRes.Height
@@ -430,9 +430,9 @@ Public Class VBtask : Implements IDisposable
         captureRes = parms.captureRes
         optionsChanged = True
 
-        ReDim task.results.dstList(3)
-        For i = 0 To task.results.dstList.Count - 1
-            task.results.dstList(i) = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
+        ReDim results.dstList(3)
+        For i = 0 To results.dstList.Count - 1
+            results.dstList(i) = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
         Next
 
         OpenGL_Left = CInt(GetSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", mainFormLocation.X))
@@ -443,7 +443,7 @@ Public Class VBtask : Implements IDisposable
         allOptions = New OptionsContainer
         allOptions.Show()
 
-        If algName.StartsWith("GL_") And algName <> "GL_MainForm" And task.optionsChanged Then
+        If algName.StartsWith("GL_") And algName <> "GL_MainForm" And optionsChanged Then
             If sharpGL IsNot Nothing Then sharpGL.Dispose()
             sharpGL = New SharpGLForm
             sharpGL.Show()
@@ -454,8 +454,8 @@ Public Class VBtask : Implements IDisposable
         treeView = New TreeViewForm
 
         callTrace = New List(Of String)
-        task.pointCloud = New cv.Mat(task.workRes, cv.MatType.CV_32FC3, 0)
-        task.gravityCloud = New cv.Mat(task.workRes, cv.MatType.CV_32FC3, 0)
+        pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
+        gravityCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
 
         colorizer = New DepthColorizer_Basics
         gmat = New IMU_GMatrix
@@ -477,8 +477,8 @@ Public Class VBtask : Implements IDisposable
         gOptions.Show()
         Options_HistPointCloud.setupCalcHist()
         treeView.Show()
-        centerRect = New cv.Rect(task.workRes.Width / 4, task.workRes.Height / 4,
-                                 task.workRes.Width / 2, task.workRes.Height / 2)
+        centerRect = New cv.Rect(workRes.Width / 4, workRes.Height / 4,
+                                 workRes.Width / 2, workRes.Height / 2)
 
         fpList.Clear()
 
@@ -587,22 +587,24 @@ Public Class VBtask : Implements IDisposable
 
         frameHistoryCount = 3 ' default value.  Use Options_History to update this value.
 
-        If task.optionsChanged Then task.motionMask.SetTo(255)
+        If optionsChanged Then motionMask.SetTo(255)
 
-        rgbFilter.Run(task.color)
-        motionBasics.Run(task.gray)
-        If task.gOptions.UseMotionMask.Checked Then
-            If task.optionsChanged Then
-                task.motionRect = New cv.Rect(0, 0, task.workRes.Width, task.workRes.Height)
+        rgbFilter.Run(color)
+        If gOptions.UseMotionMask.Checked Then
+            motionBasics.Run(gray)
+            If optionsChanged Then
+                motionRect = New cv.Rect(0, 0, workRes.Width, workRes.Height)
                 grayStable = gray.Clone
                 leftViewStable = leftView.Clone
             Else
                 If motionRect.Width > 0 Then
-                    gray.CopyTo(grayStable, task.motionMask)
-                    leftView.CopyTo(leftViewStable, task.motionMask)
+                    gray.CopyTo(grayStable, motionMask)
+                    leftView.CopyTo(leftViewStable, motionMask)
                 End If
             End If
         Else
+            motionMask.SetTo(255)
+            motionBasics.motionList.Clear()
             grayStable = gray
             leftViewStable = leftView
             motionRect = New cv.Rect(0, 0, gray.Width, gray.Height)
@@ -612,8 +614,8 @@ Public Class VBtask : Implements IDisposable
 
         colorizer.Run(src)
 
-        If task.feat IsNot Nothing Then task.feat.Run(src)
-        If task.bricks IsNot Nothing Then bricks.Run(src)
+        If feat IsNot Nothing Then feat.Run(src)
+        If bricks IsNot Nothing Then bricks.Run(src)
 
         If pixelViewerOn And PixelViewer Is Nothing Then
             PixelViewer = New Pixel_Viewer
@@ -624,8 +626,8 @@ Public Class VBtask : Implements IDisposable
         If gOptions.CreateGif.Checked Then
             If gifCreator Is Nothing Then gifCreator = New Gif_OpenCVB
             gifCreator.Run(src.Clone)
-            If task.gifCreator.gifC.options.buildCheck.Checked Then
-                task.gifCreator.gifC.options.buildCheck.Checked = False
+            If gifCreator.gifC.options.buildCheck.Checked Then
+                gifCreator.gifC.options.buildCheck.Checked = False
                 For i = 0 To gifImages.Count - 1
                     Dim fileName As New FileInfo(HomeDir + "Temp/image" + Format(i, "000") + ".bmp")
                     gifImages(i).Save(fileName.FullName)
@@ -647,10 +649,10 @@ Public Class VBtask : Implements IDisposable
 
         lines.Run(grayStable)
         gravityBasics.Run(src.Clone)
-        histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
+        histBinList = {histogramBins, histogramBins, histogramBins}
 
-        Dim saveOptionsChanged = task.optionsChanged
-        If task.optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True
+        Dim saveOptionsChanged = optionsChanged
+        If optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True
         If activateTaskForms Then
             If sharpGL IsNot Nothing Then sharpGL.Activate()
             treeView.Activate()
@@ -658,33 +660,33 @@ Public Class VBtask : Implements IDisposable
             If PixelViewer IsNot Nothing Then PixelViewer.viewerForm.Activate()
             activateTaskForms = False
         End If
-        If task.paused = False Then
+        If paused = False Then
 
 
 
 
             algorithmPrep = False
-            task.MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
+            MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
             algorithmPrep = True
 
 
 
 
-            task.labels = task.MainUI_Algorithm.labels
-            Dim nextTrueData As List(Of TrueText) = task.MainUI_Algorithm.trueData
-            task.trueData = New List(Of TrueText)(nextTrueData)
+            labels = MainUI_Algorithm.labels
+            Dim nextTrueData As List(Of TrueText) = MainUI_Algorithm.trueData
+            trueData = New List(Of TrueText)(nextTrueData)
 
             firstPass = False
             heartBeatLT = False
 
-            Dim displayObject = findDisplayObject(task.displayObjectName)
+            Dim displayObject = findDisplayObject(displayObjectName)
             postProcess(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
 
             SyncLock resultLock
                 If gOptions.displayDst0.Checked Then
                     results.dstList(0) = Check8uC3(displayObject.dst0)
                 Else
-                    results.dstList(0) = task.color.Clone
+                    results.dstList(0) = color.Clone
                 End If
 
                 If gOptions.displayDst1.Checked Then
@@ -714,10 +716,10 @@ Public Class VBtask : Implements IDisposable
 
                 If gOptions.ShowGrid.Checked Then results.dstList(2).SetTo(cv.Scalar.White, gridMask)
                 If gOptions.showMotionMask.Checked Then
-                    For Each mIndex In task.motionBasics.motionList
+                    For Each mIndex In motionBasics.motionList
                         results.dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
                     Next
-                    results.dstList(0).Rectangle(task.motionRect, white, task.lineWidth)
+                    results.dstList(0).Rectangle(motionRect, white, lineWidth)
                 End If
 
                 If gOptions.CrossHairs.Checked Then
@@ -732,16 +734,16 @@ Public Class VBtask : Implements IDisposable
             Dim index = algorithmNames.IndexOf(displayObject.traceName)
             If index = -1 Then
                 displayObject.trueData.Add(New TrueText("This task is not active at this time.",
-                                           New cv.Point(task.workRes.Width / 3, task.workRes.Height / 2), 2))
+                                           New cv.Point(workRes.Width / 3, workRes.Height / 2), 2))
                 displayObject.trueData.Add(New TrueText("This task is not active at this time.",
-                                           New cv.Point(task.workRes.Width / 3, task.workRes.Height / 2), 3))
+                                           New cv.Point(workRes.Width / 3, workRes.Height / 2), 3))
             End If
 
             trueData = New List(Of TrueText)(displayObject.trueData)
             displayObject.trueData.Clear()
             labels = displayObject.labels
             If displayDst1 Then labels(1) = displayObject.labels(1)
-            depthAndDepthRange = task.depthAndDepthRange
+            depthAndDepthRange = depthAndDepthRange
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

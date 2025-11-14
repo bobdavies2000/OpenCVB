@@ -7819,7 +7819,8 @@ Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
 
         Dim lpLast = lpInput
 
-        Dim index = task.lines.lineCore.lpRectMap.Get(Of Byte)(lpInput.ptCenter.Y, lpInput.ptCenter.X)
+        Dim lpRectMap = XO_Line_CoreNew.createMap()
+        Dim index = lpRectMap.Get(Of Byte)(lpInput.ptCenter.Y, lpInput.ptCenter.X)
         If index > 0 Then
             Dim lp = lplist(index - 1)
             If lpInput.index = lp.index Then
@@ -7930,7 +7931,8 @@ Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
             dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
         End If
 
-        dst1 = PaletteBlackZero(task.lines.lineCore.lpRectMap)
+        Dim lpRectMap = XO_Line_CoreNew.createMap()
+        dst1 = PaletteBlackZero(lpRectMap)
         dst1.Circle(lp.ptCenter, task.DotSize, task.highlight, task.lineWidth, task.lineType)
 
         labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
@@ -7955,8 +7957,9 @@ Public Class XO_BrickPoint_VetLines : Inherits TaskParent
         bPoint.Run(src.Clone)
 
         Dim pointsPerLine(task.gridRects.Count) As List(Of Integer)
+        Dim lpRectMap = XO_Line_CoreNew.createMap()
         For Each pt In bPoint.ptList
-            Dim index = task.lines.lineCore.lpRectMap.Get(Of Byte)(pt.Y, pt.X)
+            Dim index = lpRectMap.Get(Of Byte)(pt.Y, pt.X)
             If index > 0 And index < task.lines.lpList.Count Then
                 Dim lp = task.lines.lpList(index)
                 If pointsPerLine(lp.index) Is Nothing Then pointsPerLine(lp.index) = New List(Of Integer)
@@ -8015,11 +8018,11 @@ Public Class XO_Gravity_Basics1 : Inherits TaskParent
         Static RGBcandidate As New lpData
 
         Dim stillPresent As Integer
+        Dim lpRectMap = XO_Line_CoreNew.createMap()
         If RGBcandidate.length = 0 Then
             If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
         Else
-            stillPresent = task.lines.lineCore.lpRectMap.Get(Of Byte)(RGBcandidate.ptCenter.Y,
-                                                                      RGBcandidate.ptCenter.X)
+            stillPresent = lpRectMap.Get(Of Byte)(RGBcandidate.ptCenter.Y, RGBcandidate.ptCenter.X)
         End If
 
         If stillPresent Then
@@ -10831,7 +10834,8 @@ Public Class XO_KNN_LongestLine : Inherits TaskParent
         dst3 = task.lines.dst3
         labels(3) = task.lines.labels(3)
 
-        dst1 = PaletteBlackZero(task.lines.lineCore.lpRectMap)
+        Dim lpRectMap = XO_Line_CoreNew.createMap()
+        dst1 = PaletteBlackZero(lpRectMap)
     End Sub
 End Class
 
@@ -10860,10 +10864,11 @@ Public Class XO_KNN_BoundingRect : Inherits TaskParent
             lp = lplist(sortRects.ElementAt(0).Value)
         End If
 
-        dst1 = PaletteBlackZero(task.lines.lineCore.lpRectMap)
+        Dim lpRectMap = XO_Line_CoreNew.createMap()
+        dst1 = PaletteBlackZero(lpRectMap)
         DrawCircle(dst1, lp.ptCenter)
 
-        Dim index = task.lines.lineCore.lpRectMap.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
+        Dim index = lpRectMap.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
         If index > 0 Then lp = lplist(index - 1)
         dst2 = src
         dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
@@ -10972,7 +10977,7 @@ Public Class XO_Line_GravityToLongest : Inherits TaskParent
         If matchLine.lpInput Is Nothing Then Exit Sub
         matchLine.Run(src)
         dst2 = matchLine.dst2
-        dst3 = task.lines.lineCore.rawLines.dst2
+        dst3 = task.lines.dst2
     End Sub
 End Class
 
@@ -14223,8 +14228,9 @@ Public Class XO_MinMath_Line : Inherits TaskParent
 
         Dim linesFound As New List(Of Byte)
         Dim ptList(task.lines.lpList.Count - 1) As List(Of cv.Point)
+        Dim lpRectMap = XO_Line_CoreNew.createMap()
         For Each bp In bPoints.ptList
-            Dim val = task.lines.lineCore.lpRectMap.Get(Of Byte)(bp.Y, bp.X)
+            Dim val = lpRectMap.Get(Of Byte)(bp.Y, bp.X)
             If val = 0 Then Continue For
             If linesFound.Contains(val) = False Then
                 linesFound.Add(val)
@@ -17240,5 +17246,71 @@ Public Class XO_RedCC_UseHistIDs : Inherits TaskParent
             task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
         End If
         SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_Line_CoreNew : Inherits TaskParent
+    Public lpList As New List(Of lpData)
+    Public rawLines As New Line_Raw
+    Public Sub New()
+        desc = "The core algorithm to find lines.  Line_Basics is a task algorithm that exits when run as a normal algorithm."
+    End Sub
+    Private Function lpMotion(lp As lpData) As Boolean
+        ' return true if either line endpoint was in the motion mask.
+        If task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
+        If task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
+        Return False
+    End Function
+    Public Shared Function createMap() As cv.Mat
+        Dim lpRectMap As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+        lpRectMap.SetTo(0)
+        For Each lp In task.lines.lpList
+            lpRectMap.Rectangle(lp.rect, lp.index, -1)
+        Next
+        Return lpRectMap
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If lpList.Count = 0 Then
+            task.motionMask.SetTo(255)
+            rawLines.Run(src)
+            lpList = New List(Of lpData)(rawLines.lpList)
+        End If
+
+        Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+        Dim count As Integer
+        For Each lp In lpList
+            If lpMotion(lp) = False Then
+                lp.age += 1
+                sortlines.Add(lp.length, lp)
+                count += 1
+            End If
+        Next
+
+        rawLines.Run(src)
+
+        For Each lp In rawLines.lpList
+            If lpMotion(lp) Then
+                lp.age = 1
+                sortlines.Add(lp.length, lp)
+            End If
+        Next
+
+        lpList.Clear()
+        For Each lp In sortlines.Values
+            lp.index = lpList.Count
+            lpList.Add(lp)
+        Next
+
+        For Each lp In lpList
+            DrawLine(dst2, lp, lp.color)
+        Next
+
+        labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
     End Sub
 End Class
