@@ -2,8 +2,8 @@ Imports cv = OpenCvSharp
 Public Class Structured_Basics : Inherits TaskParent
     Public lpListX As New List(Of lpData)
     Public lpListY As New List(Of lpData)
-    Public linesX As New Line_Core
-    Public linesY As New Line_Core
+    Public linesX As New Line_Basics
+    Public linesY As New Line_Basics
     Dim struct As New Structured_Core
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

@@ -10543,7 +10543,7 @@ End Class
 
 
 Public Class XO_Line_ViewLeftRight : Inherits TaskParent
-    Dim lines As New Line_Core
+    Dim lines As New Line_Basics
     Dim rawLines As New Line_Raw
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
@@ -17312,5 +17312,91 @@ Public Class XO_Line_CoreNew : Inherits TaskParent
         Next
 
         labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Line_Motion2 : Inherits TaskParent
+    Dim diff As New Diff_RGBAccum
+    Dim lineHistory As New List(Of List(Of lpData))
+    Public Sub New()
+        labels(3) = "Wave at the camera to see results - "
+        desc = "Track lines that are the result of motion."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.optionsChanged Then lineHistory.Clear()
+
+        diff.Run(src)
+        dst2 = diff.dst2
+
+        If task.heartBeat Then dst3 = src
+        lineHistory.Add(task.lines.lpList)
+        For Each lplist In lineHistory
+            For Each lp In lplist
+                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            Next
+        Next
+        If lineHistory.Count >= task.frameHistoryCount Then lineHistory.RemoveAt(0)
+
+        labels(2) = CStr(task.lines.lpList.Count) + " lines were found in the diff output"
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Line_Backprojection : Inherits TaskParent
+    Dim backP As New BackProject_DisplayColor
+    Dim rawLines As New Line_Raw
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+        labels = {"", "", "Lines found in the back projection", "Backprojection results"}
+        desc = "Find lines in the back projection"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        backP.Run(src)
+
+        rawLines.Run(backP.dst2)
+        labels(2) = rawLines.labels(2)
+        dst2 = src
+        dst3.SetTo(0)
+        For Each lp In rawLines.lpList
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_Line_BrickPoints : Inherits TaskParent
+    Public sortLines As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public Sub New()
+        If task.feat Is Nothing Then task.feat = New Feature_Basics
+        If task.feat Is Nothing Then task.feat = New Feature_Basics
+        desc = "Assign brick points to each of the lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = task.lines.dst2
+
+        sortLines.Clear()
+        dst3.SetTo(0)
+        For Each pt In task.features
+            Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
+            If lineIndex = 0 Then Continue For
+            Dim color = vecToScalar(task.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
+            Dim index As Integer = sortLines.Keys.Contains(lineIndex)
+            Dim gridindex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            sortLines.Add(lineIndex, gridindex)
+            DrawCircle(dst3, pt, color)
+        Next
     End Sub
 End Class
