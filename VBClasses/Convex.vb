@@ -40,7 +40,7 @@ Public Class Convex_Basics : Inherits TaskParent
         DrawTour(dst2, hullList, white, -1)
 
         For i = 0 To hull.Count - 1
-            DrawLine(dst2, hull(i), hull((i + 1) Mod hull.Count), white)
+            dst2.Line(hull(i), hull((i + 1) Mod hull.Count), white, task.lineWidth, task.lineWidth)
         Next
     End Sub
 End Class

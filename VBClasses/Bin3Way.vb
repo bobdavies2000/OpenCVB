@@ -34,9 +34,9 @@ Public Class Bin3Way_Basics : Inherits TaskParent
         End If
 
         Dim offset = firstThird / bins * dst3.Width
-        DrawLine(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white)
+        dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, task.lineWidth, task.lineWidth)
         offset = lastThird / bins * dst3.Width
-        DrawLine(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white)
+        dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, task.lineWidth, task.lineWidth)
 
         mats.mat(0) = task.gray.InRange(0, firstThird - 1)         ' darkest
         mats.mat(1) = task.gray.InRange(lastThird, 255)            ' lightest

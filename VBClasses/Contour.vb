@@ -222,7 +222,7 @@ Public Class Contour_LineRGB : Inherits TaskParent
         labels(2) = contours.labels(2)
 
         For Each lp In task.lines.lpList
-            DrawLine(dst2, lp.p1, lp.p2)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
         Next
     End Sub
 End Class
@@ -355,8 +355,8 @@ Public Class Contour_SidePoints : Inherits TaskParent
             If rc.contour.Count > 0 Then
                 dst3.SetTo(0)
                 DrawTour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
-                DrawLine(dst3, ptLeft, ptRight, white)
-                DrawLine(dst3, ptTop, ptBot, white)
+                dst3.Line(ptLeft, ptRight, white, task.lineWidth, task.lineWidth)
+                dst3.Line(ptTop, ptBot, white, task.lineWidth, task.lineWidth)
             End If
             If task.heartBeat Then
                 strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + " 3D location (units=meters)" + vbCrLf
@@ -566,7 +566,7 @@ Public Class Contour_FromPoints : Inherits TaskParent
             dst2.SetTo(0)
             For Each p1 In random.PointList
                 For Each p2 In random.PointList
-                    DrawLine(dst2, p1, p2, white)
+                    dst2.Line(p1, p2, white, task.lineWidth, task.lineWidth)
                 Next
             Next
         End If
@@ -727,7 +727,7 @@ Public Class Contour_Lines : Inherits TaskParent
 
         dst2 = src
         For Each lp In task.lines.lpList
-            DrawLine(dst2, lp.p1, lp.p2)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
         Next
         labels(2) = task.lines.labels(2)
     End Sub

@@ -480,7 +480,7 @@ Public Class BackProject_MaskLines : Inherits TaskParent
 
         For Each lp In rawLines.lpList
             Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-            If val = 255 Then DrawLine(dst1, lp.p1, lp.p2, white)
+            If val = 255 Then dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineWidth)
         Next
         dst3.SetTo(cv.Scalar.Yellow, masks.mask)
         dst3.SetTo(task.highlight, dst1)

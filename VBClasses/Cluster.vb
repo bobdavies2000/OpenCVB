@@ -56,7 +56,7 @@ Public Class Cluster_Basics : Inherits TaskParent
         For Each group In clusters
             For i = 0 To group.Value.Count - 1
                 For j = 0 To group.Value.Count - 1
-                    DrawLine(dst2, group.Value(i), group.Value(j), white)
+                    dst2.Line(group.Value(i), group.Value(j), white, task.lineWidth, task.lineWidth)
                 Next
             Next
         Next
@@ -98,7 +98,7 @@ Public Class Cluster_Hulls : Inherits TaskParent
                     hull.Add(New cv.Point(pt.X, pt.Y))
                 Next
             ElseIf hullPoints.Count = 2 Then
-                DrawLine(dst3, hullPoints(0), hullPoints(1), white)
+                dst3.Line(hullPoints(0), hullPoints(1), white, task.lineWidth, task.lineWidth)
             Else
                 DrawCircle(dst3, hullPoints(0), task.DotSize, task.highlight)
             End If

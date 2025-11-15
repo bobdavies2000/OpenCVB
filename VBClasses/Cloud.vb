@@ -250,7 +250,7 @@ Public Class Cloud_SetupTop : Inherits TaskParent
         Dim shift = (src.Width - src.Height) / 2
         Dim labelLocation = New cv.Point(dst2.Width / 2 + shift, dst2.Height * 15 / 16)
         SetTrueText("hFOV=" + Format(180 - startAngle * 2, "0.0") + " deg.", New cv.Point(4, dst2.Height * 7 / 8))
-        DrawLine(dst2, task.topCameraPoint, fovRight, white)
+        dst2.Line(task.topCameraPoint, fovRight, white, task.lineWidth, task.lineWidth)
     End Sub
 End Class
 
@@ -381,7 +381,7 @@ Public Class Cloud_SurfaceH : Inherits TaskParent
 
         Dim ratio = task.mouseMovePoint.Y / dst2.Height
         Dim offset = ratio * dst3.Height
-        DrawLine(dst2, New cv.Point(0, task.mouseMovePoint.Y), New cv.Point(dst2.Width, task.mouseMovePoint.Y), cv.Scalar.Yellow)
+        dst2.Line(New cv.Point(0, task.mouseMovePoint.Y), New cv.Point(dst2.Width, task.mouseMovePoint.Y), yellow, task.lineWidth, task.lineWidth)
         dst3.Line(New cv.Point(0, offset), New cv.Point(dst3.Width, offset), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class
@@ -405,7 +405,7 @@ Public Class Cloud_GridInspector : Inherits TaskParent
         Dim topPt = New cv.Point2f(cLine, 0)
         Dim botPt = New cv.Point2f(cLine, dst2.Height)
         dst2 = task.depthRGB
-        DrawLine(dst2, topPt, botPt, 255)
+        dst2.Line(topPt, botPt, 255, task.lineWidth, task.lineWidth)
 
         SetTrueText("Values show brick.pt3d values at the blue line.", New cv.Point(dst2.Width / 2, 0), 3)
         For i = 0 To dst2.Height - 1 Step task.brickSize

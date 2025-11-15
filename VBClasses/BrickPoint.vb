@@ -221,7 +221,7 @@ Public Class BrickPoint_DistanceAbove : Inherits TaskParent
         For Each brick In task.bricks.brickList
             Dim lp = lpList(brick.index)
             If lp.length < min Or lp.length > max Then Continue For
-            DrawLine(dst3, lp.p1, lp.p2)
+            dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
         Next
     End Sub
 End Class
@@ -417,13 +417,13 @@ Public Class BrickPoint_KNN : Inherits TaskParent
         For i = 0 To knn.neighbors.Count - 1
             Dim p1 = knn.trainInput(i)
             Dim p2 = knn.trainInput(knn.neighbors(i)(1))
-            DrawLine(dst3, p1, p2, 255)
+            dst3.Line(p1, p2, 255, task.lineWidth, task.lineWidth)
             lplist.Add(New lpData(p1, p2))
         Next
 
         dst2 = src.Clone
         For Each lp In task.lines.lpList
-            DrawLine(dst2, lp.p1, lp.p2)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineWidth)
         Next
     End Sub
 End Class
@@ -465,7 +465,7 @@ Public Class BrickPoint_EndPoints : Inherits TaskParent
 
         For Each index In lineList
             Dim lp = lplist(index)
-            DrawLine(dst2, lp.pE1, lp.pE2)
+            dst2.Line(lp.pE1, lp.pE2, task.highlight, task.lineWidth, task.lineWidth)
         Next
     End Sub
 End Class

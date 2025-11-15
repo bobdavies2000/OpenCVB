@@ -27,7 +27,7 @@ Public Class Bezier_Basics : Inherits TaskParent
         For i = 0 To points.Count - 4 Step 3
             For j = 0 To 100
                 Dim p2 = nextPoint(points, i, j / 100)
-                If j > 0 Then DrawLine(dst2, p1, p2, task.highlight)
+                If j > 0 Then dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineWidth)
                 p1 = p2
             Next
         Next
@@ -49,12 +49,12 @@ Public Class Bezier_Example : Inherits TaskParent
     Public Sub New()
         desc = "Draw a Bezier curve based with the 4 input points."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2.SetTo(0)
         Dim p1 As cv.Point
         For i = 0 To 100 - 1
             Dim p2 = bezier.nextPoint(points, 0, i / 100)
-            If i > 0 Then DrawLine(dst2, p1, p2, task.highlight)
+            If i > 0 Then dst2.Line(p1, p2, task.highlight, task.lineWidth, task.lineWidth)
             p1 = p2
         Next
 
@@ -62,8 +62,8 @@ Public Class Bezier_Example : Inherits TaskParent
             DrawCircle(dst2, points(i), task.DotSize + 2, white)
         Next
 
-        DrawLine(dst2, points(0), points(1), white)
-        DrawLine(dst2, points(2), points(3), white)
+        dst2.Line(points(0), points(1), white, task.lineWidth, task.lineWidth)
+        dst2.Line(points(2), points(3), white, task.lineWidth, task.lineWidth)
     End Sub
 End Class
 

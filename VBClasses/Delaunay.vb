@@ -63,7 +63,7 @@ Public Class Delaunay_SubDiv : Inherits TaskParent
                 Dim e = edgeList(i)
                 Dim p0 = New cv.Point(Math.Round(e(0)), Math.Round(e(1)))
                 Dim p1 = New cv.Point(Math.Round(e(2)), Math.Round(e(3)))
-                DrawLine(dst2, p0, p1, white)
+                dst2.Line(p0, p1, white, task.lineWidth, task.lineWidth)
             Next
         Next
 
@@ -135,7 +135,7 @@ Public Class Delaunay_Subdiv2D : Inherits TaskParent
         For Each edge In edgelist
             Dim p1 = New cv.Point2f(edge(0), edge(1))
             Dim p2 = New cv.Point2f(edge(2), edge(3))
-            DrawLine(dst2, p1, p2, cv.Scalar.Green)
+            dst2.Line(p1, p2, cv.Scalar.Green, task.lineWidth, task.lineWidth)
         Next
     End Sub
 End Class
@@ -363,7 +363,7 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
         dst3.FillConvexPoly(delaunay.facetList(index1), task.lpD.color, cv.LineTypes.Link4)
         dst3.FillConvexPoly(delaunay.facetList(index2), task.lpD.color, cv.LineTypes.Link4)
         dst3.FillConvexPoly(delaunay.facetList(index3), task.lpD.color, cv.LineTypes.Link4)
-        DrawLine(dst3, task.lpD)
+        dst3.Line(task.lpD.p1, task.lpD.p2, cv.Scalar.Green, task.lineWidth, task.lineWidth)
 
         info.Run(emptyMat)
         dst2 = info.dst2

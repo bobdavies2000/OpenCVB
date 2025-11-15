@@ -180,7 +180,7 @@ Public Class Complexity_Dots : Inherits TaskParent
         Next
 
         For i = 1 To pointSet.Count - 1
-            DrawLine(dst2, pointSet(i - 1), pointSet(i), plotColor)
+            dst2.Line(pointSet(i - 1), pointSet(i), plotColor, task.lineWidth, task.lineWidth)
         Next
 
         SetTrueText(">>>>>> Increasing input data >>>>>>" + vbCrLf + options.filename.Name,

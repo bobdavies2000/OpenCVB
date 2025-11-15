@@ -26,7 +26,7 @@ Public Class Bin2Way_Basics : Inherits TaskParent
         Next
 
         Dim offset = halfSplit / bins * dst3.Width
-        DrawLine(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white)
+        dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, task.lineWidth, task.lineWidth)
 
         mats.mat(0) = task.gray.InRange(0, halfSplit - 1)         ' darkest
         mats.mat(1) = task.gray.InRange(halfSplit, 255)            ' lightest

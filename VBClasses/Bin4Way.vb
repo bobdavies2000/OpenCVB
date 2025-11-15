@@ -585,7 +585,7 @@ Public Class Bin4Way_BasicsRed : Inherits TaskParent
 
         For i = 0 To quartiles.Count - 1
             Dim offset = quartiles(i) / bins * dst3.Width
-            DrawLine(dst3, New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white)
+            dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, task.lineWidth, task.lineWidth)
         Next
 
         mats.mat(0) = task.gray.InRange(0, quartiles(0) - 1)
