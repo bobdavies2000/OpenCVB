@@ -129,6 +129,7 @@ Keyboard
 KLT
 KMeans
 KNN
+KNNLine
 LaneFinder
 Laplacian
 LeftRight

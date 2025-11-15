@@ -4,7 +4,7 @@ Public Class GL_Basics : Inherits TaskParent
         desc = "Display the pointcloud"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.drawPointCloudRGB)
+        strOut = task.sharpGL.RunSharp(Common.oCase.drawPointCloudRGB)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -18,7 +18,7 @@ Public Class GL_MainForm : Inherits TaskParent
         desc = "Display the pointcloud in the main form - too much work..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.results.GLRequest = Comm.oCase.drawPointCloudRGB
+        task.results.GLRequest = Common.oCase.drawPointCloudRGB
         SetTrueText("Why not run all SharpGL algorithms here?" + vbCrLf +
                     "Because too much data has to move from task to main.")
     End Sub
@@ -41,7 +41,7 @@ Public Class GL_Line3DNoMotionInput : Inherits TaskParent
         dst0 = src
         dst0.SetTo(0, Not dst2)
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.line3D, dst0)
+        strOut = task.sharpGL.RunSharp(Common.oCase.line3D, dst0)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -56,7 +56,7 @@ Public Class GL_Bricks : Inherits TaskParent
         desc = "Display the bricks in SharpGL"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.quadBasics)
+        strOut = task.sharpGL.RunSharp(Common.oCase.quadBasics)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -80,7 +80,7 @@ Public Class GL_StructuredLines : Inherits TaskParent
         dst0.SetTo(0, Not dst2)
         dst1.SetTo(white)
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.line3D, dst0, dst1)
+        strOut = task.sharpGL.RunSharp(Common.oCase.line3D, dst0, dst1)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -96,7 +96,7 @@ Public Class GL_RunSharp : Inherits TaskParent
         desc = "Create a SharpGL view that uses the point cloud coordinates."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
+        strOut = task.sharpGL.RunSharp(Common.oCase.readPC)
         SetTrueText(strOut, 2)
 
         displayPC.Run(emptyMat)
@@ -118,7 +118,7 @@ Public Class GL_RunSharpHist : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
+            strOut = task.sharpGL.RunSharp(Common.oCase.readPC)
             SetTrueText(strOut, 2)
         End If
 
@@ -168,7 +168,7 @@ Public Class GL_Line3DWhite : Inherits TaskParent
         labels(3) = CStr(count) + " pixels from the point cloud were moved to the GL input. "
 
         dst1.SetTo(white)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.line3D, dst3, dst1)
+        strOut = task.sharpGL.RunSharp(Common.oCase.line3D, dst3, dst1)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -208,7 +208,7 @@ Public Class GL_Line3DReconstructed : Inherits TaskParent
         labels(3) = CStr(count) + " pixels from the point cloud were moved to the GL input. "
 
         dst1.SetTo(white)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.line3D, dst3, dst1)
+        strOut = task.sharpGL.RunSharp(Common.oCase.line3D, dst3, dst1)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -230,7 +230,7 @@ Public Class GL_LinePoints3D : Inherits TaskParent
 
         dst1.SetTo(white)
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.line3D, line3D.pointcloud, dst1)
+        strOut = task.sharpGL.RunSharp(Common.oCase.line3D, line3D.pointcloud, dst1)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -248,7 +248,7 @@ Public Class GL_LinePointsAll : Inherits TaskParent
             DrawLine(dst2, lp, lp.color)
         Next
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.line3D, task.pointCloud, dst2)
+        strOut = task.sharpGL.RunSharp(Common.oCase.line3D, task.pointCloud, dst2)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -265,7 +265,7 @@ Public Class GL_ReadPC : Inherits TaskParent
         desc = "Read the point cloud from a rendered geometry"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
+        strOut = task.sharpGL.RunSharp(Common.oCase.readPC)
         SetTrueText(strOut, 2)
 
         displayPC.Run(emptyMat)
@@ -292,7 +292,7 @@ Public Class GL_PlotHist : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
+            strOut = task.sharpGL.RunSharp(Common.oCase.readPC)
             SetTrueText(strOut, 2)
         End If
 
@@ -323,7 +323,7 @@ Public Class GL_ReadPCHist : Inherits TaskParent
         desc = "Read the point cloud from a rendered geometry"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
+        strOut = task.sharpGL.RunSharp(Common.oCase.readPC)
         labels(2) = strOut
 
         glPlot.Run(task.sharpDepth)
@@ -385,7 +385,7 @@ Public Class GL_DisplayPC : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            strOut = task.sharpGL.RunSharp(Comm.oCase.readPC)
+            strOut = task.sharpGL.RunSharp(Common.oCase.readPC)
             SetTrueText(strOut, 2)
         End If
 
@@ -417,7 +417,7 @@ Public Class GL_ReadLines : Inherits TaskParent
             DrawLine(dst3, lp, white)
         Next
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readLines, task.pointCloud, dst3)
+        strOut = task.sharpGL.RunSharp(Common.oCase.readLines, task.pointCloud, dst3)
         SetTrueText(strOut, 3)
 
         labels(3) = task.lines.labels(2)
@@ -438,7 +438,7 @@ Public Class GL_ReadQuads : Inherits TaskParent
         desc = "Read the quads back from a rendered geometry"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunSharp(Comm.oCase.readQuads)
+        strOut = task.sharpGL.RunSharp(Common.oCase.readQuads)
         SetTrueText(strOut, 2)
 
         displayPC.Run(emptyMat)
@@ -458,9 +458,9 @@ Public Class GL_Line3D : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         line3d.Run(src)
         If task.toggleOn Then
-            strOut = task.sharpGL.RunSharp(Comm.oCase.drawPointCloudRGB, line3d.dst2, line3d.dst3)
+            strOut = task.sharpGL.RunSharp(Common.oCase.drawPointCloudRGB, line3d.dst2, line3d.dst3)
         Else
-            strOut = task.sharpGL.RunSharp(Comm.oCase.drawPointCloudRGB, line3d.dst2, task.lines.dst2)
+            strOut = task.sharpGL.RunSharp(Common.oCase.drawPointCloudRGB, line3d.dst2, task.lines.dst2)
         End If
         SetTrueText(strOut, 2)
     End Sub
@@ -484,7 +484,7 @@ Public Class GL_Line3D_Debug : Inherits TaskParent
         dst3 = line3d.dst3
         labels(3) = line3d.labels(3)
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.drawPointCloudRGB, line3d.dst2, dst3)
+        strOut = task.sharpGL.RunSharp(Common.oCase.drawPointCloudRGB, line3d.dst2, dst3)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -506,7 +506,7 @@ Public Class GL_Line3D_DebugAlt : Inherits TaskParent
         dst3 = line3d.dst3
         labels(3) = line3d.labels(3)
 
-        strOut = task.sharpGL.RunSharp(Comm.oCase.drawPointCloudRGB, line3d.dst2, dst3)
+        strOut = task.sharpGL.RunSharp(Common.oCase.drawPointCloudRGB, line3d.dst2, dst3)
         SetTrueText(strOut, 2)
     End Sub
 End Class
@@ -521,7 +521,7 @@ Public Class GL_Draw3DLines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.lines.dst2
-        strOut = task.sharpGL.RunSharp(Comm.oCase.draw3DLines)
+        strOut = task.sharpGL.RunSharp(Common.oCase.draw3DLines)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -531,7 +531,7 @@ End Class
 
 Public Class GL_LogicalLines : Inherits TaskParent
     Dim logLines As New Line3D_LogicalLines
-    Public drawRequest As Integer = Comm.oCase.draw3DLines
+    Public drawRequest As Integer = Common.oCase.draw3DLines
     Public Sub New()
         desc = "Draw the logical lines found in the point cloud with the RGB lines."
     End Sub
@@ -555,7 +555,7 @@ End Class
 Public Class GL_LogicalCloud : Inherits TaskParent
     Dim glTest As New GL_LogicalLines
     Public Sub New()
-        glTest.drawRequest = Comm.oCase.draw3DLinesAndCloud
+        glTest.drawRequest = Common.oCase.draw3DLinesAndCloud
         desc = "Draw the logical lines found and include the entire pointcloud."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -610,7 +610,7 @@ Public Class GL_ImageHullsColor : Inherits TaskParent
         dst2 = runRedCloud(src, labels(2))
         labels(3) = task.redCloud.labels(3)
 
-        strOut = task.sharpGL.RunTriangles(Comm.oCase.colorTriangles, buildBuffer())
+        strOut = task.sharpGL.RunTriangles(Common.oCase.colorTriangles, buildBuffer())
     End Sub
 End Class
 
@@ -624,7 +624,7 @@ Public Class GL_ImageHulls : Inherits TaskParent
         desc = "Prepare a texture map and project it onto the RedCloud_HeartBeat hulls"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        strOut = task.sharpGL.RunTriangles(Comm.oCase.imageTriangles, Nothing)
+        strOut = task.sharpGL.RunTriangles(Common.oCase.imageTriangles, Nothing)
 
         dst2 = task.sharpGL.hulls.dst2
         dst3 = task.sharpGL.hulls.dst3

@@ -40,12 +40,16 @@ Public Class Line_Basics : Inherits TaskParent
                 lp.age = 1
                 sortlines.Add(lp.length, lp)
             End If
+
+            If lp.ptCenter.X > task.workRes.Width Then Dim k = 0
         Next
 
         lpList.Clear()
         For Each lp In sortlines.Values
             lp.index = lpList.Count
             lpList.Add(lp)
+
+            If lp.ptCenter.X > task.workRes.Width Then Dim k = 0
         Next
 
         dst2.SetTo(0)
@@ -811,39 +815,6 @@ Public Class Line_LeftRightMatch3 : Inherits TaskParent
             DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
         Next
         labels(2) = CStr(lpOutput.Count) + " left image lines were matched in the right image and confirmed with the center point."
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Line_KNN : Inherits TaskParent
-    Dim knn As New KNN_Basics
-    Public Sub New()
-        labels(2) = "The line's end points or center closest to the mouse is highlighted."
-        desc = "Use KNN to determine which line is being selected with mouse."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on yet.
-        dst2 = task.lines.dst2.Clone
-        knn.trainInput.Clear()
-        knn.queries.Clear()
-        For Each lp In task.lines.lpList
-            knn.trainInput.Add(lp.p1)
-            knn.trainInput.Add(lp.ptCenter)
-            knn.trainInput.Add(lp.p2)
-        Next
-
-        knn.queries.Add(task.mouseMovePoint)
-        knn.Run(emptyMat)
-
-        Dim index = Math.Floor(knn.result(0, 0) / 3)
-        Dim lpNext = task.lines.lpList(index)
-        dst2.Line(lpNext.p1, lpNext.p2, task.highlight, task.lineWidth * 3, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 

@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Comm
+Public Class Common
     Public Enum oCase
         drawPointCloudRGB
         drawLineAndCloud

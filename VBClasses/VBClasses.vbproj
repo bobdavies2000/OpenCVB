@@ -13,11 +13,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Comm.vb" />
+    <Compile Remove="Common.vb" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Main\Comm.vb" Link="Comm.vb" />
+    <Compile Include="..\Main\Common.vb" Link="Common.vb" />
   </ItemGroup>
 
   <ItemGroup>

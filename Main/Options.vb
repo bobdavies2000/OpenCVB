@@ -1,8 +1,8 @@
 ﻿Imports System.IO
 Imports cv = OpenCvSharp
 Public Class Options
-    Public cameraRadioButton(Comm.cameraNames.Count - 1) As RadioButton
-    Public workResRadio(Comm.resolutionList.Count - 1) As RadioButton
+    Public cameraRadioButton(Common.cameraNames.Count - 1) As RadioButton
+    Public workResRadio(Common.resolutionList.Count - 1) As RadioButton
     Public cameraName As String
     Public cameraIndex As Integer
     Public testDuration As Integer
@@ -28,7 +28,7 @@ Public Class Options
     End Sub
     Public Sub defineCameraResolutions(index As Integer)
         ' see resolutionList above - helps to see how code maps to layout of the resolutions.
-        Select Case Comm.cameraNames(index)
+        Select Case Common.cameraNames(index)
             Case "StereoLabs ZED 2/2i"
                 OpenCVB.MainUI.settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
                                                                            True, True, True,
@@ -56,8 +56,8 @@ Public Class Options
         End Select
     End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
-        Dim index = Comm.cameraNames.IndexOf(sender.text)
-        cameraName = Comm.cameraNames(index)
+        Dim index = Common.cameraNames.IndexOf(sender.text)
+        cameraName = Common.cameraNames(index)
         cameraIndex = index
 
         defineCameraResolutions(cameraIndex)
@@ -67,9 +67,9 @@ Public Class Options
         Next
 
         If cameraName.StartsWith("StereoLabs") Then
-            workResRadio(Comm.resolutionList.IndexOf("336x188 - Quarter resolution")).Checked = True
+            workResRadio(Common.resolutionList.IndexOf("336x188 - Quarter resolution")).Checked = True
         Else
-            workResRadio(Comm.resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
+            workResRadio(Common.resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         End If
     End Sub
     Public Sub MainOptions_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -80,13 +80,13 @@ Public Class Options
             radioButtonsPresent = True
             For i = 0 To cameraRadioButton.Count - 1
                 cameraRadioButton(i) = New RadioButton With {.Visible = True, .AutoSize = True,
-                                       .Enabled = OpenCVB.MainUI.settings.cameraPresent(i), .Text = Comm.cameraNames(i)}
+                                       .Enabled = OpenCVB.MainUI.settings.cameraPresent(i), .Text = Common.cameraNames(i)}
                 CameraGroup.Controls.Add(cameraRadioButton(i))
                 AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
             Next
 
             For i = 0 To workResRadio.Count - 1
-                workResRadio(i) = New RadioButton With {.Text = Comm.resolutionList(i), .Tag = i,
+                workResRadio(i) = New RadioButton With {.Text = Common.resolutionList(i), .Tag = i,
                                      .AutoSize = True, .Visible = True}
                 workResRadio(i).Enabled = OpenCVB.MainUI.settings.resolutionsSupported(i)
                 Resolutions.Controls.Add(workResRadio(i))

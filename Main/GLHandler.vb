@@ -87,7 +87,7 @@ Namespace OpenCVB
             gl.PointSize(1.0F)
 
             Select Case results.GLRequest
-                Case Comm.oCase.drawPointCloudRGB
+                Case Common.oCase.drawPointCloudRGB
                     If results.GLcloud Is Nothing Then Exit Sub
                     If results.GLcloud.Size <> OpenCVB.MainUI.settings.workRes Then
                         results.GLcloud = New cv.Mat(OpenCVB.MainUI.settings.workRes, cv.MatType.CV_32FC3, 0)

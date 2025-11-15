@@ -51,7 +51,7 @@ Namespace OpenCVB
             updatePath(HomeDir.FullName + "opencv\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
             Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
-            Dim zedIndex = Comm.cameraNames.IndexOf("StereoLabs ZED 2/2i")
+            Dim zedIndex = Common.cameraNames.IndexOf("StereoLabs ZED 2/2i")
             If cudaPath IsNot Nothing And settings.cameraPresent(zedIndex) And settings.cameraSupported(zedIndex) = True Then
                 updatePath(cudaPath, "Cuda - needed for StereoLabs")
                 updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")

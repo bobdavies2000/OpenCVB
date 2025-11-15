@@ -92,7 +92,7 @@ Namespace jsonClass
                 Dim defines = New FileInfo(OpenCVB.MainUI.HomeDir.FullName + "Cameras\CameraDefines.hpp")
                 Dim stereoLabsDefineIsOff As Boolean
                 Dim sr = New StreamReader(defines.FullName)
-                Dim zedIndex = Comm.cameraNames.IndexOf("StereoLabs ZED 2/2i")
+                Dim zedIndex = Common.cameraNames.IndexOf("StereoLabs ZED 2/2i")
                 While sr.EndOfStream = False
                     Dim nextLine = sr.ReadLine
                     If nextLine.Contains("STEREOLAB") Then
@@ -113,8 +113,8 @@ Namespace jsonClass
                 Next
 
                 .cameraPresent = New List(Of Boolean)
-                For i = 0 To Comm.cameraNames.Count - 1
-                    Dim searchname = Comm.cameraNames(i)
+                For i = 0 To Common.cameraNames.Count - 1
+                    Dim searchname = Common.cameraNames(i)
                     Dim present As Boolean = False
                     If searchname.Contains("Oak-D") Then searchname = "Movidius MyriadX"
                     If stereoLabsDefineIsOff = False Then
@@ -129,14 +129,14 @@ Namespace jsonClass
                     .cameraPresent.Add(present <> False)
                 Next
 
-                For i = 0 To Comm.cameraNames.Count - 1
-                    If Comm.cameraNames(i).StartsWith("Orbbec") Then
-                        If Comm.cameraNames(i) = .cameraName Then
+                For i = 0 To Common.cameraNames.Count - 1
+                    If Common.cameraNames(i).StartsWith("Orbbec") Then
+                        If Common.cameraNames(i) = .cameraName Then
                             .cameraIndex = i
                             Exit For
                         End If
                     Else
-                        If Comm.cameraNames(i).Contains(.cameraName) And .cameraName <> "" Then
+                        If Common.cameraNames(i).Contains(.cameraName) And .cameraName <> "" Then
                             .cameraIndex = i
                             Exit For
                         End If
@@ -144,16 +144,16 @@ Namespace jsonClass
                 Next
 
                 If .cameraName = "" Or .cameraPresent(.cameraIndex) = False Then
-                    For i = 0 To Comm.cameraNames.Count - 1
+                    For i = 0 To Common.cameraNames.Count - 1
                         If .cameraPresent(i) Then
                             .cameraIndex = i
-                            .cameraName = Comm.cameraNames(i)
+                            .cameraName = Common.cameraNames(i)
                             Exit For
                         End If
                     Next
                 Else
-                    For i = 0 To Comm.cameraNames.Count - 1
-                        If Comm.cameraNames(i) = .cameraName Then .cameraIndex = i
+                    For i = 0 To Common.cameraNames.Count - 1
+                        If Common.cameraNames(i) = .cameraName Then .cameraIndex = i
                     Next
                 End If
 

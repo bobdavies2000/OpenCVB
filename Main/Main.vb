@@ -102,7 +102,7 @@ Namespace OpenCVB
 
         Dim magnifyIndex As Integer
         Dim depthAndDepthRange As String
-        Dim results As New Comm.resultData
+        Dim results As New Common.resultData
         Public jsonfs As New jsonClass.jsonIO
         Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             Dim args() = Environment.GetCommandLineArgs()
@@ -253,8 +253,8 @@ Namespace OpenCVB
             optionsForm.MainOptions_Load(sender, e)
             optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True
             Dim resStr = CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height)
-            For i = 0 To Comm.resolutionList.Count - 1
-                If Comm.resolutionList(i).StartsWith(resStr) Then
+            For i = 0 To Common.resolutionList.Count - 1
+                If Common.resolutionList(i).StartsWith(resStr) Then
                     optionsForm.workResRadio(i).Checked = True
                 End If
             Next
@@ -703,8 +703,8 @@ Namespace OpenCVB
             If AvailableAlgorithms.Text = startingAlgorithm And AlgorithmTestAllCount > 1 Then
                 While 1
                     settings.cameraIndex += 1
-                    If settings.cameraIndex >= Comm.cameraNames.Count - 1 Then settings.cameraIndex = 0
-                    settings.cameraName = Comm.cameraNames(settings.cameraIndex)
+                    If settings.cameraIndex >= Common.cameraNames.Count - 1 Then settings.cameraIndex = 0
+                    settings.cameraName = Common.cameraNames(settings.cameraIndex)
                     If settings.cameraPresent(settings.cameraIndex) Then
                         Options.defineCameraResolutions(settings.cameraIndex)
                         setupTestAll()

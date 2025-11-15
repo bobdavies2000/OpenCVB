@@ -8,7 +8,7 @@ Imports cv = OpenCvSharp
 #Region "taskProcess"
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
-    Public results As New Comm.resultData
+    Public results As New Common.resultData
     Public resultLock As New Mutex(True, "resultLock")
 
     Public cvFontSize As Single = 0.8
