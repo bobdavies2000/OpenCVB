@@ -701,18 +701,19 @@ Namespace OpenCVB
             TestAllTimer.Interval = settings.testAllDuration * 1000
             Static startingAlgorithm = AvailableAlgorithms.Text
             If AvailableAlgorithms.Text = startingAlgorithm And AlgorithmTestAllCount > 1 Then
-                While 1
-                    settings.cameraIndex += 1
-                    If settings.cameraIndex >= Common.cameraNames.Count - 1 Then settings.cameraIndex = 0
-                    settings.cameraName = Common.cameraNames(settings.cameraIndex)
-                    If settings.cameraPresent(settings.cameraIndex) Then
-                        Options.defineCameraResolutions(settings.cameraIndex)
-                        setupTestAll()
-                        Exit While
-                    End If
-                End While
+                ' ignore switching cameras for now.  Only introduces complexity without any benefit.
+                'While 1
+                '    settings.cameraIndex += 1
+                '    If settings.cameraIndex >= Common.cameraNames.Count - 1 Then settings.cameraIndex = 0
+                '    settings.cameraName = Common.cameraNames(settings.cameraIndex)
+                '    If settings.cameraPresent(settings.cameraIndex) Then
+                '        Options.defineCameraResolutions(settings.cameraIndex)
+                '        setupTestAll()
+                '        Exit While
+                '    End If
+                'End While
                 ' extra time for the camera to restart...
-                TestAllTimer.Interval = settings.testAllDuration * 1000 * 3
+                ' TestAllTimer.Interval = settings.testAllDuration * 1000 * 3
 
                 jsonfs.write()
                 settings = jsonfs.read()

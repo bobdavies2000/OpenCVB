@@ -69,7 +69,7 @@ Public Class KNNLine_Connect : Inherits TaskParent
 
         dst3 = dst1.Clone
         labels(3) = labels(2)
-        Dim lpListLast As New List(Of lpData)(task.lines.lpList)
+        Static lpListLast As New List(Of lpData)(task.lines.lpList)
 
         knnLine.Run(src)
         dst2 = knnLine.dst2.Clone
@@ -88,6 +88,7 @@ Public Class KNNLine_Connect : Inherits TaskParent
             If count >= 10 Then Exit For
         Next
         dst1 = knnLine.dst2.Clone
+        lpListLast = New List(Of lpData)(task.lines.lpList)
     End Sub
 End Class
 
@@ -95,24 +96,213 @@ End Class
 
 
 
-Public Class KNNLine_IDLines : Inherits TaskParent
-    Dim knnLine As New KNNLine_Basics
+Public Class KNNLine_SliceList : Inherits TaskParent
+    Dim knn As New KNN_NNBasics
     Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Use CalcHist to find matching lines."
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        OptionParent.FindSlider("KNN Dimension").Value = 1
+        desc = "Slice the previous image with a horizontal line at ptCenter's height to " +
+               "find all the match candidates"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on yet.
 
-        dst1.SetTo(0)
-        For Each lp In task.lines.lpList
-            dst1.Circle(lp.ptCenter, 5, 255, -1)
+        Dim knnDimension = knn.options.knnDimension
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        Static lpListLast As New List(Of lpData)(task.lines.lpList)
+        Dim lpMatch As lpData
+        Static count As Integer
+        Static missCount As Integer
+        For i = 0 To task.lines.lpList.Count - 1
+            Dim lp = task.lines.lpList(i)
+            If lp.index > 10 Then Exit For
+            Dim color = task.scalarColors(lp.index + 1)
+            dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
+            Dim r = New cv.Rect(0, lp.ptCenter.Y, dst2.Width, 1) ' create a rect for the slice.
+            Dim histogram As New cv.Mat
+            cv.Cv2.CalcHist({task.lines.dst1(r)}, {0}, emptyMat, histogram, 1,
+                            {task.lines.lpList.Count},
+                            New cv.Rangef() {New cv.Rangef(0, task.lines.lpList.Count)})
+
+            Dim histArray(histogram.Total - 1) As Single
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+            knn.trainInput.Clear()
+            knn.queries.Clear()
+            For j = 1 To histArray.Count - 1
+                If histArray(j) > 0 Then
+                    lpMatch = lpListLast(j - 1)
+                    'knn.trainInput.Add(lpMatch.p1.X)
+                    'knn.trainInput.Add(lpMatch.p1.Y)
+                    knn.trainInput.Add(lpMatch.ptCenter.X)
+                    'knn.trainInput.Add(lpMatch.ptCenter.Y)
+                    'knn.trainInput.Add(lpMatch.p2.X)
+                    'knn.trainInput.Add(lpMatch.p2.Y)
+                End If
+            Next
+
+            'knn.queries.Add(lp.p1.X)
+            'knn.queries.Add(lp.p1.Y)
+            knn.queries.Add(lp.ptCenter.X)
+            'knn.queries.Add(lp.ptCenter.Y)
+            'knn.queries.Add(lp.p2.X)
+            'knn.queries.Add(lp.p2.Y)
+
+            knn.Run(emptyMat)
+
+            Dim index = Math.Floor(knn.result(0, 0))
+            lpMatch = lpListLast(index)
+            dst3.Circle(lpMatch.ptCenter, task.DotSize, color, -1)
+            If lp.ptCenter.DistanceTo(lpMatch.ptCenter) < 10 Then
+                dst3.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
+                count += 1
+            Else
+                missCount += 1
+            End If
         Next
 
-        Dim histogram As New cv.Mat
-        Dim histarray(task.lines.lpList.Count - 1) As Single
-        Dim ranges1 = New cv.Rangef() {New cv.Rangef(0, 255)}
-        cv.Cv2.CalcHist({task.lines.dst1}, {0}, dst1, histogram, 1, {task.lines.lpList.Count}, ranges1)
-        Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
+        dst1 = task.lines.dst2
+        lpListLast = New List(Of lpData)(task.lines.lpList)
+        labels(3) = CStr(count) + " lines were confirmed after matching and " + CStr(missCount) +
+                    " could not be confirmed since last heartBeatLT"
+
+        If task.heartBeatLT Then
+            count = 0
+            missCount = 0
+        End If
     End Sub
 End Class
+
+
+
+
+
+Public Class KNNLine_SliceTemp : Inherits TaskParent
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Slice the previous image with a horizontal line at ptCenter's height to " +
+               "find all the match candidates"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on yet.
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        Static lpListLast As New List(Of lpData)(task.lines.lpList)
+        Dim lpMatch As lpData
+        Static count As Integer
+        Static missCount As Integer
+        For i = 0 To task.lines.lpList.Count - 1
+            Dim lp = task.lines.lpList(i)
+            If lp.index > 10 Then Exit For
+            Dim color = task.scalarColors(lp.index + 1)
+            dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
+            Dim r = New cv.Rect(0, lp.ptCenter.Y, dst2.Width, 1) ' create a rect for the slice.
+            Dim histogram As New cv.Mat
+            cv.Cv2.CalcHist({task.lines.dst1(r)}, {0}, emptyMat, histogram, 1,
+                            {task.lines.lpList.Count},
+                            New cv.Rangef() {New cv.Rangef(0, task.lines.lpList.Count)})
+
+            Dim histArray(histogram.Total - 1) As Single
+            Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+            Dim distances As New List(Of Single)
+            Dim indexLast As New List(Of Integer)
+            For j = 1 To histArray.Count - 1
+                If histArray(j) > 0 Then
+                    lpMatch = lpListLast(j - 1)
+                    'knn.trainInput.Add(lpMatch.p1.X)
+                    'knn.trainInput.Add(lpMatch.p1.Y)
+                    distances.Add(lp.ptCenter.DistanceTo(lpMatch.ptCenter))
+                    indexLast.Add(lpMatch.index)
+                    ' knn.trainInput.Add(lpMatch.ptCenter.X)
+                    'knn.trainInput.Add(lpMatch.ptCenter.Y)
+                    'knn.trainInput.Add(lpMatch.p2.X)
+                    'knn.trainInput.Add(lpMatch.p2.Y)
+                End If
+            Next
+
+            'knn.queries.Add(lp.p1.X)
+            'knn.queries.Add(lp.p1.Y)
+            'knn.queries.Add(lp.ptCenter.X)
+            'knn.queries.Add(lp.ptCenter.Y)
+            'knn.queries.Add(lp.p2.X)
+            'knn.queries.Add(lp.p2.Y)
+
+            'knn.Run(emptyMat)
+            Dim index = indexLast(distances.IndexOf(distances.Min))
+
+            ' Dim index = Math.Floor(knn.result(0, 0))
+            lpMatch = lpListLast(index)
+            dst3.Circle(lpMatch.ptCenter, task.DotSize, color, -1)
+            If lp.ptCenter.DistanceTo(lpMatch.ptCenter) < 10 Then
+                dst3.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
+                count += 1
+            Else
+                missCount += 1
+            End If
+        Next
+
+        dst1 = task.lines.dst2
+        lpListLast = New List(Of lpData)(task.lines.lpList)
+        labels(3) = CStr(count) + " lines were confirmed after matching and " + CStr(missCount) +
+                    " could not be confirmed since last heartBeatLT"
+
+        If task.heartBeatLT Then
+            count = 0
+            missCount = 0
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class KNNLine_SliceIndex : Inherits TaskParent
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Compute the distances of the centers of only the longest lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on yet.
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        Static lpListLast As New List(Of lpData)(task.lines.lpList)
+        Dim lpMatch As lpData
+        Dim count As Integer
+        Dim maxCheck = 10
+        For i = 0 To Math.Min(task.lines.lpList.Count, maxCheck) - 1
+            Dim lp = task.lines.lpList(i)
+            Dim color = task.scalarColors(lp.index + 1)
+
+            dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
+            Dim distances As New List(Of Single)
+            Dim indexLast As New List(Of Integer)
+            For j = 0 To Math.Min(lpListLast.Count - 1, maxCheck * 2)
+                lpMatch = lpListLast(j)
+                distances.Add(lp.ptCenter.DistanceTo(lpMatch.ptCenter))
+                indexLast.Add(j)
+            Next
+
+            Dim index = indexLast(distances.IndexOf(distances.Min))
+
+            lpMatch = lpListLast(index)
+            dst3.Circle(lpMatch.ptCenter, task.DotSize, color, -1)
+            dst3.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
+            count += 1
+        Next
+
+        If task.heartBeat Then
+            dst1 = task.lines.dst2.Clone
+            lpListLast = New List(Of lpData)(task.lines.lpList)
+        End If
+        If task.heartBeat Then labels(3) = CStr(count) + " lines were matched."
+    End Sub
+End Class
+
+
+

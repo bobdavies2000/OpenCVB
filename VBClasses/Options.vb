@@ -4486,34 +4486,14 @@ End Class
 
 Public Class Options_KNN : Inherits OptionParent
     Public knnDimension As Integer = 2
-    Public numPoints As Integer = 10
-    Public multiplier As Integer = 10
-    Public topXDistances As Integer = 20
+    Public numPoints As Integer = 20 ' just for testing so a fixed amount is all we need.
     Public useOutSide As Boolean
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("KNN Dimension", 2, 20, knnDimension)
-            sliders.setupTrackBar("Random input points", 5, 100, numPoints)
-            sliders.setupTrackBar("Average distance multiplier", 1, 20, multiplier)
-            sliders.setupTrackBar("Top X distances", 1, 100, topXDistances)
-        End If
-        If check.Setup(traceName) Then
-            check.addCheckBox("Display queries")
-            check.addCheckBox("Display training input and connecting line")
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
-        End If
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("KNN Dimension", 1, 20, knnDimension)
     End Sub
     Public Sub Run()
         Static dimSlider = OptionParent.FindSlider("KNN Dimension")
-        Static randomSlider = OptionParent.FindSlider("Random input points")
-        Static distSlider = OptionParent.FindSlider("Random input points")
-        Static topXSlider = OptionParent.FindSlider("Top X distances")
-        Static inOutCheck = FindCheckBox("Use 'Outside' feature points (unchecked use 'Inside'")
         knnDimension = dimSlider.Value
-        numPoints = randomSlider.Value
-        multiplier = distSlider.value
-        topXDistances = topXSlider.value
     End Sub
 End Class
 

@@ -4,6 +4,7 @@ Public Class Line_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public rawLines As New Line_Raw
     Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         If standalone Then task.gOptions.showMotionMask.Checked = True
         desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
     End Sub
@@ -52,8 +53,10 @@ Public Class Line_Basics : Inherits TaskParent
             If lp.ptCenter.X > task.workRes.Width Then Dim k = 0
         Next
 
+        dst1.SetTo(0)
         dst2.SetTo(0)
         For Each lp In lpList
+            dst1.Line(lp.p1, lp.p2, lp.index, 1, cv.LineTypes.Link4)
             dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
         Next
 
