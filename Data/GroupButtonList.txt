@@ -129,7 +129,6 @@ Keyboard
 KLT
 KMeans
 KNN
-KNNLine
 LaneFinder
 Laplacian
 LeftRight
@@ -137,6 +136,7 @@ Line
 Line3D
 LinearRegression
 LineDepth
+LineMatch
 LineRect
 LUT
 Magnify
