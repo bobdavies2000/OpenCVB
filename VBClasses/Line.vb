@@ -56,7 +56,7 @@ Public Class Line_Basics : Inherits TaskParent
         dst1.SetTo(0)
         dst2.SetTo(0)
         For Each lp In lpList
-            dst1.Line(lp.p1, lp.p2, lp.index, 1, cv.LineTypes.Link4)
+            dst1.Line(lp.p1, lp.p2, lp.index + 1, 1, cv.LineTypes.Link4)
             dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
         Next
 

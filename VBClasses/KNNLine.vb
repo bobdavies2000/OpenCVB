@@ -1,4 +1,5 @@
-﻿Imports System.Runtime.InteropServices
+﻿Imports System.Diagnostics.Metrics
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class KNNLine_Basics : Inherits TaskParent
     Dim knn As New KNN_Basics
@@ -269,6 +270,7 @@ Public Class KNNLine_SliceIndex : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on yet.
 
+        dst1.SetTo(0)
         dst2.SetTo(0)
         dst3.SetTo(0)
         Static lpListLast As New List(Of lpData)(task.lines.lpList)
@@ -282,7 +284,7 @@ Public Class KNNLine_SliceIndex : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
             Dim distances As New List(Of Single)
             Dim indexLast As New List(Of Integer)
-            For j = 0 To Math.Min(lpListLast.Count - 1, maxCheck * 2)
+            For j = 0 To Math.Min(lpListLast.Count - 1, maxCheck)
                 lpMatch = lpListLast(j)
                 distances.Add(lp.ptCenter.DistanceTo(lpMatch.ptCenter))
                 indexLast.Add(j)
@@ -291,16 +293,99 @@ Public Class KNNLine_SliceIndex : Inherits TaskParent
             Dim index = indexLast(distances.IndexOf(distances.Min))
 
             lpMatch = lpListLast(index)
-            dst3.Circle(lpMatch.ptCenter, task.DotSize, color, -1)
+            dst1.Line(lp.ptCenter, lpMatch.ptCenter, task.highlight, task.lineWidth, task.lineType)
             dst3.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
             count += 1
         Next
 
-        If task.heartBeat Then
-            dst1 = task.lines.dst2.Clone
+        If task.heartBeat And task.gOptions.DebugCheckBox.Checked Then
             lpListLast = New List(Of lpData)(task.lines.lpList)
         End If
         If task.heartBeat Then labels(3) = CStr(count) + " lines were matched."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class KNNLine_SliceLine : Inherits TaskParent
+    Public Sub New()
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Find lines with an image slice to locate the best match."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on yet.
+
+        dst1.SetTo(0)
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        Static lpListLast As New List(Of lpData)(task.lines.lpList)
+        Static lpMapLast As cv.Mat = task.lines.dst1.Clone
+        Dim lpMatch As lpData
+        Dim count As Integer, missCount As Integer
+        Dim maxOffset = 5
+        Dim maxTestLines = 100
+        For i = 0 To Math.Min(task.lines.lpList.Count, maxTestLines) - 1
+            Dim lp = task.lines.lpList(i)
+            Dim color = task.scalarColors(lp.index + 1)
+
+            Dim ptMin = New cv.Point(Math.Max(lp.ptCenter.X - maxOffset, 0), lp.ptCenter.Y)
+            Dim ptMax = New cv.Point(Math.Min(lp.ptCenter.X + maxOffset, dst2.Width), lp.ptCenter.Y)
+
+            Dim r = New cv.Rect(ptMin.X, lp.ptCenter.Y, ptMax.X - ptMin.X, 1)
+            Dim lastSlice(r.Width - 1) As Byte
+            Marshal.Copy(lpMapLast(r).Data, lastSlice, 0, lastSlice.Length)
+
+            Dim angleDelta As New List(Of Single)
+            Dim lineIndex As New List(Of Integer)
+            For j = 0 To lastSlice.Length - 1
+                If lastSlice(j) > 0 Then
+                    Dim lastIndex = lastSlice(j) - 1
+                    lpMatch = lpListLast(lastIndex)
+                    angleDelta.Add(Math.Abs(lp.angle - lpMatch.angle))
+                    lineIndex.Add(lastIndex)
+                End If
+            Next
+
+            dst2.Line(lp.p1, lp.p2, color, task.lineWidth, task.lineType)
+            If angleDelta.Count > 0 Then
+                Dim minAngleDelta = angleDelta.Min
+                If minAngleDelta < 5 Then
+                    Dim index = lineIndex(angleDelta.IndexOf(minAngleDelta))
+                    lpMatch = lpListLast(index)
+                    dst3.Line(lpMatch.p1, lpMatch.p2, color, task.lineWidth, task.lineType)
+
+                    Dim newCenter As New cv.Point2f(0, lp.ptCenter.Y)
+                    For j = 0 To lastSlice.Length - 1
+                        If lastSlice(j) = lpMatch.index Then
+                            If newCenter.X = 0 Then
+                                newCenter.X = j
+                            Else
+                                newCenter.X = (newCenter.X + j) / 2
+                            End If
+                        End If
+                    Next
+                    dst1.Line(lp.ptCenter, newCenter, task.highlight, task.lineWidth, task.lineType)
+                    count += 1
+                Else
+                    missCount += 1
+                End If
+            Else
+                missCount += 1
+            End If
+        Next
+
+        If task.heartBeat Then
+            lpListLast = New List(Of lpData)(task.lines.lpList)
+            lpMapLast = task.lines.dst1.Clone
+        End If
+
+        If task.heartBeat Then
+            labels(2) = CStr(missCount) + " lines NOT matched."
+            labels(3) = CStr(count) + " lines matched."
+        End If
     End Sub
 End Class
 

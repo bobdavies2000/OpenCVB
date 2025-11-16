@@ -549,9 +549,6 @@ Public Class lpData
     Public indexHLeft As Integer = -1
     Public indexHRight As Integer = -1
 
-    Public nabeIndex1 As Integer
-    Public nabeIndex2 As Integer
-
     Public length As Single
 
     Public p1 As cv.Point2f
