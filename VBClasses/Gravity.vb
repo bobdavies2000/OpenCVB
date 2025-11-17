@@ -50,7 +50,14 @@ Public Class Gravity_Basics : Inherits TaskParent
         dst3 = task.pcSplit(0).InRange(-threshold, threshold)
         dst3.SetTo(0, task.noDepthMask)
         Dim gPoints = dst3.FindNonZero()
-        If gPoints.Rows = 0 Then Exit Sub ' no point cloud data to get the gravity line in the image coordinates.
+        If gPoints.Rows = 0 Then
+            ' build a fake gravity vector when we don't have anything so task.lines.lplist has 1 entry.
+            ' It will be updated in the next frame.  This is a startup issue.
+            task.gravityIMU = New lpData(New cv.Point2f(dst2.Width / 2, 0),
+                                         New cv.Point2f(dst2.Width / 2, dst2.Height))
+
+            Exit Sub ' no point cloud data to get the gravity line in the image coordinates.
+        End If
         xTop = findFirst(gPoints)
         xBot = findLast(gPoints)
         task.gravityIMU = New lpData(New cv.Point2f(xTop, 0), New cv.Point2f(xBot, dst2.Height))

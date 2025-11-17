@@ -89,14 +89,4 @@ Public Class OptionParent : Implements IDisposable
         radio.Dispose()
         combo.Dispose()
     End Sub
-    Public Enum FeatureSrc
-        GoodFeaturesFull = 0
-        GoodFeaturesGrid = 1
-        Agast = 2
-        BRISK = 3
-        Harris = 4
-        FAST = 5
-        LineInput = 6
-        BrickPoints = 7
-    End Enum
 End Class

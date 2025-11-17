@@ -5374,7 +5374,7 @@ End Class
 
 Public Class XO_KNN_ClosestVertical : Inherits TaskParent
     Public lines As New XO_FeatureLine_Finder3D
-    Public knn As New KNN_ClosestLine
+    Public knn As New XO_KNN_ClosestLine
     Public pt1 As New cv.Point3f
     Public pt2 As New cv.Point3f
     Public Sub New()
@@ -5695,7 +5695,7 @@ End Class
 
 Public Class XO_FeatureLine_LongestKNN : Inherits TaskParent
     Dim glines As New XO_Line_GCloud
-    Public knn As New KNN_ClosestTracker
+    Public knn As New XO_KNN_ClosestTracker
     Public gline As gravityLine
     Public match As New Match_Basics
     Dim p1 As cv.Point, p2 As cv.Point
@@ -5735,7 +5735,7 @@ End Class
 
 Public Class XO_FeatureLine_Longest : Inherits TaskParent
     Dim glines As New XO_Line_GCloud
-    Public knn As New KNN_ClosestTracker
+    Public knn As New XO_KNN_ClosestTracker
     Public gline As gravityLine
     Public match1 As New Match_Basics
     Public match2 As New Match_Basics
@@ -11450,7 +11450,7 @@ End Class
 Public Class XO_MotionCam_MultiLine : Inherits TaskParent
     Public edgeList As New List(Of SortedList(Of Single, Integer))
     Public minDistance As Integer = dst2.Width * 0.02
-    Dim knn As New KNN_EdgePoints
+    Dim knn As New XO_KNN_EdgePoints
     Public Sub New()
         desc = "Find all the line edge points and display them."
     End Sub
@@ -18193,5 +18193,602 @@ Public Class XO_Line_GCloud : Inherits TaskParent
 
         labels(2) = Format(sortedHorizontals.Count, "00") + " Horizontal lines were identified and " +
                     Format(sortedVerticals.Count, "00") + " Vertical lines were identified."
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class XO_KNN_ClosestTracker : Inherits TaskParent
+    Public lastPair As New lpData
+    Public trainInput As New List(Of cv.Point2f)
+    Dim minDistances As New List(Of Single)
+    Public Sub New()
+        labels = {"", "", "Highlight the tracked line (move camera to see track results)", "Candidate lines - standaloneTest() only"}
+        desc = "Find the longest line and keep finding it among the list of lines using a minimized KNN test."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+
+        Dim p1 As cv.Point2f, p2 As cv.Point2f
+        If trainInput.Count = 0 Then
+            dst3 = task.lines.dst2
+        Else
+            p1 = lastPair.p1
+            p2 = lastPair.p2
+        End If
+
+        For Each lp In task.lines.lpList
+            If trainInput.Count = 0 Then
+                p1 = lp.p1
+                p2 = lp.p2
+            End If
+            trainInput.Add(lp.p1)
+            trainInput.Add(lp.p2)
+            If trainInput.Count >= 10 Then Exit For
+        Next
+
+        If trainInput.Count = 0 Then
+            SetTrueText("No lines were found in the current image.")
+            Exit Sub
+        End If
+
+        If lastPair.compare(New lpData) Then lastPair = New lpData(p1, p2)
+        Dim distances As New List(Of Single)
+        For i = 0 To trainInput.Count - 1 Step 2
+            Dim pt1 = trainInput(i)
+            Dim pt2 = trainInput(i + 1)
+            distances.Add(Math.Min(pt1.DistanceTo(lastPair.p1) + pt2.DistanceTo(lastPair.p2), pt1.DistanceTo(lastPair.p2) + pt2.DistanceTo(lastPair.p2)))
+        Next
+
+        Dim minDist = distances.Min
+        Dim index = distances.IndexOf(minDist) * 2
+        p1 = trainInput(index)
+        p2 = trainInput(index + 1)
+
+        If minDistances.Count > 0 Then
+            If minDist > minDistances.Max * 2 Then
+                Debug.WriteLine("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
+                lastPair = New lpData(trainInput(0), trainInput(1))
+            Else
+                lastPair = New lpData(p1, p2)
+            End If
+        Else
+            lastPair = New lpData(p1, p2)
+        End If
+
+        If minDist > 0 Then minDistances.Add(minDist)
+        If minDistances.Count > 100 Then minDistances.RemoveAt(0)
+
+        DrawLine(dst2, p1, p2, task.highlight)
+        trainInput.Clear()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_KNN_ClosestLine : Inherits TaskParent
+    Public lastP1 As cv.Point2f
+    Public lastP2 As cv.Point2f
+    Public lastIndex As Integer
+    Public trainInput As New List(Of cv.Point2f)
+    Public Sub New()
+        desc = "Try to find the closest pair of points in the traininput.  Dynamically compute distance ceiling to determine when to report fail."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+
+        If lastP1 = New cv.Point2f Then
+            SetTrueText("KNN_ClosestLine is only run with other KNN algorithms" + vbCrLf +
+                        "lastP1 and lastP2 need to be initialized by the other algorithm." + vbCrLf +
+                        "Initialize with a pair of points to track a line. " + vbCrLf +
+                        "Use KNN_ClosestVertical to test this algorithm.", 3)
+            Exit Sub
+        End If
+
+        Dim distances As New List(Of Single)
+        For i = 0 To trainInput.Count - 1 Step 2
+            Dim pt1 = trainInput(i)
+            Dim pt2 = trainInput(i + 1)
+            distances.Add(Math.Min(pt1.DistanceTo(lastP1) + pt2.DistanceTo(lastP2), pt1.DistanceTo(lastP2) + pt2.DistanceTo(lastP2)))
+        Next
+
+        Dim minDist = distances.Min
+        lastIndex = distances.IndexOf(minDist) * 2
+        lastP1 = trainInput(lastIndex)
+        lastP2 = trainInput(lastIndex + 1)
+
+        Static minDistances As New List(Of Single)({distances(0)})
+        If minDist > minDistances.Max * 4 Then
+            Debug.WriteLine("Overriding KNN min Distance Rule = " + Format(minDist, fmt0) + " max = " + Format(minDistances.Max, fmt0))
+            lastP1 = trainInput(0)
+            lastP2 = trainInput(1)
+        End If
+
+        ' track the last 100 non-zero minDist values to use as a guide to determine when a line was lost and a new pair has to be used.
+        If minDist > 0 Then minDistances.Add(minDist)
+        If minDistances.Count > 100 Then minDistances.RemoveAt(0)
+
+        DrawLine(dst2, lastP1, lastP2, task.highlight)
+        trainInput.Clear()
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_MatchLine_BasicsOriginal : Inherits TaskParent
+    Public match As New Match_Basics
+    Public lpInput As New lpData
+    Public lpOutput As lpData
+    Public corner1 As Integer, corner2 As Integer
+    Dim lpSave As New lpData
+    Dim knn As New XO_KNN_ClosestTracker
+    Public Sub New()
+        desc = "Find and track a line in the BGR image."
+    End Sub
+    Private Function cornerToPoint(whichCorner As Integer, r As cv.Rect) As cv.Point2f
+        Select Case whichCorner
+            Case 0
+                Return r.TopLeft
+            Case 1
+                Return New cv.Point2f(r.BottomRight.X, r.TopLeft.Y)
+            Case 2
+                Return r.BottomRight
+        End Select
+        Return New cv.Point2f(r.TopLeft.X, r.BottomRight.Y)
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst2 = src.Clone
+
+        If match.correlation < task.fCorrThreshold Or lpSave.p1 <> lpInput.p1 Or lpSave.p2 <> lpInput.p2 Then
+            lpSave = lpInput
+
+            If standalone Then lpInput = task.lines.lpList(0)
+
+            Dim r = ValidateRect(New cv.Rect(Math.Min(lpInput.p1.X, lpInput.p2.X), Math.Min(lpInput.p1.Y, lpInput.p2.Y),
+                                             Math.Abs(lpInput.p1.X - lpInput.p2.X), Math.Abs(lpInput.p1.Y - lpInput.p2.Y)))
+            match.template = src(r).Clone
+
+            Dim p1 = New cv.Point(CInt(lpInput.p1.X), CInt(lpInput.p1.Y))
+            ' Determine which corner - numbering topleft = 0 clockwise, 1, 2, 3
+            If r.TopLeft.DistanceTo(p1) <= 2 Then
+                corner1 = 0
+                corner2 = 2
+            ElseIf r.BottomRight.DistanceTo(p1) <= 2 Then
+                corner1 = 2
+                corner2 = 0
+            ElseIf r.Y = p1.Y Then
+                corner1 = 1
+                corner2 = 3
+            Else
+                corner1 = 3
+                corner2 = 1
+            End If
+        End If
+
+        match.Run(src)
+        If match.correlation >= task.fCorrThreshold Then
+            If standaloneTest() Then dst3 = match.dst0.Resize(dst3.Size)
+            Dim p1 = cornerToPoint(corner1, match.newRect)
+            Dim p2 = cornerToPoint(corner2, match.newRect)
+            dst2.Line(p1, p2, task.highlight, task.lineWidth + 2, task.lineType)
+            lpOutput = New lpData(p1, p2)
+        End If
+        labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_MatchLine_Longest : Inherits TaskParent
+    Public knn As New XO_KNN_ClosestTracker
+    Public matchLine As New XO_MatchLine_BasicsOriginal
+    Public Sub New()
+        desc = "Find and track the longest line in the BGR image with a lightweight KNN."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        knn.Run(src.Clone)
+        matchLine.lpInput = New lpData(knn.lastPair.p1, knn.lastPair.p2)
+
+        matchLine.Run(src)
+        dst2 = matchLine.dst2
+        DrawLine(dst2, matchLine.lpOutput.p1, matchLine.lpOutput.p2, cv.Scalar.Red)
+
+        labels(2) = "Longest line end points had correlation of " + Format(matchLine.match.correlation, fmt3) +
+                    " with the original longest line."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_MatchLine_Horizon : Inherits TaskParent
+    Dim matchLine As New XO_MatchLine_BasicsOriginal
+    Public Sub New()
+        desc = "Verify the horizon using MatchTemplate."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        'If matchLine.match.correlation < matchLine.match.options.correlationThreshold Then matchLine.lpInput = task.lineHorizon
+        If task.quarterBeat Then matchLine.lpInput = task.lineHorizon
+        matchLine.Run(src)
+        dst2 = matchLine.dst2
+        DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, cv.Scalar.Red)
+        labels(2) = "MatchLine correlation = " + Format(matchLine.match.correlation, fmt3) + " - Red = current horizon, yellow is matchLine output"
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_MatchLine_Gravity : Inherits TaskParent
+    Dim matchLine As New XO_MatchLine_BasicsOriginal
+    Public Sub New()
+        desc = "Verify the gravity vector using MatchTemplate."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        matchLine.lpInput = task.lineGravity
+        matchLine.Run(src)
+        dst2 = matchLine.dst2
+        DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, cv.Scalar.Red)
+        labels(2) = "MatchLine correlation = " + Format(matchLine.match.correlation, fmt3) +
+                    " - Red = current gravity vector, yellow is matchLine output"
+    End Sub
+End Class
+
+
+
+
+Public Class XO_KNN_TrackMean : Inherits TaskParent
+    Dim plot As New Plot_Histogram
+    Dim knn As New KNN_OneToOne
+    Const maxDistance As Integer = 50
+    Public shiftX As Single
+    Public shiftY As Single
+    Dim motionTrack As New List(Of cv.Point2f)
+    Dim lastImage As cv.Mat
+    Dim dotSlider As TrackBar
+    Dim options As New Options_KNN
+    Dim feat As New Feature_General
+    Public Sub New()
+        task.featureOptions.FeatureSampleSize.Value = 200
+        dotSlider = OptionParent.FindSlider("Average distance multiplier")
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}
+        desc = "Track points with KNN and match the goodFeatures from frame to frame"
+    End Sub
+    Private Function plotDiff(diffList As List(Of Integer), xyStr As String, labelImage As Integer, ByRef label As String) As Single
+        Dim count = diffList.Max - diffList.Min + 1
+        Dim hist(maxDistance - 1) As Single
+        Dim zeroLoc = hist.Count / 2
+        Dim nonZero As Integer
+        Dim zeroCount As Integer
+        For Each diff In diffList
+            If diff <> 0 Then nonZero += 1 Else zeroCount += 1
+            diff += zeroLoc
+            If diff >= maxDistance Then diff = maxDistance - 1
+            If diff < 0 Then diff = 0
+            hist(diff) += 1
+        Next
+        plot.Run(cv.Mat.FromPixelData(hist.Count, 1, cv.MatType.CV_32F, hist.ToArray))
+        Dim histList = hist.ToList
+        Dim maxVal = histList.Max
+        Dim maxIndex = histList.IndexOf(maxVal)
+        plot.maxRange = Math.Ceiling((maxVal + 50) - (maxVal + 50) Mod 50)
+        label = xyStr + "Max count = " + CStr(maxVal) + " at " + CStr(maxIndex - zeroLoc) + " with " + CStr(nonZero) + " non-zero values or " +
+                             Format(nonZero / (nonZero + zeroCount), "0%")
+
+        Dim histSum As Single
+        For i = 0 To histList.Count - 1
+            histSum += histList(i) * (i - zeroLoc)
+        Next
+        Return histSum / histList.Count
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+        feat.Run(task.grayStable)
+
+        If task.firstPass Then lastImage = src.Clone
+        Dim multiplier = dotSlider.Value
+
+        knn.queries = New List(Of cv.Point2f)(task.features)
+        knn.Run(src)
+
+        Dim diffX As New List(Of Integer)
+        Dim diffY As New List(Of Integer)
+        Dim correlationMat As New cv.Mat
+        dst2 = src.Clone
+        Dim sz = task.brickSize
+        For Each mps In knn.matches
+            Dim currRect = ValidateRect(New cv.Rect(mps.p1.X - sz, mps.p1.Y - sz, sz * 2, sz * 2))
+            Dim prevRect = ValidateRect(New cv.Rect(mps.p2.X - sz, mps.p2.Y - sz, currRect.Width, currRect.Height))
+            cv.Cv2.MatchTemplate(lastImage(prevRect), src(currRect), correlationMat, feat.options.matchOption)
+            Dim corrNext = correlationMat.Get(Of Single)(0, 0)
+            DrawCircle(dst2, mps.p1, task.DotSize, task.highlight)
+            diffX.Add(mps.p1.X - mps.p2.X)
+            diffY.Add(mps.p1.Y - mps.p2.Y)
+        Next
+
+        If diffX.Count = 0 Or diffY.Count = 0 Then Exit Sub
+
+        Dim xLabel As String = Nothing, yLabel As String = Nothing
+        shiftX = multiplier * plotDiff(diffX, " X ", 3, xLabel)
+        dst3 = plot.dst2.Clone
+        dst3.Line(New cv.Point(plot.plotCenter, 0), New cv.Point(plot.plotCenter, dst2.Height), white, 1)
+
+        shiftY = multiplier * plotDiff(diffY, " Y ", 1, yLabel)
+        dst1 = plot.dst2
+        dst1.Line(New cv.Point(plot.plotCenter, 0), New cv.Point(plot.plotCenter, dst2.Height), white, 1)
+
+        lastImage = src.Clone
+
+        motionTrack.Add(New cv.Point2f(shiftX + dst2.Width / 2, shiftY + dst2.Height / 2))
+        If motionTrack.Count > task.fpsAlgorithm Then motionTrack.RemoveAt(0)
+        Dim lastpt = motionTrack(0)
+        For Each pt In motionTrack
+            DrawLine(dst2, pt, lastpt, white)
+            lastpt = pt
+        Next
+        SetTrueText(yLabel, 1)
+        SetTrueText(xLabel, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_KNN_TrackEach : Inherits TaskParent
+    Dim knn As New KNN_OneToOne
+    Dim trackAll As New List(Of List(Of lpData))
+    Public options As New Options_Features
+    Public Sub New()
+        desc = "Track each good feature with KNN and match the features from frame to frame"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim minDistance = options.minDistance
+
+        ' if there was no motion, use minDistance to eliminate the unstable points.
+        If task.optionsChanged = False Then minDistance = 2
+
+        knn.queries = New List(Of cv.Point2f)(task.features)
+        knn.Run(src)
+
+        Dim tracker As New List(Of lpData)
+        dst2 = src.Clone
+        For Each lp In knn.matches
+            If lp.p1.DistanceTo(lp.p2) < minDistance Then tracker.Add(lp)
+        Next
+
+        trackAll.Add(tracker)
+
+        For i = 0 To trackAll.Count - 1 Step 2
+            Dim t1 = trackAll(i)
+            For Each lp In t1
+                DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
+                DrawCircle(dst2, lp.p2, task.DotSize, task.highlight)
+                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
+            Next
+        Next
+
+        labels(2) = CStr(task.features.Count) + " good features were tracked across " + CStr(task.frameHistoryCount) + " frames."
+        SetTrueText(labels(2) + vbCrLf + "The highlighted dots are the feature points", 3)
+
+        If trackAll.Count > task.frameHistoryCount Then trackAll.RemoveAt(0)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_KNN_NNearest : Inherits TaskParent
+    Public knn As cv.ML.KNearest
+    Public queries As New List(Of Single)
+    Public trainInput As New List(Of Single)
+    Public trainData As cv.Mat
+    Public queryData As cv.Mat
+    Public result(,) As Integer ' Get results here...
+    Public options As New Options_KNN
+    Public Sub New()
+        knn = cv.ML.KNearest.Create()
+        desc = "Find the nearest cells to the selected cell"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        Dim responseList As IEnumerable(Of Integer) = Enumerable.Range(0, 10).Select(Function(x) x)
+        If standaloneTest() Then
+            SetTrueText("There is no output for the " + traceName + " algorithm when run standaloneTest().  Use the " + traceName + "_Test algorithm")
+            Exit Sub
+        End If
+
+        Dim qRows = CInt(queries.Count / options.knnDimension)
+        If qRows = 0 Then
+            SetTrueText("There were no queries provided.  There is nothing to do...")
+            Exit Sub
+        End If
+
+        queryData = cv.Mat.FromPixelData(qRows, options.knnDimension, cv.MatType.CV_32F, queries.ToArray)
+        Dim queryMat As cv.Mat = queryData.Clone
+
+        Dim tRows = CInt(trainInput.Count / options.knnDimension)
+        trainData = cv.Mat.FromPixelData(tRows, options.knnDimension, cv.MatType.CV_32F, trainInput.ToArray())
+
+        Dim response As cv.Mat = cv.Mat.FromPixelData(trainData.Rows, 1, cv.MatType.CV_32S,
+                                  Enumerable.Range(start:=0, trainData.Rows).ToArray)
+
+        knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
+        Dim neighbors As New cv.Mat
+        knn.FindNearest(queryMat, trainData.Rows, New cv.Mat, neighbors)
+
+        ReDim result(neighbors.Rows - 1, neighbors.Cols - 1)
+        For i = 0 To neighbors.Rows - 1
+            For j = 0 To neighbors.Cols - 1
+                Dim test = neighbors.Get(Of Single)(i, j)
+                If test < trainData.Rows And test >= 0 Then result(i, j) = neighbors.Get(Of Single)(i, j)
+            Next
+        Next
+    End Sub
+    Public Sub Close()
+        If knn IsNot Nothing Then knn.Dispose()
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_KNN_Hulls : Inherits TaskParent
+    Dim knn As New KNN_Basics
+    Dim redC As New RedCloud_Basics
+    Public matchList As New List(Of cv.Point2f)
+    Public Sub New()
+        knn.desiredMatches = 2
+        task.gOptions.DebugSlider.Value = 2
+        labels(2) = "Use the debugslider to define the maximum distance between 'close' points."
+        desc = "Use KNN to connect hulls logically."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        redC.Run(src)
+        If redC.rcList.Count = 0 Then Exit Sub
+        dst2 = redC.dst2.Clone
+
+        knn.ptListQuery.Clear()
+        dst3.SetTo(0)
+        For Each pc In redC.rcList
+            dst3(pc.rect).SetTo(pc.color, pc.mask)
+            For Each pt In pc.hull
+                dst2(pc.rect).Circle(pt, task.DotSize, task.highlight, -1)
+                knn.ptListQuery.Add(New cv.Point(CInt(pt.X) + pc.rect.X, CInt(pt.Y) + pc.rect.Y))
+            Next
+        Next
+
+        knn.ptListTrain = New List(Of cv.Point)(knn.ptListQuery)
+
+        knn.Run(src)
+        matchList.Clear()
+        Dim distanceMax = Math.Min(Math.Abs(task.gOptions.DebugSlider.Value), 10)
+        For i = 0 To knn.result.GetUpperBound(0) - 1
+            Dim p1 As cv.Point2f = knn.ptListQuery(knn.result(i, 0))
+            For j = 0 To knn.result.GetUpperBound(1) - 1
+                Dim p2 As cv.Point2f = knn.ptListQuery(knn.result(i, 1))
+                If p1.DistanceTo(p2) <= distanceMax Then
+                    matchList.Add(p1)
+                    matchList.Add(p2)
+                    dst3.Circle(p1, task.DotSize, task.highlight, -1)
+                    dst3.Circle(p2, task.DotSize, task.highlight, -1)
+                End If
+            Next
+        Next
+        labels(3) = CStr(matchList.Count / 2) + " points were within " + CStr(distanceMax) + " pixels of another cell's hull point"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_KNN_EdgePoints : Inherits TaskParent
+    Public lpInput As New List(Of lpData)
+    Dim knn As New KNN_N2Basics
+    Public distances() As Single
+    Public minDistance As Integer = dst2.Width * 0.2
+    Public Sub New()
+        desc = "Match edgepoints from the current and previous frames."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then lpInput = task.lines.lpList
+
+        dst2 = src.Clone
+        For Each lp In task.lines.lpList
+            HullLine_EdgePoints.EdgePointOffset(lp, 1)
+            DrawCircle(dst2, New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)))
+            DrawCircle(dst2, New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)))
+        Next
+
+        knn.queries.Clear()
+        For Each lp In lpInput
+            knn.queries.Add(lp.pE1)
+            knn.queries.Add(lp.pE2)
+        Next
+
+        knn.Run(emptyMat)
+        knn.trainInput = New List(Of cv.Point2f)(knn.queries) ' for the next iteration.
+
+        ReDim distances(minDistance - 1)
+        For i = 0 To knn.queries.Count - 1
+            Dim p1 = knn.queries(i)
+            Dim index = knn.result(i, 0)
+            If index >= knn.trainInput.Count Then Continue For
+            Dim p2 = knn.trainInput(index)
+
+            Dim intDistance = CInt(p1.DistanceTo(p2))
+            If intDistance >= minDistance Then intDistance = distances.Length - 1
+            distances(intDistance) += 1
+        Next
+
+        If distances.Count > 0 Then
+            Dim distList = distances.ToList
+            Dim maxIndex = distList.IndexOf(distList.Max)
+            labels(2) = CStr(lpInput.Count * 2) + " edge points found.  Peak distance at " + CStr(maxIndex) + " pixels"
+
+            If standalone Then
+                Static plot As New Plot_OverTimeSingle
+                plot.plotData = maxIndex
+                plot.Run(src)
+                dst3 = plot.dst2
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_KNN_Emax : Inherits TaskParent
+    Dim random As New Random_Basics
+    Public knn As New KNN_Basics
+    Dim em As New EMax_Basics
+    Public Sub New()
+        labels(2) = "Output from Emax"
+        labels(3) = "Red=TrainingData, yellow = queries - use EMax sigma to introduce more chaos."
+        desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        em.Run(src)
+        random.Run(src)
+
+        knn.queries = New List(Of cv.Point2f)(em.centers)
+        knn.Run(src)
+        dst2 = em.dst2 + knn.dst2
+
+        knn.knn2.displayResults()
+        dst3 = knn.dst2
+
+        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
     End Sub
 End Class

@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
 Imports VBClasses.OptionParent
 Imports cv = OpenCvSharp
 Public Class Feature_Basics : Inherits TaskParent
@@ -111,25 +112,13 @@ Public Class Feature_General : Inherits TaskParent
         End If
 
         strOut = ""
-        Select Case task.featureSource
-            Case FeatureSrc.GoodFeaturesFull
+        Select Case task.featureOptions.FeatureMethod.Text
+            Case "GoodFeatures"
                 ptLatest = cv.Cv2.GoodFeaturesToTrack(task.gray, task.FeatureSampleSize, options.quality,
                                                       options.minDistance, New cv.Mat,
                                                       options.blockSize, True, options.k).ToList
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
-            Case FeatureSrc.GoodFeaturesGrid
-                task.FeatureSampleSize = 4
-                For i = 0 To task.gridRects.Count - 1
-                    Dim roi = task.gridRects(i)
-                    Dim tmpFeatures = cv.Cv2.GoodFeaturesToTrack(task.gray(roi), task.FeatureSampleSize, options.quality,
-                                                            options.minDistance, New cv.Mat,
-                                                            options.blockSize, True, options.k).ToList
-                    For j = 0 To tmpFeatures.Count - 1
-                        ptLatest.Add(New cv.Point2f(tmpFeatures(j).X + roi.X, tmpFeatures(j).Y + roi.Y))
-                    Next
-                Next
-                strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
-            Case FeatureSrc.Agast
+            Case "AGAST"
                 If cPtr = 0 Then cPtr = Agast_Open()
                 src = task.color.Clone
                 Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
@@ -147,29 +136,26 @@ Public Class Feature_General : Inherits TaskParent
                 Next
 
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
-            Case FeatureSrc.BRISK
+            Case "BRISK"
                 Static brisk As New BRISK_Basics
                 brisk.Run(task.gray)
                 ptLatest = brisk.features
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
-            Case FeatureSrc.Harris
+            Case "Harris"
                 Static harris As New Corners_HarrisDetector_CPP
                 harris.Run(task.gray)
                 ptLatest = harris.features
                 strOut = "Harris Detector produced " + CStr(ptLatest.Count) + " features"
-            Case FeatureSrc.FAST
+            Case "FAST"
                 Static FAST As New Corners_Basics
                 FAST.Run(task.gray)
-                ptLatest = task.features
+                ptLatest = FAST.features
                 strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
-            Case FeatureSrc.LineInput
-                task.logicalLines.Clear()
+            Case "LineInput"
                 For Each lp In task.lines.lpList
-                    ptLatest.Add(lp.p1)
-                    ptLatest.Add(lp.p2)
-                    task.logicalLines.Add(lp)
+                    ptLatest.Add(lp.ptCenter)
                 Next
-            Case FeatureSrc.BrickPoints
+            Case "BrickPoint"
                 Static bPoint As New BrickPoint_Minimum
                 bPoint.Run(src)
                 For Each pt In bPoint.features

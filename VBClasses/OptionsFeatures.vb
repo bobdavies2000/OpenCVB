@@ -17,11 +17,10 @@ Public Class OptionsFeatures
         FeatureMethod.Items.Add("BrickPoint")
         FeatureMethod.Items.Add("BRISK")
         FeatureMethod.Items.Add("FAST")
-        FeatureMethod.Items.Add("GoodFeatures Full Image")
-        FeatureMethod.Items.Add("GoodFeatures using Grid")
+        FeatureMethod.Items.Add("GoodFeatures")
         FeatureMethod.Items.Add("Harris")
         FeatureMethod.Items.Add("LineInput")
-        FeatureMethod.SelectedItem() = "BrickPoint"
+        FeatureMethod.SelectedItem() = "GoodFeatures"
 
         EdgeMethods.Items.Add("Binarized Reduction")
         EdgeMethods.Items.Add("Binarized Sobel")
@@ -76,7 +75,6 @@ Public Class OptionsFeatures
         task.optionsChanged = True
     End Sub
     Private Sub FeatureMethod_SelectedIndexChanged(sender As Object, e As EventArgs) Handles FeatureMethod.SelectedIndexChanged
-        task.featureSource = FeatureMethod.SelectedIndex
         task.optionsChanged = True
     End Sub
     Private Sub verticalRadio_CheckedChanged(sender As Object, e As EventArgs)

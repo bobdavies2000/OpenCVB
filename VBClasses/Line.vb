@@ -60,7 +60,9 @@ Public Class Line_Basics : Inherits TaskParent
         Next
 
         ' so we don't have to check the lplist.count every time we need the longest line...
-        If lpList.Count = 0 Then lpList.Add(task.gravityIMU)
+        If lpList.Count = 0 Then
+            lpList.Add(task.gravityIMU)
+        End If
         If task.frameCount > 10 Then If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
         task.lineLongest = lpList(0)
 

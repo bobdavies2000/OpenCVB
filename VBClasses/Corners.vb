@@ -28,7 +28,6 @@ Public Class Corners_Basics : Inherits TaskParent
             End If
         Next
 
-
         task.featurePoints = If(newPts.Count <= threshold, task.featurePoints, New List(Of cv.Point)(newPts))
         features = If(new2f.Count <= threshold, fast.features, New List(Of cv.Point2f)(new2f))
         labels(2) = Format(task.featurePoints.Count, "000") + " identified FAST stable points - slider adjusts threshold"

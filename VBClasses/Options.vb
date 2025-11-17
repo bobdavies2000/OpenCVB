@@ -4488,12 +4488,18 @@ Public Class Options_KNN : Inherits OptionParent
     Public knnDimension As Integer = 2
     Public numPoints As Integer = 20 ' just for testing so a fixed amount is all we need.
     Public useOutSide As Boolean
+    Public multiplier As Integer = 10
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("KNN Dimension", 1, 20, knnDimension)
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Average distance multiplier", 1, 20, multiplier)
+            sliders.setupTrackBar("KNN Dimension", 1, 20, knnDimension)
+        End If
     End Sub
     Public Sub Run()
         Static dimSlider = OptionParent.FindSlider("KNN Dimension")
+        Static distSlider = OptionParent.FindSlider("Average distance multiplier")
         knnDimension = dimSlider.Value
+        multiplier = distSlider.value
     End Sub
 End Class
 

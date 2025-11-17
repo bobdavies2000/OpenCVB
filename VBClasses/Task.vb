@@ -43,7 +43,6 @@ Public Class VBtask : Implements IDisposable
     Public regionList As New List(Of oldrcData)
     Public featList As New List(Of List(Of Integer))
     Public fLess As New List(Of List(Of Integer))
-    Public logicalLines As New List(Of lpData)
 
     Public fpMap As New cv.Mat ' feature map
 
@@ -265,7 +264,6 @@ Public Class VBtask : Implements IDisposable
     Public fpsCamera As Integer
 
     Public FeatureSampleSize As Integer ' how many features do you want...
-    Public featureSource As Integer ' which Feature_Basics method...
     Public fCorrThreshold As Single ' feature correlation threshold
     Public edgeMethod As String
     Public verticalLines As Boolean
@@ -647,8 +645,8 @@ Public Class VBtask : Implements IDisposable
             End If
         End If
 
-        lines.Run(grayStable)
         gravityBasics.Run(src.Clone)
+        lines.Run(grayStable)
         histBinList = {histogramBins, histogramBins, histogramBins}
 
         Dim saveOptionsChanged = optionsChanged
