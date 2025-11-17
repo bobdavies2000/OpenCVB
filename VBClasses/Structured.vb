@@ -85,7 +85,7 @@ End Class
 
 Public Class Structured_MultiSliceLines : Inherits TaskParent
     Dim multi As New Structured_MultiSlice
-    Dim lines As New Line_Raw
+    Dim lines As New Line_Core
     Public Sub New()
         desc = "Detect lines in the multiSlice output"
     End Sub

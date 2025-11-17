@@ -168,7 +168,7 @@ End Class
 Public Class MatchLine_VH : Inherits TaskParent
     Public brickCells As New List(Of gravityLine)
     Dim match As New Match_tCell
-    Dim gLines As New Line_GCloud
+    Dim gLines As New XO_Line_GCloud
     Public Sub New()
         labels(3) = "More readable than dst1 - index, correlation, length (meters), and ArcY"
         desc = "Find and track all the horizontal or vertical lines"

@@ -5189,7 +5189,7 @@ End Class
 
 
 Public Class XO_FeatureLine_LongestVerticalKNN : Inherits TaskParent
-    Dim gLines As New Line_GCloud
+    Dim gLines As New XO_Line_GCloud
     Dim longest As New XO_FeatureLine_Longest
     Public Sub New()
         labels(3) = "All vertical lines.  The numbers: index and Arc-Y for the longest X vertical lines."
@@ -5694,7 +5694,7 @@ End Class
 
 
 Public Class XO_FeatureLine_LongestKNN : Inherits TaskParent
-    Dim glines As New Line_GCloud
+    Dim glines As New XO_Line_GCloud
     Public knn As New KNN_ClosestTracker
     Public gline As gravityLine
     Public match As New Match_Basics
@@ -5734,7 +5734,7 @@ End Class
 
 
 Public Class XO_FeatureLine_Longest : Inherits TaskParent
-    Dim glines As New Line_GCloud
+    Dim glines As New XO_Line_GCloud
     Public knn As New KNN_ClosestTracker
     Public gline As gravityLine
     Public match1 As New Match_Basics
@@ -7752,7 +7752,7 @@ End Class
 Public Class XO_TrackLine_BasicsSimple : Inherits TaskParent
     Dim lp As New lpData
     Dim match As New Match_Basics
-    Public rawLines As New Line_Raw
+    Public rawLines As New Line_Core
     Dim matchRect As cv.Rect
     Public Sub New()
         desc = "Track an individual line as best as possible."
@@ -7794,7 +7794,7 @@ Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
     Public lpInput As lpData
     Public foundLine As Boolean
     Dim match As New XO_MatchLine_Basics
-    Public rawLines As New Line_Raw
+    Public rawLines As New Line_Core
     Public Sub New()
         desc = "Track an individual line as best as possible."
     End Sub
@@ -7859,7 +7859,7 @@ End Class
 Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
     Dim match As New Match_Basics
     Dim matchRect As cv.Rect
-    Public rawLines As New Line_Raw
+    Public rawLines As New Line_Core
     Dim lplist As List(Of lpData)
     Dim knn As New KNN_NNBasics
     Public Sub New()
@@ -10479,7 +10479,7 @@ End Class
 Public Class XO_Line_BasicsNoAging : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-    Public rawLines As New Line_Raw
+    Public rawLines As New Line_Core
     Public Sub New()
         desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
     End Sub
@@ -10524,7 +10524,7 @@ End Class
 
 Public Class XO_Line_ViewLeftRight : Inherits TaskParent
     Dim lines As New Line_Basics
-    Dim rawLines As New Line_Raw
+    Dim rawLines As New Line_Core
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         desc = "Find lines in the left and right images."
@@ -10616,7 +10616,7 @@ End Class
 Public Class XO_Line_RawSubset : Inherits TaskParent
     Public lpList As New List(Of lpData)
     Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-    Public rawLines As New Line_Raw
+    Public rawLines As New Line_Core
     Public Sub New()
         task.drawRect = New cv.Rect(25, 25, 25, 25)
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -10825,7 +10825,7 @@ End Class
 
 Public Class XO_KNN_BoundingRect : Inherits TaskParent
     Public lp As lpData
-    Dim rawlines As New Line_Raw
+    Dim rawlines As New Line_Core
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         desc = "Find the line with the largest bounding rectangle."
@@ -10904,7 +10904,7 @@ End Class
 
 Public Class XO_Line_Grid : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Public rawLines As New Line_Raw
+    Public rawLines As New Line_Core
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "find the lines in each grid rectangle"
@@ -17234,7 +17234,7 @@ End Class
 
 Public Class XO_Line_CoreNew : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Public rawLines As New Line_Raw
+    Public rawLines As New Line_Core
     Public Sub New()
         desc = "The core algorithm to find lines.  Line_Basics is a task algorithm that exits when run as a normal algorithm."
     End Sub
@@ -17328,7 +17328,7 @@ End Class
 
 Public Class XO_Line_Backprojection : Inherits TaskParent
     Dim backP As New BackProject_DisplayColor
-    Dim rawLines As New Line_Raw
+    Dim rawLines As New Line_Core
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         labels = {"", "", "Lines found in the back projection", "Backprojection results"}
@@ -17759,79 +17759,6 @@ End Class
 
 
 
-Public Class Line_GCloud : Inherits TaskParent
-    Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
-    Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
-    Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
-    Public options As New Options_LineFinder
-    Dim match As New Match_tCell
-    Dim angleSlider As System.Windows.Forms.TrackBar
-    Dim rawLines As New Line_Raw
-    Public Sub New()
-        angleSlider = OptionParent.FindSlider("Angle tolerance in degrees")
-        labels(2) = "Line_GCloud - Blue are vertical lines using the angle thresholds."
-        desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity."
-    End Sub
-    Public Function updateGLine(src As cv.Mat, brick As gravityLine, p1 As cv.Point, p2 As cv.Point) As gravityLine
-        brick.tc1.center = p1
-        brick.tc2.center = p2
-        brick.tc1 = match.createCell(src, brick.tc1.correlation, p1)
-        brick.tc2 = match.createCell(src, brick.tc2.correlation, p2)
-        brick.tc1.strOut = Format(brick.tc1.correlation, fmt2) + vbCrLf + Format(brick.tc1.depth, fmt2) + "m"
-        brick.tc2.strOut = Format(brick.tc2.correlation, fmt2) + vbCrLf + Format(brick.tc2.depth, fmt2) + "m"
-
-        Dim mean = task.pointCloud(brick.tc1.rect).Mean(task.depthMask(brick.tc1.rect))
-        brick.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
-        brick.tc1.depth = brick.pt1.Z
-        mean = task.pointCloud(brick.tc2.rect).Mean(task.depthMask(brick.tc2.rect))
-        brick.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
-        brick.tc2.depth = brick.pt2.Z
-
-        brick.len3D = distance3D(brick.pt1, brick.pt2)
-        If brick.pt1 = New cv.Point3f Or brick.pt2 = New cv.Point3f Then
-            brick.len3D = 0
-        Else
-            brick.arcX = Math.Asin((brick.pt1.X - brick.pt2.X) / brick.len3D) * 57.2958
-            brick.arcY = Math.Abs(Math.Asin((brick.pt1.Y - brick.pt2.Y) / brick.len3D) * 57.2958)
-            If brick.arcY > 90 Then brick.arcY -= 90
-            brick.arcZ = Math.Asin((brick.pt1.Z - brick.pt2.Z) / brick.len3D) * 57.2958
-        End If
-
-        Return brick
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        Dim maxAngle = angleSlider.Value
-
-        dst2 = src.Clone
-        rawLines.Run(src.Clone)
-
-        sortedVerticals.Clear()
-        sortedHorizontals.Clear()
-        For Each lp In rawLines.lpList
-            Dim brick As New gravityLine
-            brick = updateGLine(src, brick, lp.p1, lp.p2)
-            allLines.Add(lp.p1.DistanceTo(lp.p2), brick)
-            If Math.Abs(90 - brick.arcY) < maxAngle And brick.tc1.depth > 0 And brick.tc2.depth > 0 Then
-                sortedVerticals.Add(lp.p1.DistanceTo(lp.p2), brick)
-                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Blue)
-            End If
-            If Math.Abs(brick.arcY) <= maxAngle And brick.tc1.depth > 0 And brick.tc2.depth > 0 Then
-                sortedHorizontals.Add(lp.p1.DistanceTo(lp.p2), brick)
-                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
-            End If
-        Next
-
-        labels(2) = Format(sortedHorizontals.Count, "00") + " Horizontal lines were identified and " +
-                    Format(sortedVerticals.Count, "00") + " Vertical lines were identified."
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class XO_Line_Info : Inherits TaskParent
     Public Sub New()
@@ -18128,5 +18055,143 @@ Public Class XO_Gravity_BasicsKalman : Inherits TaskParent
             DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, task.highlight)
             DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, cv.Scalar.Red)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Line_Trace : Inherits TaskParent
+    Public Sub New()
+        labels(2) = "Move camera to see the impact"
+        desc = "Trace the longestline to visualize the line over time"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If task.heartBeat Then dst2.SetTo(0)
+        DrawLine(dst2, task.lineLongest, task.highlight)
+        labels(2) = "Longest line is " + Format(task.lineLongest.length, fmt1) + " pixels, slope = " +
+                     Format(task.lineLongest.slope, fmt1)
+
+        Static strList = New List(Of String)({labels(2)})
+        strList.add(labels(2))
+        strOut = ""
+        For Each strNext In strList
+            strOut += strNext + vbCrLf
+        Next
+
+        If strList.Count > 20 Then strList.RemoveAt(0)
+        SetTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_Line_TraceCenter : Inherits TaskParent
+    Public match As New Match_Basics
+    Dim intersect As New Line_Intersection
+    Public trackPoint As cv.Point2f
+    Public Sub New()
+        labels(2) = "White line is the last longest line and yellow is the current perpendicular to the longest line."
+        desc = "Trace the center of the longest line."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim lplist = task.lines.lpList
+
+        Static lpLast = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
+        Dim linePerp = Line_PerpendicularTest.computePerp(task.lineLongest)
+
+        dst2 = src
+        DrawLine(dst2, lpLast, white)
+        DrawLine(dst2, linePerp, task.highlight)
+
+        intersect.lp1 = lpLast
+        intersect.lp2 = linePerp
+        intersect.Run(emptyMat)
+
+        If task.heartBeatLT Then dst3.SetTo(0)
+        trackPoint = intersect.intersectionPoint
+        DrawCircle(dst3, trackPoint)
+        DrawCircle(dst3, trackPoint)
+
+        lpLast = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class XO_Line_GCloud : Inherits TaskParent
+    Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+    Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+    Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+    Public options As New Options_LineFinder
+    Dim match As New Match_tCell
+    Dim angleSlider As System.Windows.Forms.TrackBar
+    Dim rawLines As New Line_Core
+    Public Sub New()
+        angleSlider = OptionParent.FindSlider("Angle tolerance in degrees")
+        labels(2) = "XO_Line_GCloud - Blue are vertical lines using the angle thresholds."
+        desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity."
+    End Sub
+    Public Function updateGLine(src As cv.Mat, brick As gravityLine, p1 As cv.Point, p2 As cv.Point) As gravityLine
+        brick.tc1.center = p1
+        brick.tc2.center = p2
+        brick.tc1 = match.createCell(src, brick.tc1.correlation, p1)
+        brick.tc2 = match.createCell(src, brick.tc2.correlation, p2)
+        brick.tc1.strOut = Format(brick.tc1.correlation, fmt2) + vbCrLf + Format(brick.tc1.depth, fmt2) + "m"
+        brick.tc2.strOut = Format(brick.tc2.correlation, fmt2) + vbCrLf + Format(brick.tc2.depth, fmt2) + "m"
+
+        Dim mean = task.pointCloud(brick.tc1.rect).Mean(task.depthMask(brick.tc1.rect))
+        brick.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
+        brick.tc1.depth = brick.pt1.Z
+        mean = task.pointCloud(brick.tc2.rect).Mean(task.depthMask(brick.tc2.rect))
+        brick.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
+        brick.tc2.depth = brick.pt2.Z
+
+        brick.len3D = distance3D(brick.pt1, brick.pt2)
+        If brick.pt1 = New cv.Point3f Or brick.pt2 = New cv.Point3f Then
+            brick.len3D = 0
+        Else
+            brick.arcX = Math.Asin((brick.pt1.X - brick.pt2.X) / brick.len3D) * 57.2958
+            brick.arcY = Math.Abs(Math.Asin((brick.pt1.Y - brick.pt2.Y) / brick.len3D) * 57.2958)
+            If brick.arcY > 90 Then brick.arcY -= 90
+            brick.arcZ = Math.Asin((brick.pt1.Z - brick.pt2.Z) / brick.len3D) * 57.2958
+        End If
+
+        Return brick
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        Dim maxAngle = angleSlider.Value
+
+        dst2 = src.Clone
+        rawLines.Run(src.Clone)
+
+        sortedVerticals.Clear()
+        sortedHorizontals.Clear()
+        For Each lp In rawLines.lpList
+            Dim brick As New gravityLine
+            brick = updateGLine(src, brick, lp.p1, lp.p2)
+            allLines.Add(lp.p1.DistanceTo(lp.p2), brick)
+            If Math.Abs(90 - brick.arcY) < maxAngle And brick.tc1.depth > 0 And brick.tc2.depth > 0 Then
+                sortedVerticals.Add(lp.p1.DistanceTo(lp.p2), brick)
+                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Blue)
+            End If
+            If Math.Abs(brick.arcY) <= maxAngle And brick.tc1.depth > 0 And brick.tc2.depth > 0 Then
+                sortedHorizontals.Add(lp.p1.DistanceTo(lp.p2), brick)
+                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
+            End If
+        Next
+
+        labels(2) = Format(sortedHorizontals.Count, "00") + " Horizontal lines were identified and " +
+                    Format(sortedVerticals.Count, "00") + " Vertical lines were identified."
     End Sub
 End Class

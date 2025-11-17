@@ -62,7 +62,7 @@ Public Class Reduction_HeatMapLines : Inherits TaskParent
     Public setupSide As New Cloud_SetupSide
     Public setupTop As New Cloud_SetupTop
     Dim reduction As New Reduction_PointCloud
-    Dim rawLines As New Line_Raw
+    Dim rawLines As New Line_Core
     Public Sub New()
         labels(2) = "Gravity rotated Side View with detected lines"
         labels(3) = "Gravity rotated Top View width detected lines"

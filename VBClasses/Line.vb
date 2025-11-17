@@ -1,8 +1,7 @@
-Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Line_Basics : Inherits TaskParent
     Public lpList As New List(Of lpData)
-    Public rawLines As New Line_Raw
+    Public rawLines As New Line_Core
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         If standalone Then task.gOptions.showMotionMask.Checked = True
@@ -62,10 +61,9 @@ Public Class Line_Basics : Inherits TaskParent
 
         ' so we don't have to check the lplist.count every time we need the longest line...
         If lpList.Count = 0 Then lpList.Add(task.gravityIMU)
-        If task.frameCount > 10 Then
-            If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
-            If task.lineLongest.rect.Width = 0 Then task.lineLongest = lpList(0)
-        End If
+        If task.frameCount > 10 Then If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
+        task.lineLongest = lpList(0)
+
         labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
     End Sub
 End Class
@@ -75,7 +73,7 @@ End Class
 
 
 
-Public Class Line_Raw : Inherits TaskParent
+Public Class Line_Core : Inherits TaskParent
     Dim ld As cv.XImgProc.FastLineDetector
     Public lpList As New List(Of lpData)
     Public Sub New()
@@ -166,72 +164,6 @@ Public Class Line_PerpendicularTest : Inherits TaskParent
         If standaloneTest() Then SetTrueText("The line displayed at left is the gravity vector.", 3)
     End Sub
 End Class
-
-
-
-
-
-
-
-Public Class Line_TraceCenter : Inherits TaskParent
-    Public match As New Match_Basics
-    Dim intersect As New Line_Intersection
-    Public trackPoint As cv.Point2f
-    Public Sub New()
-        labels(2) = "White line is the last longest line and yellow is the current perpendicular to the longest line."
-        desc = "Trace the center of the longest line."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lplist = task.lines.lpList
-
-        Static lpLast = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
-        Dim linePerp = Line_PerpendicularTest.computePerp(task.lineLongest)
-
-        dst2 = src
-        DrawLine(dst2, lpLast, white)
-        DrawLine(dst2, linePerp, task.highlight)
-
-        intersect.lp1 = lpLast
-        intersect.lp2 = linePerp
-        intersect.Run(emptyMat)
-
-        If task.heartBeatLT Then dst3.SetTo(0)
-        trackPoint = intersect.intersectionPoint
-        DrawCircle(dst3, trackPoint)
-        DrawCircle(dst3, trackPoint)
-
-        lpLast = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Line_Trace : Inherits TaskParent
-    Public Sub New()
-        labels(2) = "Move camera to see the impact"
-        desc = "Trace the longestline to visualize the line over time"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then dst2.SetTo(0)
-        DrawLine(dst2, task.lineLongest, task.highlight)
-        labels(2) = "Longest line is " + Format(task.lineLongest.length, fmt1) + " pixels, slope = " +
-                     Format(task.lineLongest.slope, fmt1)
-
-        Static strList = New List(Of String)({labels(2)})
-        strList.add(labels(2))
-        strOut = ""
-        For Each strNext In strList
-            strOut += strNext + vbCrLf
-        Next
-
-        If strList.Count > 20 Then strList.RemoveAt(0)
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
-
 
 
 
@@ -454,7 +386,7 @@ End Class
 Public Class Line_LeftRight : Inherits TaskParent
     Public leftLines As New List(Of lpData)
     Public rightLines As New List(Of lpData)
-    Dim lines As New Line_Raw
+    Dim lines As New Line_Core
     Public Sub New()
         labels = {"", "", "Left image lines", "Right image lines"}
         desc = "Find the lines in the Left and Right images."

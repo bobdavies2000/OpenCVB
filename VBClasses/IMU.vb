@@ -503,7 +503,7 @@ End Class
 
 
 Public Class IMU_VerticalAngles : Inherits TaskParent
-    Dim vert As New Line_GCloud
+    Dim vert As New XO_Line_GCloud
     Public Sub New()
         labels = {"", "", "Highlighted vertical lines", "Line details"}
         desc = "Compare the IMU changes to the angle changes in the vertical lines."
@@ -592,7 +592,7 @@ End Class
 
 
 Public Class IMU_Lines : Inherits TaskParent
-    Dim vert As New Line_GCloud
+    Dim vert As New XO_Line_GCloud
     Dim lastGcell As gravityLine
     Public Sub New()
         task.kalman = New Kalman_Basics

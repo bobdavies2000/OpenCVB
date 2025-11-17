@@ -460,7 +460,7 @@ End Class
 
 Public Class BackProject_MaskLines : Inherits TaskParent
     Dim masks As New BackProject_Masks
-    Dim rawLines As New Line_Raw
+    Dim rawLines As New Line_Core
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
