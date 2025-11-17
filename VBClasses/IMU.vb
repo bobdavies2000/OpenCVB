@@ -1090,7 +1090,7 @@ End Class
 
 Public Class IMU_VerticalVerify : Inherits TaskParent
     Public brickCells As New List(Of gravityLine)
-    Dim linesVH As New MatchLine_VH
+    Dim linesVH As New LineCorrelation_VH
     Dim options As New Options_VerticalVerify
     Public Sub New()
         labels = {"", "", "Highlighted vertical lines", "Line details"}

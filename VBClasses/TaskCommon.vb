@@ -540,8 +540,8 @@ Public Class lpData
 
     Public color As cv.Scalar
 
-    Public gridIndex1 As Integer
-    Public gridIndex2 As Integer
+    Public p1GridIndex As Integer
+    Public p2GridIndex As Integer
 
     Public index As Integer
     Public indexVTop As Integer = -1
@@ -639,18 +639,18 @@ Public Class lpData
 
         length = p1.DistanceTo(p2)
 
-        gridIndex1 = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
-        gridIndex2 = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
-        color = task.scalarColors(gridIndex1 Mod 255)
+        p1GridIndex = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
+        p2GridIndex = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
+        color = task.scalarColors(p1GridIndex Mod 255)
 
         pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
         If Single.IsNaN(pVec1(0)) Or pVec1(2) = 0 Then
-            Dim r = task.gridRects(gridIndex1)
+            Dim r = task.gridRects(p1GridIndex)
             pVec1 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthMask(r)).Item(0))
         End If
         pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
         If Single.IsNaN(pVec2(0)) Or pVec2(2) = 0 Then
-            Dim r = task.gridRects(gridIndex2)
+            Dim r = task.gridRects(p2GridIndex)
             pVec2 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthMask(r)).Item(0))
         End If
 
@@ -717,9 +717,9 @@ Public Class lpData
         dst.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
         Dim strOut = "rcList index = " + CStr(index) + vbCrLf
-        strOut = "Line ID = " + CStr(task.lpD.gridIndex1) + " Age = " + CStr(task.lpD.age) + vbCrLf
+        strOut = "Line ID = " + CStr(task.lpD.p1GridIndex) + " Age = " + CStr(task.lpD.age) + vbCrLf
         strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
-        strOut += "gridIndex1 = " + CStr(task.lpD.gridIndex1) + " gridIndex2 = " + CStr(task.lpD.gridIndex2) + vbCrLf
+        strOut += "p1GridIndex = " + CStr(task.lpD.p1GridIndex) + " p2GridIndex = " + CStr(task.lpD.p2GridIndex) + vbCrLf
 
         strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
         strOut += "pE1 = " + task.lpD.pE1.ToString + ", pE2 = " + task.lpD.pE2.ToString + vbCrLf + vbCrLf

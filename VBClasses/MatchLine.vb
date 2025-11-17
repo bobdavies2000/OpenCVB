@@ -1,7 +1,6 @@
 ﻿Imports cv = OpenCvSharp
-Public Class MatchLine_Basics : Inherits TaskParent
-    Public cameraMotionProxy As New lpData
-    Dim match As New XO_MatchLine_Basics
+Public Class LineCorrelation_Basics : Inherits TaskParent
+    Dim match As New LineCorrelation_Correlation
     Public correlations As New List(Of Single)
     Public Sub New()
         task.featureOptions.MatchCorrSlider.Value = 90
@@ -9,6 +8,7 @@ Public Class MatchLine_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
+        dst3 = task.rightView
         correlations.Clear()
         For Each lp In task.lines.lpList
             match.lpInput = lp
@@ -19,12 +19,9 @@ Public Class MatchLine_Basics : Inherits TaskParent
                 DrawLine(dst2, lp.p1, lp.p2)
             End If
             dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
-            'dst2.Rectangle(lp.gridRect2, task.highlight, task.lineWidth)
-            'dst2.Rectangle(lp.nabeRect1, task.highlight, task.lineWidth)
-            'dst2.Rectangle(lp.nabeRect2, task.highlight, task.lineWidth)
             DrawLine(dst2, lp.p1, lp.p2)
-            labels(2) = "Left rect has correlation " + Format(match.correlation1, fmt3) + " and " +
-                        "Right rect has " + Format(match.correlation2, fmt3)
+            labels(2) = "Rect for p1 has correlation " + Format(match.correlation1, fmt3) + " and " +
+                        "rect for p2 has " + Format(match.correlation2, fmt3)
             Exit For
         Next
 
@@ -39,7 +36,7 @@ End Class
 
 
 
-Public Class MatchLine_VH : Inherits TaskParent
+Public Class LineCorrelation_VH : Inherits TaskParent
     Public brickCells As New List(Of gravityLine)
     Dim match As New Match_tCell
     Dim gLines As New XO_Line_GCloud
@@ -105,7 +102,7 @@ End Class
 
 
 
-Public Class MatchLine_EndPoints : Inherits TaskParent
+Public Class LineCorrelation_EndPoints : Inherits TaskParent
     Public lpInput As lpData
     Dim match As New Match_Basics
     Public correlation As Single
@@ -145,5 +142,50 @@ Public Class MatchLine_EndPoints : Inherits TaskParent
         End If
 
         templateLast = match.template.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class LineCorrelation_Correlation : Inherits TaskParent
+    Public lpInput As lpData
+    Public lpOutput As lpData
+    Dim match As New Match_Basics
+    Public correlation1 As Single
+    Public correlation2 As Single
+    Public Sub New()
+        desc = "Get the end points of the longest line and compare them to the original template."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then lpInput = task.lineLongest
+        Static lastImage = task.gray.Clone
+
+        Dim rect = task.gridRects(lpInput.p1GridIndex)
+        match.template = task.gray(rect)
+        match.Run(lastImage(task.gridNabeRects(lpInput.p1GridIndex)))
+        correlation1 = match.correlation
+        Dim offsetX = match.newRect.TopLeft.X - rect.TopLeft.X
+        Dim offsetY = match.newRect.TopLeft.Y - rect.TopLeft.Y
+        Dim p1 = New cv.Point(lpInput.p1.X + offsetX, lpInput.p1.Y + offsetY)
+
+        rect = task.gridRects(lpInput.p2GridIndex)
+        match.template = task.gray(rect)
+        match.Run(lastImage(task.gridNabeRects(lpInput.p2GridIndex)))
+        correlation2 = match.correlation
+        offsetX = match.newRect.TopLeft.X - rect.TopLeft.X
+        offsetY = match.newRect.TopLeft.Y - rect.TopLeft.Y
+        Dim p2 = New cv.Point(lpInput.p1.X + offsetX, lpInput.p1.Y + offsetY)
+
+        lpOutput = New lpData(p1, p2)
+
+        If standaloneTest() Then
+            dst2 = src.Clone
+            DrawLine(dst2, lpInput, task.highlight)
+            DrawLine(dst2, lpOutput, task.highlight)
+        End If
     End Sub
 End Class

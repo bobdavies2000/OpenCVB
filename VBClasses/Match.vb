@@ -612,7 +612,7 @@ Public Class Match_Brick : Inherits TaskParent
         desc = "Match a brick's movement from the previous frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then gridIndex = task.lineLongest.gridIndex1
+        If standalone Then gridIndex = task.lineLongest.p1GridIndex
         Static lastImage As cv.Mat = task.gray.Clone
 
         Dim rect = task.gridRects(gridIndex)

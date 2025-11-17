@@ -5003,7 +5003,7 @@ End Class
 
 
 Public Class XO_FeatureLine_VerticalVerify : Inherits TaskParent
-    Dim linesVH As New MatchLine_VH
+    Dim linesVH As New LineCorrelation_VH
     Public verify As New IMU_VerticalVerify
     Public Sub New()
         desc = "Select a line or group of lines and track the result"
@@ -7793,7 +7793,7 @@ End Class
 Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
     Public lpInput As lpData
     Public foundLine As Boolean
-    Dim match As New XO_MatchLine_Basics
+    Dim match As New LineCorrelation_Correlation
     Public rawLines As New Line_Core
     Public Sub New()
         desc = "Track an individual line as best as possible."
@@ -10031,53 +10031,9 @@ End Class
 
 
 
-
-Public Class XO_MatchLine_Basics : Inherits TaskParent
-    Public lpInput As lpData
-    Public lpOutput As lpData
-    Dim match As New Match_Basics
-    Public correlation1 As Single
-    Public correlation2 As Single
-    Public Sub New()
-        desc = "Get the end points of the gravity RGB vector and compare them to the original template."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then lpInput = task.lineLongest
-        Static lastImage = task.gray.Clone
-
-        Dim rect = task.gridRects(lpInput.gridIndex1)
-        match.template = task.gray(rect)
-        match.Run(lastImage(task.gridNabeRects(lpInput.gridIndex1)))
-        correlation1 = match.correlation
-        Dim offsetX = match.newRect.TopLeft.X - rect.TopLeft.X
-        Dim offsetY = match.newRect.TopLeft.Y - rect.TopLeft.Y
-        Dim p1 = New cv.Point(lpInput.p1.X + offsetX, lpInput.p1.Y + offsetY)
-
-        rect = task.gridRects(lpInput.gridIndex2)
-        match.template = task.gray(rect)
-        match.Run(lastImage(task.gridNabeRects(lpInput.gridIndex2)))
-        correlation2 = match.correlation
-        offsetX = match.newRect.TopLeft.X - rect.TopLeft.X
-        offsetY = match.newRect.TopLeft.Y - rect.TopLeft.Y
-        Dim p2 = New cv.Point(lpInput.p1.X + offsetX, lpInput.p1.Y + offsetY)
-
-        lpOutput = New lpData(p1, p2)
-
-        If standaloneTest() Then
-            dst2 = src.Clone
-            DrawLine(dst2, lpInput, task.highlight)
-            DrawLine(dst2, lpOutput, task.highlight)
-        End If
-    End Sub
-End Class
-
-
-
-
-
 Public Class XO_MatchLine_Test : Inherits TaskParent
     Public cameraMotionProxy As New lpData
-    Dim match As New XO_MatchLine_Basics
+    Dim match As New LineCorrelation_Correlation
     Public Sub New()
         desc = "Find and track the longest line by matching line bricks."
     End Sub
@@ -10218,7 +10174,7 @@ Public Class XO_Line_LongestTest : Inherits TaskParent
             task.lineLongestChanged = True
         End If
 
-        matchBrick.gridIndex = lp.gridIndex1
+        matchBrick.gridIndex = lp.p1GridIndex
         matchBrick.Run(emptyMat)
         Dim correlation1 = matchBrick.correlation
         Dim p1 = New cv.Point(lp.p1.X + matchBrick.deltaX, lp.p1.Y + matchBrick.deltaY)
@@ -10226,7 +10182,7 @@ Public Class XO_Line_LongestTest : Inherits TaskParent
         strOut = matchBrick.labels(2) + vbCrLf
         labels(2) = matchBrick.labels(2) + vbTab
 
-        matchBrick.gridIndex = lp.gridIndex2
+        matchBrick.gridIndex = lp.p2GridIndex
         matchBrick.Run(emptyMat)
         Dim correlation2 = matchBrick.correlation
         Dim p2 = New cv.Point(lp.p2.X + matchBrick.deltaX, lp.p2.Y + matchBrick.deltaY)
@@ -10933,7 +10889,7 @@ End Class
 
 Public Class XO_Line_GravityToLongest : Inherits TaskParent
     Dim kalman As New Kalman_Basics
-    Dim matchLine As New XO_MatchLine_Basics
+    Dim matchLine As New LineCorrelation_Correlation
     Public Sub New()
         desc = "Highlight both vertical and horizontal lines"
     End Sub
@@ -16289,7 +16245,7 @@ Public Class XO_Line_Generations : Inherits TaskParent
 
         knn.queries.Clear()
         For Each lp In match3.lpOutput
-            Dim pt As New cv.Point(lp.gridIndex1, lp.gridIndex2)
+            Dim pt As New cv.Point(lp.p1GridIndex, lp.p2GridIndex)
             knn.queries.Add(pt)
         Next
 
@@ -16306,10 +16262,10 @@ Public Class XO_Line_Generations : Inherits TaskParent
             If index >= lplast.Count And lplast.Count > 0 Then Continue For
             Dim age As Integer = 1
             If Math.Abs(lplast(index).angle - match3.lpOutput(index).angle) < task.angleThreshold Then
-                Dim index1 = match3.lpOutput(index).gridIndex1
-                Dim index2 = match3.lpOutput(index).gridIndex2
-                If task.grid.gridNeighbors(index1).Contains(lplast(index).gridIndex1) And
-                    task.grid.gridNeighbors(index2).Contains(lplast(index).gridIndex2) Then
+                Dim index1 = match3.lpOutput(index).p1GridIndex
+                Dim index2 = match3.lpOutput(index).p2GridIndex
+                If task.grid.gridNeighbors(index1).Contains(lplast(index).p1GridIndex) And
+                    task.grid.gridNeighbors(index2).Contains(lplast(index).p2GridIndex) Then
                     age = lplast(index).age + 1
                 End If
             End If
@@ -17779,9 +17735,9 @@ Public Class XO_Line_Info : Inherits TaskParent
 
         dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
-        strOut = "Line ID = " + CStr(task.lpD.gridIndex1) + " Age = " + CStr(task.lpD.age) + vbCrLf
+        strOut = "Line ID = " + CStr(task.lpD.p1GridIndex) + " Age = " + CStr(task.lpD.age) + vbCrLf
         strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
-        strOut += "gridIndex1 = " + CStr(task.lpD.gridIndex1) + " gridIndex2 = " + CStr(task.lpD.gridIndex2) + vbCrLf
+        strOut += "p1GridIndex = " + CStr(task.lpD.p1GridIndex) + " p2GridIndex = " + CStr(task.lpD.p2GridIndex) + vbCrLf
 
         strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
         strOut += "pE1 = " + task.lpD.pE1.ToString + ", pE2 = " + task.lpD.pE2.ToString + vbCrLf + vbCrLf
