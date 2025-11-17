@@ -15,7 +15,7 @@ Public Class Gravity_Basics : Inherits TaskParent
         dst.Line(task.lineHorizon.pE1, task.lineHorizon.pE2, white, task.lineWidth, task.lineType)
         If task.lineLongest IsNot Nothing Then
             dst.Line(task.lineLongest.p1, task.lineLongest.p2, task.highlight, task.lineWidth * 2, task.lineType)
-            DrawLine(dst, task.lineLongest.pE1, task.lineLongest.pE2, white)
+            dst.Line(task.lineLongest.pE1, task.lineLongest.pE2, white, task.lineWidth, task.lineType)
         End If
     End Sub
     Private Function findFirst(points As cv.Mat) As Single

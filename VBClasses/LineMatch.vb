@@ -7,7 +7,6 @@ Public Class LineMatch_Basics : Inherits TaskParent
         desc = "Find lines with an image slice to locate the best matching line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on yet.
         Static lastFrame As cv.Mat = src.Clone
 
         If task.toggleOn Or Not standalone Then

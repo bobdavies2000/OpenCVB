@@ -83,7 +83,6 @@ Public Class FindNonZero_Line3DWorld : Inherits TaskParent
         desc = "Find 3D points behind an RGB line and compute their world coordinates."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub
         If standalone Then lp = task.lines.lpList(0)
 
         dst2.SetTo(0)
@@ -129,8 +128,6 @@ Public Class FindNonZero_Line3D : Inherits TaskParent
         desc = "Find 3D points behind an RGB line and linearly interpolate their values."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub
-
         If standalone Then lp = task.lines.lpList(0)
 
         dst2.SetTo(0)

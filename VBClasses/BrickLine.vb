@@ -160,8 +160,6 @@ Public Class BrickLine_DepthGaps : Inherits TaskParent
         desc = "Find cells that have a gap in depth from their neighbors."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub
-
         dst1.SetTo(0)
         For Each lp In task.lines.lpList
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
@@ -187,8 +185,6 @@ Public Class BrickLine_Lines : Inherits TaskParent
         desc = "Find the cells containing lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub
-
         dst1.SetTo(0)
         For Each lp In task.lines.lpList
             dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)

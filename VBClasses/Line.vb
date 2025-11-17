@@ -18,7 +18,7 @@ Public Class Line_Basics : Inherits TaskParent
         If task.algorithmPrep = False Then Exit Sub ' only run as a task algorithm.
 
         If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
-        If lpList.Count = 0 Then
+        If lpList.Count <= 1 Then
             task.motionMask.SetTo(255)
             rawLines.Run(src)
             lpList = New List(Of lpData)(rawLines.lpList)
@@ -60,6 +60,12 @@ Public Class Line_Basics : Inherits TaskParent
             dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
         Next
 
+        ' so we don't have to check the lplist.count every time we need the longest line...
+        If lpList.Count = 0 Then lpList.Add(task.gravityIMU)
+        If task.frameCount > 10 Then
+            If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
+            If task.lineLongest.rect.Width = 0 Then task.lineLongest = lpList(0)
+        End If
         labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
     End Sub
 End Class
@@ -177,10 +183,6 @@ Public Class Line_TraceCenter : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lplist = task.lines.lpList
-        If lplist.Count = 0 Then
-            SetTrueText("There are no lines present in the image.", 3)
-            Exit Sub
-        End If
 
         Static lpLast = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
         Dim linePerp = Line_PerpendicularTest.computePerp(task.lineLongest)
@@ -218,8 +220,8 @@ Public Class Line_Trace : Inherits TaskParent
         labels(2) = "Longest line is " + Format(task.lineLongest.length, fmt1) + " pixels, slope = " +
                      Format(task.lineLongest.slope, fmt1)
 
-        Static strList = New List(Of String)
-        strList.Add(labels(2))
+        Static strList = New List(Of String)({labels(2)})
+        strList.add(labels(2))
         strOut = ""
         For Each strNext In strList
             strOut += strNext + vbCrLf
@@ -494,24 +496,6 @@ Public Class Line_Select : Inherits TaskParent
         SetTrueText(strOut, 1) ' the line info is already prepped in strout in delaunay.
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Line_Select3D : Inherits TaskParent
-    Public delaunay As New Delaunay_LineSelect
-    Public Sub New()
-        desc = "Recompute each 3D pixel on the selected RGB line."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        delaunay.Run(src)
-        dst2 = delaunay.dst1
-        labels(2) = delaunay.labels(2)
-    End Sub
-End Class
-
 
 
 

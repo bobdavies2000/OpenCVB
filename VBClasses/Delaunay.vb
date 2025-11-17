@@ -316,7 +316,7 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(2) = "Line is best selected near the end points or center that define a delaunay cells."
+        labels(2) = "Each delaunay cell will select the line that it contains."
         labels(3) = "The mouse is hovering over the Delaunay cell for the end point of the line."
         desc = "Create a map for selecting lines"
     End Sub

@@ -83,7 +83,6 @@ Public Class Track_LongestLine : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lpList = task.lines.lpList
-        If lpList.Count = 0 Then Exit Sub
 
         If task.heartBeatLT Then
             task.optionsChanged = True
@@ -109,7 +108,6 @@ Public Class Track_GridRect : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lpList = task.lines.lpList
-        If lpList.Count = 0 Then Exit Sub
 
         Static searchRect As cv.Rect, originalRect As cv.Rect
         If searchRect.Width = 0 Or searchRect.Height = 0 Then
@@ -146,7 +144,6 @@ Public Class Track_Lines : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lpList = task.lines.lpList
-        If lpList.Count = 0 Then Exit Sub
 
         Dim trackCount = Math.Min(track.Length, lpList.Count)
         dst2 = src

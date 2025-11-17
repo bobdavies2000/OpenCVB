@@ -275,7 +275,6 @@ Public Class Match_LinesKNN : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lplist = task.lines.lpList
-        If lplist.Count = 0 Then Exit Sub
 
         dst2 = dst2
         Static lastPt As New List(Of lpData)(lplist)

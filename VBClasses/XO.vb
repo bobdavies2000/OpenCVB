@@ -3598,7 +3598,6 @@ Public Class XO_Line_InDepthAndBGR : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = task.lines.dst2
-        If task.lines.lpList.Count = 0 Then Exit Sub
 
         Dim lineList = New List(Of cv.Rect)
         If task.optionsChanged Then dst3.SetTo(0)
@@ -5591,10 +5590,6 @@ Public Class XO_FeatureLine_BasicsRaw : Inherits TaskParent
             lines.subsetRect = New cv.Rect(pad * 3, pad * 3, src.Width - pad * 6, src.Height - pad * 6)
             lines.Run(src.Clone)
 
-            If lines.lpList.Count = 0 Then
-                SetTrueText("No lines found.", 3)
-                Exit Sub
-            End If
             Dim lp = lines.lpList(0)
 
             tcells(0) = match.createCell(src, 0, lp.p1)
@@ -7239,10 +7234,9 @@ Public Class XO_FeatureLine_Basics : Inherits TaskParent
                         "line detection runs = " + CStr(totalLineRuns)
         End If
 
-        If task.heartBeatLT Or task.lines.lpList.Count = 0 Or match.correlation < 0.98 Or runOnEachFrame Then
+        If task.heartBeatLT Or task.lines.lpList.Count <= 1 Or match.correlation < 0.98 Or runOnEachFrame Then
             task.motionMask.SetTo(255) ' force a complete line detection
             task.lines.Run(src.Clone)
-            If task.lines.lpList.Count = 0 Then Exit Sub
 
             cameraMotionProxy = task.lines.lpList(0)
             lineRuns += 1
@@ -7765,7 +7759,6 @@ Public Class XO_TrackLine_BasicsSimple : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lplist = task.lines.lpList
-        If lplist.Count = 0 Then Exit Sub
 
         If standalone Then
             If lplist(0).length > lp.length Then
@@ -7807,7 +7800,6 @@ Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lplist = task.lines.lpList
-        If lplist.Count = 0 Then Exit Sub
         If standalone And foundLine = False Then lpInput = task.lineLongest
 
         Static subsetrect = lpInput.rect
@@ -7897,7 +7889,6 @@ Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         lplist = task.lines.lpList
-        If lplist.Count = 0 Then Exit Sub
 
         Static lp As New lpData, lpLast As lpData
         lpLast = lp
@@ -10108,7 +10099,6 @@ Public Class XO_MatchLine_Test : Inherits TaskParent
 
                 task.motionMask.SetTo(255) ' force a complete line detection
                 task.lines.Run(src.Clone)
-                If task.lines.lpList.Count = 0 Then Exit Sub
 
                 match.lpInput = task.lines.lpList(0)
                 match.Run(src)
@@ -10220,10 +10210,6 @@ Public Class XO_Line_LongestTest : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim threshold = task.fCorrThreshold
         Dim lplist = task.lines.lpList
-        If lplist.Count = 0 Then
-            SetTrueText("There are no lines present in the image.", 3)
-            Exit Sub
-        End If
 
         task.lineLongestChanged = False
         ' camera is often warming up for the first few images.
@@ -10315,10 +10301,6 @@ Public Class XO_Line_Gravity : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lplist = task.lines.lpList
-        If lplist.Count = 0 Then
-            SetTrueText("There are no lines present in the image.", 3)
-            Exit Sub
-        End If
 
         ' camera is often warming up for the first few images.
         If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or lp Is Nothing Then
@@ -10443,8 +10425,6 @@ Public Class XO_Line_Intercepts : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-
-        If task.lines.lpList.Count = 0 Then Exit Sub
 
         dst2 = src
         p1List.Clear()
@@ -10770,7 +10750,6 @@ Public Class XO_Line_FindNearest : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then lpInput = task.lineLongest
         Dim lpList = task.lines.lpList
-        If lpList.Count = 0 Then Exit Sub
 
         Dim sortDistance As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
         For Each lp In lpList
@@ -10813,7 +10792,6 @@ Public Class XO_KNN_LongestLine : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lplist = task.lines.lpList
-        If lplist.Count = 0 Then Exit Sub
 
         If standalone And task.heartBeatLT Then lp = lplist(0)
 
@@ -10854,7 +10832,6 @@ Public Class XO_KNN_BoundingRect : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lplist = task.lines.lpList
-        If lplist.Count = 0 Then Exit Sub
 
         If standalone And task.heartBeatLT Then
             Dim sortRects As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
@@ -16350,7 +16327,7 @@ End Class
 
 
 
-Public Class Line_TestAge : Inherits TaskParent
+Public Class XO_Line_TestAge : Inherits TaskParent
     Dim knnLine As New XO_Line_Generations
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
@@ -16403,7 +16380,7 @@ End Class
 
 
 
-Public Class Line_Stabilize : Inherits TaskParent
+Public Class XO_Line_Stabilize : Inherits TaskParent
     Dim knnLine As New XO_Line_Generations
     Dim stable As New Stable_Basics
     Public Sub New()
@@ -17276,7 +17253,7 @@ Public Class XO_Line_CoreNew : Inherits TaskParent
         Return lpRectMap
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If lpList.Count = 0 Then
+        If lpList.Count <= 1 Then
             task.motionMask.SetTo(255)
             rawLines.Run(src)
             lpList = New List(Of lpData)(rawLines.lpList)
@@ -17412,8 +17389,6 @@ Public Class XO_KNNLine_SliceTemp : Inherits TaskParent
                "find all the match candidates"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on yet.
-
         dst2.SetTo(0)
         dst3.SetTo(0)
         Static lpListLast As New List(Of lpData)(task.lines.lpList)
@@ -17490,8 +17465,6 @@ Public Class XO_KNNLine_Basics : Inherits TaskParent
         desc = "Use KNN to determine which line is being selected with mouse."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on yet.
-
         dst2 = task.lines.dst2.Clone
         knn.trainInput.Clear()
         knn.queries.Clear()
@@ -17525,8 +17498,6 @@ Public Class XO_KNNLine_Query : Inherits TaskParent
         desc = "Query the KNN results for the nearest line to the mouse."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on yet.
-
         knnLine.Run(src)
         dst2 = knnLine.dst2
         labels(2) = knnLine.labels(2)
@@ -17547,8 +17518,6 @@ Public Class XO_KNNLine_Connect : Inherits TaskParent
         desc = "Connect each line to its likely predecessor."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on yet.
-
         dst3 = dst1.Clone
         labels(3) = labels(2)
         Static lpListLast As New List(Of lpData)(task.lines.lpList)
@@ -17587,8 +17556,6 @@ Public Class XO_KNNLine_SliceList : Inherits TaskParent
                "find all the match candidates"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on yet.
-
         Dim knnDimension = knn.options.knnDimension
         dst2.SetTo(0)
         dst3.SetTo(0)
@@ -17668,8 +17635,6 @@ Public Class XO_KNNLine_SliceIndex : Inherits TaskParent
         desc = "Compute the distances of the centers of only the longest lines"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.lines.lpList.Count = 0 Then Exit Sub ' nothing to work on yet.
-
         dst1.SetTo(0)
         dst2.SetTo(0)
         dst3.SetTo(0)
@@ -17998,11 +17963,6 @@ Public Class XO_Line_LeftRightMatch3 : Inherits TaskParent
         dst3 = lrLines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim lplist As New List(Of lpData)(task.lines.lpList)
-        If lplist.Count = 0 Then
-            dst2.SetTo(0)
-            SetTrueText("No lines were found in the image.")
-            Exit Sub
-        End If
 
         lpOutput.Clear()
         For i = 0 To lplist.Count - 1
@@ -18052,10 +18012,6 @@ Public Class XO_Line_Longest : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lplist = task.lines.lpList
-        If lplist.Count = 0 Then
-            SetTrueText("There are no lines present in the image.", 3)
-            Exit Sub
-        End If
         task.lineLongestChanged = False
         ' camera is often warming up for the first few images.
         If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or task.heartBeat Then
