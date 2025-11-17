@@ -135,13 +135,13 @@ LeftRight
 Line
 Line3D
 LinearRegression
+LineEnds
 LineMatch
 LineRect
 LUT
 Magnify
 Mat
 Match
-MatchLine
 MatchShapes
 Math
 MaxDist

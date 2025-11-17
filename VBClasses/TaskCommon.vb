@@ -293,8 +293,8 @@ End Structure
 Public Structure matchRect
     Dim p1 As cv.Point
     Dim p2 As cv.Point
-    Dim correlation1 As Single
-    Dim correlation2 As Single
+    Dim p1Correlation As Single
+    Dim p2Correlation As Single
 End Structure
 
 

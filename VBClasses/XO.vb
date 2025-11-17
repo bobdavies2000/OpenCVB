@@ -5003,7 +5003,7 @@ End Class
 
 
 Public Class XO_FeatureLine_VerticalVerify : Inherits TaskParent
-    Dim linesVH As New LineCorrelation_VH
+    Dim linesVH As New LineEnds_VH
     Public verify As New IMU_VerticalVerify
     Public Sub New()
         desc = "Select a line or group of lines and track the result"
@@ -5568,7 +5568,7 @@ Public Class XO_FeatureLine_BasicsRaw : Inherits TaskParent
     Dim lines As New XO_Line_RawSubset
     Dim lineDisp As New XO_Line_DisplayInfoOld
     Dim options As New Options_Features
-    Dim match As New Match_tCell
+    Dim match As New XO_Match_tCell
     Public tcells As List(Of tCell)
     Public Sub New()
         Dim tc As New tCell
@@ -7793,7 +7793,7 @@ End Class
 Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
     Public lpInput As lpData
     Public foundLine As Boolean
-    Dim match As New LineCorrelation_Correlation
+    Dim match As New LineEnds_Correlation
     Public rawLines As New Line_Core
     Public Sub New()
         desc = "Track an individual line as best as possible."
@@ -7821,9 +7821,9 @@ Public Class XO_TrackLine_BasicsOld : Inherits TaskParent
                 match.lpInput = lpInput
                 match.Run(src)
 
-                foundLine = match.correlation1 >= task.fCorrThreshold And match.correlation2 >= task.fCorrThreshold
+                foundLine = match.p1Correlation >= task.fCorrThreshold And match.p2Correlation >= task.fCorrThreshold
                 If foundLine Then
-                    lpInput = match.lpOutput
+                    lpInput = match.lpInput
                     subsetrect = lpInput.rect
                 End If
             End If
@@ -10033,7 +10033,7 @@ End Class
 
 Public Class XO_MatchLine_Test : Inherits TaskParent
     Public cameraMotionProxy As New lpData
-    Dim match As New LineCorrelation_Correlation
+    Dim match As New LineEnds_Correlation
     Public Sub New()
         desc = "Find and track the longest line by matching line bricks."
     End Sub
@@ -10047,11 +10047,11 @@ Public Class XO_MatchLine_Test : Inherits TaskParent
             match.Run(src)
             dst1 = match.dst2
 
-            labels(2) = "EndPoint1 correlation:  " + Format(match.correlation1, fmt3) + vbTab +
-                        "EndPoint2 correlation:  " + Format(match.correlation1, fmt3)
+            labels(2) = "EndPoint1 correlation:  " + Format(match.p1Correlation, fmt3) + vbTab +
+                        "EndPoint2 correlation:  " + Format(match.p1Correlation, fmt3)
 
-            If match.correlation1 < task.fCorrThreshold Or task.frameCount < 10 Or
-               match.correlation2 < task.fCorrThreshold Then
+            If match.p1Correlation < task.fCorrThreshold Or task.frameCount < 10 Or
+               match.p2Correlation < task.fCorrThreshold Then
 
                 task.motionMask.SetTo(255) ' force a complete line detection
                 task.lines.Run(src.Clone)
@@ -10176,7 +10176,7 @@ Public Class XO_Line_LongestTest : Inherits TaskParent
 
         matchBrick.gridIndex = lp.p1GridIndex
         matchBrick.Run(emptyMat)
-        Dim correlation1 = matchBrick.correlation
+        Dim p1Correlation = matchBrick.correlation
         Dim p1 = New cv.Point(lp.p1.X + matchBrick.deltaX, lp.p1.Y + matchBrick.deltaY)
 
         strOut = matchBrick.labels(2) + vbCrLf
@@ -10184,13 +10184,13 @@ Public Class XO_Line_LongestTest : Inherits TaskParent
 
         matchBrick.gridIndex = lp.p2GridIndex
         matchBrick.Run(emptyMat)
-        Dim correlation2 = matchBrick.correlation
+        Dim p2Correlation = matchBrick.correlation
         Dim p2 = New cv.Point(lp.p2.X + matchBrick.deltaX, lp.p2.Y + matchBrick.deltaY)
 
         strOut += matchBrick.labels(2) + vbCrLf
         labels(2) += ", " + matchBrick.labels(2)
 
-        If correlation1 >= threshold And correlation2 >= threshold Then
+        If p1Correlation >= threshold And p2Correlation >= threshold Then
             lp = New lpData(p1, p2)
             task.lineLongestChanged = False
         Else
@@ -10889,7 +10889,7 @@ End Class
 
 Public Class XO_Line_GravityToLongest : Inherits TaskParent
     Dim kalman As New Kalman_Basics
-    Dim matchLine As New LineCorrelation_Correlation
+    Dim matchLine As New LineEnds_Correlation
     Public Sub New()
         desc = "Highlight both vertical and horizontal lines"
     End Sub
@@ -18088,7 +18088,7 @@ Public Class XO_Line_GCloud : Inherits TaskParent
     Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
     Public options As New Options_LineFinder
-    Dim match As New Match_tCell
+    Dim match As New XO_Match_tCell
     Dim angleSlider As System.Windows.Forms.TrackBar
     Dim rawLines As New Line_Core
     Public Sub New()
@@ -18746,5 +18746,62 @@ Public Class XO_KNN_Emax : Inherits TaskParent
         dst3 = knn.dst2
 
         knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class XO_Match_tCell : Inherits TaskParent
+    Public tCells As New List(Of tCell)
+    Dim options As New Options_Features
+    Dim lineDisp As New XO_Line_DisplayInfoOld
+    Public Sub New()
+        tCells.Add(New tCell)
+        desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided."
+    End Sub
+    Public Function createCell(src As cv.Mat, correlation As Single, pt As cv.Point2f) As tCell
+        Dim tc As New tCell
+
+        tc.rect = ValidateRect(New cv.Rect(pt.X - task.brickSize, pt.Y - task.brickSize, task.brickSize * 2, task.brickSize * 2))
+        tc.correlation = correlation
+        tc.depth = task.pcSplit(2)(tc.rect).Mean(task.depthMask(tc.rect))(0) / 1000
+        tc.center = pt
+        tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - task.brickSize * 3, tc.center.Y - task.brickSize * 3,
+                                                 task.brickSize * 6, task.brickSize * 6))
+        If tc.template Is Nothing Then tc.template = src(tc.rect).Clone
+        Return tc
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim rSize = task.brickSize
+        If standaloneTest() And task.heartBeat Then
+            options.Run()
+            tCells.Clear()
+            tCells.Add(createCell(src, 0, New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))))
+            tCells.Add(createCell(src, 0, New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))))
+        End If
+
+        For i = 0 To tCells.Count - 1
+            Dim tc = tCells(i)
+            Dim input = src(tc.searchRect)
+            cv.Cv2.MatchTemplate(tc.template, input, dst0, cv.TemplateMatchModes.CCoeffNormed)
+            Dim mm As mmData = GetMinMax(dst0)
+            tc.center = New cv.Point2f(tc.searchRect.X + mm.maxLoc.X + rSize, tc.searchRect.Y + mm.maxLoc.Y + rSize)
+            tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - rSize * 3, tc.center.Y - rSize * 3, rSize * 6, rSize * 6))
+            tc.rect = ValidateRect(New cv.Rect(tc.center.X - rSize, tc.center.Y - rSize, rSize * 2, rSize * 2))
+            tc.correlation = mm.maxVal
+            tc.depth = task.pcSplit(2)(tc.rect).Mean(task.depthMask(tc.rect))(0) / 1000
+            tc.strOut = Format(tc.correlation, fmt2) + vbCrLf + Format(tc.depth, fmt2) + "m"
+            tCells(i) = tc
+        Next
+
+        If standaloneTest() Then
+            lineDisp.tcells = tCells
+            lineDisp.Run(src)
+            dst2 = lineDisp.dst2
+        End If
     End Sub
 End Class

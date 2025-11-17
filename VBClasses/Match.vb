@@ -395,64 +395,6 @@ End Class
 
 
 
-Public Class Match_tCell : Inherits TaskParent
-    Public tCells As New List(Of tCell)
-    Dim options As New Options_Features
-    Dim lineDisp As New XO_Line_DisplayInfoOld
-    Public Sub New()
-        tCells.Add(New tCell)
-        desc = "Use MatchTemplate to find the new location of the template and update the tc that was provided."
-    End Sub
-    Public Function createCell(src As cv.Mat, correlation As Single, pt As cv.Point2f) As tCell
-        Dim tc As New tCell
-
-        tc.rect = ValidateRect(New cv.Rect(pt.X - task.brickSize, pt.Y - task.brickSize, task.brickSize * 2, task.brickSize * 2))
-        tc.correlation = correlation
-        tc.depth = task.pcSplit(2)(tc.rect).Mean(task.depthMask(tc.rect))(0) / 1000
-        tc.center = pt
-        tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - task.brickSize * 3, tc.center.Y - task.brickSize * 3,
-                                                 task.brickSize * 6, task.brickSize * 6))
-        If tc.template Is Nothing Then tc.template = src(tc.rect).Clone
-        Return tc
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim rSize = task.brickSize
-        If standaloneTest() And task.heartBeat Then
-            options.Run()
-            tCells.Clear()
-            tCells.Add(createCell(src, 0, New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))))
-            tCells.Add(createCell(src, 0, New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))))
-        End If
-
-        For i = 0 To tCells.Count - 1
-            Dim tc = tCells(i)
-            Dim input = src(tc.searchRect)
-            cv.Cv2.MatchTemplate(tc.template, input, dst0, cv.TemplateMatchModes.CCoeffNormed)
-            Dim mm As mmData = GetMinMax(dst0)
-            tc.center = New cv.Point2f(tc.searchRect.X + mm.maxLoc.X + rSize, tc.searchRect.Y + mm.maxLoc.Y + rSize)
-            tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - rSize * 3, tc.center.Y - rSize * 3, rSize * 6, rSize * 6))
-            tc.rect = ValidateRect(New cv.Rect(tc.center.X - rSize, tc.center.Y - rSize, rSize * 2, rSize * 2))
-            tc.correlation = mm.maxVal
-            tc.depth = task.pcSplit(2)(tc.rect).Mean(task.depthMask(tc.rect))(0) / 1000
-            tc.strOut = Format(tc.correlation, fmt2) + vbCrLf + Format(tc.depth, fmt2) + "m"
-            tCells(i) = tc
-        Next
-
-        If standaloneTest() Then
-            lineDisp.tcells = tCells
-            lineDisp.Run(src)
-            dst2 = lineDisp.dst2
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Match_LinePairTest : Inherits TaskParent
     Public ptx(2 - 1) As cv.Point2f
     Public target(ptx.Count - 1) As cv.Mat
@@ -644,5 +586,74 @@ Public Class Match_Brick : Inherits TaskParent
                      Format(correlation, fmt3)
 
         If correlation < task.fCorrThreshold Then lastImage = task.gray.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class LineEnds_VH : Inherits TaskParent
+    Public brickCells As New List(Of gravityLine)
+    Dim match As New XO_Match_tCell
+    Dim gLines As New XO_Line_GCloud
+    Public Sub New()
+        labels(3) = "More readable than dst1 - index, correlation, length (meters), and ArcY"
+        desc = "Find and track all the horizontal or vertical lines"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        gLines.Run(src)
+
+        Dim sortedLines = If(task.verticalLines, gLines.sortedVerticals, gLines.sortedHorizontals)
+        If sortedLines.Count = 0 Then
+            SetTrueText("There were no vertical lines found.", 3)
+            Exit Sub
+        End If
+
+        Dim brick As gravityLine
+        brickCells.Clear()
+        match.tCells.Clear()
+        For i = 0 To sortedLines.Count - 1
+            brick = sortedLines.ElementAt(i).Value
+
+            If i = 0 Then
+                dst1.SetTo(0)
+                brick.tc1.template.CopyTo(dst1(brick.tc1.rect))
+                brick.tc2.template.CopyTo(dst1(brick.tc2.rect))
+            End If
+
+            match.tCells.Clear()
+            match.tCells.Add(brick.tc1)
+            match.tCells.Add(brick.tc2)
+
+            match.Run(src)
+            Dim threshold = task.fCorrThreshold
+            If match.tCells(0).correlation >= threshold And match.tCells(1).correlation >= threshold Then
+                brick.tc1 = match.tCells(0)
+                brick.tc2 = match.tCells(1)
+                brick = gLines.updateGLine(src, brick, brick.tc1.center, brick.tc2.center)
+                If brick.len3D > 0 Then brickCells.Add(brick)
+            End If
+        Next
+
+        dst2 = src
+        dst3.SetTo(0)
+
+        For i = 0 To brickCells.Count - 1
+            Dim tc As New tCell
+            brick = brickCells(i)
+            Dim p1 As cv.Point2f, p2 As cv.Point2f
+            For j = 0 To 2 - 1
+                tc = Choose(j + 1, brick.tc1, brick.tc2)
+                If j = 0 Then p1 = tc.center Else p2 = tc.center
+            Next
+            SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(brick.arcY, fmt1), brick.tc1.center, 2)
+            SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(brick.arcY, fmt1), brick.tc1.center, 3)
+
+            DrawLine(dst2, p1, p2, task.highlight)
+            DrawLine(dst3, p1, p2, task.highlight)
+        Next
     End Sub
 End Class
