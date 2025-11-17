@@ -1,50 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Gravity_Basics : Inherits TaskParent
     Public options As New Options_Features
-    Dim gravityRaw As New Gravity_Raw
-    Dim longLine As New Line_Longest
-    Public Sub New()
-        desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
-    End Sub
-    Public Shared Sub showVectors(dst As cv.Mat)
-        dst.Line(task.lineGravity.pE1, task.lineGravity.pE2, white, task.lineWidth, task.lineType)
-        dst.Line(task.lineHorizon.pE1, task.lineHorizon.pE2, white, task.lineWidth, task.lineType)
-        If task.lineLongest IsNot Nothing Then
-            dst.Line(task.lineLongest.p1, task.lineLongest.p2, task.highlight, task.lineWidth * 2, task.lineType)
-            DrawLine(dst, task.lineLongest.pE1, task.lineLongest.pE2, white)
-        End If
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        gravityRaw.Run(emptyMat)
-        longLine.Run(src)
-        Dim useIMUVector As Boolean = True
-        Static lastLongest = task.lineLongest
-        If task.lineLongest.length <> lastLongest.length Or task.lineGravity.length = 0 Or task.frameCount < 5 Then
-            task.lineGravity = task.gravityIMU
-            task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
-            lastLongest = task.lineLongest
-        End If
-        If standaloneTest() Then
-            dst2.SetTo(0)
-            showVectors(dst2)
-            dst3.SetTo(0)
-            For Each lp In task.lines.lpList
-                If Math.Abs(task.lineGravity.angle - lp.angle) < task.angleThreshold Then DrawLine(dst3, lp, white)
-            Next
-            labels(3) = task.lines.labels(3)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Gravity_Raw : Inherits TaskParent
     Public xTop As Single, xBot As Single
     Dim sampleSize As Integer = 25
     Dim ptList As New List(Of Integer)
@@ -53,6 +9,14 @@ Public Class Gravity_Raw : Inherits TaskParent
         labels(2) = "Horizon and Gravity Vectors"
         If standalone Then task.gOptions.gravityPointCloud.Checked = False
         desc = "Method to find gravity and horizon vectors from the IMU"
+    End Sub
+    Public Shared Sub showVectors(dst As cv.Mat)
+        dst.Line(task.lineGravity.pE1, task.lineGravity.pE2, white, task.lineWidth, task.lineType)
+        dst.Line(task.lineHorizon.pE1, task.lineHorizon.pE2, white, task.lineWidth, task.lineType)
+        If task.lineLongest IsNot Nothing Then
+            dst.Line(task.lineLongest.p1, task.lineLongest.p2, task.highlight, task.lineWidth * 2, task.lineType)
+            DrawLine(dst, task.lineLongest.pE1, task.lineLongest.pE2, white)
+        End If
     End Sub
     Private Function findFirst(points As cv.Mat) As Single
         ptList.Clear()
@@ -97,37 +61,6 @@ Public Class Gravity_Raw : Inherits TaskParent
         End If
     End Sub
 End Class
-
-
-
-
-
-
-Public Class Gravity_BasicsKalman : Inherits TaskParent
-    Dim kalman As New Kalman_Basics
-    Dim gravity As New Gravity_Raw
-    Public Sub New()
-        desc = "Use kalman to smooth gravity and horizon vectors."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        gravity.Run(src)
-
-        kalman.kInput = {task.lineGravity.pE1.X, task.lineGravity.pE1.Y, task.lineGravity.pE2.X, task.lineGravity.pE2.Y}
-        kalman.Run(emptyMat)
-        task.lineGravity = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
-                                     New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3)))
-
-        task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
-
-        If standaloneTest() Then
-            dst2.SetTo(0)
-            DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, task.highlight)
-            DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, cv.Scalar.Red)
-        End If
-    End Sub
-End Class
-
-
 
 
 

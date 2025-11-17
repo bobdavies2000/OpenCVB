@@ -149,80 +149,18 @@ Public Class Line_PerpendicularTest : Inherits TaskParent
         Return New lpData(p1, p2)
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standaloneTest() Then input = task.lineGravity
+        If standaloneTest() Then input = task.gravityIMU
         dst2.SetTo(0)
         dst2.Line(input.p1, input.p2, white, task.lineWidth, task.lineType)
 
         output = computePerp(input)
-        DrawCircle(dst2, midPoint, task.DotSize + 2, cv.Scalar.Red)
+        DrawCircle(dst2, input.ptCenter, task.DotSize + 2, cv.Scalar.Red)
         dst2.Line(output.p1, output.p2, yellow, task.lineWidth, task.lineType)
+
+        If standaloneTest() Then SetTrueText("The line displayed at left is the gravity vector.", 3)
     End Sub
 End Class
 
-
-
-
-
-Public Class Line_Longest : Inherits TaskParent
-    Public match As New Match_Basics
-    Public deltaX As Single, deltaY As Single
-    Dim lp As New lpData
-    Public Sub New()
-        desc = "Identify the longest line in the output of line_basics."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lplist = task.lines.lpList
-        If lplist.Count = 0 Then
-            SetTrueText("There are no lines present in the image.", 3)
-            Exit Sub
-        End If
-        task.lineLongestChanged = False
-        ' camera is often warming up for the first few images.
-        If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or task.heartBeat Then
-            lp = lplist(0)
-            match.template = task.gray(lp.rect)
-            task.lineLongestChanged = True
-        End If
-
-        match.Run(task.gray.Clone)
-
-        If match.correlation < task.fCorrThreshold Then
-            task.lineLongestChanged = True
-            If lplist.Count > 1 Then
-                Dim histogram As New cv.Mat
-                cv.Cv2.CalcHist({task.lines.dst1(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
-                                 New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
-
-                Dim histArray(histogram.Total - 1) As Single
-                Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
-
-                Dim histList = histArray.ToList
-                ' pick the lp that has the most pixels in the lp.rect.
-                lp = lplist(histList.IndexOf(histList.Max))
-                match.template = task.gray(lp.rect)
-                match.correlation = 1
-            Else
-                match.correlation = 0 ' force a restart
-            End If
-        Else
-            deltaX = match.newRect.X - lp.rect.X
-            deltaY = match.newRect.Y - lp.rect.Y
-            Dim p1 = New cv.Point(lp.p1.X + deltaX, lp.p1.Y + deltaY)
-            Dim p2 = New cv.Point(lp.p2.X + deltaX, lp.p2.Y + deltaY)
-            lp = New lpData(p1, p2)
-        End If
-
-        If standaloneTest() Then
-            dst2 = src
-            DrawLine(dst2, lp)
-            DrawRect(dst2, lp.rect)
-            dst3 = task.lines.dst2
-        End If
-
-        task.lineLongest = lp
-        labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
-    End Sub
-End Class
 
 
 
@@ -511,47 +449,6 @@ End Class
 
 
 
-Public Class Line_Intersects : Inherits TaskParent
-    Public intersects As New List(Of cv.Point2f)
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Find any intersects in the image and track them."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        intersects.Clear()
-
-        For i = 0 To task.lines.lpList.Count - 1
-            Dim lp1 = task.lines.lpList(i)
-            For j = i + 1 To task.lines.lpList.Count - 1
-                Dim lp2 = task.lines.lpList(j)
-                Dim intersectionPoint = Line_Intersection.IntersectTest(lp1, lp2)
-                If intersectionPoint.X >= 0 And intersectionPoint.X < dst2.Width Then
-                    If intersectionPoint.Y >= 0 And intersectionPoint.Y < dst2.Height Then
-                        intersects.Add(intersectionPoint)
-                        If intersects.Count >= task.FeatureSampleSize Then Exit For
-                    End If
-                End If
-            Next
-            If intersects.Count >= task.FeatureSampleSize Then Exit For
-        Next
-
-        dst2 = src
-        If dst3.CountNonZero > task.FeatureSampleSize * 10 Then dst3.SetTo(0)
-        For Each pt In intersects
-            DrawCircle(dst2, pt, task.highlight)
-            DrawCircle(dst3, pt, white)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class Line_LeftRight : Inherits TaskParent
     Public leftLines As New List(Of lpData)
     Public rightLines As New List(Of lpData)
@@ -578,104 +475,6 @@ Public Class Line_LeftRight : Inherits TaskParent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Line_LeftRightMatch : Inherits TaskParent
-    Dim lrLines As New Line_LeftRight
-    Public lp As New lpData
-    Public lpOutput As New lpData
-    Public Sub New()
-        desc = "Identify a line that is a match in the left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        lp = task.lineLongest
-
-        lrLines.Run(emptyMat)
-        dst2 = lrLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3 = lrLines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        Dim r1 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-        Dim r2 = task.gridRects(task.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
-        Dim r3 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
-        Dim depth1 = task.pcSplit(2)(r1).Mean().Val0
-        Dim depth2 = task.pcSplit(2)(r2).Mean().Val0
-        Dim depth3 = task.pcSplit(2)(r3).Mean().Val0
-        Dim disp1 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth1
-        Dim disp2 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth2
-        Dim disp3 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth3
-
-        Dim lp1 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y),
-                             New cv.Point2f(lp.ptCenter.X - disp2, lp.ptCenter.Y))
-        Dim lp2 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y), New cv.Point2f(lp.p2.X - disp3, lp.p2.Y))
-        If Math.Abs(lp1.angle - lp2.angle) < task.angleThreshold Then lpOutput = lp2
-        DrawLine(dst3, lpOutput.p1, lpOutput.p2, task.highlight, task.lineWidth + 1)
-        DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Line_LeftRightMatch3 : Inherits TaskParent
-    Dim lrLines As New Line_LeftRight
-    Public lp As New lpData
-    Public lpOutput As New List(Of lpData)
-    Public Sub New()
-        desc = "Identify a line that is a match in the left and right images."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        lrLines.Run(emptyMat)
-        dst2 = lrLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3 = lrLines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        Dim lplist As New List(Of lpData)(task.lines.lpList)
-        If lplist.Count = 0 Then
-            dst2.SetTo(0)
-            SetTrueText("No lines were found in the image.")
-            Exit Sub
-        End If
-
-        lpOutput.Clear()
-        For i = 0 To lplist.Count - 1
-            lp = lplist(i)
-            Dim r1 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            Dim r2 = task.gridRects(task.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
-            Dim r3 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
-
-            Dim depth1 = task.pcSplit(2)(r1).Mean().Val0
-            Dim depth2 = task.pcSplit(2)(r2).Mean().Val0
-            Dim depth3 = task.pcSplit(2)(r3).Mean().Val0
-
-            If depth1 = 0 Then Continue For
-            If depth2 = 0 Then Continue For
-            If depth3 = 0 Then Continue For
-
-            Dim disp1 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth1
-            Dim disp2 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth2
-            Dim disp3 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth3
-
-            Dim lp1 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y),
-                                 New cv.Point2f(lp.ptCenter.X - disp2, lp.ptCenter.Y))
-            Dim lp2 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y),
-                                 New cv.Point2f(lp.p2.X - disp3, lp.p2.Y))
-            If Math.Abs(lp1.angle - lp2.angle) >= task.angleThreshold Then Continue For
-
-            Dim lpOut = lp2
-            lp.index = lpOutput.Count
-            lpOutput.Add(lp)
-            DrawLine(dst3, lpOut.p1, lpOut.p2, task.highlight, task.lineWidth + 1)
-            DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
-        Next
-        labels(2) = CStr(lpOutput.Count) + " left image lines were matched in the right image and confirmed with the center point."
-    End Sub
-End Class
 
 
 
