@@ -17762,3 +17762,141 @@ Public Class XO_LineDepth_Basics : Inherits TaskParent
         End If
     End Sub
 End Class
+
+
+
+
+
+
+Public Class XO_Line_Degrees : Inherits TaskParent
+    Public Sub New()
+        desc = "Find similar lines using the angle variable."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Dim degrees = task.gOptions.DebugSlider.Value
+        dst2 = src
+        Dim count As Integer
+        For Each lp In task.lines.lpList
+            If Math.Abs(lp.angle - degrees) < task.angleThreshold Then
+                DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth * 2)
+                count += 1
+            Else
+                DrawLine(dst2, lp, task.highlight)
+            End If
+        Next
+
+        SetTrueText("Use the debug slider to identify which lines to display (value indicates degrees.)")
+        labels(2) = CStr(count) + " lines were found with angle " + CStr(degrees) + " degrees"
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_GCloud : Inherits TaskParent
+    Public sortedVerticals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+    Public sortedHorizontals As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+    Public allLines As New SortedList(Of Single, gravityLine)(New compareAllowIdenticalSingleInverted)
+    Public options As New Options_LineFinder
+    Dim match As New Match_tCell
+    Dim angleSlider As System.Windows.Forms.TrackBar
+    Dim rawLines As New Line_Raw
+    Public Sub New()
+        angleSlider = OptionParent.FindSlider("Angle tolerance in degrees")
+        labels(2) = "Line_GCloud - Blue are vertical lines using the angle thresholds."
+        desc = "Find all the vertical lines using the point cloud rectified with the IMU vector for gravity."
+    End Sub
+    Public Function updateGLine(src As cv.Mat, brick As gravityLine, p1 As cv.Point, p2 As cv.Point) As gravityLine
+        brick.tc1.center = p1
+        brick.tc2.center = p2
+        brick.tc1 = match.createCell(src, brick.tc1.correlation, p1)
+        brick.tc2 = match.createCell(src, brick.tc2.correlation, p2)
+        brick.tc1.strOut = Format(brick.tc1.correlation, fmt2) + vbCrLf + Format(brick.tc1.depth, fmt2) + "m"
+        brick.tc2.strOut = Format(brick.tc2.correlation, fmt2) + vbCrLf + Format(brick.tc2.depth, fmt2) + "m"
+
+        Dim mean = task.pointCloud(brick.tc1.rect).Mean(task.depthMask(brick.tc1.rect))
+        brick.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
+        brick.tc1.depth = brick.pt1.Z
+        mean = task.pointCloud(brick.tc2.rect).Mean(task.depthMask(brick.tc2.rect))
+        brick.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
+        brick.tc2.depth = brick.pt2.Z
+
+        brick.len3D = distance3D(brick.pt1, brick.pt2)
+        If brick.pt1 = New cv.Point3f Or brick.pt2 = New cv.Point3f Then
+            brick.len3D = 0
+        Else
+            brick.arcX = Math.Asin((brick.pt1.X - brick.pt2.X) / brick.len3D) * 57.2958
+            brick.arcY = Math.Abs(Math.Asin((brick.pt1.Y - brick.pt2.Y) / brick.len3D) * 57.2958)
+            If brick.arcY > 90 Then brick.arcY -= 90
+            brick.arcZ = Math.Asin((brick.pt1.Z - brick.pt2.Z) / brick.len3D) * 57.2958
+        End If
+
+        Return brick
+    End Function
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        options.Run()
+
+        Dim maxAngle = angleSlider.Value
+
+        dst2 = src.Clone
+        rawLines.Run(src.Clone)
+
+        sortedVerticals.Clear()
+        sortedHorizontals.Clear()
+        For Each lp In rawLines.lpList
+            Dim brick As New gravityLine
+            brick = updateGLine(src, brick, lp.p1, lp.p2)
+            allLines.Add(lp.p1.DistanceTo(lp.p2), brick)
+            If Math.Abs(90 - brick.arcY) < maxAngle And brick.tc1.depth > 0 And brick.tc2.depth > 0 Then
+                sortedVerticals.Add(lp.p1.DistanceTo(lp.p2), brick)
+                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Blue)
+            End If
+            If Math.Abs(brick.arcY) <= maxAngle And brick.tc1.depth > 0 And brick.tc2.depth > 0 Then
+                sortedHorizontals.Add(lp.p1.DistanceTo(lp.p2), brick)
+                DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
+            End If
+        Next
+
+        labels(2) = Format(sortedHorizontals.Count, "00") + " Horizontal lines were identified and " +
+                    Format(sortedVerticals.Count, "00") + " Vertical lines were identified."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XO_Line_Info : Inherits TaskParent
+    Public Sub New()
+        labels(3) = "The selected line with details."
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Display details about the line selected."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        If standalone Then task.lpD = task.lineGravity
+        labels(2) = task.lines.labels(2) + " - Use the global option 'DebugSlider' to select a line."
+
+        If task.lines.lpList.Count <= 1 Then Exit Sub
+        dst2.SetTo(0)
+        For Each lp In task.lines.lpList
+            dst2.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
+            DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
+        Next
+
+        dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
+
+        strOut = "Line ID = " + CStr(task.lpD.gridIndex1) + " Age = " + CStr(task.lpD.age) + vbCrLf
+        strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
+        strOut += "gridIndex1 = " + CStr(task.lpD.gridIndex1) + " gridIndex2 = " + CStr(task.lpD.gridIndex2) + vbCrLf
+
+        strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
+        strOut += "pE1 = " + task.lpD.pE1.ToString + ", pE2 = " + task.lpD.pE2.ToString + vbCrLf + vbCrLf
+        strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
+        strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
+        strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
+
+        SetTrueText(strOut, 3)
+    End Sub
+End Class

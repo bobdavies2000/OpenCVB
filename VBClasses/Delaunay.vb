@@ -314,7 +314,6 @@ End Class
 
 Public Class Delaunay_LineSelect : Inherits TaskParent
     Dim delaunay As New Delaunay_Basics
-    Public info As New Line_Info
     Public Sub New()
         If standalone Then task.gOptions.displayDst1.Checked = True
         labels(2) = "Line is best selected near the end points or center that define a delaunay cells."
@@ -365,9 +364,9 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
         dst3.FillConvexPoly(delaunay.facetList(index3), task.lpD.color, cv.LineTypes.Link4)
         dst3.Line(task.lpD.p1, task.lpD.p2, cv.Scalar.Green, task.lineWidth, task.lineWidth)
 
-        info.Run(emptyMat)
-        dst2 = info.dst2
-        SetTrueText(info.strOut, 3)
+        If task.lpD Is Nothing Then task.lpD = task.lines.lpList(0)
+        strOut = task.lpD.displayCell(dst2)
+        SetTrueText(strOut, 3)
 
         For Each lp In task.lines.lpList
             index1 = delaunay.dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X)
@@ -380,12 +379,7 @@ Public Class Delaunay_LineSelect : Inherits TaskParent
         Next
 
         For Each lp In task.lines.lpList
-            DrawLine(dst2, lp)
-            DrawLine(dst1, lp)
-        Next
-
-        For Each pts In delaunay.facetList
-            DrawTour(dst1, pts, white, 1)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class

@@ -135,7 +135,6 @@ LeftRight
 Line
 Line3D
 LinearRegression
-LineDepth
 LineMatch
 LineRect
 LUT

@@ -16,20 +16,20 @@ Imports System.Runtime.InteropServices
 ' variance in the locations of the cities. ‘This direction could be used to represent the overall trend in the
 ' distribution of cities in ‘the United States.
 ' PCA is a powerful tool that can be used to find the main direction of a series of points.
-Public Class PCA_Basics : Inherits TaskParent
-    Dim pcaLine As New PCA_LineMask
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        desc = "Compute the principal component for the selected line."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        pcaLine.Run(src)
-        dst2 = pcaLine.selectLine.info.dst2
-        labels(2) = pcaLine.selectLine.labels(2)
-        SetTrueText(pcaLine.strOut, 1)
-        SetTrueText(pcaLine.selectLine.info.strOut, 3)
-    End Sub
-End Class
+'Public Class PCA_Basics : Inherits TaskParent
+'    Dim pcaLine As New PCA_LineMask
+'    Public Sub New()
+'        If standalone Then task.gOptions.displayDst1.Checked = True
+'        desc = "Compute the principal component for the selected line."
+'    End Sub
+'    Public Overrides Sub RunAlg(src As cv.Mat)
+'        pcaLine.Run(src)
+'        dst2 = pcaLine.selectLine.info.dst2
+'        labels(2) = pcaLine.selectLine.labels(2)
+'        SetTrueText(pcaLine.strOut, 1)
+'        SetTrueText(pcaLine.selectLine.info.strOut, 3)
+'    End Sub
+'End Class
 
 
 

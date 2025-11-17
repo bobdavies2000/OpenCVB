@@ -707,6 +707,27 @@ Public Class lpData
         If lp.p1.X = p1.X And lp.p1.Y = p1.Y And lp.p2.X = p2.X And p2.Y = p2.Y Then Return True
         Return False
     End Function
+    Public Function displayCell(ByRef dst As cv.Mat) As String
+        dst.SetTo(0)
+        For Each lp In task.lines.lpList
+            dst.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
+            dst.Circle(lp.ptCenter, task.DotSize, task.highlight, -1)
+        Next
+
+        dst.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
+
+        Dim strOut = "rcList index = " + CStr(index) + vbCrLf
+        strOut = "Line ID = " + CStr(task.lpD.gridIndex1) + " Age = " + CStr(task.lpD.age) + vbCrLf
+        strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
+        strOut += "gridIndex1 = " + CStr(task.lpD.gridIndex1) + " gridIndex2 = " + CStr(task.lpD.gridIndex2) + vbCrLf
+
+        strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
+        strOut += "pE1 = " + task.lpD.pE1.ToString + ", pE2 = " + task.lpD.pE2.ToString + vbCrLf + vbCrLf
+        strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
+        strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
+        strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
+        Return strOut
+    End Function
 End Class
 
 
