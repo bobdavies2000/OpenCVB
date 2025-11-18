@@ -18,6 +18,9 @@ Public Class VBtask : Implements IDisposable
     Public reductionTarget As Integer = 200 ' specify how much reduction is needed using options_RedCloud.
     Public brickSize As Integer
 
+    Public desiredLineMatches As Integer = 20 ' the top X lines to match to the previous image.
+    Public lineMaxOffset As Integer = 10 ' how many pixels to search for lines.
+
     ' add any task algorithms here.
     Public ogl As XO_OpenGL_Basics
     Public redColor As RedColor_Basics
