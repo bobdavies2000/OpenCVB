@@ -593,7 +593,7 @@ Public Class VBtask : Implements IDisposable
         rgbFilter.Run(color)
         If gOptions.UseMotionMask.Checked Then
             motionBasics.Run(gray)
-            If optionsChanged Then
+            If optionsChanged Or task.frameCount < 5 Then
                 motionRect = New cv.Rect(0, 0, workRes.Width, workRes.Height)
                 grayStable = gray.Clone
                 leftViewStable = leftView.Clone

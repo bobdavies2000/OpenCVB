@@ -175,33 +175,6 @@ End Class
 
 
 
-Public Class EdgeLine_JustLines : Inherits TaskParent
-    Public Sub New()
-        cPtr = EdgeLine_Image_Open()
-        labels = {"", "", "EdgeLine_Image output", ""}
-        desc = "Access the EdgeDraw algorithm directly rather than through to CPP_Basics interface - more efficient"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        Dim cppData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length)
-        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = EdgeLine_Image_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
-        handleSrc.Free()
-        If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
-    End Sub
-    Public Sub Close()
-        EdgeLine_Image_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class EdgeLine_SplitMean : Inherits TaskParent
     Dim binary As New Bin4Way_SplitMean
@@ -435,7 +408,7 @@ End Class
 Public Class EdgeLine_LeftRight : Inherits TaskParent
     Dim edges As New EdgeLine_Basics
     Public Sub New()
-        labels(3) = "Right View: Note it is updated on every frame - it does not use the motion mask."
+        labels(3) = "Right View: Note it is updated on every frame - it cannot use the motion mask."
         desc = "Build the left and right edge lines."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
