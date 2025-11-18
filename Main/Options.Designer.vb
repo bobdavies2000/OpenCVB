@@ -51,18 +51,20 @@ Partial Class Options
         ' 
         ' OKButton
         ' 
-        OKButton.Location = New Point(847, 18)
+        OKButton.Location = New Point(1016, 22)
+        OKButton.Margin = New Padding(4, 4, 4, 4)
         OKButton.Name = "OKButton"
-        OKButton.Size = New Size(137, 41)
+        OKButton.Size = New Size(164, 49)
         OKButton.TabIndex = 0
         OKButton.Text = "OK"
         OKButton.UseVisualStyleBackColor = True
         ' 
         ' Cancel_Button
         ' 
-        Cancel_Button.Location = New Point(847, 65)
+        Cancel_Button.Location = New Point(1016, 78)
+        Cancel_Button.Margin = New Padding(4, 4, 4, 4)
         Cancel_Button.Name = "Cancel_Button"
-        Cancel_Button.Size = New Size(137, 41)
+        Cancel_Button.Size = New Size(164, 49)
         Cancel_Button.TabIndex = 1
         Cancel_Button.Text = "Cancel"
         Cancel_Button.UseVisualStyleBackColor = True
@@ -75,9 +77,11 @@ Partial Class Options
         DisplayResolution.Controls.Add(SnapCustom)
         DisplayResolution.Controls.Add(Snap320)
         DisplayResolution.Controls.Add(Snap640)
-        DisplayResolution.Location = New Point(12, 438)
+        DisplayResolution.Location = New Point(14, 526)
+        DisplayResolution.Margin = New Padding(4, 4, 4, 4)
         DisplayResolution.Name = "DisplayResolution"
-        DisplayResolution.Size = New Size(982, 107)
+        DisplayResolution.Padding = New Padding(4, 4, 4, 4)
+        DisplayResolution.Size = New Size(1178, 128)
         DisplayResolution.TabIndex = 4
         DisplayResolution.TabStop = False
         DisplayResolution.Text = "Display Resolution"
@@ -86,7 +90,8 @@ Partial Class Options
         ' 
         Label3.AutoSize = True
         Label3.Font = New Font("Segoe UI", 8F)
-        Label3.Location = New Point(647, 63)
+        Label3.Location = New Point(776, 76)
+        Label3.Margin = New Padding(4, 0, 4, 0)
         Label3.Name = "Label3"
         Label3.Size = New Size(184, 21)
         Label3.TabIndex = 5
@@ -96,7 +101,8 @@ Partial Class Options
         ' 
         Label2.AutoSize = True
         Label2.Font = New Font("Segoe UI", 8F)
-        Label2.Location = New Point(358, 63)
+        Label2.Location = New Point(430, 76)
+        Label2.Margin = New Padding(4, 0, 4, 0)
         Label2.Name = "Label2"
         Label2.Size = New Size(229, 21)
         Label2.TabIndex = 4
@@ -106,7 +112,8 @@ Partial Class Options
         ' 
         Label1.AutoSize = True
         Label1.Font = New Font("Segoe UI", 8F)
-        Label1.Location = New Point(41, 63)
+        Label1.Location = New Point(49, 76)
+        Label1.Margin = New Padding(4, 0, 4, 0)
         Label1.Name = "Label1"
         Label1.Size = New Size(229, 21)
         Label1.TabIndex = 3
@@ -116,7 +123,8 @@ Partial Class Options
         ' 
         SnapCustom.AutoSize = True
         SnapCustom.Font = New Font("Segoe UI", 8F)
-        SnapCustom.Location = New Point(624, 31)
+        SnapCustom.Location = New Point(749, 37)
+        SnapCustom.Margin = New Padding(4, 4, 4, 4)
         SnapCustom.Name = "SnapCustom"
         SnapCustom.Size = New Size(273, 25)
         SnapCustom.TabIndex = 2
@@ -128,7 +136,8 @@ Partial Class Options
         ' 
         Snap320.AutoSize = True
         Snap320.Font = New Font("Segoe UI", 8F)
-        Snap320.Location = New Point(334, 31)
+        Snap320.Location = New Point(401, 37)
+        Snap320.Margin = New Padding(4, 4, 4, 4)
         Snap320.Name = "Snap320"
         Snap320.Size = New Size(241, 25)
         Snap320.TabIndex = 1
@@ -140,7 +149,8 @@ Partial Class Options
         ' 
         Snap640.AutoSize = True
         Snap640.Font = New Font("Segoe UI", 8F)
-        Snap640.Location = New Point(14, 31)
+        Snap640.Location = New Point(17, 37)
+        Snap640.Margin = New Padding(4, 4, 4, 4)
         Snap640.Name = "Snap640"
         Snap640.Size = New Size(250, 25)
         Snap640.TabIndex = 0
@@ -158,9 +168,11 @@ Partial Class Options
         GroupBox1.Controls.Add(Label4)
         GroupBox1.Controls.Add(Button1)
         GroupBox1.Controls.Add(showBatchConsole)
-        GroupBox1.Location = New Point(12, 551)
+        GroupBox1.Location = New Point(14, 661)
+        GroupBox1.Margin = New Padding(4, 4, 4, 4)
         GroupBox1.Name = "GroupBox1"
-        GroupBox1.Size = New Size(977, 187)
+        GroupBox1.Padding = New Padding(4, 4, 4, 4)
+        GroupBox1.Size = New Size(1172, 164)
         GroupBox1.TabIndex = 5
         GroupBox1.TabStop = False
         GroupBox1.Text = "Other Global Settings"
@@ -168,44 +180,51 @@ Partial Class Options
         ' Label7
         ' 
         Label7.AutoSize = True
-        Label7.Location = New Point(95, 143)
+        Label7.Location = New Point(936, 109)
+        Label7.Margin = New Padding(4, 0, 4, 0)
         Label7.Name = "Label7"
-        Label7.Size = New Size(698, 25)
+        Label7.Size = New Size(849, 30)
         Label7.TabIndex = 7
         Label7.Text = "Duration in seconds of each test when running ""Test All"" (there is a 5 second minimum)"
+        Label7.Visible = False
         ' 
         ' TestAllDuration
         ' 
-        TestAllDuration.Location = New Point(10, 141)
+        TestAllDuration.Location = New Point(834, 106)
+        TestAllDuration.Margin = New Padding(4, 4, 4, 4)
         TestAllDuration.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
         TestAllDuration.Name = "TestAllDuration"
-        TestAllDuration.Size = New Size(76, 31)
+        TestAllDuration.Size = New Size(91, 37)
         TestAllDuration.TabIndex = 6
         TestAllDuration.Value = New Decimal(New Integer() {5, 0, 0, 0})
+        TestAllDuration.Visible = False
         ' 
         ' Label6
         ' 
         Label6.AutoSize = True
-        Label6.Location = New Point(695, 59)
+        Label6.Location = New Point(834, 71)
+        Label6.Margin = New Padding(4, 0, 4, 0)
         Label6.Name = "Label6"
-        Label6.Size = New Size(215, 25)
+        Label6.Size = New Size(258, 30)
         Label6.TabIndex = 5
         Label6.Text = "is only updated manually."
         ' 
         ' Label5
         ' 
         Label5.AutoSize = True
-        Label5.Location = New Point(693, 34)
+        Label5.Location = New Point(832, 41)
+        Label5.Margin = New Padding(4, 0, 4, 0)
         Label5.Name = "Label5"
-        Label5.Size = New Size(269, 25)
+        Label5.Size = New Size(331, 30)
         Label5.TabIndex = 4
         Label5.Text = "The algorithm cross-reference is "
         ' 
         ' UpdateXRef
         ' 
-        UpdateXRef.Location = New Point(408, 34)
+        UpdateXRef.Location = New Point(490, 41)
+        UpdateXRef.Margin = New Padding(4, 4, 4, 4)
         UpdateXRef.Name = "UpdateXRef"
-        UpdateXRef.Size = New Size(277, 35)
+        UpdateXRef.Size = New Size(332, 42)
         UpdateXRef.TabIndex = 3
         UpdateXRef.Text = "Update the Algorithm XRef"
         UpdateXRef.UseVisualStyleBackColor = True
@@ -213,17 +232,19 @@ Partial Class Options
         ' Label4
         ' 
         Label4.AutoSize = True
-        Label4.Location = New Point(64, 94)
+        Label4.Location = New Point(77, 113)
+        Label4.Margin = New Padding(4, 0, 4, 0)
         Label4.Name = "Label4"
-        Label4.Size = New Size(284, 25)
+        Label4.Size = New Size(351, 30)
         Label4.TabIndex = 2
         Label4.Text = "Select the font for all TrueType text"
         ' 
         ' Button1
         ' 
-        Button1.Location = New Point(6, 90)
+        Button1.Location = New Point(7, 108)
+        Button1.Margin = New Padding(4, 4, 4, 4)
         Button1.Name = "Button1"
-        Button1.Size = New Size(52, 33)
+        Button1.Size = New Size(62, 40)
         Button1.TabIndex = 1
         Button1.Text = "..."
         Button1.UseVisualStyleBackColor = True
@@ -231,9 +252,10 @@ Partial Class Options
         ' showBatchConsole
         ' 
         showBatchConsole.AutoSize = True
-        showBatchConsole.Location = New Point(12, 40)
+        showBatchConsole.Location = New Point(14, 48)
+        showBatchConsole.Margin = New Padding(4, 4, 4, 4)
         showBatchConsole.Name = "showBatchConsole"
-        showBatchConsole.Size = New Size(363, 29)
+        showBatchConsole.Size = New Size(436, 34)
         showBatchConsole.TabIndex = 0
         showBatchConsole.Text = "Show Console Log for external processes"
         showBatchConsole.UseVisualStyleBackColor = True
@@ -241,23 +263,25 @@ Partial Class Options
         ' CameraGroup
         ' 
         CameraGroup.FlowDirection = FlowDirection.TopDown
-        CameraGroup.Location = New Point(13, 25)
+        CameraGroup.Location = New Point(16, 30)
+        CameraGroup.Margin = New Padding(4, 4, 4, 4)
         CameraGroup.Name = "CameraGroup"
-        CameraGroup.Size = New Size(827, 159)
+        CameraGroup.Size = New Size(992, 191)
         CameraGroup.TabIndex = 6
         ' 
         ' Resolutions
         ' 
-        Resolutions.Location = New Point(12, 190)
+        Resolutions.Location = New Point(14, 228)
+        Resolutions.Margin = New Padding(4, 4, 4, 4)
         Resolutions.Name = "Resolutions"
-        Resolutions.Size = New Size(828, 242)
+        Resolutions.Size = New Size(994, 290)
         Resolutions.TabIndex = 7
         ' 
         ' Options
         ' 
-        AutoScaleDimensions = New SizeF(10F, 25F)
+        AutoScaleDimensions = New SizeF(12F, 30F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1008, 750)
+        ClientSize = New Size(1210, 832)
         Controls.Add(Resolutions)
         Controls.Add(CameraGroup)
         Controls.Add(GroupBox1)
@@ -265,6 +289,7 @@ Partial Class Options
         Controls.Add(Cancel_Button)
         Controls.Add(OKButton)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
+        Margin = New Padding(4, 4, 4, 4)
         Name = "Options"
         Text = "OpenCVB Global Settings"
         DisplayResolution.ResumeLayout(False)

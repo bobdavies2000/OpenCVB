@@ -34,7 +34,6 @@ Namespace jsonClass
         Public captureRes As cv.Size
         Public displayRes As New cv.Size(640, 360)
 
-        Public testAllDuration As Integer
         Public showBatchConsole As Boolean
 
         Public treeButton As Boolean
@@ -67,7 +66,6 @@ Namespace jsonClass
             emptyApp.cameraIndex = 0
             emptyApp.workRes = New cv.Size(320, 180)
             emptyApp.snap640 = True
-            emptyApp.testAllDuration = 5
             emptyApp.showBatchConsole = False
             emptyApp.treeButton = True
             emptyApp.treeLocation = New cv.Vec4f(20, 20, 500, 600)
@@ -176,7 +174,6 @@ Namespace jsonClass
                     MessageBox.Show("There are no supported cameras present!" + vbCrLf + vbCrLf)
                 End If
 
-                If settings.testAllDuration < 5 Then settings.testAllDuration = 5
                 If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
 
                 Select Case .workRes.Height

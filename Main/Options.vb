@@ -5,7 +5,6 @@ Public Class Options
     Public workResRadio(Common.resolutionList.Count - 1) As RadioButton
     Public cameraName As String
     Public cameraIndex As Integer
-    Public testDuration As Integer
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
         OpenCVB.MainUI.settings.showBatchConsole = showBatchConsole.Checked
         OpenCVB.MainUI.settings.snap640 = Snap640.Checked
@@ -99,8 +98,6 @@ Public Class Options
         Snap320.Checked = OpenCVB.MainUI.settings.snap320
         SnapCustom.Checked = OpenCVB.MainUI.settings.snapCustom
 
-        TestAllDuration.Value = OpenCVB.MainUI.settings.testAllDuration
-        If TestAllDuration.Value < 5 Then TestAllDuration.Value = 5
         showBatchConsole.Checked = OpenCVB.MainUI.settings.showBatchConsole
     End Sub
     Private Sub MainOptions_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
@@ -112,8 +109,24 @@ Public Class Options
         Me.Hide()
     End Sub
     Private Sub TestAllDuration_ValueChanged(sender As Object, e As EventArgs) Handles TestAllDuration.ValueChanged
-        If TestAllDuration.Value < 5 Then TestAllDuration.Value = 5
-        testDuration = TestAllDuration.Value
+        Dim duration As Integer = 5 ' typically 5 seconds.
+        Select Case OpenCVB.MainUI.settings.workRes.Width
+            Case 1920
+                duration = 30
+            Case 1280
+                duration = 20
+            Case 960
+                duration = 20
+            Case 672
+                duration = 15
+            Case 640
+                duration = 15
+            Case 480
+                duration = 10
+            Case 240, 336, 320, 168, 160
+                duration = 5
+        End Select
+        TestAllDuration.Value = duration
     End Sub
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         FontDialog1.Font = OpenCVB.MainUI.settings.fontInfo
