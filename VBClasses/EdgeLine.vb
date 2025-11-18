@@ -317,6 +317,7 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(1) = "EdgeLine segments displayed one for each frame starting with the longest."
         desc = "Find lines using the brick points"
     End Sub
     Public Sub showSegment(dst As cv.Mat)
@@ -342,7 +343,7 @@ Public Class EdgeLine_BrickPoints : Inherits TaskParent
         labels(2) = bPoint.labels(2)
 
         dst2 = edgeline.dst2
-        dst3 = PaletteFull(edgeline.dst2)
+        dst3 = PaletteBlackZero(edgeline.dst2)
 
         Dim segments(edgeline.classCount) As List(Of cv.Point2f)
         Dim brickCount As Integer, segmentCount As Integer

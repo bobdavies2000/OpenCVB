@@ -8,21 +8,6 @@ Public Class OptionsGlobal
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
 
-        DotSizeSlider.Value = 1
-        LineWidth.Value = 1
-        If task.workRes.Width <= 320 Then
-            DotSizeSlider.Value = 1
-            LineWidth.Value = 1
-        ElseIf task.workRes.Width = 640 Then
-            DotSizeSlider.Value = 2
-            LineWidth.Value = 2
-        End If
-
-        labelBinsCount.Text = CStr(HistBinBar.Value)
-        LineThicknessAmount.Text = CStr(LineWidth.Value)
-        DotSizeLabel.Text = CStr(DotSizeSlider.Value)
-        DebugSliderLabel.Text = CStr(DebugSlider.Value)
-
         Palettes.Items.Clear()
         For Each mapName In mapNames
             Palettes.Items.Add(mapName)
@@ -46,28 +31,35 @@ Public Class OptionsGlobal
         task.cvFontThickness = 1
         task.brickSize = 8
         task.reductionTarget = 400
+        task.DotSize = 1
+        task.lineWidth = 1
         Select Case task.workRes.Width
             Case 1920
                 task.cvFontSize = 3.5
                 task.cvFontThickness = 4
-                task.DotSize = 4
-                task.brickSize = 24
+                task.DotSize = 5
+                task.lineWidth = 5
+                task.brickSize = 36
             Case 1280
                 task.cvFontSize = 2.5
                 task.cvFontThickness = 2
                 task.DotSize = 5
+                task.lineWidth = 4
                 task.brickSize = 24
             Case 960
                 task.cvFontSize = 2.0
                 task.cvFontThickness = 2
                 task.DotSize = 2
+                task.lineWidth = 3
                 task.brickSize = 16
             Case 672
                 task.cvFontSize = 1.5
                 task.DotSize = 2
+                task.lineWidth = 2
                 task.brickSize = 16
             Case 640
                 task.cvFontSize = 1.5
+                task.lineWidth = 2
                 task.DotSize = 2
                 task.brickSize = 16
             Case 480
@@ -85,9 +77,13 @@ Public Class OptionsGlobal
                 task.cvFontSize = 1.0
         End Select
 
-        task.gOptions.GridSlider.Value = task.brickSize
-        task.gOptions.DotSizeSlider.Value = task.DotSize
-        task.gOptions.LineWidth.Value = task.DotSize
+        GridSlider.Value = task.brickSize
+        DotSizeSlider.Value = task.DotSize
+        LineWidth.Value = task.lineWidth
+        HistBinBar.Value = 16
+        labelBinsCount.Text = CStr(HistBinBar.Value)
+
+        DebugSliderLabel.Text = CStr(DebugSlider.Value)
 
         Me.Left = 0
         Me.Top = 30
@@ -109,9 +105,9 @@ Public Class OptionsGlobal
         task.lineWidth = LineWidth.Value
         task.optionsChanged = True
     End Sub
-    Private Sub DotSizeSlider_Scroll(sender As Object, e As EventArgs) Handles DotSizeSlider.Scroll
-        DotSizeLabel.Text = CStr(DotSizeSlider.Value)
+    Private Sub DotSizeSlider_ValueChanged(sender As Object, e As EventArgs) Handles DotSizeSlider.ValueChanged
         task.DotSize = DotSizeSlider.Value
+        DotSizeLabel.Text = CStr(task.DotSize)
         task.optionsChanged = True
     End Sub
     Private Sub UseKalman_CheckedChanged(sender As Object, e As EventArgs)
@@ -134,9 +130,10 @@ Public Class OptionsGlobal
         task.brickSize = GridSlider.Value
         task.optionsChanged = True
     End Sub
-    Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar.ValueChanged
+    Private Sub HistBinBar_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar.ValueChanged
+        task.histogramBins = HistBinBar.Value
+        labelBinsCount.Text = CStr(task.histogramBins)
         task.optionsChanged = True
-        labelBinsCount.Text = CStr(HistBinBar.Value)
     End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
         task.optionsChanged = True

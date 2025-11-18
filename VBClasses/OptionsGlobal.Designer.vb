@@ -181,7 +181,7 @@ Partial Class OptionsGlobal
         HistBinBar.Size = New Size(548, 69)
         HistBinBar.TabIndex = 9
         HistBinBar.TickStyle = TickStyle.None
-        HistBinBar.Value = 5
+        HistBinBar.Value = 16
         ' 
         ' labelBinsCount
         ' 
@@ -524,7 +524,7 @@ Partial Class OptionsGlobal
         ' 
         ' OptionsGlobal
         ' 
-        AutoScaleDimensions = New SizeF(12.0F, 30.0F)
+        AutoScaleDimensions = New SizeF(12F, 30F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1849, 589)
         Controls.Add(DepthGroupBox)
