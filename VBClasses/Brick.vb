@@ -1,5 +1,4 @@
-﻿Imports System.Windows.Forms.VisualStyles
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Brick_Basics : Inherits TaskParent
     Public instantUpdate As Boolean
     Public brickDepthCount As Integer

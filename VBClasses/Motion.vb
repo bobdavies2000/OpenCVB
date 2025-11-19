@@ -47,34 +47,6 @@ End Class
 
 
 
-Public Class Motion_Validate : Inherits TaskParent
-    Dim diff As New Diff_Basics
-    Public Sub New()
-        If standalone Then task.gOptions.showMotionMask.Checked = True
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(1) = "Current grayscale image"
-        labels(2) = "Grayscale image constructed from previous image + motion rect of current image."
-        labels(3) = "Highlighted difference of task.gray and the one built with the motion data.  "
-        desc = "Compare task.gray to constructed image to verify Motion_Basics is working"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1 = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = task.motionBasics.dst2.Clone()
-
-        diff.lastFrame = dst2
-        diff.Run(dst1)
-        dst3 = diff.dst3.Threshold(task.motionThreshold, 255, cv.ThresholdTypes.Binary)
-
-        SetTrueText("Pixels different from camera image: " + CStr(diff.dst2.CountNonZero) + vbCrLf +
-                    "Grid rects with more than " + CStr(task.motionThreshold) +
-                    " pixels different: " + CStr(task.motionBasics.motionList.Count), 3)
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class Motion_PointCloud : Inherits TaskParent
@@ -189,5 +161,104 @@ Public Class Motion_PointCloud : Inherits TaskParent
             diff.Run(task.pcSplit(2))
             dst1 = diff.dst2
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Motion_Validate : Inherits TaskParent
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        If standalone Then task.gOptions.showMotionMask.Checked = True
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(1) = "Current grayscale image"
+        labels(2) = "Grayscale image constructed from previous image + motion rect of current image."
+        labels(3) = "Highlighted difference of task.gray and the one built with the motion data.  "
+        desc = "Compare task.gray to constructed image to verify Motion_Basics is working"
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        dst1 = task.gray.Clone
+        dst2 = task.motionBasics.dst2.Clone()
+
+        diff.lastFrame = dst2
+        diff.Run(dst1)
+        dst3 = diff.dst3.Threshold(task.motionThreshold, 255, cv.ThresholdTypes.Binary)
+
+        SetTrueText("Pixels different from camera image: " + CStr(diff.dst2.CountNonZero) + vbCrLf +
+                    "Grid rects with more than " + CStr(task.motionThreshold) +
+                    " pixels different: " + CStr(task.motionBasics.motionList.Count), 3)
+    End Sub
+End Class
+
+
+
+
+Public Class Motion_RightImage : Inherits TaskParent
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+        If standalone Then task.gOptions.showMotionMask.Checked = True
+        task.motionMaskRight = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        labels(1) = "The motion mask for the right view."
+        desc = "Build the MotionMask for the right image and validate it."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        task.bricks.Run(task.grayStable)
+        If task.optionsChanged Or task.frameCount < 5 Then
+            dst2 = task.rightView.Clone
+        End If
+
+        task.motionMaskRight.SetTo(0)
+        For Each index In task.motionBasics.motionList
+            task.motionMaskRight.Rectangle(task.gridRects(index), 255, -1)
+        Next
+
+        task.rightView.CopyTo(dst2, task.motionMaskRight)
+        If standaloneTest() Then
+            dst1 = task.rightView.Clone
+            For Each index In task.motionBasics.motionList
+                dst1.Rectangle(task.gridRects(index), 255, task.lineWidth)
+            Next
+
+            diff.lastFrame = dst2
+            diff.Run(task.rightView)
+            dst3 = diff.dst3.Threshold(task.motionThreshold, 255, cv.ThresholdTypes.Binary)
+
+            SetTrueText("Pixels different from right camera image: " + CStr(diff.dst2.CountNonZero) + vbCrLf +
+                    "Grid rects with more than " + CStr(task.motionThreshold) +
+                    " pixels different: " + CStr(task.motionBasics.motionList.Count), 3)
+        End If
+    End Sub
+End Class
+
+
+
+
+Public Class Motion_RightMask : Inherits TaskParent
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+        If standalone Then task.gOptions.showMotionMask.Checked = True
+        task.motionMaskRight = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        labels = {"", "Right View", "Motion Mask for the left view", "Motion Mask for the right view."}
+        If standalone Then task.gOptions.displayDst1.Checked = True
+        desc = "Build the MotionMask for the right image and validate it."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        task.bricks.Run(task.grayStable)
+        dst2 = task.motionMask
+        dst1 = task.rightView
+
+        task.motionMaskRight.SetTo(0)
+        For Each index In task.motionBasics.motionList
+            Dim brick = task.bricks.brickList(index)
+            task.motionMaskRight.Rectangle(brick.rRect, 255, -1)
+            dst1.Rectangle(brick.rRect, 255, task.lineWidth)
+        Next
+        dst3 = task.motionMaskRight.Clone
     End Sub
 End Class

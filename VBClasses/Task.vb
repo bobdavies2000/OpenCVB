@@ -79,6 +79,7 @@ Public Class VBtask : Implements IDisposable
     Public lowResDepth As New cv.Mat
 
     Public motionMask As New cv.Mat
+    Public motionMaskRight As New cv.Mat ' motion mask for the right view.
     Public motionRect As cv.Rect
 
     Public optionsChanged As Boolean = True ' global or local options changed.
