@@ -18,8 +18,7 @@ Public Class VBtask : Implements IDisposable
     Public reductionTarget As Integer = 200 ' specify how much reduction is needed using options_RedCloud.
     Public brickSize As Integer
 
-    Public desiredLineMatches As Integer = 20 ' the top X lines to match to the previous image.
-    Public lineMaxOffset As Integer = 10 ' how many pixels to search for lines.
+    Public motionLinkType As Integer = 8
 
     ' add any task algorithms here.
     Public ogl As XO_OpenGL_Basics
@@ -613,7 +612,11 @@ Public Class VBtask : Implements IDisposable
             motionRect = New cv.Rect(0, 0, gray.Width, gray.Height)
         End If
 
-        pcMotion.Run(emptyMat) '******* this is the gravity rotation *******
+        If pcMotion IsNot Nothing Then
+            pcMotion.Run(emptyMat) '******* this is the gravity rotation *******
+        Else
+            task.pcSplit = task.pointCloud.Split
+        End If
 
         colorizer.Run(src)
 

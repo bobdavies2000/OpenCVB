@@ -1,5 +1,4 @@
 ﻿Imports System.Runtime.InteropServices
-Imports OpenCvSharp.ML.DTrees
 Imports cv = OpenCvSharp
 Public Class LineMatch_Basics : Inherits TaskParent
     Public lpListLast As List(Of lpData)
@@ -31,7 +30,7 @@ Public Class LineMatch_Basics : Inherits TaskParent
         lpMatches.Clear()
         lpList.Clear()
         Dim missCount As Integer
-        For i = 0 To Math.Min(task.lines.lpList.Count, task.desiredLineMatches) - 1
+        For i = 0 To Math.Min(task.lines.lpList.Count, slices.desiredLineMatches) - 1
             Dim lp = task.lines.lpList(i)
             Dim color = task.scalarColors(lp.index + 1)
 
@@ -67,8 +66,8 @@ Public Class LineMatch_Basics : Inherits TaskParent
         Next
 
         If task.heartBeat Then
-            labels(2) = "Searching " + CStr(task.lineMaxOffset) + " pixels around center for the top " +
-                        CStr(task.desiredLineMatches) + " lines"
+            labels(2) = "Searching " + CStr(slices.lineMaxOffset) + " pixels around center for the top " +
+                        CStr(slices.desiredLineMatches) + " lines"
             labels(3) = CStr(lpMatches.Count) + " lines matched."
         End If
 
@@ -158,18 +157,20 @@ Public Class LineMatch_Slices : Inherits TaskParent
     Public ySlices As New List(Of List(Of Byte))
     Public lpList As New List(Of lpData)
     Public lpListLast As New List(Of lpData)
+    Public desiredLineMatches As Integer = 100 ' the top X lines to match to the previous image.
+    Public lineMaxOffset As Integer = 10 ' how many pixels to search for lines.
     Public Sub New()
         desc = "Build slices in X and Y from the previous image near the each line's center."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim lpMapLast As cv.Mat = task.lines.dst1.Clone
 
-        For i = 0 To Math.Min(task.lines.lpList.Count, task.desiredLineMatches) - 1
+        For i = 0 To Math.Min(task.lines.lpList.Count, desiredLineMatches) - 1
             Dim lp = task.lines.lpList(i)
             Dim color = task.scalarColors(lp.index + 1)
 
-            Dim ptMinX = New cv.Point(Math.Max(lp.ptCenter.X - task.lineMaxOffset, 0), lp.ptCenter.Y)
-            Dim ptMaxX = New cv.Point(Math.Min(lp.ptCenter.X + task.lineMaxOffset, dst2.Width), lp.ptCenter.Y)
+            Dim ptMinX = New cv.Point(Math.Max(lp.ptCenter.X - lineMaxOffset, 0), lp.ptCenter.Y)
+            Dim ptMaxX = New cv.Point(Math.Min(lp.ptCenter.X + lineMaxOffset, dst2.Width), lp.ptCenter.Y)
 
             Dim rX = New cv.Rect(ptMinX.X, lp.ptCenter.Y, ptMaxX.X - ptMinX.X, 1)
             Dim SliceX(rX.Width - 1) As Byte
@@ -177,8 +178,8 @@ Public Class LineMatch_Slices : Inherits TaskParent
 
             xSlices.Add(SliceX.ToList)
 
-            Dim ptMinY = New cv.Point(lp.ptCenter.X, Math.Max(lp.ptCenter.Y - task.lineMaxOffset, 0))
-            Dim ptMaxY = New cv.Point(lp.ptCenter.X, Math.Min(lp.ptCenter.Y + task.lineMaxOffset, dst2.Height))
+            Dim ptMinY = New cv.Point(lp.ptCenter.X, Math.Max(lp.ptCenter.Y - lineMaxOffset, 0))
+            Dim ptMaxY = New cv.Point(lp.ptCenter.X, Math.Min(lp.ptCenter.Y + lineMaxOffset, dst2.Height))
 
             Dim rY = New cv.Rect(lp.ptCenter.X, ptMinY.Y, 1, ptMaxY.Y - ptMinY.Y)
             Dim SliceY(rY.Height - 1) As Byte

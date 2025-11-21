@@ -894,19 +894,19 @@ Public Class Brick_FeaturesAndEdges : Inherits TaskParent
         dst1 = feat.featureMask.Clone
 
         boundaryCells.Clear()
-        For Each nList In task.grid.gridNeighbors
-            Dim roiA = task.gridRects(nList(0))
+        For Each nabeList In task.grid.gridNeighbors
+            Dim roiA = task.gridRects(nabeList(0))
             Dim centerType = feat.featureMask.Get(Of Byte)(roiA.Y, roiA.X)
             If centerType <> 0 Then
                 Dim boundList = New List(Of Integer)
                 Dim addFirst As Boolean = True
-                For i = 1 To nList.Count - 1
-                    Dim roiB = task.gridRects(nList(i))
+                For i = 1 To nabeList.Count - 1
+                    Dim roiB = task.gridRects(nabeList(i))
                     Dim val = feat.featureMask.Get(Of Byte)(roiB.Y, roiB.X)
                     If centerType <> val Then
-                        If addFirst Then boundList.Add(nList(0)) ' first element is the center point (has features)
+                        If addFirst Then boundList.Add(nabeList(0)) ' first element is the center point (has features)
                         addFirst = False
-                        boundList.Add(nList(i))
+                        boundList.Add(nabeList(i))
                     End If
                 Next
                 If boundList.Count > 0 Then boundaryCells.Add(boundList)

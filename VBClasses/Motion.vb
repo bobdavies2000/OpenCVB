@@ -57,7 +57,7 @@ Public Class Motion_PointCloud : Inherits TaskParent
         desc = "Point cloud after updating with the motion mask"
     End Sub
     Public Shared Function checkNanInf(pc As cv.Mat) As cv.Mat
-        ' these don't work because there are NaN's and Infinity's (both are often present)
+        ' these don't work because there are NaN's and Infinity's (both can be present)
         ' cv.Cv2.PatchNaNs(pc, 0.0) 
         ' Dim mask As New cv.Mat
         ' cv.Cv2.Compare(pc, pc, mask, cv.CmpType.EQ)

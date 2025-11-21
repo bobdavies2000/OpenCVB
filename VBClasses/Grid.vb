@@ -51,25 +51,25 @@ Public Class Grid_Basics : Inherits TaskParent
             Next
 
             ' This determines which grid rects are replaced when motion is detected.
-            ' linkType = 1 means that only the grid rect is copied
-            ' linkType = 4 means link4 gridrects and the original rect are copied
-            ' linkType = 8 means link8 gridrects and the original rect are copied.
+            ' linkType = 1 means that only the grid rect is copied (the first entry)
+            ' linkType = 4 means link4 gridrects and the original rect are copied (first 5 entries)
+            ' linkType = 8 means link8 gridrects and the original rect are copied (all entries)
             ' After some testing, it appears that link4 is adequate.  More testing needed.
-            Dim linkType = 4 ' It appears that link4 is enough.
+            task.motionLinkType = 4
             For i = 0 To task.gridRects.Count - 1
                 Dim rect = task.gridRects(i)
                 Dim p1 = rect.TopLeft
                 Dim p2 = rect.BottomRight
                 Dim nextList As New List(Of Integer)({i}) ' each neighbor list contains the rect.
 
-                If linkType = 4 Or linkType = 8 Then
+                If task.motionLinkType = 4 Or task.motionLinkType = 8 Then
                     If p1.X > 0 Then nextList.Add(i - 1)
                     If p2.X < dst2.Width And p2.Y <= dst2.Height Then nextList.Add(i + 1)
                     If p1.Y > 0 Then nextList.Add(i - bricksPerRow)
                     If p2.Y < dst2.Height Then nextList.Add(i + bricksPerRow)
                 End If
 
-                If linkType = 8 Then
+                If task.motionLinkType = 8 Then
                     If p1.X > 0 And p1.Y > 0 Then nextList.Add(i - bricksPerRow - 1)
                     If p1.Y > 0 And p2.X < dst2.Width Then nextList.Add(i - bricksPerRow + 1)
                     If p1.X > 0 And p2.Y < dst2.Height Then nextList.Add(i + bricksPerRow - 1)
