@@ -558,6 +558,7 @@ Public Class VBtask : Implements IDisposable
         algorithmTimes(3) = Now  ' starting the main algorithm
 
         Dim src = task.color
+        If src.Width = 0 Or task.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
 
         bins2D = {task.workRes.Height, task.workRes.Width}
 
