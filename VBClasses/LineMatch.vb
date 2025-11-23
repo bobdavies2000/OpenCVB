@@ -1,28 +1,16 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class LineMatch_Basics : Inherits TaskParent
-    Public lpListLast As List(Of lpData)
-    Public lpMapLast As cv.Mat = task.lines.dst1.Clone
-    Public xSlices As New List(Of List(Of Byte))
+    Public lpListLast As List(Of lpData) = New List(Of lpData)(task.lines.lpList)
     Public lpList As New List(Of lpData)
     Public lpMatches As New List(Of lpData)
     Dim slices As New LineMatch_Slices
+    Public lpMapLast = task.lines.dst1.Clone
     Public Sub New()
         desc = "Match lines with image slices to locate the best matching line.  Confirm with angle."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.lines.lpList.Count <= 1 Then Exit Sub
-
-        If lpListLast Is Nothing Then lpListLast = New List(Of lpData)(task.lines.lpList)
-        Static lastFrame As cv.Mat = src.Clone
-
-        If task.toggleOn Or Not standalone Then
-            dst2 = task.gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst3 = lastFrame.Clone
-        Else
-            dst2.SetTo(0)
-            dst3.SetTo(0)
-        End If
 
         slices.Run(emptyMat)
 
@@ -30,50 +18,48 @@ Public Class LineMatch_Basics : Inherits TaskParent
         lpMatches.Clear()
         lpList.Clear()
         Dim missCount As Integer
-        For i = 0 To Math.Min(task.lines.lpList.Count, slices.desiredLineMatches) - 1
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        For i = 0 To Math.Min(task.lines.lpList.Count, slices.xSlices.Count) - 1
             Dim lp = task.lines.lpList(i)
             Dim color = task.scalarColors(lp.index + 1)
 
-            Dim xSlice = slices.xSlices(i)
-            Dim ySlice = slices.ySlices(i)
+            For Each sliceSet In {slices.xSlices(i), slices.ySlices(i)}
+                Dim angleDelta As New List(Of Single)
+                Dim lineIndex As New List(Of Integer)
+                For j = 0 To sliceSet.Count - 1
+                    Dim lastIndex = sliceSet(j) - 1
+                    If lastIndex >= 0 And lastIndex < lpListLast.Count Then
+                        lpMatch = lpListLast(lastIndex)
+                        angleDelta.Add(Math.Abs(lp.angle - lpMatch.angle))
+                        lineIndex.Add(lastIndex)
+                    End If
+                Next
 
-            Dim angleDelta As New List(Of Single)
-            Dim lineIndex As New List(Of Integer)
-            For j = 0 To xSlice.Count - 1
-                Dim lastIndex = xSlice(j) - 1
-                If lastIndex >= 0 And lastIndex < lpListLast.Count Then
-                    lpMatch = lpListLast(lastIndex)
-                    angleDelta.Add(Math.Abs(lp.angle - lpMatch.angle))
-                    lineIndex.Add(lastIndex)
-                End If
-            Next
-
-            If angleDelta.Count > 0 Then
-                Dim minAngleDelta = angleDelta.Min
-                If minAngleDelta < 5 Then ' within 5 degrees of the original line's angle
-                    Dim index = lineIndex(angleDelta.IndexOf(minAngleDelta))
-                    lpMatch = lpListLast(index)
-                    dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
-                    dst3.Line(lpMatch.p1, lpMatch.p2, color, task.lineWidth + 2, task.lineType)
-                    lpList.Add(lp)
-                    lpMatches.Add(lpMatch)
+                If angleDelta.Count > 0 Then
+                    Dim minAngleDelta = angleDelta.Min
+                    If minAngleDelta < 5 Then ' within 5 degrees of the original line's angle
+                        Dim index = lineIndex(angleDelta.IndexOf(minAngleDelta))
+                        lpMatch = lpListLast(index)
+                        dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
+                        dst3.Line(lpMatch.p1, lpMatch.p2, color, task.lineWidth + 2, task.lineType)
+                        lpList.Add(lp)
+                        lpMatches.Add(lpMatch)
+                    Else
+                        missCount += 1
+                    End If
                 Else
                     missCount += 1
                 End If
-            Else
-                missCount += 1
-            End If
+            Next
         Next
 
         If task.heartBeat Then
-            labels(2) = "Searching " + CStr(slices.lineMaxOffset) + " pixels around center for the top " +
-                        CStr(slices.desiredLineMatches) + " lines"
+            labels(2) = "Searching " + CStr(slices.lineMaxOffset) + " pixels around center "
             labels(3) = CStr(lpMatches.Count) + " lines matched."
         End If
 
         lpListLast = New List(Of lpData)(task.lines.lpList)
-        lpMapLast = task.lines.dst1.Clone
-        lastFrame = task.color.Clone
     End Sub
 End Class
 
@@ -85,20 +71,19 @@ End Class
 Public Class LineMatch_Tester : Inherits TaskParent
     Dim match As New LineMatch_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        labels(1) = "Steady Cam image"
         desc = "Test the line match algorithm by just occasionally capturing the current state."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.lines.lpList.Count <= 1 Then Exit Sub
 
         Static lpListLast As New List(Of lpData)(task.lines.lpList)
-
+        Static srcLast = src.Clone
         Static lpListTest As New List(Of lpData)(task.lines.lpList)
         Static lpMapTest = task.lines.dst1.Clone
         If task.optionsChanged Or task.gOptions.DebugCheckBox.Checked Then
             lpListTest = New List(Of lpData)(task.lines.lpList)
             lpMapTest = task.lines.dst1.Clone
+            srcLast = src.Clone
         End If
 
         ' task.gOptions.DebugCheckBox.Checked = task.heartBeatLT
@@ -107,8 +92,13 @@ Public Class LineMatch_Tester : Inherits TaskParent
         match.lpMapLast = lpMapTest.clone
         match.Run(task.gray)
 
-        dst2.SetTo(0)
-        dst3.SetTo(0)
+        If task.toggleOn Then
+            dst2 = src
+            dst3 = srcLast
+        Else
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+        End If
         For i = 0 To match.lpList.Count - 1
             Dim lp = match.lpList(i)
             Dim color = task.scalarColors(lp.index + 1)
@@ -155,19 +145,21 @@ End Class
 Public Class LineMatch_Slices : Inherits TaskParent
     Public xSlices As New List(Of List(Of Byte))
     Public ySlices As New List(Of List(Of Byte))
-    Public lpList As New List(Of lpData)
-    Public lpListLast As New List(Of lpData)
-    Public desiredLineMatches As Integer = 100 ' the top X lines to match to the previous image.
     Public lineMaxOffset As Integer = 10 ' how many pixels to search for lines.
     Public Sub New()
+        labels(2) = "White lines are slices used to find previous line locations."
         desc = "Build slices in X and Y from the previous image near the each line's center."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lpMapLast As cv.Mat = task.lines.dst1.Clone
+        Static lpMapLast As cv.Mat = task.lines.dst1.Clone
 
-        For i = 0 To Math.Min(task.lines.lpList.Count, desiredLineMatches) - 1
+        dst2.SetTo(0)
+        xSlices.Clear()
+        ySlices.Clear()
+        For i = 0 To Math.Min(task.lines.lpList.Count, 5) - 1
             Dim lp = task.lines.lpList(i)
             Dim color = task.scalarColors(lp.index + 1)
+            dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
 
             Dim ptMinX = New cv.Point(Math.Max(lp.ptCenter.X - lineMaxOffset, 0), lp.ptCenter.Y)
             Dim ptMaxX = New cv.Point(Math.Min(lp.ptCenter.X + lineMaxOffset, dst2.Width), lp.ptCenter.Y)
@@ -175,6 +167,7 @@ Public Class LineMatch_Slices : Inherits TaskParent
             Dim rX = New cv.Rect(ptMinX.X, lp.ptCenter.Y, ptMaxX.X - ptMinX.X, 1)
             Dim SliceX(rX.Width - 1) As Byte
             Marshal.Copy(lpMapLast(rX).Data, SliceX, 0, SliceX.Length)
+            dst2.Line(ptMinX, ptMaxX, white, task.lineWidth)
 
             xSlices.Add(SliceX.ToList)
 
@@ -184,8 +177,11 @@ Public Class LineMatch_Slices : Inherits TaskParent
             Dim rY = New cv.Rect(lp.ptCenter.X, ptMinY.Y, 1, ptMaxY.Y - ptMinY.Y)
             Dim SliceY(rY.Height - 1) As Byte
             Marshal.Copy(lpMapLast(rY).Data, SliceY, 0, SliceY.Length)
+            dst2.Line(ptMinY, ptMaxY, white, task.lineWidth)
 
             ySlices.Add(SliceY.ToList)
         Next
+
+        lpMapLast = task.lines.dst1.Clone
     End Sub
 End Class

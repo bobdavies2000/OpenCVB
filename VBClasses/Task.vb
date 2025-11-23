@@ -602,6 +602,11 @@ Public Class VBtask : Implements IDisposable
                 If motionRect.Width > 0 Then
                     gray.CopyTo(grayStable, motionMask)
                     leftView.CopyTo(leftViewStable, motionMask)
+                Else
+                    If task.gOptions.debugSyncUI.Checked Then
+                        grayStable = gray.Clone
+                        leftViewStable = leftView.Clone
+                    End If
                 End If
             End If
         Else
