@@ -95,7 +95,7 @@ Public Class LineMatch_Tester : Inherits TaskParent
 
         If task.toggleOn Then
             dst2 = src
-            dst3 = srcLast
+            dst3 = srcLast.clone
         Else
             dst2.SetTo(0)
             dst3.SetTo(0)
@@ -186,5 +186,17 @@ Public Class LineMatch_Slices : Inherits TaskParent
         Next
 
         lpMapLast = task.lines.dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
+Public Class LineMatch_Correlation : Inherits TaskParent
+    Public Sub New()
+        desc = "Compute the correlation of the lpData.rect for the current and previous line."
+    End Sub
+    Public Overrides Sub RunAlg(src As cv.Mat)
     End Sub
 End Class
