@@ -19,7 +19,7 @@ Namespace OpenCVB
             CamSwitchProgress.Height = CameraSwitching.Height / 2
             CameraSwitching.BringToFront()
             CamSwitchProgress.BringToFront()
-            results.dstsReady = False
+            dstsReady = False
             CamSwitchTimer.Enabled = True
             camSwitchCount = 0
         End Sub

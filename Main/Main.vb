@@ -102,7 +102,13 @@ Namespace OpenCVB
 
         Dim magnifyIndex As Integer
         Dim depthAndDepthRange As String
-        Dim results As New Common.resultData
+
+        Dim dstsReady As Boolean
+        Dim dstList() As cv.Mat
+        Dim GLRequest As Integer
+        Dim GLcloud As cv.Mat
+        Dim GLrgb As cv.Mat
+
         Public jsonfs As New jsonClass.jsonIO
         Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             Dim args() = Environment.GetCommandLineArgs()
@@ -253,8 +259,8 @@ Namespace OpenCVB
             optionsForm.MainOptions_Load(sender, e)
             optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True
             Dim resStr = CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height)
-            For i = 0 To Common.resolutionList.Count - 1
-                If Common.resolutionList(i).StartsWith(resStr) Then
+            For i = 0 To optionsForm.resolutionList.Count - 1
+                If optionsForm.resolutionList(i).StartsWith(resStr) Then
                     optionsForm.workResRadio(i).Checked = True
                 End If
             Next
@@ -398,30 +404,28 @@ Namespace OpenCVB
                     End If
                 End If
 
-                If results.dstList Is Nothing Or camera Is Nothing Then Exit Sub
-                If results.dstsReady And cameraReady Then
+                If dstList Is Nothing Or camera Is Nothing Then Exit Sub
+                If dstsReady And cameraReady Then
                     If CameraSwitching.Visible Then
                         CameraSwitching.Visible = False
                         CamSwitchProgress.Visible = False
                         CamSwitchTimer.Enabled = False
                     End If
                     Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
-                    If results.dstList IsNot Nothing Then
-                        If results.dstList(0).Width > 0 Then
-                            SyncLock task.resultLock
-                                For i = 0 To results.dstList.Count - 1
-                                    Dim tmp = results.dstList(i)
-                                    tmp.Circle(mousePointCamPic, task.DotSize + 1, cv.Scalar.White, -1)
-                                    tmp = tmp.Resize(camSize)
-                                    cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
-                                Next
-                            End SyncLock
+                    If dstList(0).Width > 0 Then
+                        SyncLock task.resultLock
+                            For i = 0 To dstList.Count - 1
+                                Dim tmp = dstList(i)
+                                tmp.Circle(mousePointCamPic, task.DotSize + 1, cv.Scalar.White, -1)
+                                tmp = tmp.Resize(camSize)
+                                cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
+                            Next
+                        End SyncLock
 
-                            trueData.Add(New TrueText(task.depthAndDepthRange,
+                        trueData.Add(New TrueText(task.depthAndDepthRange,
                                              New cv.Point(mousePointCamPic.X, mousePointCamPic.Y - 24), 1))
-                        End If
                     End If
-                    results.dstsReady = False
+                    dstsReady = False
                 End If
 
                 Dim workRes = settings.workRes
@@ -555,9 +559,9 @@ Namespace OpenCVB
         Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
             Dim ratio = saveworkRes.Width / camPic(0).Width
             Dim r = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
-            r = validateRect(r, task.results.dstList(drawRectPic).Width, task.results.dstList(drawRectPic).Height)
+            r = validateRect(r, task.dstList(drawRectPic).Width, task.dstList(drawRectPic).Height)
             If r.Width = 0 Or r.Height = 0 Then Exit Sub
-            Dim img = task.results.dstList(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
+            Dim img = task.dstList(drawRectPic)(r).Resize(New cv.Size(drawRect.Width * 5, drawRect.Height * 5))
             cv.Cv2.ImShow("DrawRect Region " + CStr(magnifyIndex), img)
         End Sub
         Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
@@ -934,7 +938,7 @@ Namespace OpenCVB
         End Function
         Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
             If AvailableAlgorithms.Items.Count = 0 Then Exit Sub
-            If results.dstsReady Then
+            If dstsReady Then
                 camPic(0).Refresh()
                 camPic(1).Refresh()
                 camPic(2).Refresh()

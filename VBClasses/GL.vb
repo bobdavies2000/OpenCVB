@@ -18,7 +18,7 @@ Public Class GL_MainForm : Inherits TaskParent
         desc = "Display the pointcloud in the main form - too much work..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.results.GLRequest = Common.oCase.drawPointCloudRGB
+        task.GLRequest = Common.oCase.drawPointCloudRGB
         SetTrueText("Why not run all SharpGL algorithms here?" + vbCrLf +
                     "Because too much data has to move from task to main.")
     End Sub

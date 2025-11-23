@@ -79,18 +79,18 @@ Public Class Gif_OpenCVB : Inherits TaskParent
                     nextBMP = New Bitmap(dst.Width, dst.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(dst, nextBMP)
                 Case gifTypes.gifdst2
-                    If task.gOptions.ShowGrid.Checked Then task.results.dstList(2).SetTo(cv.Scalar.White, task.gridMask)
-                    If task.results.dstList(2).Channels() = 1 Then
-                        task.results.dstList(2) = task.results.dstList(2).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    If task.gOptions.ShowGrid.Checked Then task.dstList(2).SetTo(cv.Scalar.White, task.gridMask)
+                    If task.dstList(2).Channels() = 1 Then
+                        task.dstList(2) = task.dstList(2).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     End If
                     nextBMP = New Bitmap(task.workRes.Width, task.workRes.Height, Imaging.PixelFormat.Format24bppRgb)
-                    cvext.BitmapConverter.ToBitmap(task.results.dstList(2), nextBMP)
+                    cvext.BitmapConverter.ToBitmap(task.dstList(2), nextBMP)
                 Case gifTypes.gifdst3
-                    If task.results.dstList(3).Channels() = 1 Then
-                        task.results.dstList(3) = task.results.dstList(3).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    If task.dstList(3).Channels() = 1 Then
+                        task.dstList(3) = task.dstList(3).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     End If
                     nextBMP = New Bitmap(task.workRes.Width, task.workRes.Height, Imaging.PixelFormat.Format24bppRgb)
-                    cvext.BitmapConverter.ToBitmap(task.results.dstList(3), nextBMP)
+                    cvext.BitmapConverter.ToBitmap(task.dstList(3), nextBMP)
                 Case gifTypes.openCVBwindow
                     Dim r = New cv.Rect(0, 0, task.mainFormLocation.Width - 20,
                                               task.mainFormLocation.Height - 40)

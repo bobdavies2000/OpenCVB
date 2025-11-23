@@ -39,22 +39,4 @@ Public Class Common
                                                       "MYNT-EYE-D1000",
                                                       "Orbbec Gemini 335"
                                                       })
-
-    '     "1344x752 - Full resolution", "672x376 - Quarter resolution", "336x188 - Small resolution  ",
-    Public Shared resolutionList As New List(Of String)(
-        {"1920x1080 - Full resolution", "960x540 - Quarter resolution", "480x270 - Small resolution",
-         "1280x720 - Full resolution", "640x360 - Quarter resolution", "320x180 - Small resolution",
-         "640x480 - Full resolution", "320x240 - Quarter resolution", "160x120 - Small resolution",
-         "960x600 - Full resolution", "480x300 - Quarter resolution", "240x150 - Small resolution  ",
-         "672x376 - Full resolution", "336x188 - Quarter resolution", "168x94 - Small resolution    "})
-
-
-    Public Class resultData
-        Public dstsReady As Boolean
-        Public dstList() As cv.Mat
-
-        Public GLRequest As Integer
-        Public GLcloud As cv.Mat
-        Public GLrgb As cv.Mat
-    End Class
 End Class

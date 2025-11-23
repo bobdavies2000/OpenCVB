@@ -22,13 +22,13 @@ Public Class Pixel_Viewer : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            task.results.dstList(0) = dst0Input
-            task.results.dstList(1) = dst1Input
-            task.results.dstList(2) = dst2Input
-            task.results.dstList(3) = dst3Input
+            task.dstList(0) = dst0Input
+            task.dstList(1) = dst1Input
+            task.dstList(2) = dst2Input
+            task.dstList(3) = dst3Input
         End If
 
-        Dim dst = Choose(task.mousePicTag + 1, task.results.dstList(0), task.results.dstList(1), dst2Input, dst3Input)
+        Dim dst = Choose(task.mousePicTag + 1, task.dstList(0), task.dstList(1), dst2Input, dst3Input)
 
         Dim displayType = displayTypes.noType
         If dst.Type = cv.MatType.CV_8UC3 Then displayType = displayTypes.type8uC3

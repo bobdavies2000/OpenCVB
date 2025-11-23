@@ -71,6 +71,7 @@ End Class
 Public Class LineMatch_Tester : Inherits TaskParent
     Dim match As New LineMatch_Basics
     Public Sub New()
+        task.gOptions.DebugCheckBox.Checked = True
         desc = "Test the line match algorithm by just occasionally capturing the current state."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -103,9 +104,11 @@ Public Class LineMatch_Tester : Inherits TaskParent
             Dim lp = match.lpList(i)
             Dim color = task.scalarColors(lp.index + 1)
             dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
+            dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
 
             lp = match.lpMatches(i)
             dst3.Line(lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
+            dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
         Next
         labels(2) = match.labels(2)
         labels(3) = match.labels(3)

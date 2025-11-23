@@ -86,19 +86,19 @@ Namespace OpenCVB
             gl.Rotate(rotationY, 0.0F, 1.0F, 0.0F)
             gl.PointSize(1.0F)
 
-            Select Case results.GLRequest
+            Select Case GLRequest
                 Case Common.oCase.drawPointCloudRGB
-                    If results.GLcloud Is Nothing Then Exit Sub
-                    If results.GLcloud.Size <> OpenCVB.MainUI.settings.workRes Then
-                        results.GLcloud = New cv.Mat(OpenCVB.MainUI.settings.workRes, cv.MatType.CV_32FC3, 0)
+                    If GLcloud Is Nothing Then Exit Sub
+                    If GLcloud.Size <> OpenCVB.MainUI.settings.workRes Then
+                        GLcloud = New cv.Mat(OpenCVB.MainUI.settings.workRes, cv.MatType.CV_32FC3, 0)
                     End If
                     gl.Begin(OpenGL.GL_POINTS)
 
                     For y = 0 To settings.workRes.Height - 1
                         For x = 0 To settings.workRes.Width - 1
-                            Dim vec As cv.Vec3f = results.GLcloud.At(Of cv.Vec3f)(y, x)
+                            Dim vec As cv.Vec3f = GLcloud.At(Of cv.Vec3f)(y, x)
                             If vec(2) <> 0 Then
-                                Dim vec3b = results.GLrgb.Get(Of cv.Vec3b)(y, x)
+                                Dim vec3b = GLrgb.Get(Of cv.Vec3b)(y, x)
                                 gl.Color(vec3b(2) / 255, vec3b(1) / 255, vec3b(0) / 255)
                                 gl.Vertex(vec.Item0, -vec.Item1, -vec.Item2)
                             End If

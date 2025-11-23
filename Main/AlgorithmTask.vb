@@ -40,13 +40,13 @@ Namespace OpenCVB
             Return True
         End Function
         Private Sub initializeResultMats()
-            ReDim results.dstList(3)
-            For i = 0 To results.dstList.Count - 1
-                results.dstList(i) = New cv.Mat
+            ReDim dstList(3)
+            For i = 0 To dstList.Count - 1
+                dstList(i) = New cv.Mat
             Next
             If algName = "GL_MainForm" Then
-                results.GLcloud = New cv.Mat
-                results.GLrgb = New cv.Mat
+                GLcloud = New cv.Mat
+                GLrgb = New cv.Mat
             End If
         End Sub
         Private Sub logAlgorithm()
@@ -276,15 +276,15 @@ Namespace OpenCVB
                     End If
 
                     SyncLock task.resultLock
-                        For i = 0 To task.results.dstList.Count - 1
-                            results.dstList(i) = task.results.dstList(i).Clone
+                        For i = 0 To task.dstList.Count - 1
+                            dstList(i) = task.dstList(i).Clone
                         Next
                         If parms.algName = "GL_MainForm" Then
-                            results.GLRequest = task.results.GLRequest
-                            results.GLcloud = task.pointCloud.Clone
-                            results.GLrgb = task.color.Clone
+                            GLRequest = task.GLRequest
+                            GLcloud = task.pointCloud.Clone
+                            GLrgb = task.color.Clone
                         End If
-                        results.dstsReady = True ' this will trigger the paint
+                        dstsReady = True ' this will trigger the paint
                     End SyncLock
 
                     debugSyncUI = task.debugSyncUI

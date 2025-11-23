@@ -2,9 +2,16 @@
 Imports cv = OpenCvSharp
 Public Class Options
     Public cameraRadioButton(Common.cameraNames.Count - 1) As RadioButton
-    Public workResRadio(Common.resolutionList.Count - 1) As RadioButton
+    Public workResRadio() As RadioButton
     Public cameraName As String
     Public cameraIndex As Integer
+    '     "1344x752 - Full resolution", "672x376 - Quarter resolution", "336x188 - Small resolution  ",
+    Public resolutionList As New List(Of String)(
+        {"1920x1080 - Full resolution", "960x540 - Quarter resolution", "480x270 - Small resolution",
+         "1280x720 - Full resolution", "640x360 - Quarter resolution", "320x180 - Small resolution",
+         "640x480 - Full resolution", "320x240 - Quarter resolution", "160x120 - Small resolution",
+         "960x600 - Full resolution", "480x300 - Quarter resolution", "240x150 - Small resolution  ",
+         "672x376 - Full resolution", "336x188 - Quarter resolution", "168x94 - Small resolution    "})
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
         OpenCVB.MainUI.settings.showBatchConsole = showBatchConsole.Checked
         OpenCVB.MainUI.settings.snap640 = Snap640.Checked
@@ -26,7 +33,7 @@ Public Class Options
         Me.Close()
     End Sub
     Public Sub defineCameraResolutions(index As Integer)
-        ' see resolutionList above - helps to see how code maps to layout of the resolutions.
+        ' see resolutionList - helps to see how code maps to layout of the resolutions.
         Select Case Common.cameraNames(index)
             Case "StereoLabs ZED 2/2i"
                 OpenCVB.MainUI.settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
@@ -66,9 +73,9 @@ Public Class Options
         Next
 
         If cameraName.StartsWith("StereoLabs") Then
-            workResRadio(Common.resolutionList.IndexOf("336x188 - Quarter resolution")).Checked = True
+            workResRadio(resolutionList.IndexOf("336x188 - Quarter resolution")).Checked = True
         Else
-            workResRadio(Common.resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
+            workResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         End If
     End Sub
     Public Sub MainOptions_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -84,8 +91,9 @@ Public Class Options
                 AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
             Next
 
+            ReDim workResRadio(resolutionList.Count - 1)
             For i = 0 To workResRadio.Count - 1
-                workResRadio(i) = New RadioButton With {.Text = Common.resolutionList(i), .Tag = i,
+                workResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i,
                                      .AutoSize = True, .Visible = True}
                 workResRadio(i).Enabled = OpenCVB.MainUI.settings.resolutionsSupported(i)
                 Resolutions.Controls.Add(workResRadio(i))

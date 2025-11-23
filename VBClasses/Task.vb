@@ -8,7 +8,13 @@ Imports cv = OpenCvSharp
 #Region "taskProcess"
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
-    Public results As New Common.resultData
+    Public dstsReady As Boolean
+    Public dstList() As cv.Mat
+
+    Public GLRequest As Integer
+    Public GLcloud As cv.Mat
+    Public GLrgb As cv.Mat
+
     Public resultLock As New Mutex(True, "resultLock")
 
     Public cvFontSize As Single = 0.8
@@ -63,7 +69,7 @@ Public Class VBtask : Implements IDisposable
     Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
     Public gridROIclicked As Integer
     Public depthDiffMeters As Single ' bricks > than this value are depth edges - in meters
-    Public rgbLeftAligned As Boolean
+    Public rgbLeftAligned As Boolean ' if the rgb image is the left image...
 
     Public fpMotion As cv.Point2f
 
@@ -431,9 +437,9 @@ Public Class VBtask : Implements IDisposable
         captureRes = parms.captureRes
         optionsChanged = True
 
-        ReDim results.dstList(3)
-        For i = 0 To results.dstList.Count - 1
-            results.dstList(i) = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
+        ReDim dstList(3)
+        For i = 0 To dstList.Count - 1
+            dstList(i) = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
         Next
 
         OpenGL_Left = CInt(GetSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", mainFormLocation.X))
@@ -491,7 +497,7 @@ Public Class VBtask : Implements IDisposable
         ' https://www.stereolabs.com/assets/datasheets/zed-2i-datasheet-feb2022.pdf
         ' https://www.mynteye.com/pages/mynt-eye-d
         ' https://www.orbbec.com/products/stereo-vision-camera/gemini-335l/
-        ' order of cameras is the same as the order above... see cameraNames above
+        ' order of cameras is the same as the order above and in optionsform.cameraNames combobox.
         Dim vFOVangles() As Single = {59, 59, 72, 58, 42.5, 57, 57, 62, 68} ' all values from the specification - this is usually overridden by calibration data.
         Dim hFOVangles() As Single = {90, 90, 104, 105, 69.4, 86, 86, 69, 94} ' all values from the specification - this is usually overridden by calibration data.
 
@@ -695,46 +701,46 @@ Public Class VBtask : Implements IDisposable
 
             SyncLock resultLock
                 If gOptions.displayDst0.Checked Then
-                    results.dstList(0) = Check8uC3(displayObject.dst0)
+                    dstList(0) = Check8uC3(displayObject.dst0)
                 Else
-                    results.dstList(0) = color.Clone
+                    dstList(0) = color.Clone
                 End If
 
                 If gOptions.displayDst1.Checked Then
-                    results.dstList(1) = Check8uC3(displayObject.dst1)
+                    dstList(1) = Check8uC3(displayObject.dst1)
                     displayDst1 = True
                 Else
-                    results.dstList(1) = depthRGB.Clone
+                    dstList(1) = depthRGB.Clone
                     displayDst1 = False
                 End If
 
-                results.dstList(2) = Check8uC3(displayObject.dst2)
-                results.dstList(3) = Check8uC3(displayObject.dst3)
+                dstList(2) = Check8uC3(displayObject.dst2)
+                dstList(3) = Check8uC3(displayObject.dst3)
 
                 ' make sure that any outputs from the algorithm are the right size.nearest
-                If results.dstList(0).Size <> workRes And results.dstList(0).Width > 0 Then
-                    results.dstList(0) = results.dstList(0).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                If dstList(0).Size <> workRes And dstList(0).Width > 0 Then
+                    dstList(0) = dstList(0).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
-                If results.dstList(1).Size <> workRes And results.dstList(1).Width > 0 Then
-                    results.dstList(1) = results.dstList(1).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                If dstList(1).Size <> workRes And dstList(1).Width > 0 Then
+                    dstList(1) = dstList(1).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
-                If results.dstList(2).Size <> workRes And results.dstList(2).Width > 0 Then
-                    results.dstList(2) = results.dstList(2).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                If dstList(2).Size <> workRes And dstList(2).Width > 0 Then
+                    dstList(2) = dstList(2).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
-                If results.dstList(3).Size <> workRes And results.dstList(3).Width > 0 Then
-                    results.dstList(3) = results.dstList(3).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                If dstList(3).Size <> workRes And dstList(3).Width > 0 Then
+                    dstList(3) = dstList(3).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
-                If gOptions.ShowGrid.Checked Then results.dstList(2).SetTo(cv.Scalar.White, gridMask)
+                If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
                 If gOptions.showMotionMask.Checked Then
                     For Each mIndex In motionBasics.motionList
-                        results.dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
+                        dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
                     Next
-                    results.dstList(0).Rectangle(motionRect, white, lineWidth)
+                    dstList(0).Rectangle(motionRect, white, lineWidth)
                 End If
 
                 If gOptions.CrossHairs.Checked Then
-                    Gravity_Basics.showVectors(results.dstList(0))
+                    Gravity_Basics.showVectors(dstList(0))
                     Dim lp = lineLongest
                     Dim pt = New cv.Point2f((lp.pE1.X + lp.pE2.X) / 2 + 5, (lp.pE1.Y + lp.pE2.Y) / 2)
                     displayObject.trueData.Add(New TrueText("Longest", pt, 0))
@@ -766,7 +772,7 @@ Public Class VBtask : Implements IDisposable
             End If
         Next
 
-        For Each m In task.results.dstList
+        For Each m In task.dstList
             m.Dispose()
         Next
     End Sub
