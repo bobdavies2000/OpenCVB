@@ -75,7 +75,6 @@ Namespace OpenCVB
         Const MAX_RECENT = 50
         Dim algHistory As New List(Of String)
         Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
-        Dim arrowIndex As Integer
 
         Dim pixelViewerRect As cv.Rect
         Dim pixelViewerOn As Boolean
@@ -683,7 +682,7 @@ Namespace OpenCVB
                 MsgBox(AvailableAlgorithms.Text + " is running too long." + vbCrLf +
                        "Extend the time allotted to each algorithm." + vbCrLf +
                        "Or simplify the algorithm - break into small steps." + vbCrLf +
-                       "See 'Duration in seconds of each test' - global option." + vbCrLf +
+                       "Change 'TestAllDuration' for this resolution." + vbCrLf +
                        "Click 'OK' once you have read this.")
                 killThread(saveThreadID)
             End If
@@ -878,7 +877,6 @@ Namespace OpenCVB
             jsonfs.write()
         End Sub
         Private Sub algHistory_Clicked(sender As Object, e As EventArgs)
-            arrowIndex = 0
             Dim item = TryCast(sender, ToolStripMenuItem)
             If AvailableAlgorithms.Items.Contains(item.Text) = False Then
                 MessageBox.Show("That algorithm was not found" + vbCrLf + vbCrLf + "The name may have changed or " + vbCrLf +
@@ -956,7 +954,8 @@ Namespace OpenCVB
                 If algHistory.Contains(nextA) = False Then
                     algHistory.Add(nextA)
                     RecentList.DropDownItems.Add(nextA)
-                    AddHandler RecentList.DropDownItems(RecentList.DropDownItems.Count - 1).Click, AddressOf algHistory_Clicked
+                    AddHandler RecentList.DropDownItems(RecentList.DropDownItems.Count - 1).Click,
+                               AddressOf algHistory_Clicked
                 End If
             Next
         End Sub

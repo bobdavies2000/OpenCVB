@@ -120,11 +120,11 @@ Public Class Options
         Dim duration As Integer = 5 ' typically 5 seconds.
         Select Case OpenCVB.MainUI.settings.workRes.Width
             Case 1920
-                duration = 30
+                duration = 40
             Case 1280
-                duration = 20
+                duration = 35
             Case 960
-                duration = 20
+                duration = 30
             Case 672
                 duration = 15
             Case 640

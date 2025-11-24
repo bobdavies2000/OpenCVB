@@ -57,7 +57,7 @@
             ToolStrip1.Items.AddRange(New ToolStripItem() {PausePlayButton, OptionsButton, TestAllButton, Magnify, PixelViewerButton, RecentList, AvailableAlgorithms, AtoZButton, GroupComboBox, AlgDescription})
             ToolStrip1.Location = New Point(0, 0)
             ToolStrip1.Name = "ToolStrip1"
-            ToolStrip1.Size = New Size(1582, 34)
+            ToolStrip1.Size = New Size(1898, 39)
             ToolStrip1.TabIndex = 0
             ToolStrip1.Text = "ToolStrip1"
             ' 
@@ -67,7 +67,7 @@
             PausePlayButton.Image = My.Resources.Resources.PauseButtonRun
             PausePlayButton.ImageTransparentColor = Color.Magenta
             PausePlayButton.Name = "PausePlayButton"
-            PausePlayButton.Size = New Size(34, 29)
+            PausePlayButton.Size = New Size(34, 34)
             PausePlayButton.Text = "Run Pause Button"
             ' 
             ' OptionsButton
@@ -76,7 +76,7 @@
             OptionsButton.Image = My.Resources.Resources.settings
             OptionsButton.ImageTransparentColor = Color.Magenta
             OptionsButton.Name = "OptionsButton"
-            OptionsButton.Size = New Size(34, 29)
+            OptionsButton.Size = New Size(34, 34)
             OptionsButton.Text = "OpenCVB Settings"
             ' 
             ' TestAllButton
@@ -85,7 +85,7 @@
             TestAllButton.Image = My.Resources.Resources.testall
             TestAllButton.ImageTransparentColor = Color.Magenta
             TestAllButton.Name = "TestAllButton"
-            TestAllButton.Size = New Size(34, 29)
+            TestAllButton.Size = New Size(34, 34)
             TestAllButton.Text = "Test All (overnight testing)"
             ' 
             ' Magnify
@@ -94,7 +94,7 @@
             Magnify.Image = My.Resources.Resources.magnify
             Magnify.ImageTransparentColor = Color.Magenta
             Magnify.Name = "Magnify"
-            Magnify.Size = New Size(34, 29)
+            Magnify.Size = New Size(34, 34)
             Magnify.Text = "Magnify selected rectangle"
             ' 
             ' PixelViewerButton
@@ -103,7 +103,7 @@
             PixelViewerButton.Image = My.Resources.Resources.PixelViewer
             PixelViewerButton.ImageTransparentColor = Color.Magenta
             PixelViewerButton.Name = "PixelViewerButton"
-            PixelViewerButton.Size = New Size(34, 29)
+            PixelViewerButton.Size = New Size(34, 34)
             PixelViewerButton.Text = "Display pixels as text"
             ' 
             ' RecentList
@@ -111,41 +111,42 @@
             RecentList.DisplayStyle = ToolStripItemDisplayStyle.Text
             RecentList.ImageTransparentColor = Color.Magenta
             RecentList.Name = "RecentList"
-            RecentList.Size = New Size(82, 29)
+            RecentList.Size = New Size(96, 34)
             RecentList.Text = "Recent"
             RecentList.ToolTipText = " "
             ' 
             ' AvailableAlgorithms
             ' 
             AvailableAlgorithms.Name = "AvailableAlgorithms"
-            AvailableAlgorithms.Size = New Size(300, 34)
+            AvailableAlgorithms.Size = New Size(359, 39)
             ' 
             ' AtoZButton
             ' 
             AtoZButton.DisplayStyle = ToolStripItemDisplayStyle.Text
             AtoZButton.ImageTransparentColor = Color.Magenta
             AtoZButton.Name = "AtoZButton"
-            AtoZButton.Size = New Size(45, 29)
+            AtoZButton.Size = New Size(53, 34)
             AtoZButton.Text = "A-Z"
             AtoZButton.ToolTipText = "Select an algorithm group"
             ' 
             ' GroupComboBox
             ' 
             GroupComboBox.Name = "GroupComboBox"
-            GroupComboBox.Size = New Size(200, 34)
+            GroupComboBox.Size = New Size(239, 39)
             ' 
             ' AlgDescription
             ' 
             AlgDescription.Name = "AlgDescription"
-            AlgDescription.Size = New Size(102, 29)
+            AlgDescription.Size = New Size(122, 34)
             AlgDescription.Text = "Description"
             ' 
             ' XYLoc
             ' 
             XYLoc.AutoSize = True
-            XYLoc.Location = New Point(5, 718)
+            XYLoc.Location = New Point(6, 862)
+            XYLoc.Margin = New Padding(4, 0, 4, 0)
             XYLoc.Name = "XYLoc"
-            XYLoc.Size = New Size(60, 25)
+            XYLoc.Size = New Size(71, 30)
             XYLoc.TabIndex = 1
             XYLoc.Text = "XYLoc"
             XYLoc.Visible = False
@@ -154,7 +155,8 @@
             ' 
             CameraSwitching.AutoSize = True
             CameraSwitching.Font = New Font("Microsoft Sans Serif", 12F)
-            CameraSwitching.Location = New Point(33, 133)
+            CameraSwitching.Location = New Point(40, 160)
+            CameraSwitching.Margin = New Padding(4, 0, 4, 0)
             CameraSwitching.Name = "CameraSwitching"
             CameraSwitching.Size = New Size(202, 29)
             CameraSwitching.TabIndex = 2
@@ -163,9 +165,10 @@
             ' CamSwitchProgress
             ' 
             CamSwitchProgress.BackColor = SystemColors.MenuHighlight
-            CamSwitchProgress.Location = New Point(33, 165)
+            CamSwitchProgress.Location = New Point(40, 198)
+            CamSwitchProgress.Margin = New Padding(4, 4, 4, 4)
             CamSwitchProgress.Name = "CamSwitchProgress"
-            CamSwitchProgress.Size = New Size(202, 27)
+            CamSwitchProgress.Size = New Size(242, 32)
             CamSwitchProgress.TabIndex = 3
             CamSwitchProgress.TabStop = False
             ' 
@@ -185,27 +188,28 @@
             ' GLControl
             ' 
             GLControl.DrawFPS = False
-            GLControl.Location = New Point(425, 182)
-            GLControl.Margin = New Padding(5, 6, 5, 6)
+            GLControl.Location = New Point(510, 218)
+            GLControl.Margin = New Padding(6, 7, 6, 7)
             GLControl.Name = "GLControl"
             GLControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1
             GLControl.RenderContextType = SharpGL.RenderContextType.DIBSection
             GLControl.RenderTrigger = SharpGL.RenderTrigger.TimerBased
-            GLControl.Size = New Size(800, 367)
+            GLControl.Size = New Size(960, 440)
             GLControl.TabIndex = 4
             GLControl.Visible = False
             ' 
             ' MainUI
             ' 
-            AutoScaleDimensions = New SizeF(10F, 25F)
+            AutoScaleDimensions = New SizeF(12F, 30F)
             AutoScaleMode = AutoScaleMode.Font
-            ClientSize = New Size(1582, 748)
+            ClientSize = New Size(1898, 898)
             Controls.Add(GLControl)
             Controls.Add(CamSwitchProgress)
             Controls.Add(CameraSwitching)
             Controls.Add(XYLoc)
             Controls.Add(ToolStrip1)
             Icon = CType(resources.GetObject("$this.Icon"), Icon)
+            Margin = New Padding(4, 4, 4, 4)
             Name = "MainUI"
             Text = "OpenCVB Main Form"
             ToolStrip1.ResumeLayout(False)

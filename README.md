@@ -1,3 +1,22 @@
+# November 24, 2025 – Line Matching, Right View Motion
+
+-   Over 2000 algorithms are included, averaging 36 lines of code per algorithm.
+    -   Over 400 algorithms are obsolete and are compiled for reference use.
+-   Like many other applications, OpenCVB is being rewritten using modern tools.
+    -   Cursor’s tool is assisting in the current rewrite.
+    -   The Main.vb is still the default startup project while conversion progresses.
+    -   The CVB project can be set to the startup project for testing.
+-   LineMatch_Basics algorithm finds the matching line in the previous image.
+    -   The algorithm finds the longest lines and their earlier location.
+    -   Line angle is used to confirm that the match is the same line.
+    -   Further confirmation is needed with many parallel lines.
+-   Motion is also found in the right camera image.
+    -   Motion_Basics is reused to find motion in the right image.
+        -   Not a lot of work was involved in getting this working.
+    -   Potential uses for finding motion in the right image are not yet clear.
+
+![](media/23d8c048a4cbb9cd85c40044609b8bb5.gif)**LineMatch_Basics :** *Lines are identified for each image - Line_Basics is a ‘task’ algorithm that runs on every frame. Using the center of each line, the match candidates are located within X pixels around the line center. The list of candidate lines is reviewed and the one with an angle within Y degrees of the original is designated the matching line. The bottom left image contains the longest lines for the current frame and the bottom right image shows the lines that match from the previous frame. When the camera is not moving, this algorithm is not challenging but when the camera is moving, this algorithm still works quite well. A toggle shows the matches alone and in the context of the current and previous image.*
+
 # November 13, 2025 – Motion.
 
 -   Over 2000 algorithms are included, averaging 36 lines of code per algorithm.
@@ -22,7 +41,7 @@
 -   The stable gray image (grayStable) contains the motion-updated image.
     -   A motion-updated point cloud is now the default for all algorithms.
 
-**![](media/77c9976b5a0810a5e2671c395b9ca196.gif)**
+**![A screenshot of a computer AI-generated content may be incorrect.](media/77c9976b5a0810a5e2671c395b9ca196.gif)**
 
 **Motion_Validate:** *This algorithm compares the motion-updated image with the camera image. The differences are highlighted in the lower right image. The lower left image is the motion-updated image while the upper right image is the original image from the camera. In the upper left image, the motion mask is shown on the RGB image. The text in the lower right image contains a count of the number of pixels that differ and the number of grid rectangles that contain motion. Note that there are plenty of differences between the current image and the motion-updated image but that these differences are small even where there is motion. The option for “cell + link 4 cells” is visible in the motion mask (upper left.)*
 
