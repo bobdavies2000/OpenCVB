@@ -71,6 +71,7 @@ Public Class OptionsGlobal
                 task.cvFontSize = 1.0
             Case 320
                 task.cvFontSize = 1.0
+                task.brickSize = 3
             Case 168
                 task.cvFontSize = 0.5
             Case 160
