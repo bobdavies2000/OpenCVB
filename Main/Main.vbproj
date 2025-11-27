@@ -47,8 +47,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CamZed\CamZed.csproj" />
+    <ProjectReference Include="..\CPP_Native\CPP_Native.vcxproj" />
     <ProjectReference Include="..\VBClasses\VBClasses.vbproj" />
-    <ProjectReference Include="..\CVB\CVB.vbproj" />
   </ItemGroup>
 
   <ItemGroup>
