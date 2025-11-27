@@ -25,6 +25,7 @@ Namespace CVB
         Private Sub InitializeComponent()
             Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainForm))
             MainToolStrip = New ToolStrip()
+            campics = New PictureBox()
             PausePlayButton = New ToolStripButton()
             SettingsToolStripButton = New ToolStripButton()
             TestAllButton = New ToolStripButton()
@@ -37,6 +38,7 @@ Namespace CVB
             ToolStripSeparator2 = New ToolStripSeparator()
             GroupComboBox = New ToolStripComboBox()
             AlgDescription = New ToolStripTextBox()
+            CType(campics, ComponentModel.ISupportInitialize).BeginInit()
             MainToolStrip.SuspendLayout()
             SuspendLayout()
             ' 
@@ -149,11 +151,24 @@ Namespace CVB
             AlgDescription.Text = "Description"
             AlgDescription.ToolTipText = "Description"
             ' 
+            ' campics
+            ' 
+            campics.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+            campics.BackColor = SystemColors.ControlLight
+            campics.BorderStyle = BorderStyle.FixedSingle
+            campics.Location = New Point(12, 54)
+            campics.Name = "campics"
+            campics.Size = New Size(1864, 609)
+            campics.SizeMode = PictureBoxSizeMode.Zoom
+            campics.TabIndex = 1
+            campics.TabStop = False
+            ' 
             ' MainForm
             ' 
             AutoScaleDimensions = New SizeF(12F, 30F)
             AutoScaleMode = AutoScaleMode.Font
             ClientSize = New Size(1888, 675)
+            Controls.Add(campics)
             Controls.Add(MainToolStrip)
             Icon = CType(resources.GetObject("$this.Icon"), Icon)
             Margin = New Padding(4)
@@ -161,6 +176,7 @@ Namespace CVB
             Text = "CVB Application"
             MainToolStrip.ResumeLayout(False)
             MainToolStrip.PerformLayout()
+            CType(campics, ComponentModel.ISupportInitialize).EndInit()
             ResumeLayout(False)
             PerformLayout()
         End Sub
@@ -178,6 +194,7 @@ Namespace CVB
         Friend WithEvents GroupComboBox As ToolStripComboBox
         Friend WithEvents ToolStripButton1 As ToolStripButton
         Friend WithEvents AlgDescription As ToolStripTextBox
+        Friend WithEvents campics As PictureBox
 
     End Class
 End Namespace
