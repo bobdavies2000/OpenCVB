@@ -2,6 +2,7 @@
 
 -   Over 2000 algorithms are included, averaging 36 lines of code per algorithm.
     -   Over 400 algorithms are obsolete and are compiled for reference use.
+-   OpenCVB has been updated to compile with Visual Studio 2026 Community Edition (free).
 -   Like many other applications, OpenCVB is being rewritten using modern tools.
     -   Cursor’s tool is assisting in the current rewrite.
     -   The Main.vb is still the default startup project while conversion progresses.
