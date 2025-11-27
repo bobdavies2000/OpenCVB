@@ -70,15 +70,16 @@ Namespace CVB
             PausePlayButton.Image = New Bitmap(CurDir() + "/Data/PauseButton.png")
 
             setupAlgorithmHistory()
-
-            AlgDescription.Size = New Size(550, AlgDescription.Size.Height)
-            AlgDescription.Text = "Description of the algorithm"
-            AlgDescription.Visible = True
         End Sub
 
 
         Private Sub Magnifier_Click(sender As Object, e As EventArgs) Handles Magnifier.Click
 
+        End Sub
+
+        Private Sub MainForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+            AlgDescription.Size = New Size(Me.Width - 670, AlgDescription.Height)
+            AlgDescription.Text = "Description of the algorithm"
         End Sub
     End Class
 End Namespace
