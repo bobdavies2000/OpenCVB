@@ -47,7 +47,7 @@ Namespace CVB
             MainToolStrip.Location = New Point(0, 0)
             MainToolStrip.Name = "MainToolStrip"
             MainToolStrip.Padding = New Padding(0, 0, 2, 0)
-            MainToolStrip.Size = New Size(1101, 31)
+            MainToolStrip.Size = New Size(1089, 31)
             MainToolStrip.TabIndex = 0
             MainToolStrip.Text = "MainToolStrip"
             ' 
@@ -154,10 +154,10 @@ Namespace CVB
             ' 
             AutoScaleDimensions = New SizeF(7F, 15F)
             AutoScaleMode = AutoScaleMode.Font
-            ClientSize = New Size(1101, 338)
+            ClientSize = New Size(1089, 567)
             Controls.Add(MainToolStrip)
             Icon = CType(resources.GetObject("$this.Icon"), Icon)
-            Margin = New Padding(2, 2, 2, 2)
+            Margin = New Padding(2)
             Name = "MainForm"
             Text = "CVB Application"
             MainToolStrip.ResumeLayout(False)
