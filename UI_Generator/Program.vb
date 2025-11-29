@@ -54,14 +54,6 @@ Module Program
                 Next
             Next
 
-            Console.WriteLine()
-            Console.WriteLine()
-            Console.WriteLine($"Found {vbClasses.Count} classes that inherit from TaskParent:")
-            Console.WriteLine($"Found {xoClasses.Count} XO_ classes that inherit from TaskParent:")
-            Console.WriteLine($"Total source lines read: {totalLinesRead}")
-            Console.WriteLine()
-            Console.WriteLine()
-
             ' Write the counts to AlgorithmCounts.txt
             Dim dataPath As String = Path.GetFullPath(Path.Combine(appPath, "..\..\..\..\..\Data"))
             Dim countsFilePath As String = Path.Combine(dataPath, "AlgorithmCounts.txt")
@@ -69,7 +61,7 @@ Module Program
                                           "AlgorithmCount = " & vbClasses.Count.ToString() & vbCrLf &
                                           "Reference algorithm count = " & xoClasses.Count.ToString() & vbCrLf &
                                           "Average lines per algorithm = " &
-                                          If(vbClasses.Count > 0, (totalLinesRead \ (vbClasses.Count + xoClasses.Count)).ToString(), "0") & vbCrLf
+                                          (totalLinesRead \ (vbClasses.Count + xoClasses.Count)).ToString() & vbCrLf
             File.WriteAllText(countsFilePath, countsContent)
 
             ' Generate AlgorithmList.vb in the Main directory
@@ -82,7 +74,7 @@ Module Program
 
             sb.AppendLine("Public Class algorithmList")
 
-            sb.AppendLine(vbTab + "Public Function createAlgorithm(algorithmName as string) as Object")
+            sb.AppendLine(vbTab + "Public Function createAlgorithm(algorithmName as string) as taskParent")
 
             For Each className As String In vbClasses.Keys
                 sb.AppendLine($"If algorithmName = ""{className}"" Then Return New {className}")
@@ -93,6 +85,35 @@ Module Program
 
             File.WriteAllText(algorithmListPath, sb.ToString())
 
+            ' Extract first tokens from class names and write to GroupButtons.txt
+            Dim groupTokens As New SortedList(Of String, String)
+            For Each className As String In vbClasses.Keys
+                Dim parts() As String = className.Split("_"c)
+                If parts.Length > 0 AndAlso Not String.IsNullOrEmpty(parts(0)) Then
+                    If Not groupTokens.ContainsKey(parts(0)) Then
+                        groupTokens.Add(parts(0), parts(0))
+                    End If
+                End If
+            Next
+
+            Dim groupButtonsPath As String = Path.Combine(dataPath, "GroupButtonList.txt")
+            Dim groupSb As New System.Text.StringBuilder()
+            For Each token As String In groupTokens.Keys
+                groupSb.AppendLine(token)
+            Next
+            File.WriteAllText(groupButtonsPath, groupSb.ToString())
+
+
+            Console.WriteLine()
+            Console.WriteLine()
+            Console.WriteLine($"Found {vbClasses.Count} classes that inherit from TaskParent:")
+            Console.WriteLine($"Found {xoClasses.Count} XO_ classes that inherit from TaskParent:")
+            Console.WriteLine($"Total source lines read: {totalLinesRead}")
+            Console.WriteLine($"Reference algorithm count: {xoClasses.Count}")
+            Console.WriteLine($"Average lines per algorithm: " + (totalLinesRead \ (vbClasses.Count + xoClasses.Count)).ToString())
+            Console.WriteLine($"Algorithm groups: {groupTokens.Count}")
+            Console.WriteLine()
+            Console.WriteLine()
         End Using
     End Sub
 

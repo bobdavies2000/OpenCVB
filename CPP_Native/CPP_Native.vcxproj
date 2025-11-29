@@ -133,7 +133,8 @@
       <AssemblyDebug>false</AssemblyDebug>
     </Link>
     <PreBuildEvent>
-      <Command>$(SolutionDir)UI_Generator\bin\x64\Release\net8.0\UI_Generator.exe</Command>
+      <Command>
+      </Command>
       <Message>
       </Message>
     </PreBuildEvent>

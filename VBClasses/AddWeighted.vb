@@ -21,7 +21,6 @@ End Class
 
 
 
-
 Public Class AddWeighted_Basics : Inherits TaskParent
     Public src2 As cv.Mat  ' user normally provides src2! 
     Public options As New Options_AddWeighted
