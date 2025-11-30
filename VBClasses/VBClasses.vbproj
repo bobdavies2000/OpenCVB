@@ -46,7 +46,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="&quot;$(SolutionDir)UI_Generator\bin\x64\Debug\net10.0\UI_Generator.exe&quot;" />
+    <Exec Command="&quot;$(SolutionDir)UI_Generator\bin\x64\Release\net10.0\UI_Generator.exe&quot;" />
   </Target>
 
 </Project>

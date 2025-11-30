@@ -678,7 +678,7 @@ Namespace OpenCVB
             ' skip testing the XO_ algorithms (XO.vb)  They are obsolete.
             If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
 
-            TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
+            TestAllTimer.Interval = optionsForm.setDuration * 1000
             Static startingAlgorithm = AvailableAlgorithms.Text
             If AvailableAlgorithms.Text = startingAlgorithm And AlgorithmTestAllCount > 1 Then
                 ' ignore switching cameras for now.  Only introduces complexity without any benefit.

@@ -33,11 +33,6 @@ Partial Class Options
         Snap320 = New RadioButton()
         Snap640 = New RadioButton()
         GroupBox1 = New GroupBox()
-        Label7 = New Label()
-        TestAllDuration = New NumericUpDown()
-        Label6 = New Label()
-        Label5 = New Label()
-        UpdateXRef = New Button()
         Label4 = New Label()
         Button1 = New Button()
         showBatchConsole = New CheckBox()
@@ -46,13 +41,12 @@ Partial Class Options
         Resolutions = New FlowLayoutPanel()
         DisplayResolution.SuspendLayout()
         GroupBox1.SuspendLayout()
-        CType(TestAllDuration, ComponentModel.ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' OKButton
         ' 
         OKButton.Location = New Point(1016, 22)
-        OKButton.Margin = New Padding(4, 4, 4, 4)
+        OKButton.Margin = New Padding(4)
         OKButton.Name = "OKButton"
         OKButton.Size = New Size(164, 49)
         OKButton.TabIndex = 0
@@ -62,7 +56,7 @@ Partial Class Options
         ' Cancel_Button
         ' 
         Cancel_Button.Location = New Point(1016, 78)
-        Cancel_Button.Margin = New Padding(4, 4, 4, 4)
+        Cancel_Button.Margin = New Padding(4)
         Cancel_Button.Name = "Cancel_Button"
         Cancel_Button.Size = New Size(164, 49)
         Cancel_Button.TabIndex = 1
@@ -78,9 +72,9 @@ Partial Class Options
         DisplayResolution.Controls.Add(Snap320)
         DisplayResolution.Controls.Add(Snap640)
         DisplayResolution.Location = New Point(14, 526)
-        DisplayResolution.Margin = New Padding(4, 4, 4, 4)
+        DisplayResolution.Margin = New Padding(4)
         DisplayResolution.Name = "DisplayResolution"
-        DisplayResolution.Padding = New Padding(4, 4, 4, 4)
+        DisplayResolution.Padding = New Padding(4)
         DisplayResolution.Size = New Size(1178, 128)
         DisplayResolution.TabIndex = 4
         DisplayResolution.TabStop = False
@@ -124,7 +118,7 @@ Partial Class Options
         SnapCustom.AutoSize = True
         SnapCustom.Font = New Font("Segoe UI", 8F)
         SnapCustom.Location = New Point(749, 37)
-        SnapCustom.Margin = New Padding(4, 4, 4, 4)
+        SnapCustom.Margin = New Padding(4)
         SnapCustom.Name = "SnapCustom"
         SnapCustom.Size = New Size(273, 25)
         SnapCustom.TabIndex = 2
@@ -137,7 +131,7 @@ Partial Class Options
         Snap320.AutoSize = True
         Snap320.Font = New Font("Segoe UI", 8F)
         Snap320.Location = New Point(401, 37)
-        Snap320.Margin = New Padding(4, 4, 4, 4)
+        Snap320.Margin = New Padding(4)
         Snap320.Name = "Snap320"
         Snap320.Size = New Size(241, 25)
         Snap320.TabIndex = 1
@@ -150,7 +144,7 @@ Partial Class Options
         Snap640.AutoSize = True
         Snap640.Font = New Font("Segoe UI", 8F)
         Snap640.Location = New Point(17, 37)
-        Snap640.Margin = New Padding(4, 4, 4, 4)
+        Snap640.Margin = New Padding(4)
         Snap640.Name = "Snap640"
         Snap640.Size = New Size(250, 25)
         Snap640.TabIndex = 0
@@ -160,74 +154,17 @@ Partial Class Options
         ' 
         ' GroupBox1
         ' 
-        GroupBox1.Controls.Add(Label7)
-        GroupBox1.Controls.Add(TestAllDuration)
-        GroupBox1.Controls.Add(Label6)
-        GroupBox1.Controls.Add(Label5)
-        GroupBox1.Controls.Add(UpdateXRef)
         GroupBox1.Controls.Add(Label4)
         GroupBox1.Controls.Add(Button1)
         GroupBox1.Controls.Add(showBatchConsole)
         GroupBox1.Location = New Point(14, 661)
-        GroupBox1.Margin = New Padding(4, 4, 4, 4)
+        GroupBox1.Margin = New Padding(4)
         GroupBox1.Name = "GroupBox1"
-        GroupBox1.Padding = New Padding(4, 4, 4, 4)
+        GroupBox1.Padding = New Padding(4)
         GroupBox1.Size = New Size(1172, 164)
         GroupBox1.TabIndex = 5
         GroupBox1.TabStop = False
         GroupBox1.Text = "Other Global Settings"
-        ' 
-        ' Label7
-        ' 
-        Label7.AutoSize = True
-        Label7.Location = New Point(936, 109)
-        Label7.Margin = New Padding(4, 0, 4, 0)
-        Label7.Name = "Label7"
-        Label7.Size = New Size(849, 30)
-        Label7.TabIndex = 7
-        Label7.Text = "Duration in seconds of each test when running ""Test All"" (there is a 5 second minimum)"
-        Label7.Visible = False
-        ' 
-        ' TestAllDuration
-        ' 
-        TestAllDuration.Location = New Point(834, 106)
-        TestAllDuration.Margin = New Padding(4, 4, 4, 4)
-        TestAllDuration.Minimum = New Decimal(New Integer() {5, 0, 0, 0})
-        TestAllDuration.Name = "TestAllDuration"
-        TestAllDuration.Size = New Size(91, 37)
-        TestAllDuration.TabIndex = 6
-        TestAllDuration.Value = New Decimal(New Integer() {5, 0, 0, 0})
-        TestAllDuration.Visible = False
-        ' 
-        ' Label6
-        ' 
-        Label6.AutoSize = True
-        Label6.Location = New Point(834, 71)
-        Label6.Margin = New Padding(4, 0, 4, 0)
-        Label6.Name = "Label6"
-        Label6.Size = New Size(258, 30)
-        Label6.TabIndex = 5
-        Label6.Text = "is only updated manually."
-        ' 
-        ' Label5
-        ' 
-        Label5.AutoSize = True
-        Label5.Location = New Point(832, 41)
-        Label5.Margin = New Padding(4, 0, 4, 0)
-        Label5.Name = "Label5"
-        Label5.Size = New Size(331, 30)
-        Label5.TabIndex = 4
-        Label5.Text = "The algorithm cross-reference is "
-        ' 
-        ' UpdateXRef
-        ' 
-        UpdateXRef.Location = New Point(490, 41)
-        UpdateXRef.Margin = New Padding(4, 4, 4, 4)
-        UpdateXRef.Name = "UpdateXRef"
-        UpdateXRef.Size = New Size(332, 42)
-        UpdateXRef.TabIndex = 3
-        UpdateXRef.Text = "Update the Algorithm XRef"
-        UpdateXRef.UseVisualStyleBackColor = True
         ' 
         ' Label4
         ' 
@@ -242,7 +179,7 @@ Partial Class Options
         ' Button1
         ' 
         Button1.Location = New Point(7, 108)
-        Button1.Margin = New Padding(4, 4, 4, 4)
+        Button1.Margin = New Padding(4)
         Button1.Name = "Button1"
         Button1.Size = New Size(62, 40)
         Button1.TabIndex = 1
@@ -253,7 +190,7 @@ Partial Class Options
         ' 
         showBatchConsole.AutoSize = True
         showBatchConsole.Location = New Point(14, 48)
-        showBatchConsole.Margin = New Padding(4, 4, 4, 4)
+        showBatchConsole.Margin = New Padding(4)
         showBatchConsole.Name = "showBatchConsole"
         showBatchConsole.Size = New Size(436, 34)
         showBatchConsole.TabIndex = 0
@@ -264,7 +201,7 @@ Partial Class Options
         ' 
         CameraGroup.FlowDirection = FlowDirection.TopDown
         CameraGroup.Location = New Point(16, 30)
-        CameraGroup.Margin = New Padding(4, 4, 4, 4)
+        CameraGroup.Margin = New Padding(4)
         CameraGroup.Name = "CameraGroup"
         CameraGroup.Size = New Size(992, 191)
         CameraGroup.TabIndex = 6
@@ -272,7 +209,7 @@ Partial Class Options
         ' Resolutions
         ' 
         Resolutions.Location = New Point(14, 228)
-        Resolutions.Margin = New Padding(4, 4, 4, 4)
+        Resolutions.Margin = New Padding(4)
         Resolutions.Name = "Resolutions"
         Resolutions.Size = New Size(994, 290)
         Resolutions.TabIndex = 7
@@ -289,14 +226,13 @@ Partial Class Options
         Controls.Add(Cancel_Button)
         Controls.Add(OKButton)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
-        Margin = New Padding(4, 4, 4, 4)
+        Margin = New Padding(4)
         Name = "Options"
         Text = "OpenCVB Global Settings"
         DisplayResolution.ResumeLayout(False)
         DisplayResolution.PerformLayout()
         GroupBox1.ResumeLayout(False)
         GroupBox1.PerformLayout()
-        CType(TestAllDuration, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
     End Sub
 
@@ -313,11 +249,6 @@ Partial Class Options
     Friend WithEvents showBatchConsole As CheckBox
     Friend WithEvents Button1 As Button
     Friend WithEvents Label4 As Label
-    Friend WithEvents UpdateXRef As Button
-    Friend WithEvents Label6 As Label
-    Friend WithEvents Label5 As Label
-    Friend WithEvents TestAllDuration As NumericUpDown
-    Friend WithEvents Label7 As Label
     Friend WithEvents FontDialog1 As FontDialog
     Friend WithEvents CameraGroup As FlowLayoutPanel
     Friend WithEvents Resolutions As FlowLayoutPanel
