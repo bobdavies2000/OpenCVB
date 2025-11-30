@@ -33,7 +33,6 @@
             RecentList = New ToolStripDropDownButton()
             AvailableAlgorithms = New ToolStripComboBox()
             AtoZButton = New ToolStripButton()
-            GroupComboBox = New ToolStripComboBox()
             AlgDescription = New ToolStripLabel()
             XYLoc = New Label()
             CameraSwitching = New Label()
@@ -54,10 +53,10 @@
             ' ToolStrip1
             ' 
             ToolStrip1.ImageScalingSize = New Size(24, 24)
-            ToolStrip1.Items.AddRange(New ToolStripItem() {PausePlayButton, OptionsButton, TestAllButton, Magnify, PixelViewerButton, RecentList, AvailableAlgorithms, AtoZButton, GroupComboBox, AlgDescription})
+            ToolStrip1.Items.AddRange(New ToolStripItem() {PausePlayButton, OptionsButton, TestAllButton, Magnify, PixelViewerButton, RecentList, AvailableAlgorithms, AtoZButton, AlgDescription})
             ToolStrip1.Location = New Point(0, 0)
             ToolStrip1.Name = "ToolStrip1"
-            ToolStrip1.Size = New Size(1898, 39)
+            ToolStrip1.Size = New Size(1107, 31)
             ToolStrip1.TabIndex = 0
             ToolStrip1.Text = "ToolStrip1"
             ' 
@@ -67,7 +66,7 @@
             PausePlayButton.Image = My.Resources.Resources.PauseButtonRun
             PausePlayButton.ImageTransparentColor = Color.Magenta
             PausePlayButton.Name = "PausePlayButton"
-            PausePlayButton.Size = New Size(34, 34)
+            PausePlayButton.Size = New Size(28, 28)
             PausePlayButton.Text = "Run Pause Button"
             ' 
             ' OptionsButton
@@ -76,7 +75,7 @@
             OptionsButton.Image = My.Resources.Resources.settings
             OptionsButton.ImageTransparentColor = Color.Magenta
             OptionsButton.Name = "OptionsButton"
-            OptionsButton.Size = New Size(34, 34)
+            OptionsButton.Size = New Size(28, 28)
             OptionsButton.Text = "OpenCVB Settings"
             ' 
             ' TestAllButton
@@ -85,7 +84,7 @@
             TestAllButton.Image = My.Resources.Resources.testall
             TestAllButton.ImageTransparentColor = Color.Magenta
             TestAllButton.Name = "TestAllButton"
-            TestAllButton.Size = New Size(34, 34)
+            TestAllButton.Size = New Size(28, 28)
             TestAllButton.Text = "Test All (overnight testing)"
             ' 
             ' Magnify
@@ -94,7 +93,7 @@
             Magnify.Image = My.Resources.Resources.magnify
             Magnify.ImageTransparentColor = Color.Magenta
             Magnify.Name = "Magnify"
-            Magnify.Size = New Size(34, 34)
+            Magnify.Size = New Size(28, 28)
             Magnify.Text = "Magnify selected rectangle"
             ' 
             ' PixelViewerButton
@@ -103,7 +102,7 @@
             PixelViewerButton.Image = My.Resources.Resources.PixelViewer
             PixelViewerButton.ImageTransparentColor = Color.Magenta
             PixelViewerButton.Name = "PixelViewerButton"
-            PixelViewerButton.Size = New Size(34, 34)
+            PixelViewerButton.Size = New Size(28, 28)
             PixelViewerButton.Text = "Display pixels as text"
             ' 
             ' RecentList
@@ -111,42 +110,37 @@
             RecentList.DisplayStyle = ToolStripItemDisplayStyle.Text
             RecentList.ImageTransparentColor = Color.Magenta
             RecentList.Name = "RecentList"
-            RecentList.Size = New Size(96, 34)
+            RecentList.Size = New Size(56, 28)
             RecentList.Text = "Recent"
             RecentList.ToolTipText = " "
             ' 
             ' AvailableAlgorithms
             ' 
             AvailableAlgorithms.Name = "AvailableAlgorithms"
-            AvailableAlgorithms.Size = New Size(359, 39)
+            AvailableAlgorithms.Size = New Size(211, 31)
             ' 
             ' AtoZButton
             ' 
             AtoZButton.DisplayStyle = ToolStripItemDisplayStyle.Text
             AtoZButton.ImageTransparentColor = Color.Magenta
             AtoZButton.Name = "AtoZButton"
-            AtoZButton.Size = New Size(53, 34)
+            AtoZButton.Size = New Size(31, 28)
             AtoZButton.Text = "A-Z"
             AtoZButton.ToolTipText = "Select an algorithm group"
-            ' 
-            ' GroupComboBox
-            ' 
-            GroupComboBox.Name = "GroupComboBox"
-            GroupComboBox.Size = New Size(239, 39)
             ' 
             ' AlgDescription
             ' 
             AlgDescription.Name = "AlgDescription"
-            AlgDescription.Size = New Size(122, 34)
+            AlgDescription.Size = New Size(67, 28)
             AlgDescription.Text = "Description"
             ' 
             ' XYLoc
             ' 
             XYLoc.AutoSize = True
-            XYLoc.Location = New Point(6, 862)
-            XYLoc.Margin = New Padding(4, 0, 4, 0)
+            XYLoc.Location = New Point(4, 431)
+            XYLoc.Margin = New Padding(2, 0, 2, 0)
             XYLoc.Name = "XYLoc"
-            XYLoc.Size = New Size(71, 30)
+            XYLoc.Size = New Size(40, 15)
             XYLoc.TabIndex = 1
             XYLoc.Text = "XYLoc"
             XYLoc.Visible = False
@@ -155,20 +149,20 @@
             ' 
             CameraSwitching.AutoSize = True
             CameraSwitching.Font = New Font("Microsoft Sans Serif", 12F)
-            CameraSwitching.Location = New Point(40, 160)
-            CameraSwitching.Margin = New Padding(4, 0, 4, 0)
+            CameraSwitching.Location = New Point(23, 80)
+            CameraSwitching.Margin = New Padding(2, 0, 2, 0)
             CameraSwitching.Name = "CameraSwitching"
-            CameraSwitching.Size = New Size(202, 29)
+            CameraSwitching.Size = New Size(133, 20)
             CameraSwitching.TabIndex = 2
             CameraSwitching.Text = "CameraSwitching"
             ' 
             ' CamSwitchProgress
             ' 
             CamSwitchProgress.BackColor = SystemColors.MenuHighlight
-            CamSwitchProgress.Location = New Point(40, 198)
-            CamSwitchProgress.Margin = New Padding(4, 4, 4, 4)
+            CamSwitchProgress.Location = New Point(23, 99)
+            CamSwitchProgress.Margin = New Padding(2)
             CamSwitchProgress.Name = "CamSwitchProgress"
-            CamSwitchProgress.Size = New Size(242, 32)
+            CamSwitchProgress.Size = New Size(141, 16)
             CamSwitchProgress.TabIndex = 3
             CamSwitchProgress.TabStop = False
             ' 
@@ -188,28 +182,28 @@
             ' GLControl
             ' 
             GLControl.DrawFPS = False
-            GLControl.Location = New Point(510, 218)
-            GLControl.Margin = New Padding(6, 7, 6, 7)
+            GLControl.Location = New Point(298, 109)
+            GLControl.Margin = New Padding(4)
             GLControl.Name = "GLControl"
             GLControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1
             GLControl.RenderContextType = SharpGL.RenderContextType.DIBSection
             GLControl.RenderTrigger = SharpGL.RenderTrigger.TimerBased
-            GLControl.Size = New Size(960, 440)
+            GLControl.Size = New Size(560, 220)
             GLControl.TabIndex = 4
             GLControl.Visible = False
             ' 
             ' MainUI
             ' 
-            AutoScaleDimensions = New SizeF(12F, 30F)
+            AutoScaleDimensions = New SizeF(7F, 15F)
             AutoScaleMode = AutoScaleMode.Font
-            ClientSize = New Size(1898, 898)
+            ClientSize = New Size(1107, 449)
             Controls.Add(GLControl)
             Controls.Add(CamSwitchProgress)
             Controls.Add(CameraSwitching)
             Controls.Add(XYLoc)
             Controls.Add(ToolStrip1)
             Icon = CType(resources.GetObject("$this.Icon"), Icon)
-            Margin = New Padding(4, 4, 4, 4)
+            Margin = New Padding(2)
             Name = "MainUI"
             Text = "OpenCVB Main Form"
             ToolStrip1.ResumeLayout(False)
@@ -228,7 +222,6 @@
         Friend WithEvents PixelViewerButton As ToolStripButton
         Friend WithEvents AvailableAlgorithms As ToolStripComboBox
         Friend WithEvents AtoZButton As ToolStripButton
-        Friend WithEvents GroupComboBox As ToolStripComboBox
         Friend WithEvents AlgDescription As ToolStripLabel
         Friend WithEvents XYLoc As Label
         Friend WithEvents CameraSwitching As Label

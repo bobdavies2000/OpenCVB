@@ -166,32 +166,11 @@ Namespace OpenCVB
 
             setupCamPics()
             loadAlgorithmComboBoxes()
-            GroupComboBox.Text = settings.groupComboText
 
             camSwitchAnnouncement()
             If settings.cameraFound Then initCamera()
 
-            If GroupComboBox.SelectedItem() Is Nothing Then
-                Dim group = GroupComboBox.Text
-                If InStr(group, ") ") Then
-                    Dim offset = InStr(group, ") ")
-                    group = group.Substring(offset + 2)
-                End If
-                For i = 0 To GroupComboBox.Items.Count - 1
-                    If GroupComboBox.Items(i).contains(group) Then
-                        GroupComboBox.SelectedItem() = GroupComboBox.Items(i)
-                        settings.groupComboText = GroupComboBox.Text
-                        Exit For
-                    End If
-                Next
-            End If
-
-            If AvailableAlgorithms.Items.Count = 0 Then
-                MessageBox.Show("There were no algorithms listed for the " + GroupComboBox.Text + vbCrLf +
-                           "This usually indicates something has changed with " + vbCrLf + "UIGenerator")
-            Else
-                If settings.algorithm = "" Then settings.algorithm = AvailableAlgorithms.Text
-            End If
+            If settings.algorithm = "" Then settings.algorithm = AvailableAlgorithms.Text
 
             AvailableAlgorithms.ComboBox.Select()
 
@@ -548,7 +527,6 @@ Namespace OpenCVB
 
             XYLoc.Location = New Point(camPic(2).Left, camPic(2).Top + camPic(2).Height)
             AlgDescription.Visible = settings.snap640
-            GroupComboBox.Visible = settings.snap640
             If settings.snap320 Then Me.Width = 720 ' expose the list of available algorithms.
         End Sub
         Private Sub Magnify_Click(sender As Object, e As EventArgs) Handles Magnify.Click
@@ -777,45 +755,6 @@ Namespace OpenCVB
                 updateAlgorithmHistory()
             End If
         End Sub
-        Private Sub groupName_SelectedIndexChanged(sender As Object, e As EventArgs) Handles GroupComboBox.SelectedIndexChanged
-            If GroupComboBox.Text = "" Then
-                Dim incr = 1
-                If upArrow Then incr = -1
-                upArrow = False
-                downArrow = False
-                GroupComboBox.Text = GroupComboBox.Items(GroupComboBox.SelectedIndex + incr)
-                Exit Sub
-            End If
-
-            AvailableAlgorithms.Enabled = False
-            Dim keyIndex = GroupComboBox.Items.IndexOf(GroupComboBox.Text)
-            Dim groupings = groupList(keyIndex)
-            Dim split = Regex.Split(groupings, ",")
-            AvailableAlgorithms.Items.Clear()
-            Dim lastSplit As String = ""
-            For i = 1 To split.Length - 1
-                If split(i).StartsWith("Options_") Then Continue For
-                If split(i).StartsWith("CPP_Basics") Then Continue For
-                Dim namesplit = split(i).Split("_")
-                If lastSplit <> namesplit(0) And lastSplit <> "" Then
-                    AvailableAlgorithms.Items.Add(" ")
-                End If
-                AvailableAlgorithms.Items.Add(split(i))
-                lastSplit = namesplit(0)
-            Next
-            AvailableAlgorithms.Enabled = True
-
-            If GroupComboBox.Text.Contains("All") = False Then algHistory.Clear()
-
-            ' if the fpstimer is enabled, then OpenCVB is running - not initializing.
-            If fpsTimer.Enabled Then
-                If AvailableAlgorithms.Items.Contains(settings.algorithm) Then
-                    AvailableAlgorithms.Text = settings.algorithm
-                Else
-                    AvailableAlgorithms.SelectedIndex = 0
-                End If
-            End If
-        End Sub
         Private Sub loadAlgorithmComboBoxes()
             Dim countFileInfo = New FileInfo(HomeDir.FullName + "Data/AlgorithmCounts.txt")
             If countFileInfo.Exists = False Then
@@ -832,22 +771,24 @@ Namespace OpenCVB
             Dim algorithmCount = Split(1)
             sr.Close()
 
+            Dim algList = New FileInfo(HomeDir.FullName + "Data/AvailableAlgorithms.txt")
+            sr = New StreamReader(algList.FullName)
+            Dim lastGroup As String = "AddWeighted"
+            While (1)
+                Dim nextLine = sr.ReadLine
+                Dim splitLine = Regex.Split(nextLine, "_")
+                If splitLine(0) <> lastGroup Then
+                    lastGroup = splitLine(0)
+                    AvailableAlgorithms.Items.Add("") ' add a blank line between groups.
+                End If
+                AvailableAlgorithms.Items.Add(nextLine)
+                If sr.EndOfStream Then Exit While
+            End While
+            sr.Close()
+
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " +
                        CStr(algorithmCount) + " algorithms = " +
                        CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + settings.cameraName
-            Dim groupFileInfo = New FileInfo(HomeDir.FullName + "Data/GroupComboBox.txt")
-            If groupFileInfo.Exists = False Then
-                MessageBox.Show("The groupFileInfo.txt file is missing.  Run 'UI_Generator' or Clean/Rebuild to get the user interface.")
-            End If
-            sr = New StreamReader(groupFileInfo.FullName)
-            GroupComboBox.Items.Clear()
-            While sr.EndOfStream = False
-                infoLine = sr.ReadLine
-                Split = infoLine.Split(",")
-                groupList.Add(infoLine)
-                GroupComboBox.Items.Add(Split(0))
-            End While
-            sr.Close()
         End Sub
 
         Private Sub AtoZButton_Click(sender As Object, e As EventArgs) Handles AtoZButton.Click

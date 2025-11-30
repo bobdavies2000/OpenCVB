@@ -103,6 +103,12 @@ Module Program
             Next
             File.WriteAllText(groupButtonsPath, groupSb.ToString())
 
+            Dim AvailableAlgorithmsPath As String = Path.Combine(dataPath, "AvailableAlgorithms.txt")
+            Dim algList As New System.Text.StringBuilder()
+            For Each token As String In vbClasses.Keys
+                algList.AppendLine(token)
+            Next
+            File.WriteAllText(AvailableAlgorithmsPath, algList.ToString())
 
             Console.WriteLine()
             Console.WriteLine()

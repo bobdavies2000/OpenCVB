@@ -214,7 +214,6 @@ Namespace jsonClass
         Public Sub write()
             If OpenCVB.MainUI.TestAllButton.Text <> "Stop Test" Then ' don't save the algorithm name and group if "Test All" is running.
                 OpenCVB.MainUI.settings.algorithm = OpenCVB.MainUI.AvailableAlgorithms.Text
-                OpenCVB.MainUI.settings.groupComboText = OpenCVB.MainUI.GroupComboBox.Text
             End If
 
             If OpenCVB.MainUI.AvailableAlgorithms IsNot Nothing Then
