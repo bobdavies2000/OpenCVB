@@ -769,6 +769,11 @@ Namespace OpenCVB
             infoLine = sr.ReadLine
             Split = Regex.Split(infoLine, "\W+")
             Dim algorithmCount = Split(1)
+
+            infoLine = sr.ReadLine
+            infoLine = sr.ReadLine
+            Split = Regex.Split(infoLine, "\W+")
+            Dim linesPerAlgorithm = Split(Split.Length - 1)  ' after subtracting out the obsolete algorithms (XO_)
             sr.Close()
 
             Dim algList = New FileInfo(HomeDir.FullName + "Data/AvailableAlgorithms.txt")
@@ -788,7 +793,7 @@ Namespace OpenCVB
 
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " +
                        CStr(algorithmCount) + " algorithms = " +
-                       CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + settings.cameraName
+                       CStr(CInt(linesPerAlgorithm)) + " lines each (avg) - " + settings.cameraName
         End Sub
 
         Private Sub AtoZButton_Click(sender As Object, e As EventArgs) Handles AtoZButton.Click
