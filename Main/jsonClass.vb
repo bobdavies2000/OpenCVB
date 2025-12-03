@@ -1,7 +1,6 @@
 ﻿Imports System.IO
 Imports System.Management
 Imports Newtonsoft.Json
-Imports VBClasses
 Imports cv = OpenCvSharp
 
 Namespace jsonClass

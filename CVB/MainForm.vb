@@ -2,12 +2,14 @@ Imports System.Windows.Forms
 Imports System.Drawing
 Imports System.Drawing.Drawing2D
 Imports System.IO
+Imports cv = OpenCvSharp
+Imports cvext = OpenCvSharp.Extensions
 
 Namespace CVB
     Public Class MainForm : Inherits Form
         Dim isPlaying As Boolean = False
         Dim projectFilePath As String = ""
-        Dim settingsIO As CVBSettingsIO
+        Public settingsIO As CVBSettingsIO
         Dim settings As CVBSettings
         Dim lastClickPoint As Point = Point.Empty
         Const MAX_RECENT = 50
@@ -64,9 +66,11 @@ Namespace CVB
             PausePlayButton.Image = If(isPlaying, New Bitmap(CurDir() + "/Data/PauseButton.png"),
                                                   New Bitmap(CurDir() + "/Data/Run.png"))
         End Sub
-        Private Sub SettingsToolStripButton_Click(sender As Object, e As EventArgs) Handles SettingsToolStripButton.Click
-            MessageBox.Show("Settings button clicked!", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            AlgDescription.Visible = True
+        Private Sub SettingsToolStripButton_Click(sender As Object, e As EventArgs) Handles Options.Click
+            Dim optionsForm As New Options()
+            ' Note: Options form may need to be adapted for CVB settings
+            ' For now, just show it
+            optionsForm.ShowDialog()
         End Sub
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             ' Set the current directory to the project path (where .vbproj file is located)

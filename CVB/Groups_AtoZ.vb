@@ -1,5 +1,5 @@
 ﻿Imports System.IO
-
+Imports cv = OpenCvSharp
 Namespace CVB
     Public Class Groups_AtoZ
         Public homeDir As DirectoryInfo

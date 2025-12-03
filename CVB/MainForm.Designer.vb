@@ -26,7 +26,7 @@ Namespace CVB
             Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainForm))
             MainToolStrip = New ToolStrip()
             PausePlayButton = New ToolStripButton()
-            SettingsToolStripButton = New ToolStripButton()
+            Options = New ToolStripButton()
             TestAllButton = New ToolStripButton()
             Magnifier = New ToolStripButton()
             ToolStripSeparator1 = New ToolStripSeparator()
@@ -45,7 +45,7 @@ Namespace CVB
             ' MainToolStrip
             ' 
             MainToolStrip.ImageScalingSize = New Size(24, 24)
-            MainToolStrip.Items.AddRange(New ToolStripItem() {PausePlayButton, SettingsToolStripButton, TestAllButton, Magnifier, ToolStripSeparator1, PixelViewer, RecentList, AvailableAlgorithms, AtoZ, ToolStripSeparator2, AlgDescription})
+            MainToolStrip.Items.AddRange(New ToolStripItem() {PausePlayButton, Options, TestAllButton, Magnifier, ToolStripSeparator1, PixelViewer, RecentList, AvailableAlgorithms, AtoZ, ToolStripSeparator2, AlgDescription})
             MainToolStrip.Location = New Point(0, 0)
             MainToolStrip.Name = "MainToolStrip"
             MainToolStrip.Padding = New Padding(0, 0, 3, 0)
@@ -63,15 +63,15 @@ Namespace CVB
             PausePlayButton.Text = "Pause/Play"
             PausePlayButton.ToolTipText = "Play/Pause"
             ' 
-            ' SettingsToolStripButton
+            ' Options
             ' 
-            SettingsToolStripButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-            SettingsToolStripButton.Image = CType(resources.GetObject("SettingsToolStripButton.Image"), Image)
-            SettingsToolStripButton.ImageTransparentColor = Color.Magenta
-            SettingsToolStripButton.Name = "SettingsToolStripButton"
-            SettingsToolStripButton.Size = New Size(34, 34)
-            SettingsToolStripButton.Text = "Settings"
-            SettingsToolStripButton.ToolTipText = "Open Settings"
+            Options.DisplayStyle = ToolStripItemDisplayStyle.Image
+            Options.Image = CType(resources.GetObject("Options.Image"), Image)
+            Options.ImageTransparentColor = Color.Magenta
+            Options.Name = "Options"
+            Options.Size = New Size(34, 34)
+            Options.Text = "Settings"
+            Options.ToolTipText = "Open OpenCVB Settings"
             ' 
             ' TestAllButton
             ' 
@@ -111,7 +111,7 @@ Namespace CVB
             RecentList.Name = "RecentList"
             RecentList.Size = New Size(96, 34)
             RecentList.Text = "Recent"
-            RecentList.ToolTipText = "Copy selected text"
+            RecentList.ToolTipText = "List of Recent Algorithms"
             ' 
             ' AvailableAlgorithms
             ' 
@@ -120,7 +120,6 @@ Namespace CVB
             AvailableAlgorithms.Name = "AvailableAlgorithms"
             AvailableAlgorithms.Size = New Size(350, 39)
             AvailableAlgorithms.Text = "Available Algorithms"
-            AvailableAlgorithms.ToolTipText = "Available Algorithms"
             ' 
             ' AtoZ
             ' 
@@ -130,6 +129,7 @@ Namespace CVB
             AtoZ.Name = "AtoZ"
             AtoZ.Size = New Size(53, 34)
             AtoZ.Text = "A-Z"
+            AtoZ.ToolTipText = "Show all the Algorithm Groups"
             ' 
             ' ToolStripSeparator2
             ' 
@@ -167,12 +167,11 @@ Namespace CVB
             StatusLabel.Name = "StatusLabel"
             StatusLabel.Size = New Size(1867, 30)
             StatusLabel.TabIndex = 2
-            StatusLabel.Text = ""
             StatusLabel.TextAlign = ContentAlignment.MiddleLeft
             ' 
             ' MainForm
             ' 
-            AutoScaleDimensions = New SizeF(12F, 30F)
+            AutoScaleDimensions = New SizeF(12.0F, 30.0F)
             AutoScaleMode = AutoScaleMode.Font
             ClientSize = New Size(1867, 1164)
             Controls.Add(StatusLabel)
@@ -196,7 +195,7 @@ Namespace CVB
         Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
         Friend WithEvents PixelViewer As ToolStripButton
         Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
-        Friend WithEvents SettingsToolStripButton As ToolStripButton
+        Friend WithEvents Options As ToolStripButton
         Friend WithEvents RecentList As ToolStripDropDownButton
         Friend WithEvents AvailableAlgorithms As ToolStripComboBox
         Friend WithEvents AtoZ As ToolStripButton
