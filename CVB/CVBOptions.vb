@@ -83,10 +83,8 @@ Public Class CVBOptions
         If radioButtonsPresent = False Then
             radioButtonsPresent = True
             For i = 0 To cameraRadioButton.Count - 1
-                'cameraRadioButton(i) = New RadioButton With {.Visible = True, .AutoSize = True,
-                '                       .Enabled = settings.cameraPresent(i), .Text = cameraNames(i)}
                 cameraRadioButton(i) = New RadioButton With {.Visible = True, .AutoSize = True,
-                                       .Enabled = False, .Text = cameraNames(i)}
+                                       .Enabled = settings.cameraPresent(i), .Text = cameraNames(i)}
                 CameraGroup.Controls.Add(cameraRadioButton(i))
                 AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
             Next

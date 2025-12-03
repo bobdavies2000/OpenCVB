@@ -50,13 +50,13 @@ Namespace CVB
             Dim settings As New CVBSettings()
             Dim fileInfo As New FileInfo(jsonFileName)
             Dim homeDir = fileInfo.DirectoryName + "/../"
-            initialize(settings, homeDir)
             If fileInfo.Exists Then
                 Try
                     Using streamReader As New StreamReader(jsonFileName)
                         Dim json = streamReader.ReadToEnd()
                         If json <> "" Then
-                            Return JsonConvert.DeserializeObject(Of CVBSettings)(json)
+                            settings = JsonConvert.DeserializeObject(Of CVBSettings)(json)
+                            settings = initialize(settings, homeDir)
                         End If
                     End Using
                 Catch ex As Exception
@@ -64,27 +64,9 @@ Namespace CVB
                 End Try
             End If
 
-            settings.testAllDuration = 5
-            Select Case settings.workRes.Width
-                Case 1920
-                    settings.testAllDuration = 40
-                Case 1280
-                    settings.testAllDuration = 35
-                Case 960
-                    settings.testAllDuration = 30
-                Case 672
-                    settings.testAllDuration = 15
-                Case 640
-                    settings.testAllDuration = 15
-                Case 480
-                    settings.testAllDuration = 10
-                Case 240, 336, 320, 168, 160
-                    settings.testAllDuration = 5
-            End Select
-            ' Return default settings if file doesn't exist or deserialization fails
             Return settings
         End Function
-        Public Sub initialize(ByRef settings As CVBSettings, homeDir As String)
+        Public Function initialize(ByRef settings As CVBSettings, homeDir As String) As CVBSettings
             settings.cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True, True})
             settings.camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True, True})
             settings.camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False, False})
@@ -92,11 +74,6 @@ Namespace CVB
 
             ' checking the list for specific missing device here...
             Dim usbList = USBenumeration()
-            Dim testlist As New List(Of String)
-            For Each usbDevice In usbList
-                If LCase(usbDevice).Contains("orb") Then testlist.Add(usbDevice) ' debugging assistance...
-            Next
-
             settings.cameraPresent = New List(Of Boolean)
             For i = 0 To cameraNames.Count - 1
                 Dim searchname = cameraNames(i)
@@ -180,7 +157,26 @@ Namespace CVB
 
             If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
             settings.desiredFPS = 60
-        End Sub
+            settings.testAllDuration = 5
+            Select Case settings.workRes.Width
+                Case 1920
+                    settings.testAllDuration = 40
+                Case 1280
+                    settings.testAllDuration = 35
+                Case 960
+                    settings.testAllDuration = 30
+                Case 672
+                    settings.testAllDuration = 15
+                Case 640
+                    settings.testAllDuration = 15
+                Case 480
+                    settings.testAllDuration = 10
+                Case 240, 336, 320, 168, 160
+                    settings.testAllDuration = 5
+            End Select
+
+            Return settings
+        End Function
         Public Function USBenumeration() As List(Of String)
             Static usblist As New List(Of String)
             Dim info As ManagementObject

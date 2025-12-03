@@ -70,8 +70,6 @@ Namespace CVB
             Dim optionsForm As New CVBOptions()
             optionsForm.settings = settings
             optionsForm.cameraNames = Common.cameraNames
-            ' Note: Options form may need to be adapted for CVB settings
-            ' For now, just show it
             optionsForm.ShowDialog()
         End Sub
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
