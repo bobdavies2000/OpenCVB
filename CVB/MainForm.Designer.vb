@@ -36,10 +36,10 @@ Namespace CVB
             AtoZ = New ToolStripButton()
             ToolStripSeparator2 = New ToolStripSeparator()
             AlgDescription = New ToolStripTextBox()
-            MainPictureBox = New PictureBox()
+            campics = New PictureBox()
             StatusLabel = New Label()
             MainToolStrip.SuspendLayout()
-            CType(MainPictureBox, ComponentModel.ISupportInitialize).BeginInit()
+            CType(campics, ComponentModel.ISupportInitialize).BeginInit()
             SuspendLayout()
             ' 
             ' MainToolStrip
@@ -145,30 +145,29 @@ Namespace CVB
             AlgDescription.Text = "Description"
             AlgDescription.ToolTipText = "Description"
             ' 
-            ' MainPictureBox
+            ' campics
             ' 
-            MainPictureBox.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-            MainPictureBox.BackColor = Color.Black
-            MainPictureBox.Location = New Point(0, 39)
-            MainPictureBox.Margin = New Padding(0)
-            MainPictureBox.Name = "MainPictureBox"
-            MainPictureBox.Size = New Size(1867, 1095)
-            MainPictureBox.SizeMode = PictureBoxSizeMode.Zoom
-            MainPictureBox.TabIndex = 1
-            MainPictureBox.TabStop = False
+            campics.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+            campics.BackColor = Color.Black
+            campics.Location = New Point(0, 39)
+            campics.Margin = New Padding(0)
+            campics.Name = "campics"
+            campics.Size = New Size(1867, 1095)
+            campics.SizeMode = PictureBoxSizeMode.Zoom
+            campics.TabIndex = 1
+            campics.TabStop = False
             ' 
             ' StatusLabel
             ' 
             StatusLabel.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-            StatusLabel.AutoSize = False
             StatusLabel.BackColor = SystemColors.Control
             StatusLabel.BorderStyle = BorderStyle.FixedSingle
-            StatusLabel.Location = New Point(0, 1134)
+            StatusLabel.Location = New Point(9, 1125)
             StatusLabel.Margin = New Padding(0)
             StatusLabel.Name = "StatusLabel"
             StatusLabel.Size = New Size(1867, 30)
             StatusLabel.TabIndex = 2
-            StatusLabel.Text = "Ready"
+            StatusLabel.Text = ""
             StatusLabel.TextAlign = ContentAlignment.MiddleLeft
             ' 
             ' MainForm
@@ -177,7 +176,7 @@ Namespace CVB
             AutoScaleMode = AutoScaleMode.Font
             ClientSize = New Size(1867, 1164)
             Controls.Add(StatusLabel)
-            Controls.Add(MainPictureBox)
+            Controls.Add(campics)
             Controls.Add(MainToolStrip)
             Icon = CType(resources.GetObject("$this.Icon"), Icon)
             Margin = New Padding(3, 4, 3, 4)
@@ -185,7 +184,7 @@ Namespace CVB
             Text = "CVB Application"
             MainToolStrip.ResumeLayout(False)
             MainToolStrip.PerformLayout()
-            CType(MainPictureBox, ComponentModel.ISupportInitialize).EndInit()
+            CType(campics, ComponentModel.ISupportInitialize).EndInit()
             ResumeLayout(False)
             PerformLayout()
         End Sub
@@ -202,7 +201,7 @@ Namespace CVB
         Friend WithEvents AvailableAlgorithms As ToolStripComboBox
         Friend WithEvents AtoZ As ToolStripButton
         Friend WithEvents AlgDescription As ToolStripTextBox
-        Friend WithEvents MainPictureBox As PictureBox
+        Friend WithEvents campics As PictureBox
         Friend WithEvents StatusLabel As Label
 
     End Class

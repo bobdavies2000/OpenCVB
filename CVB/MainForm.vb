@@ -9,6 +9,7 @@ Namespace CVB
         Dim projectFilePath As String = ""
         Dim settingsIO As CVBSettingsIO
         Dim settings As CVBSettings
+        Dim lastClickPoint As Point = Point.Empty
         Const MAX_RECENT = 50
         Dim algHistory As New List(Of String)
         Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
@@ -88,6 +89,9 @@ Namespace CVB
 
             Me.Location = New Point(settings.FormLeft, settings.FormTop)
             Me.Size = New Size(settings.FormWidth, settings.FormHeight)
+            campics.Width = Me.Width - StatusLabel.Left * 2 - 15
+            campics.Left = StatusLabel.Left
+            campics.Top += 5
         End Sub
 
         Private Sub LoadAvailableAlgorithms()
@@ -162,6 +166,23 @@ Namespace CVB
                 settings.algorithm = AvailableAlgorithms.Text
                 settingsIO.Save(settings)
             End If
+        End Sub
+
+        Private Sub MainPictureBox_MouseMove(sender As Object, e As MouseEventArgs) Handles campics.MouseMove
+            Dim X = CInt(e.X Mod (campics.Width / 2))
+            Dim Y = CInt(e.Y Mod (campics.Height / 2))
+            If lastClickPoint <> Point.Empty Then
+                StatusLabel.Text = String.Format("X: {0}, Y: {1}, Last click: ({2}, {3})",
+                                                 X, Y, lastClickPoint.X, lastClickPoint.Y)
+            Else
+                StatusLabel.Text = String.Format("X: {0}, Y: {1}", X, Y)
+            End If
+        End Sub
+
+        Private Sub campics_MouseClick(sender As Object, e As MouseEventArgs) Handles campics.MouseClick
+            lastClickPoint = New Point(e.X, e.Y)
+            StatusLabel.Text = String.Format("Last click: ({0}, {1})", lastClickPoint.X Mod (campics.Width / 2),
+                                                                       lastClickPoint.Y Mod (campics.Height / 2))
         End Sub
     End Class
 End Namespace
