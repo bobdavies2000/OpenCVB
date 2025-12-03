@@ -89,9 +89,9 @@ Namespace CVB
 
             Me.Location = New Point(settings.FormLeft, settings.FormTop)
             Me.Size = New Size(settings.FormWidth, settings.FormHeight)
-            campics.Width = Me.Width - StatusLabel.Left * 2 - 15
             campics.Left = StatusLabel.Left
-            campics.Top += 5
+            campics.Top += 10
+            MainForm_Resize(sender, e)
         End Sub
 
         Private Sub LoadAvailableAlgorithms()
@@ -149,10 +149,8 @@ Namespace CVB
         Private Sub MainForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
             AlgDescription.Size = New Size(Me.Width - 570, AlgDescription.Height)
             AlgDescription.Text = "Description of the algorithm"
-            SaveSettings()
-        End Sub
-        Private Sub MainForm_LocationChanged(sender As Object, e As EventArgs) Handles Me.LocationChanged
-            SaveSettings()
+            campics.Width = Me.Width - 28
+            campics.Height = Me.Height - 101
         End Sub
         Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             SaveSettings()
@@ -172,8 +170,9 @@ Namespace CVB
             Dim X = CInt(e.X Mod (campics.Width / 2))
             Dim Y = CInt(e.Y Mod (campics.Height / 2))
             If lastClickPoint <> Point.Empty Then
-                StatusLabel.Text = String.Format("X: {0}, Y: {1}, Last click: ({2}, {3})",
-                                                 X, Y, lastClickPoint.X, lastClickPoint.Y)
+                StatusLabel.Text = String.Format("X: {0}, Y: {1})", X, Y)
+                StatusLabel.Text += String.Format(", Last click: ({0}, {1})", CInt(lastClickPoint.X Mod (campics.Width / 2)),
+                                                                              CInt(lastClickPoint.Y Mod (campics.Height / 2)))
             Else
                 StatusLabel.Text = String.Format("X: {0}, Y: {1}", X, Y)
             End If
@@ -181,8 +180,6 @@ Namespace CVB
 
         Private Sub campics_MouseClick(sender As Object, e As MouseEventArgs) Handles campics.MouseClick
             lastClickPoint = New Point(e.X, e.Y)
-            StatusLabel.Text = String.Format("Last click: ({0}, {1})", lastClickPoint.X Mod (campics.Width / 2),
-                                                                       lastClickPoint.Y Mod (campics.Height / 2))
         End Sub
     End Class
 End Namespace
