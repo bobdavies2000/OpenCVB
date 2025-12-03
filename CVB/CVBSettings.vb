@@ -7,6 +7,7 @@ Namespace CVB
         Public FormTop As Integer = 0
         Public FormWidth As Integer = 1867
         Public FormHeight As Integer = 1134
+        Public algorithm As String
     End Class
 
     Public Class CVBSettingsIO

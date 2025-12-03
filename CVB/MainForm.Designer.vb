@@ -33,16 +33,19 @@ Namespace CVB
             PixelViewer = New ToolStripButton()
             RecentList = New ToolStripDropDownButton()
             AvailableAlgorithms = New ToolStripComboBox()
-            ToolStripButton1 = New ToolStripButton()
+            AtoZ = New ToolStripButton()
             ToolStripSeparator2 = New ToolStripSeparator()
             AlgDescription = New ToolStripTextBox()
+            MainPictureBox = New PictureBox()
+            StatusLabel = New Label()
             MainToolStrip.SuspendLayout()
+            CType(MainPictureBox, ComponentModel.ISupportInitialize).BeginInit()
             SuspendLayout()
             ' 
             ' MainToolStrip
             ' 
             MainToolStrip.ImageScalingSize = New Size(24, 24)
-            MainToolStrip.Items.AddRange(New ToolStripItem() {PausePlayButton, SettingsToolStripButton, TestAllButton, Magnifier, ToolStripSeparator1, PixelViewer, RecentList, AvailableAlgorithms, ToolStripButton1, ToolStripSeparator2, AlgDescription})
+            MainToolStrip.Items.AddRange(New ToolStripItem() {PausePlayButton, SettingsToolStripButton, TestAllButton, Magnifier, ToolStripSeparator1, PixelViewer, RecentList, AvailableAlgorithms, AtoZ, ToolStripSeparator2, AlgDescription})
             MainToolStrip.Location = New Point(0, 0)
             MainToolStrip.Name = "MainToolStrip"
             MainToolStrip.Padding = New Padding(0, 0, 3, 0)
@@ -119,14 +122,14 @@ Namespace CVB
             AvailableAlgorithms.Text = "Available Algorithms"
             AvailableAlgorithms.ToolTipText = "Available Algorithms"
             ' 
-            ' ToolStripButton1
+            ' AtoZ
             ' 
-            ToolStripButton1.DisplayStyle = ToolStripItemDisplayStyle.Text
-            ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), Image)
-            ToolStripButton1.ImageTransparentColor = Color.Magenta
-            ToolStripButton1.Name = "ToolStripButton1"
-            ToolStripButton1.Size = New Size(53, 34)
-            ToolStripButton1.Text = "A-Z"
+            AtoZ.DisplayStyle = ToolStripItemDisplayStyle.Text
+            AtoZ.Image = CType(resources.GetObject("AtoZ.Image"), Image)
+            AtoZ.ImageTransparentColor = Color.Magenta
+            AtoZ.Name = "AtoZ"
+            AtoZ.Size = New Size(53, 34)
+            AtoZ.Text = "A-Z"
             ' 
             ' ToolStripSeparator2
             ' 
@@ -142,11 +145,39 @@ Namespace CVB
             AlgDescription.Text = "Description"
             AlgDescription.ToolTipText = "Description"
             ' 
+            ' MainPictureBox
+            ' 
+            MainPictureBox.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+            MainPictureBox.BackColor = Color.Black
+            MainPictureBox.Location = New Point(0, 39)
+            MainPictureBox.Margin = New Padding(0)
+            MainPictureBox.Name = "MainPictureBox"
+            MainPictureBox.Size = New Size(1867, 1095)
+            MainPictureBox.SizeMode = PictureBoxSizeMode.Zoom
+            MainPictureBox.TabIndex = 1
+            MainPictureBox.TabStop = False
+            ' 
+            ' StatusLabel
+            ' 
+            StatusLabel.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+            StatusLabel.AutoSize = False
+            StatusLabel.BackColor = SystemColors.Control
+            StatusLabel.BorderStyle = BorderStyle.FixedSingle
+            StatusLabel.Location = New Point(0, 1134)
+            StatusLabel.Margin = New Padding(0)
+            StatusLabel.Name = "StatusLabel"
+            StatusLabel.Size = New Size(1867, 30)
+            StatusLabel.TabIndex = 2
+            StatusLabel.Text = "Ready"
+            StatusLabel.TextAlign = ContentAlignment.MiddleLeft
+            ' 
             ' MainForm
             ' 
             AutoScaleDimensions = New SizeF(12F, 30F)
             AutoScaleMode = AutoScaleMode.Font
-            ClientSize = New Size(1867, 1134)
+            ClientSize = New Size(1867, 1164)
+            Controls.Add(StatusLabel)
+            Controls.Add(MainPictureBox)
             Controls.Add(MainToolStrip)
             Icon = CType(resources.GetObject("$this.Icon"), Icon)
             Margin = New Padding(3, 4, 3, 4)
@@ -154,6 +185,7 @@ Namespace CVB
             Text = "CVB Application"
             MainToolStrip.ResumeLayout(False)
             MainToolStrip.PerformLayout()
+            CType(MainPictureBox, ComponentModel.ISupportInitialize).EndInit()
             ResumeLayout(False)
             PerformLayout()
         End Sub
@@ -168,8 +200,10 @@ Namespace CVB
         Friend WithEvents SettingsToolStripButton As ToolStripButton
         Friend WithEvents RecentList As ToolStripDropDownButton
         Friend WithEvents AvailableAlgorithms As ToolStripComboBox
-        Friend WithEvents ToolStripButton1 As ToolStripButton
+        Friend WithEvents AtoZ As ToolStripButton
         Friend WithEvents AlgDescription As ToolStripTextBox
+        Friend WithEvents MainPictureBox As PictureBox
+        Friend WithEvents StatusLabel As Label
 
     End Class
 End Namespace

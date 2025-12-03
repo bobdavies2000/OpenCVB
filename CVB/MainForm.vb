@@ -44,7 +44,7 @@ Namespace CVB
         Public Sub New(Optional projectFile As String = "")
             InitializeComponent()
             projectFilePath = projectFile
-            
+
             ' Initialize settings IO
             Dim settingsPath As String
             If Not String.IsNullOrEmpty(projectFile) AndAlso File.Exists(projectFile) Then
@@ -77,37 +77,89 @@ Namespace CVB
 
             ' Load settings and restore form position
             settings = settingsIO.Load()
-            Me.Location = New Point(settings.FormLeft, settings.FormTop)
-            Me.Size = New Size(settings.FormWidth, settings.FormHeight)
+
+            ' Load AvailableAlgorithms from text file
+            LoadAvailableAlgorithms()
 
             PausePlayButton.PerformClick()
             PausePlayButton.Image = New Bitmap(CurDir() + "/Data/PauseButton.png")
 
             setupAlgorithmHistory()
+
+            Me.Location = New Point(settings.FormLeft, settings.FormTop)
+            Me.Size = New Size(settings.FormWidth, settings.FormHeight)
+        End Sub
+
+        Private Sub LoadAvailableAlgorithms()
+            Try
+                Dim algListPath = Path.Combine(CurDir(), "..\Data", "AvailableAlgorithms.txt")
+                If File.Exists(algListPath) Then
+                    AvailableAlgorithms.Items.Clear()
+                    Dim lines = File.ReadAllLines(algListPath)
+                    Dim lastGroup = "AddWeighted"
+                    For Each line In lines
+                        Dim nextline = line.Trim()
+                        Dim split = nextline.Split("_")
+                        If split(0) <> lastGroup Then
+                            AvailableAlgorithms.Items.Add(" ")
+                            lastGroup = split(0)
+                        End If
+                        AvailableAlgorithms.Items.Add(nextline)
+                    Next
+
+                    jumpToAlgorithm(settings.algorithm)
+                End If
+            Catch ex As Exception
+                ' If file doesn't exist or can't be read, leave combo box empty
+            End Try
         End Sub
         Private Sub Magnifier_Click(sender As Object, e As EventArgs) Handles Magnifier.Click
 
+        End Sub
+        Private Sub AtoZ_Click(sender As Object, e As EventArgs) Handles AtoZ.Click
+            ' Get the home directory (Data directory parent)
+            Dim homeDirPath As String
+            If Not String.IsNullOrEmpty(projectFilePath) AndAlso File.Exists(projectFilePath) Then
+                Dim projectDir = Path.GetDirectoryName(projectFilePath)
+                ' Go up one level from CVB to get to the root (where Data folder is)
+                homeDirPath = Path.GetDirectoryName(projectDir)
+            Else
+                homeDirPath = CurDir()
+            End If
+
+            Dim groupsForm As New Groups_AtoZ()
+            groupsForm.homeDir = New DirectoryInfo(homeDirPath)
+
+            If groupsForm.ShowDialog() = DialogResult.OK AndAlso Not String.IsNullOrEmpty(groupsForm.selectedGroup) Then
+                ' Find and select the first algorithm that starts with the selected group
+                For Each alg In AvailableAlgorithms.Items
+                    Dim algStr = alg.ToString()
+                    If Not String.IsNullOrWhiteSpace(algStr) AndAlso algStr.StartsWith(groupsForm.selectedGroup) Then
+                        AvailableAlgorithms.Text = algStr
+                        SaveSettings()
+                        Exit For
+                    End If
+                Next
+            End If
         End Sub
         Private Sub MainForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
             AlgDescription.Size = New Size(Me.Width - 570, AlgDescription.Height)
             AlgDescription.Text = "Description of the algorithm"
             SaveSettings()
         End Sub
-
         Private Sub MainForm_LocationChanged(sender As Object, e As EventArgs) Handles Me.LocationChanged
             SaveSettings()
         End Sub
-
         Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             SaveSettings()
         End Sub
-
         Private Sub SaveSettings()
             If settings IsNot Nothing AndAlso settingsIO IsNot Nothing Then
                 settings.FormLeft = Me.Left
                 settings.FormTop = Me.Top
                 settings.FormWidth = Me.Width
                 settings.FormHeight = Me.Height
+                settings.algorithm = AvailableAlgorithms.Text
                 settingsIO.Save(settings)
             End If
         End Sub
