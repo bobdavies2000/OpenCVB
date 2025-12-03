@@ -68,6 +68,8 @@ Namespace CVB
         End Sub
         Private Sub SettingsToolStripButton_Click(sender As Object, e As EventArgs) Handles Options.Click
             Dim optionsForm As New CVBOptions()
+            optionsForm.settings = settings
+            optionsForm.cameraNames = Common.cameraNames
             ' Note: Options form may need to be adapted for CVB settings
             ' For now, just show it
             optionsForm.ShowDialog()
