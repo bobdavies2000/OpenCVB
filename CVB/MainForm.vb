@@ -67,7 +67,7 @@ Namespace CVB
                                                   New Bitmap(CurDir() + "/Data/Run.png"))
         End Sub
         Private Sub SettingsToolStripButton_Click(sender As Object, e As EventArgs) Handles Options.Click
-            Dim optionsForm As New Options()
+            Dim optionsForm As New CVBOptions()
             ' Note: Options form may need to be adapted for CVB settings
             ' For now, just show it
             optionsForm.ShowDialog()

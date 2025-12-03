@@ -11,6 +11,31 @@ Namespace CVB
         Public algorithm As String
         Public workRes As New cv.Size(320, 240)
         Public captureRes As New cv.Size(640, 480)
+
+        Public cameraIndex As Integer
+        Public cameraName As String
+        Public cameraPresent As List(Of Boolean)
+        Public cameraFound As Boolean
+        Public resolutionsSupported As List(Of Boolean)
+        Public cameraSupported As List(Of Boolean)
+        Public camera640x480Support As List(Of Boolean)
+        Public camera1920x1080Support As List(Of Boolean)
+
+        Public locationPixelViewer As cv.Vec4f
+        Public locationOpenGL As cv.Vec4f
+        Public locationOptions As cv.Vec4f
+
+        Public zedSDKready As Boolean
+        Public oakDSDKready As Boolean
+
+        Public showBatchConsole As Boolean
+
+        Public treeButton As Boolean
+        Public treeLocation As cv.Vec4f
+
+        Public fontInfo As Font
+        Public desiredFPS As Integer
+
     End Class
 
     Public Class CVBSettingsIO

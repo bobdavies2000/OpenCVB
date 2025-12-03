@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Options
+Public Class CVBOptions
     Public cameraRadioButton(Common.cameraNames.Count - 1) As RadioButton
     Public workResRadio() As RadioButton
     Public cameraName As String

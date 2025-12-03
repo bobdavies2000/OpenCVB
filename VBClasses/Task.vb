@@ -495,7 +495,6 @@ Public Class VBtask : Implements IDisposable
         ' https://towardsdatascience.com/opinion-26190c7fed1b
         ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
         ' https://www.stereolabs.com/assets/datasheets/zed-2i-datasheet-feb2022.pdf
-        ' https://www.mynteye.com/pages/mynt-eye-d
         ' https://www.orbbec.com/products/stereo-vision-camera/gemini-335l/
         ' order of cameras is the same as the order above and in optionsform.cameraNames combobox.
         Dim vFOVangles() As Single = {59, 59, 72, 58, 42.5, 57, 57, 62, 68} ' all values from the specification - this is usually overridden by calibration data.

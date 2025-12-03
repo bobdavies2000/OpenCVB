@@ -20,7 +20,6 @@ Namespace jsonClass
         Public locationOpenGL As cv.Vec4f
         Public locationOptions As cv.Vec4f
 
-        Public myntSDKready As Boolean
         Public zedSDKready As Boolean
         Public oakDSDKready As Boolean
 
