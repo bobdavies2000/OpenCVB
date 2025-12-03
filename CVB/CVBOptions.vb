@@ -32,32 +32,32 @@ Public Class CVBOptions
     End Sub
     Public Sub defineCameraResolutions(index As Integer)
         ' see resolutionList - helps to see how code maps to layout of the resolutions.
-        'Select Case cameraNames(index)
-        '    Case "StereoLabs ZED 2/2i"
-        '        settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
-        '                                                                   True, True, True,
-        '                                                                   False, False, False,
-        '                                                                   True, True, True,
-        '                                                                   True, True, True})
-        '    Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
-        '        settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-        '                                                                   True, True, True,
-        '                                                                   True, True, True,
-        '                                                                   False, False, False,
-        '                                                                   False, False, False})
-        '    Case "Oak-D camera"
-        '        settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-        '                                                                   True, True, True,
-        '                                                                   False, False, False,
-        '                                                                   False, False, False,
-        '                                                                   False, False, False})
-        '    Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
-        '        settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-        '                                                                   True, True, True,
-        '                                                                   True, True, True,
-        '                                                                   False, False, False,
-        '                                                                   False, False, False})
-        'End Select
+        Select Case cameraNames(index)
+            Case "StereoLabs ZED 2/2i"
+                settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
+                                                                           True, True, True,
+                                                                           False, False, False,
+                                                                           True, True, True,
+                                                                           True, True, True})
+            Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
+                settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                                                                           True, True, True,
+                                                                           True, True, True,
+                                                                           False, False, False,
+                                                                           False, False, False})
+            Case "Oak-D camera"
+                settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                                                                           True, True, True,
+                                                                           False, False, False,
+                                                                           False, False, False,
+                                                                           False, False, False})
+            Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
+                settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
+                                                                           True, True, True,
+                                                                           True, True, True,
+                                                                           False, False, False,
+                                                                           False, False, False})
+        End Select
     End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
         Dim index = cameraNames.IndexOf(sender.text)
@@ -77,55 +77,33 @@ Public Class CVBOptions
         End If
     End Sub
     Public Sub MainOptions_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        'Static radioButtonsPresent = False
-        'defineCameraResolutions(cameraIndex)
+        Static radioButtonsPresent = False
+        defineCameraResolutions(cameraIndex)
 
-        'If radioButtonsPresent = False Then
-        '    radioButtonsPresent = True
-        '    For i = 0 To cameraRadioButton.Count - 1
-        '        cameraRadioButton(i) = New RadioButton With {.Visible = True, .AutoSize = True,
-        '                               .Enabled = settings.cameraPresent(i), .Text = cameraNames(i)}
-        '        CameraGroup.Controls.Add(cameraRadioButton(i))
-        '        AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
-        '    Next
+        If radioButtonsPresent = False Then
+            radioButtonsPresent = True
+            For i = 0 To cameraRadioButton.Count - 1
+                'cameraRadioButton(i) = New RadioButton With {.Visible = True, .AutoSize = True,
+                '                       .Enabled = settings.cameraPresent(i), .Text = cameraNames(i)}
+                cameraRadioButton(i) = New RadioButton With {.Visible = True, .AutoSize = True,
+                                       .Enabled = False, .Text = cameraNames(i)}
+                CameraGroup.Controls.Add(cameraRadioButton(i))
+                AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
+            Next
 
-        '    ReDim workResRadio(resolutionList.Count - 1)
-        '    For i = 0 To workResRadio.Count - 1
-        '        workResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i,
-        '                             .AutoSize = True, .Visible = True}
-        '        workResRadio(i).Enabled = settings.resolutionsSupported(i)
-        '        Resolutions.Controls.Add(workResRadio(i))
-        '    Next
-        'End If
+            ReDim workResRadio(resolutionList.Count - 1)
+            For i = 0 To workResRadio.Count - 1
+                workResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i,
+                                     .AutoSize = True, .Visible = True}
+                workResRadio(i).Enabled = settings.resolutionsSupported(i)
+                Resolutions.Controls.Add(workResRadio(i))
+            Next
+        End If
 
-        'cameraRadioButton(settings.cameraIndex).Checked = True
+        cameraRadioButton(settings.cameraIndex).Checked = True
 
-        'Snap640.Checked = settings.snap640
-        'Snap320.Checked = settings.snap320
-        'SnapCustom.Checked = settings.snapCustom
-
-        'showBatchConsole.Checked = settings.showBatchConsole
+        showBatchConsole.Checked = settings.showBatchConsole
     End Sub
-    Public Function setDuration() As Integer
-        Dim duration = 5
-        'Select Case settings.workRes.Width
-        '    Case 1920
-        '        duration = 40
-        '    Case 1280
-        '        duration = 35
-        '    Case 960
-        '        duration = 30
-        '    Case 672
-        '        duration = 15
-        '    Case 640
-        '        duration = 15
-        '    Case 480
-        '        duration = 10
-        '    Case 240, 336, 320, 168, 160
-        '        duration = 5
-        'End Select
-        Return duration
-    End Function
     Private Sub MainOptions_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.Escape Then Cancel_Button_Click(sender, e)
     End Sub

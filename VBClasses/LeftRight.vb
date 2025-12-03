@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class LeftRight_Basics : Inherits TaskParent
     Public Sub New()
-        If task.cameraName = "MYNT-EYE-D1000" Then OptionParent.FindSlider("Alpha (contrast)").Value = 1100
         labels = {"", "", "Left camera image", "Right camera image"}
         desc = "Display the left and right views as they came from the camera."
     End Sub

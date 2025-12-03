@@ -120,7 +120,6 @@ End Class
 ' https://www.intelrealsense.com/depth-camera-d435i/
 ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
 ' https://www.stereolabs.com/zed/
-' https://www.mynteye.com/pages/mynt-eye-d
 Public Class Cloud_SetupSide : Inherits TaskParent
     Dim arcSize As Integer
     Public Sub New()
@@ -197,7 +196,6 @@ End Class
 ' https://www.intelrealsense.com/depth-camera-d435i/
 ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
 ' https://www.stereolabs.com/zed/
-' https://www.mynteye.com/pages/mynt-eye-d
 Public Class Cloud_SetupTop : Inherits TaskParent
     Public Sub New()
         labels(2) = "Layout markers for top view"
