@@ -16,14 +16,11 @@ Namespace CVB
         Dim algHistory As New List(Of String)
         Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
 
-        ' Camera support
         Dim camera As CameraZED2 = Nothing
-        Dim cameraThread As System.Threading.Thread = Nothing
         Dim cameraRunning As Boolean = False
-        Dim currentDisplayMode As Integer = 0 ' 0=RGB, 1=Depth, 2=PointCloud, 3=Left, 4=Right
+        Dim currentDisplayMode As Integer = 0 ' 0=RGB, 1=PointCloud, 2=Left, 3=Right
         Dim currentImage As cv.Mat = Nothing
-        Dim imageLock As New Object()
-        Dim displayTimer As Timer = Nothing
+        Dim cameraTimer As Timer = Nothing
         Public Sub jumpToAlgorithm(algName As String)
             If AvailableAlgorithms.Items.Contains(algName) = False Then
                 AvailableAlgorithms.SelectedIndex = 0
@@ -69,17 +66,12 @@ Namespace CVB
             End If
             settingsIO = New CVBSettingsIO(settingsPath)
         End Sub
-        Private Sub NewToolStripButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
+        Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
             ' Toggle between Play and Pause
             isPlaying = Not isPlaying
             PausePlayButton.Image = If(isPlaying, New Bitmap(CurDir() + "/Data/PauseButton.png"),
                                                   New Bitmap(CurDir() + "/Data/Run.png"))
-
-            If isPlaying Then
-                StartCamera()
-            Else
-                StopCamera()
-            End If
+            If isPlaying Then StartCamera() Else StopCamera()
         End Sub
 
         Private Sub StartCamera()
@@ -87,15 +79,12 @@ Namespace CVB
                 Try
                     camera = New CameraZED2(settings.workRes, settings.captureRes, "StereoLabs ZED 2/2i")
                     cameraRunning = True
-                    cameraThread = New System.Threading.Thread(AddressOf CameraTask)
-                    cameraThread.Name = "CVB Camera Task"
-                    cameraThread.Start()
 
-                    ' Start display update timer
-                    displayTimer = New Timer()
-                    AddHandler displayTimer.Tick, AddressOf UpdateDisplay
-                    displayTimer.Interval = 33 ' ~30 FPS
-                    displayTimer.Start()
+                    ' Start camera timer on UI thread
+                    cameraTimer = New Timer()
+                    AddHandler cameraTimer.Tick, AddressOf CameraTimer_Tick
+                    cameraTimer.Interval = 33 ' ~30 FPS
+                    cameraTimer.Start()
                 Catch ex As Exception
                     MessageBox.Show("Failed to start camera: " + ex.Message, "Camera Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                     isPlaying = False
@@ -105,52 +94,41 @@ Namespace CVB
 
         Private Sub StopCamera()
             cameraRunning = False
-            If displayTimer IsNot Nothing Then
-                displayTimer.Stop()
-                displayTimer.Dispose()
-                displayTimer = Nothing
+            If cameraTimer IsNot Nothing Then
+                cameraTimer.Stop()
+                cameraTimer.Dispose()
+                cameraTimer = Nothing
             End If
             If camera IsNot Nothing Then
                 camera.StopCamera()
                 camera = Nothing
             End If
-            If cameraThread IsNot Nothing Then
-                cameraThread.Join(1000)
-                cameraThread = Nothing
+        End Sub
+
+        Private Sub CameraTimer_Tick(sender As Object, e As EventArgs)
+            If Not cameraRunning OrElse camera Is Nothing Then
+                Return
             End If
-        End Sub
 
-        Private Sub CameraTask()
-            While cameraRunning AndAlso camera IsNot Nothing
-                Try
-                    camera.GetNextFrame()
+            Try
+                ' Capture frame on UI thread
+                camera.GetNextFrame()
 
-                    ' Update current image based on display mode
-                    SyncLock imageLock
-                        Select Case currentDisplayMode
-                            Case 0 ' RGB
-                                currentImage = camera.Color
-                            Case 1 ' Depth
-                                currentImage = camera.Depth
-                            Case 2 ' Point Cloud
-                                currentImage = camera.PointCloud
-                            Case 3 ' Left
-                                currentImage = camera.LeftView
-                            Case 4 ' Right
-                                currentImage = camera.RightView
-                        End Select
-                    End SyncLock
-                Catch ex As Exception
-                    Debug.WriteLine("Camera error: " + ex.Message)
-                End Try
-                System.Threading.Thread.Sleep(10)
-            End While
-        End Sub
+                ' Update current image based on display mode
+                Select Case currentDisplayMode
+                    Case 0 ' RGB
+                        currentImage = camera.Color
+                    Case 1 ' Point Cloud
+                        currentImage = camera.PointCloud
+                    Case 2 ' Left
+                        currentImage = camera.LeftView
+                    Case 3 ' Right
+                        currentImage = camera.RightView
+                End Select
 
-        Private Sub UpdateDisplay(sender As Object, e As EventArgs)
-            If currentImage IsNot Nothing AndAlso currentImage.Width > 0 Then
-                Try
-                    SyncLock imageLock
+                ' Update display immediately
+                If currentImage IsNot Nothing AndAlso currentImage.Width > 0 Then
+                    Try
                         Dim displayImage = currentImage.Clone()
                         ' Convert to Bitmap for display
                         Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
@@ -159,11 +137,13 @@ Namespace CVB
                         End If
                         campics.Image = bitmap
                         displayImage.Dispose()
-                    End SyncLock
-                Catch ex As Exception
-                    Debug.WriteLine("Display update error: " + ex.Message)
-                End Try
-            End If
+                    Catch ex As Exception
+                        Debug.WriteLine("Display update error: " + ex.Message)
+                    End Try
+                End If
+            Catch ex As Exception
+                Debug.WriteLine("Camera error: " + ex.Message)
+            End Try
         End Sub
         Private Sub SettingsToolStripButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             Dim optionsForm As New CVBOptions()
@@ -179,10 +159,7 @@ Namespace CVB
                 Directory.SetCurrentDirectory(projectDir.FullName)
             End If
 
-            ' Load settings and restore form position
             settings = settingsIO.Load()
-
-            ' Load AvailableAlgorithms from text file
             LoadAvailableAlgorithms()
 
             PausePlayButton.PerformClick()
@@ -196,7 +173,6 @@ Namespace CVB
             campics.Top += 10
             MainForm_Resize(sender, e)
         End Sub
-
         Private Sub LoadAvailableAlgorithms()
             Try
                 Dim algListPath = Path.Combine(CurDir(), "..\Data", "AvailableAlgorithms.txt")
@@ -256,8 +232,8 @@ Namespace CVB
             campics.Height = Me.Height - 101
         End Sub
         Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-            StopCamera()
             SaveSettings()
+            StopCamera()
         End Sub
         Private Sub SaveSettings()
             If settings IsNot Nothing AndAlso settingsIO IsNot Nothing Then
@@ -269,7 +245,6 @@ Namespace CVB
                 settingsIO.Save(settings)
             End If
         End Sub
-
         Private Sub MainPictureBox_MouseMove(sender As Object, e As MouseEventArgs) Handles campics.MouseMove
             Dim X = CInt(e.X Mod (campics.Width / 2))
             Dim Y = CInt(e.Y Mod (campics.Height / 2))
@@ -284,34 +259,6 @@ Namespace CVB
 
         Private Sub campics_MouseClick(sender As Object, e As MouseEventArgs) Handles campics.MouseClick
             lastClickPoint = New Point(e.X, e.Y)
-
-            ' Cycle through display modes on click: RGB -> Depth -> PointCloud -> Left -> Right -> RGB
-            If camera IsNot Nothing Then
-                currentDisplayMode = (currentDisplayMode + 1) Mod 5
-                UpdateStatusLabelWithMode()
-            End If
-        End Sub
-
-        Private Sub UpdateStatusLabelWithMode()
-            Dim modeName As String = ""
-            Select Case currentDisplayMode
-                Case 0
-                    modeName = "RGB"
-                Case 1
-                    modeName = "Depth"
-                Case 2
-                    modeName = "Point Cloud"
-                Case 3
-                    modeName = "Left"
-                Case 4
-                    modeName = "Right"
-            End Select
-            If StatusLabel.Text.Contains("X:") Then
-                Dim posText = StatusLabel.Text.Substring(0, StatusLabel.Text.IndexOf("X:"))
-                StatusLabel.Text = modeName + " - " + StatusLabel.Text
-            Else
-                StatusLabel.Text = modeName + " - " + StatusLabel.Text
-            End If
         End Sub
     End Class
 End Namespace
