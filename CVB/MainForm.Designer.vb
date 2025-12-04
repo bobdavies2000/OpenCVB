@@ -36,10 +36,20 @@ Namespace CVB
             AtoZ = New ToolStripButton()
             ToolStripSeparator2 = New ToolStripSeparator()
             AlgDescription = New ToolStripTextBox()
-            campics = New PictureBox()
+            campicRGB = New PictureBox()
+            campicPointCloud = New PictureBox()
+            campicLeft = New PictureBox()
+            campicRight = New PictureBox()
+            labelRGB = New Label()
+            labelPointCloud = New Label()
+            labelLeft = New Label()
+            labelRight = New Label()
             StatusLabel = New Label()
             MainToolStrip.SuspendLayout()
-            CType(campics, ComponentModel.ISupportInitialize).BeginInit()
+            CType(campicRGB, ComponentModel.ISupportInitialize).BeginInit()
+            CType(campicPointCloud, ComponentModel.ISupportInitialize).BeginInit()
+            CType(campicLeft, ComponentModel.ISupportInitialize).BeginInit()
+            CType(campicRight, ComponentModel.ISupportInitialize).BeginInit()
             SuspendLayout()
             ' 
             ' MainToolStrip
@@ -145,24 +155,92 @@ Namespace CVB
             AlgDescription.Text = "Description"
             AlgDescription.ToolTipText = "Description"
             ' 
-            ' campics
+            ' labelRGB
             ' 
-            campics.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-            campics.BackColor = Color.Black
-            campics.Location = New Point(0, 39)
-            campics.Margin = New Padding(0)
-            campics.Name = "campics"
-            campics.Size = New Size(1867, 1095)
-            campics.SizeMode = PictureBoxSizeMode.Zoom
-            campics.TabIndex = 1
-            campics.TabStop = False
+            labelRGB.AutoSize = True
+            labelRGB.Location = New Point(0, 39)
+            labelRGB.Name = "labelRGB"
+            labelRGB.Size = New Size(40, 20)
+            labelRGB.Text = "RGB"
+            ' 
+            ' labelPointCloud
+            ' 
+            labelPointCloud.AutoSize = True
+            labelPointCloud.Location = New Point(933, 39)
+            labelPointCloud.Name = "labelPointCloud"
+            labelPointCloud.Size = New Size(80, 20)
+            labelPointCloud.Text = "Point Cloud"
+            ' 
+            ' labelLeft
+            ' 
+            labelLeft.AutoSize = True
+            labelLeft.Location = New Point(0, 587)
+            labelLeft.Name = "labelLeft"
+            labelLeft.Size = New Size(35, 20)
+            labelLeft.Text = "Left"
+            ' 
+            ' labelRight
+            ' 
+            labelRight.AutoSize = True
+            labelRight.Location = New Point(933, 587)
+            labelRight.Name = "labelRight"
+            labelRight.Size = New Size(40, 20)
+            labelRight.Text = "Right"
+            ' 
+            ' campicRGB
+            ' 
+            campicRGB.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+            campicRGB.BackColor = Color.Black
+            campicRGB.Location = New Point(0, 59)
+            campicRGB.Margin = New Padding(0)
+            campicRGB.Name = "campicRGB"
+            campicRGB.Size = New Size(933, 528)
+            campicRGB.SizeMode = PictureBoxSizeMode.StretchImage
+            campicRGB.TabIndex = 1
+            campicRGB.TabStop = False
+            ' 
+            ' campicPointCloud
+            ' 
+            campicPointCloud.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+            campicPointCloud.BackColor = Color.Black
+            campicPointCloud.Location = New Point(933, 59)
+            campicPointCloud.Margin = New Padding(0)
+            campicPointCloud.Name = "campicPointCloud"
+            campicPointCloud.Size = New Size(934, 528)
+            campicPointCloud.SizeMode = PictureBoxSizeMode.StretchImage
+            campicPointCloud.TabIndex = 2
+            campicPointCloud.TabStop = False
+            ' 
+            ' campicLeft
+            ' 
+            campicLeft.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+            campicLeft.BackColor = Color.Black
+            campicLeft.Location = New Point(0, 607)
+            campicLeft.Margin = New Padding(0)
+            campicLeft.Name = "campicLeft"
+            campicLeft.Size = New Size(933, 527)
+            campicLeft.SizeMode = PictureBoxSizeMode.StretchImage
+            campicLeft.TabIndex = 3
+            campicLeft.TabStop = False
+            ' 
+            ' campicRight
+            ' 
+            campicRight.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
+            campicRight.BackColor = Color.Black
+            campicRight.Location = New Point(933, 607)
+            campicRight.Margin = New Padding(0)
+            campicRight.Name = "campicRight"
+            campicRight.Size = New Size(934, 527)
+            campicRight.SizeMode = PictureBoxSizeMode.StretchImage
+            campicRight.TabIndex = 4
+            campicRight.TabStop = False
             ' 
             ' StatusLabel
             ' 
             StatusLabel.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
             StatusLabel.BackColor = SystemColors.Control
             StatusLabel.BorderStyle = BorderStyle.FixedSingle
-            StatusLabel.Location = New Point(9, 1125)
+            StatusLabel.Location = New Point(0, 1134)
             StatusLabel.Margin = New Padding(0)
             StatusLabel.Name = "StatusLabel"
             StatusLabel.Size = New Size(1867, 30)
@@ -175,7 +253,14 @@ Namespace CVB
             AutoScaleMode = AutoScaleMode.Font
             ClientSize = New Size(1867, 1164)
             Controls.Add(StatusLabel)
-            Controls.Add(campics)
+            Controls.Add(campicRight)
+            Controls.Add(campicLeft)
+            Controls.Add(campicPointCloud)
+            Controls.Add(campicRGB)
+            Controls.Add(labelRight)
+            Controls.Add(labelLeft)
+            Controls.Add(labelPointCloud)
+            Controls.Add(labelRGB)
             Controls.Add(MainToolStrip)
             Icon = CType(resources.GetObject("$this.Icon"), Icon)
             Margin = New Padding(3, 4, 3, 4)
@@ -183,7 +268,10 @@ Namespace CVB
             Text = "CVB Application"
             MainToolStrip.ResumeLayout(False)
             MainToolStrip.PerformLayout()
-            CType(campics, ComponentModel.ISupportInitialize).EndInit()
+            CType(campicRGB, ComponentModel.ISupportInitialize).EndInit()
+            CType(campicPointCloud, ComponentModel.ISupportInitialize).EndInit()
+            CType(campicLeft, ComponentModel.ISupportInitialize).EndInit()
+            CType(campicRight, ComponentModel.ISupportInitialize).EndInit()
             ResumeLayout(False)
             PerformLayout()
         End Sub
@@ -200,7 +288,14 @@ Namespace CVB
         Friend WithEvents AvailableAlgorithms As ToolStripComboBox
         Friend WithEvents AtoZ As ToolStripButton
         Friend WithEvents AlgDescription As ToolStripTextBox
-        Friend WithEvents campics As PictureBox
+        Friend WithEvents campicRGB As PictureBox
+        Friend WithEvents campicPointCloud As PictureBox
+        Friend WithEvents campicLeft As PictureBox
+        Friend WithEvents campicRight As PictureBox
+        Friend WithEvents labelRGB As Label
+        Friend WithEvents labelPointCloud As Label
+        Friend WithEvents labelLeft As Label
+        Friend WithEvents labelRight As Label
         Friend WithEvents StatusLabel As Label
 
     End Class

@@ -18,8 +18,6 @@ Namespace CVB
 
         Dim camera As CameraZED2 = Nothing
         Dim cameraRunning As Boolean = False
-        Dim currentDisplayMode As Integer = 0 ' 0=RGB, 1=PointCloud, 2=Left, 3=Right
-        Dim currentImage As cv.Mat = Nothing
         Dim cameraTimer As Timer = Nothing
         Public Sub jumpToAlgorithm(algName As String)
             If AvailableAlgorithms.Items.Contains(algName) = False Then
@@ -114,36 +112,31 @@ Namespace CVB
                 ' Capture frame on UI thread
                 camera.GetNextFrame()
 
-                ' Update current image based on display mode
-                Select Case currentDisplayMode
-                    Case 0 ' RGB
-                        currentImage = camera.Color
-                    Case 1 ' Point Cloud
-                        currentImage = camera.PointCloud
-                    Case 2 ' Left
-                        currentImage = camera.LeftView
-                    Case 3 ' Right
-                        currentImage = camera.RightView
-                End Select
-
-                ' Update display immediately
-                If currentImage IsNot Nothing AndAlso currentImage.Width > 0 Then
-                    Try
-                        Dim displayImage = currentImage.Clone()
-                        ' Convert to Bitmap for display
-                        Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
-                        If campics.Image IsNot Nothing Then
-                            campics.Image.Dispose()
-                        End If
-                        campics.Image = bitmap
-                        displayImage.Dispose()
-                    Catch ex As Exception
-                        Debug.WriteLine("Display update error: " + ex.Message)
-                    End Try
-                End If
+                ' Update all 4 PictureBoxes using camImages from GenericCamera
+                UpdatePictureBox(campicRGB, camera.camImages.color)
+                UpdatePictureBox(campicPointCloud, camera.camImages.pointCloud)
+                UpdatePictureBox(campicLeft, camera.camImages.left)
+                UpdatePictureBox(campicRight, camera.camImages.right)
             Catch ex As Exception
                 Debug.WriteLine("Camera error: " + ex.Message)
             End Try
+        End Sub
+
+        Private Sub UpdatePictureBox(picBox As PictureBox, image As cv.Mat)
+            If image IsNot Nothing AndAlso image.Width > 0 Then
+                Try
+                    Dim displayImage = image.Clone()
+                    ' Convert to Bitmap for display
+                    Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
+                    If picBox.Image IsNot Nothing Then
+                        picBox.Image.Dispose()
+                    End If
+                    picBox.Image = bitmap
+                    displayImage.Dispose()
+                Catch ex As Exception
+                    Debug.WriteLine("Display update error: " + ex.Message)
+                End Try
+            End If
         End Sub
         Private Sub SettingsToolStripButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             Dim optionsForm As New CVBOptions()
@@ -169,8 +162,6 @@ Namespace CVB
 
             Me.Location = New Point(settings.FormLeft, settings.FormTop)
             Me.Size = New Size(settings.FormWidth, settings.FormHeight)
-            campics.Left = StatusLabel.Left
-            campics.Top += 10
             MainForm_Resize(sender, e)
         End Sub
         Private Sub LoadAvailableAlgorithms()
@@ -228,8 +219,53 @@ Namespace CVB
         Private Sub MainForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
             AlgDescription.Size = New Size(Me.Width - 570, AlgDescription.Height)
             AlgDescription.Text = "Description of the algorithm"
-            campics.Width = Me.Width - 28
-            campics.Height = Me.Height - 101
+
+            ' Calculate sizes for 2x2 grid with labels
+            Dim labelHeight As Integer = 18
+            Dim rowSpacing As Integer = 5 ' Space between top and bottom rows for labels
+            Dim topStart As Integer = MainToolStrip.Height
+            Dim statusLabelTop As Integer = Me.Height - StatusLabel.Height
+
+            ' Calculate available space: from toolbar to status label, accounting for labels
+            ' We need: top label + top pic + spacing + bottom label + bottom pic = statusLabelTop
+            ' So: topStart + labelHeight + picHeight + rowSpacing + labelHeight + picHeight = statusLabelTop
+            ' Therefore: 2 * picHeight = statusLabelTop - topStart - (2 * labelHeight) - rowSpacing
+            Dim totalPicHeight As Integer = statusLabelTop - topStart - (2 * labelHeight) - rowSpacing - 40
+            Dim picHeight As Integer = totalPicHeight \ 2
+            Dim availableWidth As Integer = Me.Width
+            Dim picWidth As Integer = availableWidth \ 2
+
+            ' Ensure all PictureBoxes are the same size
+            Dim uniformPicWidth As Integer = picWidth
+            Dim uniformPicHeight As Integer = picHeight
+
+            ' Position top row labels
+            labelRGB.Location = New Point(0, topStart)
+            labelPointCloud.Location = New Point(uniformPicWidth, topStart)
+
+            ' Position top row PictureBoxes (same size)
+            campicRGB.Location = New Point(0, topStart + labelHeight)
+            campicRGB.Size = New Size(uniformPicWidth, uniformPicHeight)
+
+            campicPointCloud.Location = New Point(uniformPicWidth, topStart + labelHeight)
+            campicPointCloud.Size = New Size(uniformPicWidth, uniformPicHeight)
+
+            ' Position bottom row labels (with spacing from top row)
+            Dim bottomRowLabelTop As Integer = topStart + labelHeight + uniformPicHeight + rowSpacing
+            labelLeft.Location = New Point(0, bottomRowLabelTop)
+            labelRight.Location = New Point(uniformPicWidth, bottomRowLabelTop)
+
+            ' Position bottom row PictureBoxes (same size, ending exactly at status label top)
+            Dim bottomRowPicTop As Integer = bottomRowLabelTop + labelHeight
+            campicLeft.Location = New Point(0, bottomRowPicTop)
+            campicLeft.Size = New Size(uniformPicWidth, uniformPicHeight)
+
+            campicRight.Location = New Point(uniformPicWidth, bottomRowPicTop)
+            campicRight.Size = New Size(uniformPicWidth, uniformPicHeight)
+
+            ' Position status label at the bottom
+            StatusLabel.Location = New Point(0, campicLeft.Top + campicLeft.Height)
+            StatusLabel.Width = Me.Width
         End Sub
         Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             SaveSettings()
@@ -245,20 +281,26 @@ Namespace CVB
                 settingsIO.Save(settings)
             End If
         End Sub
-        Private Sub MainPictureBox_MouseMove(sender As Object, e As MouseEventArgs) Handles campics.MouseMove
-            Dim X = CInt(e.X Mod (campics.Width / 2))
-            Dim Y = CInt(e.Y Mod (campics.Height / 2))
-            If lastClickPoint <> Point.Empty Then
-                StatusLabel.Text = String.Format("X: {0}, Y: {1})", X, Y)
-                StatusLabel.Text += String.Format(", Last click: ({0}, {1})", CInt(lastClickPoint.X Mod (campics.Width / 2)),
-                                                                              CInt(lastClickPoint.Y Mod (campics.Height / 2)))
-            Else
-                StatusLabel.Text = String.Format("X: {0}, Y: {1}", X, Y)
+        Private Sub PictureBox_MouseMove(sender As Object, e As MouseEventArgs) Handles campicRGB.MouseMove, campicPointCloud.MouseMove, campicLeft.MouseMove, campicRight.MouseMove
+            Dim picBox = TryCast(sender, PictureBox)
+            If picBox IsNot Nothing Then
+                Dim X = CInt(e.X Mod (picBox.Width / 2))
+                Dim Y = CInt(e.Y Mod (picBox.Height / 2))
+                If lastClickPoint <> Point.Empty Then
+                    StatusLabel.Text = String.Format("X: {0}, Y: {1}", X, Y)
+                    StatusLabel.Text += String.Format(", Last click: {0}, {1}", CInt(lastClickPoint.X Mod (picBox.Width \ 2)),
+                                                                                 CInt(lastClickPoint.Y Mod (picBox.Height \ 2)))
+                Else
+                    StatusLabel.Text = String.Format("X: {0}, Y: {1}", X, Y)
+                End If
             End If
         End Sub
 
-        Private Sub campics_MouseClick(sender As Object, e As MouseEventArgs) Handles campics.MouseClick
-            lastClickPoint = New Point(e.X, e.Y)
+        Private Sub PictureBox_MouseClick(sender As Object, e As MouseEventArgs) Handles campicRGB.MouseClick, campicPointCloud.MouseClick, campicLeft.MouseClick, campicRight.MouseClick
+            Dim picBox = TryCast(sender, PictureBox)
+            If picBox IsNot Nothing Then
+                lastClickPoint = New Point(e.X, e.Y)
+            End If
         End Sub
     End Class
 End Namespace

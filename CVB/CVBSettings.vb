@@ -11,8 +11,8 @@ Namespace CVB
         Public FormWidth As Integer = 1867
         Public FormHeight As Integer = 1134
         Public algorithm As String
-        Public workRes As New cv.Size(320, 240)
-        Public captureRes As New cv.Size(640, 480)
+        Public workRes As New cv.Size(672, 376)
+        Public captureRes As New cv.Size(672, 376)
 
         Public cameraIndex As Integer
         Public cameraName As String = "StereoLabs ZED 2/2i"
