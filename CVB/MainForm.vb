@@ -9,8 +9,8 @@ Namespace CVB
     Public Class MainForm : Inherits Form
         Dim isPlaying As Boolean = False
         Dim projectFilePath As String = ""
-        Public settingsIO As CVBSettingsIO
-        Dim settings As CVBSettings
+        Public settingsIO As jsonCVBIO
+        Dim settings As jsonCVB
         Dim lastClickPoint As Point = Point.Empty
         Const MAX_RECENT = 50
         Dim algHistory As New List(Of String)
@@ -62,7 +62,7 @@ Namespace CVB
                 Dim appDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)
                 settingsPath = Path.Combine(appDir, "settings.json")
             End If
-            settingsIO = New CVBSettingsIO(settingsPath)
+            settingsIO = New jsonCVBIO(settingsPath)
         End Sub
         Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
             ' Toggle between Play and Pause

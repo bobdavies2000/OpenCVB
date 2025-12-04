@@ -5,7 +5,7 @@ Imports Newtonsoft.Json
 Imports cv = OpenCvSharp
 
 Namespace CVB
-    Public Class CVBSettings
+    Public Class jsonCVB
         Public FormLeft As Integer = 0
         Public FormTop As Integer = 0
         Public FormWidth As Integer = 1867
@@ -40,14 +40,14 @@ Namespace CVB
         Public testAllDuration As Integer
     End Class
 
-    Public Class CVBSettingsIO
+    Public Class jsonCVBIO
         Private jsonFileName As String
         Public Sub New(fileName As String)
             jsonFileName = fileName
         End Sub
 
-        Public Function Load() As CVBSettings
-            Dim settings As New CVBSettings()
+        Public Function Load() As jsonCVB
+            Dim settings As New jsonCVB()
             Dim fileInfo As New FileInfo(jsonFileName)
             Dim homeDir = fileInfo.DirectoryName + "/../"
             If fileInfo.Exists Then
@@ -55,7 +55,7 @@ Namespace CVB
                     Using streamReader As New StreamReader(jsonFileName)
                         Dim json = streamReader.ReadToEnd()
                         If json <> "" Then
-                            settings = JsonConvert.DeserializeObject(Of CVBSettings)(json)
+                            settings = JsonConvert.DeserializeObject(Of jsonCVB)(json)
                             settings = initialize(settings, homeDir)
                         End If
                     End Using
@@ -66,7 +66,7 @@ Namespace CVB
 
             Return settings
         End Function
-        Public Function initialize(ByRef settings As CVBSettings, homeDir As String) As CVBSettings
+        Public Function initialize(ByRef settings As jsonCVB, homeDir As String) As jsonCVB
             settings.cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True, True})
             settings.camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True, True})
             settings.camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False, False})
@@ -216,7 +216,7 @@ Namespace CVB
             Return usblist
         End Function
 
-        Public Sub Save(settings As CVBSettings)
+        Public Sub Save(settings As jsonCVB)
             Try
                 Using streamWriter As New StreamWriter(jsonFileName)
                     Dim serializer As New JsonSerializer With {.Formatting = Formatting.Indented}
