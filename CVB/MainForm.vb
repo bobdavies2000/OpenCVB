@@ -16,7 +16,7 @@ Namespace CVB
         Dim algHistory As New List(Of String)
         Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
 
-        Dim camera As CameraZED2 = Nothing
+        Dim camera As Object = Nothing
         Dim cameraRunning As Boolean = False
         Dim cameraTimer As Timer = Nothing
         Public Sub jumpToAlgorithm(algName As String)
@@ -75,7 +75,16 @@ Namespace CVB
         Private Sub StartCamera()
             If camera Is Nothing AndAlso settings IsNot Nothing Then
                 Try
-                    camera = New CameraZED2(settings.workRes, settings.captureRes, "StereoLabs ZED 2/2i")
+                    ' Select camera based on settings.cameraName
+                    Select Case settings.cameraName
+                        Case "StereoLabs ZED 2/2i"
+                            camera = New CameraZED2(settings.workRes, settings.captureRes, settings.cameraName)
+                        Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
+                            camera = New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
+                        Case Else
+                            ' Default to ZED if camera name not recognized
+                            camera = New CameraZED2(settings.workRes, settings.captureRes, "StereoLabs ZED 2/2i")
+                    End Select
                     cameraRunning = True
 
                     ' Start camera timer on UI thread
