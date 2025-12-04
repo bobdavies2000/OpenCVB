@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Main\Main.vbproj" />
+    <ProjectReference Include="..\CamZed\CamZed.csproj" />
   </ItemGroup>
 
   <ItemGroup>

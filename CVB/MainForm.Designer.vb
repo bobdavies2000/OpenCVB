@@ -26,7 +26,7 @@ Namespace CVB
             Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainForm))
             MainToolStrip = New ToolStrip()
             PausePlayButton = New ToolStripButton()
-            Options = New ToolStripButton()
+            OptionsButton = New ToolStripButton()
             TestAllButton = New ToolStripButton()
             Magnifier = New ToolStripButton()
             ToolStripSeparator1 = New ToolStripSeparator()
@@ -45,7 +45,7 @@ Namespace CVB
             ' MainToolStrip
             ' 
             MainToolStrip.ImageScalingSize = New Size(24, 24)
-            MainToolStrip.Items.AddRange(New ToolStripItem() {PausePlayButton, Options, TestAllButton, Magnifier, ToolStripSeparator1, PixelViewer, RecentList, AvailableAlgorithms, AtoZ, ToolStripSeparator2, AlgDescription})
+            MainToolStrip.Items.AddRange(New ToolStripItem() {PausePlayButton, OptionsButton, TestAllButton, Magnifier, ToolStripSeparator1, PixelViewer, RecentList, AvailableAlgorithms, AtoZ, ToolStripSeparator2, AlgDescription})
             MainToolStrip.Location = New Point(0, 0)
             MainToolStrip.Name = "MainToolStrip"
             MainToolStrip.Padding = New Padding(0, 0, 3, 0)
@@ -63,15 +63,15 @@ Namespace CVB
             PausePlayButton.Text = "Pause/Play"
             PausePlayButton.ToolTipText = "Play/Pause"
             ' 
-            ' Options
+            ' OptionsButton
             ' 
-            Options.DisplayStyle = ToolStripItemDisplayStyle.Image
-            Options.Image = CType(resources.GetObject("Options.Image"), Image)
-            Options.ImageTransparentColor = Color.Magenta
-            Options.Name = "Options"
-            Options.Size = New Size(34, 34)
-            Options.Text = "Settings"
-            Options.ToolTipText = "Open OpenCVB Settings"
+            OptionsButton.DisplayStyle = ToolStripItemDisplayStyle.Image
+            OptionsButton.Image = CType(resources.GetObject("Options.Image"), Image)
+            OptionsButton.ImageTransparentColor = Color.Magenta
+            OptionsButton.Name = "OptionsButton"
+            OptionsButton.Size = New Size(34, 34)
+            OptionsButton.Text = "Settings"
+            OptionsButton.ToolTipText = "Open OpenCVB Settings"
             ' 
             ' TestAllButton
             ' 
@@ -195,7 +195,7 @@ Namespace CVB
         Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
         Friend WithEvents PixelViewer As ToolStripButton
         Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
-        Friend WithEvents Options As ToolStripButton
+        Friend WithEvents OptionsButton As ToolStripButton
         Friend WithEvents RecentList As ToolStripDropDownButton
         Friend WithEvents AvailableAlgorithms As ToolStripComboBox
         Friend WithEvents AtoZ As ToolStripButton

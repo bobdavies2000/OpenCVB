@@ -15,6 +15,15 @@ Namespace CVB
         Const MAX_RECENT = 50
         Dim algHistory As New List(Of String)
         Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
+
+        ' Camera support
+        Dim camera As CameraZED2 = Nothing
+        Dim cameraThread As System.Threading.Thread = Nothing
+        Dim cameraRunning As Boolean = False
+        Dim currentDisplayMode As Integer = 0 ' 0=RGB, 1=Depth, 2=PointCloud, 3=Left, 4=Right
+        Dim currentImage As cv.Mat = Nothing
+        Dim imageLock As New Object()
+        Dim displayTimer As Timer = Nothing
         Public Sub jumpToAlgorithm(algName As String)
             If AvailableAlgorithms.Items.Contains(algName) = False Then
                 AvailableAlgorithms.SelectedIndex = 0
@@ -65,8 +74,98 @@ Namespace CVB
             isPlaying = Not isPlaying
             PausePlayButton.Image = If(isPlaying, New Bitmap(CurDir() + "/Data/PauseButton.png"),
                                                   New Bitmap(CurDir() + "/Data/Run.png"))
+
+            If isPlaying Then
+                StartCamera()
+            Else
+                StopCamera()
+            End If
         End Sub
-        Private Sub SettingsToolStripButton_Click(sender As Object, e As EventArgs) Handles Options.Click
+
+        Private Sub StartCamera()
+            If camera Is Nothing AndAlso settings IsNot Nothing Then
+                Try
+                    camera = New CameraZED2(settings.workRes, settings.captureRes, "StereoLabs ZED 2/2i")
+                    cameraRunning = True
+                    cameraThread = New System.Threading.Thread(AddressOf CameraTask)
+                    cameraThread.Name = "CVB Camera Task"
+                    cameraThread.Start()
+
+                    ' Start display update timer
+                    displayTimer = New Timer()
+                    AddHandler displayTimer.Tick, AddressOf UpdateDisplay
+                    displayTimer.Interval = 33 ' ~30 FPS
+                    displayTimer.Start()
+                Catch ex As Exception
+                    MessageBox.Show("Failed to start camera: " + ex.Message, "Camera Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    isPlaying = False
+                End Try
+            End If
+        End Sub
+
+        Private Sub StopCamera()
+            cameraRunning = False
+            If displayTimer IsNot Nothing Then
+                displayTimer.Stop()
+                displayTimer.Dispose()
+                displayTimer = Nothing
+            End If
+            If camera IsNot Nothing Then
+                camera.StopCamera()
+                camera = Nothing
+            End If
+            If cameraThread IsNot Nothing Then
+                cameraThread.Join(1000)
+                cameraThread = Nothing
+            End If
+        End Sub
+
+        Private Sub CameraTask()
+            While cameraRunning AndAlso camera IsNot Nothing
+                Try
+                    camera.GetNextFrame()
+
+                    ' Update current image based on display mode
+                    SyncLock imageLock
+                        Select Case currentDisplayMode
+                            Case 0 ' RGB
+                                currentImage = camera.Color
+                            Case 1 ' Depth
+                                currentImage = camera.Depth
+                            Case 2 ' Point Cloud
+                                currentImage = camera.PointCloud
+                            Case 3 ' Left
+                                currentImage = camera.LeftView
+                            Case 4 ' Right
+                                currentImage = camera.RightView
+                        End Select
+                    End SyncLock
+                Catch ex As Exception
+                    Debug.WriteLine("Camera error: " + ex.Message)
+                End Try
+                System.Threading.Thread.Sleep(10)
+            End While
+        End Sub
+
+        Private Sub UpdateDisplay(sender As Object, e As EventArgs)
+            If currentImage IsNot Nothing AndAlso currentImage.Width > 0 Then
+                Try
+                    SyncLock imageLock
+                        Dim displayImage = currentImage.Clone()
+                        ' Convert to Bitmap for display
+                        Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
+                        If campics.Image IsNot Nothing Then
+                            campics.Image.Dispose()
+                        End If
+                        campics.Image = bitmap
+                        displayImage.Dispose()
+                    End SyncLock
+                Catch ex As Exception
+                    Debug.WriteLine("Display update error: " + ex.Message)
+                End Try
+            End If
+        End Sub
+        Private Sub SettingsToolStripButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             Dim optionsForm As New CVBOptions()
             optionsForm.settings = settings
             optionsForm.cameraNames = Common.cameraNames
@@ -157,6 +256,7 @@ Namespace CVB
             campics.Height = Me.Height - 101
         End Sub
         Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+            StopCamera()
             SaveSettings()
         End Sub
         Private Sub SaveSettings()
@@ -184,6 +284,34 @@ Namespace CVB
 
         Private Sub campics_MouseClick(sender As Object, e As MouseEventArgs) Handles campics.MouseClick
             lastClickPoint = New Point(e.X, e.Y)
+
+            ' Cycle through display modes on click: RGB -> Depth -> PointCloud -> Left -> Right -> RGB
+            If camera IsNot Nothing Then
+                currentDisplayMode = (currentDisplayMode + 1) Mod 5
+                UpdateStatusLabelWithMode()
+            End If
+        End Sub
+
+        Private Sub UpdateStatusLabelWithMode()
+            Dim modeName As String = ""
+            Select Case currentDisplayMode
+                Case 0
+                    modeName = "RGB"
+                Case 1
+                    modeName = "Depth"
+                Case 2
+                    modeName = "Point Cloud"
+                Case 3
+                    modeName = "Left"
+                Case 4
+                    modeName = "Right"
+            End Select
+            If StatusLabel.Text.Contains("X:") Then
+                Dim posText = StatusLabel.Text.Substring(0, StatusLabel.Text.IndexOf("X:"))
+                StatusLabel.Text = modeName + " - " + StatusLabel.Text
+            Else
+                StatusLabel.Text = modeName + " - " + StatusLabel.Text
+            End If
         End Sub
     End Class
 End Namespace

@@ -27,7 +27,7 @@ public struct intrinsicData
     }
 public class CamZed
 {
-    public Cv.Mat color, rightView, leftView, pointCloud;
+    public Cv.Mat color, rightView, leftView, pointCloud, depth;
     public Cv.Point3f IMU_Acceleration, IMU_AngularVelocity;
     public double IMU_TimeStamp, IMU_FrameTime;
 
@@ -47,6 +47,7 @@ public class CamZed
     sl.Mat colorSL = new sl.Mat();
     sl.Mat rightSL = new sl.Mat();
     sl.Mat pointCloudSL = new sl.Mat();
+    sl.Mat depthSL = new sl.Mat();
     sl.CameraInformation camInfo;
 
     public CamZed(Cv.Size workRes, Cv.Size captureRes, string deviceName)
@@ -102,6 +103,7 @@ public class CamZed
         rightView = new Cv.Mat();
         leftView = new Cv.Mat();
         pointCloud = new Cv.Mat();
+        depth = new Cv.Mat();
     }
     public void GetNextFrame()
     {
@@ -110,6 +112,7 @@ public class CamZed
             colorSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C3);
             rightSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C3);
             pointCloudSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_8U_C4); // Note: BGRA is 4 channels
+            depthSL = new sl.Mat(new sl.Resolution(captureRows, captureCols), sl.MAT_TYPE.MAT_32F_C1); // Depth is 32-bit float
         }
 
         while (true) 
@@ -131,6 +134,9 @@ public class CamZed
         zed.RetrieveMeasure(pointCloudSL, sl.MEASURE.XYZBGRA);
         pointCloud = Cv.Mat.FromPixelData(captureRows, captureCols, Cv.MatType.CV_32FC4, pointCloudSL.GetPtr());
         pointCloud = pointCloud.CvtColor(Cv.ColorConversionCodes.BGRA2BGR);
+        
+        zed.RetrieveMeasure(depthSL, sl.MEASURE.DEPTH);
+        depth = Cv.Mat.FromPixelData(captureRows, captureCols, Cv.MatType.CV_32FC1, depthSL.GetPtr());
 
         sl.Pose zed_pose = new sl.Pose();
         zed.GetPosition(ref zed_pose, sl.REFERENCE_FRAME.WORLD); 
@@ -160,11 +166,13 @@ public class CamZed
             colorSL.Free();
             rightSL.Free();
             pointCloudSL.Free();
+            depthSL.Free();
 
             color.Dispose();
             rightView.Dispose();
             leftView.Dispose();
             pointCloud.Dispose();
+            if (depth != null) depth.Dispose();
             zed.Close();
         }
     }
