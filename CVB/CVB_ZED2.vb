@@ -1,8 +1,11 @@
 Imports cv = OpenCvSharp
+Imports System.Threading
 
 Namespace CVB
-    Public Class CameraZED2 : Inherits GenericCamera
+    Public Class CVB_ZED2 : Inherits CVB_Camera
         Dim zed As CamZed
+        Dim captureThread As Thread = Nothing
+        Dim isCapturing As Boolean = False
 
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
             captureRes = _captureRes
@@ -23,6 +26,24 @@ Namespace CVB
             CalibData.rightIntrinsics.ppy = zed.rightIntrinsics.ppy / ratio
 
             CalibData.baseline = zed.baseline
+
+            ' Start background thread to capture frames
+            isCapturing = True
+            captureThread = New Thread(AddressOf CaptureFrames)
+            captureThread.IsBackground = True
+            captureThread.Name = "ZED2_CaptureThread"
+            captureThread.Start()
+        End Sub
+
+        Private Sub CaptureFrames()
+            While isCapturing
+                Try
+                    GetNextFrame()
+                Catch ex As Exception
+                    ' Continue capturing even if one frame fails
+                    Thread.Sleep(10)
+                End Try
+            End While
         End Sub
 
         Public Sub GetNextFrame()
@@ -50,7 +71,12 @@ Namespace CVB
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
 
-        Public Sub StopCamera()
+        Public Overrides Sub StopCamera()
+            isCapturing = False
+            If captureThread IsNot Nothing Then
+                captureThread.Join(1000) ' Wait up to 1 second for thread to finish
+                captureThread = Nothing
+            End If
             If zed IsNot Nothing AndAlso camImages IsNot Nothing AndAlso camImages.pointCloud.Width > 0 Then
                 zed.StopCamera()
             End If

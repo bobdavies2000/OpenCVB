@@ -58,7 +58,7 @@ Public Class CameraImages
         End Set
     End Property
 End Class
-Public Class GenericCamera
+Public Class CVB_Camera
     Public transformationMatrix() As Single
     Public IMU_TimeStamp As Double
     Public IMU_Acceleration As cv.Point3f
@@ -80,6 +80,7 @@ Public Class GenericCamera
     Public cameraName As String = ""
     Public cPtr As IntPtr
     Public ratio As Single
+    Public Event FrameReady(sender As CVB_Camera)
     Public Structure imuDataStruct
         Dim r00 As Single
         Dim r01 As Single
@@ -126,5 +127,11 @@ Public Class GenericCamera
         lastCPUTime = CPU_TimeStamp
 
         cameraFrameCount += 1
+        RaiseEvent FrameReady(Me)
+    End Sub
+    Public Sub childStopCamera()
+        StopCamera()
+    End Sub
+    Public Overridable Sub StopCamera()
     End Sub
 End Class

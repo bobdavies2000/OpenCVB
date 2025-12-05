@@ -308,7 +308,7 @@
         4vyYD/+df8O/RVgIGWuiEpYq/+BM+MnjROdwxMz/AyQ9jyqVDqWuAAAAAElFTkSuQmCC
 </value>
   </data>
-  <data name="Options.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="OptionsButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAJYAAACVCAYAAAC6lQNMAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAACmbSURBVHhe7d0FkDVHEQfwQHB3d3f3ECS4BHdNCO7uHiR4

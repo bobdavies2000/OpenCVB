@@ -33,7 +33,6 @@ Namespace jsonClass
 
         Public showBatchConsole As Boolean
 
-        Public treeButton As Boolean
         Public treeLocation As cv.Vec4f
 
         Public fontInfo As Font
@@ -63,7 +62,6 @@ Namespace jsonClass
             emptyApp.workRes = New cv.Size(320, 180)
             emptyApp.snap640 = True
             emptyApp.showBatchConsole = False
-            emptyApp.treeButton = True
             emptyApp.treeLocation = New cv.Vec4f(20, 20, 500, 600)
 
             SaveSetting("OpenCVB", "gOptionsLeft", "gOptionsLeft", 10)

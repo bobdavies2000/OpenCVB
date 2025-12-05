@@ -75,7 +75,7 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             Dim depth = depthGrid.Mean(mask)(0)
             Dim mm = GetMinMax(depthGrid, mask)
             task.depthAndDepthRange = "Depth = " + Format(depth, fmt1) + "m grid = " + CStr(gridIndex) + " " + vbCrLf +
-                                              "Depth range = " + Format(mm.minVal, fmt1) + "m to " + Format(mm.maxVal, fmt1) + "m"
+                                               "Depth range = " + Format(mm.minVal, fmt1) + "m to " + Format(mm.maxVal, fmt1) + "m"
         Else
             task.depthAndDepthRange = ""
         End If
@@ -85,7 +85,6 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
         If cPtr <> 0 Then cPtr = Depth_Colorizer_Close(cPtr)
     End Sub
 End Class
-
 
 
 

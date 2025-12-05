@@ -1,3 +1,4 @@
+Imports System
 Imports System.Windows.Forms
 Imports System.Drawing
 Imports System.Drawing.Drawing2D
@@ -16,9 +17,9 @@ Namespace CVB
         Dim algHistory As New List(Of String)
         Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
 
-        Dim camera As Object = Nothing
+        Dim camera As CVB_Camera = Nothing
         Dim cameraRunning As Boolean = False
-        Dim cameraTimer As Timer = Nothing
+        Dim dstImages As CameraImages.images
         Public Sub jumpToAlgorithm(algName As String)
             If AvailableAlgorithms.Items.Contains(algName) = False Then
                 AvailableAlgorithms.SelectedIndex = 0
@@ -64,89 +65,6 @@ Namespace CVB
             End If
             settingsIO = New jsonCVBIO(settingsPath)
         End Sub
-        Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
-            ' Toggle between Play and Pause
-            isPlaying = Not isPlaying
-            PausePlayButton.Image = If(isPlaying, New Bitmap(CurDir() + "/Data/PauseButton.png"),
-                                                  New Bitmap(CurDir() + "/Data/Run.png"))
-            If isPlaying Then StartCamera() Else StopCamera()
-        End Sub
-
-        Private Sub StartCamera()
-            If camera Is Nothing AndAlso settings IsNot Nothing Then
-                Try
-                    ' Select camera based on settings.cameraName
-                    Select Case settings.cameraName
-                        Case "StereoLabs ZED 2/2i"
-                            camera = New CameraZED2(settings.workRes, settings.captureRes, settings.cameraName)
-                        Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
-                            camera = New CameraRS2(settings.workRes, settings.captureRes, settings.cameraName)
-                        Case Else
-                            ' Default to ZED if camera name not recognized
-                            camera = New CameraZED2(settings.workRes, settings.captureRes, "StereoLabs ZED 2/2i")
-                    End Select
-                    cameraRunning = True
-
-                    ' Start camera timer on UI thread
-                    cameraTimer = New Timer()
-                    AddHandler cameraTimer.Tick, AddressOf CameraTimer_Tick
-                    cameraTimer.Interval = 33 ' ~30 FPS
-                    cameraTimer.Start()
-                Catch ex As Exception
-                    MessageBox.Show("Failed to start camera: " + ex.Message, "Camera Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                    isPlaying = False
-                End Try
-            End If
-        End Sub
-
-        Private Sub StopCamera()
-            cameraRunning = False
-            If cameraTimer IsNot Nothing Then
-                cameraTimer.Stop()
-                cameraTimer.Dispose()
-                cameraTimer = Nothing
-            End If
-            If camera IsNot Nothing Then
-                camera.StopCamera()
-                camera = Nothing
-            End If
-        End Sub
-
-        Private Sub CameraTimer_Tick(sender As Object, e As EventArgs)
-            If Not cameraRunning OrElse camera Is Nothing Then
-                Return
-            End If
-
-            Try
-                ' Capture frame on UI thread
-                camera.GetNextFrame()
-
-                ' Update all 4 PictureBoxes using camImages from GenericCamera
-                UpdatePictureBox(campicRGB, camera.camImages.color)
-                UpdatePictureBox(campicPointCloud, camera.camImages.pointCloud)
-                UpdatePictureBox(campicLeft, camera.camImages.left)
-                UpdatePictureBox(campicRight, camera.camImages.right)
-            Catch ex As Exception
-                Debug.WriteLine("Camera error: " + ex.Message)
-            End Try
-        End Sub
-
-        Private Sub UpdatePictureBox(picBox As PictureBox, image As cv.Mat)
-            If image IsNot Nothing AndAlso image.Width > 0 Then
-                Try
-                    Dim displayImage = image.Clone()
-                    ' Convert to Bitmap for display
-                    Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
-                    If picBox.Image IsNot Nothing Then
-                        picBox.Image.Dispose()
-                    End If
-                    picBox.Image = bitmap
-                    displayImage.Dispose()
-                Catch ex As Exception
-                    Debug.WriteLine("Display update error: " + ex.Message)
-                End Try
-            End If
-        End Sub
         Private Sub SettingsToolStripButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             Dim optionsForm As New CVBOptions()
             optionsForm.settings = settings
@@ -163,6 +81,8 @@ Namespace CVB
 
             settings = settingsIO.Load()
             LoadAvailableAlgorithms()
+
+            Me.Show()
 
             PausePlayButton.PerformClick()
             PausePlayButton.Image = New Bitmap(CurDir() + "/Data/PauseButton.png")
@@ -293,23 +213,94 @@ Namespace CVB
         Private Sub PictureBox_MouseMove(sender As Object, e As MouseEventArgs) Handles campicRGB.MouseMove, campicPointCloud.MouseMove, campicLeft.MouseMove, campicRight.MouseMove
             Dim picBox = TryCast(sender, PictureBox)
             If picBox IsNot Nothing Then
-                Dim X = CInt(e.X Mod (picBox.Width / 2))
-                Dim Y = CInt(e.Y Mod (picBox.Height / 2))
                 If lastClickPoint <> Point.Empty Then
-                    StatusLabel.Text = String.Format("X: {0}, Y: {1}", X, Y)
-                    StatusLabel.Text += String.Format(", Last click: {0}, {1}", CInt(lastClickPoint.X Mod (picBox.Width \ 2)),
-                                                                                 CInt(lastClickPoint.Y Mod (picBox.Height \ 2)))
+                    StatusLabel.Text = String.Format("X: {0}, Y: {1}", e.X, e.Y)
+                    StatusLabel.Text += String.Format(", Last click: {0}, {1}", lastClickPoint.X, lastClickPoint.Y)
                 Else
-                    StatusLabel.Text = String.Format("X: {0}, Y: {1}", X, Y)
+                    StatusLabel.Text = String.Format("X: {0}, Y: {1}", e.X, e.Y)
                 End If
             End If
         End Sub
 
         Private Sub PictureBox_MouseClick(sender As Object, e As MouseEventArgs) Handles campicRGB.MouseClick, campicPointCloud.MouseClick, campicLeft.MouseClick, campicRight.MouseClick
             Dim picBox = TryCast(sender, PictureBox)
-            If picBox IsNot Nothing Then
-                lastClickPoint = New Point(e.X, e.Y)
+            If picBox IsNot Nothing Then lastClickPoint = New Point(e.X, e.Y)
+        End Sub
+
+        Private Sub StartCamera()
+            If camera Is Nothing AndAlso settings IsNot Nothing Then
+                Try
+                    ' Select camera based on settings.cameraName
+                    Select Case settings.cameraName
+                        Case "StereoLabs ZED 2/2i"
+                            camera = New CVB_ZED2(settings.workRes, settings.captureRes, settings.cameraName)
+                        Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
+                            camera = New CVB_RS2(settings.workRes, settings.captureRes, settings.cameraName)
+                        Case Else
+                            ' Default to ZED if camera name not recognized
+                            camera = New CVB_ZED2(settings.workRes, settings.captureRes, "StereoLabs ZED 2/2i")
+                    End Select
+                    cameraRunning = True
+
+                    ' Subscribe to FrameReady event
+                    AddHandler camera.FrameReady, AddressOf Camera_FrameReady
+                Catch ex As Exception
+                    MessageBox.Show("Failed to start camera: " + ex.Message, "Camera Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    isPlaying = False
+                End Try
             End If
+        End Sub
+        Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
+            ' Toggle between Play and Pause
+            isPlaying = Not isPlaying
+            PausePlayButton.Image = If(isPlaying, New Bitmap(CurDir() + "/Data/PauseButton.png"),
+                                                  New Bitmap(CurDir() + "/Data/Run.png"))
+            If isPlaying Then StartCamera() Else StopCamera()
+        End Sub
+        Private Sub StopCamera()
+            cameraRunning = False
+            If camera IsNot Nothing Then
+                ' Unsubscribe from event
+                RemoveHandler camera.FrameReady, AddressOf Camera_FrameReady
+                camera.childStopCamera()
+                camera = Nothing
+            End If
+        End Sub
+        Private Sub Camera_FrameReady(sender As CVB_Camera)
+            processImages(sender.camImages)
+            If Not cameraRunning OrElse camera Is Nothing Then Return
+        End Sub
+
+        Private Sub UpdatePictureBox(picBox As PictureBox, image As cv.Mat)
+            If image IsNot Nothing AndAlso image.Width > 0 Then
+                Try
+                    Dim displayImage = image.Clone()
+                    ' Convert to Bitmap for display
+                    Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
+                    If picBox.Image IsNot Nothing Then
+                        picBox.Image.Dispose()
+                    End If
+                    picBox.Image = bitmap
+                    displayImage.Dispose()
+                Catch ex As Exception
+                    Debug.WriteLine("Display update error: " + ex.Message)
+                End Try
+            End If
+        End Sub
+        Private Sub campicRGB_Paint(sender As Object, e As PaintEventArgs) Handles campicRGB.Paint
+            If dstImages Is Nothing Then Return
+            Try
+                ' Update all 4 PictureBoxes using camImages from CVB_Camera
+                UpdatePictureBox(campicRGB, dstImages.color)
+                UpdatePictureBox(campicPointCloud, dstImages.pointCloud)
+                UpdatePictureBox(campicLeft, dstImages.left)
+                UpdatePictureBox(campicRight, dstImages.right)
+            Catch ex As Exception
+                Debug.WriteLine("Camera display error: " + ex.Message)
+            End Try
+        End Sub
+        Private Sub processImages(camImages As CameraImages.images)
+            dstImages = camImages
         End Sub
     End Class
 End Namespace

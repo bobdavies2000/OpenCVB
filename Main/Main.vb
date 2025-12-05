@@ -965,6 +965,12 @@ Namespace OpenCVB
 
             PausePlayButton.Image = PausePlay
 
+            ' when switching resolution, best to reset these as the move from higher to lower res
+            ' could mean the point is no longer valid.
+            ClickPoint = New cv.Point
+            mousePointCamPic = New cv.Point
+            AlgDescription.Text = ""
+
             If parms.algName = "GL_MainForm" Then
                 GLControl.Visible = True
                 GLControl.Location = camPic(2).Location
@@ -975,12 +981,6 @@ Namespace OpenCVB
             End If
 
             GC.Collect()
-
-            ' when switching resolution, best to reset these as the move from higher to lower res
-            ' could mean the point is no longer valid.
-            ClickPoint = New cv.Point
-            mousePointCamPic = New cv.Point
-            AlgDescription.Text = ""
 
             Thread.CurrentThread.Priority = ThreadPriority.Lowest
             algorithmTaskHandle = New Thread(AddressOf AlgorithmTask) ' <<<<<<<<<<<<<<<<<<<<<<<<< This starts the VB_Classes algorithm.

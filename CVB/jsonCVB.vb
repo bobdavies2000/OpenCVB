@@ -6,6 +6,15 @@ Imports cv = OpenCvSharp
 
 Namespace CVB
     Public Class jsonCVB
+        Public cameraIndex As Integer
+        Public cameraName As String = "Intel(R) RealSense(TM) Depth Camera 455" ' "StereoLabs ZED 2/2i"
+        Public cameraPresent As List(Of Boolean)
+        Public cameraFound As Boolean
+        Public resolutionsSupported As List(Of Boolean)
+        Public cameraSupported As List(Of Boolean)
+        Public camera640x480Support As List(Of Boolean)
+        Public camera1920x1080Support As List(Of Boolean)
+
         Public FormLeft As Integer = 0
         Public FormTop As Integer = 0
         Public FormWidth As Integer = 1867
@@ -13,15 +22,6 @@ Namespace CVB
         Public algorithm As String
         Public workRes As New cv.Size(672, 376)
         Public captureRes As New cv.Size(672, 376)
-
-        Public cameraIndex As Integer
-        Public cameraName As String = "StereoLabs ZED 2/2i"
-        Public cameraPresent As List(Of Boolean)
-        Public cameraFound As Boolean
-        Public resolutionsSupported As List(Of Boolean)
-        Public cameraSupported As List(Of Boolean)
-        Public camera640x480Support As List(Of Boolean)
-        Public camera1920x1080Support As List(Of Boolean)
 
         Public locationPixelViewer As cv.Vec4f
         Public locationOpenGL As cv.Vec4f
@@ -32,7 +32,6 @@ Namespace CVB
 
         Public showBatchConsole As Boolean
 
-        Public treeButton As Boolean
         Public treeLocation As cv.Vec4f
 
         Public fontInfo As Font

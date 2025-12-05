@@ -115,7 +115,7 @@ Public Class CameraRS2 : Inherits GenericCamera
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Using
     End Sub
-    Public Sub stopCamera()
+    Public Overrides Sub StopCamera()
         pipe.Stop()
     End Sub
 End Class

@@ -59,6 +59,9 @@ Public Class CameraImages
     End Property
 End Class
 Public Class GenericCamera
+    ' FrameReady event - raised when a new frame is available
+    Public Event FrameReady(sender As GenericCamera)
+    
     Public transformationMatrix() As Single
     Public IMU_TimeStamp As Double
     Public IMU_Acceleration As cv.Point3f
@@ -127,5 +130,17 @@ Public Class GenericCamera
 
         cameraFrameCount += 1
         OpenCVB.MainUI.cameraReady = True
+        
+        ' Raise FrameReady event
+        RaiseEvent FrameReady(Me)
+    End Sub
+    
+    Public Overridable Sub StopCamera()
+        ' Base implementation - can be overridden by derived classes
+    End Sub
+    
+    Public Sub childStopCamera()
+        ' Call the overridden StopCamera method
+        StopCamera()
     End Sub
 End Class
