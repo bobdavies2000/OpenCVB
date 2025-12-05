@@ -47,7 +47,6 @@ Namespace CVB
             labelRight = New Label()
             StatusLabel = New Label()
             StartUpTimer = New Timer(components)
-            CamSwitchProgress = New PictureBox()
             CameraSwitching = New Label()
             Timer1 = New Timer(components)
             CamSwitchTimer = New Timer(components)
@@ -56,7 +55,6 @@ Namespace CVB
             CType(campicPointCloud, ComponentModel.ISupportInitialize).BeginInit()
             CType(campicLeft, ComponentModel.ISupportInitialize).BeginInit()
             CType(campicRight, ComponentModel.ISupportInitialize).BeginInit()
-            CType(CamSwitchProgress, ComponentModel.ISupportInitialize).BeginInit()
             SuspendLayout()
             ' 
             ' MainToolStrip
@@ -267,16 +265,6 @@ Namespace CVB
             StartUpTimer.Enabled = True
             StartUpTimer.Interval = 10
             ' 
-            ' CamSwitchProgress
-            ' 
-            CamSwitchProgress.BackColor = SystemColors.MenuHighlight
-            CamSwitchProgress.Location = New Point(61, 160)
-            CamSwitchProgress.Margin = New Padding(3, 4, 3, 4)
-            CamSwitchProgress.Name = "CamSwitchProgress"
-            CamSwitchProgress.Size = New Size(242, 32)
-            CamSwitchProgress.TabIndex = 10
-            CamSwitchProgress.TabStop = False
-            ' 
             ' CameraSwitching
             ' 
             CameraSwitching.AutoSize = True
@@ -301,7 +289,6 @@ Namespace CVB
             AutoScaleDimensions = New SizeF(12.0F, 30.0F)
             AutoScaleMode = AutoScaleMode.Font
             ClientSize = New Size(1275, 1171)
-            Controls.Add(CamSwitchProgress)
             Controls.Add(CameraSwitching)
             Controls.Add(StatusLabel)
             Controls.Add(campicRight)
@@ -323,7 +310,6 @@ Namespace CVB
             CType(campicPointCloud, ComponentModel.ISupportInitialize).EndInit()
             CType(campicLeft, ComponentModel.ISupportInitialize).EndInit()
             CType(campicRight, ComponentModel.ISupportInitialize).EndInit()
-            CType(CamSwitchProgress, ComponentModel.ISupportInitialize).EndInit()
             ResumeLayout(False)
             PerformLayout()
         End Sub
@@ -350,7 +336,6 @@ Namespace CVB
         Friend WithEvents labelRight As Label
         Friend WithEvents StatusLabel As Label
         Friend WithEvents StartUpTimer As Timer
-        Friend WithEvents CamSwitchProgress As PictureBox
         Friend WithEvents CameraSwitching As Label
         Friend WithEvents Timer1 As Timer
         Friend WithEvents CamSwitchTimer As Timer

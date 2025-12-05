@@ -23,33 +23,17 @@ Namespace CVB
         Dim dstImages As CameraImages.images
         Dim camPics As New List(Of PictureBox)
         Dim labels As New List(Of Label)
-        Public camSwitchCount As Integer
         Public dst2ready As Boolean
         Public camImages As CameraImages.images
         Private Sub camSwitchAnnouncement()
             CameraSwitching.Visible = True
             CameraSwitching.Text = settings.cameraName + " starting"
-            CamSwitchProgress.Visible = True
-            CamSwitchProgress.Left = CameraSwitching.Left
-            CamSwitchProgress.Top = CameraSwitching.Top + CameraSwitching.Height
-            CamSwitchProgress.Height = CameraSwitching.Height / 2
             CameraSwitching.BringToFront()
-            CamSwitchProgress.BringToFront()
             CamSwitchTimer.Enabled = True
             dst2ready = False
-            camSwitchCount = 0
         End Sub
         Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
-            Debug.WriteLine("testing")
-            If CamSwitchProgress.Visible Then
-                Static frames As Integer
-                Dim slideCount As Integer = 10
-                CamSwitchProgress.Width = CameraSwitching.Width * frames / slideCount
-                If frames >= slideCount Then frames = 1
-                frames += 1
-                Me.Refresh()
-            End If
-            camSwitchCount += 1
+            Me.Refresh()
         End Sub
         Public Sub jumpToAlgorithm(algName As String)
             If AvailableAlgorithms.Items.Contains(algName) = False Then
@@ -394,7 +378,6 @@ Namespace CVB
             If CameraSwitching.Visible Then
                 If camera.cameraFrameCount > 0 Then
                     CameraSwitching.Visible = False
-                    CamSwitchProgress.Visible = False
                     CamSwitchTimer.Enabled = False
                 End If
             End If
