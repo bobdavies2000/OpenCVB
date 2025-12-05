@@ -1,36 +1,76 @@
-Imports cv = OpenCvSharp
-Imports Intel.RealSense
+Imports System.Runtime.InteropServices
 Imports System.Threading
+Imports Intel.RealSense
+Imports cv = OpenCvSharp
 
 Namespace CVB
     Public Class CVB_RS2 : Inherits CVB_Camera
-        Dim rs2 As CVB_RS2
         Dim captureThread As Thread = Nothing
         Dim isCapturing As Boolean = False
-
-        Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
+        Dim pipe As New Pipeline()
+        Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
             captureRes = _captureRes
             workRes = _workRes
-            ratio = CInt(captureRes.Width / workRes.Width)
-            rs2 = New CVB_RS2(workRes, captureRes, deviceName)
+            Dim serialNumber As String = ""
+            Dim ctx As New Context()
+            Dim searchName As String = If(devName.EndsWith("455"), "D455", "D435i")
+            For Each dev In ctx.QueryDevices()
+                If dev.Info.Item(0).Contains(searchName) Then serialNumber = dev.Info.Item(1)
+            Next
 
-            calibData.rgbIntrinsics.fx = rs2.calibData.rgbIntrinsics.fx
-            calibData.rgbIntrinsics.fy = rs2.calibData.rgbIntrinsics.fy
-            calibData.rgbIntrinsics.ppx = rs2.calibData.rgbIntrinsics.ppx
-            calibData.rgbIntrinsics.ppy = rs2.calibData.rgbIntrinsics.ppy
+            Dim cfg As New Config()
+            cfg.EnableDevice(serialNumber)
 
-            calibData.leftIntrinsics.fx = rs2.calibData.leftIntrinsics.fx
-            calibData.leftIntrinsics.fy = rs2.calibData.leftIntrinsics.fy
-            calibData.leftIntrinsics.ppx = rs2.calibData.leftIntrinsics.ppx
-            calibData.leftIntrinsics.ppy = rs2.calibData.leftIntrinsics.ppy
+            cfg.EnableStream(Stream.Color, captureRes.Width, captureRes.Height, Format.Bgr8, fps)
+            cfg.EnableStream(Stream.Infrared, 1, captureRes.Width, captureRes.Height, Format.Y8, fps)
+            cfg.EnableStream(Stream.Infrared, 2, captureRes.Width, captureRes.Height, Format.Y8, fps)
+            cfg.EnableStream(Stream.Depth, captureRes.Width, captureRes.Height, Format.Z16, fps)
+            cfg.EnableStream(Stream.Accel, Format.MotionXyz32f, 63)
+            cfg.EnableStream(Stream.Gyro, Format.MotionXyz32f, 200)
 
-            calibData.rightIntrinsics.fx = rs2.calibData.rightIntrinsics.fx
-            calibData.rightIntrinsics.fy = rs2.calibData.rightIntrinsics.fy
-            calibData.rightIntrinsics.ppx = rs2.calibData.rightIntrinsics.ppx
-            calibData.rightIntrinsics.ppy = rs2.calibData.rightIntrinsics.ppy
+            Dim profiles = pipe.Start(cfg)
+            Dim streamLeft = profiles.GetStream(Stream.Infrared, 1)
+            Dim streamRight = profiles.GetStream(Stream.Infrared, 2)
+            Dim StreamColor = profiles.GetStream(Stream.Color)
+            Dim rgb As Intrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
+            Dim rgbExtrinsics As Extrinsics = StreamColor.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamLeft)
 
-            calibData.baseline = rs2.calibData.baseline
+            Dim ratio = CInt(captureRes.Width / workRes.Width)
+            calibData.rgbIntrinsics.ppx = rgb.ppx / ratio
+            calibData.rgbIntrinsics.ppy = rgb.ppy / ratio
+            calibData.rgbIntrinsics.fx = rgb.fx / ratio
+            calibData.rgbIntrinsics.fy = rgb.fy / ratio
 
+            Dim leftIntrinsics As Intrinsics = streamLeft.As(Of VideoStreamProfile)().GetIntrinsics()
+            Dim leftExtrinsics As Extrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamRight)
+            calibData.leftIntrinsics.ppx = rgb.ppx / ratio
+            calibData.leftIntrinsics.ppy = rgb.ppy / ratio
+            calibData.leftIntrinsics.fx = rgb.fx / ratio
+            calibData.leftIntrinsics.fy = rgb.fy / ratio
+
+            ReDim calibData.LtoR_translation(3 - 1)
+            ReDim calibData.LtoR_rotation(9 - 1)
+
+            ReDim calibData.ColorToLeft_translation(3 - 1)
+            ReDim calibData.ColorToLeft_rotation(9 - 1)
+
+            For i = 0 To 3 - 1
+                calibData.LtoR_translation(i) = leftExtrinsics.translation(i)
+            Next
+            For i = 0 To 9 - 1
+                calibData.LtoR_rotation(i) = leftExtrinsics.rotation(i)
+            Next
+
+            For i = 0 To 3 - 1
+                calibData.ColorToLeft_translation(i) = rgbExtrinsics.translation(i)
+            Next
+            For i = 0 To 9 - 1
+                calibData.ColorToLeft_rotation(i) = rgbExtrinsics.rotation(i)
+            Next
+
+            calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.ColorToLeft_translation(0), 2) +
+                                              System.Math.Pow(calibData.ColorToLeft_translation(1), 2) +
+                                              System.Math.Pow(calibData.ColorToLeft_translation(2), 2))
             ' Start background thread to capture frames
             isCapturing = True
             captureThread = New Thread(AddressOf CaptureFrames)
@@ -49,22 +89,52 @@ Namespace CVB
             End While
         End Sub
         Public Sub GetNextFrame()
-            rs2.GetNextFrame()
+            Dim alignToColor = New Align(Stream.Color)
+            Dim ptcloud = New PointCloud()
+            Dim cols = captureRes.Width, rows = captureRes.Height
+            Static color As cv.Mat, leftView As cv.Mat, rightView As cv.Mat, pointCloud As cv.Mat
 
-            IMU_Acceleration = rs2.IMU_Acceleration
-            IMU_AngularVelocity = rs2.IMU_AngularVelocity
-            Static IMU_StartTime = rs2.IMU_TimeStamp
-            IMU_TimeStamp = (rs2.IMU_TimeStamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
+            Using frames As FrameSet = pipe.WaitForFrames(5000)
+                For Each frame As Intel.RealSense.Frame In frames
+                    If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 1 Then
+                        leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
+                    End If
+                    If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 2 Then
+                        rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
+                    End If
+                    If frame.Profile.Stream = Stream.Accel Then
+                        IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
+                    End If
+                    If frame.Profile.Stream = Stream.Gyro Then
+                        IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
+                        Dim mFrame = frame.As(Of MotionFrame)
+                        Static initialTime As Int64 = mFrame.Timestamp
+                        IMU_FrameTime = mFrame.Timestamp - initialTime
+                    End If
+                Next
 
-            ' Main CameraRS2 already resizes images to workRes, so just copy them directly
-            camImages.color = rs2.camImages.color
-            camImages.left = rs2.camImages.left
-            camImages.right = rs2.camImages.right
-            camImages.pointCloud = rs2.camImages.pointCloud
+                Dim alignedFrames As FrameSet = alignToColor.Process(frames).As(Of FrameSet)()
 
-            If cameraFrameCount Mod 10 = 0 Then GC.Collect()
+                color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, alignedFrames.ColorFrame.Data)
 
-            MyBase.GetNextFrameCounts(IMU_FrameTime)
+                Dim pcFrame = ptcloud.Process(alignedFrames.DepthFrame)
+                pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcFrame.Data)
+
+                If color Is Nothing Then color = New cv.Mat(workRes, cv.MatType.CV_8UC3)
+                If leftView Is Nothing Then leftView = New cv.Mat(workRes, cv.MatType.CV_8UC3)
+                If rightView Is Nothing Then rightView = New cv.Mat(workRes, cv.MatType.CV_8UC3)
+                If pointCloud Is Nothing Then pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3)
+
+                camImages.color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                camImages.left = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
+                camImages.right = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
+                camImages.pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+
+                cv.Cv2.ImShow("color", camImages.color)
+
+                GC.Collect() ' do you think this is unnecessary?  Remove it and check...
+                MyBase.GetNextFrameCounts(IMU_FrameTime)
+            End Using
         End Sub
         Public Overrides Sub StopCamera()
             isCapturing = False
@@ -72,9 +142,7 @@ Namespace CVB
                 captureThread.Join(1000) ' Wait up to 1 second for thread to finish
                 captureThread = Nothing
             End If
-            If rs2 IsNot Nothing AndAlso camImages IsNot Nothing AndAlso camImages.pointCloud.Width > 0 Then
-                rs2.stopCamera()
-            End If
+            If pipe IsNot Nothing Then pipe.Stop()
         End Sub
     End Class
 End Namespace

@@ -39,6 +39,10 @@ Namespace CVB
         Public fontInfo As Font
         Public desiredFPS As Integer
         Public testAllDuration As Integer
+
+        Public snap640 As Boolean = True
+        Public snap320 As Boolean
+        Public snapCustom As Boolean
     End Class
 
     Public Class jsonCVBIO
@@ -63,9 +67,9 @@ Namespace CVB
 
                     Select Case settings.captureRes.Width
                         Case 640
-                            settings.displayRes = New Size(320, 240)
+                            settings.displayRes = New Size(640, 480)
                         Case Else
-                            settings.displayRes = New Size(336, 188)
+                            settings.displayRes = New Size(672, 376)
                     End Select
 
                 Catch ex As Exception
@@ -90,14 +94,17 @@ Namespace CVB
                 Dim searchname = cameraNames(i)
                 Dim present As Boolean = False
                 If searchname.Contains("Oak-D") Then searchname = "Movidius MyriadX"
-                If searchname.StartsWith("StereoLabs ZED 2/2I") Then searchname = "ZED 2"
+                If searchname.StartsWith("StereoLabs ZED 2/2i") Then searchname = "ZED 2"
 
                 Dim subsetList As New List(Of String)
                 For Each usbDevice In usbList
                     If usbDevice.Contains("Orb") Then subsetList.Add(usbDevice)
-                    If usbDevice.Contains(searchname) Then present = True
+                    If usbDevice.Contains(searchname) Then
+                        present = True
+                        Exit For
+                    End If
                 Next
-                settings.cameraPresent.Add(present <> False)
+                settings.cameraPresent.Add(present)
             Next
 
             If settings.cameraName = "" Or settings.cameraPresent(settings.cameraIndex) = False Then
@@ -128,7 +135,6 @@ Namespace CVB
                 End If
             Next
 
-
             settings.cameraFound = False
             For i = 0 To settings.cameraPresent.Count - 1
                 If settings.cameraPresent(i) Then
@@ -154,25 +160,25 @@ Namespace CVB
                 Case 180, 360, 720
                     settings.captureRes = New cv.Size(1280, 720)
                 Case 376, 188, 94
-                    If settings.cameraName <> "StereoLabs ZED 2/2I" Then
-                        MessageBox.Show("The json settings don't appear to be correct!" + vbCrLf +
-                                        "The 'settings.json' file should be deleted" + vbCrLf +
-                                        "and rebuilt with default settings upon restart.")
+                    If settings.cameraName = "StereoLabs ZED 2/2i" Then
+                        settings.captureRes = New cv.Size(672, 376)
+                    Else
+                        settings.workRes = New cv.Size(320, 180)
+                        settings.captureRes = New cv.Size(672, 376)
                     End If
-                    settings.captureRes = New cv.Size(672, 376)
                 Case 120, 240, 480
                     settings.captureRes = New cv.Size(640, 480)
                     If settings.camera640x480Support(settings.cameraIndex) = False Then
                         settings.captureRes = New cv.Size(1280, 720)
                         settings.workRes = New cv.Size(320, 180)
                     End If
-        End Select
+            End Select
 
-        If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
+            If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
             settings.desiredFPS = 60
             settings.testAllDuration = 5
             Select Case settings.workRes.Width
-        Case 1920
+                Case 1920
                     settings.testAllDuration = 40
                 Case 1280
                     settings.testAllDuration = 35
@@ -188,7 +194,8 @@ Namespace CVB
                     settings.testAllDuration = 5
             End Select
 
-        Return settings
+            settings.snap640 = True ' force desktop display for now...
+            Return settings
         End Function
         Public Function USBenumeration() As List(Of String)
             Static usblist As New List(Of String)

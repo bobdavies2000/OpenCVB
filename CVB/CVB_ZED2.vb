@@ -34,7 +34,6 @@ Namespace CVB
             captureThread.Name = "ZED2_CaptureThread"
             captureThread.Start()
         End Sub
-
         Private Sub CaptureFrames()
             While isCapturing
                 Try
@@ -45,7 +44,6 @@ Namespace CVB
                 End Try
             End While
         End Sub
-
         Public Sub GetNextFrame()
             zed.GetNextFrame()
 
@@ -70,7 +68,6 @@ Namespace CVB
 
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
-
         Public Overrides Sub StopCamera()
             isCapturing = False
             If captureThread IsNot Nothing Then

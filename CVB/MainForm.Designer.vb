@@ -23,6 +23,7 @@ Namespace CVB
         'Do not modify it using the code editor.
         <System.Diagnostics.DebuggerStepThrough()>
         Private Sub InitializeComponent()
+            components = New ComponentModel.Container()
             Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainForm))
             MainToolStrip = New ToolStrip()
             PausePlayButton = New ToolStripButton()
@@ -45,11 +46,17 @@ Namespace CVB
             labelLeft = New Label()
             labelRight = New Label()
             StatusLabel = New Label()
+            StartUpTimer = New Timer(components)
+            CamSwitchProgress = New PictureBox()
+            CameraSwitching = New Label()
+            Timer1 = New Timer(components)
+            CamSwitchTimer = New Timer(components)
             MainToolStrip.SuspendLayout()
             CType(campicRGB, ComponentModel.ISupportInitialize).BeginInit()
             CType(campicPointCloud, ComponentModel.ISupportInitialize).BeginInit()
             CType(campicLeft, ComponentModel.ISupportInitialize).BeginInit()
             CType(campicRight, ComponentModel.ISupportInitialize).BeginInit()
+            CType(CamSwitchProgress, ComponentModel.ISupportInitialize).BeginInit()
             SuspendLayout()
             ' 
             ' MainToolStrip
@@ -59,7 +66,7 @@ Namespace CVB
             MainToolStrip.Location = New Point(0, 0)
             MainToolStrip.Name = "MainToolStrip"
             MainToolStrip.Padding = New Padding(0, 0, 3, 0)
-            MainToolStrip.Size = New Size(1699, 39)
+            MainToolStrip.Size = New Size(1275, 39)
             MainToolStrip.TabIndex = 0
             MainToolStrip.Text = "MainToolStrip"
             ' 
@@ -76,6 +83,7 @@ Namespace CVB
             ' OptionsButton
             ' 
             OptionsButton.DisplayStyle = ToolStripItemDisplayStyle.Image
+            OptionsButton.Image = CType(resources.GetObject("OptionsButton.Image"), Image)
             OptionsButton.ImageTransparentColor = Color.Magenta
             OptionsButton.Name = "OptionsButton"
             OptionsButton.Size = New Size(34, 34)
@@ -158,7 +166,7 @@ Namespace CVB
             ' 
             campicRGB.Anchor = AnchorStyles.None
             campicRGB.BackColor = Color.Black
-            campicRGB.Location = New Point(-84, 62)
+            campicRGB.Location = New Point(-296, 62)
             campicRGB.Margin = New Padding(0)
             campicRGB.Name = "campicRGB"
             campicRGB.Size = New Size(933, 528)
@@ -170,7 +178,7 @@ Namespace CVB
             ' 
             campicPointCloud.Anchor = AnchorStyles.None
             campicPointCloud.BackColor = Color.Black
-            campicPointCloud.Location = New Point(856, 58)
+            campicPointCloud.Location = New Point(644, 58)
             campicPointCloud.Margin = New Padding(0)
             campicPointCloud.Name = "campicPointCloud"
             campicPointCloud.Size = New Size(920, 536)
@@ -182,7 +190,7 @@ Namespace CVB
             ' 
             campicLeft.Anchor = AnchorStyles.None
             campicLeft.BackColor = Color.Black
-            campicLeft.Location = New Point(-77, 606)
+            campicLeft.Location = New Point(-289, 606)
             campicLeft.Margin = New Padding(0)
             campicLeft.Name = "campicLeft"
             campicLeft.Size = New Size(919, 535)
@@ -194,7 +202,7 @@ Namespace CVB
             ' 
             campicRight.Anchor = AnchorStyles.None
             campicRight.BackColor = Color.Black
-            campicRight.Location = New Point(856, 606)
+            campicRight.Location = New Point(644, 606)
             campicRight.Margin = New Padding(0)
             campicRight.Name = "campicRight"
             campicRight.Size = New Size(920, 535)
@@ -250,15 +258,51 @@ Namespace CVB
             StatusLabel.Location = New Point(0, 1141)
             StatusLabel.Margin = New Padding(0)
             StatusLabel.Name = "StatusLabel"
-            StatusLabel.Size = New Size(1699, 30)
+            StatusLabel.Size = New Size(1275, 30)
             StatusLabel.TabIndex = 2
             StatusLabel.TextAlign = ContentAlignment.MiddleLeft
+            ' 
+            ' StartUpTimer
+            ' 
+            StartUpTimer.Enabled = True
+            StartUpTimer.Interval = 10
+            ' 
+            ' CamSwitchProgress
+            ' 
+            CamSwitchProgress.BackColor = SystemColors.MenuHighlight
+            CamSwitchProgress.Location = New Point(61, 160)
+            CamSwitchProgress.Margin = New Padding(3, 4, 3, 4)
+            CamSwitchProgress.Name = "CamSwitchProgress"
+            CamSwitchProgress.Size = New Size(242, 32)
+            CamSwitchProgress.TabIndex = 10
+            CamSwitchProgress.TabStop = False
+            ' 
+            ' CameraSwitching
+            ' 
+            CameraSwitching.AutoSize = True
+            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12.0F)
+            CameraSwitching.Location = New Point(61, 122)
+            CameraSwitching.Name = "CameraSwitching"
+            CameraSwitching.Size = New Size(202, 29)
+            CameraSwitching.TabIndex = 9
+            CameraSwitching.Text = "CameraSwitching"
+            ' 
+            ' Timer1
+            ' 
+            Timer1.Enabled = True
+            Timer1.Interval = 10
+            ' 
+            ' CamSwitchTimer
+            ' 
+            CamSwitchTimer.Interval = 10
             ' 
             ' MainForm
             ' 
             AutoScaleDimensions = New SizeF(12.0F, 30.0F)
             AutoScaleMode = AutoScaleMode.Font
-            ClientSize = New Size(1699, 1171)
+            ClientSize = New Size(1275, 1171)
+            Controls.Add(CamSwitchProgress)
+            Controls.Add(CameraSwitching)
             Controls.Add(StatusLabel)
             Controls.Add(campicRight)
             Controls.Add(campicLeft)
@@ -279,6 +323,7 @@ Namespace CVB
             CType(campicPointCloud, ComponentModel.ISupportInitialize).EndInit()
             CType(campicLeft, ComponentModel.ISupportInitialize).EndInit()
             CType(campicRight, ComponentModel.ISupportInitialize).EndInit()
+            CType(CamSwitchProgress, ComponentModel.ISupportInitialize).EndInit()
             ResumeLayout(False)
             PerformLayout()
         End Sub
@@ -304,6 +349,11 @@ Namespace CVB
         Friend WithEvents labelLeft As Label
         Friend WithEvents labelRight As Label
         Friend WithEvents StatusLabel As Label
+        Friend WithEvents StartUpTimer As Timer
+        Friend WithEvents CamSwitchProgress As PictureBox
+        Friend WithEvents CameraSwitching As Label
+        Friend WithEvents Timer1 As Timer
+        Friend WithEvents CamSwitchTimer As Timer
 
     End Class
 End Namespace

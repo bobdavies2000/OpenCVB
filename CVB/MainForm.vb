@@ -1,8 +1,9 @@
 Imports System
-Imports System.Windows.Forms
 Imports System.Drawing
 Imports System.Drawing.Drawing2D
 Imports System.IO
+Imports System.Windows.Forms
+Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 
@@ -22,6 +23,34 @@ Namespace CVB
         Dim dstImages As CameraImages.images
         Dim camPics As New List(Of PictureBox)
         Dim labels As New List(Of Label)
+        Public camSwitchCount As Integer
+        Public dst2ready As Boolean
+        Public camImages As CameraImages.images
+        Private Sub camSwitchAnnouncement()
+            CameraSwitching.Visible = True
+            CameraSwitching.Text = settings.cameraName + " starting"
+            CamSwitchProgress.Visible = True
+            CamSwitchProgress.Left = CameraSwitching.Left
+            CamSwitchProgress.Top = CameraSwitching.Top + CameraSwitching.Height
+            CamSwitchProgress.Height = CameraSwitching.Height / 2
+            CameraSwitching.BringToFront()
+            CamSwitchProgress.BringToFront()
+            CamSwitchTimer.Enabled = True
+            dst2ready = False
+            camSwitchCount = 0
+        End Sub
+        Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
+            Debug.WriteLine("testing")
+            If CamSwitchProgress.Visible Then
+                Static frames As Integer
+                Dim slideCount As Integer = 10
+                CamSwitchProgress.Width = CameraSwitching.Width * frames / slideCount
+                If frames >= slideCount Then frames = 1
+                frames += 1
+                Me.Refresh()
+            End If
+            camSwitchCount += 1
+        End Sub
         Public Sub jumpToAlgorithm(algName As String)
             If AvailableAlgorithms.Items.Contains(algName) = False Then
                 AvailableAlgorithms.SelectedIndex = 0
@@ -182,8 +211,43 @@ Namespace CVB
         Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
             ' Toggle between Play and Pause
             isPlaying = Not isPlaying
-            PausePlayButton.Image = If(isPlaying, New Bitmap(CurDir() + "/Data/PauseButton.png"),
-                                                  New Bitmap(CurDir() + "/Data/Run.png"))
+
+            ' Get the correct path to the Data directory
+            Dim dataDir As String
+            If Not String.IsNullOrEmpty(projectFilePath) AndAlso File.Exists(projectFilePath) Then
+                Dim projectDir = Path.GetDirectoryName(projectFilePath)
+                dataDir = Path.Combine(projectDir, "Data")
+            Else
+                Dim appDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)
+                dataDir = Path.Combine(appDir, "Data")
+            End If
+
+            ' Load and set the appropriate image
+            Try
+                ' Dispose old image if it exists
+                If PausePlayButton.Image IsNot Nothing Then
+                    PausePlayButton.Image.Dispose()
+                End If
+
+                If isPlaying Then
+                    Dim pausePath = Path.Combine(dataDir, "PauseButton.png")
+                    If File.Exists(pausePath) Then
+                        PausePlayButton.Image = New Bitmap(pausePath)
+                    End If
+                Else
+                    Dim playPath = Path.Combine(dataDir, "Run.png")
+                    If File.Exists(playPath) Then
+                        PausePlayButton.Image = New Bitmap(playPath)
+                    End If
+                End If
+
+                ' Force the button to refresh
+                PausePlayButton.Invalidate()
+                Application.DoEvents()
+            Catch ex As Exception
+                Debug.WriteLine("Error loading button image: " + ex.Message)
+            End Try
+
             If isPlaying Then StartCamera() Else StopCamera()
         End Sub
         Private Sub StopCamera()
@@ -196,11 +260,38 @@ Namespace CVB
             End If
         End Sub
         Private Sub Camera_FrameReady(sender As CVB_Camera)
-            processImages(sender.camImages)
+            ' This event is raised from the background thread, so we need to marshal to UI thread
+            If Me.InvokeRequired Then
+                Me.BeginInvoke(New Action(Of CVB_Camera)(AddressOf Camera_FrameReady), sender)
+                Return
+            End If
+
+            ' Now we're on the UI thread, safe to access UI elements
             If Not cameraRunning OrElse camera Is Nothing Then Return
+            Try
+                If camImages Is Nothing Then camImages = New CameraImages.images(settings.workRes)
+                camImages.color = sender.camImages.color.Clone
+                camImages.pointCloud = sender.camImages.pointCloud.Clone
+                camImages.left = sender.camImages.left.Clone
+                camImages.right = sender.camImages.right.Clone
+                processImages(camImages)
+            Catch ex As Exception
+                Debug.WriteLine("Camera_FrameReady error: " + ex.Message)
+            End Try
         End Sub
         Private Sub MainForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
-            AlgDescription.Size = New Size(Me.Width - 570, AlgDescription.Height)
+            If settings Is Nothing Then Exit Sub
+
+            'Select Case settings.displayRes.Width
+            '    Case 640
+            '        Me.Height = 850
+            '        Me.Width = 800
+            '    Case Else
+            '        Me.Width = 1362
+            '        Me.Height = 891
+            'End Select
+
+            AlgDescription.Width = Me.Width - 570
             AlgDescription.Text = "Description of the algorithm"
 
             ' Calculate sizes for 2x2 grid with labels
@@ -219,8 +310,8 @@ Namespace CVB
             Dim totalPicHeight As Integer = statusLabelTop - topStart - (2 * labelHeight) - rowSpacing - 40
 
             ' Ensure all PictureBoxes are the same size
-            Dim uniformPicWidth As Integer = picWidth
-            Dim uniformPicHeight As Integer = picHeight
+            Dim uniformPicWidth As Integer = settings.displayRes.Width
+            Dim uniformPicHeight As Integer = settings.displayRes.Height
 
             ' Position top row labels
             labelRGB.Location = New Point(0, topStart)
@@ -230,7 +321,6 @@ Namespace CVB
 
             ' Position top row PictureBoxes (same size)
             campicRGB.Location = New Point(0, topStart + labelHeight)
-            campicRGB.Size = New Size(uniformPicWidth, uniformPicHeight)
             camPics.Add(campicRGB)
 
             campicPointCloud.Location = New Point(uniformPicWidth, topStart + labelHeight)
@@ -264,19 +354,16 @@ Namespace CVB
                 lab.Visible = True
             Next
 
-            ' Position status label at the bottom
             StatusLabel.Location = New Point(0, campicLeft.Top + campicLeft.Height)
             StatusLabel.Width = Me.Width
         End Sub
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             settings = settingsIO.Load()
-
-            MainForm_Resize(sender, e)
+            Me.Size = New Size(1297, 1100)
             For Each pic In camPics
                 pic.Size = settings.displayRes
             Next
-
-            Me.Show()
+            camSwitchAnnouncement()
 
             ' Set the current directory to the project path (where .vbproj file is located)
             Dim projectDir As DirectoryInfo = Nothing
@@ -287,37 +374,34 @@ Namespace CVB
 
             LoadAvailableAlgorithms()
 
-            PausePlayButton.PerformClick()
-            PausePlayButton.Image = New Bitmap(CurDir() + "/Data/PauseButton.png")
-
             setupAlgorithmHistory()
 
             Me.Location = New Point(settings.FormLeft, settings.FormTop)
             Me.Size = New Size(settings.FormWidth, settings.FormHeight)
-            MainForm_Resize(sender, e)
         End Sub
         Private Sub UpdatePictureBox(picBox As PictureBox, image As cv.Mat)
             If image IsNot Nothing AndAlso image.Width > 0 Then
-                Try
-                    Dim displayImage = image.Clone()
-                    ' Convert to Bitmap for display
-                    Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
-                    If picBox.Image IsNot Nothing Then
-                        picBox.Image.Dispose()
-                    End If
-                    picBox.Image = bitmap
-                    displayImage.Dispose()
-                Catch ex As Exception
-                    Debug.WriteLine("Display update error: " + ex.Message)
-                End Try
+                image = image.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+                Dim displayImage = image.Clone()
+                Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
+                If picBox.Image IsNot Nothing Then picBox.Image.Dispose()
+                picBox.Image = bitmap
+                displayImage.Dispose()
             End If
         End Sub
         Private Sub campicRGB_Paint(sender As Object, e As PaintEventArgs) Handles campicRGB.Paint
-            If dstImages Is Nothing Then Return
+            If dstImages Is Nothing Then Exit Sub
+            If CameraSwitching.Visible Then
+                If camera.cameraFrameCount > 0 Then
+                    CameraSwitching.Visible = False
+                    CamSwitchProgress.Visible = False
+                    CamSwitchTimer.Enabled = False
+                End If
+            End If
+
             Try
-                ' Update all 4 PictureBoxes using camImages from CVB_Camera
                 UpdatePictureBox(campicRGB, dstImages.color)
-                UpdatePictureBox(campicPointCloud, dstImages.pointCloud)
+                ' UpdatePictureBox(campicPointCloud, dstImages.pointCloud)
                 UpdatePictureBox(campicLeft, dstImages.left)
                 UpdatePictureBox(campicRight, dstImages.right)
             Catch ex As Exception
@@ -326,6 +410,10 @@ Namespace CVB
         End Sub
         Private Sub processImages(camImages As CameraImages.images)
             dstImages = camImages
+        End Sub
+        Private Sub StartUpTimer_Tick(sender As Object, e As EventArgs) Handles StartUpTimer.Tick
+            StartUpTimer.Enabled = False
+            PausePlayButton.PerformClick()
         End Sub
     End Class
 End Namespace

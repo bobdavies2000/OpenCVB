@@ -99,7 +99,9 @@ Public Class CVBOptions
         End If
 
         cameraRadioButton(settings.cameraIndex).Checked = True
-
+        Snap320.Checked = settings.snap320
+        SnapCustom.Checked = settings.Snapcustom
+        Snap640.Checked = settings.snap640
         showBatchConsole.Checked = settings.showBatchConsole
     End Sub
     Private Sub MainOptions_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
@@ -110,22 +112,22 @@ Public Class CVBOptions
         Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.Hide()
     End Sub
-    'Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-    '    FontDialog1.Font = settings.fontInfo
-    '    If FontDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
-    '        settings.fontInfo = FontDialog1.Font
-    '    End If
-    'End Sub
-    'Public Sub Snap320_CheckedChanged(sender As Object, e As EventArgs) Handles Snap320.CheckedChanged
-    '    Dim h = settings.workRes.Height
-    '    If h = 120 Or h = 240 Or h = 480 Then
-    '        settings.displayRes = New cv.Size(320, 240)
-    '    End If
-    'End Sub
-    'Public Sub Snap640_CheckedChanged(sender As Object, e As EventArgs) Handles Snap640.CheckedChanged
-    '    Dim h = settings.workRes.Height
-    '    If h = 120 Or h = 240 Or h = 480 Then
-    '        settings.displayRes = New cv.Size(640, 480)
-    '    End If
-    'End Sub
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        FontDialog1.Font = settings.fontInfo
+        If FontDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
+            settings.fontInfo = FontDialog1.Font
+        End If
+    End Sub
+    Public Sub Snap320_CheckedChanged(sender As Object, e As EventArgs) Handles Snap320.CheckedChanged
+        Dim h = settings.workRes.Height
+        If h = 120 Or h = 240 Or h = 480 Then
+            settings.displayRes = New cv.Size(320, 240)
+        End If
+    End Sub
+    Public Sub Snap640_CheckedChanged(sender As Object, e As EventArgs) Handles Snap640.CheckedChanged
+        Dim h = settings.workRes.Height
+        If h = 120 Or h = 240 Or h = 480 Then
+            settings.displayRes = New cv.Size(640, 480)
+        End If
+    End Sub
 End Class

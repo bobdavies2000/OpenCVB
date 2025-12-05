@@ -161,7 +161,7 @@ Partial Class CVBOptions
         GroupBox1.Margin = New Padding(4)
         GroupBox1.Name = "GroupBox1"
         GroupBox1.Padding = New Padding(4)
-        GroupBox1.Size = New Size(1172, 164)
+        GroupBox1.Size = New Size(1172, 104)
         GroupBox1.TabIndex = 5
         GroupBox1.TabStop = False
         GroupBox1.Text = "Other Global Settings"
@@ -169,7 +169,7 @@ Partial Class CVBOptions
         ' Label4
         ' 
         Label4.AutoSize = True
-        Label4.Location = New Point(77, 113)
+        Label4.Location = New Point(643, 49)
         Label4.Margin = New Padding(4, 0, 4, 0)
         Label4.Name = "Label4"
         Label4.Size = New Size(351, 30)
@@ -178,7 +178,7 @@ Partial Class CVBOptions
         ' 
         ' Button1
         ' 
-        Button1.Location = New Point(7, 108)
+        Button1.Location = New Point(573, 44)
         Button1.Margin = New Padding(4)
         Button1.Name = "Button1"
         Button1.Size = New Size(62, 40)
@@ -214,11 +214,11 @@ Partial Class CVBOptions
         Resolutions.Size = New Size(994, 290)
         Resolutions.TabIndex = 7
         ' 
-        ' Options
+        ' CVBOptions
         ' 
         AutoScaleDimensions = New SizeF(12F, 30F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1210, 832)
+        ClientSize = New Size(1210, 772)
         Controls.Add(Resolutions)
         Controls.Add(CameraGroup)
         Controls.Add(GroupBox1)
@@ -227,7 +227,7 @@ Partial Class CVBOptions
         Controls.Add(OKButton)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Margin = New Padding(4)
-        Name = "Options"
+        Name = "CVBOptions"
         Text = "OpenCVB Global Settings"
         DisplayResolution.ResumeLayout(False)
         DisplayResolution.PerformLayout()
