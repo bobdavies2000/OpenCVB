@@ -23,7 +23,7 @@ Namespace CVB
 
         Public workRes As New cv.Size(336, 188)
         Public captureRes As New cv.Size(672, 376)
-        Public displayRes As Size
+        Public displayRes As cv.Size
 
         Public locationPixelViewer As cv.Vec4f
         Public locationOpenGL As cv.Vec4f
@@ -64,13 +64,6 @@ Namespace CVB
                             settings = initialize(settings, homeDir)
                         End If
                     End Using
-
-                    Select Case settings.captureRes.Width
-                        Case 640
-                            settings.displayRes = New Size(640, 480)
-                        Case Else
-                            settings.displayRes = New Size(672, 376)
-                    End Select
 
                 Catch ex As Exception
                     ' If deserialization fails, return default settings
@@ -149,52 +142,6 @@ Namespace CVB
             End If
 
             If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
-
-            Select Case settings.workRes.Height
-                Case 270, 540, 1080
-                    settings.captureRes = New cv.Size(1920, 1080)
-                    If settings.camera1920x1080Support(settings.cameraIndex) = False Then
-                        settings.captureRes = New cv.Size(1280, 720)
-                        settings.workRes = New cv.Size(320, 180)
-                    End If
-                Case 180, 360, 720
-                    settings.captureRes = New cv.Size(1280, 720)
-                Case 376, 188, 94
-                    If settings.cameraName = "StereoLabs ZED 2/2i" Then
-                        settings.captureRes = New cv.Size(672, 376)
-                    Else
-                        settings.workRes = New cv.Size(320, 180)
-                        settings.captureRes = New cv.Size(672, 376)
-                    End If
-                Case 120, 240, 480
-                    settings.captureRes = New cv.Size(640, 480)
-                    If settings.camera640x480Support(settings.cameraIndex) = False Then
-                        settings.captureRes = New cv.Size(1280, 720)
-                        settings.workRes = New cv.Size(320, 180)
-                    End If
-            End Select
-
-            If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
-            settings.desiredFPS = 60
-            settings.testAllDuration = 5
-            Select Case settings.workRes.Width
-                Case 1920
-                    settings.testAllDuration = 40
-                Case 1280
-                    settings.testAllDuration = 35
-                Case 960
-                    settings.testAllDuration = 30
-                Case 672
-                    settings.testAllDuration = 15
-                Case 640
-                    settings.testAllDuration = 15
-                Case 480
-                    settings.testAllDuration = 10
-                Case 240, 336, 320, 168, 160
-                    settings.testAllDuration = 5
-            End Select
-
-            settings.snap640 = True ' force desktop display for now...
             Return settings
         End Function
         Public Function USBenumeration() As List(Of String)
@@ -237,6 +184,53 @@ Namespace CVB
         End Function
 
         Public Sub Save(settings As jsonCVB)
+            Select Case settings.captureRes.Width
+                Case 640
+                    settings.displayRes = New cv.Size(640, 480)
+                Case Else
+                    settings.displayRes = New cv.Size(672, 376)
+            End Select
+
+            Select Case settings.workRes.Height
+                Case 270, 540, 1080
+                    settings.captureRes = New cv.Size(1920, 1080)
+                Case 180, 360, 720
+                    settings.captureRes = New cv.Size(1280, 720)
+                Case 376, 188, 94
+                    If settings.cameraName = "StereoLabs ZED 2/2i" Then
+                        settings.captureRes = New cv.Size(672, 376)
+                    Else
+                        settings.workRes = New cv.Size(320, 180)
+                        settings.captureRes = New cv.Size(672, 376)
+                        settings.displayRes = New cv.Size(672, 376)
+                    End If
+                Case 120, 240, 480
+                    settings.captureRes = New cv.Size(640, 480)
+                    settings.displayRes = New cv.Size(640, 480)
+            End Select
+
+            If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
+            settings.desiredFPS = 60
+            settings.testAllDuration = 5
+            Select Case settings.workRes.Width
+                Case 1920
+                    settings.testAllDuration = 40
+                Case 1280
+                    settings.testAllDuration = 35
+                Case 960
+                    settings.testAllDuration = 30
+                Case 672
+                    settings.testAllDuration = 15
+                Case 640
+                    settings.testAllDuration = 15
+                Case 480
+                    settings.testAllDuration = 10
+                Case 240, 336, 320, 168, 160
+                    settings.testAllDuration = 5
+            End Select
+
+            settings.snap640 = True ' force desktop display for now...
+
             Try
                 Using streamWriter As New StreamWriter(jsonFileName)
                     Dim serializer As New JsonSerializer With {.Formatting = Formatting.Indented}

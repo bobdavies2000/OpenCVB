@@ -84,7 +84,29 @@ Namespace CVB
             Dim optionsForm As New CVBOptions()
             optionsForm.settings = settings
             optionsForm.cameraNames = Common.cameraNames
-            optionsForm.ShowDialog()
+
+            optionsForm.MainOptions_Load(sender, e)
+            optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True
+            Dim resStr = CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height)
+            For i = 0 To optionsForm.resolutionList.Count - 1
+                If optionsForm.resolutionList(i).StartsWith(resStr) Then
+                    optionsForm.workResRadio(i).Checked = True
+                End If
+            Next
+
+            Dim OKcancel = optionsForm.ShowDialog()
+
+            If OKcancel = DialogResult.OK Then
+                StopCamera()
+                camSwitchAnnouncement()
+
+                settings.cameraName = optionsForm.cameraName
+                settings.cameraIndex = optionsForm.cameraIndex
+
+                SaveSettings()
+
+                StartCamera()
+            End If
         End Sub
         Private Sub LoadAvailableAlgorithms()
             Try
@@ -266,15 +288,6 @@ Namespace CVB
         Private Sub MainForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
             If settings Is Nothing Then Exit Sub
 
-            'Select Case settings.displayRes.Width
-            '    Case 640
-            '        Me.Height = 850
-            '        Me.Width = 800
-            '    Case Else
-            '        Me.Width = 1362
-            '        Me.Height = 891
-            'End Select
-
             AlgDescription.Width = Me.Width - 570
             AlgDescription.Text = "Description of the algorithm"
 
@@ -345,8 +358,9 @@ Namespace CVB
             settings = settingsIO.Load()
             Me.Size = New Size(1297, 1100)
             For Each pic In camPics
-                pic.Size = settings.displayRes
+                pic.Size = New Size(settings.displayRes.Width, settings.displayRes.Height)
             Next
+
             camSwitchAnnouncement()
 
             ' Set the current directory to the project path (where .vbproj file is located)

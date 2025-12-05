@@ -130,8 +130,6 @@ Namespace CVB
                 camImages.right = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
                 camImages.pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
 
-                cv.Cv2.ImShow("color", camImages.color)
-
                 GC.Collect() ' do you think this is unnecessary?  Remove it and check...
                 MyBase.GetNextFrameCounts(IMU_FrameTime)
             End Using
