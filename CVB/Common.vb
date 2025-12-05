@@ -30,12 +30,12 @@ Public Class Common
         imageTriangles
     End Enum
 
-    Public Shared cameraNames As New List(Of String)({"StereoLabs ZED 2/2i",
+    Public Shared cameraNames As New List(Of String)({"Intel(R) RealSense(TM) Depth Camera 455",
+                                                      "StereoLabs ZED 2/2i",
                                                       "Orbbec Gemini 335L",
                                                       "Orbbec Gemini 336L",
                                                       "Oak-D camera",
                                                       "Intel(R) RealSense(TM) Depth Camera 435i",
-                                                      "Intel(R) RealSense(TM) Depth Camera 455",
                                                       "Orbbec Gemini 335"
                                                       })
 End Class

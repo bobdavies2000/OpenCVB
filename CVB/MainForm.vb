@@ -20,6 +20,8 @@ Namespace CVB
         Dim camera As CVB_Camera = Nothing
         Dim cameraRunning As Boolean = False
         Dim dstImages As CameraImages.images
+        Dim camPics As New List(Of PictureBox)
+        Dim labels As New List(Of Label)
         Public Sub jumpToAlgorithm(algName As String)
             If AvailableAlgorithms.Items.Contains(algName) = False Then
                 AvailableAlgorithms.SelectedIndex = 0
@@ -70,28 +72,6 @@ Namespace CVB
             optionsForm.settings = settings
             optionsForm.cameraNames = Common.cameraNames
             optionsForm.ShowDialog()
-        End Sub
-        Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-            ' Set the current directory to the project path (where .vbproj file is located)
-            Dim projectDir As DirectoryInfo = Nothing
-            If Not String.IsNullOrEmpty(projectFilePath) AndAlso File.Exists(projectFilePath) Then
-                projectDir = New DirectoryInfo(Path.GetDirectoryName(projectFilePath))
-                Directory.SetCurrentDirectory(projectDir.FullName)
-            End If
-
-            settings = settingsIO.Load()
-            LoadAvailableAlgorithms()
-
-            Me.Show()
-
-            PausePlayButton.PerformClick()
-            PausePlayButton.Image = New Bitmap(CurDir() + "/Data/PauseButton.png")
-
-            setupAlgorithmHistory()
-
-            Me.Location = New Point(settings.FormLeft, settings.FormTop)
-            Me.Size = New Size(settings.FormWidth, settings.FormHeight)
-            MainForm_Resize(sender, e)
         End Sub
         Private Sub LoadAvailableAlgorithms()
             Try
@@ -144,57 +124,6 @@ Namespace CVB
                     End If
                 Next
             End If
-        End Sub
-        Private Sub MainForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
-            AlgDescription.Size = New Size(Me.Width - 570, AlgDescription.Height)
-            AlgDescription.Text = "Description of the algorithm"
-
-            ' Calculate sizes for 2x2 grid with labels
-            Dim labelHeight As Integer = 18
-            Dim rowSpacing As Integer = 5 ' Space between top and bottom rows for labels
-            Dim topStart As Integer = MainToolStrip.Height
-            Dim statusLabelTop As Integer = Me.Height - StatusLabel.Height
-
-            ' Calculate available space: from toolbar to status label, accounting for labels
-            ' We need: top label + top pic + spacing + bottom label + bottom pic = statusLabelTop
-            ' So: topStart + labelHeight + picHeight + rowSpacing + labelHeight + picHeight = statusLabelTop
-            ' Therefore: 2 * picHeight = statusLabelTop - topStart - (2 * labelHeight) - rowSpacing
-            Dim totalPicHeight As Integer = statusLabelTop - topStart - (2 * labelHeight) - rowSpacing - 40
-            Dim picHeight As Integer = totalPicHeight \ 2
-            Dim availableWidth As Integer = Me.Width
-            Dim picWidth As Integer = availableWidth \ 2
-
-            ' Ensure all PictureBoxes are the same size
-            Dim uniformPicWidth As Integer = picWidth
-            Dim uniformPicHeight As Integer = picHeight
-
-            ' Position top row labels
-            labelRGB.Location = New Point(0, topStart)
-            labelPointCloud.Location = New Point(uniformPicWidth, topStart)
-
-            ' Position top row PictureBoxes (same size)
-            campicRGB.Location = New Point(0, topStart + labelHeight)
-            campicRGB.Size = New Size(uniformPicWidth, uniformPicHeight)
-
-            campicPointCloud.Location = New Point(uniformPicWidth, topStart + labelHeight)
-            campicPointCloud.Size = New Size(uniformPicWidth, uniformPicHeight)
-
-            ' Position bottom row labels (with spacing from top row)
-            Dim bottomRowLabelTop As Integer = topStart + labelHeight + uniformPicHeight + rowSpacing
-            labelLeft.Location = New Point(0, bottomRowLabelTop)
-            labelRight.Location = New Point(uniformPicWidth, bottomRowLabelTop)
-
-            ' Position bottom row PictureBoxes (same size, ending exactly at status label top)
-            Dim bottomRowPicTop As Integer = bottomRowLabelTop + labelHeight
-            campicLeft.Location = New Point(0, bottomRowPicTop)
-            campicLeft.Size = New Size(uniformPicWidth, uniformPicHeight)
-
-            campicRight.Location = New Point(uniformPicWidth, bottomRowPicTop)
-            campicRight.Size = New Size(uniformPicWidth, uniformPicHeight)
-
-            ' Position status label at the bottom
-            StatusLabel.Location = New Point(0, campicLeft.Top + campicLeft.Height)
-            StatusLabel.Width = Me.Width
         End Sub
         Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             SaveSettings()
@@ -270,7 +199,103 @@ Namespace CVB
             processImages(sender.camImages)
             If Not cameraRunning OrElse camera Is Nothing Then Return
         End Sub
+        Private Sub MainForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+            AlgDescription.Size = New Size(Me.Width - 570, AlgDescription.Height)
+            AlgDescription.Text = "Description of the algorithm"
 
+            ' Calculate sizes for 2x2 grid with labels
+            Dim labelHeight As Integer = 18
+            Dim rowSpacing As Integer = 5 ' Space between top and bottom rows for labels
+            Dim topStart As Integer = MainToolStrip.Height
+            Dim statusLabelTop As Integer = Me.Height - StatusLabel.Height
+
+            ' Calculate available space: from toolbar to status label, accounting for labels
+            ' We need: top label + top pic + spacing + bottom label + bottom pic = statusLabelTop
+            ' So: topStart + labelHeight + picHeight + rowSpacing + labelHeight + picHeight = statusLabelTop
+            ' Therefore: 2 * picHeight = statusLabelTop - topStart - (2 * labelHeight) - rowSpacing
+            Dim picHeight As Integer = 480
+            Dim availableWidth As Integer = Me.Width
+            Dim picWidth As Integer = 640
+            Dim totalPicHeight As Integer = statusLabelTop - topStart - (2 * labelHeight) - rowSpacing - 40
+
+            ' Ensure all PictureBoxes are the same size
+            Dim uniformPicWidth As Integer = picWidth
+            Dim uniformPicHeight As Integer = picHeight
+
+            ' Position top row labels
+            labelRGB.Location = New Point(0, topStart)
+            labelPointCloud.Location = New Point(uniformPicWidth, topStart)
+            labels.Add(labelRGB)
+            labels.Add(labelPointCloud)
+
+            ' Position top row PictureBoxes (same size)
+            campicRGB.Location = New Point(0, topStart + labelHeight)
+            campicRGB.Size = New Size(uniformPicWidth, uniformPicHeight)
+            camPics.Add(campicRGB)
+
+            campicPointCloud.Location = New Point(uniformPicWidth, topStart + labelHeight)
+            campicPointCloud.Size = New Size(uniformPicWidth, uniformPicHeight)
+            camPics.Add(campicPointCloud)
+
+            ' Position bottom row labels (with spacing from top row)
+            Dim bottomRowLabelTop As Integer = topStart + labelHeight + uniformPicHeight + rowSpacing
+            labelLeft.Location = New Point(0, bottomRowLabelTop)
+            labelRight.Location = New Point(uniformPicWidth, bottomRowLabelTop)
+            labels.Add(labelLeft)
+            labels.Add(labelRight)
+
+            ' Position bottom row PictureBoxes (same size, ending exactly at status label top)
+            Dim bottomRowPicTop As Integer = bottomRowLabelTop + labelHeight
+            campicLeft.Location = New Point(0, bottomRowPicTop)
+            campicLeft.Size = New Size(uniformPicWidth, uniformPicHeight)
+            camPics.Add(campicLeft)
+
+            campicRight.Location = New Point(uniformPicWidth, bottomRowPicTop)
+            campicRight.Size = New Size(uniformPicWidth, uniformPicHeight)
+            camPics.Add(campicRight)
+
+            For Each lab In labels
+                Dim index = labels.IndexOf(lab) + 1
+                lab.Top = Choose(index, camPics(0).Top - lab.Height, camPics(0).Top - lab.Height,
+                                        camPics(2).Top - lab.Height, camPics(2).Top - lab.Height)
+                lab.Left = Choose(index, camPics(0).Left, camPics(1).Left, camPics(2).Left, camPics(3).Left)
+                lab.BackColor = Me.BackColor
+                lab.Text = Choose(index, "RGB Image", "Point Cloud", "Left Image", "Right Image")
+                lab.Visible = True
+            Next
+
+            ' Position status label at the bottom
+            StatusLabel.Location = New Point(0, campicLeft.Top + campicLeft.Height)
+            StatusLabel.Width = Me.Width
+        End Sub
+        Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+            settings = settingsIO.Load()
+
+            MainForm_Resize(sender, e)
+            For Each pic In camPics
+                pic.Size = settings.displayRes
+            Next
+
+            Me.Show()
+
+            ' Set the current directory to the project path (where .vbproj file is located)
+            Dim projectDir As DirectoryInfo = Nothing
+            If Not String.IsNullOrEmpty(projectFilePath) AndAlso File.Exists(projectFilePath) Then
+                projectDir = New DirectoryInfo(Path.GetDirectoryName(projectFilePath))
+                Directory.SetCurrentDirectory(projectDir.FullName)
+            End If
+
+            LoadAvailableAlgorithms()
+
+            PausePlayButton.PerformClick()
+            PausePlayButton.Image = New Bitmap(CurDir() + "/Data/PauseButton.png")
+
+            setupAlgorithmHistory()
+
+            Me.Location = New Point(settings.FormLeft, settings.FormTop)
+            Me.Size = New Size(settings.FormWidth, settings.FormHeight)
+            MainForm_Resize(sender, e)
+        End Sub
         Private Sub UpdatePictureBox(picBox As PictureBox, image As cv.Mat)
             If image IsNot Nothing AndAlso image.Width > 0 Then
                 Try
