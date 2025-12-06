@@ -1,6 +1,5 @@
 Imports System.IO
 Imports System.Management
-Imports Main
 Imports Newtonsoft.Json
 Imports cv = OpenCvSharp
 

@@ -1,8 +1,4 @@
-Imports System
-Imports System.Drawing
-Imports System.Drawing.Drawing2D
 Imports System.IO
-Imports System.Windows.Forms
 Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
@@ -203,6 +199,8 @@ Namespace CVB
                             camera = New CVB_ZED2(settings.workRes, settings.captureRes, settings.cameraName)
                         Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
                             camera = New CVB_RS2(settings.workRes, settings.captureRes, settings.cameraName)
+                        Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
+                            camera = New CVB_ORB(settings.workRes, settings.captureRes, settings.cameraName)
                         Case Else
                             ' Default to ZED if camera name not recognized
                             camera = New CVB_ZED2(settings.workRes, settings.captureRes, "StereoLabs ZED 2/2i")

@@ -32,7 +32,30 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="ob_csharp">
+      <HintPath>..\OrbbecSDK_CSharp\Build\Release\ob_csharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Data\OpenCVB.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- Copy Orbbec native DLLs to output directory -->
+    <Content Include="..\OrbbecSDK_CSharp\Build\Release\ob_csharp.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\OrbbecSDK\lib\win_x64\OrbbecSDK.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\OrbbecSDK\lib\win_x64\ob_usb.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\OrbbecSDK\lib\win_x64\depthengine_2_0.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\OrbbecSDK\lib\win_x64\live555.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
