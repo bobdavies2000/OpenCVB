@@ -1,0 +1,23 @@
+﻿Imports System.Windows.Forms
+Public Class OptionsCheckbox 
+    Public Box As New List(Of CheckBox)
+    Public Function Setup(traceName As String) As Boolean
+        If OptionParent.findFrm(traceName + " CheckBoxes") IsNot Nothing Then Return False
+        Me.MdiParent = Common.allOptions
+        Me.Text = traceName + " CheckBoxes"
+        Common.allOptions.addTitle(Me)
+        Me.Show()
+        Return True
+    End Function
+    Public Sub addCheckBox(labelStr As String)
+        Dim index = Box.Count
+        Box.Add(New CheckBox)
+        AddHandler Box(index).CheckedChanged, AddressOf Box_CheckChanged
+        Box(index).AutoSize = True
+        Box(index).Text = labelStr
+        FlowLayoutPanel1.Controls.Add(Box(index))
+    End Sub
+    Private Sub Box_CheckChanged(sender As Object, e As EventArgs)
+        Common.optionsChanged = True
+    End Sub
+End Class

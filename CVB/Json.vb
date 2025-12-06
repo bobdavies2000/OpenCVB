@@ -4,7 +4,7 @@ Imports Newtonsoft.Json
 Imports cv = OpenCvSharp
 
 Namespace CVB
-    Public Class MainJson
+    Public Class Json
         Public cameraIndex As Integer
         Public cameraName As String = "StereoLabs ZED 2/2I"
         Public cameraPresent As List(Of Boolean)
@@ -46,8 +46,8 @@ Namespace CVB
             jsonFileName = fileName
         End Sub
 
-        Public Function Load() As MainJson
-            Dim settings As New MainJson()
+        Public Function Load() As Json
+            Dim settings As New Json()
             Dim fileInfo As New FileInfo(jsonFileName)
             Dim homeDir = fileInfo.DirectoryName + "/../"
             If fileInfo.Exists Then
@@ -55,7 +55,7 @@ Namespace CVB
                     Using streamReader As New StreamReader(jsonFileName)
                         Dim json = streamReader.ReadToEnd()
                         If json <> "" Then
-                            settings = JsonConvert.DeserializeObject(Of MainJson)(json)
+                            settings = JsonConvert.DeserializeObject(Of Json)(json)
                             settings = initialize(settings, homeDir)
                         End If
                     End Using
@@ -69,7 +69,7 @@ Namespace CVB
 
             Return settings
         End Function
-        Public Function initialize(ByRef settings As MainJson, homeDir As String) As MainJson
+        Public Function initialize(ByRef settings As Json, homeDir As String) As Json
             settings.cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True, True})
             settings.camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True, True})
             settings.camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False, False})
@@ -178,7 +178,7 @@ Namespace CVB
             Return usblist
         End Function
 
-        Public Sub Save(settings As MainJson)
+        Public Sub Save(settings As Json)
             Select Case settings.captureRes.Width
                 Case 640
                     settings.displayRes = New cv.Size(640, 480)

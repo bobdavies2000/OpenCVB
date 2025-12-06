@@ -2,7 +2,7 @@
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Namespace CVB
-    Partial Public Class MainForm
+    Partial Public Class MainForm : Inherits Form
         Dim camera As CVB_Camera = Nothing
         Dim cameraRunning As Boolean = False
         Dim dstImages As CameraImages.images

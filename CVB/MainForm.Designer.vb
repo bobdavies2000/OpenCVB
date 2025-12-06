@@ -1,6 +1,6 @@
 Namespace CVB
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-    Partial Class MainForm
+    Partial Public Class MainForm
         Inherits Form
 
         'Form overrides dispose to clean up the component list.

@@ -1,5 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Common
+    Public Shared optionsChanged As Boolean
+    Public Shared allOptions As New OptionsContainer
     Public Enum oCase
         drawPointCloudRGB
         drawLineAndCloud
