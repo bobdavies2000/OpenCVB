@@ -21,8 +21,25 @@ Namespace CVB
         Dim labels As New List(Of Label)
         Public dst2ready As Boolean
         Public camImages As CameraImages.images
-        Dim uniformPicWidth As Integer
-        Dim uniformPicHeight As Integer
+
+
+        Dim DrawingRectangle As Boolean
+        Dim drawRect As New cv.Rect
+        Dim drawRectPic As Integer
+        Dim frameCount As Integer = -1
+        Dim GrabRectangleData As Boolean
+        Dim LastX As Integer
+        Dim LastY As Integer
+        Dim mouseClickFlag As Boolean
+        Dim activateTaskForms As Boolean
+        Dim ClickPoint As New cv.Point ' last place where mouse was clicked.
+        Dim mousePicTag As Integer
+        Dim mouseDownPoint As cv.Point
+        Dim mouseMovePoint As cv.Point ' last place the mouse was located in any of the OpenCVB images.
+        Dim mousePointCamPic As New cv.Point ' mouse location in campics
+        Dim activeMouseDown As Boolean
+        Dim BothFirstAndLastReady As Boolean
+
         Private Sub camSwitchAnnouncement()
             CameraSwitching.Visible = True
             CameraSwitching.Text = settings.cameraName + " starting"
@@ -173,21 +190,95 @@ Namespace CVB
                 settingsIO.Save(settings)
             End If
         End Sub
-        Private Sub PictureBox_MouseMove(sender As Object, e As MouseEventArgs) Handles campicRGB.MouseMove, campicPointCloud.MouseMove, campicLeft.MouseMove, campicRight.MouseMove
-            Dim picBox = TryCast(sender, PictureBox)
-            If picBox IsNot Nothing Then
-                If lastClickPoint <> Point.Empty Then
-                    StatusLabel.Text = String.Format("X: {0}, Y: {1}", e.X, e.Y)
-                    StatusLabel.Text += String.Format(", Last click: {0}, {1}", lastClickPoint.X, lastClickPoint.Y)
-                Else
-                    StatusLabel.Text = String.Format("X: {0}, Y: {1}", e.X, e.Y)
+        Private Sub CamPic_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles campicRGB.MouseUp, campicPointCloud.MouseUp, campicLeft.MouseUp, campicRight.MouseUp
+            Try
+                If DrawingRectangle Then
+                    DrawingRectangle = False
+                    GrabRectangleData = True
                 End If
+                activeMouseDown = False
+            Catch ex As Exception
+                Debug.WriteLine("Error in camPic_MouseUp: " + ex.Message)
+            End Try
+        End Sub
+        Private Sub CamPic_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles campicRGB.MouseDown, campicPointCloud.MouseDown, campicLeft.MouseDown, campicRight.MouseDown
+            Dim x As Integer = e.X * settings.workRes.Width / campicRGB.Width
+            Dim y As Integer = e.Y * settings.workRes.Height / campicRGB.Height
+            Try
+                Dim pic = DirectCast(sender, PictureBox)
+                If e.Button = System.Windows.Forms.MouseButtons.Right Then
+                    activeMouseDown = True
+                End If
+                If e.Button = System.Windows.Forms.MouseButtons.Left Then
+                    DrawingRectangle = True
+                    BothFirstAndLastReady = False ' we have to see some movement after mousedown.
+                    drawRect.Width = 0
+                    drawRect.Height = 0
+                    mouseDownPoint.X = x
+                    mouseDownPoint.Y = y
+                End If
+            Catch ex As Exception
+                Debug.WriteLine("Error in camPic_MouseDown: " + ex.Message)
+            End Try
+        End Sub
+        Private Sub CamPic_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles campicRGB.MouseMove, campicPointCloud.MouseMove, campicLeft.MouseMove, campicRight.MouseMove
+            Dim x As Integer = e.X * settings.workRes.Width / campicRGB.Width
+            Dim y As Integer = e.Y * settings.workRes.Height / campicRGB.Height
+            Try
+                Dim pic = DirectCast(sender, PictureBox)
+                If activeMouseDown Then Exit Sub
+                If DrawingRectangle Then
+                    mouseMovePoint.X = x
+                    mouseMovePoint.Y = y
+                    If mouseMovePoint.X < 0 Then mouseMovePoint.X = 0
+                    If mouseMovePoint.Y < 0 Then mouseMovePoint.Y = 0
+                    drawRectPic = pic.Tag
+                    If x < campicRGB.Width Then
+                        drawRect.X = Math.Min(mouseDownPoint.X, mouseMovePoint.X)
+                    Else
+                        drawRect.X = Math.Min(mouseDownPoint.X - campicRGB.Width, mouseMovePoint.X - campicRGB.Width)
+                        drawRectPic = 3 ' When wider than campicRGB, it can only be dst3 which has no pic.tag (because campic(2) is double-wide for timing reasons.
+                    End If
+                    drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
+                    drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
+                    drawRect.Height = Math.Abs(mouseDownPoint.Y - mouseMovePoint.Y)
+                    If drawRect.X + drawRect.Width > campicRGB.Width Then drawRect.Width = campicRGB.Width - drawRect.X
+                    If drawRect.Y + drawRect.Height > campicRGB.
+                        Height Then drawRect.Height = campicRGB.Height - drawRect.Y
+                    BothFirstAndLastReady = True
+                End If
+
+                mousePicTag = pic.Tag
+                mousePointCamPic.X = x
+                mousePointCamPic.Y = y
+                mousePointCamPic *= settings.workRes.Width / campicRGB.Width
+
+            Catch ex As Exception
+                Debug.WriteLine("Error in camPic_MouseMove: " + ex.Message)
+            End Try
+
+            If lastClickPoint <> Point.Empty Then
+                StatusLabel.Text = String.Format("X: {0}, Y: {1}", x, y)
+                StatusLabel.Text += String.Format(", Last click: {0}, {1}", lastClickPoint.X, lastClickPoint.Y)
+            Else
+                StatusLabel.Text = String.Format("X: {0}, Y: {1}", x, y)
+            End If
+
+            If drawRect.Width > 0 And drawRect.Height > 0 Then
+                'Dim ratio = campicRGB.Width / settings.workRes.Width
+                'Dim r = New cv.Rect(drawRect.X * ratio, drawRect.Y * ratio, drawRect.Width * ratio, drawRect.Height * ratio)
+                Dim r = drawRect
+                StatusLabel.Text += " DrawRect = " + String.Format("x: {0}, y: {1}, w: {2}, h: {3}", r.X, r.Y, r.Width, r.Height)
             End If
         End Sub
-
         Private Sub PictureBox_MouseClick(sender As Object, e As MouseEventArgs) Handles campicRGB.MouseClick, campicPointCloud.MouseClick, campicLeft.MouseClick, campicRight.MouseClick
             Dim picBox = TryCast(sender, PictureBox)
-            If picBox IsNot Nothing Then lastClickPoint = New Point(e.X, e.Y)
+            Dim x As Integer = e.X * settings.workRes.Width / campicRGB.Width
+            Dim y As Integer = e.Y * settings.workRes.Height / campicRGB.Height
+            lastClickPoint = New Point(x, y)
+        End Sub
+        Private Sub campic_DoubleClick(sender As Object, e As EventArgs) Handles campicRGB.DoubleClick, campicPointCloud.DoubleClick, campicLeft.DoubleClick, campicRight.DoubleClick
+            DrawingRectangle = False
         End Sub
 
         Private Sub StartCamera()
@@ -298,49 +389,38 @@ Namespace CVB
             Dim topStart As Integer = MainToolStrip.Height
             Dim statusLabelTop As Integer = Me.Height - StatusLabel.Height
 
-            ' Calculate available space: from toolbar to status label, accounting for labels
-            ' We need: top label + top pic + spacing + bottom label + bottom pic = statusLabelTop
-            ' So: topStart + labelHeight + picHeight + rowSpacing + labelHeight + picHeight = statusLabelTop
-            ' Therefore: 2 * picHeight = statusLabelTop - topStart - (2 * labelHeight) - rowSpacing
-            Dim picHeight As Integer = 480
+            Dim offset = 10
+            Dim picHeight As Integer = (statusLabelTop - topStart - labelHeight * 2) / 2 - 22
             Dim availableWidth As Integer = Me.Width
-            Dim picWidth As Integer = 640
+            Dim picWidth As Integer = Me.Width / 2 - offset * 2
             Dim totalPicHeight As Integer = statusLabelTop - topStart - (2 * labelHeight) - rowSpacing - 40
 
-            ' Ensure all PictureBoxes are the same size
-            uniformPicWidth = settings.displayRes.Width
-            uniformPicHeight = settings.displayRes.Height
-
-            ' Position top row labels
-            labelRGB.Location = New Point(0, topStart)
-            labelPointCloud.Location = New Point(uniformPicWidth, topStart)
+            labelRGB.Location = New Point(offset + offset, topStart)
+            labelPointCloud.Location = New Point(picWidth, topStart)
             labels.Add(labelRGB)
             labels.Add(labelPointCloud)
 
-            ' Position top row PictureBoxes (same size)
-            campicRGB.Location = New Point(0, topStart + labelHeight)
-            campicRGB.Size = New Size(uniformPicWidth, uniformPicHeight)
+            campicRGB.Location = New Point(offset, topStart + labelHeight)
+            campicRGB.Size = New Size(picWidth, picHeight)
             camPics.Add(campicRGB)
 
-            campicPointCloud.Location = New Point(uniformPicWidth, topStart + labelHeight)
-            campicPointCloud.Size = New Size(uniformPicWidth, uniformPicHeight)
+            campicPointCloud.Location = New Point(picWidth, topStart + labelHeight)
+            campicPointCloud.Size = New Size(picWidth + offset, picHeight)
             camPics.Add(campicPointCloud)
 
-            ' Position bottom row labels (with spacing from top row)
-            Dim bottomRowLabelTop As Integer = topStart + labelHeight + uniformPicHeight + rowSpacing
-            labelLeft.Location = New Point(0, bottomRowLabelTop)
-            labelRight.Location = New Point(uniformPicWidth, bottomRowLabelTop)
+            Dim bottomRowLabelTop As Integer = topStart + labelHeight + picHeight + rowSpacing
+            labelLeft.Location = New Point(offset, bottomRowLabelTop)
+            labelRight.Location = New Point(picWidth + offset, bottomRowLabelTop)
             labels.Add(labelLeft)
             labels.Add(labelRight)
 
-            ' Position bottom row PictureBoxes (same size, ending exactly at status label top)
             Dim bottomRowPicTop As Integer = bottomRowLabelTop + labelHeight
-            campicLeft.Location = New Point(0, bottomRowPicTop)
-            campicLeft.Size = New Size(uniformPicWidth, uniformPicHeight)
+            campicLeft.Location = New Point(offset, bottomRowPicTop)
+            campicLeft.Size = New Size(picWidth, picHeight)
             camPics.Add(campicLeft)
 
-            campicRight.Location = New Point(uniformPicWidth, bottomRowPicTop)
-            campicRight.Size = New Size(uniformPicWidth, uniformPicHeight)
+            campicRight.Location = New Point(picWidth + offset, bottomRowPicTop)
+            campicRight.Size = New Size(picWidth, picHeight)
             camPics.Add(campicRight)
 
             For Each lab In labels
@@ -398,6 +478,12 @@ Namespace CVB
                     CameraSwitching.Visible = False
                     CamSwitchTimer.Enabled = False
                 End If
+            End If
+
+            If drawRect.Width > 0 And drawRect.Height > 0 Then
+                For Each mat As cv.Mat In {dstImages.color, dstImages.pointCloud, dstImages.left, dstImages.right}
+                    mat.Rectangle(drawRect, cv.Scalar.White, 1)
+                Next
             End If
 
             Try

@@ -171,6 +171,7 @@ Namespace CVB
             campicRGB.SizeMode = PictureBoxSizeMode.StretchImage
             campicRGB.TabIndex = 1
             campicRGB.TabStop = False
+            campicRGB.Tag = "0"
             ' 
             ' campicPointCloud
             ' 
@@ -183,6 +184,7 @@ Namespace CVB
             campicPointCloud.SizeMode = PictureBoxSizeMode.StretchImage
             campicPointCloud.TabIndex = 2
             campicPointCloud.TabStop = False
+            campicPointCloud.Tag = "1"
             ' 
             ' campicLeft
             ' 
@@ -195,6 +197,7 @@ Namespace CVB
             campicLeft.SizeMode = PictureBoxSizeMode.StretchImage
             campicLeft.TabIndex = 3
             campicLeft.TabStop = False
+            campicLeft.Tag = "2"
             ' 
             ' campicRight
             ' 
@@ -207,6 +210,7 @@ Namespace CVB
             campicRight.SizeMode = PictureBoxSizeMode.StretchImage
             campicRight.TabIndex = 4
             campicRight.TabStop = False
+            campicRight.Tag = "3"
             ' 
             ' labelRGB
             ' 
@@ -268,7 +272,7 @@ Namespace CVB
             ' CameraSwitching
             ' 
             CameraSwitching.AutoSize = True
-            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12.0F)
+            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12F)
             CameraSwitching.Location = New Point(61, 122)
             CameraSwitching.Name = "CameraSwitching"
             CameraSwitching.Size = New Size(202, 29)
@@ -286,7 +290,7 @@ Namespace CVB
             ' 
             ' MainForm
             ' 
-            AutoScaleDimensions = New SizeF(12.0F, 30.0F)
+            AutoScaleDimensions = New SizeF(12F, 30F)
             AutoScaleMode = AutoScaleMode.Font
             ClientSize = New Size(1275, 1171)
             Controls.Add(CameraSwitching)

@@ -38,10 +38,6 @@ Namespace CVB
         Public fontInfo As Font
         Public desiredFPS As Integer
         Public testAllDuration As Integer
-
-        Public snap640 As Boolean = True
-        Public snap320 As Boolean
-        Public snapCustom As Boolean
     End Class
 
     Public Class jsonCVBIO
@@ -227,8 +223,6 @@ Namespace CVB
                 Case 240, 336, 320, 168, 160
                     settings.testAllDuration = 5
             End Select
-
-            settings.snap640 = True ' force desktop display for now...
 
             Try
                 Using streamWriter As New StreamWriter(jsonFileName)
