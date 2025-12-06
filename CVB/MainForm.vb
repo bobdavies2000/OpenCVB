@@ -25,12 +25,15 @@ Namespace CVB
         Dim labels As New List(Of Label)
         Public dst2ready As Boolean
         Public camImages As CameraImages.images
+        Dim uniformPicWidth As Integer
+        Dim uniformPicHeight As Integer
         Private Sub camSwitchAnnouncement()
             CameraSwitching.Visible = True
             CameraSwitching.Text = settings.cameraName + " starting"
             CameraSwitching.BringToFront()
             CamSwitchTimer.Enabled = True
             dst2ready = False
+            Application.DoEvents()
         End Sub
         Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
             Me.Refresh()
@@ -97,14 +100,14 @@ Namespace CVB
             Dim OKcancel = optionsForm.ShowDialog()
 
             If OKcancel = DialogResult.OK Then
-                StopCamera()
-                camSwitchAnnouncement()
-
                 settings.cameraName = optionsForm.cameraName
                 settings.cameraIndex = optionsForm.cameraIndex
 
                 SaveSettings()
 
+                StopCamera()
+                camSwitchAnnouncement()
+                Application.DoEvents()
                 StartCamera()
             End If
         End Sub
@@ -307,8 +310,8 @@ Namespace CVB
             Dim totalPicHeight As Integer = statusLabelTop - topStart - (2 * labelHeight) - rowSpacing - 40
 
             ' Ensure all PictureBoxes are the same size
-            Dim uniformPicWidth As Integer = settings.displayRes.Width
-            Dim uniformPicHeight As Integer = settings.displayRes.Height
+            uniformPicWidth = settings.displayRes.Width
+            uniformPicHeight = settings.displayRes.Height
 
             ' Position top row labels
             labelRGB.Location = New Point(0, topStart)
@@ -318,6 +321,7 @@ Namespace CVB
 
             ' Position top row PictureBoxes (same size)
             campicRGB.Location = New Point(0, topStart + labelHeight)
+            campicRGB.Size = New Size(uniformPicWidth, uniformPicHeight)
             camPics.Add(campicRGB)
 
             campicPointCloud.Location = New Point(uniformPicWidth, topStart + labelHeight)
@@ -358,6 +362,7 @@ Namespace CVB
             settings = settingsIO.Load()
             Me.Size = New Size(1297, 1100)
             For Each pic In camPics
+                pic = New PictureBox()
                 pic.Size = New Size(settings.displayRes.Width, settings.displayRes.Height)
             Next
 

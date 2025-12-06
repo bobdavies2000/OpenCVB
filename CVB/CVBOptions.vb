@@ -35,28 +35,28 @@ Public Class CVBOptions
         Select Case cameraNames(index)
             Case "StereoLabs ZED 2/2i"
                 settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
-                                                                           True, True, True,
-                                                                           False, False, False,
-                                                                           True, True, True,
-                                                                           True, True, True})
+                                                                      True, True, True,
+                                                                      False, False, False,
+                                                                      True, True, True,
+                                                                      True, True, True})
             Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
                 settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-                                                                           True, True, True,
-                                                                           True, True, True,
-                                                                           False, False, False,
-                                                                           False, False, False})
+                                                                      True, True, True,
+                                                                      True, True, True,
+                                                                      False, False, False,
+                                                                      False, False, False})
             Case "Oak-D camera"
                 settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-                                                                           True, True, True,
-                                                                           False, False, False,
-                                                                           False, False, False,
-                                                                           False, False, False})
+                                                                      True, True, True,
+                                                                      False, False, False,
+                                                                      False, False, False,
+                                                                      False, False, False})
             Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
                 settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
-                                                                           True, True, True,
-                                                                           True, True, True,
-                                                                           False, False, False,
-                                                                           False, False, False})
+                                                                      True, True, True,
+                                                                      True, True, True,
+                                                                      False, False, False,
+                                                                      False, False, False})
         End Select
     End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
