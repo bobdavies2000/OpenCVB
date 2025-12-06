@@ -1,7 +1,7 @@
 ﻿Imports System.IO
 Imports cv = OpenCvSharp
 Namespace CVB
-    Public Class Groups_AtoZ
+    Public Class MainAtoZ
         Public homeDir As DirectoryInfo
         Public selectedGroup As String = ""
 

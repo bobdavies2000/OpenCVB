@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Namespace CVB
-    Partial Public Class MainForm : Inherits Form
+    Partial Public Class MainForm
         Dim DrawingRectangle As Boolean
         Dim drawRect As New cv.Rect
         Dim LastX As Integer
