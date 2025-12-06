@@ -1,6 +1,11 @@
-﻿Imports System.IO
+﻿Imports System.ComponentModel
+Imports System.IO
 Imports System.Threading
 Namespace OpenCVB
+    ' this code prevents the designer from opening this as a designer and creating a .resx file.
+    <DesignerCategory("")>
+    Public Class Dummy1
+    End Class
     Partial Class MainUI
         Dim camera As Object
         Dim cameraTaskHandle As Thread

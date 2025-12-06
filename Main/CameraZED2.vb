@@ -45,7 +45,7 @@ Public Class CameraZed2 : Inherits GenericCamera
 
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
-    Public Overrides Sub StopCamera()
+    Public Overrides Sub stopCamera()
         If zed.pointCloud.Width > 0 Then zed.StopCamera()
     End Sub
 End Class

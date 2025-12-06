@@ -134,11 +134,11 @@ Public Class GenericCamera
         ' Raise FrameReady event
         RaiseEvent FrameReady(Me)
     End Sub
-    
+
     Public Overridable Sub StopCamera()
         ' Base implementation - can be overridden by derived classes
     End Sub
-    
+
     Public Sub childStopCamera()
         ' Call the overridden StopCamera method
         StopCamera()

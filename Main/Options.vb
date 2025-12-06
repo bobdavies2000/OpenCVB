@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.IO
+Imports cv = OpenCvSharp
 Public Class Options
     Public cameraRadioButton(Common.cameraNames.Count - 1) As RadioButton
     Public workResRadio() As RadioButton
@@ -107,8 +108,16 @@ Public Class Options
 
         showBatchConsole.Checked = OpenCVB.MainUI.settings.showBatchConsole
     End Sub
-    Public Function setDuration() As Integer
-        Dim duration = 5
+    Private Sub MainOptions_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+        If e.KeyCode = Keys.Escape Then Cancel_Button_Click(sender, e)
+    End Sub
+    Private Sub Cancel_Button_Click(sender As Object, e As EventArgs) Handles Cancel_Button.Click
+        MainOptions_Load(sender, e) ' restore the settings to what they were on entry...
+        Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.Hide()
+    End Sub
+    Private Sub TestAllDuration_ValueChanged(sender As Object, e As EventArgs) Handles TestAllDuration.ValueChanged
+        Dim duration As Integer = 5 ' typically 5 seconds.
         Select Case OpenCVB.MainUI.settings.workRes.Width
             Case 1920
                 duration = 40
@@ -125,15 +134,7 @@ Public Class Options
             Case 240, 336, 320, 168, 160
                 duration = 5
         End Select
-        Return duration
-    End Function
-    Private Sub MainOptions_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-        If e.KeyCode = Keys.Escape Then Cancel_Button_Click(sender, e)
-    End Sub
-    Private Sub Cancel_Button_Click(sender As Object, e As EventArgs) Handles Cancel_Button.Click
-        MainOptions_Load(sender, e) ' restore the settings to what they were on entry...
-        Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Hide()
+        TestAllDuration.Value = duration
     End Sub
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         FontDialog1.Font = OpenCVB.MainUI.settings.fontInfo
@@ -152,5 +153,12 @@ Public Class Options
         If h = 120 Or h = 240 Or h = 480 Then
             OpenCVB.MainUI.settings.displayRes = New cv.Size(640, 480)
         End If
+    End Sub
+    Public Sub UpdateXRef_Click(sender As Object, e As EventArgs) Handles UpdateXRef.Click
+        Dim UIProcess As New Process
+        UIProcess.StartInfo.FileName = OpenCVB.MainUI.HomeDir.FullName + "UI_Generator\bin\x64\Release\net8.0\UI_Generator.exe"
+        UIProcess.StartInfo.WorkingDirectory = OpenCVB.MainUI.HomeDir.FullName + "UI_Generator\bin\x64\Release\net8.0\"
+        UIProcess.StartInfo.Arguments = "All"
+        UIProcess.Start()
     End Sub
 End Class

@@ -9,7 +9,6 @@ Namespace CVB
         Dim projectFilePath As String = ""
         Public settingsIO As jsonCVBIO
         Dim settings As jsonCVB
-        Dim lastClickPoint As Point = Point.Empty
         Const MAX_RECENT = 50
         Dim algHistory As New List(Of String)
         Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
@@ -17,11 +16,9 @@ Namespace CVB
         Dim camera As CVB_Camera = Nothing
         Dim cameraRunning As Boolean = False
         Dim dstImages As CameraImages.images
-        Dim camPics As New List(Of PictureBox)
         Dim labels As New List(Of Label)
         Public dst2ready As Boolean
         Public camImages As CameraImages.images
-
         Private Sub camSwitchAnnouncement()
             CameraSwitching.Visible = True
             CameraSwitching.Text = settings.cameraName + " starting"
@@ -292,11 +289,9 @@ Namespace CVB
 
             campicRGB.Location = New Point(offset, topStart + labelHeight)
             campicRGB.Size = New Size(picWidth, picHeight)
-            camPics.Add(campicRGB)
 
             campicPointCloud.Location = New Point(picWidth, topStart + labelHeight)
             campicPointCloud.Size = New Size(picWidth + offset, picHeight)
-            camPics.Add(campicPointCloud)
 
             Dim bottomRowLabelTop As Integer = topStart + labelHeight + picHeight + rowSpacing
             labelLeft.Location = New Point(offset, bottomRowLabelTop)
@@ -307,19 +302,16 @@ Namespace CVB
             Dim bottomRowPicTop As Integer = bottomRowLabelTop + labelHeight
             campicLeft.Location = New Point(offset, bottomRowPicTop)
             campicLeft.Size = New Size(picWidth, picHeight)
-            camPics.Add(campicLeft)
 
             campicRight.Location = New Point(picWidth + offset, bottomRowPicTop)
             campicRight.Size = New Size(picWidth, picHeight)
-            camPics.Add(campicRight)
 
             For Each lab In labels
                 Dim index = labels.IndexOf(lab) + 1
-                lab.Top = Choose(index, camPics(0).Top - lab.Height, camPics(0).Top - lab.Height,
-                                        camPics(2).Top - lab.Height, camPics(2).Top - lab.Height)
-                lab.Left = Choose(index, camPics(0).Left, camPics(1).Left, camPics(2).Left, camPics(3).Left)
+                lab.Top = Choose(index, campicRGB.Top - lab.Height, campicRGB.Top - lab.Height,
+                                        campicLeft.Top - lab.Height, campicLeft.Top - lab.Height)
+                lab.Left = Choose(index, campicRGB.Left, campicPointCloud.Left, campicLeft.Left, campicRight.Left)
                 lab.BackColor = Me.BackColor
-                lab.Text = Choose(index, "RGB Image", "Point Cloud", "Left Image", "Right Image")
                 lab.Visible = True
             Next
 
@@ -329,10 +321,6 @@ Namespace CVB
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             settings = settingsIO.Load()
             Me.Size = New Size(1297, 1100)
-            For Each pic In camPics
-                pic = New PictureBox()
-                pic.Size = New Size(settings.displayRes.Width, settings.displayRes.Height)
-            Next
 
             camSwitchAnnouncement()
 
@@ -349,6 +337,7 @@ Namespace CVB
 
             Me.Location = New Point(settings.FormLeft, settings.FormTop)
             Me.Size = New Size(settings.FormWidth, settings.FormHeight)
+            StartUpTimer.Enabled = True
         End Sub
         Private Sub UpdatePictureBox(picBox As PictureBox, image As cv.Mat)
             If image IsNot Nothing AndAlso image.Width > 0 Then

@@ -136,7 +136,7 @@ Public Class CameraORB : Inherits GenericCamera
         If cameraFrameCount Mod 10 = 0 Then GC.Collect()
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
-    Public Overrides Sub StopCamera()
+    Public Overrides Sub stopCamera()
         accelSensor.Stop()
         gyroSensor.Stop()
         pipe.Stop()
@@ -241,7 +241,7 @@ Public Class CameraORB_CPP : Inherits GenericCamera
 
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
-    Public Overrides Sub StopCamera()
+    Public Overrides Sub stopCamera()
         If cPtr = 0 Then Exit Sub
         Application.DoEvents()
         Try

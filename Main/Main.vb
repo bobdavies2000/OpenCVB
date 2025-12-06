@@ -148,7 +148,7 @@ Namespace OpenCVB
 
             setupAlgorithmHistory()
 
-            Dim libraries = {"Cam_K4A.dll", "CPP_Native.dll", "Cam_Zed2.dll", "Cam_ORB335L.dll"}
+            Dim libraries = {"Cam_K4A.dll", "CPP_Native.dll", "Cam_MyntD.dll", "Cam_Zed2.dll", "Cam_ORB335L.dll"}
             For i = 0 To libraries.Count - 1
                 Dim dllName = libraries(i)
                 Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
@@ -678,7 +678,7 @@ Namespace OpenCVB
             ' skip testing the XO_ algorithms (XO.vb)  They are obsolete.
             If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
 
-            TestAllTimer.Interval = optionsForm.setDuration * 1000
+            TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
             Static startingAlgorithm = AvailableAlgorithms.Text
             If AvailableAlgorithms.Text = startingAlgorithm And AlgorithmTestAllCount > 1 Then
                 ' ignore switching cameras for now.  Only introduces complexity without any benefit.
@@ -769,11 +769,6 @@ Namespace OpenCVB
             infoLine = sr.ReadLine
             Split = Regex.Split(infoLine, "\W+")
             Dim algorithmCount = Split(1)
-
-            infoLine = sr.ReadLine
-            infoLine = sr.ReadLine
-            Split = Regex.Split(infoLine, "\W+")
-            Dim linesPerAlgorithm = Split(Split.Length - 1)  ' after subtracting out the obsolete algorithms (XO_)
             sr.Close()
 
             Dim algList = New FileInfo(HomeDir.FullName + "Data/AvailableAlgorithms.txt")
@@ -793,7 +788,7 @@ Namespace OpenCVB
 
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " +
                        CStr(algorithmCount) + " algorithms = " +
-                       CStr(CInt(linesPerAlgorithm)) + " lines each (avg) - " + settings.cameraName
+                       CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + settings.cameraName
         End Sub
 
         Private Sub AtoZButton_Click(sender As Object, e As EventArgs) Handles AtoZButton.Click
@@ -965,12 +960,6 @@ Namespace OpenCVB
 
             PausePlayButton.Image = PausePlay
 
-            ' when switching resolution, best to reset these as the move from higher to lower res
-            ' could mean the point is no longer valid.
-            ClickPoint = New cv.Point
-            mousePointCamPic = New cv.Point
-            AlgDescription.Text = ""
-
             If parms.algName = "GL_MainForm" Then
                 GLControl.Visible = True
                 GLControl.Location = camPic(2).Location
@@ -981,6 +970,12 @@ Namespace OpenCVB
             End If
 
             GC.Collect()
+
+            ' when switching resolution, best to reset these as the move from higher to lower res
+            ' could mean the point is no longer valid.
+            ClickPoint = New cv.Point
+            mousePointCamPic = New cv.Point
+            AlgDescription.Text = ""
 
             Thread.CurrentThread.Priority = ThreadPriority.Lowest
             algorithmTaskHandle = New Thread(AddressOf AlgorithmTask) ' <<<<<<<<<<<<<<<<<<<<<<<<< This starts the VB_Classes algorithm.

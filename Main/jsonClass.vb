@@ -1,11 +1,13 @@
 ﻿Imports System.IO
 Imports System.Management
 Imports Newtonsoft.Json
+Imports VBClasses
 Imports cv = OpenCvSharp
 
 Namespace jsonClass
     Public Class ApplicationStorage
         Public algorithm As String
+        Public groupComboText As String
 
         Public cameraIndex As Integer
         Public cameraName As String
@@ -20,6 +22,7 @@ Namespace jsonClass
         Public locationOpenGL As cv.Vec4f
         Public locationOptions As cv.Vec4f
 
+        Public myntSDKready As Boolean
         Public zedSDKready As Boolean
         Public oakDSDKready As Boolean
 
@@ -33,10 +36,12 @@ Namespace jsonClass
 
         Public showBatchConsole As Boolean
 
+        Public treeButton As Boolean
         Public treeLocation As cv.Vec4f
 
         Public fontInfo As Font
         Public desiredFPS As Integer
+        Public translatorMode As String
     End Class
     Public Class jsonIO
         Public jsonFileName As String
@@ -62,7 +67,10 @@ Namespace jsonClass
             emptyApp.workRes = New cv.Size(320, 180)
             emptyApp.snap640 = True
             emptyApp.showBatchConsole = False
+            emptyApp.treeButton = True
             emptyApp.treeLocation = New cv.Vec4f(20, 20, 500, 600)
+            emptyApp.groupComboText = "< All >"
+            emptyApp.translatorMode = "VB.Net to C#"
 
             SaveSetting("OpenCVB", "gOptionsLeft", "gOptionsLeft", 10)
             SaveSetting("OpenCVB", "gOptionsTop", "gOptionsTop", 10)
@@ -196,6 +204,8 @@ Namespace jsonClass
                 End Select
 
                 If .fontInfo Is Nothing Then .fontInfo = New Font("Tahoma", 9)
+                If settings.groupComboText = "" Then settings.groupComboText = "< All >"
+
                 .desiredFPS = 60
             End With
 
@@ -215,6 +225,7 @@ Namespace jsonClass
                 ' used only when .snapCustom is true
                 OpenCVB.MainUI.settings.displayRes = New cv.Size(OpenCVB.MainUI.camPic(0).Width, OpenCVB.MainUI.camPic(0).Height)
             End If
+            If OpenCVB.MainUI.settings.translatorMode = "" Then OpenCVB.MainUI.settings.translatorMode = "VB.Net to C#"
 
             Dim setlist = New List(Of jsonClass.ApplicationStorage)
             setlist.Add(OpenCVB.MainUI.settings)

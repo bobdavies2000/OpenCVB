@@ -3,27 +3,18 @@ Namespace CVB
     Partial Public Class MainForm : Inherits Form
         Dim DrawingRectangle As Boolean
         Dim drawRect As New cv.Rect
-        Dim drawRectPic As Integer
-        Dim frameCount As Integer = -1
-        Dim GrabRectangleData As Boolean
         Dim LastX As Integer
         Dim LastY As Integer
         Dim mouseClickFlag As Boolean
-        Dim activateTaskForms As Boolean
-        Dim ClickPoint As New cv.Point ' last place where mouse was clicked.
+        Dim clickPoint As New cv.Point ' last place where mouse was clicked.
         Dim mousePicTag As Integer
         Dim mouseDownPoint As cv.Point
         Dim mouseMovePoint As cv.Point ' last place the mouse was located in any of the OpenCVB images.
-        Dim mousePointCamPic As New cv.Point ' mouse location in campics
         Dim activeMouseDown As Boolean
         Dim BothFirstAndLastReady As Boolean
-
         Private Sub CamPic_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles campicRGB.MouseUp, campicPointCloud.MouseUp, campicLeft.MouseUp, campicRight.MouseUp
             Try
-                If DrawingRectangle Then
-                    DrawingRectangle = False
-                    GrabRectangleData = True
-                End If
+                If DrawingRectangle Then DrawingRectangle = False
                 activeMouseDown = False
             Catch ex As Exception
                 Debug.WriteLine("Error in camPic_MouseUp: " + ex.Message)
@@ -54,19 +45,14 @@ Namespace CVB
             Dim y As Integer = e.Y * settings.workRes.Height / campicRGB.Height
             Try
                 Dim pic = DirectCast(sender, PictureBox)
+                mousePicTag = pic.Tag
                 If activeMouseDown Then Exit Sub
                 If DrawingRectangle Then
                     mouseMovePoint.X = x
                     mouseMovePoint.Y = y
                     If mouseMovePoint.X < 0 Then mouseMovePoint.X = 0
                     If mouseMovePoint.Y < 0 Then mouseMovePoint.Y = 0
-                    drawRectPic = pic.Tag
-                    If x < campicRGB.Width Then
-                        drawRect.X = Math.Min(mouseDownPoint.X, mouseMovePoint.X)
-                    Else
-                        drawRect.X = Math.Min(mouseDownPoint.X - campicRGB.Width, mouseMovePoint.X - campicRGB.Width)
-                        drawRectPic = 3 ' When wider than campicRGB, it can only be dst3 which has no pic.tag (because campic(2) is double-wide for timing reasons.
-                    End If
+                    drawRect.X = Math.Min(mouseDownPoint.X, mouseMovePoint.X)
                     drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
                     drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
                     drawRect.Height = Math.Abs(mouseDownPoint.Y - mouseMovePoint.Y)
@@ -76,21 +62,12 @@ Namespace CVB
                     BothFirstAndLastReady = True
                 End If
 
-                mousePicTag = pic.Tag
-                mousePointCamPic.X = x
-                mousePointCamPic.Y = y
-                mousePointCamPic *= settings.workRes.Width / campicRGB.Width
-
             Catch ex As Exception
                 Debug.WriteLine("Error in camPic_MouseMove: " + ex.Message)
             End Try
 
-            If lastClickPoint <> Point.Empty Then
-                StatusLabel.Text = String.Format("X: {0}, Y: {1}", x, y)
-                StatusLabel.Text += String.Format(", Last click: {0}, {1}", lastClickPoint.X, lastClickPoint.Y)
-            Else
-                StatusLabel.Text = String.Format("X: {0}, Y: {1}", x, y)
-            End If
+            StatusLabel.Text = String.Format("X: {0}, Y: {1}", x, y)
+            StatusLabel.Text += String.Format(", Last click: {0}, {1}", clickPoint.X, clickPoint.Y)
 
             If drawRect.Width > 0 And drawRect.Height > 0 Then
                 StatusLabel.Text += " DrawRect = " + String.Format("x: {0}, y: {1}, w: {2}, h: {3}", drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
@@ -100,7 +77,7 @@ Namespace CVB
             Dim picBox = TryCast(sender, PictureBox)
             Dim x As Integer = e.X * settings.workRes.Width / campicRGB.Width
             Dim y As Integer = e.Y * settings.workRes.Height / campicRGB.Height
-            lastClickPoint = New Point(x, y)
+            clickPoint = New cv.Point(x, y)
         End Sub
         Private Sub campic_DoubleClick(sender As Object, e As EventArgs) Handles campicRGB.DoubleClick, campicPointCloud.DoubleClick, campicLeft.DoubleClick, campicRight.DoubleClick
             DrawingRectangle = False

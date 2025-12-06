@@ -266,8 +266,7 @@ Namespace CVB
             ' 
             ' StartUpTimer
             ' 
-            StartUpTimer.Enabled = True
-            StartUpTimer.Interval = 10
+            StartUpTimer.Interval = 500
             ' 
             ' CameraSwitching
             ' 

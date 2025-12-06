@@ -36,6 +36,7 @@ Public Class Common
                                                       "Oak-D camera",
                                                       "Intel(R) RealSense(TM) Depth Camera 435i",
                                                       "Intel(R) RealSense(TM) Depth Camera 455",
+                                                      "MYNT-EYE-D1000",
                                                       "Orbbec Gemini 335"
                                                       })
 End Class
