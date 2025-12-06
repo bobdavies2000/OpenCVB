@@ -8,7 +8,7 @@ Namespace CVB
         Dim isPlaying As Boolean = False
         Dim projectFilePath As String = ""
         Public settingsIO As jsonCVBIO
-        Dim settings As MainJson
+        Public settings As MainJson
         Const MAX_RECENT = 50
         Dim algHistory As New List(Of String)
         Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
