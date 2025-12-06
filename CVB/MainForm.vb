@@ -388,6 +388,7 @@ Namespace CVB
             End If
         End Sub
         Private Sub campicRGB_Paint(sender As Object, e As PaintEventArgs) Handles campicRGB.Paint
+            If camera Is Nothing Then Exit Sub
             If dstImages Is Nothing Then Exit Sub
             If CameraSwitching.Visible Then
                 If camera.cameraFrameCount > 0 Then

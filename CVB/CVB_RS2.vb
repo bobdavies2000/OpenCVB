@@ -89,6 +89,9 @@ Namespace CVB
             End While
         End Sub
         Public Sub GetNextFrame()
+            ' Check if pipe is still valid (might be cleared during stop)
+            If pipe Is Nothing Then Return
+
             Dim alignToColor = New Align(Stream.Color)
             Dim ptcloud = New PointCloud()
             Dim cols = captureRes.Width, rows = captureRes.Height
@@ -140,7 +143,22 @@ Namespace CVB
                 captureThread.Join(1000) ' Wait up to 1 second for thread to finish
                 captureThread = Nothing
             End If
-            If pipe IsNot Nothing Then pipe.Stop()
+
+            ' Stop the pipeline asynchronously so it doesn't block the UI
+            If pipe IsNot Nothing Then
+                Dim pipeToStop = pipe
+                pipe = Nothing ' Clear reference so GetNextFrame won't try to use it
+
+                ' Run pipe.Stop() on a background thread so it doesn't block
+                ThreadPool.QueueUserWorkItem(Sub(state)
+                                                 Try
+                                                     pipeToStop.Stop()
+                                                     pipeToStop.Dispose()
+                                                 Catch ex As Exception
+                                                     Debug.WriteLine("Error stopping pipeline: " + ex.Message)
+                                                 End Try
+                                             End Sub)
+            End If
         End Sub
     End Class
 End Namespace
