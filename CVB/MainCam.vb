@@ -155,8 +155,5 @@ Namespace CVB
                 Debug.WriteLine("Camera display error: " + ex.Message)
             End Try
         End Sub
-        Private Sub processImages(camImages As CameraImages.images)
-            dstImages = camImages
-        End Sub
     End Class
 End Namespace
