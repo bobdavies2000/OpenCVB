@@ -2,7 +2,7 @@
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Namespace CVB
-    Partial Public Class MainForm : Inherits Form
+    Partial Public Class MainForm
         Private Sub processImages(camImages As CameraImages.images)
             Common.allOptions.settings = settings
             Common.allOptions.Show()

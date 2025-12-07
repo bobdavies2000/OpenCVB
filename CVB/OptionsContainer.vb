@@ -5,11 +5,13 @@ Public Class OptionsContainer
     Public titlesAdded As Boolean
     Public offset = 30
     Public settings As Object
+    Dim afterLoad As Boolean
     Private Sub allOptionsFrm_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Me.Left = settings.FormLeft - offset
-        Me.Top = settings.FormTop - offset
-        Me.Width = settings.FormWidth
-        Me.Height = settings.FormHeight
+        Me.Left = settings.allOptionsLeft - offset
+        Me.Top = settings.allOptionsTop - offset
+        Me.Width = settings.allOptionsWidth
+        Me.Height = settings.allOptionsHeight
+        afterLoad = True
     End Sub
     Public Sub addTitle(frm As Object)
         If optionsTitle.Contains(frm.Text) = False Then
@@ -38,7 +40,6 @@ Public Class OptionsContainer
             Next
         Next
 
-        Dim showAllOptions = GetSetting("Opencv", "ShowAllOptions", "ShowAllOptions", False)
         Try
             Dim indexS = 1
             Dim indexO = 1
@@ -50,13 +51,13 @@ Public Class OptionsContainer
                     Dim sidelineOptions As Boolean = True
                     Dim displayTheseOptions As New List(Of String)({"Image_Basics OpenFile Options"})
                     If displayTheseOptions.Contains(frm.Text) Then sidelineOptions = False
-                    If normalRequest And sidelineOptions And showAllOptions = False Then
+                    If normalRequest And sidelineOptions Then
                         If frm Is Nothing Then Continue For
                         frm.SetDesktopLocation(Me.Width - 2 * offset, sliderOffset.Y + indexHide * offset)
                         indexHide += 1
                     Else
                         If title.Contains("OpenFile") Then
-                            frm.SetDesktopLocation(0, settings.FormTop + 350)
+                            frm.SetDesktopLocation(0, settings.allOptionsTop + 350)
                         End If
                         If title.EndsWith(" Sliders") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                             If frm Is Nothing Then Continue For
@@ -95,8 +96,8 @@ Public Class OptionsContainer
             ' For example, move it to the center of the primary screen
             Me.StartPosition = FormStartPosition.Manual
             Me.Location = New Point(0, 0)
-            settings.FormLeft = 0
-            settings.FormTop = 0
+            settings.allOptionsLeft = 0
+            settings.allOptionsTop = 0
         End If
     End Sub
     Private Sub OptionsContainer_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
@@ -110,6 +111,19 @@ Public Class OptionsContainer
                 End If
             Next
         Next
-        GC.Collect()
+    End Sub
+    Private Sub OptionsContainer_Move(sender As Object, e As EventArgs) Handles Me.Move
+        If afterLoad = False Then Exit Sub
+        settings.allOptionsLeft = Me.Left
+        settings.allOptionsTop = Me.Top
+        settings.allOptionsWidth = Me.Width
+        settings.allOptionsHeight = Me.Height
+    End Sub
+    Private Sub OptionsContainer_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        If afterLoad = False Then Exit Sub
+        settings.allOptionsLeft = Me.Left
+        settings.allOptionsTop = Me.Top
+        settings.allOptionsWidth = Me.Width
+        settings.allOptionsHeight = Me.Height
     End Sub
 End Class

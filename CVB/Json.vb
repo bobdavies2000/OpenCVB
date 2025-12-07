@@ -18,6 +18,14 @@ Namespace CVB
         Public FormTop As Integer = 0
         Public FormWidth As Integer = 1867
         Public FormHeight As Integer = 1134
+
+        Public allOptionsLeft As Integer = 0
+        Public allOptionsTop As Integer = 0
+        Public allOptionsWidth As Integer = FormWidth
+        Public allOptionsHeight As Integer = FormHeight
+
+        Public showAllOptions As Boolean
+
         Public algorithm As String
 
         Public workRes As New cv.Size(336, 188)
