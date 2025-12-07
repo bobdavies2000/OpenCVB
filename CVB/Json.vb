@@ -44,8 +44,10 @@ Namespace CVB
         Public treeLocation As cv.Vec4f
 
         Public fontInfo As Font
-        Public desiredFPS As Integer
-        Public testAllDuration As Integer
+        Public homeDirPath As String
+
+        Public desiredFPS As Integer = 60
+        Public testAllDuration As Integer = 5
 
         Public cameraNames As New List(Of String)({"Intel(R) RealSense(TM) Depth Camera 435i",
                                                    "Intel(R) RealSense(TM) Depth Camera 455",
@@ -221,8 +223,6 @@ Namespace CVB
             End Select
 
             If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
-            settings.desiredFPS = 60
-            settings.testAllDuration = 5
             Select Case settings.workRes.Width
                 Case 1920
                     settings.testAllDuration = 40

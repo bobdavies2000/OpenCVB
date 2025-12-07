@@ -1,9 +1,9 @@
 ﻿Imports System.Windows.Forms
-Public Class OptionParent : Implements IDisposable
-    Public check As New OptionsCheckbox
-    Public combo As New OptionsCombo
-    Public radio As New OptionsRadioButtons
-    Public sliders As New OptionsSliders
+Public Class OptCVBParent : Implements IDisposable
+    Public check As New OptCVBCheckbox
+    Public combo As New OptCVBCombo
+    Public radio As New OptCVBRadioButtons
+    Public sliders As New OptCVBSliders
     Public traceName As String
     Public strOut As String
     Public Shared Function FindSlider(opt As String) As TrackBar
@@ -83,7 +83,7 @@ Public Class OptionParent : Implements IDisposable
         traceName = Me.GetType.Name
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
-        If Common.allOptions IsNot Nothing Then Common.allOptions.Close()
+        If myTask.allOptions IsNot Nothing Then myTask.allOptions.Close()
         sliders.Dispose()
         check.Dispose()
         radio.Dispose()

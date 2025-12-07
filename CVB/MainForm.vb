@@ -111,17 +111,16 @@ Namespace CVB
         End Sub
         Private Sub AtoZ_Click(sender As Object, e As EventArgs) Handles AtoZ.Click
             ' Get the home directory (Data directory parent)
-            Dim homeDirPath As String
             If Not String.IsNullOrEmpty(projectFilePath) AndAlso File.Exists(projectFilePath) Then
                 Dim projectDir = Path.GetDirectoryName(projectFilePath)
                 ' Go up one level from CVB to get to the root (where Data folder is)
-                homeDirPath = Path.GetDirectoryName(projectDir)
+                settings.homeDirPath = Path.GetDirectoryName(projectDir)
             Else
-                homeDirPath = CurDir()
+                settings.homeDirPath = CurDir()
             End If
 
             Dim groupsForm As New MainAtoZ()
-            groupsForm.homeDir = New DirectoryInfo(homeDirPath)
+            groupsForm.homeDir = New DirectoryInfo(settings.homeDirPath)
 
             If groupsForm.ShowDialog() = DialogResult.OK AndAlso Not String.IsNullOrEmpty(groupsForm.selectedGroup) Then
                 ' Find and select the first algorithm that starts with the selected group

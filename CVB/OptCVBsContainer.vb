@@ -1,16 +1,15 @@
 ﻿Imports cv = OpenCvSharp
-Public Class OptionsContainer
+Public Class OptCVBsContainer
     Dim optionsTitle As New List(Of String)
     Public hiddenOptions As New List(Of String)
     Public titlesAdded As Boolean
     Public offset = 30
-    Public settings As Object
     Dim afterLoad As Boolean
     Private Sub allOptionsFrm_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Me.Left = settings.allOptionsLeft - offset
-        Me.Top = settings.allOptionsTop - offset
-        Me.Width = settings.allOptionsWidth
-        Me.Height = settings.allOptionsHeight
+        Me.Left = myTask.settings.allOptionsLeft - offset
+        Me.Top = myTask.settings.allOptionsTop - offset
+        Me.Width = myTask.settings.allOptionsWidth
+        Me.Height = myTask.settings.allOptionsHeight
         afterLoad = True
     End Sub
     Public Sub addTitle(frm As Object)
@@ -45,7 +44,7 @@ Public Class OptionsContainer
             Dim indexO = 1
             Dim indexHide As Integer
             For Each title In optionsTitle
-                Dim frm = OptionParent.FindFrm(title)
+                Dim frm = OptCVBParent.FindFrm(title)
                 If frm IsNot Nothing Then
                     frm.BringToFront()
                     Dim sidelineOptions As Boolean = True
@@ -57,7 +56,7 @@ Public Class OptionsContainer
                         indexHide += 1
                     Else
                         If title.Contains("OpenFile") Then
-                            frm.SetDesktopLocation(0, settings.allOptionsTop + 350)
+                            frm.SetDesktopLocation(0, myTask.settings.allOptionsTop + 350)
                         End If
                         If title.EndsWith(" Sliders") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                             If frm Is Nothing Then Continue For
@@ -96,8 +95,8 @@ Public Class OptionsContainer
             ' For example, move it to the center of the primary screen
             Me.StartPosition = FormStartPosition.Manual
             Me.Location = New Point(0, 0)
-            settings.allOptionsLeft = 0
-            settings.allOptionsTop = 0
+            myTask.settings.allOptionsLeft = 0
+            myTask.settings.allOptionsTop = 0
         End If
     End Sub
     Private Sub OptionsContainer_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
@@ -114,16 +113,16 @@ Public Class OptionsContainer
     End Sub
     Private Sub OptionsContainer_Move(sender As Object, e As EventArgs) Handles Me.Move
         If afterLoad = False Then Exit Sub
-        settings.allOptionsLeft = Me.Left
-        settings.allOptionsTop = Me.Top
-        settings.allOptionsWidth = Me.Width
-        settings.allOptionsHeight = Me.Height
+        myTask.settings.allOptionsLeft = Me.Left
+        myTask.settings.allOptionsTop = Me.Top
+        myTask.settings.allOptionsWidth = Me.Width
+        myTask.settings.allOptionsHeight = Me.Height
     End Sub
     Private Sub OptionsContainer_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         If afterLoad = False Then Exit Sub
-        settings.allOptionsLeft = Me.Left
-        settings.allOptionsTop = Me.Top
-        settings.allOptionsWidth = Me.Width
-        settings.allOptionsHeight = Me.Height
+        myTask.settings.allOptionsLeft = Me.Left
+        myTask.settings.allOptionsTop = Me.Top
+        myTask.settings.allOptionsWidth = Me.Width
+        myTask.settings.allOptionsHeight = Me.Height
     End Sub
 End Class

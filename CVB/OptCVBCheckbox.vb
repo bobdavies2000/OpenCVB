@@ -1,11 +1,11 @@
 ﻿Imports System.Windows.Forms
-Public Class OptionsCheckbox 
+Public Class OptCVBCheckbox
     Public Box As New List(Of CheckBox)
     Public Function Setup(traceName As String) As Boolean
-        If OptionParent.findFrm(traceName + " CheckBoxes") IsNot Nothing Then Return False
-        Me.MdiParent = Common.allOptions
+        If OptCVBParent.FindFrm(traceName + " CheckBoxes") IsNot Nothing Then Return False
+        Me.MdiParent = myTask.allOptions
         Me.Text = traceName + " CheckBoxes"
-        Common.allOptions.addTitle(Me)
+        myTask.allOptions.addTitle(Me)
         Me.Show()
         Return True
     End Function
@@ -18,6 +18,6 @@ Public Class OptionsCheckbox
         FlowLayoutPanel1.Controls.Add(Box(index))
     End Sub
     Private Sub Box_CheckChanged(sender As Object, e As EventArgs)
-        Common.optionsChanged = True
+        myTask.optionsChanged = True
     End Sub
 End Class

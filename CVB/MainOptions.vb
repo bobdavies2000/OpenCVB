@@ -2,7 +2,7 @@
 Public Class MainOptions
     Public settings As Object
     Public cameraNames As List(Of String)
-    Public cameraRadioButton(Common.cameraNames.Count - 1) As RadioButton
+    Public cameraRadioButton(settings.cameraNames.Count - 1) As RadioButton
     Public workResRadio() As RadioButton
     Public cameraName As String
     Public cameraIndex As Integer

@@ -1,6 +1,6 @@
 ﻿Imports System.Windows.Forms
 Imports System.Drawing
-Public Class OptionsSliders
+Public Class OptCVBSliders
     Public mytrackbars As New List(Of TrackBar)
     Public myLabels As New List(Of Label)
     Dim defaultHeight = 400
@@ -8,10 +8,10 @@ Public Class OptionsSliders
     Dim defaultWidth = 600
     Dim algoIndex As Integer
     Public Function Setup(traceName As String) As Boolean
-        If OptionParent.findFrm(traceName + " Sliders") IsNot Nothing Then Return False
-        If Common.allOptions.Text <> "" Then Me.MdiParent = Common.allOptions
+        If OptCVBParent.FindFrm(traceName + " Sliders") IsNot Nothing Then Return False
+        If myTask.allOptions.Text <> "" Then Me.MdiParent = myTask.allOptions
         Me.Text = traceName + " Sliders"
-        Common.allOptions.addTitle(Me)
+        myTask.allOptions.addTitle(Me)
 
         FlowLayoutPanel1.Width = Me.Width - 40
         FlowLayoutPanel1.Height = Me.Height - 60
@@ -53,7 +53,7 @@ Public Class OptionsSliders
         Dim outStr = myLabels(sender.tag).Text
         Dim split = outStr.Split("=")
         myLabels(sender.tag).Text = split(0) + "= " + CStr(mytrackbars(sender.tag).Value)
-        Common.optionsChanged = True
+        myTask.optionsChanged = True
     End Sub
     Private Sub OptionsSliders_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Width = defaultWidth

@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class OptionsGlobal
+Partial Class OptCVBGlobal
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -22,7 +22,7 @@ Partial Class OptionsGlobal
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OptionsGlobal))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OptCVBGlobal))
         Label1 = New Label()
         GroupBox1 = New GroupBox()
         DotSizeSlider = New TrackBar()
@@ -306,7 +306,7 @@ Partial Class OptionsGlobal
         DebugCheckBox.Name = "DebugCheckBox"
         DebugCheckBox.Size = New Size(367, 19)
         DebugCheckBox.TabIndex = 19
-        DebugCheckBox.Text = "DebugCheckbox - task.gOptions.DebugChecked - use for testing"
+        DebugCheckBox.Text = "DebugCheckbox - myTask.gOptions.DebugChecked - use for testing"
         DebugCheckBox.UseVisualStyleBackColor = True
         ' 
         ' GroupBox2

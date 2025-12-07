@@ -1,7 +1,7 @@
 ﻿Imports System.Windows.Forms
 Imports System.Drawing
 Imports System.ComponentModel
-Public Class OptionsFeatures
+Public Class OptCVBFeatures
     Public grayCheckbox() As RadioButton
     Public colorCheckbox() As RadioButton
     Public colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions",
@@ -9,7 +9,7 @@ Public Class OptionsFeatures
                                        "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
                                        "PCA_NColor_CPP", "MeanSubtraction_Gray"}
     Private Sub OptionsFeatures_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.MdiParent = allOptions
+        Me.MdiParent = myTask.allOptions
         Me.Left = 0
         Me.Top = 0
 
@@ -32,35 +32,35 @@ Public Class OptionsFeatures
         EdgeMethods.Items.Add("Scharr")
         EdgeMethods.Items.Add("Sobel")
         EdgeMethods.SelectedItem() = "Canny"
-        task.edgeMethod = "Canny"
+        myTask.edgeMethod = "Canny"
 
         MatchCorrSlider.Value = 95
 
-        ReDim grayCheckbox(task.rgbFilter.grayFilter.filterList.Count - 1)
-        For i = 0 To task.rgbFilter.grayFilter.filterList.Count - 1
-            Dim cb As New RadioButton
-            cb.Text = task.rgbFilter.grayFilter.filterList(i)
-            cb.Location = New Point(20, 20 + i * 20)
-            cb.AutoSize = True
-            cb.Tag = i
-            AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
-            GrayGroup.Controls.Add(cb)
-            grayCheckbox(i) = cb
-        Next
-        grayCheckbox(0).Checked = True
+        'ReDim grayCheckbox(myTask.rgbFilter.grayFilter.filterList.Count - 1)
+        'For i = 0 To myTask.rgbFilter.grayFilter.filterList.Count - 1
+        '    Dim cb As New RadioButton
+        '    cb.Text = myTask.rgbFilter.grayFilter.filterList(i)
+        '    cb.Location = New Point(20, 20 + i * 20)
+        '    cb.AutoSize = True
+        '    cb.Tag = i
+        '    AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
+        '    GrayGroup.Controls.Add(cb)
+        '    grayCheckbox(i) = cb
+        'Next
+        'grayCheckbox(0).Checked = True
 
-        ReDim colorCheckbox(task.rgbFilter.filterList.Count - 1)
-        For i = 0 To task.rgbFilter.filterList.Count - 1
-            Dim cb As New RadioButton
-            cb.Text = task.rgbFilter.filterList(i)
-            cb.Location = New Point(20, 20 + i * 20)
-            cb.AutoSize = True
-            cb.Tag = i
-            AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
-            ColorGroup.Controls.Add(cb)
-            colorCheckbox(i) = cb
-        Next
-        colorCheckbox(0).Checked = True
+        'ReDim colorCheckbox(myTask.rgbFilter.filterList.Count - 1)
+        'For i = 0 To myTask.rgbFilter.filterList.Count - 1
+        '    Dim cb As New RadioButton
+        '    cb.Text = myTask.rgbFilter.filterList(i)
+        '    cb.Location = New Point(20, 20 + i * 20)
+        '    cb.AutoSize = True
+        '    cb.Tag = i
+        '    AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
+        '    ColorGroup.Controls.Add(cb)
+        '    colorCheckbox(i) = cb
+        'Next
+        'colorCheckbox(0).Checked = True
 
         For i = 0 To colorMethods.Count - 1
             Dim method = colorMethods(i)
@@ -72,35 +72,29 @@ Public Class OptionsFeatures
 
 
     Private Sub CheckBox_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        myTask.optionsChanged = True
     End Sub
     Private Sub FeatureMethod_SelectedIndexChanged(sender As Object, e As EventArgs) Handles FeatureMethod.SelectedIndexChanged
-        task.optionsChanged = True
-    End Sub
-    Private Sub verticalRadio_CheckedChanged(sender As Object, e As EventArgs)
-        task.verticalLines = True
-    End Sub
-    Private Sub HorizRadio_CheckedChanged(sender As Object, e As EventArgs)
-        task.verticalLines = False
+        myTask.optionsChanged = True
     End Sub
     Private Sub EdgeMethods_SelectedIndexChanged(sender As Object, e As EventArgs) Handles EdgeMethods.SelectedIndexChanged
-        task.edgeMethod = EdgeMethods.Text
-        task.optionsChanged = True
+        myTask.edgeMethod = EdgeMethods.Text
+        myTask.optionsChanged = True
     End Sub
 
 
 
     Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles MatchCorrSlider.ValueChanged
-        task.fCorrThreshold = MatchCorrSlider.Value / 100
-        task.optionsChanged = True
-        FeatureCorrelationLabel.Text = Format(task.fCorrThreshold, fmt2)
+        myTask.fCorrThreshold = MatchCorrSlider.Value / 100
+        myTask.optionsChanged = True
+        FeatureCorrelationLabel.Text = Format(myTask.fCorrThreshold, fmt2)
     End Sub
     Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FeatureSampleSize.ValueChanged
-        task.FeatureSampleSize = FeatureSampleSize.Value
-        task.optionsChanged = True
-        FeatureSampleSizeLabel.Text = CStr(task.FeatureSampleSize)
+        myTask.FeatureSampleSize = FeatureSampleSize.Value
+        myTask.optionsChanged = True
+        FeatureSampleSizeLabel.Text = CStr(myTask.FeatureSampleSize)
     End Sub
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles Color8USource.SelectedIndexChanged
-        task.optionsChanged = True
+        myTask.optionsChanged = True
     End Sub
 End Class
