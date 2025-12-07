@@ -6,7 +6,6 @@ Namespace CVB
         Dim camera As CVB_Camera = Nothing
         Dim cameraRunning As Boolean = False
         Dim dstImages As CameraImages.images
-        Dim labels As New List(Of Label)
         Public dst2ready As Boolean
         Public camImages As CameraImages.images
         Private Sub camSwitchAnnouncement()

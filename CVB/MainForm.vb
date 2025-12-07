@@ -12,6 +12,8 @@ Namespace CVB
         Const MAX_RECENT = 50
         Dim algHistory As New List(Of String)
         Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
+        Dim labels As List(Of Label)
+        Dim pics As List(Of PictureBox)
         Public Sub jumpToAlgorithm(algName As String)
             If AvailableAlgorithms.Items.Contains(algName) = False Then
                 AvailableAlgorithms.SelectedIndex = 0
@@ -42,7 +44,8 @@ Namespace CVB
         Public Sub New(Optional projectFile As String = "")
             InitializeComponent()
             projectFilePath = projectFile
-
+            labels = New List(Of Label)({labelRGB, labelPointCloud, labelLeft, labelRight})
+            pics = New List(Of PictureBox)({campicRGB, campicPointCloud, campicLeft, campicRight})
             ' Initialize settings IO
             Dim settingsPath As String
             If Not String.IsNullOrEmpty(projectFile) AndAlso File.Exists(projectFile) Then
@@ -152,37 +155,22 @@ Namespace CVB
             If settings Is Nothing Then Exit Sub
             AlgDescription.Width = Me.Width - 540
 
-            ' Calculate sizes for 2x2 grid with labels
             Dim labelHeight As Integer = 18
             Dim topStart As Integer = MainToolStrip.Height
-
             Dim offset = 10
-            Dim picHeight As Integer = (Me.Height - StatusLabel.Height - topStart - labelHeight * 2) / 2 - 22
-            Dim picWidth As Integer = Me.Width / 2 - offset * 2
+            Dim h As Integer = (Me.Height - StatusLabel.Height - topStart - labelHeight * 2) / 2 - 20
+            Dim w As Integer = Me.Width / 2 - offset * 2
+            For i = 0 To 3
+                labels(i).Location = Choose(i + 1, New Point(offset, MainToolStrip.Height), New Point(w + offset, labelRGB.Top),
+                                                   New Point(offset, campicRGB.Top + h), New Point(w + offset, labelLeft.Top))
 
-            labelRGB.Location = New Point(offset, MainToolStrip.Height)
-            labelPointCloud.Location = New Point(picWidth + offset, labelRGB.Top)
-            labelLeft.Location = New Point(offset, campicRGB.Top + picHeight + 10)
-            labelRight.Location = New Point(picWidth + offset, labelLeft.Top)
-            labels.Add(labelLeft)
-            labels.Add(labelRight)
-            labels.Add(labelRGB)
-            labels.Add(labelPointCloud)
+                pics(i).Location = Choose(i + 1, New Point(offset, topStart + labelHeight), New Point(w + offset, campicRGB.Top),
+                                                 New Point(offset, labelLeft.Top + labelHeight), New Point(w + offset, campicLeft.Top))
+                pics(i).Size = New Size(w, h)
+            Next
 
-            campicRGB.Location = New Point(offset, topStart + labelHeight)
-            campicRGB.Size = New Size(picWidth, picHeight)
-
-            campicPointCloud.Location = New Point(picWidth + offset, campicRGB.Top)
-            campicPointCloud.Size = New Size(picWidth, picHeight)
-
-            campicLeft.Location = New Point(offset, labelLeft.Top + labelHeight)
-            campicLeft.Size = New Size(picWidth, picHeight)
-
-            campicRight.Location = New Point(picWidth + offset, campicLeft.Top)
-            campicRight.Size = New Size(picWidth, picHeight)
-
-            StatusLabel.Location = New Point(offset, campicLeft.Top + picHeight)
-            StatusLabel.Width = picWidth * 2
+            StatusLabel.Location = New Point(offset, campicLeft.Top + h)
+            StatusLabel.Width = w * 2
         End Sub
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             settings = settingsIO.Load()
