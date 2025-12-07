@@ -152,7 +152,7 @@ Namespace CVB
         Private Sub MainForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
             If settings Is Nothing Then Exit Sub
 
-            AlgDescription.Width = Me.Width - 570
+            AlgDescription.Width = Me.Width - 540
             AlgDescription.Text = "Description of the algorithm"
 
             ' Calculate sizes for 2x2 grid with labels

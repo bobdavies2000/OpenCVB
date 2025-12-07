@@ -1,7 +1,25 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Common
-    Public Shared optionsChanged As Boolean
-    Public Shared allOptions As New OptionsContainer
+
+Public Class vbTask
+    Public optionsChanged As Boolean
+    Public allOptions As New OptionsContainer
+    Public gOptions As OptionsGlobal
+    Public featureOptions As OptionsFeatures
+
+    Public color As New cv.Mat
+    Public gray As New cv.Mat
+    Public grayStable As New cv.Mat
+    Public leftViewStable As New cv.Mat
+    Public leftView As New cv.Mat
+    Public rightView As New cv.Mat
+    Public pointCloud As New cv.Mat
+    Public gravityCloud As New cv.Mat
+    Public sharpDepth As cv.Mat
+    Public sharpRGB As cv.Mat
+    Public pcSplit() As cv.Mat
+
+    Public gridRects As List(Of cv.Rect)
+
     Public Enum oCase
         drawPointCloudRGB
         drawLineAndCloud
@@ -31,13 +49,4 @@ Public Class Common
         colorTriangles
         imageTriangles
     End Enum
-
-    Public Shared cameraNames As New List(Of String)({"Intel(R) RealSense(TM) Depth Camera 435i",
-                                                      "Intel(R) RealSense(TM) Depth Camera 455",
-                                                      "Oak-D camera",
-                                                      "Orbbec Gemini 335",
-                                                      "Orbbec Gemini 335L",
-                                                      "Orbbec Gemini 336L",
-                                                      "StereoLabs ZED 2/2i"
-                                                      })
 End Class
