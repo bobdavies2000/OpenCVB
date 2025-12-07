@@ -14,15 +14,20 @@ Namespace CVB
         Public camera640x480Support As List(Of Boolean)
         Public camera1920x1080Support As List(Of Boolean)
 
-        Public FormLeft As Integer = 0
-        Public FormTop As Integer = 0
-        Public FormWidth As Integer = 1867
-        Public FormHeight As Integer = 1134
+        Public MainFormLeft As Integer = 0
+        Public MainFormTop As Integer = 0
+        Public MainFormWidth As Integer = 1867
+        Public MainFormHeight As Integer = 1134
+
+        Public TreeViewLeft As Integer = 0
+        Public TreeViewTop As Integer = 0
+        Public TreeViewWidth As Integer = 300
+        Public TreeViewHeight As Integer = 500
 
         Public allOptionsLeft As Integer = 0
         Public allOptionsTop As Integer = 0
-        Public allOptionsWidth As Integer = FormWidth
-        Public allOptionsHeight As Integer = FormHeight
+        Public allOptionsWidth As Integer = MainFormWidth
+        Public allOptionsHeight As Integer = MainFormHeight
 
         Public showAllOptions As Boolean
 
@@ -40,8 +45,6 @@ Namespace CVB
         Public oakDSDKready As Boolean
 
         Public showBatchConsole As Boolean
-
-        Public treeLocation As cv.Vec4f
 
         Public fontInfo As Font
         Public homeDirPath As String

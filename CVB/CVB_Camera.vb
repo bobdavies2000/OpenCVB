@@ -27,17 +27,14 @@ Public Structure cameraInfo
 End Structure
 Public Class CameraImages
     Public Class images
-        Public color As New cv.Mat
-        Public left As New cv.Mat
-        Public right As New cv.Mat
-        Public pointCloud As New cv.Mat
+        Public images() As cv.Mat
         Public Sub New()
         End Sub
         Public Sub New(workRes As cv.Size)
-            color = New cv.Mat(workRes, cv.MatType.CV_8UC3, 0)
-            left = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
-            right = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
-            pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
+            images = {New cv.Mat(workRes, cv.MatType.CV_8UC3, 0),
+                      New cv.Mat(workRes, cv.MatType.CV_32FC3, 0),
+                      New cv.Mat(workRes, cv.MatType.CV_8UC1, 0),
+                      New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)}
         End Sub
     End Class
 

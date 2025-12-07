@@ -50,6 +50,7 @@ Namespace CVB
             CameraSwitching = New Label()
             Timer1 = New Timer(components)
             CamSwitchTimer = New Timer(components)
+            fpsTimer = New Timer(components)
             MainToolStrip.SuspendLayout()
             CType(campicRGB, ComponentModel.ISupportInitialize).BeginInit()
             CType(campicPointCloud, ComponentModel.ISupportInitialize).BeginInit()
@@ -337,6 +338,7 @@ Namespace CVB
         Friend WithEvents CameraSwitching As Label
         Friend WithEvents Timer1 As Timer
         Friend WithEvents CamSwitchTimer As Timer
+        Friend WithEvents fpsTimer As Timer
 
     End Class
 End Namespace

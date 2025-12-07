@@ -140,17 +140,16 @@ Namespace CVB
             If pointCloud Is Nothing Then pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
 
             If workRes.Width = captureRes.Width Then
-                camImages.color = color.Clone
-                camImages.left = leftView * 4 ' brighten it to help with correlations.
-                camImages.right = rightView * 4
-                camImages.pointCloud = pointCloud.Clone
+                camImages.images(0) = color.Clone
+                camImages.images(1) = pointCloud.Clone
+                camImages.images(2) = leftView * 4 ' brighten it to help with correlations.
+                camImages.images(3) = rightView * 4
             Else
-                camImages.color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.left = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
-                camImages.right = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
-                camImages.pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                camImages.images(0) = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                camImages.images(1) = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                camImages.images(2) = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
+                camImages.images(3) = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
             End If
-
             ' without this GC.Collect, there are occasional memory footprint problems.  
             If cameraFrameCount Mod 10 = 0 Then GC.Collect()
             MyBase.GetNextFrameCounts(IMU_FrameTime)

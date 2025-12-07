@@ -9,10 +9,13 @@ Module GlobalVariables
     Public Const fmt4 = "0.0000"
 End Module
 Public Class cvbTask
+    Public dstList() As cv.Mat
+
     Public optionsChanged As Boolean
-    Public allOptions As New OptCVBsContainer
+    Public allOptions As OptCVBContainer
     Public gOptions As OptCVBGlobal
     Public featureOptions As OptCVBFeatures
+    Public treeView As TreeViewForm
 
     Public color As New cv.Mat
     Public gray As New cv.Mat
@@ -40,6 +43,7 @@ Public Class cvbTask
 
     Public workRes As cv.Size
 
+    ' Global Options 
     Public DotSize As Integer
     Public lineWidth As Integer
     Public cvFontThickness As Integer
@@ -54,28 +58,54 @@ Public Class cvbTask
     Public paletteIndex As Integer
     Public fCorrThreshold As Single
     Public FeatureSampleSize As Integer
+
+    ' TreeView Data.
+    Public callTrace As List(Of String)
+    Public algorithm_msMain As New List(Of Single)
+    Public algorithmNamesMain As New List(Of String)
+    Public algorithm_ms As New List(Of Single)
+    Public algorithmNames As New List(Of String)
+    Public algorithmTimes As New List(Of DateTime)
+    Public algorithmStack As New Stack()
+
+    Public desc As String = ""
+
+    Public fpsAlgorithm As Single
+    Public fpsCamera As Single
+    Public testAllRunning As Boolean
+
     Public Sub New()
     End Sub
+
     Public Sub New(camImages As CameraImages.images, _settings As CVB.Json)
         myTask = Me
         settings = _settings
-        allOptions.Show()
-        gOptions = New OptCVBGlobal
-        featureOptions = New OptCVBFeatures
 
-        color = camImages.color
-        pointCloud = camImages.pointCloud
-        leftView = camImages.left
-        rightView = camImages.right
+        workRes = settings.workRes
+        testAllDuration = settings.testAllDuration
+        gravityCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
+
+        allOptions = New OptCVBContainer
+        allOptions.Show()
+
+        featureOptions = New OptCVBFeatures
+        featureOptions.Show()
+
+        gOptions = New OptCVBGlobal
+        gOptions.Show()
+
+        treeView = New TreeViewForm
+        treeView.Show()
+        callTrace = New List(Of String)
+
+        ' process the images and put the results in dstlist.
+        dstList = {color, pointCloud, leftView, rightView}
 
         algName = settings.algorithm
         displayObjectName = algName
         cameraName = settings.cameraName
         homeDir = settings.homeDirPath
         pcSplit = pointCloud.Split()
-
-        workRes = settings.workRes
-        testAllDuration = settings.testAllDuration
     End Sub
 
     Public Enum oCase

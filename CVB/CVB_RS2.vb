@@ -128,10 +128,10 @@ Namespace CVB
                 If rightView Is Nothing Then rightView = New cv.Mat(workRes, cv.MatType.CV_8UC3)
                 If pointCloud Is Nothing Then pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3)
 
-                camImages.color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.left = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
-                camImages.right = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
-                camImages.pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                camImages.images(0) = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                camImages.images(1) = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                camImages.images(2) = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
+                camImages.images(3) = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
 
                 GC.Collect() ' do you think this is unnecessary?  Remove it and check...
                 MyBase.GetNextFrameCounts(IMU_FrameTime)

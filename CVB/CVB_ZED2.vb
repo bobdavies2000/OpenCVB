@@ -53,15 +53,15 @@ Namespace CVB
             IMU_TimeStamp = (zed.IMU_TimeStamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
 
             If workRes <> captureRes Then
-                camImages.color = zed.color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.left = zed.leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.right = zed.rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.pointCloud = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                camImages.images(0) = zed.color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                camImages.images(1) = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                camImages.images(2) = zed.leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                camImages.images(3) = zed.rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             Else
-                camImages.color = zed.color
-                camImages.left = zed.leftView
-                camImages.right = zed.rightView
-                camImages.pointCloud = zed.pointCloud
+                camImages.images(0) = zed.color
+                camImages.images(1) = zed.pointCloud
+                camImages.images(2) = zed.leftView
+                camImages.images(3) = zed.rightView
             End If
 
             If cameraFrameCount Mod 10 = 0 Then GC.Collect()
@@ -74,7 +74,7 @@ Namespace CVB
                 captureThread.Join(1000) ' Wait up to 1 second for thread to finish
                 captureThread = Nothing
             End If
-            If zed IsNot Nothing AndAlso camImages IsNot Nothing AndAlso camImages.pointCloud.Width > 0 Then
+            If zed IsNot Nothing AndAlso camImages IsNot Nothing AndAlso camImages.images(1).Width > 0 Then
                 zed.StopCamera()
             End If
         End Sub

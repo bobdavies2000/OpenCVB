@@ -1,15 +1,16 @@
 ﻿Imports cv = OpenCvSharp
-Public Class OptCVBsContainer
+Public Class OptCVBContainer
     Dim optionsTitle As New List(Of String)
     Public hiddenOptions As New List(Of String)
     Public titlesAdded As Boolean
     Public offset = 30
     Dim afterLoad As Boolean
     Private Sub allOptionsFrm_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Me.Left = myTask.settings.allOptionsLeft - offset
-        Me.Top = myTask.settings.allOptionsTop - offset
+        Me.Left = myTask.settings.allOptionsLeft
+        Me.Top = myTask.settings.allOptionsTop
         Me.Width = myTask.settings.allOptionsWidth
         Me.Height = myTask.settings.allOptionsHeight
+
         afterLoad = True
     End Sub
     Public Sub addTitle(frm As Object)

@@ -49,7 +49,6 @@ Namespace CVB
             End If
         End Sub
         Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
-            ' Toggle between Play and Pause
             isPlaying = Not isPlaying
 
             ' Get the correct path to the Data directory
@@ -110,10 +109,9 @@ Namespace CVB
             If Not cameraRunning OrElse camera Is Nothing Then Return
             Try
                 If camImages Is Nothing Then camImages = New CameraImages.images(settings.workRes)
-                camImages.color = sender.camImages.color.Clone
-                camImages.pointCloud = sender.camImages.pointCloud.Clone
-                camImages.left = sender.camImages.left.Clone
-                camImages.right = sender.camImages.right.Clone
+                For i = 0 To 3
+                    camImages.images(i) = sender.camImages.images(i)
+                Next
                 processImages(camImages)
             Catch ex As Exception
                 Debug.WriteLine("Camera_FrameReady error: " + ex.Message)
@@ -131,7 +129,7 @@ Namespace CVB
         End Sub
         Private Sub campicRGB_Paint(sender As Object, e As PaintEventArgs) Handles campicRGB.Paint
             If camera Is Nothing Then Exit Sub
-            If dstImages Is Nothing Then Exit Sub
+            If myTask Is Nothing Then Exit Sub
             If CameraSwitching.Visible Then
                 If camera.cameraFrameCount > 0 Then
                     CameraSwitching.Visible = False
@@ -140,16 +138,16 @@ Namespace CVB
             End If
 
             If drawRect.Width > 0 And drawRect.Height > 0 Then
-                For Each mat As cv.Mat In {dstImages.color, dstImages.pointCloud, dstImages.left, dstImages.right}
+                For Each mat As cv.Mat In myTask.dstList
                     mat.Rectangle(drawRect, cv.Scalar.White, 1)
                 Next
             End If
 
             Try
-                UpdatePictureBox(campicRGB, dstImages.color)
-                ' UpdatePictureBox(campicPointCloud, dstImages.pointCloud)
-                UpdatePictureBox(campicLeft, dstImages.left)
-                UpdatePictureBox(campicRight, dstImages.right)
+                For i = 0 To myTask.dstList.Count - 1
+                    If i = 1 Then Continue For
+                    UpdatePictureBox(pics(i), myTask.dstList(i))
+                Next
             Catch ex As Exception
                 Debug.WriteLine("Camera display error: " + ex.Message)
             End Try

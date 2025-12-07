@@ -9,9 +9,8 @@ Namespace CVB
         Dim projectFilePath As String = ""
         Public settingsIO As jsonCVBIO
         Public settings As Json
-        Const MAX_RECENT = 50
         Dim algHistory As New List(Of String)
-        Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
+        Dim recentMenu() As ToolStripMenuItem
         Dim labels As List(Of Label)
         Dim pics As List(Of PictureBox)
         Public Sub jumpToAlgorithm(algName As String)
@@ -30,6 +29,8 @@ Namespace CVB
             End If
         End Sub
         Public Sub setupAlgorithmHistory()
+            Const MAX_RECENT = 50
+            If recentMenu Is Nothing Then ReDim recentMenu(MAX_RECENT - 1)
             For i = 0 To MAX_RECENT - 1
                 Dim nextA = GetSetting("OpenCVB", "algHistory" + CStr(i), "algHistory" + CStr(i), "recent algorithm " + CStr(i))
                 If nextA = "" Then Exit For
@@ -143,10 +144,10 @@ Namespace CVB
         End Sub
         Private Sub SaveSettings()
             If settings IsNot Nothing AndAlso settingsIO IsNot Nothing Then
-                settings.FormLeft = Me.Left
-                settings.FormTop = Me.Top
-                settings.FormWidth = Me.Width
-                settings.FormHeight = Me.Height
+                settings.MainFormLeft = Me.Left
+                settings.MainFormTop = Me.Top
+                settings.MainFormWidth = Me.Width
+                settings.MainFormHeight = Me.Height
                 settings.algorithm = AvailableAlgorithms.Text
                 settingsIO.Save(settings)
             End If
@@ -174,8 +175,8 @@ Namespace CVB
         End Sub
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             settings = settingsIO.Load()
-            Me.Location = New Point(settings.FormLeft, settings.FormTop)
-            Me.Size = New Size(settings.FormWidth, settings.FormHeight)
+            Me.Location = New Point(settings.MainFormLeft, settings.MainFormTop)
+            Me.Size = New Size(settings.MainFormWidth, settings.MainFormHeight)
 
             camSwitchAnnouncement()
 
