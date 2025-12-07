@@ -31,8 +31,6 @@ Public Class cvbTask
     Public algName As String
     Public displayObjectName As String
     Public settings As CVB.Json
-    Public testAllRunning As Boolean
-    Public showBatchConsole As Boolean
     Public cameraName As String
     Public homeDir As String
 
@@ -73,14 +71,11 @@ Public Class cvbTask
         algName = settings.algorithm
         displayObjectName = algName
         cameraName = settings.cameraName
-        testAllRunning = False
-        showBatchConsole = settings.showBatchConsole
         homeDir = settings.homeDirPath
         pcSplit = pointCloud.Split()
 
         workRes = settings.workRes
         testAllDuration = settings.testAllDuration
-
     End Sub
 
     Public Enum oCase
