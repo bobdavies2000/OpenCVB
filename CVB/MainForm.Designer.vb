@@ -157,7 +157,7 @@ Namespace CVB
             AlgDescription.MaxLength = 200
             AlgDescription.Name = "AlgDescription"
             AlgDescription.Size = New Size(499, 37)
-            AlgDescription.Text = "Description"
+            AlgDescription.Text = "Description of algorithm"
             AlgDescription.ToolTipText = "Description"
             ' 
             ' campicRGB
@@ -220,7 +220,6 @@ Namespace CVB
             labelRGB.Size = New Size(54, 30)
             labelRGB.TabIndex = 8
             labelRGB.Text = "RGB"
-            labelRGB.Visible = False
             ' 
             ' labelPointCloud
             ' 
@@ -230,7 +229,6 @@ Namespace CVB
             labelPointCloud.Size = New Size(124, 30)
             labelPointCloud.TabIndex = 7
             labelPointCloud.Text = "Point Cloud"
-            labelPointCloud.Visible = False
             ' 
             ' labelLeft
             ' 
@@ -240,7 +238,6 @@ Namespace CVB
             labelLeft.Size = New Size(49, 30)
             labelLeft.TabIndex = 6
             labelLeft.Text = "Left"
-            labelLeft.Visible = False
             ' 
             ' labelRight
             ' 
@@ -250,13 +247,11 @@ Namespace CVB
             labelRight.Size = New Size(63, 30)
             labelRight.TabIndex = 5
             labelRight.Text = "Right"
-            labelRight.Visible = False
             ' 
             ' StatusLabel
             ' 
             StatusLabel.Anchor = AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
             StatusLabel.BackColor = SystemColors.Control
-            StatusLabel.BorderStyle = BorderStyle.FixedSingle
             StatusLabel.Location = New Point(0, 1141)
             StatusLabel.Margin = New Padding(0)
             StatusLabel.Name = "StatusLabel"

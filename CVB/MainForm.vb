@@ -150,61 +150,44 @@ Namespace CVB
         End Sub
         Private Sub MainForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
             If settings Is Nothing Then Exit Sub
-
             AlgDescription.Width = Me.Width - 540
-            AlgDescription.Text = "Description of the algorithm"
 
             ' Calculate sizes for 2x2 grid with labels
             Dim labelHeight As Integer = 18
-            Dim rowSpacing As Integer = 5 ' Space between top and bottom rows for labels
             Dim topStart As Integer = MainToolStrip.Height
-            Dim statusLabelTop As Integer = Me.Height - StatusLabel.Height
 
             Dim offset = 10
-            Dim picHeight As Integer = (statusLabelTop - topStart - labelHeight * 2) / 2 - 22
-            Dim availableWidth As Integer = Me.Width
+            Dim picHeight As Integer = (Me.Height - StatusLabel.Height - topStart - labelHeight * 2) / 2 - 22
             Dim picWidth As Integer = Me.Width / 2 - offset * 2
-            Dim totalPicHeight As Integer = statusLabelTop - topStart - (2 * labelHeight) - rowSpacing - 40
 
-            labelRGB.Location = New Point(offset + offset, topStart)
-            labelPointCloud.Location = New Point(picWidth, topStart)
+            labelRGB.Location = New Point(offset, MainToolStrip.Height)
+            labelPointCloud.Location = New Point(picWidth + offset, labelRGB.Top)
+            labelLeft.Location = New Point(offset, campicRGB.Top + picHeight + 10)
+            labelRight.Location = New Point(picWidth + offset, labelLeft.Top)
+            labels.Add(labelLeft)
+            labels.Add(labelRight)
             labels.Add(labelRGB)
             labels.Add(labelPointCloud)
 
             campicRGB.Location = New Point(offset, topStart + labelHeight)
             campicRGB.Size = New Size(picWidth, picHeight)
 
-            campicPointCloud.Location = New Point(picWidth, topStart + labelHeight)
-            campicPointCloud.Size = New Size(picWidth + offset, picHeight)
+            campicPointCloud.Location = New Point(picWidth + offset, campicRGB.Top)
+            campicPointCloud.Size = New Size(picWidth, picHeight)
 
-            Dim bottomRowLabelTop As Integer = topStart + labelHeight + picHeight + rowSpacing
-            labelLeft.Location = New Point(offset, bottomRowLabelTop)
-            labelRight.Location = New Point(picWidth + offset, bottomRowLabelTop)
-            labels.Add(labelLeft)
-            labels.Add(labelRight)
-
-            Dim bottomRowPicTop As Integer = bottomRowLabelTop + labelHeight
-            campicLeft.Location = New Point(offset, bottomRowPicTop)
+            campicLeft.Location = New Point(offset, labelLeft.Top + labelHeight)
             campicLeft.Size = New Size(picWidth, picHeight)
 
-            campicRight.Location = New Point(picWidth + offset, bottomRowPicTop)
+            campicRight.Location = New Point(picWidth + offset, campicLeft.Top)
             campicRight.Size = New Size(picWidth, picHeight)
 
-            For Each lab In labels
-                Dim index = labels.IndexOf(lab) + 1
-                lab.Top = Choose(index, campicRGB.Top - lab.Height, campicRGB.Top - lab.Height,
-                                        campicLeft.Top - lab.Height, campicLeft.Top - lab.Height)
-                lab.Left = Choose(index, campicRGB.Left, campicPointCloud.Left, campicLeft.Left, campicRight.Left)
-                lab.BackColor = Me.BackColor
-                lab.Visible = True
-            Next
-
-            StatusLabel.Location = New Point(0, campicLeft.Top + campicLeft.Height)
-            StatusLabel.Width = Me.Width
+            StatusLabel.Location = New Point(offset, campicLeft.Top + picHeight)
+            StatusLabel.Width = picWidth * 2
         End Sub
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             settings = settingsIO.Load()
-            Me.Size = New Size(1297, 1100)
+            Me.Location = New Point(settings.FormLeft, settings.FormTop)
+            Me.Size = New Size(settings.FormWidth, settings.FormHeight)
 
             camSwitchAnnouncement()
 
@@ -219,8 +202,6 @@ Namespace CVB
 
             setupAlgorithmHistory()
 
-            Me.Location = New Point(settings.FormLeft, settings.FormTop)
-            Me.Size = New Size(settings.FormWidth, settings.FormHeight)
             StartUpTimer.Enabled = True
         End Sub
     End Class

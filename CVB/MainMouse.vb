@@ -66,11 +66,11 @@ Namespace CVB
                 Debug.WriteLine("Error in camPic_MouseMove: " + ex.Message)
             End Try
 
-            StatusLabel.Text = String.Format("X: {0}, Y: {1}", x, y)
-            StatusLabel.Text += String.Format(", Last click: {0}, {1}", clickPoint.X, clickPoint.Y)
+            StatusLabel.Text = String.Format("X: {0}, Y: {1}    ", x, y)
+            StatusLabel.Text += String.Format("Last click: {0}, {1}    ", clickPoint.X, clickPoint.Y)
 
             If drawRect.Width > 0 And drawRect.Height > 0 Then
-                StatusLabel.Text += " DrawRect = " + String.Format("x: {0}, y: {1}, w: {2}, h: {3}", drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
+                StatusLabel.Text += "DrawRect = " + String.Format("x: {0}, y: {1}, w: {2}, h: {3}", drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
             End If
         End Sub
         Private Sub PictureBox_MouseClick(sender As Object, e As MouseEventArgs) Handles campicRGB.MouseClick, campicPointCloud.MouseClick, campicLeft.MouseClick, campicRight.MouseClick
