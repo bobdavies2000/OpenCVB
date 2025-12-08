@@ -59,7 +59,7 @@ Namespace CVB
             End If
             settingsIO = New jsonCVBIO(settingsPath)
         End Sub
-        Private Sub SettingsToolStripButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
+        Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             Dim optionsForm As New MainOptions()
             optionsForm.settings = settings
             optionsForm.cameraNames = Common.cameraNames

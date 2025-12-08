@@ -385,7 +385,6 @@ VB_to_CPP/.vs/
 .vs/OpenCVB/v17/.suo
 cmake.db
 OakD/Build/
-Mynt/
 OrbbecSDK/
 *.json
 AlgorithmList.*
