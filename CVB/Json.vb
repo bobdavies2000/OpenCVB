@@ -227,6 +227,30 @@ Namespace CVB
                     settings.testAllDuration = 5
             End Select
 
+            settings.desiredFPS = 30
+            If settings.cameraName.Contains("Orbbec") Then
+                settings.desiredFPS = 0 ' maximum fps available at this resolution
+            ElseIf settings.cameraname.contains("StereoLabs") Then
+                settings.desiredFPS = 100 ' possible at only
+            End If
+
+            Select Case settings.workRes.Width
+                Case 1920
+                    settings.desiredFPS = 15
+                Case 1280
+                    settings.desiredFPS = 30
+                Case 960
+                    settings.desiredFPS = 45
+                Case 672
+                    settings.desiredFPS = 60
+                Case 640
+                    settings.desiredFPS = 60
+                Case 480
+                    settings.desiredFPS = 75
+                Case 336, 320, 240, 168, 160
+                    settings.desiredFPS = 90
+            End Select
+
             Try
                 Using streamWriter As New StreamWriter(jsonFileName)
                     Dim serializer As New JsonSerializer With {.Formatting = Formatting.Indented}
