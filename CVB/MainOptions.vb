@@ -1,9 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class MainOptions
     Public settings As Object
-    Public cameraNames As List(Of String)
-    ' Public cameraRadioButton(settings.cameraNames.Count - 1) As RadioButton
-    Public cameraRadioButton(6) As RadioButton
+    Public cameraRadioButton() As RadioButton
     Public workResRadio() As RadioButton
     Public cameraName As String
     Public cameraIndex As Integer
@@ -78,6 +76,7 @@ Public Class MainOptions
         End If
     End Sub
     Public Sub MainOptions_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ReDim cameraRadioButton(cameraNames.Count - 1)
         Static radioButtonsPresent = False
         defineCameraResolutions(cameraIndex)
 

@@ -62,7 +62,6 @@ Namespace CVB
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             Dim optionsForm As New MainOptions()
             optionsForm.settings = settings
-            optionsForm.cameraNames = Common.cameraNames
 
             optionsForm.MainOptions_Load(sender, e)
             optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True

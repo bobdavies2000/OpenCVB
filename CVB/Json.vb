@@ -51,15 +51,6 @@ Namespace CVB
 
         Public desiredFPS As Integer = 60
         Public testAllDuration As Integer = 5
-
-        Public cameraNames As New List(Of String)({"Intel(R) RealSense(TM) Depth Camera 435i",
-                                                   "Intel(R) RealSense(TM) Depth Camera 455",
-                                                   "Oak-D camera",
-                                                   "Orbbec Gemini 335",
-                                                   "Orbbec Gemini 335L",
-                                                   "Orbbec Gemini 336L",
-                                                   "StereoLabs ZED 2/2i"
-                                                   })
     End Class
 
     Public Class jsonCVBIO
@@ -99,8 +90,8 @@ Namespace CVB
             ' checking the list for specific missing device here...
             Dim usbList = USBenumeration()
             settings.cameraPresent = New List(Of Boolean)
-            For i = 0 To settings.cameraNames.Count - 1
-                Dim searchname = settings.cameraNames(i)
+            For i = 0 To cameraNames.Count - 1
+                Dim searchname = cameraNames(i)
                 Dim present As Boolean = False
                 If searchname.Contains("Oak-D") Then searchname = "Movidius MyriadX"
                 If searchname.StartsWith("StereoLabs ZED 2/2i") Then searchname = "ZED 2"
@@ -117,27 +108,27 @@ Namespace CVB
             Next
 
             If settings.cameraName = "" Or settings.cameraPresent(settings.cameraIndex) = False Then
-                For i = 0 To settings.cameraNames.Count - 1
+                For i = 0 To cameraNames.Count - 1
                     If settings.cameraPresent(i) Then
                         settings.cameraIndex = i
-                        settings.cameraName = settings.cameraNames(i)
+                        settings.cameraName = cameraNames(i)
                         Exit For
                     End If
                 Next
             Else
-                For i = 0 To settings.cameraNames.Count - 1
-                    If settings.cameraNames(i) = settings.cameraName Then settings.cameraIndex = i
+                For i = 0 To cameraNames.Count - 1
+                    If cameraNames(i) = settings.cameraName Then settings.cameraIndex = i
                 Next
             End If
 
-            For i = 0 To settings.cameraNames.Count - 1
-                If settings.cameraNames(i).StartsWith("Orbbec") Then
-                    If settings.cameraNames(i) = settings.cameraName Then
+            For i = 0 To cameraNames.Count - 1
+                If cameraNames(i).StartsWith("Orbbec") Then
+                    If cameraNames(i) = settings.cameraName Then
                         settings.cameraIndex = i
                         Exit For
                     End If
                 Else
-                    If settings.cameraNames(i).Contains(settings.cameraName) And settings.cameraName <> "" Then
+                    If cameraNames(i).Contains(settings.cameraName) And settings.cameraName <> "" Then
                         settings.cameraIndex = i
                         Exit For
                     End If
@@ -148,7 +139,7 @@ Namespace CVB
             For i = 0 To settings.cameraPresent.Count - 1
                 If settings.cameraPresent(i) Then
                     settings.cameraFound = True
-                    If settings.cameraName = Nothing Then settings.cameraName = settings.cameraNames(i)
+                    If settings.cameraName = Nothing Then settings.cameraName = cameraNames(i)
                     Exit For
                 End If
             Next
