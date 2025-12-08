@@ -8,7 +8,6 @@ Namespace CVB
         Dim isPlaying As Boolean = False
         Dim projectFilePath As String = ""
         Public settingsIO As jsonCVBIO
-        Public settings As Json
         Dim algHistory As New List(Of String)
         Dim recentMenu() As ToolStripMenuItem
         Dim labels As List(Of Label)
@@ -61,7 +60,6 @@ Namespace CVB
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             Dim optionsForm As New MainOptions()
-            optionsForm.settings = settings
 
             optionsForm.MainOptions_Load(sender, e)
             optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True

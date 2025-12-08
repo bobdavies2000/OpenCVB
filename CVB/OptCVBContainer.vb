@@ -6,10 +6,10 @@ Public Class OptCVBContainer
     Public offset = 30
     Dim afterLoad As Boolean
     Private Sub allOptionsFrm_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Me.Left = myTask.settings.allOptionsLeft
-        Me.Top = myTask.settings.allOptionsTop
-        Me.Width = myTask.settings.allOptionsWidth
-        Me.Height = myTask.settings.allOptionsHeight
+        Me.Left = settings.allOptionsLeft
+        Me.Top = settings.allOptionsTop
+        Me.Width = settings.allOptionsWidth
+        Me.Height = settings.allOptionsHeight
 
         afterLoad = True
     End Sub
@@ -57,7 +57,7 @@ Public Class OptCVBContainer
                         indexHide += 1
                     Else
                         If title.Contains("OpenFile") Then
-                            frm.SetDesktopLocation(0, myTask.settings.allOptionsTop + 350)
+                            frm.SetDesktopLocation(0, settings.allOptionsTop + 350)
                         End If
                         If title.EndsWith(" Sliders") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                             If frm Is Nothing Then Continue For
@@ -96,8 +96,8 @@ Public Class OptCVBContainer
             ' For example, move it to the center of the primary screen
             Me.StartPosition = FormStartPosition.Manual
             Me.Location = New Point(0, 0)
-            myTask.settings.allOptionsLeft = 0
-            myTask.settings.allOptionsTop = 0
+            settings.allOptionsLeft = 0
+            settings.allOptionsTop = 0
         End If
     End Sub
     Private Sub OptionsContainer_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
@@ -114,16 +114,16 @@ Public Class OptCVBContainer
     End Sub
     Private Sub OptionsContainer_Move(sender As Object, e As EventArgs) Handles Me.Move
         If afterLoad = False Then Exit Sub
-        myTask.settings.allOptionsLeft = Me.Left
-        myTask.settings.allOptionsTop = Me.Top
-        myTask.settings.allOptionsWidth = Me.Width
-        myTask.settings.allOptionsHeight = Me.Height
+        settings.allOptionsLeft = Me.Left
+        settings.allOptionsTop = Me.Top
+        settings.allOptionsWidth = Me.Width
+        settings.allOptionsHeight = Me.Height
     End Sub
     Private Sub OptionsContainer_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         If afterLoad = False Then Exit Sub
-        myTask.settings.allOptionsLeft = Me.Left
-        myTask.settings.allOptionsTop = Me.Top
-        myTask.settings.allOptionsWidth = Me.Width
-        myTask.settings.allOptionsHeight = Me.Height
+        settings.allOptionsLeft = Me.Left
+        settings.allOptionsTop = Me.Top
+        settings.allOptionsWidth = Me.Width
+        settings.allOptionsHeight = Me.Height
     End Sub
 End Class

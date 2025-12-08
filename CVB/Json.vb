@@ -60,7 +60,7 @@ Namespace CVB
         End Sub
 
         Public Function Load() As Json
-            Dim settings As New Json()
+            settings = New Json()
             Dim fileInfo As New FileInfo(jsonFileName)
             Dim homeDir = fileInfo.DirectoryName + "/../"
             If fileInfo.Exists Then
@@ -69,7 +69,7 @@ Namespace CVB
                         Dim json = streamReader.ReadToEnd()
                         If json <> "" Then
                             settings = JsonConvert.DeserializeObject(Of Json)(json)
-                            settings = initialize(settings, homeDir)
+                            settings = initialize(homeDir)
                         End If
                     End Using
 
@@ -77,12 +77,12 @@ Namespace CVB
                     ' If deserialization fails, return default settings
                 End Try
             Else
-                settings = initialize(settings, homeDir)
+                settings = initialize(homeDir)
             End If
 
             Return settings
         End Function
-        Public Function initialize(ByRef settings As Json, homeDir As String) As Json
+        Public Function initialize(homeDir As String) As Json
             settings.cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True, True})
             settings.camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True, True})
             settings.camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False, False})

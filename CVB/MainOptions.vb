@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Public Class MainOptions
-    Public settings As Object
     Public cameraRadioButton() As RadioButton
     Public workResRadio() As RadioButton
     Public cameraName As String

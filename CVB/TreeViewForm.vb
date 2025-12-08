@@ -136,7 +136,7 @@
 
         PercentTime.Text = "Click on an algorithm to see more info. " + vbCrLf + vbCrLf
         PercentTime.Text += "Algorithm FPS = " + Format(myTask.fpsAlgorithm, "0") + vbCrLf
-        PercentTime.Text += "Camera FPS = " + Format(myTask.settings.desiredFPS, "0") + vbCrLf
+        PercentTime.Text += "Camera FPS = " + Format(settings.desiredFPS, "0") + vbCrLf
         Static boldFont = New Font(PercentTime.Font, FontStyle.Bold)
         Static regularFont = New Font(PercentTime.Font, FontStyle.Regular)
 
@@ -180,10 +180,10 @@
     Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         TreeView1.Dock = DockStyle.Fill
         TreeView1.SendToBack()
-        Me.Left = myTask.settings.TreeViewLeft
-        Me.Top = myTask.settings.TreeViewTop
-        Me.Width = myTask.settings.TreeViewWidth
-        Me.Height = myTask.settings.TreeViewHeight
+        Me.Left = settings.TreeViewLeft
+        Me.Top = settings.TreeViewTop
+        Me.Width = settings.TreeViewWidth
+        Me.Height = settings.TreeViewHeight
         PercentTime.Width = 250
         PercentTime.Left = 250
 
@@ -192,17 +192,17 @@
     End Sub
     Private Sub TreeViewForm_Move(sender As Object, e As EventArgs) Handles Me.Move
         If initialized = False Then Exit Sub
-        myTask.settings.TreeViewLeft = Me.Left
-        myTask.settings.TreeViewTop = Me.Top
-        myTask.settings.TreeViewWidth = Me.Width
-        myTask.settings.TreeViewHeight = Me.Height
+        settings.TreeViewLeft = Me.Left
+        settings.TreeViewTop = Me.Top
+        settings.TreeViewWidth = Me.Width
+        settings.TreeViewHeight = Me.Height
     End Sub
     Private Sub TreeviewForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         If initialized = False Then Exit Sub
-        myTask.settings.TreeViewLeft = Me.Left
-        myTask.settings.TreeViewTop = Me.Top
-        myTask.settings.TreeViewWidth = Me.Width
-        myTask.settings.TreeViewHeight = Me.Height
+        settings.TreeViewLeft = Me.Left
+        settings.TreeViewTop = Me.Top
+        settings.TreeViewWidth = Me.Width
+        settings.TreeViewHeight = Me.Height
     End Sub
 
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
