@@ -1,4 +1,5 @@
 Imports System.IO
+Imports System.Text.RegularExpressions
 Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
@@ -6,7 +7,7 @@ Imports cvext = OpenCvSharp.Extensions
 Namespace CVB
     Partial Public Class MainForm
         Dim isPlaying As Boolean = False
-        Dim projectFilePath As String = ""
+        Dim homeDir As String = ""
         Public settingsIO As jsonCVBIO
         Dim algHistory As New List(Of String)
         Dim recentMenu() As ToolStripMenuItem
@@ -43,20 +44,19 @@ Namespace CVB
         End Sub
         Public Sub New(Optional projectFile As String = "")
             InitializeComponent()
-            projectFilePath = projectFile
+
+            ' Set the current directory to the project path (where .vbproj file is located)
+            Dim projectDir As DirectoryInfo = Nothing
+            If Not String.IsNullOrEmpty(projectFile) AndAlso File.Exists(projectFile) Then
+                projectDir = New DirectoryInfo(Path.GetDirectoryName(projectFile))
+                Directory.SetCurrentDirectory(projectDir.FullName + "/../")
+            End If
+            homeDir = Path.GetDirectoryName(projectDir.FullName) + "\"
+
             labels = New List(Of Label)({labelRGB, labelPointCloud, labelLeft, labelRight})
             pics = New List(Of PictureBox)({campicRGB, campicPointCloud, campicLeft, campicRight})
-            ' Initialize settings IO
-            Dim settingsPath As String
-            If Not String.IsNullOrEmpty(projectFile) AndAlso File.Exists(projectFile) Then
-                Dim projectDir = Path.GetDirectoryName(projectFile)
-                settingsPath = Path.Combine(projectDir, "settings.json")
-            Else
-                ' Fallback to application directory
-                Dim appDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)
-                settingsPath = Path.Combine(appDir, "settings.json")
-            End If
-            settingsIO = New jsonCVBIO(settingsPath)
+
+            settingsIO = New jsonCVBIO(Path.Combine(homeDir, "CVB\settings.json"))
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             Dim optionsForm As New MainOptions()
@@ -111,17 +111,8 @@ Namespace CVB
 
         End Sub
         Private Sub AtoZ_Click(sender As Object, e As EventArgs) Handles AtoZ.Click
-            ' Get the home directory (Data directory parent)
-            If Not String.IsNullOrEmpty(projectFilePath) AndAlso File.Exists(projectFilePath) Then
-                Dim projectDir = Path.GetDirectoryName(projectFilePath)
-                ' Go up one level from CVB to get to the root (where Data folder is)
-                settings.homeDirPath = Path.GetDirectoryName(projectDir)
-            Else
-                settings.homeDirPath = CurDir()
-            End If
-
             Dim groupsForm As New MainAtoZ()
-            groupsForm.homeDir = New DirectoryInfo(settings.homeDirPath)
+            groupsForm.homeDir = New DirectoryInfo(homeDir + "\Data")
 
             If groupsForm.ShowDialog() = DialogResult.OK AndAlso Not String.IsNullOrEmpty(groupsForm.selectedGroup) Then
                 ' Find and select the first algorithm that starts with the selected group
@@ -139,6 +130,42 @@ Namespace CVB
             SaveSettings()
             myTask = Nothing
             StopCamera()
+        End Sub
+        Private Sub codeLines()
+            Dim countFileInfo = New FileInfo(homeDir + "Data/AlgorithmCounts.txt")
+            If countFileInfo.Exists = False Then
+                MessageBox.Show("The AlgorithmCounts.txt file is missing.  Run 'UI_Generator' or rebuild all to rebuild the user interface.")
+            End If
+            Dim sr = New StreamReader(countFileInfo.FullName)
+
+            Dim infoLine = sr.ReadLine
+            Dim Split = Regex.Split(infoLine, "\W+")
+            Dim CodeLineCount As Integer = Split(1)
+
+            infoLine = sr.ReadLine
+            Split = Regex.Split(infoLine, "\W+")
+            Dim algorithmCount = Split(1)
+            sr.Close()
+
+            Dim algList = New FileInfo(homeDir + "Data/AvailableAlgorithms.txt")
+            sr = New StreamReader(algList.FullName)
+            Dim lastGroup As String = "AddWeighted"
+            While (1)
+                Dim nextLine = sr.ReadLine
+                Dim splitLine = Regex.Split(nextLine, "_")
+                If splitLine(0) <> lastGroup Then
+                    lastGroup = splitLine(0)
+                    AvailableAlgorithms.Items.Add("") ' add a blank line between groups.
+                End If
+                AvailableAlgorithms.Items.Add(nextLine)
+                If sr.EndOfStream Then Exit While
+            End While
+            sr.Close()
+
+            Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " +
+                       CStr(algorithmCount) + " algorithms = " +
+                       CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + settings.cameraName
+
         End Sub
         Private Sub SaveSettings()
             If settings IsNot Nothing AndAlso settingsIO IsNot Nothing Then
@@ -178,15 +205,10 @@ Namespace CVB
 
             camSwitchAnnouncement()
 
-            ' Set the current directory to the project path (where .vbproj file is located)
-            Dim projectDir As DirectoryInfo = Nothing
-            If Not String.IsNullOrEmpty(projectFilePath) AndAlso File.Exists(projectFilePath) Then
-                projectDir = New DirectoryInfo(Path.GetDirectoryName(projectFilePath))
-                Directory.SetCurrentDirectory(projectDir.FullName)
-            End If
 
             LoadAvailableAlgorithms()
 
+            codeLines()
             setupAlgorithmHistory()
 
             StartUpTimer.Enabled = True

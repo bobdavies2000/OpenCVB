@@ -4,6 +4,7 @@ Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Module GlobalVariables
     Public settings As CVB.Json
+    Public homeDirPath As String
     Public myTask As cvbTask
 
     Public Const fmt0 = "0"

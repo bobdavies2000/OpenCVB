@@ -40,7 +40,6 @@ Namespace CVB
         Public showBatchConsole As Boolean
 
         Public fontInfo As Font
-        Public homeDirPath As String
 
         Public desiredFPS As Integer = 60
         Public testAllDuration As Integer = 5
@@ -55,14 +54,13 @@ Namespace CVB
         Public Function Load() As Json
             settings = New Json()
             Dim fileInfo As New FileInfo(jsonFileName)
-            Dim homeDir = fileInfo.DirectoryName + "/../"
             If fileInfo.Exists Then
                 Try
                     Using streamReader As New StreamReader(jsonFileName)
                         Dim json = streamReader.ReadToEnd()
                         If json <> "" Then
                             settings = JsonConvert.DeserializeObject(Of Json)(json)
-                            settings = initialize(homeDir)
+                            settings = initialize()
                         End If
                     End Using
 
@@ -70,12 +68,12 @@ Namespace CVB
                     ' If deserialization fails, return default settings
                 End Try
             Else
-                settings = initialize(homeDir)
+                settings = initialize()
             End If
 
             Return settings
         End Function
-        Public Function initialize(homeDir As String) As Json
+        Public Function initialize() As Json
             settings.cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True, True})
             settings.camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True, True})
             settings.camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False, False})

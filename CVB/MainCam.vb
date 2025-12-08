@@ -52,16 +52,6 @@ Namespace CVB
         Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
             isPlaying = Not isPlaying
 
-            ' Get the correct path to the Data directory
-            Dim dataDir As String
-            If Not String.IsNullOrEmpty(projectFilePath) AndAlso File.Exists(projectFilePath) Then
-                Dim projectDir = Path.GetDirectoryName(projectFilePath)
-                dataDir = Path.Combine(projectDir, "Data")
-            Else
-                Dim appDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)
-                dataDir = Path.Combine(appDir, "Data")
-            End If
-
             ' Load and set the appropriate image
             Try
                 ' Dispose old image if it exists
@@ -70,12 +60,12 @@ Namespace CVB
                 End If
 
                 If isPlaying Then
-                    Dim pausePath = Path.Combine(dataDir, "PauseButton.png")
+                    Dim pausePath = Path.Combine(homeDir + "\CVB\Data", "PauseButton.png")
                     If File.Exists(pausePath) Then
                         PausePlayButton.Image = New Bitmap(pausePath)
                     End If
                 Else
-                    Dim playPath = Path.Combine(dataDir, "Run.png")
+                    Dim playPath = Path.Combine(homeDir + "\CVB\Data", "Run.png")
                     If File.Exists(playPath) Then
                         PausePlayButton.Image = New Bitmap(playPath)
                     End If

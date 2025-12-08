@@ -25,7 +25,6 @@ Public Class cvbTask
     Public algName As String
     Public displayObjectName As String
     Public cameraName As String
-    Public homeDir As String
 
     Public testAllDuration As Integer
     Public verticalLines As Boolean
@@ -94,7 +93,6 @@ Public Class cvbTask
         algName = settings.algorithm
         displayObjectName = algName
         cameraName = settings.cameraName
-        homeDir = settings.homeDirPath
         pcSplit = pointCloud.Split()
     End Sub
 
