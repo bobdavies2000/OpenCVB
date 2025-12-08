@@ -29,20 +29,13 @@ Namespace CVB
         Public allOptionsWidth As Integer = MainFormWidth
         Public allOptionsHeight As Integer = MainFormHeight
 
-        Public showAllOptions As Boolean
-
         Public algorithm As String
 
         Public workRes As New cv.Size(336, 188)
         Public captureRes As New cv.Size(672, 376)
         Public displayRes As cv.Size
 
-        Public locationPixelViewer As cv.Vec4f
         Public locationOpenGL As cv.Vec4f
-        Public locationOptions As cv.Vec4f
-
-        Public zedSDKready As Boolean
-        Public oakDSDKready As Boolean
 
         Public showBatchConsole As Boolean
 

@@ -25,8 +25,6 @@ Public Class OptCVBGlobal
         highlight.Items.Add("Red")
         highlight.SelectedIndex = 0
 
-        ShowAllOptions.Checked = GetSetting("Opencv", "ShowAllOptions", "ShowAllOptions", False)
-
         myTask.DotSize = 1
         myTask.cvFontThickness = 1
         myTask.brickSize = 8
@@ -150,9 +148,6 @@ Public Class OptCVBGlobal
     End Sub
     Private Sub useMotion_CheckedChanged(sender As Object, e As EventArgs)
         myTask.optionsChanged = True
-    End Sub
-    Private Sub ShowAllByDefault_CheckedChanged(sender As Object, e As EventArgs) Handles ShowAllOptions.CheckedChanged
-        SaveSetting("Opencv", "showAllOptions", "showAllOptions", ShowAllOptions.Checked)
     End Sub
     Private Sub DebugSliderSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
