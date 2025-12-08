@@ -144,7 +144,11 @@ Namespace CVB
 
             infoLine = sr.ReadLine
             Split = Regex.Split(infoLine, "\W+")
-            Dim algorithmCount = Split(1)
+            Dim algorithmCount As Integer = Split(1)
+
+            infoLine = sr.ReadLine
+            Split = Regex.Split(infoLine, "\W+")
+            algorithmCount += Split(3)
             sr.Close()
 
             Dim algList = New FileInfo(homeDir + "Data/AvailableAlgorithms.txt")
