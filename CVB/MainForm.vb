@@ -137,6 +137,7 @@ Namespace CVB
         End Sub
         Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             SaveSettings()
+            myTask = Nothing
             StopCamera()
         End Sub
         Private Sub SaveSettings()
@@ -189,6 +190,12 @@ Namespace CVB
             setupAlgorithmHistory()
 
             StartUpTimer.Enabled = True
+        End Sub
+        Private Sub MainForm_Activated(sender As Object, e As EventArgs) Handles Me.Activated
+            If myTask Is Nothing Then Exit Sub
+            ' if mytask.sharpgl IsNot Nothing Then sharpGL.Activate()
+            If myTask.treeView IsNot Nothing Then myTask.treeView.Activate()
+            If myTask.allOptions IsNot Nothing Then myTask.allOptions.Activate()
         End Sub
     End Class
 End Namespace
