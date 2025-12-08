@@ -14,7 +14,7 @@ Namespace CVB
             If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
             If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
 
-            If isPlaying Then
+            If isPlaying And myTask IsNot Nothing Then
                 Dim timeNow As DateTime = Now
                 Dim elapsedTime = timeNow.Ticks - lastTime.Ticks
                 Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)

@@ -190,12 +190,16 @@ Namespace CVB
             setupAlgorithmHistory()
 
             StartUpTimer.Enabled = True
+            fpsTimer.Enabled = True
         End Sub
-        Private Sub MainForm_Activated(sender As Object, e As EventArgs) Handles Me.Activated
+
+
+
+        Private Sub campicRGB_Click(sender As Object, e As EventArgs) Handles campicRGB.Click, campicPointCloud.Click, campicLeft.Click, campicRight.Click
             If myTask Is Nothing Then Exit Sub
-            ' if mytask.sharpgl IsNot Nothing Then sharpGL.Activate()
-            'If myTask.treeView IsNot Nothing Then myTask.treeView.Activate()
-            'If myTask.allOptions IsNot Nothing Then myTask.allOptions.Activate()
+            'If myTask IsNot Nothing Then  if mytask.sharpgl IsNot Nothing Then sharpGL.Activate()
+            If myTask IsNot Nothing Then If myTask.treeView IsNot Nothing Then myTask.treeView.Activate()
+            If myTask IsNot Nothing Then If myTask.allOptions IsNot Nothing Then myTask.allOptions.Activate()
         End Sub
     End Class
 End Namespace

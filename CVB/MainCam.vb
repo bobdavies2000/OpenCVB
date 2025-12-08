@@ -19,6 +19,7 @@ Namespace CVB
         Private Sub StartUpTimer_Tick(sender As Object, e As EventArgs) Handles StartUpTimer.Tick
             StartUpTimer.Enabled = False
             PausePlayButton.PerformClick()
+            fpsTimer.Enabled = True
         End Sub
         Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
             Me.Refresh()

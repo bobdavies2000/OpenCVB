@@ -48,7 +48,6 @@ Namespace CVB
             StatusLabel = New Label()
             StartUpTimer = New Timer(components)
             CameraSwitching = New Label()
-            Timer1 = New Timer(components)
             CamSwitchTimer = New Timer(components)
             fpsTimer = New Timer(components)
             MainToolStrip.SuspendLayout()
@@ -267,25 +266,24 @@ Namespace CVB
             ' CameraSwitching
             ' 
             CameraSwitching.AutoSize = True
-            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12F)
+            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12.0F)
             CameraSwitching.Location = New Point(61, 122)
             CameraSwitching.Name = "CameraSwitching"
             CameraSwitching.Size = New Size(202, 29)
             CameraSwitching.TabIndex = 9
             CameraSwitching.Text = "CameraSwitching"
             ' 
-            ' Timer1
-            ' 
-            Timer1.Enabled = True
-            Timer1.Interval = 10
-            ' 
             ' CamSwitchTimer
             ' 
             CamSwitchTimer.Interval = 10
             ' 
+            ' fpsTimer
+            ' 
+            fpsTimer.Interval = 1000
+            ' 
             ' MainForm
             ' 
-            AutoScaleDimensions = New SizeF(12F, 30F)
+            AutoScaleDimensions = New SizeF(12.0F, 30.0F)
             AutoScaleMode = AutoScaleMode.Font
             ClientSize = New Size(1275, 1171)
             Controls.Add(CameraSwitching)
@@ -336,7 +334,6 @@ Namespace CVB
         Friend WithEvents StatusLabel As Label
         Friend WithEvents StartUpTimer As Timer
         Friend WithEvents CameraSwitching As Label
-        Friend WithEvents Timer1 As Timer
         Friend WithEvents CamSwitchTimer As Timer
         Friend WithEvents fpsTimer As Timer
 
