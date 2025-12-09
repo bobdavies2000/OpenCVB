@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class cvbTask
-    Public dstList() As cv.Mat
+    Public dst() As cv.Mat
 
     Public optionsChanged As Boolean
     Public allOptions As OptCVBContainer
@@ -19,11 +19,12 @@ Public Class cvbTask
     Public sharpDepth As cv.Mat
     Public sharpRGB As cv.Mat
     Public pcSplit() As cv.Mat
+    Public depthmask As cv.Mat
+    Public noDepthMask As cv.Mat
 
     Public gridRects As List(Of cv.Rect)
     Public firstPass As Boolean = True
     Public algName As String
-    Public displayObjectName As String
     Public cameraName As String
 
     Public testAllDuration As Integer
@@ -47,8 +48,9 @@ Public Class cvbTask
     Public paletteIndex As Integer
     Public fCorrThreshold As Single
     Public FeatureSampleSize As Integer
+    Public clickPoint As New cv.Point ' last place where mouse was clicked.
 
-    ' TreeView Data.
+    ' TreeView and trace Data.
     Public callTrace As List(Of String)
     Public algorithm_msMain As New List(Of Single)
     Public algorithmNamesMain As New List(Of String)
@@ -56,12 +58,28 @@ Public Class cvbTask
     Public algorithmNames As New List(Of String)
     Public algorithmTimes As New List(Of DateTime)
     Public algorithmStack As New Stack()
+    Public displayObjectName As String
+    Public activeObjects As New List(Of Object)
+    Public calibData As cameraInfo
 
     Public desc As String = ""
 
     Public fpsAlgorithm As Single
     Public fpsCamera As Single
     Public testAllRunning As Boolean
+
+    ' color maps
+    Public scalarColors(255) As cv.Scalar
+    Public vecColors(255) As cv.Vec3b
+    Public depthColorMap As cv.Mat
+    Public colorMap As cv.Mat
+    Public colorMapZeroIsBlack As cv.Mat
+    Public correlationColorMap As cv.Mat
+
+    ' task algorithms - operate on every frame regardless of which algorithm is being run.
+    Public colorizer As New DepthColorizer_Basics
+    Public palette As New Palette_LoadColorMap
+    Public paletteRandom As New Palette_RandomColors
 
     Public Sub New()
     End Sub
@@ -85,15 +103,26 @@ Public Class cvbTask
 
         treeView = New TreeViewForm
         treeView.Show()
+
         callTrace = New List(Of String)
 
-        ' process the images and put the results in dstlist.
-        dstList = {color, pointCloud, leftView, rightView}
+        ' process the images and put the results in dst().
+        myTask.color = camImages.images(0)
+        myTask.pointCloud = camImages.images(1)
+        myTask.leftView = camImages.images(2)
+        myTask.rightView = camImages.images(3)
+
+        dst = {color, pointCloud, leftView, rightView}  ' <<<<<<<<< temporary....
 
         algName = settings.algorithm
         displayObjectName = algName
         cameraName = settings.cameraName
         pcSplit = pointCloud.Split()
+
+        If pcSplit.Count > 0 Then
+            colorizer.Run(pcSplit(2))
+            dst(1) = colorizer.dst2
+        End If
     End Sub
 
     Public Enum oCase

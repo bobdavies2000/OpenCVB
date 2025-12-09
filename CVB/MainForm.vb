@@ -1,6 +1,5 @@
 Imports System.IO
 Imports System.Text.RegularExpressions
-Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 
@@ -208,7 +207,6 @@ Namespace CVB
             Me.Size = New Size(settings.MainFormWidth, settings.MainFormHeight)
 
             camSwitchAnnouncement()
-
 
             LoadAvailableAlgorithms()
 

@@ -6,7 +6,6 @@ Namespace CVB
         Dim LastX As Integer
         Dim LastY As Integer
         Dim mouseClickFlag As Boolean
-        Dim clickPoint As New cv.Point ' last place where mouse was clicked.
         Dim mousePicTag As Integer
         Dim mouseDownPoint As cv.Point
         Dim mouseMovePoint As cv.Point ' last place the mouse was located in any of the OpenCVB images.
@@ -67,7 +66,7 @@ Namespace CVB
             End Try
 
             StatusLabel.Text = String.Format("X: {0}, Y: {1}    ", x, y)
-            StatusLabel.Text += String.Format("Last click: {0}, {1}    ", clickPoint.X, clickPoint.Y)
+            StatusLabel.Text += String.Format("Last click: {0}, {1}    ", myTask.clickPoint.X, myTask.clickPoint.Y)
 
             If drawRect.Width > 0 And drawRect.Height > 0 Then
                 StatusLabel.Text += "DrawRect = " + String.Format("x: {0}, y: {1}, w: {2}, h: {3}", drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
@@ -77,7 +76,7 @@ Namespace CVB
             Dim picBox = TryCast(sender, PictureBox)
             Dim x As Integer = e.X * settings.workRes.Width / campicRGB.Width
             Dim y As Integer = e.Y * settings.workRes.Height / campicRGB.Height
-            clickPoint = New cv.Point(x, y)
+            myTask.clickPoint = New cv.Point(x, y)
         End Sub
         Private Sub campic_DoubleClick(sender As Object, e As EventArgs) Handles campicRGB.DoubleClick, campicPointCloud.DoubleClick, campicLeft.DoubleClick, campicRight.DoubleClick
             DrawingRectangle = False

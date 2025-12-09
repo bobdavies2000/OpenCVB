@@ -110,8 +110,12 @@ Namespace CVB
         End Sub
         Private Sub UpdatePictureBox(picBox As PictureBox, image As cv.Mat)
             If image IsNot Nothing AndAlso image.Width > 0 Then
-                image = image.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
                 Dim displayImage = image.Clone()
+                If drawRect.Width > 0 And drawRect.Height > 0 Then
+                    displayImage.Rectangle(drawRect, cv.Scalar.White, 1)
+                End If
+
+                displayImage = displayImage.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
                 Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
                 If picBox.Image IsNot Nothing Then picBox.Image.Dispose()
                 picBox.Image = bitmap
@@ -128,16 +132,10 @@ Namespace CVB
                 End If
             End If
 
-            If drawRect.Width > 0 And drawRect.Height > 0 Then
-                For Each mat As cv.Mat In myTask.dstList
-                    mat.Rectangle(drawRect, cv.Scalar.White, 1)
-                Next
-            End If
-
             Try
-                For i = 0 To myTask.dstList.Count - 1
+                For i = 0 To myTask.dst.Count - 1
                     If i = 1 Then Continue For
-                    UpdatePictureBox(pics(i), myTask.dstList(i))
+                    UpdatePictureBox(pics(i), myTask.dst(i))
                 Next
             Catch ex As Exception
                 Debug.WriteLine("Camera display error: " + ex.Message)
