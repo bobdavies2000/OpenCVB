@@ -21,6 +21,7 @@ Public Class cvbTask
     Public pcSplit() As cv.Mat
     Public depthmask As cv.Mat
     Public noDepthMask As cv.Mat
+    Public depthRGB As cv.Mat
 
     Public gridRects As List(Of cv.Rect)
     Public firstPass As Boolean = True
@@ -77,9 +78,7 @@ Public Class cvbTask
     Public correlationColorMap As cv.Mat
 
     ' task algorithms - operate on every frame regardless of which algorithm is being run.
-    Public colorizer As New DepthColorizer_Basics
-    Public palette As New Palette_LoadColorMap
-    Public paletteRandom As New Palette_RandomColors
+    Public colorizer As DepthColorizer_Basics
 
     Public Sub New()
     End Sub
@@ -106,19 +105,12 @@ Public Class cvbTask
 
         callTrace = New List(Of String)
 
-        ' process the images and put the results in dst().
-        myTask.color = camImages.images(0)
-        myTask.pointCloud = camImages.images(1)
-        myTask.leftView = camImages.images(2)
-        myTask.rightView = camImages.images(3)
-
-        dst = {color, pointCloud, leftView, rightView}  ' <<<<<<<<< temporary....
-
         algName = settings.algorithm
         displayObjectName = algName
         cameraName = settings.cameraName
-        pcSplit = pointCloud.Split()
+    End Sub
 
+    Public Sub RunAlgorithm()
         If pcSplit.Count > 0 Then
             colorizer.Run(pcSplit(2))
             dst(1) = colorizer.dst2

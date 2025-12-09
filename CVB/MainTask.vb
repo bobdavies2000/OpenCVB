@@ -1,5 +1,8 @@
 ﻿Imports System.IO
-Imports CVBClasses
+Imports System.Security.Cryptography
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement
+Imports Intel.RealSense
+Imports OpenCvSharp.ML.DTrees
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Module GlobalVariables
@@ -27,7 +30,17 @@ End Module
 Namespace CVB
     Partial Public Class MainForm
         Private Sub processImages(camImages As CameraImages.images)
-            If myTask Is Nothing Then myTask = New cvbTask(camImages, settings)
+            ' process the images and put the results in dst().
+            myTask.color = camImages.images(0)
+            myTask.pointCloud = camImages.images(1)
+            myTask.leftView = camImages.images(2)
+            myTask.rightView = camImages.images(3)
+
+            myTask.pcSplit = myTask.pointCloud.Split()
+            myTask.colorizer.Run(myTask.pcSplit(2))
+
+            myTask.dst = {myTask.color, myTask.depthRGB, myTask.leftView, myTask.rightView}
+
             AlgDescription.Text = myTask.desc
         End Sub
     End Class

@@ -189,7 +189,7 @@ Namespace CVB
             Dim offset = 10
             Dim h As Integer = (Me.Height - StatusLabel.Height - topStart - labelHeight * 2) / 2 - 20
             Dim w As Integer = Me.Width / 2 - offset * 2
-            For i = 0 To 3
+            For i = 0 To pics.Count - 1
                 labels(i).Location = Choose(i + 1, New Point(offset, MainToolStrip.Height), New Point(w + offset, labelRGB.Top),
                                                    New Point(offset, campicRGB.Top + h), New Point(w + offset, labelLeft.Top))
 

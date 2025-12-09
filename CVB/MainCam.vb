@@ -78,6 +78,9 @@ Namespace CVB
                 Debug.WriteLine("Error loading button image: " + ex.Message)
             End Try
 
+            myTask = New cvbTask(camImages, settings)
+            myTask.colorizer = New DepthColorizer_Basics
+
             If isPlaying Then StartCamera() Else StopCamera()
         End Sub
         Private Sub StopCamera()
@@ -100,7 +103,7 @@ Namespace CVB
             If Not cameraRunning OrElse camera Is Nothing Then Return
             Try
                 If camImages Is Nothing Then camImages = New CameraImages.images(settings.workRes)
-                For i = 0 To 3
+                For i = 0 To camImages.images.Count - 1
                     camImages.images(i) = sender.camImages.images(i)
                 Next
                 processImages(camImages)
@@ -134,7 +137,6 @@ Namespace CVB
 
             Try
                 For i = 0 To myTask.dst.Count - 1
-                    If i = 1 Then Continue For
                     UpdatePictureBox(pics(i), myTask.dst(i))
                 Next
             Catch ex As Exception

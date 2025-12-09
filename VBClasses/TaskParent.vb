@@ -1,10 +1,28 @@
 Imports cv = OpenCvSharp
 Imports System.Drawing.Imaging
-Public Class TaskCVBParent : Implements IDisposable
-    Public check As New OptCVBCheckbox
-    Public combo As New OptCVBCombo
-    Public radio As New OptCVBRadioButtons
-    Public sliders As New OptCVBSliders
+Public Class TrueText
+    Declare Sub CopyClassToManagedCpp Lib "ManagedCppLibrary.dll" (dataPtr As IntPtr)
+    Public text As String
+    Public picTag = 2
+    Public pt As cv.Point
+
+    Private Sub setup(_text As String, _pt As cv.Point, camPicIndex As Integer)
+        text = _text
+        pt = _pt
+        picTag = camPicIndex
+    End Sub
+    Public Sub New(_text As String, _pt As cv.Point, camPicIndex As Integer)
+        setup(_text, _pt, camPicIndex)
+    End Sub
+    Public Sub New(_text As String, _pt As cv.Point)
+        setup(_text, _pt, 2)
+    End Sub
+End Class
+Public Class TaskParent : Implements IDisposable
+    Public check As New OptionsCheckbox
+    Public combo As New OptionsCombo
+    Public radio As New OptionsRadioButtons
+    Public sliders As New OptionsSliders
     Public standalone As Boolean
     Public dst0 As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat
     Public labels() As String = {"", "", "", ""}
@@ -13,10 +31,11 @@ Public Class TaskCVBParent : Implements IDisposable
     Public cPtr As IntPtr
     Public trueData As New List(Of TrueText)
     Public strOut As String
+    Public emptyRect As New cv.Rect
     Public Sub New()
         traceName = Me.GetType.Name
 
-        If myTask.callTrace.Count = 0 Then myTask.callTrace.Add(myTask.algName + "\")
+        If task.callTrace.Count = 0 Then task.callTrace.Add(task.algName + "\")
         labels = {"", "", traceName, ""}
         Dim stackTrace = Environment.StackTrace
         Dim lines() = stackTrace.Split(vbCrLf)
@@ -35,40 +54,40 @@ Public Class TaskCVBParent : Implements IDisposable
             callStack = lines(i) + "\" + callStack
         Next
 
-        dst0 = New cv.Mat(myTask.workRes, cv.MatType.CV_8UC3, 0)
-        dst1 = New cv.Mat(myTask.workRes, cv.MatType.CV_8UC3, 0)
-        dst2 = New cv.Mat(myTask.workRes, cv.MatType.CV_8UC3, 0)
-        dst3 = New cv.Mat(myTask.workRes, cv.MatType.CV_8UC3, 0)
+        dst0 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+        dst1 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+        dst3 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
 
-        standalone = traceName = myTask.algName
-        myTask.callTrace.Add(callStack)
+        standalone = traceName = task.algName
+        task.callTrace.Add(callStack)
 
-        myTask.activeObjects.Add(Me)
+        task.activeObjects.Add(Me)
 
         If standalone Then
-            myTask.algorithm_ms.Clear()
-            myTask.algorithmNames.Clear()
-            myTask.algorithmNames.Add("waitingForInput")
-            myTask.algorithmTimes.Add(Now)
-            myTask.algorithm_ms.Add(0)
+            task.algorithm_ms.Clear()
+            task.algorithmNames.Clear()
+            task.algorithmNames.Add("waitingForInput")
+            task.algorithmTimes.Add(Now)
+            task.algorithm_ms.Add(0)
 
-            myTask.algorithmNames.Add("inputBufferCopy")
-            myTask.algorithmTimes.Add(Now)
-            myTask.algorithm_ms.Add(0)
+            task.algorithmNames.Add("inputBufferCopy")
+            task.algorithmTimes.Add(Now)
+            task.algorithm_ms.Add(0)
 
-            myTask.algorithmNames.Add("ReturnCopyTime")
-            myTask.algorithmTimes.Add(Now)
-            myTask.algorithm_ms.Add(0)
+            task.algorithmNames.Add("ReturnCopyTime")
+            task.algorithmTimes.Add(Now)
+            task.algorithm_ms.Add(0)
 
-            myTask.algorithmNames.Add(traceName)
-            myTask.algorithmTimes.Add(Now)
-            myTask.algorithm_ms.Add(0)
+            task.algorithmNames.Add(traceName)
+            task.algorithmTimes.Add(Now)
+            task.algorithm_ms.Add(0)
 
-            myTask.algorithmStack = New Stack()
-            myTask.algorithmStack.Push(0)
-            myTask.algorithmStack.Push(1)
-            myTask.algorithmStack.Push(2)
-            myTask.algorithmStack.Push(3)
+            task.algorithmStack = New Stack()
+            task.algorithmStack.Push(0)
+            task.algorithmStack.Push(1)
+            task.algorithmStack.Push(2)
+            task.algorithmStack.Push(3)
         End If
     End Sub
     Public Shared Function CaptureScreen() As Bitmap
@@ -83,32 +102,32 @@ Public Class TaskCVBParent : Implements IDisposable
         ' Save the bitmap to a file (e.g., PNG)
         screenshot.Save(filePath, ImageFormat.Png)
     End Sub
-    'Public Function GetWindowImage(ByVal WindowHandle As IntPtr, ByVal rect As cv.Rect) As Bitmap
-    '    Dim b As New Bitmap(rect.Width, rect.Height, Imaging.PixelFormat.Format24bppRgb)
+    Public Function GetWindowImage(ByVal WindowHandle As IntPtr, ByVal rect As cv.Rect) As Bitmap
+        Dim b As New Bitmap(rect.Width, rect.Height, Imaging.PixelFormat.Format24bppRgb)
 
-    '    Using img As Graphics = Graphics.FromImage(b)
-    '        Dim ImageHDC As IntPtr = img.GetHdc
-    '        Try
-    '            Using window As Graphics = Graphics.FromHwnd(WindowHandle)
-    '                Dim WindowHDC As IntPtr = window.GetHdc
-    '                BitBlt(ImageHDC, 0, 0, rect.Width, rect.Height, WindowHDC, rect.X, rect.Y, CopyPixelOperation.SourceCopy)
-    '                window.ReleaseHdc()
-    '            End Using
-    '            img.ReleaseHdc()
-    '        Catch ex As Exception
-    '            ' ignoring the error - they probably closed the OpenGL window.
-    '        End Try
-    '    End Using
+        Using img As Graphics = Graphics.FromImage(b)
+            Dim ImageHDC As IntPtr = img.GetHdc
+            Try
+                Using window As Graphics = Graphics.FromHwnd(WindowHandle)
+                    Dim WindowHDC As IntPtr = window.GetHdc
+                    BitBlt(ImageHDC, 0, 0, rect.Width, rect.Height, WindowHDC, rect.X, rect.Y, CopyPixelOperation.SourceCopy)
+                    window.ReleaseHdc()
+                End Using
+                img.ReleaseHdc()
+            Catch ex As Exception
+                ' ignoring the error - they probably closed the OpenGL window.
+            End Try
+        End Using
 
-    '    Return b
-    'End Function
+        Return b
+    End Function
     Public Sub DrawRotatedRect(rotatedRect As cv.RotatedRect, dst As cv.Mat, color As cv.Scalar)
         Dim vertices2f = rotatedRect.Points()
         Dim vertices(vertices2f.Length - 1) As cv.Point
         For j = 0 To vertices2f.Length - 1
             vertices(j) = New cv.Point(CInt(vertices2f(j).X), CInt(vertices2f(j).Y))
         Next
-        dst.FillConvexPoly(vertices, color, myTask.lineType)
+        dst.FillConvexPoly(vertices, color, task.lineType)
     End Sub
     Public Sub AddPlotScale(dst As cv.Mat, minVal As Double, maxVal As Double, Optional lineCount As Integer = 3)
         Dim spacer = CInt(dst.Height / (lineCount + 1))
@@ -118,12 +137,12 @@ Public Class TaskCVBParent : Implements IDisposable
         For i = 0 To lineCount
             Dim p1 = New cv.Point(0, spacer * i)
             Dim p2 = New cv.Point(dst.Width, spacer * i)
-            dst.Line(p1, p2, cv.Scalar.White, myTask.cvFontThickness)
+            dst.Line(p1, p2, white, task.cvFontThickness)
             Dim nextVal = (maxVal - spaceVal * i)
             Dim nextText = If(maxVal > 1000, Format(nextVal / 1000, "###,##0.0") + "k", Format(nextVal, fmt2))
             Dim p3 = New cv.Point(0, p1.Y + 12)
-            cv.Cv2.PutText(dst, nextText, p3, cv.HersheyFonts.HersheyPlain, myTask.cvFontSize,
-                           cv.Scalar.White, myTask.cvFontThickness, myTask.lineType)
+            cv.Cv2.PutText(dst, nextText, p3, cv.HersheyFonts.HersheyPlain, task.cvFontSize,
+                            white, task.cvFontThickness, task.lineType)
         Next
     End Sub
     Public Function Convert32f_To_8UC3(Input As cv.Mat) As cv.Mat
@@ -166,11 +185,11 @@ Public Class TaskCVBParent : Implements IDisposable
         Return New List(Of cv.Point)
     End Function
     Public Sub setPointCloudGrid()
-        myTask.gOptions.GridSlider.Value = 8
-        If myTask.workRes.Width = 640 Then
-            myTask.gOptions.GridSlider.Value = 16
-        ElseIf myTask.workRes.Width = 1280 Then
-            myTask.gOptions.GridSlider.Value = 32
+        task.gOptions.GridSlider.Value = 8
+        If task.workRes.Width = 640 Then
+            task.gOptions.GridSlider.Value = 16
+        ElseIf task.workRes.Width = 1280 Then
+            task.gOptions.GridSlider.Value = 32
         End If
     End Sub
     Public Function gMatrixToStr(gMatrix As cv.Mat) As String
@@ -189,30 +208,30 @@ Public Class TaskCVBParent : Implements IDisposable
         ' trying to avoid extreme colors... 
         Return New cv.Scalar(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240))
     End Function
-    'Public Function validContourPoint(rc As oldrcData, pt As cv.Point, offset As Integer) As cv.Point
-    '    If pt.X < rc.rect.Width And pt.Y < rc.rect.Height Then Return pt
-    '    Dim count = rc.contour.Count
-    '    For i = offset + 1 To rc.contour.Count - 1
-    '        pt = rc.contour(i Mod count)
-    '        If pt.X < rc.rect.Width And pt.Y < rc.rect.Height Then Return pt
-    '    Next
-    '    Return New cv.Point
-    'End Function
-    'Public Function build3PointEquation(rc As oldrcData) As cv.Vec4f
-    '    If rc.contour.Count < 3 Then Return New cv.Vec4f
-    '    Dim offset = rc.contour.Count / 3
-    '    Dim p1 = validContourPoint(rc, rc.contour(offset * 0), offset * 0)
-    '    Dim p2 = validContourPoint(rc, rc.contour(offset * 1), offset * 1)
-    '    Dim p3 = validContourPoint(rc, rc.contour(offset * 2), offset * 2)
+    Public Function validContourPoint(rc As oldrcData, pt As cv.Point, offset As Integer) As cv.Point
+        If pt.X < rc.rect.Width And pt.Y < rc.rect.Height Then Return pt
+        Dim count = rc.contour.Count
+        For i = offset + 1 To rc.contour.Count - 1
+            pt = rc.contour(i Mod count)
+            If pt.X < rc.rect.Width And pt.Y < rc.rect.Height Then Return pt
+        Next
+        Return New cv.Point
+    End Function
+    Public Function build3PointEquation(rc As oldrcData) As cv.Vec4f
+        If rc.contour.Count < 3 Then Return New cv.Vec4f
+        Dim offset = rc.contour.Count / 3
+        Dim p1 = validContourPoint(rc, rc.contour(offset * 0), offset * 0)
+        Dim p2 = validContourPoint(rc, rc.contour(offset * 1), offset * 1)
+        Dim p3 = validContourPoint(rc, rc.contour(offset * 2), offset * 2)
 
-    '    Dim v1 = myTask.pointCloud(rc.rect).Get(Of cv.Point3f)(p1.Y, p1.X)
-    '    Dim v2 = myTask.pointCloud(rc.rect).Get(Of cv.Point3f)(p2.Y, p2.X)
-    '    Dim v3 = myTask.pointCloud(rc.rect).Get(Of cv.Point3f)(p3.Y, p3.X)
+        Dim v1 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p1.Y, p1.X)
+        Dim v2 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p2.Y, p2.X)
+        Dim v3 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p3.Y, p3.X)
 
-    '    Dim cross = crossProduct(v1 - v2, v2 - v3)
-    '    Dim k = -(v1.X * cross.X + v1.Y * cross.Y + v1.Z * cross.Z)
-    '    Return New cv.Vec4f(cross.X, cross.Y, cross.Z, k)
-    'End Function
+        Dim cross = crossProduct(v1 - v2, v2 - v3)
+        Dim k = -(v1.X * cross.X + v1.Y * cross.Y + v1.Z * cross.Z)
+        Return New cv.Vec4f(cross.X, cross.Y, cross.Z, k)
+    End Function
     Public Function fitDepthPlane(fitDepth As List(Of cv.Point3f)) As cv.Vec4f
         Dim wDepth = cv.Mat.FromPixelData(fitDepth.Count, 1, cv.MatType.CV_32FC3, fitDepth.ToArray)
         Dim columnSum = wDepth.Sum()
@@ -275,17 +294,17 @@ Public Class TaskCVBParent : Implements IDisposable
         Return Math.Abs(v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z)
     End Function
     Public Function worldCoordinatesD6(p As cv.Point3f) As cv.Vec6f
-        Dim x = CSng((p.X - myTask.calibData.rgbIntrinsics.ppx) / myTask.calibData.rgbIntrinsics.fx)
-        Dim y = CSng((p.Y - myTask.calibData.rgbIntrinsics.ppy) / myTask.calibData.rgbIntrinsics.fy)
+        Dim x = CSng((p.X - task.calibData.rgbIntrinsics.ppx) / task.calibData.rgbIntrinsics.fx)
+        Dim y = CSng((p.Y - task.calibData.rgbIntrinsics.ppy) / task.calibData.rgbIntrinsics.fy)
         Return New cv.Vec6f(x * p.Z, y * p.Z, p.Z, p.X, p.Y, 0)
     End Function
     Public Shared Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X + r.Width >= myTask.workRes.Width * ratio Then r.Width = myTask.workRes.Width * ratio - r.X - 1
-        If r.Y + r.Height >= myTask.workRes.Height * ratio Then r.Height = myTask.workRes.Height * ratio - r.Y - 1
-        If r.X >= myTask.workRes.Width * ratio Then r.X = myTask.workRes.Width - 1
-        If r.Y >= myTask.workRes.Height * ratio Then r.Y = myTask.workRes.Height - 1
+        If r.X + r.Width >= task.workRes.Width * ratio Then r.Width = task.workRes.Width * ratio - r.X - 1
+        If r.Y + r.Height >= task.workRes.Height * ratio Then r.Height = task.workRes.Height * ratio - r.Y - 1
+        If r.X >= task.workRes.Width * ratio Then r.X = task.workRes.Width - 1
+        If r.Y >= task.workRes.Height * ratio Then r.Y = task.workRes.Height - 1
         If r.Width <= 0 Then r.Width = 1
         If r.Height <= 0 Then r.Height = 1
         Return r
@@ -314,7 +333,7 @@ Public Class TaskCVBParent : Implements IDisposable
         Return mm
     End Function
     Public Function Show_HSV_Hist(hist As cv.Mat) As cv.Mat
-        Dim img As New cv.Mat(New cv.Size(myTask.workRes.Width, myTask.workRes.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        Dim img As New cv.Mat(New cv.Size(task.workRes.Width, task.workRes.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         Dim binCount = hist.Height
         Dim binWidth = img.Width / hist.Height
         Dim mm As mmData = GetMinMax(hist)
@@ -329,23 +348,23 @@ Public Class TaskCVBParent : Implements IDisposable
         End If
         Return img
     End Function
-    'Public Function GetHist2Dminmax(input As cv.Mat, chan1 As Integer, chan2 As Integer) As cv.Rangef()
-    '    If input.Type = cv.MatType.CV_8UC3 Then
-    '        ' ranges are exclusive in OpenCV 
-    '        Return {New cv.Rangef(-histDelta, 256),
-    '                New cv.Rangef(-histDelta, 256)}
-    '    End If
+    Public Function GetHist2Dminmax(input As cv.Mat, chan1 As Integer, chan2 As Integer) As cv.Rangef()
+        If input.Type = cv.MatType.CV_8UC3 Then
+            ' ranges are exclusive in OpenCV 
+            Return {New cv.Rangef(-histDelta, 256),
+                    New cv.Rangef(-histDelta, 256)}
+        End If
 
-    '    Dim xInput = input.ExtractChannel(chan1)
-    '    Dim yInput = input.ExtractChannel(chan2)
+        Dim xInput = input.ExtractChannel(chan1)
+        Dim yInput = input.ExtractChannel(chan2)
 
-    '    Dim mmX = GetMinMax(xInput)
-    '    Dim mmY = GetMinMax(yInput)
+        Dim mmX = GetMinMax(xInput)
+        Dim mmY = GetMinMax(yInput)
 
-    '    ' ranges are exclusive in OpenCV 
-    '    Return {New cv.Rangef(mmX.minVal - histDelta, mmX.maxVal + histDelta),
-    '            New cv.Rangef(mmY.minVal - histDelta, mmY.maxVal + histDelta)}
-    'End Function
+        ' ranges are exclusive in OpenCV 
+        Return {New cv.Rangef(mmX.minVal - histDelta, mmX.maxVal + histDelta),
+                New cv.Rangef(mmY.minVal - histDelta, mmY.maxVal + histDelta)}
+    End Function
     Public Function GetMaxDist(ByRef md As maskData) As cv.Point
         Dim mask = md.mask.Clone
         mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
@@ -368,7 +387,7 @@ Public Class TaskCVBParent : Implements IDisposable
     End Function
     Public Shared Function GetMaxDistDepth(ByRef maskInput As cv.Mat, rect As cv.Rect) As cv.Point
         Dim depth As New cv.Mat
-        myTask.depthmask(rect).CopyTo(depth, maskInput)
+        task.depthMask(rect).CopyTo(depth, maskInput)
         depth.Rectangle(New cv.Rect(0, 0, depth.Width, depth.Height), 0, 1)
         Dim distance32f = depth.DistanceTransform(cv.DistanceTypes.L1, 0)
         Dim mm As mmData = GetMinMax(distance32f)
@@ -387,31 +406,31 @@ Public Class TaskCVBParent : Implements IDisposable
 
         Return mm.maxLoc
     End Function
-    'Public Sub fpDisplayAge()
-    '    For Each fp In myTask.fpList
-    '        SetTrueText(CStr(fp.age), fp.pt, 2)
-    '    Next
-    'End Sub
-    'Public Sub fpDSet()
-    '    If myTask.fpList.Count = 0 Then Exit Sub
-    '    Dim brickIndex = myTask.fpMap.Get(Of Single)(myTask.ClickPoint.Y, myTask.ClickPoint.X)
-    '    Dim fpIndex = myTask.fpFromGridCell.IndexOf(brickIndex)
-    '    If fpIndex >= 0 Then myTask.fpD = myTask.fpList(fpIndex)
-    'End Sub
-    'Public Sub fpDisplayMotion()
-    '    dst1.SetTo(0)
-    '    For Each fp In myTask.fpList
-    '        For Each pt In fp.ptHistory
-    '            DrawCircle(dst1, pt, myTask.DotSize, myTask.highlight)
-    '        Next
-    '    Next
-    'End Sub
+    Public Sub fpDisplayAge()
+        For Each fp In task.fpList
+            SetTrueText(CStr(fp.age), fp.pt, 2)
+        Next
+    End Sub
+    Public Sub fpDSet()
+        If task.fpList.Count = 0 Then Exit Sub
+        Dim brickIndex = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+        Dim fpIndex = task.fpFromGridCell.IndexOf(brickIndex)
+        If fpIndex >= 0 Then task.fpD = task.fpList(fpIndex)
+    End Sub
+    Public Sub fpDisplayMotion()
+        dst1.SetTo(0)
+        For Each fp In task.fpList
+            For Each pt In fp.ptHistory
+                DrawCircle(dst1, pt, task.DotSize, task.highlight)
+            Next
+        Next
+    End Sub
     Public Sub fpCellContour(fp As fpData, dst As cv.Mat, Optional colorIndex As Integer = 0)
         Dim color = Choose(colorIndex + 1, cv.Scalar.White, cv.Scalar.Black)
         For i = 0 To fp.facets.Count - 1
             Dim p1 = fp.facets(i)
             Dim p2 = fp.facets((i + 1) Mod fp.facets.Count)
-            dst.Line(p1, p2, color, myTask.lineWidth, myTask.lineType)
+            dst.Line(p1, p2, color, task.lineWidth, task.lineType)
         Next
     End Sub
     Public Sub SetTrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
@@ -426,51 +445,51 @@ Public Class TaskCVBParent : Implements IDisposable
         trueData.Add(strnext)
     End Sub
     Public Function standaloneTest() As Boolean
-        If standalone Or myTask.displayObjectName = traceName Then Return True
+        If standalone Or task.displayObjectName = traceName Then Return True
         Return False
     End Function
     Public Sub DrawRect(dst As cv.Mat, rect As cv.Rect, color As cv.Scalar)
-        dst.Rectangle(rect, color, myTask.lineWidth, myTask.lineType)
+        dst.Rectangle(rect, color, task.lineWidth, task.lineType)
     End Sub
     Public Sub DrawRect(dst As cv.Mat, rect As cv.Rect)
-        dst.Rectangle(rect, myTask.highlight, myTask.lineWidth, myTask.lineType)
+        dst.Rectangle(rect, task.highlight, task.lineWidth, task.lineType)
     End Sub
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar, lineWidth As Integer)
-        dst.Line(p1, p2, color, lineWidth, myTask.lineType)
+        dst.Line(p1, p2, color, lineWidth, task.lineType)
     End Sub
     Public Sub DrawLine(dst As cv.Mat, lp As lpData, color As cv.Scalar)
-        dst.Line(lp.p1, lp.p2, color, myTask.lineWidth, myTask.lineType)
+        dst.Line(lp.p1, lp.p2, color, task.lineWidth, task.lineType)
     End Sub
     Public Sub DrawLine(dst As cv.Mat, lp As lpData)
-        dst.Line(lp.p1, lp.p2, myTask.highlight, myTask.lineWidth, myTask.lineType)
+        dst.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
     End Sub
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f)
-        dst.Line(p1, p2, myTask.highlight, myTask.lineWidth, myTask.lineType)
+        dst.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
     End Sub
     Public Sub DrawFatLine(dst As cv.Mat, lp As lpData, color As cv.Scalar)
-        dst.Line(lp.p1, lp.p2, myTask.highlight, myTask.lineWidth * 3, myTask.lineType)
+        dst.Line(lp.p1, lp.p2, task.highlight, task.lineWidth * 3, task.lineType)
     End Sub
     Public Sub DrawFatLine(p1 As cv.Point2f, p2 As cv.Point2f, dst As cv.Mat, color As cv.Scalar)
-        dst.Line(p1, p2, myTask.highlight, myTask.lineWidth * 3, myTask.lineType)
+        dst.Line(p1, p2, task.highlight, task.lineWidth * 3, task.lineType)
     End Sub
     Public Shared Sub DrawLine(ByRef dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
         Dim pt1 = New cv.Point(p1.X, p1.Y)
         Dim pt2 = New cv.Point(p2.X, p2.Y)
-        dst.Line(pt1, pt2, color, myTask.lineWidth, myTask.lineType)
+        dst.Line(pt1, pt2, color, task.lineWidth, task.lineType)
     End Sub
     Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, radius As Integer, color As cv.Scalar,
                           Optional fillFlag As Integer = -1)
-        dst.Circle(pt, radius, color, fillFlag, myTask.lineType)
+        dst.Circle(pt, radius, color, fillFlag, task.lineType)
     End Sub
     Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f)
-        dst.Circle(pt, myTask.DotSize, myTask.highlight, -1, myTask.lineType)
+        dst.Circle(pt, task.DotSize, task.highlight, -1, task.lineType)
     End Sub
     Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, color As cv.Scalar)
-        dst.Circle(pt, myTask.DotSize, color, -1, myTask.lineType)
+        dst.Circle(pt, task.DotSize, color, -1, task.lineType)
     End Sub
     Public Sub DrawPolkaDot(pt As cv.Point2f, dst As cv.Mat)
-        dst.Circle(pt, myTask.DotSize + 2, white, -1, myTask.lineType)
-        DrawCircle(dst, pt, myTask.DotSize, cv.Scalar.Black)
+        dst.Circle(pt, task.DotSize + 2, white, -1, task.lineType)
+        DrawCircle(dst, pt, task.DotSize, cv.Scalar.Black)
     End Sub
 
     Public Sub DrawRotatedOutline(rotatedRect As cv.RotatedRect, dst2 As cv.Mat, color As cv.Scalar)
@@ -479,7 +498,7 @@ Public Class TaskCVBParent : Implements IDisposable
         For i = 1 To pts.Length
             Dim index = i Mod pts.Length
             Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
-            DrawLine(dst2, pt, lastPt, myTask.highlight)
+            DrawLine(dst2, pt, lastPt, task.highlight)
             lastPt = pt
         Next
     End Sub
@@ -488,28 +507,28 @@ Public Class TaskCVBParent : Implements IDisposable
     End Sub
     Public Function ShowPaletteDepth(input As cv.Mat) As cv.Mat
         Dim output As New cv.Mat
-        cv.Cv2.ApplyColorMap(input, output, myTask.depthColorMap)
-        output.SetTo(0, myTask.noDepthMask)
+        cv.Cv2.ApplyColorMap(input, output, task.depthColorMap)
+        output.SetTo(0, task.noDepthMask)
         Return output
     End Function
     Public Function ShowPaletteCorrelation(input As cv.Mat) As cv.Mat
         Dim output As New cv.Mat
-        cv.Cv2.ApplyColorMap(input, output, myTask.correlationColorMap)
+        cv.Cv2.ApplyColorMap(input, output, task.correlationColorMap)
         Return output
     End Function
     Public Function ShowPaletteDepthOriginal(input As cv.Mat) As cv.Mat
-        If myTask.palette Is Nothing Then myTask.palette = New Palette_LoadColorMap
-        myTask.palette.Run(input)
-        Return myTask.palette.dst2
+        If task.palette Is Nothing Then task.palette = New Palette_LoadColorMap
+        task.palette.Run(input)
+        Return task.palette.dst2
     End Function
     Public Shared Function PaletteFull(input As cv.Mat) As cv.Mat
         Dim output As New cv.Mat
         If input.Type <> cv.MatType.CV_8U Then
             Dim input8u As New cv.Mat
             input.ConvertTo(input8u, cv.MatType.CV_8U)
-            cv.Cv2.ApplyColorMap(input8u, output, myTask.colorMap)
+            cv.Cv2.ApplyColorMap(input8u, output, task.colorMap)
         Else
-            cv.Cv2.ApplyColorMap(input, output, myTask.colorMap)
+            cv.Cv2.ApplyColorMap(input, output, task.colorMap)
         End If
 
         Return output
@@ -519,21 +538,21 @@ Public Class TaskCVBParent : Implements IDisposable
         If input.Type <> cv.MatType.CV_8U Then
             Dim input8u As New cv.Mat
             input.ConvertTo(input8u, cv.MatType.CV_8U)
-            cv.Cv2.ApplyColorMap(input8u, output, myTask.colorMapZeroIsBlack)
+            cv.Cv2.ApplyColorMap(input8u, output, task.colorMapZeroIsBlack)
         Else
-            cv.Cv2.ApplyColorMap(input, output, myTask.colorMapZeroIsBlack)
+            cv.Cv2.ApplyColorMap(input, output, task.colorMapZeroIsBlack)
         End If
 
         Return output
     End Function
     Public Shared Function ShowPaletteOriginal(input As cv.Mat) As cv.Mat
-        If myTask.paletteRandom Is Nothing Then myTask.paletteRandom = New Palette_RandomColors
+        If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
         If input.Type <> cv.MatType.CV_8U Then input.ConvertTo(input, cv.MatType.CV_8U)
-        Return myTask.paletteRandom.useColorMapWithBlack(input).Clone
+        Return task.paletteRandom.useColorMapWithBlack(input).Clone
     End Function
     Public Function ShowPaletteFullColor(input As cv.Mat) As cv.Mat
-        If myTask.paletteRandom Is Nothing Then myTask.paletteRandom = New Palette_RandomColors
-        Return myTask.paletteRandom.useColorMapFull(input)
+        If task.paletteRandom Is Nothing Then task.paletteRandom = New Palette_RandomColors
+        Return task.paletteRandom.useColorMapFull(input)
     End Function
     Public Function ShowAddweighted(src1 As cv.Mat, src2 As cv.Mat, ByRef label As String) As cv.Mat
         Static addw As New AddWeighted_Basics
@@ -544,39 +563,39 @@ Public Class TaskCVBParent : Implements IDisposable
         label = "AddWeighted: src1 = " + Format(wt, "0%") + " vs. src2 = " + Format(1 - wt, "0%")
         Return addw.dst2
     End Function
-    'Public Function runRedList(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
-    '    If myTask.redList Is Nothing Then myTask.redList = New RedList_Basics
-    '    myTask.redList.inputRemoved = removeMask
-    '    myTask.redList.Run(src)
-    '    label = myTask.redList.labels(2)
-    '    Return myTask.redList.dst2
-    'End Function
-    'Public Function runRedList(src As cv.Mat, ByRef label As String) As cv.Mat
-    '    If myTask.redList Is Nothing Then myTask.redList = New RedList_Basics
-    '    myTask.redList.Run(src)
-    '    label = myTask.redList.labels(2)
-    '    Return myTask.redList.dst2
-    'End Function
-    'Public Function runRedCloud(src As cv.Mat, ByRef label As String) As cv.Mat
-    '    If myTask.redCloud Is Nothing Then myTask.redCloud = New RedCloud_Basics
-    '    myTask.redCloud.Run(src)
-    '    label = myTask.redCloud.labels(2)
-    '    Return myTask.redCloud.dst2
-    'End Function
-    'Public Function runRedColor(src As cv.Mat, ByRef label As String) As cv.Mat
-    '    If myTask.redColor Is Nothing Then myTask.redColor = New RedColor_Basics
-    '    myTask.redColor.Run(src)
-    '    label = myTask.redColor.labels(2)
-    '    Return myTask.redColor.dst2
-    'End Function
+    Public Function runRedList(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
+        If task.redList Is Nothing Then task.redList = New RedList_Basics
+        task.redList.inputRemoved = removeMask
+        task.redList.Run(src)
+        label = task.redList.labels(2)
+        Return task.redList.dst2
+    End Function
+    Public Function runRedList(src As cv.Mat, ByRef label As String) As cv.Mat
+        If task.redList Is Nothing Then task.redList = New RedList_Basics
+        task.redList.Run(src)
+        label = task.redList.labels(2)
+        Return task.redList.dst2
+    End Function
+    Public Function runRedCloud(src As cv.Mat, ByRef label As String) As cv.Mat
+        If task.redCloud Is Nothing Then task.redCloud = New RedCloud_Basics
+        task.redCloud.Run(src)
+        label = task.redCloud.labels(2)
+        Return task.redCloud.dst2
+    End Function
+    Public Function runRedColor(src As cv.Mat, ByRef label As String) As cv.Mat
+        If task.redColor Is Nothing Then task.redColor = New RedColor_Basics
+        task.redColor.Run(src)
+        label = task.redColor.labels(2)
+        Return task.redColor.dst2
+    End Function
     Public Function InitRandomRect(margin As Integer) As cv.Rect
         Return New cv.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),
                            msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin))
     End Function
     Public Function quickRandomPoints(howMany As Integer) As List(Of cv.Point2f)
         Dim srcPoints As New List(Of cv.Point2f)
-        Dim w = myTask.workRes.Width
-        Dim h = myTask.workRes.Height
+        Dim w = task.workRes.Width
+        Dim h = task.workRes.Height
         For i = 0 To howMany - 1
             Dim pt = New cv.Point2f(msRNG.Next(0, w), msRNG.Next(0, h))
             srcPoints.Add(pt)
@@ -585,32 +604,32 @@ Public Class TaskCVBParent : Implements IDisposable
     End Function
     Public Sub measureStartRun(name As String)
         Dim nextTime = Now
-        If myTask.algorithmNames.Contains(name) = False Then
-            myTask.algorithmNames.Add(name)
-            myTask.algorithm_ms.Add(0)
-            myTask.algorithmTimes.Add(nextTime)
+        If task.algorithmNames.Contains(name) = False Then
+            task.algorithmNames.Add(name)
+            task.algorithm_ms.Add(0)
+            task.algorithmTimes.Add(nextTime)
         End If
 
-        If myTask.algorithmStack.Count > 0 Then
-            Dim index = myTask.algorithmStack.Peek
-            Dim elapsedTicks = nextTime.Ticks - myTask.algorithmTimes(index).Ticks
+        If task.algorithmStack.Count > 0 Then
+            Dim index = task.algorithmStack.Peek
+            Dim elapsedTicks = nextTime.Ticks - task.algorithmTimes(index).Ticks
             Dim span = New TimeSpan(elapsedTicks)
-            myTask.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
+            task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
 
-            index = myTask.algorithmNames.IndexOf(name)
-            myTask.algorithmTimes(index) = nextTime
-            myTask.algorithmStack.Push(index)
+            index = task.algorithmNames.IndexOf(name)
+            task.algorithmTimes(index) = nextTime
+            task.algorithmStack.Push(index)
         End If
     End Sub
     Public Sub measureEndRun(name As String)
         Try
             Dim nextTime = Now
-            Dim index = myTask.algorithmStack.Peek
-            Dim elapsedTicks = nextTime.Ticks - myTask.algorithmTimes(index).Ticks
+            Dim index = task.algorithmStack.Peek
+            Dim elapsedTicks = nextTime.Ticks - task.algorithmTimes(index).Ticks
             Dim span = New TimeSpan(elapsedTicks)
-            myTask.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
-            myTask.algorithmStack.Pop()
-            myTask.algorithmTimes(myTask.algorithmStack.Peek) = nextTime
+            task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
+            task.algorithmStack.Pop()
+            task.algorithmTimes(task.algorithmStack.Peek) = nextTime
         Catch ex As Exception
         End Try
     End Sub
@@ -645,7 +664,7 @@ Public Class TaskCVBParent : Implements IDisposable
 
             Dim pt1 As cv.Point = New cv.Point(x + 1000 * -b, y + 1000 * a)
             Dim pt2 As cv.Point = New cv.Point(x - 1000 * -b, y - 1000 * a)
-            dst.Line(pt1, pt2, cv.Scalar.Red, myTask.lineWidth + 1, myTask.lineType, 0)
+            dst.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 1, task.lineType, 0)
         Next
     End Sub
     Public Sub Run(src As cv.Mat)
