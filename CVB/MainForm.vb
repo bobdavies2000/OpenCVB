@@ -125,6 +125,12 @@ Namespace CVB
                 Next
             End If
         End Sub
+        Private Sub campicRGB_Click(sender As Object, e As EventArgs) Handles campicRGB.Click, campicPointCloud.Click, campicLeft.Click, campicRight.Click
+            If myTask Is Nothing Then Exit Sub
+            'If myTask IsNot Nothing Then  if mytask.sharpgl IsNot Nothing Then sharpGL.Activate()
+            If myTask IsNot Nothing Then If myTask.treeView IsNot Nothing Then myTask.treeView.Activate()
+            If myTask IsNot Nothing Then If myTask.allOptions IsNot Nothing Then myTask.allOptions.Activate()
+        End Sub
         Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             SaveSettings()
             myTask = Nothing
@@ -143,11 +149,12 @@ Namespace CVB
 
             infoLine = sr.ReadLine
             Split = Regex.Split(infoLine, "\W+")
-            Dim algorithmCount As Integer = Split(1)
+            Dim algorithmCountActive As Integer = Split(1)
 
             infoLine = sr.ReadLine
             Split = Regex.Split(infoLine, "\W+")
-            algorithmCount += Split(3)
+            Dim algorithmRefs = Split(3)
+            Dim algorithmCount = algorithmCountActive + algorithmRefs
             sr.Close()
 
             Dim algList = New FileInfo(homeDir + "Data/AvailableAlgorithms.txt")
@@ -166,7 +173,7 @@ Namespace CVB
             sr.Close()
 
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " +
-                       CStr(algorithmCount) + " algorithms = " +
+                       CStr(algorithmCountActive) + " algorithms " + CStr(algorithmRefs) + " references = " +
                        CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + settings.cameraName
 
         End Sub
@@ -215,15 +222,6 @@ Namespace CVB
 
             StartUpTimer.Enabled = True
             fpsTimer.Enabled = True
-        End Sub
-
-
-
-        Private Sub campicRGB_Click(sender As Object, e As EventArgs) Handles campicRGB.Click, campicPointCloud.Click, campicLeft.Click, campicRight.Click
-            If myTask Is Nothing Then Exit Sub
-            'If myTask IsNot Nothing Then  if mytask.sharpgl IsNot Nothing Then sharpGL.Activate()
-            If myTask IsNot Nothing Then If myTask.treeView IsNot Nothing Then myTask.treeView.Activate()
-            If myTask IsNot Nothing Then If myTask.allOptions IsNot Nothing Then myTask.allOptions.Activate()
         End Sub
     End Class
 End Namespace
