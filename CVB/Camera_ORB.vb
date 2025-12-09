@@ -5,7 +5,7 @@ Imports Orbbec
 Imports cv = OpenCvSharp
 
 Namespace MainForm
-    Public Class CVB_ORB : Inherits CVB_Camera
+    Public Class Camera_ORB : Inherits GenericCamera
         Dim captureThread As Thread = Nothing
         Dim isCapturing As Boolean = False
         Dim pipe As Pipeline

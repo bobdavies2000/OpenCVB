@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 
 Namespace MainForm
-    Public Class CVB_ZED2 : Inherits CVB_Camera
+    Public Class Camera_ZED2 : Inherits GenericCamera
         Dim zed As CamZed
         Dim captureThread As Thread = Nothing
         Dim isCapturing As Boolean = False

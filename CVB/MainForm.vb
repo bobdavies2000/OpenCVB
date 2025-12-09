@@ -360,7 +360,7 @@ Namespace MainForm
 
 
     Partial Public Class MainForm
-        Dim camera As CVB_Camera = Nothing
+        Dim camera As GenericCamera = Nothing
         Dim cameraRunning As Boolean = False
         Dim dstImages As CameraImages.images
         Public dst2ready As Boolean
@@ -387,14 +387,14 @@ Namespace MainForm
                     ' Select camera based on settings.cameraName
                     Select Case settings.cameraName
                         Case "StereoLabs ZED 2/2i"
-                            camera = New CVB_ZED2(settings.workRes, settings.captureRes, settings.cameraName)
+                            camera = New Camera_ZED2(settings.workRes, settings.captureRes, settings.cameraName)
                         Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
-                            camera = New CVB_RS2(settings.workRes, settings.captureRes, settings.cameraName)
+                            camera = New Camera_RS2(settings.workRes, settings.captureRes, settings.cameraName)
                         Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
-                            camera = New CVB_ORB(settings.workRes, settings.captureRes, settings.cameraName)
+                            camera = New Camera_ORB(settings.workRes, settings.captureRes, settings.cameraName)
                         Case Else
                             ' Default to ZED if camera name not recognized
-                            camera = New CVB_ZED2(settings.workRes, settings.captureRes, "StereoLabs ZED 2/2i")
+                            camera = New Camera_ZED2(settings.workRes, settings.captureRes, "StereoLabs ZED 2/2i")
                     End Select
                     cameraRunning = True
 
@@ -415,10 +415,10 @@ Namespace MainForm
                 camera = Nothing
             End If
         End Sub
-        Private Sub Camera_FrameReady(sender As CVB_Camera)
+        Private Sub Camera_FrameReady(sender As GenericCamera)
             ' This event is raised from the background thread, so we need to marshal to UI thread
             If Me.InvokeRequired Then
-                Me.BeginInvoke(New Action(Of CVB_Camera)(AddressOf Camera_FrameReady), sender)
+                Me.BeginInvoke(New Action(Of GenericCamera)(AddressOf Camera_FrameReady), sender)
                 Return
             End If
 

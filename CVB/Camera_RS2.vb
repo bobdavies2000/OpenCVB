@@ -4,7 +4,7 @@ Imports Intel.RealSense
 Imports cv = OpenCvSharp
 
 Namespace MainForm
-    Public Class CVB_RS2 : Inherits CVB_Camera
+    Public Class Camera_RS2 : Inherits GenericCamera
         Dim captureThread As Thread = Nothing
         Dim isCapturing As Boolean = False
         Dim pipe As New Pipeline()
