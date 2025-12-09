@@ -473,4 +473,24 @@ Namespace MainForm
 
 
 
+    Partial Public Class MainForm
+        Private Sub processImages(camImages As CameraImages.images)
+            ' process the images and put the results in dst().
+            myTask.color = camImages.images(0)
+            myTask.pointCloud = camImages.images(1)
+            myTask.leftView = camImages.images(2)
+            myTask.rightView = camImages.images(3)
+
+            myTask.pcSplit = myTask.pointCloud.Split()
+            myTask.colorizer.Run(myTask.pcSplit(2))
+
+            myTask.dst = {myTask.color, myTask.depthRGB, myTask.leftView, myTask.rightView}
+
+            AlgDescription.Text = myTask.desc
+        End Sub
+    End Class
+
+
+
+
 End Namespace

@@ -78,9 +78,6 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
-    <Compile Update="MainTask.vb">
-      <DependentUpon>MainForm.vb</DependentUpon>
-    </Compile>
   </ItemGroup>
 
   <ItemGroup>
