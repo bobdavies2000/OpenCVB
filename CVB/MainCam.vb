@@ -49,40 +49,6 @@ Namespace CVB
                 End Try
             End If
         End Sub
-        Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
-            isPlaying = Not isPlaying
-
-            ' Load and set the appropriate image
-            Try
-                ' Dispose old image if it exists
-                If PausePlayButton.Image IsNot Nothing Then
-                    PausePlayButton.Image.Dispose()
-                End If
-
-                If isPlaying Then
-                    Dim pausePath = Path.Combine(homeDir + "\CVB\Data", "PauseButton.png")
-                    If File.Exists(pausePath) Then
-                        PausePlayButton.Image = New Bitmap(pausePath)
-                    End If
-                Else
-                    Dim playPath = Path.Combine(homeDir + "\CVB\Data", "Run.png")
-                    If File.Exists(playPath) Then
-                        PausePlayButton.Image = New Bitmap(playPath)
-                    End If
-                End If
-
-                ' Force the button to refresh
-                PausePlayButton.Invalidate()
-                Application.DoEvents()
-            Catch ex As Exception
-                Debug.WriteLine("Error loading button image: " + ex.Message)
-            End Try
-
-            myTask = New cvbTask(camImages, settings)
-            myTask.colorizer = New DepthColorizer_Basics
-
-            If isPlaying Then StartCamera() Else StopCamera()
-        End Sub
         Private Sub StopCamera()
             cameraRunning = False
             If camera IsNot Nothing Then

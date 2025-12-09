@@ -1,10 +1,4 @@
-﻿Imports System.IO
-Imports System.Security.Cryptography
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement
-Imports Intel.RealSense
-Imports OpenCvSharp.ML.DTrees
-Imports cv = OpenCvSharp
-Imports cvext = OpenCvSharp.Extensions
+﻿Imports cv = OpenCvSharp
 Module GlobalVariables
     Public settings As CVB.Json
     Public homeDirPath As String

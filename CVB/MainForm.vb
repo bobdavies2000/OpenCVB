@@ -136,6 +136,41 @@ Namespace CVB
             myTask = Nothing
             StopCamera()
         End Sub
+        Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
+            isPlaying = Not isPlaying
+
+            ' Load and set the appropriate image
+            Try
+                ' Dispose old image if it exists
+                If PausePlayButton.Image IsNot Nothing Then
+                    PausePlayButton.Image.Dispose()
+                End If
+
+                If isPlaying Then
+                    Dim pausePath = Path.Combine(homeDir + "\CVB\Data", "PauseButton.png")
+                    If File.Exists(pausePath) Then
+                        PausePlayButton.Image = New Bitmap(pausePath)
+                    End If
+                Else
+                    Dim playPath = Path.Combine(homeDir + "\CVB\Data", "Run.png")
+                    If File.Exists(playPath) Then
+                        PausePlayButton.Image = New Bitmap(playPath)
+                    End If
+                End If
+
+                ' Force the button to refresh
+                PausePlayButton.Invalidate()
+                Application.DoEvents()
+            Catch ex As Exception
+                Debug.WriteLine("Error loading button image: " + ex.Message)
+            End Try
+
+            myTask = New cvbTask(camImages, settings)
+            myTask.colorizer = New DepthColorizer_Basics
+
+            If isPlaying Then StartCamera() Else StopCamera()
+            TreeViewTimer.Enabled = True
+        End Sub
         Private Sub codeLines()
             Dim countFileInfo = New FileInfo(homeDir + "Data/AlgorithmCounts.txt")
             If countFileInfo.Exists = False Then
@@ -222,6 +257,9 @@ Namespace CVB
 
             StartUpTimer.Enabled = True
             fpsTimer.Enabled = True
+        End Sub
+        Private Sub TreeViewTimer_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
+            If myTask.treeView IsNot Nothing Then myTask.treeView.Timer2_Tick(sender, e)
         End Sub
     End Class
 End Namespace

@@ -50,6 +50,7 @@ Namespace CVB
             CameraSwitching = New Label()
             CamSwitchTimer = New Timer(components)
             fpsTimer = New Timer(components)
+            TreeViewTimer = New Timer(components)
             MainToolStrip.SuspendLayout()
             CType(campicRGB, ComponentModel.ISupportInitialize).BeginInit()
             CType(campicPointCloud, ComponentModel.ISupportInitialize).BeginInit()
@@ -281,6 +282,10 @@ Namespace CVB
             ' 
             fpsTimer.Interval = 1000
             ' 
+            ' TreeViewTimer
+            ' 
+            TreeViewTimer.Interval = 1000
+            ' 
             ' MainForm
             ' 
             AutoScaleDimensions = New SizeF(12.0F, 30.0F)
@@ -336,6 +341,7 @@ Namespace CVB
         Friend WithEvents CameraSwitching As Label
         Friend WithEvents CamSwitchTimer As Timer
         Friend WithEvents fpsTimer As Timer
+        Friend WithEvents TreeViewTimer As Timer
 
     End Class
 End Namespace

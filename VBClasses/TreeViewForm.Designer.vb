@@ -25,7 +25,8 @@ Partial Class TreeViewForm
         components = New ComponentModel.Container()
         TreeView1 = New TreeView()
         PercentTime = New TextBox()
-        Timer2 = New Timer(components)
+        
+        = New Timer(components)
         SuspendLayout()
         ' 
         ' TreeView1

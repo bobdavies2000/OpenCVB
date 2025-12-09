@@ -98,7 +98,7 @@
             optionsChanged = False
         End If
 
-        If algorithm_ms.Count = 0 Then
+        If algorithm_ms.Count <= 1 Then
             PercentTime.Text = ""
             Exit Sub
         End If
@@ -188,6 +188,12 @@
         PercentTime.Left = 250
 
         CheckIfOffScreen()
+
+        ' Ensure Timer2 is properly started
+        Timer2.Enabled = False
+        Timer2.Interval = 1000
+        Timer2.Enabled = True
+
         initialized = True
     End Sub
     Private Sub TreeViewForm_Move(sender As Object, e As EventArgs) Handles Me.Move
