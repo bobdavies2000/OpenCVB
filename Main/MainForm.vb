@@ -52,7 +52,7 @@ Namespace MainForm
             labels = New List(Of Label)({labelRGB, labelPointCloud, labelLeft, labelRight})
             pics = New List(Of PictureBox)({campicRGB, campicPointCloud, campicLeft, campicRight})
 
-            settingsIO = New jsonIO(Path.Combine(homeDir, "CVB\settings.json"))
+            settingsIO = New jsonIO(Path.Combine(homeDir, "Main\settings.json"))
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             Dim optionsForm As New MainOptions()
@@ -144,12 +144,12 @@ Namespace MainForm
                 End If
 
                 If isPlaying Then
-                    Dim pausePath = Path.Combine(homeDir + "\CVB\Data", "PauseButton.png")
+                    Dim pausePath = Path.Combine(homeDir + "\Main\Data", "PauseButton.png")
                     If File.Exists(pausePath) Then
                         PausePlayButton.Image = New Bitmap(pausePath)
                     End If
                 Else
-                    Dim playPath = Path.Combine(homeDir + "\CVB\Data", "Run.png")
+                    Dim playPath = Path.Combine(homeDir + "\Main\Data", "Run.png")
                     If File.Exists(playPath) Then
                         PausePlayButton.Image = New Bitmap(playPath)
                     End If
@@ -157,7 +157,6 @@ Namespace MainForm
 
                 ' Force the button to refresh
                 PausePlayButton.Invalidate()
-                Application.DoEvents()
             Catch ex As Exception
                 Debug.WriteLine("Error loading button image: " + ex.Message)
             End Try

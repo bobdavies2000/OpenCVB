@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class OptCVBContainer
+Public Class OptionsContainer
     Dim optionsTitle As New List(Of String)
     Public hiddenOptions As New List(Of String)
     Public titlesAdded As Boolean
@@ -45,7 +45,7 @@ Public Class OptCVBContainer
             Dim indexO = 1
             Dim indexHide As Integer
             For Each title In optionsTitle
-                Dim frm = OptCVBParent.FindFrm(title)
+                Dim frm = OptionsParent.FindFrm(title)
                 If frm IsNot Nothing Then
                     frm.BringToFront()
                     Dim sidelineOptions As Boolean = True

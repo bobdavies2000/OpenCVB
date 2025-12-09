@@ -1,8 +1,8 @@
 ﻿Imports System.Windows.Forms
-Public Class OptCVBRadioButtons
+Public Class OptionsRadioButtons
     Public check As New List(Of RadioButton)
     Public Function Setup(traceName As String) As Boolean
-        If OptCVBParent.FindFrm(traceName + " Radio Buttons") IsNot Nothing Then Return False
+        If OptionsParent.FindFrm(traceName + " Radio Buttons") IsNot Nothing Then Return False
         Me.MdiParent = myTask.allOptions
         Me.Text = traceName + " Radio Buttons"
         myTask.allOptions.addTitle(Me)

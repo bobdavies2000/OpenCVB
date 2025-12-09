@@ -4,9 +4,9 @@ Namespace MainForm
         Public dst() As cv.Mat
 
         Public optionsChanged As Boolean
-        Public allOptions As OptCVBContainer
-        Public gOptions As OptCVBGlobal
-        Public featureOptions As OptCVBFeatures
+        Public allOptions As OptionsContainer
+        Public gOptions As OptionsGlobal
+        Public featureOptions As OptionsFeatures
         Public treeView As TreeViewForm
 
         Public color As New cv.Mat
@@ -92,13 +92,13 @@ Namespace MainForm
             testAllDuration = settings.testAllDuration
             gravityCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
 
-            allOptions = New OptCVBContainer
+            allOptions = New OptionsContainer
             allOptions.Show()
 
-            featureOptions = New OptCVBFeatures
+            featureOptions = New OptionsFeatures
             featureOptions.Show()
 
-            gOptions = New OptCVBGlobal
+            gOptions = New OptionsGlobal
             gOptions.Show()
 
             treeView = New TreeViewForm

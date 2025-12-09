@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class TaskCVBParent : Implements IDisposable
-    Public check As New OptCVBCheckbox
-    Public combo As New OptCVBCombo
-    Public radio As New OptCVBRadioButtons
-    Public sliders As New OptCVBSliders
+    Public check As New OptionsCheckbox
+    Public combo As New OptionsCombo
+    Public radio As New OptionsRadioButtons
+    Public sliders As New OptionsSliders
     Public standalone As Boolean
     Public dst0 As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat
     Public labels() As String = {"", "", "", ""}

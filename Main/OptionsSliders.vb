@@ -1,6 +1,6 @@
 ﻿Imports System.Windows.Forms
 Imports System.Drawing
-Public Class OptCVBSliders
+Public Class OptionsSliders
     Public mytrackbars As New List(Of TrackBar)
     Public myLabels As New List(Of Label)
     Dim defaultHeight = 400
@@ -8,7 +8,7 @@ Public Class OptCVBSliders
     Dim defaultWidth = 600
     Dim algoIndex As Integer
     Public Function Setup(traceName As String) As Boolean
-        If OptCVBParent.FindFrm(traceName + " Sliders") IsNot Nothing Then Return False
+        If OptionsParent.FindFrm(traceName + " Sliders") IsNot Nothing Then Return False
         If myTask.allOptions.Text <> "" Then Me.MdiParent = myTask.allOptions
         Me.Text = traceName + " Sliders"
         myTask.allOptions.addTitle(Me)

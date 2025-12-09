@@ -1,9 +1,9 @@
 ﻿Imports System.Windows.Forms
-Public Class OptCVBParent : Implements IDisposable
-    Public check As New OptCVBCheckbox
-    Public combo As New OptCVBCombo
-    Public radio As New OptCVBRadioButtons
-    Public sliders As New OptCVBSliders
+Public Class OptionsParent : Implements IDisposable
+    Public check As New OptionsCheckbox
+    Public combo As New OptionsCombo
+    Public radio As New OptionsRadioButtons
+    Public sliders As New OptionsSliders
     Public traceName As String
     Public strOut As String
     Public Shared Function FindSlider(opt As String) As TrackBar

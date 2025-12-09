@@ -1,8 +1,8 @@
 ﻿Imports System.Windows.Forms
-Public Class OptCVBCheckbox
+Public Class OptionsCheckbox
     Public Box As New List(Of CheckBox)
     Public Function Setup(traceName As String) As Boolean
-        If OptCVBParent.FindFrm(traceName + " CheckBoxes") IsNot Nothing Then Return False
+        If OptionsParent.FindFrm(traceName + " CheckBoxes") IsNot Nothing Then Return False
         Me.MdiParent = myTask.allOptions
         Me.Text = traceName + " CheckBoxes"
         myTask.allOptions.addTitle(Me)

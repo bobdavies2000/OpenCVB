@@ -1,7 +1,7 @@
 ﻿Imports System.Windows.Forms
 Imports System.Drawing
 Imports System.ComponentModel
-Public Class OptCVBFeatures
+Public Class OptionsFeatures
     Public grayCheckbox() As RadioButton
     Public colorCheckbox() As RadioButton
     Public colorMethods() As String = {"BackProject_Full", "Bin4Way_Regions",

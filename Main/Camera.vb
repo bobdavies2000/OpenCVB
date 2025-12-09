@@ -27,17 +27,14 @@ Public Structure cameraInfo
 End Structure
 Public Class CameraImages
     Public Class images
-        Public color As New cv.Mat
-        Public left As New cv.Mat
-        Public right As New cv.Mat
-        Public pointCloud As New cv.Mat
+        Public images() As cv.Mat
         Public Sub New()
         End Sub
         Public Sub New(workRes As cv.Size)
-            color = New cv.Mat(workRes, cv.MatType.CV_8UC3, 0)
-            left = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
-            right = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
-            pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
+            images = {New cv.Mat(workRes, cv.MatType.CV_8UC3, 0),
+                      New cv.Mat(workRes, cv.MatType.CV_32FC3, 0),
+                      New cv.Mat(workRes, cv.MatType.CV_8UC1, 0),
+                      New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)}
         End Sub
     End Class
 
@@ -59,9 +56,6 @@ Public Class CameraImages
     End Property
 End Class
 Public Class GenericCamera
-    ' FrameReady event - raised when a new frame is available
-    Public Event FrameReady(sender As GenericCamera)
-    
     Public transformationMatrix() As Single
     Public IMU_TimeStamp As Double
     Public IMU_Acceleration As cv.Point3f
@@ -83,6 +77,7 @@ Public Class GenericCamera
     Public cameraName As String = ""
     Public cPtr As IntPtr
     Public ratio As Single
+    Public Event FrameReady(sender As GenericCamera)
     Public Structure imuDataStruct
         Dim r00 As Single
         Dim r01 As Single
@@ -129,18 +124,11 @@ Public Class GenericCamera
         lastCPUTime = CPU_TimeStamp
 
         cameraFrameCount += 1
-        OpenCVB.MainUI.cameraReady = True
-        
-        ' Raise FrameReady event
         RaiseEvent FrameReady(Me)
     End Sub
-
-    Public Overridable Sub StopCamera()
-        ' Base implementation - can be overridden by derived classes
-    End Sub
-
     Public Sub childStopCamera()
-        ' Call the overridden StopCamera method
         StopCamera()
+    End Sub
+    Public Overridable Sub StopCamera()
     End Sub
 End Class

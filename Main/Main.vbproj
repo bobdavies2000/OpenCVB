@@ -1,33 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <StartupObject>Main.My.MyApplication</StartupObject>
-	  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <UseWindowsForms>true</UseWindowsForms>
     <MyType>WindowsForms</MyType>
+    <StartupObject>CVB.My.MyApplication</StartupObject>
     <Platforms>x64</Platforms>
+    <RootNamespace>CVB</RootNamespace>
     <ApplicationIcon>Data\OpenCVB.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="C:\Users\bobda\.nuget\packages\sharpgl.winforms\3.1.1\contentFiles\any\netcoreapp3.1\SharpGL.ico" />
-    <Content Remove="C:\Users\bobda\.nuget\packages\sharpgl.winforms\3.1.1\contentFiles\any\netcoreapp3.1\SharpGL.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Data\OpenCVB.ico" />
-  </ItemGroup>
-
-	<ItemGroup>
-		<None Update="OpenCVB.ico">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
-  <ItemGroup>
-    <Import Include="System.Data" />
     <Import Include="System.Drawing" />
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
@@ -39,40 +24,59 @@
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.11.0.20250507" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.11.0.20250507" />
     <PackageReference Include="OpenCvSharp4.Windows" Version="4.11.0.20250507" />
-    <PackageReference Include="SharpGL" Version="3.1.1" />
-    <PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
-    <PackageReference Include="SharpGL.WinForms" Version="3.1.1" />
     <PackageReference Include="System.Management" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CamZed\CamZed.csproj" />
     <ProjectReference Include="..\CPP_Native\CPP_Native.vcxproj" />
-    <ProjectReference Include="..\VBClasses\VBClasses.vbproj" />
+    <ProjectReference Include="..\CamZed\CamZed.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Intel.RealSense">
-      <HintPath>..\librealsense\Build\wrappers\csharp\Intel.RealSense\obj\x64\Release\Intel.RealSense.dll</HintPath>
-    </Reference>
     <Reference Include="ob_csharp">
       <HintPath>..\OrbbecSDK_CSharp\Build\Release\ob_csharp.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenCvSharp">
-      <HintPath>..\..\opencvsharp_samples\packages\OpenCvSharp4.4.9.0.20240103\lib\net48\OpenCvSharp.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="My Project\Application.Designer.vb">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Application.myapp</DependentUpon>
-    </Compile>
+    <Content Include="Data\OpenCVB.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- Copy Orbbec native DLLs to output directory -->
+    <Content Include="..\OrbbecSDK_CSharp\Build\Release\ob_csharp.dll" Link="Libs\ob_csharp.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\OrbbecSDK\lib\win_x64\OrbbecSDK.dll" Link="Libs\OrbbecSDK.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\OrbbecSDK\lib\win_x64\ob_usb.dll" Link="Libs\ob_usb.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\OrbbecSDK\lib\win_x64\depthengine_2_0.dll" Link="Libs\depthengine_2_0.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\OrbbecSDK\lib\win_x64\live555.dll" Link="Libs\live555.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="My Project\Resources.Designer.vb">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="My Project\Settings.Designer.vb">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Update="MainForm.Designer.vb">
+      <DependentUpon>MainForm.vb</DependentUpon>
+      <SubType>Form</SubType>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
   </ItemGroup>
 
@@ -82,17 +86,27 @@
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Update="MainForm.resx">
+      <DependentUpon>MainForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Remove="MainTask.resx" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="My Project\Application.myapp">
-      <Generator>MyApplicationCodeGenerator</Generator>
-      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    <None Update="My Project\Settings.settings">
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Main\Data\" />
+    <Folder Include="Libs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="C:\Users\bobda\.nuget\packages\intel.realsensewithnativedll\2.51.1.1\build\\realsense2.dll" Link="Libs\realsense2.dll" />
   </ItemGroup>
 
 </Project>
+
