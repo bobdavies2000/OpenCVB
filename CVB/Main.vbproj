@@ -78,12 +78,6 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
-    <Compile Update="MainCam.vb">
-      <DependentUpon>MainForm.vb</DependentUpon>
-    </Compile>
-    <Compile Update="MainMouse.vb">
-      <DependentUpon>MainForm.vb</DependentUpon>
-    </Compile>
     <Compile Update="MainTask.vb">
       <DependentUpon>MainForm.vb</DependentUpon>
     </Compile>

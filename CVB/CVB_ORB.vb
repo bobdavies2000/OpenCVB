@@ -4,7 +4,7 @@ Imports System.Threading
 Imports Orbbec
 Imports cv = OpenCvSharp
 
-Namespace CVB
+Namespace MainForm
     Public Class CVB_ORB : Inherits CVB_Camera
         Dim captureThread As Thread = Nothing
         Dim isCapturing As Boolean = False

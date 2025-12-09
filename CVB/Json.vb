@@ -3,7 +3,7 @@ Imports System.Management
 Imports Newtonsoft.Json
 Imports cv = OpenCvSharp
 
-Namespace CVB
+Namespace MainForm
     Public Class Json
         Public cameraIndex As Integer
         Public cameraName As String = "StereoLabs ZED 2/2I"
@@ -45,7 +45,7 @@ Namespace CVB
         Public testAllDuration As Integer = 5
     End Class
 
-    Public Class jsonCVBIO
+    Public Class jsonIO
         Private jsonFileName As String
         Public Sub New(fileName As String)
             jsonFileName = fileName
@@ -228,7 +228,7 @@ Namespace CVB
             settings.desiredFPS = 30
             If settings.cameraName.Contains("Orbbec") Then
                 settings.desiredFPS = 0 ' maximum fps available at this resolution
-            ElseIf settings.cameraname.contains("StereoLabs") Then
+            ElseIf settings.cameraName.Contains("StereoLabs") Then
                 settings.desiredFPS = 100 ' possible at only
             End If
 

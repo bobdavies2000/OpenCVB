@@ -3,7 +3,7 @@ Imports System.Threading
 Imports Intel.RealSense
 Imports cv = OpenCvSharp
 
-Namespace CVB
+Namespace MainForm
     Public Class CVB_RS2 : Inherits CVB_Camera
         Dim captureThread As Thread = Nothing
         Dim isCapturing As Boolean = False

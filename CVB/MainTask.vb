@@ -1,8 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 Module GlobalVariables
-    Public settings As CVB.Json
+    Public settings As MainForm.Json
     Public homeDirPath As String
-    Public myTask As cvbTask
+    Public myTask As MainForm.cvbTask
 
     Public emptyRect As New cv.Rect
 
@@ -21,7 +21,7 @@ Module GlobalVariables
                                                "StereoLabs ZED 2/2i"
                                                })
 End Module
-Namespace CVB
+Namespace MainForm
     Partial Public Class MainForm
         Private Sub processImages(camImages As CameraImages.images)
             ' process the images and put the results in dst().

@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Namespace CVB
+Namespace MainForm
     Partial Public Class MainForm
         Public frameCount As Integer
         Dim fpsWriteCount As Integer

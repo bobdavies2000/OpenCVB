@@ -1,6 +1,6 @@
 Imports System.Windows.Forms
 
-Namespace CVB
+Namespace MainForm
     Module Program
         <STAThread()>
         Sub Main()

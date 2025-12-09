@@ -1,4 +1,4 @@
-Namespace CVB
+Namespace MainForm
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
     Partial Public Class MainForm
         Inherits Form
