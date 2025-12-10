@@ -26,35 +26,17 @@ Public Structure cameraInfo
 
 End Structure
 Public Class CameraImages
-    Public Class images
-        Public images() As cv.Mat
-        Public Sub New()
-        End Sub
-        Public Sub New(workRes As cv.Size)
-            images = {New cv.Mat(workRes, cv.MatType.CV_8UC3, 0),
-                      New cv.Mat(workRes, cv.MatType.CV_32FC3, 0),
-                      New cv.Mat(workRes, cv.MatType.CV_8UC1, 0),
-                      New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)}
-        End Sub
-    End Class
-
-    Public Shared allImages As New images
-    Private Shared camLock As New Mutex(True, "camLock")
-
-    Public Shared Property sharedImages As images
-        Get
-            SyncLock camLock
-                Return allImages
-            End SyncLock
-        End Get
-
-        Set(value As images)
-            SyncLock camLock
-                allImages = value
-            End SyncLock
-        End Set
-    End Property
+    Public images() As cv.Mat
+    Public Sub New(workRes As cv.Size)
+        images = {New cv.Mat(workRes, cv.MatType.CV_8UC3, 0),
+                  New cv.Mat(workRes, cv.MatType.CV_32FC3, 0),
+                  New cv.Mat(workRes, cv.MatType.CV_8UC1, 0),
+                  New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)}
+    End Sub
+    Public Sub New()
+    End Sub
 End Class
+
 Public Class GenericCamera
     Public transformationMatrix() As Single
     Public IMU_TimeStamp As Double
@@ -66,7 +48,7 @@ Public Class GenericCamera
     Public CPU_FrameTime As Double
     Public cameraFrameCount As Integer
     Public baseline As Single
-    Public camImages As CameraImages.images
+    Public camImages As CameraImages
 
     Public captureRes As cv.Size
     Public workRes As cv.Size
@@ -107,7 +89,7 @@ Public Class GenericCamera
         Public mapperConfidence As Integer
     End Structure
     Public Sub New()
-        camImages = New CameraImages.images(workRes)
+        camImages = New CameraImages(workRes)
         cameraFrameCount = 0
     End Sub
     Public Sub GetNextFrameCounts(frameTime As Double)

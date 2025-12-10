@@ -5,9 +5,9 @@ Namespace MainForm
     Partial Public Class MainForm
         Public camera As GenericCamera = Nothing
         Dim cameraRunning As Boolean = False
-        Dim dstImages As CameraImages.images
+        Dim dstImages As CameraImages
         Public dst2ready As Boolean
-        Public camImages As CameraImages.images
+        Public camImages As New CameraImages
         Private Sub camSwitchAnnouncement()
             CameraSwitching.Visible = True
             CameraSwitching.Text = settings.cameraName + " starting"
@@ -25,29 +25,23 @@ Namespace MainForm
             Me.Refresh()
         End Sub
         Private Sub StartCamera()
-            If camera Is Nothing AndAlso settings IsNot Nothing Then
-                Try
-                    ' Select camera based on settings.cameraName
-                    Select Case settings.cameraName
-                        Case "StereoLabs ZED 2/2i"
-                            camera = New Camera_ZED2(settings.workRes, settings.captureRes, settings.cameraName)
-                        Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
-                            camera = New Camera_RS2(settings.workRes, settings.captureRes, settings.cameraName)
-                        Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
-                            camera = New Camera_ORB(settings.workRes, settings.captureRes, settings.cameraName)
-                        Case Else
-                            ' Default to ZED if camera name not recognized
-                            camera = New Camera_ZED2(settings.workRes, settings.captureRes, "StereoLabs ZED 2/2i")
-                    End Select
-                    cameraRunning = True
+            camImages = New CameraImages(task.workRes)
+            ' Select camera based on settings.cameraName
+            Select Case settings.cameraName
+                Case "StereoLabs ZED 2/2i"
+                    camera = New Camera_ZED2(settings.workRes, settings.captureRes, settings.cameraName)
+                Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
+                    camera = New Camera_RS2(settings.workRes, settings.captureRes, settings.cameraName)
+                Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
+                    camera = New Camera_ORB(settings.workRes, settings.captureRes, settings.cameraName)
+                Case Else
+                    ' Default to ZED if camera name not recognized
+                    camera = New Camera_ZED2(settings.workRes, settings.captureRes, "StereoLabs ZED 2/2i")
+            End Select
+            cameraRunning = True
 
-                    ' Subscribe to FrameReady event
-                    AddHandler camera.FrameReady, AddressOf Camera_FrameReady
-                Catch ex As Exception
-                    MessageBox.Show("Failed to start camera: " + ex.Message, "Camera Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                    isPlaying = False
-                End Try
-            End If
+            ' Subscribe to FrameReady event
+            AddHandler camera.FrameReady, AddressOf Camera_FrameReady
 
             Cloud_Basics.ppx = mainfrm.camera.calibData.rgbIntrinsics.ppx
             Cloud_Basics.ppy = mainfrm.camera.calibData.rgbIntrinsics.ppy
@@ -70,12 +64,8 @@ Namespace MainForm
                 Return
             End If
 
-            ' Now we're on the UI thread, safe to access UI elements
-            If Not cameraRunning OrElse camera Is Nothing Then Return
-            If camImages Is Nothing Then camImages = New CameraImages.images(settings.workRes)
-            For i = 0 To camImages.images.Count - 1
-                camImages.images(i) = sender.camImages.images(i)
-            Next
+            cv.Cv2.ImShow("color", sender.camImages.images(0))
+            camImages = sender.camImages
             task.RunAlgorithm()
         End Sub
         Private Sub UpdatePictureBox(picBox As PictureBox, image As cv.Mat)
@@ -88,6 +78,7 @@ Namespace MainForm
                 displayImage = displayImage.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
                 Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
                 picBox.Image = bitmap
+                displayImage.Dispose()
             End If
         End Sub
         Private Sub campicRGB_Paint(sender As Object, e As PaintEventArgs) Handles campicRGB.Paint
