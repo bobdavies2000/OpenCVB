@@ -1,4 +1,5 @@
 ﻿Imports cv = OpenCvSharp
+Imports VBClasses
 Namespace MainForm
     Public Class cvbTask
         Public dst() As cv.Mat

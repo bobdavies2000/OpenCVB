@@ -2,6 +2,7 @@ Imports System.IO
 Imports System.Text.RegularExpressions
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
+Imports VBClasses
 
 Namespace MainForm
     Partial Public Class MainForm
@@ -82,7 +83,7 @@ Namespace MainForm
         End Sub
         Private Sub LoadAvailableAlgorithms()
             Try
-                Dim algListPath = Path.Combine(CurDir(), "..\Data", "AvailableAlgorithms.txt")
+                Dim algListPath = Path.Combine(CurDir(), "Data", "AvailableAlgorithms.txt")
                 If File.Exists(algListPath) Then
                     AvailableAlgorithms.Items.Clear()
                     Dim lines = File.ReadAllLines(algListPath)
