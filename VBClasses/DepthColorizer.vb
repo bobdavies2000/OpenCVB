@@ -56,7 +56,7 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
         'Next
         'task.correlationColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, corrColors.ToArray)
 
-        dst(1) = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Create a traditional depth color scheme."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

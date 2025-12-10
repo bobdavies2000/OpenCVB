@@ -54,10 +54,10 @@ Public Class TaskParent : Implements IDisposable
         '    callStack = lines(i) + "\" + callStack
         'Next
 
-        'dst0 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
-        'dst1 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
-        'dst2 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
-        'dst3 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+        dst0 = New cv.Mat(mytask.workRes, cv.MatType.CV_8UC3, 0)
+        dst1 = New cv.Mat(mytask.workRes, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+        dst3 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
 
         'standalone = traceName = task.algName
         'task.callTrace.Add(callStack)
