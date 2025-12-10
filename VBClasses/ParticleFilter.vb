@@ -57,7 +57,7 @@ Imports System.IO
 Public Class ParticleFilter_Example : Inherits TaskParent
     Dim imageFrame = 12
     Public Sub New()
-        cPtr = ParticleFilterTest_Open(task.HomeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
+        cPtr = ParticleFilterTest_Open(task.settings.HomeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
         desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -65,9 +65,9 @@ Public Class ParticleFilter_Example : Inherits TaskParent
         If imageFrame Mod 45 = 0 Then
             imageFrame = 13
             ParticleFilterTest_Close(cPtr)
-            cPtr = ParticleFilterTest_Open(task.HomeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
+            cPtr = ParticleFilterTest_Open(task.settings.HomeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
         End If
-        Dim nextFile As New FileInfo(task.HomeDir + "Data/ballSequence/color_" + CStr(imageFrame) + ".png")
+        Dim nextFile As New FileInfo(task.settings.HomeDir + "Data/ballSequence/color_" + CStr(imageFrame) + ".png")
         dst3 = cv.Cv2.ImRead(nextFile.FullName).Resize(dst2.Size)
         Dim imagePtr = ParticleFilterTest_Run(cPtr)
         dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr).Clone

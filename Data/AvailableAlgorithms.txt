@@ -1313,7 +1313,6 @@ PyrFilter_RedCloud
 QRcode_Basics
 Quad_Boundaries
 Quad_Bricks
-Quad_GridTiles
 Quad_Hulls
 Quad_MinMax
 Quad_RightView

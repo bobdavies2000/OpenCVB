@@ -12,8 +12,6 @@ Public Class MainOptions
          "960x600 - Full resolution", "480x300 - Quarter resolution", "240x150 - Small resolution  ",
          "672x376 - Full resolution", "336x188 - Quarter resolution", "168x94 - Small resolution    "})
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
-        settings.showBatchConsole = showBatchConsole.Checked
-
         With settings
             For Each radio In Resolutions.Controls
                 If radio.Checked Then
@@ -96,8 +94,6 @@ Public Class MainOptions
                 Resolutions.Controls.Add(workResRadio(i))
             Next
         End If
-
-        showBatchConsole.Checked = settings.showBatchConsole
     End Sub
     Private Sub MainOptions_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.Escape Then Cancel_Button_Click(sender, e)

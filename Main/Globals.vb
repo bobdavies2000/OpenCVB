@@ -2,7 +2,7 @@
 Module GlobalVariables
     Public settings As MainForm.Json
     Public homeDirPath As String
-    Public myTask As MainForm.cvbTask
+    Public mainfrm As MainForm.MainForm
 
     Public emptyRect As New cv.Rect
 
@@ -20,4 +20,34 @@ Module GlobalVariables
                                                "Orbbec Gemini 336L",
                                                "StereoLabs ZED 2/2i"
                                                })
+
+    Public Enum oCase
+        drawPointCloudRGB
+        drawLineAndCloud
+        drawFloor
+        drawPyramid
+        drawCube
+        quadBasics
+        minMaxBlocks
+        drawTiles
+        drawCell
+        drawCells
+        floorStudy
+        data3D
+        sierpinski
+        polygonCell
+        Histogram3D
+        pcPoints
+        line3D
+        pcPointsAlone
+        drawLines
+        drawAvgPointCloudRGB
+        readPC
+        readQuads
+        draw3DLines
+        draw3DLinesAndCloud
+        readLines
+        colorTriangles
+        imageTriangles
+    End Enum
 End Module

@@ -25,9 +25,9 @@ Public Class OptionsFileName
         End Get
     End Property
     Public Sub Setup(traceName As String)
-        Me.MdiParent = allOptions
+        Me.MdiParent = task.allOptions
         Me.Text = traceName + " OpenFile Options"
-        allOptions.addTitle(Me)
+        task.allOptions.addTitle(Me)
     End Sub
     Public Sub setFileName(filespec As String)
         filename.Text = filespec

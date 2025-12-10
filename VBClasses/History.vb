@@ -159,7 +159,7 @@ Public Class History_Basics8U : Inherits TaskParent
             dst2 = dst2 Or m
         Next
 
-        If task.algName = traceName Then
+        If task.settings.algorithm = traceName Then
             For i = 0 To Math.Min(saveFrames.Count, 4) - 1
                 mats.mat(i) = saveFrames(i).Clone
             Next

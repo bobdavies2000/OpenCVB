@@ -9,9 +9,9 @@ Public Class OptionsSliders
     Dim algoIndex As Integer
     Public Function Setup(traceName As String) As Boolean
         If OptionParent.findFrm(traceName + " Sliders") IsNot Nothing Then Return False
-        If allOptions.Text <> "" Then Me.MdiParent = allOptions
+        If task.allOptions.Text <> "" Then Me.MdiParent = task.allOptions
         Me.Text = traceName + " Sliders"
-        allOptions.addTitle(Me)
+        task.allOptions.addTitle(Me)
 
         FlowLayoutPanel1.Width = Me.Width - 40
         FlowLayoutPanel1.Height = Me.Height - 60

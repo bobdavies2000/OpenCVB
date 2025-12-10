@@ -3,7 +3,7 @@ Public Class OptionsRadioButtons
     Public check As New List(Of RadioButton)
     Public Function Setup(traceName As String) As Boolean
         If OptionParent.findFrm(traceName + " Radio Buttons") IsNot Nothing Then Return False
-        Me.MdiParent = allOptions
+        Me.MdiParent = task.allOptions
         Me.Text = traceName + " Radio Buttons"
         allOptions.addTitle(Me)
         Return True

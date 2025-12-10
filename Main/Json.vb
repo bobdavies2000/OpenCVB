@@ -37,8 +37,6 @@ Namespace MainForm
 
         Public locationOpenGL As cv.Vec4f
 
-        Public showBatchConsole As Boolean
-
         Public fontInfo As Font
 
         Public desiredFPS As Integer = 60

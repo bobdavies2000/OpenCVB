@@ -28,7 +28,6 @@ Partial Class MainOptions
         GroupBox1 = New GroupBox()
         Label4 = New Label()
         Button1 = New Button()
-        showBatchConsole = New CheckBox()
         FontDialog1 = New FontDialog()
         CameraGroup = New FlowLayoutPanel()
         Resolutions = New FlowLayoutPanel()
@@ -59,7 +58,6 @@ Partial Class MainOptions
         ' 
         GroupBox1.Controls.Add(Label4)
         GroupBox1.Controls.Add(Button1)
-        GroupBox1.Controls.Add(showBatchConsole)
         GroupBox1.Location = New Point(16, 526)
         GroupBox1.Margin = New Padding(4)
         GroupBox1.Name = "GroupBox1"
@@ -72,7 +70,7 @@ Partial Class MainOptions
         ' Label4
         ' 
         Label4.AutoSize = True
-        Label4.Location = New Point(643, 49)
+        Label4.Location = New Point(79, 49)
         Label4.Margin = New Padding(4, 0, 4, 0)
         Label4.Name = "Label4"
         Label4.Size = New Size(351, 30)
@@ -81,24 +79,13 @@ Partial Class MainOptions
         ' 
         ' Button1
         ' 
-        Button1.Location = New Point(573, 44)
+        Button1.Location = New Point(9, 44)
         Button1.Margin = New Padding(4)
         Button1.Name = "Button1"
         Button1.Size = New Size(62, 40)
         Button1.TabIndex = 1
         Button1.Text = "..."
         Button1.UseVisualStyleBackColor = True
-        ' 
-        ' showBatchConsole
-        ' 
-        showBatchConsole.AutoSize = True
-        showBatchConsole.Location = New Point(14, 48)
-        showBatchConsole.Margin = New Padding(4)
-        showBatchConsole.Name = "showBatchConsole"
-        showBatchConsole.Size = New Size(436, 34)
-        showBatchConsole.TabIndex = 0
-        showBatchConsole.Text = "Show Console Log for external processes"
-        showBatchConsole.UseVisualStyleBackColor = True
         ' 
         ' CameraGroup
         ' 
@@ -117,7 +104,7 @@ Partial Class MainOptions
         Resolutions.Size = New Size(994, 290)
         Resolutions.TabIndex = 7
         ' 
-        ' CVBOptions
+        ' MainOptions
         ' 
         AutoScaleDimensions = New SizeF(12F, 30F)
         AutoScaleMode = AutoScaleMode.Font
@@ -129,7 +116,7 @@ Partial Class MainOptions
         Controls.Add(OKButton)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Margin = New Padding(4)
-        Name = "CVBOptions"
+        Name = "MainOptions"
         Text = "OpenCVB Global Settings"
         GroupBox1.ResumeLayout(False)
         GroupBox1.PerformLayout()
@@ -139,7 +126,6 @@ Partial Class MainOptions
     Friend WithEvents OKButton As Button
     Friend WithEvents Cancel_Button As Button
     Friend WithEvents GroupBox1 As GroupBox
-    Friend WithEvents showBatchConsole As CheckBox
     Friend WithEvents Button1 As Button
     Friend WithEvents Label4 As Label
     Friend WithEvents FontDialog1 As FontDialog

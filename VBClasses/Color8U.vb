@@ -244,7 +244,7 @@ Public Class Color8U_ComplementaryTest : Inherits TaskParent
         desc = "Create the complementary images for Gilles Tran's 'Glasses' image for comparison"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        images.options.fileNameForm.filename.Text = task.HomeDir + "Data/Glasses by Gilles Tran.png"
+        images.options.fileNameForm.filename.Text = task.settings.HomeDir + "Data/Glasses by Gilles Tran.png"
         images.Run(src)
         dst2 = images.dst2
 
@@ -266,7 +266,7 @@ Public Class Color8U_InRange : Inherits TaskParent
         desc = "Use inRange to isolate colors from the background"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = cv.Cv2.ImRead(task.HomeDir + "Data/1.jpg", cv.ImreadModes.Grayscale)
+        dst2 = cv.Cv2.ImRead(task.settings.HomeDir + "Data/1.jpg", cv.ImreadModes.Grayscale)
         dst1 = dst2.InRange(105, 165) ' should make this a slider and experiment further...
         dst3 = dst2.Clone
         dst3.SetTo(0, dst1)

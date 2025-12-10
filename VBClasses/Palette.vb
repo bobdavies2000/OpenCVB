@@ -223,7 +223,7 @@ Public Class Palette_RGBDepth : Inherits TaskParent
             gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
         End If
 
-        Dim sliderVal = If(task.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i", 50, 80)
+        Dim sliderVal = If(task.settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i", 50, 80)
         Dim depth8u = task.pcSplit(2).ConvertScaleAbs(sliderVal)
         Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
         cv.Cv2.ApplyColorMap(depth8u, dst2, ColorMap)
@@ -299,7 +299,7 @@ Public Class Palette_Create : Inherits TaskParent
     Dim activeSchemeName As String = ""
     Dim saveColorTransitionCount As Integer = -1
     Public Sub New()
-        Dim dirInfo = New DirectoryInfo(task.HomeDir + "Data")
+        Dim dirInfo = New DirectoryInfo(task.settings.HomeDir + "Data")
         schemes = dirInfo.GetFiles("scheme*.jpg")
 
         If OptionParent.FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -327,8 +327,8 @@ Public Class Palette_Create : Inherits TaskParent
         Next
         Return result
     End Function
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Static transitionSlider =OptionParent.FindSlider("Color Transitions")
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static transitionSlider = OptionParent.FindSlider("Color Transitions")
         Dim colorTransitionCount = transitionSlider.Value
 
         Static frm = OptionParent.FindFrm(traceName + " Radio Buttons")
@@ -349,7 +349,7 @@ Public Class Palette_Create : Inherits TaskParent
                     If i = 0 Then colorGrad = gradMat Else cv.Cv2.HConcat(colorGrad, gradMat, colorGrad)
                 Next
                 colorGrad = colorGrad.Resize(New cv.Size(256, 1))
-                cv.Cv2.ImWrite(task.HomeDir + "data\nextScheme.jpg", colorGrad) ' use this to create new color schemes.
+                cv.Cv2.ImWrite(task.settings.HomeDir + "data\nextScheme.jpg", colorGrad) ' use this to create new color schemes.
             Else
                 colorGrad = cv.Cv2.ImRead(schemeName).Row(0).Clone
             End If
@@ -381,7 +381,7 @@ Public Class Palette_Variable : Inherits TaskParent
         originalColorMap = colorGrad.Clone
         desc = "Build a new palette for every frame."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         For i = 0 To colors.Count - 1
             colorGrad.Set(Of cv.Vec3b)(0, i, colors(i))
         Next
@@ -403,8 +403,8 @@ Public Class Palette_RandomColorMap : Inherits TaskParent
         labels(3) = "Generated colormap"
         desc = "Build a random colormap that smoothly transitions colors"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Static paletteSlider =OptionParent.FindSlider("Color transitions")
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static paletteSlider = OptionParent.FindSlider("Color transitions")
         If transitionCount <> paletteSlider.Value Then
             transitionCount = paletteSlider.Value
 
@@ -438,7 +438,7 @@ Public Class Palette_CustomColorMap : Inherits TaskParent
     Public Sub New()
         labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
         If standalone Then
-            Dim cMapDir As New DirectoryInfo(task.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+            Dim cMapDir As New DirectoryInfo(task.settings.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
             Dim str = cMapDir.FullName + "/colorscale_" + task.gOptions.Palettes.Text + ".jpg"
             Dim mapFile As New FileInfo(str)
             Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
@@ -447,7 +447,7 @@ Public Class Palette_CustomColorMap : Inherits TaskParent
         End If
         desc = "Apply the provided color map to the input image."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         If colorMap Is Nothing Then
             SetTrueText("With " + traceName + " the colorMap must be provided.  Update the ColorMap Mat and then call Run(src)...")
             Exit Sub
@@ -472,7 +472,7 @@ Public Class Palette_GrayToColor : Inherits TaskParent
     Public Sub New()
         desc = "Build a palette for the current image using samples from each gray level.  Everything turns out sepia-like."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim pixels As New List(Of Byte)
@@ -517,7 +517,7 @@ Public Class Palette_Bin4Way : Inherits TaskParent
         labels = {"", "", "CV_8U data is below", "Palettized version of dst2 at left"}
         desc = "Create a colorized representation of the 4-way bin split with and without depth tiers."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         binary.Run(src)
 
         dst2.SetTo(0)
@@ -561,7 +561,7 @@ End Class
 Public Class Palette_LoadColorMap : Inherits TaskParent
     Public whitebackground As Boolean
     Public colorMap As New cv.Mat
-    Dim cMapDir As New DirectoryInfo(task.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+    Dim cMapDir As New DirectoryInfo(task.settings.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
     Public Sub New()
         desc = "Apply the different color maps in OpenCV"
     End Sub

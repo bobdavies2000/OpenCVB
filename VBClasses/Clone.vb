@@ -106,7 +106,6 @@ End Class
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_gui.cpp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
-' https://www.learnopencvb.com/seamless-cloning-using-opencv-python-cpp/
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
 Public Class Clone_Eagle : Inherits TaskParent
     Dim sourceImage As cv.Mat
@@ -116,11 +115,11 @@ Public Class Clone_Eagle : Inherits TaskParent
     Dim pt As cv.Point
     Dim options As New Options_Clone
     Public Sub New()
-        sourceImage = cv.Cv2.ImRead(task.HomeDir + "Data/CloneSource.png")
+        sourceImage = cv.Cv2.ImRead(task.settings.HomeDir + "Data/CloneSource.png")
         sourceImage = sourceImage.Resize(New cv.Size(sourceImage.Width * dst2.Width / 1280, sourceImage.Height * dst2.Height / 720))
         srcROI = New cv.Rect(0, 40, sourceImage.Width, sourceImage.Height)
 
-        mask = cv.Cv2.ImRead(task.HomeDir + "Data/Clonemask.png")
+        mask = cv.Cv2.ImRead(task.settings.HomeDir + "Data/Clonemask.png")
         mask = mask.Resize(New cv.Size(mask.Width * dst2.Width / 1280, mask.Height * dst2.Height / 720))
         maskROI = New cv.Rect(srcROI.Width, 40, mask.Width, mask.Height)
 

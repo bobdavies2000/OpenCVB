@@ -35,60 +35,60 @@ Public Class TaskParent : Implements IDisposable
     Public Sub New()
         traceName = Me.GetType.Name
 
-        'If task.callTrace.Count = 0 Then task.callTrace.Add(task.algName + "\")
-        'labels = {"", "", traceName, ""}
-        'Dim stackTrace = Environment.StackTrace
-        'Dim lines() = stackTrace.Split(vbCrLf)
-        'Dim callStack As String = ""
-        'For i = 0 To lines.Count - 1
-        '    If lines(i).Contains("System.Environment") Then Continue For
-        '    If lines(i).Contains("TaskParent") Then Continue For
-        '    lines(i) = Trim(lines(i))
-        '    lines(i) = lines(i).Replace("at VBClasses.", "")
-        '    lines(i) = lines(i).Replace(" at VBClasses.", "")
-        '    lines(i) = lines(i).Substring(0, InStr(lines(i), ".") - 1)
-        '    If lines(i).StartsWith("VBtask") Then Exit For
-        '    If lines(i).StartsWith("at Microsoft") Then Continue For
-        '    If lines(i).StartsWith("at System") Then Continue For
-        '    If lines(i).StartsWith("at Main") Then Continue For
-        '    callStack = lines(i) + "\" + callStack
-        'Next
+        If task.callTrace.Count = 0 Then task.callTrace.Add(task.settings.algorithm + "\")
+        labels = {"", "", traceName, ""}
+        Dim stackTrace = Environment.StackTrace
+        Dim lines() = stackTrace.Split(vbCrLf)
+        Dim callStack As String = ""
+        For i = 0 To lines.Count - 1
+            If lines(i).Contains("System.Environment") Then Continue For
+            If lines(i).Contains("TaskParent") Then Continue For
+            lines(i) = Trim(lines(i))
+            lines(i) = lines(i).Replace("at VBClasses.", "")
+            lines(i) = lines(i).Replace(" at VBClasses.", "")
+            lines(i) = lines(i).Substring(0, InStr(lines(i), ".") - 1)
+            If lines(i).StartsWith("VBtask") Then Exit For
+            If lines(i).StartsWith("at Microsoft") Then Continue For
+            If lines(i).StartsWith("at System") Then Continue For
+            If lines(i).StartsWith("at Main") Then Continue For
+            callStack = lines(i) + "\" + callStack
+        Next
 
-        dst0 = New cv.Mat(mytask.workRes, cv.MatType.CV_8UC3, 0)
-        dst1 = New cv.Mat(mytask.workRes, cv.MatType.CV_8UC3, 0)
+        dst0 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+        dst1 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
         dst3 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
 
-        'standalone = traceName = task.algName
-        'task.callTrace.Add(callStack)
+        standalone = traceName = task.settings.algorithm
+        task.callTrace.Add(callStack)
 
-        'task.activeObjects.Add(Me)
+        task.activeObjects.Add(Me)
 
-        'If standalone Then
-        '    task.algorithm_ms.Clear()
-        '    task.algorithmNames.Clear()
-        '    task.algorithmNames.Add("waitingForInput")
-        '    task.algorithmTimes.Add(Now)
-        '    task.algorithm_ms.Add(0)
+        If standalone Then
+            task.algorithm_ms.Clear()
+            task.algorithmNames.Clear()
+            task.algorithmNames.Add("waitingForInput")
+            task.algorithmTimes.Add(Now)
+            task.algorithm_ms.Add(0)
 
-        '    task.algorithmNames.Add("inputBufferCopy")
-        '    task.algorithmTimes.Add(Now)
-        '    task.algorithm_ms.Add(0)
+            task.algorithmNames.Add("inputBufferCopy")
+            task.algorithmTimes.Add(Now)
+            task.algorithm_ms.Add(0)
 
-        '    task.algorithmNames.Add("ReturnCopyTime")
-        '    task.algorithmTimes.Add(Now)
-        '    task.algorithm_ms.Add(0)
+            task.algorithmNames.Add("ReturnCopyTime")
+            task.algorithmTimes.Add(Now)
+            task.algorithm_ms.Add(0)
 
-        '    task.algorithmNames.Add(traceName)
-        '    task.algorithmTimes.Add(Now)
-        '    task.algorithm_ms.Add(0)
+            task.algorithmNames.Add(traceName)
+            task.algorithmTimes.Add(Now)
+            task.algorithm_ms.Add(0)
 
-        '    task.algorithmStack = New Stack()
-        '    task.algorithmStack.Push(0)
-        '    task.algorithmStack.Push(1)
-        '    task.algorithmStack.Push(2)
-        '    task.algorithmStack.Push(3)
-        'End If
+            task.algorithmStack = New Stack()
+            task.algorithmStack.Push(0)
+            task.algorithmStack.Push(1)
+            task.algorithmStack.Push(2)
+            task.algorithmStack.Push(3)
+        End If
     End Sub
     Public Shared Function CaptureScreen() As Bitmap
         Dim screenBounds As Rectangle = Screen.PrimaryScreen.Bounds

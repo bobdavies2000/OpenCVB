@@ -4,7 +4,7 @@ Public Class OptionsKeyboardInput
     Public inputText As New List(Of String)
     Dim keyboardLastInput As String
     Public Sub Setup(traceName As String)
-        Me.MdiParent = allOptions
+        Me.MdiParent = task.allOptions
         Me.Text = traceName + " Keyboard Options"
         allOptions.addTitle(Me)
     End Sub

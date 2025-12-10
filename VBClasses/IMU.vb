@@ -17,7 +17,9 @@ Public Class IMU_Basics : Inherits TaskParent
         Else
             gyroAngle = task.IMU_AngularVelocity
             Dim dt_gyro = (task.IMU_TimeStamp - lastTimeStamp) / 1000
-            If task.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then dt_gyro /= 1000 ' different units in the timestamp?
+            If task.settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
+                dt_gyro /= 1000 ' different units in the timestamp?
+            End If
             gyroAngle = gyroAngle * dt_gyro
             task.theta += New cv.Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X)
             lastTimeStamp = task.IMU_TimeStamp
@@ -80,7 +82,9 @@ Public Class IMU_BasicsKalman : Inherits TaskParent
         Else
             gyroAngle = task.IMU_AngularVelocity
             Dim dt_gyro = (task.IMU_TimeStamp - lastTimeStamp) / 1000
-            If task.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then dt_gyro /= 1000 ' different units in the timestamp?
+            If task.settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
+                dt_gyro /= 1000 ' different units in the timestamp?
+            End If
             gyroAngle = gyroAngle * dt_gyro
             lastTimeStamp = task.IMU_TimeStamp
         End If
@@ -132,7 +136,9 @@ Public Class IMU_BasicsWithOptions : Inherits TaskParent
         Else
             gyroAngle = task.IMU_AngularVelocity
             Dim dt_gyro = (task.IMU_TimeStamp - lastTimeStamp) / 1000
-            If task.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then dt_gyro /= 1000 ' different units in the timestamp?
+            If task.settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
+                dt_gyro /= 1000 ' different units in the timestamp?
+            End If
             gyroAngle = gyroAngle * dt_gyro
             task.theta += New cv.Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X)
             lastTimeStamp = task.IMU_TimeStamp

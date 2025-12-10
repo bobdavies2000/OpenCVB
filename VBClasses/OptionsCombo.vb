@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class OptionsCombo
     Public Sub Setup(traceName As String, label As String, comboList As List(Of String))
-        Me.MdiParent = allOptions
+        Me.MdiParent = task.allOptions
         Me.Text = traceName + " ComboBox Options"
         allOptions.addTitle(Me)
         ComboLabel.Text = label

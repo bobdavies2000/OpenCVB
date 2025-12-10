@@ -92,7 +92,7 @@ Public Class Motion_PointCloud : Inherits TaskParent
 
         ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
         ' with and without gravity transform.  Probably my fault but just fix it here.
-        If task.cameraName = "StereoLabs ZED 2/2i" Then
+        If task.settings.cameraName = "StereoLabs ZED 2/2i" Then
             task.pointCloud = checkNanInf(task.pointCloud)
         End If
 
@@ -126,7 +126,7 @@ Public Class Motion_PointCloud : Inherits TaskParent
             dst2 = task.pointCloud.Clone
             'dst0 = task.depthMask.Clone
         End If
-        If task.cameraName = "StereoLabs ZED 2/2i" Then
+        If task.settings.cameraName = "StereoLabs ZED 2/2i" Then
             originalPointcloud = checkNanInf(task.pointCloud).Clone
         Else
             originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.

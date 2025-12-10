@@ -14,7 +14,7 @@ Namespace MainForm
             If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
             If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
 
-            If isPlaying And myTask IsNot Nothing Then
+            If isPlaying And task IsNot Nothing Then
                 Dim timeNow As DateTime = Now
                 Dim elapsedTime = timeNow.Ticks - lastTime.Ticks
                 Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
@@ -41,24 +41,24 @@ Namespace MainForm
                 cameraName = cameraName.Replace(" Camera", "")
                 cameraName = cameraName.Replace("Intel(R) RealSense(TM) Depth ", "Intel D")
 
-                myTask.fpsAlgorithm = fpsListA.Average
-                myTask.fpsCamera = CInt(fpsListC.Average)
-                If myTask.fpsAlgorithm >= 100 Then myTask.fpsAlgorithm = 99
-                If myTask.fpsCamera >= 100 Then myTask.fpsCamera = 99
+                task.fpsAlgorithm = fpsListA.Average
+                task.fpsCamera = CInt(fpsListC.Average)
+                If task.fpsAlgorithm >= 100 Then task.fpsAlgorithm = 99
+                If task.fpsCamera >= 100 Then task.fpsCamera = 99
                 If fpsListA.Count > 5 Then
                     fpsListA.RemoveAt(0)
                     fpsListC.RemoveAt(0)
                 End If
 
-                If myTask.fpsAlgorithm = 0 Then
-                    myTask.fpsAlgorithm = 1
+                If task.fpsAlgorithm = 0 Then
+                    task.fpsAlgorithm = 1
                 Else
-                    If myTask.testAllRunning Then
+                    If task.testAllRunning Then
                         Static lastWriteTime = timeNow
                         elapsedTime = timeNow.Ticks - lastWriteTime.Ticks
                         spanCopy = New TimeSpan(elapsedTime)
                         taskTimerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
-                        If taskTimerInterval > If(myTask.testAllRunning, 1000, 5000) Then
+                        If taskTimerInterval > If(task.testAllRunning, 1000, 5000) Then
                             Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
                             totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
 
@@ -69,7 +69,7 @@ Namespace MainForm
                             End If
                             fpsWriteCount += 1
                             Debug.Write(" " + Format(totalBytesOfMemoryUsed, "###") + "/" +
-                                              Format(myTask.fpsAlgorithm, fmt0) + "/" + Format(myTask.fpsCamera, fmt0))
+                                              Format(task.fpsAlgorithm, fmt0) + "/" + Format(task.fpsCamera, fmt0))
                         End If
                     End If
                 End If

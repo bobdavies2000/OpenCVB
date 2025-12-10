@@ -19,58 +19,6 @@ End Class
 
 
 
-
-Public Class Quad_GridTiles : Inherits TaskParent
-    Public quadData As New List(Of cv.Point3f)
-    Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
-        labels = {"", "RedColor cells", "", "Simplified depth map with RedColor cell colors"}
-        desc = "Simplify the OpenGL quads without using OpenGL's point size"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedList(src, labels(2))
-
-        quadData.Clear()
-        dst1.SetTo(0)
-        dst3.SetTo(0)
-        Dim vec As cv.Scalar
-        Dim shift As cv.Point3f
-        If Not standalone Then
-            Dim ptM = task.ogl.options4.moveAmount
-            shift = New cv.Point3f(ptM(0), ptM(1), ptM(2))
-        End If
-        For Each roi In task.gridRects
-            Dim c = dst2.Get(Of cv.Vec3b)(roi.Y, roi.X)
-            If standaloneTest() Then dst3(roi).SetTo(c)
-            If c = black Then Continue For
-
-            quadData.Add(New cv.Vec3f(c(0), c(1), c(2)))
-
-            Dim v = task.pointCloud(roi).Mean(task.depthMask(roi))
-            vec = Cloud_Basics.worldCoordinates(New cv.Point3f(roi.X, roi.Y, v(2))) + shift
-            quadData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
-
-            vec = Cloud_Basics.worldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y, v(2))) + shift
-            quadData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
-
-            vec = Cloud_Basics.worldCoordinates(New cv.Point3f(roi.X + roi.Width, roi.Y + roi.Height, v(2))) + shift
-            quadData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
-
-            vec = Cloud_Basics.worldCoordinates(New cv.Point3f(roi.X, roi.Y + roi.Height, v(2))) + shift
-            quadData.Add(New cv.Point3f(vec.Val0, vec.Val1, vec.Val2))
-            If standaloneTest() Then dst1(roi).SetTo(v)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Quad_MinMax : Inherits TaskParent
     Public quadData As New List(Of cv.Point3f)
     Public depthList1 As New List(Of List(Of Single))

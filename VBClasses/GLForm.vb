@@ -123,9 +123,6 @@ Public Class SharpGLForm
         zoomZ += If(delta > 0, 0.5F, -0.5F)
         GLControl.Invalidate() ' Force redraw
     End Sub
-    Private Sub sgl_Closed(sender As Object, e As EventArgs) Handles Me.Closed
-        task.closeRequest = True
-    End Sub
     Private Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
         Dim mm As mmData
         If mask Is Nothing Then

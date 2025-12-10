@@ -14,7 +14,7 @@ Public Class Gif_Basics : Inherits TaskParent
         desc = "Create a GIF file by clicking on the checkbox when dst2 is to be used."
     End Sub
     Private Sub clearTempDir()
-        Dim imgDir As New DirectoryInfo(task.HomeDir + "Temp")
+        Dim imgDir As New DirectoryInfo(task.settings.HomeDir + "Temp")
         If imgDir.Exists = False Then imgDir.Create()
         Dim imgList As FileInfo() = imgDir.GetFiles("*.bmp")
 
@@ -22,7 +22,7 @@ Public Class Gif_Basics : Inherits TaskParent
             For Each imgFile In imgList
                 My.Computer.FileSystem.DeleteFile(imgFile.FullName)
             Next
-            Dim gifFile As New FileInfo(task.HomeDir + "Temp\myGif.gif")
+            Dim gifFile As New FileInfo(task.settings.HomeDir + "Temp\myGif.gif")
             If gifFile.Exists Then My.Computer.FileSystem.DeleteFile(gifFile.FullName)
         End If
     End Sub
@@ -59,7 +59,7 @@ Public Class Gif_OpenCVB : Inherits TaskParent
         desc = "Create a GIF of the OpenCVB main screen for any algorithm."
     End Sub
     Public Sub createNextGifImage()
-        Static snapCheck = OptionParent.findCheckBox("Step 1: Check this box when ready to capture the desired snapshot.")
+        Static snapCheck = OptionParent.FindCheckBox("Step 1: Check this box when ready to capture the desired snapshot.")
         If snapCheck.checked Then
             Dim nextBMP As Bitmap = Nothing
             Select Case task.gifCaptureIndex
@@ -92,7 +92,7 @@ Public Class Gif_OpenCVB : Inherits TaskParent
                     nextBMP = New Bitmap(task.workRes.Width, task.workRes.Height, Imaging.PixelFormat.Format24bppRgb)
                     cvext.BitmapConverter.ToBitmap(task.dstList(3), nextBMP)
                 Case gifTypes.openCVBwindow
-                    Dim r = New cv.Rect(0, 0, task.mainFormLocation.Width - 20,
+                    Dim r = New cv.Rect(0, 0, task.settings.MainFormWidth - 20,
                                               task.mainFormLocation.Height - 40)
                     nextBMP = New Bitmap(r.Width, r.Height, Imaging.PixelFormat.Format24bppRgb)
                     Dim snapshot As Bitmap = GetWindowImage(task.main_hwnd, r)
@@ -117,14 +117,14 @@ Public Class Gif_OpenCVB : Inherits TaskParent
             snapCheck.checked = False
         End If
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         SetTrueText("Results are best when the main form is set to an 'auto-sized' setting.", 3)
-        Static snapCheck = OptionParent.findCheckBox("Step 1: Check this box when ready to capture the desired snapshot.")
+        Static snapCheck = OptionParent.FindCheckBox("Step 1: Check this box when ready to capture the desired snapshot.")
 
         gifC.Run(dst2)
 
         labels(2) = "Images captured: " + CStr(task.gifImages.Count)
         labels(3) = "After 'Build GIF file...' was clicked, resulting gif will be in '" +
-                    task.HomeDir + "/temp/myGIF.gif'"
+                    task.settings.HomeDir + "/temp/myGIF.gif'"
     End Sub
 End Class

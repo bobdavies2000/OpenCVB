@@ -147,7 +147,7 @@ Public Class LeftRight_RGBAlignLeft : Inherits TaskParent
         desc = "This is a crude method to align the left image with the RGB for the D435i camera only..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
+        If task.settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
             SetTrueText("This is just a crude way to align the left and rgb images." + vbCrLf +
                         "The parameters are set for only the Intel D435i camera.")
             Exit Sub

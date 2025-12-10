@@ -11,23 +11,87 @@ Public Class VBtask : Implements IDisposable
     Public dstsReady As Boolean
     Public dstList() As cv.Mat
 
-    Public GLRequest As Integer
-    Public GLcloud As cv.Mat
-    Public GLrgb As cv.Mat
+    Public optionsChanged As Boolean
+    Public allOptions As OptionsContainer
+    Public gOptions As OptionsGlobal
+    Public featureOptions As OptionsFeatures
+    Public treeView As TreeViewForm
+    Public settings As Object
 
-    Public resultLock As New Mutex(True, "resultLock")
+    Public color As New cv.Mat
+    Public gray As New cv.Mat
+    Public grayStable As New cv.Mat
+    Public leftViewStable As New cv.Mat
+    Public leftView As New cv.Mat
+    Public rightView As New cv.Mat
+    Public pointCloud As New cv.Mat
+    Public gravityCloud As New cv.Mat
+    Public sharpDepth As cv.Mat
+    Public sharpRGB As cv.Mat
+    Public pcSplit() As cv.Mat
+    Public depthmask As cv.Mat
+    Public noDepthMask As cv.Mat
+    Public depthRGB As cv.Mat
 
-    Public cvFontSize As Single = 0.8
-    Public cvFontThickness As Integer = 1
-    Public motionThreshold As Integer ' this is vital to motion detection - lower to be more sensitive, higher for less.
-    Public colorDiffThreshold As Integer
-    Public reductionTarget As Integer = 200 ' specify how much reduction is needed using options_RedCloud.
+    Public gridRects As List(Of cv.Rect)
+    Public firstPass As Boolean = True
+    Public cameraName As String
+
+    Public testAllDuration As Integer
+    Public verticalLines As Boolean
+    Public edgeMethod As String
+
+    Public workRes As cv.Size
+    Public rows As Integer
+    Public cols As Integer
+    Public captureRes As cv.Size
+
+    ' Global Options 
+    Public DotSize As Integer
+    Public lineWidth As Integer
+    Public cvFontThickness As Integer
     Public brickSize As Integer
+    Public reductionTarget As Integer
+    Public cvFontSize As Single
+    Public lineType As cv.LineTypes
+    Public histogramBins As Integer
+    Public MaxZmeters As Single
+    Public highlight As cv.Scalar
+    Public closeRequest As Boolean
+    Public paletteIndex As Integer
+    Public fCorrThreshold As Single
+    Public FeatureSampleSize As Integer
+    Public clickPoint As New cv.Point ' last place where mouse was clicked.
 
-    Public motionLinkType As Integer = 8
+    ' TreeView and trace Data.
+    Public callTrace As List(Of String)
+    Public algorithm_msMain As New List(Of Single)
+    Public algorithmNamesMain As New List(Of String)
+    Public algorithm_ms As New List(Of Single)
+    Public algorithmNames As New List(Of String)
+    Public algorithmTimes As New List(Of DateTime)
+    Public algorithmStack As New Stack()
+    Public displayObjectName As String
+    Public activeObjects As New List(Of Object)
+    Public calibData As cameraInfo
 
-    ' add any task algorithms here.
-    Public ogl As XO_OpenGL_Basics
+    Public desc As String = ""
+
+    Public fpsAlgorithm As Single
+    Public fpsCamera As Single
+    Public testAllRunning As Boolean
+    Public main_hwnd As IntPtr
+
+    ' color maps
+    Public scalarColors(255) As cv.Scalar
+    Public vecColors(255) As cv.Vec3b
+    Public depthColorMap As cv.Mat
+    Public colorMap As cv.Mat
+    Public colorMapZeroIsBlack As cv.Mat
+    Public correlationColorMap As cv.Mat
+
+    ' task algorithms - operate on every frame regardless of which algorithm is being run.
+    Public colorizer As DepthColorizer_Basics
     Public redColor As RedColor_Basics
     Public redList As RedList_Basics
     Public redCloud As RedCloud_Basics
@@ -40,9 +104,25 @@ Public Class VBtask : Implements IDisposable
     Public gravityBasics As Gravity_Basics
     Public imuBasics As IMU_Basics
     Public motionBasics As Motion_Basics
-    Public colorizer As DepthColorizer_Basics
     Public contours As Contour_Basics_List
     Public pcMotion As Motion_PointCloud
+
+
+
+
+
+
+
+    Public GLRequest As Integer
+    Public GLcloud As cv.Mat
+    Public GLrgb As cv.Mat
+
+    Public resultLock As New Mutex(True, "resultLock")
+
+    Public motionThreshold As Integer ' this is vital to motion detection - lower to be more sensitive, higher for less.
+    Public colorDiffThreshold As Integer
+
+    Public motionLinkType As Integer = 8
 
     Public feat As Feature_Basics
     Public bricks As Brick_Basics
@@ -63,7 +143,6 @@ Public Class VBtask : Implements IDisposable
 
     Public bricksPerCol As Integer
     Public bricksPerRow As Integer
-    Public gridRects As List(Of cv.Rect)
     Public gridMap As New cv.Mat
     Public gridMask As New cv.Mat
     Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
@@ -87,63 +166,22 @@ Public Class VBtask : Implements IDisposable
     Public motionMaskRight As New cv.Mat ' motion mask for the right view.
     Public motionRect As cv.Rect
 
-    Public optionsChanged As Boolean = True ' global or local options changed.
-    Public rows As Integer
-    Public cols As Integer
-    Public workRes As cv.Size
-    Public captureRes As cv.Size
-
     ' if true, algorithm prep means algorithm tasks will run.  If false, they have already been run...
     Public algorithmPrep As Boolean = True
 
     Public MainUI_Algorithm As Object
     Public myStopWatch As Stopwatch
 
-    Public color As New cv.Mat
-    Public gray As New cv.Mat
-    Public grayStable As New cv.Mat
-    Public leftViewStable As New cv.Mat
-    Public leftView As New cv.Mat
-    Public rightView As New cv.Mat
-    Public pointCloud As New cv.Mat
-    Public gravityCloud As New cv.Mat
-    Public sharpDepth As cv.Mat
-    Public sharpRGB As cv.Mat
-    Public pcSplit() As cv.Mat
-
     ' transformation matrix to convert point cloud to be vertical according to gravity.
     Public gMatrix As New cv.Mat
     Public IMU_Rotation As System.Numerics.Quaternion
-    Public noDepthMask As New cv.Mat
-    Public depthMask As New cv.Mat
     Public maxDepthMask As New cv.Mat
-    Public depthRGB As New cv.Mat
-    Public srcThread As New cv.Mat
 
     Public camMotionPixels As Single ' distance in pixels that the camera has moved.
     Public camDirection As Single ' camera direction in radians.
 
-    Public callTrace As List(Of String)
-    Public algorithm_msMain As New List(Of Single)
-    Public algorithmNamesMain As New List(Of String)
-    Public algorithm_ms As New List(Of Single)
-    Public algorithmNames As New List(Of String)
-    Public algorithmTimes As New List(Of DateTime)
-    Public algorithmStack As New Stack()
-
     Public paletteRandom As Palette_RandomColors
     Public kalman As Kalman_Basics
-
-    ' end of task algorithms
-
-    Public pythonPipeIn As NamedPipeServerStream
-    Public pythonPipeOut As NamedPipeServerStream
-    Public pythonTaskName As String
-    Public pythonProcess As Process
-    Public pythonReady As Boolean
-    Public pythonPipeIndex As Integer
-
-    Public openGLPipe As NamedPipeServerStream
 
     Public gifCreator As Gif_OpenCVB
     Public gifImages As New List(Of Bitmap)
@@ -162,7 +200,6 @@ Public Class VBtask : Implements IDisposable
     Public afterHeartBeatLT As Boolean
     Public msWatch As Integer
     Public msLast As Integer
-    Public firstPass As Boolean
 
     Public toggleOn As Boolean ' toggles on the heartbeat.
     Public paused As Boolean
@@ -201,14 +238,6 @@ Public Class VBtask : Implements IDisposable
     Public yaw As Single
     Public roll As Single
 
-    Public highlight As cv.Scalar ' color to use to highlight objects in an image.
-
-    Public histogramBins As Integer
-
-    Public gOptions As OptionsGlobal
-    Public featureOptions As OptionsFeatures
-    Public treeView As TreeViewForm
-
     ' RedCloud variables
     Public channelCount As Integer = 2
     Public channelIndex As Integer = 0
@@ -219,18 +248,11 @@ Public Class VBtask : Implements IDisposable
     Public rangesHSV() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
     Public rangesCloud() As cv.Rangef
 
-    Public paletteIndex As Integer
-
     Public mouseClickFlag As Boolean
     Public activateTaskForms As Boolean
-    Public ClickPoint As cv.Point
     Public mousePicTag As Integer ' which image was the mouse in?
     Public mouseMovePoint As cv.Point ' trace any mouse movements using this.
     Public mouseMovePointUpdated As Boolean
-
-    Public DotSize As Integer
-    Public lineWidth As Integer
-    Public lineType As cv.LineTypes
 
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
@@ -247,17 +269,7 @@ Public Class VBtask : Implements IDisposable
     Public pipeName As String
 
     Public labels() = {"", "", "", ""}
-    Public desc As String
-    Public displayObjectName As String
-    Public activeObjects As New List(Of Object)
     Public pixelViewerOn As Boolean
-
-    Public scalarColors(255) As cv.Scalar
-    Public vecColors(255) As cv.Vec3b
-    Public depthColorMap As cv.Mat
-    Public colorMap As cv.Mat
-    Public colorMapZeroIsBlack As cv.Mat
-    Public correlationColorMap As cv.Mat
 
     Public topCameraPoint As cv.Point
     Public sideCameraPoint As cv.Point
@@ -265,23 +277,7 @@ Public Class VBtask : Implements IDisposable
     Public hFov As Single
     Public vFov As Single
 
-    Public algName As String
-    Public cameraName As String
-    Public calibData As cameraInfo
-    Public HomeDir As String
-    Public fpsAlgorithm As Integer
-    Public fpsCamera As Integer
-
-    Public FeatureSampleSize As Integer ' how many features do you want...
-    Public fCorrThreshold As Single ' feature correlation threshold
-    Public edgeMethod As String
-    Public verticalLines As Boolean
-
-    Public testAllRunning As Boolean
-    Public showBatchConsole As Boolean
-
     Public mainFormLocation As cv.Rect
-    Public main_hwnd As IntPtr
 
     Public trueData As New List(Of TrueText)
 
@@ -305,13 +301,11 @@ Public Class VBtask : Implements IDisposable
     Public yRange As Single
     Public xRangeDefault As Single
     Public yRangeDefault As Single
-    Public MaxZmeters As Single
     Public metersPerPixel As Single
     Public OpenGL_Left As Integer
     Public OpenGL_Top As Integer
     Public displayDst1 As Boolean
     Public depthAndDepthRange As String = ""
-    Public closeRequest As Boolean
     Public sharpGL As VBClasses.SharpGLForm
 
     Public Structure intrinsicData
@@ -338,28 +332,6 @@ Public Class VBtask : Implements IDisposable
         Public d_fov As Single ' diagonal field of view in degrees.
     End Structure
 
-    Public Structure algParms
-        Public cameraName As String
-        Public cameraIndex As Integer
-
-        Public HomeDir As String
-        Public showBatchConsole As Boolean
-        Public testAllRunning As Boolean
-        Public RotationMatrix() As Single
-        Public RotationVector As cv.Point3f
-
-        Public mainFormLocation As cv.Rect
-        Public main_hwnd As IntPtr
-
-        Public fpsRate As Integer
-        Public fpsHostCamera As Integer
-        Public workRes As cv.Size
-        Public captureRes As cv.Size ' DisparityIn-verted_Basics needs the full resolution to compute disparity.
-
-        Public algName As String
-
-        Public calibData As cameraInfo
-    End Structure
 #End Region
     Private Function findDisplayObject(lookupName As String) As TaskParent
         Dim saveObject As Object = Nothing
@@ -403,39 +375,21 @@ Public Class VBtask : Implements IDisposable
         End Try
     End Sub
     Public Sub New()
-    End Sub
-    Public Sub New(parms As algParms)
-        Randomize() ' just in case anyone uses VB.Net's Rnd
-
         task = Me
-        useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve task.results..
+        Randomize() ' just in case anyone uses VB.Net's Rnd
         gridRects = New List(Of cv.Rect)
-        firstPass = True
-        algName = parms.algName
-        displayObjectName = algName
-        cameraName = parms.cameraName
-        testAllRunning = parms.testAllRunning
-        showBatchConsole = parms.showBatchConsole
-        fpsAlgorithm = parms.fpsRate
-        fpsCamera = parms.fpsHostCamera
-        calibData = parms.calibData
-        HomeDir = parms.HomeDir
-        main_hwnd = parms.main_hwnd
-
-        Cloud_Basics.ppx = calibData.rgbIntrinsics.ppx
-        Cloud_Basics.ppy = calibData.rgbIntrinsics.ppy
-        Cloud_Basics.fx = calibData.rgbIntrinsics.fx
-        Cloud_Basics.fy = calibData.rgbIntrinsics.fy
-
-        rgbLeftAligned = True
-        If cameraName.Contains("RealSense") Then rgbLeftAligned = False
-
-        mainFormLocation = parms.mainFormLocation
-        rows = parms.workRes.Height
-        cols = parms.workRes.Width
-        workRes = parms.workRes
-        captureRes = parms.captureRes
         optionsChanged = True
+        firstPass = True
+        useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve task.results..
+    End Sub
+    Public Sub Initialize()
+        rgbLeftAligned = True
+        If settings.cameraName.Contains("RealSense") Then rgbLeftAligned = False
+
+        rows = settings.workRes.Height
+        cols = settings.workRes.Width
+        workRes = settings.workRes
+        captureRes = settings.captureRes
 
         ReDim dstList(3)
         For i = 0 To dstList.Count - 1
@@ -445,12 +399,10 @@ Public Class VBtask : Implements IDisposable
         OpenGL_Left = CInt(GetSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", mainFormLocation.X))
         OpenGL_Top = CInt(GetSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", mainFormLocation.Y))
 
-        pythonTaskName = HomeDir + "Python\" + algName
-
         allOptions = New OptionsContainer
         allOptions.Show()
 
-        If algName.StartsWith("GL_") And algName <> "GL_MainForm" And optionsChanged Then
+        If settings.algorithm.StartsWith("GL_") And settings.algorithm <> "GL_MainForm" And optionsChanged Then
             If sharpGL IsNot Nothing Then sharpGL.Dispose()
             sharpGL = New SharpGLForm
             sharpGL.Show()
@@ -463,6 +415,12 @@ Public Class VBtask : Implements IDisposable
         callTrace = New List(Of String)
         pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
         gravityCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
+        task.motionMask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 255)
+        task.leftView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+        task.rightView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+        pointCloud = New cv.Mat(task.workRes, cv.MatType.CV_32FC3, 0)
+        noDepthMask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+        depthmask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
 
         colorizer = New DepthColorizer_Basics
         gmat = New IMU_GMatrix
@@ -474,9 +432,9 @@ Public Class VBtask : Implements IDisposable
         lines = New Line_Basics
         rgbFilter = New Filter_Basics
 
-        ' all the algorithms in the list are task algorithms that are children of the algname.
+        ' all the algorithms in the list are task algorithms that are children of the algorithm.
         For i = 1 To callTrace.Count - 1
-            callTrace(i) = algName + "\" + callTrace(i)
+            callTrace(i) = settings.algorithm + "\" + callTrace(i)
         Next
 
         updateSettings()
@@ -488,25 +446,6 @@ Public Class VBtask : Implements IDisposable
                                  workRes.Width / 2, workRes.Height / 2)
 
         fpList.Clear()
-
-        ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
-        ' https://www.intelrealsense.com/depth-camera-d435i/
-        ' https://www.intelrealsense.com/depth-camera-d455/
-        ' https://towardsdatascience.com/opinion-26190c7fed1b
-        ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
-        ' https://www.stereolabs.com/assets/datasheets/zed-2i-datasheet-feb2022.pdf
-        ' https://www.orbbec.com/products/stereo-vision-camera/gemini-335l/
-        ' order of cameras is the same as the order above and in optionsform.cameraNames combobox.
-        Dim vFOVangles() As Single = {59, 59, 72, 58, 42.5, 57, 57, 62, 68} ' all values from the specification - this is usually overridden by calibration data.
-        Dim hFOVangles() As Single = {90, 90, 104, 105, 69.4, 86, 86, 69, 94} ' all values from the specification - this is usually overridden by calibration data.
-
-        ' NOTE: I can't find the VFOV for the Oak-D or Oak-D Lite cameras.
-        ' The 62 is based on Pythagorean theorem and knowing the 71.8 HFOV and the 81.3 DFOV.
-        If parms.calibData.v_fov <> 0 Then vFOVangles(parms.cameraIndex) = parms.calibData.v_fov
-        If parms.calibData.h_fov <> 0 Then hFOVangles(parms.cameraIndex) = parms.calibData.h_fov
-
-        vFov = vFOVangles(parms.cameraIndex)  ' these are default values in case the calibration data is unavailable
-        hFov = hFOVangles(parms.cameraIndex)
 
         myStopWatch = Stopwatch.StartNew()
         optionsChanged = True
@@ -541,15 +480,15 @@ Public Class VBtask : Implements IDisposable
             allOptions.layoutOptions(normalRequest:=True)
         End If
 
-        Application.DoEvents() ' this lets the options container update.
         updateSettings()
+        Exit Sub
 
         If algorithm_ms.Count = 0 Then
             algorithmNames.Add("waitingForInput")
             algorithmTimes.Add(Now)
             algorithm_ms.Add(0)
 
-            algorithmNames.Add(algName)
+            algorithmNames.Add(settings.algorithm)
             algorithmTimes.Add(Now)
             algorithm_ms.Add(0)
 
@@ -565,16 +504,6 @@ Public Class VBtask : Implements IDisposable
         If src.Width = 0 Or task.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
 
         bins2D = {task.workRes.Height, task.workRes.Width}
-
-        ' If the workRes changes, the previous generation of images needs to be reset.
-        If task.firstPass Then
-            task.motionMask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 255)
-            task.leftView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
-            task.rightView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
-            pointCloud = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, cv.Scalar.All(0))
-            noDepthMask = New cv.Mat(rows, cols, cv.MatType.CV_8U, cv.Scalar.All(0))
-            depthMask = New cv.Mat(rows, cols, cv.MatType.CV_8U, cv.Scalar.All(0))
-        End If
 
         ' run any universal algorithms here
         IMU_RawAcceleration = IMU_Acceleration
@@ -645,12 +574,12 @@ Public Class VBtask : Implements IDisposable
             If gifCreator.gifC.options.buildCheck.Checked Then
                 gifCreator.gifC.options.buildCheck.Checked = False
                 For i = 0 To gifImages.Count - 1
-                    Dim fileName As New FileInfo(HomeDir + "Temp/image" + Format(i, "000") + ".bmp")
+                    Dim fileName As New FileInfo(settings.HomeDir + "Temp/image" + Format(i, "000") + ".bmp")
                     gifImages(i).Save(fileName.FullName)
                 Next
 
                 gifImages.Clear()
-                Dim dirInfo As New DirectoryInfo(HomeDir + "GifBuilder\bin\Debug\net8.0\")
+                Dim dirInfo As New DirectoryInfo(settings.HomeDir + "GifBuilder\bin\Debug\net8.0\")
                 Dim dirData = dirInfo.GetDirectories()
                 Dim gifExe As New FileInfo(dirInfo.FullName + "GifBuilder.exe")
                 If gifExe.Exists = False Then
@@ -684,7 +613,6 @@ Public Class VBtask : Implements IDisposable
             algorithmPrep = False
             MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
             algorithmPrep = True
-
 
 
 
@@ -745,14 +673,13 @@ Public Class VBtask : Implements IDisposable
                     displayObject.trueData.Add(New TrueText("Longest", pt, 0))
                 End If
             End SyncLock
+
             ' if there were no cycles spent on this routine, then it was inactive.
-            ' if any active algorithm has an index = -1, make sure it is running .Run, not .RunAlg
+            ' if any active algorithm has an index = -1, it has not been run.
             Dim index = algorithmNames.IndexOf(displayObject.traceName)
             If index = -1 Then
                 displayObject.trueData.Add(New TrueText("This task is not active at this time.",
                                            New cv.Point(workRes.Width / 3, workRes.Height / 2), 2))
-                displayObject.trueData.Add(New TrueText("This task is not active at this time.",
-                                           New cv.Point(workRes.Width / 3, workRes.Height / 2), 3))
             End If
 
             trueData = New List(Of TrueText)(displayObject.trueData)

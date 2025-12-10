@@ -272,10 +272,10 @@ Public Class BGSubtract_Video : Inherits TaskParent
     Dim bgSub As New BGSubtract_Basics
     Dim video As New Video_Basics
     Public Sub New()
-        video.options.fileInfo = New FileInfo(task.HomeDir + "opencv/Samples/Data/vtest.avi")
+        video.options.fileInfo = New FileInfo(task.settings.HomeDir + "opencv/Samples/Data/vtest.avi")
         desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         video.Run(src)
         dst3 = video.dst2
         bgSub.Run(dst3)
@@ -297,7 +297,7 @@ Public Class BGSubtract_Synthetic_CPP : Inherits TaskParent
         labels(2) = "Synthetic background/foreground image."
         desc = "Generate a synthetic input to background subtraction method"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         If task.optionsChanged Then
             If Not task.firstPass Then BGSubtract_Synthetic_Close(cPtr)
@@ -307,7 +307,7 @@ Public Class BGSubtract_Synthetic_CPP : Inherits TaskParent
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
 
             cPtr = BGSubtract_Synthetic_Open(handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                             task.HomeDir + "opencv/Samples/Data/baboon.jpg",
+                                             task.settings.HomeDir + "opencv/Samples/Data/baboon.jpg",
                                              options.amplitude / 100, options.magnitude, options.waveSpeed / 100, options.objectSpeed)
             handleSrc.Free()
         End If

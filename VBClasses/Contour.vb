@@ -270,7 +270,7 @@ Public Class Contour_RemoveLines : Inherits TaskParent
     Dim image As cv.Mat
     Public Sub New()
         labels = {"", "", "Identified horizontal lines - why is scale factor necessary?", "Identified vertical lines"}
-        image = cv.Cv2.ImRead(task.HomeDir + "Data/invoice.jpg")
+        image = cv.Cv2.ImRead(task.settings.HomeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(dst2.Height * dst2.Width / image.Height, dst2.Height)
         Dim dstRect = New cv.Rect(0, 0, image.Width, dst2.Height)
         image = image.Resize(dstSize)

@@ -522,7 +522,7 @@ End Class
 Public Class Brick_LeftToColor : Inherits TaskParent
     Public Sub New()
         If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-        If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
+        If task.settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
         desc = "Align brick left rectangles in color with the left image.  StereoLabs and Orbbec already match."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -551,7 +551,7 @@ Public Class Brick_LeftRightMouse : Inherits TaskParent
         If task.bricks Is Nothing Then task.bricks = New Brick_Basics
         labels(2) = "Move the mouse in the color image to see the matches in left and right images. Click to clear the rectangles."
         labels(3) = "Right view with the translated trace of bricks under the mouse."
-        If task.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
+        If task.settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
         If standalone Then task.gOptions.displayDst0.Checked = True
         desc = "Map the bricks from the color image into the left view and the right view."
     End Sub

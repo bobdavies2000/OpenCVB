@@ -106,7 +106,7 @@ Public Class GrabCut_ImageRect : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If task.heartBeat = False Then Exit Sub
-        Dim fileInputName = New FileInfo(task.HomeDir + "data/cat.jpg")
+        Dim fileInputName = New FileInfo(task.settings.HomeDir + "data/cat.jpg")
         dst2 = cv.Cv2.ImRead(fileInputName.FullName)
 
         dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
@@ -146,7 +146,7 @@ End Class
 Public Class GrabCut_ImageMask : Inherits TaskParent
     Dim image As cv.Mat
     Public Sub New()
-        Dim fileInputName = New FileInfo(task.HomeDir + "data/cat.jpg")
+        Dim fileInputName = New FileInfo(task.settings.HomeDir + "data/cat.jpg")
         image = cv.Cv2.ImRead(fileInputName.FullName)
         desc = "Grabcut example using a single image. "
     End Sub

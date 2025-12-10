@@ -588,7 +588,7 @@ Public Class OEX_FitEllipse : Inherits TaskParent
     Dim img As cv.Mat
     Dim options As New Options_FitEllipse
     Public Sub New()
-        Dim fileInputName As New FileInfo(task.HomeDir + "opencv/samples/data/ellipses.jpg")
+        Dim fileInputName As New FileInfo(task.settings.HomeDir + "opencv/samples/data/ellipses.jpg")
         img = cv.Cv2.ImRead(fileInputName.FullName).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         cPtr = OEX_FitEllipse_Open()

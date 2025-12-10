@@ -345,7 +345,7 @@ Public Class WarpAffine_RepeatedExample8 : Inherits TaskParent
         desc = "Compare an image before and after repeated rotations."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Dim input = cv.Cv2.ImRead(task.HomeDir + "Data/8.jpg", cv.ImreadModes.Color)
+        Dim input = cv.Cv2.ImRead(task.settings.HomeDir + "Data/8.jpg", cv.ImreadModes.Color)
 
         Dim center = New cv.Point(input.Width / 2, input.Height / 2)
         Dim angle45 = 45, angle90 = 90, scale = 1.0, h = input.Height, w = input.Width

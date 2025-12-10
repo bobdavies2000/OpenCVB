@@ -50,7 +50,8 @@ Public Class CComp_Shapes : Inherits TaskParent
     Dim shapes As cv.Mat
     Dim mats As New Mat_4Click
     Public Sub New()
-        shapes = New cv.Mat(task.HomeDir + "Data/Shapes.png", cv.ImreadModes.Color)
+        Dim filePath As String = task.settings.HomeDir + "Data/Shapes.png"
+        shapes = New cv.Mat(filePath, cv.ImreadModes.Color)
         labels(2) = "Largest connected component"
         labels(3) = "RectView, LabelView, Binary, grayscale"
         desc = "Use connected components to isolate objects in image."

@@ -9,7 +9,7 @@ Public Class OptionsFeatures
                                        "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
                                        "PCA_NColor_CPP", "MeanSubtraction_Gray"}
     Private Sub OptionsFeatures_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.MdiParent = allOptions
+        Me.MdiParent = task.allOptions
         Me.Left = 0
         Me.Top = 0
 

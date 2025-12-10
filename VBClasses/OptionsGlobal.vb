@@ -6,7 +6,7 @@ Public Class OptionsGlobal
     Public heartBeatSeconds = 1
     Public trackingLabel As String
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.MdiParent = allOptions
+        Me.MdiParent = task.allOptions
 
         Palettes.Items.Clear()
         For Each mapName In mapNames
@@ -240,14 +240,6 @@ Public Class OptionsGlobal
     Private Sub showMotionMask_CheckedChanged(sender As Object, e As EventArgs) Handles showMotionMask.CheckedChanged
         task.optionsChanged = True
     End Sub
-
-    Private Sub OptionsGlobal_Closed(sender As Object, e As EventArgs) Handles Me.Closed
-        task.closeRequest = True
-    End Sub
-
-
-
-
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
     End Sub
