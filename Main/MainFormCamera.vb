@@ -61,9 +61,7 @@ Namespace MainForm
                           sender.camImages.images(2).CopyTo(task.leftView)
                           sender.camImages.images(3).CopyTo(task.rightView)
 
-                          ' task.RunAlgorithm()
-                          task.dstList = {task.color, task.color, task.leftView, task.rightView}
-
+                          task.RunAlgorithm()
                           For i = 0 To task.dstList.Count - 1
                               UpdatePictureBox(pics(i), task.dstList(i))
                           Next

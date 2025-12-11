@@ -1,7 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Namespace MainForm
     Partial Public Class MainForm
-        Public frameCount As Integer
         Dim fpsWriteCount As Integer
         Dim fpsListA As New List(Of Single)
         Dim fpsListC As New List(Of Single)
@@ -11,7 +10,7 @@ Namespace MainForm
             Static lastAlgorithmFrame As Integer
             Static lastCameraFrame As Integer
             If camera Is Nothing Then Exit Sub
-            If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
+            If lastAlgorithmFrame > task.frameCount Then lastAlgorithmFrame = 0
             If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
 
             If isPlaying And task IsNot Nothing Then
@@ -21,17 +20,19 @@ Namespace MainForm
                 Dim taskTimerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
                 lastTime = timeNow
 
-                Dim countFrames = frameCount - lastAlgorithmFrame
+                Dim countFrames = task.frameCount - lastAlgorithmFrame
                 Dim camFrames = camera.cameraFrameCount - lastCameraFrame
-                lastAlgorithmFrame = frameCount
+                lastAlgorithmFrame = task.frameCount
                 lastCameraFrame = camera.cameraFrameCount
 
                 If taskTimerInterval > 0 Then
-                    fpsListA.Add(CSng(countFrames / (taskTimerInterval / 1000)))
-                    fpsListC.Add(CSng(camFrames / (taskTimerInterval / 1000)))
-                Else
-                    fpsListA.Add(0)
-                    fpsListC.Add(0)
+                    Dim testVal = camFrames / (taskTimerInterval / 1000)
+                    If testVal >= 100 Then testVal = 99
+                    fpsListC.Add(testVal)
+
+                    testVal = countFrames / (taskTimerInterval / 1000)
+                    If testVal >= 100 Then testVal = 99
+                    fpsListA.Add(testVal)
                 End If
 
                 CameraSwitching.Text = AvailableAlgorithms.Text + " awaiting first buffer"
@@ -43,8 +44,14 @@ Namespace MainForm
 
                 task.fpsAlgorithm = fpsListA.Average
                 task.fpsCamera = CInt(fpsListC.Average)
-                If task.fpsAlgorithm >= 100 Then task.fpsAlgorithm = 99
-                If task.fpsCamera >= 100 Then task.fpsCamera = 99
+
+
+
+                Debug.WriteLine("fps camera = " + Format(task.fpsCamera, fmt1) + "  fps algorithm = " + Format(task.fpsAlgorithm, fmt1))
+
+
+
+
                 If fpsListA.Count > 5 Then
                     fpsListA.RemoveAt(0)
                     fpsListC.RemoveAt(0)

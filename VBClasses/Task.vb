@@ -481,22 +481,22 @@ Public Class VBtask : Implements IDisposable
 
         updateSettings()
 
-        'If algorithm_ms.Count = 0 Then
-        '    algorithmNames.Add("waitingForInput")
-        '    algorithmTimes.Add(Now)
-        '    algorithm_ms.Add(0)
+        If algorithm_ms.Count = 0 Then
+            algorithmNames.Add("waitingForInput")
+            algorithmTimes.Add(Now)
+            algorithm_ms.Add(0)
 
-        '    algorithmNames.Add(settings.algorithm)
-        '    algorithmTimes.Add(Now)
-        '    algorithm_ms.Add(0)
+            algorithmNames.Add(settings.algorithm)
+            algorithmTimes.Add(Now)
+            algorithm_ms.Add(0)
 
-        '    algorithmStack = New Stack()
-        '    algorithmStack.Push(0)
-        '    algorithmStack.Push(1)
-        'End If
+            algorithmStack = New Stack()
+            algorithmStack.Push(0)
+            algorithmStack.Push(1)
+        End If
 
-        'algorithm_ms(0) += waitingForInput
-        'algorithmTimes(3) = Now  ' starting the main algorithm
+        algorithm_ms(0) += waitingForInput
+        algorithmTimes(3) = Now  ' starting the main algorithm
 
         Dim src = task.color
         If src.Width = 0 Or task.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
