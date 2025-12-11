@@ -6,13 +6,11 @@ Namespace MainForm
         Public camera As GenericCamera = Nothing
         Dim cameraRunning As Boolean = False
         Dim dstImages As CameraImages
-        Public dstsready As Boolean
         Private Sub camSwitchAnnouncement()
             CameraSwitching.Visible = True
             CameraSwitching.Text = settings.cameraName + " starting"
             CameraSwitching.BringToFront()
             CamSwitchTimer.Enabled = True
-            dstsready = False
             Application.DoEvents()
         End Sub
         Private Sub StartUpTimer_Tick(sender As Object, e As EventArgs) Handles StartUpTimer.Tick
@@ -57,14 +55,19 @@ Namespace MainForm
         End Sub
         Private Sub Camera_FrameReady(sender As GenericCamera)
             ' This event is raised from the background thread, so we need to marshal to UI thread
-            Me.BeginInvoke(Sub()
-                               sender.camImages.images(0).CopyTo(task.color)
-                               sender.camImages.images(1).CopyTo(task.pointCloud)
-                               sender.camImages.images(2).CopyTo(task.leftView)
-                               sender.camImages.images(3).CopyTo(task.rightView)
+            Me.Invoke(Sub()
+                          sender.camImages.images(0).CopyTo(task.color)
+                          sender.camImages.images(1).CopyTo(task.pointCloud)
+                          sender.camImages.images(2).CopyTo(task.leftView)
+                          sender.camImages.images(3).CopyTo(task.rightView)
 
-                               dstsready = True
-                           End Sub)
+                          ' task.RunAlgorithm()
+                          task.dstList = {task.color, task.color, task.leftView, task.rightView}
+
+                          For i = 0 To task.dstList.Count - 1
+                              UpdatePictureBox(pics(i), task.dstList(i))
+                          Next
+                      End Sub)
         End Sub
         Private Sub UpdatePictureBox(picBox As PictureBox, image As cv.Mat)
             If task Is Nothing Then Exit Sub

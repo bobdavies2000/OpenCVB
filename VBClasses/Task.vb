@@ -8,7 +8,6 @@ Imports cv = OpenCvSharp
 #Region "taskProcess"
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
-    Public dstsReady As Boolean
     Public dstList() As cv.Mat
 
     Public optionsChanged As Boolean

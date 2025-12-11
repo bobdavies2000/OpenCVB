@@ -242,19 +242,6 @@ Namespace MainForm
 
             StartUpTimer.Enabled = True
             Me.Show()
-
-            While (1)
-                Application.DoEvents()
-                If dstsready Then
-                    dstsready = False
-                    If closingDown Then Exit While
-                    task.RunAlgorithm()
-
-                    For i = 0 To task.dstList.Count - 1
-                        UpdatePictureBox(pics(i), task.dstList(i))
-                    Next
-                End If
-            End While
         End Sub
         Private Sub TreeViewTimer_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
             If task.treeView IsNot Nothing Then task.treeView.Timer2_Tick(sender, e)

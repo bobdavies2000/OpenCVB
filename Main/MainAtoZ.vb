@@ -17,7 +17,7 @@ Namespace MainForm
             GroupDataView.CellBorderStyle = DataGridViewCellBorderStyle.None
             GroupDataView.ColumnHeadersVisible = False
             GroupDataView.RowHeadersVisible = False
-            Dim grplines = File.ReadAllLines(homeDir.FullName + "/Data/GroupButtonList.txt")
+            Dim grplines = File.ReadAllLines(homeDir.FullName + "/GroupButtonList.txt")
 
             Dim colsPerRow = 8
             Dim rowsPerCol = 32
@@ -47,14 +47,14 @@ Namespace MainForm
             If e.RowIndex >= 0 AndAlso e.ColumnIndex >= 0 Then
                 selectedGroup = GroupDataView.Rows(e.RowIndex).Cells(e.ColumnIndex).Value?.ToString()
                 Me.DialogResult = DialogResult.OK
-                Me.Hide()
+                Me.Close()
             End If
         End Sub
 
         Private Sub Groups_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
             If e.KeyCode = Keys.Escape Then
                 Me.DialogResult = DialogResult.Cancel
-                Me.Hide()
+                Me.Close()
             End If
         End Sub
     End Class
