@@ -135,7 +135,7 @@ Namespace MainForm
             AvailableAlgorithms.MaxLength = 100
             AvailableAlgorithms.Name = "AvailableAlgorithms"
             AvailableAlgorithms.Size = New Size(350, 39)
-            AvailableAlgorithms.Text = "Available Algorithms"
+            AvailableAlgorithms.Text = ""
             ' 
             ' AtoZ
             ' 
@@ -267,7 +267,7 @@ Namespace MainForm
             ' CameraSwitching
             ' 
             CameraSwitching.AutoSize = True
-            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12F)
+            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12.0F)
             CameraSwitching.Location = New Point(61, 122)
             CameraSwitching.Name = "CameraSwitching"
             CameraSwitching.Size = New Size(202, 29)
@@ -288,7 +288,7 @@ Namespace MainForm
             ' 
             ' MainForm
             ' 
-            AutoScaleDimensions = New SizeF(12F, 30F)
+            AutoScaleDimensions = New SizeF(12.0F, 30.0F)
             AutoScaleMode = AutoScaleMode.Font
             ClientSize = New Size(1275, 1171)
             Controls.Add(CameraSwitching)

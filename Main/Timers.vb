@@ -6,6 +6,7 @@ Namespace MainForm
         Dim fpsListC As New List(Of Single)
         Dim totalBytesOfMemoryUsed As Integer
         Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
+            If task Is Nothing Then Exit Sub
             Static lastTime As DateTime = Now
             Static lastAlgorithmFrame As Integer
             Static lastCameraFrame As Integer

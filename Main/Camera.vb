@@ -1,6 +1,17 @@
 ﻿Imports System.Numerics
 Imports System.Threading
 Imports cv = OpenCvSharp
+Public Class CameraImages
+    Public images() As cv.Mat
+    Public Sub New(workRes As cv.Size)
+        images = {New cv.Mat(workRes, cv.MatType.CV_8UC3, 0),
+                  New cv.Mat(workRes, cv.MatType.CV_32FC3, 0),
+                  New cv.Mat(workRes, cv.MatType.CV_8UC1, 0),
+                  New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)}
+    End Sub
+    Public Sub New()
+    End Sub
+End Class
 Public Structure intrinsicData
     Public ppx As Single
     Public ppy As Single
@@ -23,19 +34,7 @@ Public Structure cameraInfo
     Public v_fov As Single ' vertical field of view in degrees.
     Public h_fov As Single ' horizontal field of view in degrees.
     Public d_fov As Single ' diagonal field of view in degrees.
-
 End Structure
-Public Class CameraImages
-    Public images() As cv.Mat
-    Public Sub New(workRes As cv.Size)
-        images = {New cv.Mat(workRes, cv.MatType.CV_8UC3, 0),
-                  New cv.Mat(workRes, cv.MatType.CV_32FC3, 0),
-                  New cv.Mat(workRes, cv.MatType.CV_8UC1, 0),
-                  New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)}
-    End Sub
-    Public Sub New()
-    End Sub
-End Class
 
 Public Class GenericCamera
     Public transformationMatrix() As Single
@@ -109,6 +108,7 @@ Public Class GenericCamera
     End Sub
     Public Sub childStopCamera()
         StopCamera()
+        cameraFrameCount = -1
     End Sub
     Public Overridable Sub StopCamera()
     End Sub

@@ -72,7 +72,7 @@ Public Class VBtask : Implements IDisposable
     Public algorithmStack As New Stack()
     Public displayObjectName As String
     Public activeObjects As New List(Of Object)
-    Public calibData As cameraInfo
+    Public calibData As Object
 
     Public desc As String = ""
 
@@ -304,30 +304,6 @@ Public Class VBtask : Implements IDisposable
     Public displayDst1 As Boolean
     Public depthAndDepthRange As String = ""
     Public sharpGL As VBClasses.SharpGLForm
-
-    Public Structure intrinsicData
-        Public ppx As Single
-        Public ppy As Single
-        Public fx As Single
-        Public fy As Single
-    End Structure
-    Public Structure cameraInfo
-        Public baseline As Single ' this is the baseline of the left to right cameras
-
-        Public rgbIntrinsics As intrinsicData
-        Public leftIntrinsics As intrinsicData
-        Public rightIntrinsics As intrinsicData
-
-        Public ColorToLeft_translation() As Single
-        Public ColorToLeft_rotation() As Single
-
-        Public LtoR_translation() As Single
-        Public LtoR_rotation() As Single
-
-        Public v_fov As Single ' vertical field of view in degrees.
-        Public h_fov As Single ' horizontal field of view in degrees.
-        Public d_fov As Single ' diagonal field of view in degrees.
-    End Structure
 
 #End Region
     Private Function findDisplayObject(lookupName As String) As TaskParent

@@ -14,7 +14,6 @@ Namespace MainForm
         Dim pics As List(Of PictureBox)
         Public task As VBClasses.VBtask
         Dim testAllRunning As Boolean = False
-        Dim closingDown As Boolean = False
         Public Sub jumpToAlgorithm()
             If AvailableAlgorithms.Items.Contains(settings.algorithm) = False Then
                 AvailableAlgorithms.SelectedIndex = 0
@@ -98,11 +97,11 @@ Namespace MainForm
                 settings.cameraIndex = optionsForm.cameraIndex
 
                 SaveSettings()
+                camSwitchAnnouncement()
 
                 StopCamera()
-                camSwitchAnnouncement()
-                Application.DoEvents()
                 StartCamera()
+                startAlgorithm()
             End If
         End Sub
         Private Sub LoadAvailableAlgorithms()
@@ -119,8 +118,6 @@ Namespace MainForm
                 End If
                 AvailableAlgorithms.Items.Add(nextline)
             Next
-
-            jumpToAlgorithm()
         End Sub
         Private Sub Magnifier_Click(sender As Object, e As EventArgs) Handles Magnifier.Click
 
@@ -148,10 +145,20 @@ Namespace MainForm
             If task IsNot Nothing Then If task.allOptions IsNot Nothing Then task.allOptions.Activate()
         End Sub
         Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-            closingDown = True
             SaveSettings()
             task = Nothing
             StopCamera()
+        End Sub
+        Private Sub startAlgorithm()
+            task = New VBClasses.VBtask()
+
+            task.settings = settings
+            task.main_hwnd = Me.Handle
+
+            task.Initialize()
+            task.MainUI_Algorithm = createAlgorithm(settings.algorithm)
+
+            task.calibData = camera.calibData
         End Sub
         Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
             isPlaying = Not isPlaying
@@ -165,19 +172,12 @@ Namespace MainForm
             ' Force the button to refresh
             PausePlayButton.Invalidate()
 
-            task = New VBClasses.VBtask()
-
-            mainFrm = Me
-            task.settings = settings
-            task.main_hwnd = Me.Handle
-
-            task.Initialize()
-            task.MainUI_Algorithm = createAlgorithm(settings.algorithm)
-
             If isPlaying Then StartCamera() Else StopCamera()
             TreeViewTimer.Enabled = True
+
+            jumpToAlgorithm()
         End Sub
-        Private Sub codeLines()
+        Private Sub getLineCounts()
             Dim countFileInfo = New FileInfo(homeDir + "Data/AlgorithmCounts.txt")
             If countFileInfo.Exists = False Then
                 MessageBox.Show("The AlgorithmCounts.txt file is missing.  Run 'UI_Generator' or rebuild all to rebuild the user interface.")
@@ -254,16 +254,17 @@ Namespace MainForm
             Me.Size = New Size(settings.MainFormWidth, settings.MainFormHeight)
 
             camSwitchAnnouncement()
+            getLineCounts()
 
             LoadAvailableAlgorithms()
 
-            codeLines()
             setupAlgorithmHistory()
 
-            StartUpTimer.Enabled = True
+            PausePlayButton.PerformClick()
             Me.Show()
         End Sub
         Private Sub TreeViewTimer_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
+            If task Is Nothing Then Exit Sub
             If task.treeView IsNot Nothing Then task.treeView.Timer2_Tick(sender, e)
         End Sub
 
@@ -271,7 +272,23 @@ Namespace MainForm
             testAllRunning = True
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
+            settings.algorithm = AvailableAlgorithms.Text
+            If task Is Nothing Then
+                startAlgorithm()
+            Else
+                If Trim(AvailableAlgorithms.Text) = "" Then ' Skip the space between groups
+                    If AvailableAlgorithms.SelectedIndex + 1 < AvailableAlgorithms.Items.Count Then
+                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1)
+                    Else
+                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex - 1)
+                    End If
+                End If
 
+                If AvailableAlgorithms.Enabled Then
+                    startAlgorithm()
+                    updateAlgorithmHistory()
+                End If
+            End If
         End Sub
     End Class
 End Namespace

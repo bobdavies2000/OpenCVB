@@ -13,13 +13,13 @@ Namespace MainForm
             CamSwitchTimer.Enabled = True
             Application.DoEvents()
         End Sub
-        Private Sub StartUpTimer_Tick(sender As Object, e As EventArgs) Handles StartUpTimer.Tick
-            StartUpTimer.Enabled = False
-            PausePlayButton.PerformClick()
-        End Sub
         Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
             Application.DoEvents()
             Me.Refresh()
+        End Sub
+        Private Sub StartUpTimer_Tick(sender As Object, e As EventArgs) Handles StartUpTimer.Tick
+            StartUpTimer.Enabled = False
+            PausePlayButton.PerformClick()
         End Sub
         Private Sub StartCamera()
             ' Select camera based on settings.cameraName
@@ -38,11 +38,6 @@ Namespace MainForm
 
             AddHandler camera.FrameReady, AddressOf Camera_FrameReady
 
-            Cloud_Basics.ppx = mainfrm.camera.calibData.rgbIntrinsics.ppx
-            Cloud_Basics.ppy = mainfrm.camera.calibData.rgbIntrinsics.ppy
-            Cloud_Basics.fx = mainfrm.camera.calibData.rgbIntrinsics.fx
-            Cloud_Basics.fy = mainfrm.camera.calibData.rgbIntrinsics.fy
-
             fpsTimer.Enabled = True
         End Sub
         Private Sub StopCamera()
@@ -54,6 +49,7 @@ Namespace MainForm
             End If
         End Sub
         Private Sub Camera_FrameReady(sender As GenericCamera)
+            If task Is Nothing Then Exit Sub
             ' This event is raised from the background thread, so we need to marshal to UI thread
             Me.Invoke(Sub()
                           sender.camImages.images(0).CopyTo(task.color)
