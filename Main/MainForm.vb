@@ -81,27 +81,15 @@ Namespace MainForm
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             Dim optionsForm As New MainOptions()
 
-            optionsForm.MainOptions_Load(sender, e)
-            optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True
-            Dim resStr = CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height)
-            For i = 0 To optionsForm.resolutionList.Count - 1
-                If optionsForm.resolutionList(i).StartsWith(resStr) Then
-                    optionsForm.workResRadio(i).Checked = True
+            If optionsForm.ShowDialog() = DialogResult.OK Then
+                If settings.workRes <> task.workRes And settings.cameraName <> task.cameraName Then
+                    SaveSettings()
+                    camSwitchAnnouncement()
+
+                    StopCamera()
+                    StartCamera()
+                    startAlgorithm()
                 End If
-            Next
-
-            Dim OKcancel = optionsForm.ShowDialog()
-
-            If OKcancel = DialogResult.OK Then
-                settings.cameraName = optionsForm.cameraName
-                settings.cameraIndex = optionsForm.cameraIndex
-
-                SaveSettings()
-                camSwitchAnnouncement()
-
-                StopCamera()
-                StartCamera()
-                startAlgorithm()
             End If
         End Sub
         Private Sub LoadAvailableAlgorithms()

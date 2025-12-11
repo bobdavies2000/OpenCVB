@@ -76,6 +76,7 @@ Namespace MainForm
             captureThread = New Thread(AddressOf CaptureFrames)
             captureThread.IsBackground = True
             captureThread.Name = "RS2_CaptureThread"
+            camImages = New CameraImages(workRes)
             captureThread.Start()
         End Sub
         Private Sub CaptureFrames()

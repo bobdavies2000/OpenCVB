@@ -17,10 +17,6 @@ Namespace MainForm
             Application.DoEvents()
             Me.Refresh()
         End Sub
-        Private Sub StartUpTimer_Tick(sender As Object, e As EventArgs) Handles StartUpTimer.Tick
-            StartUpTimer.Enabled = False
-            PausePlayButton.PerformClick()
-        End Sub
         Private Sub StartCamera()
             ' Select camera based on settings.cameraName
             Select Case settings.cameraName

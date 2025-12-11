@@ -5,7 +5,6 @@ Imports cv = OpenCvSharp
 
 Namespace MainForm
     Public Class Json
-        Public cameraIndex As Integer
         Public cameraName As String = "StereoLabs ZED 2/2I"
         Public cameraPresent As List(Of Boolean)
         Public cameraFound As Boolean
@@ -97,33 +96,15 @@ Namespace MainForm
                 settings.cameraPresent.Add(present)
             Next
 
-            If settings.cameraName = "" Or settings.cameraPresent(settings.cameraIndex) = False Then
+            Dim index = cameraNames.IndexOf(settings.cameraName)
+            If settings.cameraName = "" Or settings.cameraPresent(index) = False Then
                 For i = 0 To cameraNames.Count - 1
                     If settings.cameraPresent(i) Then
-                        settings.cameraIndex = i
                         settings.cameraName = cameraNames(i)
                         Exit For
                     End If
                 Next
-            Else
-                For i = 0 To cameraNames.Count - 1
-                    If cameraNames(i) = settings.cameraName Then settings.cameraIndex = i
-                Next
             End If
-
-            For i = 0 To cameraNames.Count - 1
-                If cameraNames(i).StartsWith("Orbbec") Then
-                    If cameraNames(i) = settings.cameraName Then
-                        settings.cameraIndex = i
-                        Exit For
-                    End If
-                Else
-                    If cameraNames(i).Contains(settings.cameraName) And settings.cameraName <> "" Then
-                        settings.cameraIndex = i
-                        Exit For
-                    End If
-                End If
-            Next
 
             settings.cameraFound = False
             For i = 0 To settings.cameraPresent.Count - 1

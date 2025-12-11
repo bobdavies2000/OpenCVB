@@ -1,9 +1,9 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.ComponentModel
+Imports VBClasses
+Imports cv = OpenCvSharp
 Public Class MainOptions
-    Public cameraRadioButton() As RadioButton
+    Public cameraRadioButton(cameraNames.Count - 1) As RadioButton
     Public workResRadio() As RadioButton
-    Public cameraName As String
-    Public cameraIndex As Integer
     '     "1344x752 - Full resolution", "672x376 - Quarter resolution", "336x188 - Small resolution  ",
     Public resolutionList As New List(Of String)(
         {"1920x1080 - Full resolution", "960x540 - Quarter resolution", "480x270 - Small resolution",
@@ -11,6 +11,7 @@ Public Class MainOptions
          "640x480 - Full resolution", "320x240 - Quarter resolution", "160x120 - Small resolution",
          "960x600 - Full resolution", "480x300 - Quarter resolution", "240x150 - Small resolution  ",
          "672x376 - Full resolution", "336x188 - Quarter resolution", "168x94 - Small resolution    "})
+    Dim formLoadComplete As Boolean
     Private Sub OKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OKButton.Click
         With settings
             For Each radio In Resolutions.Controls
@@ -26,9 +27,9 @@ Public Class MainOptions
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
-    Public Sub defineCameraResolutions(index As Integer)
+    Public Sub defineCameraResolutions()
         ' see resolutionList - helps to see how code maps to layout of the resolutions.
-        Select Case cameraNames(index)
+        Select Case settings.cameraName
             Case "StereoLabs ZED 2/2i"
                 settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
                                                                       True, True, True,
@@ -56,57 +57,59 @@ Public Class MainOptions
         End Select
     End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
-        Dim index = cameraNames.IndexOf(sender.text)
-        cameraName = cameraNames(index)
-        cameraIndex = index
+        If formLoadComplete = False Then Exit Sub
 
-        defineCameraResolutions(cameraIndex)
+        settings.cameraName = cameraNames.IndexOf(sender.text)
+
+        defineCameraResolutions()
 
         For i = 0 To workResRadio.Count - 1
             workResRadio(i).Enabled = settings.resolutionsSupported(i)
         Next
 
-        If cameraName.StartsWith("StereoLabs") Then
+        If settings.cameraName.StartsWith("StereoLabs") Then
             workResRadio(resolutionList.IndexOf("336x188 - Quarter resolution")).Checked = True
         Else
             workResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
         End If
     End Sub
     Public Sub MainOptions_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        ReDim cameraRadioButton(cameraNames.Count - 1)
-        Static radioButtonsPresent = False
-        defineCameraResolutions(cameraIndex)
+        For i = 0 To cameraRadioButton.Count - 1
+            cameraRadioButton(i) = New RadioButton With {.Visible = True, .AutoSize = True,
+                                   .Enabled = settings.cameraPresent(i), .Text = cameraNames(i)}
+            CameraGroup.Controls.Add(cameraRadioButton(i))
+            AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
+            If settings.cameraName = cameraNames(i) Then cameraRadioButton(i).Checked = True
+        Next
 
-        If radioButtonsPresent = False Then
-            radioButtonsPresent = True
-            For i = 0 To cameraRadioButton.Count - 1
-                cameraRadioButton(i) = New RadioButton With {.Visible = True, .AutoSize = True,
-                                       .Enabled = settings.cameraPresent(i), .Text = cameraNames(i)}
-                CameraGroup.Controls.Add(cameraRadioButton(i))
-                AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
-            Next
+        defineCameraResolutions()
 
-            ReDim workResRadio(resolutionList.Count - 1)
-            For i = 0 To workResRadio.Count - 1
-                workResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i,
+        ReDim workResRadio(resolutionList.Count - 1)
+        Dim resStr = CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height)
+        For i = 0 To workResRadio.Count - 1
+            workResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i,
                                      .AutoSize = True, .Visible = True}
-                workResRadio(i).Enabled = settings.resolutionsSupported(i)
-                Resolutions.Controls.Add(workResRadio(i))
-            Next
-        End If
+            workResRadio(i).Enabled = settings.resolutionsSupported(i)
+            Resolutions.Controls.Add(workResRadio(i))
+            If resolutionList(i).StartsWith(resStr) Then workResRadio(i).Checked = True
+        Next
+        formLoadComplete = True
     End Sub
     Private Sub MainOptions_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.Escape Then Cancel_Button_Click(sender, e)
     End Sub
     Private Sub Cancel_Button_Click(sender As Object, e As EventArgs) Handles Cancel_Button.Click
-        MainOptions_Load(sender, e) ' restore the settings to what they were on entry...
-        Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.Hide()
+        Me.DialogResult = DialogResult.Cancel
+        Me.Close()
     End Sub
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         FontDialog1.Font = settings.fontInfo
         If FontDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
             settings.fontInfo = FontDialog1.Font
         End If
+    End Sub
+
+    Private Sub MainOptions_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        Dim k = 0
     End Sub
 End Class

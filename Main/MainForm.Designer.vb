@@ -46,7 +46,6 @@ Namespace MainForm
             labelLeft = New Label()
             labelRight = New Label()
             StatusLabel = New Label()
-            StartUpTimer = New Timer(components)
             CameraSwitching = New Label()
             CamSwitchTimer = New Timer(components)
             fpsTimer = New Timer(components)
@@ -135,7 +134,6 @@ Namespace MainForm
             AvailableAlgorithms.MaxLength = 100
             AvailableAlgorithms.Name = "AvailableAlgorithms"
             AvailableAlgorithms.Size = New Size(350, 39)
-            AvailableAlgorithms.Text = ""
             ' 
             ' AtoZ
             ' 
@@ -260,14 +258,10 @@ Namespace MainForm
             StatusLabel.TabIndex = 2
             StatusLabel.TextAlign = ContentAlignment.MiddleLeft
             ' 
-            ' StartUpTimer
-            ' 
-            StartUpTimer.Interval = 500
-            ' 
             ' CameraSwitching
             ' 
             CameraSwitching.AutoSize = True
-            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12.0F)
+            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12F)
             CameraSwitching.Location = New Point(61, 122)
             CameraSwitching.Name = "CameraSwitching"
             CameraSwitching.Size = New Size(202, 29)
@@ -276,7 +270,8 @@ Namespace MainForm
             ' 
             ' CamSwitchTimer
             ' 
-            CamSwitchTimer.Interval = 10
+            CamSwitchTimer.Enabled = True
+            CamSwitchTimer.Interval = 1
             ' 
             ' fpsTimer
             ' 
@@ -288,7 +283,7 @@ Namespace MainForm
             ' 
             ' MainForm
             ' 
-            AutoScaleDimensions = New SizeF(12.0F, 30.0F)
+            AutoScaleDimensions = New SizeF(12F, 30F)
             AutoScaleMode = AutoScaleMode.Font
             ClientSize = New Size(1275, 1171)
             Controls.Add(CameraSwitching)
@@ -337,7 +332,6 @@ Namespace MainForm
         Friend WithEvents labelLeft As Label
         Friend WithEvents labelRight As Label
         Friend WithEvents StatusLabel As Label
-        Friend WithEvents StartUpTimer As Timer
         Friend WithEvents CameraSwitching As Label
         Friend WithEvents CamSwitchTimer As Timer
         Friend WithEvents fpsTimer As Timer
