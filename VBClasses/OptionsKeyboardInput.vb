@@ -6,7 +6,7 @@ Public Class OptionsKeyboardInput
     Public Sub Setup(traceName As String)
         Me.MdiParent = task.allOptions
         Me.Text = traceName + " Keyboard Options"
-        allOptions.addTitle(Me)
+        task.allOptions.addTitle(Me)
     End Sub
     Private Sub TextBox1_KeyUp(sender As Object, e As KeyEventArgs) Handles TextBox1.KeyUp
         inputText.Add(e.KeyCode.ToString)

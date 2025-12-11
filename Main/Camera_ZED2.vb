@@ -33,6 +33,7 @@ Namespace MainForm
             captureThread.IsBackground = True
             captureThread.Name = "ZED2_CaptureThread"
             captureThread.Start()
+            camImages = New CameraImages(workRes)
         End Sub
         Private Sub CaptureFrames()
             While isCapturing

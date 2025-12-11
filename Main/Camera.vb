@@ -89,7 +89,6 @@ Public Class GenericCamera
         Public mapperConfidence As Integer
     End Structure
     Public Sub New()
-        camImages = New CameraImages(workRes)
         cameraFrameCount = 0
     End Sub
     Public Sub GetNextFrameCounts(frameTime As Double)

@@ -2,7 +2,6 @@
 Namespace MainForm
     Partial Public Class MainForm
         Dim DrawingRectangle As Boolean
-        Dim drawRect As New cv.Rect
         Dim LastX As Integer
         Dim LastY As Integer
         Dim mouseClickFlag As Boolean
@@ -20,6 +19,7 @@ Namespace MainForm
             End Try
         End Sub
         Private Sub CamPic_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles campicRGB.MouseDown, campicPointCloud.MouseDown, campicLeft.MouseDown, campicRight.MouseDown
+            If task Is Nothing Then Exit Sub
             Dim x As Integer = e.X * settings.workRes.Width / campicRGB.Width
             Dim y As Integer = e.Y * settings.workRes.Height / campicRGB.Height
             Try
@@ -30,8 +30,8 @@ Namespace MainForm
                 If e.Button = System.Windows.Forms.MouseButtons.Left Then
                     DrawingRectangle = True
                     BothFirstAndLastReady = False ' we have to see some movement after mousedown.
-                    drawRect.Width = 0
-                    drawRect.Height = 0
+                    task.drawRect.Width = 0
+                    task.drawRect.Height = 0
                     mouseDownPoint.X = x
                     mouseDownPoint.Y = y
                 End If
@@ -40,39 +40,41 @@ Namespace MainForm
             End Try
         End Sub
         Private Sub CamPic_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles campicRGB.MouseMove, campicPointCloud.MouseMove, campicLeft.MouseMove, campicRight.MouseMove
+            If task Is Nothing Then Exit Sub
+
             Dim x As Integer = e.X * settings.workRes.Width / campicRGB.Width
             Dim y As Integer = e.Y * settings.workRes.Height / campicRGB.Height
-            Try
-                Dim pic = DirectCast(sender, PictureBox)
-                mousePicTag = pic.Tag
-                If activeMouseDown Then Exit Sub
-                If DrawingRectangle Then
-                    mouseMovePoint.X = x
-                    mouseMovePoint.Y = y
-                    If mouseMovePoint.X < 0 Then mouseMovePoint.X = 0
-                    If mouseMovePoint.Y < 0 Then mouseMovePoint.Y = 0
-                    drawRect.X = Math.Min(mouseDownPoint.X, mouseMovePoint.X)
-                    drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
-                    drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
-                    drawRect.Height = Math.Abs(mouseDownPoint.Y - mouseMovePoint.Y)
-                    If drawRect.X + drawRect.Width > campicRGB.Width Then drawRect.Width = campicRGB.Width - drawRect.X
-                    If drawRect.Y + drawRect.Height > campicRGB.
-                        Height Then drawRect.Height = campicRGB.Height - drawRect.Y
-                    BothFirstAndLastReady = True
+            Dim pic = DirectCast(sender, PictureBox)
+            mousePicTag = pic.Tag
+            If activeMouseDown Then Exit Sub
+            If DrawingRectangle Then
+                mouseMovePoint.X = x
+                mouseMovePoint.Y = y
+                If mouseMovePoint.X < 0 Then mouseMovePoint.X = 0
+                If mouseMovePoint.Y < 0 Then mouseMovePoint.Y = 0
+                task.drawRect.X = Math.Min(mouseDownPoint.X, mouseMovePoint.X)
+                task.drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
+                task.drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
+                task.drawRect.Height = Math.Abs(mouseDownPoint.Y - mouseMovePoint.Y)
+                If task.drawRect.X + task.drawRect.Width > campicRGB.Width Then task.drawRect.Width = campicRGB.Width - task.drawRect.X
+                If task.drawRect.Y + task.drawRect.Height > campicRGB.Height Then
+                    task.drawRect.Height = campicRGB.Height - task.drawRect.Y
                 End If
-
-            Catch ex As Exception
-                Debug.WriteLine("Error in camPic_MouseMove: " + ex.Message)
-            End Try
+                BothFirstAndLastReady = True
+            End If
 
             StatusLabel.Text = String.Format("X: {0}, Y: {1}    ", x, y)
-            StatusLabel.Text += String.Format("Last click: {0}, {1}    ", task.clickPoint.X, task.clickPoint.Y)
+            If task IsNot Nothing Then
+                StatusLabel.Text += String.Format("Last click: {0}, {1}    ", task.clickPoint.X, task.clickPoint.Y)
+            End If
 
-            If drawRect.Width > 0 And drawRect.Height > 0 Then
-                StatusLabel.Text += "DrawRect = " + String.Format("x: {0}, y: {1}, w: {2}, h: {3}", drawRect.X, drawRect.Y, drawRect.Width, drawRect.Height)
+            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
+                StatusLabel.Text += "DrawRect = " + String.Format("x: {0}, y: {1}, w: {2}, h: {3}", task.drawRect.X, task.drawRect.Y,
+                                    task.drawRect.Width, task.drawRect.Height)
             End If
         End Sub
         Private Sub PictureBox_MouseClick(sender As Object, e As MouseEventArgs) Handles campicRGB.MouseClick, campicPointCloud.MouseClick, campicLeft.MouseClick, campicRight.MouseClick
+            If task Is Nothing Then Exit Sub
             Dim picBox = TryCast(sender, PictureBox)
             Dim x As Integer = e.X * settings.workRes.Width / campicRGB.Width
             Dim y As Integer = e.Y * settings.workRes.Height / campicRGB.Height

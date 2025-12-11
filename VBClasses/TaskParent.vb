@@ -65,29 +65,29 @@ Public Class TaskParent : Implements IDisposable
         task.activeObjects.Add(Me)
 
         If standalone Then
-            task.algorithm_ms.Clear()
-            task.algorithmNames.Clear()
-            task.algorithmNames.Add("waitingForInput")
-            task.algorithmTimes.Add(Now)
-            task.algorithm_ms.Add(0)
+            'task.algorithm_ms.Clear()
+            'task.algorithmNames.Clear()
+            'task.algorithmNames.Add("waitingForInput")
+            'task.algorithmTimes.Add(Now)
+            'task.algorithm_ms.Add(0)
 
-            task.algorithmNames.Add("inputBufferCopy")
-            task.algorithmTimes.Add(Now)
-            task.algorithm_ms.Add(0)
+            'task.algorithmNames.Add("inputBufferCopy")
+            'task.algorithmTimes.Add(Now)
+            'task.algorithm_ms.Add(0)
 
-            task.algorithmNames.Add("ReturnCopyTime")
-            task.algorithmTimes.Add(Now)
-            task.algorithm_ms.Add(0)
+            'task.algorithmNames.Add("ReturnCopyTime")
+            'task.algorithmTimes.Add(Now)
+            'task.algorithm_ms.Add(0)
 
-            task.algorithmNames.Add(traceName)
-            task.algorithmTimes.Add(Now)
-            task.algorithm_ms.Add(0)
+            'task.algorithmNames.Add(traceName)
+            'task.algorithmTimes.Add(Now)
+            'task.algorithm_ms.Add(0)
 
-            task.algorithmStack = New Stack()
-            task.algorithmStack.Push(0)
-            task.algorithmStack.Push(1)
-            task.algorithmStack.Push(2)
-            task.algorithmStack.Push(3)
+            'task.algorithmStack = New Stack()
+            'task.algorithmStack.Push(0)
+            'task.algorithmStack.Push(1)
+            'task.algorithmStack.Push(2)
+            'task.algorithmStack.Push(3)
         End If
     End Sub
     Public Shared Function CaptureScreen() As Bitmap

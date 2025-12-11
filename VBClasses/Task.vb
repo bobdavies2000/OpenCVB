@@ -481,24 +481,23 @@ Public Class VBtask : Implements IDisposable
         End If
 
         updateSettings()
-        Exit Sub
 
-        If algorithm_ms.Count = 0 Then
-            algorithmNames.Add("waitingForInput")
-            algorithmTimes.Add(Now)
-            algorithm_ms.Add(0)
+        'If algorithm_ms.Count = 0 Then
+        '    algorithmNames.Add("waitingForInput")
+        '    algorithmTimes.Add(Now)
+        '    algorithm_ms.Add(0)
 
-            algorithmNames.Add(settings.algorithm)
-            algorithmTimes.Add(Now)
-            algorithm_ms.Add(0)
+        '    algorithmNames.Add(settings.algorithm)
+        '    algorithmTimes.Add(Now)
+        '    algorithm_ms.Add(0)
 
-            algorithmStack = New Stack()
-            algorithmStack.Push(0)
-            algorithmStack.Push(1)
-        End If
+        '    algorithmStack = New Stack()
+        '    algorithmStack.Push(0)
+        '    algorithmStack.Push(1)
+        'End If
 
-        algorithm_ms(0) += waitingForInput
-        algorithmTimes(3) = Now  ' starting the main algorithm
+        'algorithm_ms(0) += waitingForInput
+        'algorithmTimes(3) = Now  ' starting the main algorithm
 
         Dim src = task.color
         If src.Width = 0 Or task.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
@@ -623,7 +622,7 @@ Public Class VBtask : Implements IDisposable
             firstPass = False
             heartBeatLT = False
 
-            Dim displayObject = findDisplayObject(displayObjectName)
+            Dim displayObject = task.MainUI_Algorithm '  findDisplayObject(displayObjectName)
             postProcess(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
 
             SyncLock resultLock
@@ -682,7 +681,7 @@ Public Class VBtask : Implements IDisposable
                                            New cv.Point(workRes.Width / 3, workRes.Height / 2), 2))
             End If
 
-            trueData = New List(Of TrueText)(displayObject.trueData)
+            trueData = New List(Of TrueText) ' (displayObject.trueData)
             displayObject.trueData.Clear()
             labels = displayObject.labels
             If displayDst1 Then labels(1) = displayObject.labels(1)

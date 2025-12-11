@@ -14,6 +14,7 @@ Namespace MainForm
         Dim pics As List(Of PictureBox)
         Public task As VBClasses.VBtask
         Dim testAllRunning As Boolean = False
+        Dim closingDown As Boolean = False
         Public Sub jumpToAlgorithm()
             If AvailableAlgorithms.Items.Contains(settings.algorithm) = False Then
                 AvailableAlgorithms.SelectedIndex = 0
@@ -84,27 +85,21 @@ Namespace MainForm
             End If
         End Sub
         Private Sub LoadAvailableAlgorithms()
-            Try
-                Dim algListPath = Path.Combine(CurDir(), "Data", "AvailableAlgorithms.txt")
-                If File.Exists(algListPath) Then
-                    AvailableAlgorithms.Items.Clear()
-                    Dim lines = File.ReadAllLines(algListPath)
-                    Dim lastGroup = "AddWeighted"
-                    For Each line In lines
-                        Dim nextline = line.Trim()
-                        Dim split = nextline.Split("_")
-                        If split(0) <> lastGroup Then
-                            AvailableAlgorithms.Items.Add(" ")
-                            lastGroup = split(0)
-                        End If
-                        AvailableAlgorithms.Items.Add(nextline)
-                    Next
-
-                    jumpToAlgorithm()
+            Dim algListPath = Path.Combine(CurDir(), "Data", "AvailableAlgorithms.txt")
+            AvailableAlgorithms.Items.Clear()
+            Dim lines = File.ReadAllLines(algListPath)
+            Dim lastGroup = "AddWeighted"
+            For Each line In lines
+                Dim nextline = line.Trim()
+                Dim split = nextline.Split("_")
+                If split(0) <> lastGroup Then
+                    AvailableAlgorithms.Items.Add(" ")
+                    lastGroup = split(0)
                 End If
-            Catch ex As Exception
-                ' If file doesn't exist or can't be read, leave combo box empty
-            End Try
+                AvailableAlgorithms.Items.Add(nextline)
+            Next
+
+            jumpToAlgorithm()
         End Sub
         Private Sub Magnifier_Click(sender As Object, e As EventArgs) Handles Magnifier.Click
 
@@ -132,6 +127,7 @@ Namespace MainForm
             If task IsNot Nothing Then If task.allOptions IsNot Nothing Then task.allOptions.Activate()
         End Sub
         Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+            closingDown = True
             SaveSettings()
             task = Nothing
             StopCamera()
@@ -140,9 +136,7 @@ Namespace MainForm
             isPlaying = Not isPlaying
 
             ' Load and set the appropriate image
-            If PausePlayButton.Image IsNot Nothing Then
-                PausePlayButton.Image.Dispose()
-            End If
+            If PausePlayButton.Image IsNot Nothing Then PausePlayButton.Image.Dispose()
 
             Dim filePath = Path.Combine(homeDir + "\Main\Data", If(isPlaying, "PauseButton.png", "Run.png"))
             PausePlayButton.Image = New Bitmap(filePath)
@@ -157,6 +151,7 @@ Namespace MainForm
             task.main_hwnd = Me.Handle
 
             task.Initialize()
+            task.MainUI_Algorithm = createAlgorithm(settings.algorithm)
 
             If isPlaying Then StartCamera() Else StopCamera()
             TreeViewTimer.Enabled = True
@@ -245,9 +240,21 @@ Namespace MainForm
             codeLines()
             setupAlgorithmHistory()
 
-
             StartUpTimer.Enabled = True
-            fpsTimer.Enabled = True
+            Me.Show()
+
+            While (1)
+                Application.DoEvents()
+                If dstsready Then
+                    dstsready = False
+                    If closingDown Then Exit While
+                    task.RunAlgorithm()
+
+                    For i = 0 To task.dstList.Count - 1
+                        UpdatePictureBox(pics(i), task.dstList(i))
+                    Next
+                End If
+            End While
         End Sub
         Private Sub TreeViewTimer_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
             If task.treeView IsNot Nothing Then task.treeView.Timer2_Tick(sender, e)

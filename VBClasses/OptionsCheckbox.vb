@@ -5,7 +5,7 @@ Public Class OptionsCheckbox
         If OptionParent.findFrm(traceName + " CheckBoxes") IsNot Nothing Then Return False
         Me.MdiParent = task.allOptions
         Me.Text = traceName + " CheckBoxes"
-        allOptions.addTitle(Me)
+        task.allOptions.addTitle(Me)
         Me.Show()
         Return True
     End Function
