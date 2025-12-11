@@ -24,25 +24,46 @@ Namespace MainForm
         End Sub
         Private Sub algHistory_Clicked(sender As Object, e As EventArgs)
             Dim item = TryCast(sender, ToolStripMenuItem)
-            If AvailableAlgorithms.Items.Contains(item.Text) = False Then
-                MessageBox.Show("That algorithm was not found" + vbCrLf + vbCrLf + "The name may have changed.")
-            Else
-                settings.algorithm = item.Text
-                jumpToAlgorithm()
-            End If
+            settings.algorithm = item.Text
+            jumpToAlgorithm()
         End Sub
         Public Sub setupAlgorithmHistory()
-            Const MAX_RECENT = 50
-            If recentMenu Is Nothing Then ReDim recentMenu(MAX_RECENT - 1)
-            For i = 0 To MAX_RECENT - 1
-                Dim nextA = GetSetting("OpenCVB", "algHistory" + CStr(i), "algHistory" + CStr(i), "recent algorithm " + CStr(i))
-                If nextA = "" Then Exit For
-                If algHistory.Contains(nextA) = False Then
-                    algHistory.Add(nextA)
-                    RecentList.DropDownItems.Add(nextA)
-                    AddHandler RecentList.DropDownItems(RecentList.DropDownItems.Count - 1).Click,
-                               AddressOf algHistory_Clicked
-                End If
+            If recentMenu Is Nothing Then ReDim recentMenu(settings.algorithmHistory.Count - 1)
+            For Each alg In settings.algorithmHistory
+                algHistory.Add(alg)
+                If AvailableAlgorithms.Items.Contains(alg) = False Then Continue For
+                RecentList.DropDownItems.Add(alg)
+                AddHandler RecentList.DropDownItems(RecentList.DropDownItems.Count - 1).Click, AddressOf algHistory_Clicked
+            Next
+        End Sub
+        Private Sub updateAlgorithmHistory()
+            If testAllRunning Then Exit Sub
+            Dim copyList As List(Of String)
+            Dim maxHistory As Integer = 50
+            If algHistory.Contains(AvailableAlgorithms.Text) Then
+                ' make it the most recent
+                copyList = New List(Of String)(algHistory)
+                algHistory.Clear()
+                algHistory.Add(AvailableAlgorithms.Text)
+                For i = 0 To copyList.Count - 1
+                    If algHistory.Contains(copyList(i)) = False Then algHistory.Add(copyList(i))
+                Next
+            Else
+                copyList = New List(Of String)(algHistory)
+                algHistory.Clear()
+                algHistory.Add(AvailableAlgorithms.Text)
+                For i = 0 To copyList.Count - 1
+                    If algHistory.Contains(copyList(i)) = False Then algHistory.Add(copyList(i))
+                    If algHistory.Count >= maxHistory Then Exit For
+                Next
+            End If
+            RecentList.DropDownItems.Clear()
+            settings.algorithmHistory = New List(Of String)
+            For i = 0 To algHistory.Count - 1
+                RecentList.DropDownItems.Add(algHistory(i))
+                AddHandler RecentList.DropDownItems(i).Click, AddressOf algHistory_Clicked
+                settings.algorithmHistory.Add(algHistory(i))
+                If algHistory.Count >= maxHistory Then Exit For
             Next
         End Sub
         Public Sub New(Optional projectFile As String = "")
@@ -198,14 +219,13 @@ Namespace MainForm
 
         End Sub
         Private Sub SaveSettings()
-            If settings IsNot Nothing AndAlso settingsIO IsNot Nothing Then
-                settings.MainFormLeft = Me.Left
-                settings.MainFormTop = Me.Top
-                settings.MainFormWidth = Me.Width
-                settings.MainFormHeight = Me.Height
-                settings.algorithm = AvailableAlgorithms.Text
-                settingsIO.Save(settings)
-            End If
+            updateAlgorithmHistory()
+            settings.MainFormLeft = Me.Left
+            settings.MainFormTop = Me.Top
+            settings.MainFormWidth = Me.Width
+            settings.MainFormHeight = Me.Height
+            settings.algorithm = AvailableAlgorithms.Text
+            settingsIO.Save(settings)
         End Sub
         Private Sub MainForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
             If settings Is Nothing Then Exit Sub
@@ -249,6 +269,9 @@ Namespace MainForm
 
         Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
             testAllRunning = True
+        End Sub
+        Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
+
         End Sub
     End Class
 End Namespace

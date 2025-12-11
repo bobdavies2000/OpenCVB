@@ -80,11 +80,5 @@ Namespace MainForm
             picBox.Image = bitmap
             displayImage.Dispose()
         End Sub
-        Private Sub campicRGB_Paint(sender As Object, e As PaintEventArgs) Handles campicRGB.Paint
-            'If task Is Nothing Then Exit Sub
-            'For i = 0 To task.dstList.Count - 1
-            '    UpdatePictureBox(pics(i), task.dstList(i))
-            'Next
-        End Sub
     End Class
 End Namespace

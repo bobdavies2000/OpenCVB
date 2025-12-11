@@ -8,7 +8,7 @@ Imports cv = OpenCvSharp
 #Region "taskProcess"
 <StructLayout(LayoutKind.Sequential)>
 Public Class VBtask : Implements IDisposable
-    Public dstList() As cv.Mat
+    Public dstList(3) As cv.Mat
 
     Public optionsChanged As Boolean
     Public allOptions As OptionsContainer
@@ -115,8 +115,6 @@ Public Class VBtask : Implements IDisposable
     Public GLRequest As Integer
     Public GLcloud As cv.Mat
     Public GLrgb As cv.Mat
-
-    Public resultLock As New Mutex(True, "resultLock")
 
     Public motionThreshold As Integer ' this is vital to motion detection - lower to be more sensitive, higher for less.
     Public colorDiffThreshold As Integer
@@ -390,14 +388,6 @@ Public Class VBtask : Implements IDisposable
         workRes = settings.workRes
         captureRes = settings.captureRes
 
-        ReDim dstList(3)
-        For i = 0 To dstList.Count - 1
-            dstList(i) = New cv.Mat(rows, cols, cv.MatType.CV_8UC3, New cv.Scalar)
-        Next
-
-        OpenGL_Left = CInt(GetSetting("Opencv", "OpenGLtaskX", "OpenGLtaskX", mainFormLocation.X))
-        OpenGL_Top = CInt(GetSetting("Opencv", "OpenGLtaskY", "OpenGLtaskY", mainFormLocation.Y))
-
         allOptions = New OptionsContainer
         allOptions.Show()
 
@@ -624,53 +614,52 @@ Public Class VBtask : Implements IDisposable
             Dim displayObject = task.MainUI_Algorithm '  findDisplayObject(displayObjectName)
             postProcess(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
 
-            SyncLock resultLock
-                If gOptions.displayDst0.Checked Then
-                    dstList(0) = Check8uC3(displayObject.dst0)
-                Else
-                    dstList(0) = color.Clone
-                End If
+            If gOptions.displayDst0.Checked Then
+                dstList(0) = Check8uC3(displayObject.dst0)
+            Else
+                dstList(0) = color.Clone
+            End If
 
-                If gOptions.displayDst1.Checked Then
-                    dstList(1) = Check8uC3(displayObject.dst1)
-                    displayDst1 = True
-                Else
-                    dstList(1) = depthRGB.Clone
-                    displayDst1 = False
-                End If
+            Dim displayLabel1 As Boolean
+            If gOptions.displayDst1.Checked Then
+                dstList(1) = Check8uC3(displayObject.dst1)
+                displayLabel1 = True
+            Else
+                dstList(1) = depthRGB.Clone
+                displayLabel1 = False
+            End If
 
-                dstList(2) = Check8uC3(displayObject.dst2)
-                dstList(3) = Check8uC3(displayObject.dst3)
+            dstList(2) = Check8uC3(displayObject.dst2)
+            dstList(3) = Check8uC3(displayObject.dst3)
 
-                ' make sure that any outputs from the algorithm are the right size.nearest
-                If dstList(0).Size <> workRes And dstList(0).Width > 0 Then
-                    dstList(0) = dstList(0).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                End If
-                If dstList(1).Size <> workRes And dstList(1).Width > 0 Then
-                    dstList(1) = dstList(1).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                End If
-                If dstList(2).Size <> workRes And dstList(2).Width > 0 Then
-                    dstList(2) = dstList(2).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                End If
-                If dstList(3).Size <> workRes And dstList(3).Width > 0 Then
-                    dstList(3) = dstList(3).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                End If
+            ' make sure that any outputs from the algorithm are the right size.nearest
+            If dstList(0).Size <> workRes And dstList(0).Width > 0 Then
+                dstList(0) = dstList(0).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            End If
+            If dstList(1).Size <> workRes And dstList(1).Width > 0 Then
+                dstList(1) = dstList(1).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            End If
+            If dstList(2).Size <> workRes And dstList(2).Width > 0 Then
+                dstList(2) = dstList(2).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            End If
+            If dstList(3).Size <> workRes And dstList(3).Width > 0 Then
+                dstList(3) = dstList(3).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            End If
 
-                If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
-                If gOptions.showMotionMask.Checked Then
-                    For Each mIndex In motionBasics.motionList
-                        dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
-                    Next
-                    dstList(0).Rectangle(motionRect, white, lineWidth)
-                End If
+            If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
+            If gOptions.showMotionMask.Checked Then
+                For Each mIndex In motionBasics.motionList
+                    dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
+                Next
+                dstList(0).Rectangle(motionRect, white, lineWidth)
+            End If
 
-                If gOptions.CrossHairs.Checked Then
-                    Gravity_Basics.showVectors(dstList(0))
-                    Dim lp = lineLongest
-                    Dim pt = New cv.Point2f((lp.pE1.X + lp.pE2.X) / 2 + 5, (lp.pE1.Y + lp.pE2.Y) / 2)
-                    displayObject.trueData.Add(New TrueText("Longest", pt, 0))
-                End If
-            End SyncLock
+            If gOptions.CrossHairs.Checked Then
+                Gravity_Basics.showVectors(dstList(0))
+                Dim lp = lineLongest
+                Dim pt = New cv.Point2f((lp.pE1.X + lp.pE2.X) / 2 + 5, (lp.pE1.Y + lp.pE2.Y) / 2)
+                displayObject.trueData.Add(New TrueText("Longest", pt, 0))
+            End If
 
             ' if there were no cycles spent on this routine, then it was inactive.
             ' if any active algorithm has an index = -1, it has not been run.
@@ -683,7 +672,7 @@ Public Class VBtask : Implements IDisposable
             trueData = New List(Of TrueText) ' (displayObject.trueData)
             displayObject.trueData.Clear()
             labels = displayObject.labels
-            If displayDst1 Then labels(1) = displayObject.labels(1)
+            If displayLabel1 Then labels(1) = displayObject.labels(1)
             depthAndDepthRange = depthAndDepthRange
         End If
     End Sub

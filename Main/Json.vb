@@ -30,6 +30,7 @@ Namespace MainForm
         Public allOptionsHeight As Integer = MainFormHeight
 
         Public algorithm As String
+        Public algorithmHistory As List(Of String)
 
         Public workRes As New cv.Size(336, 188)
         Public captureRes As New cv.Size(672, 376)
