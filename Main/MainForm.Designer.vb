@@ -270,7 +270,7 @@ Namespace MainForm
             ' 
             ' CamSwitchTimer
             ' 
-            CamSwitchTimer.Enabled = True
+            CamSwitchTimer.Enabled = False
             CamSwitchTimer.Interval = 1
             ' 
             ' fpsTimer

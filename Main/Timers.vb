@@ -36,22 +36,8 @@ Namespace MainForm
                     fpsListA.Add(testVal)
                 End If
 
-                CameraSwitching.Text = AvailableAlgorithms.Text + " awaiting first buffer"
-                Dim cameraName = settings.cameraName
-                cameraName = cameraName.Replace(" 2/2i", "")
-                cameraName = cameraName.Replace(" camera", "")
-                cameraName = cameraName.Replace(" Camera", "")
-                cameraName = cameraName.Replace("Intel(R) RealSense(TM) Depth ", "Intel D")
-
                 task.fpsAlgorithm = fpsListA.Average
                 task.fpsCamera = CInt(fpsListC.Average)
-
-
-
-                Debug.WriteLine("fps camera = " + Format(task.fpsCamera, fmt1) + "  fps algorithm = " + Format(task.fpsAlgorithm, fmt1))
-
-
-
 
                 If fpsListA.Count > 5 Then
                     fpsListA.RemoveAt(0)

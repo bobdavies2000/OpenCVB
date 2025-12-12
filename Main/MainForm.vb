@@ -79,13 +79,11 @@ Namespace MainForm
             settingsIO = New jsonIO(Path.Combine(homeDir, "Main\settings.json"))
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
-            Dim optionsForm As New MainOptions()
-
-            If optionsForm.ShowDialog() = DialogResult.OK Then
+            If MainOptions.ShowDialog() = DialogResult.OK Then
                 If settings.workRes <> task.workRes And settings.cameraName <> task.cameraName Then
-                    SaveSettings()
-                    camSwitchAnnouncement()
+                    getLineCounts()
 
+                    SaveSettings()
                     StopCamera()
                     StartCamera()
                     startAlgorithm()
@@ -140,13 +138,20 @@ Namespace MainForm
         Private Sub startAlgorithm()
             task = New VBClasses.VBtask()
 
-            task.settings = settings
+            task.settings = settings ' task is in a separate project and needs access to settings.
             task.main_hwnd = Me.Handle
 
             task.Initialize()
             task.MainUI_Algorithm = createAlgorithm(settings.algorithm)
+            AlgDescription.Text = task.MainUI_Algorithm.desc
+            MainToolStrip.Refresh()
 
             task.calibData = camera.calibData
+
+            If CameraSwitching.Visible Then
+                CamSwitchTimer.Enabled = False
+                CameraSwitching.Visible = False
+            End If
         End Sub
         Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
             isPlaying = Not isPlaying
@@ -240,6 +245,7 @@ Namespace MainForm
             settings = settingsIO.Load()
             Me.Location = New Point(settings.MainFormLeft, settings.MainFormTop)
             Me.Size = New Size(settings.MainFormWidth, settings.MainFormHeight)
+            Me.Show()
 
             camSwitchAnnouncement()
             getLineCounts()
@@ -249,7 +255,6 @@ Namespace MainForm
             setupAlgorithmHistory()
 
             PausePlayButton.PerformClick()
-            Me.Show()
         End Sub
         Private Sub TreeViewTimer_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
             If task Is Nothing Then Exit Sub

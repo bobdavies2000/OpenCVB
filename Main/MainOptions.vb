@@ -25,7 +25,6 @@ Public Class MainOptions
             Next
         End With
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
-        Me.Close()
     End Sub
     Public Sub defineCameraResolutions()
         ' see resolutionList - helps to see how code maps to layout of the resolutions.
@@ -59,7 +58,7 @@ Public Class MainOptions
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
         If formLoadComplete = False Then Exit Sub
 
-        settings.cameraName = cameraNames.IndexOf(sender.text)
+        settings.cameraName = sender.text
 
         defineCameraResolutions()
 
@@ -74,23 +73,32 @@ Public Class MainOptions
         End If
     End Sub
     Public Sub MainOptions_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Dim resStr = CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height)
+
+        If formLoadComplete = False Then
+            For i = 0 To cameraRadioButton.Count - 1
+                cameraRadioButton(i) = New RadioButton With {.Visible = True, .AutoSize = True,
+                                       .Enabled = settings.cameraPresent(i), .Text = cameraNames(i)}
+                CameraGroup.Controls.Add(cameraRadioButton(i))
+                AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
+            Next
+
+            defineCameraResolutions()
+
+            ReDim workResRadio(resolutionList.Count - 1)
+            For i = 0 To workResRadio.Count - 1
+                workResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i,
+                                         .AutoSize = True, .Visible = True}
+                workResRadio(i).Enabled = settings.resolutionsSupported(i)
+                Resolutions.Controls.Add(workResRadio(i))
+            Next
+        End If
+
         For i = 0 To cameraRadioButton.Count - 1
-            cameraRadioButton(i) = New RadioButton With {.Visible = True, .AutoSize = True,
-                                   .Enabled = settings.cameraPresent(i), .Text = cameraNames(i)}
-            CameraGroup.Controls.Add(cameraRadioButton(i))
-            AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
             If settings.cameraName = cameraNames(i) Then cameraRadioButton(i).Checked = True
         Next
 
-        defineCameraResolutions()
-
-        ReDim workResRadio(resolutionList.Count - 1)
-        Dim resStr = CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height)
         For i = 0 To workResRadio.Count - 1
-            workResRadio(i) = New RadioButton With {.Text = resolutionList(i), .Tag = i,
-                                     .AutoSize = True, .Visible = True}
-            workResRadio(i).Enabled = settings.resolutionsSupported(i)
-            Resolutions.Controls.Add(workResRadio(i))
             If resolutionList(i).StartsWith(resStr) Then workResRadio(i).Checked = True
         Next
         formLoadComplete = True
@@ -100,16 +108,11 @@ Public Class MainOptions
     End Sub
     Private Sub Cancel_Button_Click(sender As Object, e As EventArgs) Handles Cancel_Button.Click
         Me.DialogResult = DialogResult.Cancel
-        Me.Close()
     End Sub
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         FontDialog1.Font = settings.fontInfo
         If FontDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
             settings.fontInfo = FontDialog1.Font
         End If
-    End Sub
-
-    Private Sub MainOptions_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        Dim k = 0
     End Sub
 End Class

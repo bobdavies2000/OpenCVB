@@ -74,8 +74,6 @@ Public Class VBtask : Implements IDisposable
     Public activeObjects As New List(Of Object)
     Public calibData As Object
 
-    Public desc As String = ""
-
     Public fpsAlgorithm As Single
     Public fpsCamera As Single
     Public testAllRunning As Boolean

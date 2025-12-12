@@ -119,8 +119,10 @@
             If algorithm_ms(i) < 0 Then algorithm_ms(i) = 0
             If i >= task.algorithmNames.Count Then Exit For
             Dim str = Format(algorithm_ms(i), "00.0%") + " " + task.algorithmNames(i)
-            If task.displayObjectName.Length > 0 Then
-                If str.Contains(task.displayObjectName) Then percentStr = str
+            If task.displayObjectName IsNot Nothing Then
+                If task.displayObjectName.Length > 0 Then
+                    If str.Contains(task.displayObjectName) Then percentStr = str
+                End If
             End If
             If task.algorithmNames(i).Contains("waitingForInput") Then
                 saveWaitTime = str + "  <<<<<<<<<< "
