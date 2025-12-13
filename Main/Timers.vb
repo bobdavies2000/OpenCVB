@@ -63,7 +63,7 @@ Namespace MainForm
                             End If
                             fpsWriteCount += 1
                             Debug.Write(" " + Format(totalBytesOfMemoryUsed, "###") + "/" +
-                                              Format(task.fpsAlgorithm, fmt0) + "/" + Format(task.fpsCamera, fmt0))
+                                              Format(task.fpsAlgorithm, "0") + "/" + Format(task.fpsCamera, "0"))
                         End If
                     End If
                 End If

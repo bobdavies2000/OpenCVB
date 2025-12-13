@@ -1,16 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Module GlobalVariables
     Public settings As MainForm.Json
-    Public homeDirPath As String
     Public mainfrm As MainForm.MainForm
-
-    Public emptyRect As New cv.Rect
-
-    Public Const fmt0 = "0"
-    Public Const fmt1 = "0.0"
-    Public Const fmt2 = "0.00"
-    Public Const fmt3 = "0.000"
-    Public Const fmt4 = "0.0000"
 
     Public cameraNames As New List(Of String)({"Intel(R) RealSense(TM) Depth Camera 435i",
                                                "Intel(R) RealSense(TM) Depth Camera 455",

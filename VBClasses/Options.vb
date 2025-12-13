@@ -6026,7 +6026,7 @@ Public Class Options_PlyFormat : Inherits OptionParent
         fileNameForm.Show()
     End Sub
     Public Sub Run()
-        If task.firstPass Then fileNameForm.Left = allOptions.Width / 3
+        If task.firstPass Then fileNameForm.Left = task.gOptions.Width / 3
         playButton = fileNameForm.PlayButton.Text
         fileName = fileNameForm.filename.Text
 

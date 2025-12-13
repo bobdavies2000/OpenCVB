@@ -1,5 +1,5 @@
 ﻿Imports System.Windows.Forms
-Public Class OptionParent : Implements IDisposable
+Public Class OptionParent
     Public check As New OptionsCheckbox
     Public combo As New OptionsCombo
     Public radio As New OptionsRadioButtons
@@ -81,12 +81,5 @@ Public Class OptionParent : Implements IDisposable
     End Function
     Public Sub New()
         traceName = Me.GetType.Name
-    End Sub
-    Public Sub Dispose() Implements IDisposable.Dispose
-        If allOptions IsNot Nothing Then allOptions.Close()
-        sliders.Dispose()
-        check.Dispose()
-        radio.Dispose()
-        combo.Dispose()
     End Sub
 End Class

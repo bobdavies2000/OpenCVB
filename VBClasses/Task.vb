@@ -1,8 +1,5 @@
 Imports System.IO
-Imports System.IO.Pipes
 Imports System.Runtime.InteropServices
-Imports System.Threading
-Imports SharpGL.SceneGraph.Cameras
 Imports cv = OpenCvSharp
 
 #Region "taskProcess"
