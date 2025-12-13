@@ -43,7 +43,7 @@ Public Class Image_Series : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         ' to work on a specific file, specify it here.
-        ' options.fileInputName = new fileinfo(task.settings.HomeDir + "Images/train/103041.jpg")
+        ' options.fileInputName = new fileinfo(task.homeDir + "Images/train/103041.jpg")
         images.Run(images.options.fullsizeImage)
         dst2 = images.dst2
     End Sub
@@ -142,7 +142,7 @@ End Class
 Public Class Image_Icon : Inherits TaskParent
     Dim inputImage As Bitmap
     Public Sub New()
-        Dim filePath As String = task.settings.HomeDir + "/Main/Data/OpenCVB.png"
+        Dim filePath As String = task.homeDir + "/Main/Data/OpenCVB.png"
         inputImage = New Bitmap(filePath)
         desc = "Create an icon from an image"
     End Sub
@@ -152,7 +152,7 @@ Public Class Image_Icon : Inherits TaskParent
         Dim icon As Icon = Icon.FromHandle(iconHandle)
 
         ' Save the icon to a file
-        Using fs As New FileStream(task.settings.HomeDir + "/Main/Data/test.ico", FileMode.OpenOrCreate)
+        Using fs As New FileStream(task.homeDir + "/Main/Data/test.ico", FileMode.OpenOrCreate)
             icon.Save(fs)
         End Using
         inputImage = Nothing

@@ -193,7 +193,7 @@ Public Class PCA_DrawImage : Inherits TaskParent
     Dim pca As New PCA_Reconstruct
     Dim image As New cv.Mat
     Public Sub New()
-        image = cv.Cv2.ImRead(task.settings.HomeDir + "opencv/Samples/Data/pca_test1.jpg")
+        image = cv.Cv2.ImRead(task.homeDir + "opencv/Samples/Data/pca_test1.jpg")
         desc = "Use PCA to find the principal direction of an object."
         labels(2) = "Original image"
         labels(3) = "PCA Output"

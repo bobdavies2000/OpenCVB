@@ -299,7 +299,7 @@ Public Class Palette_Create : Inherits TaskParent
     Dim activeSchemeName As String = ""
     Dim saveColorTransitionCount As Integer = -1
     Public Sub New()
-        Dim dirInfo = New DirectoryInfo(task.settings.HomeDir + "Data")
+        Dim dirInfo = New DirectoryInfo(task.homeDir + "Data")
         schemes = dirInfo.GetFiles("scheme*.jpg")
 
         If OptionParent.FindFrm(traceName + " Radio Buttons") Is Nothing Then
@@ -349,7 +349,7 @@ Public Class Palette_Create : Inherits TaskParent
                     If i = 0 Then colorGrad = gradMat Else cv.Cv2.HConcat(colorGrad, gradMat, colorGrad)
                 Next
                 colorGrad = colorGrad.Resize(New cv.Size(256, 1))
-                cv.Cv2.ImWrite(task.settings.HomeDir + "data\nextScheme.jpg", colorGrad) ' use this to create new color schemes.
+                cv.Cv2.ImWrite(task.homeDir + "data\nextScheme.jpg", colorGrad) ' use this to create new color schemes.
             Else
                 colorGrad = cv.Cv2.ImRead(schemeName).Row(0).Clone
             End If
@@ -438,7 +438,7 @@ Public Class Palette_CustomColorMap : Inherits TaskParent
     Public Sub New()
         labels(2) = "ColorMap = " + task.gOptions.Palettes.Text
         If standalone Then
-            Dim cMapDir As New DirectoryInfo(task.settings.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+            Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
             Dim str = cMapDir.FullName + "/colorscale_" + task.gOptions.Palettes.Text + ".jpg"
             Dim mapFile As New FileInfo(str)
             Dim tmp = cv.Cv2.ImRead(mapFile.FullName)
@@ -561,7 +561,7 @@ End Class
 Public Class Palette_LoadColorMap : Inherits TaskParent
     Public whitebackground As Boolean
     Public colorMap As New cv.Mat
-    Dim cMapDir As New DirectoryInfo(task.settings.HomeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+    Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
     Public Sub New()
         desc = "Apply the different color maps in OpenCV"
     End Sub

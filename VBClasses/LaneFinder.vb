@@ -28,7 +28,7 @@ Public Class LaneFinder_Videos : Inherits TaskParent
         If standalone Then task.gOptions.displaydst1.checked = true
         If standalone Then task.gOptions.displaydst1.checked = true
 
-        Dim inputfile = New FileInfo(task.settings.HomeDir + options.inputName)
+        Dim inputfile = New FileInfo(task.homeDir + options.inputName)
         video.options.fileInfo = New FileInfo(inputfile.FullName)
         desc = "Read in the videos showing road conditions."
     End Sub
@@ -36,7 +36,7 @@ Public Class LaneFinder_Videos : Inherits TaskParent
         options.Run()
 
         If task.optionsChanged Then
-            Dim inputfile = New FileInfo(task.settings.HomeDir + options.inputName)
+            Dim inputfile = New FileInfo(task.homeDir + options.inputName)
             If inputfile.Exists Then video.options.fileInfo = New FileInfo(inputfile.FullName)
         End If
 

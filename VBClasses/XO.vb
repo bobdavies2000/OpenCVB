@@ -1795,7 +1795,7 @@ Public Class XO_Hough_Sudoku1 : Inherits TaskParent
         desc = "FastLineDetect version for finding lines in the Sudoku input."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = cv.Cv2.ImRead(task.settings.HomeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
+        dst3 = cv.Cv2.ImRead(task.homeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
         lines.Run(dst3.Clone)
         dst2 = lines.dst2
         labels(2) = lines.labels(2)

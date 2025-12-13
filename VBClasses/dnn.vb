@@ -26,9 +26,9 @@ Public Class DNN_Basics : Inherits TaskParent
         dnnHeight = dst2.Height
         crop = New cv.Rect(dst2.Width / 2 - dnnWidth / 2, dst2.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
 
-        Dim infoText As New FileInfo(task.settings.HomeDir + "Data/MobileNetSSD_deploy.prototxt")
+        Dim infoText As New FileInfo(task.homeDir + "Data/MobileNetSSD_deploy.prototxt")
         If infoText.Exists Then
-            Dim infoModel As New FileInfo(task.settings.HomeDir + "Data/MobileNetSSD_deploy.caffemodel")
+            Dim infoModel As New FileInfo(task.homeDir + "Data/MobileNetSSD_deploy.caffemodel")
             If infoModel.Exists Then
                 net = CvDnn.ReadNetFromCaffe(infoText.FullName, infoModel.FullName)
                 dnnPrepared = True
@@ -190,7 +190,7 @@ End Class
 '    Dim net As Net
 '    Dim classnames() As String
 '    Public Sub New()
-'        Dim modelFile As New FileInfo(task.settings.HomeDir + "Data/bvlc_googlenet.caffemodel")
+'        Dim modelFile As New FileInfo(task.homeDir + "Data/bvlc_googlenet.caffemodel")
 '        If File.Exists(modelFile.FullName) = False Then
 '            ' this site is apparently gone.  caffemodel is in the Data directory in OpenCVB_HomeDir
 '            Dim client = HttpWebRequest.CreateHttp("http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel")
@@ -200,9 +200,9 @@ End Class
 '            responseStream.CopyTo(memory)
 '            File.WriteAllBytes(modelFile.FullName, memory.ToArray)
 '        End If
-'        Dim protoTxt = task.settings.HomeDir + "Data/bvlc_googlenet.prototxt"
+'        Dim protoTxt = task.homeDir + "Data/bvlc_googlenet.prototxt"
 '        net = CvDnn.ReadNetFromCaffe(protoTxt, modelFile.FullName)
-'        Dim synsetWords = task.settings.HomeDir + "Data/synset_words.txt"
+'        Dim synsetWords = task.homeDir + "Data/synset_words.txt"
 '        classnames = File.ReadAllLines(synsetWords) ' .Select(line >= line.Split(' ').Last()).ToArray()
 '        For i = 0 To classnames.Count - 1
 '            classnames(i) = classnames(i).Split(" ").Last
@@ -213,7 +213,7 @@ End Class
 '    End Sub
 '    Public Overrides sub RunAlg(src As cv.Mat)
 
-'        Dim image = cv.Cv2.ImRead(task.settings.HomeDir + "Data/space_shuttle.jpg")
+'        Dim image = cv.Cv2.ImRead(task.homeDir + "Data/space_shuttle.jpg")
 '        dst3 = image.Resize(dst3.Size())
 '        Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
 '        net.SetInput(inputBlob, "data")

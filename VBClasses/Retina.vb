@@ -21,9 +21,9 @@ Public Class Retina_Basics_CPP : Inherits TaskParent
         If options.xmlCheck Then
             Dim fileinfo = New FileInfo(CurDir() + "/RetinaDefaultParameters.xml")
             If fileinfo.Exists Then
-                FileCopy(CurDir() + "/RetinaDefaultParameters.xml", task.settings.HomeDir + "data/RetinaDefaultParameters.xml")
+                FileCopy(CurDir() + "/RetinaDefaultParameters.xml", task.homeDir + "data/RetinaDefaultParameters.xml")
                 startInfo.FileName = "wordpad.exe"
-                startInfo.Arguments = task.settings.HomeDir + "Data/RetinaDefaultParameters.xml"
+                startInfo.Arguments = task.homeDir + "Data/RetinaDefaultParameters.xml"
                 Process.Start(startInfo)
             Else
                 MessageBox.Show("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?")

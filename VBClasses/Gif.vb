@@ -14,7 +14,7 @@ Public Class Gif_Basics : Inherits TaskParent
         desc = "Create a GIF file by clicking on the checkbox when dst2 is to be used."
     End Sub
     Private Sub clearTempDir()
-        Dim imgDir As New DirectoryInfo(task.settings.HomeDir + "Temp")
+        Dim imgDir As New DirectoryInfo(task.homeDir + "Temp")
         If imgDir.Exists = False Then imgDir.Create()
         Dim imgList As FileInfo() = imgDir.GetFiles("*.bmp")
 
@@ -22,7 +22,7 @@ Public Class Gif_Basics : Inherits TaskParent
             For Each imgFile In imgList
                 My.Computer.FileSystem.DeleteFile(imgFile.FullName)
             Next
-            Dim gifFile As New FileInfo(task.settings.HomeDir + "Temp\myGif.gif")
+            Dim gifFile As New FileInfo(task.homeDir + "Temp\myGif.gif")
             If gifFile.Exists Then My.Computer.FileSystem.DeleteFile(gifFile.FullName)
         End If
     End Sub
@@ -125,6 +125,6 @@ Public Class Gif_OpenCVB : Inherits TaskParent
 
         labels(2) = "Images captured: " + CStr(task.gifImages.Count)
         labels(3) = "After 'Build GIF file...' was clicked, resulting gif will be in '" +
-                    task.settings.HomeDir + "/temp/myGIF.gif'"
+                    task.homeDir + "/temp/myGIF.gif'"
     End Sub
 End Class

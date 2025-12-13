@@ -16,6 +16,7 @@ Public Class VBtask : Implements IDisposable
     Public featureOptions As OptionsFeatures
     Public treeView As TreeViewForm
     Public settings As Object
+    Public homeDir As String
 
     Public color As New cv.Mat
     Public gray As New cv.Mat

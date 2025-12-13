@@ -211,7 +211,7 @@ Public Class Edge_RandomForest_CPP : Inherits TaskParent
 
         ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
         If task.frameCount = 5 Then
-            Dim modelInfo = New FileInfo(task.settings.HomeDir + "Data/model.yml.gz")
+            Dim modelInfo = New FileInfo(task.homeDir + "Data/model.yml.gz")
             cPtr = Edge_RandomForest_Open(modelInfo.FullName)
         End If
         If task.frameCount > 5 Then ' the first images are skipped so the message above can be displayed.

@@ -130,7 +130,7 @@ Public Class SLR_PlotTest : Inherits TaskParent
         desc = "Plot the data used in SLR_Basics"
     End Sub
     Public Sub getData(ByRef x As List(Of Double), ByRef y As List(Of Double))
-        Dim filePath As String = task.settings.HomeDir + "/Data/real_data.txt"
+        Dim filePath As String = task.homeDir + "/Data/real_data.txt"
         Dim sr = New StreamReader(filePath)
         Dim code As String = sr.ReadToEnd
         sr.Close()

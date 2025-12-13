@@ -142,6 +142,7 @@ Namespace MainForm
 
             task = New VBClasses.VBtask()
 
+            task.homeDir = homeDir
             task.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
             task.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
             task.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)

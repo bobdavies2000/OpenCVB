@@ -729,7 +729,7 @@ Public Class Options_WarpModel : Inherits OptionParent
             For i = 0 To frm.check.Count - 1
                 Dim nextRadio = frm.check(i)
                 If nextRadio.Checked Then
-                    Dim photo As New FileInfo(task.settings.HomeDir + "Data\Prokudin\" + nextRadio.Text)
+                    Dim photo As New FileInfo(task.homeDir + "Data\Prokudin\" + nextRadio.Text)
                     pkImage = cv.Cv2.ImRead(photo.FullName, cv.ImreadModes.Grayscale)
                     Exit For
                 End If
@@ -3216,9 +3216,9 @@ Public Class Options_Complexity : Inherits OptionParent
     Public filenames As List(Of String)
     Public plotColor As cv.Scalar = New cv.Scalar(255, 255, 0)
     Public Sub New()
-        Dim fnames = Directory.GetFiles(task.settings.HomeDir + "Complexity")
+        Dim fnames = Directory.GetFiles(task.homeDir + "Complexity")
         filenames = fnames.ToList
-        Dim latestFile = Directory.GetFiles(task.settings.HomeDir + "Complexity").OrderByDescending(
+        Dim latestFile = Directory.GetFiles(task.homeDir + "Complexity").OrderByDescending(
                     Function(f) New FileInfo(f).LastWriteTime).First()
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -3245,7 +3245,7 @@ Public Class Options_Complexity : Inherits OptionParent
         Static frm = FindFrm(traceName + " Radio Buttons")
         For i = 0 To frm.check.count - 1
             If frm.check(i).checked Then
-                filename = New FileInfo(task.settings.HomeDir + "Complexity/" + frm.check(i).text)
+                filename = New FileInfo(task.homeDir + "Complexity/" + frm.check(i).text)
                 plotColor = Choose((i + 1) Mod 4, cv.Scalar.White, cv.Scalar.Red, cv.Scalar.Green, cv.Scalar.Yellow)
                 Exit For
             End If
@@ -4897,7 +4897,7 @@ Public Class Options_DNN : Inherits OptionParent
         scaleMax = scaleSlider.maximum
         meanValue = meanSlider.value
 
-        superResModelFileName = task.settings.HomeDir + "Data/DNN_SuperResModels/"
+        superResModelFileName = task.homeDir + "Data/DNN_SuperResModels/"
         Static frm = FindFrm(traceName + " Radio Buttons")
         Dim index = findRadioIndex(frm.check)
         If radio.check(index).Checked Then
@@ -5433,13 +5433,13 @@ Public Class Options_Images : Inherits OptionParent
     Public fullsizeImage As cv.Mat
     Public Sub New()
         fileNameForm = New OptionsFileName
-        dirName = task.settings.HomeDir + "Images/train"
+        dirName = task.homeDir + "Images/train"
         fileNameForm.OpenFileDialog1.InitialDirectory = dirName
         fileNameForm.OpenFileDialog1.FileName = "*.*"
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("Opencv", "Image_Basics_Name", "Image_Basics_Name", task.settings.HomeDir + "Images/train/2092.jpg")
+        fileNameForm.filename.Text = GetSetting("Opencv", "Image_Basics_Name", "Image_Basics_Name", task.homeDir + "Images/train/2092.jpg")
         fileNameForm.Text = "Select an image file for use in Opencv"
         fileNameForm.FileNameLabel.Text = "Select a file."
         fileNameForm.PlayButton.Hide()
@@ -5901,7 +5901,7 @@ Public Class Options_Palette : Inherits OptionParent
             sliders.setupTrackBar("Convert And Scale", 0, 100, convertScale)
             sliders.setupTrackBar("LinearPolar radius", 0, task.cols, radius)
         End If
-        Dim dirInfo = New DirectoryInfo(task.settings.HomeDir + "Data")
+        Dim dirInfo = New DirectoryInfo(task.homeDir + "Data")
         schemes = dirInfo.GetFiles("scheme*.jpg")
         If FindFrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -6011,12 +6011,12 @@ Public Class Options_PlyFormat : Inherits OptionParent
     Public saveFileName As String = ""
     Public Sub New()
         fileNameForm = New OptionsFileName
-        fileNameForm.OpenFileDialog1.InitialDirectory = task.settings.HomeDir + "temp"
+        fileNameForm.OpenFileDialog1.InitialDirectory = task.homeDir + "temp"
         fileNameForm.OpenFileDialog1.FileName = "*.*"
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "ply (*.ply)|*.ply|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("Opencv", "plyFileName", "plyFileName", task.settings.HomeDir + "temp\pointcloud.ply")
+        fileNameForm.filename.Text = GetSetting("Opencv", "plyFileName", "plyFileName", task.homeDir + "temp\pointcloud.ply")
 
         fileNameForm.Text = "Select ply output file"
         fileNameForm.FileNameLabel.Text = "Select ply output file"
@@ -6032,7 +6032,7 @@ Public Class Options_PlyFormat : Inherits OptionParent
 
         Dim testDir = New FileInfo(fileNameForm.filename.Text)
         If testDir.Directory.Exists = False Then
-            fileNameForm.filename.Text = task.settings.HomeDir + "Temp\pointcloud.ply"
+            fileNameForm.filename.Text = task.homeDir + "Temp\pointcloud.ply"
             If testDir.Directory.Name = "Temp" Then MkDir(testDir.Directory.FullName)
         End If
 
@@ -6887,9 +6887,9 @@ Public Class Options_Video : Inherits OptionParent
     Public maxFrames As Integer = 1000
     Public currFrame As Integer = 0
     Public Sub New()
-        fileInfo = New FileInfo(task.settings.HomeDir + "Data\CarsDrivingUnderBridge.mp4")
+        fileInfo = New FileInfo(task.homeDir + "Data\CarsDrivingUnderBridge.mp4")
         fileNameForm = New OptionsFileName
-        fileNameForm.OpenFileDialog1.InitialDirectory = task.settings.HomeDir + "Data\"
+        fileNameForm.OpenFileDialog1.InitialDirectory = task.homeDir + "Data\"
         fileNameForm.OpenFileDialog1.FileName = "*.mp4"
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"

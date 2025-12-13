@@ -78,7 +78,7 @@ End Class
 Public Class Convex_Defects : Inherits TaskParent
     Dim contours As New Contour_Largest
     Public Sub New()
-        dst2 = cv.Cv2.ImRead(task.settings.HomeDir + "Data/star2.png").Threshold(200, 255,
+        dst2 = cv.Cv2.ImRead(task.homeDir + "Data/star2.png").Threshold(200, 255,
                             cv.ThresholdTypes.Binary).Resize(New cv.Size(task.workRes.Width, task.workRes.Height))
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 

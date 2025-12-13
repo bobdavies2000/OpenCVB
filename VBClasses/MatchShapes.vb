@@ -12,8 +12,8 @@ Public Class MatchShapes_Basics : Inherits TaskParent
         OptionParent.findRadio("FloodFill").Enabled = False
         OptionParent.findRadio("ApproxNone").Checked = True
 
-        dst0 = cv.Cv2.ImRead(task.settings.HomeDir + "Data/star1.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2Gray)
-        dst1 = cv.Cv2.ImRead(task.settings.HomeDir + "Data/star2.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        dst0 = cv.Cv2.ImRead(task.homeDir + "Data/star1.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2Gray)
+        dst1 = cv.Cv2.ImRead(task.homeDir + "Data/star2.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2Gray)
         desc = "MatchShapes compares single hull to single hull - pretty tricky"
     End Sub
     Public Function findBiggestHull(hull As cv.Point()(), maxLen As Integer, maxIndex As Integer, dst As cv.Mat) As Integer

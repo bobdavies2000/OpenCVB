@@ -70,7 +70,7 @@ Public Class SuperRes_Input : Inherits TaskParent
     Public video As New Video_Basics
     Public inputFileName As String
     Public Sub New()
-        video.options.fileInfo = New FileInfo(task.settings.HomeDir + "Data/testdata_superres_car.avi")
+        video.options.fileInfo = New FileInfo(task.homeDir + "Data/testdata_superres_car.avi")
         inputFileName = video.options.fileInfo.FullName
         desc = "Input data for the superres testing"
     End Sub

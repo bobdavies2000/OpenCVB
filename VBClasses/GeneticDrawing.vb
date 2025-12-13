@@ -20,7 +20,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
     Public Sub New()
         options = New Options_GeneticDrawing()
         For i = 0 To brushes.Count - 1
-            brushes(i) = cv.Cv2.ImRead(task.settings.HomeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg").CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            brushes(i) = cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg").CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Next
 
         labels(2) = "(clkwise) original, imgStage, imgGeneration, magnitude"
@@ -95,13 +95,8 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
         mats.mat(3) = runDNAseq(DNAseq)
         totalError = calculateError(mats.mat(3))
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
+    Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-
-        If task.displayObjectName = traceName Then
-            SetTrueText("There are too many operations inside GeneticDrawing_Basics to break down the displayObject results")
-            Exit Sub
-        End If
 
         Static r = New cv.Rect(0, 0, src.Width, src.Height)
         If task.drawRect.Width > 0 Then r = task.drawRect
@@ -113,7 +108,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
             stage = 0
 
             If standaloneTest() Then
-                src = If(options.snapCheck, src.Clone, cv.Cv2.ImRead(task.settings.HomeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
+                src = If(options.snapCheck, src.Clone, cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
             End If
 
             src = If(src.Channels() = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
@@ -203,8 +198,8 @@ Public Class GeneticDrawing_Color : Inherits TaskParent
         labels(2) = "Intermediate results - original+2 partial+Mag"
         desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes"
     End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        Static restartCheck = OptionParent.findCheckBox("Restart the algorithm with the current settings")
+    Public Overrides Sub RunAlg(src As cv.Mat)
+        Static restartCheck = OptionParent.FindCheckBox("Restart the algorithm with the current settings")
         Dim split() As cv.Mat
         split = src.Split()
 
@@ -238,12 +233,12 @@ Public Class GeneticDrawing_Photo : Inherits TaskParent
     Dim fileNameForm As OptionsFileName
     Public Sub New()
         fileNameForm = New OptionsFileName
-        fileNameForm.OpenFileDialog1.InitialDirectory = task.settings.HomeDir + "Data/"
+        fileNameForm.OpenFileDialog1.InitialDirectory = task.homeDir + "Data/"
         fileNameForm.OpenFileDialog1.FileName = "*.*"
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = GetSetting("OpenCVB", "PhotoFileName", "PhotoFileName", task.settings.HomeDir + "Data/GeneticDrawingExample.jpg")
+        fileNameForm.filename.Text = task.homeDir + "Data/GeneticDrawingExample.jpg"
         fileNameForm.Text = "Select an image file to create a paint version"
         fileNameForm.FileNameLabel.Text = "Select a file for use with the Sound_Basics algorithm."
         fileNameForm.PlayButton.Hide()
@@ -280,7 +275,6 @@ Public Class GeneticDrawing_Photo : Inherits TaskParent
             Else
                 src = fullsizeImage
             End If
-            SaveSetting("OpenCVB", "PhotoFileName", "PhotoFileName", fileInputName.FullName)
         End If
 
         gDraw.Run(src)
