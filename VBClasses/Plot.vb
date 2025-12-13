@@ -299,9 +299,7 @@ Public Class Plot_OverTimeFixedScale : Inherits TaskParent
     Public controlScale As Boolean ' Use this to programmatically control the scale (rather than let the automated way below keep the scale.)
     Public showScale As Boolean = True
     Public fixedScale As Boolean
-    Dim plotOutput As cv.Mat
     Public Sub New()
-        plotOutput = New cv.Mat(New cv.Size(320, 180), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         desc = "Plot an input variable over time"
         task.gOptions.LineWidth.Value = 1
         task.gOptions.DotSizeSlider.Value = 2
@@ -310,11 +308,11 @@ Public Class Plot_OverTimeFixedScale : Inherits TaskParent
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
 
-        If columnIndex + task.DotSize >= plotOutput.Width Then
-            plotOutput.ColRange(columnIndex, plotOutput.Width).SetTo(backColor)
+        If columnIndex + task.DotSize >= dst2.Width Then
+            dst2.ColRange(columnIndex, dst2.Width).SetTo(backColor)
             columnIndex = 1
         End If
-        plotOutput.ColRange(columnIndex, columnIndex + task.DotSize).SetTo(backColor)
+        dst2.ColRange(columnIndex, columnIndex + task.DotSize).SetTo(backColor)
         If standaloneTest() Then plotData = task.color.Mean()
 
         For i = 0 To plotCount - 1
@@ -347,21 +345,21 @@ Public Class Plot_OverTimeFixedScale : Inherits TaskParent
         If lastXdelta.Count >= plotSeriesCount Then lastXdelta.RemoveAt(0)
 
         If task.heartBeat Then
-            plotOutput.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, plotOutput.Height), white, task.lineWidth)
+            dst2.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), white, task.lineWidth)
         End If
 
         For i = 0 To plotCount - 1
             If plotData(i) <> 0 Then
                 Dim y = 1 - (plotData(i) - minScale) / (maxScale - minScale)
-                y *= plotOutput.Height - 1
+                y *= dst2.Height - 1
                 Dim c As New cv.Point(columnIndex - task.DotSize, y - task.DotSize)
                 If c.X < 1 Then c.X = 1
-                DrawCircle(plotOutput, c, task.DotSize, plotColors(i))
+                DrawCircle(dst2, c, task.DotSize, plotColors(i))
             End If
         Next
 
         columnIndex += 1
-        plotOutput.Col(columnIndex).SetTo(0)
+        dst2.Col(columnIndex).SetTo(0)
         labels(2) = "Blue = " + Format(plotData(0), fmt1) + " Green = " + Format(plotData(1), fmt1) +
                     " Red = " + Format(plotData(2), fmt1) + " Yellow = " + Format(plotData(3), fmt1)
         strOut = "Blue = " + Format(plotData(0), fmt1) + vbCrLf
@@ -371,10 +369,10 @@ Public Class Plot_OverTimeFixedScale : Inherits TaskParent
         SetTrueText(strOut, 3)
         Dim lineCount = CInt(maxScale - minScale - 1)
         If lineCount > 3 Or lineCount < 0 Then lineCount = 3
-        If showScale Then AddPlotScale(plotOutput, minScale, maxScale, lineCount)
-        dst2 = plotOutput.Resize(New cv.Size(task.workRes.Width, task.workRes.Height))
+        If showScale Then AddPlotScale(dst2, minScale, maxScale, lineCount)
     End Sub
 End Class
+
 
 
 

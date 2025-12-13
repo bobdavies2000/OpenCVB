@@ -189,7 +189,7 @@ Public Class VBtask : Implements IDisposable
     Public heartBeat As Boolean
     Public heartBeatLT As Boolean = True ' long term heartbeat - every X seconds.
     Public quarterBeat As Boolean
-    Public quarter(4 - 1) As Boolean
+    Public quarter(3) As Boolean
     Public midHeartBeat As Boolean
     Public almostHeartBeat As Boolean
     Public afterHeartBeatLT As Boolean
@@ -585,8 +585,8 @@ Public Class VBtask : Implements IDisposable
 
             postProcess(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
 
-            dstList(0) = If(gOptions.displayDst0.Checked, Check8uC3(displayObject.dst0), color)
-            dstList(1) = If(gOptions.displayDst1.Checked, Check8uC3(displayObject.dst1), depthRGB)
+            dstList(0) = If(gOptions.displayDst0.Checked, Check8uC3(displayObject.dst0), color).Clone
+            dstList(1) = If(gOptions.displayDst1.Checked, Check8uC3(displayObject.dst1), depthRGB).Clone
             dstList(2) = Check8uC3(displayObject.dst2)
             dstList(3) = Check8uC3(displayObject.dst3)
 

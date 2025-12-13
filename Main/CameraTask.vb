@@ -54,6 +54,7 @@ Namespace MainForm
                           sender.camImages.images(3).CopyTo(task.rightView)
 
                           task.RunAlgorithm()
+
                           For i = 0 To task.dstList.Count - 1
                               Dim displayImage = task.dstList(i).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
                               Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)

@@ -109,7 +109,6 @@ Public Module vbc
         Return outMat
     End Function
     Public Sub updateSettings()
-        task.fpsAlgorithm = If(task.frameCount < 30, 30, task.fpsAlgorithm)
         If task.myStopWatch Is Nothing Then task.myStopWatch = Stopwatch.StartNew()
 
         ' update the time measures
@@ -129,7 +128,7 @@ Public Module vbc
         Next
         If task.heartBeat Then ReDim task.quarter(4)
 
-        If task.frameCount <= 1 Then task.heartBeat = True
+        If task.frameCount = 1 Then task.heartBeat = True
 
         Static lastHeartBeatLT As Boolean = task.heartBeatLT
         task.afterHeartBeatLT = If(lastHeartBeatLT, True, False)

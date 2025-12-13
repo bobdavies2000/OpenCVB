@@ -274,6 +274,7 @@ Namespace MainForm
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
             settings.algorithm = AvailableAlgorithms.Text
+            SaveSettings()
             If task Is Nothing Then
                 startAlgorithm()
             Else
