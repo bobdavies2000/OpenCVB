@@ -44,6 +44,22 @@ Namespace MainForm
                 camera = Nothing
             End If
         End Sub
+        Private Function releaseImages() As Boolean
+            Dim gDrawFlag As Boolean = True
+            If task.debugSyncUI Then
+                Static lastTime As DateTime = Now
+                Dim timeNow As DateTime = Now
+                Dim elapsedTime = timeNow.Ticks - lastTime.Ticks
+                Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
+                Dim timerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
+                If timerInterval < 1000 Then ' adjust the debugSyncUI time here - in milliseconds.
+                    Return False
+                Else
+                    lastTime = timeNow
+                End If
+            End If
+            Return True
+        End Function
         Private Sub Camera_FrameReady(sender As GenericCamera)
             If task Is Nothing Then Exit Sub
             ' This event is raised from the background thread, so we need to marshal to UI thread
@@ -55,19 +71,21 @@ Namespace MainForm
 
                           task.RunAlgorithm()
 
-                          For i = 0 To task.dstList.Count - 1
-                              Dim displayImage = task.dstList(i).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
-                              Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
-                              pics(i).Image?.Dispose()
-                              pics(i).Image = bitmap
-                              displayImage.Dispose()
-                          Next
-                          task.mouseClickFlag = False
+                          If releaseImages() Then
+                              For i = 0 To task.dstList.Count - 1
+                                  Dim displayImage = task.dstList(i).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+                                  Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
+                                  pics(i).Image?.Dispose()
+                                  pics(i).Image = bitmap
+                                  displayImage.Dispose()
+                              Next
+                              task.mouseClickFlag = False
 
-                          For i = 0 To task.labels.Count - 1
-                              labels(i).Text = task.labels(i)
-                          Next
-                          Application.DoEvents() ' task.color doesn't appear for a few seconds without this.  Why?
+                              For i = 0 To task.labels.Count - 1
+                                  labels(i).Text = task.labels(i)
+                              Next
+                              Application.DoEvents() ' task.color doesn't appear for a few seconds without this.  Why?
+                          End If
                       End Sub)
         End Sub
     End Class

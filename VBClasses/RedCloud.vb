@@ -11,7 +11,7 @@ Public Class RedCloud_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         redSweep.Run(src)
         labels(3) = redSweep.labels(3)
-        labels(2) = redSweep.labels(2) + If(standalone, "  Number is cell age", "")
+        labels(2) = redSweep.labels(2)
 
         Dim rcListLast = New List(Of rcData)(rcList)
         Dim rcMapLast As cv.Mat = rcMap.Clone
@@ -127,7 +127,7 @@ Public Class RedCloud_Sweep : Inherits TaskParent
             dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
         Next
 
-        labels(2) = CStr(rcList.Count) + " RedCloud cells were identified."
+        labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
 
         Static unchanged As Integer
         If task.motionRect.Width = 0 Then
