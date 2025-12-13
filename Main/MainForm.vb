@@ -138,6 +138,8 @@ Namespace MainForm
             StopCamera()
         End Sub
         Private Sub startAlgorithm()
+            If task IsNot Nothing Then task.Dispose()
+
             task = New VBClasses.VBtask()
 
             task.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
