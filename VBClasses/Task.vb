@@ -633,10 +633,7 @@ Public Class VBtask : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
         allOptions.Close()
         For Each algorithm In task.activeObjects
-            Dim type As Type = algorithm.GetType()
-            If type.GetMethod("Close") IsNot Nothing Then
-                algorithm.Close()  ' Close any unmanaged classes...
-            End If
+            If algorithm.GetType().GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
         Next
 
         For Each m In task.dstList
