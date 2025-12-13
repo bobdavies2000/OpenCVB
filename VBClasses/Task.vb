@@ -605,6 +605,12 @@ Public Class VBtask : Implements IDisposable
                 displayObject.trueData.Add(New TrueText("Longest", pt, 0))
             End If
 
+            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
+                For Each dst In dstList
+                    dst.Rectangle(task.drawRect, cv.Scalar.White, 1)
+                Next
+            End If
+
             ' if there were no cycles spent on this routine, then it was inactive.
             ' if any active algorithm has an index = -1, it has not been run.
             Dim index = algorithmNames.IndexOf(displayObject.traceName)

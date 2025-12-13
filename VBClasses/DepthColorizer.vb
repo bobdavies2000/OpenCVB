@@ -4,57 +4,57 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
     Public Sub New()
         cPtr = Depth_Colorizer_Open()
 
-        'Dim gradientWidth = Math.Min(dst2.Width, 256)
-        'Dim f As Double = 1.0
-        'If saveVecColors.Count = 1 Then
-        '    Dim initVal = 43
-        '    Dim rand = New Random(initVal) ' This will make colors consistent across runs and they seem to look ok...
-        '    Dim bgr(3) As Byte
-        '    For i = 0 To task.vecColors.Length - 1
-        '        rand.NextBytes(bgr)
-        '        task.vecColors(i) = New cv.Vec3b(bgr(0), bgr(1), bgr(2))
-        '        task.scalarColors(i) = New cv.Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
-        '    Next
+        Dim gradientWidth = Math.Min(dst2.Width, 256)
+        Dim f As Double = 1.0
+        If saveVecColors.Count = 1 Then
+            Dim initVal = 43
+            Dim rand = New Random(initVal) ' This will make colors consistent across runs and they seem to look ok...
+            Dim bgr(3) As Byte
+            For i = 0 To task.vecColors.Length - 1
+                rand.NextBytes(bgr)
+                task.vecColors(i) = New cv.Vec3b(bgr(0), bgr(1), bgr(2))
+                task.scalarColors(i) = New cv.Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
+            Next
 
-        '    Dim color1 = cv.Scalar.Blue, color2 = cv.Scalar.Yellow
-        '    Dim colorList As New List(Of cv.Vec3b)
-        '    For i = 0 To gradientWidth - 1
-        '        Dim v1 = f * color2(0) + (1 - f) * color1(0)
-        '        Dim v2 = f * color2(1) + (1 - f) * color1(1)
-        '        Dim v3 = f * color2(2) + (1 - f) * color1(2)
-        '        colorList.Add(New cv.Vec3b(v1, v2, v3))
-        '        f -= 1 / gradientWidth
-        '    Next
-        '    colorList(0) = New cv.Vec3b ' black for the first color...
-        '    task.depthColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colorList.ToArray)
+            Dim color1 = cv.Scalar.Blue, color2 = cv.Scalar.Yellow
+            Dim colorList As New List(Of cv.Vec3b)
+            For i = 0 To gradientWidth - 1
+                Dim v1 = f * color2(0) + (1 - f) * color1(0)
+                Dim v2 = f * color2(1) + (1 - f) * color1(1)
+                Dim v3 = f * color2(2) + (1 - f) * color1(2)
+                colorList.Add(New cv.Vec3b(v1, v2, v3))
+                f -= 1 / gradientWidth
+            Next
+            colorList(0) = New cv.Vec3b ' black for the first color...
+            task.depthColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colorList.ToArray)
 
-        '    saveVecColors = task.vecColors
-        '    saveScalarColors = task.scalarColors
-        '    saveDepthColorMap = task.depthColorMap
-        'Else
-        '    ' why do this?  To preserve the same colors regardless of which algorithm is invoked.
-        '    ' Colors will be different when OpenCVB is restarted.  
-        '    task.vecColors = saveVecColors
-        '    task.scalarColors = saveScalarColors
-        '    task.depthColorMap = saveDepthColorMap
-        'End If
+            saveVecColors = task.vecColors
+            saveScalarColors = task.scalarColors
+            saveDepthColorMap = task.depthColorMap
+        Else
+            ' why do this?  To preserve the same colors regardless of which algorithm is invoked.
+            ' Colors will be different when OpenCVB is restarted.  
+            task.vecColors = saveVecColors
+            task.scalarColors = saveScalarColors
+            task.depthColorMap = saveDepthColorMap
+        End If
 
-        'task.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
+        task.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
 
-        'task.vecColors(0) = New cv.Vec3b ' first color is black...
-        'task.colorMapZeroIsBlack = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
+        task.vecColors(0) = New cv.Vec3b ' first color is black...
+        task.colorMapZeroIsBlack = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
 
-        'Dim color3 = cv.Scalar.Black, color4 = cv.Scalar.Red
-        'Dim corrColors = New List(Of cv.Vec3b)
-        'f = 1.0
-        'For i = 0 To gradientWidth - 1
-        '    Dim v1 = f * color3(0) + (1 - f) * color4(0)
-        '    Dim v2 = f * color3(1) + (1 - f) * color4(1)
-        '    Dim v3 = f * color3(2) + (1 - f) * color4(2)
-        '    corrColors.Add(New cv.Vec3b(v1, v2, v3))
-        '    f -= 1 / gradientWidth
-        'Next
-        'task.correlationColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, corrColors.ToArray)
+        Dim color3 = cv.Scalar.Black, color4 = cv.Scalar.Red
+        Dim corrColors = New List(Of cv.Vec3b)
+        f = 1.0
+        For i = 0 To gradientWidth - 1
+            Dim v1 = f * color3(0) + (1 - f) * color4(0)
+            Dim v2 = f * color3(1) + (1 - f) * color4(1)
+            Dim v3 = f * color3(2) + (1 - f) * color4(2)
+            corrColors.Add(New cv.Vec3b(v1, v2, v3))
+            f -= 1 / gradientWidth
+        Next
+        task.correlationColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, corrColors.ToArray)
 
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Create a traditional depth color scheme."
