@@ -204,6 +204,7 @@ Public Class VBtask : Implements IDisposable
     Public pcCeiling As Single ' y-value for ceiling...
 
     Public debugSyncUI As Boolean
+    Public debugDrawFlag As Boolean
 
     Public lineGravity As New lpData
     Public lineHorizon As New lpData
@@ -619,7 +620,12 @@ Public Class VBtask : Implements IDisposable
                                            New cv.Point(workRes.Width / 3, workRes.Height / 2), 2))
             End If
 
-            trueData = New List(Of TrueText) ' (displayObject.trueData)
+            trueData.Clear()
+            trueData.Add(New TrueText(task.depthAndDepthRange,
+                                      New cv.Point(task.mouseMovePoint.X, task.mouseMovePoint.Y - 24), 1))
+            For Each tt In displayObject.trueData
+                trueData.Add(tt)
+            Next
             displayObject.trueData.Clear()
             labels = displayObject.labels
         End If

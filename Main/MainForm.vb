@@ -244,6 +244,8 @@ Namespace MainForm
                 pics(i).Location = Choose(i + 1, New Point(offset, topStart + labelHeight), New Point(w + offset, campicRGB.Top),
                                                  New Point(offset, labelLeft.Top + labelHeight), New Point(w + offset, campicLeft.Top))
                 pics(i).Size = New Size(w, h)
+                pics(i).Tag = i
+                AddHandler pics(i).Paint, AddressOf pics_Paint
             Next
 
             StatusLabel.Location = New Point(offset, campicLeft.Top + h)
@@ -291,6 +293,29 @@ Namespace MainForm
                     updateAlgorithmHistory()
                 End If
             End If
+        End Sub
+        Private Sub pics_paint(sender As Object, e As PaintEventArgs)
+
+            Dim g As Graphics = e.Graphics
+            Dim pic = DirectCast(sender, PictureBox)
+            If pic.Image Is Nothing Then Exit Sub
+            g.ScaleTransform(1, 1)
+            g.DrawImage(pic.Image, 0, 0)
+
+            Dim ratio = pic.Width / settings.workRes.Width
+
+            Static myWhitePen As New Pen(Color.White)
+            Static myBlackPen As New Pen(Color.Black)
+
+            Static saveTrueData As List(Of TrueText)
+            If task.debugDrawFlag Then saveTrueData = New List(Of TrueText)(task.trueData)
+            For Each tt In saveTrueData
+                If tt.text Is Nothing Then Continue For
+                If tt.text.Length > 0 And tt.picTag = pic.Tag Then
+                    g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
+                                         CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
+                End If
+            Next
         End Sub
     End Class
 End Namespace

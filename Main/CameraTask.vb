@@ -45,7 +45,8 @@ Namespace MainForm
             End If
         End Sub
         Private Function releaseImages() As Boolean
-            Dim gDrawFlag As Boolean = True
+            task.debugDrawFlag = True
+            Dim ratio = pics(0).Width / settings.workRes.Width
             If task.debugSyncUI Then
                 Static lastTime As DateTime = Now
                 Dim timeNow As DateTime = Now
@@ -53,12 +54,13 @@ Namespace MainForm
                 Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
                 Dim timerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
                 If timerInterval < 1000 Then ' adjust the debugSyncUI time here - in milliseconds.
-                    Return False
+                    task.debugDrawFlag = False
                 Else
                     lastTime = timeNow
                 End If
             End If
-            Return True
+
+            Return task.debugDrawFlag
         End Function
         Private Sub Camera_FrameReady(sender As GenericCamera)
             If task Is Nothing Then Exit Sub
