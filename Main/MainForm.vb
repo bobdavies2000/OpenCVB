@@ -74,12 +74,15 @@ Namespace MainForm
             homeDir = Path.GetDirectoryName(projectDir.FullName) + "\"
 
             labels = New List(Of Label)({labelRGB, labelPointCloud, labelLeft, labelRight})
+            For Each lab In labels
+                lab.Text = ""
+            Next
             pics = New List(Of PictureBox)({campicRGB, campicPointCloud, campicLeft, campicRight})
 
             settingsIO = New jsonIO(Path.Combine(homeDir, "Main\settings.json"))
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
-            If MainOptions.ShowDialog() = DialogResult.OK Then
+            If Options.ShowDialog() = DialogResult.OK Then
                 If settings.workRes <> task.workRes And settings.cameraName <> task.cameraName Then
                     getLineCounts()
 
@@ -109,7 +112,7 @@ Namespace MainForm
 
         End Sub
         Private Sub AtoZ_Click(sender As Object, e As EventArgs) Handles AtoZ.Click
-            Dim groupsForm As New MainAtoZ()
+            Dim groupsForm As New AtoZ()
             groupsForm.homeDir = New DirectoryInfo(homeDir + "\Data")
 
             If groupsForm.ShowDialog() = DialogResult.OK AndAlso Not String.IsNullOrEmpty(groupsForm.selectedGroup) Then
@@ -132,11 +135,16 @@ Namespace MainForm
         End Sub
         Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             SaveSettings()
-            task = Nothing
             StopCamera()
         End Sub
         Private Sub startAlgorithm()
             task = New VBClasses.VBtask()
+
+            task.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
+            task.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
+            task.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
+            task.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
+            task.dstList = {task.color, task.pointCloud, task.leftView, task.rightView}
 
             task.settings = settings ' task is in a separate project and needs access to settings.
             task.main_hwnd = Me.Handle
@@ -207,7 +215,7 @@ Namespace MainForm
             sr.Close()
 
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " +
-                       CStr(algorithmCountActive) + " algorithms " + CStr(algorithmRefs) + " references = " +
+                       CStr(algorithmCountActive) + " algorithms " + " - " +
                        CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + settings.cameraName
 
         End Sub

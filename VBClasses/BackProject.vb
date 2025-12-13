@@ -38,8 +38,7 @@ Public Class BackProject_Basics : Inherits TaskParent
         dst3.SetTo(cv.Scalar.Yellow, dst0)
         Dim count = hist.histogram.Get(Of Single)(CInt(histIndex), 0)
         Dim histMax As mmData = GetMinMax(hist.histogram)
-        labels(3) = $"Backprojecting {CInt(minRange(0))} to {CInt(maxRange(0))} with {CInt(count)} of {totalPixels} compared to " +
-                    $"mask pixels = {actualCount}.  Histogram max count = {CInt(histMax.maxVal)}"
+        labels(3) = $"Highlight pixels {CInt(minRange(0))}-{CInt(maxRange(0))} with {CInt(count)} of {totalPixels}"
         dst2.Rectangle(New cv.Rect(CInt(histIndex) * brickWidth, 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
 End Class

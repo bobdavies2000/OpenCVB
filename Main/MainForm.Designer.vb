@@ -126,7 +126,7 @@ Namespace MainForm
             RecentList.Name = "RecentList"
             RecentList.Size = New Size(96, 34)
             RecentList.Text = "Recent"
-            RecentList.ToolTipText = "List of Recent Algorithms"
+            RecentList.ToolTipText = " "
             ' 
             ' AvailableAlgorithms
             ' 
@@ -261,7 +261,7 @@ Namespace MainForm
             ' CameraSwitching
             ' 
             CameraSwitching.AutoSize = True
-            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12F)
+            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12.0F)
             CameraSwitching.Location = New Point(61, 122)
             CameraSwitching.Name = "CameraSwitching"
             CameraSwitching.Size = New Size(202, 29)
@@ -270,7 +270,6 @@ Namespace MainForm
             ' 
             ' CamSwitchTimer
             ' 
-            CamSwitchTimer.Enabled = False
             CamSwitchTimer.Interval = 1
             ' 
             ' fpsTimer

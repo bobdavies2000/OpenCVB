@@ -197,7 +197,6 @@
         SaveSetting("OpenCVB", "treeViewWidth", "treeViewWidth", Me.Width)
         SaveSetting("OpenCVB", "treeViewHeight", "treeViewHeight", Me.Height)
     End Sub
-
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         Dim algorithm = e.Node.Text
         Dim split = e.Node.Text.Split(" ")

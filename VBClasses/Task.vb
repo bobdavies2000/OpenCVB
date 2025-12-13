@@ -301,21 +301,10 @@ Public Class VBtask : Implements IDisposable
     Public OpenGL_Top As Integer
     Public displayDst1 As Boolean
     Public depthAndDepthRange As String = ""
+    Public resolutionDetails As String = ""
     Public sharpGL As VBClasses.SharpGLForm
 
 #End Region
-    Private Function findDisplayObject(lookupName As String) As TaskParent
-        Dim saveObject As Object = Nothing
-        For Each obj In activeObjects
-            If obj.tracename = lookupName Then
-                saveObject = obj
-                If obj.traceName <> saveObject.labels(2) Then
-                    Return saveObject
-                End If
-            End If
-        Next
-        Return saveObject
-    End Function
     Private Sub postProcess(src As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat)
         Try
             If PixelViewer IsNot Nothing Then
@@ -361,6 +350,8 @@ Public Class VBtask : Implements IDisposable
         cols = settings.workRes.Width
         workRes = settings.workRes
         captureRes = settings.captureRes
+        resolutionDetails = "RGB Input " + CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) +
+                            ", workRes " + CStr(workRes.Width) + "x" + CStr(workRes.Height)
 
         allOptions = New OptionsContainer
         allOptions.Show()
@@ -376,12 +367,8 @@ Public Class VBtask : Implements IDisposable
         treeView = New TreeViewForm
 
         callTrace = New List(Of String)
-        pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
         gravityCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
         task.motionMask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 255)
-        task.leftView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
-        task.rightView = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
-        pointCloud = New cv.Mat(task.workRes, cv.MatType.CV_32FC3, 0)
         noDepthMask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
         depthmask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
 
@@ -426,7 +413,6 @@ Public Class VBtask : Implements IDisposable
         Dim index = task.redList.rcMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
         If index = 0 Then Exit Sub
         If index > 0 And index < task.redList.oldrclist.Count Then
-            ' ClickPoint = oldrclist(index).maxDist
             task.oldrcD = task.redList.oldrclist(index)
             task.color(task.oldrcD.rect).SetTo(cv.Scalar.White, task.oldrcD.mask)
         Else
@@ -579,46 +565,30 @@ Public Class VBtask : Implements IDisposable
 
 
             labels = MainUI_Algorithm.labels
+            If task.gOptions.displayDst0.Checked = False Then labels(0) = task.resolutionDetails
+            If task.gOptions.displayDst1.Checked = False Then labels(1) = task.depthAndDepthRange
+
             Dim nextTrueData As List(Of TrueText) = MainUI_Algorithm.trueData
             trueData = New List(Of TrueText)(nextTrueData)
 
             firstPass = False
             heartBeatLT = False
 
-            Dim displayObject = task.MainUI_Algorithm '  findDisplayObject(displayObjectName)
+            Dim displayObject = task.MainUI_Algorithm
+            ' they could have asked to display one of the algorithms in the TreeView.
+            For Each obj In activeObjects
+                If obj.tracename = task.displayObjectName Then
+                    displayObject = obj
+                    Exit For
+                End If
+            Next
+
             postProcess(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
 
-            If gOptions.displayDst0.Checked Then
-                dstList(0) = Check8uC3(displayObject.dst0)
-            Else
-                dstList(0) = color.Clone
-            End If
-
-            Dim displayLabel1 As Boolean
-            If gOptions.displayDst1.Checked Then
-                dstList(1) = Check8uC3(displayObject.dst1)
-                displayLabel1 = True
-            Else
-                dstList(1) = depthRGB.Clone
-                displayLabel1 = False
-            End If
-
+            dstList(0) = If(gOptions.displayDst0.Checked, Check8uC3(displayObject.dst0), color)
+            dstList(1) = If(gOptions.displayDst1.Checked, Check8uC3(displayObject.dst1), depthRGB)
             dstList(2) = Check8uC3(displayObject.dst2)
             dstList(3) = Check8uC3(displayObject.dst3)
-
-            ' make sure that any outputs from the algorithm are the right size.nearest
-            If dstList(0).Size <> workRes And dstList(0).Width > 0 Then
-                dstList(0) = dstList(0).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            End If
-            If dstList(1).Size <> workRes And dstList(1).Width > 0 Then
-                dstList(1) = dstList(1).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            End If
-            If dstList(2).Size <> workRes And dstList(2).Width > 0 Then
-                dstList(2) = dstList(2).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            End If
-            If dstList(3).Size <> workRes And dstList(3).Width > 0 Then
-                dstList(3) = dstList(3).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            End If
 
             If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
             If gOptions.showMotionMask.Checked Then
@@ -646,8 +616,6 @@ Public Class VBtask : Implements IDisposable
             trueData = New List(Of TrueText) ' (displayObject.trueData)
             displayObject.trueData.Clear()
             labels = displayObject.labels
-            If displayLabel1 Then labels(1) = displayObject.labels(1)
-            depthAndDepthRange = depthAndDepthRange
         End If
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose

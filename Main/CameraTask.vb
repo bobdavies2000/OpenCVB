@@ -57,6 +57,11 @@ Namespace MainForm
                           For i = 0 To task.dstList.Count - 1
                               UpdatePictureBox(pics(i), task.dstList(i))
                           Next
+                          task.mouseClickFlag = False
+
+                          For i = 0 To task.labels.Count - 1
+                              labels(i).Text = task.labels(i)
+                          Next
                       End Sub)
         End Sub
         Private Sub UpdatePictureBox(picBox As PictureBox, image As cv.Mat)
@@ -65,6 +70,8 @@ Namespace MainForm
             If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
                 displayImage.Rectangle(task.drawRect, cv.Scalar.White, 1)
             End If
+
+            Application.DoEvents() ' task.color doesn't appear for a few seconds without this.  Why?
 
             displayImage = displayImage.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
             Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)

@@ -1,6 +1,6 @@
 ﻿Namespace MainForm
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-    Partial Class MainAtoZ
+    Partial Class AtoZ
         Inherits System.Windows.Forms.Form
 
         'Form overrides dispose to clean up the component list.
@@ -23,7 +23,7 @@
         'Do not modify it using the code editor.
         <System.Diagnostics.DebuggerStepThrough()>
         Private Sub InitializeComponent()
-            Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainAtoZ))
+            Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(AtoZ))
             GroupDataView = New DataGridView()
             CType(GroupDataView, ComponentModel.ISupportInitialize).BeginInit()
             SuspendLayout()

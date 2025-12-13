@@ -1,7 +1,7 @@
 ﻿Imports System.ComponentModel
 Imports VBClasses
 Imports cv = OpenCvSharp
-Public Class MainOptions
+Public Class Options
     Public cameraRadioButton(cameraNames.Count - 1) As RadioButton
     Public workResRadio() As RadioButton
     '     "1344x752 - Full resolution", "672x376 - Quarter resolution", "336x188 - Small resolution  ",
