@@ -7,7 +7,6 @@ Imports cv = OpenCvSharp
 Namespace MainUI
     Public Class Camera_ORB : Inherits GenericCamera
         Dim captureThread As Thread = Nothing
-        Dim isCapturing As Boolean = False
         Dim pipe As Pipeline
 
         Dim accelSensor As Sensor
@@ -156,7 +155,6 @@ Namespace MainUI
         End Sub
 
         Public Overrides Sub StopCamera()
-            isCapturing = False
             If captureThread IsNot Nothing Then
                 captureThread.Join(1000) ' Wait up to 1 second for thread to finish
                 captureThread = Nothing

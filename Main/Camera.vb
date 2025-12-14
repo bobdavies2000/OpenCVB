@@ -1,5 +1,4 @@
 ﻿Imports System.Numerics
-Imports System.Threading
 Imports cv = OpenCvSharp
 Public Class CameraImages
     Public images() As cv.Mat
@@ -59,6 +58,7 @@ Public Class GenericCamera
     Public cPtr As IntPtr
     Public ratio As Single
     Public Event FrameReady(sender As GenericCamera)
+    Public isCapturing As Boolean
     Public Structure imuDataStruct
         Dim r00 As Single
         Dim r01 As Single
@@ -89,6 +89,7 @@ Public Class GenericCamera
     End Structure
     Public Sub New()
         cameraFrameCount = 0
+        isCapturing = True
     End Sub
     Public Sub GetNextFrameCounts(frameTime As Double)
         Static lastFrameTime = IMU_TimeStamp
@@ -107,6 +108,7 @@ Public Class GenericCamera
         RaiseEvent FrameReady(Me)
     End Sub
     Public Sub childStopCamera()
+        isCapturing = False
         StopCamera()
         cameraFrameCount = -1
     End Sub

@@ -223,7 +223,7 @@ Namespace MainUI
             ' TreeViewTimer
             ' 
             TreeViewTimer.Enabled = True
-            TreeViewTimer.Interval = 1000
+            TreeViewTimer.Interval = 1
             ' 
             ' MainUI
             ' 

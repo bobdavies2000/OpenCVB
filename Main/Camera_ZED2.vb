@@ -5,7 +5,6 @@ Namespace MainUI
     Public Class Camera_ZED2 : Inherits GenericCamera
         Dim zed As CamZed
         Dim captureThread As Thread = Nothing
-        Dim isCapturing As Boolean = False
 
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
             captureRes = _captureRes
@@ -28,7 +27,6 @@ Namespace MainUI
             CalibData.baseline = zed.baseline
 
             ' Start background thread to capture frames
-            isCapturing = True
             captureThread = New Thread(AddressOf CaptureFrames)
             captureThread.IsBackground = True
             captureThread.Name = "ZED2_CaptureThread"
@@ -70,7 +68,6 @@ Namespace MainUI
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
         Public Overrides Sub StopCamera()
-            isCapturing = False
             If captureThread IsNot Nothing Then
                 captureThread.Join(1000) ' Wait up to 1 second for thread to finish
                 captureThread = Nothing

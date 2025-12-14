@@ -21,7 +21,7 @@ Namespace MainUI
         Dim runPlay As Bitmap
         Dim testAllToolbarBitmap As Bitmap
 
-        Public Sub jumpToAlgorithm()
+        Public Sub setAlgorithmSelection()
             If AvailableAlgorithms.Items.Contains(settings.algorithm) = False Then
                 AvailableAlgorithms.SelectedIndex = 0
             Else
@@ -31,7 +31,7 @@ Namespace MainUI
         Private Sub algHistory_Clicked(sender As Object, e As EventArgs)
             Dim item = TryCast(sender, ToolStripMenuItem)
             settings.algorithm = item.Text
-            jumpToAlgorithm()
+            setAlgorithmSelection()
         End Sub
         Public Sub setupAlgorithmHistory()
             If recentMenu Is Nothing Then ReDim recentMenu(settings.algorithmHistory.Count - 1)
@@ -135,6 +135,12 @@ Namespace MainUI
             End If
         End Sub
         Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+            If isPlaying Then
+                StopCamera()
+                While camera IsNot Nothing
+                    Thread.Sleep(1)
+                End While
+            End If
             SaveSettings()
             StopCamera()
         End Sub
@@ -166,22 +172,6 @@ Namespace MainUI
                 CamSwitchTimer.Enabled = False
                 CameraSwitching.Visible = False
             End If
-        End Sub
-        Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
-            If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
-
-            isPlaying = Not isPlaying
-
-            If PausePlayButton.Image IsNot Nothing Then PausePlayButton.Image.Dispose()
-
-            Dim filePath = Path.Combine(homeDir + "\Main\Data", If(isPlaying, "PauseButton.png", "Run.png"))
-            PausePlayButton.Image = New Bitmap(filePath)
-
-            PausePlayButton.Invalidate()
-
-            If isPlaying Then StartCamera() Else StopCamera()
-
-            jumpToAlgorithm()
         End Sub
         Private Sub getLineCounts()
             Dim countFileInfo = New FileInfo(homeDir + "Data/AlgorithmCounts.txt")
@@ -339,12 +329,36 @@ Namespace MainUI
 
             PausePlayButton.PerformClick()
         End Sub
+        Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
+            If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
+
+            isPlaying = Not isPlaying
+
+            If PausePlayButton.Image IsNot Nothing Then PausePlayButton.Image.Dispose()
+
+            Dim filePath = Path.Combine(homeDir + "\Main\Data", If(isPlaying, "PauseButton.png", "Run.png"))
+            PausePlayButton.Image = New Bitmap(filePath)
+
+            PausePlayButton.Invalidate()
+
+            If isPlaying Then StartCamera() Else StopCamera()
+            setAlgorithmSelection()
+        End Sub
         Private Sub paintPic(sender As Object, e As PaintEventArgs)
             If algTask Is Nothing Then Exit Sub
             Dim g As Graphics = e.Graphics
             Dim pic = DirectCast(sender, PictureBox)
             If pic.Image Is Nothing Then Exit Sub
             g.ScaleTransform(1, 1)
+
+
+
+            If algTask.dstList(1).Type <> cv.MatType.CV_8UC3 Then
+                algTask.dstList(1) = New cv.Mat(algTask.workRes, cv.MatType.CV_8UC3, 0)
+            End If
+
+
+
 
             Dim displayImage = algTask.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
 
@@ -360,16 +374,14 @@ Namespace MainUI
             Static myBlackPen As New Pen(Color.Black)
 
             Static saveTrueData As List(Of TrueText)
-            If algTask.debugDrawFlag Then
-                saveTrueData = New List(Of TrueText)(algTask.trueData)
-                For Each tt In saveTrueData
-                    If tt.text Is Nothing Then Continue For
-                    If tt.text.Length > 0 And tt.picTag = pic.Tag Then
-                        g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
+            saveTrueData = New List(Of TrueText)(algTask.trueData)
+            For Each tt In saveTrueData
+                If tt.text Is Nothing Then Continue For
+                If tt.text.Length > 0 And tt.picTag = pic.Tag Then
+                    g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
                                      CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
-                    End If
-                Next
-            End If
+                End If
+            Next
         End Sub
 
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick

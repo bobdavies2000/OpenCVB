@@ -1,7 +1,6 @@
 Namespace MainUI
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
-        Dim cameraRunning As Boolean = False
         Dim dstImages As CameraImages
         Private Sub camSwitchAnnouncement()
             CameraSwitching.Visible = True
@@ -24,61 +23,55 @@ Namespace MainUI
                 Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
                     camera = New Camera_ORB(settings.workRes, settings.captureRes, settings.cameraName)
                 Case Else
-                    ' Default to ZED if camera name not recognized
-                    camera = New Camera_ZED2(settings.workRes, settings.captureRes, "StereoLabs ZED 2/2i")
+                    MsgBox("Camera is not recognized!")
             End Select
-            cameraRunning = True
 
             AddHandler camera.FrameReady, AddressOf Camera_FrameReady
 
             fpsTimer.Enabled = True
-            TreeViewTimer.Enabled = True
         End Sub
         Private Sub StopCamera()
-            cameraRunning = False
-            If camera IsNot Nothing Then
-                RemoveHandler camera.FrameReady, AddressOf Camera_FrameReady
-                camera.childStopCamera()
-                camera = Nothing
-            End If
+            If camera Is Nothing Then Exit Sub
+            camera.childStopCamera()
+            camera.isCapturing = False
+            RemoveHandler camera.FrameReady, AddressOf Camera_FrameReady
+            camera = Nothing
         End Sub
         Private Function releaseImages() As Boolean
-            algTask.debugDrawFlag = True
             If algTask.debugSyncUI Then
                 Static lastTime As DateTime = Now
                 Dim timeNow As DateTime = Now
                 Dim elapsedTime = timeNow.Ticks - lastTime.Ticks
                 Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
                 Dim timerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
-                If timerInterval < 1000 Then ' adjust the debugSyncUI time here - in milliseconds.
-                    algTask.debugDrawFlag = False
-                Else
-                    lastTime = timeNow
-                End If
+
+                ' adjust the debugSyncUI time here - the 1000 below is in milliseconds.
+                If timerInterval < 1000 Then Return False Else lastTime = timeNow
             End If
 
-            Return algTask.debugDrawFlag
+            Return True
         End Function
         Private Sub Camera_FrameReady(sender As GenericCamera)
             If algTask Is Nothing Then Exit Sub
             ' This event is raised from the background thread, so we need to marshal to UI thread
-            Me.Invoke(Sub()
-                          sender.camImages.images(0).CopyTo(algTask.color)
-                          sender.camImages.images(1).CopyTo(algTask.pointCloud)
-                          sender.camImages.images(2).CopyTo(algTask.leftView)
-                          sender.camImages.images(3).CopyTo(algTask.rightView)
+            Try
+                Me.Invoke(Sub()
+                              sender.camImages.images(0).CopyTo(algTask.color)
+                              sender.camImages.images(1).CopyTo(algTask.pointCloud)
+                              sender.camImages.images(2).CopyTo(algTask.leftView)
+                              sender.camImages.images(3).CopyTo(algTask.rightView)
 
-                          algTask.RunAlgorithm()
-
-                          algTask.mouseClickFlag = False
-
-                          If releaseImages() Then
-                              For i = 0 To algTask.labels.Count - 1
-                                  labels(i).Text = algTask.labels(i)
-                              Next
+                              algTask.RunAlgorithm()
+                              algTask.mouseClickFlag = False
+                              If releaseImages() Then
+                                  For i = 0 To algTask.labels.Count - 1
+                                      labels(i).Text = algTask.labels(i)
+                                  Next
+                              End If
                               Me.Refresh()
-                          End If
-                      End Sub)
+                          End Sub)
+            Catch ex As Exception
+            End Try
         End Sub
     End Class
 End Namespace

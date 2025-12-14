@@ -419,9 +419,9 @@ Public Class VBtask : Implements IDisposable
         dst.Line(p1, p2, color, lineWidth, lineType)
     End Sub
     Public Sub RunAlgorithm()
-        If allOptions.titlesAdded Then
-            allOptions.titlesAdded = False
-            allOptions.layoutOptions(normalRequest:=True)
+        If algTask.allOptions.titlesAdded Then
+            algTask.allOptions.titlesAdded = False
+            algTask.allOptions.layoutOptions(normalRequest:=True)
         End If
 
         updateSettings()

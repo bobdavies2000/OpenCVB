@@ -6,7 +6,6 @@ Imports cv = OpenCvSharp
 Namespace MainUI
     Public Class Camera_RS2 : Inherits GenericCamera
         Dim captureThread As Thread = Nothing
-        Dim isCapturing As Boolean = False
         Dim pipe As New Pipeline()
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
             captureRes = _captureRes
@@ -72,7 +71,6 @@ Namespace MainUI
                                               System.Math.Pow(calibData.ColorToLeft_translation(1), 2) +
                                               System.Math.Pow(calibData.ColorToLeft_translation(2), 2))
             ' Start background thread to capture frames
-            isCapturing = True
             captureThread = New Thread(AddressOf CaptureFrames)
             captureThread.IsBackground = True
             captureThread.Name = "RS2_CaptureThread"
@@ -139,7 +137,6 @@ Namespace MainUI
             End Using
         End Sub
         Public Overrides Sub StopCamera()
-            isCapturing = False
             If captureThread IsNot Nothing Then
                 captureThread.Join(1000) ' Wait up to 1 second for thread to finish
                 captureThread = Nothing
