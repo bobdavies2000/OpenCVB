@@ -172,13 +172,11 @@ Namespace MainUI
 
             isPlaying = Not isPlaying
 
-            ' Load and set the appropriate image
             If PausePlayButton.Image IsNot Nothing Then PausePlayButton.Image.Dispose()
 
             Dim filePath = Path.Combine(homeDir + "\Main\Data", If(isPlaying, "PauseButton.png", "Run.png"))
             PausePlayButton.Image = New Bitmap(filePath)
 
-            ' Force the button to refresh
             PausePlayButton.Invalidate()
 
             If isPlaying Then StartCamera() Else StopCamera()

@@ -1,4 +1,4 @@
-﻿Namespace MainUI
+Namespace MainUI
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
         Dim cameraRunning As Boolean = False
@@ -32,6 +32,7 @@
             AddHandler camera.FrameReady, AddressOf Camera_FrameReady
 
             fpsTimer.Enabled = True
+            TreeViewTimer.Enabled = True
         End Sub
         Private Sub StopCamera()
             cameraRunning = False
