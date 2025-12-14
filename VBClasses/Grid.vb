@@ -398,9 +398,6 @@ Public Class Grid_Rectangles : Inherits TaskParent
             Next
         End If
 
-        cv.Cv2.ImShow("dst2", dst2)
-        cv.Cv2.ImShow("dst3", dst3)
-
         If standaloneTest() Then
             algTask.color.CopyTo(dst2)
             dst2.SetTo(white, gridMask)

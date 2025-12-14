@@ -616,7 +616,7 @@ Public Class VBtask : Implements IDisposable
 
             trueData.Clear()
             trueData.Add(New TrueText(algTask.depthAndDepthRange,
-                                          New cv.Point(algTask.mouseMovePoint.X, algTask.mouseMovePoint.Y - 24), 1))
+                                      New cv.Point(algTask.mouseMovePoint.X, algTask.mouseMovePoint.Y - 24), 1))
             For Each tt In displayObject.trueData
                 trueData.Add(tt)
             Next
