@@ -6,9 +6,9 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <UseWindowsForms>true</UseWindowsForms>
     <MyType>WindowsForms</MyType>
-    <StartupObject>CVB.My.MyApplication</StartupObject>
+    <StartupObject>Main.My.MyApplication</StartupObject>
     <Platforms>x64</Platforms>
-    <RootNamespace>CVB</RootNamespace>
+    <RootNamespace>Main</RootNamespace>
     <ApplicationIcon>Data\OpenCVB.ico</ApplicationIcon>
   </PropertyGroup>
 

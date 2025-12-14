@@ -50,7 +50,7 @@ Public Class TaskParent : Implements IDisposable
             If lines(i).StartsWith("VBtask") Then Exit For
             If lines(i).StartsWith("at Microsoft") Then Continue For
             If lines(i).StartsWith("at System") Then Continue For
-            If lines(i).StartsWith("at CVB") Then Continue For
+            If lines(i).StartsWith("at Main") Then Continue For
             callStack = lines(i) + "\" + callStack
         Next
 

@@ -1366,6 +1366,7 @@ RedColor_CPP
 RedColor_LeftRight
 RedColor_NWay
 RedList_Basics
+RedList_BasicsNew
 RedList_CellDepthHistogram
 RedList_CellsAtDepth
 RedList_CellStatsPlot

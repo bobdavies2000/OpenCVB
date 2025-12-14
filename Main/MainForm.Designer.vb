@@ -299,7 +299,7 @@ Namespace MainForm
             Icon = CType(resources.GetObject("$this.Icon"), Icon)
             Margin = New Padding(3, 4, 3, 4)
             Name = "MainForm"
-            Text = "CVB Application"
+            Text = "Main Application"
             MainToolStrip.ResumeLayout(False)
             MainToolStrip.PerformLayout()
             CType(campicRGB, ComponentModel.ISupportInitialize).EndInit()
