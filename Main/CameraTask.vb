@@ -1,7 +1,4 @@
-﻿Imports VBClasses
-Imports cv = OpenCvSharp
-Imports cvext = OpenCvSharp.Extensions
-Namespace MainUI
+﻿Namespace MainUI
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
         Dim cameraRunning As Boolean = False
@@ -46,7 +43,6 @@ Namespace MainUI
         End Sub
         Private Function releaseImages() As Boolean
             task.debugDrawFlag = True
-            Dim ratio = pics(0).Width / settings.workRes.Width
             If task.debugSyncUI Then
                 Static lastTime As DateTime = Now
                 Dim timeNow As DateTime = Now
@@ -73,20 +69,13 @@ Namespace MainUI
 
                           task.RunAlgorithm()
 
-                          If releaseImages() Then
-                              For i = 0 To task.dstList.Count - 1
-                                  Dim displayImage = task.dstList(i).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
-                                  Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
-                                  pics(i).Image?.Dispose()
-                                  pics(i).Image = bitmap
-                                  displayImage.Dispose()
-                              Next
-                              task.mouseClickFlag = False
+                          task.mouseClickFlag = False
 
+                          If releaseImages() Then
                               For i = 0 To task.labels.Count - 1
                                   labels(i).Text = task.labels(i)
                               Next
-                              Application.DoEvents() ' task.color doesn't appear for a few seconds without this.  Why?
+                              Me.Refresh()
                           End If
                       End Sub)
         End Sub

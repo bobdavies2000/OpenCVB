@@ -8,14 +8,13 @@ Namespace MainUI
         Dim mouseMovePoint As cv.Point ' last place the mouse was located in any of the OpenCVB images.
         Dim activeMouseDown As Boolean
         Dim BothFirstAndLastReady As Boolean
-        Private Sub CamPic_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles campicRGB.MouseUp, campicPointCloud.MouseUp, campicLeft.MouseUp, campicRight.MouseUp
+        Private Sub CamPic_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
             If DrawingRectangle Then DrawingRectangle = False
             activeMouseDown = False
         End Sub
-        Private Sub CamPic_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles campicRGB.MouseDown, campicPointCloud.MouseDown, campicLeft.MouseDown, campicRight.MouseDown
-            If task Is Nothing Then Exit Sub
-            Dim x As Integer = e.X * settings.workRes.Width / campicRGB.Width
-            Dim y As Integer = e.Y * settings.workRes.Height / campicRGB.Height
+        Private Sub CamPic_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
+            Dim x As Integer = e.X * settings.workRes.Width / pics(0).Width
+            Dim y As Integer = e.Y * settings.workRes.Height / pics(0).Height
             Dim pic = DirectCast(sender, PictureBox)
             If e.Button = System.Windows.Forms.MouseButtons.Right Then
                 activeMouseDown = True
@@ -29,11 +28,10 @@ Namespace MainUI
                 mouseDownPoint.Y = y
             End If
         End Sub
-        Private Sub CamPic_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles campicRGB.MouseMove, campicPointCloud.MouseMove, campicLeft.MouseMove, campicRight.MouseMove
+        Private Sub CamPic_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
             If task Is Nothing Then Exit Sub
-
-            Dim x As Integer = e.X * settings.workRes.Width / campicRGB.Width
-            Dim y As Integer = e.Y * settings.workRes.Height / campicRGB.Height
+            Dim x As Integer = e.X * settings.workRes.Width / pics(0).Width
+            Dim y As Integer = e.Y * settings.workRes.Height / pics(0).Height
             Dim pic = DirectCast(sender, PictureBox)
             task.mousePicTag = pic.Tag
             If activeMouseDown Then Exit Sub
@@ -48,9 +46,11 @@ Namespace MainUI
                 task.drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
                 task.drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
                 task.drawRect.Height = Math.Abs(mouseDownPoint.Y - mouseMovePoint.Y)
-                If task.drawRect.X + task.drawRect.Width > campicRGB.Width Then task.drawRect.Width = campicRGB.Width - task.drawRect.X
-                If task.drawRect.Y + task.drawRect.Height > campicRGB.Height Then
-                    task.drawRect.Height = campicRGB.Height - task.drawRect.Y
+                If task.drawRect.X + task.drawRect.Width > pics(0).Width Then
+                    task.drawRect.Width = pics(0).Width - task.drawRect.X
+                End If
+                If task.drawRect.Y + task.drawRect.Height > pics(0).Height Then
+                    task.drawRect.Height = pics(0).Height - task.drawRect.Y
                 End If
                 BothFirstAndLastReady = True
             End If
@@ -66,15 +66,7 @@ Namespace MainUI
                                     task.drawRect.Width, task.drawRect.Height)
             End If
         End Sub
-        Private Sub PictureBox_MouseClick(sender As Object, e As MouseEventArgs) Handles campicRGB.MouseClick, campicPointCloud.MouseClick, campicLeft.MouseClick, campicRight.MouseClick
-            If task Is Nothing Then Exit Sub
-            Dim picBox = TryCast(sender, PictureBox)
-            Dim x As Integer = e.X * settings.workRes.Width / campicRGB.Width
-            Dim y As Integer = e.Y * settings.workRes.Height / campicRGB.Height
-            task.clickPoint = New cv.Point(x, y)
-            task.mouseClickFlag = True
-        End Sub
-        Private Sub campic_DoubleClick(sender As Object, e As EventArgs) Handles campicRGB.DoubleClick, campicPointCloud.DoubleClick, campicLeft.DoubleClick, campicRight.DoubleClick
+        Private Sub campic_DoubleClick(sender As Object, e As EventArgs)
             DrawingRectangle = False
         End Sub
     End Class

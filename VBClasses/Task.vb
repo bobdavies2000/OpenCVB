@@ -102,12 +102,6 @@ Public Class VBtask : Implements IDisposable
     Public contours As Contour_Basics_List
     Public pcMotion As Motion_PointCloud
 
-
-
-
-
-
-
     Public GLRequest As Integer
     Public GLcloud As cv.Mat
     Public GLrgb As cv.Mat
@@ -142,6 +136,8 @@ Public Class VBtask : Implements IDisposable
     Public gridROIclicked As Integer
     Public depthDiffMeters As Single ' bricks > than this value are depth edges - in meters
     Public rgbLeftAligned As Boolean ' if the rgb image is the left image...
+    Public gridRatioX As Single ' translate from display width to workres to find grid element.
+    Public gridRatioY As Single ' translate from display height to workres to find grid element.
 
     Public fpMotion As cv.Point2f
 
@@ -349,7 +345,7 @@ Public Class VBtask : Implements IDisposable
         cols = settings.workRes.Width
         workRes = settings.workRes
         captureRes = settings.captureRes
-        resolutionDetails = "RGB Input " + CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) +
+        resolutionDetails = "CaptureRes " + CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) +
                             ", workRes " + CStr(workRes.Width) + "x" + CStr(workRes.Height)
 
         allOptions = New OptionsContainer

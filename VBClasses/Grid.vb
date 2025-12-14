@@ -132,15 +132,11 @@ Public Class Grid_BasicsTest : Inherits TaskParent
         Dim mean = cv.Cv2.Mean(src)
 
         dst2.SetTo(0)
-        ' SetTrueText is not thread-safe...
-        'Parallel.For(0, task.gridRects.Count,
-        ' Sub(i)
         For i = 0 To task.gridRects.Count - 1
             Dim roi = task.gridRects(i)
             cv.Cv2.Subtract(mean, src(roi), dst2(roi))
             SetTrueText(CStr(i), New cv.Point(roi.X, roi.Y))
         Next
-        'End Sub)
         dst2.SetTo(white, task.gridMask)
 
         dst3.SetTo(0)
@@ -150,6 +146,9 @@ Public Class Grid_BasicsTest : Inherits TaskParent
              cv.Cv2.Subtract(mean, src(roi), dst3(roi))
              DrawLine(dst3(roi), New cv.Point(0, 0), New cv.Point(roi.Width, roi.Height), white)
          End Sub)
+
+        cv.Cv2.ImShow("dst2", dst2)
+        cv.Cv2.ImShow("dst3", dst3)
     End Sub
 End Class
 
@@ -303,7 +302,6 @@ Public Class Grid_TrackCenter : Inherits TaskParent
     Dim match As New Match_Basics
     Public Sub New()
         If standalone Then task.gOptions.ShowGrid.Checked = True
-
         desc = "Track a cell near the center of the grid"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

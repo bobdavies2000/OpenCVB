@@ -1,6 +1,7 @@
 Imports System.IO
 Imports System.Text.RegularExpressions
 Imports cv = OpenCvSharp
+Imports cvext = OpenCvSharp.Extensions
 Imports VBClasses
 
 Namespace MainUI
@@ -11,8 +12,8 @@ Namespace MainUI
         Dim algHistory As New List(Of String)
         Dim recentMenu() As ToolStripMenuItem
         Dim labels As List(Of Label)
-        Dim pics As List(Of PictureBox)
         Public task As VBClasses.VBtask
+        Dim pics As New List(Of PictureBox)
         Dim testAllRunning As Boolean = False
         Public Sub jumpToAlgorithm()
             If AvailableAlgorithms.Items.Contains(settings.algorithm) = False Then
@@ -77,7 +78,6 @@ Namespace MainUI
             For Each lab In labels
                 lab.Text = ""
             Next
-            pics = New List(Of PictureBox)({campicRGB, campicPointCloud, campicLeft, campicRight})
 
             settingsIO = New jsonIO(Path.Combine(homeDir, "Main\settings.json"))
         End Sub
@@ -127,12 +127,6 @@ Namespace MainUI
                 Next
             End If
         End Sub
-        Private Sub campicRGB_Click(sender As Object, e As EventArgs) Handles campicRGB.Click, campicPointCloud.Click, campicLeft.Click, campicRight.Click
-            If task Is Nothing Then Exit Sub
-            'If task IsNot Nothing Then  if task.sharpgl IsNot Nothing Then sharpGL.Activate()
-            If task IsNot Nothing Then If task.treeView IsNot Nothing Then task.treeView.Activate()
-            If task IsNot Nothing Then If task.allOptions IsNot Nothing Then task.allOptions.Activate()
-        End Sub
         Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             SaveSettings()
             StopCamera()
@@ -148,6 +142,8 @@ Namespace MainUI
             task.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
             task.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
             task.dstList = {task.color, task.pointCloud, task.leftView, task.rightView}
+            task.gridRatioX = pics(0).Width / settings.workRes.Width
+            task.gridRatioY = pics(0).Height / settings.workRes.Height
 
             task.settings = settings ' task is in a separate project and needs access to settings.
             task.main_hwnd = Me.Handle
@@ -240,34 +236,20 @@ Namespace MainUI
             Dim offset = 10
             Dim h As Integer = (Me.Height - StatusLabel.Height - topStart - labelHeight * 2) / 2 - 20
             Dim w As Integer = Me.Width / 2 - offset * 2
-            For i = 0 To pics.Count - 1
-                labels(i).Location = Choose(i + 1, New Point(offset, MainToolStrip.Height), New Point(w + offset, labelRGB.Top),
-                                                   New Point(offset, campicRGB.Top + h), New Point(w + offset, labelLeft.Top))
-
-                pics(i).Location = Choose(i + 1, New Point(offset, topStart + labelHeight), New Point(w + offset, campicRGB.Top),
-                                                 New Point(offset, labelLeft.Top + labelHeight), New Point(w + offset, campicLeft.Top))
+            For i = 0 To 3
+                labels(i).Location = Choose(i + 1, New Point(offset, MainToolStrip.Height),
+                                                   New Point(w + offset, labelRGB.Top),
+                                                   New Point(offset, topStart + labelHeight + h),
+                                                   New Point(w + offset, labelLeft.Top))
                 pics(i).Size = New Size(w, h)
-                pics(i).Tag = i
-                AddHandler pics(i).Paint, AddressOf pics_paint
+                pics(i).Location = Choose(i + 1, New Point(offset, topStart + labelHeight),
+                                                 New Point(w + offset, labels(0).Top + labelHeight),
+                                                 New Point(offset, labelLeft.Top + labelHeight),
+                                                 New Point(w + offset, labels(2).Top + labelHeight))
             Next
 
-            StatusLabel.Location = New Point(offset, campicLeft.Top + h)
+            StatusLabel.Location = New Point(offset, pics(2).Top + h)
             StatusLabel.Width = w * 2
-        End Sub
-        Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-            settings = settingsIO.Load()
-            Me.Location = New Point(settings.MainFormLeft, settings.MainFormTop)
-            Me.Size = New Size(settings.MainFormWidth, settings.MainFormHeight)
-            Me.Show()
-
-            camSwitchAnnouncement()
-            getLineCounts()
-
-            LoadAvailableAlgorithms()
-
-            setupAlgorithmHistory()
-
-            PausePlayButton.PerformClick()
         End Sub
         Private Sub TreeViewTimer_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
             If task Is Nothing Then Exit Sub
@@ -297,15 +279,61 @@ Namespace MainUI
                 End If
             End If
         End Sub
-        Private Sub pics_paint(sender As Object, e As PaintEventArgs)
+        Private Sub clickPic(sender As Object, e As EventArgs)
+            If task Is Nothing Then Exit Sub
+            'If task IsNot Nothing Then  if task.sharpgl IsNot Nothing Then sharpGL.Activate()
+            If task IsNot Nothing Then If task.treeView IsNot Nothing Then task.treeView.Activate()
+            If task IsNot Nothing Then If task.allOptions IsNot Nothing Then task.allOptions.Activate()
+        End Sub
+        Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+            settings = settingsIO.Load()
 
+            For i = 0 To 3
+                Dim pic = New PictureBox()
+                AddHandler pic.DoubleClick, AddressOf campic_DoubleClick
+                AddHandler pic.Click, AddressOf clickPic
+                AddHandler pic.Paint, AddressOf paintPic
+                AddHandler pic.MouseDown, AddressOf CamPic_MouseDown
+                AddHandler pic.MouseUp, AddressOf CamPic_MouseUp
+                AddHandler pic.MouseMove, AddressOf CamPic_MouseMove
+                pic.Tag = i
+                pic.Image = New Bitmap(200, 200)
+                pic.BackColor = Color.Black
+                pic.Visible = True
+                Me.Controls.Add(pic)
+
+                pics.Add(pic)
+            Next
+
+            Me.Location = New Point(settings.MainFormLeft, settings.MainFormTop)
+            Me.Size = New Size(settings.MainFormWidth, settings.MainFormHeight)
+            Me.Show()
+
+            camSwitchAnnouncement()
+            getLineCounts()
+
+            LoadAvailableAlgorithms()
+
+            setupAlgorithmHistory()
+
+            PausePlayButton.PerformClick()
+        End Sub
+        Private Sub paintPic(sender As Object, e As PaintEventArgs)
+            If task Is Nothing Then Exit Sub
             Dim g As Graphics = e.Graphics
             Dim pic = DirectCast(sender, PictureBox)
             If pic.Image Is Nothing Then Exit Sub
             g.ScaleTransform(1, 1)
+
+            Dim displayImage = task.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+
+            Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
+            pic.Image?.Dispose()
+            pic.Image = bitmap
             g.DrawImage(pic.Image, 0, 0)
 
-            Dim ratio = pic.Width / settings.workRes.Width
+            Dim ratioX = pic.Width / settings.workRes.Width
+            Dim ratioY = pic.Height / settings.workRes.Height
 
             Static myWhitePen As New Pen(Color.White)
             Static myBlackPen As New Pen(Color.Black)
@@ -316,7 +344,7 @@ Namespace MainUI
                 If tt.text Is Nothing Then Continue For
                 If tt.text.Length > 0 And tt.picTag = pic.Tag Then
                     g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
-                                         CSng(tt.pt.X * ratio), CSng(tt.pt.Y * ratio))
+                                 CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
                 End If
             Next
         End Sub

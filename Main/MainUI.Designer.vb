@@ -37,10 +37,6 @@ Namespace MainUI
             AtoZ = New ToolStripButton()
             ToolStripSeparator2 = New ToolStripSeparator()
             AlgDescription = New ToolStripTextBox()
-            campicRGB = New PictureBox()
-            campicPointCloud = New PictureBox()
-            campicLeft = New PictureBox()
-            campicRight = New PictureBox()
             labelRGB = New Label()
             labelPointCloud = New Label()
             labelLeft = New Label()
@@ -51,10 +47,6 @@ Namespace MainUI
             fpsTimer = New Timer(components)
             TreeViewTimer = New Timer(components)
             MainToolStrip.SuspendLayout()
-            CType(campicRGB, ComponentModel.ISupportInitialize).BeginInit()
-            CType(campicPointCloud, ComponentModel.ISupportInitialize).BeginInit()
-            CType(campicLeft, ComponentModel.ISupportInitialize).BeginInit()
-            CType(campicRight, ComponentModel.ISupportInitialize).BeginInit()
             SuspendLayout()
             ' 
             ' MainToolStrip
@@ -159,58 +151,6 @@ Namespace MainUI
             AlgDescription.Text = "Description of algorithm"
             AlgDescription.ToolTipText = "Description"
             ' 
-            ' campicRGB
-            ' 
-            campicRGB.Anchor = AnchorStyles.None
-            campicRGB.BackColor = Color.Black
-            campicRGB.Location = New Point(-296, 62)
-            campicRGB.Margin = New Padding(0)
-            campicRGB.Name = "campicRGB"
-            campicRGB.Size = New Size(933, 528)
-            campicRGB.SizeMode = PictureBoxSizeMode.StretchImage
-            campicRGB.TabIndex = 1
-            campicRGB.TabStop = False
-            campicRGB.Tag = "0"
-            ' 
-            ' campicPointCloud
-            ' 
-            campicPointCloud.Anchor = AnchorStyles.None
-            campicPointCloud.BackColor = Color.Black
-            campicPointCloud.Location = New Point(644, 58)
-            campicPointCloud.Margin = New Padding(0)
-            campicPointCloud.Name = "campicPointCloud"
-            campicPointCloud.Size = New Size(920, 536)
-            campicPointCloud.SizeMode = PictureBoxSizeMode.StretchImage
-            campicPointCloud.TabIndex = 2
-            campicPointCloud.TabStop = False
-            campicPointCloud.Tag = "1"
-            ' 
-            ' campicLeft
-            ' 
-            campicLeft.Anchor = AnchorStyles.None
-            campicLeft.BackColor = Color.Black
-            campicLeft.Location = New Point(-289, 606)
-            campicLeft.Margin = New Padding(0)
-            campicLeft.Name = "campicLeft"
-            campicLeft.Size = New Size(919, 535)
-            campicLeft.SizeMode = PictureBoxSizeMode.StretchImage
-            campicLeft.TabIndex = 3
-            campicLeft.TabStop = False
-            campicLeft.Tag = "2"
-            ' 
-            ' campicRight
-            ' 
-            campicRight.Anchor = AnchorStyles.None
-            campicRight.BackColor = Color.Black
-            campicRight.Location = New Point(644, 606)
-            campicRight.Margin = New Padding(0)
-            campicRight.Name = "campicRight"
-            campicRight.Size = New Size(920, 535)
-            campicRight.SizeMode = PictureBoxSizeMode.StretchImage
-            campicRight.TabIndex = 4
-            campicRight.TabStop = False
-            campicRight.Tag = "3"
-            ' 
             ' labelRGB
             ' 
             labelRGB.AutoSize = True
@@ -262,7 +202,7 @@ Namespace MainUI
             ' 
             CameraSwitching.AutoSize = True
             CameraSwitching.Font = New Font("Microsoft Sans Serif", 12.0F)
-            CameraSwitching.Location = New Point(61, 122)
+            CameraSwitching.Location = New Point(40, 118)
             CameraSwitching.Name = "CameraSwitching"
             CameraSwitching.Size = New Size(202, 29)
             CameraSwitching.TabIndex = 9
@@ -287,10 +227,6 @@ Namespace MainUI
             ClientSize = New Size(1275, 1171)
             Controls.Add(CameraSwitching)
             Controls.Add(StatusLabel)
-            Controls.Add(campicRight)
-            Controls.Add(campicLeft)
-            Controls.Add(campicPointCloud)
-            Controls.Add(campicRGB)
             Controls.Add(labelRight)
             Controls.Add(labelLeft)
             Controls.Add(labelPointCloud)
@@ -302,10 +238,6 @@ Namespace MainUI
             Text = "Main Application"
             MainToolStrip.ResumeLayout(False)
             MainToolStrip.PerformLayout()
-            CType(campicRGB, ComponentModel.ISupportInitialize).EndInit()
-            CType(campicPointCloud, ComponentModel.ISupportInitialize).EndInit()
-            CType(campicLeft, ComponentModel.ISupportInitialize).EndInit()
-            CType(campicRight, ComponentModel.ISupportInitialize).EndInit()
             ResumeLayout(False)
             PerformLayout()
         End Sub
@@ -322,10 +254,6 @@ Namespace MainUI
         Friend WithEvents AvailableAlgorithms As ToolStripComboBox
         Friend WithEvents AtoZ As ToolStripButton
         Friend WithEvents AlgDescription As ToolStripTextBox
-        Friend WithEvents campicRGB As PictureBox
-        Friend WithEvents campicPointCloud As PictureBox
-        Friend WithEvents campicLeft As PictureBox
-        Friend WithEvents campicRight As PictureBox
         Friend WithEvents labelRGB As Label
         Friend WithEvents labelPointCloud As Label
         Friend WithEvents labelLeft As Label
