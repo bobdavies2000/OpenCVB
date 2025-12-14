@@ -3,8 +3,8 @@ Imports System.Text.RegularExpressions
 Imports cv = OpenCvSharp
 Imports VBClasses
 
-Namespace MainForm
-    Partial Public Class MainForm
+Namespace MainUI
+    Partial Public Class MainUI
         Dim isPlaying As Boolean = False
         Dim homeDir As String = ""
         Public settingsIO As jsonIO
@@ -248,7 +248,7 @@ Namespace MainForm
                                                  New Point(offset, labelLeft.Top + labelHeight), New Point(w + offset, campicLeft.Top))
                 pics(i).Size = New Size(w, h)
                 pics(i).Tag = i
-                AddHandler pics(i).Paint, AddressOf pics_Paint
+                AddHandler pics(i).Paint, AddressOf pics_paint
             Next
 
             StatusLabel.Location = New Point(offset, campicLeft.Top + h)

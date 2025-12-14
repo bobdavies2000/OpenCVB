@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
-Namespace MainForm
-    Partial Public Class MainForm
+Namespace MainUI
+    Partial Public Class MainUI
         Dim DrawingRectangle As Boolean
         Dim LastX As Integer
         Dim LastY As Integer

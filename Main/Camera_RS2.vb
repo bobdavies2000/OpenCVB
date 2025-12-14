@@ -3,7 +3,7 @@ Imports System.Threading
 Imports Intel.RealSense
 Imports cv = OpenCvSharp
 
-Namespace MainForm
+Namespace MainUI
     Public Class Camera_RS2 : Inherits GenericCamera
         Dim captureThread As Thread = Nothing
         Dim isCapturing As Boolean = False

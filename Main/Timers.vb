@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
-Namespace MainForm
-    Partial Public Class MainForm
+Namespace MainUI
+    Partial Public Class MainUI
         Dim fpsWriteCount As Integer
         Dim fpsListA As New List(Of Single)
         Dim fpsListC As New List(Of Single)

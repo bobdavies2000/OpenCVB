@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Module GlobalVariables
-    Public settings As MainForm.Json
-    Public mainfrm As MainForm.MainForm
+    Public settings As MainUI.Json
+    Public mainfrm As MainUI.MainUI
 
     Public cameraNames As New List(Of String)({"Intel(R) RealSense(TM) Depth Camera 435i",
                                                "Intel(R) RealSense(TM) Depth Camera 455",

@@ -17,7 +17,7 @@ Public Class Bin4Way_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Static index As Integer = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-        If task.mousePicTag = 1 Then index = task.gridMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
+        index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
         Dim roiSave = If(index < task.gridRects.Count, task.gridRects(index), New cv.Rect)
 
         If task.optionsChanged Then index = 0

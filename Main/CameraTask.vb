@@ -1,8 +1,8 @@
 ﻿Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
-Namespace MainForm
-    Partial Public Class MainForm
+Namespace MainUI
+    Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
         Dim cameraRunning As Boolean = False
         Dim dstImages As CameraImages

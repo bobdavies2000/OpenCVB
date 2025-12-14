@@ -46,7 +46,7 @@ Namespace My
                 currentDir = currentDir.Parent
             End While
 
-            Me.MainForm = New MainForm.MainForm(projectFilePath)
+            Me.MainForm = New MainUI.MainUI(projectFilePath)
         End Sub
 
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>

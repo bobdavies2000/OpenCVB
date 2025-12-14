@@ -1,6 +1,6 @@
-Namespace MainForm
+Namespace MainUI
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-    Partial Public Class MainForm
+    Partial Public Class MainUI
         Inherits Form
 
         'Form overrides dispose to clean up the component list.
@@ -24,7 +24,7 @@ Namespace MainForm
         <System.Diagnostics.DebuggerStepThrough()>
         Private Sub InitializeComponent()
             components = New ComponentModel.Container()
-            Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainForm))
+            Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainUI))
             MainToolStrip = New ToolStrip()
             PausePlayButton = New ToolStripButton()
             OptionsButton = New ToolStripButton()
@@ -280,9 +280,9 @@ Namespace MainForm
             ' 
             TreeViewTimer.Interval = 1000
             ' 
-            ' MainForm
+            ' MainUI
             ' 
-            AutoScaleDimensions = New SizeF(12F, 30F)
+            AutoScaleDimensions = New SizeF(12.0F, 30.0F)
             AutoScaleMode = AutoScaleMode.Font
             ClientSize = New Size(1275, 1171)
             Controls.Add(CameraSwitching)
@@ -298,7 +298,7 @@ Namespace MainForm
             Controls.Add(MainToolStrip)
             Icon = CType(resources.GetObject("$this.Icon"), Icon)
             Margin = New Padding(3, 4, 3, 4)
-            Name = "MainForm"
+            Name = "MainUI"
             Text = "Main Application"
             MainToolStrip.ResumeLayout(False)
             MainToolStrip.PerformLayout()

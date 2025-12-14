@@ -3,7 +3,7 @@ Imports System.Management
 Imports Newtonsoft.Json
 Imports cv = OpenCvSharp
 
-Namespace MainForm
+Namespace MainUI
     Public Class Json
         Public cameraName As String = "StereoLabs ZED 2/2I"
         Public cameraPresent As List(Of Boolean)
