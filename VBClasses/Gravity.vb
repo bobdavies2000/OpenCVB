@@ -7,15 +7,15 @@ Public Class Gravity_Basics : Inherits TaskParent
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(2) = "Horizon and Gravity Vectors"
-        If standalone Then task.gOptions.gravityPointCloud.Checked = False
+        If standalone Then algTask.gOptions.gravityPointCloud.Checked = False
         desc = "Method to find gravity and horizon vectors from the IMU"
     End Sub
     Public Shared Sub showVectors(dst As cv.Mat)
-        dst.Line(task.lineGravity.pE1, task.lineGravity.pE2, white, task.lineWidth, task.lineType)
-        dst.Line(task.lineHorizon.pE1, task.lineHorizon.pE2, white, task.lineWidth, task.lineType)
-        If task.lineLongest IsNot Nothing Then
-            dst.Line(task.lineLongest.p1, task.lineLongest.p2, task.highlight, task.lineWidth * 2, task.lineType)
-            dst.Line(task.lineLongest.pE1, task.lineLongest.pE2, white, task.lineWidth, task.lineType)
+        dst.Line(algTask.lineGravity.pE1, algTask.lineGravity.pE2, white, algTask.lineWidth, algTask.lineType)
+        dst.Line(algTask.lineHorizon.pE1, algTask.lineHorizon.pE2, white, algTask.lineWidth, algTask.lineType)
+        If algTask.lineLongest IsNot Nothing Then
+            dst.Line(algTask.lineLongest.p1, algTask.lineLongest.p2, algTask.highlight, algTask.lineWidth * 2, algTask.lineType)
+            dst.Line(algTask.lineLongest.pE1, algTask.lineLongest.pE2, white, algTask.lineWidth, algTask.lineType)
         End If
     End Sub
     Private Function findFirst(points As cv.Mat) As Single
@@ -47,24 +47,24 @@ Public Class Gravity_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim threshold As Single = 0.015 ' surround zero by 15 cm's
 
-        dst3 = task.pcSplit(0).InRange(-threshold, threshold)
-        dst3.SetTo(0, task.noDepthMask)
+        dst3 = algTask.pcSplit(0).InRange(-threshold, threshold)
+        dst3.SetTo(0, algTask.noDepthMask)
         Dim gPoints = dst3.FindNonZero()
         If gPoints.Rows = 0 Then
-            ' build a fake gravity vector when we don't have anything so task.lines.lplist has 1 entry.
+            ' build a fake gravity vector when we don't have anything so algTask.lines.lplist has 1 entry.
             ' It will be updated in the next frame.  This is a startup issue.
-            task.gravityIMU = New lpData(New cv.Point2f(dst2.Width / 2, 0),
+            algTask.gravityIMU = New lpData(New cv.Point2f(dst2.Width / 2, 0),
                                          New cv.Point2f(dst2.Width / 2, dst2.Height))
 
             Exit Sub ' no point cloud data to get the gravity line in the image coordinates.
         End If
         xTop = findFirst(gPoints)
         xBot = findLast(gPoints)
-        task.gravityIMU = New lpData(New cv.Point2f(xTop, 0), New cv.Point2f(xBot, dst2.Height))
+        algTask.gravityIMU = New lpData(New cv.Point2f(xTop, 0), New cv.Point2f(xBot, dst2.Height))
 
         If standaloneTest() Then
-            dst2 = task.color
-            DrawLine(dst2, task.gravityIMU.p1, task.gravityIMU.p2, task.highlight)
+            dst2 = algTask.color
+            DrawLine(dst2, algTask.gravityIMU.p1, algTask.gravityIMU.p2, algTask.highlight)
         End If
     End Sub
 End Class
@@ -80,11 +80,11 @@ Public Class Gravity_RGB : Inherits TaskParent
         desc = "Rotate the RGB image using the offset from gravity."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Static rotateAngle As Double = task.verticalizeAngle - 2
+        Static rotateAngle As Double = algTask.verticalizeAngle - 2
         Static rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
 
         rotateAngle += 0.1
-        If rotateAngle >= task.verticalizeAngle + 2 Then rotateAngle = task.verticalizeAngle - 2
+        If rotateAngle >= algTask.verticalizeAngle + 2 Then rotateAngle = algTask.verticalizeAngle - 2
 
         Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)
         dst3 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Nearest)
@@ -92,10 +92,10 @@ Public Class Gravity_RGB : Inherits TaskParent
         survey.Run(dst3)
         dst2 = survey.dst2
 
-        Dim incrX = dst1.Width / task.brickSize
-        Dim incrY = dst1.Height / task.brickSize
-        For y = 0 To task.brickSize - 1
-            For x = 0 To task.brickSize - 1
+        Dim incrX = dst1.Width / algTask.brickSize
+        Dim incrY = dst1.Height / algTask.brickSize
+        For y = 0 To algTask.brickSize - 1
+            For x = 0 To algTask.brickSize - 1
                 SetTrueText(CStr(survey.results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
             Next
         Next
@@ -110,11 +110,11 @@ End Class
 Public Class Gravity_BrickRotate : Inherits TaskParent
     Dim survey As New BrickPoint_PopulationSurvey
     Public Sub New()
-        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
         desc = "Rotate the grid point using the offset from gravity."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim angle = Math.Abs(task.verticalizeAngle)
+        Dim angle = Math.Abs(algTask.verticalizeAngle)
         Static rotateAngle As Double = -angle
         Static rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
 
@@ -122,7 +122,7 @@ Public Class Gravity_BrickRotate : Inherits TaskParent
         If rotateAngle >= angle Then rotateAngle = -angle
 
         dst1 = src
-        For Each brick In task.bricks.brickList
+        For Each brick In algTask.bricks.brickList
             If brick.pt.Y = brick.rect.Y Then DrawCircle(dst1, brick.pt)
         Next
 
@@ -132,10 +132,10 @@ Public Class Gravity_BrickRotate : Inherits TaskParent
         survey.Run(dst3)
         dst2 = survey.dst2
 
-        Dim incrX = dst1.Width / task.brickSize
-        Dim incrY = dst1.Height / task.brickSize
-        For y = 0 To task.brickSize - 1
-            For x = 0 To task.brickSize - 1
+        Dim incrX = dst1.Width / algTask.brickSize
+        Dim incrY = dst1.Height / algTask.brickSize
+        For y = 0 To algTask.brickSize - 1
+            For x = 0 To algTask.brickSize - 1
                 SetTrueText(CStr(survey.results(x, y)), New cv.Point(x * incrX, y * incrY), 2)
             Next
         Next
@@ -154,25 +154,25 @@ Public Class Gravity_BasicsOld : Inherits TaskParent
         desc = "Find all the points where depth X-component transitions from positive to negative"
     End Sub
     Public Sub displayResults(p1 As cv.Point, p2 As cv.Point)
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             If p1.Y >= 1 And p1.Y <= dst2.Height - 1 Then strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf
         End If
 
         dst2.SetTo(0)
         dst3.SetTo(0)
         For Each pt In points
-            DrawCircle(dst2, pt, task.DotSize, white)
+            DrawCircle(dst2, pt, algTask.DotSize, white)
         Next
 
-        DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, white)
-        DrawLine(dst3, task.lineGravity.p1, task.lineGravity.p2, white)
+        DrawLine(dst2, algTask.lineGravity.p1, algTask.lineGravity.p2, white)
+        DrawLine(dst3, algTask.lineGravity.p1, algTask.lineGravity.p2, white)
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(0) Else dst0 = src
+        If src.Type <> cv.MatType.CV_32F Then dst0 = algTask.pcSplit(0) Else dst0 = src
 
         dst0 = dst0.Abs()
         dst1 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        dst0.SetTo(task.MaxZmeters, Not dst1)
+        dst0.SetTo(algTask.MaxZmeters, Not dst1)
 
         points.Clear()
         For i = dst0.Height / 3 To dst0.Height * 2 / 3 - 1
@@ -199,11 +199,11 @@ Public Class Gravity_BasicsOld : Inherits TaskParent
             strOut += "Using the previous value for the gravity vector."
         Else
             Dim lp = New lpData(p1, p2)
-            task.lineGravity = New lpData(lp.pE1, lp.pE2)
+            algTask.lineGravity = New lpData(lp.pE1, lp.pE2)
             If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
         End If
 
-        task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
+        algTask.lineHorizon = Line_PerpendicularTest.computePerp(algTask.lineGravity)
         SetTrueText(strOut, 3)
     End Sub
 End Class
@@ -220,10 +220,10 @@ Public Class Gravity_BasicsOriginal : Inherits TaskParent
         desc = "Search for the transition from positive to negative to find the gravity vector."
     End Sub
     Public Shared Function PrepareDepthInput(index As Integer) As cv.Mat
-        If task.gOptions.gravityPointCloud.Checked Then Return task.pcSplit(index) ' already oriented to gravity
+        If algTask.gOptions.gravityPointCloud.Checked Then Return algTask.pcSplit(index) ' already oriented to gravity
 
         ' rebuild the pointcloud so it is oriented to gravity.
-        Dim pc = (task.pointCloud.Reshape(1, task.pointCloud.Rows * task.pointCloud.Cols) * task.gMatrix).ToMat.Reshape(3, task.pointCloud.Rows)
+        Dim pc = (algTask.pointCloud.Reshape(1, algTask.pointCloud.Rows * algTask.pointCloud.Cols) * algTask.gMatrix).ToMat.Reshape(3, algTask.pointCloud.Rows)
         Dim split = pc.Split()
         Return split(index)
     End Function
@@ -240,7 +240,7 @@ Public Class Gravity_BasicsOriginal : Inherits TaskParent
                     Dim pt = New cv.Point2f(x + Math.Abs(val) / Math.Abs(val - lastVal), y)
                     ptX.Add(pt.X)
                     ptY.Add(pt.Y)
-                    If ptX.Count >= task.frameHistoryCount Then
+                    If ptX.Count >= algTask.frameHistoryCount Then
                         Return New cv.Point2f(ptX.Average, ptY.Average)
                     End If
                 End If
@@ -251,7 +251,7 @@ Public Class Gravity_BasicsOriginal : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(0) Else dst0 = src
+        If src.Type <> cv.MatType.CV_32F Then dst0 = algTask.pcSplit(0) Else dst0 = src
 
         Dim p1 = findTransition(0, dst0.Height - 1, 1)
         Dim p2 = findTransition(dst0.Height - 1, 0, -1)

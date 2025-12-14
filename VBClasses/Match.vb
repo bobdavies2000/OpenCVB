@@ -11,7 +11,7 @@ Public Class Match_Basics : Inherits TaskParent
                "(allows multiple targets per image.)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone And task.algorithmPrep = False Then
+        If standalone And algTask.algorithmPrep = False Then
             SetTrueText("Match is called often so no need for standalone test.")
             Exit Sub
         End If
@@ -25,9 +25,9 @@ Public Class Match_Basics : Inherits TaskParent
         newCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
         newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
         If standaloneTest() Then
-            dst2 = task.gray.Clone
-            dst2.Rectangle(newRect, white, task.lineWidth)
-            DrawLine(dst2, task.lineLongest.p1, task.lineLongest.p2, white)
+            dst2 = algTask.gray.Clone
+            dst2.Rectangle(newRect, white, algTask.lineWidth)
+            DrawLine(dst2, algTask.lineLongest.p1, algTask.lineLongest.p2, white)
         End If
     End Sub
 End Class
@@ -45,7 +45,7 @@ Public Class Match_Basics1 : Inherits TaskParent
                "(allows multiple targets per image.)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone And task.algorithmPrep = False Then
+        If standalone And algTask.algorithmPrep = False Then
             SetTrueText("Match is called often so no need for standalone test.")
             Exit Sub
         End If
@@ -57,9 +57,9 @@ Public Class Match_Basics1 : Inherits TaskParent
         labels(2) = "Template has " + Format(correlation, fmt3) + " Correlation to the src input"
         newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, template.Width, template.Height)
         If standaloneTest() Then
-            dst2 = task.gray.Clone
-            dst2.Rectangle(newRect, white, task.lineWidth)
-            DrawLine(dst2, task.lineLongest.p1, task.lineLongest.p2, white)
+            dst2 = algTask.gray.Clone
+            dst2.Rectangle(newRect, white, algTask.lineWidth)
+            DrawLine(dst2, algTask.lineLongest.p1, algTask.lineLongest.p2, white)
         End If
     End Sub
 End Class
@@ -76,9 +76,9 @@ Public Class Match_Duplicate : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = src.Clone
-        If task.drawRect.Width = 0 Then task.drawRect = New cv.Rect(10, 10, 50, 50)
-        If task.optionsChanged Then match.template = src(task.drawRect).Clone
-        match.Run(src(task.drawRect))
+        If algTask.drawRect.Width = 0 Then algTask.drawRect = New cv.Rect(10, 10, 50, 50)
+        If algTask.optionsChanged Then match.template = src(algTask.drawRect).Clone
+        match.Run(src(algTask.drawRect))
         labels(2) = "Correlation coefficient = " + Format(match.correlation, fmt3)
     End Sub
 End Class
@@ -97,8 +97,8 @@ Public Class Match_BasicsTest : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            If task.heartBeatLT Then
-                matchRect = ValidateRect(task.lineLongest.rect)
+            If algTask.heartBeatLT Then
+                matchRect = ValidateRect(algTask.lineLongest.rect)
                 match.template = src(matchRect)
             End If
         End If
@@ -108,8 +108,8 @@ Public Class Match_BasicsTest : Inherits TaskParent
 
         If standaloneTest() Then
             dst2 = src
-            DrawCircle(dst2, match.newCenter, task.DotSize, white)
-            dst2.Rectangle(matchRect, task.highlight, task.lineWidth)
+            DrawCircle(dst2, match.newCenter, algTask.DotSize, white)
+            dst2.Rectangle(matchRect, algTask.highlight, algTask.lineWidth)
             dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
             SetTrueText(Format(match.correlation, fmt3), match.newCenter)
         End If
@@ -139,14 +139,14 @@ Public Class Match_RandomTest : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
         If standaloneTest() Then
-            Static saveSampleCount = task.FeatureSampleSize
-            If saveSampleCount <> task.FeatureSampleSize Then
-                saveSampleCount = task.FeatureSampleSize
+            Static saveSampleCount = algTask.FeatureSampleSize
+            If saveSampleCount <> algTask.FeatureSampleSize Then
+                saveSampleCount = algTask.FeatureSampleSize
                 maxCorrelation = Single.MinValue
                 minCorrelation = Single.MaxValue
             End If
-            template = New cv.Mat(New cv.Size(task.FeatureSampleSize, 1), cv.MatType.CV_32FC1)
-            src = New cv.Mat(New cv.Size(task.FeatureSampleSize, 1), cv.MatType.CV_32FC1)
+            template = New cv.Mat(New cv.Size(algTask.FeatureSampleSize, 1), cv.MatType.CV_32FC1)
+            src = New cv.Mat(New cv.Size(algTask.FeatureSampleSize, 1), cv.MatType.CV_32FC1)
             cv.Cv2.Randn(template, 100, 25)
             cv.Cv2.Randn(src, 0, 25)
         End If
@@ -189,14 +189,14 @@ Public Class Match_BestEntropy : Inherits TaskParent
         desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             entropy.Run(src)
-            task.drawRect = entropy.eMaxRect
+            algTask.drawRect = entropy.eMaxRect
         End If
         match.Run(src)
         dst2 = match.dst2
         dst3 = match.dst3
-        dst2.SetTo(white, task.gridMask)
+        dst2.SetTo(white, algTask.gridMask)
     End Sub
 End Class
 
@@ -227,13 +227,13 @@ Public Class Match_Motion : Inherits TaskParent
         Dim updateCount As Integer
         mask.SetTo(0)
 
-        For Each roi In task.gridRects
+        For Each roi In algTask.gridRects
             Dim correlation As New cv.Mat, mean As Single, stdev As Single
             cv.Cv2.MeanStdDev(dst2(roi), mean, stdev)
             If stdev > optionsMatch.stdevThreshold Then
                 cv.Cv2.MatchTemplate(dst2(roi), lastFrame(roi), correlation, options.matchOption)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                If correlation.Get(Of Single)(0, 0) < task.fCorrThreshold Then
+                If correlation.Get(Of Single)(0, 0) < algTask.fCorrThreshold Then
                     Interlocked.Increment(updateCount)
                 Else
                     mask(roi).SetTo(255)
@@ -245,15 +245,15 @@ Public Class Match_Motion : Inherits TaskParent
             End If
         Next
 
-        dst2.SetTo(255, task.gridMask)
+        dst2.SetTo(255, algTask.gridMask)
         dst3.SetTo(0)
         saveFrame.CopyTo(dst3, mask)
         lastFrame = saveFrame
-        Dim corrPercent = Format(task.fCorrThreshold, "0.0%") + " correlation"
+        Dim corrPercent = Format(algTask.fCorrThreshold, "0.0%") + " correlation"
         labels(2) = "Correlation value for each cell is shown. " + CStr(updateCount) + " of " +
-                     CStr(task.gridRects.Count) + " with < " + corrPercent + " or stdev < " +
+                     CStr(algTask.gridRects.Count) + " with < " + corrPercent + " or stdev < " +
                      Format(optionsMatch.stdevThreshold, fmt0)
-        labels(3) = CStr(task.gridRects.Count - updateCount) + " segments out of " + CStr(task.gridRects.Count) + " had > " + corrPercent
+        labels(3) = CStr(algTask.gridRects.Count - updateCount) + " segments out of " + CStr(algTask.gridRects.Count) + " had > " + corrPercent
     End Sub
 End Class
 
@@ -274,7 +274,7 @@ Public Class Match_LinesKNN : Inherits TaskParent
         desc = "Use the 2 points from a line as input to a 4-dimension KNN"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lplist = task.lines.lpList
+        Dim lplist = algTask.lines.lpList
 
         dst2 = dst2
         Static lastPt As New List(Of lpData)(lplist)
@@ -283,7 +283,7 @@ Public Class Match_LinesKNN : Inherits TaskParent
         For Each lp In lplist
             knn.queries.Add(New cv.Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
         Next
-        If task.optionsChanged Then knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
+        If algTask.optionsChanged Then knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
         knn.Run(src)
 
         If knn.queries.Count = 0 Then Exit Sub
@@ -320,19 +320,19 @@ Public Class Match_TraceRedC : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst3 = runRedList(src, labels(3))
-        If task.heartBeat Then dst2.SetTo(0)
-        If task.optionsChanged Then frameList.Clear()
+        If algTask.heartBeat Then dst2.SetTo(0)
+        If algTask.optionsChanged Then frameList.Clear()
 
         dst0.SetTo(0)
         Dim points As New List(Of cv.Point)
 
-        For Each rc In task.redList.oldrclist
+        For Each rc In algTask.redList.oldrclist
             dst0.Set(Of Byte)(rc.maxDist.Y, rc.maxDist.X, 1)
         Next
-        labels(2) = CStr(task.redList.oldrclist.Count) + " cells added"
+        labels(2) = CStr(algTask.redList.oldrclist.Count) + " cells added"
 
         frameList.Add(dst0.Clone)
-        If frameList.Count >= task.frameHistoryCount Then
+        If frameList.Count >= algTask.frameHistoryCount Then
             dst1 = dst1.Subtract(frameList(0))
             frameList.RemoveAt(0)
         End If
@@ -358,15 +358,15 @@ Public Class Match_DrawRect : Inherits TaskParent
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
         If standalone Then labels(3) = "Probabilities (draw rectangle to test again)"
         labels(2) = "Red dot marks best match for the selected region.  Draw a rectangle anywhere to test again. "
-        desc = "Find the requested template in task.drawrect in an image"
+        desc = "Find the requested template in algTask.drawrect in an image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Static lastImage As cv.Mat = src.Clone
-        If task.mouseClickFlag And task.drawRect.Width <> 0 Then
-            inputRect = ValidateRect(task.drawRect)
+        If algTask.mouseClickFlag And algTask.drawRect.Width <> 0 Then
+            inputRect = ValidateRect(algTask.drawRect)
             match.template = src(inputRect).Clone()
         Else
-            If task.firstPass Then match.template = lastImage(inputRect).Clone()
+            If algTask.firstPass Then match.template = lastImage(inputRect).Clone()
         End If
 
         match.Run(src)
@@ -382,7 +382,7 @@ Public Class Match_DrawRect : Inherits TaskParent
         SetTrueText("maxLoc = " + CStr(match.newCenter.X) + ", " + CStr(match.newCenter.Y), New cv.Point(1, 1), 3)
 
         If standaloneTest() Then
-            DrawCircle(dst2, match.newCenter, task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst2, match.newCenter, algTask.DotSize, cv.Scalar.Red)
             SetTrueText(Format(match.correlation, fmt3), match.newCenter, 2)
         End If
         lastImage = src
@@ -403,20 +403,20 @@ Public Class Match_LinePairTest : Inherits TaskParent
         desc = "Use MatchTemplate to find the new location of the template and update the point provided."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim radius = task.brickSize / 2
+        Dim radius = algTask.brickSize / 2
 
         Dim rect As cv.Rect
 
-        If target(0) IsNot Nothing And correlation(0) < task.fCorrThreshold Then target(0) = Nothing
-        If task.mouseClickFlag Then
-            ptx(0) = task.ClickPoint
-            ptx(1) = New cv.Point2f(msRNG.Next(task.brickSize, dst2.Width - 2 * task.brickSize),
-                                    msRNG.Next(task.brickSize, dst2.Height - 2 * task.brickSize))
+        If target(0) IsNot Nothing And correlation(0) < algTask.fCorrThreshold Then target(0) = Nothing
+        If algTask.mouseClickFlag Then
+            ptx(0) = algTask.ClickPoint
+            ptx(1) = New cv.Point2f(msRNG.Next(algTask.brickSize, dst2.Width - 2 * algTask.brickSize),
+                                    msRNG.Next(algTask.brickSize, dst2.Height - 2 * algTask.brickSize))
 
-            rect = ValidateRect(New cv.Rect(ptx(0).X - radius, ptx(0).Y - radius, task.brickSize, task.brickSize))
+            rect = ValidateRect(New cv.Rect(ptx(0).X - radius, ptx(0).Y - radius, algTask.brickSize, algTask.brickSize))
             target(0) = src(rect)
 
-            rect = ValidateRect(New cv.Rect(ptx(1).X - radius, ptx(1).Y - radius, task.brickSize, task.brickSize))
+            rect = ValidateRect(New cv.Rect(ptx(1).X - radius, ptx(1).Y - radius, algTask.brickSize, algTask.brickSize))
             target(1) = src(rect)
         End If
 
@@ -430,21 +430,21 @@ Public Class Match_LinePairTest : Inherits TaskParent
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC1, 0)
 
         For i = 0 To ptx.Count - 1
-            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.brickSize, task.brickSize))
-            Dim searchRect = ValidateRect(New cv.Rect(rect.X - task.brickSize, rect.Y - task.brickSize,
-                                                      task.brickSize * 3, task.brickSize * 3))
+            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, algTask.brickSize, algTask.brickSize))
+            Dim searchRect = ValidateRect(New cv.Rect(rect.X - algTask.brickSize, rect.Y - algTask.brickSize,
+                                                      algTask.brickSize * 3, algTask.brickSize * 3))
             cv.Cv2.MatchTemplate(target(i), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
             Dim mmData = GetMinMax(dst0)
             correlation(i) = mmData.maxVal
             If i = 0 Then
                 dst0.CopyTo(dst2(New cv.Rect(0, 0, dst0.Width, dst0.Height)))
-                dst2 = dst2.Threshold(task.fCorrThreshold, 255, cv.ThresholdTypes.Binary)
+                dst2 = dst2.Threshold(algTask.fCorrThreshold, 255, cv.ThresholdTypes.Binary)
             End If
             ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-            DrawCircle(dst3, ptx(i), task.DotSize, task.highlight)
+            DrawCircle(dst3, ptx(i), algTask.DotSize, algTask.highlight)
             dst3.Rectangle(searchRect, cv.Scalar.Yellow, 1)
-            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, task.brickSize, task.brickSize))
-            target(i) = task.color(rect)
+            rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, algTask.brickSize, algTask.brickSize))
+            target(i) = algTask.color(rect)
         Next
 
         labels(3) = "p1 = " + CStr(ptx(0).X) + "," + CStr(ptx(0).Y) + " p2 = " + CStr(ptx(1).X) + "," + CStr(ptx(1).Y)
@@ -473,20 +473,20 @@ Public Class Match_GoodFeatureKNN : Inherits TaskParent
         Static distSlider = OptionParent.FindSlider("Maximum travel distance per frame")
         Dim maxDistance = distSlider.Value
 
-        knn.queries = New List(Of cv.Point2f)(task.features)
+        knn.queries = New List(Of cv.Point2f)(algTask.features)
         knn.Run(src)
 
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             frameList.Clear()
             dst1.SetTo(0)
         End If
 
         dst0.SetTo(0)
         For Each lp In knn.matches
-            If lp.p1.DistanceTo(lp.p2) <= maxDistance Then dst0.Line(lp.p1, lp.p2, 255, task.lineWidth + 2, cv.LineTypes.Link4)
+            If lp.p1.DistanceTo(lp.p2) <= maxDistance Then dst0.Line(lp.p1, lp.p2, 255, algTask.lineWidth + 2, cv.LineTypes.Link4)
         Next
         frameList.Add(dst0.Clone)
-        If frameList.Count >= task.frameHistoryCount Then
+        If frameList.Count >= algTask.frameHistoryCount Then
             dst1 = dst1.Subtract(frameList(0))
             frameList.RemoveAt(0)
         End If
@@ -494,7 +494,7 @@ Public Class Match_GoodFeatureKNN : Inherits TaskParent
         dst2 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         dst3 = src
-        dst3.SetTo(task.highlight, dst2)
+        dst3.SetTo(algTask.highlight, dst2)
     End Sub
 End Class
 
@@ -523,16 +523,16 @@ Public Class Match_Point : Inherits TaskParent
             Exit Sub
         End If
 
-        Dim radius = task.brickSize / 2
+        Dim radius = algTask.brickSize / 2
 
-        Dim rect = ValidateRect(New cv.Rect(pt.X - radius, pt.Y - radius, task.brickSize, task.brickSize))
-        searchRect = ValidateRect(New cv.Rect(rect.X - task.brickSize, rect.Y - task.brickSize,
-                                              task.brickSize * 3, task.brickSize * 3))
+        Dim rect = ValidateRect(New cv.Rect(pt.X - radius, pt.Y - radius, algTask.brickSize, algTask.brickSize))
+        searchRect = ValidateRect(New cv.Rect(rect.X - algTask.brickSize, rect.Y - algTask.brickSize,
+                                              algTask.brickSize * 3, algTask.brickSize * 3))
         cv.Cv2.MatchTemplate(target(rect), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
         Dim mmData = GetMinMax(dst0)
         correlation = mmData.maxVal
         pt = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-        DrawCircle(src, pt, task.DotSize, white)
+        DrawCircle(src, pt, algTask.DotSize, white)
         src.Rectangle(searchRect, cv.Scalar.Yellow, 1)
     End Sub
 End Class
@@ -554,12 +554,12 @@ Public Class Match_Brick : Inherits TaskParent
         desc = "Match a brick's movement from the previous frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then gridIndex = task.lineLongest.p1GridIndex
-        Static lastImage As cv.Mat = task.gray.Clone
+        If standalone Then gridIndex = algTask.lineLongest.p1GridIndex
+        Static lastImage As cv.Mat = algTask.gray.Clone
 
-        Dim rect = task.gridRects(gridIndex)
-        match.template = task.gray(rect)
-        Dim searchrect = task.gridNabeRects(gridIndex)
+        Dim rect = algTask.gridRects(gridIndex)
+        match.template = algTask.gray(rect)
+        Dim searchrect = algTask.gridNabeRects(gridIndex)
 
         match.Run(lastImage(searchrect))
         correlation = match.correlation
@@ -575,9 +575,9 @@ Public Class Match_Brick : Inherits TaskParent
             newRect.X += deltaX
             newRect.Y += deltaY
 
-            dst2 = task.gray.Clone
+            dst2 = algTask.gray.Clone
             DrawRect(dst2, newRect, white)
-            DrawRect(dst2, task.gridNabeRects(gridIndex), white)
+            DrawRect(dst2, algTask.gridNabeRects(gridIndex), white)
 
             dst3 = lastImage
             DrawRect(dst3, newRect, white)
@@ -585,7 +585,7 @@ Public Class Match_Brick : Inherits TaskParent
         labels(2) = "Delta X/Y = " + Format(deltaX, fmt2) + "/" + Format(deltaY, fmt2) + ", corr: " +
                      Format(correlation, fmt3)
 
-        If correlation < task.fCorrThreshold Then lastImage = task.gray.Clone
+        If correlation < algTask.fCorrThreshold Then lastImage = algTask.gray.Clone
     End Sub
 End Class
 
@@ -606,7 +606,7 @@ Public Class LineEnds_VH : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         gLines.Run(src)
 
-        Dim sortedLines = If(task.verticalLines, gLines.sortedVerticals, gLines.sortedHorizontals)
+        Dim sortedLines = If(algTask.verticalLines, gLines.sortedVerticals, gLines.sortedHorizontals)
         If sortedLines.Count = 0 Then
             SetTrueText("There were no vertical lines found.", 3)
             Exit Sub
@@ -629,7 +629,7 @@ Public Class LineEnds_VH : Inherits TaskParent
             match.tCells.Add(brick.tc2)
 
             match.Run(src)
-            Dim threshold = task.fCorrThreshold
+            Dim threshold = algTask.fCorrThreshold
             If match.tCells(0).correlation >= threshold And match.tCells(1).correlation >= threshold Then
                 brick.tc1 = match.tCells(0)
                 brick.tc2 = match.tCells(1)
@@ -652,8 +652,8 @@ Public Class LineEnds_VH : Inherits TaskParent
             SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(brick.arcY, fmt1), brick.tc1.center, 2)
             SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(brick.arcY, fmt1), brick.tc1.center, 3)
 
-            DrawLine(dst2, p1, p2, task.highlight)
-            DrawLine(dst3, p1, p2, task.highlight)
+            DrawLine(dst2, p1, p2, algTask.highlight)
+            DrawLine(dst3, p1, p2, algTask.highlight)
         Next
     End Sub
 End Class

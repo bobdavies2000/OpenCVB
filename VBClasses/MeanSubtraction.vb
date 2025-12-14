@@ -22,11 +22,11 @@ Public Class MeanSubtraction_LeftRight : Inherits TaskParent
         desc = "Apply mean subtraction to the left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        LRMeanSub.Run(task.leftView)
+        LRMeanSub.Run(algTask.leftView)
         dst2 = LRMeanSub.dst2.Clone
         labels(2) = "LeftView image"
 
-        LRMeanSub.Run(task.rightView)
+        LRMeanSub.Run(algTask.rightView)
         dst3 = LRMeanSub.dst2
         labels(3) = "RightView image"
     End Sub
@@ -64,8 +64,8 @@ Public Class MeanSubtraction_Left : Inherits TaskParent
         desc = "Apply mean subtraction to the left image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim mean = cv.Cv2.Mean(task.leftView)
-        cv.Cv2.Subtract(mean, task.leftView, dst2)
+        Dim mean = cv.Cv2.Mean(algTask.leftView)
+        cv.Cv2.Subtract(mean, algTask.leftView, dst2)
         dst2 *= 100 / scaleValue
     End Sub
 End Class

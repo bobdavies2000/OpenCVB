@@ -10,7 +10,7 @@ Public Class Homography_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         Options.Run()
 
-        If standaloneTest() And task.heartBeat And options.hMethod = cv.HomographyMethods.None Then
+        If standaloneTest() And algTask.heartBeat And options.hMethod = cv.HomographyMethods.None Then
             random.Run(src)
             corners1 = New List(Of cv.Point2d)(random.PointList)
             random.Run(src)

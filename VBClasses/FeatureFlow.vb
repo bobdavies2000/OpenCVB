@@ -4,7 +4,7 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
     Public mpCorrelation As New List(Of Single)
     Dim feat As New Feature_General
     Public Sub New()
-        task.gOptions.MaxDepthBar.Value = 20
+        algTask.gOptions.MaxDepthBar.Value = 20
         labels(1) = "NOTE: matching right point is always to the left of the left point"
         desc = "Identify which feature in the left image corresponds to the feature in the right image."
     End Sub
@@ -12,18 +12,18 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         Dim correlationmat As New cv.Mat
         lpList.Clear()
         mpCorrelation.Clear()
-        Dim pad = task.brickSize / 2
+        Dim pad = algTask.brickSize / 2
         For Each p1 In prevFeatures
-            Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.brickSize, task.brickSize))
+            Dim rect = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, algTask.brickSize, algTask.brickSize))
             Dim correlations As New List(Of Single)
             For Each p2 In currFeatures
-                Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, task.brickSize),
-                                                                         Math.Min(task.brickSize, rect.Height)))
+                Dim r = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, Math.Min(rect.Width, algTask.brickSize),
+                                                                         Math.Min(algTask.brickSize, rect.Height)))
                 cv.Cv2.MatchTemplate(dst2(rect), dst3(r), correlationmat, cv.TemplateMatchModes.CCoeffNormed)
                 correlations.Add(correlationmat.Get(Of Single)(0, 0))
             Next
             Dim maxCorrelation = correlations.Max
-            If maxCorrelation >= task.fCorrThreshold Then
+            If maxCorrelation >= algTask.fCorrThreshold Then
                 Dim index = correlations.IndexOf(maxCorrelation)
                 lpList.Add(New lpData(p1, currFeatures(index)))
                 mpCorrelation.Add(maxCorrelation)
@@ -31,19 +31,19 @@ Public Class FeatureFlow_Basics : Inherits TaskParent
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.grayStable)
+        feat.Run(algTask.grayStable)
         labels = feat.labels
 
-        dst3 = If(task.firstPass, src.Clone, dst2.Clone)
-        Static prevFeatures As New List(Of cv.Point)(task.featurePoints)
-        buildCorrelations(prevFeatures, task.featurePoints)
+        dst3 = If(algTask.firstPass, src.Clone, dst2.Clone)
+        Static prevFeatures As New List(Of cv.Point)(algTask.featurePoints)
+        buildCorrelations(prevFeatures, algTask.featurePoints)
 
         SetTrueText("Click near any feature to find the corresponding pair of features.", 1)
         dst2 = src.Clone
-        For Each pt In task.featurePoints
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+        For Each pt In algTask.featurePoints
+            DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
         Next
-        prevFeatures = New List(Of cv.Point)(task.featurePoints)
+        prevFeatures = New List(Of cv.Point)(algTask.featurePoints)
     End Sub
 End Class
 
@@ -91,14 +91,14 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        feat.Run(task.grayStable)
+        feat.Run(algTask.grayStable)
 
         dst2 = src.Clone()
         dst3 = src.Clone()
 
-        If src.Channels() = 3 Then src = task.grayStable
-        Static lastGray As cv.Mat = task.grayStable.Clone
-        features = task.features
+        If src.Channels() = 3 Then src = algTask.grayStable
+        Static lastGray As cv.Mat = algTask.grayStable.Clone
+        features = algTask.features
         Dim features1 = cv.Mat.FromPixelData(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
         Dim features2 = New cv.Mat
         Dim status As New cv.Mat, err As New cv.Mat, winSize As New cv.Size(3, 3)
@@ -113,15 +113,15 @@ Public Class FeatureFlow_LucasKanade : Inherits TaskParent
                 If length < 30 Then
                     features.Add(pt1)
                     lastFeatures.Add(pt2)
-                    dst2.Line(pt1, pt2, task.highlight, task.lineWidth + task.lineWidth, task.lineType)
-                    DrawCircle(dst3, pt1, task.DotSize + 3, white)
-                    DrawCircle(dst3, pt2, task.DotSize + 1, cv.Scalar.Red)
+                    dst2.Line(pt1, pt2, algTask.highlight, algTask.lineWidth + algTask.lineWidth, algTask.lineType)
+                    DrawCircle(dst3, pt1, algTask.DotSize + 3, white)
+                    DrawCircle(dst3, pt2, algTask.DotSize + 1, cv.Scalar.Red)
                 End If
             End If
         Next
         labels(2) = "Matched " + CStr(features.Count) + " points "
 
-        If task.heartBeat Then lastGray = src.Clone()
+        If algTask.heartBeat Then lastGray = src.Clone()
         lastGray = src.Clone()
     End Sub
 End Class
@@ -138,40 +138,40 @@ Public Class FeatureFlow_LeftRight1 : Inherits TaskParent
     Dim ptRight As New List(Of cv.Point)
     Public ptlist As New List(Of cv.Point)
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then algTask.gOptions.displaydst1.checked = true
         desc = "Find features using optical flow in both the left and right images."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        pyrLeft.Run(task.leftView)
-        pyrRight.Run(task.rightView)
+        pyrLeft.Run(algTask.leftView)
+        pyrRight.Run(algTask.rightView)
 
         Dim leftY As New List(Of Integer)
         ptLeft.Clear()
-        dst2 = task.leftView.Clone
+        dst2 = algTask.leftView.Clone
         For i = 0 To pyrLeft.features.Count - 1
             Dim pt = pyrLeft.features(i)
             ptLeft.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
             leftY.Add(pt.Y)
 
             pt = pyrLeft.lastFeatures(i)
             ptLeft.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
             leftY.Add(pt.Y)
         Next
 
         Dim rightY As New List(Of Integer)
         ptRight.Clear()
-        dst3 = task.rightView.Clone
+        dst3 = algTask.rightView.Clone
         For i = 0 To pyrRight.features.Count - 1
             Dim pt = pyrRight.features(i)
             ptRight.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst3, pt, task.DotSize, task.highlight)
+            DrawCircle(dst3, pt, algTask.DotSize, algTask.highlight)
             rightY.Add(pt.Y)
 
             pt = pyrRight.lastFeatures(i)
             ptRight.Add(New cv.Point(pt.X, pt.Y))
-            DrawCircle(dst3, pt, task.DotSize, task.highlight)
+            DrawCircle(dst3, pt, algTask.DotSize, algTask.highlight)
             rightY.Add(pt.Y)
         Next
 
@@ -182,7 +182,7 @@ Public Class FeatureFlow_LeftRight1 : Inherits TaskParent
             If index >= 0 Then lpList.Add(New lpData(ptLeft(i), ptRight(index)))
         Next
 
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             labels(2) = CStr(ptLeft.Count) + " features found in the left image, " + CStr(ptRight.Count) + " features in the right and " +
                         CStr(ptlist.Count) + " features are matched."
         End If
@@ -204,12 +204,12 @@ Public Class FeatureFlow_LeftRightHist : Inherits TaskParent
     End Sub
     Public Function displayFeatures(dst As cv.Mat, features As List(Of cv.Point)) As cv.Mat
         For Each pt In features
-            DrawCircle(dst, pt, task.DotSize, task.highlight)
+            DrawCircle(dst, pt, algTask.DotSize, algTask.highlight)
         Next
         Return dst
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
-        pyrLeft.Run(task.leftView)
+        pyrLeft.Run(algTask.leftView)
         Dim tmpLeft As New List(Of cv.Point)
         For i = 0 To pyrLeft.features.Count - 1
             Dim pt = New cv.Point(pyrLeft.features(i).X, pyrLeft.features(i).Y)
@@ -218,7 +218,7 @@ Public Class FeatureFlow_LeftRightHist : Inherits TaskParent
             tmpLeft.Add(New cv.Point(pt.X, pt.Y))
         Next
 
-        pyrRight.Run(task.rightView)
+        pyrRight.Run(algTask.rightView)
         Dim tmpRight As New List(Of cv.Point)
         For i = 0 To pyrRight.features.Count - 1
             Dim pt = New cv.Point(pyrRight.features(i).X, pyrRight.features(i).Y)
@@ -230,7 +230,7 @@ Public Class FeatureFlow_LeftRightHist : Inherits TaskParent
         Static leftHist As New List(Of List(Of cv.Point))({tmpLeft})
         Static rightHist As New List(Of List(Of cv.Point))({tmpRight})
 
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             leftHist = New List(Of List(Of cv.Point))({tmpLeft})
             rightHist = New List(Of List(Of cv.Point))({tmpRight})
         End If
@@ -263,17 +263,17 @@ Public Class FeatureFlow_LeftRightHist : Inherits TaskParent
             rightHist = New List(Of List(Of cv.Point))({tmpRight})
         End If
 
-        dst2 = displayFeatures(task.leftView.Clone, leftFeatures)
-        dst3 = displayFeatures(task.rightView.Clone, rightFeatures)
+        dst2 = displayFeatures(algTask.leftView.Clone, leftFeatures)
+        dst3 = displayFeatures(algTask.rightView.Clone, rightFeatures)
 
         leftHist.Add(tmpLeft)
         rightHist.Add(tmpRight)
-        Dim threshold = Math.Min(task.frameHistoryCount, leftHist.Count)
+        Dim threshold = Math.Min(algTask.frameHistoryCount, leftHist.Count)
 
-        If leftHist.Count >= task.frameHistoryCount Then leftHist.RemoveAt(0)
-        If rightHist.Count >= task.frameHistoryCount Then rightHist.RemoveAt(0)
+        If leftHist.Count >= algTask.frameHistoryCount Then leftHist.RemoveAt(0)
+        If rightHist.Count >= algTask.frameHistoryCount Then rightHist.RemoveAt(0)
 
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             labels(2) = CStr(leftFeatures.Count) + " detected in the left image that have matches in " + CStr(threshold) + " previous left images"
             labels(3) = CStr(rightFeatures.Count) + " detected in the right image that have matches in " + CStr(threshold) + " previous right images"
         End If
@@ -295,7 +295,7 @@ Public Class FeatureFlow_LeftRight : Inherits TaskParent
     Public Function displayFeatures(dst As cv.Mat, features As List(Of List(Of cv.Point))) As cv.Mat
         For Each ptlist In features
             For Each pt In ptlist
-                DrawCircle(dst, pt, task.DotSize, task.highlight)
+                DrawCircle(dst, pt, algTask.DotSize, algTask.highlight)
             Next
         Next
         Return dst
@@ -340,10 +340,10 @@ Public Class FeatureFlow_LeftRight : Inherits TaskParent
             End If
         Next
 
-        dst2 = displayFeatures(task.leftView.Clone, leftFeatures)
-        dst3 = displayFeatures(task.rightView.Clone, rightFeatures)
+        dst2 = displayFeatures(algTask.leftView.Clone, leftFeatures)
+        dst3 = displayFeatures(algTask.rightView.Clone, rightFeatures)
 
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             labels(2) = CStr(leftFeatures.Count) + " detected in the left image that match one or more Y-coordinates found in the right image"
             labels(3) = CStr(rightFeatures.Count) + " detected in the right image that match one or more Y-coordinates found in the left image"
         End If

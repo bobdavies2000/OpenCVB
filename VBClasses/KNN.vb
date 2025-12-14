@@ -10,7 +10,7 @@ Public Class KNN_Basics : Inherits TaskParent
     Public result(,) As Integer ' Get results here...
     Public desiredMatches As Integer = -1 ' -1 indicates it is to use the number of queries.
     Public Sub New()
-        If standalone Then If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+        If standalone Then If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
         desc = "Default unnormalized KNN with dimension 2"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -45,10 +45,10 @@ Public Class KNN_Basics : Inherits TaskParent
         result = knn2.result
 
         If standaloneTest() Then
-            dst2 = task.color
+            dst2 = algTask.color
             For Each pt In trainInput
-                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Red)
-                dst2.Circle(pt, task.DotSize, task.highlight)
+                DrawCircle(dst2, pt, algTask.DotSize, cv.Scalar.Red)
+                dst2.Circle(pt, algTask.DotSize, algTask.highlight)
             Next
         End If
     End Sub
@@ -78,12 +78,12 @@ Public Class KNN_N2Basics : Inherits TaskParent
             Dim test = result(i, 0)
             If test >= trainInput.Count Or test < 0 Then Continue For
             Dim nn = trainInput(result(i, 0))
-            DrawCircle(dst2, pt, task.DotSize + 4, cv.Scalar.Yellow)
+            DrawCircle(dst2, pt, algTask.DotSize + 4, cv.Scalar.Yellow)
             DrawLine(dst2, pt, nn, cv.Scalar.Yellow)
         Next
 
         For Each pt In trainInput
-            DrawCircle(dst2, pt, task.DotSize + 4, cv.Scalar.Red)
+            DrawCircle(dst2, pt, algTask.DotSize + 4, cv.Scalar.Red)
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -91,7 +91,7 @@ Public Class KNN_N2Basics : Inherits TaskParent
 
         If standalone Then
             Static random As New Random_Basics
-            If task.heartBeat Then
+            If algTask.heartBeat Then
                 random.Run(src)
                 trainInput = New List(Of cv.Point2f)(random.PointList)
             End If
@@ -166,16 +166,16 @@ Public Class KNN_N2BasicsTest : Inherits TaskParent
             Dim test = knn.result(i, 0)
             If test >= knn.trainInput.Count Or test < 0 Then Continue For
             Dim nn = knn.trainInput(knn.result(i, 0))
-            DrawCircle(dst3, pt, task.DotSize + 4, cv.Scalar.Yellow)
+            DrawCircle(dst3, pt, algTask.DotSize + 4, cv.Scalar.Yellow)
             DrawLine(dst3, pt, nn, cv.Scalar.Yellow)
         Next
 
         For Each pt In knn.trainInput
-            DrawCircle(dst3, pt, task.DotSize + 4, cv.Scalar.Red)
+            DrawCircle(dst3, pt, algTask.DotSize + 4, cv.Scalar.Red)
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             dst3.SetTo(0)
             random.Run(src)
             knn.trainInput = New List(Of cv.Point2f)(random.PointList)
@@ -312,12 +312,12 @@ Public Class KNN_N3BasicsTest : Inherits TaskParent
         desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             knn.queries.Clear()
             knn.trainInput.Clear()
             random.Run(src)
             For Each pt In random.PointList
-                Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
+                Dim vec = algTask.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
                 If knn.trainInput.Count = 10 Then
                     If vec.Z Then
                         knn.queries.Add(pt)
@@ -336,7 +336,7 @@ Public Class KNN_N3BasicsTest : Inherits TaskParent
         dist.inPoint1 = knn.queries(0)
         For i = 0 To knn.trainInput.Count - 1
             Dim pt = New cv.Point2f(knn.trainInput(i).X, knn.trainInput(i).Y)
-            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst2, pt, algTask.DotSize, cv.Scalar.Red)
             dist.inPoint2 = knn.trainInput(i)
             dist.Run(src)
             SetTrueText("depth=" + CStr(knn.trainInput(i).Z) + vbCrLf + "dist=" + Format(dist.distance, fmt0), pt)
@@ -346,7 +346,7 @@ Public Class KNN_N3BasicsTest : Inherits TaskParent
             For j = 0 To Math.Min(2, knn.trainInput.Count) - 1
                 Dim index = knn.result(i, j)
                 Dim nn = New cv.Point2f(knn.trainInput(index).X, knn.trainInput(index).Y)
-                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst2, pt, algTask.DotSize, cv.Scalar.Yellow)
                 DrawLine(dst2, pt, nn, cv.Scalar.Yellow)
                 Dim midPt = New cv.Point2f((pt.X + nn.X) / 2, (pt.Y + nn.Y) / 2)
                 SetTrueText(CStr(j), midPt)
@@ -373,7 +373,7 @@ Public Class KNN_N4BasicsTest : Inherits TaskParent
         desc = "Validate that knn works with random 3D points in the image.  Find the nearest requested neighbors."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             random.Run(src)
             knn.trainInput = New List(Of cv.Vec4f)(random.PointList)
             knn.queries.Clear()
@@ -386,7 +386,7 @@ Public Class KNN_N4BasicsTest : Inherits TaskParent
         dist.inPoint1 = knn.queries(0)
         For i = 0 To knn.trainInput.Count - 1
             Dim pt = New cv.Point2f(knn.trainInput(i)(0), knn.trainInput(i)(1))
-            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst2, pt, algTask.DotSize, cv.Scalar.Red)
             dist.inPoint2 = knn.trainInput(i)
             dist.Run(src)
             SetTrueText("dist=" + Format(dist.distance, fmt0), pt)
@@ -396,8 +396,8 @@ Public Class KNN_N4BasicsTest : Inherits TaskParent
             For j = knn.result.GetLowerBound(1) To knn.result.GetUpperBound(1)
                 Dim index = knn.result(i, j)
                 Dim nn = New cv.Point2f(knn.trainInput(index)(0), knn.trainInput(index)(1))
-                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
-                DrawLine(dst2, pt, nn, task.highlight)
+                DrawCircle(dst2, pt, algTask.DotSize, cv.Scalar.Yellow)
+                DrawLine(dst2, pt, nn, algTask.highlight)
                 Dim midPt = New cv.Point2f((pt.X + nn.X) / 2, (pt.Y + nn.Y) / 2)
                 SetTrueText(CStr(j), midPt)
             Next
@@ -419,7 +419,7 @@ Public Class KNN_Farthest : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            If task.heartBeat Then
+            If algTask.heartBeat Then
                 Static random As New Random_Basics
                 random.Run(src)
                 knn.trainInput = New List(Of cv.Point2f)(random.PointList)
@@ -436,15 +436,15 @@ Public Class KNN_Farthest : Inherits TaskParent
         For i = 0 To knn.result.GetUpperBound(0) - 1
             Dim farIndex = knn.result(i, knn.result.GetUpperBound(1))
             Dim lp = New lpData(knn.queries(i), knn.trainInput(farIndex))
-            DrawCircle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Yellow)
-            DrawCircle(dst2, lp.p2, task.DotSize + 4, cv.Scalar.Yellow)
+            DrawCircle(dst2, lp.p1, algTask.DotSize + 4, cv.Scalar.Yellow)
+            DrawCircle(dst2, lp.p2, algTask.DotSize + 4, cv.Scalar.Yellow)
             DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
             farthest.Add(lp)
             distances.Add(lp.p1.DistanceTo(lp.p2))
         Next
 
         For Each pt In knn.queries
-            DrawCircle(dst3, pt, task.DotSize + 4, cv.Scalar.Red)
+            DrawCircle(dst3, pt, algTask.DotSize + 4, cv.Scalar.Red)
         Next
 
         Dim maxIndex = distances.IndexOf(distances.Max())
@@ -466,7 +466,7 @@ Public Class KNN_NNBasicsTest : Inherits TaskParent
         desc = "Test the use of the general form KNN_BasicsN algorithm"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             knn.trainInput.Clear()
             For i = 0 To knn.options.numPoints - 1
                 For j = 0 To knn.options.knnDimension - 1
@@ -484,14 +484,14 @@ Public Class KNN_NNBasicsTest : Inherits TaskParent
         dst2.SetTo(0)
         For i = 0 To knn.trainInput.Count - 1 Step knn.options.knnDimension
             Dim pt = New cv.Point2f(knn.trainInput(i), knn.trainInput(i + 1))
-            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Red)
+            DrawCircle(dst2, pt, algTask.DotSize, cv.Scalar.Red)
         Next
         For i = 0 To knn.queries.Count - 1 Step knn.options.knnDimension
             Dim pt = New cv.Point2f(knn.queries(i), knn.queries(i + 1))
             Dim index = knn.result(i, 0)
             Dim nn = New cv.Point2f(knn.trainInput(index * knn.options.knnDimension), knn.trainInput(index * knn.options.knnDimension + 1))
-            DrawCircle(dst2, pt, task.DotSize + 1, task.highlight)
-            DrawLine(dst2, pt, nn, task.highlight)
+            DrawCircle(dst2, pt, algTask.DotSize + 1, algTask.highlight)
+            DrawLine(dst2, pt, nn, algTask.highlight)
         Next
         If standaloneTest() Then
             SetTrueText("Results are easily verified for the 2-dimensional case.  For higher dimension, " + vbCrLf +
@@ -580,7 +580,7 @@ Public Class KNN_OneToOne : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            If task.heartBeat Then
+            If algTask.heartBeat Then
                 random.Run(src)
                 knn.trainInput = New List(Of cv.Point2f)(random.PointList)
                 random.Run(src)
@@ -632,14 +632,14 @@ Public Class KNN_OneToOne : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each pt In knn.trainInput
-            DrawCircle(dst2, pt, task.DotSize + 4, cv.Scalar.Red)
+            DrawCircle(dst2, pt, algTask.DotSize + 4, cv.Scalar.Red)
         Next
 
         noMatch.Clear()
         matches.Clear()
         For i = 0 To queries.Count - 1
             Dim pt = queries(i)
-            DrawCircle(dst2, pt, task.DotSize + 4, cv.Scalar.Yellow)
+            DrawCircle(dst2, pt, algTask.DotSize + 4, cv.Scalar.Yellow)
             If nearest(i) = -1 Then
                 noMatch.Add(pt)
             Else
@@ -673,7 +673,7 @@ Public Class KNN_MaxDistance : Inherits TaskParent
 
         perif.Run(src)
         dst3 = perif.dst3
-        If task.features.Count = 0 Then Exit Sub
+        If algTask.features.Count = 0 Then Exit Sub
 
         knn.queries = perif.ptOutside
         knn.trainInput = knn.queries
@@ -683,10 +683,10 @@ Public Class KNN_MaxDistance : Inherits TaskParent
         For i = 0 To knn.result.GetUpperBound(0)
             Dim lp = New lpData(knn.queries(knn.result(i, knn.queries.Count - 1)),
                                 knn.queries(knn.result(i, 0)))
-            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth)
+            dst2.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth)
         Next
 
-        labels(2) = "There were " + CStr(task.features.Count) + " features and " + CStr(knn.queries.Count) + " were on the periphery."
+        labels(2) = "There were " + CStr(algTask.features.Count) + " features and " + CStr(knn.queries.Count) + " were on the periphery."
     End Sub
 End Class
 
@@ -751,17 +751,17 @@ Public Class KNN_NormalizedTestDim2 : Inherits TaskParent
             Dim pt = queryInput(i)
             Dim index = knn.result(i, 0)
             Dim nn = trainInput(index)
-            DrawCircle(dst2, pt, task.DotSize + 4, cv.Scalar.Yellow)
+            DrawCircle(dst2, pt, algTask.DotSize + 4, cv.Scalar.Yellow)
             DrawLine(dst2, pt, nn, cv.Scalar.Yellow)
         Next
 
         For Each pt In trainInput
-            DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.Red)
+            DrawCircle(dst2, pt, algTask.DotSize + 2, cv.Scalar.Red)
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            If task.heartBeat Then
+            If algTask.heartBeat Then
                 queryInput.Clear()
                 trainInput.Clear()
                 random.Run(src)
@@ -814,18 +814,18 @@ Public Class KNN_NormalizedTestDim3 : Inherits TaskParent
             Dim pt = New cv.Point(queryInput(i).X, queryInput(i).Y)
             Dim index = knn.result(i, 0)
             Dim nn = New cv.Point(trainInput(index).X, trainInput(index).Y)
-            DrawCircle(dst2, pt, task.DotSize + 4, cv.Scalar.Yellow)
+            DrawCircle(dst2, pt, algTask.DotSize + 4, cv.Scalar.Yellow)
             DrawLine(dst2, pt, nn, cv.Scalar.Yellow)
         Next
 
         For Each pt In trainInput
             Dim p1 = New cv.Point(pt.X, pt.Y)
-            DrawCircle(dst2, p1, task.DotSize + 2, cv.Scalar.Red)
+            DrawCircle(dst2, p1, algTask.DotSize + 2, cv.Scalar.Red)
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            If task.heartBeat Then
+            If algTask.heartBeat Then
                 queryInput.Clear()
                 trainInput.Clear()
                 random.Run(src)
@@ -880,18 +880,18 @@ Public Class KNN_NormalizedTestDim4 : Inherits TaskParent
             Dim pt = New cv.Point(queryInput(i).Item(0), queryInput(i).Item(1))
             Dim index = knn.result(i, 0)
             Dim nn = New cv.Point(trainInput(index).Item(0), trainInput(index).Item(1))
-            DrawCircle(dst2, pt, task.DotSize + 4, cv.Scalar.Yellow)
+            DrawCircle(dst2, pt, algTask.DotSize + 4, cv.Scalar.Yellow)
             DrawLine(dst2, pt, nn, cv.Scalar.Yellow)
         Next
 
         For Each pt In trainInput
             Dim p1 = New cv.Point(pt.Item(0), pt.Item(1))
-            DrawCircle(dst2, p1, task.DotSize + 2, cv.Scalar.Red)
+            DrawCircle(dst2, p1, algTask.DotSize + 2, cv.Scalar.Red)
         Next
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            If task.heartBeat Then
+            If algTask.heartBeat Then
                 queryInput.Clear()
                 trainInput.Clear()
                 random.Run(src)
@@ -938,16 +938,16 @@ Public Class KNN_MinDistance : Inherits TaskParent
     Dim options As New Options_Features
     Dim feat As New Feature_General
     Public Sub New()
-        If standalone Then task.featureOptions.FeatureMethod.SelectedItem = "AGAST"
+        If standalone Then algTask.featureOptions.FeatureMethod.SelectedItem = "AGAST"
         desc = "Enforce a minimum distance to the next feature threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        feat.Run(task.grayStable)
+        feat.Run(algTask.grayStable)
         labels = feat.labels
 
-        If task.features.Count = 0 Then Exit Sub
-        If standalone Then inputPoints = task.features
+        If algTask.features.Count = 0 Then Exit Sub
+        If standalone Then inputPoints = algTask.features
 
         knn.queries = New List(Of cv.Point2f)(inputPoints)
         knn.trainInput = knn.queries
@@ -955,7 +955,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each pt In inputPoints
-            DrawCircle(dst3, pt, task.DotSize, cv.Scalar.White)
+            DrawCircle(dst3, pt, algTask.DotSize, cv.Scalar.White)
         Next
         labels(3) = "There were " + CStr(inputPoints.Count) + " points in the input"
 
@@ -981,7 +981,7 @@ Public Class KNN_MinDistance : Inherits TaskParent
         outputPoints.Clear()
         outputPoints2f.Clear()
         For Each pt In knn.queries
-            DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.White)
+            DrawCircle(dst2, pt, algTask.DotSize + 2, cv.Scalar.White)
             outputPoints.Add(pt)
             outputPoints2f.Add(pt)
         Next

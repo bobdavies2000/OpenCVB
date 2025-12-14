@@ -18,7 +18,7 @@ Public Class Pendulum_Basics : Inherits TaskParent
 
         Dim accumulator As Single
 
-        If task.frameCount Mod 1000 = 0 Or task.optionsChanged Then
+        If algTask.frameCount Mod 1000 = 0 Or algTask.optionsChanged Then
             dst2.SetTo(0)
             dst3.SetTo(0)
         End If
@@ -48,10 +48,10 @@ Public Class Pendulum_Basics : Inherits TaskParent
         p1 = New cv.Point2f(p1.X * 2, p1.Y * 0.5)
         Dim p2 = New cv.Point2f(p1.X + (Math.Sin(o2) * l2 + dw * 0.5) / dw, p1.Y - (Math.Cos(o2) * l2 + dh * 0.5) / dh)
 
-        DrawLine(dst2, center, p1, task.scalarColors(task.frameCount Mod 255))
-        DrawLine(dst2, p1, p2, task.scalarColors(task.frameCount Mod 255))
+        DrawLine(dst2, center, p1, algTask.scalarColors(algTask.frameCount Mod 255))
+        DrawLine(dst2, p1, p2, algTask.scalarColors(algTask.frameCount Mod 255))
 
-        DrawCircle(dst3, p1, task.DotSize, task.scalarColors(task.frameCount Mod 255))
-        DrawCircle(dst3, p2, task.DotSize, task.scalarColors(task.frameCount Mod 255))
+        DrawCircle(dst3, p1, algTask.DotSize, algTask.scalarColors(algTask.frameCount Mod 255))
+        DrawCircle(dst3, p2, algTask.DotSize, algTask.scalarColors(algTask.frameCount Mod 255))
     End Sub
 End Class

@@ -37,7 +37,7 @@ Public Class Photon_Test : Inherits TaskParent
     Dim counts(4 - 1) As List(Of Integer)
     Dim mats As New Mat_4to1
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then algTask.gOptions.displaydst1.checked = true
         For i = 0 To counts.Count - 1
             counts(i) = New List(Of Integer)
         Next
@@ -120,20 +120,20 @@ Public Class Photon_Distance3D : Inherits TaskParent
     Dim hist As New Hist_Basics
     Dim distances As New List(Of Single)
     Public Sub New()
-        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
         hist.plotHist.removeZeroEntry = False
-        task.gOptions.setHistogramBins(10)
-        task.gOptions.UseMotionMask.Checked = False
+        algTask.gOptions.setHistogramBins(10)
+        algTask.gOptions.UseMotionMask.Checked = False
         desc = "Plot a histogram of the 3D distance of each picture from the previous image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim currColors As New List(Of cv.Vec3b)
-        For Each roi In task.gridRects
-            currColors.Add(task.bricks.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
+        For Each roi In algTask.gridRects
+            currColors.Add(algTask.bricks.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
         Next
 
         Static lastColors As New List(Of cv.Vec3b)(currColors)
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             lastColors = New List(Of cv.Vec3b)(currColors)
         End If
 

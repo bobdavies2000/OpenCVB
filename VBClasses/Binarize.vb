@@ -19,10 +19,10 @@ Public Class Binarize_Basics : Inherits TaskParent
         meanScalar = cv.Cv2.Mean(src, mask)
 
         If useBlur Then
-            blur.Run(task.gray)
+            blur.Run(algTask.gray)
             dst2 = blur.dst2.Threshold(meanScalar(0), 255, thresholdType)
         Else
-            dst2 = task.gray.Threshold(meanScalar(0), 255, thresholdType)
+            dst2 = algTask.gray.Threshold(meanScalar(0), 255, thresholdType)
         End If
     End Sub
 End Class
@@ -45,7 +45,7 @@ Public Class Binarize_OTSU : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        binarize.meanScalar = cv.Cv2.Mean(task.gray)
+        binarize.meanScalar = cv.Cv2.Mean(algTask.gray)
 
         binarize.useBlur = False
         Select Case labels(2)
@@ -59,7 +59,7 @@ Public Class Binarize_OTSU : Inherits TaskParent
                 binarize.useBlur = True
                 binarize.thresholdType = cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu
         End Select
-        binarize.Run(task.gray)
+        binarize.Run(algTask.gray)
         dst2 = binarize.dst2
     End Sub
 End Class
@@ -77,9 +77,9 @@ Public Class Binarize_Niblack_Sauvola : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        CvXImgProc.NiblackThreshold(task.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
+        CvXImgProc.NiblackThreshold(algTask.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
         dst2 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        CvXImgProc.NiblackThreshold(task.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)
+        CvXImgProc.NiblackThreshold(algTask.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)
         dst3 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
@@ -99,8 +99,8 @@ Public Class Binarize_Wolf_Nick : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        CvXImgProc.NiblackThreshold(task.gray, dst2, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf)
-        CvXImgProc.NiblackThreshold(task.gray, dst3, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick)
+        CvXImgProc.NiblackThreshold(algTask.gray, dst2, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf)
+        CvXImgProc.NiblackThreshold(algTask.gray, dst3, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick)
     End Sub
 End Class
 
@@ -197,7 +197,7 @@ Public Class Binarize_Simple : Inherits TaskParent
         desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        meanScalar = cv.Cv2.Mean(task.gray)
+        meanScalar = cv.Cv2.Mean(algTask.gray)
         dst2 = src.Threshold(meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
     End Sub
 End Class

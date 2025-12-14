@@ -7,7 +7,7 @@ Public Class SVM_Basics : Inherits TaskParent
     Dim svm As cv.ML.SVM
     Public Sub New()
         desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
-        If standalone Then task.gOptions.GridSlider.Value = 8
+        If standalone Then algTask.gOptions.GridSlider.Value = 8
         labels = {"", "", "SVM_Basics input data", "Results - white line is ground truth"}
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -24,14 +24,14 @@ Public Class SVM_Basics : Inherits TaskParent
         Dim resMat = cv.Mat.FromPixelData(options.sampleCount, 1, cv.MatType.CV_32SC1, response.ToArray)
         dataMat *= 1 / src.Height
 
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             If svm IsNot Nothing Then svm.Dispose()
             svm = options.createSVM()
         End If
         svm.Train(dataMat, cv.ML.SampleTypes.RowSample, resMat)
 
         dst3.SetTo(0)
-        For Each roi In task.gridRects
+        For Each roi In algTask.gridRects
             If roi.X > src.Height Then Continue For ' working only with square - not rectangles.
             Dim samples() As Single = {roi.X / src.Height, roi.Y / src.Height}
             If svm.Predict(cv.Mat.FromPixelData(1, 2, cv.MatType.CV_32F, samples)) = 1 Then
@@ -117,7 +117,7 @@ Public Class SVM_TestCase : Inherits TaskParent
         Dim labeled = 1
         Dim nonlabel = -1
 
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             points.Clear()
             responses.Clear()
             For i = 0 To 4 - 1
@@ -130,7 +130,7 @@ Public Class SVM_TestCase : Inherits TaskParent
         Dim labelsMat = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32SC1, responses.ToArray)
         Dim dataMat = trainMat * 1 / src.Height
 
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             If svm IsNot Nothing Then svm.Dispose()
             svm = options.createSVM()
         End If
@@ -143,15 +143,15 @@ Public Class SVM_TestCase : Inherits TaskParent
                 sampleMat.Set(Of Single)(0, 1, y / src.Height)
                 Dim response = svm.Predict(sampleMat)
                 Dim color = If(response >= 0, cv.Scalar.Blue, cv.Scalar.Red)
-                DrawCircle(dst3, New cv.Point(CInt(x), CInt(y)), task.DotSize + 1, color)
+                DrawCircle(dst3, New cv.Point(CInt(x), CInt(y)), algTask.DotSize + 1, color)
             Next
         Next
 
         For i = 0 To trainMat.Rows - 1
             Dim color = If(labelsMat.Get(Of Integer)(i) = 1, cv.Scalar.Blue, cv.Scalar.Red)
             Dim pt = New cv.Point(trainMat.Get(Of Single)(i, 0), trainMat.Get(Of Single)(i, 1))
-            DrawCircle(dst2, pt, task.DotSize + 2, color)
-            DrawCircle(dst3, pt, task.DotSize + 2, color)
+            DrawCircle(dst2, pt, algTask.DotSize + 2, color)
+            DrawCircle(dst3, pt, algTask.DotSize + 2, color)
         Next
     End Sub
     Public Sub Close()
@@ -183,7 +183,7 @@ Public Class SVM_ReuseBasics : Inherits TaskParent
         Dim labeled = 1
         Dim nonlabel = -1
 
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             points.Clear()
             responses.Clear()
             For i = 0 To 4 - 1
@@ -205,8 +205,8 @@ Public Class SVM_ReuseBasics : Inherits TaskParent
         dst2.SetTo(white)
         For i = 0 To svm.points.Count - 1
             Dim color = If(svm.response(i) = 1, cv.Scalar.Blue, cv.Scalar.Red)
-            DrawCircle(dst2,svm.points(i), task.DotSize, color)
-            DrawCircle(dst3,svm.points(i), task.DotSize, color)
+            DrawCircle(dst2,svm.points(i), algTask.DotSize, color)
+            DrawCircle(dst3,svm.points(i), algTask.DotSize, color)
         Next
     End Sub
 End Class
@@ -222,14 +222,14 @@ Public Class SVM_ReuseRandom : Inherits TaskParent
     Dim blueCount As Integer
     Public Sub New()
        OptionParent.FindSlider("Granularity").Value = 15
-        task.drawRect = New cv.Rect(dst2.Cols / 4, dst2.Rows / 4, dst2.Cols / 2, dst2.Rows / 2)
+        algTask.drawRect = New cv.Rect(dst2.Cols / 4, dst2.Rows / 4, dst2.Cols / 2, dst2.Rows / 2)
         labels(2) = "SVM Training data - draw a rectangle anywhere to test further."
         desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         svm.options.Run()
 
-        Dim rect = task.drawRect
+        Dim rect = algTask.drawRect
         Dim contour As New List(Of cv.Point)
         contour.Clear()
         contour.Add(New cv.Point(rect.X, rect.Y))
@@ -245,7 +245,7 @@ Public Class SVM_ReuseRandom : Inherits TaskParent
             rect.Width = width
         End If
 
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             dst2.SetTo(0)
             blueCount = 0
             svm.points.Clear()
@@ -262,7 +262,7 @@ Public Class SVM_ReuseRandom : Inherits TaskParent
 
                 svm.response.Add(res)
                 If res > 0 Then blueCount += 1
-                DrawCircle(dst2, pt, task.DotSize, If(res = 1, cv.Scalar.Blue, cv.Scalar.Green))
+                DrawCircle(dst2, pt, algTask.DotSize, If(res = 1, cv.Scalar.Blue, cv.Scalar.Green))
             Next
 
             svm.Run(src)

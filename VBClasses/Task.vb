@@ -85,7 +85,7 @@ Public Class VBtask : Implements IDisposable
     Public colorMapZeroIsBlack As cv.Mat
     Public correlationColorMap As cv.Mat
 
-    ' task algorithms - operate on every frame regardless of which algorithm is being run.
+    ' algTask algorithms - operate on every frame regardless of which algorithm is being run.
     Public colorizer As DepthColorizer_Basics
     Public redColor As RedColor_Basics
     Public redList As RedList_Basics
@@ -330,12 +330,12 @@ Public Class VBtask : Implements IDisposable
         End Try
     End Sub
     Public Sub New()
-        task = Me
+        algTask = Me
         Randomize() ' just in case anyone uses VB.Net's Rnd
         gridRects = New List(Of cv.Rect)
         optionsChanged = True
         firstPass = True
-        useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve task.results..
+        useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve algTask.results..
     End Sub
     Public Sub Initialize()
         rgbLeftAligned = True
@@ -346,7 +346,7 @@ Public Class VBtask : Implements IDisposable
         workRes = settings.workRes
         captureRes = settings.captureRes
         resolutionDetails = "CaptureRes " + CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) +
-                            ", workRes " + CStr(workRes.Width) + "x" + CStr(workRes.Height)
+                                ", workRes " + CStr(workRes.Width) + "x" + CStr(workRes.Height)
 
         allOptions = New OptionsContainer
         allOptions.Show()
@@ -363,9 +363,9 @@ Public Class VBtask : Implements IDisposable
 
         callTrace = New List(Of String)
         gravityCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
-        task.motionMask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 255)
-        noDepthMask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
-        depthmask = New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+        algTask.motionMask = New cv.Mat(algTask.workRes, cv.MatType.CV_8U, 255)
+        noDepthMask = New cv.Mat(algTask.workRes, cv.MatType.CV_8U, 0)
+        depthmask = New cv.Mat(algTask.workRes, cv.MatType.CV_8U, 0)
 
         colorizer = New DepthColorizer_Basics
         gmat = New IMU_GMatrix
@@ -377,7 +377,7 @@ Public Class VBtask : Implements IDisposable
         lines = New Line_Basics
         rgbFilter = New Filter_Basics
 
-        ' all the algorithms in the list are task algorithms that are children of the algorithm.
+        ' all the algorithms in the list are algTask algorithms that are children of the algorithm.
         For i = 1 To callTrace.Count - 1
             callTrace(i) = settings.algorithm + "\" + callTrace(i)
         Next
@@ -388,7 +388,7 @@ Public Class VBtask : Implements IDisposable
         Options_HistPointCloud.setupCalcHist()
         treeView.Show()
         centerRect = New cv.Rect(workRes.Width / 4, workRes.Height / 4,
-                                 workRes.Width / 2, workRes.Height / 2)
+                                     workRes.Width / 2, workRes.Height / 2)
 
         fpList.Clear()
 
@@ -400,19 +400,19 @@ Public Class VBtask : Implements IDisposable
         trueData.Add(str)
     End Sub
     Public Sub setSelectedCell()
-        If task.redList Is Nothing Then Exit Sub
-        If task.redList.oldrclist.Count = 0 Then Exit Sub
-        If ClickPoint = newPoint And task.redList.oldrclist.Count > 1 Then
-            ClickPoint = task.redList.oldrclist(1).maxDist
+        If algTask.redList Is Nothing Then Exit Sub
+        If algTask.redList.oldrclist.Count = 0 Then Exit Sub
+        If clickPoint = newPoint And algTask.redList.oldrclist.Count > 1 Then
+            clickPoint = algTask.redList.oldrclist(1).maxDist
         End If
-        Dim index = task.redList.rcMap.Get(Of Byte)(ClickPoint.Y, ClickPoint.X)
+        Dim index = algTask.redList.rcMap.Get(Of Byte)(clickPoint.Y, clickPoint.X)
         If index = 0 Then Exit Sub
-        If index > 0 And index < task.redList.oldrclist.Count Then
-            task.oldrcD = task.redList.oldrclist(index)
-            task.color(task.oldrcD.rect).SetTo(cv.Scalar.White, task.oldrcD.mask)
+        If index > 0 And index < algTask.redList.oldrclist.Count Then
+            algTask.oldrcD = algTask.redList.oldrclist(index)
+            algTask.color(algTask.oldrcD.rect).SetTo(cv.Scalar.White, algTask.oldrcD.mask)
         Else
             ' the 0th cell is always the upper left corner with just 1 pixel.
-            If task.redList.oldrclist.Count > 1 Then task.oldrcD = task.redList.oldrclist(1)
+            If algTask.redList.oldrclist.Count > 1 Then algTask.oldrcD = algTask.redList.oldrclist(1)
         End If
     End Sub
     Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
@@ -443,17 +443,17 @@ Public Class VBtask : Implements IDisposable
         algorithm_ms(0) += waitingForInput
         algorithmTimes(3) = Now  ' starting the main algorithm
 
-        Dim src = task.color
-        If src.Width = 0 Or task.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
+        Dim src = algTask.color
+        If src.Width = 0 Or algTask.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
 
-        bins2D = {task.workRes.Height, task.workRes.Width}
+        bins2D = {algTask.workRes.Height, algTask.workRes.Width}
 
         ' run any universal algorithms here
         IMU_RawAcceleration = IMU_Acceleration
         IMU_RawAngularVelocity = IMU_AngularVelocity
         IMU_AlphaFilter = 0.5 '  gOptions.imu_Alpha
 
-        grid.Run(task.color)
+        grid.Run(algTask.color)
         imuBasics.Run(emptyMat)
         gmat.Run(emptyMat)
 
@@ -471,7 +471,7 @@ Public Class VBtask : Implements IDisposable
         rgbFilter.Run(color)
         If gOptions.UseMotionMask.Checked Then
             motionBasics.Run(gray)
-            If optionsChanged Or task.frameCount < 5 Then
+            If optionsChanged Or algTask.frameCount < 5 Then
                 motionRect = New cv.Rect(0, 0, workRes.Width, workRes.Height)
                 grayStable = gray.Clone
                 leftViewStable = leftView.Clone
@@ -480,7 +480,7 @@ Public Class VBtask : Implements IDisposable
                     gray.CopyTo(grayStable, motionMask)
                     leftView.CopyTo(leftViewStable, motionMask)
                 Else
-                    If task.gOptions.debugSyncUI.Checked Then
+                    If algTask.gOptions.debugSyncUI.Checked Then
                         grayStable = gray.Clone
                         leftViewStable = leftView.Clone
                     End If
@@ -497,7 +497,7 @@ Public Class VBtask : Implements IDisposable
         If pcMotion IsNot Nothing Then
             pcMotion.Run(emptyMat) '******* this is the gravity rotation *******
         Else
-            task.pcSplit = task.pointCloud.Split
+            algTask.pcSplit = algTask.pointCloud.Split
         End If
 
         colorizer.Run(src)
@@ -560,8 +560,8 @@ Public Class VBtask : Implements IDisposable
 
 
             labels = MainUI_Algorithm.labels
-            If task.gOptions.displayDst0.Checked = False Then labels(0) = task.resolutionDetails
-            If task.gOptions.displayDst1.Checked = False Then labels(1) = task.depthAndDepthRange
+            If algTask.gOptions.displayDst0.Checked = False Then labels(0) = algTask.resolutionDetails
+            If algTask.gOptions.displayDst1.Checked = False Then labels(1) = algTask.depthAndDepthRange.Replace(vbCrLf, "")
 
             Dim nextTrueData As List(Of TrueText) = MainUI_Algorithm.trueData
             trueData = New List(Of TrueText)(nextTrueData)
@@ -569,10 +569,10 @@ Public Class VBtask : Implements IDisposable
             firstPass = False
             heartBeatLT = False
 
-            Dim displayObject = task.MainUI_Algorithm
+            Dim displayObject = algTask.MainUI_Algorithm
             ' they could have asked to display one of the algorithms in the TreeView.
             For Each obj In activeObjects
-                If obj.tracename = task.displayObjectName Then
+                If obj.tracename = algTask.displayObjectName Then
                     displayObject = obj
                     Exit For
                 End If
@@ -600,9 +600,9 @@ Public Class VBtask : Implements IDisposable
                 displayObject.trueData.Add(New TrueText("Longest", pt, 0))
             End If
 
-            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
+            If algTask.drawRect.Width > 0 And algTask.drawRect.Height > 0 Then
                 For Each dst In dstList
-                    dst.Rectangle(task.drawRect, cv.Scalar.White, 1)
+                    dst.Rectangle(algTask.drawRect, cv.Scalar.White, 1)
                 Next
             End If
 
@@ -610,13 +610,13 @@ Public Class VBtask : Implements IDisposable
             ' if any active algorithm has an index = -1, it has not been run.
             Dim index = algorithmNames.IndexOf(displayObject.traceName)
             If index = -1 Then
-                displayObject.trueData.Add(New TrueText("This task is not active at this time.",
-                                           New cv.Point(workRes.Width / 3, workRes.Height / 2), 2))
+                displayObject.trueData.Add(New TrueText("This algTask is not active at this time.",
+                                               New cv.Point(workRes.Width / 3, workRes.Height / 2), 2))
             End If
 
             trueData.Clear()
-            trueData.Add(New TrueText(task.depthAndDepthRange,
-                                      New cv.Point(task.mouseMovePoint.X, task.mouseMovePoint.Y - 24), 1))
+            trueData.Add(New TrueText(algTask.depthAndDepthRange,
+                                          New cv.Point(algTask.mouseMovePoint.X, algTask.mouseMovePoint.Y - 24), 1))
             For Each tt In displayObject.trueData
                 trueData.Add(tt)
             Next
@@ -626,11 +626,11 @@ Public Class VBtask : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         allOptions.Close()
-        For Each algorithm In task.activeObjects
+        For Each algorithm In algTask.activeObjects
             If algorithm.GetType().GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
         Next
 
-        For Each m In task.dstList
+        For Each m In algTask.dstList
             m.Dispose()
         Next
     End Sub

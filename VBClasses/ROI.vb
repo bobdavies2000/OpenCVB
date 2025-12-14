@@ -20,8 +20,8 @@ Public Class ROI_Basics : Inherits TaskParent
         aoiRect = New cv.Rect(mm0.minVal, mm1.minVal, mm0.maxVal - mm0.minVal, mm1.maxVal - mm1.minVal)
 
         If aoiRect.Width > 0 And aoiRect.Height > 0 Then
-            task.color.Rectangle(aoiRect, cv.Scalar.Yellow, task.lineWidth)
-            dst2.Rectangle(aoiRect, white, task.lineWidth)
+            algTask.color.Rectangle(aoiRect, cv.Scalar.Yellow, algTask.lineWidth)
+            dst2.Rectangle(aoiRect, white, algTask.lineWidth)
         End If
     End Sub
 End Class
@@ -64,8 +64,8 @@ Public Class ROI_FindNonZeroNoSingle : Inherits TaskParent
         Next
         If minX <> Integer.MaxValue Then
             aoiRect = New cv.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1)
-            task.color.Rectangle(aoiRect, cv.Scalar.Yellow, task.lineWidth)
-            dst2.Rectangle(aoiRect, white, task.lineWidth)
+            algTask.color.Rectangle(aoiRect, cv.Scalar.Yellow, algTask.lineWidth)
+            dst2.Rectangle(aoiRect, white, algTask.lineWidth)
         End If
     End Sub
 End Class
@@ -81,7 +81,7 @@ Public Class ROI_AccumulateOld : Inherits TaskParent
     Public minX = Integer.MaxValue, maxX = Integer.MinValue, minY = Integer.MaxValue, maxY = Integer.MinValue
     Dim options As New Options_ROI
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then algTask.gOptions.displaydst1.checked = true
         labels = {"", "", "Area of Interest", ""}
         dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
         OptionParent.FindSlider("Color Difference Threshold").Value = 30
@@ -89,8 +89,8 @@ Public Class ROI_AccumulateOld : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
-        If aoiRect.Width * aoiRect.Height > src.Total * options.roiPercent Or task.optionsChanged Then
-            dst0 = task.color
+        If aoiRect.Width * aoiRect.Height > src.Total * options.roiPercent Or algTask.optionsChanged Then
+            dst0 = algTask.color
             dst1.SetTo(0)
             aoiRect = New cv.Rect
             minX = Integer.MaxValue
@@ -104,9 +104,9 @@ Public Class ROI_AccumulateOld : Inherits TaskParent
         cv.Cv2.BitwiseOr(dst3, dst1, dst1)
         Dim tmp = dst3.FindNonZero()
         If aoiRect <> New cv.Rect Then
-            task.color(aoiRect).CopyTo(dst0(aoiRect))
-            dst0.Rectangle(aoiRect, cv.Scalar.Yellow, task.lineWidth)
-            dst2.Rectangle(aoiRect, white, task.lineWidth)
+            algTask.color(aoiRect).CopyTo(dst0(aoiRect))
+            dst0.Rectangle(aoiRect, cv.Scalar.Yellow, algTask.lineWidth)
+            dst2.Rectangle(aoiRect, white, algTask.lineWidth)
         End If
         If tmp.Rows = 0 Then Exit Sub
         For i = 0 To tmp.Rows - 1
@@ -118,7 +118,7 @@ Public Class ROI_AccumulateOld : Inherits TaskParent
         Next
         aoiRect = New cv.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1)
         dst1.CopyTo(dst2)
-        dst2.Rectangle(aoiRect, white, task.lineWidth)
+        dst2.Rectangle(aoiRect, white, algTask.lineWidth)
     End Sub
 End Class
 
@@ -142,7 +142,7 @@ Public Class ROI_Accumulate : Inherits TaskParent
         options.Run()
 
         SetTrueText(traceName + " is the same as ROI_AccumulateOld but simpler.", 3)
-        If roiRect.Width * roiRect.Height > src.Total * options.roiPercent Or task.optionsChanged Then
+        If roiRect.Width * roiRect.Height > src.Total * options.roiPercent Or algTask.optionsChanged Then
             dst2.SetTo(0)
             roiRect = New cv.Rect
         End If
@@ -160,7 +160,7 @@ Public Class ROI_Accumulate : Inherits TaskParent
                 cv.Cv2.BitwiseOr(diff.dst2, dst2, dst2)
             End If
         End If
-        dst2.Rectangle(roiRect, white, task.lineWidth)
-        task.color.Rectangle(roiRect, task.highlight, task.lineWidth)
+        dst2.Rectangle(roiRect, white, algTask.lineWidth)
+        algTask.color.Rectangle(roiRect, algTask.highlight, algTask.lineWidth)
     End Sub
 End Class

@@ -11,7 +11,7 @@ Public Class FitEllipse_Basics : Inherits TaskParent
         desc = "Use FitEllipse OpenCV API to draw around a set of points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If Not task.heartBeat Then Exit Sub
+        If Not algTask.heartBeat Then Exit Sub
         If standaloneTest() Then
             options.Run()
             inputPoints = options.srcPoints
@@ -19,7 +19,7 @@ Public Class FitEllipse_Basics : Inherits TaskParent
 
         dst2.SetTo(0)
         For Each pt In inputPoints
-            DrawCircle(dst2, pt, task.DotSize, white)
+            DrawCircle(dst2, pt, algTask.DotSize, white)
         Next
 
         If inputPoints.Count > 4 Then
@@ -30,7 +30,7 @@ Public Class FitEllipse_Basics : Inherits TaskParent
                     If Single.IsNaN(vertices(i).X) Or Single.IsNaN(vertices(i).Y) Then Exit Sub ' can't draw the result...
                     DrawLine(dst2, vertices(i), vertices((i + 1) Mod 4), cv.Scalar.Green)
                 Next
-                dst2.Ellipse(box, cv.Scalar.Green, task.lineWidth, task.lineType)
+                dst2.Ellipse(box, cv.Scalar.Green, algTask.lineWidth, algTask.lineType)
             End If
         End If
     End Sub
@@ -49,14 +49,14 @@ Public Class FitEllipse_AMS_CPP : Inherits TaskParent
         desc = "Use FitEllipse_AMS to draw around a set of points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If Not task.heartBeat Then Exit Sub
+        If Not algTask.heartBeat Then Exit Sub
         If standaloneTest() Then
             options.Run()
             inputPoints = options.srcPoints
         End If
         dst2.SetTo(0)
         For Each pt In inputPoints
-            DrawCircle(dst2, pt, task.DotSize, white)
+            DrawCircle(dst2, pt, algTask.DotSize, white)
         Next
 
         Dim input As cv.Mat = cv.Mat.FromPixelData(inputPoints.Count, 1, cv.MatType.CV_32FC2, inputPoints.ToArray)
@@ -74,10 +74,10 @@ Public Class FitEllipse_AMS_CPP : Inherits TaskParent
         Dim center = lpData.validatePoint(New cv.Point2f(ellipse(1), ellipse(2)))
         Dim size As New cv.Size2f(ellipse(3), ellipse(4))
         If Single.IsNaN(ellipse(3)) Or Single.IsNaN(ellipse(4)) Then Exit Sub ' one of the random points is the same
-        If size.Width < task.lineWidth + 1 Or size.Height < task.lineWidth + 1 Then Exit Sub
+        If size.Width < algTask.lineWidth + 1 Or size.Height < algTask.lineWidth + 1 Then Exit Sub
 
         Dim box = New cv.RotatedRect(center, size, angle)
-        dst2.Ellipse(box, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        dst2.Ellipse(box, cv.Scalar.Yellow, algTask.lineWidth, algTask.lineType)
     End Sub
 End Class
 
@@ -94,13 +94,13 @@ Public Class FitEllipse_Direct_CPP : Inherits TaskParent
         desc = "Use FitEllipse to draw around a set of points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If Not task.heartBeat Then Exit Sub
+        If Not algTask.heartBeat Then Exit Sub
         options.Run()
         Dim dataSrc(options.srcPoints.Count * 2 - 1) As Single
 
         dst2.SetTo(0)
         For Each pt In options.srcPoints
-            DrawCircle(dst2, pt, task.DotSize, white)
+            DrawCircle(dst2, pt, algTask.DotSize, white)
         Next
 
         Dim input As cv.Mat = cv.Mat.FromPixelData(options.srcPoints.Count, 1, cv.MatType.CV_32FC2, options.srcPoints.ToArray)
@@ -116,10 +116,10 @@ Public Class FitEllipse_Direct_CPP : Inherits TaskParent
         Dim angle = ellipse(0)
         Dim center As New cv.Point2f(ellipse(1), ellipse(2))
         Dim size As New cv.Size2f(ellipse(3), ellipse(4))
-        If size.Width < task.lineWidth + 1 Or size.Height < task.lineWidth + 1 Then Exit Sub
+        If size.Width < algTask.lineWidth + 1 Or size.Height < algTask.lineWidth + 1 Then Exit Sub
 
         Dim box = New cv.RotatedRect(center, size, angle)
-        dst2.Ellipse(box, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        dst2.Ellipse(box, cv.Scalar.Yellow, algTask.lineWidth, algTask.lineType)
     End Sub
 End Class
 
@@ -135,19 +135,19 @@ Public Class FitEllipse_RedCloud : Inherits TaskParent
         desc = "Create an ellipse from a contour"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If Not task.heartBeat Then Exit Sub
+        If Not algTask.heartBeat Then Exit Sub
         dst2 = runRedList(src, labels(2))
 
-        If task.oldrcD.contour Is Nothing Then Exit Sub
+        If algTask.oldrcD.contour Is Nothing Then Exit Sub
         fitE.inputPoints.Clear()
-        For Each pt In task.oldrcD.contour
+        For Each pt In algTask.oldrcD.contour
             fitE.inputPoints.Add(New cv.Point2f(pt.X, pt.Y))
         Next
         fitE.Run(src)
         dst3.SetTo(0)
-        dst3(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
-        DrawRect(dst3, task.oldrcD.rect, white)
-        dst3(task.oldrcD.rect).Ellipse(fitE.box, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        dst3(algTask.oldrcD.rect).SetTo(white, algTask.oldrcD.mask)
+        DrawRect(dst3, algTask.oldrcD.rect, white)
+        dst3(algTask.oldrcD.rect).Ellipse(fitE.box, cv.Scalar.Yellow, algTask.lineWidth, algTask.lineType)
     End Sub
 End Class
 
@@ -166,7 +166,7 @@ Public Class FitEllipse_Rectangle : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            If task.heartBeatLT = False Then
+            If algTask.heartBeatLT = False Then
                 Exit Sub
             Else
                 noisyLine.Run(src)

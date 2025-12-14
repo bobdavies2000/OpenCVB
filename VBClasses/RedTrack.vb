@@ -1,16 +1,16 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedTrack_Basics : Inherits TaskParent
     Public Sub New()
-        If New cv.Size(task.workRes.Width, task.workRes.Height) <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
+        If New cv.Size(algTask.workRes.Width, algTask.workRes.Height) <> New cv.Size(168, 94) Then algTask.frameHistoryCount = 1
         desc = "Get stats on each RedCloud cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst3 = runRedList(src, labels(2))
-        labels(2) = task.redList.labels(2)
+        labels(2) = algTask.redList.labels(2)
         dst2.SetTo(0)
-        For Each rc As oldrcData In task.redList.oldrclist
+        For Each rc As oldrcData In algTask.redList.oldrclist
             DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
-            If rc.index = task.oldrcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
+            If rc.index = algTask.oldrcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
         Next
     End Sub
 End Class
@@ -27,9 +27,9 @@ Public Class RedTrack_Lines : Inherits TaskParent
         desc = "Identify and track the lines in an image as RedCloud Cells"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then dst3.SetTo(0)
+        If algTask.heartBeat Then dst3.SetTo(0)
         Dim index As Integer
-        For Each lp In task.lines.lpList
+        For Each lp In algTask.lines.lpList
             DrawLine(dst3, lp.p1, lp.p2, 255)
             index += 1
             If index > 10 Then Exit For
@@ -58,7 +58,7 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
     Private Function findNearest(pt As cv.Point) As Integer
         Dim bestDistance As Single = Single.MaxValue
         Dim bestIndex As Integer
-        For Each rc In task.redList.oldrclist
+        For Each rc In algTask.redList.oldrclist
             Dim d = pt.DistanceTo(rc.maxDist)
             If d < bestDistance Then
                 bestDistance = d
@@ -70,12 +70,12 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         track.Run(src)
         dst2 = track.dst2
-        If task.redList.oldrclist.Count = 0 Then
+        If algTask.redList.oldrclist.Count = 0 Then
             SetTrueText("No lines found to track.", 3)
             Exit Sub
         End If
         Dim xList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For Each rc In task.redList.oldrclist
+        For Each rc In algTask.redList.oldrclist
             If rc.index = 0 Then Continue For
             xList.Add(rc.rect.X, rc.index)
         Next
@@ -89,21 +89,21 @@ Public Class RedTrack_LineSingle : Inherits TaskParent
             While leftCenter.DistanceTo(rightCenter) < dst2.Width / 4
                 leftMost = msRNG.Next(minLeft, minRight)
                 rightmost = msRNG.Next(minLeft, minRight)
-                leftCenter = task.redList.oldrclist(leftMost).maxDist
-                rightCenter = task.redList.oldrclist(rightmost).maxDist
+                leftCenter = algTask.redList.oldrclist(leftMost).maxDist
+                rightCenter = algTask.redList.oldrclist(rightmost).maxDist
                 iterations += 1
                 If iterations > 10 Then Exit Sub
             End While
         End If
 
         leftMost = findNearest(leftCenter)
-        leftCenter = task.redList.oldrclist(leftMost).maxDist
+        leftCenter = algTask.redList.oldrclist(leftMost).maxDist
 
         rightmost = findNearest(rightCenter)
-        rightCenter = task.redList.oldrclist(rightmost).maxDist
+        rightCenter = algTask.redList.oldrclist(rightmost).maxDist
 
         DrawLine(dst2, leftCenter, rightCenter, white)
-        labels(2) = task.redList.labels(2)
+        labels(2) = algTask.redList.labels(2)
     End Sub
 End Class
 
@@ -120,7 +120,7 @@ Public Class RedTrack_FeaturesKNN : Inherits TaskParent
         desc = "Use KNN with the good features in the image to create a grid of points"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        knn.queries = New List(Of cv.Point2f)(task.features)
+        knn.queries = New List(Of cv.Point2f)(algTask.features)
         knn.Run(src)
 
         dst3 = src.Clone
@@ -129,8 +129,8 @@ Public Class RedTrack_FeaturesKNN : Inherits TaskParent
             Dim index = knn.neighbors(i)(knn.neighbors(i).Count - 1)
             If index >= 0 And index < knn.trainInput.Count Then
                 Dim p2 = knn.trainInput(index)
-                DrawCircle(dst3, p1, task.DotSize, cv.Scalar.Yellow)
-                DrawCircle(dst3, p2, task.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst3, p1, algTask.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst3, p2, algTask.DotSize, cv.Scalar.Yellow)
                 DrawLine(dst3, p1, p2, white)
             End If
         Next
@@ -155,7 +155,7 @@ Public Class RedTrack_GoodCellInput : Inherits TaskParent
         Static distSlider = OptionParent.FindSlider("Max feature travel distance")
         Dim maxDistance = distSlider.Value
 
-        knn.queries = New List(Of cv.Point2f)(task.features)
+        knn.queries = New List(Of cv.Point2f)(algTask.features)
         knn.Run(src)
 
         featureList.Clear()
@@ -187,9 +187,9 @@ Public Class RedTrack_Points : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst3.SetTo(0)
         Dim index As Integer
-        For Each lp In task.lines.lpList
-            DrawCircle(dst3, lp.p1, task.DotSize, 255)
-            DrawCircle(dst3, lp.p2, task.DotSize, 255)
+        For Each lp In algTask.lines.lpList
+            DrawCircle(dst3, lp.p1, algTask.DotSize, 255)
+            DrawCircle(dst3, lp.p2, algTask.DotSize, 255)
             index += 1
             If index >= 10 Then Exit For
         Next
@@ -207,21 +207,21 @@ End Class
 
 Public Class RedTrack_Features : Inherits TaskParent
     Public Sub New()
-        task.redList = New RedList_Basics
+        algTask.redList = New RedList_Basics
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Output of Feature_Stable - input to RedCloud",
                   "Value Is correlation of x to y in contour points (0 indicates circular.)"}
         desc = "Similar to RedTrack_KNNPoints"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then dst2.SetTo(0)
-        For Each pt In task.features
-            DrawCircle(dst2, pt, task.DotSize, 255)
+        If algTask.heartBeat Then dst2.SetTo(0)
+        For Each pt In algTask.features
+            DrawCircle(dst2, pt, algTask.DotSize, 255)
         Next
 
-        task.redList.Run(dst2)
+        algTask.redList.Run(dst2)
         dst3.SetTo(0)
-        For Each rc In task.redList.oldrclist
+        For Each rc In algTask.redList.oldrclist
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
             DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)
             If rc.contour.Count > 0 Then SetTrueText(RedList_ShapeCorrelation.shapeCorrelation(rc.contour).ToString(fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
@@ -290,19 +290,19 @@ Public Class XO_RedList_TopX : Inherits TaskParent
         dst3 = runRedList(src, labels(2))
         dst2.SetTo(0)
 
-        If task.heartBeat Or task.optionsChanged Then
+        If algTask.heartBeat Or algTask.optionsChanged Then
             topXcells.Clear()
-            For Each rc In task.redList.oldrclist
+            For Each rc In algTask.redList.oldrclist
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 topXcells.Add(rc.maxDist)
             Next
         Else
             Dim maxList As New List(Of cv.Point)
             For Each pt In topXcells
-                Dim index = task.redList.rcMap.Get(Of Byte)(pt.Y, pt.X)
-                Dim rc = task.redList.oldrclist(index)
+                Dim index = algTask.redList.rcMap.Get(Of Byte)(pt.Y, pt.X)
+                Dim rc = algTask.redList.oldrclist(index)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                DrawCircle(dst2, rc.maxDist, task.DotSize, task.highlight)
+                DrawCircle(dst2, rc.maxDist, algTask.DotSize, algTask.highlight)
                 maxList.Add(rc.maxDist)
             Next
             topXcells = New List(Of cv.Point)(maxList)
@@ -311,7 +311,7 @@ Public Class XO_RedList_TopX : Inherits TaskParent
 
         dst1 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        task.redList.inputRemoved = dst1
+        algTask.redList.inputRemoved = dst1
     End Sub
 End Class
 
@@ -334,9 +334,9 @@ Public Class XO_RedList_UnmatchedCount : Inherits TaskParent
 
         Dim unMatchedCells As Integer
         Dim mostlyColor As Integer
-        For i = 0 To task.redList.oldrclist.Count - 1
-            Dim rc = task.redList.oldrclist(i)
-            If task.redList.oldrclist(i).depthPixels / task.redList.oldrclist(i).pixels < 0.5 Then mostlyColor += 1
+        For i = 0 To algTask.redList.oldrclist.Count - 1
+            Dim rc = algTask.redList.oldrclist(i)
+            If algTask.redList.oldrclist(i).depthPixels / algTask.redList.oldrclist(i).pixels < 0.5 Then mostlyColor += 1
             If rc.indexLast <> 0 Then
                 Dim val = dst3.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If val = 0 Then
@@ -354,15 +354,15 @@ Public Class XO_RedList_UnmatchedCount : Inherits TaskParent
         End If
         changedCellCounts.Add(unMatchedCells)
 
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             dst3.SetTo(0)
             framecounts.Clear()
             frameLoc.Clear()
             myFrameCount = 0
             Dim sum = changedCellCounts.Sum(), avg = If(changedCellCounts.Count > 0, changedCellCounts.Average(), 0)
             labels(3) = CStr(sum) + " new/moved cells in the last second " + Format(avg, fmt1) + " changed per frame"
-            labels(2) = CStr(task.redList.oldrclist.Count) + " cells, unmatched cells = " + CStr(unMatchedCells) + "   " +
-                        CStr(mostlyColor) + " cells were mostly color and " + CStr(task.redList.oldrclist.Count - mostlyColor) + " had depth."
+            labels(2) = CStr(algTask.redList.oldrclist.Count) + " cells, unmatched cells = " + CStr(unMatchedCells) + "   " +
+                        CStr(mostlyColor) + " cells were mostly color and " + CStr(algTask.redList.oldrclist.Count - mostlyColor) + " had depth."
             changedCellCounts.Clear()
         End If
     End Sub

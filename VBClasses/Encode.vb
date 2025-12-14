@@ -9,7 +9,7 @@ Public Class Encode_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
-        If task.firstPass Then OptionParent.FindSlider("Encode Output Scaling").Value = 10
+        If algTask.firstPass Then OptionParent.FindSlider("Encode Output Scaling").Value = 10
 
         Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
         Dim buf() = src.ImEncode(".jpg", encodeParams)

@@ -42,9 +42,9 @@ Public Class Deterministic_MotionMask : Inherits TaskParent
         deter.Run(src.Clone) ' run with the unfiltered image.
         dst2 = deter.dst2.Clone
 
-        Static lastFrame As cv.Mat = task.color.Clone
+        Static lastFrame As cv.Mat = algTask.color.Clone
         Dim dst1 = lastFrame.Clone
-        src.CopyTo(dst1, task.motionMask)
+        src.CopyTo(dst1, algTask.motionMask)
         deter.Run(dst1)
 
         If deter.dst2.Channels <> 1 Then
@@ -76,15 +76,15 @@ Public Class Deterministic_Histogram : Inherits TaskParent
         plothist.minRange = 0
         plothist.maxRange = 255
         plothist.createHistogram = True
-        task.gOptions.setHistogramBins(255)
+        algTask.gOptions.setHistogramBins(255)
         labels(2) = "Histogram bins range from 0 to 255."
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then algTask.gOptions.displayDst1.Checked = True
         desc = "Build a histogram from the differences in an attempt to answer why are the images different."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         deter.Run(src)
 
-        If task.heartBeat = False Then Exit Sub
+        If algTask.heartBeat = False Then Exit Sub
         dst3 = deter.dst3
 
         plothist.histMask = deter.dst3.Clone
@@ -103,16 +103,16 @@ Public Class Deterministic_BackProject : Inherits TaskParent
     Dim deter As New Deterministic_MotionMask
     Dim bProject As New BackProject_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displayDst0.Checked = True
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        task.gOptions.CrossHairs.Checked = False
+        If standalone Then algTask.gOptions.displayDst0.Checked = True
+        If standalone Then algTask.gOptions.displayDst1.Checked = True
+        algTask.gOptions.CrossHairs.Checked = False
         labels(3) = "Mask of pixels that differ between original image and motion-filtered image."
         desc = "Build a histogram from the differences in an attempt to answer why are the images different."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        deter.Run(task.gray)
+        deter.Run(algTask.gray)
 
-        If task.heartBeat = False Then Exit Sub
+        If algTask.heartBeat = False Then Exit Sub
         dst3 = deter.dst3
 
         bProject.hist.histMask = deter.dst3.Clone
@@ -120,8 +120,8 @@ Public Class Deterministic_BackProject : Inherits TaskParent
         dst2 = bProject.dst2
 
         Static saveMouseMove As cv.Point
-        If saveMouseMove <> task.mouseMovePoint Then
-            saveMouseMove = task.mouseMovePoint
+        If saveMouseMove <> algTask.mouseMovePoint Then
+            saveMouseMove = algTask.mouseMovePoint
             dst1.SetTo(0)
         End If
 
@@ -131,7 +131,7 @@ Public Class Deterministic_BackProject : Inherits TaskParent
         dst0 = src.Clone
         dst1.CopyTo(dst0, mask)
 
-        Dim mm = GetMinMax(task.gray, deter.dst3)
+        Dim mm = GetMinMax(algTask.gray, deter.dst3)
         labels(2) = "Active histogram bins range from " + CStr(mm.minVal) + " to " + CStr(mm.maxVal) + ".  X-axis is 0 to 255"
         SetTrueText("Pixels in the selected histogram bin - move mouse to reset to 0.", 1)
     End Sub

@@ -18,8 +18,8 @@ Public Class BlockMatching_Basics : Inherits TaskParent
         If blockMatch Is Nothing Then blockMatch = cv.StereoBM.Create()
         blockMatch.BlockSize = options.blockSize
         blockMatch.MinDisparity = 0
-        blockMatch.ROI1 = New cv.Rect(0, 0, task.leftview.Width, task.leftview.Height)
-        blockMatch.ROI2 = New cv.Rect(0, 0, task.leftview.Width, task.leftview.Height)
+        blockMatch.ROI1 = New cv.Rect(0, 0, algTask.leftview.Width, algTask.leftview.Height)
+        blockMatch.ROI2 = New cv.Rect(0, 0, algTask.leftview.Width, algTask.leftview.Height)
         blockMatch.PreFilterCap = 31
         blockMatch.NumDisparities = options.numDisparity
         blockMatch.TextureThreshold = 10
@@ -38,7 +38,7 @@ Public Class BlockMatching_Basics : Inherits TaskParent
         dst1(rect) = dst1(rect).Threshold(10, 10, cv.ThresholdTypes.Trunc)
         colorizer.Run(dst1)
         dst2(rect) = colorizer.dst2(rect)
-        dst3 = task.rightview.Resize(src.Size())
+        dst3 = algTask.rightview.Resize(src.Size())
     End Sub
     Public Sub Close()
         If blockMatch IsNot Nothing Then blockMatch.Dispose()

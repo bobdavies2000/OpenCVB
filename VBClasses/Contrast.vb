@@ -26,7 +26,7 @@ Public Class Contrast_POW : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst2 = task.gray
+        dst2 = algTask.gray
         dst2.ConvertTo(dst3, cv.MatType.CV_32FC3)
         dst3 = dst3.Normalize()
         dst3 = dst3.Pow(options.exponent)

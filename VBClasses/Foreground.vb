@@ -19,7 +19,7 @@ Public Class Foreground_Basics : Inherits TaskParent
         For i = 0 To classCount - 1
             Dim tmp = simK.dst2.InRange(i, i)
             depthMats.Add(tmp.Clone)
-            Dim depth = task.pcSplit(2).Mean(tmp)(0)
+            Dim depth = algTask.pcSplit(2).Mean(tmp)(0)
             sortedMats.Add(depth, i)
         Next
 
@@ -33,10 +33,10 @@ Public Class Foreground_Basics : Inherits TaskParent
             dst1.SetTo(index + 1, tmp)
         Next
         dst2 = PaletteFull(dst1)
-        fg = task.pcSplit(2).Threshold(fgDepth, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
+        fg = algTask.pcSplit(2).Threshold(fgDepth, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         dst0 = fg
 
-        fg.SetTo(0, task.noDepthMask)
+        fg.SetTo(0, algTask.noDepthMask)
         bg = Not fg
 
         dst3.SetTo(0)
@@ -56,14 +56,14 @@ Public Class Foreground_KMeans : Inherits TaskParent
     Public Sub New()
         OptionParent.FindSlider("KMeans k").Value = 2
         labels = {"", "", "Foreground Mask", "Background Mask"}
-        dst2 = New cv.Mat(New cv.Size(task.workRes.Width, task.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
-        dst3 = New cv.Mat(New cv.Size(task.workRes.Width, task.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst2 = New cv.Mat(New cv.Size(algTask.workRes.Width, algTask.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+        dst3 = New cv.Mat(New cv.Size(algTask.workRes.Width, algTask.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Separate foreground and background using Kmeans with k=2."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.optionsChanged = True
+        algTask.optionsChanged = True
 
-        src = task.pcSplit(2).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
+        src = algTask.pcSplit(2).Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         km.Run(src)
 
         Dim minDistance = Single.MaxValue
@@ -77,10 +77,10 @@ Public Class Foreground_KMeans : Inherits TaskParent
         Next
         dst2.SetTo(0)
         dst2.SetTo(255, km.masks(minIndex))
-        dst2.SetTo(0, task.noDepthMask)
+        dst2.SetTo(0, algTask.noDepthMask)
 
         dst3 = Not dst2
-        dst3.SetTo(0, task.noDepthMask)
+        dst3.SetTo(0, algTask.noDepthMask)
     End Sub
 End Class
 
@@ -93,7 +93,7 @@ End Class
 Public Class Foreground_Hist3D : Inherits TaskParent
     Dim hcloud As New Hist3Dcloud_Basics
     Public Sub New()
-        hcloud.maskInput = task.noDepthMask
+        hcloud.maskInput = algTask.noDepthMask
         labels = {"", "", "Foreground", "Background"}
         desc = "Use the first class of hist3Dcloud_Basics as the definition of foreground"
     End Sub
@@ -101,7 +101,7 @@ Public Class Foreground_Hist3D : Inherits TaskParent
         hcloud.Run(src)
 
         dst2.SetTo(0)
-        dst2 = hcloud.dst2.InRange(1, 1) Or task.noDepthMask
+        dst2 = hcloud.dst2.InRange(1, 1) Or algTask.noDepthMask
         dst3 = Not dst2
     End Sub
 End Class
@@ -125,8 +125,8 @@ Public Class Foreground_RedCloud : Inherits TaskParent
         back.Run(src)
         dst3 = back.dst2
         labels(3) = back.labels(2)
-        If task.redList.oldrclist.Count > 0 Then
-            dst2(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
+        If algTask.redList.oldrclist.Count > 0 Then
+            dst2(algTask.oldrcD.rect).SetTo(white, algTask.oldrcD.mask)
         End If
     End Sub
 End Class
@@ -146,7 +146,7 @@ Public Class Foreground_CellsFore : Inherits TaskParent
         fore.Run(src)
         dst3 = fore.dst3
         dst2.SetTo(0)
-        For Each rc In task.redList.oldrclist
+        For Each rc In algTask.redList.oldrclist
             Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
             If tmp.CountNonZero Then dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
@@ -165,9 +165,9 @@ Public Class Foreground_CellsBack : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         runRedList(src, labels(2))
         fore.Run(src)
-        dst3 = Not fore.dst2 And task.depthMask
+        dst3 = Not fore.dst2 And algTask.depthMask
         dst2.SetTo(0)
-        For Each rc In task.redList.oldrclist
+        For Each rc In algTask.redList.oldrclist
             Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
             If tmp.CountNonZero Then dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next

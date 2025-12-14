@@ -36,7 +36,7 @@ Public Class Benford_Basics : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim gray32f As New cv.Mat
         If standalone Then
-            task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
+            algTask.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
         Else
             gray32f = src
         End If
@@ -98,7 +98,7 @@ Public Class Benford_NormalizedImage : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Dim gray32f As New cv.Mat
-        task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
+        algTask.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
 
         benford.Run(gray32f.Normalize(1))
         dst2 = benford.dst2
@@ -122,7 +122,7 @@ Public Class Benford_NormalizedImage99 : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Dim gray32f As New cv.Mat
-        task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
+        algTask.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
 
         benford.Run(gray32f.Normalize(1))
         dst2 = benford.dst2
@@ -219,7 +219,7 @@ Public Class Benford_Depth : Inherits TaskParent
         desc = "Apply Benford to the depth data"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        benford.Run(task.pcSplit(2))
+        benford.Run(algTask.pcSplit(2))
         dst2 = benford.dst2
         labels(2) = benford.labels(3)
     End Sub
@@ -242,7 +242,7 @@ Public Class Benford_Primes : Inherits TaskParent
         desc = "Apply Benford to a list of primes"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then sieve.Run(src) ' only need to compute this once...
+        If algTask.optionsChanged Then sieve.Run(src) ' only need to compute this once...
         SetTrueText($"Primes found: {sieve.primes.Count}", 3)
 
         Dim tmp = cv.Mat.FromPixelData(sieve.primes.Count, 1, cv.MatType.CV_32S, sieve.primes.ToArray())

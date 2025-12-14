@@ -1,8 +1,9 @@
 Imports System.IO
 Imports System.Text.RegularExpressions
+Imports System.Threading
+Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
-Imports VBClasses
 
 Namespace MainUI
     Partial Public Class MainUI
@@ -12,9 +13,14 @@ Namespace MainUI
         Dim algHistory As New List(Of String)
         Dim recentMenu() As ToolStripMenuItem
         Dim labels As List(Of Label)
-        Public task As VBClasses.VBtask
+        Public algTask As VBClasses.VBtask
         Dim pics As New List(Of PictureBox)
         Dim testAllRunning As Boolean = False
+        Dim stopTestAll As Bitmap
+        Dim PausePlay As Bitmap
+        Dim runPlay As Bitmap
+        Dim testAllToolbarBitmap As Bitmap
+
         Public Sub jumpToAlgorithm()
             If AvailableAlgorithms.Items.Contains(settings.algorithm) = False Then
                 AvailableAlgorithms.SelectedIndex = 0
@@ -82,8 +88,9 @@ Namespace MainUI
             settingsIO = New jsonIO(Path.Combine(homeDir, "Main\settings.json"))
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
+            If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
             If Options.ShowDialog() = DialogResult.OK Then
-                If settings.workRes <> task.workRes And settings.cameraName <> task.cameraName Then
+                If settings.workRes <> algTask.workRes And settings.cameraName <> algTask.cameraName Then
                     getLineCounts()
 
                     SaveSettings()
@@ -132,28 +139,28 @@ Namespace MainUI
             StopCamera()
         End Sub
         Private Sub startAlgorithm()
-            If task IsNot Nothing Then task.Dispose()
+            If algTask IsNot Nothing Then algTask.Dispose()
 
-            task = New VBClasses.VBtask()
+            algTask = New VBClasses.VBtask()
 
-            task.homeDir = homeDir
-            task.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
-            task.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
-            task.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
-            task.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
-            task.dstList = {task.color, task.pointCloud, task.leftView, task.rightView}
-            task.gridRatioX = pics(0).Width / settings.workRes.Width
-            task.gridRatioY = pics(0).Height / settings.workRes.Height
+            algTask.homeDir = homeDir
+            algTask.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
+            algTask.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
+            algTask.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
+            algTask.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
+            algTask.dstList = {algTask.color, algTask.pointCloud, algTask.leftView, algTask.rightView}
+            algTask.gridRatioX = pics(0).Width / settings.workRes.Width
+            algTask.gridRatioY = pics(0).Height / settings.workRes.Height
 
-            task.settings = settings ' task is in a separate project and needs access to settings.
-            task.main_hwnd = Me.Handle
+            algTask.settings = settings ' algTask is in a separate project and needs access to settings.
+            algTask.main_hwnd = Me.Handle
 
-            task.Initialize()
-            task.MainUI_Algorithm = createAlgorithm(settings.algorithm)
-            AlgDescription.Text = task.MainUI_Algorithm.desc
+            algTask.Initialize()
+            algTask.MainUI_Algorithm = createAlgorithm(settings.algorithm)
+            AlgDescription.Text = algTask.MainUI_Algorithm.desc
             MainToolStrip.Refresh()
 
-            task.calibData = camera.calibData
+            algTask.calibData = camera.calibData
 
             If CameraSwitching.Visible Then
                 CamSwitchTimer.Enabled = False
@@ -161,6 +168,8 @@ Namespace MainUI
             End If
         End Sub
         Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
+            If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
+
             isPlaying = Not isPlaying
 
             ' Load and set the appropriate image
@@ -173,7 +182,6 @@ Namespace MainUI
             PausePlayButton.Invalidate()
 
             If isPlaying Then StartCamera() Else StopCamera()
-            TreeViewTimer.Enabled = True
 
             jumpToAlgorithm()
         End Sub
@@ -251,18 +259,28 @@ Namespace MainUI
             StatusLabel.Location = New Point(offset, pics(2).Top + h)
             StatusLabel.Width = w * 2
         End Sub
-        Private Sub TreeViewTimer_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
-            If task Is Nothing Then Exit Sub
-            If task.treeView IsNot Nothing Then task.treeView.Timer2_Tick(sender, e)
-        End Sub
-
         Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
-            testAllRunning = True
+            TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTestAll, testAllToolbarBitmap)
+            If TestAllButton.Text = "Test All" Then
+                Debug.WriteLine("")
+                Debug.WriteLine("Starting 'TestAll' overnight run.")
+
+                TestAllButton.Text = "Stop Test"
+                AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
+                TestAllTimer.Interval = 1
+                TestAllTimer.Enabled = True
+            Else
+                Debug.WriteLine("Stopping 'TestAll' overnight run.")
+                AvailableAlgorithms.Enabled = True
+                TestAllTimer.Enabled = False
+                TestAllButton.Text = "Test All"
+            End If
+            testAllRunning = TestAllTimer.Enabled
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
             settings.algorithm = AvailableAlgorithms.Text
             SaveSettings()
-            If task Is Nothing Then
+            If algTask Is Nothing Then
                 startAlgorithm()
             Else
                 If Trim(AvailableAlgorithms.Text) = "" Then ' Skip the space between groups
@@ -280,13 +298,18 @@ Namespace MainUI
             End If
         End Sub
         Private Sub clickPic(sender As Object, e As EventArgs)
-            If task Is Nothing Then Exit Sub
-            'If task IsNot Nothing Then  if task.sharpgl IsNot Nothing Then sharpGL.Activate()
-            If task IsNot Nothing Then If task.treeView IsNot Nothing Then task.treeView.Activate()
-            If task IsNot Nothing Then If task.allOptions IsNot Nothing Then task.allOptions.Activate()
+            If algTask Is Nothing Then Exit Sub
+            'If algTask IsNot Nothing Then  if algTask.sharpgl IsNot Nothing Then sharpGL.Activate()
+            If algTask IsNot Nothing Then If algTask.treeView IsNot Nothing Then algTask.treeView.Activate()
+            If algTask IsNot Nothing Then If algTask.allOptions IsNot Nothing Then algTask.allOptions.Activate()
         End Sub
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             settings = settingsIO.Load()
+
+            PausePlay = New Bitmap(homeDir + "Main/Data/PauseButton.png")
+            stopTestAll = New Bitmap(homeDir + "Main/Data/stopTestAll.png")
+            testAllToolbarBitmap = New Bitmap(homeDir + "Main/Data/testall.png")
+            runPlay = New Bitmap(homeDir + "Main/Data/Run.png")
 
             For i = 0 To 3
                 Dim pic = New PictureBox()
@@ -319,13 +342,13 @@ Namespace MainUI
             PausePlayButton.PerformClick()
         End Sub
         Private Sub paintPic(sender As Object, e As PaintEventArgs)
-            If task Is Nothing Then Exit Sub
+            If algTask Is Nothing Then Exit Sub
             Dim g As Graphics = e.Graphics
             Dim pic = DirectCast(sender, PictureBox)
             If pic.Image Is Nothing Then Exit Sub
             g.ScaleTransform(1, 1)
 
-            Dim displayImage = task.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+            Dim displayImage = algTask.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
 
             Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
             pic.Image?.Dispose()
@@ -339,14 +362,40 @@ Namespace MainUI
             Static myBlackPen As New Pen(Color.Black)
 
             Static saveTrueData As List(Of TrueText)
-            If task.debugDrawFlag Then saveTrueData = New List(Of TrueText)(task.trueData)
-            For Each tt In saveTrueData
-                If tt.text Is Nothing Then Continue For
-                If tt.text.Length > 0 And tt.picTag = pic.Tag Then
-                    g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
-                                 CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
+            If algTask.debugDrawFlag Then
+                saveTrueData = New List(Of TrueText)(algTask.trueData)
+                For Each tt In saveTrueData
+                    If tt.text Is Nothing Then Continue For
+                    If tt.text.Length > 0 And tt.picTag = pic.Tag Then
+                        g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
+                                     CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
+                    End If
+                Next
+            End If
+        End Sub
+
+        Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
+            If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
+                AvailableAlgorithms.SelectedIndex = 0
+            Else
+                If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = "" Then
+                    AvailableAlgorithms.SelectedIndex += 2
+                Else
+                    AvailableAlgorithms.SelectedIndex += 1
                 End If
-            Next
+            End If
+
+            ' skip testing the XO_ algorithms (XO.vb)  They are obsolete.
+            If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
+
+            TestAllTimer.Interval = settings.testAllDuration
+            Static startingAlgorithm = AvailableAlgorithms.Text
+            startAlgorithm()
+        End Sub
+        Private Sub TreeViewTimer_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
+            If isPlaying = False Then Exit Sub
+            If algTask Is Nothing Then Exit Sub
+            If algTask.treeView IsNot Nothing Then algTask.treeView.Timer2_Tick(sender, e)
         End Sub
     End Class
 End Namespace

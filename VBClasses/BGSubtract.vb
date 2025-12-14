@@ -12,7 +12,7 @@ Public Class BGSubtract_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             BGSubtract_BGFG_Close(cPtr)
             cPtr = BGSubtract_BGFG_Open(options.currMethod)
         End If
@@ -119,7 +119,7 @@ Public Class BGSubtract_MotionDetect : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If task.optionsChanged Or task.frameCount < 10 Then src.CopyTo(dst3)
+        If algTask.optionsChanged Or algTask.frameCount < 10 Then src.CopyTo(dst3)
         Dim threadCount = options.threadData(0)
         Dim width = options.threadData(1), height = options.threadData(2)
         Dim taskArray(threadCount - 1) As System.Threading.Tasks.Task
@@ -184,13 +184,13 @@ Public Class BGSubtract_GMG_KNN : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
-        If task.frameCount < 120 Then
-            SetTrueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.frameCount))
+        If algTask.frameCount < 120 Then
+            SetTrueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(algTask.frameCount))
         Else
             SetTrueText("")
         End If
 
-        gmg.Apply(task.gray, dst2, options.learnRate)
+        gmg.Apply(algTask.gray, dst2, options.learnRate)
         knn.Apply(dst2, dst2, options.learnRate)
     End Sub
     Public Sub Close()
@@ -217,11 +217,11 @@ Public Class BGSubtract_MOG_RGBDepth : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        grayMat = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        grayMat = algTask.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOGDepth.Apply(grayMat, grayMat, options.learnRate)
         dst2 = grayMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        MOGRGB.Apply(task.gray, dst3, options.learnRate)
+        MOGRGB.Apply(algTask.gray, dst3, options.learnRate)
     End Sub
     Public Sub Close()
         If MOGDepth IsNot Nothing Then MOGDepth.Dispose()
@@ -239,7 +239,7 @@ Public Class BGSubtract_MOG_Retina : Inherits TaskParent
         desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        retina.Run(task.depthRGB)
+        retina.Run(algTask.depthRGB)
         bgSub.Run(retina.dst3.Clone())
         dst2 = bgSub.dst2
         cv.Cv2.Subtract(bgSub.dst2, retina.dst3, dst3)
@@ -272,7 +272,7 @@ Public Class BGSubtract_Video : Inherits TaskParent
     Dim bgSub As New BGSubtract_Basics
     Dim video As New Video_Basics
     Public Sub New()
-        video.options.fileInfo = New FileInfo(task.homeDir + "opencv/Samples/Data/vtest.avi")
+        video.options.fileInfo = New FileInfo(algTask.homeDir + "opencv/Samples/Data/vtest.avi")
         desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -299,15 +299,15 @@ Public Class BGSubtract_Synthetic_CPP : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        If task.optionsChanged Then
-            If Not task.firstPass Then BGSubtract_Synthetic_Close(cPtr)
+        If algTask.optionsChanged Then
+            If Not algTask.firstPass Then BGSubtract_Synthetic_Close(cPtr)
 
             Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
 
             cPtr = BGSubtract_Synthetic_Open(handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                             task.homeDir + "opencv/Samples/Data/baboon.jpg",
+                                             algTask.homeDir + "opencv/Samples/Data/baboon.jpg",
                                              options.amplitude / 100, options.magnitude, options.waveSpeed / 100, options.objectSpeed)
             handleSrc.Free()
         End If

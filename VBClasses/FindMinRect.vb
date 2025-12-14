@@ -9,7 +9,7 @@ Public Class FindMinRect_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            If Not task.heartBeat Then Exit Sub
+            If Not algTask.heartBeat Then Exit Sub
             options.Run()
             inputPoints = quickRandomPoints(options.numPoints)
         End If
@@ -22,7 +22,7 @@ Public Class FindMinRect_Basics : Inherits TaskParent
         If standaloneTest() Then
             dst2.SetTo(0)
             For Each pt In inputPoints
-                DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.Red)
+                DrawCircle(dst2, pt, algTask.DotSize + 2, cv.Scalar.Red)
             Next
             DrawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
         End If

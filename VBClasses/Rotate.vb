@@ -34,7 +34,7 @@ End Class
 Public Class Rotate_Box : Inherits TaskParent
     Dim rotation As New Rotate_Basics
     Public Sub New()
-        task.drawRect = New cv.Rect(100, 100, 100, 100)
+        algTask.drawRect = New cv.Rect(100, 100, 100, 100)
         labels(2) = "Original Rectangle in the original perspective"
         labels(3) = "Same Rectangle in the new warped perspective"
         desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
@@ -43,7 +43,7 @@ Public Class Rotate_Box : Inherits TaskParent
         rotation.Run(src)
         dst3 = dst2.Clone()
 
-        Dim r = task.drawRect
+        Dim r = algTask.drawRect
         dst2 = src.Clone()
         dst2.Rectangle(r, white, 1)
 
@@ -61,7 +61,7 @@ Public Class Rotate_Box : Inherits TaskParent
         For i = 0 To dstpoints.Width - 1
             Dim p1 = dstpoints.Get(Of cv.Point2f)(0, i)
             Dim p2 = dstpoints.Get(Of cv.Point2f)(0, (i + 1) Mod 4)
-            dst3.Line(p1, p2, white, task.lineWidth + 1, task.lineType)
+            dst3.Line(p1, p2, white, algTask.lineWidth + 1, algTask.lineType)
         Next
     End Sub
 End Class
@@ -118,12 +118,12 @@ Public Class Rotate_Verticalize : Inherits TaskParent
     Public angleSlider As New System.Windows.Forms.TrackBar
     Public Sub New()
         angleSlider = OptionParent.FindSlider("Rotation Angle in degrees X100")
-        angleSlider.Value = task.verticalizeAngle / 100
+        angleSlider.Value = algTask.verticalizeAngle / 100
         OptionParent.findRadio("Nearest (preserves pixel values best)").Checked = True
         desc = "Use gravity vector to rotate the image to be vertical"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then angleSlider.Value = task.verticalizeAngle * 100
+        If standalone Then angleSlider.Value = algTask.verticalizeAngle * 100
         rotate.Run(src)
         dst2 = rotate.dst2
         SetTrueText("Angle offset from gravity = " + Format(angleSlider.Value / 100, fmt2))

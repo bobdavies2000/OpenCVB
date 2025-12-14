@@ -20,7 +20,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
     Public Sub New()
         options = New Options_GeneticDrawing()
         For i = 0 To brushes.Count - 1
-            brushes(i) = cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg").CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            brushes(i) = cv.Cv2.ImRead(algTask.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg").CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Next
 
         labels(2) = "(clkwise) original, imgStage, imgGeneration, magnitude"
@@ -99,7 +99,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
         options.Run()
 
         Static r = New cv.Rect(0, 0, src.Width, src.Height)
-        If task.drawRect.Width > 0 Then r = task.drawRect
+        If algTask.drawRect.Width > 0 Then r = algTask.drawRect
         If restartRequested Then
             restartRequested = False
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
@@ -108,7 +108,7 @@ Public Class GeneticDrawing_Basics : Inherits TaskParent
             stage = 0
 
             If standaloneTest() Then
-                src = If(options.snapCheck, src.Clone, cv.Cv2.ImRead(task.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
+                src = If(options.snapCheck, src.Clone, cv.Cv2.ImRead(algTask.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
             End If
 
             src = If(src.Channels() = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
@@ -233,12 +233,12 @@ Public Class GeneticDrawing_Photo : Inherits TaskParent
     Dim fileNameForm As OptionsFileName
     Public Sub New()
         fileNameForm = New OptionsFileName
-        fileNameForm.OpenFileDialog1.InitialDirectory = task.homeDir + "Data/"
+        fileNameForm.OpenFileDialog1.InitialDirectory = algTask.homeDir + "Data/"
         fileNameForm.OpenFileDialog1.FileName = "*.*"
         fileNameForm.OpenFileDialog1.CheckFileExists = False
         fileNameForm.OpenFileDialog1.Filter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
         fileNameForm.OpenFileDialog1.FilterIndex = 1
-        fileNameForm.filename.Text = task.homeDir + "Data/GeneticDrawingExample.jpg"
+        fileNameForm.filename.Text = algTask.homeDir + "Data/GeneticDrawingExample.jpg"
         fileNameForm.Text = "Select an image file to create a paint version"
         fileNameForm.FileNameLabel.Text = "Select a file for use with the Sound_Basics algorithm."
         fileNameForm.PlayButton.Hide()
@@ -250,7 +250,7 @@ Public Class GeneticDrawing_Photo : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
 
         Static fileInputName = New FileInfo(fileNameForm.filename.Text)
-        If inputFileName <> fileInputName.FullName Or task.optionsChanged Then
+        If inputFileName <> fileInputName.FullName Or algTask.optionsChanged Then
             inputFileName = fileInputName.FullName
             If fileInputName.Exists = False Then
                 labels(2) = "No input file specified or file not found."

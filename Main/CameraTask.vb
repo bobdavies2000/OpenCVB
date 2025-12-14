@@ -42,38 +42,38 @@
             End If
         End Sub
         Private Function releaseImages() As Boolean
-            task.debugDrawFlag = True
-            If task.debugSyncUI Then
+            algTask.debugDrawFlag = True
+            If algTask.debugSyncUI Then
                 Static lastTime As DateTime = Now
                 Dim timeNow As DateTime = Now
                 Dim elapsedTime = timeNow.Ticks - lastTime.Ticks
                 Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
                 Dim timerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
                 If timerInterval < 1000 Then ' adjust the debugSyncUI time here - in milliseconds.
-                    task.debugDrawFlag = False
+                    algTask.debugDrawFlag = False
                 Else
                     lastTime = timeNow
                 End If
             End If
 
-            Return task.debugDrawFlag
+            Return algTask.debugDrawFlag
         End Function
         Private Sub Camera_FrameReady(sender As GenericCamera)
-            If task Is Nothing Then Exit Sub
+            If algTask Is Nothing Then Exit Sub
             ' This event is raised from the background thread, so we need to marshal to UI thread
             Me.Invoke(Sub()
-                          sender.camImages.images(0).CopyTo(task.color)
-                          sender.camImages.images(1).CopyTo(task.pointCloud)
-                          sender.camImages.images(2).CopyTo(task.leftView)
-                          sender.camImages.images(3).CopyTo(task.rightView)
+                          sender.camImages.images(0).CopyTo(algTask.color)
+                          sender.camImages.images(1).CopyTo(algTask.pointCloud)
+                          sender.camImages.images(2).CopyTo(algTask.leftView)
+                          sender.camImages.images(3).CopyTo(algTask.rightView)
 
-                          task.RunAlgorithm()
+                          algTask.RunAlgorithm()
 
-                          task.mouseClickFlag = False
+                          algTask.mouseClickFlag = False
 
                           If releaseImages() Then
-                              For i = 0 To task.labels.Count - 1
-                                  labels(i).Text = task.labels(i)
+                              For i = 0 To algTask.labels.Count - 1
+                                  labels(i).Text = algTask.labels(i)
                               Next
                               Me.Refresh()
                           End If

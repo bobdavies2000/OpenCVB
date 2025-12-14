@@ -9,7 +9,7 @@ Public Class FindTriangle_Basics : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             srcPoints = New List(Of cv.Point2f)(options.srcPoints)
         Else
             If srcPoints.Count < 3 Then Exit Sub ' not enough points
@@ -38,7 +38,7 @@ Public Class FindTriangle_Basics : Inherits TaskParent
         Next
 
         For Each pt In srcPoints
-            DrawCircle(dst2, pt, task.DotSize + 1, cv.Scalar.Red)
+            DrawCircle(dst2, pt, algTask.DotSize + 1, cv.Scalar.Red)
         Next
     End Sub
 End Class

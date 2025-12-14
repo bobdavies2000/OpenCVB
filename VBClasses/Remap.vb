@@ -38,7 +38,7 @@ Public Class Remap_Basics : Inherits TaskParent
                 cv.Cv2.Remap(src, dst2, mapx3, mapy3, cv.InterpolationFlags.Nearest)
         End Select
 
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             direction += 1
             direction = direction Mod 4
         End If
@@ -66,7 +66,7 @@ Public Class Remap_Flip : Inherits TaskParent
             Case 3 ' flip horizontally and vertically
                 cv.Cv2.Flip(src, dst2, cv.FlipMode.XY)
         End Select
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             direction += 1
             direction = direction Mod 4
         End If

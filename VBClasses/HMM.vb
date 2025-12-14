@@ -3,12 +3,12 @@ Imports System.Runtime.InteropServices
 'https://github.com/omidsakhi/cv-hmm
 Public Class HMM_Example_CPP : Inherits TaskParent
     Public Sub New()
-        If task.testAllRunning = False Then cPtr = HMM_Open()
+        If algTask.testAllRunning = False Then cPtr = HMM_Open()
         labels(2) = "Text output with explanation will appear in the Visual Studio output."
         desc = "Simple test of Hidden Markov Model - text output"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If task.testAllRunning Then
+        If algTask.testAllRunning Then
             SetTrueText("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
             Exit Sub
         End If

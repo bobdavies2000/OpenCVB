@@ -66,7 +66,7 @@ Public Class Kalman_Compare : Inherits TaskParent
         desc = "Use this kalman filter to predict the next value."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
                     For i = 0 To kalman.Count - 1
@@ -149,8 +149,8 @@ Public Class Kalman_RotatingPoint : Inherits TaskParent
         drawCross(dst2, statePt, white)
         drawCross(dst2, measPt, white)
         drawCross(dst2, predictPt, white)
-        dst2.Line(statePt, measPt, New cv.Scalar(0, 0, 255), task.lineWidth + 2, task.lineType)
-        dst2.Line(statePt, predictPt, New cv.Scalar(0, 255, 255), task.lineWidth + 2, task.lineType)
+        dst2.Line(statePt, measPt, New cv.Scalar(0, 0, 255), algTask.lineWidth + 2, algTask.lineType)
+        dst2.Line(statePt, predictPt, New cv.Scalar(0, 255, 255), algTask.lineWidth + 2, algTask.lineType)
 
         If msRNG.Next(0, 4) <> 0 Then kf.Correct(measurement)
 
@@ -168,23 +168,23 @@ End Class
 ' https://www.codeproject.com/Articles/865935/Object-Tracking-Kalman-Filter-with-Ease
 Public Class Kalman_MousePredict : Inherits TaskParent
     Public Sub New()
-        task.kalman = New Kalman_Basics
-        ReDim task.kalman.kInput(2 - 1)
-        ReDim task.kalman.kOutput(2 - 1)
+        algTask.kalman = New Kalman_Basics
+        ReDim algTask.kalman.kInput(2 - 1)
+        ReDim algTask.kalman.kOutput(2 - 1)
 
         labels(2) = "Red is real mouse, white is prediction"
         desc = "Use kalman filter to predict the next mouse location."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.frameCount Mod 300 = 0 Then dst2.SetTo(0)
+        If algTask.frameCount Mod 300 = 0 Then dst2.SetTo(0)
 
-        Dim lastStateResult = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
-        Static lastRealMouse = task.mouseMovePoint
-        task.kalman.kInput = {task.mouseMovePoint.X, task.mouseMovePoint.Y}
-        task.kalman.Run(emptyMat)
-        DrawLine(dst2, New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), lastStateResult, white)
-        dst2.Line(task.mouseMovePoint, lastRealMouse, cv.Scalar.Red)
-        lastRealMouse = task.mouseMovePoint
+        Dim lastStateResult = New cv.Point(algTask.kalman.kOutput(0), algTask.kalman.kOutput(1))
+        Static lastRealMouse = algTask.mouseMovePoint
+        algTask.kalman.kInput = {algTask.mouseMovePoint.X, algTask.mouseMovePoint.Y}
+        algTask.kalman.Run(emptyMat)
+        DrawLine(dst2, New cv.Point(algTask.kalman.kOutput(0), algTask.kalman.kOutput(1)), lastStateResult, white)
+        dst2.Line(algTask.mouseMovePoint, lastRealMouse, cv.Scalar.Red)
+        lastRealMouse = algTask.mouseMovePoint
     End Sub
 End Class
 
@@ -302,7 +302,7 @@ Public Class Kalman_DepthSmall : Inherits TaskParent
         desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        kalman.Run(task.depthRGB)
+        kalman.Run(algTask.depthRGB)
         dst2 = kalman.dst2
         dst3 = kalman.dst3
     End Sub
@@ -325,13 +325,13 @@ Public Class Kalman_Depth32f : Inherits TaskParent
         desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        resize.Run(task.pcSplit(2))
+        resize.Run(algTask.pcSplit(2))
 
         kalman.input = resize.dst2.Reshape(1, resize.dst2.Width * resize.dst2.Height)
         kalman.Run(src)
         dst2 = kalman.output.Reshape(1, resize.dst2.Height)
         dst2 = dst2.Resize(src.Size())
-        cv.Cv2.Subtract(dst2, task.pcSplit(2), dst3)
+        cv.Cv2.Subtract(dst2, algTask.pcSplit(2), dst3)
         dst3 = dst3.Normalize(255)
     End Sub
 End Class
@@ -566,7 +566,7 @@ Public Class Kalman_VB_Basics : Inherits TaskParent
             Next
         End If
 
-        matrix(task.frameCount Mod saveAvgCount) = kInput
+        matrix(algTask.frameCount Mod saveAvgCount) = kInput
         kAverage = (cv.Mat.FromPixelData(saveAvgCount, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean()(0)
 
         If options.useKalman Then

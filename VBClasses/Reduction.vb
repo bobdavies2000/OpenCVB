@@ -99,7 +99,7 @@ Public Class Reduction_XYZ : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> cv.MatType.CV_32FC3 Then src = algTask.pointCloud
         Dim split = src.Split()
         For i = 0 To split.Length - 1
             If options.reduceXYZ(i) Then
@@ -112,8 +112,8 @@ Public Class Reduction_XYZ : Inherits TaskParent
         Next
 
         cv.Cv2.Merge(split, dst3)
-        dst3.SetTo(0, task.noDepthMask)
-        SetTrueText("Task.PointCloud (or 32fc3 input) has been reduced and is in dst3")
+        dst3.SetTo(0, algTask.noDepthMask)
+        SetTrueText("algTask.PointCloud (or 32fc3 input) has been reduced and is in dst3")
     End Sub
 End Class
 
@@ -181,17 +181,17 @@ Public Class Reduction_MotionTest : Inherits TaskParent
     Dim diff As New Diff_Basics
     Public Sub New()
         reduction.alwaysDisplay = True
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then algTask.gOptions.displayDst1.Checked = True
         desc = "Compare reduction with and without motion."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
 
         reduction.Run(src)
         dst2 = reduction.dst3
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             dst3 = dst2
         Else
-            dst2.CopyTo(dst3, task.motionMask)
+            dst2.CopyTo(dst3, algTask.motionMask)
 
             diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             diff.Run(dst3)
@@ -213,9 +213,9 @@ Public Class Reduction_PointCloud : Inherits TaskParent
         desc = "Use reduction to smooth depth data"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pcSplit(2)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = algTask.pcSplit(2)
 
-        src *= 255 / task.MaxZmeters
+        src *= 255 / algTask.MaxZmeters
         src.ConvertTo(dst0, cv.MatType.CV_32S)
         reduction.Run(dst0)
         reduction.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
@@ -256,8 +256,8 @@ Public Class Reduction_NoDepth : Inherits TaskParent
         desc = "Reduce the grayscale image where there is no depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst3 = task.grayStable
-        dst3.SetTo(0, task.depthMask)
+        dst3 = algTask.grayStable
+        dst3.SetTo(0, algTask.depthMask)
         reduction.Run(dst3)
         dst2 = reduction.dst3
     End Sub

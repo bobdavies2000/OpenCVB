@@ -60,17 +60,17 @@ Public Class FLANN_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If options.reuseData = False Or task.frameCount < 2 Or task.mouseClickFlag Then random.Run(src) ' fill result1 with random points in x and y range of the image.
+        If options.reuseData = False Or algTask.frameCount < 2 Or algTask.mouseClickFlag Then random.Run(src) ' fill result1 with random points in x and y range of the image.
         Dim features As cv.Mat = cv.Mat.FromPixelData(random.PointList.Count, 2, cv.MatType.CV_32F, random.PointList.ToArray)
 
         Dim matchCount = Math.Min(options.matchCount, random.PointList.Count - 1)
         dst2.SetTo(white)
         For i = 0 To features.Rows - 1
             Dim pt = random.PointList(i)
-            DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Blue)
+            DrawCircle(dst2, pt, algTask.DotSize, cv.Scalar.Blue)
         Next
 
-        If options.reuseData = False Or task.optionsChanged Or task.mouseClickFlag Then
+        If options.reuseData = False Or algTask.optionsChanged Or algTask.mouseClickFlag Then
             ReDim qArray(options.queryCount - 1)
             For i = 0 To options.queryCount - 1
                 qArray(i) = New cv.Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
@@ -93,7 +93,7 @@ Public Class FLANN_Basics : Inherits TaskParent
                         DrawLine(dst2, pt1, pt2, cv.Scalar.Red)
                     End If
                 Next
-                DrawCircle(dst2, pt1, task.DotSize, cv.Scalar.Red)
+                DrawCircle(dst2, pt1, algTask.DotSize, cv.Scalar.Red)
             Next
         End Using
 

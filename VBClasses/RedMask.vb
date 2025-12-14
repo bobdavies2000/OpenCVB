@@ -43,7 +43,7 @@ Public Class RedMask_Basics : Inherits TaskParent
             DrawTour(md.mask, md.contour, 255, -1)
             md.pixels = md.mask.CountNonZero
             md.maxDist = GetMaxDist(md)
-            md.mm = GetMinMax(task.pcSplit(2)(md.rect), task.depthMask(md.rect))
+            md.mm = GetMinMax(algTask.pcSplit(2)(md.rect), algTask.depthmask(md.rect))
             md.index = mdList.Count
             mdList.Add(md)
         Next
@@ -52,8 +52,8 @@ Public Class RedMask_Basics : Inherits TaskParent
 
         dst3 = PaletteBlackZero(dst2)
 
-        If task.heartBeat Then labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
-        If task.heartBeat Then labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
+        If algTask.heartBeat Then labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
+        If algTask.heartBeat Then labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)

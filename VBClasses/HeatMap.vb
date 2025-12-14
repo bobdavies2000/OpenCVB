@@ -11,12 +11,12 @@ Public Class HeatMap_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> cv.MatType.CV_32FC3 Then src = algTask.pointCloud
 
-        cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, histogramTop, 2, task.bins2D, task.rangesTop)
+        cv.Cv2.CalcHist({src}, algTask.channelsTop, New cv.Mat, histogramTop, 2, algTask.bins2D, algTask.rangesTop)
         histogramTop.Row(0).SetTo(0)
 
-        cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, histogramSide, 2, task.bins2D, task.rangesSide)
+        cv.Cv2.CalcHist({src}, algTask.channelsSide, New cv.Mat, histogramSide, 2, algTask.bins2D, algTask.rangesSide)
         histogramSide.Col(0).SetTo(0)
 
         topframes.Run(histogramTop)
@@ -27,8 +27,8 @@ Public Class HeatMap_Basics : Inherits TaskParent
 
         dst2 = PaletteBlackZero(dst0.ConvertScaleAbs()).Clone
         dst3 = PaletteBlackZero(dst1.ConvertScaleAbs())
-        labels(2) = "Top view of heat map with the last " + CStr(task.frameHistoryCount) + " frames"
-        labels(3) = "Side view of heat map with the last " + CStr(task.frameHistoryCount) + " frames"
+        labels(2) = "Top view of heat map with the last " + CStr(algTask.frameHistoryCount) + " frames"
+        labels(3) = "Side view of heat map with the last " + CStr(algTask.frameHistoryCount) + " frames"
     End Sub
 End Class
 
@@ -42,14 +42,14 @@ End Class
 Public Class HeatMap_Grid : Inherits TaskParent
     Dim heat As New HeatMap_Basics
     Public Sub New()
-        task.gOptions.GridSlider.Value = 5
+        algTask.gOptions.GridSlider.Value = 5
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         labels = {"", "", "Histogram mask for top-down view - original histogram in dst0", "Histogram mask for side view - original histogram in dst1"}
         desc = "Apply a grid to the HeatMap_OverTime to isolate objects."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> cv.MatType.CV_32FC3 Then src = algTask.pointCloud
 
         heat.Run(src)
 
@@ -57,7 +57,7 @@ Public Class HeatMap_Grid : Inherits TaskParent
         dst3.SetTo(0)
         Dim maxCount1 As Integer, maxCount2 As Integer
         Dim sync1 As New Object, sync2 As New Object
-        For Each roi In task.gridRects
+        For Each roi In algTask.gridRects
             Dim count1 = heat.histogramTop(roi).CountNonZero
             dst2(roi).SetTo(count1)
             If count1 > maxCount1 Then maxCount1 = count1
@@ -91,8 +91,8 @@ Public Class HeatMap_Hot : Inherits TaskParent
 
         Dim mmTop = GetMinMax(dst2)
         Dim mmSide = GetMinMax(dst3)
-        If task.heartBeat Then labels(2) = CStr(mmTop.maxVal) + " max count " + CStr(dst2.CountNonZero) + " pixels in the top down view"
-        If task.heartBeat Then labels(3) = CStr(mmSide.maxVal) + " max count " + CStr(dst3.CountNonZero) + " pixels in the side view"
+        If algTask.heartBeat Then labels(2) = CStr(mmTop.maxVal) + " max count " + CStr(dst2.CountNonZero) + " pixels in the top down view"
+        If algTask.heartBeat Then labels(3) = CStr(mmSide.maxVal) + " max count " + CStr(dst3.CountNonZero) + " pixels in the side view"
     End Sub
 End Class
 
@@ -107,7 +107,7 @@ Public Class HeatMap_Cell : Inherits TaskParent
     Dim flood As New Flood_Basics
     Dim heat As New HeatMap_Hot
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then algTask.gOptions.displaydst1.checked = true
         desc = "Display the heat map for the selected cell"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -116,7 +116,7 @@ Public Class HeatMap_Cell : Inherits TaskParent
         labels(2) = flood.labels(2)
 
         dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
-        task.pointCloud(task.oldrcD.rect).CopyTo(dst0(task.oldrcD.rect), task.oldrcD.mask)
+        algTask.pointCloud(algTask.oldrcD.rect).CopyTo(dst0(algTask.oldrcD.rect), algTask.oldrcD.mask)
 
         heat.Run(dst0)
         dst1 = heat.dst2

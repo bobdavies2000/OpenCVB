@@ -70,7 +70,7 @@ Public Class SuperRes_Input : Inherits TaskParent
     Public video As New Video_Basics
     Public inputFileName As String
     Public Sub New()
-        video.options.fileInfo = New FileInfo(task.homeDir + "Data/testdata_superres_car.avi")
+        video.options.fileInfo = New FileInfo(algTask.homeDir + "Data/testdata_superres_car.avi")
         inputFileName = video.options.fileInfo.FullName
         desc = "Input data for the superres testing"
     End Sub
@@ -93,11 +93,11 @@ Public Class SuperRes_SubPixelZoom : Inherits TaskParent
     Dim zoom As New Pixel_SubPixel
     Dim video As New SuperRes_Input
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then algTask.gOptions.displaydst1.checked = true
         desc = "Is SuperRes better than just zoom with sub-pixel accuracy?"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        task.mouseMovePoint = New cv.Point(45, 60)
+        algTask.mouseMovePoint = New cv.Point(45, 60)
         video.Run(src)
         If video.video.captureVideo.PosFrames > 30 Then Exit Sub
         dst1 = video.dst2

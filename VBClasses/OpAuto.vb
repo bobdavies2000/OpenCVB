@@ -5,7 +5,7 @@ Public Class OpAuto_Valley : Inherits TaskParent
     Public options As New Options_Boundary
     Dim kalmanHist As New Hist_Kalman
     Public Sub New()
-        If standalone Then task.gOptions.setHistogramBins(255)
+        If standalone Then algTask.gOptions.setHistogramBins(255)
         desc = "Get the top X highest quality valley points in the histogram."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -51,7 +51,7 @@ Public Class OpAuto_Valley : Inherits TaskParent
 
         If standaloneTest() Then
             For Each entry In valleyOrder
-                Dim col = entry.Value * dst2.Width / task.histogramBins
+                Dim col = entry.Value * dst2.Width / algTask.histogramBins
                 DrawLine(dst2, New cv.Point(col, 0), New cv.Point(col, dst2.Height), white)
             Next
             SetTrueText(CStr(valleys.Count) + " valleys in histogram", 3)
@@ -68,7 +68,7 @@ Public Class OpAuto_Peaks2D : Inherits TaskParent
     Public clusterPoints As New List(Of cv.Point2f)
     Dim heatmap As New HeatMap_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setHistogramBins(255)
+        If standalone Then algTask.gOptions.setHistogramBins(255)
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
@@ -80,8 +80,8 @@ Public Class OpAuto_Peaks2D : Inherits TaskParent
         ' input should be a 2D histogram.  If standaloneTest(), get one...
         If standaloneTest() Then
             heatmap.Run(src)
-            dst2 = If(task.toggleOn, heatmap.dst2, heatmap.dst3)
-            src = If(task.toggleOn, heatmap.dst0.Clone, heatmap.dst1.Clone)
+            dst2 = If(algTask.toggleOn, heatmap.dst2, heatmap.dst3)
+            src = If(algTask.toggleOn, heatmap.dst0.Clone, heatmap.dst1.Clone)
         End If
 
         clusterPoints.Clear()
@@ -95,7 +95,7 @@ Public Class OpAuto_Peaks2D : Inherits TaskParent
         If Not standaloneTest() Then dst2.SetTo(0)
         For i = 0 To clusterPoints.Count - 1
             Dim pt = clusterPoints(i)
-            DrawCircle(dst2,pt, task.DotSize * 3, white)
+            DrawCircle(dst2,pt, algTask.DotSize * 3, white)
         Next
     End Sub
 End Class
@@ -109,7 +109,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits TaskParent
     Dim options As New Options_Boundary
     Dim hist2d As New Hist2D_Basics
     Public Sub New()
-        If standalone Then task.gOptions.setHistogramBins(255)
+        If standalone Then algTask.gOptions.setHistogramBins(255)
         labels = {"", "", "2D Histogram view with highlighted peaks", ""}
         desc = "Find the peaks in a 2D histogram"
     End Sub
@@ -125,7 +125,7 @@ Public Class OpAuto_Peaks2DGrid : Inherits TaskParent
         End If
 
         Dim pointPop As New SortedList(Of Single, cv.Point)(New compareAllowIdenticalSingleInverted)
-        For Each roi In task.gridRects
+        For Each roi In algTask.gridRects
             Dim mm as mmData = GetMinMax(src(roi))
             If mm.maxVal = 0 Then Continue For
             pointPop.Add(mm.maxVal, New cv.Point(roi.X + mm.maxLoc.X, roi.Y + mm.maxLoc.Y))
@@ -141,10 +141,10 @@ Public Class OpAuto_Peaks2DGrid : Inherits TaskParent
         If Not standaloneTest() Then dst2.SetTo(0)
         For i = 0 To clusterPoints.Count - 1
             Dim pt = clusterPoints(i)
-            DrawCircle(dst2,pt, task.DotSize * 3, white)
+            DrawCircle(dst2,pt, algTask.DotSize * 3, white)
         Next
 
-        dst2.SetTo(white, task.gridMask)
+        dst2.SetTo(white, algTask.gridMask)
         labels(3) = CStr(pointPop.Count) + " grid samples trimmed to " + CStr(clusterPoints.Count)
     End Sub
 End Class

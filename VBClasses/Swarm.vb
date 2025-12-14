@@ -11,7 +11,7 @@ Public Class Swarm_Basics : Inherits TaskParent
     Dim cornerHistory As New List(Of List(Of cv.Point2f))
     Dim feat As New Feature_General
     Public Sub New()
-        task.featureOptions.FeatureSampleSize.Value = task.featureOptions.FeatureSampleSize.Maximum
+        algTask.featureOptions.FeatureSampleSize.Value = algTask.featureOptions.FeatureSampleSize.Maximum
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
@@ -26,25 +26,25 @@ Public Class Swarm_Basics : Inherits TaskParent
             Dim pt = queries(i)
             For j = 0 To Math.Min(nabList.Count, options.ptCount) - 1
                 Dim ptNew = trainInput(nabList(j))
-                DrawLine(dst, pt, ptNew, white, task.lineWidth)
-                If ptNew.X < options.border Then DrawLine(dst, New cv.Point2f(0, ptNew.Y), ptNew, white, task.lineWidth)
-                If ptNew.Y < options.border Then DrawLine(dst, New cv.Point2f(ptNew.X, 0), ptNew, white, task.lineWidth)
-                If ptNew.X > dst.Width - options.border Then DrawLine(dst, New cv.Point2f(dst.Width, ptNew.Y), ptNew, white, task.lineWidth)
-                If ptNew.Y > dst.Height - options.border Then DrawLine(dst, New cv.Point2f(ptNew.X, dst.Height), ptNew, white, task.lineWidth)
+                DrawLine(dst, pt, ptNew, white, algTask.lineWidth)
+                If ptNew.X < options.border Then DrawLine(dst, New cv.Point2f(0, ptNew.Y), ptNew, white, algTask.lineWidth)
+                If ptNew.Y < options.border Then DrawLine(dst, New cv.Point2f(ptNew.X, 0), ptNew, white, algTask.lineWidth)
+                If ptNew.X > dst.Width - options.border Then DrawLine(dst, New cv.Point2f(dst.Width, ptNew.Y), ptNew, white, algTask.lineWidth)
+                If ptNew.Y > dst.Height - options.border Then DrawLine(dst, New cv.Point2f(ptNew.X, dst.Height), ptNew, white, algTask.lineWidth)
             Next
         Next
         Return dst
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        feat.Run(task.grayStable)
+        feat.Run(algTask.grayStable)
 
         dst3 = feat.dst2
 
-        If task.optionsChanged Then cornerHistory.Clear()
+        If algTask.optionsChanged Then cornerHistory.Clear()
 
-        Dim histCount = task.frameHistoryCount
-        cornerHistory.Add(New List(Of cv.Point2f)(task.features))
+        Dim histCount = algTask.frameHistoryCount
+        cornerHistory.Add(New List(Of cv.Point2f)(algTask.features))
 
         Dim lastIndex = cornerHistory.Count - 1
         knn.trainInput = New List(Of cv.Point2f)(cornerHistory.ElementAt(0))
@@ -75,7 +75,7 @@ Public Class Swarm_Basics : Inherits TaskParent
 
         labels(3) = CStr(lpList.Count) + " points were matched to the previous set of features."
         distanceAvg = 0
-        If task.heartBeat Then distanceMax = 0
+        If algTask.heartBeat Then distanceMax = 0
         If disList.Count > 10 Then
             distanceAvg = disList.Average
             distanceMax = Math.Max(distanceMax, disList.Max)
@@ -106,23 +106,23 @@ Public Class Swarm_LeftRight : Inherits TaskParent
     Public rightMax As Single
     Dim swarm As New Swarm_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then algTask.gOptions.displayDst1.Checked = True
         labels = {"", "", "Left view feature points", "Right view feature points"}
         desc = "Get direction and distance from the left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        swarm.Run(task.leftView)
+        swarm.Run(algTask.leftView)
         leftDistance = swarm.distanceAvg
         leftDirection = swarm.directionAvg
         leftMax = swarm.distanceMax
-        dst2 = task.leftView
+        dst2 = algTask.leftView
         dst2.SetTo(cv.Scalar.White, swarm.DrawLines())
 
-        swarm.Run(task.rightView)
+        swarm.Run(algTask.rightView)
         rightDistance = swarm.distanceAvg
         rightDirection = swarm.directionAvg
         rightMax = swarm.distanceMax
-        dst3 = task.rightView
+        dst3 = algTask.rightView
         dst3.SetTo(cv.Scalar.White, swarm.DrawLines())
 
         strOut = swarm.labels(2) + vbCrLf + swarm.labels(3)
@@ -152,7 +152,7 @@ Public Class Swarm_Percentage : Inherits TaskParent
         dst3.SetTo(0)
         Dim pixels As Integer
         Dim count As Integer
-        For Each rc In task.redList.oldrclist
+        For Each rc In algTask.redList.oldrclist
             dst3(rc.rect).SetTo(rc.color, rc.mask)
             pixels += rc.pixels
             count += 1
@@ -184,7 +184,7 @@ Public Class Swarm_Flood : Inherits TaskParent
         flood.Run(color8U.dst2)
         dst2 = flood.dst2
 
-        task.setSelectedCell()
+        algTask.setSelectedCell()
         labels(2) = flood.cellGen.labels(2)
     End Sub
 End Class

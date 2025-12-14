@@ -5,8 +5,8 @@ Public Class LeftRight_Basics : Inherits TaskParent
         desc = "Display the left and right views as they came from the camera."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = task.leftView
-        dst3 = task.rightView
+        dst2 = algTask.leftView
+        dst3 = algTask.rightView
     End Sub
 End Class
 
@@ -24,14 +24,14 @@ Public Class LeftRight_CompareRaw : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        Dim r1 = New cv.Rect(0, options.sliceY, task.leftView.Width, options.sliceHeight)
-        Dim r2 = New cv.Rect(0, 25, task.leftView.Width, options.sliceHeight)
+        Dim r1 = New cv.Rect(0, options.sliceY, algTask.leftView.Width, options.sliceHeight)
+        Dim r2 = New cv.Rect(0, 25, algTask.leftView.Width, options.sliceHeight)
         dst2.SetTo(0)
-        task.leftView(r1).CopyTo(dst2(r2))
+        algTask.leftView(r1).CopyTo(dst2(r2))
 
         r2.Y += options.sliceHeight
-        task.rightView(r1).CopyTo(dst2(r2))
-        dst3 = task.rightView
+        algTask.rightView(r1).CopyTo(dst2(r2))
+        dst3 = algTask.rightView
     End Sub
 End Class
 
@@ -46,8 +46,8 @@ Public Class LeftRight_Palettized : Inherits TaskParent
         labels(3) = "Right Image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = PaletteFull(task.leftView)
-        dst3 = PaletteFull(task.rightView)
+        dst2 = PaletteFull(algTask.leftView)
+        dst3 = PaletteFull(algTask.rightView)
     End Sub
 End Class
 
@@ -69,10 +69,10 @@ Public Class LeftRight_BRISK : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        brisk.Run(task.leftView)
+        brisk.Run(algTask.leftView)
         dst2 = brisk.dst2.Clone
 
-        brisk.Run(task.rightView)
+        brisk.Run(algTask.rightView)
         dst3 = brisk.dst2.Clone
     End Sub
 End Class
@@ -90,10 +90,10 @@ Public Class LeftRight_Reduction : Inherits TaskParent
         desc = "Reduce both the left and right color images"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        reduction.Run(task.leftView)
+        reduction.Run(algTask.leftView)
         dst2 = reduction.dst2.Clone
 
-        reduction.Run(task.rightView)
+        reduction.Run(algTask.rightView)
         dst3 = reduction.dst2.Clone
     End Sub
 End Class
@@ -110,7 +110,7 @@ Public Class LeftRight_RedRightGray : Inherits TaskParent
         desc = "Segment the right view image with RedMask_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        color8u.Run(task.rightView)
+        color8u.Run(algTask.rightView)
         redMask.Run(color8u.dst2)
         dst2 = redMask.dst2.Clone
         dst3 = PaletteFull(dst2)
@@ -129,7 +129,7 @@ Public Class LeftRight_RedLeftGray : Inherits TaskParent
         desc = "Segment the left view image with RedMask_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        color8u.Run(task.leftView)
+        color8u.Run(algTask.leftView)
         redMask.Run(color8u.dst2)
         dst2 = redMask.dst2.Clone
         dst3 = PaletteFull(dst2)
@@ -147,7 +147,7 @@ Public Class LeftRight_RGBAlignLeft : Inherits TaskParent
         desc = "This is a crude method to align the left image with the RGB for the D435i camera only..."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
+        If algTask.settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
             SetTrueText("This is just a crude way to align the left and rgb images." + vbCrLf +
                         "The parameters are set for only the Intel D435i camera.")
             Exit Sub
@@ -162,7 +162,7 @@ Public Class LeftRight_RGBAlignLeft : Inherits TaskParent
         Dim xS = options.xShift
         Dim yS = options.yShift
         Dim rect = New cv.Rect(xD + xS, yD + yS, w - xD * 2, h - yD * 2)
-        dst2 = task.leftView(rect).Resize(dst0.Size)
+        dst2 = algTask.leftView(rect).Resize(dst0.Size)
 
         dst3 = ShowAddweighted(dst2, src, labels(3))
     End Sub
@@ -176,13 +176,13 @@ End Class
 Public Class LeftRight_ContourLeft : Inherits TaskParent
     Dim color8U As New Color8U_Basics
     Public Sub New()
-        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
+        If algTask.contours Is Nothing Then algTask.contours = New Contour_Basics_List
         desc = "Segment the left view with contour_basics_List"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        color8U.Run(task.leftView)
-        task.contours.Run(color8U.dst2)
-        dst2 = task.contours.dst2
+        color8U.Run(algTask.leftView)
+        algTask.contours.Run(color8U.dst2)
+        dst2 = algTask.contours.dst2
     End Sub
 End Class
 
@@ -200,10 +200,10 @@ Public Class LeftRight_Edges : Inherits TaskParent
         labels(3) = "Right Image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.leftView)
+        edges.Run(algTask.leftView)
         dst2 = edges.dst2
 
-        edges.Run(task.rightView)
+        edges.Run(algTask.rightView)
         dst3 = edges.dst2
     End Sub
 End Class
@@ -217,19 +217,19 @@ End Class
 Public Class LeftRight_EdgesColor : Inherits TaskParent
     Dim edges As New Edge_Basics
     Public Sub New()
-        If standalone Then task.gOptions.displayDst0.Checked = True
+        If standalone Then algTask.gOptions.displayDst0.Checked = True
         desc = "Display the edges in the left, right, and color views"
         labels(2) = "Left Image"
         labels(3) = "Right Image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(task.gray)
+        edges.Run(algTask.gray)
         dst0 = edges.dst2.Clone
 
-        edges.Run(task.leftView)
+        edges.Run(algTask.leftView)
         dst2 = edges.dst2.Clone
 
-        edges.Run(task.rightView)
+        edges.Run(algTask.rightView)
         dst3 = edges.dst2
     End Sub
 End Class

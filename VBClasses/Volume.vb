@@ -8,14 +8,14 @@ Public Class Volume_Basics : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             dst2 = runRedList(src, labels(2))
-            rc = task.oldrcD
+            rc = algTask.oldrcD
         End If
 
         Dim xList As New List(Of Single)
         Dim yList As New List(Of Single)
         Dim zList As New List(Of Single)
         For Each pt In rc.contour
-            Dim vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+            Dim vec = algTask.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
             If vec(0) <> 0 Then xList.Add(vec(0))
             If vec(1) <> 0 Then yList.Add(vec(1))
             If vec(2) <> 0 Then zList.Add(vec(2))
@@ -33,7 +33,7 @@ Public Class Volume_Basics : Inherits TaskParent
         Dim meterFactor As Integer = 100
         Dim mString = If(meterFactor = 100, "centimeters", If(meterFactor = 1, "meters", "decimeters"))
         volume = (maxX - minX) * (maxY - minY) * (maxZ - minZ) * meterFactor * meterFactor * meterFactor
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             strOut = "Volume = " + Format(volume, fmt0) + " cubic " + mString + vbCrLf + vbCrLf
             strOut += "Min " + vbTab + "Max " + vbTab + "Range " + vbTab + " units=" + mString + vbCrLf
             strOut += Format(minX * meterFactor, fmt0) + vbTab + Format(maxX * meterFactor, fmt0) + vbTab + Format((maxX - minX) * meterFactor, fmt0) + vbTab + " X dimension" + vbCrLf

@@ -5,7 +5,7 @@ Public Class History_Basics : Inherits TaskParent
         desc = "Create a frame history to sum the last X frames"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If task.frameHistoryCount = 1 Then
+        If algTask.frameHistoryCount = 1 Then
             dst2 = src
             Exit Sub
         End If
@@ -13,12 +13,12 @@ Public Class History_Basics : Inherits TaskParent
         Dim input = src.Clone
         If input.Type <> cv.MatType.CV_32F Then input.ConvertTo(input, cv.MatType.CV_32F)
 
-        If dst1.Type <> input.Type Or dst1.Channels() <> input.Channels() Or task.optionsChanged Then
+        If dst1.Type <> input.Type Or dst1.Channels() <> input.Channels() Or algTask.optionsChanged Then
             dst1 = input
             saveFrames.Clear()
         End If
 
-        If saveFrames.Count >= task.frameHistoryCount Then saveFrames.RemoveAt(0)
+        If saveFrames.Count >= algTask.frameHistoryCount Then saveFrames.RemoveAt(0)
         saveFrames.Add(input.Clone)
 
         For Each m In saveFrames
@@ -43,17 +43,17 @@ Public Class History_Cloud : Inherits TaskParent
     Public frames As New History_BasicsNoSaturation
     Dim saveFrames As New List(Of cv.Mat)
     Public Sub New()
-        desc = "Create a frame history and sum the last X task.pointcloud's"
+        desc = "Create a frame history and sum the last X algTask.pointcloud's"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Or src.Channels() <> 3 Then src = task.pointCloud
+        If src.Type <> cv.MatType.CV_32FC3 Or src.Channels() <> 3 Then src = algTask.pointCloud
 
-        If task.optionsChanged Or dst3.Type <> cv.MatType.CV_32FC3 Then
+        If algTask.optionsChanged Or dst3.Type <> cv.MatType.CV_32FC3 Then
             saveFrames.Clear()
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
         End If
 
-        If saveFrames.Count >= task.frameHistoryCount Then
+        If saveFrames.Count >= algTask.frameHistoryCount Then
             dst3 = dst3.Subtract(saveFrames.ElementAt(0))
             saveFrames.RemoveAt(0)
         End If
@@ -62,7 +62,7 @@ Public Class History_Cloud : Inherits TaskParent
         dst3 = src + dst3
         dst2 = dst3 / saveFrames.Count
 
-        frames.Run(task.depthMask)
+        frames.Run(algTask.depthMask)
         dst2.SetTo(0, Not frames.dst2)
     End Sub
 End Class
@@ -83,12 +83,12 @@ Public Class History_BasicsNoSaturation : Inherits TaskParent
         If dst3.Type <> input.Type Or dst3.Channels() <> input.Channels() Then dst3 = New cv.Mat(input.Size(), input.Type, 0)
         input /= 255 ' input is all zeros or ones.
 
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             saveFrames.Clear()
             dst3.SetTo(0)
         End If
 
-        If saveFrames.Count >= task.frameHistoryCount Then
+        If saveFrames.Count >= algTask.frameHistoryCount Then
             dst3 = dst3.Subtract(saveFrames.ElementAt(0))
             saveFrames.RemoveAt(0)
         End If
@@ -140,18 +140,18 @@ Public Class History_Basics8U : Inherits TaskParent
         If standalone Then
             options.Run()
             src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            If task.firstPass Then lastFrame = src.Clone
+            If algTask.firstPass Then lastFrame = src.Clone
             cv.Cv2.Absdiff(src, lastFrame, dst3)
             lastFrame = src.Clone
             src = dst3.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         End If
 
-        If task.frameHistoryCount = 1 Then
+        If algTask.frameHistoryCount = 1 Then
             dst2 = src
             Exit Sub
         End If
 
-        If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
+        If saveFrames.Count > algTask.frameHistoryCount Then saveFrames.RemoveAt(0)
         saveFrames.Add(src.Clone)
 
         dst2.SetTo(0)
@@ -159,7 +159,7 @@ Public Class History_Basics8U : Inherits TaskParent
             dst2 = dst2 Or m
         Next
 
-        If task.settings.algorithm = traceName Then
+        If algTask.settings.algorithm = traceName Then
             For i = 0 To Math.Min(saveFrames.Count, 4) - 1
                 mats.mat(i) = saveFrames(i).Clone
             Next
@@ -180,19 +180,19 @@ Public Class History_ReliableDepth : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         If saveFrames.Count > 0 Then
-            If task.optionsChanged Or saveFrames(0).Size <> src.Size Then saveFrames.Clear()
+            If algTask.optionsChanged Or saveFrames(0).Size <> src.Size Then saveFrames.Clear()
         End If
 
-        If standalone Then src = task.noDepthMask
+        If standalone Then src = algTask.noDepthMask
 
-        If task.frameHistoryCount = 1 Then
-            dst2 = task.depthMask
+        If algTask.frameHistoryCount = 1 Then
+            dst2 = algTask.depthMask
             Exit Sub
         End If
 
-        If task.optionsChanged Then saveFrames.Clear()
+        If algTask.optionsChanged Then saveFrames.Clear()
 
-        If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
+        If saveFrames.Count > algTask.frameHistoryCount Then saveFrames.RemoveAt(0)
         saveFrames.Add(src.Clone)
 
         dst2 = saveFrames(0)
@@ -201,6 +201,6 @@ Public Class History_ReliableDepth : Inherits TaskParent
         Next
         dst2 = Not dst2
         dst3.SetTo(0)
-        task.depthRGB.CopyTo(dst3, dst2)
+        algTask.depthRGB.CopyTo(dst3, dst2)
     End Sub
 End Class

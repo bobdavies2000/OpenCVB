@@ -8,9 +8,9 @@ Public Class Watershed_Basics : Inherits TaskParent
         desc = "Watershed API experiment.  Draw on the image to test."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then rects.Add(task.drawRect)
+        If algTask.drawRect.Width > 0 And algTask.drawRect.Height > 0 Then rects.Add(algTask.drawRect)
 
-        If (standaloneTest() Or UseCorners) And task.optionsChanged Then
+        If (standaloneTest() Or UseCorners) And algTask.optionsChanged Then
             For i = 0 To 4 - 1
                 Dim r As New cv.Rect(0, 0, src.Width / 10, src.Height / 10)
                 Select Case i
@@ -43,7 +43,7 @@ Public Class Watershed_Basics : Inherits TaskParent
         Else
             dst2 = src
         End If
-        task.drawRect = New cv.Rect
+        algTask.drawRect = New cv.Rect
         labels(2) = "There were " + CStr(rects.Count) + " regions defined as input"
     End Sub
 End Class
@@ -63,7 +63,7 @@ Public Class Watershed_DepthReduction : Inherits TaskParent
         desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        reduction.Run(task.depthRGB)
+        reduction.Run(algTask.depthRGB)
         dst3 = reduction.dst3
 
         watershed.Run(dst3)
@@ -87,7 +87,7 @@ Public Class Watershed_DepthAuto : Inherits TaskParent
         desc = "Watershed the four corners of the depth image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        watershed.Run(task.depthRGB)
+        watershed.Run(algTask.depthRGB)
         dst2 = watershed.dst2
         labels(2) = watershed.labels(2)
     End Sub

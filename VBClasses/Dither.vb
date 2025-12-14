@@ -16,7 +16,7 @@ Public Class Dither_Basics : Inherits TaskParent
         Dim pixels(dst2.Total * dst2.ElemSize - 1) As Byte
         Dim hpixels = GCHandle.Alloc(pixels, GCHandleType.Pinned)
         For i = 0 To 1
-            Dim copySrc = Choose(i + 1, src, task.depthRGB)
+            Dim copySrc = Choose(i + 1, src, algTask.depthRGB)
             Marshal.Copy(copySrc.Data, pixels, 0, pixels.Length)
             Select Case options.radioIndex
                 Case 0

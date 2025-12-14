@@ -5,7 +5,7 @@ Public Class FREAK_Basics : Inherits TaskParent
     Dim orb As New ORB_Basics
     Dim freak As FREAK
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then algTask.gOptions.displaydst1.checked = true
         desc = "Find keypoints using FREAK algorithm"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

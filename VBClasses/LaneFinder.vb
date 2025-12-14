@@ -3,8 +3,8 @@ Imports System.IO
 Public Class LaneFinder_Basics : Inherits TaskParent
     Dim lane As New LaneFinder_SlopeIntercept
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then algTask.gOptions.displaydst1.checked = true
+        If standalone Then algTask.gOptions.displaydst1.checked = true
         desc = "The basics of lane-finding.  A better name than LaneFinder_SlopeIntercept"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
@@ -25,18 +25,18 @@ Public Class LaneFinder_Videos : Inherits TaskParent
     Public video As New Video_Basics
     Dim options As New Options_LaneFinder
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then algTask.gOptions.displaydst1.checked = true
+        If standalone Then algTask.gOptions.displaydst1.checked = true
 
-        Dim inputfile = New FileInfo(task.homeDir + options.inputName)
+        Dim inputfile = New FileInfo(algTask.homeDir + options.inputName)
         video.options.fileInfo = New FileInfo(inputfile.FullName)
         desc = "Read in the videos showing road conditions."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If task.optionsChanged Then
-            Dim inputfile = New FileInfo(task.homeDir + options.inputName)
+        If algTask.optionsChanged Then
+            Dim inputfile = New FileInfo(algTask.homeDir + options.inputName)
             If inputfile.Exists Then video.options.fileInfo = New FileInfo(inputfile.FullName)
         End If
 
@@ -106,7 +106,7 @@ Public Class LaneFinder_ROI : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         hls.Run(src)
 
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             Dim w = hls.input.video.dst2.Width
             Dim h = hls.input.video.dst2.Height
 
@@ -117,16 +117,16 @@ Public Class LaneFinder_ROI : Inherits TaskParent
 
             Dim pList() As cv.Point = {bl, tl, tr, br}
             dst1 = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, cv.Scalar.All(0))
-            dst1.FillConvexPoly(pList, white, task.lineType)
+            dst1.FillConvexPoly(pList, white, algTask.lineType)
             pListList(0) = pList
         End If
 
         dst0 = hls.input.video.dst2
         dst2 = hls.dst0
         dst3 = hls.dst3
-        cv.Cv2.Polylines(dst0, pListList, True, cv.Scalar.White, task.lineWidth, task.lineType, 0)
-        cv.Cv2.Polylines(dst2, pListList, True, cv.Scalar.White, task.lineWidth, task.lineType, 0)
-        cv.Cv2.Polylines(dst3, pListList, True, cv.Scalar.White, task.lineWidth, task.lineType, 0)
+        cv.Cv2.Polylines(dst0, pListList, True, cv.Scalar.White, algTask.lineWidth, algTask.lineType, 0)
+        cv.Cv2.Polylines(dst2, pListList, True, cv.Scalar.White, algTask.lineWidth, algTask.lineType, 0)
+        cv.Cv2.Polylines(dst3, pListList, True, cv.Scalar.White, algTask.lineWidth, algTask.lineType, 0)
     End Sub
 End Class
 
@@ -192,11 +192,11 @@ Public Class LaneFinder_SlopeIntercept : Inherits TaskParent
 
         Dim p1 = New cv.Point(0, leftLaneIntercept)
         Dim p2 = New cv.Point(-leftLaneIntercept / leftAvgSlope, 0)
-        tmp.Line(p1, p2, white, task.lineWidth, task.lineType)
+        tmp.Line(p1, p2, white, algTask.lineWidth, algTask.lineType)
 
         p1 = New cv.Point(0, rightLaneIntercept)
         p2 = New cv.Point((dst0.Height - rightLaneIntercept) / rightAvgSlope, dst2.Height)
-        tmp.Line(p1, p2, white, task.lineWidth, task.lineType)
+        tmp.Line(p1, p2, white, algTask.lineWidth, algTask.lineType)
 
         tmp.CopyTo(dst2, hough.mask)
         dst2.CopyTo(dst3, dst2)

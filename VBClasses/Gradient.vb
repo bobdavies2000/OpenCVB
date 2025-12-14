@@ -23,7 +23,7 @@ Public Class Gradient_PhaseDepth : Inherits TaskParent
         desc = "Use phase to compute gradient on depth image"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        sobel.Run(task.pcSplit(2))
+        sobel.Run(algTask.pcSplit(2))
         cv.Cv2.Phase(sobel.dst0, sobel.dst1, dst3)
         dst2 = sobel.dst0
     End Sub

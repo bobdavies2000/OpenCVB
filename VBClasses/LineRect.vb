@@ -18,10 +18,10 @@ Public Class LineRect_Basics : Inherits TaskParent
 
         Dim inputPoints() As cv.Point2f = {lpInput1.p1, lpInput1.p2, lpInput2.p1, lpInput2.p2}
         rotatedRect = cv.Cv2.MinAreaRect(inputPoints)
-        If standalone And task.heartBeat Then
+        If standalone And algTask.heartBeat Then
             dst2.SetTo(0)
             For Each pt In inputPoints
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
             Next
             DrawLine(dst2, lpInput1.p1, lpInput1.p2)
             DrawLine(dst2, lpInput2.p1, lpInput2.p2)
@@ -43,7 +43,7 @@ End Class
 Public Class LineRect_CenterNeighbor : Inherits TaskParent
     Public options As New Options_LineRect
     Public Sub New()
-        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
         desc = "Remove lines which have similar depth in bricks on either side of a line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -54,16 +54,16 @@ Public Class LineRect_CenterNeighbor : Inherits TaskParent
 
         Dim depthThreshold = options.depthThreshold
         Dim depthLines As Integer, colorLines As Integer
-        For Each lp In task.lines.lpList
+        For Each lp In algTask.lines.lpList
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-            Dim index As Integer = task.gridMap.Get(Of Integer)(center.Y, center.X)
-            Dim nabeList = task.grid.gridNeighbors(index)
+            Dim index As Integer = algTask.gridMap.Get(Of Integer)(center.Y, center.X)
+            Dim nabeList = algTask.grid.gridNeighbors(index)
             Dim foundObjectLine As Boolean = False
             For i = 1 To nabeList.Count - 1
-                Dim brick1 = task.bricks.brickList(nabeList(i))
+                Dim brick1 = algTask.bricks.brickList(nabeList(i))
                 If brick1.depth = 0 Then Continue For
                 For j = i + 1 To nabeList.Count - 1
-                    Dim brick2 = task.bricks.brickList(nabeList(j))
+                    Dim brick2 = algTask.bricks.brickList(nabeList(j))
                     If brick2.depth = 0 Then Continue For
                     If Math.Abs(brick1.depth - brick2.depth) > depthThreshold Then
                         foundObjectLine = True
@@ -73,15 +73,15 @@ Public Class LineRect_CenterNeighbor : Inherits TaskParent
                 If foundObjectLine Then Exit For
             Next
             If foundObjectLine Then
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                dst2.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, cv.LineTypes.Link4)
                 depthLines += 1
             Else
-                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                dst3.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, cv.LineTypes.Link4)
                 colorLines += 1
             End If
         Next
 
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             labels(2) = CStr(depthLines) + " lines were found between objects (External Lines)"
             labels(3) = CStr(colorLines) + " internal lines were indentified and are not likely important"
         End If
@@ -98,7 +98,7 @@ End Class
 Public Class LineRect_CenterRange : Inherits TaskParent
     Public options As New Options_LineRect
     Public Sub New()
-        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
         desc = "Remove lines which have similar depth in bricks on either side of a line."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -109,20 +109,20 @@ Public Class LineRect_CenterRange : Inherits TaskParent
 
         Dim depthThreshold = options.depthThreshold
         Dim depthLines As Integer, colorLines As Integer
-        For Each lp In task.lines.lpList
+        For Each lp In algTask.lines.lpList
             Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-            Dim index As Integer = task.gridMap.Get(Of Integer)(center.Y, center.X)
-            Dim brick = task.bricks.brickList(index)
+            Dim index As Integer = algTask.gridMap.Get(Of Integer)(center.Y, center.X)
+            Dim brick = algTask.bricks.brickList(index)
             If brick.mm.maxVal - brick.mm.minVal > depthThreshold Then
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                dst2.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, cv.LineTypes.Link4)
                 depthLines += 1
             Else
-                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
+                dst3.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, cv.LineTypes.Link4)
                 colorLines += 1
             End If
         Next
 
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             labels(2) = CStr(depthLines) + " external lines found with gaps in depth."
             labels(3) = CStr(colorLines) + " internal lines found with similar depth on both sides"
         End If

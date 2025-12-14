@@ -8,7 +8,7 @@ Public Class CSV_Basics : Inherits TaskParent
     Dim readText() As String
     Dim variables() As String
     Public Sub New()
-        Dim fileInput As New FileInfo(task.homeDir + "Data/agaricus-lepiota.data")
+        Dim fileInput As New FileInfo(algTask.homeDir + "Data/agaricus-lepiota.data")
         inputFile = fileInput.FullName
         readText = File.ReadAllLines(inputFile) ' user supplies the inputfile name.
         Dim variables = readText(0).Split(",")

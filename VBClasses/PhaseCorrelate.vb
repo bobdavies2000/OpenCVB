@@ -47,14 +47,14 @@ Public Class PhaseCorrelate_Basics : Inherits TaskParent
                 center = New cv.Point(input64.Cols / 2, input64.Rows / 2)
                 If src.Channels() = 1 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 dst2 = src.Clone
-                dst2.Circle(center, radius, task.highlight, task.lineWidth + 2, task.lineType)
-                dst2.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+                dst2.Circle(center, radius, algTask.highlight, algTask.lineWidth + 2, algTask.lineType)
+                dst2.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, algTask.lineWidth + 1, algTask.lineType)
 
                 src(srcRect).CopyTo(dst3(stableRect))
 
                 If radius > 5 Then
-                    dst3.Circle(center, radius, task.highlight, task.lineWidth + 2, task.lineType)
-                    dst3.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+                    dst3.Circle(center, radius, algTask.highlight, algTask.lineWidth + 2, algTask.lineType)
+                    dst3.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, algTask.lineWidth + 1, algTask.lineType)
                 End If
             Else
                 resetLastFrame = True
@@ -118,11 +118,11 @@ Public Class PhaseCorrelate_RandomInput : Inherits TaskParent
         Dim shiftX = msRNG.Next(-options.FASTthreshold, options.FASTthreshold)
         Dim shiftY = msRNG.Next(-options.FASTthreshold, options.FASTthreshold)
 
-        If task.firstPass Then
+        If algTask.firstPass Then
             lastShiftX = shiftX
             lastShiftY = shiftY
         End If
-        If task.frameCount Mod 2 = 0 Then
+        If algTask.frameCount Mod 2 = 0 Then
             shiftX = lastShiftX
             shiftY = lastShiftY
         End If
@@ -157,11 +157,11 @@ Public Class PhaseCorrelate_Depth : Inherits TaskParent
         desc = "Use phase correlation on the depth data"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        Static lastFrame = task.pcSplit(2).Clone
-        phaseC.Run(task.pcSplit(2))
-        dst2 = task.pcSplit(2)
+        Static lastFrame = algTask.pcSplit(2).Clone
+        phaseC.Run(algTask.pcSplit(2))
+        dst2 = algTask.pcSplit(2)
         Dim tmp = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-        If phaseC.resetLastFrame Then task.pcSplit(2).CopyTo(lastFrame)
+        If phaseC.resetLastFrame Then algTask.pcSplit(2).CopyTo(lastFrame)
         If Double.IsNaN(phaseC.response) Then
             SetTrueText("PhaseCorrelate_Basics has detected NaN's in the input image.", 3)
         End If
@@ -173,11 +173,11 @@ Public Class PhaseCorrelate_Depth : Inherits TaskParent
             tmp = tmp.Normalize(0, 255, cv.NormTypes.MinMax)
             tmp.ConvertTo(dst3, cv.MatType.CV_8UC1)
 
-            dst3.Circle(phaseC.center, phaseC.radius, task.highlight, task.lineWidth + 2, task.lineType)
-            dst3.Line(phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+            dst3.Circle(phaseC.center, phaseC.radius, algTask.highlight, algTask.lineWidth + 2, algTask.lineType)
+            dst3.Line(phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, algTask.lineWidth + 1, algTask.lineType)
         End If
 
-        lastFrame = task.pcSplit(2).Clone
+        lastFrame = algTask.pcSplit(2).Clone
     End Sub
 End Class
 

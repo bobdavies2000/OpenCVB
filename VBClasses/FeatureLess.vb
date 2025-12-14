@@ -2,19 +2,19 @@ Imports cv = OpenCvSharp
 Public Class FeatureLess_Basics : Inherits TaskParent
     Dim edgeline As New EdgeLine_Basics
     Public Sub New()
-        If task.contours Is Nothing Then task.contours = New Contour_Basics_List
+        If algTask.contours Is Nothing Then algTask.contours = New Contour_Basics_List
         desc = "Use Contour_Basics to get the contour data for the top contours by size."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        edgeline.Run(task.grayStable)
+        edgeline.Run(algTask.grayStable)
         If src.Type <> cv.MatType.CV_8U Then
-            task.contours.Run(edgeline.dst2)
-            dst2 = task.contours.dst2
-            labels = task.contours.labels
+            algTask.contours.Run(edgeline.dst2)
+            dst2 = algTask.contours.dst2
+            labels = algTask.contours.labels
         Else
-            task.contours.Run(src)
-            dst2 = task.contours.dst2
-            labels = task.contours.labels
+            algTask.contours.Run(src)
+            dst2 = algTask.contours.dst2
+            labels = algTask.contours.labels
         End If
     End Sub
 End Class
@@ -210,7 +210,7 @@ Public Class FeatureLess_Groups : Inherits TaskParent
         dst1 = fless.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         labels(2) = fless.labels(2)
 
-        If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
+        If algTask.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, algTask.motionMask)
         redCPP.Run(dst2 - 1)
         classCount = redCPP.classCount
         dst3 = PaletteFull(redCPP.dst2)
@@ -232,14 +232,14 @@ Public Class FeatureLess_LeftRight : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standalone Then
-            dst0 = task.leftView
-            dst1 = task.rightView
+            dst0 = algTask.leftView
+            dst1 = algTask.rightView
         End If
 
-        fLess.Run(task.leftView)
+        fLess.Run(algTask.leftView)
         dst2 = fLess.dst2.Clone
 
-        fLess.Run(task.rightView)
+        fLess.Run(algTask.rightView)
         dst3 = fLess.dst2.Clone
     End Sub
 End Class

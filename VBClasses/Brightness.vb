@@ -64,7 +64,7 @@ Public Class Brightness_Grid : Inherits TaskParent
         dst2 = bright.dst2
 
         Dim meanVals As New List(Of Single)
-        For Each r In task.gridRects
+        For Each r In algTask.gridRects
             meanVals.Add(dst2(r).Mean()(0))
         Next
 
@@ -73,7 +73,7 @@ Public Class Brightness_Grid : Inherits TaskParent
             Dim nextVal = alphaSlider.value - 10
             If nextVal > 0 Then alphaSlider.value = nextVal
         End If
-        brightRect = task.gridRects(meanVals.IndexOf(max))
+        brightRect = algTask.gridRects(meanVals.IndexOf(max))
         If standaloneTest() Then
             dst3.SetTo(0)
             dst2(brightRect).CopyTo(dst3(brightRect))

@@ -10,10 +10,10 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             Dim initVal = 43
             Dim rand = New Random(initVal) ' This will make colors consistent across runs and they seem to look ok...
             Dim bgr(3) As Byte
-            For i = 0 To task.vecColors.Length - 1
+            For i = 0 To algTask.vecColors.Length - 1
                 rand.NextBytes(bgr)
-                task.vecColors(i) = New cv.Vec3b(bgr(0), bgr(1), bgr(2))
-                task.scalarColors(i) = New cv.Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
+                algTask.vecColors(i) = New cv.Vec3b(bgr(0), bgr(1), bgr(2))
+                algTask.scalarColors(i) = New cv.Scalar(algTask.vecColors(i)(0), algTask.vecColors(i)(1), algTask.vecColors(i)(2))
             Next
 
             Dim color1 = cv.Scalar.Blue, color2 = cv.Scalar.Yellow
@@ -26,23 +26,23 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
                 f -= 1 / gradientWidth
             Next
             colorList(0) = New cv.Vec3b ' black for the first color...
-            task.depthColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colorList.ToArray)
+            algTask.depthColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, colorList.ToArray)
 
-            saveVecColors = task.vecColors
-            saveScalarColors = task.scalarColors
-            saveDepthColorMap = task.depthColorMap
+            saveVecColors = algTask.vecColors
+            saveScalarColors = algTask.scalarColors
+            saveDepthColorMap = algTask.depthColorMap
         Else
             ' why do this?  To preserve the same colors regardless of which algorithm is invoked.
             ' Colors will be different when OpenCVB is restarted.  
-            task.vecColors = saveVecColors
-            task.scalarColors = saveScalarColors
-            task.depthColorMap = saveDepthColorMap
+            algTask.vecColors = saveVecColors
+            algTask.scalarColors = saveScalarColors
+            algTask.depthColorMap = saveDepthColorMap
         End If
 
-        task.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
+        algTask.colorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, algTask.vecColors.ToArray)
 
-        task.vecColors(0) = New cv.Vec3b ' first color is black...
-        task.colorMapZeroIsBlack = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
+        algTask.vecColors(0) = New cv.Vec3b ' first color is black...
+        algTask.colorMapZeroIsBlack = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, algTask.vecColors.ToArray)
 
         Dim color3 = cv.Scalar.Black, color4 = cv.Scalar.Red
         Dim corrColors = New List(Of cv.Vec3b)
@@ -54,32 +54,32 @@ Public Class DepthColorizer_Basics : Inherits TaskParent
             corrColors.Add(New cv.Vec3b(v1, v2, v3))
             f -= 1 / gradientWidth
         Next
-        task.correlationColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, corrColors.ToArray)
+        algTask.correlationColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, corrColors.ToArray)
 
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         desc = "Create a traditional depth color scheme."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.gOptions.displayDst1.Checked = False Or standaloneTest() Then
-            Dim depthData(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1) As Byte
+        If algTask.gOptions.displayDst1.Checked = False Or standaloneTest() Then
+            Dim depthData(algTask.pcSplit(2).Total * algTask.pcSplit(2).ElemSize - 1) As Byte
             Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
-            Marshal.Copy(task.pcSplit(2).Data, depthData, 0, depthData.Length)
-            Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
+            Marshal.Copy(algTask.pcSplit(2).Data, depthData, 0, depthData.Length)
+            Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, algTask.MaxZmeters)
             handleSrc.Free()
 
-            If imagePtr <> 0 Then task.depthRGB = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+            If imagePtr <> 0 Then algTask.depthRGB = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
 
-            Dim gridIndex = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            Dim depthGrid = task.pcSplit(2)(task.gridRects(gridIndex))
-            Dim mask = task.depthMask(task.gridRects(gridIndex))
+            Dim gridIndex = algTask.gridMap.Get(Of Integer)(algTask.mouseMovePoint.Y, algTask.mouseMovePoint.X)
+            Dim depthGrid = algTask.pcSplit(2)(algTask.gridRects(gridIndex))
+            Dim mask = algTask.depthMask(algTask.gridRects(gridIndex))
             Dim depth = depthGrid.Mean(mask)(0)
             Dim mm = GetMinMax(depthGrid, mask)
-            task.depthAndDepthRange = "Depth = " + Format(depth, fmt1) + "m grid = " + CStr(gridIndex) + " " + vbCrLf +
+            algTask.depthAndDepthRange = "Depth = " + Format(depth, fmt1) + "m grid = " + CStr(gridIndex) + " " + vbCrLf +
                                                    "Depth range = " + Format(mm.minVal, fmt1) + "m to " + Format(mm.maxVal, fmt1) + "m"
         Else
-            task.depthAndDepthRange = ""
+            algTask.depthAndDepthRange = ""
         End If
-        If standaloneTest() Then dst2 = task.depthRGB
+        If standaloneTest() Then dst2 = algTask.depthRGB
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Depth_Colorizer_Close(cPtr)
@@ -96,12 +96,12 @@ Public Class DepthColorizer_CPP : Inherits TaskParent
         desc = "Display depth data with InRange.  Higher contrast than others - yellow to blue always present."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> cv.MatType.CV_32F Then src = algTask.pcSplit(2)
 
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
         Marshal.Copy(src.Data, depthData, 0, depthData.Length)
-        Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.MaxZmeters)
+        Dim imagePtr = Depth_Colorizer_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, algTask.MaxZmeters)
         handleSrc.Free()
 
         If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
@@ -125,7 +125,7 @@ Public Class DepthColorizer_Mean : Inherits TaskParent
         desc = "Take the average depth at each pixel but eliminate any pixels that had zero depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        If src.Type <> cv.MatType.CV_32F Then src = algTask.pcSplit(2)
         avg.Run(src)
 
         dst3 = avg.dst2

@@ -5,7 +5,7 @@ Public Class GridROI_Basics : Inherits TaskParent
     Public stdevList As New List(Of Single)
     Public stdevAverage As Single
     Public Sub New()
-        task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+        algTask.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Compute the stdev for each roi.  If small (<10), mark as featureLess."
     End Sub
@@ -14,7 +14,7 @@ Public Class GridROI_Basics : Inherits TaskParent
         stdevList.Clear()
         meanList.Clear()
         Dim mean As cv.Scalar, stdev As cv.Scalar
-        For Each roi In task.gridRects
+        For Each roi In algTask.gridRects
             cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
             stdevList.Add(stdev(0))
             meanList.Add(mean(0))
@@ -24,16 +24,16 @@ Public Class GridROI_Basics : Inherits TaskParent
         dst3.SetTo(0)
         rects.Clear()
         For i = 0 To stdevList.Count - 1
-            Dim roi = task.gridRects(i)
-            Dim depthCheck = task.noDepthMask(roi)
+            Dim roi = algTask.gridRects(i)
+            Dim depthCheck = algTask.noDepthMask(roi)
             If stdevList(i) < stdevAverage Or depthCheck.CountNonZero / depthCheck.Total > 0.5 Then
                 dst3.Rectangle(roi, white, -1)
             Else
                 rects.Add(roi)
             End If
         Next
-        If task.heartBeat Then
-            labels(2) = CStr(rects.Count) + " of " + CStr(task.gridRects.Count) + " roi's had above average standard deviation (average = " +
+        If algTask.heartBeat Then
+            labels(2) = CStr(rects.Count) + " of " + CStr(algTask.gridRects.Count) + " roi's had above average standard deviation (average = " +
                         Format(stdevList.Average, fmt1) + ")"
         End If
 
@@ -50,7 +50,7 @@ End Class
 
 Public Class GridROI_Color : Inherits TaskParent
     Public Sub New()
-        task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+        algTask.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         desc = "Compute the stdev for each roi.  If small (<10), mark as featureLess."
     End Sub
@@ -59,7 +59,7 @@ Public Class GridROI_Color : Inherits TaskParent
         Dim stdevList1 As New List(Of Single)
         Dim stdevList2 As New List(Of Single)
         Dim mean As cv.Scalar, stdev As cv.Scalar
-        For Each roi In task.gridRects
+        For Each roi In algTask.gridRects
             cv.Cv2.MeanStdDev(src(roi), mean, stdev)
             stdevList0.Add(stdev(0))
             stdevList1.Add(stdev(1))
@@ -71,7 +71,7 @@ Public Class GridROI_Color : Inherits TaskParent
         Dim avg2 = stdevList2.Average
         dst3.SetTo(0)
         For i = 0 To stdevList0.Count - 1
-            Dim roi = task.gridRects(i)
+            Dim roi = algTask.gridRects(i)
             If stdevList0(i) < avg0 And stdevList1(i) < avg1 And stdevList2(i) < avg2 Then
                 dst3.Rectangle(roi, white, -1)
             End If
@@ -97,7 +97,7 @@ Public Class GridROI_Sorted : Inherits TaskParent
     Public maskVal As Integer = 255
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+        algTask.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         If standalone = False Then maskVal = 1
         labels(2) = "Use the AddWeighted slider to observe where stdev is above average."
         desc = "Sort the roi's by the sum of their bgr stdev's to find the least volatile regions"
@@ -110,7 +110,7 @@ Public Class GridROI_Sorted : Inherits TaskParent
         bgrList.Clear()
         roiList.Clear()
         ReDim categories(9)
-        For Each roi In task.gridRects
+        For Each roi In algTask.gridRects
             cv.Cv2.MeanStdDev(src(roi), meanS, stdev)
             sortedStd.Add(stdev(0) + stdev(1) + stdev(2), roi)
             Dim colorIndex As Integer = 1
@@ -172,7 +172,7 @@ Public Class GridROI_ColorSplit : Inherits TaskParent
     Dim devGrid As New GridROI_Sorted
     Public Sub New()
         devGrid.maskVal = 255
-        task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+        algTask.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Split each roi into one of 9 categories - black, white, gray, yellow, purple, teal, blue, green, or red - based on the stdev for the roi"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -219,12 +219,12 @@ Public Class GridROI_CorrelationMotion : Inherits TaskParent
         Dim correlationMat As New cv.Mat
         Dim motionCount As Integer
         For i = 0 To gather.stdevList.Count - 1
-            Dim roi = task.gridRects(i)
+            Dim roi = algTask.gridRects(i)
             If gather.stdevList(i) >= gather.stdevAverage Then
                 cv.Cv2.MatchTemplate(dst1(roi), lastImage(roi), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
                 Dim corr = correlationMat.Get(Of Single)(0, 0)
-                If corr < task.fCorrThreshold Then SetTrueText(Format(corr, fmt1), roi.TopLeft)
-                If corr < task.fCorrThreshold Then motionCount += 1
+                If corr < algTask.fCorrThreshold Then SetTrueText(Format(corr, fmt1), roi.TopLeft)
+                If corr < algTask.fCorrThreshold Then motionCount += 1
             End If
         Next
 
@@ -233,7 +233,7 @@ Public Class GridROI_CorrelationMotion : Inherits TaskParent
         plot.Run(src)
         dst3 = plot.dst2
 
-        labels(2) = CStr(gather.rects.Count) + " of " + CStr(task.gridRects.Count) + " roi's had above average standard deviation."
+        labels(2) = CStr(gather.rects.Count) + " of " + CStr(algTask.gridRects.Count) + " roi's had above average standard deviation."
         lastImage = dst1.Clone
     End Sub
 End Class
@@ -256,13 +256,13 @@ Public Class GridROI_LowStdev : Inherits TaskParent
 
         rects.Clear()
         For i = 0 To gather.stdevList.Count - 1
-            Dim roi = task.gridRects(i)
+            Dim roi = algTask.gridRects(i)
             If gather.stdevList(i) < gather.stdevAverage Then
                 rects.Add(roi)
                 SetTrueText(Format(gather.stdevList(i), fmt1), roi.TopLeft, 3)
             End If
         Next
-        If task.heartBeat Then labels = {"", "", CStr(task.gridRects.Count - gather.rects.Count) + " roi's had low standard deviation",
+        If algTask.heartBeat Then labels = {"", "", CStr(algTask.gridRects.Count - gather.rects.Count) + " roi's had low standard deviation",
                                          "Stdev average = " + Format(gather.stdevList.Average, fmt1)}
     End Sub
 End Class
@@ -298,7 +298,7 @@ Public Class GridROI_LowStdevCorrelation : Inherits TaskParent
 
         Static saveCorrs As New List(Of Single)(correlations)
         Static saveRects As New List(Of cv.Rect)(gather.rects)
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             saveCorrs = New List(Of Single)(correlations)
             saveRects = New List(Of cv.Rect)(gather.rects)
 
@@ -310,8 +310,8 @@ Public Class GridROI_LowStdevCorrelation : Inherits TaskParent
             Next
         End If
         For i = 0 To saveRects.Count - 1
-            If saveCorrs(i) < task.fCorrThreshold Then SetTrueText(Format(saveCorrs(i), fmt2), saveRects(i).TopLeft)
-            If saveCorrs(i) < task.fCorrThreshold Then SetTrueText(Format(saveStdev(i), fmt2), saveRects(i).TopLeft, 3)
+            If saveCorrs(i) < algTask.fCorrThreshold Then SetTrueText(Format(saveCorrs(i), fmt2), saveRects(i).TopLeft)
+            If saveCorrs(i) < algTask.fCorrThreshold Then SetTrueText(Format(saveStdev(i), fmt2), saveRects(i).TopLeft, 3)
         Next
 
         lastImage = dst1.Clone
@@ -330,11 +330,11 @@ Public Class GridROI_LR : Inherits TaskParent
         desc = "Capture the above average standard deviation roi's for the left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        gLeft.Run(task.leftView)
+        gLeft.Run(algTask.leftView)
         dst2 = gLeft.dst2
         labels(2) = CStr(gLeft.rects.Count) + " roi's had above average standard deviation in the left image"
 
-        gRight.Run(task.rightView)
+        gRight.Run(algTask.rightView)
         dst3 = gRight.dst2
         labels(3) = CStr(gRight.rects.Count) + " roi's had above average standard deviation in the right image"
     End Sub
@@ -350,9 +350,9 @@ Public Class GridROI_LRClick : Inherits TaskParent
     Dim ClickPoint As cv.Point, picTag As Integer
     Dim options As New Options_Features
     Public Sub New()
-        task.gOptions.GridSlider.Value = 16
-        If standalone Then task.gOptions.displayDst1.Checked = True
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        algTask.gOptions.GridSlider.Value = 16
+        If standalone Then algTask.gOptions.displayDst1.Checked = True
+        If standalone Then algTask.gOptions.displayDst1.Checked = True
         labels(2) = "Click the above average stdev roi's (the darker regions) to find corresponding roi in the right image."
         desc = "Capture the above average standard deviation roi's for the left and right images."
     End Sub
@@ -364,26 +364,26 @@ Public Class GridROI_LRClick : Inherits TaskParent
         options.Run()
 
         dst0 = src.Clone
-        dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
+        dst3 = If(algTask.rightView.Channels() <> 3, algTask.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), algTask.rightView.Clone)
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If algTask.rightView.Channels() <> 1 Then algTask.rightView = algTask.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
         dst2 = gather.dst2
         labels = gather.labels
 
         If gather.rects.Count = 0 Then Exit Sub
-        If task.mouseClickFlag Then setClickPoint(task.ClickPoint, task.mousePicTag)
+        If algTask.mouseClickFlag Then setClickPoint(algTask.ClickPoint, algTask.mousePicTag)
         If ClickPoint = newPoint Then setClickPoint(gather.rects(gather.rects.Count / 2).TopLeft, 2)
-        Dim gridIndex As Integer = task.gridMap.Get(Of Integer)(ClickPoint.Y, ClickPoint.X)
-        Dim roi = task.gridRects(gridIndex)
-        dst2.Rectangle(roi, white, task.lineWidth)
+        Dim gridIndex As Integer = algTask.gridMap.Get(Of Integer)(ClickPoint.Y, ClickPoint.X)
+        Dim roi = algTask.gridRects(gridIndex)
+        dst2.Rectangle(roi, white, algTask.lineWidth)
 
         Dim correlationMat As New cv.Mat
         Dim corr As New List(Of Single)
         For j = 0 To roi.X - 1
             Dim r = New cv.Rect(j, roi.Y, roi.Width, roi.Height)
-            cv.Cv2.MatchTemplate(src(roi), task.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            cv.Cv2.MatchTemplate(src(roi), algTask.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             corr.Add(correlationMat.Get(Of Single)(0, 0))
         Next
 
@@ -391,13 +391,13 @@ Public Class GridROI_LRClick : Inherits TaskParent
             SetTrueText("No corresponding roi found", 2)
         Else
             Dim maxCorr = corr.Max
-            If maxCorr < task.fCorrThreshold Then
-                SetTrueText("Correlation " + Format(maxCorr, fmt3) + " is less than " + Format(task.fCorrThreshold, fmt1), 1)
+            If maxCorr < algTask.fCorrThreshold Then
+                SetTrueText("Correlation " + Format(maxCorr, fmt3) + " is less than " + Format(algTask.fCorrThreshold, fmt1), 1)
             Else
                 Dim index = corr.IndexOf(maxCorr)
                 Dim rectRight = New cv.Rect(index, roi.Y, roi.Width, roi.Height)
                 Dim offset = roi.TopLeft.X - rectRight.TopLeft.X
-                If task.heartBeat Then
+                If algTask.heartBeat Then
                     strOut = "CoeffNormed max correlation = " + Format(maxCorr, fmt3) + vbCrLf
                     strOut += "Left Mean = " + Format(gather.meanList(gridIndex), fmt3) + " Left stdev = " + Format(gather.stdevList(gridIndex), fmt3) + vbCrLf
                     Dim mean As cv.Scalar, stdev As cv.Scalar
@@ -405,11 +405,11 @@ Public Class GridROI_LRClick : Inherits TaskParent
                     strOut += "Right Mean = " + Format(mean(0), fmt3) + " Right stdev = " + Format(stdev(0), fmt3) + vbCrLf
                     strOut += "Right rectangle is offset " + CStr(offset) + " pixels from the left image rectangle"
                 End If
-                dst3.Rectangle(rectRight, task.highlight, task.lineWidth)
-                dst0.Rectangle(roi, task.highlight, task.lineWidth)
+                dst3.Rectangle(rectRight, algTask.highlight, algTask.lineWidth)
+                dst0.Rectangle(roi, algTask.highlight, algTask.lineWidth)
                 dst1.SetTo(0)
-                DrawCircle(dst1, roi.TopLeft, task.DotSize, task.highlight)
-                DrawCircle(dst1, rectRight.TopLeft, task.DotSize + 2, task.highlight)
+                DrawCircle(dst1, roi.TopLeft, algTask.DotSize, algTask.highlight)
+                DrawCircle(dst1, rectRight.TopLeft, algTask.DotSize + 2, algTask.highlight)
                 Dim pt = New cv.Point(rectRight.X, roi.Y + 5)
                 SetTrueText(CStr(offset) + " pixel offset" + vbCrLf + "Larger = Right", pt, 1)
                 SetTrueText(strOut, 1)
@@ -429,16 +429,16 @@ Public Class GridROI_LRAll : Inherits TaskParent
     Dim options As New Options_Features
     Public sortedRects As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
-        task.gOptions.GridSlider.Value = 16
+        algTask.gOptions.GridSlider.Value = 16
         labels(3) = "The highlighted roi's are those high stdev roi's with the highest correlation between left and right images."
         desc = "Find all the roi's with high stdev and high correlation between left and right images."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        dst3 = If(task.rightView.Channels() <> 3, task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.Clone)
+        dst3 = If(algTask.rightView.Channels() <> 3, algTask.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), algTask.rightView.Clone)
         src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If task.rightView.Channels() <> 1 Then task.rightView = task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If algTask.rightView.Channels() <> 1 Then algTask.rightView = algTask.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         gather.Run(src)
         dst2 = gather.dst2
@@ -450,14 +450,14 @@ Public Class GridROI_LRAll : Inherits TaskParent
         For Each roi In gather.rects
             If roi.X = 0 Then Continue For
             Dim r = New cv.Rect(0, roi.Y, roi.X, roi.Height)
-            cv.Cv2.MatchTemplate(src(roi), task.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            cv.Cv2.MatchTemplate(src(roi), algTask.rightView(r), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
             Dim mm = GetMinMax(correlationMat)
-            If mm.maxVal >= task.fCorrThreshold Then sortedRects.Add(mm.maxVal, New cv.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height))
+            If mm.maxVal >= algTask.fCorrThreshold Then sortedRects.Add(mm.maxVal, New cv.Rect(mm.maxLoc.X, roi.Y, roi.Width, roi.Height))
         Next
-        labels(2) = CStr(sortedRects.Count) + " roi's had left/right correlation higher than " + Format(task.fCorrThreshold, fmt3)
+        labels(2) = CStr(sortedRects.Count) + " roi's had left/right correlation higher than " + Format(algTask.fCorrThreshold, fmt3)
 
         For Each roi In sortedRects.Values
-            dst3.Rectangle(roi, task.highlight, task.lineWidth)
+            dst3.Rectangle(roi, algTask.highlight, algTask.lineWidth)
         Next
     End Sub
 End Class
@@ -470,8 +470,8 @@ End Class
 Public Class GridROI_Canny : Inherits TaskParent
     Dim edges As New Edge_Basics
     Public Sub New()
-        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-        task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
+        algTask.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Find all the GridCells with edges in them."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -479,7 +479,7 @@ Public Class GridROI_Canny : Inherits TaskParent
         dst3 = edges.dst2
 
         dst2.SetTo(0)
-        For Each brick In task.bricks.brickList
+        For Each brick In algTask.bricks.brickList
             If dst3(brick.rect).CountNonZero Then src(brick.rect).CopyTo(dst2(brick.rect))
         Next
     End Sub
@@ -494,7 +494,7 @@ Public Class GridROI_Sobel : Inherits TaskParent
     Dim edges As New GridROI_Canny
     Dim sobel As New Edge_Sobel
     Public Sub New()
-        task.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
+        algTask.gOptions.GridSlider.Value = CInt(dst2.Width / 40) ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
         desc = "Find all the GridCells with edges in them."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)

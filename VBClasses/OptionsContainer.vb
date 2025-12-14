@@ -5,10 +5,10 @@ Public Class OptionsContainer
     Public titlesAdded As Boolean
     Public offset = 30
     Private Sub allOptionsFrm_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Me.Left = GetSetting("Opencv", "gOptionsLeft", "gOptionsLeft", task.mainFormLocation.X - offset)
-        Me.Top = GetSetting("Opencv", "gOptionsTop", "gOptionsTop", task.mainFormLocation.Y - offset)
-        Me.Width = GetSetting("Opencv", "gOptionsWidth", "gOptionsWidth", task.mainFormLocation.Width)
-        Me.Height = GetSetting("Opencv", "gOptionsHeight", "gOptionsHeight", task.mainFormLocation.Height)
+        Me.Left = GetSetting("Opencv", "gOptionsLeft", "gOptionsLeft", algTask.mainFormLocation.X - offset)
+        Me.Top = GetSetting("Opencv", "gOptionsTop", "gOptionsTop", algTask.mainFormLocation.Y - offset)
+        Me.Width = GetSetting("Opencv", "gOptionsWidth", "gOptionsWidth", algTask.mainFormLocation.Width)
+        Me.Height = GetSetting("Opencv", "gOptionsHeight", "gOptionsHeight", algTask.mainFormLocation.Height)
     End Sub
     Public Sub addTitle(frm As Object)
         If optionsTitle.Contains(frm.Text) = False Then
@@ -23,7 +23,7 @@ Public Class OptionsContainer
         End Try
     End Sub
     Public Sub layoutOptions(normalRequest As Boolean)
-        Dim w = GetSetting("Opencv", "gOptionsWidth", "gOptionsWidth", task.mainFormLocation.Width)
+        Dim w = GetSetting("Opencv", "gOptionsWidth", "gOptionsWidth", algTask.mainFormLocation.Width)
         Dim radioCheckOffset = New cv.Point(w / 2, 0)
 
         Dim sliderOffset As New cv.Point(0, 0)
@@ -55,7 +55,7 @@ Public Class OptionsContainer
                         indexHide += 1
                     Else
                         If title.Contains("OpenFile") Then
-                            frm.SetDesktopLocation(0, task.gOptions.Top + 350)
+                            frm.SetDesktopLocation(0, algTask.gOptions.Top + 350)
                         End If
                         If title.EndsWith(" Sliders") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                             If frm Is Nothing Then Continue For
@@ -77,9 +77,9 @@ Public Class OptionsContainer
     End Sub
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
         layoutOptions(normalRequest:=True)
-        task.featureOptions.BringToFront()
-        task.gOptions.BringToFront()
-        task.gOptions.BringToFront()
+        algTask.featureOptions.BringToFront()
+        algTask.gOptions.BringToFront()
+        algTask.gOptions.BringToFront()
     End Sub
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
         layoutOptions(normalRequest:=False)
@@ -116,10 +116,10 @@ Public Class OptionsContainer
                 End If
             Next
         Next
-        task.gOptions.Close()
-        task.featureOptions.Close()
-        task.treeView.Close()
-        If task.sharpGL IsNot Nothing Then task.sharpGL.Close()
+        algTask.gOptions.Close()
+        algTask.featureOptions.Close()
+        algTask.treeView.Close()
+        If algTask.sharpGL IsNot Nothing Then algTask.sharpGL.Close()
         GC.Collect()
     End Sub
 End Class

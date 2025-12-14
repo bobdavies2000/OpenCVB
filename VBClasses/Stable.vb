@@ -3,7 +3,7 @@ Public Class Stable_Basics : Inherits TaskParent
     Public lp As lpData
     Public lpLast As lpData
     Public Sub New()
-        desc = "Use task.lineLongest to find the angle needed to stabilize the image."
+        desc = "Use algTask.lineLongest to find the angle needed to stabilize the image."
     End Sub
     Public Function GetAngleBetweenLinesBySlopes(ByVal slope1 As Double, ByVal slope2 As Double) As Double
         Const EPSILON As Double = 0.000000001
@@ -43,7 +43,7 @@ Public Class Stable_Basics : Inherits TaskParent
         Return angleDegrees
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then lp = task.lineLongest
+        If standalone Then lp = algTask.lineLongest
         If lpLast Is Nothing Then lpLast = lp
 
         Dim rotateAngle = GetAngleBetweenLinesBySlopes(lp.slope, lpLast.slope)
@@ -53,10 +53,10 @@ Public Class Stable_Basics : Inherits TaskParent
             dst2 = src.WarpAffine(M, src.Size(), cv.InterpolationFlags.Cubic)
             lpLast = lp
         Else
-            If task.heartBeat Then dst2 = src.Clone
+            If algTask.heartBeat Then dst2 = src.Clone
         End If
 
-        If task.heartBeat Then lpLast = lp
+        If algTask.heartBeat Then lpLast = lp
 
         labels(2) = "Image after rotation by " + Format(rotateAngle, fmt3) + " degrees.  Move camera to see impact."
     End Sub
@@ -76,8 +76,8 @@ Public Class Stable_BasicsCount : Inherits TaskParent
         desc = "Track the stable good features found in the BGR image."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.features.Count > 0 Then
-            basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.features)
+        If algTask.features.Count > 0 Then
+            basics.facetGen.inputPoints = New List(Of cv.Point2f)(algTask.features)
         Else
             bPoint.Run(src)
             basics.facetGen.inputPoints.Clear()
@@ -93,7 +93,7 @@ Public Class Stable_BasicsCount : Inherits TaskParent
         Dim g As Integer
         For i = 0 To basics.ptList.Count - 1
             Dim pt = basics.ptList(i)
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
             g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
             goodCounts.Add(g, i)
             SetTrueText(CStr(g), pt)
@@ -112,29 +112,29 @@ End Class
 Public Class Stable_Lines : Inherits TaskParent
     Public basics As New FCS_StablePoints
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then algTask.gOptions.displayDst1.Checked = True
         desc = "Track the line end points found in the BGR image and keep those that are stable."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         basics.facetGen.inputPoints.Clear()
         dst1 = src.Clone
-        For Each lp In task.lines.lpList
+        For Each lp In algTask.lines.lpList
             basics.facetGen.inputPoints.Add(lp.p1)
             basics.facetGen.inputPoints.Add(lp.p2)
-            DrawLine(dst1, lp.p1, lp.p2, task.highlight)
+            DrawLine(dst1, lp.p1, lp.p2, algTask.highlight)
         Next
         basics.Run(src)
         dst2 = basics.dst2
         dst3 = basics.dst3
         For Each pt In basics.ptList
-            DrawCircle(dst2,pt, task.DotSize + 1, task.highlight)
+            DrawCircle(dst2,pt, algTask.DotSize + 1, algTask.highlight)
             If standaloneTest() Then
                 Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 SetTrueText(CStr(g), pt)
             End If
         Next
         labels(2) = basics.labels(2)
-        labels(3) = CStr(task.lines.lpList.Count) + " line end points were found and " + CStr(basics.ptList.Count) + " were stable"
+        labels(3) = CStr(algTask.lines.lpList.Count) + " line end points were found and " + CStr(basics.ptList.Count) + " were stable"
     End Sub
 End Class
 
@@ -155,18 +155,18 @@ Public Class Stable_FAST : Inherits TaskParent
         fast.Run(src)
 
         basics.facetGen.inputPoints.Clear()
-        basics.facetGen.inputPoints = New List(Of cv.Point2f)(task.features)
+        basics.facetGen.inputPoints = New List(Of cv.Point2f)(algTask.features)
         basics.Run(src)
         dst3 = basics.dst3
         dst2 = basics.dst2
         For Each pt In basics.ptList
-            DrawCircle(dst2, pt, task.DotSize + 1, task.highlight)
+            DrawCircle(dst2, pt, algTask.DotSize + 1, algTask.highlight)
             If standaloneTest() Then
                 Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 SetTrueText(CStr(g), pt)
             End If
         Next
         labels(2) = basics.labels(2)
-        labels(3) = CStr(task.features.Count) + " features were found and " + CStr(basics.ptList.Count) + " were stable"
+        labels(3) = CStr(algTask.features.Count) + " features were found and " + CStr(basics.ptList.Count) + " were stable"
     End Sub
 End Class

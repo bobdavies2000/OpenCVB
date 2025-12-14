@@ -127,7 +127,7 @@ Public Class Complexity_Dots : Inherits TaskParent
         desc = "Plot the results of multiple runs at various resolutions."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.testAllRunning Then Exit Sub ' there is some bug below that only occurs during test all.  Not worth pursuing...
+        If algTask.testAllRunning Then Exit Sub ' there is some bug below that only occurs during test all.  Not worth pursuing...
         options.Run()
 
         If fileName <> "" Then options.filename = New FileInfo(fileName)
@@ -175,12 +175,12 @@ Public Class Complexity_Dots : Inherits TaskParent
         For i = 0 To sortData.Count - 1
             Dim pt = New cv.Point(dst2.Width * sortData.ElementAt(i).Key / maxX,
                                   dst2.Height - dst2.Height * sortData.ElementAt(i).Value / maxTime)
-            DrawCircle(dst2, pt, task.DotSize, plotColor)
+            DrawCircle(dst2, pt, algTask.DotSize, plotColor)
             pointSet.Add(pt)
         Next
 
         For i = 1 To pointSet.Count - 1
-            dst2.Line(pointSet(i - 1), pointSet(i), plotColor, task.lineWidth, task.lineWidth)
+            dst2.Line(pointSet(i - 1), pointSet(i), plotColor, algTask.lineWidth, algTask.lineWidth)
         Next
 
         SetTrueText(">>>>>> Increasing input data >>>>>>" + vbCrLf + options.filename.Name,

@@ -33,7 +33,7 @@ Public Class Feature_Basics : Inherits TaskParent
 
         strOut = CStr(features.Count) + " features were found using 'BrickPoints' method. " +
                  CStr(count) + " features were skipped."
-        If task.heartBeat Then labels(2) = strOut
+        If algTask.heartBeat Then labels(2) = strOut
     End Sub
 End Class
 
@@ -45,24 +45,24 @@ End Class
 Public Class Feature_BrickLine : Inherits TaskParent
     Public features As New List(Of cv.Point)
     Public Sub New()
-        task.gOptions.LineWidth.Value = 3
-        If task.feat Is Nothing Then task.feat = New Feature_Basics
+        algTask.gOptions.LineWidth.Value = 3
+        If algTask.feat Is Nothing Then algTask.feat = New Feature_Basics
         desc = "Find the lines implied in the brick points."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         Dim sortByGrid As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
-        For Each pt In task.feat.features
-            Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
+        For Each pt In algTask.feat.features
+            Dim lineIndex = algTask.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
             If lineIndex = 0 Then Continue For
-            Dim gridindex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim gridindex = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
             sortByGrid.Add(gridindex, pt)
         Next
 
-        Dim brickLines(task.lines.lpList.Count - 1) As List(Of cv.Point)
+        Dim brickLines(algTask.lines.lpList.Count - 1) As List(Of cv.Point)
         dst3.SetTo(0)
         features.Clear()
         For Each pt In sortByGrid.Values
-            Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X) - 1
+            Dim lineIndex = algTask.lines.dst1.Get(Of Byte)(pt.Y, pt.X) - 1
             If brickLines(lineIndex) Is Nothing Then
                 brickLines(lineIndex) = New List(Of cv.Point)({pt})
             Else
@@ -78,7 +78,7 @@ Public Class Feature_BrickLine : Inherits TaskParent
             If brickLines.Count = 1 Then Continue For
             Dim pt = brickLines(i)(0)
             If pt = brickLines(i).Last Then Continue For
-            Dim color = vecToScalar(task.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
+            Dim color = vecToScalar(algTask.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
             DrawCircle(dst3, pt, color)
             DrawLine(dst2, pt, brickLines(i).Last, color)
             DrawLine(dst3, pt, brickLines(i).Last, color)
@@ -100,27 +100,27 @@ Public Class Feature_General : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If standaloneTest() Then dst2 = task.color.Clone
+        If standaloneTest() Then dst2 = algTask.color.Clone
 
         Dim ptLatest As New List(Of cv.Point2f)
         Dim ptNew As New List(Of cv.Point2f)
-        If task.optionsChanged = False Then
-            For Each pt In task.features
-                Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+        If algTask.optionsChanged = False Then
+            For Each pt In algTask.features
+                Dim val = algTask.motionMask.Get(Of Byte)(pt.Y, pt.X)
                 If val = 0 Then ptNew.Add(pt)
             Next
         End If
 
         strOut = ""
-        Select Case task.featureOptions.FeatureMethod.Text
+        Select Case algTask.featureOptions.FeatureMethod.Text
             Case "GoodFeatures"
-                ptLatest = cv.Cv2.GoodFeaturesToTrack(task.gray, task.FeatureSampleSize, options.quality,
+                ptLatest = cv.Cv2.GoodFeaturesToTrack(algTask.gray, algTask.FeatureSampleSize, options.quality,
                                                       options.minDistance, New cv.Mat,
                                                       options.blockSize, True, options.k).ToList
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
             Case "AGAST"
                 If cPtr = 0 Then cPtr = Agast_Open()
-                src = task.color.Clone
+                src = algTask.color.Clone
                 Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
                 Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
 
@@ -132,27 +132,27 @@ Public Class Feature_General : Inherits TaskParent
                 For i = 0 To ptMat.Rows - 1
                     Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
                     ptLatest.Add(pt)
-                    If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize, white)
+                    If standaloneTest() Then DrawCircle(dst2, pt, algTask.DotSize, white)
                 Next
 
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
             Case "BRISK"
                 Static brisk As New BRISK_Basics
-                brisk.Run(task.gray)
+                brisk.Run(algTask.gray)
                 ptLatest = brisk.features
                 strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
             Case "Harris"
                 Static harris As New Corners_HarrisDetector_CPP
-                harris.Run(task.gray)
+                harris.Run(algTask.gray)
                 ptLatest = harris.features
                 strOut = "Harris Detector produced " + CStr(ptLatest.Count) + " features"
             Case "FAST"
                 Static FAST As New Corners_Basics
-                FAST.Run(task.gray)
+                FAST.Run(algTask.gray)
                 ptLatest = FAST.features
                 strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
             Case "LineInput"
-                For Each lp In task.lines.lpList
+                For Each lp In algTask.lines.lpList
                     ptLatest.Add(lp.ptCenter)
                 Next
             Case "BrickPoint"
@@ -164,47 +164,47 @@ Public Class Feature_General : Inherits TaskParent
                 strOut = bPoint.labels(2)
         End Select
 
-        task.fpFromGridCellLast = New List(Of Integer)(task.fpFromGridCell)
-        task.fpLastList = New List(Of fpData)(task.fpList)
+        algTask.fpFromGridCellLast = New List(Of Integer)(algTask.fpFromGridCell)
+        algTask.fpLastList = New List(Of fpData)(algTask.fpList)
 
-        If task.optionsChanged Or ptNew.Count = 0 Then
+        If algTask.optionsChanged Or ptNew.Count = 0 Then
             For Each pt In ptLatest
                 ptNew.Add(pt)
             Next
         Else
             For Each pt In ptLatest
-                Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                Dim val = algTask.motionMask.Get(Of Byte)(pt.Y, pt.X)
                 If val = 255 Then ptNew.Add(pt)
             Next
         End If
 
         Dim sortByGrid As New SortedList(Of Single, cv.Point2f)(New compareAllowIdenticalSingle)
         For Each pt In ptNew
-            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim index = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
             sortByGrid.Add(index, pt)
         Next
 
-        task.features.Clear()
-        task.featurePoints.Clear()
-        task.fpFromGridCell.Clear()
+        algTask.features.Clear()
+        algTask.featurePoints.Clear()
+        algTask.fpFromGridCell.Clear()
         For i = 0 To sortByGrid.Count - 1
             Dim pt = sortByGrid.ElementAt(i).Value
-            task.features.Add(pt)
-            task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
+            algTask.features.Add(pt)
+            algTask.featurePoints.Add(New cv.Point(pt.X, pt.Y))
 
-            Dim nextIndex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            task.fpFromGridCell.Add(nextIndex)
+            Dim nextIndex = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            algTask.fpFromGridCell.Add(nextIndex)
         Next
 
         If standaloneTest() Then
-            For Each pt In task.features
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            For Each pt In algTask.features
+                DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
             Next
         End If
 
-        strOut += "  " + CStr(task.features.Count) + " features were found using '" + task.featureOptions.FeatureMethod.Text +
+        strOut += "  " + CStr(algTask.features.Count) + " features were found using '" + algTask.featureOptions.FeatureMethod.Text +
                   "' method."
-        If task.heartBeat Then labels(2) = strOut
+        If algTask.heartBeat Then labels(2) = strOut
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
@@ -228,8 +228,8 @@ Public Class Feature_NoMotionTest : Inherits TaskParent
 
         method.Run(src)
 
-        For Each pt In task.features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+        For Each pt In algTask.features
+            DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
         Next
 
         labels(2) = method.labels(2)
@@ -264,9 +264,9 @@ Public Class Feature_Delaunay : Inherits TaskParent
         delaunay.Run(src)
         dst3 = delaunay.dst2
         For Each pt In delaunay.bPoint.ptList
-            DrawCircle(dst3, pt, task.DotSize, white)
+            DrawCircle(dst3, pt, algTask.DotSize, white)
         Next
-        labels(3) = "There were " + CStr(task.features.Count) + " Delaunay contours"
+        labels(3) = "There were " + CStr(algTask.features.Count) + " Delaunay contours"
     End Sub
 End Class
 
@@ -288,7 +288,7 @@ Public Class Feature_LucasKanade : Inherits TaskParent
         dst2 = pyr.dst2
         labels(2) = pyr.labels(2)
 
-        If task.heartBeat Then dst3.SetTo(0)
+        If algTask.heartBeat Then dst3.SetTo(0)
 
         ptList.Clear()
         Dim stationary As Integer, motion As Integer
@@ -296,7 +296,7 @@ Public Class Feature_LucasKanade : Inherits TaskParent
             Dim pt = New cv.Point(pyr.features(i).X, pyr.features(i).Y)
             ptList.Add(pt)
             If ptLast.Contains(pt) Then
-                DrawCircle(dst3, pt, task.DotSize, task.highlight)
+                DrawCircle(dst3, pt, algTask.DotSize, algTask.highlight)
                 stationary += 1
             Else
                 DrawLine(dst3, pyr.lastFeatures(i), pyr.features(i), white)
@@ -304,7 +304,7 @@ Public Class Feature_LucasKanade : Inherits TaskParent
             End If
         Next
 
-        If task.heartBeat Then labels(3) = CStr(stationary) + " features were stationary and " + CStr(motion) + " features had some motion."
+        If algTask.heartBeat Then labels(3) = CStr(stationary) + " features were stationary and " + CStr(motion) + " features had some motion."
         ptLast = New List(Of cv.Point)(ptList)
     End Sub
 End Class
@@ -324,14 +324,14 @@ Public Class Feature_Points : Inherits TaskParent
         desc = "Use the sorted list of Delaunay regions to find the top X points to track."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.grayStable)
+        feat.Run(algTask.grayStable)
 
-        If task.heartBeat Then dst2.SetTo(0)
+        If algTask.heartBeat Then dst2.SetTo(0)
 
-        For Each pt In task.features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+        For Each pt In algTask.features
+            DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
         Next
-        labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(task.FeatureSampleSize) + " requested."
+        labels(2) = CStr(algTask.features.Count) + " targets were present with " + CStr(algTask.FeatureSampleSize) + " requested."
     End Sub
 End Class
 
@@ -351,22 +351,22 @@ Public Class Feature_TraceDelaunay : Inherits TaskParent
         features.Run(src)
         dst3 = features.dst3
 
-        If task.optionsChanged Then goodList.Clear()
+        If algTask.optionsChanged Then goodList.Clear()
 
-        Dim ptList As New List(Of cv.Point2f)(task.features)
+        Dim ptList As New List(Of cv.Point2f)(algTask.features)
         goodList.Add(ptList)
 
-        If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)
+        If goodList.Count >= algTask.frameHistoryCount Then goodList.RemoveAt(0)
 
         dst2.SetTo(0)
         For Each ptList In goodList
             For Each pt In ptList
-                DrawCircle(task.color, pt, task.DotSize, task.highlight)
+                DrawCircle(algTask.color, pt, algTask.DotSize, algTask.highlight)
                 Dim c = dst3.Get(Of cv.Vec3b)(pt.Y, pt.X)
-                DrawCircle(dst2, pt, task.DotSize + 1, c)
+                DrawCircle(dst2, pt, algTask.DotSize + 1, c)
             Next
         Next
-        labels(2) = CStr(task.features.Count) + " features were identified in the image."
+        labels(2) = CStr(algTask.features.Count) + " features were identified in the image."
     End Sub
 End Class
 
@@ -388,17 +388,17 @@ Public Class Feature_ShiTomasi : Inherits TaskParent
         options.Run()
 
         If options.useShiTomasi Then
-            dst2 = task.leftView
-            dst3 = task.rightView
-            shiTomasi.Run(task.leftView)
+            dst2 = algTask.leftView
+            dst3 = algTask.rightView
+            shiTomasi.Run(algTask.leftView)
             dst2.SetTo(cv.Scalar.White, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
-            shiTomasi.Run(task.rightView)
-            dst3.SetTo(task.highlight, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            shiTomasi.Run(algTask.rightView)
+            dst3.SetTo(algTask.highlight, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Else
-            harris.Run(task.leftView)
+            harris.Run(algTask.leftView)
             dst2 = harris.dst2.Clone
-            harris.Run(task.rightView)
+            harris.Run(algTask.rightView)
             dst3 = harris.dst2
         End If
     End Sub
@@ -417,15 +417,15 @@ Public Class Feature_Generations : Inherits TaskParent
         desc = "Find feature age maximum and average."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.grayStable)
+        feat.Run(algTask.grayStable)
 
         Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-        For Each pt In task.featurePoints
+        For Each pt In algTask.featurePoints
             Dim index = features.IndexOf(pt)
             If index >= 0 Then newfeatures.Add(gens(index) + 1, pt) Else newfeatures.Add(1, pt)
         Next
 
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             features.Clear()
             gens.Clear()
         End If
@@ -437,10 +437,10 @@ Public Class Feature_Generations : Inherits TaskParent
         For i = 0 To features.Count - 1
             If gens(i) = 1 Then Exit For
             Dim pt = features(i)
-            DrawCircle(dst2, pt, task.DotSize, white)
+            DrawCircle(dst2, pt, algTask.DotSize, white)
         Next
 
-        If task.heartBeat And gens.Count > 0 Then
+        If algTask.heartBeat And gens.Count > 0 Then
             labels(2) = CStr(features.Count) + " features found with max/average " + CStr(gens(0)) + "/" + Format(gens.Average, fmt0) + " generations"
         End If
     End Sub
@@ -459,11 +459,11 @@ Public Class Feature_History : Inherits TaskParent
         desc = "Find good features across multiple frames."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.grayStable)
+        feat.Run(algTask.grayStable)
 
         dst2 = src.Clone
 
-        featureHistory.Add(New List(Of cv.Point)(task.featurePoints))
+        featureHistory.Add(New List(Of cv.Point)(algTask.featurePoints))
 
         Dim newFeatures As New List(Of cv.Point)
         gens.Clear()
@@ -479,27 +479,27 @@ Public Class Feature_History : Inherits TaskParent
             Next
         Next
 
-        Dim threshold = If(task.frameHistoryCount = 1, 0, 1)
+        Dim threshold = If(algTask.frameHistoryCount = 1, 0, 1)
         features.Clear()
         Dim whiteCount As Integer
         For i = 0 To newFeatures.Count - 1
             If gens(i) > threshold Then
                 Dim pt = newFeatures(i)
                 features.Add(pt)
-                If gens(i) < task.frameHistoryCount Then
-                    DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.Red)
+                If gens(i) < algTask.frameHistoryCount Then
+                    DrawCircle(dst2, pt, algTask.DotSize + 2, cv.Scalar.Red)
                 Else
                     whiteCount += 1
-                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                    DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
                 End If
             End If
         Next
 
-        If featureHistory.Count > task.frameHistoryCount Then featureHistory.RemoveAt(0)
-        If task.heartBeat Then
+        If featureHistory.Count > algTask.frameHistoryCount Then featureHistory.RemoveAt(0)
+        If algTask.heartBeat Then
             labels(2) = CStr(features.Count) + "/" + CStr(whiteCount) + " present/present on every frame" +
                         " Red is a recent addition, yellow is present on previous " +
-                        CStr(task.frameHistoryCount) + " frames"
+                        CStr(algTask.frameHistoryCount) + " frames"
         End If
     End Sub
 End Class
@@ -517,15 +517,15 @@ Public Class Feature_GridPopulation : Inherits TaskParent
         desc = "Find the feature population for each cell."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.grayStable)
+        feat.Run(algTask.grayStable)
         labels(2) = feat.labels(2)
 
         dst3.SetTo(0)
-        For Each pt In task.featurePoints
+        For Each pt In algTask.featurePoints
             dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
 
-        For Each roi In task.gridRects
+        For Each roi In algTask.gridRects
             Dim test = dst3(roi).FindNonZero()
             SetTrueText(CStr(test.Rows), roi.TopLeft, 3)
         Next
@@ -556,7 +556,7 @@ Public Class Feature_AKaze : Inherits TaskParent
         Dim kazeDescriptors As New cv.Mat()
         kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
         For i As Integer = 0 To kazeKeyPoints.Length - 1
-            DrawCircle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.highlight)
+            DrawCircle(dst2, kazeKeyPoints(i).Pt, algTask.DotSize, algTask.highlight)
         Next
     End Sub
     Public Sub Close()
@@ -578,8 +578,8 @@ Public Class Feature_RedCloud : Inherits TaskParent
 
         dst2 = runRedList(src, labels(2))
 
-        For Each pt In task.featurePoints
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+        For Each pt In algTask.featurePoints
+            DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
         Next
     End Sub
 End Class
@@ -592,22 +592,22 @@ End Class
 Public Class Feature_WithDepth : Inherits TaskParent
     Dim feat As New Feature_General
     Public Sub New()
-        If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
         desc = "Show the feature points that have depth."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.grayStable)
+        feat.Run(algTask.grayStable)
 
         dst2 = src
         Dim depthCount As Integer
-        For Each pt In task.featurePoints
-            Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            If task.bricks.brickList(index).depth > 0 Then
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+        For Each pt In algTask.featurePoints
+            Dim index = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            If algTask.bricks.brickList(index).depth > 0 Then
+                DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
                 depthCount += 1
             End If
         Next
-        labels(2) = CStr(depthCount) + " features had depth or " + Format(depthCount / task.features.Count, "0%")
+        labels(2) = CStr(depthCount) + " features had depth or " + Format(depthCount / algTask.features.Count, "0%")
     End Sub
 End Class
 
@@ -621,7 +621,7 @@ Public Class Feature_Matching : Inherits TaskParent
     Dim match As New Match_Basics
     Dim feat As New Feature_General
     Public Sub New()
-        task.featureOptions.FeatureSampleSize.Value = 150
+        algTask.featureOptions.FeatureSampleSize.Value = 150
         desc = "Use correlation coefficient to keep features from frame to frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -630,13 +630,13 @@ Public Class Feature_Matching : Inherits TaskParent
         Dim matched As New List(Of cv.Point)
         motionPoints.Clear()
         For Each pt In features
-            Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            Dim val = algTask.motionMask.Get(Of Byte)(pt.Y, pt.X)
             If val = 0 Then
-                Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim r = task.gridRects(index)
+                Dim index As Integer = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim r = algTask.gridRects(index)
                 match.template = fpLastSrc(r)
                 match.Run(src(r))
-                If match.correlation > task.fCorrThreshold Then matched.Add(pt)
+                If match.correlation > algTask.fCorrThreshold Then matched.Add(pt)
             Else
                 motionPoints.Add(pt)
             End If
@@ -645,16 +645,16 @@ Public Class Feature_Matching : Inherits TaskParent
         labels(2) = "There were " + CStr(features.Count) + " features identified and " + CStr(matched.Count) +
                     " were matched to the previous frame"
 
-        If matched.Count < task.FeatureSampleSize / 2 Then
+        If matched.Count < algTask.FeatureSampleSize / 2 Then
             feat.Run(src)
-            features = task.featurePoints
+            features = algTask.featurePoints
         Else
             features = New List(Of cv.Point)(matched)
         End If
 
         dst2 = src.Clone
         For Each pt In features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
         Next
 
         fpLastSrc = src.Clone
@@ -676,14 +676,14 @@ Public Class Feature_SteadyCam : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        feat.Run(task.grayStable)
+        feat.Run(algTask.grayStable)
 
-        Static features As New List(Of cv.Point)(task.featurePoints)
+        Static features As New List(Of cv.Point)(algTask.featurePoints)
         Static lastSrc As cv.Mat = src.Clone
 
-        Dim resync = features.Count / task.features.Count < options.resyncThreshold
-        If task.heartBeat Or task.optionsChanged Or resync Then
-            features = New List(Of cv.Point)(task.featurePoints)
+        Dim resync = features.Count / algTask.features.Count < options.resyncThreshold
+        If algTask.heartBeat Or algTask.optionsChanged Or resync Then
+            features = New List(Of cv.Point)(algTask.featurePoints)
         End If
 
         Dim ptList = New List(Of cv.Point)(features)
@@ -691,17 +691,17 @@ Public Class Feature_SteadyCam : Inherits TaskParent
         Dim mode = cv.TemplateMatchModes.CCoeffNormed
         features.Clear()
         For Each pt In ptList
-            Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            Dim r = task.gridRects(index)
+            Dim index As Integer = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
+            Dim r = algTask.gridRects(index)
             cv.Cv2.MatchTemplate(src(r), lastSrc(r), correlationMat, mode)
-            If correlationMat.Get(Of Single)(0, 0) >= task.fCorrThreshold Then
+            If correlationMat.Get(Of Single)(0, 0) >= algTask.fCorrThreshold Then
                 features.Add(pt)
             End If
         Next
 
         dst2 = src
         For Each pt In features
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
         Next
 
         lastSrc = src.Clone
@@ -725,7 +725,7 @@ Public Class Feature_FacetPoints : Inherits TaskParent
         feat.Run(src)
         dst2 = runRedList(src, labels(2))
 
-        delaunay.inputPoints = task.features
+        delaunay.inputPoints = algTask.features
         delaunay.Run(src)
 
         Dim ptList As New List(Of cv.Point)
@@ -738,26 +738,26 @@ Public Class Feature_FacetPoints : Inherits TaskParent
         Next
 
         For Each pt In ptList
-            Dim index = task.redList.rcMap.Get(Of Byte)(pt.Y, pt.X)
+            Dim index = algTask.redList.rcMap.Get(Of Byte)(pt.Y, pt.X)
             If index = 0 Then Continue For
-            Dim rc = task.redList.oldrclist(index)
-            Dim val = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+            Dim rc = algTask.redList.oldrclist(index)
+            Dim val = algTask.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
             If val <> 0 Then
                 rc.ptFacets.Add(pt)
-                task.redList.oldrclist(index) = rc
+                algTask.redList.oldrclist(index) = rc
             End If
         Next
 
-        For Each rc In task.redList.oldrclist
+        For Each rc In algTask.redList.oldrclist
             For Each pt In rc.ptFacets
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
             Next
         Next
 
-        If standalone And task.redList.oldrclist.Count > 0 Then
-            task.color.Rectangle(task.oldrcD.rect, task.highlight, task.lineWidth)
-            For Each pt In task.oldrcD.ptFacets
-                DrawCircle(task.color, pt, task.DotSize, task.highlight)
+        If standalone And algTask.redList.oldrclist.Count > 0 Then
+            algTask.color.Rectangle(algTask.oldrcD.rect, algTask.highlight, algTask.lineWidth)
+            For Each pt In algTask.oldrcD.ptFacets
+                DrawCircle(algTask.color, pt, algTask.DotSize, algTask.highlight)
             Next
         End If
     End Sub
@@ -779,7 +779,7 @@ Public Class Feature_Agast : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             If agastFD IsNot Nothing Then agastFD.Dispose()
             agastFD = cv.AgastFeatureDetector.Create(options.agastThreshold, options.useNonMaxSuppression,
                                                      cv.AgastFeatureDetector.DetectorType.OAST_9_16)
@@ -794,19 +794,19 @@ Public Class Feature_Agast : Inherits TaskParent
 
         Dim newList As New List(Of cv.Point2f)
         For Each pt In stablePoints
-            Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            Dim val = algTask.motionMask.Get(Of Byte)(pt.Y, pt.X)
             If val = 0 Then newList.Add(pt)
         Next
 
         For Each pt In currPoints
-            Dim val = task.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            Dim val = algTask.motionMask.Get(Of Byte)(pt.Y, pt.X)
             If val <> 0 Then newList.Add(pt)
         Next
 
         stablePoints = New List(Of cv.Point2f)(newList)
         dst2 = src
         For Each pt In stablePoints
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
         Next
         labels(2) = $"Found {keypoints.Length} features with agast"
     End Sub
@@ -823,17 +823,17 @@ End Class
 Public Class Feature_NoMotion : Inherits TaskParent
     Dim feat As New Feature_General
     Public Sub New()
-        task.gOptions.UseMotionMask.Checked = False
+        algTask.gOptions.UseMotionMask.Checked = False
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Find good features to track in a BGR image using the motion mask+"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.grayStable)
+        feat.Run(algTask.grayStable)
         dst2 = src.Clone
 
         dst3.SetTo(0)
-        For Each pt In task.featurePoints
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+        For Each pt In algTask.featurePoints
+            DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
             dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
 
@@ -853,16 +853,16 @@ Public Class Feature_StableVisual : Inherits TaskParent
         desc = "Show only features present on this and the previous frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lastFeatures As New List(Of cv.Point)(task.featurePoints)
+        Dim lastFeatures As New List(Of cv.Point)(algTask.featurePoints)
 
         noMotion.Run(src)
         dst3 = noMotion.dst2
 
         dst2.SetTo(0)
         Dim stable As New List(Of cv.Point)
-        For Each pt In task.featurePoints
+        For Each pt In algTask.featurePoints
             If lastFeatures.Contains(pt) Then
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
                 stable.Add(pt)
             End If
         Next
@@ -871,7 +871,7 @@ Public Class Feature_StableVisual : Inherits TaskParent
 
         dst2 = src.Clone
         For Each pt In stable
-            DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
         Next
         labels(3) = "The " + CStr(stable.Count) + " points are present for more than one frame."
     End Sub
@@ -889,15 +889,15 @@ Public Class Feature_StableVisualize : Inherits TaskParent
         desc = "Identify features that consistently present in the image - with motion ignored."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim lastFeatures As New List(Of cv.Point)(task.featurePoints)
+        Dim lastFeatures As New List(Of cv.Point)(algTask.featurePoints)
 
         noMotion.Run(src)
 
         dst2 = src
         Dim stable As New List(Of cv.Point)
-        For Each pt In task.featurePoints
+        For Each pt In algTask.featurePoints
             If lastFeatures.Contains(pt) Then
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
                 stable.Add(pt)
             End If
         Next
@@ -928,7 +928,7 @@ Public Class Feature_StableVisualize : Inherits TaskParent
         dst3.SetTo(0)
         For Each fp In fpStable
             If fp.age > 2 Then
-                DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
+                DrawCircle(dst3, fp.pt, algTask.DotSize, algTask.highlight)
                 SetTrueText(CStr(fp.age), fp.pt, 3)
             End If
         Next
@@ -952,17 +952,17 @@ Public Class Feature_KNN : Inherits TaskParent
         desc = "Find good features to track in the image but use the same point if closer than a threshold"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(task.grayStable)
+        feat.Run(algTask.grayStable)
 
-        If task.features.Count = 0 Then
+        If algTask.features.Count = 0 Then
             featurePoints.Clear()
             Exit Sub
         End If
 
-        knn.queries = New List(Of cv.Point2f)(task.features)
-        If task.firstPass Or task.gOptions.DebugCheckBox.Checked Then
+        knn.queries = New List(Of cv.Point2f)(algTask.features)
+        If algTask.firstPass Or algTask.gOptions.DebugCheckBox.Checked Then
             knn.trainInput = New List(Of cv.Point2f)(knn.queries)
-            task.gOptions.DebugCheckBox.Checked = False
+            algTask.gOptions.DebugCheckBox.Checked = False
         End If
 
         knn.Run(src)
@@ -970,8 +970,8 @@ Public Class Feature_KNN : Inherits TaskParent
         For i = 0 To knn.neighbors.Count - 1
             Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
             Dim pt = knn.trainInput(trainIndex)
-            Dim qPt = task.features(i)
-            If pt.DistanceTo(qPt) > 2 Then knn.trainInput(trainIndex) = task.features(i)
+            Dim qPt = algTask.features(i)
+            If pt.DistanceTo(qPt) > 2 Then knn.trainInput(trainIndex) = algTask.features(i)
         Next
 
         featurePoints = New List(Of cv.Point2f)(knn.trainInput)
@@ -979,8 +979,8 @@ Public Class Feature_KNN : Inherits TaskParent
         src.CopyTo(dst2)
         dst3.SetTo(0)
         For Each pt In featurePoints
-            DrawCircle(dst2, pt, task.DotSize + 2, white)
-            DrawCircle(dst3, pt, task.DotSize + 2, white)
+            DrawCircle(dst2, pt, algTask.DotSize + 2, white)
+            DrawCircle(dst3, pt, algTask.DotSize + 2, white)
         Next
 
         labels(2) = feat.labels(2)

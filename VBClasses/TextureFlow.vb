@@ -33,7 +33,7 @@ Public Class TextureFlow_Depth : Inherits TaskParent
         desc = "Display texture flow in the depth data"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        flow.Run(task.depthRGB)
+        flow.Run(algTask.depthRGB)
         dst2 = flow.dst2
     End Sub
 End Class
@@ -94,7 +94,7 @@ Public Class TextureFlow_Bricks : Inherits TaskParent
         desc = "Use the grid points as input to the texture flow algorithm"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        bPoint.Run(task.grayStable)
+        bPoint.Run(algTask.grayStable)
         dst3 = bPoint.dst3
 
         knn.trainInput.Clear()
@@ -105,8 +105,8 @@ Public Class TextureFlow_Bricks : Inherits TaskParent
         knn.Run(emptyMat)
 
         For i = 0 To knn.neighbors.Count - 1
-            dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(1)), 255, task.lineWidth, task.lineType)
-            dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(2)), 255, task.lineWidth, task.lineType)
+            dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(1)), 255, algTask.lineWidth, algTask.lineType)
+            dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(2)), 255, algTask.lineWidth, algTask.lineType)
         Next
 
         flow.Run(dst3)

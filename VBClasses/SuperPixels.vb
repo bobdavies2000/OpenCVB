@@ -8,8 +8,8 @@ Public Class SuperPixel_Basics : Inherits TaskParent
         dst2 = runRedList(src, labels(2))
 
         dst3 = src
-        For Each rc In task.redList.oldrclist
-            DrawTour(dst3(rc.rect), rc.contour, white, task.lineWidth)
+        For Each rc In algTask.redList.oldrclist
+            DrawTour(dst3(rc.rect), rc.contour, white, algTask.lineWidth)
         Next
     End Sub
 End Class
@@ -29,7 +29,7 @@ Public Class SuperPixel_Basics_CPP : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             If cPtr <> 0 Then SuperPixel_Close(cPtr)
             cPtr = SuperPixel_Open(src.Width, src.Height, options.numSuperPixels, options.numIterations, options.prior)
         End If
@@ -92,7 +92,7 @@ Public Class SuperPixel_Depth : Inherits TaskParent
         desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        pixels.Run(task.depthRGB)
+        pixels.Run(algTask.depthRGB)
         dst2 = pixels.dst2
         dst3 = pixels.dst3
     End Sub
@@ -111,7 +111,7 @@ Public Class SuperPixel_WithCanny : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         edges.Run(src)
-        src = task.color.Clone()
+        src = algTask.color.Clone()
         src.SetTo(white, edges.dst2)
         pixels.Run(src)
         dst2 = pixels.dst2
@@ -133,9 +133,9 @@ Public Class SuperPixel_WithLineDetector : Inherits TaskParent
         desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        dst3 = task.lines.dst2
+        dst3 = algTask.lines.dst2
         pixels.Run(dst3)
         dst2 = pixels.dst2
-        labels(3) = task.lines.labels(2)
+        labels(3) = algTask.lines.labels(2)
     End Sub
 End Class

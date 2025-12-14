@@ -39,9 +39,9 @@ Public Class MSER_Basics : Inherits TaskParent
 
             rc.maxDist = GetMaxDist(rc)
 
-            rc.indexLast = task.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If rc.indexLast <> 0 And rc.indexLast < task.redList.oldrclist.Count Then
-                Dim lrc = task.redList.oldrclist(rc.indexLast)
+            rc.indexLast = algTask.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If rc.indexLast <> 0 And rc.indexLast < algTask.redList.oldrclist.Count Then
+                Dim lrc = algTask.redList.oldrclist(rc.indexLast)
                 rc.maxDStable = lrc.maxDStable
                 rc.color = lrc.color
                 matched.Add(rc.indexLast, rc.indexLast)
@@ -50,15 +50,15 @@ Public Class MSER_Basics : Inherits TaskParent
             End If
 
             Dim colorStdev As cv.Scalar, colormean As cv.Scalar
-            cv.Cv2.MeanStdDev(task.color(rc.rect), colormean, colorStdev, rc.mask)
+            cv.Cv2.MeanStdDev(algTask.color(rc.rect), colormean, colorStdev, rc.mask)
             rc.color = colormean
             If rc.pixels > 0 Then sortedCells.Add(rc.pixels, rc)
         Next
 
-        task.redList.oldrclist = New List(Of oldrcData)(sortedCells.Values)
+        algTask.redList.oldrclist = New List(Of oldrcData)(sortedCells.Values)
         dst2 = RebuildRCMap(sortedCells)
 
-        labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
+        labels(2) = CStr(algTask.redList.oldrclist.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
     End Sub
 End Class
 
@@ -82,7 +82,7 @@ Public Class MSER_Detect : Inherits TaskParent
 
         dst2 = src.Clone
 
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             If mser IsNot Nothing Then mser.dispose()
             mser = cv.MSER.Create(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                                   options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize)
@@ -161,11 +161,11 @@ Public Class MSER_LeftRight : Inherits TaskParent
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        left.Run(task.leftView)
+        left.Run(algTask.leftView)
         dst2 = left.dst2
         labels(2) = left.labels(2)
 
-        right.Run(task.rightView)
+        right.Run(algTask.rightView)
         dst3 = right.dst2
         labels(3) = right.labels(2)
     End Sub
@@ -184,7 +184,7 @@ Public Class MSER_Left : Inherits TaskParent
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        mser.Run(task.leftView)
+        mser.Run(algTask.leftView)
         dst2 = mser.dst2
         labels(2) = mser.labels(2)
     End Sub
@@ -204,7 +204,7 @@ Public Class MSER_Right : Inherits TaskParent
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        mser.Run(task.rightView)
+        mser.Run(algTask.rightView)
         dst2 = mser.dst2
         labels(2) = mser.labels(2)
     End Sub
@@ -231,15 +231,15 @@ Public Class MSER_Hulls : Inherits TaskParent
 
         Dim pixels As Integer
         dst3.SetTo(0)
-        For Each rc In task.redList.oldrclist
+        For Each rc In algTask.redList.oldrclist
             rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
             pixels += rc.pixels
             DrawTour(dst3(rc.rect), rc.hull, rc.color, -1)
         Next
 
-        If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " Regions with average size " +
-                                           If(task.redList.oldrclist.Count > 0,
-                                           CStr(CInt(pixels / task.redList.oldrclist.Count)), "0")
+        If algTask.heartBeat Then labels(2) = CStr(algTask.redList.oldrclist.Count) + " Regions with average size " +
+                                           If(algTask.redList.oldrclist.Count > 0,
+                                           CStr(CInt(pixels / algTask.redList.oldrclist.Count)), "0")
     End Sub
 End Class
 
@@ -359,7 +359,7 @@ Public Class MSER_ROI : Inherits TaskParent
                 If center.X >= box.X And center.X <= (box.X + box.Width) Then
                     If center.Y >= box.Y And center.Y <= (box.Y + box.Height) Then
                         removeBoxes.Add(i)
-                        dst3.Rectangle(b, task.highlight, task.lineWidth)
+                        dst3.Rectangle(b, algTask.highlight, algTask.lineWidth)
                     End If
                 End If
             Next
@@ -370,7 +370,7 @@ Public Class MSER_ROI : Inherits TaskParent
         End While
 
         For Each rect In containers
-            dst2.Rectangle(rect, task.highlight, task.lineWidth)
+            dst2.Rectangle(rect, algTask.highlight, algTask.lineWidth)
         Next
 
         labels(2) = CStr(containers.Count) + " consolidated regions of interest located"
@@ -392,8 +392,8 @@ Public Class MSER_TestExample : Inherits TaskParent
     Public Sub New()
         labels(2) = "Contour regions from MSER"
         labels(3) = "Box regions from MSER"
-        If standalone Then task.gOptions.displaydst1.checked = True
-        image = cv.Cv2.ImRead(task.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
+        If standalone Then algTask.gOptions.displaydst1.checked = True
+        image = cv.Cv2.ImRead(algTask.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         mser = cv.MSER.Create()
         desc = "Maximally Stable Extremal Regions example - still image"
     End Sub
@@ -407,7 +407,7 @@ Public Class MSER_TestExample : Inherits TaskParent
         dst2 = image.Clone
         dst3 = image.Clone()
 
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             If mser IsNot Nothing Then mser.Dispose()
             mser = cv.MSER.Create(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                                   options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize)
@@ -417,7 +417,7 @@ Public Class MSER_TestExample : Inherits TaskParent
         mser.DetectRegions(dst2, regions, boxes)
         Dim index As Integer
         For Each pts In regions
-            Dim color = task.vecColors(index Mod 256)
+            Dim color = algTask.vecColors(index Mod 256)
             For Each pt In pts
                 dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, color)
             Next
@@ -425,7 +425,7 @@ Public Class MSER_TestExample : Inherits TaskParent
         Next
 
         For Each box In boxes
-            dst3.Rectangle(box, task.highlight, task.lineWidth + 1, task.lineType)
+            dst3.Rectangle(box, algTask.highlight, algTask.lineWidth + 1, algTask.lineType)
         Next
         labels(2) = CStr(boxes.Count) + " regions were found using MSER"
     End Sub
@@ -442,15 +442,15 @@ End Class
 Public Class MSER_RedCloud : Inherits TaskParent
     Dim mser As New MSER_Basics
     Public Sub New()
-        task.redList = New RedList_Basics
+        algTask.redList = New RedList_Basics
         desc = "Use the MSER_Basics output as input to RedList_Basics"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         mser.Run(src)
 
-        task.redList.Run(mser.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst2 = task.redList.dst2
-        labels(2) = task.redList.labels(2)
+        algTask.redList.Run(mser.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst2 = algTask.redList.dst2
+        labels(2) = algTask.redList.labels(2)
     End Sub
 End Class
 
@@ -472,7 +472,7 @@ Public Class MSER_Mask_CPP : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             MSER_Close(cPtr)
             cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                              options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
@@ -480,7 +480,7 @@ Public Class MSER_Mask_CPP : Inherits TaskParent
 
         If options.graySetting And src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, cppData, 0, cppData.Length)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
@@ -561,11 +561,11 @@ Public Class MSER_BasicsNew : Inherits TaskParent
         dst3 = src
         For i = 0 To boxes.Count - 1
             Dim r = boxes.ElementAt(i).Value
-            dst3.Rectangle(r, task.highlight, task.lineWidth)
+            dst3.Rectangle(r, algTask.highlight, algTask.lineWidth)
             If i >= displaycount Then Exit For
         Next
 
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             labels(2) = "Displaying the largest " + CStr(displaycount) + " rectangles out of " + CStr(boxes.Count) + " found"
             ' displaycount += 1
             If displaycount >= boxes.Count Then displaycount = 0
@@ -614,7 +614,7 @@ Public Class MSER_Basics2 : Inherits TaskParent
             rc.maxDist = GetMaxDist(rc)
             rc.indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
 
-            rc.color = task.scalarColors(i Mod 255)
+            rc.color = algTask.scalarColors(i Mod 255)
             If rc.indexLast <> 0 Then matchCount += 1
 
             oldrclist.Add(rc)
@@ -622,7 +622,7 @@ Public Class MSER_Basics2 : Inherits TaskParent
             dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
-        If task.heartBeat Then labels(2) = detect.labels(2) + " and " + CStr(matchCount) + " were matched to the previous frame"
+        If algTask.heartBeat Then labels(2) = detect.labels(2) + " and " + CStr(matchCount) + " were matched to the previous frame"
     End Sub
 End Class
 
@@ -648,7 +648,7 @@ Public Class MSER_CPP : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
-        If task.optionsChanged Then
+        If algTask.optionsChanged Then
             MSER_Close(cPtr)
             cPtr = MSER_Open(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                              options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize, options.pass2Setting)
@@ -693,7 +693,7 @@ Public Class MSER_CPP : Inherits TaskParent
         If standaloneTest() Then
             dst3 = src
             For i = 0 To boxes.Count - 1
-                dst3.Rectangle(boxes(i), task.highlight, task.lineWidth)
+                dst3.Rectangle(boxes(i), algTask.highlight, algTask.lineWidth)
             Next
         End If
         labels(2) = CStr(classcount) + " regions identified"

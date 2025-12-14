@@ -10,13 +10,13 @@ Public Class Duster_Basics : Inherits TaskParent
 
         For i = 1 To dust.classCount
             Dim mask = dust.dst2.InRange(i, i)
-            Dim depth = task.pcSplit(2).Mean(mask)
-            task.pcSplit(2).SetTo(depth(0), mask)
+            Dim depth = algTask.pcSplit(2).Mean(mask)
+            algTask.pcSplit(2).SetTo(depth(0), mask)
         Next
 
-        cv.Cv2.Merge(task.pcSplit, dst2)
+        cv.Cv2.Merge(algTask.pcSplit, dst2)
         dst2.SetTo(0, Not dust.dst0)
-        dst2.SetTo(0, task.maxDepthMask)
+        dst2.SetTo(0, algTask.maxDepthMask)
 
         dst3 = dust.dst3
     End Sub
@@ -39,11 +39,11 @@ Public Class Duster_MaskZ : Inherits TaskParent
         options.Run()
         hist.bins = options.bins
 
-        Dim src32f = task.pcSplit(2)
-        task.maxDepthMask = src32f.InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
-        src32f.SetTo(task.MaxZmeters, task.maxDepthMask)
+        Dim src32f = algTask.pcSplit(2)
+        algTask.maxDepthMask = src32f.InRange(algTask.MaxZmeters, algTask.MaxZmeters).ConvertScaleAbs()
+        src32f.SetTo(algTask.MaxZmeters, algTask.maxDepthMask)
 
-        hist.fixedRanges = {New cv.Rangef(0.001, task.MaxZmeters)}
+        hist.fixedRanges = {New cv.Rangef(0.001, algTask.MaxZmeters)}
         hist.Run(src32f)
 
         Dim histArray = hist.histArray
@@ -66,7 +66,7 @@ Public Class Duster_MaskZ : Inherits TaskParent
             sampleCount += histArray(i)
         Next
 
-        Dim incr = task.MaxZmeters / options.bins
+        Dim incr = algTask.MaxZmeters / options.bins
         classCount = 0
         For i As Integer = 0 To Math.Min(clusters.Count, options.maxClusters) - 1
             Dim vec = clusters.ElementAt(i).Value
@@ -81,10 +81,10 @@ Public Class Duster_MaskZ : Inherits TaskParent
         dst1.ConvertTo(dst2, cv.MatType.CV_8U)
 
         classCount += 1
-        dst2.SetTo(classCount, task.maxDepthMask)
+        dst2.SetTo(classCount, algTask.maxDepthMask)
 
         dst3 = PaletteFull(dst2)
-        If task.heartBeat Then labels(2) = "dst2 = CV_8U version of depth segmented into " + CStr(classCount) + " clusters."
+        If algTask.heartBeat Then labels(2) = "dst2 = CV_8U version of depth segmented into " + CStr(classCount) + " clusters."
         dst0 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
@@ -102,13 +102,13 @@ Public Class Duster_BasicsY : Inherits TaskParent
 
         For i = 1 To dust.classCount
             Dim mask = dust.dst2.InRange(i, i)
-            Dim pcY = task.pcSplit(1).Mean(mask)
-            task.pcSplit(1).SetTo(pcY(0), mask)
+            Dim pcY = algTask.pcSplit(1).Mean(mask)
+            algTask.pcSplit(1).SetTo(pcY(0), mask)
         Next
 
-        cv.Cv2.Merge(task.pcSplit, dst2)
+        cv.Cv2.Merge(algTask.pcSplit, dst2)
         dst2.SetTo(0, Not dust.dst0)
-        dst2.SetTo(0, task.maxDepthMask)
+        dst2.SetTo(0, algTask.maxDepthMask)
 
         dst3 = dust.dst3
     End Sub

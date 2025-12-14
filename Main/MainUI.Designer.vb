@@ -45,6 +45,7 @@ Namespace MainUI
             CameraSwitching = New Label()
             CamSwitchTimer = New Timer(components)
             fpsTimer = New Timer(components)
+            TestAllTimer = New Timer(components)
             TreeViewTimer = New Timer(components)
             MainToolStrip.SuspendLayout()
             SuspendLayout()
@@ -201,7 +202,7 @@ Namespace MainUI
             ' CameraSwitching
             ' 
             CameraSwitching.AutoSize = True
-            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12.0F)
+            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12F)
             CameraSwitching.Location = New Point(40, 118)
             CameraSwitching.Name = "CameraSwitching"
             CameraSwitching.Size = New Size(202, 29)
@@ -216,13 +217,17 @@ Namespace MainUI
             ' 
             fpsTimer.Interval = 1000
             ' 
+            ' TestAllTimer
+            ' 
+            ' 
             ' TreeViewTimer
             ' 
+            TreeViewTimer.Enabled = True
             TreeViewTimer.Interval = 1000
             ' 
             ' MainUI
             ' 
-            AutoScaleDimensions = New SizeF(12.0F, 30.0F)
+            AutoScaleDimensions = New SizeF(12F, 30F)
             AutoScaleMode = AutoScaleMode.Font
             ClientSize = New Size(1275, 1171)
             Controls.Add(CameraSwitching)
@@ -262,6 +267,7 @@ Namespace MainUI
         Friend WithEvents CameraSwitching As Label
         Friend WithEvents CamSwitchTimer As Timer
         Friend WithEvents fpsTimer As Timer
+        Friend WithEvents TestAllTimer As Timer
         Friend WithEvents TreeViewTimer As Timer
 
     End Class

@@ -91,7 +91,7 @@ Public Class Blob_RenderBlobs : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         input.Run(src)
         dst2 = input.dst2
-        If task.frameCount Mod input.updateFrequency = 0 Then
+        If algTask.frameCount Mod input.updateFrequency = 0 Then
             Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
             Dim labelView = dst2.EmptyClone
@@ -102,15 +102,15 @@ Public Class Blob_RenderBlobs : Inherits TaskParent
             cc.RenderBlobs(labelView)
 
             For Each b In cc.Blobs.Skip(1)
-                dst2.Rectangle(b.Rect, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+                dst2.Rectangle(b.Rect, cv.Scalar.Red, algTask.lineWidth + 1, algTask.lineType)
             Next
 
             Dim maxBlob = cc.GetLargestBlob()
             dst3.SetTo(0)
             cc.FilterByBlob(dst2, dst3, maxBlob)
 
-            DrawCircle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize + 3, cv.Scalar.Blue)
-            DrawCircle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), task.DotSize, cv.Scalar.Yellow)
+            DrawCircle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), algTask.DotSize + 3, cv.Scalar.Blue)
+            DrawCircle(dst3, New cv.Point(maxBlob.Centroid.X, maxBlob.Centroid.Y), algTask.DotSize, cv.Scalar.Yellow)
         End If
     End Sub
 End Class

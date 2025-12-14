@@ -10,7 +10,7 @@ Public Class Dilate_Basics : Inherits TaskParent
         If options.noshape Or options.iterations = 0 Then dst2 = src Else dst2 = src.Dilate(options.element, Nothing, options.iterations)
 
         If standaloneTest() Then
-            dst3 = task.depthRGB.Dilate(options.element, Nothing, options.iterations)
+            dst3 = algTask.depthRGB.Dilate(options.element, Nothing, options.iterations)
             labels(3) = "Dilated Depth " + CStr(options.iterations) + " times"
         End If
         labels(2) = "Dilated BGR " + CStr(options.iterations) + " times"
@@ -32,7 +32,7 @@ Public Class Dilate_OpenClose : Inherits TaskParent
     Public Overrides sub RunAlg(src As cv.Mat)
         Options.Run()
         Dim openClose = If(options.iterations > 0, cv.MorphTypes.Open, cv.MorphTypes.Close)
-        cv.Cv2.MorphologyEx(task.depthRGB, dst3, openClose, options.element)
+        cv.Cv2.MorphologyEx(algTask.depthRGB, dst3, openClose, options.element)
         cv.Cv2.MorphologyEx(src, dst2, openClose, options.element)
     End Sub
 End Class

@@ -43,7 +43,7 @@ Public Class Image_Series : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         ' to work on a specific file, specify it here.
-        ' options.fileInputName = new fileinfo(task.homeDir + "Images/train/103041.jpg")
+        ' options.fileInputName = new fileinfo(algTask.homeDir + "Images/train/103041.jpg")
         images.Run(images.options.fullsizeImage)
         dst2 = images.dst2
     End Sub
@@ -61,7 +61,7 @@ End Class
 Public Class Image_RedCloudColor : Inherits TaskParent
     Public images As New Image_Series
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then algTask.gOptions.displayDst1.Checked = True
         desc = "Use RedCloud on a photo instead of the video stream."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
@@ -71,7 +71,7 @@ Public Class Image_RedCloudColor : Inherits TaskParent
 
         dst2 = runRedList(src, labels(2))
 
-        Dim mask = task.redList.rcMap.InRange(0, 0)
+        Dim mask = algTask.redList.rcMap.InRange(0, 0)
         dst2.SetTo(cv.Scalar.Black, mask)
     End Sub
 End Class
@@ -86,13 +86,13 @@ Public Class Image_CellStats : Inherits TaskParent
     Dim stats As New XO_RedCell_Basics
     Public Sub New()
         images.images.images.options.imageSeries = False
-        If standalone Then task.gOptions.displaydst0.checked = true
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then algTask.gOptions.displaydst0.checked = true
+        If standalone Then algTask.gOptions.displaydst1.checked = true
         desc = "Display the statistics for the selected cell"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        task.pointCloud.SetTo(0)
-        task.pcSplit = task.pointCloud.Split()
+        algTask.pointCloud.SetTo(0)
+        algTask.pcSplit = algTask.pointCloud.Split()
 
         images.Run(src)
         dst0 = images.dst0
@@ -117,7 +117,7 @@ Public Class Image_MSER : Inherits TaskParent
     Dim core As New MSER_Detect
     Dim options As New Options_Images
     Public Sub New()
-        If standalone Then task.gOptions.displaydst1.checked = true
+        If standalone Then algTask.gOptions.displaydst1.checked = true
         OptionParent.FindSlider("MSER Min Area").Value = 15
         OptionParent.FindSlider("MSER Max Area").Value = 200000
         desc = "Find the MSER (Maximally Stable Extermal Regions) in the still image."
@@ -142,7 +142,7 @@ End Class
 Public Class Image_Icon : Inherits TaskParent
     Dim inputImage As Bitmap
     Public Sub New()
-        Dim filePath As String = task.homeDir + "/Main/Data/OpenCVB.png"
+        Dim filePath As String = algTask.homeDir + "/Main/Data/OpenCVB.png"
         inputImage = New Bitmap(filePath)
         desc = "Create an icon from an image"
     End Sub
@@ -152,7 +152,7 @@ Public Class Image_Icon : Inherits TaskParent
         Dim icon As Icon = Icon.FromHandle(iconHandle)
 
         ' Save the icon to a file
-        Using fs As New FileStream(task.homeDir + "/Main/Data/test.ico", FileMode.OpenOrCreate)
+        Using fs As New FileStream(algTask.homeDir + "/Main/Data/test.ico", FileMode.OpenOrCreate)
             icon.Save(fs)
         End Using
         inputImage = Nothing

@@ -9,8 +9,8 @@ Public Class Flood_Basics : Inherits TaskParent
         Else
             dst2 = runRedList(src, labels(2))
         End If
-        dst1 = task.redList.dst1
-        SetTrueText(task.redList.strOut, 3)
+        dst1 = algTask.redList.dst1
+        SetTrueText(algTask.redList.strOut, 3)
     End Sub
 End Class
 
@@ -20,12 +20,12 @@ End Class
 
 Public Class Flood_CellStatsPlot : Inherits TaskParent
     Public Sub New()
-        task.gOptions.setHistogramBins(1000)
+        algTask.gOptions.setHistogramBins(1000)
         desc = "Provide cell stats on the flood_basics cells.  Identical to XO_RedCell_FloodFill"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         dst2 = runRedList(src, labels(2))
-        SetTrueText(task.redList.strOut, 3)
+        SetTrueText(algTask.redList.strOut, 3)
     End Sub
 End Class
 
@@ -44,12 +44,12 @@ Public Class Flood_ContainedCells : Inherits TaskParent
         If standalone Then dst2 = runRedList(src, labels(2))
 
         Dim removeCells As New List(Of Integer)
-        For i = task.redList.oldrclist.Count - 1 To 0 Step -1
-            Dim rc = task.redList.oldrclist(i)
+        For i = algTask.redList.oldrclist.Count - 1 To 0 Step -1
+            Dim rc = algTask.redList.oldrclist(i)
             Dim nabs As New List(Of Integer)
             Dim contains As New List(Of Integer)
-            For j = 0 To task.redList.oldrclist.Count - 1
-                Dim rcBig = task.redList.oldrclist(j)
+            For j = 0 To algTask.redList.oldrclist.Count - 1
+                Dim rcBig = algTask.redList.oldrclist(j)
                 If rcBig.rect.IntersectsWith(rc.rect) Then nabs.Add(rcBig.index)
                 If rcBig.rect.Contains(rc.rect) Then contains.Add(rcBig.index)
             Next
@@ -58,11 +58,11 @@ Public Class Flood_ContainedCells : Inherits TaskParent
 
         dst3.SetTo(0)
         For Each index In removeCells
-            Dim rc = task.redList.oldrclist(index)
+            Dim rc = algTask.redList.oldrclist(index)
             dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             labels(3) = CStr(removeCells.Count) + " cells were completely contained in another cell's rect"
         End If
     End Sub
@@ -81,7 +81,7 @@ Public Class Flood_Tiers : Inherits TaskParent
         desc = "Subdivide the Flood_Basics cells using depth tiers."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim tier = task.gOptions.DebugSlider.Value
+        Dim tier = algTask.gOptions.DebugSlider.Value
 
         tiers.Run(src)
         If tier >= tiers.classCount Then tier = 0
@@ -102,7 +102,7 @@ Public Class Flood_Tiers : Inherits TaskParent
         dst2 = flood.dst2
         dst3 = flood.dst3
 
-        task.setSelectedCell()
+        algTask.setSelectedCell()
     End Sub
 End Class
 
@@ -119,14 +119,14 @@ Public Class Flood_Motion : Inherits TaskParent
     Dim maxDists As New List(Of cv.Point2f)
     Dim maxIndex As New List(Of Integer)
     Public Sub New()
-        If standalone Then task.gOptions.displayDst1.Checked = True
+        If standalone Then algTask.gOptions.displayDst1.Checked = True
         desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             flood.Run(src)
-            oldrclist = New List(Of oldrcData)(task.redList.oldrclist)
-            cellMap = task.redList.rcMap.Clone
+            oldrclist = New List(Of oldrcData)(algTask.redList.oldrclist)
+            cellMap = algTask.redList.rcMap.Clone
             dst2 = flood.dst2.Clone
             dst3 = flood.dst2.Clone
             labels(2) = flood.labels(2)
@@ -140,7 +140,7 @@ Public Class Flood_Motion : Inherits TaskParent
         Else
             flood.Run(src)
             dst1.SetTo(0)
-            For Each rc In task.redList.oldrclist
+            For Each rc In algTask.redList.oldrclist
                 If maxDists.Contains(rc.maxDist) Then
                     Dim lrc = oldrclist(maxIndex(maxDists.IndexOf(rc.maxDist)))
                     dst1(lrc.rect).SetTo(lrc.color, lrc.mask)
@@ -169,15 +169,15 @@ Public Class Flood_Minimal : Inherits TaskParent
         prep.Run(src)
         dst2 = prep.dst2
 
-        If task.mouseClickFlag Then
+        If algTask.mouseClickFlag Then
             Dim rect As New cv.Rect
-            Dim pt = task.ClickPoint
+            Dim pt = algTask.ClickPoint
             Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
             Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
             Dim count = cv.Cv2.FloodFill(dst2, mask, pt, 255, rect, 0, 0, flags)
             dst1.SetTo(0)
             dst3 = mask(New cv.Rect(1, 1, dst2.Width, dst2.Height)).Clone
-            dst1.Rectangle(rect, 255, task.lineWidth)
+            dst1.Rectangle(rect, 255, algTask.lineWidth)
         End If
     End Sub
 End Class
@@ -198,7 +198,7 @@ Public Class Flood_BasicsMask : Inherits TaskParent
         If standalone Then
             Static color8U As New Color8U_Basics
             color8U.Run(src)
-            inputRemoved = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
+            inputRemoved = algTask.pcSplit(2).InRange(algTask.MaxZmeters, algTask.MaxZmeters).ConvertScaleAbs()
             src = color8U.dst2
         End If
 
@@ -206,8 +206,8 @@ Public Class Flood_BasicsMask : Inherits TaskParent
         If inputRemoved IsNot Nothing Then src.SetTo(0, inputRemoved)
         dst2 = runRedColor(src, labels(2)).SetTo(0, inputRemoved)
 
-        If task.heartBeat Then labels(2) = $"{task.redColor.rcList.Count} cells identified"
+        If algTask.heartBeat Then labels(2) = $"{algTask.redColor.rcList.Count} cells identified"
 
-        If showSelected Then task.setSelectedCell()
+        If showSelected Then algTask.setSelectedCell()
     End Sub
 End Class

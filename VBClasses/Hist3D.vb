@@ -17,9 +17,9 @@ Public Class Hist3D_Basics : Inherits TaskParent
 
         hCloud.Run(src)
         hCloud.dst2 += hColor.classCount + 1
-        hCloud.dst2.SetTo(0, task.noDepthMask)
+        hCloud.dst2.SetTo(0, algTask.noDepthMask)
 
-        hCloud.dst2.CopyTo(dst2, task.depthMask)
+        hCloud.dst2.CopyTo(dst2, algTask.depthMask)
         classCount = hColor.classCount + hCloud.classCount
 
         dst3 = PaletteFull(dst2)
@@ -43,7 +43,7 @@ Public Class Hist3D_BuildHistogram : Inherits TaskParent
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            task.gOptions.setHistogramBins(100)
+            algTask.gOptions.setHistogramBins(100)
             plot.Run(src)
             If plot.histogram.Rows = 0 Then Exit Sub
             src = plot.histogram
@@ -120,7 +120,7 @@ Public Class Hist3D_RedColor : Inherits TaskParent
         dst3 = hColor.dst3
         labels(3) = hColor.labels(3)
         dst2 = runRedList(hColor.dst2, labels(2))
-        If task.redList.oldrclist.Count > 0 Then dst2(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
+        If algTask.redList.oldrclist.Count > 0 Then dst2(algTask.oldrcD.rect).SetTo(white, algTask.oldrcD.mask)
     End Sub
 End Class
 
@@ -140,7 +140,7 @@ Public Class Hist3D_DepthWithMask : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
             fore.Run(src)
-            depthMask = fore.dst2 Or task.noDepthMask
+            depthMask = fore.dst2 Or algTask.noDepthMask
         End If
         hColor.inputMask = depthMask
         dst0 = Not depthMask
@@ -173,9 +173,9 @@ Public Class Hist3D_Pixel : Inherits TaskParent
     Public Overrides Sub RunAlg(src As cv.Mat)
         options.Run()
 
-        If src.Channels() <> 3 Then src = task.color
+        If src.Channels() <> 3 Then src = algTask.color
         Dim bins = options.histogram3DBins
-        cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, task.rangesBGR)
+        cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, algTask.rangesBGR)
 
         ReDim histArray(histogram.Total - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -187,7 +187,7 @@ Public Class Hist3D_Pixel : Inherits TaskParent
         classCount = bins * bins * bins
         Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
 
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, algTask.rangesBGR)
         dst3 = PaletteFull(dst2)
     End Sub
 End Class
@@ -212,8 +212,8 @@ Public Class Hist3D_PixelCells : Inherits TaskParent
 
         pixel.Run(src)
 
-        For Each rc In task.redList.oldrclist
-            cv.Cv2.CalcBackProject({src(rc.rect)}, {0, 1, 2}, pixel.histogram, dst2(rc.rect), task.rangesBGR)
+        For Each rc In algTask.redList.oldrclist
+            cv.Cv2.CalcBackProject({src(rc.rect)}, {0, 1, 2}, pixel.histogram, dst2(rc.rect), algTask.rangesBGR)
         Next
 
         dst3 = PaletteFull(dst2)
@@ -237,8 +237,8 @@ Public Class Hist3D_PixelClassify : Inherits TaskParent
 
         dst2 = runRedList(pixel.dst2, labels(2))
 
-        If task.redList.oldrclist.Count > 0 Then
-            dst2(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
+        If algTask.redList.oldrclist.Count > 0 Then
+            dst2(algTask.oldrcD.rect).SetTo(white, algTask.oldrcD.mask)
         End If
     End Sub
 End Class
@@ -271,7 +271,7 @@ Public Class Hist3D_RedCloudGrid : Inherits TaskParent
     Dim pixels As New Pixel_Vectors
     Dim hVector As New Hist3Dcolor_Vector
     Public Sub New()
-        task.gOptions.GridSlider.Value = 8
+        algTask.gOptions.GridSlider.Value = 8
         desc = "Build RedCloud pixel vectors and then measure each grid element's distance to those vectors."
     End Sub
     Private Function distanceN(vec1 As List(Of Single), vec2 As List(Of Single)) As Double
@@ -290,12 +290,12 @@ Public Class Hist3D_RedCloudGrid : Inherits TaskParent
     End Function
     Public Overrides Sub RunAlg(src As cv.Mat)
         pixels.Run(src)
-        dst2 = task.redList.rcMap
+        dst2 = algTask.redList.rcMap
         dst3 = dst2.InRange(0, 0)
         If pixels.pixelVector.Count = 0 Then Exit Sub
         dst1.SetTo(0)
-        dst0 = task.redList.rcMap
-        For Each roi In task.gridRects
+        dst0 = algTask.redList.rcMap
+        For Each roi In algTask.gridRects
             If dst3(roi).CountNonZero Then
                 Dim candidates As New List(Of Integer)
                 For y = 0 To roi.Height - 1

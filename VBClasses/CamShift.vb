@@ -18,11 +18,11 @@ Public Class CamShift_Basics : Inherits TaskParent
         Dim mask = redHue.dst3
 
         Dim ranges() = {New cv.Rangef(0, 180)}
-        Dim hsize() As Integer = {task.histogramBins}
-        task.drawRect = ValidateRect(task.drawRect)
-        cv.Cv2.CalcHist({hue(task.drawRect)}, {0}, mask(task.drawRect), histogram, 1, hsize, ranges)
+        Dim hsize() As Integer = {algTask.histogramBins}
+        algTask.drawRect = ValidateRect(algTask.drawRect)
+        cv.Cv2.CalcHist({hue(algTask.drawRect)}, {0}, mask(algTask.drawRect), histogram, 1, hsize, ranges)
         histogram = histogram.Normalize(0, 255, cv.NormTypes.MinMax)
-        roi = task.drawRect
+        roi = algTask.drawRect
 
         If histogram.Rows <> 0 Then
             cv.Cv2.CalcBackProject({hue}, {0}, histogram, dst1, ranges)
@@ -32,7 +32,7 @@ Public Class CamShift_Basics : Inherits TaskParent
             dst3 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         End If
         If trackBox.Size.Width > 0 Then
-            dst2.Ellipse(trackBox, white, task.lineWidth + 1, task.lineType)
+            dst2.Ellipse(trackBox, white, algTask.lineWidth + 1, algTask.lineType)
         End If
     End Sub
 End Class

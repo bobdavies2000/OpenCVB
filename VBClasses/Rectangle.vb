@@ -8,7 +8,7 @@ Public Class Rectangle_Basics : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         options.Run()
-        If task.heartBeat Then
+        If algTask.heartBeat Then
             dst2.SetTo(cv.Scalar.Black)
             rectangles.Clear()
             rotatedRectangles.Clear()
@@ -19,7 +19,7 @@ Public Class Rectangle_Basics : Inherits TaskParent
                 Dim eSize = New cv.Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
                 Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
 
-                Dim nextColor = New cv.Scalar(task.vecColors(i)(0), task.vecColors(i)(1), task.vecColors(i)(2))
+                Dim nextColor = New cv.Scalar(algTask.vecColors(i)(0), algTask.vecColors(i)(1), algTask.vecColors(i)(2))
                 Dim rr = New cv.RotatedRect(nPoint, eSize, angle)
                 Dim r = New cv.Rect(nPoint.X, nPoint.Y, width, height)
                 If options.drawRotated Then
@@ -67,7 +67,7 @@ Public Class Rectangle_Overlap : Inherits TaskParent
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Static typeCheckBox = OptionParent.findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-        If task.heartBeatLT = False Then Exit Sub
+        If algTask.heartBeatLT = False Then Exit Sub
         If standaloneTest() Then
             draw.Run(src)
             dst2 = draw.dst2
@@ -134,8 +134,8 @@ Public Class Rectangle_Intersection : Inherits TaskParent
     End Function
     Public Overrides sub RunAlg(src As cv.Mat)
         If standaloneTest() Then
-            If task.heartBeat Then
-                rotatedCheck.Enabled = task.toggleOn
+            If algTask.heartBeat Then
+                rotatedCheck.Enabled = algTask.toggleOn
                 countSlider.Value = msRNG.Next(2, 10)
                 labels(2) = "Input rectangles = " + CStr(countSlider.Value)
 
@@ -301,7 +301,7 @@ Public Class Rectangle_EnclosingPoints : Inherits TaskParent
             pointList = quickRandomPoints(20)
             dst2.SetTo(0)
             For Each pt In pointList
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
             Next
         End If
 
@@ -318,13 +318,13 @@ End Class
 
 Public Class Rectangle_Fit : Inherits TaskParent
     Public Sub New()
-        If standalone Then task.drawRect = New cv.Rect(25, 25, 25, 35)
+        If standalone Then algTask.drawRect = New cv.Rect(25, 25, 25, 35)
         desc = "Fit a rectangle into dst2 that maximizes the width or height of the rectangle"
     End Sub
     Public Overrides Sub RunAlg(src As cv.Mat)
-        If task.optionsChanged Then dst2.SetTo(0)
+        If algTask.optionsChanged Then dst2.SetTo(0)
 
-        If src.Width = dst2.Width Then dst1 = src(task.drawRect) Else dst1 = src
+        If src.Width = dst2.Width Then dst1 = src(algTask.drawRect) Else dst1 = src
 
         Dim w = dst2.Width / dst1.Width
         Dim h = dst2.Height / dst1.Height

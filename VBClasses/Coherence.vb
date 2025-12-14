@@ -23,7 +23,7 @@ Public Class Coherence_Basics : Inherits TaskParent
         Dim xoffset = src.Width / 2 - side / 2
         Dim yoffset = src.Height / 2 - side / 2
         Dim srcRect = New cv.Rect(xoffset, yoffset, side, side)
-        If task.drawRect.Width <> 0 Then srcRect = task.drawRect
+        If algTask.drawRect.Width <> 0 Then srcRect = algTask.drawRect
 
         dst2 = src.Clone()
         src = src(srcRect)
@@ -81,7 +81,7 @@ Public Class Coherence_Depth : Inherits TaskParent
         desc = "Find coherent lines in the depth image"
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
-        coherent.Run(task.depthRGB)
+        coherent.Run(algTask.depthRGB)
         dst2 = coherent.dst2
     End Sub
 End Class

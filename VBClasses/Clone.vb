@@ -10,18 +10,18 @@ Public Class Clone_Basics : Inherits TaskParent
         labels(2) = "Clone result - draw anywhere to clone a region"
         labels(3) = "Clone Region Mask"
         desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
-        task.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
+        algTask.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
     End Sub
     Public Overrides sub RunAlg(src As cv.Mat)
         Dim mask As New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        If task.drawRect = New cv.Rect Then
+        If algTask.drawRect = New cv.Rect Then
             mask.SetTo(255)
         Else
-            cv.Cv2.Rectangle(mask, task.drawRect, cv.Scalar.White, -1)
+            cv.Cv2.Rectangle(mask, algTask.drawRect, cv.Scalar.White, -1)
         End If
         dst3 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        If standaloneTest() And task.frameCount Mod 10 = 0 Then cloneSpec += 1
+        If standaloneTest() And algTask.frameCount Mod 10 = 0 Then cloneSpec += 1
         Select Case cloneSpec Mod 3
             Case 0
                 cv.Cv2.ColorChange(src, mask, dst2, colorChangeValues(0), colorChangeValues(1), colorChangeValues(2))
@@ -115,11 +115,11 @@ Public Class Clone_Eagle : Inherits TaskParent
     Dim pt As cv.Point
     Dim options As New Options_Clone
     Public Sub New()
-        sourceImage = cv.Cv2.ImRead(task.homeDir + "Data/CloneSource.png")
+        sourceImage = cv.Cv2.ImRead(algTask.homeDir + "Data/CloneSource.png")
         sourceImage = sourceImage.Resize(New cv.Size(sourceImage.Width * dst2.Width / 1280, sourceImage.Height * dst2.Height / 720))
         srcROI = New cv.Rect(0, 40, sourceImage.Width, sourceImage.Height)
 
-        mask = cv.Cv2.ImRead(task.homeDir + "Data/Clonemask.png")
+        mask = cv.Cv2.ImRead(algTask.homeDir + "Data/Clonemask.png")
         mask = mask.Resize(New cv.Size(mask.Width * dst2.Width / 1280, mask.Height * dst2.Height / 720))
         maskROI = New cv.Rect(srcROI.Width, 40, mask.Width, mask.Height)
 
@@ -136,8 +136,8 @@ Public Class Clone_Eagle : Inherits TaskParent
         options.Run()
 
         dst2 = src.Clone()
-        If task.mouseClickFlag Then
-            pt = task.ClickPoint  ' pt corresponds To the center Of the source image.  Roi can't be outside image boundary.
+        If algTask.mouseClickFlag Then
+            pt = algTask.ClickPoint  ' pt corresponds To the center Of the source image.  Roi can't be outside image boundary.
             If pt.X + srcROI.Width / 2 >= src.Width Then pt.X = src.Width - srcROI.Width / 2
             If pt.X - srcROI.Width / 2 < 0 Then pt.X = srcROI.Width / 2
             If pt.Y + srcROI.Height >= src.Height Then pt.Y = src.Height - srcROI.Height / 2
@@ -164,15 +164,15 @@ Public Class Clone_Seamless : Inherits TaskParent
 
         Dim center As New cv.Point(src.Width / 2, src.Height / 2)
         Dim radius = 100
-        If task.drawRect = New cv.Rect Then
+        If algTask.drawRect = New cv.Rect Then
             dst3.SetTo(0)
             DrawCircle(dst3, center, radius, white)
         Else
-            cv.Cv2.Rectangle(dst3, task.drawRect, cv.Scalar.White, -1)
+            cv.Cv2.Rectangle(dst3, algTask.drawRect, cv.Scalar.White, -1)
         End If
 
         dst2 = src.Clone()
-        cv.Cv2.SeamlessClone(task.depthRGB, src, dst3, center, dst2, options.cloneFlag)
+        cv.Cv2.SeamlessClone(algTask.depthRGB, src, dst3, center, dst2, options.cloneFlag)
         DrawCircle(dst2, center, radius, white)
     End Sub
 End Class
