@@ -13,7 +13,6 @@ Namespace MainUI
         Dim gyroSensor As Sensor
 
         Dim acceleration As cv.Point3f, angularVelocity As cv.Point3f, timeStamp As Int64
-        Dim color As cv.Mat, leftView As cv.Mat, pointCloud As cv.Mat, rightView As cv.Mat
         Dim PtCloud As New PointCloudFilter
         Dim initialTime As Int64 = timeStamp
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
@@ -58,31 +57,9 @@ Namespace MainUI
                                               timeStamp = frame.GetTimeStamp
                                           End Sub)
             pipe.EnableFrameSync()
-            Try
-                pipe.Start(config)
-            Catch ex As Exception
-            End Try
-
-            ' Start background thread to capture frames
-            isCapturing = True
-            captureThread = New Thread(AddressOf CaptureFrames)
-            captureThread.IsBackground = True
-            captureThread.Name = "ORB_CaptureThread"
-            captureThread.Start()
+            pipe.Start(config)
         End Sub
-
-        Private Sub CaptureFrames()
-            While isCapturing
-                Try
-                    GetNextFrame()
-                Catch ex As Exception
-                    ' Continue capturing even if one frame fails
-                    Thread.Sleep(10)
-                End Try
-            End While
-        End Sub
-
-        Public Sub GetNextFrame()
+        Public Overrides Sub getNextFrameSet()
             Dim rows = captureRes.Height, cols = captureRes.Width
 
             Dim frames As Frameset = Nothing
@@ -107,15 +84,15 @@ Namespace MainUI
             Dim rFrame = frames.GetFrame(FrameType.OB_FRAME_IR_RIGHT)
 
             If cFrame IsNot Nothing Then
-                color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, cFrame.GetDataPtr)
+                color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, cFrame.GetDataPtr).Clone
             End If
 
             If lFrame IsNot Nothing Then
-                leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, lFrame.GetDataPtr)
+                leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, lFrame.GetDataPtr).Clone
             End If
 
             If rFrame IsNot Nothing Then
-                rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rFrame.GetDataPtr)
+                rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rFrame.GetDataPtr).Clone
             End If
 
             If dFrame IsNot Nothing Then
@@ -124,7 +101,8 @@ Namespace MainUI
                 PtCloud.SetPointFormat(Format.OB_FORMAT_POINT)
                 Dim pcData = PtCloud.Process(dFrame)
                 If pcData IsNot Nothing Then
-                    pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcData.GetDataPtr) / 1000
+                    pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcData.GetDataPtr).Clone
+                    pointCloud /= 1000
                 End If
             End If
 
@@ -133,34 +111,15 @@ Namespace MainUI
             IMU_Acceleration.Z *= -1
             IMU_FrameTime = timeStamp - initialTime
 
-            If color Is Nothing Then color = New cv.Mat(workRes, cv.MatType.CV_8UC3, 0)
-            If leftView Is Nothing Then leftView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
-            If rightView Is Nothing Then rightView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
-            If pointCloud Is Nothing Then pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
-
-            If workRes.Width = captureRes.Width Then
-                camImages.images(0) = color.Clone
-                camImages.images(1) = pointCloud.Clone
-                camImages.images(2) = leftView * 4 ' brighten it to help with correlations.
-                camImages.images(3) = rightView * 4
-            Else
-                camImages.images(0) = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.images(1) = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.images(2) = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
-                camImages.images(3) = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
+            If workRes.Width <> captureRes.Width Then
+                color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                leftView = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
+                rightView = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
             End If
-            ' without this GC.Collect, there are occasional memory footprint problems.  
-            If cameraFrameCount Mod 10 = 0 Then GC.Collect()
-            MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
 
         Public Overrides Sub StopCamera()
-            If captureThread IsNot Nothing Then
-                captureThread.Join(1000) ' Wait up to 1 second for thread to finish
-                captureThread = Nothing
-            End If
-
-            ' Stop the pipeline asynchronously so it doesn't block the UI
             If pipe IsNot Nothing Then
                 Dim pipeToStop = pipe
                 pipe = Nothing ' Clear reference so GetNextFrame won't try to use it

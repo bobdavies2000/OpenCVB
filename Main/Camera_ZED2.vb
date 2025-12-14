@@ -25,25 +25,8 @@ Namespace MainUI
             CalibData.rightIntrinsics.ppy = zed.rightIntrinsics.ppy / ratio
 
             CalibData.baseline = zed.baseline
-
-            ' Start background thread to capture frames
-            captureThread = New Thread(AddressOf CaptureFrames)
-            captureThread.IsBackground = True
-            captureThread.Name = "ZED2_CaptureThread"
-            captureThread.Start()
-            camImages = New CameraImages(workRes)
         End Sub
-        Private Sub CaptureFrames()
-            While isCapturing
-                Try
-                    GetNextFrame()
-                Catch ex As Exception
-                    ' Continue capturing even if one frame fails
-                    Thread.Sleep(10)
-                End Try
-            End While
-        End Sub
-        Public Sub GetNextFrame()
+        Public Overrides Sub getNextFrameSet()
             zed.GetNextFrame()
 
             IMU_Acceleration = zed.IMU_Acceleration
@@ -52,29 +35,20 @@ Namespace MainUI
             IMU_TimeStamp = (zed.IMU_TimeStamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
 
             If workRes <> captureRes Then
-                camImages.images(0) = zed.color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.images(1) = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.images(2) = zed.leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.images(3) = zed.rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                color = zed.color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
+                pointCloud = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
+                leftView = zed.leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
+                rightView = zed.rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
             Else
-                camImages.images(0) = zed.color
-                camImages.images(1) = zed.pointCloud
-                camImages.images(2) = zed.leftView
-                camImages.images(3) = zed.rightView
+                color = zed.color.Clone
+                pointCloud = zed.pointCloud.Clone
+                leftView = zed.leftView.Clone
+                rightView = zed.rightView.Clone
             End If
-
-            If cameraFrameCount Mod 10 = 0 Then GC.Collect()
-
-            MyBase.GetNextFrameCounts(IMU_FrameTime)
+            GC.Collect()
         End Sub
         Public Overrides Sub StopCamera()
-            If captureThread IsNot Nothing Then
-                captureThread.Join(1000) ' Wait up to 1 second for thread to finish
-                captureThread = Nothing
-            End If
-            If zed IsNot Nothing AndAlso camImages IsNot Nothing AndAlso camImages.images(1).Width > 0 Then
-                zed.StopCamera()
-            End If
+            If zed IsNot Nothing Then zed.StopCamera()
         End Sub
     End Class
 End Namespace

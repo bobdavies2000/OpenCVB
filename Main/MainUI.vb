@@ -166,8 +166,6 @@ Namespace MainUI
             AlgDescription.Text = algTask.MainUI_Algorithm.desc
             MainToolStrip.Refresh()
 
-            algTask.calibData = camera.calibData
-
             If CameraSwitching.Visible Then
                 CamSwitchTimer.Enabled = False
                 CameraSwitching.Visible = False
@@ -341,8 +339,30 @@ Namespace MainUI
 
             PausePlayButton.Invalidate()
 
-            If isPlaying Then StartCamera() Else StopCamera()
+            StartCamera()
             setAlgorithmSelection()
+
+            While 1
+                camera.getNextFrame()
+
+                algTask.color = camera.color
+                algTask.pointCloud = camera.pointCloud
+                algTask.leftView = camera.leftView
+                algTask.rightView = camera.rightView
+
+                algTask.RunAlgorithm()
+                algTask.mouseClickFlag = False
+                If releaseImages() Then
+                    For i = 0 To algTask.labels.Count - 1
+                        labels(i).Text = algTask.labels(i)
+                    Next
+                End If
+
+                If algTask.heartBeat Then algTask.treeView.Timer2_Tick(sender, e)
+
+                Me.Invalidate()
+                Thread.Sleep(100)
+            End While
         End Sub
         Private Sub paintPic(sender As Object, e As PaintEventArgs)
             If algTask Is Nothing Then Exit Sub

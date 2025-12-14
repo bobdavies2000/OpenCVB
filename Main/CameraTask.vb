@@ -1,6 +1,7 @@
+Imports cv = OpenCvSharp
 Namespace MainUI
     Partial Public Class MainUI
-        Public camera As GenericCamera = Nothing
+        Public camera As GenericCamera
         Dim dstImages As CameraImages
         Private Sub camSwitchAnnouncement()
             CameraSwitching.Visible = True
@@ -26,15 +27,13 @@ Namespace MainUI
                     MsgBox("Camera is not recognized!")
             End Select
 
-            AddHandler camera.FrameReady, AddressOf Camera_FrameReady
-
             fpsTimer.Enabled = True
         End Sub
         Private Sub StopCamera()
-            If camera Is Nothing Then Exit Sub
-            camera.childStopCamera()
+            'If camera Is Nothing Then Exit Sub
+            'camera.childStopCamera()
             camera.isCapturing = False
-            RemoveHandler camera.FrameReady, AddressOf Camera_FrameReady
+            'RemoveHandler camera.FrameReady, AddressOf Camera_FrameReady
             camera = Nothing
         End Sub
         Private Function releaseImages() As Boolean
@@ -51,27 +50,5 @@ Namespace MainUI
 
             Return True
         End Function
-        Private Sub Camera_FrameReady(sender As GenericCamera)
-            If algTask Is Nothing Then Exit Sub
-            ' This event is raised from the background thread, so we need to marshal to UI thread
-            Try
-                Me.Invoke(Sub()
-                              sender.camImages.images(0).CopyTo(algTask.color)
-                              sender.camImages.images(1).CopyTo(algTask.pointCloud)
-                              sender.camImages.images(2).CopyTo(algTask.leftView)
-                              sender.camImages.images(3).CopyTo(algTask.rightView)
-
-                              algTask.RunAlgorithm()
-                              algTask.mouseClickFlag = False
-                              If releaseImages() Then
-                                  For i = 0 To algTask.labels.Count - 1
-                                      labels(i).Text = algTask.labels(i)
-                                  Next
-                              End If
-                              Me.Refresh()
-                          End Sub)
-            Catch ex As Exception
-            End Try
-        End Sub
     End Class
 End Namespace

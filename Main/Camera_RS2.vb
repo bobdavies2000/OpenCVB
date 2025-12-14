@@ -70,39 +70,22 @@ Namespace MainUI
             calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.ColorToLeft_translation(0), 2) +
                                               System.Math.Pow(calibData.ColorToLeft_translation(1), 2) +
                                               System.Math.Pow(calibData.ColorToLeft_translation(2), 2))
-            ' Start background thread to capture frames
-            captureThread = New Thread(AddressOf CaptureFrames)
-            captureThread.IsBackground = True
-            captureThread.Name = "RS2_CaptureThread"
-            camImages = New CameraImages(workRes)
-            captureThread.Start()
         End Sub
-        Private Sub CaptureFrames()
-            While isCapturing
-                Try
-                    GetNextFrame()
-                Catch ex As Exception
-                    ' Continue capturing even if one frame fails
-                    Thread.Sleep(10)
-                End Try
-            End While
-        End Sub
-        Public Sub GetNextFrame()
+        Public Overrides Sub getNextFrameSet()
             ' Check if pipe is still valid (might be cleared during stop)
             If pipe Is Nothing Then Return
 
             Dim alignToColor = New Align(Stream.Color)
             Dim ptcloud = New PointCloud()
             Dim cols = captureRes.Width, rows = captureRes.Height
-            Static color As cv.Mat, leftView As cv.Mat, rightView As cv.Mat, pointCloud As cv.Mat
 
             Using frames As FrameSet = pipe.WaitForFrames(5000)
                 For Each frame As Intel.RealSense.Frame In frames
                     If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 1 Then
-                        leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
+                        leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data).Clone
                     End If
                     If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 2 Then
-                        rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
+                        rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data).Clone
                     End If
                     If frame.Profile.Stream = Stream.Accel Then
                         IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
@@ -117,44 +100,28 @@ Namespace MainUI
 
                 Dim alignedFrames As FrameSet = alignToColor.Process(frames).As(Of FrameSet)()
 
-                color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, alignedFrames.ColorFrame.Data)
+                color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, alignedFrames.ColorFrame.Data).Clone
 
                 Dim pcFrame = ptcloud.Process(alignedFrames.DepthFrame)
-                pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcFrame.Data)
+                pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcFrame.Data).Clone
 
-                If color Is Nothing Then color = New cv.Mat(workRes, cv.MatType.CV_8UC3)
-                If leftView Is Nothing Then leftView = New cv.Mat(workRes, cv.MatType.CV_8UC3)
-                If rightView Is Nothing Then rightView = New cv.Mat(workRes, cv.MatType.CV_8UC3)
-                If pointCloud Is Nothing Then pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3)
+                color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                leftView = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
+                rightView = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
 
-                camImages.images(0) = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.images(1) = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.images(2) = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
-                camImages.images(3) = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
-
-                GC.Collect() ' do you think this is unnecessary?  Remove it and check...
-                MyBase.GetNextFrameCounts(IMU_FrameTime)
+                GC.Collect() ' Is this necessary?  Remove it and check...
             End Using
         End Sub
         Public Overrides Sub StopCamera()
-            If captureThread IsNot Nothing Then
-                captureThread.Join(1000) ' Wait up to 1 second for thread to finish
-                captureThread = Nothing
-            End If
-
-            ' Stop the pipeline asynchronously so it doesn't block the UI
             If pipe IsNot Nothing Then
                 Dim pipeToStop = pipe
                 pipe = Nothing ' Clear reference so GetNextFrame won't try to use it
 
                 ' Run pipe.Stop() on a background thread so it doesn't block
                 ThreadPool.QueueUserWorkItem(Sub(state)
-                                                 Try
-                                                     pipeToStop.Stop()
-                                                     pipeToStop.Dispose()
-                                                 Catch ex As Exception
-                                                     Debug.WriteLine("Error stopping pipeline: " + ex.Message)
-                                                 End Try
+                                                 pipeToStop.Stop()
+                                                 pipeToStop.Dispose()
                                              End Sub)
             End If
         End Sub

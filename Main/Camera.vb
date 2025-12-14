@@ -59,6 +59,7 @@ Public Class GenericCamera
     Public ratio As Single
     Public Event FrameReady(sender As GenericCamera)
     Public isCapturing As Boolean
+    Public color As cv.Mat, leftView As cv.Mat, rightView As cv.Mat, pointCloud As cv.Mat
     Public Structure imuDataStruct
         Dim r00 As Single
         Dim r01 As Single
@@ -91,7 +92,8 @@ Public Class GenericCamera
         cameraFrameCount = 0
         isCapturing = True
     End Sub
-    Public Sub GetNextFrameCounts(frameTime As Double)
+    Public Sub getNextFrame()
+        getNextFrameSet()
         Static lastFrameTime = IMU_TimeStamp
         Static imuStartTime = IMU_TimeStamp
         IMU_FrameTime = IMU_TimeStamp - lastFrameTime - imuStartTime
@@ -105,6 +107,11 @@ Public Class GenericCamera
         lastCPUTime = CPU_TimeStamp
 
         cameraFrameCount += 1
+        If cameraFrameCount Mod 10 = 0 Then GC.Collect()
+    End Sub
+    Public Overridable Sub getNextFrameSet()
+    End Sub
+    Public Sub GetNextFrameCounts(frameTime As Double)
         RaiseEvent FrameReady(Me)
     End Sub
     Public Sub childStopCamera()
