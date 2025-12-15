@@ -2,8 +2,7 @@
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.Extensions
 Imports System.ComponentModel
-Imports VBClasses.VBClasses.Structures
-Imports VBClasses.VBClasses.vbc
+Imports VBClasses.VBClasses
 Public Class SharpGLForm
     Dim gl As OpenGL
     Dim isDragging As Boolean = False

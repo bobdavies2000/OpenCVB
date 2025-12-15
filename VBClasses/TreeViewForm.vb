@@ -1,4 +1,4 @@
-﻿Imports VBClasses.VBClasses.vbc
+﻿Imports VBClasses.VBClasses
 Public Class TreeviewForm
     Dim botDistance As Integer
     Dim treeData As New List(Of String)

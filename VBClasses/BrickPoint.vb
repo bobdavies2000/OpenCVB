@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports VBClasses.VBClasses.vbc
 Namespace VBClasses
     Public Class BrickPoint_Basics : Inherits TaskParent
         Public sobel As New Edge_Sobel

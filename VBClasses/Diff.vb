@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports VBClasses.VBClasses.vbc
 Namespace VBClasses
     Public Class Diff_Basics : Inherits TaskParent
         Public changedPixels As Integer

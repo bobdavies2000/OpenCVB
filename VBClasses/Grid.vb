@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Threading
-Imports VBClasses.VBClasses.vbc
 Namespace VBClasses
     Public Class Grid_Basics : Inherits TaskParent
         Public brickList As New List(Of brickData)

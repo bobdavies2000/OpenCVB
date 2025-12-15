@@ -1,7 +1,7 @@
 Imports System.IO
 Imports System.Text.RegularExpressions
 Imports System.Threading
-Imports VBClasses.VBClasses.vbc
+Imports VBClasses.VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 

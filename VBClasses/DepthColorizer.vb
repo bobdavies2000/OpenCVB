@@ -1,6 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Imports VBClasses.VBClasses.vbc
 Namespace VBClasses
     Public Class DepthColorizer_Basics : Inherits TaskParent
         Public Sub New()

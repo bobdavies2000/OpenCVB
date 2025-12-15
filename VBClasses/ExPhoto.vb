@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.XPhoto
 Imports System.Runtime.InteropServices
-Imports VBClasses.VBClasses.vbc
 Namespace VBClasses
     Public Class ExPhoto_Bm3dDenoise : Inherits TaskParent
         Public Sub New()

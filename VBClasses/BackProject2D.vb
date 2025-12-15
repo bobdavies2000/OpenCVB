@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports VBClasses.VBClasses.vbc
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
 Namespace VBClasses
     Public Class BackProject2D_Basics : Inherits TaskParent

@@ -1,8 +1,6 @@
 Imports System.IO
 Imports System.Runtime.InteropServices
-Imports Microsoft.VisualBasic.Logging
 Imports cv = OpenCvSharp
-Imports VBClasses.VBClasses.vbc
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
 Namespace VBClasses
     Public Class BGSubtract_Basics : Inherits TaskParent
