@@ -1,7 +1,9 @@
+Imports cv = OpenCvSharp
+Imports System.Threading
 Namespace MainUI
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
-        Dim dstImages As CameraImages
+        Public testImage As cv.Mat
         Private Sub camSwitchAnnouncement()
             CameraSwitching.Visible = True
             CameraSwitching.Text = settings.cameraName + " starting"
@@ -31,10 +33,11 @@ Namespace MainUI
             fpsTimer.Enabled = True
         End Sub
         Private Sub StopCamera()
+            RemoveHandler camera.FrameReady, AddressOf Camera_FrameReady
+
             If camera Is Nothing Then Exit Sub
             camera.childStopCamera()
             camera.isCapturing = False
-            RemoveHandler camera.FrameReady, AddressOf Camera_FrameReady
             camera = Nothing
         End Sub
         Private Function releaseImages() As Boolean
@@ -53,25 +56,24 @@ Namespace MainUI
         End Function
         Private Sub Camera_FrameReady(sender As GenericCamera)
             If algTask Is Nothing Then Exit Sub
-            ' This event is raised from the background thread, so we need to marshal to UI thread
-            Try
-                Me.Invoke(Sub()
-                              sender.camImages.images(0).CopyTo(algTask.color)
-                              sender.camImages.images(1).CopyTo(algTask.pointCloud)
-                              sender.camImages.images(2).CopyTo(algTask.leftView)
-                              sender.camImages.images(3).CopyTo(algTask.rightView)
+            If testImage Is Nothing Then testImage = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
 
-                              algTask.RunAlgorithm()
-                              algTask.mouseClickFlag = False
-                              If releaseImages() Then
-                                  For i = 0 To algTask.labels.Count - 1
-                                      labels(i).Text = algTask.labels(i)
-                                  Next
-                              End If
-                              Me.Refresh()
-                          End Sub)
-            Catch ex As Exception
-            End Try
+            Me.Invoke(Sub()
+                          sender.camImages.images(0).CopyTo(testImage)
+                          'sender.camImages.images(0).CopyTo(algTask.color)
+                          'sender.camImages.images(1).CopyTo(algTask.pointCloud)
+                          'sender.camImages.images(2).CopyTo(algTask.leftView)
+                          'sender.camImages.images(3).CopyTo(algTask.rightView)
+
+                          'algTask.RunAlgorithm()
+                          'algTask.mouseClickFlag = False
+                          'If releaseImages() Then
+                          '    For i = 0 To algTask.labels.Count - 1
+                          '        labels(i).Text = algTask.labels(i)
+                          '    Next
+                          'End If
+                          'Me.Refresh()
+                      End Sub)
         End Sub
     End Class
 End Namespace

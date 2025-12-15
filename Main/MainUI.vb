@@ -144,35 +144,6 @@ Namespace MainUI
             SaveSettings()
             StopCamera()
         End Sub
-        Private Sub startAlgorithm()
-            If algTask IsNot Nothing Then algTask.Dispose()
-
-            algTask = New VBClasses.VBtask()
-
-            algTask.homeDir = homeDir
-            algTask.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
-            algTask.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
-            algTask.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
-            algTask.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
-            algTask.dstList = {algTask.color, algTask.pointCloud, algTask.leftView, algTask.rightView}
-            algTask.gridRatioX = pics(0).Width / settings.workRes.Width
-            algTask.gridRatioY = pics(0).Height / settings.workRes.Height
-
-            algTask.settings = settings ' algTask is in a separate project and needs access to settings.
-            algTask.main_hwnd = Me.Handle
-
-            algTask.Initialize()
-            algTask.MainUI_Algorithm = createAlgorithm(settings.algorithm)
-            AlgDescription.Text = algTask.MainUI_Algorithm.desc
-            MainToolStrip.Refresh()
-
-            algTask.calibData = camera.calibData
-
-            If CameraSwitching.Visible Then
-                CamSwitchTimer.Enabled = False
-                CameraSwitching.Visible = False
-            End If
-        End Sub
         Private Sub getLineCounts()
             Dim countFileInfo = New FileInfo(homeDir + "Data/AlgorithmCounts.txt")
             If countFileInfo.Exists = False Then
@@ -265,26 +236,6 @@ Namespace MainUI
             End If
             testAllRunning = TestAllTimer.Enabled
         End Sub
-        Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
-            settings.algorithm = AvailableAlgorithms.Text
-            SaveSettings()
-            If algTask Is Nothing Then
-                startAlgorithm()
-            Else
-                If Trim(AvailableAlgorithms.Text) = "" Then ' Skip the space between groups
-                    If AvailableAlgorithms.SelectedIndex + 1 < AvailableAlgorithms.Items.Count Then
-                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1)
-                    Else
-                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex - 1)
-                    End If
-                End If
-
-                If AvailableAlgorithms.Enabled Then
-                    startAlgorithm()
-                    updateAlgorithmHistory()
-                End If
-            End If
-        End Sub
         Private Sub clickPic(sender As Object, e As EventArgs)
             If algTask Is Nothing Then Exit Sub
             'If algTask IsNot Nothing Then  if algTask.sharpgl IsNot Nothing Then sharpGL.Activate()
@@ -334,12 +285,8 @@ Namespace MainUI
 
             isPlaying = Not isPlaying
 
-            If PausePlayButton.Image IsNot Nothing Then PausePlayButton.Image.Dispose()
-
             Dim filePath = Path.Combine(homeDir + "\Main\Data", If(isPlaying, "PauseButton.png", "Run.png"))
             PausePlayButton.Image = New Bitmap(filePath)
-
-            PausePlayButton.Invalidate()
 
             If isPlaying Then StartCamera() Else StopCamera()
             setAlgorithmSelection()
@@ -353,14 +300,14 @@ Namespace MainUI
 
 
 
-            If algTask.dstList(1).Type <> cv.MatType.CV_8UC3 Then
-                algTask.dstList(1) = New cv.Mat(algTask.workRes, cv.MatType.CV_8UC3, 0)
-            End If
+            'If algTask.dstList(1).Type <> cv.MatType.CV_8UC3 Then
+            '    algTask.dstList(1) = New cv.Mat(algTask.workRes, cv.MatType.CV_8UC3, 0)
+            'End If
+            'Dim displayImage = algTask.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
 
 
 
-
-            Dim displayImage = algTask.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+            Dim displayImage As New cv.Mat(New cv.Size(settings.displayRes.Width, settings.displayRes.Height), cv.MatType.CV_8UC3, 0)
 
             Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
             pic.Image?.Dispose()
@@ -382,6 +329,7 @@ Namespace MainUI
                                      CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
                 End If
             Next
+            displayImage.Dispose()
         End Sub
 
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
@@ -407,5 +355,61 @@ Namespace MainUI
             If algTask Is Nothing Then Exit Sub
             If algTask.treeView IsNot Nothing Then algTask.treeView.Timer2_Tick(sender, e)
         End Sub
+
+        Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+            Debug.WriteLine("test timer.")
+        End Sub
+        Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
+            settings.algorithm = AvailableAlgorithms.Text
+            SaveSettings()
+            If algTask Is Nothing Then
+                startAlgorithm()
+            Else
+                If Trim(AvailableAlgorithms.Text) = "" Then ' Skip the space between groups
+                    If AvailableAlgorithms.SelectedIndex + 1 < AvailableAlgorithms.Items.Count Then
+                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1)
+                    Else
+                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex - 1)
+                    End If
+                End If
+
+                If AvailableAlgorithms.Enabled Then
+                    startAlgorithm()
+                    updateAlgorithmHistory()
+                End If
+            End If
+        End Sub
+        Private Sub startAlgorithm()
+            If algTask IsNot Nothing Then algTask.Dispose()
+
+            algTask = New VBClasses.VBtask()
+
+            'algTask.homeDir = homeDir
+            'algTask.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
+            'algTask.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
+            'algTask.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
+            'algTask.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
+            'For i = 0 To 3
+            '    algTask.dstList(i) = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
+            'Next
+            'algTask.gridRatioX = pics(0).Width / settings.workRes.Width
+            'algTask.gridRatioY = pics(0).Height / settings.workRes.Height
+
+            'algTask.settings = settings ' algTask is in a separate project and needs access to settings.
+            'algTask.main_hwnd = Me.Handle
+
+            'algTask.Initialize()
+            'algTask.MainUI_Algorithm = createAlgorithm(settings.algorithm)
+            'AlgDescription.Text = algTask.MainUI_Algorithm.desc
+            'MainToolStrip.Refresh()
+
+            'If algTask.calibData IsNot Nothing Then algTask.calibData = camera.calibData
+
+            'If CameraSwitching.Visible Then
+            '    CamSwitchTimer.Enabled = False
+            '    CameraSwitching.Visible = False
+            'End If
+        End Sub
+
     End Class
 End Namespace

@@ -133,11 +133,6 @@ Namespace MainUI
             IMU_Acceleration.Z *= -1
             IMU_FrameTime = timeStamp - initialTime
 
-            If color Is Nothing Then color = New cv.Mat(workRes, cv.MatType.CV_8UC3, 0)
-            If leftView Is Nothing Then leftView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
-            If rightView Is Nothing Then rightView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
-            If pointCloud Is Nothing Then pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
-
             If workRes.Width = captureRes.Width Then
                 camImages.images(0) = color.Clone
                 camImages.images(1) = pointCloud.Clone

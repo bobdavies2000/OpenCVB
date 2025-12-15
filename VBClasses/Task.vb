@@ -69,7 +69,7 @@ Public Class VBtask : Implements IDisposable
     Public algorithmTimes As New List(Of DateTime)
     Public algorithmStack As New Stack()
     Public displayObjectName As String
-    Public activeObjects As New List(Of Object)
+    Public activeObjects As List(Of Object)
     Public calibData As Object
 
     Public fpsAlgorithm As Single
@@ -331,11 +331,11 @@ Public Class VBtask : Implements IDisposable
     End Sub
     Public Sub New()
         algTask = Me
-        Randomize() ' just in case anyone uses VB.Net's Rnd
-        gridRects = New List(Of cv.Rect)
-        optionsChanged = True
-        firstPass = True
-        useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve algTask.results..
+        'Randomize() ' just in case anyone uses VB.Net's Rnd
+        'gridRects = New List(Of cv.Rect)
+        'optionsChanged = True
+        'firstPass = True
+        'useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve algTask.results..
     End Sub
     Public Sub Initialize()
         rgbLeftAligned = True

@@ -122,11 +122,6 @@ Namespace MainUI
                 Dim pcFrame = ptcloud.Process(alignedFrames.DepthFrame)
                 pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcFrame.Data)
 
-                If color Is Nothing Then color = New cv.Mat(workRes, cv.MatType.CV_8UC3)
-                If leftView Is Nothing Then leftView = New cv.Mat(workRes, cv.MatType.CV_8UC3)
-                If rightView Is Nothing Then rightView = New cv.Mat(workRes, cv.MatType.CV_8UC3)
-                If pointCloud Is Nothing Then pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3)
-
                 camImages.images(0) = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 camImages.images(1) = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 camImages.images(2) = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness

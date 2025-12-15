@@ -47,6 +47,7 @@ Namespace MainUI
             fpsTimer = New Timer(components)
             TestAllTimer = New Timer(components)
             TreeViewTimer = New Timer(components)
+            Timer1 = New Timer(components)
             MainToolStrip.SuspendLayout()
             SuspendLayout()
             ' 
@@ -219,11 +220,17 @@ Namespace MainUI
             ' 
             ' TestAllTimer
             ' 
+            TestAllTimer.Interval = 1
             ' 
             ' TreeViewTimer
             ' 
             TreeViewTimer.Enabled = True
             TreeViewTimer.Interval = 1
+            ' 
+            ' Timer1
+            ' 
+            Timer1.Enabled = True
+            Timer1.Interval = 10
             ' 
             ' MainUI
             ' 
@@ -269,6 +276,7 @@ Namespace MainUI
         Friend WithEvents fpsTimer As Timer
         Friend WithEvents TestAllTimer As Timer
         Friend WithEvents TreeViewTimer As Timer
+        Friend WithEvents Timer1 As Timer
 
     End Class
 End Namespace
