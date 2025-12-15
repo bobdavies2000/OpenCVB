@@ -64,17 +64,20 @@ Namespace MainUI
                           sender.camImages.images(2).CopyTo(algTask.leftView)
                           sender.camImages.images(3).CopyTo(algTask.rightView)
 
-                          Dim displayImage = algTask.color.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
-                          Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
-                          picImages(0) = bitmap
+                          algTask.RunAlgorithm()
+                          algTask.mouseClickFlag = False
 
-                          'algTask.RunAlgorithm()
-                          'algTask.mouseClickFlag = False
-                          'If releaseImages() Then
-                          '    For i = 0 To algTask.labels.Count - 1
-                          '        labels(i).Text = algTask.labels(i)
-                          '    Next
-                          'End If
+                          For i = 0 To 3
+                              Dim displayImage = algTask.dstList(i).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+                              Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
+                              picImages(i) = bitmap
+                          Next
+
+                          If releaseImages() Then
+                              For i = 0 To algTask.labels.Count - 1
+                                  labels(i).Text = algTask.labels(i)
+                              Next
+                          End If
                           ' Me.Refresh()
                       End Sub)
         End Sub

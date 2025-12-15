@@ -306,14 +306,16 @@ Namespace MainUI
                 Case 0
                     displayImage = algTask.color.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
                 Case 1
-                    displayImage = algTask.color.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+                    If algTask.depthRGB IsNot Nothing Then
+                        displayImage = algTask.depthRGB.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+                    End If
                 Case 2
                     displayImage = algTask.leftView.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
                 Case 3
                     displayImage = algTask.rightView.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
             End Select
 
-            g.DrawImage(picImages(0), 0, 0)
+            g.DrawImage(picImages(pic.Tag), 0, 0)
 
             Dim ratioX = pic.Width / settings.workRes.Width
             Dim ratioY = pic.Height / settings.workRes.Height
@@ -357,10 +359,8 @@ Namespace MainUI
             If algTask.treeView IsNot Nothing Then algTask.treeView.Timer2_Tick(sender, e)
         End Sub
 
-        Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-            Static count As Integer
-            Debug.WriteLine("test timer " + CStr(count))
-            count += 1
+        Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
+            Me.Refresh() ' set to trigger a refresh every 33 ms...
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
             settings.algorithm = AvailableAlgorithms.Text
