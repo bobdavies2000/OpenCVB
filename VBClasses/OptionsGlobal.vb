@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
+Imports VBClasses.VBClasses
 Public Class OptionsGlobal
     Public pixelDiffThreshold As Integer
     Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
-    Public heartBeatSeconds = 1
     Public trackingLabel As String
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = algTask.allOptions

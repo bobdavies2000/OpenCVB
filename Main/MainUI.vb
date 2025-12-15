@@ -1,7 +1,7 @@
 Imports System.IO
 Imports System.Text.RegularExpressions
 Imports System.Threading
-Imports VBClasses
+Imports VBClasses.VBClasses.vbc
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 
@@ -13,8 +13,8 @@ Namespace MainUI
         Dim algHistory As New List(Of String)
         Dim recentMenu() As ToolStripMenuItem
         Dim labels As List(Of Label)
-        Public algTask As VBClasses.VBtask
         Dim pics As New List(Of PictureBox)
+        Dim picImages As New List(Of Image)
         Dim testAllRunning As Boolean = False
         Dim stopTestAll As Bitmap
         Dim PausePlay As Bitmap
@@ -137,12 +137,14 @@ Namespace MainUI
         Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             If isPlaying Then
                 StopCamera()
+                Dim count As Integer
                 While camera IsNot Nothing
                     Thread.Sleep(1)
+                    count += 1
+                    If count = 10 Then Exit While
                 End While
             End If
             SaveSettings()
-            StopCamera()
         End Sub
         Private Sub getLineCounts()
             Dim countFileInfo = New FileInfo(homeDir + "Data/AlgorithmCounts.txt")
@@ -254,12 +256,13 @@ Namespace MainUI
                 Dim pic = New PictureBox()
                 AddHandler pic.DoubleClick, AddressOf campic_DoubleClick
                 AddHandler pic.Click, AddressOf clickPic
-                AddHandler pic.Paint, AddressOf paintPic
+                AddHandler pic.Paint, AddressOf Pic_Paint
                 AddHandler pic.MouseDown, AddressOf CamPic_MouseDown
                 AddHandler pic.MouseUp, AddressOf CamPic_MouseUp
                 AddHandler pic.MouseMove, AddressOf CamPic_MouseMove
                 pic.Tag = i
-                pic.Image = New Bitmap(200, 200)
+                pic.Image = New Bitmap(settings.displayRes.Width, settings.displayRes.Height)
+                picImages.Add(pic.Image)
                 pic.BackColor = Color.Black
                 pic.Visible = True
                 Me.Controls.Add(pic)
@@ -291,28 +294,35 @@ Namespace MainUI
             If isPlaying Then StartCamera() Else StopCamera()
             setAlgorithmSelection()
         End Sub
-        Private Sub paintPic(sender As Object, e As PaintEventArgs)
+        Private Sub Pic_Paint(sender As Object, e As PaintEventArgs)
             If algTask Is Nothing Then Exit Sub
             Dim g As Graphics = e.Graphics
             Dim pic = DirectCast(sender, PictureBox)
             If pic.Image Is Nothing Then Exit Sub
             g.ScaleTransform(1, 1)
 
+            Dim displayImage As New cv.Mat
+            Select Case pic.Tag
+                Case 0
+                    displayImage = algTask.color.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+                Case 1
+                    displayImage = algTask.color.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+                Case 2
+                    displayImage = algTask.leftView.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+                Case 3
+                    displayImage = algTask.rightView.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+            End Select
+
+            'Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
+            'pic.Image?.Dispose()
+            'pic.Image = bitmap
+            'g.DrawImage(pic.Image, 0, 0)
+            g.DrawImage(picImages(0), 0, 0)
 
 
-            'If algTask.dstList(1).Type <> cv.MatType.CV_8UC3 Then
-            '    algTask.dstList(1) = New cv.Mat(algTask.workRes, cv.MatType.CV_8UC3, 0)
-            'End If
-            'Dim displayImage = algTask.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+            cv.Cv2.ImShow("displayimage", displayImage)
 
 
-
-            Dim displayImage As New cv.Mat(New cv.Size(settings.displayRes.Width, settings.displayRes.Height), cv.MatType.CV_8UC3, 0)
-
-            Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
-            pic.Image?.Dispose()
-            pic.Image = bitmap
-            g.DrawImage(pic.Image, 0, 0)
 
             Dim ratioX = pic.Width / settings.workRes.Width
             Dim ratioY = pic.Height / settings.workRes.Height
@@ -320,8 +330,8 @@ Namespace MainUI
             Static myWhitePen As New Pen(Color.White)
             Static myBlackPen As New Pen(Color.Black)
 
-            Static saveTrueData As List(Of TrueText)
-            saveTrueData = New List(Of TrueText)(algTask.trueData)
+            Static saveTrueData As List(Of VBClasses.VBClasses.TrueText)
+            saveTrueData = New List(Of VBClasses.VBClasses.TrueText)(algTask.trueData)
             For Each tt In saveTrueData
                 If tt.text Is Nothing Then Continue For
                 If tt.text.Length > 0 And tt.picTag = pic.Tag Then
@@ -357,7 +367,9 @@ Namespace MainUI
         End Sub
 
         Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-            Debug.WriteLine("test timer.")
+            Static count As Integer
+            Debug.WriteLine("test timer " + CStr(count))
+            count += 1
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
             settings.algorithm = AvailableAlgorithms.Text
@@ -380,35 +392,33 @@ Namespace MainUI
             End If
         End Sub
         Private Sub startAlgorithm()
-            If algTask IsNot Nothing Then algTask.Dispose()
+            ' If algTask IsNot Nothing Then algTask.Dispose()
 
-            algTask = New VBClasses.VBtask()
 
-            'algTask.homeDir = homeDir
-            'algTask.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
-            'algTask.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
-            'algTask.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
-            'algTask.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
-            'For i = 0 To 3
-            '    algTask.dstList(i) = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
-            'Next
-            'algTask.gridRatioX = pics(0).Width / settings.workRes.Width
-            'algTask.gridRatioY = pics(0).Height / settings.workRes.Height
+            algTask = New VBClasses.VBClasses.AlgorithmTask
 
-            'algTask.settings = settings ' algTask is in a separate project and needs access to settings.
-            'algTask.main_hwnd = Me.Handle
+            algTask.homeDir = homeDir
+            algTask.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
+            algTask.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
+            algTask.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
+            algTask.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
+            algTask.gridRatioX = pics(0).Width / settings.workRes.Width
+            algTask.gridRatioY = pics(0).Height / settings.workRes.Height
 
-            'algTask.Initialize()
-            'algTask.MainUI_Algorithm = createAlgorithm(settings.algorithm)
-            'AlgDescription.Text = algTask.MainUI_Algorithm.desc
-            'MainToolStrip.Refresh()
+            algTask.settings = settings ' algTask is in a separate project and needs access to settings.
+            algTask.main_hwnd = Me.Handle
 
-            'If algTask.calibData IsNot Nothing Then algTask.calibData = camera.calibData
+            algTask.Initialize()
+            algTask.MainUI_Algorithm = createAlgorithm(settings.algorithm)
+            AlgDescription.Text = algTask.MainUI_Algorithm.desc
+            MainToolStrip.Refresh()
 
-            'If CameraSwitching.Visible Then
-            '    CamSwitchTimer.Enabled = False
-            '    CameraSwitching.Visible = False
-            'End If
+            If algTask.calibData IsNot Nothing Then algTask.calibData = camera.calibData
+
+            If CameraSwitching.Visible Then
+                CamSwitchTimer.Enabled = False
+                CameraSwitching.Visible = False
+            End If
         End Sub
 
     End Class

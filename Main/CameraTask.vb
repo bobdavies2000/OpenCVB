@@ -1,5 +1,6 @@
 Imports cv = OpenCvSharp
-Imports System.Threading
+Imports cvext = OpenCvSharp.Extensions
+Imports VBClasses.VBClasses.vbc
 Namespace MainUI
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
@@ -33,12 +34,12 @@ Namespace MainUI
             fpsTimer.Enabled = True
         End Sub
         Private Sub StopCamera()
-            RemoveHandler camera.FrameReady, AddressOf Camera_FrameReady
+
+            ' RemoveHandler camera.FrameReady, AddressOf Camera_FrameReady
 
             If camera Is Nothing Then Exit Sub
             camera.childStopCamera()
             camera.isCapturing = False
-            camera = Nothing
         End Sub
         Private Function releaseImages() As Boolean
             If algTask.debugSyncUI Then
@@ -56,14 +57,16 @@ Namespace MainUI
         End Function
         Private Sub Camera_FrameReady(sender As GenericCamera)
             If algTask Is Nothing Then Exit Sub
-            If testImage Is Nothing Then testImage = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
 
             Me.Invoke(Sub()
-                          sender.camImages.images(0).CopyTo(testImage)
-                          'sender.camImages.images(0).CopyTo(algTask.color)
-                          'sender.camImages.images(1).CopyTo(algTask.pointCloud)
-                          'sender.camImages.images(2).CopyTo(algTask.leftView)
-                          'sender.camImages.images(3).CopyTo(algTask.rightView)
+                          sender.camImages.images(0).CopyTo(algTask.color)
+                          sender.camImages.images(1).CopyTo(algTask.pointCloud)
+                          sender.camImages.images(2).CopyTo(algTask.leftView)
+                          sender.camImages.images(3).CopyTo(algTask.rightView)
+
+                          Dim displayImage = algTask.color.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+                          Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
+                          picImages(0) = bitmap
 
                           'algTask.RunAlgorithm()
                           'algTask.mouseClickFlag = False
@@ -72,7 +75,7 @@ Namespace MainUI
                           '        labels(i).Text = algTask.labels(i)
                           '    Next
                           'End If
-                          'Me.Refresh()
+                          ' Me.Refresh()
                       End Sub)
         End Sub
     End Class

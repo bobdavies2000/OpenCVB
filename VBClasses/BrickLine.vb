@@ -1,78 +1,79 @@
 ﻿Imports cv = OpenCvSharp
-Public Class BrickLine_Basics : Inherits TaskParent
-    Dim hist As New Hist_GridCell
-    Public edgeRequest As Boolean
-    Public options As New Options_Features
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        labels(2) = "Use 'Selected Feature' in 'Options_Features' to highlight different edges."
-        desc = "Given lines or edges, build a grid of cells that cover them."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
+Namespace VBClasses
+    Public Class BrickLine_Basics : Inherits TaskParent
+        Dim hist As New Hist_GridCell
+        Public edgeRequest As Boolean
+        Public options As New Options_Features
+        Public Sub New()
+            If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
+            labels(2) = "Use 'Selected Feature' in 'Options_Features' to highlight different edges."
+            desc = "Given lines or edges, build a grid of cells that cover them."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        If standalone Or edgeRequest Then
-            Static contour As New Contour_RotateRect
-            contour.Run(algTask.grayStable)
-            src = contour.dst1.Clone
-        End If
+            If standalone Or edgeRequest Then
+                Static contour As New Contour_RotateRect
+                contour.Run(algTask.grayStable)
+                src = contour.dst1.Clone
+            End If
 
-        dst2 = PaletteBlackZero(src)
-        dst3 = dst2.Clone
+            dst2 = PaletteBlackZero(src)
+            dst3 = dst2.Clone
 
-        Dim mm = GetMinMax(src)
-        Dim featList As New List(Of List(Of Integer))
-        For i = 0 To mm.maxVal ' the 0th entry is a placeholder for the background and will have 0 entries.
-            featList.Add(New List(Of Integer))
-        Next
-
-        For Each brick In algTask.bricks.brickList
-            hist.Run(src(brick.rect))
-            For i = 1 To hist.histarray.Count - 1
-                If hist.histarray(i) > 0 Then
-                    featList(i).Add(brick.index)
-                End If
-            Next
-        Next
-
-        Dim edgeSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To mm.maxVal
-            edgeSorted.Add(featList(i).Count, i)
-        Next
-
-        algTask.featList.Clear()
-        For Each index In edgeSorted.Values
-            If featList(index).Count > 0 Then algTask.featList.Add(featList(index))
-        Next
-
-        Dim edgeIndex = Math.Abs(algTask.gOptions.DebugSlider.Value)
-        If edgeIndex <> 0 And edgeIndex < algTask.featList.Count Then
-            For Each index In algTask.featList(edgeIndex)
-                Dim brick = algTask.bricks.brickList(index)
-                dst2.Rectangle(brick.rect, algTask.highlight, algTask.lineWidth)
-            Next
-        End If
-
-        For i = 0 To algTask.featList.Count - 1
-            If i <> Math.Abs(algTask.gOptions.DebugSlider.Value) Then Continue For
-            Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
-            For Each index In algTask.featList(i)
-                Dim brick = algTask.bricks.brickList(index)
-                depthSorted.Add(brick.depth, index)
+            Dim mm = GetMinMax(src)
+            Dim featList As New List(Of List(Of Integer))
+            For i = 0 To mm.maxVal ' the 0th entry is a placeholder for the background and will have 0 entries.
+                featList.Add(New List(Of Integer))
             Next
 
-            Dim lastDepth = depthSorted.ElementAt(0).Key
-            For Each ele In depthSorted
-                If Math.Abs(ele.Key - lastDepth) > algTask.depthDiffMeters Then
-                    Dim brick = algTask.bricks.brickList(ele.Value)
-                    dst2.Rectangle(brick.rect, red, algTask.lineWidth + 1)
-                End If
-                lastDepth = ele.Key
+            For Each brick In algTask.bricks.brickList
+                hist.Run(src(brick.rect))
+                For i = 1 To hist.histarray.Count - 1
+                    If hist.histarray(i) > 0 Then
+                        featList(i).Add(brick.index)
+                    End If
+                Next
             Next
-        Next
-        labels(3) = CStr(algTask.featList.Count) + " features are present in the input lines or edges"
-    End Sub
-End Class
+
+            Dim edgeSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+            For i = 0 To mm.maxVal
+                edgeSorted.Add(featList(i).Count, i)
+            Next
+
+            algTask.featList.Clear()
+            For Each index In edgeSorted.Values
+                If featList(index).Count > 0 Then algTask.featList.Add(featList(index))
+            Next
+
+            Dim edgeIndex = Math.Abs(algTask.gOptions.DebugSlider.Value)
+            If edgeIndex <> 0 And edgeIndex < algTask.featList.Count Then
+                For Each index In algTask.featList(edgeIndex)
+                    Dim brick = algTask.bricks.brickList(index)
+                    dst2.Rectangle(brick.rect, algTask.highlight, algTask.lineWidth)
+                Next
+            End If
+
+            For i = 0 To algTask.featList.Count - 1
+                If i <> Math.Abs(algTask.gOptions.DebugSlider.Value) Then Continue For
+                Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
+                For Each index In algTask.featList(i)
+                    Dim brick = algTask.bricks.brickList(index)
+                    depthSorted.Add(brick.depth, index)
+                Next
+
+                Dim lastDepth = depthSorted.ElementAt(0).Key
+                For Each ele In depthSorted
+                    If Math.Abs(ele.Key - lastDepth) > algTask.depthDiffMeters Then
+                        Dim brick = algTask.bricks.brickList(ele.Value)
+                        dst2.Rectangle(brick.rect, red, algTask.lineWidth + 1)
+                    End If
+                    lastDepth = ele.Key
+                Next
+            Next
+            labels(3) = CStr(algTask.featList.Count) + " features are present in the input lines or edges"
+        End Sub
+    End Class
 
 
 
@@ -80,237 +81,238 @@ End Class
 
 
 
-Public Class BrickLine_Edges : Inherits TaskParent
-    Dim findCells As New BrickLine_Basics
-    Public Sub New()
-        findCells.edgeRequest = True
-        labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different edges."
-        desc = "Find the cells containing edges."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        findCells.Run(algTask.grayStable)
-        dst2 = findCells.dst2
-        dst3 = findCells.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class BrickLine_DepthGap : Inherits TaskParent
-    Dim findCells As New BrickLine_Basics
-    Public Sub New()
-        labels(2) = "Cells highlighted below have a significant gap in depth from their neighbors."
-        desc = "Find cells mapping the edges/lines which are not near any other cell - they are neighboring edges/lines but not in depth."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If standalone Then
+    Public Class BrickLine_Edges : Inherits TaskParent
+        Dim findCells As New BrickLine_Basics
+        Public Sub New()
             findCells.edgeRequest = True
+            labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different edges."
+            desc = "Find the cells containing edges."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
             findCells.Run(algTask.grayStable)
-        Else
-            findCells.Run(src)
-        End If
+            dst2 = findCells.dst2
+            dst3 = findCells.dst3
+        End Sub
+    End Class
 
-        Dim gapCells As New List(Of Integer)
-        For i = 0 To algTask.featList.Count - 1
-            If algTask.featList(i).Count = 0 Then Exit For
-            Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
-            For Each index In algTask.featList(i)
-                Dim brick = algTask.bricks.brickList(index)
-                depthSorted.Add(brick.depth, index)
+
+
+
+
+
+
+
+    Public Class BrickLine_DepthGap : Inherits TaskParent
+        Dim findCells As New BrickLine_Basics
+        Public Sub New()
+            labels(2) = "Cells highlighted below have a significant gap in depth from their neighbors."
+            desc = "Find cells mapping the edges/lines which are not near any other cell - they are neighboring edges/lines but not in depth."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then
+                findCells.edgeRequest = True
+                findCells.Run(algTask.grayStable)
+            Else
+                findCells.Run(src)
+            End If
+
+            Dim gapCells As New List(Of Integer)
+            For i = 0 To algTask.featList.Count - 1
+                If algTask.featList(i).Count = 0 Then Exit For
+                Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
+                For Each index In algTask.featList(i)
+                    Dim brick = algTask.bricks.brickList(index)
+                    depthSorted.Add(brick.depth, index)
+                Next
+
+                Dim lastDepth = depthSorted.ElementAt(0).Key
+                For Each ele In depthSorted
+                    If Math.Abs(ele.Key - lastDepth) > algTask.depthDiffMeters Then gapCells.Add(algTask.bricks.brickList(ele.Value).index)
+                    lastDepth = ele.Key
+                Next
             Next
 
-            Dim lastDepth = depthSorted.ElementAt(0).Key
-            For Each ele In depthSorted
-                If Math.Abs(ele.Key - lastDepth) > algTask.depthDiffMeters Then gapCells.Add(algTask.bricks.brickList(ele.Value).index)
-                lastDepth = ele.Key
+            If algTask.heartBeat Then
+                dst2 = findCells.dst2.Clone
+                Dim debugMode = algTask.gOptions.DebugSlider.Value <> 0
+                For i = 0 To gapCells.Count - 1
+                    If debugMode Then If i <> Math.Abs(algTask.gOptions.DebugSlider.Value) Then Continue For
+                    Dim brick = algTask.bricks.brickList(gapCells(i))
+                    dst2.Rectangle(brick.rect, algTask.highlight, algTask.lineWidth)
+                    If i = Math.Abs(algTask.gOptions.DebugSlider.Value) Then
+                        SetTrueText(Format(brick.depth, fmt1), brick.rect.BottomRight)
+                    End If
+                Next
+            End If
+            labels(3) = CStr(algTask.featList.Count) + " features are present in the input lines or edges"
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class BrickLine_DepthGaps : Inherits TaskParent
+        Dim findCells As New BrickLine_DepthGap
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
+            desc = "Find cells that have a gap in depth from their neighbors."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst1.SetTo(0)
+            For Each lp In algTask.lines.lpList
+                dst1.Line(lp.p1, lp.p2, lp.index, algTask.lineWidth, cv.LineTypes.Link8)
             Next
-        Next
 
-        If algTask.heartBeat Then
-            dst2 = findCells.dst2.Clone
-            Dim debugMode = algTask.gOptions.DebugSlider.Value <> 0
-            For i = 0 To gapCells.Count - 1
-                If debugMode Then If i <> Math.Abs(algTask.gOptions.DebugSlider.Value) Then Continue For
-                Dim brick = algTask.bricks.brickList(gapCells(i))
-                dst2.Rectangle(brick.rect, algTask.highlight, algTask.lineWidth)
-                If i = Math.Abs(algTask.gOptions.DebugSlider.Value) Then
-                    SetTrueText(Format(brick.depth, fmt1), brick.rect.BottomRight)
-                End If
+            findCells.Run(dst1)
+            dst2 = findCells.dst2
+            dst3 = findCells.dst3
+            labels = findCells.labels
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class BrickLine_Lines : Inherits TaskParent
+        Dim findCells As New BrickLine_Basics
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
+            desc = "Find the cells containing lines."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst1.SetTo(0)
+            For Each lp In algTask.lines.lpList
+                dst1.Line(lp.p1, lp.p2, lp.index, algTask.lineWidth, cv.LineTypes.Link8)
             Next
-        End If
-        labels(3) = CStr(algTask.featList.Count) + " features are present in the input lines or edges"
-    End Sub
-End Class
+
+            findCells.Run(dst1)
+            dst2 = findCells.dst2
+            dst3 = findCells.dst3
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class BrickLine_DepthGaps : Inherits TaskParent
-    Dim findCells As New BrickLine_DepthGap
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
-        desc = "Find cells that have a gap in depth from their neighbors."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1.SetTo(0)
-        For Each lp In algTask.lines.lpList
-            dst1.Line(lp.p1, lp.p2, lp.index, algTask.lineWidth, cv.LineTypes.Link8)
-        Next
-
-        findCells.Run(dst1)
-        dst2 = findCells.dst2
-        dst3 = findCells.dst3
-        labels = findCells.labels
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class BrickLine_Lines : Inherits TaskParent
-    Dim findCells As New BrickLine_Basics
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Use the 'Feature' option 'Selected Feature' to highlight different lines."
-        desc = "Find the cells containing lines."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1.SetTo(0)
-        For Each lp In algTask.lines.lpList
-            dst1.Line(lp.p1, lp.p2, lp.index, algTask.lineWidth, cv.LineTypes.Link8)
-        Next
-
-        findCells.Run(dst1)
-        dst2 = findCells.dst2
-        dst3 = findCells.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class BrickLine_EdgesNoEdges : Inherits TaskParent
-    Public edges As New List(Of Integer)
-    Public noEdges As New List(Of Integer)
-    Dim edgeline As New EdgeLine_Basics
-    Public Sub New()
-        desc = "Define each brick according to whether it has edges or not.  Ignore peripheral bricks..."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        edgeline.Run(algTask.grayStable)
-        dst2 = src.Clone
-        dst3 = src.Clone
-        edges.Clear()
-        noEdges.Clear()
-        For i = 0 To algTask.gridRects.Count - 1
-            Dim r = algTask.gridRects(i)
-            If r.X = 0 Then Continue For
-            If r.X + r.Width = dst2.Width Then Continue For
-            If r.Y = 0 Then Continue For
-            If r.Y + r.Height = dst2.Height Then Continue For
-            If edgeline.dst2(r).CountNonZero Then edges.Add(i) Else noEdges.Add(i)
-        Next
-
-        If standaloneTest() Then
-            For Each index In edges
-                DrawRect(dst2, algTask.gridRects(index), white)
+    Public Class BrickLine_EdgesNoEdges : Inherits TaskParent
+        Public edges As New List(Of Integer)
+        Public noEdges As New List(Of Integer)
+        Dim edgeline As New EdgeLine_Basics
+        Public Sub New()
+            desc = "Define each brick according to whether it has edges or not.  Ignore peripheral bricks..."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            edgeline.Run(algTask.grayStable)
+            dst2 = src.Clone
+            dst3 = src.Clone
+            edges.Clear()
+            noEdges.Clear()
+            For i = 0 To algTask.gridRects.Count - 1
+                Dim r = algTask.gridRects(i)
+                If r.X = 0 Then Continue For
+                If r.X + r.Width = dst2.Width Then Continue For
+                If r.Y = 0 Then Continue For
+                If r.Y + r.Height = dst2.Height Then Continue For
+                If edgeline.dst2(r).CountNonZero Then edges.Add(i) Else noEdges.Add(i)
             Next
-            For Each index In noEdges
-                DrawRect(dst3, algTask.gridRects(index), white)
+
+            If standaloneTest() Then
+                For Each index In edges
+                    DrawRect(dst2, algTask.gridRects(index), white)
+                Next
+                For Each index In noEdges
+                    DrawRect(dst3, algTask.gridRects(index), white)
+                Next
+            End If
+
+            dst3.SetTo(white, edgeline.dst2)
+            labels(2) = CStr(edges.Count) + " bricks had edges"
+            labels(3) = CStr(noEdges.Count) + " bricks were featureless"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class BrickLine_LeftRight : Inherits TaskParent
+        Dim edges As New EdgeLine_LeftRight
+        Dim fLess As New BrickLine_EdgesNoEdges
+        Dim mats As New Mat_4Click
+        Public bestBricks As New List(Of Integer)
+        Dim edgeline As New EdgeLine_Basics
+        Public Sub New()
+            labels(1) = "Left edges, right edges, bricks with left image edges, bricks with right image edges"
+            labels(2) = "The cells below have depth and good correlation left to right"
+            desc = "Display a line in both the left and right images using the bricks that contain the line"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            edges.Run(src)
+            mats.mat(0) = edges.dst2.Clone
+            mats.mat(1) = edges.dst3.Clone
+
+            fLess.Run(edges.dst2)
+            mats.mat(2) = fLess.dst2.Clone
+            Dim leftEdges As New List(Of Integer)(fLess.edges)
+            For Each index In leftEdges
+                DrawRect(mats.mat(2), algTask.gridRects(index), white)
             Next
-        End If
 
-        dst3.SetTo(white, edgeline.dst2)
-        labels(2) = CStr(edges.Count) + " bricks had edges"
-        labels(3) = CStr(noEdges.Count) + " bricks were featureless"
-    End Sub
-End Class
+            edgeline.Run(edges.dst3)
+            fLess.Run(edgeline.dst2)
+            mats.mat(3) = fLess.dst2.Clone
+            Dim rightEdges As New List(Of Integer)(fLess.edges)
+            For Each index In rightEdges
+                DrawRect(mats.mat(3), algTask.gridRects(index), white)
+            Next
 
+            '  mats.Run(emptyMat)
 
+            dst2 = algTask.leftView
+            dst3 = algTask.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            Dim correlationMat As New cv.Mat
+            bestBricks.Clear()
+            For Each index In leftEdges
+                Dim brick As New brickData
+                brick.rect = algTask.gridRects(index)
 
+                ' too close to the edges of the image
+                If algTask.gridNabeRects(index).Width + brick.rect.X + algTask.brickSize * 2 > dst2.Width Then Continue For
+                If algTask.gridNabeRects(index).Height + brick.rect.Y + algTask.brickSize * 2 > dst2.Height Then Continue For
 
+                brick.lRect = brick.rect
+                brick.depth = algTask.pcSplit(2)(brick.rect).Mean()(0)
+                If brick.depth > 0 Then
+                    brick.rRect = brick.rect
+                    brick.rRect.X -= algTask.calibData.baseline * algTask.calibData.rgbIntrinsics.fx / brick.depth
+                    If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then Continue For
 
-Public Class BrickLine_LeftRight : Inherits TaskParent
-    Dim edges As New EdgeLine_LeftRight
-    Dim fLess As New BrickLine_EdgesNoEdges
-    Dim mats As New Mat_4Click
-    Public bestBricks As New List(Of Integer)
-    Dim edgeline As New EdgeLine_Basics
-    Public Sub New()
-        labels(1) = "Left edges, right edges, bricks with left image edges, bricks with right image edges"
-        labels(2) = "The cells below have depth and good correlation left to right"
-        desc = "Display a line in both the left and right images using the bricks that contain the line"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        edges.Run(src)
-        mats.mat(0) = edges.dst2.Clone
-        mats.mat(1) = edges.dst3.Clone
+                    If algTask.rgbLeftAligned = False Then
+                        brick = Brick_Basics.RealSenseAlign(brick)
+                    End If
 
-        fLess.Run(edges.dst2)
-        mats.mat(2) = fLess.dst2.Clone
-        Dim leftEdges As New List(Of Integer)(fLess.edges)
-        For Each index In leftEdges
-            DrawRect(mats.mat(2), algTask.gridRects(index), white)
-        Next
-
-        edgeline.Run(edges.dst3)
-        fLess.Run(edgeline.dst2)
-        mats.mat(3) = fLess.dst2.Clone
-        Dim rightEdges As New List(Of Integer)(fLess.edges)
-        For Each index In rightEdges
-            DrawRect(mats.mat(3), algTask.gridRects(index), white)
-        Next
-
-        '  mats.Run(emptyMat)
-
-        dst2 = algTask.leftView
-        dst3 = algTask.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        Dim correlationMat As New cv.Mat
-        bestBricks.Clear()
-        For Each index In leftEdges
-            Dim brick As New brickData
-            brick.rect = algTask.gridRects(index)
-
-            ' too close to the edges of the image
-            If algTask.gridNabeRects(index).Width + brick.rect.X + algTask.brickSize * 2 > dst2.Width Then Continue For
-            If algTask.gridNabeRects(index).Height + brick.rect.Y + algTask.brickSize * 2 > dst2.Height Then Continue For
-
-            brick.lRect = brick.rect
-            brick.depth = algTask.pcSplit(2)(brick.rect).Mean()(0)
-            If brick.depth > 0 Then
-                brick.rRect = brick.rect
-                brick.rRect.X -= algTask.calibData.baseline * algTask.calibData.rgbIntrinsics.fx / brick.depth
-                If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then Continue For
-
-                If algTask.rgbLeftAligned = False Then
-                    brick = Brick_Basics.RealSenseAlign(brick)
-                End If
-
-                cv.Cv2.MatchTemplate(algTask.leftView(brick.lRect), algTask.rightView(brick.rRect), correlationMat,
+                    cv.Cv2.MatchTemplate(algTask.leftView(brick.lRect), algTask.rightView(brick.rRect), correlationMat,
                                      cv.TemplateMatchModes.CCoeffNormed)
 
-                brick.correlation = correlationMat.Get(Of Single)(0, 0)
-                If brick.correlation >= algTask.fCorrThreshold Then
-                    DrawRect(dst2, brick.rect, white)
-                    DrawRect(dst3, brick.rRect, red)
-                    bestBricks.Add(index)
+                    brick.correlation = correlationMat.Get(Of Single)(0, 0)
+                    If brick.correlation >= algTask.fCorrThreshold Then
+                        DrawRect(dst2, brick.rect, white)
+                        DrawRect(dst3, brick.rRect, red)
+                        bestBricks.Add(index)
+                    End If
                 End If
-            End If
-        Next
+            Next
 
-        labels(3) = CStr(bestBricks.Count) + " bricks had lines and correlation >" + Format(algTask.fCorrThreshold, fmt2) + ") or " +
+            labels(3) = CStr(bestBricks.Count) + " bricks had lines and correlation >" + Format(algTask.fCorrThreshold, fmt2) + ") or " +
                   Format(bestBricks.Count / algTask.gridRects.Count, "00%") + " of all the bricks"
-    End Sub
-End Class
+        End Sub
+    End Class
+End Namespace

@@ -1,61 +1,63 @@
 Imports cv = OpenCvSharp
-Public Class Etch_ASketch : Inherits TaskParent
-    Dim keys As Keyboard_Basics
-    Dim slateColor = New cv.Scalar(122, 122, 122)
-    Dim cursor As cv.Point
-    Dim ms_rng As New System.Random
-    Dim options As New Options_Etch_ASketch
-    Dim lastCursor As cv.Point
-    Private Function randomCursor()
-        Dim nextCursor = New cv.Point(ms_rng.Next(0, dst2.Width), ms_rng.Next(0, dst2.Height))
-        lastCursor = nextCursor
-        Return nextCursor
-    End Function
-    Public Sub New()
-        keys = New Keyboard_Basics()
+Namespace VBClasses
+    Public Class Etch_ASketch : Inherits TaskParent
+        Dim keys As Keyboard_Basics
+        Dim slateColor = New cv.Scalar(122, 122, 122)
+        Dim cursor As cv.Point
+        Dim ms_rng As New System.Random
+        Dim options As New Options_Etch_ASketch
+        Dim lastCursor As cv.Point
+        Private Function randomCursor()
+            Dim nextCursor = New cv.Point(ms_rng.Next(0, dst2.Width), ms_rng.Next(0, dst2.Height))
+            lastCursor = nextCursor
+            Return nextCursor
+        End Function
+        Public Sub New()
+            keys = New Keyboard_Basics()
 
-        cursor = randomCursor()
-        dst2.SetTo(slateColor)
-        desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        keys.Run(src)
-        Dim keyIn = New List(Of String)(keys.keyInput)
-
-        If options.demoMode Then
-            keyIn.Clear() ' ignore any keyboard input when in Demo mode.
-            Dim nextKey = Choose(ms_rng.Next(1, 5), "Down", "Up", "Left", "Right")
-            labels(2) = "Etch_ASketch demo mode - moving randomly"
-            For i = 0 To ms_rng.Next(10, 50)
-                keyIn.Add(nextKey)
-            Next
-        Else
-            labels(2) = "Use Up/Down/Left/Right keys to create image"
-        End If
-        If options.cleanMode Then
             cursor = randomCursor()
             dst2.SetTo(slateColor)
-        End If
+            desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        For i = 0 To keyIn.Count - 1
-            Select Case keyIn(i)
-                Case "Down"
-                    cursor.Y += 1
-                Case "Up"
-                    cursor.Y -= 1
-                Case "Left"
-                    cursor.X -= 1
-                Case "Right"
-                    cursor.X += 1
-            End Select
-            If cursor.X < 0 Then cursor.X = 0
-            If cursor.Y < 0 Then cursor.Y = 0
-            If cursor.X >= src.Width Then cursor.X = src.Width - 1
-            If cursor.Y >= src.Height Then cursor.Y = src.Height - 1
-            dst2.Set(Of cv.Vec3b)(cursor.Y, cursor.X, black.ToVec3b)
-        Next
-        If options.demoMode Then lastCursor = cursor
-    End Sub
-End Class
+            keys.Run(src)
+            Dim keyIn = New List(Of String)(keys.keyInput)
+
+            If options.demoMode Then
+                keyIn.Clear() ' ignore any keyboard input when in Demo mode.
+                Dim nextKey = Choose(ms_rng.Next(1, 5), "Down", "Up", "Left", "Right")
+                labels(2) = "Etch_ASketch demo mode - moving randomly"
+                For i = 0 To ms_rng.Next(10, 50)
+                    keyIn.Add(nextKey)
+                Next
+            Else
+                labels(2) = "Use Up/Down/Left/Right keys to create image"
+            End If
+            If options.cleanMode Then
+                cursor = randomCursor()
+                dst2.SetTo(slateColor)
+            End If
+
+            For i = 0 To keyIn.Count - 1
+                Select Case keyIn(i)
+                    Case "Down"
+                        cursor.Y += 1
+                    Case "Up"
+                        cursor.Y -= 1
+                    Case "Left"
+                        cursor.X -= 1
+                    Case "Right"
+                        cursor.X += 1
+                End Select
+                If cursor.X < 0 Then cursor.X = 0
+                If cursor.Y < 0 Then cursor.Y = 0
+                If cursor.X >= src.Width Then cursor.X = src.Width - 1
+                If cursor.Y >= src.Height Then cursor.Y = src.Height - 1
+                dst2.Set(Of cv.Vec3b)(cursor.Y, cursor.X, black.ToVec3b)
+            Next
+            If options.demoMode Then lastCursor = cursor
+        End Sub
+    End Class
+End Namespace

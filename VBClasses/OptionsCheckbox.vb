@@ -1,8 +1,8 @@
-﻿Imports System.Windows.Forms
+﻿Imports VBClasses.VBClasses
 Public Class OptionsCheckbox
     Public Box As New List(Of CheckBox)
     Public Function Setup(traceName As String) As Boolean
-        If OptionParent.findFrm(traceName + " CheckBoxes") IsNot Nothing Then Return False
+        If OptionParent.FindFrm(traceName + " CheckBoxes") IsNot Nothing Then Return False
         Me.MdiParent = algTask.allOptions
         Me.Text = traceName + " CheckBoxes"
         algTask.allOptions.addTitle(Me)

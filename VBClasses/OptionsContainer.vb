@@ -1,4 +1,5 @@
 ﻿Imports cv = OpenCvSharp
+Imports VBClasses.VBClasses.vbc
 Public Class OptionsContainer
     Dim optionsTitle As New List(Of String)
     Public hiddenOptions As New List(Of String)
@@ -43,7 +44,7 @@ Public Class OptionsContainer
             Dim indexO = 1
             Dim indexHide As Integer
             For Each title In optionsTitle
-                Dim frm = OptionParent.FindFrm(title)
+                Dim frm = VBClasses.OptionParent.FindFrm(title)
                 If frm IsNot Nothing Then
                     frm.BringToFront()
                     Dim sidelineOptions As Boolean = True
@@ -116,9 +117,9 @@ Public Class OptionsContainer
                 End If
             Next
         Next
-        algTask.gOptions.Close()
-        algTask.featureOptions.Close()
-        algTask.treeView.Close()
+        VBClasses.algTask.gOptions.Close()
+        VBClasses.algTask.featureOptions.Close()
+        VBClasses.algTask.treeView.Close()
         If algTask.sharpGL IsNot Nothing Then algTask.sharpGL.Close()
         GC.Collect()
     End Sub

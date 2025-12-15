@@ -1,5 +1,4 @@
-﻿Imports System.Windows.Forms
-Imports System.Drawing
+﻿Imports VBClasses.VBClasses
 Public Class OptionsSliders
     Public mytrackbars As New List(Of TrackBar)
     Public myLabels As New List(Of Label)
@@ -8,7 +7,7 @@ Public Class OptionsSliders
     Dim defaultWidth = 600
     Dim algoIndex As Integer
     Public Function Setup(traceName As String) As Boolean
-        If OptionParent.findFrm(traceName + " Sliders") IsNot Nothing Then Return False
+        If OptionParent.FindFrm(traceName + " Sliders") IsNot Nothing Then Return False
         If algTask.allOptions.Text <> "" Then Me.MdiParent = algTask.allOptions
         Me.Text = traceName + " Sliders"
         algTask.allOptions.addTitle(Me)

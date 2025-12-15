@@ -1,136 +1,139 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-Public Class Duster_Basics : Inherits TaskParent
-    Public dust As New Duster_MaskZ
-    Public Sub New()
-        desc = "Removed blowback (stray 3D points between objects) in the pointcloud"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        dust.Run(src)
+Namespace VBClasses
+    Public Class Duster_Basics : Inherits TaskParent
+        Public dust As New Duster_MaskZ
+        Public Sub New()
+            desc = "Removed blowback (stray 3D points between objects) in the pointcloud"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dust.Run(src)
 
-        For i = 1 To dust.classCount
-            Dim mask = dust.dst2.InRange(i, i)
-            Dim depth = algTask.pcSplit(2).Mean(mask)
-            algTask.pcSplit(2).SetTo(depth(0), mask)
-        Next
-
-        cv.Cv2.Merge(algTask.pcSplit, dst2)
-        dst2.SetTo(0, Not dust.dst0)
-        dst2.SetTo(0, algTask.maxDepthMask)
-
-        dst3 = dust.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Duster_MaskZ : Inherits TaskParent
-    Public hist As New Hist_Basics
-    Public classCount As Integer
-    Public options As New Options_GuidedBPDepth
-    Public Sub New()
-        labels(3) = "Any flickering below is from changes in the sorted order of the clusters.  It should not be a problem."
-        desc = "Build a histogram that finds the clusters of depth data"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        options.Run()
-        hist.bins = options.bins
-
-        Dim src32f = algTask.pcSplit(2)
-        algTask.maxDepthMask = src32f.InRange(algTask.MaxZmeters, algTask.MaxZmeters).ConvertScaleAbs()
-        src32f.SetTo(algTask.MaxZmeters, algTask.maxDepthMask)
-
-        hist.fixedRanges = {New cv.Rangef(0.001, algTask.MaxZmeters)}
-        hist.Run(src32f)
-
-        Dim histArray = hist.histArray
-
-        ' this insures that the maxDepthMask is separate from any previous cluster
-        histArray(histArray.Count - 1) = 0
-
-        Dim start As Integer
-        Dim clusters As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
-        Dim lastEntry As Single
-        Dim sampleCount As Integer
-
-        For i = 0 To histArray.Count - 1
-            If histArray(i) > 0 And lastEntry = 0 Then start = i
-            If histArray(i) = 0 And lastEntry > 0 Then
-                clusters.Add(sampleCount, New cv.Vec2i(start, i))
-                sampleCount = 0
-            End If
-            lastEntry = histArray(i)
-            sampleCount += histArray(i)
-        Next
-
-        Dim incr = algTask.MaxZmeters / options.bins
-        classCount = 0
-        For i As Integer = 0 To Math.Min(clusters.Count, options.maxClusters) - 1
-            Dim vec = clusters.ElementAt(i).Value
-            classCount += 1
-            For j = vec(0) To vec(1)
-                histArray(j) = classCount
+            For i = 1 To dust.classCount
+                Dim mask = dust.dst2.InRange(i, i)
+                Dim depth = algTask.pcSplit(2).Mean(mask)
+                algTask.pcSplit(2).SetTo(depth(0), mask)
             Next
-        Next
 
-        Marshal.Copy(histArray, 0, hist.histogram.Data, histArray.Length)
-        cv.Cv2.CalcBackProject({src32f}, {0}, hist.histogram, dst1, hist.ranges)
-        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+            cv.Cv2.Merge(algTask.pcSplit, dst2)
+            dst2.SetTo(0, Not dust.dst0)
+            dst2.SetTo(0, algTask.maxDepthMask)
 
-        classCount += 1
-        dst2.SetTo(classCount, algTask.maxDepthMask)
-
-        dst3 = PaletteFull(dst2)
-        If algTask.heartBeat Then labels(2) = "dst2 = CV_8U version of depth segmented into " + CStr(classCount) + " clusters."
-        dst0 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-Public Class Duster_BasicsY : Inherits TaskParent
-    Dim dust As New Duster_MaskZ
-    Public Sub New()
-        desc = "Removed blowback in the pointcloud"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        dust.Run(src)
-
-        For i = 1 To dust.classCount
-            Dim mask = dust.dst2.InRange(i, i)
-            Dim pcY = algTask.pcSplit(1).Mean(mask)
-            algTask.pcSplit(1).SetTo(pcY(0), mask)
-        Next
-
-        cv.Cv2.Merge(algTask.pcSplit, dst2)
-        dst2.SetTo(0, Not dust.dst0)
-        dst2.SetTo(0, algTask.maxDepthMask)
-
-        dst3 = dust.dst3
-    End Sub
-End Class
+            dst3 = dust.dst3
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class Duster_RedCloud : Inherits TaskParent
-    Dim duster As New Duster_Basics
-    Public Sub New()
-        desc = "Run Bin3Way_RedCloud on the largest regions identified in Duster_Basics"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        duster.Run(src)
-        dst1 = duster.dust.dst2.InRange(1, 1)
+    Public Class Duster_MaskZ : Inherits TaskParent
+        Public hist As New Hist_Basics
+        Public classCount As Integer
+        Public options As New Options_GuidedBPDepth
+        Public Sub New()
+            labels(3) = "Any flickering below is from changes in the sorted order of the clusters.  It should not be a problem."
+            desc = "Build a histogram that finds the clusters of depth data"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            hist.bins = options.bins
 
-        dst3.SetTo(0)
-        src.CopyTo(dst3, dst1)
+            Dim src32f = algTask.pcSplit(2)
+            algTask.maxDepthMask = src32f.InRange(algTask.MaxZmeters, algTask.MaxZmeters).ConvertScaleAbs()
+            src32f.SetTo(algTask.MaxZmeters, algTask.maxDepthMask)
 
-        dst2 = runRedList(src, labels(2), Not dst1)
-    End Sub
-End Class
+            hist.fixedRanges = {New cv.Rangef(0.001, algTask.MaxZmeters)}
+            hist.Run(src32f)
+
+            Dim histArray = hist.histArray
+
+            ' this insures that the maxDepthMask is separate from any previous cluster
+            histArray(histArray.Count - 1) = 0
+
+            Dim start As Integer
+            Dim clusters As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
+            Dim lastEntry As Single
+            Dim sampleCount As Integer
+
+            For i = 0 To histArray.Count - 1
+                If histArray(i) > 0 And lastEntry = 0 Then start = i
+                If histArray(i) = 0 And lastEntry > 0 Then
+                    clusters.Add(sampleCount, New cv.Vec2i(start, i))
+                    sampleCount = 0
+                End If
+                lastEntry = histArray(i)
+                sampleCount += histArray(i)
+            Next
+
+            Dim incr = algTask.MaxZmeters / options.bins
+            classCount = 0
+            For i As Integer = 0 To Math.Min(clusters.Count, options.maxClusters) - 1
+                Dim vec = clusters.ElementAt(i).Value
+                classCount += 1
+                For j = vec(0) To vec(1)
+                    histArray(j) = classCount
+                Next
+            Next
+
+            Marshal.Copy(histArray, 0, hist.histogram.Data, histArray.Length)
+            cv.Cv2.CalcBackProject({src32f}, {0}, hist.histogram, dst1, hist.ranges)
+            dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+
+            classCount += 1
+            dst2.SetTo(classCount, algTask.maxDepthMask)
+
+            dst3 = PaletteFull(dst2)
+            If algTask.heartBeat Then labels(2) = "dst2 = CV_8U version of depth segmented into " + CStr(classCount) + " clusters."
+            dst0 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        End Sub
+    End Class
+
+
+
+
+    Public Class Duster_BasicsY : Inherits TaskParent
+        Dim dust As New Duster_MaskZ
+        Public Sub New()
+            desc = "Removed blowback in the pointcloud"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dust.Run(src)
+
+            For i = 1 To dust.classCount
+                Dim mask = dust.dst2.InRange(i, i)
+                Dim pcY = algTask.pcSplit(1).Mean(mask)
+                algTask.pcSplit(1).SetTo(pcY(0), mask)
+            Next
+
+            cv.Cv2.Merge(algTask.pcSplit, dst2)
+            dst2.SetTo(0, Not dust.dst0)
+            dst2.SetTo(0, algTask.maxDepthMask)
+
+            dst3 = dust.dst3
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Duster_RedCloud : Inherits TaskParent
+        Dim duster As New Duster_Basics
+        Public Sub New()
+            desc = "Run Bin3Way_RedCloud on the largest regions identified in Duster_Basics"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            duster.Run(src)
+            dst1 = duster.dust.dst2.InRange(1, 1)
+
+            dst3.SetTo(0)
+            src.CopyTo(dst3, dst1)
+
+            dst2 = runRedList(src, labels(2), Not dst1)
+        End Sub
+    End Class
+
+End Namespace

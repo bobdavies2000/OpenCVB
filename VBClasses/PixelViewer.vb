@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Windows.Forms
+Imports VBClasses.VBClasses.vbc
 Public Class PixelViewerForm
     Public mousePoint As cv.Point
     Public saveText As String

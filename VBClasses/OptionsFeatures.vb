@@ -1,6 +1,4 @@
-﻿Imports System.Windows.Forms
-Imports System.Drawing
-Imports System.ComponentModel
+﻿Imports VBClasses.VBClasses
 Public Class OptionsFeatures
     Public grayCheckbox() As RadioButton
     Public colorCheckbox() As RadioButton
