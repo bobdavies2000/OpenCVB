@@ -313,16 +313,7 @@ Namespace MainUI
                     displayImage = algTask.rightView.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
             End Select
 
-            'Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
-            'pic.Image?.Dispose()
-            'pic.Image = bitmap
-            'g.DrawImage(pic.Image, 0, 0)
             g.DrawImage(picImages(0), 0, 0)
-
-
-            cv.Cv2.ImShow("displayimage", displayImage)
-
-
 
             Dim ratioX = pic.Width / settings.workRes.Width
             Dim ratioY = pic.Height / settings.workRes.Height
