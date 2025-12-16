@@ -25,7 +25,7 @@ Public Class OptionsGlobal
         highlight.Items.Add("Red")
         highlight.SelectedIndex = 0
 
-        ShowAllOptions.Checked = GetSetting("Opencv", "ShowAllOptions", "ShowAllOptions", False)
+        ShowAllOptions.Checked = algTask.settings.ShowAllOptions
 
         algTask.DotSize = 1
         algTask.cvFontThickness = 1
@@ -153,7 +153,7 @@ Public Class OptionsGlobal
         algTask.optionsChanged = True
     End Sub
     Private Sub ShowAllByDefault_CheckedChanged(sender As Object, e As EventArgs) Handles ShowAllOptions.CheckedChanged
-        SaveSetting("Opencv", "showAllOptions", "showAllOptions", ShowAllOptions.Checked)
+        algTask.settings.showAllOptions = ShowAllOptions.Checked
     End Sub
     Private Sub DebugSliderSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
         DebugSliderLabel.Text = CStr(DebugSlider.Value)

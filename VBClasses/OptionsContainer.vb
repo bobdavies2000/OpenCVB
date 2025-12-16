@@ -17,11 +17,8 @@ Public Class OptionsContainer
         Else
             hiddenOptions.Add(frm.Text)
         End If
-        Try
-            frm.show
-            titlesAdded = True
-        Catch ex As Exception
-        End Try
+        frm.show
+        titlesAdded = True
     End Sub
     Public Sub layoutOptions(normalRequest As Boolean)
         Dim w = GetSetting("Opencv", "gOptionsWidth", "gOptionsWidth", algTask.mainFormLocation.Width)
@@ -38,42 +35,37 @@ Public Class OptionsContainer
             Next
         Next
 
-        Dim showAllOptions = GetSetting("Opencv", "ShowAllOptions", "ShowAllOptions", False)
-        Try
-            Dim indexS = 1
-            Dim indexO = 1
-            Dim indexHide As Integer
-            For Each title In optionsTitle
-                Dim frm = VBClasses.OptionParent.FindFrm(title)
-                If frm IsNot Nothing Then
-                    frm.BringToFront()
-                    Dim sidelineOptions As Boolean = True
-                    Dim displayTheseOptions As New List(Of String)({"Image_Basics OpenFile Options"})
-                    If displayTheseOptions.Contains(frm.Text) Then sidelineOptions = False
-                    If normalRequest And sidelineOptions And showAllOptions = False Then
+        Dim indexS = 1
+        Dim indexO = 1
+        Dim indexHide As Integer
+        For Each title In optionsTitle
+            Dim frm = VBClasses.OptionParent.FindFrm(title)
+            If frm IsNot Nothing Then
+                frm.BringToFront()
+                Dim sidelineOptions As Boolean = True
+                Dim displayTheseOptions As New List(Of String)({"Image_Basics OpenFile Options"})
+                If displayTheseOptions.Contains(frm.Text) Then sidelineOptions = False
+                If normalRequest And sidelineOptions And algTask.settings.ShowAllOptions = False Then
+                    If frm Is Nothing Then Continue For
+                    frm.SetDesktopLocation(Me.Width - 2 * offset, sliderOffset.Y + indexHide * offset)
+                    indexHide += 1
+                Else
+                    If title.Contains("OpenFile") Then
+                        frm.SetDesktopLocation(0, algTask.gOptions.Top + 350)
+                    End If
+                    If title.EndsWith(" Sliders") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                         If frm Is Nothing Then Continue For
-                        frm.SetDesktopLocation(Me.Width - 2 * offset, sliderOffset.Y + indexHide * offset)
-                        indexHide += 1
-                    Else
-                        If title.Contains("OpenFile") Then
-                            frm.SetDesktopLocation(0, algTask.gOptions.Top + 350)
-                        End If
-                        If title.EndsWith(" Sliders") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
-                            If frm Is Nothing Then Continue For
-                            frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
-                            indexS += 1
-                        End If
-                        If title.EndsWith(" Radio Buttons") Or title.EndsWith(" CheckBoxes") Then
-                            If frm Is Nothing Then Continue For
-                            frm.SetDesktopLocation(radioCheckOffset.X + indexO * offset, radioCheckOffset.Y + indexO * offset)
-                            indexO += 1
-                        End If
+                        frm.SetDesktopLocation(sliderOffset.X + indexS * offset, sliderOffset.Y + indexS * offset)
+                        indexS += 1
+                    End If
+                    If title.EndsWith(" Radio Buttons") Or title.EndsWith(" CheckBoxes") Then
+                        If frm Is Nothing Then Continue For
+                        frm.SetDesktopLocation(radioCheckOffset.X + indexO * offset, radioCheckOffset.Y + indexO * offset)
+                        indexO += 1
                     End If
                 End If
-            Next
-        Catch ex As Exception
-            Debug.WriteLine("Error in layoutOptions: " + ex.Message)
-        End Try
+            End If
+        Next
         hiddenOptions.Clear()
     End Sub
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click

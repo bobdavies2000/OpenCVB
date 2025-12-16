@@ -192,7 +192,6 @@ Namespace VBClasses
 
         Public toggleOn As Boolean ' toggles on the heartbeat.
         Public paused As Boolean
-        Public showAllOptions As Boolean ' show all options when initializing the options for all algorithms.
 
         Public pcFloor As Single ' y-value for floor...
         Public pcCeiling As Single ' y-value for ceiling...

@@ -41,6 +41,7 @@ Namespace MainUI
 
         Public desiredFPS As Integer = 60
         Public testAllDuration As Integer = 5
+        Public ShowAllOptions As Boolean
     End Class
 
     Public Class jsonIO
