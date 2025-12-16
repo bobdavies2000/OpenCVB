@@ -1,4 +1,4 @@
-﻿Imports VBClasses.VBClasses
+﻿Imports VBClasses
 Public Class OptionsSliders
     Public mytrackbars As New List(Of TrackBar)
     Public myLabels As New List(Of Label)

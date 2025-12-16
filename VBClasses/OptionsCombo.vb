@@ -1,4 +1,4 @@
-﻿Imports VBClasses.VBClasses
+﻿Imports VBClasses
 Public Class OptionsCombo
     Public Sub Setup(traceName As String, label As String, comboList As List(Of String))
         Me.MdiParent = algTask.allOptions

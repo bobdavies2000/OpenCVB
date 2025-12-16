@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
-Imports VBClasses.VBClasses
+Imports VBClasses
 Namespace MainUI
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing

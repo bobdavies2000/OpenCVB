@@ -2,7 +2,7 @@
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.Extensions
 Imports System.ComponentModel
-Imports VBClasses.VBClasses
+Imports VBClasses
 Public Class SharpGLForm
     Dim gl As OpenGL
     Dim isDragging As Boolean = False
@@ -32,17 +32,17 @@ Public Class SharpGLForm
         options = New VBClasses.Options_SharpGL
         options1 = New VBClasses.Options_GL
         options2 = New VBClasses.Options_SharpGL2
-        Me.Left = GetSetting("Opencv", "sglLeft", "sglLeft", algTask.mainFormLocation.X + algTask.mainFormLocation.Width)
-        Me.Top = GetSetting("Opencv", "sglTop", "sglTop", algTask.mainFormLocation.Y)
-        Me.Width = GetSetting("Opencv", "sglWidth", "sglWidth", algTask.mainFormLocation.Width)
-        Me.Height = GetSetting("Opencv", "sglHeight", "sglHeight", algTask.mainFormLocation.Height)
+
+        Me.Location = New Point(algTask.settings.sharpGLLeft, algTask.settings.sharpGLTop)
+        Me.Size = New Size(algTask.settings.sharpGLWidth, algTask.settings.sharpGLHeight)
+
         gl = GLControl.OpenGL
     End Sub
     Private Sub sgl_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        SaveSetting("Opencv", "sglLeft", "sglLeft", Math.Abs(Me.Left))
-        SaveSetting("Opencv", "sglTop", "sglTop", Me.Top)
-        SaveSetting("Opencv", "sglWidth", "sglWidth", Me.Width)
-        SaveSetting("Opencv", "sglHeight", "sglHeight", Me.Height)
+        algTask.settings.sharpGLLeft = Me.Left
+        algTask.settings.sharpGLTop = Me.Top
+        algTask.settings.sharpGLWidth = Me.Width
+        algTask.settings.sharpGLHeight = Me.Height
     End Sub
     Private Sub OpenGLControl_MouseDown(sender As Object, e As MouseEventArgs) Handles GLControl.MouseDown
         If e.Button = MouseButtons.Right Then

@@ -1,5 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Drawing.Imaging
+Imports jsonShared
 Namespace VBClasses
     Public Class TrueText
         Declare Sub CopyClassToManagedCpp Lib "ManagedCppLibrary.dll" (dataPtr As IntPtr)

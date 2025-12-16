@@ -1,4 +1,4 @@
-﻿Imports VBClasses.VBClasses
+﻿Imports VBClasses
 Public Class TreeviewForm
     Dim botDistance As Integer
     Dim treeData As New List(Of String)
@@ -183,20 +183,20 @@ Public Class TreeviewForm
     Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         TreeView1.Dock = DockStyle.Fill
         TreeView1.SendToBack()
-        Me.Left = GetSetting("OpenCVB", "treeViewLeft", "treeViewLeft", Me.Left)
-        Me.Top = GetSetting("OpenCVB", "treeViewTop", "treeViewTop", Me.Top)
-        Me.Width = GetSetting("OpenCVB", "treeViewWidth", "treeViewWidth", Me.Width)
-        Me.Height = GetSetting("OpenCVB", "treeViewHeight", "treeViewHeight", Me.Height)
+
+        Me.Location = New Point(algTask.settings.TreeViewLeft, algTask.settings.TreeViewTop)
+        Me.Size = New Size(algTask.settings.TreeViewWidth, algTask.settings.TreeViewHeight)
+
         PercentTime.Width = 250
         PercentTime.Left = 250
 
         CheckIfOffScreen()
     End Sub
     Private Sub TreeviewForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
-        SaveSetting("OpenCVB", "treeViewLeft", "treeViewLeft", Me.Left)
-        SaveSetting("OpenCVB", "treeViewTop", "treeViewTop", Me.Top)
-        SaveSetting("OpenCVB", "treeViewWidth", "treeViewWidth", Me.Width)
-        SaveSetting("OpenCVB", "treeViewHeight", "treeViewHeight", Me.Height)
+        algTask.settings.TreeViewLeft = Me.Left
+        algTask.settings.TreeViewTop = Me.Top
+        algTask.settings.TreeViewWidth = Me.Width
+        algTask.settings.TreeViewHeight = Me.Height
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         Dim algorithm = e.Node.Text

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports VBClasses.VBClasses
+Imports VBClasses
 Namespace PixelViewer
     Public Class Pixel_Viewer : Inherits TaskParent
         Dim firstUpdate = True

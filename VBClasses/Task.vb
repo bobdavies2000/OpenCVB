@@ -1,10 +1,13 @@
 Imports System.IO
-Imports VBClasses.PixelViewer
+Imports PixelViewer
 Imports cv = OpenCvSharp
+Imports jsonShared
 
 #Region "taskProcess"
 Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
+        Public ReadOnly Settings As jsonShared.Settings
+
         Public dstList(3) As cv.Mat
 
         Public optionsChanged As Boolean
@@ -12,7 +15,6 @@ Namespace VBClasses
         Public gOptions As OptionsGlobal
         Public featureOptions As OptionsFeatures
         Public treeView As TreeViewForm
-        Public settings As Object
         Public homeDir As String
 
         Public color As New cv.Mat
@@ -310,7 +312,7 @@ Namespace VBClasses
         End Sub
 #End Region
 
-        Public Sub Initialize()
+        Public Sub Initialize(settings As jsonShared.Settings)
             rgbLeftAligned = True
             If settings.cameraName.Contains("RealSense") Then rgbLeftAligned = False
 
@@ -488,12 +490,12 @@ Namespace VBClasses
                 If gifCreator.gifC.options.buildCheck.Checked Then
                     gifCreator.gifC.options.buildCheck.Checked = False
                     For i = 0 To gifImages.Count - 1
-                        Dim fileName As New FileInfo(settings.HomeDir + "Temp/image" + Format(i, "000") + ".bmp")
+                        Dim fileName As New FileInfo(algTask.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
                         gifImages(i).Save(fileName.FullName)
                     Next
 
                     gifImages.Clear()
-                    Dim dirInfo As New DirectoryInfo(settings.HomeDir + "GifBuilder\bin\Debug\net8.0\")
+                    Dim dirInfo As New DirectoryInfo(algTask.homeDir + "GifBuilder\bin\Debug\net8.0\")
                     Dim dirData = dirInfo.GetDirectories()
                     Dim gifExe As New FileInfo(dirInfo.FullName + "GifBuilder.exe")
                     If gifExe.Exists = False Then

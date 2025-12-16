@@ -109,10 +109,4 @@ Public Class Options
     Private Sub Cancel_Button_Click(sender As Object, e As EventArgs) Handles Cancel_Button.Click
         Me.DialogResult = DialogResult.Cancel
     End Sub
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        FontDialog1.Font = settings.fontInfo
-        If FontDialog1.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
-            settings.fontInfo = FontDialog1.Font
-        End If
-    End Sub
 End Class

@@ -4,7 +4,7 @@ Namespace VBClasses
         Dim topLocations As New List(Of cv.Point3d)
         Dim options As New Options_TransformationMatrix
         Public Sub New()
-            If algTask.settings.cameraName.startswith = "StereoLabs" Then
+            If algTask.Settings.cameraName.StartsWith("StereoLabs") Then
                 ' need a smaller multiplier for this camera...
                 OptionParent.FindSlider("TMatrix Top View multiplier").Value = 1
             End If
@@ -38,7 +38,4 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-
-
-
 End Namespace

@@ -1,4 +1,4 @@
-﻿Imports VBClasses.VBClasses
+﻿Imports VBClasses
 Public Class OptionsFileName
     Public fileStarted As Boolean
     Public newFileName As Boolean

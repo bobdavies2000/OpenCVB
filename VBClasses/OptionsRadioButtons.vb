@@ -1,4 +1,4 @@
-﻿Imports VBClasses.VBClasses
+﻿Imports VBClasses
 Public Class OptionsRadioButtons
     Public check As New List(Of RadioButton)
     Public Function Setup(traceName As String) As Boolean

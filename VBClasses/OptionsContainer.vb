@@ -1,15 +1,13 @@
 ﻿Imports cv = OpenCvSharp
-Imports VBClasses.VBClasses
+Imports VBClasses
 Public Class OptionsContainer
     Dim optionsTitle As New List(Of String)
     Public hiddenOptions As New List(Of String)
     Public titlesAdded As Boolean
     Public offset = 30
     Private Sub allOptionsFrm_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Me.Left = GetSetting("Opencv", "gOptionsLeft", "gOptionsLeft", algTask.mainFormLocation.X - offset)
-        Me.Top = GetSetting("Opencv", "gOptionsTop", "gOptionsTop", algTask.mainFormLocation.Y - offset)
-        Me.Width = GetSetting("Opencv", "gOptionsWidth", "gOptionsWidth", algTask.mainFormLocation.Width)
-        Me.Height = GetSetting("Opencv", "gOptionsHeight", "gOptionsHeight", algTask.mainFormLocation.Height)
+        Me.Location = New Point(algTask.Settings.allOptionsLeft, algTask.Settings.allOptionsTop)
+        Me.Size = New Size(algTask.Settings.allOptionsWidth, algTask.Settings.allOptionsHeight)
     End Sub
     Public Sub addTitle(frm As Object)
         If optionsTitle.Contains(frm.Text) = False Then
@@ -45,7 +43,7 @@ Public Class OptionsContainer
                 Dim sidelineOptions As Boolean = True
                 Dim displayTheseOptions As New List(Of String)({"Image_Basics OpenFile Options"})
                 If displayTheseOptions.Contains(frm.Text) Then sidelineOptions = False
-                If normalRequest And sidelineOptions And algTask.settings.ShowAllOptions = False Then
+                If normalRequest And sidelineOptions And algTask.Settings.ShowAllOptions = False Then
                     If frm Is Nothing Then Continue For
                     frm.SetDesktopLocation(Me.Width - 2 * offset, sliderOffset.Y + indexHide * offset)
                     indexHide += 1
@@ -77,29 +75,7 @@ Public Class OptionsContainer
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
         layoutOptions(normalRequest:=False)
     End Sub
-    Private Sub CheckIfOffScreen()
-        Dim formRect As Rectangle = Me.Bounds
-        Dim screenBounds As Rectangle = Screen.PrimaryScreen.WorkingArea ' Use WorkingArea to exclude taskbar
-
-        ' Check if any part of the form is visible on the screen
-        If Not screenBounds.IntersectsWith(formRect) Then
-            ' The entire form is off the screen
-            MessageBox.Show("Form is completely offscreen!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-
-            ' Optionally, you might want to move the form back onto the screen
-            ' For example, move it to the center of the primary screen
-            Me.StartPosition = FormStartPosition.Manual
-            Me.Location = New Point(0, 0)
-            SaveSetting("Opencv", "gOptionsLeft", "gOptionsLeft", 0)
-            SaveSetting("Opencv", "gOptionsTop", "gOptionsTop", 0)
-        End If
-    End Sub
     Private Sub OptionsContainer_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        SaveSetting("Opencv", "gOptionsLeft", "gOptionsLeft", Math.Abs(Me.Left))
-        SaveSetting("Opencv", "gOptionsTop", "gOptionsTop", Me.Top)
-        SaveSetting("Opencv", "gOptionsWidth", "gOptionsWidth", Me.Width)
-        SaveSetting("Opencv", "gOptionsHeight", "gOptionsHeight", Me.Height)
-        CheckIfOffScreen()
         For Each title In hiddenOptions
             Dim hideList As New List(Of Form)
             For Each frm In Application.OpenForms
@@ -114,5 +90,14 @@ Public Class OptionsContainer
         VBClasses.algTask.treeView.Close()
         If algTask.sharpGL IsNot Nothing Then algTask.sharpGL.Close()
         GC.Collect()
+    End Sub
+    Private Sub OptionsContainer_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
+        algTask.Settings.allOptionsLeft = Me.Left
+        algTask.Settings.allOptionsTop = Me.Top
+        algTask.Settings.allOptionsWidth = Me.Width
+        algTask.Settings.allOptionsHeight = Me.Height
+    End Sub
+    Private Sub OptionsContainer_Move(sender As Object, e As EventArgs) Handles Me.Move
+        OptionsContainer_ResizeEnd(sender, e)
     End Sub
 End Class

@@ -25,13 +25,9 @@ Partial Class Options
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Options))
         OKButton = New Button()
         Cancel_Button = New Button()
-        GroupBox1 = New GroupBox()
-        Label4 = New Label()
-        Button1 = New Button()
         FontDialog1 = New FontDialog()
         CameraGroup = New FlowLayoutPanel()
         Resolutions = New FlowLayoutPanel()
-        GroupBox1.SuspendLayout()
         SuspendLayout()
         ' 
         ' OKButton
@@ -54,39 +50,6 @@ Partial Class Options
         Cancel_Button.Text = "Cancel"
         Cancel_Button.UseVisualStyleBackColor = True
         ' 
-        ' GroupBox1
-        ' 
-        GroupBox1.Controls.Add(Label4)
-        GroupBox1.Controls.Add(Button1)
-        GroupBox1.Location = New Point(16, 526)
-        GroupBox1.Margin = New Padding(4)
-        GroupBox1.Name = "GroupBox1"
-        GroupBox1.Padding = New Padding(4)
-        GroupBox1.Size = New Size(1172, 104)
-        GroupBox1.TabIndex = 5
-        GroupBox1.TabStop = False
-        GroupBox1.Text = "Other Global Settings"
-        ' 
-        ' Label4
-        ' 
-        Label4.AutoSize = True
-        Label4.Location = New Point(79, 49)
-        Label4.Margin = New Padding(4, 0, 4, 0)
-        Label4.Name = "Label4"
-        Label4.Size = New Size(351, 30)
-        Label4.TabIndex = 2
-        Label4.Text = "Select the font for all TrueType text"
-        ' 
-        ' Button1
-        ' 
-        Button1.Location = New Point(9, 44)
-        Button1.Margin = New Padding(4)
-        Button1.Name = "Button1"
-        Button1.Size = New Size(62, 40)
-        Button1.TabIndex = 1
-        Button1.Text = "..."
-        Button1.UseVisualStyleBackColor = True
-        ' 
         ' CameraGroup
         ' 
         CameraGroup.FlowDirection = FlowDirection.TopDown
@@ -104,30 +67,24 @@ Partial Class Options
         Resolutions.Size = New Size(994, 290)
         Resolutions.TabIndex = 7
         ' 
-        ' MainOptions
+        ' Options
         ' 
         AutoScaleDimensions = New SizeF(12F, 30F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1210, 637)
+        ClientSize = New Size(1210, 528)
         Controls.Add(Resolutions)
         Controls.Add(CameraGroup)
-        Controls.Add(GroupBox1)
         Controls.Add(Cancel_Button)
         Controls.Add(OKButton)
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
         Margin = New Padding(4)
-        Name = "MainOptions"
+        Name = "Options"
         Text = "OpenCVB Global Settings"
-        GroupBox1.ResumeLayout(False)
-        GroupBox1.PerformLayout()
         ResumeLayout(False)
     End Sub
 
     Friend WithEvents OKButton As Button
     Friend WithEvents Cancel_Button As Button
-    Friend WithEvents GroupBox1 As GroupBox
-    Friend WithEvents Button1 As Button
-    Friend WithEvents Label4 As Label
     Friend WithEvents FontDialog1 As FontDialog
     Friend WithEvents CameraGroup As FlowLayoutPanel
     Friend WithEvents Resolutions As FlowLayoutPanel

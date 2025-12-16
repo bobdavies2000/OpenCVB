@@ -30,6 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CPP_Native\CPP_Native.vcxproj" />
     <ProjectReference Include="..\CamZed\CamZed.csproj" />
+    <ProjectReference Include="..\jsonShared\jsonShared.vbproj" />
     <ProjectReference Include="..\VBClasses\VBClasses.vbproj" />
   </ItemGroup>
 

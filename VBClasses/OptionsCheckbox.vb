@@ -1,4 +1,4 @@
-﻿Imports VBClasses.VBClasses
+﻿Imports VBClasses
 Public Class OptionsCheckbox
     Public Box As New List(Of CheckBox)
     Public Function Setup(traceName As String) As Boolean

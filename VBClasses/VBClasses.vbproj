@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>VBClasses</RootNamespace>
+    <RootNamespace></RootNamespace>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
 	  <ImplicitUsings>enable</ImplicitUsings>
@@ -11,9 +11,6 @@
 	  <Platforms>x64</Platforms>
 	  <ImportedNamespaces>System.Data=False,System.Drawing=False,System.Windows.Forms=False,Microsoft.VisualBasic=True,System=True,System.Collections=True,System.Collections.Generic=True,System.Diagnostics=True,System.Linq=True,System.Xml.Linq=True,System.Threading.Tasks=True,VBClasses=True</ImportedNamespaces>
   </PropertyGroup>
-
-  <ItemGroup>
-  </ItemGroup>
 
   <ItemGroup>
     <Import Include="System.Data" />
@@ -29,6 +26,10 @@
     <PackageReference Include="SharpGL" Version="3.1.1" />
     <PackageReference Include="SharpGL.SceneGraph" Version="3.1.1" />
     <PackageReference Include="SharpGL.WinForms" Version="3.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\jsonShared\jsonShared.vbproj" />
   </ItemGroup>
 
   <ItemGroup>

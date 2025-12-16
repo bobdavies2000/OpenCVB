@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Imports VBClasses.VBClasses
+Imports VBClasses
 Public Class OptionsGlobal
     Public pixelDiffThreshold As Integer
     Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",

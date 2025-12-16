@@ -1,9 +1,11 @@
 Imports System.IO
 Imports System.Text.RegularExpressions
 Imports System.Threading
-Imports VBClasses.VBClasses
+Imports System.Drawing
+Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
+Imports System.Net.Mime.MediaTypeNames
 
 Namespace MainUI
     Partial Public Class MainUI
@@ -14,7 +16,6 @@ Namespace MainUI
         Dim recentMenu() As ToolStripMenuItem
         Dim labels As List(Of Label)
         Dim pics As New List(Of PictureBox)
-        Dim picImages As New List(Of Image)
         Dim testAllRunning As Boolean = False
         Dim stopTestAll As Bitmap
         Dim PausePlay As Bitmap
@@ -261,8 +262,6 @@ Namespace MainUI
                 AddHandler pic.MouseUp, AddressOf CamPic_MouseUp
                 AddHandler pic.MouseMove, AddressOf CamPic_MouseMove
                 pic.Tag = i
-                pic.Image = New Bitmap(settings.displayRes.Width, settings.displayRes.Height)
-                picImages.Add(pic.Image)
                 pic.BackColor = Color.Black
                 pic.Visible = True
                 Me.Controls.Add(pic)
@@ -303,8 +302,7 @@ Namespace MainUI
 
             Dim displayImage = algTask.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
             Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
-            picImages(pic.Tag) = bitmap
-            g.DrawImage(picImages(pic.Tag), 0, 0)
+            g.DrawImage(bitmap, 0, 0)
 
             Dim ratioX = pic.Width / settings.workRes.Width
             Dim ratioY = pic.Height / settings.workRes.Height
@@ -312,12 +310,13 @@ Namespace MainUI
             Static myWhitePen As New Pen(Color.White)
             Static myBlackPen As New Pen(Color.Black)
 
-            Static saveTrueData As List(Of VBClasses.VBClasses.TrueText)
-            saveTrueData = New List(Of VBClasses.VBClasses.TrueText)(algTask.trueData)
+            Static saveTrueData As List(Of VBClasses.TrueText)
+            saveTrueData = New List(Of VBClasses.TrueText)(algTask.trueData)
+            Dim font = New System.Drawing.Font("Tahoma", 9)
             For Each tt In saveTrueData
                 If tt.text Is Nothing Then Continue For
                 If tt.text.Length > 0 And tt.picTag = pic.Tag Then
-                    g.DrawString(tt.text, settings.fontInfo, New SolidBrush(Color.White),
+                    g.DrawString(tt.text, font, New SolidBrush(Color.White),
                                      CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
                 End If
             Next
@@ -372,10 +371,7 @@ Namespace MainUI
             End If
         End Sub
         Private Sub startAlgorithm()
-            ' If algTask IsNot Nothing Then algTask.Dispose()
-
-
-            algTask = New VBClasses.VBClasses.AlgorithmTask
+            algTask = New VBClasses.AlgorithmTask
 
             algTask.homeDir = homeDir
             algTask.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
@@ -385,10 +381,9 @@ Namespace MainUI
             algTask.gridRatioX = pics(0).Width / settings.workRes.Width
             algTask.gridRatioY = pics(0).Height / settings.workRes.Height
 
-            algTask.settings = settings ' algTask is in a separate project and needs access to settings.
             algTask.main_hwnd = Me.Handle
 
-            algTask.Initialize()
+            algTask.Initialize(settings)
             algTask.MainUI_Algorithm = createAlgorithm(settings.algorithm)
             AlgDescription.Text = algTask.MainUI_Algorithm.desc
             MainToolStrip.Refresh()

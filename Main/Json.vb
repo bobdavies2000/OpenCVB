@@ -2,64 +2,24 @@ Imports System.IO
 Imports System.Management
 Imports Newtonsoft.Json
 Imports cv = OpenCvSharp
+Imports jsonShared
 
 Namespace MainUI
-    Public Class Json
-        Public cameraName As String = "StereoLabs ZED 2/2I"
-        Public cameraPresent As List(Of Boolean)
-        Public cameraFound As Boolean
-        Public resolutionsSupported As List(Of Boolean)
-        Public cameraSupported As List(Of Boolean)
-        Public camera640x480Support As List(Of Boolean)
-        Public camera1920x1080Support As List(Of Boolean)
-
-        Public MainFormLeft As Integer = 0
-        Public MainFormTop As Integer = 0
-        Public MainFormWidth As Integer = 1867
-        Public MainFormHeight As Integer = 1134
-
-        Public TreeViewLeft As Integer = 0
-        Public TreeViewTop As Integer = 0
-        Public TreeViewWidth As Integer = 300
-        Public TreeViewHeight As Integer = 500
-
-        Public allOptionsLeft As Integer = 0
-        Public allOptionsTop As Integer = 0
-        Public allOptionsWidth As Integer = MainFormWidth
-        Public allOptionsHeight As Integer = MainFormHeight
-
-        Public algorithm As String
-        Public algorithmHistory As List(Of String)
-
-        Public workRes As New cv.Size(336, 188)
-        Public captureRes As New cv.Size(672, 376)
-        Public displayRes As cv.Size
-
-        Public locationOpenGL As cv.Vec4f
-
-        Public fontInfo As Font
-
-        Public desiredFPS As Integer = 60
-        Public testAllDuration As Integer = 5
-        Public ShowAllOptions As Boolean
-    End Class
-
     Public Class jsonIO
         Private jsonFileName As String
         Public Sub New(fileName As String)
             jsonFileName = fileName
         End Sub
-
-        Public Function Load() As Json
-            settings = New Json()
+        Public Function Load() As jsonShared.Settings
+            Dim settings = New jsonShared.Settings()
             Dim fileInfo As New FileInfo(jsonFileName)
             If fileInfo.Exists Then
                 Try
                     Using streamReader As New StreamReader(jsonFileName)
-                        Dim json = streamReader.ReadToEnd()
-                        If json <> "" Then
-                            settings = JsonConvert.DeserializeObject(Of Json)(json)
-                            settings = initialize()
+                        Dim jsonSettings = streamReader.ReadToEnd()
+                        If jsonSettings <> "" Then
+                            settings = JsonConvert.DeserializeObject(Of jsonShared.Settings)(jsonSettings)
+                            settings = initialize(settings)
                         End If
                     End Using
 
@@ -67,19 +27,19 @@ Namespace MainUI
                     ' If deserialization fails, return default settings
                 End Try
             Else
-                settings = initialize()
+                settings = initialize(settings)
             End If
 
             Return settings
         End Function
-        Public Function initialize() As Json
-            settings.cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True, True})
-            settings.camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True, True})
-            settings.camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False, False})
+        Public Function initialize(Settings As jsonShared.Settings)
+            Settings.cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True, True})
+            Settings.camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True, True})
+            Settings.camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False, False})
 
             ' checking the list for specific missing device here...
             Dim usbList = USBenumeration()
-            settings.cameraPresent = New List(Of Boolean)
+            Settings.cameraPresent = New List(Of Boolean)
             For i = 0 To cameraNames.Count - 1
                 Dim searchname = cameraNames(i)
                 Dim present As Boolean = False
@@ -94,34 +54,33 @@ Namespace MainUI
                         Exit For
                     End If
                 Next
-                settings.cameraPresent.Add(present)
+                Settings.cameraPresent.Add(present)
             Next
 
-            Dim index = cameraNames.IndexOf(settings.cameraName)
-            If settings.cameraName = "" Or settings.cameraPresent(index) = False Then
+            Dim index = cameraNames.IndexOf(Settings.cameraName)
+            If Settings.cameraName = "" Or Settings.cameraPresent(index) = False Then
                 For i = 0 To cameraNames.Count - 1
-                    If settings.cameraPresent(i) Then
-                        settings.cameraName = cameraNames(i)
+                    If Settings.cameraPresent(i) Then
+                        Settings.cameraName = cameraNames(i)
                         Exit For
                     End If
                 Next
             End If
 
-            settings.cameraFound = False
-            For i = 0 To settings.cameraPresent.Count - 1
-                If settings.cameraPresent(i) Then
-                    settings.cameraFound = True
-                    If settings.cameraName = Nothing Then settings.cameraName = cameraNames(i)
+            Settings.cameraFound = False
+            For i = 0 To Settings.cameraPresent.Count - 1
+                If Settings.cameraPresent(i) Then
+                    Settings.cameraFound = True
+                    If Settings.cameraName = Nothing Then Settings.cameraName = cameraNames(i)
                     Exit For
                 End If
             Next
-            If settings.cameraFound = False Then
-                settings.cameraName = ""
+            If Settings.cameraFound = False Then
+                Settings.cameraName = ""
                 MessageBox.Show("There are no supported cameras present!" + vbCrLf + vbCrLf)
             End If
 
-            If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
-            Return settings
+            Return Settings
         End Function
         Public Function USBenumeration() As List(Of String)
             Static usblist As New List(Of String)
@@ -162,7 +121,7 @@ Namespace MainUI
             Return usblist
         End Function
 
-        Public Sub Save(settings As Json)
+        Public Sub Save(settings As jsonShared.Settings)
             Select Case settings.captureRes.Width
                 Case 640
                     settings.displayRes = New cv.Size(640, 480)
@@ -188,7 +147,6 @@ Namespace MainUI
                     settings.displayRes = New cv.Size(640, 480)
             End Select
 
-            If settings.fontInfo Is Nothing Then settings.fontInfo = New Font("Tahoma", 9)
             Select Case settings.workRes.Width
                 Case 1920
                     settings.testAllDuration = 40

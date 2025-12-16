@@ -5440,7 +5440,8 @@ Namespace VBClasses
             fileNameForm.OpenFileDialog1.CheckFileExists = False
             fileNameForm.OpenFileDialog1.Filter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
             fileNameForm.OpenFileDialog1.FilterIndex = 1
-            fileNameForm.filename.Text = GetSetting("Opencv", "Image_Basics_Name", "Image_Basics_Name", algTask.homeDir + "Images/train/2092.jpg")
+            fileNameForm.filename.Text = algTask.settings.Image_Basics_Name
+            If fileNameForm.filename.Text = "" Then fileNameForm.filename.Text = algTask.homeDir + "Images/train/2092.jpg"
             fileNameForm.Text = "Select an image file for use in Opencv"
             fileNameForm.FileNameLabel.Text = "Select a file."
             fileNameForm.PlayButton.Hide()
@@ -5743,8 +5744,8 @@ Namespace VBClasses
                 radio.addRadio("Cholesky")
                 radio.addRadio("Eig (works but results are incorrect)")
                 radio.addRadio("LU")
-                radio.addRadio("Normal (not working)")
-                radio.addRadio("QR (not working)")
+                radio.addRadio("Normal (Not working)")
+                radio.addRadio("QR (Not working)")
                 radio.addRadio("SVD (works but results are incorrect)")
                 radio.check(0).Checked = True
                 radio.check(3).Enabled = False ' not accepted!
@@ -6008,7 +6009,6 @@ Namespace VBClasses
         Public fileNameForm As New OptionsFileName
         Public fileName As String = ""
         Public playButton As String = ""
-        Public allOptionsLeft As Integer = 0
         Public saveFileName As String = ""
         Public Sub New()
             fileNameForm = New OptionsFileName
@@ -6017,7 +6017,8 @@ Namespace VBClasses
             fileNameForm.OpenFileDialog1.CheckFileExists = False
             fileNameForm.OpenFileDialog1.Filter = "ply (*.ply)|*.ply|All files (*.*)|*.*"
             fileNameForm.OpenFileDialog1.FilterIndex = 1
-            fileNameForm.filename.Text = GetSetting("Opencv", "plyFileName", "plyFileName", algTask.homeDir + "temp\pointcloud.ply")
+            fileNameForm.filename.Text = algTask.settings.plyFileName
+            If fileNameForm.filename.Text = "" Then fileNameForm.filename.Text = algTask.homeDir + "temp\pointcloud.ply"
 
             fileNameForm.Text = "Select ply output file"
             fileNameForm.FileNameLabel.Text = "Select ply output file"
@@ -6137,10 +6138,10 @@ Namespace VBClasses
     Public Class Options_Pyramid : Inherits OptionParent
         Public zoom As Integer = 0
         Public Sub New()
-            If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom in and out", -1, 1, zoom)
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Zoom in And out", -1, 1, zoom)
         End Sub
         Public Sub Run()
-            Static zoomSlider = OptionParent.FindSlider("Zoom in and out")
+            Static zoomSlider = OptionParent.FindSlider("Zoom in And out")
             zoom = zoomSlider.Value
         End Sub
     End Class
@@ -6779,12 +6780,12 @@ Namespace VBClasses
             If radio.Setup(traceName) Then
                 radio.addRadio("Boosting")
                 radio.addRadio("MIL")
-                radio.addRadio("KCF - appears to not work...")
+                radio.addRadio("KCF - appears to Not work...")
                 radio.addRadio("TLD")
                 radio.addRadio("MedianFlow")
-                radio.addRadio("GoTurn - appears to not work...")
+                radio.addRadio("GoTurn - appears to Not work...")
                 radio.addRadio("Mosse")
-                radio.addRadio("TrackerCSRT - Channel and Spatial Reliability Tracker")
+                radio.addRadio("TrackerCSRT - Channel And Spatial Reliability Tracker")
                 radio.check(trackType).Checked = True
                 radio.check(2).Enabled = False
                 radio.check(5).Enabled = False
@@ -6794,7 +6795,7 @@ Namespace VBClasses
             Static frm = FindFrm(traceName + " Radio Buttons")
             For i = 0 To frm.check.Count - 1
                 If frm.check(i).Checked = True Then
-                    label = "Method: " + radio.check(i).Text
+                    label = "Method " + radio.check(i).Text
                     trackType = i
                     Exit For
                 End If
@@ -6895,7 +6896,8 @@ Namespace VBClasses
             fileNameForm.OpenFileDialog1.CheckFileExists = False
             fileNameForm.OpenFileDialog1.Filter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
             fileNameForm.OpenFileDialog1.FilterIndex = 1
-            fileNameForm.filename.Text = GetSetting("Opencv", "VideoFileName", "VideoFileName", fileInfo.FullName)
+            fileNameForm.filename.Text = algTask.settings.VideoFileName
+            If fileNameForm.filename.Text = "" Then fileNameForm.filename.Text = fileInfo.FullName
             fileNameForm.Text = "Select a video file for input"
             fileNameForm.FileNameLabel.Text = "Select a video file for input"
             fileNameForm.PlayButton.Hide()
@@ -6910,7 +6912,7 @@ Namespace VBClasses
                 currFrame = 0
                 If fileNameForm.newFileName Then fileInfo = New FileInfo(fileNameForm.filename.Text)
                 If fileInfo.Exists = False Then
-                    MessageBox.Show("File not found: " + fileInfo.FullName)
+                    MessageBox.Show("File Not found: " + fileInfo.FullName)
                     Exit Sub
                 End If
             End If
