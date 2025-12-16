@@ -301,20 +301,9 @@ Namespace MainUI
             If pic.Image Is Nothing Then Exit Sub
             g.ScaleTransform(1, 1)
 
-            Dim displayImage As New cv.Mat
-            Select Case pic.Tag
-                Case 0
-                    displayImage = algTask.color.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
-                Case 1
-                    If algTask.depthRGB IsNot Nothing Then
-                        displayImage = algTask.depthRGB.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
-                    End If
-                Case 2
-                    displayImage = algTask.leftView.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
-                Case 3
-                    displayImage = algTask.rightView.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
-            End Select
-
+            Dim displayImage = algTask.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+            Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
+            picImages(pic.Tag) = bitmap
             g.DrawImage(picImages(pic.Tag), 0, 0)
 
             Dim ratioX = pic.Width / settings.workRes.Width

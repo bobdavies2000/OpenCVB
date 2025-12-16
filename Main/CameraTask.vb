@@ -57,29 +57,33 @@ Namespace MainUI
         End Function
         Private Sub Camera_FrameReady(sender As GenericCamera)
             If algTask Is Nothing Then Exit Sub
+            Static frameProcessed As Boolean = True
+            If frameProcessed = False Then Exit Sub
+            frameProcessed = False
 
-            Me.Invoke(Sub()
-                          sender.camImages.images(0).CopyTo(algTask.color)
-                          sender.camImages.images(1).CopyTo(algTask.pointCloud)
-                          sender.camImages.images(2).CopyTo(algTask.leftView)
-                          sender.camImages.images(3).CopyTo(algTask.rightView)
+            Me.BeginInvoke(Sub()
+                               sender.camImages.images(0).CopyTo(algTask.color)
+                               sender.camImages.images(1).CopyTo(algTask.pointCloud)
+                               sender.camImages.images(2).CopyTo(algTask.leftView)
+                               sender.camImages.images(3).CopyTo(algTask.rightView)
 
-                          algTask.RunAlgorithm()
-                          algTask.mouseClickFlag = False
+                               algTask.RunAlgorithm()
+                               algTask.mouseClickFlag = False
+                               algTask.frameCount += 1
 
-                          For i = 0 To 3
-                              Dim displayImage = algTask.dstList(i).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
-                              Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
-                              picImages(i) = bitmap
-                          Next
+                               'For i = 0 To 3
+                               '    Dim displayImage = algTask.dstList(i).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+                               '    Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
+                               '    picImages(i) = bitmap
+                               'Next
+                               frameProcessed = True
 
-                          If releaseImages() Then
-                              For i = 0 To algTask.labels.Count - 1
-                                  labels(i).Text = algTask.labels(i)
-                              Next
-                          End If
-                          ' Me.Refresh()
-                      End Sub)
+                               If releaseImages() Then
+                                   For i = 0 To algTask.labels.Count - 1
+                                       labels(i).Text = algTask.labels(i)
+                                   Next
+                               End If
+                           End Sub)
         End Sub
     End Class
 End Namespace

@@ -208,11 +208,9 @@ Namespace MainUI
             settings.desiredFPS = 30
             If settings.cameraName.Contains("Orbbec") Then
                 settings.desiredFPS = 0 ' maximum fps available at this resolution
-            ElseIf settings.cameraName.Contains("StereoLabs") Then
-                settings.desiredFPS = 100 ' possible at only
             End If
 
-            Select Case settings.workRes.Width
+            Select Case settings.captureRes.Width
                 Case 1920
                     settings.desiredFPS = 15
                 Case 1280
@@ -220,13 +218,9 @@ Namespace MainUI
                 Case 960
                     settings.desiredFPS = 45
                 Case 672
-                    settings.desiredFPS = 60
+                    settings.desiredFPS = 100
                 Case 640
                     settings.desiredFPS = 60
-                Case 480
-                    settings.desiredFPS = 75
-                Case 336, 320, 240, 168, 160
-                    settings.desiredFPS = 90
             End Select
 
             Try

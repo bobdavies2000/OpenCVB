@@ -620,7 +620,6 @@ Namespace VBClasses
                     treeView.optionsChanged = False
                 End If
                 optionsChanged = False
-                frameCount += 1
             Catch ex As Exception
                 Debug.WriteLine("Active Algorithm exception occurred: " + ex.Message)
             End Try
