@@ -73,11 +73,25 @@ Namespace MainUI
                 If algHistory.Count >= maxHistory Then Exit For
             Next
         End Sub
-        Public Sub New(Optional projectFile As String = "")
+        Public Sub New(Optional projectDirectory As String = "")
             InitializeComponent()
 
             ' Set the current directory to the project path (where .vbproj file is located)
-            Dim projectDir As DirectoryInfo = New DirectoryInfo(Path.GetDirectoryName(projectFile))
+            Dim projectDir As DirectoryInfo
+            If String.IsNullOrEmpty(projectDirectory) Then
+                ' Fallback: try to find the project directory
+                Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
+                Dim currentDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
+                While currentDir IsNot Nothing
+                    Dim vbprojFile = currentDir.GetFiles("MainUI.vbproj")
+                    If vbprojFile.Length > 0 Then
+                        projectDirectory = currentDir.FullName
+                        Exit While
+                    End If
+                    currentDir = currentDir.Parent
+                End While
+            End If
+            projectDir = New DirectoryInfo(projectDirectory)
             Directory.SetCurrentDirectory(projectDir.FullName + "/../")
             homeDir = Path.GetDirectoryName(projectDir.FullName) + "\"
 
@@ -86,7 +100,7 @@ Namespace MainUI
                 lab.Text = ""
             Next
 
-            settingsIO = New jsonIO(Path.Combine(homeDir, "Main\settings.json"))
+            settingsIO = New jsonIO(Path.Combine(homeDir, "MainUI\settings.json"))
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
@@ -248,10 +262,10 @@ Namespace MainUI
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             settings = settingsIO.Load()
 
-            PausePlay = New Bitmap(homeDir + "Main/Data/PauseButton.png")
-            stopTestAll = New Bitmap(homeDir + "Main/Data/stopTestAll.png")
-            testAllToolbarBitmap = New Bitmap(homeDir + "Main/Data/testall.png")
-            runPlay = New Bitmap(homeDir + "Main/Data/Run.png")
+            PausePlay = New Bitmap(homeDir + "MainUI/Data/PauseButton.png")
+            stopTestAll = New Bitmap(homeDir + "MainUI/Data/stopTestAll.png")
+            testAllToolbarBitmap = New Bitmap(homeDir + "MainUI/Data/testall.png")
+            runPlay = New Bitmap(homeDir + "MainUI/Data/Run.png")
 
             For i = 0 To 3
                 Dim pic = New PictureBox()
@@ -287,7 +301,7 @@ Namespace MainUI
 
             isPlaying = Not isPlaying
 
-            Dim filePath = Path.Combine(homeDir + "\Main\Data", If(isPlaying, "PauseButton.png", "Run.png"))
+            Dim filePath = Path.Combine(homeDir + "MainUI\Data", If(isPlaying, "PauseButton.png", "Run.png"))
             PausePlayButton.Image = New Bitmap(filePath)
 
             If isPlaying Then StartCamera() Else StopCamera()
@@ -297,7 +311,6 @@ Namespace MainUI
             If algTask Is Nothing Then Exit Sub
             Dim g As Graphics = e.Graphics
             Dim pic = DirectCast(sender, PictureBox)
-            If pic.Image Is Nothing Then Exit Sub
             g.ScaleTransform(1, 1)
 
             Dim displayImage = algTask.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
@@ -346,7 +359,6 @@ Namespace MainUI
             If algTask Is Nothing Then Exit Sub
             If algTask.treeView IsNot Nothing Then algTask.treeView.Timer2_Tick(sender, e)
         End Sub
-
         Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
             Me.Refresh() ' set to trigger a refresh every 33 ms...
         End Sub

@@ -107,7 +107,7 @@ Namespace VBClasses
             If input.Channels() = 1 And input.Type = cv.MatType.CV_8UC1 Then outMat = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             Return outMat
         End Function
-        Public Sub updateSettings()
+        Public Sub taskUpdate()
             If algTask.myStopWatch Is Nothing Then algTask.myStopWatch = Stopwatch.StartNew()
 
             ' update the time measures

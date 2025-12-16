@@ -5,10 +5,7 @@ Public Class OptionsContainer
     Public hiddenOptions As New List(Of String)
     Public titlesAdded As Boolean
     Public offset = 30
-    Private Sub allOptionsFrm_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Me.Location = New Point(algTask.Settings.allOptionsLeft, algTask.Settings.allOptionsTop)
-        Me.Size = New Size(algTask.Settings.allOptionsWidth, algTask.Settings.allOptionsHeight)
-    End Sub
+    Public alreadyPositioned As Boolean
     Public Sub addTitle(frm As Object)
         If optionsTitle.Contains(frm.Text) = False Then
             optionsTitle.Add(frm.Text)
@@ -19,7 +16,7 @@ Public Class OptionsContainer
         titlesAdded = True
     End Sub
     Public Sub layoutOptions(normalRequest As Boolean)
-        Dim w = GetSetting("Opencv", "gOptionsWidth", "gOptionsWidth", algTask.mainFormLocation.Width)
+        Dim w = algTask.Settings.allOptionsWidth
         Dim radioCheckOffset = New cv.Point(w / 2, 0)
 
         Dim sliderOffset As New cv.Point(0, 0)
@@ -92,10 +89,12 @@ Public Class OptionsContainer
         GC.Collect()
     End Sub
     Private Sub OptionsContainer_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
-        algTask.Settings.allOptionsLeft = Me.Left
-        algTask.Settings.allOptionsTop = Me.Top
-        algTask.Settings.allOptionsWidth = Me.Width
-        algTask.Settings.allOptionsHeight = Me.Height
+        If alreadyPositioned Then
+            algTask.Settings.allOptionsLeft = Me.Left
+            algTask.Settings.allOptionsTop = Me.Top
+            algTask.Settings.allOptionsWidth = Me.Width
+            algTask.Settings.allOptionsHeight = Me.Height
+        End If
     End Sub
     Private Sub OptionsContainer_Move(sender As Object, e As EventArgs) Handles Me.Move
         OptionsContainer_ResizeEnd(sender, e)

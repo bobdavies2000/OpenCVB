@@ -58,7 +58,7 @@ Namespace MainUI
             Next
 
             Dim index = cameraNames.IndexOf(Settings.cameraName)
-            If Settings.cameraName = "" Or Settings.cameraPresent(index) = False Then
+            If index < 0 Then
                 For i = 0 To cameraNames.Count - 1
                     If Settings.cameraPresent(i) Then
                         Settings.cameraName = cameraNames(i)

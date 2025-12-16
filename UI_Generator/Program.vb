@@ -84,7 +84,7 @@ Module Program
             sb.AppendLine("End Class")
             sb.AppendLine("End NameSpace")
 
-            Dim mainPath As String = Path.GetFullPath(Path.Combine(appPath, "..\..\..\..\..\Main"))
+            Dim mainPath As String = Path.GetFullPath(Path.Combine(appPath, "..\..\..\..\..\MainUI"))
             Dim algorithmListPath As String = Path.Combine(mainPath, "AlgorithmList.vb")
 
             File.WriteAllText(algorithmListPath, sb.ToString())

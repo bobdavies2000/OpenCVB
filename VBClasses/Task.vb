@@ -6,7 +6,7 @@ Imports jsonShared
 #Region "taskProcess"
 Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
-        Public ReadOnly Settings As jsonShared.Settings
+        Public Settings As jsonShared.Settings
 
         Public dstList(3) As cv.Mat
 
@@ -313,6 +313,7 @@ Namespace VBClasses
 #End Region
 
         Public Sub Initialize(settings As jsonShared.Settings)
+            algTask.Settings = settings
             rgbLeftAligned = True
             If settings.cameraName.Contains("RealSense") Then rgbLeftAligned = False
 
@@ -321,10 +322,14 @@ Namespace VBClasses
             workRes = settings.workRes
             captureRes = settings.captureRes
             resolutionDetails = "CaptureRes " + CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) +
-                            ", workRes " + CStr(workRes.Width) + "x" + CStr(workRes.Height)
+                                ", workRes " + CStr(workRes.Width) + "x" + CStr(workRes.Height)
 
             allOptions = New OptionsContainer
             allOptions.Show()
+            allOptions.Left = algTask.Settings.allOptionsLeft
+            allOptions.Top = algTask.Settings.allOptionsTop
+            allOptions.Size = New Size(algTask.Settings.allOptionsWidth, algTask.Settings.allOptionsHeight)
+            allOptions.alreadyPositioned = True
 
             If settings.algorithm.StartsWith("GL_") And settings.algorithm <> "GL_MainForm" And optionsChanged Then
                 If sharpGL IsNot Nothing Then sharpGL.Dispose()
@@ -357,7 +362,7 @@ Namespace VBClasses
                 callTrace(i) = settings.algorithm + "\" + callTrace(i)
             Next
 
-            updateSettings()
+            taskUpdate()
             featureOptions.Show()
             gOptions.Show()
             Options_HistPointCloud.setupCalcHist()
@@ -397,7 +402,7 @@ Namespace VBClasses
                 allOptions.layoutOptions(normalRequest:=True)
             End If
 
-            updateSettings()
+            taskUpdate()
 
             If algorithm_ms.Count = 0 Then
                 algorithmNames.Add("waitingForInput")
