@@ -30,7 +30,7 @@ Namespace VBClasses
                         Next
                     Next
                     sw.Close()
-                    SaveSetting("OpenCVB", "plyFileName", "plyFileName", saveFileName)
+                    algTask.Settings.plyFileName = saveFileName
                 Catch ex As Exception
                 End Try
             End If
@@ -78,7 +78,7 @@ Namespace VBClasses
                         Next
                     Next
                     sw.Close()
-                    SaveSetting("OpenCVB", "plyFileName", "plyFileName", saveFileName)
+                    algTask.Settings.plyFileName = saveFileName
                 Catch ex As Exception
                 End Try
             End If

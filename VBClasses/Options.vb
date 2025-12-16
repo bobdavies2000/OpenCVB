@@ -6039,7 +6039,7 @@ Namespace VBClasses
             End If
 
             If saveFileName <> fileName And fileName.Length > 0 Then
-                SaveSetting("Opencv", "plyFileName", "plyFileName", fileName)
+                algTask.Settings.plyFileName = fileName
                 saveFileName = fileName
             End If
         End Sub
