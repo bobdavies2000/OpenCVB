@@ -108,7 +108,7 @@ Namespace MainUI
                 If settings.workRes <> algTask.workRes And settings.cameraName <> algTask.cameraName Then
                     getLineCounts()
 
-                    SaveSettings()
+                    SaveJsonSettings()
                     StopCamera()
                     StartCamera()
                     startAlgorithm()
@@ -143,7 +143,7 @@ Namespace MainUI
                     Dim algStr = alg.ToString()
                     If Not String.IsNullOrWhiteSpace(algStr) AndAlso algStr.StartsWith(groupsForm.selectedGroup) Then
                         AvailableAlgorithms.Text = algStr
-                        SaveSettings()
+                        SaveJsonSettings()
                         Exit For
                     End If
                 Next
@@ -159,7 +159,7 @@ Namespace MainUI
                     If count = 10 Then Exit While
                 End While
             End If
-            SaveSettings()
+            SaveJsonSettings()
         End Sub
         Private Sub getLineCounts()
             Dim countFileInfo = New FileInfo(homeDir + "Data/AlgorithmCounts.txt")
@@ -202,7 +202,7 @@ Namespace MainUI
                        CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + settings.cameraName
 
         End Sub
-        Private Sub SaveSettings()
+        Private Sub SaveJsonSettings()
             updateAlgorithmHistory()
             settings.MainFormLeft = Me.Left
             settings.MainFormTop = Me.Top
@@ -364,7 +364,7 @@ Namespace MainUI
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
             settings.algorithm = AvailableAlgorithms.Text
-            SaveSettings()
+            SaveJsonSettings()
             If algTask Is Nothing Then
                 startAlgorithm()
             Else
