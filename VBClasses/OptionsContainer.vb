@@ -5,7 +5,7 @@ Public Class OptionsContainer
     Public hiddenOptions As New List(Of String)
     Public titlesAdded As Boolean
     Public offset = 30
-    Public alreadyPositioned As Boolean
+    Public positionedFromSettings As Boolean
     Public Sub addTitle(frm As Object)
         If optionsTitle.Contains(frm.Text) = False Then
             optionsTitle.Add(frm.Text)
@@ -89,7 +89,7 @@ Public Class OptionsContainer
         GC.Collect()
     End Sub
     Private Sub OptionsContainer_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
-        If alreadyPositioned Then
+        If positionedFromSettings Then
             algTask.Settings.allOptionsLeft = Me.Left
             algTask.Settings.allOptionsTop = Me.Top
             algTask.Settings.allOptionsWidth = Me.Width

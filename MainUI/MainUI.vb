@@ -304,6 +304,7 @@ Namespace MainUI
                 pic.Tag = i
                 pic.BackColor = Color.Black
                 pic.Visible = True
+                pic.SizeMode = PictureBoxSizeMode.StretchImage
                 Me.Controls.Add(pic)
 
                 pics.Add(pic)

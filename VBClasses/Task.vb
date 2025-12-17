@@ -322,10 +322,9 @@ Namespace VBClasses
 
             allOptions = New OptionsContainer
             allOptions.Show()
-            allOptions.Left = algTask.Settings.allOptionsLeft
-            allOptions.Top = algTask.Settings.allOptionsTop
+            allOptions.Location = New Point(algTask.Settings.allOptionsLeft, algTask.Settings.allOptionsTop)
             allOptions.Size = New Size(algTask.Settings.allOptionsWidth, algTask.Settings.allOptionsHeight)
-            allOptions.alreadyPositioned = True
+            allOptions.positionedFromSettings = True
 
             If settings.algorithm.StartsWith("GL_") And settings.algorithm <> "GL_MainForm" And optionsChanged Then
                 If sharpGL IsNot Nothing Then sharpGL.Dispose()
