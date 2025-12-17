@@ -31,10 +31,10 @@ Namespace jsonShared
         Public allOptionsHeight As Integer = MainFormHeight
 
         Public algorithm As String
-        Public algorithmHistory As List(Of String)
+        Public algorithmHistory As New List(Of String)
 
-        Public workRes As New cv.Size(336, 188)
-        Public captureRes As New cv.Size(672, 376)
+        Public workRes As New cv.Size(320, 240)
+        Public captureRes As New cv.Size(640, 480)
         Public displayRes As cv.Size
 
         Public desiredFPS As Integer = 60

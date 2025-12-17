@@ -243,7 +243,4 @@ Public Class OptionsGlobal
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs)
         algTask.optionsChanged = True
     End Sub
-    Private Sub debugSyncUI_CheckedChanged(sender As Object, e As EventArgs) Handles debugSyncUI.CheckedChanged
-        algTask.debugSyncUI = debugSyncUI.Checked
-    End Sub
 End Class

@@ -120,13 +120,12 @@ Namespace MainUI
             End If
             Return usblist
         End Function
-
         Public Sub Save(settings As jsonShared.Settings)
             Select Case settings.captureRes.Width
-                Case 640
-                    settings.displayRes = New cv.Size(640, 480)
-                Case Else
+                Case 672
                     settings.displayRes = New cv.Size(672, 376)
+                Case Else
+                    settings.displayRes = New cv.Size(640, 480)
             End Select
 
             Select Case settings.workRes.Height
@@ -134,6 +133,8 @@ Namespace MainUI
                     settings.captureRes = New cv.Size(1920, 1080)
                 Case 180, 360, 720
                     settings.captureRes = New cv.Size(1280, 720)
+                Case 600
+                    settings.captureRes = New cv.Size(960, 600)
                 Case 376, 188, 94
                     If settings.cameraName = "StereoLabs ZED 2/2i" Then
                         settings.captureRes = New cv.Size(672, 376)

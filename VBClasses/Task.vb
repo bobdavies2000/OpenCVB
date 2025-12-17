@@ -198,9 +198,6 @@ Namespace VBClasses
         Public pcFloor As Single ' y-value for floor...
         Public pcCeiling As Single ' y-value for ceiling...
 
-        Public debugSyncUI As Boolean
-        Public debugDrawFlag As Boolean
-
         Public lineGravity As New lpData
         Public lineHorizon As New lpData
         Public lineLongest As New lpData
@@ -299,6 +296,7 @@ Namespace VBClasses
         Public depthAndDepthRange As String = ""
         Public resolutionDetails As String = ""
         Public sharpGL As SharpGLForm
+        Public readyForCameraInput As Boolean
         Public Sub Dispose() Implements IDisposable.Dispose
             If allOptions IsNot Nothing Then allOptions.Close()
             If activeObjects IsNot Nothing Then
@@ -374,6 +372,7 @@ Namespace VBClasses
 
             myStopWatch = Stopwatch.StartNew()
             optionsChanged = True
+            readyForCameraInput = True
         End Sub
 
         Public Sub setSelectedCell()
@@ -439,7 +438,7 @@ Namespace VBClasses
                 heartBeat = False
                 optionsChanged = False
             Else
-                heartBeat = heartBeat Or debugSyncUI Or optionsChanged Or mouseClickFlag
+                heartBeat = heartBeat Or optionsChanged Or mouseClickFlag
             End If
 
             frameHistoryCount = 3 ' default value.  Use Options_History to update this value.
@@ -457,11 +456,6 @@ Namespace VBClasses
                     If motionRect.Width > 0 Then
                         gray.CopyTo(grayStable, motionMask)
                         leftView.CopyTo(leftViewStable, motionMask)
-                    Else
-                        If algTask.gOptions.debugSyncUI.Checked Then
-                            grayStable = gray.Clone
-                            leftViewStable = leftView.Clone
-                        End If
                     End If
                 End If
             Else

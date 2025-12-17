@@ -2,7 +2,7 @@
 Public Class OptionsRadioButtons
     Public check As New List(Of RadioButton)
     Public Function Setup(traceName As String) As Boolean
-        If VBClasses.OptionParent.FindFrm(traceName + " Radio Buttons") IsNot Nothing Then Return False
+        If OptionParent.FindFrm(traceName + " Radio Buttons") IsNot Nothing Then Return False
         Me.MdiParent = algTask.allOptions
         Me.Text = traceName + " Radio Buttons"
         algtask.allOptions.addTitle(Me)
@@ -17,6 +17,6 @@ Public Class OptionsRadioButtons
         FlowLayoutPanel1.Controls.Add(check(index))
     End Sub
     Private Sub radio_CheckChanged(sender As Object, e As EventArgs)
-        VBClasses.vbc.algTask.optionsChanged = True
+        algTask.optionsChanged = True
     End Sub
 End Class

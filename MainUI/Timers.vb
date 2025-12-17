@@ -29,11 +29,11 @@ Namespace MainUI
 
                 If taskTimerInterval > 0 Then
                     Dim testVal = camFrames / (taskTimerInterval / 1000)
-                    If testVal >= 100 Then testVal = 99
+                    If testVal >= 200 Then testVal = 99
                     fpsListC.Add(testVal)
 
                     testVal = countFrames / (taskTimerInterval / 1000)
-                    If testVal >= 100 Then testVal = 99
+                    If testVal >= 200 Then testVal = 99
                     fpsListA.Add(testVal)
                 End If
 

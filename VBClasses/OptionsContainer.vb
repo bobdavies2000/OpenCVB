@@ -34,7 +34,7 @@ Public Class OptionsContainer
         Dim indexO = 1
         Dim indexHide As Integer
         For Each title In optionsTitle
-            Dim frm = VBClasses.OptionParent.FindFrm(title)
+            Dim frm = OptionParent.FindFrm(title)
             If frm IsNot Nothing Then
                 frm.BringToFront()
                 Dim sidelineOptions As Boolean = True
@@ -82,9 +82,9 @@ Public Class OptionsContainer
                 End If
             Next
         Next
-        VBClasses.algTask.gOptions.Close()
-        VBClasses.algTask.featureOptions.Close()
-        VBClasses.algTask.treeView.Close()
+        algTask.gOptions.Close()
+        algTask.featureOptions.Close()
+        algTask.treeView.Close()
         If algTask.sharpGL IsNot Nothing Then algTask.sharpGL.Close()
         GC.Collect()
     End Sub

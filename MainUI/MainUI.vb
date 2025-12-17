@@ -35,7 +35,9 @@ Namespace MainUI
             setAlgorithmSelection()
         End Sub
         Public Sub setupAlgorithmHistory()
-            If recentMenu Is Nothing Then ReDim recentMenu(settings.algorithmHistory.Count - 1)
+            If recentMenu Is Nothing Then
+                If settings.algorithmHistory.Count > 0 Then ReDim recentMenu(settings.algorithmHistory.Count - 1)
+            End If
             For Each alg In settings.algorithmHistory
                 algHistory.Add(alg)
                 If AvailableAlgorithms.Items.Contains(alg) = False Then Continue For
@@ -100,20 +102,7 @@ Namespace MainUI
                 lab.Text = ""
             Next
 
-            settingsIO = New jsonIO(Path.Combine(homeDir, "MainUI\settings.json"))
-        End Sub
-        Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
-            If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
-            If Options.ShowDialog() = DialogResult.OK Then
-                If settings.workRes <> algTask.workRes And settings.cameraName <> algTask.cameraName Then
-                    getLineCounts()
-
-                    SaveJsonSettings()
-                    StopCamera()
-                    StartCamera()
-                    startAlgorithm()
-                End If
-            End If
+            settingsIO = New jsonIO(Path.Combine(homeDir, "settings.json"))
         End Sub
         Private Sub LoadAvailableAlgorithms()
             Dim algListPath = Path.Combine(CurDir(), "Data", "AvailableAlgorithms.txt")
@@ -215,7 +204,7 @@ Namespace MainUI
             If settings Is Nothing Then Exit Sub
             AlgDescription.Width = Me.Width - 540
 
-            Dim labelHeight As Integer = 18
+            Dim labelHeight As Integer = 20
             Dim topStart As Integer = MainToolStrip.Height
             Dim offset = 10
             Dim h As Integer = (Me.Height - StatusLabel.Height - topStart - labelHeight * 2) / 2 - 20
@@ -258,6 +247,35 @@ Namespace MainUI
             'If algTask IsNot Nothing Then  if algTask.sharpgl IsNot Nothing Then sharpGL.Activate()
             If algTask IsNot Nothing Then If algTask.treeView IsNot Nothing Then algTask.treeView.Activate()
             If algTask IsNot Nothing Then If algTask.allOptions IsNot Nothing Then algTask.allOptions.Activate()
+        End Sub
+        Private Sub TreeViewTimer_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
+            If isPlaying = False Then Exit Sub
+            If algTask Is Nothing Then Exit Sub
+            If algTask.treeView IsNot Nothing Then algTask.treeView.Timer2_Tick(sender, e)
+        End Sub
+        Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
+            Me.Refresh() ' set to trigger a refresh every 33 ms...
+        End Sub
+        Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
+            settings.algorithm = AvailableAlgorithms.Text
+
+            SaveJsonSettings()
+            If algTask Is Nothing Then
+                startAlgorithm()
+            Else
+                If Trim(AvailableAlgorithms.Text) = "" Then ' Skip the space between groups
+                    If AvailableAlgorithms.SelectedIndex + 1 < AvailableAlgorithms.Items.Count Then
+                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1)
+                    Else
+                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex - 1)
+                    End If
+                End If
+
+                If AvailableAlgorithms.Enabled Then
+                    startAlgorithm()
+                    updateAlgorithmHistory()
+                End If
+            End If
         End Sub
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             settings = settingsIO.Load()
@@ -307,34 +325,6 @@ Namespace MainUI
             If isPlaying Then StartCamera() Else StopCamera()
             setAlgorithmSelection()
         End Sub
-        Private Sub Pic_Paint(sender As Object, e As PaintEventArgs)
-            If algTask Is Nothing Then Exit Sub
-            Dim g As Graphics = e.Graphics
-            Dim pic = DirectCast(sender, PictureBox)
-            g.ScaleTransform(1, 1)
-
-            Dim displayImage = algTask.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
-            Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
-            g.DrawImage(bitmap, 0, 0)
-
-            Dim ratioX = pic.Width / settings.workRes.Width
-            Dim ratioY = pic.Height / settings.workRes.Height
-
-            Static myWhitePen As New Pen(Color.White)
-            Static myBlackPen As New Pen(Color.Black)
-
-            Static saveTrueData As List(Of VBClasses.TrueText)
-            saveTrueData = New List(Of VBClasses.TrueText)(algTask.trueData)
-            Dim font = New System.Drawing.Font("Tahoma", 9)
-            For Each tt In saveTrueData
-                If tt.text Is Nothing Then Continue For
-                If tt.text.Length > 0 And tt.picTag = pic.Tag Then
-                    g.DrawString(tt.text, font, New SolidBrush(Color.White),
-                                     CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
-                End If
-            Next
-            displayImage.Dispose()
-        End Sub
 
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
             If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
@@ -354,44 +344,69 @@ Namespace MainUI
             Static startingAlgorithm = AvailableAlgorithms.Text
             startAlgorithm()
         End Sub
-        Private Sub TreeViewTimer_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
-            If isPlaying = False Then Exit Sub
+        Private Sub Pic_Paint(sender As Object, e As PaintEventArgs)
             If algTask Is Nothing Then Exit Sub
-            If algTask.treeView IsNot Nothing Then algTask.treeView.Timer2_Tick(sender, e)
-        End Sub
-        Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
-            Me.Refresh() ' set to trigger a refresh every 33 ms...
-        End Sub
-        Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
-            settings.algorithm = AvailableAlgorithms.Text
-            SaveJsonSettings()
-            If algTask Is Nothing Then
-                startAlgorithm()
-            Else
-                If Trim(AvailableAlgorithms.Text) = "" Then ' Skip the space between groups
-                    If AvailableAlgorithms.SelectedIndex + 1 < AvailableAlgorithms.Items.Count Then
-                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1)
-                    Else
-                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex - 1)
-                    End If
-                End If
+            Dim g As Graphics = e.Graphics
+            Dim pic = DirectCast(sender, PictureBox)
+            g.ScaleTransform(1, 1)
 
-                If AvailableAlgorithms.Enabled Then
-                    startAlgorithm()
-                    updateAlgorithmHistory()
+            Dim displayImage = algTask.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+            Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
+            g.DrawImage(bitmap, 0, 0)
+
+            For i = 0 To algTask.labels.Count - 1
+                labels(i).Text = algTask.labels(i)
+            Next
+
+            Dim ratioX = pic.Width / settings.workRes.Width
+            Dim ratioY = pic.Height / settings.workRes.Height
+
+            Static myWhitePen As New Pen(Color.White)
+            Static myBlackPen As New Pen(Color.Black)
+
+            Static saveTrueData As List(Of TrueText)
+            saveTrueData = New List(Of TrueText)(algTask.trueData)
+            Dim font = New System.Drawing.Font("Tahoma", 9)
+            For Each tt In saveTrueData
+                If tt.text Is Nothing Then Continue For
+                If tt.text.Length > 0 And tt.picTag = pic.Tag Then
+                    g.DrawString(tt.text, font, New SolidBrush(Color.White),
+                                     CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
                 End If
+            Next
+            displayImage.Dispose()
+        End Sub
+        Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
+            If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
+            algTask.readyForCameraInput = False
+            StopCamera()
+            algTask.Dispose()
+            algTask = Nothing
+
+            If Options.ShowDialog() = DialogResult.OK Then
+                getLineCounts()
+
+                SaveJsonSettings()
+
+                StartCamera()
+                startAlgorithm()
             End If
         End Sub
         Private Sub startAlgorithm()
-            algTask = New VBClasses.AlgorithmTask
 
-            algTask.homeDir = homeDir
+            algTask = New AlgorithmTask
+
+            For i = 0 To 3
+                algTask.dstList(i) = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
+            Next
+
             algTask.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
             algTask.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
             algTask.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
             algTask.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
             algTask.gridRatioX = pics(0).Width / settings.workRes.Width
             algTask.gridRatioY = pics(0).Height / settings.workRes.Height
+            algTask.homeDir = homeDir
 
             algTask.main_hwnd = Me.Handle
 

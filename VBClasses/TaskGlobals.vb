@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Module vbc
-        Public algTask As VBClasses.AlgorithmTask
+        Public algTask As AlgorithmTask
         Public Const fmt0 = "0"
         Public Const fmt1 = "0.0"
         Public Const fmt2 = "0.00"

@@ -41,22 +41,9 @@ Namespace MainUI
             camera.childStopCamera()
             camera.isCapturing = False
         End Sub
-        Private Function releaseImages() As Boolean
-            If algTask.debugSyncUI Then
-                Static lastTime As DateTime = Now
-                Dim timeNow As DateTime = Now
-                Dim elapsedTime = timeNow.Ticks - lastTime.Ticks
-                Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
-                Dim timerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
-
-                ' adjust the debugSyncUI time here - the 1000 below is in milliseconds.
-                If timerInterval < 1000 Then Return False Else lastTime = timeNow
-            End If
-
-            Return True
-        End Function
         Private Sub Camera_FrameReady(sender As GenericCamera)
-            If algTask Is Nothing Then Exit Sub
+            If algTask.readyForCameraInput = False Then Exit Sub
+
             Static frameProcessed As Boolean = True
             If frameProcessed = False Then Exit Sub
             frameProcessed = False
@@ -70,19 +57,7 @@ Namespace MainUI
                                algTask.RunAlgorithm()
                                algTask.mouseClickFlag = False
                                algTask.frameCount += 1
-
-                               'For i = 0 To 3
-                               '    Dim displayImage = algTask.dstList(i).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
-                               '    Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
-                               '    picImages(i) = bitmap
-                               'Next
                                frameProcessed = True
-
-                               If releaseImages() Then
-                                   For i = 0 To algTask.labels.Count - 1
-                                       labels(i).Text = algTask.labels(i)
-                                   Next
-                               End If
                            End Sub)
         End Sub
     End Class

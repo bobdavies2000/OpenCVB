@@ -20,18 +20,18 @@ Public Class SharpGLForm
     Dim upX As Integer
     Dim upY As Integer = 1
     Dim upZ As Integer
-    Public options As VBClasses.Options_SharpGL
-    Public options1 As VBClasses.Options_GL
-    Public options2 As VBClasses.Options_SharpGL2
+    Public options As Options_SharpGL
+    Public options1 As Options_GL
+    Public options2 As Options_SharpGL2
     Public ppx = algTask.calibData.rgbIntrinsics.ppx
     Public ppy = algTask.calibData.rgbIntrinsics.ppy
     Public fx = algTask.calibData.rgbIntrinsics.fx
     Public fy = algTask.calibData.rgbIntrinsics.fy
-    Public hulls As VBClasses.RedCloud_Basics
+    Public hulls As RedCloud_Basics
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
-        options = New VBClasses.Options_SharpGL
-        options1 = New VBClasses.Options_GL
-        options2 = New VBClasses.Options_SharpGL2
+        options = New Options_SharpGL
+        options1 = New Options_GL
+        options2 = New Options_SharpGL2
 
         Me.Location = New Point(algTask.settings.sharpGLLeft, algTask.settings.sharpGLTop)
         Me.Size = New Size(algTask.settings.sharpGLWidth, algTask.settings.sharpGLHeight)
@@ -124,8 +124,8 @@ Public Class SharpGLForm
         zoomZ += If(delta > 0, 0.5F, -0.5F)
         GLControl.Invalidate() ' Force redraw
     End Sub
-    Private Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As VBClasses.mmData
-        Dim mm As VBClasses.mmData = Nothing
+    Private Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
+        Dim mm As mmData = Nothing
         If mask Is Nothing Then
             mat.MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc)
         Else
@@ -151,8 +151,8 @@ Public Class SharpGLForm
             Dim color = algTask.color(rect).Mean()
 
             gl.Color(CSng(color(2) / 255), CSng(color(1) / 255), CSng(color(0) / 255))
-            Dim p0 = VBClasses.Cloud_Basics.worldCoordinates(rect.TopLeft, depth)
-            Dim p1 = VBClasses.Cloud_Basics.worldCoordinates(rect.BottomRight, depth)
+            Dim p0 = Cloud_Basics.worldCoordinates(rect.TopLeft, depth)
+            Dim p1 = Cloud_Basics.worldCoordinates(rect.BottomRight, depth)
             gl.Vertex(p0.X, p0.Y, depth)
             gl.Vertex(p1.X, p0.Y, depth)
             gl.Vertex(p1.X, p1.Y, depth)
@@ -201,27 +201,27 @@ Public Class SharpGLForm
         If pointcloud Is Nothing Then pointcloud = algTask.pointCloud
         If RGB Is Nothing Then RGB = algTask.color
         Select Case func
-            Case VBClasses.Common.oCase.readPC
+            Case Common.oCase.readPC
                 label = drawCloud(pointcloud, RGB)
                 readPointCloud()
 
-            Case VBClasses.Common.oCase.readLines
+            Case Common.oCase.readLines
                 label = drawCloud(pointcloud, RGB)
                 label += draw3DLines(algTask.lines.lpList)
                 readPointCloud()
 
-            Case VBClasses.Common.oCase.readQuads
+            Case Common.oCase.readQuads
                 label = drawQuads()
                 readPointCloud()
 
-            Case VBClasses.Common.oCase.drawPointCloudRGB
+            Case Common.oCase.drawPointCloudRGB
                 'gl.ClearStencil(0)
                 'gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT Or OpenGL.GL_DEPTH_BUFFER_BIT Or OpenGL.GL_STENCIL_BUFFER_BIT)
 
                 label = drawCloud(pointcloud, RGB)
 
 
-            Case VBClasses.Common.oCase.line3D
+            Case Common.oCase.line3D
                 gl.Begin(OpenGL.GL_POINTS)
                 Dim count As Integer, all255 As Boolean
                 If RGB Is Nothing Then all255 = True
@@ -244,13 +244,13 @@ Public Class SharpGLForm
                 label = CStr(count) + " points were rendered for the selected line(s)."
 
 
-            Case VBClasses.Common.oCase.quadBasics
+            Case Common.oCase.quadBasics
                 drawQuads()
 
-            Case VBClasses.Common.oCase.draw3DLines
+            Case Common.oCase.draw3DLines
                 label = draw3DLines(algTask.lines.lpList)
 
-            Case VBClasses.Common.oCase.draw3DLinesAndCloud
+            Case Common.oCase.draw3DLinesAndCloud
                 label = drawCloud(pointcloud, RGB)
 
                 label += " " + draw3DLines(algTask.lines.lpList)
@@ -276,9 +276,9 @@ Public Class SharpGLForm
 
         Dim label = ""
         Select Case func
-            Case VBClasses.Common.oCase.draw3DLines
+            Case Common.oCase.draw3DLines
                 label = draw3DLines(lpList)
-            Case VBClasses.Common.oCase.draw3DLinesAndCloud
+            Case Common.oCase.draw3DLinesAndCloud
                 label = drawCloud(algTask.pointCloud, algTask.color)
                 label += " " + draw3DLines(lpList)
         End Select
@@ -291,7 +291,7 @@ Public Class SharpGLForm
 
         Dim label = ""
         Select Case func
-            Case VBClasses.Common.oCase.colorTriangles
+            Case Common.oCase.colorTriangles
                 Dim vec As cv.Vec3f
                 gl.Begin(OpenGL.GL_TRIANGLES)
 
@@ -312,8 +312,8 @@ Public Class SharpGLForm
                 gl.End()
                 label = CStr(dataBuffer.Count) + " triangles were sent to OpenGL."
 
-            Case VBClasses.Common.oCase.imageTriangles
-                If hulls Is Nothing Then hulls = New VBClasses.RedCloud_Basics
+            Case Common.oCase.imageTriangles
+                If hulls Is Nothing Then hulls = New RedCloud_Basics
                 hulls.Run(algTask.color)
 
                 Dim textureID As UInt32() = New UInt32(0) {} ' Array to hold the texture ID
