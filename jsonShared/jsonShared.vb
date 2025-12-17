@@ -36,7 +36,7 @@ Namespace jsonShared
         Public workRes As New cv.Size(320, 240)
         Public captureRes As New cv.Size(640, 480)
         Public displayRes As cv.Size
-        Public displayFPS As Integer
+        Public FPSdisplay As Integer
 
         Public desiredFPS As Integer = 60
         Public testAllDuration As Integer = 5

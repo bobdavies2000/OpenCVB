@@ -118,12 +118,13 @@ Partial Class OptionsGlobal
         ' 
         DisplayFPSSlider.Location = New Point(230, 27)
         DisplayFPSSlider.Margin = New Padding(3, 4, 3, 4)
-        DisplayFPSSlider.Minimum = 1
+        DisplayFPSSlider.Maximum = 60
+        DisplayFPSSlider.Minimum = -5
         DisplayFPSSlider.Name = "DisplayFPSSlider"
         DisplayFPSSlider.Size = New Size(549, 69)
         DisplayFPSSlider.TabIndex = 12
         DisplayFPSSlider.TickStyle = TickStyle.None
-        DisplayFPSSlider.Value = 5
+        DisplayFPSSlider.Value = 15
         ' 
         ' FPSDisplayLabel
         ' 

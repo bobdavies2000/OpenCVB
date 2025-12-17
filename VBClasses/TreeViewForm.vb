@@ -140,6 +140,12 @@ Public Class TreeviewForm
         PercentTime.Text = "Click on an algorithm to see more info. " + vbCrLf + vbCrLf
         PercentTime.Text += "Algorithm FPS = " + Format(algTask.fpsAlgorithm, "0") + vbCrLf
         PercentTime.Text += "Camera FPS = " + Format(algTask.fpsCamera, "0") + vbCrLf
+
+        Dim fps As Single = algTask.Settings.FPSdisplay
+        fps = If(fps >= 1, fps, If(fps = 0, 1, 1 / Math.Abs(fps)))
+        Dim fmt As String = If(fps >= 1, "0", "0.0")
+        PercentTime.Text += "Display FPS ~ " + Format(fps, fmt) + vbCrLf
+
         Static boldFont = New Font(PercentTime.Font, FontStyle.Bold)
         Static regularFont = New Font(PercentTime.Font, FontStyle.Regular)
 

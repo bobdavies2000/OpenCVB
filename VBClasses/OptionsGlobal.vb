@@ -138,8 +138,18 @@ Public Class OptionsGlobal
     End Sub
     Private Sub DisplayFPSSlider_ValueChanged(sender As Object, e As EventArgs) Handles DisplayFPSSlider.ValueChanged
         algTask.optionsChanged = True
-        algTask.Settings.displayFPS = DisplayFPSSlider.Value
-        FPSDisplayLabel.Text = CStr(DisplayFPSSlider.Value)
+        Dim fps = DisplayFPSSlider.Value
+        algTask.Settings.FPSdisplay = fps
+        FPSDisplayLabel.Text = CStr(fps)
+
+        ' tick count is in milliseconds
+        If fps = 0 Then
+            algTask.refreshTimerTickCount = 1000
+        ElseIf fps < 0 Then
+            algTask.refreshTimerTickCount = Math.Abs(fps) * 1000
+        Else
+            algTask.refreshTimerTickCount = CInt(1000 / fps)
+        End If
     End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
         algTask.optionsChanged = True

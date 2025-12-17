@@ -57,6 +57,10 @@ Namespace MainUI
                                algTask.RunAlgorithm()
                                algTask.mouseClickFlag = False
                                algTask.frameCount += 1
+
+                               If RefreshTimer.Interval <> algTask.refreshTimerTickCount Then
+                                   RefreshTimer.Interval = algTask.refreshTimerTickCount
+                               End If
                                frameProcessed = True
                            End Sub)
         End Sub
