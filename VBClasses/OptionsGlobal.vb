@@ -136,6 +136,11 @@ Public Class OptionsGlobal
         labelBinsCount.Text = CStr(algTask.histogramBins)
         algTask.optionsChanged = True
     End Sub
+    Private Sub DisplayFPSSlider_ValueChanged(sender As Object, e As EventArgs) Handles DisplayFPSSlider.ValueChanged
+        algTask.optionsChanged = True
+        algTask.Settings.displayFPS = DisplayFPSSlider.Value
+        FPSDisplayLabel.Text = CStr(DisplayFPSSlider.Value)
+    End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
         algTask.optionsChanged = True
     End Sub
