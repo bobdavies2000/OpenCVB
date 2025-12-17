@@ -21,6 +21,7 @@ Namespace MainUI
         Dim PausePlay As Bitmap
         Dim runPlay As Bitmap
         Dim testAllToolbarBitmap As Bitmap
+        Dim resolutionDetails As String
 
         Public Sub setAlgorithmSelection()
             If AvailableAlgorithms.Items.Contains(settings.algorithm) = False Then
@@ -221,6 +222,13 @@ Namespace MainUI
                                                  New Point(w + offset, labels(2).Top + labelHeight))
             Next
 
+            settings.displayRes = New cv.Size(w, h)
+
+            resolutionDetails = "CaptureRes " + CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) +
+                                ", WorkRes " + CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height) +
+                                ", DisplayRes " + CStr(settings.displayRes.Width) + "x" + CStr(settings.displayRes.Height)
+            If algTask IsNot Nothing Then algTask.resolutionDetails = resolutionDetails
+
             StatusLabel.Location = New Point(offset, pics(2).Top + h)
             StatusLabel.Width = w * 2
         End Sub
@@ -325,7 +333,6 @@ Namespace MainUI
             If isPlaying Then StartCamera() Else StopCamera()
             setAlgorithmSelection()
         End Sub
-
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
             If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
                 AvailableAlgorithms.SelectedIndex = 0
@@ -393,7 +400,6 @@ Namespace MainUI
             End If
         End Sub
         Private Sub startAlgorithm()
-
             algTask = New AlgorithmTask
 
             For i = 0 To 3
@@ -414,6 +420,7 @@ Namespace MainUI
             algTask.MainUI_Algorithm = createAlgorithm(settings.algorithm)
             AlgDescription.Text = algTask.MainUI_Algorithm.desc
             MainToolStrip.Refresh()
+            algTask.resolutionDetails = resolutionDetails
 
             If algTask.calibData IsNot Nothing Then algTask.calibData = camera.calibData
 

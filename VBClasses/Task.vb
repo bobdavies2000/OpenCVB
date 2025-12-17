@@ -319,8 +319,6 @@ Namespace VBClasses
             cols = settings.workRes.Width
             workRes = settings.workRes
             captureRes = settings.captureRes
-            resolutionDetails = "CaptureRes " + CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) +
-                                ", workRes " + CStr(workRes.Width) + "x" + CStr(workRes.Height)
 
             allOptions = New OptionsContainer
             allOptions.Show()
