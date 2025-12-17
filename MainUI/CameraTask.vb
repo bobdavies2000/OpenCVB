@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-Imports cvext = OpenCvSharp.Extensions
 Imports VBClasses
 Namespace MainUI
     Partial Public Class MainUI
@@ -34,9 +33,7 @@ Namespace MainUI
             fpsTimer.Enabled = True
         End Sub
         Private Sub StopCamera()
-
             ' RemoveHandler camera.FrameReady, AddressOf Camera_FrameReady
-
             If camera Is Nothing Then Exit Sub
             camera.childStopCamera()
             camera.isCapturing = False
@@ -55,14 +52,41 @@ Namespace MainUI
                                sender.camImages.images(3).CopyTo(algTask.rightView)
 
                                algTask.RunAlgorithm()
+                               frameProcessed = True
+
                                algTask.mouseClickFlag = False
                                algTask.frameCount += 1
 
                                If RefreshTimer.Interval <> algTask.refreshTimerTickCount Then
                                    RefreshTimer.Interval = algTask.refreshTimerTickCount
                                End If
-                               frameProcessed = True
                            End Sub)
         End Sub
     End Class
 End Namespace
+'' Run algorithm on background thread
+'Task.Run(Sub()
+'             Try
+'                 ' Run algorithm on background thread
+'                 algTask.RunAlgorithm()
+
+'                 ' Update UI on UI thread after algorithm completes
+'                 Me.BeginInvoke(Sub()
+'                                    Try
+'                                        algTask.mouseClickFlag = False
+'                                        algTask.frameCount += 1
+
+'                                        If RefreshTimer.Interval <> algTask.refreshTimerTickCount Then
+'                                            RefreshTimer.Interval = algTask.refreshTimerTickCount
+'                                        End If
+'                                    Catch ex As Exception
+'                                        Debug.WriteLine("Error updating UI after algorithm: " + ex.Message)
+'                                    Finally
+'                                        Interlocked.Exchange(algorithmTaskRunning, 0)
+'                                    End Try
+'                                End Sub)
+'             Catch ex As Exception
+'                 Debug.WriteLine("Error running algorithm: " + ex.Message)
+'                 Me.BeginInvoke(Sub() Interlocked.Exchange(algorithmTaskRunning, 0))
+'             End Try
+'         End Sub)

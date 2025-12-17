@@ -1,7 +1,9 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Threading
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Module vbc
         Public algTask As AlgorithmTask
+        Public imageLock As New Mutex(True, "imageLock")
         Public Const fmt0 = "0"
         Public Const fmt1 = "0.0"
         Public Const fmt2 = "0.00"

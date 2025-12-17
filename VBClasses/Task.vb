@@ -116,7 +116,7 @@ Namespace VBClasses
                 algorithmTimes.Add(Now)
                 algorithm_ms.Add(0)
 
-                algorithmNames.Add(settings.algorithm)
+                algorithmNames.Add(Settings.algorithm)
                 algorithmTimes.Add(Now)
                 algorithm_ms.Add(0)
 

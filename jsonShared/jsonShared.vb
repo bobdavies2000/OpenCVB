@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-
 Namespace jsonShared
     Public Class Settings
         Public cameraName As String = "StereoLabs ZED 2/2I"

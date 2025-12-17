@@ -1,12 +1,9 @@
 Imports System.IO
 Imports System.Text.RegularExpressions
 Imports System.Threading
-Imports System.Drawing
 Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
-Imports System.Net.Mime.MediaTypeNames
-
 Namespace MainUI
     Partial Public Class MainUI
         Dim isPlaying As Boolean = False
@@ -262,7 +259,15 @@ Namespace MainUI
             If algTask.treeView IsNot Nothing Then algTask.treeView.Timer2_Tick(sender, e)
         End Sub
         Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
-            Me.Refresh() ' set to trigger a refresh every 33 ms...
+            For i = 0 To 3
+                pics(i).Refresh() ' control the frequency of paints with global option Display FPS.
+            Next
+            Static meRefreshCount As Integer
+            If meRefreshCount > 50 Then
+                meRefreshCount = 0
+                Me.Refresh()
+            End If
+            meRefreshCount += 1
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
             settings.algorithm = AvailableAlgorithms.Text
@@ -358,8 +363,11 @@ Namespace MainUI
             Dim pic = DirectCast(sender, PictureBox)
             g.ScaleTransform(1, 1)
 
-            Dim displayImage = algTask.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
-            Dim bitmap = cvext.BitmapConverter.ToBitmap(displayImage)
+            Static displayimage As New cv.Mat
+            SyncLock imageLock
+                displayimage = algTask.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+            End SyncLock
+            Dim bitmap = cvext.BitmapConverter.ToBitmap(displayimage)
             g.DrawImage(bitmap, 0, 0)
 
             For i = 0 To algTask.labels.Count - 1
@@ -382,7 +390,7 @@ Namespace MainUI
                                      CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
                 End If
             Next
-            displayImage.Dispose()
+            displayimage.Dispose()
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
