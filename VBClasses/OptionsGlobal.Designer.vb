@@ -118,7 +118,7 @@ Partial Class OptionsGlobal
         ' 
         DisplayFPSSlider.Location = New Point(230, 27)
         DisplayFPSSlider.Margin = New Padding(3, 4, 3, 4)
-        DisplayFPSSlider.Maximum = 60
+        DisplayFPSSlider.Maximum = 100
         DisplayFPSSlider.Minimum = -5
         DisplayFPSSlider.Name = "DisplayFPSSlider"
         DisplayFPSSlider.Size = New Size(549, 69)
@@ -327,7 +327,7 @@ Partial Class OptionsGlobal
         DebugCheckBox.Location = New Point(1020, 451)
         DebugCheckBox.Margin = New Padding(3, 4, 3, 4)
         DebugCheckBox.Name = "DebugCheckBox"
-        DebugCheckBox.Size = New Size(697, 34)
+        DebugCheckBox.Size = New Size(665, 34)
         DebugCheckBox.TabIndex = 19
         DebugCheckBox.Text = "DebugCheckbox - task.gOptions.DebugChecked - use for testing"
         DebugCheckBox.UseVisualStyleBackColor = True

@@ -3,8 +3,6 @@ Imports VBClasses
 Namespace MainUI
     Partial Public Class MainUI
         Dim fpsWriteCount As Integer
-        Dim fpsListA As New List(Of Single)
-        Dim fpsListC As New List(Of Single)
         Dim totalBytesOfMemoryUsed As Integer
         Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
             If task Is Nothing Then Exit Sub
@@ -20,6 +18,7 @@ Namespace MainUI
                 Dim elapsedTime = timeNow.Ticks - lastTime.Ticks
                 Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
                 Dim taskTimerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
+                If taskTimerInterval = 0 Then Exit Sub
                 lastTime = timeNow
 
                 Dim countFrames = task.frameCount - lastAlgorithmFrame
@@ -27,23 +26,11 @@ Namespace MainUI
                 lastAlgorithmFrame = task.frameCount
                 lastCameraFrame = camera.cameraFrameCount
 
-                If taskTimerInterval > 0 Then
-                    Dim testVal = camFrames / (taskTimerInterval / 1000)
-                    If testVal >= 200 Then testVal = 99
-                    fpsListC.Add(testVal)
+                task.fpsCamera = camFrames / (taskTimerInterval / 1000)
+                If task.fpsCamera >= 200 Then task.fpsCamera = 100
 
-                    testVal = countFrames / (taskTimerInterval / 1000)
-                    If testVal >= 200 Then testVal = 99
-                    fpsListA.Add(testVal)
-                End If
-
-                task.fpsAlgorithm = fpsListA.Average
-                task.fpsCamera = CInt(fpsListC.Average)
-
-                If fpsListA.Count > 5 Then
-                    fpsListA.RemoveAt(0)
-                    fpsListC.RemoveAt(0)
-                End If
+                task.fpsAlgorithm = countFrames / (taskTimerInterval / 1000)
+                If task.fpsAlgorithm >= 200 Then task.fpsAlgorithm = 100
 
                 If task.fpsAlgorithm = 0 Then
                     task.fpsAlgorithm = 1
