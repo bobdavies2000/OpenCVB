@@ -91,11 +91,11 @@ Public Class TreeviewForm
         End Function
     End Class
     Public Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
-        Dim algorithm_ms = New List(Of Single)(Task.algorithm_ms)
+        Dim algorithm_ms = New List(Of Single)(task.cpu.algorithm_ms)
         Static saveCount As Integer
-        If Task.callTrace.Count <> saveCount Or optionsChanged Then
-            saveCount = Task.callTrace.Count
-            updateTree(New List(Of String)(Task.callTrace))
+        If task.cpu.callTrace.Count <> saveCount Or optionsChanged Then
+            saveCount = task.cpu.callTrace.Count
+            updateTree(New List(Of String)(task.cpu.callTrace))
             optionsChanged = False
         End If
 
@@ -118,18 +118,14 @@ Public Class TreeviewForm
         For i = 0 To algorithm_ms.Count - 1
             algorithm_ms(i) /= sumTime
             If algorithm_ms(i) < 0 Then algorithm_ms(i) = 0
-            If i >= Task.algorithmNames.Count Then Exit For
-            Dim str = Format(algorithm_ms(i), "00.0%") + " " + Task.algorithmNames(i)
-            If Task.displayObjectName IsNot Nothing Then
-                If Task.displayObjectName.Length > 0 Then
-                    If str.Contains(Task.displayObjectName) Then percentStr = str
+            If i >= task.cpu.algorithmNames.Count Then Exit For
+            Dim str = Format(algorithm_ms(i), "00.0%") + " " + task.cpu.algorithmNames(i)
+            If task.cpu.displayObjectName IsNot Nothing Then
+                If task.cpu.displayObjectName.Length > 0 Then
+                    If str.Contains(task.cpu.displayObjectName) Then percentStr = str
                 End If
             End If
-            If Task.algorithmNames(i).Contains("waitingForInput") Then
-                saveWaitTime = str + "  <<<<<<<<<< "
-            Else
-                PercentTimes.Add(algorithm_ms(i), str)
-            End If
+            PercentTimes.Add(algorithm_ms(i), str)
         Next
 
         Dim otherTimes As New List(Of Single)
@@ -160,12 +156,8 @@ Public Class TreeviewForm
         Next
 
         PercentTime.Text += saveWaitTime + vbCrLf
-        'PercentTime.Text += "---------------- Tree order display: " + vbCrLf
-        'For Each sn In timeDataTree
-        '    If sn.Contains("%") Then PercentTime.Text += sn + vbCrLf
-        'Next
 
-        PercentTime.Text += vbCrLf + Format(otherTimes.Sum, "00.0%") + " " + CStr(otherTimes.Count) + " algorithms each < 1.0%" +
+        PercentTime.Text += Format(otherTimes.Sum, "00.0%") + " " + CStr(otherTimes.Count) + " algorithms each < 1.0%" +
                             vbCrLf + vbCrLf + "Click an algorithm at left to see it below:" + vbCrLf + vbCrLf
 
         PercentTime.Text += If(percentStr Is Nothing, "Inactive algorithm selected", percentStr)
@@ -207,6 +199,6 @@ Public Class TreeviewForm
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         Dim algorithm = e.Node.Text
         Dim split = e.Node.Text.Split(" ")
-        Task.displayObjectName = split(0)
+        task.cpu.displayObjectName = split(0)
     End Sub
 End Class

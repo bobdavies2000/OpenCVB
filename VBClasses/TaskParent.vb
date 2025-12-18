@@ -37,7 +37,7 @@ Namespace VBClasses
         Public Sub New()
             traceName = Me.GetType.Name
 
-            If Task.callTrace.Count = 0 Then Task.callTrace.Add(Task.Settings.algorithm + "\")
+            If task.cpu.callTrace.Count = 0 Then task.cpu.callTrace.Add(task.Settings.algorithm + "\")
             labels = {"", "", traceName, ""}
             Dim stackTrace = Environment.StackTrace
             Dim lines() = stackTrace.Split(vbCrLf)
@@ -62,35 +62,9 @@ Namespace VBClasses
             dst3 = New cv.Mat(Task.workRes, cv.MatType.CV_8UC3, 0)
 
             standalone = traceName = Task.settings.algorithm
-            Task.callTrace.Add(callStack)
-
-            Task.activeObjects.Add(Me)
-
-            If standalone Then
-                Task.algorithm_ms.Clear()
-                Task.algorithmNames.Clear()
-                Task.algorithmNames.Add("waitingForInput")
-                Task.algorithmTimes.Add(Now)
-                Task.algorithm_ms.Add(0)
-
-                Task.algorithmNames.Add("inputBufferCopy")
-                Task.algorithmTimes.Add(Now)
-                Task.algorithm_ms.Add(0)
-
-                Task.algorithmNames.Add("ReturnCopyTime")
-                Task.algorithmTimes.Add(Now)
-                Task.algorithm_ms.Add(0)
-
-                Task.algorithmNames.Add(traceName)
-                Task.algorithmTimes.Add(Now)
-                Task.algorithm_ms.Add(0)
-
-                Task.algorithmStack = New Stack()
-                Task.algorithmStack.Push(0)
-                Task.algorithmStack.Push(1)
-                Task.algorithmStack.Push(2)
-                Task.algorithmStack.Push(3)
-            End If
+            task.cpu.callTrace.Add(callStack)
+            task.cpu.activeObjects.Add(Me)
+            If standalone Then task.cpu.initialize(traceName)
         End Sub
         Public Shared Function CaptureScreen() As Bitmap
             Dim screenBounds As Rectangle = Screen.PrimaryScreen.Bounds
@@ -398,7 +372,7 @@ Namespace VBClasses
             trueData.Add(strnext)
         End Sub
         Public Function standaloneTest() As Boolean
-            If standalone Or Task.displayObjectName = traceName Then Return True
+            If standalone Or task.cpu.displayObjectName = traceName Then Return True
             Return False
         End Function
         Public Sub DrawRect(dst As cv.Mat, rect As cv.Rect, color As cv.Scalar)
@@ -538,37 +512,6 @@ Namespace VBClasses
             Next
             Return srcPoints
         End Function
-        Public Sub measureStartRun(name As String)
-            Dim nextTime = Now
-            If Task.algorithmNames.Contains(name) = False Then
-                Task.algorithmNames.Add(name)
-                Task.algorithm_ms.Add(0)
-                Task.algorithmTimes.Add(nextTime)
-            End If
-
-            If Task.algorithmStack.Count > 0 Then
-                Dim index = Task.algorithmStack.Peek
-                Dim elapsedTicks = nextTime.Ticks - Task.algorithmTimes(index).Ticks
-                Dim span = New TimeSpan(elapsedTicks)
-                Task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
-
-                index = Task.algorithmNames.IndexOf(name)
-                Task.algorithmTimes(index) = nextTime
-                Task.algorithmStack.Push(index)
-            End If
-        End Sub
-        Public Sub measureEndRun(name As String)
-            Try
-                Dim nextTime = Now
-                Dim index = Task.algorithmStack.Peek
-                Dim elapsedTicks = nextTime.Ticks - Task.algorithmTimes(index).Ticks
-                Dim span = New TimeSpan(elapsedTicks)
-                Task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
-                Task.algorithmStack.Pop()
-                Task.algorithmTimes(Task.algorithmStack.Peek) = nextTime
-            Catch ex As Exception
-            End Try
-        End Sub
         Public Shared Sub DrawTour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
                         Optional lineType As cv.LineTypes = cv.LineTypes.Link8)
             If contour Is Nothing Then Exit Sub
@@ -604,12 +547,12 @@ Namespace VBClasses
             Next
         End Sub
         Public Sub Run(src As cv.Mat)
-            measureStartRun(traceName)
+            task.cpu.measureStartRun(traceName)
 
             trueData.Clear()
             RunAlg(src)
 
-            measureEndRun(traceName)
+            task.cpu.measureEndRun()
         End Sub
         Public Overridable Sub RunAlg(src As cv.Mat)
             ' every algorithm overrides this Sub 

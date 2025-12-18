@@ -31,7 +31,14 @@ Namespace VBClasses
 
         Public gridRects As List(Of cv.Rect)
         Public firstPass As Boolean = True
+
+        ' treeview data
+        Public cpu As New CPUTime
+
         Public cameraName As String
+        Public calibData As Object
+        Public fpsAlgorithm As Single
+        Public fpsCamera As Single
 
         Public testAllDuration As Integer
         Public verticalLines As Boolean
@@ -59,20 +66,6 @@ Namespace VBClasses
         Public FeatureSampleSize As Integer
         Public clickPoint As New cv.Point ' last place where mouse was clicked.
 
-        ' TreeView and trace Data.
-        Public callTrace As List(Of String)
-        Public algorithm_msMain As New List(Of Single)
-        Public algorithmNamesMain As New List(Of String)
-        Public algorithm_ms As New List(Of Single)
-        Public algorithmNames As New List(Of String)
-        Public algorithmTimes As New List(Of DateTime)
-        Public algorithmStack As New Stack()
-        Public displayObjectName As String
-        Public activeObjects As New List(Of Object)
-        Public calibData As Object
-
-        Public fpsAlgorithm As Single
-        Public fpsCamera As Single
         Public testAllRunning As Boolean
         Public main_hwnd As IntPtr
 
@@ -266,8 +259,6 @@ Namespace VBClasses
         Public mainFormLocation As cv.Rect
 
         Public trueData As New List(Of TrueText)
-
-        Public waitingForInput As Single ' the amount of time waiting for buffers.
 
         Public OpenGLTitle As String
         Public polyCount As Integer

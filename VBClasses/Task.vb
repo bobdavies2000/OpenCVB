@@ -8,8 +8,8 @@ Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
         Public Sub Dispose() Implements IDisposable.Dispose
             If allOptions IsNot Nothing Then allOptions.Close()
-            If activeObjects IsNot Nothing Then
-                For Each algorithm In activeObjects
+            If cpu.activeObjects IsNot Nothing Then
+                For Each algorithm In cpu.activeObjects
                     If algorithm.GetType().GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
                 Next
             End If
@@ -47,7 +47,7 @@ Namespace VBClasses
             featureOptions = New OptionsFeatures
             treeView = New TreeViewForm
 
-            callTrace = New List(Of String)
+            cpu.callTrace = New List(Of String)
             gravityCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
             motionMask = New cv.Mat(workRes, cv.MatType.CV_8U, 255)
             noDepthMask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
@@ -64,8 +64,8 @@ Namespace VBClasses
             rgbFilter = New Filter_Basics
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
-            For i = 1 To callTrace.Count - 1
-                callTrace(i) = settings.algorithm + "\" + callTrace(i)
+            For i = 1 To cpu.callTrace.Count - 1
+                cpu.callTrace(i) = settings.algorithm + "\" + cpu.callTrace(i)
             Next
 
             taskUpdate()
@@ -111,22 +111,8 @@ Namespace VBClasses
 
             taskUpdate()
 
-            If algorithm_ms.Count = 0 Then
-                algorithmNames.Add("waitingForInput")
-                algorithmTimes.Add(Now)
-                algorithm_ms.Add(0)
-
-                algorithmNames.Add(Settings.algorithm)
-                algorithmTimes.Add(Now)
-                algorithm_ms.Add(0)
-
-                algorithmStack = New Stack()
-                algorithmStack.Push(0)
-                algorithmStack.Push(1)
-            End If
-
-            algorithm_ms(0) += waitingForInput
-            algorithmTimes(3) = Now  ' starting the main algorithm
+            If cpu.algorithm_ms.Count = 0 Then task.cpu.startRun(Settings.algorithm)
+            cpu.algorithmTimes(0) = Now  ' starting the main algorithm
 
             Dim src = Task.color
             If src.Width = 0 Or Task.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
@@ -251,8 +237,8 @@ Namespace VBClasses
 
                 Dim displayObject = Task.MainUI_Algorithm
                 ' they could have asked to display one of the algorithms in the TreeView.
-                For Each obj In activeObjects
-                    If obj.tracename = Task.displayObjectName Then
+                For Each obj In cpu.activeObjects
+                    If obj.tracename = task.cpu.displayObjectName Then
                         displayObject = obj
                         Exit For
                     End If
@@ -288,7 +274,7 @@ Namespace VBClasses
 
                 ' if there were no cycles spent on this routine, then it was inactive.
                 ' if any active algorithm has an index = -1, it has not been run.
-                Dim index = algorithmNames.IndexOf(displayObject.traceName)
+                Dim index = cpu.algorithmNames.IndexOf(displayObject.traceName)
                 If index = -1 Then
                     displayObject.trueData.Add(New TrueText("This task is not active at this time.",
                                            New cv.Point(workRes.Width / 3, workRes.Height / 2), 2))
