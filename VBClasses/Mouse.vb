@@ -57,4 +57,29 @@ Namespace VBClasses
             Next
         End Sub
     End Class
+
+
+
+
+
+    Public Class Mouse_ValidateLocation : Inherits TaskParent
+        Public Sub New()
+            desc = "With custom display resolutions, it is necessary to validate the location in terms of the workres."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            SetTrueText("Move the mouse over the RGB image above." + vbCrLf +
+                        "The display resolution will appear in dst3 " + vbCrLf +
+                        "while the workRes location will appear in the lower left corner.")
+
+            Dim ratioX As Single = algTask.workRes.Width / algTask.Settings.displayRes.Width
+            Dim ratioY As Single = algTask.workRes.Height / algTask.Settings.displayRes.Height
+            SetTrueText("Mouse location in display resolution (X, Y): " +
+                        CStr(algTask.mouseDisplayPoint.X) + ", " +
+                        CStr(algTask.mouseDisplayPoint.Y) + vbCrLf +
+                        "Mouse location in workRes resolution (X, Y): " +
+                        CStr(CInt(algTask.mouseDisplayPoint.X * ratioX)) + ", " +
+                        CStr(CInt(algTask.mouseDisplayPoint.Y * ratioY)), 3)
+        End Sub
+    End Class
+
 End Namespace

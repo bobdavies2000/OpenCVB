@@ -31,6 +31,7 @@ Namespace MainUI
         End Sub
         Private Sub CamPic_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
             If algTask Is Nothing Then Exit Sub
+            algTask.mouseDisplayPoint = New cv.Point(e.X, e.Y)
             Dim x As Integer = e.X * settings.workRes.Width / pics(0).Width
             Dim y As Integer = e.Y * settings.workRes.Height / pics(0).Height
             Dim pic = DirectCast(sender, PictureBox)
@@ -69,6 +70,13 @@ Namespace MainUI
         End Sub
         Private Sub campic_DoubleClick(sender As Object, e As EventArgs)
             DrawingRectangle = False
+        End Sub
+        Private Sub clickPic(sender As Object, e As EventArgs)
+            If algTask Is Nothing Then Exit Sub
+            'If algTask IsNot Nothing Then  if algTask.sharpgl IsNot Nothing Then sharpGL.Activate()
+            If algTask IsNot Nothing Then If algTask.treeView IsNot Nothing Then algTask.treeView.Activate()
+            If algTask IsNot Nothing Then If algTask.allOptions IsNot Nothing Then algTask.allOptions.Activate()
+            algTask.clickPoint = algTask.mouseMovePoint
         End Sub
     End Class
 End Namespace

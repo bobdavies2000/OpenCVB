@@ -247,12 +247,6 @@ Namespace MainUI
             End If
             testAllRunning = TestAllTimer.Enabled
         End Sub
-        Private Sub clickPic(sender As Object, e As EventArgs)
-            If algTask Is Nothing Then Exit Sub
-            'If algTask IsNot Nothing Then  if algTask.sharpgl IsNot Nothing Then sharpGL.Activate()
-            If algTask IsNot Nothing Then If algTask.treeView IsNot Nothing Then algTask.treeView.Activate()
-            If algTask IsNot Nothing Then If algTask.allOptions IsNot Nothing Then algTask.allOptions.Activate()
-        End Sub
         Private Sub TreeViewTimer_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
             If isPlaying = False Then Exit Sub
             If algTask Is Nothing Then Exit Sub

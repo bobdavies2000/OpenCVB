@@ -726,9 +726,9 @@ Grid_BasicsTest
 Grid_FPS
 Grid_List
 Grid_MinMaxDepth
-Grid_Neighbors
 Grid_Rectangles
 Grid_TrackCenter
+Grid_ValidateLocation
 GridROI_Basics
 GridROI_Canny
 GridROI_Color
@@ -1118,6 +1118,7 @@ Motion_ValidateRight
 Mouse_Basics
 Mouse_ClickPointUsage
 Mouse_LeftClickZoom
+Mouse_ValidateLocation
 MSER_Basics
 MSER_Basics1
 MSER_Basics2

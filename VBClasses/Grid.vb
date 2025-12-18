@@ -229,7 +229,7 @@ Namespace VBClasses
 
 
 
-    Public Class Grid_Neighbors : Inherits TaskParent
+    Public Class Grid_ValidateLocation : Inherits TaskParent
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             algTask.clickPoint = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -237,12 +237,17 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
+            labels(2) = "Clickpoint is at (X, Y): " + CStr(algTask.clickPoint.X) + ", " + CStr(algTask.clickPoint.Y)
 
             SetTrueText("Click any grid entry to see its neighbors", 3)
             dst2.SetTo(white, algTask.gridMask)
 
             Dim roiIndex As Integer = algTask.gridMap.Get(Of Integer)(algTask.clickPoint.Y, algTask.clickPoint.X)
-
+            If algTask.gridRects(roiIndex).Contains(algTask.clickPoint) Then
+                labels(3) = "Grid index = " + CStr(roiIndex) + " contains the mouse clickpoint" + vbCrLf
+            Else
+                labels(3) = "Grid index = " + CStr(roiIndex) + " does NOT match the grid location." + vbCrLf
+            End If
             dst3.SetTo(0)
             For Each index In algTask.grid.gridNeighbors(roiIndex)
                 Dim roi = algTask.gridRects(index)

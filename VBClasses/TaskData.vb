@@ -236,7 +236,8 @@ Namespace VBClasses
         Public mouseClickFlag As Boolean
         Public activateTaskForms As Boolean
         Public mousePicTag As Integer ' which image was the mouse in?
-        Public mouseMovePoint As cv.Point ' trace any mouse movements using this.
+        Public mouseDisplayPoint As cv.Point ' Mouse location in terms of the display resolution
+        Public mouseMovePoint As cv.Point ' mouse location in the workRes resolution.
         Public mouseMovePointUpdated As Boolean
 
         Public CPU_TimeStamp As Double
