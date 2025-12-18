@@ -80,35 +80,6 @@ Namespace VBClasses
             Next
             Return dst
         End Function
-        Public Function Convert32f_To_8UC3(Input As cv.Mat) As cv.Mat
-            Dim outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax)
-            If Input.Channels() = 1 Then
-                outMat.ConvertTo(outMat, cv.MatType.CV_8U)
-                Return outMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            End If
-            outMat.ConvertTo(outMat, cv.MatType.CV_8UC3)
-            Return outMat
-        End Function
-        Public Function Check8uC3(ByVal input As cv.Mat) As cv.Mat
-            Dim outMat As New cv.Mat
-            If input.Type = cv.MatType.CV_8UC3 Then Return input
-            If input.Type = cv.MatType.CV_32F Then
-                outMat = Convert32f_To_8UC3(input)
-            ElseIf input.Type = cv.MatType.CV_32SC1 Then
-                input.ConvertTo(outMat, cv.MatType.CV_32F)
-                outMat = Convert32f_To_8UC3(outMat)
-            ElseIf input.Type = cv.MatType.CV_32SC3 Then
-                input.ConvertTo(outMat, cv.MatType.CV_32F)
-                outMat = outMat.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                outMat = Convert32f_To_8UC3(outMat)
-            ElseIf input.Type = cv.MatType.CV_32FC3 Then
-                outMat = input.ConvertScaleAbs(255)
-            Else
-                outMat = input.Clone
-            End If
-            If input.Channels() = 1 And input.Type = cv.MatType.CV_8UC1 Then outMat = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            Return outMat
-        End Function
         Public Sub taskUpdate()
             If algTask.myStopWatch Is Nothing Then algTask.myStopWatch = Stopwatch.StartNew()
 

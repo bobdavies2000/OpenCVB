@@ -35,8 +35,8 @@ Namespace VBClasses
             If standalone Then src2 = algTask.depthRGB
             If src2.Type <> src.Type Then
                 If src.Type <> cv.MatType.CV_8UC3 Or src2.Type <> cv.MatType.CV_8UC3 Then
-                    If src.Type = cv.MatType.CV_32FC1 Then src = Convert32f_To_8UC3(src)
-                    If src2.Type = cv.MatType.CV_32FC1 Then src2 = Convert32f_To_8UC3(src2)
+                    If src.Type = cv.MatType.CV_32FC1 Then src = Mat_Convert.Mat_32f_To_8UC3(src)
+                    If src2.Type = cv.MatType.CV_32FC1 Then src2 = Mat_Convert.Mat_32f_To_8UC3(src2)
                     If src.Type <> cv.MatType.CV_8UC3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                     If src2.Type <> cv.MatType.CV_8UC3 Then src2 = src2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 End If

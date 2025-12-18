@@ -11,7 +11,7 @@ Namespace VBClasses
             labels(2) = "ColorMap = " + algTask.gOptions.Palettes.Text
 
             If src.Type = cv.MatType.CV_32F Then
-                src = Convert32f_To_8UC3(src)
+                src = Mat_Convert.Mat_32f_To_8UC3(src)
                 src.ConvertTo(src, cv.MatType.CV_8U)
             End If
 
@@ -455,7 +455,7 @@ Namespace VBClasses
             End If
             If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             If src.Type = cv.MatType.CV_32F Then
-                src = Convert32f_To_8UC3(src)
+                src = Mat_Convert.Mat_32f_To_8UC3(src)
                 src.ConvertTo(src, cv.MatType.CV_8U)
             End If
             cv.Cv2.ApplyColorMap(src, dst2, colorMap)
@@ -635,7 +635,7 @@ Namespace VBClasses
             End If
 
             If src.Type = cv.MatType.CV_32F Then
-                src = Convert32f_To_8UC3(src)
+                src = Mat_Convert.Mat_32f_To_8UC3(src)
                 src.ConvertTo(src, cv.MatType.CV_8U)
             End If
 

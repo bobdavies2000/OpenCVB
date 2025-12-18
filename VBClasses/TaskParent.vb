@@ -147,15 +147,6 @@ Namespace VBClasses
                             white, algTask.cvFontThickness, algTask.lineType)
             Next
         End Sub
-        Public Function Convert32f_To_8UC3(Input As cv.Mat) As cv.Mat
-            Dim outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax)
-            If Input.Channels() = 1 Then
-                outMat.ConvertTo(outMat, cv.MatType.CV_8U)
-                Return outMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            End If
-            outMat.ConvertTo(outMat, cv.MatType.CV_8UC3)
-            Return outMat
-        End Function
         Public Function distance3D(p1 As cv.Point3f, p2 As cv.Point3f) As Single
             Return Math.Sqrt((p1.X - p2.X) * (p1.X - p2.X) + (p1.Y - p2.Y) * (p1.Y - p2.Y) + (p1.Z - p2.Z) * (p1.Z - p2.Z))
         End Function

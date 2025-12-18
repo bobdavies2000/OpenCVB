@@ -907,7 +907,7 @@ Namespace VBClasses
                         {algTask.histogramBins, algTask.histogramBins}, algTask.rangesSide)
             dst0.Col(0).SetTo(0) ' too many zero depth points...
 
-            dst0 = Convert32f_To_8UC3(dst0)
+            dst0 = Mat_Convert.Mat_32f_To_8UC3(dst0)
             dst0.ConvertTo(dst0, cv.MatType.CV_8UC1)
 
             Dim r As New cv.Rect(0, 0, dst2.Height, dst2.Height)
@@ -936,7 +936,7 @@ Namespace VBClasses
                         {algTask.histogramBins, algTask.histogramBins}, algTask.rangesTop)
             dst0.Row(0).SetTo(0) ' too many zero depth points...
 
-            dst0 = Convert32f_To_8UC3(dst0)
+            dst0 = Mat_Convert.Mat_32f_To_8UC3(dst0)
             dst0.ConvertTo(dst0, cv.MatType.CV_8UC1)
 
             Dim r As New cv.Rect(0, 0, dst2.Height, dst2.Height)

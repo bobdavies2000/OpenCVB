@@ -523,4 +523,45 @@ Namespace VBClasses
 
 
 
+
+    Public Class Mat_Convert : Inherits TaskParent
+        Public Sub New()
+            desc = "Convert the input into 8uC3."
+        End Sub
+        Public Shared Function Mat_32f_To_8UC3(Input As cv.Mat) As cv.Mat
+            Dim outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax)
+            If Input.Channels() = 1 Then
+                outMat.ConvertTo(outMat, cv.MatType.CV_8U)
+                Return outMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            End If
+            outMat.ConvertTo(outMat, cv.MatType.CV_8UC3)
+            Return outMat
+        End Function
+        Public Shared Function Mat_Check8uc3(src As cv.Mat) As cv.Mat
+            If src.Type = cv.MatType.CV_8UC3 Then Return src
+            Dim dst As New cv.Mat
+            If src.Type = cv.MatType.CV_32F Then
+                dst = Mat_32f_To_8UC3(src)
+            ElseIf src.Type = cv.MatType.CV_32SC1 Then
+                src.ConvertTo(dst, cv.MatType.CV_32F)
+                dst = Mat_32f_To_8UC3(dst)
+            ElseIf src.Type = cv.MatType.CV_32SC3 Then
+                src.ConvertTo(dst, cv.MatType.CV_32F)
+                dst = dst.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                dst = Mat_32f_To_8UC3(dst)
+            ElseIf src.Type = cv.MatType.CV_32FC3 Then
+                dst = src.ConvertScaleAbs(255)
+            Else
+                dst = src.Clone
+            End If
+            If src.Channels() = 1 And src.Type = cv.MatType.CV_8UC1 Then dst = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            Return dst
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standalone Then src = algTask.pointCloud
+            dst2 = Mat_Check8uc3(src)
+        End Sub
+    End Class
+
+
 End Namespace

@@ -4083,8 +4083,8 @@ Namespace VBClasses
                 pointcloud = algTask.pointCloud
             End If
 
-            dst2 = Convert32f_To_8UC3(algTask.pcSplit(0))
-            dst3 = Convert32f_To_8UC3(algTask.pcSplit(1))
+            dst2 = Mat_Convert.Mat_32f_To_8UC3(algTask.pcSplit(0))
+            dst3 = Mat_Convert.Mat_32f_To_8UC3(algTask.pcSplit(1))
             dst2.SetTo(0, algTask.noDepthMask)
             dst3.SetTo(0, algTask.noDepthMask)
         End Sub
@@ -13009,7 +13009,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             gradient.Run(src)
-            dst3 = Convert32f_To_8UC3(gradient.dst3)
+            dst3 = Mat_Convert.Mat_32f_To_8UC3(gradient.dst3)
 
             dense.Run(src)
             dst2 = dense.dst2

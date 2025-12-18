@@ -251,7 +251,7 @@ Namespace VBClasses
                 dst3 += img
             Next
             If dst3.Type <> src.Type Then dst3.ConvertTo(dst2, src.Type) Else dst2 = dst3.Clone
-            dst3 = Convert32f_To_8UC3(dst3)
+            dst3 = Mat_Convert.Mat_32f_To_8UC3(dst3)
             labels(2) = "Average image over previous " + CStr(algTask.frameHistoryCount) + " images"
         End Sub
     End Class

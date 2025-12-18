@@ -1046,6 +1046,7 @@ Magnify_Example
 Mat_2to1
 Mat_4Click
 Mat_4to1
+Mat_Convert
 Mat_FindNearZero
 Mat_Inverse
 Mat_Inverse_4D

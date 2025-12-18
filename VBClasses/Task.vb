@@ -260,10 +260,10 @@ Namespace VBClasses
 
                 postProcess(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
 
-                dstList(0) = If(gOptions.displayDst0.Checked, Check8uC3(displayObject.dst0), color).Clone
-                dstList(1) = If(gOptions.displayDst1.Checked, Check8uC3(displayObject.dst1), depthRGB).Clone
-                dstList(2) = Check8uC3(displayObject.dst2)
-                dstList(3) = Check8uC3(displayObject.dst3)
+                dstList(0) = If(gOptions.displayDst0.Checked, Mat_Convert.Mat_Check8uc3(displayObject.dst0), color).Clone
+                dstList(1) = If(gOptions.displayDst1.Checked, Mat_Convert.Mat_Check8uc3(displayObject.dst1), depthRGB).Clone
+                dstList(2) = Mat_Convert.Mat_Check8uc3(displayObject.dst2)
+                dstList(3) = Mat_Convert.Mat_Check8uc3(displayObject.dst3)
 
                 If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
                 If gOptions.showMotionMask.Checked Then

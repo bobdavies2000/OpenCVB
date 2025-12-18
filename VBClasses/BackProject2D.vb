@@ -329,7 +329,7 @@ Namespace VBClasses
             labels(2) = "Histogram 2D with Backprojection by " + selection
 
             backp.Run(algTask.color)
-            dst2 = Convert32f_To_8UC3(backp.dst2) * 255
+            dst2 = Mat_Convert.Mat_32f_To_8UC3(backp.dst2) * 255
 
             Dim roi = algTask.gridRects(algTask.gridMap.Get(Of Integer)(algTask.mouseMovePoint.Y, algTask.mouseMovePoint.X))
             Dim rect As cv.Rect

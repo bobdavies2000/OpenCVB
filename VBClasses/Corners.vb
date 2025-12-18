@@ -171,7 +171,7 @@ Namespace VBClasses
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr).Clone
 
-            dst3 = Convert32f_To_8UC3(dst2)
+            dst3 = Mat_Convert.Mat_32f_To_8UC3(dst2)
             dst3 = dst3.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary)
         End Sub
     End Class
