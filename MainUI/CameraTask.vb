@@ -1,5 +1,6 @@
-Imports cv = OpenCvSharp
+Imports System.ComponentModel
 Imports VBClasses
+Imports cv = OpenCvSharp
 Namespace MainUI
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
@@ -39,27 +40,49 @@ Namespace MainUI
             camera.isCapturing = False
         End Sub
         Private Sub Camera_FrameReady(sender As GenericCamera)
-            If Task.readyForCameraInput = False Then Exit Sub
+            If task.readyForCameraInput = False Then Exit Sub
 
             Static frameProcessed As Boolean = True
             If frameProcessed = False Then Exit Sub
             frameProcessed = False
 
             Me.BeginInvoke(Sub()
-                               sender.camImages.images(0).CopyTo(Task.color)
-                               sender.camImages.images(1).CopyTo(Task.pointCloud)
-                               sender.camImages.images(2).CopyTo(Task.leftView)
-                               sender.camImages.images(3).CopyTo(Task.rightView)
+                               If task.cpu.algorithm_ms.Count = 0 Then task.cpu.startRun(settings.algorithm)
 
-                               Task.RunAlgorithm()
-                               frameProcessed = True
+                               task.cpu.algorithmTimes(1) = Now
 
-                               Task.mouseClickFlag = False
-                               Task.frameCount += 1
+                               Dim elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - task.cpu.algorithmTimes(0).Ticks
+                               Dim spanWait = New TimeSpan(elapsedWaitTicks)
+                               Dim spanTime = TimeSpan.TicksPerMillisecond
+                               task.cpu.algorithm_ms(0) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                               If RefreshTimer.Interval <> Task.refreshTimerTickCount Then
-                                   RefreshTimer.Interval = Task.refreshTimerTickCount
+                               task.cpu.algorithmTimes(0) = task.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
+
+                               sender.camImages.images(0).CopyTo(task.color)
+                               sender.camImages.images(1).CopyTo(task.pointCloud)
+                               sender.camImages.images(2).CopyTo(task.leftView)
+                               sender.camImages.images(3).CopyTo(task.rightView)
+
+                               task.RunAlgorithm()
+
+                               task.cpu.algorithmTimes(1) = Now
+
+                               elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - task.cpu.algorithmTimes(0).Ticks
+
+                               spanWait = New TimeSpan(elapsedWaitTicks)
+                               spanTime = TimeSpan.TicksPerMillisecond
+                               task.cpu.algorithm_ms(1) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
+
+                               task.cpu.algorithmTimes(0) = task.cpu.algorithmTimes(1) ' start time wait = end time algorithm
+
+                               task.mouseClickFlag = False
+                               task.frameCount += 1
+
+                               If RefreshTimer.Interval <> task.refreshTimerTickCount Then
+                                   RefreshTimer.Interval = task.refreshTimerTickCount
                                End If
+
+                               frameProcessed = True
                            End Sub)
         End Sub
     End Class

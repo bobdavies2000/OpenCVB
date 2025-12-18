@@ -125,7 +125,11 @@ Public Class TreeviewForm
                     If str.Contains(task.cpu.displayObjectName) Then percentStr = str
                 End If
             End If
-            PercentTimes.Add(algorithm_ms(i), str)
+            If task.cpu.algorithmNames(i).Contains("waitingForInput") Then
+                saveWaitTime = str + "  <<<<<<<<<< "
+            Else
+                PercentTimes.Add(algorithm_ms(i), str)
+            End If
         Next
 
         Dim otherTimes As New List(Of Single)

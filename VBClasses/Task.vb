@@ -111,9 +111,6 @@ Namespace VBClasses
 
             taskUpdate()
 
-            If cpu.algorithm_ms.Count = 0 Then task.cpu.startRun(Settings.algorithm)
-            cpu.algorithmTimes(0) = Now  ' starting the main algorithm
-
             Dim src = Task.color
             If src.Width = 0 Or Task.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
 
