@@ -17,7 +17,7 @@ Namespace VBClasses
             algorithm_ms.Clear()
             algorithmNames.Clear()
 
-            algorithmNames.Add("waitingForInput")
+            algorithmNames.Add("Wait For Input")
             algorithm_ms.Add(0)
             algorithmTimes.Add(Now)
 
