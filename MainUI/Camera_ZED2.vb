@@ -9,10 +9,10 @@ Namespace MainUI
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
             captureRes = _captureRes
             workRes = _workRes
-            ratio = CInt(captureRes.Width / workRes.Width)
+            ratio = captureRes.Width \ workRes.Width
             zed = New CamZed(workRes, captureRes, deviceName)
 
-            CalibData.rgbIntrinsics.fx = zed.rgbIntrinsics.fx / ratio
+            calibData.rgbIntrinsics.fx = zed.rgbIntrinsics.fx / ratio
             CalibData.rgbIntrinsics.fy = zed.rgbIntrinsics.fy / ratio
             CalibData.rgbIntrinsics.ppx = zed.rgbIntrinsics.ppx / ratio
             CalibData.rgbIntrinsics.ppy = zed.rgbIntrinsics.ppy / ratio

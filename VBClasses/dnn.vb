@@ -27,9 +27,9 @@ Namespace VBClasses
             dnnHeight = dst2.Height
             crop = New cv.Rect(dst2.Width / 2 - dnnWidth / 2, dst2.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
 
-            Dim infoText As New FileInfo(task.homeDir + "Data/MobileNetSSD_deploy.prototxt")
+            Dim infoText As New FileInfo(algTask.homeDir + "Data/MobileNetSSD_deploy.prototxt")
             If infoText.Exists Then
-                Dim infoModel As New FileInfo(task.homeDir + "Data/MobileNetSSD_deploy.caffemodel")
+                Dim infoModel As New FileInfo(algTask.homeDir + "Data/MobileNetSSD_deploy.caffemodel")
                 If infoModel.Exists Then
                     net = CvDnn.ReadNetFromCaffe(infoText.FullName, infoModel.FullName)
                     dnnPrepared = True
@@ -97,7 +97,7 @@ Namespace VBClasses
                             kalman(minIndex).Run(src)
                             rect = New cv.Rect(kalman(minIndex).kOutput(0), kalman(minIndex).kOutput(1), kalman(minIndex).kOutput(2), kalman(minIndex).kOutput(3))
                         End If
-                        dst3.Rectangle(rect, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+                        dst3.Rectangle(rect, cv.Scalar.Yellow, algTask.lineWidth + 2, algTask.lineType)
                         rect.Width = src.Width / 12
                         rect.Height = src.Height / 16
                         dst3.Rectangle(rect, cv.Scalar.Black, -1)
@@ -130,7 +130,7 @@ Namespace VBClasses
         Dim saveModelFile = ""
         Dim multiplier As Integer
         Public Sub New()
-            task.drawRect = New cv.Rect(10, 10, 20, 20)
+            algTask.drawRect = New cv.Rect(10, 10, 20, 20)
             labels(2) = "Output of a resize using OpenCV"
             desc = "Get better super-resolution through a DNN"
         End Sub
@@ -142,8 +142,8 @@ Namespace VBClasses
                 dnn = New DnnSuperResImpl(options.shortModelName, multiplier)
                 dnn.ReadModel(saveModelFile)
             End If
-            Dim r = task.drawRect
-            If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then Exit Sub
+            Dim r = algTask.drawRect
+            If algTask.drawRect.Width = 0 Or algTask.drawRect.Height = 0 Then Exit Sub
             Dim outRect = New cv.Rect(0, 0, r.Width * multiplier, r.Height * multiplier)
             If outRect.Width > dst3.Width Then
                 r.Width = dst3.Width / multiplier
@@ -191,7 +191,7 @@ Namespace VBClasses
     '    Dim net As Net
     '    Dim classnames() As String
     '    Public Sub New()
-    '        Dim modelFile As New FileInfo(task.homeDir + "Data/bvlc_googlenet.caffemodel")
+    '        Dim modelFile As New FileInfo(algTask.homeDir + "Data/bvlc_googlenet.caffemodel")
     '        If File.Exists(modelFile.FullName) = False Then
     '            ' this site is apparently gone.  caffemodel is in the Data directory in OpenCVB_HomeDir
     '            Dim client = HttpWebRequest.CreateHttp("http://dl.caffe.berkeleyvision.org/bvlc_googlenet.caffemodel")
@@ -201,9 +201,9 @@ Namespace VBClasses
     '            responseStream.CopyTo(memory)
     '            File.WriteAllBytes(modelFile.FullName, memory.ToArray)
     '        End If
-    '        Dim protoTxt = task.homeDir + "Data/bvlc_googlenet.prototxt"
+    '        Dim protoTxt = algTask.homeDir + "Data/bvlc_googlenet.prototxt"
     '        net = CvDnn.ReadNetFromCaffe(protoTxt, modelFile.FullName)
-    '        Dim synsetWords = task.homeDir + "Data/synset_words.txt"
+    '        Dim synsetWords = algTask.homeDir + "Data/synset_words.txt"
     '        classnames = File.ReadAllLines(synsetWords) ' .Select(line >= line.Split(' ').Last()).ToArray()
     '        For i = 0 To classnames.Count - 1
     '            classnames(i) = classnames(i).Split(" ").Last
@@ -214,7 +214,7 @@ Namespace VBClasses
     '    End Sub
     '    Public Overrides sub RunAlg(src As cv.Mat)
 
-    '        Dim image = cv.Cv2.ImRead(task.homeDir + "Data/space_shuttle.jpg")
+    '        Dim image = cv.Cv2.ImRead(algTask.homeDir + "Data/space_shuttle.jpg")
     '        dst3 = image.Resize(dst3.Size())
     '        Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
     '        net.SetInput(inputBlob, "data")

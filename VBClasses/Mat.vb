@@ -8,7 +8,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim small = src.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
             dst2 = small.Repeat(10, 10)
-            small = Task.depthRGB.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
+            small = algTask.depthRGB.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
             dst3 = small.Repeat(10, 10)
         End Sub
     End Class
@@ -31,7 +31,7 @@ Namespace VBClasses
             random.Run(src)
             dst2.SetTo(0)
             For Each pt In random.PointList
-                DrawCircle(dst2, pt, Task.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst2, pt, algTask.DotSize, cv.Scalar.Yellow)
             Next
 
             Dim rows = random.PointList.Count
@@ -80,7 +80,7 @@ Namespace VBClasses
 
     Public Class Mat_Transpose : Inherits TaskParent
         Public Sub New()
-            desc = "Transpose a Mat and show task.results.."
+            desc = "Transpose a Mat and show algTask.results.."
             labels(2) = "Color Image Transposed"
             labels(3) = "Color Image Transposed back (artifacts)"
         End Sub
@@ -146,7 +146,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
-            If Task.heartBeat Then
+            If algTask.heartBeat Then
                 If nextColor = New cv.Vec3b(0, 0, 255) Then nextColor = New cv.Vec3b(0, 255, 0) Else nextColor = New cv.Vec3b(0, 0, 255)
             End If
             For i = 0 To img.Length - 1
@@ -222,7 +222,7 @@ Namespace VBClasses
         Public inverse As New cv.Mat
         Dim options As New Options_Mat
         Public Sub New()
-            desc = "Given a 3x3 matrix, invert it and present task.results.."
+            desc = "Given a 3x3 matrix, invert it and present algTask.results.."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -384,12 +384,12 @@ Namespace VBClasses
             desc = "Fill a Mat with 2 images"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim nSize = New cv.Size(Task.workRes.Width, Task.workRes.Height / 2)
+            Dim nSize = New cv.Size(algTask.workRes.Width, algTask.workRes.Height / 2)
             Dim roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
             Dim roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
             If standaloneTest() Then
                 mat1 = src
-                mat2 = Task.depthRGB
+                mat2 = algTask.depthRGB
                 mat = {mat1, mat2}
             End If
             dst2.SetTo(0)
@@ -400,7 +400,7 @@ Namespace VBClasses
                     If mat(i).Empty = False Then dst2(roi) = mat(i).Resize(nSize)
                 Next
                 If lineSeparators Then
-                    dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), white, Task.lineWidth + 1)
+                    dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), white, algTask.lineWidth + 1)
                 End If
             End If
         End Sub
@@ -429,16 +429,16 @@ Namespace VBClasses
             mats.Run(emptyMat)
             dst2 = mats.dst2.Clone
             If standalone Then mats.defaultMats(emptyMat)
-            If Task.firstPass Then
-                Task.ClickPoint = New cv.Point(0, 0)
-                Task.mousePicTag = 2
+            If algTask.firstPass Then
+                algTask.ClickPoint = New cv.Point(0, 0)
+                algTask.mousePicTag = 2
             End If
 
-            If Task.mouseClickFlag And Task.mousePicTag = 2 Then
-                If Task.ClickPoint.Y < dst2.Rows / 2 Then
-                    quadrant = If(Task.clickPoint.X < Task.workRes.Width / 2, 0, 1)
+            If algTask.mouseClickFlag And algTask.mousePicTag = 2 Then
+                If algTask.ClickPoint.Y < dst2.Rows / 2 Then
+                    quadrant = If(algTask.ClickPoint.X < algTask.workRes.Width / 2, 0, 1)
                 Else
-                    quadrant = If(Task.clickPoint.X < Task.workRes.Width / 2, 2, 3)
+                    quadrant = If(algTask.ClickPoint.X < algTask.workRes.Width / 2, 2, 3)
                 End If
             End If
             mats.Run(emptyMat)
@@ -466,11 +466,11 @@ Namespace VBClasses
             desc = "Use one Mat for up to 4 images"
         End Sub
         Public Sub defaultMats(src As cv.Mat)
-            Dim tmpLeft = If(Task.leftView.Channels() = 1, Task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
-                         Task.leftView)
-            Dim tmpRight = If(Task.rightView.Channels() = 1, Task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
-                          Task.rightView)
-            mat = {Task.color.Clone, Task.depthRGB.Clone, tmpLeft, tmpRight}
+            Dim tmpLeft = If(algTask.leftView.Channels() = 1, algTask.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
+                         algTask.leftView)
+            Dim tmpRight = If(algTask.rightView.Channels() = 1, algTask.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR),
+                          algTask.rightView)
+            mat = {algTask.color.Clone, algTask.depthRGB.Clone, tmpLeft, tmpRight}
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim nSize = New cv.Size(dst2.Width / 2, dst2.Height / 2)
@@ -488,8 +488,8 @@ Namespace VBClasses
                 dst2(roi) = tmp.Resize(nSize)
             Next
             If lineSeparators Then
-                dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), white, Task.lineWidth + 1)
-                dst2.Line(New cv.Point(dst2.Width / 2, 0), New cv.Point(dst2.Width / 2, dst2.Height), white, Task.lineWidth + 1)
+                dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), white, algTask.lineWidth + 1)
+                dst2.Line(New cv.Point(dst2.Width / 2, 0), New cv.Point(dst2.Width / 2, dst2.Height), white, algTask.lineWidth + 1)
             End If
         End Sub
     End Class
@@ -509,8 +509,8 @@ Namespace VBClasses
             Static thresholdSlider = OptionParent.FindSlider("FindNearZero threshold X1000")
             Dim threshold = thresholdSlider.value / 1000
 
-            dst3 = Task.pcSplit(1).InRange(-threshold, threshold)
-            dst3.SetTo(0, Task.noDepthMask)
+            dst3 = algTask.pcSplit(1).InRange(-threshold, threshold)
+            dst3.SetTo(0, algTask.noDepthMask)
             dst3.ConvertTo(dst2, cv.MatType.CV_8U)
 
             dst1 = dst3.FindNonZero()
@@ -558,7 +558,7 @@ Namespace VBClasses
             Return dst
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then src = Task.pointCloud
+            If standalone Then src = algTask.pointCloud
             dst2 = Mat_Check8uc3(src)
         End Sub
     End Class

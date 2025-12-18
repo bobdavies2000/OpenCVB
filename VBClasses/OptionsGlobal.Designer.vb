@@ -329,7 +329,7 @@ Partial Class OptionsGlobal
         DebugCheckBox.Name = "DebugCheckBox"
         DebugCheckBox.Size = New Size(697, 34)
         DebugCheckBox.TabIndex = 19
-        DebugCheckBox.Text = "DebugCheckbox - task.gOptions.DebugChecked - use for testing"
+        DebugCheckBox.Text = "DebugCheckbox - algTask.gOptions.DebugChecked - use for testing"
         DebugCheckBox.UseVisualStyleBackColor = True
         ' 
         ' GroupBox2

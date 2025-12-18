@@ -8,19 +8,19 @@ Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
         Public Sub Dispose() Implements IDisposable.Dispose
             If allOptions IsNot Nothing Then allOptions.Close()
-            If cpu.activeObjects IsNot Nothing Then
-                For Each algorithm In cpu.activeObjects
+            If activeObjects IsNot Nothing Then
+                For Each algorithm In activeObjects
                     If algorithm.GetType().GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
                 Next
             End If
-            For Each mat In Task.dstList
+            For Each mat In algTask.dstList
                 If mat IsNot Nothing Then mat.Dispose()
             Next
         End Sub
 #End Region
 
         Public Sub Initialize(settings As jsonShared.Settings)
-            Task.Settings = settings
+            algTask.Settings = settings
             rgbLeftAligned = True
             If settings.cameraName.Contains("RealSense") Then rgbLeftAligned = False
 
@@ -31,8 +31,8 @@ Namespace VBClasses
 
             allOptions = New OptionsContainer
             allOptions.Show()
-            allOptions.Location = New Point(Task.Settings.allOptionsLeft, Task.Settings.allOptionsTop)
-            allOptions.Size = New Size(Task.Settings.allOptionsWidth, Task.Settings.allOptionsHeight)
+            allOptions.Location = New Point(algTask.Settings.allOptionsLeft, algTask.Settings.allOptionsTop)
+            allOptions.Size = New Size(algTask.Settings.allOptionsWidth, algTask.Settings.allOptionsHeight)
             allOptions.positionedFromSettings = True
 
             If settings.algorithm.StartsWith("GL_") And settings.algorithm <> "GL_MainForm" And optionsChanged Then
@@ -41,13 +41,13 @@ Namespace VBClasses
                 sharpGL.Show()
             End If
 
-            Dim fps = Task.Settings.FPSdisplay
+            Dim fps = algTask.Settings.FPSdisplay
             gOptions = New OptionsGlobal
             gOptions.DisplayFPSSlider.Value = fps
             featureOptions = New OptionsFeatures
             treeView = New TreeViewForm
 
-            cpu.callTrace = New List(Of String)
+            callTrace = New List(Of String)
             gravityCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
             motionMask = New cv.Mat(workRes, cv.MatType.CV_8U, 255)
             noDepthMask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
@@ -63,9 +63,9 @@ Namespace VBClasses
             lines = New Line_Basics
             rgbFilter = New Filter_Basics
 
-            ' all the algorithms in the list are task algorithms that are children of the algorithm.
-            For i = 1 To cpu.callTrace.Count - 1
-                cpu.callTrace(i) = settings.algorithm + "\" + cpu.callTrace(i)
+            ' all the algorithms in the list are algTask algorithms that are children of the algorithm.
+            For i = 1 To callTrace.Count - 1
+                callTrace(i) = settings.algorithm + "\" + callTrace(i)
             Next
 
             taskUpdate()
@@ -111,17 +111,34 @@ Namespace VBClasses
 
             taskUpdate()
 
-            Dim src = Task.color
-            If src.Width = 0 Or Task.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
+            If algorithm_ms.Count = 0 Then
+                algorithmNames.Add("waitingForInput")
+                algorithmTimes.Add(Now)
+                algorithm_ms.Add(0)
 
-            bins2D = {Task.workRes.Height, Task.workRes.Width}
+                algorithmNames.Add(Settings.algorithm)
+                algorithmTimes.Add(Now)
+                algorithm_ms.Add(0)
+
+                algorithmStack = New Stack()
+                algorithmStack.Push(0)
+                algorithmStack.Push(1)
+            End If
+
+            algorithm_ms(0) += waitingForInput
+            algorithmTimes(3) = Now  ' starting the main algorithm
+
+            Dim src = algTask.color
+            If src.Width = 0 Or algTask.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
+
+            bins2D = {algTask.workRes.Height, algTask.workRes.Width}
 
             ' run any universal algorithms here
             IMU_RawAcceleration = IMU_Acceleration
             IMU_RawAngularVelocity = IMU_AngularVelocity
             IMU_AlphaFilter = 0.5 '  gOptions.imu_Alpha
 
-            grid.Run(Task.color)
+            grid.Run(algTask.color)
             imuBasics.Run(emptyMat)
             gmat.Run(emptyMat)
 
@@ -139,7 +156,7 @@ Namespace VBClasses
             rgbFilter.Run(color)
             If gOptions.UseMotionMask.Checked Then
                 motionBasics.Run(gray)
-                If optionsChanged Or Task.frameCount < 5 Then
+                If optionsChanged Or algTask.frameCount < 5 Then
                     motionRect = New cv.Rect(0, 0, workRes.Width, workRes.Height)
                     grayStable = gray.Clone
                     leftViewStable = leftView.Clone
@@ -160,7 +177,7 @@ Namespace VBClasses
             If pcMotion IsNot Nothing Then
                 pcMotion.Run(emptyMat) '******* this is the gravity rotation *******
             Else
-                Task.pcSplit = Task.pointCloud.Split
+                algTask.pcSplit = algTask.pointCloud.Split
             End If
 
             colorizer.Run(src)
@@ -180,12 +197,12 @@ Namespace VBClasses
                 If gifCreator.gifC.options.buildCheck.Checked Then
                     gifCreator.gifC.options.buildCheck.Checked = False
                     For i = 0 To gifImages.Count - 1
-                        Dim fileName As New FileInfo(Task.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
+                        Dim fileName As New FileInfo(algTask.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
                         gifImages(i).Save(fileName.FullName)
                     Next
 
                     gifImages.Clear()
-                    Dim dirInfo As New DirectoryInfo(Task.homeDir + "GifBuilder\bin\Debug\net8.0\")
+                    Dim dirInfo As New DirectoryInfo(algTask.homeDir + "GifBuilder\bin\Debug\net8.0\")
                     Dim dirData = dirInfo.GetDirectories()
                     Dim gifExe As New FileInfo(dirInfo.FullName + "GifBuilder.exe")
                     If gifExe.Exists = False Then
@@ -203,6 +220,7 @@ Namespace VBClasses
             histBinList = {histogramBins, histogramBins, histogramBins}
 
             Dim saveOptionsChanged = optionsChanged
+            If optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True
             If activateTaskForms Then
                 If sharpGL IsNot Nothing Then sharpGL.Activate()
                 treeView.Activate()
@@ -222,8 +240,8 @@ Namespace VBClasses
 
 
                 labels = MainUI_Algorithm.labels
-                If Task.gOptions.displayDst0.Checked = False Then labels(0) = Task.resolutionDetails
-                If Task.gOptions.displayDst1.Checked = False Then labels(1) = Task.depthAndDepthRange.Replace(vbCrLf, "")
+                If algTask.gOptions.displayDst0.Checked = False Then labels(0) = algTask.resolutionDetails
+                If algTask.gOptions.displayDst1.Checked = False Then labels(1) = algTask.depthAndDepthRange.Replace(vbCrLf, "")
 
                 Dim nextTrueData As List(Of TrueText) = MainUI_Algorithm.trueData
                 trueData = New List(Of TrueText)(nextTrueData)
@@ -231,10 +249,10 @@ Namespace VBClasses
                 firstPass = False
                 heartBeatLT = False
 
-                Dim displayObject = Task.MainUI_Algorithm
+                Dim displayObject = algTask.MainUI_Algorithm
                 ' they could have asked to display one of the algorithms in the TreeView.
-                For Each obj In cpu.activeObjects
-                    If obj.tracename = task.cpu.displayObjectName Then
+                For Each obj In activeObjects
+                    If obj.tracename = algTask.displayObjectName Then
                         displayObject = obj
                         Exit For
                     End If
@@ -262,23 +280,23 @@ Namespace VBClasses
                     displayObject.trueData.Add(New TrueText("Longest", pt, 0))
                 End If
 
-                If Task.drawRect.Width > 0 And Task.drawRect.Height > 0 Then
+                If algTask.drawRect.Width > 0 And algTask.drawRect.Height > 0 Then
                     For Each dst In dstList
-                        dst.Rectangle(Task.drawRect, cv.Scalar.White, 1)
+                        dst.Rectangle(algTask.drawRect, cv.Scalar.White, 1)
                     Next
                 End If
 
                 ' if there were no cycles spent on this routine, then it was inactive.
                 ' if any active algorithm has an index = -1, it has not been run.
-                Dim index = cpu.algorithmNames.IndexOf(displayObject.traceName)
+                Dim index = algorithmNames.IndexOf(displayObject.traceName)
                 If index = -1 Then
-                    displayObject.trueData.Add(New TrueText("This task is not active at this time.",
+                    displayObject.trueData.Add(New TrueText("This algTask is not active at this time.",
                                            New cv.Point(workRes.Width / 3, workRes.Height / 2), 2))
                 End If
 
                 trueData.Clear()
-                trueData.Add(New TrueText(Task.depthAndDepthRange,
-                                  New cv.Point(Task.mouseMovePoint.X, Task.mouseMovePoint.Y - 24), 1))
+                trueData.Add(New TrueText(algTask.depthAndDepthRange,
+                                  New cv.Point(algTask.mouseMovePoint.X, algTask.mouseMovePoint.Y - 24), 1))
                 For Each tt In displayObject.trueData
                     trueData.Add(tt)
                 Next
@@ -304,6 +322,11 @@ Namespace VBClasses
 
                 If gifCreator IsNot Nothing Then gifCreator.createNextGifImage()
 
+                If optionsChanged = True And treeView IsNot Nothing Then
+                    treeView.optionsChanged = True
+                    Dim sender As Object = Nothing, e As EventArgs = Nothing
+                    treeView.optionsChanged = False
+                End If
                 optionsChanged = False
             Catch ex As Exception
                 Debug.WriteLine("Active Algorithm exception occurred: " + ex.Message)
@@ -314,7 +337,7 @@ Namespace VBClasses
             gridRects = New List(Of cv.Rect)
             optionsChanged = True
             firstPass = True
-            useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve task.results..
+            useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve algTask.results..
         End Sub
     End Class
 End Namespace

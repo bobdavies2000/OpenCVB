@@ -10,8 +10,8 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1.SetTo(0)
-            dst1.Line(task.lineGravity.p1, task.lineGravity.p2, 255, 1, cv.LineTypes.Link8)
-            dst1.Line(task.lineHorizon.p1, task.lineHorizon.p2, 255, 1, cv.LineTypes.Link8)
+            dst1.Line(algTask.lineGravity.p1, algTask.lineGravity.p2, 255, 1, cv.LineTypes.Link8)
+            dst1.Line(algTask.lineHorizon.p1, algTask.lineHorizon.p2, 255, 1, cv.LineTypes.Link8)
 
             Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8)
             If dst1.Get(Of Byte)(p1.Y, p1.X) = 0 Then cv.Cv2.FloodFill(dst1, New cv.Mat, p1, 1 * 255 / 4, rect, 0, 0, flags)

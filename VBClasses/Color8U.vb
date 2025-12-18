@@ -3,15 +3,15 @@ Namespace VBClasses
     Public Class Color8U_Basics : Inherits TaskParent
         Public classCount As Integer
         Public classifier As Object
-        Dim colorMethods(task.featureOptions.colorMethods.Count) As Object
+        Dim colorMethods(algTask.featureOptions.colorMethods.Count) As Object
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
             desc = "Classify pixels by color using a variety of techniques"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.optionsChanged Or classifier Is Nothing Then
-                Dim index = task.featureOptions.Color8USource.SelectedIndex
-                Select Case task.featureOptions.Color8USource.Text
+            If algTask.optionsChanged Or classifier Is Nothing Then
+                Dim index = algTask.featureOptions.Color8USource.SelectedIndex
+                Select Case algTask.featureOptions.Color8USource.Text
                     Case "BackProject_Full"
                         If colorMethods(index) Is Nothing Then colorMethods(index) = New BackProject_Full
                     Case "Bin4Way_Regions"
@@ -36,13 +36,13 @@ Namespace VBClasses
                 classifier = colorMethods(index)
             End If
 
-            If task.featureOptions.Color8USource.Text = "PCA_NColor_CPP" Then
+            If algTask.featureOptions.Color8USource.Text = "PCA_NColor_CPP" Then
                 classifier.Run(src.Clone)
             Else
                 If src.Type = cv.MatType.CV_8U Then
                     classifier.run(src)
                 Else
-                    classifier.Run(task.gray)
+                    classifier.Run(algTask.gray)
                 End If
             End If
 
@@ -50,7 +50,7 @@ Namespace VBClasses
             classCount = classifier.classCount
 
             dst3 = PaletteFull(dst2)
-            labels(3) = "dst3 = PaletteFull(dst2) - " + task.featureOptions.Color8USource.Text
+            labels(3) = "dst3 = PaletteFull(dst2) - " + algTask.featureOptions.Color8USource.Text
             labels(2) = "Color8U_Basics: method = " + classifier.tracename + " produced " + CStr(classCount) +
                         " pixel classifications"
         End Sub
@@ -69,17 +69,17 @@ Namespace VBClasses
             desc = "Sweep through all the Color8U_Basics algorithms..."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Then
-                Static index As Integer = task.featureOptions.Color8USource.SelectedIndex + 1
-                If index >= task.featureOptions.Color8USource.Items.Count Then index = 0
-                task.featureOptions.Color8USource.SelectedIndex = index
+            If algTask.heartBeatLT Then
+                Static index As Integer = algTask.featureOptions.Color8USource.SelectedIndex + 1
+                If index >= algTask.featureOptions.Color8USource.Items.Count Then index = 0
+                algTask.featureOptions.Color8USource.SelectedIndex = index
             End If
 
             color8u.Run(src)
             classCount = color8u.classCount
             dst2 = PaletteFull(color8u.dst2)
 
-            strOut = "Current color source = " + task.featureOptions.Color8USource.Text
+            strOut = "Current color source = " + algTask.featureOptions.Color8USource.Text
             SetTrueText(strOut, 2)
         End Sub
     End Class
@@ -105,7 +105,7 @@ Namespace VBClasses
             End If
 
             If options.useOpenCV Then
-                dst2 = task.gray
+                dst2 = algTask.gray
             Else
                 dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                 Parallel.For(0, src.Rows,
@@ -129,7 +129,7 @@ Namespace VBClasses
         Public depth As New Depth_InRange
         Public classCount As Integer
         Public Sub New()
-            task.gOptions.LineType.SelectedIndex = 1 ' linetype = link4
+            algTask.gOptions.LineType.SelectedIndex = 1 ' linetype = link4
             labels = {"", "", "Color Reduction Edges", "Depth Range Edges"}
             desc = "Add depth regions edges to the color Reduction image."
         End Sub
@@ -158,7 +158,7 @@ Namespace VBClasses
         Public km2 As New KMeans_Basics
         Public colorFmt As New Color_Basics
         Public Sub New()
-            If standaloneTest() Then task.gOptions.displaydst1.checked = True
+            If standaloneTest() Then algTask.gOptions.displaydst1.checked = True
             labels(0) = "Recombined channels in other images."
             desc = "Run KMeans on each of the 3 color channels"
         End Sub
@@ -245,7 +245,7 @@ Namespace VBClasses
             desc = "Create the complementary images for Gilles Tran's 'Glasses' image for comparison"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            images.options.fileNameForm.filename.Text = task.homeDir + "Data/Glasses by Gilles Tran.png"
+            images.options.fileNameForm.filename.Text = algTask.homeDir + "Data/Glasses by Gilles Tran.png"
             images.Run(src)
             dst2 = images.dst2
 
@@ -267,7 +267,7 @@ Namespace VBClasses
             desc = "Use inRange to isolate colors from the background"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = cv.Cv2.ImRead(task.homeDir + "Data/1.jpg", cv.ImreadModes.Grayscale)
+            dst2 = cv.Cv2.ImRead(algTask.homeDir + "Data/1.jpg", cv.ImreadModes.Grayscale)
             dst1 = dst2.InRange(105, 165) ' should make this a slider and experiment further...
             dst3 = dst2.Clone
             dst3.SetTo(0, dst1)
@@ -400,7 +400,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst1 = task.gray
+            dst1 = algTask.gray
             dst2 = dst1.Threshold(options.minThreshold, 255, cv.ThresholdTypes.BinaryInv)
             dst3 = dst1.Threshold(options.maxThreshold, 255, cv.ThresholdTypes.Binary)
         End Sub
@@ -416,18 +416,18 @@ Namespace VBClasses
         Public classCount As Integer
         Dim motion As New XO_Motion_BGSub
         Public Sub New()
-            desc = "Prepare a Color8U_Basics image using the task.motionMask"
+            desc = "Prepare a Color8U_Basics image using the algTask.motionMask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.motionMask.CountNonZero Then
-                src.SetTo(0, Not task.motionMask)
+            If algTask.motionMask.CountNonZero Then
+                src.SetTo(0, Not algTask.motionMask)
                 color8U.Run(src)
                 dst2 = color8U.dst3
-                dst2.CopyTo(dst3, task.motionMask)
-                dst2.SetTo(0, Not task.motionMask)
+                dst2.CopyTo(dst3, algTask.motionMask)
+                dst2.SetTo(0, Not algTask.motionMask)
                 classCount = color8U.classCount
             End If
-            If task.heartBeatLT Then dst3.SetTo(0)
+            If algTask.heartBeatLT Then dst3.SetTo(0)
             labels(2) = color8U.strOut
         End Sub
     End Class
@@ -440,15 +440,15 @@ Namespace VBClasses
     Public Class Color8U_LeftRight : Inherits TaskParent
         Dim color8u As New Color8U_Basics
         Public Sub New()
-            task.gOptions.UseMotionMask.Checked = False
+            algTask.gOptions.UseMotionMask.Checked = False
             desc = "Create a color transformation for both the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8u.Run(task.leftView)
+            color8u.Run(algTask.leftView)
             dst2 = color8u.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
             labels(2) = color8u.labels(2)
 
-            color8u.Run(task.rightView)
+            color8u.Run(algTask.rightView)
             dst3 = color8u.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
             labels(3) = color8u.labels(2)
         End Sub

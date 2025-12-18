@@ -16,7 +16,7 @@ Public Class OptionsContainer
         titlesAdded = True
     End Sub
     Public Sub layoutOptions(normalRequest As Boolean)
-        Dim w = Task.Settings.allOptionsWidth
+        Dim w = algTask.Settings.allOptionsWidth
         Dim radioCheckOffset = New cv.Point(w / 2, 0)
 
         Dim sliderOffset As New cv.Point(0, 0)
@@ -40,13 +40,13 @@ Public Class OptionsContainer
                 Dim sidelineOptions As Boolean = True
                 Dim displayTheseOptions As New List(Of String)({"Image_Basics OpenFile Options"})
                 If displayTheseOptions.Contains(frm.Text) Then sidelineOptions = False
-                If normalRequest And sidelineOptions And Task.Settings.ShowAllOptions = False Then
+                If normalRequest And sidelineOptions And algTask.Settings.ShowAllOptions = False Then
                     If frm Is Nothing Then Continue For
                     frm.SetDesktopLocation(Me.Width - 2 * offset, sliderOffset.Y + indexHide * offset)
                     indexHide += 1
                 Else
                     If title.Contains("OpenFile") Then
-                        frm.SetDesktopLocation(0, Task.gOptions.Top + 350)
+                        frm.SetDesktopLocation(0, algTask.gOptions.Top + 350)
                     End If
                     If title.EndsWith(" Sliders") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                         If frm Is Nothing Then Continue For
@@ -65,9 +65,9 @@ Public Class OptionsContainer
     End Sub
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
         layoutOptions(normalRequest:=True)
-        Task.featureOptions.BringToFront()
-        Task.gOptions.BringToFront()
-        Task.gOptions.BringToFront()
+        algTask.featureOptions.BringToFront()
+        algTask.gOptions.BringToFront()
+        algTask.gOptions.BringToFront()
     End Sub
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
         layoutOptions(normalRequest:=False)
@@ -82,18 +82,18 @@ Public Class OptionsContainer
                 End If
             Next
         Next
-        Task.gOptions.Close()
-        Task.featureOptions.Close()
-        Task.treeView.Close()
-        If Task.sharpGL IsNot Nothing Then Task.sharpGL.Close()
+        algTask.gOptions.Close()
+        algTask.featureOptions.Close()
+        algTask.treeView.Close()
+        If algTask.sharpGL IsNot Nothing Then algTask.sharpGL.Close()
         GC.Collect()
     End Sub
     Private Sub OptionsContainer_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         If positionedFromSettings Then
-            Task.Settings.allOptionsLeft = Me.Left
-            Task.Settings.allOptionsTop = Me.Top
-            Task.Settings.allOptionsWidth = Me.Width
-            Task.Settings.allOptionsHeight = Me.Height
+            algTask.Settings.allOptionsLeft = Me.Left
+            algTask.Settings.allOptionsTop = Me.Top
+            algTask.Settings.allOptionsWidth = Me.Width
+            algTask.Settings.allOptionsHeight = Me.Height
         End If
     End Sub
     Private Sub OptionsContainer_Move(sender As Object, e As EventArgs) Handles Me.Move

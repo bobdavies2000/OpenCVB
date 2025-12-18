@@ -8,17 +8,17 @@ Namespace VBClasses
         Public Sub New()
             cPtr = EdgeLineRaw_Open()
             labels(3) = "Palette version of dst2"
-            If standalone Then task.gOptions.showMotionMask.Checked = True
+            If standalone Then algTask.gOptions.showMotionMask.Checked = True
             desc = "Use EdgeLines to find edges/lines but without using motionMask directly"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.grayStable
+            If src.Channels <> 1 Then src = algTask.grayStable
 
             Dim cppData(src.Total - 1) As Byte
             Marshal.Copy(src.Data, cppData, 0, cppData.Length)
             Dim handlesrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                              task.lineWidth)
+                                              algTask.lineWidth)
             handlesrc.Free()
             rcMap = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
             rcMap.ConvertTo(dst2, cv.MatType.CV_8U)
@@ -43,11 +43,11 @@ Namespace VBClasses
                 Dim rc = New rcData(mask, r, index, 0)
 
                 rcList.Add(rc)
-                If standaloneTest() Then dst3(rc.rect).SetTo(task.scalarColors(rc.gIndex), rc.mask)
+                If standaloneTest() Then dst3(rc.rect).SetTo(algTask.scalarColors(rc.gIndex), rc.mask)
             Next
 
             labels(2) = CStr(classCount) + " line segments were found with motion threshold of " +
-                        CStr(task.motionThreshold) + " pixels changed in a grid rect."
+                        CStr(algTask.motionThreshold) + " pixels changed in a grid rect."
         End Sub
         Public Sub Close()
             EdgeLineRaw_Close(cPtr)
@@ -63,7 +63,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public classCount As Integer
         Public Sub New()
-            If standalone Then task.gOptions.showMotionMask.Checked = True
+            If standalone Then algTask.gOptions.showMotionMask.Checked = True
             labels(1) = "CV_8U edges - input to PalleteBlackZero"
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
             desc = "Retain edges where there was no motion."
@@ -73,18 +73,18 @@ Namespace VBClasses
             Dim n = rc.contour.Count - 1
             nextList.Clear()
             nextList.Add(rc.contour)
-            cv.Cv2.Polylines(dst2(rc.rect), nextList, False, cv.Scalar.All(rc.index), task.lineWidth, task.lineType)
+            cv.Cv2.Polylines(dst2(rc.rect), nextList, False, cv.Scalar.All(rc.index), algTask.lineWidth, algTask.lineType)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim histogram As New cv.Mat
             Dim histarray(edgeLine.rcList.Count - 1) As Single
-            If task.motionRect.Width = 0 Then Exit Sub ' no change!
+            If algTask.motionRect.Width = 0 Then Exit Sub ' no change!
 
             Dim newList As New List(Of rcData)
             dst2.SetTo(0)
             If edgeLine.rcList.Count Then
                 Dim ranges1 = New cv.Rangef() {New cv.Rangef(0, edgeLine.rcList.Count)}
-                cv.Cv2.CalcHist({dst2}, {0}, task.motionMask, histogram,
+                cv.Cv2.CalcHist({dst2}, {0}, algTask.motionMask, histogram,
                             1, {edgeLine.rcList.Count}, ranges1)
                 Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
@@ -105,7 +105,7 @@ Namespace VBClasses
             ReDim histarray(edgeLine.classCount - 1)
 
             Dim ranges2 = New cv.Rangef() {New cv.Rangef(0, edgeLine.classCount)}
-            cv.Cv2.CalcHist({edgeLine.dst2}, {0}, task.motionMask, histogram,
+            cv.Cv2.CalcHist({edgeLine.dst2}, {0}, algTask.motionMask, histogram,
                         1, {edgeLine.classCount}, ranges2)
             Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
@@ -115,8 +115,8 @@ Namespace VBClasses
                     count += 1
                     rc.index = newList.Count + 1
                     If rc.contour.Count > 0 Then
-                        Dim gIndex = task.gridMap.Get(Of Integer)(rc.contour(0).Y, rc.contour(0).X)
-                        rc.color = task.vecColors(gIndex Mod 255)
+                        Dim gIndex = algTask.gridMap.Get(Of Integer)(rc.contour(0).Y, rc.contour(0).X)
+                        rc.color = algTask.vecColors(gIndex Mod 255)
                     End If
                     newList.Add(rc)
 
@@ -153,7 +153,7 @@ Namespace VBClasses
             Dim cppData(input.Total - 1) As Byte
             Marshal.Copy(input.Data, cppData, 0, cppData.Length)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-            Dim imagePtr = EdgeLineSimple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), input.Rows, input.Cols, task.lineWidth * 2)
+            Dim imagePtr = EdgeLineSimple_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), input.Rows, input.Cols, algTask.lineWidth * 2)
             handleSrc.Free()
 
             dst2 = cv.Mat.FromPixelData(input.Rows, input.Cols, cv.MatType.CV_8U, imagePtr).Clone
@@ -213,7 +213,7 @@ Namespace VBClasses
             Dim cppData(src.Total - 1) As Byte
             Marshal.Copy(src.Data, cppData, 0, cppData.Length)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-            Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
+            Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, algTask.lineWidth)
             handleSrc.Free()
             If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
 
@@ -252,23 +252,23 @@ Namespace VBClasses
             desc = "Native C++ version to find edges/lines using motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim input = If(src.Channels() = 1, src.Clone, task.grayStable.Clone)
+            Dim input = If(src.Channels() = 1, src.Clone, algTask.grayStable.Clone)
 
             Dim cppData(input.Total - 1) As Byte
             Marshal.Copy(input.Data, cppData, 0, cppData.Length)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
 
-            Dim maskData(task.motionMask.Total - 1) As Byte
-            Marshal.Copy(task.motionMask.Data, maskData, 0, maskData.Length)
+            Dim maskData(algTask.motionMask.Total - 1) As Byte
+            Marshal.Copy(algTask.motionMask.Data, maskData, 0, maskData.Length)
             Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
 
             Dim imagePtr = EdgeLine_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), input.Rows, input.Cols,
-                                        task.lineWidth)
+                                        algTask.lineWidth)
             handleSrc.Free()
             handleMask.Free()
 
             dst2 = cv.Mat.FromPixelData(input.Rows, input.Cols, cv.MatType.CV_8U, imagePtr)
-            If task.heartBeat Then
+            If algTask.heartBeat Then
                 labels(2) = "There were " + CStr(EdgeLine_GetEdgeLength(cPtr)) + " edge/lines found while " +
                                         CStr(EdgeLine_GetSegCount(cPtr)) + " edge/lines were found on the current image."
                 labels(3) = "There were " + CStr(EdgeLine_UnchangedCount(cPtr)) + " edge/lines retained from the previous image."
@@ -290,15 +290,15 @@ Namespace VBClasses
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then algTask.gOptions.displayDst1.Checked = True
             labels(1) = "EdgeLine segments displayed one for each frame starting with the longest."
             desc = "Find lines using the brick points"
         End Sub
         Public Sub showSegment(dst As cv.Mat)
-            If task.quarterBeat Then
+            If algTask.quarterBeat Then
                 Static debugSegment = 0
                 debugSegment += 1
-                edgeline.Run(task.grayStable)
+                edgeline.Run(algTask.grayStable)
                 If debugSegment >= edgeline.classCount Then
                     debugSegment = 0
                     dst.SetTo(0)
@@ -312,7 +312,7 @@ Namespace VBClasses
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.grayStable)
+            edgeline.Run(algTask.grayStable)
             bPoint.Run(src)
             labels(2) = bPoint.labels(2)
 
@@ -364,7 +364,7 @@ Namespace VBClasses
             desc = "Break up any edgeline segments that cross depth boundaries."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.grayStable)
+            edgeline.Run(algTask.grayStable)
             dst2 = edgeline.dst2
 
             segments.Clear()
@@ -372,7 +372,7 @@ Namespace VBClasses
                 Dim nextSeg As New List(Of cv.Point)
                 Dim lastDepth = -1
                 For Each pt In rc.contour
-                    Dim depth = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+                    Dim depth = algTask.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
                     If lastDepth > 0 And Math.Abs(lastDepth - depth) > 1 Then
                         If nextSeg.Count > 0 Then
                             segments.Add(nextSeg)
@@ -389,10 +389,10 @@ Namespace VBClasses
             dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
             Dim r = New cv.Rect(0, 0, dst2.Width, dst2.Height)
             dst3.Rectangle(r, black, 4)
-            If task.toggleOn Then
+            If algTask.toggleOn Then
                 SetTrueText("Segments without depth removed.", 3)
             Else
-                dst3.SetTo(0, task.noDepthMask)
+                dst3.SetTo(0, algTask.noDepthMask)
                 SetTrueText("Segments with depth removed.", 3)
             End If
             labels(3) = "After using depth to isolate segments there are " + CStr(segments.Count) + " segments"
@@ -413,10 +413,10 @@ Namespace VBClasses
             desc = "Build the left and right edge lines."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edges.Run(task.leftViewStable)
+            edges.Run(algTask.leftViewStable)
             dst2 = edges.dst2.Clone
 
-            edges.Run(task.rightView)
+            edges.Run(algTask.rightView)
             dst3 = edges.dst2.Clone
         End Sub
     End Class

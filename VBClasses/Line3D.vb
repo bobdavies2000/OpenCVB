@@ -5,38 +5,38 @@ Namespace VBClasses
         Public lines3D As New List(Of cv.Point3f)
         Public lines3DMat As New cv.Mat
         Public Sub New()
-            If standalone Then task.featureOptions.FeatureSampleSize.Value = 10
+            If standalone Then algTask.featureOptions.FeatureSampleSize.Value = 10
             desc = "Find the end point depth for the top X longest lines."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
-            labels(2) = task.lines.labels(2)
+            labels(2) = algTask.lines.labels(2)
 
             lines3D.Clear()
 
-            For Each lp In task.lines.lpList
-                Dim rect1 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-                Dim depth1 = task.pcSplit(2)(rect1).Mean(task.depthmask(rect1))(0)
+            For Each lp In algTask.lines.lpList
+                Dim rect1 = algTask.gridRects(algTask.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+                Dim depth1 = algTask.pcSplit(2)(rect1).Mean(algTask.depthmask(rect1))(0)
                 If depth1 = 0 Then Continue For
 
-                Dim rect2 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-                Dim depth2 = task.pcSplit(2)(rect2).Mean(task.depthmask(rect2))(0)
+                Dim rect2 = algTask.gridRects(algTask.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+                Dim depth2 = algTask.pcSplit(2)(rect2).Mean(algTask.depthmask(rect2))(0)
                 If depth2 = 0 Then Continue For
 
                 Dim p1 = Cloud_Basics.worldCoordinates(rect1.TopLeft, depth1)
                 Dim p2 = Cloud_Basics.worldCoordinates(rect2.TopLeft, depth2)
                 lines3D.Add(p1)
                 lines3D.Add(p2)
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link8)
+                dst2.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, cv.LineTypes.Link8)
                 SetTrueText(Format(depth1, fmt1), lp.p1, 2)
                 SetTrueText(Format(depth2, fmt1), lp.p2, 2)
             Next
 
             lines3DMat = cv.Mat.FromPixelData(lines3D.Count / 2, 1, cv.MatType.CV_32FC3, lines3D.ToArray)
 
-            If task.heartBeat Then
+            If algTask.heartBeat Then
                 strOut = CStr(lines3D.Count / 2) + " 3D lines are prepared in lines3D." + vbCrLf +
-                         CStr(task.lines.lpList.Count - lines3D.Count / 2) + " lines occurred in areas with no depth and were skipped."
+                         CStr(algTask.lines.lpList.Count - lines3D.Count / 2) + " lines occurred in areas with no depth and were skipped."
             End If
             SetTrueText(strOut, 3)
         End Sub
@@ -48,25 +48,25 @@ Namespace VBClasses
 
     Public Class Line3D_Longest : Inherits TaskParent
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Find the longest line in BGR and use it to measure the average depth for the line"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.lines.lpList.Count <= 1 Then Exit Sub
-            Dim lp = task.lines.lpList(0)
+            If algTask.lines.lpList.Count <= 1 Then Exit Sub
+            Dim lp = algTask.lines.lpList(0)
             dst2 = src
 
-            dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
+            dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, algTask.lineWidth + 3, algTask.lineType)
 
-            Dim gcMin = task.bricks.brickList(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            Dim gcMax = task.bricks.brickList(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+            Dim gcMin = algTask.bricks.brickList(algTask.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim gcMax = algTask.bricks.brickList(algTask.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
 
             dst0.SetTo(0)
-            dst0.Line(lp.p1, lp.p2, 255, 3, task.lineType)
-            dst0.SetTo(0, task.noDepthMask)
+            dst0.Line(lp.p1, lp.p2, 255, 3, algTask.lineType)
+            dst0.SetTo(0, algTask.noDepthMask)
 
-            Dim mm = GetMinMax(task.pcSplit(2), dst0)
+            Dim mm = GetMinMax(algTask.pcSplit(2), dst0)
             If gcMin.pt.DistanceTo(mm.minLoc) > gcMin.pt.DistanceTo(mm.maxLoc) Then
                 Dim tmp = gcMin
                 gcMin = gcMax
@@ -76,9 +76,9 @@ Namespace VBClasses
             Dim depthMin = If(gcMin.depth > 0, gcMin.depth, mm.minVal)
             Dim depthMax = If(gcMax.depth > 0, gcMax.depth, mm.maxVal)
 
-            Dim depthMean = task.pcSplit(2).Mean(dst0)(0)
-            DrawCircle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Red)
-            DrawCircle(dst2, lp.p2, task.DotSize + 4, cv.Scalar.Blue)
+            Dim depthMean = algTask.pcSplit(2).Mean(dst0)(0)
+            DrawCircle(dst2, lp.p1, algTask.DotSize + 4, cv.Scalar.Red)
+            DrawCircle(dst2, lp.p2, algTask.DotSize + 4, cv.Scalar.Blue)
 
             If lp.p1.DistanceTo(mm.minLoc) < lp.p2.DistanceTo(mm.maxLoc) Then
                 mm.minLoc = lp.p1
@@ -117,8 +117,8 @@ Namespace VBClasses
             dst2 = selectLine.dst2
             labels(2) = selectLine.labels(2)
 
-            If task.lpD.age = 1 Or task.optionsChanged Then
-                findLine3D.lp = task.lpD
+            If algTask.lpD.age = 1 Or algTask.optionsChanged Then
+                findLine3D.lp = algTask.lpD
                 findLine3D.Run(src)
 
                 If findLine3D.veclist.Count = 0 Then Exit Sub ' nothing to work on...
@@ -146,7 +146,7 @@ Namespace VBClasses
         Dim plot As New Plot_OverTimeScalar
         Dim toggleFirstSecond As Boolean
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then algTask.gOptions.displayDst1.Checked = True
             plot.plotCount = 2
 
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -164,11 +164,11 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                If task.mouseClickFlag Then
+                If algTask.mouseClickFlag Then
                     If toggleFirstSecond = False Then
-                        p1 = task.ClickPoint
+                        p1 = algTask.ClickPoint
                     Else
-                        p2 = task.ClickPoint
+                        p2 = algTask.ClickPoint
                         toggleFirstSecond = False
                     End If
                 End If
@@ -177,17 +177,17 @@ Namespace VBClasses
             If toggleFirstSecond Then Exit Sub ' wait until the second point is selected...
 
             dst1 = src
-            vbc.DrawLine(dst1, p1, p2, task.highlight)
+            vbc.DrawLine(dst1, p1, p2, algTask.highlight)
             dst0.SetTo(0)
             vbc.DrawLine(dst0, p1, p2, 255)
             dst1.SetTo(0)
-            task.pcSplit(0).CopyTo(dst1, dst0)
+            algTask.pcSplit(0).CopyTo(dst1, dst0)
             Dim points = dst1.FindNonZero()
 
             Dim nextList As New List(Of cv.Point3f)
             For i = 0 To points.Rows - 1
                 Dim pt = points.Get(Of cv.Point)(i, 0)
-                nextList.Add(task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X))
+                nextList.Add(algTask.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X))
             Next
             If nextList.Count = 0 Then Exit Sub ' line is completely in area with no depth.
 
@@ -220,24 +220,24 @@ Namespace VBClasses
             desc = "Select a line using the debug slider."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If lp Is Nothing Then lp = task.lines.lpList(0)
+            If lp Is Nothing Then lp = algTask.lines.lpList(0)
 
-            If task.firstPass = False Then
+            If algTask.firstPass = False Then
                 dst1(lp.rect).SetTo(0)
                 dst2(lp.rect).SetTo(0)
                 dst3(lp.rect).SetTo(0)
             End If
 
             If standalone Or debugRequest Then
-                If Math.Abs(task.gOptions.DebugSlider.Value) < task.lines.lpList.Count Then
-                    lp = task.lines.lpList(Math.Abs(task.gOptions.DebugSlider.Value))
+                If Math.Abs(algTask.gOptions.DebugSlider.Value) < algTask.lines.lpList.Count Then
+                    lp = algTask.lines.lpList(Math.Abs(algTask.gOptions.DebugSlider.Value))
                 End If
             End If
             dst3.Line(lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
             If standaloneTest() Or debugRequest Then allPoints = dst3(lp.rect).FindNonZero()
 
-            task.pcSplit(2)(lp.rect).CopyTo(dst1(lp.rect), dst3(lp.rect))
-            dst3(lp.rect).SetTo(0, task.noDepthMask(lp.rect))
+            algTask.pcSplit(2)(lp.rect).CopyTo(dst1(lp.rect), dst3(lp.rect))
+            dst3(lp.rect).SetTo(0, algTask.noDepthMask(lp.rect))
             Dim depthAvg = dst1(lp.rect).Mean(dst3(lp.rect)).Item(0)
             Dim points = dst3(lp.rect).FindNonZero()
             Dim ptList As New List(Of cv.Point)
@@ -261,8 +261,8 @@ Namespace VBClasses
                 p1 = ptList(i - 1)
                 p2 = ptList(i)
                 If p1.DistanceTo(p2) > 2 Then Continue For ' too big a gap of missing depth.
-                d1 = task.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
-                d2 = task.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
+                d1 = algTask.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
+                d2 = algTask.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
                 Dim delta = d2 - d1
                 If Math.Abs(delta) < 0.1 Then incrList.Add(delta) ' if delta is less than 10 centimeters, then keep it.
             Next
@@ -328,12 +328,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             lpList.Clear()
 
-            dst2 = task.pointCloud.Clone
+            dst2 = algTask.pointCloud.Clone
             dst3 = src.Clone
-            For Each selection.lp In task.lines.lpList
+            For Each selection.lp In algTask.lines.lpList
                 selection.run(emptyMat)
                 lpList.Add(selection.lp)
-                dst3.Line(selection.lp.p1, selection.lp.p2, task.highlight, task.lineWidth)
+                dst3.Line(selection.lp.p1, selection.lp.p2, algTask.highlight, algTask.lineWidth)
             Next
         End Sub
     End Class
@@ -351,18 +351,18 @@ Namespace VBClasses
             desc = "Use the debug slider in Global Options to select which line to test."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Then dst1.SetTo(0)
+            If algTask.heartBeatLT Then dst1.SetTo(0)
             Selection.Run(emptyMat)
             Dim lp = Selection.lp
 
             dst3.SetTo(0)
             dst3.Line(lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
-            dst1(lp.rect).SetTo(task.highlight, dst3(lp.rect))
+            dst1(lp.rect).SetTo(algTask.highlight, dst3(lp.rect))
 
-            dst2 = task.pointCloud.Clone
+            dst2 = algTask.pointCloud.Clone
             Selection.dst2.CopyTo(dst2, dst3)
 
-            labels(2) = "Line " + CStr(lp.index) + " selected of " + CStr(task.lines.lpList.Count) + " top lines.  " +
+            labels(2) = "Line " + CStr(lp.index) + " selected of " + CStr(algTask.lines.lpList.Count) + " top lines.  " +
                     "Use Global Options debug slider to select other lines."
             labels(3) = "Mask of selected line - use debug slider to select other lines."
 
@@ -382,13 +382,13 @@ Namespace VBClasses
             desc = "Create logical lines for all the lines detected."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.lines.dst2
-            labels = task.lines.labels
+            dst2 = algTask.lines.dst2
+            labels = algTask.lines.labels
 
             Dim count As Integer
             lpList.Clear()
 
-            For Each selection.lp In task.lines.lpList
+            For Each selection.lp In algTask.lines.lpList
                 If selection.lp.age = 1 Then
                     count += 1
                     selection.Run(src)

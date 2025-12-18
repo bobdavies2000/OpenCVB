@@ -29,7 +29,7 @@ Namespace VBClasses
 
             pc.hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
 
-            pc.color = task.vecColors(pc.index)
+            pc.color = algTask.vecColors(pc.index)
             pc.pixels = pc.mask.CountNonZero
             Return pc
         End Function
@@ -38,12 +38,12 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             Dim index As Integer = 1
-            For Each pc In task.redCloud.rcList
+            For Each pc In algTask.redCloud.rcList
                 Dim pcTest = New rcData(pc.mask, pc.rect, index)
                 If pcTest.index >= 0 Then
                     pcTest.color = pc.color
                     dst3(pcTest.rect).SetTo(pcTest.color, pcTest.mask)
-                    dst3.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+                    dst3.Circle(pc.maxDist, algTask.DotSize, algTask.highlight, -1)
                     index += 1
                 End If
             Next
@@ -60,18 +60,18 @@ Namespace VBClasses
             desc = "Is it necessary to draw a rectangle of zeros at the edge of the mask?  Answer: no"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedCloud(src, labels(2)) ' task.redCloud.rcList uses the rectangle of zeros.
+            dst2 = runRedCloud(src, labels(2)) ' algTask.redCloud.rcList uses the rectangle of zeros.
 
             Dim rcList As New List(Of rcData)
             dst3.SetTo(0)
-            For Each pc In task.redCloud.rcList
+            For Each pc In algTask.redCloud.rcList
                 ' This rcList will NOT use the rectangle of zeros (definitely need the rectangle!)
                 Dim pcTest = MaxDist_Basics.setCloudData(pc.mask, pc.rect, rcList.Count + 1, False)
                 If pcTest Is Nothing Then Continue For
                 If pcTest.index >= 0 Then
                     pcTest.color = pc.color
                     dst3(pcTest.rect).SetTo(pcTest.color, pcTest.mask)
-                    dst3.Circle(pc.maxDist, task.DotSize, task.highlight, -1)
+                    dst3.Circle(pc.maxDist, algTask.DotSize, algTask.highlight, -1)
                     rcList.Add(pcTest)
                 End If
             Next

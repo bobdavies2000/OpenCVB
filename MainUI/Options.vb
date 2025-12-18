@@ -1,6 +1,4 @@
-﻿Imports System.ComponentModel
-Imports VBClasses
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Options
     Public cameraRadioButton(cameraNames.Count - 1) As RadioButton
     Public workResRadio() As RadioButton

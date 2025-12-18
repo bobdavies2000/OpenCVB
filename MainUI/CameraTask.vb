@@ -1,6 +1,5 @@
-Imports System.ComponentModel
-Imports VBClasses
 Imports cv = OpenCvSharp
+Imports VBClasses
 Namespace MainUI
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
@@ -40,49 +39,27 @@ Namespace MainUI
             camera.isCapturing = False
         End Sub
         Private Sub Camera_FrameReady(sender As GenericCamera)
-            If task.readyForCameraInput = False Then Exit Sub
+            If algTask.readyForCameraInput = False Then Exit Sub
 
             Static frameProcessed As Boolean = True
             If frameProcessed = False Then Exit Sub
             frameProcessed = False
 
             Me.BeginInvoke(Sub()
-                               If task.cpu.algorithm_ms.Count = 0 Then task.cpu.startRun(settings.algorithm)
+                               sender.camImages.images(0).CopyTo(algTask.color)
+                               sender.camImages.images(1).CopyTo(algTask.pointCloud)
+                               sender.camImages.images(2).CopyTo(algTask.leftView)
+                               sender.camImages.images(3).CopyTo(algTask.rightView)
 
-                               task.cpu.algorithmTimes(1) = Now
-
-                               Dim elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - task.cpu.algorithmTimes(0).Ticks
-                               Dim spanWait = New TimeSpan(elapsedWaitTicks)
-                               Dim spanTime = TimeSpan.TicksPerMillisecond
-                               task.cpu.algorithm_ms(0) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
-
-                               task.cpu.algorithmTimes(0) = task.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
-
-                               sender.camImages.images(0).CopyTo(task.color)
-                               sender.camImages.images(1).CopyTo(task.pointCloud)
-                               sender.camImages.images(2).CopyTo(task.leftView)
-                               sender.camImages.images(3).CopyTo(task.rightView)
-
-                               task.RunAlgorithm()
-
-                               task.cpu.algorithmTimes(1) = Now
-
-                               elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - task.cpu.algorithmTimes(0).Ticks
-
-                               spanWait = New TimeSpan(elapsedWaitTicks)
-                               spanTime = TimeSpan.TicksPerMillisecond
-                               task.cpu.algorithm_ms(1) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
-
-                               task.cpu.algorithmTimes(0) = task.cpu.algorithmTimes(1) ' start time wait = end time algorithm
-
-                               task.mouseClickFlag = False
-                               task.frameCount += 1
-
-                               If RefreshTimer.Interval <> task.refreshTimerTickCount Then
-                                   RefreshTimer.Interval = task.refreshTimerTickCount
-                               End If
-
+                               algTask.RunAlgorithm()
                                frameProcessed = True
+
+                               algTask.mouseClickFlag = False
+                               algTask.frameCount += 1
+
+                               If RefreshTimer.Interval <> algTask.refreshTimerTickCount Then
+                                   RefreshTimer.Interval = algTask.refreshTimerTickCount
+                               End If
                            End Sub)
         End Sub
     End Class
@@ -91,16 +68,16 @@ End Namespace
 'Task.Run(Sub()
 '             Try
 '                 ' Run algorithm on background thread
-'                 task.RunAlgorithm()
+'                 algTask.RunAlgorithm()
 
 '                 ' Update UI on UI thread after algorithm completes
 '                 Me.BeginInvoke(Sub()
 '                                    Try
-'                                        task.mouseClickFlag = False
-'                                        task.frameCount += 1
+'                                        algTask.mouseClickFlag = False
+'                                        algTask.frameCount += 1
 
-'                                        If RefreshTimer.Interval <> task.refreshTimerTickCount Then
-'                                            RefreshTimer.Interval = task.refreshTimerTickCount
+'                                        If RefreshTimer.Interval <> algTask.refreshTimerTickCount Then
+'                                            RefreshTimer.Interval = algTask.refreshTimerTickCount
 '                                        End If
 '                                    Catch ex As Exception
 '                                        Debug.WriteLine("Error updating UI after algorithm: " + ex.Message)

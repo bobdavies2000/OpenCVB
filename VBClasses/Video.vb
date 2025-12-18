@@ -14,7 +14,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If task.optionsChanged Then
+            If algTask.optionsChanged Then
                 captureVideo = New cv.VideoCapture(options.fileInfo.FullName)
             End If
 
@@ -115,7 +115,7 @@ Namespace VBClasses
         Public bgSub As New BGSubtract_MOG
         Public contours As cv.Point()()
         Public Sub New()
-            video.options.fileInfo = New FileInfo(task.homeDir + "Data/CarsDrivingUnderBridge.mp4")
+            video.options.fileInfo = New FileInfo(algTask.homeDir + "Data/CarsDrivingUnderBridge.mp4")
             video.Run(dst2)
             desc = "Find area of car outline - example of using minAreaRect"
         End Sub

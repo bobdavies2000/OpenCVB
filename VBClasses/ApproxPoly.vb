@@ -14,7 +14,7 @@ Namespace VBClasses
             options.Run()
 
             If standaloneTest() Then
-                If task.heartBeat Then rotatedRect.Run(src)
+                If algTask.heartBeat Then rotatedRect.Run(src)
                 dst2 = rotatedRect.dst2
             End If
 
@@ -65,7 +65,7 @@ Namespace VBClasses
                 If nextContour.Count > 2 Then contours.Add(nextContour)
             Next
 
-            cv.Cv2.DrawContours(dst3, contours, -1, New cv.Scalar(0, 255, 255), task.lineWidth, task.lineType)
+            cv.Cv2.DrawContours(dst3, contours, -1, New cv.Scalar(0, 255, 255), algTask.lineWidth, algTask.lineType)
         End Sub
     End Class
 

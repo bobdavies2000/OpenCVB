@@ -9,7 +9,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 dst2 = runRedList(src, labels(2))
-                rc = task.oldrcD
+                rc = algTask.oldrcD
             End If
 
             volZ.rc = rc

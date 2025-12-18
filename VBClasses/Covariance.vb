@@ -35,8 +35,8 @@ Namespace VBClasses
             If standaloneTest() Then
                 Static lastCenter As cv.Point2f = center
                 DrawCircle(dst3, center, 5, cv.Scalar.Red)
-                dst3.Circle(lastCenter, 5, task.highlight, task.lineWidth + 1, task.lineType)
-                dst3.Line(center, lastCenter, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+                dst3.Circle(lastCenter, 5, algTask.highlight, algTask.lineWidth + 1, algTask.lineType)
+                dst3.Line(center, lastCenter, cv.Scalar.Red, algTask.lineWidth + 1, algTask.lineType)
                 lastCenter = center
                 strOut += "Yellow is last center, red is the current center"
             End If
@@ -76,11 +76,11 @@ Namespace VBClasses
             desc = "Calculate the covariance of 2 images"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.optionsChanged Then task.gray.ConvertTo(last32f, cv.MatType.CV_32F)
-            dst2 = task.gray
+            If algTask.optionsChanged Then algTask.gray.ConvertTo(last32f, cv.MatType.CV_32F)
+            dst2 = algTask.gray
 
             Dim gray32f As New cv.Mat
-            task.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
+            algTask.gray.ConvertTo(gray32f, cv.MatType.CV_32F)
             cv.Cv2.Merge({gray32f, last32f}, dst0)
             Dim samples = dst0.Reshape(1, dst0.Rows * dst0.Cols)
             covar.Run(samples)

@@ -11,9 +11,9 @@ Namespace VBClasses
             options.Run()
             options1.Run()
 
-            If standalone Then src = task.pcSplit(2)
+            If standalone Then src = algTask.pcSplit(2)
 
-            Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
+            Dim r1 = New cv.Rect(1, 1, algTask.cols - 2, algTask.rows - 2)
             Dim r2 As cv.Rect
             Select Case options.offsetDirection
                 Case "Upper Left"
@@ -34,13 +34,13 @@ Namespace VBClasses
                     r2 = New cv.Rect(2, 2, r1.Width, r1.Height)
             End Select
 
-            Dim r3 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
+            Dim r3 = New cv.Rect(1, 1, algTask.cols - 2, algTask.rows - 2)
 
             dst2 = New cv.Mat(dst2.Size, src.Type, 0)
             cv.Cv2.Absdiff(src(r1), src(r2), dst2(r3))
             dst1 = dst2.Threshold(options1.mmThreshold / 1000, 255, cv.ThresholdTypes.BinaryInv)
             dst3 = dst1.ConvertScaleAbs
-            dst3.SetTo(0, task.noDepthMask)
+            dst3.SetTo(0, algTask.noDepthMask)
         End Sub
     End Class
 
@@ -51,21 +51,21 @@ Namespace VBClasses
     Public Class PCdiff_Edges : Inherits TaskParent
         Dim pcDiff As New PCdiff_Basics
         Public Sub New()
-            task.gOptions.DebugSlider.Value = 0
-            task.gOptions.DebugSlider.Minimum = 0
-            task.gOptions.DebugSlider.Maximum = 2
+            algTask.gOptions.DebugSlider.Value = 0
+            algTask.gOptions.DebugSlider.Minimum = 0
+            algTask.gOptions.DebugSlider.Maximum = 2
             desc = "Find any significant differences in neighboring pixels of the pointcloud."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static index As Integer = -1
 
-            If task.heartBeatLT Then
+            If algTask.heartBeatLT Then
                 index += 1
                 If index > 2 Then index = 0
             End If
 
-            index = task.gOptions.DebugSlider.Value
-            pcDiff.Run(task.pcSplit(index))
+            index = algTask.gOptions.DebugSlider.Value
+            pcDiff.Run(algTask.pcSplit(index))
 
             strOut = "Index = " + CStr(index) + "  Difference in the pointcloud "
             strOut += Choose(index + 1, "X-Direction", "Y-Direction", "Z-Direction")
@@ -100,9 +100,9 @@ Namespace VBClasses
                     End If
                 Next
             Next
-            dst2.SetTo(0, task.noDepthMask)
+            dst2.SetTo(0, algTask.noDepthMask)
             dst3.SetTo(0)
-            task.pointCloud.CopyTo(dst3, dst2)
+            algTask.pointCloud.CopyTo(dst3, dst2)
         End Sub
     End Class
 
@@ -121,13 +121,13 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             filter.Run(src)
-            task.pcSplit = filter.dst3.Split()
+            algTask.pcSplit = filter.dst3.Split()
 
             dst2.SetTo(0)
             Dim countInf As Integer
             Dim delta = filter.pcDiff.options1.pixelDiffThreshold / 1000
-            For y = 0 To task.pcSplit(2).Rows - 1
-                Dim slice = task.pcSplit(2).Row(y)
+            For y = 0 To algTask.pcSplit(2).Rows - 1
+                Dim slice = algTask.pcSplit(2).Row(y)
                 Dim lastVal As Single = 0
                 For x = 0 To slice.Cols - 2
                     Dim val = slice.Get(Of Single)(0, x)
@@ -137,7 +137,7 @@ Namespace VBClasses
                     End If
                     If val <> 0 Then
                         If Math.Abs(val - lastVal) > delta Then
-                            task.pcSplit(2).Set(Of Single)(y, x, 0) ' neighbors cannot have diff > delta.
+                            algTask.pcSplit(2).Set(Of Single)(y, x, 0) ' neighbors cannot have diff > delta.
                             dst2.Set(Of Byte)(y, x, 255)
                         End If
                     End If
@@ -145,8 +145,8 @@ Namespace VBClasses
                 Next
             Next
 
-            task.noDepthMask = task.pcSplit(2).InRange(0, 0)
-            cv.Cv2.Merge(task.pcSplit, dst3)
+            algTask.noDepthMask = algTask.pcSplit(2).InRange(0, 0)
+            cv.Cv2.Merge(algTask.pcSplit, dst3)
         End Sub
     End Class
 
@@ -163,8 +163,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             points.Run(src)
 
-            cv.Cv2.Merge(task.pcSplit, task.pointCloud)
-            backP.Run(task.pointCloud)
+            cv.Cv2.Merge(algTask.pcSplit, algTask.pointCloud)
+            backP.Run(algTask.pointCloud)
             dst2 = backP.dst2
             labels(2) = backP.labels(2)
         End Sub

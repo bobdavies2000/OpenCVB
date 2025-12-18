@@ -34,7 +34,7 @@ Namespace MainUI
             Dim rgb As Intrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
             Dim rgbExtrinsics As Extrinsics = StreamColor.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamLeft)
 
-            Dim ratio = CInt(captureRes.Width / workRes.Width)
+            Dim ratio = captureRes.Width \ workRes.Width
             calibData.rgbIntrinsics.ppx = rgb.ppx / ratio
             calibData.rgbIntrinsics.ppy = rgb.ppy / ratio
             calibData.rgbIntrinsics.fx = rgb.fx / ratio

@@ -92,7 +92,7 @@ Namespace MainUI
 
             If calibData.baseline = 0 Then
                 Dim param As CameraParam = pipe.GetCameraParam()
-                Dim ratio = CInt(captureRes.Width / workRes.Width)
+                Dim ratio = captureRes.Width \ workRes.Width
                 calibData.rgbIntrinsics.ppx = param.rgbIntrinsic.cx / ratio
                 calibData.rgbIntrinsics.ppy = param.rgbIntrinsic.cy / ratio
                 calibData.rgbIntrinsics.fx = param.rgbIntrinsic.fx / ratio

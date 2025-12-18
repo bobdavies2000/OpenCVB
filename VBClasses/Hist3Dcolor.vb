@@ -17,10 +17,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Type <> cv.MatType.CV_8UC3 Then src = task.color
-            If task.heartBeat Or alwaysRun Or histogram.Width = 0 Then
+            If src.Type <> cv.MatType.CV_8UC3 Then src = algTask.color
+            If algTask.heartBeat Or alwaysRun Or histogram.Width = 0 Then
                 Dim bins = options.histogram3DBins
-                cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, {bins, bins, bins}, task.rangesBGR)
+                cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, {bins, bins, bins}, algTask.rangesBGR)
 
                 ReDim histArray(histogram.Total - 1)
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -31,7 +31,7 @@ Namespace VBClasses
                 classCount = simK.classCount
             End If
 
-            cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
+            cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, algTask.rangesBGR)
 
             dst3 = PaletteFull(dst2)
 
@@ -125,12 +125,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Channels() <> 3 Then src = task.color
+            If src.Channels() <> 3 Then src = algTask.color
 
-            If task.optionsChanged Then
+            If algTask.optionsChanged Then
                 Dim bins = options.histogram3DBins
                 Dim hBins() As Integer = {bins, bins, bins}
-                cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, task.rangesBGR)
+                cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, algTask.rangesBGR)
 
                 Dim histArray(histogram.Total - 1) As Single
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -162,7 +162,7 @@ Namespace VBClasses
 
                 Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
             End If
-            cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
+            cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, algTask.rangesBGR)
             dst3 = PaletteFull(dst2)
             labels(2) = "Hist3Dcolor_ZeroGroups classCount = " + CStr(classCount)
         End Sub
@@ -210,7 +210,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             hColor.Run(src)
 
-            Dim selection = task.gOptions.DebugSlider.Value
+            Dim selection = algTask.gOptions.DebugSlider.Value
             dst2 = hColor.dst2.InRange(selection, selection)
             Dim saveCount = dst2.CountNonZero
 
@@ -261,7 +261,7 @@ Namespace VBClasses
                 histogram = simK.dst2
                 classCount = simK.classCount
 
-                cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
+                cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, algTask.rangesBGR)
 
                 Dim mm As mmData = GetMinMax(dst2)
 
@@ -294,7 +294,7 @@ Namespace VBClasses
 
             diff.Run(hColor.dst2)
 
-            If task.heartBeat Then dst3.SetTo(0)
+            If algTask.heartBeat Then dst3.SetTo(0)
             dst3 = dst3 Or diff.dst2
         End Sub
     End Class
@@ -318,12 +318,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Channels() <> 3 Then src = task.color
-            If task.optionsChanged Or binArray Is Nothing Then
+            If src.Channels() <> 3 Then src = algTask.color
+            If algTask.optionsChanged Or binArray Is Nothing Then
                 binArray = {options.histogram3DBins, options.histogram3DBins, options.histogram3DBins}
             End If
 
-            cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, binArray, task.rangesBGR)
+            cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, binArray, algTask.rangesBGR)
 
             ReDim histArray(histogram.Total - 1)
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)

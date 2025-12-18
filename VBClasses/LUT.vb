@@ -105,7 +105,7 @@ Namespace VBClasses
             desc = "Use a LUT on the RGBDepth to segregate depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            lut.Run(task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            lut.Run(algTask.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             dst2 = lut.dst2 * 255 / lut.classCount
             labels(2) = lut.labels(2)
         End Sub
@@ -124,9 +124,9 @@ Namespace VBClasses
             desc = "Use a LUT on the 32-bit depth to segregate depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            lut.Run(task.pcSplit(2).Normalize(255).ConvertScaleAbs(255))
+            lut.Run(algTask.pcSplit(2).Normalize(255).ConvertScaleAbs(255))
             dst2 = lut.dst2 * 255 / lut.classCount
-            dst2.SetTo(0, task.noDepthMask)
+            dst2.SetTo(0, algTask.noDepthMask)
             labels(2) = lut.labels(2)
         End Sub
     End Class
@@ -206,7 +206,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static colorSlider = OptionParent.FindSlider("Color transitions")
-            If task.optionsChanged Or task.heartBeat Then
+            If algTask.optionsChanged Or algTask.heartBeat Then
                 If saveColorCount = 20 Then colorSlider.Value = 5 Else colorSlider.Value += 1
                 saveColorCount = colorSlider.Value
                 gradMap.Run(src)
@@ -225,14 +225,14 @@ Namespace VBClasses
     Public Class LUT_RedCloud : Inherits TaskParent
         Dim sort3 As New Sort_3Channel
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then algTask.gOptions.displayDst1.Checked = True
             desc = "Use LUT on the grayscale image after masking with rc.mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2)).Clone
 
             dst3.SetTo(0)
-            Dim rc = task.oldrcD
+            Dim rc = algTask.oldrcD
             src(rc.rect).CopyTo(dst3(rc.rect), rc.mask)
 
             sort3.Run(dst3)
@@ -256,7 +256,7 @@ Namespace VBClasses
 
             Dim split = src.Split()
             For i = 0 To 2
-                If task.firstPass Then ReDim pixels(i)(src.Total - 1)
+                If algTask.firstPass Then ReDim pixels(i)(src.Total - 1)
                 Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
             Next
 

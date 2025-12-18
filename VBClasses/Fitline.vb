@@ -7,7 +7,7 @@ Namespace VBClasses
             desc = "Use FitEllipse to build the FitLine solution."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone And task.heartBeatLT Then
+            If standalone And algTask.heartBeatLT Then
                 Static noisyLine As New Eigen_Input
                 noisyLine.Run(src)
                 ptList = New List(Of cv.Point2f)(noisyLine.PointList)
@@ -20,7 +20,7 @@ Namespace VBClasses
             Dim p1 = New cv.Point((v(0).X + v(3).X) / 2, (v(0).Y + v(3).Y) / 2)
             Dim p2 = New cv.Point((v(1).X + v(2).X) / 2, (v(1).Y + v(2).Y) / 2)
             lp = New lpData(p1, p2)
-            dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            dst2.Line(lp.p1, lp.p2, 255, algTask.lineWidth, algTask.lineType)
         End Sub
     End Class
 
@@ -37,7 +37,7 @@ Namespace VBClasses
             desc = "Show how Fitline API works with simple data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone And task.heartBeatLT Then
+            If standalone And algTask.heartBeatLT Then
                 Static noisyLine As New Eigen_Input
                 noisyLine.Run(src)
                 ptList = New List(Of cv.Point2f)(noisyLine.PointList)
@@ -75,7 +75,7 @@ Namespace VBClasses
                "and the lines are occasionally not found."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If Not task.heartBeatLT Then Exit Sub
+            If Not algTask.heartBeatLT Then Exit Sub
             options.Run()
 
             If standaloneTest() Then
@@ -124,12 +124,12 @@ Namespace VBClasses
 
             If standalone Then
                 Static random As New Random_Basics3D
-                If task.firstPass Then OptionParent.FindSlider("Random Pixel Count").Value = 200
+                If algTask.firstPass Then OptionParent.FindSlider("Random Pixel Count").Value = 200
                 random.Run(src)
                 dst2.SetTo(0)
                 ptList.Clear()
                 For Each pt In random.PointList
-                    DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow)
+                    DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), algTask.DotSize, cv.Scalar.Yellow)
                     ptList.Add(pt)
                 Next
             End If
@@ -142,7 +142,7 @@ Namespace VBClasses
             Dim lp = New lpData(center, p2)
             lpResult = findEdgePoints(lp)
             DrawLine(dst2, lpResult.p1, lpResult.p2)
-            dst2.Circle(center, task.DotSize + 2, cv.Scalar.Blue, -1)
+            dst2.Circle(center, algTask.DotSize + 2, cv.Scalar.Blue, -1)
         End Sub
     End Class
 
@@ -158,7 +158,7 @@ Namespace VBClasses
             desc = "A way to test the fitline using 3D data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone And task.heartBeat = False Then Exit Sub
+            If standalone And algTask.heartBeat = False Then Exit Sub
             noisyLine.Run(src)
             dst2 = noisyLine.dst2
 
@@ -169,7 +169,7 @@ Namespace VBClasses
             fitLine.Run(src)
 
             DrawLine(dst2, fitLine.lp.p1, fitLine.lp.p2)
-            dst2.Circle(fitLine.center, task.DotSize + 2, cv.Scalar.Blue, -1)
+            dst2.Circle(fitLine.center, algTask.DotSize + 2, cv.Scalar.Blue, -1)
         End Sub
     End Class
 
@@ -188,12 +188,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
                 Static noisyLine As New Eigen_Input3D
-                If task.heartBeat = False Then Exit Sub
+                If algTask.heartBeat = False Then Exit Sub
                 noisyLine.Run(src)
                 dst2.SetTo(0)
                 ptList.Clear()
                 For Each pt In noisyLine.PointList
-                    DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, task.highlight)
+                    DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), algTask.DotSize, algTask.highlight)
                     ptList.Add(pt)
                 Next
             End If
@@ -207,7 +207,7 @@ Namespace VBClasses
 
             lp = findEdgePoints(New lpData(p1, p2))
             DrawLine(dst2, lp.p1, lp.p2)
-            dst2.Circle(New cv.Point2f(line.X1, line.Y1), task.DotSize + 2, cv.Scalar.Blue, -1)
+            dst2.Circle(New cv.Point2f(line.X1, line.Y1), algTask.DotSize + 2, cv.Scalar.Blue, -1)
         End Sub
     End Class
 
@@ -229,7 +229,7 @@ Namespace VBClasses
             dst2 = edges.dst2
 
             dst3.SetTo(0)
-            For Each rect In task.gridRects
+            For Each rect In algTask.gridRects
                 If dst2(rect).CountNonZero >= 5 Then
                     nZero.Run(dst2(rect))
 
@@ -239,7 +239,7 @@ Namespace VBClasses
                     Next
 
                     fitline.Run(dst2(rect))
-                    dst3(rect).Line(fitline.lp.p1, fitline.lp.p2, 255, task.lineWidth, task.lineType)
+                    dst3(rect).Line(fitline.lp.p1, fitline.lp.p2, 255, algTask.lineWidth, algTask.lineType)
                 End If
             Next
         End Sub

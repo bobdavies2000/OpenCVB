@@ -9,7 +9,7 @@ Namespace VBClasses
             desc = "Convert a color and grayscale bitmap to a cv.Mat"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim filePath As String = task.homeDir + "opencv/Samples/Data/lena.jpg"
+            Dim filePath As String = algTask.homeDir + "opencv/Samples/Data/lena.jpg"
             Dim bitmap = New System.Drawing.Bitmap(filePath)
             dst2 = cv.Extensions.BitmapConverter.ToMat(bitmap).Resize(src.Size)
 

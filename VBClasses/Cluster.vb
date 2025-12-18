@@ -15,7 +15,7 @@ Namespace VBClasses
             options.Run()
 
             dst2 = src.Clone
-            If standalone Then ptInput = task.featurePoints
+            If standalone Then ptInput = algTask.featurePoints
 
             If ptInput.Count <= 3 Then Exit Sub
 
@@ -57,14 +57,14 @@ Namespace VBClasses
             For Each group In clusters
                 For i = 0 To group.Value.Count - 1
                     For j = 0 To group.Value.Count - 1
-                        dst2.Line(group.Value(i), group.Value(j), white, task.lineWidth, task.lineWidth)
+                        dst2.Line(group.Value(i), group.Value(j), white, algTask.lineWidth, algTask.lineWidth)
                     Next
                 Next
             Next
             dst3.SetTo(0)
             For i = 0 To knn.queries.Count - 1
-                DrawCircle(dst2, knn.queries(i), task.DotSize, cv.Scalar.Red)
-                DrawCircle(dst3, knn.queries(i), task.DotSize, task.highlight)
+                DrawCircle(dst2, knn.queries(i), algTask.DotSize, cv.Scalar.Red)
+                DrawCircle(dst3, knn.queries(i), algTask.DotSize, algTask.highlight)
             Next
             labels(2) = CStr(clusters.Count) + " groups built from " + CStr(ptInput.Count) + " by combining each input point and its nearest neighbor."
         End Sub
@@ -83,9 +83,9 @@ Namespace VBClasses
             desc = "Create hulls for each cluster of feature points found in Cluster_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bPoint.Run(task.grayStable)
+            bPoint.Run(algTask.grayStable)
 
-            cluster.ptInput = task.featurePoints
+            cluster.ptInput = algTask.featurePoints
             cluster.Run(src)
             dst2 = cluster.dst2
             dst3 = cluster.dst3
@@ -99,13 +99,13 @@ Namespace VBClasses
                         hull.Add(New cv.Point(pt.X, pt.Y))
                     Next
                 ElseIf hullPoints.Count = 2 Then
-                    dst3.Line(hullPoints(0), hullPoints(1), white, task.lineWidth, task.lineWidth)
+                    dst3.Line(hullPoints(0), hullPoints(1), white, algTask.lineWidth, algTask.lineWidth)
                 Else
-                    DrawCircle(dst3, hullPoints(0), task.DotSize, task.highlight)
+                    DrawCircle(dst3, hullPoints(0), algTask.DotSize, algTask.highlight)
                 End If
 
                 hulls.Add(hull)
-                If (hull.Count > 0) Then DrawTour(dst3, hull, white, task.lineWidth)
+                If (hull.Count > 0) Then DrawTour(dst3, hull, white, algTask.lineWidth)
             Next
             labels(3) = bPoint.labels(2)
         End Sub

@@ -6,7 +6,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
-            task.redColor = Me
+            algTask.redColor = Me
             cPtr = RedCloud_Open()
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
@@ -61,7 +61,7 @@ Namespace VBClasses
                 Else
                     indexLast = -1
                 End If
-                If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
+                If indexLast >= 0 And r1.IntersectsWith(r2) And algTask.optionsChanged = False Then
                     rc.age = rcListLast(indexLast).age + 1
                     rc.color = rcListLast(indexLast).color
                     If rc.age >= 1000 Then rc.age = 2
@@ -85,12 +85,12 @@ Namespace VBClasses
                 rc.mask = rcMap(rc.rect).InRange(rc.index, rc.index)
                 rc.buildMaxDist()
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+                dst2.Circle(rc.maxDist, algTask.DotSize, algTask.highlight, -1)
             Next
 
             If standaloneTest() Then
                 RedCloud_Cell.selectCell(rcMap, rcList)
-                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+                If algTask.rcD IsNot Nothing Then strOut = algTask.rcD.displayCell()
                 SetTrueText(strOut, 3)
             End If
 
@@ -164,7 +164,7 @@ Namespace VBClasses
                 Else
                     indexLast = -1
                 End If
-                If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
+                If indexLast >= 0 And r1.IntersectsWith(r2) And algTask.optionsChanged = False Then
                     rc.age = rcListLast(indexLast).age + 1
                     rc.color = rcListLast(indexLast).color
                     If rc.age >= 1000 Then rc.age = 2
@@ -188,12 +188,12 @@ Namespace VBClasses
                 rc.mask = rcMap(rc.rect).InRange(rc.index, rc.index)
                 rc.buildMaxDist()
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+                dst2.Circle(rc.maxDist, algTask.DotSize, algTask.highlight, -1)
             Next
 
             If standaloneTest() Then
                 RedCloud_Cell.selectCell(rcMap, rcList)
-                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+                If algTask.rcD IsNot Nothing Then strOut = algTask.rcD.displayCell()
                 SetTrueText(strOut, 3)
             End If
 
@@ -218,13 +218,13 @@ Namespace VBClasses
             desc = "Display the RedColor_Basics output for both the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            reduction.Run(task.leftView)
+            reduction.Run(algTask.leftView)
 
             redLeft.Run(reduction.dst2)
             dst2 = PaletteFull(redLeft.dst2)
             labels(2) = redLeft.labels(2) + " in the left image"
 
-            reduction.Run(task.rightView)
+            reduction.Run(algTask.rightView)
 
             redRight.Run(reduction.dst2)
             dst3 = PaletteFull(redRight.dst2)

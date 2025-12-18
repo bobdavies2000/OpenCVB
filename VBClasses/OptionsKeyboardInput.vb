@@ -3,9 +3,9 @@ Public Class OptionsKeyboardInput
     Public inputText As New List(Of String)
     Dim keyboardLastInput As String
     Public Sub Setup(traceName As String)
-        Me.MdiParent = task.allOptions
+        Me.MdiParent = algTask.allOptions
         Me.Text = traceName + " Keyboard Options"
-        task.allOptions.addTitle(Me)
+        algTask.allOptions.addTitle(Me)
     End Sub
     Private Sub TextBox1_KeyUp(sender As Object, e As KeyEventArgs) Handles TextBox1.KeyUp
         inputText.Add(e.KeyCode.ToString)
