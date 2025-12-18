@@ -100,7 +100,7 @@ Namespace PixelViewer
             Select Case displayType
 
                 Case displayTypes.type8uC3
-                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth - 1)) + vbLf
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
                     For y = 0 To img.Height - 1
                         imgText += "r" + Format(dw.Y + y, "000") + "   "
                         For x = 0 To img.Width - 1
@@ -111,7 +111,7 @@ Namespace PixelViewer
                     Next
 
                 Case displayTypes.type8u
-                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth - 1)) + vbLf
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
                     For y = 0 To img.Height - 1
                         imgText += "r" + Format(dw.Y + y, "000") + "   "
                         For x = 0 To img.Width - 1
@@ -125,7 +125,7 @@ Namespace PixelViewer
                     Next
 
                 Case displayTypes.type32F
-                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth - 1)) + vbLf
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
                     For y = 0 To img.Height - 1
                         imgText += "r" + Format(dw.Y + y, "000") + "   "
                         For x = 0 To img.Width - 1
@@ -135,7 +135,7 @@ Namespace PixelViewer
                     Next
 
                 Case displayTypes.type32FC3
-                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth - 1)) + vbLf
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
                     For y = 0 To img.Height - 1
                         imgText += "r" + Format(dw.Y + y, "000") + "   "
                         For x = 0 To img.Width - 1
@@ -146,7 +146,7 @@ Namespace PixelViewer
                     Next
 
                 Case displayTypes.type32SC1
-                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth - 1)) + vbLf
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
                     For y = 0 To img.Height - 1
                         imgText += "r" + Format(dw.Y + y, "000") + "   "
                         For x = 0 To img.Width - 1
@@ -155,7 +155,7 @@ Namespace PixelViewer
                         imgText += vbLf
                     Next
                 Case displayTypes.type32SC3
-                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth - 1)) + vbLf
+                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(dw.X + drWidth - 1) + vbLf
                     For y = 0 To img.Height - 1
                         imgText += "r" + Format(dw.Y + y, "000") + "   "
                         For x = 0 To img.Width - 1

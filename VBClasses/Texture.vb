@@ -7,7 +7,7 @@ Namespace VBClasses
         Dim texturePop As Integer
         Public tChange As Boolean ' if the texture hasn't changed this will be false.
         Public Sub New()
-            task.gOptions.GridSlider.Value = Math.Min(CInt(dst2.Width / 8), task.gOptions.GridSlider.Maximum)
+            task.gOptions.GridSlider.Value = Math.Min(dst2.Width \ 8, task.gOptions.GridSlider.Maximum)
 
             desc = "find the best sample 256x256 texture of a mask"
         End Sub

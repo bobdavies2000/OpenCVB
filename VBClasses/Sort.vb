@@ -116,7 +116,7 @@ Namespace VBClasses
             src.CopyTo(dst2, dst1)
             sort.Run(dst2)
 
-            Dim pixelsPerBlock = CInt(dst3.Total / dst2.Rows)
+            Dim pixelsPerBlock = dst3.Total \ dst2.Rows
             Dim sq = Math.Sqrt(pixelsPerBlock)
             task.gOptions.GridSlider.Value = CInt(Math.Min(sq, 10))
 

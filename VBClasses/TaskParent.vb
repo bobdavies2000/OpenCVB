@@ -107,8 +107,8 @@ Namespace VBClasses
             dst.FillConvexPoly(vertices, color, task.lineType)
         End Sub
         Public Sub AddPlotScale(dst As cv.Mat, minVal As Double, maxVal As Double, Optional lineCount As Integer = 3)
-            Dim spacer = CInt(dst.Height / (lineCount + 1))
-            Dim spaceVal = CInt((maxVal - minVal) / (lineCount + 1))
+            Dim spacer = dst.Height \ (lineCount + 1)
+            Dim spaceVal = (maxVal - minVal) \ (lineCount + 1)
             If lineCount > 1 Then If spaceVal < 1 Then spaceVal = 1
             If spaceVal > 10 Then spaceVal += spaceVal Mod 10
             For i = 0 To lineCount
@@ -271,7 +271,7 @@ Namespace VBClasses
                     Dim h = img.Height * (hist.Get(Of Single)(i, 0)) / mm.maxVal
                     If h = 0 Then h = 5 ' show the color range in the plot
                     img.Rectangle(New cv.Rect(i * binWidth, img.Height - h, binWidth, h),
-                              New cv.Scalar(CInt(180.0 * i / binCount), 255, 255), -1)
+                              New cv.Scalar(180.0 * i \ binCount, 255, 255), -1)
                 Next
             End If
             Return img

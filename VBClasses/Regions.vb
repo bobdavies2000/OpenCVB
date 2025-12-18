@@ -30,7 +30,7 @@ Namespace VBClasses
                     hRects.Add(r)
                     dst0(r).SetTo(hRects.Count)
 
-                    Dim color = task.scalarColors(CInt(task.bricksPerCol * r.Y / dst2.Height) Mod 255)
+                    Dim color = task.scalarColors(task.bricksPerCol * r.Y \ dst2.Height Mod 255)
                     dst2(r).SetTo(color)
                 End If
             Next
@@ -50,7 +50,7 @@ Namespace VBClasses
                     vRects.Add(r)
                     dst1(r).SetTo(vRects.Count)
 
-                    Dim color = task.scalarColors(CInt(task.bricksPerRow * r.X / dst2.Width) Mod 255)
+                    Dim color = task.scalarColors(task.bricksPerRow * r.X \ dst2.Width Mod 255)
                     dst3(r).SetTo(color)
                 End If
             Next

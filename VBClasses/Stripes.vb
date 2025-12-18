@@ -18,7 +18,7 @@ Namespace VBClasses
             dst2 = cv.Cv2.Abs(depth32S) / options.simpleReductionValue
             Dim maxVal = Math.Min(Math.Abs(mm.minVal), mm.maxVal) ' symmetric around 0
             If maxVal = 0 Then maxVal = mm.maxVal ' symmetric around 0 except for Z where all values are above 0
-            classCount = CInt(maxVal / options.simpleReductionValue)
+            classCount = maxVal \ options.simpleReductionValue
 
             dst3 = PaletteFull(dst2)
             mm = GetMinMax(dst2, task.depthmask)

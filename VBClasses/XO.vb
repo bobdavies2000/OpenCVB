@@ -1575,8 +1575,8 @@ Namespace VBClasses
             For Each lp In task.lines.lpList
                 Dim rect = findRectFromLine(lp)
                 Dim mask = New cv.Mat(New cv.Size(rect.Width, rect.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
-                mask.Line(New cv.Point(CInt(lp.p1.X - rect.X), CInt(lp.p1.Y - rect.Y)),
-                          New cv.Point(CInt(lp.p2.X - rect.X), CInt(lp.p2.Y - rect.Y)), 255, task.lineWidth, cv.LineTypes.Link4)
+                mask.Line(New cv.Point(lp.p1.X - rect.X, lp.p1.Y - rect.Y),
+                          New cv.Point(lp.p2.X - rect.X, lp.p2.Y - rect.Y), 255, task.lineWidth, cv.LineTypes.Link4)
                 Dim mean = task.pointCloud(rect).Mean(mask)
 
                 If mean <> New cv.Scalar Then
@@ -2391,9 +2391,9 @@ Namespace VBClasses
                          Dim m = task.depthMask.Get(Of Byte)(y, x)
                          If m > 0 Then
                              Dim depth = task.pcSplit(2).Get(Of Single)(y, x)
-                             Dim dy = CInt(src.Height * depth / range)
+                             Dim dy = src.Height * depth \ range
                              If dy < src.Height And dy > 0 Then dst2.Set(Of cv.Vec3b)(src.Height - dy, x, black)
-                             Dim dx = CInt(src.Width * depth / range)
+                             Dim dx = src.Width * depth \ range
                              If dx < src.Width And dx > 0 Then dst3.Set(Of cv.Vec3b)(y, dx, black)
                          End If
                      Next
@@ -3665,7 +3665,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim yLines = CInt(options.xLines * dst2.Height / dst2.Width)
+            Dim yLines = options.xLines * dst2.Height \ dst2.Width
 
             Dim stepX = dst3.Width / options.xLines
             Dim stepY = dst3.Height / yLines
@@ -3702,7 +3702,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim xLines = sCloud.options.indexX
-            Dim yLines = CInt(xLines * dst2.Width / dst2.Height)
+            Dim yLines = xLines * dst2.Width \ dst2.Height
             If sCloud.options.indexX > xLines Then sCloud.options.indexX = xLines - 1
             If sCloud.options.indexY > yLines Then sCloud.options.indexY = yLines - 1
 
@@ -4657,7 +4657,7 @@ Namespace VBClasses
         Dim colorizer As New DepthColorizer_CPP
         Public Sub New()
             task.gOptions.GridSlider.Maximum = dst2.Cols / 2
-            task.gOptions.GridSlider.Value = CInt(dst2.Cols / 2)
+            task.gOptions.GridSlider.Value = dst2.Cols \ 2
 
             labels = {"", "", "ML filled shadow", ""}
             desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
@@ -9079,7 +9079,7 @@ Namespace VBClasses
             searchRects.Clear()
             featureRects.Clear()
             For Each roi In matchRects
-                half = CInt(roi.Width / 2) ' stubby bricks are those at the bottom or right side of the image.
+                half = roi.Width \ 2 ' stubby bricks are those at the bottom or right side of the image.
                 pt = New cv.Point(roi.X + half, roi.Y + half)
                 Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 featureRects.Add(roi)

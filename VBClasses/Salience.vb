@@ -36,7 +36,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim threads = 32
-            Dim h = CInt(src.Height / threads)
+            Dim h = src.Height \ threads
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Parallel.For(0, threads,
             Sub(i)

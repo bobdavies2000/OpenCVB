@@ -545,8 +545,7 @@ Namespace VBClasses
                 Next
                 If addLabels Then AddPlotScale(dst2, mm.minVal, mm.maxVal)
             End If
-            If task.heartBeat Then labels(2) = CStr(CInt(mm.maxVal)) + " max value " +
-                                           CStr(CInt(mm.minVal)) + " min value"
+            If task.heartBeat Then labels(2) = CStr(CInt(mm.maxVal)) + " max value " + CStr(CInt(mm.minVal)) + " min value"
         End Sub
     End Class
 
@@ -570,8 +569,8 @@ Namespace VBClasses
             For i = 0 To input.Count - 1
                 Dim y = input(i).Y
                 If Single.IsNaN(y) Then y = 0
-                Dim pt = New cv.Point(CInt(dst2.Width * (input(i).X - minX) / (maxX - minX)),
-                                  CInt(dst2.Height - dst2.Height * (y - minY) / (maxY - minY)))
+                Dim pt = New cv.Point(dst2.Width * (input(i).X - minX) \ (maxX - minX),
+                                  dst2.Height - dst2.Height * (y - minY) \ (maxY - minY))
                 If pt.Y <> dst2.Height / 2 Then
                     DrawCircle(dst2, pt, task.DotSize, task.highlight)
                     output.Add(pt)

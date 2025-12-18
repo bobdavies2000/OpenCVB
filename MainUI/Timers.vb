@@ -27,10 +27,10 @@ Namespace MainUI
                 lastCameraFrame = camera.cameraFrameCount
 
                 task.fpsCamera = camFrames / (taskTimerInterval / 1000)
-                If task.fpsCamera >= 200 Then task.fpsCamera = 100
+                If task.fpsCamera >= 100 Then task.fpsCamera = 99
 
                 task.fpsAlgorithm = countFrames / (taskTimerInterval / 1000)
-                If task.fpsAlgorithm >= 200 Then task.fpsAlgorithm = 100
+                If task.fpsAlgorithm >= 100 Then task.fpsAlgorithm = 99
 
                 If task.fpsAlgorithm = 0 Then
                     task.fpsAlgorithm = 1
