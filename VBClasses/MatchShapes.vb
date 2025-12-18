@@ -13,8 +13,8 @@ Namespace VBClasses
             OptionParent.findRadio("FloodFill").Enabled = False
             OptionParent.findRadio("ApproxNone").Checked = True
 
-            dst0 = cv.Cv2.ImRead(algTask.homeDir + "Data/star1.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            dst1 = cv.Cv2.ImRead(algTask.homeDir + "Data/star2.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst0 = cv.Cv2.ImRead(task.homeDir + "Data/star1.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst1 = cv.Cv2.ImRead(task.homeDir + "Data/star2.png", cv.ImreadModes.Color).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             desc = "MatchShapes compares single hull to single hull - pretty tricky"
         End Sub
         Public Function findBiggestHull(hull As cv.Point()(), maxLen As Integer, maxIndex As Integer, dst As cv.Mat) As Integer
@@ -26,7 +26,7 @@ Namespace VBClasses
             Next
 
             For Each p In hull(maxIndex)
-                DrawCircle(dst, p, algTask.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst, p, task.DotSize, cv.Scalar.Yellow)
             Next
             Return maxIndex
         End Function
@@ -78,17 +78,17 @@ Namespace VBClasses
             options.Run()
 
             If standaloneTest() Then
-                hulls.Run(algTask.color)
-                If algTask.redList.oldrclist.Count = 0 Then Exit Sub
+                hulls.Run(task.color)
+                If task.redList.oldrclist.Count = 0 Then Exit Sub
                 dst2 = hulls.dst2
-                rc = algTask.oldrcD
+                rc = task.oldrcD
             End If
 
             dst3.SetTo(0)
             similarCells.Clear()
 
             Dim minMatch As Single = Single.MaxValue
-            For Each rc2 In algTask.redList.oldrclist
+            For Each rc2 In task.redList.oldrclist
                 If rc2.hull Is Nothing Or rc.hull Is Nothing Then Continue For
                 If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta Then Continue For
                 Dim matchVal = cv.Cv2.MatchShapes(rc.hull, rc2.hull, options.matchOption)
@@ -133,19 +133,19 @@ Namespace VBClasses
             Dim myStandalone = standaloneTest() Or runStandalone
 
             If myStandalone Then
-                dst2 = runRedList(algTask.color, labels(2)).Clone
-                If algTask.redList.oldrclist.Count = 0 Then Exit Sub
-                addTour.oldrclist = New List(Of oldrcData)(algTask.redList.oldrclist)
+                dst2 = runRedList(task.color, labels(2)).Clone
+                If task.redList.oldrclist.Count = 0 Then Exit Sub
+                addTour.oldrclist = New List(Of oldrcData)(task.redList.oldrclist)
                 addTour.Run(src)
-                rc = algTask.oldrcD
+                rc = task.oldrcD
             End If
 
-            If algTask.heartBeat And myStandalone Then dst3.SetTo(0)
+            If task.heartBeat And myStandalone Then dst3.SetTo(0)
             similarCells.Clear()
 
-            If algTask.gOptions.displayDst0.Checked Then
-                dst0 = algTask.color.Clone
-                DrawTour(dst0(rc.rect), rc.contour, algTask.highlight)
+            If task.gOptions.displayDst0.Checked Then
+                dst0 = task.color.Clone
+                DrawTour(dst0(rc.rect), rc.contour, task.highlight)
             End If
 
             Dim minMatch As Single = Single.MaxValue
@@ -166,7 +166,7 @@ Namespace VBClasses
 
             If bestCell >= 0 Then
                 Dim rc = similarCells(bestCell)
-                DrawCircle(dst3, rc.maxDist, algTask.DotSize, white)
+                DrawCircle(dst3, rc.maxDist, task.DotSize, white)
                 SetTrueText("Best match", rc.maxDist, 3)
             End If
             If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
@@ -192,11 +192,11 @@ Namespace VBClasses
 
             hulls.Run(src)
             dst2 = hulls.dst2
-            If algTask.heartBeat Then dst3.SetTo(0)
+            If task.heartBeat Then dst3.SetTo(0)
 
-            Dim rcX = algTask.oldrcD
+            Dim rcX = task.oldrcD
 
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
                 Dim matchVal = cv.Cv2.MatchShapes(rcX.hull, rc.hull, options.matchOption)
                 If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.hull, white, -1)
@@ -225,11 +225,11 @@ Namespace VBClasses
             options.Run()
 
             dst2 = runRedList(src, labels(2))
-            If algTask.heartBeat Then dst3.SetTo(0)
+            If task.heartBeat Then dst3.SetTo(0)
 
-            Dim rcX = algTask.oldrcD
+            Dim rcX = task.oldrcD
 
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 If rc.contour Is Nothing Then Continue For
                 Dim matchVal = cv.Cv2.MatchShapes(rcX.contour, rc.contour, options.matchOption)
                 If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.contour, white, -1)

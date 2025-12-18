@@ -6,7 +6,7 @@ Namespace VBClasses
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public percentImage As Single
         Public Sub New()
-            algTask.redCloud = Me
+            task.redCloud = Me
             desc = "Build contours for each cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -29,7 +29,7 @@ Namespace VBClasses
                     indexLast -= 1 ' index is 1 less than the rcMap value
                     r2 = rcListLast(indexLast).rect
                 End If
-                If indexLast >= 0 And r1.IntersectsWith(r2) And algTask.optionsChanged = False Then
+                If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                     Dim lrc = rcListLast(indexLast)
                     If rc.rect.Contains(lrc.maxDist) Then
                         Dim row = lrc.maxDist.Y - lrc.rect.Y
@@ -45,7 +45,7 @@ Namespace VBClasses
                     rc.age = lrc.age + 1
                     If rc.age > 1000 Then rc.age = 2
 
-                    If algTask.motionRect.Contains(rc.maxDist) Then rc.age = 1
+                    If task.motionRect.Contains(rc.maxDist) Then rc.age = 1
 
                     rc.color = lrc.color
                 End If
@@ -57,14 +57,14 @@ Namespace VBClasses
 
             If standalone Then
                 For Each rc In rcList
-                    dst2.Circle(rc.maxDist, algTask.DotSize, algTask.highlight, -1)
+                    dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
                     SetTrueText(CStr(rc.age), rc.maxDist)
                 Next
             End If
 
             If standaloneTest() Then
                 RedCloud_Cell.selectCell(rcMap, rcList)
-                If algTask.rcD IsNot Nothing Then strOut = algTask.rcD.displayCell()
+                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
                 SetTrueText(strOut, 3)
             End If
         End Sub
@@ -122,20 +122,20 @@ Namespace VBClasses
             For Each rc In rcList
                 index += 1
                 rc.index = index
-                rc.color = algTask.vecColors(rc.index Mod 255)
+                rc.color = task.vecColors(rc.index Mod 255)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                dst2.Circle(rc.maxDist, algTask.DotSize, algTask.highlight, -1)
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
             Next
 
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
 
             Static unchanged As Integer
-            If algTask.motionRect.Width = 0 Then
+            If task.motionRect.Width = 0 Then
                 unchanged += 1
                 labels(3) = "RedCloud cells were unchanged " + CStr(unchanged) + " times since last heartBeatLT"
             End If
-            If algTask.heartBeatLT Then unchanged = 0
+            If task.heartBeatLT Then unchanged = 0
         End Sub
     End Class
 
@@ -148,32 +148,32 @@ Namespace VBClasses
     Public Class RedCloud_CellDepthHistogram : Inherits TaskParent
         Dim plot As New Plot_Histogram
         Public Sub New()
-            algTask.gOptions.setHistogramBins(100)
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            task.gOptions.setHistogramBins(100)
+            If standalone Then task.gOptions.displayDst1.Checked = True
             plot.createHistogram = True
             desc = "Display the histogram of a selected RedCloud cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedCloud(src, labels(2))
 
-            RedCloud_Cell.selectCell(algTask.redCloud.rcMap, algTask.redCloud.rcList)
-            If algTask.rcD IsNot Nothing Then strOut = algTask.rcD.displayCell
+            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell
             SetTrueText(strOut, 1)
 
-            If algTask.rcD Is Nothing Then
+            If task.rcD Is Nothing Then
                 labels(3) = "Select a RedCloud cell to see the histogram"
                 Exit Sub
             End If
 
-            Dim depth As cv.Mat = algTask.pcSplit(2)(algTask.rcD.rect)
-            depth.SetTo(0, algTask.noDepthMask(algTask.rcD.rect))
+            Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
+            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
             plot.minRange = 0
-            plot.maxRange = algTask.MaxZmeters
+            plot.maxRange = task.MaxZmeters
             plot.Run(depth)
-            labels(3) = "0 meters to " + Format(algTask.MaxZmeters, fmt0) + " meters - vertical lines every meter"
+            labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + " meters - vertical lines every meter"
 
-            Dim incr = dst2.Width / algTask.MaxZmeters
-            For i = 1 To CInt(algTask.MaxZmeters - 1)
+            Dim incr = dst2.Width / task.MaxZmeters
+            For i = 1 To CInt(task.MaxZmeters - 1)
                 Dim x = incr * i
                 vbc.DrawLine(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White)
             Next
@@ -195,12 +195,12 @@ Namespace VBClasses
             redMotion.Run(src)
 
             dst3.SetTo(0)
-            For Each rc In algTask.redCloud.rcList
+            For Each rc In task.redCloud.rcList
                 Dim listOfPoints = New List(Of List(Of cv.Point))({rc.contour})
-                cv.Cv2.DrawContours(dst3(rc.rect), listOfPoints, 0, white, algTask.lineWidth, cv.LineTypes.Link8)
+                cv.Cv2.DrawContours(dst3(rc.rect), listOfPoints, 0, white, task.lineWidth, cv.LineTypes.Link8)
             Next
 
-            dst2 = algTask.redCloud.redSweep.dst1
+            dst2 = task.redCloud.redSweep.dst1
         End Sub
     End Class
 
@@ -214,28 +214,28 @@ Namespace VBClasses
         End Sub
         Public Shared Sub selectCell(rcMap As cv.Mat, rcList As List(Of rcData))
             If rcList.Count > 0 Then
-                Dim clickIndex = rcMap.Get(Of Byte)(algTask.ClickPoint.Y, algTask.ClickPoint.X) - 1
+                Dim clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X) - 1
                 If clickIndex >= 0 And clickIndex < rcList.Count Then
-                    algTask.rcD = rcList(clickIndex)
+                    task.rcD = rcList(clickIndex)
                 Else
                     Dim ages As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
                     For Each pc In rcList
                         ages.Add(pc.age, pc.index - 1)
                     Next
-                    algTask.rcD = rcList(ages.ElementAt(0).Value)
+                    task.rcD = rcList(ages.ElementAt(0).Value)
                 End If
-                If algTask.rcD.rect.Contains(algTask.ClickPoint) Then
-                    algTask.color(algTask.rcD.rect).SetTo(white, algTask.rcD.mask)
+                If task.rcD.rect.Contains(task.clickPoint) Then
+                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
                     Exit Sub
                 End If
             End If
-            algTask.rcD = Nothing
+            task.rcD = Nothing
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then dst2 = runRedCloud(src, labels(2))
 
-            selectCell(algTask.redCloud.rcMap, algTask.redCloud.rcList)
-            If algTask.rcD IsNot Nothing Then strOut = algTask.rcD.displayCell()
+            selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
         End Sub
     End Class
@@ -248,7 +248,7 @@ Namespace VBClasses
     Public Class RedCloud_Small : Inherits TaskParent
         Dim minRes As cv.Size
         Public Sub New()
-            Select Case CStr(algTask.cols) + "x" + CStr(algTask.rows)
+            Select Case CStr(task.cols) + "x" + CStr(task.rows)
                 Case "1920x1080", "960x540", "480x270"
                     minRes = New cv.Size(480, 270)
                 Case "1280x720", "640x360", "320x180"
@@ -264,26 +264,26 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim minRect = New cv.Rect(0, 0, minRes.Width, minRes.Height)
-            If src.Size <> minRes Then src = algTask.pointCloud.Resize(minRes) Else src = algTask.pointCloud
+            If src.Size <> minRes Then src = task.pointCloud.Resize(minRes) Else src = task.pointCloud
             dst1 = runRedCloud(src, labels(2))(minRect)
-            dst2 = dst1.Resize(algTask.workRes)
+            dst2 = dst1.Resize(task.workRes)
 
-            If algTask.firstPass Then
+            If task.firstPass Then
                 OptionParent.FindSlider("Reduction Target").Value = 400
             End If
 
-            Dim ratio = algTask.workRes.Width \ minRes.Width
-            algTask.redCloud.rcMap.SetTo(0)
-            For Each rc In algTask.redCloud.rcList
+            Dim ratio = task.workRes.Width \ minRes.Width
+            task.redCloud.rcMap.SetTo(0)
+            For Each rc In task.redCloud.rcList
                 Dim r = rc.rect
                 rc.rect = New cv.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio)
                 Dim maskSize = New cv.Size(rc.rect.Width, rc.rect.Height)
                 rc.mask = rc.mask.Resize(maskSize)
-                algTask.redCloud.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                task.redCloud.rcMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
-            RedCloud_Cell.selectCell(algTask.redCloud.rcMap, algTask.redCloud.rcList)
-            If algTask.rcD IsNot Nothing Then strOut = algTask.rcD.displayCell()
+            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
         End Sub
     End Class

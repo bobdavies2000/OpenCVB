@@ -13,7 +13,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If algTask.clickPoint <> newPoint Then center = algTask.clickPoint
+            If task.clickPoint <> newPoint Then center = task.clickPoint
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, cppData, 0, cppData.Length)
@@ -50,7 +50,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If algTask.ClickPoint <> newPoint Then center = algTask.ClickPoint
+            If task.ClickPoint <> newPoint Then center = task.ClickPoint
             Dim maxDist = New cv.Point(0, 0).DistanceTo(center) * options.radius
             Dim tmp As Double
             For y = 0 To src.Height - 1
@@ -84,7 +84,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() And defaultImage Is Nothing Then
-                Dim fileInfo = New FileInfo(algTask.homeDir + "data/nature.jpg")
+                Dim fileInfo = New FileInfo(task.homeDir + "data/nature.jpg")
                 If fileInfo.Exists Then defaultImage = cv.Cv2.ImRead(fileInfo.FullName)
                 defaultImage = defaultImage.Resize(dst3.Size)
                 dst2 = defaultImage.Clone

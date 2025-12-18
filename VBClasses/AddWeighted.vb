@@ -9,7 +9,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If src.Channels <> 1 Then src = algTask.gray
+            If src.Channels <> 1 Then src = task.gray
             src.ConvertTo(dst3, cv.MatType.CV_32F)
             cv.Cv2.AccumulateWeighted(dst3, dst1, options.accumWeighted, New cv.Mat)
             dst1.ConvertTo(dst2, cv.MatType.CV_8U)
@@ -32,7 +32,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If standalone Then src2 = algTask.depthRGB
+            If standalone Then src2 = task.depthRGB
             If src2.Type <> src.Type Then
                 If src.Type <> cv.MatType.CV_8UC3 Or src2.Type <> cv.MatType.CV_8UC3 Then
                     If src.Type = cv.MatType.CV_32FC1 Then src = Mat_Convert.Mat_32f_To_8UC3(src)
@@ -61,7 +61,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            cv.Cv2.AccumulateWeighted(algTask.pcSplit(2) * 1000, dst2, options.accumWeighted, New cv.Mat)
+            cv.Cv2.AccumulateWeighted(task.pcSplit(2) * 1000, dst2, options.accumWeighted, New cv.Mat)
         End Sub
     End Class
 
@@ -78,15 +78,15 @@ Namespace VBClasses
             desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image.  Some cameras are not close to aligned."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.toggleOn Then
-                dst1 = algTask.leftView
+            If task.toggleOn Then
+                dst1 = task.leftView
                 labels(2) = "Left view combined with depthRGB"
             Else
-                dst1 = algTask.rightView
+                dst1 = task.rightView
                 labels(2) = "Right view combined with depthRGB"
             End If
 
-            dst2 = ShowAddweighted(dst1, algTask.depthRGB, labels(3))
+            dst2 = ShowAddweighted(dst1, task.depthRGB, labels(3))
         End Sub
     End Class
 
@@ -122,7 +122,7 @@ Namespace VBClasses
             desc = "Use AddWeighted to add the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = ShowAddweighted(algTask.rightView, algTask.leftView, labels(2))
+            dst2 = ShowAddweighted(task.rightView, task.leftView, labels(2))
         End Sub
     End Class
 End Namespace

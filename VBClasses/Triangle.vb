@@ -9,24 +9,24 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            If algTask.redList.oldrclist.Count <= 1 Then Exit Sub
-            algTask.oldrcD = algTask.redList.oldrclist(1)
+            If task.redList.oldrclist.Count <= 1 Then Exit Sub
+            task.oldrcD = task.redList.oldrclist(1)
 
             dst3.SetTo(0)
             Dim pt3D As New List(Of cv.Point3f)
-            For Each pt In algTask.oldrcD.contour
-                pt = New cv.Point(pt.X + algTask.oldrcD.rect.X, pt.Y + algTask.oldrcD.rect.Y)
-                Dim vec = algTask.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
+            For Each pt In task.oldrcD.contour
+                pt = New cv.Point(pt.X + task.oldrcD.rect.X, pt.Y + task.oldrcD.rect.Y)
+                Dim vec = task.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
                 If vec.Z = 0 Then
-                    vec = Cloud_Basics.worldCoordinates(New cv.Point3f(pt.X, pt.Y, algTask.oldrcD.depth))
+                    vec = Cloud_Basics.worldCoordinates(New cv.Point3f(pt.X, pt.Y, task.oldrcD.depth))
                 End If
-                DrawCircle(dst3, pt, algTask.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
                 pt3D.Add(vec)
             Next
 
-            Dim c3D = algTask.pointCloud.Get(Of cv.Point3f)(algTask.oldrcD.maxDist.Y, algTask.oldrcD.maxDist.X)
+            Dim c3D = task.pointCloud.Get(Of cv.Point3f)(task.oldrcD.maxDist.Y, task.oldrcD.maxDist.X)
             triangles.Clear()
-            Dim color3D As New cv.Point3f(algTask.oldrcD.color(0), algTask.oldrcD.color(1), algTask.oldrcD.color(2))
+            Dim color3D As New cv.Point3f(task.oldrcD.color(0), task.oldrcD.color(1), task.oldrcD.color(2))
             For i = 0 To pt3D.Count - 1
                 triangles.Add(color3D)
                 triangles.Add(c3D)
@@ -45,28 +45,28 @@ Namespace VBClasses
     Public Class Triangle_HullContour : Inherits TaskParent
         Dim hulls As New RedList_Hulls
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Selected cell", "RedList_Basics output", "Selected contour"}
             desc = "Given a contour, convert that contour to a series of triangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             hulls.Run(src)
             dst2 = hulls.dst2
-            If algTask.redList.oldrclist.Count <= 1 Then Exit Sub
-            Dim rc = algTask.oldrcD
+            If task.redList.oldrclist.Count <= 1 Then Exit Sub
+            Dim rc = task.oldrcD
 
             rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxTC89L1)
 
             dst3.SetTo(0)
             For Each pt In rc.contour
                 pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
-                DrawCircle(dst3, pt, algTask.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
             Next
 
             dst1.SetTo(0)
             For Each pt In rc.hull
                 pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
-                DrawCircle(dst1, pt, algTask.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst1, pt, task.DotSize, cv.Scalar.Yellow)
             Next
         End Sub
     End Class
@@ -85,8 +85,8 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            If algTask.redList.oldrclist.Count <= 1 Then Exit Sub
-            Dim rc = algTask.oldrcD
+            If task.redList.oldrclist.Count <= 1 Then Exit Sub
+            Dim rc = task.oldrcD
             If rc.index = 0 Then Exit Sub
 
             dst3.SetTo(0)
@@ -102,16 +102,16 @@ Namespace VBClasses
                 xFactor = rc.rect.Width * dst2.Height / rc.rect.Height
                 yFactor = dst2.Height
             End If
-            dst3.Rectangle(cellRect, white, algTask.lineWidth)
+            dst3.Rectangle(cellRect, white, task.lineWidth)
 
             For Each pt In rc.contour
-                Dim vec = algTask.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
+                Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
                 pt = New cv.Point(xFactor * pt.X / rc.rect.Width, yFactor * pt.Y / rc.rect.Height)
-                DrawCircle(dst3, pt, algTask.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
                 pt3D.Add(vec)
             Next
 
-            Dim c3D = algTask.pointCloud.Get(Of cv.Point3f)(rc.maxDist.Y, rc.maxDist.X)
+            Dim c3D = task.pointCloud.Get(Of cv.Point3f)(rc.maxDist.Y, rc.maxDist.X)
             triangles.Clear()
             Dim color3D As New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255)
             For i = 0 To pt3D.Count - 1
@@ -139,8 +139,8 @@ Namespace VBClasses
 
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            If algTask.redList.oldrclist.Count <= 1 Then Exit Sub
-            Dim rc = algTask.oldrcD
+            If task.redList.oldrclist.Count <= 1 Then Exit Sub
+            Dim rc = task.oldrcD
             If rc.index = 0 Then Exit Sub
 
             dst3.SetTo(0)
@@ -156,23 +156,23 @@ Namespace VBClasses
                 xFactor = rc.rect.Width * dst2.Height / rc.rect.Height
                 yFactor = dst2.Height
             End If
-            dst3.Rectangle(cellRect, white, algTask.lineWidth)
+            dst3.Rectangle(cellRect, white, task.lineWidth)
 
             triangles.Clear()
             For y = 0 To rc.rect.Height - 1
                 For x = 0 To rc.rect.Width - 1
                     If rc.mask.Get(Of Byte)(y, x) = 0 Then Continue For
-                    Dim vec = algTask.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
+                    Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
                     Dim pt = New cv.Point2f(xFactor * x / rc.rect.Width, yFactor * y / rc.rect.Height)
-                    DrawCircle(dst3, pt, algTask.DotSize, cv.Scalar.Yellow)
+                    DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
                     pt3D.Add(vec)
                 Next
             Next
 
             Dim newMaxDist = New cv.Point2f(xFactor * (rc.maxDist.X - rc.rect.X) / rc.rect.Width,
                                       yFactor * (rc.maxDist.Y - rc.rect.Y) / rc.rect.Height)
-            DrawCircle(dst3, newMaxDist, algTask.DotSize + 2, cv.Scalar.Red)
-            labels(2) = algTask.redList.labels(2)
+            DrawCircle(dst3, newMaxDist, task.DotSize + 2, cv.Scalar.Red)
+            labels(2) = task.redList.labels(2)
         End Sub
     End Class
 
@@ -187,7 +187,7 @@ Namespace VBClasses
         Public oglOptions As New Options_OpenGLFunctions
         Public hulls As New RedList_Hulls
         Public Sub New()
-            algTask.gOptions.GridSlider.Value = 30
+            task.gOptions.GridSlider.Value = 30
             desc = "Prepare the list of 2D triangles"
         End Sub
         Private Function addTriangle(c1 As cv.Point, c2 As cv.Point, center As cv.Point, rc As oldrcData, shift As cv.Point3f) As List(Of cv.Point)
@@ -216,7 +216,7 @@ Namespace VBClasses
             points.Clear()
             colors.Clear()
             Dim listOfPoints = New List(Of List(Of cv.Point))
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 If rc.contour Is Nothing Then Continue For
                 If rc.contour.Count < 5 Then Continue For
                 Dim corners(4 - 1) As cv.Point
@@ -239,7 +239,7 @@ Namespace VBClasses
             For i = 0 To colors.Count - 1
                 cv.Cv2.DrawContours(dst3, listOfPoints, i, colors(i), -1)
             Next
-            labels(2) = CStr(colors.Count) + " triangles from " + CStr(algTask.redList.oldrclist.Count) + " RedCloud cells"
+            labels(2) = CStr(colors.Count) + " triangles from " + CStr(task.redList.oldrclist.Count) + " RedCloud cells"
         End Sub
     End Class
 End Namespace

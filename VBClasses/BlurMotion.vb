@@ -23,7 +23,7 @@ Namespace VBClasses
             dst2 = src.Filter2D(-1, kernel)
             pt1 += New cv.Point(src.Width / 2, src.Height / 2)
             pt2 += New cv.Point(src.Width / 2, src.Height / 2)
-            If options.showDirection Then dst2.Line(pt1, pt2, cv.Scalar.Yellow, algTask.lineWidth + 3, algTask.lineType)
+            If options.showDirection Then dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
         End Sub
     End Class
 
@@ -115,9 +115,9 @@ Namespace VBClasses
             labels(3) = "Deblurred Image Output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            mblur.Options.Run()
+            mblur.options.Run()
 
-            If algTask.heartBeat Then mblur.options.redoCheckBox.Checked = True
+            If task.heartBeat Then mblur.options.redoCheckBox.Checked = True
             If mblur.options.redoCheckBox.Checked Then
                 mblur.Run(src)
                 mblur.options.showDirection = False

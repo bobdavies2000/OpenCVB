@@ -6,10 +6,10 @@ Namespace PixelViewer
         Dim firstUpdate = True
         Public viewerForm As New PixelViewerForm
         Dim mouseLoc = New cv.Point(10, 10) ' assume 
-        Public dst0Input As New cv.Mat(algTask.workRes, cv.MatType.CV_8UC3, 0)
-        Public dst1Input As New cv.Mat(algTask.workRes, cv.MatType.CV_8UC3, 0)
-        Public dst2Input As New cv.Mat(algTask.workRes, cv.MatType.CV_8UC3, 0)
-        Public dst3Input As New cv.Mat(algTask.workRes, cv.MatType.CV_8UC3, 0)
+        Public dst0Input As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+        Public dst1Input As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+        Public dst2Input As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+        Public dst3Input As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
         Enum displayTypes
             noType = -1
             type8uC3 = 0
@@ -24,13 +24,13 @@ Namespace PixelViewer
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                algTask.dstList(0) = dst0Input
-                algTask.dstList(1) = dst1Input
-                algTask.dstList(2) = dst2Input
-                algTask.dstList(3) = dst3Input
+                task.dstList(0) = dst0Input
+                task.dstList(1) = dst1Input
+                task.dstList(2) = dst2Input
+                task.dstList(3) = dst3Input
             End If
 
-            Dim dst = Choose(algTask.mousePicTag + 1, algTask.dstList(0), algTask.dstList(1), dst2Input, dst3Input)
+            Dim dst = Choose(task.mousePicTag + 1, task.dstList(0), task.dstList(1), dst2Input, dst3Input)
 
             Dim displayType = displayTypes.noType
             If dst.Type = cv.MatType.CV_8UC3 Then displayType = displayTypes.type8uC3
@@ -45,7 +45,7 @@ Namespace PixelViewer
             End If
 
             Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3", "32SC1", "32SC3")
-            viewerForm.Text = "Pixel Viewer for " + Choose(algTask.mousePicTag + 1, "Color", "RGB Depth", "dst2", "dst3") + " " + formatType
+            viewerForm.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst2", "dst3") + " " + formatType
 
             ' yeah, kind of a mess but lots of factors...
             Dim drWidth As Integer = Choose(displayType + 1, 5, 17, 13, 3, 16, 5) * viewerForm.Width / 450 + 3
@@ -53,20 +53,20 @@ Namespace PixelViewer
             If drHeight < 20 Then drHeight = 20
 
             If viewerForm.mousePoint <> newPoint Then
-                algTask.mouseMovePoint += viewerForm.mousePoint
-                algTask.mouseMovePointUpdated = True
+                task.mouseMovePoint += viewerForm.mousePoint
+                task.mouseMovePointUpdated = True
                 viewerForm.mousePoint = New cv.Point
             End If
-            If algTask.mouseMovePoint.X Or algTask.mouseMovePoint.Y Then
-                Dim x As Integer = If(algTask.mouseMovePoint.X >= drWidth, algTask.mouseMovePoint.X - drWidth - 1, 0)
-                Dim y As Integer = If(algTask.mouseMovePoint.Y >= drHeight, algTask.mouseMovePoint.Y - drHeight - 1, 0)
-                If algTask.mouseMovePoint.X >= drWidth Then x += 2
-                If algTask.mouseMovePoint.Y >= drHeight Then y += 2
+            If task.mouseMovePoint.X Or task.mouseMovePoint.Y Then
+                Dim x As Integer = If(task.mouseMovePoint.X >= drWidth, task.mouseMovePoint.X - drWidth - 1, 0)
+                Dim y As Integer = If(task.mouseMovePoint.Y >= drHeight, task.mouseMovePoint.Y - drHeight - 1, 0)
+                If task.mouseMovePoint.X >= drWidth Then x += 2
+                If task.mouseMovePoint.Y >= drHeight Then y += 2
                 mouseLoc = New cv.Point(x, y)
             End If
 
-            algTask.pixelViewerRect = New cv.Rect(0, 0, -1, -1)
-            algTask.pixelViewTag = algTask.mousePicTag
+            task.pixelViewerRect = New cv.Rect(0, 0, -1, -1)
+            task.pixelViewTag = task.mousePicTag
             Dim dw = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
             dw = ValidateRect(dw)
 
@@ -96,7 +96,7 @@ Namespace PixelViewer
             End If
 
             Dim imgText = ""
-            Dim ClickPoint = New cv.Point(algTask.clickPoint.X - dw.X, algTask.clickPoint.Y - dw.Y)
+            Dim ClickPoint = New cv.Point(task.clickPoint.X - dw.X, task.clickPoint.Y - dw.Y)
             Select Case displayType
 
                 Case displayTypes.type8uC3
@@ -115,7 +115,7 @@ Namespace PixelViewer
                     For y = 0 To img.Height - 1
                         imgText += "r" + Format(dw.Y + y, "000") + "   "
                         For x = 0 To img.Width - 1
-                            If (algTask.toggleOn And y = ClickPoint.Y) And (x = ClickPoint.X - 1 Or x = ClickPoint.X) Then
+                            If (task.toggleOn And y = ClickPoint.Y) And (x = ClickPoint.X - 1 Or x = ClickPoint.X) Then
                                 imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "***", "*")
                             Else
                                 imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
@@ -165,7 +165,7 @@ Namespace PixelViewer
                         imgText += vbLf
                     Next
             End Select
-            algTask.pixelViewerRect = dw
+            task.pixelViewerRect = dw
 
             If viewerForm.rtb.Text <> imgText Then
                 If firstUpdate Then viewerForm.rtb.Text = imgText Else viewerForm.saveText = imgText
@@ -254,12 +254,12 @@ Namespace VBClasses
 
     Public Class Pixel_Measure : Inherits TaskParent
         Public Sub New()
-            Dim maxZ = algTask.MaxZmeters * 1000
+            Dim maxZ = task.MaxZmeters * 1000
             If sliders.Setup(traceName) Then sliders.setupTrackBar("Distance in mm", 50, If(maxZ < 1500, 1500, maxZ), maxZ)
             desc = "Compute how many pixels per meter at a requested distance"
         End Sub
         Public Function Compute(mmDist As Single) As Single
-            Dim halfLineInMeters = Math.Tan(0.0174533 * algTask.hFov / 2) * mmDist
+            Dim halfLineInMeters = Math.Tan(0.0174533 * task.hFov / 2) * mmDist
             Return halfLineInMeters * 2 / dst2.Width
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -288,10 +288,10 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                If algTask.heartBeat Then
+                If task.heartBeat Then
                     Dim w = 25, h = 25
-                    If algTask.drawRect <> New cv.Rect Then
-                        random.range = algTask.drawRect
+                    If task.drawRect <> New cv.Rect Then
+                        random.range = task.drawRect
                     Else
                         random.range = New cv.Rect(msRNG.Next(0, src.Width - w), msRNG.Next(0, src.Height - h), w, h)
                     End If
@@ -323,7 +323,7 @@ Namespace VBClasses
                 dst2 = src
                 dst2.Rectangle(random.range, white, 1)
                 For Each pt In random.PointList
-                    DrawCircle(dst2, pt, algTask.DotSize, white)
+                    DrawCircle(dst2, pt, task.DotSize, white)
                 Next
                 labels(2) = "Dominant color value = " + CStr(maskColor(0)) + ", " + CStr(maskColor(1)) + ", " + CStr(maskColor(2))
                 SetTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)
@@ -363,7 +363,7 @@ Namespace VBClasses
             dst3 = dst3.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
 
             unstable.Add(dst3)
-            If unstable.Count > algTask.frameHistoryCount Then unstable.RemoveAt(0)
+            If unstable.Count > task.frameHistoryCount Then unstable.RemoveAt(0)
 
             unstablePixels = unstable(0)
             For i = 1 To unstable.Count - 1
@@ -403,7 +403,7 @@ Namespace VBClasses
             Dim zoomArray() = {2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16}
             Dim zoomFactor = zoomArray(zoomSlider.Value)
 
-            If algTask.mouseMovePoint <> newPoint Then mousePoint = algTask.mouseMovePoint
+            If task.mouseMovePoint <> newPoint Then mousePoint = task.mouseMovePoint
             Dim width As Double = src.Width / zoomFactor
             Dim height As Double = src.Height / zoomFactor
             Dim x = Math.Min(mousePoint.X, src.Width - width)
@@ -429,7 +429,7 @@ Namespace VBClasses
             Dim zoomArray() = {2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16}
             Dim zoomFactor = zoomArray(zoom.zoomSlider.Value)
 
-            If algTask.mouseMovePoint <> newPoint Then zoom.mousePoint = algTask.mouseMovePoint
+            If task.mouseMovePoint <> newPoint Then zoom.mousePoint = task.mouseMovePoint
             Dim width As Double = src.Width / zoomFactor
             Dim height As Double = src.Height / zoomFactor
             Dim x = Math.Min(zoom.mousePoint.X, src.Width - width)
@@ -457,7 +457,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Type <> cv.MatType.CV_32F Then src = algTask.pcSplit(2)
+            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
             pt1.Clear()
             pt2.Clear()
@@ -474,7 +474,7 @@ Namespace VBClasses
                 Next
             Next
 
-            dst2 = algTask.color.Clone
+            dst2 = task.color.Clone
             For i = 0 To pt1.Count - 1
                 vbc.DrawLine(dst2, pt1(i), pt2(i), cv.Scalar.Yellow)
             Next
@@ -499,7 +499,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Type <> cv.MatType.CV_32F Then src = algTask.pcSplit(2)
+            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
             pt1.Clear()
             pt2.Clear()
@@ -516,7 +516,7 @@ Namespace VBClasses
                 Next
             Next
 
-            dst2 = algTask.color.Clone
+            dst2 = task.color.Clone
             For i = 0 To pt1.Count - 1
                 vbc.DrawLine(dst2, pt1(i), pt2(i), cv.Scalar.Yellow)
             Next
@@ -537,7 +537,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If src.Type <> cv.MatType.CV_32F Then src = algTask.pcSplit(2)
+            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
             Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             Dim r1 = New cv.Rect(0, 0, dst2.Width, dst2.Height - options.pixels)
@@ -545,7 +545,7 @@ Namespace VBClasses
             cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
             tmp32f = tmp32f.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv)
             dst2 = tmp32f.ConvertScaleAbs(255)
-            dst2.SetTo(0, algTask.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
             dst2(New cv.Rect(dst2.Width - options.pixels, 0, options.pixels, dst2.Height)).SetTo(0)
             labels(2) = "White: z is within " + Format(options.threshold, fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
         End Sub
@@ -564,7 +564,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If src.Type <> cv.MatType.CV_32F Then src = algTask.pcSplit(2)
+            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
             Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             Dim r1 = New cv.Rect(0, 0, dst2.Width, dst2.Height - options.pixels)
@@ -572,7 +572,7 @@ Namespace VBClasses
             cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
             tmp32f = tmp32f.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv)
             dst2 = tmp32f.ConvertScaleAbs(255)
-            dst2.SetTo(0, algTask.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
             dst2(New cv.Rect(dst2.Width - options.pixels, 0, options.pixels, dst2.Height)).SetTo(0)
             labels(2) = "White: z is within " + Format(options.threshold, fmt0) + " mm's with X pixel offset " + CStr(options.pixels)
         End Sub
@@ -615,7 +615,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Type <> cv.MatType.CV_32F Then src = algTask.pcSplit(2)
+            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
             dst2 = src
             If options.patchZ Then
@@ -648,7 +648,7 @@ Namespace VBClasses
             Else
                 labels(2) = "Z-values not updated "
             End If
-            cv.Cv2.Merge(algTask.pcSplit, dst3)
+            cv.Cv2.Merge(task.pcSplit, dst3)
         End Sub
     End Class
 
@@ -662,7 +662,7 @@ Namespace VBClasses
         Dim hColor As New Hist3Dcolor_Basics
         Public pixelVector As New List(Of List(Of Single))
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             OptionParent.FindSlider("Histogram 3D Bins").Value = 3
             labels = {"", "RedList_Basics output", "3D Histogram counts for each of the cells at left", ""}
             desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
@@ -671,10 +671,10 @@ Namespace VBClasses
             runRedList(src, labels(2))
             Dim maxRegion = 20
 
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 pixelVector.Clear()
                 strOut = "3D histogram counts for each cell - " + CStr(maxRegion) + " largest only for readability..." + vbCrLf
-                For Each rc In algTask.redList.oldrclist
+                For Each rc In task.redList.oldrclist
                     hColor.inputMask = rc.mask
                     hColor.Run(src(rc.rect))
                     pixelVector.Add(hColor.histArray.ToList)
@@ -690,12 +690,12 @@ Namespace VBClasses
 
             dst1.SetTo(0)
             dst2.SetTo(0)
-            For Each rc In algTask.redList.oldrclist
-                algTask.color(rc.rect).CopyTo(dst2(rc.rect), rc.mask)
+            For Each rc In task.redList.oldrclist
+                task.color(rc.rect).CopyTo(dst2(rc.rect), rc.mask)
                 dst1(rc.rect).SetTo(rc.color, rc.mask)
                 If rc.index <= maxRegion Then SetTrueText(CStr(rc.index), rc.maxDist, 2)
             Next
-            labels(1) = algTask.redList.labels(3)
+            labels(1) = task.redList.labels(3)
         End Sub
     End Class
 
@@ -715,12 +715,12 @@ Namespace VBClasses
             dst2 = runRedList(src, labels(2))
 
             pixelVector.Clear()
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 hVector.inputMask = rc.mask
                 hVector.Run(src(rc.rect))
                 pixelVector.Add(hVector.histArray)
             Next
-            oldrclist = algTask.redList.oldrclist
+            oldrclist = task.redList.oldrclist
 
             SetTrueText("3D color histograms were created for " + CStr(pixelVector.Count) + " cells", 3)
         End Sub
@@ -736,7 +736,7 @@ Namespace VBClasses
             desc = "Resize the input to a small image, convert to gray, and map gray to color"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 Dim nSize = New cv.Size(src.Width / 8, src.Height / 8)
                 dst1 = src.Resize(nSize)
                 Dim samples(dst1.Total * dst1.ElemSize - 1) As Byte
@@ -791,7 +791,7 @@ Namespace VBClasses
             mapper.Run(src)
             dst2 = mapper.dst2
 
-            Dim tmp As cv.Mat = algTask.rightView
+            Dim tmp As cv.Mat = task.rightView
             If tmp.Channels = 3 Then tmp = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             cv.Cv2.ApplyColorMap(tmp, dst3, mapper.colorMap)
         End Sub
@@ -814,7 +814,7 @@ Namespace VBClasses
             dst2 = mapper.dst2
 
             Static myColorMap As cv.Mat = mapper.colorMap.Clone
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 Dim samples(mapper.colorMap.Total * mapper.colorMap.ElemSize - 1) As Byte
                 Marshal.Copy(mapper.colorMap.Data, samples, 0, samples.Length)
 
@@ -845,11 +845,11 @@ Namespace VBClasses
 
                 Marshal.Copy(vecs3b.ToArray, 0, mapper.colorMap.Data, myColorMap.Total * myColorMap.ElemSize)
             End If
-            Dim tmp As cv.Mat = algTask.leftView
+            Dim tmp As cv.Mat = task.leftView
             If tmp.Channels = 3 Then tmp = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             cv.Cv2.ApplyColorMap(tmp, dst2, myColorMap)
 
-            tmp = algTask.rightView
+            tmp = task.rightView
             If tmp.Channels = 3 Then tmp = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             cv.Cv2.ApplyColorMap(tmp, dst3, myColorMap)
         End Sub
@@ -872,9 +872,9 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                If algTask.heartBeat Then
-                    If algTask.drawRect <> New cv.Rect Then
-                        random.range = algTask.drawRect
+                If task.heartBeat Then
+                    If task.drawRect <> New cv.Rect Then
+                        random.range = task.drawRect
                     Else
                         random.range = New cv.Rect(msRNG.Next(0, src.Width - width), msRNG.Next(0, src.Height - height), width, height)
                     End If
@@ -916,7 +916,7 @@ Namespace VBClasses
                 dst2 = src
                 dst2.Rectangle(random.range, white, 1)
                 For Each pt In random.PointList
-                    DrawCircle(dst2, pt, algTask.DotSize, white)
+                    DrawCircle(dst2, pt, task.DotSize, white)
                 Next
                 labels(2) = "Dominant gray value = " + CStr(dominantGray)
                 SetTrueText("Draw in the image to select a region for testing.", New cv.Point(10, 200), 3)
@@ -934,22 +934,22 @@ Namespace VBClasses
         Dim width = 25
         Dim height = 25
         Public Sub New()
-            If algTask.drawRect.Width <> 0 Then
-                random.range = algTask.drawRect
+            If task.drawRect.Width <> 0 Then
+                random.range = task.drawRect
             Else
                 random.range = New cv.Rect(msRNG.Next(0, dst2.Width - width), msRNG.Next(0, dst2.Height - height), width, height)
             End If
             random.Run(emptyMat)
-            algTask.drawRect = random.range
+            task.drawRect = random.range
 
             labels(2) = "Draw a rectangle anywhere in the image to see the stats for that region."
             desc = "Find the pixels within the drawrect and display their stats."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 Dim mean As cv.Scalar, stdev As cv.Scalar
-                cv.Cv2.MeanStdDev(src(algTask.drawRect), mean, stdev)
+                cv.Cv2.MeanStdDev(src(task.drawRect), mean, stdev)
                 Dim pt = New cv.Vec3i(mean(0), mean(1), mean(2))
                 strOut = "Mean BGR " + pt.ToString() + vbCrLf + "Stdev BGR " + stdev.ToString
             End If
@@ -975,7 +975,7 @@ Namespace VBClasses
             dst2 = mapper.dst2
 
             Static myColorMap As cv.Mat = mapper.colorMap.Clone
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 Dim samples(mapper.colorMap.Total * mapper.colorMap.ElemSize - 1) As Byte
                 Marshal.Copy(mapper.colorMap.Data, samples, 0, samples.Length)
 
@@ -1004,12 +1004,12 @@ Namespace VBClasses
                 Next
             End If
 
-            If algTask.leftView.Channels = 1 Then
-                cv.Cv2.ApplyColorMap(algTask.leftView, dst2, myColorMap)
-                cv.Cv2.ApplyColorMap(algTask.rightView, dst3, myColorMap)
+            If task.leftView.Channels = 1 Then
+                cv.Cv2.ApplyColorMap(task.leftView, dst2, myColorMap)
+                cv.Cv2.ApplyColorMap(task.rightView, dst3, myColorMap)
             Else
-                cv.Cv2.ApplyColorMap(algTask.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst2, myColorMap)
-                cv.Cv2.ApplyColorMap(algTask.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst3, myColorMap)
+                cv.Cv2.ApplyColorMap(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst2, myColorMap)
+                cv.Cv2.ApplyColorMap(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY), dst3, myColorMap)
             End If
         End Sub
     End Class

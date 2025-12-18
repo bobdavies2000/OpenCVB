@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Imports System.Text
 Namespace VBClasses
-    Module TaskExterns
+    Module Externs
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
         Public Function SemiGlobalMatching_Open(rows As Integer, cols As Integer, disparityRange As Integer) As IntPtr
         End Function

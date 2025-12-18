@@ -15,7 +15,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             If src.Type <> cv.MatType.CV_8U Then
-                If standalone And algTask.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                If standalone And task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
                     dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Else
                     dst1 = srcMustBe8U(src)
@@ -33,13 +33,13 @@ Namespace VBClasses
 
             dst2 = cellGen.dst2
 
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 DrawCircle(dst2, rc.maxDStable)
             Next
             labels(2) = cellGen.labels(2)
             labels(3) = ""
             SetTrueText("", newPoint, 1)
-            algTask.setSelectedCell()
+            task.setSelectedCell()
         End Sub
     End Class
 
@@ -60,7 +60,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             If src.Type <> cv.MatType.CV_8U Then
-                If standalone And algTask.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                If standalone And task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
                     dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Else
                     dst1 = srcMustBe8U(src)
@@ -84,7 +84,7 @@ Namespace VBClasses
             labels(2) = cellGen.labels(2)
             labels(3) = ""
             SetTrueText("", newPoint, 1)
-            algTask.setSelectedCell()
+            task.setSelectedCell()
         End Sub
     End Class
 
@@ -106,8 +106,8 @@ Namespace VBClasses
 
             dst2 = runRedList(src, labels(2))
 
-            Dim cppData(algTask.redList.rcMap.Total - 1) As Byte
-            Marshal.Copy(algTask.redList.rcMap.Data, cppData, 0, cppData.Length)
+            Dim cppData(task.redList.rcMap.Total - 1) As Byte
+            Marshal.Copy(task.redList.rcMap.Data, cppData, 0, cppData.Length)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = RedList_FindBricks_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
             handleSrc.Free()
@@ -123,8 +123,8 @@ Namespace VBClasses
             dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
             dst3.SetTo(0)
             For Each index In bricks
-                If algTask.redList.oldrclist.Count <= index Then Continue For
-                Dim rc = algTask.redList.oldrclist(index)
+                If task.redList.oldrclist.Count <= index Then Continue For
+                Dim rc = task.redList.oldrclist(index)
                 DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
             Next
@@ -175,7 +175,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 dst2 = runRedList(src, labels(2))
-                oldrclist = New List(Of oldrcData)(algTask.redList.oldrclist)
+                oldrclist = New List(Of oldrcData)(task.redList.oldrclist)
             End If
 
             Dim newCells As New List(Of oldrcData)
@@ -189,7 +189,7 @@ Namespace VBClasses
 
             oldrclist = New List(Of oldrcData)(newCells)
 
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 Dim index As Integer
                 strOut = ""
                 For Each rc In oldrclist
@@ -217,45 +217,45 @@ Namespace VBClasses
     Public Class RedList_CellsAtDepth : Inherits TaskParent
         Dim plot As New Plot_Histogram
         Public Sub New()
-            algTask.kalman = New Kalman_Basics
+            task.kalman = New Kalman_Basics
             plot.removeZeroEntry = False
-            algTask.gOptions.HistBinBar.Value = 20
+            task.gOptions.HistBinBar.Value = 20
             labels(3) = "Use mouse to select depth to highlight.  Histogram shows count of cells at each depth."
             desc = "Create a histogram of depth using RedCloud cells"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            Dim histBins = algTask.histogramBins
+            Dim histBins = task.histogramBins
             Dim slotList(histBins) As List(Of Integer)
             For i = 0 To slotList.Count - 1
                 slotList(i) = New List(Of Integer)
             Next
             Dim hist(histBins - 1) As Single
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 Dim slot As Integer
-                If rc.depth > algTask.MaxZmeters Then rc.depth = algTask.MaxZmeters
-                slot = rc.depth \ algTask.MaxZmeters * histBins)
+                If rc.depth > task.MaxZmeters Then rc.depth = task.MaxZmeters
+                slot = rc.depth \ task.MaxZmeters * histBins
                 If slot >= hist.Length Then slot = hist.Length - 1
                 slotList(slot).Add(rc.index)
                 hist(slot) += rc.pixels
             Next
 
-            algTask.kalman.kInput = hist
-            algTask.kalman.Run(emptyMat)
+            task.kalman.kInput = hist
+            task.kalman.Run(emptyMat)
 
-            Dim histMat = cv.Mat.FromPixelData(histBins, 1, cv.MatType.CV_32F, algTask.kalman.kOutput)
+            Dim histMat = cv.Mat.FromPixelData(histBins, 1, cv.MatType.CV_32F, task.kalman.kOutput)
             plot.Run(histMat)
             dst3 = plot.dst2
 
             Dim barWidth = dst3.Width / histBins
-            Dim histIndex = Math.Floor(algTask.mouseMovePoint.X / barWidth)
+            Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
             If histIndex >= slotList.Count() Then histIndex = slotList.Count() - 1
-            dst3.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst3.Height), cv.Scalar.Yellow, algTask.lineWidth)
+            dst3.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst3.Height), cv.Scalar.Yellow, task.lineWidth)
             For i = 0 To slotList(histIndex).Count - 1
-                Dim rc = algTask.redList.oldrclist(slotList(histIndex)(i))
+                Dim rc = task.redList.oldrclist(slotList(histIndex)(i))
                 DrawTour(dst2(rc.rect), rc.contour, cv.Scalar.Yellow)
-                DrawTour(algTask.color(rc.rect), rc.contour, cv.Scalar.Yellow)
+                DrawTour(task.color(rc.rect), rc.contour, cv.Scalar.Yellow)
             Next
         End Sub
     End Class
@@ -283,7 +283,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            Dim rc = algTask.oldrcD
+            Dim rc = task.oldrcD
             If rc.contour.Count > 0 Then
                 Dim shape = shapeCorrelation(rc.contour)
                 strOut = "Contour correlation for selected cell contour X to Y = " + Format(shape, fmt3) + vbCrLf + vbCrLf +
@@ -323,7 +323,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             Dim fitPoints As New List(Of cv.Point3f)
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 If rc.eq = newVec4f Then
                     rc.eq = New cv.Vec4f
                     If options.useMaskPoints Then
@@ -356,12 +356,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then dst2 = runRedList(src, labels(2))
 
-            Dim rc = algTask.oldrcD
+            Dim rc = task.oldrcD
             Dim fitPoints As New List(Of cv.Point3f)
             For Each pt In rc.contour
                 If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
                 If rc.mask.Get(Of Byte)(pt.Y, pt.X) = 0 Then Continue For
-                fitPoints.Add(algTask.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X))
+                fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X))
             Next
             rc.eq = fitDepthPlane(fitPoints)
             If standaloneTest() Then
@@ -387,11 +387,11 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then dst2 = runRedList(src, labels(2))
 
-            Dim rc = algTask.oldrcD
+            Dim rc = task.oldrcD
             Dim fitPoints As New List(Of cv.Point3f)
             For y = 0 To rc.rect.Height - 1
                 For x = 0 To rc.rect.Width - 1
-                    If rc.mask.Get(Of Byte)(y, x) Then fitPoints.Add(algTask.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x))
+                    If rc.mask.Get(Of Byte)(y, x) Then fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x))
                 Next
             Next
             rc.eq = fitDepthPlane(fitPoints)
@@ -417,7 +417,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            Dim rc = algTask.oldrcD
+            Dim rc = task.oldrcD
             If rc.mmZ.maxVal Then
                 eq.rc = rc
                 eq.Run(src)
@@ -448,13 +448,13 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            If algTask.heartBeat Or algTask.frameCount = 2 Then
+            If task.heartBeat Or task.frameCount = 2 Then
                 dst1 = dst2.Clone
                 dst3.SetTo(0)
             End If
 
             Dim currList As New List(Of cv.Point)
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 If prevList.Contains(rc.maxDStable) = False Then
                     DrawTour(dst1(rc.rect), rc.contour, white, -1)
                     DrawTour(dst1(rc.rect), rc.contour, cv.Scalar.Black)
@@ -483,13 +483,13 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            If algTask.heartBeat Or algTask.frameCount = 2 Then
+            If task.heartBeat Or task.frameCount = 2 Then
                 dst1 = dst2.Clone
                 dst3.SetTo(0)
             End If
 
             Dim currList As New List(Of cv.Point)
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
                 If prevList.Contains(rc.maxDStable) = False Then
                     DrawTour(dst1(rc.rect), rc.hull, white, -1)
@@ -511,7 +511,7 @@ Namespace VBClasses
     Public Class RedList_CellStatsPlot : Inherits TaskParent
         Dim cells As New XO_RedCell_BasicsPlot
         Public Sub New()
-            If standaloneTest() Then algTask.gOptions.displayDst1.Checked = True
+            If standaloneTest() Then task.gOptions.displayDst1.Checked = True
             cells.runRedCflag = True
             desc = "Display the stats for the selected cell"
         End Sub
@@ -589,7 +589,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             Dim count As Integer
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 If rc.age > 1 Then
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
                     count += 1
@@ -625,26 +625,26 @@ Namespace VBClasses
 
             dst2 = runRedList(src, labels(2))
 
-            Dim rc = algTask.oldrcD
+            Dim rc = task.oldrcD
 
-            dst0 = algTask.color
+            dst0 = task.color
             Dim correlationMat As New cv.Mat, correlationXtoZ As Single, correlationYtoZ As Single
             dst3.SetTo(0)
             Select Case options.selection
                 Case 0
                     Dim pt = rc.maxDist
-                    dst2.Circle(pt, algTask.DotSize, algTask.highlight, -1, cv.LineTypes.AntiAlias)
+                    dst2.Circle(pt, task.DotSize, task.highlight, -1, cv.LineTypes.AntiAlias)
                     labels(3) = "maxDist Is at (" + CStr(pt.X) + ", " + CStr(pt.Y) + ")"
                 Case 1
-                    dst3(rc.rect).SetTo(vbNearFar((rc.depth) / algTask.MaxZmeters), rc.mask)
+                    dst3(rc.rect).SetTo(vbNearFar((rc.depth) / task.MaxZmeters), rc.mask)
                     labels(3) = "rc.depth Is highlighted in dst2"
                     labels(3) = "Mean depth for the cell Is " + Format(rc.depth, fmt3)
                 Case 2
-                    cv.Cv2.MatchTemplate(algTask.pcSplit(0)(rc.rect), algTask.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
+                    cv.Cv2.MatchTemplate(task.pcSplit(0)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
                     correlationXtoZ = correlationMat.Get(Of Single)(0, 0)
                     labels(3) = "High correlation X to Z Is yellow, low correlation X to Z Is blue"
                 Case 3
-                    cv.Cv2.MatchTemplate(algTask.pcSplit(1)(rc.rect), algTask.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
+                    cv.Cv2.MatchTemplate(task.pcSplit(1)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
                     correlationYtoZ = correlationMat.Get(Of Single)(0, 0)
                     labels(3) = "High correlation Y to Z Is yellow, low correlation Y to Z Is blue"
             End Select
@@ -685,7 +685,7 @@ Namespace VBClasses
             nonFlipCells.Clear()
             dst2.SetTo(0)
             Dim currMap = DisplayCells()
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 Dim lastColor = lastMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                 Dim currColor = currMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
                 If lastColor <> currColor Then
@@ -700,8 +700,8 @@ Namespace VBClasses
 
             lastMap = currMap.Clone
 
-            If algTask.heartBeat Then
-                labels(2) = CStr(unMatched) + " of " + CStr(algTask.redList.oldrclist.Count) + " cells changed " +
+            If task.heartBeat Then
+                labels(2) = CStr(unMatched) + " of " + CStr(task.redList.oldrclist.Count) + " cells changed " +
                         " tracking color, totaling " + CStr(unMatchedPixels) + " pixels."
             End If
         End Sub
@@ -719,7 +719,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1 = runRedList(src, labels(2))
-            Dim lastCells As New List(Of oldrcData)(algTask.redList.oldrclist)
+            Dim lastCells As New List(Of oldrcData)(task.redList.oldrclist)
             flipper.Run(src)
             dst3 = flipper.dst2
 
@@ -740,7 +740,7 @@ Namespace VBClasses
                     count += 1
                 End If
             Next
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 labels(2) = CStr(flipper.flipCells.Count) + " cells flipped and " + CStr(count) + " cells " +
                         " were flipped back to the main cell."
                 labels(3) = flipper.labels(2)
@@ -790,8 +790,8 @@ Namespace VBClasses
 
             If standaloneTest() Then dst3 = PaletteFull(dst2)
 
-            If algTask.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
-            If algTask.heartBeat Then labels(3) = "Palette version of the data In dst2 With " + CStr(classCount) + " regions."
+            If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
+            If task.heartBeat Then labels(3) = "Palette version of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
         Public Sub Close()
             If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
@@ -818,9 +818,9 @@ Namespace VBClasses
             dst2 = runRedList(src, labels(2))
 
             Dim defectCount As Integer
-            algTask.redList.rcMap.SetTo(0)
+            task.redList.rcMap.SetTo(0)
             oldrclist.Clear()
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 If rc.contour.Count >= 5 Then
                     rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
                     Dim hullIndices = cv.Cv2.ConvexHullIndices(rc.hull.ToArray, False)
@@ -848,22 +848,22 @@ Namespace VBClasses
     Public Class RedList_CellDepthHistogram : Inherits TaskParent
         Dim plot As New Plot_Histogram
         Public Sub New()
-            algTask.gOptions.setHistogramBins(100)
+            task.gOptions.setHistogramBins(100)
             plot.createHistogram = True
             desc = "Display the histogram of a selected RedColor cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            If algTask.heartBeat Then
-                Dim depth As cv.Mat = algTask.pcSplit(2)(algTask.oldrcD.rect)
-                depth.SetTo(0, algTask.noDepthMask(algTask.oldrcD.rect))
+            If task.heartBeat Then
+                Dim depth As cv.Mat = task.pcSplit(2)(task.oldrcD.rect)
+                depth.SetTo(0, task.noDepthMask(task.oldrcD.rect))
                 plot.minRange = 0
-                plot.maxRange = algTask.MaxZmeters
+                plot.maxRange = task.MaxZmeters
                 plot.Run(depth)
-                labels(3) = "0 meters to " + Format(algTask.MaxZmeters, fmt0) + " meters - vertical lines every meter"
+                labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + " meters - vertical lines every meter"
 
-                Dim incr = dst2.Width / algTask.MaxZmeters
-                For i = 1 To CInt(algTask.MaxZmeters - 1)
+                Dim incr = dst2.Width / task.MaxZmeters
+                For i = 1 To CInt(task.MaxZmeters - 1)
                     Dim x = incr * i
                     vbc.DrawLine(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White)
                 Next

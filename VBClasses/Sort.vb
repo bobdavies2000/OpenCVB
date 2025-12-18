@@ -34,12 +34,12 @@ Namespace VBClasses
         Public rect As cv.Rect
         Public Sub New()
             labels(3) = "Original input to sort"
-            If standalone Then algTask.drawRect = New cv.Rect(10, 10, 50, 5)
+            If standalone Then task.drawRect = New cv.Rect(10, 10, 50, 5)
             desc = "Sort the grayscale image portion in a rect while allowing for a mask."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            Dim tmpRect = If(rect = New cv.Rect, algTask.drawRect, rect)
+            Dim tmpRect = If(rect = New cv.Rect, task.drawRect, rect)
             dst1 = src(tmpRect).Clone
             If mask IsNot Nothing Then
                 mask = mask.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
@@ -99,9 +99,9 @@ Namespace VBClasses
         Public rangeStart As New List(Of Integer)
         Public rangeEnd As New List(Of Integer)
         Public Sub New()
-            If standalone Then algTask.gOptions.displaydst1.checked = True
+            If standalone Then task.gOptions.displaydst1.checked = True
             OptionParent.findRadio("Sort all pixels descending").Checked = True
-            If standalone Then algTask.gOptions.GridSlider.Value = 10
+            If standalone Then task.gOptions.GridSlider.Value = 10
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             labels = {"", "Mask used to isolate the gray scale input to sort", "Sorted thresholded data", "Output of sort - no duplicates"}
             desc = "Take some 1-channel input, sort it, and provide the list of unique elements"
@@ -118,7 +118,7 @@ Namespace VBClasses
 
             Dim pixelsPerBlock = CInt(dst3.Total / dst2.Rows)
             Dim sq = Math.Sqrt(pixelsPerBlock)
-            algTask.gOptions.GridSlider.Value = CInt(Math.Min(sq, 10))
+            task.gOptions.GridSlider.Value = CInt(Math.Min(sq, 10))
 
             dst0 = sort.dst2.Reshape(1, dst2.Rows)
 
@@ -126,8 +126,8 @@ Namespace VBClasses
             dst3.SetTo(255)
             Dim inputCount = dups.dst3.CountNonZero
             Dim testVals As New List(Of Integer)
-            For i = 0 To Math.Min(inputCount, algTask.gridRects.Count) - 1
-                Dim roi = algTask.gridRects(i)
+            For i = 0 To Math.Min(inputCount, task.gridRects.Count) - 1
+                Dim roi = task.gridRects(i)
                 Dim val = CInt(dups.dst3.Get(Of Byte)(0, i))
                 testVals.Add(val)
                 dst3(roi).SetTo(val)
@@ -159,7 +159,7 @@ Namespace VBClasses
         Dim dups As New ML_RemoveDups_CPP
         Dim bgra As cv.Mat
         Public Sub New()
-            If standalone Then algTask.gOptions.displaydst1.checked = True
+            If standalone Then task.gOptions.displaydst1.checked = True
             OptionParent.findRadio("Sort all pixels descending").Checked = True
             labels = {"", "The BGRA input to sort - shown here as 1-channel CV_32S format", "Output of sort - no duplicates", "Input before removing the dups - use slider to increase/decrease the amount of data"}
             desc = "Take some 3-channel input, convert it to BGRA, sort it as integers, and provide the list of unique elements"
@@ -243,7 +243,7 @@ Namespace VBClasses
 
             Dim split = src.Split()
             For i = 0 To 2
-                If algTask.firstPass Then ReDim pixels(i)(src.Total - 1)
+                If task.firstPass Then ReDim pixels(i)(src.Total - 1)
                 Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
             Next
 
@@ -279,7 +279,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim split = src.Split()
             For i = 0 To 2
-                If algTask.firstPass Then ReDim pixels(i)(src.Total - 1)
+                If task.firstPass Then ReDim pixels(i)(src.Total - 1)
                 Marshal.Copy(split(i).Data, pixels(i), 0, pixels(i).Length)
             Next
 

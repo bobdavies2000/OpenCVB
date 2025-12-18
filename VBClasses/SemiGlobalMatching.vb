@@ -9,7 +9,7 @@ Namespace VBClasses
             desc = "Find depth using the semi-global matching algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.frameCount < 10 Then Exit Sub
+            If task.frameCount < 10 Then Exit Sub
 
             'If leftData.Length <> src.Total Then
             '    ReDim leftData(src.Total - 1)
@@ -17,17 +17,17 @@ Namespace VBClasses
             '    cPtr = SemiGlobalMatching_Open(src.Rows, src.Cols, 3)
             'End If
 
-            'Marshal.Copy(algTask.leftView.Data, leftData, 0, leftData.Length)
-            'Marshal.Copy(algTask.rightView.Data, rightData, 0, rightData.Length)
+            'Marshal.Copy(task.leftView.Data, leftData, 0, leftData.Length)
+            'Marshal.Copy(task.rightView.Data, rightData, 0, rightData.Length)
 
             'Dim handleLeft = GCHandle.Alloc(leftData, GCHandleType.Pinned)
             'Dim handleRight = GCHandle.Alloc(rightData, GCHandleType.Pinned)
             'Dim imagePtr = SemiGlobalMatching_Run(cPtr, handleLeft.AddrOfPinnedObject(), handleRight.AddrOfPinnedObject(),
-            '                                      algTask.leftView.Rows, algTask.leftView.Cols)
+            '                                      task.leftView.Rows, task.leftView.Cols)
             'handleLeft.Free()
             'handleRight.Free()
 
-            'Dim dst2 = New cv.Mat(algTask.leftView.Rows, algTask.leftView.Cols, cv.MatType.CV_8U, imagePtr)
+            'Dim dst2 = New cv.Mat(task.leftView.Rows, task.leftView.Cols, cv.MatType.CV_8U, imagePtr)
             SetTrueText("This algorithm runs but always returns zero - a bug in the C++ algorithm as ported?" + vbCrLf +
                         "Needs work but investing further is not needed - we have disparity from the device.", 3)
         End Sub

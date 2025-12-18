@@ -77,7 +77,7 @@ Namespace VBClasses
             Next
 
             Dim saveWaitTime As String = ""
-            Dim PercentTimes As New SortedList(Of Single, String)(New compareAllowIdenticalSingle)
+            Dim PercentTimes As New SortedList(Of Single, String)(New compareAllowIdenticalSingleInverted)
             Dim percentStr As String = ""
             For i = 0 To algorithm_ms.Count - 1
                 algorithm_ms(i) /= sumTime
