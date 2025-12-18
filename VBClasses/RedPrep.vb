@@ -9,7 +9,7 @@ Namespace VBClasses
             desc = "Reduction transform for the point cloud"
         End Sub
         Private Function reduceChan(chan As cv.Mat, noDepthmask As cv.Mat) As cv.Mat
-            chan *= algTask.reductionTarget
+            chan *= task.reductionTarget
             Dim mm As mmData = GetMinMax(chan)
             Dim dst32f As New cv.Mat
             If Math.Abs(mm.minVal) > mm.maxVal Then
@@ -27,20 +27,20 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Type <> cv.MatType.CV_32FC3 Then src = algTask.pointCloud.Clone
+            If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
 
             Dim pc32S As New cv.Mat
-            src.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / algTask.reductionTarget)
+            src.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.reductionTarget)
             Dim split = pc32S.Split()
 
             dst2.SetTo(0)
             Dim saveNoDepth As cv.Mat = Nothing
-            If src.Size <> algTask.workRes Then
-                saveNoDepth = algTask.noDepthMask.Clone
-                algTask.noDepthMask = algTask.noDepthMask.Resize(src.Size)
+            If src.Size <> task.workRes Then
+                saveNoDepth = task.noDepthMask.Clone
+                task.noDepthMask = task.noDepthMask.Resize(src.Size)
             End If
             If options.PrepX Then
-                prepEdges.Run(reduceChan(split(0), algTask.noDepthMask))
+                prepEdges.Run(reduceChan(split(0), task.noDepthMask))
                 If dst2.Size <> src.Size Then
                     dst2 = dst2.Resize(src.Size)
                     dst2 = dst2 Or prepEdges.dst3
@@ -50,12 +50,12 @@ Namespace VBClasses
             End If
 
             If options.PrepY Then
-                prepEdges.Run(reduceChan(split(1), algTask.noDepthMask))
+                prepEdges.Run(reduceChan(split(1), task.noDepthMask))
                 dst2 = dst2 Or prepEdges.dst3
             End If
 
             If options.PrepZ Then
-                prepEdges.Run(reduceChan(split(2), algTask.noDepthMask))
+                prepEdges.Run(reduceChan(split(2), task.noDepthMask))
                 dst2 = dst2 Or prepEdges.dst3
             End If
 
@@ -66,8 +66,8 @@ Namespace VBClasses
             ' this rectangle prevents bleeds at the image edges.  It is necessary.  Test without it to see the impact.
             dst2.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), 255, 2)
 
-            If src.Size <> algTask.workRes Then algTask.noDepthMask = saveNoDepth.Clone
-            labels(2) = "Using reduction factor = " + CStr(algTask.reductionTarget)
+            If src.Size <> task.workRes Then task.noDepthMask = saveNoDepth.Clone
+            labels(2) = "Using reduction factor = " + CStr(task.reductionTarget)
         End Sub
     End Class
 
@@ -86,22 +86,22 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim inputX(algTask.pcSplit(0).Total * algTask.pcSplit(0).ElemSize - 1) As Byte
-            Dim inputY(algTask.pcSplit(1).Total * algTask.pcSplit(1).ElemSize - 1) As Byte
+            Dim inputX(task.pcSplit(0).Total * task.pcSplit(0).ElemSize - 1) As Byte
+            Dim inputY(task.pcSplit(1).Total * task.pcSplit(1).ElemSize - 1) As Byte
 
-            Marshal.Copy(algTask.pcSplit(0).Data, inputX, 0, inputX.Length)
-            Marshal.Copy(algTask.pcSplit(1).Data, inputY, 0, inputY.Length)
+            Marshal.Copy(task.pcSplit(0).Data, inputX, 0, inputX.Length)
+            Marshal.Copy(task.pcSplit(1).Data, inputY, 0, inputY.Length)
 
             Dim handleX = GCHandle.Alloc(inputX, GCHandleType.Pinned)
             Dim handleY = GCHandle.Alloc(inputY, GCHandleType.Pinned)
 
             Dim imagePtr = PrepXY_Run(cPtr, handleX.AddrOfPinnedObject(), handleY.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                  algTask.xRange, algTask.yRange, algTask.histogramBins)
+                                  task.xRange, task.yRange, task.histogramBins)
             handleX.Free()
             handleY.Free()
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-            dst2.SetTo(0, algTask.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
 
             dst3 = PaletteBlackZero(dst2)
         End Sub
@@ -128,14 +128,14 @@ Namespace VBClasses
             For i = 0 To 1
                 Select Case i
                     Case 0 ' X Reduction
-                        dst1 = algTask.pcSplit(0)
-                        ranges = New cv.Rangef() {New cv.Rangef(-algTask.xRange, algTask.xRange)}
+                        dst1 = task.pcSplit(0)
+                        ranges = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange)}
                     Case 1 ' Y Reduction
-                        dst1 = algTask.pcSplit(1)
-                        ranges = New cv.Rangef() {New cv.Rangef(-algTask.yRange, algTask.yRange)}
+                        dst1 = task.pcSplit(1)
+                        ranges = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange)}
                 End Select
 
-                cv.Cv2.CalcHist({dst1}, {0}, algTask.depthMask, histogram, 1, {algTask.histogramBins}, ranges)
+                cv.Cv2.CalcHist({dst1}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
                 Dim histArray(histogram.Total - 1) As Single
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -152,9 +152,9 @@ Namespace VBClasses
             Next
 
             dst3.ConvertTo(dst2, cv.MatType.CV_8U)
-            dst2.SetTo(0, algTask.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
 
-            labels(2) = CStr(algTask.histogramBins * 2 - zeroCount) + " depth regions mapped (control with histogram bins.)"
+            labels(2) = CStr(task.histogramBins * 2 - zeroCount) + " depth regions mapped (control with histogram bins.)"
         End Sub
     End Class
 
@@ -211,7 +211,7 @@ Namespace VBClasses
         Public options As New Options_RedCloud
         Public options1 As New Options_HistPointCloud
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Reduction transform for the point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -219,12 +219,12 @@ Namespace VBClasses
             options1.Run()
 
             Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
-            Dim reduceAmt = algTask.reductionTarget
-            algTask.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
-            algTask.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
-            algTask.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
+            Dim reduceAmt = task.reductionTarget
+            task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reduceAmt)
+            task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
+            task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
 
-            Select Case algTask.reductionName
+            Select Case task.reductionName
                 Case "X Reduction"
                     dst0 = split(0) * reduceAmt
                 Case "Y Reduction"
@@ -253,7 +253,7 @@ Namespace VBClasses
             dst2 = (dst0 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-            dst2.SetTo(0, algTask.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
 
             If standaloneTest() Then
                 mm = GetMinMax(dst2)
@@ -335,12 +335,12 @@ Namespace VBClasses
             handleSrc.Free()
 
             dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
-            If src.Size <> algTask.noDepthMask.Size Then
-                dst3.SetTo(255, algTask.noDepthMask.Resize(src.Size))
+            If src.Size <> task.noDepthMask.Size Then
+                dst3.SetTo(255, task.noDepthMask.Resize(src.Size))
                 dst2 = dst2.Resize(src.Size)
                 dst2.SetTo(0, dst3)
             Else
-                dst3.SetTo(255, algTask.noDepthMask)
+                dst3.SetTo(255, task.noDepthMask)
                 dst2.SetTo(0, dst3)
             End If
         End Sub
@@ -362,7 +362,7 @@ Namespace VBClasses
             desc = "Reduction transform for the point cloud"
         End Sub
         Private Function reduceChan(chan As cv.Mat) As cv.Mat
-            chan *= algTask.reductionTarget
+            chan *= task.reductionTarget
             Dim mm As mmData = GetMinMax(chan)
             Dim dst32f As New cv.Mat
             If Math.Abs(mm.minVal) > mm.maxVal Then
@@ -374,14 +374,14 @@ Namespace VBClasses
             End If
             chan = (chan - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
             chan.ConvertTo(chan, cv.MatType.CV_8U)
-            chan.SetTo(0, algTask.noDepthMask)
+            chan.SetTo(0, task.noDepthMask)
             Return chan
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
             Dim pc32S As New cv.Mat
-            algTask.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / algTask.reductionTarget)
+            task.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / task.reductionTarget)
             Dim split = pc32S.Split()
 
             dst2.SetTo(0)
@@ -403,10 +403,10 @@ Namespace VBClasses
             redSimple.Run(src)
             edges.Run(redSimple.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             dst3 = edges.dst2
-            dst3.CopyTo(dst2, algTask.noDepthMask)
+            dst3.CopyTo(dst2, task.noDepthMask)
 
-            dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, algTask.lineWidth)
-            labels(2) = "Using reduction factor = " + CStr(algTask.reductionTarget)
+            dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, task.lineWidth)
+            labels(2) = "Using reduction factor = " + CStr(task.reductionTarget)
         End Sub
     End Class
 
@@ -426,7 +426,7 @@ Namespace VBClasses
             dst2 = edges.dst2
             labels(2) = edges.labels(2)
 
-            dst2.SetTo(0, algTask.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
         End Sub
     End Class
 
@@ -447,7 +447,7 @@ Namespace VBClasses
             dst2 = edges.dst2
             labels(2) = edges.labels(2)
 
-            dst2.SetTo(0, algTask.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
         End Sub
     End Class
 
@@ -466,7 +466,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             edges.Run(src)
             dst2 = edges.dst2
-            dst2.SetTo(0, algTask.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
 
             labels(2) = edges.labels(2)
         End Sub
@@ -497,8 +497,8 @@ Namespace VBClasses
 
             vCells.Clear()
             hCells.Clear()
-            For Each rc In algTask.redList.oldrclist
-                If rc.depth >= algTask.MaxZmeters Then Continue For
+            For Each rc In task.redList.oldrclist
+                If rc.depth >= task.MaxZmeters Then Continue For
                 Dim tmp As cv.Mat = verts.dst2(rc.rect) And rc.mask
                 If tmp.CountNonZero / rc.pixels > 0.5 Then
                     DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
@@ -512,7 +512,7 @@ Namespace VBClasses
                 End If
             Next
 
-            Dim rcX = algTask.oldrcD
+            Dim rcX = task.oldrcD
             SetTrueText("mean depth = " + Format(rcX.depth, "0.0"), 3)
         End Sub
     End Class
@@ -530,7 +530,7 @@ Namespace VBClasses
             dst2 = runRedList(src, labels(2))
 
             dst3.SetTo(0)
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 If rc.depthPixels / rc.pixels > 0.5 Then dst3(rc.rect).SetTo(rc.color, rc.mask)
             Next
         End Sub
@@ -549,20 +549,20 @@ Namespace VBClasses
             desc = "If a RedCloud cell has no motion, it is preserved."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.motionRect.Width = 0 Then Exit Sub ' full image stable means nothing needs to be done...
+            If task.motionRect.Width = 0 Then Exit Sub ' full image stable means nothing needs to be done...
             runRedList(src, labels(2))
-            If algTask.redList.oldrclist.Count = 0 Then Exit Sub
+            If task.redList.oldrclist.Count = 0 Then Exit Sub
 
-            Static rcLastList As New List(Of oldrcData)(algTask.redList.oldrclist)
+            Static rcLastList As New List(Of oldrcData)(task.redList.oldrclist)
 
             Dim count As Integer
             dst1.SetTo(0)
-            algTask.redList.oldrclist.RemoveAt(0)
+            task.redList.oldrclist.RemoveAt(0)
             'Dim newList As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
             Dim newList As New List(Of oldrcData), tmp As New cv.Mat
             Dim countMaxD As Integer, countMissedMaxD As Integer
-            For Each rc In algTask.redList.oldrclist
-                tmp = algTask.motionMask(rc.rect) And rc.mask
+            For Each rc In task.redList.oldrclist
+                tmp = task.motionMask(rc.rect) And rc.mask
                 If tmp.CountNonZero = 0 Then
                     If rc.indexLast <> 0 And rc.indexLast < rcLastList.Count Then
                         Dim lrc = rcLastList(rc.indexLast)
@@ -582,25 +582,25 @@ Namespace VBClasses
                 End If
                 dst1(rc.rect).SetTo(255, rc.mask)
             Next
-            labels(3) = CStr(count) + " of " + CStr(algTask.redList.oldrclist.Count) + " redCloud cells had motion." +
+            labels(3) = CStr(count) + " of " + CStr(task.redList.oldrclist.Count) + " redCloud cells had motion." +
                     "  There were " + CStr(countMaxD) + " maxDstable matches and " + CStr(countMissedMaxD) + " misses"
 
-            algTask.redList.oldrclist.Clear()
-            algTask.redList.oldrclist.Add(New oldrcData)
+            task.redList.oldrclist.Clear()
+            task.redList.oldrclist.Add(New oldrcData)
             For Each rc In newList
-                rc.index = algTask.redList.oldrclist.Count
-                algTask.redList.oldrclist.Add(rc)
+                rc.index = task.redList.oldrclist.Count
+                task.redList.oldrclist.Add(rc)
             Next
 
-            rcLastList = New List(Of oldrcData)(algTask.redList.oldrclist)
+            rcLastList = New List(Of oldrcData)(task.redList.oldrclist)
 
             dst3.SetTo(0)
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
-            dst2 = RebuildRCMap(algTask.redList.oldrclist)
-            algTask.setSelectedCell()
+            dst2 = RebuildRCMap(task.redList.oldrclist)
+            task.setSelectedCell()
         End Sub
     End Class
 
@@ -620,9 +620,9 @@ Namespace VBClasses
             dst2 = hColor.dst3
             labels(2) = hColor.labels(3)
 
-            dst3 = algTask.redList.rcMap
-            dst3.SetTo(0, algTask.noDepthMask)
-            labels(3) = algTask.redList.labels(2)
+            dst3 = task.redList.rcMap
+            dst3.SetTo(0, task.noDepthMask)
+            labels(3) = task.redList.labels(2)
         End Sub
     End Class
 
@@ -638,16 +638,16 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             runRedList(src, labels(3))
 
-            Dim lastCells As New List(Of oldrcData)(algTask.redList.oldrclist)
-            Dim lastMap As cv.Mat = algTask.redList.rcMap.Clone
+            Dim lastCells As New List(Of oldrcData)(task.redList.oldrclist)
+            Dim lastMap As cv.Mat = task.redList.rcMap.Clone
             Dim lastColors As cv.Mat = dst3.Clone
 
             Dim newCells As New List(Of oldrcData)
-            algTask.redList.rcMap.SetTo(0)
+            task.redList.rcMap.SetTo(0)
             dst3.SetTo(0)
             Dim usedColors = New List(Of cv.Scalar)({black})
             Dim unmatched As Integer
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 Dim index = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If index < lastCells.Count Then
                     rc.color = lastColors.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X).ToVec3f
@@ -660,19 +660,19 @@ Namespace VBClasses
                 End If
                 usedColors.Add(rc.color)
 
-                If algTask.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) = 0 Then
-                    rc.index = algTask.redList.oldrclist.Count
+                If task.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) = 0 Then
+                    rc.index = task.redList.oldrclist.Count
                     newCells.Add(rc)
-                    algTask.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                    task.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
                 End If
             Next
 
-            algTask.redList.oldrclist = New List(Of oldrcData)(newCells)
-            labels(3) = CStr(algTask.redList.oldrclist.Count) + " cells were identified."
-            labels(2) = algTask.redList.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
+            task.redList.oldrclist = New List(Of oldrcData)(newCells)
+            labels(3) = CStr(task.redList.oldrclist.Count) + " cells were identified."
+            labels(2) = task.redList.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
 
-            If algTask.redList.oldrclist.Count > 0 Then dst2 = PaletteFull(lastMap)
+            If task.redList.oldrclist.Count > 0 Then dst2 = PaletteFull(lastMap)
         End Sub
     End Class
 End Namespace

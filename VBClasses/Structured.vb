@@ -15,15 +15,15 @@ Namespace VBClasses
             linesX.Run(struct.dst2)
 
             dst2 = src.Clone
-            algTask.FeatureSampleSize = 1000 ' want all the lines 
+            task.FeatureSampleSize = 1000 ' want all the lines 
             lpListX = New List(Of lpData)(linesX.lpList)
             For Each lp In linesX.lpList
                 DrawLine(dst2, lp)
             Next
 
-            algTask.FeatureSampleSize = 1000 ' want all the lines 
+            task.FeatureSampleSize = 1000 ' want all the lines 
             linesY.Run(struct.dst3)
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 labels(2) = linesX.labels(2)
                 labels(3) = linesY.labels(2)
             End If
@@ -49,31 +49,31 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2.SetTo(0)
             Dim depthMask As New cv.Mat
-            For yCoordinate = 0 To src.Height - 1 Step algTask.brickSize
-                Dim sliceY = -algTask.yRange * (algTask.sideCameraPoint.Y - yCoordinate) / algTask.sideCameraPoint.Y
-                If yCoordinate > algTask.sideCameraPoint.Y Then
-                    sliceY = algTask.yRange * (yCoordinate - algTask.sideCameraPoint.Y) / (dst3.Height - algTask.sideCameraPoint.Y)
+            For yCoordinate = 0 To src.Height - 1 Step task.brickSize
+                Dim sliceY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+                If yCoordinate > task.sideCameraPoint.Y Then
+                    sliceY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
                 End If
-                Dim minVal = sliceY - algTask.metersPerPixel
-                Dim maxVal = sliceY + algTask.metersPerPixel
-                depthMask = algTask.pcSplit(1).InRange(minVal, maxVal)
+                Dim minVal = sliceY - task.metersPerPixel
+                Dim maxVal = sliceY + task.metersPerPixel
+                depthMask = task.pcSplit(1).InRange(minVal, maxVal)
                 dst2.SetTo(255, depthMask)
-                If minVal < 0 And maxVal > 0 Then dst2.SetTo(0, algTask.noDepthMask)
+                If minVal < 0 And maxVal > 0 Then dst2.SetTo(0, task.noDepthMask)
             Next
 
             dst3.SetTo(0)
-            For xCoordinate = 0 To src.Width - 1 Step algTask.brickSize
-                Dim sliceX = -algTask.xRange * (algTask.topCameraPoint.X - xCoordinate) / algTask.topCameraPoint.X
-                If xCoordinate > algTask.topCameraPoint.X Then
-                    sliceX = algTask.xRange * (xCoordinate - algTask.topCameraPoint.X) / (dst3.Width - algTask.topCameraPoint.X)
+            For xCoordinate = 0 To src.Width - 1 Step task.brickSize
+                Dim sliceX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+                If xCoordinate > task.topCameraPoint.X Then
+                    sliceX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
                 End If
-                Dim minVal = sliceX - algTask.metersPerPixel
-                Dim maxVal = sliceX + algTask.metersPerPixel
-                depthMask = algTask.pcSplit(0).InRange(minVal, maxVal)
+                Dim minVal = sliceX - task.metersPerPixel
+                Dim maxVal = sliceX + task.metersPerPixel
+                depthMask = task.pcSplit(0).InRange(minVal, maxVal)
                 dst3.SetTo(255, depthMask)
-                If minVal < 0 And maxVal > 0 Then dst3.SetTo(0, algTask.noDepthMask)
+                If minVal < 0 And maxVal > 0 Then dst3.SetTo(0, task.noDepthMask)
             Next
-            labels = {"", "", "Horizontal depth lines with cell size = " + CStr(algTask.brickSize), "Vertical depth lines with cell size = " + CStr(algTask.brickSize)}
+            labels = {"", "", "Horizontal depth lines with cell size = " + CStr(task.brickSize), "Vertical depth lines with cell size = " + CStr(task.brickSize)}
         End Sub
     End Class
 
@@ -111,20 +111,20 @@ Namespace VBClasses
         Dim plot As New Plot_Histogram
         Dim counts As New List(Of Single)
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Structured Slice heatmap input - red line is max", "Max Slice output - likely vertical surface", "Histogram of pixel counts in each slice"}
             desc = "Count the number of pixels found in each slice of the point cloud data."
         End Sub
         Private Function makeXSlice(index As Integer) As cv.Mat
             Dim sliceMask As New cv.Mat
 
-            Dim planeX = -algTask.xRange * (algTask.topCameraPoint.X - index) / algTask.topCameraPoint.X
-            If index > algTask.topCameraPoint.X Then planeX = algTask.xRange * (index - algTask.topCameraPoint.X) / (dst3.Width - algTask.topCameraPoint.X)
+            Dim planeX = -task.xRange * (task.topCameraPoint.X - index) / task.topCameraPoint.X
+            If index > task.topCameraPoint.X Then planeX = task.xRange * (index - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
 
-            Dim minVal = planeX - algTask.metersPerPixel
-            Dim maxVal = planeX + algTask.metersPerPixel
-            cv.Cv2.InRange(algTask.pcSplit(0).Clone, minVal, maxVal, sliceMask)
-            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, algTask.noDepthMask) ' don't include zero depth locations
+            Dim minVal = planeX - task.metersPerPixel
+            Dim maxVal = planeX + task.metersPerPixel
+            cv.Cv2.InRange(task.pcSplit(0).Clone, minVal, maxVal, sliceMask)
+            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask) ' don't include zero depth locations
             counts.Add(sliceMask.CountNonZero)
             Return sliceMask
         End Function
@@ -140,7 +140,7 @@ Namespace VBClasses
             Dim max = counts.Max
             Dim index = counts.IndexOf(max)
             dst0 = makeXSlice(index)
-            dst2 = algTask.color.Clone
+            dst2 = task.color.Clone
             dst2.SetTo(white, dst0)
             dst1.Line(New cv.Point(index, 0), New cv.Point(index, dst1.Height), cv.Scalar.Red, slice.options.sliceSize)
 
@@ -175,18 +175,18 @@ Namespace VBClasses
 
             sliceMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             For yCoordinate = 0 To src.Height - 1 Step stepsize
-                Dim planeY = -algTask.yRange * (algTask.sideCameraPoint.Y - yCoordinate) / algTask.sideCameraPoint.Y
-                If yCoordinate > algTask.sideCameraPoint.Y Then planeY = algTask.yRange * (yCoordinate - algTask.sideCameraPoint.Y) / (dst3.Height - algTask.sideCameraPoint.Y)
+                Dim planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+                If yCoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
                 Dim depthMask As New cv.Mat
                 Dim minVal As Double, maxVal As Double
-                minVal = planeY - algTask.metersPerPixel
-                maxVal = planeY + algTask.metersPerPixel
-                cv.Cv2.InRange(algTask.pcSplit(1).Clone, minVal, maxVal, depthMask)
+                minVal = planeY - task.metersPerPixel
+                maxVal = planeY + task.metersPerPixel
+                cv.Cv2.InRange(task.pcSplit(1).Clone, minVal, maxVal, depthMask)
                 sliceMask.SetTo(255, depthMask)
-                If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, algTask.noDepthMask)
+                If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
             Next
 
-            dst2 = algTask.color.Clone
+            dst2 = task.color.Clone
             dst2.SetTo(white, sliceMask)
             labels(3) = heat.labels(3)
         End Sub
@@ -209,22 +209,22 @@ Namespace VBClasses
             multi.Run(src)
             dst3 = multi.heat.dst2
 
-            Dim col = If(algTask.mouseMovePoint.X = 0, dst2.Width / 2, algTask.mouseMovePoint.X)
+            Dim col = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
 
             Dim rect = New cv.Rect(col, 0, If(col + options.sliceSize >= dst3.Width, dst3.Width - col,
                                options.sliceSize), dst3.Height - 1)
             Dim mm As mmData = GetMinMax(multi.heat.topframes.dst2(rect))
 
-            DrawCircle(dst3, New cv.Point(col, mm.maxLoc.Y), algTask.DotSize + 3, cv.Scalar.Yellow)
+            DrawCircle(dst3, New cv.Point(col, mm.maxLoc.Y), task.DotSize + 3, cv.Scalar.Yellow)
 
-            dst2 = algTask.color.Clone
-            Dim filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * algTask.MaxZmeters
+            dst2 = task.color.Clone
+            Dim filterZ = (dst3.Height - mm.maxLoc.Y) / dst3.Height * task.MaxZmeters
             If filterZ > 0 Then
-                Dim depthMask = algTask.pcSplit(2).InRange(filterZ - 0.05, filterZ + 0.05) ' a 10 cm buffer surrounding the z value
+                Dim depthMask = task.pcSplit(2).InRange(filterZ - 0.05, filterZ + 0.05) ' a 10 cm buffer surrounding the z value
                 dst2.SetTo(white, depthMask)
             End If
 
-            labels(3) = "Peak histogram count (" + Format(mm.maxVal, fmt0) + ") at " + Format(filterZ, fmt2) + " meters +-" + Format(5 / dst2.Height / algTask.MaxZmeters, fmt2) + " m"
+            labels(3) = "Peak histogram count (" + Format(mm.maxVal, fmt0) + ") at " + Format(filterZ, fmt2) + " meters +-" + Format(5 / dst2.Height / task.MaxZmeters, fmt2) + " m"
             SetTrueText("Use the mouse to move the yellow dot above.", New cv.Point(10, dst2.Height * 7 / 8), 3)
         End Sub
     End Class
@@ -247,21 +247,21 @@ Namespace VBClasses
             multi.Run(src)
             dst3 = multi.heat.dst3
 
-            Dim row = If(algTask.mouseMovePoint.Y = 0, dst2.Height / 2, algTask.mouseMovePoint.Y)
+            Dim row = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
 
             Dim rect = New cv.Rect(0, row, dst3.Width - 1, If(row + options.sliceSize >= dst3.Height,
                                dst3.Height - row, options.sliceSize))
             Dim mm As mmData = GetMinMax(multi.heat.sideframes.dst2(rect))
 
             If mm.maxVal > 0 Then
-                DrawCircle(dst3, New cv.Point(mm.maxLoc.X, row), algTask.DotSize + 3, cv.Scalar.Yellow)
-                ' dst3.Line(New cv.Point(mm.maxLoc.X, 0), New cv.Point(mm.maxLoc.X, dst3.Height), algTask.highlight, algTask.lineWidth, algTask.lineType)
-                Dim filterZ = mm.maxLoc.X / dst3.Width * algTask.MaxZmeters
+                DrawCircle(dst3, New cv.Point(mm.maxLoc.X, row), task.DotSize + 3, cv.Scalar.Yellow)
+                ' dst3.Line(New cv.Point(mm.maxLoc.X, 0), New cv.Point(mm.maxLoc.X, dst3.Height), task.highlight, task.lineWidth, task.lineType)
+                Dim filterZ = mm.maxLoc.X / dst3.Width * task.MaxZmeters
 
-                Dim depthMask = algTask.pcSplit(2).InRange(filterZ - 0.05, filterZ + 0.05) ' a 10 cm buffer surrounding the z value
-                dst2 = algTask.color.Clone
+                Dim depthMask = task.pcSplit(2).InRange(filterZ - 0.05, filterZ + 0.05) ' a 10 cm buffer surrounding the z value
+                dst2 = task.color.Clone
                 dst2.SetTo(white, depthMask)
-                Dim pixelsPerMeter = dst2.Width / algTask.MaxZmeters
+                Dim pixelsPerMeter = dst2.Width / task.MaxZmeters
                 labels(3) = "Peak histogram count (" + Format(mm.maxVal, fmt0) + ") at " + Format(filterZ, fmt2) + " meters +-" + Format(5 / pixelsPerMeter, fmt2) + " m"
             End If
             SetTrueText("Use the mouse to move the yellow dot above.", New cv.Point(10, dst2.Height * 7 / 8), 3)
@@ -287,25 +287,25 @@ Namespace VBClasses
             Static topRadio = OptionParent.findCheckBox("Top View (Unchecked Side View)")
             Dim topView = topRadio.checked
 
-            Dim sliceVal = If(topView, algTask.mouseMovePoint.X, algTask.mouseMovePoint.Y)
+            Dim sliceVal = If(topView, task.mouseMovePoint.X, task.mouseMovePoint.Y)
             heat.Run(src)
 
             Dim minVal As Double, maxVal As Double
             If topView Then
-                Dim planeX = -algTask.xRange * (algTask.topCameraPoint.X - sliceVal) / algTask.topCameraPoint.X
-                If sliceVal > algTask.topCameraPoint.X Then planeX = algTask.xRange * (sliceVal - algTask.topCameraPoint.X) / (dst3.Width - algTask.topCameraPoint.X)
-                minVal = planeX - algTask.metersPerPixel
-                maxVal = planeX + algTask.metersPerPixel
-                sliceMask = algTask.pcSplit(0).InRange(minVal, maxVal)
+                Dim planeX = -task.xRange * (task.topCameraPoint.X - sliceVal) / task.topCameraPoint.X
+                If sliceVal > task.topCameraPoint.X Then planeX = task.xRange * (sliceVal - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
+                minVal = planeX - task.metersPerPixel
+                maxVal = planeX + task.metersPerPixel
+                sliceMask = task.pcSplit(0).InRange(minVal, maxVal)
             Else
-                Dim planeY = -algTask.yRange * (algTask.sideCameraPoint.Y - sliceVal) / algTask.sideCameraPoint.Y
-                If sliceVal > algTask.sideCameraPoint.Y Then planeY = algTask.yRange * (sliceVal - algTask.sideCameraPoint.Y) / (dst3.Height - algTask.sideCameraPoint.Y)
-                minVal = planeY - algTask.metersPerPixel
-                maxVal = planeY + algTask.metersPerPixel
-                sliceMask = algTask.pcSplit(1).InRange(minVal, maxVal)
+                Dim planeY = -task.yRange * (task.sideCameraPoint.Y - sliceVal) / task.sideCameraPoint.Y
+                If sliceVal > task.sideCameraPoint.Y Then planeY = task.yRange * (sliceVal - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+                minVal = planeY - task.metersPerPixel
+                maxVal = planeY + task.metersPerPixel
+                sliceMask = task.pcSplit(1).InRange(minVal, maxVal)
             End If
 
-            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, algTask.noDepthMask)
+            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
 
             labels(2) = "At offset " + CStr(sliceVal) + " x = " + Format((maxVal + minVal) / 2, fmt2) + " with " +
                  Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
@@ -313,11 +313,11 @@ Namespace VBClasses
             labels(3) = heat.labels(3)
 
             dst3 = heat.dst3
-            DrawCircle(dst3, New cv.Point(algTask.topCameraPoint.X, dst3.Height), algTask.DotSize,
+            DrawCircle(dst3, New cv.Point(task.topCameraPoint.X, dst3.Height), task.DotSize,
                     cv.Scalar.Yellow)
             If topView Then
                 dst3.Line(New cv.Point(sliceVal, 0), New cv.Point(sliceVal, dst3.Height),
-                      cv.Scalar.Yellow, algTask.lineWidth)
+                      cv.Scalar.Yellow, task.lineWidth)
             Else
                 Dim yPlaneOffset = If(sliceVal < dst3.Height - options.sliceSize, CInt(sliceVal),
                                   dst3.Height - options.sliceSize - 1)
@@ -351,26 +351,26 @@ Namespace VBClasses
             options.Run()
 
             Dim sliceMask As New cv.Mat
-            Dim ycoordinate = If(algTask.mouseMovePoint.Y = 0, dst2.Height / 2, algTask.mouseMovePoint.Y)
+            Dim ycoordinate = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
 
-            Dim planeY = -algTask.yRange * (algTask.sideCameraPoint.Y - ycoordinate) / algTask.sideCameraPoint.Y
-            If ycoordinate > algTask.sideCameraPoint.Y Then planeY = algTask.yRange * (ycoordinate - algTask.sideCameraPoint.Y) / (dst3.Height - algTask.sideCameraPoint.Y)
+            Dim planeY = -task.yRange * (task.sideCameraPoint.Y - ycoordinate) / task.sideCameraPoint.Y
+            If ycoordinate > task.sideCameraPoint.Y Then planeY = task.yRange * (ycoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
 
-            Dim thicknessMeters = options.sliceSize * algTask.metersPerPixel
+            Dim thicknessMeters = options.sliceSize * task.metersPerPixel
             Dim minVal = planeY - thicknessMeters
             Dim maxVal = planeY + thicknessMeters
-            cv.Cv2.InRange(algTask.pcSplit(1), minVal, maxVal, sliceMask)
+            cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
 
             labels(2) = "At offset " + CStr(ycoordinate) + " y = " + Format((maxVal + minVal) / 2, fmt2) + " with " +
                     Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
-            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, algTask.noDepthMask)
+            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
 
             Return sliceMask
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim sliceMask = createSliceMaskH()
 
-            histTop.Run(algTask.pointCloud.SetTo(0, Not sliceMask))
+            histTop.Run(task.pointCloud.SetTo(0, Not sliceMask))
             dst3 = histTop.dst2
 
             If standaloneTest() Then
@@ -396,28 +396,28 @@ Namespace VBClasses
             options.Run()
 
             Dim sliceMask As New cv.Mat
-            If algTask.mouseMovePoint = newPoint Then algTask.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
-            Dim xCoordinate = If(algTask.mouseMovePoint.X = 0, dst2.Width / 2, algTask.mouseMovePoint.X)
+            If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
+            Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
 
-            Dim planeX = -algTask.xRange * (algTask.topCameraPoint.X - xCoordinate) / algTask.topCameraPoint.X
-            If xCoordinate > algTask.topCameraPoint.X Then planeX = algTask.xRange * (xCoordinate - algTask.topCameraPoint.X) / (dst3.Width - algTask.topCameraPoint.X)
+            Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+            If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
 
-            Dim thicknessMeters = options.sliceSize * algTask.metersPerPixel
+            Dim thicknessMeters = options.sliceSize * task.metersPerPixel
             Dim minVal = planeX - thicknessMeters
             Dim maxVal = planeX + thicknessMeters
-            cv.Cv2.InRange(algTask.pcSplit(0), minVal, maxVal, sliceMask)
+            cv.Cv2.InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
 
             labels(2) = "At offset " + CStr(xCoordinate) + " x = " + Format((maxVal + minVal) / 2, fmt2) + " with " +
                     Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
 
-            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, algTask.noDepthMask)
+            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
 
             Return sliceMask
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim sliceMask = createSliceMaskV()
 
-            histSide.Run(algTask.pointCloud.SetTo(0, Not sliceMask))
+            histSide.Run(task.pointCloud.SetTo(0, Not sliceMask))
             dst3 = histSide.dst2
 
             If standaloneTest() Then
@@ -442,7 +442,7 @@ Namespace VBClasses
         Public Sub New()
             rotate.rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Width / 2)
             rotate.rotateAngle = -90
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
             desc = "Count the number of pixels found in each slice of the point cloud data."
         End Sub
@@ -453,11 +453,11 @@ Namespace VBClasses
             counts.Clear()
             yValues.Clear()
             For i = 0 To dst2.Height - 1
-                Dim planeY = algTask.yRange * (i - algTask.sideCameraPoint.Y) / algTask.sideCameraPoint.Y
-                Dim minVal = planeY - algTask.metersPerPixel, maxVal = planeY + algTask.metersPerPixel
+                Dim planeY = task.yRange * (i - task.sideCameraPoint.Y) / task.sideCameraPoint.Y
+                Dim minVal = planeY - task.metersPerPixel, maxVal = planeY + task.metersPerPixel
 
-                Dim sliceMask = algTask.pcSplit(1).InRange(minVal, maxVal)
-                If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, algTask.noDepthMask) ' don't include zero depth locations
+                Dim sliceMask = task.pcSplit(1).InRange(minVal, maxVal)
+                If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask) ' don't include zero depth locations
                 counts.Add(sliceMask.CountNonZero)
                 yValues.Add(planeY)
             Next
@@ -491,14 +491,14 @@ Namespace VBClasses
             desc = "Count the number of points found in each slice of the point cloud data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            cv.Cv2.CalcHist({algTask.pointCloud}, algTask.channelsSide, New cv.Mat, dst2, 2, algTask.bins2D, algTask.rangesSide)
+            cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, dst2, 2, task.bins2D, task.rangesSide)
             dst2.Col(0).SetTo(0)
 
             counts.Clear()
             yValues.Clear()
-            Dim ratio = algTask.yRange / algTask.yRangeDefault
+            Dim ratio = task.yRange / task.yRangeDefault
             For i = 0 To dst2.Height - 1
-                Dim planeY = algTask.yRange * (i - algTask.sideCameraPoint.Y) / algTask.sideCameraPoint.Y
+                Dim planeY = task.yRange * (i - task.sideCameraPoint.Y) / task.sideCameraPoint.Y
                 counts.Add(dst2.Row(i).Sum(0))
                 yValues.Add(planeY * ratio)
             Next
@@ -516,7 +516,7 @@ Namespace VBClasses
                 End If
             Next
 
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 strOut = "Flat surface at: "
                 For i = 0 To surfaces.Count - 1
                     strOut += Format(surfaces(i), fmt3) + ", "
@@ -552,19 +552,19 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If algTask.mouseMovePoint = newPoint Then algTask.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
-            Dim xCoordinate = If(algTask.mouseMovePoint.X = 0, dst2.Width / 2, algTask.mouseMovePoint.X)
+            If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
+            Dim xCoordinate = If(task.mouseMovePoint.X = 0, dst2.Width / 2, task.mouseMovePoint.X)
 
             heat.Run(src)
 
-            Dim planeX = -algTask.xRange * (algTask.topCameraPoint.X - xCoordinate) / algTask.topCameraPoint.X
-            If xCoordinate > algTask.topCameraPoint.X Then planeX = algTask.xRange * (xCoordinate - algTask.topCameraPoint.X) / (dst3.Width - algTask.topCameraPoint.X)
+            Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+            If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
 
-            Dim thicknessMeters = options.sliceSize * algTask.metersPerPixel
+            Dim thicknessMeters = options.sliceSize * task.metersPerPixel
             Dim minVal = planeX - thicknessMeters
             Dim maxVal = planeX + thicknessMeters
-            cv.Cv2.InRange(algTask.pcSplit(0), minVal, maxVal, sliceMask)
-            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, algTask.noDepthMask)
+            cv.Cv2.InRange(task.pcSplit(0), minVal, maxVal, sliceMask)
+            If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
 
             labels(2) = "At offset " + CStr(xCoordinate) + " x = " + Format((maxVal + minVal) / 2, fmt2) +
                     " with " + Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
@@ -572,8 +572,8 @@ Namespace VBClasses
             labels(3) = heat.labels(3)
 
             dst3 = heat.dst2
-            DrawCircle(dst3, New cv.Point(algTask.topCameraPoint.X, 0), algTask.DotSize, algTask.highlight)
-            dst3.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), algTask.highlight, options.sliceSize)
+            DrawCircle(dst3, New cv.Point(task.topCameraPoint.X, 0), task.DotSize, task.highlight)
+            dst3.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst3.Height), task.highlight, options.sliceSize)
             If standaloneTest() Then
                 dst2 = src
                 dst2.SetTo(white, sliceMask)
@@ -600,25 +600,25 @@ Namespace VBClasses
 
             heat.Run(src)
 
-            If standaloneTest() Then ycoordinate = If(algTask.mouseMovePoint.Y = 0, dst2.Height / 2, algTask.mouseMovePoint.Y)
+            If standaloneTest() Then ycoordinate = If(task.mouseMovePoint.Y = 0, dst2.Height / 2, task.mouseMovePoint.Y)
 
-            Dim sliceY = -algTask.yRange * (algTask.sideCameraPoint.Y - ycoordinate) / algTask.sideCameraPoint.Y
-            If ycoordinate > algTask.sideCameraPoint.Y Then sliceY = algTask.yRange * (ycoordinate - algTask.sideCameraPoint.Y) / (dst3.Height - algTask.sideCameraPoint.Y)
+            Dim sliceY = -task.yRange * (task.sideCameraPoint.Y - ycoordinate) / task.sideCameraPoint.Y
+            If ycoordinate > task.sideCameraPoint.Y Then sliceY = task.yRange * (ycoordinate - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
 
-            Dim thicknessMeters = options.sliceSize * algTask.metersPerPixel
+            Dim thicknessMeters = options.sliceSize * task.metersPerPixel
             Dim minVal = sliceY - thicknessMeters
             Dim maxVal = sliceY + thicknessMeters
-            cv.Cv2.InRange(algTask.pcSplit(1), minVal, maxVal, sliceMask)
+            cv.Cv2.InRange(task.pcSplit(1), minVal, maxVal, sliceMask)
 
             labels(2) = "At offset " + CStr(ycoordinate) + " y = " + Format((maxVal + minVal) / 2, fmt2) +
                     " with " + Format(Math.Abs(maxVal - minVal) * 100, fmt2) + " cm width"
-            If minVal <= 0 And maxVal >= 0 Then sliceMask.SetTo(0, algTask.noDepthMask)
+            If minVal <= 0 And maxVal >= 0 Then sliceMask.SetTo(0, task.noDepthMask)
             labels(3) = heat.labels(2)
 
             dst3 = heat.dst3
             Dim yPlaneOffset = If(ycoordinate < dst3.Height - options.sliceSize, CInt(ycoordinate), dst3.Height - options.sliceSize - 1)
-            DrawCircle(dst3, New cv.Point(0, algTask.sideCameraPoint.Y), algTask.DotSize, algTask.highlight)
-            dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), algTask.highlight, options.sliceSize)
+            DrawCircle(dst3, New cv.Point(0, task.sideCameraPoint.Y), task.DotSize, task.highlight)
+            dst3.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst3.Width, yPlaneOffset), task.highlight, options.sliceSize)
             If standaloneTest() Then
                 dst2 = src
                 dst2.SetTo(white, sliceMask)
@@ -639,9 +639,9 @@ Namespace VBClasses
             desc = "Mark each horizontal slice with a separate color.  Y-Range determines how thick the slice is."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC3 Then src = algTask.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
-            cv.Cv2.CalcHist({src}, algTask.channelsSide, New cv.Mat, dst3, 2, algTask.bins2D, algTask.rangesSide)
+            cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, dst3, 2, task.bins2D, task.rangesSide)
             dst3.Col(0).SetTo(0)
             dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
             dst3.ConvertTo(dst3, cv.MatType.CV_8U)
@@ -659,13 +659,13 @@ Namespace VBClasses
             Dim index As Integer
             dst2.SetTo(0)
             For y = topRow To botRow
-                Dim sliceY = -algTask.yRange * (algTask.sideCameraPoint.Y - y) / algTask.sideCameraPoint.Y
-                If y > algTask.sideCameraPoint.Y Then sliceY = algTask.yRange * (y - algTask.sideCameraPoint.Y) / (dst3.Height - algTask.sideCameraPoint.Y)
-                Dim minVal = sliceY - algTask.metersPerPixel
-                Dim maxVal = sliceY + algTask.metersPerPixel
+                Dim sliceY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y
+                If y > task.sideCameraPoint.Y Then sliceY = task.yRange * (y - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
+                Dim minVal = sliceY - task.metersPerPixel
+                Dim maxVal = sliceY + task.metersPerPixel
                 If minVal < 0 And maxVal > 0 Then Continue For
-                dst0 = algTask.pcSplit(1).InRange(minVal, maxVal)
-                dst2.SetTo(algTask.scalarColors(index Mod 256), dst0)
+                dst0 = task.pcSplit(1).InRange(minVal, maxVal)
+                dst2.SetTo(task.scalarColors(index Mod 256), dst0)
                 index += 1
             Next
         End Sub
@@ -684,9 +684,9 @@ Namespace VBClasses
             desc = "Mark each vertical slice with a separate color.  X-Range determines how thick the slice is."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC3 Then src = algTask.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
-            cv.Cv2.CalcHist({src}, algTask.channelsTop, New cv.Mat, dst3, 2, algTask.bins2D, algTask.rangesTop)
+            cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, dst3, 2, task.bins2D, task.rangesTop)
             dst3.Row(0).SetTo(0)
             dst3 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
             dst3.ConvertTo(dst3, cv.MatType.CV_8U)
@@ -704,13 +704,13 @@ Namespace VBClasses
             Dim index As Integer
             dst2.SetTo(0)
             For x = column To lastColumn
-                Dim sliceX = -algTask.xRange * (algTask.topCameraPoint.X - x) / algTask.topCameraPoint.X
-                If x > algTask.topCameraPoint.X Then sliceX = algTask.xRange * (x - algTask.topCameraPoint.X) / (dst3.Height - algTask.topCameraPoint.X)
-                Dim minVal = sliceX - algTask.metersPerPixel
-                Dim maxVal = sliceX + algTask.metersPerPixel
+                Dim sliceX = -task.xRange * (task.topCameraPoint.X - x) / task.topCameraPoint.X
+                If x > task.topCameraPoint.X Then sliceX = task.xRange * (x - task.topCameraPoint.X) / (dst3.Height - task.topCameraPoint.X)
+                Dim minVal = sliceX - task.metersPerPixel
+                Dim maxVal = sliceX + task.metersPerPixel
                 If minVal < 0 And maxVal > 0 Then Continue For
-                dst0 = algTask.pcSplit(0).InRange(minVal, maxVal)
-                dst2.SetTo(algTask.scalarColors(index Mod 256), dst0)
+                dst0 = task.pcSplit(0).InRange(minVal, maxVal)
+                dst2.SetTo(task.scalarColors(index Mod 256), dst0)
                 index += 1
             Next
         End Sub
@@ -748,7 +748,7 @@ Namespace VBClasses
             For i = 0 To contours.Length - 1
                 If contours(i).Length = 2 Then Continue For
                 If contours(i).Length <= options.maxSides Then
-                    cv.Cv2.DrawContours(dst3, contours, i, New cv.Scalar(0, 255, 255), algTask.lineWidth + 1, algTask.lineType)
+                    cv.Cv2.DrawContours(dst3, contours, i, New cv.Scalar(0, 255, 255), task.lineWidth + 1, task.lineType)
                 End If
             Next
         End Sub
@@ -779,25 +779,25 @@ Namespace VBClasses
             classCount = 0
             Dim minVal As Double, maxVal As Double
             For xCoordinate = 0 To src.Width - 1 Step stepSize
-                Dim planeX = -algTask.xRange * (algTask.topCameraPoint.X - xCoordinate) / algTask.topCameraPoint.X
-                If xCoordinate > algTask.topCameraPoint.X Then
-                    planeX = algTask.xRange * (xCoordinate - algTask.topCameraPoint.X) / (dst2.Width - algTask.topCameraPoint.X)
+                Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+                If xCoordinate > task.topCameraPoint.X Then
+                    planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
                 End If
-                minVal = planeX - algTask.metersPerPixel
-                maxVal = planeX + algTask.metersPerPixel
-                Dim depthMask = algTask.pcSplit(0).InRange(minVal, maxVal)
+                minVal = planeX - task.metersPerPixel
+                maxVal = planeX + task.metersPerPixel
+                Dim depthMask = task.pcSplit(0).InRange(minVal, maxVal)
                 dst2.SetTo(classCount, depthMask)
                 classCount += 1
             Next
 
             For yCoordinate = 0 To src.Height - 1 Step stepSize
-                Dim planeY = -algTask.yRange * (algTask.sideCameraPoint.Y - yCoordinate) / algTask.sideCameraPoint.Y
-                If yCoordinate > algTask.sideCameraPoint.Y Then
-                    planeY = algTask.yRange * (yCoordinate - algTask.sideCameraPoint.Y) / (dst2.Height - algTask.sideCameraPoint.Y)
+                Dim planeY = -task.yRange * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+                If yCoordinate > task.sideCameraPoint.Y Then
+                    planeY = task.yRange * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
                 End If
-                minVal = planeY - algTask.metersPerPixel
-                maxVal = planeY + algTask.metersPerPixel
-                Dim depthMask = algTask.pcSplit(1).InRange(minVal, maxVal)
+                minVal = planeY - task.metersPerPixel
+                maxVal = planeY + task.metersPerPixel
+                Dim depthMask = task.pcSplit(1).InRange(minVal, maxVal)
                 dst2.SetTo(classCount, depthMask)
                 classCount += 1
             Next
@@ -828,18 +828,18 @@ Namespace VBClasses
 
             Dim sliceMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             For xCoordinate = 0 To src.Width - 1 Step stepsize
-                Dim planeX = -algTask.xRange * (algTask.topCameraPoint.X - xCoordinate) / algTask.topCameraPoint.X
-                If xCoordinate > algTask.topCameraPoint.X Then planeX = algTask.xRange * (xCoordinate - algTask.topCameraPoint.X) / (dst3.Width - algTask.topCameraPoint.X)
+                Dim planeX = -task.xRange * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+                If xCoordinate > task.topCameraPoint.X Then planeX = task.xRange * (xCoordinate - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
                 Dim depthMask As New cv.Mat
                 Dim minVal As Double, maxVal As Double
-                minVal = planeX - algTask.metersPerPixel
-                maxVal = planeX + algTask.metersPerPixel
-                cv.Cv2.InRange(algTask.pcSplit(0).Clone, minVal, maxVal, depthMask)
+                minVal = planeX - task.metersPerPixel
+                maxVal = planeX + task.metersPerPixel
+                cv.Cv2.InRange(task.pcSplit(0).Clone, minVal, maxVal, depthMask)
                 sliceMask.SetTo(255, depthMask)
-                If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, algTask.noDepthMask)
+                If minVal < 0 And maxVal > 0 Then sliceMask.SetTo(0, task.noDepthMask)
             Next
 
-            dst2 = algTask.color.Clone
+            dst2 = task.color.Clone
             dst2.SetTo(white, sliceMask)
             labels(3) = heat.labels(3)
         End Sub
@@ -869,7 +869,7 @@ Namespace VBClasses
             dst3 = floor.dst3
             sliceMask = floor.slice.sliceMask
 
-            Dim imuPC = algTask.pointCloud.Clone
+            Dim imuPC = task.pointCloud.Clone
             imuPC.SetTo(0, Not sliceMask)
 
             If sliceMask.CountNonZero > 0 Then
@@ -920,14 +920,14 @@ Namespace VBClasses
                                 split(2).Row(i).SetTo(mean(0))
                             End If
                         Next
-                        dst2.Line(New cv.Point(0, firstRow), New cv.Point(dst2.Width, firstRow), cv.Scalar.Yellow, algTask.lineWidth + 1)
-                        dst2.Line(New cv.Point(0, lastRow), New cv.Point(dst2.Width, lastRow), cv.Scalar.Yellow, algTask.lineWidth + 1)
+                        dst2.Line(New cv.Point(0, firstRow), New cv.Point(dst2.Width, firstRow), cv.Scalar.Yellow, task.lineWidth + 1)
+                        dst2.Line(New cv.Point(0, lastRow), New cv.Point(dst2.Width, lastRow), cv.Scalar.Yellow, task.lineWidth + 1)
                     End If
                 End If
 
                 cv.Cv2.Merge(split, imuPC)
 
-                imuPC.CopyTo(algTask.pointCloud, sliceMask)
+                imuPC.CopyTo(task.pointCloud, sliceMask)
             End If
         End Sub
     End Class
@@ -946,10 +946,10 @@ Namespace VBClasses
             struct.Run(src)
             dst2.SetTo(0)
             For Each lp In struct.lpListX
-                dst2.Line(lp.p1, lp.p2, 255, algTask.lineWidth, cv.LineTypes.Link8)
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
             Next
             For Each lp In struct.lpListY
-                dst2.Line(lp.p1, lp.p2, 255, algTask.lineWidth, cv.LineTypes.Link8)
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link8)
             Next
         End Sub
     End Class

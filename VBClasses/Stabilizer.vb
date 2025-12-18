@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Stabilizer_Basics : Inherits TaskParent
         Public Sub New()
-            desc = "Use algTask.lineLongest to find the angle needed to stabilize the image."
+            desc = "Use task.lineLongest to find the angle needed to stabilize the image."
         End Sub
         Public Function GetAngleBetweenLinesBySlopes(ByVal slope1 As Double, ByVal slope2 As Double) As Double
             Const EPSILON As Double = 0.000000001
@@ -43,12 +43,12 @@ Namespace VBClasses
             Return angleDegrees
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static lpLast As lpData = algTask.lineLongest
+            Static lpLast As lpData = task.lineLongest
 
-            Dim lp = algTask.lineLongest
-            If lp.pE1 = lpLast.pE1 And lp.pE2 = lpLast.pE2 Or algTask.lineLongestChanged Then
+            Dim lp = task.lineLongest
+            If lp.pE1 = lpLast.pE1 And lp.pE2 = lpLast.pE2 Or task.lineLongestChanged Then
                 dst2 = src
-                If algTask.lineLongestChanged Then lpLast = algTask.lineLongest
+                If task.lineLongestChanged Then lpLast = task.lineLongest
             Else
                 Dim rotateAngle = GetAngleBetweenLinesBySlopes(lp.slope, lpLast.slope)
 

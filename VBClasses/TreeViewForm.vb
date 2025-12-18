@@ -5,7 +5,7 @@ Public Class TreeviewForm
     Dim moduleList As New List(Of String) ' the list of all active algorithms.
     Dim PercentTimes As New SortedList(Of Single, String)(New compareAllowIdenticalSingle)
     Dim titleStr = " - Click on any node to review the algorithm's output."
-    ' updated when algTask.optionschanged occurs - used in the timer so can't use algTask.optionschanged.
+    ' updated when task.optionschanged occurs - used in the timer so can't use task.optionschanged.
     Public optionsChanged As Boolean
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         TreeView1.Height = Me.Height
@@ -91,11 +91,11 @@ Public Class TreeviewForm
         End Function
     End Class
     Public Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
-        Dim algorithm_ms = New List(Of Single)(algTask.algorithm_ms)
+        Dim algorithm_ms = New List(Of Single)(Task.algorithm_ms)
         Static saveCount As Integer
-        If algTask.callTrace.Count <> saveCount Or optionsChanged Then
-            saveCount = algTask.callTrace.Count
-            updateTree(New List(Of String)(algTask.callTrace))
+        If Task.callTrace.Count <> saveCount Or optionsChanged Then
+            saveCount = Task.callTrace.Count
+            updateTree(New List(Of String)(Task.callTrace))
             optionsChanged = False
         End If
 
@@ -118,14 +118,14 @@ Public Class TreeviewForm
         For i = 0 To algorithm_ms.Count - 1
             algorithm_ms(i) /= sumTime
             If algorithm_ms(i) < 0 Then algorithm_ms(i) = 0
-            If i >= algTask.algorithmNames.Count Then Exit For
-            Dim str = Format(algorithm_ms(i), "00.0%") + " " + algTask.algorithmNames(i)
-            If algTask.displayObjectName IsNot Nothing Then
-                If algTask.displayObjectName.Length > 0 Then
-                    If str.Contains(algTask.displayObjectName) Then percentStr = str
+            If i >= Task.algorithmNames.Count Then Exit For
+            Dim str = Format(algorithm_ms(i), "00.0%") + " " + Task.algorithmNames(i)
+            If Task.displayObjectName IsNot Nothing Then
+                If Task.displayObjectName.Length > 0 Then
+                    If str.Contains(Task.displayObjectName) Then percentStr = str
                 End If
             End If
-            If algTask.algorithmNames(i).Contains("waitingForInput") Then
+            If Task.algorithmNames(i).Contains("waitingForInput") Then
                 saveWaitTime = str + "  <<<<<<<<<< "
             Else
                 PercentTimes.Add(algorithm_ms(i), str)
@@ -138,13 +138,13 @@ Public Class TreeviewForm
         Next
 
         PercentTime.Text = "Click on an algorithm to see more info. " + vbCrLf + vbCrLf
-        PercentTime.Text += "Algorithm FPS = " + Format(algTask.fpsAlgorithm, "0") + vbCrLf
-        PercentTime.Text += "Camera FPS = " + Format(algTask.fpsCamera, "0") + vbCrLf
+        PercentTime.Text += "Algorithm FPS = " + Format(Task.fpsAlgorithm, "0") + vbCrLf
+        PercentTime.Text += "Camera FPS = " + Format(Task.fpsCamera, "0") + vbCrLf
 
-        Dim fps As Single = algTask.Settings.FPSdisplay
+        Dim fps As Single = Task.Settings.FPSdisplay
         fps = If(fps >= 1, fps, If(fps = 0, 1, 1 / Math.Abs(fps)))
         Dim fmt As String = If(fps >= 1, "0", "0.0")
-        PercentTime.Text += "Display FPS ~ " + Format(fps, fmt) + vbCrLf
+        PercentTime.Text += "Display FPS ~ " + Format(fps, fmt) + vbCrLf + vbCrLf
 
         Static boldFont = New Font(PercentTime.Font, FontStyle.Bold)
         Static regularFont = New Font(PercentTime.Font, FontStyle.Regular)
@@ -190,8 +190,8 @@ Public Class TreeviewForm
         TreeView1.Dock = DockStyle.Fill
         TreeView1.SendToBack()
 
-        Me.Location = New Point(algTask.settings.TreeViewLeft, algTask.settings.TreeViewTop)
-        Me.Size = New Size(algTask.settings.TreeViewWidth, algTask.settings.TreeViewHeight)
+        Me.Location = New Point(Task.Settings.TreeViewLeft, Task.settings.TreeViewTop)
+        Me.Size = New Size(Task.Settings.TreeViewWidth, Task.settings.TreeViewHeight)
 
         PercentTime.Width = 250
         PercentTime.Left = 250
@@ -199,14 +199,14 @@ Public Class TreeviewForm
         CheckIfOffScreen()
     End Sub
     Private Sub TreeviewForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
-        algTask.settings.TreeViewLeft = Me.Left
-        algTask.settings.TreeViewTop = Me.Top
-        algTask.settings.TreeViewWidth = Me.Width
-        algTask.settings.TreeViewHeight = Me.Height
+        Task.settings.TreeViewLeft = Me.Left
+        Task.settings.TreeViewTop = Me.Top
+        Task.settings.TreeViewWidth = Me.Width
+        Task.settings.TreeViewHeight = Me.Height
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         Dim algorithm = e.Node.Text
         Dim split = e.Node.Text.Split(" ")
-        algTask.displayObjectName = split(0)
+        Task.displayObjectName = split(0)
     End Sub
 End Class

@@ -15,8 +15,8 @@ Namespace VBClasses
             desc = "Minimalist approach to find a flat surface that is oriented to gravity (floor or ceiling)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim ranges() = New cv.Rangef() {New cv.Rangef(-algTask.yRange, algTask.yRange), New cv.Rangef(0, algTask.MaxZmeters)}
-            cv.Cv2.CalcHist({algTask.pointCloud}, {1, 2}, New cv.Mat, dst0, 2,
+            Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.MaxZmeters)}
+            cv.Cv2.CalcHist({task.pointCloud}, {1, 2}, New cv.Mat, dst0, 2,
                             {dst2.Height, dst2.Width}, ranges)
 
             Dim thicknessCMs = 0.1, rect As cv.Rect, nextY As Single
@@ -27,16 +27,16 @@ Namespace VBClasses
                 Dim pixelCount = dst0(rect).Sum()
                 totalPixels += pixelCount.Val0
                 If count > 10 Then
-                    nextY = -algTask.yRange * (algTask.sideCameraPoint.Y - y) / algTask.sideCameraPoint.Y - thicknessCMs
+                    nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs
                     Exit For
                 End If
             Next
 
             Dim floorY = rect.Y
             floorList.Add(nextY)
-            algTask.pcFloor = floorList.Average()
-            If floorList.Count > algTask.frameHistoryCount Then floorList.RemoveAt(0)
-            labels(2) = "Y = " + Format(algTask.pcFloor, fmt3) + " separates the floor.  Total pixels below floor level = " + Format(totalPixels, fmt0)
+            task.pcFloor = floorList.Average()
+            If floorList.Count > task.frameHistoryCount Then floorList.RemoveAt(0)
+            labels(2) = "Y = " + Format(task.pcFloor, fmt3) + " separates the floor.  Total pixels below floor level = " + Format(totalPixels, fmt0)
 
             For y = 0 To dst2.Height - 1
                 rect = New cv.Rect(0, y, dst0.Width - 1, 1)
@@ -44,23 +44,23 @@ Namespace VBClasses
                 Dim pixelCount = dst0(rect).Sum()
                 totalPixels += pixelCount.Val0
                 If count > 10 Then
-                    nextY = -algTask.yRange * (algTask.sideCameraPoint.Y - y) / algTask.sideCameraPoint.Y - thicknessCMs
+                    nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs
                     Exit For
                 End If
             Next
 
             Dim ceilingY = rect.Y
             ceilingList.Add(nextY)
-            algTask.pcCeiling = ceilingList.Average()
-            If ceilingList.Count > algTask.frameHistoryCount Then ceilingList.RemoveAt(0)
-            labels(3) = "Y = " + Format(algTask.pcCeiling, fmt3) + " separates the ceiling.  Total pixels above ceiling level = " + Format(totalPixels, fmt0)
+            task.pcCeiling = ceilingList.Average()
+            If ceilingList.Count > task.frameHistoryCount Then ceilingList.RemoveAt(0)
+            labels(3) = "Y = " + Format(task.pcCeiling, fmt3) + " separates the ceiling.  Total pixels above ceiling level = " + Format(totalPixels, fmt0)
 
             If standaloneTest() Then
                 dst2 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
                 dst2.ConvertTo(dst2, cv.MatType.CV_8U)
                 dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-                dst2.Line(New cv.Point(0, floorY), New cv.Point(dst2.Width, floorY), cv.Scalar.Red, algTask.lineWidth + 2, algTask.lineType)
-                dst2.Line(New cv.Point(0, ceilingY), New cv.Point(dst2.Width, ceilingY), cv.Scalar.Red, algTask.lineWidth + 2, algTask.lineType)
+                dst2.Line(New cv.Point(0, floorY), New cv.Point(dst2.Width, floorY), cv.Scalar.Red, task.lineWidth + 2, task.lineType)
+                dst2.Line(New cv.Point(0, ceilingY), New cv.Point(dst2.Width, ceilingY), cv.Scalar.Red, task.lineWidth + 2, task.lineType)
             End If
         End Sub
     End Class
@@ -112,8 +112,8 @@ Namespace VBClasses
             Dim threshold As Single = 0.015
             Dim work As New cv.Mat
 
-            work = algTask.pcSplit(1).InRange(-threshold, threshold)
-            work.SetTo(0, algTask.noDepthMask)
+            work = task.pcSplit(1).InRange(-threshold, threshold)
+            work.SetTo(0, task.noDepthMask)
             work.ConvertTo(dst1, cv.MatType.CV_8U)
             Dim hPoints = dst1.FindNonZero()
             If hPoints.Total > 0 Then
@@ -136,8 +136,8 @@ Namespace VBClasses
                 yRight = 0
             End If
 
-            work = algTask.pcSplit(0).InRange(-threshold, threshold)
-            work.SetTo(0, algTask.noDepthMask)
+            work = task.pcSplit(0).InRange(-threshold, threshold)
+            work.SetTo(0, task.noDepthMask)
             work.ConvertTo(dst3, cv.MatType.CV_8U)
             Dim gPoints = dst3.FindNonZero()
             Dim sampleUnused As Integer
@@ -155,7 +155,7 @@ Namespace VBClasses
                 lineGravity = New lpData(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
 
                 dst2.SetTo(0)
-                vbc.DrawLine(dst2, lineGravity.p1, lineGravity.p2, algTask.highlight)
+                vbc.DrawLine(dst2, lineGravity.p1, lineGravity.p2, task.highlight)
                 vbc.DrawLine(dst2, lineHorizon.p1, lineHorizon.p2, cv.Scalar.Red)
             End If
         End Sub
@@ -167,24 +167,24 @@ Namespace VBClasses
 
     Public Class XO_Horizon_FindNonZero : Inherits TaskParent
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            algTask.lineGravity = New lpData(New cv.Point2f(dst2.Width / 2, 0),
+            task.lineGravity = New lpData(New cv.Point2f(dst2.Width / 2, 0),
                                              New cv.Point2f(dst2.Width / 2, dst2.Height))
-            algTask.lineHorizon = New lpData(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
+            task.lineHorizon = New lpData(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
             labels = {"", "Horizon vector mask", "Crosshairs - lineGravity (vertical) and lineHorizon (horizontal)", "Gravity vector mask"}
             desc = "Create lines for the gravity vector and horizon vector in the camera image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim pc = algTask.pointCloud
+            Dim pc = task.pointCloud
             Dim split = pc.Split()
-            split(2).SetTo(algTask.MaxZmeters)
+            split(2).SetTo(task.MaxZmeters)
             cv.Cv2.Merge(split, pc)
 
-            pc = (pc.Reshape(1, pc.Rows * pc.Cols) * algTask.gMatrix).ToMat.Reshape(3, pc.Rows)
+            pc = (pc.Reshape(1, pc.Rows * pc.Cols) * task.gMatrix).ToMat.Reshape(3, pc.Rows)
 
             dst1 = split(1).InRange(-0.05, 0.05)
-            dst1.SetTo(0, algTask.noDepthMask)
+            dst1.SetTo(0, task.noDepthMask)
             Dim pointsMat = dst1.FindNonZero()
             If pointsMat.Rows > 0 Then
                 dst2.SetTo(0)
@@ -200,12 +200,12 @@ Namespace VBClasses
                 Dim p2 = points(xVals.IndexOf(xVals.Max()))
 
                 Dim lp = findEdgePoints(New lpData(p1, p2))
-                algTask.lineHorizon = New lpData(lp.p1, lp.p2)
-                vbc.DrawLine(dst2, algTask.lineHorizon.p1, algTask.lineHorizon.p2, 255)
+                task.lineHorizon = New lpData(lp.p1, lp.p2)
+                vbc.DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, 255)
             End If
 
             dst3 = split(0).InRange(-0.01, 0.01)
-            dst3.SetTo(0, algTask.noDepthMask)
+            dst3.SetTo(0, task.noDepthMask)
             pointsMat = dst3.FindNonZero()
             If pointsMat.Rows > 0 Then
                 Dim yVals As New List(Of Integer)
@@ -219,12 +219,12 @@ Namespace VBClasses
                 Dim p1 = points(yVals.IndexOf(yVals.Min()))
                 Dim p2 = points(yVals.IndexOf(yVals.Max()))
                 If Math.Abs(p1.X - p2.X) < 2 Then
-                    algTask.lineGravity = New lpData(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
+                    task.lineGravity = New lpData(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
                 Else
                     Dim lp = findEdgePoints(New lpData(p1, p2))
-                    algTask.lineGravity = New lpData(lp.p1, lp.p2)
+                    task.lineGravity = New lpData(lp.p1, lp.p2)
                 End If
-                vbc.DrawLine(dst2, algTask.lineGravity.p1, algTask.lineGravity.p2, 255)
+                vbc.DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, 255)
             End If
         End Sub
     End Class
@@ -243,13 +243,13 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            vbc.DrawLine(dst2, algTask.lineHorizon.p1, algTask.lineHorizon.p2, white)
+            vbc.DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, white)
 
-            perp.input = algTask.lineHorizon
+            perp.input = task.lineHorizon
             perp.Run(src)
             vbc.DrawLine(dst2, perp.output.p1, perp.output.p2, cv.Scalar.Yellow)
 
-            Dim gVec = algTask.lineGravity
+            Dim gVec = task.lineGravity
             gVec.p1.X += 10
             gVec.p2.X += 10
             vbc.DrawLine(dst2, gVec.p1, gVec.p2, white)
@@ -294,7 +294,7 @@ Namespace VBClasses
             desc = "Find all the points where depth Y-component transitions from positive to negative"
         End Sub
         Public Sub displayResults(p1 As cv.Point2f, p2 As cv.Point2f)
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 If p1.Y >= 1 And p1.Y <= dst2.Height - 1 Then
                     strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf
                 End If
@@ -303,17 +303,17 @@ Namespace VBClasses
             dst2.SetTo(0)
             For Each pt In points
                 pt = New cv.Point(pt.X * resizeRatio, pt.Y * resizeRatio)
-                DrawCircle(dst2, pt, algTask.DotSize, white)
+                DrawCircle(dst2, pt, task.DotSize, white)
             Next
 
             vbc.DrawLine(dst2, vec.p1, vec.p2, 255)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32F Then dst0 = algTask.pcSplit(1) Else dst0 = src
+            If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(1) Else dst0 = src
 
             dst0 = dst0.Abs()
             dst1 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-            dst0.SetTo(algTask.MaxZmeters, Not dst1)
+            dst0.SetTo(task.MaxZmeters, Not dst1)
 
             points.Clear()
             For i = dst0.Width / 3 To dst0.Width * 2 / 3 - 1
@@ -367,24 +367,24 @@ Namespace VBClasses
             desc = "Validate the horizon points using Match_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim pad = algTask.brickSize / 2
+            Dim pad = task.brickSize / 2
 
             src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            If algTask.heartBeat Then
-                ptLeft = algTask.lineGravity.p1
-                ptRight = algTask.lineGravity.p2
-                Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, algTask.brickSize, algTask.brickSize))
+            If task.heartBeat Then
+                ptLeft = task.lineGravity.p1
+                ptRight = task.lineGravity.p2
+                Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, task.brickSize, task.brickSize))
                 leftTemplate = src(r)
 
-                r = ValidateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, algTask.brickSize, algTask.brickSize))
+                r = ValidateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, task.brickSize, task.brickSize))
                 rightTemplate = src(r)
             Else
-                Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, algTask.brickSize, algTask.brickSize))
+                Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, task.brickSize, task.brickSize))
                 match.template = leftTemplate.Clone
                 match.Run(src)
                 ptLeft = match.newCenter
 
-                r = ValidateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, algTask.brickSize, algTask.brickSize))
+                r = ValidateRect(New cv.Rect(ptRight.X - pad, ptRight.Y - pad, task.brickSize, task.brickSize))
                 match.template = leftTemplate.Clone
                 match.Run(src)
                 ptLeft = match.newCenter
@@ -403,7 +403,7 @@ Namespace VBClasses
             desc = "Supply the point cloud input to Horizon_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst0 = algTask.pcSplit(1)
+            dst0 = task.pcSplit(1)
             horizon.Run(dst0)
             dst2 = horizon.dst2
         End Sub
@@ -420,25 +420,25 @@ Namespace VBClasses
             desc = "Find all the points where depth X-component transitions from positive to negative"
         End Sub
         Public Sub displayResults(p1 As cv.Point, p2 As cv.Point)
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 If p1.Y >= 1 And p1.Y <= dst2.Height - 1 Then strOut = "p1 = " + p1.ToString + vbCrLf + "p2 = " + p2.ToString + vbCrLf
             End If
 
             dst2.SetTo(0)
             dst3.SetTo(0)
             For Each pt In points
-                DrawCircle(dst2, pt, algTask.DotSize, white)
+                DrawCircle(dst2, pt, task.DotSize, white)
             Next
 
-            vbc.DrawLine(dst2, algTask.lineGravity.p1, algTask.lineGravity.p2, white)
-            vbc.DrawLine(dst3, algTask.lineGravity.p1, algTask.lineGravity.p2, white)
+            vbc.DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, white)
+            vbc.DrawLine(dst3, task.lineGravity.p1, task.lineGravity.p2, white)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32F Then dst0 = algTask.pcSplit(0) Else dst0 = src
+            If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(0) Else dst0 = src
 
             dst0 = dst0.Abs()
             dst1 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-            dst0.SetTo(algTask.MaxZmeters, Not dst1)
+            dst0.SetTo(task.MaxZmeters, Not dst1)
 
             points.Clear()
             For i = dst0.Height / 3 To dst0.Height * 2 / 3 - 1
@@ -465,11 +465,11 @@ Namespace VBClasses
                 strOut += "Using the previous value for the gravity vector."
             Else
                 Dim lp = findEdgePoints(New lpData(p1, p2))
-                algTask.lineGravity = New lpData(lp.p1, lp.p2)
+                task.lineGravity = New lpData(lp.p1, lp.p2)
                 If standaloneTest() Then displayResults(p1, p2)
             End If
 
-            algTask.lineHorizon = Line_PerpendicularTest.computePerp(algTask.lineGravity)
+            task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
             SetTrueText(strOut, 3)
         End Sub
     End Class
@@ -486,19 +486,19 @@ Namespace VBClasses
         Public Sub New()
             dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             dst3 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            algTask.gOptions.DebugSlider.Value = 3
+            task.gOptions.DebugSlider.Value = 3
             desc = "Merge with previous image using just translation of the gravity vector and horizon vector (if present)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim lineGravity = New lpData(algTask.lineGravity.p1, algTask.lineGravity.p2)
-            Dim lineHorizon = New lpData(algTask.lineHorizon.p1, algTask.lineHorizon.p2)
+            Dim lineGravity = New lpData(task.lineGravity.p1, task.lineGravity.p2)
+            Dim lineHorizon = New lpData(task.lineHorizon.p1, task.lineHorizon.p2)
 
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            translationX = algTask.gOptions.DebugSlider.Value ' Math.Round(lineGravity.p1.X - algTask.lineGravity.p1.X)
-            translationY = algTask.gOptions.DebugSlider.Value ' Math.Round(lineHorizon.p1.Y - algTask.lineHorizon.p1.Y)
+            translationX = task.gOptions.DebugSlider.Value ' Math.Round(lineGravity.p1.X - task.lineGravity.p1.X)
+            translationY = task.gOptions.DebugSlider.Value ' Math.Round(lineHorizon.p1.Y - task.lineHorizon.p1.Y)
             If Math.Abs(translationX) >= dst2.Width / 2 Then translationX = 0
             If lineHorizon.p1.Y >= dst2.Height Or lineHorizon.p2.Y >= dst2.Height Or Math.Abs(translationY) >= dst2.Height / 2 Then
                 lineHorizon = New lpData(New cv.Point2f, New cv.Point2f(336, 0))
@@ -508,8 +508,8 @@ Namespace VBClasses
             Dim r1 As cv.Rect, r2 As cv.Rect
             If translationX = 0 And translationY = 0 Then
                 dst2 = src
-                algTask.camMotionPixels = 0
-                algTask.camDirection = 0
+                task.camMotionPixels = 0
+                task.camDirection = 0
             Else
                 ' dst2.SetTo(0)
                 r1 = New cv.Rect(translationX, translationY, Math.Min(dst2.Width - translationX * 2, dst2.Width),
@@ -525,33 +525,33 @@ Namespace VBClasses
 
                 r2 = New cv.Rect(Math.Abs(translationX), Math.Abs(translationY), r1.Width, r1.Height)
 
-                algTask.camMotionPixels = Math.Sqrt(translationX * translationX + translationY * translationY)
+                task.camMotionPixels = Math.Sqrt(translationX * translationX + translationY * translationY)
                 If translationX = 0 Then
-                    If translationY < 0 Then algTask.camDirection = Math.PI / 4 Else algTask.camDirection = Math.PI * 3 / 4
+                    If translationY < 0 Then task.camDirection = Math.PI / 4 Else task.camDirection = Math.PI * 3 / 4
                 Else
-                    algTask.camDirection = Math.Atan(translationY / translationX)
+                    task.camDirection = Math.Atan(translationY / translationX)
                 End If
 
                 If secondOpinion Then
                     dst3.SetTo(0)
                     ' the point cloud contributes one set of camera motion distance and direction.  Now confirm it with feature points
                     feat.Run(src)
-                    strOut = "Swarm distance = " + Format(feat.distanceAvg, fmt1) + " when camMotionPixels = " + Format(algTask.camMotionPixels, fmt1)
-                    If (feat.distanceAvg < algTask.camMotionPixels / 2) Or algTask.heartBeat Then
-                        algTask.camMotionPixels = 0
+                    strOut = "Swarm distance = " + Format(feat.distanceAvg, fmt1) + " when camMotionPixels = " + Format(task.camMotionPixels, fmt1)
+                    If (feat.distanceAvg < task.camMotionPixels / 2) Or task.heartBeat Then
+                        task.camMotionPixels = 0
                         src.CopyTo(dst2)
                     End If
                     dst3 = (src - dst2).ToMat.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
                 End If
             End If
 
-            lineGravity = New lpData(algTask.lineGravity.p1, algTask.lineGravity.p2)
-            lineHorizon = New lpData(algTask.lineHorizon.p1, algTask.lineHorizon.p2)
+            lineGravity = New lpData(task.lineGravity.p1, task.lineGravity.p2)
+            lineHorizon = New lpData(task.lineHorizon.p1, task.lineHorizon.p2)
             SetTrueText(strOut, 3)
 
             labels(2) = "Translation (X, Y) = (" + CStr(translationX) + ", " + CStr(translationY) + ")" +
                         If(lineHorizon.p1.Y = 0 And lineHorizon.p2.Y = 0, " there is no horizon present", "")
-            labels(3) = "Camera direction (radians) = " + Format(algTask.camDirection, fmt1) + " with distance = " + Format(algTask.camMotionPixels, fmt1)
+            labels(3) = "Camera direction (radians) = " + Format(task.camDirection, fmt1) + " with distance = " + Format(task.camMotionPixels, fmt1)
         End Sub
     End Class
 
@@ -576,13 +576,13 @@ Namespace VBClasses
         End Sub
         Public Sub translateRotateX(x1 As Integer, x2 As Integer)
             rotationX = Math.Atan(Math.Abs((x1 - x2)) / dst2.Height) * 57.2958
-            centerX = New cv.Point2f((algTask.lineGravity.p1.X + algTask.lineGravity.p2.X) / 2, (algTask.lineGravity.p1.Y + algTask.lineGravity.p2.Y) / 2)
+            centerX = New cv.Point2f((task.lineGravity.p1.X + task.lineGravity.p2.X) / 2, (task.lineGravity.p1.Y + task.lineGravity.p2.Y) / 2)
             If x1 >= 0 And x2 > 0 Then
                 translationX = If(x1 > x2, x1 - x2, x2 - x1)
-                centerX = algTask.lineGravity.p2
+                centerX = task.lineGravity.p2
             ElseIf x1 <= 0 And x2 < 0 Then
                 translationX = If(x1 > x2, x1 - x2, x2 - x1)
-                centerX = algTask.lineGravity.p1
+                centerX = task.lineGravity.p1
             ElseIf x1 < 0 And x2 > 0 Then
                 translationX = 0
             Else
@@ -592,13 +592,13 @@ Namespace VBClasses
         End Sub
         Public Sub translateRotateY(y1 As Integer, y2 As Integer)
             rotationY = Math.Atan(Math.Abs((y1 - y2)) / dst2.Width) * 57.2958
-            centerY = New cv.Point2f((algTask.lineHorizon.p1.X + algTask.lineHorizon.p2.X) / 2, (algTask.lineHorizon.p1.Y + algTask.lineHorizon.p2.Y) / 2)
+            centerY = New cv.Point2f((task.lineHorizon.p1.X + task.lineHorizon.p2.X) / 2, (task.lineHorizon.p1.Y + task.lineHorizon.p2.Y) / 2)
             If y1 > 0 And y2 > 0 Then
                 translationY = If(y1 > y2, y1 - y2, y2 - y1)
-                centerY = algTask.lineHorizon.p2
+                centerY = task.lineHorizon.p2
             ElseIf y1 < 0 And y2 < 0 Then
                 translationY = If(y1 > y2, y1 - y2, y2 - y1)
-                centerY = algTask.lineHorizon.p1
+                centerY = task.lineHorizon.p1
             ElseIf y1 < 0 And y2 > 0 Then
                 translationY = 0
             Else
@@ -609,18 +609,18 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If algTask.firstPass Then
-                lineGravity = algTask.lineGravity
-                lineHorizon = algTask.lineHorizon
+            If task.firstPass Then
+                lineGravity = task.lineGravity
+                lineHorizon = task.lineHorizon
             End If
 
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            Dim x1 = lineGravity.p1.X - algTask.lineGravity.p1.X
-            Dim x2 = lineGravity.p2.X - algTask.lineGravity.p2.X
+            Dim x1 = lineGravity.p1.X - task.lineGravity.p1.X
+            Dim x2 = lineGravity.p2.X - task.lineGravity.p2.X
 
-            Dim y1 = lineHorizon.p1.Y - algTask.lineHorizon.p1.Y
-            Dim y2 = lineHorizon.p2.Y - algTask.lineHorizon.p2.Y
+            Dim y1 = lineHorizon.p1.Y - task.lineHorizon.p1.Y
+            Dim y2 = lineHorizon.p2.Y - task.lineHorizon.p2.Y
 
             translateRotateX(x1, x2)
             translateRotateY(y1, y2)
@@ -640,8 +640,8 @@ Namespace VBClasses
                 dst2 = src
             End If
 
-            lineGravity = algTask.lineGravity
-            lineHorizon = algTask.lineHorizon
+            lineGravity = task.lineGravity
+            lineHorizon = task.lineHorizon
 
             labels(2) = "Translation X = " + Format(translationX, fmt1) + " rotation X = " + Format(rotationX, fmt1) + " degrees " +
                         " center of rotation X = " + Format(centerX.X, fmt0) + ", " + Format(centerX.Y, fmt0)
@@ -685,16 +685,16 @@ Namespace VBClasses
             dst2 = rotate.dst2.Clone
             dst1 = dst2.Clone
 
-            Dim lineHorizon = New lpData(algTask.lineHorizon.p1, algTask.lineHorizon.p2)
+            Dim lineHorizon = New lpData(task.lineHorizon.p1, task.lineHorizon.p2)
 
-            lineHorizon.p1 = RotatePoint(algTask.lineHorizon.p1, rotate.rotateCenter, -rotate.rotateAngle)
-            lineHorizon.p2 = RotatePoint(algTask.lineHorizon.p2, rotate.rotateCenter, -rotate.rotateAngle)
+            lineHorizon.p1 = RotatePoint(task.lineHorizon.p1, rotate.rotateCenter, -rotate.rotateAngle)
+            lineHorizon.p2 = RotatePoint(task.lineHorizon.p2, rotate.rotateCenter, -rotate.rotateAngle)
 
-            vbc.DrawLine(dst2, lineHorizon.p1, lineHorizon.p2, algTask.highlight)
-            vbc.DrawLine(dst2, algTask.lineHorizon.p1, algTask.lineHorizon.p2, white)
+            vbc.DrawLine(dst2, lineHorizon.p1, lineHorizon.p2, task.highlight)
+            vbc.DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, white)
 
-            Dim y1 = lineHorizon.p1.Y - algTask.lineHorizon.p1.Y
-            Dim y2 = lineHorizon.p2.Y - algTask.lineHorizon.p2.Y
+            Dim y1 = lineHorizon.p1.Y - task.lineHorizon.p1.Y
+            Dim y2 = lineHorizon.p2.Y - task.lineHorizon.p2.Y
             edges.translateRotateY(y1, y2)
 
             rotate.rotateAngle = edges.rotationY
@@ -730,14 +730,14 @@ Namespace VBClasses
                         Dim pt = New cv.Point2f(x + Math.Abs(val) / Math.Abs(val - lastVal), y)
                         ptX.Add(pt.X)
                         ptY.Add(pt.Y)
-                        If ptX.Count >= algTask.frameHistoryCount Then Return New cv.Point2f(ptX.Average, ptY.Average)
+                        If ptX.Count >= task.frameHistoryCount Then Return New cv.Point2f(ptX.Average, ptY.Average)
                     End If
                 Next
             Next
             Return New cv.Point
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32F Then dst0 = algTask.pcSplit(0) Else dst0 = src
+            If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(0) Else dst0 = src
 
             Dim p1 = findTransition(0, dst0.Height - 1, 1)
             Dim p2 = findTransition(dst0.Height - 1, 0, -1)
@@ -762,40 +762,40 @@ Namespace VBClasses
 
     Public Class XO_Depth_MinMaxToVoronoi : Inherits TaskParent
         Public Sub New()
-            algTask.kalman = New Kalman_Basics
-            ReDim algTask.kalman.kInput(algTask.gridRects.Count * 4 - 1)
+            task.kalman = New Kalman_Basics
+            ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
 
             labels = {"", "", "Red is min distance, blue is max distance", "Voronoi representation of min point (only) for each cell."}
             desc = "Find min and max depth in each roi and create a voronoi representation using the min and max points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.optionsChanged Then ReDim algTask.kalman.kInput(algTask.gridRects.Count * 4 - 1)
+            If task.optionsChanged Then ReDim task.kalman.kInput(task.gridRects.Count * 4 - 1)
 
-            Parallel.For(0, algTask.gridRects.Count,
+            Parallel.For(0, task.gridRects.Count,
             Sub(i)
-                Dim roi = algTask.gridRects(i)
-                Dim mm As mmData = GetMinMax(algTask.pcSplit(2)(roi), algTask.depthMask(roi))
+                Dim roi = task.gridRects(i)
+                Dim mm As mmData = GetMinMax(task.pcSplit(2)(roi), task.depthMask(roi))
                 If mm.minLoc.X < 0 Or mm.minLoc.Y < 0 Then mm.minLoc = New cv.Point2f(0, 0)
-                algTask.kalman.kInput(i * 4) = mm.minLoc.X
-                algTask.kalman.kInput(i * 4 + 1) = mm.minLoc.Y
-                algTask.kalman.kInput(i * 4 + 2) = mm.maxLoc.X
-                algTask.kalman.kInput(i * 4 + 3) = mm.maxLoc.Y
+                task.kalman.kInput(i * 4) = mm.minLoc.X
+                task.kalman.kInput(i * 4 + 1) = mm.minLoc.Y
+                task.kalman.kInput(i * 4 + 2) = mm.maxLoc.X
+                task.kalman.kInput(i * 4 + 3) = mm.maxLoc.Y
             End Sub)
 
-            algTask.kalman.Run(emptyMat)
+            task.kalman.Run(emptyMat)
 
-            Static minList(algTask.gridRects.Count - 1) As cv.Point2f
-            Static maxList(algTask.gridRects.Count - 1) As cv.Point2f
-            If algTask.optionsChanged Then
-                ReDim minList(algTask.gridRects.Count - 1)
-                ReDim maxList(algTask.gridRects.Count - 1)
+            Static minList(task.gridRects.Count - 1) As cv.Point2f
+            Static maxList(task.gridRects.Count - 1) As cv.Point2f
+            If task.optionsChanged Then
+                ReDim minList(task.gridRects.Count - 1)
+                ReDim maxList(task.gridRects.Count - 1)
             End If
-            For Each index In algTask.motionBasics.motionList
-                Dim rect = algTask.gridRects(index)
-                Dim ptmin = New cv.Point2f(algTask.kalman.kOutput(index * 4) + rect.X,
-                                       algTask.kalman.kOutput(index * 4 + 1) + rect.Y)
-                Dim ptmax = New cv.Point2f(algTask.kalman.kOutput(index * 4 + 2) + rect.X,
-                                       algTask.kalman.kOutput(index * 4 + 3) + rect.Y)
+            For Each index In task.motionBasics.motionList
+                Dim rect = task.gridRects(index)
+                Dim ptmin = New cv.Point2f(task.kalman.kOutput(index * 4) + rect.X,
+                                       task.kalman.kOutput(index * 4 + 1) + rect.Y)
+                Dim ptmax = New cv.Point2f(task.kalman.kOutput(index * 4 + 2) + rect.X,
+                                       task.kalman.kOutput(index * 4 + 3) + rect.Y)
                 ptmin = lpData.validatePoint(ptmin)
                 ptmax = lpData.validatePoint(ptmax)
                 minList(index) = ptmin
@@ -803,16 +803,16 @@ Namespace VBClasses
             Next
 
             dst1 = src.Clone()
-            dst1.SetTo(white, algTask.gridMask)
+            dst1.SetTo(white, task.gridMask)
             Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, src.Width, src.Height))
             For i = 0 To minList.Count - 1
                 Dim ptMin = minList(i)
                 subdiv.Insert(ptMin)
-                DrawCircle(dst1, ptMin, algTask.DotSize, cv.Scalar.Red)
-                DrawCircle(dst1, maxList(i), algTask.DotSize, cv.Scalar.Blue)
+                DrawCircle(dst1, ptMin, task.DotSize, cv.Scalar.Red)
+                DrawCircle(dst1, maxList(i), task.DotSize, cv.Scalar.Blue)
             Next
 
-            If algTask.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, algTask.motionMask)
+            If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
 
             Dim facets = New cv.Point2f()() {Nothing}
             Dim centers() As cv.Point2f = Nothing
@@ -827,8 +827,8 @@ Namespace VBClasses
                     ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
                 Next
                 ifacets(0) = ifacet
-                dst3.FillConvexPoly(ifacet, algTask.scalarColors(i Mod algTask.scalarColors.Length), algTask.lineType)
-                cv.Cv2.Polylines(dst3, ifacets, True, cv.Scalar.Black, algTask.lineWidth, algTask.lineType, 0)
+                dst3.FillConvexPoly(ifacet, task.scalarColors(i Mod task.scalarColors.Length), task.lineType)
+                cv.Cv2.Polylines(dst3, ifacets, True, cv.Scalar.Black, task.lineWidth, task.lineType, 0)
             Next
         End Sub
     End Class
@@ -844,7 +844,7 @@ Namespace VBClasses
     Public Class XO_Brick_GrayScaleTest : Inherits TaskParent
         Dim options As New Options_Stdev
         Public Sub New()
-            If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(3) = "bricks where grayscale stdev and average of the 3 color stdev's"
             desc = "Is the average of the color stdev's the same as the stdev of the grayscale?"
         End Sub
@@ -852,23 +852,23 @@ Namespace VBClasses
             options.Run()
             Dim threshold = options.stdevThreshold
 
-            Dim pt = algTask.brickD.rect.TopLeft
+            Dim pt = task.brickD.rect.TopLeft
             Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
             Dim ColorMean As cv.Scalar, colorStdev As cv.Scalar
             Static saveTrueData As New List(Of TrueText)
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 dst3.SetTo(0)
                 dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Dim count As Integer
-                For Each brick In algTask.bricks.brickList
+                For Each brick In task.bricks.brickList
                     cv.Cv2.MeanStdDev(dst2(brick.rect), grayMean, grayStdev)
-                    cv.Cv2.MeanStdDev(algTask.color(brick.rect), ColorMean, colorStdev)
+                    cv.Cv2.MeanStdDev(task.color(brick.rect), ColorMean, colorStdev)
                     Dim nextColorStdev = (colorStdev(0) + colorStdev(1) + colorStdev(2)) / 3
                     Dim diff = Math.Abs(grayStdev(0) - nextColorStdev)
                     If diff > threshold Then
-                        dst2.Rectangle(brick.rect, 255, algTask.lineWidth)
+                        dst2.Rectangle(brick.rect, 255, task.lineWidth)
                         SetTrueText(Format(grayStdev(0), fmt1) + " " + Format(colorStdev, fmt1), brick.rect.TopLeft, 2)
-                        dst3.Rectangle(brick.rect, algTask.highlight, algTask.lineWidth)
+                        dst3.Rectangle(brick.rect, task.highlight, task.lineWidth)
                         SetTrueText(Format(diff, fmt1), brick.rect.TopLeft, 3)
                         count += 1
                     End If
@@ -906,7 +906,7 @@ Namespace VBClasses
                 input = src
             End If
             Dim keypoints As cv.KeyPoint() = agastFD.Detect(input)
-            If algTask.heartBeat OrElse lastPoints.Count < 10 Then
+            If task.heartBeat OrElse lastPoints.Count < 10 Then
                 lastPoints.Clear()
                 For Each kpt As cv.KeyPoint In keypoints
                     lastPoints.Add(kpt.Pt)
@@ -918,11 +918,11 @@ Namespace VBClasses
                 Dim p1 As New cv.Point2f(CSng(Math.Round(pt.Pt.X * resizeFactor)), CSng(Math.Round(pt.Pt.Y * resizeFactor)))
                 If lastPoints.Contains(p1) Then
                     stablePoints.Add(p1)
-                    DrawCircle(dst2, p1, algTask.DotSize, New cv.Scalar(0, 0, 255))
+                    DrawCircle(dst2, p1, task.DotSize, New cv.Scalar(0, 0, 255))
                 End If
             Next
             lastPoints = New List(Of cv.Point2f)(stablePoints)
-            If algTask.midHeartBeat Then
+            If task.midHeartBeat Then
                 labels(2) = $"{keypoints.Length} features found and {stablePoints.Count} of them were stable"
             End If
             labels(2) = $"Found {keypoints.Length} features"
@@ -968,7 +968,7 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For Each lp In lpList
-                dst2.Line(lp.p1, lp.p2, 255, algTask.lineWidth, algTask.lineType)
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
             labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
         End Sub
@@ -986,27 +986,27 @@ Namespace VBClasses
     Public Class XO_Line_LeftRight : Inherits TaskParent
         Dim lineCore As New XO_Line_Core
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Show lines in both the right and left images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = algTask.lines.dst2.Clone
-            labels(2) = "Left view" + algTask.lines.labels(2)
+            dst2 = task.lines.dst2.Clone
+            labels(2) = "Left view" + task.lines.labels(2)
 
-            dst1 = algTask.rightView
-            lineCore.Run(algTask.rightView)
+            dst1 = task.rightView
+            lineCore.Run(task.rightView)
             dst3 = lineCore.dst2.Clone
             labels(3) = "Right View: " + lineCore.labels(2)
 
             If standalone Then
-                If algTask.gOptions.DebugCheckBox.Checked Then
-                    dst2.SetTo(0, algTask.noDepthMask)
-                    dst3.SetTo(0, algTask.noDepthMask)
+                If task.gOptions.DebugCheckBox.Checked Then
+                    dst2.SetTo(0, task.noDepthMask)
+                    dst3.SetTo(0, task.noDepthMask)
                 End If
             Else
-                If algTask.toggleOn Then
-                    dst2.SetTo(0, algTask.noDepthMask)
-                    dst3.SetTo(0, algTask.noDepthMask)
+                If task.toggleOn Then
+                    dst2.SetTo(0, task.noDepthMask)
+                    dst3.SetTo(0, task.noDepthMask)
                 End If
             End If
         End Sub
@@ -1042,15 +1042,15 @@ Namespace VBClasses
             options.Run()
             dst2 = src.Clone
 
-            If algTask.firstPass Then OptionParent.FindSlider("Min Line Length").Value = 30
+            If task.firstPass Then OptionParent.FindSlider("Min Line Length").Value = 30
 
             Dim tolerance = 0.1
             Dim newSet As New List(Of lpData)
             Dim removeList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
             Dim addList As New List(Of lpData)
             Dim combineCount As Integer
-            For i = 0 To algTask.lines.lpList.Count - 1
-                Dim lp = algTask.lines.lpList(i)
+            For i = 0 To task.lines.lpList.Count - 1
+                Dim lp = task.lines.lpList(i)
                 Dim lpRemove As Boolean = False
                 For j = 0 To 1
                     Dim pt = Choose(j + 1, lp.p1, lp.p2)
@@ -1061,7 +1061,7 @@ Namespace VBClasses
                         Dim lpNew = combine2Lines(lp, mp)
                         If lpNew IsNot Nothing Then
                             addList.Add(lpNew)
-                            vbc.DrawLine(dst2, lpNew.p1, lpNew.p2, algTask.highlight)
+                            vbc.DrawLine(dst2, lpNew.p1, lpNew.p2, task.highlight)
                             If removeList.Values.Contains(j) = False Then removeList.Add(j, j)
                             lpRemove = True
                             combineCount += 1
@@ -1074,13 +1074,13 @@ Namespace VBClasses
             Next
 
             For i = 0 To removeList.Count - 1
-                algTask.lines.lpList.RemoveAt(removeList.ElementAt(i).Value)
+                task.lines.lpList.RemoveAt(removeList.ElementAt(i).Value)
             Next
 
             For Each lp In addList
-                algTask.lines.lpList.Add(lp)
+                task.lines.lpList.Add(lp)
             Next
-            lpList = New List(Of lpData)(algTask.lines.lpList)
+            lpList = New List(Of lpData)(task.lines.lpList)
             lpMap.SetTo(0)
             For i = 0 To lpList.Count - 1
                 Dim lp = lpList(i)
@@ -1088,8 +1088,8 @@ Namespace VBClasses
             Next
             lpMap.ConvertTo(dst3, cv.MatType.CV_8U)
             dst3 = dst3.Threshold(0, cv.Scalar.White, cv.ThresholdTypes.Binary)
-            If algTask.heartBeat Then
-                labels(2) = CStr(algTask.lines.lpList.Count) + " lines were input and " + CStr(combineCount) +
+            If task.heartBeat Then
+                labels(2) = CStr(task.lines.lpList.Count) + " lines were input and " + CStr(combineCount) +
                             " lines were matched to the previous frame"
             End If
         End Sub
@@ -1106,13 +1106,13 @@ Namespace VBClasses
             desc = "Isolate the top X lines by length - lines are already sorted by length."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = algTask.lines.dst2
-            labels(2) = algTask.lines.labels(2)
+            dst2 = task.lines.dst2
+            labels(2) = task.lines.labels(2)
 
             dst3.SetTo(0)
             For i = 0 To 9
-                Dim lp = algTask.lines.lpList(i)
-                dst3.Line(lp.p1, lp.p2, 255, algTask.lineWidth, algTask.lineType)
+                Dim lp = task.lines.lpList(i)
+                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
         End Sub
     End Class
@@ -1137,7 +1137,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            If standaloneTest() And algTask.heartBeat Then
+            If standaloneTest() And task.heartBeat Then
                 Dim tc As New tCell
                 tcells.Clear()
                 For i = 0 To 2 - 1
@@ -1147,10 +1147,10 @@ Namespace VBClasses
             End If
             If tcells.Count < 2 Then Exit Sub
 
-            If myCurrentFrame < algTask.frameCount Then
+            If myCurrentFrame < task.frameCount Then
                 canny.Run(src)
                 blur.Run(canny.dst2)
-                myCurrentFrame = algTask.frameCount
+                myCurrentFrame = task.frameCount
             End If
             dst1.SetTo(0)
             Dim p1 = tcells(0).center
@@ -1164,12 +1164,12 @@ Namespace VBClasses
 
             For Each tc In tcells
                 'dst2.Rectangle(tc.rect, myhighlight)
-                'dst2.Rectangle(tc.searchRect, white, algTask.lineWidth)
+                'dst2.Rectangle(tc.searchRect, white, task.lineWidth)
                 SetTrueText(tc.strOut, New cv.Point(tc.rect.X, tc.rect.Y))
             Next
 
             strOut = "Mask count = " + CStr(maskCount) + ", Expected count = " + CStr(distance) + " or " + Format(maskCount / distance, "0%") + vbCrLf
-            vbc.DrawLine(dst2, p1, p2, algTask.highlight)
+            vbc.DrawLine(dst2, p1, p2, task.highlight)
 
             strOut += "Color changes when correlation falls below threshold and new line is detected." + vbCrLf +
                       "Correlation coefficient is shown with the depth in meters."
@@ -1243,7 +1243,7 @@ Namespace VBClasses
 
             If OptionParent.FindFrm(traceName + " CheckBoxes") Is Nothing Then
                 check.Setup(traceName)
-                check.addCheckBox("Show intermediate vertical step algTask.results..")
+                check.addCheckBox("Show intermediate vertical step task.results..")
                 check.addCheckBox("Run horizontal without vertical step")
             End If
 
@@ -1251,7 +1251,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static noVertCheck = OptionParent.FindCheckBox("Run horizontal without vertical step")
-            Static verticalCheck = OptionParent.FindCheckBox("Show intermediate vertical step algTask.results..")
+            Static verticalCheck = OptionParent.FindCheckBox("Show intermediate vertical step task.results..")
             reduction.Run(src)
             dst2 = reduction.dst2
             dst3 = dst2.Clone
@@ -1338,7 +1338,7 @@ Namespace VBClasses
             desc = "Find the nearest point on a line"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() And algTask.heartBeat Then
+            If standaloneTest() And task.heartBeat Then
                 lp.p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
                 lp.p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
                 pt = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -1378,7 +1378,7 @@ Namespace VBClasses
                 dst2.SetTo(0)
                 vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Yellow)
                 vbc.DrawLine(dst2, pt, nearPoint, white)
-                DrawCircle(dst2, pt, algTask.DotSize, white)
+                DrawCircle(dst2, pt, task.DotSize, white)
             End If
             distance = Math.Sqrt(Math.Pow(pt.X - nearPoint.X, 2) + Math.Pow(pt.Y - nearPoint.Y, 2))
         End Sub
@@ -1400,8 +1400,8 @@ Namespace VBClasses
             desc = "Collect lines over time"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.optionsChanged Then frameList.Clear()
-            Dim nextMpList = New List(Of lpData)(algTask.lines.lpList)
+            If task.optionsChanged Then frameList.Clear()
+            Dim nextMpList = New List(Of lpData)(task.lines.lpList)
             frameList.Add(nextMpList)
 
             dst2 = src
@@ -1417,7 +1417,7 @@ Namespace VBClasses
                 Next
             Next
 
-            If frameList.Count >= algTask.frameHistoryCount Then frameList.RemoveAt(0)
+            If frameList.Count >= task.frameHistoryCount Then frameList.RemoveAt(0)
             pixelcount = dst3.CountNonZero
             labels(3) = "There were " + CStr(lineTotal) + " lines detected using " + Format(pixelcount / 1000, "#.0") + "k pixels"
         End Sub
@@ -1433,7 +1433,7 @@ Namespace VBClasses
         Dim color8U As New Color8U_Basics
         Dim lines As New XO_Line_RawSorted
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "", "Lines for the current color class", "Color Class input"}
             desc = "Review lines in all the different color classes"
         End Sub
@@ -1459,7 +1459,7 @@ Namespace VBClasses
         Dim contours As New XO_Contour_Gray
         Dim lines As New XO_Line_RawSorted
         Public Sub New()
-            algTask.gOptions.highlight.SelectedIndex = 3
+            task.gOptions.highlight.SelectedIndex = 3
             desc = "Find the lines in the contours."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -1514,8 +1514,8 @@ Namespace VBClasses
         Dim gradientColors(100) As cv.Scalar
         Dim frameCount As Integer
         Public Sub New()
-            algTask.kalman = New Kalman_Basics
-            algTask.kalman.kOutput = {0, 0, 0, 0}
+            task.kalman = New Kalman_Basics
+            task.kalman.kOutput = {0, 0, 0, 0}
 
             Dim color1 = cv.Scalar.Yellow, color2 = cv.Scalar.Blue
             Dim f As Double = 1.0
@@ -1536,10 +1536,10 @@ Namespace VBClasses
                     k2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
                     dst2.SetTo(0)
                 End If
-                algTask.kalman.kInput = {k1.X, k1.Y, k2.X, k2.Y}
-                algTask.kalman.Run(emptyMat)
-                p1 = New cv.Point(algTask.kalman.kOutput(0), algTask.kalman.kOutput(1))
-                p2 = New cv.Point(algTask.kalman.kOutput(2), algTask.kalman.kOutput(3))
+                task.kalman.kInput = {k1.X, k1.Y, k2.X, k2.Y}
+                task.kalman.Run(emptyMat)
+                p1 = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
+                p2 = New cv.Point(task.kalman.kOutput(2), task.kalman.kOutput(3))
             End If
             frameCount += 1
             vbc.DrawLine(dst2, p1, p2, gradientColors(frameCount Mod gradientColors.Count))
@@ -1563,25 +1563,25 @@ Namespace VBClasses
             desc = "Find the BGR lines and confirm they are present in the cloud data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = algTask.lines.dst2
+            dst2 = task.lines.dst2
 
             Dim lineList = New List(Of cv.Rect)
-            If algTask.optionsChanged Then dst3.SetTo(0)
-            dst3.SetTo(0, algTask.motionMask)
+            If task.optionsChanged Then dst3.SetTo(0)
+            dst3.SetTo(0, task.motionMask)
             p1List.Clear()
             p2List.Clear()
             z1List.Clear()
             z2List.Clear()
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 Dim rect = findRectFromLine(lp)
                 Dim mask = New cv.Mat(New cv.Size(rect.Width, rect.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
                 mask.Line(New cv.Point(CInt(lp.p1.X - rect.X), CInt(lp.p1.Y - rect.Y)),
-                          New cv.Point(CInt(lp.p2.X - rect.X), CInt(lp.p2.Y - rect.Y)), 255, algTask.lineWidth, cv.LineTypes.Link4)
-                Dim mean = algTask.pointCloud(rect).Mean(mask)
+                          New cv.Point(CInt(lp.p2.X - rect.X), CInt(lp.p2.Y - rect.Y)), 255, task.lineWidth, cv.LineTypes.Link4)
+                Dim mean = task.pointCloud(rect).Mean(mask)
 
                 If mean <> New cv.Scalar Then
-                    Dim mmX = GetMinMax(algTask.pcSplit(0)(rect), mask)
-                    Dim mmY = GetMinMax(algTask.pcSplit(1)(rect), mask)
+                    Dim mmX = GetMinMax(task.pcSplit(0)(rect), mask)
+                    Dim mmY = GetMinMax(task.pcSplit(1)(rect), mask)
                     Dim len1 = mmX.minLoc.DistanceTo(mmX.maxLoc)
                     Dim len2 = mmY.minLoc.DistanceTo(mmY.maxLoc)
                     If len1 > len2 Then
@@ -1595,8 +1595,8 @@ Namespace VBClasses
                         vbc.DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Yellow)
                         p1List.Add(lp.p1)
                         p2List.Add(lp.p2)
-                        z1List.Add(algTask.pointCloud.Get(Of cv.Point3f)(lp.p1.Y, lp.p1.X))
-                        z2List.Add(algTask.pointCloud.Get(Of cv.Point3f)(lp.p2.Y, lp.p2.X))
+                        z1List.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p1.Y, lp.p1.X))
+                        z2List.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p2.Y, lp.p2.X))
                     End If
                 End If
             Next
@@ -1628,7 +1628,7 @@ Namespace VBClasses
             lpList.Clear()
             lpList.Add(New lpData) ' placeholder to allow us to build a map.
             If lastList.Count > 0 Then
-                lpRectMap.SetTo(0, Not algTask.motionMask)
+                lpRectMap.SetTo(0, Not task.motionMask)
                 cv.Cv2.CalcHist({lpRectMap}, {0}, emptyMat, histogram, 1, {lastList.Count}, New cv.Rangef() {New cv.Rangef(0, lastList.Count)})
                 Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
@@ -1641,7 +1641,7 @@ Namespace VBClasses
             ReDim histarray(lines.lpList.Count - 1)
 
             Dim tmp = lines.lpRectMap.Clone
-            tmp.SetTo(0, Not algTask.motionMask)
+            tmp.SetTo(0, Not task.motionMask)
             cv.Cv2.CalcHist({tmp}, {0}, emptyMat, histogram, 1, {lines.lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lines.lpList.Count)})
             Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
@@ -1653,11 +1653,11 @@ Namespace VBClasses
             lpRectMap.SetTo(0)
             For i = 0 To lpList.Count - 1
                 Dim lp = lpList(i)
-                dst2.Line(lp.p1, lp.p2, 255, algTask.lineWidth, algTask.lineType)
-                lpRectMap.Line(lp.p1, lp.p2, i, algTask.lineWidth, algTask.lineType)
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+                lpRectMap.Line(lp.p1, lp.p2, i, task.lineWidth, task.lineType)
             Next
 
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 labels(2) = CStr(lines.lpList.Count) + " lines found in XO_Line_RawSorted in the current image with " +
                             CStr(lpList.Count) + " after filtering with the motion mask."
             End If
@@ -1684,12 +1684,12 @@ Namespace VBClasses
             dst3.SetTo(0)
             dst2.SetTo(cv.Scalar.White, lineCore.dst2)
             For Each lp In lineCore.lpList
-                lpRectMap.Line(lp.p1, lp.p2, lp.index, algTask.lineWidth + 1, cv.LineTypes.Link8)
-                dst3.Line(lp.p1, lp.p2, 255, algTask.lineWidth, algTask.lineType)
+                lpRectMap.Line(lp.p1, lp.p2, lp.index, task.lineWidth + 1, cv.LineTypes.Link8)
+                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
 
             lpList = New List(Of lpData)(lineCore.lpList)
-            algTask.lines.lpList = New List(Of lpData)(lineCore.lpList)
+            task.lines.lpList = New List(Of lpData)(lineCore.lpList)
             labels(2) = lineCore.labels(2)
         End Sub
     End Class
@@ -1712,19 +1712,19 @@ Namespace VBClasses
             line.Run(src)
 
             dst2.SetTo(0)
-            Dim w = algTask.lineWidth + 5
+            Dim w = task.lineWidth + 5
             lpList.Clear()
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 If Math.Abs(lp.slope) < 0.1 Then
                     lp = findEdgePoints(lp)
-                    dst2.Line(lp.p1, lp.p2, 255, w, algTask.lineType)
+                    dst2.Line(lp.p1, lp.p2, 255, w, task.lineType)
                     lpList.Add(lp)
                 End If
             Next
 
             Dim histogram = line.autoY.histogram
             histogram.SetTo(0, Not dst2)
-            cv.Cv2.CalcBackProject({algTask.pointCloud}, algTask.channelsSide, histogram, dst1, algTask.rangesSide)
+            cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogram, dst1, task.rangesSide)
             dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
             dst3 = src
             dst3.SetTo(white, dst1)
@@ -1746,16 +1746,16 @@ Namespace VBClasses
             desc = "Automatically find the Y values that best describes the floor and ceiling (if present)"
         End Sub
         Private Sub rebuildMask(maskLabel As String, min As Single, max As Single)
-            Dim mask = algTask.pcSplit(1).InRange(min, max).ConvertScaleAbs
+            Dim mask = task.pcSplit(1).InRange(min, max).ConvertScaleAbs
 
             Dim mean As cv.Scalar, stdev As cv.Scalar
-            cv.Cv2.MeanStdDev(algTask.pointCloud, mean, stdev, mask)
+            cv.Cv2.MeanStdDev(task.pointCloud, mean, stdev, mask)
 
             strOut += "The " + maskLabel + " mask has Y mean and stdev are:" + vbCrLf
             strOut += maskLabel + " Y Mean = " + Format(mean(1), fmt3) + vbCrLf
             strOut += maskLabel + " Y Stdev = " + Format(stdev(1), fmt3) + vbCrLf + vbCrLf
 
-            If Math.Abs(mean(1)) > algTask.yRange / 4 Then dst1 = mask Or dst1
+            If Math.Abs(mean(1)) > task.yRange / 4 Then dst1 = mask Or dst1
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim pad As Single = 0.05 ' pad the estimate by X cm's
@@ -1764,18 +1764,18 @@ Namespace VBClasses
             bpLine.Run(src)
 
             If bpLine.lpList.Count > 0 Then
-                strOut = "Y range = " + Format(algTask.yRange, fmt3) + vbCrLf + vbCrLf
-                If algTask.heartBeat Then yList.Clear()
-                If algTask.heartBeat Then dst1.SetTo(0)
+                strOut = "Y range = " + Format(task.yRange, fmt3) + vbCrLf + vbCrLf
+                If task.heartBeat Then yList.Clear()
+                If task.heartBeat Then dst1.SetTo(0)
                 Dim h = dst2.Height / 2
                 For Each lp In bpLine.lpList
-                    Dim nextY = algTask.yRange * (lp.p1.Y - h) / h
-                    If Math.Abs(nextY) > algTask.yRange / 4 Then yList.Add(nextY)
+                    Dim nextY = task.yRange * (lp.p1.Y - h) / h
+                    If Math.Abs(nextY) > task.yRange / 4 Then yList.Add(nextY)
                 Next
 
                 If yList.Count > 0 Then
-                    If yList.Max > 0 Then rebuildMask("floor", yList.Max - pad, algTask.yRange)
-                    If yList.Min < 0 Then rebuildMask("ceiling", -algTask.yRange, yList.Min + pad)
+                    If yList.Max > 0 Then rebuildMask("floor", yList.Max - pad, task.yRange)
+                    If yList.Min < 0 Then rebuildMask("ceiling", -task.yRange, yList.Min + pad)
                 End If
 
                 dst2.SetTo(white, dst1)
@@ -1796,13 +1796,13 @@ Namespace VBClasses
             desc = "FastLineDetect version for finding lines in the Sudoku input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = cv.Cv2.ImRead(algTask.homeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
+            dst3 = cv.Cv2.ImRead(task.homeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
             lines.Run(dst3.Clone)
             dst2 = lines.dst2
             labels(2) = lines.labels(2)
             For Each lp In lines.lpList
                 lp = findEdgePoints(lp)
-                dst3.Line(lp.p1, lp.p2, cv.Scalar.Red, algTask.lineWidth, algTask.lineType)
+                dst3.Line(lp.p1, lp.p2, cv.Scalar.Red, task.lineWidth, task.lineType)
             Next
         End Sub
     End Class
@@ -1835,10 +1835,10 @@ Namespace VBClasses
             Dim blue = New cv.Scalar(254, 0, 0)
 
             Dim center = New cv.Point(dst3.Width / 2, dst3.Height / 2)
-            dst3.Line(New cv.Point(0, 0), center, blue, algTask.lineWidth, cv.LineTypes.Link4)
-            dst3.Line(New cv.Point(dst2.Width, 0), center, red, algTask.lineWidth, cv.LineTypes.Link4)
-            dst3.Line(New cv.Point(0, dst2.Height), center, blue, algTask.lineWidth, cv.LineTypes.Link4)
-            dst3.Line(New cv.Point(dst2.Width, dst2.Height), center, yellow, algTask.lineWidth, cv.LineTypes.Link4)
+            dst3.Line(New cv.Point(0, 0), center, blue, task.lineWidth, cv.LineTypes.Link4)
+            dst3.Line(New cv.Point(dst2.Width, 0), center, red, task.lineWidth, cv.LineTypes.Link4)
+            dst3.Line(New cv.Point(0, dst2.Height), center, blue, task.lineWidth, cv.LineTypes.Link4)
+            dst3.Line(New cv.Point(dst2.Width, dst2.Height), center, yellow, task.lineWidth, cv.LineTypes.Link4)
 
             Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, cv.Scalar.All(0))
             Dim pt = New cv.Point(center.X, center.Y - 30)
@@ -1852,9 +1852,9 @@ Namespace VBClasses
 
             pt = New cv.Point(center.X + 30, center.Y)
             cv.Cv2.FloodFill(dst3, mask, pt, yellow, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
-            Dim color = dst3.Get(Of cv.Vec3b)(algTask.mouseMovePoint.Y, algTask.mouseMovePoint.X)
+            Dim color = dst3.Get(Of cv.Vec3b)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
 
-            Dim p1 = algTask.mouseMovePoint
+            Dim p1 = task.mouseMovePoint
             If p1.X = center.X Then
                 If p1.Y <= center.Y Then p2 = New cv.Point(dst3.Width / 2, 0) Else p2 = New cv.Point(dst3.Width, dst3.Height)
             Else
@@ -1867,7 +1867,7 @@ Namespace VBClasses
                 If color(0) = 254 Then p2 = New cv.Point(0, b) ' blue
                 vbc.DrawLine(dst3, center, p2, cv.Scalar.Black)
             End If
-            DrawCircle(dst3, center, algTask.DotSize, white)
+            DrawCircle(dst3, center, task.DotSize, white)
             If color(0) = 0 Then redRadio.Checked = True
             If color(0) = 1 Then greenRadio.Checked = True
             If color(0) = 2 Then yellowRadio.Checked = True
@@ -1877,16 +1877,16 @@ Namespace VBClasses
                 Select Case lines.options.selectedIntercept
                     Case 0
                         dst3.Line(New cv.Point(inter.Key, 0), New cv.Point(inter.Key, 10), white,
-                             algTask.lineWidth)
+                             task.lineWidth)
                     Case 1
                         dst3.Line(New cv.Point(inter.Key, dst3.Height), New cv.Point(inter.Key, dst3.Height - 10),
-                             white, algTask.lineWidth)
+                             white, task.lineWidth)
                     Case 2
                         dst3.Line(New cv.Point(0, inter.Key), New cv.Point(10, inter.Key), white,
-                             algTask.lineWidth)
+                             task.lineWidth)
                     Case 3
                         dst3.Line(New cv.Point(dst3.Width, inter.Key), New cv.Point(dst3.Width - 10, inter.Key),
-                             white, algTask.lineWidth)
+                             white, task.lineWidth)
                 End Select
             Next
             dst2 = lines.dst2
@@ -1909,12 +1909,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If algTask.heartBeat Then
-                dst1 = algTask.gray.Clone
+            If task.heartBeat Then
+                dst1 = task.gray.Clone
                 dst2.SetTo(0)
             End If
 
-            cv.Cv2.Absdiff(algTask.gray, dst1, dst3)
+            cv.Cv2.Absdiff(task.gray, dst1, dst3)
             cumulativePixels = dst3.CountNonZero
             dst2 = dst2 Or dst3.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
         End Sub
@@ -1941,10 +1941,10 @@ Namespace VBClasses
             Dim pt1 As cv.Point = New cv.Point(x, y)
             Dim pt2 As cv.Point
             If m = 0 Then pt2 = New cv.Point(x, dst.Rows) Else pt2 = New cv.Point((dst.Rows - b) / m, dst.Rows)
-            dst.Line(pt1, pt2, cv.Scalar.Red, algTask.lineWidth + 2, algTask.lineType, 0)
+            dst.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 2, task.lineType, 0)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If Not algTask.heartBeat Then Exit Sub
+            If Not task.heartBeat Then Exit Sub
             hlines.Run(src)
             dst3 = hlines.dst3
             Dim mask = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
@@ -1953,9 +1953,9 @@ Namespace VBClasses
 
             Dim lines As New List(Of cv.Line3D)
             Dim nullLine = New cv.Line3D(0, 0, 0, 0, 0, 0)
-            Parallel.ForEach(algTask.gridRects,
+            Parallel.ForEach(task.gridRects,
         Sub(roi)
-            Dim depth = algTask.pcSplit(2)(roi)
+            Dim depth = task.pcSplit(2)(roi)
             Dim fMask = mask(roi)
             Dim points As New List(Of cv.Point3f)
             Dim rows = src.Rows, cols = src.Cols
@@ -1972,7 +1972,7 @@ Namespace VBClasses
             Dim line = nullLine
             If points.Count = 0 Then
                 ' save the average color for this roi
-                Dim mean = algTask.depthRGB(roi).Mean()
+                Dim mean = task.depthRGB(roi).Mean()
                 mean(0) = 255 - mean(0)
                 dst3.Rectangle(roi, mean)
             Else
@@ -1983,8 +1983,8 @@ Namespace VBClasses
             End SyncLock
         End Sub)
             ' putting this in the parallel for above causes a memory leak - could not find it...
-            For i = 0 To algTask.gridRects.Count - 1
-                houghShowLines3D(dst2(algTask.gridRects(i)), lines.ElementAt(i))
+            For i = 0 To task.gridRects.Count - 1
+                houghShowLines3D(dst2(task.gridRects(i)), lines.ElementAt(i))
             Next
         End Sub
     End Class
@@ -2003,8 +2003,8 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If algTask.optionsChanged Then
-                ReDim lastCorrelation(algTask.gridRects.Count - 1)
+            If task.optionsChanged Then
+                ReDim lastCorrelation(task.gridRects.Count - 1)
             End If
 
             LRMeanSub.Run(src)
@@ -2012,15 +2012,15 @@ Namespace VBClasses
             Dim stdev As cv.Scalar, mean As cv.Scalar
             Dim correlationMat As New cv.Mat
 
-            algTask.bricks.brickList.Clear()
-            For i = 0 To algTask.gridRects.Count - 1
+            task.bricks.brickList.Clear()
+            For i = 0 To task.gridRects.Count - 1
                 Dim brick As New brickData
-                brick.rect = algTask.gridRects(i)
+                brick.rect = task.gridRects(i)
                 brick.rect = brick.rect
                 brick.lRect = brick.rect ' for some cameras the color image and the left image are the same but not all, i.e. Intel Realsense.
                 brick.center = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
-                If algTask.depthMask(brick.rect).CountNonZero Then
-                    cv.Cv2.MeanStdDev(algTask.pcSplit(2)(brick.rect), mean, stdev, algTask.depthMask(brick.rect))
+                If task.depthMask(brick.rect).CountNonZero Then
+                    cv.Cv2.MeanStdDev(task.pcSplit(2)(brick.rect), mean, stdev, task.depthMask(brick.rect))
                     brick.depth = mean(0)
                 End If
 
@@ -2028,18 +2028,18 @@ Namespace VBClasses
                     brick.correlation = 0
                     brick.rRect = emptyRect
                 Else
-                    brick.mm = GetMinMax(algTask.pcSplit(2)(brick.rect), algTask.depthMask(brick.rect))
-                    If algTask.rgbLeftAligned Then
+                    brick.mm = GetMinMax(task.pcSplit(2)(brick.rect), task.depthMask(brick.rect))
+                    If task.rgbLeftAligned Then
                         brick.lRect = brick.rect
                         brick.rRect = brick.lRect
-                        brick.rRect.X -= algTask.calibData.baseline * algTask.calibData.rgbIntrinsics.fx / brick.depth
+                        brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
                         brick.rRect = ValidateRect(brick.rRect)
                         cv.Cv2.MatchTemplate(LRMeanSub.dst2(brick.lRect), LRMeanSub.dst3(brick.rRect), correlationMat,
                                                      cv.TemplateMatchModes.CCoeffNormed)
 
                         brick.correlation = correlationMat.Get(Of Single)(0, 0)
                     Else
-                        Dim irPt = Intrinsics_Basics.translate_LeftToRight(algTask.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
+                        Dim irPt = Intrinsics_Basics.translate_LeftToRight(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
                         If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
                             brick.depth = 0 ' off the grid.
                             brick.lRect = emptyRect
@@ -2049,7 +2049,7 @@ Namespace VBClasses
                             brick.lRect = ValidateRect(brick.lRect)
 
                             brick.rRect = brick.lRect
-                            brick.rRect.X -= algTask.calibData.baseline * algTask.calibData.leftIntrinsics.fx / brick.depth
+                            brick.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
                             brick.rRect = ValidateRect(brick.rRect)
                             cv.Cv2.MatchTemplate(LRMeanSub.dst2(brick.lRect), LRMeanSub.dst3(brick.rRect), correlationMat,
                                                       cv.TemplateMatchModes.CCoeffNormed)
@@ -2060,14 +2060,14 @@ Namespace VBClasses
                 End If
 
                 lastCorrelation(i) = brick.correlation
-                brick.index = algTask.bricks.brickList.Count
-                algTask.gridMap(brick.rect).SetTo(i)
-                algTask.bricks.brickList.Add(brick)
+                brick.index = task.bricks.brickList.Count
+                task.gridMap(brick.rect).SetTo(i)
+                task.bricks.brickList.Add(brick)
             Next
 
             ' quad.Run(src)
 
-            If algTask.heartBeat Then labels(2) = CStr(algTask.bricks.brickList.Count) + " bricks have the useful depth values."
+            If task.heartBeat Then labels(2) = CStr(task.bricks.brickList.Count) + " bricks have the useful depth values."
         End Sub
     End Class
 
@@ -2086,7 +2086,7 @@ Namespace VBClasses
             Dim infTotal(2) As Integer
             For y = 0 To src.Rows - 1
                 For x = 0 To src.Cols - 1
-                    Dim vec = algTask.pointCloud.Get(Of cv.Vec3f)(y, x)
+                    Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
                     If Single.IsInfinity(vec(0)) Then infTotal(0) += 1
                     If Single.IsInfinity(vec(1)) Then infTotal(1) += 1
                     If Single.IsInfinity(vec(2)) Then infTotal(2) += 1
@@ -2120,16 +2120,16 @@ Namespace VBClasses
         Public Function findHorizontalPoints(ByRef xyList As List(Of List(Of cv.Point))) As List(Of List(Of cv.Point3f))
             Dim ptlist As New List(Of List(Of cv.Point3f))
             Dim lastVec = New cv.Point3f
-            For y = 0 To algTask.pointCloud.Height - 1 Step algTask.gridRects(0).Height - 1
+            For y = 0 To task.pointCloud.Height - 1 Step task.gridRects(0).Height - 1
                 Dim vecList As New List(Of cv.Point3f)
                 Dim xyVec As New List(Of cv.Point)
-                For x = 0 To algTask.pointCloud.Width - 1 Step algTask.gridRects(0).Width - 1
-                    Dim vec = algTask.pointCloud.Get(Of cv.Point3f)(y, x)
+                For x = 0 To task.pointCloud.Width - 1 Step task.gridRects(0).Width - 1
+                    Dim vec = task.pointCloud.Get(Of cv.Point3f)(y, x)
                     Dim jumpZ As Boolean = False
                     If vec.Z > 0 Then
                         If (Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold And lastVec.X < vec.X) Or lastVec.Z = 0 Then
                             actualCount += 1
-                            DrawCircle(dst2, New cv.Point(x, y), algTask.DotSize, white)
+                            DrawCircle(dst2, New cv.Point(x, y), task.DotSize, white)
                             vecList.Add(vec)
                             xyVec.Add(New cv.Point(x, y))
                         Else
@@ -2152,16 +2152,16 @@ Namespace VBClasses
         Public Function findVerticalPoints(ByRef xyList As List(Of List(Of cv.Point))) As List(Of List(Of cv.Point3f))
             Dim ptlist As New List(Of List(Of cv.Point3f))
             Dim lastVec = New cv.Point3f
-            For x = 0 To algTask.pointCloud.Width - 1 Step algTask.gridRects(0).Width - 1
+            For x = 0 To task.pointCloud.Width - 1 Step task.gridRects(0).Width - 1
                 Dim vecList As New List(Of cv.Point3f)
                 Dim xyVec As New List(Of cv.Point)
-                For y = 0 To algTask.pointCloud.Height - 1 Step algTask.gridRects(0).Height - 1
-                    Dim vec = algTask.pointCloud.Get(Of cv.Point3f)(y, x)
+                For y = 0 To task.pointCloud.Height - 1 Step task.gridRects(0).Height - 1
+                    Dim vec = task.pointCloud.Get(Of cv.Point3f)(y, x)
                     Dim jumpZ As Boolean = False
                     If vec.Z > 0 Then
                         If (Math.Abs(lastVec.Z - vec.Z) < options.deltaThreshold And lastVec.Y < vec.Y) Or lastVec.Z = 0 Then
                             actualCount += 1
-                            DrawCircle(dst2, New cv.Point(x, y), algTask.DotSize, white)
+                            DrawCircle(dst2, New cv.Point(x, y), task.DotSize, white)
                             vecList.Add(vec)
                             xyVec.Add(New cv.Point(x, y))
                         Else
@@ -2296,11 +2296,11 @@ Namespace VBClasses
     Public Class XO_PointCloud_NeighborV : Inherits TaskParent
         Dim options As New Options_Neighbors
         Public Sub New()
-            desc = "Show where vertical neighbor depth values are within algTask.depthDiffMeters"
+            desc = "Show where vertical neighbor depth values are within task.depthDiffMeters"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If src.Type <> cv.MatType.CV_32F Then src = algTask.pcSplit(2)
+            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
             Dim tmp32f = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             Dim r1 = New cv.Rect(options.pixels, 0, dst2.Width - options.pixels, dst2.Height)
@@ -2308,7 +2308,7 @@ Namespace VBClasses
             cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
             tmp32f = tmp32f.Threshold(options.threshold, 255, cv.ThresholdTypes.BinaryInv)
             dst2 = tmp32f.ConvertScaleAbs(255)
-            dst2.SetTo(0, algTask.noDepthMask)
+            dst2.SetTo(0, task.noDepthMask)
             dst2(New cv.Rect(0, dst2.Height - options.pixels, dst2.Width, options.pixels)).SetTo(0)
             labels(2) = "White: z is within " + Format(options.threshold * 1000, fmt0) + " mm's with Y pixel offset " + CStr(options.pixels)
         End Sub
@@ -2327,7 +2327,7 @@ Namespace VBClasses
             desc = "Display the pointcloud as a BGR image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim pcSplit = {algTask.pcSplit(0).ConvertScaleAbs(255), algTask.pcSplit(1).ConvertScaleAbs(255), algTask.pcSplit(2).ConvertScaleAbs(255)}
+            Dim pcSplit = {task.pcSplit(0).ConvertScaleAbs(255), task.pcSplit(1).ConvertScaleAbs(255), task.pcSplit(2).ConvertScaleAbs(255)}
             cv.Cv2.Merge(pcSplit, dst2)
         End Sub
     End Class
@@ -2347,15 +2347,15 @@ Namespace VBClasses
             cPtr = SimpleProjectionOpen()
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.firstPass Then ReDim depthBytes(algTask.pcSplit(2).Total * algTask.pcSplit(2).ElemSize - 1)
+            If task.firstPass Then ReDim depthBytes(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1)
 
-            Marshal.Copy(algTask.pcSplit(2).Data, depthBytes, 0, depthBytes.Length)
+            Marshal.Copy(task.pcSplit(2).Data, depthBytes, 0, depthBytes.Length)
             Dim handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)
 
-            Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, 0, algTask.MaxZmeters, algTask.pcSplit(2).Height, algTask.pcSplit(2).Width)
+            Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, 0, task.MaxZmeters, task.pcSplit(2).Height, task.pcSplit(2).Width)
 
-            dst2 = cv.Mat.FromPixelData(algTask.pcSplit(2).Rows, algTask.pcSplit(2).Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst3 = cv.Mat.FromPixelData(algTask.pcSplit(2).Rows, algTask.pcSplit(2).Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = cv.Mat.FromPixelData(task.pcSplit(2).Rows, task.pcSplit(2).Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst3 = cv.Mat.FromPixelData(task.pcSplit(2).Rows, task.pcSplit(2).Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
             handleDepth.Free()
             labels(2) = "Top View (looking down)"
@@ -2378,19 +2378,19 @@ Namespace VBClasses
             cPtr = SimpleProjectionOpen()
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim range As Single = algTask.MaxZmeters
+            Dim range As Single = task.MaxZmeters
 
             ' this VB.Net version is much slower than the optimized C++ version below.
             dst2 = src.EmptyClone.SetTo(white)
             dst3 = dst2.Clone()
             Dim black = New cv.Vec3b(0, 0, 0)
-            Parallel.ForEach(algTask.gridRects,
+            Parallel.ForEach(task.gridRects,
              Sub(roi)
                  For y = roi.Y To roi.Y + roi.Height - 1
                      For x = roi.X To roi.X + roi.Width - 1
-                         Dim m = algTask.depthMask.Get(Of Byte)(y, x)
+                         Dim m = task.depthMask.Get(Of Byte)(y, x)
                          If m > 0 Then
-                             Dim depth = algTask.pcSplit(2).Get(Of Single)(y, x)
+                             Dim depth = task.pcSplit(2).Get(Of Single)(y, x)
                              Dim dy = CInt(src.Height * depth / range)
                              If dy < src.Height And dy > 0 Then dst2.Set(Of cv.Vec3b)(src.Height - dy, x, black)
                              Dim dx = CInt(src.Width * depth / range)
@@ -2422,25 +2422,25 @@ Namespace VBClasses
             desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.optionsChanged Then pcPoints = New cv.Mat(algTask.bricksPerCol, algTask.bricksPerRow, cv.MatType.CV_32FC3, cv.Scalar.All(0))
+            If task.optionsChanged Then pcPoints = New cv.Mat(task.bricksPerCol, task.bricksPerRow, cv.MatType.CV_32FC3, cv.Scalar.All(0))
 
             dst2.SetTo(0)
             actualCount = 0
             Dim lastMeanZ As Single
-            For y = 0 To algTask.bricksPerCol - 1
-                For x = 0 To algTask.bricksPerRow - 1
-                    Dim roi = algTask.gridRects(y * algTask.bricksPerRow + x)
-                    Dim mean = algTask.pointCloud(roi).Mean(algTask.depthMask(roi))
+            For y = 0 To task.bricksPerCol - 1
+                For x = 0 To task.bricksPerRow - 1
+                    Dim roi = task.gridRects(y * task.bricksPerRow + x)
+                    Dim mean = task.pointCloud(roi).Mean(task.depthMask(roi))
                     If Single.IsNaN(mean(0)) Then Continue For
                     If Single.IsNaN(mean(1)) Then Continue For
                     If Single.IsInfinity(mean(2)) Then Continue For
-                    Dim depthPresent = algTask.depthMask(roi).CountNonZero > roi.Width * roi.Height / 2
+                    Dim depthPresent = task.depthMask(roi).CountNonZero > roi.Width * roi.Height / 2
                     If (depthPresent And mean(2) > 0 And Math.Abs(lastMeanZ - mean(2)) < 0.2 And
-                    mean(2) < algTask.MaxZmeters) Or (lastMeanZ = 0 And mean(2) > 0) Then
+                    mean(2) < task.MaxZmeters) Or (lastMeanZ = 0 And mean(2) > 0) Then
 
                         pcPoints.Set(Of cv.Point3f)(y, x, New cv.Point3f(mean(0), mean(1), mean(2)))
                         actualCount += 1
-                        DrawCircle(dst2, New cv.Point(roi.X, roi.Y), algTask.DotSize * Math.Max(mean(2), 1), white)
+                        DrawCircle(dst2, New cv.Point(roi.X, roi.Y), task.DotSize * Math.Max(mean(2), 1), white)
                     End If
                     lastMeanZ = mean(2)
                 Next
@@ -2462,20 +2462,20 @@ Namespace VBClasses
             desc = "Reduce the point cloud to a manageable number points in 3D using the mean value"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rw = algTask.gridRects(0).Width / 2, rh = algTask.gridRects(0).Height / 2
+            Dim rw = task.gridRects(0).Width / 2, rh = task.gridRects(0).Height / 2
             Dim red32 = New cv.Point3f(0, 0, 1), blue32 = New cv.Point3f(1, 0, 0), white32 = New cv.Point3f(1, 1, 1)
             Dim red = cv.Scalar.Red, blue = cv.Scalar.Blue
 
             pcPoints.Clear()
             dst2 = src
-            For Each roi In algTask.gridRects
+            For Each roi In task.gridRects
                 Dim pt = New cv.Point(roi.X + rw, roi.Y + rh)
-                Dim mean = algTask.pointCloud(roi).Mean(algTask.depthMask(roi))
+                Dim mean = task.pointCloud(roi).Mean(task.depthMask(roi))
 
                 If mean(2) > 0 Then
                     pcPoints.Add(Choose(pt.Y Mod 3 + 1, red32, blue32, white32))
                     pcPoints.Add(New cv.Point3f(mean(0), mean(1), mean(2)))
-                    DrawCircle(dst2, pt, algTask.DotSize, Choose(CInt(pt.Y) Mod 3 + 1, red, blue, cv.Scalar.White))
+                    DrawCircle(dst2, pt, task.DotSize, Choose(CInt(pt.Y) Mod 3 + 1, red, blue, cv.Scalar.White))
                 End If
             Next
             labels(2) = "PointCloud Point Points found = " + CStr(pcPoints.Count / 2)
@@ -2551,7 +2551,7 @@ Namespace VBClasses
             mats.mat(2) = PaletteFull(dst1)
 
             mats.mat(3) = ShowAddweighted(src, mats.mat(2), labels(3))
-            If algTask.heartBeat Then labels(2) = CStr(indexV + indexH) + " regions were found that were connected in depth."
+            If task.heartBeat Then labels(2) = CStr(indexV + indexH) + " regions were found that were connected in depth."
 
             mats.Run(emptyMat)
             dst2 = mats.dst2
@@ -2570,8 +2570,8 @@ Namespace VBClasses
         Dim plot As New Plot_Histogram
         Public Sub New()
             plot.createHistogram = True
-            algTask.gOptions.setHistogramBins(255)
-            algTask.gOptions.GridSlider.Value = 8
+            task.gOptions.setHistogramBins(255)
+            task.gOptions.GridSlider.Value = 8
             desc = "Sort all the featureless grayscale pixels."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2598,7 +2598,7 @@ Namespace VBClasses
         Public hRects As New List(Of cv.Rect)
         Dim connect As New Region_Core
         Public Sub New()
-            If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Connect bricks with similar depth - horizontally scanning."
         End Sub
@@ -2611,8 +2611,8 @@ Namespace VBClasses
             Dim index As Integer
             For Each tup In connect.hTuples
                 If tup.Item1 = tup.Item2 Then Continue For
-                Dim brick1 = algTask.bricks.brickList(tup.Item1)
-                Dim brick2 = algTask.bricks.brickList(tup.Item2)
+                Dim brick1 = task.bricks.brickList(tup.Item1)
+                Dim brick2 = task.bricks.brickList(tup.Item2)
 
                 Dim w = brick2.rect.BottomRight.X - brick1.rect.X
                 Dim h = brick1.rect.Height
@@ -2623,7 +2623,7 @@ Namespace VBClasses
                 dst2(r).SetTo(255)
 
                 index += 1
-                dst3(r).SetTo(algTask.scalarColors(index Mod 256))
+                dst3(r).SetTo(task.scalarColors(index Mod 256))
             Next
         End Sub
     End Class
@@ -2637,7 +2637,7 @@ Namespace VBClasses
         Public vRects As New List(Of cv.Rect)
         Dim connect As New Region_Core
         Public Sub New()
-            If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Connect bricks with similar depth - vertically scanning."
         End Sub
@@ -2650,8 +2650,8 @@ Namespace VBClasses
             Dim index As Integer
             For Each tup In connect.vTuples
                 If tup.Item1 = tup.Item2 Then Continue For
-                Dim brick1 = algTask.bricks.brickList(tup.Item1)
-                Dim brick2 = algTask.bricks.brickList(tup.Item2)
+                Dim brick1 = task.bricks.brickList(tup.Item1)
+                Dim brick2 = task.bricks.brickList(tup.Item2)
 
                 Dim w = brick1.rect.Width
                 Dim h = brick2.rect.BottomRight.Y - brick1.rect.Y
@@ -2661,7 +2661,7 @@ Namespace VBClasses
                 dst2(r).SetTo(255)
 
                 index += 1
-                dst3(r).SetTo(algTask.scalarColors(index Mod 256))
+                dst3(r).SetTo(task.scalarColors(index Mod 256))
             Next
         End Sub
     End Class
@@ -2702,9 +2702,9 @@ Namespace VBClasses
             connect.Run(src)
 
             dst3 = runRedList(src, labels(3))
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 Dim index = connect.dst1.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                dst2(rc.rect).SetTo(algTask.scalarColors(index), rc.mask)
+                dst2(rc.rect).SetTo(task.scalarColors(index), rc.mask)
             Next
         End Sub
     End Class
@@ -2716,7 +2716,7 @@ Namespace VBClasses
     Public Class XO_Region_Gaps : Inherits TaskParent
         Dim connect As New Region_Core
         Public Sub New()
-            If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "bricks with single cells removed for both vertical and horizontal connected cells."
             labels(3) = "Vertical cells with single cells removed."
             desc = "Use the horizontal/vertical connected cells to find gaps in depth and the like featureless regions."
@@ -2728,14 +2728,14 @@ Namespace VBClasses
 
             For Each tup In connect.hTuples
                 If tup.Item2 - tup.Item1 = 0 Then
-                    Dim brick = algTask.bricks.brickList(tup.Item1)
+                    Dim brick = task.bricks.brickList(tup.Item1)
                     dst2(brick.rect).SetTo(0)
                 End If
             Next
 
             For Each tup In connect.vTuples
-                Dim brick1 = algTask.bricks.brickList(tup.Item1)
-                Dim brick2 = algTask.bricks.brickList(tup.Item2)
+                Dim brick1 = task.bricks.brickList(tup.Item1)
+                Dim brick2 = task.bricks.brickList(tup.Item2)
                 If brick2.rect.Y - brick1.rect.Y = 0 Then
                     dst2(brick1.rect).SetTo(0)
                     dst3(brick1.rect).SetTo(0)
@@ -2769,44 +2769,44 @@ Namespace VBClasses
     Public Class XO_FCSLine_Basics : Inherits TaskParent
         Dim delaunay As New Delaunay_Basics
         Public Sub New()
-            If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Build a feature coordinate system (FCS) based on lines, not features."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastMap = algTask.fpMap.Clone
-            Dim lastCount = algTask.lines.lpList.Count
+            Dim lastMap = task.fpMap.Clone
+            Dim lastCount = task.lines.lpList.Count
 
-            dst2 = algTask.lines.dst2
+            dst2 = task.lines.dst2
 
             delaunay.inputPoints.Clear()
 
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
                 delaunay.inputPoints.Add(center)
             Next
 
             delaunay.Run(src)
 
-            algTask.fpMap.SetTo(0)
+            task.fpMap.SetTo(0)
             dst1.SetTo(0)
             For i = 0 To delaunay.facetList.Count - 1
-                Dim lp = algTask.lines.lpList(i)
+                Dim lp = task.lines.lpList(i)
                 Dim facets = delaunay.facetList(i)
 
-                DrawTour(dst1, facets, 255, algTask.lineWidth)
-                DrawTour(algTask.fpMap, facets, i)
+                DrawTour(dst1, facets, 255, task.lineWidth)
+                DrawTour(task.fpMap, facets, i)
                 Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-                Dim brick = algTask.bricks.brickList(algTask.gridMap.Get(Of Integer)(center.Y, center.X))
-                algTask.lines.lpList(i) = lp
+                Dim brick = task.bricks.brickList(task.gridMap.Get(Of Integer)(center.Y, center.X))
+                task.lines.lpList(i) = lp
             Next
 
-            Dim index = algTask.fpMap.Get(Of Single)(algTask.ClickPoint.Y, algTask.ClickPoint.X)
-            algTask.lpD = algTask.lines.lpList(index)
-            Dim facetsD = delaunay.facetList(algTask.lpD.index)
-            DrawTour(dst2, facetsD, white, algTask.lineWidth)
+            Dim index = task.fpMap.Get(Of Single)(task.ClickPoint.Y, task.ClickPoint.X)
+            task.lpD = task.lines.lpList(index)
+            Dim facetsD = delaunay.facetList(task.lpD.index)
+            DrawTour(dst2, facetsD, white, task.lineWidth)
 
-            labels(2) = algTask.lines.labels(2)
+            labels(2) = task.lines.labels(2)
             labels(3) = delaunay.labels(2)
         End Sub
     End Class
@@ -2845,8 +2845,8 @@ Namespace VBClasses
                         Dim rotatedRect1 = cv.Cv2.MinAreaRect({lp1.p1, lp1.p2})
                         Dim rotatedRect2 = cv.Cv2.MinAreaRect({lp2.p1, lp2.p2})
                         minRect.Run(src)
-                        dst2.Line(lp1.p1, lp1.p2, algTask.highlight, algTask.lineWidth, algTask.lineType)
-                        dst2.Line(lp2.p1, lp2.p2, algTask.highlight, algTask.lineWidth, algTask.lineType)
+                        dst2.Line(lp1.p1, lp1.p2, task.highlight, task.lineWidth, task.lineType)
+                        dst2.Line(lp2.p1, lp2.p2, task.highlight, task.lineWidth, task.lineType)
                         DrawRotatedOutline(minRect.rotatedRect, dst3, cv.Scalar.Yellow)
                     End If
                 Next
@@ -2903,16 +2903,16 @@ Namespace VBClasses
             sortedVerticals.Clear()
             sortedHorizontals.Clear()
 
-            dst2 = algTask.lines.dst2
+            dst2 = task.lines.dst2
 
             Dim raw2D As New List(Of lpData)
             Dim raw3D As New List(Of cv.Point3f)
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 Dim pt1 As cv.Point3f, pt2 As cv.Point3f
                 For j = 0 To 1
                     Dim pt = Choose(j + 1, lp.p1, lp.p2)
                     Dim rect = ValidateRect(New cv.Rect(pt.x - options.kSize, pt.y - options.kSize, options.kernelSize, options.kernelSize))
-                    Dim val = algTask.pointCloud(rect).Mean(algTask.depthMask(rect))
+                    Dim val = task.pointCloud(rect).Mean(task.depthMask(rect))
                     If j = 0 Then pt1 = New cv.Point3f(val(0), val(1), val(2)) Else pt2 = New cv.Point3f(val(0), val(1), val(2))
                 Next
 
@@ -2926,7 +2926,7 @@ Namespace VBClasses
             If raw3D.Count = 0 Then
                 SetTrueText("No vertical or horizontal lines were found")
             Else
-                Dim matLines3D As cv.Mat = (cv.Mat.FromPixelData(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray)) * algTask.gMatrix
+                Dim matLines3D As cv.Mat = (cv.Mat.FromPixelData(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray)) * task.gMatrix
 
                 For i = 0 To raw2D.Count - 2 Step 2
                     Dim pt1 = matLines3D.Get(Of cv.Point3f)(i, 0)
@@ -2966,7 +2966,7 @@ Namespace VBClasses
                     End If
                 Next
             End If
-            labels(2) = "Starting with " + Format(algTask.lines.lpList.Count, "000") + " lines, there are " +
+            labels(2) = "Starting with " + Format(task.lines.lpList.Count, "000") + " lines, there are " +
                                        Format(lines3D.Count / 2, "000") + " with depth data."
             labels(3) = "There were " + CStr(sortedVerticals.Count) + " vertical lines (blue) and " + CStr(sortedHorizontals.Count) + " horizontal lines (yellow)"
         End Sub
@@ -2991,7 +2991,7 @@ Namespace VBClasses
             dst3 = src.Clone
             For i = 0 To lines.lines2D.Count - 1 Step 2
                 Dim p1 = lines.lines2D(i), p2 = lines.lines2D(i + 1)
-                dst3.Line(p1, p2, cv.Scalar.Yellow, algTask.lineWidth, algTask.lineType)
+                dst3.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             Next
         End Sub
     End Class
@@ -3011,30 +3011,30 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst2 = algTask.lines.dst2
+            dst2 = task.lines.dst2
 
             Dim raw3D As New List(Of cv.Point3f)
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 Dim pt1 As cv.Point3f, pt2 As cv.Point3f
                 For j = 0 To 1
                     Dim pt = Choose(j + 1, lp.p1, lp.p2)
                     Dim rect = ValidateRect(New cv.Rect(pt.x - options.kSize, pt.y - options.kSize, options.kernelSize, options.kernelSize))
-                    Dim val = algTask.pointCloud(rect).Mean(algTask.depthMask(rect))
+                    Dim val = task.pointCloud(rect).Mean(task.depthMask(rect))
                     If j = 0 Then pt1 = New cv.Point3f(val(0), val(1), val(2)) Else pt2 = New cv.Point3f(val(0), val(1), val(2))
                 Next
                 If pt1.Z > 0 And pt2.Z > 0 Then
-                    raw3D.Add(algTask.pointCloud.Get(Of cv.Point3f)(lp.p1.Y, lp.p1.X))
-                    raw3D.Add(algTask.pointCloud.Get(Of cv.Point3f)(lp.p2.Y, lp.p2.X))
+                    raw3D.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p1.Y, lp.p1.X))
+                    raw3D.Add(task.pointCloud.Get(Of cv.Point3f)(lp.p2.Y, lp.p2.X))
                 End If
             Next
 
-            If algTask.heartBeat Then labels(2) = "Starting with " + Format(algTask.lines.lpList.Count, "000") +
+            If task.heartBeat Then labels(2) = "Starting with " + Format(task.lines.lpList.Count, "000") +
                                " lines, there are " + Format(raw3D.Count, "000") + " with depth data."
             If raw3D.Count = 0 Then
                 SetTrueText("No vertical or horizontal lines were found")
             Else
-                algTask.gMatrix = algTask.gmat.gMatrix
-                Dim matLines3D = cv.Mat.FromPixelData(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray) * algTask.gmat.gMatrix
+                task.gMatrix = task.gmat.gMatrix
+                Dim matLines3D = cv.Mat.FromPixelData(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray) * task.gmat.gMatrix
             End If
         End Sub
     End Class
@@ -3082,7 +3082,7 @@ Namespace VBClasses
                 SetTrueText(CStr(index) + vbCrLf + Format(brick.arcY, fmt1), pt, 3)
                 index += 1
 
-                vbc.DrawLine(dst3, p1, p2, algTask.highlight)
+                vbc.DrawLine(dst3, p1, p2, task.highlight)
                 longest.knn.trainInput.Add(p1)
                 longest.knn.trainInput.Add(p2)
             Next
@@ -3116,9 +3116,9 @@ Namespace VBClasses
             Dim index = lines.sortedVerticals.ElementAt(0).Value
             Dim p1 = lines.lines2D(index)
             Dim p2 = lines.lines2D(index + 1)
-            vbc.DrawLine(dst2, p1, p2, algTask.highlight)
+            vbc.DrawLine(dst2, p1, p2, task.highlight)
             dst3.SetTo(0)
-            vbc.DrawLine(dst3, p1, p2, algTask.highlight)
+            vbc.DrawLine(dst3, p1, p2, task.highlight)
         End Sub
     End Class
 
@@ -3167,9 +3167,9 @@ Namespace VBClasses
             Dim p2 = New cv.Point2f(knn.trainInput(index)(2), knn.trainInput(index)(3))
             pt1 = match3D(index * 2)
             pt2 = match3D(index * 2 + 1)
-            vbc.DrawLine(dst2, p1, p2, algTask.highlight)
+            vbc.DrawLine(dst2, p1, p2, task.highlight)
             dst3.SetTo(0)
-            vbc.DrawLine(dst3, p1, p2, algTask.highlight)
+            vbc.DrawLine(dst3, p1, p2, task.highlight)
 
             Static lastLength = lines.sorted2DV.ElementAt(0).Key
             Dim bestLength = lines.sorted2DV.ElementAt(0).Key
@@ -3181,7 +3181,7 @@ Namespace VBClasses
                 lengthReject += 1
                 lastLength = bestLength
             End If
-            labels(3) = "Length rejects = " + Format(lengthReject / (algTask.frameCount + 1), "0%")
+            labels(3) = "Length rejects = " + Format(lengthReject / (task.frameCount + 1), "0%")
         End Sub
     End Class
 
@@ -3197,7 +3197,7 @@ Namespace VBClasses
             desc = "Use FeatureLine_Finder data to identify the longest lines and show its angle."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 dst2 = src.Clone
                 lines.Run(src)
 
@@ -3211,9 +3211,9 @@ Namespace VBClasses
             Dim index = lines.sortedVerticals.ElementAt(0).Value
             Dim p1 = lines.lines2D(index)
             Dim p2 = lines.lines2D(index + 1)
-            vbc.DrawLine(dst2, p1, p2, algTask.highlight)
+            vbc.DrawLine(dst2, p1, p2, task.highlight)
             dst3.SetTo(0)
-            vbc.DrawLine(dst3, p1, p2, algTask.highlight)
+            vbc.DrawLine(dst3, p1, p2, task.highlight)
             Dim pt1 = lines.lines3D(index)
             Dim pt2 = lines.lines3D(index + 1)
             Dim len3D = distance3D(pt1, pt2)
@@ -3270,7 +3270,7 @@ Namespace VBClasses
             pt2 = lines.lines3D(knn.lastIndex + 1)
 
             dst3 = lines.dst3
-            vbc.DrawLine(dst2, knn.lastP1, knn.lastP2, algTask.highlight)
+            vbc.DrawLine(dst2, knn.lastP1, knn.lastP2, task.highlight)
         End Sub
     End Class
 
@@ -3321,7 +3321,7 @@ Namespace VBClasses
         Dim nearest As New XO_Line_Nearest
         Dim options As New Options_Diff
         Public Sub New()
-            algTask.gOptions.LineWidth.Value = 2
+            task.gOptions.LineWidth.Value = 2
             desc = "Find all the lines in the color image that are parallel to gravity or the horizon using distance to the line instead of slope."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -3330,12 +3330,12 @@ Namespace VBClasses
             Dim pixelDiff = options.pixelDiffThreshold
 
             dst2 = src.Clone
-            If standaloneTest() Then dst3 = algTask.lines.dst2
+            If standaloneTest() Then dst3 = task.lines.dst2
 
-            nearest.lp = algTask.lineGravity
-            vbc.DrawLine(dst2, algTask.lineGravity.p1, algTask.lineGravity.p2, white)
-            For Each lp In algTask.lines.lpList
-                Dim ptInter = Line_Intersection.IntersectTest(lp.p1, lp.p2, algTask.lineGravity.p1, algTask.lineGravity.p2)
+            nearest.lp = task.lineGravity
+            vbc.DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, white)
+            For Each lp In task.lines.lpList
+                Dim ptInter = Line_Intersection.IntersectTest(lp.p1, lp.p2, task.lineGravity.p1, task.lineGravity.p2)
                 If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then
                     Continue For
                 End If
@@ -3349,14 +3349,14 @@ Namespace VBClasses
                 Dim d2 = nearest.distance
 
                 If Math.Abs(d1 - d2) <= pixelDiff Then
-                    vbc.DrawLine(dst2, lp.p1, lp.p2, algTask.highlight)
+                    vbc.DrawLine(dst2, lp.p1, lp.p2, task.highlight)
                 End If
             Next
 
-            vbc.DrawLine(dst2, algTask.lineHorizon.p1, algTask.lineHorizon.p2, white)
-            nearest.lp = algTask.lineHorizon
-            For Each lp In algTask.lines.lpList
-                Dim ptInter = Line_Intersection.IntersectTest(lp.p1, lp.p2, algTask.lineHorizon.p1, algTask.lineHorizon.p2)
+            vbc.DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, white)
+            nearest.lp = task.lineHorizon
+            For Each lp In task.lines.lpList
+                Dim ptInter = Line_Intersection.IntersectTest(lp.p1, lp.p2, task.lineHorizon.p1, task.lineHorizon.p2)
                 If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
 
                 nearest.pt = lp.p1
@@ -3371,8 +3371,8 @@ Namespace VBClasses
                     vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
                 End If
             Next
-            labels(2) = "Slope for gravity is " + Format(algTask.lineGravity.slope, fmt1) + ".  Slope for horizon is " +
-                    Format(algTask.lineHorizon.slope, fmt1)
+            labels(2) = "Slope for gravity is " + Format(task.lineGravity.slope, fmt1) + ".  Slope for horizon is " +
+                    Format(task.lineHorizon.slope, fmt1)
         End Sub
     End Class
 
@@ -3398,12 +3398,12 @@ Namespace VBClasses
             Dim distanceThreshold = 50 ' pixels - arbitrary but realistically needs some value
             Dim linePercentThreshold = 0.7 ' if less than 70% of the pixels in the line are edges, then find a better line.  Again, arbitrary but realistic.
 
-            Dim correlationTest = tcells(0).correlation <= algTask.fCorrThreshold Or tcells(1).correlation <= algTask.fCorrThreshold
+            Dim correlationTest = tcells(0).correlation <= task.fCorrThreshold Or tcells(1).correlation <= task.fCorrThreshold
             lineDisp.distance = tcells(0).center.DistanceTo(tcells(1).center)
-            If algTask.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or
+            If task.optionsChanged Or correlationTest Or lineDisp.maskCount / lineDisp.distance < linePercentThreshold Or
            lineDisp.distance < distanceThreshold Then
 
-                Dim pad = algTask.brickSize / 2
+                Dim pad = task.brickSize / 2
                 lines.subsetRect = New cv.Rect(pad * 3, pad * 3, src.Width - pad * 6, src.Height - pad * 6)
                 lines.Run(src.Clone)
 
@@ -3449,7 +3449,7 @@ Namespace VBClasses
             desc = "Use FeatureLine_Finder data to collect vertical lines and measure accuracy of each."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 dst2 = src.Clone
                 lines.Run(src)
 
@@ -3465,9 +3465,9 @@ Namespace VBClasses
                     Dim index = lines.sortedVerticals.ElementAt(i).Value
                     Dim p1 = lines.lines2D(index)
                     Dim p2 = lines.lines2D(index + 1)
-                    vbc.DrawLine(dst2, p1, p2, algTask.highlight)
+                    vbc.DrawLine(dst2, p1, p2, task.highlight)
                     SetTrueText(CStr(i), If(i Mod 2, p1, p2), 2)
-                    vbc.DrawLine(dst3, p1, p2, algTask.highlight)
+                    vbc.DrawLine(dst3, p1, p2, task.highlight)
 
                     Dim pt1 = lines.lines3D(index)
                     Dim pt2 = lines.lines3D(index + 1)
@@ -3496,7 +3496,7 @@ Namespace VBClasses
             Dim avg = arcList.Average()
             arcLongAverage.Add(avg)
             labels(3) = "arcY avg = " + Format(avg, fmt1) + ", long term average = " + Format(arcLongAverage.Average, fmt1) +
-                    ", first was best " + Format(firstBest / algTask.frameCount, "0%") + " of the time, Avg of longest line " + Format(firstAverage.Average, fmt1)
+                    ", first was best " + Format(firstBest / task.frameCount, "0%") + " of the time, Avg of longest line " + Format(firstAverage.Average, fmt1)
             If arcLongAverage.Count > 1000 Then
                 arcLongAverage.RemoveAt(0)
                 firstAverage.RemoveAt(0)
@@ -3530,15 +3530,15 @@ Namespace VBClasses
             Dim rect = ValidateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
             match.template = src(rect).Clone
             match.Run(src)
-            If match.correlation >= algTask.fCorrThreshold Then
+            If match.correlation >= task.fCorrThreshold Then
                 dst3 = match.dst0.Resize(dst3.Size)
-                vbc.DrawLine(dst2, p1, p2, algTask.highlight)
-                DrawCircle(dst2, p1, algTask.DotSize, algTask.highlight)
-                DrawCircle(dst2, p2, algTask.DotSize, algTask.highlight)
+                vbc.DrawLine(dst2, p1, p2, task.highlight)
+                DrawCircle(dst2, p1, task.DotSize, task.highlight)
+                DrawCircle(dst2, p2, task.DotSize, task.highlight)
                 rect = ValidateRect(New cv.Rect(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X) + 2, Math.Abs(p1.Y - p2.Y)))
                 match.template = src(rect).Clone
             Else
-                algTask.highlight = If(algTask.highlight = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
+                task.highlight = If(task.highlight = cv.Scalar.Yellow, cv.Scalar.Blue, cv.Scalar.Yellow)
                 knn.lastPair = New lpData(New cv.Point2f, New cv.Point2f)
             End If
             labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
@@ -3562,19 +3562,19 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
-            Dim pad = algTask.brickSize / 2
+            Dim pad = task.brickSize / 2
 
             Static p1 As cv.Point, p2 As cv.Point
-            If algTask.heartBeat Or match1.correlation < algTask.fCorrThreshold And
-                             match2.correlation < algTask.fCorrThreshold Then
+            If task.heartBeat Or match1.correlation < task.fCorrThreshold And
+                             match2.correlation < task.fCorrThreshold Then
                 knn.Run(src.Clone)
 
                 p1 = knn.lastPair.p1
-                Dim r1 = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, algTask.brickSize, algTask.brickSize))
+                Dim r1 = ValidateRect(New cv.Rect(p1.X - pad, p1.Y - pad, task.brickSize, task.brickSize))
                 match1.template = src(r1).Clone
 
                 p2 = knn.lastPair.p2
-                Dim r2 = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, algTask.brickSize, algTask.brickSize))
+                Dim r2 = ValidateRect(New cv.Rect(p2.X - pad, p2.Y - pad, task.brickSize, task.brickSize))
                 match2.template = src(r2).Clone
             End If
 
@@ -3585,9 +3585,9 @@ Namespace VBClasses
             p2 = match2.newCenter
 
             gline = glines.updateGLine(src, gline, p1, p2)
-            vbc.DrawLine(dst2, p1, p2, algTask.highlight)
-            DrawCircle(dst2, p1, algTask.DotSize, algTask.highlight)
-            DrawCircle(dst2, p2, algTask.DotSize, algTask.highlight)
+            vbc.DrawLine(dst2, p1, p2, task.highlight)
+            DrawCircle(dst2, p1, task.DotSize, task.highlight)
+            DrawCircle(dst2, p2, task.DotSize, task.highlight)
             SetTrueText(Format(match1.correlation, fmt3), p1)
             SetTrueText(Format(match2.correlation, fmt3), p2)
         End Sub
@@ -3611,7 +3611,7 @@ Namespace VBClasses
             options.Run()
 
             Dim input = src
-            If input.Type <> cv.MatType.CV_32F Then input = algTask.pcSplit(2)
+            If input.Type <> cv.MatType.CV_32F Then input = task.pcSplit(2)
 
             Dim stepX = dst2.Width / options.xLines
             Dim stepY = dst2.Height / options.yLines
@@ -3624,10 +3624,10 @@ Namespace VBClasses
                 For x = 1 To options.xLines - 2
                     Dim p1 = New cv.Point2f(x * stepX, y * stepY)
                     Dim p2 = New cv.Point2f((x + 1) * stepX, y * stepY)
-                    Dim d1 = algTask.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
-                    Dim d2 = algTask.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
+                    Dim d1 = task.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
+                    Dim d2 = task.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
                     If stepX * options.threshold > Math.Abs(d1 - d2) And d1 > 0 And d2 > 0 Then
-                        Dim p = algTask.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
+                        Dim p = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
                         Dim mmPP = mmPixel.Compute(d1)
                         If options.xConstraint Then
                             p(0) = (p1.X - midX) * mmPP
@@ -3638,7 +3638,7 @@ Namespace VBClasses
                             If p1.Y = midY Then p(1) = mmPP
                         End If
                         Dim r = New cv.Rect(p1.X - halfStepX, p1.Y - halfStepy, stepX, stepY)
-                        Dim meanVal = cv.Cv2.Mean(algTask.pcSplit(2)(r), algTask.depthMask(r))
+                        Dim meanVal = cv.Cv2.Mean(task.pcSplit(2)(r), task.depthMask(r))
                         p(2) = (d1 + d2) / 2
                         dst3.Set(Of cv.Vec3f)(y, x, p)
                     End If
@@ -3659,7 +3659,7 @@ Namespace VBClasses
     Public Class XO_Structured_Cloud : Inherits TaskParent
         Public options As New Options_StructuredCloud
         Public Sub New()
-            algTask.gOptions.GridSlider.Value = 10
+            task.gOptions.GridSlider.Value = 10
             desc = "Attempt to impose a linear structure on the pointcloud."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -3675,8 +3675,8 @@ Namespace VBClasses
                     Dim r = New cv.Rect(x * stepX, y * stepY, stepX - 1, stepY - 1)
                     Dim p1 = New cv.Point(r.X, r.Y)
                     Dim p2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
-                    Dim vec1 = algTask.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
-                    Dim vec2 = algTask.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
+                    Dim vec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
+                    Dim vec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
                     If vec1(2) > 0 And vec2(2) > 0 Then dst2(r).SetTo(vec1)
                 Next
             Next
@@ -3746,14 +3746,14 @@ Namespace VBClasses
                             Dim p1 = New cv.Point(pointX.Get(Of Integer)(y - 1, x), pointY.Get(Of Integer)(y - 1, x))
                             If p1.X > 0 Then
                                 Dim p2 = New cv.Point(xx, yy)
-                                dst2.Line(p1, p2, algTask.highlight, algTask.lineWidth + 1, algTask.lineType)
+                                dst2.Line(p1, p2, task.highlight, task.lineWidth + 1, task.lineType)
                             End If
                         End If
                         If y = sCloud.options.indexY Then
                             Dim p1 = New cv.Point(pointX.Get(Of Integer)(y, x - 1), pointY.Get(Of Integer)(y, x - 1))
                             If p1.X > 0 Then
                                 Dim p2 = New cv.Point(xx, yy)
-                                dst2.Line(p1, p2, algTask.highlight, algTask.lineWidth + 1, algTask.lineType)
+                                dst2.Line(p1, p2, task.highlight, task.lineWidth + 1, task.lineType)
                             End If
                         End If
                     End If
@@ -3773,20 +3773,20 @@ Namespace VBClasses
         Public data As New cv.Mat
         Public oglData As New List(Of cv.Point3f)
         Public Sub New()
-            algTask.gOptions.GridSlider.Value = 10
+            task.gOptions.GridSlider.Value = 10
             desc = "Simplify the point cloud so it can be represented as quads in OpenGL"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = New cv.Mat(dst3.Size(), cv.MatType.CV_32FC3, 0)
-            For Each roi In algTask.gridRects
-                Dim d = algTask.pointCloud(roi).Mean(algTask.depthMask(roi))
+            For Each roi In task.gridRects
+                Dim d = task.pointCloud(roi).Mean(task.depthMask(roi))
                 Dim depth = New cv.Vec3f(d.Val0, d.Val1, d.Val2)
                 Dim pt = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
-                Dim vec = algTask.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+                Dim vec = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
                 If vec(2) > 0 Then dst2(roi).SetTo(depth)
             Next
 
-            labels(2) = traceName + " with " + CStr(algTask.gridRects.Count) + " regions was created"
+            labels(2) = traceName + " with " + CStr(task.gridRects.Count) + " regions was created"
         End Sub
     End Class
 
@@ -3801,7 +3801,7 @@ Namespace VBClasses
         Public oglData As New List(Of cv.Vec3f)
         Dim hulls As New RedList_Hulls
         Public Sub New()
-            algTask.gOptions.GridSlider.Value = 10
+            task.gOptions.GridSlider.Value = 10
             desc = "Use the OpenGL point size to represent the point cloud as data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -3810,16 +3810,16 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             oglData.Clear()
-            For Each roi In algTask.gridRects
+            For Each roi In task.gridRects
                 Dim c = dst2.Get(Of cv.Vec3b)(roi.Y, roi.X)
                 If c = black Then Continue For
                 oglData.Add(New cv.Vec3f(c(2) / 255, c(1) / 255, c(0) / 255))
 
-                Dim v = algTask.pointCloud(roi).Mean(algTask.depthMask(roi))
+                Dim v = task.pointCloud(roi).Mean(task.depthMask(roi))
                 oglData.Add(New cv.Vec3f(v.Val0, v.Val1, v.Val2))
                 dst3(roi).SetTo(c)
             Next
-            labels(2) = traceName + " with " + CStr(algTask.gridRects.Count) + " regions was created"
+            labels(2) = traceName + " with " + CStr(task.gridRects.Count) + " regions was created"
         End Sub
     End Class
 
@@ -3831,7 +3831,7 @@ Namespace VBClasses
     Public Class XO_LineRect_CenterDepth : Inherits TaskParent
         Public options As New Options_LineRect
         Public Sub New()
-            If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             desc = "Remove lines which have similar depth in bricks on either side of a line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -3842,24 +3842,24 @@ Namespace VBClasses
 
             Dim depthThreshold = options.depthThreshold
             Dim depthLines As Integer, colorLines As Integer
-            For Each lp In algTask.lines.lpList
-                dst2.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, cv.LineTypes.Link4)
+            For Each lp In task.lines.lpList
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                 Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
                 Dim lpPerp = lp.perpendicularPoints(center)
-                Dim index1 As Integer = algTask.gridMap.Get(Of Integer)(lpPerp.p1.Y, lpPerp.p1.X)
-                Dim index2 As Integer = algTask.gridMap.Get(Of Integer)(lpPerp.p2.Y, lpPerp.p2.X)
-                Dim brick1 = algTask.bricks.brickList(index1)
-                Dim brick2 = algTask.bricks.brickList(index2)
+                Dim index1 As Integer = task.gridMap.Get(Of Integer)(lpPerp.p1.Y, lpPerp.p1.X)
+                Dim index2 As Integer = task.gridMap.Get(Of Integer)(lpPerp.p2.Y, lpPerp.p2.X)
+                Dim brick1 = task.bricks.brickList(index1)
+                Dim brick2 = task.bricks.brickList(index2)
                 If Math.Abs(brick1.depth - brick2.depth) > depthThreshold Then
-                    dst2.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, cv.LineTypes.Link4)
+                    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                     depthLines += 1
                 Else
-                    dst3.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, cv.LineTypes.Link4)
+                    dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, cv.LineTypes.Link4)
                     colorLines += 1
                 End If
             Next
 
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 labels(2) = CStr(depthLines) + " lines were found between objects (depth Lines)"
                 labels(3) = CStr(colorLines) + " internal lines were indentified and are not likely important"
             End If
@@ -3895,8 +3895,8 @@ Namespace VBClasses
 
             dst2 = src.Clone
             For Each cp In coinList
-                dst2.Line(cp.p3, cp.p4, cv.Scalar.Red, algTask.lineWidth + 2, algTask.lineType)
-                dst2.Line(cp.p1, cp.p2, algTask.highlight, algTask.lineWidth + 1, algTask.lineType)
+                dst2.Line(cp.p3, cp.p4, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
+                dst2.Line(cp.p1, cp.p2, task.highlight, task.lineWidth + 1, task.lineType)
             Next
             labels(2) = CStr(coinList.Count) + " coincident lines were detected"
         End Sub
@@ -3923,14 +3923,14 @@ Namespace VBClasses
             dst2 = sliceH.dst2
 
             Dim mask = sliceH.sliceMask
-            Dim perMeter = dst3.Height / algTask.MaxZmeters
+            Dim perMeter = dst3.Height / task.MaxZmeters
             dst3.SetTo(0)
             Dim white As New cv.Vec3b(255, 255, 255)
             For y = 0 To mask.Height - 1
                 For x = 0 To mask.Width - 1
                     Dim val = mask.Get(Of Byte)(y, x)
                     If val > 0 Then
-                        Dim depth = algTask.pcSplit(2).Get(Of Single)(y, x)
+                        Dim depth = task.pcSplit(2).Get(Of Single)(y, x)
                         Dim row = dst1.Height - depth * perMeter
                         dst3.Set(Of cv.Vec3b)(If(row < 0, 0, row), x, white)
                     End If
@@ -3949,8 +3949,8 @@ Namespace VBClasses
     Public Class XO_Structured_FloorCeiling : Inherits TaskParent
         Public slice As New Structured_SliceEither
         Public Sub New()
-            algTask.kalman = New Kalman_Basics
-            ReDim algTask.kalman.kInput(2 - 1)
+            task.kalman = New Kalman_Basics
+            ReDim task.kalman.kInput(2 - 1)
             OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
             desc = "Find the floor or ceiling plane"
         End Sub
@@ -3984,15 +3984,15 @@ Namespace VBClasses
                 End If
             Next
 
-            algTask.kalman.kInput(0) = floorY
-            algTask.kalman.kInput(1) = ceilingY
-            algTask.kalman.Run(emptyMat)
+            task.kalman.kInput(0) = floorY
+            task.kalman.kInput(1) = ceilingY
+            task.kalman.Run(emptyMat)
 
-            labels(2) = "Current slice is at row =" + CStr(algTask.mouseMovePoint.Y)
-            labels(3) = "Ceiling is at row =" + CStr(CInt(algTask.kalman.kOutput(1))) + " floor at y=" + CStr(CInt(algTask.kalman.kOutput(0)))
+            labels(2) = "Current slice is at row =" + CStr(task.mouseMovePoint.Y)
+            labels(3) = "Ceiling is at row =" + CStr(CInt(task.kalman.kOutput(1))) + " floor at y=" + CStr(CInt(task.kalman.kOutput(0)))
 
             vbc.DrawLine(dst2, New cv.Point(0, floorY), New cv.Point(dst2.Width, floorY), cv.Scalar.Yellow)
-            SetTrueText("floor", New cv.Point(10, floorY + algTask.DotSize), 3)
+            SetTrueText("floor", New cv.Point(10, floorY + task.DotSize), 3)
 
             Dim rect = New cv.Rect(0, Math.Max(ceilingY - 5, 0), dst2.Width, 10)
             Dim mask = slice.heat.dst3(rect)
@@ -4000,7 +4000,7 @@ Namespace VBClasses
             cv.Cv2.MeanStdDev(mask, mean, stdev)
             If mean(0) < mean(2) Then
                 vbc.DrawLine(dst2, New cv.Point(0, ceilingY), New cv.Point(dst2.Width, ceilingY), cv.Scalar.Yellow)
-                SetTrueText("ceiling", New cv.Point(10, ceilingY + algTask.DotSize), 3)
+                SetTrueText("ceiling", New cv.Point(10, ceilingY + task.DotSize), 3)
             Else
                 SetTrueText("Ceiling does not appear to be present", 3)
             End If
@@ -4024,7 +4024,7 @@ Namespace VBClasses
             desc = "Rebuild the point cloud using inrange - not useful yet"
         End Sub
         Private Function rebuildX(viewX As cv.Mat) As cv.Mat
-            Dim output As New cv.Mat(algTask.pcSplit(1).Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+            Dim output As New cv.Mat(task.pcSplit(1).Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             Dim firstCol As Integer
             For firstCol = 0 To viewX.Width - 1
                 If viewX.Col(firstCol).CountNonZero > 0 Then Exit For
@@ -4037,16 +4037,16 @@ Namespace VBClasses
 
             Dim sliceMask As New cv.Mat
             For i = firstCol To lastCol
-                Dim planeX = -algTask.xRange * (algTask.topCameraPoint.X - i) / algTask.topCameraPoint.X
-                If i > algTask.topCameraPoint.X Then planeX = algTask.xRange * (i - algTask.topCameraPoint.X) / (dst3.Width - algTask.topCameraPoint.X)
+                Dim planeX = -task.xRange * (task.topCameraPoint.X - i) / task.topCameraPoint.X
+                If i > task.topCameraPoint.X Then planeX = task.xRange * (i - task.topCameraPoint.X) / (dst3.Width - task.topCameraPoint.X)
 
-                cv.Cv2.InRange(algTask.pcSplit(0), planeX - thickness, planeX + thickness, sliceMask)
+                cv.Cv2.InRange(task.pcSplit(0), planeX - thickness, planeX + thickness, sliceMask)
                 output.SetTo(planeX, sliceMask)
             Next
             Return output
         End Function
         Private Function rebuildY(viewY As cv.Mat) As cv.Mat
-            Dim output As New cv.Mat(algTask.pcSplit(1).Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
+            Dim output As New cv.Mat(task.pcSplit(1).Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             Dim firstLine As Integer
             For firstLine = 0 To viewY.Height - 1
                 If viewY.Row(firstLine).CountNonZero > 0 Then Exit For
@@ -4059,10 +4059,10 @@ Namespace VBClasses
 
             Dim sliceMask As New cv.Mat
             For i = firstLine To lastLine
-                Dim planeY = -algTask.yRange * (algTask.sideCameraPoint.Y - i) / algTask.sideCameraPoint.Y
-                If i > algTask.sideCameraPoint.Y Then planeY = algTask.yRange * (i - algTask.sideCameraPoint.Y) / (dst3.Height - algTask.sideCameraPoint.Y)
+                Dim planeY = -task.yRange * (task.sideCameraPoint.Y - i) / task.sideCameraPoint.Y
+                If i > task.sideCameraPoint.Y Then planeY = task.yRange * (i - task.sideCameraPoint.Y) / (dst3.Height - task.sideCameraPoint.Y)
 
-                cv.Cv2.InRange(algTask.pcSplit(1), planeY - thickness, planeY + thickness, sliceMask)
+                cv.Cv2.InRange(task.pcSplit(1), planeY - thickness, planeY + thickness, sliceMask)
                 output.SetTo(planeY, sliceMask)
             Next
             Return output
@@ -4070,23 +4070,23 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim metersPerPixel = algTask.MaxZmeters / dst3.Height
+            Dim metersPerPixel = task.MaxZmeters / dst3.Height
             thickness = options.sliceSize * metersPerPixel
             heat.Run(src)
 
             If options.rebuilt Then
-                algTask.pcSplit(0) = rebuildX(heat.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-                algTask.pcSplit(1) = rebuildY(heat.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-                cv.Cv2.Merge(algTask.pcSplit, pointcloud)
+                task.pcSplit(0) = rebuildX(heat.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+                task.pcSplit(1) = rebuildY(heat.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+                cv.Cv2.Merge(task.pcSplit, pointcloud)
             Else
-                algTask.pcSplit = algTask.pointCloud.Split()
-                pointcloud = algTask.pointCloud
+                task.pcSplit = task.pointCloud.Split()
+                pointcloud = task.pointCloud
             End If
 
-            dst2 = Mat_Convert.Mat_32f_To_8UC3(algTask.pcSplit(0))
-            dst3 = Mat_Convert.Mat_32f_To_8UC3(algTask.pcSplit(1))
-            dst2.SetTo(0, algTask.noDepthMask)
-            dst3.SetTo(0, algTask.noDepthMask)
+            dst2 = Mat_Convert.Mat_32f_To_8UC3(task.pcSplit(0))
+            dst3 = Mat_Convert.Mat_32f_To_8UC3(task.pcSplit(1))
+            dst2.SetTo(0, task.noDepthMask)
+            dst3.SetTo(0, task.noDepthMask)
         End Sub
     End Class
 
@@ -4107,7 +4107,7 @@ Namespace VBClasses
             desc = "Find the vertical center line with accurate depth data.."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.mouseMovePoint = newPoint Then algTask.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
+            If task.mouseMovePoint = newPoint Then task.mouseMovePoint = New cv.Point(dst2.Width / 2, dst2.Height)
             slice.Run(src)
 
             lines.Run(slice.sliceMask)
@@ -4115,10 +4115,10 @@ Namespace VBClasses
             Dim bots As New List(Of Integer)
             Dim topsList As New List(Of cv.Point)
             Dim botsList As New List(Of cv.Point)
-            If algTask.lines.lpList.Count > 0 Then
+            If task.lines.lpList.Count > 0 Then
                 dst3 = lines.dst2
-                For Each lp In algTask.lines.lpList
-                    dst3.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth + 3, algTask.lineType)
+                For Each lp In task.lines.lpList
+                    dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 3, task.lineType)
                     tops.Add(If(lp.p1.Y < lp.p2.Y, lp.p1.Y, lp.p2.Y))
                     bots.Add(If(lp.p1.Y > lp.p2.Y, lp.p1.Y, lp.p2.Y))
                     topsList.Add(lp.p1)
@@ -4127,9 +4127,9 @@ Namespace VBClasses
 
                 'Dim topPt = topsList(tops.IndexOf(tops.Min))
                 'Dim botPt = botsList(bots.IndexOf(bots.Max))
-                'DrawCircle(dst3,New cv.Point2f((topPt.X + botPt.X) / 2, (topPt.Y + botPt.Y) / 2), algTask.DotSize + 5, cv.Scalar.Red)
-                'dst3.Line(topPt, botPt, cv.Scalar.Red, algTask.lineWidth, algTask.lineType)
-                'DrawLine(dst2,topPt, botPt, algTask.highlight, algTask.lineWidth + 2, algTask.lineType)
+                'DrawCircle(dst3,New cv.Point2f((topPt.X + botPt.X) / 2, (topPt.Y + botPt.Y) / 2), task.DotSize + 5, cv.Scalar.Red)
+                'dst3.Line(topPt, botPt, cv.Scalar.Red, task.lineWidth, task.lineType)
+                'DrawLine(dst2,topPt, botPt, task.highlight, task.lineWidth + 2, task.lineType)
             End If
             If standaloneTest() Then
                 dst2 = src
@@ -4147,15 +4147,15 @@ Namespace VBClasses
     Public Class XO_Contour_Gray : Inherits TaskParent
         Public contour As New List(Of cv.Point)
         Public options As New Options_Contours
-        Dim myFrameCount As Integer = algTask.frameCount
+        Dim myFrameCount As Integer = task.frameCount
         Dim reduction As New Reduction_Basics
         Public Sub New()
             desc = "Find the contour for the src."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If myFrameCount <> algTask.frameCount Then
+            If myFrameCount <> task.frameCount Then
                 options.Run() ' avoid running options more than once per frame.
-                myFrameCount = algTask.frameCount
+                myFrameCount = task.frameCount
             End If
 
             If standalone Then
@@ -4170,7 +4170,7 @@ Namespace VBClasses
 
             dst2 = src
             For Each tour In allContours
-                DrawTour(dst2, tour.ToList, white, algTask.lineWidth)
+                DrawTour(dst2, tour.ToList, white, task.lineWidth)
             Next
             labels(2) = $"There were {allContours.Count} contours found."
         End Sub
@@ -4185,16 +4185,16 @@ Namespace VBClasses
     Public Class XO_Contour_RC_AddContour : Inherits TaskParent
         Public contour As New List(Of cv.Point)
         Public options As New Options_Contours
-        Dim myFrameCount As Integer = algTask.frameCount
+        Dim myFrameCount As Integer = task.frameCount
         Dim reduction As New Reduction_Basics
         Dim contours As New Contour_Regions
         Public Sub New()
             desc = "Find the contour for the src."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If myFrameCount <> algTask.frameCount Then
+            If myFrameCount <> task.frameCount Then
                 options.Run() ' avoid running options more than once per frame.
-                myFrameCount = algTask.frameCount
+                myFrameCount = task.frameCount
             End If
 
             If standalone Then
@@ -4216,7 +4216,7 @@ Namespace VBClasses
             Next
             If contours.contourList.Count = 0 Then Exit Sub
             Dim contour = New List(Of cv.Point)(contours.contourList(maxIndex).ToList)
-            DrawTour(dst2, contour, algTask.highlight, algTask.lineWidth)
+            DrawTour(dst2, contour, task.highlight, task.lineWidth)
         End Sub
     End Class
 
@@ -4231,7 +4231,7 @@ Namespace VBClasses
             desc = "Create the list of pixels in a RedCloud Cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.drawRect <> New cv.Rect Then src = src(algTask.drawRect)
+            If task.drawRect <> New cv.Rect Then src = src(task.drawRect)
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, cppData, 0, cppData.Length)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
@@ -4291,7 +4291,7 @@ Namespace VBClasses
             For i = 0 To corners.Count - 1
                 Dim nextColor = sides.cornerColors(i)
                 Dim nextLabel = sides.cornerNames(i)
-                vbc.DrawLine(dst3, algTask.oldrcD.maxDist, corners(i), white)
+                vbc.DrawLine(dst3, task.oldrcD.maxDist, corners(i), white)
                 SetTrueText(nextLabel, New cv.Point(corners(i).X, corners(i).Y), 3)
             Next
 
@@ -4314,11 +4314,11 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 dst2 = runRedList(src, labels(2))
-                rc = algTask.oldrcD
+                rc = task.oldrcD
             End If
 
             dst3.SetTo(0)
-            DrawCircle(dst3, rc.maxDist, algTask.DotSize, white)
+            DrawCircle(dst3, rc.maxDist, task.DotSize, white)
             Dim center As New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
             Dim maxDistance(4 - 1) As Single
             For i = 0 To corners.Length - 1
@@ -4399,13 +4399,13 @@ Namespace VBClasses
             desc = "Intersect the cell contours and the edges in the image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(algTask.grayStable)
+            edgeline.Run(task.grayStable)
             runRedList(src, labels(3))
-            labels(2) = algTask.redList.labels(2) + " - Contours only.  Click anywhere to select a cell"
+            labels(2) = task.redList.labels(2) + " - Contours only.  Click anywhere to select a cell"
 
             dst2.SetTo(0)
-            For Each rc In algTask.redList.oldrclist
-                DrawTour(dst2(rc.rect), rc.contour, 255, algTask.lineWidth)
+            For Each rc In task.redList.oldrclist
+                DrawTour(dst2(rc.rect), rc.contour, 255, task.lineWidth)
             Next
 
             dst3 = edgeline.dst2 And dst2
@@ -4421,8 +4421,8 @@ Namespace VBClasses
     Public Class XO_LeftRight_Markers : Inherits TaskParent
         Dim redView As New LeftRight_Reduction
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             labels = {"", "", "Reduced Left Image", "Reduced Right Image"}
@@ -4438,7 +4438,7 @@ Namespace VBClasses
 
             ' find combinations in the left image - they are markers.
             Dim impList As New List(Of List(Of Integer))
-            Dim lineLen = algTask.gOptions.DebugSlider.Value
+            Dim lineLen = task.gOptions.DebugSlider.Value
             For y = 0 To left.Height - 1
                 Dim important As New List(Of Integer)
                 Dim impCounts As New List(Of Integer)
@@ -4494,7 +4494,7 @@ Namespace VBClasses
 
             ' find combinations in the left image - they are markers.
             Dim impList As New List(Of List(Of Integer))
-            Dim lineLen = algTask.gOptions.DebugSlider.Value
+            Dim lineLen = task.gOptions.DebugSlider.Value
             For y = 0 To dst2.Height - 1
                 Dim important As New List(Of Integer)
                 Dim impCounts As New List(Of Integer)
@@ -4540,7 +4540,7 @@ Namespace VBClasses
             desc = "Find edges in the Color8U_Basics output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(algTask.grayStable)
+            edgeline.Run(task.grayStable)
             dst2 = edgeline.dst2
 
             edges.Run(dst2)
@@ -4556,19 +4556,19 @@ Namespace VBClasses
 
     Public Class XO_Brick_FitLeftInColor : Inherits TaskParent
         Public Sub New()
-            If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-            algTask.drawRect = New cv.Rect(10, 10, 50, 50)
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            task.drawRect = New cv.Rect(10, 10, 50, 50)
             labels(3) = "Draw a rectangle to update."
             desc = "Translate the left image into the same coordinates as the color image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim correlationMat As New cv.Mat
 
-            Dim p1 = algTask.bricks.brickList(0).lRect.TopLeft
-            Dim p2 = algTask.bricks.brickList(algTask.bricks.brickList.Count - 1).lRect.BottomRight
+            Dim p1 = task.bricks.brickList(0).lRect.TopLeft
+            Dim p2 = task.bricks.brickList(task.bricks.brickList.Count - 1).lRect.BottomRight
 
-            ' Dim rect = ValidateRect(New cv.Rect(p1.X - algTask.brickSize, p1.Y - algTask.brickSize, algTask.brickSize * 2, algTask.brickSize * 2))
-            cv.Cv2.MatchTemplate(algTask.gray(algTask.drawRect), algTask.leftView, dst2, cv.TemplateMatchModes.CCoeffNormed)
+            ' Dim rect = ValidateRect(New cv.Rect(p1.X - task.brickSize, p1.Y - task.brickSize, task.brickSize * 2, task.brickSize * 2))
+            cv.Cv2.MatchTemplate(task.gray(task.drawRect), task.leftView, dst2, cv.TemplateMatchModes.CCoeffNormed)
             Dim mm = GetMinMax(dst2)
             dst3 = src(ValidateRect(New cv.Rect(mm.maxLoc.X / 2, mm.maxLoc.Y / 2, dst2.Width, dst2.Height)))
             labels(2) = "Correlation coefficient peak = " + Format(mm.maxVal, fmt3)
@@ -4583,65 +4583,65 @@ Namespace VBClasses
         Dim meanSeries As New cv.Mat
         Dim maxMeanVal As Single, maxStdevVal As Single
         Public Sub New()
-            If standalone Then algTask.gOptions.GridSlider.Value = algTask.gOptions.GridSlider.Maximum
+            If standalone Then task.gOptions.GridSlider.Value = task.gOptions.GridSlider.Maximum
             dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, cv.Scalar.All(0))
             dst3 = New cv.Mat(dst3.Rows, dst3.Cols, cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Collect a time series of depth mean and stdev to highlight where depth is unstable."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.optionsChanged Then meanSeries = New cv.Mat(algTask.gridRects.Count, algTask.frameHistoryCount, cv.MatType.CV_32F, cv.Scalar.All(0))
+            If task.optionsChanged Then meanSeries = New cv.Mat(task.gridRects.Count, task.frameHistoryCount, cv.MatType.CV_32F, cv.Scalar.All(0))
 
-            Dim index = algTask.frameCount Mod algTask.frameHistoryCount
-            Dim meanValues(algTask.gridRects.Count - 1) As Single
-            Dim stdValues(algTask.gridRects.Count - 1) As Single
-            Parallel.For(0, algTask.gridRects.Count,
+            Dim index = task.frameCount Mod task.frameHistoryCount
+            Dim meanValues(task.gridRects.Count - 1) As Single
+            Dim stdValues(task.gridRects.Count - 1) As Single
+            Parallel.For(0, task.gridRects.Count,
         Sub(i)
-            Dim roi = algTask.gridRects(i)
+            Dim roi = task.gridRects(i)
             Dim mean As cv.Scalar, stdev As cv.Scalar
-            cv.Cv2.MeanStdDev(algTask.pcSplit(2)(roi), mean, stdev, algTask.depthMask(roi))
+            cv.Cv2.MeanStdDev(task.pcSplit(2)(roi), mean, stdev, task.depthMask(roi))
             meanSeries.Set(Of Single)(i, index, mean)
-            If algTask.frameCount >= algTask.frameHistoryCount - 1 Then
+            If task.frameCount >= task.frameHistoryCount - 1 Then
                 cv.Cv2.MeanStdDev(meanSeries.Row(i), mean, stdev)
                 meanValues(i) = mean
                 stdValues(i) = stdev
             End If
         End Sub)
 
-            If algTask.frameCount >= algTask.frameHistoryCount Then
-                Dim means As cv.Mat = cv.Mat.FromPixelData(algTask.gridRects.Count, 1, cv.MatType.CV_32F, meanValues.ToArray)
-                Dim stdevs As cv.Mat = cv.Mat.FromPixelData(algTask.gridRects.Count, 1, cv.MatType.CV_32F, stdValues.ToArray)
-                Dim meanmask = means.Threshold(1, algTask.MaxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+            If task.frameCount >= task.frameHistoryCount Then
+                Dim means As cv.Mat = cv.Mat.FromPixelData(task.gridRects.Count, 1, cv.MatType.CV_32F, meanValues.ToArray)
+                Dim stdevs As cv.Mat = cv.Mat.FromPixelData(task.gridRects.Count, 1, cv.MatType.CV_32F, stdValues.ToArray)
+                Dim meanmask = means.Threshold(1, task.MaxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs()
                 Dim mm As mmData = GetMinMax(means, meanmask)
-                Dim stdMask = stdevs.Threshold(0.001, algTask.MaxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs() ' volatile region is x cm stdev.
+                Dim stdMask = stdevs.Threshold(0.001, task.MaxZmeters, cv.ThresholdTypes.Binary).ConvertScaleAbs() ' volatile region is x cm stdev.
                 Dim mmStd = GetMinMax(stdevs, stdMask)
 
                 maxMeanVal = Math.Max(maxMeanVal, mm.maxVal)
                 maxStdevVal = Math.Max(maxStdevVal, mmStd.maxVal)
 
-                Parallel.For(0, algTask.gridRects.Count,
+                Parallel.For(0, task.gridRects.Count,
             Sub(i)
-                Dim roi = algTask.gridRects(i)
+                Dim roi = task.gridRects(i)
                 dst3(roi).SetTo(255 * stdevs.Get(Of Single)(i, 0) / maxStdevVal)
-                dst3(roi).SetTo(0, algTask.noDepthMask(roi))
+                dst3(roi).SetTo(0, task.noDepthMask(roi))
 
                 dst2(roi).SetTo(255 * means.Get(Of Single)(i, 0) / maxMeanVal)
-                dst2(roi).SetTo(0, algTask.noDepthMask(roi))
+                dst2(roi).SetTo(0, task.noDepthMask(roi))
             End Sub)
 
-                If algTask.heartBeat Then
+                If task.heartBeat Then
                     maxMeanVal = 0
                     maxStdevVal = 0
                 End If
 
                 If standaloneTest() Then
-                    For i = 0 To algTask.gridRects.Count - 1
-                        Dim roi = algTask.gridRects(i)
+                    For i = 0 To task.gridRects.Count - 1
+                        Dim roi = task.gridRects(i)
                         SetTrueText(Format(meanValues(i), fmt3) + vbCrLf +
                                 Format(stdValues(i), fmt3), roi.Location, 3)
                     Next
                 End If
 
-                dst3 = dst3 Or algTask.gridMask
+                dst3 = dst3 Or task.gridMask
                 labels(2) = "The regions where the depth is volatile are brighter.  Stdev min " + Format(mmStd.minVal, fmt3) + " Stdev Max " + Format(mmStd.maxVal, fmt3)
                 labels(3) = "Mean/stdev for each ROI: Min " + Format(mm.minVal, fmt3) + " Max " + Format(mm.maxVal, fmt3)
             End If
@@ -4656,8 +4656,8 @@ Namespace VBClasses
         Dim shadow As New Depth_Holes
         Dim colorizer As New DepthColorizer_CPP
         Public Sub New()
-            algTask.gOptions.GridSlider.Maximum = dst2.Cols / 2
-            algTask.gOptions.GridSlider.Value = CInt(dst2.Cols / 2)
+            task.gOptions.GridSlider.Maximum = dst2.Cols / 2
+            task.gOptions.GridSlider.Value = CInt(dst2.Cols / 2)
 
             labels = {"", "", "ML filled shadow", ""}
             desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
@@ -4717,15 +4717,15 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim minLearnCount = 5
-            Parallel.ForEach(algTask.gridRects,
+            Parallel.ForEach(task.gridRects,
             Sub(roi)
-                algTask.pcSplit(2)(roi) = detectAndFillShadow(algTask.noDepthMask(roi), shadow.dst3(roi), algTask.pcSplit(2)(roi), src(roi),
+                task.pcSplit(2)(roi) = detectAndFillShadow(task.noDepthMask(roi), shadow.dst3(roi), task.pcSplit(2)(roi), src(roi),
                                                            minLearnCount)
             End Sub)
 
-            colorizer.Run(algTask.pcSplit(2))
+            colorizer.Run(task.pcSplit(2))
             dst2 = colorizer.dst2.Clone()
-            dst2.SetTo(white, algTask.gridMask)
+            dst2.SetTo(white, task.gridMask)
         End Sub
     End Class
 
@@ -4738,7 +4738,7 @@ Namespace VBClasses
         Public Sub New()
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0) ' can't use 32S because calcHist won't use it...
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            desc = "Collect lines across frames using the motion mask.  Results are in algTask.lines.lpList."
+            desc = "Collect lines across frames using the motion mask.  Results are in task.lines.lpList."
         End Sub
         Private Function getLineCounts(lpList As List(Of lpData)) As Single()
             Dim histarray(lpList.Count - 1) As Single
@@ -4746,10 +4746,10 @@ Namespace VBClasses
                 Dim histogram As New cv.Mat
                 dst1.SetTo(0)
                 For Each lp In lpList
-                    dst1.Line(lp.p1, lp.p2, lp.index + 1, algTask.lineWidth, cv.LineTypes.Link4)
+                    dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
                 Next
 
-                cv.Cv2.CalcHist({dst1}, {0}, algTask.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lpList.Count)})
+                cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lpList.Count)})
 
                 Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
             End If
@@ -4757,7 +4757,7 @@ Namespace VBClasses
             Return histarray
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.optionsChanged Then algTask.lines.lpList.Clear()
+            If task.optionsChanged Then task.lines.lpList.Clear()
 
             Dim histArray = getLineCounts(lines.lpList)
             Dim newList As New List(Of lpData)
@@ -4765,18 +4765,18 @@ Namespace VBClasses
                 If histArray(i) = 0 Then newList.Add(lines.lpList(i))
             Next
 
-            If src.Channels = 1 Then lines.Run(src) Else lines.Run(algTask.grayStable.Clone)
+            If src.Channels = 1 Then lines.Run(src) Else lines.Run(task.grayStable.Clone)
 
-            histArray = getLineCounts(algTask.lines.lpList)
+            histArray = getLineCounts(task.lines.lpList)
             For i = histArray.Count - 1 To 1 Step -1
                 If histArray(i) Then
-                    newList.Add(algTask.lines.lpList(i)) ' Add the lines in the motion mask.
+                    newList.Add(task.lines.lpList(i)) ' Add the lines in the motion mask.
                 End If
             Next
 
             dst3.SetTo(0)
             For Each lp In newList
-                dst3.Line(lp.p1, lp.p2, 255, algTask.lineWidth, cv.LineTypes.Link4)
+                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
             Next
 
             Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
@@ -4784,17 +4784,17 @@ Namespace VBClasses
                 If lp.length > 0 Then sortlines.Add(lp.length, lp)
             Next
 
-            algTask.lines.lpList.Clear()
+            task.lines.lpList.Clear()
             ' placeholder for zero so we can distinguish line 1 from the background which is 0.
-            algTask.lines.lpList.Add(New lpData(New cv.Point, New cv.Point))
+            task.lines.lpList.Add(New lpData(New cv.Point, New cv.Point))
 
             dst2 = src
             For Each lp In sortlines.Values
-                algTask.lines.lpList.Add(lp)
-                dst2.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, algTask.lineType)
+                task.lines.lpList.Add(lp)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             Next
 
-            labels(2) = CStr(algTask.lines.lpList.Count) + " lines were found."
+            labels(2) = CStr(task.lines.lpList.Count) + " lines were found."
             labels(3) = CStr(lines.lpList.Count) + " lines were in the motion mask."
         End Sub
     End Class
@@ -4812,12 +4812,12 @@ Namespace VBClasses
         Public runOnEachFrame As Boolean
         Public gravityMatch As New XO_Line_MatchGravity
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Find and track the longest line by matching line bricks."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.optionsChanged Then algTask.lines.lpList.Clear()
+            If task.optionsChanged Then task.lines.lpList.Clear()
 
             If matchRuns > 500 Then
                 Dim percent = lineRuns / matchRuns
@@ -4825,15 +4825,15 @@ Namespace VBClasses
                 matchRuns = lineRuns / percent
             End If
 
-            Dim index = algTask.gridMap.Get(Of Integer)(cameraMotionProxy.p1.Y, cameraMotionProxy.p1.X)
-            Dim firstRect = algTask.gridNabeRects(index)
-            index = algTask.gridMap.Get(Of Integer)(cameraMotionProxy.p2.Y, cameraMotionProxy.p2.X)
-            Dim lastRect = algTask.gridNabeRects(index)
+            Dim index = task.gridMap.Get(Of Integer)(cameraMotionProxy.p1.Y, cameraMotionProxy.p1.X)
+            Dim firstRect = task.gridNabeRects(index)
+            index = task.gridMap.Get(Of Integer)(cameraMotionProxy.p2.Y, cameraMotionProxy.p2.X)
+            Dim lastRect = task.gridNabeRects(index)
 
             dst2 = src.Clone
-            If algTask.lines.lpList.Count > 0 Then
+            If task.lines.lpList.Count > 0 Then
                 matchRuns += 1
-                cameraMotionProxy = algTask.lines.lpList(0)
+                cameraMotionProxy = task.lines.lpList(0)
 
                 Dim matchInput As New cv.Mat
                 cv.Cv2.HConcat(src(firstRect), src(lastRect), matchInput)
@@ -4845,11 +4845,11 @@ Namespace VBClasses
                         "line detection runs = " + CStr(totalLineRuns)
             End If
 
-            If algTask.heartBeatLT Or algTask.lines.lpList.Count <= 1 Or match.correlation < 0.98 Or runOnEachFrame Then
-                algTask.motionMask.SetTo(255) ' force a complete line detection
-                algTask.lines.Run(src.Clone)
+            If task.heartBeatLT Or task.lines.lpList.Count <= 1 Or match.correlation < 0.98 Or runOnEachFrame Then
+                task.motionMask.SetTo(255) ' force a complete line detection
+                task.lines.Run(src.Clone)
 
-                cameraMotionProxy = algTask.lines.lpList(0)
+                cameraMotionProxy = task.lines.lpList(0)
                 lineRuns += 1
                 totalLineRuns += 1
 
@@ -4859,16 +4859,16 @@ Namespace VBClasses
             End If
 
             labels(3) = "Currently available lines."
-            dst3 = algTask.lines.dst3
-            labels(3) = algTask.lines.labels(3)
+            dst3 = task.lines.dst3
+            labels(3) = task.lines.labels(3)
 
             gravityMatch.Run(src)
             If gravityMatch.gLines.Count > 0 Then gravityRGB = gravityMatch.gLines(0)
 
-            dst2.Rectangle(firstRect, algTask.highlight, algTask.lineWidth)
-            dst2.Rectangle(lastRect, algTask.highlight, algTask.lineWidth)
-            dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, algTask.highlight, algTask.lineWidth, algTask.lineType)
-            dst2.Line(algTask.lineGravity.pE1, algTask.lineGravity.pE2, algTask.highlight, algTask.lineWidth, algTask.lineType)
+            dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
+            dst2.Rectangle(lastRect, task.highlight, task.lineWidth)
+            dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, task.highlight, task.lineWidth, task.lineType)
+            dst2.Line(task.lineGravity.pE1, task.lineGravity.pE2, task.highlight, task.lineWidth, task.lineType)
         End Sub
     End Class
 
@@ -4888,10 +4888,10 @@ Namespace VBClasses
             desc = "Create a mini point cloud for use with histograms"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            resize.Run(algTask.pointCloud)
+            resize.Run(task.pointCloud)
 
             Dim split = resize.dst2.Split()
-            split(2).SetTo(0, algTask.noDepthMask.Resize(split(2).Size))
+            split(2).SetTo(0, task.noDepthMask.Resize(split(2).Size))
             rect = New cv.Rect(0, 0, resize.dst2.Width, resize.dst2.Height)
             If rect.Height < dst2.Height / 2 Then rect.Y = dst2.Height / 4 ' move it below the dst2 caption
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -4923,7 +4923,7 @@ Namespace VBClasses
             Dim input = src
             mini.Run(input)
             input = mini.dst3
-            algTask.accRadians.Y = ySlider.Value
+            task.accRadians.Y = ySlider.Value
 
             Dim cx As Double = 1, sx As Double = 0, cy As Double = 1, sy As Double = 0, cz As Double = 1, sz As Double = 0
             Dim gM(,) As Single = {{cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
@@ -4932,8 +4932,8 @@ Namespace VBClasses
             '[cos(a) 0 -sin(a)]
             '[0      1       0]
             '[sin(a) 0   cos(a] rotate the point cloud around the y-axis.
-            cy = Math.Cos(algTask.accRadians.Y * cv.Cv2.PI / 180)
-            sy = Math.Sin(algTask.accRadians.Y * cv.Cv2.PI / 180)
+            cy = Math.Cos(task.accRadians.Y * cv.Cv2.PI / 180)
+            sy = Math.Sin(task.accRadians.Y * cv.Cv2.PI / 180)
             gM = {{gM(0, 0) * cy + gM(0, 1) * 0 + gM(0, 2) * sy}, {gM(0, 0) * 0 + gM(0, 1) * 1 + gM(0, 2) * 0}, {gM(0, 0) * -sy + gM(0, 1) * 0 + gM(0, 2) * cy},
               {gM(1, 0) * cy + gM(1, 1) * 0 + gM(1, 2) * sy}, {gM(1, 0) * 0 + gM(1, 1) * 1 + gM(1, 2) * 0}, {gM(1, 0) * -sy + gM(1, 1) * 0 + gM(1, 2) * cy},
               {gM(2, 0) * cy + gM(2, 1) * 0 + gM(2, 2) * sy}, {gM(2, 0) * 0 + gM(2, 1) * 1 + gM(2, 2) * 0}, {gM(2, 0) * -sy + gM(2, 1) * 0 + gM(2, 2) * cy}}
@@ -4947,7 +4947,7 @@ Namespace VBClasses
             Dim mask = split(2).Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
             input.SetTo(0, mask.ConvertScaleAbs(255)) ' remove zero depth pixels with non-zero x and y.
 
-            Dim ranges() = New cv.Rangef() {New cv.Rangef(-algTask.yRange, algTask.yRange), New cv.Rangef(0, algTask.MaxZmeters)}
+            Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.MaxZmeters)}
             cv.Cv2.CalcHist({input}, {1, 2}, New cv.Mat, histogram, 2, {input.Height, input.Width}, ranges)
 
             dst2(mini.rect) = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
@@ -4968,7 +4968,7 @@ Namespace VBClasses
         Public plot As New Plot_OverTimeSingle
         Dim resetCheck As System.Windows.Forms.CheckBox
         Public Sub New()
-            algTask.accRadians.Y = -cv.Cv2.PI / 2
+            task.accRadians.Y = -cv.Cv2.PI / 2
 
             labels(2) = "peak dst2, peak dst3, changed mask, maxvalues history"
             labels(3) = "Blue is maxVal, green is mean * 100"
@@ -5014,7 +5014,7 @@ Namespace VBClasses
     Public Class XO_MiniCloud_RotateSinglePass : Inherits TaskParent
         Dim peak As New XO_MiniCloud_Rotate
         Public Sub New()
-            algTask.accRadians.Y = -cv.Cv2.PI
+            task.accRadians.Y = -cv.Cv2.PI
             desc = "Same operation as New MiniCloud_RotateAngle but in a single pass."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -5036,7 +5036,7 @@ Namespace VBClasses
                 End If
             Next
             peak.Run(peak.mini.dst3)
-            algTask.accRadians.Y = bestAngle
+            task.accRadians.Y = bestAngle
             dst2 = peak.dst2
             dst3 = peak.dst3
 
@@ -5055,16 +5055,16 @@ Namespace VBClasses
             desc = "Automatically adjust the X-Range option of the pointcloud to maximize visible pixels"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim expectedCount = algTask.depthMask.CountNonZero
+            Dim expectedCount = task.depthMask.CountNonZero
 
             Dim diff = Math.Abs(expectedCount - adjustedCount)
 
             ' the input is a histogram.  If standaloneTest(), go get one...
             If standaloneTest() Then
-                cv.Cv2.CalcHist({algTask.pointCloud}, algTask.channelsTop, New cv.Mat, histogram, 2, algTask.bins2D, algTask.rangesTop)
+                cv.Cv2.CalcHist({task.pointCloud}, task.channelsTop, New cv.Mat, histogram, 2, task.bins2D, task.rangesTop)
                 histogram.Row(0).SetTo(0)
                 dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-                dst3 = histogram.Threshold(algTask.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+                dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
                 src = histogram
             End If
 
@@ -5074,18 +5074,18 @@ Namespace VBClasses
             strOut = "Adjusted = " + vbTab + CStr(adjustedCount) + "k" + vbCrLf +
                  "Expected = " + vbTab + CStr(expectedCount) + "k" + vbCrLf +
                  "Diff = " + vbTab + vbTab + CStr(diff) + vbCrLf +
-                 "xRange = " + vbTab + Format(algTask.xRange, fmt3)
+                 "xRange = " + vbTab + Format(task.xRange, fmt3)
 
-            If algTask.useXYRange Then
-                Dim saveOptionState = algTask.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
+            If task.useXYRange Then
+                Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
                 Dim leftGap = histogram.Col(0).CountNonZero
                 Dim rightGap = histogram.Col(histogram.Width - 1).CountNonZero
-                'If leftGap = 0 And rightGap = 0 And algTask.gOptions.XRangeBar.Value > 3 Then
-                '    algTask.gOptions.XRangeBar.Value -= 1
+                'If leftGap = 0 And rightGap = 0 And task.gOptions.XRangeBar.Value > 3 Then
+                '    task.gOptions.XRangeBar.Value -= 1
                 'Else
-                '    If adjustedCount < expectedCount Then algTask.gOptions.XRangeBar.Value += 1 Else algTask.gOptions.XRangeBar.Value -= 1
+                '    If adjustedCount < expectedCount Then task.gOptions.XRangeBar.Value += 1 Else task.gOptions.XRangeBar.Value -= 1
                 'End If
-                algTask.optionsChanged = saveOptionState
+                task.optionsChanged = saveOptionState
             End If
 
             SetTrueText(strOut, 3)
@@ -5104,16 +5104,16 @@ Namespace VBClasses
             desc = "Automatically adjust the Y-Range option of the pointcloud to maximize visible pixels"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim expectedCount = algTask.depthMask.CountNonZero
+            Dim expectedCount = task.depthMask.CountNonZero
 
             Dim diff = Math.Abs(expectedCount - adjustedCount)
 
             ' the input is a histogram.  If standaloneTest(), go get one...
             If standaloneTest() Then
-                cv.Cv2.CalcHist({algTask.pointCloud}, algTask.channelsSide, New cv.Mat, histogram, 2, algTask.bins2D, algTask.rangesSide)
+                cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
                 histogram.Col(0).SetTo(0)
                 dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-                dst3 = histogram.Threshold(algTask.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+                dst3 = histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
                 src = histogram
             End If
 
@@ -5123,18 +5123,18 @@ Namespace VBClasses
             strOut = "Adjusted = " + vbTab + CStr(adjustedCount) + "k" + vbCrLf +
                  "Expected = " + vbTab + CStr(expectedCount) + "k" + vbCrLf +
                  "Diff = " + vbTab + vbTab + CStr(diff) + vbCrLf +
-                 "yRange = " + vbTab + Format(algTask.yRange, fmt3)
+                 "yRange = " + vbTab + Format(task.yRange, fmt3)
 
-            If algTask.useXYRange Then
-                Dim saveOptionState = algTask.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
+            If task.useXYRange Then
+                Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
                 Dim topGap = histogram.Row(0).CountNonZero
                 Dim botGap = histogram.Row(histogram.Height - 1).CountNonZero
-                'If topGap = 0 And botGap = 0 And algTask.gOptions.YRangeSlider.Value > 3 Then
-                '    algTask.gOptions.YRangeSlider.Value -= 1
+                'If topGap = 0 And botGap = 0 And task.gOptions.YRangeSlider.Value > 3 Then
+                '    task.gOptions.YRangeSlider.Value -= 1
                 'Else
-                '    If adjustedCount < expectedCount Then algTask.gOptions.YRangeSlider.Value += 1 Else algTask.gOptions.YRangeSlider.Value -= 1
+                '    If adjustedCount < expectedCount Then task.gOptions.YRangeSlider.Value += 1 Else task.gOptions.YRangeSlider.Value -= 1
                 'End If
-                algTask.optionsChanged = saveOptionState
+                task.optionsChanged = saveOptionState
             End If
             SetTrueText(strOut, 3)
         End Sub
@@ -5154,10 +5154,10 @@ Namespace VBClasses
             histTop.Run(src)
 
             autoX.Run(histTop.histogram)
-            dst2 = histTop.histogram.Threshold(algTask.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            dst2 = histTop.histogram.Threshold(task.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
 
             Dim ptList As New List(Of cv.Point)
-            If algTask.gOptions.DebugCheckBox.Checked Then
+            If task.gOptions.DebugCheckBox.Checked Then
                 For y = 0 To dst2.Height - 1
                     For x = 0 To dst2.Width - 1
                         If dst2.Get(Of Byte)(y, x) <> 0 Then ptList.Add(New cv.Point(x, y))
@@ -5191,30 +5191,30 @@ Namespace VBClasses
             Dim histogram As New cv.Mat
 
             Dim channels() As Integer = {0}
-            Select Case algTask.reductionName
+            Select Case task.reductionName
                 Case "X Reduction"
-                    dst0 = algTask.pcSplit(0)
+                    dst0 = task.pcSplit(0)
                 Case "Y Reduction"
-                    dst0 = algTask.pcSplit(1)
+                    dst0 = task.pcSplit(1)
                 Case "Z Reduction"
-                    dst0 = algTask.pcSplit(2)
+                    dst0 = task.pcSplit(2)
                 Case "XY Reduction"
-                    dst0 = algTask.pcSplit(0) + algTask.pcSplit(1)
+                    dst0 = task.pcSplit(0) + task.pcSplit(1)
                     channels = {0, 1}
                 Case "XZ Reduction"
-                    dst0 = algTask.pcSplit(0) + algTask.pcSplit(2)
+                    dst0 = task.pcSplit(0) + task.pcSplit(2)
                     channels = {0, 1}
                 Case "YZ Reduction"
-                    dst0 = algTask.pcSplit(1) + algTask.pcSplit(2)
+                    dst0 = task.pcSplit(1) + task.pcSplit(2)
                     channels = {0, 1}
                 Case "XYZ Reduction"
-                    dst0 = algTask.pcSplit(0) + algTask.pcSplit(1) + algTask.pcSplit(2)
+                    dst0 = task.pcSplit(0) + task.pcSplit(1) + task.pcSplit(2)
                     channels = {0, 1}
             End Select
 
             Dim mm = GetMinMax(dst0)
             Dim ranges = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
-            cv.Cv2.CalcHist({dst0}, channels, algTask.depthMask, histogram, 1, {algTask.histogramBins}, ranges)
+            cv.Cv2.CalcHist({dst0}, channels, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
             Dim histArray(histogram.Total - 1) As Single
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -5227,9 +5227,9 @@ Namespace VBClasses
             cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst1, ranges)
             dst1.ConvertTo(dst2, cv.MatType.CV_8U)
             dst3 = PaletteFull(dst2)
-            dst3.SetTo(0, algTask.noDepthMask)
+            dst3.SetTo(0, task.noDepthMask)
 
-            labels(2) = "Pointcloud data backprojection to " + CStr(algTask.histogramBins) + " classes."
+            labels(2) = "Pointcloud data backprojection to " + CStr(task.histogramBins) + " classes."
         End Sub
     End Class
 
@@ -5275,7 +5275,7 @@ Namespace VBClasses
             Next
 
             Static saveTrueData As New List(Of TrueText)
-            If algTask.heartBeatLT Then
+            If task.heartBeatLT Then
                 saveTrueData = New List(Of TrueText)(trueData)
             Else
                 trueData = New List(Of TrueText)(saveTrueData)
@@ -5297,17 +5297,17 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1.SetTo(0)
-            For Each lp In algTask.lines.lpList
-                dst1.Line(lp.p1, lp.p2, 255, algTask.lineWidth + 1, cv.LineTypes.Link8)
+            For Each lp In task.lines.lpList
+                dst1.Line(lp.p1, lp.p2, 255, task.lineWidth + 1, cv.LineTypes.Link8)
             Next
 
             dst2 = runRedList(dst1, labels(2), Not dst1)
 
             dst3.SetTo(0)
-            For Each lp In algTask.lines.lpList
-                vbc.DrawLine(dst3, lp.p1, lp.p2, white, algTask.lineWidth)
+            For Each lp In task.lines.lpList
+                vbc.DrawLine(dst3, lp.p1, lp.p2, white, task.lineWidth)
                 Dim center = New cv.Point(CInt((lp.p1.X + lp.p2.X) / 2), CInt((lp.p1.Y + lp.p2.Y) / 2))
-                DrawCircle(dst3, center, algTask.DotSize, algTask.highlight, -1)
+                DrawCircle(dst3, center, task.DotSize, task.highlight, -1)
             Next
         End Sub
     End Class
@@ -5320,8 +5320,8 @@ Namespace VBClasses
     Public Class XO_TrackLine_Map : Inherits TaskParent
         Dim lTrack As New XO_TrackLine_Basics
         Public Sub New()
-            If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-            algTask.gOptions.CrossHairs.Checked = False
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            task.gOptions.CrossHairs.Checked = False
             desc = "Show the gridMap and fpMap (features points) "
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -5332,18 +5332,18 @@ Namespace VBClasses
 
             Dim count As Integer
             dst3.SetTo(0)
-            Dim histarray(algTask.redList.oldrclist.Count - 1) As Single
+            Dim histarray(task.redList.oldrclist.Count - 1) As Single
             Dim histogram As New cv.Mat
-            For Each brick In algTask.bricks.brickList
-                cv.Cv2.CalcHist({algTask.redList.rcMap(brick.rect)}, {0}, emptyMat, histogram, 1, {algTask.redList.oldrclist.Count},
-                             New cv.Rangef() {New cv.Rangef(1, algTask.redList.oldrclist.Count)})
+            For Each brick In task.bricks.brickList
+                cv.Cv2.CalcHist({task.redList.rcMap(brick.rect)}, {0}, emptyMat, histogram, 1, {task.redList.oldrclist.Count},
+                             New cv.Rangef() {New cv.Rangef(1, task.redList.oldrclist.Count)})
 
                 Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
                 ' if multiple lines intersect a grid rect, choose the largest redcloud cell containing them.
                 ' The largest will be the index of the first non-zero histogram entry.
                 For j = 1 To histarray.Count - 1
                     If histarray(j) > 0 Then
-                        Dim rc = algTask.redList.oldrclist(j)
+                        Dim rc = task.redList.oldrclist(j)
                         dst3(brick.rect).SetTo(rc.color)
                         ' dst3(brick.rect).SetTo(0, Not dst1(brick.rect))
                         count += 1
@@ -5369,7 +5369,7 @@ Namespace VBClasses
             desc = "Track an individual line as best as possible."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lplist = algTask.lines.lpList
+            Dim lplist = task.lines.lpList
 
             If standalone Then
                 If lplist(0).length > lp.length Then
@@ -5385,15 +5385,15 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst2 = src
-                DrawCircle(dst2, match.newCenter, algTask.DotSize, white)
-                dst2.Rectangle(matchRect, algTask.highlight, algTask.lineWidth)
+                DrawCircle(dst2, match.newCenter, task.DotSize, white)
+                dst2.Rectangle(matchRect, task.highlight, task.lineWidth)
                 dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
                 SetTrueText(Format(match.correlation, fmt3), match.newCenter)
             End If
 
             rawLines.Run(src(matchRect))
             If rawLines.lpList.Count > 0 Then lp = rawLines.lpList(0)
-            dst2(matchRect).Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, algTask.lineType)
+            dst2(matchRect).Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         End Sub
     End Class
 
@@ -5410,12 +5410,12 @@ Namespace VBClasses
             desc = "Track an individual line as best as possible."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lplist = algTask.lines.lpList
-            If standalone And foundLine = False Then lpInput = algTask.lineLongest
+            Dim lplist = task.lines.lpList
+            If standalone And foundLine = False Then lpInput = task.lineLongest
 
             Static subsetrect = lpInput.rect
             If subsetrect.width <= dst2.Height / 10 Then
-                lpInput = algTask.lineLongest
+                lpInput = task.lineLongest
                 subsetrect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
                 Exit Sub
             End If
@@ -5432,7 +5432,7 @@ Namespace VBClasses
                     match.lpInput = lpInput
                     match.Run(src)
 
-                    foundLine = match.p1Correlation >= algTask.fCorrThreshold And match.p2Correlation >= algTask.fCorrThreshold
+                    foundLine = match.p1Correlation >= task.fCorrThreshold And match.p2Correlation >= task.fCorrThreshold
                     If foundLine Then
                         lpInput = match.lpInput
                         subsetrect = lpInput.rect
@@ -5449,17 +5449,17 @@ Namespace VBClasses
                     lpInput = lplist(0)
                 End If
 
-                Dim deltaX1 = Math.Abs(algTask.gravityIMU.pE1.X - lpInput.pE1.X)
-                Dim deltaX2 = Math.Abs(algTask.gravityIMU.pE2.X - lpInput.pE2.X)
-                If Math.Abs(deltaX1 - deltaX2) > algTask.gravityBasics.options.pixelThreshold Then
-                    lpInput = algTask.lineLongest
+                Dim deltaX1 = Math.Abs(task.gravityIMU.pE1.X - lpInput.pE1.X)
+                Dim deltaX2 = Math.Abs(task.gravityIMU.pE2.X - lpInput.pE2.X)
+                If Math.Abs(deltaX1 - deltaX2) > task.gravityBasics.options.pixelThreshold Then
+                    lpInput = task.lineLongest
                 End If
                 subsetrect = lpInput.rect
             End If
 
             dst2 = src
-            dst2.Line(lpInput.p1, lpInput.p2, algTask.highlight, algTask.lineWidth + 1, algTask.lineType)
-            dst2.Rectangle(subsetrect, algTask.highlight, algTask.lineWidth)
+            dst2.Line(lpInput.p1, lpInput.p2, task.highlight, task.lineWidth + 1, task.lineType)
+            dst2.Rectangle(subsetrect, task.highlight, task.lineWidth)
         End Sub
     End Class
 
@@ -5474,13 +5474,13 @@ Namespace VBClasses
         Dim lplist As List(Of lpData)
         Dim knn As New KNN_NNBasics
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             OptionParent.FindSlider("KNN Dimension").Value = 6
             desc = "Track an individual line as best as possible."
         End Sub
         Private Function restartLine(src As cv.Mat) As lpData
             For Each lpTemp In lplist
-                If Math.Abs(algTask.lineGravity.angle - lpTemp.angle) < algTask.angleThreshold Then
+                If Math.Abs(task.lineGravity.angle - lpTemp.angle) < task.angleThreshold Then
                     matchRect = lpTemp.rect
                     match.template = src(matchRect).Clone
                     Return lpTemp
@@ -5489,8 +5489,8 @@ Namespace VBClasses
             Return New lpData
         End Function
         Private Sub prepEntry(knnList As List(Of Single), lpNext As lpData)
-            Dim brick1 = algTask.gridMap.Get(Of Integer)(lpNext.p1.Y, lpNext.p1.X)
-            Dim brick2 = algTask.gridMap.Get(Of Integer)(lpNext.p2.Y, lpNext.p2.X)
+            Dim brick1 = task.gridMap.Get(Of Integer)(lpNext.p1.Y, lpNext.p1.X)
+            Dim brick2 = task.gridMap.Get(Of Integer)(lpNext.p2.Y, lpNext.p2.X)
             knnList.Add(lpNext.p1.X)
             knnList.Add(lpNext.p1.Y)
             knnList.Add(lpNext.p2.X)
@@ -5499,19 +5499,19 @@ Namespace VBClasses
             knnList.Add(brick2)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            lplist = algTask.lines.lpList
+            lplist = task.lines.lpList
 
             Static lp As New lpData, lpLast As lpData
             lpLast = lp
 
-            If match.correlation < algTask.fCorrThreshold Or matchRect.Width <= 1 Then ' Or algTask.heartBeatLT 
+            If match.correlation < task.fCorrThreshold Or matchRect.Width <= 1 Then ' Or task.heartBeatLT 
                 lp = restartLine(src)
             End If
 
             match.Run(src)
 
             knn.trainInput.Clear()
-            For Each nextlp In algTask.lines.lpList
+            For Each nextlp In task.lines.lpList
                 prepEntry(knn.trainInput, nextlp)
             Next
 
@@ -5519,23 +5519,23 @@ Namespace VBClasses
             prepEntry(knn.queries, lp)
             knn.Run(emptyMat)
 
-            lp = algTask.lines.lpList(knn.result(0, 0))
+            lp = task.lines.lpList(knn.result(0, 0))
             labels(3) = "Index of the current lp = " + CStr(lp.index - 1)
 
             If standaloneTest() Then
                 dst2 = src.Clone
-                DrawCircle(dst2, match.newCenter, algTask.DotSize, white)
-                dst2.Rectangle(lp.rect, algTask.highlight, algTask.lineWidth)
-                dst2.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, algTask.lineType)
+                DrawCircle(dst2, match.newCenter, task.DotSize, white)
+                dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
                 SetTrueText(Format(match.correlation, fmt3), match.newCenter)
 
-                dst2.Rectangle(lp.rect, algTask.highlight, algTask.lineWidth)
+                dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
             End If
 
             Dim lpRectMap = XO_Line_CoreNew.createMap()
             dst1 = PaletteBlackZero(lpRectMap)
-            dst1.Circle(lp.ptCenter, algTask.DotSize, algTask.highlight, algTask.lineWidth, algTask.lineType)
+            dst1.Circle(lp.ptCenter, task.DotSize, task.highlight, task.lineWidth, task.lineType)
 
             labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
         End Sub
@@ -5558,27 +5558,27 @@ Namespace VBClasses
 
             bPoint.Run(src.Clone)
 
-            Dim pointsPerLine(algTask.gridRects.Count) As List(Of Integer)
+            Dim pointsPerLine(task.gridRects.Count) As List(Of Integer)
             Dim lpRectMap = XO_Line_CoreNew.createMap()
             For Each pt In bPoint.ptList
                 Dim index = lpRectMap.Get(Of Byte)(pt.Y, pt.X)
-                If index > 0 And index < algTask.lines.lpList.Count Then
-                    Dim lp = algTask.lines.lpList(index)
+                If index > 0 And index < task.lines.lpList.Count Then
+                    Dim lp = task.lines.lpList(index)
                     If pointsPerLine(lp.index) Is Nothing Then pointsPerLine(lp.index) = New List(Of Integer)
                     pointsPerLine(lp.index).Add(lp.index)
-                    dst2.Circle(pt, algTask.DotSize * 3, lp.color, -1, algTask.lineType)
+                    dst2.Circle(pt, task.DotSize * 3, lp.color, -1, task.lineType)
                 End If
             Next
 
             lpList.Clear()
             For Each ppl In pointsPerLine
                 If ppl Is Nothing Then Continue For
-                If ppl.Count > 1 Then lpList.Add(algTask.lines.lpList(ppl(0)))
+                If ppl.Count > 1 Then lpList.Add(task.lines.lpList(ppl(0)))
             Next
 
             dst3 = src
             For Each lp In lpList
-                dst3.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, algTask.lineType)
+                dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             Next
             labels(3) = CStr(lpList.Count) + " lines were confirmed with brickpoints"
         End Sub
@@ -5597,18 +5597,18 @@ Namespace VBClasses
             desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
         End Sub
         Private Shared Sub showVec(dst As cv.Mat, vec As lpData)
-            dst.Line(vec.p1, vec.p2, algTask.highlight, algTask.lineWidth * 2, algTask.lineType)
-            Dim gIndex = algTask.gridMap.Get(Of Integer)(vec.p1.Y, vec.p1.X)
-            Dim firstRect = algTask.gridNabeRects(gIndex)
-            gIndex = algTask.gridMap.Get(Of Integer)(vec.p2.Y, vec.p2.X)
-            Dim lastRect = algTask.gridNabeRects(gIndex)
-            dst.Rectangle(firstRect, algTask.highlight, algTask.lineWidth)
-            dst.Rectangle(lastRect, algTask.highlight, algTask.lineWidth)
+            dst.Line(vec.p1, vec.p2, task.highlight, task.lineWidth * 2, task.lineType)
+            Dim gIndex = task.gridMap.Get(Of Integer)(vec.p1.Y, vec.p1.X)
+            Dim firstRect = task.gridNabeRects(gIndex)
+            gIndex = task.gridMap.Get(Of Integer)(vec.p2.Y, vec.p2.X)
+            Dim lastRect = task.gridNabeRects(gIndex)
+            dst.Rectangle(firstRect, task.highlight, task.lineWidth)
+            dst.Rectangle(lastRect, task.highlight, task.lineWidth)
         End Sub
         Public Shared Sub showVectors(dst As cv.Mat)
-            dst.Line(algTask.lineGravity.p1, algTask.lineGravity.p2, white, algTask.lineWidth, algTask.lineType)
-            dst.Line(algTask.lineHorizon.p1, algTask.lineHorizon.p2, white, algTask.lineWidth, algTask.lineType)
-            showVec(dst, algTask.lineLongest)
+            dst.Line(task.lineGravity.p1, task.lineGravity.p2, white, task.lineWidth, task.lineType)
+            dst.Line(task.lineHorizon.p1, task.lineHorizon.p2, white, task.lineWidth, task.lineType)
+            showVec(dst, task.lineLongest)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -5631,28 +5631,28 @@ Namespace VBClasses
                 nearest.lpInput = RGBcandidate
                 nearest.Run(src)
                 RGBcandidate = nearest.lpOutput
-                Dim deltaX1 = Math.Abs(algTask.lineGravity.pE1.X - RGBcandidate.pE1.X)
-                Dim deltaX2 = Math.Abs(algTask.lineGravity.pE2.X - RGBcandidate.pE2.X)
+                Dim deltaX1 = Math.Abs(task.lineGravity.pE1.X - RGBcandidate.pE1.X)
+                Dim deltaX2 = Math.Abs(task.lineGravity.pE2.X - RGBcandidate.pE2.X)
                 If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
-                    algTask.lineGravity = algTask.gravityIMU
+                    task.lineGravity = task.gravityIMU
                     RGBcandidate = New lpData
                     If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
                 End If
             Else
-                algTask.lineGravity = algTask.gravityIMU
+                task.lineGravity = task.gravityIMU
                 RGBcandidate = New lpData
                 If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
             End If
 
-            algTask.lineHorizon = Line_PerpendicularTest.computePerp(algTask.lineGravity)
+            task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
 
             gravityRGB = RGBcandidate
 
             If standaloneTest() Then
                 dst2.SetTo(0)
                 showVectors(dst2)
-                dst3 = algTask.lines.dst3
-                labels(3) = algTask.lines.labels(3)
+                dst3 = task.lines.dst3
+                labels(3) = task.lines.labels(3)
             End If
         End Sub
     End Class
@@ -5669,15 +5669,15 @@ Namespace VBClasses
         Public sides As New XO_FPoly_Sides
         Dim options As New Options_Features
         Public Sub New()
-            algTask.featureOptions.FeatureSampleSize.Value = 30
+            task.featureOptions.FeatureSampleSize.Value = 30
             If dst2.Width >= 640 Then OptionParent.FindSlider("Resync if feature moves > X pixels").Value = 15
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Feature Polygon with perpendicular lines for center of rotation.", "Feature polygon created by highest generation counts",
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
             desc = "Build a Feature polygon with the top generation counts of the good features"
         End Sub
         Public Shared Sub DrawFPoly(ByRef dst As cv.Mat, poly As List(Of cv.Point2f), color As cv.Scalar)
-            Dim minMod = Math.Min(poly.Count, algTask.polyCount)
+            Dim minMod = Math.Min(poly.Count, task.polyCount)
             For i = 0 To minMod - 1
                 vbc.DrawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
             Next
@@ -5685,21 +5685,21 @@ Namespace VBClasses
         Public Shared Sub DrawPolys(dst As cv.Mat, poly As fPolyData)
             DrawFPoly(dst, poly.prevPoly, cv.Scalar.White)
             DrawFPoly(dst, poly.currPoly, cv.Scalar.Yellow)
-            dst.Line(poly.currPoly(poly.polyPrevSideIndex), poly.currPoly((poly.polyPrevSideIndex + 1) Mod algTask.polyCount),
-                 algTask.highlight, algTask.lineWidth * 3, algTask.lineType)
-            dst.Line(poly.prevPoly(poly.polyPrevSideIndex), poly.prevPoly((poly.polyPrevSideIndex + 1) Mod algTask.polyCount),
-                 algTask.highlight, algTask.lineWidth * 3, algTask.lineType)
+            dst.Line(poly.currPoly(poly.polyPrevSideIndex), poly.currPoly((poly.polyPrevSideIndex + 1) Mod task.polyCount),
+                 task.highlight, task.lineWidth * 3, task.lineType)
+            dst.Line(poly.prevPoly(poly.polyPrevSideIndex), poly.prevPoly((poly.polyPrevSideIndex + 1) Mod task.polyCount),
+                 task.highlight, task.lineWidth * 3, task.lineType)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If algTask.firstPass Then sides.prevImage = src.Clone
+            If task.firstPass Then sides.prevImage = src.Clone
             sides.options.Run()
 
             feat.Run(src)
             dst2 = src.Clone
             sides.currPoly = New List(Of cv.Point2f)(feat.topFeatures)
-            If sides.currPoly.Count < algTask.polyCount Then Exit Sub
+            If sides.currPoly.Count < task.polyCount Then Exit Sub
             sides.Run(src)
             dst3 = sides.dst2
 
@@ -5716,7 +5716,7 @@ Namespace VBClasses
             End If
             causes += vbCrLf
 
-            If algTask.optionsChanged Then
+            If task.optionsChanged Then
                 resync = True
                 causes += " - Options changed"
             End If
@@ -5728,9 +5728,9 @@ Namespace VBClasses
             End If
             causes += vbCrLf
 
-            If Math.Abs(sides.currLengths.Sum() - sides.prevLengths.Sum()) > sides.options.removeThreshold * algTask.polyCount Then
+            If Math.Abs(sides.currLengths.Sum() - sides.prevLengths.Sum()) > sides.options.removeThreshold * task.polyCount Then
                 resync = True
-                causes += " - The top " + CStr(algTask.polyCount) + " vertices have moved because of the generation counts"
+                causes += " - The top " + CStr(task.polyCount) + " vertices have moved because of the generation counts"
             Else
                 If Math.Abs(sides.prevFLineLen - sides.currFLineLen) > sides.options.removeThreshold Then
                     resync = True
@@ -5740,7 +5740,7 @@ Namespace VBClasses
             End If
             causes += vbCrLf
 
-            If resync Or sides.prevPoly.Count <> algTask.polyCount Or algTask.optionsChanged Then
+            If resync Or sides.prevPoly.Count <> task.polyCount Or task.optionsChanged Then
                 sides.prevPoly = New List(Of cv.Point2f)(sides.currPoly)
                 sides.prevLengths = New List(Of Single)(sides.currLengths)
                 sides.prevSideIndex = sides.prevLengths.IndexOf(sides.prevLengths.Max)
@@ -5806,10 +5806,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If algTask.firstPass Then prevImage = src.Clone
+            If task.firstPass Then prevImage = src.Clone
             options.Run()
 
-            If standaloneTest() And algTask.heartBeat Then
+            If standaloneTest() And task.heartBeat Then
                 random.Run(src)
                 currPoly = New List(Of cv.Point2f)(random.PointList)
             End If
@@ -5821,7 +5821,7 @@ Namespace VBClasses
             Next
             currSideIndex = currLengths.IndexOf(currLengths.Max)
 
-            If algTask.firstPass Then
+            If task.firstPass Then
                 prevPoly = New List(Of cv.Point2f)(currPoly)
                 prevLengths = New List(Of Single)(currLengths)
                 prevSideIndex = prevLengths.IndexOf(prevLengths.Max)
@@ -5829,8 +5829,8 @@ Namespace VBClasses
 
             If prevPoly.Count = 0 Then Exit Sub
 
-            mpPrev = New lpData(prevPoly(prevSideIndex), prevPoly((prevSideIndex + 1) Mod algTask.polyCount))
-            mpCurr = New lpData(currPoly(currSideIndex), currPoly((currSideIndex + 1) Mod algTask.polyCount))
+            mpPrev = New lpData(prevPoly(prevSideIndex), prevPoly((prevSideIndex + 1) Mod task.polyCount))
+            mpCurr = New lpData(currPoly(currSideIndex), currPoly((currSideIndex + 1) Mod task.polyCount))
 
             prevFLineLen = mpPrev.p1.DistanceTo(mpPrev.p2)
             currFLineLen = mpCurr.p1.DistanceTo(mpCurr.p2)
@@ -5864,7 +5864,7 @@ Namespace VBClasses
                     near.lp = mpPrev
                     near.pt = newNear.p1
                     near.Run(src)
-                    dst1.Line(near.pt, near.nearPoint, cv.Scalar.Red, algTask.lineWidth + 5, algTask.lineType)
+                    dst1.Line(near.pt, near.nearPoint, cv.Scalar.Red, task.lineWidth + 5, task.lineType)
 
                     Dim hypotenuse = rotateCenter.DistanceTo(near.pt)
                     rotateAngle = -Math.Asin(near.nearPoint.DistanceTo(near.pt) / hypotenuse)
@@ -5892,7 +5892,7 @@ Namespace VBClasses
             XO_FPoly_Basics.DrawFPoly(dst2, prevPoly, white)
             XO_FPoly_Basics.DrawFPoly(dst2, currPoly, cv.Scalar.Yellow)
             DrawFatLine(dst2, mpPrev, white)
-            DrawFatLine(dst2, mpCurr, algTask.highlight)
+            DrawFatLine(dst2, mpCurr, task.highlight)
         End Sub
     End Class
 
@@ -5919,16 +5919,16 @@ Namespace VBClasses
         Dim optionsEx As New Options_Features
         Public Sub New()
             center = New XO_FPoly_Center
-            algTask.featureOptions.FeatureSampleSize.Value = 30
+            task.featureOptions.FeatureSampleSize.Value = 30
             If dst2.Width >= 640 Then OptionParent.FindSlider("Resync if feature moves > X pixels").Value = 15
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Feature Polygon with perpendicular lines for center of rotation.",
                       "Feature polygon created by highest generation counts",
                   "Ordered Feature polygons of best features - white is original, yellow latest"}
             desc = "Build a Feature polygon with the top generation counts of the good features"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.firstPass Then resyncImage = src.Clone
+            If task.firstPass Then resyncImage = src.Clone
             options.Run()
             optionsEx.Run()
 
@@ -5937,14 +5937,14 @@ Namespace VBClasses
             dst1 = feat.dst3
             fPD.currPoly = New List(Of cv.Point2f)(feat.topFeatures)
 
-            If algTask.optionsChanged Then fPD = New fPolyData(fPD.currPoly)
-            If fPD.currPoly.Count < algTask.polyCount Then Exit Sub
+            If task.optionsChanged Then fPD = New fPolyData(fPD.currPoly)
+            If fPD.currPoly.Count < task.polyCount Then Exit Sub
 
             fPD.computeCurrLengths()
             For i = 0 To fPD.currPoly.Count - 1
                 SetTrueText(CStr(i), fPD.currPoly(i), 1)
             Next
-            If algTask.firstPass Then fPD.lengthPrevious = New List(Of Single)(fPD.currLength)
+            If task.firstPass Then fPD.lengthPrevious = New List(Of Single)(fPD.currLength)
 
             center.fPD = fPD
             center.Run(src)
@@ -5968,7 +5968,7 @@ Namespace VBClasses
             End If
             causes += vbCrLf
 
-            If algTask.optionsChanged Then
+            If task.optionsChanged Then
                 resync = True
                 causes += " - Options changed"
             End If
@@ -5980,9 +5980,9 @@ Namespace VBClasses
             End If
             causes += vbCrLf
 
-            If Math.Abs(fPD.currLength.Sum() - fPD.lengthPrevious.Sum()) > options.removeThreshold * algTask.polyCount Then
+            If Math.Abs(fPD.currLength.Sum() - fPD.lengthPrevious.Sum()) > options.removeThreshold * task.polyCount Then
                 resync = True
-                causes += " - The top " + CStr(algTask.polyCount) + " vertices have moved because of the generation counts"
+                causes += " - The top " + CStr(task.polyCount) + " vertices have moved because of the generation counts"
             Else
                 If fPD.computeFLineLength() > options.removeThreshold Then
                     resync = True
@@ -5992,7 +5992,7 @@ Namespace VBClasses
             End If
             causes += vbCrLf
 
-            If resync Or fPD.prevPoly.Count <> algTask.polyCount Or algTask.optionsChanged Then
+            If resync Or fPD.prevPoly.Count <> task.polyCount Or task.optionsChanged Then
                 fPD.resync()
                 resyncImage = src.Clone
                 resyncFrames = 0
@@ -6060,7 +6060,7 @@ Namespace VBClasses
                 If absDiff >= hist.Length Then absDiff = hist.Length - 1
                 If absDiff < fGrid.threshold Then
                     hist(CInt(absDiff)) += 1
-                    vbc.DrawLine(dst3, fGrid.anchor, pt, algTask.highlight)
+                    vbc.DrawLine(dst3, fGrid.anchor, pt, task.highlight)
                     distDiff.Add(absDiff)
                 Else
                     hist(fGrid.threshold) += 1
@@ -6092,7 +6092,7 @@ Namespace VBClasses
         Public fPlot As New XO_FPoly_Plot
         Dim plotHist As New Plot_Histogram
         Public Sub New()
-            algTask.kalman = New Kalman_Basics
+            task.kalman = New Kalman_Basics
             plotHist.minRange = 0
             plotHist.removeZeroEntry = False
             labels = {"", "Distance change from previous frame", "", "anchor and companions - input to distance difference"}
@@ -6103,11 +6103,11 @@ Namespace VBClasses
             dst3 = fPlot.dst3
 
             Dim lastPlot As cv.Mat = plotHist.dst2.Clone
-            If algTask.optionsChanged Then ReDim algTask.kalman.kInput(fPlot.hist.Length - 1)
+            If task.optionsChanged Then ReDim task.kalman.kInput(fPlot.hist.Length - 1)
 
-            algTask.kalman.kInput = fPlot.hist
-            algTask.kalman.Run(emptyMat)
-            fPlot.hist = algTask.kalman.kOutput
+            task.kalman.kInput = fPlot.hist
+            task.kalman.Run(emptyMat)
+            fPlot.hist = task.kalman.kOutput
 
             Dim hlist = fPlot.hist.ToList
             Dim peak = hlist.Max
@@ -6116,7 +6116,7 @@ Namespace VBClasses
             plotHist.maxRange = fPlot.fGrid.stable.basics.ptList.Count
             plotHist.Run(histMat)
             dst2 = ShowAddweighted(plotHist.dst2, lastPlot, labels(2))
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 Dim avg = If(fPlot.distDiff.Count > 0, fPlot.distDiff.Average, 0)
                 labels(2) = "Average distance change (after threshholding) = " + Format(avg, fmt3) + ", peak at " +
                         CStr(peakIndex) + " with " + Format(peak, fmt1) + " occurances"
@@ -6132,7 +6132,7 @@ Namespace VBClasses
     Public Class XO_FPoly_Stablizer : Inherits TaskParent
         Public fGrid As New XO_FPoly_Core
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Movement amount - dot is current anchor point", "SyncImage aligned to current image - slide camera left or right",
                   "current image with distance map"}
             desc = "Feature Grid: show the accumulated camera movement in X and Y (no rotation)"
@@ -6181,7 +6181,7 @@ Namespace VBClasses
         Dim fGrid As New XO_FPoly_Core
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, 255)
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Track the feature grid points back to the last sync point"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -6212,7 +6212,7 @@ Namespace VBClasses
                     usedGood.Add(startPoint)
                     facet = facets(startPoint)
                     dst0.FillConvexPoly(facet, startPoint, cv.LineTypes.Link4)
-                    If standaloneTest() Then dst1.FillConvexPoly(facet, algTask.scalarColors(startPoint), algTask.lineType)
+                    If standaloneTest() Then dst1.FillConvexPoly(facet, task.scalarColors(startPoint), task.lineType)
                     lpList.Add(New lpData(startPoints(startPoint), pt))
                 End If
             Next
@@ -6220,9 +6220,9 @@ Namespace VBClasses
             ' dst3.SetTo(0)
             For Each lp In lpList
                 If lp.p1.DistanceTo(lp.p2) <= maxShift Then vbc.DrawLine(dst1, lp.p1, lp.p2, cv.Scalar.Yellow)
-                DrawCircle(dst1, lp.p1, algTask.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst1, lp.p1, task.DotSize, cv.Scalar.Yellow)
             Next
-            dst1.Line(fGrid.anchor, fGrid.startAnchor, white, algTask.lineWidth + 1, algTask.lineType)
+            dst1.Line(fGrid.anchor, fGrid.startAnchor, white, task.lineWidth + 1, task.lineType)
         End Sub
     End Class
 
@@ -6355,8 +6355,8 @@ Namespace VBClasses
             XO_FPoly_Basics.DrawFPoly(dst2, rotatePoly.poly, cv.Scalar.Yellow)
             For i = 0 To polyPrev.Count - 1
                 Dim p1 = New cv.Point2f(rotatePoly.poly(i).X - centerShift.X, rotatePoly.poly(i).Y - centerShift.Y)
-                Dim p2 = New cv.Point2f(rotatePoly.poly((i + 1) Mod algTask.polyCount).X - centerShift.X,
-                                    rotatePoly.poly((i + 1) Mod algTask.polyCount).Y - centerShift.Y)
+                Dim p2 = New cv.Point2f(rotatePoly.poly((i + 1) Mod task.polyCount).X - centerShift.X,
+                                    rotatePoly.poly((i + 1) Mod task.polyCount).Y - centerShift.Y)
                 rotateAndShift.Add(p1)
                 SetTrueText(CStr(i), rotatePoly.poly(i), 2)
                 SetTrueText(CStr(i), polyPrev(i), 2)
@@ -6384,7 +6384,7 @@ Namespace VBClasses
         Dim fPoly As New XO_FPoly_BasicsOriginal
         Dim options As New Options_Diff
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Use OpenCV's WarpAffine to rotate and translate the starting image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -6436,7 +6436,7 @@ Namespace VBClasses
         Public rotatePoints As New XO_FPoly_RotatePoints
         Dim near As New XO_Line_Nearest
         Public Sub New()
-            algTask.kalman = New Kalman_Basics
+            task.kalman = New Kalman_Basics
             labels = {"", "", "Output of XO_FPoly_Basics", "Center of rotation is where the extended lines intersect"}
             desc = "Find the center of rotation using the perpendicular lines from polymp and FLine (feature line) in XO_FPoly_Basics"
         End Sub
@@ -6462,13 +6462,13 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             perp1.input = New lpData(fPD.currPoly(fPD.polyPrevSideIndex),
-                                    fPD.currPoly((fPD.polyPrevSideIndex + 1) Mod algTask.polyCount))
+                                    fPD.currPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount))
             perp1.Run(src)
 
             vbc.DrawLine(dst2, perp1.output.p1, perp1.output.p2, cv.Scalar.Yellow)
 
             perp2.input = New lpData(fPD.prevPoly(fPD.polyPrevSideIndex),
-                                   fPD.prevPoly((fPD.polyPrevSideIndex + 1) Mod algTask.polyCount))
+                                   fPD.prevPoly((fPD.polyPrevSideIndex + 1) Mod task.polyCount))
             perp2.Run(src)
             vbc.DrawLine(dst2, perp2.output.p1, perp2.output.p2, white)
 
@@ -6476,7 +6476,7 @@ Namespace VBClasses
             If fPD.rotateCenter = New cv.Point2f Then
                 fPD.rotateAngle = 0
             Else
-                DrawCircle(dst2, fPD.rotateCenter, algTask.DotSize + 2, cv.Scalar.Red)
+                DrawCircle(dst2, fPD.rotateCenter, task.DotSize + 2, cv.Scalar.Red)
                 fPD.rotateAngle = findrotateAngle(perp2.output.p1, perp2.output.p2, perp1.output.p1)
             End If
             If fPD.rotateAngle = 0 Then fPD.rotateCenter = New cv.Point2f
@@ -6484,9 +6484,9 @@ Namespace VBClasses
             altCenterShift = New cv.Point2f(fPD.currPoly(fPD.polyPrevSideIndex).X - fPD.prevPoly(fPD.polyPrevSideIndex).X,
                                         fPD.currPoly(fPD.polyPrevSideIndex).Y - fPD.prevPoly(fPD.polyPrevSideIndex).Y)
 
-            algTask.kalman.kInput = {fPD.rotateAngle}
-            algTask.kalman.Run(emptyMat)
-            fPD.rotateAngle = algTask.kalman.kOutput(0)
+            task.kalman.kInput = {fPD.rotateAngle}
+            task.kalman.Run(emptyMat)
+            fPD.rotateAngle = task.kalman.kOutput(0)
 
             rotatePoints.poly = fPD.currPoly
             rotatePoints.polyPrev = fPD.prevPoly
@@ -6511,7 +6511,7 @@ Namespace VBClasses
         Public resync As Boolean
         Dim options As New Options_Diff
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
                   "Resync Image after rotation and translation", "Difference between current image and dst2"}
             desc = "Rotate and shift the image as indicated by XO_FPoly_Basics"
@@ -6589,7 +6589,7 @@ Namespace VBClasses
         Public fImage As New XO_FPoly_Image
         Dim options As New Options_Diff
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             OptionParent.FindSlider("Color Difference Threshold").Value = 10
             desc = "Build the image mask of the differences between the current frame and resync image"
         End Sub
@@ -6616,16 +6616,16 @@ Namespace VBClasses
         Public fMask As New XO_FPoly_ImageMask
         Public fPolyCloud As cv.Mat
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Update changed point cloud pixels as indicated by the FPoly_ImageMask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fMask.Run(src)
-            If fMask.fImage.fpoly.resync Or algTask.firstPass Then fPolyCloud = algTask.pointCloud.Clone
+            If fMask.fImage.fpoly.resync Or task.firstPass Then fPolyCloud = task.pointCloud.Clone
             dst1 = fMask.dst1
             dst2 = fMask.dst2
             dst3 = fMask.dst3
-            algTask.pointCloud.CopyTo(fPolyCloud, dst3)
+            task.pointCloud.CopyTo(fPolyCloud, dst3)
 
             SetTrueText(fMask.fImage.strOut, 1)
         End Sub
@@ -6678,7 +6678,7 @@ Namespace VBClasses
         Public fPD As fPolyData
         Dim newPoly As List(Of cv.Point2f)
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Layout of feature polygons after just translation - red line is used in sine computation",
                       "Layout of the starting (white) and current (yellow) feature polygons",
                       "Layout of feature polygons after rotation and translation"}
@@ -6695,7 +6695,7 @@ Namespace VBClasses
             Dim threshold = thresholdSlider.Value
 
             Dim sindex1 = fPD.polyPrevSideIndex
-            Dim sIndex2 = (sindex1 + 1) Mod algTask.polyCount
+            Dim sIndex2 = (sindex1 + 1) Mod task.polyCount
 
             Dim mp1 = fPD.currmp()
             Dim mp2 = fPD.prevmp()
@@ -6730,7 +6730,7 @@ Namespace VBClasses
                     near.lp = New lpData(fPD.prevPoly(sindex1), fPD.prevPoly(sIndex2))
                     near.pt = newNear.p1
                     near.Run(src)
-                    dst1.Line(near.pt, near.nearPoint, cv.Scalar.Red, algTask.lineWidth + 5, algTask.lineType)
+                    dst1.Line(near.pt, near.nearPoint, cv.Scalar.Red, task.lineWidth + 5, task.lineType)
 
                     Dim hypotenuse = fPD.rotateCenter.DistanceTo(near.pt)
                     fPD.rotateAngle = -Math.Asin(near.nearPoint.DistanceTo(near.pt) / hypotenuse)
@@ -6772,7 +6772,7 @@ Namespace VBClasses
         Dim fMask As New XO_FPoly_ImageMask
         Dim edges As New Edge_Basics
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Remove edges from the FPoly_ImageMask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -6799,7 +6799,7 @@ Namespace VBClasses
         Public resync As Boolean
         Dim options As New Options_Diff
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Feature polygon alignment, White is original, Yellow is current, Red Dot (if present) is center of rotation",
                   "Resync Image after rotation and translation", "Difference between current image and dst2"}
             desc = "Rotate and shift the image as indicated by XO_FPoly_Basics"
@@ -6869,19 +6869,19 @@ Namespace VBClasses
         Dim leftPoly As New XO_FPoly_Basics
         Dim rightPoly As New XO_FPoly_Basics
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"Left image", "Right image", "FPoly output for left image", "FPoly output for right image"}
             desc = "Measure camera motion through the left and right images using FPoly"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst0 = algTask.leftView
-            dst1 = algTask.rightView
-            leftPoly.Run(algTask.leftView)
+            dst0 = task.leftView
+            dst1 = task.rightView
+            leftPoly.Run(task.leftView)
             dst2 = leftPoly.dst3
             SetTrueText(leftPoly.strOut, 2)
 
-            rightPoly.Run(algTask.rightView)
+            rightPoly.Run(task.rightView)
             dst3 = rightPoly.dst3
             SetTrueText(rightPoly.strOut, 3)
         End Sub
@@ -6906,7 +6906,7 @@ Namespace VBClasses
         Dim optionsEx As New Options_Features
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
-            algTask.featureOptions.FeatureSampleSize.Value = 20
+            task.featureOptions.FeatureSampleSize.Value = 20
             labels(3) = "Feature points with anchor"
             desc = "Feature Grid: compute distances between good features from frame to frame"
         End Sub
@@ -6931,14 +6931,14 @@ Namespace VBClasses
                 Dim facet = stable.basics.facetGen.facet.facetList(i)
                 Dim pt = stable.basics.ptList(i)
                 Dim d = anchor.DistanceTo(pt)
-                dst0.FillConvexPoly(facet, d, algTask.lineType)
+                dst0.FillConvexPoly(facet, d, task.lineType)
                 Dim lastd = lastDistance.Get(Of Single)(pt.Y, pt.X)
                 Dim absDiff = Math.Abs(lastd - d)
                 If absDiff < threshold Or threshold = 0 Then
                     goodPoints.Add(pt)
                     goodFacets.Add(facet)
                     SetTrueText(Format(absDiff, fmt1), pt, 2)
-                    vbc.DrawLine(dst3, anchor, pt, algTask.highlight)
+                    vbc.DrawLine(dst3, anchor, pt, task.highlight)
                     dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, white.ToVec3b)
                 End If
             Next
@@ -6966,7 +6966,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            feat.Run(algTask.grayStable)
+            feat.Run(task.grayStable)
 
             stable.Run(src)
             dst2 = stable.dst2
@@ -6976,7 +6976,7 @@ Namespace VBClasses
                 Dim pt = stable.basics.ptList(keyVal.Value)
                 Dim g = stable.basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 If showText Then SetTrueText(CStr(g), pt)
-                If topFeatures.Count < algTask.polyCount Then topFeatures.Add(pt)
+                If topFeatures.Count < task.polyCount Then topFeatures.Add(pt)
             Next
 
             For i = 0 To topFeatures.Count - 2
@@ -7001,9 +7001,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             bPoint.Run(src)
 
-            algTask.features.Clear()
+            task.features.Clear()
             For Each pt In bPoint.ptList
-                algTask.features.Add(New cv.Point2f(pt.X, pt.Y))
+                task.features.Add(New cv.Point2f(pt.X, pt.Y))
             Next
 
             feat.Run(src)
@@ -7011,7 +7011,7 @@ Namespace VBClasses
             Dim pts = feat.topFeatures
             Dim distances As New List(Of Single)
             For i = 0 To pts.Count - 2
-                vbc.DrawLine(dst2, pts(i), pts(i + 1), algTask.highlight)
+                vbc.DrawLine(dst2, pts(i), pts(i + 1), task.highlight)
                 distances.Add(pts(i).DistanceTo(pts(i + 1)))
             Next
 
@@ -7019,7 +7019,7 @@ Namespace VBClasses
                 Dim index = distances.IndexOf(distances.Max)
                 lp = New lpData(pts(index), pts(index + 1))
                 dst3 = src
-                vbc.DrawLine(dst3, lp.p1, lp.p2, algTask.highlight)
+                vbc.DrawLine(dst3, lp.p1, lp.p2, task.highlight)
             End If
         End Sub
     End Class
@@ -7033,8 +7033,8 @@ Namespace VBClasses
         Dim fLine As New XO_FPoly_Line
         Public lpRect As New cv.Rect
         Public Sub New()
-            labels(2) = "The rectangle is formed by the longest line between the algTask.topFeatures"
-            desc = "Build the rectangle formed by the longest line in algTask.topFeatures."
+            labels(2) = "The rectangle is formed by the longest line between the task.topFeatures"
+            desc = "Build the rectangle formed by the longest line in task.topFeatures."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             fLine.Run(src)
@@ -7044,8 +7044,8 @@ Namespace VBClasses
             lpRect = rotatedRect.BoundingRect
 
             dst2 = src
-            vbc.DrawLine(dst2, lp.p1, lp.p2, algTask.highlight)
-            dst2.Rectangle(lpRect, algTask.highlight, algTask.lineWidth)
+            vbc.DrawLine(dst2, lp.p1, lp.p2, task.highlight)
+            dst2.Rectangle(lpRect, task.highlight, task.lineWidth)
         End Sub
     End Class
 
@@ -7069,9 +7069,9 @@ Namespace VBClasses
             If standalone Then
                 Static bPoint As New BrickPoint_Basics
                 bPoint.Run(src)
-                algTask.features.Clear()
+                task.features.Clear()
                 For Each pt In bPoint.ptList
-                    algTask.features.Add(New cv.Point2f(pt.X, pt.Y))
+                    task.features.Add(New cv.Point2f(pt.X, pt.Y))
                 Next
             End If
             Static ptSlider = OptionParent.FindSlider("Points to use in Feature Poly")
@@ -7138,14 +7138,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             fRect.Run(src)
 
-            If algTask.heartBeatLT Or match.correlation < 0.5 Then
+            If task.heartBeatLT Or match.correlation < 0.5 Then
                 srcSave = src.Clone
                 dst2 = fRect.dst2.Clone()
             End If
             match.template = srcSave(ValidateRect(fRect.lpRect)).Clone
             match.Run(src)
             dst3 = src
-            dst3.Rectangle(match.newRect, algTask.highlight, algTask.lineWidth)
+            dst3.Rectangle(match.newRect, task.highlight, task.lineWidth)
             labels(3) = "Correlation Coefficient = " + Format(match.correlation * 100, fmt1)
         End Sub
     End Class
@@ -7168,29 +7168,29 @@ Namespace VBClasses
             searchRects.Clear()
             featureRects.Clear()
             For Each pt In feat.topFeatures
-                Dim index As Integer = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, algTask.brickSize, algTask.brickSize)
+                Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickSize, task.brickSize)
                 roi = ValidateRect(roi)
                 featureRects.Add(roi)
-                searchRects.Add(algTask.gridNabeRects(index))
+                searchRects.Add(task.gridNabeRects(index))
             Next
 
             dst2 = dst1.Clone
             For Each pt In feat.topFeatures
-                Dim index As Integer = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, algTask.brickSize, algTask.brickSize)
+                Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickSize, task.brickSize)
                 roi = ValidateRect(roi)
-                dst2.Rectangle(roi, algTask.highlight, algTask.lineWidth)
-                dst2.Rectangle(algTask.gridNabeRects(index), algTask.highlight, algTask.lineWidth)
+                dst2.Rectangle(roi, task.highlight, task.lineWidth)
+                dst2.Rectangle(task.gridNabeRects(index), task.highlight, task.lineWidth)
             Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            half = CInt(algTask.brickSize / 2)
+            half = CInt(task.brickSize / 2)
 
             dst1 = src.Clone
             feat.Run(src)
 
-            If algTask.heartBeatLT Then
+            If task.heartBeatLT Then
                 snapShotFeatures()
             End If
 
@@ -7200,7 +7200,7 @@ Namespace VBClasses
                 Dim roi = featureRects(i)
                 match.template = dst1(roi).Clone
                 match.Run(src(searchRects(i)))
-                dst3.Rectangle(match.newRect, algTask.highlight, algTask.lineWidth)
+                dst3.Rectangle(match.newRect, task.highlight, task.lineWidth)
                 matchRects.Add(match.newRect)
             Next
 
@@ -7208,9 +7208,9 @@ Namespace VBClasses
             featureRects.Clear()
             For Each roi In matchRects
                 Dim pt = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
-                Dim index As Integer = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 featureRects.Add(roi)
-                searchRects.Add(algTask.gridNabeRects(index))
+                searchRects.Add(task.gridNabeRects(index))
             Next
         End Sub
     End Class
@@ -7232,13 +7232,13 @@ Namespace VBClasses
             desc = "Rotate a triangle around a center of rotation"
         End Sub
         Private Sub drawPolygon(dst As cv.Mat, color As cv.Scalar)
-            Dim minMod = Math.Min(poly.Count, algTask.polyCount)
+            Dim minMod = Math.Min(poly.Count, task.polyCount)
             For i = 0 To minMod - 1
                 vbc.DrawLine(dst, poly(i), poly((i + 1) Mod minMod), color)
             Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 dst2.SetTo(0)
                 dst3.SetTo(0)
             End If
@@ -7274,7 +7274,7 @@ Namespace VBClasses
                 poly.Add(New cv.Point2f(pt.X + rotateCenter.X, pt.Y + rotateCenter.Y))
             Next
 
-            drawPolygon(dst3, algTask.highlight)
+            drawPolygon(dst3, task.highlight)
         End Sub
     End Class
 
@@ -7297,9 +7297,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             optionsFPoly.Run()
 
-            If options.changeCheck.Checked Or algTask.firstPass Then
+            If options.changeCheck.Checked Or task.firstPass Then
                 rPoly.Clear()
-                For i = 0 To algTask.polyCount - 1
+                For i = 0 To task.polyCount - 1
                     rPoly.Add(New cv.Point2f(msRNG.Next(dst2.Width / 4, dst2.Width * 3 / 4), msRNG.Next(dst2.Height / 4, dst2.Height * 3 / 4)))
                 Next
                 rotateQT.rotateCenter = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -7311,7 +7311,7 @@ Namespace VBClasses
             rotateQT.Run(src)
             dst2 = rotateQT.dst3
 
-            DrawCircle(dst2, rotateQT.rotateCenter, algTask.DotSize + 2, cv.Scalar.Yellow)
+            DrawCircle(dst2, rotateQT.rotateCenter, task.DotSize + 2, cv.Scalar.Yellow)
             SetTrueText("center of rotation", rotateQT.rotateCenter)
             labels(3) = rotateQT.labels(3)
         End Sub
@@ -7342,7 +7342,7 @@ Namespace VBClasses
                                    options.width, options.height)
 
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            If algTask.firstPass Then lastFrame = src.Clone()
+            If task.firstPass Then lastFrame = src.Clone()
 
             dst2 = src.Clone
 
@@ -7443,7 +7443,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim vert_Border = borderCrop * src.Rows / src.Cols
-            If algTask.optionsChanged Then
+            If task.optionsChanged Then
                 errScale = New cv.Mat(New cv.Size(1, 5), cv.MatType.CV_64F, 1)
                 qScale = New cv.Mat(New cv.Size(1, 5), cv.MatType.CV_64F, 0.004)
                 rScale = New cv.Mat(New cv.Size(1, 5), cv.MatType.CV_64F, 0.5)
@@ -7454,11 +7454,11 @@ Namespace VBClasses
             dst2 = src
 
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            inputFeat = New List(Of cv.Point2f)(algTask.features)
+            inputFeat = New List(Of cv.Point2f)(task.features)
             features1 = cv.Mat.FromPixelData(inputFeat.Count, 1, cv.MatType.CV_32FC2, inputFeat.ToArray)
 
             Static lastFrame As cv.Mat = src.Clone()
-            If algTask.frameCount > 0 Then
+            If task.frameCount > 0 Then
                 Dim features2 = New cv.Mat
                 Dim status As New cv.Mat
                 Dim err As New cv.Mat
@@ -7519,13 +7519,13 @@ Namespace VBClasses
                 smoothedMat.Set(Of Double)(0, 2, dx)
                 smoothedMat.Set(Of Double)(1, 2, dy)
 
-                Dim smoothedFrame = algTask.color.WarpAffine(smoothedMat, src.Size())
+                Dim smoothedFrame = task.color.WarpAffine(smoothedMat, src.Size())
                 smoothedFrame = smoothedFrame(New cv.Range(vert_Border, smoothedFrame.Rows - vert_Border), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
                 dst3 = smoothedFrame.Resize(src.Size())
 
                 For i = 0 To commonPoints.Count - 1
-                    DrawCircle(dst2, commonPoints.ElementAt(i), algTask.DotSize + 3, cv.Scalar.Red)
-                    DrawCircle(dst2, lastFeatures.ElementAt(i), algTask.DotSize + 1, cv.Scalar.Blue)
+                    DrawCircle(dst2, commonPoints.ElementAt(i), task.DotSize + 3, cv.Scalar.Red)
+                    DrawCircle(dst2, lastFeatures.ElementAt(i), task.DotSize + 1, cv.Scalar.Blue)
                 Next
             End If
             inputFeat = Nothing ' show that we consumed the current set of features.
@@ -7558,8 +7558,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If algTask.optionsChanged Then
-                Dim size = algTask.brickSize
+            If task.optionsChanged Then
+                Dim size = task.brickSize
                 ul = New cv.Rect(0, 0, size, size)
                 ur = New cv.Rect(dst2.Width - size, 0, size, size)
                 ll = New cv.Rect(0, dst2.Height - size, size, size)
@@ -7575,7 +7575,7 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For Each pt In features
-                DrawCircle(dst2, pt, algTask.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
             Next
             labels(2) = "There were " + CStr(features.Count) + " key points detected"
         End Sub
@@ -7593,11 +7593,11 @@ Namespace VBClasses
             desc = "Track a RedCloud rectangle using MatchTemplate.  Click on a cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.optionsChanged Then match.correlation = 0
-            If match.correlation < algTask.fCorrThreshold Or rectSave <> rectInput Or algTask.mouseClickFlag Then
+            If task.optionsChanged Then match.correlation = 0
+            If match.correlation < task.fCorrThreshold Or rectSave <> rectInput Or task.mouseClickFlag Then
                 If standalone Then
                     dst2 = runRedList(src, labels(2)).Clone
-                    rectInput = algTask.oldrcD.rect
+                    rectInput = task.oldrcD.rect
                 End If
                 rectSave = rectInput
                 match.template = src(rectInput).Clone
@@ -7607,7 +7607,7 @@ Namespace VBClasses
             rectOutput = match.newRect
 
             If standalone Then
-                If algTask.heartBeat Then dst3.SetTo(0)
+                If task.heartBeat Then dst3.SetTo(0)
                 DrawRect(dst3, rectOutput)
             End If
         End Sub
@@ -7623,13 +7623,13 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            algTask.ClickPoint = algTask.oldrcD.maxDist
+            task.ClickPoint = task.oldrcD.maxDist
 
-            If algTask.heartBeat Then matchRect.rectInput = algTask.oldrcD.rect
+            If task.heartBeat Then matchRect.rectInput = task.oldrcD.rect
 
             matchRect.Run(src)
             If standalone Then
-                If algTask.heartBeat Then dst3.SetTo(0)
+                If task.heartBeat Then dst3.SetTo(0)
                 DrawRect(dst3, matchRect.rectOutput)
             End If
             labels(2) = "MatchLine correlation = " + Format(matchRect.match.correlation, fmt3) +
@@ -7649,11 +7649,11 @@ Namespace VBClasses
             desc = "Find and track the longest line by matching line bricks."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.optionsChanged Then algTask.lines.lpList.Clear()
+            If task.optionsChanged Then task.lines.lpList.Clear()
 
             dst2 = src.Clone
-            If algTask.lines.lpList.Count > 0 Then
-                cameraMotionProxy = algTask.lines.lpList(0)
+            If task.lines.lpList.Count > 0 Then
+                cameraMotionProxy = task.lines.lpList(0)
                 match.lpInput = cameraMotionProxy
                 match.Run(src)
                 dst1 = match.dst2
@@ -7661,21 +7661,21 @@ Namespace VBClasses
                 labels(2) = "EndPoint1 correlation:  " + Format(match.p1Correlation, fmt3) + vbTab +
                         "EndPoint2 correlation:  " + Format(match.p1Correlation, fmt3)
 
-                If match.p1Correlation < algTask.fCorrThreshold Or algTask.frameCount < 10 Or
-               match.p2Correlation < algTask.fCorrThreshold Then
+                If match.p1Correlation < task.fCorrThreshold Or task.frameCount < 10 Or
+               match.p2Correlation < task.fCorrThreshold Then
 
-                    algTask.motionMask.SetTo(255) ' force a complete line detection
-                    algTask.lines.Run(src.Clone)
+                    task.motionMask.SetTo(255) ' force a complete line detection
+                    task.lines.Run(src.Clone)
 
-                    match.lpInput = algTask.lines.lpList(0)
+                    match.lpInput = task.lines.lpList(0)
                     match.Run(src)
                 End If
             End If
 
-            dst3 = algTask.lines.dst3
-            labels(3) = algTask.lines.labels(3)
+            dst3 = task.lines.dst3
+            labels(3) = task.lines.labels(3)
 
-            dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, algTask.highlight, algTask.lineWidth, algTask.lineType)
+            dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, task.highlight, task.lineWidth, task.lineType)
         End Sub
     End Class
 
@@ -7697,10 +7697,10 @@ Namespace VBClasses
             desc = "Track the selected points"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.firstPass Then mPoint.target = src.Clone
+            If task.firstPass Then mPoint.target = src.Clone
 
             If standaloneTest() Then
-                ptx = New List(Of cv.Point2f)(algTask.features)
+                ptx = New List(Of cv.Point2f)(task.features)
                 SetTrueText("Move camera around to watch the point being tracked", 3)
             End If
 
@@ -7733,13 +7733,13 @@ Namespace VBClasses
             desc = "Use the top X goodFeatures and then use matchTemplate to find track them."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim pad = algTask.brickSize / 2
+            Dim pad = task.brickSize / 2
             strOut = ""
             If mPoints.ptx.Count <= 3 Then
                 mPoints.ptx.Clear()
-                For Each pt In algTask.features
+                For Each pt In task.features
                     mPoints.ptx.Add(pt)
-                    Dim rect = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, algTask.brickSize, algTask.brickSize))
+                    Dim rect = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, task.brickSize, task.brickSize))
                 Next
                 strOut = "Restart tracking -----------------------------------------------------------------------------" + vbCrLf
             End If
@@ -7747,8 +7747,8 @@ Namespace VBClasses
 
             dst2 = src.Clone
             For i = mPoints.ptx.Count - 1 To 0 Step -1
-                If mPoints.correlation(i) > algTask.fCorrThreshold Then
-                    DrawCircle(dst2, mPoints.ptx(i), algTask.DotSize, algTask.highlight)
+                If mPoints.correlation(i) > task.fCorrThreshold Then
+                    DrawCircle(dst2, mPoints.ptx(i), task.DotSize, task.highlight)
                     strOut += Format(mPoints.correlation(i), fmt3) + ", "
                 Else
                     mPoints.ptx.RemoveAt(i)
@@ -7759,8 +7759,8 @@ Namespace VBClasses
                 flow.Run(src)
             End If
 
-            labels(2) = "Of the " + CStr(algTask.features.Count) + " input points, " + CStr(mPoints.ptx.Count) +
-                    " points were tracked with correlation above " + Format(algTask.fCorrThreshold, fmt2)
+            labels(2) = "Of the " + CStr(task.features.Count) + " input points, " + CStr(mPoints.ptx.Count) +
+                    " points were tracked with correlation above " + Format(task.fCorrThreshold, fmt2)
         End Sub
     End Class
 
@@ -7775,14 +7775,14 @@ Namespace VBClasses
             desc = "Identify a line by matching each of the points to the previous image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim threshold = algTask.fCorrThreshold
-            Dim lplist = algTask.lines.lpList
+            Dim threshold = task.fCorrThreshold
+            Dim lplist = task.lines.lpList
 
-            algTask.lineLongestChanged = False
+            task.lineLongestChanged = False
             ' camera is often warming up for the first few images.
-            If algTask.frameCount < 10 Or algTask.heartBeat Then
+            If task.frameCount < 10 Or task.heartBeat Then
                 lp = lplist(0)
-                algTask.lineLongestChanged = True
+                task.lineLongestChanged = True
             End If
 
             matchBrick.gridIndex = lp.p1GridIndex
@@ -7803,19 +7803,19 @@ Namespace VBClasses
 
             If p1Correlation >= threshold And p2Correlation >= threshold Then
                 lp = New lpData(p1, p2)
-                algTask.lineLongestChanged = False
+                task.lineLongestChanged = False
             Else
-                algTask.lineLongestChanged = True
+                task.lineLongestChanged = True
             End If
 
             If standaloneTest() Then
                 dst2 = src
                 vbc.DrawLine(dst2, lp)
                 DrawRect(dst2, lp.rect)
-                dst3 = algTask.lines.dst2
+                dst3 = task.lines.dst2
             End If
 
-            ' algTask.lineLongest = lp
+            ' task.lineLongest = lp
             Static strList As New List(Of String)
             strList.Add(strOut)
             If strList.Count > 10 Then strList.RemoveAt(0)
@@ -7841,18 +7841,18 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim correlations As New List(Of Single)
-            Static lpLast = New List(Of lpData)(algTask.lines.lpList)
+            Static lpLast = New List(Of lpData)(task.lines.lpList)
             For Each lp In lpLast
-                match.template = algTask.gray(lp.rect)
-                match.Run(algTask.gray.Clone)
+                match.template = task.gray(lp.rect)
+                match.Run(task.gray.Clone)
                 correlations.Add(match.correlation)
             Next
 
-            dst2 = algTask.lines.dst2
+            dst2 = task.lines.dst2
 
             labels(2) = "Mean correlation of all the lines is " + Format(correlations.Average, fmt3)
             labels(3) = "Min/Max correlation = " + Format(correlations.Min, fmt3) + "/" + Format(correlations.Max, fmt3)
-            lpLast = New List(Of lpData)(algTask.lines.lpList)
+            lpLast = New List(Of lpData)(task.lines.lpList)
         End Sub
     End Class
 
@@ -7867,28 +7867,28 @@ Namespace VBClasses
             desc = "Find the longest RGB line that is parallel to gravity"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lplist = algTask.lines.lpList
+            Dim lplist = task.lines.lpList
 
             ' camera is often warming up for the first few images.
-            If match.correlation < algTask.fCorrThreshold Or algTask.frameCount < 10 Or lp Is Nothing Then
+            If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or lp Is Nothing Then
                 lp = lplist(0)
                 For Each lp In lplist
-                    If Math.Abs(algTask.lineGravity.angle - lp.angle) < algTask.angleThreshold Then Exit For
+                    If Math.Abs(task.lineGravity.angle - lp.angle) < task.angleThreshold Then Exit For
                 Next
                 match.template = src(lp.rect)
             End If
 
-            If Math.Abs(algTask.lineGravity.angle - lp.angle) >= algTask.angleThreshold Then
+            If Math.Abs(task.lineGravity.angle - lp.angle) >= task.angleThreshold Then
                 lp = Nothing
                 Exit Sub
             End If
 
             match.Run(src.Clone)
 
-            If match.correlation < algTask.fCorrThreshold Then
+            If match.correlation < task.fCorrThreshold Then
                 If lplist.Count > 1 Then
                     Dim histogram As New cv.Mat
-                    cv.Cv2.CalcHist({algTask.lines.dst1(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
+                    cv.Cv2.CalcHist({task.lines.dst1(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
                                  New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
 
                     Dim histArray(histogram.Total - 1) As Single
@@ -7912,7 +7912,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst2 = src
-                dst2.Rectangle(lp.rect, algTask.highlight, algTask.lineWidth)
+                dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
                 vbc.DrawLine(dst2, lp.p1, lp.p2)
             End If
 
@@ -7932,15 +7932,15 @@ Namespace VBClasses
         End Sub
 
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 Dim p1 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
                 Dim p2 = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
 
                 Dim lp = New lpData(p1, p2)
                 dst2 = src
-                vbc.DrawLine(dst2, lp.pE1, lp.pE2, algTask.highlight)
-                DrawCircle(dst2, p1, algTask.DotSize + 2, cv.Scalar.Red)
-                DrawCircle(dst2, p2, algTask.DotSize + 2, cv.Scalar.Red)
+                vbc.DrawLine(dst2, lp.pE1, lp.pE2, task.highlight)
+                DrawCircle(dst2, p1, task.DotSize + 2, cv.Scalar.Red)
+                DrawCircle(dst2, p2, task.DotSize + 2, cv.Scalar.Red)
             End If
         End Sub
     End Class
@@ -7955,12 +7955,12 @@ Namespace VBClasses
             desc = "Create a list of all the extended lines in an image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = algTask.lines.dst2
+            dst2 = task.lines.dst2
 
             dst3 = src.Clone
             lpList.Clear()
-            For Each lp In algTask.lines.lpList
-                vbc.DrawLine(dst3, lp.pE1, lp.pE2, algTask.highlight)
+            For Each lp In task.lines.lpList
+                vbc.DrawLine(dst3, lp.pE1, lp.pE2, task.highlight)
                 lpList.Add(New lpData(lp.pE1, lp.pE2))
             Next
         End Sub
@@ -8002,7 +8002,7 @@ Namespace VBClasses
             leftIntercepts.Clear()
             rightIntercepts.Clear()
             Dim index As Integer
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 Dim minXX = Math.Min(lp.p1.X, lp.p2.X)
                 If lp.p1.X <> minXX Then ' leftmost point is always in p1
                     Dim tmp = lp.p1
@@ -8051,9 +8051,9 @@ Namespace VBClasses
             desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.optionsChanged Then
+            If task.optionsChanged Then
                 lpList.Clear()
-                algTask.motionMask.SetTo(255)
+                task.motionMask.SetTo(255)
             End If
 
             Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
@@ -8072,12 +8072,12 @@ Namespace VBClasses
             For Each lp In sortlines.Values
                 lpList.Add(lp)
                 vbc.DrawLine(dst2, lp.p1, lp.p2)
-                lpRectMap.Line(lp.p1, lp.p2, sortlines.Values.IndexOf(lp) + 1, algTask.lineWidth * 3, cv.LineTypes.Link8)
+                lpRectMap.Line(lp.p1, lp.p2, sortlines.Values.IndexOf(lp) + 1, task.lineWidth * 3, cv.LineTypes.Link8)
 
                 If standaloneTest() Then
-                    dst2.Line(lp.p1, lp.p2, algTask.highlight, 10, cv.LineTypes.Link8)
+                    dst2.Line(lp.p1, lp.p2, task.highlight, 10, cv.LineTypes.Link8)
                 End If
-                If lpList.Count >= algTask.FeatureSampleSize Then Exit For
+                If lpList.Count >= task.FeatureSampleSize Then Exit For
             Next
 
             If standaloneTest() Then dst1 = PaletteFull(lpRectMap)
@@ -8097,14 +8097,14 @@ Namespace VBClasses
             desc = "Find lines in the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            lines.Run(algTask.leftView)
+            lines.Run(task.leftView)
             dst2.SetTo(0)
-            For Each lp In algTask.lines.lpList
-                dst2.Line(lp.p1, lp.p2, 255, algTask.lineWidth)
+            For Each lp In task.lines.lpList
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth)
             Next
             labels(2) = lines.labels(2)
 
-            rawLines.Run(algTask.rightView)
+            rawLines.Run(task.rightView)
             dst3 = rawLines.dst2
             labels(3) = rawLines.labels(2)
         End Sub
@@ -8124,11 +8124,11 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             swarm.options.Run()
-            dst2 = algTask.lines.dst2
+            dst2 = task.lines.dst2
 
             dst3.SetTo(0)
             swarm.knn.queries.Clear()
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 swarm.knn.queries.Add(lp.p1)
                 swarm.knn.queries.Add(lp.p2)
                 vbc.DrawLine(dst3, lp.p1, lp.p2, 255)
@@ -8137,7 +8137,7 @@ Namespace VBClasses
             swarm.knn.Run(src)
 
             dst3 = swarm.DrawLines().Clone
-            labels(2) = algTask.lines.labels(2)
+            labels(2) = task.lines.labels(2)
         End Sub
     End Class
 
@@ -8154,14 +8154,14 @@ Namespace VBClasses
             desc = "Find all the lines similar to gravity."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = algTask.lines.dst3
-            labels(3) = algTask.lines.labels(3)
+            dst3 = task.lines.dst3
+            labels(3) = task.lines.labels(3)
 
             gLines.Clear()
             dst2 = src.Clone
-            For Each lp In algTask.lines.lpList
-                If Math.Abs(algTask.lineGravity.angle - lp.angle) < 2 Then
-                    dst2.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth + 1, algTask.lineType)
+            For Each lp In task.lines.lpList
+                If Math.Abs(task.lineGravity.angle - lp.angle) < 2 Then
+                    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
                     gLines.Add(lp)
                 End If
             Next
@@ -8185,18 +8185,18 @@ Namespace VBClasses
         Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         Public rawLines As New Line_Core
         Public Sub New()
-            algTask.drawRect = New cv.Rect(25, 25, 25, 25)
+            task.drawRect = New cv.Rect(25, 25, 25, 25)
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset rectangle (provided externally)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then subsetRect = algTask.drawRect
+            If standalone Then subsetRect = task.drawRect
             rawLines.Run(src(subsetRect))
 
             lpList.Clear()
-            dst2 = algTask.lines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = task.lines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             For Each lp In rawLines.lpList
-                dst2(subsetRect).Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth * 3, algTask.lineType)
+                dst2(subsetRect).Line(lp.p1, lp.p2, task.highlight, task.lineWidth * 3, task.lineType)
                 lpList.Add(lp)
             Next
             labels(2) = CStr(lpList.Count) + " lines were detected in src(subsetRect)"
@@ -8215,14 +8215,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
 
-            Dim p1 = algTask.lineHorizon.p1, p2 = algTask.lineHorizon.p2
+            Dim p1 = task.lineHorizon.p1, p2 = task.lineHorizon.p2
             Dim sideOpposite = p2.Y - p1.Y
             If p1.X = 0 Then sideOpposite = p1.Y - p2.Y
             Dim hAngle = Math.Atan(sideOpposite / dst2.Width) * 57.2958
 
             horizList.Clear()
-            For Each lp In algTask.lines.lpList
-                If Math.Abs(algTask.lineHorizon.angle - lp.angle) < algTask.angleThreshold Then
+            For Each lp In task.lines.lpList
+                If Math.Abs(task.lineHorizon.angle - lp.angle) < task.angleThreshold Then
                     vbc.DrawLine(dst2, lp.p1, lp.p2)
                     horizList.Add(lp)
                 End If
@@ -8242,14 +8242,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
 
-            Dim p1 = algTask.lineGravity.p1, p2 = algTask.lineGravity.p2
+            Dim p1 = task.lineGravity.p1, p2 = task.lineGravity.p2
             Dim sideOpposite = p2.X - p1.X
             If p1.Y = 0 Then sideOpposite = p1.X - p2.X
             Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * 57.2958
 
             vertList.Clear()
-            For Each lp In algTask.lines.lpList
-                If Math.Abs(algTask.lineGravity.angle - lp.angle) < algTask.angleThreshold Then
+            For Each lp In task.lines.lpList
+                If Math.Abs(task.lineGravity.angle - lp.angle) < task.angleThreshold Then
                     vbc.DrawLine(dst2, lp.p1, lp.p2)
                     vertList.Add(lp)
                 End If
@@ -8270,7 +8270,7 @@ Namespace VBClasses
         Public vertList As New List(Of lpData)
         Public horizList As New List(Of lpData)
         Public Sub New()
-            algTask.gOptions.LineWidth.Value = 2
+            task.gOptions.LineWidth.Value = 2
             labels(3) = "Vertical lines are in yellow and horizontal lines in red."
             desc = "Highlight both vertical and horizontal lines"
         End Sub
@@ -8285,8 +8285,8 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each lp In verts.vertList
                 vList.Add(lp.length, lp)
-                vbc.DrawLine(dst2, lp.p1, lp.p2, algTask.highlight)
-                vbc.DrawLine(dst3, lp.p1, lp.p2, algTask.highlight)
+                vbc.DrawLine(dst2, lp.p1, lp.p2, task.highlight)
+                vbc.DrawLine(dst3, lp.p1, lp.p2, task.highlight)
             Next
 
             For Each lp In horiz.horizList
@@ -8315,8 +8315,8 @@ Namespace VBClasses
             desc = "Find the line that is closest to the input line"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then lpInput = algTask.lineLongest
-            Dim lpList = algTask.lines.lpList
+            If standalone Then lpInput = task.lineLongest
+            Dim lpList = task.lines.lpList
 
             Dim sortDistance As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
             For Each lp In lpList
@@ -8343,13 +8343,13 @@ Namespace VBClasses
         Public lp As lpData
         Dim knn As New KNN_NNBasics
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             OptionParent.FindSlider("KNN Dimension").Value = 6
             desc = "Track the longest line"
         End Sub
         Private Sub prepEntry(knnList As List(Of Single), lpNext As lpData)
-            Dim brick1 = algTask.gridMap.Get(Of Integer)(lpNext.p1.Y, lpNext.p1.X)
-            Dim brick2 = algTask.gridMap.Get(Of Integer)(lpNext.p2.Y, lpNext.p2.X)
+            Dim brick1 = task.gridMap.Get(Of Integer)(lpNext.p1.Y, lpNext.p1.X)
+            Dim brick2 = task.gridMap.Get(Of Integer)(lpNext.p2.Y, lpNext.p2.X)
             knnList.Add(lpNext.p1.X)
             knnList.Add(lpNext.p1.Y)
             knnList.Add(lpNext.p2.X)
@@ -8358,9 +8358,9 @@ Namespace VBClasses
             knnList.Add(brick2)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lplist = algTask.lines.lpList
+            Dim lplist = task.lines.lpList
 
-            If standalone And algTask.heartBeatLT Then lp = lplist(0)
+            If standalone And task.heartBeatLT Then lp = lplist(0)
 
             knn.trainInput.Clear()
             For Each lpNext In lplist
@@ -8374,10 +8374,10 @@ Namespace VBClasses
 
             lp = lplist(knn.result(0, 0))
             dst2 = src
-            dst2.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth + 1, algTask.lineType)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
-            dst3 = algTask.lines.dst3
-            labels(3) = algTask.lines.labels(3)
+            dst3 = task.lines.dst3
+            labels(3) = task.lines.labels(3)
 
             Dim lpRectMap = XO_Line_CoreNew.createMap()
             dst1 = PaletteBlackZero(lpRectMap)
@@ -8394,13 +8394,13 @@ Namespace VBClasses
         Public lp As lpData
         Dim rawlines As New Line_Core
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Find the line with the largest bounding rectangle."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lplist = algTask.lines.lpList
+            Dim lplist = task.lines.lpList
 
-            If standalone And algTask.heartBeatLT Then
+            If standalone And task.heartBeatLT Then
                 Dim sortRects As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
                 For Each lpNext In lplist
                     sortRects.Add(lpNext.rect.Width * lpNext.rect.Height, lpNext.index)
@@ -8415,10 +8415,10 @@ Namespace VBClasses
             Dim index = lpRectMap.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
             If index > 0 Then lp = lplist(index - 1)
             dst2 = src
-            dst2.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth + 1, algTask.lineType)
+            dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
-            dst3 = algTask.lines.dst3
-            labels(3) = algTask.lines.labels(3)
+            dst3 = task.lines.dst3
+            labels(3) = task.lines.labels(3)
         End Sub
     End Class
 
@@ -8437,7 +8437,7 @@ Namespace VBClasses
         End Sub
 
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 p1 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
                 p2 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
                 p3 = New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -8448,10 +8448,10 @@ Namespace VBClasses
             intersectionPoint = Line_Intersection.IntersectTest(New lpData(p1, p2), New lpData(p3, p4))
 
             dst2.SetTo(0)
-            dst2.Line(p1, p2, cv.Scalar.Yellow, algTask.lineWidth, algTask.lineType)
-            dst2.Line(p3, p4, cv.Scalar.Yellow, algTask.lineWidth, algTask.lineType)
+            dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            dst2.Line(p3, p4, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             If intersectionPoint <> New cv.Point2f Then
-                DrawCircle(dst2, intersectionPoint, algTask.DotSize + 4, white)
+                DrawCircle(dst2, intersectionPoint, task.DotSize + 4, white)
                 labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
             Else
                 labels(2) = "Parallel!!!"
@@ -8479,10 +8479,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst3 = src
             dst2.SetTo(0)
-            For Each rect In algTask.gridNabeRects
+            For Each rect In task.gridNabeRects
                 rawLines.Run(src(rect))
                 For Each lp In rawLines.lpList
-                    dst2(rect).Line(lp.p1, lp.p2, 255, algTask.lineWidth, algTask.lineType)
+                    dst2(rect).Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
                     vbc.DrawLine(dst3, lp.p1, lp.p2)
                     lpList.Add(lp)
                 Next
@@ -8505,14 +8505,14 @@ Namespace VBClasses
             desc = "Highlight both vertical and horizontal lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim gravityDelta As Single = algTask.lineGravity.pE1.X - algTask.lineGravity.pE2.X
+            Dim gravityDelta As Single = task.lineGravity.pE1.X - task.lineGravity.pE2.X
 
             kalman.kInput = {gravityDelta}
             kalman.Run(emptyMat)
             gravityDelta = kalman.kOutput(0)
 
             matchLine.lpInput = Nothing
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 If Math.Abs(lp.angle) > 45 Then
                     matchLine.lpInput = lp
                     Exit For
@@ -8521,7 +8521,7 @@ Namespace VBClasses
             If matchLine.lpInput Is Nothing Then Exit Sub
             matchLine.Run(src)
             dst2 = matchLine.dst2
-            dst3 = algTask.lines.dst2
+            dst3 = task.lines.dst2
         End Sub
     End Class
 
@@ -8541,27 +8541,27 @@ Namespace VBClasses
             desc = "Highlight both vertical and horizontal lines - not terribly good..."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim gravityDelta As Single = algTask.lineGravity.pE1.X - algTask.lineGravity.pE2.X
+            Dim gravityDelta As Single = task.lineGravity.pE1.X - task.lineGravity.pE2.X
 
             dst2 = src
-            If standalone Then dst3 = algTask.lines.dst2
+            If standalone Then dst3 = task.lines.dst2
             Dim deltaList As New List(Of Single)
             vertList.Clear()
-            For Each lp In algTask.lines.lpList
-                If Math.Abs(lp.angle) > 45 And Math.Sign(algTask.lineGravity.slope) = Math.Sign(lp.slope) Then
+            For Each lp In task.lines.lpList
+                If Math.Abs(lp.angle) > 45 And Math.Sign(task.lineGravity.slope) = Math.Sign(lp.slope) Then
                     Dim delta = lp.pE1.X - lp.pE2.X
-                    If Math.Abs(gravityDelta - delta) < algTask.gravityBasics.options.pixelThreshold Then
+                    If Math.Abs(gravityDelta - delta) < task.gravityBasics.options.pixelThreshold Then
                         deltaList.Add(delta)
                         vertList.Add(lp)
                         vbc.DrawLine(dst2, lp.pE1, lp.pE2)
-                        If standalone Then vbc.DrawLine(dst3, lp.p1, lp.p2, algTask.highlight)
+                        If standalone Then vbc.DrawLine(dst3, lp.p1, lp.p2, task.highlight)
                     End If
                 End If
             Next
 
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 labels(3) = "Gravity offset at image edge = " + Format(gravityDelta, fmt3) + " and m = " +
-                        Format(algTask.lineGravity.slope, fmt3)
+                        Format(task.lineGravity.slope, fmt3)
                 If deltaList.Count > 0 Then
                     labels(2) = Format(gravityDelta, fmt3) + "/" + Format(deltaList.Average(), fmt3) + " gravity delta/line average delta"
                 Else
@@ -8619,11 +8619,11 @@ Namespace VBClasses
                     If distance1 < distanceMid * 2 And distance2 < distanceMid * 2 Then
                         Dim cp As coinPoints
 
-                        Dim mps = algTask.lines.lpList(index)
+                        Dim mps = task.lines.lpList(index)
                         cp.p1 = mps.p1
                         cp.p2 = mps.p2
 
-                        mps = algTask.lines.lpList(i)
+                        mps = task.lines.lpList(i)
                         cp.p3 = mps.p1
                         cp.p4 = mps.p2
 
@@ -8631,7 +8631,7 @@ Namespace VBClasses
                             If (cp.p1 = cp.p3 Or cp.p1 = cp.p4) And (cp.p2 = cp.p3 Or cp.p2 = cp.p4) Then
                                 ' duplicate points...
                             Else
-                                vbc.DrawLine(dst2, cp.p1, cp.p2, algTask.highlight)
+                                vbc.DrawLine(dst2, cp.p1, cp.p2, task.highlight)
                                 vbc.DrawLine(dst2, cp.p3, cp.p4, cv.Scalar.Red)
                                 parList.Add(cp)
                                 checkList.Add(cp.p1)
@@ -8663,12 +8663,12 @@ Namespace VBClasses
             desc = "Display end points of the lines and map them."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = algTask.lines.dst2
+            dst2 = task.lines.dst2
 
             knn.queries.Clear()
-            For Each lp In algTask.lines.lpList
-                Dim rect = algTask.gridNabeRects(algTask.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-                dst2.Rectangle(rect, algTask.highlight, algTask.lineWidth)
+            For Each lp In task.lines.lpList
+                Dim rect = task.gridNabeRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+                dst2.Rectangle(rect, task.highlight, task.lineWidth)
                 knn.queries.Add(lp.ptCenter)
             Next
 
@@ -8678,11 +8678,11 @@ Namespace VBClasses
 
             knn.Run(emptyMat)
 
-            dst3 = algTask.lines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst3 = task.lines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             For i = 0 To knn.neighbors.Count - 1
                 Dim p1 = knn.queries(i)
                 Dim p2 = knn.trainInput(knn.neighbors(i)(0))
-                dst3.Line(p1, p2, algTask.highlight, algTask.lineWidth + 3, algTask.lineType)
+                dst3.Line(p1, p2, task.highlight, task.lineWidth + 3, task.lineType)
             Next
 
             lastQueries = New List(Of cv.Point2f)(knn.queries)
@@ -8749,7 +8749,7 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For Each lp In lpList
-                dst2.Line(lp.p1, lp.p2, 255, algTask.lineWidth + 1, algTask.lineType)
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth + 1, task.lineType)
             Next
 
             labels(2) = CStr(lpList.Count) + " highlighted lines were detected in the current frame. Others were too similar."
@@ -8807,7 +8807,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each lp In lpList
-                    dst2.Line(lp.p1, lp.p2, 255, algTask.lineWidth, algTask.lineType)
+                    dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
                 Next
             End If
 
@@ -8830,26 +8830,26 @@ Namespace VBClasses
             desc = "Find all the line edge points and display them."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = algTask.lines.dst2
-            labels(3) = "The top " + CStr(algTask.lines.lpList.Count) + " longest lines in the image."
+            dst2 = task.lines.dst2
+            labels(3) = "The top " + CStr(task.lines.lpList.Count) + " longest lines in the image."
 
-            knn.lpInput = algTask.lines.lpList
+            knn.lpInput = task.lines.lpList
             knn.Run(emptyMat)
 
-            For Each lpIn In algTask.lines.lpList
+            For Each lpIn In task.lines.lpList
                 Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 1)
                 DrawCircle(dst2, New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)))
                 DrawCircle(dst2, New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)))
             Next
 
-            Static lpLast As New List(Of lpData)(algTask.lines.lpList)
+            Static lpLast As New List(Of lpData)(task.lines.lpList)
             For Each lpIn In lpLast
                 Dim lp = HullLine_EdgePoints.EdgePointOffset(lpIn, 5)
                 DrawCircle(dst2, New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)), white)
                 DrawCircle(dst2, New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)), white)
             Next
 
-            lpLast = New List(Of lpData)(algTask.lines.lpList)
+            lpLast = New List(Of lpData)(task.lines.lpList)
 
             labels(2) = knn.labels(2)
         End Sub
@@ -8863,7 +8863,7 @@ Namespace VBClasses
     Public Class XO_MotionCam_MatchLast : Inherits TaskParent
         Dim motion As New XO_MotionCam_SideApproach
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Find the common trends in the image edge points of the top, left, right, and bottom."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -8872,7 +8872,7 @@ Namespace VBClasses
             labels(1) = motion.labels(1)
 
             Static edgeList As New List(Of SortedList(Of Single, Integer))(motion.edgeList)
-            Static lpLastList As New List(Of lpData)(algTask.lines.lpList)
+            Static lpLastList As New List(Of lpData)(task.lines.lpList)
 
             For i = 0 To edgeList.Count - 1
                 If edgeList(i).Count = motion.edgeList(i).Count Then
@@ -8887,7 +8887,7 @@ Namespace VBClasses
             trueData = motion.trueData
 
             edgeList = New List(Of SortedList(Of Single, Integer))(motion.edgeList)
-            lpLastList = New List(Of lpData)(algTask.lines.lpList)
+            lpLastList = New List(Of lpData)(task.lines.lpList)
 
             labels(2) = motion.labels(2) + "  White points are for the previous frame"
         End Sub
@@ -8900,7 +8900,7 @@ Namespace VBClasses
     Public Class XO_MotionCam_SideApproach : Inherits TaskParent
         Public edgeList As New List(Of SortedList(Of Single, Integer))
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Find all the line edge points and display them."
         End Sub
         Public Sub buildDisplay(edgePoints As List(Of SortedList(Of Single, Integer)), lpList As List(Of lpData),
@@ -8930,15 +8930,15 @@ Namespace VBClasses
             Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = algTask.lines.dst2
-            labels(1) = "The top " + CStr(algTask.lines.lpList.Count) + " longest lines in the image."
+            dst1 = task.lines.dst2
+            labels(1) = "The top " + CStr(task.lines.lpList.Count) + " longest lines in the image."
 
             Dim top As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
             Dim left As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
             Dim right As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
             Dim bottom As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
 
-            Dim lpList = algTask.lines.lpList
+            Dim lpList = task.lines.lpList
             For Each lp In lpList
                 If lp.pE1.X = 0 Then left.Add(lp.pE1.Y, lp.index)
                 If lp.pE1.Y = 0 Then top.Add(lp.pE1.X, lp.index)
@@ -8958,9 +8958,9 @@ Namespace VBClasses
             Next
 
             dst2 = src.Clone
-            buildDisplay(edgeList, lpList, 0, algTask.highlight)
+            buildDisplay(edgeList, lpList, 0, task.highlight)
 
-            labels(2) = CStr(algTask.lines.lpList.Count * 2) + " edge points of the top " + CStr(algTask.lines.lpList.Count) +
+            labels(2) = CStr(task.lines.lpList.Count * 2) + " edge points of the top " + CStr(task.lines.lpList.Count) +
                     " longest lines in the image are shown."
         End Sub
     End Class
@@ -8976,8 +8976,8 @@ Namespace VBClasses
             desc = "Measure how much the camera has moved."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static vecLast = algTask.lineLongest
-            Dim vec = algTask.lineLongest
+            Static vecLast = task.lineLongest
+            Dim vec = task.lineLongest
 
             deltaX1 = vec.pE1.X - vecLast.pE1.x
             deltaY1 = vec.pE1.Y - vecLast.pE1.Y
@@ -8988,7 +8988,7 @@ Namespace VBClasses
             Static strList As New List(Of String)
             strList.Add(Format(deltaX1, fmt1) + " " + Format(deltaX2, fmt1) + " " +
                     Format(deltaY1, fmt1) + " " + Format(deltaY2, fmt1) +
-                    If(algTask.frameCount Mod 6 = 0, vbCrLf, vbTab))
+                    If(task.frameCount Mod 6 = 0, vbCrLf, vbTab))
             If strList.Count >= 132 Then strList.RemoveAt(0)
 
             strOut = ""
@@ -9040,28 +9040,28 @@ Namespace VBClasses
             desc = "Find the top feature cells and track them in the next frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim half As Integer = CInt(algTask.brickSize / 2)
+            Dim half As Integer = CInt(task.brickSize / 2)
             Dim pt As cv.Point
-            If algTask.heartBeatLT Then
+            If task.heartBeatLT Then
                 features.Run(src)
                 searchRects.Clear()
                 featureRects.Clear()
                 saveMat = src.Clone
-                For Each pt In algTask.features
-                    Dim index As Integer = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                    Dim roi = New cv.Rect(pt.X - half, pt.Y - half, algTask.brickSize, algTask.brickSize)
+                For Each pt In task.features
+                    Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                    Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickSize, task.brickSize)
                     roi = ValidateRect(roi) ' stub bricks are fixed here 
                     featureRects.Add(roi)
-                    searchRects.Add(algTask.gridNabeRects(index))
+                    searchRects.Add(task.gridNabeRects(index))
                 Next
 
                 dst2 = saveMat.Clone
-                For Each pt In algTask.features
-                    Dim index As Integer = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                    Dim roi = New cv.Rect(pt.X - half, pt.Y - half, algTask.brickSize, algTask.brickSize)
+                For Each pt In task.features
+                    Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                    Dim roi = New cv.Rect(pt.X - half, pt.Y - half, task.brickSize, task.brickSize)
                     roi = ValidateRect(roi) ' stub bricks are fixed here 
-                    dst2.Rectangle(roi, algTask.highlight, algTask.lineWidth)
-                    dst2.Rectangle(algTask.gridNabeRects(index), algTask.highlight, algTask.lineWidth)
+                    dst2.Rectangle(roi, task.highlight, task.lineWidth)
+                    dst2.Rectangle(task.gridNabeRects(index), task.highlight, task.lineWidth)
                 Next
             End If
 
@@ -9071,7 +9071,7 @@ Namespace VBClasses
                 Dim roi = featureRects(i)
                 match.template = saveMat(roi).Clone
                 match.Run(src(searchRects(i)))
-                dst3.Rectangle(match.newRect, algTask.highlight, algTask.lineWidth)
+                dst3.Rectangle(match.newRect, task.highlight, task.lineWidth)
                 matchRects.Add(match.newRect)
             Next
 
@@ -9081,9 +9081,9 @@ Namespace VBClasses
             For Each roi In matchRects
                 half = CInt(roi.Width / 2) ' stubby bricks are those at the bottom or right side of the image.
                 pt = New cv.Point(roi.X + half, roi.Y + half)
-                Dim index As Integer = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 featureRects.Add(roi)
-                searchRects.Add(algTask.gridNabeRects(index))
+                searchRects.Add(task.gridNabeRects(index))
             Next
         End Sub
     End Class
@@ -9095,30 +9095,30 @@ Namespace VBClasses
     Public Class XO_ML_BasicsOld : Inherits TaskParent
         Dim rtree As RTrees
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "depth32f - 32fc3 format with missing depth filled with predicted depth based on color (brighter is farther)", "", "Color used for roi prediction"}
             desc = "Predict depth from color to fill in the depth shadow areas"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim noDepthCount(algTask.gridRects.Count - 1) As Integer
-            Dim roiColor(algTask.gridRects.Count - 1) As cv.Vec3b
+            Dim noDepthCount(task.gridRects.Count - 1) As Integer
+            Dim roiColor(task.gridRects.Count - 1) As cv.Vec3b
 
             dst2.SetTo(0)
-            Parallel.For(0, algTask.gridRects.Count,
+            Parallel.For(0, task.gridRects.Count,
         Sub(i)
-            Dim roi = algTask.gridRects(i)
+            Dim roi = task.gridRects(i)
             roiColor(i) = src(roi).Get(Of cv.Vec3b)(roi.Height / 2, roi.Width / 2)
-            dst2(roi).SetTo(roiColor(i), algTask.depthMask(roi))
-            noDepthCount(i) = algTask.noDepthMask(roi).CountNonZero
+            dst2(roi).SetTo(roiColor(i), task.depthMask(roi))
+            noDepthCount(i) = task.noDepthMask(roi).CountNonZero
         End Sub)
 
             If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
             Dim mlInput As New List(Of mlData)
             Dim mResponse As New List(Of Single)
-            For i = 0 To algTask.gridRects.Count - 1
+            For i = 0 To task.gridRects.Count - 1
                 If noDepthCount(i) = 0 Then Continue For
                 Dim ml As mlData
-                Dim roi = algTask.gridRects(i)
+                Dim roi = task.gridRects(i)
                 ml.row = roi.Y + roi.Height / 2
                 ml.col = roi.X + roi.Width / 2
                 Dim c = roiColor(i)
@@ -9126,7 +9126,7 @@ Namespace VBClasses
                 ml.green = c(1)
                 ml.red = c(2)
                 mlInput.Add(ml)
-                mResponse.Add(algTask.pcSplit(2)(roi).Mean())
+                mResponse.Add(task.pcSplit(2)(roi).Mean())
             Next
 
             If mlInput.Count = 0 Then
@@ -9144,10 +9144,10 @@ Namespace VBClasses
             Dim colors As New List(Of cv.Vec3b)
             Dim saveRoi As New List(Of cv.Rect)
             Dim depthMask As New List(Of cv.Mat)
-            For i = 0 To algTask.gridRects.Count - 1
+            For i = 0 To task.gridRects.Count - 1
                 If noDepthCount(i) = 0 Then Continue For
-                Dim roi = algTask.gridRects(i)
-                depthMask.Add(algTask.noDepthMask(roi))
+                Dim roi = task.gridRects(i)
+                depthMask.Add(task.noDepthMask(roi))
                 Dim ml As mlData
                 ml.row = roi.Y + roi.Height / 2
                 ml.col = roi.X + roi.Width / 2
@@ -9164,7 +9164,7 @@ Namespace VBClasses
             Dim output = New cv.Mat(predictList.Count, 1, cv.MatType.CV_32FC1, cv.Scalar.All(0))
             rtree.Predict(predMat, output)
 
-            dst1 = algTask.pcSplit(2)
+            dst1 = task.pcSplit(2)
             dst3.SetTo(0)
             For i = 0 To predictList.Count - 1
                 Dim roi = saveRoi(i)
@@ -9173,7 +9173,7 @@ Namespace VBClasses
                 dst3(roi).SetTo(colors(i), depthMask(i))
             Next
 
-            labels(2) = CStr(algTask.gridRects.Count) + " regions with " + CStr(mlInput.Count) + " used for learning and " + CStr(predictList.Count) + " were predicted"
+            labels(2) = CStr(task.gridRects.Count) + " regions with " + CStr(mlInput.Count) + " used for learning and " + CStr(predictList.Count) + " were predicted"
         End Sub
         Public Sub Close()
             If rtree IsNot Nothing Then rtree.Dispose()
@@ -9193,11 +9193,11 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static totalPixels As Integer
-            algTask.FeatureSampleSize = 1000 ' use as many lines as are available.
+            task.FeatureSampleSize = 1000 ' use as many lines as are available.
             lines3DList.Clear()
             pointcloud.SetTo(0)
             totalPixels = 0
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 findLine3D.lp = lp
                 findLine3D.Run(src)
 
@@ -9209,8 +9209,8 @@ Namespace VBClasses
                 Dim newLine3D As New List(Of cv.Vec3f)
                 For i = 0 To veclist.Count - 1
                     Dim pt = findLine3D.ptList(i)
-                    'If algTask.toggleOn Then
-                    '    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, algTask.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X))
+                    'If task.toggleOn Then
+                    '    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X))
                     'Else
                     Dim vec = Cloud_Basics.worldCoordinates(pt, depthInit + incr * i)
                     newLine3D.Add(vec)
@@ -9221,7 +9221,7 @@ Namespace VBClasses
                 totalPixels += newLine3D.Count
             Next
 
-            dst2 = algTask.lines.dst2
+            dst2 = task.lines.dst2
             labels(2) = CStr(lines3DList.Count) + " lines were found and " + CStr(totalPixels) +
                     " pixels were updated in the point cloud."
         End Sub
@@ -9240,10 +9240,10 @@ Namespace VBClasses
             desc = "Build the 3D lines found in Line_Basics if there is 3D info at both end points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            algTask.FeatureSampleSize = 1000 ' use as many lines as are available.
+            task.FeatureSampleSize = 1000 ' use as many lines as are available.
             lines3DList.Clear()
             Dim totalPixels As Integer
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 findLine3D.lp = lp
                 findLine3D.Run(src)
 
@@ -9255,19 +9255,19 @@ Namespace VBClasses
                 Dim newLine3D As New List(Of cv.Vec3f)
                 For i = 0 To veclist.Count - 1
                     Dim pt = findLine3D.ptList(i)
-                    'If algTask.toggleOn Then
-                    '    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, algTask.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X))
+                    'If task.toggleOn Then
+                    '    pointcloud.Set(Of cv.Vec3f)(pt.Y, pt.X, task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X))
                     'Else
                     Dim vec = Cloud_Basics.worldCoordinates(pt, depthInit + incr * i)
                     newLine3D.Add(vec)
-                    algTask.pointCloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
+                    task.pointCloud.Set(Of cv.Vec3f)(pt.Y, pt.X, vec)
                     totalPixels += 1
                     'End If
                 Next
                 lines3DList.Add(newLine3D)
             Next
 
-            dst2 = algTask.lines.dst2
+            dst2 = task.lines.dst2
             labels(2) = CStr(lines3DList.Count) + " lines were found and " + CStr(totalPixels) +
                     " pixels were updated in the point cloud."
         End Sub
@@ -9281,23 +9281,23 @@ Namespace VBClasses
     Public Class XO_GL_Draw3DLinesAndCloud : Inherits TaskParent
         Dim line3D As New XO_Line3D_ReconstructLines
         Public Sub New()
-            algTask.featureOptions.FeatureSampleSize.Value = algTask.featureOptions.FeatureSampleSize.Maximum
+            task.featureOptions.FeatureSampleSize.Value = task.featureOptions.FeatureSampleSize.Maximum
             desc = "Draw the RGB lines in SharpGL and include the line points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC3 Then src = algTask.pointCloud.Clone
-            dst2 = algTask.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
+            dst2 = task.lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            labels(2) = algTask.lines.labels(2)
+            labels(2) = task.lines.labels(2)
 
             dst0 = src
             dst0.SetTo(0, Not dst2)
 
             dst1.SetTo(red)
-            strOut = algTask.sharpGL.RunSharp(Common.oCase.draw3DLinesAndCloud, dst0, algTask.lines.dst2)
+            strOut = task.sharpGL.RunSharp(Common.oCase.draw3DLinesAndCloud, dst0, task.lines.dst2)
             SetTrueText(strOut, 3)
 
-            dst2 = algTask.lines.dst2
+            dst2 = task.lines.dst2
         End Sub
     End Class
 
@@ -9315,7 +9315,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             split2.Run(src)
 
-            cv.Cv2.CalcHist({split2.dst3}, algTask.channelsTop, New cv.Mat, dst1, 2, algTask.bins2D, algTask.rangesTop)
+            cv.Cv2.CalcHist({split2.dst3}, task.channelsTop, New cv.Mat, dst1, 2, task.bins2D, task.rangesTop)
 
             dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
             dst1 = dst1.Flip(cv.FlipMode.X)
@@ -9334,7 +9334,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             split2.Run(src)
 
-            cv.Cv2.CalcHist({split2.dst3}, algTask.channelsSide, New cv.Mat, dst1, 2, algTask.bins2D, algTask.rangesSide)
+            cv.Cv2.CalcHist({split2.dst3}, task.channelsSide, New cv.Mat, dst1, 2, task.bins2D, task.rangesSide)
 
             dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
             dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
@@ -9357,7 +9357,7 @@ Namespace VBClasses
                 check.Box(2).Checked = True
             End If
 
-            algTask.gOptions.setGravityUsage(False)
+            task.gOptions.setGravityUsage(False)
             desc = "Spin the point cloud exercise"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -9388,7 +9388,7 @@ Namespace VBClasses
 
             gMat.Run(src)
 
-            Dim gOutput = (algTask.pointCloud.Reshape(1, dst2.Rows * dst2.Cols) * gMat.gMatrix).ToMat  ' <<<<<<<<<<<<<<<<<<<<<<< this is the rotation...
+            Dim gOutput = (task.pointCloud.Reshape(1, dst2.Rows * dst2.Cols) * gMat.gMatrix).ToMat  ' <<<<<<<<<<<<<<<<<<<<<<< this is the rotation...
             dst2 = gOutput.Reshape(3, src.Rows)
         End Sub
     End Class
@@ -9408,7 +9408,7 @@ Namespace VBClasses
             dst2 = runRedList(src, labels(2))
 
             spin.Run(src)
-            algTask.pointCloud = spin.dst2
+            task.pointCloud = spin.dst2
             redCSpin.Run(src)
             dst3 = redCSpin.dst2
         End Sub
@@ -9422,20 +9422,20 @@ Namespace VBClasses
         Public line3d As New XO_Line3D_DrawLine
         Public lpList As New List(Of lpData)
         Public Sub New()
-            If standalone Then algTask.gOptions.LineWidth.Value = 3
+            If standalone Then task.gOptions.LineWidth.Value = 3
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Recompute the depth for the lines found."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then lpList = New List(Of lpData)(algTask.lines.lpList)
-            dst2 = algTask.pointCloud.Clone
+            If standalone Then lpList = New List(Of lpData)(task.lines.lpList)
+            dst2 = task.pointCloud.Clone
             dst1.SetTo(0)
             For Each lp In lpList
-                dst1.Line(lp.p1, lp.p2, 255, algTask.lineWidth, cv.LineTypes.Link4)
+                dst1.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
             Next
 
             dst3 = src
-            algTask.lines.dst2.CopyTo(dst3, dst1)
+            task.lines.dst2.CopyTo(dst3, dst1)
             For Each line3d.lp In lpList
                 line3d.Run(emptyMat)
                 Dim index As Integer = 0
@@ -9448,7 +9448,7 @@ Namespace VBClasses
                 End If
             Next
             labels(2) = "At least one end of a line should fade into the surrounding (except where depth data is limited)"
-            labels(3) = algTask.lines.labels(2)
+            labels(3) = task.lines.labels(2)
         End Sub
     End Class
 
@@ -9462,25 +9462,25 @@ Namespace VBClasses
         Public incr As Single
         Public points As cv.Mat
         Public Sub New()
-            If standalone Then algTask.gOptions.LineWidth.Value = 3
+            If standalone Then task.gOptions.LineWidth.Value = 3
             dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Create a 3D line where there is a detected line in 2D."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst3.SetTo(0)
-            If standalone Then lp = algTask.lineLongest
+            If standalone Then lp = task.lineLongest
             If lp.pVec1(2) = 0 Or lp.pVec2(2) = 0 Then
                 lp = Nothing ' no result...
                 Exit Sub
             End If
 
-            dst3.Line(lp.p1, lp.p2, 255, algTask.lineWidth, cv.LineTypes.Link4)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
 
             points = dst3.FindNonZero()
             Dim count As Integer = points.Rows
 
             Dim pt = points.Get(Of cv.Point)(0, 0), depth2 As Single
-            If lp.p1.DistanceTo(pt) <= algTask.lineWidth Then
+            If lp.p1.DistanceTo(pt) <= task.lineWidth Then
                 depth1 = lp.pVec1(2)
                 depth2 = lp.pVec2(2)
             Else
@@ -9490,7 +9490,7 @@ Namespace VBClasses
             incr = (depth1 - depth2) / count
 
             If standalone Then
-                dst2 = algTask.pointCloud.Clone
+                dst2 = task.pointCloud.Clone
                 For i = 0 To points.Rows - 1
                     pt = points.Get(Of cv.Point)(i, 0)
                     dst2.Set(Of cv.Vec3f)(pt.Y, pt.X, Cloud_Basics.worldCoordinates(pt.X, pt.Y, depth1 + i * incr))
@@ -9509,23 +9509,23 @@ Namespace VBClasses
         Public incr As Single
         Public points As cv.Mat
         Public Sub New()
-            If standalone Then algTask.gOptions.LineWidth.Value = 3
+            If standalone Then task.gOptions.LineWidth.Value = 3
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Create a 3D line where there is a detected line in 2D."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then lp = algTask.lineLongest
+            If standalone Then lp = task.lineLongest
             If lp.pVec1(2) = 0 Or lp.pVec2(2) = 0 Then
                 lp = Nothing ' no result...
                 Exit Sub
             End If
 
             dst3.SetTo(0)
-            dst3.Line(lp.p1, lp.p2, 255, algTask.lineWidth, cv.LineTypes.Link4)
+            dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, cv.LineTypes.Link4)
 
             dst1.SetTo(0)
-            algTask.pcSplit(2)(lp.rect).CopyTo(dst1(lp.rect), dst3(lp.rect))
+            task.pcSplit(2)(lp.rect).CopyTo(dst1(lp.rect), dst3(lp.rect))
             depthAvg = dst1(lp.rect).Mean(dst3(lp.rect)).Item(0)
             points = dst3.FindNonZero()
 
@@ -9546,14 +9546,14 @@ Namespace VBClasses
             For i = 1 To ptList.Count - 1
                 p1 = ptList(i - 1)
                 p2 = ptList(i)
-                d1 = algTask.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
-                d2 = algTask.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
+                d1 = task.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
+                d2 = task.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
                 Dim delta = d2 - d1
                 If Math.Abs(delta) < 0.1 Then incrList.Add(delta) ' if delta is less than 10 centimeters, then keep it.
             Next
             incr = incrList.Average()
 
-            dst2 = algTask.pointCloud.Clone
+            dst2 = task.pointCloud.Clone
             Dim dirSign As Integer = If(lp.p1.DistanceTo(ptList(0)) < lp.p2.DistanceTo(ptList(0)), -1, 1)
             For i = indexMid To 0 Step -1
                 Dim pt = ptList(i)
@@ -9593,16 +9593,16 @@ Namespace VBClasses
     Public Class XO_Reliable_Depth : Inherits TaskParent
         Dim rDepth As New History_ReliableDepth
         Public Sub New()
-            labels = {"", "", "Mask of Reliable depth data", "algTask.DepthRGB after removing unreliable depth (compare with above.)"}
+            labels = {"", "", "Mask of Reliable depth data", "task.DepthRGB after removing unreliable depth (compare with above.)"}
             desc = "Provide only depth that has been present over the last framehistory frames."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            rDepth.Run(algTask.noDepthMask)
+            rDepth.Run(task.noDepthMask)
             dst2 = rDepth.dst2
 
             If standaloneTest() Then
                 dst3.SetTo(0)
-                algTask.depthRGB.CopyTo(dst3, dst2)
+                task.depthRGB.CopyTo(dst3, dst2)
             End If
         End Sub
     End Class
@@ -9620,9 +9620,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
             Dim split() As cv.Mat
-            If src.Type = cv.MatType.CV_32FC3 Then split = src.Split() Else split = algTask.pcSplit
+            If src.Type = cv.MatType.CV_32FC3 Then split = src.Split() Else split = task.pcSplit
 
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 dst3 = split(2)
             End If
             If options.useMax Then
@@ -9677,17 +9677,17 @@ Namespace VBClasses
     Public Class XO_RedCloud_Contours : Inherits TaskParent
         Dim prep As New RedPrep_Depth
         Public Sub New()
-            If algTask.contours Is Nothing Then algTask.contours = New Contour_Basics_List
+            If task.contours Is Nothing Then task.contours = New Contour_Basics_List
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Run the reduced pointcloud output through the RedList_CPP algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            algTask.contours.Run(src)
+            task.contours.Run(src)
             prep.Run(src)
             dst3 = prep.dst3
 
-            dst2 = algTask.contours.dst2
-            labels(2) = algTask.contours.labels(2)
+            dst2 = task.contours.dst2
+            labels(2) = task.contours.labels(2)
         End Sub
     End Class
 
@@ -9709,16 +9709,16 @@ Namespace VBClasses
             For i = 0 To 2
                 Select Case i
                     Case 0 ' X Reduction
-                        dst0 = algTask.pcSplit(0)
+                        dst0 = task.pcSplit(0)
                     Case 1 ' Y Reduction
-                        dst0 = algTask.pcSplit(1)
+                        dst0 = task.pcSplit(1)
                     Case 2 ' Z Reduction
-                        dst0 = algTask.pcSplit(2)
+                        dst0 = task.pcSplit(2)
                 End Select
 
                 Dim mm = GetMinMax(dst0)
                 Dim ranges = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
-                cv.Cv2.CalcHist({dst0}, {0}, algTask.depthMask, histogram, 1, {algTask.histogramBins}, ranges)
+                cv.Cv2.CalcHist({dst0}, {0}, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
 
                 Dim histArray(histogram.Total - 1) As Single
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -9731,7 +9731,7 @@ Namespace VBClasses
                 cv.Cv2.CalcBackProject({dst0}, {0}, histogram, dst0, ranges)
                 dst0.ConvertTo(dst1, cv.MatType.CV_8U)
                 mats.mat(i) = PaletteFull(dst1)
-                mats.mat(i).SetTo(0, algTask.noDepthMask)
+                mats.mat(i).SetTo(0, task.noDepthMask)
             Next
 
             mats.Run(emptyMat)
@@ -9793,8 +9793,8 @@ Namespace VBClasses
             dst2 = runRedList(src, labels(2))
 
             dst3.SetTo(0)
-            For Each rc In algTask.redList.oldrclist
-                DrawTour(dst3(rc.rect), rc.contour, 255, algTask.lineWidth)
+            For Each rc In task.redList.oldrclist
+                DrawTour(dst3(rc.rect), rc.contour, 255, task.lineWidth)
             Next
         End Sub
     End Class
@@ -9807,7 +9807,7 @@ Namespace VBClasses
         Dim prep As New XO_RedCloud_PrepOutline
         Public options As New Options_Contours
         Public contourList As New List(Of contourData)
-        Public contourMap As New cv.Mat(algTask.workRes, cv.MatType.CV_32F, 0)
+        Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
         Dim sortContours As New Contour_Sort
         Public Sub New()
             desc = "Use the RedPrep_Basics as input to contours_basics."
@@ -9828,7 +9828,7 @@ Namespace VBClasses
 
             contourList = sortContours.contourList
             contourMap = sortContours.contourMap
-            If algTask.heartBeat Then labels(2) = sortContours.labels(2)
+            If task.heartBeat Then labels(2) = sortContours.labels(2)
             dst2 = sortContours.dst2
         End Sub
     End Class
@@ -9843,17 +9843,17 @@ Namespace VBClasses
         Dim prep As New XO_RedCloud_PrepOutline
         Public options As New Options_Contours
         Public contourList As New List(Of contourData)
-        Public contourMap As New cv.Mat(algTask.workRes, cv.MatType.CV_32F, 0)
+        Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
         Public contourIDs As New List(Of Integer)
         Public Sub New()
-            If algTask.contours Is Nothing Then algTask.contours = New Contour_Basics_List
+            If task.contours Is Nothing Then task.contours = New Contour_Basics_List
             desc = "Use the RedPrep_Basics as input to contours_basics."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            algTask.contours.Run(src)
-            dst2 = algTask.contours.dst2
-            labels(2) = algTask.contours.labels(2)
+            task.contours.Run(src)
+            dst2 = task.contours.dst2
+            labels(2) = task.contours.labels(2)
 
             prep.Run(src)
             prep.dst2.ConvertTo(dst1, cv.MatType.CV_8U)
@@ -9877,11 +9877,11 @@ Namespace VBClasses
             prep.Run(src)
             dst2 = prep.dst2
 
-            ' dst2.SetTo(0, algTask.noDepthMask)
+            ' dst2.SetTo(0, task.noDepthMask)
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             Dim mm = GetMinMax(dst2)
             dst3 = PaletteFull(dst2)
-            algTask.setSelectedCell()
+            task.setSelectedCell()
 
             labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
         End Sub
@@ -9897,7 +9897,7 @@ Namespace VBClasses
         Dim world As New Depth_World
         Dim prep As New RedPrep_Basics
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels(3) = "Generated pointcloud"
             desc = "Display the output of a generated pointcloud as RedCloud cells"
         End Sub
@@ -9947,7 +9947,7 @@ Namespace VBClasses
             desc = "Floodfill each region of the RedPrep_Basics output."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 redCold.Run(src)
                 dst2 = redCold.dst2
                 dst3 = redCold.dst3
@@ -9968,14 +9968,14 @@ Namespace VBClasses
                 Dim count = cv.Cv2.FloodFill(dst3, mask, pc.maxDist, index, rect, 0, 0, flags)
                 If count >= minCount And count < maxCount Then
                     Dim pd = New rcData(dst3(rect), rect, index)
-                    dst2(rect).SetTo(algTask.scalarColors(index), mask(rect))
+                    dst2(rect).SetTo(task.scalarColors(index), mask(rect))
                     rcList.Add(pd)
                     index += 1
                 End If
             Next
 
             For Each pd In rcList
-                dst2.Circle(pd.maxDist, algTask.DotSize, algTask.highlight, -1)
+                dst2.Circle(pd.maxDist, task.DotSize, task.highlight, -1)
             Next
 
             labels(2) = CStr(index) + " regions were identified"
@@ -9992,7 +9992,7 @@ Namespace VBClasses
         Dim stats As New XO_RedCell_Color
         Public Sub New()
             OptionParent.findRadio("XY Reduction").Checked = True
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Run the reduced pointcloud output through the RedList_CPP algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -10058,10 +10058,10 @@ Namespace VBClasses
             Next
             dst2 = PaletteBlackZero(dst1)
 
-            Dim clickIndex = dst1.Get(Of Byte)(algTask.ClickPoint.Y, algTask.ClickPoint.X)
+            Dim clickIndex = dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
             If clickIndex > 0 And clickIndex < rcList.Count Then
-                algTask.color(rcList(clickIndex - 1).rect).SetTo(white, rcList(clickIndex - 1).mask)
-                algTask.color.Rectangle(rcList(clickIndex - 1).rect, white, algTask.lineWidth, algTask.lineType)
+                task.color(rcList(clickIndex - 1).rect).SetTo(white, rcList(clickIndex - 1).mask)
+                task.color.Rectangle(rcList(clickIndex - 1).rect, white, task.lineWidth, task.lineType)
             End If
             labels(2) = CStr(newList.Count) + " regions were identified. Region " + CStr(clickIndex) + " was selected."
         End Sub
@@ -10147,7 +10147,7 @@ Namespace VBClasses
         Public Sub New()
             OptionParent.findRadio("YZ Reduction").Checked = True
             labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Build YZ RedCloud cells"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -10172,7 +10172,7 @@ Namespace VBClasses
         Public Sub New()
             OptionParent.findRadio("XZ Reduction").Checked = True
             labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Build XZ RedCloud cells."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -10196,7 +10196,7 @@ Namespace VBClasses
         Public Sub New()
             OptionParent.findRadio("X Reduction").Checked = True
             labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Build X RedCloud cells."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -10220,7 +10220,7 @@ Namespace VBClasses
         Public Sub New()
             OptionParent.findRadio("Y Reduction").Checked = True
             labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Build Y RedCloud cells."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -10243,7 +10243,7 @@ Namespace VBClasses
         Public Sub New()
             OptionParent.findRadio("Z Reduction").Checked = True
             labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Build Z RedCloud cells."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -10276,7 +10276,7 @@ Namespace VBClasses
             dst1.SetTo(0)
             dst3.SetTo(0)
             Dim percentDepth As New List(Of Single)
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 If rc.depthPixels > 0 Then dst1(rc.rect).SetTo(255, rc.mask)
                 If rc.depthPixels > 0 And rc.index > 0 Then
                     Dim pc = rc.depthPixels / rc.pixels
@@ -10287,7 +10287,7 @@ Namespace VBClasses
             Next
 
             Dim beforeCount = dst1.CountNonZero
-            dst1.SetTo(0, algTask.depthMask)
+            dst1.SetTo(0, task.depthMask)
             Dim aftercount = dst1.CountNonZero
 
             If beforeCount <> aftercount Then
@@ -10310,13 +10310,13 @@ Namespace VBClasses
         Dim plot As New Hist_Depth
         Public runRedCflag As Boolean
         Public Sub New()
-            If standalone Then algTask.gOptions.setHistogramBins(20)
+            If standalone Then task.gOptions.setHistogramBins(20)
             desc = "Display the statistics for the selected cell."
         End Sub
         Public Sub statsString()
-            Dim rc = algTask.oldrcD
+            Dim rc = task.oldrcD
 
-            Dim gridID As Integer = algTask.gridMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+            Dim gridID As Integer = task.gridMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
             strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbTab
             strOut += "rc.age = " + CStr(rc.age) + vbCrLf
             strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
@@ -10343,9 +10343,9 @@ Namespace VBClasses
 
             strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.depth, fmt2) + vbCrLf
 
-            Dim tmp = New cv.Mat(algTask.oldrcD.mask.Rows, algTask.oldrcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
-            algTask.pcSplit(2)(algTask.oldrcD.rect).CopyTo(tmp, algTask.oldrcD.mask)
-            plot.rc = algTask.oldrcD
+            Dim tmp = New cv.Mat(task.oldrcD.mask.Rows, task.oldrcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
+            task.pcSplit(2)(task.oldrcD.rect).CopyTo(tmp, task.oldrcD.mask)
+            plot.rc = task.oldrcD
             plot.Run(tmp)
             dst3 = plot.dst2
         End Sub
@@ -10353,38 +10353,38 @@ Namespace VBClasses
             If standalone Or runRedCflag Then dst2 = runRedList(src, labels(2))
             statsString()
             SetTrueText(strOut, 3)
-            labels(3) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(algTask.MaxZmeters)) + " meters"
+            labels(3) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.MaxZmeters)) + " meters"
         End Sub
     End Class
     Public Class XO_RedCell_Distance : Inherits TaskParent
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             labels = {"", "Depth distance to selected cell", "", "Color distance to selected cell"}
             desc = "Measure the color distance of each cell to the selected cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.heartBeat Or algTask.quarterBeat Then
+            If task.heartBeat Or task.quarterBeat Then
                 dst2 = runRedList(src, labels(2))
-                dst0 = algTask.color
+                dst0 = task.color
 
                 Dim depthDistance As New List(Of Single)
                 Dim colorDistance As New List(Of Single)
-                Dim selectedMean As cv.Scalar = src(algTask.oldrcD.rect).Mean(algTask.oldrcD.mask)
-                If algTask.redList.oldrclist.Count = 0 Then Exit Sub ' next frame please...
-                For Each rc In algTask.redList.oldrclist
+                Dim selectedMean As cv.Scalar = src(task.oldrcD.rect).Mean(task.oldrcD.mask)
+                If task.redList.oldrclist.Count = 0 Then Exit Sub ' next frame please...
+                For Each rc In task.redList.oldrclist
                     colorDistance.Add(distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
-                    depthDistance.Add(distance3D(algTask.oldrcD.depth, rc.depth))
+                    depthDistance.Add(distance3D(task.oldrcD.depth, rc.depth))
                 Next
 
                 dst1.SetTo(0)
                 dst3.SetTo(0)
                 Dim maxColorDistance = colorDistance.Max()
-                For i = 0 To algTask.redList.oldrclist.Count - 1
-                    Dim rc = algTask.redList.oldrclist(i)
-                    dst1(rc.rect).SetTo(255 - depthDistance(i) * 255 / algTask.MaxZmeters, rc.mask)
+                For i = 0 To task.redList.oldrclist.Count - 1
+                    Dim rc = task.redList.oldrclist(i)
+                    dst1(rc.rect).SetTo(255 - depthDistance(i) * 255 / task.MaxZmeters, rc.mask)
                     dst3(rc.rect).SetTo(255 - colorDistance(i) * 255 / maxColorDistance, rc.mask)
                 Next
             End If
@@ -10400,8 +10400,8 @@ Namespace VBClasses
 
     Public Class XO_RedCell_Binarize : Inherits TaskParent
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             dst1 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             labels = {"", "Binarized image", "", "Relative gray image"}
@@ -10409,13 +10409,13 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst0 = src
-            If algTask.heartBeat Or algTask.quarterBeat Then
+            If task.heartBeat Or task.quarterBeat Then
                 dst2 = runRedList(src, labels(2))
 
                 Dim grayMeans As New List(Of Single)
                 Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                If algTask.redList.oldrclist.Count = 0 Then Exit Sub ' next frame please...
-                For Each rc In algTask.redList.oldrclist
+                If task.redList.oldrclist.Count = 0 Then Exit Sub ' next frame please...
+                For Each rc In task.redList.oldrclist
                     Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
                     cv.Cv2.MeanStdDev(gray(rc.rect), grayMean, grayStdev, rc.mask)
                     grayMeans.Add(grayMean(0))
@@ -10425,7 +10425,7 @@ Namespace VBClasses
                 Dim avg = grayMeans.Average
 
                 dst3.SetTo(0)
-                For Each rc In algTask.redList.oldrclist
+                For Each rc In task.redList.oldrclist
                     Dim color = (grayMeans(rc.index) - min) * 255 / (max - min)
                     dst3(rc.rect).SetTo(color, rc.mask)
                     dst1(rc.rect).SetTo(If(grayMeans(rc.index) > avg, 255, 0), rc.mask)
@@ -10468,14 +10468,14 @@ Namespace VBClasses
         Public runRedCflag As Boolean
         Dim stats As New XO_RedCell_Basics
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
-            If standalone Then algTask.gOptions.setHistogramBins(20)
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.setHistogramBins(20)
             desc = "Display the statistics for the selected cell."
         End Sub
         Public Sub statsString(src As cv.Mat)
-            Dim tmp = New cv.Mat(algTask.oldrcD.mask.Rows, algTask.oldrcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
-            algTask.pcSplit(2)(algTask.oldrcD.rect).CopyTo(tmp, algTask.oldrcD.mask)
-            plot.rc = algTask.oldrcD
+            Dim tmp = New cv.Mat(task.oldrcD.mask.Rows, task.oldrcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
+            task.pcSplit(2)(task.oldrcD.rect).CopyTo(tmp, task.oldrcD.mask)
+            plot.rc = task.oldrcD
             plot.Run(tmp)
             dst3 = plot.dst2
 
@@ -10485,17 +10485,17 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Or runRedCflag Then
                 dst2 = runRedList(src, labels(2))
-                If algTask.ClickPoint = newPoint Then
-                    If algTask.redList.oldrclist.Count > 1 Then
-                        algTask.oldrcD = algTask.redList.oldrclist(1)
-                        algTask.ClickPoint = algTask.oldrcD.maxDist
+                If task.ClickPoint = newPoint Then
+                    If task.redList.oldrclist.Count > 1 Then
+                        task.oldrcD = task.redList.oldrclist(1)
+                        task.ClickPoint = task.oldrcD.maxDist
                     End If
                 End If
             End If
-            If algTask.heartBeat Then statsString(src)
+            If task.heartBeat Then statsString(src)
 
             SetTrueText(strOut, 1)
-            labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(algTask.MaxZmeters)) + " meters"
+            labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.MaxZmeters)) + " meters"
         End Sub
     End Class
 
@@ -10520,10 +10520,10 @@ Namespace VBClasses
             dst1.SetTo(0)
             dst3.SetTo(0)
             Dim percentDepth As New List(Of Single)
-            For Each pc In algTask.redCloud.rcList
+            For Each pc In task.redCloud.rcList
                 If pc.pixels > 0 Then dst1(pc.rect).SetTo(255, pc.mask)
                 If pc.pixels > 0 Then
-                    Dim tmp As cv.Mat = algTask.depthMask(pc.rect) And pc.mask
+                    Dim tmp As cv.Mat = task.depthMask(pc.rect) And pc.mask
 
                     Dim percent = tmp.CountNonZero / pc.pixels
                     percentDepth.Add(percent)
@@ -10533,7 +10533,7 @@ Namespace VBClasses
             Next
 
             Dim beforeCount = dst1.CountNonZero
-            dst1.SetTo(0, algTask.depthMask)
+            dst1.SetTo(0, task.depthMask)
             Dim aftercount = dst1.CountNonZero
 
             If beforeCount <> aftercount Then
@@ -10564,7 +10564,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             Dim hullCounts As New List(Of Integer)
-            For Each pc In algTask.redCloud.rcList
+            For Each pc In task.redCloud.rcList
                 pc.hull = cv.Cv2.ConvexHull(pc.hull.ToArray, True).ToList
                 DrawTour(dst3(pc.rect), pc.hull, pc.color, -1)
                 hullCounts.Add(pc.hull.Count)
@@ -10615,8 +10615,8 @@ Namespace VBClasses
 
             If standalone Then dst3 = PaletteFull(dst2)
 
-            If algTask.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
-            If algTask.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
+            If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
+            If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
         Public Sub Close()
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
@@ -10656,7 +10656,7 @@ Namespace VBClasses
             bright.Run(src)
 
             dst2 = runRedList(bright.dst2, labels(2))
-            dst3 = algTask.redList.dst3
+            dst3 = task.redList.dst3
         End Sub
     End Class
 
@@ -10709,15 +10709,15 @@ Namespace VBClasses
             redCold.Run(src)
             dst2 = redCold.dst2
 
-            diff.Run(algTask.redList.rcMap)
+            diff.Run(task.redList.rcMap)
             dst1 = diff.dst2
 
-            cellLists.Add(New List(Of oldrcData)(algTask.redList.oldrclist))
-            cellmaps.Add(algTask.redList.rcMap And Not dst1)
+            cellLists.Add(New List(Of oldrcData)(task.redList.oldrclist))
+            cellmaps.Add(task.redList.rcMap And Not dst1)
             diffs.Add(dst1.Clone)
 
-            algTask.redList.oldrclist.Clear()
-            algTask.redList.oldrclist.Add(New oldrcData)
+            task.redList.oldrclist.Clear()
+            task.redList.oldrclist.Add(New oldrcData)
             For i = 0 To cellLists.Count - 1
                 For Each rc In cellLists(i)
                     Dim present As Boolean = True
@@ -10729,24 +10729,24 @@ Namespace VBClasses
                         End If
                     Next
                     If present Then
-                        rc.index = algTask.redList.oldrclist.Count
-                        algTask.redList.oldrclist.Add(rc)
+                        rc.index = task.redList.oldrclist.Count
+                        task.redList.oldrclist.Add(rc)
                     End If
                 Next
             Next
 
             dst2.SetTo(0)
-            algTask.redList.rcMap.SetTo(0)
-            For Each rc In algTask.redList.oldrclist
+            task.redList.rcMap.SetTo(0)
+            For Each rc In task.redList.oldrclist
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                algTask.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                task.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
             For Each mat In diffs
                 dst2.SetTo(0, mat)
             Next
 
-            If cellmaps.Count > algTask.frameHistoryCount Then
+            If cellmaps.Count > task.frameHistoryCount Then
                 cellmaps.RemoveAt(0)
                 cellLists.RemoveAt(0)
                 diffs.RemoveAt(0)
@@ -10767,7 +10767,7 @@ Namespace VBClasses
             dst3 = runRedList(src, labels(2))
 
             dst2.SetTo(0)
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 For i = 1 To 8
                     Dim deltaX = Choose(i, -1, 1, 0, 0, -1, 1, -1, 1)
                     Dim deltaY = Choose(i, 0, 0, -1, 1, -1, 1, 1, -1)
@@ -10779,7 +10779,7 @@ Namespace VBClasses
                         contour.Add(pt)
                     Next
                     If i < 8 Then
-                        DrawTour(dst2(rc.rect), contour, rc.color, algTask.lineWidth)
+                        DrawTour(dst2(rc.rect), contour, rc.color, task.lineWidth)
                     Else
                         DrawTour(dst2(rc.rect), contour, rc.color, -1)
                     End If
@@ -10804,7 +10804,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 dst2 = runRedList(src, labels(2))
-                oldrclist = algTask.redList.oldrclist
+                oldrclist = task.redList.oldrclist
             End If
 
             dst3.SetTo(0)
@@ -10834,18 +10834,18 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            For Each rc In algTask.redList.oldrclist
-                DrawCircle(dst2, rc.maxDist, algTask.DotSize, algTask.highlight)
+            For Each rc In task.redList.oldrclist
+                DrawCircle(dst2, rc.maxDist, task.DotSize, task.highlight)
             Next
 
-            addTour.oldrclist = algTask.redList.oldrclist
+            addTour.oldrclist = task.redList.oldrclist
             addTour.Run(src)
             dst3 = addTour.dst3
 
             For i = 1 To addTour.oldrclist.Count - 1
                 Dim rc = addTour.oldrclist(i)
                 rc.maxDist = GetMaxDist(rc)
-                DrawCircle(dst3, rc.maxDist, algTask.DotSize, algTask.highlight)
+                DrawCircle(dst3, rc.maxDist, task.DotSize, task.highlight)
             Next
         End Sub
     End Class
@@ -10889,9 +10889,9 @@ Namespace VBClasses
             desc = "Use the Depth_Outline output over time to isolate high quality cells"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            outline.Run(algTask.depthMask)
+            outline.Run(task.depthMask)
 
-            If algTask.heartBeat Then dst3.SetTo(0)
+            If task.heartBeat Then dst3.SetTo(0)
             dst3 = dst3 Or outline.dst2
 
             dst1.SetTo(0)
@@ -10905,12 +10905,12 @@ Namespace VBClasses
 
     Public Class XO_RedList_NoDepth : Inherits TaskParent
         Public Sub New()
-            algTask.featureOptions.Color8USource.SelectedItem = "Reduction_Basics"
+            task.featureOptions.Color8USource.SelectedItem = "Reduction_Basics"
             desc = "Run RedList_Basics on just the regions with no depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            dst2.SetTo(0, algTask.depthMask)
+            dst2.SetTo(0, task.depthMask)
         End Sub
     End Class
 
@@ -10927,7 +10927,7 @@ Namespace VBClasses
 
             If fps.heartBeat Then
                 dst2 = runRedList(src, labels(2)).Clone
-                labels(2) = algTask.redList.labels(2) + " " + fps.strOut
+                labels(2) = task.redList.labels(2) + " " + fps.strOut
             End If
         End Sub
     End Class
@@ -10946,15 +10946,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            frames.Run(algTask.redList.rcMap.InRange(0, 0))
+            frames.Run(task.redList.rcMap.InRange(0, 0))
             dst3 = frames.dst2
 
-            If algTask.redList.oldrclist.Count > 0 Then
-                dst2(algTask.oldrcD.rect).SetTo(white, algTask.oldrcD.mask)
+            If task.redList.oldrclist.Count > 0 Then
+                dst2(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
             End If
 
-            If algTask.redList.oldrclist.Count > 0 Then
-                Dim rc = algTask.redList.oldrclist(0) ' index can now be zero.
+            If task.redList.oldrclist.Count > 0 Then
+                Dim rc = task.redList.oldrclist(0) ' index can now be zero.
                 dst3(rc.rect).SetTo(0, rc.mask)
             End If
             Dim count = dst3.CountNonZero
@@ -10977,15 +10977,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             flood.Run(src)
             dst3 = flood.dst2
-            If algTask.heartBeat Then Exit Sub
+            If task.heartBeat Then Exit Sub
             labels(2) = flood.labels(2)
 
             contains.Run(src)
 
             dst2.SetTo(0)
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                dst2.Rectangle(rc.rect, algTask.highlight, algTask.lineWidth)
+                dst2.Rectangle(rc.rect, task.highlight, task.lineWidth)
             Next
         End Sub
     End Class
@@ -11000,8 +11000,8 @@ Namespace VBClasses
     Public Class XO_RedList_GridCellsOld : Inherits TaskParent
         Dim regions As New Region_Contours
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
-            desc = "Use the brickData regions to build algTask.redList.oldrclist"
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Use the brickData regions to build task.redList.oldrclist"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             regions.Run(src)
@@ -11017,7 +11017,7 @@ Namespace VBClasses
             Dim oldrclist As New List(Of oldrcData)
             Dim usedList As New List(Of Integer)
             For Each md In mdList
-                cv.Cv2.CalcHist({algTask.redList.rcMap(md.rect)}, {0}, md.mask, histogram, 1, {255}, ranges)
+                cv.Cv2.CalcHist({task.redList.rcMap(md.rect)}, {0}, md.mask, histogram, 1, {255}, ranges)
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
                 Dim index = oldrclist.Count
                 Dim c = dst1.Get(Of cv.Vec3b)(md.maxDist.Y, md.maxDist.X)
@@ -11025,7 +11025,7 @@ Namespace VBClasses
                 For i = 1 To histArray.Count - 1
                     If usedList.Contains(i) Then Continue For
                     If histArray(i) > 0 Then
-                        Dim rc = algTask.redList.oldrclist(i)
+                        Dim rc = task.redList.oldrclist(i)
                         If rc.depth > md.mm.minVal And rc.depth < md.mm.maxVal Then
                             rc.index = oldrclist.Count
                             rc.color = color
@@ -11050,22 +11050,22 @@ Namespace VBClasses
     Public Class XO_RedList_GridCells : Inherits TaskParent
         Dim regions As New Region_Contours
         Public Sub New()
-            algTask.gOptions.TruncateDepth.Checked = True
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
-            desc = "Use the brickData regions to build algTask.redList.oldrclist"
+            task.gOptions.TruncateDepth.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Use the brickData regions to build task.redList.oldrclist"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             regions.Run(src)
             dst1 = regions.dst2
 
             runRedList(src, labels(2))
-            Dim lastList As New List(Of oldrcData)(algTask.redList.oldrclist)
+            Dim lastList As New List(Of oldrcData)(task.redList.oldrclist)
 
             dst2.SetTo(0)
 
             Dim oldrclist As New List(Of oldrcData)
-            For Each rc In algTask.redList.oldrclist
-                If algTask.motionMask(rc.rect).CountNonZero = 0 Then
+            For Each rc In task.redList.oldrclist
+                If task.motionMask(rc.rect).CountNonZero = 0 Then
                     If rc.indexLast > 0 And rc.indexLast < lastList.Count Then rc = lastList(rc.indexLast)
                 End If
                 Dim index = oldrclist.Count
@@ -11081,7 +11081,7 @@ Namespace VBClasses
                 oldrclist.Add(rc)
             Next
 
-            algTask.redList.oldrclist = New List(Of oldrcData)(oldrclist)
+            task.redList.oldrclist = New List(Of oldrcData)(oldrclist)
             labels(3) = CStr(oldrclist.Count) + " redCloud cells were found"
         End Sub
     End Class
@@ -11097,7 +11097,7 @@ Namespace VBClasses
     Public Class XO_RedList_GridCellsHist : Inherits TaskParent
         Dim regions As New Region_Contours
         Public Sub New()
-            algTask.gOptions.TruncateDepth.Checked = True
+            task.gOptions.TruncateDepth.Checked = True
             desc = "For each redCell find the highest population region it covers."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -11105,7 +11105,7 @@ Namespace VBClasses
             dst1 = regions.redM.dst2
 
             runRedList(src, labels(2))
-            Static rcLastList As New List(Of oldrcData)(algTask.redList.oldrclist)
+            Static rcLastList As New List(Of oldrcData)(task.redList.oldrclist)
 
             Dim mdList = New List(Of maskData)(regions.redM.mdList)
             Dim histogram As New cv.Mat
@@ -11113,14 +11113,14 @@ Namespace VBClasses
             Dim oldrclist As New List(Of oldrcData)
             Dim lastCount As Integer
             Dim histArray(mdList.Count - 1) As Single
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 cv.Cv2.CalcHist({dst1(rc.rect)}, {0}, rc.mask, histogram, 1, {255}, ranges)
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
                 Dim index = histArray.ToList.IndexOf(histArray.Max)
                 Dim md = mdList(index)
-                rc.color = algTask.scalarColors(md.index)
+                rc.color = task.scalarColors(md.index)
                 If rc.indexLast <> 0 Then
-                    If (algTask.motionMask(rc.rect) And rc.mask).ToMat.CountNonZero = 0 Then
+                    If (task.motionMask(rc.rect) And rc.mask).ToMat.CountNonZero = 0 Then
                         rc = rcLastList(rc.indexLast)
                         lastCount += 1
                     End If
@@ -11135,7 +11135,7 @@ Namespace VBClasses
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
-            algTask.redList.oldrclist = New List(Of oldrcData)(oldrclist)
+            task.redList.oldrclist = New List(Of oldrcData)(oldrclist)
             rcLastList = New List(Of oldrcData)(oldrclist)
             labels(3) = CStr(oldrclist.Count) + " redCloud cells were found and " + CStr(lastCount) + " cells had no motion."
         End Sub
@@ -11175,9 +11175,9 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            If algTask.redList.oldrclist.Count = 0 Then Exit Sub ' next frame please...
+            If task.redList.oldrclist.Count = 0 Then Exit Sub ' next frame please...
 
-            Dim rc = algTask.redList.oldrclist(1)
+            Dim rc = task.redList.oldrclist(1)
             Static rcSave As oldrcData = rc, stableCount As Integer
             If rc.maxDStable <> rcSave.maxDStable Then
                 rcSave = rc
@@ -11188,7 +11188,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             dst3(rc.rect).SetTo(rc.color, rc.mask)
-            dst3.Circle(rc.maxDStable, algTask.DotSize + 2, cv.Scalar.Black)
+            dst3.Circle(rc.maxDStable, task.DotSize + 2, cv.Scalar.Black)
             DrawCircle(dst3, rc.maxDStable)
             labels(3) = "MaxDStable was the same for " + CStr(stableCount) + " frames"
         End Sub
@@ -11209,19 +11209,19 @@ Namespace VBClasses
             desc = "Display the RedMask_Basics output for both the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redLeft.Run(algTask.leftView)
+            redLeft.Run(task.leftView)
             dst2 = redLeft.dst2.Clone
             If standaloneTest() Then
                 For Each md In redLeft.redMask.mdList
-                    DrawCircle(dst2, md.maxDist, algTask.DotSize, algTask.highlight)
+                    DrawCircle(dst2, md.maxDist, task.DotSize, task.highlight)
                 Next
             End If
 
-            redRight.Run(algTask.rightView)
+            redRight.Run(task.rightView)
             dst3 = redRight.dst2.Clone
             If standaloneTest() Then
                 For Each md In redRight.redMask.mdList
-                    DrawCircle(dst3, md.maxDist, algTask.DotSize, algTask.highlight)
+                    DrawCircle(dst3, md.maxDist, task.DotSize, task.highlight)
                 Next
             End If
             labels(2) = redLeft.labels(2)
@@ -11241,8 +11241,8 @@ Namespace VBClasses
             desc = "Segment the right view image with RedMask_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = algTask.rightView.Clone
-            fLess.Run(algTask.rightView)
+            dst3 = task.rightView.Clone
+            fLess.Run(task.rightView)
             dst2 = fLess.dst2
             redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             dst2 = PaletteFull(redMask.dst2)
@@ -11263,7 +11263,7 @@ Namespace VBClasses
             desc = "Segment the left view image with RedMask_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = algTask.leftView
+            dst3 = task.leftView
             fLess.Run(src)
             redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             dst2 = PaletteFull(redMask.dst2)
@@ -11302,7 +11302,7 @@ Namespace VBClasses
             desc = "Use the depth outline as input to RedList_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            outline.Run(algTask.depthMask)
+            outline.Run(task.depthMask)
 
             color8U.Run(src)
             dst1 = color8U.dst2 + 1
@@ -11335,12 +11335,12 @@ Namespace VBClasses
 
     Public Class XO_RedList_Reduction : Inherits TaskParent
         Public Sub New()
-            algTask.gOptions.setHistogramBins(20)
+            task.gOptions.setHistogramBins(20)
             desc = "Segment the image based On both the reduced color"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            dst3 = algTask.redList.rcMap
+            dst3 = task.redList.rcMap
         End Sub
     End Class
 
@@ -11362,13 +11362,13 @@ Namespace VBClasses
 
             Dim changedPixels = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero
             Dim changedCells As Integer
-            For Each rc As oldrcData In algTask.redList.oldrclist
+            For Each rc As oldrcData In task.redList.oldrclist
                 If rc.indexLast = 0 Then changedCells += 1
             Next
 
             dst2Last = dst2.Clone
-            If algTask.heartBeat Then
-                labels(2) = "Changed cells = " + Format(changedCells, "000") + " cells or " + Format(changedCells / algTask.redList.oldrclist.Count, "0%")
+            If task.heartBeat Then
+                labels(2) = "Changed cells = " + Format(changedCells, "000") + " cells or " + Format(changedCells / task.redList.oldrclist.Count, "0%")
                 labels(3) = "Changed pixel total = " + Format(changedPixels / 1000, "0.0") + "k or " + Format(changedPixels / dst2.Total, "0%")
             End If
         End Sub
@@ -11392,7 +11392,7 @@ Namespace VBClasses
             options.Run()
             dst3 = runRedList(src, labels(3))
 
-            If algTask.optionsChanged Then
+            If task.optionsChanged Then
                 For i = 0 To oldrclist.Count - 1
                     oldrclist(i) = New List(Of oldrcData)
                     cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -11403,14 +11403,14 @@ Namespace VBClasses
 
             Dim sortedCells As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
             For i = options.startRegion To options.endRegion
-                algTask.redList.rcMap = cellMaps(i)
+                task.redList.rcMap = cellMaps(i)
 
-                algTask.redList.oldrclist = oldrclist(i)
+                task.redList.oldrclist = oldrclist(i)
                 flood.inputRemoved = Not bin2.mats.mat(i)
                 flood.Run(bin2.mats.mat(i))
-                cellMaps(i) = algTask.redList.rcMap.Clone
-                oldrclist(i) = New List(Of oldrcData)(algTask.redList.oldrclist)
-                For Each orc In algTask.redList.oldrclist
+                cellMaps(i) = task.redList.rcMap.Clone
+                oldrclist(i) = New List(Of oldrcData)(task.redList.oldrclist)
+                For Each orc In task.redList.oldrclist
                     If orc.index = 0 Then Continue For
                     sortedCells.Add(orc.pixels, orc)
                 Next
@@ -11418,7 +11418,7 @@ Namespace VBClasses
 
             dst2 = RebuildRCMap(sortedCells)
 
-            If algTask.heartBeat Then labels(2) = CStr(algTask.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
+            If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
         End Sub
     End Class
 
@@ -11431,7 +11431,7 @@ Namespace VBClasses
         Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Dim reduction As New Reduction_Basics
         Public Sub New()
-            algTask.gOptions.UseMotionMask.Checked = False
+            task.gOptions.UseMotionMask.Checked = False
             desc = "Use RedColor for regions with no depth to add cells to RedCloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -11439,10 +11439,10 @@ Namespace VBClasses
 
             Static rcListLast = New List(Of rcData)
             Dim rcMapLast = rcMap.clone
-            rcList = New List(Of rcData)(algTask.redCloud.rcList)
+            rcList = New List(Of rcData)(task.redCloud.rcList)
 
-            dst3 = algTask.gray
-            dst3.SetTo(0, algTask.depthMask)
+            dst3 = task.gray
+            dst3.SetTo(0, task.depthMask)
             reduction.Run(dst3)
             dst1 = reduction.dst2 - 1
 
@@ -11462,7 +11462,7 @@ Namespace VBClasses
                             'If count >= minCount Then
                             Dim pc = New rcData(dst3(rect), rect, index)
                             If pc Is Nothing Then Continue For
-                            pc.color = algTask.scalarColors(pc.index)
+                            pc.color = task.scalarColors(pc.index)
                             newList.Add(pc)
                             'dst1(pc.rect).SetTo(pc.index Mod 255, pc.mask)
                             SetTrueText(CStr(pc.index), pc.rect.TopLeft)
@@ -11476,7 +11476,7 @@ Namespace VBClasses
             Next
 
             RedCloud_Cell.selectCell(rcMap, rcList)
-            If algTask.rcD IsNot Nothing Then strOut = algTask.rcD.displayCell()
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
 
             labels(2) = "Cells found = " + CStr(rcList.Count) + " and " + CStr(newList.Count) + " were color only cells."
@@ -11503,16 +11503,16 @@ Namespace VBClasses
             diff.Run(src)
             dst2 = diff.dst2
 
-            If algTask.heartBeat Then dst3 = src
-            lineHistory.Add(algTask.lines.lpList)
+            If task.heartBeat Then dst3 = src
+            lineHistory.Add(task.lines.lpList)
             For Each lplist In lineHistory
                 For Each lp In lplist
                     vbc.DrawLine(dst3, lp.p1, lp.p2)
                 Next
             Next
-            If lineHistory.Count > algTask.frameHistoryCount Then lineHistory.RemoveAt(0)
+            If lineHistory.Count > task.frameHistoryCount Then lineHistory.RemoveAt(0)
 
-            labels(2) = CStr(algTask.lines.lpList.Count) + " lines were found in the diff output"
+            labels(2) = CStr(task.lines.lpList.Count) + " lines were found in the diff output"
         End Sub
     End Class
 
@@ -11533,7 +11533,7 @@ Namespace VBClasses
             labels(2) = bPoints.labels(2)
 
             Dim linesFound As New List(Of Byte)
-            Dim ptList(algTask.lines.lpList.Count - 1) As List(Of cv.Point)
+            Dim ptList(task.lines.lpList.Count - 1) As List(Of cv.Point)
             Dim lpRectMap = XO_Line_CoreNew.createMap()
             For Each bp In bPoints.ptList
                 Dim val = lpRectMap.Get(Of Byte)(bp.Y, bp.X)
@@ -11558,7 +11558,7 @@ Namespace VBClasses
             Next
 
             For Each index In linesFound
-                Dim lp = algTask.lines.lpList(index - 1)
+                Dim lp = task.lines.lpList(index - 1)
             Next
             labels(3) = CStr(linesFound.Count) + " lines were confirmed by brick points."
         End Sub
@@ -11573,27 +11573,27 @@ Namespace VBClasses
         Public cellAge(0) As Integer
         Public motionFlags(0) As Boolean
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             labels(3) = "Below Is the difference between the current image And the dst2 at left which Is composed Using the motion mask."
             desc = "Isolate all motion In the scene"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If lastColor.Count <> algTask.gridRects.Count Then
-                ReDim lastColor(algTask.gridRects.Count - 1)
-                ReDim cellAge(algTask.gridRects.Count - 1)
+            If lastColor.Count <> task.gridRects.Count Then
+                ReDim lastColor(task.gridRects.Count - 1)
+                ReDim cellAge(task.gridRects.Count - 1)
             End If
 
             Dim colorstdev As cv.Scalar, colorMean As cv.Scalar
-            ReDim motionFlags(algTask.gridRects.Count - 1)
+            ReDim motionFlags(task.gridRects.Count - 1)
             Dim motionList As New List(Of Integer)
-            For i = 0 To algTask.gridRects.Count - 1
-                cv.Cv2.MeanStdDev(src(algTask.gridRects(i)), colorMean, colorstdev)
+            For i = 0 To task.gridRects.Count - 1
+                cv.Cv2.MeanStdDev(src(task.gridRects(i)), colorMean, colorstdev)
                 Dim colorVec = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
                 Dim colorChange = distance3D(colorVec, lastColor(i))
-                If colorChange > algTask.motionThreshold Then
+                If colorChange > task.motionThreshold Then
                     lastColor(i) = colorVec
-                    For Each index In algTask.grid.gridNeighbors(i)
+                    For Each index In task.grid.gridNeighbors(i)
                         If motionList.Contains(index) = False Then
                             motionFlags(index) = True
                             motionList.Add(index)
@@ -11604,16 +11604,16 @@ Namespace VBClasses
 
             dst1.SetTo(0)
             For Each i In motionList
-                dst1(algTask.gridRects(i)).SetTo(255)
+                dst1(task.gridRects(i)).SetTo(255)
                 motionFlags(i) = True
             Next
 
-            labels(2) = Format(motionList.Count / algTask.gridRects.Count, "00%") + " Of bricks had motion."
+            labels(2) = Format(motionList.Count / task.gridRects.Count, "00%") + " Of bricks had motion."
 
-            If algTask.gOptions.UseMotionMask.Checked = False Then dst1.SetTo(255)
+            If task.gOptions.UseMotionMask.Checked = False Then dst1.SetTo(255)
 
             If standaloneTest() Then
-                If algTask.gOptions.UseMotionMask.Checked Then src.CopyTo(dst2, dst3)
+                If task.gOptions.UseMotionMask.Checked Then src.CopyTo(dst2, dst3)
                 Static diff As New Diff_Basics
                 diff.lastFrame = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 diff.Run(src)
@@ -11621,8 +11621,8 @@ Namespace VBClasses
                 SetTrueText("NOTE: the differences below should be small - no artifacts should be present." + vbCrLf +
                         "Any differences that persist should not be visible in the RGB image at left." + vbCrLf, 3)
             End If
-            If algTask.heartBeat Then dst2 = src.Clone
-            algTask.motionMask = dst1.Clone
+            If task.heartBeat Then dst2 = src.Clone
+            task.motionMask = dst1.Clone
         End Sub
     End Class
 
@@ -11668,7 +11668,7 @@ Namespace VBClasses
                 Dim r = New cv.Rect(rects(i), rects(i + 1), rects(i + 2), rects(i + 3))
                 If r.Width * r.Height >= minPixels Then
                     RectList.Add(r)
-                    dst3.Rectangle(r, algTask.highlight, algTask.lineWidth)
+                    dst3.Rectangle(r, task.highlight, task.lineWidth)
                 End If
             Next
             labels(3) = CStr(RectList.Count) + " cells were found."
@@ -11687,28 +11687,28 @@ Namespace VBClasses
         Dim lastRects As New List(Of cv.Rect)
         Public Sub New()
             labels(3) = "The white spots show the difference of the constructed image from the current image."
-            desc = "Track algTask.gray using Motion_Enclosing to isolate the motion"
+            desc = "Track task.gray using Motion_Enclosing to isolate the motion"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             motion.Run(src)
             Dim r = motion.motionRect
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 dst2 = src.Clone
                 lastRects.Clear()
             Else
                 For Each rect In lastRects
                     r = r.Union(rect)
                 Next
-                dst2 = algTask.motionBasics.dst2
+                dst2 = task.motionBasics.dst2
                 lastRects.Add(r)
-                If lastRects.Count > algTask.frameHistoryCount Then lastRects.RemoveAt(0)
+                If lastRects.Count > task.frameHistoryCount Then lastRects.RemoveAt(0)
             End If
 
             If standaloneTest() Then
-                diff.lastFrame = algTask.gray
+                diff.lastFrame = task.gray
                 diff.Run(dst2)
                 dst3 = diff.dst3
-                dst3.Rectangle(r, white, algTask.lineWidth)
+                dst3.Rectangle(r, white, task.lineWidth)
             End If
         End Sub
     End Class
@@ -11741,9 +11741,9 @@ Namespace VBClasses
 
             Static lastFrame As cv.Mat = input.Clone
             dst3.SetTo(0)
-            Parallel.For(0, algTask.gridRects.Count,
+            Parallel.For(0, task.gridRects.Count,
         Sub(i)
-            Dim roi = algTask.gridRects(i)
+            Dim roi = task.gridRects(i)
             Dim correlation As New cv.Mat
             Dim mean As Single, stdev As Single
             cv.Cv2.MeanStdDev(input(roi), mean, stdev)
@@ -11751,15 +11751,15 @@ Namespace VBClasses
                 cv.Cv2.MatchTemplate(lastFrame(roi), input(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                 Dim mm As mmData = GetMinMax(correlation)
                 If mm.maxVal < ccThreshold / 1000 Then
-                    If (i Mod algTask.bricksPerCol) <> 0 Then dst3(algTask.gridRects(i - 1)).SetTo(255)
-                    If (i Mod algTask.bricksPerCol) < algTask.bricksPerCol And i < algTask.gridRects.Count - 1 Then dst3(algTask.gridRects(i + 1)).SetTo(255)
-                    If i > algTask.bricksPerCol Then
-                        dst3(algTask.gridRects(i - algTask.bricksPerCol)).SetTo(255)
-                        dst3(algTask.gridRects(i - algTask.bricksPerCol + 1)).SetTo(255)
+                    If (i Mod task.bricksPerCol) <> 0 Then dst3(task.gridRects(i - 1)).SetTo(255)
+                    If (i Mod task.bricksPerCol) < task.bricksPerCol And i < task.gridRects.Count - 1 Then dst3(task.gridRects(i + 1)).SetTo(255)
+                    If i > task.bricksPerCol Then
+                        dst3(task.gridRects(i - task.bricksPerCol)).SetTo(255)
+                        dst3(task.gridRects(i - task.bricksPerCol + 1)).SetTo(255)
                     End If
-                    If i < (algTask.gridRects.Count - algTask.bricksPerCol - 1) Then
-                        dst3(algTask.gridRects(i + algTask.bricksPerCol)).SetTo(255)
-                        dst3(algTask.gridRects(i + algTask.bricksPerCol + 1)).SetTo(255)
+                    If i < (task.gridRects.Count - task.bricksPerCol - 1) Then
+                        dst3(task.gridRects(i + task.bricksPerCol)).SetTo(255)
+                        dst3(task.gridRects(i + task.bricksPerCol + 1)).SetTo(255)
                     End If
                     dst3(roi).SetTo(255)
                 End If
@@ -11768,7 +11768,7 @@ Namespace VBClasses
 
             lastFrame = input.Clone
 
-            If algTask.heartBeat Then dst2 = src.Clone Else src.CopyTo(dst2, dst3)
+            If task.heartBeat Then dst2 = src.Clone Else src.CopyTo(dst2, dst3)
         End Sub
     End Class
 
@@ -11786,8 +11786,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Channels() <> 1 Then src = algTask.gray
-            If algTask.heartBeat Or dst1.Channels <> 1 Then
+            If src.Channels() <> 1 Then src = task.gray
+            If task.heartBeat Or dst1.Channels <> 1 Then
                 dst1 = src.Clone
                 dst2.SetTo(0)
             End If
@@ -11825,7 +11825,7 @@ Namespace VBClasses
         Public bgSub As New BGSubtract_MOG2
         Dim rectList As New List(Of cv.Rect)
         Public Sub New()
-            algTask.redList = New RedList_Basics
+            task.redList = New RedList_Basics
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "The option-free version of Motion_BGSub"
         End Sub
@@ -11837,20 +11837,20 @@ Namespace VBClasses
 
             dst2 = src
 
-            algTask.redList.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
-            If algTask.redList.oldrclist.Count < 2 Then
+            task.redList.Run(src.Threshold(0, 255, cv.ThresholdTypes.Binary))
+            If task.redList.oldrclist.Count < 2 Then
                 rectList.Clear()
             Else
-                Dim nextRect = algTask.redList.oldrclist.ElementAt(1).rect
-                For i = 2 To algTask.redList.oldrclist.Count - 1
-                    Dim rc = algTask.redList.oldrclist.ElementAt(i)
+                Dim nextRect = task.redList.oldrclist.ElementAt(1).rect
+                For i = 2 To task.redList.oldrclist.Count - 1
+                    Dim rc = task.redList.oldrclist.ElementAt(i)
                     nextRect = nextRect.Union(rc.rect)
                 Next
             End If
 
             If standaloneTest() Then
-                If algTask.redList.oldrclist.Count > 1 Then
-                    labels(2) = CStr(algTask.redList.oldrclist.Count) + " RedMask cells had motion"
+                If task.redList.oldrclist.Count > 1 Then
+                    labels(2) = CStr(task.redList.oldrclist.Count) + " RedMask cells had motion"
                 Else
                     labels(2) = "No motion detected"
                 End If
@@ -11873,19 +11873,19 @@ Namespace VBClasses
             desc = "Isolate all motion in the scene"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.gOptions.UseMotionMask.Checked = False Then Exit Sub
+            If task.gOptions.UseMotionMask.Checked = False Then Exit Sub
 
-            If src.Channels <> 1 Then src = algTask.gray
-            If algTask.heartBeat Then dst2 = src.Clone
+            If src.Channels <> 1 Then src = task.gray
+            If task.heartBeat Then dst2 = src.Clone
 
             diff.Run(src)
 
             motionList.Clear()
             dst3.SetTo(0)
-            For i = 0 To algTask.gridRects.Count - 1
-                Dim diffCount = diff.dst2(algTask.gridRects(i)).CountNonZero
-                If diffCount >= algTask.motionThreshold Then
-                    For Each index In algTask.grid.gridNeighbors(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
+                If diffCount >= task.motionThreshold Then
+                    For Each index In task.grid.gridNeighbors(i)
                         If motionList.Contains(index) = False Then
                             motionList.Add(index)
                         End If
@@ -11898,16 +11898,16 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each lst In cellList
                 For Each index In lst
-                    dst3(algTask.gridRects(index)).SetTo(255)
+                    dst3(task.gridRects(index)).SetTo(255)
                 Next
             Next
 
-            If cellList.Count >= algTask.frameHistoryCount Then cellList.RemoveAt(0)
+            If cellList.Count >= task.frameHistoryCount Then cellList.RemoveAt(0)
             src.CopyTo(dst2, dst3)
-            algTask.motionMask = dst3.Clone
+            task.motionMask = dst3.Clone
 
             labels(2) = CStr(motionList.Count) + " grid rect's or " +
-                    Format(motionList.Count / algTask.gridRects.Count, "0.0%") +
+                    Format(motionList.Count / task.gridRects.Count, "0.0%") +
                     " of bricks had motion."
         End Sub
     End Class
@@ -11925,15 +11925,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             brickLine.Run(src)
             dst2 = brickLine.dst2
-            Static lastGray = algTask.gray.Clone
+            Static lastGray = task.gray.Clone
 
             Dim offsetX As New List(Of Single)
             Dim offsetY As New List(Of Single)
             dst3 = lastGray.clone
             For Each index In brickLine.bestBricks
-                Dim nabeRect = algTask.gridNabeRects(index)
-                match.template = lastGray(algTask.gridRects(index))
-                match.Run(algTask.gray(nabeRect))
+                Dim nabeRect = task.gridNabeRects(index)
+                match.template = lastGray(task.gridRects(index))
+                match.Run(task.gray(nabeRect))
 
                 Dim x = match.newCenter.X - nabeRect.Width / 2
                 Dim y = match.newCenter.Y - nabeRect.Height / 2
@@ -11946,7 +11946,7 @@ Namespace VBClasses
                 SetTrueText(Format(x, fmt0) + "/" + Format(y, fmt0), rect.TopLeft, 3)
             Next
 
-            lastGray = algTask.gray.Clone
+            lastGray = task.gray.Clone
             If offsetX.Count > 0 Then
                 labels(3) = "Average offset X/Y = " + Format(offsetX.Average(), fmt3) + "/" + Format(offsetY.Average(), fmt3)
             End If
@@ -11988,13 +11988,13 @@ Namespace VBClasses
             desc = "Identify the difference in pixels from one image to the next"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static lastGray As cv.Mat = algTask.gray.Clone
+            Static lastGray As cv.Mat = task.gray.Clone
 
-            dst2 = algTask.gray.Clone
+            dst2 = task.gray.Clone
             dst2 -= lastGray
-            dst3 = dst2.Threshold(algTask.motionThreshold, 255, cv.ThresholdTypes.Binary)
+            dst3 = dst2.Threshold(task.motionThreshold, 255, cv.ThresholdTypes.Binary)
 
-            lastGray = algTask.gray.Clone
+            lastGray = task.gray.Clone
         End Sub
     End Class
 
@@ -12022,11 +12022,11 @@ Namespace VBClasses
             options.Run()
 
             ' set a low threshold to make the results more visible.
-            Dim correlationThreshold = 0.95 ' If(algTask.gOptions.debugChecked, 0.5, 0.9)
-            If algTask.heartBeatLT Or gravitySnap.p1.X = 0 Or correlation < correlationThreshold Then
-                If inputRect.Width <> 0 Then algTask.centerRect = inputRect
-                template = src(algTask.centerRect).Clone
-                gravitySnap = algTask.lineGravity
+            Dim correlationThreshold = 0.95 ' If(task.gOptions.debugChecked, 0.5, 0.9)
+            If task.heartBeatLT Or gravitySnap.p1.X = 0 Or correlation < correlationThreshold Then
+                If inputRect.Width <> 0 Then task.centerRect = inputRect
+                template = src(task.centerRect).Clone
+                gravitySnap = task.lineGravity
             End If
 
             cv.Cv2.MatchTemplate(template, src, dst3, options.matchOption)
@@ -12035,24 +12035,24 @@ Namespace VBClasses
 
             correlation = mm.maxVal
             Dim w = template.Width, h = template.Height
-            matchCenter = New cv.Point(mm.maxLoc.X + algTask.centerRect.X, mm.maxLoc.Y + algTask.centerRect.Y)
+            matchCenter = New cv.Point(mm.maxLoc.X + task.centerRect.X, mm.maxLoc.Y + task.centerRect.Y)
             matchRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
 
             dst2 = src.Clone
-            dst2.Rectangle(matchRect, algTask.highlight, algTask.lineWidth)
+            dst2.Rectangle(matchRect, task.highlight, task.lineWidth)
 
             dst3 = dst3.Normalize(0, 255, cv.NormTypes.MinMax).Resize(dst2.Size)
-            DrawCircle(dst3, matchCenter, algTask.DotSize, cv.Scalar.Black)
+            DrawCircle(dst3, matchCenter, task.DotSize, cv.Scalar.Black)
 
             Dim smp = New lpData(gravitySnap.p1, gravitySnap.p2)
-            dst2.Line(smp.p1, smp.p2, algTask.highlight, algTask.lineWidth + 2, algTask.lineType)
+            dst2.Line(smp.p1, smp.p2, task.highlight, task.lineWidth + 2, task.lineType)
 
             Dim xDisp = matchCenter.X - dst2.Width / 2
             Dim yDisp = matchCenter.Y - dst2.Height / 2
             translation = New cv.Point2f(xDisp, yDisp)
 
-            Dim mp = algTask.lineGravity
-            dst2.Line(mp.p1, mp.p2, black, algTask.lineWidth, algTask.lineType)
+            Dim mp = task.lineGravity
+            dst2.Line(mp.p1, mp.p2, black, task.lineWidth, task.lineType)
 
             Dim sideAdjacent = dst2.Height / 2
             Dim sideOpposite = Math.Abs(smp.p1.X - dst2.Width / 2)
@@ -12086,37 +12086,37 @@ Namespace VBClasses
         Dim centerRect As cv.Rect
         Dim drawRotate As New Draw_RotatedRect
         Public Sub New()
-            algTask.kalman = New Kalman_Basics
-            ReDim algTask.kalman.kInput(2 - 1)
+            task.kalman = New Kalman_Basics
+            ReDim task.kalman.kInput(2 - 1)
             labels(3) = "Template for motion matchTemplate.  Shake the camera to see Kalman impact."
             desc = "Kalmanize the output of center rotation"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.firstPass Then centerRect = algTask.centerRect
+            If task.firstPass Then centerRect = task.centerRect
             dst2 = src.Clone
             motion.Run(src)
 
             Dim newRect As cv.Rect
             If motion.translation.X = 0 And motion.translation.Y = 0 And motion.angle = 0 Then
                 newRect = centerRect
-                drawRotate.rr = New cv.RotatedRect(motion.matchCenter, algTask.centerRect.Size, 0)
+                drawRotate.rr = New cv.RotatedRect(motion.matchCenter, task.centerRect.Size, 0)
             Else
-                algTask.kalman.kInput = {motion.translation.X, motion.translation.Y}
-                algTask.kalman.Run(emptyMat)
+                task.kalman.kInput = {motion.translation.X, motion.translation.Y}
+                task.kalman.Run(emptyMat)
 
-                newRect = New cv.Rect(centerRect.X + algTask.kalman.kOutput(0), centerRect.Y + algTask.kalman.kOutput(1),
+                newRect = New cv.Rect(centerRect.X + task.kalman.kOutput(0), centerRect.Y + task.kalman.kOutput(1),
                                   centerRect.Width, centerRect.Height)
 
                 kalmanRR.kInput = New Single() {motion.matchCenter.X, motion.matchCenter.Y, motion.angle}
                 kalmanRR.Run(src)
 
                 Dim pt = New cv.Point2f(kalmanRR.kOutput(0), kalmanRR.kOutput(1))
-                drawRotate.rr = New cv.RotatedRect(pt, algTask.centerRect.Size, kalmanRR.kOutput(2))
+                drawRotate.rr = New cv.RotatedRect(pt, task.centerRect.Size, kalmanRR.kOutput(2))
             End If
 
             drawRotate.Run(dst2)
             dst2 = drawRotate.dst2
-            dst2.Rectangle(newRect, algTask.highlight, algTask.lineWidth)
+            dst2.Rectangle(newRect, task.highlight, task.lineWidth)
 
             dst3(centerRect) = motion.template
             labels(2) = motion.labels(2)
@@ -12133,7 +12133,7 @@ Namespace VBClasses
         Dim leftC As New XO_Motion_CenterRect
         Dim rightC As New XO_Motion_CenterRect
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Calculate translation and rotation for both left and right images"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -12141,19 +12141,19 @@ Namespace VBClasses
             dst1 = CenterC.dst2
             labels(1) = CenterC.labels(2)
 
-            If algTask.leftView.Channels = 1 Then
-                leftC.Run(algTask.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+            If task.leftView.Channels = 1 Then
+                leftC.Run(task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
             Else
-                leftC.Run(algTask.leftView)
+                leftC.Run(task.leftView)
             End If
 
             dst2 = leftC.dst2
             labels(2) = leftC.labels(2)
 
-            If algTask.rightView.Channels = 1 Then
-                rightC.Run(algTask.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+            If task.rightView.Channels = 1 Then
+                rightC.Run(task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
             Else
-                rightC.Run(algTask.rightView)
+                rightC.Run(task.rightView)
             End If
 
             dst3 = rightC.dst2
@@ -12220,13 +12220,13 @@ Namespace VBClasses
 
                 Dim pair = New lpData(topPoint, botPoint)
                 mp = findEdgePoints(pair)
-                dst3.Line(mp.p1, mp.p2, algTask.highlight, algTask.lineWidth + 1, algTask.lineType)
+                dst3.Line(mp.p1, mp.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
                 Dim sideAdjacent = dst2.Height
                 Dim sideOpposite = mp.p1.X - mp.p2.X
                 angle = Math.Atan(sideOpposite / sideAdjacent) * 180 / cv.Cv2.PI
                 If mp.p1.Y = dst2.Height Then angle = -angle
-                rotatedRect = New cv.RotatedRect(mm.maxLoc, algTask.centerRect.Size, angle)
+                rotatedRect = New cv.RotatedRect(mm.maxLoc, task.centerRect.Size, angle)
                 labels(3) = "angle = " + Format(angle, fmt1) + " degrees"
                 drawRotate.rr = rotatedRect
                 drawRotate.Run(dst3)
@@ -12262,10 +12262,10 @@ Namespace VBClasses
             dst3 = runRedList(dst2, labels(2), Not dst2)
 
             motionRect = New cv.Rect
-            If algTask.redList.oldrclist.Count < 2 Then Exit Sub
-            motionRect = algTask.redList.oldrclist.ElementAt(1).rect
-            For i = 2 To algTask.redList.oldrclist.Count - 1
-                Dim rc = algTask.redList.oldrclist.ElementAt(i)
+            If task.redList.oldrclist.Count < 2 Then Exit Sub
+            motionRect = task.redList.oldrclist.ElementAt(1).rect
+            For i = 2 To task.redList.oldrclist.Count - 1
+                Dim rc = task.redList.oldrclist.ElementAt(i)
                 motionRect = motionRect.Union(rc.rect)
             Next
 
@@ -12288,9 +12288,9 @@ Namespace VBClasses
             desc = "Determine the motion of the end points of the longest line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = algTask.gray
+            dst2 = task.gray
 
-            Dim lp = New lpData(algTask.lineLongest.pE1, algTask.lineLongest.pE2)
+            Dim lp = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
             vbc.DrawLine(dst2, lp, white)
         End Sub
     End Class
@@ -12320,7 +12320,7 @@ Namespace VBClasses
 
             If motionTest Then changeCount += 1
             frames += 1
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 strOut = "Pixels changed = " + CStr(changedPixels) + " at last heartbeat.  Since last heartbeat: " +
                      Format(changeCount / frames, "0%") + " of frames were different"
                 changeCount = 0
@@ -12337,8 +12337,8 @@ Namespace VBClasses
     Public Class XO_RedCloud_MotionSimple : Inherits TaskParent
         Dim redContours As New RedCloud_Basics
         Public Sub New()
-            algTask.gOptions.HistBinBar.Maximum = 255
-            algTask.gOptions.HistBinBar.Value = 255
+            task.gOptions.HistBinBar.Maximum = 255
+            task.gOptions.HistBinBar.Value = 255
             desc = "Use motion to identify which cells changed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -12347,21 +12347,21 @@ Namespace VBClasses
             dst2 = redContours.dst2
             labels(2) = redContours.labels(2)
 
-            dst1.SetTo(0, Not algTask.motionMask)
+            dst1.SetTo(0, Not task.motionMask)
 
             Dim histogram As New cv.Mat
             Dim ranges = {New cv.Rangef(1, 256)}
-            cv.Cv2.CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {algTask.histogramBins}, ranges)
+            cv.Cv2.CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
 
             Dim histArray(histogram.Rows - 1) As Single
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
             Dim pcUsed As New List(Of Integer)
-            If algTask.heartBeat Then dst3 = dst2.Clone
+            If task.heartBeat Then dst3 = dst2.Clone
             For i = 1 To histArray.Count - 1
                 If histArray(i) > 0 And pcUsed.Contains(i) = False Then
                     Dim rc = redContours.rcList(i)
-                    dst3(rc.rect).SetTo(algTask.scalarColors(rc.index), rc.mask)
+                    dst3(rc.rect).SetTo(task.scalarColors(rc.index), rc.mask)
                     pcUsed.Add(i)
                 End If
             Next
@@ -12405,8 +12405,8 @@ Namespace VBClasses
 
             If standalone Then dst3 = PaletteFull(dst2)
 
-            If algTask.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
-            If algTask.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
+            If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
+            If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
         Public Sub Close()
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
@@ -12431,18 +12431,18 @@ Namespace VBClasses
             dst3.SetTo(0)
 
             Dim newContour As New List(Of cv.Point)
-            rc = algTask.oldrcD
+            rc = task.oldrcD
             If rc.contour.Count = 0 Then Exit Sub
             Dim p1 As cv.Point, p2 As cv.Point
             newContour.Add(p1)
             For i = 0 To rc.contour.Count - 2
                 p1 = rc.contour(i)
                 p2 = rc.contour(i + 1)
-                dst3(rc.rect).Line(p1, p2, white, algTask.lineWidth + 1)
+                dst3(rc.rect).Line(p1, p2, white, task.lineWidth + 1)
                 newContour.Add(p2)
             Next
             rc.contour = New List(Of cv.Point)(newContour)
-            dst3(rc.rect).Line(rc.contour(rc.contour.Count - 1), rc.contour(0), white, algTask.lineWidth + 1)
+            dst3(rc.rect).Line(rc.contour(rc.contour.Count - 1), rc.contour(0), white, task.lineWidth + 1)
 
             labels(2) = "Input points = " + CStr(rc.contour.Count)
         End Sub
@@ -12457,11 +12457,11 @@ Namespace VBClasses
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public percentImage As Single
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Build contours for each cell"
         End Sub
         Public Function motionDisplayCell() As rcData
-            Dim clickIndex = rcMap.Get(Of Byte)(algTask.ClickPoint.Y, algTask.ClickPoint.X) - 1
+            Dim clickIndex = rcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
             If clickIndex >= 0 Then
                 Return rcList(clickIndex)
             End If
@@ -12469,7 +12469,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst3 = runRedCloud(src, labels(3))
-            labels(2) = algTask.redCloud.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
+            labels(2) = task.redCloud.labels(2) + If(standalone, "  Age of each cell is displayed as well.", "")
 
             Static rcListLast = New List(Of rcData)(rcList)
             Static rcMapLast As cv.Mat = rcMap.Clone
@@ -12479,12 +12479,12 @@ Namespace VBClasses
             rcMap.SetTo(0)
             dst2.SetTo(0)
             Dim unchangedCount As Integer
-            For Each rc In algTask.redCloud.rcList
+            For Each rc In task.redCloud.rcList
                 Dim r1 = rc.rect
                 r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
                 Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
                 If indexLast > 0 Then r2 = rcListLast(indexLast).rect
-                If indexLast >= 0 And r1.IntersectsWith(r2) And algTask.optionsChanged = False Then
+                If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                     If rc.rect.Contains(rcListLast(indexLast).maxdist) Then
                         rc = rcListLast(indexLast)
                         unchangedCount += 1
@@ -12496,13 +12496,13 @@ Namespace VBClasses
                 rc.index = rcList.Count + 1
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                dst2.Circle(rc.maxDist, algTask.DotSize, algTask.highlight, -1)
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
                 SetTrueText(CStr(rc.age), rc.maxDist)
                 rcList.Add(rc)
             Next
 
-            RedCloud_Cell.selectCell(algTask.redCloud.rcMap, algTask.redCloud.rcList)
-            If algTask.rcD IsNot Nothing Then strOut = algTask.rcD.displayCell + vbCrLf + vbCrLf +
+            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell + vbCrLf + vbCrLf +
                     Format(percentImage, "0.0%") + " of image" + vbCrLf +
                     CStr(rcList.Count) + " cells present"
 
@@ -12518,24 +12518,24 @@ Namespace VBClasses
 
     Public Class XO_RedCloud_MotionCells : Inherits TaskParent
         Public Sub New()
-            algTask.gOptions.HistBinBar.Maximum = 255
-            algTask.gOptions.HistBinBar.Value = 255
+            task.gOptions.HistBinBar.Maximum = 255
+            task.gOptions.HistBinBar.Value = 255
             desc = "Use motion to identify which cells changed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedCloud(src, labels(2))
-            dst1 = algTask.redCloud.dst1
+            dst1 = task.redCloud.dst1
 
             dst3.SetTo(0)
             Dim count As Integer
-            For Each rc In algTask.redCloud.rcList
+            For Each rc In task.redCloud.rcList
                 If rc.age > 10 Then
                     dst3(rc.rect).SetTo(rc.color, rc.mask)
                     count += 1
                 Else
                     dst3(rc.rect).SetTo(white, rc.mask)
                 End If
-                dst3.Circle(rc.maxDist, algTask.DotSize, algTask.highlight, -1)
+                dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
                 SetTrueText(CStr(rc.age), rc.maxDist)
             Next
             labels(3) = CStr(count) + " cells had no RGB motion... white cells had motion."
@@ -12552,12 +12552,12 @@ Namespace VBClasses
         Public rcMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public prepEdges As New RedPrep_Basics
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             redCore.redSweep.prepEdges = prepEdges
             desc = "Run RedCloud_Map on the heartbeat but just floodFill at maxDist otherwise."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.heartBeat Or algTask.optionsChanged Then
+            If task.heartBeat Or task.optionsChanged Then
                 redCore.Run(src)
                 dst2 = redCore.dst2
                 labels(2) = redCore.labels(2)
@@ -12603,9 +12603,9 @@ Namespace VBClasses
             End If
 
             RedCloud_Cell.selectCell(rcMap, rcList)
-            If algTask.rcD IsNot Nothing Then
-                strOut = algTask.rcD.displayCell + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf + CStr(rcList.Count) + " cells present"
-                algTask.color(algTask.rcD.rect).SetTo(white, algTask.rcD.mask)
+            If task.rcD IsNot Nothing Then
+                strOut = task.rcD.displayCell + vbCrLf + vbCrLf + Format(percentImage, "0.0%") + " of image" + vbCrLf + CStr(rcList.Count) + " cells present"
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
             End If
             SetTrueText(strOut, 1)
         End Sub
@@ -12625,7 +12625,7 @@ Namespace VBClasses
                 SetTrueText("RedCell_Color is run by numerous algorithms but generates no output when standalone. ", 2)
                 Exit Sub
             End If
-            If algTask.redList Is Nothing Then algTask.redList = New RedList_Basics
+            If task.redList Is Nothing Then task.redList = New RedList_Basics
 
             Dim initialList As New List(Of oldrcData)
             For i = 0 To mdList.Count - 1
@@ -12635,13 +12635,13 @@ Namespace VBClasses
                 rc.mask = mdList(i).mask
                 rc.maxDist = mdList(i).maxDist
                 rc.maxDStable = rc.maxDist
-                rc.indexLast = algTask.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc.indexLast = task.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rc.contour = mdList(i).contour
                 DrawTour(rc.mask, rc.contour, 255, -1)
                 rc.pixels = mdList(i).mask.CountNonZero
-                If rc.indexLast >= algTask.redList.oldrclist.Count Then rc.indexLast = 0
+                If rc.indexLast >= task.redList.oldrclist.Count Then rc.indexLast = 0
                 If rc.indexLast > 0 Then
-                    Dim lrc = algTask.redList.oldrclist(rc.indexLast)
+                    Dim lrc = task.redList.oldrclist(rc.indexLast)
                     rc.age = lrc.age + 1
                     rc.depth = lrc.depth
                     rc.depthPixels = lrc.depthPixels
@@ -12654,7 +12654,7 @@ Namespace VBClasses
                         rc.color = yellow
                     Else
                         ' verify that the maxDStable is still good.
-                        Dim v1 = algTask.redList.rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                        Dim v1 = task.redList.rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                         If v1 <> lrc.index Then
                             rc.maxDStable = rc.maxDist
 
@@ -12665,8 +12665,8 @@ Namespace VBClasses
                     rc.age = 1
                 End If
 
-                Dim brickIndex = algTask.gridMap.Get(Of Integer)(rc.maxDStable.Y, rc.maxDStable.X)
-                rc.color = algTask.scalarColors(brickIndex Mod 255)
+                Dim brickIndex = task.gridMap.Get(Of Integer)(rc.maxDStable.Y, rc.maxDStable.X)
+                rc.color = task.scalarColors(brickIndex Mod 255)
                 initialList.Add(rc)
             Next
 
@@ -12679,15 +12679,15 @@ Namespace VBClasses
                 If rc.pixels = 0 Then Continue For
 
                 Dim depthMask = rc.mask.Clone
-                depthMask.SetTo(0, algTask.noDepthMask(rc.rect))
+                depthMask.SetTo(0, task.noDepthMask(rc.rect))
                 Dim depthPixels = depthMask.CountNonZero
 
                 If depthPixels / rc.pixels > 0.1 Then
-                    rc.mmX = GetMinMax(algTask.pcSplit(0)(rc.rect), depthMask)
-                    rc.mmY = GetMinMax(algTask.pcSplit(1)(rc.rect), depthMask)
-                    rc.mmZ = GetMinMax(algTask.pcSplit(2)(rc.rect), depthMask)
+                    rc.mmX = GetMinMax(task.pcSplit(0)(rc.rect), depthMask)
+                    rc.mmY = GetMinMax(task.pcSplit(1)(rc.rect), depthMask)
+                    rc.mmZ = GetMinMax(task.pcSplit(2)(rc.rect), depthMask)
 
-                    cv.Cv2.MeanStdDev(algTask.pointCloud(rc.rect), depthMean, depthStdev, depthMask)
+                    cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, depthMask)
                     rc.depth = depthMean(2)
                     If Single.IsNaN(rc.depth) Or rc.depth < 0 Then rc.depth = 0
                 End If
@@ -12696,9 +12696,9 @@ Namespace VBClasses
                 sortedCells.Add(rc.pixels, rc)
             Next
 
-            If algTask.heartBeat Then
-                labels(2) = CStr(algTask.redList.oldrclist.Count) + " total cells (shown with '" + algTask.gOptions.trackingLabel + "' and " +
-                        CStr(algTask.redList.oldrclist.Count - rcNewCount) + " matched to previous frame"
+            If task.heartBeat Then
+                labels(2) = CStr(task.redList.oldrclist.Count) + " total cells (shown with '" + task.gOptions.trackingLabel + "' and " +
+                        CStr(task.redList.oldrclist.Count - rcNewCount) + " matched to previous frame"
             End If
             dst2 = RebuildRCMap(sortedCells)
         End Sub
@@ -12718,7 +12718,7 @@ Namespace VBClasses
                 SetTrueText("RedCell_Color is run by numerous algorithms but generates no output when standalone. ", 2)
                 Exit Sub
             End If
-            If algTask.redList Is Nothing Then algTask.redList = New RedList_Basics
+            If task.redList Is Nothing Then task.redList = New RedList_Basics
 
             Dim initialList As New List(Of oldrcData)
             For i = 0 To mdList.Count - 1
@@ -12728,13 +12728,13 @@ Namespace VBClasses
                 rc.mask = mdList(i).mask
                 rc.maxDist = mdList(i).maxDist
                 rc.maxDStable = rc.maxDist
-                rc.indexLast = algTask.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc.indexLast = task.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 rc.contour = mdList(i).contour
                 DrawTour(rc.mask, rc.contour, 255, -1)
                 rc.pixels = mdList(i).mask.CountNonZero
-                If rc.indexLast >= algTask.redList.oldrclist.Count Then rc.indexLast = 0
+                If rc.indexLast >= task.redList.oldrclist.Count Then rc.indexLast = 0
                 If rc.indexLast > 0 Then
-                    Dim lrc = algTask.redList.oldrclist(rc.indexLast)
+                    Dim lrc = task.redList.oldrclist(rc.indexLast)
                     rc.age = lrc.age + 1
                     rc.depth = lrc.depth
                     rc.depthPixels = lrc.depthPixels
@@ -12747,7 +12747,7 @@ Namespace VBClasses
                         rc.color = yellow
                     Else
                         ' verify that the maxDStable is still good.
-                        Dim v1 = algTask.redList.rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
+                        Dim v1 = task.redList.rcMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X)
                         If v1 <> lrc.index Then
                             rc.maxDStable = rc.maxDist
 
@@ -12758,8 +12758,8 @@ Namespace VBClasses
                     rc.age = 1
                 End If
 
-                Dim brickIndex = algTask.gridMap.Get(Of Integer)(rc.maxDStable.Y, rc.maxDStable.X)
-                rc.color = algTask.scalarColors(brickIndex Mod 255)
+                Dim brickIndex = task.gridMap.Get(Of Integer)(rc.maxDStable.Y, rc.maxDStable.X)
+                rc.color = task.scalarColors(brickIndex Mod 255)
                 initialList.Add(rc)
             Next
 
@@ -12772,15 +12772,15 @@ Namespace VBClasses
                 If rc.pixels = 0 Then Continue For
 
                 Dim depthMask = rc.mask.Clone
-                depthMask.SetTo(0, algTask.noDepthMask(rc.rect))
+                depthMask.SetTo(0, task.noDepthMask(rc.rect))
                 Dim depthPixels = depthMask.CountNonZero
 
                 If depthPixels / rc.pixels > 0.1 Then
-                    rc.mmX = GetMinMax(algTask.pcSplit(0)(rc.rect), depthMask)
-                    rc.mmY = GetMinMax(algTask.pcSplit(1)(rc.rect), depthMask)
-                    rc.mmZ = GetMinMax(algTask.pcSplit(2)(rc.rect), depthMask)
+                    rc.mmX = GetMinMax(task.pcSplit(0)(rc.rect), depthMask)
+                    rc.mmY = GetMinMax(task.pcSplit(1)(rc.rect), depthMask)
+                    rc.mmZ = GetMinMax(task.pcSplit(2)(rc.rect), depthMask)
 
-                    cv.Cv2.MeanStdDev(algTask.pointCloud(rc.rect), depthMean, depthStdev, depthMask)
+                    cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, depthMask)
                     rc.depth = depthMean(2)
                     If Single.IsNaN(rc.depth) Or rc.depth < 0 Then rc.depth = 0
                 End If
@@ -12789,9 +12789,9 @@ Namespace VBClasses
                 sortedCells.Add(rc.pixels, rc)
             Next
 
-            If algTask.heartBeat Then
-                labels(2) = CStr(algTask.redList.oldrclist.Count) + " total cells (shown with '" + algTask.gOptions.trackingLabel + "' and " +
-                        CStr(algTask.redList.oldrclist.Count - rcNewCount) + " matched to previous frame"
+            If task.heartBeat Then
+                labels(2) = CStr(task.redList.oldrclist.Count) + " total cells (shown with '" + task.gOptions.trackingLabel + "' and " +
+                        CStr(task.redList.oldrclist.Count - rcNewCount) + " matched to previous frame"
             End If
             dst2 = RebuildRCMap(sortedCells)
         End Sub
@@ -12806,30 +12806,30 @@ Namespace VBClasses
             desc = "Show the image segmentation for both the point cloud and the color image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32F Then src = algTask.pointCloud
+            If src.Type <> cv.MatType.CV_32F Then src = task.pointCloud
             dst2 = runRedCloud(src, labels(2))
             dst3 = runRedColor(src, labels(3))
 
             If standaloneTest() Then
-                For Each rc In algTask.redCloud.rcList
-                    dst2.Circle(rc.maxDist, algTask.DotSize, algTask.highlight, -1)
+                For Each rc In task.redCloud.rcList
+                    dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
                     SetTrueText(CStr(rc.age), rc.maxDist)
                 Next
 
-                For Each rc In algTask.redColor.rcList
-                    dst3.Circle(rc.maxDist, algTask.DotSize, algTask.highlight, -1)
+                For Each rc In task.redColor.rcList
+                    dst3.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
                     SetTrueText(CStr(rc.age), rc.maxDist, 3)
                 Next
             End If
 
             Static picTag As Integer
-            If algTask.mouseClickFlag Then picTag = algTask.mousePicTag
+            If task.mouseClickFlag Then picTag = task.mousePicTag
             If picTag = 2 Then
-                RedCloud_Cell.selectCell(algTask.redCloud.rcMap, algTask.redCloud.rcList)
-                If algTask.rcD IsNot Nothing Then dst3(algTask.rcD.rect).SetTo(white, algTask.rcD.mask)
+                RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+                If task.rcD IsNot Nothing Then dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
             Else
-                RedCloud_Cell.selectCell(algTask.redColor.rcMap, algTask.redColor.rcList)
-                If algTask.rcD IsNot Nothing Then dst2(algTask.rcD.rect).SetTo(white, algTask.rcD.mask)
+                RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
+                If task.rcD IsNot Nothing Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
             End If
         End Sub
     End Class
@@ -12852,7 +12852,7 @@ Namespace VBClasses
             options.Run()
             dst3 = runRedColor(src, labels(3))
 
-            If algTask.optionsChanged Then
+            If task.optionsChanged Then
                 For i = 0 To rclist.Count - 1
                     rclist(i) = New List(Of rcData)
                     cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
@@ -12862,8 +12862,8 @@ Namespace VBClasses
             bin3.Run(src)
 
             For i = options.startRegion To options.endRegion
-                algTask.redColor.rcMap = cellMaps(i)
-                algTask.redColor.rcList = rclist(i)
+                task.redColor.rcMap = cellMaps(i)
+                task.redColor.rcList = rclist(i)
                 If i = 2 Then
                     flood.inputRemoved = bin3.bin3.mats.mat(0) Or bin3.bin3.mats.mat(1)
                     color8U.Run(src)
@@ -12872,8 +12872,8 @@ Namespace VBClasses
                     flood.inputRemoved = Not bin3.bin3.mats.mat(i)
                     flood.Run(bin3.bin3.mats.mat(i))
                 End If
-                cellMaps(i) = algTask.redColor.rcMap.Clone
-                rclist(i) = New List(Of rcData)(algTask.redColor.rcList)
+                cellMaps(i) = task.redColor.rcMap.Clone
+                rclist(i) = New List(Of rcData)(task.redColor.rcList)
             Next
 
             Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
@@ -12885,7 +12885,7 @@ Namespace VBClasses
 
             'dst2 = RebuildRCMap(sortedCells)
 
-            If algTask.heartBeat Then labels(2) = CStr(algTask.redColor.rcList.Count) + " cells were identified and matched to the previous image"
+            If task.heartBeat Then labels(2) = CStr(task.redColor.rcList.Count) + " cells were identified and matched to the previous image"
         End Sub
     End Class
 
@@ -12906,7 +12906,7 @@ Namespace VBClasses
             options.Run()
             dst3 = runRedList(src, labels(3))
 
-            If algTask.optionsChanged Then
+            If task.optionsChanged Then
                 For i = 0 To oldrclist.Count - 1
                     oldrclist(i) = New List(Of oldrcData)
                     cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -12917,12 +12917,12 @@ Namespace VBClasses
 
             Dim sortedCells As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
             For i = options.startRegion To options.endRegion
-                algTask.redList.rcMap = cellMaps(i)
-                algTask.redList.oldrclist = oldrclist(i)
+                task.redList.rcMap = cellMaps(i)
+                task.redList.oldrclist = oldrclist(i)
                 flood.inputRemoved = Not bin3.bin3.mats.mat(i)
                 flood.Run(bin3.bin3.mats.mat(i))
-                cellMaps(i) = algTask.redList.rcMap.Clone
-                oldrclist(i) = New List(Of oldrcData)(algTask.redList.oldrclist)
+                cellMaps(i) = task.redList.rcMap.Clone
+                oldrclist(i) = New List(Of oldrcData)(task.redList.oldrclist)
                 For Each rc In oldrclist(i)
                     If rc.index = 0 Then Continue For
                     sortedCells.Add(rc.pixels, rc)
@@ -12931,7 +12931,7 @@ Namespace VBClasses
 
             dst2 = RebuildRCMap(sortedCells)
 
-            If algTask.heartBeat Then labels(2) = CStr(algTask.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
+            If task.heartBeat Then labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
         End Sub
     End Class
 
@@ -12953,7 +12953,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Or buildinputRemoved Then
                 color8U.Run(src)
-                inputRemoved = algTask.pcSplit(2).InRange(algTask.MaxZmeters, algTask.MaxZmeters).ConvertScaleAbs()
+                inputRemoved = task.pcSplit(2).InRange(task.MaxZmeters, task.MaxZmeters).ConvertScaleAbs()
                 src = color8U.dst2
             End If
 
@@ -12966,9 +12966,9 @@ Namespace VBClasses
 
             dst2 = cellGen.dst2
 
-            If algTask.heartBeat Then labels(2) = $"{algTask.redList.oldrclist.Count} cells identified"
+            If task.heartBeat Then labels(2) = $"{task.redList.oldrclist.Count} cells identified"
 
-            If showSelected Then algTask.setSelectedCell()
+            If showSelected Then task.setSelectedCell()
         End Sub
     End Class
 
@@ -12982,7 +12982,7 @@ Namespace VBClasses
             desc = "Isolate points in 3D using the distance to the 8 neighboring points in the pointcloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32F Then src = algTask.pcSplit(2)
+            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, cppData, 0, cppData.Length)
@@ -13028,7 +13028,7 @@ Namespace VBClasses
             desc = "Isolate points in 3D by counting 8 neighboring Z points in the pointcloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32F Then src = algTask.pcSplit(2)
+            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, cppData, 0, cppData.Length)
@@ -13055,15 +13055,15 @@ Namespace VBClasses
             desc = "Measure a mask's size in any image and track the biggest regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels() <> 1 Then src = algTask.gray
-            src.SetTo(0, algTask.noDepthMask)
+            If src.Channels() <> 1 Then src = task.gray
+            src.SetTo(0, task.noDepthMask)
 
-            Dim threshold = algTask.brickSize * algTask.brickSize / 2
-            Dim activeList(algTask.gridRects.Count - 1) As Boolean
+            Dim threshold = task.brickSize * task.brickSize / 2
+            Dim activeList(task.gridRects.Count - 1) As Boolean
             dst3.SetTo(0)
-            Parallel.For(0, algTask.gridRects.Count,
+            Parallel.For(0, task.gridRects.Count,
              Sub(i)
-                 Dim roi = algTask.gridRects(i)
+                 Dim roi = task.gridRects(i)
                  Dim count = src(roi).CountNonZero
                  If count > threshold Then
                      dst3(roi).SetTo(white)
@@ -13075,7 +13075,7 @@ Namespace VBClasses
 
             For i = 0 To activeList.Count - 1
                 If activeList(i) Then
-                    Dim roi = algTask.gridRects(i)
+                    Dim roi = task.gridRects(i)
                     pointList.Add(New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2))
                 End If
             Next
@@ -13185,17 +13185,17 @@ Namespace VBClasses
         Public classCount As Integer
         Public Sub New()
             cPtr = EdgeLineRaw_Open()
-            If standalone Then algTask.gOptions.showMotionMask.Checked = True
+            If standalone Then task.gOptions.showMotionMask.Checked = True
             desc = "Use EdgeLines to find edges/lines but without using motionMask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = algTask.grayStable
+            If src.Channels <> 1 Then src = task.grayStable
 
             Dim cppData(src.Total - 1) As Byte
             Marshal.Copy(src.Data, cppData, 0, cppData.Length)
             Dim handlesrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
             Dim imagePtr = EdgeLineRaw_RunCPP(cPtr, handlesrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                          algTask.lineWidth)
+                                          task.lineWidth)
             handlesrc.Free()
             dst1 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32S, imagePtr)
             dst1.ConvertTo(dst2, cv.MatType.CV_8U)
@@ -13234,7 +13234,7 @@ Namespace VBClasses
                 segments.Add(segment)
             Next
             labels(2) = CStr(classCount) + " segments were found using " + CStr(pointCount) + " points. " +
-                    CStr(algTask.toggleOn)
+                    CStr(task.toggleOn)
 
             dst3.SetTo(0)
         End Sub
@@ -13253,7 +13253,7 @@ Namespace VBClasses
         Public options As New Options_Contours
         Public Sub New()
             labels(3) = "Details for the selected contour."
-            algTask.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
+            task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
             desc = "List retrieval mode contour finder"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -13284,7 +13284,7 @@ Namespace VBClasses
         Dim sortContours As New Contour_Sort
         Public Sub New()
             OptionParent.findRadio("CComp").Checked = True
-            algTask.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
+            task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics"
             desc = "CComp retrieval mode contour finder"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -13309,7 +13309,7 @@ Namespace VBClasses
     Public Class XO_Contour_Basics_FloodFill : Inherits TaskParent
         Public options As New Options_Contours
         Public contourList As New List(Of contourData)
-        Public contourMap As New cv.Mat(algTask.workRes, cv.MatType.CV_32F, 0)
+        Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
         Dim sortContours As New Contour_Sort
         Public Sub New()
             desc = "FloodFill retrieval mode contour finder"
@@ -13404,14 +13404,14 @@ Namespace VBClasses
 
     Public Class XO_Contour_SortTest : Inherits TaskParent
         Public Sub New()
-            If algTask.contours Is Nothing Then algTask.contours = New Contour_Basics_List
+            If task.contours Is Nothing Then task.contours = New Contour_Basics_List
             desc = "Test the contour sort (by size) algorithm nearby. Contour_Sort standalone does nothing."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            algTask.contours.Run(src)
-            dst2 = algTask.contours.dst2
-            labels = algTask.contours.labels
-            SetTrueText(algTask.contours.strOut, 3)
+            task.contours.Run(src)
+            dst2 = task.contours.dst2
+            labels = task.contours.labels
+            SetTrueText(task.contours.strOut, 3)
         End Sub
     End Class
 
@@ -13440,32 +13440,32 @@ Namespace VBClasses
     Public Class XO_Motion_BasicsOld : Inherits TaskParent
         Public mCore As New XO_Motion_CoreOld
         Public Sub New()
-            If standalone Then algTask.gOptions.showMotionMask.Checked = True
+            If standalone Then task.gOptions.showMotionMask.Checked = True
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-            labels(3) = "Updated algTask.motionRect"
+            labels(3) = "Updated task.motionRect"
             desc = "Use the motionlist of rects to create one motion rectangle."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.algorithmPrep = False Then Exit Sub
+            If task.algorithmPrep = False Then Exit Sub
 
             mCore.Run(src)
 
-            If algTask.heartBeat Then dst2 = algTask.gray
+            If task.heartBeat Then dst2 = task.gray
 
             dst3.SetTo(0)
             If mCore.motionList.Count > 0 Then
-                algTask.motionRect = algTask.gridRects(mCore.motionList(0))
+                task.motionRect = task.gridRects(mCore.motionList(0))
                 For Each index In mCore.motionList
-                    algTask.motionRect = algTask.motionRect.Union(algTask.gridRects(index))
+                    task.motionRect = task.motionRect.Union(task.gridRects(index))
                 Next
-                dst3(algTask.motionRect).SetTo(255)
-                algTask.gray(algTask.motionRect).CopyTo(dst2(algTask.motionRect))
+                dst3(task.motionRect).SetTo(255)
+                task.gray(task.motionRect).CopyTo(dst2(task.motionRect))
             Else
-                algTask.motionRect = New cv.Rect
+                task.motionRect = New cv.Rect
             End If
 
             labels(2) = CStr(mCore.motionList.Count) + " grid rect's or " +
-                    Format(mCore.motionList.Count / algTask.gridRects.Count, "0.0%") +
+                    Format(mCore.motionList.Count / task.gridRects.Count, "0.0%") +
                     " of bricks had motion."
         End Sub
     End Class
@@ -13478,23 +13478,23 @@ Namespace VBClasses
         Public motionList As New List(Of Integer)
         Dim diff As New Diff_Basics
         Public Sub New()
-            If standalone Then algTask.gOptions.showMotionMask.Checked = True
+            If standalone Then task.gOptions.showMotionMask.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             labels(3) = "The motion mask"
             desc = "Find all the grid rects that had motion since the last frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = algTask.gray
-            If algTask.heartBeat Or algTask.optionsChanged Then dst2 = src.Clone
+            If src.Channels <> 1 Then src = task.gray
+            If task.heartBeat Or task.optionsChanged Then dst2 = src.Clone
 
             diff.Run(src)
 
             motionList.Clear()
-            For i = 0 To algTask.gridRects.Count - 1
-                Dim diffCount = diff.dst2(algTask.gridRects(i)).CountNonZero
-                If diffCount >= algTask.motionThreshold Then
-                    For Each index In algTask.grid.gridNeighbors(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
+                If diffCount >= task.motionThreshold Then
+                    For Each index In task.grid.gridNeighbors(i)
                         If motionList.Contains(index) = False Then motionList.Add(index)
                     Next
                 End If
@@ -13502,12 +13502,12 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             For Each index In motionList
-                Dim rect = algTask.gridRects(index)
+                Dim rect = task.gridRects(index)
                 src(rect).CopyTo(dst2(rect))
                 dst3(rect).SetTo(255)
             Next
 
-            algTask.motionMask = dst3.Clone
+            task.motionMask = dst3.Clone
             labels(2) = CStr(motionList.Count) + " grid rects had motion."
         End Sub
     End Class
@@ -13542,7 +13542,7 @@ Namespace VBClasses
                 knn.queries.Add(pt)
             Next
 
-            If algTask.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+            If task.firstPass Then knn.trainInput = New List(Of cv.Point2f)(knn.queries)
 
             knn.Run(emptyMat)
 
@@ -13554,11 +13554,11 @@ Namespace VBClasses
                 If index >= match3.lpOutput.Count Then Continue For
                 If index >= lplast.Count And lplast.Count > 0 Then Continue For
                 Dim age As Integer = 1
-                If Math.Abs(lplast(index).angle - match3.lpOutput(index).angle) < algTask.angleThreshold Then
+                If Math.Abs(lplast(index).angle - match3.lpOutput(index).angle) < task.angleThreshold Then
                     Dim index1 = match3.lpOutput(index).p1GridIndex
                     Dim index2 = match3.lpOutput(index).p2GridIndex
-                    If algTask.grid.gridNeighbors(index1).Contains(lplast(index).p1GridIndex) And
-                    algTask.grid.gridNeighbors(index2).Contains(lplast(index).p2GridIndex) Then
+                    If task.grid.gridNeighbors(index1).Contains(lplast(index).p1GridIndex) And
+                    task.grid.gridNeighbors(index2).Contains(lplast(index).p2GridIndex) Then
                         age = lplast(index).age + 1
                     End If
                 End If
@@ -13579,7 +13579,7 @@ Namespace VBClasses
     Public Class XO_Line_TestAge : Inherits TaskParent
         Dim knnLine As New XO_Line_Generations
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Are there ever frames where no line is connected to a line on a previous frame?"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -13640,7 +13640,7 @@ Namespace VBClasses
             If knnLine.lpOutput.Count = 0 Then Exit Sub
             labels(2) = knnLine.labels(2)
 
-            If algTask.firstPass Then
+            If task.firstPass Then
                 stable.lpLast = knnLine.lpOutput(0)
                 stable.lp = stable.lpLast
             Else
@@ -13697,68 +13697,68 @@ Namespace VBClasses
             Return pc
         End Function
         Public Sub preparePointcloud()
-            If algTask.gOptions.gravityPointCloud.Checked Then
+            If task.gOptions.gravityPointCloud.Checked Then
                 '******* this is the gravity rotation *******
-                algTask.gravityCloud = (algTask.pointCloud.Reshape(1,
-                            algTask.rows * algTask.cols) * algTask.gMatrix).ToMat.Reshape(3, algTask.rows)
-                algTask.pointCloud = algTask.gravityCloud
+                task.gravityCloud = (task.pointCloud.Reshape(1,
+                            task.rows * task.cols) * task.gMatrix).ToMat.Reshape(3, task.rows)
+                task.pointCloud = task.gravityCloud
             End If
 
-            algTask.pcSplit = algTask.pointCloud.Split
+            task.pcSplit = task.pointCloud.Split
 
-            If algTask.optionsChanged Then
-                algTask.maxDepthMask = New cv.Mat(algTask.pcSplit(2).Size, cv.MatType.CV_8U, 0)
+            If task.optionsChanged Then
+                task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
             End If
-            If algTask.gOptions.TruncateDepth.Checked Then
-                algTask.pcSplit(2) = algTask.pcSplit(2).Threshold(algTask.MaxZmeters,
-                                                        algTask.MaxZmeters, cv.ThresholdTypes.Trunc)
-                algTask.maxDepthMask = algTask.pcSplit(2).InRange(algTask.MaxZmeters,
-                                                        algTask.MaxZmeters).ConvertScaleAbs()
-                cv.Cv2.Merge(algTask.pcSplit, algTask.pointCloud)
+            If task.gOptions.TruncateDepth.Checked Then
+                task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
+                                                        task.MaxZmeters, cv.ThresholdTypes.Trunc)
+                task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
+                                                        task.MaxZmeters).ConvertScaleAbs()
+                cv.Cv2.Merge(task.pcSplit, task.pointCloud)
             End If
 
-            algTask.depthMask = algTask.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-            algTask.noDepthMask = Not algTask.depthMask
+            task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            task.noDepthMask = Not task.depthMask
 
-            If algTask.xRange <> algTask.xRangeDefault Or algTask.yRange <> algTask.yRangeDefault Then
-                Dim xRatio = algTask.xRangeDefault / algTask.xRange
-                Dim yRatio = algTask.yRangeDefault / algTask.yRange
-                algTask.pcSplit(0) *= xRatio
-                algTask.pcSplit(1) *= yRatio
+            If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
+                Dim xRatio = task.xRangeDefault / task.xRange
+                Dim yRatio = task.yRangeDefault / task.yRange
+                task.pcSplit(0) *= xRatio
+                task.pcSplit(1) *= yRatio
 
-                cv.Cv2.Merge(algTask.pcSplit, algTask.pointCloud)
+                cv.Cv2.Merge(task.pcSplit, task.pointCloud)
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
 
-            If algTask.settings.cameraName = "StereoLabs ZED 2/2i" Then
-                originalPointcloud = checkNanInf(algTask.pointCloud).Clone
+            If task.settings.cameraName = "StereoLabs ZED 2/2i" Then
+                originalPointcloud = checkNanInf(task.pointCloud).Clone
             Else
-                originalPointcloud = algTask.pointCloud.Clone ' save the original camera pointcloud.
+                originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
             End If
 
-            If algTask.optionsChanged Then
-                If algTask.rangesCloud Is Nothing Then
-                    Dim rx = New cv.Vec2f(-algTask.xRangeDefault, algTask.xRangeDefault)
-                    Dim ry = New cv.Vec2f(-algTask.yRangeDefault, algTask.yRangeDefault)
-                    Dim rz = New cv.Vec2f(0, algTask.MaxZmeters)
-                    algTask.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1),
+            If task.optionsChanged Then
+                If task.rangesCloud Is Nothing Then
+                    Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+                    Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+                    Dim rz = New cv.Vec2f(0, task.MaxZmeters)
+                    task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1),
                                                     New cv.Rangef(ry.Item0, ry.Item1),
                                                     New cv.Rangef(rz.Item0, rz.Item1)}
                 End If
             End If
 
-            If algTask.gOptions.UseMotionMask.Checked Then
-                If algTask.heartBeatLT Or algTask.frameCount < 5 Or algTask.optionsChanged Then
-                    dst2 = algTask.pointCloud.Clone
+            If task.gOptions.UseMotionMask.Checked Then
+                If task.heartBeatLT Or task.frameCount < 5 Or task.optionsChanged Then
+                    dst2 = task.pointCloud.Clone
                 End If
 
-                If algTask.motionRect.Width = 0 And algTask.optionsChanged = False Then
-                    algTask.pointCloud = dst2
+                If task.motionRect.Width = 0 And task.optionsChanged = False Then
+                    task.pointCloud = dst2
                     Exit Sub ' nothing changed...
                 End If
-                algTask.pointCloud(algTask.motionRect).CopyTo(dst2(algTask.motionRect))
-                algTask.pointCloud = dst2
+                task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
+                task.pointCloud = dst2
             End If
 
             ' this will move the motion-updated pointcloud into production.
@@ -13768,9 +13768,9 @@ Namespace VBClasses
                 Static diff As New Diff_Depth32f
                 Dim split = originalPointcloud.Split()
                 diff.lastDepth32f = split(2)
-                diff.Run(algTask.pcSplit(2))
+                diff.Run(task.pcSplit(2))
                 dst3 = diff.dst2
-                dst3.Rectangle(algTask.motionRect, white, algTask.lineWidth)
+                dst3.Rectangle(task.motionRect, white, task.lineWidth)
             End If
         End Sub
     End Class
@@ -13783,23 +13783,23 @@ Namespace VBClasses
         Dim diff As New Diff_Basics
         Dim motionLists As New List(Of List(Of Integer))
         Public Sub New()
-            If standalone Then algTask.gOptions.showMotionMask.Checked = True
+            If standalone Then task.gOptions.showMotionMask.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             labels(3) = "The motion mask"
             desc = "Accumulate grid rects that had motion in the last X frames."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = algTask.gray
-            If algTask.heartBeat Or algTask.optionsChanged Then dst2 = src.Clone
+            If src.Channels <> 1 Then src = task.gray
+            If task.heartBeat Or task.optionsChanged Then dst2 = src.Clone
 
             diff.Run(src)
 
             motionList.Clear()
-            For i = 0 To algTask.gridRects.Count - 1
-                Dim diffCount = diff.dst2(algTask.gridRects(i)).CountNonZero
-                If diffCount >= algTask.motionThreshold Then
-                    For Each index In algTask.grid.gridNeighbors(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
+                If diffCount >= task.motionThreshold Then
+                    For Each index In task.grid.gridNeighbors(i)
                         If motionList.Contains(index) = False Then motionList.Add(index)
                     Next
                 End If
@@ -13810,7 +13810,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each mList In motionLists
                 For Each index In motionList
-                    Dim rect = algTask.gridRects(index)
+                    Dim rect = task.gridRects(index)
                     src(rect).CopyTo(dst2(rect))
                     dst3(rect).SetTo(255)
                 Next
@@ -13818,7 +13818,7 @@ Namespace VBClasses
 
             If motionLists.Count > 10 Then motionLists.RemoveAt(0)
 
-            algTask.motionMask = dst3.Clone
+            task.motionMask = dst3.Clone
             labels(2) = CStr(motionList.Count) + " grid rects had motion."
         End Sub
     End Class
@@ -13829,30 +13829,30 @@ Namespace VBClasses
     Public Class XO_Motion_BasicsAccum : Inherits TaskParent
         Public mCore As New XO_Motion_CoreAccum
         Public Sub New()
-            If standalone Then algTask.gOptions.showMotionMask.Checked = True
+            If standalone Then task.gOptions.showMotionMask.Checked = True
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-            labels(3) = "Updated algTask.motionRect"
+            labels(3) = "Updated task.motionRect"
             desc = "Use the motionlist of rects to create one motion rectangle."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             mCore.Run(src)
 
-            If algTask.heartBeat Then dst2 = algTask.gray
+            If task.heartBeat Then dst2 = task.gray
 
             dst3.SetTo(0)
             If mCore.motionList.Count > 0 Then
-                algTask.motionRect = algTask.gridRects(mCore.motionList(0))
+                task.motionRect = task.gridRects(mCore.motionList(0))
                 For Each index In mCore.motionList
-                    algTask.motionRect = algTask.motionRect.Union(algTask.gridRects(index))
+                    task.motionRect = task.motionRect.Union(task.gridRects(index))
                 Next
-                dst3(algTask.motionRect).SetTo(255)
-                algTask.gray(algTask.motionRect).CopyTo(dst2(algTask.motionRect))
+                dst3(task.motionRect).SetTo(255)
+                task.gray(task.motionRect).CopyTo(dst2(task.motionRect))
             Else
-                algTask.motionRect = New cv.Rect
+                task.motionRect = New cv.Rect
             End If
 
             labels(2) = CStr(mCore.motionList.Count) + " grid rect's or " +
-                    Format(mCore.motionList.Count / algTask.gridRects.Count, "0.0%") +
+                    Format(mCore.motionList.Count / task.gridRects.Count, "0.0%") +
                     " of bricks had motion."
         End Sub
     End Class
@@ -13870,23 +13870,23 @@ Namespace VBClasses
             Static correlationSlider = OptionParent.FindSlider("Correlation Threshold")
             Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            If algTask.heartBeat Then dst3 = src.Clone
+            If task.heartBeat Then dst3 = src.Clone
 
             dst2 = src
 
             Dim updateCount As Integer
-            Parallel.ForEach(Of cv.Rect)(algTask.gridRects,
+            Parallel.ForEach(Of cv.Rect)(task.gridRects,
             Sub(roi)
                 Dim correlation As New cv.Mat
                 cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                 If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                     Interlocked.Increment(updateCount)
                     src(roi).CopyTo(dst3(roi))
-                    dst2.Rectangle(roi, white, algTask.lineWidth)
+                    dst2.Rectangle(roi, white, task.lineWidth)
                 End If
             End Sub)
-            labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(algTask.gridRects.Count)
-            labels(3) = CStr(algTask.gridRects.Count - updateCount) + " segments out of " + CStr(algTask.gridRects.Count) + " had > " +
+            labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(task.gridRects.Count)
+            labels(3) = CStr(task.gridRects.Count - updateCount) + " segments out of " + CStr(task.gridRects.Count) + " had > " +
                          Format(correlationSlider.Value / 1000, "0.0%") + " correlation. "
         End Sub
     End Class
@@ -13904,10 +13904,10 @@ Namespace VBClasses
             Static correlationSlider = OptionParent.FindSlider("Correlation Threshold")
             Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            If algTask.heartBeat Then dst3 = src.Clone
+            If task.heartBeat Then dst3 = src.Clone
 
             Dim roiMotion As New List(Of cv.Rect)
-            For Each roi In algTask.gridRects
+            For Each roi In task.gridRects
                 Dim correlation As New cv.Mat
                 cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                 If correlation.Get(Of Single)(0, 0) < CCthreshold Then
@@ -13917,10 +13917,10 @@ Namespace VBClasses
             Next
             dst2 = src
             For Each roi In roiMotion
-                dst2.Rectangle(roi, white, algTask.lineWidth)
+                dst2.Rectangle(roi, white, task.lineWidth)
             Next
-            labels(2) = "Motion added to dst3 for " + CStr(roiMotion.Count) + " segments out of " + CStr(algTask.gridRects.Count)
-            labels(3) = CStr(algTask.gridRects.Count - roiMotion.Count) + " segments out of " + CStr(algTask.gridRects.Count) + " had > " +
+            labels(2) = "Motion added to dst3 for " + CStr(roiMotion.Count) + " segments out of " + CStr(task.gridRects.Count)
+            labels(3) = CStr(task.gridRects.Count - roiMotion.Count) + " segments out of " + CStr(task.gridRects.Count) + " had > " +
                          Format(correlationSlider.Value / 1000, "0.0%") + " correlation. "
         End Sub
     End Class
@@ -13957,7 +13957,7 @@ Namespace VBClasses
         Public dst(2) As cv.Mat
         Public pcFiltered(2) As cv.Mat
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
@@ -13967,7 +13967,7 @@ Namespace VBClasses
             options.Run()
             options1.Run()
 
-            Dim r1 = New cv.Rect(1, 1, algTask.cols - 2, algTask.rows - 2)
+            Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
             Dim r2 As cv.Rect
             Select Case options.offsetDirection
                 Case "Upper Left"
@@ -13990,16 +13990,16 @@ Namespace VBClasses
 
             Dim r3 = New cv.Rect(1, 1, r1.Width, r1.Height)
 
-            cv.Cv2.Absdiff(algTask.pcSplit(0)(r1), algTask.pcSplit(0)(r2), dst1(r3))
-            cv.Cv2.Absdiff(algTask.pcSplit(1)(r1), algTask.pcSplit(1)(r2), dst2(r3))
-            cv.Cv2.Absdiff(algTask.pcSplit(2)(r1), algTask.pcSplit(2)(r2), dst3(r3))
+            cv.Cv2.Absdiff(task.pcSplit(0)(r1), task.pcSplit(0)(r2), dst1(r3))
+            cv.Cv2.Absdiff(task.pcSplit(1)(r1), task.pcSplit(1)(r2), dst2(r3))
+            cv.Cv2.Absdiff(task.pcSplit(2)(r1), task.pcSplit(2)(r2), dst3(r3))
 
             dst = {dst1, dst2, dst3}
             For i = 0 To dst.Count - 1
                 masks(i) = dst(i).Threshold(options1.pixelDiffThreshold / 1000, 255,
                                         cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
                 pcFiltered(i) = New cv.Mat(src.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
-                algTask.pcSplit(i).CopyTo(pcFiltered(i), masks(i))
+                task.pcSplit(i).CopyTo(pcFiltered(i), masks(i))
             Next
         End Sub
     End Class
@@ -14017,7 +14017,7 @@ Namespace VBClasses
             dst2 = runRedCloud(src, labels(2))
 
             dst3.SetTo(0)
-            For Each rc In algTask.redCloud.rcList
+            For Each rc In task.redCloud.rcList
                 Dim contour = ContourBuild(rc.mask)
                 Dim hullIndices = cv.Cv2.ConvexHullIndices(contour, False)
                 For i = 0 To contour.Count - 1
@@ -14061,22 +14061,22 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static unchanged As Integer
-            If algTask.motionRect.Width Then
-                dst2 = runRedCloud(algTask.pointCloud, labels(2))
+            If task.motionRect.Width Then
+                dst2 = runRedCloud(task.pointCloud, labels(2))
             Else
                 unchanged += 1
             End If
-            If algTask.heartBeatLT Then unchanged = 0
+            If task.heartBeatLT Then unchanged = 0
 
-            dst2.Rectangle(algTask.motionRect, algTask.highlight, algTask.lineWidth)
+            dst2.Rectangle(task.motionRect, task.highlight, task.lineWidth)
 
             If standaloneTest() Then
-                For Each rc In algTask.redCloud.rcList
+                For Each rc In task.redCloud.rcList
                     SetTrueText(CStr(rc.age), rc.maxDist)
                 Next
 
-                RedCloud_Cell.selectCell(algTask.redCloud.rcMap, algTask.redCloud.rcList)
-                If algTask.rcD IsNot Nothing Then strOut = algTask.rcD.displayCell()
+                RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
                 SetTrueText(strOut, 3)
             End If
 
@@ -14141,7 +14141,7 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Track the RedColor cells from RedColor_Core"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -14160,10 +14160,10 @@ Namespace VBClasses
                 r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
                 Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
                 If indexLast > 0 Then r2 = rcListLast(indexLast).rect
-                If indexLast >= 0 And r1.IntersectsWith(r2) And algTask.optionsChanged = False Then
+                If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
                     rc.age = rcListLast(indexLast).age + 1
                     If rc.age >= 1000 Then rc.age = 2
-                    If algTask.heartBeat = False And rc.rect.Contains(rcListLast(indexLast).maxdist) Then
+                    If task.heartBeat = False And rc.rect.Contains(rcListLast(indexLast).maxdist) Then
                         rc.maxDist = rcListLast(indexLast).maxdist
                     End If
                     rc.color = rcListLast(indexLast).color
@@ -14172,7 +14172,7 @@ Namespace VBClasses
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 If standaloneTest() Then
-                    dst2.Circle(rc.maxDist, algTask.DotSize, algTask.highlight, -1)
+                    dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
                     SetTrueText(CStr(rc.age), rc.maxDist)
                 End If
                 rcList.Add(rc)
@@ -14185,7 +14185,7 @@ Namespace VBClasses
             rcMapLast = rcMap.Clone
 
             RedCloud_Cell.selectCell(rcMap, rcList)
-            If algTask.rcD IsNot Nothing Then strOut = algTask.rcD.displayCell()
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 1)
         End Sub
     End Class
@@ -14206,13 +14206,13 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static rcLost As New List(Of Integer)
-            If algTask.heartBeat Or algTask.optionsChanged Then
+            If task.heartBeat Or task.optionsChanged Then
                 rcLost.Clear()
                 redCore.Run(src)
                 dst2 = redCore.dst2
                 labels(2) = redCore.labels(2)
             Else
-                If src.Type <> cv.MatType.CV_8U Then src = algTask.gray
+                If src.Type <> cv.MatType.CV_8U Then src = task.gray
                 redCore.redSweep.reduction.Run(src)
                 dst1 = redCore.redSweep.reduction.dst2 + 1
 
@@ -14249,7 +14249,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 For Each rc In rcList
-                    dst2.Circle(rc.maxDist, algTask.DotSize, algTask.highlight, -1)
+                    dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
                 Next
 
                 dst3.SetTo(0)
@@ -14260,7 +14260,7 @@ Namespace VBClasses
                 labels(3) = "There were " + CStr(rcLost.Count) + " cells temporarily lost."
 
                 RedCloud_Cell.selectCell(rcMap, rcList)
-                If algTask.rcD IsNot Nothing Then strOut = algTask.rcD.displayCell()
+                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
                 SetTrueText(strOut, 3)
             End If
         End Sub
@@ -14283,7 +14283,7 @@ Namespace VBClasses
             reduction.Run(src)
 
             Dim index = reduction.classCount + 1
-            For Each rc In algTask.redCloud.rcList
+            For Each rc In task.redCloud.rcList
                 reduction.dst2(rc.rect).SetTo(index, rc.mask)
                 index += 1
                 If index >= 255 Then Exit For
@@ -14292,8 +14292,8 @@ Namespace VBClasses
             dst2 = runRedColor(reduction.dst2, labels(2))
 
             If standaloneTest() Then
-                RedCloud_Cell.selectCell(algTask.redColor.rcMap, algTask.redColor.rcList)
-                If algTask.rcD IsNot Nothing Then strOut = algTask.rcD.displayCell()
+                RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
+                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
                 SetTrueText(strOut, 3)
             End If
         End Sub
@@ -14317,8 +14317,8 @@ Namespace VBClasses
             dst2 = runRedColor(reduction.dst2, labels(2))
 
             If standaloneTest() Then
-                RedCloud_Cell.selectCell(algTask.redColor.rcMap, algTask.redColor.rcList)
-                If algTask.rcD IsNot Nothing Then strOut = algTask.rcD.displayCell()
+                RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
+                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
                 SetTrueText(strOut, 3)
             End If
         End Sub
@@ -14334,7 +14334,7 @@ Namespace VBClasses
             desc = "Find RedColor cells in the reduced color image using a simple floodfill loop."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_8U Then src = algTask.gray
+            If src.Type <> cv.MatType.CV_8U Then src = task.gray
             reduction.Run(src)
             dst3 = reduction.dst2 + 1
             labels(3) = reduction.labels(2)
@@ -14370,11 +14370,11 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 For Each rc In rcList
-                    dst2.Circle(rc.maxDist, algTask.DotSize, algTask.highlight, -1)
+                    dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
                 Next
 
                 RedCloud_Cell.selectCell(rcMap, rcList)
-                If algTask.rcD IsNot Nothing Then strOut = algTask.rcD.displayCell()
+                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
                 SetTrueText(strOut, 3)
             End If
 
@@ -14405,12 +14405,12 @@ Namespace VBClasses
             For i = 1 To hist.histArray.Count - 1
                 If hist.histArray(i) Then actualClasses += 1
             Next
-            If algTask.gOptions.HistBinBar.Maximum >= actualClasses + 1 Then
-                algTask.gOptions.HistBinBar.Value = actualClasses + 1
+            If task.gOptions.HistBinBar.Maximum >= actualClasses + 1 Then
+                task.gOptions.HistBinBar.Value = actualClasses + 1
             End If
 
             colorIDList.Clear()
-            For Each rc In algTask.redCloud.rcList
+            For Each rc In task.redCloud.rcList
                 Dim tmp = dst1(rc.rect)
                 tmp.SetTo(0, Not rc.mask)
 
@@ -14424,7 +14424,7 @@ Namespace VBClasses
                 colorIDList.Add(colorIDs)
 
                 If standaloneTest() Then
-                    dst2.Circle(rc.maxDist, algTask.DotSize, algTask.highlight, -1)
+                    dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
                     strOut = ""
                     For Each index In colorIDs
                         strOut += CStr(index) + ","
@@ -14433,7 +14433,7 @@ Namespace VBClasses
                     SetTrueText(strOut, rc.maxDist, 3)
                 End If
             Next
-            If algTask.rcD IsNot Nothing Then dst3.Rectangle(algTask.rcD.rect, white, algTask.lineWidth)
+            If task.rcD IsNot Nothing Then dst3.Rectangle(task.rcD.rect, white, task.lineWidth)
         End Sub
     End Class
 
@@ -14450,7 +14450,7 @@ Namespace VBClasses
             dst2 = histID.dst2
             labels(2) = histID.labels(2)
 
-            For Each rc In algTask.redCloud.rcList
+            For Each rc In task.redCloud.rcList
                 Dim colorMask As New cv.Mat(rc.rect.Size, cv.MatType.CV_8U, 0)
                 For Each index In histID.colorIDList(rc.index - 1)
                     colorMask = colorMask Or histID.redCC.color8u.dst2(rc.rect).InRange(index, index)
@@ -14458,12 +14458,12 @@ Namespace VBClasses
                 rc.mask = rc.mask Or colorMask
             Next
 
-            RedCloud_Cell.selectCell(algTask.redCloud.rcMap, algTask.redCloud.rcList)
-            If algTask.rcD IsNot Nothing Then
-                strOut = algTask.rcD.displayCell
+            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            If task.rcD IsNot Nothing Then
+                strOut = task.rcD.displayCell
                 dst3.SetTo(0)
-                dst3(algTask.rcD.rect).SetTo(white, algTask.rcD.mask)
-                algTask.color(algTask.rcD.rect).SetTo(white, algTask.rcD.mask)
+                dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
             End If
             SetTrueText(strOut, 3)
         End Sub
@@ -14479,25 +14479,25 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public rawLines As New Line_Core
         Public Sub New()
-            desc = "The core algorithm to find lines.  Line_Basics is a algTask algorithm that exits when run as a normal algorithm."
+            desc = "The core algorithm to find lines.  Line_Basics is a task algorithm that exits when run as a normal algorithm."
         End Sub
         Private Function lpMotion(lp As lpData) As Boolean
             ' return true if either line endpoint was in the motion mask.
-            If algTask.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
-            If algTask.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
+            If task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
+            If task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
             Return False
         End Function
         Public Shared Function createMap() As cv.Mat
-            Dim lpRectMap As New cv.Mat(algTask.workRes, cv.MatType.CV_8U, 0)
+            Dim lpRectMap As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
             lpRectMap.SetTo(0)
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 lpRectMap.Rectangle(lp.rect, lp.index, -1)
             Next
             Return lpRectMap
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If lpList.Count <= 1 Then
-                algTask.motionMask.SetTo(255)
+                task.motionMask.SetTo(255)
                 rawLines.Run(src)
                 lpList = New List(Of lpData)(rawLines.lpList)
             End If
@@ -14547,21 +14547,21 @@ Namespace VBClasses
             desc = "Track lines that are the result of motion."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.optionsChanged Then lineHistory.Clear()
+            If task.optionsChanged Then lineHistory.Clear()
 
             diff.Run(src)
             dst2 = diff.dst2
 
-            If algTask.heartBeat Then dst3 = src
-            lineHistory.Add(algTask.lines.lpList)
+            If task.heartBeat Then dst3 = src
+            lineHistory.Add(task.lines.lpList)
             For Each lplist In lineHistory
                 For Each lp In lplist
-                    dst3.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, algTask.lineType)
+                    dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
                 Next
             Next
-            If lineHistory.Count >= algTask.frameHistoryCount Then lineHistory.RemoveAt(0)
+            If lineHistory.Count >= task.frameHistoryCount Then lineHistory.RemoveAt(0)
 
-            labels(2) = CStr(algTask.lines.lpList.Count) + " lines were found in the diff output"
+            labels(2) = CStr(task.lines.lpList.Count) + " lines were found in the diff output"
         End Sub
     End Class
 
@@ -14585,8 +14585,8 @@ Namespace VBClasses
             dst2 = src
             dst3.SetTo(0)
             For Each lp In rawLines.lpList
-                dst2.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, algTask.lineType)
-                dst3.Line(lp.p1, lp.p2, 255, algTask.lineWidth, algTask.lineType)
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
         End Sub
     End Class
@@ -14600,21 +14600,21 @@ Namespace VBClasses
     Public Class XO_Line_BrickPoints : Inherits TaskParent
         Public sortLines As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Public Sub New()
-            If algTask.feat Is Nothing Then algTask.feat = New Feature_Basics
-            If algTask.feat Is Nothing Then algTask.feat = New Feature_Basics
+            If task.feat Is Nothing Then task.feat = New Feature_Basics
+            If task.feat Is Nothing Then task.feat = New Feature_Basics
             desc = "Assign brick points to each of the lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = algTask.lines.dst2
+            dst2 = task.lines.dst2
 
             sortLines.Clear()
             dst3.SetTo(0)
-            For Each pt In algTask.features
-                Dim lineIndex = algTask.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
+            For Each pt In task.features
+                Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
                 If lineIndex = 0 Then Continue For
-                Dim color = vecToScalar(algTask.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
+                Dim color = vecToScalar(task.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
                 Dim index As Integer = sortLines.Keys.Contains(lineIndex)
-                Dim gridindex = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim gridindex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 sortLines.Add(lineIndex, gridindex)
                 DrawCircle(dst3, pt, color)
             Next
@@ -14627,27 +14627,27 @@ Namespace VBClasses
 
     Public Class XO_KNNLine_SliceTemp : Inherits TaskParent
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Slice the previous image with a horizontal line at ptCenter's height to " +
                "find all the match candidates"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2.SetTo(0)
             dst3.SetTo(0)
-            Static lpListLast As New List(Of lpData)(algTask.lines.lpList)
+            Static lpListLast As New List(Of lpData)(task.lines.lpList)
             Dim lpMatch As lpData
             Static count As Integer
             Static missCount As Integer
-            For i = 0 To algTask.lines.lpList.Count - 1
-                Dim lp = algTask.lines.lpList(i)
+            For i = 0 To task.lines.lpList.Count - 1
+                Dim lp = task.lines.lpList(i)
                 If lp.index > 10 Then Exit For
-                Dim color = algTask.scalarColors(lp.index + 1)
-                dst2.Line(lp.p1, lp.p2, color, algTask.lineWidth + 1, algTask.lineType)
+                Dim color = task.scalarColors(lp.index + 1)
+                dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
                 Dim r = New cv.Rect(0, lp.ptCenter.Y, dst2.Width, 1) ' create a rect for the slice.
                 Dim histogram As New cv.Mat
-                cv.Cv2.CalcHist({algTask.lines.dst1(r)}, {0}, emptyMat, histogram, 1,
-                            {algTask.lines.lpList.Count},
-                            New cv.Rangef() {New cv.Rangef(0, algTask.lines.lpList.Count)})
+                cv.Cv2.CalcHist({task.lines.dst1(r)}, {0}, emptyMat, histogram, 1,
+                            {task.lines.lpList.Count},
+                            New cv.Rangef() {New cv.Rangef(0, task.lines.lpList.Count)})
 
                 Dim histArray(histogram.Total - 1) As Single
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -14680,21 +14680,21 @@ Namespace VBClasses
 
                 ' Dim index = Math.Floor(knn.result(0, 0))
                 lpMatch = lpListLast(index)
-                dst3.Circle(lpMatch.ptCenter, algTask.DotSize, color, -1)
+                dst3.Circle(lpMatch.ptCenter, task.DotSize, color, -1)
                 If lp.ptCenter.DistanceTo(lpMatch.ptCenter) < 10 Then
-                    dst3.Line(lp.p1, lp.p2, color, algTask.lineWidth + 1, algTask.lineType)
+                    dst3.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
                     count += 1
                 Else
                     missCount += 1
                 End If
             Next
 
-            dst1 = algTask.lines.dst2
-            lpListLast = New List(Of lpData)(algTask.lines.lpList)
+            dst1 = task.lines.dst2
+            lpListLast = New List(Of lpData)(task.lines.lpList)
             labels(3) = CStr(count) + " lines were confirmed after matching and " + CStr(missCount) +
                     " could not be confirmed since last heartBeatLT"
 
-            If algTask.heartBeatLT Then
+            If task.heartBeatLT Then
                 count = 0
                 missCount = 0
             End If
@@ -14708,24 +14708,24 @@ Namespace VBClasses
             desc = "Use KNN to determine which line is being selected with mouse."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = algTask.lines.dst2.Clone
+            dst2 = task.lines.dst2.Clone
             knn.trainInput.Clear()
             knn.queries.Clear()
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 knn.trainInput.Add(lp.p1)
                 knn.trainInput.Add(lp.ptCenter)
                 knn.trainInput.Add(lp.p2)
             Next
 
-            knn.queries.Add(algTask.mouseMovePoint)
+            knn.queries.Add(task.mouseMovePoint)
             knn.Run(emptyMat)
 
             results = knn.result
 
             If standaloneTest() Then
                 Dim index = Math.Floor(results(0, 0) / 3)
-                Dim lpNext = algTask.lines.lpList(index)
-                dst2.Line(lpNext.p1, lpNext.p2, algTask.highlight, algTask.lineWidth * 3, cv.LineTypes.AntiAlias)
+                Dim lpNext = task.lines.lpList(index)
+                dst2.Line(lpNext.p1, lpNext.p2, task.highlight, task.lineWidth * 3, cv.LineTypes.AntiAlias)
             End If
         End Sub
     End Class
@@ -14746,8 +14746,8 @@ Namespace VBClasses
             labels(2) = knnLine.labels(2)
 
             Dim index = Math.Floor(knnLine.results(0, 0) / 3)
-            Dim lpNext = algTask.lines.lpList(index)
-            dst2.Line(lpNext.p1, lpNext.p2, algTask.highlight, algTask.lineWidth * 3, cv.LineTypes.AntiAlias)
+            Dim lpNext = task.lines.lpList(index)
+            dst2.Line(lpNext.p1, lpNext.p2, task.highlight, task.lineWidth * 3, cv.LineTypes.AntiAlias)
         End Sub
     End Class
 
@@ -14763,26 +14763,26 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst3 = dst1.Clone
             labels(3) = labels(2)
-            Static lpListLast As New List(Of lpData)(algTask.lines.lpList)
+            Static lpListLast As New List(Of lpData)(task.lines.lpList)
 
             knnLine.Run(src)
             dst2 = knnLine.dst2.Clone
-            labels(2) = algTask.lines.labels(2)
+            labels(2) = task.lines.labels(2)
 
             Dim count As Integer
-            For i = 0 To algTask.lines.lpList.Count - 1
-                Dim lp1 = algTask.lines.lpList(i)
+            For i = 0 To task.lines.lpList.Count - 1
+                Dim lp1 = task.lines.lpList(i)
                 Dim p1 = New cv.Point(dst2.Width, lp1.ptCenter.Y)
-                dst2.Line(lp1.ptCenter, p1, algTask.highlight, algTask.lineWidth, algTask.lineType)
+                dst2.Line(lp1.ptCenter, p1, task.highlight, task.lineWidth, task.lineType)
 
                 Dim lp2 = lpListLast(lp1.index)
                 Dim p2 = New cv.Point2f(0, lp2.ptCenter.Y)
-                dst3.Line(p2, lp2.ptCenter, algTask.highlight, algTask.lineWidth, algTask.lineType)
+                dst3.Line(p2, lp2.ptCenter, task.highlight, task.lineWidth, task.lineType)
                 count += 1
                 If count >= 10 Then Exit For
             Next
             dst1 = knnLine.dst2.Clone
-            lpListLast = New List(Of lpData)(algTask.lines.lpList)
+            lpListLast = New List(Of lpData)(task.lines.lpList)
         End Sub
     End Class
 
@@ -14793,7 +14793,7 @@ Namespace VBClasses
     Public Class XO_KNNLine_SliceList : Inherits TaskParent
         Dim knn As New KNN_NNBasics
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             OptionParent.FindSlider("KNN Dimension").Value = 1
             desc = "Slice the previous image with a horizontal line at ptCenter's height to " +
                "find all the match candidates"
@@ -14802,20 +14802,20 @@ Namespace VBClasses
             Dim knnDimension = knn.options.knnDimension
             dst2.SetTo(0)
             dst3.SetTo(0)
-            Static lpListLast As New List(Of lpData)(algTask.lines.lpList)
+            Static lpListLast As New List(Of lpData)(task.lines.lpList)
             Dim lpMatch As lpData
             Static count As Integer
             Static missCount As Integer
-            For i = 0 To algTask.lines.lpList.Count - 1
-                Dim lp = algTask.lines.lpList(i)
+            For i = 0 To task.lines.lpList.Count - 1
+                Dim lp = task.lines.lpList(i)
                 If lp.index > 10 Then Exit For
-                Dim color = algTask.scalarColors(lp.index + 1)
-                dst2.Line(lp.p1, lp.p2, color, algTask.lineWidth + 1, algTask.lineType)
+                Dim color = task.scalarColors(lp.index + 1)
+                dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
                 Dim r = New cv.Rect(0, lp.ptCenter.Y, dst2.Width, 1) ' create a rect for the slice.
                 Dim histogram As New cv.Mat
-                cv.Cv2.CalcHist({algTask.lines.dst1(r)}, {0}, emptyMat, histogram, 1,
-                            {algTask.lines.lpList.Count},
-                            New cv.Rangef() {New cv.Rangef(0, algTask.lines.lpList.Count)})
+                cv.Cv2.CalcHist({task.lines.dst1(r)}, {0}, emptyMat, histogram, 1,
+                            {task.lines.lpList.Count},
+                            New cv.Rangef() {New cv.Rangef(0, task.lines.lpList.Count)})
 
                 Dim histArray(histogram.Total - 1) As Single
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -14845,21 +14845,21 @@ Namespace VBClasses
 
                 Dim index = Math.Floor(knn.result(0, 0))
                 lpMatch = lpListLast(index)
-                dst3.Circle(lpMatch.ptCenter, algTask.DotSize, color, -1)
+                dst3.Circle(lpMatch.ptCenter, task.DotSize, color, -1)
                 If lp.ptCenter.DistanceTo(lpMatch.ptCenter) < 10 Then
-                    dst3.Line(lp.p1, lp.p2, color, algTask.lineWidth + 1, algTask.lineType)
+                    dst3.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
                     count += 1
                 Else
                     missCount += 1
                 End If
             Next
 
-            dst1 = algTask.lines.dst2
-            lpListLast = New List(Of lpData)(algTask.lines.lpList)
+            dst1 = task.lines.dst2
+            lpListLast = New List(Of lpData)(task.lines.lpList)
             labels(3) = CStr(count) + " lines were confirmed after matching and " + CStr(missCount) +
                     " could not be confirmed since last heartBeatLT"
 
-            If algTask.heartBeatLT Then
+            If task.heartBeatLT Then
                 count = 0
                 missCount = 0
             End If
@@ -14874,22 +14874,22 @@ Namespace VBClasses
 
     Public Class XO_KNNLine_SliceIndex : Inherits TaskParent
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Compute the distances of the centers of only the longest lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1.SetTo(0)
             dst2.SetTo(0)
             dst3.SetTo(0)
-            Static lpListLast As New List(Of lpData)(algTask.lines.lpList)
+            Static lpListLast As New List(Of lpData)(task.lines.lpList)
             Dim lpMatch As lpData
             Dim count As Integer
             Dim maxCheck = 10
-            For i = 0 To Math.Min(algTask.lines.lpList.Count, maxCheck) - 1
-                Dim lp = algTask.lines.lpList(i)
-                Dim color = algTask.scalarColors(lp.index + 1)
+            For i = 0 To Math.Min(task.lines.lpList.Count, maxCheck) - 1
+                Dim lp = task.lines.lpList(i)
+                Dim color = task.scalarColors(lp.index + 1)
 
-                dst2.Line(lp.p1, lp.p2, color, algTask.lineWidth + 1, algTask.lineType)
+                dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
                 Dim distances As New List(Of Single)
                 Dim indexLast As New List(Of Integer)
                 For j = 0 To Math.Min(lpListLast.Count - 1, maxCheck)
@@ -14901,15 +14901,15 @@ Namespace VBClasses
                 Dim index = indexLast(distances.IndexOf(distances.Min))
 
                 lpMatch = lpListLast(index)
-                dst1.Line(lp.ptCenter, lpMatch.ptCenter, algTask.highlight, algTask.lineWidth, algTask.lineType)
-                dst3.Line(lp.p1, lp.p2, color, algTask.lineWidth + 1, algTask.lineType)
+                dst1.Line(lp.ptCenter, lpMatch.ptCenter, task.highlight, task.lineWidth, task.lineType)
+                dst3.Line(lp.p1, lp.p2, color, task.lineWidth + 1, task.lineType)
                 count += 1
             Next
 
-            If algTask.heartBeat And algTask.gOptions.DebugCheckBox.Checked Then
-                lpListLast = New List(Of lpData)(algTask.lines.lpList)
+            If task.heartBeat And task.gOptions.DebugCheckBox.Checked Then
+                lpListLast = New List(Of lpData)(task.lines.lpList)
             End If
-            If algTask.heartBeat Then labels(3) = CStr(count) + " lines were matched."
+            If task.heartBeat Then labels(3) = CStr(count) + " lines were matched."
         End Sub
     End Class
 
@@ -14919,25 +14919,25 @@ Namespace VBClasses
 
     Public Class XO_LineDepth_Basics : Inherits TaskParent
         Public Sub New()
-            If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Find the longest line in BGR and use it to measure the average depth for the line"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.lines.lpList.Count <= 1 Then Exit Sub
-            Dim lp = algTask.lines.lpList(0)
+            If task.lines.lpList.Count <= 1 Then Exit Sub
+            Dim lp = task.lines.lpList(0)
             dst2 = src
 
-            dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, algTask.lineWidth + 3, algTask.lineType)
+            dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
 
-            Dim gcMin = algTask.bricks.brickList(algTask.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
-            Dim gcMax = algTask.bricks.brickList(algTask.gridMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
+            Dim gcMin = task.bricks.brickList(task.gridMap.Get(Of Single)(lp.p1.Y, lp.p1.X))
+            Dim gcMax = task.bricks.brickList(task.gridMap.Get(Of Single)(lp.p2.Y, lp.p2.X))
 
             dst0.SetTo(0)
-            dst0.Line(lp.p1, lp.p2, 255, 3, algTask.lineType)
-            dst0.SetTo(0, algTask.noDepthMask)
+            dst0.Line(lp.p1, lp.p2, 255, 3, task.lineType)
+            dst0.SetTo(0, task.noDepthMask)
 
-            Dim mm = GetMinMax(algTask.pcSplit(2), dst0)
+            Dim mm = GetMinMax(task.pcSplit(2), dst0)
             If gcMin.pt.DistanceTo(mm.minLoc) > gcMin.pt.DistanceTo(mm.maxLoc) Then
                 Dim tmp = gcMin
                 gcMin = gcMax
@@ -14947,9 +14947,9 @@ Namespace VBClasses
             Dim depthMin = If(gcMin.depth > 0, gcMin.depth, mm.minVal)
             Dim depthMax = If(gcMax.depth > 0, gcMax.depth, mm.maxVal)
 
-            Dim depthMean = algTask.pcSplit(2).Mean(dst0)(0)
-            DrawCircle(dst2, lp.p1, algTask.DotSize + 4, cv.Scalar.Red)
-            DrawCircle(dst2, lp.p2, algTask.DotSize + 4, cv.Scalar.Blue)
+            Dim depthMean = task.pcSplit(2).Mean(dst0)(0)
+            DrawCircle(dst2, lp.p1, task.DotSize + 4, cv.Scalar.Red)
+            DrawCircle(dst2, lp.p2, task.DotSize + 4, cv.Scalar.Blue)
 
             If lp.p1.DistanceTo(mm.minLoc) < lp.p2.DistanceTo(mm.maxLoc) Then
                 mm.minLoc = lp.p1
@@ -14959,7 +14959,7 @@ Namespace VBClasses
                 mm.maxLoc = lp.p1
             End If
 
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 SetTrueText("Average Depth = " + Format(depthMean, fmt1) + "m", New cv.Point((lp.p1.X + lp.p2.X) / 2,
                                                                                      (lp.p1.Y + lp.p2.Y) / 2), 2)
                 labels(2) = "Min Distance = " + Format(depthMin, fmt1) + ", Max Distance = " + Format(depthMax, fmt1) +
@@ -14981,15 +14981,15 @@ Namespace VBClasses
             desc = "Find similar lines using the angle variable."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim degrees = algTask.gOptions.DebugSlider.Value
+            Dim degrees = task.gOptions.DebugSlider.Value
             dst2 = src
             Dim count As Integer
-            For Each lp In algTask.lines.lpList
-                If Math.Abs(lp.angle - degrees) < algTask.angleThreshold Then
-                    vbc.DrawLine(dst2, lp.p1, lp.p2, algTask.highlight, algTask.lineWidth * 2)
+            For Each lp In task.lines.lpList
+                If Math.Abs(lp.angle - degrees) < task.angleThreshold Then
+                    vbc.DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth * 2)
                     count += 1
                 Else
-                    vbc.DrawLine(dst2, lp, algTask.highlight)
+                    vbc.DrawLine(dst2, lp, task.highlight)
                 End If
             Next
 
@@ -15010,26 +15010,26 @@ Namespace VBClasses
             desc = "Display details about the line selected."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then algTask.lpD = algTask.lineGravity
-            labels(2) = algTask.lines.labels(2) + " - Use the global option 'DebugSlider' to select a line."
+            If standalone Then task.lpD = task.lineGravity
+            labels(2) = task.lines.labels(2) + " - Use the global option 'DebugSlider' to select a line."
 
-            If algTask.lines.lpList.Count <= 1 Then Exit Sub
+            If task.lines.lpList.Count <= 1 Then Exit Sub
             dst2.SetTo(0)
-            For Each lp In algTask.lines.lpList
-                dst2.Line(lp.p1, lp.p2, white, algTask.lineWidth, cv.LineTypes.Link8)
-                DrawCircle(dst2, lp.p1, algTask.DotSize, algTask.highlight)
+            For Each lp In task.lines.lpList
+                dst2.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
+                DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
             Next
 
-            dst2.Line(algTask.lpD.p1, algTask.lpD.p2, algTask.highlight, algTask.lineWidth + 1, algTask.lineType)
+            dst2.Line(task.lpD.p1, task.lpD.p2, task.highlight, task.lineWidth + 1, task.lineType)
 
-            strOut = "Line ID = " + CStr(algTask.lpD.p1GridIndex) + " Age = " + CStr(algTask.lpD.age) + vbCrLf
-            strOut += "Length (pixels) = " + Format(algTask.lpD.length, fmt1) + " index = " + CStr(algTask.lpD.index) + vbCrLf
-            strOut += "p1GridIndex = " + CStr(algTask.lpD.p1GridIndex) + " p2GridIndex = " + CStr(algTask.lpD.p2GridIndex) + vbCrLf
+            strOut = "Line ID = " + CStr(task.lpD.p1GridIndex) + " Age = " + CStr(task.lpD.age) + vbCrLf
+            strOut += "Length (pixels) = " + Format(task.lpD.length, fmt1) + " index = " + CStr(task.lpD.index) + vbCrLf
+            strOut += "p1GridIndex = " + CStr(task.lpD.p1GridIndex) + " p2GridIndex = " + CStr(task.lpD.p2GridIndex) + vbCrLf
 
-            strOut += "p1 = " + algTask.lpD.p1.ToString + ", p2 = " + algTask.lpD.p2.ToString + vbCrLf
-            strOut += "pE1 = " + algTask.lpD.pE1.ToString + ", pE2 = " + algTask.lpD.pE2.ToString + vbCrLf + vbCrLf
-            strOut += "RGB Angle = " + CStr(algTask.lpD.angle) + vbCrLf
-            strOut += "RGB Slope = " + Format(algTask.lpD.slope, fmt3) + vbCrLf
+            strOut += "p1 = " + task.lpD.p1.ToString + ", p2 = " + task.lpD.p2.ToString + vbCrLf
+            strOut += "pE1 = " + task.lpD.pE1.ToString + ", pE2 = " + task.lpD.pE2.ToString + vbCrLf + vbCrLf
+            strOut += "RGB Angle = " + CStr(task.lpD.angle) + vbCrLf
+            strOut += "RGB Slope = " + Format(task.lpD.slope, fmt3) + vbCrLf
             strOut += vbCrLf + "NOTE: the Y-Axis is inverted - Y increases down so slopes are inverted." + vbCrLf + vbCrLf
 
             SetTrueText(strOut, 3)
@@ -15051,25 +15051,25 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             intersects.Clear()
 
-            For i = 0 To algTask.lines.lpList.Count - 1
-                Dim lp1 = algTask.lines.lpList(i)
-                For j = i + 1 To algTask.lines.lpList.Count - 1
-                    Dim lp2 = algTask.lines.lpList(j)
+            For i = 0 To task.lines.lpList.Count - 1
+                Dim lp1 = task.lines.lpList(i)
+                For j = i + 1 To task.lines.lpList.Count - 1
+                    Dim lp2 = task.lines.lpList(j)
                     Dim intersectionPoint = Line_Intersection.IntersectTest(lp1, lp2)
                     If intersectionPoint.X >= 0 And intersectionPoint.X < dst2.Width Then
                         If intersectionPoint.Y >= 0 And intersectionPoint.Y < dst2.Height Then
                             intersects.Add(intersectionPoint)
-                            If intersects.Count >= algTask.FeatureSampleSize Then Exit For
+                            If intersects.Count >= task.FeatureSampleSize Then Exit For
                         End If
                     End If
                 Next
-                If intersects.Count >= algTask.FeatureSampleSize Then Exit For
+                If intersects.Count >= task.FeatureSampleSize Then Exit For
             Next
 
             dst2 = src
-            If dst3.CountNonZero > algTask.FeatureSampleSize * 10 Then dst3.SetTo(0)
+            If dst3.CountNonZero > task.FeatureSampleSize * 10 Then dst3.SetTo(0)
             For Each pt In intersects
-                DrawCircle(dst2, pt, algTask.highlight)
+                DrawCircle(dst2, pt, task.highlight)
                 DrawCircle(dst3, pt, white)
             Next
         End Sub
@@ -15089,28 +15089,28 @@ Namespace VBClasses
             desc = "Identify a line that is a match in the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            lp = algTask.lineLongest
+            lp = task.lineLongest
 
             lrLines.Run(emptyMat)
             dst2 = lrLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst3 = lrLines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-            Dim r1 = algTask.gridRects(algTask.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            Dim r2 = algTask.gridRects(algTask.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
-            Dim r3 = algTask.gridRects(algTask.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
-            Dim depth1 = algTask.pcSplit(2)(r1).Mean().Val0
-            Dim depth2 = algTask.pcSplit(2)(r2).Mean().Val0
-            Dim depth3 = algTask.pcSplit(2)(r3).Mean().Val0
-            Dim disp1 = algTask.calibData.baseline * algTask.calibData.leftIntrinsics.fx / depth1
-            Dim disp2 = algTask.calibData.baseline * algTask.calibData.leftIntrinsics.fx / depth2
-            Dim disp3 = algTask.calibData.baseline * algTask.calibData.leftIntrinsics.fx / depth3
+            Dim r1 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim r2 = task.gridRects(task.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
+            Dim r3 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+            Dim depth1 = task.pcSplit(2)(r1).Mean().Val0
+            Dim depth2 = task.pcSplit(2)(r2).Mean().Val0
+            Dim depth3 = task.pcSplit(2)(r3).Mean().Val0
+            Dim disp1 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth1
+            Dim disp2 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth2
+            Dim disp3 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth3
 
             Dim lp1 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y),
                              New cv.Point2f(lp.ptCenter.X - disp2, lp.ptCenter.Y))
             Dim lp2 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y), New cv.Point2f(lp.p2.X - disp3, lp.p2.Y))
-            If Math.Abs(lp1.angle - lp2.angle) < algTask.angleThreshold Then lpOutput = lp2
-            vbc.DrawLine(dst3, lpOutput.p1, lpOutput.p2, algTask.highlight, algTask.lineWidth + 1)
-            vbc.DrawLine(dst2, lp.p1, lp.p2, algTask.highlight, algTask.lineWidth + 1)
+            If Math.Abs(lp1.angle - lp2.angle) < task.angleThreshold Then lpOutput = lp2
+            vbc.DrawLine(dst3, lpOutput.p1, lpOutput.p2, task.highlight, task.lineWidth + 1)
+            vbc.DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
         End Sub
     End Class
 
@@ -15132,38 +15132,38 @@ Namespace VBClasses
             dst2 = lrLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst3 = lrLines.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-            Dim lplist As New List(Of lpData)(algTask.lines.lpList)
+            Dim lplist As New List(Of lpData)(task.lines.lpList)
 
             lpOutput.Clear()
             For i = 0 To lplist.Count - 1
                 lp = lplist(i)
-                Dim r1 = algTask.gridRects(algTask.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-                Dim r2 = algTask.gridRects(algTask.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
-                Dim r3 = algTask.gridRects(algTask.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+                Dim r1 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+                Dim r2 = task.gridRects(task.gridMap.Get(Of Integer)(lp.ptCenter.Y, lp.ptCenter.X))
+                Dim r3 = task.gridRects(task.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
 
-                Dim depth1 = algTask.pcSplit(2)(r1).Mean().Val0
-                Dim depth2 = algTask.pcSplit(2)(r2).Mean().Val0
-                Dim depth3 = algTask.pcSplit(2)(r3).Mean().Val0
+                Dim depth1 = task.pcSplit(2)(r1).Mean().Val0
+                Dim depth2 = task.pcSplit(2)(r2).Mean().Val0
+                Dim depth3 = task.pcSplit(2)(r3).Mean().Val0
 
                 If depth1 = 0 Then Continue For
                 If depth2 = 0 Then Continue For
                 If depth3 = 0 Then Continue For
 
-                Dim disp1 = algTask.calibData.baseline * algTask.calibData.leftIntrinsics.fx / depth1
-                Dim disp2 = algTask.calibData.baseline * algTask.calibData.leftIntrinsics.fx / depth2
-                Dim disp3 = algTask.calibData.baseline * algTask.calibData.leftIntrinsics.fx / depth3
+                Dim disp1 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth1
+                Dim disp2 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth2
+                Dim disp3 = task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth3
 
                 Dim lp1 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y),
                                  New cv.Point2f(lp.ptCenter.X - disp2, lp.ptCenter.Y))
                 Dim lp2 = New lpData(New cv.Point2f(lp.p1.X - disp1, lp.p1.Y),
                                  New cv.Point2f(lp.p2.X - disp3, lp.p2.Y))
-                If Math.Abs(lp1.angle - lp2.angle) >= algTask.angleThreshold Then Continue For
+                If Math.Abs(lp1.angle - lp2.angle) >= task.angleThreshold Then Continue For
 
                 Dim lpOut = lp2
                 lp.index = lpOutput.Count
                 lpOutput.Add(lp)
-                vbc.DrawLine(dst3, lpOut.p1, lpOut.p2, algTask.highlight, algTask.lineWidth + 1)
-                vbc.DrawLine(dst2, lp.p1, lp.p2, algTask.highlight, algTask.lineWidth + 1)
+                vbc.DrawLine(dst3, lpOut.p1, lpOut.p2, task.highlight, task.lineWidth + 1)
+                vbc.DrawLine(dst2, lp.p1, lp.p2, task.highlight, task.lineWidth + 1)
             Next
             labels(2) = CStr(lpOutput.Count) + " left image lines were matched in the right image and confirmed with the center point."
         End Sub
@@ -15181,22 +15181,22 @@ Namespace VBClasses
             desc = "Identify the longest line in the output of line_basics."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lplist = algTask.lines.lpList
-            algTask.lineLongestChanged = False
+            Dim lplist = task.lines.lpList
+            task.lineLongestChanged = False
             ' camera is often warming up for the first few images.
-            If match.correlation < algTask.fCorrThreshold Or algTask.frameCount < 10 Or algTask.heartBeat Then
+            If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or task.heartBeat Then
                 lp = lplist(0)
-                match.template = algTask.gray(lp.rect)
-                algTask.lineLongestChanged = True
+                match.template = task.gray(lp.rect)
+                task.lineLongestChanged = True
             End If
 
-            match.Run(algTask.gray.Clone)
+            match.Run(task.gray.Clone)
 
-            If match.correlation < algTask.fCorrThreshold Then
-                algTask.lineLongestChanged = True
+            If match.correlation < task.fCorrThreshold Then
+                task.lineLongestChanged = True
                 If lplist.Count > 1 Then
                     Dim histogram As New cv.Mat
-                    cv.Cv2.CalcHist({algTask.lines.dst1(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
+                    cv.Cv2.CalcHist({task.lines.dst1(lp.rect)}, {0}, emptyMat, histogram, 1, {lplist.Count},
                                  New cv.Rangef() {New cv.Rangef(1, lplist.Count)})
 
                     Dim histArray(histogram.Total - 1) As Single
@@ -15205,7 +15205,7 @@ Namespace VBClasses
                     Dim histList = histArray.ToList
                     ' pick the lp that has the most pixels in the lp.rect.
                     lp = lplist(histList.IndexOf(histList.Max))
-                    match.template = algTask.gray(lp.rect)
+                    match.template = task.gray(lp.rect)
                     match.correlation = 1
                 Else
                     match.correlation = 0 ' force a restart
@@ -15222,10 +15222,10 @@ Namespace VBClasses
                 dst2 = src
                 vbc.DrawLine(dst2, lp)
                 DrawRect(dst2, lp.rect)
-                dst3 = algTask.lines.dst2
+                dst3 = task.lines.dst2
             End If
 
-            algTask.lineLongest = lp
+            task.lineLongest = lp
             labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
         End Sub
     End Class
@@ -15240,11 +15240,11 @@ Namespace VBClasses
             desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
         End Sub
         Public Shared Sub showVectors(dst As cv.Mat)
-            dst.Line(algTask.lineGravity.pE1, algTask.lineGravity.pE2, white, algTask.lineWidth, algTask.lineType)
-            dst.Line(algTask.lineHorizon.pE1, algTask.lineHorizon.pE2, white, algTask.lineWidth, algTask.lineType)
-            If algTask.lineLongest IsNot Nothing Then
-                dst.Line(algTask.lineLongest.p1, algTask.lineLongest.p2, algTask.highlight, algTask.lineWidth * 2, algTask.lineType)
-                vbc.DrawLine(dst, algTask.lineLongest.pE1, algTask.lineLongest.pE2, white)
+            dst.Line(task.lineGravity.pE1, task.lineGravity.pE2, white, task.lineWidth, task.lineType)
+            dst.Line(task.lineHorizon.pE1, task.lineHorizon.pE2, white, task.lineWidth, task.lineType)
+            If task.lineLongest IsNot Nothing Then
+                dst.Line(task.lineLongest.p1, task.lineLongest.p2, task.highlight, task.lineWidth * 2, task.lineType)
+                vbc.DrawLine(dst, task.lineLongest.pE1, task.lineLongest.pE2, white)
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -15252,22 +15252,22 @@ Namespace VBClasses
 
             gravityRaw.Run(emptyMat)
             longLine.Run(src)
-            Static lastLongest = algTask.lines.lpList(0)
-            If algTask.lineLongest.length <> lastLongest.length Or algTask.lineGravity.length = 0 Or
-            algTask.frameCount < 5 Then
+            Static lastLongest = task.lines.lpList(0)
+            If task.lineLongest.length <> lastLongest.length Or task.lineGravity.length = 0 Or
+            task.frameCount < 5 Then
 
-                algTask.lineGravity = algTask.gravityIMU
-                algTask.lineHorizon = Line_PerpendicularTest.computePerp(algTask.lineGravity)
-                lastLongest = algTask.lineLongest
+                task.lineGravity = task.gravityIMU
+                task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
+                lastLongest = task.lineLongest
             End If
             If standaloneTest() Then
                 dst2.SetTo(0)
                 showVectors(dst2)
                 dst3.SetTo(0)
-                For Each lp In algTask.lines.lpList
-                    If Math.Abs(algTask.lineGravity.angle - lp.angle) < algTask.angleThreshold Then vbc.DrawLine(dst3, lp, white)
+                For Each lp In task.lines.lpList
+                    If Math.Abs(task.lineGravity.angle - lp.angle) < task.angleThreshold Then vbc.DrawLine(dst3, lp, white)
                 Next
-                labels(3) = algTask.lines.labels(3)
+                labels(3) = task.lines.labels(3)
             End If
         End Sub
     End Class
@@ -15286,17 +15286,17 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             gravity.Run(src)
 
-            kalman.kInput = {algTask.lineGravity.pE1.X, algTask.lineGravity.pE1.Y, algTask.lineGravity.pE2.X, algTask.lineGravity.pE2.Y}
+            kalman.kInput = {task.lineGravity.pE1.X, task.lineGravity.pE1.Y, task.lineGravity.pE2.X, task.lineGravity.pE2.Y}
             kalman.Run(emptyMat)
-            algTask.lineGravity = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
+            task.lineGravity = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
                                      New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3)))
 
-            algTask.lineHorizon = Line_PerpendicularTest.computePerp(algTask.lineGravity)
+            task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
 
             If standaloneTest() Then
                 dst2.SetTo(0)
-                vbc.DrawLine(dst2, algTask.lineGravity.p1, algTask.lineGravity.p2, algTask.highlight)
-                vbc.DrawLine(dst2, algTask.lineHorizon.p1, algTask.lineHorizon.p2, cv.Scalar.Red)
+                vbc.DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, task.highlight)
+                vbc.DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, cv.Scalar.Red)
             End If
         End Sub
     End Class
@@ -15312,10 +15312,10 @@ Namespace VBClasses
             desc = "Trace the longestline to visualize the line over time"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.heartBeat Then dst2.SetTo(0)
-            vbc.DrawLine(dst2, algTask.lineLongest, algTask.highlight)
-            labels(2) = "Longest line is " + Format(algTask.lineLongest.length, fmt1) + " pixels, slope = " +
-                     Format(algTask.lineLongest.slope, fmt1)
+            If task.heartBeat Then dst2.SetTo(0)
+            vbc.DrawLine(dst2, task.lineLongest, task.highlight)
+            labels(2) = "Longest line is " + Format(task.lineLongest.length, fmt1) + " pixels, slope = " +
+                     Format(task.lineLongest.slope, fmt1)
 
             Static strList = New List(Of String)({labels(2)})
             strList.add(labels(2))
@@ -15344,25 +15344,25 @@ Namespace VBClasses
             desc = "Trace the center of the longest line."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lplist = algTask.lines.lpList
+            Dim lplist = task.lines.lpList
 
-            Static lpLast = New lpData(algTask.lineLongest.pE1, algTask.lineLongest.pE2)
-            Dim linePerp = Line_PerpendicularTest.computePerp(algTask.lineLongest)
+            Static lpLast = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
+            Dim linePerp = Line_PerpendicularTest.computePerp(task.lineLongest)
 
             dst2 = src
             vbc.DrawLine(dst2, lpLast, white)
-            vbc.DrawLine(dst2, linePerp, algTask.highlight)
+            vbc.DrawLine(dst2, linePerp, task.highlight)
 
             intersect.lp1 = lpLast
             intersect.lp2 = linePerp
             intersect.Run(emptyMat)
 
-            If algTask.heartBeatLT Then dst3.SetTo(0)
+            If task.heartBeatLT Then dst3.SetTo(0)
             trackPoint = intersect.intersectionPoint
             DrawCircle(dst3, trackPoint)
             DrawCircle(dst3, trackPoint)
 
-            lpLast = New lpData(algTask.lineLongest.pE1, algTask.lineLongest.pE2)
+            lpLast = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
         End Sub
     End Class
 
@@ -15391,10 +15391,10 @@ Namespace VBClasses
             brick.tc1.strOut = Format(brick.tc1.correlation, fmt2) + vbCrLf + Format(brick.tc1.depth, fmt2) + "m"
             brick.tc2.strOut = Format(brick.tc2.correlation, fmt2) + vbCrLf + Format(brick.tc2.depth, fmt2) + "m"
 
-            Dim mean = algTask.pointCloud(brick.tc1.rect).Mean(algTask.depthMask(brick.tc1.rect))
+            Dim mean = task.pointCloud(brick.tc1.rect).Mean(task.depthMask(brick.tc1.rect))
             brick.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
             brick.tc1.depth = brick.pt1.Z
-            mean = algTask.pointCloud(brick.tc2.rect).Mean(algTask.depthMask(brick.tc2.rect))
+            mean = task.pointCloud(brick.tc2.rect).Mean(task.depthMask(brick.tc2.rect))
             brick.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
             brick.tc2.depth = brick.pt2.Z
 
@@ -15459,13 +15459,13 @@ Namespace VBClasses
 
             Dim p1 As cv.Point2f, p2 As cv.Point2f
             If trainInput.Count = 0 Then
-                dst3 = algTask.lines.dst2
+                dst3 = task.lines.dst2
             Else
                 p1 = lastPair.p1
                 p2 = lastPair.p2
             End If
 
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 If trainInput.Count = 0 Then
                     p1 = lp.p1
                     p2 = lp.p2
@@ -15507,7 +15507,7 @@ Namespace VBClasses
             If minDist > 0 Then minDistances.Add(minDist)
             If minDistances.Count > 100 Then minDistances.RemoveAt(0)
 
-            vbc.DrawLine(dst2, p1, p2, algTask.highlight)
+            vbc.DrawLine(dst2, p1, p2, task.highlight)
             trainInput.Clear()
         End Sub
     End Class
@@ -15559,7 +15559,7 @@ Namespace VBClasses
             If minDist > 0 Then minDistances.Add(minDist)
             If minDistances.Count > 100 Then minDistances.RemoveAt(0)
 
-            vbc.DrawLine(dst2, lastP1, lastP2, algTask.highlight)
+            vbc.DrawLine(dst2, lastP1, lastP2, task.highlight)
             trainInput.Clear()
         End Sub
     End Class
@@ -15592,10 +15592,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
 
-            If match.correlation < algTask.fCorrThreshold Or lpSave.p1 <> lpInput.p1 Or lpSave.p2 <> lpInput.p2 Then
+            If match.correlation < task.fCorrThreshold Or lpSave.p1 <> lpInput.p1 Or lpSave.p2 <> lpInput.p2 Then
                 lpSave = lpInput
 
-                If standalone Then lpInput = algTask.lines.lpList(0)
+                If standalone Then lpInput = task.lines.lpList(0)
 
                 Dim r = ValidateRect(New cv.Rect(Math.Min(lpInput.p1.X, lpInput.p2.X), Math.Min(lpInput.p1.Y, lpInput.p2.Y),
                                              Math.Abs(lpInput.p1.X - lpInput.p2.X), Math.Abs(lpInput.p1.Y - lpInput.p2.Y)))
@@ -15619,11 +15619,11 @@ Namespace VBClasses
             End If
 
             match.Run(src)
-            If match.correlation >= algTask.fCorrThreshold Then
+            If match.correlation >= task.fCorrThreshold Then
                 If standaloneTest() Then dst3 = match.dst0.Resize(dst3.Size)
                 Dim p1 = cornerToPoint(corner1, match.newRect)
                 Dim p2 = cornerToPoint(corner2, match.newRect)
-                dst2.Line(p1, p2, algTask.highlight, algTask.lineWidth + 2, algTask.lineType)
+                dst2.Line(p1, p2, task.highlight, task.lineWidth + 2, task.lineType)
                 lpOutput = New lpData(p1, p2)
             End If
             labels(2) = "Longest line end points had correlation of " + Format(match.correlation, fmt3) + " with the original longest line."
@@ -15666,11 +15666,11 @@ Namespace VBClasses
             desc = "Verify the horizon using MatchTemplate."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            'If matchLine.match.correlation < matchLine.match.options.correlationThreshold Then matchLine.lpInput = algTask.lineHorizon
-            If algTask.quarterBeat Then matchLine.lpInput = algTask.lineHorizon
+            'If matchLine.match.correlation < matchLine.match.options.correlationThreshold Then matchLine.lpInput = task.lineHorizon
+            If task.quarterBeat Then matchLine.lpInput = task.lineHorizon
             matchLine.Run(src)
             dst2 = matchLine.dst2
-            vbc.DrawLine(dst2, algTask.lineHorizon.p1, algTask.lineHorizon.p2, cv.Scalar.Red)
+            vbc.DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, cv.Scalar.Red)
             labels(2) = "MatchLine correlation = " + Format(matchLine.match.correlation, fmt3) + " - Red = current horizon, yellow is matchLine output"
         End Sub
     End Class
@@ -15685,10 +15685,10 @@ Namespace VBClasses
             desc = "Verify the gravity vector using MatchTemplate."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            matchLine.lpInput = algTask.lineGravity
+            matchLine.lpInput = task.lineGravity
             matchLine.Run(src)
             dst2 = matchLine.dst2
-            vbc.DrawLine(dst2, algTask.lineGravity.p1, algTask.lineGravity.p2, cv.Scalar.Red)
+            vbc.DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, cv.Scalar.Red)
             labels(2) = "MatchLine correlation = " + Format(matchLine.match.correlation, fmt3) +
                     " - Red = current gravity vector, yellow is matchLine output"
         End Sub
@@ -15709,9 +15709,9 @@ Namespace VBClasses
         Dim options As New Options_KNN
         Dim feat As New Feature_General
         Public Sub New()
-            algTask.featureOptions.FeatureSampleSize.Value = 200
+            task.featureOptions.FeatureSampleSize.Value = 200
             dotSlider = OptionParent.FindSlider("Average distance multiplier")
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Histogram of Y-Axis camera motion", "Yellow points are good features and the white trail in the center estimates camera motion.", "Histogram of X-Axis camera motion"}
             desc = "Track points with KNN and match the goodFeatures from frame to frame"
         End Sub
@@ -15744,25 +15744,25 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            feat.Run(algTask.grayStable)
+            feat.Run(task.grayStable)
 
-            If algTask.firstPass Then lastImage = src.Clone
+            If task.firstPass Then lastImage = src.Clone
             Dim multiplier = dotSlider.Value
 
-            knn.queries = New List(Of cv.Point2f)(algTask.features)
+            knn.queries = New List(Of cv.Point2f)(task.features)
             knn.Run(src)
 
             Dim diffX As New List(Of Integer)
             Dim diffY As New List(Of Integer)
             Dim correlationMat As New cv.Mat
             dst2 = src.Clone
-            Dim sz = algTask.brickSize
+            Dim sz = task.brickSize
             For Each mps In knn.matches
                 Dim currRect = ValidateRect(New cv.Rect(mps.p1.X - sz, mps.p1.Y - sz, sz * 2, sz * 2))
                 Dim prevRect = ValidateRect(New cv.Rect(mps.p2.X - sz, mps.p2.Y - sz, currRect.Width, currRect.Height))
                 cv.Cv2.MatchTemplate(lastImage(prevRect), src(currRect), correlationMat, feat.options.matchOption)
                 Dim corrNext = correlationMat.Get(Of Single)(0, 0)
-                DrawCircle(dst2, mps.p1, algTask.DotSize, algTask.highlight)
+                DrawCircle(dst2, mps.p1, task.DotSize, task.highlight)
                 diffX.Add(mps.p1.X - mps.p2.X)
                 diffY.Add(mps.p1.Y - mps.p2.Y)
             Next
@@ -15781,7 +15781,7 @@ Namespace VBClasses
             lastImage = src.Clone
 
             motionTrack.Add(New cv.Point2f(shiftX + dst2.Width / 2, shiftY + dst2.Height / 2))
-            If motionTrack.Count > algTask.fpsAlgorithm Then motionTrack.RemoveAt(0)
+            If motionTrack.Count > task.fpsAlgorithm Then motionTrack.RemoveAt(0)
             Dim lastpt = motionTrack(0)
             For Each pt In motionTrack
                 vbc.DrawLine(dst2, pt, lastpt, white)
@@ -15808,9 +15808,9 @@ Namespace VBClasses
             Dim minDistance = options.minDistance
 
             ' if there was no motion, use minDistance to eliminate the unstable points.
-            If algTask.optionsChanged = False Then minDistance = 2
+            If task.optionsChanged = False Then minDistance = 2
 
-            knn.queries = New List(Of cv.Point2f)(algTask.features)
+            knn.queries = New List(Of cv.Point2f)(task.features)
             knn.Run(src)
 
             Dim tracker As New List(Of lpData)
@@ -15824,16 +15824,16 @@ Namespace VBClasses
             For i = 0 To trackAll.Count - 1 Step 2
                 Dim t1 = trackAll(i)
                 For Each lp In t1
-                    DrawCircle(dst2, lp.p1, algTask.DotSize, algTask.highlight)
-                    DrawCircle(dst2, lp.p2, algTask.DotSize, algTask.highlight)
+                    DrawCircle(dst2, lp.p1, task.DotSize, task.highlight)
+                    DrawCircle(dst2, lp.p2, task.DotSize, task.highlight)
                     vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
                 Next
             Next
 
-            labels(2) = CStr(algTask.features.Count) + " good features were tracked across " + CStr(algTask.frameHistoryCount) + " frames."
+            labels(2) = CStr(task.features.Count) + " good features were tracked across " + CStr(task.frameHistoryCount) + " frames."
             SetTrueText(labels(2) + vbCrLf + "The highlighted dots are the feature points", 3)
 
-            If trackAll.Count > algTask.frameHistoryCount Then trackAll.RemoveAt(0)
+            If trackAll.Count > task.frameHistoryCount Then trackAll.RemoveAt(0)
         End Sub
     End Class
 
@@ -15907,7 +15907,7 @@ Namespace VBClasses
         Public matchList As New List(Of cv.Point2f)
         Public Sub New()
             knn.desiredMatches = 2
-            algTask.gOptions.DebugSlider.Value = 2
+            task.gOptions.DebugSlider.Value = 2
             labels(2) = "Use the debugslider to define the maximum distance between 'close' points."
             desc = "Use KNN to connect hulls logically."
         End Sub
@@ -15921,7 +15921,7 @@ Namespace VBClasses
             For Each pc In redC.rcList
                 dst3(pc.rect).SetTo(pc.color, pc.mask)
                 For Each pt In pc.hull
-                    dst2(pc.rect).Circle(pt, algTask.DotSize, algTask.highlight, -1)
+                    dst2(pc.rect).Circle(pt, task.DotSize, task.highlight, -1)
                     knn.ptListQuery.Add(New cv.Point(CInt(pt.X) + pc.rect.X, CInt(pt.Y) + pc.rect.Y))
                 Next
             Next
@@ -15930,7 +15930,7 @@ Namespace VBClasses
 
             knn.Run(src)
             matchList.Clear()
-            Dim distanceMax = Math.Min(Math.Abs(algTask.gOptions.DebugSlider.Value), 10)
+            Dim distanceMax = Math.Min(Math.Abs(task.gOptions.DebugSlider.Value), 10)
             For i = 0 To knn.result.GetUpperBound(0) - 1
                 Dim p1 As cv.Point2f = knn.ptListQuery(knn.result(i, 0))
                 For j = 0 To knn.result.GetUpperBound(1) - 1
@@ -15938,8 +15938,8 @@ Namespace VBClasses
                     If p1.DistanceTo(p2) <= distanceMax Then
                         matchList.Add(p1)
                         matchList.Add(p2)
-                        dst3.Circle(p1, algTask.DotSize, algTask.highlight, -1)
-                        dst3.Circle(p2, algTask.DotSize, algTask.highlight, -1)
+                        dst3.Circle(p1, task.DotSize, task.highlight, -1)
+                        dst3.Circle(p2, task.DotSize, task.highlight, -1)
                     End If
                 Next
             Next
@@ -15961,10 +15961,10 @@ Namespace VBClasses
             desc = "Match edgepoints from the current and previous frames."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then lpInput = algTask.lines.lpList
+            If standalone Then lpInput = task.lines.lpList
 
             dst2 = src.Clone
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 HullLine_EdgePoints.EdgePointOffset(lp, 1)
                 DrawCircle(dst2, New cv.Point(CInt(lp.pE1.X), CInt(lp.pE1.Y)))
                 DrawCircle(dst2, New cv.Point(CInt(lp.pE2.X), CInt(lp.pE2.Y)))
@@ -16053,18 +16053,18 @@ Namespace VBClasses
         Public Function createCell(src As cv.Mat, correlation As Single, pt As cv.Point2f) As tCell
             Dim tc As New tCell
 
-            tc.rect = ValidateRect(New cv.Rect(pt.X - algTask.brickSize, pt.Y - algTask.brickSize, algTask.brickSize * 2, algTask.brickSize * 2))
+            tc.rect = ValidateRect(New cv.Rect(pt.X - task.brickSize, pt.Y - task.brickSize, task.brickSize * 2, task.brickSize * 2))
             tc.correlation = correlation
-            tc.depth = algTask.pcSplit(2)(tc.rect).Mean(algTask.depthMask(tc.rect))(0) / 1000
+            tc.depth = task.pcSplit(2)(tc.rect).Mean(task.depthMask(tc.rect))(0) / 1000
             tc.center = pt
-            tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - algTask.brickSize * 3, tc.center.Y - algTask.brickSize * 3,
-                                                 algTask.brickSize * 6, algTask.brickSize * 6))
+            tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - task.brickSize * 3, tc.center.Y - task.brickSize * 3,
+                                                 task.brickSize * 6, task.brickSize * 6))
             If tc.template Is Nothing Then tc.template = src(tc.rect).Clone
             Return tc
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim rSize = algTask.brickSize
-            If standaloneTest() And algTask.heartBeat Then
+            Dim rSize = task.brickSize
+            If standaloneTest() And task.heartBeat Then
                 options.Run()
                 tCells.Clear()
                 tCells.Add(createCell(src, 0, New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))))
@@ -16080,7 +16080,7 @@ Namespace VBClasses
                 tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - rSize * 3, tc.center.Y - rSize * 3, rSize * 6, rSize * 6))
                 tc.rect = ValidateRect(New cv.Rect(tc.center.X - rSize, tc.center.Y - rSize, rSize * 2, rSize * 2))
                 tc.correlation = mm.maxVal
-                tc.depth = algTask.pcSplit(2)(tc.rect).Mean(algTask.depthMask(tc.rect))(0) / 1000
+                tc.depth = task.pcSplit(2)(tc.rect).Mean(task.depthMask(tc.rect))(0) / 1000
                 tc.strOut = Format(tc.correlation, fmt2) + vbCrLf + Format(tc.depth, fmt2) + "m"
                 tCells(i) = tc
             Next
@@ -16113,7 +16113,7 @@ Namespace VBClasses
             Dim cppData(src.Total - 1) As Byte
             Marshal.Copy(src.Data, cppData, 0, cppData.Length)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-            Dim imagePtr = EdgeLine_Image_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, algTask.lineWidth)
+            Dim imagePtr = EdgeLine_Image_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.lineWidth)
             handleSrc.Free()
             If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
         End Sub
@@ -16127,26 +16127,26 @@ Namespace VBClasses
 
     Public Class XO_Motion_RightMask : Inherits TaskParent
         Public Sub New()
-            If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-            If standalone Then algTask.gOptions.showMotionMask.Checked = True
-            algTask.motionMaskRight = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            If standalone Then task.gOptions.showMotionMask.Checked = True
+            task.motionMaskRight = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             labels = {"", "Right View", "Motion Mask for the left view", "Motion Mask for the right view."}
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Build the MotionMask for the right image from the left image bricks with " + vbCrLf +
                "motion.  The result is sloppy and should not be used."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            algTask.bricks.Run(algTask.grayStable)
-            dst2 = algTask.motionMask
-            dst1 = algTask.rightView
+            task.bricks.Run(task.grayStable)
+            dst2 = task.motionMask
+            dst1 = task.rightView
 
-            algTask.motionMaskRight.SetTo(0)
-            For Each index In algTask.motionBasics.motionList
-                Dim brick = algTask.bricks.brickList(index)
-                algTask.motionMaskRight.Rectangle(brick.rRect, 255, -1)
-                dst1.Rectangle(brick.rRect, 255, algTask.lineWidth)
+            task.motionMaskRight.SetTo(0)
+            For Each index In task.motionBasics.motionList
+                Dim brick = task.bricks.brickList(index)
+                task.motionMaskRight.Rectangle(brick.rRect, 255, -1)
+                dst1.Rectangle(brick.rRect, 255, task.lineWidth)
             Next
-            dst3 = algTask.motionMaskRight.Clone
+            dst3 = task.motionMaskRight.Clone
         End Sub
     End Class
 End Namespace

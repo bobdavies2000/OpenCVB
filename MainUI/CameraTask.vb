@@ -39,26 +39,26 @@ Namespace MainUI
             camera.isCapturing = False
         End Sub
         Private Sub Camera_FrameReady(sender As GenericCamera)
-            If algTask.readyForCameraInput = False Then Exit Sub
+            If Task.readyForCameraInput = False Then Exit Sub
 
             Static frameProcessed As Boolean = True
             If frameProcessed = False Then Exit Sub
             frameProcessed = False
 
             Me.BeginInvoke(Sub()
-                               sender.camImages.images(0).CopyTo(algTask.color)
-                               sender.camImages.images(1).CopyTo(algTask.pointCloud)
-                               sender.camImages.images(2).CopyTo(algTask.leftView)
-                               sender.camImages.images(3).CopyTo(algTask.rightView)
+                               sender.camImages.images(0).CopyTo(Task.color)
+                               sender.camImages.images(1).CopyTo(Task.pointCloud)
+                               sender.camImages.images(2).CopyTo(Task.leftView)
+                               sender.camImages.images(3).CopyTo(Task.rightView)
 
-                               algTask.RunAlgorithm()
+                               Task.RunAlgorithm()
                                frameProcessed = True
 
-                               algTask.mouseClickFlag = False
-                               algTask.frameCount += 1
+                               Task.mouseClickFlag = False
+                               Task.frameCount += 1
 
-                               If RefreshTimer.Interval <> algTask.refreshTimerTickCount Then
-                                   RefreshTimer.Interval = algTask.refreshTimerTickCount
+                               If RefreshTimer.Interval <> Task.refreshTimerTickCount Then
+                                   RefreshTimer.Interval = Task.refreshTimerTickCount
                                End If
                            End Sub)
         End Sub
@@ -68,16 +68,16 @@ End Namespace
 'Task.Run(Sub()
 '             Try
 '                 ' Run algorithm on background thread
-'                 algTask.RunAlgorithm()
+'                 task.RunAlgorithm()
 
 '                 ' Update UI on UI thread after algorithm completes
 '                 Me.BeginInvoke(Sub()
 '                                    Try
-'                                        algTask.mouseClickFlag = False
-'                                        algTask.frameCount += 1
+'                                        task.mouseClickFlag = False
+'                                        task.frameCount += 1
 
-'                                        If RefreshTimer.Interval <> algTask.refreshTimerTickCount Then
-'                                            RefreshTimer.Interval = algTask.refreshTimerTickCount
+'                                        If RefreshTimer.Interval <> task.refreshTimerTickCount Then
+'                                            RefreshTimer.Interval = task.refreshTimerTickCount
 '                                        End If
 '                                    Catch ex As Exception
 '                                        Debug.WriteLine("Error updating UI after algorithm: " + ex.Message)

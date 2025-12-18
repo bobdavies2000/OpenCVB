@@ -42,7 +42,7 @@ Namespace VBClasses
             Dim responseMat = cv.Mat.FromPixelData(trainMats(0).Total, 1, cv.MatType.CV_32F, trainResponse.Data)
 
             Dim respFormat = cv.MatType.CV_32F
-            If algTask.heartBeat Or buildEveryPass Then
+            If task.heartBeat Or buildEveryPass Then
                 Select Case options.ML_Name
                     Case "NormalBayesClassifier"
                         normalBayes = cv.ML.NormalBayesClassifier.Create()
@@ -156,7 +156,7 @@ Namespace VBClasses
             desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            mats.mat(1) = algTask.noDepthMask.Clone
+            mats.mat(1) = task.noDepthMask.Clone
 
             Dim color32f As New cv.Mat
             resizer.Run(src)
@@ -165,13 +165,13 @@ Namespace VBClasses
             resizer.dst2.ConvertTo(color32f, cv.MatType.CV_32FC3)
             Dim shadowSmall = mats.mat(1).Resize(color32f.Size()).Clone()
             color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
-            Dim depth = algTask.pcSplit(2).Resize(color32f.Size())
+            Dim depth = task.pcSplit(2).Resize(color32f.Size())
 
-            Dim mask = depth.Threshold(algTask.MaxZmeters, 255, cv.ThresholdTypes.Binary)
+            Dim mask = depth.Threshold(task.MaxZmeters, 255, cv.ThresholdTypes.Binary)
             mask.ConvertTo(mask, cv.MatType.CV_8U)
             mats.mat(2) = mask.Resize(src.Size())
 
-            depth.SetTo(algTask.MaxZmeters, Not mask)
+            depth.SetTo(task.MaxZmeters, Not mask)
 
             colorPal.Run(depth.ConvertScaleAbs())
             mats.mat(3) = colorPal.dst2.Clone()
@@ -198,7 +198,7 @@ Namespace VBClasses
 
             mats.Run(emptyMat)
             dst2 = mats.dst2
-            labels(2) = "prediction, shadow, Depth Mask < " + CStr(algTask.MaxZmeters) + ", Learn Input"
+            labels(2) = "prediction, shadow, Depth Mask < " + CStr(task.MaxZmeters) + ", Learn Input"
             dst3 = mats.dst3
         End Sub
         Public Sub Close()
@@ -219,7 +219,7 @@ Namespace VBClasses
             ' desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            mats.mat(0) = algTask.noDepthMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            mats.mat(0) = task.noDepthMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
             Dim color32f As New cv.Mat
 
@@ -227,17 +227,17 @@ Namespace VBClasses
 
             Dim colorROI As New cv.Rect(0, 0, resizer.newSize.Width, resizer.newSize.Height)
             resizer.dst2.ConvertTo(color32f, cv.MatType.CV_32FC3)
-            Dim shadowSmall = algTask.noDepthMask.Resize(color32f.Size())
+            Dim shadowSmall = task.noDepthMask.Resize(color32f.Size())
             color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
-            Dim depth32f = algTask.pcSplit(2).Resize(color32f.Size())
+            Dim depth32f = task.pcSplit(2).Resize(color32f.Size())
 
-            Dim mask = depth32f.Threshold(algTask.MaxZmeters, algTask.MaxZmeters, cv.ThresholdTypes.BinaryInv)
+            Dim mask = depth32f.Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.BinaryInv)
             mask.SetTo(0, shadowSmall) ' remove the unknown depth...
             mask.ConvertTo(mask, cv.MatType.CV_8U)
             mats.mat(2) = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
 
             mask = Not mask
-            depth32f.SetTo(algTask.MaxZmeters, mask)
+            depth32f.SetTo(task.MaxZmeters, mask)
 
             colorizer.Run(depth32f.ConvertScaleAbs)
             mats.mat(3) = colorizer.dst2.Clone()
@@ -280,7 +280,7 @@ Namespace VBClasses
 
             mats.Run(emptyMat)
             dst3 = mats.dst2
-            labels(3) = "shadow, empty, Depth Mask < " + CStr(algTask.MaxZmeters) + ", Learn Input"
+            labels(3) = "shadow, empty, Depth Mask < " + CStr(task.MaxZmeters) + ", Learn Input"
         End Sub
         Public Sub Close()
             If rtree IsNot Nothing Then rtree.Dispose()
@@ -304,32 +304,32 @@ Namespace VBClasses
         Dim color8U As New Color8U_Basics
         Dim rtree As RTrees
         Public Sub New()
-            algTask.featureOptions.Color8USource.SelectedItem() = "Bin4Way_Regions"
+            task.featureOptions.Color8USource.SelectedItem() = "Bin4Way_Regions"
             desc = "Prepare a grid of color and depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(src)
             dst2 = color8U.dst3
-            labels(2) = "Output of Color8U_Basics running " + algTask.featureOptions.Color8USource.Text
+            labels(2) = "Output of Color8U_Basics running " + task.featureOptions.Color8USource.Text
 
             If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
             Dim mlInput As New List(Of mlColor)
             Dim mResponse As New List(Of Single)
             Dim predictList As New List(Of mlColor)
             Dim roiPredict As New List(Of cv.Rect)
-            For i = 0 To algTask.gridRects.Count - 1
-                Dim roi = algTask.gridRects(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim roi = task.gridRects(i)
                 Dim mls As mlColor
                 mls.colorIndex = color8U.dst2.Get(Of Byte)(roi.Y, roi.X)
                 mls.x = roi.X
                 mls.y = roi.Y
 
-                If algTask.noDepthMask(roi).CountNonZero > 0 Then
+                If task.noDepthMask(roi).CountNonZero > 0 Then
                     roiPredict.Add(roi)
                     predictList.Add(mls)
                 Else
                     mlInput.Add(mls)
-                    mResponse.Add(algTask.pcSplit(2)(roi).Mean())
+                    mResponse.Add(task.pcSplit(2)(roi).Mean())
                 End If
             Next
 
@@ -346,12 +346,12 @@ Namespace VBClasses
             Dim output = New cv.Mat(predictList.Count, 1, cv.MatType.CV_32FC1, cv.Scalar.All(0))
             rtree.Predict(predMat, output)
 
-            dst3 = algTask.pcSplit(2).Clone
+            dst3 = task.pcSplit(2).Clone
             For i = 0 To predictList.Count - 1
                 Dim mls = predictList(i)
                 Dim roi = roiPredict(i)
                 Dim depth = output.Get(Of Single)(i, 0)
-                dst3(roi).SetTo(depth, algTask.noDepthMask(roi))
+                dst3(roi).SetTo(depth, task.noDepthMask(roi))
             Next
 
         End Sub
@@ -378,32 +378,32 @@ Namespace VBClasses
         Dim color8U As New Color8U_Basics
         Dim rtree As RTrees
         Public Sub New()
-            algTask.featureOptions.Color8USource.SelectedItem() = "Bin4Way_Regions"
+            task.featureOptions.Color8USource.SelectedItem() = "Bin4Way_Regions"
             desc = "Prepare a grid of color and depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(src)
             dst2 = color8U.dst3
-            labels(2) = "Output of Color8U_Basics running " + algTask.featureOptions.Color8USource.Text
+            labels(2) = "Output of Color8U_Basics running " + task.featureOptions.Color8USource.Text
 
             If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
             Dim mlInput As New List(Of mlColorInTier)
             Dim mResponse As New List(Of Single)
             Dim predictList As New List(Of mlColorInTier)
             Dim roiPredict As New List(Of cv.Rect)
-            For i = 0 To algTask.gridRects.Count - 1
-                Dim roi = algTask.gridRects(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim roi = task.gridRects(i)
                 Dim mls As mlColorInTier
                 mls.colorIndex = color8U.dst2.Get(Of Byte)(roi.Y, roi.X)
                 mls.x = roi.X
                 mls.y = roi.Y
 
-                If algTask.noDepthMask(roi).CountNonZero > 0 Then
+                If task.noDepthMask(roi).CountNonZero > 0 Then
                     roiPredict.Add(roi)
                     predictList.Add(mls)
                 Else
                     mlInput.Add(mls)
-                    mResponse.Add(algTask.pcSplit(2)(roi).Mean())
+                    mResponse.Add(task.pcSplit(2)(roi).Mean())
                 End If
             Next
 
@@ -420,12 +420,12 @@ Namespace VBClasses
             Dim output = New cv.Mat(predictList.Count, cv.MatType.CV_32FC1, 0)
             rtree.Predict(predMat, output)
 
-            dst3 = algTask.pcSplit(2).Clone
+            dst3 = task.pcSplit(2).Clone
             For i = 0 To predictList.Count - 1
                 Dim mls = predictList(i)
                 Dim roi = roiPredict(i)
                 Dim depth = output.Get(Of Single)(i, 0)
-                dst3(roi).SetTo(depth, algTask.noDepthMask(roi))
+                dst3(roi).SetTo(depth, task.noDepthMask(roi))
             Next
         End Sub
         Public Sub Close()
@@ -456,7 +456,7 @@ Namespace VBClasses
             Dim mResponse As New List(Of Single)
             For y = 0 To regions.rcMapX.Height - 1
                 For x = 0 To regions.rcMapX.Width - 1
-                    Dim zVal = algTask.pcSplit(2).Get(Of Single)(y, x)
+                    Dim zVal = task.pcSplit(2).Get(Of Single)(y, x)
                     Dim val = CSng(gray.Get(Of Byte)(y, x))
                     If zVal = 0 Then
                         ptList.Add(New cv.Point3f(CSng(x), CSng(y), val))
@@ -493,7 +493,7 @@ Namespace VBClasses
         Dim color8U As New Color8U_Basics
         Dim rtree As RTrees
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "", "Entire image after ML", "ML Predictions where no region was defined."}
             desc = "Learn region from X, Y, and grayscale for the RedCloud cells."
         End Sub

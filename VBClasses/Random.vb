@@ -14,7 +14,7 @@ Namespace VBClasses
             options.Run()
 
             Dim sizeRequest = options.count
-            If algTask.paused = False Then
+            If task.paused = False Then
                 PointList.Clear()
                 While PointList.Count < sizeRequest
                     PointList.Add(New cv.Point2f(msRNG.Next(range.X, range.X + range.Width),
@@ -23,7 +23,7 @@ Namespace VBClasses
                 If standaloneTest() Then
                     dst2.SetTo(0)
                     For Each pt In PointList
-                        DrawCircle(dst2, pt, algTask.DotSize, cv.Scalar.Yellow)
+                        DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
                     Next
                 End If
             End If
@@ -46,7 +46,7 @@ Namespace VBClasses
             options.Run()
 
             PointList.Clear()
-            If algTask.paused = False Then
+            If task.paused = False Then
                 For i = 0 To options.count - 1
                     PointList.Add(New cv.Point2d(msRNG.Next(range.X, range.X + range.Width), msRNG.Next(range.Y, range.Y + range.Height)))
                 Next
@@ -81,7 +81,7 @@ Namespace VBClasses
             End Function).ToArray
             dst2.SetTo(0)
             For Each pt In points
-                DrawCircle(dst2, pt, algTask.DotSize, cv.Scalar.Yellow)
+                DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
             Next
         End Sub
     End Class
@@ -94,7 +94,7 @@ Namespace VBClasses
         Public Points3f() As cv.Point3f
         Dim options As New Options_Random
         Public PointList As New List(Of cv.Point3f)
-        Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, algTask.MaxZmeters}
+        Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, task.MaxZmeters}
         Public Sub New()
             OptionParent.FindSlider("Random Pixel Count").Value = 20
             OptionParent.FindSlider("Random Pixel Count").Maximum = dst2.Cols * dst2.Rows
@@ -104,14 +104,14 @@ Namespace VBClasses
             options.Run()
 
             PointList.Clear()
-            If algTask.paused = False Then
+            If task.paused = False Then
                 For i = 0 To options.count - 1
                     PointList.Add(New cv.Point3f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)), msRNG.Next(ranges(4), ranges(5))))
                 Next
                 If standaloneTest() Then
                     dst2.SetTo(0)
                     For Each pt In PointList
-                        DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), algTask.DotSize, cv.Scalar.Yellow)
+                        DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow)
                     Next
                 End If
                 Points3f = PointList.ToArray
@@ -127,7 +127,7 @@ Namespace VBClasses
     Public Class Random_Basics4D : Inherits TaskParent
         Public vec4f() As cv.Vec4f
         Public PointList As New List(Of cv.Vec4f)
-        Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, algTask.MaxZmeters, 0, algTask.MaxZmeters}
+        Public ranges() As Single = {0, dst2.Width, 0, dst2.Height, 0, task.MaxZmeters, 0, task.MaxZmeters}
         Dim options As New Options_Random
         Dim countSlider As System.Windows.Forms.TrackBar
         Public Sub New()
@@ -137,7 +137,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             PointList.Clear()
             Dim count = countSlider.Value
-            If algTask.paused = False Then
+            If task.paused = False Then
                 For i = 0 To count - 1
                     PointList.Add(New cv.Vec4f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)),
                                            msRNG.Next(ranges(4), ranges(5)), msRNG.Next(ranges(6), ranges(7))))
@@ -145,7 +145,7 @@ Namespace VBClasses
                 If standaloneTest() Then
                     dst2.SetTo(0)
                     For Each v In PointList
-                        DrawCircle(dst2, New cv.Point2f(v(0), v(1)), algTask.DotSize, cv.Scalar.Yellow)
+                        DrawCircle(dst2, New cv.Point2f(v(0), v(1)), task.DotSize, cv.Scalar.Yellow)
                     Next
                 End If
                 vec4f = PointList.ToArray
@@ -183,7 +183,7 @@ Namespace VBClasses
             labels(3) = "kmeans run to get colors"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.heartBeat Or algTask.frameCount < 10 Then
+            If task.heartBeat Or task.frameCount < 10 Then
                 random.Run(src)
                 lutMat = New cv.Mat(New cv.Size(1, 256), cv.MatType.CV_8UC3, cv.Scalar.All(0))
                 Dim lutIndex = 0
@@ -470,7 +470,7 @@ Namespace VBClasses
     Public Class Random_StaticTV : Inherits TaskParent
         Dim options As New Options_StaticTV
         Public Sub New()
-            algTask.drawRect = New cv.Rect(10, 10, 50, 50)
+            task.drawRect = New cv.Rect(10, 10, 50, 50)
             labels(2) = "Draw anywhere to select a test region"
             labels(3) = "Resized selection rectangle in dst2"
             desc = "Imitate an old TV appearance using randomness."
@@ -479,7 +479,7 @@ Namespace VBClasses
             options.Run()
 
             dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            dst3 = dst2(algTask.drawRect)
+            dst3 = dst2(task.drawRect)
             For y = 0 To dst3.Height - 1
                 For x = 0 To dst3.Width - 1
                     If 255 * Rnd() <= options.threshPercent Then
@@ -583,7 +583,7 @@ Namespace VBClasses
         Dim currSet As New List(Of cv.Point2f)
         Dim refreshPoints As Boolean = True
         Public Sub New()
-            algTask.kalman = New Kalman_Basics
+            task.kalman = New Kalman_Basics
             Dim offset = dst2.Width / 5
             random.range = New cv.Rect(offset, offset, Math.Abs(dst2.Width - offset * 2), Math.Abs(dst2.Height - offset * 2))
             OptionParent.FindSlider("Random Pixel Count").Value = 10
@@ -596,25 +596,25 @@ Namespace VBClasses
                 currSet = New List(Of cv.Point2f)(random.PointList) ' just to get the updated size
                 refreshPoints = False
 
-                If targetSet.Count * 2 <> algTask.kalman.kInput.Length Then ReDim algTask.kalman.kInput(targetSet.Count * 2 - 1)
+                If targetSet.Count * 2 <> task.kalman.kInput.Length Then ReDim task.kalman.kInput(targetSet.Count * 2 - 1)
 
             End If
 
             For i = 0 To targetSet.Count - 1
                 Dim pt As cv.Point = targetSet(i)
-                algTask.kalman.kInput(i * 2) = pt.X
-                algTask.kalman.kInput(i * 2 + 1) = pt.Y
+                task.kalman.kInput(i * 2) = pt.X
+                task.kalman.kInput(i * 2 + 1) = pt.Y
             Next
 
-            algTask.kalman.Run(emptyMat)
-            For i = 0 To algTask.kalman.kOutput.Count - 1 Step 2
-                currSet(i / 2) = New cv.Point(algTask.kalman.kOutput(i), algTask.kalman.kOutput(i + 1))
+            task.kalman.Run(emptyMat)
+            For i = 0 To task.kalman.kOutput.Count - 1 Step 2
+                currSet(i / 2) = New cv.Point(task.kalman.kOutput(i), task.kalman.kOutput(i + 1))
             Next
 
             dst2.SetTo(0)
             For i = 0 To currSet.Count - 1
-                DrawCircle(dst2, currSet(i), algTask.DotSize + 2, cv.Scalar.Yellow)
-                DrawCircle(dst2, targetSet(i), algTask.DotSize + 2, cv.Scalar.Red)
+                DrawCircle(dst2, currSet(i), task.DotSize + 2, cv.Scalar.Yellow)
+                DrawCircle(dst2, targetSet(i), task.DotSize + 2, cv.Scalar.Red)
             Next
 
             Dim noChanges As Boolean = True
@@ -639,14 +639,14 @@ Namespace VBClasses
         Public clusters As New List(Of List(Of cv.Point2f))
         Dim options As New Options_Clusters
         Public Sub New()
-            algTask.scalarColors(0) = cv.Scalar.Yellow
-            algTask.scalarColors(1) = cv.Scalar.Blue
-            algTask.scalarColors(2) = cv.Scalar.Red
+            task.scalarColors(0) = cv.Scalar.Yellow
+            task.scalarColors(1) = cv.Scalar.Blue
+            task.scalarColors(2) = cv.Scalar.Red
             labels = {"", "", "Colorized sets", ""}
             desc = "Use OpenCV's randN API to create a cluster around a random mean with a requested stdev"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If Not algTask.heartBeat Then Exit Sub
+            If Not task.heartBeat Then Exit Sub
             options.Run()
 
             Dim ptMat As cv.Mat = New cv.Mat(1, 1, cv.MatType.CV_32FC2)
@@ -664,7 +664,7 @@ Namespace VBClasses
                     If pt.X >= dst2.Width Then pt.X = dst2.Width - 1
                     If pt.Y < 0 Then pt.Y = 0
                     If pt.Y >= dst2.Height Then pt.Y = dst2.Height - 1
-                    DrawCircle(dst2, pt, algTask.DotSize, algTask.scalarColors(i Mod 256))
+                    DrawCircle(dst2, pt, task.DotSize, task.scalarColors(i Mod 256))
 
                     cList.Add(pt)
                     labelList.Add(i)

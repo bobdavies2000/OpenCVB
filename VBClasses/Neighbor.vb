@@ -14,24 +14,24 @@ Namespace VBClasses
             If standalone Or runRedCflag Then dst2 = runRedList(src, labels(2))
 
             knn.queries.Clear()
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 knn.queries.Add(rc.maxDist)
             Next
             knn.trainInput = New List(Of cv.Point2f)(knn.queries)
             knn.Run(src)
 
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 For i = 0 To Math.Min(knn.neighbors.Count, options.neighbors) - 1
                     rc.nabs.Add(knn.neighbors(rc.index)(i))
                 Next
             Next
 
             If standalone Then
-                algTask.setSelectedCell()
+                task.setSelectedCell()
                 dst3.SetTo(0)
-                For Each index In algTask.oldrcD.nabs
-                    If index < algTask.redList.oldrclist.Count Then
-                        DrawCircle(dst2, algTask.redList.oldrclist(index).maxDist, algTask.DotSize, algTask.highlight)
+                For Each index In task.oldrcD.nabs
+                    If index < task.redList.oldrclist.Count Then
+                        DrawCircle(dst2, task.redList.oldrclist(index).maxDist, task.DotSize, task.highlight)
                     End If
                 Next
             End If
@@ -52,7 +52,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Or src.Type <> cv.MatType.CV_8U Then
                 dst2 = runRedList(src, labels(2))
-                src = algTask.redList.rcMap
+                src = task.redList.rcMap
             End If
 
             Dim samples(src.Total - 1) As Byte
@@ -78,10 +78,10 @@ Namespace VBClasses
             Next
 
             If standaloneTest() Then
-                dst3 = algTask.color.Clone
+                dst3 = task.color.Clone
                 For Each pt In nPoints
-                    DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
-                    DrawCircle(dst3, pt, algTask.DotSize, cv.Scalar.Yellow)
+                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                    DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Yellow)
                 Next
             End If
 
@@ -105,12 +105,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            corners.Run(algTask.redList.rcMap.Clone())
+            corners.Run(task.redList.rcMap.Clone())
             For Each pt In corners.nPoints
-                DrawCircle(dst2, pt, algTask.DotSize, algTask.highlight)
+                DrawCircle(dst2, pt, task.DotSize, task.highlight)
             Next
 
-            labels(2) = algTask.redList.labels(2) + " and " + CStr(corners.nPoints.Count) + " cell intersections"
+            labels(2) = task.redList.labels(2) + " and " + CStr(corners.nPoints.Count) + " cell intersections"
         End Sub
     End Class
 
@@ -126,15 +126,15 @@ Namespace VBClasses
         Public runRedCflag As Boolean = False
         Public Sub New()
             cPtr = Neighbor_Open()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Find the neighbors in a selected RedCell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Or runRedCflag Then
                 dst2 = runRedList(src, labels(2))
 
-                src = algTask.redList.rcMap
-                oldrclist = algTask.redList.oldrclist
+                src = task.redList.rcMap
+                oldrclist = task.redList.oldrclist
             End If
 
             Dim mapData(src.Total - 1) As Byte
@@ -165,17 +165,17 @@ Namespace VBClasses
             '    nabList(0).Clear() ' neighbors to zero are not interesting (yet?)
             '    oldrclist(0).nabs.Clear() ' not interesting.
 
-            '    If algTask.heartBeat And standaloneTest() Then
+            '    If task.heartBeat And standaloneTest() Then
             '        Static stats As New XO_RedCell_Basics
             '        If stats Is Nothing Then stats = New XO_RedCell_Basics
-            '        stats.Run(algTask.color)
+            '        stats.Run(task.color)
 
             '        strOut = stats.strOut
-            '        If nabList(algTask.oldrcD.index).Count > 0 Then
+            '        If nabList(task.oldrcD.index).Count > 0 Then
             '            strOut += "Neighbors: "
             '            dst1.SetTo(0)
-            '            dst1(algTask.oldrcD.rect).SetTo(algTask.oldrcD.color, algTask.oldrcD.mask)
-            '            For Each index In nabList(algTask.oldrcD.index)
+            '            dst1(task.oldrcD.rect).SetTo(task.oldrcD.color, task.oldrcD.mask)
+            '            For Each index In nabList(task.oldrcD.index)
             '                Dim rc = oldrclist(index)
             '                dst1(rc.rect).SetTo(rc.color, rc.mask)
             '                strOut += CStr(index) + ","

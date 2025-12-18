@@ -2,7 +2,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Module vbc
-        Public algTask As AlgorithmTask
+        Public task As AlgorithmTask
         Public imageLock As New Mutex(True, "imageLock")
         Public Const fmt0 = "0"
         Public Const fmt1 = "0.0"
@@ -36,102 +36,102 @@ Namespace VBClasses
             Return New cv.Scalar(c(0), c(1), c(2))
         End Function
         Public Function DisplayCells() As cv.Mat
-            Dim dst As New cv.Mat(algTask.workRes, cv.MatType.CV_8UC3, 0)
+            Dim dst As New cv.Mat(Task.workRes, cv.MatType.CV_8UC3, 0)
 
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In Task.redList.oldrclist
                 dst(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
             Return dst
         End Function
         Public Function RebuildRCMap(sortedCells As SortedList(Of Integer, oldrcData)) As cv.Mat
-            algTask.redList.oldrclist.Clear()
-            algTask.redList.oldrclist.Add(New oldrcData) ' placeholder oldrcData so map is correct.
-            algTask.redList.rcMap.SetTo(0)
-            Static saveColorSetting = algTask.gOptions.trackingLabel
+            Task.redList.oldrclist.Clear()
+            Task.redList.oldrclist.Add(New oldrcData) ' placeholder oldrcData so map is correct.
+            Task.redList.rcMap.SetTo(0)
+            Static saveColorSetting = Task.gOptions.trackingLabel
             For Each rc In sortedCells.Values
-                rc.index = algTask.redList.oldrclist.Count
+                rc.index = Task.redList.oldrclist.Count
 
-                If saveColorSetting <> algTask.gOptions.trackingLabel Then rc.color = black
-                'Select Case algTask.gOptions.trackingLabel
+                If saveColorSetting <> Task.gOptions.trackingLabel Then rc.color = black
+                'Select Case task.gOptions.trackingLabel
                 '    Case "Mean Color"
                 '        Dim colorStdev As cv.Scalar
-                '        cv.Cv2.MeanStdDev(algTask.color(rc.rect), rc.color, colorStdev, rc.mask)
+                '        cv.Cv2.MeanStdDev(task.color(rc.rect), rc.color, colorStdev, rc.mask)
                 ' Case "Tracking Color"
-                If rc.color = black Then rc.color = algTask.scalarColors(rc.index)
+                If rc.color = black Then rc.color = Task.scalarColors(rc.index)
                 'End Select
 
-                algTask.redList.oldrclist.Add(rc)
-                algTask.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                DisplayCells.Circle(rc.maxDStable, algTask.DotSize, algTask.highlight, -1)
+                Task.redList.oldrclist.Add(rc)
+                Task.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                DisplayCells.Circle(rc.maxDStable, Task.DotSize, Task.highlight, -1)
                 If rc.index >= 255 Then Exit For
             Next
-            saveColorSetting = algTask.gOptions.trackingLabel
-            algTask.redList.rcMap.SetTo(0, algTask.noDepthMask)
+            saveColorSetting = Task.gOptions.trackingLabel
+            Task.redList.rcMap.SetTo(0, Task.noDepthMask)
             Return DisplayCells()
         End Function
         Public Function RebuildRCMap(oldrclist As List(Of oldrcData)) As cv.Mat
-            algTask.redList.rcMap.SetTo(0)
-            Dim dst As New cv.Mat(algTask.workRes, cv.MatType.CV_8UC3, 0)
+            Task.redList.rcMap.SetTo(0)
+            Dim dst As New cv.Mat(Task.workRes, cv.MatType.CV_8UC3, 0)
             For Each rc In oldrclist
-                algTask.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                Task.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 dst(rc.rect).SetTo(rc.color, rc.mask)
                 If rc.index >= 255 Then Exit For
             Next
             Return dst
         End Function
         Public Sub taskUpdate()
-            If algTask.myStopWatch Is Nothing Then algTask.myStopWatch = Stopwatch.StartNew()
+            If Task.myStopWatch Is Nothing Then Task.myStopWatch = Stopwatch.StartNew()
 
             ' update the time measures
-            algTask.msWatch = algTask.myStopWatch.ElapsedMilliseconds
+            Task.msWatch = Task.myStopWatch.ElapsedMilliseconds
 
-            algTask.quarterBeat = False
-            algTask.midHeartBeat = False
-            algTask.heartBeat = False
-            Dim ms = (algTask.msWatch - algTask.msLast) / 1000
-            For i = 0 To algTask.quarter.Count - 1
-                If algTask.quarter(i) = False And ms > Choose(i + 1, 0.25, 0.5, 0.75, 1.0) Then
-                    algTask.quarterBeat = True
-                    If i = 1 Then algTask.midHeartBeat = True
-                    If i = 3 Then algTask.heartBeat = True
-                    algTask.quarter(i) = True
+            Task.quarterBeat = False
+            Task.midHeartBeat = False
+            Task.heartBeat = False
+            Dim ms = (Task.msWatch - Task.msLast) / 1000
+            For i = 0 To Task.quarter.Count - 1
+                If Task.quarter(i) = False And ms > Choose(i + 1, 0.25, 0.5, 0.75, 1.0) Then
+                    Task.quarterBeat = True
+                    If i = 1 Then Task.midHeartBeat = True
+                    If i = 3 Then Task.heartBeat = True
+                    Task.quarter(i) = True
                 End If
             Next
-            If algTask.heartBeat Then ReDim algTask.quarter(4)
+            If Task.heartBeat Then ReDim Task.quarter(4)
 
-            If algTask.frameCount = 1 Then algTask.heartBeat = True
+            If Task.frameCount = 1 Then Task.heartBeat = True
 
-            Static lastHeartBeatLT As Boolean = algTask.heartBeatLT
-            algTask.afterHeartBeatLT = If(lastHeartBeatLT, True, False)
-            lastHeartBeatLT = algTask.heartBeatLT
+            Static lastHeartBeatLT As Boolean = Task.heartBeatLT
+            Task.afterHeartBeatLT = If(lastHeartBeatLT, True, False)
+            lastHeartBeatLT = Task.heartBeatLT
 
             Static heartBeatCount As Integer = 5
-            If algTask.heartBeat Then
+            If Task.heartBeat Then
                 heartBeatCount += 1
                 If heartBeatCount >= 5 Then
-                    algTask.heartBeatLT = True
+                    Task.heartBeatLT = True
                     heartBeatCount = 0
                 End If
             End If
 
-            Dim frameDuration = 1000 / algTask.fpsAlgorithm
-            algTask.almostHeartBeat = If(algTask.msWatch - algTask.msLast + frameDuration * 1.5 > 1000, True, False)
+            Dim frameDuration = 1000 / Task.fpsAlgorithm
+            Task.almostHeartBeat = If(Task.msWatch - Task.msLast + frameDuration * 1.5 > 1000, True, False)
 
-            If (algTask.msWatch - algTask.msLast) > 1000 Then algTask.msLast = algTask.msWatch
-            If algTask.heartBeatLT Then algTask.toggleOn = Not algTask.toggleOn
+            If (Task.msWatch - Task.msLast) > 1000 Then Task.msLast = Task.msWatch
+            If Task.heartBeatLT Then Task.toggleOn = Not Task.toggleOn
 
-            If algTask.paused Then
-                algTask.midHeartBeat = False
-                algTask.almostHeartBeat = False
+            If Task.paused Then
+                Task.midHeartBeat = False
+                Task.almostHeartBeat = False
             End If
 
-            'algTask.histogramBins = algTask.gOptions.HistBinBar.Value
-            'algTask.lineWidth = algTask.gOptions.LineWidth.Value
-            'algTask.DotSize = algTask.gOptions.DotSizeSlider.Value
+            'task.histogramBins = task.gOptions.HistBinBar.Value
+            'task.lineWidth = task.gOptions.LineWidth.Value
+            'task.DotSize = task.gOptions.DotSizeSlider.Value
 
-            'algTask.metersPerPixel = algTask.MaxZmeters / algTask.workRes.Height ' meters per pixel in projections - side and top.
-            'algTask.debugSyncUI = algTask.gOptions.debugSyncUI.Checked
+            'task.metersPerPixel = task.MaxZmeters / task.workRes.Height ' meters per pixel in projections - side and top.
+            'task.debugSyncUI = task.gOptions.debugSyncUI.Checked
         End Sub
 
         Public Function findRectFromLine(lp As lpData) As cv.Rect
@@ -146,7 +146,7 @@ Namespace VBClasses
         Public Function findEdgePoints(lp As lpData) As lpData
             ' compute the edge to edge line - might be useful...
             Dim yIntercept = lp.p1.Y - lp.slope * lp.p1.X
-            Dim w = algTask.cols, h = algTask.rows
+            Dim w = Task.cols, h = Task.rows
 
             Dim xp1 = New cv.Point2f(0, yIntercept)
             Dim xp2 = New cv.Point2f(w, w * lp.slope + yIntercept)
@@ -169,8 +169,8 @@ Namespace VBClasses
                 xp2.Y = 0
             End If
 
-            If xp1.Y = algTask.color.Height Then xp1.Y -= 1
-            If xp2.Y = algTask.color.Height Then xp2.Y -= 1
+            If xp1.Y = Task.color.Height Then xp1.Y -= 1
+            If xp2.Y = Task.color.Height Then xp2.Y -= 1
             Return New lpData(xp1, xp2)
 
         End Function
@@ -206,27 +206,27 @@ Namespace VBClasses
         Public Sub DrawLine(ByRef dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
             Dim pt1 = New cv.Point(p1.X, p1.Y)
             Dim pt2 = New cv.Point(p2.X, p2.Y)
-            dst.Line(pt1, pt2, color, algTask.lineWidth, algTask.lineType)
+            dst.Line(pt1, pt2, color, Task.lineWidth, Task.lineType)
         End Sub
         Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar, lineWidth As Integer)
-            dst.Line(p1, p2, color, lineWidth, algTask.lineType)
+            dst.Line(p1, p2, color, lineWidth, Task.lineType)
         End Sub
         Public Sub DrawLine(dst As cv.Mat, lp As lpData, color As cv.Scalar)
-            dst.Line(lp.p1, lp.p2, color, algTask.lineWidth, algTask.lineType)
+            dst.Line(lp.p1, lp.p2, color, Task.lineWidth, Task.lineType)
         End Sub
         Public Sub DrawLine(dst As cv.Mat, lp As lpData)
-            dst.Line(lp.p1, lp.p2, algTask.highlight, algTask.lineWidth, algTask.lineType)
+            dst.Line(lp.p1, lp.p2, Task.highlight, Task.lineWidth, Task.lineType)
         End Sub
         Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f)
-            dst.Line(p1, p2, algTask.highlight, algTask.lineWidth, algTask.lineType)
+            dst.Line(p1, p2, Task.highlight, Task.lineWidth, Task.lineType)
         End Sub
         Public Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
             If r.X < 0 Then r.X = 0
             If r.Y < 0 Then r.Y = 0
-            If r.X + r.Width >= algTask.workRes.Width * ratio Then r.Width = algTask.workRes.Width * ratio - r.X - 1
-            If r.Y + r.Height >= algTask.workRes.Height * ratio Then r.Height = algTask.workRes.Height * ratio - r.Y - 1
-            If r.X >= algTask.workRes.Width * ratio Then r.X = algTask.workRes.Width - 1
-            If r.Y >= algTask.workRes.Height * ratio Then r.Y = algTask.workRes.Height - 1
+            If r.X + r.Width >= Task.workRes.Width * ratio Then r.Width = Task.workRes.Width * ratio - r.X - 1
+            If r.Y + r.Height >= Task.workRes.Height * ratio Then r.Height = Task.workRes.Height * ratio - r.Y - 1
+            If r.X >= Task.workRes.Width * ratio Then r.X = Task.workRes.Width - 1
+            If r.Y >= Task.workRes.Height * ratio Then r.Y = Task.workRes.Height - 1
             If r.Width <= 0 Then r.Width = 1
             If r.Height <= 0 Then r.Height = 1
             Return r

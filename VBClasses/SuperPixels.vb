@@ -9,8 +9,8 @@ Namespace VBClasses
             dst2 = runRedList(src, labels(2))
 
             dst3 = src
-            For Each rc In algTask.redList.oldrclist
-                DrawTour(dst3(rc.rect), rc.contour, white, algTask.lineWidth)
+            For Each rc In task.redList.oldrclist
+                DrawTour(dst3(rc.rect), rc.contour, white, task.lineWidth)
             Next
         End Sub
     End Class
@@ -30,7 +30,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If algTask.optionsChanged Then
+            If task.optionsChanged Then
                 If cPtr <> 0 Then SuperPixel_Close(cPtr)
                 cPtr = SuperPixel_Open(src.Width, src.Height, options.numSuperPixels, options.numIterations, options.prior)
             End If
@@ -93,7 +93,7 @@ Namespace VBClasses
             desc = "Create SuperPixels using RGBDepth image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            pixels.Run(algTask.depthRGB)
+            pixels.Run(task.depthRGB)
             dst2 = pixels.dst2
             dst3 = pixels.dst3
         End Sub
@@ -112,7 +112,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             edges.Run(src)
-            src = algTask.color.Clone()
+            src = task.color.Clone()
             src.SetTo(white, edges.dst2)
             pixels.Run(src)
             dst2 = pixels.dst2
@@ -134,10 +134,10 @@ Namespace VBClasses
             desc = "Create SuperPixels using RGBDepth image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = algTask.lines.dst2
+            dst3 = task.lines.dst2
             pixels.Run(dst3)
             dst2 = pixels.dst2
-            labels(3) = algTask.lines.labels(2)
+            labels(3) = task.lines.labels(2)
         End Sub
     End Class
 End Namespace

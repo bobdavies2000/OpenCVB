@@ -34,7 +34,7 @@ Namespace VBClasses
             desc = "Use brickpoints to find edgeLines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(algTask.grayStable)
+            edgeline.Run(task.grayStable)
             bPoints.Run(src)
             dst2 = bPoints.dst2
             labels(2) = bPoints.labels(2)
@@ -65,7 +65,7 @@ Namespace VBClasses
             dst2 = bPoints.dst2
             labels(2) = bPoints.labels(2)
 
-            For Each brick In algTask.bricks.brickList
+            For Each brick In task.bricks.brickList
             Next
         End Sub
     End Class

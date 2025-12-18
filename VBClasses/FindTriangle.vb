@@ -10,7 +10,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If algTask.heartBeat Then
+            If task.heartBeat Then
                 srcPoints = New List(Of cv.Point2f)(options.srcPoints)
             Else
                 If srcPoints.Count < 3 Then Exit Sub ' not enough points
@@ -39,7 +39,7 @@ Namespace VBClasses
             Next
 
             For Each pt In srcPoints
-                DrawCircle(dst2, pt, algTask.DotSize + 1, cv.Scalar.Red)
+                DrawCircle(dst2, pt, task.DotSize + 1, cv.Scalar.Red)
             Next
         End Sub
     End Class

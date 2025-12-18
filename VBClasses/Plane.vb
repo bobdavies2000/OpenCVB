@@ -9,18 +9,18 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim topHist As New cv.Mat, sideHist As New cv.Mat, topBackP As New cv.Mat, sideBackP As New cv.Mat
-            cv.Cv2.CalcHist({algTask.pointCloud}, algTask.channelsTop, New cv.Mat, topHist, 2,
-                            {dst2.Height, dst2.Width}, algTask.rangesTop)
+            cv.Cv2.CalcHist({task.pointCloud}, task.channelsTop, New cv.Mat, topHist, 2,
+                            {dst2.Height, dst2.Width}, task.rangesTop)
             topHist.Row(0).SetTo(0)
-            cv.Cv2.InRange(topHist, algTask.projectionThreshold, topHist.Total, dst1)
+            cv.Cv2.InRange(topHist, task.projectionThreshold, topHist.Total, dst1)
             dst1.ConvertTo(dst1, cv.MatType.CV_32F)
-            cv.Cv2.CalcBackProject({algTask.pointCloud}, algTask.channelsTop, dst1, topBackP, algTask.rangesTop)
+            cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, topBackP, task.rangesTop)
 
             frames.Run(topBackP)
             frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
             dst3 = Not dst2
-            dst3.SetTo(0, algTask.noDepthMask)
+            dst3.SetTo(0, task.noDepthMask)
         End Sub
     End Class
 
@@ -92,10 +92,10 @@ Namespace VBClasses
             plane.Run(src)
 
             dst2 = plane.dst2
-            If algTask.heartBeat Then addW.src2.SetTo(0)
+            If task.heartBeat Then addW.src2.SetTo(0)
 
             Dim flatCount = 0
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 If rc.depth < 1.0 Then Continue For ' close objects look like planes.
                 Dim RMSerror As Double = 0
                 Dim pixelCount = 0
@@ -104,7 +104,7 @@ Namespace VBClasses
                         Dim val = rc.mask.Get(Of Byte)(y, x)
                         If val > 0 Then
                             If msRNG.Next(100) < 10 Then
-                                Dim pt = algTask.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
+                                Dim pt = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
                                 ' a*x + b*y + c*z + k = 0 ---> z = -(k + a*x + b*y) / c
                                 Dim depth = -(rc.eq(0) * pt.X + rc.eq(1) * pt.Y + rc.eq(3)) / rc.eq(2)
                                 RMSerror += Math.Abs(pt.Z - depth)
@@ -120,7 +120,7 @@ Namespace VBClasses
                 End If
             Next
 
-            addW.Run(algTask.color)
+            addW.Run(task.color)
             dst3 = addW.dst2
             labels(3) = "There were " + CStr(flatCount) + " RedCloud Cells with an average RMSerror per pixel less than " + Format(plane.options.rmsThreshold * 100, fmt0) + " cm"
         End Sub
@@ -145,7 +145,7 @@ Namespace VBClasses
             For y = 0 To rc.rect.Height - 1
                 For x = 0 To rc.rect.Width - 1
                     If rc.mask.Get(Of Byte)(y, x) > 0 Then
-                        Dim pt = algTask.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
+                        Dim pt = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
                         ' a*x + b*y + c*z + k = 0 ---> z = -(k + a*x + b*y) / c
                         pt.Z = -(rc.eq(0) * pt.X + rc.eq(1) * pt.Y + rc.eq(3)) / rc.eq(2)
                         If rc.mmZ.minVal <= pt.Z And rc.mmZ.maxVal >= pt.Z Then
@@ -160,12 +160,12 @@ Namespace VBClasses
             dst2 = plane.dst2
 
             dst3.SetTo(0)
-            For Each rc In algTask.redList.oldrclist
+            For Each rc In task.redList.oldrclist
                 If plane.options.reuseRawDepthData = False Then buildCloudPlane(rc)
             Next
-            If plane.options.reuseRawDepthData Then dst3 = algTask.pointCloud
+            If plane.options.reuseRawDepthData Then dst3 = task.pointCloud
 
-            Dim rcX = algTask.oldrcD
+            Dim rcX = task.oldrcD
         End Sub
     End Class
 
@@ -222,9 +222,9 @@ Namespace VBClasses
             Dim s2 = If(pt(2) < 0, " - ", " + ")
 
             If count(index) > plane.equations.Count / 4 Then
-                If algTask.kalman Is Nothing Then algTask.kalman = New Kalman_Basics
-                If algTask.heartBeat Then
-                    With algTask.kalman
+                If task.kalman Is Nothing Then task.kalman = New Kalman_Basics
+                If task.heartBeat Then
+                    With task.kalman
                         .kInput = {pt(0), pt(1), pt(2), pt(3)}
                         .Run(src)
 
@@ -257,7 +257,7 @@ Namespace VBClasses
             For Each pt In rc.contour
                 If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
                 If rc.mask.Get(Of Byte)(pt.Y, pt.X) = 0 Then Continue For
-                fitPoints.Add(algTask.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)) ' each contour point is guaranteed to be in the mask and have depth.
+                fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)) ' each contour point is guaranteed to be in the mask and have depth.
             Next
             Return fitPoints
         End Function
@@ -265,7 +265,7 @@ Namespace VBClasses
             Dim fitPoints As New List(Of cv.Point3f)
             For y = 0 To rc.rect.Height - 1
                 For x = 0 To rc.rect.Width - 1
-                    If rc.mask.Get(Of Byte)(y, x) Then fitPoints.Add(algTask.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x))
+                    If rc.mask.Get(Of Byte)(y, x) Then fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x))
                 Next
             Next
             Return fitPoints
@@ -277,8 +277,8 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             Dim newCells As New List(Of oldrcData)
-            Dim rcX = algTask.oldrcD
-            For Each rc In algTask.redList.oldrclist
+            Dim rcX = task.oldrcD
+            For Each rc In task.redList.oldrclist
                 rc.eq = New cv.Vec4f
                 If options.useMaskPoints Then
                     rc.eq = fitDepthPlane(buildMaskPointEq(rc))
@@ -292,7 +292,7 @@ Namespace VBClasses
                                               Math.Abs(255 * rc.eq(1)),
                                               Math.Abs(255 * rc.eq(2))), rc.mask)
             Next
-            algTask.redList.oldrclist = New List(Of oldrcData)(newCells)
+            task.redList.oldrclist = New List(Of oldrcData)(newCells)
         End Sub
     End Class
 
@@ -316,7 +316,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            Dim rc = algTask.oldrcD
+            Dim rc = task.oldrcD
             labels(2) = "Selected cell has " + CStr(rc.contour.Count) + " points."
 
             ' this contour will have more depth data behind it.  Simplified contours will lose lots of depth data.
@@ -325,7 +325,7 @@ Namespace VBClasses
             Dim pt As cv.Point3f, list2D As New List(Of cv.Point)
             ptList.Clear()
             For i = 0 To rc.contour.Count - 1
-                pt = algTask.pointCloud.Get(Of cv.Point3f)(rc.contour(i).Y, rc.contour(i).X)
+                pt = task.pointCloud.Get(Of cv.Point3f)(rc.contour(i).Y, rc.contour(i).X)
                 If pt.Z > 0 Then
                     ptList.Add(pt)
                     list2D.Add(rc.contour(i))
@@ -333,7 +333,7 @@ Namespace VBClasses
                 End If
             Next
 
-            If algTask.heartBeat Or needOutput Then
+            If task.heartBeat Or needOutput Then
                 ptList2D.Clear()
                 equations.Clear()
                 needOutput = False
@@ -389,7 +389,7 @@ Namespace VBClasses
             Dim yList As New List(Of Single)
             For i = 0 To points.Rows - 1
                 Dim pt = points.Get(Of cv.Point)(i, 0)
-                Dim yVal = algTask.pcSplit(1).Get(Of Single)(pt.Y, pt.X)
+                Dim yVal = task.pcSplit(1).Get(Of Single)(pt.Y, pt.X)
                 If yVal <> 0 Then yList.Add(yVal)
             Next
 
@@ -398,22 +398,22 @@ Namespace VBClasses
             hist.mm.maxVal = yList.Max
             hist.Run(cv.Mat.FromPixelData(yList.Count, 1, cv.MatType.CV_32F, yList.ToArray))
             dst2 = hist.dst2
-            Dim binWidth As Single = dst2.Width / algTask.histogramBins
-            Dim rangePerBin = (hist.mm.maxVal - hist.mm.minVal) / algTask.histogramBins
+            Dim binWidth As Single = dst2.Width / task.histogramBins
+            Dim rangePerBin = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
 
-            Dim midHist = algTask.histogramBins / 2
+            Dim midHist = task.histogramBins / 2
             Dim mm As mmData = GetMinMax(hist.histogram(New cv.Rect(0, midHist, 1, midHist)))
             floorPop = mm.maxVal
             Dim peak = hist.mm.minVal + (midHist + mm.maxLoc.Y + 1) * rangePerBin
             Dim rX As Integer = (midHist + mm.maxLoc.Y) * binWidth
-            dst2.Rectangle(New cv.Rect(rX, 0, binWidth, dst2.Height), cv.Scalar.Black, algTask.lineWidth)
+            dst2.Rectangle(New cv.Rect(rX, 0, binWidth, dst2.Height), cv.Scalar.Black, task.lineWidth)
             If Math.Abs(peak - peakCeiling) > rangePerBin Then peakCeiling = peak
 
             mm = GetMinMax(hist.histogram(New cv.Rect(0, 0, 1, midHist)))
             ceilingPop = mm.maxVal
             peak = hist.mm.minVal + (mm.maxLoc.Y + 1) * rangePerBin
             rX = mm.maxLoc.Y * binWidth
-            dst2.Rectangle(New cv.Rect(rX, 0, binWidth, dst2.Height), cv.Scalar.Yellow, algTask.lineWidth)
+            dst2.Rectangle(New cv.Rect(rX, 0, binWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
             If Math.Abs(peak - peakFloor) > rangePerBin * 2 Then peakFloor = peak
 
             labels(3) = "Peak Ceiling = " + Format(peakCeiling, fmt3) + " and Peak Floor = " + Format(peakFloor, fmt3)
@@ -437,7 +437,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 dst2 = runRedList(src, labels(2))
-                rc = algTask.oldrcD
+                rc = task.oldrcD
                 If rc.index = 0 Then SetTrueText("Select a cell in the image at left.")
             End If
 
@@ -453,10 +453,10 @@ Namespace VBClasses
                 Dim p3 = rc.contour(j + offset * 2)
                 Dim p4 = rc.contour(j + offset * 3)
 
-                Dim v1 = algTask.pointCloud(rc.rect).Get(Of cv.Point3f)(p1.Y, p1.X)
-                Dim v2 = algTask.pointCloud(rc.rect).Get(Of cv.Point3f)(p2.Y, p2.X)
-                Dim v3 = algTask.pointCloud(rc.rect).Get(Of cv.Point3f)(p3.Y, p3.X)
-                Dim v4 = algTask.pointCloud(rc.rect).Get(Of cv.Point3f)(p4.Y, p4.X)
+                Dim v1 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p1.Y, p1.X)
+                Dim v2 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p2.Y, p2.X)
+                Dim v3 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p3.Y, p3.X)
+                Dim v4 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p4.Y, p4.X)
                 Dim cross1 = crossProduct(v1 - v2, v2 - v3)
                 Dim cross2 = crossProduct(v1 - v4, v4 - v3)
 
@@ -474,7 +474,7 @@ Namespace VBClasses
                 rc.eq = New cv.Vec4f(xList(dotIndex), yList(dotIndex), zList(dotIndex), kList(dotIndex))
             End If
             If dotlist.Count Then
-                If algTask.heartBeat Then
+                If task.heartBeat Then
                     justEquation = Format(rc.eq(0), fmt3) + "*X + " + Format(rc.eq(1), fmt3) + "*Y + "
                     justEquation += Format(rc.eq(2), fmt3) + "*Z + " + Format(rc.eq(3), fmt3) + vbCrLf
                     If xList.Count > 0 Then
@@ -507,7 +507,7 @@ Namespace VBClasses
         Dim solo As New Cloud_Solo
         Dim frames As New History_Basics
         Public Sub New()
-            If standalone Then algTask.gOptions.displaydst1.checked = True
+            If standalone Then task.gOptions.displaydst1.checked = True
             labels = {"RGB image with highlights for likely vertical surfaces over X frames.",
                   "Heatmap top view", "Single frame backprojection of red areas in the heatmap",
                   "Thresholded heatmap top view mask"}
@@ -515,19 +515,19 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             solo.Run(src)
-            dst3 = solo.heat.topframes.dst2.InRange(algTask.projectionThreshold * algTask.frameHistoryCount, dst2.Total)
+            dst3 = solo.heat.topframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
 
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC1, 0)
             solo.heat.dst0.CopyTo(dst1, dst3)
             dst1.ConvertTo(dst1, cv.MatType.CV_32FC1)
 
-            cv.Cv2.CalcBackProject({algTask.pointCloud}, algTask.channelsTop, dst1, dst2, algTask.rangesTop)
+            cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, dst1, dst2, task.rangesTop)
 
             frames.Run(dst2)
             frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
             dst2.ConvertTo(dst0, cv.MatType.CV_8U)
-            algTask.color.SetTo(white, dst0)
+            task.color.SetTo(white, dst0)
         End Sub
     End Class
 
@@ -541,7 +541,7 @@ Namespace VBClasses
         Dim solo As New Cloud_Solo
         Dim frames As New History_Basics
         Public Sub New()
-            If standalone Then algTask.gOptions.displaydst1.checked = True
+            If standalone Then task.gOptions.displaydst1.checked = True
             labels = {"RGB image with highlights for likely floor or ceiling over X frames.",
                   "Heatmap side view", "Single frame backprojection areas in the heatmap",
                   "Thresholded heatmap side view mask"}
@@ -549,19 +549,19 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             solo.Run(src)
-            dst3 = solo.heat.sideframes.dst2.InRange(algTask.projectionThreshold * algTask.frameHistoryCount, dst2.Total)
+            dst3 = solo.heat.sideframes.dst2.InRange(task.projectionThreshold * task.frameHistoryCount, dst2.Total)
 
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             solo.heat.dst1.CopyTo(dst1, dst3)
             dst1.ConvertTo(dst1, cv.MatType.CV_32FC1)
 
-            cv.Cv2.CalcBackProject({algTask.pointCloud}, algTask.channelsSide, dst1, dst2, algTask.rangesSide)
+            cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, dst1, dst2, task.rangesSide)
 
             frames.Run(dst2)
             frames.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             dst2 = frames.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
             dst2.ConvertTo(dst0, cv.MatType.CV_8U)
-            algTask.color.SetTo(white, dst0)
+            task.color.SetTo(white, dst0)
         End Sub
     End Class
 
@@ -579,7 +579,7 @@ Namespace VBClasses
         Public planeY As Single
         Dim options = New Options_PlaneFloor()
         Public Sub New()
-            If standalone Then algTask.gOptions.displaydst1.checked = True
+            If standalone Then task.gOptions.displaydst1.checked = True
             labels = {"", "", "", ""}
             desc = "Find the floor plane (if present)"
         End Sub
@@ -590,15 +590,15 @@ Namespace VBClasses
             dst1 = slice.dst3
 
             dst0 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            Dim thicknessCMs = algTask.metersPerPixel * 1000 / 100, rect As cv.Rect, nextY As Single
+            Dim thicknessCMs = task.metersPerPixel * 1000 / 100, rect As cv.Rect, nextY As Single
             For y = dst0.Height - 2 To 0 Step -1
                 rect = New cv.Rect(0, y, dst0.Width - 1, 1)
                 Dim count = dst0(rect).CountNonZero
                 If count > options.countThreshold Then
-                    nextY = -algTask.yRange * (algTask.sideCameraPoint.Y - y) / algTask.sideCameraPoint.Y - thicknessCMs / 2.5 ' narrow it down to about 1 cm
+                    nextY = -task.yRange * (task.sideCameraPoint.Y - y) / task.sideCameraPoint.Y - thicknessCMs / 2.5 ' narrow it down to about 1 cm
                     labels(2) = "Y = " + Format(planeY, fmt3) + " separates the floor."
                     SetTrueText(labels(2), 3)
-                    Dim sliceMask = algTask.pcSplit(1).InRange(cv.Scalar.All(planeY), cv.Scalar.All(3.0))
+                    Dim sliceMask = task.pcSplit(1).InRange(cv.Scalar.All(planeY), cv.Scalar.All(3.0))
                     dst2 = src
                     dst2.SetTo(white, sliceMask)
                     Exit For
@@ -608,7 +608,7 @@ Namespace VBClasses
             yList.Add(nextY)
             planeY = yList.Average()
             If yList.Count > 20 Then yList.RemoveAt(0)
-            dst1.Line(New cv.Point(0, rect.Y), New cv.Point(dst2.Width, rect.Y), cv.Scalar.Yellow, slice.options.sliceSize, algTask.lineType)
+            dst1.Line(New cv.Point(0, rect.Y), New cv.Point(dst2.Width, rect.Y), cv.Scalar.Yellow, slice.options.sliceSize, task.lineType)
         End Sub
     End Class
 End Namespace

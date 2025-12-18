@@ -5,21 +5,21 @@ Namespace VBClasses
         Public rawLines As New Line_Core
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            If standalone Then algTask.gOptions.showMotionMask.Checked = True
+            If standalone Then task.gOptions.showMotionMask.Checked = True
             desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
         End Sub
         Private Function lpMotion(lp As lpData) As Boolean
             ' return true if either line endpoint was in the motion mask.
-            If algTask.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
-            If algTask.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
+            If task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
+            If task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
             Return False
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If algTask.algorithmPrep = False Then Exit Sub ' only run as a algTask algorithm.
+            If task.algorithmPrep = False Then Exit Sub ' only run as a task algorithm.
 
-            If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = algTask.gray.Clone
+            If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
             If lpList.Count <= 1 Then
-                algTask.motionMask.SetTo(255)
+                task.motionMask.SetTo(255)
                 rawLines.Run(src)
                 lpList = New List(Of lpData)(rawLines.lpList)
             End If
@@ -42,7 +42,7 @@ Namespace VBClasses
                     sortlines.Add(lp.length, lp)
                 End If
 
-                If lp.ptCenter.X > algTask.workRes.Width Then Dim k = 0
+                If lp.ptCenter.X > task.workRes.Width Then Dim k = 0
             Next
 
             lpList.Clear()
@@ -50,22 +50,22 @@ Namespace VBClasses
                 lp.index = lpList.Count
                 lpList.Add(lp)
 
-                If lp.ptCenter.X > algTask.workRes.Width Then Dim k = 0
+                If lp.ptCenter.X > task.workRes.Width Then Dim k = 0
             Next
 
             dst1.SetTo(0)
             dst2.SetTo(0)
             For Each lp In lpList
                 dst1.Line(lp.p1, lp.p2, lp.index + 1, 1, cv.LineTypes.Link4)
-                dst2.Line(lp.p1, lp.p2, lp.color, algTask.lineWidth, algTask.lineType)
+                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
             Next
 
             ' so we don't have to check the lplist.count every time we need the longest line...
             If lpList.Count = 0 Then
-                lpList.Add(algTask.gravityIMU)
+                lpList.Add(task.gravityIMU)
             End If
-            If algTask.frameCount > 10 Then If algTask.lpD.rect.Width = 0 Then algTask.lpD = lpList(0)
-            algTask.lineLongest = lpList(0)
+            If task.frameCount > 10 Then If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
+            task.lineLongest = lpList(0)
 
             labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
         End Sub
@@ -108,7 +108,7 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For Each lp In lpList
-                dst2.Line(lp.p1, lp.p2, 255, algTask.lineWidth, algTask.lineType)
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
 
             labels(2) = CStr(lpList.Count) + " lines were detected."
@@ -138,10 +138,10 @@ Namespace VBClasses
             Dim m = If(lp.slope = 0, 100000, -1 / lp.slope)
             Dim b = midPoint.Y - m * midPoint.X
             Dim p1 = New cv.Point2f(-b / m, 0)
-            Dim p2 = New cv.Point2f((algTask.workRes.Height - b) / m, algTask.workRes.Height)
+            Dim p2 = New cv.Point2f((task.workRes.Height - b) / m, task.workRes.Height)
 
-            Dim w = algTask.workRes.Width
-            Dim h = algTask.workRes.Height
+            Dim w = task.workRes.Width
+            Dim h = task.workRes.Height
 
             If p1.X < 0 Then p1 = New cv.Point2f(0, b)
             If p1.X > w Then p1 = New cv.Point2f(w, m * w + b)
@@ -156,13 +156,13 @@ Namespace VBClasses
             Return New lpData(p1, p2)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() Then input = algTask.gravityIMU
+            If standaloneTest() Then input = task.gravityIMU
             dst2.SetTo(0)
-            dst2.Line(input.p1, input.p2, white, algTask.lineWidth, algTask.lineType)
+            dst2.Line(input.p1, input.p2, white, task.lineWidth, task.lineType)
 
             output = computePerp(input)
-            DrawCircle(dst2, input.ptCenter, algTask.DotSize + 2, cv.Scalar.Red)
-            dst2.Line(output.p1, output.p2, yellow, algTask.lineWidth, algTask.lineType)
+            DrawCircle(dst2, input.ptCenter, task.DotSize + 2, cv.Scalar.Red)
+            dst2.Line(output.p1, output.p2, yellow, task.lineWidth, task.lineType)
 
             If standaloneTest() Then SetTrueText("The line displayed at left is the gravity vector.", 3)
         End Sub
@@ -183,18 +183,18 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
             Dim parallels As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-            For Each lp In algTask.lines.lpList
+            For Each lp In task.lines.lpList
                 parallels.Add(lp.angle, lp.index)
             Next
 
-            ReDim classes(algTask.lines.lpList.Count - 1)
+            ReDim classes(task.lines.lpList.Count - 1)
             Dim index As Integer, j As Integer
             unParallel.Clear()
             For i = 0 To parallels.Count - 1
-                Dim lp1 = algTask.lines.lpList(parallels.ElementAt(i).Value)
+                Dim lp1 = task.lines.lpList(parallels.ElementAt(i).Value)
                 For j = i + 1 To parallels.Count - 1
-                    Dim lp2 = algTask.lines.lpList(parallels.ElementAt(j).Value)
-                    If Math.Abs(lp1.angle - lp2.angle) < algTask.angleThreshold Then
+                    Dim lp2 = task.lines.lpList(parallels.ElementAt(j).Value)
+                    If Math.Abs(lp1.angle - lp2.angle) < task.angleThreshold Then
                         If classes(index) Is Nothing Then classes(index) = New List(Of Integer)({lp1.index})
                         classes(index).Add(lp2.index)
                     Else
@@ -211,21 +211,21 @@ Namespace VBClasses
             For i = 0 To classes.Count - 1
                 If classes(i) Is Nothing Then Exit For
                 For j = 0 To classes(i).Count - 1
-                    Dim lp = algTask.lines.lpList(classes(i).ElementAt(j))
-                    dst2.Line(lp.p1, lp.p2, lp.color, algTask.lineWidth * 2, algTask.lineType)
+                    Dim lp = task.lines.lpList(classes(i).ElementAt(j))
+                    dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth * 2, task.lineType)
                     SetTrueText(CStr(colorIndex), lp.ptCenter)
                 Next
                 colorIndex += 1
             Next
 
             For Each index In unParallel
-                Dim lp = algTask.lines.lpList(index)
+                Dim lp = task.lines.lpList(index)
                 vbc.DrawLine(dst2, lp)
                 SetTrueText("0", lp.ptCenter)
             Next
 
-            dst3 = algTask.lines.dst2
-            labels(3) = algTask.lines.labels(2)
+            dst3 = task.lines.dst2
+            labels(3) = task.lines.labels(2)
         End Sub
     End Class
 
@@ -247,7 +247,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                lp = algTask.lineLongest
+                lp = task.lineLongest
                 If lp.length = 0 Then Exit Sub
             End If
 
@@ -256,13 +256,13 @@ Namespace VBClasses
 
             Dim r = lp.rect
             dst1.SetTo(0)
-            sobel.Run(algTask.gray)
+            sobel.Run(task.gray)
             sobel.dst2(r).CopyTo(dst1(r), dst3(r))
             DrawRect(dst1, r, black)
 
             Dim allPoints As New List(Of cv.Point)
             Dim brickList As New List(Of cv.Rect)
-            For Each rect In algTask.gridRects
+            For Each rect In task.gridRects
                 Dim brick = dst1(rect)
                 If brick.CountNonZero = 0 Then Continue For
                 Dim mm = GetMinMax(brick)
@@ -283,7 +283,7 @@ Namespace VBClasses
                 Dim pt = allPoints(i)
                 For j = i + 1 To allPoints.Count - 1
                     Dim lpTest = New lpData(pt, allPoints(j))
-                    If Math.Abs(lp.angle - lpTest.angle) < algTask.angleThreshold Then
+                    If Math.Abs(lp.angle - lpTest.angle) < task.angleThreshold Then
                         angles.Add(lpTest.angle)
                         ptList.Add(pt)
                         ptList.Add(allPoints(j))
@@ -354,7 +354,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                If algTask.heartBeat Then
+                If task.heartBeat Then
                     lp1 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
                              New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)))
                     lp2 = New lpData(New cv.Point2f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height)),
@@ -366,10 +366,10 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst2.SetTo(0)
-                dst2.Line(lp1.p1, lp1.p2, cv.Scalar.Yellow, algTask.lineWidth, algTask.lineType)
-                dst2.Line(lp2.p1, lp2.p2, cv.Scalar.Yellow, algTask.lineWidth, algTask.lineType)
+                dst2.Line(lp1.p1, lp1.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                dst2.Line(lp2.p1, lp2.p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
                 If intersectionPoint <> New cv.Point2f Then
-                    DrawCircle(dst2, intersectionPoint, algTask.DotSize + 4, white)
+                    DrawCircle(dst2, intersectionPoint, task.DotSize + 4, white)
                     labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y))
                 Else
                     labels(2) = "Parallel!!!"
@@ -395,18 +395,18 @@ Namespace VBClasses
             desc = "Find the lines in the Left and Right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            leftLines = New List(Of lpData)(algTask.lines.lpList)
-            dst2 = algTask.leftView.Clone
+            leftLines = New List(Of lpData)(task.lines.lpList)
+            dst2 = task.leftView.Clone
             For Each lp In leftLines
-                dst2.Line(lp.p1, lp.p2, 255, algTask.lineWidth, algTask.lineType)
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
             labels(2) = "There were " + CStr(leftLines.Count) + " lines found in the left view"
 
-            lines.Run(algTask.rightView.Clone)
+            lines.Run(task.rightView.Clone)
             rightLines = New List(Of lpData)(lines.lpList)
-            dst3 = algTask.rightView.Clone
+            dst3 = task.rightView.Clone
             For Each lp In rightLines
-                dst3.Line(lp.p1, lp.p2, 255, algTask.lineWidth, algTask.lineType)
+                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
             labels(3) = "There were " + CStr(rightLines.Count) + " lines found in the right view"
         End Sub
@@ -420,14 +420,14 @@ Namespace VBClasses
     Public Class Line_Select : Inherits TaskParent
         Public delaunay As New Delaunay_LineSelect
         Public Sub New()
-            If standalone Then algTask.gOptions.displayDst1.Checked = True
-            desc = "Select a line with mouse movement and put the selection into algTask.lpD."
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Select a line with mouse movement and put the selection into task.lpD."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             delaunay.Run(src)
             dst2 = delaunay.dst1
             labels(2) = delaunay.labels(2)
-            strOut = algTask.lpD.displayCell(dst3)
+            strOut = task.lpD.displayCell(dst3)
             SetTrueText(strOut, 1) ' the line info is already prepped in strout in delaunay.
         End Sub
     End Class
@@ -465,26 +465,26 @@ Namespace VBClasses
 
                 Dim minVal = deltaX.Min
                 Dim index = deltaX.IndexOf(minVal)
-                If minVal < algTask.brickSize Then
+                If minVal < task.brickSize Then
                     Dim lp = New lpData(p1, ptList(index))
                     If lp.indexVTop < 0 Or lp.indexVBot < 0 Then Continue For
                     lp.index = lpList.Count
                     lpList.Add(lp)
-                    dst2.Line(p1, ptList(index), algTask.highlight, algTask.lineWidth, algTask.lineType)
+                    dst2.Line(p1, ptList(index), task.highlight, task.lineWidth, task.lineType)
                 End If
             Next
 
-            Dim topGroups(algTask.bricksPerRow - 1) As List(Of Integer)
+            Dim topGroups(task.bricksPerRow - 1) As List(Of Integer)
             For Each lp In lpList
                 If topGroups(lp.indexVTop) Is Nothing Then topGroups(lp.indexVTop) = New List(Of Integer)
                 topGroups(lp.indexVTop).Add(lp.index)
             Next
 
-            Dim indexVTop = Math.Abs(algTask.gOptions.DebugSlider.Value)
+            Dim indexVTop = Math.Abs(task.gOptions.DebugSlider.Value)
             dst3.SetTo(0)
             If indexVTop < topGroups.Count Then
                 If topGroups(indexVTop) IsNot Nothing Then
-                    Dim botGroups(algTask.bricksPerRow - 1) As List(Of Integer)
+                    Dim botGroups(task.bricksPerRow - 1) As List(Of Integer)
                     For Each index In topGroups(indexVTop)
                         Dim lp = lpList(index)
                         If botGroups(lp.indexVBot) Is Nothing Then botGroups(lp.indexVBot) = New List(Of Integer)
