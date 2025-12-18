@@ -203,7 +203,6 @@ Namespace VBClasses
             histBinList = {histogramBins, histogramBins, histogramBins}
 
             Dim saveOptionsChanged = optionsChanged
-            If optionsChanged And treeView IsNot Nothing Then treeView.optionsChanged = True
             If activateTaskForms Then
                 If sharpGL IsNot Nothing Then sharpGL.Activate()
                 treeView.Activate()
@@ -305,11 +304,6 @@ Namespace VBClasses
 
                 If gifCreator IsNot Nothing Then gifCreator.createNextGifImage()
 
-                If optionsChanged = True And treeView IsNot Nothing Then
-                    treeView.optionsChanged = True
-                    Dim sender As Object = Nothing, e As EventArgs = Nothing
-                    treeView.optionsChanged = False
-                End If
                 optionsChanged = False
             Catch ex As Exception
                 Debug.WriteLine("Active Algorithm exception occurred: " + ex.Message)

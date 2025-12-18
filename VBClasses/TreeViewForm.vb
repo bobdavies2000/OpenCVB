@@ -5,8 +5,6 @@ Public Class TreeviewForm
     Dim moduleList As New List(Of String) ' the list of all active algorithms.
     Dim PercentTimes As New SortedList(Of Single, String)(New compareAllowIdenticalSingle)
     Dim titleStr = " - Click on any node to review the algorithm's output."
-    ' updated when task.optionschanged occurs - used in the timer so can't use task.optionschanged.
-    Public optionsChanged As Boolean
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         TreeView1.Height = Me.Height
         PercentTime.Height = TreeView1.Height
@@ -91,114 +89,29 @@ Public Class TreeviewForm
         End Function
     End Class
     Public Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
-        Dim algorithm_ms = New List(Of Single)(task.cpu.algorithm_ms)
         Static saveCount As Integer
-        If task.cpu.callTrace.Count <> saveCount Or optionsChanged Then
+        If task.cpu.callTrace.Count <> saveCount Then
             saveCount = task.cpu.callTrace.Count
             updateTree(New List(Of String)(task.cpu.callTrace))
-            optionsChanged = False
         End If
 
-        If algorithm_ms.Count = 0 Then
-            PercentTime.Text = ""
-            Exit Sub
-        End If
-        Dim sumTime As Single
-        For i = 0 To algorithm_ms.Count - 1
-            sumTime += algorithm_ms(i)
-        Next
-
-        For Each percent In algorithm_ms
-            percent /= sumTime
-        Next
-
-        Dim saveWaitTime As String = ""
-        PercentTimes.Clear()
-        Dim percentStr As String = ""
-        For i = 0 To algorithm_ms.Count - 1
-            algorithm_ms(i) /= sumTime
-            If algorithm_ms(i) < 0 Then algorithm_ms(i) = 0
-            If i >= task.cpu.algorithmNames.Count Then Exit For
-            Dim str = Format(algorithm_ms(i), "00.0%") + " " + task.cpu.algorithmNames(i)
-            If task.cpu.displayObjectName IsNot Nothing Then
-                If task.cpu.displayObjectName.Length > 0 Then
-                    If str.Contains(task.cpu.displayObjectName) Then percentStr = str
-                End If
-            End If
-            If task.cpu.algorithmNames(i).Contains("Wait For Input") Then
-                saveWaitTime = str + "<<<<<< " + vbCrLf
-            Else
-                PercentTimes.Add(algorithm_ms(i), str)
-            End If
-        Next
-
-        Dim otherTimes As New List(Of Single)
-        For Each percent In PercentTimes.Keys
-            If percent < 0.01 Then otherTimes.Add(percent)
-        Next
-
-        PercentTime.Text = "Click on an algorithm to see more info. " + vbCrLf + vbCrLf
-        PercentTime.Text += "Algorithm FPS = " + Format(Task.fpsAlgorithm, "0") + vbCrLf
-        PercentTime.Text += "Camera FPS = " + Format(Task.fpsCamera, "0") + vbCrLf
-
-        Dim fps As Single = Task.Settings.FPSdisplay
-        fps = If(fps >= 1, fps, If(fps = 0, 1, 1 / Math.Abs(fps)))
-        Dim fmt As String = If(fps >= 1, "0", "0.0")
-        PercentTime.Text += "Display FPS ~ " + Format(fps, fmt) + vbCrLf + vbCrLf
-
-        Static boldFont = New Font(PercentTime.Font, FontStyle.Bold)
-        Static regularFont = New Font(PercentTime.Font, FontStyle.Regular)
-
-        Dim timeDataTree As New List(Of String)(treeData)
-        For i = 0 To PercentTimes.Count - 1
-            If PercentTimes.ElementAt(i).Key > 0.01 Then
-                Dim str = PercentTimes.ElementAt(i).Value
-                Dim index = treeData.IndexOf(str.Substring(6))
-                PercentTime.Text += str + vbCrLf
-                If index >= 0 Then timeDataTree(index) = str.Substring(0, 5) + " " + timeDataTree(index)
-            End If
-        Next
-
-        PercentTime.Text += saveWaitTime + vbCrLf
-
-        PercentTime.Text += Format(otherTimes.Sum, "00.0%") + " " + CStr(otherTimes.Count) + " algorithms each < 1.0%" +
-                            vbCrLf + vbCrLf + "Click an algorithm at left to see it below:" + vbCrLf + vbCrLf
-
-        PercentTime.Text += If(percentStr Is Nothing, "Inactive algorithm selected", percentStr)
-    End Sub
-    Private Sub CheckIfOffScreen()
-        Dim formRect As Rectangle = Me.Bounds
-        Dim screenBounds As Rectangle = Screen.PrimaryScreen.WorkingArea ' Use WorkingArea to exclude taskbar
-
-        ' Check if any part of the form is visible on the screen
-        If Not screenBounds.IntersectsWith(formRect) Then
-            ' The entire form is off the screen
-            MessageBox.Show("Form is completely off-screen!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-
-            ' Optionally, you might want to move the form back onto the screen
-            ' For example, move it to the center of the primary screen
-            Me.StartPosition = FormStartPosition.Manual
-            Me.Location = New Point(screenBounds.Left + (screenBounds.Width - Me.Width) \ 2,
-                                    screenBounds.Top + (screenBounds.Height - Me.Height) \ 2)
-        End If
+        PercentTime.Text = task.cpu.PrepareReport(treeData)
     End Sub
     Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         TreeView1.Dock = DockStyle.Fill
         TreeView1.SendToBack()
 
-        Me.Location = New Point(Task.Settings.TreeViewLeft, Task.settings.TreeViewTop)
-        Me.Size = New Size(Task.Settings.TreeViewWidth, Task.settings.TreeViewHeight)
+        Me.Location = New Point(task.Settings.TreeViewLeft, task.Settings.TreeViewTop)
+        Me.Size = New Size(task.Settings.TreeViewWidth, task.Settings.TreeViewHeight)
 
         PercentTime.Width = 250
         PercentTime.Left = 250
-
-        CheckIfOffScreen()
     End Sub
     Private Sub TreeviewForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
-        Task.settings.TreeViewLeft = Me.Left
-        Task.settings.TreeViewTop = Me.Top
-        Task.settings.TreeViewWidth = Me.Width
-        Task.settings.TreeViewHeight = Me.Height
+        task.Settings.TreeViewLeft = Me.Left
+        task.Settings.TreeViewTop = Me.Top
+        task.Settings.TreeViewWidth = Me.Width
+        task.Settings.TreeViewHeight = Me.Height
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         Dim algorithm = e.Node.Text
