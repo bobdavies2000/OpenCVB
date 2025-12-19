@@ -12,7 +12,7 @@ Namespace MainUI
             If lastAlgorithmFrame > taskAlg.frameCount Then lastAlgorithmFrame = 0
             If lastCameraFrame > camera.cameraFrameCount Then lastCameraFrame = 0
 
-            If isPlaying And taskAlg IsNot Nothing Then
+            If isPlaying Then
                 Dim timeNow As DateTime = Now
                 Dim elapsedTime = timeNow.Ticks - lastTime.Ticks
                 Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
@@ -31,27 +31,23 @@ Namespace MainUI
                 taskAlg.fpsAlgorithm = countFrames / (taskTimerInterval / 1000)
                 If taskAlg.fpsAlgorithm >= 100 Then taskAlg.fpsAlgorithm = 99
 
-                If taskAlg.fpsAlgorithm = 0 Then
-                    taskAlg.fpsAlgorithm = 1
-                Else
-                    If taskAlg.testAllRunning Then
-                        Static lastWriteTime = timeNow
-                        elapsedTime = timeNow.Ticks - lastWriteTime.Ticks
-                        spanCopy = New TimeSpan(elapsedTime)
-                        taskTimerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
-                        If taskTimerInterval > If(taskAlg.testAllRunning, 1000, 5000) Then
-                            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
-                            totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
+                If TestAllTimer.Enabled Then
+                    Static lastWriteTime = timeNow
+                    elapsedTime = timeNow.Ticks - lastWriteTime.Ticks
+                    spanCopy = New TimeSpan(elapsedTime)
+                    taskTimerInterval = spanCopy.Ticks / TimeSpan.TicksPerMillisecond
+                    If taskTimerInterval > 5000 Then
+                        Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+                        totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
 
-                            lastWriteTime = timeNow
-                            If fpsWriteCount = 5 Then
-                                Debug.WriteLine("")
-                                fpsWriteCount = 0
-                            End If
-                            fpsWriteCount += 1
-                            Debug.Write(" " + Format(totalBytesOfMemoryUsed, "###") + "/" +
-                                              Format(taskAlg.fpsAlgorithm, "0") + "/" + Format(taskAlg.fpsCamera, "0"))
+                        lastWriteTime = timeNow
+                        If fpsWriteCount = 5 Then
+                            Debug.WriteLine("")
+                            fpsWriteCount = 0
                         End If
+                        fpsWriteCount += 1
+                        Debug.Write(" " + Format(totalBytesOfMemoryUsed, "###") + "/" +
+                                              Format(taskAlg.fpsAlgorithm, "0") + "/" + Format(taskAlg.fpsCamera, "0"))
                     End If
                 End If
             End If

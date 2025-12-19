@@ -39,6 +39,7 @@ Namespace MainUI
             camera.isCapturing = False
         End Sub
         Private Sub Camera_FrameReady(sender As GenericCamera)
+            If taskAlg Is Nothing Then Exit Sub
             If taskAlg.readyForCameraInput = False Then Exit Sub
 
             Static frameProcessed As Boolean = True

@@ -13,13 +13,13 @@ Namespace MainUI
         Dim recentMenu() As ToolStripMenuItem
         Dim labels As List(Of Label)
         Dim pics As New List(Of PictureBox)
-        Dim testAllRunning As Boolean = False
         Dim stopTestAll As Bitmap
         Dim PausePlay As Bitmap
         Dim runPlay As Bitmap
         Dim testAllToolbarBitmap As Bitmap
         Dim resolutionDetails As String
         Dim magnifyIndex As Integer
+        Dim paintCount As Integer
 
         Public Sub setAlgorithmSelection()
             If AvailableAlgorithms.Items.Contains(settings.algorithm) = False Then
@@ -45,7 +45,6 @@ Namespace MainUI
             Next
         End Sub
         Private Sub updateAlgorithmHistory()
-            If testAllRunning Then Exit Sub
             Dim copyList As List(Of String)
             Dim maxHistory As Integer = 50
             If algHistory.Contains(AvailableAlgorithms.Text) Then
@@ -240,47 +239,18 @@ Namespace MainUI
             StatusLabel.Location = New Point(offset, pics(2).Top + h)
             StatusLabel.Width = w * 2
         End Sub
-        Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
-            TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTestAll, testAllToolbarBitmap)
-            If TestAllButton.Text = "Test All" Then
-                Debug.WriteLine("")
-                Debug.WriteLine("Starting 'TestAll' overnight run.")
-
-                TestAllButton.Text = "Stop Test"
-                AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
-                TestAllTimer.Interval = settings.testAllDuration * 1000
-                TestAllTimer.Enabled = True
-            Else
-                Debug.WriteLine("Stopping 'TestAll' overnight run.")
-                AvailableAlgorithms.Enabled = True
-                TestAllTimer.Enabled = False
-                TestAllButton.Text = "Test All"
-            End If
-            testAllRunning = TestAllTimer.Enabled
-        End Sub
         Private Sub TreeViewTimer_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
             If isPlaying = False Then Exit Sub
             If taskAlg Is Nothing Then Exit Sub
             If taskAlg.treeView IsNot Nothing Then taskAlg.treeView.Timer2_Tick(sender, e)
         End Sub
-        Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
-            For i = 0 To 3
-                pics(i).Refresh() ' control the frequency of paints with global option Display FPS.
-            Next
-            Static meRefreshCount As Integer
-            If meRefreshCount > 50 Then
-                meRefreshCount = 0
-                Me.Refresh()
-            End If
-            meRefreshCount += 1
-        End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
-            If testAllRunning = False Then settings.algorithm = AvailableAlgorithms.Text
+            If TestAllTimer.Enabled Then Exit Sub
+
+            settings.algorithm = AvailableAlgorithms.Text
 
             SaveJsonSettings()
-            If taskAlg Is Nothing Then
-                startAlgorithm()
-            Else
+            If taskAlg IsNot Nothing Then
                 If Trim(AvailableAlgorithms.Text) = "" Then ' Skip the space between groups
                     If AvailableAlgorithms.SelectedIndex + 1 < AvailableAlgorithms.Items.Count Then
                         AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1)
@@ -288,12 +258,10 @@ Namespace MainUI
                         AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex - 1)
                     End If
                 End If
-
-                If AvailableAlgorithms.Enabled Then
-                    startAlgorithm()
-                    updateAlgorithmHistory()
-                End If
             End If
+
+            startAlgorithm()
+            updateAlgorithmHistory()
         End Sub
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             settings = settingsIO.Load()
@@ -361,6 +329,36 @@ Namespace MainUI
             Static startingAlgorithm = AvailableAlgorithms.Text
             startAlgorithm()
         End Sub
+        Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
+            TestAllTimer.Enabled = Not TestAllTimer.Enabled
+            TestAllButton.Image = If(TestAllTimer.Enabled, stopTestAll, testAllToolbarBitmap)
+            If TestAllTimer.Enabled Then
+                Debug.WriteLine("")
+                Debug.WriteLine("Starting 'TestAll' overnight run.")
+
+                AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
+                TestAllTimer.Interval = settings.testAllDuration * 1000
+                TestAllTimer.Enabled = True
+                taskAlg.testAllRunning = True
+            Else
+                Debug.WriteLine("Stopping 'TestAll' overnight run.")
+                AvailableAlgorithms.Enabled = True
+                TestAllTimer.Enabled = False
+                taskAlg.testAllRunning = False
+            End If
+        End Sub
+        Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
+            If paintCount = 0 Then Exit Sub
+            For i = 0 To 3
+                pics(i).Refresh() ' control the frequency of paints with global option Display FPS.
+            Next
+            Static refreshCount As Integer
+            If refreshCount Mod 50 = 0 Then
+                refreshCount = 0
+                Me.Refresh()
+            End If
+            refreshCount += 1
+        End Sub
         Private Sub Pic_Paint(sender As Object, e As PaintEventArgs)
             If taskAlg Is Nothing Then Exit Sub
             Dim g As Graphics = e.Graphics
@@ -395,6 +393,9 @@ Namespace MainUI
                 End If
             Next
             displayimage.Dispose()
+
+            If paintCount = 0 Then MainForm_Resize(sender, e)
+            paintCount += 1
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
@@ -442,6 +443,5 @@ Namespace MainUI
                 CameraSwitching.Visible = False
             End If
         End Sub
-
     End Class
 End Namespace

@@ -116,6 +116,12 @@ Namespace MainUI
             Return usblist
         End Function
         Public Sub Save(settings As jsonShared.Settings)
+            If settings.allOptionsWidth = 0 Then settings.allOptionsWidth = 1000
+            If settings.allOptionsHeight = 0 Then settings.allOptionsHeight = 500
+
+            If settings.MainFormWidth = 0 Then settings.MainFormWidth = 500
+            If settings.MainFormHeight = 0 Then settings.MainFormHeight = 350
+
             Select Case settings.captureRes.Width
                 Case 672
                     settings.displayRes = New cv.Size(672, 376)

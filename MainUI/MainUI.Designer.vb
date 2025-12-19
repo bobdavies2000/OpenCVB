@@ -90,7 +90,7 @@ Namespace MainUI
             TestAllButton.ImageTransparentColor = Color.Magenta
             TestAllButton.Name = "TestAllButton"
             TestAllButton.Size = New Size(34, 34)
-            TestAllButton.Text = "Open"
+            TestAllButton.Text = "Start"
             TestAllButton.ToolTipText = "Test All Algorithms"
             ' 
             ' Magnifier
@@ -232,6 +232,9 @@ Namespace MainUI
             ' 
             RefreshTimer.Enabled = True
             RefreshTimer.Interval = 33
+            ' 
+            ' MagnifyTimer
+            ' 
             ' 
             ' MainUI
             ' 

@@ -3,7 +3,6 @@ Imports PixelViewer
 Imports cv = OpenCvSharp
 Imports jsonShared
 
-#Region "taskProcess"
 Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
         Public Sub Dispose() Implements IDisposable.Dispose
@@ -17,8 +16,6 @@ Namespace VBClasses
                 If mat IsNot Nothing Then mat.Dispose()
             Next
         End Sub
-#End Region
-
         Public Sub Initialize(settings As jsonShared.Settings)
             taskAlg.Settings = settings
             rgbLeftAligned = True
