@@ -220,9 +220,9 @@ Namespace VBClasses
 
 
 
-                labels = MainUI_Algorithm.labels
-                If taskAlg.gOptions.displayDst0.Checked = False Then labels(0) = taskAlg.resolutionDetails
-                If taskAlg.gOptions.displayDst1.Checked = False Then labels(1) = taskAlg.depthAndDepthRange.Replace(vbCrLf, "")
+
+                Dim displayObject = taskAlg.MainUI_Algorithm
+                displayObject.trueData.Clear()
 
                 Dim nextTrueData As List(Of TrueText) = MainUI_Algorithm.trueData
                 trueData = New List(Of TrueText)(nextTrueData)
@@ -230,7 +230,6 @@ Namespace VBClasses
                 firstPass = False
                 heartBeatLT = False
 
-                Dim displayObject = taskAlg.MainUI_Algorithm
                 ' they could have asked to display one of the algorithms in the TreeView.
                 For Each obj In taskAlg.cpu.activeObjects
                     If obj.tracename = taskAlg.cpu.displayObjectName Then
@@ -281,8 +280,10 @@ Namespace VBClasses
                 For Each tt In displayObject.trueData
                     trueData.Add(tt)
                 Next
-                displayObject.trueData.Clear()
+
                 labels = displayObject.labels
+                If taskAlg.gOptions.displayDst0.Checked = False Then labels(0) = taskAlg.resolutionDetails
+                If taskAlg.gOptions.displayDst1.Checked = False Then labels(1) = taskAlg.depthAndDepthRange.Replace(vbCrLf, "")
             End If
         End Sub
         Private Sub postProcess(src As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat)
