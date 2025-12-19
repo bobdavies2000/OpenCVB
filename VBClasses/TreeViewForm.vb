@@ -90,12 +90,12 @@ Public Class TreeviewForm
     End Class
     Public Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
         Static saveCount As Integer
-        If task.cpu.callTrace.Count <> saveCount Then
-            saveCount = task.cpu.callTrace.Count
-            updateTree(New List(Of String)(task.cpu.callTrace))
+        If taskAlg.cpu.callTrace.Count <> saveCount Then
+            saveCount = taskAlg.cpu.callTrace.Count
+            updateTree(New List(Of String)(taskAlg.cpu.callTrace))
         End If
 
-        PercentTime.Text = task.cpu.PrepareReport(treeData)
+        PercentTime.Text = taskAlg.cpu.PrepareReport(treeData)
     End Sub
     Private Sub CheckIfOffScreen()
         Dim formRect As Rectangle = Me.Bounds
@@ -117,8 +117,8 @@ Public Class TreeviewForm
         TreeView1.Dock = DockStyle.Fill
         TreeView1.SendToBack()
 
-        Me.Location = New Point(task.Settings.TreeViewLeft, task.Settings.TreeViewTop)
-        Me.Size = New Size(task.Settings.TreeViewWidth, task.Settings.TreeViewHeight)
+        Me.Location = New Point(taskAlg.Settings.TreeViewLeft, taskAlg.Settings.TreeViewTop)
+        Me.Size = New Size(taskAlg.Settings.TreeViewWidth, taskAlg.Settings.TreeViewHeight)
 
         PercentTime.Width = 250
         PercentTime.Left = 250
@@ -126,14 +126,14 @@ Public Class TreeviewForm
         CheckIfOffScreen()
     End Sub
     Private Sub TreeviewForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
-        task.Settings.TreeViewLeft = Me.Left
-        task.Settings.TreeViewTop = Me.Top
-        task.Settings.TreeViewWidth = Me.Width
-        task.Settings.TreeViewHeight = Me.Height
+        taskAlg.Settings.TreeViewLeft = Me.Left
+        taskAlg.Settings.TreeViewTop = Me.Top
+        taskAlg.Settings.TreeViewWidth = Me.Width
+        taskAlg.Settings.TreeViewHeight = Me.Height
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         Dim algorithm = e.Node.Text
         Dim split = e.Node.Text.Split(" ")
-        task.cpu.displayObjectName = split(0)
+        taskAlg.cpu.displayObjectName = split(0)
     End Sub
 End Class

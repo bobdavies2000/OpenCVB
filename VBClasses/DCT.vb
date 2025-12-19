@@ -10,7 +10,7 @@ Namespace VBClasses
             options.Run()
 
             Dim src32f As New cv.Mat
-            task.gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
+            taskAlg.gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
 
             Dim frequencies As New cv.Mat
             cv.Cv2.Dct(src32f, frequencies, options.removeFrequency)
@@ -22,7 +22,7 @@ Namespace VBClasses
             cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
             src32f.ConvertTo(dst2, cv.MatType.CV_8UC1, 255)
 
-            cv.Cv2.Subtract(task.gray, dst2, dst3)
+            cv.Cv2.Subtract(taskAlg.gray, dst2, dst3)
         End Sub
     End Class
 
@@ -72,7 +72,7 @@ Namespace VBClasses
             desc = "Find featureless surfaces in the depth data - expected to be useful only on the K4A for Azure camera."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+            Dim gray = taskAlg.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2Gray)
             Dim frequencies As New cv.Mat
             Dim src32f As New cv.Mat
             gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
@@ -143,43 +143,43 @@ Namespace VBClasses
         Public Sub New()
             flow.parentData = Me
             labels = {"", "", "Stats on the largest region below DCT threshold", "Various views of regions with DCT below threshold"}
-            If standalone Then task.gOptions.displayDst0.Checked = False
+            If standalone Then taskAlg.gOptions.displayDst0.Checked = False
             desc = "Find plane equation for a featureless surface - debugging one region for now."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            ' If task.heartBeat Then flow.msgs.Clear()
+            ' If taskAlg.heartBeat Then flow.msgs.Clear()
 
             mats.mat(0) = src.Clone
-            mats.mat(0).SetTo(white, task.gridMask)
+            mats.mat(0).SetTo(white, taskAlg.gridMask)
 
             dct.Run(src)
             mats.mat(1) = dct.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Clone()
             mats.mat(2) = dct.dst3.Clone()
 
             Dim mask = dct.dst2.Clone() ' result1 contains the DCT mask of featureless surfaces.
-            task.pcSplit(2).SetTo(0, Not mask) ' remove non-featureless surface depth data.
+            taskAlg.pcSplit(2).SetTo(0, Not mask) ' remove non-featureless surface depth data.
 
             ' find the most featureless roi
             Dim maxIndex As Integer
-            Dim roiCounts(task.gridRects.Count - 1)
-            For i = 0 To task.gridRects.Count - 1
-                roiCounts(i) = mask(task.gridRects(i)).CountNonZero
+            Dim roiCounts(taskAlg.gridRects.Count - 1)
+            For i = 0 To taskAlg.gridRects.Count - 1
+                roiCounts(i) = mask(taskAlg.gridRects(i)).CountNonZero
                 If roiCounts(i) > roiCounts(maxIndex) Then maxIndex = i
             Next
 
             mats.mat(3) = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
-            src(task.gridRects(maxIndex)).CopyTo(mats.mat(3)(task.gridRects(maxIndex)), mask(task.gridRects(maxIndex)))
+            src(taskAlg.gridRects(maxIndex)).CopyTo(mats.mat(3)(taskAlg.gridRects(maxIndex)), mask(taskAlg.gridRects(maxIndex)))
             mats.Run(emptyMat)
             dst3 = mats.dst2
 
-            Dim roi = task.gridRects(maxIndex) ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
-            If roi.X = task.gridRects(maxIndex).X And roi.Y = task.gridRects(maxIndex).Y Then
+            Dim roi = taskAlg.gridRects(maxIndex) ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
+            If roi.X = taskAlg.gridRects(maxIndex).X And roi.Y = taskAlg.gridRects(maxIndex).Y Then
                 If roiCounts(maxIndex) > roi.Width * roi.Height / 4 Then
                     Dim fitPoints As New List(Of cv.Point3f)
                     Dim minDepth = Single.MaxValue, maxDepth = Single.MinValue
                     For j = 0 To roi.Height - 1
                         For i = 0 To roi.Width - 1
-                            Dim nextD = task.pcSplit(2)(roi).Get(Of Single)(j, i)
+                            Dim nextD = taskAlg.pcSplit(2)(roi).Get(Of Single)(j, i)
                             If nextD <> 0 Then
                                 If minDepth > nextD Then minDepth = nextD
                                 If maxDepth < nextD Then maxDepth = nextD

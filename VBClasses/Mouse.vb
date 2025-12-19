@@ -9,13 +9,13 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             ' only display mouse movement in the lower left image (pic.tag = 2)
-            If lastPoint = task.mouseMovePoint Or task.mousePicTag <> 2 Then Exit Sub
-            lastPoint = task.mouseMovePoint
-            Dim nextColor = task.scalarColors(colorIndex)
-            Dim nextPt = task.mouseMovePoint
-            DrawCircle(dst2, nextPt, task.DotSize + 3, nextColor)
+            If lastPoint = taskAlg.mouseMovePoint Or taskAlg.mousePicTag <> 2 Then Exit Sub
+            lastPoint = taskAlg.mouseMovePoint
+            Dim nextColor = taskAlg.scalarColors(colorIndex)
+            Dim nextPt = taskAlg.mouseMovePoint
+            DrawCircle(dst2, nextPt, taskAlg.DotSize + 3, nextColor)
             colorIndex += 1
-            If colorIndex >= task.scalarColors.Count Then colorIndex = 0
+            If colorIndex >= taskAlg.scalarColors.Count Then colorIndex = 0
         End Sub
     End Class
 
@@ -28,11 +28,11 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             SetTrueText("Left-click and drag to select a region in any of the images." + vbCrLf +
-                    "The selected area is a rectangle that is saved in task.drawRect." + vbCrLf +
+                    "The selected area is a rectangle that is saved in taskAlg.drawRect." + vbCrLf +
                     "In this example, the selected region from the BGR image will be resized to fit in the Result2 image to the right." + vbCrLf +
                     "Double-click an image to remove the selected region.")
 
-            If task.drawRect.Width <> 0 And task.drawRect.Height <> 0 Then dst3 = src(task.drawRect).Resize(dst3.Size())
+            If taskAlg.drawRect.Width <> 0 And taskAlg.drawRect.Height <> 0 Then dst3 = src(taskAlg.drawRect).Resize(dst3.Size())
         End Sub
     End Class
 
@@ -45,13 +45,13 @@ Namespace VBClasses
 
     Public Class Mouse_ClickPointUsage : Inherits TaskParent
         Public Sub New()
-            desc = "This algorithm shows how to use task.ClickPoint to dynamically identify what to break on."
+            desc = "This algorithm shows how to use taskAlg.ClickPoint to dynamically identify what to break on."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             SetTrueText("Click on one of the feature points (carefully) to hit the breakpoint below.")
 
-            For Each pt In task.features
-                If pt = task.ClickPoint Then
+            For Each pt In taskAlg.features
+                If pt = taskAlg.ClickPoint Then
                     debug.writeline("Hit the point you selected.")
                 End If
             Next
@@ -71,14 +71,14 @@ Namespace VBClasses
                         "The display resolution will appear in dst3 " + vbCrLf +
                         "while the workRes location will appear in the lower left corner.")
 
-            Dim ratioX As Single = task.workRes.Width / task.Settings.displayRes.Width
-            Dim ratioY As Single = task.workRes.Height / task.Settings.displayRes.Height
+            Dim ratioX As Single = taskAlg.workRes.Width / taskAlg.Settings.displayRes.Width
+            Dim ratioY As Single = taskAlg.workRes.Height / taskAlg.Settings.displayRes.Height
             SetTrueText("Mouse location in display resolution (X, Y): " +
-                        CStr(task.mouseDisplayPoint.X) + ", " +
-                        CStr(task.mouseDisplayPoint.Y) + vbCrLf +
+                        CStr(taskAlg.mouseDisplayPoint.X) + ", " +
+                        CStr(taskAlg.mouseDisplayPoint.Y) + vbCrLf +
                         "Mouse location in workRes resolution (X, Y): " +
-                        CStr(CInt(task.mouseDisplayPoint.X * ratioX)) + ", " +
-                        CStr(CInt(task.mouseDisplayPoint.Y * ratioY)), 3)
+                        CStr(CInt(taskAlg.mouseDisplayPoint.X * ratioX)) + ", " +
+                        CStr(CInt(taskAlg.mouseDisplayPoint.Y * ratioY)), 3)
         End Sub
     End Class
 

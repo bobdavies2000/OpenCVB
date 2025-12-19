@@ -7,11 +7,11 @@ Namespace VBClasses
             desc = "Floodfill the distance_basics results"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then src = task.depthmask.Clone
-            If task.optionsChanged Then dst1 = src.Clone Else src.CopyTo(dst1, task.motionMask)
+            If standalone Then src = taskAlg.depthmask.Clone
+            If taskAlg.optionsChanged Then dst1 = src.Clone Else src.CopyTo(dst1, taskAlg.motionMask)
             distance.Run(dst1)
             dst2 = distance.dst2
-            dst2.SetTo(0, task.noDepthMask)
+            dst2.SetTo(0, taskAlg.noDepthMask)
         End Sub
     End Class
 
@@ -42,7 +42,7 @@ Namespace VBClasses
             If cRadio.Checked Then DistanceType = cv.DistanceTypes.C
             If l1Radio.Checked Then DistanceType = cv.DistanceTypes.L1
 
-            dst0 = dst3 And task.gray
+            dst0 = dst3 And taskAlg.gray
             dst0 = dst0.DistanceTransform(DistanceType, cv.DistanceTransformMasks.Precise)
             Dim dist32f = dst0.Normalize(0, 255, cv.NormTypes.MinMax)
             dist32f.ConvertTo(dst1, cv.MatType.CV_8UC1)
@@ -84,17 +84,17 @@ Namespace VBClasses
             desc = "Compute the distance in meters between 3D points in the point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() And task.heartBeat Then
+            If standaloneTest() And taskAlg.heartBeat Then
                 inPoint1 = New cv.Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000))
                 inPoint2 = New cv.Point3f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height), msRNG.Next(0, 10000))
 
                 dst2.SetTo(0)
                 Dim p1 = New cv.Point(inPoint1.X, inPoint1.Y)
                 Dim p2 = New cv.Point(inPoint2.X, inPoint2.Y)
-                vbc.DrawLine(dst2, p1, p2, task.highlight)
+                vbc.DrawLine(dst2, p1, p2, taskAlg.highlight)
 
-                Dim vec1 = task.pointCloud.Get(Of cv.Point3f)(p1.Y, p1.X)
-                Dim vec2 = task.pointCloud.Get(Of cv.Point3f)(p2.Y, p2.X)
+                Dim vec1 = taskAlg.pointCloud.Get(Of cv.Point3f)(p1.Y, p1.X)
+                Dim vec2 = taskAlg.pointCloud.Get(Of cv.Point3f)(p2.Y, p2.X)
             End If
 
             Dim x = inPoint1.X - inPoint2.X
@@ -124,9 +124,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 inPoint1 = New cv.Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height),
-                                    msRNG.Next(0, task.MaxZmeters), msRNG.Next(0, task.MaxZmeters))
+                                    msRNG.Next(0, taskAlg.MaxZmeters), msRNG.Next(0, taskAlg.MaxZmeters))
                 inPoint2 = New cv.Vec4f(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height),
-                                    msRNG.Next(0, task.MaxZmeters), msRNG.Next(0, task.MaxZmeters))
+                                    msRNG.Next(0, taskAlg.MaxZmeters), msRNG.Next(0, taskAlg.MaxZmeters))
             End If
 
             Dim x = inPoint1(0) - inPoint2(0)
@@ -136,7 +136,7 @@ Namespace VBClasses
             distance = Math.Sqrt(x * x + y * y + z * z + d * d)
 
             strOut = inPoint1.ToString + vbCrLf + inPoint2.ToString + vbCrLf + "Distance = " + Format(distance, fmt1)
-            If standalone And task.heartBeat Then SetTrueText(strOut, New cv.Point(10, 10), 2)
+            If standalone And taskAlg.heartBeat Then SetTrueText(strOut, New cv.Point(10, 10), 2)
         End Sub
     End Class
 
@@ -149,7 +149,7 @@ Namespace VBClasses
         Dim binary As New Binarize_Simple
         Dim distance As New Distance_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displaydst1.checked = True
+            If standalone Then taskAlg.gOptions.displaydst1.checked = True
             desc = "Measure the fragmentation of a binary image by using the distance transform"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -157,13 +157,13 @@ Namespace VBClasses
             dst2 = binary.dst2
             labels(2) = binary.labels(2) + " Draw a rectangle to measure specific area."
 
-            If task.drawRect.Width > 0 Then
-                distance.Run(dst2(task.drawRect))
+            If taskAlg.drawRect.Width > 0 Then
+                distance.Run(dst2(taskAlg.drawRect))
             Else
                 distance.Run(dst2)
             End If
             dst3 = distance.dst2
-            dst1 = dst3.Threshold(task.gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
+            dst1 = dst3.Threshold(taskAlg.gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
         End Sub
     End Class
 
@@ -179,12 +179,12 @@ Namespace VBClasses
             desc = "Find the grid rects which are furthest from the zero depth"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.noDepthMask.CountNonZero = task.noDepthMask.Total Then Exit Sub ' startup issue 
-            Dim distance32f = task.depthMask.DistanceTransform(cv.DistanceTypes.L1, 0)
+            If taskAlg.noDepthMask.CountNonZero = taskAlg.noDepthMask.Total Then Exit Sub ' startup issue 
+            Dim distance32f = taskAlg.depthMask.DistanceTransform(cv.DistanceTypes.L1, 0)
 
             Dim maxList As New List(Of Double)
             Dim ptList As New List(Of cv.Point)
-            For Each rect In task.gridRects
+            For Each rect In taskAlg.gridRects
                 Dim mm = GetMinMax(distance32f(rect))
                 maxList.Add(mm.maxVal)
                 If mm.maxVal > 0 Then ptList.Add(New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y))
@@ -194,15 +194,15 @@ Namespace VBClasses
             If standalone Then
                 dst3 = src.Clone
                 For Each pt In ptList
-                    DrawCircle(dst3, pt, task.DotSize, task.highlight)
+                    DrawCircle(dst3, pt, taskAlg.DotSize, taskAlg.highlight)
                 Next
                 labels(3) = CStr(ptList.Count) + " points selected"
             End If
 
             Dim max = maxList.Max
             dst2.SetTo(0)
-            For i = 0 To task.gridRects.Count - 1
-                Dim rect = task.gridRects(i)
+            For i = 0 To taskAlg.gridRects.Count - 1
+                Dim rect = taskAlg.gridRects(i)
                 dst2(rect).SetTo(255 * maxList(i) / max)
             Next
         End Sub
@@ -220,12 +220,12 @@ Namespace VBClasses
             desc = "Find the grid rects which are furthest from the zero depth"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.noDepthMask.CountNonZero = task.noDepthMask.Total Then Exit Sub ' startup issue 
-            Dim distance32f = task.noDepthMask.DistanceTransform(cv.DistanceTypes.L1, 0)
+            If taskAlg.noDepthMask.CountNonZero = taskAlg.noDepthMask.Total Then Exit Sub ' startup issue 
+            Dim distance32f = taskAlg.noDepthMask.DistanceTransform(cv.DistanceTypes.L1, 0)
 
             Dim maxList As New List(Of Double)
             Dim ptList As New List(Of cv.Point)
-            For Each rect In task.gridRects
+            For Each rect In taskAlg.gridRects
                 Dim mm = GetMinMax(distance32f(rect))
                 maxList.Add(mm.maxVal)
                 If mm.maxVal > 0 Then ptList.Add(New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y))
@@ -234,15 +234,15 @@ Namespace VBClasses
             If standalone Then
                 dst3 = src.Clone
                 For Each pt In ptList
-                    DrawCircle(dst3, pt, task.DotSize, task.highlight)
+                    DrawCircle(dst3, pt, taskAlg.DotSize, taskAlg.highlight)
                 Next
                 labels(3) = CStr(ptList.Count) + " points selected"
             End If
 
             Dim max = maxList.Max
             dst2.SetTo(0)
-            For i = 0 To task.gridRects.Count - 1
-                Dim rect = task.gridRects(i)
+            For i = 0 To taskAlg.gridRects.Count - 1
+                Dim rect = taskAlg.gridRects(i)
                 dst2(rect).SetTo(255 * maxList(i) / max)
             Next
         End Sub
@@ -264,7 +264,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If standalone Then src = task.noDepthMask
+            If standalone Then src = taskAlg.noDepthMask
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
             cv.Cv2.DistanceTransformWithLabels(src, dst0, dst1, options.distanceType, cv.DistanceTransformMasks.Precise)
@@ -273,7 +273,7 @@ Namespace VBClasses
             dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
             dst3 = PaletteFull(dst1)
-            If standalone Then dst3.SetTo(0, task.depthMask)
+            If standalone Then dst3.SetTo(0, taskAlg.depthMask)
         End Sub
     End Class
 
@@ -289,12 +289,12 @@ Namespace VBClasses
             desc = "Distance algorithm for the regions with no depth"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat = False Then Exit Sub
-            labeller.Run(task.noDepthMask)
+            If taskAlg.heartBeat = False Then Exit Sub
+            labeller.Run(taskAlg.noDepthMask)
             dst2 = labeller.dst2
             dst3 = labeller.dst3
             labels = labeller.labels
-            dst3.SetTo(0, task.depthMask)
+            dst3.SetTo(0, taskAlg.depthMask)
         End Sub
     End Class
 
@@ -309,12 +309,12 @@ Namespace VBClasses
             desc = "Distance algorithm for the regions with no depth"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT = False Then Exit Sub
-            labeller.Run(task.depthMask)
+            If taskAlg.heartBeatLT = False Then Exit Sub
+            labeller.Run(taskAlg.depthMask)
             dst2 = labeller.dst2
             dst3 = labeller.dst3
             labels = labeller.labels
-            dst3.SetTo(0, task.noDepthMask)
+            dst3.SetTo(0, taskAlg.noDepthMask)
         End Sub
     End Class
 
@@ -330,7 +330,7 @@ Namespace VBClasses
             desc = "Combine the output of edge_Basics and distance_basics."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            distance.Run(task.depthMask)
+            distance.Run(taskAlg.depthMask)
 
             edges.Run(src)
 
@@ -353,7 +353,7 @@ Namespace VBClasses
 
             distance.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
-            dst2 = ShowAddweighted(distance.dst2, task.redList.dst2, labels(2))
+            dst2 = ShowAddweighted(distance.dst2, taskAlg.redList.dst2, labels(2))
         End Sub
     End Class
 
@@ -369,7 +369,7 @@ Namespace VBClasses
         Dim lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
         Dim lastrcList As New List(Of oldrcData)
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
             OptionParent.FindSlider("Histogram 3D Bins").Value = 5
             hColor.noMotionMask = True
             labels(1) = "3D Histogram distance for each of the cells at left"
@@ -388,8 +388,8 @@ Namespace VBClasses
 
             pixelVector.Clear()
             distances.Clear()
-            For i = 1 To task.redList.oldrclist.Count - 1
-                Dim rc = task.redList.oldrclist(i)
+            For i = 1 To taskAlg.redList.oldrclist.Count - 1
+                Dim rc = taskAlg.redList.oldrclist(i)
                 hColor.inputMask = rc.mask
                 hColor.Run(src(rc.rect))
 
@@ -397,7 +397,7 @@ Namespace VBClasses
                 distances.Add(nextD, i)
             Next
 
-            If task.heartBeatLT Then
+            If taskAlg.heartBeatLT Then
                 strOut = "3D histogram distances from zero for each cell" + vbCrLf
                 Dim index As Integer
                 For Each el In distances
@@ -427,17 +427,17 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For i = 0 To distances.Count - 1
-                Dim rp = task.redList.oldrclist(distances.ElementAt(i).Value)
-                task.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
+                Dim rp = taskAlg.redList.oldrclist(distances.ElementAt(i).Value)
+                taskAlg.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
             Next
-            labels(2) = task.redList.labels(3)
+            labels(2) = taskAlg.redList.labels(3)
 
             lastDistances.Clear()
             For Each el In distances
                 lastDistances.Add(el.Key, el.Value)
             Next
 
-            lastrcList = New List(Of oldrcData)(task.redList.oldrclist)
+            lastrcList = New List(Of oldrcData)(taskAlg.redList.oldrclist)
         End Sub
     End Class
 
@@ -453,7 +453,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If standaloneTest() Then src = task.depthRGB
+            If standaloneTest() Then src = taskAlg.depthRGB
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
             dst0 = src.DistanceTransform(options.distanceType, 0)
@@ -469,18 +469,18 @@ Namespace VBClasses
     Public Class Distance_Depth : Inherits TaskParent
         Dim options As New Options_Distance
         Public Sub New()
-            task.gOptions.DebugSlider.Value = 3
+            taskAlg.gOptions.DebugSlider.Value = 3
             desc = "Apply the distance transform to the depth data and clip values below specified threshold."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+            If src.Type <> cv.MatType.CV_32F Then src = taskAlg.pcSplit(2)
             Dim mm = GetMinMax(src)
             dst1 = src * 255 / mm.maxVal
             dst1.ConvertTo(dst1, cv.MatType.CV_8U)
             dst2 = dst1.DistanceTransform(options.distanceType, 0)
-            dst3 = dst2.Threshold(task.gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
+            dst3 = dst2.Threshold(taskAlg.gOptions.DebugSlider.Value, 255, cv.ThresholdTypes.Binary)
             mm = GetMinMax(dst2)
             labels(2) = "Distance results of 32F input data (usually Depth data).  Min = " + CStr(CInt(mm.minVal)) + " and max = " + CStr(CInt(mm.maxVal))
         End Sub
@@ -502,7 +502,7 @@ Namespace VBClasses
             dist.Run(src)
             dst2 = dist.dst2
 
-            Dim threshold = Math.Abs(task.gOptions.DebugSlider.Value)
+            Dim threshold = Math.Abs(taskAlg.gOptions.DebugSlider.Value)
             Dim mask = dst2.Threshold(threshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
             dst3.SetTo(0)
             dst2.CopyTo(dst3, mask)
@@ -526,11 +526,11 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst1 = task.grayStable.InRange(0, 0)
+            dst1 = taskAlg.grayStable.InRange(0, 0)
 
-            task.grayStable.SetTo(255, dst1)
-            task.grayStable.Set(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X, 0)
-            dst2 = task.grayStable.DistanceTransform(options.distanceType, 0)
+            taskAlg.grayStable.SetTo(255, dst1)
+            taskAlg.grayStable.Set(Of Byte)(taskAlg.ClickPoint.Y, taskAlg.ClickPoint.X, 0)
+            dst2 = taskAlg.grayStable.DistanceTransform(options.distanceType, 0)
             dst3 = 255 - dst2
         End Sub
     End Class
@@ -543,8 +543,8 @@ Namespace VBClasses
     Public Class Distance_DepthBricks : Inherits TaskParent
         Dim dist As New Distance_Depth
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-            task.gOptions.DebugSlider.Value = 20
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            taskAlg.gOptions.DebugSlider.Value = 20
             desc = "Threshold the maxDist in each brick to highlight centers for key objects.  Use the 'DebugSlider' to provide the value."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -552,8 +552,8 @@ Namespace VBClasses
             dst2 = dist.dst2
             dst3 = src.Clone
 
-            Dim threshold = Math.Abs(task.gOptions.DebugSlider.Value)
-            For Each brick In task.bricks.brickList
+            Dim threshold = Math.Abs(taskAlg.gOptions.DebugSlider.Value)
+            For Each brick In taskAlg.bricks.brickList
                 Dim mm = GetMinMax(dst2(brick.rect))
                 If mm.maxVal >= threshold Then
                     Dim pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
@@ -572,24 +572,24 @@ Namespace VBClasses
     Public Class Distance_Contour : Inherits TaskParent
         Dim options As New Options_Distance
         Public Sub New()
-            If task.contours Is Nothing Then task.contours = New Contour_Basics_List
-            If standalone Then task.gOptions.displayDst0.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If taskAlg.contours Is Nothing Then taskAlg.contours = New Contour_Basics_List
+            If standalone Then taskAlg.gOptions.displayDst0.Checked = True
+            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Compute the distance of each point from the top contour (or a selected contour.)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            task.contours.Run(src)
+            taskAlg.contours.Run(src)
 
-            dst2 = task.contours.dst2
-            labels(2) = task.contours.labels(2)
+            dst2 = taskAlg.contours.dst2
+            labels(2) = taskAlg.contours.labels(2)
 
             dst3 = src.Clone
-            dst3(task.contourD.rect).SetTo(white, task.contourD.mask)
+            dst3(taskAlg.contourD.rect).SetTo(white, taskAlg.contourD.mask)
 
             dst1.SetTo(255)
-            dst1(task.contourD.rect).SetTo(0, task.contourD.mask)
+            dst1(taskAlg.contourD.rect).SetTo(0, taskAlg.contourD.mask)
 
             dst0 = dst1.DistanceTransform(options.distanceType, 0)
         End Sub

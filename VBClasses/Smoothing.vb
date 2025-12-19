@@ -50,7 +50,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             smOptions.Run()
             If standaloneTest() Then
-                If task.heartBeat And Not task.paused Then
+                If taskAlg.heartBeat And Not taskAlg.paused Then
                     Dim hullList = hull.buildRandomHullPoints()
                     dst2.SetTo(0)
                     hull.Run(src)
@@ -128,7 +128,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
             If standaloneTest() Then
-                If task.heartBeat And task.paused = False Then
+                If taskAlg.heartBeat And taskAlg.paused = False Then
                     Dim hullList = hull.buildRandomHullPoints()
                     dst2.SetTo(0)
                     hull.Run(src)

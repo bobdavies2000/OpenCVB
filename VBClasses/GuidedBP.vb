@@ -78,7 +78,7 @@ Namespace VBClasses
                 Dim dist = p1.DistanceTo(p2)
                 Dim r = rectList(i)
                 If dist < r.Width / 2 And dist < r.Height / 2 Then
-                    dst.Rectangle(r, white, task.lineWidth)
+                    dst.Rectangle(r, white, taskAlg.lineWidth)
                     Dim pt = New cv.Point(r.X + r.Width, r.Y + r.Height)
                     SetTrueText(CStr(index), pt, dstindex)
                 End If
@@ -157,7 +157,7 @@ Namespace VBClasses
     Public Class GuidedBP_Lookup : Inherits TaskParent
         Dim guided As New GuidedBP_Basics
         Public Sub New()
-            task.clickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+            taskAlg.clickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
             desc = "Given a point cloud pixel, look up which object it is in.  Click in the Depth RGB image to test."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -179,11 +179,11 @@ Namespace VBClasses
         Public hist As New Hist_PointCloud
         Public classCount As Integer
         Public Sub New()
-            task.gOptions.setHistogramBins(16)
+            taskAlg.gOptions.setHistogramBins(16)
             desc = "Backproject the 2D histogram of depth for selected channels to categorize the depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Then src = taskAlg.pointCloud
 
             hist.Run(src)
 
@@ -209,14 +209,14 @@ Namespace VBClasses
 
             Marshal.Copy(newSamples, 0, hist.histogram.Data, newSamples.Length)
 
-            cv.Cv2.CalcBackProject({src}, task.channels, hist.histogram, dst2, task.ranges)
+            cv.Cv2.CalcBackProject({src}, taskAlg.channels, hist.histogram, dst2, taskAlg.ranges)
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-            labels(3) = "Use task.gOptions.PointCloudReduction to select different cloud combinations."
+            labels(3) = "Use taskAlg.gOptions.PointCloudReduction to select different cloud combinations."
             If standaloneTest() Then dst3 = PaletteFull(dst2 + 1)
 
-            Dim depthCount = task.depthmask.CountNonZero
-            dst3.SetTo(0, task.noDepthMask)
+            Dim depthCount = taskAlg.depthmask.CountNonZero
+            dst3.SetTo(0, taskAlg.noDepthMask)
             Dim count = dst2.CountNonZero
             labels(2) = CStr(classCount) + " regions detected in the backprojection - " + Format(count / depthCount, "0%") + " of depth data"
         End Sub
@@ -236,7 +236,7 @@ Namespace VBClasses
         Dim floodRect As New cv.Rect(1, 1, dst2.Width - 2, dst2.Height - 2)
         Dim mask As New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U)
         Public Sub New()
-            task.useXYRange = False
+            taskAlg.useXYRange = False
             desc = "Use floodfill to identify all the objects in both the top and side views."
         End Sub
         Private Function hotPoints(ByRef view As cv.Mat) As List(Of cv.Rect)
@@ -272,8 +272,8 @@ Namespace VBClasses
             sideRects = hotPoints(histSide.dst3)
             dst3 = PaletteBlackZero(histSide.dst3)
 
-            If task.heartBeat Then labels(2) = "Top " + CStr(topRects.Count) + " objects identified in the top view."
-            If task.heartBeat Then labels(3) = "Top " + CStr(sideRects.Count) + " objects identified in the side view."
+            If taskAlg.heartBeat Then labels(2) = "Top " + CStr(topRects.Count) + " objects identified in the top view."
+            If taskAlg.heartBeat Then labels(3) = "Top " + CStr(sideRects.Count) + " objects identified in the side view."
         End Sub
     End Class
 
@@ -307,7 +307,7 @@ Namespace VBClasses
                     classCount += 1
                 End If
             Next
-            cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histTop.histogram, dst0, task.rangesTop)
+            cv.Cv2.CalcBackProject({taskAlg.pointCloud}, taskAlg.channelsTop, histTop.histogram, dst0, taskAlg.rangesTop)
             Dim mm = GetMinMax(dst0)
             dst2 = PaletteFull(dst0)
             labels(2) = "The nonzero horizontal slices produced " + CStr(classCount) + " classes"
@@ -323,7 +323,7 @@ Namespace VBClasses
                     classCount += 1
                 End If
             Next
-            cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histSide.histogram, dst1, task.rangesSide)
+            cv.Cv2.CalcBackProject({taskAlg.pointCloud}, taskAlg.channelsSide, histSide.histogram, dst1, taskAlg.rangesSide)
             dst3 = PaletteFull(dst1)
             labels(3) = "The nonzero vertical slices produced " + CStr(classCount) + " classes"
         End Sub
@@ -344,23 +344,23 @@ Namespace VBClasses
         Public rcMapX As New cv.Mat
         Public rcMapY As New cv.Mat
         Public Sub New()
-            task.redList = New RedList_Basics
+            taskAlg.redList = New RedList_Basics
             desc = "Identify each segment in the X and Y point cloud data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             guide.Run(src)
 
             redCx.Run(guide.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            rcMapX = task.redList.rcMap.Clone
+            rcMapX = taskAlg.redList.rcMap.Clone
             dst2 = redCx.dst2
-            rcListX = New List(Of oldrcData)(task.redList.oldrclist)
-            labels(2) = CStr(task.redList.oldrclist.Count) + " cells were found in vertical segments"
+            rcListX = New List(Of oldrcData)(taskAlg.redList.oldrclist)
+            labels(2) = CStr(taskAlg.redList.oldrclist.Count) + " cells were found in vertical segments"
 
             redCx.Run(guide.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            rcMapY = task.redList.rcMap.Clone
+            rcMapY = taskAlg.redList.rcMap.Clone
             dst3 = redCx.dst2
-            rcListY = New List(Of oldrcData)(task.redList.oldrclist)
-            labels(3) = CStr(task.redList.oldrclist.Count) + " cells were found in horizontal segments"
+            rcListY = New List(Of oldrcData)(taskAlg.redList.oldrclist)
+            labels(3) = CStr(taskAlg.redList.oldrclist.Count) + " cells were found in horizontal segments"
         End Sub
     End Class
 
@@ -380,8 +380,8 @@ Namespace VBClasses
         Public rcMapX As New cv.Mat
         Public rcMapY As New cv.Mat
         Public Sub New()
-            If standalone Then task.gOptions.displayDst0.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then taskAlg.gOptions.displayDst0.Checked = True
+            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
             labels(3) = "Click a quadrant in the left image and see it below."
             desc = "Identify the top X regions in the GuidedBP_RedCloud output"
         End Sub
@@ -448,8 +448,8 @@ Namespace VBClasses
             hotPoints.Run(src)
 
             hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, cv.MatType.CV_32F)
-            cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogramTop, backP,
-                                task.rangesTop)
+            cv.Cv2.CalcBackProject({taskAlg.pointCloud}, taskAlg.channelsTop, histogramTop, backP,
+                                taskAlg.rangesTop)
 
             topRects = New List(Of cv.Rect)(hotPoints.ptHot.topRects)
             sideRects = New List(Of cv.Rect)(hotPoints.ptHot.sideRects)
@@ -457,15 +457,15 @@ Namespace VBClasses
             dst2 = PaletteFull(backP)
 
             hotPoints.ptHot.histSide.dst3.ConvertTo(histogramSide, cv.MatType.CV_32F)
-            cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogramSide, dst3, task.rangesSide)
+            cv.Cv2.CalcBackProject({taskAlg.pointCloud}, taskAlg.channelsSide, histogramSide, dst3, taskAlg.rangesSide)
 
             dst3 = PaletteFull(dst3)
 
             classCount = topRects.Count + sideRects.Count
 
-            If task.mouseClickFlag Then selectedPoint = task.clickPoint
-            If task.heartBeat Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
-            If task.heartBeat Then labels(3) = CStr(sideRects.Count) + " objects were identified in the side view."
+            If taskAlg.mouseClickFlag Then selectedPoint = taskAlg.clickPoint
+            If taskAlg.heartBeat Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
+            If taskAlg.heartBeat Then labels(3) = CStr(sideRects.Count) + " objects were identified in the side view."
         End Sub
     End Class
 
@@ -508,19 +508,19 @@ Namespace VBClasses
             desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Then src = taskAlg.pointCloud
             hotPoints.Run(src)
 
             hotPoints.ptHot.histTop.dst3.ConvertTo(histogramTop, cv.MatType.CV_32F)
-            cv.Cv2.CalcBackProject({src}, task.channelsTop, histogramTop, backP,
-                                task.rangesTop)
+            cv.Cv2.CalcBackProject({src}, taskAlg.channelsTop, histogramTop, backP,
+                                taskAlg.rangesTop)
 
             topRects = New List(Of cv.Rect)(hotPoints.ptHot.topRects)
 
             dst2 = PaletteFull(backP)
             classCount = topRects.Count
 
-            If task.heartBeat Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
+            If taskAlg.heartBeat Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
         End Sub
     End Class
 End Namespace

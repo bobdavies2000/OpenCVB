@@ -12,8 +12,8 @@ Namespace VBClasses
         Public Sub drawMap()
             dst2.SetTo(0)
             For i = 0 To cityOrder.Length - 1
-                DrawCircle(dst2, cityPositions(i), task.DotSize, white)
-                dst2.Line(cityPositions(i), cityPositions(cityOrder(i)), white, task.lineWidth, task.lineType)
+                DrawCircle(dst2, cityPositions(i), taskAlg.DotSize, white)
+                dst2.Line(cityPositions(i), cityPositions(cityOrder(i)), white, taskAlg.lineWidth, taskAlg.lineType)
             Next
             SetTrueText("Energy" + vbCrLf + Format(energy, fmt0), New cv.Point(10, 100), 2)
         End Sub
@@ -57,7 +57,7 @@ Namespace VBClasses
             Dim split As String() = Regex.Split(msg, "\W+")
             energy = CSng(split(split.Count - 2) + "." + split(split.Count - 1))
             If standaloneTest() Then
-                If energyLast = energy Or task.optionsChanged Then
+                If energyLast = energy Or taskAlg.optionsChanged Then
                     Annealing_Basics_Close(cPtr)
                     setup()
                     Open()
@@ -108,7 +108,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If task.optionsChanged Then setup()
+            If taskAlg.optionsChanged Then setup()
             Parallel.For(0, anneal.Length,
             Sub(i)
                 anneal(i).Run(src)

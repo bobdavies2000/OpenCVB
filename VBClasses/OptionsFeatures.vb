@@ -7,7 +7,7 @@ Public Class OptionsFeatures
                                        "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
                                        "PCA_NColor_CPP", "MeanSubtraction_Gray"}
     Private Sub OptionsFeatures_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.MdiParent = task.allOptions
+        Me.MdiParent = taskAlg.allOptions
         Me.Left = 0
         Me.Top = 0
 
@@ -30,14 +30,14 @@ Public Class OptionsFeatures
         EdgeMethods.Items.Add("Scharr")
         EdgeMethods.Items.Add("Sobel")
         EdgeMethods.SelectedItem() = "Canny"
-        task.edgeMethod = "Canny"
+        taskAlg.edgeMethod = "Canny"
 
         MatchCorrSlider.Value = 95
 
-        ReDim grayCheckbox(task.rgbFilter.grayFilter.filterList.Count - 1)
-        For i = 0 To task.rgbFilter.grayFilter.filterList.Count - 1
+        ReDim grayCheckbox(taskAlg.rgbFilter.grayFilter.filterList.Count - 1)
+        For i = 0 To taskAlg.rgbFilter.grayFilter.filterList.Count - 1
             Dim cb As New RadioButton
-            cb.Text = task.rgbFilter.grayFilter.filterList(i)
+            cb.Text = taskAlg.rgbFilter.grayFilter.filterList(i)
             cb.Location = New Point(20, 20 + i * 20)
             cb.AutoSize = True
             cb.Tag = i
@@ -47,10 +47,10 @@ Public Class OptionsFeatures
         Next
         grayCheckbox(0).Checked = True
 
-        ReDim colorCheckbox(task.rgbFilter.filterList.Count - 1)
-        For i = 0 To task.rgbFilter.filterList.Count - 1
+        ReDim colorCheckbox(taskAlg.rgbFilter.filterList.Count - 1)
+        For i = 0 To taskAlg.rgbFilter.filterList.Count - 1
             Dim cb As New RadioButton
-            cb.Text = task.rgbFilter.filterList(i)
+            cb.Text = taskAlg.rgbFilter.filterList(i)
             cb.Location = New Point(20, 20 + i * 20)
             cb.AutoSize = True
             cb.Tag = i
@@ -70,35 +70,35 @@ Public Class OptionsFeatures
 
 
     Private Sub CheckBox_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub FeatureMethod_SelectedIndexChanged(sender As Object, e As EventArgs) Handles FeatureMethod.SelectedIndexChanged
-        task.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub verticalRadio_CheckedChanged(sender As Object, e As EventArgs)
-        task.verticalLines = True
+        taskAlg.verticalLines = True
     End Sub
     Private Sub HorizRadio_CheckedChanged(sender As Object, e As EventArgs)
-        task.verticalLines = False
+        taskAlg.verticalLines = False
     End Sub
     Private Sub EdgeMethods_SelectedIndexChanged(sender As Object, e As EventArgs) Handles EdgeMethods.SelectedIndexChanged
-        task.edgeMethod = EdgeMethods.Text
-        task.optionsChanged = True
+        taskAlg.edgeMethod = EdgeMethods.Text
+        taskAlg.optionsChanged = True
     End Sub
 
 
 
     Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles MatchCorrSlider.ValueChanged
-        task.fCorrThreshold = MatchCorrSlider.Value / 100
-        task.optionsChanged = True
-        FeatureCorrelationLabel.Text = Format(task.fCorrThreshold, fmt2)
+        taskAlg.fCorrThreshold = MatchCorrSlider.Value / 100
+        taskAlg.optionsChanged = True
+        FeatureCorrelationLabel.Text = Format(taskAlg.fCorrThreshold, fmt2)
     End Sub
     Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FeatureSampleSize.ValueChanged
-        task.FeatureSampleSize = FeatureSampleSize.Value
-        task.optionsChanged = True
-        FeatureSampleSizeLabel.Text = CStr(task.FeatureSampleSize)
+        taskAlg.FeatureSampleSize = FeatureSampleSize.Value
+        taskAlg.optionsChanged = True
+        FeatureSampleSizeLabel.Text = CStr(taskAlg.FeatureSampleSize)
     End Sub
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles Color8USource.SelectedIndexChanged
-        task.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
 End Class

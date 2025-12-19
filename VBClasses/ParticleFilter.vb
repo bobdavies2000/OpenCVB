@@ -6,7 +6,7 @@ Namespace VBClasses
     '    Dim plot1D As New Plot_Histogram2D
     '    Dim histogram As New cv.Mat
     '    Public Sub New()
-    '        If standaloneTest() Then task.gOptions.displaydst1.checked = true
+    '        If standaloneTest() Then taskAlg.gOptions.displaydst1.checked = true
     '        labels = {"", "", "Particle traffic", "Largest count in 2D Histogram"}
     '        desc = "Use the good features of an image to create a histogram of particle motion. Peak histogram is net movement of the camera."
     '    End Sub
@@ -16,12 +16,12 @@ Namespace VBClasses
     '        Dim halfsize = 10
     '        If histogram.Rows <> matSize Then
     '            histogram = New cv.Mat(matSize, matSize, cv.MatType.CV_32F, cv.Scalar.All(0))
-    '            task.gOptions.HistBinSlider.Value = matSize
+    '            taskAlg.gOptions.HistBinSlider.Value = matSize
     '        End If
 
     '        trace.Run(src)
     '        dst2 = trace.dst2
-    '        If task.firstPass Then Exit Sub ' all entries are identical on the first pass.
+    '        If taskAlg.firstPass Then Exit Sub ' all entries are identical on the first pass.
 
     '        histogram.SetTo(0)
     '        For Each lp In trace.lpList
@@ -41,7 +41,7 @@ Namespace VBClasses
     '        Dim h = CInt(dst2.Height / matSize)
     '        Dim maxLoc = New cv.Point2f(w * mm.maxLoc.X, h * mm.maxLoc.Y)
     '        dst1.SetTo(0)
-    '        dst1.Rectangle(New cv.Rect(maxLoc.X, maxLoc.Y, w, h), white, task.lineWidth, task.lineType)
+    '        dst1.Rectangle(New cv.Rect(maxLoc.X, maxLoc.Y, w, h), white, taskAlg.lineWidth, taskAlg.lineType)
 
     '        Dim center = New cv.Point2f(mm.maxLoc.X - halfsize, mm.maxLoc.Y - halfsize)
     '        SetTrueText("Histogram peak is at " + center.ToString, 1)
@@ -58,7 +58,7 @@ Namespace VBClasses
     Public Class ParticleFilter_Example : Inherits TaskParent
         Dim imageFrame = 12
         Public Sub New()
-            cPtr = ParticleFilterTest_Open(task.homeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
+            cPtr = ParticleFilterTest_Open(taskAlg.homeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
             desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -66,9 +66,9 @@ Namespace VBClasses
             If imageFrame Mod 45 = 0 Then
                 imageFrame = 13
                 ParticleFilterTest_Close(cPtr)
-                cPtr = ParticleFilterTest_Open(task.homeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
+                cPtr = ParticleFilterTest_Open(taskAlg.homeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
             End If
-            Dim nextFile As New FileInfo(task.homeDir + "Data/ballSequence/color_" + CStr(imageFrame) + ".png")
+            Dim nextFile As New FileInfo(taskAlg.homeDir + "Data/ballSequence/color_" + CStr(imageFrame) + ".png")
             dst3 = cv.Cv2.ImRead(nextFile.FullName).Resize(dst2.Size)
             Dim imagePtr = ParticleFilterTest_Run(cPtr)
             dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
@@ -101,7 +101,7 @@ Namespace VBClasses
     '        net.X = dst2.Width / 2 + net.X / trace.lpList.Count
     '        net.Y = dst2.Height / 2 + net.Y / trace.lpList.Count
     '        dst3.SetTo(0)
-    '        DrawLine(dst3, New cv.Point2f(dst2.Width / 2, dst2.Height / 2), net, white, task.lineWidth, task.lineType)
+    '        DrawLine(dst3, New cv.Point2f(dst2.Width / 2, dst2.Height / 2), net, white, taskAlg.lineWidth, taskAlg.lineType)
     '        SetTrueText(trace.strOut, 3)
     '    End Sub
     'End Class

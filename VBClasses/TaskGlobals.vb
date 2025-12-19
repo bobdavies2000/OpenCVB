@@ -36,102 +36,102 @@ Namespace VBClasses
             Return New cv.Scalar(c(0), c(1), c(2))
         End Function
         Public Function DisplayCells() As cv.Mat
-            Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+            Dim dst As New cv.Mat(taskAlg.workRes, cv.MatType.CV_8UC3, 0)
 
-            For Each rc In task.redList.oldrclist
+            For Each rc In taskAlg.redList.oldrclist
                 dst(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
             Return dst
         End Function
         Public Function RebuildRCMap(sortedCells As SortedList(Of Integer, oldrcData)) As cv.Mat
-            task.redList.oldrclist.Clear()
-            task.redList.oldrclist.Add(New oldrcData) ' placeholder oldrcData so map is correct.
-            task.redList.rcMap.SetTo(0)
-            Static saveColorSetting = task.gOptions.trackingLabel
+            taskAlg.redList.oldrclist.Clear()
+            taskAlg.redList.oldrclist.Add(New oldrcData) ' placeholder oldrcData so map is correct.
+            taskAlg.redList.rcMap.SetTo(0)
+            Static saveColorSetting = taskAlg.gOptions.trackingLabel
             For Each rc In sortedCells.Values
-                rc.index = task.redList.oldrclist.Count
+                rc.index = taskAlg.redList.oldrclist.Count
 
-                If saveColorSetting <> task.gOptions.trackingLabel Then rc.color = black
-                'Select Case task.gOptions.trackingLabel
+                If saveColorSetting <> taskAlg.gOptions.trackingLabel Then rc.color = black
+                'Select Case taskAlg.gOptions.trackingLabel
                 '    Case "Mean Color"
                 '        Dim colorStdev As cv.Scalar
-                '        cv.Cv2.MeanStdDev(task.color(rc.rect), rc.color, colorStdev, rc.mask)
+                '        cv.Cv2.MeanStdDev(taskAlg.color(rc.rect), rc.color, colorStdev, rc.mask)
                 ' Case "Tracking Color"
-                If rc.color = black Then rc.color = task.scalarColors(rc.index)
+                If rc.color = black Then rc.color = taskAlg.scalarColors(rc.index)
                 'End Select
 
-                task.redList.oldrclist.Add(rc)
-                task.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                DisplayCells.Circle(rc.maxDStable, task.DotSize, task.highlight, -1)
+                taskAlg.redList.oldrclist.Add(rc)
+                taskAlg.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                DisplayCells.Circle(rc.maxDStable, taskAlg.DotSize, taskAlg.highlight, -1)
                 If rc.index >= 255 Then Exit For
             Next
-            saveColorSetting = task.gOptions.trackingLabel
-            task.redList.rcMap.SetTo(0, task.noDepthMask)
+            saveColorSetting = taskAlg.gOptions.trackingLabel
+            taskAlg.redList.rcMap.SetTo(0, taskAlg.noDepthMask)
             Return DisplayCells()
         End Function
         Public Function RebuildRCMap(oldrclist As List(Of oldrcData)) As cv.Mat
-            task.redList.rcMap.SetTo(0)
-            Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
+            taskAlg.redList.rcMap.SetTo(0)
+            Dim dst As New cv.Mat(taskAlg.workRes, cv.MatType.CV_8UC3, 0)
             For Each rc In oldrclist
-                task.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                taskAlg.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
                 dst(rc.rect).SetTo(rc.color, rc.mask)
                 If rc.index >= 255 Then Exit For
             Next
             Return dst
         End Function
         Public Sub taskUpdate()
-            If task.myStopWatch Is Nothing Then task.myStopWatch = Stopwatch.StartNew()
+            If taskAlg.myStopWatch Is Nothing Then taskAlg.myStopWatch = Stopwatch.StartNew()
 
             ' update the time measures
-            task.msWatch = task.myStopWatch.ElapsedMilliseconds
+            taskAlg.msWatch = taskAlg.myStopWatch.ElapsedMilliseconds
 
-            task.quarterBeat = False
-            task.midHeartBeat = False
-            task.heartBeat = False
-            Dim ms = (task.msWatch - task.msLast) / 1000
-            For i = 0 To task.quarter.Count - 1
-                If task.quarter(i) = False And ms > Choose(i + 1, 0.25, 0.5, 0.75, 1.0) Then
-                    task.quarterBeat = True
-                    If i = 1 Then task.midHeartBeat = True
-                    If i = 3 Then task.heartBeat = True
-                    task.quarter(i) = True
+            taskAlg.quarterBeat = False
+            taskAlg.midHeartBeat = False
+            taskAlg.heartBeat = False
+            Dim ms = (taskAlg.msWatch - taskAlg.msLast) / 1000
+            For i = 0 To taskAlg.quarter.Count - 1
+                If taskAlg.quarter(i) = False And ms > Choose(i + 1, 0.25, 0.5, 0.75, 1.0) Then
+                    taskAlg.quarterBeat = True
+                    If i = 1 Then taskAlg.midHeartBeat = True
+                    If i = 3 Then taskAlg.heartBeat = True
+                    taskAlg.quarter(i) = True
                 End If
             Next
-            If task.heartBeat Then ReDim task.quarter(4)
+            If taskAlg.heartBeat Then ReDim taskAlg.quarter(4)
 
-            If task.frameCount = 1 Then task.heartBeat = True
+            If taskAlg.frameCount = 1 Then taskAlg.heartBeat = True
 
-            Static lastHeartBeatLT As Boolean = task.heartBeatLT
-            task.afterHeartBeatLT = If(lastHeartBeatLT, True, False)
-            lastHeartBeatLT = task.heartBeatLT
+            Static lastHeartBeatLT As Boolean = taskAlg.heartBeatLT
+            taskAlg.afterHeartBeatLT = If(lastHeartBeatLT, True, False)
+            lastHeartBeatLT = taskAlg.heartBeatLT
 
             Static heartBeatCount As Integer = 5
-            If task.heartBeat Then
+            If taskAlg.heartBeat Then
                 heartBeatCount += 1
                 If heartBeatCount >= 5 Then
-                    task.heartBeatLT = True
+                    taskAlg.heartBeatLT = True
                     heartBeatCount = 0
                 End If
             End If
 
-            Dim frameDuration = 1000 / task.fpsAlgorithm
-            task.almostHeartBeat = If(task.msWatch - task.msLast + frameDuration * 1.5 > 1000, True, False)
+            Dim frameDuration = 1000 / taskAlg.fpsAlgorithm
+            taskAlg.almostHeartBeat = If(taskAlg.msWatch - taskAlg.msLast + frameDuration * 1.5 > 1000, True, False)
 
-            If (task.msWatch - task.msLast) > 1000 Then task.msLast = task.msWatch
-            If task.heartBeatLT Then task.toggleOn = Not task.toggleOn
+            If (taskAlg.msWatch - taskAlg.msLast) > 1000 Then taskAlg.msLast = taskAlg.msWatch
+            If taskAlg.heartBeatLT Then taskAlg.toggleOn = Not taskAlg.toggleOn
 
-            If task.paused Then
-                task.midHeartBeat = False
-                task.almostHeartBeat = False
+            If taskAlg.paused Then
+                taskAlg.midHeartBeat = False
+                taskAlg.almostHeartBeat = False
             End If
 
-            'task.histogramBins = task.gOptions.HistBinBar.Value
-            'task.lineWidth = task.gOptions.LineWidth.Value
-            'task.DotSize = task.gOptions.DotSizeSlider.Value
+            'taskAlg.histogramBins = taskAlg.gOptions.HistBinBar.Value
+            'taskAlg.lineWidth = taskAlg.gOptions.LineWidth.Value
+            'taskAlg.DotSize = taskAlg.gOptions.DotSizeSlider.Value
 
-            'task.metersPerPixel = task.MaxZmeters / task.workRes.Height ' meters per pixel in projections - side and top.
-            'task.debugSyncUI = task.gOptions.debugSyncUI.Checked
+            'taskAlg.metersPerPixel = taskAlg.MaxZmeters / taskAlg.workRes.Height ' meters per pixel in projections - side and top.
+            'taskAlg.debugSyncUI = taskAlg.gOptions.debugSyncUI.Checked
         End Sub
 
         Public Function findRectFromLine(lp As lpData) As cv.Rect
@@ -146,7 +146,7 @@ Namespace VBClasses
         Public Function findEdgePoints(lp As lpData) As lpData
             ' compute the edge to edge line - might be useful...
             Dim yIntercept = lp.p1.Y - lp.slope * lp.p1.X
-            Dim w = task.cols, h = task.rows
+            Dim w = taskAlg.cols, h = taskAlg.rows
 
             Dim xp1 = New cv.Point2f(0, yIntercept)
             Dim xp2 = New cv.Point2f(w, w * lp.slope + yIntercept)
@@ -169,8 +169,8 @@ Namespace VBClasses
                 xp2.Y = 0
             End If
 
-            If xp1.Y = task.color.Height Then xp1.Y -= 1
-            If xp2.Y = task.color.Height Then xp2.Y -= 1
+            If xp1.Y = taskAlg.color.Height Then xp1.Y -= 1
+            If xp2.Y = taskAlg.color.Height Then xp2.Y -= 1
             Return New lpData(xp1, xp2)
 
         End Function
@@ -206,27 +206,27 @@ Namespace VBClasses
         Public Sub DrawLine(ByRef dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
             Dim pt1 = New cv.Point(p1.X, p1.Y)
             Dim pt2 = New cv.Point(p2.X, p2.Y)
-            dst.Line(pt1, pt2, color, task.lineWidth, task.lineType)
+            dst.Line(pt1, pt2, color, taskAlg.lineWidth, taskAlg.lineType)
         End Sub
         Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar, lineWidth As Integer)
-            dst.Line(p1, p2, color, lineWidth, task.lineType)
+            dst.Line(p1, p2, color, lineWidth, taskAlg.lineType)
         End Sub
         Public Sub DrawLine(dst As cv.Mat, lp As lpData, color As cv.Scalar)
-            dst.Line(lp.p1, lp.p2, color, task.lineWidth, task.lineType)
+            dst.Line(lp.p1, lp.p2, color, taskAlg.lineWidth, taskAlg.lineType)
         End Sub
         Public Sub DrawLine(dst As cv.Mat, lp As lpData)
-            dst.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            dst.Line(lp.p1, lp.p2, taskAlg.highlight, taskAlg.lineWidth, taskAlg.lineType)
         End Sub
         Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f)
-            dst.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+            dst.Line(p1, p2, taskAlg.highlight, taskAlg.lineWidth, taskAlg.lineType)
         End Sub
         Public Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
             If r.X < 0 Then r.X = 0
             If r.Y < 0 Then r.Y = 0
-            If r.X + r.Width >= task.workRes.Width * ratio Then r.Width = task.workRes.Width * ratio - r.X - 1
-            If r.Y + r.Height >= task.workRes.Height * ratio Then r.Height = task.workRes.Height * ratio - r.Y - 1
-            If r.X >= task.workRes.Width * ratio Then r.X = task.workRes.Width - 1
-            If r.Y >= task.workRes.Height * ratio Then r.Y = task.workRes.Height - 1
+            If r.X + r.Width >= taskAlg.workRes.Width * ratio Then r.Width = taskAlg.workRes.Width * ratio - r.X - 1
+            If r.Y + r.Height >= taskAlg.workRes.Height * ratio Then r.Height = taskAlg.workRes.Height * ratio - r.Y - 1
+            If r.X >= taskAlg.workRes.Width * ratio Then r.X = taskAlg.workRes.Width - 1
+            If r.Y >= taskAlg.workRes.Height * ratio Then r.Y = taskAlg.workRes.Height - 1
             If r.Width <= 0 Then r.Width = 1
             If r.Height <= 0 Then r.Height = 1
             Return r

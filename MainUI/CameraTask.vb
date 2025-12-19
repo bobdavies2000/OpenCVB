@@ -39,46 +39,46 @@ Namespace MainUI
             camera.isCapturing = False
         End Sub
         Private Sub Camera_FrameReady(sender As GenericCamera)
-            If task.readyForCameraInput = False Then Exit Sub
+            If taskAlg.readyForCameraInput = False Then Exit Sub
 
             Static frameProcessed As Boolean = True
             If frameProcessed = False Then Exit Sub
             frameProcessed = False
 
             Me.BeginInvoke(Sub()
-                               If task.cpu.algorithm_ms.Count = 0 Then task.cpu.startRun(settings.algorithm)
+                               If taskAlg.cpu.algorithm_ms.Count = 0 Then taskAlg.cpu.startRun(settings.algorithm)
 
-                               task.cpu.algorithmTimes(1) = Now
+                               taskAlg.cpu.algorithmTimes(1) = Now
 
-                               Dim elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - task.cpu.algorithmTimes(0).Ticks
+                               Dim elapsedWaitTicks = taskAlg.cpu.algorithmTimes(1).Ticks - taskAlg.cpu.algorithmTimes(0).Ticks
                                Dim spanWait = New TimeSpan(elapsedWaitTicks)
                                Dim spanTime = TimeSpan.TicksPerMillisecond
-                               task.cpu.algorithm_ms(0) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
+                               taskAlg.cpu.algorithm_ms(0) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                               task.cpu.algorithmTimes(0) = task.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
+                               taskAlg.cpu.algorithmTimes(0) = taskAlg.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
 
-                               sender.camImages.images(0).CopyTo(task.color)
-                               sender.camImages.images(1).CopyTo(task.pointCloud)
-                               sender.camImages.images(2).CopyTo(task.leftView)
-                               sender.camImages.images(3).CopyTo(task.rightView)
+                               sender.camImages.images(0).CopyTo(taskAlg.color)
+                               sender.camImages.images(1).CopyTo(taskAlg.pointCloud)
+                               sender.camImages.images(2).CopyTo(taskAlg.leftView)
+                               sender.camImages.images(3).CopyTo(taskAlg.rightView)
 
-                               task.RunAlgorithm()
+                               taskAlg.RunAlgorithm()
 
-                               task.cpu.algorithmTimes(1) = Now
+                               taskAlg.cpu.algorithmTimes(1) = Now
 
-                               elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - task.cpu.algorithmTimes(0).Ticks
+                               elapsedWaitTicks = taskAlg.cpu.algorithmTimes(1).Ticks - taskAlg.cpu.algorithmTimes(0).Ticks
 
                                spanWait = New TimeSpan(elapsedWaitTicks)
                                spanTime = TimeSpan.TicksPerMillisecond
-                               task.cpu.algorithm_ms(1) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
+                               taskAlg.cpu.algorithm_ms(1) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                               task.cpu.algorithmTimes(0) = task.cpu.algorithmTimes(1) ' start time wait = end time algorithm
+                               taskAlg.cpu.algorithmTimes(0) = taskAlg.cpu.algorithmTimes(1) ' start time wait = end time algorithm
 
-                               task.mouseClickFlag = False
-                               task.frameCount += 1
+                               taskAlg.mouseClickFlag = False
+                               taskAlg.frameCount += 1
 
-                               If RefreshTimer.Interval <> task.refreshTimerTickCount Then
-                                   RefreshTimer.Interval = task.refreshTimerTickCount
+                               If RefreshTimer.Interval <> taskAlg.refreshTimerTickCount Then
+                                   RefreshTimer.Interval = taskAlg.refreshTimerTickCount
                                End If
 
                                frameProcessed = True
@@ -87,19 +87,19 @@ Namespace MainUI
     End Class
 End Namespace
 '' Run algorithm on background thread
-'Task.Run(Sub()
+'taskAlg.Run(Sub()
 '             Try
 '                 ' Run algorithm on background thread
-'                 task.RunAlgorithm()
+'                 taskAlg.RunAlgorithm()
 
 '                 ' Update UI on UI thread after algorithm completes
 '                 Me.BeginInvoke(Sub()
 '                                    Try
-'                                        task.mouseClickFlag = False
-'                                        task.frameCount += 1
+'                                        taskAlg.mouseClickFlag = False
+'                                        taskAlg.frameCount += 1
 
-'                                        If RefreshTimer.Interval <> task.refreshTimerTickCount Then
-'                                            RefreshTimer.Interval = task.refreshTimerTickCount
+'                                        If RefreshTimer.Interval <> taskAlg.refreshTimerTickCount Then
+'                                            RefreshTimer.Interval = taskAlg.refreshTimerTickCount
 '                                        End If
 '                                    Catch ex As Exception
 '                                        Debug.WriteLine("Error updating UI after algorithm: " + ex.Message)

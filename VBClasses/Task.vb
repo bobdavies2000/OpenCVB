@@ -13,14 +13,14 @@ Namespace VBClasses
                     If algorithm.GetType().GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
                 Next
             End If
-            For Each mat In task.dstList
+            For Each mat In taskAlg.dstList
                 If mat IsNot Nothing Then mat.Dispose()
             Next
         End Sub
 #End Region
 
         Public Sub Initialize(settings As jsonShared.Settings)
-            task.Settings = settings
+            taskAlg.Settings = settings
             rgbLeftAligned = True
             If settings.cameraName.Contains("RealSense") Then rgbLeftAligned = False
 
@@ -31,8 +31,8 @@ Namespace VBClasses
 
             allOptions = New OptionsContainer
             allOptions.Show()
-            allOptions.Location = New Point(task.Settings.allOptionsLeft, task.Settings.allOptionsTop)
-            allOptions.Size = New Size(task.Settings.allOptionsWidth, task.Settings.allOptionsHeight)
+            allOptions.Location = New Point(taskAlg.Settings.allOptionsLeft, taskAlg.Settings.allOptionsTop)
+            allOptions.Size = New Size(taskAlg.Settings.allOptionsWidth, taskAlg.Settings.allOptionsHeight)
             allOptions.positionedFromSettings = True
 
             If settings.algorithm.StartsWith("GL_") And settings.algorithm <> "GL_MainForm" And optionsChanged Then
@@ -41,7 +41,7 @@ Namespace VBClasses
                 sharpGL.Show()
             End If
 
-            Dim fps = task.Settings.FPSdisplay
+            Dim fps = taskAlg.Settings.FPSdisplay
             gOptions = New OptionsGlobal
             gOptions.DisplayFPSSlider.Value = fps
             featureOptions = New OptionsFeatures
@@ -63,7 +63,7 @@ Namespace VBClasses
             lines = New Line_Basics
             rgbFilter = New Filter_Basics
 
-            ' all the algorithms in the list are task algorithms that are children of the algorithm.
+            ' all the algorithms in the list are taskAlg algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1
                 cpu.callTrace(i) = settings.algorithm + "\" + cpu.callTrace(i)
             Next
@@ -111,19 +111,19 @@ Namespace VBClasses
 
             taskUpdate()
 
-            If task.cpu.algorithm_ms.Count = 0 Then task.cpu.initialize(Settings.algorithm)
+            If taskAlg.cpu.algorithm_ms.Count = 0 Then taskAlg.cpu.initialize(Settings.algorithm)
 
-            Dim src = task.color
-            If src.Width = 0 Or task.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
+            Dim src = taskAlg.color
+            If src.Width = 0 Or taskAlg.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
 
-            bins2D = {task.workRes.Height, task.workRes.Width}
+            bins2D = {taskAlg.workRes.Height, taskAlg.workRes.Width}
 
             ' run any universal algorithms here
             IMU_RawAcceleration = IMU_Acceleration
             IMU_RawAngularVelocity = IMU_AngularVelocity
             IMU_AlphaFilter = 0.5 '  gOptions.imu_Alpha
 
-            grid.Run(task.color)
+            grid.Run(taskAlg.color)
             imuBasics.Run(emptyMat)
             gmat.Run(emptyMat)
 
@@ -141,7 +141,7 @@ Namespace VBClasses
             rgbFilter.Run(color)
             If gOptions.UseMotionMask.Checked Then
                 motionBasics.Run(gray)
-                If optionsChanged Or task.frameCount < 5 Then
+                If optionsChanged Or taskAlg.frameCount < 5 Then
                     motionRect = New cv.Rect(0, 0, workRes.Width, workRes.Height)
                     grayStable = gray.Clone
                     leftViewStable = leftView.Clone
@@ -162,7 +162,7 @@ Namespace VBClasses
             If pcMotion IsNot Nothing Then
                 pcMotion.Run(emptyMat) '******* this is the gravity rotation *******
             Else
-                task.pcSplit = task.pointCloud.Split
+                taskAlg.pcSplit = taskAlg.pointCloud.Split
             End If
 
             colorizer.Run(src)
@@ -182,12 +182,12 @@ Namespace VBClasses
                 If gifCreator.gifC.options.buildCheck.Checked Then
                     gifCreator.gifC.options.buildCheck.Checked = False
                     For i = 0 To gifImages.Count - 1
-                        Dim fileName As New FileInfo(task.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
+                        Dim fileName As New FileInfo(taskAlg.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
                         gifImages(i).Save(fileName.FullName)
                     Next
 
                     gifImages.Clear()
-                    Dim dirInfo As New DirectoryInfo(task.homeDir + "GifBuilder\bin\Debug\net8.0\")
+                    Dim dirInfo As New DirectoryInfo(taskAlg.homeDir + "GifBuilder\bin\Debug\net8.0\")
                     Dim dirData = dirInfo.GetDirectories()
                     Dim gifExe As New FileInfo(dirInfo.FullName + "GifBuilder.exe")
                     If gifExe.Exists = False Then
@@ -224,8 +224,8 @@ Namespace VBClasses
 
 
                 labels = MainUI_Algorithm.labels
-                If task.gOptions.displayDst0.Checked = False Then labels(0) = task.resolutionDetails
-                If task.gOptions.displayDst1.Checked = False Then labels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")
+                If taskAlg.gOptions.displayDst0.Checked = False Then labels(0) = taskAlg.resolutionDetails
+                If taskAlg.gOptions.displayDst1.Checked = False Then labels(1) = taskAlg.depthAndDepthRange.Replace(vbCrLf, "")
 
                 Dim nextTrueData As List(Of TrueText) = MainUI_Algorithm.trueData
                 trueData = New List(Of TrueText)(nextTrueData)
@@ -233,10 +233,10 @@ Namespace VBClasses
                 firstPass = False
                 heartBeatLT = False
 
-                Dim displayObject = task.MainUI_Algorithm
+                Dim displayObject = taskAlg.MainUI_Algorithm
                 ' they could have asked to display one of the algorithms in the TreeView.
-                For Each obj In task.cpu.activeObjects
-                    If obj.tracename = task.cpu.displayObjectName Then
+                For Each obj In taskAlg.cpu.activeObjects
+                    If obj.tracename = taskAlg.cpu.displayObjectName Then
                         displayObject = obj
                         Exit For
                     End If
@@ -264,23 +264,23 @@ Namespace VBClasses
                     displayObject.trueData.Add(New TrueText("Longest", pt, 0))
                 End If
 
-                If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
+                If taskAlg.drawRect.Width > 0 And taskAlg.drawRect.Height > 0 Then
                     For Each dst In dstList
-                        dst.Rectangle(task.drawRect, cv.Scalar.White, 1)
+                        dst.Rectangle(taskAlg.drawRect, cv.Scalar.White, 1)
                     Next
                 End If
 
                 ' if there were no cycles spent on this routine, then it was inactive.
                 ' if any active algorithm has an index = -1, it has not been run.
-                Dim index = task.cpu.algorithmNames.IndexOf(displayObject.traceName)
+                Dim index = taskAlg.cpu.algorithmNames.IndexOf(displayObject.traceName)
                 If index = -1 Then
-                    displayObject.trueData.Add(New TrueText("This task is not active at this time.",
+                    displayObject.trueData.Add(New TrueText("This taskAlg is not active at this time.",
                                            New cv.Point(workRes.Width / 3, workRes.Height / 2), 2))
                 End If
 
                 trueData.Clear()
-                trueData.Add(New TrueText(task.depthAndDepthRange,
-                                  New cv.Point(task.mouseMovePoint.X, task.mouseMovePoint.Y - 24), 1))
+                trueData.Add(New TrueText(taskAlg.depthAndDepthRange,
+                                  New cv.Point(taskAlg.mouseMovePoint.X, taskAlg.mouseMovePoint.Y - 24), 1))
                 For Each tt In displayObject.trueData
                     trueData.Add(tt)
                 Next
@@ -312,7 +312,7 @@ Namespace VBClasses
             gridRects = New List(Of cv.Rect)
             optionsChanged = True
             firstPass = True
-            useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve task.results..
+            useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve taskAlg.results..
         End Sub
     End Class
 End Namespace

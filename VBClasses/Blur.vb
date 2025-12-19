@@ -95,10 +95,10 @@ Namespace VBClasses
             dst3 = (dst3 * 1 / options.reduction).ToMat
             dst3 = (dst3 * options.reduction).ToMat
 
-            dst3 = ShowAddweighted(dst3, task.color, labels(3))
+            dst3 = ShowAddweighted(dst3, taskAlg.color, labels(3))
 
             labels(2) = "Blur = " + CStr(options.nextPercent) + "% Reduction Factor = " + CStr(options.reduction)
-            If task.frameCount Mod options.frameCycle = 0 Then options.nextPercent -= 1
+            If taskAlg.frameCount Mod options.frameCycle = 0 Then options.nextPercent -= 1
             If options.nextPercent <= 0 Then options.nextPercent = options.savePercent
         End Sub
     End Class
@@ -122,9 +122,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim r = New cv.Rect(dst2.Width / 2 - 25, dst2.Height / 2 - 25, 50, 50)
             If standaloneTest() Then
-                If task.drawRect <> New cv.Rect Then r = task.drawRect
+                If taskAlg.drawRect <> New cv.Rect Then r = taskAlg.drawRect
                 ' deliberately blur a small region to test the algorithm
-                If task.frameCount Mod 2 Then
+                If taskAlg.frameCount Mod 2 Then
                     blur.Run(src(r))
                     src(r) = blur.dst2
                 End If
@@ -138,7 +138,7 @@ Namespace VBClasses
             cv.Cv2.MeanStdDev(dst2, mean, stdev)
             SetTrueText("Blur variance is " + Format(stdev * stdev, fmt3), 3)
 
-            If standaloneTest() Then dst2.Rectangle(r, white, task.lineWidth)
+            If standaloneTest() Then dst2.Rectangle(r, white, taskAlg.lineWidth)
         End Sub
     End Class
 
@@ -154,7 +154,7 @@ Namespace VBClasses
             desc = "Blur the depth results to help find the boundaries to large depth regions"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst3 = taskAlg.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
 
             blur.Run(dst3)
             dst2 = blur.dst2
@@ -186,16 +186,16 @@ Namespace VBClasses
         Dim blur As New Blur_Bilateral
         Dim myhist As New Hist_EqualizeGray
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
             labels(2) = "Use Blur slider to see impact on histogram peak values"
             desc = "Compound algorithms Blur and Histogram"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            myhist.Run(task.grayStable)
+            myhist.Run(taskAlg.grayStable)
 
             mat2to1.mat(0) = myhist.dst2.Clone
 
-            blur.Run(task.grayStable)
+            blur.Run(taskAlg.grayStable)
             dst3 = blur.dst2.Clone
 
             myhist.Run(blur.dst2)
@@ -222,7 +222,7 @@ Namespace VBClasses
             desc = "Visualize the impact of blurring with the histogram.  Draw a rectangle anywhere to test a section of the image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.drawRect <> New cv.Rect Then src = task.grayStable(task.drawRect) Else src = task.grayStable
+            If taskAlg.drawRect <> New cv.Rect Then src = taskAlg.grayStable(taskAlg.drawRect) Else src = taskAlg.grayStable
             Static kernelSlider = OptionParent.FindSlider("Blur Kernel Size")
 
             myhist.Run(src)
@@ -233,7 +233,7 @@ Namespace VBClasses
             myhist.Run(blur.dst2)
             dst3 = myhist.dst2
 
-            If task.heartBeat Then
+            If taskAlg.heartBeat Then
                 If kernelSlider.value >= kernelSlider.maximum Then kernelSlider.value = 1
                 kernelSlider.value += 2
                 labels(3) = "Blur kernel size = " + CStr(kernelSlider.value)

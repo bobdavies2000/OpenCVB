@@ -224,7 +224,7 @@ Namespace MainUI
             resolutionDetails = "CaptureRes " + CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) +
                                 ", WorkRes " + CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height) +
                                 ", DisplayRes " + CStr(settings.displayRes.Width) + "x" + CStr(settings.displayRes.Height)
-            If task IsNot Nothing Then task.resolutionDetails = resolutionDetails
+            If taskAlg IsNot Nothing Then taskAlg.resolutionDetails = resolutionDetails
 
             StatusLabel.Location = New Point(offset, pics(2).Top + h)
             StatusLabel.Width = w * 2
@@ -237,7 +237,7 @@ Namespace MainUI
 
                 TestAllButton.Text = "Stop Test"
                 AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
-                TestAllTimer.Interval = task.testAllDuration * 1000
+                TestAllTimer.Interval = taskAlg.testAllDuration * 1000
                 TestAllTimer.Enabled = True
             Else
                 Debug.WriteLine("Stopping 'TestAll' overnight run.")
@@ -249,8 +249,8 @@ Namespace MainUI
         End Sub
         Private Sub TreeViewTimer_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
             If isPlaying = False Then Exit Sub
-            If task Is Nothing Then Exit Sub
-            If task.treeView IsNot Nothing Then task.treeView.Timer2_Tick(sender, e)
+            If taskAlg Is Nothing Then Exit Sub
+            If taskAlg.treeView IsNot Nothing Then taskAlg.treeView.Timer2_Tick(sender, e)
         End Sub
         Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
             For i = 0 To 3
@@ -264,11 +264,10 @@ Namespace MainUI
             meRefreshCount += 1
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
-            If task Is Nothing Then Exit Sub
-            If task.testAllRunning = False Then settings.algorithm = AvailableAlgorithms.Text
+            If testAllRunning = False Then settings.algorithm = AvailableAlgorithms.Text
 
             SaveJsonSettings()
-            If task Is Nothing Then
+            If taskAlg Is Nothing Then
                 startAlgorithm()
             Else
                 If Trim(AvailableAlgorithms.Text) = "" Then ' Skip the space between groups
@@ -353,20 +352,20 @@ Namespace MainUI
             startAlgorithm()
         End Sub
         Private Sub Pic_Paint(sender As Object, e As PaintEventArgs)
-            If task Is Nothing Then Exit Sub
+            If taskAlg Is Nothing Then Exit Sub
             Dim g As Graphics = e.Graphics
             Dim pic = DirectCast(sender, PictureBox)
             g.ScaleTransform(1, 1)
 
             Static displayimage As New cv.Mat
             SyncLock imageLock
-                displayimage = task.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+                displayimage = taskAlg.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
             End SyncLock
             Dim bitmap = cvext.BitmapConverter.ToBitmap(displayimage)
             g.DrawImage(bitmap, 0, 0)
 
-            For i = 0 To task.labels.Count - 1
-                labels(i).Text = task.labels(i)
+            For i = 0 To taskAlg.labels.Count - 1
+                labels(i).Text = taskAlg.labels(i)
             Next
 
             Dim ratioX = pic.Width / settings.workRes.Width
@@ -376,7 +375,7 @@ Namespace MainUI
             Static myBlackPen As New Pen(Color.Black)
 
             Static saveTrueData As List(Of TrueText)
-            saveTrueData = New List(Of TrueText)(task.trueData)
+            saveTrueData = New List(Of TrueText)(taskAlg.trueData)
             Dim font = New System.Drawing.Font("Tahoma", 9)
             For Each tt In saveTrueData
                 If tt.text Is Nothing Then Continue For
@@ -389,10 +388,10 @@ Namespace MainUI
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
-            task.readyForCameraInput = False
+            taskAlg.readyForCameraInput = False
             StopCamera()
-            task.Dispose()
-            task = Nothing
+            taskAlg.Dispose()
+            taskAlg = Nothing
 
             If Options.ShowDialog() = DialogResult.OK Then
                 getLineCounts()
@@ -404,29 +403,29 @@ Namespace MainUI
             End If
         End Sub
         Private Sub startAlgorithm()
-            task = New AlgorithmTask
+            taskAlg = New AlgorithmTask
 
             For i = 0 To 3
-                task.dstList(i) = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
+                taskAlg.dstList(i) = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
             Next
 
-            task.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
-            task.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
-            task.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
-            task.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
-            task.gridRatioX = pics(0).Width / settings.workRes.Width
-            task.gridRatioY = pics(0).Height / settings.workRes.Height
-            task.homeDir = homeDir
+            taskAlg.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
+            taskAlg.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
+            taskAlg.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
+            taskAlg.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
+            taskAlg.gridRatioX = pics(0).Width / settings.workRes.Width
+            taskAlg.gridRatioY = pics(0).Height / settings.workRes.Height
+            taskAlg.homeDir = homeDir
 
-            task.main_hwnd = Me.Handle
+            taskAlg.main_hwnd = Me.Handle
 
-            task.Initialize(settings)
-            task.MainUI_Algorithm = createAlgorithm(settings.algorithm)
-            AlgDescription.Text = task.MainUI_Algorithm.desc
+            taskAlg.Initialize(settings)
+            taskAlg.MainUI_Algorithm = createAlgorithm(settings.algorithm)
+            AlgDescription.Text = taskAlg.MainUI_Algorithm.desc
             MainToolStrip.Refresh()
-            task.resolutionDetails = resolutionDetails
+            taskAlg.resolutionDetails = resolutionDetails
 
-            If task.calibData IsNot Nothing Then task.calibData = camera.calibData
+            If taskAlg.calibData IsNot Nothing Then taskAlg.calibData = camera.calibData
 
             If CameraSwitching.Visible Then
                 CamSwitchTimer.Enabled = False

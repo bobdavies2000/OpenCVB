@@ -20,7 +20,7 @@ Namespace VBClasses
     'Public Class PCA_Basics : Inherits TaskParent
     '    Dim pcaLine As New PCA_LineMask
     '    Public Sub New()
-    '        If standalone Then task.gOptions.displayDst1.Checked = True
+    '        If standalone Then taskAlg.gOptions.displayDst1.Checked = True
     '        desc = "Compute the principal component for the selected line."
     '    End Sub
     '    Public Overrides Sub RunAlg(src As cv.Mat)
@@ -77,10 +77,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Or runRedCflag Then dst2 = runRedList(src, labels(2))
 
-            Dim rc = task.oldrcD
+            Dim rc = taskAlg.oldrcD
             Dim inputPoints As New List(Of cv.Point3f)
             For Each pt In rc.contour
-                Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
+                Dim vec = taskAlg.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
                 If vec.Z > 0 Then inputPoints.Add(vec)
             Next
 
@@ -116,9 +116,9 @@ Namespace VBClasses
             dst2 = pca.dst2
             labels(2) = pca.labels(2)
 
-            Dim rc = task.oldrcD
+            Dim rc = taskAlg.oldrcD
             If rc.mmZ.maxVal > 0 Then
-                pcaPrep.Run(task.pointCloud(rc.rect).Clone)
+                pcaPrep.Run(taskAlg.pointCloud(rc.rect).Clone)
 
                 If pcaPrep.inputData.Rows > 0 Then
                     pca.pca_analysis = New cv.PCA(pcaPrep.inputData, New cv.Mat, cv.PCA.Flags.DataAsRow)
@@ -150,13 +150,13 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static retainSlider = OptionParent.FindSlider("Retained Variance")
-            Dim index = task.frameCount Mod images.Length
+            Dim index = taskAlg.frameCount Mod images.Length
             images(index) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim gray32f As New cv.Mat
             images(index).ConvertTo(gray32f, cv.MatType.CV_32F)
             gray32f = gray32f.Normalize(0, 255, cv.NormTypes.MinMax)
             images32f(index) = gray32f.Reshape(1, 1)
-            If task.frameCount >= images.Length Then
+            If taskAlg.frameCount >= images.Length Then
                 Dim data = New cv.Mat(images.Length, src.Rows * src.Cols, cv.MatType.CV_32F)
                 For i = 0 To images.Length - 1
                     images32f(i).CopyTo(data.Row(i))
@@ -181,7 +181,7 @@ Namespace VBClasses
             desc = "Reconstruct a depth stream as a composite of X images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            pca.Run(task.depthRGB)
+            pca.Run(taskAlg.depthRGB)
             dst2 = pca.dst2
         End Sub
     End Class
@@ -194,7 +194,7 @@ Namespace VBClasses
         Dim pca As New PCA_Reconstruct
         Dim image As New cv.Mat
         Public Sub New()
-            image = cv.Cv2.ImRead(task.homeDir + "opencv/Samples/Data/pca_test1.jpg")
+            image = cv.Cv2.ImRead(taskAlg.homeDir + "opencv/Samples/Data/pca_test1.jpg")
             desc = "Use PCA to find the principal direction of an object."
             labels(2) = "Original image"
             labels(3) = "PCA Output"
@@ -204,13 +204,13 @@ Namespace VBClasses
             Dim hypotenuse = Math.Sqrt((p.Y - q.Y) * (p.Y - q.Y) + (p.X - q.X) * (p.X - q.X))
             q.X = p.X - scale * hypotenuse * Math.Cos(angle)
             q.Y = p.Y - scale * hypotenuse * Math.Sin(angle)
-            img.Line(p, q, color, task.lineWidth, task.lineType)
+            img.Line(p, q, color, taskAlg.lineWidth, taskAlg.lineType)
             p.X = q.X + 9 * Math.Cos(angle + Math.PI / 4)
             p.Y = q.Y + 9 * Math.Sin(angle + Math.PI / 4)
-            img.Line(p, q, color, task.lineWidth, task.lineType)
+            img.Line(p, q, color, taskAlg.lineWidth, taskAlg.lineType)
             p.X = q.X + 9 * Math.Cos(angle - Math.PI / 4)
             p.Y = q.Y + 9 * Math.Sin(angle - Math.PI / 4)
-            img.Line(p, q, color, task.lineWidth, task.lineType)
+            img.Line(p, q, color, taskAlg.lineWidth, taskAlg.lineType)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = image.Resize(dst2.Size())
@@ -223,7 +223,7 @@ Namespace VBClasses
             For i = 0 To contours.Length - 1
                 Dim area = cv.Cv2.ContourArea(contours(i))
                 If area < 100 Or area > 100000 Then Continue For
-                cv.Cv2.DrawContours(dst3, contours, i, cv.Scalar.Red, task.lineWidth, task.lineType)
+                cv.Cv2.DrawContours(dst3, contours, i, cv.Scalar.Red, taskAlg.lineWidth, taskAlg.lineType)
                 Dim sz = contours(i).Length
                 Dim data_pts = New cv.Mat(sz, 2, cv.MatType.CV_64FC1)
                 For j = 0 To data_pts.Rows - 1
@@ -240,7 +240,7 @@ Namespace VBClasses
                     eigen_val(j) = pca_analysis.Eigenvalues.Get(Of Double)(0, j)
                 Next
 
-                DrawCircle(dst3, cntr, task.DotSize + 1, cv.Scalar.BlueViolet)
+                DrawCircle(dst3, cntr, taskAlg.DotSize + 1, cv.Scalar.BlueViolet)
                 Dim factor As Single = 0.02 ' scaling factor for the lines depicting the principal components.
                 Dim ept1 = New cv.Point(cntr.X + factor * eigen_vecs(0).X * eigen_val(0), cntr.Y + factor * eigen_vecs(0).Y * eigen_val(0))
                 Dim ept2 = New cv.Point(cntr.X - factor * eigen_vecs(1).X * eigen_val(1), cntr.Y - factor * eigen_vecs(1).Y * eigen_val(1))
@@ -845,7 +845,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst3 = PaletteFull(img8u)
-                labels(3) = "dst2 is palettized using global palette option: " + task.gOptions.Palettes.Text
+                labels(3) = "dst2 is palettized using global palette option: " + taskAlg.gOptions.Palettes.Text
             End If
 
             labels(2) = "The image above is mapped to " + CStr(paletteCount) + " colors below.  "
@@ -877,7 +877,7 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            If task.heartBeat Then palettize.Run(src) ' get the palette in VB.Net
+            If taskAlg.heartBeat Then palettize.Run(src) ' get the palette in VB.Net
             Marshal.Copy(src.Data, rgb, 0, rgb.Length)
             classCount = palettize.options.desiredNcolors
 
@@ -921,7 +921,7 @@ Namespace VBClasses
             desc = "Create a faster version of the PCA_NColor algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then palettize.Run(src) ' get the palette in VB.Net which is very fast.
+            If taskAlg.heartBeat Then palettize.Run(src) ' get the palette in VB.Net which is very fast.
 
             Marshal.Copy(src.Data, rgb, 0, rgb.Length)
             Dim paletteImage = nColor.RgbToIndex(rgb, dst1.Width, dst1.Height, palettize.palette, palettize.options.desiredNcolors)
@@ -949,7 +949,7 @@ Namespace VBClasses
             desc = "Take some pointcloud data and return the non-zero points in a point3f vector"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Then src = taskAlg.pointCloud
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, cppData, 0, cppData.Length)
@@ -981,7 +981,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             selectLine.Run(src) ' this will select a line if not standalone
-            Dim lp = If(standalone, task.lineLongest, task.lpD)
+            Dim lp = If(standalone, taskAlg.lineLongest, taskAlg.lpD)
 
             findLine3D.lp = lp
             findLine3D.Run(src)
@@ -992,7 +992,7 @@ Namespace VBClasses
                 strOut = pca.displayResults() + vbCrLf
                 strOut += "Anchor point " + lp.ptCenter.ToString + vbCrLf
                 DrawCircle(dst3, lp.ptCenter, 255)
-                dst3.Circle(lp.ptCenter, task.DotSize * 2, 255, -1, task.lineType)
+                dst3.Circle(lp.ptCenter, taskAlg.DotSize * 2, 255, -1, taskAlg.lineType)
             End If
 
             labels(3) = CStr(findLine3D.vecMat.Rows) + " samples were found for the selected line."
