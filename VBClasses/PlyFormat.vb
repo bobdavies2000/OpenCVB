@@ -12,27 +12,24 @@ Namespace VBClasses
 
             Dim fileInfo = New FileInfo(options.fileName)
             If saveFileName <> fileInfo.FullName Then
-                Try
-                    Dim sw As New StreamWriter(fileInfo.FullName)
-                    saveFileName = fileInfo.FullName
+                Dim sw As New StreamWriter(fileInfo.FullName)
+                saveFileName = fileInfo.FullName
 
-                    sw.WriteLine("ply")
-                    sw.WriteLine("format ascii 1.0")
-                    sw.WriteLine("element vertex " + CStr(task.pointCloud.Total))
-                    sw.WriteLine("property float x")
-                    sw.WriteLine("property float y")
-                    sw.WriteLine("property float z")
-                    sw.WriteLine("end_header")
-                    For y = 0 To task.pointCloud.Height - 1
-                        For x = 0 To task.pointCloud.Width - 1
-                            Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
-                            sw.WriteLine(Format(vec(0), fmt3) + " " + Format(vec(1), fmt3) + " " + Format(vec(2), fmt3))
-                        Next
+                sw.WriteLine("ply")
+                sw.WriteLine("format ascii 1.0")
+                sw.WriteLine("element vertex " + CStr(task.pointCloud.Total))
+                sw.WriteLine("property float x")
+                sw.WriteLine("property float y")
+                sw.WriteLine("property float z")
+                sw.WriteLine("end_header")
+                For y = 0 To task.pointCloud.Height - 1
+                    For x = 0 To task.pointCloud.Width - 1
+                        Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
+                        sw.WriteLine(Format(vec(0), fmt3) + " " + Format(vec(1), fmt3) + " " + Format(vec(2), fmt3))
                     Next
-                    sw.Close()
-                    task.Settings.plyFileName = saveFileName
-                Catch ex As Exception
-                End Try
+                Next
+                sw.Close()
+                task.Settings.plyFileName = saveFileName
             End If
             SetTrueText(".ply format file saved in " + options.fileName)
         End Sub

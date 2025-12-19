@@ -169,22 +169,18 @@ Namespace VBClasses
          Sub(roi)
              dst3(roi).SetTo(0)
          End Sub)
-            Try
-                Dim CurrentProcess As Process = Process.GetCurrentProcess()
-                Dim myThreads As ProcessThreadCollection = CurrentProcess.Threads
-                Dim str = ""
-                Dim threadCount As Integer
-                Dim notIdle As Integer
-                For Each thread In myThreads
-                    str += CStr(thread.id) + " state = " + CStr(thread.threadstate) + ", "
-                    threadCount += 1
-                    If threadCount Mod 5 = 0 Then str += vbCrLf
-                    If thread.threadstate <> 5 Then notIdle += 1
-                Next thread
-                SetTrueText("There were " + CStr(threadCount) + " threads in OpenCVB with " + CStr(notIdle) + " of them not idle when traversing the gridRects" + vbCrLf + str)
-            Catch e As Exception
-                MessageBox.Show(e.Message)
-            End Try
+            Dim CurrentProcess As Process = Process.GetCurrentProcess()
+            Dim myThreads As ProcessThreadCollection = CurrentProcess.Threads
+            Dim str = ""
+            Dim threadCount As Integer
+            Dim notIdle As Integer
+            For Each thread In myThreads
+                str += CStr(thread.id) + " state = " + CStr(thread.threadstate) + ", "
+                threadCount += 1
+                If threadCount Mod 5 = 0 Then str += vbCrLf
+                If thread.threadstate <> 5 Then notIdle += 1
+            Next thread
+            SetTrueText("There were " + CStr(threadCount) + " threads in OpenCVB with " + CStr(notIdle) + " of them not idle when traversing the gridRects" + vbCrLf + str)
         End Sub
     End Class
 

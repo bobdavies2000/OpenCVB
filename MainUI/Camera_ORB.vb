@@ -58,10 +58,7 @@ Namespace MainUI
                                               timeStamp = frame.GetTimeStamp
                                           End Sub)
             pipe.EnableFrameSync()
-            Try
-                pipe.Start(config)
-            Catch ex As Exception
-            End Try
+            pipe.Start(config)
 
             ' Start background thread to capture frames
             isCapturing = True
@@ -73,12 +70,7 @@ Namespace MainUI
 
         Private Sub CaptureFrames()
             While isCapturing
-                Try
-                    GetNextFrame()
-                Catch ex As Exception
-                    ' Continue capturing even if one frame fails
-                    Thread.Sleep(10)
-                End Try
+                GetNextFrame()
             End While
         End Sub
 

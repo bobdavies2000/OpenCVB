@@ -1,5 +1,4 @@
-﻿Imports cv = OpenCvSharp
-Imports VBClasses
+﻿Imports VBClasses
 Namespace MainUI
     Partial Public Class MainUI
         Dim fpsWriteCount As Integer

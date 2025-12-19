@@ -14028,25 +14028,21 @@ Namespace VBClasses
                     Next
                 Next
 
-                Try
-                    Dim defects = cv.Cv2.ConvexityDefects(contour, hullIndices.ToList)
-                    Dim lastV As Integer = -1
-                    Dim newC As New List(Of cv.Point)
-                    For Each v In defects
-                        If v(0) <> lastV And lastV >= 0 Then
-                            For i = lastV To v(0) - 1
-                                newC.Add(contour(i))
-                            Next
-                        End If
-                        newC.Add(contour(v(0)))
-                        newC.Add(contour(v(2)))
-                        newC.Add(contour(v(1)))
-                        lastV = v(1)
-                    Next
-                    DrawTour(dst3(rc.rect), newC, rc.color)
-                Catch ex As Exception
-                    Continue For
-                End Try
+                Dim defects = cv.Cv2.ConvexityDefects(contour, hullIndices.ToList)
+                Dim lastV As Integer = -1
+                Dim newC As New List(Of cv.Point)
+                For Each v In defects
+                    If v(0) <> lastV And lastV >= 0 Then
+                        For i = lastV To v(0) - 1
+                            newC.Add(contour(i))
+                        Next
+                    End If
+                    newC.Add(contour(v(0)))
+                    newC.Add(contour(v(2)))
+                    newC.Add(contour(v(1)))
+                    lastV = v(1)
+                Next
+                DrawTour(dst3(rc.rect), newC, rc.color)
             Next
         End Sub
     End Class

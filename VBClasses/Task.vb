@@ -289,27 +289,23 @@ Namespace VBClasses
             End If
         End Sub
         Private Sub postProcess(src As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat)
-            Try
-                If PixelViewer IsNot Nothing Then
-                    If pixelViewerOn Then
-                        PixelViewer.viewerForm.Visible = True
-                        PixelViewer.viewerForm.Show()
-                        PixelViewer.dst0Input = src
-                        PixelViewer.dst1Input = dst1
-                        PixelViewer.dst2Input = dst2
-                        PixelViewer.dst3Input = dst3
-                        PixelViewer.Run(src)
-                    Else
-                        PixelViewer.viewerForm.Visible = False
-                    End If
+            If PixelViewer IsNot Nothing Then
+                If pixelViewerOn Then
+                    PixelViewer.viewerForm.Visible = True
+                    PixelViewer.viewerForm.Show()
+                    PixelViewer.dst0Input = src
+                    PixelViewer.dst1Input = dst1
+                    PixelViewer.dst2Input = dst2
+                    PixelViewer.dst3Input = dst3
+                    PixelViewer.Run(src)
+                Else
+                    PixelViewer.viewerForm.Visible = False
                 End If
+            End If
 
-                If gifCreator IsNot Nothing Then gifCreator.createNextGifImage()
+            If gifCreator IsNot Nothing Then gifCreator.createNextGifImage()
 
-                optionsChanged = False
-            Catch ex As Exception
-                Debug.WriteLine("Active Algorithm exception occurred: " + ex.Message)
-            End Try
+            optionsChanged = False
         End Sub
         Public Sub New()
             Randomize() ' just in case anyone uses VB.Net's Rnd

@@ -79,12 +79,7 @@ Namespace MainUI
         End Sub
         Private Sub CaptureFrames()
             While isCapturing
-                Try
-                    GetNextFrame()
-                Catch ex As Exception
-                    ' Continue capturing even if one frame fails
-                    Thread.Sleep(10)
-                End Try
+                GetNextFrame()
             End While
         End Sub
         Public Sub GetNextFrame()

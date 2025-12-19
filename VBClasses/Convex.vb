@@ -162,12 +162,9 @@ Namespace VBClasses
             dst2.SetTo(0)
             DrawTour(dst2, hull.ToList, task.highlight, -1)
 
-            Try
-                Dim defects = cv.Cv2.ConvexityDefects(c, hullIndices.ToList)
-                rc.contour = betterContour(c, defects)
-            Catch ex As Exception
-                SetTrueText("Convexity defects failed due to self-intersection.", 3)
-            End Try
+            Dim defects = cv.Cv2.ConvexityDefects(c, hullIndices.ToList)
+            rc.contour = betterContour(c, defects)
+            ' SetTrueText("Convexity defects will sometimes fail due to self-intersection.", 3)
 
             DrawTour(dst2, rc.contour, cv.Scalar.Red)
         End Sub

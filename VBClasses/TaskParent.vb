@@ -84,16 +84,12 @@ Namespace VBClasses
 
             Using img As Graphics = Graphics.FromImage(b)
                 Dim ImageHDC As IntPtr = img.GetHdc
-                Try
-                    Using window As Graphics = Graphics.FromHwnd(WindowHandle)
-                        Dim WindowHDC As IntPtr = window.GetHdc
-                        BitBlt(ImageHDC, 0, 0, rect.Width, rect.Height, WindowHDC, rect.X, rect.Y, CopyPixelOperation.SourceCopy)
-                        window.ReleaseHdc()
-                    End Using
-                    img.ReleaseHdc()
-                Catch ex As Exception
-                    ' ignoring the error - they probably closed the OpenGL window.
-                End Try
+                Using window As Graphics = Graphics.FromHwnd(WindowHandle)
+                    Dim WindowHDC As IntPtr = window.GetHdc
+                    BitBlt(ImageHDC, 0, 0, rect.Width, rect.Height, WindowHDC, rect.X, rect.Y, CopyPixelOperation.SourceCopy)
+                    window.ReleaseHdc()
+                End Using
+                img.ReleaseHdc()
             End Using
 
             Return b

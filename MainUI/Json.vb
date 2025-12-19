@@ -14,18 +14,13 @@ Namespace MainUI
             Dim settings = New jsonShared.Settings()
             Dim fileInfo As New FileInfo(jsonFileName)
             If fileInfo.Exists Then
-                Try
-                    Using streamReader As New StreamReader(jsonFileName)
-                        Dim jsonSettings = streamReader.ReadToEnd()
-                        If jsonSettings <> "" Then
-                            settings = JsonConvert.DeserializeObject(Of jsonShared.Settings)(jsonSettings)
-                            settings = initialize(settings)
-                        End If
-                    End Using
-
-                Catch ex As Exception
-                    ' If deserialization fails, return default settings
-                End Try
+                Using streamReader As New StreamReader(jsonFileName)
+                    Dim jsonSettings = streamReader.ReadToEnd()
+                    If jsonSettings <> "" Then
+                        settings = JsonConvert.DeserializeObject(Of jsonShared.Settings)(jsonSettings)
+                        settings = initialize(settings)
+                    End If
+                End Using
             Else
                 settings = initialize(settings)
             End If

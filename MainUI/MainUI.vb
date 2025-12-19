@@ -237,7 +237,7 @@ Namespace MainUI
 
                 TestAllButton.Text = "Stop Test"
                 AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
-                TestAllTimer.Interval = 1
+                TestAllTimer.Interval = task.testAllDuration * 1000
                 TestAllTimer.Enabled = True
             Else
                 Debug.WriteLine("Stopping 'TestAll' overnight run.")
@@ -264,7 +264,8 @@ Namespace MainUI
             meRefreshCount += 1
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
-            settings.algorithm = AvailableAlgorithms.Text
+            If task Is Nothing Then Exit Sub
+            If task.testAllRunning = False Then settings.algorithm = AvailableAlgorithms.Text
 
             SaveJsonSettings()
             If task Is Nothing Then
