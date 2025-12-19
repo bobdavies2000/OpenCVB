@@ -78,8 +78,9 @@ Namespace MainUI
                                taskAlg.mouseClickFlag = False
                                taskAlg.frameCount += 1
 
-                               If RefreshTimer.Interval <> taskAlg.refreshTimerTickCount Then
-                                   RefreshTimer.Interval = taskAlg.refreshTimerTickCount
+                               If RefreshTimer.Interval <> taskAlg.refreshTimerInterval Then
+                                   RefreshTimer.Interval = 1000 \ settings.FPSPaintTarget
+                                   taskAlg.refreshTimerInterval = RefreshTimer.Interval
                                End If
 
                                frameProcessed = True

@@ -46,7 +46,6 @@ Namespace MainUI
             CamSwitchTimer = New Timer(components)
             fpsTimer = New Timer(components)
             TestAllTimer = New Timer(components)
-            TreeViewTimer = New Timer(components)
             RefreshTimer = New Timer(components)
             MagnifyTimer = New Timer(components)
             MainToolStrip.SuspendLayout()
@@ -217,20 +216,14 @@ Namespace MainUI
             ' 
             ' fpsTimer
             ' 
-            fpsTimer.Interval = 1000
+            fpsTimer.Interval = 3000
             ' 
             ' TestAllTimer
             ' 
             TestAllTimer.Interval = 1
             ' 
-            ' TreeViewTimer
-            ' 
-            TreeViewTimer.Enabled = True
-            TreeViewTimer.Interval = 1000
-            ' 
             ' RefreshTimer
             ' 
-            RefreshTimer.Enabled = True
             RefreshTimer.Interval = 33
             ' 
             ' MagnifyTimer
@@ -279,7 +272,6 @@ Namespace MainUI
         Friend WithEvents CamSwitchTimer As Timer
         Friend WithEvents fpsTimer As Timer
         Friend WithEvents TestAllTimer As Timer
-        Friend WithEvents TreeViewTimer As Timer
         Friend WithEvents RefreshTimer As Timer
         Friend WithEvents MagnifyTimer As Timer
 

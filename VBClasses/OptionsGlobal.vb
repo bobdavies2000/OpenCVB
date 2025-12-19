@@ -136,18 +136,9 @@ Public Class OptionsGlobal
     End Sub
     Private Sub DisplayFPSSlider_ValueChanged(sender As Object, e As EventArgs) Handles DisplayFPSSlider.ValueChanged
         taskAlg.optionsChanged = True
-        Dim fps = DisplayFPSSlider.Value
-        taskAlg.Settings.FPSdisplay = fps
-        FPSDisplayLabel.Text = CStr(fps)
-
-        ' tick count is in milliseconds
-        If fps = 0 Then
-            taskAlg.refreshTimerTickCount = 1000
-        ElseIf fps < 0 Then
-            taskAlg.refreshTimerTickCount = Math.Abs(fps) * 1000
-        Else
-            taskAlg.refreshTimerTickCount = 1000 \ fps
-        End If
+        taskAlg.Settings.FPSPaintTarget = DisplayFPSSlider.Value
+        FPSDisplayLabel.Text = CStr(DisplayFPSSlider.Value)
+        taskAlg.refreshTimerInterval = DisplayFPSSlider.Value
     End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
         taskAlg.optionsChanged = True

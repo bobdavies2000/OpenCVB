@@ -285,6 +285,6 @@ Namespace VBClasses
         Public resolutionDetails As String = ""
         Public sharpGL As SharpGLForm
         Public readyForCameraInput As Boolean
-        Public refreshTimerTickCount As Integer ' this is the timer tick count for the refreshtimer (when negative it is delay.)
+        Public refreshTimerInterval As Integer
     End Class
 End Namespace

@@ -19,7 +19,6 @@ Namespace MainUI
         Dim testAllToolbarBitmap As Bitmap
         Dim resolutionDetails As String
         Dim magnifyIndex As Integer
-        Dim paintCount As Integer
 
         Public Sub setAlgorithmSelection()
             If AvailableAlgorithms.Items.Contains(settings.algorithm) = False Then
@@ -239,11 +238,6 @@ Namespace MainUI
             StatusLabel.Location = New Point(offset, pics(2).Top + h)
             StatusLabel.Width = w * 2
         End Sub
-        Private Sub TreeViewTimer_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
-            If isPlaying = False Then Exit Sub
-            If taskAlg Is Nothing Then Exit Sub
-            If taskAlg.treeView IsNot Nothing Then taskAlg.treeView.Timer2_Tick(sender, e)
-        End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
             If TestAllTimer.Enabled Then Exit Sub
 
@@ -348,19 +342,13 @@ Namespace MainUI
             End If
         End Sub
         Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
-            If paintCount = 0 Then Exit Sub
             For i = 0 To 3
                 pics(i).Refresh() ' control the frequency of paints with global option Display FPS.
             Next
-            Static refreshCount As Integer
-            If refreshCount Mod 50 = 0 Then
-                refreshCount = 0
-                Me.Refresh()
-            End If
-            refreshCount += 1
         End Sub
         Private Sub Pic_Paint(sender As Object, e As PaintEventArgs)
             If taskAlg Is Nothing Then Exit Sub
+
             Dim g As Graphics = e.Graphics
             Dim pic = DirectCast(sender, PictureBox)
             g.ScaleTransform(1, 1)
@@ -379,23 +367,14 @@ Namespace MainUI
             Dim ratioX = pic.Width / settings.workRes.Width
             Dim ratioY = pic.Height / settings.workRes.Height
 
-            Static myWhitePen As New Pen(Color.White)
-            Static myBlackPen As New Pen(Color.Black)
-
-            Static saveTrueData As List(Of TrueText)
-            saveTrueData = New List(Of TrueText)(taskAlg.trueData)
             Dim font = New System.Drawing.Font("Tahoma", 9)
-            For Each tt In saveTrueData
+            For Each tt In taskAlg.trueData
                 If tt.text Is Nothing Then Continue For
                 If tt.text.Length > 0 And tt.picTag = pic.Tag Then
-                    g.DrawString(tt.text, font, New SolidBrush(Color.White),
-                                     CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
+                    g.DrawString(tt.text, font, New SolidBrush(Color.White), CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
                 End If
             Next
             displayimage.Dispose()
-
-            If paintCount = 0 Then MainForm_Resize(sender, e)
-            paintCount += 1
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
@@ -438,10 +417,15 @@ Namespace MainUI
 
             If taskAlg.calibData IsNot Nothing Then taskAlg.calibData = camera.calibData
 
+            RefreshTimer.Enabled = True
+            RefreshTimer.Interval = 1000 / settings.FPSPaintTarget
+            Dim sender As Object = Nothing, e As EventArgs = Nothing
+            MainForm_Resize(sender, e)
             If CameraSwitching.Visible Then
                 CamSwitchTimer.Enabled = False
                 CameraSwitching.Visible = False
             End If
+            MainToolStrip.Refresh()
         End Sub
     End Class
 End Namespace

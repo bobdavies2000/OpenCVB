@@ -38,7 +38,7 @@ Namespace VBClasses
                 sharpGL.Show()
             End If
 
-            Dim fps = taskAlg.Settings.FPSdisplay
+            Dim fps = taskAlg.Settings.fpsPaintTarget
             gOptions = New OptionsGlobal
             gOptions.DisplayFPSSlider.Value = fps
             featureOptions = New OptionsFeatures

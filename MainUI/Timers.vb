@@ -20,16 +20,17 @@ Namespace MainUI
                 If taskTimerInterval = 0 Then Exit Sub
                 lastTime = timeNow
 
-                Dim countFrames = taskAlg.frameCount - lastAlgorithmFrame
+                Dim algFrames = taskAlg.frameCount - lastAlgorithmFrame
                 Dim camFrames = camera.cameraFrameCount - lastCameraFrame
+
                 lastAlgorithmFrame = taskAlg.frameCount
                 lastCameraFrame = camera.cameraFrameCount
 
                 taskAlg.fpsCamera = camFrames / (taskTimerInterval / 1000)
-                If taskAlg.fpsCamera >= 100 Then taskAlg.fpsCamera = 99
+                If taskAlg.fpsCamera >= 99 Then taskAlg.fpsCamera = 99
 
-                taskAlg.fpsAlgorithm = countFrames / (taskTimerInterval / 1000)
-                If taskAlg.fpsAlgorithm >= 100 Then taskAlg.fpsAlgorithm = 99
+                taskAlg.fpsAlgorithm = algFrames / (taskTimerInterval / 1000)
+                If taskAlg.fpsAlgorithm >= 99 Then taskAlg.fpsAlgorithm = 99
 
                 If TestAllTimer.Enabled Then
                     Static lastWriteTime = timeNow

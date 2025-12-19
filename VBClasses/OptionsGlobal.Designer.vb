@@ -119,7 +119,7 @@ Partial Class OptionsGlobal
         DisplayFPSSlider.Location = New Point(230, 27)
         DisplayFPSSlider.Margin = New Padding(3, 4, 3, 4)
         DisplayFPSSlider.Maximum = 100
-        DisplayFPSSlider.Minimum = -5
+        DisplayFPSSlider.Minimum = 1
         DisplayFPSSlider.Name = "DisplayFPSSlider"
         DisplayFPSSlider.Size = New Size(549, 69)
         DisplayFPSSlider.TabIndex = 12
@@ -138,11 +138,11 @@ Partial Class OptionsGlobal
         ' Label9
         ' 
         Label9.AutoSize = True
-        Label9.Location = New Point(14, 27)
+        Label9.Location = New Point(27, 27)
         Label9.Name = "Label9"
-        Label9.Size = New Size(203, 30)
+        Label9.Size = New Size(190, 30)
         Label9.TabIndex = 10
-        Label9.Text = "Desired Display FPS"
+        Label9.Text = "Target Display FPS"
         ' 
         ' DotSizeSlider
         ' 
@@ -327,7 +327,7 @@ Partial Class OptionsGlobal
         DebugCheckBox.Location = New Point(1020, 451)
         DebugCheckBox.Margin = New Padding(3, 4, 3, 4)
         DebugCheckBox.Name = "DebugCheckBox"
-        DebugCheckBox.Size = New Size(665, 34)
+        DebugCheckBox.Size = New Size(697, 34)
         DebugCheckBox.TabIndex = 19
         DebugCheckBox.Text = "DebugCheckbox - taskAlg.gOptions.DebugChecked - use for testing"
         DebugCheckBox.UseVisualStyleBackColor = True

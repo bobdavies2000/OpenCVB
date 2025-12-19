@@ -21,7 +21,7 @@ Namespace jsonShared
         Public desiredFPS As Integer = 60
         Public displayRes As cv.Size
 
-        Public FPSdisplay As Integer
+        Public FPSPaintTarget As Integer
         Public Image_Basics_Name As String = ""
 
         Public MainFormLeft As Integer = 0

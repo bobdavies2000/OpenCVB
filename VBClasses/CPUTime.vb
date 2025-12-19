@@ -66,13 +66,17 @@ Namespace VBClasses
             algorithmStack.Push(0)
         End Sub
         Public Function PrepareReport(treeData As List(Of String)) As String
+            Static percentTime As String = ""
+
             Dim algorithm_ms = New List(Of Single)(taskAlg.cpu.algorithm_ms)
             Dim sumTime As Single
-            For i = 0 To algorithm_ms.Count - 1
+            For i = 1 To algorithm_ms.Count - 1
                 sumTime += algorithm_ms(i)
+            Next
+            If sumTime = 0 Then Return percentTime
+            For i = 0 To algorithm_ms.Count - 1
                 taskAlg.cpu.algorithm_ms(i) = 0
             Next
-
             For Each percent In algorithm_ms
                 percent /= sumTime
             Next
@@ -91,7 +95,7 @@ Namespace VBClasses
                     End If
                 End If
                 If taskAlg.cpu.algorithmNames(i).Contains("Wait For Input") Then
-                    saveWaitTime = str + "<<<<<< " + vbCrLf
+                    saveWaitTime = str
                 Else
                     PercentTimes.Add(algorithm_ms(i), str)
                 End If
@@ -102,20 +106,13 @@ Namespace VBClasses
                 If percent < 0.01 Then otherTimes.Add(percent)
             Next
 
-            Dim percentTime As String = ""
             percentTime = "Click on an algorithm to see more info. " + vbCrLf + vbCrLf
-            percentTime += "Algorithm FPS = " + Format(taskAlg.fpsAlgorithm, "0") + vbCrLf
-            percentTime += "Camera FPS = " + Format(taskAlg.fpsCamera, "0") + vbCrLf
-
-            Dim fps As Single = taskAlg.Settings.FPSdisplay
-            fps = If(fps >= 1, fps, If(fps = 0, 1, 1 / Math.Abs(fps)))
-            Dim fmt As String = If(fps >= 1, "0", "0.0")
-            percentTime += "Display FPS ~ " + Format(fps, fmt) + vbCrLf + vbCrLf
-
-            'Static boldFont = New Font(PercentTime.Font, FontStyle.Bold)
-            'Static regularFont = New Font(PercentTime.Font, FontStyle.Regular)
+            percentTime += "Algorithm FPS = " + Format(taskAlg.fpsAlgorithm, fmt0) + vbCrLf
+            percentTime += "Camera FPS = " + Format(taskAlg.fpsCamera, fmt0) + vbCrLf
+            percentTime += "Target Display FPS = " + CStr(taskAlg.Settings.FPSPaintTarget) + vbCrLf + vbCrLf
 
             Dim timeDataTree As New List(Of String)(treeData)
+            percentTime += saveWaitTime + vbCrLf + vbCrLf
             For i = 0 To PercentTimes.Count - 1
                 If PercentTimes.ElementAt(i).Key > 0.01 Then
                     Dim str = PercentTimes.ElementAt(i).Value
@@ -124,8 +121,6 @@ Namespace VBClasses
                     If index >= 0 Then timeDataTree(index) = str.Substring(0, 5) + " " + timeDataTree(index)
                 End If
             Next
-
-            percentTime += saveWaitTime + vbCrLf
 
             percentTime += Format(otherTimes.Sum, "00.0%") + " " + CStr(otherTimes.Count) + " algorithms each < 1.0%" +
                                 vbCrLf + vbCrLf + "Click an algorithm at left to see it below:" + vbCrLf + vbCrLf
