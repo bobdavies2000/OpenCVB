@@ -231,5 +231,16 @@ Namespace VBClasses
             If r.Height <= 0 Then r.Height = 1
             Return r
         End Function
+        Public Function validateRect(r As cv.Rect, width As Integer, height As Integer) As cv.Rect
+            If r.Width < 0 Then r.Width = 1
+            If r.Height < 0 Then r.Height = 1
+            If r.X < 0 Then r.X = 0
+            If r.Y < 0 Then r.Y = 0
+            If r.X > width Then r.X = width - 1
+            If r.Y > height Then r.Y = height - 1
+            If r.X + r.Width > width Then r.Width = width - r.X - 1
+            If r.Y + r.Height > height Then r.Height = height - r.Y - 1
+            Return r
+        End Function
     End Module
 End Namespace

@@ -19,6 +19,7 @@ Namespace MainUI
         Dim runPlay As Bitmap
         Dim testAllToolbarBitmap As Bitmap
         Dim resolutionDetails As String
+        Dim magnifyIndex As Integer
 
         Public Sub setAlgorithmSelection()
             If AvailableAlgorithms.Items.Contains(settings.algorithm) = False Then
@@ -118,7 +119,17 @@ Namespace MainUI
             Next
         End Sub
         Private Sub Magnifier_Click(sender As Object, e As EventArgs) Handles Magnifier.Click
-
+            MagnifyTimer.Enabled = True
+            magnifyIndex += 1
+        End Sub
+        Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
+            Dim ratio = settings.workRes.Width / pics(0).Width
+            Dim r = New cv.Rect(taskAlg.drawRect.X * ratio, taskAlg.drawRect.Y * ratio,
+                                taskAlg.drawRect.Width * ratio, taskAlg.drawRect.Height * ratio)
+            r = ValidateRect(r, taskAlg.dstList(taskAlg.mousePicTag).Width, taskAlg.dstList(taskAlg.mousePicTag).Height)
+            If r.Width = 0 Or r.Height = 0 Then Exit Sub
+            Dim img = taskAlg.dstList(taskAlg.mousePicTag)(r).Resize(New cv.Size(taskAlg.drawRect.Width * 5, taskAlg.drawRect.Height * 5))
+            cv.Cv2.ImShow("DrawRect Region " + CStr(magnifyIndex), img)
         End Sub
         Private Sub AtoZ_Click(sender As Object, e As EventArgs) Handles AtoZ.Click
             Dim groupsForm As New AtoZ()

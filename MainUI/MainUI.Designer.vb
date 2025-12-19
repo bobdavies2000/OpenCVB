@@ -48,6 +48,7 @@ Namespace MainUI
             TestAllTimer = New Timer(components)
             TreeViewTimer = New Timer(components)
             RefreshTimer = New Timer(components)
+            MagnifyTimer = New Timer(components)
             MainToolStrip.SuspendLayout()
             SuspendLayout()
             ' 
@@ -277,6 +278,7 @@ Namespace MainUI
         Friend WithEvents TestAllTimer As Timer
         Friend WithEvents TreeViewTimer As Timer
         Friend WithEvents RefreshTimer As Timer
+        Friend WithEvents MagnifyTimer As Timer
 
     End Class
 End Namespace
