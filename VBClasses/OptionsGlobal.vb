@@ -64,14 +64,12 @@ Public Class OptionsGlobal
                 taskAlg.brickSize = 16
             Case 480
                 taskAlg.cvFontSize = 1.2
-                taskAlg.brickSize = 8
             Case 240
                 taskAlg.cvFontSize = 1.2
             Case 336
                 taskAlg.cvFontSize = 1.0
             Case 320
                 taskAlg.cvFontSize = 1.0
-                taskAlg.brickSize = 3
             Case 168
                 taskAlg.cvFontSize = 0.5
             Case 160

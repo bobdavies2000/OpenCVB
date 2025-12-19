@@ -406,12 +406,12 @@ Namespace MainUI
 
             If Options.ShowDialog() = DialogResult.OK Then
                 getLineCounts()
-
                 SaveJsonSettings()
-
-                StartCamera()
-                startAlgorithm()
             End If
+
+            camSwitchAnnouncement()
+            StartCamera()
+            startAlgorithm()
         End Sub
         Private Sub startAlgorithm()
             taskAlg = New AlgorithmTask
