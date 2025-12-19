@@ -79,23 +79,6 @@ Namespace VBClasses
             optionsChanged = True
             readyForCameraInput = True
         End Sub
-
-        Public Sub setSelectedCell()
-            If redList Is Nothing Then Exit Sub
-            If redList.oldrclist.Count = 0 Then Exit Sub
-            If clickPoint = newPoint And redList.oldrclist.Count > 1 Then
-                clickPoint = redList.oldrclist(1).maxDist
-            End If
-            Dim index = redList.rcMap.Get(Of Byte)(clickPoint.Y, clickPoint.X)
-            If index = 0 Then Exit Sub
-            If index > 0 And index < redList.oldrclist.Count Then
-                oldrcD = redList.oldrclist(index)
-                color(oldrcD.rect).SetTo(cv.Scalar.White, oldrcD.mask)
-            Else
-                ' the 0th cell is always the upper left corner with just 1 pixel.
-                If redList.oldrclist.Count > 1 Then oldrcD = redList.oldrclist(1)
-            End If
-        End Sub
         Public Sub TrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
             Dim str As New TrueText(text, pt, picTag)
             trueData.Add(str)

@@ -1229,7 +1229,7 @@ Namespace VBClasses
                     dst3 = valley.dst2.Clone
                     labels(3) = valley.strOut
                     taskAlg.ClickPoint = rc.maxDist
-                    taskAlg.setSelectedCell()
+                    RedList_Basics.setSelectedCell()
                 End If
                 If taskAlg.heartBeat Then SetTrueText(CStr(valley.classCount) + " classes", rc.maxDist)
             Next

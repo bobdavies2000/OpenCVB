@@ -9881,7 +9881,7 @@ Namespace VBClasses
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             Dim mm = GetMinMax(dst2)
             dst3 = PaletteFull(dst2)
-            taskAlg.setSelectedCell()
+            RedList_Basics.setSelectedCell()
 
             labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
         End Sub
@@ -12968,7 +12968,7 @@ Namespace VBClasses
 
             If taskAlg.heartBeat Then labels(2) = $"{taskAlg.redList.oldrclist.Count} cells identified"
 
-            If showSelected Then taskAlg.setSelectedCell()
+            If showSelected Then RedList_Basics.setSelectedCell()
         End Sub
     End Class
 

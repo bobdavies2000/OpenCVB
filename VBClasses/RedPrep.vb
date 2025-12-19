@@ -600,7 +600,7 @@ Namespace VBClasses
             Next
 
             dst2 = RebuildRCMap(taskAlg.redList.oldrclist)
-            taskAlg.setSelectedCell()
+            RedList_Basics.setSelectedCell()
         End Sub
     End Class
 

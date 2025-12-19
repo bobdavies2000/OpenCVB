@@ -12,6 +12,22 @@ Namespace VBClasses
             rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Find cells and then match them to the previous generation with minimum boundary"
         End Sub
+        Public Shared Sub setSelectedCell()
+            If taskAlg.redList Is Nothing Then Exit Sub
+            If taskAlg.redList.oldrclist.Count = 0 Then Exit Sub
+            If taskAlg.clickPoint = newPoint And taskAlg.redList.oldrclist.Count > 1 Then
+                taskAlg.clickPoint = taskAlg.redList.oldrclist(1).maxDist
+            End If
+            Dim index = taskAlg.redList.rcMap.Get(Of Byte)(taskAlg.clickPoint.Y, taskAlg.clickPoint.X)
+            If index = 0 Then Exit Sub
+            If index > 0 And index < taskAlg.redList.oldrclist.Count Then
+                taskAlg.oldrcD = taskAlg.redList.oldrclist(index)
+                taskAlg.color(taskAlg.oldrcD.rect).SetTo(cv.Scalar.White, taskAlg.oldrcD.mask)
+            Else
+                ' the 0th cell is always the upper left corner with just 1 pixel.
+                If taskAlg.redList.oldrclist.Count > 1 Then taskAlg.oldrcD = taskAlg.redList.oldrclist(1)
+            End If
+        End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)
             If src.Type <> cv.MatType.CV_8U Then
@@ -39,7 +55,7 @@ Namespace VBClasses
             labels(2) = cellGen.labels(2)
             labels(3) = ""
             SetTrueText("", newPoint, 1)
-            taskAlg.setSelectedCell()
+            setSelectedCell()
         End Sub
     End Class
 
@@ -84,7 +100,7 @@ Namespace VBClasses
             labels(2) = cellGen.labels(2)
             labels(3) = ""
             SetTrueText("", newPoint, 1)
-            taskAlg.setSelectedCell()
+            RedList_Basics.setSelectedCell()
         End Sub
     End Class
 
