@@ -40,7 +40,6 @@ Namespace VBClasses
         Public fpsAlgorithm As Single
         Public fpsCamera As Single
 
-        Public testAllDuration As Integer
         Public verticalLines As Boolean
         Public edgeMethod As String
 

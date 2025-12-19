@@ -237,7 +237,7 @@ Namespace MainUI
 
                 TestAllButton.Text = "Stop Test"
                 AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
-                TestAllTimer.Interval = taskAlg.testAllDuration * 1000
+                TestAllTimer.Interval = settings.testAllDuration * 1000
                 TestAllTimer.Enabled = True
             Else
                 Debug.WriteLine("Stopping 'TestAll' overnight run.")
@@ -347,7 +347,6 @@ Namespace MainUI
             ' skip testing the XO_ algorithms (XO.vb)  They are obsolete.
             If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
 
-            TestAllTimer.Interval = settings.testAllDuration
             Static startingAlgorithm = AvailableAlgorithms.Text
             startAlgorithm()
         End Sub
