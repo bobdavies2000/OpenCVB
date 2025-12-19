@@ -79,10 +79,6 @@ Namespace VBClasses
             optionsChanged = True
             readyForCameraInput = True
         End Sub
-        Public Sub TrueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
-            Dim str As New TrueText(text, pt, picTag)
-            trueData.Add(str)
-        End Sub
         Public Sub RunAlgorithm()
             If allOptions.titlesAdded Then
                 allOptions.titlesAdded = False
@@ -205,9 +201,8 @@ Namespace VBClasses
 
 
                 Dim displayObject = taskAlg.MainUI_Algorithm
-                displayObject.trueData.Clear()
 
-                Dim nextTrueData As List(Of TrueText) = MainUI_Algorithm.trueData
+                Dim nextTrueData As List(Of TrueText) = displayObject.trueData
                 trueData = New List(Of TrueText)(nextTrueData)
 
                 firstPass = False
@@ -264,6 +259,7 @@ Namespace VBClasses
                     trueData.Add(tt)
                 Next
 
+                displayObject.trueData.Clear()
                 labels = displayObject.labels
                 If taskAlg.gOptions.displayDst0.Checked = False Then labels(0) = taskAlg.resolutionDetails
                 If taskAlg.gOptions.displayDst1.Checked = False Then labels(1) = taskAlg.depthAndDepthRange.Replace(vbCrLf, "")
