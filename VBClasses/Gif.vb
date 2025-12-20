@@ -93,8 +93,7 @@ Namespace VBClasses
                         nextBMP = New Bitmap(taskAlg.workRes.Width, taskAlg.workRes.Height, Imaging.PixelFormat.Format24bppRgb)
                         cvext.BitmapConverter.ToBitmap(taskAlg.dstList(3), nextBMP)
                     Case gifTypes.openCVBwindow
-                        Dim r = New cv.Rect(0, 0, taskAlg.settings.MainFormWidth - 20,
-                                              taskAlg.mainFormLocation.Height - 40)
+                        Dim r = New cv.Rect(0, 0, taskAlg.Settings.MainFormWidth - 20, taskAlg.Settings.MainFormHeight - 40)
                         nextBMP = New Bitmap(r.Width, r.Height, Imaging.PixelFormat.Format24bppRgb)
                         Dim snapshot As Bitmap = GetWindowImage(taskAlg.main_hwnd, r)
                         Dim snap = cvext.BitmapConverter.ToMat(snapshot)
