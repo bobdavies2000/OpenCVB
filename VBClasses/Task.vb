@@ -59,9 +59,11 @@ Namespace VBClasses
             Options_HistPointCloud.setupCalcHist()
             treeView.Show()
             centerRect = New cv.Rect(workRes.Width / 4, workRes.Height / 4,
-                                 workRes.Width / 2, workRes.Height / 2)
+                                     workRes.Width / 2, workRes.Height / 2)
 
             fpList.Clear()
+
+            taskAlg.mouseMovePoint = New cv.Point(taskAlg.workRes.Width \ 2, taskAlg.workRes.Height \ 2)
 
             myStopWatch = Stopwatch.StartNew()
             optionsChanged = True

@@ -413,6 +413,7 @@ Namespace MainUI
             taskAlg.gridRatioX = pics(0).Width / settings.workRes.Width
             taskAlg.gridRatioY = pics(0).Height / settings.workRes.Height
             taskAlg.homeDir = homeDir
+            taskAlg.calibData = camera.calibData
 
             taskAlg.main_hwnd = Me.Handle
 
@@ -430,7 +431,7 @@ Namespace MainUI
                 CamSwitchTimer.Enabled = False
                 CameraSwitching.Visible = False
             End If
-            MainToolStrip.Refresh()
+            AvailableAlgorithms.Text = settings.algorithm
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
             Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + vbCrLf +
@@ -470,7 +471,6 @@ Namespace MainUI
             If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
 
             settings.algorithm = AvailableAlgorithms.Text
-
             TaskStart()
         End Sub
     End Class

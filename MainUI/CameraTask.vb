@@ -8,7 +8,7 @@ Namespace MainUI
             CameraSwitching.Text = settings.cameraName + " starting"
             CameraSwitching.BringToFront()
             CamSwitchTimer.Enabled = True
-            Application.DoEvents()
+            Me.MainForm_Resize(Nothing, Nothing)
         End Sub
         Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
             Application.DoEvents()

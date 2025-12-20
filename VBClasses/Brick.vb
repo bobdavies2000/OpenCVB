@@ -10,12 +10,6 @@ Namespace VBClasses
             labels(3) = "Right camera image.  Highlighted rectangle matches the dst2 (left) rectangle."
             desc = "Create the grid of bricks that reduce depth volatility"
         End Sub
-        Public Function setBrickD() As brickData
-            Static pt As cv.Point2f = brickList(0).rect.TopLeft
-            If taskAlg.mouseClickFlag Then pt = taskAlg.clickPoint
-            Dim index = taskAlg.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            Return brickList(index)
-        End Function
         Public Shared Function RealSenseAlign(brick As brickData) As brickData
             Dim irPt = Intrinsics_Basics.translate_ColorToLeft(taskAlg.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
             Dim badTranslation As Boolean = False
