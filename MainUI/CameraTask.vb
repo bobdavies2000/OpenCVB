@@ -1,11 +1,8 @@
 Imports cv = OpenCvSharp
 Imports VBClasses
-Imports System.Threading
 Namespace MainUI
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
-        Public testImage As cv.Mat
-        Private frameInvokePending As Integer = 0 ' Thread-safe flag: 0 = no pending, 1 = pending
         Private Sub camSwitchAnnouncement()
             CameraSwitching.Visible = True
             CameraSwitching.Text = settings.cameraName + " starting"

@@ -9,7 +9,6 @@ Namespace VBClasses
         Dim dnnPrepared As Boolean
         Dim crop As cv.Rect
         Dim dnnWidth As Integer, dnnHeight As Integer
-        Dim testImage As cv.Mat
         Dim kalman(10) As Kalman_Basics
         Public rect As cv.Rect
         Dim options As New Options_DNN
