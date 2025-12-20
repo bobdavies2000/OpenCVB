@@ -380,9 +380,15 @@ Namespace MainUI
             taskAlg = Nothing
         End Sub
         Private Sub TaskStart()
-            camSwitchAnnouncement()
+            CameraSwitching.Visible = True
+            CameraSwitching.Text = settings.cameraName + " starting"
+            CameraSwitching.BringToFront()
+            CamSwitchTimer.Enabled = True
+
             StartCamera()
-            startAlgorithm()
+            AvailableAlgorithms.SelectedItem = settings.algorithm
+
+            Me.MainForm_Resize(Nothing, Nothing)
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)

@@ -3,13 +3,6 @@ Imports VBClasses
 Namespace MainUI
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
-        Private Sub camSwitchAnnouncement()
-            CameraSwitching.Visible = True
-            CameraSwitching.Text = settings.cameraName + " starting"
-            CameraSwitching.BringToFront()
-            CamSwitchTimer.Enabled = True
-            Me.MainForm_Resize(Nothing, Nothing)
-        End Sub
         Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
             Application.DoEvents()
             Me.Refresh()

@@ -7899,7 +7899,6 @@ Namespace VBClasses
             Static diffSlider = OptionParent.FindSlider("Depth Difference Threshold (mm)")
             Static qualitySlider = OptionParent.FindSlider("Quality Level")
             Static kSlider = OptionParent.FindSlider("k X1000")
-            Static vertRadio = findRadio("Vertical lines")
             k = kSlider.value / 1000
 
             quality = qualitySlider.Value / 100
