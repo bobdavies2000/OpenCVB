@@ -103,7 +103,7 @@ Namespace VBClasses
             dst2 = flood.dst2
             dst3 = flood.dst3
 
-            RedList_Basics.setSelectedCell()
+            XO_RedList_Basics.setSelectedCell()
         End Sub
     End Class
 
@@ -209,7 +209,7 @@ Namespace VBClasses
 
             If taskAlg.heartBeat Then labels(2) = $"{taskAlg.redColor.rcList.Count} cells identified"
 
-            If showSelected Then RedList_Basics.setSelectedCell()
+            If showSelected Then XO_RedList_Basics.setSelectedCell()
         End Sub
     End Class
 End Namespace

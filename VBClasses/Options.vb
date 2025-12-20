@@ -3010,7 +3010,7 @@ Namespace VBClasses
         Public gapGray As Integer = 1
         Public sampleThreshold As Integer = 10
         Public Sub New()
-            taskAlg.redList = New RedList_Basics
+            taskAlg.redList = New XO_RedList_Basics
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Gap in depth spectrum (cm's)", 1, 50, gapDepth)
                 sliders.setupTrackBar("Gap in gray spectrum", 1, 50, gapGray)

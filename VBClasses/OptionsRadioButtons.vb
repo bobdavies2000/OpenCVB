@@ -1,4 +1,4 @@
-﻿Imports VBClasses
+Imports VBClasses
 Public Class OptionsRadioButtons
     Public check As New List(Of RadioButton)
     Public Function Setup(traceName As String) As Boolean
@@ -18,5 +18,27 @@ Public Class OptionsRadioButtons
     End Sub
     Private Sub radio_CheckChanged(sender As Object, e As EventArgs)
         taskAlg.optionsChanged = True
+    End Sub
+
+    Protected Overrides Sub Dispose(disposing As Boolean)
+        If disposing Then
+            ' Remove event handlers
+            For Each radioButton In check
+                If radioButton IsNot Nothing Then
+                    RemoveHandler radioButton.CheckedChanged, AddressOf radio_CheckChanged
+                End If
+            Next
+
+            ' Dispose all dynamically created controls
+            For Each radioButton In check
+                If radioButton IsNot Nothing Then
+                    radioButton.Dispose()
+                End If
+            Next
+
+            ' Clear the list
+            check.Clear()
+        End If
+        MyBase.Dispose(disposing)
     End Sub
 End Class

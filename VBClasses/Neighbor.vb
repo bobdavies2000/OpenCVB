@@ -27,7 +27,7 @@ Namespace VBClasses
             Next
 
             If standalone Then
-                RedList_Basics.setSelectedCell()
+                XO_RedList_Basics.setSelectedCell()
                 dst3.SetTo(0)
                 For Each index In taskAlg.oldrcD.nabs
                     If index < taskAlg.redList.oldrclist.Count Then

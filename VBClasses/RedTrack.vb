@@ -208,7 +208,7 @@ Namespace VBClasses
 
     Public Class RedTrack_Features : Inherits TaskParent
         Public Sub New()
-            taskAlg.redList = New RedList_Basics
+            taskAlg.redList = New XO_RedList_Basics
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             labels = {"", "", "Output of Feature_Stable - input to RedCloud",
                   "Value Is correlation of x to y in contour points (0 indicates circular.)"}
@@ -225,7 +225,7 @@ Namespace VBClasses
             For Each rc In taskAlg.redList.oldrclist
                 If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
                 DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)
-                If rc.contour.Count > 0 Then SetTrueText(RedList_ShapeCorrelation.shapeCorrelation(rc.contour).ToString(fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
+                If rc.contour.Count > 0 Then SetTrueText(XO_RedList_ShapeCorrelation.shapeCorrelation(rc.contour).ToString(fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
             Next
             SetTrueText("Move camera to see the value of this algorithm", 2)
             SetTrueText("Values are correlation of x to y.  Leans left (negative) or right (positive) or circular (neutral correlation.)", 3)

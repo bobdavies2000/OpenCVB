@@ -471,14 +471,14 @@ Namespace VBClasses
             Return addw.dst2
         End Function
         Public Function runRedList(src As cv.Mat, ByRef label As String, removeMask As cv.Mat) As cv.Mat
-            If taskAlg.redList Is Nothing Then taskAlg.redList = New RedList_Basics
+            If taskAlg.redList Is Nothing Then taskAlg.redList = New XO_RedList_Basics
             taskAlg.redList.inputRemoved = removeMask
             taskAlg.redList.Run(src)
             label = taskAlg.redList.labels(2)
             Return taskAlg.redList.dst2
         End Function
         Public Function runRedList(src As cv.Mat, ByRef label As String) As cv.Mat
-            If taskAlg.redList Is Nothing Then taskAlg.redList = New RedList_Basics
+            If taskAlg.redList Is Nothing Then taskAlg.redList = New XO_RedList_Basics
             taskAlg.redList.Run(src)
             label = taskAlg.redList.labels(2)
             Return taskAlg.redList.dst2

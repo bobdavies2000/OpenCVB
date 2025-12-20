@@ -599,8 +599,8 @@ Namespace VBClasses
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
             Next
 
-            dst2 = RebuildRCMap(taskAlg.redList.oldrclist)
-            RedList_Basics.setSelectedCell()
+            dst2 = RebuildRCMap(taskAlg.redList.oldrclist.ToList)
+            XO_RedList_Basics.setSelectedCell()
         End Sub
     End Class
 

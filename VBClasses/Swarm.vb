@@ -184,7 +184,7 @@ Namespace VBClasses
             flood.Run(color8U.dst2)
             dst2 = flood.dst2
 
-            RedList_Basics.setSelectedCell()
+            XO_RedList_Basics.setSelectedCell()
             labels(2) = flood.cellGen.labels(2)
         End Sub
     End Class

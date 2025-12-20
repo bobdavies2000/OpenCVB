@@ -57,7 +57,7 @@ Namespace VBClasses
             Next
 
             taskAlg.redList.oldrclist = New List(Of oldrcData)(sortedCells.Values)
-            dst2 = RebuildRCMap(sortedCells)
+            dst2 = RebuildRCMap(sortedCells.Values.ToList)
 
             labels(2) = CStr(taskAlg.redList.oldrclist.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
         End Sub
@@ -443,7 +443,7 @@ Namespace VBClasses
     Public Class MSER_RedCloud : Inherits TaskParent
         Dim mser As New MSER_Basics
         Public Sub New()
-            taskAlg.redList = New RedList_Basics
+            taskAlg.redList = New XO_RedList_Basics
             desc = "Use the MSER_Basics output as input to RedList_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

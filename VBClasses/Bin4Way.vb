@@ -645,7 +645,7 @@ Namespace VBClasses
                 Next
             Next
 
-            dst2 = RebuildRCMap(sortedCells)
+            dst2 = RebuildRCMap(sortedCells.Values.ToList)
 
             If taskAlg.heartBeat Then labels(2) = CStr(taskAlg.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
         End Sub

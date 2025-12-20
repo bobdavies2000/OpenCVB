@@ -122,7 +122,7 @@ Namespace VBClasses
         Public rc As New oldrcData
         Dim options As New Options_MatchShapes
         Public runStandalone As Boolean = False
-        Dim addTour As New RedList_Basics
+        Dim addTour As New XO_RedList_Basics
         Public Sub New()
             labels = {"Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells"}
             desc = "MatchShapes: Find matches at similar latitude (controlled with slider)"

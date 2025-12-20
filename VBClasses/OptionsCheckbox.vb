@@ -1,4 +1,4 @@
-﻿Imports VBClasses
+Imports VBClasses
 Public Class OptionsCheckbox
     Public Box As New List(Of CheckBox)
     Public Function Setup(traceName As String) As Boolean
@@ -19,5 +19,27 @@ Public Class OptionsCheckbox
     End Sub
     Private Sub Box_CheckChanged(sender As Object, e As EventArgs)
         taskAlg.optionsChanged = True
+    End Sub
+
+    Protected Overrides Sub Dispose(disposing As Boolean)
+        If disposing Then
+            ' Remove event handlers
+            For Each checkbox In Box
+                If checkbox IsNot Nothing Then
+                    RemoveHandler checkbox.CheckedChanged, AddressOf Box_CheckChanged
+                End If
+            Next
+
+            ' Dispose all dynamically created controls
+            For Each checkbox In Box
+                If checkbox IsNot Nothing Then
+                    checkbox.Dispose()
+                End If
+            Next
+
+            ' Clear the list
+            Box.Clear()
+        End If
+        MyBase.Dispose(disposing)
     End Sub
 End Class

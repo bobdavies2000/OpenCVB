@@ -3,7 +3,8 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Module vbc
         Public taskAlg As AlgorithmTask
-        Public imageLock As New Mutex(True, "imageLock")
+        Public AlgorithmTestAllCount As Integer = 1
+
         Public Const fmt0 = "0"
         Public Const fmt1 = "0.0"
         Public Const fmt2 = "0.00"
@@ -34,41 +35,6 @@ Namespace VBClasses
         End Sub
         Public Function vecToScalar(c As cv.Vec3b) As cv.Scalar
             Return New cv.Scalar(c(0), c(1), c(2))
-        End Function
-        Public Function DisplayCells() As cv.Mat
-            Dim dst As New cv.Mat(taskAlg.workRes, cv.MatType.CV_8UC3, 0)
-
-            For Each rc In taskAlg.redList.oldrclist
-                dst(rc.rect).SetTo(rc.color, rc.mask)
-            Next
-
-            Return dst
-        End Function
-        Public Function RebuildRCMap(sortedCells As SortedList(Of Integer, oldrcData)) As cv.Mat
-            taskAlg.redList.oldrclist.Clear()
-            taskAlg.redList.oldrclist.Add(New oldrcData) ' placeholder oldrcData so map is correct.
-            taskAlg.redList.rcMap.SetTo(0)
-            Static saveColorSetting = taskAlg.gOptions.trackingLabel
-            For Each rc In sortedCells.Values
-                rc.index = taskAlg.redList.oldrclist.Count
-
-                If saveColorSetting <> taskAlg.gOptions.trackingLabel Then rc.color = black
-                'Select Case taskAlg.gOptions.trackingLabel
-                '    Case "Mean Color"
-                '        Dim colorStdev As cv.Scalar
-                '        cv.Cv2.MeanStdDev(taskAlg.color(rc.rect), rc.color, colorStdev, rc.mask)
-                ' Case "Tracking Color"
-                If rc.color = black Then rc.color = taskAlg.scalarColors(rc.index)
-                'End Select
-
-                taskAlg.redList.oldrclist.Add(rc)
-                taskAlg.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                DisplayCells.Circle(rc.maxDStable, taskAlg.DotSize, taskAlg.highlight, -1)
-                If rc.index >= 255 Then Exit For
-            Next
-            saveColorSetting = taskAlg.gOptions.trackingLabel
-            taskAlg.redList.rcMap.SetTo(0, taskAlg.noDepthMask)
-            Return DisplayCells()
         End Function
         Public Function RebuildRCMap(oldrclist As List(Of oldrcData)) As cv.Mat
             taskAlg.redList.rcMap.SetTo(0)

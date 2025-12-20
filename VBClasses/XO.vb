@@ -9399,7 +9399,7 @@ Namespace VBClasses
 
     Public Class XO_Cloud_Spin2 : Inherits TaskParent
         Dim spin As New XO_Cloud_Spin
-        Dim redCSpin As New RedList_Basics
+        Dim redCSpin As New XO_RedList_Basics
         Public Sub New()
             labels = {"", "", "RedCloud output", "Spinning RedCloud output - use options to spin on different axes."}
             desc = "Spin the RedCloud output exercise"
@@ -9881,7 +9881,7 @@ Namespace VBClasses
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             Dim mm = GetMinMax(dst2)
             dst3 = PaletteFull(dst2)
-            RedList_Basics.setSelectedCell()
+            XO_RedList_Basics.setSelectedCell()
 
             labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
         End Sub
@@ -11416,7 +11416,7 @@ Namespace VBClasses
                 Next
             Next
 
-            dst2 = RebuildRCMap(sortedCells)
+            dst2 = RebuildRCMap(sortedCells.Values.ToList)
 
             If taskAlg.heartBeat Then labels(2) = CStr(taskAlg.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
         End Sub
@@ -11825,7 +11825,7 @@ Namespace VBClasses
         Public bgSub As New BGSubtract_MOG2
         Dim rectList As New List(Of cv.Rect)
         Public Sub New()
-            taskAlg.redList = New RedList_Basics
+            taskAlg.redList = New XO_RedList_Basics
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "The option-free version of Motion_BGSub"
         End Sub
@@ -12625,7 +12625,7 @@ Namespace VBClasses
                 SetTrueText("RedCell_Color is run by numerous algorithms but generates no output when standalone. ", 2)
                 Exit Sub
             End If
-            If taskAlg.redList Is Nothing Then taskAlg.redList = New RedList_Basics
+            If taskAlg.redList Is Nothing Then taskAlg.redList = New XO_RedList_Basics
 
             Dim initialList As New List(Of oldrcData)
             For i = 0 To mdList.Count - 1
@@ -12700,7 +12700,8 @@ Namespace VBClasses
                 labels(2) = CStr(taskAlg.redList.oldrclist.Count) + " total cells (shown with '" + taskAlg.gOptions.trackingLabel + "' and " +
                         CStr(taskAlg.redList.oldrclist.Count - rcNewCount) + " matched to previous frame"
             End If
-            dst2 = RebuildRCMap(sortedCells)
+
+            dst2 = RebuildRCMap(sortedCells.Values.ToList.ToList)
         End Sub
     End Class
 
@@ -12718,7 +12719,7 @@ Namespace VBClasses
                 SetTrueText("RedCell_Color is run by numerous algorithms but generates no output when standalone. ", 2)
                 Exit Sub
             End If
-            If taskAlg.redList Is Nothing Then taskAlg.redList = New RedList_Basics
+            If taskAlg.redList Is Nothing Then taskAlg.redList = New XO_RedList_Basics
 
             Dim initialList As New List(Of oldrcData)
             For i = 0 To mdList.Count - 1
@@ -12793,7 +12794,7 @@ Namespace VBClasses
                 labels(2) = CStr(taskAlg.redList.oldrclist.Count) + " total cells (shown with '" + taskAlg.gOptions.trackingLabel + "' and " +
                         CStr(taskAlg.redList.oldrclist.Count - rcNewCount) + " matched to previous frame"
             End If
-            dst2 = RebuildRCMap(sortedCells)
+            dst2 = RebuildRCMap(sortedCells.Values.ToList)
         End Sub
     End Class
 
@@ -12929,7 +12930,7 @@ Namespace VBClasses
                 Next
             Next
 
-            dst2 = RebuildRCMap(sortedCells)
+            dst2 = RebuildRCMap(sortedCells.Values.ToList)
 
             If taskAlg.heartBeat Then labels(2) = CStr(taskAlg.redList.oldrclist.Count) + " cells were identified and matched to the previous image"
         End Sub
@@ -12968,7 +12969,7 @@ Namespace VBClasses
 
             If taskAlg.heartBeat Then labels(2) = $"{taskAlg.redList.oldrclist.Count} cells identified"
 
-            If showSelected Then RedList_Basics.setSelectedCell()
+            If showSelected Then XO_RedList_Basics.setSelectedCell()
         End Sub
     End Class
 
@@ -16143,6 +16144,649 @@ Namespace VBClasses
                 dst1.Rectangle(brick.rRect, 255, taskAlg.lineWidth)
             Next
             dst3 = taskAlg.motionMaskRight.Clone
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+
+
+    Public Class XO_RedList_Flippers : Inherits TaskParent
+        Public flipCells As New List(Of oldrcData)
+        Public nonFlipCells As New List(Of oldrcData)
+        Public Sub New()
+            labels(3) = "Highlighted below are the cells which flipped in color from the previous frame."
+            desc = "Identify the cells that are changing color because they were split or lost."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst3 = runRedList(src, labels(3))
+            Static lastMap As cv.Mat = XO_RedList_Basics.DisplayCells()
+
+            Dim unMatched As Integer
+            Dim unMatchedPixels As Integer
+            flipCells.Clear()
+            nonFlipCells.Clear()
+            dst2.SetTo(0)
+            Dim currMap = XO_RedList_Basics.DisplayCells()
+            For Each rc In taskAlg.redList.oldrclist
+                Dim lastColor = lastMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                Dim currColor = currMap.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+                If lastColor <> currColor Then
+                    unMatched += 1
+                    unMatchedPixels += rc.pixels
+                    flipCells.Add(rc)
+                    dst2(rc.rect).SetTo(rc.color, rc.mask)
+                Else
+                    nonFlipCells.Add(rc)
+                End If
+            Next
+
+            lastMap = currMap.Clone
+
+            If taskAlg.heartBeat Then
+                labels(2) = CStr(unMatched) + " of " + CStr(taskAlg.redList.oldrclist.Count) + " cells changed " +
+                        " tracking color, totaling " + CStr(unMatchedPixels) + " pixels."
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XO_RedList_FlipTest : Inherits TaskParent
+        Dim flipper As New XO_RedList_Flippers
+        Public Sub New()
+            desc = "Display nonFlipped cells"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst1 = runRedList(src, labels(2))
+            Dim lastCells As New List(Of oldrcData)(taskAlg.redList.oldrclist)
+            flipper.Run(src)
+            dst3 = flipper.dst2
+
+            dst2.SetTo(0)
+            Dim ptmaxDstable As New List(Of cv.Point)
+            For Each rc In flipper.nonFlipCells
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
+                ptmaxDstable.Add(rc.maxDStable)
+            Next
+
+            Dim count As Integer
+            For Each rc In flipper.flipCells
+                Dim lrc = lastCells(rc.indexLast)
+                Dim index = ptmaxDstable.IndexOf(lrc.maxDStable)
+                If index > 0 Then
+                    Dim rcNabe = flipper.nonFlipCells(index)
+                    dst2(rc.rect).SetTo(rcNabe.color, rc.mask)
+                    count += 1
+                End If
+            Next
+            If taskAlg.heartBeat Then
+                labels(2) = CStr(flipper.flipCells.Count) + " cells flipped and " + CStr(count) + " cells " +
+                        " were flipped back to the main cell."
+                labels(3) = flipper.labels(2)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_RedList_Basics : Inherits TaskParent
+        Public inputRemoved As cv.Mat
+        Public cellGen As New XO_RedCell_Color
+        Public redMask As New RedMask_Basics
+        Public oldrclist As New List(Of oldrcData)
+        Public rcMap As cv.Mat ' redColor map 
+        Public contours As New Contour_Basics
+        Public Sub New()
+            rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+            desc = "Find cells and then match them to the previous generation with minimum boundary"
+        End Sub
+        Public Shared Sub setSelectedCell()
+            If taskAlg.redList Is Nothing Then Exit Sub
+            If taskAlg.redList.oldrclist.Count = 0 Then Exit Sub
+            If taskAlg.clickPoint = newPoint And taskAlg.redList.oldrclist.Count > 1 Then
+                taskAlg.clickPoint = taskAlg.redList.oldrclist(1).maxDist
+            End If
+            Dim index = taskAlg.redList.rcMap.Get(Of Byte)(taskAlg.clickPoint.Y, taskAlg.clickPoint.X)
+            If index = 0 Then Exit Sub
+            If index > 0 And index < taskAlg.redList.oldrclist.Count Then
+                taskAlg.oldrcD = taskAlg.redList.oldrclist(index)
+                taskAlg.color(taskAlg.oldrcD.rect).SetTo(cv.Scalar.White, taskAlg.oldrcD.mask)
+            Else
+                ' the 0th cell is always the upper left corner with just 1 pixel.
+                If taskAlg.redList.oldrclist.Count > 1 Then taskAlg.oldrcD = taskAlg.redList.oldrclist(1)
+            End If
+        End Sub
+        Public Shared Function DisplayCells() As cv.Mat
+            Dim dst As New cv.Mat(taskAlg.workRes, cv.MatType.CV_8UC3, 0)
+
+            For Each rc In taskAlg.redList.oldrclist
+                dst(rc.rect).SetTo(rc.color, rc.mask)
+            Next
+
+            Return dst
+        End Function
+        Public Shared Function RebuildRCMap(sortedCells As List(Of oldrcData)) As cv.Mat
+            taskAlg.redList.oldrclist.Clear()
+            taskAlg.redList.oldrclist.Add(New oldrcData) ' placeholder oldrcData so map is correct.
+            taskAlg.redList.rcMap.SetTo(0)
+            Static saveColorSetting = taskAlg.gOptions.trackingLabel
+            For Each rc In sortedCells
+                rc.index = taskAlg.redList.oldrclist.Count
+
+                If saveColorSetting <> taskAlg.gOptions.trackingLabel Then rc.color = black
+                If rc.color = black Then rc.color = taskAlg.scalarColors(rc.index)
+
+                taskAlg.redList.oldrclist.Add(rc)
+                taskAlg.redList.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+                DisplayCells.Circle(rc.maxDStable, taskAlg.DotSize, taskAlg.highlight, -1)
+                If rc.index >= 255 Then Exit For
+            Next
+            saveColorSetting = taskAlg.gOptions.trackingLabel
+            taskAlg.redList.rcMap.SetTo(0, taskAlg.noDepthMask)
+            Return DisplayCells()
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            contours.Run(src)
+            If src.Type <> cv.MatType.CV_8U Then
+                If standalone And taskAlg.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                    dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                Else
+                    dst1 = srcMustBe8U(src)
+                End If
+            Else
+                dst1 = src
+            End If
+
+            If inputRemoved IsNot Nothing Then dst1.SetTo(0, inputRemoved)
+            redMask.Run(dst1)
+
+            If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
+            cellGen.mdList = redMask.mdList
+            cellGen.Run(redMask.dst2)
+
+            dst2 = cellGen.dst2
+
+            For Each rc In taskAlg.redList.oldrclist
+                DrawCircle(dst2, rc.maxDStable)
+            Next
+            labels(2) = cellGen.labels(2)
+            labels(3) = ""
+            SetTrueText("", newPoint, 1)
+            ' setSelectedCell()
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_RedList_BasicsNew : Inherits TaskParent
+        Public inputRemoved As cv.Mat
+        Public cellGen As New XO_RedCell_Color
+        Public redMask As New RedMask_Basics
+        Public rclist As New List(Of rcData)
+        Public rcMap As cv.Mat ' redColor map 
+        Public contours As New Contour_Basics
+        Public Sub New()
+            rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+            desc = "Find cells and then match them to the previous generation with minimum boundary"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            contours.Run(src)
+            If src.Type <> cv.MatType.CV_8U Then
+                If standalone And taskAlg.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                    dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                Else
+                    dst1 = srcMustBe8U(src)
+                End If
+            Else
+                dst1 = src
+            End If
+
+            If inputRemoved IsNot Nothing Then dst1.SetTo(0, inputRemoved)
+            redMask.Run(dst1)
+
+            If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
+            cellGen.mdList = redMask.mdList
+            cellGen.Run(redMask.dst2)
+
+            dst2 = cellGen.dst2
+
+            For Each rc In rclist
+                DrawCircle(dst2, rc.maxDist)
+            Next
+            labels(2) = cellGen.labels(2)
+            labels(3) = ""
+            SetTrueText("", newPoint, 1)
+            XO_RedList_Basics.setSelectedCell()
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_RedList_FindCells : Inherits TaskParent
+        Public bricks As New List(Of Integer)
+        Public Sub New()
+            OptionParent.FindSlider("Color Difference Threshold").Value = 25
+            cPtr = RedList_FindBricks_Open()
+            desc = "Find all the RedCloud cells touched by the mask created by the Motion_History rectangle"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bricks = New List(Of Integer)
+
+            dst2 = runRedList(src, labels(2))
+
+            Dim cppData(taskAlg.redList.rcMap.Total - 1) As Byte
+            Marshal.Copy(taskAlg.redList.rcMap.Data, cppData, 0, cppData.Length)
+            Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+            Dim imagePtr = RedList_FindBricks_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst1.Rows, dst1.Cols)
+            handleSrc.Free()
+
+            Dim count = RedList_FindBricks_TotalCount(cPtr)
+            If count = 0 Then Exit Sub
+
+            Dim cellsFound(count - 1) As Integer
+            Marshal.Copy(imagePtr, cellsFound, 0, cellsFound.Length)
+
+            bricks = cellsFound.ToList
+            dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+            dst3.SetTo(0)
+            For Each index In bricks
+                If taskAlg.redList.oldrclist.Count <= index Then Continue For
+                Dim rc = taskAlg.redList.oldrclist(index)
+                DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+            Next
+            labels(3) = CStr(count) + " cells were found using the motion mask"
+        End Sub
+        Public Sub Close()
+            RedList_FindBricks_Close(cPtr)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+
+    '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
+    ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
+    Public Class XO_RedList_Planes : Inherits TaskParent
+        Public planes As New XO_RedList_PlaneColor
+        Public Sub New()
+            desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            planes.Run(src)
+            dst2 = planes.dst2
+            dst3 = planes.dst3
+            labels = planes.labels
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XO_RedList_Equations : Inherits TaskParent
+        Dim eq As New Plane_Equation
+        Public oldrclist As New List(Of oldrcData)
+        Public Sub New()
+            labels(3) = "The estimated plane equations for the largest 20 RedCloud cells."
+            desc = "Show the estimated plane equations for all the cells."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standaloneTest() Then
+                dst2 = runRedList(src, labels(2))
+                oldrclist = New List(Of oldrcData)(taskAlg.redList.oldrclist)
+            End If
+
+            Dim newCells As New List(Of oldrcData)
+            For Each orc As oldrcData In oldrclist
+                If orc.contour.Count > 4 Then
+                    eq.rc = orc
+                    eq.Run(src)
+                    newCells.Add(eq.rc)
+                End If
+            Next
+
+            oldrclist = New List(Of oldrcData)(newCells)
+
+            If taskAlg.heartBeat Then
+                Dim index As Integer
+                strOut = ""
+                For Each rc In oldrclist
+                    If rc.contour.Count > 4 Then
+                        Dim justEquation = Format(rc.eq(0), fmt3) + "*X + " + Format(rc.eq(1), fmt3) + "*Y + "
+                        justEquation += Format(rc.eq(2), fmt3) + "*Z + " + Format(rc.eq(3), fmt3) + vbCrLf
+                        strOut += justEquation
+                        index += 1
+                        If index >= 20 Then Exit For
+                    End If
+                Next
+            End If
+
+            SetTrueText(strOut, 3)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XO_RedList_CellsAtDepth : Inherits TaskParent
+        Dim plot As New Plot_Histogram
+        Public Sub New()
+            taskAlg.kalman = New Kalman_Basics
+            plot.removeZeroEntry = False
+            taskAlg.gOptions.HistBinBar.Value = 20
+            labels(3) = "Use mouse to select depth to highlight.  Histogram shows count of cells at each depth."
+            desc = "Create a histogram of depth using RedCloud cells"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = runRedList(src, labels(2))
+
+            Dim histBins = taskAlg.histogramBins
+            Dim slotList(histBins) As List(Of Integer)
+            For i = 0 To slotList.Count - 1
+                slotList(i) = New List(Of Integer)
+            Next
+            Dim hist(histBins - 1) As Single
+            For Each rc In taskAlg.redList.oldrclist
+                Dim slot As Integer
+                If rc.depth > taskAlg.MaxZmeters Then rc.depth = taskAlg.MaxZmeters
+                slot = rc.depth \ taskAlg.MaxZmeters * histBins
+                If slot >= hist.Length Then slot = hist.Length - 1
+                slotList(slot).Add(rc.index)
+                hist(slot) += rc.pixels
+            Next
+
+            taskAlg.kalman.kInput = hist
+            taskAlg.kalman.Run(emptyMat)
+
+            Dim histMat = cv.Mat.FromPixelData(histBins, 1, cv.MatType.CV_32F, taskAlg.kalman.kOutput)
+            plot.Run(histMat)
+            dst3 = plot.dst2
+
+            Dim barWidth = dst3.Width / histBins
+            Dim histIndex = Math.Floor(taskAlg.mouseMovePoint.X / barWidth)
+            If histIndex >= slotList.Count() Then histIndex = slotList.Count() - 1
+            dst3.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst3.Height), cv.Scalar.Yellow, taskAlg.lineWidth)
+            For i = 0 To slotList(histIndex).Count - 1
+                Dim rc = taskAlg.redList.oldrclist(slotList(histIndex)(i))
+                DrawTour(dst2(rc.rect), rc.contour, cv.Scalar.Yellow)
+                DrawTour(taskAlg.color(rc.rect), rc.contour, cv.Scalar.Yellow)
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XO_RedList_ShapeCorrelation : Inherits TaskParent
+        Public Sub New()
+            desc = "A shape correlation is between each x and y in list of contours points.  It allows classification based on angle and shape."
+        End Sub
+        Public Shared Function shapeCorrelation(points As List(Of cv.Point)) As Single
+            Dim pts As cv.Mat = cv.Mat.FromPixelData(points.Count, 1, cv.MatType.CV_32SC2, points.ToArray)
+            Dim pts32f As New cv.Mat
+            pts.ConvertTo(pts32f, cv.MatType.CV_32FC2)
+            Dim split = pts32f.Split()
+            Dim correlationMat As New cv.Mat
+            cv.Cv2.MatchTemplate(split(0), split(1), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            Return correlationMat.Get(Of Single)(0, 0)
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = runRedList(src, labels(2))
+
+            Dim rc = taskAlg.oldrcD
+            If rc.contour.Count > 0 Then
+                Dim shape = shapeCorrelation(rc.contour)
+                strOut = "Contour correlation for selected cell contour X to Y = " + Format(shape, fmt3) + vbCrLf + vbCrLf +
+                     "Select different cells and notice the pattern for the correlation of the contour.X to contour.Y values:" + vbCrLf +
+                     "(The contour correlation - contour.x to contour.y - Is computed above.)" + vbCrLf + vbCrLf +
+                     "If shape leans left, correlation Is positive And proportional to the lean." + vbCrLf +
+                     "If shape leans right, correlation Is negative And proportional to the lean. " + vbCrLf +
+                     "If shape Is symmetric (i.e. rectangle Or circle), correlation Is near zero." + vbCrLf +
+                     "(Remember that Y increases from the top of the image to the bottom.)"
+            End If
+
+            SetTrueText(strOut, 3)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+
+    '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
+    ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
+    Public Class XO_RedList_PlaneColor : Inherits TaskParent
+        Public options As New Options_Plane
+        Dim planeCells As New Plane_CellColor
+        Public Sub New()
+            labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
+            desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            dst2 = runRedList(src, labels(2))
+
+            dst3.SetTo(0)
+            Dim fitPoints As New List(Of cv.Point3f)
+            For Each rc In taskAlg.redList.oldrclist
+                If rc.eq = newVec4f Then
+                    rc.eq = New cv.Vec4f
+                    If options.useMaskPoints Then
+                        rc.eq = fitDepthPlane(planeCells.buildMaskPointEq(rc))
+                    ElseIf options.useContourPoints Then
+                        rc.eq = fitDepthPlane(planeCells.buildContourPoints(rc))
+                    ElseIf options.use3Points Then
+                        rc.eq = build3PointEquation(rc)
+                    End If
+                End If
+                dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)),
+                                              Math.Abs(255 * rc.eq(1)),
+                                              Math.Abs(255 * rc.eq(2))), rc.mask)
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
+    ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
+    Public Class XO_RedList_PlaneFromContour : Inherits TaskParent
+        Public Sub New()
+            labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
+            desc = "Create a plane equation each cell's contour"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standaloneTest() Then dst2 = runRedList(src, labels(2))
+
+            Dim rc = taskAlg.oldrcD
+            Dim fitPoints As New List(Of cv.Point3f)
+            For Each pt In rc.contour
+                If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
+                If rc.mask.Get(Of Byte)(pt.Y, pt.X) = 0 Then Continue For
+                fitPoints.Add(taskAlg.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X))
+            Next
+            rc.eq = fitDepthPlane(fitPoints)
+            If standaloneTest() Then
+                dst3.SetTo(0)
+                dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
+    ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
+    Public Class XO_RedList_PlaneFromMask : Inherits TaskParent
+        Public Sub New()
+            labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
+            desc = "Create a plane equation from the pointcloud samples in a RedCloud cell"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standaloneTest() Then dst2 = runRedList(src, labels(2))
+
+            Dim rc = taskAlg.oldrcD
+            Dim fitPoints As New List(Of cv.Point3f)
+            For y = 0 To rc.rect.Height - 1
+                For x = 0 To rc.rect.Width - 1
+                    If rc.mask.Get(Of Byte)(y, x) Then fitPoints.Add(taskAlg.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x))
+                Next
+            Next
+            rc.eq = fitDepthPlane(fitPoints)
+            If standaloneTest() Then
+                dst3.SetTo(0)
+                dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XO_RedList_PlaneEq3D : Inherits TaskParent
+        Dim eq As New Plane_Equation
+        Public Sub New()
+            desc = "If a RedColor cell contains depth then build a plane equation"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = runRedList(src, labels(2))
+
+            Dim rc = taskAlg.oldrcD
+            If rc.mmZ.maxVal Then
+                eq.rc = rc
+                eq.Run(src)
+                rc = eq.rc
+            End If
+
+            dst3.SetTo(0)
+            DrawTour(dst3(rc.rect), rc.contour, rc.color, -1)
+
+            SetTrueText(eq.strOut, 3)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+
+    Public Class XO_RedList_UnstableCells : Inherits TaskParent
+        Dim prevList As New List(Of cv.Point)
+        Public Sub New()
+            labels = {"", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing"}
+            desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = runRedList(src, labels(2))
+
+            If taskAlg.heartBeat Or taskAlg.frameCount = 2 Then
+                dst1 = dst2.Clone
+                dst3.SetTo(0)
+            End If
+
+            Dim currList As New List(Of cv.Point)
+            For Each rc In taskAlg.redList.oldrclist
+                If prevList.Contains(rc.maxDStable) = False Then
+                    DrawTour(dst1(rc.rect), rc.contour, white, -1)
+                    DrawTour(dst1(rc.rect), rc.contour, cv.Scalar.Black)
+                    DrawTour(dst3(rc.rect), rc.contour, white, -1)
+                End If
+                currList.Add(rc.maxDStable)
+            Next
+
+            prevList = New List(Of cv.Point)(currList)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XO_RedList_UnstableHulls : Inherits TaskParent
+        Dim prevList As New List(Of cv.Point)
+        Public Sub New()
+            labels = {"", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDStable changing"}
+            desc = "Use maxDStable to identify unstable cells - cells which were NOT present in the previous generation."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = runRedList(src, labels(2))
+
+            If taskAlg.heartBeat Or taskAlg.frameCount = 2 Then
+                dst1 = dst2.Clone
+                dst3.SetTo(0)
+            End If
+
+            Dim currList As New List(Of cv.Point)
+            For Each rc In taskAlg.redList.oldrclist
+                rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
+                If prevList.Contains(rc.maxDStable) = False Then
+                    DrawTour(dst1(rc.rect), rc.hull, white, -1)
+                    DrawTour(dst1(rc.rect), rc.hull, cv.Scalar.Black)
+                    DrawTour(dst3(rc.rect), rc.hull, white, -1)
+                End If
+                currList.Add(rc.maxDStable)
+            Next
+
+            prevList = New List(Of cv.Point)(currList)
         End Sub
     End Class
 End Namespace

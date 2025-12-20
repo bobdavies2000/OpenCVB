@@ -337,14 +337,14 @@ Namespace VBClasses
 
     Public Class GuidedBP_RedCloud : Inherits TaskParent
         Dim guide As New GuidedBP_MultiSlice
-        Public redCx As New RedList_Basics
-        Public redCy As New RedList_Basics
+        Public redCx As New XO_RedList_Basics
+        Public redCy As New XO_RedList_Basics
         Public rcListX As New List(Of oldrcData)
         Public rcListY As New List(Of oldrcData)
         Public rcMapX As New cv.Mat
         Public rcMapY As New cv.Mat
         Public Sub New()
-            taskAlg.redList = New RedList_Basics
+            taskAlg.redList = New XO_RedList_Basics
             desc = "Identify each segment in the X and Y point cloud data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
