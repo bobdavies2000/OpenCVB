@@ -4,7 +4,7 @@ Namespace MainUI
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
         Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
-            Me.Refresh()
+            MainForm_Resize(Nothing, Nothing)
         End Sub
         Private Sub StartCamera()
             ' Select camera based on settings.cameraName
@@ -32,6 +32,7 @@ Namespace MainUI
         Private Sub Camera_FrameReady(sender As GenericCamera)
             If taskAlg Is Nothing Then Exit Sub
             If taskAlg.readyForCameraInput = False Then Exit Sub
+            Static lastPaintTime As DateTime = Now
 
             Static frameProcessed As Boolean = True
             If frameProcessed = False Then Exit Sub
@@ -45,7 +46,6 @@ Namespace MainUI
 
                                Dim elapsedWaitTicks = taskAlg.cpu.algorithmTimes(1).Ticks - taskAlg.cpu.algorithmTimes(0).Ticks
                                Dim spanWait = New TimeSpan(elapsedWaitTicks)
-                               Dim spanTime = TimeSpan.TicksPerMillisecond
                                taskAlg.cpu.algorithm_ms(0) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
                                taskAlg.cpu.algorithmTimes(0) = taskAlg.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
@@ -62,13 +62,16 @@ Namespace MainUI
                                elapsedWaitTicks = taskAlg.cpu.algorithmTimes(1).Ticks - taskAlg.cpu.algorithmTimes(0).Ticks
 
                                spanWait = New TimeSpan(elapsedWaitTicks)
-                               spanTime = TimeSpan.TicksPerMillisecond
                                taskAlg.cpu.algorithm_ms(1) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
                                taskAlg.cpu.algorithmTimes(0) = taskAlg.cpu.algorithmTimes(1) ' start time wait = end time algorithm
 
                                taskAlg.mouseClickFlag = False
                                taskAlg.frameCount += 1
+
+                               elapsedWaitTicks = taskAlg.cpu.algorithmTimes(1).Ticks - lastPaintTime.Ticks
+                               spanWait = New TimeSpan(elapsedWaitTicks)
+                               Dim msSinceLastPaint = spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
                                For i = 0 To pics.Count - 1
                                    pics(i).Invalidate()

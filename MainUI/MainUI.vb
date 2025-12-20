@@ -35,6 +35,8 @@ Namespace MainUI
                 pic.BackColor = Color.Black
                 pic.Visible = True
                 pic.SizeMode = PictureBoxSizeMode.StretchImage
+                pic.Width = settings.displayRes.Width
+                pic.Height = settings.displayRes.Height
                 Me.Controls.Add(pic)
 
                 pics.Add(pic)
@@ -181,6 +183,7 @@ Namespace MainUI
                     End If
                 Next
             End If
+            MainForm_Resize(Nothing, Nothing)
         End Sub
         Private Sub MainForm_Closing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             If isPlaying Then
