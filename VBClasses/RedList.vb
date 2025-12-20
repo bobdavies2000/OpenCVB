@@ -168,7 +168,7 @@ Namespace VBClasses
             desc = "Run the C++ RedCloud Interface With Or without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = srcMustBe8U(src)
+            dst1 = Mat_Basics.srcMustBe8U(src)
 
             Dim inputData(dst1.Total - 1) As Byte
             Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)

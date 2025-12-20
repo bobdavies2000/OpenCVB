@@ -7,6 +7,11 @@ Namespace VBClasses
         Public smoothPoints As List(Of cv.Point)
         Public plotColor = cv.Scalar.Yellow
         Dim smOptions As New Options_Smoothing
+        Public Sub New()
+            labels(2) = "Original Points (white) Smoothed (yellow)"
+            labels(3) = ""
+            desc = "Smoothing the line connecting a series of points."
+        End Sub
         Private Function getSplineInterpolationCatmullRom(points As List(Of cv.Point), nrOfInterpolatedPoints As Integer) As List(Of cv.Point)
             Dim spline As New List(Of cv.Point)
             ' Create a new pointlist to spline.  If you don't do this, the original pointlist is included with the extrapolated points
@@ -42,10 +47,10 @@ Namespace VBClasses
             spline.Add(spoints(spoints.Count - 2))
             Return spline
         End Function
-        Public Sub New()
-            labels(2) = "Original Points (white) Smoothed (yellow)"
-            labels(3) = ""
-            desc = "Smoothing the line connecting a series of points."
+        Public Shared Sub DrawPoly(result As cv.Mat, polyPoints As List(Of cv.Point), color As cv.Scalar)
+            If polyPoints.Count < 3 Then Exit Sub
+            Dim listOfPoints = New List(Of List(Of cv.Point))({polyPoints})
+            cv.Cv2.DrawContours(result, listOfPoints, 0, color, 2)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             smOptions.Run()
@@ -134,7 +139,7 @@ Namespace VBClasses
                     hull.Run(src)
                     Dim nextHull = cv.Cv2.ConvexHull(hullList.ToArray, True)
                     inputPoints = nextHull.ToList
-                    DrawPoly(dst2, nextHull.ToList, white)
+                    Smoothing_Exterior.DrawPoly(dst2, nextHull.ToList, white)
                 Else
                     Exit Sub
                 End If
@@ -146,7 +151,7 @@ Namespace VBClasses
             For i = 0 To smoothPoints2d.Count - 1 Step options.stepSize
                 smoothPoints.Add(New cv.Point(CInt(smoothPoints2d.ElementAt(i).X), CInt(smoothPoints2d.ElementAt(i).Y)))
             Next
-            If smoothPoints.Count > 0 Then DrawPoly(dst2, smoothPoints, plotColor)
+            If smoothPoints.Count > 0 Then Smoothing_Exterior.DrawPoly(dst2, smoothPoints, plotColor)
         End Sub
     End Class
 End Namespace

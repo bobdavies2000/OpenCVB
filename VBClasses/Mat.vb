@@ -1,10 +1,18 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
-    Public Class Mat_Repeat : Inherits TaskParent
+    Public Class Mat_Basics : Inherits TaskParent
         Public Sub New()
             desc = "Use the repeat method to replicate data."
         End Sub
+        Public Shared Function srcMustBe8U(src As cv.Mat) As cv.Mat
+            If src.Type <> cv.MatType.CV_8U Then
+                Static color8U As New Color8U_Basics
+                color8U.Run(src)
+                Return color8U.dst2
+            End If
+            Return src
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim small = src.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
             dst2 = small.Repeat(10, 10)

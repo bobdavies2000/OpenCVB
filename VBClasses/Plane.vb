@@ -7,6 +7,91 @@ Namespace VBClasses
             labels = {"", "Top down mask after after thresholding heatmap", "Vertical regions", "Horizontal regions"}
             desc = "Find the regions that are mostly vertical and mostly horizontal."
         End Sub
+        Public Shared Function validContourPoint(rc As oldrcData, pt As cv.Point, offset As Integer) As cv.Point
+            If pt.X < rc.rect.Width And pt.Y < rc.rect.Height Then Return pt
+            Dim count = rc.contour.Count
+            For i = offset + 1 To rc.contour.Count - 1
+                pt = rc.contour(i Mod count)
+                If pt.X < rc.rect.Width And pt.Y < rc.rect.Height Then Return pt
+            Next
+            Return New cv.Point
+        End Function
+        Public Shared Function build3PointEquation(rc As oldrcData) As cv.Vec4f
+            If rc.contour.Count < 3 Then Return New cv.Vec4f
+            Dim offset = rc.contour.Count / 3
+            Dim p1 = validContourPoint(rc, rc.contour(offset * 0), offset * 0)
+            Dim p2 = validContourPoint(rc, rc.contour(offset * 1), offset * 1)
+            Dim p3 = validContourPoint(rc, rc.contour(offset * 2), offset * 2)
+
+            Dim v1 = taskAlg.pointCloud(rc.rect).Get(Of cv.Point3f)(p1.Y, p1.X)
+            Dim v2 = taskAlg.pointCloud(rc.rect).Get(Of cv.Point3f)(p2.Y, p2.X)
+            Dim v3 = taskAlg.pointCloud(rc.rect).Get(Of cv.Point3f)(p3.Y, p3.X)
+
+            Dim cross = crossProduct(v1 - v2, v2 - v3)
+            Dim k = -(v1.X * cross.X + v1.Y * cross.Y + v1.Z * cross.Z)
+            Return New cv.Vec4f(cross.X, cross.Y, cross.Z, k)
+        End Function
+        ' http://james-ramsden.com/calculate-the-cross-product-c-code/
+        Public Shared Function crossProduct(v1 As cv.Point3f, v2 As cv.Point3f) As cv.Point3f
+            Dim product As New cv.Point3f
+            product.X = v1.Y * v2.Z - v1.Z * v2.Y
+            product.Y = v1.Z * v2.X - v1.X * v2.Z
+            product.Z = v1.X * v2.Y - v1.Y * v2.X
+
+            If (Single.IsNaN(product.X) Or Single.IsNaN(product.Y) Or Single.IsNaN(product.Z)) Then Return New cv.Point3f(0, 0, 0)
+            Dim magnitude = Math.Sqrt(product.X * product.X + product.Y * product.Y + product.Z * product.Z)
+            If magnitude = 0 Then Return New cv.Point3f(0, 0, 0)
+            Return New cv.Point3f(product.X / magnitude, product.Y / magnitude, product.Z / magnitude)
+        End Function
+        Public Shared Function dotProduct3D(v1 As cv.Point3f, v2 As cv.Point3f) As Single
+            Return Math.Abs(v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z)
+        End Function
+        Public Shared Function fitDepthPlane(fitDepth As List(Of cv.Point3f)) As cv.Vec4f
+            Dim wDepth = cv.Mat.FromPixelData(fitDepth.Count, 1, cv.MatType.CV_32FC3, fitDepth.ToArray)
+            Dim columnSum = wDepth.Sum()
+            Dim count = CDbl(fitDepth.Count)
+            Dim plane As New cv.Vec4f
+            Dim centroid = New cv.Point3f
+            If count > 0 Then
+                centroid = New cv.Point3f(columnSum(0) / count, columnSum(1) / count, columnSum(2) / count)
+                wDepth = wDepth.Subtract(centroid)
+                Dim xx As Double, xy As Double, xz As Double, yy As Double, yz As Double, zz As Double
+                For i = 0 To wDepth.Rows - 1
+                    Dim tmp = wDepth.Get(Of cv.Point3f)(i, 0)
+                    xx += tmp.X * tmp.X
+                    xy += tmp.X * tmp.Y
+                    xz += tmp.X * tmp.Z
+                    yy += tmp.Y * tmp.Y
+                    yz += tmp.Y * tmp.Z
+                    zz += tmp.Z * tmp.Z
+                Next
+
+                Dim det_x = yy * zz - yz * yz
+                Dim det_y = xx * zz - xz * xz
+                Dim det_z = xx * yy - xy * xy
+
+                Dim det_max = Math.Max(det_x, det_y)
+                det_max = Math.Max(det_max, det_z)
+
+                If det_max = det_x Then
+                    plane(0) = 1
+                    plane(1) = (xz * yz - xy * zz) / det_x
+                    plane(2) = (xy * yz - xz * yy) / det_x
+                ElseIf det_max = det_y Then
+                    plane(0) = (yz * xz - xy * zz) / det_y
+                    plane(1) = 1
+                    plane(2) = (xy * xz - yz * xx) / det_y
+                Else
+                    plane(0) = (yz * xy - xz * yy) / det_z
+                    plane(1) = (xz * xy - yz * xx) / det_z
+                    plane(2) = 1
+                End If
+            End If
+
+            Dim magnitude = Math.Sqrt(plane(0) * plane(0) + plane(1) * plane(1) + plane(2) * plane(2))
+            Dim normal = New cv.Point3f(plane(0) / magnitude, plane(1) / magnitude, plane(2) / magnitude)
+            Return New cv.Vec4f(normal.X, normal.Y, normal.Z, -(normal.X * centroid.X + normal.Y * centroid.Y + normal.Z * centroid.Z))
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim topHist As New cv.Mat, sideHist As New cv.Mat, topBackP As New cv.Mat, sideBackP As New cv.Mat
             cv.Cv2.CalcHist({taskAlg.pointCloud}, taskAlg.channelsTop, New cv.Mat, topHist, 2,
@@ -53,7 +138,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim v1 = input(1) - input(0)
             Dim v2 = input(1) - input(2)
-            cross = crossProduct(v1, v2)
+            cross = Plane_Basics.crossProduct(v1, v2)
 
             ' a*x + b*y + c*z + k = 0 or k = -a*x - b*y - c*z
             k = -cross.X * input(0).X - cross.Y * input(0).Y - cross.Z * input(0).Z
@@ -281,11 +366,11 @@ Namespace VBClasses
             For Each rc In taskAlg.redList.oldrclist
                 rc.eq = New cv.Vec4f
                 If options.useMaskPoints Then
-                    rc.eq = fitDepthPlane(buildMaskPointEq(rc))
+                    rc.eq = Plane_Basics.fitDepthPlane(buildMaskPointEq(rc))
                 ElseIf options.useContourPoints Then
-                    rc.eq = fitDepthPlane(buildContourPoints(rc))
+                    rc.eq = Plane_Basics.fitDepthPlane(buildContourPoints(rc))
                 ElseIf options.use3Points Then
-                    rc.eq = build3PointEquation(rc)
+                    rc.eq = Plane_Basics.build3PointEquation(rc)
                 End If
                 newCells.Add(rc)
                 dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)),
@@ -457,10 +542,10 @@ Namespace VBClasses
                 Dim v2 = taskAlg.pointCloud(rc.rect).Get(Of cv.Point3f)(p2.Y, p2.X)
                 Dim v3 = taskAlg.pointCloud(rc.rect).Get(Of cv.Point3f)(p3.Y, p3.X)
                 Dim v4 = taskAlg.pointCloud(rc.rect).Get(Of cv.Point3f)(p4.Y, p4.X)
-                Dim cross1 = crossProduct(v1 - v2, v2 - v3)
-                Dim cross2 = crossProduct(v1 - v4, v4 - v3)
+                Dim cross1 = Plane_Basics.crossProduct(v1 - v2, v2 - v3)
+                Dim cross2 = Plane_Basics.crossProduct(v1 - v4, v4 - v3)
 
-                Dim dot = dotProduct3D(cross1, cross2)
+                Dim dot = Plane_Basics.dotProduct3D(cross1, cross2)
                 dotlist.Add(dot)
                 Dim k = -cross1.X * v1.X - cross1.Y * v1.Y - cross1.Z * v1.Z
                 xList.Add(cross1.X)

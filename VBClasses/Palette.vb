@@ -7,6 +7,11 @@ Namespace VBClasses
         Public Sub New()
             desc = "Apply the different color maps in OpenCV"
         End Sub
+        Public Shared Function randomCellColor() As cv.Scalar
+            Static msRNG As New System.Random
+            ' trying to avoid extreme colors... 
+            Return New cv.Scalar(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240))
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             labels(2) = "ColorMap = " + taskAlg.gOptions.Palettes.Text
 
@@ -376,7 +381,7 @@ Namespace VBClasses
         Public Sub New()
             colorGrad = New cv.Mat(1, 256, cv.MatType.CV_8UC3, cv.Scalar.All(0))
             For i = 0 To 255
-                Dim vec = randomCellColor()
+                Dim vec = Palette_Basics.randomCellColor()
                 colorGrad.Set(Of cv.Vec3b)(0, i, New cv.Vec3b(vec(0), vec(1), vec(2)))
             Next
             originalColorMap = colorGrad.Clone
@@ -543,7 +548,7 @@ Namespace VBClasses
         Public Sub New()
             colorMap = New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
             For i = 0 To 255
-                Dim vec = randomCellColor()
+                Dim vec = Palette_Basics.randomCellColor()
                 colorMap.Set(Of cv.Vec3b)(i, 0, New cv.Vec3b(vec(0), vec(1), vec(2)))
             Next
 

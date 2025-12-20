@@ -831,7 +831,7 @@ Namespace VBClasses
                 For i = 0 To vecs.Count - 2
                     Dim vecA = vecs(i)
                     Dim vecB = vecs(i + 1)
-                    distances.Add(distance3D(vecA, vecB))
+                    distances.Add(Distance_Basics.distance3D(vecA, vecB))
                 Next
 
                 Dim avg = distances.Average

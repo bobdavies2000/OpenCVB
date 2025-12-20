@@ -243,6 +243,17 @@ Namespace VBClasses
         Public Sub New()
             desc = "Find the angle of tilt for the camera with respect to gravity."
         End Sub
+        Public Shared Function gMatrixToStr(gMatrix As cv.Mat) As String
+            Dim outStr = "Gravity transform matrix" + vbCrLf
+            For i = 0 To gMatrix.Rows - 1
+                For j = 0 To gMatrix.Cols - 1
+                    outStr += Format(gMatrix.Get(Of Single)(j, i), fmt3) + vbTab
+                Next
+                outStr += vbCrLf
+            Next
+
+            Return outStr
+        End Function
         Private Sub buildGmatrix()
             '[cx -sx    0]  [1  0   0 ] 
             '[sx  cx    0]  [0  cz -sz]
@@ -1077,11 +1088,11 @@ Namespace VBClasses
                           "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
 
                 Dim tmpGMat1 = buildGmatrix()
-                strOut += vbCrLf + "Gravity-oriented gMatrix - move camera to test this:" + vbCrLf + gMatrixToStr(tmpGMat1)
+                strOut += vbCrLf + "Gravity-oriented gMatrix - move camera to test this:" + vbCrLf + IMU_GMatrix.gMatrixToStr(tmpGMat1)
 
                 getSliderValues()
                 Dim tmpGMat2 = buildGmatrix()
-                strOut += vbCrLf + "gMatrix with slider input - use Options_IMU Sliders to change this:" + vbCrLf + gMatrixToStr(tmpGMat2)
+                strOut += vbCrLf + "gMatrix with slider input - use Options_IMU Sliders to change this:" + vbCrLf + IMU_GMatrix.gMatrixToStr(tmpGMat2)
             End If
             SetTrueText(strOut)
             taskAlg.gMatrix = gMatrix

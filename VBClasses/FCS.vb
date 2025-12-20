@@ -7,6 +7,20 @@ Namespace VBClasses
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Track the stable good features found in the BGR image."
         End Sub
+        Public Shared Sub fpDSet()
+            If taskAlg.fpList.Count = 0 Then Exit Sub
+            Dim brickIndex = taskAlg.fpMap.Get(Of Single)(taskAlg.clickPoint.Y, taskAlg.clickPoint.X)
+            Dim fpIndex = taskAlg.fpFromGridCell.IndexOf(brickIndex)
+            If fpIndex >= 0 Then taskAlg.fpD = taskAlg.fpList(fpIndex)
+        End Sub
+        Public Shared Sub fpCellContour(fp As fpData, dst As cv.Mat, Optional colorIndex As Integer = 0)
+            Dim color = Choose(colorIndex + 1, cv.Scalar.White, cv.Scalar.Black)
+            For i = 0 To fp.facets.Count - 1
+                Dim p1 = fp.facets(i)
+                Dim p2 = fp.facets((i + 1) Mod fp.facets.Count)
+                dst.Line(p1, p2, color, taskAlg.lineWidth, taskAlg.lineType)
+            Next
+        End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             basics.Run(src)
             dst3 = basics.dst3
@@ -108,7 +122,7 @@ Namespace VBClasses
             Static restartRequest As Boolean
             fcs.inputFeatures.Clear()
             For Each contour In taskAlg.contours.contourList
-                fcs.inputFeatures.Add(GetMaxDist(contour.mask, contour.rect))
+                fcs.inputFeatures.Add(Distance_Basics.GetMaxDist(contour.mask, contour.rect))
             Next
             If taskAlg.contours.contourList.Count <= 1 Then ' when the camera is starting up the image may be too dark to process... Restart if so.
                 restartRequest = True
@@ -238,10 +252,12 @@ Namespace VBClasses
             Next
 
             If standalone Then
-                fpDisplayAge()
-                fpCellContour(taskAlg.fpD, taskAlg.color)
+                For Each fp In taskAlg.fpList
+                    SetTrueTextBase(CStr(fp.age), fp.pt, 2)
+                Next
+                FCS_Basics.fpCellContour(taskAlg.fpD, taskAlg.color)
             End If
-            fpDSet()
+            FCS_Basics.fpDSet()
 
             If taskAlg.heartBeat Then
                 labels(2) = traceName + ": " + Format(taskAlg.features.Count, "000") + " cells found.  Matched = " +
@@ -267,8 +283,10 @@ Namespace VBClasses
             dst2 = fcs.dst2
             dst3 = fcs.dst3
 
-            fpDisplayAge()
-            fpDSet()
+            For Each fp In taskAlg.fpList
+                SetTrueTextBase(CStr(fp.age), fp.pt, 2)
+            Next
+            FCS_Basics.fpDSet()
             labels(2) = fcs.labels(2)
         End Sub
     End Class
@@ -289,8 +307,10 @@ Namespace VBClasses
             dst2 = fcs.dst2
             dst3 = fcs.dst3
 
-            fpDisplayAge()
-            fpDSet()
+            For Each fp In taskAlg.fpList
+                SetTrueTextBase(CStr(fp.age), fp.pt, 2)
+            Next
+            FCS_Basics.fpDSet()
             labels(2) = fcs.labels(2)
         End Sub
     End Class
@@ -354,7 +374,7 @@ Namespace VBClasses
                     DrawCircle(dst3, fp.pt, taskAlg.DotSize, taskAlg.highlight)
                 End If
             Next
-            fpDSet()
+            FCS_Basics.fpDSet()
         End Sub
     End Class
 
@@ -458,7 +478,7 @@ Namespace VBClasses
             info.Run(src)
             SetTrueText(info.strOut, 3)
 
-            fpDSet()
+            FCS_Basics.fpDSet()
         End Sub
     End Class
 
@@ -521,7 +541,7 @@ Namespace VBClasses
             plot.plotData = New cv.Scalar(motionPercent, 0, 0)
             plot.Run(src)
             dst1 = plot.dst2
-            fpDSet()
+            FCS_Basics.fpDSet()
         End Sub
     End Class
 
@@ -580,7 +600,7 @@ Namespace VBClasses
             SetTrueText("X distances" + rangeText, 2)
             SetTrueText("Y distances " + rangeText, New cv.Point(dst2.Width / 2 + 2, 0), 2)
             labels = fcsM.labels
-            fpDSet()
+            FCS_Basics.fpDSet()
         End Sub
     End Class
 
@@ -652,7 +672,7 @@ Namespace VBClasses
     '        taskAlg.features = New List(Of cv.Point2f)(knnMin.outputPoints2f)
     '        fcs.Run(src)
     '        dst2 = taskAlg.feat.fcs.dst2
-    '        fpDSet()
+    '        FCS_Basics.fpDSet()
     '        labels(3) = fcs.labels(2)
     '    End Sub
     'End Class
@@ -679,7 +699,9 @@ Namespace VBClasses
             fcs.Run(taskAlg.grayStable)
             dst2 = fcs.dst2
 
-            fpDisplayAge()
+            For Each fp In taskAlg.fpList
+                SetTrueTextBase(CStr(fp.age), fp.pt, 2)
+            Next
 
             If taskAlg.heartBeat Then labels(2) = CStr(taskAlg.features.Count) + " lines were used to create " +
                                            CStr(taskAlg.fpList.Count) + " cells"
@@ -758,7 +780,7 @@ Namespace VBClasses
             For Each ele In fpCells
                 Dim fp As fpData = ele.Item1
                 SetTrueText(Format(fp.age, fmt0), fp.pt, 0)
-                fpCellContour(fp, taskAlg.color, 0)
+                FCS_Basics.fpCellContour(fp, taskAlg.color, 0)
             Next
             dst3 = PaletteFull(palInput)
             dst3.SetTo(0, palInput.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
@@ -803,7 +825,7 @@ Namespace VBClasses
                     ptInside.Add(fp.pt)
                 End If
             Next
-            fpDSet()
+            FCS_Basics.fpDSet()
             labels(2) = "There are " + CStr(ptOutside.Count) + " features on the periphery of the image."
             labels(3) = "There are " + CStr(taskAlg.fpList.Count - ptOutside.Count) + " features in the interior region of the image."
         End Sub
@@ -827,7 +849,7 @@ Namespace VBClasses
             For Each fp In taskAlg.fpList
                 If fp.periph = False Then dst3.FillConvexPoly(fp.facets, 255, taskAlg.lineType)
             Next
-            fpDSet()
+            FCS_Basics.fpDSet()
             labels = perif.labels
         End Sub
     End Class

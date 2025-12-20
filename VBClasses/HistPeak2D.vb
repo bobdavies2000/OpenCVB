@@ -31,7 +31,7 @@ Namespace VBClasses
             If ranges Is Nothing Or taskAlg.optionsChanged Then
                 ' the pcsplit arrays have been patched for inf and nan's already in taskAlg.vb.
                 If taskAlg.settings.cameraName.StartsWith("StereoLabs") Then cv.Cv2.Merge(taskAlg.pcSplit, src)
-                ranges = GetHist2Dminmax(src, taskAlg.channels(0), taskAlg.channels(1))
+                ranges = Hist2D_Basics.GetHist2Dminmax(src, taskAlg.channels(0), taskAlg.channels(1))
             End If
 
             Dim backProjection As New cv.Mat

@@ -12,6 +12,22 @@ Namespace VBClasses
             labels(3) = "Histogram of targeted region (hue only)"
             desc = "CamShift Demo - draw on the images to define the object to track. "
         End Sub
+        Public Shared Function Show_HSV_Hist(hist As cv.Mat) As cv.Mat
+            Dim img As New cv.Mat(New cv.Size(taskAlg.workRes.Width, taskAlg.workRes.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+            Dim binCount = hist.Height
+            Dim binWidth = img.Width / hist.Height
+            Dim mm As mmData = GetMinMax(hist)
+            img.SetTo(0)
+            If mm.maxVal > 0 Then
+                For i = 0 To binCount - 2
+                    Dim h = img.Height * (hist.Get(Of Single)(i, 0)) / mm.maxVal
+                    If h = 0 Then h = 5 ' show the color range in the plot
+                    img.Rectangle(New cv.Rect(i * binWidth, img.Height - h, binWidth, h),
+                              New cv.Scalar(180.0 * i \ binCount, 255, 255), -1)
+                Next
+            End If
+            Return img
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             redHue.Run(src)
             dst2 = redHue.dst2

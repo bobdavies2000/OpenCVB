@@ -291,7 +291,7 @@ Namespace VBClasses
                 Dim pt = inputPoints(i)
                 Dim vec As cv.Vec3b = lastColor.Get(Of cv.Vec3b)(pt.Y, pt.X)
                 Dim nextColor As cv.Scalar = vec.ToVec3d
-                If usedColors.Contains(nextColor) Then nextColor = randomCellColor()
+                If usedColors.Contains(nextColor) Then nextColor = Palette_Basics.randomCellColor()
                 usedColors.Add(nextColor)
 
                 dst2.FillConvexPoly(nextFacet, nextColor)

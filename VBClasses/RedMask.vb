@@ -9,7 +9,7 @@ Namespace VBClasses
             desc = "Run the C++ RedMask to create a list of mask, rect, and other info about image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = srcMustBe8U(src)
+            dst1 = Mat_Basics.srcMustBe8U(src)
 
             Dim inputData(dst1.Total - 1) As Byte
             Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
@@ -43,7 +43,7 @@ Namespace VBClasses
                 md.contour = ContourBuild(md.mask)
                 DrawTour(md.mask, md.contour, 255, -1)
                 md.pixels = md.mask.CountNonZero
-                md.maxDist = GetMaxDist(md)
+                md.maxDist = Distance_Basics.GetMaxDist(md)
                 md.mm = vbc.GetMinMax(taskAlg.pcSplit(2)(md.rect), taskAlg.depthmask(md.rect))
                 md.index = mdList.Count
                 mdList.Add(md)

@@ -304,7 +304,7 @@ Namespace VBClasses
                     Dim distances As New List(Of Single)
                     For Each pt In top
                         Dim vec = src.Get(Of cv.Vec3b)(y, x)
-                        distances.Add(distance3D(pt, New cv.Vec3b(vec.Item0, vec.Item1, vec.Item2)))
+                        distances.Add(Distance_Basics.distance3D(pt, New cv.Vec3b(vec.Item0, vec.Item1, vec.Item2)))
                     Next
                     Dim best = top(distances.IndexOf(distances.Min))
                     dst2.Set(Of cv.Vec3b)(y, x, New cv.Vec3b(best.Item0, best.Item1, best.Item2))
@@ -337,7 +337,7 @@ Namespace VBClasses
                     Dim distances As New List(Of Single)
                     For Each pt In common
                         Dim vec = src.Get(Of cv.Vec3b)(y, x)
-                        distances.Add(distance3D(pt, New cv.Vec3b(vec.Item0, vec.Item1, vec.Item2)))
+                        distances.Add(Distance_Basics.distance3D(pt, New cv.Vec3b(vec.Item0, vec.Item1, vec.Item2)))
                     Next
                     Dim best = common(distances.IndexOf(distances.Min))
                     dst2.Set(Of cv.Vec3b)(y, x, New cv.Vec3b(best.Item0, best.Item1, best.Item2))

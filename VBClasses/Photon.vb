@@ -139,7 +139,7 @@ Namespace VBClasses
             End If
 
             For i = 0 To currColors.Count - 1
-                distances.Add(distance3D(lastColors(i), currColors(i)))
+                distances.Add(Distance_Basics.distance3D(lastColors(i), currColors(i)))
             Next
 
             lastColors = New List(Of cv.Vec3b)(currColors)

@@ -7,6 +7,14 @@ Namespace VBClasses
         Public Sub New()
             desc = "Draw the requested number of rectangles."
         End Sub
+        Public Shared Sub DrawRotatedRect(rotatedRect As cv.RotatedRect, dst As cv.Mat, color As cv.Scalar)
+            Dim vertices2f = rotatedRect.Points()
+            Dim vertices(vertices2f.Length - 1) As cv.Point
+            For j = 0 To vertices2f.Length - 1
+                vertices(j) = New cv.Point(CInt(vertices2f(j).X), CInt(vertices2f(j).Y))
+            Next
+            dst.FillConvexPoly(vertices, color, taskAlg.lineType)
+        End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
             If taskAlg.heartBeat Then
@@ -297,6 +305,16 @@ Namespace VBClasses
         Public Sub New()
             desc = "Build an enclosing rectangle for the supplied pointlist"
         End Sub
+        Public Shared Function quickRandomPoints(howMany As Integer) As List(Of cv.Point2f)
+            Dim srcPoints As New List(Of cv.Point2f)
+            Dim w = taskAlg.workRes.Width
+            Dim h = taskAlg.workRes.Height
+            For i = 0 To howMany - 1
+                Dim pt = New cv.Point2f(msRNG.Next(0, w), msRNG.Next(0, h))
+                srcPoints.Add(pt)
+            Next
+            Return srcPoints
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 pointList = quickRandomPoints(20)

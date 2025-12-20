@@ -133,7 +133,7 @@ Namespace VBClasses
 
             If standaloneTest() Or plotRequested Then
                 plotMaxValue = Math.Round(mm.maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
-                AddPlotScale(dst2, 0, plotMaxValue)
+                Plot_Basics.AddPlotScale(dst2, 0, plotMaxValue)
                 labels(2) = "Histogram for src image (default color) - " + CStr(taskAlg.histogramBins) + " bins"
             End If
         End Sub
@@ -665,7 +665,7 @@ Namespace VBClasses
                 dst3 = comp.histK.hist.plotHist.dst2.Clone
 
                 Dim mm As mmData = GetMinMax(histX)
-                AddPlotScale(dst2, 0, mm.maxVal)
+                Plot_Basics.AddPlotScale(dst2, 0, mm.maxVal)
             End If
             trueData = New List(Of TrueText)(ttLabels)
         End Sub

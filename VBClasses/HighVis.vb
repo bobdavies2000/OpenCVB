@@ -6,6 +6,12 @@ Namespace VBClasses
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Display all the bricks that have good visibility"
         End Sub
+        Public Function ShowPaletteDepth(input As cv.Mat) As cv.Mat
+            Dim output As New cv.Mat
+            cv.Cv2.ApplyColorMap(input, output, taskAlg.depthColorMap)
+            output.SetTo(0, taskAlg.noDepthMask)
+            Return output
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1.SetTo(0)
             For Each brick In taskAlg.bricks.brickList

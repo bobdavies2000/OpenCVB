@@ -193,8 +193,8 @@ Namespace VBClasses
             delaunay.inputPoints.Clear()
             Dim maxList As New List(Of cv.Point2f)
             For Each contour In contours.contourList
-                maxList.Add(GetMaxDist(contour.mask, contour.rect))
-                delaunay.inputPoints.Add(GetMaxDist(contour.mask, contour.rect))
+                maxList.Add(Distance_Basics.GetMaxDist(contour.mask, contour.rect))
+                delaunay.inputPoints.Add(Distance_Basics.GetMaxDist(contour.mask, contour.rect))
             Next
 
             delaunay.Run(emptyMat)
@@ -935,7 +935,7 @@ Namespace VBClasses
             dst1.SetTo(0)
             For i = 0 To sortedTours.Values.Count - 1
                 Dim tuple = sortedTours.Values(i)
-                DrawRotatedRect(tuple.Item1, dst2, 255)
+                Rectangle_Basics.DrawRotatedRect(tuple.Item1, dst2, 255)
                 DrawTour(dst2, contours(tuple.Item2).ToList, 0, taskAlg.lineWidth, cv.LineTypes.Link4)
                 DrawTour(dst1, contours(tuple.Item2).ToList, (i Mod 254) + 1, taskAlg.lineWidth, cv.LineTypes.Link4)
             Next

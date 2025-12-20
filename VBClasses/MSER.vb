@@ -38,7 +38,7 @@ Namespace VBClasses
                 rc.contour = ContourBuild(rc.mask)
                 DrawTour(rc.mask, rc.contour, 255, -1)
 
-                rc.maxDist = GetMaxDist(rc)
+                rc.maxDist = Distance_Basics.GetMaxDist(rc)
 
                 rc.indexLast = taskAlg.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If rc.indexLast <> 0 And rc.indexLast < taskAlg.redList.oldrclist.Count Then
@@ -612,7 +612,7 @@ Namespace VBClasses
                 dst1(rc.rect).SetTo(rc.index, rc.mask)
                 rc.pixels = detect.maskCounts(i)
 
-                rc.maxDist = GetMaxDist(rc)
+                rc.maxDist = Distance_Basics.GetMaxDist(rc)
                 rc.indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
 
                 rc.color = taskAlg.scalarColors(i Mod 255)

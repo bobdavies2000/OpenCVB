@@ -656,7 +656,7 @@ Namespace VBClasses
                 End If
                 If usedColors.Contains(rc.color) Then
                     unmatched += 1
-                    rc.color = randomCellColor()
+                    rc.color = Palette_Basics.randomCellColor()
                 End If
                 usedColors.Add(rc.color)
 

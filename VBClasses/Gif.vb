@@ -1,4 +1,5 @@
-﻿Imports System.IO
+﻿Imports System.Drawing.Imaging
+Imports System.IO
 Imports System.Runtime.Intrinsics
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
@@ -59,6 +60,29 @@ Namespace VBClasses
         Public Sub New()
             desc = "Create a GIF of the OpenCVB main screen for any algorithm."
         End Sub
+        Public Function CaptureScreen() As Bitmap
+            Dim screenBounds As Rectangle = Screen.PrimaryScreen.Bounds
+            Dim screenshot As New Bitmap(screenBounds.Width, screenBounds.Height, PixelFormat.Format32bppArgb)
+            Using g As Graphics = Graphics.FromImage(screenshot)
+                g.CopyFromScreen(screenBounds.X, screenBounds.Y, 0, 0, screenBounds.Size, CopyPixelOperation.SourceCopy)
+            End Using
+            Return screenshot
+        End Function
+        Public Function GetWindowImage(ByVal WindowHandle As IntPtr, ByVal rect As cv.Rect) As Bitmap
+            Dim b As New Bitmap(rect.Width, rect.Height, Imaging.PixelFormat.Format24bppRgb)
+
+            Using img As Graphics = Graphics.FromImage(b)
+                Dim ImageHDC As IntPtr = img.GetHdc
+                Using window As Graphics = Graphics.FromHwnd(WindowHandle)
+                    Dim WindowHDC As IntPtr = window.GetHdc
+                    BitBlt(ImageHDC, 0, 0, rect.Width, rect.Height, WindowHDC, rect.X, rect.Y, CopyPixelOperation.SourceCopy)
+                    window.ReleaseHdc()
+                End Using
+                img.ReleaseHdc()
+            End Using
+
+            Return b
+        End Function
         Public Sub createNextGifImage()
             Static snapCheck = OptionParent.FindCheckBox("Step 1: Check this box when ready to capture the desired snapshot.")
             If snapCheck.checked Then

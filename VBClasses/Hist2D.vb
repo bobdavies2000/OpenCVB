@@ -12,6 +12,23 @@ Namespace VBClasses
             labels = {"", "", "All non-zero entries in the 2D histogram", ""}
             desc = "Create a 2D histogram from the input."
         End Sub
+        Public Shared Function GetHist2Dminmax(input As cv.Mat, chan1 As Integer, chan2 As Integer) As cv.Rangef()
+            If input.Type = cv.MatType.CV_8UC3 Then
+                ' ranges are exclusive in OpenCV 
+                Return {New cv.Rangef(-histDelta, 256),
+                    New cv.Rangef(-histDelta, 256)}
+            End If
+
+            Dim xInput = input.ExtractChannel(chan1)
+            Dim yInput = input.ExtractChannel(chan2)
+
+            Dim mmX = GetMinMax(xInput)
+            Dim mmY = GetMinMax(yInput)
+
+            ' ranges are exclusive in OpenCV 
+            Return {New cv.Rangef(mmX.minVal - histDelta, mmX.maxVal + histDelta),
+                New cv.Rangef(mmY.minVal - histDelta, mmY.maxVal + histDelta)}
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             ranges = GetHist2Dminmax(src, channels(0), channels(1))
             cv.Cv2.CalcHist({src}, channels, New cv.Mat(), histogram, 2, histRowsCols, ranges)

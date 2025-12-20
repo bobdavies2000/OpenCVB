@@ -6,6 +6,63 @@ Namespace VBClasses
         Public Sub New()
             desc = "Floodfill the distance_basics results"
         End Sub
+        Public Shared Function distance3D(p1 As cv.Point3f, p2 As cv.Point3f) As Single
+            Return Math.Sqrt((p1.X - p2.X) * (p1.X - p2.X) + (p1.Y - p2.Y) * (p1.Y - p2.Y) + (p1.Z - p2.Z) * (p1.Z - p2.Z))
+        End Function
+        Public Shared Function distance3D(p1 As cv.Vec3b, p2 As cv.Vec3b) As Single
+            Return Math.Sqrt((CInt(p1(0)) - CInt(p2(0))) * (CInt(p1(0)) - CInt(p2(0))) +
+                             (CInt(p1(1)) - CInt(p2(1))) * (CInt(p1(1)) - CInt(p2(1))) +
+                             (CInt(p1(2)) - CInt(p2(2))) * (CInt(p1(2)) - CInt(p2(2))))
+        End Function
+        Public Shared Function distance3D(p1 As cv.Point3i, p2 As cv.Point3i) As Single
+            Return Math.Sqrt((p1.X - p2.X) * (p1.X - p2.X) + (p1.Y - p2.Y) * (p1.Y - p2.Y) + (p1.Z - p2.Z) * (p1.Z - p2.Z))
+        End Function
+        Public Shared Function distance3D(p1 As cv.Scalar, p2 As cv.Scalar) As Single
+            Return Math.Sqrt((p1(0) - p2(0)) * (p1(0) - p2(0)) +
+                             (p1(1) - p2(1)) * (p1(1) - p2(1)) +
+                             (p1(2) - p2(2)) * (p1(2) - p2(2)))
+        End Function
+        Public Shared Function GetMaxDist(ByRef md As maskData) As cv.Point
+            Dim mask = md.mask.Clone
+            mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+            Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+            Dim mm As mmData = GetMinMax(distance32f)
+            mm.maxLoc.X += md.rect.X
+            mm.maxLoc.Y += md.rect.Y
+
+            Return mm.maxLoc
+        End Function
+        Public Shared Function GetMaxDist(ByRef maskInput As cv.Mat, rect As cv.Rect) As cv.Point
+            Dim mask = maskInput.Clone
+            mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+            Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+            Dim mm As mmData = GetMinMax(distance32f)
+            mm.maxLoc.X += rect.X
+            mm.maxLoc.Y += rect.Y
+
+            Return mm.maxLoc
+        End Function
+        Public Shared Function GetMaxDistDepth(ByRef maskInput As cv.Mat, rect As cv.Rect) As cv.Point
+            Dim depth As New cv.Mat
+            taskAlg.depthmask(rect).CopyTo(depth, maskInput)
+            depth.Rectangle(New cv.Rect(0, 0, depth.Width, depth.Height), 0, 1)
+            Dim distance32f = depth.DistanceTransform(cv.DistanceTypes.L1, 0)
+            Dim mm As mmData = GetMinMax(distance32f)
+            mm.maxLoc.X += rect.X
+            mm.maxLoc.Y += rect.Y
+
+            Return mm.maxLoc
+        End Function
+        Public Shared Function GetMaxDist(ByRef rc As oldrcData) As cv.Point
+            Dim mask = rc.mask.Clone
+            mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+            Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+            Dim mm As mmData = GetMinMax(distance32f)
+            mm.maxLoc.X += rc.rect.X
+            mm.maxLoc.Y += rc.rect.Y
+
+            Return mm.maxLoc
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then src = taskAlg.depthmask.Clone
             If taskAlg.optionsChanged Then dst1 = src.Clone Else src.CopyTo(dst1, taskAlg.motionMask)

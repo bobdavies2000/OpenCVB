@@ -308,7 +308,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             v1 *= 1 / Math.Sqrt(v1.X * v1.X + v1.Y * v1.Y + v1.Z * v1.Z) ' normalize the input
             v2 *= 1 / Math.Sqrt(v2.X * v2.X + v2.Y * v2.Y + v2.Z * v2.Z)
-            Dim n1 = dotProduct3D(v1, v2)
+            Dim n1 = Plane_Basics.dotProduct3D(v1, v2)
 
             If showWork Then
                 strOut = "Input: " + vbCrLf

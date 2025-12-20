@@ -2114,7 +2114,6 @@ Namespace VBClasses
         Public xyVList As New List(Of List(Of cv.Point))
         Dim options As New Options_PointCloud()
         Public Sub New()
-            setPointCloudGrid()
             desc = "Reduce the point cloud to a manageable number points in 3D"
         End Sub
         Public Function findHorizontalPoints(ByRef xyList As List(Of List(Of cv.Point))) As List(Of List(Of cv.Point3f))
@@ -2267,7 +2266,6 @@ Namespace VBClasses
         Public xyList As New List(Of cv.Point)
         Dim white32 = New cv.Point3f(1, 1, 1)
         Public Sub New()
-            setPointCloudGrid()
             desc = "Find planes using a reduced set of 3D points and the intersection of vertical and horizontal lines through those points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2417,7 +2415,6 @@ Namespace VBClasses
         Public pcPoints As cv.Mat
         Public actualCount As Integer
         Public Sub New()
-            setPointCloudGrid()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Reduce the point cloud to a manageable number points in 3D representing the averages of X, Y, and Z in that roi."
         End Sub
@@ -2458,7 +2455,6 @@ Namespace VBClasses
     Public Class XO_PointCloud_PCPoints : Inherits TaskParent
         Public pcPoints As New List(Of cv.Point3f)
         Public Sub New()
-            setPointCloudGrid()
             desc = "Reduce the point cloud to a manageable number points in 3D using the mean value"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -2931,7 +2927,7 @@ Namespace VBClasses
                 For i = 0 To raw2D.Count - 2 Step 2
                     Dim pt1 = matLines3D.Get(Of cv.Point3f)(i, 0)
                     Dim pt2 = matLines3D.Get(Of cv.Point3f)(i + 1, 0)
-                    Dim len3D = distance3D(pt1, pt2)
+                    Dim len3D = Distance_Basics.distance3D(pt1, pt2)
                     Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
                     If Math.Abs(arcY - 90) < options.tolerance Then
                         vbc.DrawLine(dst3, raw2D(i).p1, raw2D(i).p2, cv.Scalar.Blue)
@@ -3216,7 +3212,7 @@ Namespace VBClasses
             vbc.DrawLine(dst3, p1, p2, taskAlg.highlight)
             Dim pt1 = lines.lines3D(index)
             Dim pt2 = lines.lines3D(index + 1)
-            Dim len3D = distance3D(pt1, pt2)
+            Dim len3D = Distance_Basics.distance3D(pt1, pt2)
             Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
             SetTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m dist", p1)
             SetTrueText(Format(arcY, fmt3) + vbCrLf + Format(len3D, fmt3) + "m len" + vbCrLf + Format(pt1.Z, fmt1) + "m distant", p1, 3)
@@ -3471,7 +3467,7 @@ Namespace VBClasses
 
                     Dim pt1 = lines.lines3D(index)
                     Dim pt2 = lines.lines3D(index + 1)
-                    Dim len3D = distance3D(pt1, pt2)
+                    Dim len3D = Distance_Basics.distance3D(pt1, pt2)
                     If len3D > 0 Then
                         Dim arcY = Math.Abs(Math.Asin((pt1.Y - pt2.Y) / len3D) * 57.2958)
                         arcList.Add(arcY)
@@ -5803,6 +5799,12 @@ Namespace VBClasses
             labels(2) = "White is the original FPoly and yellow is the current FPoly."
             desc = "Compute the lengths of each side in a polygon"
         End Sub
+        Public Shared Sub DrawFatLine(dst As cv.Mat, lp As lpData, color As cv.Scalar)
+            dst.Line(lp.p1, lp.p2, taskAlg.highlight, taskAlg.lineWidth * 3, taskAlg.lineType)
+        End Sub
+        Public Shared Sub DrawFatLine(p1 As cv.Point2f, p2 As cv.Point2f, dst As cv.Mat, color As cv.Scalar)
+            dst.Line(p1, p2, taskAlg.highlight, taskAlg.lineWidth * 3, taskAlg.lineType)
+        End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
@@ -6155,9 +6157,9 @@ Namespace VBClasses
             dst1.SetTo(0)
             dst1(rect) = syncImage(rect)
             Dim lp As New lpData(fGrid.startAnchor, fGrid.anchor)
-            DrawFatLine(dst1, lp, white)
+            XO_FPoly_Sides.DrawFatLine(dst1, lp, white)
 
-            DrawPolkaDot(fGrid.anchor, dst1)
+            XO_Match_Points.DrawPolkaDot(fGrid.anchor, dst1)
 
             Dim r = New cv.Rect(0, 0, rect.Width, rect.Height)
             If fGrid.anchor.X > fGrid.startAnchor.X Then r.X = fGrid.anchor.X - fGrid.startAnchor.X
@@ -7695,6 +7697,10 @@ Namespace VBClasses
         Public Sub New()
             labels(2) = "Rectangle shown is the search rectangle."
             desc = "Track the selected points"
+        End Sub
+        Public Shared Sub DrawPolkaDot(pt As cv.Point2f, dst As cv.Mat)
+            dst.Circle(pt, taskAlg.DotSize + 2, white, -1, taskAlg.lineType)
+            dst.Circle(pt, taskAlg.DotSize, black, -1, taskAlg.lineType)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If taskAlg.firstPass Then mPoint.target = src.Clone
@@ -10375,8 +10381,8 @@ Namespace VBClasses
                 Dim selectedMean As cv.Scalar = src(taskAlg.oldrcD.rect).Mean(taskAlg.oldrcD.mask)
                 If taskAlg.redList.oldrclist.Count = 0 Then Exit Sub ' next frame please...
                 For Each rc In taskAlg.redList.oldrclist
-                    colorDistance.Add(distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
-                    depthDistance.Add(distance3D(taskAlg.oldrcD.depth, rc.depth))
+                    colorDistance.Add(Distance_Basics.distance3D(selectedMean, src(rc.rect).Mean(rc.mask)))
+                    depthDistance.Add(Distance_Basics.distance3D(taskAlg.oldrcD.depth, rc.depth))
                 Next
 
                 dst1.SetTo(0)
@@ -10590,7 +10596,7 @@ Namespace VBClasses
             desc = "Run the C++ RedCloud Interface With Or without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = srcMustBe8U(src)
+            dst1 = Mat_Basics.srcMustBe8U(src)
 
             Dim inputData(dst1.Total - 1) As Byte
             Marshal.Copy(dst1.Data, inputData, 0, inputData.Length)
@@ -10844,7 +10850,7 @@ Namespace VBClasses
 
             For i = 1 To addTour.oldrclist.Count - 1
                 Dim rc = addTour.oldrclist(i)
-                rc.maxDist = GetMaxDist(rc)
+                rc.maxDist = Distance_Basics.GetMaxDist(rc)
                 DrawCircle(dst3, rc.maxDist, taskAlg.DotSize, taskAlg.highlight)
             Next
         End Sub
@@ -11590,7 +11596,7 @@ Namespace VBClasses
             For i = 0 To taskAlg.gridRects.Count - 1
                 cv.Cv2.MeanStdDev(src(taskAlg.gridRects(i)), colorMean, colorstdev)
                 Dim colorVec = New cv.Vec3f(colorMean(0), colorMean(1), colorMean(2))
-                Dim colorChange = distance3D(colorVec, lastColor(i))
+                Dim colorChange = Distance_Basics.distance3D(colorVec, lastColor(i))
                 If colorChange > taskAlg.motionThreshold Then
                     lastColor(i) = colorVec
                     For Each index In taskAlg.grid.gridNeighbors(i)
@@ -11639,7 +11645,7 @@ Namespace VBClasses
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = srcMustBe8U(src)
+            dst1 = Mat_Basics.srcMustBe8U(src)
 
             Dim imagePtr As IntPtr
             Dim inputData(dst1.Total - 1) As Byte
@@ -13260,7 +13266,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst3 = srcMustBe8U(src)
+            dst3 = Mat_Basics.srcMustBe8U(src)
 
             sortContours.allContours = Contour_Basics.buildContours(dst3)
             sortContours.Run(src)
@@ -13291,7 +13297,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst3 = srcMustBe8U(src)
+            dst3 = Mat_Basics.srcMustBe8U(src)
 
             sortContours.allContours = Contour_Basics.buildContours(dst3)
             sortContours.Run(dst3)
@@ -13318,7 +13324,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst3 = srcMustBe8U(src)
+            dst3 = Mat_Basics.srcMustBe8U(src)
 
             Dim mode = options.options2.ApproximationMode
             dst3.ConvertTo(dst1, cv.MatType.CV_32SC1)
@@ -13351,7 +13357,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst1 = srcMustBe8U(src)
+            dst1 = Mat_Basics.srcMustBe8U(src)
 
             Dim mode = options.options2.ApproximationMode
             cv.Cv2.FindContours(dst1, sortContours.allContours, Nothing, cv.RetrievalModes.List, mode)
@@ -13382,7 +13388,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst1 = srcMustBe8U(src)
+            dst1 = Mat_Basics.srcMustBe8U(src)
 
             Dim mode = options.options2.ApproximationMode
             If dst1.Type <> cv.MatType.CV_8U Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -14094,7 +14100,7 @@ Namespace VBClasses
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = srcMustBe8U(src)
+            dst1 = Mat_Basics.srcMustBe8U(src)
 
             Dim imagePtr As IntPtr
             Dim inputData(dst1.Total - 1) As Byte
@@ -15395,7 +15401,7 @@ Namespace VBClasses
             brick.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
             brick.tc2.depth = brick.pt2.Z
 
-            brick.len3D = distance3D(brick.pt1, brick.pt2)
+            brick.len3D = Distance_Basics.distance3D(brick.pt1, brick.pt2)
             If brick.pt1 = New cv.Point3f Or brick.pt2 = New cv.Point3f Then
                 brick.len3D = 0
             Else
@@ -16305,7 +16311,7 @@ Namespace VBClasses
                 If standalone And taskAlg.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
                     dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Else
-                    dst1 = srcMustBe8U(src)
+                    dst1 = Mat_Basics.srcMustBe8U(src)
                 End If
             Else
                 dst1 = src
@@ -16350,7 +16356,7 @@ Namespace VBClasses
                 If standalone And taskAlg.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
                     dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 Else
-                    dst1 = srcMustBe8U(src)
+                    dst1 = Mat_Basics.srcMustBe8U(src)
                 End If
             Else
                 dst1 = src
@@ -16614,11 +16620,11 @@ Namespace VBClasses
                 If rc.eq = newVec4f Then
                     rc.eq = New cv.Vec4f
                     If options.useMaskPoints Then
-                        rc.eq = fitDepthPlane(planeCells.buildMaskPointEq(rc))
+                        rc.eq = Plane_Basics.fitDepthPlane(planeCells.buildMaskPointEq(rc))
                     ElseIf options.useContourPoints Then
-                        rc.eq = fitDepthPlane(planeCells.buildContourPoints(rc))
+                        rc.eq = Plane_Basics.fitDepthPlane(planeCells.buildContourPoints(rc))
                     ElseIf options.use3Points Then
-                        rc.eq = build3PointEquation(rc)
+                        rc.eq = Plane_Basics.build3PointEquation(rc)
                     End If
                 End If
                 dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)),
@@ -16650,7 +16656,7 @@ Namespace VBClasses
                 If rc.mask.Get(Of Byte)(pt.Y, pt.X) = 0 Then Continue For
                 fitPoints.Add(taskAlg.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X))
             Next
-            rc.eq = fitDepthPlane(fitPoints)
+            rc.eq = Plane_Basics.fitDepthPlane(fitPoints)
             If standaloneTest() Then
                 dst3.SetTo(0)
                 dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)
@@ -16681,7 +16687,7 @@ Namespace VBClasses
                     If rc.mask.Get(Of Byte)(y, x) Then fitPoints.Add(taskAlg.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x))
                 Next
             Next
-            rc.eq = fitDepthPlane(fitPoints)
+            rc.eq = Plane_Basics.fitDepthPlane(fitPoints)
             If standaloneTest() Then
                 dst3.SetTo(0)
                 dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)

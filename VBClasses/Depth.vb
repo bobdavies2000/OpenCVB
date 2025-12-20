@@ -96,7 +96,7 @@ Namespace VBClasses
                 Dim contour = sortContours.ElementAt(i).Value
                 Dim minRect = cv.Cv2.MinAreaRect(contour)
                 Dim nextColor = New cv.Scalar(taskAlg.vecColors(i Mod 256)(0), taskAlg.vecColors(i Mod 256)(1), taskAlg.vecColors(i Mod 256)(2))
-                DrawRotatedRect(minRect, dst2, nextColor)
+                Rectangle_Basics.DrawRotatedRect(minRect, dst2, nextColor)
                 DrawTour(dst3, contour.ToList, white, taskAlg.lineWidth)
             Next
             cv.Cv2.AddWeighted(dst2, 0.5, taskAlg.depthRGB, 0.5, 0, dst2)

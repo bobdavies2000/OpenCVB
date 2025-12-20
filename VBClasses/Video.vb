@@ -129,7 +129,7 @@ Namespace VBClasses
                 If standaloneTest() Then
                     For i = 0 To contours.Length - 1
                         Dim minRect = cv.Cv2.MinAreaRect(contours(i))
-                        DrawRotatedRect(minRect, dst2, cv.Scalar.Red)
+                        Rectangle_Basics.DrawRotatedRect(minRect, dst2, cv.Scalar.Red)
                     Next
                 End If
                 dst3 = video.dst2

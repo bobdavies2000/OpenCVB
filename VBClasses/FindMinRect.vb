@@ -12,7 +12,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 If Not taskAlg.heartBeat Then Exit Sub
                 options.Run()
-                inputPoints = quickRandomPoints(options.numPoints)
+                inputPoints = Rectangle_EnclosingPoints.quickRandomPoints(options.numPoints)
             End If
 
             If inputPoints.Count = 0 Then
@@ -55,7 +55,7 @@ Namespace VBClasses
                 Dim minRect = cv.Cv2.MinAreaRect(tour)
                 If minRect.BoundingRect.Width > 1 And minRect.BoundingRect.Height > 1 Then
                     contourCount += 1
-                    DrawRotatedRect(minRect, dst1, contourCount Mod 256)
+                    Rectangle_Basics.DrawRotatedRect(minRect, dst1, contourCount Mod 256)
                 End If
             Next
             dst2 = PaletteFull(dst1)

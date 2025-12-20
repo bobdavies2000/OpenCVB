@@ -117,7 +117,7 @@ Namespace VBClasses
                 strOut = "Gravity-oriented gMatrix" + vbCrLf
                 strOut += taskAlg.gmat.strOut + vbCrLf
                 strOut += vbCrLf + "New gMatrix from sliders" + vbCrLf
-                strOut += gMatrixToStr(taskAlg.gmat.gMatrix) + vbCrLf + vbCrLf
+                strOut += IMU_GMatrix.gMatrixToStr(taskAlg.gmat.gMatrix) + vbCrLf + vbCrLf
                 strOut += "Angle X = " + Format(options.rotateX, fmt1) + vbCrLf
                 strOut += "Angle Y = " + Format(options.rotateY, fmt1) + vbCrLf
                 strOut += "Angle Z = " + Format(options.rotateZ, fmt1) + vbCrLf

@@ -11,7 +11,7 @@ Namespace VBClasses
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = srcMustBe8U(src)
+            dst1 = Mat_Basics.srcMustBe8U(src)
 
             Dim imagePtr As IntPtr
             Dim inputData(dst1.Total - 1) As Byte
@@ -69,7 +69,7 @@ Namespace VBClasses
                 End If
 
                 If usedColor.Contains(rc.color) Then
-                    rc.color = randomCellColor()
+                    rc.color = Palette_Basics.randomCellColor()
                     rc.age = 1
                 End If
                 usedColor.Add(rc.color)
@@ -114,7 +114,7 @@ Namespace VBClasses
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst1 = srcMustBe8U(src)
+            dst1 = Mat_Basics.srcMustBe8U(src)
 
             Dim imagePtr As IntPtr
             Dim inputData(dst1.Total - 1) As Byte
@@ -172,7 +172,7 @@ Namespace VBClasses
                 End If
 
                 If usedColor.Contains(rc.color) Then
-                    rc.color = randomCellColor()
+                    rc.color = Palette_Basics.randomCellColor()
                     rc.age = 1
                 End If
                 usedColor.Add(rc.color)

@@ -27,7 +27,7 @@ Namespace VBClasses
             If trackbox.Width <> 0 Then
                 cv.Cv2.MeanShift(dst1, trackbox, cv.TermCriteria.Both(10, 1))
                 dst2.Rectangle(trackbox, cv.Scalar.Red, rectangleEdgeWidth, taskAlg.lineType)
-                dst3 = Show_HSV_Hist(histogram)
+                dst3 = CamShift_Basics.Show_HSV_Hist(histogram)
                 dst3 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR)
             End If
         End Sub

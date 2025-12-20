@@ -35,9 +35,9 @@ Namespace VBClasses
             taskAlg.contours.Run(src)
             dst2 = taskAlg.contours.dst2
             For Each contour In taskAlg.contours.contourList
-                Dim maxDist = GetMaxDistDepth(contour.mask, contour.rect)
+                Dim maxDist = Distance_Basics.GetMaxDistDepth(contour.mask, contour.rect)
                 DrawCircle(dst2, maxDist)
-                maxDist = GetMaxDist(contour.mask, contour.rect)
+                maxDist = Distance_Basics.GetMaxDist(contour.mask, contour.rect)
                 DrawCircle(dst2, maxDist, blue)
             Next
         End Sub
@@ -58,7 +58,7 @@ Namespace VBClasses
             dst2 = taskAlg.contours.dst2
             labels(2) = taskAlg.contours.labels(2)
             For Each contour In taskAlg.contours.contourList
-                Dim maxDist = GetMaxDistDepth(contour.mask, contour.rect)
+                Dim maxDist = Distance_Basics.GetMaxDistDepth(contour.mask, contour.rect)
 
                 Dim rleft = contour.rect, rRight = contour.rect
                 rleft.Width = maxDist.X - contour.rect.X
@@ -104,7 +104,7 @@ Namespace VBClasses
             taskAlg.contours.Run(src)
             dst2 = taskAlg.contours.dst2
             For Each contour In taskAlg.contours.contourList
-                Dim maxDist = GetMaxDistDepth(contour.mask, contour.rect)
+                Dim maxDist = Distance_Basics.GetMaxDistDepth(contour.mask, contour.rect)
 
                 Dim rleft = contour.rect, rRight = contour.rect
                 rleft.Width = maxDist.X - contour.rect.X
