@@ -1,6 +1,7 @@
 Imports System.IO
 Imports System.Text.RegularExpressions
 Imports System.Threading
+Imports System.Drawing
 Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
@@ -19,6 +20,7 @@ Namespace MainUI
         Dim testAllToolbarBitmap As Bitmap
         Dim resolutionDetails As String
         Dim magnifyIndex As Integer
+        Dim windowsFont = New System.Drawing.Font("Tahoma", 9)
 
         Public Sub setAlgorithmSelection()
             If AvailableAlgorithms.Items.Contains(settings.algorithm) = False Then
@@ -155,7 +157,7 @@ Namespace MainUI
                     If count = 10 Then Exit While
                 End While
             End If
-            SaveJsonSettings()
+            If TestAllTimer.Enabled = False Then SaveJsonSettings()
         End Sub
         Private Sub getLineCounts()
             Dim countFileInfo = New FileInfo(homeDir + "Data/AlgorithmCounts.txt")
@@ -238,25 +240,6 @@ Namespace MainUI
             StatusLabel.Location = New Point(offset, pics(2).Top + h)
             StatusLabel.Width = w * 2
         End Sub
-        Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
-            If TestAllTimer.Enabled Then Exit Sub
-
-            settings.algorithm = AvailableAlgorithms.Text
-
-            SaveJsonSettings()
-            If taskAlg IsNot Nothing Then
-                If Trim(AvailableAlgorithms.Text) = "" Then ' Skip the space between groups
-                    If AvailableAlgorithms.SelectedIndex + 1 < AvailableAlgorithms.Items.Count Then
-                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1)
-                    Else
-                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex - 1)
-                    End If
-                End If
-            End If
-
-            startAlgorithm()
-            updateAlgorithmHistory()
-        End Sub
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             settings = settingsIO.Load()
 
@@ -307,10 +290,27 @@ Namespace MainUI
             setAlgorithmSelection()
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
+            Static lastTime As DateTime = Now
+            Dim timeNow As DateTime = Now
+            Static lastWriteTime = timeNow
+
+            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+            totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
+
+            lastWriteTime = timeNow
+            If fpsWriteCount = 5 Then
+                Debug.WriteLine("")
+                fpsWriteCount = 0
+            End If
+            fpsWriteCount += 1
+            Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + vbCrLf +
+                        " " + Format(taskAlg.fpsAlgorithm, "0") + " FPS Algorithm" + vbCrLf +
+                        " " + Format(taskAlg.fpsCamera, "0") + " FPS Camera")
+
             If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
                 AvailableAlgorithms.SelectedIndex = 0
             Else
-                If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = "" Then
+                If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = " " Then
                     AvailableAlgorithms.SelectedIndex += 2
                 Else
                     AvailableAlgorithms.SelectedIndex += 1
@@ -320,8 +320,27 @@ Namespace MainUI
             ' skip testing the XO_ algorithms (XO.vb)  They are obsolete.
             If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
 
-            Static startingAlgorithm = AvailableAlgorithms.Text
+            taskAlg.Settings.algorithm = AvailableAlgorithms.Text
             startAlgorithm()
+        End Sub
+        Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
+            If TestAllTimer.Enabled Then Exit Sub
+
+            settings.algorithm = AvailableAlgorithms.Text
+
+            SaveJsonSettings()
+            If taskAlg IsNot Nothing Then
+                If Trim(AvailableAlgorithms.Text) = "" Then ' Skip the space between groups
+                    If AvailableAlgorithms.SelectedIndex + 1 < AvailableAlgorithms.Items.Count Then
+                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1)
+                    Else
+                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex - 1)
+                    End If
+                End If
+            End If
+
+            startAlgorithm()
+            updateAlgorithmHistory()
         End Sub
         Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
             TestAllTimer.Enabled = Not TestAllTimer.Enabled
@@ -353,26 +372,25 @@ Namespace MainUI
             Dim pic = DirectCast(sender, PictureBox)
             g.ScaleTransform(1, 1)
 
-            Static displayimage As New cv.Mat
-            displayimage = taskAlg.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+            Dim displayimage = taskAlg.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
             Dim bitmap = cvext.BitmapConverter.ToBitmap(displayimage)
+            If pics(pic.Tag).Image IsNot Nothing Then pics(pic.Tag).Image.Dispose()
+            'pic.Image = bitmap
+            'g.DrawImage(pic.Image, 0, 0)
             g.DrawImage(bitmap, 0, 0)
+            bitmap.Dispose()
 
-            For i = 0 To taskAlg.labels.Count - 1
-                labels(i).Text = taskAlg.labels(i)
-            Next
+            labels(pic.Tag).Text = taskAlg.labels(pic.Tag)
 
             Dim ratioX = pic.Width / settings.workRes.Width
             Dim ratioY = pic.Height / settings.workRes.Height
 
-            Dim font = New System.Drawing.Font("Tahoma", 9)
             For Each tt In taskAlg.trueData
                 If tt.text Is Nothing Then Continue For
                 If tt.text.Length > 0 And tt.picTag = pic.Tag Then
-                    g.DrawString(tt.text, font, New SolidBrush(Color.White), CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
+                    g.DrawString(tt.text, windowsFont, New SolidBrush(Color.White), CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
                 End If
             Next
-            displayimage.Dispose()
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
