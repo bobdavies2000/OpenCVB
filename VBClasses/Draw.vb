@@ -247,6 +247,20 @@ Namespace VBClasses
             taskAlg.kalman = New Kalman_Basics
             desc = "Use OpenCV's ellipse function to draw an arc"
         End Sub
+        Public Shared Sub DrawRotatedOutline(rotatedRect As cv.RotatedRect, dst2 As cv.Mat, color As cv.Scalar)
+            Dim pts = rotatedRect.Points()
+            Dim lastPt = pts(0)
+            For i = 1 To pts.Length
+                Dim index = i Mod pts.Length
+                Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
+                vbc.DrawLine(dst2, pt, lastPt, taskAlg.highlight)
+                lastPt = pt
+            Next
+        End Sub
+        Public Shared Function InitRandomRect(margin As Integer) As cv.Rect
+            Return New cv.Rect(msRNG.Next(margin, taskAlg.workRes.Width - 2 * margin), msRNG.Next(margin, taskAlg.workRes.Height - 2 * margin),
+                               msRNG.Next(margin, taskAlg.workRes.Width - 2 * margin), msRNG.Next(margin, taskAlg.workRes.Height - 2 * margin))
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
             If taskAlg.heartBeat Then
@@ -271,7 +285,7 @@ Namespace VBClasses
             dst2.SetTo(white)
             If options.drawFull Then
                 dst2.Ellipse(rr, color, thickness, taskAlg.lineType)
-                DrawRotatedOutline(rr, dst2, taskAlg.scalarColors(colorIndex))
+                Draw_Arc.DrawRotatedOutline(rr, dst2, taskAlg.scalarColors(colorIndex))
             Else
                 Dim angle = taskAlg.kalman.kOutput(4)
                 Dim startAngle = taskAlg.kalman.kOutput(5)
@@ -298,10 +312,10 @@ Namespace VBClasses
         Dim hitCount = 0
         Private Sub setup()
             ReDim taskAlg.kalman.kInput(8)
-            Dim r = InitRandomRect(25)
+            Dim r = Draw_Arc.InitRandomRect(25)
             pt1 = New cv.Point(r.X, r.Y)
             pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
-            rect = InitRandomRect(25)
+            rect = Draw_Arc.InitRandomRect(25)
             flow.flowText.Add("--------------------------- setup ---------------------------")
         End Sub
         Public Sub New()

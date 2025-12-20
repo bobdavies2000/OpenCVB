@@ -28,7 +28,7 @@ Namespace VBClasses
                 DrawLine(dst2, lpInput2.p1, lpInput2.p2)
                 SetTrueText("Line 1", lpInput1.p1, 2)
                 SetTrueText("Line 2", lpInput2.p1, 2)
-                DrawRotatedOutline(rotatedRect, dst2, cv.Scalar.Yellow)
+                Draw_Arc.DrawRotatedOutline(rotatedRect, dst2, cv.Scalar.Yellow)
             End If
         End Sub
     End Class

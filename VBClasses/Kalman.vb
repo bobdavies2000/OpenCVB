@@ -246,7 +246,7 @@ Namespace VBClasses
 
                 Static lastRect As cv.Rect = rect
                 If lastRect = rect Then
-                    Dim r = InitRandomRect(25)
+                    Dim r = Draw_Arc.InitRandomRect(25)
                     Dim array() As Single = {r.X, r.Y, r.Width, r.Height}
                     input = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32F, array)
                 End If

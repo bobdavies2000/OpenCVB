@@ -2843,7 +2843,7 @@ Namespace VBClasses
                         minRect.Run(src)
                         dst2.Line(lp1.p1, lp1.p2, taskAlg.highlight, taskAlg.lineWidth, taskAlg.lineType)
                         dst2.Line(lp2.p1, lp2.p2, taskAlg.highlight, taskAlg.lineWidth, taskAlg.lineType)
-                        DrawRotatedOutline(minRect.rotatedRect, dst3, cv.Scalar.Yellow)
+                        Draw_Arc.DrawRotatedOutline(minRect.rotatedRect, dst3, cv.Scalar.Yellow)
                     End If
                 Next
             Next

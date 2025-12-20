@@ -437,14 +437,15 @@ Namespace MainUI
                 CamSwitchTimer.Enabled = False
                 CameraSwitching.Visible = False
             End If
-            AvailableAlgorithms.Text = settings.algorithm
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
+            If taskAlg Is Nothing Then Exit Sub
+
             Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + vbCrLf +
                         " " + Format(taskAlg.fpsAlgorithm, "0") + " FPS Algorithm" + vbCrLf +
                         " " + Format(taskAlg.fpsCamera, "0") + " FPS Camera")
 
-            taskTerminate()
+            TaskTerminate()
 
             Static lastTime As DateTime = Now
             Dim timeNow As DateTime = Now

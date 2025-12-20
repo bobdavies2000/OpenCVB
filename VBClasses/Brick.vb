@@ -1006,6 +1006,11 @@ Namespace VBClasses
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Display a heatmap of the correlation of the left and right images for each brick."
         End Sub
+        Public Function ShowPaletteCorrelation(input As cv.Mat) As cv.Mat
+            Dim output As New cv.Mat
+            cv.Cv2.ApplyColorMap(input, output, taskAlg.correlationColorMap)
+            Return output
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1.SetTo(0)
             taskAlg.depthAndDepthRange = ""

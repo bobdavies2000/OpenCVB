@@ -19,6 +19,7 @@ Namespace VBClasses
         End Sub
     End Class
     Public Class TaskParent : Implements IDisposable
+        ' these variables are specific to each algorithm
         Public check As New OptionsCheckbox
         Public combo As New OptionsCombo
         Public radio As New OptionsRadioButtons
@@ -97,21 +98,6 @@ Namespace VBClasses
         Public Sub DrawCircle(dst As cv.Mat, pt As cv.Point2f, color As cv.Scalar)
             dst.Circle(pt, taskAlg.DotSize, color, -1, taskAlg.lineType)
         End Sub
-        Public Sub DrawRotatedOutline(rotatedRect As cv.RotatedRect, dst2 As cv.Mat, color As cv.Scalar)
-            Dim pts = rotatedRect.Points()
-            Dim lastPt = pts(0)
-            For i = 1 To pts.Length
-                Dim index = i Mod pts.Length
-                Dim pt = New cv.Point(CInt(pts(index).X), CInt(pts(index).Y))
-                vbc.DrawLine(dst2, pt, lastPt, taskAlg.highlight)
-                lastPt = pt
-            Next
-        End Sub
-        Public Function ShowPaletteCorrelation(input As cv.Mat) As cv.Mat
-            Dim output As New cv.Mat
-            cv.Cv2.ApplyColorMap(input, output, taskAlg.correlationColorMap)
-            Return output
-        End Function
         Public Shared Function PaletteFull(input As cv.Mat) As cv.Mat
             Dim output As New cv.Mat
             If input.Type <> cv.MatType.CV_8U Then
@@ -135,15 +121,6 @@ Namespace VBClasses
             End If
 
             Return output
-        End Function
-        Public Shared Function ShowPaletteOriginal(input As cv.Mat) As cv.Mat
-            If taskAlg.paletteRandom Is Nothing Then taskAlg.paletteRandom = New Palette_RandomColors
-            If input.Type <> cv.MatType.CV_8U Then input.ConvertTo(input, cv.MatType.CV_8U)
-            Return taskAlg.paletteRandom.useColorMapWithBlack(input).Clone
-        End Function
-        Public Function ShowPaletteFullColor(input As cv.Mat) As cv.Mat
-            If taskAlg.paletteRandom Is Nothing Then taskAlg.paletteRandom = New Palette_RandomColors
-            Return taskAlg.paletteRandom.useColorMapFull(input)
         End Function
         Public Function ShowAddweighted(src1 As cv.Mat, src2 As cv.Mat, ByRef label As String) As cv.Mat
             Static addw As New AddWeighted_Basics
@@ -179,38 +156,12 @@ Namespace VBClasses
             label = taskAlg.redColor.labels(2)
             Return taskAlg.redColor.dst2
         End Function
-        Public Function InitRandomRect(margin As Integer) As cv.Rect
-            Return New cv.Rect(msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin),
-                           msRNG.Next(margin, dst2.Width - 2 * margin), msRNG.Next(margin, dst2.Height - 2 * margin))
-        End Function
         Public Shared Sub DrawTour(dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -1,
                         Optional lineType As cv.LineTypes = cv.LineTypes.Link8)
             If contour Is Nothing Then Exit Sub
             If contour.Count < 3 Then Exit Sub ' this is not enough to draw.
             Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
             cv.Cv2.DrawContours(dst, listOfPoints, 0, color, lineWidth, lineType)
-        End Sub
-        Public Sub DetectFace(ByRef src As cv.Mat, cascade As cv.CascadeClassifier)
-            Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            Dim faces() = cascade.DetectMultiScale(gray, 1.08, 3, cv.HaarDetectionTypes.ScaleImage, New cv.Size(30, 30))
-            For Each fface In faces
-                DrawRect(src, fface, cv.Scalar.Red)
-            Next
-        End Sub
-        Public Sub houghShowLines(dst As cv.Mat, segments() As cv.LineSegmentPolar, desiredCount As Integer)
-            For i = 0 To Math.Min(segments.Length, desiredCount) - 1
-                Dim rho As Single = segments(i).Rho
-                Dim theta As Single = segments(i).Theta
-
-                Dim a As Double = Math.Cos(theta)
-                Dim b As Double = Math.Sin(theta)
-                Dim x As Double = a * rho
-                Dim y As Double = b * rho
-
-                Dim pt1 As cv.Point = New cv.Point(x + 1000 * -b, y + 1000 * a)
-                Dim pt2 As cv.Point = New cv.Point(x - 1000 * -b, y - 1000 * a)
-                dst.Line(pt1, pt2, cv.Scalar.Red, taskAlg.lineWidth + 1, taskAlg.lineType, 0)
-            Next
         End Sub
         Public Sub Run(src As cv.Mat)
             taskAlg.cpu.measureStartRun(traceName)

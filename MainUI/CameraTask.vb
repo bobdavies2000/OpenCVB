@@ -4,7 +4,6 @@ Namespace MainUI
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
         Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
-            Application.DoEvents()
             Me.Refresh()
         End Sub
         Private Sub StartCamera()

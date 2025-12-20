@@ -25,7 +25,7 @@ Namespace VBClasses
                 For Each pt In inputPoints
                     DrawCircle(dst2, pt, taskAlg.DotSize + 2, cv.Scalar.Red)
                 Next
-                DrawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
+                Draw_Arc.DrawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
             End If
         End Sub
     End Class

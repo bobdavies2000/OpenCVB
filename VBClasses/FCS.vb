@@ -117,6 +117,10 @@ Namespace VBClasses
             If taskAlg.contours Is Nothing Then taskAlg.contours = New Contour_Basics_List
             desc = "Create the reference map for FCS. "
         End Sub
+        Public Function ShowPaletteFullColor(input As cv.Mat) As cv.Mat
+            If taskAlg.paletteRandom Is Nothing Then taskAlg.paletteRandom = New Palette_RandomColors
+            Return taskAlg.paletteRandom.useColorMapFull(input)
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             taskAlg.contours.Run(src)
             Static restartRequest As Boolean

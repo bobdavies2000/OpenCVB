@@ -9,6 +9,21 @@ Namespace VBClasses
         Public Sub New()
             desc = "Use Houghlines to find lines in the image."
         End Sub
+        Public Shared Sub houghShowLines(dst As cv.Mat, segments() As cv.LineSegmentPolar, desiredCount As Integer)
+            For i = 0 To Math.Min(segments.Length, desiredCount) - 1
+                Dim rho As Single = segments(i).Rho
+                Dim theta As Single = segments(i).Theta
+
+                Dim a As Double = Math.Cos(theta)
+                Dim b As Double = Math.Sin(theta)
+                Dim x As Double = a * rho
+                Dim y As Double = b * rho
+
+                Dim pt1 As cv.Point = New cv.Point(x + 1000 * -b, y + 1000 * a)
+                Dim pt2 As cv.Point = New cv.Point(x - 1000 * -b, y - 1000 * a)
+                dst.Line(pt1, pt2, cv.Scalar.Red, taskAlg.lineWidth + 1, taskAlg.lineType, 0)
+            Next
+        End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
             edges.Run(src)
@@ -48,7 +63,7 @@ Namespace VBClasses
             dst2 = cv.Cv2.ImRead(taskAlg.homeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
             dst3 = dst2.Clone
             hough.Run(dst2)
-            houghShowLines(dst3, hough.segments, hough.options.lineCount)
+            Hough_Basics.houghShowLines(dst3, hough.segments, hough.options.lineCount)
         End Sub
     End Class
 
@@ -114,7 +129,7 @@ Namespace VBClasses
                 Exit Sub
             End If
             dst3(roi).SetTo(0)
-            houghShowLines(dst3(roi), segments, 1)
+            Hough_Basics.houghShowLines(dst3(roi), segments, 1)
         End Sub)
         End Sub
     End Class
@@ -296,8 +311,8 @@ Namespace VBClasses
             For Each roi In taskAlg.gridRects
                 Dim segments = cv.Cv2.HoughLines(edges.dst2(roi), options.rho, options.theta, options.threshold)
                 If segments.Count = 0 Then Continue For
-                houghShowLines(dst2(roi), segments, 2)
-                houghShowLines(dst3(roi), segments, 2)
+                Hough_Basics.houghShowLines(dst2(roi), segments, 2)
+                Hough_Basics.houghShowLines(dst3(roi), segments, 2)
             Next
         End Sub
     End Class
@@ -323,10 +338,10 @@ Namespace VBClasses
             If standaloneTest() Then
                 src.CopyTo(dst2)
                 dst2.SetTo(white, edges.dst2)
-                houghShowLines(dst2, segments, options.lineCount)
+                Hough_Basics.houghShowLines(dst2, segments, options.lineCount)
 
                 dst3.SetTo(0)
-                houghShowLines(dst3, segments, options.lineCount)
+                Hough_Basics.houghShowLines(dst3, segments, options.lineCount)
                 dst3.SetTo(white, edges.dst2)
             End If
         End Sub

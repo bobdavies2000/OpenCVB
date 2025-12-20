@@ -88,8 +88,8 @@ Namespace VBClasses
                 Dim r2 As cv.RotatedRect = draw.rotatedRectangles(1)
                 rect1 = r1.BoundingRect
                 rect2 = r2.BoundingRect
-                DrawRotatedOutline(r1, dst3, cv.Scalar.Yellow)
-                DrawRotatedOutline(r2, dst3, cv.Scalar.Yellow)
+                Draw_Arc.DrawRotatedOutline(r1, dst3, cv.Scalar.Yellow)
+                Draw_Arc.DrawRotatedOutline(r2, dst3, cv.Scalar.Yellow)
             Else
                 rect1 = draw.rectangles(0)
                 rect2 = draw.rectangles(1)
@@ -325,7 +325,7 @@ Namespace VBClasses
             End If
 
             minRect = cv.Cv2.MinAreaRect(pointList.ToArray)
-            DrawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
+            Draw_Arc.DrawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
         End Sub
     End Class
 

@@ -89,6 +89,7 @@ Public Class TreeviewForm
         End Function
     End Class
     Public Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
+        If taskAlg Is Nothing Then Exit Sub
         Static saveCount As Integer
         If taskAlg.cpu.callTrace.Count <> saveCount Then
             saveCount = taskAlg.cpu.callTrace.Count
