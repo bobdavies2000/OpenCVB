@@ -31,10 +31,6 @@ Namespace MainUI
 
                 taskAlg.fpsAlgorithm = algFrames / (taskTimerInterval / 1000)
                 If taskAlg.fpsAlgorithm >= 99 Then taskAlg.fpsAlgorithm = 99
-
-                If TestAllTimer.Enabled Then
-
-                End If
             End If
         End Sub
     End Class

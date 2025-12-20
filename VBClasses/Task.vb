@@ -2,7 +2,6 @@ Imports System.IO
 Imports PixelViewer
 Imports cv = OpenCvSharp
 Imports jsonShared
-
 Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
         Public Sub Dispose() Implements IDisposable.Dispose
@@ -38,7 +37,7 @@ Namespace VBClasses
                 sharpGL.Show()
             End If
 
-            Dim fps = taskAlg.Settings.fpsPaintTarget
+            Dim fps = taskAlg.Settings.FPSPaintTarget
             gOptions = New OptionsGlobal
             gOptions.DisplayFPSSlider.Value = fps
             featureOptions = New OptionsFeatures

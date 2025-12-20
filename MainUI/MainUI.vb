@@ -1,10 +1,13 @@
 Imports System.IO
 Imports System.Text.RegularExpressions
 Imports System.Threading
-Imports System.Drawing
 Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
+Imports System.Runtime.InteropServices
+
+
+
 Namespace MainUI
     Partial Public Class MainUI
         Dim isPlaying As Boolean = False
@@ -147,7 +150,7 @@ Namespace MainUI
                 Next
             End If
         End Sub
-        Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        Private Sub MainForm_Closing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             If isPlaying Then
                 StopCamera()
                 Dim count As Integer
@@ -317,6 +320,9 @@ Namespace MainUI
                 End If
             End If
 
+            Debug.WriteLine(vbCrLf + "GDI: " & GdiMonitor.GetGdiCount())
+            Debug.WriteLine("USER: " & GdiMonitor.GetUserCount())
+
             ' skip testing the XO_ algorithms (XO.vb)  They are obsolete.
             If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
 
@@ -374,23 +380,29 @@ Namespace MainUI
 
             Dim displayimage = taskAlg.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
             Dim bitmap = cvext.BitmapConverter.ToBitmap(displayimage)
+
+#If 0 Then
             If pics(pic.Tag).Image IsNot Nothing Then pics(pic.Tag).Image.Dispose()
-            'pic.Image = bitmap
-            'g.DrawImage(pic.Image, 0, 0)
+            pics(pic.Tag).Image = bitmap
+#Else
+            If pics(pic.Tag).Image IsNot Nothing Then pics(pic.Tag).Image.Dispose()
             g.DrawImage(bitmap, 0, 0)
             bitmap.Dispose()
+#End If
 
             labels(pic.Tag).Text = taskAlg.labels(pic.Tag)
 
             Dim ratioX = pic.Width / settings.workRes.Width
             Dim ratioY = pic.Height / settings.workRes.Height
 
+            Dim brush As New SolidBrush(Color.White)
             For Each tt In taskAlg.trueData
                 If tt.text Is Nothing Then Continue For
                 If tt.text.Length > 0 And tt.picTag = pic.Tag Then
-                    g.DrawString(tt.text, windowsFont, New SolidBrush(Color.White), CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
+                    g.DrawString(tt.text, windowsFont, brush, CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
                 End If
             Next
+            brush.Dispose()
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
