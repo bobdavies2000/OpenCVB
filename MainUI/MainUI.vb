@@ -4,10 +4,6 @@ Imports System.Threading
 Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
-Imports System.Runtime.InteropServices
-
-
-
 Namespace MainUI
     Partial Public Class MainUI
         Dim isPlaying As Boolean = False
@@ -25,6 +21,8 @@ Namespace MainUI
         Dim magnifyIndex As Integer
         Dim windowsFont = New System.Drawing.Font("Tahoma", 9)
         Private Sub addPics()
+            pics.Clear()
+
             For i = 0 To 3
                 Dim pic = New PictureBox()
                 AddHandler pic.DoubleClick, AddressOf campic_DoubleClick
@@ -60,6 +58,7 @@ Namespace MainUI
                     Me.Controls.Remove(pic)
                 End If
             Next
+            pics.Clear()
         End Sub
         Private Sub algHistory_Clicked(sender As Object, e As EventArgs)
             Dim item = TryCast(sender, ToolStripMenuItem)
@@ -254,7 +253,7 @@ Namespace MainUI
             Dim offset = 10
             Dim h As Integer = (Me.Height - StatusLabel.Height - topStart - labelHeight * 2) / 2 - 20
             Dim w As Integer = Me.Width / 2 - offset * 2
-            For i = 0 To 3
+            For i = 0 To pics.Count - 1
                 labels(i).Location = Choose(i + 1, New Point(offset, MainToolStrip.Height),
                                                    New Point(w + offset, labelRGB.Top),
                                                    New Point(offset, topStart + labelHeight + h),
@@ -299,28 +298,40 @@ Namespace MainUI
             PausePlayButton.PerformClick()
         End Sub
         Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
-            If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
-
             isPlaying = Not isPlaying
 
             Dim filePath = Path.Combine(homeDir + "MainUI\Data", If(isPlaying, "PauseButton.png", "Run.png"))
             PausePlayButton.Image = New Bitmap(filePath)
 
-            If isPlaying Then TaskStart() Else TaskTerminate()
+            If isPlaying Then
+                CameraSwitching.Visible = True
+                CamSwitchTimer.Enabled = True
+                CameraSwitching.Text = settings.cameraName + " starting"
+                CameraSwitching.BringToFront()
+
+                StartCamera()
+                AvailableAlgorithms.SelectedItem = settings.algorithm
+
+                CameraSwitching.Visible = False
+                CamSwitchTimer.Enabled = False
+
+                Me.MainForm_Resize(Nothing, Nothing)
+            Else
+                taskAlg.readyForCameraInput = False
+                StopCamera()
+                taskAlg.Dispose()
+                taskAlg = Nothing
+            End If
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
-            If TestAllTimer.Enabled Then Exit Sub
-
             settings.algorithm = AvailableAlgorithms.Text
+            If TestAllTimer.Enabled = False Then SaveJsonSettings()
 
-            SaveJsonSettings()
             If taskAlg IsNot Nothing Then
-                If Trim(AvailableAlgorithms.Text) = "" Then ' Skip the space between groups
-                    If AvailableAlgorithms.SelectedIndex + 1 < AvailableAlgorithms.Items.Count Then
-                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1)
-                    Else
-                        AvailableAlgorithms.Text = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex - 1)
-                    End If
+                If AvailableAlgorithms.SelectedIndex + 1 < AvailableAlgorithms.Items.Count Then
+                    settings.algorithm = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1)
+                Else
+                    settings.algorithm = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex - 1)
                 End If
             End If
 
@@ -373,42 +384,25 @@ Namespace MainUI
             brush.Dispose()
             bitmap.Dispose()
         End Sub
-        Private Sub TaskTerminate()
-            taskAlg.readyForCameraInput = False
-            StopCamera()
-            taskAlg.Dispose()
-            taskAlg = Nothing
-        End Sub
-        Private Sub TaskStart()
-            CameraSwitching.Visible = True
-            CameraSwitching.Text = settings.cameraName + " starting"
-            CameraSwitching.BringToFront()
-            CamSwitchTimer.Enabled = True
-
-            StartCamera()
-            AvailableAlgorithms.SelectedItem = settings.algorithm
-
-            Me.MainForm_Resize(Nothing, Nothing)
-        End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
             If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
 
             Debug.WriteLine(vbCrLf + "OptionsTesting GDI: " & GdiMonitor.GetGdiCount())
             Debug.WriteLine("OptionsTesting USER: " & GdiMonitor.GetUserCount())
 
-            TaskTerminate()
+            PausePlayButton.PerformClick()
 
             If Options.ShowDialog() = DialogResult.OK Then
                 getLineCounts()
                 SaveJsonSettings()
             End If
 
-            TaskStart()
+            PausePlayButton.PerformClick()
         End Sub
         Private Sub startAlgorithm()
             taskAlg = New AlgorithmTask
 
-            For i = 0 To 3
+            For i = 0 To pics.Count - 1
                 taskAlg.dstList(i) = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
             Next
 
@@ -426,17 +420,12 @@ Namespace MainUI
             taskAlg.Initialize(settings)
             taskAlg.MainUI_Algorithm = createAlgorithm(settings.algorithm)
             AlgDescription.Text = taskAlg.MainUI_Algorithm.desc
-            MainToolStrip.Refresh()
             taskAlg.resolutionDetails = resolutionDetails
 
             If taskAlg.calibData IsNot Nothing Then taskAlg.calibData = camera.calibData
 
             Dim sender As Object = Nothing, e As EventArgs = Nothing
             MainForm_Resize(sender, e)
-            If CameraSwitching.Visible Then
-                CamSwitchTimer.Enabled = False
-                CameraSwitching.Visible = False
-            End If
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
             If taskAlg Is Nothing Then Exit Sub
@@ -445,7 +434,7 @@ Namespace MainUI
                         " " + Format(taskAlg.fpsAlgorithm, "0") + " FPS Algorithm" + vbCrLf +
                         " " + Format(taskAlg.fpsCamera, "0") + " FPS Camera")
 
-            TaskTerminate()
+            PausePlayButton.PerformClick()
 
             Static lastTime As DateTime = Now
             Dim timeNow As DateTime = Now
@@ -477,8 +466,7 @@ Namespace MainUI
             ' skip testing the XO_ algorithms (XO.vb)  They are obsolete.
             If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
 
-            settings.algorithm = AvailableAlgorithms.Text
-            TaskStart()
+            PausePlayButton.PerformClick()
         End Sub
     End Class
 End Namespace
