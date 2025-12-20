@@ -24,7 +24,43 @@ Namespace MainUI
         Dim resolutionDetails As String
         Dim magnifyIndex As Integer
         Dim windowsFont = New System.Drawing.Font("Tahoma", 9)
+        Private Sub addPics()
+            For i = 0 To 3
+                Dim pic = New PictureBox()
+                AddHandler pic.DoubleClick, AddressOf campic_DoubleClick
+                AddHandler pic.Click, AddressOf clickPic
+                AddHandler pic.Paint, AddressOf Pic_Paint
+                AddHandler pic.MouseDown, AddressOf CamPic_MouseDown
+                AddHandler pic.MouseUp, AddressOf CamPic_MouseUp
+                AddHandler pic.MouseMove, AddressOf CamPic_MouseMove
+                pic.Tag = i
+                pic.BackColor = Color.Black
+                pic.Visible = True
+                pic.SizeMode = PictureBoxSizeMode.StretchImage
+                Me.Controls.Add(pic)
 
+                pics.Add(pic)
+            Next
+        End Sub
+        Private Sub removePics()
+            ' Remove event handlers from PictureBox controls to prevent handle leaks
+            For Each pic In pics
+                If pic IsNot Nothing Then
+                    RemoveHandler pic.DoubleClick, AddressOf campic_DoubleClick
+                    RemoveHandler pic.Click, AddressOf clickPic
+                    RemoveHandler pic.Paint, AddressOf Pic_Paint
+                    RemoveHandler pic.MouseDown, AddressOf CamPic_MouseDown
+                    RemoveHandler pic.MouseUp, AddressOf CamPic_MouseUp
+                    RemoveHandler pic.MouseMove, AddressOf CamPic_MouseMove
+                    ' Dispose the image if it exists
+                    If pic.Image IsNot Nothing Then
+                        pic.Image.Dispose()
+                        pic.Image = Nothing
+                    End If
+                    Me.Controls.Remove(pic)
+                End If
+            Next
+        End Sub
         Public Sub setAlgorithmSelection()
             If AvailableAlgorithms.Items.Contains(settings.algorithm) = False Then
                 AvailableAlgorithms.SelectedIndex = 0
@@ -251,22 +287,7 @@ Namespace MainUI
             testAllToolbarBitmap = New Bitmap(homeDir + "MainUI/Data/testall.png")
             runPlay = New Bitmap(homeDir + "MainUI/Data/Run.png")
 
-            For i = 0 To 3
-                Dim pic = New PictureBox()
-                AddHandler pic.DoubleClick, AddressOf campic_DoubleClick
-                AddHandler pic.Click, AddressOf clickPic
-                AddHandler pic.Paint, AddressOf Pic_Paint
-                AddHandler pic.MouseDown, AddressOf CamPic_MouseDown
-                AddHandler pic.MouseUp, AddressOf CamPic_MouseUp
-                AddHandler pic.MouseMove, AddressOf CamPic_MouseMove
-                pic.Tag = i
-                pic.BackColor = Color.Black
-                pic.Visible = True
-                pic.SizeMode = PictureBoxSizeMode.StretchImage
-                Me.Controls.Add(pic)
-
-                pics.Add(pic)
-            Next
+            addPics()
 
             Me.Location = New Point(settings.MainFormLeft, settings.MainFormTop)
             Me.Size = New Size(settings.MainFormWidth, settings.MainFormHeight)
@@ -326,7 +347,7 @@ Namespace MainUI
             ' skip testing the XO_ algorithms (XO.vb)  They are obsolete.
             If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
 
-            taskAlg.Settings.algorithm = AvailableAlgorithms.Text
+            settings.algorithm = AvailableAlgorithms.Text
             startAlgorithm()
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
@@ -381,14 +402,8 @@ Namespace MainUI
             Dim displayimage = taskAlg.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
             Dim bitmap = cvext.BitmapConverter.ToBitmap(displayimage)
 
-#If 0 Then
-            If pics(pic.Tag).Image IsNot Nothing Then pics(pic.Tag).Image.Dispose()
-            pics(pic.Tag).Image = bitmap
-#Else
             If pics(pic.Tag).Image IsNot Nothing Then pics(pic.Tag).Image.Dispose()
             g.DrawImage(bitmap, 0, 0)
-            bitmap.Dispose()
-#End If
 
             labels(pic.Tag).Text = taskAlg.labels(pic.Tag)
 
