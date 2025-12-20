@@ -61,17 +61,14 @@ Namespace MainUI
                 End If
             Next
         End Sub
-        Public Sub setAlgorithmSelection()
+        Private Sub algHistory_Clicked(sender As Object, e As EventArgs)
+            Dim item = TryCast(sender, ToolStripMenuItem)
+            settings.algorithm = item.Text
             If AvailableAlgorithms.Items.Contains(settings.algorithm) = False Then
                 AvailableAlgorithms.SelectedIndex = 0
             Else
                 AvailableAlgorithms.SelectedItem = settings.algorithm
             End If
-        End Sub
-        Private Sub algHistory_Clicked(sender As Object, e As EventArgs)
-            Dim item = TryCast(sender, ToolStripMenuItem)
-            settings.algorithm = item.Text
-            setAlgorithmSelection()
         End Sub
         Public Sub setupAlgorithmHistory()
             If recentMenu Is Nothing Then
@@ -293,7 +290,6 @@ Namespace MainUI
             Me.Size = New Size(settings.MainFormWidth, settings.MainFormHeight)
             Me.Show()
 
-            camSwitchAnnouncement()
             getLineCounts()
 
             LoadAvailableAlgorithms()
@@ -310,45 +306,7 @@ Namespace MainUI
             Dim filePath = Path.Combine(homeDir + "MainUI\Data", If(isPlaying, "PauseButton.png", "Run.png"))
             PausePlayButton.Image = New Bitmap(filePath)
 
-            If isPlaying Then StartCamera() Else StopCamera()
-            setAlgorithmSelection()
-        End Sub
-        Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-            Static lastTime As DateTime = Now
-            Dim timeNow As DateTime = Now
-            Static lastWriteTime = timeNow
-
-            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
-            totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
-
-            lastWriteTime = timeNow
-            If fpsWriteCount = 5 Then
-                Debug.WriteLine("")
-                fpsWriteCount = 0
-            End If
-            fpsWriteCount += 1
-            Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + vbCrLf +
-                        " " + Format(taskAlg.fpsAlgorithm, "0") + " FPS Algorithm" + vbCrLf +
-                        " " + Format(taskAlg.fpsCamera, "0") + " FPS Camera")
-
-            If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
-                AvailableAlgorithms.SelectedIndex = 0
-            Else
-                If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = " " Then
-                    AvailableAlgorithms.SelectedIndex += 2
-                Else
-                    AvailableAlgorithms.SelectedIndex += 1
-                End If
-            End If
-
-            Debug.WriteLine(vbCrLf + "GDI: " & GdiMonitor.GetGdiCount())
-            Debug.WriteLine("USER: " & GdiMonitor.GetUserCount())
-
-            ' skip testing the XO_ algorithms (XO.vb)  They are obsolete.
-            If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
-
-            settings.algorithm = AvailableAlgorithms.Text
-            startAlgorithm()
+            If isPlaying Then TaskStart() Else TaskTerminate()
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
             If TestAllTimer.Enabled Then Exit Sub
@@ -387,11 +345,6 @@ Namespace MainUI
                 taskAlg.testAllRunning = False
             End If
         End Sub
-        Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
-            For i = 0 To 3
-                pics(i).Refresh() ' control the frequency of paints with global option Display FPS.
-            Next
-        End Sub
         Private Sub Pic_Paint(sender As Object, e As PaintEventArgs)
             If taskAlg Is Nothing Then Exit Sub
 
@@ -418,22 +371,33 @@ Namespace MainUI
                 End If
             Next
             brush.Dispose()
+            bitmap.Dispose()
         End Sub
-        Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
-            If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
+        Private Sub TaskTerminate()
             taskAlg.readyForCameraInput = False
             StopCamera()
             taskAlg.Dispose()
             taskAlg = Nothing
+        End Sub
+        Private Sub TaskStart()
+            camSwitchAnnouncement()
+            StartCamera()
+            startAlgorithm()
+        End Sub
+        Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
+            If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
+
+            Debug.WriteLine(vbCrLf + "OptionsTesting GDI: " & GdiMonitor.GetGdiCount())
+            Debug.WriteLine("OptionsTesting USER: " & GdiMonitor.GetUserCount())
+
+            TaskTerminate()
 
             If Options.ShowDialog() = DialogResult.OK Then
                 getLineCounts()
                 SaveJsonSettings()
             End If
 
-            camSwitchAnnouncement()
-            StartCamera()
-            startAlgorithm()
+            TaskStart()
         End Sub
         Private Sub startAlgorithm()
             taskAlg = New AlgorithmTask
@@ -460,8 +424,6 @@ Namespace MainUI
 
             If taskAlg.calibData IsNot Nothing Then taskAlg.calibData = camera.calibData
 
-            RefreshTimer.Enabled = True
-            RefreshTimer.Interval = 1000 / settings.FPSPaintTarget
             Dim sender As Object = Nothing, e As EventArgs = Nothing
             MainForm_Resize(sender, e)
             If CameraSwitching.Visible Then
@@ -469,6 +431,47 @@ Namespace MainUI
                 CameraSwitching.Visible = False
             End If
             MainToolStrip.Refresh()
+        End Sub
+        Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
+            Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + vbCrLf +
+                        " " + Format(taskAlg.fpsAlgorithm, "0") + " FPS Algorithm" + vbCrLf +
+                        " " + Format(taskAlg.fpsCamera, "0") + " FPS Camera")
+
+            taskTerminate()
+
+            Static lastTime As DateTime = Now
+            Dim timeNow As DateTime = Now
+            Static lastWriteTime = timeNow
+
+            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+            totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
+
+            lastWriteTime = timeNow
+            If fpsWriteCount = 5 Then
+                Debug.WriteLine("")
+                fpsWriteCount = 0
+            End If
+            fpsWriteCount += 1
+
+            If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
+                AvailableAlgorithms.SelectedIndex = 0
+            Else
+                If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = " " Then
+                    AvailableAlgorithms.SelectedIndex += 2
+                Else
+                    AvailableAlgorithms.SelectedIndex += 1
+                End If
+            End If
+
+            Debug.WriteLine(vbCrLf + "GDI: " & GdiMonitor.GetGdiCount())
+            Debug.WriteLine("USER: " & GdiMonitor.GetUserCount())
+
+            ' skip testing the XO_ algorithms (XO.vb)  They are obsolete.
+            If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
+
+            settings.algorithm = AvailableAlgorithms.Text
+
+            TaskStart()
         End Sub
     End Class
 End Namespace

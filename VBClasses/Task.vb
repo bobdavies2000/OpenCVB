@@ -4,17 +4,6 @@ Imports cv = OpenCvSharp
 Imports jsonShared
 Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
-        Public Sub Dispose() Implements IDisposable.Dispose
-            If allOptions IsNot Nothing Then allOptions.Close()
-            If cpu.activeObjects IsNot Nothing Then
-                For Each algorithm In cpu.activeObjects
-                    If algorithm.GetType().GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
-                Next
-            End If
-            For Each mat In taskAlg.dstList
-                If mat IsNot Nothing Then mat.Dispose()
-            Next
-        End Sub
         Public Sub Initialize(settings As jsonShared.Settings)
             taskAlg.Settings = settings
             rgbLeftAligned = True
@@ -295,6 +284,17 @@ Namespace VBClasses
             optionsChanged = True
             firstPass = True
             useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve taskAlg.results..
+        End Sub
+        Public Sub Dispose() Implements IDisposable.Dispose
+            If allOptions IsNot Nothing Then allOptions.Close()
+            If cpu.activeObjects IsNot Nothing Then
+                For Each algorithm In cpu.activeObjects
+                    If algorithm.GetType().GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
+                Next
+            End If
+            For Each mat In taskAlg.dstList
+                If mat IsNot Nothing Then mat.Dispose()
+            Next
         End Sub
     End Class
 End Namespace

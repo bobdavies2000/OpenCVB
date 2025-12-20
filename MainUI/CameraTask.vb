@@ -46,6 +46,7 @@ Namespace MainUI
             frameProcessed = False
 
             Me.BeginInvoke(Sub()
+                               If taskAlg Is Nothing Then Exit Sub
                                If taskAlg.cpu.algorithm_ms.Count = 0 Then taskAlg.cpu.startRun(settings.algorithm)
 
                                taskAlg.cpu.algorithmTimes(1) = Now
@@ -77,11 +78,9 @@ Namespace MainUI
                                taskAlg.mouseClickFlag = False
                                taskAlg.frameCount += 1
 
-                               If RefreshTimer.Interval <> taskAlg.refreshTimerInterval Then
-                                   RefreshTimer.Interval = 1000 \ settings.FPSPaintTarget
-                                   taskAlg.refreshTimerInterval = RefreshTimer.Interval
-                               End If
-
+                               For i = 0 To pics.Count - 1
+                                   pics(i).Invalidate()
+                               Next
                                frameProcessed = True
                            End Sub)
         End Sub

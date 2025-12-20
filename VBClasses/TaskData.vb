@@ -285,6 +285,5 @@ Namespace VBClasses
         Public resolutionDetails As String = ""
         Public sharpGL As SharpGLForm
         Public readyForCameraInput As Boolean
-        Public refreshTimerInterval As Integer
     End Class
 End Namespace

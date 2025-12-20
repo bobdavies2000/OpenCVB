@@ -138,7 +138,6 @@ Public Class OptionsGlobal
         taskAlg.optionsChanged = True
         taskAlg.Settings.FPSPaintTarget = DisplayFPSSlider.Value
         FPSDisplayLabel.Text = CStr(DisplayFPSSlider.Value)
-        taskAlg.refreshTimerInterval = DisplayFPSSlider.Value
     End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
         taskAlg.optionsChanged = True

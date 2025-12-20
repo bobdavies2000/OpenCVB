@@ -46,7 +46,6 @@ Namespace MainUI
             CamSwitchTimer = New Timer(components)
             fpsTimer = New Timer(components)
             TestAllTimer = New Timer(components)
-            RefreshTimer = New Timer(components)
             MagnifyTimer = New Timer(components)
             MainToolStrip.SuspendLayout()
             SuspendLayout()
@@ -222,10 +221,6 @@ Namespace MainUI
             ' 
             TestAllTimer.Interval = 1
             ' 
-            ' RefreshTimer
-            ' 
-            RefreshTimer.Interval = 33
-            ' 
             ' MagnifyTimer
             ' 
             ' 
@@ -272,7 +267,6 @@ Namespace MainUI
         Friend WithEvents CamSwitchTimer As Timer
         Friend WithEvents fpsTimer As Timer
         Friend WithEvents TestAllTimer As Timer
-        Friend WithEvents RefreshTimer As Timer
         Friend WithEvents MagnifyTimer As Timer
 
     End Class

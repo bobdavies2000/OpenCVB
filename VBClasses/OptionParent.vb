@@ -63,7 +63,6 @@ Namespace VBClasses
             Return Nothing
         End Function
         Public Shared Function FindFrm(title As String) As System.Windows.Forms.Form
-            On Error Resume Next
             For Each frm In Application.OpenForms
                 If frm.text = title Then Return frm
             Next
