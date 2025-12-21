@@ -712,8 +712,8 @@ Namespace VBClasses
             For i = 1 To templateY.Width - 1
                 templateY.Col(0).CopyTo(templateY.Col(i))
             Next
-            templateX -= taskAlg.calibData.rgbIntrinsics.ppx
-            templateY -= taskAlg.calibData.rgbIntrinsics.ppy
+            templateX -= cv.Scalar.All(taskAlg.calibData.rgbIntrinsics.ppx)
+            templateY -= cv.Scalar.All(taskAlg.calibData.rgbIntrinsics.ppy)
 
             desc = "Prepare for injecting depth into the point cloud."
         End Sub
@@ -732,10 +732,10 @@ Namespace VBClasses
             Dim worldX As New cv.Mat, worldY As New cv.Mat
 
             cv.Cv2.Multiply(templateX, src, worldX)
-            worldX *= 1 / fxTemplate
+            worldX *= cv.Scalar.All(1 / fxTemplate)
 
             cv.Cv2.Multiply(templateY, src, worldY)
-            worldY *= 1 / fyTemplate
+            worldY *= cv.Scalar.All(1 / fyTemplate)
 
             cv.Cv2.Merge({worldX, worldY, src}, dst2)
         End Sub

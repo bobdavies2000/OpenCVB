@@ -34,9 +34,8 @@ Namespace MainUI
             If taskAlg.readyForCameraInput = False Then Exit Sub
             Static lastPaintTime As DateTime = Now
 
-            Static frameProcessed As Boolean = True
-            If frameProcessed = False Then Exit Sub
-            frameProcessed = False
+            If camera.frameProcessed = False Then Exit Sub
+            camera.frameProcessed = False
 
             Me.BeginInvoke(Sub()
                                If taskAlg Is Nothing Then Exit Sub
@@ -76,7 +75,7 @@ Namespace MainUI
                                For i = 0 To pics.Count - 1
                                    pics(i).Invalidate()
                                Next
-                               frameProcessed = True
+                               camera.frameProcessed = True
                            End Sub)
         End Sub
     End Class

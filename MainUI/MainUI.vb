@@ -324,7 +324,7 @@ Namespace MainUI
             bitmap.Dispose()
         End Sub
         Private Sub startAlgorithm()
-            taskAlg = New AlgorithmTask
+            vbc.taskAlg = New AlgorithmTask
 
             For i = 0 To pics.Count - 1
                 taskAlg.dstList(i) = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
@@ -342,6 +342,8 @@ Namespace MainUI
             taskAlg.main_hwnd = Me.Handle
 
             taskAlg.Initialize(settings)
+            taskAlg.lowResDepth = New cv.Mat(taskAlg.workRes, cv.MatType.CV_32F)
+            taskAlg.lowResColor = New cv.Mat(taskAlg.workRes, cv.MatType.CV_32F)
             taskAlg.MainUI_Algorithm = createAlgorithm(settings.algorithm)
             AlgDescription.Text = taskAlg.MainUI_Algorithm.desc
             taskAlg.resolutionDetails = resolutionDetails
@@ -417,7 +419,7 @@ Namespace MainUI
                 settings.algorithm = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1)
             End If
 
-            If taskAlg Is Nothing Then startAlgorithm()
+            startAlgorithm()
             updateAlgorithmHistory()
         End Sub
         Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
@@ -428,10 +430,8 @@ Namespace MainUI
 
             PausePlayButton.PerformClick()
 
-            If Options.ShowDialog() = DialogResult.OK Then
-                getLineCounts()
-                SaveJsonSettings()
-            End If
+            If Options.ShowDialog() = DialogResult.OK Then SaveJsonSettings()
+            AvailableAlgorithms_SelectedIndexChanged(Nothing, Nothing)
 
             PausePlayButton.PerformClick()
 
@@ -460,9 +460,9 @@ Namespace MainUI
 
                 Me.MainForm_Resize(Nothing, Nothing)
             Else
+                StopCamera()
                 If taskAlg IsNot Nothing Then ' already stopped...
                     taskAlg.readyForCameraInput = False
-                    StopCamera()
                     taskAlg.Dispose()
                     taskAlg = Nothing
                 End If

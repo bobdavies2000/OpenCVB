@@ -59,6 +59,8 @@ Public Class GenericCamera
     Public ratio As Single
     Public Event FrameReady(sender As GenericCamera)
     Public isCapturing As Boolean
+    Public frameProcessed As Boolean = True
+
     Public Structure imuDataStruct
         Dim r00 As Single
         Dim r01 As Single

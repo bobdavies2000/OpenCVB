@@ -214,8 +214,8 @@ Namespace VBClasses
                 dst3.Col(0).CopyTo(dst3.Col(i)) ' duplicate above col
             Next
 
-            dst2 -= taskAlg.calibData.rgbIntrinsics.ppx
-            dst3 -= taskAlg.calibData.rgbIntrinsics.ppy
+            dst2 = dst2.Subtract(cv.Scalar.All(taskAlg.calibData.rgbIntrinsics.ppx))
+            dst3 = dst3.Subtract(cv.Scalar.All(taskAlg.calibData.rgbIntrinsics.ppx))
 
             labels = {"", "", "Input Template showing columns", "Input Template showing rows"}
             desc = "Build a template for use with computing the point cloud"

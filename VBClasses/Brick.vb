@@ -585,7 +585,9 @@ Namespace VBClasses
         Public Sub New()
             If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
             labels(3) = "Right camera image..."
-            If taskAlg.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then taskAlg.gOptions.gravityPointCloud.Checked = False
+            If taskAlg.Settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then
+                taskAlg.gOptions.gravityPointCloud.Checked = False
+            End If
             desc = "Translate the RGB to left view - only needed for the Intel RealSense cameras."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -683,10 +685,10 @@ Namespace VBClasses
                         split(2).SetTo(brick.mm.maxVal, taskAlg.depthmask(brick.rect))
 
                         cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
-                        split(0) *= 1 / taskAlg.calibData.rgbIntrinsics.fx
+                        split(0) *= cv.Scalar.All(1 / taskAlg.calibData.rgbIntrinsics.fx)
 
                         cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
-                        split(1) *= 1 / taskAlg.calibData.rgbIntrinsics.fy
+                        split(1) *= cv.Scalar.All(1 / taskAlg.calibData.rgbIntrinsics.fy)
 
                         cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
                         splitCount += 1
@@ -721,10 +723,10 @@ Namespace VBClasses
                     split(2).SetTo(brick.depth, taskAlg.depthmask(brick.rect))
 
                     cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
-                    split(0) *= 1 / taskAlg.calibData.rgbIntrinsics.fx
+                    split(0) *= cv.Scalar.All(1 / taskAlg.calibData.rgbIntrinsics.fx)
 
                     cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
-                    split(1) *= 1 / taskAlg.calibData.rgbIntrinsics.fy
+                    split(1) *= cv.Scalar.All(1 / taskAlg.calibData.rgbIntrinsics.fy)
 
                     cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
                     splitCount += 1
@@ -762,10 +764,10 @@ Namespace VBClasses
                         split(2) += brick.depth
 
                         cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
-                        split(0) *= 1 / taskAlg.calibData.rgbIntrinsics.fx
+                        split(0) *= cv.Scalar.All(1 / taskAlg.calibData.rgbIntrinsics.fx)
 
                         cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
-                        split(1) *= 1 / taskAlg.calibData.rgbIntrinsics.fy
+                        split(1) *= cv.Scalar.All(1 / taskAlg.calibData.rgbIntrinsics.fy)
 
                         cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
                         dst2(brick.rect).SetTo(0, taskAlg.noDepthMask(brick.rect))

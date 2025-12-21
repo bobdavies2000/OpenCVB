@@ -143,7 +143,7 @@ Namespace VBClasses
     Public Class Image_Icon : Inherits TaskParent
         Dim inputImage As Bitmap
         Public Sub New()
-            Dim filePath As String = taskAlg.homeDir + "/Main/Data/OpenCVB.png"
+            Dim filePath As String = taskAlg.homeDir + "/MainUI/Data/PauseButton.png"
             inputImage = New Bitmap(filePath)
             desc = "Create an icon from an image"
         End Sub
@@ -153,7 +153,7 @@ Namespace VBClasses
             Dim icon As Icon = Icon.FromHandle(iconHandle)
 
             ' Save the icon to a file
-            Using fs As New FileStream(taskAlg.homeDir + "/Main/Data/test.ico", FileMode.OpenOrCreate)
+            Using fs As New FileStream(taskAlg.homeDir + "/MainUI/Data/test.ico", FileMode.OpenOrCreate)
                 icon.Save(fs)
             End Using
             inputImage = Nothing

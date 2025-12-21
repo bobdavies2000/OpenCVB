@@ -35,7 +35,6 @@ Namespace VBClasses
         ' treeview data
         Public cpu As New CPUTime
 
-        Public cameraName As String
         Public calibData As Object
         Public fpsAlgorithm As Single
         Public fpsCamera As Single

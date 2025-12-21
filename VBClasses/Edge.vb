@@ -1524,6 +1524,7 @@ Namespace VBClasses
             For Each brick In taskAlg.bricks.brickList
                 If brick.depth = 0 Then Continue For
                 If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then Continue For
+                If brick.rRect.Width = 0 Or brick.rRect.Height = 0 Then Continue For
                 If dst2(brick.lRect).CountNonZero And dst3(brick.rRect).CountNonZero Then
                     dst2.Rectangle(brick.lRect, white, taskAlg.lineWidth)
                     dst3.Rectangle(brick.rRect, white, taskAlg.lineWidth)

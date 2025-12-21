@@ -70,7 +70,7 @@ Namespace VBClasses
 
             Dim algorithm_ms = New List(Of Single)(taskAlg.cpu.algorithm_ms)
             Dim sumTime As Single
-            For i = 1 To algorithm_ms.Count - 1
+            For i = 0 To algorithm_ms.Count - 1
                 sumTime += algorithm_ms(i)
             Next
             If sumTime = 0 Then Return percentTime

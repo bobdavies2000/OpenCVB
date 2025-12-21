@@ -1410,10 +1410,10 @@ Namespace VBClasses
             If src.Type <> cv.MatType.CV_32F Then src = taskAlg.pcSplit(2)
 
             cv.Cv2.Multiply(template.dst2, src, dst0)
-            dst0 *= 1 / taskAlg.calibData.rgbIntrinsics.fx
+            dst0 *= cv.Scalar.All(1 / taskAlg.calibData.rgbIntrinsics.fx)
 
             cv.Cv2.Multiply(template.dst3, src, dst1)
-            dst1 *= 1 / taskAlg.calibData.rgbIntrinsics.fy
+            dst1 *= cv.Scalar.All(1 / taskAlg.calibData.rgbIntrinsics.fy)
 
             cv.Cv2.Merge({dst0, dst1, src}, dst2)
             colorizer.Run(dst2)
