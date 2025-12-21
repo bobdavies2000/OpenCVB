@@ -78,6 +78,8 @@ Public Class OptionsGlobal
 
         GridSlider.Value = taskAlg.brickSize
         DotSizeSlider.Value = taskAlg.DotSize
+        DotSizeLabel.Text = CStr(DotSizeSlider.Value)
+        FPSDisplayLabel.Text = CStr(TargetDisplaySlider.Value)
         LineWidth.Value = taskAlg.lineWidth
         HistBinBar.Value = 16
         labelBinsCount.Text = CStr(HistBinBar.Value)
@@ -134,10 +136,10 @@ Public Class OptionsGlobal
         labelBinsCount.Text = CStr(taskAlg.histogramBins)
         taskAlg.optionsChanged = True
     End Sub
-    Private Sub DisplayFPSSlider_ValueChanged(sender As Object, e As EventArgs) Handles DisplayFPSSlider.ValueChanged
+    Private Sub DisplayFPSSlider_ValueChanged(sender As Object, e As EventArgs) Handles TargetDisplaySlider.ValueChanged
         taskAlg.optionsChanged = True
-        taskAlg.Settings.FPSPaintTarget = DisplayFPSSlider.Value
-        FPSDisplayLabel.Text = CStr(DisplayFPSSlider.Value)
+        taskAlg.Settings.FPSPaintTarget = TargetDisplaySlider.Value
+        FPSDisplayLabel.Text = CStr(TargetDisplaySlider.Value)
     End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
         taskAlg.optionsChanged = True

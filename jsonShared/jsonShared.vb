@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace jsonShared
     Public Class Settings
-        Public algorithm As String
+        Public algorithm As String = "AddWeighted_Basics"
         Public algorithmHistory As New List(Of String)
 
         Public allOptionsLeft As Integer = 0
@@ -19,9 +19,9 @@ Namespace jsonShared
         Public captureRes As New cv.Size(640, 480)
 
         Public desiredFPS As Integer = 60
-        Public displayRes As cv.Size
+        Public displayRes As cv.Size = New cv.Size(320, 240)
 
-        Public FPSPaintTarget As Integer
+        Public FPSPaintTarget As Integer = 30
         Public Image_Basics_Name As String = ""
 
         Public MainFormLeft As Integer = 0

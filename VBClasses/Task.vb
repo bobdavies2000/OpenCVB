@@ -28,7 +28,7 @@ Namespace VBClasses
 
             Dim fps = taskAlg.Settings.FPSPaintTarget
             gOptions = New OptionsGlobal
-            gOptions.DisplayFPSSlider.Value = fps
+            gOptions.TargetDisplaySlider.Value = fps
             featureOptions = New OptionsFeatures
             treeView = New TreeViewForm
 

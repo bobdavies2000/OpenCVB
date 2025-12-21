@@ -20,19 +20,14 @@ Namespace VBClasses
                 mats.Add(src(rect).Clone())
             Next
 
-            If taskAlg.testAllRunning Then
-                ' It runs fine but after several runs during 'Test All', it will fail with an external exception.  Only happens on 'Test All' runs.
-                SetTrueText("Stitch_Basics only fails when running 'Test All'." + vbCrLf +
-                                         "Skipping it during a 'Test All' just so all the other tests can be exercised.", New cv.Point(10, 100), 3)
-                Exit Sub
-            End If
-
             If sticherObj IsNot Nothing Then sticherObj = cv.Stitcher.Create(cv.Stitcher.Mode.Scans)
             Dim pano As New cv.Mat
 
+            SetTrueText("This algorithm stopped working.  Not sure why but it is not used anywhere.  Fix whenever...", 3)
+            Exit Sub
+
             ' stitcher may fail with an external exception if you make width and height too small.
             Dim status = sticherObj.Stitch(mats, pano)
-
             dst3.SetTo(0)
             If status = cv.Stitcher.Status.OK Then
                 Dim w = pano.Width, h = pano.Height

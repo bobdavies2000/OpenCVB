@@ -240,7 +240,7 @@ Partial Class OptionsFeatures
         ' 
         MotionPixelSlider.Location = New Point(235, 312)
         MotionPixelSlider.Margin = New Padding(4)
-        MotionPixelSlider.Maximum = 50
+        MotionPixelSlider.Maximum = 400
         MotionPixelSlider.Name = "MotionPixelSlider"
         MotionPixelSlider.Size = New Size(550, 69)
         MotionPixelSlider.TabIndex = 28

@@ -25,7 +25,7 @@ Partial Class OptionsGlobal
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OptionsGlobal))
         Label1 = New Label()
         GroupBox1 = New GroupBox()
-        DisplayFPSSlider = New TrackBar()
+        TargetDisplaySlider = New TrackBar()
         FPSDisplayLabel = New Label()
         Label9 = New Label()
         DotSizeSlider = New TrackBar()
@@ -66,7 +66,7 @@ Partial Class OptionsGlobal
         Label14 = New Label()
         DepthGroupBox = New GroupBox()
         GroupBox1.SuspendLayout()
-        CType(DisplayFPSSlider, ComponentModel.ISupportInitialize).BeginInit()
+        CType(TargetDisplaySlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(DotSizeSlider, ComponentModel.ISupportInitialize).BeginInit()
         CType(LineWidth, ComponentModel.ISupportInitialize).BeginInit()
         CType(HistBinBar, ComponentModel.ISupportInitialize).BeginInit()
@@ -88,7 +88,7 @@ Partial Class OptionsGlobal
         ' 
         ' GroupBox1
         ' 
-        GroupBox1.Controls.Add(DisplayFPSSlider)
+        GroupBox1.Controls.Add(TargetDisplaySlider)
         GroupBox1.Controls.Add(FPSDisplayLabel)
         GroupBox1.Controls.Add(Label9)
         GroupBox1.Controls.Add(DotSizeSlider)
@@ -114,17 +114,17 @@ Partial Class OptionsGlobal
         GroupBox1.TabIndex = 1
         GroupBox1.TabStop = False
         ' 
-        ' DisplayFPSSlider
+        ' TargetDisplaySlider
         ' 
-        DisplayFPSSlider.Location = New Point(230, 27)
-        DisplayFPSSlider.Margin = New Padding(3, 4, 3, 4)
-        DisplayFPSSlider.Maximum = 100
-        DisplayFPSSlider.Minimum = 1
-        DisplayFPSSlider.Name = "DisplayFPSSlider"
-        DisplayFPSSlider.Size = New Size(549, 69)
-        DisplayFPSSlider.TabIndex = 12
-        DisplayFPSSlider.TickStyle = TickStyle.None
-        DisplayFPSSlider.Value = 15
+        TargetDisplaySlider.Location = New Point(230, 27)
+        TargetDisplaySlider.Margin = New Padding(3, 4, 3, 4)
+        TargetDisplaySlider.Maximum = 100
+        TargetDisplaySlider.Minimum = 1
+        TargetDisplaySlider.Name = "TargetDisplaySlider"
+        TargetDisplaySlider.Size = New Size(549, 69)
+        TargetDisplaySlider.TabIndex = 12
+        TargetDisplaySlider.TickStyle = TickStyle.None
+        TargetDisplaySlider.Value = 30
         ' 
         ' FPSDisplayLabel
         ' 
@@ -162,7 +162,7 @@ Partial Class OptionsGlobal
         DotSizeLabel.Name = "DotSizeLabel"
         DotSizeLabel.Size = New Size(138, 30)
         DotSizeLabel.TabIndex = 8
-        DotSizeLabel.Text = "DotSizeLabel"
+        DotSizeLabel.Text = ""
         ' 
         ' Label7
         ' 
@@ -555,7 +555,7 @@ Partial Class OptionsGlobal
         Text = "OptionsGlobal"
         GroupBox1.ResumeLayout(False)
         GroupBox1.PerformLayout()
-        CType(DisplayFPSSlider, ComponentModel.ISupportInitialize).EndInit()
+        CType(TargetDisplaySlider, ComponentModel.ISupportInitialize).EndInit()
         CType(DotSizeSlider, ComponentModel.ISupportInitialize).EndInit()
         CType(LineWidth, ComponentModel.ISupportInitialize).EndInit()
         CType(HistBinBar, ComponentModel.ISupportInitialize).EndInit()
@@ -609,7 +609,7 @@ Partial Class OptionsGlobal
     Friend WithEvents Label14 As Label
     Friend WithEvents DepthGroupBox As GroupBox
     Friend WithEvents Label3 As Label
-    Friend WithEvents DisplayFPSSlider As TrackBar
+    Friend WithEvents TargetDisplaySlider As TrackBar
     Friend WithEvents FPSDisplayLabel As Label
     Friend WithEvents Label9 As Label
 End Class

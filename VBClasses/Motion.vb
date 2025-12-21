@@ -37,7 +37,7 @@ Namespace VBClasses
             Next
 
             taskAlg.motionMask = dst3.Clone
-            labels(2) = CStr(motionList.Count) + " grid rects had motion."
+            labels(2) = "Grid rects with motion: " + CStr(motionList.Count)
         End Sub
     End Class
 
@@ -51,7 +51,6 @@ Namespace VBClasses
     Public Class Motion_PointCloud : Inherits TaskParent
         Public originalPointcloud As cv.Mat
         Public Sub New()
-            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
             labels(1) = "The difference between the latest pointcloud and the motion-adjusted point cloud."
             labels(2) = "Point cloud after updating with the motion mask changes."
             labels(3) = "taskAlg.pointcloud for the current frame."
@@ -158,7 +157,6 @@ Namespace VBClasses
                 Dim split = dst3.Split()
                 diff.lastDepth32f = split(2)
                 diff.Run(taskAlg.pcSplit(2))
-                dst1 = diff.dst2
             End If
         End Sub
     End Class

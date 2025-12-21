@@ -124,10 +124,12 @@ Namespace VBClasses
             desc = "Use gravity vector to rotate the image to be vertical"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If Math.Abs(taskAlg.verticalizeAngle) > 90 Then taskAlg.verticalizeAngle = taskAlg.verticalizeAngle Mod 90
+
             If standalone Then angleSlider.Value = taskAlg.verticalizeAngle * 100
             rotate.Run(src)
             dst2 = rotate.dst2
-            SetTrueText("Angle offset from gravity = " + Format(angleSlider.Value / 100, fmt2))
+            SetTrueText("Angle offset from gravity = " + Format(angleSlider.Value / 100, fmt2), 3)
         End Sub
     End Class
 End Namespace

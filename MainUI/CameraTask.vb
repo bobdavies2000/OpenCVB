@@ -72,9 +72,14 @@ Namespace MainUI
                                spanWait = New TimeSpan(elapsedWaitTicks)
                                Dim msSinceLastPaint = spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                               For i = 0 To pics.Count - 1
-                                   pics(i).Invalidate()
-                               Next
+                               Dim threshold = 1000 / taskAlg.Settings.FPSPaintTarget
+
+                               If msSinceLastPaint > threshold Then
+                                   lastPaintTime = taskAlg.cpu.algorithmTimes(1)
+                                   For i = 0 To pics.Count - 1
+                                       pics(i).Invalidate()
+                                   Next
+                               End If
                                camera.frameProcessed = True
                            End Sub)
         End Sub
