@@ -164,23 +164,6 @@ Namespace MainUI
             Dim img = taskAlg.dstList(taskAlg.mousePicTag)(r).Resize(New cv.Size(taskAlg.drawRect.Width * 5, taskAlg.drawRect.Height * 5))
             cv.Cv2.ImShow("DrawRect Region " + CStr(magnifyIndex), img)
         End Sub
-        Private Sub AtoZ_Click(sender As Object, e As EventArgs) Handles AtoZ.Click
-            Dim groupsForm As New AtoZ()
-            groupsForm.homeDir = New DirectoryInfo(homeDir + "\Data")
-
-            If groupsForm.ShowDialog() = DialogResult.OK AndAlso Not String.IsNullOrEmpty(groupsForm.selectedGroup) Then
-                ' Find and select the first algorithm that starts with the selected group
-                For Each alg In AvailableAlgorithms.Items
-                    Dim algStr = alg.ToString()
-                    If Not String.IsNullOrWhiteSpace(algStr) AndAlso algStr.StartsWith(groupsForm.selectedGroup) Then
-                        AvailableAlgorithms.Text = algStr
-                        SaveJsonSettings()
-                        Exit For
-                    End If
-                Next
-            End If
-            MainForm_Resize(Nothing, Nothing)
-        End Sub
         Private Sub MainForm_Closing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             If isPlaying Then
                 StopCamera()
@@ -407,6 +390,22 @@ Namespace MainUI
             If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
 
             PausePlayButton.PerformClick()
+        End Sub
+        Private Sub AtoZ_Click(sender As Object, e As EventArgs) Handles AtoZ.Click
+            Dim groupsForm As New AtoZ()
+            groupsForm.homeDir = New DirectoryInfo(homeDir + "\Data")
+
+            If groupsForm.ShowDialog() = DialogResult.OK AndAlso Not String.IsNullOrEmpty(groupsForm.selectedGroup) Then
+                ' Find and select the first algorithm that starts with the selected group
+                For Each alg In AvailableAlgorithms.Items
+                    Dim algStr = alg.ToString()
+                    If Not String.IsNullOrWhiteSpace(algStr) AndAlso algStr.StartsWith(groupsForm.selectedGroup) Then
+                        AvailableAlgorithms.SelectedItem = algStr
+                        Exit For
+                    End If
+                Next
+            End If
+            MainForm_Resize(Nothing, Nothing)
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
             settings.algorithm = AvailableAlgorithms.Text
