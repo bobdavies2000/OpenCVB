@@ -291,21 +291,7 @@ Namespace MainUI
 
             PausePlayButton.PerformClick()
         End Sub
-        Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
-            settings.algorithm = AvailableAlgorithms.Text
-            If TestAllTimer.Enabled = False Then SaveJsonSettings()
 
-            If taskAlg IsNot Nothing Then
-                If AvailableAlgorithms.SelectedIndex + 1 < AvailableAlgorithms.Items.Count Then
-                    settings.algorithm = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1)
-                Else
-                    settings.algorithm = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex - 1)
-                End If
-            End If
-
-            startAlgorithm()
-            updateAlgorithmHistory()
-        End Sub
         Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
             TestAllTimer.Enabled = Not TestAllTimer.Enabled
             Static testAllToolbarBitmap = New Bitmap(homeDir + "MainUI/Data/testall.png")
@@ -354,21 +340,6 @@ Namespace MainUI
             brush.Dispose()
             bitmap.Dispose()
         End Sub
-        Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
-            If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
-
-            Debug.WriteLine(vbCrLf + "OptionsTesting GDI: " & GdiMonitor.GetGdiCount())
-            Debug.WriteLine("OptionsTesting USER: " & GdiMonitor.GetUserCount())
-
-            PausePlayButton.PerformClick()
-
-            If Options.ShowDialog() = DialogResult.OK Then
-                getLineCounts()
-                SaveJsonSettings()
-            End If
-
-            PausePlayButton.PerformClick()
-        End Sub
         Private Sub startAlgorithm()
             taskAlg = New AlgorithmTask
 
@@ -394,37 +365,7 @@ Namespace MainUI
 
             If taskAlg.calibData IsNot Nothing Then taskAlg.calibData = camera.calibData
 
-            Dim sender As Object = Nothing, e As EventArgs = Nothing
-            MainForm_Resize(sender, e)
-        End Sub
-        Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
-            isPlaying = Not isPlaying
-
-            Static PausePlay = New Bitmap(homeDir + "MainUI/Data/PauseButton.png")
-            Static runPlay = New Bitmap(homeDir + "MainUI/Data/Run.png")
-            PausePlayButton.Image = If(isPlaying, PausePlay, runPlay)
-
-            If isPlaying Then
-                CameraSwitching.Visible = True
-                CamSwitchTimer.Enabled = True
-                CameraSwitching.Text = settings.cameraName + " starting"
-                CameraSwitching.BringToFront()
-
-                StartCamera()
-                AvailableAlgorithms.SelectedItem = settings.algorithm
-
-                CameraSwitching.Visible = False
-                CamSwitchTimer.Enabled = False
-
-                Me.MainForm_Resize(Nothing, Nothing)
-            Else
-                If taskAlg IsNot Nothing Then ' already stopped...
-                    taskAlg.readyForCameraInput = False
-                    StopCamera()
-                    taskAlg.Dispose()
-                    taskAlg = Nothing
-                End If
-            End If
+            MainForm_Resize(Nothing, Nothing)
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
             If taskAlg Is Nothing Then Exit Sub
@@ -466,6 +407,67 @@ Namespace MainUI
             If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
 
             PausePlayButton.PerformClick()
+        End Sub
+        Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
+            settings.algorithm = AvailableAlgorithms.Text
+            If TestAllTimer.Enabled = False Then SaveJsonSettings()
+
+            If AvailableAlgorithms.SelectedItem <> " " Then
+                settings.algorithm = AvailableAlgorithms.SelectedItem
+            Else
+                settings.algorithm = AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1)
+            End If
+
+            If taskAlg Is Nothing Then startAlgorithm()
+            updateAlgorithmHistory()
+        End Sub
+        Private Sub OptionsButton_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
+            If TestAllTimer.Enabled Then TestAllButton_Click(sender, e)
+
+            Debug.WriteLine(vbCrLf + "OptionsTesting GDI: " & GdiMonitor.GetGdiCount())
+            Debug.WriteLine("OptionsTesting USER: " & GdiMonitor.GetUserCount())
+
+            PausePlayButton.PerformClick()
+
+            If Options.ShowDialog() = DialogResult.OK Then
+                getLineCounts()
+                SaveJsonSettings()
+            End If
+
+            PausePlayButton.PerformClick()
+
+            If taskAlg Is Nothing Then startAlgorithm()
+
+            MainForm_Resize(Nothing, Nothing)
+        End Sub
+        Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
+            isPlaying = Not isPlaying
+
+            Static PausePlay = New Bitmap(homeDir + "MainUI/Data/PauseButton.png")
+            Static runPlay = New Bitmap(homeDir + "MainUI/Data/Run.png")
+            PausePlayButton.Image = If(isPlaying, PausePlay, runPlay)
+
+            If isPlaying Then
+                CameraSwitching.Visible = True
+                CamSwitchTimer.Enabled = True
+                CameraSwitching.Text = settings.cameraName + " starting"
+                CameraSwitching.BringToFront()
+
+                StartCamera()
+                AvailableAlgorithms.SelectedItem = settings.algorithm
+
+                CameraSwitching.Visible = False
+                CamSwitchTimer.Enabled = False
+
+                Me.MainForm_Resize(Nothing, Nothing)
+            Else
+                If taskAlg IsNot Nothing Then ' already stopped...
+                    taskAlg.readyForCameraInput = False
+                    StopCamera()
+                    taskAlg.Dispose()
+                    taskAlg = Nothing
+                End If
+            End If
         End Sub
     End Class
 End Namespace
