@@ -65,6 +65,30 @@ Public Class OptionsFeatures
             Color8USource.Items.Add(method)
         Next
         Color8USource.SelectedItem = "Reduction_Basics"
+
+        Select Case taskAlg.workRes.Width
+            Case 1920
+                MotionPixelSlider.Value = 400
+                taskAlg.colorDiffThreshold = 50
+            Case 1280
+                ColorDiffSlider.Value = 40
+                MotionPixelSlider.Value = 100
+            Case 960
+                ColorDiffSlider.Value = 30
+                MotionPixelSlider.Value = 100
+            Case 672
+                ColorDiffSlider.Value = 20
+                MotionPixelSlider.Value = 100
+            Case 640
+                ColorDiffSlider.Value = 20
+                MotionPixelSlider.Value = 20
+            Case 240, 320, 160
+                MotionPixelSlider.Value = 5
+                ColorDiffSlider.Value = 15
+            Case 336, 168
+                MotionPixelSlider.Value = 5
+                ColorDiffSlider.Value = 5
+        End Select
     End Sub
 
 
@@ -97,6 +121,16 @@ Public Class OptionsFeatures
         taskAlg.FeatureSampleSize = FeatureSampleSize.Value
         taskAlg.optionsChanged = True
         FeatureSampleSizeLabel.Text = CStr(taskAlg.FeatureSampleSize)
+    End Sub
+    Private Sub ColorDiffSlider_ValueChanged(sender As Object, e As EventArgs) Handles ColorDiffSlider.ValueChanged
+        taskAlg.colorDiffThreshold = ColorDiffSlider.Value
+        taskAlg.optionsChanged = True
+        ColorDiffLabel.Text = CStr(taskAlg.colorDiffThreshold)
+    End Sub
+    Private Sub MotionPixelSlider_ValueChanged(sender As Object, e As EventArgs) Handles MotionPixelSlider.ValueChanged
+        taskAlg.motionThreshold = MotionPixelSlider.Value
+        taskAlg.optionsChanged = True
+        MotionPixelLabel1.Text = CStr(taskAlg.motionThreshold)
     End Sub
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles Color8USource.SelectedIndexChanged
         taskAlg.optionsChanged = True

@@ -8214,33 +8214,10 @@ Namespace VBClasses
         Public pixelDiffThreshold As Integer
         Public mmThreshold As Integer
         Public Sub New()
-            taskAlg.motionThreshold = 5
-            Select Case taskAlg.workRes.Width
-                Case 1920
-                    taskAlg.motionThreshold = 400
-                Case 1280
-                    taskAlg.motionThreshold = 100
-                Case 960
-                    taskAlg.motionThreshold = 100
-                Case 672
-                    taskAlg.motionThreshold = 100
-                Case 480
-                    taskAlg.motionThreshold = 20
-                Case 640, 240, 336, 320, 168, 160
-                    taskAlg.motionThreshold = 5
-            End Select
-            If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Color Difference Threshold", 0, 50, 5)
-                sliders.setupTrackBar("Motion pixel threshold", 0, 400, taskAlg.motionThreshold)
-                sliders.setupTrackBar("Pointcloud threshold (mm)", 0, 1000, 100)
-            End If
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Pointcloud threshold (mm)", 0, 1000, 100)
         End Sub
         Public Sub Run()
-            Static motionSlider = FindSlider("Motion pixel threshold")
-            Static diffSlider = FindSlider("Color Difference Threshold")
             Static mmSlider = FindSlider("Pointcloud threshold (mm)")
-            pixelDiffThreshold = diffSlider.value
-            taskAlg.motionThreshold = motionSlider.value
             mmThreshold = mmSlider.value
         End Sub
     End Class

@@ -74,7 +74,7 @@ Namespace VBClasses
     Public Class RedList_Consistent : Inherits TaskParent
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            OptionParent.FindSlider("Color Difference Threshold").Value = 1
+            taskAlg.featureOptions.ColorDiffSlider.Value = 1
             desc = "Remove RedColor results that are inconsistent with the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

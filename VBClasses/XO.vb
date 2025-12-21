@@ -6592,7 +6592,7 @@ Namespace VBClasses
         Dim options As New Options_Diff
         Public Sub New()
             If standalone Then taskAlg.gOptions.displayDst1.Checked = True
-            OptionParent.FindSlider("Color Difference Threshold").Value = 10
+            taskAlg.featureOptions.ColorDiffSlider.Value = 10
             desc = "Build the image mask of the differences between the current frame and resync image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -9659,7 +9659,7 @@ Namespace VBClasses
                 diff(i) = New XO_Motion_Diff
                 history(i) = New History_Basics8U
             Next
-            OptionParent.FindSlider("Color Difference Threshold").Value = 10
+            taskAlg.featureOptions.ColorDiffSlider.Value = 10
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             labels = {"", "", "Mask of unreliable color data", "Color image after removing unreliable pixels"}
             desc = "Accumulate those color pixels that are volatile - different by more than the global options 'Color Difference threshold'"
@@ -10708,7 +10708,7 @@ Namespace VBClasses
         Dim diffs As New List(Of cv.Mat)
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            OptionParent.FindSlider("Color Difference Threshold").Value = 1
+            taskAlg.featureOptions.ColorDiffSlider.Value = 1
             desc = "Remove RedCloud results that are inconsistent with the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -16390,7 +16390,7 @@ Namespace VBClasses
     Public Class XO_RedList_FindCells : Inherits TaskParent
         Public bricks As New List(Of Integer)
         Public Sub New()
-            OptionParent.FindSlider("Color Difference Threshold").Value = 25
+            taskAlg.featureOptions.ColorDiffSlider.Value = 25
             cPtr = RedList_FindBricks_Open()
             desc = "Find all the RedCloud cells touched by the mask created by the Motion_History rectangle"
         End Sub

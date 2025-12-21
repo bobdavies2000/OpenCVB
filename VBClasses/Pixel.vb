@@ -346,7 +346,7 @@ Namespace VBClasses
         Dim kSlider = OptionParent.FindSlider("KMeans k")
         Dim options As New Options_Diff
         Public Sub New()
-            OptionParent.FindSlider("Color Difference Threshold").Value = 2
+            taskAlg.featureOptions.ColorDiffSlider.Value = 2
             labels(2) = "KMeans_Basics output"
             desc = "Detect where pixels are unstable"
         End Sub

@@ -3,23 +3,20 @@ Namespace VBClasses
     Public Class Diff_Basics : Inherits TaskParent
         Public changedPixels As Integer
         Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-        Public options As New Options_Diff
-
         Public Sub New()
             desc = "Capture an image and compare it to previous frame using absDiff and threshold"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             If taskAlg.optionsChanged Then lastFrame = src.Clone
 
             cv.Cv2.Absdiff(src, lastFrame, dst3)
-            dst2 = dst3.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
+            dst2 = dst3.Threshold(taskAlg.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
             changedPixels = dst2.CountNonZero
             If changedPixels > 0 Then
                 lastFrame = src.Clone
                 strOut = "Motion detected - " + CStr(changedPixels) + " pixels changed with threshold " +
-                         CStr(options.pixelDiffThreshold)
+                         CStr(taskAlg.colorDiffThreshold)
             Else
                 strOut = "No motion detected"
             End If
