@@ -1,243 +1,245 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Triangle_Basics : Inherits TaskParent
-    Public triangles As New List(Of cv.Point3f)
-    Public Sub New()
-        labels = {"", "", "RedList_Hulls output", "Selected contour - each pixel has depth"}
-        desc = "Given a contour, convert that contour to a series of triangles"
-    End Sub
-    Public Overrides sub RunAlg(src As cv.Mat)
-        dst2 = runRedList(src, labels(2))
+Namespace VBClasses
+    Public Class Triangle_Basics : Inherits TaskParent
+        Public triangles As New List(Of cv.Point3f)
+        Public Sub New()
+            labels = {"", "", "RedList_Hulls output", "Selected contour - each pixel has depth"}
+            desc = "Given a contour, convert that contour to a series of triangles"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = runRedList(src, labels(2))
 
-        If algTask.redList.oldrclist.Count <= 1 Then Exit Sub
-        algTask.oldrcD = algTask.redList.oldrclist(1)
+            If taskAlg.redList.oldrclist.Count <= 1 Then Exit Sub
+            taskAlg.oldrcD = taskAlg.redList.oldrclist(1)
 
-        dst3.SetTo(0)
-        Dim pt3D As New List(Of cv.Point3f)
-        For Each pt In algTask.oldrcD.contour
-            pt = New cv.Point(pt.X + algTask.oldrcD.rect.X, pt.Y + algTask.oldrcD.rect.Y)
-            Dim vec = algTask.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
-            If vec.Z = 0 Then
-                vec = Cloud_Basics.worldCoordinates(New cv.Point3f(pt.X, pt.Y, algTask.oldrcD.depth))
-            End If
-            DrawCircle(dst3, pt, algTask.DotSize, cv.Scalar.Yellow)
-            pt3D.Add(vec)
-        Next
-
-        Dim c3D = algTask.pointCloud.Get(Of cv.Point3f)(algTask.oldrcD.maxDist.Y, algTask.oldrcD.maxDist.X)
-        triangles.Clear()
-        Dim color3D As New cv.Point3f(algTask.oldrcD.color(0), algTask.oldrcD.color(1), algTask.oldrcD.color(2))
-        For i = 0 To pt3D.Count - 1
-            triangles.Add(color3D)
-            triangles.Add(c3D)
-            triangles.Add(pt3D(i))
-            triangles.Add(pt3D((i + 1) Mod pt3D.Count))
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Triangle_HullContour : Inherits TaskParent
-    Dim hulls As New RedList_Hulls
-    Public Sub New()
-        If standalone Then algTask.gOptions.displayDst1.Checked = True
-        labels = {"", "Selected cell", "RedList_Basics output", "Selected contour"}
-        desc = "Given a contour, convert that contour to a series of triangles"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        hulls.Run(src)
-        dst2 = hulls.dst2
-        If algTask.redList.oldrclist.Count <= 1 Then Exit Sub
-        Dim rc = algTask.oldrcD
-
-        rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxTC89L1)
-
-        dst3.SetTo(0)
-        For Each pt In rc.contour
-            pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
-            DrawCircle(dst3, pt, algTask.DotSize, cv.Scalar.Yellow)
-        Next
-
-        dst1.SetTo(0)
-        For Each pt In rc.hull
-            pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
-            DrawCircle(dst1, pt, algTask.DotSize, cv.Scalar.Yellow)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Triangle_Cell : Inherits TaskParent
-    Public triangles As New List(Of cv.Point3f)
-    Public Sub New()
-        labels = {"", "", "RedList_Basics output", "Selected contour - each pixel has depth"}
-        desc = "Given a contour, convert that contour to a series of triangles"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedList(src, labels(2))
-        If algTask.redList.oldrclist.Count <= 1 Then Exit Sub
-        Dim rc = algTask.oldrcD
-        If rc.index = 0 Then Exit Sub
-
-        dst3.SetTo(0)
-        Dim pt3D As New List(Of cv.Point3f)
-        Dim aspectRect = rc.rect.Width / rc.rect.Height, aspect = dst2.Width / dst2.Height, cellRect As cv.Rect
-        Dim xFactor As Single, yFactor As Single
-        If aspectRect > aspect Then
-            cellRect = New cv.Rect(0, 0, dst2.Width, rc.rect.Height * dst2.Width / rc.rect.Width)
-            xFactor = dst2.Width
-            yFactor = rc.rect.Height * dst2.Width / rc.rect.Width
-        Else
-            cellRect = New cv.Rect(0, 0, rc.rect.Width * dst2.Height / rc.rect.Height, dst2.Height)
-            xFactor = rc.rect.Width * dst2.Height / rc.rect.Height
-            yFactor = dst2.Height
-        End If
-        dst3.Rectangle(cellRect, white, algTask.lineWidth)
-
-        For Each pt In rc.contour
-            Dim vec = algTask.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
-            pt = New cv.Point(xFactor * pt.X / rc.rect.Width, yFactor * pt.Y / rc.rect.Height)
-            DrawCircle(dst3, pt, algTask.DotSize, cv.Scalar.Yellow)
-            pt3D.Add(vec)
-        Next
-
-        Dim c3D = algTask.pointCloud.Get(Of cv.Point3f)(rc.maxDist.Y, rc.maxDist.X)
-        triangles.Clear()
-        Dim color3D As New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255)
-        For i = 0 To pt3D.Count - 1
-            triangles.Add(color3D)
-            triangles.Add(c3D)
-            triangles.Add(pt3D(i))
-            triangles.Add(pt3D((i + 1) Mod pt3D.Count))
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Triangle_Mask : Inherits TaskParent
-    Public triangles As New List(Of cv.Point3f)
-    Public Sub New()
-        labels = {"", "", "RedList_Basics output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
-        desc = "Given a RedCloud cell, resize it and show the points with depth."
-    End Sub
-
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = runRedList(src, labels(2))
-        If algTask.redList.oldrclist.Count <= 1 Then Exit Sub
-        Dim rc = algTask.oldrcD
-        If rc.index = 0 Then Exit Sub
-
-        dst3.SetTo(0)
-        Dim pt3D As New List(Of cv.Point3f)
-        Dim aspectRect = rc.rect.Width / rc.rect.Height, aspect = dst2.Width / dst2.Height, cellRect As cv.Rect
-        Dim xFactor As Single, yFactor As Single
-        If aspectRect > aspect Then
-            cellRect = New cv.Rect(0, 0, dst2.Width, rc.rect.Height * dst2.Width / rc.rect.Width)
-            xFactor = dst2.Width
-            yFactor = rc.rect.Height * dst2.Width / rc.rect.Width
-        Else
-            cellRect = New cv.Rect(0, 0, rc.rect.Width * dst2.Height / rc.rect.Height, dst2.Height)
-            xFactor = rc.rect.Width * dst2.Height / rc.rect.Height
-            yFactor = dst2.Height
-        End If
-        dst3.Rectangle(cellRect, white, algTask.lineWidth)
-
-        triangles.Clear()
-        For y = 0 To rc.rect.Height - 1
-            For x = 0 To rc.rect.Width - 1
-                If rc.mask.Get(Of Byte)(y, x) = 0 Then Continue For
-                Dim vec = algTask.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
-                Dim pt = New cv.Point2f(xFactor * x / rc.rect.Width, yFactor * y / rc.rect.Height)
-                DrawCircle(dst3, pt, algTask.DotSize, cv.Scalar.Yellow)
+            dst3.SetTo(0)
+            Dim pt3D As New List(Of cv.Point3f)
+            For Each pt In taskAlg.oldrcD.contour
+                pt = New cv.Point(pt.X + taskAlg.oldrcD.rect.X, pt.Y + taskAlg.oldrcD.rect.Y)
+                Dim vec = taskAlg.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X)
+                If vec.Z = 0 Then
+                    vec = Cloud_Basics.worldCoordinates(New cv.Point3f(pt.X, pt.Y, taskAlg.oldrcD.depth))
+                End If
+                DrawCircle(dst3, pt, taskAlg.DotSize, cv.Scalar.Yellow)
                 pt3D.Add(vec)
             Next
-        Next
 
-        Dim newMaxDist = New cv.Point2f(xFactor * (rc.maxDist.X - rc.rect.X) / rc.rect.Width,
-                                      yFactor * (rc.maxDist.Y - rc.rect.Y) / rc.rect.Height)
-        DrawCircle(dst3, newMaxDist, algTask.DotSize + 2, cv.Scalar.Red)
-        labels(2) = algTask.redList.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Triangle_Basics2D : Inherits TaskParent
-    Public points As New List(Of cv.Point3f)
-    Public colors As New List(Of cv.Scalar)
-    Public oglOptions As New Options_OpenGLFunctions
-    Public hulls As New RedList_Hulls
-    Public Sub New()
-        algTask.gOptions.GridSlider.Value = 30
-        desc = "Prepare the list of 2D triangles"
-    End Sub
-    Private Function addTriangle(c1 As cv.Point, c2 As cv.Point, center As cv.Point, rc As oldrcData, shift As cv.Point3f) As List(Of cv.Point)
-        Dim pt1 = Cloud_Basics.worldCoordinates(New cv.Point3f(c1.X, c1.Y, rc.depth))
-        Dim ptCenter = Cloud_Basics.worldCoordinates(New cv.Point3f(center.X, center.Y, rc.depth))
-        Dim pt2 = Cloud_Basics.worldCoordinates(New cv.Point3f(c2.X, c2.Y, rc.depth))
-
-        colors.Add(rc.color)
-        points.Add(New cv.Point3f(pt1.X + shift.X, pt1.Y + shift.Y, pt1.Z + shift.Z))
-        points.Add(New cv.Point3f(ptCenter.X + shift.X, ptCenter.Y + shift.Y, ptCenter.Z + shift.Z))
-        points.Add(New cv.Point3f(pt2.X + shift.X, pt2.Y + shift.Y, pt2.Z + shift.Z))
-
-        Dim points2d As New List(Of cv.Point)
-        points2d.Add(c1)
-        points2d.Add(center)
-        points2d.Add(c2)
-        Return points2d
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        oglOptions.Run()
-        Dim ptM = oglOptions.moveAmount
-        Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
-
-        hulls.Run(src)
-        dst2 = hulls.dst2
-        points.Clear()
-        colors.Clear()
-        Dim listOfPoints = New List(Of List(Of cv.Point))
-        For Each rc In algTask.redList.oldrclist
-            If rc.contour Is Nothing Then Continue For
-            If rc.contour.Count < 5 Then Continue For
-            Dim corners(4 - 1) As cv.Point
-            For i = 0 To corners.Count - 1
-                Dim pt = rc.contour(i * rc.contour.Count / 4)
-                corners(i) = New cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y)
+            Dim c3D = taskAlg.pointCloud.Get(Of cv.Point3f)(taskAlg.oldrcD.maxDist.Y, taskAlg.oldrcD.maxDist.X)
+            triangles.Clear()
+            Dim color3D As New cv.Point3f(taskAlg.oldrcD.color(0), taskAlg.oldrcD.color(1), taskAlg.oldrcD.color(2))
+            For i = 0 To pt3D.Count - 1
+                triangles.Add(color3D)
+                triangles.Add(c3D)
+                triangles.Add(pt3D(i))
+                triangles.Add(pt3D((i + 1) Mod pt3D.Count))
             Next
-            Dim center = New cv.Point(rc.rect.X + rc.rect.Width / 2, rc.rect.Y + rc.rect.Height / 2)
-            DrawLine(dst2, corners(0), center, white)
-            DrawLine(dst2, corners(1), center, white)
-            DrawLine(dst2, corners(2), center, white)
-            DrawLine(dst2, corners(3), center, white)
+        End Sub
+    End Class
 
-            listOfPoints.Add(addTriangle(corners(0), corners(3), center, rc, shift))
-            listOfPoints.Add(addTriangle(corners(1), corners(0), center, rc, shift))
-            listOfPoints.Add(addTriangle(corners(2), corners(1), center, rc, shift))
-            listOfPoints.Add(addTriangle(corners(3), corners(2), center, rc, shift))
-        Next
-        dst3.SetTo(0)
-        For i = 0 To colors.Count - 1
-            cv.Cv2.DrawContours(dst3, listOfPoints, i, colors(i), -1)
-        Next
-        labels(2) = CStr(colors.Count) + " triangles from " + CStr(algTask.redList.oldrclist.Count) + " RedCloud cells"
-    End Sub
-End Class
+
+
+
+
+
+
+    Public Class Triangle_HullContour : Inherits TaskParent
+        Dim hulls As New RedList_Hulls
+        Public Sub New()
+            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
+            labels = {"", "Selected cell", "RedList_Basics output", "Selected contour"}
+            desc = "Given a contour, convert that contour to a series of triangles"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            hulls.Run(src)
+            dst2 = hulls.dst2
+            If taskAlg.redList.oldrclist.Count <= 1 Then Exit Sub
+            Dim rc = taskAlg.oldrcD
+
+            rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxTC89L1)
+
+            dst3.SetTo(0)
+            For Each pt In rc.contour
+                pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
+                DrawCircle(dst3, pt, taskAlg.DotSize, cv.Scalar.Yellow)
+            Next
+
+            dst1.SetTo(0)
+            For Each pt In rc.hull
+                pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
+                DrawCircle(dst1, pt, taskAlg.DotSize, cv.Scalar.Yellow)
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class Triangle_Cell : Inherits TaskParent
+        Public triangles As New List(Of cv.Point3f)
+        Public Sub New()
+            labels = {"", "", "RedList_Basics output", "Selected contour - each pixel has depth"}
+            desc = "Given a contour, convert that contour to a series of triangles"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = runRedList(src, labels(2))
+            If taskAlg.redList.oldrclist.Count <= 1 Then Exit Sub
+            Dim rc = taskAlg.oldrcD
+            If rc.index = 0 Then Exit Sub
+
+            dst3.SetTo(0)
+            Dim pt3D As New List(Of cv.Point3f)
+            Dim aspectRect = rc.rect.Width / rc.rect.Height, aspect = dst2.Width / dst2.Height, cellRect As cv.Rect
+            Dim xFactor As Single, yFactor As Single
+            If aspectRect > aspect Then
+                cellRect = New cv.Rect(0, 0, dst2.Width, rc.rect.Height * dst2.Width / rc.rect.Width)
+                xFactor = dst2.Width
+                yFactor = rc.rect.Height * dst2.Width / rc.rect.Width
+            Else
+                cellRect = New cv.Rect(0, 0, rc.rect.Width * dst2.Height / rc.rect.Height, dst2.Height)
+                xFactor = rc.rect.Width * dst2.Height / rc.rect.Height
+                yFactor = dst2.Height
+            End If
+            dst3.Rectangle(cellRect, white, taskAlg.lineWidth)
+
+            For Each pt In rc.contour
+                Dim vec = taskAlg.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
+                pt = New cv.Point(xFactor * pt.X / rc.rect.Width, yFactor * pt.Y / rc.rect.Height)
+                DrawCircle(dst3, pt, taskAlg.DotSize, cv.Scalar.Yellow)
+                pt3D.Add(vec)
+            Next
+
+            Dim c3D = taskAlg.pointCloud.Get(Of cv.Point3f)(rc.maxDist.Y, rc.maxDist.X)
+            triangles.Clear()
+            Dim color3D As New cv.Point3f(rc.color(2) / 255, rc.color(1) / 255, rc.color(0) / 255)
+            For i = 0 To pt3D.Count - 1
+                triangles.Add(color3D)
+                triangles.Add(c3D)
+                triangles.Add(pt3D(i))
+                triangles.Add(pt3D((i + 1) Mod pt3D.Count))
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class Triangle_Mask : Inherits TaskParent
+        Public triangles As New List(Of cv.Point3f)
+        Public Sub New()
+            labels = {"", "", "RedList_Basics output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
+            desc = "Given a RedCloud cell, resize it and show the points with depth."
+        End Sub
+
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = runRedList(src, labels(2))
+            If taskAlg.redList.oldrclist.Count <= 1 Then Exit Sub
+            Dim rc = taskAlg.oldrcD
+            If rc.index = 0 Then Exit Sub
+
+            dst3.SetTo(0)
+            Dim pt3D As New List(Of cv.Point3f)
+            Dim aspectRect = rc.rect.Width / rc.rect.Height, aspect = dst2.Width / dst2.Height, cellRect As cv.Rect
+            Dim xFactor As Single, yFactor As Single
+            If aspectRect > aspect Then
+                cellRect = New cv.Rect(0, 0, dst2.Width, rc.rect.Height * dst2.Width / rc.rect.Width)
+                xFactor = dst2.Width
+                yFactor = rc.rect.Height * dst2.Width / rc.rect.Width
+            Else
+                cellRect = New cv.Rect(0, 0, rc.rect.Width * dst2.Height / rc.rect.Height, dst2.Height)
+                xFactor = rc.rect.Width * dst2.Height / rc.rect.Height
+                yFactor = dst2.Height
+            End If
+            dst3.Rectangle(cellRect, white, taskAlg.lineWidth)
+
+            triangles.Clear()
+            For y = 0 To rc.rect.Height - 1
+                For x = 0 To rc.rect.Width - 1
+                    If rc.mask.Get(Of Byte)(y, x) = 0 Then Continue For
+                    Dim vec = taskAlg.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
+                    Dim pt = New cv.Point2f(xFactor * x / rc.rect.Width, yFactor * y / rc.rect.Height)
+                    DrawCircle(dst3, pt, taskAlg.DotSize, cv.Scalar.Yellow)
+                    pt3D.Add(vec)
+                Next
+            Next
+
+            Dim newMaxDist = New cv.Point2f(xFactor * (rc.maxDist.X - rc.rect.X) / rc.rect.Width,
+                                      yFactor * (rc.maxDist.Y - rc.rect.Y) / rc.rect.Height)
+            DrawCircle(dst3, newMaxDist, taskAlg.DotSize + 2, cv.Scalar.Red)
+            labels(2) = taskAlg.redList.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Triangle_Basics2D : Inherits TaskParent
+        Public points As New List(Of cv.Point3f)
+        Public colors As New List(Of cv.Scalar)
+        Public oglOptions As New Options_OpenGLFunctions
+        Public hulls As New RedList_Hulls
+        Public Sub New()
+            taskAlg.gOptions.GridSlider.Value = 30
+            desc = "Prepare the list of 2D triangles"
+        End Sub
+        Private Function addTriangle(c1 As cv.Point, c2 As cv.Point, center As cv.Point, rc As oldrcData, shift As cv.Point3f) As List(Of cv.Point)
+            Dim pt1 = Cloud_Basics.worldCoordinates(New cv.Point3f(c1.X, c1.Y, rc.depth))
+            Dim ptCenter = Cloud_Basics.worldCoordinates(New cv.Point3f(center.X, center.Y, rc.depth))
+            Dim pt2 = Cloud_Basics.worldCoordinates(New cv.Point3f(c2.X, c2.Y, rc.depth))
+
+            colors.Add(rc.color)
+            points.Add(New cv.Point3f(pt1.X + shift.X, pt1.Y + shift.Y, pt1.Z + shift.Z))
+            points.Add(New cv.Point3f(ptCenter.X + shift.X, ptCenter.Y + shift.Y, ptCenter.Z + shift.Z))
+            points.Add(New cv.Point3f(pt2.X + shift.X, pt2.Y + shift.Y, pt2.Z + shift.Z))
+
+            Dim points2d As New List(Of cv.Point)
+            points2d.Add(c1)
+            points2d.Add(center)
+            points2d.Add(c2)
+            Return points2d
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            oglOptions.Run()
+            Dim ptM = oglOptions.moveAmount
+            Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
+
+            hulls.Run(src)
+            dst2 = hulls.dst2
+            points.Clear()
+            colors.Clear()
+            Dim listOfPoints = New List(Of List(Of cv.Point))
+            For Each rc In taskAlg.redList.oldrclist
+                If rc.contour Is Nothing Then Continue For
+                If rc.contour.Count < 5 Then Continue For
+                Dim corners(4 - 1) As cv.Point
+                For i = 0 To corners.Count - 1
+                    Dim pt = rc.contour(i * rc.contour.Count / 4)
+                    corners(i) = New cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y)
+                Next
+                Dim center = New cv.Point(rc.rect.X + rc.rect.Width / 2, rc.rect.Y + rc.rect.Height / 2)
+                vbc.DrawLine(dst2, corners(0), center, white)
+                vbc.DrawLine(dst2, corners(1), center, white)
+                vbc.DrawLine(dst2, corners(2), center, white)
+                vbc.DrawLine(dst2, corners(3), center, white)
+
+                listOfPoints.Add(addTriangle(corners(0), corners(3), center, rc, shift))
+                listOfPoints.Add(addTriangle(corners(1), corners(0), center, rc, shift))
+                listOfPoints.Add(addTriangle(corners(2), corners(1), center, rc, shift))
+                listOfPoints.Add(addTriangle(corners(3), corners(2), center, rc, shift))
+            Next
+            dst3.SetTo(0)
+            For i = 0 To colors.Count - 1
+                cv.Cv2.DrawContours(dst3, listOfPoints, i, colors(i), -1)
+            Next
+            labels(2) = CStr(colors.Count) + " triangles from " + CStr(taskAlg.redList.oldrclist.Count) + " RedCloud cells"
+        End Sub
+    End Class
+End Namespace

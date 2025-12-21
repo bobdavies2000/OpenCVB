@@ -1,1076 +1,1079 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Brick_Basics : Inherits TaskParent
-    Public instantUpdate As Boolean
-    Public brickDepthCount As Integer
-    Public brickList As New List(Of brickData)
-    Public options As New Options_Features
-    Public Sub New()
-        algTask.bricks = Me
-        labels(3) = "Right camera image.  Highlighted rectangle matches the dst2 (left) rectangle."
-        desc = "Create the grid of bricks that reduce depth volatility"
-    End Sub
-    Public Function setBrickD() As brickData
-        Static pt As cv.Point2f = brickList(0).rect.TopLeft
-        If algTask.mouseClickFlag Then pt = algTask.ClickPoint
-        Dim index = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
-        Return brickList(index)
-    End Function
-    Public Shared Function RealSenseAlign(brick As brickData) As brickData
-        Dim irPt = Intrinsics_Basics.translate_ColorToLeft(algTask.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
-        Dim badTranslation As Boolean = False
-        If Single.IsNaN(irPt.X) Or Single.IsNaN(irPt.Y) Then badTranslation = True
-        If irPt.X = 0 And irPt.Y = 0 Then badTranslation = True
-        If irPt.X < 0 Or irPt.X >= algTask.color.Width Or irPt.Y >= algTask.color.Height Or badTranslation Then
-            brick.depth = 0 ' off the image
-        Else
-            brick.lRect = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
-            brick.lRect = ValidateRect(brick.lRect)
-
-            Dim LtoR_Pt = Intrinsics_Basics.translate_LeftToRight(algTask.pointCloud.Get(Of cv.Point3f)(brick.lRect.Y,
-                                                                                                                             brick.lRect.X))
-            If LtoR_Pt.X < 0 Or (LtoR_Pt.X = 0 And LtoR_Pt.Y = 0) Or
-                                (LtoR_Pt.X >= algTask.color.Width Or
-                                 LtoR_Pt.Y >= algTask.color.Height) Then
-                brick.depth = 0 ' off the image
-            Else
-                brick.rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, brick.rect.Width, brick.rect.Height)
-                brick.rRect = ValidateRect(brick.rRect)
-            End If
-        End If
-        Return brick
-    End Function
-    Public Shared Function getCorrelation(rect As cv.Rect) As Single
-        Dim correlationMat As New cv.Mat
-        Dim lRect = rect, rRect As cv.Rect
-        Dim depth = algTask.pcSplit(2)(rect).Mean(algTask.depthMask(rect))
-        If depth = 0 Then Return 0 ' no correlation if there is no depth...
-        If algTask.rgbLeftAligned Then
-            rRect = rect
-            rRect.X -= algTask.calibData.baseline * algTask.calibData.rgbIntrinsics.fx / depth.Val0
-            If rRect.X < 0 Or rRect.X + rRect.Width >= algTask.color.Width Then
-                Return 0 ' no correlation if there is no depth...
-            End If
-        Else
-            Dim irPt = Intrinsics_Basics.translate_ColorToLeft(algTask.pointCloud.Get(Of cv.Point3f)(rect.Y, rect.X))
+Namespace VBClasses
+    Public Class Brick_Basics : Inherits TaskParent
+        Public instantUpdate As Boolean
+        Public brickDepthCount As Integer
+        Public brickList As New List(Of brickData)
+        Public options As New Options_Features
+        Public Sub New()
+            taskAlg.bricks = Me
+            labels(3) = "Right camera image.  Highlighted rectangle matches the dst2 (left) rectangle."
+            desc = "Create the grid of bricks that reduce depth volatility"
+        End Sub
+        Public Shared Function RealSenseAlign(brick As brickData) As brickData
+            Dim irPt = Intrinsics_Basics.translate_ColorToLeft(taskAlg.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
             Dim badTranslation As Boolean = False
             If Single.IsNaN(irPt.X) Or Single.IsNaN(irPt.Y) Then badTranslation = True
             If irPt.X = 0 And irPt.Y = 0 Then badTranslation = True
-            If irPt.X < 0 Or irPt.X >= algTask.color.Width Or irPt.Y >= algTask.color.Height Or badTranslation Then
-                Return 0 ' no correlation if there is no depth..
+            If irPt.X < 0 Or irPt.X >= taskAlg.color.Width Or irPt.Y >= taskAlg.color.Height Or badTranslation Then
+                brick.depth = 0 ' off the image
             Else
-                lRect = New cv.Rect(irPt.X, irPt.Y, rect.Width, rect.Height)
-                lRect = ValidateRect(lRect)
+                brick.lRect = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
+                brick.lRect = ValidateRect(brick.lRect)
 
-                Dim LtoR_Pt = Intrinsics_Basics.translate_LeftToRight(algTask.pointCloud.Get(Of cv.Point3f)(lRect.Y, lRect.X))
+                Dim LtoR_Pt = Intrinsics_Basics.translate_LeftToRight(taskAlg.pointCloud.Get(Of cv.Point3f)(brick.lRect.Y,
+                                                                                                                                 brick.lRect.X))
                 If LtoR_Pt.X < 0 Or (LtoR_Pt.X = 0 And LtoR_Pt.Y = 0) Or
-                                (LtoR_Pt.X >= algTask.color.Width Or
-                                 LtoR_Pt.Y >= algTask.color.Height) Then
+                                    (LtoR_Pt.X >= taskAlg.color.Width Or
+                                     LtoR_Pt.Y >= taskAlg.color.Height) Then
+                    brick.depth = 0 ' off the image
+                Else
+                    brick.rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, brick.rect.Width, brick.rect.Height)
+                    brick.rRect = ValidateRect(brick.rRect)
+                End If
+            End If
+            Return brick
+        End Function
+        Public Shared Function getCorrelation(rect As cv.Rect) As Single
+            Dim correlationMat As New cv.Mat
+            Dim lRect = rect, rRect As cv.Rect
+            Dim depth = taskAlg.pcSplit(2)(rect).Mean(taskAlg.depthmask(rect))
+            If depth = 0 Then Return 0 ' no correlation if there is no depth...
+            If taskAlg.rgbLeftAligned Then
+                rRect = rect
+                rRect.X -= taskAlg.calibData.baseline * taskAlg.calibData.rgbIntrinsics.fx / depth.Val0
+                If rRect.X < 0 Or rRect.X + rRect.Width >= taskAlg.color.Width Then
+                    Return 0 ' no correlation if there is no depth...
+                End If
+            Else
+                Dim irPt = Intrinsics_Basics.translate_ColorToLeft(taskAlg.pointCloud.Get(Of cv.Point3f)(rect.Y, rect.X))
+                Dim badTranslation As Boolean = False
+                If Single.IsNaN(irPt.X) Or Single.IsNaN(irPt.Y) Then badTranslation = True
+                If irPt.X = 0 And irPt.Y = 0 Then badTranslation = True
+                If irPt.X < 0 Or irPt.X >= taskAlg.color.Width Or irPt.Y >= taskAlg.color.Height Or badTranslation Then
                     Return 0 ' no correlation if there is no depth..
                 Else
-                    rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, rect.Width, rect.Height)
-                    rRect = ValidateRect(rRect)
-                End If
-            End If
-        End If
+                    lRect = New cv.Rect(irPt.X, irPt.Y, rect.Width, rect.Height)
+                    lRect = ValidateRect(lRect)
 
-        cv.Cv2.MatchTemplate(algTask.leftView(lRect), algTask.rightView(rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-        Return correlationMat.Get(Of Single)(0, 0)
-    End Function
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
-
-        If algTask.bricks.brickList.Count <> algTask.gridRects.Count Then algTask.bricks.brickList.Clear()
-
-        Dim correlationMat As New cv.Mat
-        Dim maxPixels = algTask.brickSize * algTask.brickSize
-        algTask.bricks.brickList.Clear()
-        Dim depthCount As Integer
-        brickDepthCount = 0
-        Dim colorstdev As cv.Scalar
-        For i = 0 To algTask.gridRects.Count - 1
-            Dim brick As New brickData
-            brick.index = algTask.bricks.brickList.Count
-
-            brick.rect = algTask.gridRects(brick.index)
-            brick.lRect = brick.rect
-
-            brick.depth = algTask.pcSplit(2)(brick.rect).Mean(algTask.depthMask(brick.rect))
-            If brick.depth > Single.MaxValue Or brick.depth < Single.MinValue Then brick.depth = 0
-
-            cv.Cv2.MeanStdDev(src(brick.rect), brick.color, colorstdev)
-            brick.center = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
-
-            If brick.depth > 0 Then
-                brick.mm = GetMinMax(algTask.pcSplit(2)(brick.rect), algTask.depthMask(brick.rect))
-                brickDepthCount += 1
-                If algTask.rgbLeftAligned Then
-                    brick.rRect = brick.rect
-                    brick.rRect.X -= algTask.calibData.baseline * algTask.calibData.rgbIntrinsics.fx / brick.depth
-                    If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then
-                        brick.rRect.Width = 0 ' off the image
+                    Dim LtoR_Pt = Intrinsics_Basics.translate_LeftToRight(taskAlg.pointCloud.Get(Of cv.Point3f)(lRect.Y, lRect.X))
+                    If LtoR_Pt.X < 0 Or (LtoR_Pt.X = 0 And LtoR_Pt.Y = 0) Or
+                                    (LtoR_Pt.X >= taskAlg.color.Width Or
+                                     LtoR_Pt.Y >= taskAlg.color.Height) Then
+                        Return 0 ' no correlation if there is no depth..
+                    Else
+                        rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, rect.Width, rect.Height)
+                        rRect = ValidateRect(rRect)
                     End If
-                Else
-                    If i > 0 Then brick = RealSenseAlign(brick)
-                End If
-
-                If brick.lRect.Width = brick.rRect.Width Then
-                    cv.Cv2.MatchTemplate(algTask.leftView(brick.lRect), algTask.rightView(brick.rRect),
-                                                 correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-                    brick.correlation = correlationMat.Get(Of Single)(0, 0)
-
-                    Dim p0 = Cloud_Basics.worldCoordinates(brick.rect.TopLeft, brick.depth)
-                    Dim p1 = Cloud_Basics.worldCoordinates(brick.rect.BottomRight, brick.depth)
-
-                    ' clockwise around starting in upper left.
-                    brick.corners.Add(New cv.Point3f(p0.X, p0.Y, brick.depth))
-                    brick.corners.Add(New cv.Point3f(p1.X, p0.Y, brick.depth))
-                    brick.corners.Add(New cv.Point3f(p1.X, p1.Y, brick.depth))
-                    brick.corners.Add(New cv.Point3f(p0.X, p1.Y, brick.depth))
                 End If
             End If
 
-            If brick.depth > 0 Then depthCount += 1
-            algTask.bricks.brickList.Add(brick)
-        Next
+            cv.Cv2.MatchTemplate(taskAlg.leftView(lRect), taskAlg.rightView(rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+            Return correlationMat.Get(Of Single)(0, 0)
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        If standaloneTest() Then
-            Static edgesLR As New Edge_LeftRight
-            edgesLR.Run(emptyMat)
-            dst2 = edgesLR.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst3 = edgesLR.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            If taskAlg.bricks.brickList.Count <> taskAlg.gridRects.Count Then taskAlg.bricks.brickList.Clear()
 
-            Dim index = algTask.gridMap.Get(Of Integer)(algTask.mouseMovePoint.Y, algTask.mouseMovePoint.X)
-            Dim br = algTask.bricks.brickList(index)
-            SetTrueText(br.displayCell, 1)
-            dst2.Rectangle(br.lRect, algTask.highlight, algTask.lineWidth + 1)
-            dst3.Rectangle(br.rRect, algTask.highlight, algTask.lineWidth + 1)
-            algTask.color.Rectangle(br.lRect, algTask.highlight, algTask.lineWidth)
-        End If
+            Dim correlationMat As New cv.Mat
+            Dim maxPixels = taskAlg.brickSize * taskAlg.brickSize
+            taskAlg.bricks.brickList.Clear()
+            Dim depthCount As Integer
+            brickDepthCount = 0
+            Dim colorstdev As cv.Scalar
+            For i = 0 To taskAlg.gridRects.Count - 1
+                Dim brick As New brickData
+                brick.index = taskAlg.bricks.brickList.Count
 
-        If algTask.heartBeat Then
-            labels(2) = CStr(algTask.bricks.brickList.Count) + " bricks and " +
-                CStr(brickDepthCount) + " had depth.  Left camera image is below."
-        End If
-    End Sub
-End Class
+                brick.rect = taskAlg.gridRects(brick.index)
+                brick.lRect = brick.rect
 
+                brick.depth = taskAlg.pcSplit(2)(brick.rect).Mean(taskAlg.depthmask(brick.rect))
+                If brick.depth > Single.MaxValue Or brick.depth < Single.MinValue Then brick.depth = 0
 
+                cv.Cv2.MeanStdDev(src(brick.rect), brick.color, colorstdev)
+                brick.center = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
 
+                If brick.depth > 0 Then
+                    brick.mm = GetMinMax(taskAlg.pcSplit(2)(brick.rect), taskAlg.depthmask(brick.rect))
+                    brickDepthCount += 1
+                    If taskAlg.rgbLeftAligned Then
+                        brick.rRect = brick.rect
+                        brick.rRect.X -= taskAlg.calibData.baseline * taskAlg.calibData.rgbIntrinsics.fx / brick.depth
+                        If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then
+                            brick.rRect.Width = 0 ' off the image
+                        End If
+                    Else
+                        If i > 0 Then brick = RealSenseAlign(brick)
+                    End If
 
+                    If brick.lRect.Width = brick.rRect.Width Then
+                        cv.Cv2.MatchTemplate(taskAlg.leftView(brick.lRect), taskAlg.rightView(brick.rRect),
+                                                     correlationMat, cv.TemplateMatchModes.CCoeffNormed)
+                        brick.correlation = correlationMat.Get(Of Single)(0, 0)
 
+                        Dim p0 = Cloud_Basics.worldCoordinates(brick.rect.TopLeft, brick.depth)
+                        Dim p1 = Cloud_Basics.worldCoordinates(brick.rect.BottomRight, brick.depth)
 
-Public Class Brick_Plot : Inherits TaskParent
-    Dim plotHist As New Plot_Histogram
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        plotHist.createHistogram = True
-        plotHist.addLabels = False
-        labels(2) = "Click anywhere In the image To the histogram Of that the depth In that cell."
-        desc = "Select any cell To plot a histogram Of that cell's depth"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = algTask.bricks.dst2
+                        ' clockwise around starting in upper left.
+                        brick.corners.Add(New cv.Point3f(p0.X, p0.Y, brick.depth))
+                        brick.corners.Add(New cv.Point3f(p1.X, p0.Y, brick.depth))
+                        brick.corners.Add(New cv.Point3f(p1.X, p1.Y, brick.depth))
+                        brick.corners.Add(New cv.Point3f(p0.X, p1.Y, brick.depth))
+                    End If
+                End If
 
-        Dim index As Integer = algTask.gridMap.Get(Of Integer)(algTask.mouseMovePoint.Y, algTask.mouseMovePoint.X)
-        If algTask.bricks.brickList.Count = 0 Or algTask.optionsChanged Then Exit Sub
-
-        Dim brick As brickData
-        If index < 0 Or index >= algTask.bricks.brickList.Count Then
-            brick = algTask.bricks.brickList(algTask.bricks.brickList.Count / 2)
-            algTask.mouseMovePoint = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
-        Else
-            brick = algTask.bricks.brickList(index)
-        End If
-
-        Dim split() = algTask.pointCloud(brick.rect).Split()
-        Dim mm = GetMinMax(split(2))
-        If Single.IsInfinity(mm.maxVal) Then Exit Sub
-
-        Static lastMouse As cv.Point = algTask.mouseMovePoint
-        If algTask.heartBeat Or lastMouse <> algTask.mouseMovePoint Then
-            lastMouse = algTask.mouseMovePoint
-            If Math.Abs(mm.maxVal - mm.minVal) > 0 Then
-                plotHist.minRange = mm.minVal
-                plotHist.maxRange = mm.maxVal
-                plotHist.Run(split(2))
-                dst3 = plotHist.dst2
-                labels(3) = "Depth values vary from " + Format(plotHist.minRange, fmt3) +
-                                " to " + Format(plotHist.maxRange, fmt3)
-            End If
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Brick_FullDepth : Inherits TaskParent
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        labels(2) = "Left image bricks - no overlap.  Click in any column to highlight that column."
-        labels(3) = "Right image: corresponding bricks.  Overlap indicates uncertainty about depth."
-        desc = "Display the bricks for all cells with depth."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If algTask.rgbLeftAligned Then
-            dst2 = algTask.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        Else
-            dst2 = src
-        End If
-        dst3 = algTask.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        Dim col As Integer, bricksPerRow = algTask.bricksPerRow
-        Static whiteCol As Integer = bricksPerRow / 2
-        If algTask.mouseClickFlag Then
-            whiteCol = Math.Round(bricksPerRow * (algTask.ClickPoint.X - algTask.brickSize / 2) / dst2.Width)
-        End If
-        For Each brick In algTask.bricks.brickList
-            If brick.depth > 0 Then
-                Dim color = If(col = whiteCol, cv.Scalar.Black, algTask.scalarColors(255 * (col / bricksPerRow)))
-                dst2.Rectangle(brick.rect, color, algTask.lineWidth)
-                dst3.Rectangle(brick.rRect, color, algTask.lineWidth)
-            End If
-            col += 1
-            If col >= bricksPerRow Then col = 0
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Brick_InstantUpdate : Inherits TaskParent
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        algTask.bricks = New Brick_Basics
-        algTask.bricks.instantUpdate = True
-        labels(3) = "Pointcloud image for cells with good visibility"
-        desc = "Create the grid of bricks with good visibility"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If algTask.heartBeat Then labels(2) = CStr(algTask.bricks.brickDepthCount) + " bricks have reasonable depth."
-
-        dst2 = algTask.bricks.dst2
-        dst3 = algTask.bricks.dst3
-
-        labels(2) = algTask.bricks.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Brick_Edges : Inherits TaskParent
-    Public edges As New Edge_Basics
-    Public featureRects As New List(Of cv.Rect)
-    Public featureMask As New cv.Mat
-    Public fLessMask As New cv.Mat
-    Public fLessRects As New List(Of cv.Rect)
-    Public Sub New()
-        featureMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        fLessMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        algTask.featureOptions.EdgeMethods.SelectedItem() = "Laplacian"
-        desc = "Add edges to features"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Static stateList As New List(Of Single)
-        Static lastDepth As cv.Mat = algTask.lowResDepth.Clone
-
-        edges.Run(src)
-
-        featureRects.Clear()
-        fLessRects.Clear()
-        featureMask.SetTo(0)
-        fLessMask.SetTo(0)
-        Dim flist As New List(Of Single)
-        For Each r In algTask.gridRects
-            flist.Add(If(edges.dst2(r).CountNonZero <= 1, 1, 2))
-        Next
-
-        If algTask.optionsChanged Or stateList.Count = 0 Then
-            stateList.Clear()
-            For Each n In flist
-                stateList.Add(n)
+                If brick.depth > 0 Then depthCount += 1
+                taskAlg.bricks.brickList.Add(brick)
             Next
-        End If
 
-        Dim flipRects As New List(Of cv.Rect)
-        For i = 0 To algTask.gridRects.Count - 1
-            stateList(i) = (stateList(i) + flist(i)) / 2
-            Dim r = algTask.gridRects(i)
-            If stateList(i) >= 1.95 Then
-                featureRects.Add(r)
-                featureMask(r).SetTo(255)
-            ElseIf stateList(i) <= 1.05 Then
-                fLessRects.Add(r)
-                fLessMask(r).SetTo(255)
+            If standaloneTest() Then
+                Static edgesLR As New Edge_LeftRight
+                edgesLR.Run(emptyMat)
+                dst2 = edgesLR.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                dst3 = edgesLR.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+                Dim index = taskAlg.gridMap.Get(Of Integer)(taskAlg.mouseMovePoint.Y, taskAlg.mouseMovePoint.X)
+                Dim br = taskAlg.bricks.brickList(index)
+                SetTrueText(br.displayCell, 1)
+                dst2.Rectangle(br.lRect, taskAlg.highlight, taskAlg.lineWidth + 1)
+                dst3.Rectangle(br.rRect, taskAlg.highlight, taskAlg.lineWidth + 1)
+                taskAlg.color.Rectangle(br.lRect, taskAlg.highlight, taskAlg.lineWidth)
+            End If
+
+            If taskAlg.heartBeat Then
+                labels(2) = CStr(taskAlg.bricks.brickList.Count) + " bricks and " +
+                    CStr(brickDepthCount) + " had depth.  Left camera image is below."
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Brick_Plot : Inherits TaskParent
+        Dim plotHist As New Plot_Histogram
+        Public Sub New()
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            plotHist.createHistogram = True
+            plotHist.addLabels = False
+            labels(2) = "Click anywhere In the image To the histogram Of that the depth In that cell."
+            desc = "Select any cell To plot a histogram Of that cell's depth"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = taskAlg.bricks.dst2
+
+            Dim index As Integer = taskAlg.gridMap.Get(Of Integer)(taskAlg.mouseMovePoint.Y, taskAlg.mouseMovePoint.X)
+            If taskAlg.bricks.brickList.Count = 0 Or taskAlg.optionsChanged Then Exit Sub
+
+            Dim brick As brickData
+            If index < 0 Or index >= taskAlg.bricks.brickList.Count Then
+                brick = taskAlg.bricks.brickList(taskAlg.bricks.brickList.Count / 2)
+                taskAlg.mouseMovePoint = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
             Else
-                flipRects.Add(r)
+                brick = taskAlg.bricks.brickList(index)
             End If
-        Next
 
-        dst2.SetTo(0)
-        dst3.SetTo(0)
-        src.CopyTo(dst2, featureMask)
-        src.CopyTo(dst3, featureMask)
+            Dim split() = taskAlg.pointCloud(brick.rect).Split()
+            Dim mm = GetMinMax(split(2))
+            If Single.IsInfinity(mm.maxVal) Then Exit Sub
 
-        For Each r In flipRects
-            dst2.Rectangle(r, algTask.highlight, algTask.lineWidth)
-        Next
+            Static lastMouse As cv.Point = taskAlg.mouseMovePoint
+            If taskAlg.heartBeat Or lastMouse <> taskAlg.mouseMovePoint Then
+                lastMouse = taskAlg.mouseMovePoint
+                If Math.Abs(mm.maxVal - mm.minVal) > 0 Then
+                    plotHist.minRange = mm.minVal
+                    plotHist.maxRange = mm.maxVal
+                    plotHist.Run(split(2))
+                    dst3 = plotHist.dst2
+                    labels(3) = "Depth values vary from " + Format(plotHist.minRange, fmt3) +
+                                " to " + Format(plotHist.maxRange, fmt3)
+                End If
+            End If
+        End Sub
+    End Class
 
-        For Each r In fLessRects
-            Dim x = CInt(r.X / algTask.brickSize)
-            Dim y = CInt(r.Y / algTask.brickSize)
-            algTask.lowResDepth.Set(Of Single)(y, x, lastDepth.Get(Of Single)(y, x))
-        Next
-        lastDepth = algTask.lowResDepth.Clone
-        If algTask.heartBeat Then
-            labels(2) = CStr(fLessRects.Count) + " cells without features were found.  " +
+
+
+
+
+
+    Public Class Brick_FullDepth : Inherits TaskParent
+        Public Sub New()
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            labels(2) = "Left image bricks - no overlap.  Click in any column to highlight that column."
+            labels(3) = "Right image: corresponding bricks.  Overlap indicates uncertainty about depth."
+            desc = "Display the bricks for all cells with depth."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If taskAlg.rgbLeftAligned Then
+                dst2 = taskAlg.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            Else
+                dst2 = src
+            End If
+            dst3 = taskAlg.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+            Dim col As Integer, bricksPerRow = taskAlg.bricksPerRow
+            Static whiteCol As Integer = bricksPerRow / 2
+            If taskAlg.mouseClickFlag Then
+                whiteCol = Math.Round(bricksPerRow * (taskAlg.clickPoint.X - taskAlg.brickSize / 2) / dst2.Width)
+            End If
+            For Each brick In taskAlg.bricks.brickList
+                If brick.depth > 0 Then
+                    Dim color = If(col = whiteCol, cv.Scalar.Black, taskAlg.scalarColors(255 * (col / bricksPerRow)))
+                    dst2.Rectangle(brick.rect, color, taskAlg.lineWidth)
+                    dst3.Rectangle(brick.rRect, color, taskAlg.lineWidth)
+                End If
+                col += 1
+                If col >= bricksPerRow Then col = 0
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class Brick_InstantUpdate : Inherits TaskParent
+        Public Sub New()
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            taskAlg.bricks = New Brick_Basics
+            taskAlg.bricks.instantUpdate = True
+            labels(3) = "Pointcloud image for cells with good visibility"
+            desc = "Create the grid of bricks with good visibility"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If taskAlg.heartBeat Then labels(2) = CStr(taskAlg.bricks.brickDepthCount) + " bricks have reasonable depth."
+
+            dst2 = taskAlg.bricks.dst2
+            dst3 = taskAlg.bricks.dst3
+
+            labels(2) = taskAlg.bricks.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class Brick_Edges : Inherits TaskParent
+        Public edges As New Edge_Basics
+        Public featureRects As New List(Of cv.Rect)
+        Public featureMask As New cv.Mat
+        Public fLessMask As New cv.Mat
+        Public fLessRects As New List(Of cv.Rect)
+        Public Sub New()
+            featureMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+            fLessMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+            taskAlg.featureOptions.EdgeMethods.SelectedItem() = "Laplacian"
+            desc = "Add edges to features"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static stateList As New List(Of Single)
+            Static lastDepth As cv.Mat = taskAlg.lowResDepth.Clone
+
+            edges.Run(src)
+
+            featureRects.Clear()
+            fLessRects.Clear()
+            featureMask.SetTo(0)
+            fLessMask.SetTo(0)
+            Dim flist As New List(Of Single)
+            For Each r In taskAlg.gridRects
+                flist.Add(If(edges.dst2(r).CountNonZero <= 1, 1, 2))
+            Next
+
+            If taskAlg.optionsChanged Or stateList.Count = 0 Then
+                stateList.Clear()
+                For Each n In flist
+                    stateList.Add(n)
+                Next
+            End If
+
+            Dim flipRects As New List(Of cv.Rect)
+            For i = 0 To taskAlg.gridRects.Count - 1
+                stateList(i) = (stateList(i) + flist(i)) / 2
+                Dim r = taskAlg.gridRects(i)
+                If stateList(i) >= 1.95 Then
+                    featureRects.Add(r)
+                    featureMask(r).SetTo(255)
+                ElseIf stateList(i) <= 1.05 Then
+                    fLessRects.Add(r)
+                    fLessMask(r).SetTo(255)
+                Else
+                    flipRects.Add(r)
+                End If
+            Next
+
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            src.CopyTo(dst2, featureMask)
+            src.CopyTo(dst3, featureMask)
+
+            For Each r In flipRects
+                dst2.Rectangle(r, taskAlg.highlight, taskAlg.lineWidth)
+            Next
+
+            For Each r In fLessRects
+                Dim x = CInt(r.X / taskAlg.brickSize)
+                Dim y = CInt(r.Y / taskAlg.brickSize)
+                taskAlg.lowResDepth.Set(Of Single)(y, x, lastDepth.Get(Of Single)(y, x))
+            Next
+            lastDepth = taskAlg.lowResDepth.Clone
+            If taskAlg.heartBeat Then
+                labels(2) = CStr(fLessRects.Count) + " cells without features were found.  " +
                         "Cells that are flipping (with and without edges) are highlighted"
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Brick_MLColorDepth : Inherits TaskParent
-    Dim ml As New ML_Basics
-    Dim bounds As New Brick_FeaturesAndEdges
-    Public Sub New()
-        If standalone Then algTask.gOptions.displayDst1.Checked = True
-        ml.buildEveryPass = True
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bounds.Run(src)
-        Dim edgeMask = bounds.feat.edges.dst2
-
-        Dim rgb32f As New cv.Mat, tmp As New cv.Mat
-        src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
-
-        dst1 = bounds.feat.fLessMask
-        Dim trainRGB As cv.Mat, trainDepth As cv.Mat
-        For i = 0 To bounds.boundaryCells.Count - 1
-            Dim nList = bounds.boundaryCells(i)
-
-            ' the first roi is the center one and the only roi with edges.  The rest are featureless.
-            Dim roi = algTask.gridRects(nList(0))
-            Dim edgePixels = edgeMask(roi).FindNonZero()
-
-            ' mark the edge pixels as class 2 - others will be updated next
-            ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
-                                           cv.MatType.CV_32F, New cv.Scalar(2))
-            trainRGB = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32FC3)
-            trainDepth = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32F)
-
-            For j = 1 To nList.Count - 1
-                Dim roiA = algTask.gridRects(nList(j))
-                Dim x As Integer = Math.Floor(roiA.X * algTask.bricksPerRow / algTask.cols)
-                Dim y As Integer = Math.Floor(roiA.Y * algTask.bricksPerCol / algTask.rows)
-                Dim val = algTask.lowResColor.Get(Of cv.Vec3f)(y, x)
-                trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
-                trainDepth.Set(Of Single)(j - 1, 0, algTask.lowResDepth.Get(Of Single)(y, x))
-                ml.trainResponse.Set(Of Single)(j - 1, 0, 1)
-            Next
-
-            ' next, add the edge pixels in the target cell - they are the feature identifiers.
-            Dim index = nList.Count - 1
-            For j = 0 To edgePixels.Rows - 1
-                Dim pt = edgePixels.Get(Of cv.Point)(j, 0)
-                Dim val = rgb32f(roi).Get(Of cv.Vec3f)(pt.Y, pt.X)
-                trainRGB.Set(Of cv.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
-                Dim depth = algTask.pcSplit(2)(roi).Get(Of Single)(pt.Y, pt.X)
-                trainDepth.Set(Of Single)(index + j, 0, depth)
-            Next
-
-            ml.trainMats = {trainRGB, trainDepth}
-
-            Dim roiB = algTask.gridRects(nList(0))
-            ml.testMats = {rgb32f(roiB), algTask.pcSplit(2)(roiB)}
-            ml.Run(src)
-
-            dst1(roiB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
-                                        ConvertScaleAbs.Reshape(1, roiB.Height)
-        Next
-
-        dst2.SetTo(0)
-        src.CopyTo(dst2, dst1)
-
-        dst3.SetTo(0)
-        src.CopyTo(dst3, Not dst1)
-
-        labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
-                  " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Brick_EdgeDraw : Inherits TaskParent
-    Dim regions As New Region_Contours
-    Dim edgeline As New EdgeLine_Basics
-    Public Sub New()
-        desc = "Lines can mean cells are connected."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        regions.Run(src)
-        dst2 = regions.dst3
-        labels(2) = regions.labels(2)
-
-        edgeline.Run(algTask.grayStable)
-        dst2.SetTo(cv.Scalar.White, edgeline.dst2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-Public Class Brick_CorrelationInput : Inherits TaskParent
-    Dim LRMeanSub As New MeanSubtraction_LeftRight
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        desc = "Given a left image cell, find it's match in the right image, and display their correlation."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If algTask.optionsChanged Then Exit Sub ' settle down first...
-
-        LRMeanSub.Run(src)
-        dst2 = LRMeanSub.dst2
-        dst3 = LRMeanSub.dst3
-
-        Dim index As Integer = algTask.gridMap.Get(Of Integer)(algTask.mouseMovePoint.Y, algTask.mouseMovePoint.X)
-        If index < 0 Or index > algTask.bricks.brickList.Count Then Exit Sub
-        algTask.brickD = algTask.bricks.brickList(index)
-
-        Dim corr = algTask.brickD.correlation
-        DrawCircle(dst2, algTask.brickD.lRect.TopLeft, algTask.DotSize, 255)
-        Dim pt = New cv.Point(algTask.brickD.rect.TopLeft.X, algTask.brickD.rect.TopLeft.Y - 10)
-        SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)
-        labels(3) = "Correlation of the left brick to the right is " + Format(corr, fmt3)
-
-        Dim grayScale As Integer = 128
-        DrawRect(dst2, algTask.brickD.lRect, grayScale)
-        DrawRect(dst3, algTask.brickD.rRect, grayScale)
-        labels(2) = "The correlation coefficient at " + algTask.brickD.rect.TopLeft.ToString + " is " + Format(corr, fmt3)
-    End Sub
-End Class
-
-
-
-
-Public Class Brick_Info : Inherits TaskParent
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        algTask.ClickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        desc = "Display the info about the select brick."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        labels(2) = algTask.bricks.labels(2)
-
-        Dim index As Integer = algTask.gridMap.Get(Of Integer)(algTask.mouseMovePoint.Y, algTask.mouseMovePoint.X)
-
-        Dim brick As brickData = algTask.bricks.brickList(index)
-        dst2 = src
-
-        strOut = labels(2) + vbCrLf + vbCrLf
-
-        dst2.Rectangle(brick.rect, algTask.highlight, algTask.lineWidth)
-
-        strOut += CStr(index) + vbTab + "Grid ID" + vbCrLf
-        strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
-        strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation of the left image to right image" + vbCrLf
-        strOut += Format(brick.depth, fmt3) + vbTab + "Depth" + vbCrLf
-        strOut += Format(brick.mm.minVal, fmt3) + vbTab + "Depth mm.minval" + vbCrLf
-        strOut += Format(brick.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
-        strOut += Format(brick.mm.range, fmt3) + vbTab + "Depth mm.range" + vbCrLf
-
-        SetTrueText(strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Brick_LeftToColor : Inherits TaskParent
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        If algTask.settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then algTask.gOptions.gravityPointCloud.Checked = False
-        desc = "Align brick left rectangles in color with the left image.  StereoLabs and Orbbec already match."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = algTask.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3.SetTo(0)
-        Dim count As Integer
-        For Each brick In algTask.bricks.brickList
-            If brick.depth > 0 Then
-                count += 1
-                DrawCircle(algTask.color, brick.rect.TopLeft)
-                DrawCircle(dst2, brick.lRect.TopLeft)
             End If
-        Next
-        labels(2) = CStr(count) + " bricks have depth and therefore an equivalent in the left and right views."
-    End Sub
-End Class
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class Brick_LeftRightMouse : Inherits TaskParent
-    Public means As New List(Of Single)
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        labels(2) = "Move the mouse in the color image to see the matches in left and right images. Click to clear the rectangles."
-        labels(3) = "Right view with the translated trace of bricks under the mouse."
-        If algTask.settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then algTask.gOptions.gravityPointCloud.Checked = False
-        If standalone Then algTask.gOptions.displayDst0.Checked = True
-        desc = "Map the bricks from the color image into the left view and the right view."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst0 = src
-        dst2 = algTask.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3 = algTask.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        Static myBricks As New List(Of Integer)
-        If standalone And algTask.testAllRunning Then
-            Dim index As Integer = algTask.gridMap.Get(Of Integer)(algTask.ClickPoint.Y, algTask.ClickPoint.X)
-            For i = index To index + 10
-                If myBricks.Contains(i) = False Then myBricks.Add(i)
+    Public Class Brick_MLColorDepth : Inherits TaskParent
+        Dim ml As New ML_Basics
+        Dim bounds As New Brick_FeaturesAndEdges
+        Public Sub New()
+            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
+            ml.buildEveryPass = True
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+            desc = "Train an ML tree to predict each pixel of the boundary cells using color and depth from boundary neighbors."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bounds.Run(src)
+            Dim edgeMask = bounds.feat.edges.dst2
+
+            Dim rgb32f As New cv.Mat, tmp As New cv.Mat
+            src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
+
+            dst1 = bounds.feat.fLessMask
+            Dim trainRGB As cv.Mat, trainDepth As cv.Mat
+            For i = 0 To bounds.boundaryCells.Count - 1
+                Dim nList = bounds.boundaryCells(i)
+
+                ' the first roi is the center one and the only roi with edges.  The rest are featureless.
+                Dim roi = taskAlg.gridRects(nList(0))
+                Dim edgePixels = edgeMask(roi).FindNonZero()
+
+                ' mark the edge pixels as class 2 - others will be updated next
+                ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
+                                           cv.MatType.CV_32F, New cv.Scalar(2))
+                trainRGB = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32FC3)
+                trainDepth = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32F)
+
+                For j = 1 To nList.Count - 1
+                    Dim roiA = taskAlg.gridRects(nList(j))
+                    Dim x As Integer = Math.Floor(roiA.X * taskAlg.bricksPerRow / taskAlg.cols)
+                    Dim y As Integer = Math.Floor(roiA.Y * taskAlg.bricksPerCol / taskAlg.rows)
+                    Dim val = taskAlg.lowResColor.Get(Of cv.Vec3f)(y, x)
+                    trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
+                    trainDepth.Set(Of Single)(j - 1, 0, taskAlg.lowResDepth.Get(Of Single)(y, x))
+                    ml.trainResponse.Set(Of Single)(j - 1, 0, 1)
+                Next
+
+                ' next, add the edge pixels in the target cell - they are the feature identifiers.
+                Dim index = nList.Count - 1
+                For j = 0 To edgePixels.Rows - 1
+                    Dim pt = edgePixels.Get(Of cv.Point)(j, 0)
+                    Dim val = rgb32f(roi).Get(Of cv.Vec3f)(pt.Y, pt.X)
+                    trainRGB.Set(Of cv.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
+                    Dim depth = taskAlg.pcSplit(2)(roi).Get(Of Single)(pt.Y, pt.X)
+                    trainDepth.Set(Of Single)(index + j, 0, depth)
+                Next
+
+                ml.trainMats = {trainRGB, trainDepth}
+
+                Dim roiB = taskAlg.gridRects(nList(0))
+                ml.testMats = {rgb32f(roiB), taskAlg.pcSplit(2)(roiB)}
+                ml.Run(src)
+
+                dst1(roiB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
+                                        ConvertScaleAbs.Reshape(1, roiB.Height)
             Next
-        Else
-            Dim index As Integer = algTask.gridMap.Get(Of Integer)(algTask.mouseMovePoint.Y, algTask.mouseMovePoint.X)
-            If myBricks.Contains(index) = False Then myBricks.Add(index)
-        End If
 
-        For Each index In myBricks
-            Dim brick = algTask.bricks.brickList(index)
-            dst0.Rectangle(brick.rect, algTask.highlight, algTask.lineWidth)
-            dst2.Rectangle(brick.lRect, algTask.highlight, algTask.lineWidth)
-            dst3.Rectangle(brick.rRect, algTask.highlight, algTask.lineWidth)
-        Next
-        If algTask.mouseClickFlag Then myBricks.Clear()
-    End Sub
-End Class
+            dst2.SetTo(0)
+            src.CopyTo(dst2, dst1)
+
+            dst3.SetTo(0)
+            src.CopyTo(dst3, Not dst1)
+
+            labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
+                  " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class Brick_RGBtoLeft : Inherits TaskParent
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        labels(3) = "Right camera image..."
-        If algTask.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then algTask.gOptions.gravityPointCloud.Checked = False
-        desc = "Translate the RGB to left view - only needed for the Intel RealSense cameras."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        Dim camInfo = algTask.calibData, correlationMat As New cv.Mat
-        Dim index As Integer = algTask.gridMap.Get(Of Integer)(algTask.mouseMovePoint.Y, algTask.mouseMovePoint.X)
-        Dim brick As brickData
-        If index > 0 And index < algTask.bricks.brickList.Count Then
-            brick = algTask.bricks.brickList(index)
-        Else
-            brick = algTask.bricks.brickList(algTask.bricks.brickList.Count / 2)
-        End If
 
-        Dim irPt As cv.Point = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        Dim rgbTop = brick.rect.TopLeft, ir3D As cv.Point3f
-        ' stereolabs and orbbec already aligned the RGB and left images so depth in the left image
-        ' can be found.  For Intel, the left image and RGB need to be aligned first.
-        ' With depth the correlation between the left and right for that brick will be accurate (if there is depth.)
-        If algTask.rgbLeftAligned Then
-            irPt = brick.rect.TopLeft ' the above cameras are already have RGB aligned to the left image.
-        Else
-            Dim pcTop = algTask.pointCloud.Get(Of cv.Point3f)(rgbTop.Y, rgbTop.X)
-            If pcTop.Z > 0 Then
-                ir3D.X = camInfo.ColorToLeft_rotation(0) * pcTop.X +
+    Public Class Brick_EdgeDraw : Inherits TaskParent
+        Dim regions As New Region_Contours
+        Dim edgeline As New EdgeLine_Basics
+        Public Sub New()
+            desc = "Lines can mean cells are connected."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            regions.Run(src)
+            dst2 = regions.dst3
+            labels(2) = regions.labels(2)
+
+            edgeline.Run(taskAlg.grayStable)
+            dst2.SetTo(cv.Scalar.White, edgeline.dst2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+
+
+
+    Public Class Brick_CorrelationInput : Inherits TaskParent
+        Dim LRMeanSub As New MeanSubtraction_LeftRight
+        Public Sub New()
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            desc = "Given a left image cell, find it's match in the right image, and display their correlation."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If taskAlg.optionsChanged Then Exit Sub ' settle down first...
+
+            LRMeanSub.Run(src)
+            dst2 = LRMeanSub.dst2
+            dst3 = LRMeanSub.dst3
+
+            Dim index As Integer = taskAlg.gridMap.Get(Of Integer)(taskAlg.mouseMovePoint.Y, taskAlg.mouseMovePoint.X)
+            If index < 0 Or index > taskAlg.bricks.brickList.Count Then Exit Sub
+            taskAlg.brickD = taskAlg.bricks.brickList(index)
+
+            Dim corr = taskAlg.brickD.correlation
+            DrawCircle(dst2, taskAlg.brickD.lRect.TopLeft, taskAlg.DotSize, 255)
+            Dim pt = New cv.Point(taskAlg.brickD.rect.TopLeft.X, taskAlg.brickD.rect.TopLeft.Y - 10)
+            SetTrueText("Corr. " + Format(corr, fmt3) + vbCrLf, pt, 2)
+            labels(3) = "Correlation of the left brick to the right is " + Format(corr, fmt3)
+
+            Dim grayScale As Integer = 128
+            DrawRect(dst2, taskAlg.brickD.lRect, grayScale)
+            DrawRect(dst3, taskAlg.brickD.rRect, grayScale)
+            labels(2) = "The correlation coefficient at " + taskAlg.brickD.rect.TopLeft.ToString + " is " + Format(corr, fmt3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class Brick_Info : Inherits TaskParent
+        Public Sub New()
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            taskAlg.clickPoint = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+            desc = "Display the info about the select brick."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            labels(2) = taskAlg.bricks.labels(2)
+
+            Dim index As Integer = taskAlg.gridMap.Get(Of Integer)(taskAlg.mouseMovePoint.Y, taskAlg.mouseMovePoint.X)
+
+            Dim brick As brickData = taskAlg.bricks.brickList(index)
+            dst2 = src
+
+            strOut = labels(2) + vbCrLf + vbCrLf
+
+            dst2.Rectangle(brick.rect, taskAlg.highlight, taskAlg.lineWidth)
+
+            strOut += CStr(index) + vbTab + "Grid ID" + vbCrLf
+            strOut += CStr(brick.age) + vbTab + "Age" + vbTab + vbCrLf
+            strOut += Format(brick.correlation, fmt3) + vbTab + "Correlation of the left image to right image" + vbCrLf
+            strOut += Format(brick.depth, fmt3) + vbTab + "Depth" + vbCrLf
+            strOut += Format(brick.mm.minVal, fmt3) + vbTab + "Depth mm.minval" + vbCrLf
+            strOut += Format(brick.mm.maxVal, fmt3) + vbTab + "Depth mm.maxval" + vbCrLf
+            strOut += Format(brick.mm.range, fmt3) + vbTab + "Depth mm.range" + vbCrLf
+
+            SetTrueText(strOut, 3)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class Brick_LeftToColor : Inherits TaskParent
+        Public Sub New()
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            If taskAlg.Settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then taskAlg.gOptions.gravityPointCloud.Checked = False
+            desc = "Align brick left rectangles in color with the left image.  StereoLabs and Orbbec already match."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = taskAlg.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst3.SetTo(0)
+            Dim count As Integer
+            For Each brick In taskAlg.bricks.brickList
+                If brick.depth > 0 Then
+                    count += 1
+                    DrawCircle(taskAlg.color, brick.rect.TopLeft)
+                    DrawCircle(dst2, brick.lRect.TopLeft)
+                End If
+            Next
+            labels(2) = CStr(count) + " bricks have depth and therefore an equivalent in the left and right views."
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Brick_LeftRightMouse : Inherits TaskParent
+        Public means As New List(Of Single)
+        Public Sub New()
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            labels(2) = "Move the mouse in the color image to see the matches in left and right images. Click to clear the rectangles."
+            labels(3) = "Right view with the translated trace of bricks under the mouse."
+            If taskAlg.Settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then taskAlg.gOptions.gravityPointCloud.Checked = False
+            If standalone Then taskAlg.gOptions.displayDst0.Checked = True
+            desc = "Map the bricks from the color image into the left view and the right view."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst0 = src
+            dst2 = taskAlg.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst3 = taskAlg.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+            Static myBricks As New List(Of Integer)
+            If standalone And taskAlg.testAllRunning Then
+                Dim index As Integer = taskAlg.gridMap.Get(Of Integer)(taskAlg.clickPoint.Y, taskAlg.clickPoint.X)
+                For i = index To index + 10
+                    If myBricks.Contains(i) = False Then myBricks.Add(i)
+                Next
+            Else
+                Dim index As Integer = taskAlg.gridMap.Get(Of Integer)(taskAlg.mouseMovePoint.Y, taskAlg.mouseMovePoint.X)
+                If myBricks.Contains(index) = False Then myBricks.Add(index)
+            End If
+
+            For Each index In myBricks
+                Dim brick = taskAlg.bricks.brickList(index)
+                dst0.Rectangle(brick.rect, taskAlg.highlight, taskAlg.lineWidth)
+                dst2.Rectangle(brick.lRect, taskAlg.highlight, taskAlg.lineWidth)
+                dst3.Rectangle(brick.rRect, taskAlg.highlight, taskAlg.lineWidth)
+            Next
+            If taskAlg.mouseClickFlag Then myBricks.Clear()
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Brick_RGBtoLeft : Inherits TaskParent
+        Public Sub New()
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            labels(3) = "Right camera image..."
+            If taskAlg.Settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then
+                taskAlg.gOptions.gravityPointCloud.Checked = False
+            End If
+            desc = "Translate the RGB to left view - only needed for the Intel RealSense cameras."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim camInfo = taskAlg.calibData, correlationMat As New cv.Mat
+            Dim index As Integer = taskAlg.gridMap.Get(Of Integer)(taskAlg.mouseMovePoint.Y, taskAlg.mouseMovePoint.X)
+            Dim brick As brickData
+            If index > 0 And index < taskAlg.bricks.brickList.Count Then
+                brick = taskAlg.bricks.brickList(index)
+            Else
+                brick = taskAlg.bricks.brickList(taskAlg.bricks.brickList.Count / 2)
+            End If
+
+            Dim irPt As cv.Point = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+            Dim rgbTop = brick.rect.TopLeft, ir3D As cv.Point3f
+            ' stereolabs and orbbec already aligned the RGB and left images so depth in the left image
+            ' can be found.  For Intel, the left image and RGB need to be aligned first.
+            ' With depth the correlation between the left and right for that brick will be accurate (if there is depth.)
+            If taskAlg.rgbLeftAligned Then
+                irPt = brick.rect.TopLeft ' the above cameras are already have RGB aligned to the left image.
+            Else
+                Dim pcTop = taskAlg.pointCloud.Get(Of cv.Point3f)(rgbTop.Y, rgbTop.X)
+                If pcTop.Z > 0 Then
+                    ir3D.X = camInfo.ColorToLeft_rotation(0) * pcTop.X +
                          camInfo.ColorToLeft_rotation(1) * pcTop.Y +
                          camInfo.ColorToLeft_rotation(2) * pcTop.Z + camInfo.ColorToLeft_translation(0)
-                ir3D.Y = camInfo.ColorToLeft_rotation(3) * pcTop.X +
+                    ir3D.Y = camInfo.ColorToLeft_rotation(3) * pcTop.X +
                          camInfo.ColorToLeft_rotation(4) * pcTop.Y +
                          camInfo.ColorToLeft_rotation(5) * pcTop.Z + camInfo.ColorToLeft_translation(1)
-                ir3D.Z = camInfo.ColorToLeft_rotation(6) * pcTop.X +
+                    ir3D.Z = camInfo.ColorToLeft_rotation(6) * pcTop.X +
                          camInfo.ColorToLeft_rotation(7) * pcTop.Y +
                          camInfo.ColorToLeft_rotation(8) * pcTop.Z + camInfo.ColorToLeft_translation(2)
-                irPt.X = camInfo.leftIntrinsics.fx * ir3D.X / ir3D.Z + camInfo.leftIntrinsics.ppx
-                irPt.Y = camInfo.leftIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.leftIntrinsics.ppy
+                    irPt.X = camInfo.leftIntrinsics.fx * ir3D.X / ir3D.Z + camInfo.leftIntrinsics.ppx
+                    irPt.Y = camInfo.leftIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.leftIntrinsics.ppy
+                End If
             End If
-        End If
-        labels(2) = "RGB point at " + rgbTop.ToString + " is at " + irPt.ToString + " in the left view "
+            labels(2) = "RGB point at " + rgbTop.ToString + " is at " + irPt.ToString + " in the left view "
 
-        dst2 = algTask.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3 = algTask.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = taskAlg.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst3 = taskAlg.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        dst2.Rectangle(New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height), algTask.highlight, algTask.lineWidth)
-        dst3.Rectangle(brick.rRect, algTask.highlight, algTask.lineWidth)
-    End Sub
-End Class
-
+            dst2.Rectangle(New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height), taskAlg.highlight, taskAlg.lineWidth)
+            dst3.Rectangle(brick.rRect, taskAlg.highlight, taskAlg.lineWidth)
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class Brick_RegionLines : Inherits TaskParent
-    Dim regions As New Region_Contours
-    Public Sub New()
-        desc = "Lines can mean cells are connected."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        regions.Run(src)
-        dst2 = regions.dst2
-        dst3 = regions.dst3
-        labels = regions.labels
 
-        For Each lp In algTask.lines.lpList
-            Dim c1 = dst2.Get(Of cv.Vec3b)(lp.p1.Y, lp.p1.X)
-            Dim c2 = dst2.Get(Of cv.Vec3b)(lp.p2.Y, lp.p2.X)
-            If c1 <> c2 Then
-                dst3.Line(lp.p1, lp.p2, white, algTask.lineWidth, algTask.lineWidth)
-            Else
-                dst2.Line(lp.p1, lp.p2, white, algTask.lineWidth, algTask.lineWidth)
-            End If
-        Next
-    End Sub
-End Class
+    Public Class Brick_RegionLines : Inherits TaskParent
+        Dim regions As New Region_Contours
+        Public Sub New()
+            desc = "Lines can mean cells are connected."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            regions.Run(src)
+            dst2 = regions.dst2
+            dst3 = regions.dst3
+            labels = regions.labels
 
-
-
+            For Each lp In taskAlg.lines.lpList
+                Dim c1 = dst2.Get(Of cv.Vec3b)(lp.p1.Y, lp.p1.X)
+                Dim c2 = dst2.Get(Of cv.Vec3b)(lp.p2.Y, lp.p2.X)
+                If c1 <> c2 Then
+                    dst3.Line(lp.p1, lp.p2, white, taskAlg.lineWidth, taskAlg.lineWidth)
+                Else
+                    dst2.Line(lp.p1, lp.p2, white, taskAlg.lineWidth, taskAlg.lineWidth)
+                End If
+            Next
+        End Sub
+    End Class
 
 
 
-Public Class Brick_CloudMaxVal : Inherits TaskParent
-    Dim template As New Math_Intrinsics
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        desc = "Use RGB motion bricks to determine if depth has changed in any brick."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If algTask.heartBeatLT Or algTask.frameCount < 3 Then algTask.pointCloud.CopyTo(dst2)
 
-        Dim splitCount As Integer
-        For Each brick In algTask.bricks.brickList
-            If brick.depth > 0 Then
-                If brick.age < 10 Then
-                    Dim split() As cv.Mat = algTask.pointCloud(brick.rect).Split
-                    split(2).SetTo(brick.mm.maxVal, algTask.depthMask(brick.rect))
+
+
+    Public Class Brick_CloudMaxVal : Inherits TaskParent
+        Dim template As New Math_Intrinsics
+        Public Sub New()
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+            desc = "Use RGB motion bricks to determine if depth has changed in any brick."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If taskAlg.heartBeatLT Or taskAlg.frameCount < 3 Then taskAlg.pointCloud.CopyTo(dst2)
+
+            Dim splitCount As Integer
+            For Each brick In taskAlg.bricks.brickList
+                If brick.depth > 0 Then
+                    If brick.age < 10 Then
+                        Dim split() As cv.Mat = taskAlg.pointCloud(brick.rect).Split
+                        split(2).SetTo(brick.mm.maxVal, taskAlg.depthmask(brick.rect))
+
+                        cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
+                        split(0) *= cv.Scalar.All(1 / taskAlg.calibData.rgbIntrinsics.fx)
+
+                        cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
+                        split(1) *= cv.Scalar.All(1 / taskAlg.calibData.rgbIntrinsics.fy)
+
+                        cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
+                        splitCount += 1
+                    End If
+                End If
+            Next
+
+            labels(2) = CStr(splitCount) + " bricks of " + CStr(taskAlg.gridRects.Count) + " were modified."
+            If standaloneTest() Then dst3 = taskAlg.pointCloud
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Brick_CloudMean : Inherits TaskParent
+        Dim template As New Math_Intrinsics
+        Public Sub New()
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+            desc = "Use RGB motion bricks to determine if depth has changed in any brick."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If taskAlg.heartBeatLT Or taskAlg.frameCount < 3 Then taskAlg.pointCloud.CopyTo(dst2)
+
+            Dim splitCount As Integer
+            For Each brick In taskAlg.bricks.brickList
+                If brick.depth > 0 Then
+                    Dim split() As cv.Mat = taskAlg.pointCloud(brick.rect).Split
+                    split(2).SetTo(brick.depth, taskAlg.depthmask(brick.rect))
 
                     cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
-                    split(0) *= 1 / algTask.calibData.rgbIntrinsics.fx
+                    split(0) *= cv.Scalar.All(1 / taskAlg.calibData.rgbIntrinsics.fx)
 
                     cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
-                    split(1) *= 1 / algTask.calibData.rgbIntrinsics.fy
+                    split(1) *= cv.Scalar.All(1 / taskAlg.calibData.rgbIntrinsics.fy)
 
                     cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
                     splitCount += 1
                 End If
-            End If
-        Next
+            Next
 
-        labels(2) = CStr(splitCount) + " bricks of " + CStr(algTask.gridRects.Count) + " were modified."
-        If standaloneTest() Then dst3 = algTask.pointCloud
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Brick_CloudMean : Inherits TaskParent
-    Dim template As New Math_Intrinsics
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        desc = "Use RGB motion bricks to determine if depth has changed in any brick."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If algTask.heartBeatLT Or algTask.frameCount < 3 Then algTask.pointCloud.CopyTo(dst2)
-
-        Dim splitCount As Integer
-        For Each brick In algTask.bricks.brickList
-            If brick.depth > 0 Then
-                Dim split() As cv.Mat = algTask.pointCloud(brick.rect).Split
-                split(2).SetTo(brick.depth, algTask.depthMask(brick.rect))
-
-                cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
-                split(0) *= 1 / algTask.calibData.rgbIntrinsics.fx
-
-                cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
-                split(1) *= 1 / algTask.calibData.rgbIntrinsics.fy
-
-                cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
-                splitCount += 1
-            End If
-        Next
-
-        labels(2) = CStr(splitCount) + " bricks of " + CStr(algTask.gridRects.Count) + " were modified."
-        If standaloneTest() Then dst3 = algTask.pointCloud
-    End Sub
-End Class
+            labels(2) = CStr(splitCount) + " bricks of " + CStr(taskAlg.gridRects.Count) + " were modified."
+            If standaloneTest() Then dst3 = taskAlg.pointCloud
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class Brick_CloudRange : Inherits TaskParent
-    Dim template As New Math_Intrinsics
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        desc = "Use RGB motion bricks to determine if depth has changed in any brick."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If algTask.heartBeatLT Or algTask.frameCount < 3 Then algTask.pointCloud.CopyTo(dst2)
+    Public Class Brick_CloudRange : Inherits TaskParent
+        Dim template As New Math_Intrinsics
+        Public Sub New()
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+            desc = "Use RGB motion bricks to determine if depth has changed in any brick."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If taskAlg.heartBeatLT Or taskAlg.frameCount < 3 Then taskAlg.pointCloud.CopyTo(dst2)
 
-        Dim splitCount As Integer
-        Dim newRange As Single = 0.1
-        For Each brick In algTask.bricks.brickList
-            If brick.depth > 0 And brick.age = 1 Then
-                If brick.mm.range > newRange Then ' if the range within a brick is > 10 cm's, fit it within 10 cm's.
-                    Dim split() As cv.Mat = algTask.pointCloud(brick.rect).Split
-                    split(2) -= brick.mm.minVal
-                    split(2) *= newRange / brick.mm.range
-                    split(2) += brick.depth
+            Dim splitCount As Integer
+            Dim newRange As Single = 0.1
+            For Each brick In taskAlg.bricks.brickList
+                If brick.depth > 0 And brick.age = 1 Then
+                    If brick.mm.range > newRange Then ' if the range within a brick is > 10 cm's, fit it within 10 cm's.
+                        Dim split() As cv.Mat = taskAlg.pointCloud(brick.rect).Split
+                        split(2) -= brick.mm.minVal
+                        split(2) *= newRange / brick.mm.range
+                        split(2) += brick.depth
 
-                    cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
-                    split(0) *= 1 / algTask.calibData.rgbIntrinsics.fx
+                        cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
+                        split(0) *= cv.Scalar.All(1 / taskAlg.calibData.rgbIntrinsics.fx)
 
-                    cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
-                    split(1) *= 1 / algTask.calibData.rgbIntrinsics.fy
+                        cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
+                        split(1) *= cv.Scalar.All(1 / taskAlg.calibData.rgbIntrinsics.fy)
 
-                    cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
-                    dst2(brick.rect).SetTo(0, algTask.noDepthMask(brick.rect))
-                    splitCount += 1
+                        cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
+                        dst2(brick.rect).SetTo(0, taskAlg.noDepthMask(brick.rect))
+                        splitCount += 1
+                    End If
                 End If
-            End If
-        Next
+            Next
 
-        labels(2) = CStr(splitCount) + " bricks of " + CStr(algTask.gridRects.Count) + " were modified."
-        If standaloneTest() Then dst3 = algTask.pointCloud
-    End Sub
-End Class
-
+            labels(2) = CStr(splitCount) + " bricks of " + CStr(taskAlg.gridRects.Count) + " were modified."
+            If standaloneTest() Then dst3 = taskAlg.pointCloud
+        End Sub
+    End Class
 
 
 
 
 
-Public Class Brick_Cloud : Inherits TaskParent
-    Dim template As New Math_Intrinsics
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-        desc = "Use RGB motion bricks to determine if depth has changed in any brick."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        If algTask.heartBeatLT Or algTask.frameCount < 3 Then algTask.pointCloud.CopyTo(dst2)
-        If algTask.motionRect.Width = 0 Then Exit Sub ' no change...
 
-        Dim updateCount As Integer
-        Dim newRange As Single = 0.01
+    Public Class Brick_Cloud : Inherits TaskParent
+        Dim template As New Math_Intrinsics
+        Public Sub New()
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+            desc = "Use RGB motion bricks to determine if depth has changed in any brick."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If taskAlg.heartBeatLT Or taskAlg.frameCount < 3 Then taskAlg.pointCloud.CopyTo(dst2)
+            If taskAlg.motionRect.Width = 0 Then Exit Sub ' no change...
 
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-        cv.Cv2.ExtractChannel(dst2, dst1, 2)
-        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
+            Dim updateCount As Integer
+            Dim newRange As Single = 0.01
 
-        For Each brick In algTask.bricks.brickList
-            If brick.depth > 0 Then
-                If brick.age = 1 Then
-                    algTask.pointCloud(brick.rect).CopyTo(dst2(brick.rect))
-                    Continue For
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+            cv.Cv2.ExtractChannel(dst2, dst1, 2)
+            dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
+
+            For Each brick In taskAlg.bricks.brickList
+                If brick.depth > 0 Then
+                    If brick.age = 1 Then
+                        taskAlg.pointCloud(brick.rect).CopyTo(dst2(brick.rect))
+                        Continue For
+                    End If
+                    If taskAlg.depthmask.CountNonZero = 0 Then Continue For
+                    'If brick.mm.range >= 1 Then
+                    '    dst2(brick.rect).SetTo(0) ' an 8x8 block spread over a meter?  Can't be real data...
+                    '    Continue For
+                    'End If
+
+                    ' check for any new depth pixels (not updates to existing as those come only with motion (age = 1)
+                    Dim mask As cv.Mat = dst1(brick.rect) And taskAlg.depthmask(brick.rect)
+                    If mask.CountNonZero = 0 Then Continue For ' nothing to update.
+                    taskAlg.pointCloud(brick.rect).CopyTo(dst2(brick.rect), mask) ' update any newly arrived depth data.
+                    updateCount += 1
                 End If
-                If algTask.depthMask.CountNonZero = 0 Then Continue For
-                'If brick.mm.range >= 1 Then
-                '    dst2(brick.rect).SetTo(0) ' an 8x8 block spread over a meter?  Can't be real data...
-                '    Continue For
-                'End If
+            Next
 
-                ' check for any new depth pixels (not updates to existing as those come only with motion (age = 1)
-                Dim mask As cv.Mat = dst1(brick.rect) And algTask.depthMask(brick.rect)
-                If mask.CountNonZero = 0 Then Continue For ' nothing to update.
-                algTask.pointCloud(brick.rect).CopyTo(dst2(brick.rect), mask) ' update any newly arrived depth data.
-                updateCount += 1
-            End If
-        Next
-
-        labels(2) = CStr(updateCount) + " bricks of " + CStr(algTask.gridRects.Count) + " were reviewed for changes."
-    End Sub
-End Class
+            labels(2) = CStr(updateCount) + " bricks of " + CStr(taskAlg.gridRects.Count) + " were reviewed for changes."
+        End Sub
+    End Class
 
 
 
 
 
-Public Class Brick_Features : Inherits TaskParent
-    Public featureBricks As New List(Of cv.Rect)
-    Public Sub New()
-        algTask.gOptions.LineWidth.Value = 3
-        If algTask.feat Is Nothing Then algTask.feat = New Feature_Basics
-        labels(3) = "Featureless areas"
-        desc = "Identify the cells with features"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = algTask.feat.dst2
+    Public Class Brick_Features : Inherits TaskParent
+        Public featureBricks As New List(Of cv.Rect)
+        Public Sub New()
+            taskAlg.gOptions.LineWidth.Value = 3
+            If taskAlg.feat Is Nothing Then taskAlg.feat = New Feature_Basics
+            labels(3) = "Featureless areas"
+            desc = "Identify the cells with features"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = taskAlg.feat.dst2
 
-        featureBricks.Clear()
-        Dim featList As New List(Of cv.Point)(algTask.feat.features)
-        For Each pt In featList
-            Dim index As Integer = algTask.gridMap.Get(Of Integer)(pt.Y, pt.X)
-            featureBricks.Add(algTask.gridRects(index))
-        Next
-
-        If algTask.gOptions.DebugCheckBox.Checked Then
+            featureBricks.Clear()
+            Dim featList As New List(Of cv.Point)(taskAlg.feat.features)
             For Each pt In featList
-                DrawCircle(dst2, pt, algTask.DotSize, cv.Scalar.Black)
+                Dim index As Integer = taskAlg.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                featureBricks.Add(taskAlg.gridRects(index))
             Next
-        End If
 
-        If standaloneTest() Then
+            If taskAlg.gOptions.DebugCheckBox.Checked Then
+                For Each pt In featList
+                    DrawCircle(dst2, pt, taskAlg.DotSize, cv.Scalar.Black)
+                Next
+            End If
+
+            If standaloneTest() Then
+                dst3.SetTo(0)
+                For Each r In featureBricks
+                    dst3.Rectangle(r, white, -1)
+                Next
+                dst3 = Not dst3
+            End If
+
+            If taskAlg.heartBeat Then
+                Dim flessCount = taskAlg.gridRects.Count - featureBricks.Count
+                labels(2) = CStr(featureBricks.Count) + " cells had features while " + CStr(flessCount) + " had none"
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class Brick_FeaturesAndEdges : Inherits TaskParent
+        Public feat As New Brick_Edges
+        Public boundaryCells As New List(Of List(Of Integer))
+        Public Sub New()
+            labels(2) = "Gray and black regions are featureless while white has features..."
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+            desc = "Find the boundary cells between feature and featureless cells."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(src)
+            dst1 = feat.featureMask.Clone
+
+            boundaryCells.Clear()
+            For Each nabeList In taskAlg.grid.gridNeighbors
+                Dim roiA = taskAlg.gridRects(nabeList(0))
+                Dim centerType = feat.featureMask.Get(Of Byte)(roiA.Y, roiA.X)
+                If centerType <> 0 Then
+                    Dim boundList = New List(Of Integer)
+                    Dim addFirst As Boolean = True
+                    For i = 1 To nabeList.Count - 1
+                        Dim roiB = taskAlg.gridRects(nabeList(i))
+                        Dim val = feat.featureMask.Get(Of Byte)(roiB.Y, roiB.X)
+                        If centerType <> val Then
+                            If addFirst Then boundList.Add(nabeList(0)) ' first element is the center point (has features)
+                            addFirst = False
+                            boundList.Add(nabeList(i))
+                        End If
+                    Next
+                    If boundList.Count > 0 Then boundaryCells.Add(boundList)
+                End If
+            Next
+
+            dst2.SetTo(0)
+            For Each nlist In boundaryCells
+                For Each n In nlist
+                    Dim mytoggle As Integer
+                    Dim roi = taskAlg.gridRects(n)
+                    Dim val = feat.featureMask.Get(Of Byte)(roi.Y, roi.X)
+                    If val > 0 Then mytoggle = 255 Else mytoggle = 128
+                    dst2(taskAlg.gridRects(n)).SetTo(mytoggle)
+                Next
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Brick_MLColor : Inherits TaskParent
+        Dim ml As New ML_Basics
+        Dim bounds As New Brick_FeaturesAndEdges
+        Public Sub New()
+            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
+            ml.buildEveryPass = True
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+            desc = "Train an ML tree to predict each pixel of the boundary cells using only color from boundary neighbors."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bounds.Run(src)
+            Dim edgeMask = bounds.feat.edges.dst2
+
+            Dim rgb32f As New cv.Mat, tmp As New cv.Mat
+            src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
+
+            dst1 = bounds.feat.fLessMask
+            Dim trainRGB As cv.Mat
+            For i = 0 To bounds.boundaryCells.Count - 1
+                Dim nList = bounds.boundaryCells(i)
+
+                ' the first roi is the center one and the only roi with edges.  The rest are featureless.
+                Dim roi = taskAlg.gridRects(nList(0))
+                Dim edgePixels = edgeMask(roi).FindNonZero()
+
+                ' mark the edge pixels as class 2 - others will be updated next
+                ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
+                                           cv.MatType.CV_32F, New cv.Scalar(2))
+                trainRGB = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32FC3)
+
+                For j = 1 To nList.Count - 1
+                    Dim roiA = taskAlg.gridRects(nList(j))
+                    Dim x As Integer = Math.Floor(roiA.X * taskAlg.bricksPerRow / taskAlg.cols)
+                    Dim y As Integer = Math.Floor(roiA.Y * taskAlg.bricksPerCol / taskAlg.rows)
+                    Dim val = taskAlg.lowResColor.Get(Of cv.Vec3f)(y, x)
+                    trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
+                    ml.trainResponse.Set(Of Single)(j - 1, 0, 1)
+                Next
+
+                ' next, add the edge pixels in the target cell - they are the feature identifiers.
+                Dim index = nList.Count - 1
+                For j = 0 To edgePixels.Rows - 1
+                    Dim pt = edgePixels.Get(Of cv.Point)(j, 0)
+                    Dim val = rgb32f.Get(Of cv.Vec3f)(roi.Y + pt.Y, roi.X + pt.X)
+                    trainRGB.Set(Of cv.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
+                Next
+
+                ml.trainMats = {trainRGB}
+
+                Dim roiB = taskAlg.gridRects(nList(0))
+                ml.testMats = {rgb32f(roiB)}
+                ml.Run(src)
+
+                dst1(roiB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
+                                        ConvertScaleAbs.Reshape(1, roiB.Height)
+            Next
+
+            dst2.SetTo(0)
+            src.CopyTo(dst2, dst1)
+
             dst3.SetTo(0)
-            For Each r In featureBricks
-                dst3.Rectangle(r, white, -1)
+            src.CopyTo(dst3, Not dst1)
+
+            labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
+                  " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Brick_CorrelationMap : Inherits TaskParent
+        Public Sub New()
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            labels(3) = "The map to identify each brick's depth."
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Display a heatmap of the correlation of the left and right images for each brick."
+        End Sub
+        Public Function ShowPaletteCorrelation(input As cv.Mat) As cv.Mat
+            Dim output As New cv.Mat
+            cv.Cv2.ApplyColorMap(input, output, taskAlg.correlationColorMap)
+            Return output
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst1.SetTo(0)
+            taskAlg.depthAndDepthRange = ""
+            For Each brick In taskAlg.bricks.brickList
+                dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
             Next
-            dst3 = Not dst3
-        End If
 
-        If algTask.heartBeat Then
-            Dim flessCount = algTask.gridRects.Count - featureBricks.Count
-            labels(2) = CStr(featureBricks.Count) + " cells had features while " + CStr(flessCount) + " had none"
-        End If
-    End Sub
-End Class
+            dst2 = ShowPaletteCorrelation(dst1)
+            dst2.SetTo(0, taskAlg.noDepthMask)
+
+            Dim pt = taskAlg.mouseMovePoint, w = taskAlg.workRes.Width, h = taskAlg.workRes.Height
+            If pt.X >= 0 And pt.X < w And pt.Y >= 0 And pt.Y < h Then
+                Dim index As Integer = taskAlg.gridMap.Get(Of Integer)(taskAlg.mouseMovePoint.Y, taskAlg.mouseMovePoint.X)
+                taskAlg.brickD = taskAlg.bricks.brickList(index)
+                taskAlg.depthAndDepthRange = "depth = " + Format(taskAlg.brickD.depth, fmt3) + "m ID=" +
+                                      CStr(taskAlg.brickD.index) + vbCrLf + " range " +
+                                      Format(taskAlg.brickD.mm.minVal, fmt1) + "-" +
+                                      Format(taskAlg.brickD.mm.maxVal, fmt1) + "m, age = " +
+                                      CStr(taskAlg.brickD.age) + vbCrLf +
+                                      " correlation = " + Format(taskAlg.brickD.correlation, fmt3)
+
+                Dim ptTextLoc = taskAlg.brickD.rect.TopLeft
+                If ptTextLoc.X > w * 0.85 Or (ptTextLoc.Y < h * 0.15 And ptTextLoc.X > w * 0.15) Then
+                    ptTextLoc.X -= w * 0.15
+                Else
+                    ptTextLoc.Y -= taskAlg.brickD.rect.Height * 3
+                End If
+
+                SetTrueText(taskAlg.depthAndDepthRange, ptTextLoc, 2)
+                SetTrueText(taskAlg.depthAndDepthRange, 3)
+            End If
+            labels(2) = taskAlg.bricks.labels(2)
+        End Sub
+    End Class
 
 
 
 
 
 
+    Public Class Brick_LeftRight : Inherits TaskParent
+        Public means As New List(Of Single)
+        Public Sub New()
+            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            labels(2) = "Only every other colum is shown to make it clear which bricks are being translated (can get crowded otherwise.)"
+            labels(3) = "Right view with the translated bricks shown at left."
+            desc = "Map the column of bricks in the color image into the left view and then to the right view."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = taskAlg.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst3 = taskAlg.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-
-Public Class Brick_FeaturesAndEdges : Inherits TaskParent
-    Public feat As New Brick_Edges
-    Public boundaryCells As New List(Of List(Of Integer))
-    Public Sub New()
-        labels(2) = "Gray and black regions are featureless while white has features..."
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        desc = "Find the boundary cells between feature and featureless cells."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        feat.Run(src)
-        dst1 = feat.featureMask.Clone
-
-        boundaryCells.Clear()
-        For Each nabeList In algTask.grid.gridNeighbors
-            Dim roiA = algTask.gridRects(nabeList(0))
-            Dim centerType = feat.featureMask.Get(Of Byte)(roiA.Y, roiA.X)
-            If centerType <> 0 Then
-                Dim boundList = New List(Of Integer)
-                Dim addFirst As Boolean = True
-                For i = 1 To nabeList.Count - 1
-                    Dim roiB = algTask.gridRects(nabeList(i))
-                    Dim val = feat.featureMask.Get(Of Byte)(roiB.Y, roiB.X)
-                    If centerType <> val Then
-                        If addFirst Then boundList.Add(nabeList(0)) ' first element is the center point (has features)
-                        addFirst = False
-                        boundList.Add(nabeList(i))
+            For i = 0 To taskAlg.bricksPerRow - 1 Step 2
+                For j = i To taskAlg.gridRects.Count - taskAlg.bricksPerRow - 1 Step taskAlg.bricksPerRow
+                    Dim brick = taskAlg.bricks.brickList(j)
+                    If brick.depth > 0 Then
+                        dst2.Rectangle(brick.lRect, taskAlg.highlight, taskAlg.lineWidth)
+                        dst3.Rectangle(brick.rRect, taskAlg.highlight, taskAlg.lineWidth)
                     End If
                 Next
-                If boundList.Count > 0 Then boundaryCells.Add(boundList)
-            End If
-        Next
-
-        dst2.SetTo(0)
-        For Each nlist In boundaryCells
-            For Each n In nlist
-                Dim mytoggle As Integer
-                Dim roi = algTask.gridRects(n)
-                Dim val = feat.featureMask.Get(Of Byte)(roi.Y, roi.X)
-                If val > 0 Then mytoggle = 255 Else mytoggle = 128
-                dst2(algTask.gridRects(n)).SetTo(mytoggle)
             Next
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Brick_MLColor : Inherits TaskParent
-    Dim ml As New ML_Basics
-    Dim bounds As New Brick_FeaturesAndEdges
-    Public Sub New()
-        If standalone Then algTask.gOptions.displayDst1.Checked = True
-        ml.buildEveryPass = True
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        desc = "Train an ML tree to predict each pixel of the boundary cells using only color from boundary neighbors."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bounds.Run(src)
-        Dim edgeMask = bounds.feat.edges.dst2
-
-        Dim rgb32f As New cv.Mat, tmp As New cv.Mat
-        src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
-
-        dst1 = bounds.feat.fLessMask
-        Dim trainRGB As cv.Mat
-        For i = 0 To bounds.boundaryCells.Count - 1
-            Dim nList = bounds.boundaryCells(i)
-
-            ' the first roi is the center one and the only roi with edges.  The rest are featureless.
-            Dim roi = algTask.gridRects(nList(0))
-            Dim edgePixels = edgeMask(roi).FindNonZero()
-
-            ' mark the edge pixels as class 2 - others will be updated next
-            ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
-                                           cv.MatType.CV_32F, New cv.Scalar(2))
-            trainRGB = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32FC3)
-
-            For j = 1 To nList.Count - 1
-                Dim roiA = algTask.gridRects(nList(j))
-                Dim x As Integer = Math.Floor(roiA.X * algTask.bricksPerRow / algTask.cols)
-                Dim y As Integer = Math.Floor(roiA.Y * algTask.bricksPerCol / algTask.rows)
-                Dim val = algTask.lowResColor.Get(Of cv.Vec3f)(y, x)
-                trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
-                ml.trainResponse.Set(Of Single)(j - 1, 0, 1)
-            Next
-
-            ' next, add the edge pixels in the target cell - they are the feature identifiers.
-            Dim index = nList.Count - 1
-            For j = 0 To edgePixels.Rows - 1
-                Dim pt = edgePixels.Get(Of cv.Point)(j, 0)
-                Dim val = rgb32f.Get(Of cv.Vec3f)(roi.Y + pt.Y, roi.X + pt.X)
-                trainRGB.Set(Of cv.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
-            Next
-
-            ml.trainMats = {trainRGB}
-
-            Dim roiB = algTask.gridRects(nList(0))
-            ml.testMats = {rgb32f(roiB)}
-            ml.Run(src)
-
-            dst1(roiB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
-                                        ConvertScaleAbs.Reshape(1, roiB.Height)
-        Next
-
-        dst2.SetTo(0)
-        src.CopyTo(dst2, dst1)
-
-        dst3.SetTo(0)
-        src.CopyTo(dst3, Not dst1)
-
-        labels = {"Src image with edges.", "Src featureless regions", ml.options.ML_Name +
-                  " found FeatureLess Regions", ml.options.ML_Name + " found these regions had features"}
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Brick_CorrelationMap : Inherits TaskParent
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        labels(3) = "The map to identify each brick's depth."
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Display a heatmap of the correlation of the left and right images for each brick."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst1.SetTo(0)
-        algTask.depthAndDepthRange = ""
-        For Each brick In algTask.bricks.brickList
-            dst1(brick.rect).SetTo((brick.correlation + 1) * 255 / 2)
-        Next
-
-        dst2 = ShowPaletteCorrelation(dst1)
-        dst2.SetTo(0, algTask.noDepthMask)
-
-        Dim pt = algTask.mouseMovePoint, w = algTask.workRes.Width, h = algTask.workRes.Height
-        If pt.X >= 0 And pt.X < w And pt.Y >= 0 And pt.Y < h Then
-            Dim index As Integer = algTask.gridMap.Get(Of Integer)(algTask.mouseMovePoint.Y, algTask.mouseMovePoint.X)
-            algTask.brickD = algTask.bricks.brickList(index)
-            algTask.depthAndDepthRange = "depth = " + Format(algTask.brickD.depth, fmt3) + "m ID=" +
-                                      CStr(algTask.brickD.index) + vbCrLf + " range " +
-                                      Format(algTask.brickD.mm.minVal, fmt1) + "-" +
-                                      Format(algTask.brickD.mm.maxVal, fmt1) + "m, age = " +
-                                      CStr(algTask.brickD.age) + vbCrLf +
-                                      " correlation = " + Format(algTask.brickD.correlation, fmt3)
-
-            Dim ptTextLoc = algTask.brickD.rect.TopLeft
-            If ptTextLoc.X > w * 0.85 Or (ptTextLoc.Y < h * 0.15 And ptTextLoc.X > w * 0.15) Then
-                ptTextLoc.X -= w * 0.15
-            Else
-                ptTextLoc.Y -= algTask.brickD.rect.Height * 3
-            End If
-
-            SetTrueText(algTask.depthAndDepthRange, ptTextLoc, 2)
-            SetTrueText(algTask.depthAndDepthRange, 3)
-        End If
-        labels(2) = algTask.bricks.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Brick_LeftRight : Inherits TaskParent
-    Public means As New List(Of Single)
-    Public Sub New()
-        If algTask.bricks Is Nothing Then algTask.bricks = New Brick_Basics
-        labels(2) = "Only every other colum is shown to make it clear which bricks are being translated (can get crowded otherwise.)"
-        labels(3) = "Right view with the translated bricks shown at left."
-        desc = "Map the column of bricks in the color image into the left view and then to the right view."
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        dst2 = algTask.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst3 = algTask.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        For i = 0 To algTask.bricksPerRow - 1 Step 2
-            For j = i To algTask.gridRects.Count - algTask.bricksPerRow - 1 Step algTask.bricksPerRow
-                Dim brick = algTask.bricks.brickList(j)
-                If brick.depth > 0 Then
-                    dst2.Rectangle(brick.lRect, algTask.highlight, algTask.lineWidth)
-                    dst3.Rectangle(brick.rRect, algTask.highlight, algTask.lineWidth)
-                End If
-            Next
-        Next
-    End Sub
-End Class
+        End Sub
+    End Class
+End Namespace

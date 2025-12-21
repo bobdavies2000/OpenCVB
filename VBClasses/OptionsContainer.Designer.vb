@@ -60,7 +60,7 @@ Partial Class OptionsContainer
         ' 
         ' OptionsContainer
         ' 
-        AutoScaleDimensions = New SizeF(10F, 25F)
+        AutoScaleDimensions = New SizeF(10.0F, 25.0F)
         AutoScaleMode = AutoScaleMode.Font
         ClientSize = New Size(1936, 1082)
         Controls.Add(ToolStrip1)

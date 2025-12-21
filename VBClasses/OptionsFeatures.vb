@@ -1,6 +1,4 @@
-﻿Imports System.Windows.Forms
-Imports System.Drawing
-Imports System.ComponentModel
+﻿Imports VBClasses
 Public Class OptionsFeatures
     Public grayCheckbox() As RadioButton
     Public colorCheckbox() As RadioButton
@@ -9,7 +7,7 @@ Public Class OptionsFeatures
                                        "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
                                        "PCA_NColor_CPP", "MeanSubtraction_Gray"}
     Private Sub OptionsFeatures_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.MdiParent = algTask.allOptions
+        Me.MdiParent = taskAlg.allOptions
         Me.Left = 0
         Me.Top = 0
 
@@ -32,14 +30,14 @@ Public Class OptionsFeatures
         EdgeMethods.Items.Add("Scharr")
         EdgeMethods.Items.Add("Sobel")
         EdgeMethods.SelectedItem() = "Canny"
-        algTask.edgeMethod = "Canny"
+        taskAlg.edgeMethod = "Canny"
 
         MatchCorrSlider.Value = 95
 
-        ReDim grayCheckbox(algTask.rgbFilter.grayFilter.filterList.Count - 1)
-        For i = 0 To algTask.rgbFilter.grayFilter.filterList.Count - 1
+        ReDim grayCheckbox(taskAlg.rgbFilter.grayFilter.filterList.Count - 1)
+        For i = 0 To taskAlg.rgbFilter.grayFilter.filterList.Count - 1
             Dim cb As New RadioButton
-            cb.Text = algTask.rgbFilter.grayFilter.filterList(i)
+            cb.Text = taskAlg.rgbFilter.grayFilter.filterList(i)
             cb.Location = New Point(20, 20 + i * 20)
             cb.AutoSize = True
             cb.Tag = i
@@ -49,10 +47,10 @@ Public Class OptionsFeatures
         Next
         grayCheckbox(0).Checked = True
 
-        ReDim colorCheckbox(algTask.rgbFilter.filterList.Count - 1)
-        For i = 0 To algTask.rgbFilter.filterList.Count - 1
+        ReDim colorCheckbox(taskAlg.rgbFilter.filterList.Count - 1)
+        For i = 0 To taskAlg.rgbFilter.filterList.Count - 1
             Dim cb As New RadioButton
-            cb.Text = algTask.rgbFilter.filterList(i)
+            cb.Text = taskAlg.rgbFilter.filterList(i)
             cb.Location = New Point(20, 20 + i * 20)
             cb.AutoSize = True
             cb.Tag = i
@@ -67,40 +65,74 @@ Public Class OptionsFeatures
             Color8USource.Items.Add(method)
         Next
         Color8USource.SelectedItem = "Reduction_Basics"
+
+        Select Case taskAlg.workRes.Width
+            Case 1920
+                MotionPixelSlider.Value = 400
+                taskAlg.colorDiffThreshold = 50
+            Case 1280
+                ColorDiffSlider.Value = 40
+                MotionPixelSlider.Value = 100
+            Case 960
+                ColorDiffSlider.Value = 30
+                MotionPixelSlider.Value = 100
+            Case 672
+                ColorDiffSlider.Value = 20
+                MotionPixelSlider.Value = 100
+            Case 640
+                ColorDiffSlider.Value = 20
+                MotionPixelSlider.Value = 20
+            Case 240, 320, 160
+                MotionPixelSlider.Value = 5
+                ColorDiffSlider.Value = 15
+            Case 336, 168
+                MotionPixelSlider.Value = 5
+                ColorDiffSlider.Value = 5
+        End Select
     End Sub
 
 
 
     Private Sub CheckBox_CheckedChanged(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub FeatureMethod_SelectedIndexChanged(sender As Object, e As EventArgs) Handles FeatureMethod.SelectedIndexChanged
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub verticalRadio_CheckedChanged(sender As Object, e As EventArgs)
-        algTask.verticalLines = True
+        taskAlg.verticalLines = True
     End Sub
     Private Sub HorizRadio_CheckedChanged(sender As Object, e As EventArgs)
-        algTask.verticalLines = False
+        taskAlg.verticalLines = False
     End Sub
     Private Sub EdgeMethods_SelectedIndexChanged(sender As Object, e As EventArgs) Handles EdgeMethods.SelectedIndexChanged
-        algTask.edgeMethod = EdgeMethods.Text
-        algTask.optionsChanged = True
+        taskAlg.edgeMethod = EdgeMethods.Text
+        taskAlg.optionsChanged = True
     End Sub
 
 
 
     Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles MatchCorrSlider.ValueChanged
-        algTask.fCorrThreshold = MatchCorrSlider.Value / 100
-        algTask.optionsChanged = True
-        FeatureCorrelationLabel.Text = Format(algTask.fCorrThreshold, fmt2)
+        taskAlg.fCorrThreshold = MatchCorrSlider.Value / 100
+        taskAlg.optionsChanged = True
+        FeatureCorrelationLabel.Text = Format(taskAlg.fCorrThreshold, fmt2)
     End Sub
     Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FeatureSampleSize.ValueChanged
-        algTask.FeatureSampleSize = FeatureSampleSize.Value
-        algTask.optionsChanged = True
-        FeatureSampleSizeLabel.Text = CStr(algTask.FeatureSampleSize)
+        taskAlg.FeatureSampleSize = FeatureSampleSize.Value
+        taskAlg.optionsChanged = True
+        FeatureSampleSizeLabel.Text = CStr(taskAlg.FeatureSampleSize)
+    End Sub
+    Private Sub ColorDiffSlider_ValueChanged(sender As Object, e As EventArgs) Handles ColorDiffSlider.ValueChanged
+        taskAlg.colorDiffThreshold = ColorDiffSlider.Value
+        taskAlg.optionsChanged = True
+        ColorDiffLabel.Text = CStr(taskAlg.colorDiffThreshold)
+    End Sub
+    Private Sub MotionPixelSlider_ValueChanged(sender As Object, e As EventArgs) Handles MotionPixelSlider.ValueChanged
+        taskAlg.motionThreshold = MotionPixelSlider.Value
+        taskAlg.optionsChanged = True
+        MotionPixelLabel1.Text = CStr(taskAlg.motionThreshold)
     End Sub
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles Color8USource.SelectedIndexChanged
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
 End Class

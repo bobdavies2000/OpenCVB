@@ -1,14 +1,14 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Windows.Forms
+Imports VBClasses
 Public Class PixelViewerForm
     Public mousePoint As cv.Point
     Public saveText As String
     Private Sub PixelShow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.Left = algTask.mainFormLocation.X
-        Me.Top = algTask.mainFormLocation.Y - 40
+        Me.Left = taskAlg.mainFormLocation.X
+        Me.Top = taskAlg.mainFormLocation.Y - 40
 
-        Me.Width = algTask.mainFormLocation.Width
-        Me.Height = algTask.mainFormLocation.Height
+        Me.Width = taskAlg.mainFormLocation.Width
+        Me.Height = taskAlg.mainFormLocation.Height
         PixelViewerForm_ResizeEnd(sender, e)
         Timer1.Enabled = True
     End Sub

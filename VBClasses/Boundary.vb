@@ -1,88 +1,89 @@
 ﻿Imports cv = OpenCvSharp
-Public Class Boundary_Basics : Inherits TaskParent
-    Public redCPP As New RedList_CPP
-    Dim color8U As New Color8U_Basics
-    Public Sub New()
-        algTask.featureOptions.Color8USource.SelectedItem = "Bin4Way_Regions"
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Create a mask of the RedCloud cell boundaries"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        color8U.Run(src)
-        dst2 = runRedList(color8U.dst2, labels(2))
+Namespace VBClasses
+    Public Class Boundary_Basics : Inherits TaskParent
+        Public redCPP As New RedList_CPP
+        Dim color8U As New Color8U_Basics
+        Public Sub New()
+            taskAlg.featureOptions.Color8USource.SelectedItem = "Bin4Way_Regions"
+            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            desc = "Create a mask of the RedCloud cell boundaries"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            color8U.Run(src)
+            dst2 = runRedList(color8U.dst2, labels(2))
 
-        redCPP.Run(dst1)
+            redCPP.Run(dst1)
 
-        dst3.SetTo(0)
-        For i = 1 To algTask.redList.oldrclist.Count - 1
-            Dim rc = algTask.redList.oldrclist(i)
-            DrawTour(dst3(rc.rect), rc.contour, 255, algTask.lineWidth)
-        Next
+            dst3.SetTo(0)
+            For i = 1 To taskAlg.redList.oldrclist.Count - 1
+                Dim rc = taskAlg.redList.oldrclist(i)
+                DrawTour(dst3(rc.rect), rc.contour, 255, taskAlg.lineWidth)
+            Next
 
-        labels(3) = $"{algTask.redList.oldrclist.Count} cells were found."
-    End Sub
-End Class
-
-
-
+            labels(3) = $"{taskAlg.redList.oldrclist.Count} cells were found."
+        End Sub
+    End Class
 
 
 
 
-Public Class Boundary_Rectangles : Inherits TaskParent
-    Public bounds As New Boundary_Basics
-    Public rects As New List(Of cv.Rect)
-    Public smallRects As New List(Of cv.Rect)
-    Public smallContours As New List(Of List(Of cv.Point))
-    Dim options As New Options_BoundaryRect
-    Public Sub New()
-        desc = "Build the boundaries for oldrclist and remove interior rectangles"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        options.Run()
 
-        bounds.Run(src)
 
-        dst2.SetTo(0)
-        For Each rc In algTask.redList.oldrclist
-            dst2.Rectangle(rc.rect, algTask.highlight, algTask.lineWidth)
-        Next
-        labels(2) = $"{algTask.redList.oldrclist.Count} rectangles before contain test"
 
-        rects.Clear()
-        For i = 0 To CInt(algTask.redList.oldrclist.Count * options.percentRect) - 1
-            rects.Add(algTask.redList.oldrclist(i).rect)
-        Next
+    Public Class Boundary_Rectangles : Inherits TaskParent
+        Public bounds As New Boundary_Basics
+        Public rects As New List(Of cv.Rect)
+        Public smallRects As New List(Of cv.Rect)
+        Public smallContours As New List(Of List(Of cv.Point))
+        Dim options As New Options_BoundaryRect
+        Public Sub New()
+            desc = "Build the boundaries for oldrclist and remove interior rectangles"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
 
-        smallRects.Clear()
-        smallContours.Clear()
-        For i = algTask.redList.oldrclist.Count - 1 To CInt(algTask.redList.oldrclist.Count * options.percentRect) Step -1
-            algTask.oldrcD = algTask.redList.oldrclist(i)
-            Dim r = algTask.oldrcD.rect
-            Dim contained As Boolean = False
-            For Each rc In algTask.redList.oldrclist
-                If r = rc.rect Then Continue For
-                If rc.rect.Contains(r) Then
-                    contained = True
-                    Exit For
+            bounds.Run(src)
+
+            dst2.SetTo(0)
+            For Each rc In taskAlg.redList.oldrclist
+                dst2.Rectangle(rc.rect, taskAlg.highlight, taskAlg.lineWidth)
+            Next
+            labels(2) = $"{taskAlg.redList.oldrclist.Count} rectangles before contain test"
+
+            rects.Clear()
+            For i = 0 To CInt(taskAlg.redList.oldrclist.Count * options.percentRect) - 1
+                rects.Add(taskAlg.redList.oldrclist(i).rect)
+            Next
+
+            smallRects.Clear()
+            smallContours.Clear()
+            For i = taskAlg.redList.oldrclist.Count - 1 To CInt(taskAlg.redList.oldrclist.Count * options.percentRect) Step -1
+                taskAlg.oldrcD = taskAlg.redList.oldrclist(i)
+                Dim r = taskAlg.oldrcD.rect
+                Dim contained As Boolean = False
+                For Each rc In taskAlg.redList.oldrclist
+                    If r = rc.rect Then Continue For
+                    If rc.rect.Contains(r) Then
+                        contained = True
+                        Exit For
+                    End If
+                Next
+
+                If contained Then
+                    smallContours.Add(taskAlg.oldrcD.contour)
+                    smallRects.Add(r)
+                Else
+                    rects.Add(r)
                 End If
             Next
 
-            If contained Then
-                smallContours.Add(algTask.oldrcD.contour)
-                smallRects.Add(r)
-            Else
-                rects.Add(r)
-            End If
-        Next
-
-        dst3.SetTo(0)
-        For Each r In rects
-            dst3.Rectangle(r, algTask.highlight, algTask.lineWidth)
-        Next
-        labels(3) = $"{rects.Count} rectangles after contain test"
-    End Sub
-End Class
+            dst3.SetTo(0)
+            For Each r In rects
+                dst3.Rectangle(r, taskAlg.highlight, taskAlg.lineWidth)
+            Next
+            labels(3) = $"{rects.Count} rectangles after contain test"
+        End Sub
+    End Class
 
 
 
@@ -92,101 +93,102 @@ End Class
 
 
 
-Public Class Boundary_RemovedRects : Inherits TaskParent
-    Public bRects As New Boundary_Rectangles
-    Public Sub New()
-        If standalone Then algTask.gOptions.displayDst1.Checked = True
-        desc = "Build the boundaries for oldrclist and remove interior rectangles"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        bRects.Run(src)
-        dst2 = bRects.bounds.dst2.Clone
-        dst3 = bRects.dst2
-        dst1 = bRects.dst3
-        labels(3) = $"{algTask.redList.oldrclist.Count} cells before contain test"
+    Public Class Boundary_RemovedRects : Inherits TaskParent
+        Public bRects As New Boundary_Rectangles
+        Public Sub New()
+            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
+            desc = "Build the boundaries for oldrclist and remove interior rectangles"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            bRects.Run(src)
+            dst2 = bRects.bounds.dst2.Clone
+            dst3 = bRects.dst2
+            dst1 = bRects.dst3
+            labels(3) = $"{taskAlg.redList.oldrclist.Count} cells before contain test"
 
-        For i = 0 To bRects.smallRects.Count - 1
-            DrawTour(dst2(bRects.smallRects(i)), bRects.smallContours(i), cv.Scalar.Black, algTask.lineWidth)
-        Next
-        labels(1) = labels(2)
-        labels(2) = $"{algTask.redList.oldrclist.Count - bRects.smallRects.Count} cells after contain test"
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Boundary_GuidedBP : Inherits TaskParent
-    Dim guided As New GuidedBP_Depth
-    Public Sub New()
-        algTask.gOptions.setHistogramBins(100)
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Create a mask of the RedCloud cell boundaries using Guided Backprojection"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        guided.Run(src)
-        dst2 = runRedList(guided.dst2, labels(2))
-
-        dst3.SetTo(0)
-        For i = 1 To algTask.redList.oldrclist.Count - 1
-            Dim rc = algTask.redList.oldrclist(i)
-            DrawTour(dst3(rc.rect), rc.contour, 255, algTask.lineWidth)
-        Next
-
-        labels(3) = $"{algTask.redList.oldrclist.Count} cells were found."
-    End Sub
-End Class
+            For i = 0 To bRects.smallRects.Count - 1
+                DrawTour(dst2(bRects.smallRects(i)), bRects.smallContours(i), cv.Scalar.Black, taskAlg.lineWidth)
+            Next
+            labels(1) = labels(2)
+            labels(2) = $"{taskAlg.redList.oldrclist.Count - bRects.smallRects.Count} cells after contain test"
+        End Sub
+    End Class
 
 
 
 
 
 
-Public Class Boundary_RedColor : Inherits TaskParent
-    Dim prep As New RedPrep_ReductionChoices
-    Public Sub New()
-        algTask.gOptions.MaxDepthBar.Value = 20
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Find the RedCloud cell contours"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(src)
-        dst2 = runRedList(prep.dst2, labels(2))
+    Public Class Boundary_GuidedBP : Inherits TaskParent
+        Dim guided As New GuidedBP_Depth
+        Public Sub New()
+            taskAlg.gOptions.setHistogramBins(100)
+            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            desc = "Create a mask of the RedCloud cell boundaries using Guided Backprojection"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            guided.Run(src)
+            dst2 = runRedList(guided.dst2, labels(2))
 
-        dst3.SetTo(0)
-        For i = 1 To algTask.redList.oldrclist.Count - 1
-            Dim rc = algTask.redList.oldrclist(i)
-            DrawTour(dst3(rc.rect), rc.contour, 255, algTask.lineWidth)
-        Next
+            dst3.SetTo(0)
+            For i = 1 To taskAlg.redList.oldrclist.Count - 1
+                Dim rc = taskAlg.redList.oldrclist(i)
+                DrawTour(dst3(rc.rect), rc.contour, 255, taskAlg.lineWidth)
+            Next
 
-        labels(3) = $"{algTask.redList.oldrclist.Count} cells were found."
-    End Sub
-End Class
-
-
+            labels(3) = $"{taskAlg.redList.oldrclist.Count} cells were found."
+        End Sub
+    End Class
 
 
 
-Public Class Boundary_RedCloud : Inherits TaskParent
-    Dim prep As New RedPrep_Basics
-    Public Sub New()
-        algTask.gOptions.MaxDepthBar.Value = 20
-        dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        desc = "Find the RedCloud cell contours"
-    End Sub
-    Public Overrides Sub RunAlg(src As cv.Mat)
-        prep.Run(src)
-        dst2 = runRedCloud(prep.dst2, labels(2))
 
-        dst3.SetTo(0)
-        For i = 1 To algTask.redCloud.rcList.Count - 1
-            Dim rc = algTask.redCloud.rcList(i)
-            Dim contour = ContourBuild(rc.mask)
-            DrawTour(dst3(rc.rect), contour, 255, algTask.lineWidth)
-        Next
 
-        labels(3) = $"{algTask.redCloud.rcList.Count} cells were found."
-    End Sub
-End Class
+
+    Public Class Boundary_RedColor : Inherits TaskParent
+        Dim prep As New RedPrep_ReductionChoices
+        Public Sub New()
+            taskAlg.gOptions.MaxDepthBar.Value = 20
+            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            desc = "Find the RedCloud cell contours"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.Run(src)
+            dst2 = runRedList(prep.dst2, labels(2))
+
+            dst3.SetTo(0)
+            For i = 1 To taskAlg.redList.oldrclist.Count - 1
+                Dim rc = taskAlg.redList.oldrclist(i)
+                DrawTour(dst3(rc.rect), rc.contour, 255, taskAlg.lineWidth)
+            Next
+
+            labels(3) = $"{taskAlg.redList.oldrclist.Count} cells were found."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Boundary_RedCloud : Inherits TaskParent
+        Dim prep As New RedPrep_Basics
+        Public Sub New()
+            taskAlg.gOptions.MaxDepthBar.Value = 20
+            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            desc = "Find the RedCloud cell contours"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.Run(src)
+            dst2 = runRedCloud(prep.dst2, labels(2))
+
+            dst3.SetTo(0)
+            For i = 1 To taskAlg.redCloud.rcList.Count - 1
+                Dim rc = taskAlg.redCloud.rcList(i)
+                Dim contour = vbc.ContourBuild(rc.mask)
+                DrawTour(dst3(rc.rect), contour, 255, taskAlg.lineWidth)
+            Next
+
+            labels(3) = $"{taskAlg.redCloud.rcList.Count} cells were found."
+        End Sub
+    End Class
+End Namespace

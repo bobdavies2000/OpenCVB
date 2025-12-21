@@ -25,37 +25,39 @@ Partial Class TreeViewForm
         components = New ComponentModel.Container()
         TreeView1 = New TreeView()
         PercentTime = New TextBox()
-
         Timer2 = New Timer(components)
         SuspendLayout()
         ' 
         ' TreeView1
         ' 
         TreeView1.Location = New Point(0, 0)
+        TreeView1.Margin = New Padding(4, 4, 4, 4)
         TreeView1.Name = "TreeView1"
-        TreeView1.Size = New Size(239, 947)
+        TreeView1.Size = New Size(286, 1136)
         TreeView1.TabIndex = 0
         ' 
         ' PercentTime
         ' 
-        PercentTime.Location = New Point(450, 0)
+        PercentTime.Location = New Point(540, 0)
+        PercentTime.Margin = New Padding(4, 4, 4, 4)
         PercentTime.Multiline = True
         PercentTime.Name = "PercentTime"
-        PercentTime.Size = New Size(151, 31)
+        PercentTime.Size = New Size(180, 36)
         PercentTime.TabIndex = 1
         ' 
         ' Timer2
         ' 
         Timer2.Enabled = True
-        Timer2.Interval = 1000
+        Timer2.Interval = 3000
         ' 
         ' TreeViewForm
         ' 
-        AutoScaleDimensions = New SizeF(10F, 25F)
+        AutoScaleDimensions = New SizeF(12F, 30F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(613, 950)
+        ClientSize = New Size(736, 1140)
         Controls.Add(PercentTime)
         Controls.Add(TreeView1)
+        Margin = New Padding(4, 4, 4, 4)
         Name = "TreeViewForm"
         Text = "TreeViewForm"
         ResumeLayout(False)

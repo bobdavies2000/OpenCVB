@@ -1,12 +1,12 @@
 ﻿Imports cv = OpenCvSharp
+Imports VBClasses
 Public Class OptionsGlobal
     Public pixelDiffThreshold As Integer
     Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
-    Public heartBeatSeconds = 1
     Public trackingLabel As String
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.MdiParent = algTask.allOptions
+        Me.MdiParent = taskAlg.allOptions
 
         Palettes.Items.Clear()
         For Each mapName In mapNames
@@ -25,62 +25,62 @@ Public Class OptionsGlobal
         highlight.Items.Add("Red")
         highlight.SelectedIndex = 0
 
-        ShowAllOptions.Checked = GetSetting("Opencv", "ShowAllOptions", "ShowAllOptions", False)
+        ShowAllOptions.Checked = taskAlg.Settings.ShowAllOptions
 
-        algTask.DotSize = 1
-        algTask.cvFontThickness = 1
-        algTask.brickSize = 8
-        algTask.reductionTarget = 400
-        algTask.DotSize = 1
-        algTask.lineWidth = 1
-        Select Case algTask.workRes.Width
+        taskAlg.DotSize = 1
+        taskAlg.cvFontThickness = 1
+        taskAlg.brickSize = 8
+        taskAlg.reductionTarget = 400
+        taskAlg.DotSize = 1
+        taskAlg.lineWidth = 1
+        Select Case taskAlg.workRes.Width
             Case 1920
-                algTask.cvFontSize = 3.5
-                algTask.cvFontThickness = 4
-                algTask.DotSize = 5
-                algTask.lineWidth = 5
-                algTask.brickSize = 36
+                taskAlg.cvFontSize = 3.5
+                taskAlg.cvFontThickness = 4
+                taskAlg.DotSize = 5
+                taskAlg.lineWidth = 5
+                taskAlg.brickSize = 36
             Case 1280
-                algTask.cvFontSize = 2.5
-                algTask.cvFontThickness = 2
-                algTask.DotSize = 5
-                algTask.lineWidth = 4
-                algTask.brickSize = 24
+                taskAlg.cvFontSize = 2.5
+                taskAlg.cvFontThickness = 2
+                taskAlg.DotSize = 5
+                taskAlg.lineWidth = 4
+                taskAlg.brickSize = 24
             Case 960
-                algTask.cvFontSize = 2.0
-                algTask.cvFontThickness = 2
-                algTask.DotSize = 2
-                algTask.lineWidth = 3
-                algTask.brickSize = 16
+                taskAlg.cvFontSize = 2.0
+                taskAlg.cvFontThickness = 2
+                taskAlg.DotSize = 2
+                taskAlg.lineWidth = 3
+                taskAlg.brickSize = 16
             Case 672
-                algTask.cvFontSize = 1.5
-                algTask.DotSize = 2
-                algTask.lineWidth = 2
-                algTask.brickSize = 16
+                taskAlg.cvFontSize = 1.5
+                taskAlg.DotSize = 2
+                taskAlg.lineWidth = 2
+                taskAlg.brickSize = 16
             Case 640
-                algTask.cvFontSize = 1.5
-                algTask.lineWidth = 2
-                algTask.DotSize = 2
-                algTask.brickSize = 16
+                taskAlg.cvFontSize = 1.5
+                taskAlg.lineWidth = 2
+                taskAlg.DotSize = 2
+                taskAlg.brickSize = 16
             Case 480
-                algTask.cvFontSize = 1.2
-                algTask.brickSize = 8
+                taskAlg.cvFontSize = 1.2
             Case 240
-                algTask.cvFontSize = 1.2
+                taskAlg.cvFontSize = 1.2
             Case 336
-                algTask.cvFontSize = 1.0
+                taskAlg.cvFontSize = 1.0
             Case 320
-                algTask.cvFontSize = 1.0
-                algTask.brickSize = 3
+                taskAlg.cvFontSize = 1.0
             Case 168
-                algTask.cvFontSize = 0.5
+                taskAlg.cvFontSize = 0.5
             Case 160
-                algTask.cvFontSize = 1.0
+                taskAlg.cvFontSize = 1.0
         End Select
 
-        GridSlider.Value = algTask.brickSize
-        DotSizeSlider.Value = algTask.DotSize
-        LineWidth.Value = algTask.lineWidth
+        GridSlider.Value = taskAlg.brickSize
+        DotSizeSlider.Value = taskAlg.DotSize
+        DotSizeLabel.Text = CStr(DotSizeSlider.Value)
+        FPSDisplayLabel.Text = CStr(TargetDisplaySlider.Value)
+        LineWidth.Value = taskAlg.lineWidth
         HistBinBar.Value = 16
         labelBinsCount.Text = CStr(HistBinBar.Value)
 
@@ -91,110 +91,115 @@ Public Class OptionsGlobal
         maxCount.Text = CStr(MaxDepthBar.Value)
     End Sub
     Private Sub LineType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LineType.SelectedIndexChanged
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
         Select Case LineType.Text
             Case "AntiAlias"
-                algTask.lineType = cv.LineTypes.AntiAlias
+                taskAlg.lineType = cv.LineTypes.AntiAlias
             Case "Link4"
-                algTask.lineType = cv.LineTypes.Link4
+                taskAlg.lineType = cv.LineTypes.Link4
             Case "Link8"
-                algTask.lineType = cv.LineTypes.Link8
+                taskAlg.lineType = cv.LineTypes.Link8
         End Select
     End Sub
     Private Sub LineWidth_ValueChanged(sender As Object, e As EventArgs) Handles LineWidth.ValueChanged
         LineThicknessAmount.Text = CStr(LineWidth.Value)
-        algTask.lineWidth = LineWidth.Value
-        algTask.optionsChanged = True
+        taskAlg.lineWidth = LineWidth.Value
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub DotSizeSlider_ValueChanged(sender As Object, e As EventArgs) Handles DotSizeSlider.ValueChanged
-        algTask.DotSize = DotSizeSlider.Value
-        DotSizeLabel.Text = CStr(algTask.DotSize)
-        algTask.optionsChanged = True
+        taskAlg.DotSize = DotSizeSlider.Value
+        DotSizeLabel.Text = CStr(taskAlg.DotSize)
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub UseKalman_CheckedChanged(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub displayDst0_CheckedChanged(sender As Object, e As EventArgs) Handles displayDst0.CheckedChanged
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub displayDst1_CheckedChanged(sender As Object, e As EventArgs) Handles displayDst1.CheckedChanged
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub MaxDepth_ValueChanged(sender As Object, e As EventArgs) Handles MaxDepthBar.ValueChanged
         maxCount.Text = CStr(MaxDepthBar.Value)
         ' why add anything?  Because histograms are exclusive on ranges.
-        algTask.MaxZmeters = MaxDepthBar.Value + 0.01
-        algTask.optionsChanged = True
+        taskAlg.MaxZmeters = MaxDepthBar.Value + 0.01
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub GridSlider_ValueChanged(sender As Object, e As EventArgs) Handles GridSlider.ValueChanged
         GridSizeLabel.Text = CStr(GridSlider.Value)
-        algTask.brickSize = GridSlider.Value
-        algTask.optionsChanged = True
+        taskAlg.brickSize = GridSlider.Value
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub HistBinBar_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar.ValueChanged
-        algTask.histogramBins = HistBinBar.Value
-        labelBinsCount.Text = CStr(algTask.histogramBins)
-        algTask.optionsChanged = True
+        taskAlg.histogramBins = HistBinBar.Value
+        labelBinsCount.Text = CStr(taskAlg.histogramBins)
+        taskAlg.optionsChanged = True
+    End Sub
+    Private Sub DisplayFPSSlider_ValueChanged(sender As Object, e As EventArgs) Handles TargetDisplaySlider.ValueChanged
+        taskAlg.optionsChanged = True
+        taskAlg.Settings.FPSPaintTarget = TargetDisplaySlider.Value
+        FPSDisplayLabel.Text = CStr(TargetDisplaySlider.Value)
     End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub Palettes_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles Palettes.SelectedIndexChanged
-        algTask.optionsChanged = True
-        algTask.paletteIndex = mapNames.IndexOf(Palettes.Text)
+        taskAlg.optionsChanged = True
+        taskAlg.paletteIndex = mapNames.IndexOf(Palettes.Text)
     End Sub
     Private Sub DebugCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles DebugCheckBox.CheckedChanged
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub OpenGLCapture_Click(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub useMotion_CheckedChanged(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub ShowAllByDefault_CheckedChanged(sender As Object, e As EventArgs) Handles ShowAllOptions.CheckedChanged
-        SaveSetting("Opencv", "showAllOptions", "showAllOptions", ShowAllOptions.Checked)
+        taskAlg.Settings.ShowAllOptions = ShowAllOptions.Checked
     End Sub
     Private Sub DebugSliderSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
     End Sub
     Private Sub useCloudHistory_CheckedChanged(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
 
 
 
     Private Sub unFiltered_CheckedChanged(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub MotionFilteredCloudOnly_CheckedChanged(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub MotionFilteredColorOnly_CheckedChanged(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub MotionFilteredColorAndCloud_CheckedChanged(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub UseHistoryCloud_CheckedChanged(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub DustFree_CheckedChanged(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub useFilter_CheckedChanged(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub highlight_SelectedIndexChanged(sender As Object, e As EventArgs) Handles highlight.SelectedIndexChanged
         Select Case highlight.Text
             Case "Yellow"
-                algTask.highlight = cv.Scalar.Yellow
+                taskAlg.highlight = cv.Scalar.Yellow
             Case "Black"
-                algTask.highlight = cv.Scalar.Black
+                taskAlg.highlight = cv.Scalar.Black
             Case "White"
-                algTask.highlight = cv.Scalar.White
+                taskAlg.highlight = cv.Scalar.White
             Case "Red"
-                algTask.highlight = cv.Scalar.Red
+                taskAlg.highlight = cv.Scalar.Red
         End Select
     End Sub
     Public Sub setMaxDepth(val As Integer)
@@ -229,21 +234,18 @@ Public Class OptionsGlobal
         DotSizeSlider.Value = val
     End Sub
     Private Sub TruncateDepth_CheckedChanged(sender As Object, e As EventArgs) Handles TruncateDepth.CheckedChanged
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub ShowQuadDepth_CheckedChanged(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub UseMotionMask_CheckedChanged(sender As Object, e As EventArgs) Handles UseMotionMask.CheckedChanged
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub showMotionMask_CheckedChanged(sender As Object, e As EventArgs) Handles showMotionMask.CheckedChanged
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
-    End Sub
-    Private Sub debugSyncUI_CheckedChanged(sender As Object, e As EventArgs) Handles debugSyncUI.CheckedChanged
-        algTask.debugSyncUI = debugSyncUI.Checked
+        taskAlg.optionsChanged = True
     End Sub
 End Class

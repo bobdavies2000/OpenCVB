@@ -1,8 +1,39 @@
+# December 17, 2025 – VS2026, Infrastructure, Reduced Threading, Display FPS, Error-Handling, JSON, Image Sizing.
+
+-   Over 1500 algorithms are included, averaging 36 lines of code per algorithm.
+    -   Over 300 additional obsolete algorithms compiled for reference use.
+-   OpenCVB is now updated to use Visual Studio Community Edition 2026 (free.)
+    -   OpenCVB Python infrastructure was removed – no longer needed.
+    -   OpenCVB OpenGL interface replaced with SharpGL package.
+-   New tools were used to rebuild OpenCVB and improve the application.
+    -   Cursor.ai was used to rebuild the infrastructure for algorithm testing.
+    -   The algorithms are unchanged from the previous OpenCVB version.
+    -   Better infrastructure means easier debugging.
+-   One key simplification of OpenCVB was *reduced* threading.
+    -   There are now just 2 threads in OpenCVB – UI and the camera task.
+    -   Threading added complexity to understanding the code.
+    -   The algorithm thread UI is in the same thread as the UI.
+-   The motive for the earlier multi-threading was to remove the cost of display.
+    -   Single threading means display will interrupt or hold back processing.
+    -   A global option “Display FPS” now limits the cost of displaying images.
+        -   It may not be a useful enhancement but it is worth more study.
+-   Cautious error-handling (Try/Catch) is limited in its use in OpenCVB.
+    -   OpenCVB is always running in Debug mode with source so “let it fail”.
+    -   Checking all Windows Debugging exceptions stops the code at the error.
+    -   The intent is to get as close to the error as possible.
+    -   The code is simpler to read with limited impact on debugging.
+-   OpenCVB options are now exclusively maintained in JSON.
+    -   No GetSetting or SaveSetting calls remain.
+    -   JSON settings are available to all algorithms through a shared library.
+-   The image size of all 4 OpenCVB outputs is completely customizable.
+-   Algorithm count in the main form caption only reflects active algorithms.
+    -   The algorithm count was over 2000 but is now close to 1500.
+
 # November 24, 2025 – Line Matching, Right View Motion
 
 -   Over 2000 algorithms are included, averaging 36 lines of code per algorithm.
     -   Over 400 algorithms are obsolete and are compiled for reference use.
--   OpenCVB has been updated to compile with Visual Studio 2026 Community Edition (free).
+-   OpenCVB is now updated to use Visual Studio Community Edition 2026 (free.)
 -   Like many other applications, OpenCVB is being rewritten using modern tools.
     -   Cursor’s tool is assisting in the current rewrite.
     -   The Main.vb is still the default startup project while conversion progresses.
@@ -16,7 +47,7 @@
         -   Not a lot of work was involved in getting this working.
     -   Potential uses for finding motion in the right image are not yet clear.
 
-![](media/23d8c048a4cbb9cd85c40044609b8bb5.gif)**LineMatch_Basics :** *Lines are identified for each image - Line_Basics is a ‘task’ algorithm that runs on every frame. Using the center of each line, the match candidates are located within X pixels around the line center. The list of candidate lines is reviewed and the one with an angle within Y degrees of the original is designated the matching line. The bottom left image contains the longest lines for the current frame and the bottom right image shows the lines that match from the previous frame. When the camera is not moving, this algorithm is not challenging but when the camera is moving, this algorithm still works quite well. A toggle shows the matches alone and in the context of the current and previous image.*
+![A computer screen shot AI-generated content may be incorrect.](media/23d8c048a4cbb9cd85c40044609b8bb5.gif)**LineMatch_Basics :** *Lines are identified for each image - Line_Basics is a ‘task’ algorithm that runs on every frame. Using the center of each line, the match candidates are located within X pixels around the line center. The list of candidate lines is reviewed and the one with an angle within Y degrees of the original is designated the matching line. The bottom left image contains the longest lines for the current frame and the bottom right image shows the lines that match from the previous frame. When the camera is not moving, this algorithm is not challenging but when the camera is moving, this algorithm still works quite well. A toggle shows the matches alone and in the context of the current and previous image.*
 
 # November 13, 2025 – Motion.
 
@@ -128,7 +159,6 @@
 -   The default value for SharpGL is to use non-linear mode – more realistic.
     -   If SharpGL’s ReadPointCloud is used, linear mode is recommended.
 -   It is no longer the default to transform the point cloud using the gravity vector.
--   The log of previous changes has moved to be directly below the latest update.
 
 ![A computer screen shot of a room AI-generated content may be incorrect.](media/b52ca4c4a1e2f8e993985b1ca8518d72.gif)
 
@@ -158,7 +188,6 @@
     -   Normally SharpGL uses non-linear coordinates to improve presentation.
     -   With linear mode geometries can be rendered in SharpGL.
 -   The default value – linear vs. non-linear mode – is still TBD.
--   The log of previous changes has moved to be directly below the latest update.
 
 ![](media/747013ca4f3229c4862a1bf3437c1f3c.gif)
 
@@ -184,7 +213,6 @@
     -   Now SharpGL form is only created for “GL_” algorithms.
 -   GIF create process now supports the SharpGL output (instead of OpenGL output.)
     -   It is simpler to create a GIF from a VB.Net form than an external window.
--   A log of previous changes is included at the bottom of this document.
 
 ![](media/12d32a7111eb4345058e76fbe94830b5.gif)
 
@@ -208,7 +236,6 @@
     -   The OpenGL algorithms are all still present but now reside in XO.vb (obsolete.)
     -   SharpGL algorithm added to read the point cloud.
 -   Orbbec C\# interface memory overflow is now fixed with a garbage collection
--   A log of previous changes is included at the bottom of this document.
 
 ![A computer screen shot of a room AI-generated content may be incorrect.](media/87f60f3939519c014790037a7221476f.png)
 
@@ -225,7 +252,6 @@
     -   This change was prompted by the Runtime-Identifier change with Net8.0.
     -   OpenCVB’s binary is never invoked by itself – it is always part of Visual Studio.
 -   Brick points are now a possible Feature source – see Feature_Basics example below.
--   A log of previous changes is included at the bottom of this document.
 
 ![A hand reaching out to a room with yellow dots AI-generated content may be incorrect.](media/1c33c86ceee205402f23c9035987ebad.gif)
 
@@ -253,7 +279,6 @@
     -   All lines can be mapped into a linear spectrum based on their angle.
     -   Negative angles correspond to negative slopes and positive to positive slopes.
     -   Slope is quite useful but non-linear as a classifier in comparison.
--   A log of previous changes is included at the bottom of this document.
 
 ![A hand reaching out to a shelf AI-generated content may be incorrect.](media/122a37f63e6a1e574e5117f07d87a2bd.jpeg)
 
@@ -276,7 +301,6 @@
 -   Switching cameras during a run is simpler and faster and hopefully bug-free.
 -   Oak 4D Pro camera (released June 2025) is not working for me – device not found.
     -   Any suggestions would be gratefully received. Even better: a pull request.
--   A log of previous changes is included at the bottom of this document.
 
 ![A shelf and a shelf AI-generated content may be incorrect.](media/fb9e21f35bdf318623a18eb0598fa9c5.gif)
 
@@ -301,7 +325,6 @@
 -   For that first build after a download, build the UI_Generate project by itself.
     -   The VBClasses build process uses UI_Generate in a pre-build event.
     -   Alternatively, just build that first build again and UI_Generate will work.
--   A log of previous changes is included at the bottom of this document.
 
 # 2025 July 11th – RGB Line Tracking, Options Close, EdgeLine, DepthRGB, Hull Lines, OpenGL Testing, and Options Changes.
 
@@ -330,7 +353,6 @@
 -   Support for Orbbec Gemini 335L is present but Gemini 335 needed an update.
 -   OpenCV 4.13 (the current version) was added (PragmaLibs.h updated.)
 -   Kinect 4 Azure camera interface dropped – no longer needed.
--   A log of previous changes is included at the bottom of this document.
 
 ![A collage of images of a room AI-generated content may be incorrect.](media/62150eb1904b9faf9d77b56958341e17.png)
 
@@ -361,7 +383,6 @@
 -   The lpMap (line pointer map) was removed – lines are not easily clickable.
     -   Instead, use the global option debug slider to identify a line for display.
     -   See the “Line_Info” algorithm to display the characteristics of a line.
--   A log of previous changes is included at the bottom of this document.
 
 **![A red and yellow lines on a black background AI-generated content may be incorrect.](media/58382b8918581bfb06ad7ea4a17fd803.gif)Gravity Vector:** *This output shows the typical subtle jitter for the gravity vector. The camera was not moving during this test and shows that the IMU captures the gravity vector but with slight variations from frame to frame. The new Gravity_Basics algorithm in OpenCVB uses the longest line in the RGB image to remove this variability. If the RGB line shows motion, the IMU gravity values are used.*
 
@@ -393,7 +414,6 @@
     -   Support for multiple Intel cameras broke (name change?). Now fixed.
         -   Multiple cameras can be attached but only one camera will be used.
     -   The Oak-D camera support is still TBD – Oak-D Pro 4 camera not here yet.
--   A log of previous changes is included at the bottom of this document.
 
 ![A screenshot of a computer AI-generated content may be incorrect.](media/79f6e36c9e119263741e7b3774c34c3e.png)
 
@@ -431,7 +451,6 @@
         -   Lines on a wall and painting frame will have similar depth values.
     -   Lines in depth should have coherent depth for the length of the line.
     -   Optical illusions are examples of when lines are not coherent, hopefully rare.
--   A log of previous changes is included at the bottom of this document.
 
 ![A collage of images of different colors AI-generated content may be incorrect.](media/8ecc1cc1682ce29ec4ba0dd0fdd6d9db.gif)
 
@@ -463,7 +482,6 @@
 -   Gravity and Horizon were incorrect at the highest resolution.
     -   FindNonZero found plenty of pixels but all in row zero. Problem fixed.
 -   The TreeView output was updated to show detail of algorithms \< 1% utilization.
--   A log of previous changes is included at the bottom of this document.
 
 ![A collage of images of people and objects AI-generated content may be incorrect.](media/ef742dde619d31abd091b68a09c09191.gif)
 
@@ -494,7 +512,6 @@
         -   Grid cells impacted by RGB motion get a full update.
         -   And so do grid cells with low depth correlation (unreliable depth.)
     -   RGB motion cannot cover changes in depth shadow from foreground objects.
--   A log of previous changes is included at the bottom of this document.
 
 ![A screenshot of a computer AI-generated content may be incorrect.](media/5411c8981b86e7bc4779ffc60a1a8309.gif)
 
@@ -535,7 +552,6 @@
     -   Separating inactive code is simpler and preserves the possibility of later use.
     -   Obsolete gravity and horizon algorithms prompted XO’s creation.
     -   More and more algorithms will migrate there to simplify the source tree.
--   A log of previous changes is included at the bottom of this document.
 
 ![A collage of images of a person in a room AI-generated content may be incorrect.](media/101f64619a75aba05208e888ad0a7c16.gif)
 
@@ -569,10 +585,7 @@
     -   Random palettes will be consistently used with all algorithms in a run.
 -   Feature_Agast options improve the quality of feature points found.
 -   ShowPalette no longer requires normalizing – saves a matrix multiply.
--   Emax_Basics example builds a special set of grid rectangles for its use.
--   A log of previous changes is included at the bottom of this document.
-
-![A collage of a person sitting in a chair AI-generated content may be incorrect.](media/f1f77b330a4a33ef4872f2d85b188b32.gif)
+-   Emax_Basics example builds a special set of grid rectangles for its use. ![A collage of a person sitting in a chair AI-generated content may be incorrect.](media/f1f77b330a4a33ef4872f2d85b188b32.gif)
 
 **Connected_Contours :** *Each region contains grid cells and neighbors which are at approximately the same depth. For instance, the green cell in the lower left consistently defines and tracks the person seated at the desk (our humble programmer.) The wall and painting are tracked as well. The lower right image confirms this by showing the color image and the contours using OpenCV’s AddWeighted method. The tracking color of the wall changes because it is shrinking in size as the contours are colored by order of size in this version.*
 
@@ -596,7 +609,6 @@
     -   Motion_Basics – to build the motion mask for the current frame.
 -   The PixelViewer form can be closed by both the caption box and ![A blue microscope with black outline AI-generated content may be incorrect.](media/0e674efad2384a95fc65c5a030a951fd.png)button.
 -   The AddWeighted_Basics algorithm was moved into a function – reduced code.
--   A log of previous changes is included at the bottom of this document.
 
 ![A screenshot of a computer AI-generated content may be incorrect.](media/2afba4eb6b4ad7bf708ac64a8673a002.png)
 
@@ -625,7 +637,6 @@
     -   The “Depth Correlation” view is a good example of motion detection usage.
         -   The upper right image (below) shows the red grid cells are stable.
     -   Motion detection is a compromise that preserves grid cell color.
--   A log of previous changes is included at the bottom of this document.
 
 ![A screenshot of a computer AI-generated content may be incorrect.](media/ba9fd91a6d76b04326a7171aad5eb8ba.gif)
 
@@ -659,7 +670,6 @@
     -   This camera is highly desirable because the RGB and left cameras are the same.
     -   Any MYNT developer’s pull request would be gratefully received.
 -   The upper right image (DepthRGB) shows the % depth pixels that are present.
--   A log of previous changes is included at the bottom of this document.
 
 ![A room with a door and a room with a door and a room with a door and a room with a door and a room with a door and a room with a door and a room AI-generated content may be incorrect.](media/3f3ecad62a60b44ad5d6a8aefa22c148.gif)
 
@@ -685,7 +695,6 @@
     -   The limited use of left/right images didn’t require color values.
         -   Future uses may require color so some cameras may be limited.
     -   Using grayscale images is more efficient for now.
--   A log of previous changes is included at the bottom of this document.
 
 ![A collage of a person sitting in a chair AI-generated content may be incorrect.](media/d86045cbdc8eec1c2a5fe6965baf507e.gif)
 
@@ -710,10 +719,7 @@
 -   OpenCVB’s OpenGL interface is improved with multiple point cloud buffers.
     -   3D cameras produce point clouds that are always slightly different.
     -   Combining them produces a more solid appearance to the 3D model.
-    -   Below is an example showing the cosmetic difference.
--   A log of previous changes is included at the bottom of this document.
-
-![A screen shot of a computer screen Description automatically generated](media/9f00f342149e24119ff7d554df58f31b.png)  ![A screenshot of a computer screen Description automatically generated](media/ed0ab23749b244a50928420654c93c93.png) **OpenGL Multiple Buffers:** *Since the point cloud is different on every frame (depth is only an approximation), using multiple buffers allows a cosmetic improvement to the appearance of the point cloud. The first point cloud is what one buffer looks like while the next uses the last 10 frames. The frame rate for this example was 60 fps at 320x240 with significant magnification (approximately 4X.)*
+    -   Below is an example showing the cosmetic difference.![A screen shot of a computer screen Description automatically generated](media/9f00f342149e24119ff7d554df58f31b.png)  ![A screenshot of a computer screen Description automatically generated](media/ed0ab23749b244a50928420654c93c93.png) **OpenGL Multiple Buffers:** *Since the point cloud is different on every frame (depth is only an approximation), using multiple buffers allows a cosmetic improvement to the appearance of the point cloud. The first point cloud is what one buffer looks like while the next uses the last 10 frames. The frame rate for this example was 60 fps at 320x240 with significant magnification (approximately 4X.)*
 
 # 2025 January (2) – GifBuilder updates, RGBFilter, Ideal Depth.
 
@@ -729,7 +735,6 @@
 -   TreeView form was moved into the VBClasses where the data is produced.
     -   Allowed code to be simpler in the Main form.
     -   TreeView button is no longer needed in Main
--   A log of previous changes is included at the bottom of this document.
 
 **![A collage of a person using a computer Description automatically generated](media/1c85b62195b05f1695bd32287f38eac8.gif)Depth_Ideal :** *The cells marked in the lower left image have ideal depth data with a high percentage of the cell’s pixels containing a depth value. By definition, they are the cells which are fully visible in both the left and right cameras. The lower right image is the point cloud containing only the cells that have ideal depth. The lower right image is filtered by motion – only the cells in the motion mask are updated on each frame.*
 
@@ -768,7 +773,6 @@
 
 -   The “Blue +” button to create new algorithms is limited to VB.Net, C++, and OpenGL.
 -   Left and Right camera images are now always grayscale (some were color.)
--   A log of previous changes is included at the bottom of this document.
 
 ![A screenshot of a computer Description automatically generated](media/893013652590bac4fa557520f5e13e4a.gif)
 
@@ -797,7 +801,6 @@
 -   The ‘A-Z’ group selection button is moved next to the algorithm combo box.
     -   See the toolbar in the latest screen shot below for RedCloud_Basics.
 -   Managed C++ code is disabled for now – not much value there for now.
--   A log of previous changes is included at the bottom of this document.
 
 ![A collage of images of a room Description automatically generated](media/928bcaa46cf6abb063c6824e9086236e.png)
 
@@ -822,7 +825,6 @@
 -   This update includes the Feature Coordinate System – see FCS_Basics.
     -   A Delaunay map is created using the features or lines.
     -   The map allows tracking the area even as the features come and go.
--   A log of previous changes is included at the bottom of this document.
 
 ![A screenshot of a computer AI-generated content may be incorrect.](media/baa4fe87e03b08a9288be72cdb139c41.png)
 
@@ -852,7 +854,6 @@
 -   A long-term heartbeat is now available in the task structure.
     -   Images can now be refreshed on a heartbeat or heartbeatLT (long term).
     -   The current heartbeat is 1 second while heartbeatLT is X seconds.
--   A log of previous changes is included at the bottom of this document.
 
 ![A screenshot of a computer Description automatically generated](media/9ecba468726fbd244063f9aa06417b68.gif)
 
@@ -879,7 +880,6 @@
     -   Makes it easier to determine the value of optimizing any VB.Net algorithm.
 -   Orbbec Gemini 335L is now working at 30 FPS.
     -   Care must be taken to make sure it is on a USB-C port.
--   A log of previous changes is included at the bottom of this document.
 
 ![A screenshot of a computer Description automatically generated](media/a4ade72e34b35bccb590db3772e53c01.png)
 
@@ -921,7 +921,6 @@
     -   The K4A equivalent camera is available as Orbbec Femto Bolt.
 -   Other news: another way to capture motion is in Motion_FromEdgeColorize
     -   Blue is motion, Red is not (see below.)
--   A log of previous changes is included at the bottom of this document.
 
 ![A collage of images of people sitting in a chair Description automatically generated](media/3b7fcfc4ec5dcb8a1619770024131824.png)
 
@@ -957,7 +956,6 @@
         -   “_CC” algorithms are called using PInvoke to native dll’s.
     -   Python examples end in .py. PyStream algorithms end in …_PS.py.
 -   Install directory with spaces now supported. Resolved – September 5th.
--   A log of previous changes is included at the bottom of this document.
 
 ![A screenshot of a computer AI-generated content may be incorrect.](media/f6ba222f6e73f72f51d0b393a6b64bae.png)
 
@@ -998,7 +996,6 @@
     -   Most algorithms were converted to C\# in a few minutes.
     -   Longer conversions required the improved VB.Net infrastructure.
 -   Previous Releases had a discontinued C++ AI translation process. It will return.
--   A log of previous changes is included at the bottom of this document.
 
 ![A collage of images of a room Description automatically generated](media/5eb5c074fbaeaf5aa017addc04b8710d.png)
 
@@ -1033,7 +1030,6 @@
     -   Most algorithms were converted to C\# in a few minutes.
     -   Longer conversions required the improved VB.Net infrastructure.
 -   Previous Releases had a discontinued C++ AI translation process. It will return.
--   A log of previous changes is included at the bottom of this document.
 
 ![A screenshot of a computer Description automatically generated](media/5dd47a048cd220e4dd856894c3d6bac7.png)
 
@@ -1066,7 +1062,6 @@
     -   Feature_Basics now uses correlation coefficients to track RGB features.
 -   Color8U is the new name for algorithms converting RGB to CV_8U format.
 -   New modules for C\# interface were added but are not yet in use.
--   A log of previous changes is included at the bottom of this document.
 
 ![A screenshot of a computer Description automatically generated](media/c8c7bce7087510e62ffc160f82e12e07.png)
 
@@ -1093,7 +1088,6 @@
     -   Each region without features is isolated and identified to RedCloud.
 -   Cell_Generate reuses cell features for exact matches – less work, same result.
 -   Cells with motion are now identified providing another way to detect motion.
--   A log of previous changes is included at the bottom of this document.
 
 ![A collage of images of a person in a room Description automatically generated](media/a18bd533a52c859d195439cb4fabc6f1.png)
 
@@ -1132,7 +1126,6 @@
     -   See any algorithms starting with ‘HistValley’.
 -   EdgeToEdgeLine function in pointPair structure was added.
     -   Line is defined in terms of an edge-to-edge pair of points.
--   A log of previous changes is included at the bottom of this document.
 
 ![A collage of images of a room Description automatically generated](media/36150778314078d8e16dfcde622cec21.png)
 
@@ -1160,7 +1153,6 @@
     -   Removes one-off experiments and cleans up the list of algorithms.
     -   It is a further refinement of the user interface to help active development.
     -   It also provides a useful way for beginners to find the better algorithms.
--   A log of previous changes is included at the bottom of this document.
 
 ![A screenshot of a computer screen Description automatically generated](media/da280b898b238ab7490bfca8fc4abbfa.gif)
 
@@ -1195,7 +1187,6 @@
 -   This version also introduces another RedCloud color source: Binarize_FourWay.
     -   Binarize an image and binarize each half to classify each pixel.
     -   Below is an example of the output from RedCloud_BinarizeColor.
--   A log of previous changes is included at the bottom of this document.
 
 ![A collage of images of people in different colors Description automatically generated](media/9b95f50d8a35d8ee7156f9fb857f4557.jpeg)
 
@@ -1221,7 +1212,6 @@
     -   Options can override the default to hide the option form at the side.
     -   See Gif_Basics for an example of overriding the default to hide the form.
 -   Foreground in depth can be found using several methods in Foreground.vb.
--   A log of changes is included at the bottom of this document.
 
 ![A screen shot of a computer Description automatically generated](media/bf94edf2ee5f261622a2e31f34db3d51.png)
 
@@ -1252,7 +1242,6 @@
 -   HistValley_Depth finds histogram valleys and separates depth into tiers.
 -   Added RedMin algorithms to find a minimalist approach to RedCloud cells.
     -   No requirement for a dummy cell at location 0, 0.
--   A log of changes is included at the bottom of this document.
 
 ![A computer generated image of a building Description automatically generated](media/7e883a32a7ee8faaf76107f24eea917a.gif)
 
@@ -1278,7 +1267,6 @@
     -   Core technique to find neighbors (example below) is in Neighbors.vb.
 -   The TreeView display of performance times now shows the data in tree order.
     -   Easier to identify where the overhead is in the algorithm.
--   A log of changes is included at the bottom of this document.
 
 ![A collage of images of different colors Description automatically generated](media/aa767d146879de432a3a0208b65b6eca.gif)
 
@@ -1303,7 +1291,6 @@
     -   They were not getting reused by other algorithms.
     -   They added a lot NuGet packages that complicated installation.
 -   The OpenCVB git repository was reset – the repo was bigger than the tree.
--   A log of changes is included at the bottom of this document.
 
 ![A colorful pattern with dots Description automatically generated with medium confidence](media/db52b0115273726a6ff2d1aa986c0817.gif)
 
@@ -1328,7 +1315,6 @@
 -   Improvements to the display of side and top projections were added.
     -   Output images no longer clip the side and top view data.
     -   New global variables XRange and YRange control how projection spreads.
--   A log of changes is included at the bottom of this document.
 
 ![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
 
@@ -1349,7 +1335,6 @@
 -   FeatureMatch_Basics (shown below) now uses color images for left/right images.
     -   Kinect for Azure has only 1 camera, so it doesn’t produce any matches.
     -   All other cameras have left and right images and will work properly.
--   A log of changes is included at the bottom of this document.
 
 ![A room with a computer and a desk Description automatically generated](media/6910830262336f25a37fd666645d9382.gif)
 
@@ -1377,7 +1362,6 @@
     -   Histogram output is much more readable with different resolutions.
 -   The GroupName combo box now uses blank lines to group the selections.
     -   It is easier to locate an OpenCV API or OpenCVB algorithm group.
--   A log of the monthly changes is included at the bottom of this document.
 
 ![A room with colorful furniture Description automatically generated](media/505f9ca73f5ee142fb9e3879bdae651d.gif)
 
@@ -1395,7 +1379,6 @@
     -   Examples below compare using the history and raw cloud images.
 -   Algorithm option presentation was improved – fewer algorithm options present.
 -   RedCloud contours now use ApproxNone – better floodfill results.
--   A log of the monthly changes is included at the bottom of this document.
 
 ![A colorful cube with a laser Description automatically generated](media/1e1c632b14491a6493bfa9ba40589995.gif)
 
@@ -1421,9 +1404,8 @@
     -   RedCloud algorithms use a reduced point cloud input.
     -   RedColor algorithms use a reduced color image,
     -   RedCommon algorithms can be by either RedCloud or RedColor.
--   A log of the monthly changes is included at the bottom of this document.
 
-    ![A screenshot of a computer screen AI-generated content may be incorrect.](media/6cba27c1ec97a5d241d60e43951855c1.gif)
+        ![A screenshot of a computer screen AI-generated content may be incorrect.](media/6cba27c1ec97a5d241d60e43951855c1.gif)
 
 **RedCloud_MotionBGSubtract:** *The GIF above shows another way to detect motion in an image. The lower right shows the conventional difference between images – a standard way to detect changes in pixel values by comparing images. The lower left image is the RedCloud_Basics output with cells for each reduced color segment. The upper right image shows the RedCloud cells that contain pixels that changed.*
 
@@ -1448,7 +1430,6 @@
     -   Click on the global algorithm checkbox “Create GIF of current algorithm”.
     -   There is an option to capture dst2, dst3, or the entire application window.
     -   Example below captures the entire application window.
--   A log of the monthly changes is included at the bottom of this document.
 
 ![A collage of images of a person AI-generated content may be incorrect.](media/62ec1d7073fbf71e996e7ada7bec557b.gif)**RedCloud_BasicsColor:** *An example of using the GIF interface to capture an OpenCVB algorithm. The bottom left image is the RedCloud_BasicsColor output that uses both color and cloud data..*
 
@@ -1474,7 +1455,6 @@
 -   “Temp Slider” added to the “All Algorithm Options” for testing.
     -   Algorithms can test a slider before adding it as a new option.
     -   Similar to the “Fun Checkbox” that can toggle a feature.
--   A log of the monthly changes is included at the bottom of this document.
 
 # 2023 June - Recent Changes
 

@@ -1,11 +1,11 @@
-﻿Imports System.Windows.Forms
+Imports VBClasses
 Public Class OptionsCheckbox
     Public Box As New List(Of CheckBox)
     Public Function Setup(traceName As String) As Boolean
-        If OptionParent.findFrm(traceName + " CheckBoxes") IsNot Nothing Then Return False
-        Me.MdiParent = algTask.allOptions
+        If OptionParent.FindFrm(traceName + " CheckBoxes") IsNot Nothing Then Return False
+        Me.MdiParent = taskAlg.allOptions
         Me.Text = traceName + " CheckBoxes"
-        algTask.allOptions.addTitle(Me)
+        taskAlg.allOptions.addTitle(Me)
         Me.Show()
         Return True
     End Function
@@ -18,6 +18,28 @@ Public Class OptionsCheckbox
         FlowLayoutPanel1.Controls.Add(Box(index))
     End Sub
     Private Sub Box_CheckChanged(sender As Object, e As EventArgs)
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
+    End Sub
+
+    Protected Overrides Sub Dispose(disposing As Boolean)
+        If disposing Then
+            ' Remove event handlers
+            For Each checkbox In Box
+                If checkbox IsNot Nothing Then
+                    RemoveHandler checkbox.CheckedChanged, AddressOf Box_CheckChanged
+                End If
+            Next
+
+            ' Dispose all dynamically created controls
+            For Each checkbox In Box
+                If checkbox IsNot Nothing Then
+                    checkbox.Dispose()
+                End If
+            Next
+
+            ' Clear the list
+            Box.Clear()
+        End If
+        MyBase.Dispose(disposing)
     End Sub
 End Class

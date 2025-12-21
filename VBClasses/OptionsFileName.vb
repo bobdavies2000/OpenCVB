@@ -1,4 +1,4 @@
-﻿Imports System.Windows.Forms
+﻿Imports VBClasses
 Public Class OptionsFileName
     Public fileStarted As Boolean
     Public newFileName As Boolean
@@ -10,24 +10,19 @@ Public Class OptionsFileName
             PlayButton.Text = "Start"
             fileStarted = False
         End If
-        algTask.optionsChanged = True
+        taskAlg.optionsChanged = True
     End Sub
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         If OpenFileDialog1.ShowDialog() = DialogResult.OK Then
             filename.Text = OpenFileDialog1.FileName
-            algTask.optionsChanged = True
+            taskAlg.optionsChanged = True
         End If
         newFileName = True
     End Sub
-    Protected Overloads Overrides ReadOnly Property ShowWithoutActivation() As Boolean
-        Get
-            Return True
-        End Get
-    End Property
     Public Sub Setup(traceName As String)
-        Me.MdiParent = algTask.allOptions
+        Me.MdiParent = taskAlg.allOptions
         Me.Text = traceName + " OpenFile Options"
-        algTask.allOptions.addTitle(Me)
+        taskAlg.allOptions.addTitle(Me)
     End Sub
     Public Sub setFileName(filespec As String)
         filename.Text = filespec
