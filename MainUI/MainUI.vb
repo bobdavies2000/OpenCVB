@@ -13,10 +13,6 @@ Namespace MainUI
         Dim recentMenu() As ToolStripMenuItem
         Dim labels As List(Of Label)
         Dim pics As New List(Of PictureBox)
-        Dim stopTestAll As Bitmap
-        Dim PausePlay As Bitmap
-        Dim runPlay As Bitmap
-        Dim testAllToolbarBitmap As Bitmap
         Dim resolutionDetails As String
         Dim magnifyIndex As Integer
         Dim windowsFont = New System.Drawing.Font("Tahoma", 9)
@@ -281,11 +277,6 @@ Namespace MainUI
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             settings = settingsIO.Load()
 
-            PausePlay = New Bitmap(homeDir + "MainUI/Data/PauseButton.png")
-            stopTestAll = New Bitmap(homeDir + "MainUI/Data/stopTestAll.png")
-            testAllToolbarBitmap = New Bitmap(homeDir + "MainUI/Data/testall.png")
-            runPlay = New Bitmap(homeDir + "MainUI/Data/Run.png")
-
             addPics()
 
             Me.Location = New Point(settings.MainFormLeft, settings.MainFormTop)
@@ -299,32 +290,6 @@ Namespace MainUI
             setupAlgorithmHistory()
 
             PausePlayButton.PerformClick()
-        End Sub
-        Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
-            isPlaying = Not isPlaying
-
-            Dim filePath = Path.Combine(homeDir + "MainUI\Data", If(isPlaying, "PauseButton.png", "Run.png"))
-            PausePlayButton.Image = New Bitmap(filePath)
-
-            If isPlaying Then
-                CameraSwitching.Visible = True
-                CamSwitchTimer.Enabled = True
-                CameraSwitching.Text = settings.cameraName + " starting"
-                CameraSwitching.BringToFront()
-
-                StartCamera()
-                AvailableAlgorithms.SelectedItem = settings.algorithm
-
-                CameraSwitching.Visible = False
-                CamSwitchTimer.Enabled = False
-
-                Me.MainForm_Resize(Nothing, Nothing)
-            Else
-                taskAlg.readyForCameraInput = False
-                StopCamera()
-                taskAlg.Dispose()
-                taskAlg = Nothing
-            End If
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
             settings.algorithm = AvailableAlgorithms.Text
@@ -343,6 +308,8 @@ Namespace MainUI
         End Sub
         Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
             TestAllTimer.Enabled = Not TestAllTimer.Enabled
+            Static testAllToolbarBitmap = New Bitmap(homeDir + "MainUI/Data/testall.png")
+            Static stopTestAll = New Bitmap(homeDir + "MainUI/Data/stopTestAll.png")
             TestAllButton.Image = If(TestAllTimer.Enabled, stopTestAll, testAllToolbarBitmap)
             If TestAllTimer.Enabled Then
                 Debug.WriteLine("")
@@ -429,6 +396,35 @@ Namespace MainUI
 
             Dim sender As Object = Nothing, e As EventArgs = Nothing
             MainForm_Resize(sender, e)
+        End Sub
+        Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
+            isPlaying = Not isPlaying
+
+            Static PausePlay = New Bitmap(homeDir + "MainUI/Data/PauseButton.png")
+            Static runPlay = New Bitmap(homeDir + "MainUI/Data/Run.png")
+            PausePlayButton.Image = If(isPlaying, PausePlay, runPlay)
+
+            If isPlaying Then
+                CameraSwitching.Visible = True
+                CamSwitchTimer.Enabled = True
+                CameraSwitching.Text = settings.cameraName + " starting"
+                CameraSwitching.BringToFront()
+
+                StartCamera()
+                AvailableAlgorithms.SelectedItem = settings.algorithm
+
+                CameraSwitching.Visible = False
+                CamSwitchTimer.Enabled = False
+
+                Me.MainForm_Resize(Nothing, Nothing)
+            Else
+                If taskAlg IsNot Nothing Then ' already stopped...
+                    taskAlg.readyForCameraInput = False
+                    StopCamera()
+                    taskAlg.Dispose()
+                    taskAlg = Nothing
+                End If
+            End If
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
             If taskAlg Is Nothing Then Exit Sub

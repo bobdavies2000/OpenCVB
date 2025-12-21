@@ -14,6 +14,8 @@ Namespace MainUI
             activeMouseDown = False
         End Sub
         Private Sub CamPic_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
+            If taskAlg Is Nothing Then Exit Sub
+
             Dim x As Integer = e.X * settings.workRes.Width / pics(0).Width
             Dim y As Integer = e.Y * settings.workRes.Height / pics(0).Height
             Dim pic = DirectCast(sender, PictureBox)
