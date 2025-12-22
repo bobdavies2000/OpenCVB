@@ -284,8 +284,16 @@ Namespace MainUI
                 Debug.WriteLine("")
                 Debug.WriteLine("Starting 'TestAll' overnight run.")
 
-                If isPlaying Then StartCamera() Else StopCamera()
-                setAlgorithmSelection()
+                AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
+                TestAllTimer.Interval = settings.testAllDuration * 1000
+                TestAllTimer.Enabled = True
+                taskAlg.testAllRunning = True
+            Else
+                Debug.WriteLine("Stopping 'TestAll' overnight run.")
+                AvailableAlgorithms.Enabled = True
+                TestAllTimer.Enabled = False
+                taskAlg.testAllRunning = False
+            End If
         End Sub
         Private Sub Pic_Paint(sender As Object, e As PaintEventArgs)
             If taskAlg Is Nothing Then Exit Sub

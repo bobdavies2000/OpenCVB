@@ -4,8 +4,6 @@ Imports System.Threading
 Namespace MainUI
     Public Class Camera_ZED2 : Inherits GenericCamera
         Dim zed As CamZed
-        Dim captureThread As Thread = Nothing
-
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
             captureRes = _captureRes
             workRes = _workRes
@@ -13,18 +11,25 @@ Namespace MainUI
             zed = New CamZed(workRes, captureRes, deviceName)
 
             calibData.rgbIntrinsics.fx = zed.rgbIntrinsics.fx / ratio
-            CalibData.rgbIntrinsics.fy = zed.rgbIntrinsics.fy / ratio
-            CalibData.rgbIntrinsics.ppx = zed.rgbIntrinsics.ppx / ratio
-            CalibData.rgbIntrinsics.ppy = zed.rgbIntrinsics.ppy / ratio
+            calibData.rgbIntrinsics.fy = zed.rgbIntrinsics.fy / ratio
+            calibData.rgbIntrinsics.ppx = zed.rgbIntrinsics.ppx / ratio
+            calibData.rgbIntrinsics.ppy = zed.rgbIntrinsics.ppy / ratio
 
-            CalibData.leftIntrinsics = CalibData.rgbIntrinsics
+            calibData.leftIntrinsics = calibData.rgbIntrinsics
 
-            CalibData.rightIntrinsics.fx = zed.rightIntrinsics.fx / ratio
-            CalibData.rightIntrinsics.fy = zed.rightIntrinsics.fy / ratio
-            CalibData.rightIntrinsics.ppx = zed.rightIntrinsics.ppx / ratio
-            CalibData.rightIntrinsics.ppy = zed.rightIntrinsics.ppy / ratio
+            calibData.rightIntrinsics.fx = zed.rightIntrinsics.fx / ratio
+            calibData.rightIntrinsics.fy = zed.rightIntrinsics.fy / ratio
+            calibData.rightIntrinsics.ppx = zed.rightIntrinsics.ppx / ratio
+            calibData.rightIntrinsics.ppy = zed.rightIntrinsics.ppy / ratio
 
-            CalibData.baseline = zed.baseline
+            calibData.baseline = zed.baseline
+
+            ' Start background thread to capture frames
+            captureThread = New Thread(AddressOf CaptureFrames)
+            captureThread.IsBackground = True
+            captureThread.Name = "ZED2_CaptureThread"
+            captureThread.Start()
+            camImages = New CameraImages(workRes)
         End Sub
         Private Sub CaptureFrames()
             While isCapturing
@@ -40,20 +45,29 @@ Namespace MainUI
             IMU_TimeStamp = (zed.IMU_TimeStamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
 
             If workRes <> captureRes Then
-                color = zed.color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
-                pointCloud = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
-                leftView = zed.leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
-                rightView = zed.rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest).Clone
+                camImages.images(0) = zed.color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                camImages.images(1) = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                camImages.images(2) = zed.leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                camImages.images(3) = zed.rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             Else
-                color = zed.color.Clone
-                pointCloud = zed.pointCloud.Clone
-                leftView = zed.leftView.Clone
-                rightView = zed.rightView.Clone
+                camImages.images(0) = zed.color
+                camImages.images(1) = zed.pointCloud
+                camImages.images(2) = zed.leftView
+                camImages.images(3) = zed.rightView
             End If
-            GC.Collect()
+
+            If cameraFrameCount Mod 10 = 0 Then GC.Collect()
+
+            MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
         Public Overrides Sub StopCamera()
-            If zed IsNot Nothing Then zed.StopCamera()
+            If captureThread IsNot Nothing Then
+                captureThread.Join(1000) ' Wait up to 1 second for thread to finish
+                captureThread = Nothing
+            End If
+            If zed IsNot Nothing AndAlso camImages IsNot Nothing AndAlso camImages.images(1).Width > 0 Then
+                zed.StopCamera()
+            End If
         End Sub
     End Class
 End Namespace

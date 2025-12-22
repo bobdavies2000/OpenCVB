@@ -6,13 +6,13 @@ Imports cv = OpenCvSharp
 
 Namespace MainUI
     Public Class Camera_ORB : Inherits GenericCamera
-        Dim captureThread As Thread = Nothing
         Dim pipe As Pipeline
 
         Dim accelSensor As Sensor
         Dim gyroSensor As Sensor
 
         Dim acceleration As cv.Point3f, angularVelocity As cv.Point3f, timeStamp As Int64
+        Dim color As cv.Mat, leftView As cv.Mat, pointCloud As cv.Mat, rightView As cv.Mat
         Dim PtCloud As New PointCloudFilter
         Dim initialTime As Int64 = timeStamp
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
@@ -98,15 +98,15 @@ Namespace MainUI
             Dim rFrame = frames.GetFrame(FrameType.OB_FRAME_IR_RIGHT)
 
             If cFrame IsNot Nothing Then
-                color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, cFrame.GetDataPtr).Clone
+                color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, cFrame.GetDataPtr)
             End If
 
             If lFrame IsNot Nothing Then
-                leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, lFrame.GetDataPtr).Clone
+                leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, lFrame.GetDataPtr)
             End If
 
             If rFrame IsNot Nothing Then
-                rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rFrame.GetDataPtr).Clone
+                rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rFrame.GetDataPtr)
             End If
 
             If dFrame IsNot Nothing Then
@@ -115,8 +115,7 @@ Namespace MainUI
                 PtCloud.SetPointFormat(Format.OB_FORMAT_POINT)
                 Dim pcData = PtCloud.Process(dFrame)
                 If pcData IsNot Nothing Then
-                    pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcData.GetDataPtr).Clone
-                    pointCloud /= 1000
+                    pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcData.GetDataPtr) / 1000
                 End If
             End If
 
@@ -136,9 +135,18 @@ Namespace MainUI
                 camImages.images(2) = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
                 camImages.images(3) = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
             End If
+            ' without this GC.Collect, there are occasional memory footprint problems.  
+            If cameraFrameCount Mod 10 = 0 Then GC.Collect()
+            MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
 
         Public Overrides Sub StopCamera()
+            If captureThread IsNot Nothing Then
+                captureThread.Join(1000) ' Wait up to 1 second for thread to finish
+                captureThread = Nothing
+            End If
+
+            ' Stop the pipeline asynchronously so it doesn't block the UI
             If pipe IsNot Nothing Then
                 Dim pipeToStop = pipe
                 pipe = Nothing ' Clear reference so GetNextFrame won't try to use it
