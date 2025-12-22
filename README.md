@@ -8,24 +8,25 @@
 -   New tools were used to rebuild OpenCVB and improve the application.
     -   Cursor.ai was used to rebuild the infrastructure for algorithm testing.
     -   The algorithms are unchanged from the previous OpenCVB version.
-    -   Better infrastructure means easier debugging.
+    -   Better infrastructure means easier debugging and fewer bugs.
 -   One key simplification of OpenCVB was *reduced* threading.
     -   There are now just 2 threads in OpenCVB – UI and the camera task.
     -   Threading added complexity to understanding the code.
-    -   The algorithm thread UI is in the same thread as the UI.
+    -   The algorithm thread UI is the same thread as the UI.
 -   The motive for the earlier multi-threading was to remove the cost of display.
     -   Single threading means display will interrupt or hold back processing.
     -   A global option “Display FPS” now limits the cost of displaying images.
-        -   It may not be a useful enhancement but it is worth more study.
+        -   It may not be a useful enhancement, but it is worth more study.
 -   Cautious error-handling (Try/Catch) is limited in its use in OpenCVB.
     -   OpenCVB is always running in Debug mode with source so “let it fail”.
-    -   Checking all Windows Debugging exceptions stops the code at the error.
+    -   Check all Windows Debugging Exceptions to stop the code at the error.
     -   The intent is to get as close to the error as possible.
     -   The code is simpler to read with limited impact on debugging.
 -   OpenCVB options are now exclusively maintained in JSON.
     -   No GetSetting or SaveSetting calls remain.
-    -   JSON settings are available to all algorithms through a shared library.
+    -   JSON settings are available to algorithms through a shared library.
 -   The image size of all 4 OpenCVB outputs is completely customizable.
+    -   Clicking or drawing on the image uses work resolution coordinates.
 -   Algorithm count in the main form caption only reflects active algorithms.
     -   The algorithm count was over 2000 but is now close to 1500.
 
