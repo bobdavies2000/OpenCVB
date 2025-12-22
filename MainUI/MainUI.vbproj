@@ -28,13 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CPP_Native\CPP_Native.vcxproj" />
-    <ProjectReference Include="..\CamZed\CamZed.csproj" />
-    <ProjectReference Include="..\jsonShared\jsonShared.vbproj" />
-    <ProjectReference Include="..\VBClasses\VBClasses.vbproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="ob_csharp">
       <HintPath>..\OrbbecSDK_CSharp\Build\Release\ob_csharp.dll</HintPath>
       <Private>True</Private>
@@ -104,6 +97,13 @@
 
   <ItemGroup>
     <Folder Include="Libs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CamZed\CamZed.csproj" />
+    <ProjectReference Include="..\CPP_Native\CPP_Native.vcxproj" />
+    <ProjectReference Include="..\jsonShared\jsonShared.vbproj" />
+    <ProjectReference Include="..\VBClasses\VBClasses.vbproj" />
   </ItemGroup>
 
   <ItemGroup>
