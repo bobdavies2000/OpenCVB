@@ -81,6 +81,8 @@ Namespace MainUI
         Private Sub updateAlgorithmHistory()
             Dim copyList As List(Of String)
             Dim maxHistory As Integer = 50
+            If TestAllTimer.Enabled Then Exit Sub
+
             If algHistory.Contains(AvailableAlgorithms.Text) Then
                 ' make it the most recent
                 copyList = New List(Of String)(algHistory)
@@ -335,6 +337,8 @@ Namespace MainUI
         Private Sub Pic_Paint(sender As Object, e As PaintEventArgs)
             If taskAlg Is Nothing Then Exit Sub
 
+            Dim timeStart As DateTime = Now
+
             Dim g As Graphics = e.Graphics
             Dim pic = DirectCast(sender, PictureBox)
             g.ScaleTransform(1, 1)
@@ -359,6 +363,11 @@ Namespace MainUI
             Next
             brush.Dispose()
             bitmap.Dispose()
+
+            Dim timeEnd As DateTime = Now
+            Dim elapsedTime = timeEnd.Ticks - timeStart.Ticks
+            Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
+            taskAlg.cpu.paintTime += spanCopy.Ticks / TimeSpan.TicksPerMillisecond
         End Sub
         Private Sub startAlgorithm()
             vbc.taskAlg = New AlgorithmTask

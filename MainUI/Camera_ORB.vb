@@ -21,6 +21,11 @@ Namespace MainUI
             Dim ctx As New Context
             Dim devList = ctx.QueryDeviceList()
             Dim dev = devList.GetDevice(0)
+            color = New cv.Mat(workRes, cv.MatType.CV_8UC3, 0)
+            leftView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
+            pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
+            rightView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
+            camImages = New CameraImages(workRes)
 
             Dim fps = 0
             Dim w = captureRes.Width, h = captureRes.Height

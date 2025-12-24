@@ -10,6 +10,7 @@ Namespace VBClasses
         Public algorithmNames As New List(Of String)
         Public algorithmTimes As New List(Of DateTime)
         Public algorithmStack As New Stack()
+        Public paintTime As Single
         Public displayObjectName As String
         Public activeObjects As New List(Of Object)
 
@@ -100,6 +101,8 @@ Namespace VBClasses
                     PercentTimes.Add(algorithm_ms(i), str)
                 End If
             Next
+            Dim paintStr = Format(taskAlg.cpu.paintTime, fmt1) + " ms paint time"
+            taskAlg.cpu.paintTime = 0
 
             Dim otherTimes As New List(Of Single)
             For Each percent In PercentTimes.Keys
@@ -112,7 +115,8 @@ Namespace VBClasses
             percentTime += "Target Display FPS = " + CStr(taskAlg.Settings.FPSPaintTarget) + vbCrLf + vbCrLf
 
             Dim timeDataTree As New List(Of String)(treeData)
-            percentTime += saveWaitTime + vbCrLf + vbCrLf
+            percentTime += saveWaitTime + vbCrLf
+            percentTime += paintStr + vbCrLf + vbCrLf
             For i = 0 To PercentTimes.Count - 1
                 If PercentTimes.ElementAt(i).Key > 0.01 Then
                     Dim str = PercentTimes.ElementAt(i).Value

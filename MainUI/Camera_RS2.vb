@@ -121,7 +121,7 @@ Namespace MainUI
                 camImages.images(2) = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
                 camImages.images(3) = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
 
-                GC.Collect() ' do you think this is unnecessary?  Remove it and check...
+                'GC.Collect() ' do you think this is unnecessary?  Remove it and check...
                 MyBase.GetNextFrameCounts(IMU_FrameTime)
             End Using
         End Sub
