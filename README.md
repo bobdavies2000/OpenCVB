@@ -1,3 +1,9 @@
+# December 23, 2025 – Installation and Build Issues.
+-   The latest release didn't properly install.
+    -   Most of the issues were related to the switch to Visual Studio 2026.
+    -   VCVarsAll.bat would not be found on systems without VS2026 installed.
+    -   The Build Configuration was not properly set for X64.
+    
 # December 17, 2025 – VS2026, Infrastructure, Reduced Threading, Display FPS, Error-Handling, JSON, Image Sizing.
 
 -   Over 1500 algorithms are included, averaging 36 lines of code per algorithm.
