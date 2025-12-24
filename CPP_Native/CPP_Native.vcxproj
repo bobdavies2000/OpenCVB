@@ -195,7 +195,7 @@
       <AssemblyDebug>false</AssemblyDebug>
     </Link>
     <PreBuildEvent>
-      <Command>$(SolutionDir)UI_Generator\bin\x64\Release\net8.0\UI_Generator.exe</Command>
+      <Command>$(SolutionDir)C:\src\OpenCVB\UI_Generator\bin\x64\Release\net10.0\UI_Generator.exe</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>

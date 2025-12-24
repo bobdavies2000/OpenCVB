@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace></RootNamespace>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
 	  <ImplicitUsings>enable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
@@ -29,8 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CamZed\CamZed.csproj" />
     <ProjectReference Include="..\CPP_Native\CPP_Native.vcxproj" />
     <ProjectReference Include="..\jsonShared\jsonShared.vbproj" />
+    <ProjectReference Include="..\UI_Generator\UI_Generator.vbproj" />
   </ItemGroup>
 
   <ItemGroup>

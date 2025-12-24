@@ -38,11 +38,11 @@ Public Class SharpGLForm
 
         gl = GLControl.OpenGL
     End Sub
-    Private Sub sgl_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        taskAlg.settings.sharpGLLeft = Me.Left
-        taskAlg.settings.sharpGLTop = Me.Top
-        taskAlg.settings.sharpGLWidth = Me.Width
-        taskAlg.settings.sharpGLHeight = Me.Height
+    Private Sub sgl_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        taskAlg.Settings.sharpGLLeft = Me.Left
+        taskAlg.Settings.sharpGLTop = Me.Top
+        taskAlg.Settings.sharpGLWidth = Me.Width
+        taskAlg.Settings.sharpGLHeight = Me.Height
     End Sub
     Private Sub OpenGLControl_MouseDown(sender As Object, e As MouseEventArgs) Handles GLControl.MouseDown
         If e.Button = MouseButtons.Right Then

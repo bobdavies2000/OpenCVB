@@ -107,6 +107,19 @@ Namespace MainUI
                 If algHistory.Count >= maxHistory Then Exit For
             Next
         End Sub
+        Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
+            Dim systemPath = Environment.GetEnvironmentVariable("Path")
+            Dim foundDirectory As Boolean
+            If Directory.Exists(neededDirectory) Then
+                foundDirectory = True
+                systemPath = neededDirectory + ";" + systemPath
+            End If
+
+            If foundDirectory = False And notFoundMessage.Length > 0 Then
+                MessageBox.Show(neededDirectory + " was not found.  " + notFoundMessage)
+            End If
+            Environment.SetEnvironmentVariable("Path", systemPath)
+        End Sub
         Public Sub New(Optional projectDirectory As String = "")
             InitializeComponent()
 
@@ -259,6 +272,30 @@ Namespace MainUI
         End Sub
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             settings = settingsIO.Load()
+
+            updatePath(homeDir + "bin\", "Release version of CPP_Native.dll")
+            updatePath(homeDir + "opencv\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+
+            updatePath(homeDir + "opencv\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+            updatePath(homeDir + "opencv\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+
+            Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
+            Dim zedIndex = cameraNames.IndexOf("StereoLabs ZED 2/2i")
+            If cudaPath IsNot Nothing And settings.cameraPresent(zedIndex) And settings.cameraSupported(zedIndex) = True Then
+                updatePath(cudaPath, "Cuda - needed for StereoLabs")
+                updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
+            End If
+            updatePath(homeDir + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")
+            updatePath(homeDir + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
+            updatePath(homeDir + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")
+            updatePath(homeDir + "OrbbecSDK\lib\win_x64\", "OrbbecSDK.dll")
+
+            updatePath(homeDir + "librealsense\build\Debug\", "Realsense camera support.")
+            updatePath(homeDir + "librealsense\build\Release\", "Realsense camera support.")
+
+            If settings.cameraPresent(3) Then ' OakD is the 3rd element in cameraPresent but it is not defined explicitly.
+                updatePath(homeDir + "OakD\build\Release\", "Luxonis Oak-D camera support.")
+            End If
 
             addPics()
 

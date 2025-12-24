@@ -31,7 +31,7 @@ Public Class PixelViewerForm
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         rtb.Text = saveText
     End Sub
-    Private Sub PixelViewerForm_Closed(sender As Object, e As EventArgs) Handles Me.Closed
+    Private Sub PixelViewerForm_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
         Timer1.Enabled = False
     End Sub
     Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click

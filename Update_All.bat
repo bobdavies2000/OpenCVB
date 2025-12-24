@@ -1,5 +1,5 @@
 @echo off
-call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64
+call "C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvarsall.bat" x86_amd64
 
 @echo off
 
@@ -60,7 +60,7 @@ if not exist OakD\Build (
 	msbuild.exe OakD/depthai-core/Build/Cam_Oak-D.sln /p:Configuration=Debug
 )
 
-msbuild.exe UI_Generator/UI_Generator.vcxproj /p:Configuration=Release
+msbuild.exe UI_Generator/UI_Generator.vbproj /p:Configuration=Release	
 msbuild.exe GifBuilder/GifBuilder.sln /p:Configuration=Debug /p:Platform="Any CPU"
 msbuild.exe GifBuilder/GifBuilder.sln /p:Configuration=Release /p:Platform="Any CPU"
 
