@@ -49,10 +49,12 @@ Namespace MainUI
 
                                taskAlg.cpu.algorithmTimes(0) = taskAlg.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
 
-                               sender.camImages.images(0).CopyTo(taskAlg.color)
-                               sender.camImages.images(1).CopyTo(taskAlg.pointCloud)
-                               sender.camImages.images(2).CopyTo(taskAlg.leftView)
-                               sender.camImages.images(3).CopyTo(taskAlg.rightView)
+                               SyncLock camera.cameraMutex
+                                   sender.camImages.images(0).CopyTo(taskAlg.color)
+                                   sender.camImages.images(1).CopyTo(taskAlg.pointCloud)
+                                   sender.camImages.images(2).CopyTo(taskAlg.leftView)
+                                   sender.camImages.images(3).CopyTo(taskAlg.rightView)
+                               End SyncLock
 
                                taskAlg.RunAlgorithm()
 

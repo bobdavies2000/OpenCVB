@@ -24,6 +24,8 @@ Namespace MainUI
 
             calibData.baseline = zed.baseline
 
+            MyBase.prepImages()
+
             ' Start background thread to capture frames
             captureThread = New Thread(AddressOf CaptureFrames)
             captureThread.IsBackground = True
@@ -44,19 +46,10 @@ Namespace MainUI
             Static IMU_StartTime = zed.IMU_TimeStamp
             IMU_TimeStamp = (zed.IMU_TimeStamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
 
-            If workRes <> captureRes Then
-                camImages.images(0) = zed.color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.images(1) = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.images(2) = zed.leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.images(3) = zed.rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            Else
-                camImages.images(0) = zed.color
-                camImages.images(1) = zed.pointCloud
-                camImages.images(2) = zed.leftView
-                camImages.images(3) = zed.rightView
-            End If
-
-            If cameraFrameCount Mod 10 = 0 Then GC.Collect()
+            color = zed.color
+            pointCloud = zed.pointCloud
+            leftView = zed.leftView
+            rightView = zed.rightView
 
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub

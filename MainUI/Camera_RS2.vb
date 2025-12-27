@@ -69,11 +69,13 @@ Namespace MainUI
             calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.ColorToLeft_translation(0), 2) +
                                               System.Math.Pow(calibData.ColorToLeft_translation(1), 2) +
                                               System.Math.Pow(calibData.ColorToLeft_translation(2), 2))
+
+            MyBase.prepImages()
+
             ' Start background thread to capture frames
             captureThread = New Thread(AddressOf CaptureFrames)
             captureThread.IsBackground = True
             captureThread.Name = "RS2_CaptureThread"
-            camImages = New CameraImages(workRes)
             captureThread.Start()
         End Sub
         Private Sub CaptureFrames()
@@ -85,10 +87,9 @@ Namespace MainUI
             ' Check if pipe is still valid (might be cleared during stop)
             If pipe Is Nothing Then Return
 
-            Dim alignToColor = New Align(Stream.Color)
-            Dim ptcloud = New PointCloud()
+            Static alignToColor = New Align(Stream.Color)
+            Static ptcloud = New PointCloud()
             Dim cols = captureRes.Width, rows = captureRes.Height
-            Static color As cv.Mat, leftView As cv.Mat, rightView As cv.Mat, pointCloud As cv.Mat
 
             Using frames As FrameSet = pipe.WaitForFrames(5000)
                 For Each frame As Intel.RealSense.Frame In frames
@@ -116,12 +117,7 @@ Namespace MainUI
                 Dim pcFrame = ptcloud.Process(alignedFrames.DepthFrame)
                 pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcFrame.Data)
 
-                camImages.images(0) = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.images(1) = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.images(2) = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
-                camImages.images(3) = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 2 ' improve brightness
-
-                'GC.Collect() ' do you think this is unnecessary?  Remove it and check...
+                GC.Collect() ' do you think this is unnecessary?  Remove it and check...
                 MyBase.GetNextFrameCounts(IMU_FrameTime)
             End Using
         End Sub

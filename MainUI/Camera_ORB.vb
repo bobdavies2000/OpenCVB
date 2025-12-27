@@ -12,7 +12,6 @@ Namespace MainUI
         Dim gyroSensor As Sensor
 
         Dim acceleration As cv.Point3f, angularVelocity As cv.Point3f, timeStamp As Int64
-        Dim color As cv.Mat, leftView As cv.Mat, pointCloud As cv.Mat, rightView As cv.Mat
         Dim PtCloud As New PointCloudFilter
         Dim initialTime As Int64 = timeStamp
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
@@ -21,11 +20,6 @@ Namespace MainUI
             Dim ctx As New Context
             Dim devList = ctx.QueryDeviceList()
             Dim dev = devList.GetDevice(0)
-            color = New cv.Mat(workRes, cv.MatType.CV_8UC3, 0)
-            leftView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
-            pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
-            rightView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
-            camImages = New CameraImages(workRes)
 
             Dim fps = 0
             Dim w = captureRes.Width, h = captureRes.Height
@@ -62,6 +56,9 @@ Namespace MainUI
                                               timeStamp = frame.GetTimeStamp
                                           End Sub)
             pipe.EnableFrameSync()
+
+            MyBase.prepImages()
+
             pipe.Start(config)
 
             ' Start background thread to capture frames
@@ -129,19 +126,6 @@ Namespace MainUI
             IMU_Acceleration.Z *= -1
             IMU_FrameTime = timeStamp - initialTime
 
-            If workRes.Width = captureRes.Width Then
-                camImages.images(0) = color.Clone
-                camImages.images(1) = pointCloud.Clone
-                camImages.images(2) = leftView * 4 ' brighten it to help with correlations.
-                camImages.images(3) = rightView * 4
-            Else
-                camImages.images(0) = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.images(1) = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                camImages.images(2) = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
-                camImages.images(3) = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest) * 4
-            End If
-            ' without this GC.Collect, there are occasional memory footprint problems.  
-            If cameraFrameCount Mod 10 = 0 Then GC.Collect()
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
 

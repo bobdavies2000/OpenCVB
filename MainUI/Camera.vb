@@ -1,6 +1,8 @@
 ﻿Imports System.Numerics
-Imports cv = OpenCvSharp
 Imports System.Threading
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement
+Imports Intel.RealSense
+Imports cv = OpenCvSharp
 Public Class CameraImages
     Public images() As cv.Mat
     Public Sub New(workRes As cv.Size)
@@ -37,6 +39,8 @@ Public Structure cameraInfo
 End Structure
 
 Public Class GenericCamera
+    Public cameraMutex = New Mutex(True, "CameraMutex")
+    Public color As cv.Mat, leftView As cv.Mat, pointCloud As cv.Mat, rightView As cv.Mat
     Public transformationMatrix() As Single
     Public IMU_TimeStamp As Double
     Public IMU_Acceleration As cv.Point3f
@@ -94,6 +98,16 @@ Public Class GenericCamera
         cameraFrameCount = 0
         isCapturing = True
     End Sub
+    Public Sub prepImages()
+        SyncLock cameraMutex
+            color = New cv.Mat(workRes, cv.MatType.CV_8UC3, 0)
+            leftView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
+            pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
+            rightView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
+
+            camImages = New CameraImages(workRes)
+        End SyncLock
+    End Sub
     Public Sub GetNextFrameCounts(frameTime As Double)
         Static lastFrameTime = IMU_TimeStamp
         Static imuStartTime = IMU_TimeStamp
@@ -108,6 +122,15 @@ Public Class GenericCamera
         lastCPUTime = CPU_TimeStamp
 
         cameraFrameCount += 1
+
+        SyncLock cameraMutex
+            camImages.images(0) = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            camImages.images(1) = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            camImages.images(2) = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            camImages.images(3) = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+        End SyncLock
+
+        If cameraFrameCount Mod 10 = 0 Then GC.Collect() ' do you think this is unnecessary?  Remove it and check...
         RaiseEvent FrameReady(Me)
     End Sub
     Public Sub childStopCamera()
