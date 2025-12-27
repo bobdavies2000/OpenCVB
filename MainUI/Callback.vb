@@ -1,5 +1,7 @@
-Imports cv = OpenCvSharp
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement
+Imports Intel.RealSense
 Imports VBClasses
+Imports cv = OpenCvSharp
 Namespace MainUI
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
@@ -50,10 +52,10 @@ Namespace MainUI
                                taskAlg.cpu.algorithmTimes(0) = taskAlg.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
 
                                SyncLock camera.cameraMutex
-                                   sender.camImages.images(0).CopyTo(taskAlg.color)
-                                   sender.camImages.images(1).CopyTo(taskAlg.pointCloud)
-                                   sender.camImages.images(2).CopyTo(taskAlg.leftView)
-                                   sender.camImages.images(3).CopyTo(taskAlg.rightView)
+                                   camera.color.CopyTo(taskAlg.color)
+                                   camera.pointCloud.CopyTo(taskAlg.pointCloud)
+                                   camera.leftView.CopyTo(taskAlg.leftView)
+                                   camera.rightView.CopyTo(taskAlg.rightView)
                                End SyncLock
 
                                taskAlg.RunAlgorithm()

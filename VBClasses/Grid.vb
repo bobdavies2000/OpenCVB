@@ -126,6 +126,7 @@ Namespace VBClasses
 
     Public Class Grid_BasicsTest : Inherits TaskParent
         Public Sub New()
+            If standalone Then taskAlg.gOptions.GridSlider.Value = 16
             labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each roi.  Bottom might be a shortened roi."}
             If standalone Then desc = "Validation test for Grid_Basics algorithm"
         End Sub

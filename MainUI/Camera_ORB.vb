@@ -99,32 +99,35 @@ Namespace MainUI
             Dim lFrame = frames.GetFrame(FrameType.OB_FRAME_IR_LEFT)
             Dim rFrame = frames.GetFrame(FrameType.OB_FRAME_IR_RIGHT)
 
-            If cFrame IsNot Nothing Then
-                color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, cFrame.GetDataPtr)
-            End If
-
-            If lFrame IsNot Nothing Then
-                leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, lFrame.GetDataPtr)
-            End If
-
-            If rFrame IsNot Nothing Then
-                rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rFrame.GetDataPtr)
-            End If
-
-            If dFrame IsNot Nothing Then
-                Dim depthValueScale As Single = dFrame.GetValueScale()
-                PtCloud.SetPositionDataScaled(depthValueScale)
-                PtCloud.SetPointFormat(Format.OB_FORMAT_POINT)
-                Dim pcData = PtCloud.Process(dFrame)
-                If pcData IsNot Nothing Then
-                    pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcData.GetDataPtr) / 1000
+            SyncLock cameraMutex
+                If cFrame IsNot Nothing Then
+                    color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, cFrame.GetDataPtr).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
-            End If
 
-            IMU_AngularVelocity = angularVelocity
-            IMU_Acceleration = acceleration
-            IMU_Acceleration.Z *= -1
-            IMU_FrameTime = timeStamp - initialTime
+                If lFrame IsNot Nothing Then
+                    leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, lFrame.GetDataPtr).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                End If
+
+                If rFrame IsNot Nothing Then
+                    rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rFrame.GetDataPtr).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                End If
+
+                If dFrame IsNot Nothing Then
+                    Dim depthValueScale As Single = dFrame.GetValueScale()
+                    PtCloud.SetPositionDataScaled(depthValueScale)
+                    PtCloud.SetPointFormat(Format.OB_FORMAT_POINT)
+                    Dim pcData = PtCloud.Process(dFrame)
+                    If pcData IsNot Nothing Then
+                        pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcData.GetDataPtr) / 1000
+                        pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    End If
+                End If
+
+                IMU_AngularVelocity = angularVelocity
+                IMU_Acceleration = acceleration
+                IMU_Acceleration.Z *= -1
+                IMU_FrameTime = timeStamp - initialTime
+            End SyncLock
 
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub

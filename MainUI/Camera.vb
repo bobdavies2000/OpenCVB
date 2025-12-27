@@ -3,17 +3,6 @@ Imports System.Threading
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 Imports Intel.RealSense
 Imports cv = OpenCvSharp
-Public Class CameraImages
-    Public images() As cv.Mat
-    Public Sub New(workRes As cv.Size)
-        images = {New cv.Mat(workRes, cv.MatType.CV_8UC3, 0),
-                  New cv.Mat(workRes, cv.MatType.CV_32FC3, 0),
-                  New cv.Mat(workRes, cv.MatType.CV_8UC1, 0),
-                  New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)}
-    End Sub
-    Public Sub New()
-    End Sub
-End Class
 Public Structure intrinsicData
     Public ppx As Single
     Public ppy As Single
@@ -51,7 +40,6 @@ Public Class GenericCamera
     Public CPU_FrameTime As Double
     Public cameraFrameCount As Integer
     Public baseline As Single
-    Public camImages As CameraImages
 
     Public captureRes As cv.Size
     Public workRes As cv.Size
@@ -104,8 +92,6 @@ Public Class GenericCamera
             leftView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
             pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
             rightView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
-
-            camImages = New CameraImages(workRes)
         End SyncLock
     End Sub
     Public Sub GetNextFrameCounts(frameTime As Double)
@@ -122,13 +108,6 @@ Public Class GenericCamera
         lastCPUTime = CPU_TimeStamp
 
         cameraFrameCount += 1
-
-        SyncLock cameraMutex
-            camImages.images(0) = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            camImages.images(1) = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            camImages.images(2) = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            camImages.images(3) = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-        End SyncLock
 
         If cameraFrameCount Mod 10 = 0 Then GC.Collect() ' do you think this is unnecessary?  Remove it and check...
         RaiseEvent FrameReady(Me)

@@ -3936,8 +3936,8 @@ Namespace VBClasses
 
 
     Public Class Options_AsciiArt : Inherits OptionParent
-        Public hStep As Double = 31
-        Public wStep As Double = 55
+        Public hStep As Double = 20
+        Public wStep As Double = 20
         Public size As cv.Size = New cv.Size(wStep, hStep)
         Public Sub New()
             If sliders.Setup(traceName) Then

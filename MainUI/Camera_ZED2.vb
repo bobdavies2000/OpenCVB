@@ -31,7 +31,6 @@ Namespace MainUI
             captureThread.IsBackground = True
             captureThread.Name = "ZED2_CaptureThread"
             captureThread.Start()
-            camImages = New CameraImages(workRes)
         End Sub
         Private Sub CaptureFrames()
             While isCapturing
@@ -46,10 +45,10 @@ Namespace MainUI
             Static IMU_StartTime = zed.IMU_TimeStamp
             IMU_TimeStamp = (zed.IMU_TimeStamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
 
-            color = zed.color
-            pointCloud = zed.pointCloud
-            leftView = zed.leftView
-            rightView = zed.rightView
+            color = zed.color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            pointCloud = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            leftView = zed.leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            rightView = zed.rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
 
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
@@ -58,9 +57,7 @@ Namespace MainUI
                 captureThread.Join(1000) ' Wait up to 1 second for thread to finish
                 captureThread = Nothing
             End If
-            If zed IsNot Nothing AndAlso camImages IsNot Nothing AndAlso camImages.images(1).Width > 0 Then
-                zed.StopCamera()
-            End If
+            If zed IsNot Nothing Then zed.StopCamera()
         End Sub
     End Class
 End Namespace

@@ -92,30 +92,32 @@ Namespace MainUI
             Dim cols = captureRes.Width, rows = captureRes.Height
 
             Using frames As FrameSet = pipe.WaitForFrames(5000)
-                For Each frame As Intel.RealSense.Frame In frames
-                    If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 1 Then
-                        leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
-                    End If
-                    If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 2 Then
-                        rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
-                    End If
-                    If frame.Profile.Stream = Stream.Accel Then
-                        IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
-                    End If
-                    If frame.Profile.Stream = Stream.Gyro Then
-                        IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
-                        Dim mFrame = frame.As(Of MotionFrame)
-                        Static initialTime As Int64 = mFrame.Timestamp
-                        IMU_FrameTime = mFrame.Timestamp - initialTime
-                    End If
-                Next
+                SyncLock cameraMutex
+                    For Each frame As Intel.RealSense.Frame In frames
+                        If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 1 Then
+                            leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                        End If
+                        If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 2 Then
+                            rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                        End If
+                        If frame.Profile.Stream = Stream.Accel Then
+                            IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
+                        End If
+                        If frame.Profile.Stream = Stream.Gyro Then
+                            IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
+                            Dim mFrame = frame.As(Of MotionFrame)
+                            Static initialTime As Int64 = mFrame.Timestamp
+                            IMU_FrameTime = mFrame.Timestamp - initialTime
+                        End If
+                    Next
 
-                Dim alignedFrames As FrameSet = alignToColor.Process(frames).As(Of FrameSet)()
+                    Dim alignedFrames As FrameSet = alignToColor.Process(frames).As(Of FrameSet)()
 
-                color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, alignedFrames.ColorFrame.Data)
+                    color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, alignedFrames.ColorFrame.Data).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
 
-                Dim pcFrame = ptcloud.Process(alignedFrames.DepthFrame)
-                pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcFrame.Data)
+                    Dim pcFrame = ptcloud.Process(alignedFrames.DepthFrame)
+                    pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcFrame.Data).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                End SyncLock
 
                 GC.Collect() ' do you think this is unnecessary?  Remove it and check...
                 MyBase.GetNextFrameCounts(IMU_FrameTime)
