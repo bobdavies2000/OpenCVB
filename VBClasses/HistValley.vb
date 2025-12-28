@@ -426,6 +426,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             trends.Run(src)
+            If trends.resultingValues.Count = 0 Then Exit Sub
 
             If taskAlg.kalman.kInput.Length <> taskAlg.histogramBins Then ReDim taskAlg.kalman.kInput(taskAlg.histogramBins - 1)
             taskAlg.kalman.kInput = trends.resultingValues.ToArray

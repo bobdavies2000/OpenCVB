@@ -16795,4 +16795,34 @@ Namespace VBClasses
             prevList = New List(Of cv.Point)(currList)
         End Sub
     End Class
+
+
+
+
+
+
+
+
+
+    Public Class XO_Color8U_MotionFiltered : Inherits TaskParent
+        Dim color8U As New XO_Color8U_Sweep
+        Public classCount As Integer
+        Dim motion As New XO_Motion_BGSub
+        Public Sub New()
+            desc = "Prepare a Color8U_Basics image using the taskAlg.motionMask"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If taskAlg.motionMask.CountNonZero Then
+                src.SetTo(0, Not taskAlg.motionMask)
+                color8U.Run(src)
+                dst2 = color8U.dst3
+                dst2.CopyTo(dst3, taskAlg.motionMask)
+                dst2.SetTo(0, Not taskAlg.motionMask)
+                classCount = color8U.classCount
+            End If
+            If taskAlg.heartBeatLT Then dst3.SetTo(0)
+            labels(2) = color8U.strOut
+        End Sub
+    End Class
+
 End Namespace

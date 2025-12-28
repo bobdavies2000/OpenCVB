@@ -81,7 +81,7 @@ Namespace MainUI
         Private Sub updateAlgorithmHistory()
             Dim copyList As List(Of String)
             Dim maxHistory As Integer = 50
-            If TestAllTimer.Enabled Then Exit Sub
+            'If TestAllTimer.Enabled Then Exit Sub
 
             If algHistory.Contains(AvailableAlgorithms.Text) Then
                 ' make it the most recent
@@ -421,14 +421,10 @@ Namespace MainUI
             End If
             fpsWriteCount += 1
 
-            If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
-                AvailableAlgorithms.SelectedIndex = 0
+            If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = " " Then
+                AvailableAlgorithms.SelectedIndex += 2
             Else
-                If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = " " Then
-                    AvailableAlgorithms.SelectedIndex += 2
-                Else
-                    AvailableAlgorithms.SelectedIndex += 1
-                End If
+                AvailableAlgorithms.SelectedIndex += 1
             End If
 
             Debug.WriteLine(vbCrLf + "GDI: " & GdiMonitor.GetGdiCount())
@@ -458,6 +454,7 @@ Namespace MainUI
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
             settings.algorithm = AvailableAlgorithms.Text
             If TestAllTimer.Enabled = False Then SaveJsonSettings()
+            'SaveJsonSettings() ' uncomment this to capture the algorithm that crashes the computer.
 
             If AvailableAlgorithms.SelectedItem <> " " Then
                 settings.algorithm = AvailableAlgorithms.SelectedItem

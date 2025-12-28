@@ -248,10 +248,8 @@ Color8U_Hue
 Color8U_InRange
 Color8U_KMeans
 Color8U_LeftRight
-Color8U_MotionFiltered
 Color8U_RedHue
 Color8U_Smoothing
-Color8U_Sweep
 Color8U_TopX
 Complexity_Basics
 Complexity_Dots

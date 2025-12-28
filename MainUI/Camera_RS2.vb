@@ -119,7 +119,6 @@ Namespace MainUI
                     pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcFrame.Data).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End SyncLock
 
-                GC.Collect() ' do you think this is unnecessary?  Remove it and check...
                 MyBase.GetNextFrameCounts(IMU_FrameTime)
             End Using
         End Sub

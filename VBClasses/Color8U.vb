@@ -62,7 +62,7 @@ Namespace VBClasses
 
 
 
-    Public Class Color8U_Sweep : Inherits TaskParent
+    Public Class XO_Color8U_Sweep : Inherits TaskParent
         Dim color8u As New Color8U_Basics
         Public classCount As Integer
         Public Sub New()
@@ -403,32 +403,6 @@ Namespace VBClasses
             dst1 = taskAlg.gray
             dst2 = dst1.Threshold(options.minThreshold, 255, cv.ThresholdTypes.BinaryInv)
             dst3 = dst1.Threshold(options.maxThreshold, 255, cv.ThresholdTypes.Binary)
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class Color8U_MotionFiltered : Inherits TaskParent
-        Dim color8U As New Color8U_Sweep
-        Public classCount As Integer
-        Dim motion As New XO_Motion_BGSub
-        Public Sub New()
-            desc = "Prepare a Color8U_Basics image using the taskAlg.motionMask"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskAlg.motionMask.CountNonZero Then
-                src.SetTo(0, Not taskAlg.motionMask)
-                color8U.Run(src)
-                dst2 = color8U.dst3
-                dst2.CopyTo(dst3, taskAlg.motionMask)
-                dst2.SetTo(0, Not taskAlg.motionMask)
-                classCount = color8U.classCount
-            End If
-            If taskAlg.heartBeatLT Then dst3.SetTo(0)
-            labels(2) = color8U.strOut
         End Sub
     End Class
 

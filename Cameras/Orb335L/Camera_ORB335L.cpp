@@ -1,4 +1,3 @@
-#include "../CameraDefines.hpp"
 #include "libobsensor/hpp/Pipeline.hpp"
 #include "libobsensor/hpp/Error.hpp"
 #include <mutex>

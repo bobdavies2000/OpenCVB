@@ -45,10 +45,12 @@ Namespace MainUI
             Static IMU_StartTime = zed.IMU_TimeStamp
             IMU_TimeStamp = (zed.IMU_TimeStamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
 
-            color = zed.color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            pointCloud = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            leftView = zed.leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-            rightView = zed.rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            SyncLock cameraMutex
+                color = zed.color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                pointCloud = zed.pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                leftView = zed.leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                rightView = zed.rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+            End SyncLock
 
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub

@@ -746,7 +746,7 @@ Namespace VBClasses
 
                         ' Implicit QL transformation.
 
-                        p = d(m)
+                        p = (m)
                         c = 1.0
                         c2 = c
                         c3 = c

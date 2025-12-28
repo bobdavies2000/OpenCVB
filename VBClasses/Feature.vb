@@ -959,7 +959,7 @@ Namespace VBClasses
             End If
 
             knn.queries = New List(Of cv.Point2f)(taskAlg.features)
-            If taskAlg.firstPass Or taskAlg.gOptions.DebugCheckBox.Checked Then
+            If knn.trainInput.Count = 0 Or taskAlg.gOptions.DebugCheckBox.Checked Then
                 knn.trainInput = New List(Of cv.Point2f)(knn.queries)
                 taskAlg.gOptions.DebugCheckBox.Checked = False
             End If
