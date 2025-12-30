@@ -289,11 +289,15 @@ Namespace MainUI
             End If
             updatePath(homeDir + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")
             updatePath(homeDir + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
-            updatePath(homeDir + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")
-            updatePath(homeDir + "OrbbecSDK\lib\win_x64\", "OrbbecSDK.dll")
+            updatePath(homeDir + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")  ' 
 
             updatePath(homeDir + "librealsense\build\Debug\", "Realsense camera support.")
             updatePath(homeDir + "librealsense\build\Release\", "Realsense camera support.")
+
+            updatePath(homeDir + "OakD\src\bin\", "Oak-D camera support.")
+            updatePath(homeDir + "OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin\", "Oak-D camera support.")
+            updatePath(homeDir + "OakD\depthai-core\Build\Release", "Oak-D camera support.")
+            updatePath(homeDir + "OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin", "Oak-D camera support.")
 
             If settings.cameraPresent(3) Then ' OakD is the 3rd element in cameraPresent but it is not defined explicitly.
                 updatePath(homeDir + "OakD\build\Release\", "Luxonis Oak-D camera support.")

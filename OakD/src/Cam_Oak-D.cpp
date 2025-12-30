@@ -1,19 +1,16 @@
-#include "depthai/depthai.hpp"
- 
+#include <opencv2/opencv.hpp>
+#include <depthai/depthai.hpp>
+#include "../CPP_Native/PragmaLibs.h"
+
 using namespace std;
 using namespace cv;
-
-// The disparity is computed at this resolution, then upscaled to BGR resolution
-static constexpr auto monoRes = dai::MonoCameraProperties::SensorResolution::THE_400_P;
+#if 1
 
 class OakDCamera
 {
 private:
 public:
 	dai::Pipeline pipeline;
-	std::vector<std::string> queueNames;
-	std::unordered_map<std::string, Mat> frame;
-	std::unordered_map<std::string, std::shared_ptr<dai::ImgFrame>> latestPacket;
 	Mat rgb, leftView, rightView, depth16u;
 	dai::CalibrationHandler deviceCalib;
 	double imuTimeStamp;
@@ -21,131 +18,169 @@ public:
 	int rows, cols;
 	bool firstPass;
 	float intrinsics[9];
+	float extrinsicsRGBtoLeft[12];
+	float extrinsicsLeftToRight[12];
+	
 	std::shared_ptr<dai::Device> device;
-	std::shared_ptr<dai::node::ColorCamera> camRgb;
-	std::shared_ptr<dai::node::XLinkOut> xoutRgb;
-	std::shared_ptr<dai::node::MonoCamera> monoLeft;
-	std::shared_ptr<dai::node::MonoCamera> monoRight;
+	
+	// v3 Camera nodes (replacing ColorCamera and MonoCamera)
+	std::shared_ptr<dai::node::Camera> camRgb;
+	std::shared_ptr<dai::node::Camera> camLeft;
+	std::shared_ptr<dai::node::Camera> camRight;
 	std::shared_ptr<dai::node::StereoDepth> stereo;
-	std::shared_ptr<dai::node::XLinkOut> xoutLeft;
-	std::shared_ptr<dai::node::XLinkOut> xoutRight;
-	std::shared_ptr<dai::node::XLinkOut> xoutDepth;
-	std::shared_ptr<dai::node::XLinkOut> xoutRectifL;
-	std::shared_ptr<dai::node::XLinkOut> xoutRectifR;
 	std::shared_ptr<dai::node::IMU> imu;
-	std::shared_ptr<dai::node::XLinkOut> xlinkOut;
-
-	std::shared_ptr <dai::DataOutputQueue> qRgb;
-	std::shared_ptr <dai::DataOutputQueue> leftQueue;
-	std::shared_ptr <dai::DataOutputQueue> rightQueue;
-	std::shared_ptr <dai::DataOutputQueue> depthQueue;
-	std::shared_ptr <dai::DataOutputQueue> rectifLeftQueue;
-	std::shared_ptr <dai::DataOutputQueue> rectifRightQueue;
-	std::shared_ptr <dai::DataOutputQueue> imuQueue;
+	
+	// Output pointers from nodes
+	dai::Node::Output* rgbOutput = nullptr;
+	
+	// v3 MessageQueues (replacing DataOutputQueue)
+	std::shared_ptr<dai::MessageQueue> rgbQueue;
+	std::shared_ptr<dai::MessageQueue> leftQueue;
+	std::shared_ptr<dai::MessageQueue> rightQueue;
+	std::shared_ptr<dai::MessageQueue> depthQueue;
+	std::shared_ptr<dai::MessageQueue> imuQueue;
+	
 	std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration> baseTs;
 
 	dai::IMUReportAccelerometer acceleroValues;
 	dai::IMUReportGyroscope gyroValues;
 
+	const dai::CameraBoardSocket RGB_SOCKET = dai::CameraBoardSocket::CAM_A;
+	const dai::CameraBoardSocket LEFT_SOCKET = dai::CameraBoardSocket::CAM_B;
+	const dai::CameraBoardSocket RIGHT_SOCKET = dai::CameraBoardSocket::CAM_C;
+
 	~OakDCamera() {}
+	
 	OakDCamera(int _cols, int _rows)
 	{
 		firstPass = true;
 		rows = _rows;
 		cols = _cols;
 
-		camRgb = pipeline.create<dai::node::ColorCamera>();
-		xoutRgb = pipeline.create<dai::node::XLinkOut>();
-		monoLeft = pipeline.create<dai::node::MonoCamera>();
-		monoRight = pipeline.create<dai::node::MonoCamera>();
-		stereo = pipeline.create<dai::node::StereoDepth>();
-		xoutLeft = pipeline.create<dai::node::XLinkOut>();
-		xoutRight = pipeline.create<dai::node::XLinkOut>();
-		xoutDepth = pipeline.create<dai::node::XLinkOut>();
-		xoutRectifL = pipeline.create<dai::node::XLinkOut>();
-		xoutRectifR = pipeline.create<dai::node::XLinkOut>();
-		imu = pipeline.create<dai::node::IMU>();
-		xlinkOut = pipeline.create<dai::node::XLinkOut>();
+		//auto camRgb = pipeline.create<dai::node::Camera>();
+		//camRgb->build(RGB_SOCKET);
+		//auto left = pipeline.create<dai::node::Camera>();
+		//left->build(LEFT_SOCKET);
+		//auto right = pipeline.create<dai::node::Camera>();
+		//right->build(RIGHT_SOCKET);
+		//auto stereo = pipeline.create<dai::node::StereoDepth>();
+		//auto sync = pipeline.create<dai::node::Sync>();
 
-		xlinkOut->setStreamName("imu");
-		// enable ACCELEROMETER_RAW at 500 hz rate
-		imu->enableIMUSensor(dai::IMUSensor::ACCELEROMETER_RAW, 500);
-		// enable GYROSCOPE_RAW at 400 hz rate
-		imu->enableIMUSensor(dai::IMUSensor::GYROSCOPE_RAW, 400);
-		// it's recommended to set both setBatchReportThreshold and setMaxBatchReports to 20 when integrating in a pipeline with a lot of input/output connections
-		// above this threshold packets will be sent in batch of X, if the host is not blocked and USB bandwidth is available
-		imu->setBatchReportThreshold(1);
-		// maximum number of IMU packets in a batch, if it's reached device will block sending until host can receive it
-		// if lower or equal to batchReportThreshold then the sending is always blocking on device
-		// useful to reduce device's CPU load  and number of lost packets, if CPU load is high on device side due to multiple nodes
-		imu->setMaxBatchReports(1);
-		// Link plugins IMU -> XLINK
-		imu->out.link(xlinkOut->input);
-
-		camRgb->setInterleaved(false);
-		camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
-		camRgb->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
-		camRgb->isp.link(xoutRgb->input);
-		// If the Oak-D camera is stopped and then restarted, it will fail here.  Need to find out why.  
-		camRgb->setPreviewSize(cols, rows);
-		//camRgb->initialControl.setManualFocus(135);
-
-		// added these 
-		camRgb->setFps(60);
-		camRgb->setIspScale(2, 3);
-
-		// XLinkOut
-		xoutRgb->setStreamName("rgb");
-		xoutLeft->setStreamName("left");
-		xoutRight->setStreamName("right");
-		xoutDepth->setStreamName("depth");
-		xoutRectifL->setStreamName("rectified_left");
-		xoutRectifR->setStreamName("rectified_right");
-
-		queueNames.push_back("rgb");
-		queueNames.push_back("depth");
-		queueNames.push_back("left");
-		queueNames.push_back("right");
-		queueNames.push_back("rectified_left");
-		queueNames.push_back("rectified_right");
-
-		//auto connectedCameras = device.getConnectedCameraFeatures();
-		//for (const auto& cam : connectedCameras) {
-		//	if (cam.sensorName == "COLOR") {
-		//		camRgb->setBoardSocket(cam.socket);
-		//		break;
-		//	}
+		//// Check if platform is RVC4 and create ImageAlign node if needed
+		//auto platform = pipeline.getDefaultDevice()->getPlatform();
+		//std::shared_ptr<dai::node::ImageAlign> align;
+		//if (platform == dai::Platform::RVC4) {
+		//	align = pipeline.create<dai::node::ImageAlign>();
 		//}
-		camRgb->setBoardSocket(dai::CameraBoardSocket::CAM_A); 
-		monoLeft->setResolution(dai::MonoCameraProperties::SensorResolution::THE_720_P);
-		monoLeft->setBoardSocket(dai::CameraBoardSocket::CAM_B);
-		monoRight->setResolution(dai::MonoCameraProperties::SensorResolution::THE_720_P);
-		monoRight->setBoardSocket(dai::CameraBoardSocket::CAM_C);
 
-		stereo->setRectifyEdgeFillColor(0);  // black, to better see the cutout
-		stereo->initialConfig.setMedianFilter(dai::MedianFilter::KERNEL_7x7);
-		stereo->setDefaultProfilePreset(dai::node::StereoDepth::PresetMode::HIGH_DENSITY);
-		stereo->setLeftRightCheck(true); // LR-check is required for depth alignment
+		//stereo->setExtendedDisparity(true);
+		//sync->setSyncThreshold(std::chrono::duration<int64_t, std::nano>(static_cast<int64_t>(1e9 / (2.0 * FPS))));
+
+		//// Configure outputs
+		//auto rgbOut = camRgb->requestOutput(std::make_pair(1280, 960), dai::ImgFrame::Type::NV12, dai::ImgResizeMode::CROP, FPS, true);
+		//auto leftOut = left->requestOutput(std::make_pair(640, 400), std::nullopt, dai::ImgResizeMode::CROP, FPS);
+		//auto rightOut = right->requestOutput(std::make_pair(640, 400), std::nullopt, dai::ImgResizeMode::CROP, FPS);
+
+		//// Link nodes
+		//rgbOut->link(sync->inputs["rgb"]);
+		//leftOut->link(stereo->left);
+		//rightOut->link(stereo->right);
+
+		//if (platform == dai::Platform::RVC4) {
+		//	stereo->depth.link(align->input);
+		//	rgbOut->link(align->inputAlignTo);
+		//	align->outputAligned.link(sync->inputs["depth_aligned"]);
+		//}
+		//else {
+		//	stereo->depth.link(sync->inputs["depth_aligned"]);
+		//	rgbOut->link(stereo->inputAlignTo);
+		//}
+
+		//// Create output queue
+		//auto queue = sync->out.createOutputQueue();
+
+		//// Create and configure windows
+		//const std::string windowName = "rgb-depth";
+		//cv::namedWindow(windowName, cv::WINDOW_NORMAL);
+		//cv::resizeWindow(windowName, 1280, 720);
+		//cv::createTrackbar("RGB Weight %", windowName, nullptr, 100, updateBlendWeights);
+		//cv::setTrackbarPos("RGB Weight %", windowName, static_cast<int>(rgbWeight * 100));
+
+		//// Start pipeline
+		//pipeline.start();
+			
+		// Create Camera nodes (v3 unified Camera replaces ColorCamera and MonoCamera)
+		camRgb = pipeline.create<dai::node::Camera>();
+		camLeft = pipeline.create<dai::node::Camera>();
+		camRight = pipeline.create<dai::node::Camera>();
+		stereo = pipeline.create<dai::node::StereoDepth>();
+		imu = pipeline.create<dai::node::IMU>();
+
+		// Configure IMU
+		imu->enableIMUSensor(dai::IMUSensor::ACCELEROMETER_RAW, 500);
+		imu->enableIMUSensor(dai::IMUSensor::GYROSCOPE_RAW, 400);
+		imu->setBatchReportThreshold(1);
+		imu->setMaxBatchReports(1);
+
+		// Build cameras with their board sockets
+		// RGB camera on CAM_A
+		camRgb->build(dai::CameraBoardSocket::CAM_A);
+		
+		// Left mono camera on CAM_B
+		camLeft->build(dai::CameraBoardSocket::CAM_B);
+		
+		// Right mono camera on CAM_C
+		camRight->build(dai::CameraBoardSocket::CAM_C);
+
+		// Request outputs from cameras
+		// RGB output - request BGR format at desired resolution
+		rgbOutput = camRgb->requestOutput(
+			{static_cast<uint32_t>(cols), static_cast<uint32_t>(rows)},
+			dai::ImgFrame::Type::BGR888i,
+			dai::ImgResizeMode::CROP,
+			60.0f  // FPS
+		);
+		
+		// Mono camera outputs for stereo (720p grayscale)
+		auto leftOutput = camLeft->requestOutput(
+			{1280, 720},
+			dai::ImgFrame::Type::GRAY8,
+			dai::ImgResizeMode::CROP
+		);
+		
+		auto rightOutput = camRight->requestOutput(
+			{1280, 720},
+			dai::ImgFrame::Type::GRAY8,
+			dai::ImgResizeMode::CROP
+		);
+
+		// Configure stereo depth
+		stereo->setDefaultProfilePreset(dai::node::StereoDepth::PresetMode::FAST_DENSITY);
+		stereo->initialConfig->setMedianFilter(dai::StereoDepthConfig::MedianFilter::KERNEL_7x7);
+		stereo->initialConfig->setConfidenceThreshold(230);
+		stereo->setLeftRightCheck(true);
 		stereo->setSubpixel(false);
-
-		// added these
-		stereo->initialConfig.setConfidenceThreshold(230);
 		stereo->setDepthAlign(dai::CameraBoardSocket::CAM_A);
+		stereo->setRectifyEdgeFillColor(0);
 
-		// Linking
-		monoLeft->out.link(stereo->left);
-		monoRight->out.link(stereo->right);
+		// Link mono cameras to stereo
+		leftOutput->link(stereo->left);
+		rightOutput->link(stereo->right);
 
-		stereo->rectifiedLeft.link(xoutRectifL->input);
-		stereo->rectifiedRight.link(xoutRectifR->input);
-		stereo->depth.link(xoutDepth->input);
-		stereo->syncedLeft.link(xoutLeft->input);
-		stereo->syncedRight.link(xoutRight->input);
+		// Create output queues using v3 API - call createOutputQueue on the Output directly
+		rgbQueue = rgbOutput->createOutputQueue(8, false);
+		depthQueue = stereo->depth.createOutputQueue(8, false);
+		leftQueue = stereo->rectifiedLeft.createOutputQueue(8, false);
+		rightQueue = stereo->rectifiedRight.createOutputQueue(8, false);
+		imuQueue = imu->out.createOutputQueue(50, false);
 
-		device = std::make_shared<dai::Device>(pipeline);
+		// Start the device with the pipeline
+		device = std::make_shared<dai::Device>();
+		device->startPipeline(pipeline);
+		
+		// Get calibration data
 		deviceCalib = device->readCalibration();
 
-		imuQueue = device->getOutputQueue("imu", 50, false);
 		baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();
 
 		rgb = Mat(rows, cols, CV_8UC3);
@@ -156,45 +191,40 @@ public:
 
 	void waitForFrame()
 	{
-		std::unordered_map<std::string, std::shared_ptr<dai::ImgFrame>> latestPacket;
-
-		using namespace std::chrono;
-
-		qRgb = device->getOutputQueue("rgb", 4, false);
-		leftQueue = device->getOutputQueue("left", 8, false);
-		rightQueue = device->getOutputQueue("right", 8, false);
-		depthQueue = device->getOutputQueue("depth", 8, false);
-		rectifLeftQueue = device->getOutputQueue("rectified_left", 8, false);
-		rectifRightQueue = device->getOutputQueue("rectified_right", 8, false);
-
-		auto inRGB = qRgb->get<dai::ImgFrame>();
-		auto inLeft = rectifLeftQueue->get<dai::ImgFrame>();
-		auto inRight = rectifRightQueue->get<dai::ImgFrame>();
-
-		auto queueEvents = device->getQueueEvents(queueNames);
-		for (const auto& name : queueEvents) {
-			auto packets = device->getOutputQueue(name)->tryGetAll<dai::ImgFrame>();
-			auto count = packets.size();
-			if (count > 0) latestPacket[name] = packets[count - 1];
-		}
-
-		auto beforeTime = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
+		// Get frames from queues
+		auto inRGB = rgbQueue->get<dai::ImgFrame>();
+		auto inLeft = leftQueue->get<dai::ImgFrame>();
+		auto inRight = rightQueue->get<dai::ImgFrame>();
 		auto depth = depthQueue->get<dai::ImgFrame>();
-		depth16u = depth->getCvFrame();
 
-		rgb = inRGB->getCvFrame();
-		resize(inLeft->getCvFrame(), leftView, rgb.size());
-		resize(inRight->getCvFrame(), rightView, rgb.size());
+		// Convert to OpenCV Mats using raw data (avoids ABI issues with getCvFrame)
+		// Depth - 16-bit unsigned
+		cv::Mat depthRaw(depth->getHeight(), depth->getWidth(), CV_16UC1, depth->getData().data());
+		cv::resize(depthRaw, depth16u, cv::Size(cols, rows));
+		
+		// RGB - BGR 8-bit
+		cv::Mat rgbRaw(inRGB->getHeight(), inRGB->getWidth(), CV_8UC3, inRGB->getData().data());
+		cv::resize(rgbRaw, rgb, cv::Size(cols, rows));
+		
+		// Left - Grayscale 8-bit
+		cv::Mat leftRaw(inLeft->getHeight(), inLeft->getWidth(), CV_8UC1, inLeft->getData().data());
+		cv::resize(leftRaw, leftView, cv::Size(cols, rows));
+		
+		// Right - Grayscale 8-bit
+		cv::Mat rightRaw(inRight->getHeight(), inRight->getWidth(), CV_8UC1, inRight->getData().data());
+		cv::resize(rightRaw, rightView, cv::Size(cols, rows));
 
+		// Get IMU data
 		auto imuData = imuQueue->get<dai::IMUData>();
-
 		auto imuPackets = imuData->packets;
+		
 		for (auto& imuPacket : imuPackets) {
 			acceleroValues = imuPacket.acceleroMeter;
 			gyroValues = imuPacket.gyroscope;
 
 			auto acceleroTs1 = acceleroValues.getTimestampDevice();
 			auto gyroTs1 = gyroValues.getTimestampDevice();
+			
 			if (!firstTs) {
 				baseTs = std::min(acceleroTs1, gyroTs1);
 				firstTs = true;
@@ -202,6 +232,9 @@ public:
 
 			auto acceleroTs = acceleroTs1 - baseTs;
 			auto gyroTs = gyroTs1 - baseTs;
+			
+			// Store timestamp in seconds
+			imuTimeStamp = std::chrono::duration<double>(acceleroTs).count();
 		}
 	}
 };
@@ -239,20 +272,20 @@ extern "C" __declspec(dllexport)
 int* OakDExtrinsicsRGBtoLeft(OakDCamera* cPtr)
 {
 	auto extrinsics = cPtr->deviceCalib.getCameraExtrinsics(dai::CameraBoardSocket::CAM_A, dai::CameraBoardSocket::CAM_B);
-	std::vector<float> translationRotation = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
+	
 	for (auto i = 0; i < 3; i++) {
-		translationRotation[i] = extrinsics[i][3];
+		cPtr->extrinsicsRGBtoLeft[i] = extrinsics[i][3];
 	}
 
 	int index = 3;
 	for (auto i = 0; i < 3; i++) {
 		for (auto j = 0; j < 3; j++)
 		{
-			translationRotation[index++] = extrinsics[i][j];
+			cPtr->extrinsicsRGBtoLeft[index++] = extrinsics[i][j];
 		}
 	}
 
-	return (int*)&translationRotation[0];
+	return (int*)&cPtr->extrinsicsRGBtoLeft[0];
 }
 
 
@@ -260,20 +293,20 @@ extern "C" __declspec(dllexport)
 int* OakDExtrinsicsLeftToRight(OakDCamera* cPtr)
 {
 	auto extrinsics = cPtr->deviceCalib.getCameraExtrinsics(dai::CameraBoardSocket::CAM_B, dai::CameraBoardSocket::CAM_C);
-	std::vector<float> translationRotation = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
+	
 	for (auto i = 0; i < 3; i++) {
-		translationRotation[i] = extrinsics[i][3];
+		cPtr->extrinsicsLeftToRight[i] = extrinsics[i][3];
 	}
 
 	int index = 3;
 	for (auto i = 0; i < 3; i++) {
 		for (auto j = 0; j < 3; j++)
 		{
-			translationRotation[index++] = extrinsics[i][j];
+			cPtr->extrinsicsLeftToRight[index++] = extrinsics[i][j];
 		}
 	}
 
-	return (int*)&translationRotation[0];
+	return (int*)&cPtr->extrinsicsLeftToRight[0];
 }
 
 
@@ -283,8 +316,6 @@ extern "C" __declspec(dllexport) int* OakDRawDepth(OakDCamera* cPtr)
 }
 
 
-
-//http://graphics.cs.cmu.edu/courses/15-463/2017_fall/lectures/lecture19.pdf
 extern "C" __declspec(dllexport) int* OakDPointCloud(OakDCamera* cPtr) { return 0; }
 extern "C" __declspec(dllexport) double OakDIMUTimeStamp(OakDCamera* cPtr) { return cPtr->imuTimeStamp; }
 extern "C" __declspec(dllexport) int* OakDGyro(OakDCamera* cPtr) { return (int*)&cPtr->gyroValues.x; }
@@ -293,8 +324,286 @@ extern "C" __declspec(dllexport) int* OakDColor(OakDCamera* cPtr) { return (int*
 extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera* cPtr) { cPtr->waitForFrame(); }
 extern "C" __declspec(dllexport) void OakDStop(OakDCamera* cPtr)
 {
-	cPtr->device->close();
-	if (cPtr != 0) delete cPtr;
+	if (cPtr != nullptr) {
+		if (cPtr->device != nullptr) {
+			cPtr->device->close();
+		}
+		delete cPtr;
+	}
 }
 extern "C" __declspec(dllexport) int* OakDLeftImage(OakDCamera* cPtr) { return (int*)cPtr->leftView.data; }
 extern "C" __declspec(dllexport) int* OakDRightImage(OakDCamera* cPtr) { return (int*)cPtr->rightView.data; }
+
+#else
+class OakDCamera
+{
+private:
+public:
+	dai::Pipeline pipeline;
+	Mat rgb, leftView, rightView, depth16u;
+	dai::CalibrationHandler deviceCalib;
+	double imuTimeStamp;
+	bool firstTs = false;
+	int rows, cols;
+	bool firstPass;
+	float intrinsics[9];
+	float extrinsicsRGBtoLeft[12];
+	float extrinsicsLeftToRight[12];
+
+	std::shared_ptr<dai::Device> device;
+
+	// v3 Camera nodes (replacing ColorCamera and MonoCamera)
+	std::shared_ptr<dai::node::Camera> camRgb;
+	std::shared_ptr<dai::node::Camera> camLeft;
+	std::shared_ptr<dai::node::Camera> camRight;
+	std::shared_ptr<dai::node::StereoDepth> stereo;
+	std::shared_ptr<dai::node::IMU> imu;
+
+	// Output pointers from nodes
+	dai::Node::Output* rgbOutput = nullptr;
+
+	// v3 MessageQueues (replacing DataOutputQueue)
+	std::shared_ptr<dai::MessageQueue> rgbQueue;
+	std::shared_ptr<dai::MessageQueue> leftQueue;
+	std::shared_ptr<dai::MessageQueue> rightQueue;
+	std::shared_ptr<dai::MessageQueue> depthQueue;
+	std::shared_ptr<dai::MessageQueue> imuQueue;
+
+	std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration> baseTs;
+
+	dai::IMUReportAccelerometer acceleroValues;
+	dai::IMUReportGyroscope gyroValues;
+
+	~OakDCamera() {}
+
+	OakDCamera(int _cols, int _rows)
+	{
+		firstPass = true;
+		rows = _rows;
+		cols = _cols;
+
+		// Create Camera nodes (v3 unified Camera replaces ColorCamera and MonoCamera)
+		camRgb = pipeline.create<dai::node::Camera>();
+		camLeft = pipeline.create<dai::node::Camera>();
+		camRight = pipeline.create<dai::node::Camera>();
+		stereo = pipeline.create<dai::node::StereoDepth>();
+		imu = pipeline.create<dai::node::IMU>();
+
+		// Configure IMU
+		imu->enableIMUSensor(dai::IMUSensor::ACCELEROMETER_RAW, 500);
+		imu->enableIMUSensor(dai::IMUSensor::GYROSCOPE_RAW, 400);
+		imu->setBatchReportThreshold(1);
+		imu->setMaxBatchReports(1);
+
+		// Build cameras with their board sockets
+		// RGB camera on CAM_A
+		camRgb->build(dai::CameraBoardSocket::CAM_A);
+
+		// Left mono camera on CAM_B
+		camLeft->build(dai::CameraBoardSocket::CAM_B);
+
+		// Right mono camera on CAM_C
+		camRight->build(dai::CameraBoardSocket::CAM_C);
+
+		// Request outputs from cameras
+		// RGB output - request BGR format at desired resolution
+		rgbOutput = camRgb->requestOutput(
+			{ static_cast<uint32_t>(cols), static_cast<uint32_t>(rows) },
+			dai::ImgFrame::Type::BGR888i,
+			dai::ImgResizeMode::CROP,
+			60.0f  // FPS
+		);
+
+		// Mono camera outputs for stereo (720p grayscale)
+		auto leftOutput = camLeft->requestOutput(
+			{ 1280, 720 },
+			dai::ImgFrame::Type::GRAY8,
+			dai::ImgResizeMode::CROP
+		);
+
+		auto rightOutput = camRight->requestOutput(
+			{ 1280, 720 },
+			dai::ImgFrame::Type::GRAY8,
+			dai::ImgResizeMode::CROP
+		);
+
+		// Configure stereo depth
+		stereo->setDefaultProfilePreset(dai::node::StereoDepth::PresetMode::FAST_DENSITY);
+		stereo->initialConfig->setMedianFilter(dai::StereoDepthConfig::MedianFilter::KERNEL_7x7);
+		stereo->initialConfig->setConfidenceThreshold(230);
+		stereo->setLeftRightCheck(true);
+		stereo->setSubpixel(false);
+		stereo->setDepthAlign(dai::CameraBoardSocket::CAM_A);
+		stereo->setRectifyEdgeFillColor(0);
+
+		// Link mono cameras to stereo
+		leftOutput->link(stereo->left);
+		rightOutput->link(stereo->right);
+
+		// Create output queues using v3 API - call createOutputQueue on the Output directly
+		rgbQueue = rgbOutput->createOutputQueue(8, false);
+		depthQueue = stereo->depth.createOutputQueue(8, false);
+		leftQueue = stereo->rectifiedLeft.createOutputQueue(8, false);
+		rightQueue = stereo->rectifiedRight.createOutputQueue(8, false);
+		imuQueue = imu->out.createOutputQueue(50, false);
+
+		// Start the device with the pipeline
+		device = std::make_shared<dai::Device>();
+		device->startPipeline(pipeline);
+
+		// Get calibration data
+		deviceCalib = device->readCalibration();
+
+		baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();
+
+		rgb = Mat(rows, cols, CV_8UC3);
+		depth16u = Mat(rows, cols, CV_16UC1);
+		leftView = Mat(rows, cols, CV_8UC1);
+		rightView = Mat(rows, cols, CV_8UC1);
+	}
+
+	void waitForFrame()
+	{
+		// Get frames from queues
+		auto inRGB = rgbQueue->get<dai::ImgFrame>();
+		auto inLeft = leftQueue->get<dai::ImgFrame>();
+		auto inRight = rightQueue->get<dai::ImgFrame>();
+		auto depth = depthQueue->get<dai::ImgFrame>();
+
+		// Convert to OpenCV Mats using raw data (avoids ABI issues with getCvFrame)
+		// Depth - 16-bit unsigned
+		cv::Mat depthRaw(depth->getHeight(), depth->getWidth(), CV_16UC1, depth->getData().data());
+		cv::resize(depthRaw, depth16u, cv::Size(cols, rows));
+
+		// RGB - BGR 8-bit
+		cv::Mat rgbRaw(inRGB->getHeight(), inRGB->getWidth(), CV_8UC3, inRGB->getData().data());
+		cv::resize(rgbRaw, rgb, cv::Size(cols, rows));
+
+		// Left - Grayscale 8-bit
+		cv::Mat leftRaw(inLeft->getHeight(), inLeft->getWidth(), CV_8UC1, inLeft->getData().data());
+		cv::resize(leftRaw, leftView, cv::Size(cols, rows));
+
+		// Right - Grayscale 8-bit
+		cv::Mat rightRaw(inRight->getHeight(), inRight->getWidth(), CV_8UC1, inRight->getData().data());
+		cv::resize(rightRaw, rightView, cv::Size(cols, rows));
+
+		// Get IMU data
+		auto imuData = imuQueue->get<dai::IMUData>();
+		auto imuPackets = imuData->packets;
+
+		for (auto& imuPacket : imuPackets) {
+			acceleroValues = imuPacket.acceleroMeter;
+			gyroValues = imuPacket.gyroscope;
+
+			auto acceleroTs1 = acceleroValues.getTimestampDevice();
+			auto gyroTs1 = gyroValues.getTimestampDevice();
+
+			if (!firstTs) {
+				baseTs = std::min(acceleroTs1, gyroTs1);
+				firstTs = true;
+			}
+
+			auto acceleroTs = acceleroTs1 - baseTs;
+			auto gyroTs = gyroTs1 - baseTs;
+
+			// Store timestamp in seconds
+			imuTimeStamp = std::chrono::duration<double>(acceleroTs).count();
+		}
+	}
+};
+
+
+extern "C" __declspec(dllexport)
+int* OakDOpen(int w, int h)
+{
+	OakDCamera* cPtr = new OakDCamera(w, h);
+	return (int*)cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* OakDintrinsics(OakDCamera* cPtr, int camera)
+{
+	std::vector<std::vector<float>> intrin;
+	if (camera == 1) // rgb camera
+	{
+		intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_A, 1280, 720);
+	}
+	else {
+		if (camera == 2)  // left camera
+			intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_B, 1280, 720);
+		else
+			intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_C, 1280, 720);  // right camera
+	}
+
+	int i = 0;
+	for (auto row : intrin)  for (auto val : row) cPtr->intrinsics[i++] = val;
+	return (int*)&cPtr->intrinsics;
+}
+
+
+extern "C" __declspec(dllexport)
+int* OakDExtrinsicsRGBtoLeft(OakDCamera* cPtr)
+{
+	auto extrinsics = cPtr->deviceCalib.getCameraExtrinsics(dai::CameraBoardSocket::CAM_A, dai::CameraBoardSocket::CAM_B);
+
+	for (auto i = 0; i < 3; i++) {
+		cPtr->extrinsicsRGBtoLeft[i] = extrinsics[i][3];
+	}
+
+	int index = 3;
+	for (auto i = 0; i < 3; i++) {
+		for (auto j = 0; j < 3; j++)
+		{
+			cPtr->extrinsicsRGBtoLeft[index++] = extrinsics[i][j];
+		}
+	}
+
+	return (int*)&cPtr->extrinsicsRGBtoLeft[0];
+}
+
+
+extern "C" __declspec(dllexport)
+int* OakDExtrinsicsLeftToRight(OakDCamera* cPtr)
+{
+	auto extrinsics = cPtr->deviceCalib.getCameraExtrinsics(dai::CameraBoardSocket::CAM_B, dai::CameraBoardSocket::CAM_C);
+
+	for (auto i = 0; i < 3; i++) {
+		cPtr->extrinsicsLeftToRight[i] = extrinsics[i][3];
+	}
+
+	int index = 3;
+	for (auto i = 0; i < 3; i++) {
+		for (auto j = 0; j < 3; j++)
+		{
+			cPtr->extrinsicsLeftToRight[index++] = extrinsics[i][j];
+		}
+	}
+
+	return (int*)&cPtr->extrinsicsLeftToRight[0];
+}
+
+
+extern "C" __declspec(dllexport) int* OakDRawDepth(OakDCamera* cPtr)
+{
+	return (int*)cPtr->depth16u.data;
+}
+
+
+extern "C" __declspec(dllexport) int* OakDPointCloud(OakDCamera* cPtr) { return 0; }
+extern "C" __declspec(dllexport) double OakDIMUTimeStamp(OakDCamera* cPtr) { return cPtr->imuTimeStamp; }
+extern "C" __declspec(dllexport) int* OakDGyro(OakDCamera* cPtr) { return (int*)&cPtr->gyroValues.x; }
+extern "C" __declspec(dllexport) int* OakDAccel(OakDCamera* cPtr) { return (int*)&cPtr->acceleroValues.x; }
+extern "C" __declspec(dllexport) int* OakDColor(OakDCamera* cPtr) { return (int*)cPtr->rgb.data; }
+extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera* cPtr) { cPtr->waitForFrame(); }
+extern "C" __declspec(dllexport) void OakDStop(OakDCamera* cPtr)
+{
+	if (cPtr != nullptr) {
+		if (cPtr->device != nullptr) {
+			cPtr->device->close();
+		}
+		delete cPtr;
+	}
+}
+extern "C" __declspec(dllexport) int* OakDLeftImage(OakDCamera* cPtr) { return (int*)cPtr->leftView.data; }
+extern "C" __declspec(dllexport) int* OakDRightImage(OakDCamera* cPtr) { return (int*)cPtr->rightView.data; }
+#endif

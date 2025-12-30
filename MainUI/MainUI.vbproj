@@ -103,6 +103,7 @@
     <ProjectReference Include="..\CamZed\CamZed.csproj" />
     <ProjectReference Include="..\CPP_Native\CPP_Native.vcxproj" />
     <ProjectReference Include="..\jsonShared\jsonShared.vbproj" />
+    <ProjectReference Include="..\OakD\src\Cam_Oak-D.vcxproj" />
     <ProjectReference Include="..\VBClasses\VBClasses.vbproj" />
   </ItemGroup>
 

@@ -2070,45 +2070,6 @@ Namespace VBClasses
 
 
 
-    Public Class Options_Extrinsics : Inherits OptionParent
-        Public leftCorner As Integer = 0
-        Public rightCorner As Integer = 0
-        Public topCorner As Integer = 0
-        Public Sub New()
-            Dim leftVal As Integer = 15
-            Dim rightVal As Integer = 15
-            Dim topBotVal As Integer = 15
-            Select Case taskAlg.settings.cameraName
-                Case "Intel(R) RealSense(TM) Depth Camera 435i"
-                    leftVal = 14
-                    rightVal = 13
-                    topBotVal = 14
-                Case "Oak-D camera"
-                    leftVal = 10
-                    rightVal = 10
-                    topBotVal = 10
-            End Select
-            If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Left image percent", 0, 50, leftVal)
-                sliders.setupTrackBar("Right image percent", 0, 50, rightVal)
-                sliders.setupTrackBar("Height percent", 0, 50, topBotVal)
-            End If
-        End Sub
-        Public Sub Run()
-            Static leftSlider = OptionParent.FindSlider("Left image percent")
-            Static rightSlider = OptionParent.FindSlider("Right image percent")
-            Static heightSlider = OptionParent.FindSlider("Height percent")
-            leftCorner = taskAlg.cols * leftSlider.value / 100
-            rightCorner = taskAlg.cols * rightSlider.value / 100
-            topCorner = taskAlg.rows * heightSlider.value / 100
-        End Sub
-    End Class
-
-
-
-
-
-
 
     Public Class Options_Translation : Inherits OptionParent
         Public leftTrans As Integer = 0
