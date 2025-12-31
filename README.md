@@ -1,5 +1,14 @@
+# December 30, 2025 – Oak-D Pro Camera Support under construction.
+    -   The Oak-D Pro camera .Net interface was supported by OpenCVB using the R2 depthai-core.
+    -   When R3 arrived, support the the Oak-D Pro camera was dropped (too many changes.)
+    -   The support for Oak-D is now being restarted but it is not working yet.
+    -   The infrastructure for R3 support has been added to the source tree.
+    -   The Update_All.bat script downloads the R3 SDK.
+    -   As a result, Visual Studio 2026 is now required for OpenCVB.
+    -   Visual Studio 2026 Community Edition is free so this requirement is not onerous.
+
 # December 23, 2025 – Installation and Build Issues.
--   The latest release didn't properly install.
+    -   The latest release didn't properly install.
     -   Most of the issues were related to the switch to Visual Studio 2026.
     -   VCVarsAll.bat would not be found on systems without VS2026 installed.
     -   The Build Configuration was not properly set for X64.
