@@ -6,6 +6,8 @@ using namespace std;
 using namespace cv;
 #if 1
 
+constexpr float FPS = 25.0f;
+
 class OakDCamera
 {
 private:
@@ -31,7 +33,7 @@ public:
 	std::shared_ptr<dai::node::IMU> imu;
 	
 	// Output pointers from nodes
-	dai::Node::Output* rgbOutput = nullptr;
+	dai::Node::Output* rgbOut = nullptr;
 	
 	// v3 MessageQueues (replacing DataOutputQueue)
 	std::shared_ptr<dai::MessageQueue> rgbQueue;
@@ -53,11 +55,12 @@ public:
 	
 	OakDCamera(int _cols, int _rows)
 	{
-		firstPass = true;
-		rows = _rows;
-		cols = _cols;
+		//firstPass = true;
+		//rows = _rows;
+		//cols = _cols;
 
-		//auto camRgb = pipeline.create<dai::node::Camera>();
+		//// Create and configure nodes
+		//camRgb = pipeline.create<dai::node::Camera>();
 		//camRgb->build(RGB_SOCKET);
 		//auto left = pipeline.create<dai::node::Camera>();
 		//left->build(LEFT_SOCKET);
@@ -99,89 +102,37 @@ public:
 		//// Create output queue
 		//auto queue = sync->out.createOutputQueue();
 
-		//// Create and configure windows
-		//const std::string windowName = "rgb-depth";
-		//cv::namedWindow(windowName, cv::WINDOW_NORMAL);
-		//cv::resizeWindow(windowName, 1280, 720);
-		//cv::createTrackbar("RGB Weight %", windowName, nullptr, 100, updateBlendWeights);
-		//cv::setTrackbarPos("RGB Weight %", windowName, static_cast<int>(rgbWeight * 100));
-
 		//// Start pipeline
 		//pipeline.start();
-			
-		// Create Camera nodes (v3 unified Camera replaces ColorCamera and MonoCamera)
-		camRgb = pipeline.create<dai::node::Camera>();
-		camLeft = pipeline.create<dai::node::Camera>();
-		camRight = pipeline.create<dai::node::Camera>();
-		stereo = pipeline.create<dai::node::StereoDepth>();
-		imu = pipeline.create<dai::node::IMU>();
-
-		// Configure IMU
-		imu->enableIMUSensor(dai::IMUSensor::ACCELEROMETER_RAW, 500);
-		imu->enableIMUSensor(dai::IMUSensor::GYROSCOPE_RAW, 400);
-		imu->setBatchReportThreshold(1);
-		imu->setMaxBatchReports(1);
-
-		// Build cameras with their board sockets
-		// RGB camera on CAM_A
-		camRgb->build(dai::CameraBoardSocket::CAM_A);
-		
-		// Left mono camera on CAM_B
-		camLeft->build(dai::CameraBoardSocket::CAM_B);
-		
-		// Right mono camera on CAM_C
-		camRight->build(dai::CameraBoardSocket::CAM_C);
-
-		// Request outputs from cameras
-		// RGB output - request BGR format at desired resolution
-		rgbOutput = camRgb->requestOutput(
-			{static_cast<uint32_t>(cols), static_cast<uint32_t>(rows)},
-			dai::ImgFrame::Type::BGR888i,
-			dai::ImgResizeMode::CROP,
-			60.0f  // FPS
-		);
-		
-		// Mono camera outputs for stereo (720p grayscale)
-		auto leftOutput = camLeft->requestOutput(
-			{1280, 720},
-			dai::ImgFrame::Type::GRAY8,
-			dai::ImgResizeMode::CROP
-		);
-		
-		auto rightOutput = camRight->requestOutput(
-			{1280, 720},
-			dai::ImgFrame::Type::GRAY8,
-			dai::ImgResizeMode::CROP
-		);
 
 		// Configure stereo depth
-		stereo->setDefaultProfilePreset(dai::node::StereoDepth::PresetMode::FAST_DENSITY);
-		stereo->initialConfig->setMedianFilter(dai::StereoDepthConfig::MedianFilter::KERNEL_7x7);
-		stereo->initialConfig->setConfidenceThreshold(230);
-		stereo->setLeftRightCheck(true);
-		stereo->setSubpixel(false);
-		stereo->setDepthAlign(dai::CameraBoardSocket::CAM_A);
-		stereo->setRectifyEdgeFillColor(0);
+		//stereo->setDefaultProfilePreset(dai::node::StereoDepth::PresetMode::FAST_DENSITY);
+		//stereo->initialConfig->setMedianFilter(dai::StereoDepthConfig::MedianFilter::KERNEL_7x7);
+		//stereo->initialConfig->setConfidenceThreshold(230);
+		//stereo->setLeftRightCheck(true);
+		//stereo->setSubpixel(false);
+		//stereo->setDepthAlign(dai::CameraBoardSocket::CAM_A);
+		//stereo->setRectifyEdgeFillColor(0);
 
-		// Link mono cameras to stereo
-		leftOutput->link(stereo->left);
-		rightOutput->link(stereo->right);
+		//// Link mono cameras to stereo
+		//leftOut->link(stereo->left);
+		//rightOut->link(stereo->right);
 
-		// Create output queues using v3 API - call createOutputQueue on the Output directly
-		rgbQueue = rgbOutput->createOutputQueue(8, false);
-		depthQueue = stereo->depth.createOutputQueue(8, false);
-		leftQueue = stereo->rectifiedLeft.createOutputQueue(8, false);
-		rightQueue = stereo->rectifiedRight.createOutputQueue(8, false);
-		imuQueue = imu->out.createOutputQueue(50, false);
+		//// Create output queues using v3 API - call createOutputQueue on the Output directly
+		//rgbQueue = rgbOut->createOutputQueue(8, false);
+		//depthQueue = stereo->depth.createOutputQueue(8, false);
+		//leftQueue = stereo->rectifiedLeft.createOutputQueue(8, false);
+		//rightQueue = stereo->rectifiedRight.createOutputQueue(8, false);
+		//imuQueue = imu->out.createOutputQueue(50, false);
 
-		// Start the device with the pipeline
-		device = std::make_shared<dai::Device>();
-		device->startPipeline(pipeline);
-		
-		// Get calibration data
-		deviceCalib = device->readCalibration();
+		//// Start the device with the pipeline
+		//device = std::make_shared<dai::Device>();
+		//device->startPipeline(pipeline);
+		//
+		//// Get calibration data
+		//deviceCalib = device->readCalibration();
 
-		baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();
+		//baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();
 
 		rgb = Mat(rows, cols, CV_8UC3);
 		depth16u = Mat(rows, cols, CV_16UC1);
@@ -191,51 +142,72 @@ public:
 
 	void waitForFrame()
 	{
-		// Get frames from queues
-		auto inRGB = rgbQueue->get<dai::ImgFrame>();
-		auto inLeft = leftQueue->get<dai::ImgFrame>();
-		auto inRight = rightQueue->get<dai::ImgFrame>();
-		auto depth = depthQueue->get<dai::ImgFrame>();
+		//auto messageGroup = queue->get<dai::MessageGroup>();
+		//fpsCounter.tick();
 
-		// Convert to OpenCV Mats using raw data (avoids ABI issues with getCvFrame)
-		// Depth - 16-bit unsigned
-		cv::Mat depthRaw(depth->getHeight(), depth->getWidth(), CV_16UC1, depth->getData().data());
-		cv::resize(depthRaw, depth16u, cv::Size(cols, rows));
-		
-		// RGB - BGR 8-bit
-		cv::Mat rgbRaw(inRGB->getHeight(), inRGB->getWidth(), CV_8UC3, inRGB->getData().data());
-		cv::resize(rgbRaw, rgb, cv::Size(cols, rows));
-		
-		// Left - Grayscale 8-bit
-		cv::Mat leftRaw(inLeft->getHeight(), inLeft->getWidth(), CV_8UC1, inLeft->getData().data());
-		cv::resize(leftRaw, leftView, cv::Size(cols, rows));
-		
-		// Right - Grayscale 8-bit
-		cv::Mat rightRaw(inRight->getHeight(), inRight->getWidth(), CV_8UC1, inRight->getData().data());
-		cv::resize(rightRaw, rightView, cv::Size(cols, rows));
+		//auto frameRgb = messageGroup->get<dai::ImgFrame>("rgb");
+		//auto frameDepth = messageGroup->get<dai::ImgFrame>("depth_aligned");
 
-		// Get IMU data
-		auto imuData = imuQueue->get<dai::IMUData>();
-		auto imuPackets = imuData->packets;
-		
-		for (auto& imuPacket : imuPackets) {
-			acceleroValues = imuPacket.acceleroMeter;
-			gyroValues = imuPacket.gyroscope;
+		//if (frameDepth != nullptr) {
+		//	cv::Mat cvFrame = frameRgb->getCvFrame();
 
-			auto acceleroTs1 = acceleroValues.getTimestampDevice();
-			auto gyroTs1 = gyroValues.getTimestampDevice();
-			
-			if (!firstTs) {
-				baseTs = std::min(acceleroTs1, gyroTs1);
-				firstTs = true;
-			}
+		//	// Colorize depth
+		//	cv::Mat alignedDepthColorized = colorizeDepth(frameDepth->getFrame());
+		//	cv::imshow("Depth aligned", alignedDepthColorized);
 
-			auto acceleroTs = acceleroTs1 - baseTs;
-			auto gyroTs = gyroTs1 - baseTs;
-			
-			// Store timestamp in seconds
-			imuTimeStamp = std::chrono::duration<double>(acceleroTs).count();
-		}
+		//	// Convert grayscale to BGR if needed
+		//	if (cvFrame.channels() == 1) {
+		//		cv::cvtColor(cvFrame, cvFrame, cv::COLOR_GRAY2BGR);
+		//	}
+
+		//	// Blend frames
+		//	cv::Mat blended;
+		//	cv::addWeighted(cvFrame, rgbWeight, alignedDepthColorized, depthWeight, 0, blended);
+
+		//	// Add FPS text
+		//	cv::putText(blended, "FPS: " + std::to_string(fpsCounter.getFps()), cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(255, 255, 255), 2);
+
+		//	cv::imshow(windowName, blended);
+		//}
+		//// Convert to OpenCV Mats using raw data (avoids ABI issues with getCvFrame)
+		//// Depth - 16-bit unsigned
+		//cv::Mat depthRaw(depth->getHeight(), depth->getWidth(), CV_16UC1, depth->getData().data());
+		//cv::resize(depthRaw, depth16u, cv::Size(cols, rows));
+		//
+		//// RGB - BGR 8-bit
+		//cv::Mat rgbRaw(inRGB->getHeight(), inRGB->getWidth(), CV_8UC3, inRGB->getData().data());
+		//cv::resize(rgbRaw, rgb, cv::Size(cols, rows));
+		//
+		//// Left - Grayscale 8-bit
+		//cv::Mat leftRaw(inLeft->getHeight(), inLeft->getWidth(), CV_8UC1, inLeft->getData().data());
+		//cv::resize(leftRaw, leftView, cv::Size(cols, rows));
+		//
+		//// Right - Grayscale 8-bit
+		//cv::Mat rightRaw(inRight->getHeight(), inRight->getWidth(), CV_8UC1, inRight->getData().data());
+		//cv::resize(rightRaw, rightView, cv::Size(cols, rows));
+
+		//// Get IMU data
+		//auto imuData = imuQueue->get<dai::IMUData>();
+		//auto imuPackets = imuData->packets;
+		//
+		//for (auto& imuPacket : imuPackets) {
+		//	acceleroValues = imuPacket.acceleroMeter;
+		//	gyroValues = imuPacket.gyroscope;
+
+		//	auto acceleroTs1 = acceleroValues.getTimestampDevice();
+		//	auto gyroTs1 = gyroValues.getTimestampDevice();
+		//	
+		//	if (!firstTs) {
+		//		baseTs = std::min(acceleroTs1, gyroTs1);
+		//		firstTs = true;
+		//	}
+
+		//	auto acceleroTs = acceleroTs1 - baseTs;
+		//	auto gyroTs = gyroTs1 - baseTs;
+		//	
+		//	// Store timestamp in seconds
+		//	imuTimeStamp = std::chrono::duration<double>(acceleroTs).count();
+		//}
 	}
 };
 
@@ -360,7 +332,9 @@ public:
 	std::shared_ptr<dai::node::IMU> imu;
 
 	// Output pointers from nodes
-	dai::Node::Output* rgbOutput = nullptr;
+	dai::Node::Output* rgbOut = nullptr;
+	dai::Node::Output* leftOut = nullptr;
+	dai::Node::Output* rightOut = nullptr;
 
 	// v3 MessageQueues (replacing DataOutputQueue)
 	std::shared_ptr<dai::MessageQueue> rgbQueue;
@@ -407,7 +381,7 @@ public:
 
 		// Request outputs from cameras
 		// RGB output - request BGR format at desired resolution
-		rgbOutput = camRgb->requestOutput(
+		rgbOut = camRgb->requestOutput(
 			{ static_cast<uint32_t>(cols), static_cast<uint32_t>(rows) },
 			dai::ImgFrame::Type::BGR888i,
 			dai::ImgResizeMode::CROP,
@@ -415,7 +389,7 @@ public:
 		);
 
 		// Mono camera outputs for stereo (720p grayscale)
-		auto leftOutput = camLeft->requestOutput(
+		leftOut = camLeft->requestOutput(
 			{ 1280, 720 },
 			dai::ImgFrame::Type::GRAY8,
 			dai::ImgResizeMode::CROP
@@ -437,11 +411,11 @@ public:
 		stereo->setRectifyEdgeFillColor(0);
 
 		// Link mono cameras to stereo
-		leftOutput->link(stereo->left);
+		leftOut->link(stereo->left);
 		rightOutput->link(stereo->right);
 
 		// Create output queues using v3 API - call createOutputQueue on the Output directly
-		rgbQueue = rgbOutput->createOutputQueue(8, false);
+		rgbQueue = rgbOut->createOutputQueue(8, false);
 		depthQueue = stereo->depth.createOutputQueue(8, false);
 		leftQueue = stereo->rectifiedLeft.createOutputQueue(8, false);
 		rightQueue = stereo->rectifiedRight.createOutputQueue(8, false);
