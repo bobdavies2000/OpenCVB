@@ -1,18 +1,30 @@
-# December 30, 2025 – Oak-D Pro Camera Support under construction.
-    -   The Oak-D Pro camera .Net interface used the R2 depthai-core.
-    -   When R3 arrived, support the the Oak-D Pro camera broke.
-    -   The support for Oak-D is now being restarted but it is not working yet.
-    -   The infrastructure for R3 support has been added to the source tree.
-    -   The Update_All.bat script downloads the R3 SDK.
-    -   As a result, Visual Studio 2026 is now required for OpenCVB.
-    -   Visual Studio 2026 Community Edition is free so this is not onerous.
+**January 1, 2025 – Oak-D Pro, Install Fixes.**
+
+-   This version of OpenCVB requires VS 2026 and OpenCV 4.14.
+    -   Install script uses the “.slnx” designation for solutions.
+-   The latest version of CMake is recommended with this version.
+-   The installation scripts have been more thoroughly tested.
+-   GIFBuilder and UI_Generator are built with the rest of OpenCVB.
+    -   They were previously build with the Update_All script.
+-   There were some improvements in camera buffer management.
+    -   Using locks reduced the number of copies.
+
+**December 30, 2025 – Oak-D Pro Camera Support under construction.**
+
+-   The Oak-D Pro camera .Net interface in OpenCVB used R2 depthai-core.
+-   The support for Oak-D is no being restarted with R3 depthai-core.
+-   The R2 OpenCVB support needs to be rewritten = different interfaces.
+-   The infrastructure for R3 is now in place with this release.
 
 # December 23, 2025 – Installation and Build Issues.
-    -   The latest release didn't properly install.
-    -   Most of the issues were related to the switch to Visual Studio 2026.
-    -   VCVarsAll.bat would not be found on systems without VS2026 installed.
-    -   The Build Configuration was not properly set for X64.
-    
+
+-   The previous release did not properly install.
+-   Most of the issues were related to the switch to Visual Studio 2026
+-   VCVarsAll.bat would not be found on systems without VS 2026.
+-   The Build configuration was not properly set for X64.
+-   Visual Studio 2026 is required for OpenCVB. VS 2022 support is dropped.
+-   Visual Studio 2026 Community Edition is free so this is not onerous.
+
 # December 17, 2025 – VS2026, Infrastructure, Reduced Threading, Display FPS, Error-Handling, JSON, Image Sizing.
 
 -   Over 1500 algorithms are included, averaging 36 lines of code per algorithm.
@@ -1310,7 +1322,7 @@
 
 ![A colorful pattern with dots Description automatically generated with medium confidence](media/db52b0115273726a6ff2d1aa986c0817.gif)
 
-**RedCloud_Basics:**  *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
+**RedCloud_Basics:** *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
 
 ![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
 

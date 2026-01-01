@@ -31,10 +31,9 @@ if not exist OakD\depthai-core (
 )
 
 if not exist opencv\Build (
-	cmake -DBUILD_PERF_TESTS=NO -DBUILD_TESTS=NO -DBUILD_opencv_python_tests=NO -DOPENCV_EXTRA_MODULES_PATH=OpenCV/OpenCV_Contrib/Modules -S OpenCV -B OpenCV/Build
-	:: cannot cmake Kinect or depthai until OpenCV is built.
-	msbuild.exe OpenCV/Build/OpenCV.sln /p:Configuration=Debug
-	msbuild.exe OpenCV/Build/OpenCV.sln /p:Configuration=Release
+	cmake -S OpenCV -B OpenCV/Build -G "Visual Studio 18 2026" -A x64 -DBUILD_PERF_TESTS=NO -DBUILD_TESTS=NO -DBUILD_opencv_python_tests=NO -DOPENCV_EXTRA_MODULES_PATH=OpenCV/OpenCV_Contrib/Modules
+	msbuild.exe OpenCV/Build/OpenCV.slnx /p:Configuration=Debug
+	msbuild.exe OpenCV/Build/OpenCV.slnx /p:Configuration=Release
 	cd OpenCV/Build
 	cmake --install .
 	cd ../../
@@ -42,32 +41,28 @@ if not exist opencv\Build (
 
 if not exist librealsense\Build (
 	cmake -DBUILD_CSHARP_BINDINGS=ON -S librealsense -B librealsense/Build
-	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Debug
-	msbuild.exe librealsense/Build/realsense2.sln /p:Configuration=Release
-	msbuild.exe librealsense/Build/wrappers/RealsenseWrappers.sln /p:Configuration=Release
-	msbuild.exe librealsense/Build/wrappers/RealsenseWrappers.sln /p:Configuration=Debug
+	msbuild.exe librealsense/Build/realsense2.slnx /p:Configuration=Debug
+	msbuild.exe librealsense/Build/realsense2.slnx /p:Configuration=Release
+	msbuild.exe librealsense/Build/wrappers/RealsenseWrappers.slnx /p:Configuration=Release
+	msbuild.exe librealsense/Build/wrappers/RealsenseWrappers.slnx /p:Configuration=Debug
 )
 
 if not exist OrbbecSDK_CSharp\Build (
 	cmake -S OrbbecSDK_CSharp -B OrbbecSDK_CSharp/Build -DCMAKE_CONFIGURATION_TYPES=Debug;Release; -DCMAKE_INSTALL_PREFIX=OrbbecSDK/Build
-	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.sln /p:Configuration=Debug
-	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.sln /p:Configuration=Release
+	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.slnx /p:Configuration=Debug
+	msbuild.exe OrbbecSDK_CSharp/Build/ob_csharp.slnx /p:Configuration=Release
 )
 
 if not exist OakD\depthai-core\Build (
 	echo Building Oak-D camera support...
 	mkdir OakD\depthai-core\Build
 	cd OakD\depthai-core\Build
-	cmake .. -A x64 -DCMAKE_BUILD_TYPE=Release -DDEPTHAI_BUILD_EXAMPLES=ON  -DDEPTHAI_SANITIZE=OFF -DOpenCV_DIR=..\	..\..\OpenCV\Build
+	cmake .. -DCMAKE_BUILD_TYPE=Release -DDEPTHAI_BUILD_EXAMPLES=OFF  -DDEPTHAI_SANITIZE=OFF -DOpenCV_DIR=..\..\..\OpenCV\Build
 	cmake --build . --config Release
-	msbuild.exe OakD/depthai-core/Build/Cam_Oak-D.sln /p:Configuration=Release
+	cmake --build . --config Debug
 	echo Oak-D camera support built successfully.
 	cd ..\..\..\
 )
-
-msbuild.exe UI_Generator/UI_Generator.vbproj /p:Configuration=Release	
-msbuild.exe GifBuilder/GifBuilder.sln /p:Configuration=Debug /p:Platform="Any CPU"
-msbuild.exe GifBuilder/GifBuilder.sln /p:Configuration=Release /p:Platform="Any CPU"
 
 echo.
 echo ========================================
