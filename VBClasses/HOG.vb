@@ -7,7 +7,7 @@ Namespace VBClasses
         Dim options As New Options_HOG
         Public Sub New()
             desc = "Find people with Histogram of Gradients (HOG) 2D feature"
-            If Image Is Nothing Then Image = cv.Cv2.ImRead(taskAlg.homeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
+            If Image Is Nothing Then Image = cv.Cv2.ImRead(task.homeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
             dst3 = Image.Resize(dst3.Size)
         End Sub
         Private Sub drawFoundRectangles(dst2 As cv.Mat, found() As cv.Rect)

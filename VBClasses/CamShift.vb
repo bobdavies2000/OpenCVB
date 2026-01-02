@@ -13,7 +13,7 @@ Namespace VBClasses
             desc = "CamShift Demo - draw on the images to define the object to track. "
         End Sub
         Public Shared Function Show_HSV_Hist(hist As cv.Mat) As cv.Mat
-            Dim img As New cv.Mat(New cv.Size(taskAlg.workRes.Width, taskAlg.workRes.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
+            Dim img As New cv.Mat(New cv.Size(task.workRes.Width, task.workRes.Height), cv.MatType.CV_8UC3, cv.Scalar.All(0))
             Dim binCount = hist.Height
             Dim binWidth = img.Width / hist.Height
             Dim mm As mmData = GetMinMax(hist)
@@ -35,11 +35,11 @@ Namespace VBClasses
             Dim mask = redHue.dst3
 
             Dim ranges() = {New cv.Rangef(0, 180)}
-            Dim hsize() As Integer = {taskAlg.histogramBins}
-            taskAlg.drawRect = ValidateRect(taskAlg.drawRect)
-            cv.Cv2.CalcHist({hue(taskAlg.drawRect)}, {0}, mask(taskAlg.drawRect), histogram, 1, hsize, ranges)
+            Dim hsize() As Integer = {task.histogramBins}
+            task.drawRect = ValidateRect(task.drawRect)
+            cv.Cv2.CalcHist({hue(task.drawRect)}, {0}, mask(task.drawRect), histogram, 1, hsize, ranges)
             histogram = histogram.Normalize(0, 255, cv.NormTypes.MinMax)
-            roi = taskAlg.drawRect
+            roi = task.drawRect
 
             If histogram.Rows <> 0 Then
                 cv.Cv2.CalcBackProject({hue}, {0}, histogram, dst1, ranges)
@@ -49,7 +49,7 @@ Namespace VBClasses
                 dst3 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR)
             End If
             If trackBox.Size.Width > 0 Then
-                dst2.Ellipse(trackBox, white, taskAlg.lineWidth + 1, taskAlg.lineType)
+                dst2.Ellipse(trackBox, white, task.lineWidth + 1, task.lineType)
             End If
         End Sub
     End Class

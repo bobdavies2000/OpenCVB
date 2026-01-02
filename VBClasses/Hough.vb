@@ -21,7 +21,7 @@ Namespace VBClasses
 
                 Dim pt1 As cv.Point = New cv.Point(x + 1000 * -b, y + 1000 * a)
                 Dim pt2 As cv.Point = New cv.Point(x - 1000 * -b, y - 1000 * a)
-                dst.Line(pt1, pt2, cv.Scalar.Red, taskAlg.lineWidth + 1, taskAlg.lineType, 0)
+                dst.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 1, task.lineType, 0)
             Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -39,7 +39,7 @@ Namespace VBClasses
                 Dim probSegments = cv.Cv2.HoughLinesP(edges.dst2, options.rho, options.theta, options.threshold)
                 For i = 0 To Math.Min(probSegments.Length, options.lineCount) - 1
                     Dim line = probSegments(i)
-                    dst3.Line(line.P1, line.P2, cv.Scalar.Red, taskAlg.lineWidth + 2, taskAlg.lineType)
+                    dst3.Line(line.P1, line.P2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
                 Next
                 labels(3) = "Probablistic lines = " + CStr(probSegments.Length)
             End If
@@ -60,7 +60,7 @@ Namespace VBClasses
             desc = "Successful use of Hough to find lines in Sudoku grid."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = cv.Cv2.ImRead(taskAlg.homeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
+            dst2 = cv.Cv2.ImRead(task.homeDir + "opencv/Samples/Data/sudoku.png").Resize(dst2.Size)
             dst3 = dst2.Clone
             hough.Run(dst2)
             Hough_Basics.houghShowLines(dst3, hough.segments, hough.options.lineCount)
@@ -92,7 +92,7 @@ Namespace VBClasses
             dst2.CopyTo(dst3)
             For i = 0 To cFound.Length - 1
                 Dim pt = New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y))
-                dst3.Circle(pt, cFound(i).Radius, foundColor, 5, taskAlg.lineType)
+                dst3.Circle(pt, cFound(i).Radius, foundColor, 5, task.lineType)
             Next
             labels(3) = CStr(cFound.Length) + " circles were identified"
         End Sub
@@ -120,8 +120,8 @@ Namespace VBClasses
             edges.Run(src)
             dst2 = edges.dst2
 
-            Dim depth8uC3 = taskAlg.depthRGB
-            Parallel.ForEach(taskAlg.gridRects,
+            Dim depth8uC3 = task.depthRGB
+            Parallel.ForEach(task.gridRects,
         Sub(roi)
             Dim segments() = cv.Cv2.HoughLines(dst2(roi), options.rho, options.theta, options.threshold)
             If segments.Count = 0 Then
@@ -152,7 +152,7 @@ Namespace VBClasses
         Public options As New Options_Hough
         Public roiColor() As cv.Vec3b
         Public Sub New()
-            taskAlg.gOptions.GridSlider.Value = 10
+            task.gOptions.GridSlider.Value = 10
             labels(2) = "Featureless mask"
             desc = "Multithread Houghlines to find featureless regions in an image."
         End Sub
@@ -163,10 +163,10 @@ Namespace VBClasses
 
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             Dim regionCount As Integer
-            ReDim noDepthCount(taskAlg.gridRects.Count - 1)
-            ReDim roiColor(taskAlg.gridRects.Count - 1)
+            ReDim noDepthCount(task.gridRects.Count - 1)
+            ReDim roiColor(task.gridRects.Count - 1)
 
-            For Each roi In taskAlg.gridRects
+            For Each roi In task.gridRects
                 Dim segments() = cv.Cv2.HoughLines(edges.dst2(roi), options.rho, options.theta, options.threshold)
                 If edges.dst2(roi).CountNonZero = 0 Then
                     regionCount += 1
@@ -177,7 +177,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             src.CopyTo(dst3, dst2)
             labels(2) = "FeatureLess Regions = " + CStr(regionCount)
-            labels(3) = "Of the " + CStr(taskAlg.gridRects.Count) + " grid elements, " + CStr(regionCount) + " had no edge or hough features present"
+            labels(3) = "Of the " + CStr(task.gridRects.Count) + " grid elements, " + CStr(regionCount) + " had no edge or hough features present"
         End Sub
     End Class
 
@@ -195,8 +195,8 @@ Namespace VBClasses
         Public maskFeat As cv.Mat
         Public maskPredict As cv.Mat
         Public Sub New()
-            If standalone Then taskAlg.gOptions.displaydst1.checked = True
-            taskAlg.gOptions.GridSlider.Value = 10
+            If standalone Then task.gOptions.displaydst1.checked = True
+            task.gOptions.GridSlider.Value = 10
             maskFless = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
             maskFeat = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
             maskPredict = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
@@ -213,7 +213,7 @@ Namespace VBClasses
             src.CopyTo(dst2)
             maskFless.SetTo(0)
             maskFeat.SetTo(0)
-            Parallel.ForEach(taskAlg.gridRects,
+            Parallel.ForEach(task.gridRects,
         Sub(roi)
             Dim segments() = cv.Cv2.HoughLines(edges.dst2(roi), options.rho, options.theta, options.threshold)
             If segments.Count = 0 Then maskFless(roi).SetTo(255)
@@ -254,7 +254,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             hls.Run(src)
-            If taskAlg.optionsChanged Then
+            If task.optionsChanged Then
                 Dim w = hls.input.video.dst2.Width
                 Dim h = hls.input.video.dst2.Height
 
@@ -265,7 +265,7 @@ Namespace VBClasses
 
                 Dim pList() As cv.Point = {bl, tl, tr, br}
                 mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, cv.Scalar.All(0))
-                mask.FillConvexPoly(pList, white, taskAlg.lineType)
+                mask.FillConvexPoly(pList, white, task.lineType)
             End If
             dst1 = mask.Clone
 
@@ -284,7 +284,7 @@ Namespace VBClasses
             For i = 0 To segments.Length - 1
                 If laneLineMinY > segments(i).P1.Y Then laneLineMinY = segments(i).P1.Y
                 If laneLineMinY > segments(i).P2.Y Then laneLineMinY = segments(i).P2.Y
-                vbc.DrawLine(dst3, segments(i).P1, segments(i).P2, taskAlg.highlight)
+                vbc.DrawLine(dst3, segments(i).P1, segments(i).P2, task.highlight)
             Next
         End Sub
     End Class
@@ -297,7 +297,7 @@ Namespace VBClasses
         Dim edges As New Edge_Basics
         Dim options As New Options_Hough
         Public Sub New()
-            taskAlg.gOptions.GridSlider.Value = 30
+            task.gOptions.GridSlider.Value = 30
             labels(2) = "Output of the Canny Edge algorithm (no Hough lines)"
             labels(3) = "Hough Lines for each threaded cell or if no lines, the featureless cell depth data."
             desc = "Multithread Houghlines to find lines in image fragments."
@@ -308,7 +308,7 @@ Namespace VBClasses
             dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
             dst3.SetTo(0)
-            For Each roi In taskAlg.gridRects
+            For Each roi In task.gridRects
                 Dim segments = cv.Cv2.HoughLines(edges.dst2(roi), options.rho, options.theta, options.threshold)
                 If segments.Count = 0 Then Continue For
                 Hough_Basics.houghShowLines(dst2(roi), segments, 2)
@@ -357,7 +357,7 @@ Namespace VBClasses
         Public segments() As cv.LineSegmentPolar
         Public options As New Options_Hough
         Public Sub New()
-            taskAlg.gOptions.GridSlider.Value = 30
+            task.gOptions.GridSlider.Value = 30
             desc = "Use Houghlines to find lines in the image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -365,14 +365,14 @@ Namespace VBClasses
             edges.Run(src)
 
             Static segments As cv.LineSegmentPoint()
-            If taskAlg.gOptions.DebugCheckBox.Checked Then
+            If task.gOptions.DebugCheckBox.Checked Then
                 src.CopyTo(dst2)
                 dst2.SetTo(white, edges.dst2)
                 dst3.SetTo(0)
                 segments = cv.Cv2.HoughLinesP(edges.dst2, options.rho, options.theta, options.threshold)
                 For i = 0 To Math.Min(segments.Length, options.lineCount) - 1
                     Dim line = segments(i)
-                    dst3.Line(line.P1, line.P2, cv.Scalar.Red, taskAlg.lineWidth + 2, taskAlg.lineType)
+                    dst3.Line(line.P1, line.P2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
                 Next
                 labels(3) = "Probablistic lines = " + CStr(segments.Length)
             End If

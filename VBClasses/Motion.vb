@@ -4,39 +4,39 @@ Namespace VBClasses
         Public motionList As New List(Of Integer)
         Dim diff As New Diff_Basics
         Public Sub New()
-            If standalone Then taskAlg.gOptions.showMotionMask.Checked = True
+            If standalone Then task.gOptions.showMotionMask.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             labels(3) = "The motion mask"
             desc = "Find all the grid rects that had motion since the last frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = taskAlg.gray
-            If taskAlg.heartBeat Or taskAlg.optionsChanged Then dst2 = src.Clone
+            If src.Channels <> 1 Then src = task.gray
+            If task.heartBeat Or task.optionsChanged Then dst2 = src.Clone
 
             diff.lastFrame = dst2
             diff.Run(src)
 
             motionList.Clear()
-            For i = 0 To taskAlg.gridRects.Count - 1
-                Dim diffCount = diff.dst2(taskAlg.gridRects(i)).CountNonZero
-                If diffCount >= taskAlg.motionThreshold Then
-                    For Each index In taskAlg.grid.gridNeighbors(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
+                If diffCount >= task.motionThreshold Then
+                    For Each index In task.grid.gridNeighbors(i)
                         If motionList.Contains(index) = False Then motionList.Add(index)
                     Next
                 End If
             Next
 
             dst3.SetTo(0)
-            taskAlg.motionRect = If(motionList.Count > 0, taskAlg.gridRects(motionList(0)), New cv.Rect)
+            task.motionRect = If(motionList.Count > 0, task.gridRects(motionList(0)), New cv.Rect)
             For Each index In motionList
-                Dim rect = taskAlg.gridRects(index)
-                taskAlg.motionRect = taskAlg.motionRect.Union(rect)
+                Dim rect = task.gridRects(index)
+                task.motionRect = task.motionRect.Union(rect)
                 src(rect).CopyTo(dst2(rect))
                 dst3(rect).SetTo(255)
             Next
 
-            taskAlg.motionMask = dst3.Clone
+            task.motionMask = dst3.Clone
             labels(2) = "Grid rects with motion: " + CStr(motionList.Count)
         End Sub
     End Class
@@ -53,7 +53,7 @@ Namespace VBClasses
         Public Sub New()
             labels(1) = "The difference between the latest pointcloud and the motion-adjusted point cloud."
             labels(2) = "Point cloud after updating with the motion mask changes."
-            labels(3) = "taskAlg.pointcloud for the current frame."
+            labels(3) = "task.pointcloud for the current frame."
             desc = "Point cloud after updating with the motion mask"
         End Sub
         Public Shared Function checkNanInf(pc As cv.Mat) As cv.Mat
@@ -83,70 +83,70 @@ Namespace VBClasses
             Return pc
         End Function
         Public Sub preparePointcloud()
-            If taskAlg.gOptions.gravityPointCloud.Checked Then
+            If task.gOptions.gravityPointCloud.Checked Then
                 '******* this is the gravity rotation *******
-                taskAlg.gravityCloud = (taskAlg.pointCloud.Reshape(1,
-                            taskAlg.rows * taskAlg.cols) * taskAlg.gMatrix).ToMat.Reshape(3, taskAlg.rows)
-                taskAlg.pointCloud = taskAlg.gravityCloud
+                task.gravityCloud = (task.pointCloud.Reshape(1,
+                            task.rows * task.cols) * task.gMatrix).ToMat.Reshape(3, task.rows)
+                task.pointCloud = task.gravityCloud
             End If
 
             ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
             ' with and without gravity transform.  Probably my fault but just fix it here.
-            If taskAlg.settings.cameraName = "StereoLabs ZED 2/2i" Then
-                taskAlg.pointCloud = checkNanInf(taskAlg.pointCloud)
+            If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
+                task.pointCloud = checkNanInf(task.pointCloud)
             End If
 
-            taskAlg.pcSplit = taskAlg.pointCloud.Split
+            task.pcSplit = task.pointCloud.Split
 
-            If taskAlg.optionsChanged Then
-                taskAlg.maxDepthMask = New cv.Mat(taskAlg.pcSplit(2).Size, cv.MatType.CV_8U, 0)
+            If task.optionsChanged Then
+                task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
             End If
-            If taskAlg.gOptions.TruncateDepth.Checked Then
-                taskAlg.pcSplit(2) = taskAlg.pcSplit(2).Threshold(taskAlg.MaxZmeters,
-                                                        taskAlg.MaxZmeters, cv.ThresholdTypes.Trunc)
-                taskAlg.maxDepthMask = taskAlg.pcSplit(2).InRange(taskAlg.MaxZmeters,
-                                                        taskAlg.MaxZmeters).ConvertScaleAbs()
-                cv.Cv2.Merge(taskAlg.pcSplit, taskAlg.pointCloud)
+            If task.gOptions.TruncateDepth.Checked Then
+                task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
+                                                        task.MaxZmeters, cv.ThresholdTypes.Trunc)
+                task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
+                                                        task.MaxZmeters).ConvertScaleAbs()
+                cv.Cv2.Merge(task.pcSplit, task.pointCloud)
             End If
 
-            taskAlg.depthMask = taskAlg.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-            taskAlg.noDepthMask = Not taskAlg.depthMask
+            task.depthmask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            task.noDepthMask = Not task.depthmask
 
-            If taskAlg.xRange <> taskAlg.xRangeDefault Or taskAlg.yRange <> taskAlg.yRangeDefault Then
-                Dim xRatio = taskAlg.xRangeDefault / taskAlg.xRange
-                Dim yRatio = taskAlg.yRangeDefault / taskAlg.yRange
-                taskAlg.pcSplit(0) *= xRatio
-                taskAlg.pcSplit(1) *= yRatio
+            If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
+                Dim xRatio = task.xRangeDefault / task.xRange
+                Dim yRatio = task.yRangeDefault / task.yRange
+                task.pcSplit(0) *= xRatio
+                task.pcSplit(1) *= yRatio
 
-                cv.Cv2.Merge(taskAlg.pcSplit, taskAlg.pointCloud)
+                cv.Cv2.Merge(task.pcSplit, task.pointCloud)
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskAlg.heartBeatLT Or taskAlg.optionsChanged Or taskAlg.frameCount < 5 Then
-                dst2 = taskAlg.pointCloud.Clone
-                'dst0 = taskAlg.depthMask.Clone
+            If task.heartBeatLT Or task.optionsChanged Or task.frameCount < 5 Then
+                dst2 = task.pointCloud.Clone
+                'dst0 = task.depthMask.Clone
             End If
-            If taskAlg.settings.cameraName = "StereoLabs ZED 2/2i" Then
-                originalPointcloud = checkNanInf(taskAlg.pointCloud).Clone
+            If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
+                originalPointcloud = checkNanInf(task.pointCloud).Clone
             Else
-                originalPointcloud = taskAlg.pointCloud.Clone ' save the original camera pointcloud.
+                originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
             End If
-            If taskAlg.algorithmPrep = False Then Exit Sub ' this is a 'taskAlg' algorithm - run every frame.
+            If task.algorithmPrep = False Then Exit Sub ' this is a 'task' algorithm - run every frame.
 
-            If taskAlg.optionsChanged Then
-                If taskAlg.rangesCloud Is Nothing Then
-                    Dim rx = New cv.Vec2f(-taskAlg.xRangeDefault, taskAlg.xRangeDefault)
-                    Dim ry = New cv.Vec2f(-taskAlg.yRangeDefault, taskAlg.yRangeDefault)
-                    Dim rz = New cv.Vec2f(0, taskAlg.MaxZmeters)
-                    taskAlg.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1),
+            If task.optionsChanged Then
+                If task.rangesCloud Is Nothing Then
+                    Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+                    Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+                    Dim rz = New cv.Vec2f(0, task.MaxZmeters)
+                    task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1),
                                                     New cv.Rangef(ry.Item0, ry.Item1),
                                                     New cv.Rangef(rz.Item0, rz.Item1)}
                 End If
             End If
 
-            taskAlg.pointCloud.CopyTo(dst2, taskAlg.motionMask)
-            taskAlg.pointCloud = dst2
-            ' dst0.CopyTo(taskAlg.depthMask, taskAlg.motionMask)
+            task.pointCloud.CopyTo(dst2, task.motionMask)
+            task.pointCloud = dst2
+            ' dst0.CopyTo(task.depthMask, task.motionMask)
 
             preparePointcloud()
 
@@ -156,7 +156,7 @@ Namespace VBClasses
                 Static diff As New Diff_Depth32f
                 Dim split = dst3.Split()
                 diff.lastDepth32f = split(2)
-                diff.Run(taskAlg.pcSplit(2))
+                diff.Run(task.pcSplit(2))
             End If
         End Sub
     End Class
@@ -169,24 +169,24 @@ Namespace VBClasses
     Public Class Motion_Validate : Inherits TaskParent
         Dim diff As New Diff_Basics
         Public Sub New()
-            If standalone Then taskAlg.gOptions.showMotionMask.Checked = True
-            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.showMotionMask.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels(1) = "Current grayscale image"
             labels(2) = "Grayscale image constructed from previous images + motion updates."
-            labels(3) = "Highlighted difference of taskAlg.gray and the one built with the motion data.  "
-            desc = "Compare taskAlg.gray to constructed images to verify Motion_Basics is working"
+            labels(3) = "Highlighted difference of task.gray and the one built with the motion data.  "
+            desc = "Compare task.gray to constructed images to verify Motion_Basics is working"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then dst1 = taskAlg.gray.Clone Else dst1 = src.Clone
-            dst2 = taskAlg.motionBasics.dst2.Clone()
+            If src.Channels <> 1 Then dst1 = task.gray.Clone Else dst1 = src.Clone
+            dst2 = task.motionBasics.dst2.Clone()
 
             diff.lastFrame = dst2
             diff.Run(dst1)
-            dst3 = diff.dst3.Threshold(taskAlg.motionThreshold, 255, cv.ThresholdTypes.Binary)
+            dst3 = diff.dst3.Threshold(task.motionThreshold, 255, cv.ThresholdTypes.Binary)
 
             SetTrueText("Pixels different from camera image: " + CStr(diff.dst2.CountNonZero) + vbCrLf +
-                    "Grid rects with more than " + CStr(taskAlg.motionThreshold) +
-                    " pixels different: " + CStr(taskAlg.motionBasics.motionList.Count), 3)
+                    "Grid rects with more than " + CStr(task.motionThreshold) +
+                    " pixels different: " + CStr(task.motionBasics.motionList.Count), 3)
         End Sub
     End Class
 
@@ -199,28 +199,28 @@ Namespace VBClasses
         Dim diff As New Diff_Basics
         Dim motionRight As New Motion_RightImage
         Public Sub New()
-            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels(1) = "Current right image"
             labels(2) = "Right image constructed from previous images + motion updates."
-            labels(3) = "Highlighted difference of taskAlg.rightView and the one built with the motion data."
+            labels(3) = "Highlighted difference of task.rightView and the one built with the motion data."
             desc = "Validate that the right image motion mask (Motion_RightImage) is working properly."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             motionRight.Run(emptyMat)
 
-            dst1 = taskAlg.rightView.Clone
+            dst1 = task.rightView.Clone
             dst2 = motionRight.motion.dst2.Clone()
 
             diff.lastFrame = dst2
             diff.Run(dst1)
-            dst3 = diff.dst3.Threshold(taskAlg.motionThreshold, 255, cv.ThresholdTypes.Binary)
+            dst3 = diff.dst3.Threshold(task.motionThreshold, 255, cv.ThresholdTypes.Binary)
 
             SetTrueText("Pixels different from camera image: " + CStr(diff.dst2.CountNonZero) + vbCrLf +
-                    "Grid rects with more than " + CStr(taskAlg.motionThreshold) +
+                    "Grid rects with more than " + CStr(task.motionThreshold) +
                     " pixels different: " + CStr(motionRight.motion.motionList.Count), 3)
 
             For Each index In motionRight.motion.motionList
-                dst1.Rectangle(taskAlg.gridRects(index), 255, taskAlg.lineWidth)
+                dst1.Rectangle(task.gridRects(index), 255, task.lineWidth)
             Next
         End Sub
     End Class
@@ -234,12 +234,12 @@ Namespace VBClasses
             desc = "Build the MotionMask for the right camera and validate it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            motion.Run(taskAlg.rightView)
+            motion.Run(task.rightView)
             dst1 = motion.dst1
             dst2 = motion.dst2
             dst3 = motion.dst3
 
-            taskAlg.motionMaskRight = dst3.Clone
+            task.motionMaskRight = dst3.Clone
             labels(2) = motion.labels(2)
             labels(3) = "The motion mask for the right image - MotionMaskRight"
         End Sub

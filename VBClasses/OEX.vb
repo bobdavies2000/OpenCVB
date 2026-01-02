@@ -13,8 +13,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180)}
 
-            Dim hsv As cv.Mat = taskAlg.color.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-            cv.Cv2.CalcHist({hsv}, {0}, New cv.Mat, histogram, 1, {taskAlg.histogramBins}, ranges)
+            Dim hsv As cv.Mat = task.color.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+            cv.Cv2.CalcHist({hsv}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
             classCount = histogram.CountNonZero
             dst0 = histogram.Normalize(0, classCount, cv.NormTypes.MinMax) ' for the backprojection.
 
@@ -29,14 +29,14 @@ Namespace VBClasses
             cv.Cv2.CalcBackProject({hsv}, {0}, dst0, dst2, ranges)
 
             dst3.SetTo(cv.Scalar.Red)
-            Dim binW = dst2.Width / taskAlg.histogramBins
+            Dim binW = dst2.Width / task.histogramBins
             Dim bins = dst2.Width / binW
             For i = 0 To bins - 1
                 Dim h = dst2.Height * histArray(i)
                 Dim r = New cv.Rect(i * binW, dst2.Height - h, binW, h)
                 dst3.Rectangle(r, cv.Scalar.Black, -1)
             Next
-            If taskAlg.heartBeat Then labels(3) = $"The max value below is {peakValue}"
+            If task.heartBeat Then labels(3) = $"The max value below is {peakValue}"
         End Sub
     End Class
 
@@ -50,14 +50,14 @@ Namespace VBClasses
         Public histogram As New cv.Mat
         Public classCount As Integer = 10 ' initial value is just a guess.  It is refined after the first pass.
         Public Sub New()
-            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
-            taskAlg.gOptions.setHistogramBins(6)
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            task.gOptions.setHistogramBins(6)
             labels = {"", "Mask for isolated region", "Backprojection of the hsv 2D histogram", "Mask in image context"}
             desc = "OpenCV Sample CalcBackProject_Demo2"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim count As Integer
-            If taskAlg.clickPoint <> newPoint Then
+            If task.clickPoint <> newPoint Then
                 Dim connectivity As Integer = 8
                 Dim flags = connectivity Or (255 << 8) Or cv.FloodFillFlags.FixedRange Or cv.FloodFillFlags.MaskOnly
                 Dim mask2 As New cv.Mat(src.Rows + 2, src.Cols + 2, cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -65,14 +65,14 @@ Namespace VBClasses
                 ' the delta between each regions value is 255 / classcount. no low or high bound needed.
                 Dim delta = 255 \ classCount - 1
                 Dim bounds = New cv.Scalar(delta, delta, delta)
-                count = cv.Cv2.FloodFill(dst2, mask2, taskAlg.clickPoint, 255, Nothing, bounds, bounds, flags)
+                count = cv.Cv2.FloodFill(dst2, mask2, task.clickPoint, 255, Nothing, bounds, bounds, flags)
 
                 If count <> src.Total Then dst1 = mask2(New cv.Range(1, mask2.Rows - 1), New cv.Range(1, mask2.Cols - 1))
             End If
             Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256)}
 
-            Dim hsv As cv.Mat = taskAlg.color.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-            cv.Cv2.CalcHist({hsv}, {0, 1}, New cv.Mat, histogram, 2, {taskAlg.histogramBins, taskAlg.histogramBins}, ranges)
+            Dim hsv As cv.Mat = task.color.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+            cv.Cv2.CalcHist({hsv}, {0, 1}, New cv.Mat, histogram, 2, {task.histogramBins, task.histogramBins}, ranges)
             classCount = histogram.CountNonZero
             histogram = histogram.Normalize(0, 255, cv.NormTypes.MinMax)
             cv.Cv2.CalcBackProject({hsv}, {0, 1}, histogram, dst2, ranges)
@@ -117,7 +117,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If taskAlg.optionsChanged Then
+            If task.optionsChanged Then
                 If pBackSub IsNot Nothing Then pBackSub.Dispose()
                 Select Case options.methodDesc
                     Case "GMG"
@@ -192,7 +192,7 @@ Namespace VBClasses
         Dim points As New List(Of cv.Point2f)
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, dst2.Width, dst2.Height))
         Public Sub New()
-            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "", "Next triangle list being built.  Latest entry is in red.", "The completed voronoi facets"}
             desc = "OpenCV Example delaunay2"
         End Sub
@@ -207,17 +207,17 @@ Namespace VBClasses
                 Do
                     Dim org As cv.Point, dst As cv.Point
                     If subdiv.EdgeOrg(e, org) > 0 And subdiv.EdgeDst(e, dst) > 0 Then
-                        img.Line(org, dst, activeColor, taskAlg.lineWidth + 3, taskAlg.lineType, 0)
+                        img.Line(org, dst, activeColor, task.lineWidth + 3, task.lineType, 0)
                     End If
 
                     e = subdiv.GetEdge(e, cv.Subdiv2D.NEXT_AROUND_LEFT)
                 Loop While e <> e0
             End If
 
-            DrawCircle(img, pt, taskAlg.DotSize, activeColor)
+            DrawCircle(img, pt, task.DotSize, activeColor)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskAlg.quarterBeat Then
+            If task.quarterBeat Then
                 If points.Count < 10 Then
                     dst2.SetTo(0)
                     Dim pt = New cv.Point2f(msRNG.Next(0, dst2.Width - 10) + 5, msRNG.Next(0, dst2.Height - 10) + 5)
@@ -250,11 +250,11 @@ Namespace VBClasses
                         ifacet.Clear()
                         ifacet.AddRange(facets(i).Select(Function(p) New cv.Point(p.X, p.Y)))
 
-                        Dim color = taskAlg.vecColors(i Mod 256)
+                        Dim color = task.vecColors(i Mod 256)
                         dst3.FillConvexPoly(ifacet, color, 8, 0)
 
                         ifacets(0) = ifacet
-                        cv.Cv2.Polylines(dst3, ifacets, True, New cv.Vec3b, taskAlg.lineWidth, taskAlg.lineType)
+                        cv.Cv2.Polylines(dst3, ifacets, True, New cv.Vec3b, task.lineWidth, task.lineType)
                         DrawCircle(dst3, centers(i), 3, New cv.Vec3b)
                     Next
 
@@ -281,14 +281,14 @@ Namespace VBClasses
             desc = "OpenCV Example MeanShift"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim roi = If(taskAlg.drawRect.Width > 0, taskAlg.drawRect, New cv.Rect(0, 0, dst2.Width, dst2.Height))
+            Dim roi = If(task.drawRect.Width > 0, task.drawRect, New cv.Rect(0, 0, dst2.Width, dst2.Height))
             Dim hsv As cv.Mat = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
             dst2 = src
-            If taskAlg.optionsChanged Then
+            If task.optionsChanged Then
                 trackWindow = roi
                 Dim mask As New cv.Mat
                 cv.Cv2.InRange(hsv, New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255), mask)
-                cv.Cv2.CalcHist({hsv(roi)}, {0}, New cv.Mat, histogram, 1, {taskAlg.histogramBins}, ranges)
+                cv.Cv2.CalcHist({hsv(roi)}, {0}, New cv.Mat, histogram, 1, {task.histogramBins}, ranges)
                 histogram = histogram.Normalize(0, 255, cv.NormTypes.MinMax)
             End If
             cv.Cv2.CalcBackProject({hsv}, {0}, histogram, dst3, ranges)
@@ -470,7 +470,7 @@ Namespace VBClasses
             desc = "Use OpenCV's reduce API to create row/col sums, averages, and min/max."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskAlg.heartBeat Then
+            If task.heartBeat Then
                 Dim m As cv.Mat = cv.Mat.FromPixelData(3, 2, cv.MatType.CV_32F, New Single() {1, 2, 3, 4, 5, 6})
                 Dim col_sum As New cv.Mat, row_sum As New cv.Mat
                 cv.Cv2.Reduce(m, col_sum, 0, cv.ReduceTypes.Sum, cv.MatType.CV_32F)
@@ -572,7 +572,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
 
-            If taskAlg.heartBeat Then ind += 1
+            If task.heartBeat Then ind += 1
             kernelSize = 3 + 2 * (ind Mod 5)
             Dim kernel As cv.Mat = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F, cv.Scalar.All(1 / (kernelSize * kernelSize)))
 
@@ -589,7 +589,7 @@ Namespace VBClasses
         Dim img As cv.Mat
         Dim options As New Options_FitEllipse
         Public Sub New()
-            Dim fileInputName As New FileInfo(taskAlg.homeDir + "opencv/samples/data/ellipses.jpg")
+            Dim fileInputName As New FileInfo(task.homeDir + "opencv/samples/data/ellipses.jpg")
             img = cv.Cv2.ImRead(fileInputName.FullName).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
             cPtr = OEX_FitEllipse_Open()

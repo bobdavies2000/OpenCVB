@@ -9,19 +9,19 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Type <> cv.MatType.CV_32FC1 Then src = taskAlg.pcSplit(0)
+            If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(0)
             Dim depth32f As cv.Mat = src * 1000
             Dim depth32S As New cv.Mat
             depth32f.ConvertTo(depth32S, cv.MatType.CV_32S)
 
-            Dim mm = GetMinMax(depth32S, taskAlg.depthmask)
+            Dim mm = GetMinMax(depth32S, task.depthmask)
             dst2 = cv.Cv2.Abs(depth32S) / options.simpleReductionValue
             Dim maxVal = Math.Min(Math.Abs(mm.minVal), mm.maxVal) ' symmetric around 0
             If maxVal = 0 Then maxVal = mm.maxVal ' symmetric around 0 except for Z where all values are above 0
             classCount = maxVal \ options.simpleReductionValue
 
             dst3 = PaletteFull(dst2)
-            mm = GetMinMax(dst2, taskAlg.depthmask)
+            mm = GetMinMax(dst2, task.depthmask)
             dst2 *= 255 / mm.maxVal
         End Sub
     End Class
@@ -37,7 +37,7 @@ Namespace VBClasses
             desc = "Create stripes throughout the image with reduction"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            stripes.run(taskAlg.pcSplit(0))
+            stripes.run(task.pcSplit(0))
             dst2 = stripes.dst2
             dst3 = stripes.dst3
         End Sub
@@ -54,7 +54,7 @@ Namespace VBClasses
             desc = "Create stripes throughout the image with reduction"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            stripes.Run(taskAlg.pcSplit(1))
+            stripes.Run(task.pcSplit(1))
             dst2 = stripes.dst2
             dst3 = stripes.dst3
         End Sub
@@ -71,7 +71,7 @@ Namespace VBClasses
             desc = "Create stripes throughout the image with reduction"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            stripes.Run(taskAlg.pcSplit(2))
+            stripes.Run(task.pcSplit(2))
             dst2 = stripes.dst2
             dst3 = stripes.dst3
         End Sub
@@ -86,16 +86,16 @@ Namespace VBClasses
         Dim stripeY As New Stripes_CloudY
         Dim stripeZ As New Stripes_CloudZ
         Public Sub New()
-            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "Stripes in the X-direction", "Stripes in the Y-direction", "Stripes in the Z-direction"}
             desc = "Outline stripes in all 3 dimensions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            stripeX.Run(taskAlg.pcSplit(0))
+            stripeX.Run(task.pcSplit(0))
             dst1 = stripeX.dst3.Clone
-            stripeY.Run(taskAlg.pcSplit(1))
+            stripeY.Run(task.pcSplit(1))
             dst2 = stripeY.dst3.Clone
-            stripeZ.Run(taskAlg.pcSplit(2))
+            stripeZ.Run(task.pcSplit(2))
             dst3 = stripeZ.dst3
         End Sub
     End Class

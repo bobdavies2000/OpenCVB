@@ -22,9 +22,9 @@ Namespace VBClasses
             If options.xmlCheck Then
                 Dim fileinfo = New FileInfo(CurDir() + "/RetinaDefaultParameters.xml")
                 If fileinfo.Exists Then
-                    FileCopy(CurDir() + "/RetinaDefaultParameters.xml", taskAlg.homeDir + "data/RetinaDefaultParameters.xml")
+                    FileCopy(CurDir() + "/RetinaDefaultParameters.xml", task.homeDir + "data/RetinaDefaultParameters.xml")
                     startInfo.FileName = "wordpad.exe"
-                    startInfo.Arguments = taskAlg.homeDir + "Data/RetinaDefaultParameters.xml"
+                    startInfo.Arguments = task.homeDir + "Data/RetinaDefaultParameters.xml"
                     Process.Start(startInfo)
                 Else
                     MessageBox.Show("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?")
@@ -36,12 +36,12 @@ Namespace VBClasses
                 ReDim dataSrc(src.Total * src.ElemSize - 1)
                 saveUseLogSampling = options.useLogSampling
                 samplingFactor = options.sampleFactor
-                If taskAlg.testAllRunning = False Then cPtr = Retina_Basics_Open(src.Rows, src.Cols, options.useLogSampling, samplingFactor)
+                If task.testAllRunning = False Then cPtr = Retina_Basics_Open(src.Rows, src.Cols, options.useLogSampling, samplingFactor)
             End If
             Dim handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim imagePtr As IntPtr = 0
-            If taskAlg.testAllRunning = False Then
+            If task.testAllRunning = False Then
                 Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
                 imagePtr = Retina_Basics_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
                                              handleMagno.AddrOfPinnedObject(), options.useLogSampling)
@@ -78,7 +78,7 @@ Namespace VBClasses
             labels(3) = "Current depth motion result"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            retina.Run(taskAlg.depthRGB)
+            retina.Run(task.depthRGB)
             dst3 = retina.dst3
             If lastMotion.Width = 0 Then lastMotion = retina.dst3
             dst2 = lastMotion Or retina.dst3

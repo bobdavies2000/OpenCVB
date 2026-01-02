@@ -43,9 +43,9 @@ Namespace VBClasses
             deter.Run(src.Clone) ' run with the unfiltered image.
             dst2 = deter.dst2.Clone
 
-            Static lastFrame As cv.Mat = taskAlg.color.Clone
+            Static lastFrame As cv.Mat = task.color.Clone
             Dim dst1 = lastFrame.Clone
-            src.CopyTo(dst1, taskAlg.motionMask)
+            src.CopyTo(dst1, task.motionMask)
             deter.Run(dst1)
 
             If deter.dst2.Channels <> 1 Then
@@ -77,15 +77,15 @@ Namespace VBClasses
             plothist.minRange = 0
             plothist.maxRange = 255
             plothist.createHistogram = True
-            taskAlg.gOptions.setHistogramBins(255)
+            task.gOptions.setHistogramBins(255)
             labels(2) = "Histogram bins range from 0 to 255."
-            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Build a histogram from the differences in an attempt to answer why are the images different."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             deter.Run(src)
 
-            If taskAlg.heartBeat = False Then Exit Sub
+            If task.heartBeat = False Then Exit Sub
             dst3 = deter.dst3
 
             plothist.histMask = deter.dst3.Clone
@@ -104,16 +104,16 @@ Namespace VBClasses
         Dim deter As New Deterministic_MotionMask
         Dim bProject As New BackProject_Basics
         Public Sub New()
-            If standalone Then taskAlg.gOptions.displayDst0.Checked = True
-            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
-            taskAlg.gOptions.CrossHairs.Checked = False
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            task.gOptions.CrossHairs.Checked = False
             labels(3) = "Mask of pixels that differ between original image and motion-filtered image."
             desc = "Build a histogram from the differences in an attempt to answer why are the images different."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            deter.Run(taskAlg.gray)
+            deter.Run(task.gray)
 
-            If taskAlg.heartBeat = False Then Exit Sub
+            If task.heartBeat = False Then Exit Sub
             dst3 = deter.dst3
 
             bProject.hist.histMask = deter.dst3.Clone
@@ -121,8 +121,8 @@ Namespace VBClasses
             dst2 = bProject.dst2
 
             Static saveMouseMove As cv.Point
-            If saveMouseMove <> taskAlg.mouseMovePoint Then
-                saveMouseMove = taskAlg.mouseMovePoint
+            If saveMouseMove <> task.mouseMovePoint Then
+                saveMouseMove = task.mouseMovePoint
                 dst1.SetTo(0)
             End If
 
@@ -132,7 +132,7 @@ Namespace VBClasses
             dst0 = src.Clone
             dst1.CopyTo(dst0, mask)
 
-            Dim mm = GetMinMax(taskAlg.gray, deter.dst3)
+            Dim mm = GetMinMax(task.gray, deter.dst3)
             labels(2) = "Active histogram bins range from " + CStr(mm.minVal) + " to " + CStr(mm.maxVal) + ".  X-axis is 0 to 255"
             SetTrueText("Pixels in the selected histogram bin - move mouse to reset to 0.", 1)
         End Sub

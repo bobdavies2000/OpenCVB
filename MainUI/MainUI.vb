@@ -172,11 +172,11 @@ Namespace MainUI
         End Sub
         Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
             Dim ratio = settings.workRes.Width / pics(0).Width
-            Dim r = New cv.Rect(taskAlg.drawRect.X * ratio, taskAlg.drawRect.Y * ratio,
-                                taskAlg.drawRect.Width * ratio, taskAlg.drawRect.Height * ratio)
-            r = validateRect(r, taskAlg.dstList(taskAlg.mousePicTag).Width, taskAlg.dstList(taskAlg.mousePicTag).Height)
+            Dim r = New cv.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
+                                task.drawRect.Width * ratio, task.drawRect.Height * ratio)
+            r = validateRect(r, task.dstList(task.mousePicTag).Width, task.dstList(task.mousePicTag).Height)
             If r.Width = 0 Or r.Height = 0 Then Exit Sub
-            Dim img = taskAlg.dstList(taskAlg.mousePicTag)(r).Resize(New cv.Size(taskAlg.drawRect.Width * 5, taskAlg.drawRect.Height * 5))
+            Dim img = task.dstList(task.mousePicTag)(r).Resize(New cv.Size(task.drawRect.Width * 5, task.drawRect.Height * 5))
             cv.Cv2.ImShow("DrawRect Region " + CStr(magnifyIndex), img)
         End Sub
         Private Sub MainForm_Closing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
@@ -267,7 +267,7 @@ Namespace MainUI
             resolutionDetails = "CaptureRes " + CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) +
                                 ", WorkRes " + CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height) +
                                 ", DisplayRes " + CStr(settings.displayRes.Width) + "x" + CStr(settings.displayRes.Height)
-            If taskAlg IsNot Nothing Then taskAlg.resolutionDetails = resolutionDetails
+            If task IsNot Nothing Then task.resolutionDetails = resolutionDetails
 
             StatusLabel.Location = New Point(offset, pics(2).Top + h)
             StatusLabel.Width = w * 2
@@ -331,16 +331,16 @@ Namespace MainUI
                 AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
                 TestAllTimer.Interval = settings.testAllDuration * 1000
                 TestAllTimer.Enabled = True
-                taskAlg.testAllRunning = True
+                task.testAllRunning = True
             Else
                 Debug.WriteLine("Stopping 'TestAll' overnight run.")
                 AvailableAlgorithms.Enabled = True
                 TestAllTimer.Enabled = False
-                taskAlg.testAllRunning = False
+                task.testAllRunning = False
             End If
         End Sub
         Private Sub Pic_Paint(sender As Object, e As PaintEventArgs)
-            If taskAlg Is Nothing Then Exit Sub
+            If task Is Nothing Then Exit Sub
 
             Dim timeStart As DateTime = Now
 
@@ -348,19 +348,19 @@ Namespace MainUI
             Dim pic = DirectCast(sender, PictureBox)
             g.ScaleTransform(1, 1)
 
-            Dim displayimage = taskAlg.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+            Dim displayimage = task.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
             Dim bitmap = cvext.BitmapConverter.ToBitmap(displayimage)
 
             If pics(pic.Tag).Image IsNot Nothing Then pics(pic.Tag).Image.Dispose()
             g.DrawImage(bitmap, 0, 0)
 
-            labels(pic.Tag).Text = taskAlg.labels(pic.Tag)
+            labels(pic.Tag).Text = task.labels(pic.Tag)
 
             Dim ratioX = pic.Width / settings.workRes.Width
             Dim ratioY = pic.Height / settings.workRes.Height
 
             Dim brush As New SolidBrush(Color.White)
-            For Each tt In taskAlg.trueData
+            For Each tt In task.trueData
                 If tt.text Is Nothing Then Continue For
                 If tt.text.Length > 0 And tt.picTag = pic.Tag Then
                     g.DrawString(tt.text, windowsFont, brush, CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
@@ -372,43 +372,43 @@ Namespace MainUI
             Dim timeEnd As DateTime = Now
             Dim elapsedTime = timeEnd.Ticks - timeStart.Ticks
             Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
-            taskAlg.cpu.paintTime += spanCopy.Ticks / TimeSpan.TicksPerMillisecond
+            task.cpu.paintTime += spanCopy.Ticks / TimeSpan.TicksPerMillisecond
         End Sub
         Private Sub startAlgorithm()
-            vbc.taskAlg = New AlgorithmTask
+            vbc.task = New AlgorithmTask
 
             For i = 0 To pics.Count - 1
-                taskAlg.dstList(i) = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
+                task.dstList(i) = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
             Next
 
-            taskAlg.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
-            taskAlg.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
-            taskAlg.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
-            taskAlg.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
-            taskAlg.gridRatioX = pics(0).Width / settings.workRes.Width
-            taskAlg.gridRatioY = pics(0).Height / settings.workRes.Height
-            taskAlg.homeDir = homeDir
-            taskAlg.calibData = camera.calibData
+            task.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
+            task.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
+            task.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
+            task.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
+            task.gridRatioX = pics(0).Width / settings.workRes.Width
+            task.gridRatioY = pics(0).Height / settings.workRes.Height
+            task.homeDir = homeDir
+            task.calibData = camera.calibData
 
-            taskAlg.main_hwnd = Me.Handle
+            task.main_hwnd = Me.Handle
 
-            taskAlg.Initialize(settings)
-            taskAlg.lowResDepth = New cv.Mat(taskAlg.workRes, cv.MatType.CV_32F)
-            taskAlg.lowResColor = New cv.Mat(taskAlg.workRes, cv.MatType.CV_32F)
-            taskAlg.MainUI_Algorithm = createAlgorithm(settings.algorithm)
-            AlgDescription.Text = taskAlg.MainUI_Algorithm.desc
-            taskAlg.resolutionDetails = resolutionDetails
+            task.Initialize(settings)
+            task.lowResDepth = New cv.Mat(task.workRes, cv.MatType.CV_32F)
+            task.lowResColor = New cv.Mat(task.workRes, cv.MatType.CV_32F)
+            task.MainUI_Algorithm = createAlgorithm(settings.algorithm)
+            AlgDescription.Text = task.MainUI_Algorithm.desc
+            task.resolutionDetails = resolutionDetails
 
-            If taskAlg.calibData IsNot Nothing Then taskAlg.calibData = camera.calibData
+            If task.calibData IsNot Nothing Then task.calibData = camera.calibData
 
             MainForm_Resize(Nothing, Nothing)
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-            If taskAlg Is Nothing Then Exit Sub
+            If task Is Nothing Then Exit Sub
 
             Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + vbCrLf +
-                        " " + Format(taskAlg.fpsAlgorithm, "0") + " FPS Algorithm" + vbCrLf +
-                        " " + Format(taskAlg.fpsCamera, "0") + " FPS Camera")
+                        " " + Format(task.fpsAlgorithm, "0") + " FPS Algorithm" + vbCrLf +
+                        " " + Format(task.fpsCamera, "0") + " FPS Camera")
 
             PausePlayButton.PerformClick()
 
@@ -483,7 +483,7 @@ Namespace MainUI
 
             PausePlayButton.PerformClick()
 
-            If taskAlg Is Nothing Then startAlgorithm()
+            If task Is Nothing Then startAlgorithm()
 
             MainForm_Resize(Nothing, Nothing)
         End Sub
@@ -509,10 +509,10 @@ Namespace MainUI
                 Me.MainForm_Resize(Nothing, Nothing)
             Else
                 StopCamera()
-                If taskAlg IsNot Nothing Then ' already stopped...
-                    taskAlg.readyForCameraInput = False
-                    taskAlg.Dispose()
-                    taskAlg = Nothing
+                If task IsNot Nothing Then ' already stopped...
+                    task.readyForCameraInput = False
+                    task.Dispose()
+                    task = Nothing
                 End If
             End If
         End Sub

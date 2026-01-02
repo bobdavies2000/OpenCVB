@@ -8,20 +8,20 @@ Namespace VBClasses
         End Sub
         Public Function ShowPaletteDepth(input As cv.Mat) As cv.Mat
             Dim output As New cv.Mat
-            cv.Cv2.ApplyColorMap(input, output, taskAlg.depthColorMap)
-            output.SetTo(0, taskAlg.noDepthMask)
+            cv.Cv2.ApplyColorMap(input, output, task.depthColorMap)
+            output.SetTo(0, task.noDepthMask)
             Return output
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1.SetTo(0)
-            For Each brick In taskAlg.bricks.brickList
+            For Each brick In task.bricks.brickList
                 dst1(brick.rect).SetTo((brick.correlation + 1) * 127)
             Next
 
             dst0 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
             Dim mm = GetMinMax(dst1, dst0)
             dst2 = ShowPaletteDepth((dst1 - mm.minVal) * mm.maxVal / (mm.maxVal - mm.minVal))
-            labels(2) = taskAlg.bricks.labels(2)
+            labels(2) = task.bricks.labels(2)
 
             info.Run(src)
             SetTrueText(info.strOut, 3)

@@ -18,7 +18,7 @@ Namespace VBClasses
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst2 = src
             Dim claheObj = cv.Cv2.CreateCLAHE()
-            claheObj.TilesGridSize() = New cv.Size(CInt(taskAlg.brickSize), CInt(taskAlg.brickSize))
+            claheObj.TilesGridSize() = New cv.Size(CInt(task.brickSize), CInt(task.brickSize))
             claheObj.ClipLimit = clipSlider.Value
             claheObj.Apply(src, dst3)
             claheObj.Dispose()
@@ -30,7 +30,7 @@ Namespace VBClasses
     Public Class PhotoShop_HSV : Inherits TaskParent
         Public hsv_planes(2) As cv.Mat
         Public Sub New()
-            If standalone Then taskAlg.gOptions.displayDst1.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"", "", "HSV (8UC3)", "Hue (8uC1)"}
             desc = "HSV 8UC3 is in dst2, dst3 is Hue in 8UC1, and dst1 is Saturation 8UC1."
         End Sub
@@ -548,7 +548,7 @@ Namespace VBClasses
             Static sSigmaSlider = OptionParent.FindSlider("DetailEnhance Sigma_s")
             Static rSigmaSlider = OptionParent.FindSlider("DetailEnhance Sigma_r X100")
 
-            If src.Channels <> 3 Then src = taskAlg.color.Clone
+            If src.Channels <> 3 Then src = task.color.Clone
             cv.Cv2.DetailEnhance(src, dst2, sSigmaSlider.Value, rSigmaSlider.Value / rSigmaSlider.Maximum)
         End Sub
     End Class
@@ -569,7 +569,7 @@ Namespace VBClasses
             Static thresholdSlider = OptionParent.FindSlider("White balance threshold X100")
             Dim thresholdVal As Single = thresholdSlider.Value / 100
 
-            If src.Channels <> 3 Then src = taskAlg.color.Clone
+            If src.Channels <> 3 Then src = task.color.Clone
             Dim rgbData(src.Total * src.ElemSize - 1) As Byte
             Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
             Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)

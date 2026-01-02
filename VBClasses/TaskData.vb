@@ -75,7 +75,7 @@ Namespace VBClasses
         Public colorMapZeroIsBlack As cv.Mat
         Public correlationColorMap As cv.Mat
 
-        ' taskAlg algorithms - operate on every frame regardless of which algorithm is being run.
+        ' task algorithms - operate on every frame regardless of which algorithm is being run.
         Public colorizer As DepthColorizer_Basics
         Public redColor As RedColor_Basics
         Public redList As XO_RedList_Basics

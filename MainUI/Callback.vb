@@ -34,54 +34,54 @@ Namespace MainUI
             camera.isCapturing = False
         End Sub
         Private Sub Camera_FrameReady(sender As GenericCamera)
-            If taskAlg Is Nothing Then Exit Sub
-            If taskAlg.readyForCameraInput = False Then Exit Sub
+            If task Is Nothing Then Exit Sub
+            If task.readyForCameraInput = False Then Exit Sub
             Static lastPaintTime As DateTime = Now
 
             If camera.frameProcessed = False Then Exit Sub
             camera.frameProcessed = False
 
             Me.BeginInvoke(Sub()
-                               If taskAlg Is Nothing Then Exit Sub
-                               If taskAlg.cpu.algorithm_ms.Count = 0 Then taskAlg.cpu.startRun(settings.algorithm)
+                               If task Is Nothing Then Exit Sub
+                               If task.cpu.algorithm_ms.Count = 0 Then task.cpu.startRun(settings.algorithm)
 
-                               taskAlg.cpu.algorithmTimes(1) = Now
+                               task.cpu.algorithmTimes(1) = Now
 
-                               Dim elapsedWaitTicks = taskAlg.cpu.algorithmTimes(1).Ticks - taskAlg.cpu.algorithmTimes(0).Ticks
+                               Dim elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - task.cpu.algorithmTimes(0).Ticks
                                Dim spanWait = New TimeSpan(elapsedWaitTicks)
-                               taskAlg.cpu.algorithm_ms(0) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
+                               task.cpu.algorithm_ms(0) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                               taskAlg.cpu.algorithmTimes(0) = taskAlg.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
+                               task.cpu.algorithmTimes(0) = task.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
 
                                SyncLock camera.cameraMutex
-                                   camera.color.CopyTo(taskAlg.color)
-                                   camera.pointCloud.CopyTo(taskAlg.pointCloud)
-                                   camera.leftView.CopyTo(taskAlg.leftView)
-                                   camera.rightView.CopyTo(taskAlg.rightView)
+                                   camera.color.CopyTo(task.color)
+                                   camera.pointCloud.CopyTo(task.pointCloud)
+                                   camera.leftView.CopyTo(task.leftView)
+                                   camera.rightView.CopyTo(task.rightView)
                                End SyncLock
 
-                               taskAlg.RunAlgorithm()
+                               task.RunAlgorithm()
 
-                               taskAlg.cpu.algorithmTimes(1) = Now
+                               task.cpu.algorithmTimes(1) = Now
 
-                               elapsedWaitTicks = taskAlg.cpu.algorithmTimes(1).Ticks - taskAlg.cpu.algorithmTimes(0).Ticks
+                               elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - task.cpu.algorithmTimes(0).Ticks
 
                                spanWait = New TimeSpan(elapsedWaitTicks)
-                               taskAlg.cpu.algorithm_ms(1) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
+                               task.cpu.algorithm_ms(1) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                               taskAlg.cpu.algorithmTimes(0) = taskAlg.cpu.algorithmTimes(1) ' start time wait = end time algorithm
+                               task.cpu.algorithmTimes(0) = task.cpu.algorithmTimes(1) ' start time wait = end time algorithm
 
-                               taskAlg.mouseClickFlag = False
-                               taskAlg.frameCount += 1
+                               task.mouseClickFlag = False
+                               task.frameCount += 1
 
-                               elapsedWaitTicks = taskAlg.cpu.algorithmTimes(1).Ticks - lastPaintTime.Ticks
+                               elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - lastPaintTime.Ticks
                                spanWait = New TimeSpan(elapsedWaitTicks)
                                Dim msSinceLastPaint = spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                               Dim threshold = 1000 / taskAlg.Settings.FPSPaintTarget
+                               Dim threshold = 1000 / task.Settings.FPSPaintTarget
 
                                If msSinceLastPaint > threshold Then
-                                   lastPaintTime = taskAlg.cpu.algorithmTimes(1)
+                                   lastPaintTime = task.cpu.algorithmTimes(1)
                                    For i = 0 To pics.Count - 1
                                        pics(i).Invalidate()
                                    Next
@@ -92,19 +92,19 @@ Namespace MainUI
     End Class
 End Namespace
 '' Run algorithm on background thread
-'taskAlg.Run(Sub()
+'task.Run(Sub()
 '             Try
 '                 ' Run algorithm on background thread
-'                 taskAlg.RunAlgorithm()
+'                 task.RunAlgorithm()
 
 '                 ' Update UI on UI thread after algorithm completes
 '                 Me.BeginInvoke(Sub()
 '                                    Try
-'                                        taskAlg.mouseClickFlag = False
-'                                        taskAlg.frameCount += 1
+'                                        task.mouseClickFlag = False
+'                                        task.frameCount += 1
 
-'                                        If RefreshTimer.Interval <> taskAlg.refreshTimerTickCount Then
-'                                            RefreshTimer.Interval = taskAlg.refreshTimerTickCount
+'                                        If RefreshTimer.Interval <> task.refreshTimerTickCount Then
+'                                            RefreshTimer.Interval = task.refreshTimerTickCount
 '                                        End If
 '                                    Catch ex As Exception
 '                                        Debug.WriteLine("Error updating UI after algorithm: " + ex.Message)

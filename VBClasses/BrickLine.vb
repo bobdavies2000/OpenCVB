@@ -5,7 +5,7 @@ Namespace VBClasses
         Public edgeRequest As Boolean
         Public options As New Options_Features
         Public Sub New()
-            If taskAlg.bricks Is Nothing Then taskAlg.bricks = New Brick_Basics
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "Use 'Selected Feature' in 'Options_Features' to highlight different edges."
             desc = "Given lines or edges, build a grid of cells that cover them."
         End Sub
@@ -14,7 +14,7 @@ Namespace VBClasses
 
             If standalone Or edgeRequest Then
                 Static contour As New Contour_RotateRect
-                contour.Run(taskAlg.grayStable)
+                contour.Run(task.grayStable)
                 src = contour.dst1.Clone
             End If
 
@@ -27,7 +27,7 @@ Namespace VBClasses
                 featList.Add(New List(Of Integer))
             Next
 
-            For Each brick In taskAlg.bricks.brickList
+            For Each brick In task.bricks.brickList
                 hist.Run(src(brick.rect))
                 For i = 1 To hist.histarray.Count - 1
                     If hist.histarray(i) > 0 Then
@@ -41,37 +41,37 @@ Namespace VBClasses
                 edgeSorted.Add(featList(i).Count, i)
             Next
 
-            taskAlg.featList.Clear()
+            task.featList.Clear()
             For Each index In edgeSorted.Values
-                If featList(index).Count > 0 Then taskAlg.featList.Add(featList(index))
+                If featList(index).Count > 0 Then task.featList.Add(featList(index))
             Next
 
-            Dim edgeIndex = Math.Abs(taskAlg.gOptions.DebugSlider.Value)
-            If edgeIndex <> 0 And edgeIndex < taskAlg.featList.Count Then
-                For Each index In taskAlg.featList(edgeIndex)
-                    Dim brick = taskAlg.bricks.brickList(index)
-                    dst2.Rectangle(brick.rect, taskAlg.highlight, taskAlg.lineWidth)
+            Dim edgeIndex = Math.Abs(task.gOptions.DebugSlider.Value)
+            If edgeIndex <> 0 And edgeIndex < task.featList.Count Then
+                For Each index In task.featList(edgeIndex)
+                    Dim brick = task.bricks.brickList(index)
+                    dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
                 Next
             End If
 
-            For i = 0 To taskAlg.featList.Count - 1
-                If i <> Math.Abs(taskAlg.gOptions.DebugSlider.Value) Then Continue For
+            For i = 0 To task.featList.Count - 1
+                If i <> Math.Abs(task.gOptions.DebugSlider.Value) Then Continue For
                 Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
-                For Each index In taskAlg.featList(i)
-                    Dim brick = taskAlg.bricks.brickList(index)
+                For Each index In task.featList(i)
+                    Dim brick = task.bricks.brickList(index)
                     depthSorted.Add(brick.depth, index)
                 Next
 
                 Dim lastDepth = depthSorted.ElementAt(0).Key
                 For Each ele In depthSorted
-                    If Math.Abs(ele.Key - lastDepth) > taskAlg.depthDiffMeters Then
-                        Dim brick = taskAlg.bricks.brickList(ele.Value)
-                        dst2.Rectangle(brick.rect, red, taskAlg.lineWidth + 1)
+                    If Math.Abs(ele.Key - lastDepth) > task.depthDiffMeters Then
+                        Dim brick = task.bricks.brickList(ele.Value)
+                        dst2.Rectangle(brick.rect, red, task.lineWidth + 1)
                     End If
                     lastDepth = ele.Key
                 Next
             Next
-            labels(3) = CStr(taskAlg.featList.Count) + " features are present in the input lines or edges"
+            labels(3) = CStr(task.featList.Count) + " features are present in the input lines or edges"
         End Sub
     End Class
 
@@ -89,7 +89,7 @@ Namespace VBClasses
             desc = "Find the cells containing edges."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            findCells.Run(taskAlg.grayStable)
+            findCells.Run(task.grayStable)
             dst2 = findCells.dst2
             dst3 = findCells.dst3
         End Sub
@@ -111,40 +111,40 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
                 findCells.edgeRequest = True
-                findCells.Run(taskAlg.grayStable)
+                findCells.Run(task.grayStable)
             Else
                 findCells.Run(src)
             End If
 
             Dim gapCells As New List(Of Integer)
-            For i = 0 To taskAlg.featList.Count - 1
-                If taskAlg.featList(i).Count = 0 Then Exit For
+            For i = 0 To task.featList.Count - 1
+                If task.featList(i).Count = 0 Then Exit For
                 Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
-                For Each index In taskAlg.featList(i)
-                    Dim brick = taskAlg.bricks.brickList(index)
+                For Each index In task.featList(i)
+                    Dim brick = task.bricks.brickList(index)
                     depthSorted.Add(brick.depth, index)
                 Next
 
                 Dim lastDepth = depthSorted.ElementAt(0).Key
                 For Each ele In depthSorted
-                    If Math.Abs(ele.Key - lastDepth) > taskAlg.depthDiffMeters Then gapCells.Add(taskAlg.bricks.brickList(ele.Value).index)
+                    If Math.Abs(ele.Key - lastDepth) > task.depthDiffMeters Then gapCells.Add(task.bricks.brickList(ele.Value).index)
                     lastDepth = ele.Key
                 Next
             Next
 
-            If taskAlg.heartBeat Then
+            If task.heartBeat Then
                 dst2 = findCells.dst2.Clone
-                Dim debugMode = taskAlg.gOptions.DebugSlider.Value <> 0
+                Dim debugMode = task.gOptions.DebugSlider.Value <> 0
                 For i = 0 To gapCells.Count - 1
-                    If debugMode Then If i <> Math.Abs(taskAlg.gOptions.DebugSlider.Value) Then Continue For
-                    Dim brick = taskAlg.bricks.brickList(gapCells(i))
-                    dst2.Rectangle(brick.rect, taskAlg.highlight, taskAlg.lineWidth)
-                    If i = Math.Abs(taskAlg.gOptions.DebugSlider.Value) Then
+                    If debugMode Then If i <> Math.Abs(task.gOptions.DebugSlider.Value) Then Continue For
+                    Dim brick = task.bricks.brickList(gapCells(i))
+                    dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
+                    If i = Math.Abs(task.gOptions.DebugSlider.Value) Then
                         SetTrueText(Format(brick.depth, fmt1), brick.rect.BottomRight)
                     End If
                 Next
             End If
-            labels(3) = CStr(taskAlg.featList.Count) + " features are present in the input lines or edges"
+            labels(3) = CStr(task.featList.Count) + " features are present in the input lines or edges"
         End Sub
     End Class
 
@@ -162,8 +162,8 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1.SetTo(0)
-            For Each lp In taskAlg.lines.lpList
-                dst1.Line(lp.p1, lp.p2, lp.index, taskAlg.lineWidth, cv.LineTypes.Link8)
+            For Each lp In task.lines.lpList
+                dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
             Next
 
             findCells.Run(dst1)
@@ -187,8 +187,8 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1.SetTo(0)
-            For Each lp In taskAlg.lines.lpList
-                dst1.Line(lp.p1, lp.p2, lp.index, taskAlg.lineWidth, cv.LineTypes.Link8)
+            For Each lp In task.lines.lpList
+                dst1.Line(lp.p1, lp.p2, lp.index, task.lineWidth, cv.LineTypes.Link8)
             Next
 
             findCells.Run(dst1)
@@ -210,13 +210,13 @@ Namespace VBClasses
             desc = "Define each brick according to whether it has edges or not.  Ignore peripheral bricks..."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(taskAlg.grayStable)
+            edgeline.Run(task.grayStable)
             dst2 = src.Clone
             dst3 = src.Clone
             edges.Clear()
             noEdges.Clear()
-            For i = 0 To taskAlg.gridRects.Count - 1
-                Dim r = taskAlg.gridRects(i)
+            For i = 0 To task.gridRects.Count - 1
+                Dim r = task.gridRects(i)
                 If r.X = 0 Then Continue For
                 If r.X + r.Width = dst2.Width Then Continue For
                 If r.Y = 0 Then Continue For
@@ -226,10 +226,10 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 For Each index In edges
-                    DrawRect(dst2, taskAlg.gridRects(index), white)
+                    DrawRect(dst2, task.gridRects(index), white)
                 Next
                 For Each index In noEdges
-                    DrawRect(dst3, taskAlg.gridRects(index), white)
+                    DrawRect(dst3, task.gridRects(index), white)
                 Next
             End If
 
@@ -263,7 +263,7 @@ Namespace VBClasses
             mats.mat(2) = fLess.dst2.Clone
             Dim leftEdges As New List(Of Integer)(fLess.edges)
             For Each index In leftEdges
-                DrawRect(mats.mat(2), taskAlg.gridRects(index), white)
+                DrawRect(mats.mat(2), task.gridRects(index), white)
             Next
 
             edgeline.Run(edges.dst3)
@@ -271,39 +271,39 @@ Namespace VBClasses
             mats.mat(3) = fLess.dst2.Clone
             Dim rightEdges As New List(Of Integer)(fLess.edges)
             For Each index In rightEdges
-                DrawRect(mats.mat(3), taskAlg.gridRects(index), white)
+                DrawRect(mats.mat(3), task.gridRects(index), white)
             Next
 
             '  mats.Run(emptyMat)
 
-            dst2 = taskAlg.leftView
-            dst3 = taskAlg.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = task.leftView
+            dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             Dim correlationMat As New cv.Mat
             bestBricks.Clear()
             For Each index In leftEdges
                 Dim brick As New brickData
-                brick.rect = taskAlg.gridRects(index)
+                brick.rect = task.gridRects(index)
 
                 ' too close to the edges of the image
-                If taskAlg.gridNabeRects(index).Width + brick.rect.X + taskAlg.brickSize * 2 > dst2.Width Then Continue For
-                If taskAlg.gridNabeRects(index).Height + brick.rect.Y + taskAlg.brickSize * 2 > dst2.Height Then Continue For
+                If task.gridNabeRects(index).Width + brick.rect.X + task.brickSize * 2 > dst2.Width Then Continue For
+                If task.gridNabeRects(index).Height + brick.rect.Y + task.brickSize * 2 > dst2.Height Then Continue For
 
                 brick.lRect = brick.rect
-                brick.depth = taskAlg.pcSplit(2)(brick.rect).Mean()(0)
+                brick.depth = task.pcSplit(2)(brick.rect).Mean()(0)
                 If brick.depth > 0 Then
                     brick.rRect = brick.rect
-                    brick.rRect.X -= taskAlg.calibData.baseline * taskAlg.calibData.rgbIntrinsics.fx / brick.depth
+                    brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
                     If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then Continue For
 
-                    If taskAlg.rgbLeftAligned = False Then
+                    If task.rgbLeftAligned = False Then
                         brick = Brick_Basics.RealSenseAlign(brick)
                     End If
 
-                    cv.Cv2.MatchTemplate(taskAlg.leftView(brick.lRect), taskAlg.rightView(brick.rRect), correlationMat,
+                    cv.Cv2.MatchTemplate(task.leftView(brick.lRect), task.rightView(brick.rRect), correlationMat,
                                      cv.TemplateMatchModes.CCoeffNormed)
 
                     brick.correlation = correlationMat.Get(Of Single)(0, 0)
-                    If brick.correlation >= taskAlg.fCorrThreshold Then
+                    If brick.correlation >= task.fCorrThreshold Then
                         DrawRect(dst2, brick.rect, white)
                         DrawRect(dst3, brick.rRect, red)
                         bestBricks.Add(index)
@@ -311,8 +311,8 @@ Namespace VBClasses
                 End If
             Next
 
-            labels(3) = CStr(bestBricks.Count) + " bricks had lines and correlation >" + Format(taskAlg.fCorrThreshold, fmt2) + ") or " +
-                  Format(bestBricks.Count / taskAlg.gridRects.Count, "00%") + " of all the bricks"
+            labels(3) = CStr(bestBricks.Count) + " bricks had lines and correlation >" + Format(task.fCorrThreshold, fmt2) + ") or " +
+                  Format(bestBricks.Count / task.gridRects.Count, "00%") + " of all the bricks"
         End Sub
     End Class
 End Namespace

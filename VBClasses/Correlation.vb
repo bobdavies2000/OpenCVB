@@ -14,7 +14,7 @@ Namespace VBClasses
             dst1 = kFlood.dst2
             dst2 = kFlood.dst3
 
-            Dim row = taskAlg.mouseMovePoint.Y
+            Dim row = task.mouseMovePoint.Y
             If row = 0 Then SetTrueText("Move mouse across image to see the relationship between X and Z" + vbCrLf +
                                         "A linear relationship is a useful correlation", New cv.Point(0, 10), 3)
 
@@ -23,13 +23,13 @@ Namespace VBClasses
             Dim dataZ As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, cv.Scalar.All(0))
 
             Dim mask = kFlood.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            taskAlg.pcSplit(0).CopyTo(dataX, mask)
-            taskAlg.pcSplit(1).CopyTo(dataY, mask)
-            taskAlg.pcSplit(2).CopyTo(dataZ, mask)
+            task.pcSplit(0).CopyTo(dataX, mask)
+            task.pcSplit(1).CopyTo(dataY, mask)
+            task.pcSplit(2).CopyTo(dataZ, mask)
 
             Dim row1 = dataX.Row(row)
             Dim row2 = dataZ.Row(row)
-            dst2.Line(New cv.Point(0, row), New cv.Point(dst2.Width, row), cv.Scalar.Yellow, taskAlg.lineWidth + 1)
+            dst2.Line(New cv.Point(0, row), New cv.Point(dst2.Width, row), cv.Scalar.Yellow, task.lineWidth + 1)
 
             Dim correlationmat As New cv.Mat
             cv.Cv2.MatchTemplate(row1, row2, correlationmat, options.matchOption)
@@ -54,7 +54,7 @@ Namespace VBClasses
                 For i = 0 To plotX.Count - 1
                     Dim x = dst3.Width * (plotX(i) - minx) / (maxx - minx)
                     Dim y = dst3.Height * (plotZ(i) - minZ) / (maxZ - minZ)
-                    DrawCircle(dst3, New cv.Point(x, y), taskAlg.DotSize, cv.Scalar.Yellow)
+                    DrawCircle(dst3, New cv.Point(x, y), task.DotSize, cv.Scalar.Yellow)
                 Next
                 SetTrueText("Z-min " + Format(minZ, fmt2), New cv.Point(10, 5), 3)
                 SetTrueText("Z-max " + Format(maxZ, fmt2) + vbCrLf + vbTab + "X-min " + Format(minx, fmt2), New cv.Point(0, dst3.Height - 20), 3)

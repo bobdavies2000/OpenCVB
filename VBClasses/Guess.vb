@@ -8,7 +8,7 @@ Namespace VBClasses
             desc = "Fill single pixel holes in the point cloud."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC3 Then src = taskAlg.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, cppData, 0, cppData.Length)
@@ -17,7 +17,7 @@ Namespace VBClasses
             handleSrc.Free()
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32FC3, imagePtr).Clone
-            If standaloneTest() Then dst3 = taskAlg.pointCloud
+            If standaloneTest() Then dst3 = task.pointCloud
         End Sub
         Public Sub Close()
             Guess_Depth_Close(cPtr)
@@ -41,7 +41,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static distSlider = OptionParent.FindSlider("Max Distance from edge")
 
-            If src.Type <> cv.MatType.CV_32FC3 Then src = taskAlg.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
             Dim cppData(src.Total * src.ElemSize - 1) As Byte
             Marshal.Copy(src.Data, cppData, 0, cppData.Length)
@@ -50,7 +50,7 @@ Namespace VBClasses
             handleSrc.Free()
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32FC3, cppData).Clone
-            If standaloneTest() Then dst3 = taskAlg.pointCloud
+            If standaloneTest() Then dst3 = task.pointCloud
         End Sub
         Public Sub Close()
             Guess_ImageEdges_Close(cPtr)

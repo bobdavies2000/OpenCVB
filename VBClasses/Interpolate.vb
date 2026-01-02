@@ -48,7 +48,7 @@ Namespace VBClasses
         Dim heartCount As Integer
         Dim options As New Options_Kalman
         Public Sub New()
-            taskAlg.kalman = New Kalman_Basics
+            task.kalman = New Kalman_Basics
             desc = "Use Kalman to smooth the grayscale results of interpolation"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -57,26 +57,26 @@ Namespace VBClasses
             inter.Run(src)
 
             dst2 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            If taskAlg.optionsChanged Then
-                ReDim taskAlg.kalman.kInput(dst2.Width * dst2.Height - 1)
+            If task.optionsChanged Then
+                ReDim task.kalman.kInput(dst2.Width * dst2.Height - 1)
                 myFrameCount = 1
                 updatedFrames = 0
             End If
 
             Dim tmp32f As New cv.Mat
             dst2.ConvertTo(tmp32f, cv.MatType.CV_32F)
-            Marshal.Copy(tmp32f.Data, taskAlg.kalman.kInput, 0, taskAlg.kalman.kInput.Length)
-            taskAlg.kalman.Run(emptyMat)
+            Marshal.Copy(tmp32f.Data, task.kalman.kInput, 0, task.kalman.kInput.Length)
+            task.kalman.Run(emptyMat)
 
-            Dim results(taskAlg.kalman.kInput.Length - 1) As Byte
-            For i = 0 To taskAlg.kalman.kOutput.Length - 1
-                Dim val = taskAlg.kalman.kOutput(i)
+            Dim results(task.kalman.kInput.Length - 1) As Byte
+            For i = 0 To task.kalman.kOutput.Length - 1
+                Dim val = task.kalman.kOutput(i)
                 If Single.IsNaN(val) Then val = 255
                 If val < 0 Then val = 0
                 If val > 255 Then val = 255
                 results(i) = val
             Next
-            Marshal.Copy(results, 0, dst2.Data, taskAlg.kalman.kOutput.Length)
+            Marshal.Copy(results, 0, dst2.Data, task.kalman.kOutput.Length)
 
             If options.useKalman Then
                 labels(2) = "Kalman-smoothed output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)
@@ -98,7 +98,7 @@ Namespace VBClasses
                     " savings = " + CStr(myFrameCount - updatedFrames) + " or " +
                     Format((myFrameCount - updatedFrames) / myFrameCount, "0%") + " diffCount = " + CStr(diffCount)
 
-            If taskAlg.heartBeat Then
+            If task.heartBeat Then
                 heartCount += 1
                 If heartCount Mod 10 = 0 Then
                     myFrameCount = 0
@@ -126,13 +126,13 @@ Namespace VBClasses
             dst1 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(dst3.Size)
             dst1 = dst1.Threshold(inter.iOptions.interpolationThreshold, 255, cv.ThresholdTypes.Binary)
 
-            dst2 = taskAlg.lines.dst2
+            dst2 = task.lines.dst2
             dst3 = src
 
-            For Each lp In taskAlg.lines.lpList
+            For Each lp In task.lines.lpList
                 vbc.DrawLine(dst3, lp.p1, lp.p2, cv.Scalar.Yellow)
             Next
-            labels(3) = "There were " + CStr(taskAlg.lines.lpList.Count) + " lines found"
+            labels(3) = "There were " + CStr(task.lines.lpList.Count) + " lines found"
             labels(2) = inter.labels(2)
         End Sub
     End Class
@@ -177,7 +177,7 @@ Namespace VBClasses
             desc = "Highlight the image differences after every quarter second."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskAlg.quarterBeat Then
+            If task.quarterBeat Then
                 diff.Run(src)
                 dst3 = diff.dst2
                 If diff.dst2.CountNonZero > 0 Then
@@ -187,7 +187,7 @@ Namespace VBClasses
                 End If
             End If
 
-            If taskAlg.heartBeat Then
+            If task.heartBeat Then
                 Static heartCount As Integer
                 heartCount += 1
                 If heartCount Mod 3 = 0 Then

@@ -18,11 +18,11 @@ Namespace VBClasses
             Return ptList
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If (standaloneTest() And taskAlg.heartBeat) Or (useRandomPoints And taskAlg.heartBeat) Then
+            If (standaloneTest() And task.heartBeat) Or (useRandomPoints And task.heartBeat) Then
                 random.Run(src)
                 dst2.SetTo(0)
                 For Each pt In random.PointList
-                    DrawCircle(dst2, pt, taskAlg.DotSize, white)
+                    DrawCircle(dst2, pt, task.DotSize, white)
                 Next
                 inputPoints = New List(Of cv.Point2f)(random.PointList)
             End If
@@ -100,10 +100,10 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours1.Run(src)
-            taskAlg.contourD = contours1.selectContour()
+            task.contourD = contours1.selectContour()
 
             dst2.SetTo(0)
-            dst2(taskAlg.contourD.rect).SetTo(255, taskAlg.contourD.mask)
+            dst2(task.contourD.rect).SetTo(255, task.contourD.mask)
             contours2.Run(dst2)
 
             dst3.SetTo(0)
@@ -112,7 +112,7 @@ Namespace VBClasses
                     hull = cv.Cv2.ConvexHull(contours1.sortContours.allContours(0), True).ToList
 
                     DrawTour(dst3, contours2.sortContours.allContours(0).ToList, white, -1)
-                    DrawTour(dst3, hull, white, taskAlg.lineWidth)
+                    DrawTour(dst3, hull, white, task.lineWidth)
                 End If
             End If
         End Sub

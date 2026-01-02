@@ -7,7 +7,7 @@ Namespace VBClasses
         Dim texturePop As Integer
         Public tChange As Boolean ' if the texture hasn't changed this will be false.
         Public Sub New()
-            taskAlg.gOptions.GridSlider.Value = Math.Min(dst2.Width \ 8, taskAlg.gOptions.GridSlider.Maximum)
+            task.gOptions.GridSlider.Value = Math.Min(dst2.Width \ 8, task.gOptions.GridSlider.Maximum)
 
             desc = "find the best sample 256x256 texture of a mask"
         End Sub
@@ -17,7 +17,7 @@ Namespace VBClasses
                 dst2 = ellipse.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 dst2 = dst2.ConvertScaleAbs(255)
                 dst3 = ellipse.dst2.Clone
-                dst3.SetTo(cv.Scalar.Yellow, taskAlg.gridMask)
+                dst3.SetTo(cv.Scalar.Yellow, task.gridMask)
             Else
                 dst2 = src
             End If
@@ -29,12 +29,12 @@ Namespace VBClasses
             End If
             If tChange Then
                 Dim sortcounts As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
-                For Each roi In taskAlg.gridRects
+                For Each roi In task.gridRects
                     sortcounts.Add(dst2(roi).CountNonZero, roi)
                 Next
                 If standaloneTest() Then dst3.Rectangle(sortcounts.ElementAt(0).Value, white, 2)
                 tRect = sortcounts.ElementAt(0).Value
-                texture = taskAlg.color(tRect)
+                texture = task.color(tRect)
                 texturePop = dst2(tRect).CountNonZero
             End If
             If standaloneTest() Then dst3.Rectangle(tRect, white, 2)

@@ -15,7 +15,7 @@ Namespace VBClasses
         Public terminateProducer As Boolean
         Public options As New Options_ProCon
         Public Sub New()
-            If taskAlg.testAllRunning = False Then
+            If task.testAllRunning = False Then
                 flow.parentData = Me
                 p = New Thread(AddressOf Producer)
                 p.Name = "Producer"
@@ -32,7 +32,7 @@ Namespace VBClasses
         End Function
         Public Sub Consumer()
             While 1
-                If taskAlg.frameCount < 0 Then Exit While
+                If task.frameCount < 0 Then Exit While
                 SyncLock mutex
                     head = success(head)
                     Dim item = options.buffer(head)
@@ -47,7 +47,7 @@ Namespace VBClasses
         End Sub
         Private Sub Producer()
             While 1
-                If taskAlg.frameCount < 0 Then Exit While
+                If task.frameCount < 0 Then Exit While
                 SyncLock mutex
                     tail = success(tail)
                     If options.buffer(tail) = -1 Then
@@ -61,7 +61,7 @@ Namespace VBClasses
             End While
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskAlg.testAllRunning Then
+            If task.testAllRunning Then
                 SetTrueText("ProCon_Basics is well-tested but threads hang around during overnight testing. " + vbCrLf + "Skipping for now...")
                 Exit Sub
             End If
@@ -96,11 +96,11 @@ Namespace VBClasses
         Dim frameCount As Integer
         Public Sub New()
             procon = New ProCon_Basics()
-            procon.terminateProducer = True ' we don't need a 2 producer taskAlg.  RunVB below provides the second thread.
+            procon.terminateProducer = True ' we don't need a 2 producer task.  RunVB below provides the second thread.
             desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskAlg.testAllRunning Then
+            If task.testAllRunning Then
                 SetTrueText("ProCon_Variation is well-tested but threads hang around during overnight testing. " + vbCrLf + "Skipping for now...")
                 Exit Sub
             End If

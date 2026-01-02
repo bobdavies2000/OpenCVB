@@ -2,16 +2,16 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class LineMatch_Basics : Inherits TaskParent
-        Public lpListLast As List(Of lpData) = New List(Of lpData)(taskAlg.lines.lpList)
+        Public lpListLast As List(Of lpData) = New List(Of lpData)(task.lines.lpList)
         Public lpList As New List(Of lpData)
         Public lpMatches As New List(Of lpData)
         Dim slices As New LineMatch_Slices
-        Public lpMapLast = taskAlg.lines.dst1.Clone
+        Public lpMapLast = task.lines.dst1.Clone
         Public Sub New()
             desc = "Match lines with image slices to locate the best matching line.  Confirm with angle."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskAlg.lines.lpList.Count <= 1 Then Exit Sub
+            If task.lines.lpList.Count <= 1 Then Exit Sub
 
             slices.Run(emptyMat)
 
@@ -21,9 +21,9 @@ Namespace VBClasses
             Dim missCount As Integer
             dst2.SetTo(0)
             dst3.SetTo(0)
-            For i = 0 To Math.Min(taskAlg.lines.lpList.Count, slices.xSlices.Count) - 1
-                Dim lp = taskAlg.lines.lpList(i)
-                Dim color = taskAlg.scalarColors(lp.index + 1)
+            For i = 0 To Math.Min(task.lines.lpList.Count, slices.xSlices.Count) - 1
+                Dim lp = task.lines.lpList(i)
+                Dim color = task.scalarColors(lp.index + 1)
 
                 For Each sliceSet In {slices.xSlices(i), slices.ySlices(i)}
                     Dim angleDelta As New List(Of Single)
@@ -42,8 +42,8 @@ Namespace VBClasses
                         If minAngleDelta < 5 Then ' within 5 degrees of the original line's angle
                             Dim index = lineIndex(angleDelta.IndexOf(minAngleDelta))
                             lpMatch = lpListLast(index)
-                            dst2.Line(lp.p1, lp.p2, color, taskAlg.lineWidth + 2, taskAlg.lineType)
-                            dst3.Line(lpMatch.p1, lpMatch.p2, color, taskAlg.lineWidth + 2, taskAlg.lineType)
+                            dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
+                            dst3.Line(lpMatch.p1, lpMatch.p2, color, task.lineWidth + 2, task.lineType)
                             lpList.Add(lp)
                             lpMatches.Add(lpMatch)
                         Else
@@ -55,12 +55,12 @@ Namespace VBClasses
                 Next
             Next
 
-            If taskAlg.heartBeat Then
+            If task.heartBeat Then
                 labels(2) = "Searching " + CStr(slices.lineMaxOffset) + " pixels around center "
                 labels(3) = CStr(lpMatches.Count) + " lines matched."
             End If
 
-            lpListLast = New List(Of lpData)(taskAlg.lines.lpList)
+            lpListLast = New List(Of lpData)(task.lines.lpList)
         End Sub
     End Class
 
@@ -72,29 +72,29 @@ Namespace VBClasses
     Public Class LineMatch_Tester : Inherits TaskParent
         Dim match As New LineMatch_Basics
         Public Sub New()
-            taskAlg.gOptions.DebugCheckBox.Checked = True
+            task.gOptions.DebugCheckBox.Checked = True
             desc = "Test the line match algorithm by just occasionally capturing the current state."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskAlg.lines.lpList.Count <= 1 Then Exit Sub
+            If task.lines.lpList.Count <= 1 Then Exit Sub
 
-            Static lpListLast As New List(Of lpData)(taskAlg.lines.lpList)
+            Static lpListLast As New List(Of lpData)(task.lines.lpList)
             Static srcLast = src.Clone
-            Static lpListTest As New List(Of lpData)(taskAlg.lines.lpList)
-            Static lpMapTest = taskAlg.lines.dst1.Clone
-            If taskAlg.optionsChanged Or taskAlg.gOptions.DebugCheckBox.Checked Then
-                lpListTest = New List(Of lpData)(taskAlg.lines.lpList)
-                lpMapTest = taskAlg.lines.dst1.Clone
+            Static lpListTest As New List(Of lpData)(task.lines.lpList)
+            Static lpMapTest = task.lines.dst1.Clone
+            If task.optionsChanged Or task.gOptions.DebugCheckBox.Checked Then
+                lpListTest = New List(Of lpData)(task.lines.lpList)
+                lpMapTest = task.lines.dst1.Clone
                 srcLast = src.Clone
             End If
 
-            ' taskAlg.gOptions.DebugCheckBox.Checked = taskAlg.heartBeatLT
+            ' task.gOptions.DebugCheckBox.Checked = task.heartBeatLT
 
             match.lpListLast = New List(Of lpData)(lpListTest)
             match.lpMapLast = lpMapTest.clone
-            match.Run(taskAlg.gray)
+            match.Run(task.gray)
 
-            If taskAlg.toggleOn Then
+            If task.toggleOn Then
                 dst2 = src
                 dst3 = srcLast.clone
             Else
@@ -103,18 +103,18 @@ Namespace VBClasses
             End If
             For i = 0 To match.lpList.Count - 1
                 Dim lp = match.lpList(i)
-                Dim color = taskAlg.scalarColors(lp.index + 1)
-                dst2.Line(lp.p1, lp.p2, color, taskAlg.lineWidth + 2, taskAlg.lineType)
-                dst2.Line(lp.p1, lp.p2, white, taskAlg.lineWidth, taskAlg.lineType)
+                Dim color = task.scalarColors(lp.index + 1)
+                dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
+                dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
 
                 lp = match.lpMatches(i)
-                dst3.Line(lp.p1, lp.p2, color, taskAlg.lineWidth + 2, taskAlg.lineType)
-                dst3.Line(lp.p1, lp.p2, white, taskAlg.lineWidth, taskAlg.lineType)
+                dst3.Line(lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
+                dst3.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
             Next
             labels(2) = match.labels(2)
             labels(3) = match.labels(3)
 
-            taskAlg.gOptions.DebugCheckBox.Checked = False
+            task.gOptions.DebugCheckBox.Checked = False
         End Sub
     End Class
 
@@ -155,15 +155,15 @@ Namespace VBClasses
             desc = "Build slices in X and Y from the previous image near the each line's center."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static lpMapLast As cv.Mat = taskAlg.lines.dst1.Clone
+            Static lpMapLast As cv.Mat = task.lines.dst1.Clone
 
             dst2.SetTo(0)
             xSlices.Clear()
             ySlices.Clear()
-            For i = 0 To Math.Min(taskAlg.lines.lpList.Count, 5) - 1
-                Dim lp = taskAlg.lines.lpList(i)
-                Dim color = taskAlg.scalarColors(lp.index + 1)
-                dst2.Line(lp.p1, lp.p2, color, taskAlg.lineWidth + 2, taskAlg.lineType)
+            For i = 0 To Math.Min(task.lines.lpList.Count, 5) - 1
+                Dim lp = task.lines.lpList(i)
+                Dim color = task.scalarColors(lp.index + 1)
+                dst2.Line(lp.p1, lp.p2, color, task.lineWidth + 2, task.lineType)
 
                 Dim ptMinX = New cv.Point(Math.Max(lp.ptCenter.X - lineMaxOffset, 0), lp.ptCenter.Y)
                 Dim ptMaxX = New cv.Point(Math.Min(lp.ptCenter.X + lineMaxOffset, dst2.Width), lp.ptCenter.Y)
@@ -171,7 +171,7 @@ Namespace VBClasses
                 Dim rX = New cv.Rect(ptMinX.X, lp.ptCenter.Y, ptMaxX.X - ptMinX.X, 1)
                 Dim SliceX(rX.Width - 1) As Byte
                 Marshal.Copy(lpMapLast(rX).Data, SliceX, 0, SliceX.Length)
-                dst2.Line(ptMinX, ptMaxX, white, taskAlg.lineWidth)
+                dst2.Line(ptMinX, ptMaxX, white, task.lineWidth)
 
                 xSlices.Add(SliceX.ToList)
 
@@ -181,12 +181,12 @@ Namespace VBClasses
                 Dim rY = New cv.Rect(lp.ptCenter.X, ptMinY.Y, 1, ptMaxY.Y - ptMinY.Y)
                 Dim SliceY(rY.Height - 1) As Byte
                 Marshal.Copy(lpMapLast(rY).Data, SliceY, 0, SliceY.Length)
-                dst2.Line(ptMinY, ptMaxY, white, taskAlg.lineWidth)
+                dst2.Line(ptMinY, ptMaxY, white, task.lineWidth)
 
                 ySlices.Add(SliceY.ToList)
             Next
 
-            lpMapLast = taskAlg.lines.dst1.Clone
+            lpMapLast = task.lines.dst1.Clone
         End Sub
     End Class
 

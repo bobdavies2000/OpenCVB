@@ -375,7 +375,7 @@ Namespace VBClasses
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Match Threshold %", 0, 100, matchThreshold * 100)
                 sliders.setupTrackBar("Max Y Delta % (of height)", 0, 10, maxYdelta * 100)
-                sliders.setupTrackBar("Min Size % of image size", 0, 20, taskAlg.cols * taskAlg.rows / 100)
+                sliders.setupTrackBar("Min Size % of image size", 0, 20, task.cols * task.rows / 100)
             End If
         End Sub
         Public Sub Run()
@@ -383,8 +383,8 @@ Namespace VBClasses
             Static ySlider = OptionParent.FindSlider("Max Y Delta % (of height)")
             Static minSlider = OptionParent.FindSlider("Min Size % of image size")
             matchThreshold = thresholdSlider.Value / 100
-            maxYdelta = ySlider.Value * taskAlg.rows / 100
-            minSize = minSlider.value * taskAlg.cols * taskAlg.rows / 100
+            maxYdelta = ySlider.Value * task.rows / 100
+            minSize = minSlider.value * task.cols * task.rows / 100
 
             Static frm = FindFrm(traceName + " Radio Buttons")
             For i = 0 To frm.check.Count - 1
@@ -719,7 +719,7 @@ Namespace VBClasses
             Static gradientCheck = FindCheckBox("Use Gradient in WarpInput")
             Static frm = FindFrm(traceName + " Radio Buttons")
 
-            If taskAlg.optionsChanged Then
+            If task.optionsChanged Then
                 options2.Run()
                 warpMode = options2.warpMode
                 useWarpAffine = options2.useWarpAffine
@@ -730,7 +730,7 @@ Namespace VBClasses
                 For i = 0 To frm.check.Count - 1
                     Dim nextRadio = frm.check(i)
                     If nextRadio.Checked Then
-                        Dim photo As New FileInfo(taskAlg.homeDir + "Data\Prokudin\" + nextRadio.Text)
+                        Dim photo As New FileInfo(task.homeDir + "Data\Prokudin\" + nextRadio.Text)
                         pkImage = cv.Cv2.ImRead(photo.FullName, cv.ImreadModes.Grayscale)
                         Exit For
                     End If
@@ -893,7 +893,7 @@ Namespace VBClasses
             Static sizeSlider = OptionParent.FindSlider("Buffer Size")
             Static proSlider = OptionParent.FindSlider("Producer Workload Duration (ms)")
             Static conSlider = OptionParent.FindSlider("Consumer Workload Duration (ms)")
-            If taskAlg.optionsChanged Then
+            If task.optionsChanged Then
                 bufferSize = sizeSlider.Value
                 pduration = proSlider.Value
                 cduration = conSlider.Value
@@ -1198,8 +1198,8 @@ Namespace VBClasses
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Sample Size", 200, 1000, 500)
-                sliders.setupTrackBar("Radius 1", 1, taskAlg.rows / 2, taskAlg.rows / 4)
-                sliders.setupTrackBar("Radius 2", 1, taskAlg.rows / 2, taskAlg.rows / 8)
+                sliders.setupTrackBar("Radius 1", 1, task.rows / 2, task.rows / 4)
+                sliders.setupTrackBar("Radius 2", 1, task.rows / 2, task.rows / 8)
                 sliders.setupTrackBar("nGenPer", 1, 500, 100)
             End If
             If check.Setup(traceName) Then
@@ -1223,17 +1223,17 @@ Namespace VBClasses
             Static demoCheck = FindCheckBox("Use demo mode")
 
             If demoCheck.Checked Then
-                If taskAlg.frameCount Mod 30 = 0 Then
+                If task.frameCount Mod 30 = 0 Then
                     If countSlider.Value < countSlider.Maximum - 17 Then countSlider.Value += 17 Else countSlider.Value = countSlider.Minimum
                     If r1Slider.Value < r1Slider.Maximum - 10 Then r1Slider.Value += 10 Else r1Slider.Value = 1
                     If r2Slider.Value > 13 Then r2Slider.Value -= 13 Else r2Slider.Value = r2Slider.Maximum
                     If nGenPerSlider.Value > 27 Then nGenPerSlider.Value -= 27 Else nGenPerSlider.Value = nGenPerSlider.Maximum
-                    fillColor = taskAlg.scalarColors(taskAlg.frameCount Mod 256)
+                    fillColor = task.scalarColors(task.frameCount Mod 256)
                 End If
-                If taskAlg.frameCount Mod 37 = 0 Then symCheck.Checked = Not symCheck.Checked
-                If taskAlg.frameCount Mod 222 = 0 Then fillCheck.Checked = Not fillCheck.Checked
-                If taskAlg.frameCount Mod 77 = 0 Then regularCheck.Checked = Not regularCheck.Checked
-                If taskAlg.frameCount Mod 100 = 0 Then reverseCheck.Checked = Not reverseCheck.Checked
+                If task.frameCount Mod 37 = 0 Then symCheck.Checked = Not symCheck.Checked
+                If task.frameCount Mod 222 = 0 Then fillCheck.Checked = Not fillCheck.Checked
+                If task.frameCount Mod 77 = 0 Then regularCheck.Checked = Not regularCheck.Checked
+                If task.frameCount Mod 100 = 0 Then reverseCheck.Checked = Not reverseCheck.Checked
                 rotateAngle += 1
             End If
 
@@ -1260,7 +1260,7 @@ Namespace VBClasses
         Public drawFill As Boolean = False
         Public Sub New()
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Clearance from image edge (margin size)", 5, taskAlg.cols / 8, saveMargin * 16)
+                sliders.setupTrackBar("Clearance from image edge (margin size)", 5, task.cols / 8, saveMargin * 16)
             End If
 
             If radio.Setup(traceName) Then
@@ -1411,7 +1411,7 @@ Namespace VBClasses
             Static nightCheck = FindCheckBox("KLT - Night Mode")
             Static deleteCheck = FindCheckBox("KLT - delete all Points")
 
-            If deleteCheck.Checked Or taskAlg.heartBeat Then
+            If deleteCheck.Checked Or task.heartBeat Then
                 ptInput = Nothing ' just delete all points and start again.
                 deleteCheck.Checked = False
             End If
@@ -1677,7 +1677,7 @@ Namespace VBClasses
             Static pointSlider = OptionParent.FindSlider("Points to use in Feature Poly")
             Static resyncSlider = OptionParent.FindSlider("Automatically resync after X frames")
             removeThreshold = thresholdSlider.Value
-            taskAlg.polyCount = pointSlider.Value
+            task.polyCount = pointSlider.Value
             autoResyncAfterX = resyncSlider.Value
         End Sub
     End Class
@@ -1743,7 +1743,7 @@ Namespace VBClasses
         Public count As Integer = 0
         Public Sub New()
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Random Pixel Count", 1, taskAlg.cols * taskAlg.rows, 20)
+                sliders.setupTrackBar("Random Pixel Count", 1, task.cols * task.rows, 20)
             End If
         End Sub
         Public Sub Run()
@@ -1949,8 +1949,8 @@ Namespace VBClasses
             f = fSlider.value
             distance = distanceSlider.value
 
-            Dim a(,) As Double = {{1, 0, -taskAlg.cols / 2},
-                                {0, 1, -taskAlg.rows / 2},
+            Dim a(,) As Double = {{1, 0, -task.cols / 2},
+                                {0, 1, -task.rows / 2},
                                 {0, 0, 0},
                                 {0, 0, 1}}
 
@@ -1974,8 +1974,8 @@ Namespace VBClasses
                                 {0, 0, 1, distance},
                                 {0, 0, 0, 1}}
 
-            Dim b(,) As Double = {{f, 0, taskAlg.cols / 2, 0},
-                                {0, f, taskAlg.rows / 2, 0},
+            Dim b(,) As Double = {{f, 0, task.cols / 2, 0},
+                                {0, f, task.rows / 2, 0},
                                 {0, 0, 1, 0}}
 
             Dim a1 = cv.Mat.FromPixelData(4, 3, cv.MatType.CV_64F, a)
@@ -2077,7 +2077,7 @@ Namespace VBClasses
         Public Sub New()
             Dim rightShift As Integer = 4
             Dim leftShift As Integer = 5
-            If taskAlg.settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then
+            If task.settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then
                 leftShift = 1
                 rightShift = 2
             End If
@@ -2089,8 +2089,8 @@ Namespace VBClasses
         Public Sub Run()
             Static leftSlider = OptionParent.FindSlider("Left translation percent")
             Static rightSlider = OptionParent.FindSlider("Right translation percent")
-            leftTrans = taskAlg.cols * leftSlider.value / 100
-            rightTrans = taskAlg.cols * rightSlider.value / 100
+            leftTrans = task.cols * leftSlider.value / 100
+            rightTrans = task.cols * rightSlider.value / 100
         End Sub
     End Class
 
@@ -2203,7 +2203,7 @@ Namespace VBClasses
             Static rightRadio = findRadio("Show Right intercepts")
 
             For selectedIntercept = 0 To 3
-                mouseMovePoint = Choose(selectedIntercept + 1, taskAlg.mouseMovePoint.X, taskAlg.mouseMovePoint.X, taskAlg.mouseMovePoint.Y, taskAlg.mouseMovePoint.Y)
+                mouseMovePoint = Choose(selectedIntercept + 1, task.mouseMovePoint.X, task.mouseMovePoint.X, task.mouseMovePoint.Y, task.mouseMovePoint.Y)
                 If Choose(selectedIntercept + 1, topRadio, botRadio, leftRadio, rightRadio).checked Then Exit For
             Next
         End Sub
@@ -2259,7 +2259,7 @@ Namespace VBClasses
             maxForegroundDepthInMeters = depthSlider.value / 1000
             minSizeContour = minSizeSlider.value
             numberOfRegions = regionSlider.value
-            depthPerRegion = taskAlg.MaxZmeters / numberOfRegions
+            depthPerRegion = task.MaxZmeters / numberOfRegions
         End Sub
     End Class
 
@@ -2275,7 +2275,7 @@ Namespace VBClasses
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Min Pixels", 1, 2000, 30)
-                sliders.setupTrackBar("Step Size", 1, taskAlg.cols / 2, stepSize)
+                sliders.setupTrackBar("Step Size", 1, task.cols / 2, stepSize)
             End If
             If FindFrm(traceName + " CheckBoxes") Is Nothing Then
                 check.Setup(traceName)
@@ -2557,7 +2557,7 @@ Namespace VBClasses
                 Case "Use RandomCenters"
                     kMeansFlag = cv.KMeansFlags.RandomCenters
                 Case "Use Initialized Labels"
-                    If taskAlg.optionsChanged Then kMeansFlag = cv.KMeansFlags.PpCenters Else kMeansFlag = cv.KMeansFlags.UseInitialLabels
+                    If task.optionsChanged Then kMeansFlag = cv.KMeansFlags.PpCenters Else kMeansFlag = cv.KMeansFlags.UseInitialLabels
             End Select
             kMeansK = kSlider.Value
         End Sub
@@ -2700,26 +2700,26 @@ Namespace VBClasses
         Public Sub Run()
             Static frmCheck = FindFrm(traceName + " CheckBoxes")
             Static frmRadio = FindFrm(traceName + " Radio Buttons")
-            If taskAlg.firstPass Or taskAlg.optionsChanged Then
-                frmCheck.Left = taskAlg.gOptions.Width / 2
-                frmCheck.top = taskAlg.gOptions.Height / 2
-                frmRadio.left = taskAlg.gOptions.Width * 2 / 3
-                frmRadio.top = taskAlg.gOptions.Height * 2 / 3
+            If task.firstPass Or task.optionsChanged Then
+                frmCheck.Left = task.gOptions.Width / 2
+                frmCheck.top = task.gOptions.Height / 2
+                frmRadio.left = task.gOptions.Width * 2 / 3
+                frmRadio.top = task.gOptions.Height * 2 / 3
             End If
 
-            If dst0Radio.Checked Then taskAlg.gifCaptureIndex = 0
-            If dst1Radio.Checked Then taskAlg.gifCaptureIndex = 1
-            If dst2Radio.Checked Then taskAlg.gifCaptureIndex = 2
-            If dst3Radio.Checked Then taskAlg.gifCaptureIndex = 3
-            If Opencvwindow.Checked Then taskAlg.gifCaptureIndex = 4
-            If OpenGLwindow.Checked Then taskAlg.gifCaptureIndex = 5
-            If EntireScreen.Checked Then taskAlg.gifCaptureIndex = 6
+            If dst0Radio.Checked Then task.gifCaptureIndex = 0
+            If dst1Radio.Checked Then task.gifCaptureIndex = 1
+            If dst2Radio.Checked Then task.gifCaptureIndex = 2
+            If dst3Radio.Checked Then task.gifCaptureIndex = 3
+            If Opencvwindow.Checked Then task.gifCaptureIndex = 4
+            If OpenGLwindow.Checked Then task.gifCaptureIndex = 5
+            If EntireScreen.Checked Then task.gifCaptureIndex = 6
 
             Static restartCheck = FindCheckBox("Optional: Restart - clear all previous images.")
             restartRequest = restartCheck.checked
             restartCheck.checked = False
 
-            taskAlg.optionsChanged = False
+            task.optionsChanged = False
         End Sub
     End Class
 
@@ -2738,7 +2738,7 @@ Namespace VBClasses
                 sliders.setupTrackBar("Rotate pointcloud around X-axis (degrees)", -90, 90, rotateX)
                 sliders.setupTrackBar("Rotate pointcloud around Y-axis (degrees)", -90, 90, rotateY)
                 sliders.setupTrackBar("Rotate pointcloud around Z-axis (degrees)", -90, 90, rotateZ)
-                sliders.setupTrackBar("IMU_Basics: Alpha X100", 0, 100, taskAlg.IMU_AlphaFilter * 100)
+                sliders.setupTrackBar("IMU_Basics: Alpha X100", 0, 100, task.IMU_AlphaFilter * 100)
                 sliders.setupTrackBar("IMU Stability Threshold (radians) X100", 0, 100, stableThreshold * 100)
             End If
         End Sub
@@ -2751,7 +2751,7 @@ Namespace VBClasses
             rotateX = xRotateSlider.value
             rotateY = yRotateSlider.value
             rotateZ = zRotateSlider.value
-            taskAlg.IMU_AlphaFilter = alphaSlider.value / 100
+            task.IMU_AlphaFilter = alphaSlider.value / 100
             stableThreshold = stabilitySlider.value / 100
         End Sub
     End Class
@@ -2831,7 +2831,7 @@ Namespace VBClasses
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Desired boundary count", 2, 100, desiredBoundaries)
-                sliders.setupTrackBar("Distance to next Peak (pixels)", 2, taskAlg.cols / 10, peakDistance)
+                sliders.setupTrackBar("Distance to next Peak (pixels)", 2, task.cols / 10, peakDistance)
             End If
         End Sub
         Public Sub Run()
@@ -2887,7 +2887,7 @@ Namespace VBClasses
         Public pass2Setting As Integer = 0
         Public graySetting As Boolean = False
         Public Sub New()
-            Select Case taskAlg.cols
+            Select Case task.cols
                 Case 1920
                     maxArea = 350000
                     minArea = 6000
@@ -2971,7 +2971,7 @@ Namespace VBClasses
         Public gapGray As Integer = 1
         Public sampleThreshold As Integer = 10
         Public Sub New()
-            taskAlg.redList = New XO_RedList_Basics
+            task.redList = New XO_RedList_Basics
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Gap in depth spectrum (cm's)", 1, 50, gapDepth)
                 sliders.setupTrackBar("Gap in gray spectrum", 1, 50, gapGray)
@@ -2984,9 +2984,9 @@ Namespace VBClasses
             Dim pixels As New List(Of Integer)
             Dim counts As New List(Of Integer)
 
-            Dim rc = taskAlg.oldrcD
+            Dim rc = task.oldrcD
             Dim mask = rc.mask.Clone
-            mask.SetTo(0, taskAlg.noDepthMask(rc.rect))
+            mask.SetTo(0, task.noDepthMask(rc.rect))
             For y = 0 To input.Height - 1
                 For x = 0 To input.Width - 1
                     If mask.Get(Of Byte)(y, x) > 0 Then
@@ -3059,7 +3059,7 @@ Namespace VBClasses
             Dim pixels As New List(Of Integer)
             Dim counts As New List(Of Integer)
 
-            Dim rc = taskAlg.oldrcD
+            Dim rc = task.oldrcD
             For y = 0 To input.Height - 1
                 For x = 0 To input.Width - 1
                     If rc.mask.Get(Of Byte)(y, x) > 0 Then
@@ -3126,7 +3126,7 @@ Namespace VBClasses
             Return ranges
         End Function
         Public Sub Run()
-            If taskAlg.firstPass Then taskAlg.redList.Run(taskAlg.color)
+            If task.firstPass Then task.redList.Run(task.color)
             Static frmSliders = FindFrm("Options_Spectrum Sliders")
             Static gapDSlider = OptionParent.FindSlider("Gap in depth spectrum (cm's)")
             Static gapGSlider = OptionParent.FindSlider("Gap in gray spectrum")
@@ -3135,9 +3135,9 @@ Namespace VBClasses
             gapGray = gapGSlider.value
             sampleThreshold = countSlider.value
 
-            If taskAlg.firstPass Then
-                frmSliders.Left = taskAlg.gOptions.Width / 2
-                frmSliders.top = taskAlg.gOptions.Height / 2
+            If task.firstPass Then
+                frmSliders.Left = task.gOptions.Width / 2
+                frmSliders.top = task.gOptions.Height / 2
             End If
         End Sub
     End Class
@@ -3178,9 +3178,9 @@ Namespace VBClasses
         Public filenames As List(Of String)
         Public plotColor As cv.Scalar = New cv.Scalar(255, 255, 0)
         Public Sub New()
-            Dim fnames = Directory.GetFiles(taskAlg.homeDir + "Complexity")
+            Dim fnames = Directory.GetFiles(task.homeDir + "Complexity")
             filenames = fnames.ToList
-            Dim latestFile = Directory.GetFiles(taskAlg.homeDir + "Complexity").OrderByDescending(
+            Dim latestFile = Directory.GetFiles(task.homeDir + "Complexity").OrderByDescending(
                         Function(f) New FileInfo(f).LastWriteTime).First()
             If FindFrm(traceName + " Radio Buttons") Is Nothing Then
                 radio.Setup(traceName)
@@ -3207,14 +3207,14 @@ Namespace VBClasses
             Static frm = FindFrm(traceName + " Radio Buttons")
             For i = 0 To frm.check.count - 1
                 If frm.check(i).checked Then
-                    filename = New FileInfo(taskAlg.homeDir + "Complexity/" + frm.check(i).text)
+                    filename = New FileInfo(task.homeDir + "Complexity/" + frm.check(i).text)
                     plotColor = Choose((i + 1) Mod 4, cv.Scalar.White, cv.Scalar.Red, cv.Scalar.Green, cv.Scalar.Yellow)
                     Exit For
                 End If
             Next
-            If taskAlg.firstPass Then
-                frm.Left = taskAlg.gOptions.Width / 2
-                frm.top = taskAlg.gOptions.Height / 2
+            If task.firstPass Then
+                frm.Left = task.gOptions.Width / 2
+                frm.top = task.gOptions.Height / 2
             End If
         End Sub
     End Class
@@ -3300,7 +3300,7 @@ Namespace VBClasses
         Public methodName As String = "Normal Bayes (NBC)"
         Public sampleCount As Integer = 200
         Public Sub New()
-            If sliders.Setup(traceName) Then sliders.setupTrackBar("Random Samples", 10, taskAlg.cols * taskAlg.rows, sampleCount)
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Random Samples", 10, task.cols * task.rows, sampleCount)
 
             If FindFrm(traceName + " Radio Buttons") Is Nothing Then
                 radio.Setup(traceName)
@@ -3325,9 +3325,9 @@ Namespace VBClasses
                     Exit For
                 End If
             Next
-            If taskAlg.firstPass Then
-                frm.Left = taskAlg.gOptions.Width / 2
-                frm.top = taskAlg.gOptions.Height / 2
+            If task.firstPass Then
+                frm.Left = task.gOptions.Width / 2
+                frm.top = task.gOptions.Height / 2
             End If
 
             sampleCount = inputSlider.value
@@ -3368,7 +3368,7 @@ Namespace VBClasses
             End If
         End Sub
         Public Sub Run()
-            If taskAlg.firstPass Then  ' special case!  Can't run it in constructor or measurements fail...
+            If task.firstPass Then  ' special case!  Can't run it in constructor or measurements fail...
                 gradient.Run(emptyMat)
                 dst2 = gradient.dst2
             End If
@@ -3520,8 +3520,8 @@ Namespace VBClasses
             End If
         End Sub
         Public Sub Run()
-            If taskAlg.firstPass Then  ' special case!  Can't run it in constructor or measurements fail...
-                gradient.Run(taskAlg.color.Clone)
+            If task.firstPass Then  ' special case!  Can't run it in constructor or measurements fail...
+                gradient.Run(task.color.Clone)
                 dst2 = gradient.dst2
             End If
 
@@ -3587,8 +3587,8 @@ Namespace VBClasses
         Public dftFlag As cv.DftFlags = cv.DftFlags.ComplexOutput
         Public Sub New()
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("DFT B Filter - Radius", 1, taskAlg.rows, radius)
-                sliders.setupTrackBar("DFT B Filter - Order", 1, taskAlg.rows, order)
+                sliders.setupTrackBar("DFT B Filter - Radius", 1, task.rows, radius)
+                sliders.setupTrackBar("DFT B Filter - Order", 1, task.rows, order)
             End If
             If radio.Setup(traceName) Then
                 radio.addRadio("DFT Flags ComplexOutput")
@@ -3879,12 +3879,12 @@ Namespace VBClasses
             If FindFrm(traceName + " CheckBox Options") Is Nothing Then
                 check.Setup(traceName)
                 check.addCheckBox("Display cluster colors")
-                check.addCheckBox("Use taskAlg.pointCloud")
+                check.addCheckBox("Use task.pointCloud")
             End If
         End Sub
         Public Sub Run()
             Static colorCheck = FindCheckBox("Display cluster colors")
-            Static cloudCheck = FindCheckBox("Use taskAlg.pointCloud")
+            Static cloudCheck = FindCheckBox("Use task.pointCloud")
             useClusterColors = colorCheck.checked
             useTaskPointCloud = cloudCheck.checked
         End Sub
@@ -3910,8 +3910,8 @@ Namespace VBClasses
             Static hSlider = OptionParent.FindSlider("Character height in pixels")
             Static wSlider = OptionParent.FindSlider("Character width in pixels")
 
-            hStep = taskAlg.rows \ hSlider.value
-            wStep = taskAlg.cols \ wSlider.value
+            hStep = task.rows \ hSlider.value
+            wStep = task.cols \ wSlider.value
             size = New cv.Size(CInt(wSlider.value), CInt(hSlider.value))
         End Sub
     End Class
@@ -3940,8 +3940,8 @@ Namespace VBClasses
             End If
         End Sub
         Public Sub Run()
-            Dim w = taskAlg.cols
-            Dim h = taskAlg.rows
+            Dim w = task.cols
+            Dim h = task.rows
             Static radioChoices() As cv.Vec3i = {New cv.Vec3i(1, w, h), New cv.Vec3i(2, w / 2, h), New cv.Vec3i(4, w / 2, h / 2),
                         New cv.Vec3i(8, w / 4, h / 2), New cv.Vec3i(16, w / 4, h / 4), New cv.Vec3i(32, w / 8, h / 4),
                         New cv.Vec3i(32, w / 8, h / 8), New cv.Vec3i(1, w, h), New cv.Vec3i(2, w / 2, h), New cv.Vec3i(4, w / 2, h / 2),
@@ -4034,14 +4034,14 @@ Namespace VBClasses
             Static frameSlider = OptionParent.FindSlider("Frame Count Cycle")
             Static percentSlider = OptionParent.FindSlider("Percent of Blurring")
 
-            If taskAlg.optionsChanged Then
+            If task.optionsChanged Then
                 savePercent = percentSlider.Value
                 nextPercent = savePercent
             End If
 
             frameCycle = frameSlider.value
             reduction = reductionSlider.value / 100
-            kernelSize = nextPercent \ 100 * taskAlg.cols Or 1
+            kernelSize = nextPercent \ 100 * task.cols Or 1
         End Sub
     End Class
 
@@ -4076,11 +4076,11 @@ Namespace VBClasses
         Public Sub New()
             Dim alphaDefault = 2000
             Dim betaDefault = -100
-            If taskAlg.settings.cameraName = "Oak-D camera" Then
+            If task.settings.cameraName = "Oak-D camera" Then
                 alphaDefault = 500
                 betaDefault = 0
             End If
-            If taskAlg.settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then alphaDefault = 1500
+            If task.settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then alphaDefault = 1500
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Alpha (contrast)", 0, 10000, alphaDefault)
                 sliders.setupTrackBar("Beta (brightness)", -127, 127, betaDefault)
@@ -4265,12 +4265,12 @@ Namespace VBClasses
     Public Class Options_EmaxInputClusters : Inherits OptionParent
         Public samplesPerRegion As Integer = 10
         Public sigma As Integer = 10
-        Public emaxCellSize As Integer = taskAlg.workRes.Width \ 3
+        Public emaxCellSize As Integer = task.workRes.Width \ 3
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("EMax Number of Samples per region", 1, 20, samplesPerRegion)
                 sliders.setupTrackBar("EMax Sigma (spread)", 1, 100, sigma)
-                sliders.setupTrackBar("EMax Cell Size", 1, taskAlg.workRes.Width, emaxCellSize)
+                sliders.setupTrackBar("EMax Cell Size", 1, task.workRes.Width, emaxCellSize)
             End If
         End Sub
         Public Sub Run()
@@ -4341,7 +4341,7 @@ Namespace VBClasses
         End Sub
         Public Sub Run()
             Static rowRadio = findRadio("BackProject Row")
-            If taskAlg.mouseClickFlag Then rowRadio.checked = Not rowRadio.checked
+            If task.mouseClickFlag Then rowRadio.checked = Not rowRadio.checked
             backProjectRow = rowRadio.checked
         End Sub
     End Class
@@ -4859,7 +4859,7 @@ Namespace VBClasses
             scaleMax = scaleSlider.maximum
             meanValue = meanSlider.value
 
-            superResModelFileName = taskAlg.homeDir + "Data/DNN_SuperResModels/"
+            superResModelFileName = task.homeDir + "Data/DNN_SuperResModels/"
             Static frm = FindFrm(traceName + " Radio Buttons")
             Dim index = findRadioIndex(frm.check)
             If radio.check(index).Checked Then
@@ -4974,7 +4974,7 @@ Namespace VBClasses
                 sliders.setupTrackBar("Deriche Omega X1000", 1, 1000, omega)
                 sliders.setupTrackBar("Output filter threshold", 0, 255, threshold)
                 sliders.setupTrackBar("Input pixel distance", 0, 20, gapDistance)
-                sliders.setupTrackBar("Input pixel difference", 0, 50, If(taskAlg.cols = 640, gapdiff, 20))
+                sliders.setupTrackBar("Input pixel difference", 0, 50, If(task.cols = 640, gapdiff, 20))
             End If
         End Sub
         Public Sub Run()
@@ -5395,14 +5395,14 @@ Namespace VBClasses
         Public fullsizeImage As cv.Mat
         Public Sub New()
             fileNameForm = New OptionsFileName
-            dirName = taskAlg.homeDir + "Images/train"
+            dirName = task.homeDir + "Images/train"
             fileNameForm.OpenFileDialog1.InitialDirectory = dirName
             fileNameForm.OpenFileDialog1.FileName = "*.*"
             fileNameForm.OpenFileDialog1.CheckFileExists = False
             fileNameForm.OpenFileDialog1.Filter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
             fileNameForm.OpenFileDialog1.FilterIndex = 1
-            fileNameForm.filename.Text = taskAlg.settings.Image_Basics_Name
-            If fileNameForm.filename.Text = "" Then fileNameForm.filename.Text = taskAlg.homeDir + "Images/train/2092.jpg"
+            fileNameForm.filename.Text = task.settings.Image_Basics_Name
+            If fileNameForm.filename.Text = "" Then fileNameForm.filename.Text = task.homeDir + "Images/train/2092.jpg"
             fileNameForm.Text = "Select an image file for use in Opencv"
             fileNameForm.FileNameLabel.Text = "Select a file."
             fileNameForm.PlayButton.Hide()
@@ -5423,7 +5423,7 @@ Namespace VBClasses
         End Sub
         Public Sub Run()
             Static nextCheck = FindCheckBox("Load the next image")
-            If (taskAlg.heartBeat And imageSeries) Or fullsizeImage Is Nothing Then nextCheck.checked = True
+            If (task.heartBeat And imageSeries) Or fullsizeImage Is Nothing Then nextCheck.checked = True
             If nextCheck.checked = True Then
                 If nextCheck.checked Then fileIndex += 1
                 If fileIndex >= fileNameList.Count Then fileIndex = 0
@@ -5530,7 +5530,7 @@ Namespace VBClasses
 
             If matrix.Count > 0 Then
                 Const MAX_INPUT = 20
-                matrix(taskAlg.frameCount Mod MAX_INPUT) = kalmanInput
+                matrix(task.frameCount Mod MAX_INPUT) = kalmanInput
                 Dim AverageOutput = (cv.Mat.FromPixelData(MAX_INPUT, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean()(0)
 
                 If AverageOutput < 0 Then AverageOutput = 0
@@ -5666,7 +5666,7 @@ Namespace VBClasses
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Slice Starting Y", 0, 300, sliceY)
-                sliders.setupTrackBar("Slice Height", 1, (taskAlg.rows - 10) / 2, sliceHeight)
+                sliders.setupTrackBar("Slice Height", 1, (task.rows - 10) / 2, sliceHeight)
             End If
         End Sub
         Public Sub Run()
@@ -5858,13 +5858,13 @@ Namespace VBClasses
         Public radius As Integer = 0
         Public schemes() As FileInfo
         Public Sub New()
-            radius = taskAlg.cols / 2
+            radius = task.cols / 2
             If (sliders.Setup(traceName)) Then
                 sliders.setupTrackBar("Color transitions", 1, 255, transitions)
                 sliders.setupTrackBar("Convert And Scale", 0, 100, convertScale)
-                sliders.setupTrackBar("LinearPolar radius", 0, taskAlg.cols, radius)
+                sliders.setupTrackBar("LinearPolar radius", 0, task.cols, radius)
             End If
-            Dim dirInfo = New DirectoryInfo(taskAlg.homeDir + "Data")
+            Dim dirInfo = New DirectoryInfo(task.homeDir + "Data")
             schemes = dirInfo.GetFiles("scheme*.jpg")
             If FindFrm(traceName + " Radio Buttons") Is Nothing Then
                 radio.Setup(traceName)
@@ -5921,7 +5921,7 @@ Namespace VBClasses
             Static initCheck = FindCheckBox("Reset initial conditions")
             Static timeSlider = OptionParent.FindSlider("Pendulum FPS")
             If initCheck.checked Then initCheck.checked = False
-            If taskAlg.firstPass Then check.Box(0).Checked = True
+            If task.firstPass Then check.Box(0).Checked = True
             fps = timeSlider.value
         End Sub
     End Class
@@ -5973,13 +5973,13 @@ Namespace VBClasses
         Public saveFileName As String = ""
         Public Sub New()
             fileNameForm = New OptionsFileName
-            fileNameForm.OpenFileDialog1.InitialDirectory = taskAlg.homeDir + "temp"
+            fileNameForm.OpenFileDialog1.InitialDirectory = task.homeDir + "temp"
             fileNameForm.OpenFileDialog1.FileName = "*.*"
             fileNameForm.OpenFileDialog1.CheckFileExists = False
             fileNameForm.OpenFileDialog1.Filter = "ply (*.ply)|*.ply|All files (*.*)|*.*"
             fileNameForm.OpenFileDialog1.FilterIndex = 1
-            fileNameForm.filename.Text = taskAlg.settings.plyFileName
-            If fileNameForm.filename.Text = "" Then fileNameForm.filename.Text = taskAlg.homeDir + "temp\pointcloud.ply"
+            fileNameForm.filename.Text = task.settings.plyFileName
+            If fileNameForm.filename.Text = "" Then fileNameForm.filename.Text = task.homeDir + "temp\pointcloud.ply"
 
             fileNameForm.Text = "Select ply output file"
             fileNameForm.FileNameLabel.Text = "Select ply output file"
@@ -5989,18 +5989,18 @@ Namespace VBClasses
             fileNameForm.Show()
         End Sub
         Public Sub Run()
-            If taskAlg.firstPass Then fileNameForm.Left = taskAlg.gOptions.Width / 3
+            If task.firstPass Then fileNameForm.Left = task.gOptions.Width / 3
             playButton = fileNameForm.PlayButton.Text
             fileName = fileNameForm.filename.Text
 
             Dim testDir = New FileInfo(fileNameForm.filename.Text)
             If testDir.Directory.Exists = False Then
-                fileNameForm.filename.Text = taskAlg.homeDir + "Temp\pointcloud.ply"
+                fileNameForm.filename.Text = task.homeDir + "Temp\pointcloud.ply"
                 If testDir.Directory.Name = "Temp" Then MkDir(testDir.Directory.FullName)
             End If
 
             If saveFileName <> fileName And fileName.Length > 0 Then
-                taskAlg.Settings.plyFileName = fileName
+                task.Settings.plyFileName = fileName
                 saveFileName = fileName
             End If
         End Sub
@@ -6245,7 +6245,7 @@ Namespace VBClasses
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("DrawCount", 0, 20, drawCount)
-                sliders.setupTrackBar("Merge rectangles within X pixels", 0, taskAlg.cols, If(taskAlg.cols = 1280, proximity * 2, proximity))
+                sliders.setupTrackBar("Merge rectangles within X pixels", 0, task.cols, If(task.cols = 1280, proximity * 2, proximity))
             End If
 
             If check.Setup(traceName) Then
@@ -6448,8 +6448,8 @@ Namespace VBClasses
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Max % of lost pixels before reseting image", 0, 100, lostMax * 100)
-                sliders.setupTrackBar("Width of input to matchtemplate", 10, taskAlg.cols - pad, width)
-                sliders.setupTrackBar("Height of input to matchtemplate", 10, taskAlg.rows - pad, height)
+                sliders.setupTrackBar("Width of input to matchtemplate", 10, task.cols - pad, width)
+                sliders.setupTrackBar("Height of input to matchtemplate", 10, task.rows - pad, height)
                 sliders.setupTrackBar("Min stdev in correlation rect", 1, 50, minStdev)
                 sliders.setupTrackBar("Stabilizer Correlation Threshold X1000", 0, 1000, corrThreshold * 1000)
             End If
@@ -6479,12 +6479,12 @@ Namespace VBClasses
         Public width As Integer = 0
         Public height As Integer = 0
         Public Sub New()
-            width = taskAlg.cols / 2
-            height = taskAlg.rows / 2
+            width = task.cols / 2
+            height = task.rows / 2
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Number of random images", 10, 50, 10)
-                sliders.setupTrackBar("Rectangle width", taskAlg.cols / 4, taskAlg.cols - 1, width)
-                sliders.setupTrackBar("Rectangle height", taskAlg.rows / 4, taskAlg.rows - 1, height)
+                sliders.setupTrackBar("Rectangle width", task.cols / 4, task.cols - 1, width)
+                sliders.setupTrackBar("Rectangle height", task.rows / 4, task.rows - 1, height)
             End If
         End Sub
         Public Sub Run()
@@ -6782,8 +6782,8 @@ Namespace VBClasses
                 sliders.setupTrackBar("Resize Percent", 50, 1000, resizeFactor * 100)
                 sliders.setupTrackBar("Angle", -180, 180, angle)
                 sliders.setupTrackBar("Scale Factor% (100% means no scaling)", 1, 100, scale * 100)
-                sliders.setupTrackBar("Rotation center X", 1, taskAlg.cols, taskAlg.cols / 2)
-                sliders.setupTrackBar("Rotation center Y", 1, taskAlg.rows, taskAlg.rows / 2)
+                sliders.setupTrackBar("Rotation center X", 1, task.cols, task.cols / 2)
+                sliders.setupTrackBar("Rotation center Y", 1, task.rows, task.rows / 2)
             End If
             If check.Setup(traceName) Then
                 check.addCheckBox("Check to snap the first point cloud")
@@ -6850,14 +6850,14 @@ Namespace VBClasses
         Public maxFrames As Integer = 1000
         Public currFrame As Integer = 0
         Public Sub New()
-            fileInfo = New FileInfo(taskAlg.homeDir + "Data\CarsDrivingUnderBridge.mp4")
+            fileInfo = New FileInfo(task.homeDir + "Data\CarsDrivingUnderBridge.mp4")
             fileNameForm = New OptionsFileName
-            fileNameForm.OpenFileDialog1.InitialDirectory = taskAlg.homeDir + "Data\"
+            fileNameForm.OpenFileDialog1.InitialDirectory = task.homeDir + "Data\"
             fileNameForm.OpenFileDialog1.FileName = "*.mp4"
             fileNameForm.OpenFileDialog1.CheckFileExists = False
             fileNameForm.OpenFileDialog1.Filter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
             fileNameForm.OpenFileDialog1.FilterIndex = 1
-            fileNameForm.filename.Text = taskAlg.settings.VideoFileName
+            fileNameForm.filename.Text = task.settings.VideoFileName
             If fileNameForm.filename.Text = "" Then fileNameForm.filename.Text = fileInfo.FullName
             fileNameForm.Text = "Select a video file for input"
             fileNameForm.FileNameLabel.Text = "Select a video file for input"
@@ -6868,7 +6868,7 @@ Namespace VBClasses
             fileNameForm.filename.Text = fileInfo.FullName
         End Sub
         Public Sub Run()
-            If taskAlg.optionsChanged Then
+            If task.optionsChanged Then
                 maxFrames = 1000
                 currFrame = 0
                 If fileNameForm.newFileName Then fileInfo = New FileInfo(fileNameForm.filename.Text)
@@ -6908,12 +6908,12 @@ Namespace VBClasses
         Public height As Integer = 0
         Public angle As Integer = 0
         Public Sub New()
-            width = taskAlg.cols - 50
-            height = taskAlg.rows - 50
+            width = task.cols - 50
+            height = task.rows - 50
             angle = 0
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Warped Width", 0, taskAlg.cols, width)
-                sliders.setupTrackBar("Warped Height", 0, taskAlg.rows, height)
+                sliders.setupTrackBar("Warped Width", 0, task.cols, width)
+                sliders.setupTrackBar("Warped Height", 0, task.rows, height)
                 sliders.setupTrackBar("Warped Angle", 0, 360, angle)
             End If
         End Sub
@@ -6959,7 +6959,7 @@ Namespace VBClasses
         Public Sub New()
             If FindFrm(traceName + " CheckBox Options") Is Nothing Then
                 check.Setup(traceName)
-                For Each alg In taskAlg.featureOptions.colorMethods
+                For Each alg In task.featureOptions.colorMethods
                     check.addCheckBox(alg)
                 Next
                 check.Box(4).Checked = True
@@ -7045,7 +7045,7 @@ Namespace VBClasses
         Public Sub Run()
             Static frm = FindFrm(traceName + " Radio Buttons")
             ML_Name = frm.check(findRadioIndex(frm.check)).Text
-            If taskAlg.frameCount < 100 Or taskAlg.optionsChanged Then frm.left = taskAlg.gOptions.Width / 2 + 10
+            If task.frameCount < 100 Or task.optionsChanged Then frm.left = task.gOptions.Width / 2 + 10
         End Sub
     End Class
 
@@ -7285,8 +7285,8 @@ Namespace VBClasses
 
             Dim offsetX As Integer = If(horizontalDerivative, 1, 0)
             Dim offsetY As Integer = If(verticalDerivative, 1, 0)
-            rect1 = New cv.Rect(0, 0, taskAlg.cols - offsetX, taskAlg.rows - offsetY)
-            rect2 = New cv.Rect(offsetX, offsetY, taskAlg.cols - offsetX, taskAlg.rows - offsetY)
+            rect1 = New cv.Rect(0, 0, task.cols - offsetX, task.rows - offsetY)
+            rect2 = New cv.Rect(offsetX, offsetY, task.cols - offsetX, task.rows - offsetY)
         End Sub
     End Class
 
@@ -7301,8 +7301,8 @@ Namespace VBClasses
         Public height As Integer = 8
         Public Sub New()
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("brick Width", 1, taskAlg.cols, width)
-                sliders.setupTrackBar("brick Height", 1, taskAlg.rows, height)
+                sliders.setupTrackBar("brick Width", 1, task.cols, width)
+                sliders.setupTrackBar("brick Height", 1, task.rows, height)
             End If
         End Sub
         Public Sub Run()
@@ -7386,7 +7386,7 @@ Namespace VBClasses
                 sliders.setupTrackBar("OpenGL yaw (degrees)", -180, 180, yaw)
                 sliders.setupTrackBar("OpenGL pitch (degrees)", -180, 180, pitch)
                 sliders.setupTrackBar("OpenGL roll (degrees)", -180, 180, roll)
-                If taskAlg.settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then
+                If task.settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i" Then
                     OptionParent.FindSlider("OpenGL yaw (degrees)").Value = 135
                 End If
             End If
@@ -7666,8 +7666,8 @@ Namespace VBClasses
             Dim pt As cv.Point2f
             numPoints = numSlider.Value
             For i = 0 To numPoints - 1
-                pt.X = msRNG.Next(taskAlg.cols / 2 - minSize, taskAlg.cols / 2 + minSize)
-                pt.Y = msRNG.Next(taskAlg.rows / 2 - minSize, taskAlg.rows / 2 + minSize)
+                pt.X = msRNG.Next(task.cols / 2 - minSize, task.cols / 2 + minSize)
+                pt.Y = msRNG.Next(task.rows / 2 - minSize, task.rows / 2 + minSize)
                 srcPoints.Add(pt)
             Next
         End Sub
@@ -7686,7 +7686,7 @@ Namespace VBClasses
                 check.addCheckBox("Use Non-Max = True")
                 check.Box(0).Checked = True
             End If
-            If taskAlg.cols >= 640 Then FASTthreshold = 30
+            If task.cols >= 640 Then FASTthreshold = 30
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Fast Threshold", 0, 100, FASTthreshold)
             End If
@@ -7842,7 +7842,7 @@ Namespace VBClasses
         Public minDistance As Integer = 25
         Public Sub New()
             If sliders.Setup(traceName) Then
-                If taskAlg.cols <= 336 Then minDistance = 10 ' small image, small distances
+                If task.cols <= 336 Then minDistance = 10 ' small image, small distances
                 sliders.setupTrackBar("Min Distance", 0, 100, minDistance)
                 sliders.setupTrackBar("Depth Difference Threshold (mm)", 1, 1000, 100)
                 sliders.setupTrackBar("Quality Level", 1, 100, quality * 100)
@@ -7867,7 +7867,7 @@ Namespace VBClasses
             Static thresholdSlider = FindSlider("Threshold for EndPoint comparisons")
             pixelThreshold = thresholdSlider.value
 
-            taskAlg.depthDiffMeters = diffSlider.value / 1000
+            task.depthDiffMeters = diffSlider.value / 1000
             minDistance = minSlider.value
         End Sub
     End Class
@@ -7921,14 +7921,14 @@ Namespace VBClasses
             End If
             If sliders.Setup(traceName) Then
                 ' Reduction target depends on resolution.  Default is set in GlobalOptions.vb.
-                sliders.setupTrackBar("Reduction Target", 1, 1000, taskAlg.reductionTarget)
+                sliders.setupTrackBar("Reduction Target", 1, 1000, task.reductionTarget)
             End If
         End Sub
         Public Sub Run()
             Static redSlider = FindSlider("Reduction Target")
-            Dim lastTarget = taskAlg.reductionTarget
-            taskAlg.reductionTarget = redSlider.value
-            If lastTarget <> taskAlg.reductionTarget Then taskAlg.optionsChanged = False
+            Dim lastTarget = task.reductionTarget
+            task.reductionTarget = redSlider.value
+            If lastTarget <> task.reductionTarget Then task.optionsChanged = False
 
 
             Static PrepXBox = FindCheckBox("Prep Edges in X")
@@ -7955,12 +7955,12 @@ Namespace VBClasses
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Histogram threshold", 0, 1000, threshold)
-                sliders.setupTrackBar("Histogram X bins", 1, taskAlg.cols, xBins)
-                sliders.setupTrackBar("Histogram Y bins", 1, taskAlg.rows, yBins)
+                sliders.setupTrackBar("Histogram X bins", 1, task.cols, xBins)
+                sliders.setupTrackBar("Histogram Y bins", 1, task.rows, yBins)
                 sliders.setupTrackBar("Histogram Z bins", 1, 200, zBins)
             End If
 
-            Select Case taskAlg.cols
+            Select Case task.cols
                 Case 640
                     OptionParent.FindSlider("Histogram threshold").Value = 200
                 Case 320
@@ -7984,97 +7984,97 @@ Namespace VBClasses
         Public Shared Sub setupCalcHist()
             ' The specification for each camera spells out the FOV angle
             ' The sliders adjust the depth data histogram to fill the frustrum which is built from the specification FOV
-            Select Case taskAlg.settings.cameraName
+            Select Case task.settings.cameraName
                 Case "Intel(R) RealSense(TM) Depth Camera 435i"
-                    If taskAlg.workRes.Height = 480 Or taskAlg.workRes.Height = 240 Or taskAlg.workRes.Height = 120 Then
-                        taskAlg.xRange = 1.38
-                        taskAlg.yRange = 1.0
+                    If task.workRes.Height = 480 Or task.workRes.Height = 240 Or task.workRes.Height = 120 Then
+                        task.xRange = 1.38
+                        task.yRange = 1.0
                     Else
-                        taskAlg.xRange = 2.5
-                        taskAlg.yRange = 0.8
+                        task.xRange = 2.5
+                        task.yRange = 0.8
                     End If
                 Case "Intel(R) RealSense(TM) Depth Camera 455", ""
-                    If taskAlg.workRes.Height = 480 Or taskAlg.workRes.Height = 240 Or taskAlg.workRes.Height = 120 Then
-                        taskAlg.xRange = 2.04
-                        taskAlg.yRange = 2.14
+                    If task.workRes.Height = 480 Or task.workRes.Height = 240 Or task.workRes.Height = 120 Then
+                        task.xRange = 2.04
+                        task.yRange = 2.14
                     Else
-                        taskAlg.xRange = 3.22
-                        taskAlg.yRange = 1.39
+                        task.xRange = 3.22
+                        task.yRange = 1.39
                     End If
                 Case "StereoLabs ZED 2/2i"
-                    taskAlg.xRange = 4
-                    taskAlg.yRange = 1.5
+                    task.xRange = 4
+                    task.yRange = 1.5
                 Case "Oak-D camera"
-                    taskAlg.xRange = 4.07
-                    taskAlg.yRange = 1.32
+                    task.xRange = 4.07
+                    task.yRange = 1.32
                 Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
-                    taskAlg.xRange = 3.5
-                    taskAlg.yRange = 1.5
+                    task.xRange = 3.5
+                    task.yRange = 1.5
             End Select
 
-            taskAlg.xRangeDefault = taskAlg.xRange
-            taskAlg.yRangeDefault = taskAlg.yRange
+            task.xRangeDefault = task.xRange
+            task.yRangeDefault = task.yRange
 
-            taskAlg.sideCameraPoint = New cv.Point(0, taskAlg.workRes.Height \ 2)
-            taskAlg.topCameraPoint = New cv.Point(taskAlg.workRes.Width \ 2, 0)
+            task.sideCameraPoint = New cv.Point(0, task.workRes.Height \ 2)
+            task.topCameraPoint = New cv.Point(task.workRes.Width \ 2, 0)
 
-            taskAlg.channelsTop = {2, 0}
-            taskAlg.channelsSide = {1, 2}
+            task.channelsTop = {2, 0}
+            task.channelsSide = {1, 2}
 
-            taskAlg.rangesTop = New cv.Rangef() {New cv.Rangef(0.1, taskAlg.MaxZmeters + 0.1),
-                                              New cv.Rangef(-taskAlg.xRange, taskAlg.xRange)}
-            taskAlg.rangesSide = New cv.Rangef() {New cv.Rangef(-taskAlg.yRange, taskAlg.yRange),
-                                               New cv.Rangef(0.1, taskAlg.MaxZmeters + 0.1)}
+            task.rangesTop = New cv.Rangef() {New cv.Rangef(0.1, task.MaxZmeters + 0.1),
+                                              New cv.Rangef(-task.xRange, task.xRange)}
+            task.rangesSide = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange),
+                                               New cv.Rangef(0.1, task.MaxZmeters + 0.1)}
 
-            taskAlg.sideCameraPoint = New cv.Point(0, CInt(taskAlg.workRes.Height / 2))
-            taskAlg.topCameraPoint = New cv.Point(taskAlg.workRes.Width \ 2, 0)
+            task.sideCameraPoint = New cv.Point(0, CInt(task.workRes.Height / 2))
+            task.topCameraPoint = New cv.Point(task.workRes.Width \ 2, 0)
 
-            taskAlg.projectionThreshold = 3 ' ProjectionThresholdBar.Value
-            taskAlg.channelCount = 1
-            taskAlg.channelIndex = 0
+            task.projectionThreshold = 3 ' ProjectionThresholdBar.Value
+            task.channelCount = 1
+            task.channelIndex = 0
 
-            Dim rx = New cv.Vec2f(-taskAlg.xRangeDefault, taskAlg.xRangeDefault)
-            Dim ry = New cv.Vec2f(-taskAlg.yRangeDefault, taskAlg.yRangeDefault)
-            Dim rz = New cv.Vec2f(0, taskAlg.MaxZmeters)
-            taskAlg.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1),
+            Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+            Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+            Dim rz = New cv.Vec2f(0, task.MaxZmeters)
+            task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1),
                                                 New cv.Rangef(rz.Item0, rz.Item1)}
 
-            Select Case taskAlg.reductionName
+            Select Case task.reductionName
                 Case "X Reduction"
-                    taskAlg.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
-                    taskAlg.channels = {0}
-                    taskAlg.histBinList = {taskAlg.histogramBins}
+                    task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
+                    task.channels = {0}
+                    task.histBinList = {task.histogramBins}
                 Case "Y Reduction"
-                    taskAlg.ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1)}
-                    taskAlg.channels = {1}
-                    taskAlg.histBinList = {taskAlg.histogramBins}
+                    task.ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1)}
+                    task.channels = {1}
+                    task.histBinList = {task.histogramBins}
                 Case "Z Reduction"
-                    taskAlg.ranges = New cv.Rangef() {New cv.Rangef(rz.Item0, rz.Item1)}
-                    taskAlg.channels = {2}
-                    taskAlg.histBinList = {taskAlg.histogramBins}
+                    task.ranges = New cv.Rangef() {New cv.Rangef(rz.Item0, rz.Item1)}
+                    task.channels = {2}
+                    task.histBinList = {task.histogramBins}
                 Case "XY Reduction"
-                    taskAlg.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
-                    taskAlg.channelCount = 2
-                    taskAlg.channels = {0, 1}
-                    taskAlg.histBinList = {taskAlg.histogramBins, taskAlg.histogramBins}
+                    task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
+                    task.channelCount = 2
+                    task.channels = {0, 1}
+                    task.histBinList = {task.histogramBins, task.histogramBins}
                 Case "XZ Reduction"
-                    taskAlg.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-                    taskAlg.channelCount = 2
-                    taskAlg.channels = {0, 2}
-                    taskAlg.channelIndex = 1
-                    taskAlg.histBinList = {taskAlg.histogramBins, taskAlg.histogramBins}
+                    task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                    task.channelCount = 2
+                    task.channels = {0, 2}
+                    task.channelIndex = 1
+                    task.histBinList = {task.histogramBins, task.histogramBins}
                 Case "YZ Reduction"
-                    taskAlg.ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-                    taskAlg.channelCount = 2
-                    taskAlg.channels = {1, 2}
-                    taskAlg.channelIndex = 1
-                    taskAlg.histBinList = {taskAlg.histogramBins, taskAlg.histogramBins}
+                    task.ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                    task.channelCount = 2
+                    task.channels = {1, 2}
+                    task.channelIndex = 1
+                    task.histBinList = {task.histogramBins, task.histogramBins}
                 Case "XYZ Reduction"
-                    taskAlg.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-                    taskAlg.channelCount = 3
-                    taskAlg.channels = {0, 1, 2}
-                    taskAlg.channelIndex = 2
-                    taskAlg.histBinList = {taskAlg.histogramBins, taskAlg.histogramBins, taskAlg.histogramBins}
+                    task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                    task.channelCount = 3
+                    task.channels = {0, 1, 2}
+                    task.channelIndex = 2
+                    task.histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
             End Select
         End Sub
         Public Sub Run()
@@ -8088,7 +8088,7 @@ Namespace VBClasses
             threshold = tSlider.value
 
             Static frm = FindFrm(traceName + " Radio Buttons")
-            taskAlg.reductionName = frm.check(findRadioIndex(frm.check)).Text
+            task.reductionName = frm.check(findRadioIndex(frm.check)).Text
         End Sub
     End Class
 
@@ -8102,7 +8102,7 @@ Namespace VBClasses
         End Sub
         Public Sub Run()
             Static histSlider = FindSlider("Frame History")
-            taskAlg.frameHistoryCount = histSlider.value
+            task.frameHistoryCount = histSlider.value
         End Sub
     End Class
 

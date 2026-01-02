@@ -17,19 +17,19 @@ Namespace VBClasses
 
                 sw.WriteLine("ply")
                 sw.WriteLine("format ascii 1.0")
-                sw.WriteLine("element vertex " + CStr(taskAlg.pointCloud.Total))
+                sw.WriteLine("element vertex " + CStr(task.pointCloud.Total))
                 sw.WriteLine("property float x")
                 sw.WriteLine("property float y")
                 sw.WriteLine("property float z")
                 sw.WriteLine("end_header")
-                For y = 0 To taskAlg.pointCloud.Height - 1
-                    For x = 0 To taskAlg.pointCloud.Width - 1
-                        Dim vec = taskAlg.pointCloud.Get(Of cv.Vec3f)(y, x)
+                For y = 0 To task.pointCloud.Height - 1
+                    For x = 0 To task.pointCloud.Width - 1
+                        Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
                         sw.WriteLine(Format(vec(0), fmt3) + " " + Format(vec(1), fmt3) + " " + Format(vec(2), fmt3))
                     Next
                 Next
                 sw.Close()
-                taskAlg.Settings.plyFileName = saveFileName
+                task.Settings.plyFileName = saveFileName
             End If
             SetTrueText(".ply format file saved in " + options.fileName)
         End Sub
@@ -57,7 +57,7 @@ Namespace VBClasses
 
                     sw.WriteLine("ply")
                     sw.WriteLine("format ascii 1.0")
-                    sw.WriteLine("element vertex " + CStr(taskAlg.pointCloud.Total))
+                    sw.WriteLine("element vertex " + CStr(task.pointCloud.Total))
                     sw.WriteLine("property float x")
                     sw.WriteLine("property float y")
                     sw.WriteLine("property float z")
@@ -66,16 +66,16 @@ Namespace VBClasses
                     sw.WriteLine("property uchar blue")
 
                     sw.WriteLine("end_header")
-                    For y = 0 To taskAlg.pointCloud.Height - 1
-                        For x = 0 To taskAlg.pointCloud.Width - 1
-                            Dim vec = taskAlg.pointCloud.Get(Of cv.Vec3f)(y, x)
+                    For y = 0 To task.pointCloud.Height - 1
+                        For x = 0 To task.pointCloud.Width - 1
+                            Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
                             Dim bgr = src.Get(Of cv.Vec3b)(y, x)
                             sw.WriteLine(Format(vec(0), fmt3) + " " + Format(vec(1), fmt3) + " " + Format(vec(2), fmt3),
                                  CStr(bgr(2)) + " " + CStr(bgr(1)) + " " + CStr(bgr(0)))
                         Next
                     Next
                     sw.Close()
-                    taskAlg.Settings.plyFileName = saveFileName
+                    task.Settings.plyFileName = saveFileName
                 Catch ex As Exception
                 End Try
             End If

@@ -15,7 +15,7 @@ Namespace VBClasses
             options.Run()
             optionsWarp.Run()
 
-            If standaloneTest() And taskAlg.heartBeat Then
+            If standaloneTest() And task.heartBeat Then
                 rotateAngle = optionsWarp.angle
                 rotateCenter.X = msRNG.Next(0, dst2.Width)
                 rotateCenter.Y = msRNG.Next(0, dst2.Height)
@@ -43,7 +43,7 @@ Namespace VBClasses
             desc = "Use WarpAffine to transform input images with no options."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() And taskAlg.heartBeat Then
+            If standaloneTest() And task.heartBeat Then
                 SetTrueText("There is no output for the " + traceName + " algorithm.  Use WarpAffine_Basics to test.")
                 Exit Sub
             End If
@@ -87,7 +87,7 @@ Namespace VBClasses
                 Dim endY = rng.Next(0, image.Rows - 1)
 
                 Dim c = New cv.Scalar(rng.Next(0, 255), rng.Next(0, 255), rng.Next(0, 255))
-                image.Line(New cv.Point(startX, startY), New cv.Point(endX, endY), c, rng.Next(1, 3), taskAlg.lineType)
+                image.Line(New cv.Point(startX, startY), New cv.Point(endX, endY), c, rng.Next(1, 3), task.lineType)
             Next
         End Sub
 
@@ -129,7 +129,7 @@ Namespace VBClasses
                 Dim charImage = New cv.Mat(charHeight, charWidth, cv.MatType.CV_8UC3, white)
                 Dim c = characters(rng.Next(0, characters.Length - 1))
                 cv.Cv2.PutText(charImage, c, New cv.Point(10, charHeight - 10), msRNG.Next(1, 6), msRNG.Next(3, 4),
-                           taskAlg.vecColors(i), msRNG.Next(1, 5), cv.LineTypes.AntiAlias)
+                           task.vecColors(i), msRNG.Next(1, 5), cv.LineTypes.AntiAlias)
                 transformPerspective(charImage)
                 rotateImg(charImage, charImage)
                 scaleImg(charImage, charImage)
@@ -161,7 +161,7 @@ Namespace VBClasses
             labels(3) = "Image with affine transform applied"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskAlg.heartBeat Then
+            If task.heartBeat Then
                 Dim triangles(1) As cv.Mat
                 triangle.Run(src)
                 triangles(0) = triangle.triangle.Clone()
@@ -181,7 +181,7 @@ Namespace VBClasses
                         Dim p1 = triangles(j).Get(Of cv.Point2f)(i) + New cv.Point2f(j * src.Width, 0)
                         Dim p2 = triangles(j).Get(Of cv.Point2f)((i + 1) Mod 3) + New cv.Point2f(j * src.Width, 0)
                         Dim color = Choose(i + 1, cv.Scalar.Red, cv.Scalar.White, cv.Scalar.Yellow)
-                        wideMat.Line(p1, p2, color, taskAlg.lineWidth + 3, taskAlg.lineType)
+                        wideMat.Line(p1, p2, color, task.lineWidth + 3, task.lineType)
                         If j = 0 Then
                             Dim p3 = triangles(j + 1).Get(Of cv.Point2f)(i) + New cv.Point2f(src.Width, 0)
                             vbc.DrawLine(wideMat, p1, p3, white)
@@ -190,9 +190,9 @@ Namespace VBClasses
                 Next
 
                 Dim corner = triangles(0).Get(Of cv.Point2f)(0)
-                DrawCircle(wideMat, corner, taskAlg.DotSize + 5, cv.Scalar.Yellow)
+                DrawCircle(wideMat, corner, task.DotSize + 5, cv.Scalar.Yellow)
                 corner = New cv.Point2f(M.Get(Of Double)(0, 2) + src.Width, M.Get(Of Double)(1, 2))
-                DrawCircle(wideMat, corner, taskAlg.DotSize + 5, cv.Scalar.Yellow)
+                DrawCircle(wideMat, corner, task.DotSize + 5, cv.Scalar.Yellow)
 
                 dst2 = wideMat(New cv.Rect(0, 0, src.Width, src.Height))
                 dst3 = wideMat(New cv.Rect(src.Width, 0, src.Width, src.Height))
@@ -200,9 +200,9 @@ Namespace VBClasses
                 Dim pt As cv.Point
                 For i = 0 To srcPoints1.Count - 1
                     pt = New cv.Point(CInt(srcPoints1(i).X), CInt(srcPoints1(i).Y))
-                    DrawCircle(dst2, pt, taskAlg.DotSize + 2, cv.Scalar.White)
+                    DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.White)
                     pt = New cv.Point(CInt(srcPoints2(i).X), CInt(srcPoints2(i).Y))
-                    DrawCircle(dst3, pt, taskAlg.DotSize + 2, cv.Scalar.White)
+                    DrawCircle(dst3, pt, task.DotSize + 2, cv.Scalar.White)
                 Next
             End If
             SetTrueText("M defined as: " + vbCrLf +
@@ -229,7 +229,7 @@ Namespace VBClasses
             labels(2) = "Color image with perspective transform applied"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If taskAlg.heartBeat Then
+            If task.heartBeat Then
                 options.Run()
                 mRect.inputPoints = options.srcPoints
 
@@ -256,7 +256,7 @@ Namespace VBClasses
                             vbc.DrawLine(dst2, p1, p3, white)
                         End If
                         Dim color = Choose(i + 1, cv.Scalar.Red, cv.Scalar.White, cv.Scalar.Yellow, cv.Scalar.Green)
-                        dst2.Line(p1, p2, color, taskAlg.lineWidth + 3, taskAlg.lineType)
+                        dst2.Line(p1, p2, color, task.lineWidth + 3, task.lineType)
                     Next
                 Next
             End If
@@ -272,9 +272,9 @@ Namespace VBClasses
                       Format(M.Get(Of Double)(2, 1), fmt2) + vbTab +
                       Format(M.Get(Of Double)(2, 2), fmt2) + vbCrLf)
             Dim center As New cv.Point2f(M.Get(Of Double)(0, 2), M.Get(Of Double)(1, 2))
-            DrawCircle(dst2, center, taskAlg.DotSize + 5, cv.Scalar.Yellow)
+            DrawCircle(dst2, center, task.DotSize + 5, cv.Scalar.Yellow)
             center = New cv.Point2f(50, src.Height / 2)
-            DrawCircle(dst2, center, taskAlg.DotSize + 5, cv.Scalar.Yellow)
+            DrawCircle(dst2, center, task.DotSize + 5, cv.Scalar.Yellow)
         End Sub
     End Class
 
@@ -346,7 +346,7 @@ Namespace VBClasses
             desc = "Compare an image before and after repeated rotations."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim input = cv.Cv2.ImRead(taskAlg.homeDir + "Data/8.jpg", cv.ImreadModes.Color)
+            Dim input = cv.Cv2.ImRead(task.homeDir + "Data/8.jpg", cv.ImreadModes.Color)
 
             Dim center = New cv.Point(input.Width / 2, input.Height / 2)
             Dim angle45 = 45, angle90 = 90, scale = 1.0, h = input.Height, w = input.Width
