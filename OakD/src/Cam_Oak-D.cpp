@@ -29,18 +29,21 @@ public:
 	std::shared_ptr<dai::Device> device;
 	
 	// v3 Camera nodes (replacing ColorCamera and MonoCamera)
-	std::shared_ptr<dai::node::Camera> color;
-	std::shared_ptr<dai::node::Camera> monoLeft;
-	std::shared_ptr<dai::node::Camera> monoRight;
+	std::shared_ptr<dai::node::Camera> camRgb;
+	std::shared_ptr<dai::node::Camera> left;
+	std::shared_ptr<dai::node::Camera> right;
 	std::shared_ptr<dai::node::StereoDepth> stereo;
+	std::shared_ptr<dai::node::StereoDepth> sync;
 	std::shared_ptr<dai::node::IMU> imu;
-	
+
 	// Output pointers from nodes
 	dai::Node::Output* rgbOut = nullptr;
 	
 	// v3 MessageQueues (replacing DataOutputQueue)
-	std::shared_ptr<dai::MessageQueue> colorOut;
-	std::shared_ptr<dai::MessageQueue> rightOut;
+	//std::shared_ptr<dai::MessageQueue> rgbOut;
+	//std::shared_ptr<dai::MessageQueue> leftOut;
+	//std::shared_ptr<dai::MessageQueue> rightOut; 
+	std::shared_ptr<dai::MessageQueue> queue;
 	std::shared_ptr<dai::MessageQueue> stereoOut;
 	std::shared_ptr<dai::MessageQueue> depthQueue;
 	std::shared_ptr<dai::MessageQueue> imuQueue;
@@ -58,7 +61,7 @@ public:
 	const dai::CameraBoardSocket RIGHT_SOCKET = dai::CameraBoardSocket::CAM_C;
 
 	~OakDCamera() {}
-	
+
 	cv::Mat processDepthFrame(const cv::Mat& depthFrame) {
 		cv::Mat depth_downscaled;
 		cv::resize(depthFrame, depth_downscaled, cv::Size(), 0.25, 0.25);
@@ -98,68 +101,96 @@ public:
 		cv::applyColorMap(normalized, colorized, cv::COLORMAP_HOT);
 		return colorized;
 	}
+	cv::Mat colorizeDepth(cv::Mat frameDepth) {
+		try {
+			// Early exit if no valid pixels
+			if (cv::countNonZero(frameDepth) == 0) {
+				return cv::Mat::zeros(frameDepth.rows, frameDepth.cols, CV_8UC3);
+			}
+
+			// Convert to float once
+			cv::Mat frameDepthFloat;
+			frameDepth.convertTo(frameDepthFloat, CV_32F);
+
+			double minVal, maxVal;
+			cv::minMaxLoc(frameDepthFloat, &minVal, &maxVal, nullptr, nullptr, frameDepthFloat > 0);
+
+			// Take log in-place
+			cv::log(frameDepthFloat, frameDepthFloat);
+			float logMinDepth = std::log(minVal);
+			float logMaxDepth = std::log(maxVal);
+
+			frameDepthFloat = (frameDepthFloat - logMinDepth) * (255.0f / (logMaxDepth - logMinDepth));
+
+			cv::Mat normalizedDepth;
+			frameDepthFloat.convertTo(normalizedDepth, CV_8UC1);
+
+			cv::Mat depthFrameColor;
+			cv::applyColorMap(normalizedDepth, depthFrameColor, cv::COLORMAP_JET);
+
+			// Mask invalid pixels
+			depthFrameColor.setTo(0, frameDepth == 0);
+
+			return depthFrameColor;
+
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Error in colorizeDepth: " << e.what() << std::endl;
+			return cv::Mat::zeros(frameDepth.rows, frameDepth.cols, CV_8UC3);
+		}
+	}
 
 	OakDCamera(int _cols, int _rows)
 	{
 		rows = _rows;
 		cols = _cols;
-		color = pipeline.create<dai::node::Camera>();
-		color->build(dai::CameraBoardSocket::CAM_A);
 
-		monoLeft = pipeline.create<dai::node::Camera>();
-		monoLeft->build(dai::CameraBoardSocket::CAM_B);
-
-		monoRight = pipeline.create<dai::node::Camera>();
-		monoRight->build(dai::CameraBoardSocket::CAM_C);
+		// Create and configure nodes
+		camRgb = pipeline.create<dai::node::Camera>();
+		camRgb->build(RGB_SOCKET);
+		left = pipeline.create<dai::node::Camera>();
+		left->build(LEFT_SOCKET);
+		right = pipeline.create<dai::node::Camera>();
+		right->build(RIGHT_SOCKET);
 
 		stereo = pipeline.create<dai::node::StereoDepth>();
+		auto sync = pipeline.create<dai::node::Sync>();
 
-		// Configure stereo node
-		stereo->setDefaultProfilePreset(dai::node::StereoDepth::PresetMode::DEFAULT);
-		stereo->setDepthAlign(dai::CameraBoardSocket::CAM_A);
-		stereo->setOutputSize(640, 400);
+		// Check if platform is RVC4 and create ImageAlign node if needed
+		auto platform = pipeline.getDefaultDevice()->getPlatform();
+		std::shared_ptr<dai::node::ImageAlign> align;
+		if (platform == dai::Platform::RVC4) {
+			align = pipeline.create<dai::node::ImageAlign>();
+		}
+
+		stereo->setExtendedDisparity(true);
+		sync->setSyncThreshold(std::chrono::duration<int64_t, std::nano>(static_cast<int64_t>(1e9 / (2.0 * FPS))));
 
 		// Configure outputs
-		colorCamOut = color->requestOutput(std::make_pair(640, 480));
-		monoLeftOut = monoLeft->requestOutput(std::make_pair(640, 480));
-		monoRightOut = monoRight->requestOutput(std::make_pair(640, 480));
+		auto rgbOut = camRgb->requestOutput(std::make_pair(640, 480), dai::ImgFrame::Type::NV12, dai::ImgResizeMode::CROP, FPS, true);
+		auto leftOut = left->requestOutput(std::make_pair(640, 400), std::nullopt, dai::ImgResizeMode::CROP, FPS);
+		auto rightOut = right->requestOutput(std::make_pair(640, 400), std::nullopt, dai::ImgResizeMode::CROP, FPS);
 
-		// Link mono cameras to stereo
-		monoLeftOut->link(stereo->left);
-		monoRightOut->link(stereo->right);
+		// Link nodes
+		rgbOut->link(sync->inputs["rgb"]);
+		leftOut->link(stereo->left);
+		rightOut->link(stereo->right);
 
-		// Create output queues from output objects (before device starts)
-		try {
-			colorOut = colorCamOut->createOutputQueue(8, false);
-			rightOut = monoRightOut->createOutputQueue(8, false);
-			stereoOut = stereo->depth.createOutputQueue(8, false);
+		if (platform == dai::Platform::RVC4) {
+			stereo->depth.link(align->input);
+			rgbOut->link(align->inputAlignTo);
+			align->outputAligned.link(sync->inputs["depth_aligned"]);
 		}
-		catch (const std::exception& e) {
-			std::cerr << "Failed to create output queues: " << e.what() << std::endl;
-			throw;  // Re-throw to let caller handle
-		}
-
-		// Create device and start pipeline
-		try {
-			device = std::make_shared<dai::Device>();
-			device->startPipeline(pipeline);
-			
-			// Give the device a moment to initialize before reading
-			std::this_thread::sleep_for(std::chrono::milliseconds(200));
-		}
-		catch (const std::exception& e) {
-			std::cerr << "Failed to create device or start pipeline: " << e.what() << std::endl;
-			throw;  // Re-throw to let caller handle
+		else {
+			stereo->depth.link(sync->inputs["depth_aligned"]);
+			rgbOut->link(stereo->inputAlignTo);
 		}
 
-		// Get calibration data
-		try {
-			deviceCalib = device->readCalibration();
-		}
-		catch (const std::exception& e) {
-			std::cerr << "Failed to read calibration: " << e.what() << std::endl;
-			// Continue anyway - calibration might not be critical
-		}
+		// Create output queue
+		queue = sync->out.createOutputQueue();
+
+		// Start pipeline
+		pipeline.start();
 
 		rgb = Mat(rows, cols, CV_8UC3);
 		depth16u = Mat(rows, cols, CV_16UC1);
@@ -171,97 +202,20 @@ public:
 
 	void waitForFrame()
 	{
-		// Check if queues are valid before reading
-		if (!colorOut || !stereoOut || !device) {
-			return;  // Queues or device not ready yet
+		auto messageGroup = queue->get<dai::MessageGroup>();
+
+		auto frameRgb = messageGroup->get<dai::ImgFrame>("rgb");
+		auto frameDepth = messageGroup->get<dai::ImgFrame>("depth_aligned");
+
+		if (frameDepth != nullptr) 
+		{
+			cv::Mat rgb = frameRgb->getCvFrame();
+			cv::imshow("RGB Frame", rgb);
+
+			cv::Mat alignedDepthColorized = colorizeDepth(frameDepth->getFrame());
+			cv::imshow("Aligned Depth Colorized", alignedDepthColorized);
+			cv::waitKey(1);
 		}
-		
-		try {
-			// Get frames (blocking call - will wait for frames)
-			auto colorFrame = colorOut->get<dai::ImgFrame>();
-			auto stereoFrame = stereoOut->get<dai::ImgFrame>();
-
-			// Check if we got valid frames
-			if (colorFrame == nullptr || stereoFrame == nullptr) {
-				return;  // Skip this frame if either is null
-			}
-
-			// Validate transformations (if available)
-			try {
-				if (!colorFrame->validateTransformations() || !stereoFrame->validateTransformations()) {
-					std::cerr << "Invalid transformations!" << std::endl;
-					return;
-				}
-			}
-			catch (...) {
-				// validateTransformations might not be available or might throw
-				// Continue anyway
-			}
-
-			// Get frames as OpenCV Mats
-			try {
-				rgb = colorFrame->getCvFrame();
-				cv::Mat depthMat = stereoFrame->getCvFrame();
-				depth16u = processDepthFrame(depthMat);
-			}
-			catch (const std::exception& e) {
-				std::cerr << "Error converting frames: " << e.what() << std::endl;
-				return;
-			}
-		}
-		catch (const dai::XLinkReadError& e) {
-			// XLink communication error - device might be disconnected or busy
-			std::cerr << "XLink read error: " << e.what() << std::endl;
-			return;  // Skip this frame
-		}
-		catch (const std::exception& e) {
-			std::cerr << "Error reading frames: " << e.what() << std::endl;
-			return;  // Skip this frame
-		}
-
-		// Create and remap rectangle
-		//dai::RotatedRect rect(dai::Point2f(300, 200), dai::Size2f(200, 100), 10);
-		//auto remappedRect = colorFrame->transformation.remapRectTo(stereoFrame->transformation, rect);
-
-		//// Convert to OpenCV Mats using raw data (avoids ABI issues with getCvFrame)
-		//// Depth - 16-bit unsigned
-		//cv::Mat depthRaw(depth->getHeight(), depth->getWidth(), CV_16UC1, depth->getData().data());
-		//cv::resize(depthRaw, depth16u, cv::Size(cols, rows));
-		//
-		//// RGB - BGR 8-bit
-		//cv::Mat rgbRaw(inRGB->getHeight(), inRGB->getWidth(), CV_8UC3, inRGB->getData().data());
-		//cv::resize(rgbRaw, rgb, cv::Size(cols, rows));
-		//
-		//// Left - Grayscale 8-bit
-		//cv::Mat leftRaw(inLeft->getHeight(), inLeft->getWidth(), CV_8UC1, inLeft->getData().data());
-		//cv::resize(leftRaw, leftView, cv::Size(cols, rows));
-		//
-		//// Right - Grayscale 8-bit
-		//cv::Mat rightRaw(inRight->getHeight(), inRight->getWidth(), CV_8UC1, inRight->getData().data());
-		//cv::resize(rightRaw, rightView, cv::Size(cols, rows));
-
-		//// Get IMU data
-		//auto imuData = imuQueue->get<dai::IMUData>();
-		//auto imuPackets = imuData->packets;
-		//
-		//for (auto& imuPacket : imuPackets) {
-		//	acceleroValues = imuPacket.acceleroMeter;
-		//	gyroValues = imuPacket.gyroscope;
-
-		//	auto acceleroTs1 = acceleroValues.getTimestampDevice();
-		//	auto gyroTs1 = gyroValues.getTimestampDevice();
-		//	
-		//	if (!firstTs) {
-		//		baseTs = std::min(acceleroTs1, gyroTs1);
-		//		firstTs = true;
-		//	}
-
-		//	auto acceleroTs = acceleroTs1 - baseTs;
-		//	auto gyroTs = gyroTs1 - baseTs;
-		//	
-		//	// Store timestamp in seconds
-		//	imuTimeStamp = std::chrono::duration<double>(acceleroTs).count();
-		//}
 	}
 };
 
