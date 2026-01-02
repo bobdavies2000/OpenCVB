@@ -1,4 +1,4 @@
-**January 1, 2025 – Install Fixes and Testing.**
+# December 23, 2025 – Install Fixes and Testing.
 
 -   This version of OpenCVB requires VS 2026 and OpenCV 4.14.
     -   Install script uses the “.slnx” designation for solutions.
@@ -10,7 +10,7 @@
 -   There were some improvements in camera buffer management.
     -   Using locks reduced the number of copies.
 
-**December 30, 2025 – Oak-D Pro Camera Support under construction.**
+# December 23, 2025 – Oak-D Pro Camera support under construction.
 
 -   The Oak-D Pro camera .Net interface in OpenCVB used R2 depthai-core.
 -   The support for Oak-D is no being restarted with R3 depthai-core.
