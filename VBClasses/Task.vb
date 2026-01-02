@@ -114,11 +114,10 @@ Namespace VBClasses
             If gOptions.UseMotionMask.Checked Then
                 motionBasics.Run(gray)
                 If optionsChanged Or task.frameCount < 5 Then
-                    motionRect = New cv.Rect(0, 0, workRes.Width, workRes.Height)
                     grayStable = gray.Clone
                     leftViewStable = leftView.Clone
                 Else
-                    If motionRect.Width > 0 Then
+                    If motionBasics.motionList.Count > 0 Then
                         gray.CopyTo(grayStable, motionMask)
                         leftView.CopyTo(leftViewStable, motionMask)
                     End If
@@ -128,7 +127,6 @@ Namespace VBClasses
                 motionBasics.motionList.Clear()
                 grayStable = gray
                 leftViewStable = leftView
-                motionRect = New cv.Rect(0, 0, gray.Width, gray.Height)
             End If
 
             If pcMotion IsNot Nothing Then
@@ -224,7 +222,6 @@ Namespace VBClasses
                     For Each mIndex In motionBasics.motionList
                         dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
                     Next
-                    dstList(0).Rectangle(motionRect, white, lineWidth)
                 End If
 
                 If gOptions.CrossHairs.Checked Then

@@ -143,7 +143,6 @@ Namespace VBClasses
 
         Public motionMask As New cv.Mat
         Public motionMaskRight As New cv.Mat ' motion mask for the right view.
-        Public motionRect As cv.Rect
 
         ' if true, algorithm prep means algorithm tasks will run.  If false, they have already been run...
         Public algorithmPrep As Boolean = True

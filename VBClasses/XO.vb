@@ -11695,9 +11695,16 @@ Namespace VBClasses
             labels(3) = "The white spots show the difference of the constructed image from the current image."
             desc = "Track task.gray using Motion_Enclosing to isolate the motion"
         End Sub
+        Public Shared Function getMotionRect() As cv.Rect
+            Dim motionRect As cv.Rect
+            For Each index In task.motionBasics.motionList
+                motionRect = motionRect.Union(task.gridRects(index))
+            Next
+            Return motionRect
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             motion.Run(src)
-            Dim r = motion.motionRect
+            Dim r = getMotionRect()
             If task.heartBeat Then
                 dst2 = src.Clone
                 lastRects.Clear()
@@ -13460,15 +13467,11 @@ Namespace VBClasses
             If task.heartBeat Then dst2 = task.gray
 
             dst3.SetTo(0)
+            Dim motionRect As cv.Rect
             If mCore.motionList.Count > 0 Then
-                task.motionRect = task.gridRects(mCore.motionList(0))
-                For Each index In mCore.motionList
-                    task.motionRect = task.motionRect.Union(task.gridRects(index))
-                Next
-                dst3(task.motionRect).SetTo(255)
-                task.gray(task.motionRect).CopyTo(dst2(task.motionRect))
-            Else
-                task.motionRect = New cv.Rect
+                motionRect = XO_Motion_RectHistory.getMotionRect()
+                dst3(motionRect).SetTo(255)
+                task.gray(motionRect).CopyTo(dst2(motionRect))
             End If
 
             labels(2) = CStr(mCore.motionList.Count) + " grid rect's or " +
@@ -13755,16 +13758,17 @@ Namespace VBClasses
                 End If
             End If
 
+            Dim motionRect = XO_Motion_RectHistory.getMotionRect()
             If task.gOptions.UseMotionMask.Checked Then
                 If task.heartBeatLT Or task.frameCount < 5 Or task.optionsChanged Then
                     dst2 = task.pointCloud.Clone
                 End If
 
-                If task.motionRect.Width = 0 And task.optionsChanged = False Then
+                If motionRect.Width = 0 And task.optionsChanged = False Then
                     task.pointCloud = dst2
                     Exit Sub ' nothing changed...
                 End If
-                task.pointCloud(task.motionRect).CopyTo(dst2(task.motionRect))
+                task.pointCloud(motionRect).CopyTo(dst2(motionRect))
                 task.pointCloud = dst2
             End If
 
@@ -13777,7 +13781,7 @@ Namespace VBClasses
                 diff.lastDepth32f = split(2)
                 diff.Run(task.pcSplit(2))
                 dst3 = diff.dst2
-                dst3.Rectangle(task.motionRect, white, task.lineWidth)
+                dst3.Rectangle(motionRect, white, task.lineWidth)
             End If
         End Sub
     End Class
@@ -13847,15 +13851,10 @@ Namespace VBClasses
             If task.heartBeat Then dst2 = task.gray
 
             dst3.SetTo(0)
+            Dim motionRect = XO_Motion_RectHistory.getMotionRect()
             If mCore.motionList.Count > 0 Then
-                task.motionRect = task.gridRects(mCore.motionList(0))
-                For Each index In mCore.motionList
-                    task.motionRect = task.motionRect.Union(task.gridRects(index))
-                Next
-                dst3(task.motionRect).SetTo(255)
-                task.gray(task.motionRect).CopyTo(dst2(task.motionRect))
-            Else
-                task.motionRect = New cv.Rect
+                dst3(motionRect).SetTo(255)
+                task.gray(motionRect).CopyTo(dst2(motionRect))
             End If
 
             labels(2) = CStr(mCore.motionList.Count) + " grid rect's or " +
@@ -14064,14 +14063,15 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static unchanged As Integer
-            If task.motionRect.Width Then
+            Dim motionRect = XO_Motion_RectHistory.getMotionRect()
+            If motionRect.Width Then
                 dst2 = runRedCloud(task.pointCloud, labels(2))
             Else
                 unchanged += 1
             End If
             If task.heartBeatLT Then unchanged = 0
 
-            dst2.Rectangle(task.motionRect, task.highlight, task.lineWidth)
+            dst2.Rectangle(motionRect, task.highlight, task.lineWidth)
 
             If standaloneTest() Then
                 For Each rc In task.redCloud.rcList

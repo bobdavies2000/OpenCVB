@@ -130,7 +130,7 @@ Namespace VBClasses
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
 
             Static unchanged As Integer
-            If task.motionRect.Width = 0 Then
+            If task.motionBasics.motionList.Count = 0 Then
                 unchanged += 1
                 labels(3) = "The rcMap was unchanged " + CStr(unchanged) + " times since last heartBeatLT"
             End If

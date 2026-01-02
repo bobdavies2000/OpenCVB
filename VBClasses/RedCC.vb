@@ -62,8 +62,6 @@ Namespace VBClasses
             RedCloud_Cell.selectCell(rcMap, rcList)
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
-
-            dst2.Rectangle(task.motionRect, task.highlight, task.lineWidth)
         End Sub
     End Class
 

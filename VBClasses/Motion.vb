@@ -28,10 +28,8 @@ Namespace VBClasses
             Next
 
             dst3.SetTo(0)
-            task.motionRect = If(motionList.Count > 0, task.gridRects(motionList(0)), New cv.Rect)
             For Each index In motionList
                 Dim rect = task.gridRects(index)
-                task.motionRect = task.motionRect.Union(rect)
                 src(rect).CopyTo(dst2(rect))
                 dst3(rect).SetTo(255)
             Next

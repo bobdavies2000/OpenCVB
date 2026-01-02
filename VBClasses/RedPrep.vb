@@ -549,7 +549,7 @@ Namespace VBClasses
             desc = "If a RedCloud cell has no motion, it is preserved."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.motionRect.Width = 0 Then Exit Sub ' full image stable means nothing needs to be done...
+            If task.motionBasics.motionList.Count = 0 Then Exit Sub ' full image stable means nothing needs to be done...
             runRedList(src, labels(2))
             If task.redList.oldrclist.Count = 0 Then Exit Sub
 
