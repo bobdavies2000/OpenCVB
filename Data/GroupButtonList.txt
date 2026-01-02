@@ -34,7 +34,6 @@ Cluster
 Coherence
 Color
 Color8U
-Complexity
 Concat
 Contour
 ContourPlane

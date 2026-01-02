@@ -251,9 +251,6 @@ Color8U_LeftRight
 Color8U_RedHue
 Color8U_Smoothing
 Color8U_TopX
-Complexity_Basics
-Complexity_Dots
-Complexity_PlotOpenCV
 Concat_4way
 Concat_Basics
 Contour_Basics
