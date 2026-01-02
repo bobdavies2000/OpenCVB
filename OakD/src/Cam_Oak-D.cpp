@@ -22,7 +22,6 @@ public:
 	double imuTimeStamp;
 	bool firstTs = false;
 	int rows, cols;
-	bool firstPass;
 	float intrinsics[9];
 	float extrinsicsRGBtoLeft[12];
 	float extrinsicsLeftToRight[12];
@@ -104,90 +103,121 @@ public:
 	{
 		rows = _rows;
 		cols = _cols;
-		firstPass = true;
+		color = pipeline.create<dai::node::Camera>();
+		color->build(dai::CameraBoardSocket::CAM_A);
+
+		monoLeft = pipeline.create<dai::node::Camera>();
+		monoLeft->build(dai::CameraBoardSocket::CAM_B);
+
+		monoRight = pipeline.create<dai::node::Camera>();
+		monoRight->build(dai::CameraBoardSocket::CAM_C);
+
+		stereo = pipeline.create<dai::node::StereoDepth>();
+
+		// Configure stereo node
+		stereo->setDefaultProfilePreset(dai::node::StereoDepth::PresetMode::DEFAULT);
+		stereo->setDepthAlign(dai::CameraBoardSocket::CAM_A);
+		stereo->setOutputSize(640, 400);
+
+		// Configure outputs
+		colorCamOut = color->requestOutput(std::make_pair(640, 480));
+		monoLeftOut = monoLeft->requestOutput(std::make_pair(640, 480));
+		monoRightOut = monoRight->requestOutput(std::make_pair(640, 480));
+
+		// Link mono cameras to stereo
+		monoLeftOut->link(stereo->left);
+		monoRightOut->link(stereo->right);
+
+		// Create output queues from output objects (before device starts)
+		try {
+			colorOut = colorCamOut->createOutputQueue(8, false);
+			rightOut = monoRightOut->createOutputQueue(8, false);
+			stereoOut = stereo->depth.createOutputQueue(8, false);
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Failed to create output queues: " << e.what() << std::endl;
+			throw;  // Re-throw to let caller handle
+		}
+
+		// Create device and start pipeline
+		try {
+			device = std::make_shared<dai::Device>();
+			device->startPipeline(pipeline);
+			
+			// Give the device a moment to initialize before reading
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Failed to create device or start pipeline: " << e.what() << std::endl;
+			throw;  // Re-throw to let caller handle
+		}
+
+		// Get calibration data
+		try {
+			deviceCalib = device->readCalibration();
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Failed to read calibration: " << e.what() << std::endl;
+			// Continue anyway - calibration might not be critical
+		}
+
+		rgb = Mat(rows, cols, CV_8UC3);
+		depth16u = Mat(rows, cols, CV_16UC1);
+		leftView = Mat(rows, cols, CV_8UC1);
+		rightView = Mat(rows, cols, CV_8UC1);
+		leftView.setTo(0);
+		rightView.setTo(0);
 	}
 
 	void waitForFrame()
 	{
-		if (firstPass)
-		{
-			// Create and configure nodes
-			color = pipeline.create<dai::node::Camera>();
-			color->build(dai::CameraBoardSocket::CAM_A);
-
-			monoLeft = pipeline.create<dai::node::Camera>();
-			monoLeft->build(dai::CameraBoardSocket::CAM_B);
-
-			monoRight = pipeline.create<dai::node::Camera>();
-			monoRight->build(dai::CameraBoardSocket::CAM_C);
-
-			stereo = pipeline.create<dai::node::StereoDepth>();
-
-			// Configure stereo node
-			stereo->setDefaultProfilePreset(dai::node::StereoDepth::PresetMode::DEFAULT);
-			stereo->setDepthAlign(dai::CameraBoardSocket::CAM_A);
-			stereo->setOutputSize(640, 400);
-
-			// Configure outputs
-			colorCamOut = color->requestOutput(std::make_pair(640, 480));
-			monoLeftOut = monoLeft->requestOutput(std::make_pair(640, 480));
-			monoRightOut = monoRight->requestOutput(std::make_pair(640, 480));
-
-			// Link mono cameras to stereo
-			monoLeftOut->link(stereo->left);
-			monoRightOut->link(stereo->right);
-
-			// Create output queues with blocking enabled (default)
-			colorOut = colorCamOut->createOutputQueue(8, false);
-			rightOut = monoRightOut->createOutputQueue(8, false);
-			stereoOut = stereo->depth.createOutputQueue(8, false);
-
-			// Create device and start pipeline
-			device = std::make_shared<dai::Device>();
-			device->startPipeline(pipeline);
-
-			// Get calibration data
-			deviceCalib = device->readCalibration();
-
-			rgb = Mat(rows, cols, CV_8UC3);
-			depth16u = Mat(rows, cols, CV_16UC1);
-			leftView = Mat(rows, cols, CV_8UC1);
-			rightView = Mat(rows, cols, CV_8UC1);
-			leftView.setTo(0);
-			rightView.setTo(0);
-
-			firstPass = false;
-			
-			// Give the device a moment to start producing frames
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		}
-		
 		// Check if queues are valid before reading
-		if (!colorOut || !stereoOut) {
-			return;  // Queues not ready yet
+		if (!colorOut || !stereoOut || !device) {
+			return;  // Queues or device not ready yet
 		}
 		
-		// Get frames (blocking call - will wait for frames)
-		auto colorFrame = colorOut->get<dai::ImgFrame>();
-		auto stereoFrame = stereoOut->get<dai::ImgFrame>();
+		try {
+			// Get frames (blocking call - will wait for frames)
+			auto colorFrame = colorOut->get<dai::ImgFrame>();
+			auto stereoFrame = stereoOut->get<dai::ImgFrame>();
 
-		// Check if we got valid frames
-		if (colorFrame == nullptr || stereoFrame == nullptr) {
-			return;  // Skip this frame if either is null
+			// Check if we got valid frames
+			if (colorFrame == nullptr || stereoFrame == nullptr) {
+				return;  // Skip this frame if either is null
+			}
+
+			// Validate transformations (if available)
+			try {
+				if (!colorFrame->validateTransformations() || !stereoFrame->validateTransformations()) {
+					std::cerr << "Invalid transformations!" << std::endl;
+					return;
+				}
+			}
+			catch (...) {
+				// validateTransformations might not be available or might throw
+				// Continue anyway
+			}
+
+			// Get frames as OpenCV Mats
+			try {
+				rgb = colorFrame->getCvFrame();
+				cv::Mat depthMat = stereoFrame->getCvFrame();
+				depth16u = processDepthFrame(depthMat);
+			}
+			catch (const std::exception& e) {
+				std::cerr << "Error converting frames: " << e.what() << std::endl;
+				return;
+			}
 		}
-
-		// Validate transformations
-		if (!colorFrame->validateTransformations() || !stereoFrame->validateTransformations()) {
-			std::cerr << "Invalid transformations!" << std::endl;
-			return;
+		catch (const dai::XLinkReadError& e) {
+			// XLink communication error - device might be disconnected or busy
+			std::cerr << "XLink read error: " << e.what() << std::endl;
+			return;  // Skip this frame
 		}
-
-		// Get frames
-		rgb = colorFrame->getCvFrame();
-		//cv::imshow("rgb", rgb);
-		//cv::waitKey(1);
-
-		depth16u = processDepthFrame(stereoFrame->getCvFrame());
+		catch (const std::exception& e) {
+			std::cerr << "Error reading frames: " << e.what() << std::endl;
+			return;  // Skip this frame
+		}
 
 		// Create and remap rectangle
 		//dai::RotatedRect rect(dai::Point2f(300, 200), dai::Size2f(200, 100), 10);

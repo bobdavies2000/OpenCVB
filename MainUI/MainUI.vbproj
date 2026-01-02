@@ -11,6 +11,9 @@
     <RootNamespace>Main</RootNamespace>
     <ApplicationIcon>Data\OpenCVB.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+  </PropertyGroup>
 
   <ItemGroup>
     <Import Include="System.Drawing" />
