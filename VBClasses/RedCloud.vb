@@ -25,6 +25,7 @@ Namespace VBClasses
                 Dim r1 = rc.rect
                 r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
                 Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+
                 If indexLast > 0 Then
                     indexLast -= 1 ' index is 1 less than the rcMap value
                     r2 = rcListLast(indexLast).rect
@@ -44,8 +45,6 @@ Namespace VBClasses
 
                     rc.age = lrc.age + 1
                     If rc.age > 1000 Then rc.age = 2
-
-                    If taskAlg.motionRect.Contains(rc.maxDist) Then rc.age = 1
 
                     rc.color = lrc.color
                 End If
@@ -133,7 +132,7 @@ Namespace VBClasses
             Static unchanged As Integer
             If taskAlg.motionRect.Width = 0 Then
                 unchanged += 1
-                labels(3) = "RedCloud cells were unchanged " + CStr(unchanged) + " times since last heartBeatLT"
+                labels(3) = "The rcMap was unchanged " + CStr(unchanged) + " times since last heartBeatLT"
             End If
             If taskAlg.heartBeatLT Then unchanged = 0
         End Sub
