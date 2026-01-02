@@ -1,4 +1,4 @@
-**January 1, 2025 – Oak-D Pro, Install Fixes.**
+**January 1, 2025 – Install Fixes and Testing.**
 
 -   This version of OpenCVB requires VS 2026 and OpenCV 4.14.
     -   Install script uses the “.slnx” designation for solutions.
@@ -6,7 +6,7 @@
 -   The latest version of CMake is recommended with this version.
 -   The installation scripts have been more thoroughly tested.
 -   GIFBuilder and UI_Generator are built with the rest of OpenCVB.
-    -   They were previously build with the Update_All script.
+    -   They were previously built with the Update_All script.
 -   There were some improvements in camera buffer management.
     -   Using locks reduced the number of copies.
 
