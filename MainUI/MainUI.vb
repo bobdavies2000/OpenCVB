@@ -109,19 +109,6 @@ Namespace MainUI
                 If algHistory.Count >= maxHistory Then Exit For
             Next
         End Sub
-        Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
-            Dim systemPath = Environment.GetEnvironmentVariable("Path")
-            Dim foundDirectory As Boolean
-            If Directory.Exists(neededDirectory) Then
-                foundDirectory = True
-                systemPath = neededDirectory + ";" + systemPath
-            End If
-
-            If foundDirectory = False And notFoundMessage.Length > 0 Then
-                MessageBox.Show(neededDirectory + " was not found.  " + notFoundMessage)
-            End If
-            Environment.SetEnvironmentVariable("Path", systemPath)
-        End Sub
         Public Sub New(Optional projectDirectory As String = "")
             InitializeComponent()
 
@@ -271,6 +258,23 @@ Namespace MainUI
 
             StatusLabel.Location = New Point(offset, pics(2).Top + h)
             StatusLabel.Width = w * 2
+        End Sub
+        Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
+            Dim systemPath = Environment.GetEnvironmentVariable("Path")
+            Dim foundDirectory As Boolean
+            If Directory.Exists(neededDirectory) Then
+                foundDirectory = True
+                systemPath = neededDirectory + ";" + systemPath
+            End If
+
+            If foundDirectory = False And notFoundMessage.Length > 0 Then
+                Debug.WriteLine(neededDirectory + " was not found.  " + notFoundMessage)
+                Debug.WriteLine(neededDirectory + " was not found.  " + notFoundMessage)
+                Debug.WriteLine(neededDirectory + " was not found.  " + notFoundMessage)
+                Debug.WriteLine(neededDirectory + " was not found.  " + notFoundMessage)
+                Debug.WriteLine("Review updatePath for directories needed in the path for OpenCVB.")
+            End If
+            Environment.SetEnvironmentVariable("Path", systemPath)
         End Sub
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             settings = settingsIO.Load()
