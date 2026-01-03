@@ -47,6 +47,7 @@ public:
 	std::shared_ptr<dai::MessageQueue> queue;
 	std::shared_ptr<dai::MessageQueue> qRGB;
 	std::shared_ptr<dai::MessageQueue> qLeft;
+	std::shared_ptr<dai::MessageQueue> qRight;
 	std::shared_ptr<dai::MessageQueue> stereoOut;
 	std::shared_ptr<dai::MessageQueue> depthQueue;
 	std::shared_ptr<dai::MessageQueue> imuQueue;
@@ -73,12 +74,6 @@ public:
 		monoRight = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_C);
 		depth = pipeline.create<dai::node::StereoDepth>();
 
-		//rgbOut = camRgb->requestOutput(
-		//	{ static_cast<uint32_t>(cols), static_cast<uint32_t>(rows) },
-		//	dai::ImgFrame::Type::BGR888i,
-		//	dai::ImgResizeMode::CROP,
-		//	60.0f  // FPS
-		//);
 		rgbOut = camRgb->requestOutput({ cols, rows }, dai::ImgFrame::Type::BGR888i);
 		lout = monoLeft->requestOutput({ cols, rows });
 		rout = monoRight->requestOutput({ cols, rows });
@@ -94,6 +89,7 @@ public:
 		queue = depth->disparity.createOutputQueue();
 		qRGB = rgbOut->createOutputQueue();
 		qLeft = lout->createOutputQueue();
+		qRight = rout->createOutputQueue();
 
 		pipeline.start();
 
@@ -111,8 +107,12 @@ public:
 		auto inRGB = qRGB->get<dai::ImgFrame>();
 		auto inDepth = queue->get<dai::ImgFrame>();
 		auto inLeft = qLeft->get<dai::ImgFrame>();
+		auto inRight = qRight->get<dai::ImgFrame>();
 		auto frame = inDepth->getFrame();
 		rgb = inRGB->getFrame().clone();
+		leftView = inLeft->getFrame().clone();
+		rightView = inRight->getFrame().clone();
+
 		// Normalization for better visualization
 		frame.convertTo(frame, CV_8UC1, 255 / maxDisparity);
 	}

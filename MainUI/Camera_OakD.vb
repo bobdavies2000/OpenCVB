@@ -172,18 +172,18 @@ Namespace MainUI
                     End If
 
                     '' Get left image
-                    'Dim leftPtr = OakDLeftImage(cPtr)
-                    'If leftPtr <> IntPtr.Zero Then
-                    '    Dim leftMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr)
-                    '    leftView = leftMat.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                    'End If
+                    Dim leftPtr = OakDLeftImage(cPtr)
+                    If leftPtr <> IntPtr.Zero Then
+                        Dim leftMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr)
+                        leftView = leftMat.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    End If
 
-                    '' Get right image
-                    'Dim rightPtr = OakDRightImage(cPtr)
-                    'If rightPtr <> IntPtr.Zero Then
-                    '    Dim rightMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr)
-                    '    rightView = rightMat.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                    'End If
+                    ' Get right image
+                    Dim rightPtr = OakDRightImage(cPtr)
+                    If rightPtr <> IntPtr.Zero Then
+                        Dim rightMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr)
+                        rightView = rightMat.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    End If
 
                     '' Get depth and compute point cloud
                     'Dim depthPtr = OakDRawDepth(cPtr)
