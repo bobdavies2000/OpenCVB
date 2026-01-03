@@ -66,7 +66,6 @@ public:
 		rows = _rows;
 		cols = _cols;
 
-		// Define sources and outputs
 		pipeRGB = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_A);
 		pipeLeft = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_B);
 		pipeRight = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_C);
@@ -110,13 +109,16 @@ public:
 		auto inDepth = qDisparity->get<dai::ImgFrame>();
 		auto inLeft = qLeft->get<dai::ImgFrame>();
 		auto inRight = qRight->get<dai::ImgFrame>();
-		auto frame = inDepth->getFrame();
+		auto disparity = inDepth->getFrame();
 		rgb = inRGB->getFrame().clone();
 		leftView = inLeft->getFrame().clone();
 		rightView = inRight->getFrame().clone();
 
 		// Normalization for better visualization
-		frame.convertTo(frame, CV_8UC1, 255 / maxDisparity);
+		disparity.convertTo(disparity, CV_8UC1, 255 / maxDisparity);
+
+		cv::imshow("disparity", disparity);
+		cv::waitKey(1);
 	}
 };
 
