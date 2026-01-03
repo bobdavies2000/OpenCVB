@@ -166,51 +166,51 @@ Namespace MainUI
 
                 SyncLock cameraMutex
                     ' Get color image (RGB format from C++)
-                    Dim colorPtr = OakDColor(cPtr)
-                    If colorPtr <> IntPtr.Zero Then
-                        Dim colorMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorPtr)
-                        color = colorMat.CvtColor(cv.ColorConversionCodes.RGB2BGR).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    'Dim colorPtr = OakDColor(cPtr)
+                    'If colorPtr <> IntPtr.Zero Then
+                    '    Dim colorMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorPtr)
+                    '    color = colorMat.CvtColor(cv.ColorConversionCodes.RGB2BGR).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
 
-                        cv.Cv2.ImShow("color", color)
-                        cv.Cv2.WaitKey(1)
-                    End If
+                    '    cv.Cv2.ImShow("color", color)
+                    '    cv.Cv2.WaitKey(1)
+                    'End If
 
-                    ' Get left image
-                    Dim leftPtr = OakDLeftImage(cPtr)
-                    If leftPtr <> IntPtr.Zero Then
-                        Dim leftMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr)
-                        leftView = leftMat.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                    End If
+                    '' Get left image
+                    'Dim leftPtr = OakDLeftImage(cPtr)
+                    'If leftPtr <> IntPtr.Zero Then
+                    '    Dim leftMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr)
+                    '    leftView = leftMat.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    'End If
 
-                    ' Get right image
-                    Dim rightPtr = OakDRightImage(cPtr)
-                    If rightPtr <> IntPtr.Zero Then
-                        Dim rightMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr)
-                        rightView = rightMat.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                    End If
+                    '' Get right image
+                    'Dim rightPtr = OakDRightImage(cPtr)
+                    'If rightPtr <> IntPtr.Zero Then
+                    '    Dim rightMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr)
+                    '    rightView = rightMat.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    'End If
 
-                    ' Get depth and compute point cloud
-                    Dim depthPtr = OakDRawDepth(cPtr)
-                    If depthPtr <> IntPtr.Zero Then
-                        Dim depth16 = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr)
-                        pointCloud = ComputePointCloud(depth16, calibData.rgbIntrinsics)
-                        pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                    End If
+                    '' Get depth and compute point cloud
+                    'Dim depthPtr = OakDRawDepth(cPtr)
+                    'If depthPtr <> IntPtr.Zero Then
+                    '    Dim depth16 = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr)
+                    '    pointCloud = ComputePointCloud(depth16, calibData.rgbIntrinsics)
+                    '    pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    'End If
 
-                    ' Get IMU data
-                    Dim accelPtr = OakDAccel(cPtr)
-                    If accelPtr <> IntPtr.Zero Then
-                        IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelPtr)
-                    End If
+                    '' Get IMU data
+                    'Dim accelPtr = OakDAccel(cPtr)
+                    'If accelPtr <> IntPtr.Zero Then
+                    '    IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelPtr)
+                    'End If
 
-                    Dim gyroPtr = OakDGyro(cPtr)
-                    If gyroPtr <> IntPtr.Zero Then
-                        IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroPtr)
-                    End If
+                    'Dim gyroPtr = OakDGyro(cPtr)
+                    'If gyroPtr <> IntPtr.Zero Then
+                    '    IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroPtr)
+                    'End If
 
-                    Dim timeStamp = OakDIMUTimeStamp(cPtr)
-                    If initialTime = 0 Then initialTime = timeStamp
-                    IMU_FrameTime = timeStamp - initialTime
+                    'Dim timeStamp = OakDIMUTimeStamp(cPtr)
+                    'If initialTime = 0 Then initialTime = timeStamp
+                    'IMU_FrameTime = timeStamp - initialTime
                 End SyncLock
 
                 MyBase.GetNextFrameCounts(IMU_FrameTime)
