@@ -37,24 +37,22 @@ public:
 	std::shared_ptr<dai::Device> device;
 	
 	// v3 Camera nodes (replacing ColorCamera and MonoCamera)
-	std::shared_ptr<dai::node::Camera> camRgb;
-	std::shared_ptr<dai::node::Camera> monoLeft;
-	std::shared_ptr<dai::node::Camera> monoRight;
-	std::shared_ptr<dai::node::StereoDepth> depth;
+	std::shared_ptr<dai::node::Camera> pipeRGB;
+	std::shared_ptr<dai::node::Camera> pipeLeft;
+	std::shared_ptr<dai::node::Camera> pipeRight;
+	std::shared_ptr<dai::node::StereoDepth> pipeDepth;
 	std::shared_ptr<dai::node::Sync> sync;
 	std::shared_ptr<dai::node::IMU> imu;
 	
-	std::shared_ptr<dai::MessageQueue> queue;
+	std::shared_ptr<dai::MessageQueue> qDisparity;
 	std::shared_ptr<dai::MessageQueue> qRGB;
 	std::shared_ptr<dai::MessageQueue> qLeft;
 	std::shared_ptr<dai::MessageQueue> qRight;
 	std::shared_ptr<dai::MessageQueue> stereoOut;
-	std::shared_ptr<dai::MessageQueue> depthQueue;
 	std::shared_ptr<dai::MessageQueue> imuQueue;
-	dai::Node::Output* rgbOut;
-	dai::Node::Output* lout;
-	dai::Node::Output* rout;
-	//dai::Node::Output* depth;
+	dai::Node::Output* outRGB;
+	dai::Node::Output* outLeft;
+	dai::Node::Output* outRight;
 
 	std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration> baseTs;
 
@@ -69,31 +67,35 @@ public:
 		cols = _cols;
 
 		// Define sources and outputs
-		camRgb = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_A);
-		monoLeft = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_B);
-		monoRight = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_C);
-		depth = pipeline.create<dai::node::StereoDepth>();
+		pipeRGB = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_A);
+		pipeLeft = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_B);
+		pipeRight = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_C);
+		pipeDepth = pipeline.create<dai::node::StereoDepth>();
 
-		rgbOut = camRgb->requestOutput({ cols, rows }, dai::ImgFrame::Type::BGR888i);
-		lout = monoLeft->requestOutput({ cols, rows });
-		rout = monoRight->requestOutput({ cols, rows });
+		outRGB = pipeRGB->requestOutput({ cols, rows }, dai::ImgFrame::Type::BGR888i);
+		outLeft = pipeLeft->requestOutput({ cols, rows });
+		outRight = pipeRight->requestOutput({ cols, rows });
 
 		// Create a node that will produce the depth map (using disparity output as it's easier to visualize depth this way)
-		depth->build(*lout, *rout, dai::node::StereoDepth::PresetMode::DEFAULT);
-		// Options: MEDIAN_OFF, KERNEL_3x3, KERNEL_5x5, KERNEL_7x7 (default)
-		depth->initialConfig->setMedianFilter(dai::StereoDepthConfig::MedianFilter::KERNEL_7x7);
-		depth->setLeftRightCheck(lr_check);
-		depth->setExtendedDisparity(extended_disparity);
-		depth->setSubpixel(subpixel);
+		pipeDepth->build(*outLeft, *outRight, dai::node::StereoDepth::PresetMode::DEFAULT);
 
-		queue = depth->disparity.createOutputQueue();
-		qRGB = rgbOut->createOutputQueue();
-		qLeft = lout->createOutputQueue();
-		qRight = rout->createOutputQueue();
+		// Options: MEDIAN_OFF, KERNEL_3x3, KERNEL_5x5, KERNEL_7x7 (default)
+		pipeDepth->initialConfig->setMedianFilter(dai::StereoDepthConfig::MedianFilter::KERNEL_7x7);
+		pipeDepth->setLeftRightCheck(lr_check);
+		pipeDepth->setExtendedDisparity(extended_disparity);
+		pipeDepth->setSubpixel(subpixel);
+
+		// Create output queues - StereoDepth outputs are accessed directly (depth, disparity, etc.)
+		qDisparity = pipeDepth->disparity.createOutputQueue();
+		// If you need depth output instead of disparity, use: pipeDepth->depth.createOutputQueue()
+		
+		qRGB = outRGB->createOutputQueue();
+		qLeft = outLeft->createOutputQueue();
+		qRight = outRight->createOutputQueue();
 
 		pipeline.start();
 
-		maxDisparity = (float)depth->initialConfig->getMaxDisparity();
+		maxDisparity = (float)pipeDepth->initialConfig->getMaxDisparity();
 		rgb = Mat(rows, cols, CV_8UC3);
 		depth16u = Mat(rows, cols, CV_16UC1);
 		leftView = Mat(rows, cols, CV_8UC1);
@@ -105,7 +107,7 @@ public:
 	void waitForFrame()
 	{
 		auto inRGB = qRGB->get<dai::ImgFrame>();
-		auto inDepth = queue->get<dai::ImgFrame>();
+		auto inDepth = qDisparity->get<dai::ImgFrame>();
 		auto inLeft = qLeft->get<dai::ImgFrame>();
 		auto inRight = qRight->get<dai::ImgFrame>();
 		auto frame = inDepth->getFrame();
