@@ -186,12 +186,12 @@ Namespace MainUI
                     End If
 
                     ' Get depth and compute point cloud
-                    'Dim depthPtr = OakDRawDepth(cPtr)
-                    'If depthPtr <> IntPtr.Zero Then
-                    '    Dim depth16 = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr)
-                    '    pointCloud = ComputePointCloud(depth16, calibData.rgbIntrinsics)
-                    '    pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                    'End If
+                    Dim depthPtr = OakDRawDepth(cPtr)
+                    If depthPtr <> IntPtr.Zero Then
+                        Dim depth16 = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr)
+                        pointCloud = ComputePointCloud(depth16, calibData.rgbIntrinsics)
+                        pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    End If
 
                     '' Get IMU data
                     Dim accelPtr = OakDAccel(cPtr)

@@ -1,6 +1,4 @@
 #include <iostream>
-
-// Includes common necessary includes for development using depthai library
 #include "depthai/depthai.hpp"
 #include "depthai/pipeline/datatype/StereoDepthConfig.hpp"
 #include "depthai/pipeline/node/StereoDepth.hpp"
@@ -10,7 +8,7 @@
 using namespace std;
 using namespace cv;
 
-constexpr float FPS = 25.0f;
+constexpr float FPS = 60.0f;
 
 // Closer-in minimum depth, disparity range is doubled (from 95 to 190):
 static std::atomic<bool> extended_disparity{ false };
