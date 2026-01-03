@@ -18,6 +18,15 @@ Namespace MainUI
                     Dim jsonSettings = streamReader.ReadToEnd()
                     If jsonSettings <> "" Then
                         settings = JsonConvert.DeserializeObject(Of jsonShared.Settings)(jsonSettings)
+
+
+                        settings.captureRes.Height = 480
+                        settings.captureRes.Width = 640
+                        settings.workRes.Height = 480
+                        settings.workRes.Width = 640
+
+
+
                         settings = initialize(settings)
                     End If
                 End Using
@@ -28,10 +37,6 @@ Namespace MainUI
             Return settings
         End Function
         Public Function initialize(Settings As jsonShared.Settings)
-            Settings.cameraSupported = New List(Of Boolean)({True, True, True, True, True, False, True, True})
-            Settings.camera640x480Support = New List(Of Boolean)({False, True, True, False, False, False, True, True})
-            Settings.camera1920x1080Support = New List(Of Boolean)({True, False, False, False, True, False, False, False})
-
             ' checking the list for specific missing device here...
             Dim usbList = USBenumeration()
             Settings.cameraPresent = New List(Of Boolean)

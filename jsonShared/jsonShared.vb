@@ -13,8 +13,6 @@ Namespace jsonShared
         Public cameraPresent As List(Of Boolean)
         Public cameraFound As Boolean
         Public cameraSupported As List(Of Boolean)
-        Public camera640x480Support As List(Of Boolean)
-        Public camera1920x1080Support As List(Of Boolean)
 
         Public captureRes As New cv.Size(640, 480)
 

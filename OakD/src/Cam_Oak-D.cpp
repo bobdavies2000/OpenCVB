@@ -41,7 +41,7 @@ public:
 	std::shared_ptr<dai::node::Camera> pipeLeft;
 	std::shared_ptr<dai::node::Camera> pipeRight;
 	std::shared_ptr<dai::node::StereoDepth> pipeDepth;
-	std::shared_ptr<dai::node::Sync> sync;
+	std::shared_ptr<dai::node::Sync> pipeSync;
 	std::shared_ptr<dai::node::IMU> imu;
 	
 	std::shared_ptr<dai::MessageQueue> qDisparity;
@@ -70,6 +70,7 @@ public:
 		pipeLeft = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_B);
 		pipeRight = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_C);
 		pipeDepth = pipeline.create<dai::node::StereoDepth>();
+		//pipeSync = pipeline.create<dai::node::Sync>();
 
 		outRGB = pipeRGB->requestOutput({ cols, rows }, dai::ImgFrame::Type::BGR888i);
 		outLeft = pipeLeft->requestOutput({ cols, rows });
@@ -95,12 +96,6 @@ public:
 		pipeline.start();
 
 		maxDisparity = (float)pipeDepth->initialConfig->getMaxDisparity();
-		rgb = Mat(rows, cols, CV_8UC3);
-		depth16u = Mat(rows, cols, CV_16UC1);
-		leftView = Mat(rows, cols, CV_8UC1);
-		rightView = Mat(rows, cols, CV_8UC1);
-		leftView.setTo(0);
-		rightView.setTo(0);
 	}
 
 	void waitForFrame()
@@ -109,10 +104,14 @@ public:
 		auto inDepth = qDisparity->get<dai::ImgFrame>();
 		auto inLeft = qLeft->get<dai::ImgFrame>();
 		auto inRight = qRight->get<dai::ImgFrame>();
+		
+		// Get frames and resize to desired output resolution
 		rgb = inRGB->getFrame().clone();
-		depth16u = inDepth->getFrame().clone();
 		leftView = inLeft->getFrame().clone();
 		rightView = inRight->getFrame().clone();
+		
+		cv::Mat depthMat = inDepth->getFrame();
+		cv::resize(depthMat, depth16u, cv::Size(cols, rows));
 	}
 };
 

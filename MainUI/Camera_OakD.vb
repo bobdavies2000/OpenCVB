@@ -158,8 +158,8 @@ Namespace MainUI
         Public Sub GetNextFrame()
             If cPtr = IntPtr.Zero Then Return
 
-            Dim rows = captureRes.Height
-            Dim cols = captureRes.Width
+            Dim rows = 480 ' captureRes.Height
+            Dim cols = 640 ' captureRes.Width
 
             Try
                 OakDWaitForFrame(cPtr)
@@ -168,23 +168,24 @@ Namespace MainUI
                     Dim colorPtr = OakDColor(cPtr)
                     If colorPtr <> IntPtr.Zero Then
                         Dim colorMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorPtr)
-                        color = colorMat.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                        color = colorMat
                     End If
 
                     '' Get left image
                     Dim leftPtr = OakDLeftImage(cPtr)
                     If leftPtr <> IntPtr.Zero Then
                         Dim leftMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr)
-                        leftView = leftMat.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                        leftView = leftMat
                     End If
 
                     ' Get right image
                     Dim rightPtr = OakDRightImage(cPtr)
                     If rightPtr <> IntPtr.Zero Then
                         Dim rightMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr)
-                        rightView = rightMat.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                        rightView = rightMat
                     End If
 
+                    pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
                     '' Get depth and compute point cloud
                     'Dim depthPtr = OakDRawDepth(cPtr)
                     'If depthPtr <> IntPtr.Zero Then
