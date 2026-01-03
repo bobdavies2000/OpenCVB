@@ -112,12 +112,9 @@ public:
 		auto inDepth = queue->get<dai::ImgFrame>();
 		auto inLeft = qLeft->get<dai::ImgFrame>();
 		auto frame = inDepth->getFrame();
+		rgb = inRGB->getFrame().clone();
 		// Normalization for better visualization
 		frame.convertTo(frame, CV_8UC1, 255 / maxDisparity);
-
-		cv::imshow("rgb", inRGB->getFrame());
-		cv::imshow("Disparity", frame);
-		cv::waitKey(1);
 	}
 };
 
@@ -202,7 +199,9 @@ extern "C" __declspec(dllexport) int* OakDPointCloud(OakDCamera* cPtr) { return 
 extern "C" __declspec(dllexport) double OakDIMUTimeStamp(OakDCamera* cPtr) { return cPtr->imuTimeStamp; }
 extern "C" __declspec(dllexport) int* OakDGyro(OakDCamera* cPtr) { return (int*)&cPtr->gyroValues.x; }
 extern "C" __declspec(dllexport) int* OakDAccel(OakDCamera* cPtr) { return (int*)&cPtr->acceleroValues.x; }
-extern "C" __declspec(dllexport) int* OakDColor(OakDCamera* cPtr) { return (int*)cPtr->rgb.data; }
+extern "C" __declspec(dllexport) int* OakDColor(OakDCamera* cPtr) { 
+	return (int*)cPtr->rgb.data; 
+}
 extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera* cPtr) { cPtr->waitForFrame(); }
 extern "C" __declspec(dllexport) void OakDStop(OakDCamera* cPtr)
 {

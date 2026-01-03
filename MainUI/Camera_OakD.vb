@@ -165,15 +165,11 @@ Namespace MainUI
                 OakDWaitForFrame(cPtr)
 
                 SyncLock cameraMutex
-                    ' Get color image (RGB format from C++)
-                    'Dim colorPtr = OakDColor(cPtr)
-                    'If colorPtr <> IntPtr.Zero Then
-                    '    Dim colorMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorPtr)
-                    '    color = colorMat.CvtColor(cv.ColorConversionCodes.RGB2BGR).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-
-                    '    cv.Cv2.ImShow("color", color)
-                    '    cv.Cv2.WaitKey(1)
-                    'End If
+                    Dim colorPtr = OakDColor(cPtr)
+                    If colorPtr <> IntPtr.Zero Then
+                        Dim colorMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorPtr)
+                        color = colorMat.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    End If
 
                     '' Get left image
                     'Dim leftPtr = OakDLeftImage(cPtr)
