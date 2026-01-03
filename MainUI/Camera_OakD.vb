@@ -70,74 +70,74 @@ Namespace MainUI
             End If
 
             ' Get calibration data
-            'Dim ratio = captureRes.Width \ workRes.Width
-            'Dim intrinsicsPtr = OakDintrinsics(cPtr, 1) ' RGB camera
-            'If intrinsicsPtr <> IntPtr.Zero Then
-            '    Dim intrinsics(8) As Single
-            '    Marshal.Copy(intrinsicsPtr, intrinsics, 0, 9)
-            '    ' Intrinsics matrix: [fx, 0, cx; 0, fy, cy; 0, 0, 1]
-            '    calibData.rgbIntrinsics.fx = intrinsics(0) / ratio
-            '    calibData.rgbIntrinsics.ppx = intrinsics(2) / ratio
-            '    calibData.rgbIntrinsics.fy = intrinsics(4) / ratio
-            '    calibData.rgbIntrinsics.ppy = intrinsics(5) / ratio
-            'End If
+            Dim ratio = captureRes.Width \ workRes.Width
+            Dim intrinsicsPtr = OakDintrinsics(cPtr, 1) ' RGB camera
+            If intrinsicsPtr <> IntPtr.Zero Then
+                Dim intrinsics(8) As Single
+                Marshal.Copy(intrinsicsPtr, intrinsics, 0, 9)
+                ' Intrinsics matrix: [fx, 0, cx; 0, fy, cy; 0, 0, 1]
+                calibData.rgbIntrinsics.fx = intrinsics(0) / ratio
+                calibData.rgbIntrinsics.ppx = intrinsics(2) / ratio
+                calibData.rgbIntrinsics.fy = intrinsics(4) / ratio
+                calibData.rgbIntrinsics.ppy = intrinsics(5) / ratio
+            End If
 
-            'Dim leftIntrinsicsPtr = OakDintrinsics(cPtr, 2) ' Left camera
-            'If leftIntrinsicsPtr <> IntPtr.Zero Then
-            '    Dim intrinsics(8) As Single
-            '    Marshal.Copy(leftIntrinsicsPtr, intrinsics, 0, 9)
-            '    calibData.leftIntrinsics.fx = intrinsics(0) / ratio
-            '    calibData.leftIntrinsics.ppx = intrinsics(2) / ratio
-            '    calibData.leftIntrinsics.fy = intrinsics(4) / ratio
-            '    calibData.leftIntrinsics.ppy = intrinsics(5) / ratio
-            'End If
+            Dim leftIntrinsicsPtr = OakDintrinsics(cPtr, 2) ' Left camera
+            If leftIntrinsicsPtr <> IntPtr.Zero Then
+                Dim intrinsics(8) As Single
+                Marshal.Copy(leftIntrinsicsPtr, intrinsics, 0, 9)
+                calibData.leftIntrinsics.fx = intrinsics(0) / ratio
+                calibData.leftIntrinsics.ppx = intrinsics(2) / ratio
+                calibData.leftIntrinsics.fy = intrinsics(4) / ratio
+                calibData.leftIntrinsics.ppy = intrinsics(5) / ratio
+            End If
 
-            'Dim rightIntrinsicsPtr = OakDintrinsics(cPtr, 3) ' Right camera
-            'If rightIntrinsicsPtr <> IntPtr.Zero Then
-            '    Dim intrinsics(8) As Single
-            '    Marshal.Copy(rightIntrinsicsPtr, intrinsics, 0, 9)
-            '    calibData.rightIntrinsics.fx = intrinsics(0) / ratio
-            '    calibData.rightIntrinsics.ppx = intrinsics(2) / ratio
-            '    calibData.rightIntrinsics.fy = intrinsics(4) / ratio
-            '    calibData.rightIntrinsics.ppy = intrinsics(5) / ratio
-            'End If
+            Dim rightIntrinsicsPtr = OakDintrinsics(cPtr, 3) ' Right camera
+            If rightIntrinsicsPtr <> IntPtr.Zero Then
+                Dim intrinsics(8) As Single
+                Marshal.Copy(rightIntrinsicsPtr, intrinsics, 0, 9)
+                calibData.rightIntrinsics.fx = intrinsics(0) / ratio
+                calibData.rightIntrinsics.ppx = intrinsics(2) / ratio
+                calibData.rightIntrinsics.fy = intrinsics(4) / ratio
+                calibData.rightIntrinsics.ppy = intrinsics(5) / ratio
+            End If
 
-            '' Get extrinsics
-            'Dim rgbToLeftPtr = OakDExtrinsicsRGBtoLeft(cPtr)
-            'If rgbToLeftPtr <> IntPtr.Zero Then
-            '    Dim extrinsics(11) As Single
-            '    Marshal.Copy(rgbToLeftPtr, extrinsics, 0, 12)
-            '    ReDim calibData.ColorToLeft_translation(2)
-            '    ReDim calibData.ColorToLeft_rotation(8)
-            '    For i = 0 To 2
-            '        calibData.ColorToLeft_translation(i) = extrinsics(i)
-            '    Next
-            '    For i = 0 To 8
-            '        calibData.ColorToLeft_rotation(i) = extrinsics(i + 3)
-            '    Next
-            'End If
+            ' Get extrinsics
+            Dim rgbToLeftPtr = OakDExtrinsicsRGBtoLeft(cPtr)
+            If rgbToLeftPtr <> IntPtr.Zero Then
+                Dim extrinsics(11) As Single
+                Marshal.Copy(rgbToLeftPtr, extrinsics, 0, 12)
+                ReDim calibData.ColorToLeft_translation(2)
+                ReDim calibData.ColorToLeft_rotation(8)
+                For i = 0 To 2
+                    calibData.ColorToLeft_translation(i) = extrinsics(i)
+                Next
+                For i = 0 To 8
+                    calibData.ColorToLeft_rotation(i) = extrinsics(i + 3)
+                Next
+            End If
 
-            'Dim leftToRightPtr = OakDExtrinsicsLeftToRight(cPtr)
-            'If leftToRightPtr <> IntPtr.Zero Then
-            '    Dim extrinsics(11) As Single
-            '    Marshal.Copy(leftToRightPtr, extrinsics, 0, 12)
-            '    ReDim calibData.LtoR_translation(2)
-            '    ReDim calibData.LtoR_rotation(8)
-            '    For i = 0 To 2
-            '        calibData.LtoR_translation(i) = extrinsics(i)
-            '    Next
-            '    For i = 0 To 8
-            '        calibData.LtoR_rotation(i) = extrinsics(i + 3)
-            '    Next
+            Dim leftToRightPtr = OakDExtrinsicsLeftToRight(cPtr)
+            If leftToRightPtr <> IntPtr.Zero Then
+                Dim extrinsics(11) As Single
+                Marshal.Copy(leftToRightPtr, extrinsics, 0, 12)
+                ReDim calibData.LtoR_translation(2)
+                ReDim calibData.LtoR_rotation(8)
+                For i = 0 To 2
+                    calibData.LtoR_translation(i) = extrinsics(i)
+                Next
+                For i = 0 To 8
+                    calibData.LtoR_rotation(i) = extrinsics(i + 3)
+                Next
 
-            '    ' Calculate baseline from translation vector
-            '    calibData.baseline = CSng(Math.Sqrt(
-            '        calibData.LtoR_translation(0) * calibData.LtoR_translation(0) +
-            '        calibData.LtoR_translation(1) * calibData.LtoR_translation(1) +
-            '        calibData.LtoR_translation(2) * calibData.LtoR_translation(2)))
-            'End If
+                ' Calculate baseline from translation vector
+                calibData.baseline = CSng(Math.Sqrt(
+                    calibData.LtoR_translation(0) * calibData.LtoR_translation(0) +
+                    calibData.LtoR_translation(1) * calibData.LtoR_translation(1) +
+                    calibData.LtoR_translation(2) * calibData.LtoR_translation(2)))
+            End If
 
-            'If calibData.baseline = 0 Then calibData.baseline = 0.075F ' Default Oak-D baseline ~7.5cm
+            If calibData.baseline = 0 Then calibData.baseline = 0.075F ' Default Oak-D baseline ~7.5cm
 
             MyBase.prepImages()
 
@@ -185,8 +185,7 @@ Namespace MainUI
                         rightView = rightMat
                     End If
 
-                    pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
-                    '' Get depth and compute point cloud
+                    ' Get depth and compute point cloud
                     'Dim depthPtr = OakDRawDepth(cPtr)
                     'If depthPtr <> IntPtr.Zero Then
                     '    Dim depth16 = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr)
@@ -195,19 +194,17 @@ Namespace MainUI
                     'End If
 
                     '' Get IMU data
-                    'Dim accelPtr = OakDAccel(cPtr)
-                    'If accelPtr <> IntPtr.Zero Then
-                    '    IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelPtr)
-                    'End If
+                    Dim accelPtr = OakDAccel(cPtr)
+                    If accelPtr <> IntPtr.Zero Then
+                        IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelPtr)
+                    End If
 
-                    'Dim gyroPtr = OakDGyro(cPtr)
-                    'If gyroPtr <> IntPtr.Zero Then
-                    '    IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroPtr)
-                    'End If
+                    Dim gyroPtr = OakDGyro(cPtr)
+                    If gyroPtr <> IntPtr.Zero Then
+                        IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroPtr)
+                    End If
 
-                    'Dim timeStamp = OakDIMUTimeStamp(cPtr)
-                    'If initialTime = 0 Then initialTime = timeStamp
-                    'IMU_FrameTime = timeStamp - initialTime
+                    IMU_FrameTime = OakDIMUTimeStamp(cPtr)
                 End SyncLock
 
                 MyBase.GetNextFrameCounts(IMU_FrameTime)
