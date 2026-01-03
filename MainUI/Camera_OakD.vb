@@ -152,9 +152,6 @@ Namespace MainUI
         Private Sub CaptureFrames()
             While isCapturing
                 GetNextFrame()
-
-                cv.Cv2.ImShow("rgb", color)
-                cv.Cv2.WaitKey(1)
             End While
         End Sub
 
@@ -173,19 +170,22 @@ Namespace MainUI
                     If colorPtr <> IntPtr.Zero Then
                         Dim colorMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorPtr)
                         color = colorMat.CvtColor(cv.ColorConversionCodes.RGB2BGR).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+
+                        cv.Cv2.ImShow("color", color)
+                        cv.Cv2.WaitKey(1)
                     End If
 
                     ' Get left image
                     Dim leftPtr = OakDLeftImage(cPtr)
                     If leftPtr <> IntPtr.Zero Then
-                        Dim leftMat = cv.Mat.FromPixelData(720, 1280, cv.MatType.CV_8UC1, leftPtr)
+                        Dim leftMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr)
                         leftView = leftMat.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     End If
 
                     ' Get right image
                     Dim rightPtr = OakDRightImage(cPtr)
                     If rightPtr <> IntPtr.Zero Then
-                        Dim rightMat = cv.Mat.FromPixelData(720, 1280, cv.MatType.CV_8UC1, rightPtr)
+                        Dim rightMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr)
                         rightView = rightMat.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     End If
 

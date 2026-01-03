@@ -33,23 +33,16 @@ public:
 	std::shared_ptr<dai::node::Camera> left;
 	std::shared_ptr<dai::node::Camera> right;
 	std::shared_ptr<dai::node::StereoDepth> stereo;
-	std::shared_ptr<dai::node::StereoDepth> sync;
+	std::shared_ptr<dai::node::Sync> sync;
 	std::shared_ptr<dai::node::IMU> imu;
-
-	// Output pointers from nodes
-	dai::Node::Output* rgbOut = nullptr;
 	
-	// v3 MessageQueues (replacing DataOutputQueue)
-	//std::shared_ptr<dai::MessageQueue> rgbOut;
-	//std::shared_ptr<dai::MessageQueue> leftOut;
-	//std::shared_ptr<dai::MessageQueue> rightOut; 
 	std::shared_ptr<dai::MessageQueue> queue;
 	std::shared_ptr<dai::MessageQueue> stereoOut;
 	std::shared_ptr<dai::MessageQueue> depthQueue;
 	std::shared_ptr<dai::MessageQueue> imuQueue;
-	dai::Node::Output* colorCamOut;
-	dai::Node::Output* monoLeftOut;
-	dai::Node::Output* monoRightOut;
+	dai::Node::Output* rgbOut;
+	dai::Node::Output* leftOut;
+	dai::Node::Output* rightOut;
 
 	std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration> baseTs;
 
@@ -154,43 +147,34 @@ public:
 		right->build(RIGHT_SOCKET);
 
 		stereo = pipeline.create<dai::node::StereoDepth>();
-		auto sync = pipeline.create<dai::node::Sync>();
-
-		// Check if platform is RVC4 and create ImageAlign node if needed
-		auto platform = pipeline.getDefaultDevice()->getPlatform();
-		std::shared_ptr<dai::node::ImageAlign> align;
-		if (platform == dai::Platform::RVC4) {
-			align = pipeline.create<dai::node::ImageAlign>();
-		}
+		sync = pipeline.create<dai::node::Sync>();
 
 		stereo->setExtendedDisparity(true);
 		sync->setSyncThreshold(std::chrono::duration<int64_t, std::nano>(static_cast<int64_t>(1e9 / (2.0 * FPS))));
 
 		// Configure outputs
-		auto rgbOut = camRgb->requestOutput(std::make_pair(640, 480), dai::ImgFrame::Type::NV12, dai::ImgResizeMode::CROP, FPS, true);
-		auto leftOut = left->requestOutput(std::make_pair(640, 400), std::nullopt, dai::ImgResizeMode::CROP, FPS);
-		auto rightOut = right->requestOutput(std::make_pair(640, 400), std::nullopt, dai::ImgResizeMode::CROP, FPS);
+		rgbOut = camRgb->requestOutput(std::make_pair(640, 480), dai::ImgFrame::Type::NV12, dai::ImgResizeMode::CROP, FPS, true);
+		leftOut = left->requestOutput(std::make_pair(640, 400), std::nullopt, dai::ImgResizeMode::CROP, FPS);
+		rightOut = right->requestOutput(std::make_pair(640, 400), std::nullopt, dai::ImgResizeMode::CROP, FPS);
 
 		// Link nodes
 		rgbOut->link(sync->inputs["rgb"]);
 		leftOut->link(stereo->left);
 		rightOut->link(stereo->right);
 
-		if (platform == dai::Platform::RVC4) {
-			stereo->depth.link(align->input);
-			rgbOut->link(align->inputAlignTo);
-			align->outputAligned.link(sync->inputs["depth_aligned"]);
-		}
-		else {
-			stereo->depth.link(sync->inputs["depth_aligned"]);
-			rgbOut->link(stereo->inputAlignTo);
-		}
+		// Use default configuration (depth alignment via stereo node)
+		stereo->depth.link(sync->inputs["depth_aligned"]);
+		rgbOut->link(stereo->inputAlignTo);
 
-		// Create output queue
+		// Create output queue (before starting pipeline)
 		queue = sync->out.createOutputQueue();
 
-		// Start pipeline
-		pipeline.start();
+		// Create device and start pipeline
+		device = std::make_shared<dai::Device>();
+		device->startPipeline(pipeline);
+			
+		// Get calibration data
+		//deviceCalib = device->readCalibration();
 
 		rgb = Mat(rows, cols, CV_8UC3);
 		depth16u = Mat(rows, cols, CV_16UC1);
@@ -202,19 +186,53 @@ public:
 
 	void waitForFrame()
 	{
-		auto messageGroup = queue->get<dai::MessageGroup>();
+		// Check if queue is valid
+		if (!queue || !device) {
+			return;  // Queue or device not ready
+		}
 
-		auto frameRgb = messageGroup->get<dai::ImgFrame>("rgb");
-		auto frameDepth = messageGroup->get<dai::ImgFrame>("depth_aligned");
+		try {
+			// Get message group from queue
+			auto messageGroup = queue->get<dai::MessageGroup>();
 
-		if (frameDepth != nullptr) 
-		{
-			cv::Mat rgb = frameRgb->getCvFrame();
-			cv::imshow("RGB Frame", rgb);
+			if (messageGroup == nullptr) {
+				return;  // No message group received
+			}
 
-			cv::Mat alignedDepthColorized = colorizeDepth(frameDepth->getFrame());
-			cv::imshow("Aligned Depth Colorized", alignedDepthColorized);
-			cv::waitKey(1);
+			auto frameRgb = messageGroup->get<dai::ImgFrame>("rgb");
+			auto frameDepth = messageGroup->get<dai::ImgFrame>("depth_aligned");
+
+			if (frameRgb == nullptr || frameDepth == nullptr) {
+				return;  // Missing frames
+			}
+
+			// Get frames as OpenCV Mats
+			cv::Mat rgbMat = frameRgb->getCvFrame();
+			cv::Mat depthMat = frameDepth->getFrame();
+
+			// Resize and store
+			cv::resize(rgbMat, rgb, cv::Size(cols, rows));
+			
+			// Process depth frame
+			cv::Mat alignedDepthColorized = colorizeDepth(depthMat);
+			cv::resize(alignedDepthColorized, depth16u, cv::Size(cols, rows));
+		}
+		catch (const dai::XLinkReadError& e) {
+			// XLink communication error - device might be disconnected or busy
+			std::cerr << "XLink read error: " << e.what() << std::endl;
+			return;  // Skip this frame
+		}
+		catch (const dai::MessageQueue::QueueException& e) {
+			std::cerr << "Queue exception: " << e.what() << std::endl;
+			return;  // Skip this frame
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Error reading frames: " << e.what() << std::endl;
+			return;  // Skip this frame
+		}
+		catch (...) {
+			std::cerr << "Unknown error reading frames" << std::endl;
+			return;  // Skip this frame
 		}
 	}
 };
