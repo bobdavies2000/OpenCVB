@@ -40,9 +40,9 @@ Public Class Options
                                                                       False, False, False,
                                                                       False, False, False})
             Case "Oak-D camera"
-                settings.resolutionsSupported = New List(Of Boolean)({True, True, True,
+                settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                                       True, True, True,
-                                                                      False, False, False,
+                                                                      True, True, True,
                                                                       False, False, False,
                                                                       False, False, False})
             Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"

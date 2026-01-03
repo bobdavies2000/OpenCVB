@@ -623,10 +623,6 @@ public:
     }
 };
 
-
-
-
-
 extern "C" __declspec(dllexport)
 Depth_Colorizer* Depth_Colorizer_Open()
 {

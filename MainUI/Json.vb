@@ -18,15 +18,6 @@ Namespace MainUI
                     Dim jsonSettings = streamReader.ReadToEnd()
                     If jsonSettings <> "" Then
                         settings = JsonConvert.DeserializeObject(Of jsonShared.Settings)(jsonSettings)
-
-
-                        settings.captureRes.Height = 480
-                        settings.captureRes.Width = 640
-                        settings.workRes.Height = 480
-                        settings.workRes.Width = 640
-
-
-
                         settings = initialize(settings)
                     End If
                 End Using
@@ -127,13 +118,6 @@ Namespace MainUI
             If settings.MainFormWidth = 0 Then settings.MainFormWidth = 500
             If settings.MainFormHeight = 0 Then settings.MainFormHeight = 350
 
-            Select Case settings.captureRes.Width
-                Case 672
-                    settings.displayRes = New cv.Size(672, 376)
-                Case Else
-                    settings.displayRes = New cv.Size(640, 480)
-            End Select
-
             Select Case settings.workRes.Height
                 Case 270, 540, 1080
                     settings.captureRes = New cv.Size(1920, 1080)
@@ -147,11 +131,9 @@ Namespace MainUI
                     Else
                         settings.workRes = New cv.Size(320, 180)
                         settings.captureRes = New cv.Size(672, 376)
-                        settings.displayRes = New cv.Size(672, 376)
                     End If
                 Case 120, 240, 480
                     settings.captureRes = New cv.Size(640, 480)
-                    settings.displayRes = New cv.Size(640, 480)
             End Select
 
             Select Case settings.workRes.Width

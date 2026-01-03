@@ -63,7 +63,7 @@ Namespace MainUI
             workRes = _workRes
 
             ' Open the Oak-D camera
-            cPtr = OakDOpen(captureRes.Width, captureRes.Height)
+            cPtr = OakDOpen(workRes.Width, workRes.Height)
 
             If cPtr = IntPtr.Zero Then
                 Throw New Exception("Failed to open Oak-D camera")
@@ -158,8 +158,8 @@ Namespace MainUI
         Public Sub GetNextFrame()
             If cPtr = IntPtr.Zero Then Return
 
-            Dim rows = 480 ' captureRes.Height
-            Dim cols = 640 ' captureRes.Width
+            Dim rows = workRes.Height
+            Dim cols = workRes.Width
 
             Try
                 OakDWaitForFrame(cPtr)
@@ -167,33 +167,29 @@ Namespace MainUI
                 SyncLock cameraMutex
                     Dim colorPtr = OakDColor(cPtr)
                     If colorPtr <> IntPtr.Zero Then
-                        Dim colorMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorPtr)
-                        color = colorMat
+                        color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorPtr).Clone()
                     End If
 
-                    '' Get left image
+                    ' Get left image
                     Dim leftPtr = OakDLeftImage(cPtr)
                     If leftPtr <> IntPtr.Zero Then
-                        Dim leftMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr)
-                        leftView = leftMat
+                        leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr).Clone()
                     End If
 
                     ' Get right image
                     Dim rightPtr = OakDRightImage(cPtr)
                     If rightPtr <> IntPtr.Zero Then
-                        Dim rightMat = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr)
-                        rightView = rightMat
+                        rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr).Clone()
                     End If
 
                     ' Get depth and compute point cloud
                     Dim depthPtr = OakDRawDepth(cPtr)
                     If depthPtr <> IntPtr.Zero Then
-                        Dim depth16 = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr)
+                        Dim depth16 = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr).Clone()
                         pointCloud = ComputePointCloud(depth16, calibData.rgbIntrinsics)
-                        pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     End If
 
-                    '' Get IMU data
+                    ' Get IMU data
                     Dim accelPtr = OakDAccel(cPtr)
                     If accelPtr <> IntPtr.Zero Then
                         IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelPtr)
