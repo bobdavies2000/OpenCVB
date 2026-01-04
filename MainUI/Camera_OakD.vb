@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports cv = OpenCvSharp
 
-Namespace Main
+Namespace MainApp
     Public Class Camera_OakD : Inherits GenericCamera
         <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
         Private Shared Function OakDOpen(w As Integer, h As Integer) As IntPtr

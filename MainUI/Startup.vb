@@ -1,10 +1,10 @@
 Imports System.Windows.Forms
 Imports System.IO
-Module Program
+Module Startup
     <STAThread()>
     Sub Main()
         Application.EnableVisualStyles()
         Application.SetCompatibleTextRenderingDefault(False)
-        Application.Run(New Main.MainUI())
+        Application.Run(New MainApp.MainUI())
     End Sub
 End Module

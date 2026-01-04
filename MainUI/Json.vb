@@ -4,7 +4,7 @@ Imports Newtonsoft.Json
 Imports cv = OpenCvSharp
 Imports jsonShared
 
-Namespace Main
+Namespace MainApp
     Public Class jsonIO
         Private jsonFileName As String
         Public Sub New(fileName As String)

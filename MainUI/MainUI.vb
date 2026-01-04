@@ -4,8 +4,8 @@ Imports System.Threading
 Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
-Namespace Main
-    Partial Public Class MainUI
+Namespace MainApp
+    Partial Public Class MainUI : Inherits Form
         Dim isPlaying As Boolean = False
         Dim homeDir As String = ""
         Public settingsIO As jsonIO
@@ -445,7 +445,8 @@ Namespace Main
 
             PausePlayButton.PerformClick()
 
-            If Options.ShowDialog() = DialogResult.OK Then SaveJsonSettings()
+            Dim optionsForm As New Options()
+            If optionsForm.ShowDialog() = DialogResult.OK Then SaveJsonSettings()
             AvailableAlgorithms_SelectedIndexChanged(Nothing, Nothing)
 
             PausePlayButton.PerformClick()
@@ -453,6 +454,7 @@ Namespace Main
             If task Is Nothing Then startAlgorithm()
 
             MainForm_Resize(Nothing, Nothing)
+            optionsForm.Dispose()
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
             If task Is Nothing Then Exit Sub

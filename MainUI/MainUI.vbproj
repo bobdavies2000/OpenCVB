@@ -1,14 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+<EnableMyApplicationFramework>false</EnableMyApplicationFramework>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows7.0</TargetFramework>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <UseWindowsForms>true</UseWindowsForms>
-    <MyType>WindowsForms</MyType>
-    <StartupObject>Main.My.MyApplication</StartupObject>
+    <MyType>console</MyType>
+    <StartupObject>Startup</StartupObject>
     <Platforms>x64</Platforms>
-    <RootNamespace>Main</RootNamespace>
+    <RootNamespace></RootNamespace>
     <ApplicationIcon>Data\OpenCVB.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">

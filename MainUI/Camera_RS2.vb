@@ -3,7 +3,7 @@ Imports System.Threading
 Imports Intel.RealSense
 Imports cv = OpenCvSharp
 
-Namespace Main
+Namespace MainApp
     Public Class Camera_RS2 : Inherits GenericCamera
         Dim pipe As New Pipeline()
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)

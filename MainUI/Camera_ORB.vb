@@ -4,7 +4,7 @@ Imports System.Threading
 Imports Orbbec
 Imports cv = OpenCvSharp
 
-Namespace Main
+Namespace MainApp
     Public Class Camera_ORB : Inherits GenericCamera
         Dim pipe As Pipeline
 
