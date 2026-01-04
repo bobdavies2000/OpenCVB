@@ -31,22 +31,7 @@ Namespace My
 
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>
         Protected Overrides Sub OnCreateMainForm()
-            ' Find the MainUI project directory
-            Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
-            Dim currentDir = New IO.DirectoryInfo(IO.Path.GetDirectoryName(executingAssemblyPath))
-            Dim projectDirectory As String = ""
-
-            ' Navigate up the directory tree to find MainUI.vbproj
-            While currentDir IsNot Nothing
-                Dim vbprojFile = currentDir.GetFiles("MainUI.vbproj")
-                If vbprojFile.Length > 0 Then
-                    projectDirectory = currentDir.FullName
-                    Exit While
-                End If
-                currentDir = currentDir.Parent
-            End While
-
-            Me.MainForm = New MainUI.MainUI(projectDirectory)
+            Me.MainForm = New MainUI.MainUI()
         End Sub
 
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>

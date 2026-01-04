@@ -109,25 +109,24 @@ Namespace MainUI
                 If algHistory.Count >= maxHistory Then Exit For
             Next
         End Sub
-        Public Sub New(Optional projectDirectory As String = "")
+        Public Sub New()
             InitializeComponent()
 
-            ' Set the current directory to the project path (where .vbproj file is located)
-            Dim projectDir As DirectoryInfo
-            If String.IsNullOrEmpty(projectDirectory) Then
-                ' Fallback: try to find the project directory
-                Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
-                Dim currentDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
-                While currentDir IsNot Nothing
-                    Dim vbprojFile = currentDir.GetFiles("MainUI.vbproj")
-                    If vbprojFile.Length > 0 Then
-                        projectDirectory = currentDir.FullName
-                        Exit While
-                    End If
-                    currentDir = currentDir.Parent
-                End While
-            End If
-            projectDir = New DirectoryInfo(projectDirectory)
+            Dim executingAssemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
+            Dim currentDir = New DirectoryInfo(Path.GetDirectoryName(executingAssemblyPath))
+            Dim projectDirectory As String = ""
+
+            ' Navigate up the directory tree to find MainUI.vbproj
+            While currentDir IsNot Nothing
+                Dim vbprojFile = currentDir.GetFiles("MainUI.vbproj")
+                If vbprojFile.Length > 0 Then
+                    projectDirectory = currentDir.FullName
+                    Exit While
+                End If
+                currentDir = currentDir.Parent
+            End While
+
+            Dim projectDir = New DirectoryInfo(projectDirectory)
             Directory.SetCurrentDirectory(projectDir.FullName + "/../")
             homeDir = Path.GetDirectoryName(projectDir.FullName) + "\"
 
