@@ -69,9 +69,7 @@ Namespace VBClasses
             optionsChanged = True
             readyForCameraInput = True
 
-            Debug.WriteLine("")
-            Debug.WriteLine("")
-            Debug.WriteLine("Starting algorithm " + settings.algorithm)
+            Debug.WriteLine(vbCrLf + vbCrLf + vbCrLf + "Starting algorithm " + settings.algorithm)
             Debug.WriteLine(vbTab + CStr(AlgorithmTestAllCount) + " algorithms tested")
             AlgorithmTestAllCount += 1
         End Sub

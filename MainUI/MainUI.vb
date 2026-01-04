@@ -175,6 +175,7 @@ Namespace MainUI
                     count += 1
                     If count = 10 Then Exit While
                 End While
+                vbc.task.Dispose()
             End If
             If TestAllTimer.Enabled = False Then SaveJsonSettings()
         End Sub
@@ -461,8 +462,6 @@ Namespace MainUI
                         " " + Format(task.fpsAlgorithm, "0") + " FPS Algorithm" + vbCrLf +
                         " " + Format(task.fpsCamera, "0") + " FPS Camera")
 
-            PausePlayButton.PerformClick()
-
             Static lastTime As DateTime = Now
             Dim timeNow As DateTime = Now
             Static lastWriteTime = timeNow
@@ -482,21 +481,14 @@ Namespace MainUI
             Else
                 AvailableAlgorithms.SelectedIndex += 1
             End If
+            If AvailableAlgorithms.Items.Count <= AvailableAlgorithms.SelectedIndex + 1 Then AvailableAlgorithms.SelectedIndex = 0
 
-            Debug.WriteLine(vbCrLf + "GDI: " & GdiMonitor.GetGdiCount())
+            Debug.WriteLine("GDI: " & GdiMonitor.GetGdiCount())
             Debug.WriteLine("USER: " & GdiMonitor.GetUserCount())
 
-            ' skip testing the XO_ algorithms (XO.vb)  They are obsolete.
-            If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
-
-            PausePlayButton.PerformClick()
+            AvailableAlgorithms.SelectedItem = settings.algorithm
         End Sub
         Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
-            If TestAllTimer.Enabled Then
-                AvailableAlgorithms.SelectedItem = settings.algorithm
-                Exit Sub
-            End If
-
             isPlaying = Not isPlaying
 
             Static PausePlay = New Bitmap(homeDir + "MainUI/Data/PauseButton.png")

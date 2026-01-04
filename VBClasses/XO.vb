@@ -14064,7 +14064,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static unchanged As Integer
             Dim motionRect = XO_Motion_RectHistory.getMotionRect()
-            If motionRect.Width Then
+            If motionRect.Width Or task.redCloud Is Nothing Then
                 dst2 = runRedCloud(task.pointCloud, labels(2))
             Else
                 unchanged += 1
