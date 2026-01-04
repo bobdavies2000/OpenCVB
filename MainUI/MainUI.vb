@@ -1,4 +1,6 @@
 Imports System.IO
+Imports System.Runtime.InteropServices
+Imports System.Runtime.Intrinsics
 Imports System.Text.RegularExpressions
 Imports System.Threading
 Imports VBClasses
@@ -167,6 +169,7 @@ Namespace MainApp
         End Sub
         Private Sub MainForm_Closing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             If TestAllTimer.Enabled = False Then SaveJsonSettings()
+            vbc.task.Dispose()
             If isPlaying Then
                 StopCamera()
                 Dim count As Integer
@@ -175,7 +178,6 @@ Namespace MainApp
                     count += 1
                     If count = 10 Then Exit While
                 End While
-                vbc.task.Dispose()
             End If
         End Sub
         Private Sub getLineCounts()
@@ -320,6 +322,13 @@ Namespace MainApp
             setupAlgorithmHistory()
 
             PausePlayButton.PerformClick()
+
+            Const WM_SETICON As Integer = &H80
+            Const ICON_SMALL As Integer = 0
+            Const ICON_BIG As Integer = 1
+
+            SendMessage(Me.Handle, WM_SETICON, CType(ICON_SMALL, IntPtr), Me.Icon.Handle)
+            SendMessage(Me.Handle, WM_SETICON, CType(ICON_BIG, IntPtr), Me.Icon.Handle)
         End Sub
 
         Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
@@ -497,16 +506,8 @@ Namespace MainApp
             PausePlayButton.Image = If(isPlaying, PausePlay, runPlay)
 
             If isPlaying Then
-                CameraSwitching.Visible = True
-                CamSwitchTimer.Enabled = True
-                CameraSwitching.Text = settings.cameraName + " starting"
-                CameraSwitching.BringToFront()
-
                 StartCamera()
                 AvailableAlgorithms.SelectedItem = settings.algorithm
-
-                CameraSwitching.Visible = False
-                CamSwitchTimer.Enabled = False
 
                 Me.MainForm_Resize(Nothing, Nothing)
             Else

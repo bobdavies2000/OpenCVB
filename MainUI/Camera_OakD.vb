@@ -241,11 +241,11 @@ Namespace MainApp
         End Function
 
         Public Overrides Sub StopCamera()
+            OakDStop(cPtr)
             If captureThread IsNot Nothing Then
                 captureThread.Join(1000) ' Wait up to 1 second for thread to finish
                 captureThread = Nothing
             End If
-            OakDStop(cPtr)
         End Sub
     End Class
 End Namespace

@@ -42,8 +42,6 @@ Namespace MainApp
             labelLeft = New Label()
             labelRight = New Label()
             StatusLabel = New Label()
-            CameraSwitching = New Label()
-            CamSwitchTimer = New Timer(components)
             fpsTimer = New Timer(components)
             TestAllTimer = New Timer(components)
             MagnifyTimer = New Timer(components)
@@ -199,20 +197,6 @@ Namespace MainApp
             StatusLabel.TabIndex = 2
             StatusLabel.TextAlign = ContentAlignment.MiddleLeft
             ' 
-            ' CameraSwitching
-            ' 
-            CameraSwitching.AutoSize = True
-            CameraSwitching.Font = New Font("Microsoft Sans Serif", 12F)
-            CameraSwitching.Location = New Point(40, 118)
-            CameraSwitching.Name = "CameraSwitching"
-            CameraSwitching.Size = New Size(202, 29)
-            CameraSwitching.TabIndex = 9
-            CameraSwitching.Text = "CameraSwitching"
-            ' 
-            ' CamSwitchTimer
-            ' 
-            CamSwitchTimer.Interval = 1
-            ' 
             ' fpsTimer
             ' 
             fpsTimer.Interval = 3000
@@ -229,7 +213,6 @@ Namespace MainApp
             AutoScaleDimensions = New SizeF(12F, 30F)
             AutoScaleMode = AutoScaleMode.Font
             ClientSize = New Size(1275, 1171)
-            Controls.Add(CameraSwitching)
             Controls.Add(StatusLabel)
             Controls.Add(labelRight)
             Controls.Add(labelLeft)
@@ -263,8 +246,6 @@ Namespace MainApp
         Friend WithEvents labelLeft As Label
         Friend WithEvents labelRight As Label
         Friend WithEvents StatusLabel As Label
-        Friend WithEvents CameraSwitching As Label
-        Friend WithEvents CamSwitchTimer As Timer
         Friend WithEvents fpsTimer As Timer
         Friend WithEvents TestAllTimer As Timer
         Friend WithEvents MagnifyTimer As Timer

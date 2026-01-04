@@ -3,9 +3,6 @@ Imports cv = OpenCvSharp
 Namespace MainApp
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
-        Private Sub CamSwitchTimer_Tick(sender As Object, e As EventArgs) Handles CamSwitchTimer.Tick
-            MainForm_Resize(Nothing, Nothing)
-        End Sub
         Private Sub StartCamera()
             ' Select camera based on settings.cameraName
             Select Case settings.cameraName

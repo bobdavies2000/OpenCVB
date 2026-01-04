@@ -55,4 +55,7 @@ Module GlobalVariables
         colorTriangles
         imageTriangles
     End Enum
+    <DllImport("user32.dll", SetLastError:=True)>
+    Public Function SendMessage(hWnd As IntPtr, msg As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
+    End Function
 End Module
