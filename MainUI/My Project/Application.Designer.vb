@@ -31,7 +31,7 @@ Namespace My
 
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>
         Protected Overrides Sub OnCreateMainForm()
-            Me.MainForm = New MainUI.MainUI()
+            Me.MainForm = New Main.MainUI()
         End Sub
 
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>

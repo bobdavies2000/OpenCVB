@@ -5,6 +5,6 @@ Module Program
     Sub Main()
         Application.EnableVisualStyles()
         Application.SetCompatibleTextRenderingDefault(False)
-        Application.Run(New MainUI.MainUI())
+        Application.Run(New Main.MainUI())
     End Sub
 End Module

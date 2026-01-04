@@ -1,4 +1,4 @@
-Namespace MainUI
+Namespace Main
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
     Partial Public Class MainUI
         Inherits Form

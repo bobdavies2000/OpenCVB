@@ -1,4 +1,4 @@
-﻿Namespace MainUI
+﻿Namespace Main
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
     Partial Class AtoZ
         Inherits System.Windows.Forms.Form

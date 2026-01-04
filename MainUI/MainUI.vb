@@ -4,7 +4,7 @@ Imports System.Threading
 Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
-Namespace MainUI
+Namespace Main
     Partial Public Class MainUI
         Dim isPlaying As Boolean = False
         Dim homeDir As String = ""
