@@ -285,7 +285,12 @@ Namespace VBClasses
             useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve task.results..
         End Sub
         Public Sub Dispose() Implements IDisposable.Dispose
-            If allOptions IsNot Nothing Then allOptions.Close()
+            If allOptions IsNot Nothing Then allOptions.Dispose()
+
+            task.featureOptions.Close()
+            task.treeView.Close()
+            If task.sharpGL IsNot Nothing Then task.sharpGL.Close()
+
             If cpu.activeObjects IsNot Nothing Then
                 For Each algorithm In cpu.activeObjects
                     If algorithm.GetType().GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
@@ -294,6 +299,8 @@ Namespace VBClasses
             For Each mat In task.dstList
                 If mat IsNot Nothing Then mat.Dispose()
             Next
+
+            GC.Collect()
         End Sub
     End Class
 End Namespace

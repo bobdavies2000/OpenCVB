@@ -53,8 +53,6 @@ public:
 	dai::IMUReportAccelerometer acceleroValues;
 	dai::IMUReportGyroscope gyroValues;
 
-	~OakDCamera() {}
-
 	OakDCamera(int _cols, int _rows)
 	{
 		rows = _rows;
@@ -243,6 +241,7 @@ extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera* cPtr) { cPtr-
 extern "C" __declspec(dllexport) void OakDStop(OakDCamera* cPtr)
 {
 	if (cPtr != nullptr) {
+		cPtr->device->close();
 		delete cPtr;
 	}
 }

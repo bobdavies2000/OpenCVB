@@ -245,21 +245,7 @@ Namespace MainUI
                 captureThread.Join(1000) ' Wait up to 1 second for thread to finish
                 captureThread = Nothing
             End If
-
-            ' Stop the camera asynchronously so it doesn't block the UI
-            If cPtr <> IntPtr.Zero Then
-                Dim ptrToStop = cPtr
-                cPtr = IntPtr.Zero ' Clear reference so GetNextFrame won't try to use it
-
-                ' Run OakDStop on a background thread so it doesn't block
-                ThreadPool.QueueUserWorkItem(Sub(state)
-                                                 Try
-                                                     OakDStop(ptrToStop)
-                                                 Catch ex As Exception
-                                                     Debug.WriteLine("Error stopping Oak-D camera: " + ex.Message)
-                                                 End Try
-                                             End Sub)
-            End If
+            OakDStop(cPtr)
         End Sub
     End Class
 End Namespace

@@ -73,20 +73,6 @@ Public Class OptionsContainer
         layoutOptions(normalRequest:=False)
     End Sub
     Private Sub OptionsContainer_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        For Each title In hiddenOptions
-            Dim hideList As New List(Of Form)
-            For Each frm In Application.OpenForms
-                If frm.text = title Then
-                    frm.close()
-                    Exit For
-                End If
-            Next
-        Next
-        task.gOptions.Close()
-        task.featureOptions.Close()
-        task.treeView.Close()
-        If task.sharpGL IsNot Nothing Then task.sharpGL.Close()
-        GC.Collect()
     End Sub
     Private Sub OptionsContainer_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         If positionedFromSettings Then
@@ -98,5 +84,14 @@ Public Class OptionsContainer
     End Sub
     Private Sub OptionsContainer_Move(sender As Object, e As EventArgs) Handles Me.Move
         OptionsContainer_ResizeEnd(sender, e)
+    End Sub
+    Private Sub OptionsContainer_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
+        For Each title In hiddenOptions
+            Dim hideList As New List(Of Form)
+            For Each frm In Application.OpenForms
+                If frm.text = title Then frm.close()
+            Next
+        Next
+        task.gOptions.Close()
     End Sub
 End Class

@@ -138,19 +138,19 @@ Namespace MainUI
 
             Select Case settings.workRes.Width
                 Case 1920
-                    settings.testAllDuration = 40
-                Case 1280
-                    settings.testAllDuration = 35
-                Case 960
                     settings.testAllDuration = 30
+                Case 1280
+                    settings.testAllDuration = 25
+                Case 960
+                    settings.testAllDuration = 20
                 Case 672
-                    settings.testAllDuration = 20
-                Case 640
-                    settings.testAllDuration = 20
-                Case 480
                     settings.testAllDuration = 15
-                Case 240, 336, 320, 168, 160
+                Case 640
+                    settings.testAllDuration = 12
+                Case 480
                     settings.testAllDuration = 10
+                Case 240, 336, 320, 168, 160
+                    settings.testAllDuration = 5
             End Select
 
             settings.desiredFPS = 30

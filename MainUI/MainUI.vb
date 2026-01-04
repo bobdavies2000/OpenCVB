@@ -378,6 +378,7 @@ Namespace MainUI
             task.cpu.paintTime += spanCopy.Ticks / TimeSpan.TicksPerMillisecond
         End Sub
         Private Sub startAlgorithm()
+            If vbc.task IsNot Nothing Then vbc.task.Dispose()
             vbc.task = New AlgorithmTask
 
             For i = 0 To pics.Count - 1
@@ -405,43 +406,6 @@ Namespace MainUI
             If task.calibData IsNot Nothing Then task.calibData = camera.calibData
 
             MainForm_Resize(Nothing, Nothing)
-        End Sub
-        Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-            If task Is Nothing Then Exit Sub
-
-            Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + vbCrLf +
-                        " " + Format(task.fpsAlgorithm, "0") + " FPS Algorithm" + vbCrLf +
-                        " " + Format(task.fpsCamera, "0") + " FPS Camera")
-
-            PausePlayButton.PerformClick()
-
-            Static lastTime As DateTime = Now
-            Dim timeNow As DateTime = Now
-            Static lastWriteTime = timeNow
-
-            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
-            totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
-
-            lastWriteTime = timeNow
-            If fpsWriteCount = 5 Then
-                Debug.WriteLine("")
-                fpsWriteCount = 0
-            End If
-            fpsWriteCount += 1
-
-            If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = " " Then
-                AvailableAlgorithms.SelectedIndex += 2
-            Else
-                AvailableAlgorithms.SelectedIndex += 1
-            End If
-
-            Debug.WriteLine(vbCrLf + "GDI: " & GdiMonitor.GetGdiCount())
-            Debug.WriteLine("USER: " & GdiMonitor.GetUserCount())
-
-            ' skip testing the XO_ algorithms (XO.vb)  They are obsolete.
-            If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
-
-            PausePlayButton.PerformClick()
         End Sub
         Private Sub AtoZ_Click(sender As Object, e As EventArgs) Handles AtoZ.Click
             Dim groupsForm As New AtoZ()
@@ -490,7 +454,49 @@ Namespace MainUI
 
             MainForm_Resize(Nothing, Nothing)
         End Sub
+        Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
+            If task Is Nothing Then Exit Sub
+
+            Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + vbCrLf +
+                        " " + Format(task.fpsAlgorithm, "0") + " FPS Algorithm" + vbCrLf +
+                        " " + Format(task.fpsCamera, "0") + " FPS Camera")
+
+            PausePlayButton.PerformClick()
+
+            Static lastTime As DateTime = Now
+            Dim timeNow As DateTime = Now
+            Static lastWriteTime = timeNow
+
+            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+            totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)
+
+            lastWriteTime = timeNow
+            If fpsWriteCount = 5 Then
+                Debug.WriteLine("")
+                fpsWriteCount = 0
+            End If
+            fpsWriteCount += 1
+
+            If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = " " Then
+                AvailableAlgorithms.SelectedIndex += 2
+            Else
+                AvailableAlgorithms.SelectedIndex += 1
+            End If
+
+            Debug.WriteLine(vbCrLf + "GDI: " & GdiMonitor.GetGdiCount())
+            Debug.WriteLine("USER: " & GdiMonitor.GetUserCount())
+
+            ' skip testing the XO_ algorithms (XO.vb)  They are obsolete.
+            If AvailableAlgorithms.Text.StartsWith("XO_") Then AvailableAlgorithms.SelectedIndex = 0
+
+            PausePlayButton.PerformClick()
+        End Sub
         Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
+            If TestAllTimer.Enabled Then
+                AvailableAlgorithms.SelectedItem = settings.algorithm
+                Exit Sub
+            End If
+
             isPlaying = Not isPlaying
 
             Static PausePlay = New Bitmap(homeDir + "MainUI/Data/PauseButton.png")
