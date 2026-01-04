@@ -92,4 +92,21 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+    Public Class InPaint_MissingDepth : Inherits TaskParent
+        Dim options As New Options_InPaint
+        Public Sub New()
+            desc = "Fill in depth with smoothed depth values."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            ' Apply inpainting to fill missing pixels
+            cv.Cv2.Inpaint(task.pcSplit(2), task.noDepthMask, dst2, options.radius,
+                           If(options.telea, cv.InpaintMethod.Telea, cv.InpaintMethod.NS))
+        End Sub
+    End Class
+
 End Namespace

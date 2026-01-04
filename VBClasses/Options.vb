@@ -1611,16 +1611,21 @@ Namespace VBClasses
 
     Public Class Options_InPaint : Inherits OptionParent
         Public telea As Boolean = False
+        Public radius As Integer
         Public Sub New()
             If radio.Setup(traceName) Then
                 radio.addRadio("TELEA")
                 radio.addRadio("Navier-Stokes")
                 radio.check(0).Checked = True
             End If
+
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("InPaint Radius", 1, 21, 5)
         End Sub
         Public Sub Run()
             Static teleaRadio = findRadio("TELEA")
             telea = teleaRadio.checked
+            Static radiusSlider = FindSlider("InPaint Radius")
+            radius = radiusSlider.value
         End Sub
     End Class
 
