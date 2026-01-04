@@ -166,6 +166,7 @@ Namespace MainApp
             cv.Cv2.ImShow("DrawRect Region " + CStr(magnifyIndex), img)
         End Sub
         Private Sub MainForm_Closing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+            If TestAllTimer.Enabled = False Then SaveJsonSettings()
             If isPlaying Then
                 StopCamera()
                 Dim count As Integer
@@ -176,7 +177,6 @@ Namespace MainApp
                 End While
                 vbc.task.Dispose()
             End If
-            If TestAllTimer.Enabled = False Then SaveJsonSettings()
         End Sub
         Private Sub getLineCounts()
             Dim countFileInfo = New FileInfo(homeDir + "Data/AlgorithmCounts.txt")
