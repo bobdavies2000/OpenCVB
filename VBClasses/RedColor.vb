@@ -48,25 +48,35 @@ Namespace VBClasses
             rcList.Clear()
             dst2.SetTo(0)
             Dim changed As Integer
+            Dim usedColor As New List(Of cv.Scalar)
             For Each rc In newList.Values
                 Dim maxDist = rc.maxDist
                 rc = RedCloud_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
 
                 rc.index = rcList.Count + 1
-                If maxDist <> rc.maxDist Then
-                    'rc.color = task.scalarColors(rc.index)
-                    'rc.age = 1
-                    changed += 1
-                End If
+
+                ' The first cell often contains other cells completely within it.
+                ' These often cause the maxdist to move around.
+                ' So just fix the color here and create a stable image.
+                ' The cells within the largest cell will switch colors but many cells are stable.
+                If rc.index = 1 Then rc.color = blue
+                If maxDist <> rc.maxDist Then changed += 1
+
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)
+
+                If usedColor.Contains(rc.color) Then
+                    rc.color = Palette_Basics.randomCellColor()
+                    rc.age = 1
+                End If
+                usedColor.Add(rc.color)
 
                 rcList.Add(rc)
 
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+
                 SetTrueText(CStr(rc.age), rc.maxDist)
             Next
-
             If standaloneTest() Then
                 RedCloud_Cell.selectCell(rcMap, rcList)
                 If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()

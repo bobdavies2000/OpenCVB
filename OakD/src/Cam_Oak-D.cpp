@@ -238,12 +238,5 @@ extern "C" __declspec(dllexport) int* OakDGyro(OakDCamera* cPtr) { return (int*)
 extern "C" __declspec(dllexport) int* OakDAccel(OakDCamera* cPtr) { return (int*)&cPtr->acceleroValues.x; }
 extern "C" __declspec(dllexport) int* OakDColor(OakDCamera* cPtr) { return (int*)cPtr->rgb.data; }
 extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera* cPtr) { cPtr->waitForFrame(); }
-extern "C" __declspec(dllexport) void OakDStop(OakDCamera* cPtr)
-{
-	if (cPtr != nullptr) {
-		cPtr->device->close();
-		delete cPtr;
-	}
-}
 extern "C" __declspec(dllexport) int* OakDLeftImage(OakDCamera* cPtr) { return (int*)cPtr->leftView.data; }
 extern "C" __declspec(dllexport) int* OakDRightImage(OakDCamera* cPtr) { return (int*)cPtr->rightView.data; }

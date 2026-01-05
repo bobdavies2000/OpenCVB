@@ -40,7 +40,7 @@ Namespace jsonShared
 
         Public TreeViewLeft As Integer = 0
         Public TreeViewTop As Integer = 0
-        Public TreeViewWidth As Integer = 300
+        Public TreeViewWidth As Integer = 515
         Public TreeViewHeight As Integer = 500
 
         Public VideoFileName As String = ""
