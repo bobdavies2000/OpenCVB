@@ -1,4 +1,4 @@
-**January 4, 2025 – Oak-D Pro, Install Fixes.**
+**January 5, 2025 – Oak-D Pro, More Install Fixes.**
 
 -   NOTE: OpenCVB requires VS 2026 and will install OpenCV 4.14.
     -   Install script uses the “.slnx” designation for solutions.
@@ -11,6 +11,7 @@
 -   Splash screen was added and camera startup messages are removed.
 -   OpenCVB’s icon now appears in the taskbar.
 -   OpenCVB’s SharpGL interface is working.
+-   RedColor color management was improved – no repeated colors.
 
 **January 1, 2025 – Oak-D Pro, Install Fixes.**
 
