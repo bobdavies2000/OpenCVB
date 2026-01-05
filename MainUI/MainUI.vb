@@ -280,6 +280,7 @@ Namespace MainApp
         End Sub
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             settings = settingsIO.Load()
+            ' Startup.Splash.loadingLabel.Text = "Starting " + settings.cameraName
 
             updatePath(homeDir + "bin\", "Release version of CPP_Native.dll")
             updatePath(homeDir + "opencv\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")

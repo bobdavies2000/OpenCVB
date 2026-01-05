@@ -9,57 +9,59 @@ Namespace VBClasses
             task.redCloud = Me
             desc = "Build contours for each cell"
         End Sub
+        Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData), rcMapLast As cv.Mat) As rcData
+            Dim r1 = rc.rect
+            Dim r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
+            Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+
+            If indexLast > 0 And indexLast < rcListLast.Count Then
+                indexLast -= 1 ' index is 1 less than the rcMap value
+                r2 = rcListLast(indexLast).rect
+            End If
+
+            If indexLast >= 0 And indexLast < rcListLast.Count And r1.IntersectsWith(r2) And task.optionsChanged = False Then
+                Dim lrc = rcListLast(indexLast)
+                If rc.rect.Contains(lrc.maxDist) Then
+                    Dim row = lrc.maxDist.Y - lrc.rect.Y
+                    Dim col = lrc.maxDist.X - lrc.rect.X
+                    If row < rc.mask.Height And col < rc.mask.Width Then
+                        If rc.mask.Get(Of Byte)(row, col) Then ' more doublechecking...
+                            rc.maxDist = lrc.maxDist
+                            rc.depth = lrc.depth
+                        End If
+                    End If
+                End If
+
+                rc.age = lrc.age + 1
+                If rc.age > 1000 Then rc.age = 2
+
+                rc.color = lrc.color
+            End If
+            Return rc
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             redSweep.Run(src)
             labels(3) = redSweep.labels(3)
             labels(2) = redSweep.labels(2)
 
-            Dim rcListLast = New List(Of rcData)(rcList)
+            Dim rcListLast As New List(Of rcData)(rcList)
             Dim rcMapLast As cv.Mat = rcMap.Clone
 
             rcList.Clear()
-            Dim r2 As cv.Rect
             rcMap.SetTo(0)
             dst2.SetTo(0)
             For Each rc In redSweep.rcList
-                Dim r1 = rc.rect
-                r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
-                Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+                rc = rcDataMatch(rc, rcListLast, rcMapLast)
 
-                If indexLast > 0 Then
-                    indexLast -= 1 ' index is 1 less than the rcMap value
-                    r2 = rcListLast(indexLast).rect
-                End If
-                If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
-                    Dim lrc = rcListLast(indexLast)
-                    If rc.rect.Contains(lrc.maxDist) Then
-                        Dim row = lrc.maxDist.Y - lrc.rect.Y
-                        Dim col = lrc.maxDist.X - lrc.rect.X
-                        If row < rc.mask.Height And col < rc.mask.Width Then
-                            If rc.mask.Get(Of Byte)(row, col) Then ' more doublechecking...
-                                rc.maxDist = lrc.maxDist
-                                rc.depth = lrc.depth
-                            End If
-                        End If
-                    End If
-
-                    rc.age = lrc.age + 1
-                    If rc.age > 1000 Then rc.age = 2
-
-                    rc.color = lrc.color
-                End If
                 rc.index = rcList.Count + 1
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
-                rcList.Add(rc)
-            Next
 
-            If standalone Then
-                For Each rc In rcList
-                    dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
-                    SetTrueText(CStr(rc.age), rc.maxDist)
-                Next
-            End If
+                rcList.Add(rc)
+
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+                SetTrueText(CStr(rc.age), rc.maxDist)
+            Next
 
             If standaloneTest() Then
                 RedCloud_Cell.selectCell(rcMap, rcList)

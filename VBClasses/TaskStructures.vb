@@ -581,7 +581,7 @@ Namespace VBClasses
             Public depth As Single
             Public hull As List(Of cv.Point)
             Public index As Integer
-            Public gIndex As Integer
+            Public gridIndex As Integer
             Public mask As cv.Mat
             Public maxDist As cv.Point
             Public pixels As Integer
@@ -617,10 +617,10 @@ Namespace VBClasses
 
                         ' keep the hull points around (there aren't many of them.)
                         hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
-                        gIndex = task.gridMap.Get(Of Integer)(rect.TopLeft.Y + contour(0).Y,
+                        gridIndex = task.gridMap.Get(Of Integer)(rect.TopLeft.Y + contour(0).Y,
                                                           rect.TopLeft.X + contour(0).X) Mod 255
                     Else
-                        gIndex = task.gridMap.Get(Of Integer)(rect.TopLeft.Y, rect.TopLeft.X) Mod 255
+                        gridIndex = task.gridMap.Get(Of Integer)(rect.TopLeft.Y, rect.TopLeft.X) Mod 255
                     End If
                     buildMaxDist()
 

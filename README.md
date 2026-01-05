@@ -1,3 +1,35 @@
+**January 4, 2025 – Oak-D Pro, Install Fixes.**
+
+-   NOTE: OpenCVB requires VS 2026 and will install OpenCV 4.14.
+    -   Install script uses the “.slnx” designation for solutions.
+-   Oak D support is restored using the latest release.
+    -   The original Oak D cameras are supported and working.
+    -   My Oak 4 D Pro camera doesn’t work. USB-C connection failed.
+    -   A POE switch has been ordered – arrives tomorrow.
+    -   At almost \$1k, the camera is too expensive to order a second.
+-   The overnight testing was improved and runs without restarting camera.
+-   Splash screen was added and camera startup messages are removed.
+-   OpenCVB’s icon now appears in the taskbar.
+-   OpenCVB’s SharpGL interface is working.
+
+**January 1, 2025 – Oak-D Pro, Install Fixes.**
+
+-   This version of OpenCVB requires VS 2026 and OpenCV 4.14.
+    -   Install script uses the “.slnx” designation for solutions.
+-   The latest version of CMake is recommended with this version.
+-   The installation scripts have been more thoroughly tested.
+-   GIFBuilder and UI_Generator are built with the rest of OpenCVB.
+    -   They were previously build with the Update_All script.
+-   There were some improvements in camera buffer management.
+    -   Using locks reduced the number of copies.
+
+**December 30, 2025 – Oak-D Pro Camera Support under construction.**
+
+-   The Oak-D Pro camera .Net interface in OpenCVB used R2 depthai-core.
+-   The support for Oak-D is no being restarted with R3 depthai-core.
+-   The R2 OpenCVB support needs to be rewritten = different interfaces.
+-   The infrastructure for R3 is now in place with this release.
+
 # December 23, 2025 – Install Fixes and Testing.
 
 -   This version of OpenCVB requires VS 2026 and OpenCV 4.14.

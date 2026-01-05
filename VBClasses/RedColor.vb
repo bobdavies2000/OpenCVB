@@ -26,12 +26,10 @@ Namespace VBClasses
 
             If classCount = 0 Then Exit Sub ' no data to process.
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4,
-                                                RedCloud_Rects(cPtr))
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, RedCloud_Rects(cPtr))
 
             Dim rects(classCount * 4) As Integer
             Marshal.Copy(rectData.Data, rects, 0, rects.Length)
-
 
             Dim rcListLast = New List(Of rcData)(rcList)
             Dim rcMapLast As cv.Mat = rcMap.Clone
@@ -47,45 +45,26 @@ Namespace VBClasses
                 index += 1
             Next
 
-            Dim r2 As cv.Rect
-            Dim count As Integer
             rcList.Clear()
-            Dim usedColor As New List(Of cv.Scalar)
+            dst2.SetTo(0)
+            Dim changed As Integer
             For Each rc In newList.Values
-                Dim r1 = rc.rect
-                r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
-                Dim indexLast As Integer = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-                If indexLast > 0 And indexLast < rcListLast.Count Then
-                    indexLast -= 1 ' index is 1 less than the rcMap value
-                    r2 = rcListLast(indexLast).rect
-                Else
-                    indexLast = -1
-                End If
-                If indexLast >= 0 And r1.IntersectsWith(r2) And task.optionsChanged = False Then
-                    rc.age = rcListLast(indexLast).age + 1
-                    rc.color = rcListLast(indexLast).color
-                    If rc.age >= 1000 Then rc.age = 2
-                    count += 1
-                End If
-
-                If usedColor.Contains(rc.color) Then
-                    rc.color = Palette_Basics.randomCellColor()
-                    rc.age = 1
-                End If
-                usedColor.Add(rc.color)
+                Dim maxDist = rc.maxDist
+                rc = RedCloud_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
 
                 rc.index = rcList.Count + 1
-                rcList.Add(rc)
+                If maxDist <> rc.maxDist Then
+                    'rc.color = task.scalarColors(rc.index)
+                    'rc.age = 1
+                    changed += 1
+                End If
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                SetTrueText(CStr(rc.age), rc.maxDist)
-            Next
 
-            dst2.SetTo(0)
-            For Each rc In rcList
-                rc.mask = rcMap(rc.rect).InRange(rc.index, rc.index)
-                rc.buildMaxDist()
+                rcList.Add(rc)
+
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+                SetTrueText(CStr(rc.age), rc.maxDist)
             Next
 
             If standaloneTest() Then
@@ -95,7 +74,7 @@ Namespace VBClasses
             End If
 
             labels(2) = CStr(classCount) + " RedColor cells. " + CStr(rcList.Count) + " cells >" +
-                        " minpixels.  " + CStr(count) + " matched to previous generation"
+                        " minpixels.  " + CStr(rcList.Count - changed) + " matched to previous generation"
         End Sub
         Public Sub Close()
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
