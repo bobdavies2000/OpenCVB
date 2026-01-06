@@ -127,7 +127,7 @@ Namespace VBClasses
             Next
 
             percentTime += Format(otherTimes.Sum, "00.0%") + " " + CStr(otherTimes.Count) + " algorithms each < 1.0%" +
-                                vbCrLf + vbCrLf + "Click an algorithm at left to see it below:" + vbCrLf + vbCrLf
+                                vbCrLf + vbCrLf + "Click tree at left to see it below:" + vbCrLf + vbCrLf
 
             percentTime += If(percentStr Is Nothing, "Inactive algorithm selected", percentStr)
             Return percentTime
