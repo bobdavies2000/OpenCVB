@@ -171,6 +171,7 @@ Namespace MainApp
             If TestAllTimer.Enabled = False Then SaveJsonSettings()
             vbc.task.Dispose()
             If isPlaying Then
+                isPlaying = False
                 StopCamera()
                 Dim count As Integer
                 While camera IsNot Nothing
@@ -457,9 +458,9 @@ Namespace MainApp
 
             Dim optionsForm As New Options()
             If optionsForm.ShowDialog() = DialogResult.OK Then SaveJsonSettings()
-            AvailableAlgorithms_SelectedIndexChanged(Nothing, Nothing)
 
             PausePlayButton.PerformClick()
+            AvailableAlgorithms_SelectedIndexChanged(Nothing, Nothing)
 
             If task Is Nothing Then startAlgorithm()
 

@@ -18,14 +18,12 @@ Namespace VBClasses
             If irPt.X < 0 Or irPt.X >= task.color.Width Or irPt.Y >= task.color.Height Or badTranslation Then
                 brick.depth = 0 ' off the image
             Else
-                brick.lRect = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
-                brick.lRect = ValidateRect(brick.lRect)
+                'brick.lRect = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
+                'brick.lRect = ValidateRect(brick.lRect)
 
-                Dim LtoR_Pt = Intrinsics_Basics.translate_LeftToRight(task.pointCloud.Get(Of cv.Point3f)(brick.lRect.Y,
-                                                                                                                                 brick.lRect.X))
+                Dim LtoR_Pt = Intrinsics_Basics.translate_LeftToRight(task.pointCloud.Get(Of cv.Point3f)(brick.lRect.Y, brick.lRect.X))
                 If LtoR_Pt.X < 0 Or (LtoR_Pt.X = 0 And LtoR_Pt.Y = 0) Or
-                                    (LtoR_Pt.X >= task.color.Width Or
-                                     LtoR_Pt.Y >= task.color.Height) Then
+                                    (LtoR_Pt.X >= task.color.Width Or LtoR_Pt.Y >= task.color.Height) Then
                     brick.depth = 0 ' off the image
                 Else
                     brick.rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, brick.rect.Width, brick.rect.Height)
@@ -33,43 +31,6 @@ Namespace VBClasses
                 End If
             End If
             Return brick
-        End Function
-        Public Shared Function getCorrelation(rect As cv.Rect) As Single
-            Dim correlationMat As New cv.Mat
-            Dim lRect = rect, rRect As cv.Rect
-            Dim depth = task.pcSplit(2)(rect).Mean(task.depthmask(rect))
-            If depth = 0 Then Return 0 ' no correlation if there is no depth...
-            If task.rgbLeftAligned Then
-                rRect = rect
-                rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / depth.Val0
-                If rRect.X < 0 Or rRect.X + rRect.Width >= task.color.Width Then
-                    Return 0 ' no correlation if there is no depth...
-                End If
-            Else
-                Dim irPt = Intrinsics_Basics.translate_ColorToLeft(task.pointCloud.Get(Of cv.Point3f)(rect.Y, rect.X))
-                Dim badTranslation As Boolean = False
-                If Single.IsNaN(irPt.X) Or Single.IsNaN(irPt.Y) Then badTranslation = True
-                If irPt.X = 0 And irPt.Y = 0 Then badTranslation = True
-                If irPt.X < 0 Or irPt.X >= task.color.Width Or irPt.Y >= task.color.Height Or badTranslation Then
-                    Return 0 ' no correlation if there is no depth..
-                Else
-                    lRect = New cv.Rect(irPt.X, irPt.Y, rect.Width, rect.Height)
-                    lRect = ValidateRect(lRect)
-
-                    Dim LtoR_Pt = Intrinsics_Basics.translate_LeftToRight(task.pointCloud.Get(Of cv.Point3f)(lRect.Y, lRect.X))
-                    If LtoR_Pt.X < 0 Or (LtoR_Pt.X = 0 And LtoR_Pt.Y = 0) Or
-                                    (LtoR_Pt.X >= task.color.Width Or
-                                     LtoR_Pt.Y >= task.color.Height) Then
-                        Return 0 ' no correlation if there is no depth..
-                    Else
-                        rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, rect.Width, rect.Height)
-                        rRect = ValidateRect(rRect)
-                    End If
-                End If
-            End If
-
-            cv.Cv2.MatchTemplate(task.leftView(lRect), task.rightView(rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
-            Return correlationMat.Get(Of Single)(0, 0)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -95,6 +56,7 @@ Namespace VBClasses
                 cv.Cv2.MeanStdDev(src(brick.rect), brick.color, colorstdev)
                 brick.center = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
 
+                If brick.index = 483 Then Dim k = 0
                 If brick.depth > 0 Then
                     brick.mm = GetMinMax(task.pcSplit(2)(brick.rect), task.depthmask(brick.rect))
                     brickDepthCount += 1
@@ -136,7 +98,6 @@ Namespace VBClasses
 
                 Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
                 Dim br = task.bricks.brickList(index)
-                SetTrueText(br.displayCell, 1)
                 dst2.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
                 dst3.Rectangle(br.rRect, task.highlight, task.lineWidth + 1)
                 task.color.Rectangle(br.lRect, task.highlight, task.lineWidth)
@@ -146,6 +107,10 @@ Namespace VBClasses
                 labels(2) = CStr(task.bricks.brickList.Count) + " bricks and " +
                     CStr(brickDepthCount) + " had depth.  Left camera image is below."
             End If
+
+            dst2.Circle(task.mouseMovePoint, task.DotSize, task.highlight, -1)
+            Dim testindex = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            task.color.Rectangle(task.gridRects(testindex), task.highlight, task.lineWidth)
         End Sub
     End Class
 
@@ -542,6 +507,7 @@ Namespace VBClasses
 
     Public Class Brick_LeftRightMouse : Inherits TaskParent
         Public means As New List(Of Single)
+        Dim myBricks As New List(Of Integer)
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "Move the mouse in the color image to see the matches in left and right images. Click to clear the rectangles."
@@ -555,7 +521,6 @@ Namespace VBClasses
             dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-            Static myBricks As New List(Of Integer)
             If standalone And task.testAllRunning Then
                 Dim index As Integer = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
                 For i = index To index + 10

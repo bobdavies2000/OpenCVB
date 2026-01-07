@@ -8,6 +8,7 @@ Namespace VBClasses
             task.Settings = settings
             rgbLeftAligned = True
             If settings.cameraName.Contains("RealSense") Then rgbLeftAligned = False
+            If settings.cameraName.Contains("Oak") Then rgbLeftAligned = False
 
             rows = settings.workRes.Height
             cols = settings.workRes.Width

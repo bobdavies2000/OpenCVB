@@ -57,7 +57,6 @@ Namespace MainApp
         End Sub
 
         Private initialTime As Double = 0
-
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
             captureRes = _captureRes
             workRes = _workRes
@@ -136,8 +135,6 @@ Namespace MainApp
                     calibData.LtoR_translation(1) * calibData.LtoR_translation(1) +
                     calibData.LtoR_translation(2) * calibData.LtoR_translation(2)))
             End If
-
-            If calibData.baseline = 0 Then calibData.baseline = 0.075F ' Default Oak-D baseline ~7.5cm
 
             MyBase.prepImages()
 

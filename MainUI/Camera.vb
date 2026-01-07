@@ -110,7 +110,7 @@ Public Class GenericCamera
         cameraFrameCount += 1
 
         If cameraFrameCount Mod 10 = 0 Then GC.Collect() ' do you think this is unnecessary?  Remove it and check...
-        RaiseEvent FrameReady(Me)
+        If isCapturing Then RaiseEvent FrameReady(Me)
     End Sub
     Public Sub childStopCamera()
         isCapturing = False

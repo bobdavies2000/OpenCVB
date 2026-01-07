@@ -79,6 +79,7 @@ Namespace MainApp
             If task IsNot Nothing Then If task.treeView IsNot Nothing Then task.treeView.Activate()
             If task IsNot Nothing Then If task.allOptions IsNot Nothing Then task.allOptions.Activate()
             task.clickPoint = task.mouseMovePoint
+            task.mouseClickFlag = True
         End Sub
     End Class
 End Namespace

@@ -1,9 +1,9 @@
 Imports System.IO
 Imports System.Management
+Imports System.Runtime.InteropServices
+Imports jsonShared
 Imports Newtonsoft.Json
 Imports cv = OpenCvSharp
-Imports jsonShared
-
 Namespace MainApp
     Public Class jsonIO
         Private jsonFileName As String
@@ -28,13 +28,12 @@ Namespace MainApp
             Return settings
         End Function
         Public Function initialize(Settings As jsonShared.Settings)
-            ' checking the list for specific missing device here...
             Dim usbList = USBenumeration()
             Settings.cameraPresent = New List(Of Boolean)
             For i = 0 To cameraNames.Count - 1
                 Dim searchname = cameraNames(i)
                 Dim present As Boolean = False
-                If searchname.Contains("Oak-D") Then searchname = "Movidius MyriadX"
+                If searchname.StartsWith("Oak-D") Then searchname = "Movidius"
                 If searchname.StartsWith("StereoLabs ZED 2/2i") Then searchname = "ZED 2"
 
                 Dim subsetList As New List(Of String)
@@ -49,7 +48,7 @@ Namespace MainApp
             Next
 
             Dim index = cameraNames.IndexOf(Settings.cameraName)
-            If index < 0 Then
+            If Settings.cameraPresent(index) = False Then
                 For i = 0 To cameraNames.Count - 1
                     If Settings.cameraPresent(i) Then
                         Settings.cameraName = cameraNames(i)
@@ -66,8 +65,8 @@ Namespace MainApp
                     Exit For
                 End If
             Next
+
             If Settings.cameraFound = False Then
-                Settings.cameraName = ""
                 MessageBox.Show("There are no supported cameras present!" + vbCrLf + vbCrLf)
             End If
 

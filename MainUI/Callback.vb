@@ -23,7 +23,7 @@ Namespace MainApp
             fpsTimer.Enabled = True
         End Sub
         Private Sub StopCamera()
-            ' RemoveHandler camera.FrameReady, AddressOf Camera_FrameReady
+            RemoveHandler camera.FrameReady, AddressOf Camera_FrameReady
             If camera Is Nothing Then Exit Sub
             camera.childStopCamera()
             camera.isCapturing = False
