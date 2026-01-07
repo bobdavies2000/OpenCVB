@@ -158,53 +158,48 @@ Namespace MainApp
             Dim rows = workRes.Height
             Dim cols = workRes.Width
 
-            Try
-                OakDWaitForFrame(cPtr)
+            OakDWaitForFrame(cPtr)
 
-                SyncLock cameraMutex
-                    Dim colorPtr = OakDColor(cPtr)
-                    If colorPtr <> IntPtr.Zero Then
-                        color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorPtr).Clone()
-                    End If
+            SyncLock cameraMutex
+                Dim colorPtr = OakDColor(cPtr)
+                If colorPtr <> IntPtr.Zero Then
+                    color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorPtr).Clone()
+                End If
 
-                    ' Get left image
-                    Dim leftPtr = OakDLeftImage(cPtr)
-                    If leftPtr <> IntPtr.Zero Then
-                        leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr).Clone()
-                    End If
+                ' Get left image
+                Dim leftPtr = OakDLeftImage(cPtr)
+                If leftPtr <> IntPtr.Zero Then
+                    leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr).Clone()
+                End If
 
-                    ' Get right image
-                    Dim rightPtr = OakDRightImage(cPtr)
-                    If rightPtr <> IntPtr.Zero Then
-                        rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr).Clone()
-                    End If
+                ' Get right image
+                Dim rightPtr = OakDRightImage(cPtr)
+                If rightPtr <> IntPtr.Zero Then
+                    rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr).Clone()
+                End If
 
-                    ' Get depth and compute point cloud
-                    Dim depthPtr = OakDRawDepth(cPtr)
-                    If depthPtr <> IntPtr.Zero Then
-                        Dim depth16 = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr).Clone()
-                        pointCloud = ComputePointCloud(depth16, calibData.rgbIntrinsics)
-                    End If
+                ' Get depth and compute point cloud
+                Dim depthPtr = OakDRawDepth(cPtr)
+                If depthPtr <> IntPtr.Zero Then
+                    Dim depth16 = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr).Clone()
+                    pointCloud = ComputePointCloud(depth16, calibData.rgbIntrinsics)
+                End If
 
-                    ' Get IMU data
-                    Dim accelPtr = OakDAccel(cPtr)
-                    If accelPtr <> IntPtr.Zero Then
-                        IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelPtr)
-                    End If
+                ' Get IMU data
+                Dim accelPtr = OakDAccel(cPtr)
+                If accelPtr <> IntPtr.Zero Then
+                    IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelPtr)
+                End If
 
-                    Dim gyroPtr = OakDGyro(cPtr)
-                    If gyroPtr <> IntPtr.Zero Then
-                        IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroPtr)
-                    End If
+                Dim gyroPtr = OakDGyro(cPtr)
+                If gyroPtr <> IntPtr.Zero Then
+                    IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroPtr)
+                End If
 
-                    IMU_FrameTime = OakDIMUTimeStamp(cPtr)
-                End SyncLock
+                IMU_FrameTime = OakDIMUTimeStamp(cPtr)
+            End SyncLock
 
-                MyBase.GetNextFrameCounts(IMU_FrameTime)
-
-            Catch ex As Exception
-                Debug.WriteLine("Error in GetNextFrame: " + ex.Message)
-            End Try
+            MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
 
         Private Function ComputePointCloud(depth16 As cv.Mat, intrinsics As intrinsicData) As cv.Mat
@@ -238,10 +233,6 @@ Namespace MainApp
         End Function
 
         Public Overrides Sub StopCamera()
-            If captureThread IsNot Nothing Then
-                captureThread.Join(300) ' Wait for thread to finish
-                captureThread = Nothing
-            End If
         End Sub
     End Class
 End Namespace

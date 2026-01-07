@@ -23,12 +23,17 @@ Namespace MainApp
             fpsTimer.Enabled = True
         End Sub
         Private Sub StopCamera()
-            RemoveHandler camera.FrameReady, AddressOf Camera_FrameReady
             If camera Is Nothing Then Exit Sub
-            camera.childStopCamera()
+            ' Set isCapturing to False first to prevent new events from being raised
             camera.isCapturing = False
+            ' Stop the camera thread - this will wait for any in-flight events to complete
+            camera.childStopCamera()
+            ' Now safe to remove the handler after thread has stopped
+            RemoveHandler camera.FrameReady, AddressOf Camera_FrameReady
         End Sub
         Private Sub Camera_FrameReady(sender As GenericCamera)
+            ' Check if camera is still valid (might be Nothing during shutdown)
+            If camera Is Nothing OrElse Not camera.isCapturing Then Exit Sub
             If task Is Nothing Then Exit Sub
             If task.readyForCameraInput = False Then Exit Sub
             Static lastPaintTime As DateTime = Now

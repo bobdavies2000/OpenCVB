@@ -55,10 +55,6 @@ Namespace MainApp
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
         Public Overrides Sub StopCamera()
-            If captureThread IsNot Nothing Then
-                captureThread.Join(300) ' Wait up to 1 second for thread to finish
-                captureThread = Nothing
-            End If
             If zed IsNot Nothing Then zed.StopCamera()
         End Sub
     End Class

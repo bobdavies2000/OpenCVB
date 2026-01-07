@@ -169,17 +169,11 @@ Namespace MainApp
         End Sub
         Private Sub MainForm_Closing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             If TestAllTimer.Enabled = False Then SaveJsonSettings()
-            vbc.task.Dispose()
             If isPlaying Then
                 isPlaying = False
                 StopCamera()
-                Dim count As Integer
-                While camera IsNot Nothing
-                    Thread.Sleep(1)
-                    count += 1
-                    If count = 10 Then Exit While
-                End While
             End If
+            vbc.task.Dispose()
         End Sub
         Private Sub getLineCounts()
             Dim countFileInfo = New FileInfo(homeDir + "Data/AlgorithmCounts.txt")
@@ -220,7 +214,6 @@ Namespace MainApp
             Me.Text = "OpenCVB - " + Format(CodeLineCount, "###,##0") + " lines / " +
                        CStr(algorithmCountActive) + " algorithms " + " - " +
                        CStr(CInt(CodeLineCount / algorithmCount)) + " lines each (avg) - " + settings.cameraName
-
         End Sub
         Private Sub SaveJsonSettings()
             updateAlgorithmHistory()
@@ -465,6 +458,9 @@ Namespace MainApp
             If task Is Nothing Then startAlgorithm()
 
             MainForm_Resize(Nothing, Nothing)
+
+            getLineCounts() ' this will update the main form's title with the latest camera name as well as counts.
+
             optionsForm.Dispose()
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick

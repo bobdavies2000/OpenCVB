@@ -123,26 +123,19 @@ Namespace MainApp
             End Using
         End Sub
         Public Overrides Sub StopCamera()
-            If captureThread IsNot Nothing Then
-                captureThread.Join(300) ' Wait up to 1 second for thread to finish
-                captureThread = Nothing
-            End If
-
             ' Stop the pipeline asynchronously so it doesn't block the UI
-            If pipe IsNot Nothing Then
-                Dim pipeToStop = pipe
-                pipe = Nothing ' Clear reference so GetNextFrame won't try to use it
+            Dim pipeToStop = pipe
+            pipe = Nothing ' Clear reference so GetNextFrame won't try to use it
 
-                ' Run pipe.Stop() on a background thread so it doesn't block
-                ThreadPool.QueueUserWorkItem(Sub(state)
-                                                 Try
-                                                     pipeToStop.Stop()
-                                                     pipeToStop.Dispose()
-                                                 Catch ex As Exception
-                                                     Debug.WriteLine("Error stopping pipeline: " + ex.Message)
-                                                 End Try
-                                             End Sub)
-            End If
+            ' Run pipe.Stop() on a background thread so it doesn't block
+            ThreadPool.QueueUserWorkItem(Sub(state)
+                                             Try
+                                                 pipeToStop.Stop()
+                                                 pipeToStop.Dispose()
+                                             Catch ex As Exception
+                                                 Debug.WriteLine("Error stopping pipeline: " + ex.Message)
+                                             End Try
+                                         End Sub)
         End Sub
     End Class
 End Namespace
