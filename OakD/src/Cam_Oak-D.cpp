@@ -22,7 +22,7 @@ class OakDCamera
 private:
 public:
 	dai::Pipeline pipeline;
-	std::shared_ptr<dai::Device> device; 
+	std::shared_ptr<dai::Device> device;
 	Mat rgb, leftView, rightView, depth16u, disparity;
 	dai::CalibrationHandler deviceCalib;
 	double imuTimeStamp;
@@ -32,7 +32,7 @@ public:
 	float intrinsics[9];
 	float extrinsicsRGBtoLeft[12];
 	float extrinsicsLeftToRight[12];
-	
+
 	// v3 Camera nodes (replacing ColorCamera and MonoCamera)
 	std::shared_ptr<dai::node::Camera> pipeRGB;
 	std::shared_ptr<dai::node::Camera> pipeLeft;
@@ -40,7 +40,7 @@ public:
 	std::shared_ptr<dai::node::StereoDepth> pipeStereo;
 	std::shared_ptr<dai::node::Sync> pipeSync;
 	std::shared_ptr<dai::node::IMU> pipeIMU;
-	
+
 	std::shared_ptr<dai::MessageQueue> qRGB;
 	std::shared_ptr<dai::MessageQueue> qLeft;
 	std::shared_ptr<dai::MessageQueue> qRight;
@@ -100,15 +100,7 @@ public:
 		outLeft->link(pipeStereo->left);
 		outRight->link(pipeStereo->right);
 
-		if (platform == dai::Platform::RVC4) {
-			pipeStereo->depth.link(align->input);
-			outRGB->link(align->inputAlignTo);
-			align->outputAligned.link(pipeSync->inputs["depth_aligned"]);
-		}
-		else {
-			pipeStereo->depth.link(pipeSync->inputs["depth_aligned"]);
-			outRGB->link(pipeStereo->inputAlignTo);
-		}
+		pipeStereo->disparity.link(pipeSync->inputs["disparity"]);
 
 		// Create output queue
 		qMessage = pipeSync->out.createOutputQueue();
@@ -126,14 +118,14 @@ public:
 		auto inRGB = qRGB->get<dai::ImgFrame>();
 		auto inLeft = qLeft->get<dai::ImgFrame>();
 		auto inRight = qRight->get<dai::ImgFrame>();
-		auto inDepth = messageGroup->get<dai::ImgFrame>("depth_aligned");
+		auto inDisparity = messageGroup->get<dai::ImgFrame>("disparity");
 
 		// Get frames and resize to desired output resolution
 		rgb = inRGB->getFrame().clone();
 		leftView = inLeft->getFrame().clone();
 		rightView = inRight->getFrame().clone();
-		
-		depth16u = inDepth->getFrame().clone();
+
+		disparity = inDisparity->getFrame().clone();
 
 		auto imuData = qIMU->get<dai::IMUData>();
 		if (imuData != nullptr)
@@ -144,7 +136,7 @@ public:
 
 				auto acceleroTs = acceleroValues.getTimestamp();
 				auto gyroTs = gyroValues.getTimestamp();
-				
+
 				if (!firstTs) {
 					baseTs = std::min(acceleroTs, gyroTs);
 					firstTs = true;
@@ -188,7 +180,7 @@ extern "C" __declspec(dllexport)
 int* OakDExtrinsicsRGBtoLeft(OakDCamera* cPtr)
 {
 	auto extrinsics = cPtr->deviceCalib.getCameraExtrinsics(dai::CameraBoardSocket::CAM_A, dai::CameraBoardSocket::CAM_B);
-	
+
 	for (auto i = 0; i < 3; i++) {
 		cPtr->extrinsicsRGBtoLeft[i] = extrinsics[i][3];
 	}
@@ -209,7 +201,7 @@ extern "C" __declspec(dllexport)
 int* OakDExtrinsicsLeftToRight(OakDCamera* cPtr)
 {
 	auto extrinsics = cPtr->deviceCalib.getCameraExtrinsics(dai::CameraBoardSocket::CAM_B, dai::CameraBoardSocket::CAM_C);
-	
+
 	for (auto i = 0; i < 3; i++) {
 		cPtr->extrinsicsLeftToRight[i] = extrinsics[i][3];
 	}
@@ -232,7 +224,6 @@ extern "C" __declspec(dllexport) int* OakDRawDepth(OakDCamera* cPtr)
 }
 
 
-extern "C" __declspec(dllexport) int* OakDPointCloud(OakDCamera* cPtr) { return 0; }
 extern "C" __declspec(dllexport) double OakDIMUTimeStamp(OakDCamera* cPtr) { return cPtr->imuTimeStamp; }
 extern "C" __declspec(dllexport) int* OakDGyro(OakDCamera* cPtr) { return (int*)&cPtr->gyroValues.x; }
 extern "C" __declspec(dllexport) int* OakDAccel(OakDCamera* cPtr) { return (int*)&cPtr->acceleroValues.x; }
@@ -240,6 +231,7 @@ extern "C" __declspec(dllexport) int* OakDColor(OakDCamera* cPtr) { return (int*
 extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera* cPtr) { cPtr->waitForFrame(); }
 extern "C" __declspec(dllexport) int* OakDLeftImage(OakDCamera* cPtr) { return (int*)cPtr->leftView.data; }
 extern "C" __declspec(dllexport) int* OakDRightImage(OakDCamera* cPtr) { return (int*)cPtr->rightView.data; }
+extern "C" __declspec(dllexport) int* OakDDisparity(OakDCamera* cPtr) { return (int*)cPtr->disparity.data; }
 
 extern "C" __declspec(dllexport) bool OakGetDevice() {
 	auto devices = dai::Device::getAllAvailableDevices();

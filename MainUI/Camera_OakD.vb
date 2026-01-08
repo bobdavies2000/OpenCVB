@@ -57,6 +57,10 @@ Namespace MainApp
         Private Shared Sub OakDStop(cPtr As IntPtr)
         End Sub
 
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDDisparity(cPtr As IntPtr) As IntPtr
+        End Function
+
         Private initialTime As Double = 0
 #End Region
 
@@ -156,6 +160,8 @@ Namespace MainApp
         End Sub
 
         Public Sub GetNextFrame()
+            Static disparity As New cv.Mat
+            Static depth16 As New cv.Mat
             If cPtr = IntPtr.Zero Then Return
 
             Dim rows = workRes.Height
@@ -164,27 +170,27 @@ Namespace MainApp
             OakDWaitForFrame(cPtr)
 
             SyncLock cameraMutex
-                Dim colorPtr = OakDColor(cPtr)
-                If colorPtr <> IntPtr.Zero Then
-                    color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorPtr).Clone()
-                End If
+                'Dim colorPtr = OakDColor(cPtr)
+                'If colorPtr <> IntPtr.Zero Then
+                '    color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorPtr).Clone()
+                'End If
 
-                ' Get left image
                 Dim leftPtr = OakDLeftImage(cPtr)
                 If leftPtr <> IntPtr.Zero Then
                     leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr).Clone()
+                    color = leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 End If
 
-                ' Get right image
+
                 Dim rightPtr = OakDRightImage(cPtr)
                 If rightPtr <> IntPtr.Zero Then
                     rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr).Clone()
                 End If
 
-                ' Get depth and compute point cloud
-                Dim depthPtr = OakDRawDepth(cPtr)
-                If depthPtr <> IntPtr.Zero Then
-                    Dim depth16 = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr).Clone()
+                Dim disparityPtr = OakDDisparity(cPtr)
+                If disparityPtr <> IntPtr.Zero Then
+                    disparity = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, disparityPtr).Clone()
+                    disparity.ConvertTo(depth16, cv.MatType.CV_16U)
                     pointCloud = ComputePointCloud(depth16, calibData.rgbIntrinsics)
                 End If
 

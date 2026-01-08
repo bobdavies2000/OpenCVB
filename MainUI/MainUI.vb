@@ -278,8 +278,6 @@ Namespace MainApp
 
             updatePath(homeDir + "bin\", "Release version of CPP_Native.dll")
             updatePath(homeDir + "opencv\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
-
-            updatePath(homeDir + "opencv\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
             updatePath(homeDir + "opencv\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
 
             Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
@@ -296,13 +294,8 @@ Namespace MainApp
 
             updatePath(homeDir + "bin\", "Oak-D camera support.")
             updatePath(homeDir + "OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin\", "Oak-D camera support.")
-            'updatePath(homeDir + "OakD\depthai-core\Build\Release", "Oak-D camera support.")
+            updatePath(homeDir + "OakD\depthai-core\Build\Release", "Oak-D camera support.")
             updatePath(homeDir + "OakD\depthai-core\Build\Debug", "Oak-D camera support.")
-            updatePath(homeDir + "OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin", "Oak-D camera support.")
-
-            If settings.cameraPresent(3) Then ' OakD is the 3rd element in cameraPresent but it is not defined explicitly.
-                updatePath(homeDir + "OakD\build\Release\", "Luxonis Oak-D camera support.")
-            End If
 
             addPics()
 
