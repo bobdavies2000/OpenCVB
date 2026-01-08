@@ -491,8 +491,7 @@ Namespace MainApp
             End If
             If AvailableAlgorithms.Items.Count <= AvailableAlgorithms.SelectedIndex + 1 Then AvailableAlgorithms.SelectedIndex = 0
 
-            Debug.WriteLine("GDI: " & GdiMonitor.GetGdiCount())
-            Debug.WriteLine("USER: " & GdiMonitor.GetUserCount())
+            Debug.WriteLine("Usage GDI: " & GdiMonitor.GetGdiCount() + " USER: " & GdiMonitor.GetUserCount())
 
             AvailableAlgorithms.SelectedItem = settings.algorithm
         End Sub

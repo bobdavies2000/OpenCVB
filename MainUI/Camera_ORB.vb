@@ -65,7 +65,7 @@ Namespace MainApp
             isCapturing = True
             captureThread = New Thread(AddressOf CaptureFrames)
             captureThread.IsBackground = True
-            captureThread.Name = "ORB_CaptureThread"
+            captureThread.Name = "CaptureThread_ORB"
             captureThread.Start()
         End Sub
 

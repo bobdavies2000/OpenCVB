@@ -29,7 +29,7 @@ Namespace MainApp
             ' Start background thread to capture frames
             captureThread = New Thread(AddressOf CaptureFrames)
             captureThread.IsBackground = True
-            captureThread.Name = "ZED2_CaptureThread"
+            captureThread.Name = "CaptureThread_ZED2"
             captureThread.Start()
         End Sub
         Private Sub CaptureFrames()

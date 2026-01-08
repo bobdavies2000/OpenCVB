@@ -145,7 +145,7 @@ Namespace MainApp
             isCapturing = True
             captureThread = New Thread(AddressOf CaptureFrames)
             captureThread.IsBackground = True
-            captureThread.Name = "OakD_CaptureThread"
+            captureThread.Name = "CaptureThread_OakD"
             captureThread.Start()
         End Sub
 
