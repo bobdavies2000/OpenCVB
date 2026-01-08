@@ -14,18 +14,16 @@ Namespace VBClasses
             options.Run()
 
             Dim sizeRequest = options.count
-            If task.paused = False Then
-                PointList.Clear()
-                While PointList.Count < sizeRequest
-                    PointList.Add(New cv.Point2f(msRNG.Next(range.X, range.X + range.Width),
+            PointList.Clear()
+            While PointList.Count < sizeRequest
+                PointList.Add(New cv.Point2f(msRNG.Next(range.X, range.X + range.Width),
                                                   msRNG.Next(range.Y, range.Y + range.Height)))
-                End While
-                If standaloneTest() Then
-                    dst2.SetTo(0)
-                    For Each pt In PointList
-                        DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
-                    Next
-                End If
+            End While
+            If standaloneTest() Then
+                dst2.SetTo(0)
+                For Each pt In PointList
+                    DrawCircle(dst2, pt, task.DotSize, cv.Scalar.Yellow)
+                Next
             End If
         End Sub
     End Class
@@ -46,16 +44,14 @@ Namespace VBClasses
             options.Run()
 
             PointList.Clear()
-            If task.paused = False Then
-                For i = 0 To options.count - 1
-                    PointList.Add(New cv.Point2d(msRNG.Next(range.X, range.X + range.Width), msRNG.Next(range.Y, range.Y + range.Height)))
+            For i = 0 To options.count - 1
+                PointList.Add(New cv.Point2d(msRNG.Next(range.X, range.X + range.Width), msRNG.Next(range.Y, range.Y + range.Height)))
+            Next
+            If standaloneTest() Then
+                dst2.SetTo(0)
+                For Each pt In PointList
+                    DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y))
                 Next
-                If standaloneTest() Then
-                    dst2.SetTo(0)
-                    For Each pt In PointList
-                        DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y))
-                    Next
-                End If
             End If
         End Sub
     End Class
@@ -104,18 +100,16 @@ Namespace VBClasses
             options.Run()
 
             PointList.Clear()
-            If task.paused = False Then
-                For i = 0 To options.count - 1
-                    PointList.Add(New cv.Point3f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)), msRNG.Next(ranges(4), ranges(5))))
+            For i = 0 To options.count - 1
+                PointList.Add(New cv.Point3f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)), msRNG.Next(ranges(4), ranges(5))))
+            Next
+            If standaloneTest() Then
+                dst2.SetTo(0)
+                For Each pt In PointList
+                    DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow)
                 Next
-                If standaloneTest() Then
-                    dst2.SetTo(0)
-                    For Each pt In PointList
-                        DrawCircle(dst2, New cv.Point2f(pt.X, pt.Y), task.DotSize, cv.Scalar.Yellow)
-                    Next
-                End If
-                Points3f = PointList.ToArray
             End If
+            Points3f = PointList.ToArray
         End Sub
     End Class
 
@@ -137,19 +131,17 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             PointList.Clear()
             Dim count = countSlider.Value
-            If task.paused = False Then
-                For i = 0 To count - 1
-                    PointList.Add(New cv.Vec4f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)),
+            For i = 0 To count - 1
+                PointList.Add(New cv.Vec4f(msRNG.Next(ranges(0), ranges(1)), msRNG.Next(ranges(2), ranges(3)),
                                            msRNG.Next(ranges(4), ranges(5)), msRNG.Next(ranges(6), ranges(7))))
+            Next
+            If standaloneTest() Then
+                dst2.SetTo(0)
+                For Each v In PointList
+                    DrawCircle(dst2, New cv.Point2f(v(0), v(1)), task.DotSize, cv.Scalar.Yellow)
                 Next
-                If standaloneTest() Then
-                    dst2.SetTo(0)
-                    For Each v In PointList
-                        DrawCircle(dst2, New cv.Point2f(v(0), v(1)), task.DotSize, cv.Scalar.Yellow)
-                    Next
-                End If
-                vec4f = PointList.ToArray
             End If
+            vec4f = PointList.ToArray
         End Sub
     End Class
 

@@ -180,7 +180,6 @@ Namespace VBClasses
         Public msLast As Integer
 
         Public toggleOn As Boolean ' toggles on the heartbeat.
-        Public paused As Boolean
 
         Public pcFloor As Single ' y-value for floor...
         Public pcCeiling As Single ' y-value for ceiling...
@@ -237,7 +236,6 @@ Namespace VBClasses
 
         Public drawRect As cv.Rect ' filled in if the user draws on any of the images.
         Public drawRectClear As Boolean ' used to remove the drawing rectangle when it has been used to initialize a camshift or mean shift.
-        Public drawRectUpdated As Boolean
 
         Public pixelViewerRect As cv.Rect
         Public pixelViewTag As Integer

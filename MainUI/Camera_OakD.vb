@@ -3,6 +3,7 @@ Imports System.Threading
 Imports cv = OpenCvSharp
 
 Namespace MainApp
+#Region "Externs"
     Public Class Camera_OakD : Inherits GenericCamera
         <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
         Private Shared Function OakDOpen(w As Integer, h As Integer) As IntPtr
@@ -57,6 +58,8 @@ Namespace MainApp
         End Sub
 
         Private initialTime As Double = 0
+#End Region
+
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
             captureRes = _captureRes
             workRes = _workRes
@@ -123,7 +126,7 @@ Namespace MainApp
                 ReDim calibData.LtoR_translation(2)
                 ReDim calibData.LtoR_rotation(8)
                 For i = 0 To 2
-                    calibData.LtoR_translation(i) = extrinsics(i)
+                    calibData.LtoR_translation(i) = -extrinsics(i)
                 Next
                 For i = 0 To 8
                     calibData.LtoR_rotation(i) = extrinsics(i + 3)

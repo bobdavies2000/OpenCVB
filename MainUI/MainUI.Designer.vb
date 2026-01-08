@@ -26,7 +26,6 @@ Namespace MainApp
             components = New ComponentModel.Container()
             Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MainUI))
             MainToolStrip = New ToolStrip()
-            PausePlayButton = New ToolStripButton()
             OptionsButton = New ToolStripButton()
             TestAllButton = New ToolStripButton()
             Magnifier = New ToolStripButton()
@@ -51,23 +50,13 @@ Namespace MainApp
             ' MainToolStrip
             ' 
             MainToolStrip.ImageScalingSize = New Size(24, 24)
-            MainToolStrip.Items.AddRange(New ToolStripItem() {PausePlayButton, OptionsButton, TestAllButton, Magnifier, ToolStripSeparator1, PixelViewer, RecentList, AvailableAlgorithms, AtoZ, ToolStripSeparator2, AlgDescription})
+            MainToolStrip.Items.AddRange(New ToolStripItem() {OptionsButton, TestAllButton, Magnifier, ToolStripSeparator1, PixelViewer, RecentList, AvailableAlgorithms, AtoZ, ToolStripSeparator2, AlgDescription})
             MainToolStrip.Location = New Point(0, 0)
             MainToolStrip.Name = "MainToolStrip"
             MainToolStrip.Padding = New Padding(0, 0, 3, 0)
             MainToolStrip.Size = New Size(1275, 39)
             MainToolStrip.TabIndex = 0
             MainToolStrip.Text = "MainToolStrip"
-            ' 
-            ' PausePlayButton
-            ' 
-            PausePlayButton.DisplayStyle = ToolStripItemDisplayStyle.Image
-            PausePlayButton.Image = CType(resources.GetObject("PausePlayButton.Image"), Image)
-            PausePlayButton.ImageTransparentColor = Color.Magenta
-            PausePlayButton.Name = "PausePlayButton"
-            PausePlayButton.Size = New Size(34, 34)
-            PausePlayButton.Text = "Pause/Play"
-            PausePlayButton.ToolTipText = "Play/Pause"
             ' 
             ' OptionsButton
             ' 
@@ -230,7 +219,6 @@ Namespace MainApp
         End Sub
 
         Friend WithEvents MainToolStrip As ToolStrip
-        Friend WithEvents PausePlayButton As ToolStripButton
         Friend WithEvents TestAllButton As ToolStripButton
         Friend WithEvents Magnifier As ToolStripButton
         Friend WithEvents ToolStripSeparator1 As ToolStripSeparator

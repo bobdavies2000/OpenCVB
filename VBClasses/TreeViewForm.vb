@@ -1,13 +1,19 @@
-﻿Imports VBClasses
+﻿Imports System.ComponentModel
+Imports VBClasses
 Public Class TreeviewForm
     Dim botDistance As Integer
     Dim treeData As New List(Of String)
     Dim moduleList As New List(Of String) ' the list of all active algorithms.
-    Dim PercentTimes As New SortedList(Of Single, String)(New compareAllowIdenticalSingle)
     Dim titleStr = " - Click on any node to review the algorithm's output."
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         TreeView1.Height = Me.Height
         PercentTime.Height = TreeView1.Height
+    End Sub
+    Private Sub TreeviewForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
+        task.Settings.TreeViewLeft = Me.Left
+        task.Settings.TreeViewTop = Me.Top
+        task.Settings.TreeViewWidth = Me.Width
+        task.Settings.TreeViewHeight = Me.Height
     End Sub
     Private Function FindRecursive(ByVal tNode As TreeNode, name As String) As TreeNode
         Dim tn As TreeNode
@@ -81,13 +87,6 @@ Public Class TreeviewForm
         tv.HideSelection = False
         tv.SelectedNode = n
     End Sub
-    Private Class compareAllowIdenticalSingle : Implements IComparer(Of Single)
-        Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
-            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
-            If a <= b Then Return 1
-            Return -1
-        End Function
-    End Class
     Public Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
         If task Is Nothing Then Exit Sub
         Static saveCount As Integer
@@ -108,12 +107,6 @@ Public Class TreeviewForm
 
         PercentTime.Width = 250
         PercentTime.Left = 250
-    End Sub
-    Private Sub TreeviewForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
-        task.Settings.TreeViewLeft = Me.Left
-        task.Settings.TreeViewTop = Me.Top
-        task.Settings.TreeViewWidth = Me.Width
-        task.Settings.TreeViewHeight = Me.Height
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         Dim algorithm = e.Node.Text

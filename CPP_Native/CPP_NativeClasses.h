@@ -2377,15 +2377,13 @@ public:
 
     void Run(Mat src) {
         pointList.clear();
-        if (!ctask->paused) {
-            while (pointList.size() < sizeRequest) {
-                pointList.push_back(Point2f(range.x + float((rand() % range.width)), range.y + float((rand() % range.height))));
-            }
+        while (pointList.size() < sizeRequest) {
+            pointList.push_back(Point2f(range.x + float((rand() % range.width)), range.y + float((rand() % range.height))));
+        }
 
-            dst2.setTo(0);
-            for (Point2f pt : pointList) {
-                circle(dst2, pt, ctask->DotSize, Scalar(0, 255, 255), -1, ctask->lineType, 0);
-            }
+        dst2.setTo(0);
+        for (Point2f pt : pointList) {
+            circle(dst2, pt, ctask->DotSize, Scalar(0, 255, 255), -1, ctask->lineType, 0);
         }
     }
 };

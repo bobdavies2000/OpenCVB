@@ -18,15 +18,16 @@ Namespace VBClasses
             If irPt.X < 0 Or irPt.X >= task.color.Width Or irPt.Y >= task.color.Height Or badTranslation Then
                 brick.depth = 0 ' off the image
             Else
-                'brick.lRect = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
-                'brick.lRect = ValidateRect(brick.lRect)
+                brick.lRect = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
+                brick.lRect = ValidateRect(brick.lRect)
 
                 Dim LtoR_Pt = Intrinsics_Basics.translate_LeftToRight(task.pointCloud.Get(Of cv.Point3f)(brick.lRect.Y, brick.lRect.X))
                 If LtoR_Pt.X < 0 Or (LtoR_Pt.X = 0 And LtoR_Pt.Y = 0) Or
-                                    (LtoR_Pt.X >= task.color.Width Or LtoR_Pt.Y >= task.color.Height) Then
+                                        (LtoR_Pt.X >= task.color.Width Or LtoR_Pt.Y >= task.color.Height) Then
                     brick.depth = 0 ' off the image
                 Else
-                    brick.rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, brick.rect.Width, brick.rect.Height)
+                    ' brick.rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, brick.rect.Width, brick.rect.Height)
+                    brick.rRect = New cv.Rect(LtoR_Pt.X, brick.lRect.Y, brick.rect.Width, brick.rect.Height)
                     brick.rRect = ValidateRect(brick.rRect)
                 End If
             End If
@@ -56,7 +57,6 @@ Namespace VBClasses
                 cv.Cv2.MeanStdDev(src(brick.rect), brick.color, colorstdev)
                 brick.center = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
 
-                If brick.index = 483 Then Dim k = 0
                 If brick.depth > 0 Then
                     brick.mm = GetMinMax(task.pcSplit(2)(brick.rect), task.depthmask(brick.rect))
                     brickDepthCount += 1
@@ -99,18 +99,14 @@ Namespace VBClasses
                 Dim index = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
                 Dim br = task.bricks.brickList(index)
                 dst2.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
+                task.color.Rectangle(br.lRect, task.highlight, task.lineWidth + 1)
                 dst3.Rectangle(br.rRect, task.highlight, task.lineWidth + 1)
-                task.color.Rectangle(br.lRect, task.highlight, task.lineWidth)
             End If
 
             If task.heartBeat Then
                 labels(2) = CStr(task.bricks.brickList.Count) + " bricks and " +
                     CStr(brickDepthCount) + " had depth.  Left camera image is below."
             End If
-
-            dst2.Circle(task.mouseMovePoint, task.DotSize, task.highlight, -1)
-            Dim testindex = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            task.color.Rectangle(task.gridRects(testindex), task.highlight, task.lineWidth)
         End Sub
     End Class
 

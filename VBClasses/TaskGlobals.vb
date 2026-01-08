@@ -87,11 +87,6 @@ Namespace VBClasses
             If (task.msWatch - task.msLast) > 1000 Then task.msLast = task.msWatch
             If task.heartBeatLT Then task.toggleOn = Not task.toggleOn
 
-            If task.paused Then
-                task.midHeartBeat = False
-                task.almostHeartBeat = False
-            End If
-
             'task.histogramBins = task.gOptions.HistBinBar.Value
             'task.lineWidth = task.gOptions.LineWidth.Value
             'task.DotSize = task.gOptions.DotSizeSlider.Value

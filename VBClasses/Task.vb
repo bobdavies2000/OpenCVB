@@ -181,81 +181,79 @@ Namespace VBClasses
                 If PixelViewer IsNot Nothing Then PixelViewer.viewerForm.Activate()
                 activateTaskForms = False
             End If
-            If paused = False Then
 
 
 
 
-                algorithmPrep = False
-                MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
-                algorithmPrep = True
+            algorithmPrep = False
+            MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
+            algorithmPrep = True
 
 
 
 
-                Dim displayObject = task.MainUI_Algorithm
+            Dim displayObject = task.MainUI_Algorithm
 
-                Dim nextTrueData As List(Of TrueText) = displayObject.trueData
-                trueData = New List(Of TrueText)(nextTrueData)
+            Dim nextTrueData As List(Of TrueText) = displayObject.trueData
+            trueData = New List(Of TrueText)(nextTrueData)
 
-                firstPass = False
-                heartBeatLT = False
+            firstPass = False
+            heartBeatLT = False
 
-                ' they could have asked to display one of the algorithms in the TreeView.
-                For Each obj In task.cpu.activeObjects
-                    If obj.tracename = task.cpu.displayObjectName Then
-                        displayObject = obj
-                        Exit For
-                    End If
+            ' they could have asked to display one of the algorithms in the TreeView.
+            For Each obj In task.cpu.activeObjects
+                If obj.tracename = task.cpu.displayObjectName Then
+                    displayObject = obj
+                    Exit For
+                End If
+            Next
+
+            postProcess(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
+
+            dstList(0) = If(gOptions.displayDst0.Checked, Mat_Convert.Mat_Check8uc3(displayObject.dst0), color).Clone
+            dstList(1) = If(gOptions.displayDst1.Checked, Mat_Convert.Mat_Check8uc3(displayObject.dst1), depthRGB).Clone
+            dstList(2) = Mat_Convert.Mat_Check8uc3(displayObject.dst2)
+            dstList(3) = Mat_Convert.Mat_Check8uc3(displayObject.dst3)
+
+            If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
+            If gOptions.showMotionMask.Checked Then
+                For Each mIndex In motionBasics.motionList
+                    dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
                 Next
-
-                postProcess(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
-
-                dstList(0) = If(gOptions.displayDst0.Checked, Mat_Convert.Mat_Check8uc3(displayObject.dst0), color).Clone
-                dstList(1) = If(gOptions.displayDst1.Checked, Mat_Convert.Mat_Check8uc3(displayObject.dst1), depthRGB).Clone
-                dstList(2) = Mat_Convert.Mat_Check8uc3(displayObject.dst2)
-                dstList(3) = Mat_Convert.Mat_Check8uc3(displayObject.dst3)
-
-                If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
-                If gOptions.showMotionMask.Checked Then
-                    For Each mIndex In motionBasics.motionList
-                        dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
-                    Next
-                End If
-
-                If gOptions.CrossHairs.Checked Then
-                    Gravity_Basics.showVectors(dstList(0))
-                    Dim lp = lineLongest
-                    Dim pt = New cv.Point2f((lp.pE1.X + lp.pE2.X) / 2 + 5, (lp.pE1.Y + lp.pE2.Y) / 2)
-                    displayObject.trueData.Add(New TrueText("Longest", pt, 0))
-                End If
-
-                If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
-                    For Each dst In dstList
-                        dst.Rectangle(task.drawRect, cv.Scalar.White, 1)
-                    Next
-                End If
-
-                ' if there were no cycles spent on this routine, then it was inactive.
-                ' if any active algorithm has an index = -1, it has not been run.
-                Dim index = task.cpu.algorithmNames.IndexOf(displayObject.traceName)
-                If index = -1 Then
-                    displayObject.trueData.Add(New TrueText("This task is not active at this time.",
-                                           New cv.Point(workRes.Width / 3, workRes.Height / 2), 2))
-                End If
-
-                trueData.Clear()
-                trueData.Add(New TrueText(task.depthAndDepthRange,
-                                  New cv.Point(task.mouseMovePoint.X, task.mouseMovePoint.Y - 24), 1))
-                For Each tt In displayObject.trueData
-                    trueData.Add(tt)
-                Next
-
-                displayObject.trueData.Clear()
-                labels = displayObject.labels
-                If task.gOptions.displayDst0.Checked = False Then labels(0) = task.resolutionDetails
-                If task.gOptions.displayDst1.Checked = False Then labels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")
             End If
+
+            If gOptions.CrossHairs.Checked Then
+                Gravity_Basics.showVectors(dstList(0))
+                Dim lp = lineLongest
+                Dim pt = New cv.Point2f((lp.pE1.X + lp.pE2.X) / 2 + 5, (lp.pE1.Y + lp.pE2.Y) / 2)
+                displayObject.trueData.Add(New TrueText("Longest", pt, 0))
+            End If
+
+            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
+                For Each dst In dstList
+                    dst.Rectangle(task.drawRect, cv.Scalar.White, 1)
+                Next
+            End If
+
+            ' if there were no cycles spent on this routine, then it was inactive.
+            ' if any active algorithm has an index = -1, it has not been run.
+            Dim index = task.cpu.algorithmNames.IndexOf(displayObject.traceName)
+            If index = -1 Then
+                displayObject.trueData.Add(New TrueText("This task is not active at this time.",
+                                               New cv.Point(workRes.Width / 3, workRes.Height / 2), 2))
+            End If
+
+            trueData.Clear()
+            trueData.Add(New TrueText(task.depthAndDepthRange,
+                                      New cv.Point(task.mouseMovePoint.X, task.mouseMovePoint.Y - 24), 1))
+            For Each tt In displayObject.trueData
+                trueData.Add(tt)
+            Next
+
+            displayObject.trueData.Clear()
+            labels = displayObject.labels
+            If task.gOptions.displayDst0.Checked = False Then labels(0) = task.resolutionDetails
+            If task.gOptions.displayDst1.Checked = False Then labels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")
         End Sub
         Private Sub postProcess(src As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat)
             If PixelViewer IsNot Nothing Then

@@ -17,7 +17,7 @@ Namespace VBClasses
 
 
 
-    Public Class LeftRight_CompareRaw : Inherits TaskParent
+    Public Class LeftRight_Raw : Inherits TaskParent
         Dim options As New Options_LeftRight
         Public Sub New()
             desc = "Show slices of the left and right view next to each other for visual comparison"
@@ -25,14 +25,36 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim r1 = New cv.Rect(0, options.sliceY, task.leftView.Width, options.sliceHeight)
-            Dim r2 = New cv.Rect(0, 25, task.leftView.Width, options.sliceHeight)
-            dst2.SetTo(0)
-            task.leftView(r1).CopyTo(dst2(r2))
-
-            r2.Y += options.sliceHeight
-            task.rightView(r1).CopyTo(dst2(r2))
+            dst2 = task.leftView
             dst3 = task.rightView
+
+            'Dim r1 = New cv.Rect(0, options.sliceY, task.leftView.Width, options.sliceHeight)
+            'Dim r2 = New cv.Rect(0, 25, task.leftView.Width, options.sliceHeight)
+            'dst2.SetTo(0)
+            'task.leftView(r1).CopyTo(dst2(r2))
+
+            'r2.Y += options.sliceHeight
+            'task.rightView(r1).CopyTo(dst2(r2))
+            'dst3 = task.rightView
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class LeftRight_RawLeft : Inherits TaskParent
+        Public Sub New()
+            task.drawRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            desc = "Match the raw left image with the color image with a drawRect"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.leftView
+
+            If task.drawRect.Width <> dst2.Width Then Dim k = 0
+            dst3 = dst2(task.drawRect).Resize(dst2.Size)
         End Sub
     End Class
 

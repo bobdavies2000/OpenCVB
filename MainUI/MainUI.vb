@@ -8,7 +8,7 @@ Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Namespace MainApp
     Partial Public Class MainUI : Inherits Form
-        Dim isPlaying As Boolean = False
+        Dim isPlaying As Boolean
         Dim homeDir As String = ""
         Public settingsIO As jsonIO
         Dim algHistory As New List(Of String)
@@ -170,10 +170,10 @@ Namespace MainApp
         Private Sub MainForm_Closing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             If TestAllTimer.Enabled = False Then SaveJsonSettings()
             If isPlaying Then
+                vbc.task.Dispose()
                 isPlaying = False
                 StopCamera()
             End If
-            vbc.task.Dispose()
         End Sub
         Private Sub getLineCounts()
             Dim countFileInfo = New FileInfo(homeDir + "Data/AlgorithmCounts.txt")
@@ -316,7 +316,7 @@ Namespace MainApp
 
             setupAlgorithmHistory()
 
-            PausePlayButton.PerformClick()
+            StartStopTask()
 
             Const WM_SETICON As Integer = &H80
             Const ICON_SMALL As Integer = 0
@@ -447,12 +447,12 @@ Namespace MainApp
             Debug.WriteLine(vbCrLf + "OptionsTesting GDI: " & GdiMonitor.GetGdiCount())
             Debug.WriteLine("OptionsTesting USER: " & GdiMonitor.GetUserCount())
 
-            PausePlayButton.PerformClick()
+            StartStopTask()
 
             Dim optionsForm As New Options()
             If optionsForm.ShowDialog() = DialogResult.OK Then SaveJsonSettings()
 
-            PausePlayButton.PerformClick()
+            StartStopTask()
             AvailableAlgorithms_SelectedIndexChanged(Nothing, Nothing)
 
             If task Is Nothing Then startAlgorithm()
@@ -496,20 +496,17 @@ Namespace MainApp
 
             AvailableAlgorithms.SelectedItem = settings.algorithm
         End Sub
-        Private Sub PausePlayButton_Click(sender As Object, e As EventArgs) Handles PausePlayButton.Click
+        Private Sub StartStopTask()
             isPlaying = Not isPlaying
-
-            Static PausePlay = New Bitmap(homeDir + "MainUI/Data/PauseButton.png")
-            Static runPlay = New Bitmap(homeDir + "MainUI/Data/Run.png")
-            PausePlayButton.Image = If(isPlaying, PausePlay, runPlay)
 
             If isPlaying Then
                 StartCamera()
                 AvailableAlgorithms.SelectedItem = settings.algorithm
 
-                Me.MainForm_Resize(Nothing, Nothing)
+                MainForm_Resize(Nothing, Nothing)
             Else
                 StopCamera()
+
                 If task IsNot Nothing Then ' already stopped...
                     task.readyForCameraInput = False
                     task.Dispose()

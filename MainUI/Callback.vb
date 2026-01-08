@@ -91,29 +91,3 @@ Namespace MainApp
         End Sub
     End Class
 End Namespace
-'' Run algorithm on background thread
-'task.Run(Sub()
-'             Try
-'                 ' Run algorithm on background thread
-'                 task.RunAlgorithm()
-
-'                 ' Update UI on UI thread after algorithm completes
-'                 Me.BeginInvoke(Sub()
-'                                    Try
-'                                        task.mouseClickFlag = False
-'                                        task.frameCount += 1
-
-'                                        If RefreshTimer.Interval <> task.refreshTimerTickCount Then
-'                                            RefreshTimer.Interval = task.refreshTimerTickCount
-'                                        End If
-'                                    Catch ex As Exception
-'                                        Debug.WriteLine("Error updating UI after algorithm: " + ex.Message)
-'                                    Finally
-'                                        Interlocked.Exchange(algorithmTaskRunning, 0)
-'                                    End Try
-'                                End Sub)
-'             Catch ex As Exception
-'                 Debug.WriteLine("Error running algorithm: " + ex.Message)
-'                 Me.BeginInvoke(Sub() Interlocked.Exchange(algorithmTaskRunning, 0))
-'             End Try
-'         End Sub)

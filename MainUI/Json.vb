@@ -18,6 +18,7 @@ Namespace MainApp
                     Dim jsonSettings = streamReader.ReadToEnd()
                     If jsonSettings <> "" Then
                         settings = JsonConvert.DeserializeObject(Of jsonShared.Settings)(jsonSettings)
+                        If settings.algorithm = "" Then settings.algorithm = "AddWeighted_Basics"
                         settings = initialize(settings)
                     End If
                 End Using

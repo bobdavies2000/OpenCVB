@@ -985,11 +985,12 @@ Laplacian_Blur
 Laplacian_PyramidFilter
 LeftRight_Basics
 LeftRight_BRISK
-LeftRight_CompareRaw
 LeftRight_ContourLeft
 LeftRight_Edges
 LeftRight_EdgesColor
 LeftRight_Palettized
+LeftRight_Raw
+LeftRight_RawLeft
 LeftRight_RedLeftGray
 LeftRight_RedMask
 LeftRight_RedRightGray
