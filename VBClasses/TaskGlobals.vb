@@ -87,12 +87,7 @@ Namespace VBClasses
             If (task.msWatch - task.msLast) > 1000 Then task.msLast = task.msWatch
             If task.heartBeatLT Then task.toggleOn = Not task.toggleOn
 
-            'task.histogramBins = task.gOptions.HistBinBar.Value
-            'task.lineWidth = task.gOptions.LineWidth.Value
-            'task.DotSize = task.gOptions.DotSizeSlider.Value
-
-            'task.metersPerPixel = task.MaxZmeters / task.workRes.Height ' meters per pixel in projections - side and top.
-            'task.debugSyncUI = task.gOptions.debugSyncUI.Checked
+            task.metersPerPixel = task.MaxZmeters / task.workRes.Height ' meters per pixel in projections - side and top.
         End Sub
 
         Public Function findRectFromLine(lp As lpData) As cv.Rect

@@ -466,9 +466,8 @@ Namespace MainApp
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
             If task Is Nothing Then Exit Sub
 
-            Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + vbCrLf +
-                        " " + Format(task.fpsAlgorithm, "0") + " FPS Algorithm" + vbCrLf +
-                        " " + Format(task.fpsCamera, "0") + " FPS Camera")
+            Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + " FPS Algorithm/" + settings.cameraName + " " +
+                        Format(task.fpsAlgorithm, "0") + "/" + Format(task.fpsCamera, "0"))
 
             Static lastTime As DateTime = Now
             Dim timeNow As DateTime = Now
@@ -491,7 +490,7 @@ Namespace MainApp
             End If
             If AvailableAlgorithms.Items.Count <= AvailableAlgorithms.SelectedIndex + 1 Then AvailableAlgorithms.SelectedIndex = 0
 
-            Debug.WriteLine("Usage GDI: " & GdiMonitor.GetGdiCount() + " USER: " & GdiMonitor.GetUserCount())
+            Debug.WriteLine("Usage GDI: " & CStr(GdiMonitor.GetGdiCount()) + " USER: " & CStr(GdiMonitor.GetUserCount()))
 
             AvailableAlgorithms.SelectedItem = settings.algorithm
         End Sub
