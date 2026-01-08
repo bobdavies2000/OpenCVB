@@ -42,7 +42,7 @@ Namespace MainApp
 
             IMU_Acceleration = zed.IMU_Acceleration
             IMU_AngularVelocity = zed.IMU_AngularVelocity
-            Static IMU_StartTime = zed.IMU_TimeStamp
+            Static IMU_StartTime As Double = zed.IMU_TimeStamp
             IMU_TimeStamp = (zed.IMU_TimeStamp - IMU_StartTime) / 4000000 ' crude conversion to milliseconds.
 
             SyncLock cameraMutex

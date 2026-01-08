@@ -180,7 +180,7 @@ Namespace VBClasses
             If task.frameCount Mod 300 = 0 Then dst2.SetTo(0)
 
             Dim lastStateResult = New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1))
-            Static lastRealMouse = task.mouseMovePoint
+            Static lastRealMouse As cv.Point = task.mouseMovePoint
             task.kalman.kInput = {task.mouseMovePoint.X, task.mouseMovePoint.Y}
             task.kalman.Run(emptyMat)
             vbc.DrawLine(dst2, New cv.Point(task.kalman.kOutput(0), task.kalman.kOutput(1)), lastStateResult, white)
@@ -350,8 +350,8 @@ Namespace VBClasses
         Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
         Public inputReal As Single
         Public stateResult As Single
-        Public ProcessNoiseCov As Single = 0.00001
-        Public MeasurementNoiseCov As Single = 0.1
+        Public ProcessNoiseCov As Single = 0.00001F
+        Public MeasurementNoiseCov As Single = 0.1F
         Public ErrorCovPost As Single = 1
         Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMat_vbbacrix.
         Public newTransmissionMatrix As Boolean = True
@@ -359,8 +359,8 @@ Namespace VBClasses
             Dim tMatrix() As Single = {1, 1, 0, 1}
             kf.TransitionMatrix = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_32F, tMatrix)
             kf.MeasurementMatrix.SetIdentity(1)
-            kf.ProcessNoiseCov.SetIdentity(0.00001)
-            kf.MeasurementNoiseCov.SetIdentity(0.1)
+            kf.ProcessNoiseCov.SetIdentity(0.00001F)
+            kf.MeasurementNoiseCov.SetIdentity(0.1F)
             kf.ErrorCovPost.SetIdentity(1)
             plot.plotCount = 2
             desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
@@ -397,16 +397,16 @@ Namespace VBClasses
         Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, cv.Scalar.All(0))
         Public inputReal As Single
         Public stateResult As Single
-        Public ProcessNoiseCov As Single = 0.00001
-        Public MeasurementNoiseCov As Single = 0.1
+        Public ProcessNoiseCov As Single = 0.00001F
+        Public MeasurementNoiseCov As Single = 0.1F
         Public ErrorCovPost As Single = 1
         Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
         Public newTMatrix As Boolean = True
         Public Sub updateTMatrix()
             kf.TransitionMatrix = cv.Mat.FromPixelData(2, 2, cv.MatType.CV_32F, transitionMatrix)
             kf.MeasurementMatrix.SetIdentity(1)
-            kf.ProcessNoiseCov.SetIdentity(0.00001)
-            kf.MeasurementNoiseCov.SetIdentity(0.1)
+            kf.ProcessNoiseCov.SetIdentity(0.00001F)
+            kf.MeasurementNoiseCov.SetIdentity(0.1F)
             kf.ErrorCovPost.SetIdentity(1)
         End Sub
         Public Sub New()
@@ -439,9 +439,9 @@ Namespace VBClasses
         Dim P(,) As Single = {{1, 0}, {0, 1}} '2x2 This is the covarience matrix
         Dim q_bias As Single
         Dim rate As Single
-        Dim R_angle As Single = 0.002
-        Dim Q_angle As Single = 0.001 'This is the process covarience matrix. It's how much we trust the accelerometer
-        Dim Q_gyro As Single = 0.3
+        Dim R_angle As Single = 0.002F
+        Dim Q_angle As Single = 0.001F 'This is the process covarience matrix. It's how much we trust the accelerometer
+        Dim Q_gyro As Single = 0.3F
         Dim options As New Options_Kalman_VB
         Public Sub New()
             oRand = New Random(DateTime.Now.Millisecond)
@@ -510,8 +510,8 @@ Namespace VBClasses
         Public kAverage As Single
         Dim P(,) As Single = {{1, 0}, {0, 1}} '2x2 This is the covarience matrix
         Dim q_bias As Single
-        Dim outputError As Single = 0.002
-        Dim processCovar As Single = 0.001 'This is the process covarience matrix. It's how much we trust the accelerometer
+        Dim outputError As Single = 0.002F
+        Dim processCovar As Single = 0.001F 'This is the process covarience matrix. It's how much we trust the accelerometer
         Dim matrix As New List(Of Single)
         Dim plot As New Plot_OverTimeScalar
         Dim saveAvgCount As Integer

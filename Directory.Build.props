@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <!-- Enable old RID graph to support version-specific RIDs like win10-x64 used by Stereolabs.zed -->
+    <UseRidGraph>true</UseRidGraph>
+    <!-- Suppress NETSDK1206 warning about version-specific RIDs -->
+    <!-- Suppress VB.NET compiler warnings -->
+    <NoWarn>$(NoWarn);NETSDK1206;BC42020;BC42017;BC42016;BC42019;BC41999;BC42018;BC42032;BC30451</NoWarn>
+  </PropertyGroup>
+</Project>
+

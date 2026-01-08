@@ -117,14 +117,14 @@ Namespace VBClasses
             labels(3) = "Mouse selects different Julia Sets - zoom for detail"
             desc = "Build Julia set from any point in the Mandelbrot fractal"
         End Sub
-        Private Function julia_point(x As Single, y As Single, r As Integer, depth As Integer, max As Integer, c As Complex, z As Complex)
+        Private Function julia_point(x As Single, y As Single, r As Integer, depth As Integer, max As Integer, c As Complex, z As Complex) As cv.Point
             If Complex.Abs(z) > r Then
                 Dim mt = (255 * Math.Pow(max - depth, 2) Mod (max * max)) Mod 256
                 dst2.Set(Of Byte)(y, x, 255 - mt)
                 depth = 0
             End If
             If Math.Sqrt(Math.Pow(x - dst2.Width / 2, 2) + Math.Pow(y - dst2.Height / 2, 2)) > dst2.Height / 2 Then dst2.Set(Of Byte)(y, x, 0)
-            If depth < max / 4 Then Return 0
+            If depth < max / 4 Then Return New cv.Point
             Return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)

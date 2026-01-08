@@ -46,7 +46,7 @@ Namespace VBClasses
             Return ptList.Average()
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim threshold As Single = 0.015 ' surround zero by 15 cm's
+            Dim threshold As Single = 0.015F ' surround zero by 15 cm's
 
             dst3 = task.pcSplit(0).InRange(-threshold, threshold)
             dst3.SetTo(0, task.noDepthMask)
@@ -82,7 +82,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static rotateAngle As Double = task.verticalizeAngle - 2
-            Static rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
+            Static rotateCenter As cv.Point2f = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
 
             rotateAngle += 0.1
             If rotateAngle >= task.verticalizeAngle + 2 Then rotateAngle = task.verticalizeAngle - 2
@@ -117,7 +117,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim angle = Math.Abs(task.verticalizeAngle)
             Static rotateAngle As Double = -angle
-            Static rotateCenter = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
+            Static rotateCenter As cv.Point2f = New cv.Point2f(dst2.Width / 2, dst2.Height / 2)
 
             rotateAngle += 0.1
             If rotateAngle >= angle Then rotateAngle = -angle

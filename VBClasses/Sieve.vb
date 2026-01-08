@@ -18,7 +18,7 @@ Namespace VBClasses
                     nextList = "   "
                 End If
             Next
-            Return completeList + Mid(nextList, 1, If(nextList.Length > 2, Len(nextList) - 2, ""))
+            Return completeList + Mid(nextList, 1, If(nextList.Length > 2, Len(nextList) - 2, 0))
         End Function
         Public Sub setMaxPrimes()
             Static countSlider = OptionParent.FindSlider("Count of desired primes")

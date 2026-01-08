@@ -3,9 +3,9 @@
 Namespace VBClasses
     Public Class Pendulum_Basics : Inherits TaskParent
         Dim l1 As Single = 150, l2 As Single = 150, m1 As Single = 10, m2 As Single = 10
-        Dim o1 = 2 * cv.Cv2.PI / 2, o2 = 2 * cv.Cv2.PI / 3
+        Dim o1 As Single = CSng(2 * cv.Cv2.PI / 2), o2 As Single = CSng(2 * cv.Cv2.PI / 3)
         Dim w1 As Single, w2 As Single
-        Dim g = 9.81
+        Dim g As Single = 9.81F
         Dim dw As Single = 2, dh As Single = 4
         Dim center = New cv.Point2f(dst2.Width / 2, 0)
         Dim fps As Single = 300
@@ -32,7 +32,7 @@ Namespace VBClasses
             End If
 
             fps = options.fps
-            Dim dt = 1 / fps
+            Dim dt As Single = CSng(1 / fps)
 
             Dim alfa1 = (-g * (2 * m1 + m2) * Math.Sin(o1) - g * m2 * Math.Sin(o1 - 2 * o2) - 2 * m2 * Math.Sin(o1 - o2) * (w2 * w2 * l2 + w1 * w1 * l1 * Math.Cos(o1 - o2))) / (l1 * (2 * m1 + m2 - m2 * Math.Cos(2 * o1 - 2 * o2)))
             Dim alfa2 = (2 * Math.Sin(o1 - o2)) * (w1 * w1 * l1 * (m1 + m2) + g * (m1 + m2) * Math.Cos(o1) + w2 * w2 * l2 * m2 * Math.Cos(o1 - o2)) / l2 / (2 * m1 + m2 - m2 * Math.Cos(2 * o1 - 2 * o2))
@@ -44,10 +44,10 @@ Namespace VBClasses
 
             accumulator += dt
 
-            Dim p1 = New cv.Point2f((dst2.Width / 2 + Math.Sin(o1) * l1 + dw * 0.5) / dw, dst2.Height - (Math.Cos(o1) * l1 + dh * 0.5) / dh + dst2.Height / dh / 2)
+            Dim p1 = New cv.Point2f((dst2.Width / 2 + Math.Sin(o1) * l1 + dw * 0.5F) / dw, dst2.Height - (Math.Cos(o1) * l1 + dh * 0.5F) / dh + dst2.Height / dh / 2)
             ' adjust to fit in the image better
-            p1 = New cv.Point2f(p1.X * 2, p1.Y * 0.5)
-            Dim p2 = New cv.Point2f(p1.X + (Math.Sin(o2) * l2 + dw * 0.5) / dw, p1.Y - (Math.Cos(o2) * l2 + dh * 0.5) / dh)
+            p1 = New cv.Point2f(p1.X * 2, p1.Y * 0.5F)
+            Dim p2 = New cv.Point2f(p1.X + (Math.Sin(o2) * l2 + dw * 0.5F) / dw, p1.Y - (Math.Cos(o2) * l2 + dh * 0.5F) / dh)
 
             vbc.DrawLine(dst2, center, p1, task.scalarColors(task.frameCount Mod 255))
             vbc.DrawLine(dst2, p1, p2, task.scalarColors(task.frameCount Mod 255))

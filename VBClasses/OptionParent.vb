@@ -31,10 +31,16 @@ Namespace VBClasses
             Return Nothing
         End Function
         Public Shared Function findRadio(opt As String) As RadioButton
-            Dim index As Integer
-            Dim radio = searchForms(opt, index)
-            If radio Is Nothing Then Return Nothing
-            Return radio(index)
+            Dim radio = FindCheckBox(opt)
+            For Each frm In Application.OpenForms
+                If frm.text.endswith(" Radio Buttons") Then
+                    For j = 0 To frm.check.count - 1
+                        If frm.check(j).text = opt Then Return frm.check(j)
+                    Next
+                End If
+            Next
+            Debug.WriteLine("OptionParent.findRadioForm failed.  The application list of forms changed while iterating.  Not critical.")
+            Return Nothing
         End Function
         Public Shared Function findRadioText(ByRef radioList As List(Of RadioButton)) As String
             For Each rad In radioList
@@ -42,25 +48,11 @@ Namespace VBClasses
             Next
             Return radioList(0).Text
         End Function
-        Public Shared Function findRadioIndex(ByRef radioList As List(Of RadioButton)) As String
+        Public Shared Function findRadioIndex(ByRef radioList As List(Of RadioButton)) As Integer
             For i = 0 To radioList.Count - 1
                 If radioList(i).Checked Then Return i
             Next
             Return 0
-        End Function
-        Private Shared Function searchForms(opt As String, ByRef index As Integer)
-            For Each frm In Application.OpenForms
-                If frm.text.endswith(" Radio Buttons") Then
-                    For j = 0 To frm.check.count - 1
-                        If frm.check(j).text = opt Then
-                            index = j
-                            Return frm.check
-                        End If
-                    Next
-                End If
-            Next
-            Debug.WriteLine("OptionParent.findRadioForm failed.  The application list of forms changed while iterating.  Not critical.")
-            Return Nothing
         End Function
         Public Shared Function FindFrm(title As String) As System.Windows.Forms.Form
             For Each frm In Application.OpenForms

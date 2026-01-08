@@ -28,7 +28,7 @@ Namespace MainApp
 
             Return settings
         End Function
-        Public Function initialize(Settings As jsonShared.Settings)
+        Public Function initialize(Settings As jsonShared.Settings) As jsonShared.Settings
             Dim usbList = USBenumeration()
             Settings.cameraPresent = New List(Of Boolean)
             For i = 0 To cameraNames.Count - 1

@@ -7,7 +7,7 @@ Namespace VBClasses
         Dim ms_rng As New System.Random
         Dim options As New Options_Etch_ASketch
         Dim lastCursor As cv.Point
-        Private Function randomCursor()
+        Private Function randomCursor() As cv.Point
             Dim nextCursor = New cv.Point(ms_rng.Next(0, dst2.Width), ms_rng.Next(0, dst2.Height))
             lastCursor = nextCursor
             Return nextCursor

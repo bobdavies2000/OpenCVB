@@ -384,7 +384,7 @@ Namespace VBClasses
             Static dimSlider = OptionParent.FindSlider("Dimension")
 
             Dim merge As New cv.Mat
-            Select Case dimSlider.value
+            Select Case CInt(dimSlider.value)
                 Case 1 ' grayscale
                     If src.Channels() = 1 Then
                         src.ConvertTo(merge, cv.MatType.CV_32F)

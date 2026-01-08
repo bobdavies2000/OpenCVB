@@ -715,7 +715,7 @@ Namespace VBClasses
             If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
 
             Dim splitCount As Integer
-            Dim newRange As Single = 0.1
+            Dim newRange As Single = 0.1F
             For Each brick In task.bricks.brickList
                 If brick.depth > 0 And brick.age = 1 Then
                     If brick.mm.range > newRange Then ' if the range within a brick is > 10 cm's, fit it within 10 cm's.
@@ -759,7 +759,7 @@ Namespace VBClasses
             If task.motionBasics.motionList.Count = 0 Then Exit Sub ' no change...
 
             Dim updateCount As Integer
-            Dim newRange As Single = 0.01
+            Dim newRange As Single = 0.01F
 
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
             cv.Cv2.ExtractChannel(dst2, dst1, 2)

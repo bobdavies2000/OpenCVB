@@ -95,15 +95,15 @@ Public Class GenericCamera
         End SyncLock
     End Sub
     Public Sub GetNextFrameCounts(frameTime As Double)
-        Static lastFrameTime = IMU_TimeStamp
-        Static imuStartTime = IMU_TimeStamp
+        Static lastFrameTime As Double = IMU_TimeStamp
+        Static imuStartTime As Double = IMU_TimeStamp
         IMU_FrameTime = IMU_TimeStamp - lastFrameTime - imuStartTime
         lastFrameTime = IMU_TimeStamp - imuStartTime
 
         Static myStopWatch As New System.Diagnostics.Stopwatch
         If cameraFrameCount = 0 Then myStopWatch.Start()
         CPU_TimeStamp = myStopWatch.ElapsedMilliseconds
-        Static lastCPUTime = CPU_TimeStamp
+        Static lastCPUTime As Double = CPU_TimeStamp
         CPU_FrameTime = CPU_TimeStamp - lastCPUTime
         lastCPUTime = CPU_TimeStamp
 

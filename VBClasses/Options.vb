@@ -21,12 +21,12 @@ Namespace VBClasses
             End If
         End Sub
         Public Sub Run()
-            Static perspectiveSlider = FindSlider("Perspective")
-            Static zNearSlider = FindSlider("zNear X100")
-            Static zFarSlider = FindSlider("zFar")
-            Static pointSlider = FindSlider("Pointsize")
-            Static xSlider = FindSlider("SharpGL X range")
-            Static ySlider = FindSlider("SharpGL Y range")
+            Static perspectiveSlider As TrackBar = FindSlider("Perspective")
+            Static zNearSlider As TrackBar = FindSlider("zNear X100")
+            Static zFarSlider As TrackBar = FindSlider("zFar")
+            Static pointSlider As TrackBar = FindSlider("Pointsize")
+            Static xSlider As TrackBar = FindSlider("SharpGL X range")
+            Static ySlider As TrackBar = FindSlider("SharpGL Y range")
             perspective = perspectiveSlider.value
             zNear = zNearSlider.value / 100
             zFar = zFarSlider.value
@@ -118,15 +118,15 @@ Namespace VBClasses
             End If
         End Sub
         Public Sub Run()
-            Static travelCheck = FindCheckBox("Restart Traveling Salesman")
-            Static circleCheck = FindCheckBox("Circular pattern of cities (allows you to visually check if successful.)")
-            Static copyBestCheck = FindCheckBox("Copy Best Intermediate solutions (top half) to Bottom Half")
-            Static circularCheck = FindCheckBox("Circular pattern of cities (allows you to visually check if successful.)")
+            Static travelCheck As CheckBox = FindCheckBox("Restart Traveling Salesman")
+            Static circleCheck As CheckBox = FindCheckBox("Circular pattern of cities (allows you to visually check if successful.)")
+            Static copyBestCheck As CheckBox = FindCheckBox("Copy Best Intermediate solutions (top half) to Bottom Half")
+            Static circularCheck As CheckBox = FindCheckBox("Circular pattern of cities (allows you to visually check if successful.)")
             Static citySlider = OptionParent.FindSlider("Anneal Number of Cities")
             Static successSlider = OptionParent.FindSlider("Success = top X threads agree on energy level.")
 
-            copyBestFlag = copyBestCheck.checked
-            circularFlag = circularCheck.checked
+            copyBestFlag = copyBestCheck.Checked
+            circularFlag = circularCheck.Checked
             cityCount = citySlider.Value
             successCount = successSlider.Value
             travelCheck.Checked = False
@@ -340,11 +340,11 @@ Namespace VBClasses
             Static genSlider = OptionParent.FindSlider("Number of Generations")
             Static stageSlider = OptionParent.FindSlider("Number of Stages")
             Static brushSlider = OptionParent.FindSlider("Brush size Percentage")
-            Static snapCheckbox = FindCheckBox("Snapshot Video input to initialize genetic drawing")
+            Static snapCheckbox As CheckBox = FindCheckBox("Snapshot Video input to initialize genetic drawing")
             Static strokeSlider = OptionParent.FindSlider("Brushstroke count per generation")
 
-            If snapCheckbox.checked Then snapCheckbox.checked = False
-            snapCheck = snapCheckbox.checked
+            If snapCheckbox.Checked Then snapCheckbox.Checked = False
+            snapCheck = snapCheckbox.Checked
             stageTotal = stageSlider.value
             generations = genSlider.value
             brushPercent = brushSlider.value / 100
@@ -2983,7 +2983,7 @@ Namespace VBClasses
                 sliders.setupTrackBar("Sample count threshold", 1, 50, sampleThreshold)
             End If
         End Sub
-        Public Function buildDepthRanges(input As cv.Mat, typeSpec As String)
+        Public Function buildDepthRanges(input As cv.Mat, typeSpec As String) As List(Of rangeData)
             Dim ranges As New List(Of rangeData)
             Dim sorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger) ' the spectrum of the values 
             Dim pixels As New List(Of Integer)

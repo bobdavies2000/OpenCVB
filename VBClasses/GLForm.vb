@@ -259,7 +259,7 @@ Public Class SharpGLForm
         gl.Flush()
         Return label
     End Function
-    Private Function draw3DLines(lplist As List(Of lpData))
+    Private Function draw3DLines(lplist As List(Of lpData)) As String
         gl.LineWidth(options.pointSize)
         gl.Begin(OpenGL.GL_LINES)
         For Each lp In lplist

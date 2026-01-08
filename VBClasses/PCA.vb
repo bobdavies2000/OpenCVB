@@ -1,21 +1,21 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
-    ' You can find the main direction of a series of points using principal component analysis ‘(PCA).
+    ' You can find the main direction of a series of points using principal component analysis ï¿½(PCA).
     ' PCA is a statistical technique that can be used to find the directions of greatest variance in a dataset.
     ' The main direction of a series of points is the direction of greatest variance in the dataset.
     ' To find the main direction of a series of points using PCA, you can follow these steps:
 
-    '   1. Collect your data. The data should be a set of points in a multidimensional ‘space.
+    '   1. Collect your data. The data should be a set of points in a multidimensional ï¿½space.
     '   2. Compute the covariance matrix of the data. The covariance matrix is a
     '      square matrix that measures the covariance between each pair of variables.
     '   3. Find the eigenvectors of the covariance matrix. The eigenvectors are the directions of greatest variance in the dataset.
     '   4. The eigenvector with the largest eigenvalue is the main direction of the dataset.
 
-    ' For example, let's say you have a dataset of points that represent the locations of cities ‘in the United States.
-    ' You can use PCA to find the main direction of this dataset. The ‘main direction will be the direction of greatest
-    ' variance in the locations of the cities. ‘This direction could be used to represent the overall trend in the
-    ' distribution of cities in ‘the United States.
+    ' For example, let's say you have a dataset of points that represent the locations of cities ï¿½in the United States.
+    ' You can use PCA to find the main direction of this dataset. The ï¿½main direction will be the direction of greatest
+    ' variance in the locations of the cities. ï¿½This direction could be used to represent the overall trend in the
+    ' distribution of cities in ï¿½the United States.
     ' PCA is a powerful tool that can be used to find the main direction of a series of points.
     'Public Class PCA_Basics : Inherits TaskParent
     '    Dim pcaLine As New PCA_LineMask
@@ -241,7 +241,7 @@ Namespace VBClasses
                 Next
 
                 DrawCircle(dst3, cntr, task.DotSize + 1, cv.Scalar.BlueViolet)
-                Dim factor As Single = 0.02 ' scaling factor for the lines depicting the principal components.
+                Dim factor As Single = 0.02F ' scaling factor for the lines depicting the principal components.
                 Dim ept1 = New cv.Point(cntr.X + factor * eigen_vecs(0).X * eigen_val(0), cntr.Y + factor * eigen_vecs(0).Y * eigen_val(0))
                 Dim ept2 = New cv.Point(cntr.X - factor * eigen_vecs(1).X * eigen_val(1), cntr.Y - factor * eigen_vecs(1).Y * eigen_val(1))
 

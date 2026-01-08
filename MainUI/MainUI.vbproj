@@ -11,6 +11,8 @@
     <Platforms>x64</Platforms>
     <RootNamespace></RootNamespace>
     <ApplicationIcon>Data\OpenCVB.ico</ApplicationIcon>
+    <!-- Enable old RID graph to support version-specific RIDs like win10-x64 used by Stereolabs.zed -->
+    <UseRidGraph>true</UseRidGraph>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>

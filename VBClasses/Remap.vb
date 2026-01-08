@@ -50,7 +50,7 @@ Namespace VBClasses
 
 
     Public Class Remap_Flip : Inherits TaskParent
-        Public direction = 0
+        Public direction As Integer = 0
         Public Sub New()
             desc = "Use flip to remap an image."
         End Sub

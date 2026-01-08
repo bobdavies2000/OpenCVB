@@ -87,8 +87,8 @@ Namespace MainApp
             ' Check if pipe is still valid (might be cleared during stop)
             If pipe Is Nothing Then Return
 
-            Static alignToColor = New Align(Stream.Color)
-            Static ptcloud = New PointCloud()
+            Static alignToColor As Align = New Align(Stream.Color)
+            Static ptcloud As PointCloud = New PointCloud()
             Dim cols = captureRes.Width, rows = captureRes.Height
 
             Using frames As FrameSet = pipe.WaitForFrames(5000)

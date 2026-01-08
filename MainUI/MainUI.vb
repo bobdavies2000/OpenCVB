@@ -328,8 +328,8 @@ Namespace MainApp
 
         Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
             TestAllTimer.Enabled = Not TestAllTimer.Enabled
-            Static testAllToolbarBitmap = New Bitmap(homeDir + "MainUI/Data/testall.png")
-            Static stopTestAll = New Bitmap(homeDir + "MainUI/Data/stopTestAll.png")
+            Static testAllToolbarBitmap As Bitmap = New Bitmap(homeDir + "MainUI/Data/testall.png")
+            Static stopTestAll As Bitmap = New Bitmap(homeDir + "MainUI/Data/stopTestAll.png")
             TestAllButton.Image = If(TestAllTimer.Enabled, stopTestAll, testAllToolbarBitmap)
             If TestAllTimer.Enabled Then
                 Debug.WriteLine("")
@@ -472,7 +472,7 @@ Namespace MainApp
 
             Static lastTime As DateTime = Now
             Dim timeNow As DateTime = Now
-            Static lastWriteTime = timeNow
+            Static lastWriteTime As DateTime = timeNow
 
             Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
             totalBytesOfMemoryUsed = currentProcess.PrivateMemorySize64 / (1024 * 1024)

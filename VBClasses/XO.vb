@@ -109,7 +109,7 @@ Namespace VBClasses
             Return ptList.Average()
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim threshold As Single = 0.015
+            Dim threshold As Single = 0.015F
             Dim work As New cv.Mat
 
             work = task.pcSplit(1).InRange(-threshold, threshold)
@@ -1250,8 +1250,8 @@ Namespace VBClasses
             desc = "Use the reduction values between lines to identify regions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static noVertCheck = OptionParent.FindCheckBox("Run horizontal without vertical step")
-            Static verticalCheck = OptionParent.FindCheckBox("Show intermediate vertical step task.results..")
+            Static noVertCheck As CheckBox = OptionParent.FindCheckBox("Run horizontal without vertical step")
+            Static verticalCheck As CheckBox = OptionParent.FindCheckBox("Show intermediate vertical step task.results..")
             reduction.Run(src)
             dst2 = reduction.dst2
             dst3 = dst2.Clone
@@ -1758,7 +1758,7 @@ Namespace VBClasses
             If Math.Abs(mean(1)) > task.yRange / 4 Then dst1 = mask Or dst1
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim pad As Single = 0.05 ' pad the estimate by X cm's
+            Dim pad As Single = 0.05F ' pad the estimate by X cm's
 
             dst2 = src.Clone
             bpLine.Run(src)
@@ -9367,9 +9367,9 @@ Namespace VBClasses
             desc = "Spin the point cloud exercise"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static xCheck = OptionParent.FindCheckBox("Spin pointcloud on X-axis")
-            Static yCheck = OptionParent.FindCheckBox("Spin pointcloud on Y-axis")
-            Static zCheck = OptionParent.FindCheckBox("Spin pointcloud on Z-axis")
+            Static xCheck As CheckBox = OptionParent.FindCheckBox("Spin pointcloud on X-axis")
+            Static yCheck As CheckBox = OptionParent.FindCheckBox("Spin pointcloud on Y-axis")
+            Static zCheck As CheckBox = OptionParent.FindCheckBox("Spin pointcloud on Z-axis")
             Static xRotateSlider = OptionParent.FindSlider("Rotate pointcloud around X-axis (degrees)")
             Static yRotateSlider = OptionParent.FindSlider("Rotate pointcloud around Y-axis (degrees)")
             Static zRotateSlider = OptionParent.FindSlider("Rotate pointcloud around Z-axis (degrees)")
