@@ -160,6 +160,7 @@ Namespace VBClasses
 
 
     Public Class RedList_CPP : Inherits TaskParent
+        Implements IDisposable
         Public classCount As Integer
         Public rectList As New List(Of cv.Rect)
         Public identifyCount As Integer = 255
@@ -197,7 +198,7 @@ Namespace VBClasses
             If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
             If task.heartBeat Then labels(3) = "Palette version of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
         End Sub
     End Class

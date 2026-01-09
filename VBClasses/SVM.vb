@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class SVM_Basics : Inherits TaskParent
+        Implements IDisposable
         Public options As New Options_SVM
         Dim sampleData As New SVM_SampleData
         Public points As New List(Of cv.Point2f)
@@ -51,7 +52,7 @@ Namespace VBClasses
                 Next
             End If
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If svm IsNot Nothing Then svm.Dispose()
         End Sub
     End Class
@@ -101,6 +102,7 @@ Namespace VBClasses
 
     ' https://docs.opencvb.org/3.4/d1/d73/tutorial_introduction_to_svm.html
     Public Class SVM_TestCase : Inherits TaskParent
+        Implements IDisposable
         Dim options As New Options_SVM
         Dim points As New List(Of cv.Point2f)
         Dim responses As New List(Of Integer)
@@ -155,7 +157,7 @@ Namespace VBClasses
                 DrawCircle(dst3, pt, task.DotSize + 2, color)
             Next
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If svm IsNot Nothing Then svm.Dispose()
         End Sub
     End Class

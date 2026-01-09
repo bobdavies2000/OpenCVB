@@ -78,6 +78,7 @@ Namespace VBClasses
 
 
     Public Class RedPrep_Depth : Inherits TaskParent
+        Implements IDisposable
         Dim options As New Options_HistPointCloud
         Public Sub New()
             cPtr = PrepXY_Open()
@@ -105,7 +106,7 @@ Namespace VBClasses
 
             dst3 = PaletteBlackZero(dst2)
         End Sub
-        Public Sub Close()
+                Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)
         End Sub
     End Class
@@ -314,6 +315,7 @@ Namespace VBClasses
 
 
     Public Class RedPrep_Edges_CPP : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
             cPtr = RedPrep_CPP_Open()
             desc = "Isolate each depth region"
@@ -344,7 +346,7 @@ Namespace VBClasses
                 dst2.SetTo(0, dst3)
             End If
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             RedPrep_CPP_Close(cPtr)
         End Sub
     End Class

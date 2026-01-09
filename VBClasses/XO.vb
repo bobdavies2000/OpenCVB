@@ -936,6 +936,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_BasicsRawOld : Inherits TaskParent
+        Implements IDisposable
         Dim ld As cv.XImgProc.FastLineDetector
         Public lpList As New List(Of lpData)
         Public ptList As New List(Of cv.Point)
@@ -972,7 +973,7 @@ Namespace VBClasses
             Next
             labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             ld.Dispose()
         End Sub
     End Class
@@ -2337,6 +2338,7 @@ Namespace VBClasses
 
 
     Public Class XO_PointCloud_Raw_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim depthBytes() As Byte
         Public Sub New()
             labels(2) = "Top View"
@@ -2359,7 +2361,7 @@ Namespace VBClasses
             labels(2) = "Top View (looking down)"
             labels(3) = "Side View"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             SimpleProjectionClose(cPtr)
         End Sub
     End Class
@@ -2369,6 +2371,7 @@ Namespace VBClasses
 
 
     Public Class XO_PointCloud_Raw : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
             labels(2) = "Top View"
             labels(3) = "Side View"
@@ -2400,7 +2403,7 @@ Namespace VBClasses
             labels(2) = "Top View (looking down)"
             labels(3) = "Side View"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             SimpleProjectionClose(cPtr)
         End Sub
     End Class
@@ -4222,6 +4225,7 @@ Namespace VBClasses
 
 
     Public Class XO_Pixel_Unique_CPP : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
             cPtr = Pixels_Vector_Open()
             desc = "Create the list of pixels in a RedCloud Cell"
@@ -4239,7 +4243,7 @@ Namespace VBClasses
             SetTrueText(CStr(classCount) + " unique BGR pixels were found in the src." + vbCrLf +
                     "Or " + Format(classCount / src.Total, "0%") + " of the input were unique pixels.")
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             Pixels_Vector_Close(cPtr)
         End Sub
     End Class
@@ -8700,6 +8704,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_RawEPLines : Inherits TaskParent
+        Implements IDisposable
         Dim ld As cv.XImgProc.FastLineDetector
         Public lpList As New List(Of lpData)
         Public Sub New()
@@ -8761,7 +8766,7 @@ Namespace VBClasses
             labels(2) = CStr(lpList.Count) + " highlighted lines were detected in the current frame. Others were too similar."
             labels(3) = "There were " + CStr(removeList.Count) + " coincident lines"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             ld.Dispose()
         End Sub
     End Class
@@ -8775,6 +8780,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_RawSorted : Inherits TaskParent
+        Implements IDisposable
         Dim ld As cv.XImgProc.FastLineDetector
         Public lpList As New List(Of lpData)
         Public Sub New()
@@ -8819,7 +8825,7 @@ Namespace VBClasses
 
             labels(2) = CStr(lpList.Count) + " lines were detected in the current frame"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             ld.Dispose()
         End Sub
     End Class
@@ -9099,6 +9105,7 @@ Namespace VBClasses
 
 
     Public Class XO_ML_BasicsOld : Inherits TaskParent
+        Implements IDisposable
         Dim rtree As RTrees
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -9181,7 +9188,7 @@ Namespace VBClasses
 
             labels(2) = CStr(task.gridRects.Count) + " regions with " + CStr(mlInput.Count) + " used for learning and " + CStr(predictList.Count) + " were predicted"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
@@ -10588,6 +10595,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_BasicsNoMask : Inherits TaskParent
+        Implements IDisposable
         Public classCount As Integer
         Public rectList As New List(Of cv.Rect)
         Public identifyCount As Integer = 255
@@ -10624,7 +10632,7 @@ Namespace VBClasses
             If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
             If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
         End Sub
     End Class
@@ -11638,6 +11646,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedColor_BasicsFast : Inherits TaskParent
+        Implements IDisposable
         Public classCount As Integer
         Public RectList As New List(Of cv.Rect)
         Public Sub New()
@@ -11679,7 +11688,7 @@ Namespace VBClasses
             Next
             labels(3) = CStr(RectList.Count) + " cells were found."
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
         End Sub
     End Class
@@ -12255,6 +12264,7 @@ Namespace VBClasses
 
 
     Public Class XO_Motion_Enclosing : Inherits TaskParent
+        Implements IDisposable
         Dim learnRate As Double
         Public motionRect As New cv.Rect
         Public Sub New()
@@ -12287,7 +12297,7 @@ Namespace VBClasses
             End If
             DrawRect(dst2, motionRect, 255)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)
         End Sub
     End Class
@@ -12387,6 +12397,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedPrep_FloodFill : Inherits TaskParent
+        Implements IDisposable
         Public classCount As Integer
         Public rectList As New List(Of cv.Rect)
         Public identifyCount As Integer = 255
@@ -12421,7 +12432,7 @@ Namespace VBClasses
             If task.heartBeat Then labels(2) = "CV_8U result With " + CStr(classCount) + " regions."
             If task.heartBeat Then labels(3) = "Palette version Of the data In dst2 With " + CStr(classCount) + " regions."
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
         End Sub
     End Class
@@ -12991,6 +13002,7 @@ Namespace VBClasses
 
 
     Public Class XO_Density_Basics : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
             cPtr = Density_2D_Open()
             desc = "Isolate points in 3D using the distance to the 8 neighboring points in the pointcloud"
@@ -13006,7 +13018,7 @@ Namespace VBClasses
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             Density_2D_Close(cPtr)
         End Sub
     End Class
@@ -13037,6 +13049,7 @@ Namespace VBClasses
 
 
     Public Class XO_Density_Count_CPP : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
             cPtr = Density_Count_Open()
             desc = "Isolate points in 3D by counting 8 neighboring Z points in the pointcloud"
@@ -13052,7 +13065,7 @@ Namespace VBClasses
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             Density_Count_Close(cPtr)
         End Sub
     End Class
@@ -13130,6 +13143,7 @@ Namespace VBClasses
 
 
     Public Class XO_EdgeLine_BasicsNoMotion : Inherits TaskParent
+        Implements IDisposable
         Public segments As New List(Of List(Of cv.Point))
         Public rectList As New List(Of cv.Rect)
         Public classCount As Integer
@@ -13185,7 +13199,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             EdgeLineRaw_Close(cPtr)
         End Sub
     End Class
@@ -13195,6 +13209,7 @@ Namespace VBClasses
 
 
     Public Class XO_EdgeLine_Basics : Inherits TaskParent
+        Implements IDisposable
         Public segments As New List(Of List(Of cv.Point))
         Public classCount As Integer
         Public Sub New()
@@ -13252,7 +13267,7 @@ Namespace VBClasses
 
             dst3.SetTo(0)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             EdgeLineRaw_Close(cPtr)
         End Sub
     End Class
@@ -14093,6 +14108,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedColor_BasicsFastAlt : Inherits TaskParent
+        Implements IDisposable
         Public classCount As Integer
         Public RectList As New List(Of cv.Rect)
         Public Sub New()
@@ -14131,7 +14147,7 @@ Namespace VBClasses
             Next
             labels(2) = CStr(RectList.Count) + " cells were found."
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
         End Sub
     End Class
@@ -15847,6 +15863,7 @@ Namespace VBClasses
 
 
     Public Class XO_KNN_NNearest : Inherits TaskParent
+        Implements IDisposable
         Public knn As cv.ML.KNearest
         Public queries As New List(Of Single)
         Public trainInput As New List(Of Single)
@@ -15894,7 +15911,7 @@ Namespace VBClasses
                 Next
             Next
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If knn IsNot Nothing Then knn.Dispose()
         End Sub
     End Class
@@ -16105,6 +16122,7 @@ Namespace VBClasses
 
 
     Public Class XO_EdgeLine_JustLines : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
             cPtr = EdgeLine_Image_Open()
             labels = {"", "", "EdgeLine_Image output", ""}
@@ -16120,7 +16138,7 @@ Namespace VBClasses
             handleSrc.Free()
             If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             EdgeLine_Image_Close(cPtr)
         End Sub
     End Class
@@ -16388,6 +16406,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedList_FindCells : Inherits TaskParent
+        Implements IDisposable
         Public bricks As New List(Of Integer)
         Public Sub New()
             task.featureOptions.ColorDiffSlider.Value = 25
@@ -16423,7 +16442,7 @@ Namespace VBClasses
             Next
             labels(3) = CStr(count) + " cells were found using the motion mask"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             RedList_FindBricks_Close(cPtr)
         End Sub
     End Class

@@ -2,6 +2,7 @@ Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp/blob/master/test/OpenCvSharp.Tests/stitching/StitchingTest.cs
 Namespace VBClasses
     Public Class Stitch_Basics : Inherits TaskParent
+        Implements IDisposable
         Dim options As New Options_Stitch
         Dim sticherObj As cv.Stitcher
         Public Sub New()
@@ -38,7 +39,7 @@ Namespace VBClasses
                 If status = cv.Stitcher.Status.ErrorNeedMoreImgs Then SetTrueText("Need more images", 3)
             End If
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If sticherObj IsNot Nothing Then sticherObj.Dispose()
         End Sub
     End Class

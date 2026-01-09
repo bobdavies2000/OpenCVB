@@ -70,6 +70,7 @@ Namespace VBClasses
 
     'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
     Public Class MSER_Detect : Inherits TaskParent
+        Implements IDisposable
         Public boxes() As cv.Rect
         Public regions()() As cv.Point
         Public mser = cv.MSER.Create
@@ -98,7 +99,7 @@ Namespace VBClasses
                 dst2.Rectangle(z, cv.Scalar.Yellow, 1)
             Next
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If mser IsNot Nothing Then mser.Dispose()
         End Sub
     End Class
@@ -387,6 +388,7 @@ Namespace VBClasses
 
     ' https://github.com/shimat/opencvsharp/wiki/MSER
     Public Class MSER_TestExample : Inherits TaskParent
+        Implements IDisposable
         Dim image As cv.Mat
         Dim mser As cv.MSER
         Dim options As New Options_MSER
@@ -430,7 +432,7 @@ Namespace VBClasses
             Next
             labels(2) = CStr(boxes.Count) + " regions were found using MSER"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If mser IsNot Nothing Then mser.Dispose()
         End Sub
     End Class
@@ -462,6 +464,7 @@ Namespace VBClasses
 
 
     Public Class MSER_Mask_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim options As New Options_MSER
         Public classCount As Integer
         Public Sub New()
@@ -497,7 +500,7 @@ Namespace VBClasses
             src.SetTo(white, dst3)
             dst2 = runRedList(src, labels(2))
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             MSER_Close(cPtr)
         End Sub
     End Class
@@ -635,6 +638,7 @@ Namespace VBClasses
 
 
     Public Class MSER_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim options As New Options_MSER
         Public boxes As New List(Of cv.Rect)
         Public floodPoints As New List(Of cv.Point)
@@ -699,7 +703,7 @@ Namespace VBClasses
             End If
             labels(2) = CStr(classcount) + " regions identified"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             MSER_Close(cPtr)
         End Sub
     End Class

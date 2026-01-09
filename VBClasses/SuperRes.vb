@@ -3,6 +3,7 @@ Imports System.IO
 ' https://github.com/opencv/opencv/blob/3.2.0/samples/gpu/super_resolution.cpp
 Namespace VBClasses
     Public Class SuperRes_Basics : Inherits TaskParent
+        Implements IDisposable
         Dim video As New SuperRes_Input
         Dim options As New Options_SuperRes
         Dim optFlow As cv.DenseOpticalFlowExt
@@ -56,7 +57,7 @@ Namespace VBClasses
                 optFlow = Nothing ' start over...
             End If
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If optFlow IsNot Nothing Then optFlow.Dispose()
         End Sub
     End Class

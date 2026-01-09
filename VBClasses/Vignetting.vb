@@ -3,6 +3,7 @@ Imports  System.IO
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class Vignetting_Basics : Inherits TaskParent
+        Implements IDisposable
         Public removeVig As Boolean
         Dim center As New cv.Point(dst2.Width / 2, dst2.Height / 2)
         Dim options As New Options_Vignetting
@@ -23,7 +24,7 @@ Namespace VBClasses
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Vignetting_Close(cPtr)
         End Sub
     End Class

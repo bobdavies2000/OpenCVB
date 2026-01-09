@@ -3,6 +3,7 @@ Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 Namespace VBClasses
     Public Class Annealing_Basics_CPP : Inherits TaskParent
+        Implements IDisposable
         Public numberOfCities As Integer = 25
         Public cityPositions() As cv.Point2f
         Public cityOrder() As Integer
@@ -67,7 +68,7 @@ Namespace VBClasses
 
             drawMap()
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Annealing_Basics_Close(cPtr)
         End Sub
     End Class

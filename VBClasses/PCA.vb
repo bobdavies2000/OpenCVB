@@ -859,6 +859,7 @@ Namespace VBClasses
 
     ' https://www.codeproject.com/Tips/5384047/Implementing-Principal-Component-Analysis-Image-Se
     Public Class PCA_NColor_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim custom As New Palette_CustomColorMap
         Dim palettize As New PCA_Palettize
         Public rgb(dst1.Total * dst1.ElemSize - 1) As Byte
@@ -899,7 +900,7 @@ Namespace VBClasses
             labels(2) = "The CV_8U image is below.  Values range from 0 to " + CStr(classCount)
             labels(3) = "The upper left image is mapped to " + CStr(classCount) + " colors below.  "
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             PCA_NColor_Close(cPtr)
         End Sub
     End Class
@@ -943,6 +944,7 @@ Namespace VBClasses
 
 
     Public Class PCA_Prep_CPP : Inherits TaskParent
+        Implements IDisposable
         Public inputData As New cv.Mat
         Public Sub New()
             cPtr = PCA_Prep_Open()
@@ -960,7 +962,7 @@ Namespace VBClasses
             inputData = cv.Mat.FromPixelData(count, 3, cv.MatType.CV_32F, imagePtr).Clone
             SetTrueText("Data has been prepared and resides in inputData public")
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             PCA_Prep_Close(cPtr)
         End Sub
     End Class

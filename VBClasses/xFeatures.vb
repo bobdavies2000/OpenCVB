@@ -3,6 +3,7 @@ Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/StarDetectorSample.vb
 Namespace VBClasses
     Public Class XFeatures2D_StarDetector : Inherits TaskParent
+        Implements IDisposable
         Dim detector As StarDetector
         Public Sub New()
             desc = "Basics of the StarDetector - a 2D feature detector.  FAILS IN COMPUTE.  Uncomment to investigate further."
@@ -22,7 +23,7 @@ Namespace VBClasses
                 Next kpt
             End If
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If detector IsNot Nothing Then detector.Dispose()
         End Sub
     End Class

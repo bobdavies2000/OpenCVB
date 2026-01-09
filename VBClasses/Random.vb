@@ -313,6 +313,7 @@ Namespace VBClasses
 
 
     Public Class Random_PatternGenerator_CPP : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
             cPtr = Random_PatternGenerator_Open()
             desc = "Generate random patterns for use with 'Random Pattern Calibration'"
@@ -323,7 +324,7 @@ Namespace VBClasses
             Dim imagePtr = Random_PatternGenerator_Run(cPtr, src.Rows, src.Cols)
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Random_PatternGenerator_Close(cPtr)
         End Sub
     End Class

@@ -2,6 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class Salience_Basics_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim grayData(0) As Byte
         Public options As New Options_Salience
         Public Sub New()
@@ -20,7 +21,7 @@ Namespace VBClasses
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Salience_Close(cPtr)
         End Sub
     End Class

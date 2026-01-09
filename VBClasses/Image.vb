@@ -143,7 +143,7 @@ Namespace VBClasses
     Public Class Image_Icon : Inherits TaskParent
         Dim inputImage As Bitmap
         Public Sub New()
-            Dim filePath As String = task.homeDir + "/MainUI/Data/PauseButton.png"
+            Dim filePath As String = task.homeDir + "/MainUI/Data/Magnify.png"
             inputImage = New Bitmap(filePath)
             desc = "Create an icon from an image"
         End Sub

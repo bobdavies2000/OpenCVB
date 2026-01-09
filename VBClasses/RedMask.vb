@@ -2,6 +2,7 @@
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class RedMask_Basics : Inherits TaskParent
+        Implements IDisposable
         Public mdList As New List(Of maskData)
         Public classCount As Integer
         Public Sub New()
@@ -56,7 +57,7 @@ Namespace VBClasses
             If task.heartBeat Then labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
             If task.heartBeat Then labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)
         End Sub
     End Class

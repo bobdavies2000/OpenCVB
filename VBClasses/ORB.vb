@@ -2,6 +2,7 @@ Imports cv = OpenCvSharp
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
 Namespace VBClasses
     Public Class ORB_Basics : Inherits TaskParent
+        Implements IDisposable
         Public keypoints() As cv.KeyPoint
         Dim orb As cv.ORB
         Dim options As New Options_ORB
@@ -20,7 +21,7 @@ Namespace VBClasses
             Next
             labels(2) = CStr(keypoints.Count) + " key points were identified"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If orb IsNot Nothing Then orb.Dispose()
         End Sub
     End Class

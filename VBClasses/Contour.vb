@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Contour_Basics : Inherits TaskParent
+        Implements IDisposable
         Public classCount As Integer
         Public contourList As New List(Of contourData)
         Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
@@ -63,6 +64,9 @@ Namespace VBClasses
             classCount = contourList.Count
 
             labels(2) = CStr(contourList.Count) + " contours were found"
+        End Sub
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            edgeline.Dispose()
         End Sub
     End Class
 

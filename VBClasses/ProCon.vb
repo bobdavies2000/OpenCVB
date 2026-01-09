@@ -4,6 +4,7 @@ Imports System.Windows.Forms
 ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
 Namespace VBClasses
     Public Class ProCon_Basics : Inherits TaskParent
+        Implements IDisposable
         Public mutex = New Mutex(True, "BufferMutex")
         Public p As Thread
         Public c As Thread
@@ -80,7 +81,7 @@ Namespace VBClasses
                 flow.Run(src)
             End SyncLock
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             terminateProducer = True
             terminateConsumer = True
         End Sub
@@ -92,6 +93,7 @@ Namespace VBClasses
 
     ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
     Public Class ProCon_Variation : Inherits TaskParent
+        Implements IDisposable
         Dim procon As ProCon_Basics
         Dim frameCount As Integer
         Public Sub New()
@@ -114,7 +116,7 @@ Namespace VBClasses
             End SyncLock
             procon.Run(src)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             procon.terminateConsumer = True
             procon.terminateProducer = True
         End Sub

@@ -20,6 +20,7 @@ Namespace VBClasses
 
 
     Public Class SuperPixel_Basics_CPP : Inherits TaskParent
+        Implements IDisposable
         Public wireGrid As cv.Mat
         Public gridColor = white
         Dim options As New Options_SuperPixels
@@ -53,7 +54,7 @@ Namespace VBClasses
             If options.numSuperPixels < 255 Then labels *= 255 / options.numSuperPixels
             labels.ConvertTo(dst3, cv.MatType.CV_8U)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = SuperPixel_Close(cPtr)
         End Sub
     End Class

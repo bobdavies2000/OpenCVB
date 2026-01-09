@@ -193,6 +193,7 @@ Namespace VBClasses
 
     '  https://docs.opencvb.org/3.1.0/d0/da5/tutorial_ximgproc_prediction.html
     Public Class Edge_RandomForest_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim rgbData() As Byte
         Dim options As New Options_Edges2
         Public Sub New()
@@ -224,7 +225,7 @@ Namespace VBClasses
                 dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Threshold(options.edgeRFthreshold, 255, cv.ThresholdTypes.Binary)
             End If
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Edge_RandomForest_Close(cPtr)
         End Sub
     End Class
@@ -542,6 +543,7 @@ Namespace VBClasses
 
 
     Public Class Edge_ColorGap_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim gap As New Edge_ColorGap_VB
         Public Sub New()
             cPtr = Edge_ColorGap_Open()
@@ -564,7 +566,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             src.CopyTo(dst3, Not dst2)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Edge_ColorGap_Close(cPtr)
         End Sub
     End Class
@@ -1019,6 +1021,7 @@ Namespace VBClasses
 
 
     Public Class Edge_DiffX_CPP : Inherits TaskParent
+        Implements IDisposable
         Public segments As New Hist_CloudSegments
         Dim edges As New Edge_Sobel
         Public Sub New()
@@ -1038,7 +1041,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
             dst3 = segments.dst3
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             Edge_DiffX_Close(cPtr)
         End Sub
     End Class
@@ -1048,6 +1051,7 @@ Namespace VBClasses
 
 
     Public Class Edge_DiffY_CPP : Inherits TaskParent
+        Implements IDisposable
         Public segments As New Hist_CloudSegments
         Dim edges As New Edge_Sobel
         Public Sub New()
@@ -1067,7 +1071,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
             dst3 = segments.dst3
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             Edge_DiffY_Close(cPtr)
         End Sub
     End Class
@@ -1077,6 +1081,7 @@ Namespace VBClasses
 
 
     Public Class Edge_DiffZ_CPP : Inherits TaskParent
+        Implements IDisposable
         Public segments As New Hist_CloudSegments
         Dim edges As New Edge_Sobel
         Public Sub New()
@@ -1096,7 +1101,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
             dst3 = segments.dst3
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             Edge_DiffY_Close(cPtr)
         End Sub
     End Class
@@ -1213,6 +1218,7 @@ Namespace VBClasses
 
     ' https://github.com/opencv/opencv_contrib/blob/master/modules/ximgproc/samples/dericheSample.py
     Public Class Edge_Deriche_CPP : Inherits TaskParent
+        Implements IDisposable
         Public options As New Options_Edges3
         Public Sub New()
             cPtr = Edge_Deriche_Open()
@@ -1232,7 +1238,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
             dst3 = src Or dst2
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Edge_Deriche_Close(cPtr)
         End Sub
     End Class

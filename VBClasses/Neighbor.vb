@@ -121,6 +121,7 @@ Namespace VBClasses
 
 
     Public Class Neighbor_Precise : Inherits TaskParent
+        Implements IDisposable
         Public nabList As New List(Of List(Of Integer))
         Public oldrclist As List(Of oldrcData)
         Public runRedCflag As Boolean = False
@@ -188,7 +189,7 @@ Namespace VBClasses
 
             labels(3) = CStr(nabCount) + " neighbor pairs were found."
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             Neighbor_Close(cPtr)
         End Sub
     End Class

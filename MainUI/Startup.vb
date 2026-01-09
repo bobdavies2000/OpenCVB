@@ -10,7 +10,7 @@ Module Startup
 
         ' Show splash screen
         Dim splash As New MainApp.Splash()
-        splash.Show()
+        'splash.Show()
         Application.DoEvents()
 
         Dim mainForm As New MainApp.MainUI()

@@ -426,6 +426,7 @@ Namespace VBClasses
 
     ' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
     Public Class Plot_Basics_CPP : Inherits TaskParent
+        Implements IDisposable
         Public srcX As New List(Of Double)
         Public srcY As New List(Of Double)
         Public Sub New()
@@ -450,7 +451,7 @@ Namespace VBClasses
             Dim maxX = srcX.Max, minX = srcX.Min, maxY = srcY.Max, minY = srcY.Min
             labels(2) = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + ", y-axis: " + CStr(minY) + " to " + CStr(maxY)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = PlotOpenCV_Close(cPtr)
         End Sub
     End Class

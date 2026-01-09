@@ -57,6 +57,7 @@ Namespace VBClasses
 
 
     Public Class Sort_MLPrepTest_CPP : Inherits TaskParent
+        Implements IDisposable
         Public reduction As New Reduction_Basics
         Public MLTestData As New cv.Mat
         Public Sub New()
@@ -79,7 +80,7 @@ Namespace VBClasses
             dst2 = split(0)
             dst3 = split(1)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Sort_MLPrepTest_Close(cPtr)
         End Sub
     End Class

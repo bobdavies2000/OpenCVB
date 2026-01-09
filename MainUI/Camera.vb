@@ -114,9 +114,10 @@ Public Class GenericCamera
     End Sub
     Public Sub childStopCamera()
         isCapturing = False
+        Thread.Sleep(100)
         cameraFrameCount = -1
         If captureThread IsNot Nothing Then
-            captureThread.Join(300) ' Wait up to 1 second for thread to finish
+            captureThread.Join(300)
             captureThread = Nothing
         End If
     End Sub

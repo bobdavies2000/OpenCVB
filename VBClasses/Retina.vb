@@ -5,6 +5,7 @@ Imports System.Windows.Forms
 'https://docs.opencvb.org/3.4/d3/d86/tutorial_bioinspired_retina_model.html
 Namespace VBClasses
     Public Class Retina_Basics_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim startInfo As New ProcessStartInfo
         Dim magnoData(0) As Byte
         Dim dataSrc(0) As Byte
@@ -59,7 +60,7 @@ Namespace VBClasses
                 dst3 = cv.Mat.FromPixelData(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8U, magnoData).Resize(src.Size())
             End If
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Retina_Basics_Close(cPtr)
         End Sub
     End Class

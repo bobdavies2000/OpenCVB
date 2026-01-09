@@ -61,6 +61,7 @@ Namespace VBClasses
 
 
     Public Class KNN_N2Basics : Inherits TaskParent
+        Implements IDisposable
         Public knn As cv.ML.KNearest
         Public trainInput As New List(Of cv.Point2f) ' put training data here
         Public queries As New List(Of cv.Point2f) ' put Query data here
@@ -144,7 +145,7 @@ Namespace VBClasses
             Next
             If standaloneTest() Then displayResults()
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If knn IsNot Nothing Then knn.Dispose()
         End Sub
     End Class
@@ -200,6 +201,7 @@ Namespace VBClasses
 
 
     Public Class KNN_N3Basics : Inherits TaskParent
+        Implements IDisposable
         Public knn As cv.ML.KNearest
         Public trainInput As New List(Of cv.Point3f) ' put training data here
         Public queries As New List(Of cv.Point3f) ' put Query data here
@@ -240,7 +242,7 @@ Namespace VBClasses
                 Next
             Next
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If knn IsNot Nothing Then knn.Dispose()
         End Sub
     End Class
@@ -251,6 +253,7 @@ Namespace VBClasses
 
 
     Public Class KNN_N4Basics : Inherits TaskParent
+        Implements IDisposable
         Public knn As cv.ML.KNearest
         Public trainInput As New List(Of cv.Vec4f) ' put training data here
         Public queries As New List(Of cv.Vec4f) ' put Query data here
@@ -292,7 +295,7 @@ Namespace VBClasses
                 Next
             Next
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If knn IsNot Nothing Then knn.Dispose()
         End Sub
     End Class
@@ -508,6 +511,7 @@ Namespace VBClasses
 
 
     Public Class KNN_NNBasics : Inherits TaskParent
+        Implements IDisposable
         Public knn As cv.ML.KNearest
         Public trainInput As New List(Of Single) ' put training data here
         Public queries As New List(Of Single) ' put Query data here
@@ -558,7 +562,7 @@ Namespace VBClasses
                 Next
             Next
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If knn IsNot Nothing Then knn.Dispose()
         End Sub
     End Class

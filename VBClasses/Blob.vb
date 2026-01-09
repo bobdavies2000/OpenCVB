@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Blob_Basics : Inherits TaskParent
+        Implements IDisposable
         Dim options As Options_Blob
         Dim input As Blob_Input
         Dim simpleBlob As cv.SimpleBlobDetector
@@ -33,7 +34,7 @@ Namespace VBClasses
                                   color:=cv.Scalar.FromRgb(255, 0, 0),
                                   flags:=cv.DrawMatchesFlags.DrawRichKeypoints)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If simpleBlob IsNot Nothing Then simpleBlob.Dispose()
         End Sub
     End Class

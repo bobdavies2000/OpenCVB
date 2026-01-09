@@ -97,8 +97,6 @@ Namespace VBClasses
             If rect.Height < 2 Then rect.Height = 2
             Return rect
         End Function
-
-
         Public Function findEdgePoints(lp As lpData) As lpData
             ' compute the edge to edge line - might be useful...
             Dim yIntercept = lp.p1.Y - lp.slope * lp.p1.X
@@ -128,7 +126,6 @@ Namespace VBClasses
             If xp1.Y = task.color.Height Then xp1.Y -= 1
             If xp2.Y = task.color.Height Then xp2.Y -= 1
             Return New lpData(xp1, xp2)
-
         End Function
         Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
             Dim mm As mmData

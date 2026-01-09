@@ -8,7 +8,6 @@ Namespace VBClasses
             task.Settings = settings
             rgbLeftAligned = True
             If settings.cameraName.Contains("RealSense") Then rgbLeftAligned = False
-            If settings.cameraName.Contains("Oak") Then rgbLeftAligned = False
 
             rows = settings.workRes.Height
             cols = settings.workRes.Width
@@ -59,9 +58,7 @@ Namespace VBClasses
             gOptions.Show()
             Options_HistPointCloud.setupCalcHist()
             treeView.Show()
-            centerRect = New cv.Rect(workRes.Width / 4, workRes.Height / 4,
-                                     workRes.Width / 2, workRes.Height / 2)
-
+            centerRect = New cv.Rect(workRes.Width / 4, workRes.Height / 4, workRes.Width / 2, workRes.Height / 2)
             fpList.Clear()
 
             task.mouseMovePoint = New cv.Point(task.workRes.Width \ 2, task.workRes.Height \ 2)
@@ -287,15 +284,6 @@ Namespace VBClasses
             task.featureOptions.Close()
             task.treeView.Close()
             If task.sharpGL IsNot Nothing Then task.sharpGL.Close()
-
-            If cpu.activeObjects IsNot Nothing Then
-                For Each algorithm In cpu.activeObjects
-                    If algorithm.GetType().GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
-                Next
-            End If
-            For Each mat In task.dstList
-                If mat IsNot Nothing Then mat.Dispose()
-            Next
 
             GC.Collect()
         End Sub

@@ -2,6 +2,7 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Hist_Basics : Inherits TaskParent
+        Implements IDisposable
         Public histogram As New cv.Mat
         Public mm As mmData
         Public plotHist As New Plot_Histogram
@@ -1021,6 +1022,7 @@ Namespace VBClasses
 
 
     Public Class Hist_GotchaFixed_CPP : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
             cPtr = Hist_1D_Open()
             desc = "Testing the C++ CalcHist to investigate gotcha with sample counts"
@@ -1045,7 +1047,7 @@ Namespace VBClasses
             End If
             SetTrueText(strOut, 2)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             Hist_1D_Close(cPtr)
         End Sub
     End Class
@@ -1054,6 +1056,7 @@ Namespace VBClasses
 
 
     Public Class Hist_Byte_CPP : Inherits TaskParent
+        Implements IDisposable
         Public plotHist As New Plot_Histogram
         Public Sub New()
             cPtr = Hist_1D_Open()
@@ -1074,7 +1077,7 @@ Namespace VBClasses
 
             SetTrueText(strOut, 2)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             Hist_1D_Close(cPtr)
         End Sub
     End Class

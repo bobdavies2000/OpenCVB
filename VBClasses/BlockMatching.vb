@@ -2,6 +2,7 @@ Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/stereo_match.cpp
 Namespace VBClasses
     Public Class BlockMatching_Basics : Inherits TaskParent
+        Implements IDisposable
         Dim colorizer As New DepthColorizer_CPP
         Dim options As New Options_BlockMatching
         Public leftView As cv.Mat, rightView As cv.Mat
@@ -41,7 +42,7 @@ Namespace VBClasses
             dst2(rect) = colorizer.dst2(rect)
             dst3 = task.rightView.Resize(src.Size())
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If blockMatch IsNot Nothing Then blockMatch.Dispose()
         End Sub
     End Class

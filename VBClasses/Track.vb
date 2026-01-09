@@ -4,6 +4,7 @@ Imports System.Windows
 ' https://learnopencvb.com/object-tracking-using-opencv-cpp-python/
 Namespace VBClasses
     Public Class Track_Basics : Inherits TaskParent
+        Implements IDisposable
         Public outputRect As cv.Rect
         Public inputRect As cv.Rect
         Dim options As New Options_Tracker
@@ -23,7 +24,7 @@ Namespace VBClasses
             outputRect = track.outputRect
             SetTrueText("Draw a rectangle around any object to be tracked in the BGR image above.", 3)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Track_Basics_Close(cPtr)
         End Sub
     End Class
@@ -34,6 +35,7 @@ Namespace VBClasses
 
 
     Public Class Track_BasicsQT : Inherits TaskParent
+        Implements IDisposable
         Public outputRect As cv.Rect
         Public inputRect As cv.Rect
         Public trackerIndex As Integer = 1 ' default is "MIL" 
@@ -66,7 +68,7 @@ Namespace VBClasses
             dst2.Rectangle(outputRect, white, task.lineWidth)
             SetTrueText("Draw a rectangle around any object to be tracked in the BGR image above.", 3)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Track_Basics_Close(cPtr)
         End Sub
     End Class

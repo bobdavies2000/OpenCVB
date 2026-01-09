@@ -3,6 +3,7 @@ Imports OpenCvSharp.ML
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class ML_Basics : Inherits TaskParent
+        Implements IDisposable
         Public trainMats() As cv.Mat ' all entries are 32FCx
         Public trainResponse As cv.Mat ' 32FC1 format
         Public testMats() As cv.Mat ' all entries are 32FCx
@@ -126,7 +127,7 @@ Namespace VBClasses
                 predictions.ConvertTo(predictions, cv.MatType.CV_32F)
             End If
         End Sub
-        Public Sub close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If normalBayes IsNot Nothing Then normalBayes.Dispose()
             If knearest IsNot Nothing Then knearest.Dispose()
             If svm IsNot Nothing Then svm.Dispose()
@@ -146,6 +147,7 @@ Namespace VBClasses
 
 
     Public Class ML_DepthFromColor : Inherits TaskParent
+        Implements IDisposable
         Dim colorPal As New DepthColorizer_Basics
         Dim mats As New Mat_4Click
         Dim resizer As New Resize_Smaller
@@ -201,7 +203,7 @@ Namespace VBClasses
             labels(2) = "prediction, shadow, Depth Mask < " + CStr(task.MaxZmeters) + ", Learn Input"
             dst3 = mats.dst3
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
@@ -209,6 +211,7 @@ Namespace VBClasses
 
 
     Public Class ML_DepthFromXYColor : Inherits TaskParent
+        Implements IDisposable
         Dim mats As New Mat_4to1
         Dim resizer As New Resize_Smaller
         Dim colorizer As New DepthColorizer_CPP
@@ -282,7 +285,7 @@ Namespace VBClasses
             dst3 = mats.dst2
             labels(3) = "shadow, empty, Depth Mask < " + CStr(task.MaxZmeters) + ", Learn Input"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
@@ -300,7 +303,7 @@ Namespace VBClasses
 
 
     Public Class ML_Color2Depth : Inherits TaskParent
-        Dim minMax As New Grid_MinMaxDepth
+        Implements IDisposable
         Dim color8U As New Color8U_Basics
         Dim rtree As RTrees
         Public Sub New()
@@ -355,7 +358,7 @@ Namespace VBClasses
             Next
 
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
@@ -375,6 +378,7 @@ Namespace VBClasses
 
 
     Public Class ML_ColorInTier2Depth : Inherits TaskParent
+        Implements IDisposable
         Dim color8U As New Color8U_Basics
         Dim rtree As RTrees
         Public Sub New()
@@ -428,7 +432,7 @@ Namespace VBClasses
                 dst3(roi).SetTo(depth, task.noDepthMask(roi))
             Next
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
@@ -441,6 +445,7 @@ Namespace VBClasses
 
 
     Public Class ML_LearnZfromXGray : Inherits TaskParent
+        Implements IDisposable
         Dim regions As New GuidedBP_Regions
         Dim rtree As RTrees
         Public Sub New()
@@ -477,7 +482,7 @@ Namespace VBClasses
             Dim output = New cv.Mat(ptList.Count, 1, cv.MatType.CV_32FC1, cv.Scalar.All(0))
             rtree.Predict(predMat, output)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
@@ -489,6 +494,7 @@ Namespace VBClasses
 
 
     Public Class ML_LearnRegions : Inherits TaskParent
+        Implements IDisposable
         Dim regions As New GuidedBP_Regions
         Dim color8U As New Color8U_Basics
         Dim rtree As RTrees
@@ -546,7 +552,7 @@ Namespace VBClasses
                 End If
             Next
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If rtree IsNot Nothing Then rtree.Dispose()
         End Sub
     End Class
@@ -558,6 +564,7 @@ Namespace VBClasses
 
 
     Public Class ML_RemoveDups_CPP : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
             cPtr = ML_RemoveDups_Open()
             labels = {"", "", "BGR input below is converted to BGRA and sorted as integers", ""}
@@ -577,7 +584,7 @@ Namespace VBClasses
 
             labels(3) = "The BGR data in dst2 after removing duplicate BGR entries.  Input count = " + CStr(dst2.Total) + " output = " + CStr(compressedCount)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = ML_RemoveDups_Close(cPtr)
         End Sub
     End Class

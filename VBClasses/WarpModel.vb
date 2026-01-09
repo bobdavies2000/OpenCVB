@@ -51,6 +51,7 @@ Namespace VBClasses
 
     ' https://www.learnopencvb.com/image-alignment-ecc-in-opencv-c-python/
     Public Class WarpModel_ECC : Inherits TaskParent
+        Implements IDisposable
         Public warpInput As New WarpModel_Input
         Public warpMatrix() As Single
         Public src2 As New cv.Mat
@@ -123,7 +124,7 @@ Namespace VBClasses
             End If
             SetTrueText(outStr, New cv.Point(aligned.Width + 10, 220))
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = WarpModel_Close(cPtr)
         End Sub
     End Class

@@ -2,6 +2,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
+        Implements IDisposable
         Public classCount As Integer
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -86,7 +87,7 @@ Namespace VBClasses
             labels(2) = CStr(classCount) + " RedColor cells. " + CStr(rcList.Count) + " cells >" +
                         " minpixels.  " + CStr(rcList.Count - changed) + " matched to previous generation"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
         End Sub
     End Class
@@ -95,6 +96,7 @@ Namespace VBClasses
 
 
     Public Class RedColor_CPP : Inherits TaskParent
+        Implements IDisposable
         Public classCount As Integer
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -189,7 +191,7 @@ Namespace VBClasses
             labels(2) = CStr(classCount) + " cells. " + CStr(rcList.Count) + " cells >" +
                     " minpixels.  " + CStr(count) + " matched to previous generation"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
         End Sub
     End Class

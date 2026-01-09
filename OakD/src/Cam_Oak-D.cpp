@@ -26,29 +26,18 @@ public:
 	Mat rgb, leftView, rightView, depth16u, disparity;
 	dai::CalibrationHandler deviceCalib;
 	double imuTimeStamp;
+	float disparityFactor = 0;
 	bool firstTs = false;
 	std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration> baseTs; int rows, cols;
 
-	float intrinsics[9];
+	float intrinsics[9]; 
 	float extrinsicsRGBtoLeft[12];
 	float extrinsicsLeftToRight[12];
 
-	// v3 Camera nodes (replacing ColorCamera and MonoCamera)
-	std::shared_ptr<dai::node::Camera> pipeRGB;
-	std::shared_ptr<dai::node::Camera> pipeLeft;
-	std::shared_ptr<dai::node::Camera> pipeRight;
-	std::shared_ptr<dai::node::StereoDepth> pipeStereo;
-	std::shared_ptr<dai::node::Sync> pipeSync;
-	std::shared_ptr<dai::node::IMU> pipeIMU;
-
-	std::shared_ptr<dai::MessageQueue> qRGB;
 	std::shared_ptr<dai::MessageQueue> qLeft;
 	std::shared_ptr<dai::MessageQueue> qRight;
-	std::shared_ptr<dai::MessageQueue> qMessage;
 	std::shared_ptr<dai::MessageQueue> qIMU;
-	dai::Node::Output* outRGB;
-	dai::Node::Output* outLeft;
-	dai::Node::Output* outRight;
+	std::shared_ptr<dai::MessageQueue> qDisparity;
 
 	dai::IMUReportAccelerometer acceleroValues;
 	dai::IMUReportGyroscope gyroValues;
@@ -58,19 +47,7 @@ public:
 		rows = _rows;
 		cols = _cols;
 
-		pipeRGB = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_A);
-		pipeLeft = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_B);
-		pipeRight = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_C);
-		pipeStereo = pipeline.create<dai::node::StereoDepth>();
-		pipeSync = pipeline.create<dai::node::Sync>();
-		pipeIMU = pipeline.create<dai::node::IMU>();
-
-		// Check if platform is RVC4 and create ImageAlign node if needed
-		auto platform = pipeline.getDefaultDevice()->getPlatform();
-		std::shared_ptr<dai::node::ImageAlign> align;
-		if (platform == dai::Platform::RVC4) {
-			align = pipeline.create<dai::node::ImageAlign>();
-		}
+		auto pipeIMU = pipeline.create<dai::node::IMU>();
 
 		// Enable ACCELEROMETER_RAW at 480 hz rate
 		pipeIMU->enableIMUSensor(dai::IMUSensor::ACCELEROMETER_RAW, 480);
@@ -81,58 +58,58 @@ public:
 		pipeIMU->setBatchReportThreshold(1);
 		pipeIMU->setMaxBatchReports(10);
 
-		outRGB = pipeRGB->requestOutput({ cols, rows }, dai::ImgFrame::Type::BGR888i);
-		outLeft = pipeLeft->requestOutput({ cols, rows });
-		outRight = pipeRight->requestOutput({ cols, rows });
+		qIMU = pipeIMU->out.createOutputQueue(50, false);
 
+		// Define sources and outputs
+		auto pipeLeft = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_B);
+		auto pipeRight = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_C);
+		auto pipeStereo = pipeline.create<dai::node::StereoDepth>();
+
+		// Properties
+		auto* outLeft = pipeLeft->requestOutput({ cols, rows });
+		auto* outRight = pipeRight->requestOutput({ cols, rows });
+
+		// Create a node that will produce the depth map (using disparity output as it's easier to visualize depth this way)
+		pipeStereo->build(*outLeft, *outRight, dai::node::StereoDepth::PresetMode::DEFAULT);
+		// Options: MEDIAN_OFF, KERNEL_3x3, KERNEL_5x5, KERNEL_7x7 (default)
+		pipeStereo->initialConfig->setMedianFilter(dai::StereoDepthConfig::MedianFilter::KERNEL_7x7);
+		pipeStereo->setLeftRightCheck(lr_check);
 		pipeStereo->setExtendedDisparity(extended_disparity);
 		pipeStereo->setSubpixel(subpixel);
 
-		pipeSync->setSyncThreshold(std::chrono::duration<int64_t, std::nano>(static_cast<int64_t>(1e9 / (2.0 * FPS))));
-
-		qRGB = outRGB->createOutputQueue();
+		// Output queue will be used to get the disparity frames from the outputs defined above
+		qDisparity = pipeStereo->disparity.createOutputQueue();
 		qLeft = outLeft->createOutputQueue();
 		qRight = outRight->createOutputQueue();
-		qIMU = pipeIMU->out.createOutputQueue(50, false);
 
-		// Link nodes
-		outRGB->link(pipeSync->inputs["rgb"]);
-		outLeft->link(pipeStereo->left);
-		outRight->link(pipeStereo->right);
-
-		pipeStereo->disparity.link(pipeSync->inputs["disparity"]);
-
-		// Create output queue
-		qMessage = pipeSync->out.createOutputQueue();
 		pipeline.start();
 
 		device = pipeline.getDefaultDevice();
 		deviceCalib = device->readCalibration();
 		baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();
+
+		disparityFactor = 255 / pipeStereo->initialConfig->getMaxDisparity();
 	}
 
 	void waitForFrame()
 	{
-		auto messageGroup = qMessage->get<dai::MessageGroup>();
-
-		auto inRGB = qRGB->get<dai::ImgFrame>();
+		auto inDisparity = qDisparity->get<dai::ImgFrame>();
 		auto inLeft = qLeft->get<dai::ImgFrame>();
 		auto inRight = qRight->get<dai::ImgFrame>();
-		auto inDisparity = messageGroup->get<dai::ImgFrame>("disparity");
 
-		// Get frames and resize to desired output resolution
-		rgb = inRGB->getFrame().clone();
+		disparity = inDisparity->getFrame();
 		leftView = inLeft->getFrame().clone();
 		rightView = inRight->getFrame().clone();
+		cv::resize(disparity, disparity, cv::Size(cols, rows));
 
-		disparity = inDisparity->getFrame().clone();
+		//disparity.convertTo(test, CV_8UC1, disparityFactor);
 
 		auto imuData = qIMU->get<dai::IMUData>();
 		if (imuData != nullptr)
 		{
 			for (const auto& imuPacket : imuData->packets) {
-				acceleroValues = imuPacket.acceleroMeter;
-				gyroValues = imuPacket.gyroscope;
+				auto acceleroValues = imuPacket.acceleroMeter;
+				auto gyroValues = imuPacket.gyroscope;
 
 				auto acceleroTs = acceleroValues.getTimestamp();
 				auto gyroTs = gyroValues.getTimestamp();
@@ -232,7 +209,7 @@ extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera* cPtr) { cPtr-
 extern "C" __declspec(dllexport) int* OakDLeftImage(OakDCamera* cPtr) { return (int*)cPtr->leftView.data; }
 extern "C" __declspec(dllexport) int* OakDRightImage(OakDCamera* cPtr) { return (int*)cPtr->rightView.data; }
 extern "C" __declspec(dllexport) int* OakDDisparity(OakDCamera* cPtr) { return (int*)cPtr->disparity.data; }
-
+extern "C" __declspec(dllexport) float OakDDisparityFactor(OakDCamera* cPtr) { return cPtr->disparityFactor; }
 extern "C" __declspec(dllexport) bool OakGetDevice() {
 	auto devices = dai::Device::getAllAvailableDevices();
 	if (devices.empty()) return false;

@@ -56,6 +56,7 @@ Namespace VBClasses
 
     ' https://github.com/masaddev/OpenCVParticleFilter/tree/master/OpenCVParticleFilter
     Public Class ParticleFilter_Example : Inherits TaskParent
+        Implements IDisposable
         Dim imageFrame = 12
         Public Sub New()
             cPtr = ParticleFilterTest_Open(task.homeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
@@ -73,7 +74,7 @@ Namespace VBClasses
             Dim imagePtr = ParticleFilterTest_Run(cPtr)
             dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = ParticleFilterTest_Close(cPtr)
         End Sub
     End Class

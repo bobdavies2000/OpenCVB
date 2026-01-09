@@ -2,6 +2,7 @@
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class EdgeLine_Basics : Inherits TaskParent
+        Implements IDisposable
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat
         Public classCount As Integer
@@ -49,7 +50,7 @@ Namespace VBClasses
             labels(2) = CStr(classCount) + " line segments were found with motion threshold of " +
                         CStr(task.motionThreshold) + " pixels changed in a grid rect."
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             EdgeLineRaw_Close(cPtr)
         End Sub
     End Class
@@ -142,6 +143,7 @@ Namespace VBClasses
 
 
     Public Class EdgeLine_Simple : Inherits TaskParent
+        Implements IDisposable
         Public classCount As Integer
         Public Sub New()
             cPtr = EdgeLineSimple_Open()
@@ -164,7 +166,7 @@ Namespace VBClasses
             If dst2.Width >= 1280 Then imageEdgeWidth = 4
             dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth) ' prevent leaks at the image boundary...
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             EdgeLineSimple_Close(cPtr)
         End Sub
     End Class
@@ -202,6 +204,7 @@ Namespace VBClasses
 
 
     Public Class EdgeLine_Segments : Inherits TaskParent
+        Implements IDisposable
         Public segments As New List(Of List(Of cv.Point))
         Public Sub New()
             cPtr = EdgeLineRaw_Open()
@@ -234,7 +237,7 @@ Namespace VBClasses
             Next
 
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             EdgeLineRaw_Close(cPtr)
         End Sub
     End Class
@@ -246,6 +249,7 @@ Namespace VBClasses
 
 
     Public Class EdgeLine_SimpleMotion : Inherits TaskParent
+        Implements IDisposable
         Public edgeList As New List(Of List(Of cv.Point))
         Public Sub New()
             cPtr = EdgeLine_Open()
@@ -274,7 +278,7 @@ Namespace VBClasses
                 labels(3) = "There were " + CStr(EdgeLine_UnchangedCount(cPtr)) + " edge/lines retained from the previous image."
             End If
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             EdgeLine_Close(cPtr)
         End Sub
     End Class

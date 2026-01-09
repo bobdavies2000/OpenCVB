@@ -4325,10 +4325,9 @@ EdgeLineRaw* EdgeLineRaw_Open() {
 }
 
 extern "C" __declspec(dllexport)
-int* EdgeLineRaw_Close(EdgeLineRaw* cPtr)
+void EdgeLineRaw_Close(EdgeLineRaw* cPtr)
 {
     delete cPtr;
-    return (int*)0;
 }
 
 extern "C" __declspec(dllexport)

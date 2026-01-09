@@ -3,6 +3,7 @@ Imports System.Runtime.InteropServices
 ' https://github.com/ufoym
 Namespace VBClasses
     Public Class RecursiveBilateralFilter_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim dataSrc(0) As Byte
         Dim options As New Options_RBF
         Public Sub New()
@@ -21,7 +22,7 @@ Namespace VBClasses
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = RecursiveBilateralFilter_Close(cPtr)
         End Sub
     End Class

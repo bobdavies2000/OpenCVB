@@ -3,6 +3,7 @@ Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
 Namespace VBClasses
     Public Class BackProject_Basics : Inherits TaskParent
+        Implements IDisposable
         Public hist As New Hist_Basics
         Public minRange As cv.Scalar, maxRange As cv.Scalar
         Public Sub New()
@@ -42,6 +43,9 @@ Namespace VBClasses
             labels(3) = $"Highlight pixels {CInt(minRange(0))}-{CInt(maxRange(0))} with {CInt(count)} of {totalPixels}"
             dst2.Rectangle(New cv.Rect(CInt(histIndex) * brickWidth, 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
         End Sub
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            hist.Dispose()
+        End Sub
     End Class
 
 
@@ -75,6 +79,7 @@ Namespace VBClasses
 
 
     Public Class BackProject_FeatureLess : Inherits TaskParent
+        Implements IDisposable
         Dim bProject As New BackProject_Basics
         Dim contours As New Contour_Basics
         Public Sub New()
@@ -88,6 +93,10 @@ Namespace VBClasses
             dst2 = bProject.dst2
             dst3 = bProject.dst3
             labels(2) = "Bins = " + CStr(task.histogramBins)
+        End Sub
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            bProject.Dispose()
+            contours.Dispose()
         End Sub
     End Class
 

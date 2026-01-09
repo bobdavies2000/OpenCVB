@@ -2,6 +2,7 @@
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class Classifier_Basics_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim options As New Options_Classifier
         Public Sub New()
             cPtr = OEX_Points_Classifier_Open()
@@ -24,7 +25,7 @@ Namespace VBClasses
 
             SetTrueText("Click the global DebugCheckBox to get another set of points.", 3)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             OEX_Points_Classifier_Close(cPtr)
         End Sub
     End Class
@@ -76,6 +77,7 @@ Namespace VBClasses
 
 
     Public Class Classifier_Bayesian : Inherits TaskParent
+        Implements IDisposable
         Dim options As New Options_Classifier
         Public Sub New()
             cPtr = OEX_Points_Classifier_Open()
@@ -99,7 +101,7 @@ Namespace VBClasses
             dst2 = PaletteFull(dst0)
             imagePtr = OEX_ShowPoints(cPtr, dst2.Rows, dst2.Cols, task.DotSize)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             OEX_Points_Classifier_Close(cPtr)
         End Sub
     End Class
@@ -114,6 +116,7 @@ Namespace VBClasses
 
 
     Public Class Classifier_BayesianTest : Inherits TaskParent
+        Implements IDisposable
         Dim nabs As New Neighbor_Precise
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -185,7 +188,7 @@ Namespace VBClasses
             'Next
             'If zeroOutput Then SetTrueText("None of the neighbors were as similar to the selected cell.", 3)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then Classifier_Bayesian_Close(cPtr)
         End Sub
     End Class

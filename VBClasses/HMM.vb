@@ -3,6 +3,7 @@ Imports System.Runtime.InteropServices
 'https://github.com/omidsakhi/cv-hmm
 Namespace VBClasses
     Public Class HMM_Example_CPP : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
             If task.testAllRunning = False Then cPtr = HMM_Open()
             labels(2) = "Text output with explanation will appear in the Visual Studio output."
@@ -22,7 +23,7 @@ Namespace VBClasses
             SetTrueText("Review the 'Visual Studio's Immediate Window' output to see the sharedResults.images..", 3)
             If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, IIf(src.Channels() = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).Clone
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = HMM_Close(cPtr)
         End Sub
     End Class

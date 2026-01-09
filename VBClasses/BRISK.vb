@@ -1,6 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class BRISK_Basics : Inherits TaskParent
+        Implements IDisposable
         Dim brisk As cv.BRISK
         Public features As New List(Of cv.Point2f)
         Dim options As New Options_Features
@@ -24,7 +25,7 @@ Namespace VBClasses
             Next
             labels(2) = CStr(features.Count) + " features found with BRISK"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             brisk.Dispose()
         End Sub
     End Class

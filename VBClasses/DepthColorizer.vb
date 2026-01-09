@@ -2,9 +2,8 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class DepthColorizer_Basics : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
-            cPtr = Depth_Colorizer_Open()
-
             Dim gradientWidth = Math.Min(dst2.Width, 256)
             Dim f As Double = 1.0
             If saveVecColors.Count = 1 Then
@@ -62,6 +61,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.gOptions.displayDst1.Checked = False Or standaloneTest() Then
+                If cPtr = 0 Then cPtr = Depth_Colorizer_Open()
                 Dim depthData(task.pcSplit(2).Total * task.pcSplit(2).ElemSize - 1) As Byte
                 Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
                 Marshal.Copy(task.pcSplit(2).Data, depthData, 0, depthData.Length)
@@ -82,7 +82,7 @@ Namespace VBClasses
             End If
             If standaloneTest() Then dst2 = task.depthRGB
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Depth_Colorizer_Close(cPtr)
         End Sub
     End Class
@@ -92,6 +92,7 @@ Namespace VBClasses
 
 
     Public Class DepthColorizer_CPP : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
             cPtr = Depth_Colorizer_Open()
             desc = "Display depth data with InRange.  Higher contrast than others - yellow to blue always present."
@@ -107,7 +108,7 @@ Namespace VBClasses
 
             If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Depth_Colorizer_Close(cPtr)
         End Sub
     End Class

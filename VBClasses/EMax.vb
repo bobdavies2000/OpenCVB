@@ -5,6 +5,7 @@ Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
 Namespace VBClasses
     Public Class EMax_Basics : Inherits TaskParent
+        Implements IDisposable
         Public emaxInput As New EMax_InputClusters
         ' algorithms using this must provide the following items.
         Public eLabels As New List(Of Integer)
@@ -61,7 +62,7 @@ Namespace VBClasses
             dst2 = palette.dst2
             centers = New List(Of cv.Point2f)(emaxInput.centers)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = EMax_Close(cPtr)
         End Sub
     End Class
@@ -157,6 +158,7 @@ Namespace VBClasses
     ' https://docs.opencvb.org/3.0-beta/modules/ml/doc/expectation_maximization.html
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
     Public Class EMax_VB_Failing : Inherits TaskParent
+        Implements IDisposable
         Public emaxInput As New EMax_InputClusters
         Public eLabels As New List(Of Integer)
         Public eSamples As New List(Of cv.Point2f)
@@ -198,7 +200,7 @@ Namespace VBClasses
                 Next
             Next
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If em_model IsNot Nothing Then em_model.Dispose()
         End Sub
     End Class

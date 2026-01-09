@@ -2,6 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class Guess_Depth_CPP : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
             cPtr = Guess_Depth_Open()
             labels = {"", "", "Updated point cloud (holes filled)", "Original point cloud"}
@@ -19,7 +20,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32FC3, imagePtr).Clone
             If standaloneTest() Then dst3 = task.pointCloud
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             Guess_Depth_Close(cPtr)
         End Sub
     End Class
@@ -31,6 +32,7 @@ Namespace VBClasses
 
 
     Public Class Guess_ImageEdges_CPP : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
             If sliders.Setup(traceName) Then sliders.setupTrackBar("Max Distance from edge", 0, 100, 50)
 
@@ -52,7 +54,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_32FC3, cppData).Clone
             If standaloneTest() Then dst3 = task.pointCloud
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             Guess_ImageEdges_Close(cPtr)
         End Sub
     End Class

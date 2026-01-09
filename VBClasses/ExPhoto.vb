@@ -48,6 +48,7 @@ Namespace VBClasses
 
     ' https://github.com/opencv/opencv_contrib/blob/master/modules/xphoto/samples/oil.cpp
     Public Class ExPhoto_OilPaint_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim options As New Options_XPhoto
         Public Sub New()
             cPtr = ExPhoto_OilPaint_Open()
@@ -65,7 +66,7 @@ Namespace VBClasses
 
             If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = ExPhoto_OilPaint_Close(cPtr)
         End Sub
     End Class
@@ -103,6 +104,7 @@ Namespace VBClasses
 
 
     Public Class ExPhoto_Inpaint_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim inpVB As New ExPhoto_Inpaint
         Public Sub New()
             cPtr = ExPhoto_Inpaint_Open()
@@ -133,7 +135,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
             SetTrueText("The xPhoto Inpaint call hangs." + vbCrLf + "Uncomment the C++ line - see XPhoto.cpp - to test", 1)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = ExPhoto_Inpaint_Close(cPtr)
         End Sub
     End Class

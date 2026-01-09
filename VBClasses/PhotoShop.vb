@@ -559,6 +559,7 @@ Namespace VBClasses
 
     ' https://blog.csdn.net/just_sort/article/details/85982871
     Public Class PhotoShop_WhiteBalance : Inherits TaskParent
+        Implements IDisposable
         Public Sub New()
             If sliders.Setup(traceName) Then sliders.setupTrackBar("White balance threshold X100", 1, 100, 50)
             cPtr = WhiteBalance_Open()
@@ -584,7 +585,7 @@ Namespace VBClasses
                 dst3 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
             End If
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = WhiteBalance_Close(cPtr)
         End Sub
     End Class

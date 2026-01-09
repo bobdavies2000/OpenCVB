@@ -92,6 +92,7 @@ Namespace VBClasses
 
 
     Public Class Feature_General : Inherits TaskParent
+        Implements IDisposable
         Public options As New Options_Features
         Public Sub New()
             desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
@@ -205,7 +206,7 @@ Namespace VBClasses
                   "' method."
             If task.heartBeat Then labels(2) = strOut
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
         End Sub
     End Class
@@ -508,7 +509,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_GridPopulation : Inherits TaskParent
+    Public Class XO_Feature_GridPopulation : Inherits TaskParent
         Dim feat As New Feature_General
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -540,6 +541,7 @@ Namespace VBClasses
 
 
     Public Class Feature_AKaze : Inherits TaskParent
+        Implements IDisposable
         Dim kazeKeyPoints As cv.KeyPoint() = Nothing
         Dim kaze As cv.AKAZE
         Public Sub New()
@@ -558,7 +560,7 @@ Namespace VBClasses
                 DrawCircle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.highlight)
             Next
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If kaze IsNot Nothing Then kaze.Dispose()
         End Sub
     End Class
@@ -769,6 +771,7 @@ Namespace VBClasses
 
 
     Public Class Feature_Agast : Inherits TaskParent
+        Implements IDisposable
         Dim agastFD As cv.AgastFeatureDetector
         Dim stablePoints As New List(Of cv.Point2f)
         Dim options As New Options_Agast
@@ -809,7 +812,7 @@ Namespace VBClasses
             Next
             labels(2) = $"Found {keypoints.Length} features with agast"
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If agastFD IsNot Nothing Then agastFD.Dispose()
         End Sub
     End Class

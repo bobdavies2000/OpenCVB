@@ -109,6 +109,7 @@ Namespace VBClasses
 
 
     Public Class OEX_bgSub : Inherits TaskParent
+        Implements IDisposable
         Dim pBackSub As cv.BackgroundSubtractor
         Dim options As New Options_BGSubtract
         Public Sub New()
@@ -132,7 +133,7 @@ Namespace VBClasses
             End If
             pBackSub.Apply(src, dst2, options.learnRate)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If pBackSub IsNot Nothing Then pBackSub.Dispose()
         End Sub
     End Class
@@ -586,6 +587,7 @@ Namespace VBClasses
 
 
     Public Class OEX_FitEllipse : Inherits TaskParent
+        Implements IDisposable
         Dim img As cv.Mat
         Dim options As New Options_FitEllipse
         Public Sub New()
@@ -607,7 +609,7 @@ Namespace VBClasses
 
             dst2 = cv.Mat.FromPixelData(img.Rows + 4, img.Cols + 4, cv.MatType.CV_8UC3, imagePtr).Clone
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             OEX_FitEllipse_Close(cPtr)
         End Sub
     End Class

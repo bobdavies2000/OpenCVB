@@ -83,7 +83,7 @@ Namespace MainApp
         Private Sub updateAlgorithmHistory()
             Dim copyList As List(Of String)
             Dim maxHistory As Integer = 50
-            'If TestAllTimer.Enabled Then Exit Sub
+            If TestAllTimer.Enabled Then Exit Sub
 
             If algHistory.Contains(AvailableAlgorithms.Text) Then
                 ' make it the most recent
@@ -458,6 +458,8 @@ Namespace MainApp
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
             If task Is Nothing Then Exit Sub
+
+            vbc.task.MainUI_Algorithm.Dispose()
 
             Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + " FPS Algorithm/" + settings.cameraName + " " +
                         Format(task.fpsAlgorithm, "0") + "/" + Format(task.fpsCamera, "0"))

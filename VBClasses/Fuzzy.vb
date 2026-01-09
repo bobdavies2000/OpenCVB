@@ -3,6 +3,7 @@ Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
 Namespace VBClasses
     Public Class Fuzzy_Basics : Inherits TaskParent
+        Implements IDisposable
         Dim reduction As New Reduction_Basics
         Dim options As New Options_Contours
         Public contours As cv.Point()()
@@ -64,7 +65,7 @@ Namespace VBClasses
             dst1.SetTo(0, dst3)
             labels(1) = "There were " + CStr(sortContours.Count) + " contour > 100 points."
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Fuzzy_Close(cPtr)
         End Sub
     End Class

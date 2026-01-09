@@ -3,6 +3,7 @@ Imports OpenCvSharp.XFeatures2D
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
 Namespace VBClasses
     Public Class FREAK_Basics : Inherits TaskParent
+        Implements IDisposable
         Dim orb As New ORB_Basics
         Dim freak As FREAK
         Public Sub New()
@@ -30,7 +31,7 @@ Namespace VBClasses
             labels(3) = CStr(orb.keypoints.Count) + " FREAK Descriptors (resized) One row = keypoint"
             If fdesc.Width > 0 And fdesc.Height > 0 Then dst3 = fdesc.Resize(dst3.Size())
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If freak IsNot Nothing Then freak.Dispose()
         End Sub
     End Class

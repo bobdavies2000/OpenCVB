@@ -249,6 +249,7 @@ Namespace VBClasses
 
     ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
     Public Class Corners_Harris_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim options As New Options_Harris
         Public Sub New()
             cPtr = Harris_Features_Open()
@@ -270,7 +271,7 @@ Namespace VBClasses
 
             dst3 = ShowAddweighted(dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.color, labels(3))
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Harris_Features_Close(cPtr)
         End Sub
     End Class
@@ -282,6 +283,7 @@ Namespace VBClasses
 
     ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
     Public Class Corners_HarrisDetector_CPP : Inherits TaskParent
+        Implements IDisposable
         Public features As New List(Of cv.Point2f)
         Dim options As New Options_Features
         Public Sub New()
@@ -309,7 +311,7 @@ Namespace VBClasses
                 Next
             End If
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Harris_Detector_Close(cPtr)
         End Sub
     End Class

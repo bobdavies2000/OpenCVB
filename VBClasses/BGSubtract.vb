@@ -4,6 +4,7 @@ Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
 Namespace VBClasses
     Public Class BGSubtract_Basics : Inherits TaskParent
+        Implements IDisposable
         Public options As New Options_BGSubtract
         Public Sub New()
             cPtr = BGSubtract_BGFG_Open(options.currMethod)
@@ -26,7 +27,7 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
             labels(2) = options.methodDesc
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)
         End Sub
     End Class
@@ -37,6 +38,7 @@ Namespace VBClasses
 
     ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
     Public Class BGSubtract_Basics_QT : Inherits TaskParent
+        Implements IDisposable
         Dim learnRate As Double
         Public Sub New()
             Dim learnRate = If(dst2.Width >= 1280, 0.5, 0.1) ' learn faster with large images (slower frame rate)
@@ -52,7 +54,7 @@ Namespace VBClasses
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = BGSubtract_BGFG_Close(cPtr)
         End Sub
     End Class
@@ -66,6 +68,7 @@ Namespace VBClasses
 
 
     Public Class BGSubtract_MOG2 : Inherits TaskParent
+        Implements IDisposable
         Dim MOG2 As cv.BackgroundSubtractorMOG2
         Dim options As New Options_BGSubtract
         Public Sub New()
@@ -77,7 +80,7 @@ Namespace VBClasses
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             MOG2.Apply(src, dst2, options.learnRate)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If MOG2 IsNot Nothing Then MOG2.Dispose()
         End Sub
     End Class
@@ -89,6 +92,7 @@ Namespace VBClasses
 
 
     Public Class BGSubtract_MOG2_QT : Inherits TaskParent
+        Implements IDisposable
         Dim MOG2 As cv.BackgroundSubtractorMOG2
         Public Sub New()
             MOG2 = cv.BackgroundSubtractorMOG2.Create()
@@ -99,7 +103,7 @@ Namespace VBClasses
             Dim learnRate = If(dst2.Width >= 1280, 0.5, 0.1) ' learn faster with large images (slower frame rate)
             MOG2.Apply(src, dst2, learnRate)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If MOG2 IsNot Nothing Then MOG2.Dispose()
         End Sub
     End Class
@@ -152,6 +156,7 @@ Namespace VBClasses
 
 
     Public Class BGSubtract_MOG : Inherits TaskParent
+        Implements IDisposable
         Dim MOG As cv.BackgroundSubtractorMOG
         Dim options As New Options_BGSubtract
         Public Sub New()
@@ -163,7 +168,7 @@ Namespace VBClasses
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             MOG.Apply(src, dst2, options.learnRate)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If MOG IsNot Nothing Then MOG.Dispose()
         End Sub
     End Class
@@ -174,6 +179,7 @@ Namespace VBClasses
 
 
     Public Class BGSubtract_GMG_KNN : Inherits TaskParent
+        Implements IDisposable
         Dim gmg As cv.BackgroundSubtractorGMG
         Dim knn As cv.BackgroundSubtractorKNN
         Dim options As New Options_BGSubtract
@@ -193,7 +199,7 @@ Namespace VBClasses
             gmg.Apply(task.gray, dst2, options.learnRate)
             knn.Apply(dst2, dst2, options.learnRate)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If gmg IsNot Nothing Then gmg.Dispose()
             If knn IsNot Nothing Then knn.Dispose()
         End Sub
@@ -205,6 +211,7 @@ Namespace VBClasses
 
 
     Public Class BGSubtract_MOG_RGBDepth : Inherits TaskParent
+        Implements IDisposable
         Public grayMat As New cv.Mat
         Dim options As New Options_BGSubtract
         Dim MOGDepth As cv.BackgroundSubtractorMOG
@@ -223,7 +230,7 @@ Namespace VBClasses
 
             MOGRGB.Apply(task.gray, dst3, options.learnRate)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If MOGDepth IsNot Nothing Then MOGDepth.Dispose()
             If MOGRGB IsNot Nothing Then MOGRGB.Dispose()
         End Sub
@@ -292,6 +299,7 @@ Namespace VBClasses
 
 
     Public Class BGSubtract_Synthetic_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim options As New Options_BGSubtractSynthetic
         Public Sub New()
             labels(2) = "Synthetic background/foreground image."
@@ -314,7 +322,7 @@ Namespace VBClasses
             Dim imagePtr = BGSubtract_Synthetic_Run(cPtr)
             If imagePtr <> 0 Then dst2 = cv.Mat.FromPixelData(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr).Clone
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = BGSubtract_Synthetic_Close(cPtr)
         End Sub
     End Class

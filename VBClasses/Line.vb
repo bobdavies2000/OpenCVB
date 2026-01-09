@@ -77,6 +77,7 @@ Namespace VBClasses
 
 
     Public Class Line_Core : Inherits TaskParent
+        Implements IDisposable
         Dim ld As cv.XImgProc.FastLineDetector
         Public lpList As New List(Of lpData)
         Public Sub New()
@@ -113,7 +114,7 @@ Namespace VBClasses
 
             labels(2) = CStr(lpList.Count) + " lines were detected."
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             ld.Dispose()
         End Sub
     End Class

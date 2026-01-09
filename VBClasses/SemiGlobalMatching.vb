@@ -3,6 +3,7 @@ Imports System.Runtime.InteropServices
 ' https://github.com/epiception/SGM-Census
 Namespace VBClasses
     Public Class SemiGlobalMatching_CPP : Inherits TaskParent
+        Implements IDisposable
         Dim leftData(0) As Byte
         Dim rightData(0) As Byte
         Public Sub New()
@@ -31,7 +32,7 @@ Namespace VBClasses
             SetTrueText("This algorithm runs but always returns zero - I don't see my mistake?" + vbCrLf +
                         "Needs work but investing further is not needed - we have disparity from the device.", 3)
         End Sub
-        Public Sub Close()
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = SemiGlobalMatching_Close(cPtr)
         End Sub
     End Class

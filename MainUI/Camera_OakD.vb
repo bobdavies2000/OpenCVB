@@ -61,6 +61,10 @@ Namespace MainApp
         Private Shared Function OakDDisparity(cPtr As IntPtr) As IntPtr
         End Function
 
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDDisparityFactor(cPtr As IntPtr) As Single
+        End Function
+
         Private initialTime As Double = 0
 #End Region
 
@@ -170,17 +174,11 @@ Namespace MainApp
             OakDWaitForFrame(cPtr)
 
             SyncLock cameraMutex
-                'Dim colorPtr = OakDColor(cPtr)
-                'If colorPtr <> IntPtr.Zero Then
-                '    color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, colorPtr).Clone()
-                'End If
-
                 Dim leftPtr = OakDLeftImage(cPtr)
                 If leftPtr <> IntPtr.Zero Then
                     leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr).Clone()
                     color = leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 End If
-
 
                 Dim rightPtr = OakDRightImage(cPtr)
                 If rightPtr <> IntPtr.Zero Then
@@ -190,8 +188,10 @@ Namespace MainApp
                 Dim disparityPtr = OakDDisparity(cPtr)
                 If disparityPtr <> IntPtr.Zero Then
                     disparity = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, disparityPtr).Clone()
-                    disparity.ConvertTo(depth16, cv.MatType.CV_16U)
-                    pointCloud = ComputePointCloud(depth16, calibData.rgbIntrinsics)
+                    disparity *= OakDDisparityFactor(cPtr)
+                    Dim minVal As Double, maxVal As Double
+                    disparity.MinMaxLoc(minVal, maxVal)
+                    pointCloud = ComputePointCloud(disparity, calibData.leftIntrinsics)
                 End If
 
                 ' Get IMU data
@@ -211,10 +211,10 @@ Namespace MainApp
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
 
-        Private Function ComputePointCloud(depth16 As cv.Mat, intrinsics As intrinsicData) As cv.Mat
+        Private Function ComputePointCloud(disparity As cv.Mat, intrinsics As intrinsicData) As cv.Mat
             ' Compute point cloud from depth image and camera intrinsics
-            Dim rows = depth16.Rows
-            Dim cols = depth16.Cols
+            Dim rows = disparity.Rows
+            Dim cols = disparity.Cols
             Dim pc = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, New cv.Scalar(0, 0, 0))
 
             Dim fx = intrinsics.fx * (captureRes.Width / workRes.Width)
@@ -223,14 +223,15 @@ Namespace MainApp
             Dim cy = intrinsics.ppy * (captureRes.Height / workRes.Height)
 
             ' Use indexer for depth data
-            Dim depthIndexer = depth16.GetGenericIndexer(Of UInt16)()
+            Dim disparityIndexer = disparity.GetGenericIndexer(Of Byte)()
             Dim pcIndexer = pc.GetGenericIndexer(Of cv.Vec3f)()
 
+            Dim disp_constant As Single = calibData.baseline * fx * 20 ' picked 20 to match the real depth values.  Don't understand yet.
             For y = 0 To rows - 1
                 For x = 0 To cols - 1
-                    Dim d = depthIndexer(y, x)
-                    If d > 0 AndAlso d < 10000 Then ' Valid depth in mm
-                        Dim z = d / 1000.0F ' Convert to meters
+                    Dim disp = CSng(disparityIndexer(y, x))
+                    If disp > 0 Then ' Valid depth in mm
+                        Dim z = disp_constant / disp / 1000.0F ' Convert to meters
                         Dim px = (x - cx) * z / fx
                         Dim py = (y - cy) * z / fy
                         pcIndexer(y, x) = New cv.Vec3f(px, py, z)
@@ -238,6 +239,9 @@ Namespace MainApp
                 Next
             Next
 
+            Dim split = pc.Split()
+            Dim minVal As Double, maxVal As Double
+            split(2).MinMaxLoc(minVal, maxVal)
             Return pc
         End Function
 
