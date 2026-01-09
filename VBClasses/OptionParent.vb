@@ -20,6 +20,7 @@ Namespace VBClasses
             Return Nothing
         End Function
         Public Shared Function FindCheckBox(opt As String) As CheckBox
+            Application.DoEvents() ' settle down any forms that are opening...
             For Each frm In Application.OpenForms
                 If frm.text.endswith(" CheckBoxes") Then
                     For j = 0 To frm.Box.Count - 1
@@ -31,7 +32,6 @@ Namespace VBClasses
             Return Nothing
         End Function
         Public Shared Function findRadio(opt As String) As RadioButton
-            Dim radio = FindCheckBox(opt)
             For Each frm In Application.OpenForms
                 If frm.text.endswith(" Radio Buttons") Then
                     For j = 0 To frm.check.count - 1
@@ -39,7 +39,7 @@ Namespace VBClasses
                     Next
                 End If
             Next
-            Debug.WriteLine("OptionParent.findRadioForm failed.  The application list of forms changed while iterating.  Not critical.")
+            ' Debug.WriteLine("OptionParent.findRadioForm failed.  The application list of forms changed while iterating.  Not critical.")
             Return Nothing
         End Function
         Public Shared Function findRadioText(ByRef radioList As List(Of RadioButton)) As String

@@ -53,32 +53,6 @@ Namespace VBClasses
 
 
 
-    'https://www.learnopencvb.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
-    Public Class FeatureFlow_Dense : Inherits TaskParent
-        Dim options As New Options_OpticalFlow
-        Public Sub New()
-            desc = "Use dense optical flow algorithm  "
-        End Sub
-
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            options.Run()
-            Static lastGray As cv.Mat = src.Clone
-            Dim hsv = opticalFlow_Dense(lastGray, src, options.pyrScale, options.levels, options.winSize, options.iterations, options.polyN,
-                                    options.polySigma, options.OpticalFlowFlags)
-
-            dst2 = hsv.CvtColor(cv.ColorConversionCodes.HSV2RGB)
-            dst2 = dst2.ConvertScaleAbs(options.outputScaling)
-            dst3 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            lastGray = src.Clone()
-        End Sub
-    End Class
-
-
-
-
-
-
 
     ' https://www.learnopencvb.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
     Public Class FeatureFlow_LucasKanade : Inherits TaskParent

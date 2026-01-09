@@ -7658,14 +7658,10 @@ Namespace VBClasses
         Public minSize As Integer = 10
         Public numPoints As Integer = 5
         Public Sub New()
-            If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Area Number of Points", 1, 30, numPoints)
-                sliders.setupTrackBar("Minimum width and height", 10, 300, minSize)
-            End If
+            If sliders.Setup(traceName) Then sliders.setupTrackBar("Area Number of Points", 1, 30, numPoints)
         End Sub
         Public Sub Run()
             Static numSlider = OptionParent.FindSlider("Area Number of Points")
-            Static sizeSlider = OptionParent.FindSlider("Area size")
             srcPoints.Clear()
 
             Dim pt As cv.Point2f
