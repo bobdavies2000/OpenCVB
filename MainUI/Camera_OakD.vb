@@ -226,7 +226,7 @@ Namespace MainApp
             Dim disparityIndexer = disparity.GetGenericIndexer(Of Byte)()
             Dim pcIndexer = pc.GetGenericIndexer(Of cv.Vec3f)()
 
-            Dim disp_constant As Single = calibData.baseline * fx * 20 ' picked 20 to match the real depth values.  Don't understand yet.
+            Dim disp_constant As Single = calibData.baseline * fx * 30 ' picked XXX to match the real depth values.  Don't understand yet.
             For y = 0 To rows - 1
                 For x = 0 To cols - 1
                     Dim disp = CSng(disparityIndexer(y, x))

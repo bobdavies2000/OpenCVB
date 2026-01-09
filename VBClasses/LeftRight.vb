@@ -51,10 +51,8 @@ Namespace VBClasses
             desc = "Match the raw left image with the color image with a drawRect"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.leftView
-
-            If task.drawRect.Width <> dst2.Width Then Dim k = 0
-            dst3 = dst2(task.drawRect).Resize(dst2.Size)
+            dst2 = src
+            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then dst3 = src(task.drawRect)
         End Sub
     End Class
 

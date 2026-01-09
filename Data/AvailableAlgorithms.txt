@@ -589,7 +589,6 @@ Feature_SteadyCam
 Feature_TraceDelaunay
 Feature_WithDepth
 FeatureFlow_Basics
-FeatureFlow_Dense
 FeatureFlow_LeftRight
 FeatureFlow_LeftRight1
 FeatureFlow_LeftRightHist

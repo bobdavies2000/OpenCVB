@@ -421,6 +421,7 @@ Namespace MainApp
             MainForm_Resize(Nothing, Nothing)
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
+            If AvailableAlgorithms.Text.Trim = "" Then AvailableAlgorithms.SelectedIndex += 1
             settings.algorithm = AvailableAlgorithms.Text
             If TestAllTimer.Enabled = False Then SaveJsonSettings()
             'SaveJsonSettings() ' uncomment this to capture the algorithm that crashes the computer.

@@ -7,10 +7,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
-                task.drawRect = ValidateRect(task.drawRect)
-                dst3 = dst2(task.drawRect).Resize(dst3.Size(), 0, 0, cv.InterpolationFlags.Nearest)
-            End If
+            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then dst3 = src(task.drawRect)
         End Sub
     End Class
 
@@ -34,5 +31,4 @@ Namespace VBClasses
             dst3 = zoom.dst3
         End Sub
     End Class
-
 End Namespace
