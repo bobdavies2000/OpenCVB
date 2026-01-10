@@ -21,12 +21,13 @@ Namespace VBClasses
             options.Run()
 
             If options.xmlCheck Then
-                Dim fileinfo = New FileInfo(CurDir() + "/RetinaDefaultParameters.xml")
+                Static xmlCheckBox = OptionParent.FindCheckBox("Open resulting xml file")
+                xmlCheckBox.checked = False
+                Dim fileinfo = New FileInfo(task.homeDir + "/RetinaDefaultParameters.xml")
                 If fileinfo.Exists Then
-                    FileCopy(CurDir() + "/RetinaDefaultParameters.xml", task.homeDir + "data/RetinaDefaultParameters.xml")
-                    startInfo.FileName = "wordpad.exe"
-                    startInfo.Arguments = task.homeDir + "Data/RetinaDefaultParameters.xml"
-                    Process.Start(startInfo)
+                    FileCopy(task.homeDir + "/RetinaDefaultParameters.xml", task.homeDir + "Data\RetinaDefaultParameters.xml")
+                    fileinfo.Delete()
+                    MessageBox.Show("XML Parameters file is available at: " + task.homeDir + "Data\RetinaDefaultParameters.xml")
                 Else
                     MessageBox.Show("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?")
                 End If
@@ -86,7 +87,4 @@ Namespace VBClasses
             lastMotion = retina.dst3
         End Sub
     End Class
-
-
-
 End Namespace

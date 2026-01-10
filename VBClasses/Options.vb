@@ -6358,7 +6358,6 @@ Namespace VBClasses
             Static logCheckbox = FindCheckBox("Use log sampling")
             Static xmlCheckbox = FindCheckBox("Open resulting xml file")
             useLogSampling = logCheckbox.Checked
-            If xmlCheckbox.checked Then xmlCheckbox.checked = False
             xmlCheck = xmlCheckbox.checked
             sampleFactor = sampleSlider.value
         End Sub
