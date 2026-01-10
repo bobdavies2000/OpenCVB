@@ -1,4 +1,4 @@
-**January 10, 2025 – Play/Pause, Oak Support, Test All, Exceptions.**
+**January 10, 2026 – Play/Pause, Oak Support, Test All, Exceptions.**
 
 -   Over 1500 algorithms are included, averaging 36 lines of code per algorithm.
     -   Over 300 additional obsolete algorithms compiled for reference use.
@@ -18,7 +18,7 @@
     -   For debugging a new algorithm, the VS Menu solution is preferred.
 -   SharpGL algorithms now remember their size and location.
 
-**January 5, 2025 – Oak-D Pro, More Install Fixes.**
+**January 5, 2026 – Oak-D Pro, More Install Fixes.**
 
 -   NOTE: OpenCVB requires VS 2026 and will install OpenCV 4.14.
     -   Install script uses the “.slnx” designation for solutions.
@@ -34,7 +34,7 @@
 -   RedColor color management was improved – no repeated colors.
 -   
 
-**January 1, 2025 – Oak-D Pro, Install Fixes.**
+**January 1, 2026 – Oak-D Pro, Install Fixes.**
 
 -   This version of OpenCVB requires VS 2026 and OpenCV 4.14.
     -   Install script uses the “.slnx” designation for solutions.
@@ -1377,7 +1377,7 @@
 
 ![A colorful pattern with dots Description automatically generated with medium confidence](media/db52b0115273726a6ff2d1aa986c0817.gif)
 
-**RedCloud_Basics:** *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
+**RedCloud_Basics:**  *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
 
 ![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
 
