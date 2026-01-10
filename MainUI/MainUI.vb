@@ -5,7 +5,6 @@ Imports System.Text.RegularExpressions
 Imports System.Threading
 Imports VBClasses
 Imports cv = OpenCvSharp
-Imports cvext = OpenCvSharp.Extensions
 Namespace MainApp
     Partial Public Class MainUI : Inherits Form
         Dim isPlaying As Boolean
@@ -165,7 +164,6 @@ Namespace MainApp
             r = validateRect(r, task.dstList(task.mousePicTag).Width, task.dstList(task.mousePicTag).Height)
             If r.Width = 0 Or r.Height = 0 Then Exit Sub
             Dim img = task.dstList(task.mousePicTag)(r).Resize(New cv.Size(task.drawRect.Width * 5, task.drawRect.Height * 5))
-            cv.Cv2.ImShow("DrawRect Region " + CStr(magnifyIndex), img)
         End Sub
         Private Sub MainForm_Closing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             If TestAllTimer.Enabled = False Then SaveJsonSettings()
@@ -310,13 +308,6 @@ Namespace MainApp
             setupAlgorithmHistory()
 
             StartStopTask()
-
-            Const WM_SETICON As Integer = &H80
-            Const ICON_SMALL As Integer = 0
-            Const ICON_BIG As Integer = 1
-
-            SendMessage(Me.Handle, WM_SETICON, CType(ICON_SMALL, IntPtr), Me.Icon.Handle)
-            SendMessage(Me.Handle, WM_SETICON, CType(ICON_BIG, IntPtr), Me.Icon.Handle)
         End Sub
 
         Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
@@ -348,11 +339,7 @@ Namespace MainApp
             Dim pic = DirectCast(sender, PictureBox)
             g.ScaleTransform(1, 1)
 
-            Dim displayimage = task.dstList(pic.Tag).Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
-            Dim bitmap = cvext.BitmapConverter.ToBitmap(displayimage)
-
-            If pics(pic.Tag).Image IsNot Nothing Then pics(pic.Tag).Image.Dispose()
-            g.DrawImage(bitmap, 0, 0)
+            g.DrawImage(pics(pic.Tag).Image, 0, 0)
 
             labels(pic.Tag).Text = task.labels(pic.Tag)
 
@@ -366,8 +353,6 @@ Namespace MainApp
                     g.DrawString(tt.text, windowsFont, brush, CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
                 End If
             Next
-            brush.Dispose()
-            bitmap.Dispose()
 
             Dim timeEnd As DateTime = Now
             Dim elapsedTime = timeEnd.Ticks - timeStart.Ticks
@@ -375,6 +360,13 @@ Namespace MainApp
             task.cpu.paintTime += spanCopy.Ticks / TimeSpan.TicksPerMillisecond
         End Sub
         Private Sub startAlgorithm()
+            Const WM_SETICON As Integer = &H80
+            Const ICON_SMALL As Integer = 0
+            Const ICON_BIG As Integer = 1
+
+            SendMessage(Me.Handle, WM_SETICON, CType(ICON_SMALL, IntPtr), Me.Icon.Handle)
+            SendMessage(Me.Handle, WM_SETICON, CType(ICON_BIG, IntPtr), Me.Icon.Handle)
+
             If vbc.task IsNot Nothing Then vbc.task.Dispose()
             vbc.task = New AlgorithmTask
 
@@ -422,6 +414,7 @@ Namespace MainApp
         End Sub
         Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
             If AvailableAlgorithms.Text.Trim = "" Then AvailableAlgorithms.SelectedIndex += 1
+
             settings.algorithm = AvailableAlgorithms.Text
             If TestAllTimer.Enabled = False Then SaveJsonSettings()
             'SaveJsonSettings() ' uncomment this to capture the algorithm that crashes the computer.
@@ -479,12 +472,14 @@ Namespace MainApp
             End If
             fpsWriteCount += 1
 
-            If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = " " Then
-                AvailableAlgorithms.SelectedIndex += 2
-            Else
-                AvailableAlgorithms.SelectedIndex += 1
-            End If
-            If AvailableAlgorithms.Items.Count <= AvailableAlgorithms.SelectedIndex + 1 Then AvailableAlgorithms.SelectedIndex = 0
+            ' the SharpGL code is not careful about releasing GDI handles.
+            Dim index = AvailableAlgorithms.SelectedIndex + 1
+            While AvailableAlgorithms.Items(index).StartsWith("GL_") And AvailableAlgorithms.Items(index) <> " "
+                index += 1
+            End While
+
+            If AvailableAlgorithms.Items.Count <= index Then index = 0
+            AvailableAlgorithms.SelectedIndex = index
 
             Debug.WriteLine("Usage GDI: " & CStr(GdiMonitor.GetGdiCount()) + " USER: " & CStr(GdiMonitor.GetUserCount()))
 
@@ -495,7 +490,11 @@ Namespace MainApp
 
             If isPlaying Then
                 StartCamera()
-                AvailableAlgorithms.SelectedItem = settings.algorithm
+                If AvailableAlgorithms.Items.Contains(settings.algorithm) = False Then
+                    AvailableAlgorithms.SelectedIndex = 0
+                Else
+                    AvailableAlgorithms.SelectedItem = settings.algorithm
+                End If
 
                 MainForm_Resize(Nothing, Nothing)
             Else

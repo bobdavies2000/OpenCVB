@@ -1,5 +1,7 @@
+Imports System.Security.Cryptography
 Imports VBClasses
 Imports cv = OpenCvSharp
+Imports cvext = OpenCvSharp.Extensions
 Namespace MainApp
     Partial Public Class MainUI
         Public camera As GenericCamera = Nothing
@@ -82,6 +84,14 @@ Namespace MainApp
 
                                If msSinceLastPaint > threshold Then
                                    lastPaintTime = task.cpu.algorithmTimes(1)
+                                   Dim tmp As cv.Mat
+                                   For i = 0 To pics.Count - 1
+                                       tmp = task.dstList(i).Clone
+                                       tmp.Rectangle(task.drawRect, cv.Scalar.White, 1)
+                                       tmp = tmp.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+                                       If pics(i).Image IsNot Nothing Then pics(i).Image.Dispose()
+                                       pics(i).Image = cvext.BitmapConverter.ToBitmap(tmp)
+                                   Next
                                    For i = 0 To pics.Count - 1
                                        pics(i).Invalidate()
                                    Next

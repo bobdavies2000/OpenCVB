@@ -31,13 +31,12 @@ Namespace VBClasses
             imageTriangles
         End Enum
 
-        Public Shared cameraNames As New List(Of String)({"StereoLabs ZED 2/2i",
-                                                          "Orbbec Gemini 335L",
+        Public Shared cameraNames As New List(Of String)({"Orbbec Gemini 335L",
                                                           "Orbbec Gemini 336L",
                                                           "Oak-D camera",
                                                           "Intel(R) RealSense(TM) Depth Camera 435i",
                                                           "Intel(R) RealSense(TM) Depth Camera 455",
-                                                          "Orbbec Gemini 335"
+                                                          "Orbbec Gemini 335", "StereoLabs ZED 2/2i"
                                                           })
     End Class
 End Namespace

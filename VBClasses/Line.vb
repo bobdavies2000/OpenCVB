@@ -41,16 +41,12 @@ Namespace VBClasses
                     lp.age = 1
                     sortlines.Add(lp.length, lp)
                 End If
-
-                If lp.ptCenter.X > task.workRes.Width Then Dim k = 0
             Next
 
             lpList.Clear()
             For Each lp In sortlines.Values
                 lp.index = lpList.Count
                 lpList.Add(lp)
-
-                If lp.ptCenter.X > task.workRes.Width Then Dim k = 0
             Next
 
             dst1.SetTo(0)

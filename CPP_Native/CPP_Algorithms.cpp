@@ -2196,6 +2196,9 @@ public:
 		currentFrame = 13;
 		pf = ParticleFilter(ballLocation.col(currentFrame), inR);
 	}
+	~ParticleFilterTest()
+	{
+	}
 	Mat loadImage(int imageNum)
 	{
 		Mat inImage;
