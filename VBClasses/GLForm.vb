@@ -80,7 +80,7 @@ Public Class SharpGLForm
             task.gOptions.DebugCheckBox.Checked = False
             task.sharpGL.resetView()
         End If
-        'If task.firstPass Or task.optionsChanged Then task.sharpGL.resetView()
+
         gl.Viewport(0, 0, GLControl.Width, GLControl.Height)
         'gl.MatrixMode(OpenGL.GL_PROJECTION)
         'gl.LoadIdentity()
@@ -379,5 +379,11 @@ Public Class SharpGLForm
         gl.Flush()
         Return label
     End Function
+    Private Sub SharpGLForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
+        task.Settings.sharpGLLeft = Me.Left
+        task.Settings.sharpGLTop = Me.Top
+        task.Settings.sharpGLWidth = Me.Width
+        task.Settings.sharpGLHeight = Me.Height
+    End Sub
 End Class
 

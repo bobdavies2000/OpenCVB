@@ -210,41 +210,6 @@ Namespace MainApp
 
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
-
-        Private Function ComputePointCloud(disparity As cv.Mat, intrinsics As intrinsicData) As cv.Mat
-            ' Compute point cloud from depth image and camera intrinsics
-            Dim rows = disparity.Rows
-            Dim cols = disparity.Cols
-            Dim pc = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, New cv.Scalar(0, 0, 0))
-
-            Dim fx = intrinsics.fx * (captureRes.Width / workRes.Width)
-            Dim fy = intrinsics.fy * (captureRes.Height / workRes.Height)
-            Dim cx = intrinsics.ppx * (captureRes.Width / workRes.Width)
-            Dim cy = intrinsics.ppy * (captureRes.Height / workRes.Height)
-
-            ' Use indexer for depth data
-            Dim disparityIndexer = disparity.GetGenericIndexer(Of Byte)()
-            Dim pcIndexer = pc.GetGenericIndexer(Of cv.Vec3f)()
-
-            Dim disp_constant As Single = calibData.baseline * fx * 30 ' picked XXX to match the real depth values.  Don't understand yet.
-            For y = 0 To rows - 1
-                For x = 0 To cols - 1
-                    Dim disp = CSng(disparityIndexer(y, x))
-                    If disp > 0 Then ' Valid depth in mm
-                        Dim z = disp_constant / disp / 1000.0F ' Convert to meters
-                        Dim px = (x - cx) * z / fx
-                        Dim py = (y - cy) * z / fy
-                        pcIndexer(y, x) = New cv.Vec3f(px, py, z)
-                    End If
-                Next
-            Next
-
-            Dim split = pc.Split()
-            Dim minVal As Double, maxVal As Double
-            split(2).MinMaxLoc(minVal, maxVal)
-            Return pc
-        End Function
-
         Public Overrides Sub StopCamera()
         End Sub
     End Class
