@@ -44,59 +44,64 @@ Namespace MainApp
             camera.frameProcessed = False
 
             Me.BeginInvoke(Sub()
-                               If task Is Nothing Then Exit Sub
-                               If task.cpu.algorithm_ms.Count = 0 Then task.cpu.startRun(settings.algorithm)
+                               Try
+                                   If task Is Nothing Then Exit Sub
+                                   If task.cpu.algorithm_ms.Count = 0 Then task.cpu.startRun(settings.algorithm)
 
-                               task.cpu.algorithmTimes(1) = Now
+                                   task.cpu.algorithmTimes(1) = Now
 
-                               Dim elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - task.cpu.algorithmTimes(0).Ticks
-                               Dim spanWait = New TimeSpan(elapsedWaitTicks)
-                               task.cpu.algorithm_ms(0) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
+                                   Dim elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - task.cpu.algorithmTimes(0).Ticks
+                                   Dim spanWait = New TimeSpan(elapsedWaitTicks)
+                                   task.cpu.algorithm_ms(0) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                               task.cpu.algorithmTimes(0) = task.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
+                                   task.cpu.algorithmTimes(0) = task.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
 
-                               SyncLock camera.cameraMutex
-                                   camera.color.CopyTo(task.color)
-                                   camera.pointCloud.CopyTo(task.pointCloud)
-                                   camera.leftView.CopyTo(task.leftView)
-                                   camera.rightView.CopyTo(task.rightView)
-                               End SyncLock
+                                   SyncLock camera.cameraMutex
+                                       camera.color.CopyTo(task.color)
+                                       camera.pointCloud.CopyTo(task.pointCloud)
+                                       camera.leftView.CopyTo(task.leftView)
+                                       camera.rightView.CopyTo(task.rightView)
+                                   End SyncLock
 
-                               task.RunAlgorithm()
+                                   task.RunAlgorithm()
 
-                               task.cpu.algorithmTimes(1) = Now
+                                   task.cpu.algorithmTimes(1) = Now
 
-                               elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - task.cpu.algorithmTimes(0).Ticks
+                                   elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - task.cpu.algorithmTimes(0).Ticks
 
-                               spanWait = New TimeSpan(elapsedWaitTicks)
-                               task.cpu.algorithm_ms(1) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
+                                   spanWait = New TimeSpan(elapsedWaitTicks)
+                                   task.cpu.algorithm_ms(1) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                               task.cpu.algorithmTimes(0) = task.cpu.algorithmTimes(1) ' start time wait = end time algorithm
+                                   task.cpu.algorithmTimes(0) = task.cpu.algorithmTimes(1) ' start time wait = end time algorithm
 
-                               task.mouseClickFlag = False
-                               task.frameCount += 1
+                                   task.mouseClickFlag = False
+                                   task.frameCount += 1
 
-                               elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - lastPaintTime.Ticks
-                               spanWait = New TimeSpan(elapsedWaitTicks)
-                               Dim msSinceLastPaint = spanWait.Ticks / TimeSpan.TicksPerMillisecond
+                                   elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - lastPaintTime.Ticks
+                                   spanWait = New TimeSpan(elapsedWaitTicks)
+                                   Dim msSinceLastPaint = spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                               Dim threshold = 1000 / task.Settings.FPSPaintTarget
+                                   Dim threshold = 1000 / task.Settings.FPSPaintTarget
 
-                               If msSinceLastPaint > threshold Then
-                                   lastPaintTime = task.cpu.algorithmTimes(1)
-                                   Dim tmp As cv.Mat
-                                   For i = 0 To pics.Count - 1
-                                       tmp = task.dstList(i).Clone
-                                       tmp.Rectangle(task.drawRect, cv.Scalar.White, 1)
-                                       tmp = tmp.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
-                                       If pics(i).Image IsNot Nothing Then pics(i).Image.Dispose()
-                                       pics(i).Image = cvext.BitmapConverter.ToBitmap(tmp)
-                                   Next
-                                   For i = 0 To pics.Count - 1
-                                       pics(i).Invalidate()
-                                   Next
-                               End If
-                               camera.frameProcessed = True
+                                   If msSinceLastPaint > threshold Then
+                                       lastPaintTime = task.cpu.algorithmTimes(1)
+                                       Dim tmp As cv.Mat
+                                       For i = 0 To pics.Count - 1
+                                           tmp = task.dstList(i).Clone
+                                           tmp.Rectangle(task.drawRect, cv.Scalar.White, 1)
+                                           tmp = tmp.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
+                                           If pics(i).Image IsNot Nothing Then pics(i).Image.Dispose()
+                                           pics(i).Image = cvext.BitmapConverter.ToBitmap(tmp)
+                                       Next
+                                       For i = 0 To pics.Count - 1
+                                           pics(i).Invalidate()
+                                       Next
+                                   End If
+                                   camera.frameProcessed = True
+                               Catch ex As Exception
+                                   Debug.WriteLine($"Exception in FrameReady callback: {ex.Message}")
+                                   Debug.WriteLine($"Stack trace: {ex.StackTrace}")
+                               End Try
                            End Sub)
         End Sub
     End Class

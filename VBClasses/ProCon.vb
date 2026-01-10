@@ -33,6 +33,7 @@ Namespace VBClasses
         End Function
         Public Sub Consumer()
             While 1
+                If task.MainUI_Algorithm.traceName <> traceName Then Exit While
                 If task.frameCount < 0 Then Exit While
                 SyncLock mutex
                     head = success(head)

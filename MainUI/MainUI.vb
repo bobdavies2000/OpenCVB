@@ -451,7 +451,7 @@ Namespace MainApp
             optionsForm.Dispose()
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-            If task Is Nothing Then Exit Sub
+            ' If task Is Nothing Then Exit Sub
 
             vbc.task.MainUI_Algorithm.Dispose()
 
@@ -474,16 +474,14 @@ Namespace MainApp
 
             ' the SharpGL code is not careful about releasing GDI handles.
             Dim index = AvailableAlgorithms.SelectedIndex + 1
-            While AvailableAlgorithms.Items(index).StartsWith("GL_") And AvailableAlgorithms.Items(index) <> " "
+            If AvailableAlgorithms.Items.Count <= index Then index = 0
+            If AvailableAlgorithms.Items(index) = " " Then index += 1
+            While AvailableAlgorithms.Items(index).StartsWith("GL_")
                 index += 1
             End While
+            Debug.WriteLine(vbCrLf + "Usage GDI/USER: " & CStr(GdiMonitor.GetGdiCount()) + "/" & CStr(GdiMonitor.GetUserCount()))
 
-            If AvailableAlgorithms.Items.Count <= index Then index = 0
             AvailableAlgorithms.SelectedIndex = index
-
-            Debug.WriteLine("Usage GDI: " & CStr(GdiMonitor.GetGdiCount()) + " USER: " & CStr(GdiMonitor.GetUserCount()))
-
-            AvailableAlgorithms.SelectedItem = settings.algorithm
         End Sub
         Private Sub StartStopTask()
             isPlaying = Not isPlaying

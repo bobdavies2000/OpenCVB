@@ -167,7 +167,12 @@ Namespace VBClasses
             task.cpu.measureStartRun(traceName)
 
             trueData.Clear()
-            RunAlg(src)
+            Try
+                RunAlg(src)
+            Catch ex As Exception
+                Debug.WriteLine($"Exception in {traceName}: {ex.Message}")
+                Debug.WriteLine($"Stack trace: {ex.StackTrace}")
+            End Try
 
             task.cpu.measureEndRun()
         End Sub
