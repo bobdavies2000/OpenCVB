@@ -1,3 +1,23 @@
+**January 10, 2025 – Play/Pause, Oak Support, Test All, Exceptions.**
+
+-   Over 1500 algorithms are included, averaging 36 lines of code per algorithm.
+    -   Over 300 additional obsolete algorithms compiled for reference use.
+-   The play/pause button has been removed – it was not used or needed.
+-   Code Review: cursor.ai inspected the code and made recommendations.
+-   Switching between cameras had some inconsistencies, now removed.
+-   The Oak3-D Pro support now installs examples to allow comparisons.
+    -   The Oak3 left image is now the RGB image (grayscale only.)
+    -   The Oak3 point cloud is computed in OpenCVB.
+    -   Advantage: the depth is aligned to the left image automatically.
+-   The Oak4-D Pro support is stalled awaiting a signed USB driver for installation.
+-   The “Test All” overnight testing has been improved.
+-   Error handling in the camera callback provides 2 ways to handle exceptions:
+    -   Default: use Try/Catch to log the error and keep running.
+    -   Turn on VS Menu “Debug-\>Windows-\>Exception Settings” to stop run.
+-   For “Test All” runs using the Try/Catch Default above may be preferred.
+    -   For debugging a new algorithm, the VS Menu solution is preferred.
+-   SharpGL algorithms now remember their size and location.
+
 **January 5, 2025 – Oak-D Pro, More Install Fixes.**
 
 -   NOTE: OpenCVB requires VS 2026 and will install OpenCV 4.14.
@@ -8,10 +28,11 @@
     -   A POE switch has been ordered – arrives tomorrow.
     -   At almost \$1k, the camera is too expensive to order a second.
 -   The overnight testing was improved and runs without restarting camera.
--   Splash screen was added and camera startup messages are removed.
+-   Splash screen was added and camera startup messages were removed.
 -   OpenCVB’s icon now appears in the taskbar.
 -   OpenCVB’s SharpGL interface is working.
 -   RedColor color management was improved – no repeated colors.
+-   
 
 **January 1, 2025 – Oak-D Pro, Install Fixes.**
 
@@ -1356,7 +1377,7 @@
 
 ![A colorful pattern with dots Description automatically generated with medium confidence](media/db52b0115273726a6ff2d1aa986c0817.gif)
 
-**RedCloud_Basics:**  *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
+**RedCloud_Basics:** *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
 
 ![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
 
