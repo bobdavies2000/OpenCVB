@@ -32,7 +32,7 @@ Namespace MainApp
             setupAlgorithmHistory()
 
             Me.Show()
-
+            Application.DoEvents()
             StartStopTask()
         End Sub
         Private Sub pathFixup()
@@ -319,7 +319,7 @@ Namespace MainApp
             Dim pic = DirectCast(sender, PictureBox)
             g.ScaleTransform(1, 1)
 
-            g.DrawImage(pics(pic.Tag).Image, 0, 0)
+            If pics(pic.Tag).Image IsNot Nothing Then g.DrawImage(pics(pic.Tag).Image, 0, 0)
 
             labels(pic.Tag).Text = task.labels(pic.Tag)
 
