@@ -17,6 +17,63 @@ Namespace MainApp
         Dim resolutionDetails As String
         Dim magnifyIndex As Integer
         Dim windowsFont = New System.Drawing.Font("Tahoma", 9)
+        Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+            settings = settingsIO.Load()
+            pathFixup()
+
+            addPics()
+
+            Me.Location = New Point(settings.MainFormLeft, settings.MainFormTop)
+            Me.Size = New Size(settings.MainFormWidth, settings.MainFormHeight)
+            Application.DoEvents()
+
+            getLineCounts()
+            LoadAvailableAlgorithms()
+            setupAlgorithmHistory()
+
+            Me.Show()
+
+            StartStopTask()
+        End Sub
+        Private Sub pathFixup()
+            updatePath(homeDir + "bin\", "Release version of CPP_Native.dll")
+            updatePath(homeDir + "opencv\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+            updatePath(homeDir + "opencv\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
+
+            Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
+            If cudaPath IsNot Nothing And settings.cameraName.StartsWith("StereoLabs") Then
+                updatePath(cudaPath, "Cuda - needed for StereoLabs")
+                updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
+            End If
+            updatePath(homeDir + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")
+            updatePath(homeDir + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
+            updatePath(homeDir + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")  ' 
+
+            updatePath(homeDir + "librealsense\build\Debug\", "Realsense camera support.")
+            updatePath(homeDir + "librealsense\build\Release\", "Realsense camera support.")
+
+            updatePath(homeDir + "bin\", "Oak-D camera support.")
+            updatePath(homeDir + "OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin\", "Oak-D camera support.")
+            updatePath(homeDir + "OakD\depthai-core\Build\Release", "Oak-D camera support.")
+            updatePath(homeDir + "OakD\depthai-core\Build\Debug", "Oak-D camera support.")
+        End Sub
+        Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
+            Dim systemPath = Environment.GetEnvironmentVariable("Path")
+            Dim foundDirectory As Boolean
+            If Directory.Exists(neededDirectory) Then
+                foundDirectory = True
+                systemPath = neededDirectory + ";" + systemPath
+            End If
+
+            If foundDirectory = False And notFoundMessage.Length > 0 Then
+                Debug.WriteLine(neededDirectory + " was not found.  " + notFoundMessage)
+                Debug.WriteLine(neededDirectory + " was not found.  " + notFoundMessage)
+                Debug.WriteLine(neededDirectory + " was not found.  " + notFoundMessage)
+                Debug.WriteLine(neededDirectory + " was not found.  " + notFoundMessage)
+                Debug.WriteLine("Review updatePath for directories needed in the path for OpenCVB.")
+            End If
+            Environment.SetEnvironmentVariable("Path", systemPath)
+        End Sub
         Private Sub addPics()
             pics.Clear()
 
@@ -38,26 +95,6 @@ Namespace MainApp
 
                 pics.Add(pic)
             Next
-        End Sub
-        Private Sub removePics()
-            ' Remove event handlers from PictureBox controls to prevent handle leaks
-            For Each pic In pics
-                If pic IsNot Nothing Then
-                    RemoveHandler pic.DoubleClick, AddressOf campic_DoubleClick
-                    RemoveHandler pic.Click, AddressOf clickPic
-                    RemoveHandler pic.Paint, AddressOf Pic_Paint
-                    RemoveHandler pic.MouseDown, AddressOf CamPic_MouseDown
-                    RemoveHandler pic.MouseUp, AddressOf CamPic_MouseUp
-                    RemoveHandler pic.MouseMove, AddressOf CamPic_MouseMove
-                    ' Dispose the image if it exists
-                    If pic.Image IsNot Nothing Then
-                        pic.Image.Dispose()
-                        pic.Image = Nothing
-                    End If
-                    Me.Controls.Remove(pic)
-                End If
-            Next
-            pics.Clear()
         End Sub
         Private Sub algHistory_Clicked(sender As Object, e As EventArgs)
             Dim item = TryCast(sender, ToolStripMenuItem)
@@ -253,63 +290,6 @@ Namespace MainApp
             StatusLabel.Location = New Point(offset, pics(2).Top + h)
             StatusLabel.Width = w * 2
         End Sub
-        Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
-            Dim systemPath = Environment.GetEnvironmentVariable("Path")
-            Dim foundDirectory As Boolean
-            If Directory.Exists(neededDirectory) Then
-                foundDirectory = True
-                systemPath = neededDirectory + ";" + systemPath
-            End If
-
-            If foundDirectory = False And notFoundMessage.Length > 0 Then
-                Debug.WriteLine(neededDirectory + " was not found.  " + notFoundMessage)
-                Debug.WriteLine(neededDirectory + " was not found.  " + notFoundMessage)
-                Debug.WriteLine(neededDirectory + " was not found.  " + notFoundMessage)
-                Debug.WriteLine(neededDirectory + " was not found.  " + notFoundMessage)
-                Debug.WriteLine("Review updatePath for directories needed in the path for OpenCVB.")
-            End If
-            Environment.SetEnvironmentVariable("Path", systemPath)
-        End Sub
-        Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-            settings = settingsIO.Load()
-            ' Startup.Splash.loadingLabel.Text = "Starting " + settings.cameraName
-
-            updatePath(homeDir + "bin\", "Release version of CPP_Native.dll")
-            updatePath(homeDir + "opencv\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
-            updatePath(homeDir + "opencv\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
-
-            Dim cudaPath = Environment.GetEnvironmentVariable("CUDA_PATH")
-            If cudaPath IsNot Nothing And settings.cameraName.StartsWith("StereoLabs") Then
-                updatePath(cudaPath, "Cuda - needed for StereoLabs")
-                updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
-            End If
-            updatePath(homeDir + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")
-            updatePath(homeDir + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
-            updatePath(homeDir + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")  ' 
-
-            updatePath(homeDir + "librealsense\build\Debug\", "Realsense camera support.")
-            updatePath(homeDir + "librealsense\build\Release\", "Realsense camera support.")
-
-            updatePath(homeDir + "bin\", "Oak-D camera support.")
-            updatePath(homeDir + "OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin\", "Oak-D camera support.")
-            updatePath(homeDir + "OakD\depthai-core\Build\Release", "Oak-D camera support.")
-            updatePath(homeDir + "OakD\depthai-core\Build\Debug", "Oak-D camera support.")
-
-            addPics()
-
-            Me.Location = New Point(settings.MainFormLeft, settings.MainFormTop)
-            Me.Size = New Size(settings.MainFormWidth, settings.MainFormHeight)
-            Me.Show()
-
-            getLineCounts()
-
-            LoadAvailableAlgorithms()
-
-            setupAlgorithmHistory()
-
-            StartStopTask()
-        End Sub
-
         Private Sub TestAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
             TestAllTimer.Enabled = Not TestAllTimer.Enabled
             Static testAllToolbarBitmap As Bitmap = New Bitmap(homeDir + "MainUI/Data/testall.png")

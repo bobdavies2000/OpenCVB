@@ -37,6 +37,16 @@ Namespace MainApp
             ' Check if camera is still valid (might be Nothing during shutdown)
             If camera Is Nothing OrElse Not camera.isCapturing Then Exit Sub
             If task Is Nothing Then Exit Sub
+
+            ' The testall timer will occasionally not get called after running test all overnight.
+            ' The cause is usually too many GDI or User Objects created and
+            ' none are available for the timer.  Another cause may be too many threads and
+            ' there are a lot of threads from OpenCVSharp (harmless, I am told.)  
+            ' But this doevents is intended to allow any shortfall to be addressed.
+            If task.testAllRunning Then
+                If task.heartBeat Then Application.DoEvents()
+            End If
+
             If task.readyForCameraInput = False Then Exit Sub
             Static lastPaintTime As DateTime = Now
 

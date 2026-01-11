@@ -90,7 +90,6 @@ public:
 
 		disparityFactor = 255 / pipeStereo->initialConfig->getMaxDisparity();
 	}
-
 	void waitForFrame()
 	{
 		auto inDisparity = qDisparity->get<dai::ImgFrame>();
@@ -210,6 +209,12 @@ extern "C" __declspec(dllexport) int* OakDLeftImage(OakDCamera* cPtr) { return (
 extern "C" __declspec(dllexport) int* OakDRightImage(OakDCamera* cPtr) { return (int*)cPtr->rightView.data; }
 extern "C" __declspec(dllexport) int* OakDDisparity(OakDCamera* cPtr) { return (int*)cPtr->disparity.data; }
 extern "C" __declspec(dllexport) float OakDDisparityFactor(OakDCamera* cPtr) { return cPtr->disparityFactor; }
+extern "C" __declspec(dllexport) void OakDStop(OakDCamera* cPtr) {
+	if (cPtr != nullptr) {
+		cPtr->device.reset();
+		delete cPtr;
+	}
+}
 extern "C" __declspec(dllexport) bool OakGetDevice() {
 	auto devices = dai::Device::getAllAvailableDevices();
 	if (devices.empty()) return false;

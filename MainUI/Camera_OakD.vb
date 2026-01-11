@@ -211,6 +211,7 @@ Namespace MainApp
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
         Public Overrides Sub StopCamera()
+            OakDStop(cPtr)
         End Sub
     End Class
 End Namespace

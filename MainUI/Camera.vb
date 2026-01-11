@@ -118,6 +118,7 @@ Public Class GenericCamera
         cameraFrameCount = -1
         If captureThread IsNot Nothing Then
             captureThread.Join(300)
+            StopCamera()
             captureThread = Nothing
         End If
     End Sub
