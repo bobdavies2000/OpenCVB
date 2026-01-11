@@ -7,13 +7,15 @@
         <Snippet>
             <Code Language="VB">
                 <![CDATA[
-Public Class OEX_name : Inherits TaskParent
-    Public Sub New()
-        desc = "OpenCV Example name"
-    End Sub
-    Public Overrides Sub RunAlg(src as cv.Mat)
-    End Sub
-End Class
+Namespace VBClasses
+    Public Class OEX_name : Inherits TaskParent
+        Public Sub New()
+            desc = "OpenCV Example name"
+        End Sub
+        Public Overrides Sub RunAlg(src as cv.Mat)
+        End Sub
+    End Class
+End Namespace
 ]]>
             </Code>
         </Snippet>

@@ -7,14 +7,16 @@
         <Snippet>
             <Code Language="VB">
                 <![CDATA[
-Public Class newClass_Basics : Inherits TaskParent
-    Public Sub New()
-        desc = "description"
-    End Sub
-    Public Overrides Sub RunAlg(src as cv.Mat)
-	    dst2 = src.cvtColor(cv.ColorConversionCodes.BGR2GRAY)
-    End Sub
-End Class
+Namespace VBClasses
+    Public Class newClass_Basics : Inherits TaskParent
+        Public Sub New()
+            desc = "description"
+        End Sub
+        Public Overrides Sub RunAlg(src as cv.Mat)
+	        dst2 = src.cvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        End Sub
+    End Class
+End Namespace
 ]]>
             </Code>
         </Snippet>

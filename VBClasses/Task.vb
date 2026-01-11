@@ -190,8 +190,8 @@ Namespace VBClasses
 
 
             Dim displayObject = task.MainUI_Algorithm
-
             Dim nextTrueData As List(Of TrueText) = displayObject.trueData
+
             trueData = New List(Of TrueText)(nextTrueData)
 
             firstPass = False
@@ -239,10 +239,8 @@ Namespace VBClasses
                 displayObject.trueData.Add(New TrueText("This task is not active at this time.",
                                                New cv.Point(workRes.Width / 3, workRes.Height / 2), 2))
             End If
-
             trueData.Clear()
-            trueData.Add(New TrueText(task.depthAndDepthRange,
-                                      New cv.Point(task.mouseMovePoint.X, task.mouseMovePoint.Y - 24), 1))
+            trueData.Add(New TrueText(task.depthAndDepthRange, New cv.Point(task.mouseMovePoint.X, task.mouseMovePoint.Y - 24), 1))
             For Each tt In displayObject.trueData
                 trueData.Add(tt)
             Next

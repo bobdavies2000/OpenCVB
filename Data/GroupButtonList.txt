@@ -155,6 +155,7 @@ Mouse
 MSER
 MultiDimensionScaling
 Neighbor
+NotLine
 OEX
 OilPaint
 OpAuto

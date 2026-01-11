@@ -40,26 +40,28 @@
 '//		return (int *) cPtr->dst.data; 
 '//}
 
-Public Class Anyname_CPP : Inherits TaskParent
-    Public Sub New()
-        cPtr = Anyname_Open()
-        desc = "description"
-	  End Sub
-    Public Overrides Sub RunAlg(src as cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+Namespace VBClasses
+    Public Class Anyname_CPP : Inherits TaskParent
+        Public Sub New()
+            cPtr = Anyname_Open()
+            desc = "description"
+	      End Sub
+        Public Overrides Sub RunAlg(src as cv.Mat)
+            If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Dim cppData(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
-        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = Anyname_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
-        handleSrc.Free()
+            Dim cppData(src.Total * src.ElemSize - 1) As Byte
+            Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+            Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+            Dim imagePtr = Anyname_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+            handleSrc.Free()
 
-        dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, If(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).clone
-    End Sub
-    Public Sub Close() 
-        Anyname_Close(cPtr)
-    End Sub
-End Class
+            dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, If(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).clone
+        End Sub
+        Public Sub Close() 
+            Anyname_Close(cPtr)
+        End Sub
+    End Class
+End Namespace
 
 ' place this code in TaskExterns.vb
 Module Anyname_CPP_Module

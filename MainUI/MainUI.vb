@@ -10,6 +10,7 @@ Namespace MainApp
         Dim isPlaying As Boolean
         Dim homeDir As String = ""
         Public settingsIO As jsonIO
+        Public testAllRunning As Boolean
         Dim algHistory As New List(Of String)
         Dim recentMenu() As ToolStripMenuItem
         Dim labels As List(Of Label)
@@ -309,6 +310,7 @@ Namespace MainApp
                 TestAllTimer.Enabled = False
                 task.testAllRunning = False
             End If
+            testAllRunning = task.testAllRunning ' share with the callback...
         End Sub
         Private Sub Pic_Paint(sender As Object, e As PaintEventArgs)
             If task Is Nothing Then Exit Sub
@@ -327,12 +329,19 @@ Namespace MainApp
             Dim ratioY = pic.Height / settings.workRes.Height
 
             Dim brush As New SolidBrush(Color.White)
-            For Each tt In task.trueData
-                If tt.text Is Nothing Then Continue For
-                If tt.text.Length > 0 And tt.picTag = pic.Tag Then
-                    g.DrawString(tt.text, windowsFont, brush, CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
-                End If
-            Next
+            If testAllRunning Then
+                Dim pt = New cv.Point(10, 5)
+                g.DrawString("Text markups are removed during 'Test All' runs", windowsFont, brush,
+                              CSng(pt.X * ratioX), CSng(pt.Y * ratioY))
+            Else
+                For Each tt In task.trueData
+                    If tt.text Is Nothing Then Continue For
+                    If tt.text.Length > 0 And tt.picTag = pic.Tag Then
+                        g.DrawString(tt.text, windowsFont, brush, CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
+                    End If
+                Next
+            End If
+            brush.Dispose()
 
             Dim timeEnd As DateTime = Now
             Dim elapsedTime = timeEnd.Ticks - timeStart.Ticks
@@ -431,8 +440,6 @@ Namespace MainApp
             optionsForm.Dispose()
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-            ' If task Is Nothing Then Exit Sub
-
             vbc.task.MainUI_Algorithm.Dispose()
 
             Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + " FPS Algorithm/" + settings.cameraName + " " +
@@ -456,7 +463,7 @@ Namespace MainApp
             Dim index = AvailableAlgorithms.SelectedIndex + 1
             If AvailableAlgorithms.Items.Count <= index Then index = 0
             If AvailableAlgorithms.Items(index) = " " Then index += 1
-            While AvailableAlgorithms.Items(index).StartsWith("GL_")
+            While AvailableAlgorithms.Items(index).StartsWith("GL_") Or AvailableAlgorithms.Items(index).StartsWith("ImShow_")
                 index += 1
             End While
             Debug.WriteLine(vbCrLf + "Usage GDI/USER: " & CStr(GdiMonitor.GetGdiCount()) + "/" & CStr(GdiMonitor.GetUserCount()))

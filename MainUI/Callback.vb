@@ -38,15 +38,6 @@ Namespace MainApp
             If camera Is Nothing OrElse Not camera.isCapturing Then Exit Sub
             If task Is Nothing Then Exit Sub
 
-            ' The testall timer will occasionally not get called after running test all overnight.
-            ' The cause is usually too many GDI or User Objects created and
-            ' none are available for the timer.  Another cause may be too many threads and
-            ' there are a lot of threads from OpenCVSharp (harmless, I am told.)  
-            ' But this doevents is intended to allow any shortfall to be addressed.
-            If task.testAllRunning Then
-                If task.heartBeat Then Application.DoEvents()
-            End If
-
             If task.readyForCameraInput = False Then Exit Sub
             Static lastPaintTime As DateTime = Now
 
@@ -56,6 +47,15 @@ Namespace MainApp
             Me.BeginInvoke(Sub()
                                Try
                                    If task Is Nothing Then Exit Sub
+                                   task.testAllRunning = testAllRunning
+
+                                   ' The testall timer will occasionally not get called after running test all overnight.
+                                   ' The cause can be too many GDI or User Objects created and
+                                   ' none are available for the timer.  Another cause may be too many threads and
+                                   ' there are a lot of threads from OpenCVSharp (harmless, I am told.)  
+                                   ' But this doevents is intended to allow any shortfall to be addressed.
+                                   If testAllRunning Then If camera.cameraFrameCount Mod 10 = 0 Then Application.DoEvents()
+
                                    If task.cpu.algorithm_ms.Count = 0 Then task.cpu.startRun(settings.algorithm)
 
                                    task.cpu.algorithmTimes(1) = Now
@@ -108,6 +108,7 @@ Namespace MainApp
                                        Next
                                    End If
                                    camera.frameProcessed = True
+
                                Catch ex As Exception
                                    Debug.WriteLine($"Exception in FrameReady callback: {ex.Message}")
                                    Debug.WriteLine($"Stack trace: {ex.StackTrace}")
