@@ -6,7 +6,6 @@ Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
         Public Sub Initialize(settings As jsonShared.Settings)
             task.Settings = settings
-            rgbLeftAligned = True
             If settings.cameraName.Contains("RealSense") Then rgbLeftAligned = False
 
             rows = settings.workRes.Height
@@ -46,7 +45,8 @@ Namespace VBClasses
             pcMotion = New Motion_PointCloud
             grid = New Grid_Basics
             lines = New Line_Basics
-            rgbFilter = New Filter_Basics
+            ' rgbFilter = New Filter_Basics
+            brightness = New Brightness_Basics
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1
@@ -106,7 +106,16 @@ Namespace VBClasses
 
             If optionsChanged Then motionMask.SetTo(255)
 
-            rgbFilter.Run(color)
+            brightness.Run(leftView)
+            leftView = brightness.dst2.Clone
+
+            color = brightness.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            gray = leftView.Clone
+
+            brightness.Run(rightView)
+            rightView = brightness.dst2.Clone
+
+            ' rgbFilter.Run(color)
             If gOptions.UseMotionMask.Checked Then
                 motionBasics.Run(gray)
                 If optionsChanged Or task.frameCount < 5 Then

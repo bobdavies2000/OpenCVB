@@ -380,6 +380,7 @@ Namespace MainApp
             task.MainUI_Algorithm = createAlgorithm(settings.algorithm)
             AlgDescription.Text = task.MainUI_Algorithm.desc
             task.resolutionDetails = resolutionDetails
+            task.rgbLeftAligned = camera.rgbLeftAligned
 
             If task.calibData IsNot Nothing Then task.calibData = camera.calibData
 

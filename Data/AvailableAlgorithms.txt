@@ -1014,6 +1014,7 @@ Line3D_Selection
 LinearRegression_Basics
 LinearRegression_Random
 LinearRegression_Test
+LineDepth_Basics
 LineEnds_Basics
 LineEnds_Concat
 LineEnds_Correlation
@@ -1139,7 +1140,6 @@ Neighbor_Basics
 Neighbor_ColorOnly
 Neighbor_Intersects
 Neighbor_Precise
-NotLine_Basics
 OEX_BasicLinearTransforms
 OEX_BasicLinearTransformsTrackBar
 OEX_bgfg_segm
@@ -1536,7 +1536,6 @@ Track_LongestLine
 Transform_Affine3D
 Transform_Resize
 Transform_Rotate
-TransformationMatrix_Basics
 Triangle_Basics
 Triangle_Basics2D
 Triangle_Cell

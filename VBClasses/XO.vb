@@ -10408,9 +10408,6 @@ Namespace VBClasses
 
 
 
-
-
-
     Public Class XO_RedCell_Binarize : Inherits TaskParent
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -10426,11 +10423,10 @@ Namespace VBClasses
                 dst2 = runRedList(src, labels(2))
 
                 Dim grayMeans As New List(Of Single)
-                Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 If task.redList.oldrclist.Count = 0 Then Exit Sub ' next frame please...
                 For Each rc In task.redList.oldrclist
                     Dim grayMean As cv.Scalar, grayStdev As cv.Scalar
-                    cv.Cv2.MeanStdDev(gray(rc.rect), grayMean, grayStdev, rc.mask)
+                    cv.Cv2.MeanStdDev(task.gray(rc.rect), grayMean, grayStdev, rc.mask)
                     grayMeans.Add(grayMean(0))
                 Next
                 Dim min = grayMeans.Min

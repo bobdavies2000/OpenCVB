@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Filter_Basics : Inherits TaskParent
-        Public filterList As String() = {"Original", "PhotoShop_HSV", "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance"
-                                         }
+        Public filterList As String() = {"Original", "PhotoShop_HSV", "PhotoShop_SharpenDetail", "PhotoShop_WhiteBalance"}
         Dim filters(filterList.Count - 1) As Object
         Public grayFilter As New Filter_BasicsGray
         Public Sub New()

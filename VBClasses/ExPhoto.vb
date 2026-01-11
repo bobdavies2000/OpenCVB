@@ -30,8 +30,8 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim test = New cv.Mat(src.Size(), cv.MatType.CV_8U)
-            Dim gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            cv.Cv2.EqualizeHist(gray, gray)
+            Dim gray As New cv.Mat
+            cv.Cv2.EqualizeHist(task.gray, gray)
             CvXPhoto.Bm3dDenoising(gray, dst2)
             cv.Cv2.Subtract(dst2, gray, dst3)
             Dim mm As mmData = GetMinMax(dst3)

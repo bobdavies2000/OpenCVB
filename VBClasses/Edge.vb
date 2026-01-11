@@ -246,10 +246,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim frequencies As New cv.Mat
             Dim src32f As New cv.Mat
-            gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
+            task.gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
             cv.Cv2.Dct(src32f, frequencies, cv.DctFlags.None)
 
             Dim roi As New cv.Rect(0, 0, options.removeFrequencies, src32f.Height)
@@ -711,7 +710,7 @@ Namespace VBClasses
             options1.Run()
 
             Dim gray = src
-            If src.Channels() = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels() = 3 Then gray = task.gray
             Dim newFrame = gray(New cv.Range(options.vertPixels, gray.Rows - options.vertPixels),
                             New cv.Range(options.horizPixels, gray.Cols - options.horizPixels))
             newFrame = newFrame.Resize(gray.Size(), 0, 0, cv.InterpolationFlags.Nearest)

@@ -30,11 +30,12 @@ End Structure
 Public Class GenericCamera
     Public cameraMutex = New Mutex(True, "CameraMutex")
     Public color As cv.Mat, leftView As cv.Mat, pointCloud As cv.Mat, rightView As cv.Mat
-    Public transformationMatrix() As Single
+
     Public IMU_TimeStamp As Double
     Public IMU_Acceleration As cv.Point3f
     Public IMU_AngularAcceleration As cv.Point3f
     Public IMU_AngularVelocity As cv.Point3f
+
     Public IMU_FrameTime As Double
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
@@ -44,16 +45,15 @@ Public Class GenericCamera
     Public captureRes As cv.Size
     Public workRes As cv.Size
 
-    Public deviceCount As Integer
     Public calibData As cameraInfo
 
-    Public cameraName As String = ""
     Public cPtr As IntPtr
     Public ratio As Single
     Public Event FrameReady(sender As GenericCamera)
     Public isCapturing As Boolean
     Public frameProcessed As Boolean = True
     Public captureThread As Thread = Nothing
+    Public rgbLeftAligned As Boolean = True
     Public Structure imuDataStruct
         Dim r00 As Single
         Dim r01 As Single

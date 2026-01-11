@@ -58,8 +58,7 @@ Namespace VBClasses
             desc = "Use connected components to isolate objects in image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim gray = shapes.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu + cv.ThresholdTypes.Binary)
+            Dim binary = task.gray.Threshold(0, 255, cv.ThresholdTypes.Otsu + cv.ThresholdTypes.Binary)
             Dim labelview = shapes.EmptyClone()
             Dim rectView = binary.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
@@ -78,7 +77,7 @@ Namespace VBClasses
             mats.mat(0) = rectView
             mats.mat(1) = labelview
             mats.mat(2) = binary
-            mats.mat(3) = gray
+            mats.mat(3) = task.gray
             mats.Run(emptyMat)
             dst2 = mats.dst2
             dst3 = mats.dst3

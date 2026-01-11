@@ -85,12 +85,13 @@ Namespace VBClasses
         Public grid As Grid_Basics
         Public palette As Palette_LoadColorMap
         Public PixelViewer As Pixel_Viewer
-        Public rgbFilter As Filter_Basics
+        ' Public rgbFilter As Filter_Basics
         Public gravityBasics As Gravity_Basics
         Public imuBasics As IMU_Basics
         Public motionBasics As Motion_Basics
         Public contours As Contour_Basics_List
         Public pcMotion As Motion_PointCloud
+        Public brightness As Brightness_Basics
 
         Public GLRequest As Integer
         Public GLcloud As cv.Mat
@@ -165,8 +166,6 @@ Namespace VBClasses
         Public gifImages As New List(Of Bitmap)
         Public gifBuild As Boolean
         Public gifCaptureIndex As Integer
-
-        Public transformationMatrix() As Single
 
         Public frameCount As Integer = 1
         Public heartBeat As Boolean

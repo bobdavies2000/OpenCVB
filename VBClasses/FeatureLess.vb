@@ -7,7 +7,7 @@ Namespace VBClasses
             desc = "Use Contour_Basics to get the contour data for the top contours by size."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.grayStable)
+            If src.Channels = 1 Then edgeline.Run(src) Else edgeline.Run(task.grayStable)
             If src.Type <> cv.MatType.CV_8U Then
                 task.contours.Run(edgeline.dst2)
                 dst2 = task.contours.dst2
@@ -232,16 +232,16 @@ Namespace VBClasses
             desc = "Find the featureless regions of the left and right images"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then
-                dst0 = task.leftView
-                dst1 = task.rightView
+            If task.toggleOn Then
+                fLess.Run(task.leftView)
+                dst2 = fLess.dst2.Clone
+
+                fLess.Run(task.rightView)
+                dst3 = fLess.dst2.Clone
+            Else
+                dst2 = task.leftView
+                dst3 = task.rightView
             End If
-
-            fLess.Run(task.leftView)
-            dst2 = fLess.dst2.Clone
-
-            fLess.Run(task.rightView)
-            dst3 = fLess.dst2.Clone
         End Sub
     End Class
 

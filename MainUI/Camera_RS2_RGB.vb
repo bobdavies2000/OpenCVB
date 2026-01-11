@@ -1,10 +1,10 @@
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 Imports System.Threading
 Imports Intel.RealSense
 Imports cv = OpenCvSharp
 
 Namespace MainApp
-    Public Class Camera_RS2 : Inherits GenericCamera
+    Public Class Camera_RS2_RGB : Inherits GenericCamera
         Dim pipe As New Pipeline()
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
             captureRes = _captureRes
@@ -19,6 +19,7 @@ Namespace MainApp
             Dim cfg As New Config()
             cfg.EnableDevice(serialNumber)
 
+            cfg.EnableStream(Stream.Color, captureRes.Width, captureRes.Height, Format.Bgr8, fps)
             cfg.EnableStream(Stream.Infrared, 1, captureRes.Width, captureRes.Height, Format.Y8, fps)
             cfg.EnableStream(Stream.Infrared, 2, captureRes.Width, captureRes.Height, Format.Y8, fps)
             cfg.EnableStream(Stream.Depth, captureRes.Width, captureRes.Height, Format.Z16, fps)
@@ -28,14 +29,22 @@ Namespace MainApp
             Dim profiles = pipe.Start(cfg)
             Dim streamLeft = profiles.GetStream(Stream.Infrared, 1)
             Dim streamRight = profiles.GetStream(Stream.Infrared, 2)
-            Dim leftIntrin As Intrinsics = streamLeft.As(Of VideoStreamProfile)().GetIntrinsics()
-            Dim leftExtrinsics As Extrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamRight)
+            Dim StreamColor = profiles.GetStream(Stream.Color)
+            Dim rgb As Intrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
+            Dim rgbExtrinsics As Extrinsics = StreamColor.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamLeft)
 
             Dim ratio = captureRes.Width \ workRes.Width
-            calibData.leftIntrinsics.ppx = leftIntrin.ppx / ratio
-            calibData.leftIntrinsics.ppy = leftIntrin.ppy / ratio
-            calibData.leftIntrinsics.fx = leftIntrin.fx / ratio
-            calibData.leftIntrinsics.fy = leftIntrin.fy / ratio
+            calibData.rgbIntrinsics.ppx = rgb.ppx / ratio
+            calibData.rgbIntrinsics.ppy = rgb.ppy / ratio
+            calibData.rgbIntrinsics.fx = rgb.fx / ratio
+            calibData.rgbIntrinsics.fy = rgb.fy / ratio
+
+            Dim leftIntrinsics As Intrinsics = streamLeft.As(Of VideoStreamProfile)().GetIntrinsics()
+            Dim leftExtrinsics As Extrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamRight)
+            calibData.leftIntrinsics.ppx = rgb.ppx / ratio
+            calibData.leftIntrinsics.ppy = rgb.ppy / ratio
+            calibData.leftIntrinsics.fx = rgb.fx / ratio
+            calibData.leftIntrinsics.fy = rgb.fy / ratio
 
             ReDim calibData.LtoR_translation(3 - 1)
             ReDim calibData.LtoR_rotation(9 - 1)
@@ -50,10 +59,18 @@ Namespace MainApp
                 calibData.LtoR_rotation(i) = leftExtrinsics.rotation(i)
             Next
 
-            calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.LtoR_translation(0), 2) +
-                                                  System.Math.Pow(calibData.LtoR_translation(1), 2) +
-                                                  System.Math.Pow(calibData.LtoR_translation(2), 2))
+            For i = 0 To 3 - 1
+                calibData.ColorToLeft_translation(i) = rgbExtrinsics.translation(i)
+            Next
+            For i = 0 To 9 - 1
+                calibData.ColorToLeft_rotation(i) = rgbExtrinsics.rotation(i)
+            Next
 
+            calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.ColorToLeft_translation(0), 2) +
+                                              System.Math.Pow(calibData.ColorToLeft_translation(1), 2) +
+                                              System.Math.Pow(calibData.ColorToLeft_translation(2), 2))
+
+            rgbLeftAligned = False
             MyBase.prepImages()
 
             ' Start background thread to capture frames
@@ -71,10 +88,10 @@ Namespace MainApp
             ' Check if pipe is still valid (might be cleared during stop)
             If pipe Is Nothing Then Return
 
+            Static alignToColor As Align = New Align(Stream.Color)
             Static ptcloud As PointCloud = New PointCloud()
             Dim cols = captureRes.Width, rows = captureRes.Height
 
-            Dim depth16u As cv.Mat = Nothing
             Using frames As FrameSet = pipe.WaitForFrames(5000)
                 SyncLock cameraMutex
                     For Each frame As Intel.RealSense.Frame In frames
@@ -83,9 +100,6 @@ Namespace MainApp
                         End If
                         If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 2 Then
                             rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                        End If
-                        If frame.Profile.Stream = Stream.Depth Then
-                            depth16u = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, frame.Data).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                         End If
                         If frame.Profile.Stream = Stream.Accel Then
                             IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
@@ -98,11 +112,12 @@ Namespace MainApp
                         End If
                     Next
 
-                    color = leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    Dim alignedFrames As FrameSet = alignToColor.Process(frames).As(Of FrameSet)()
 
-                    If depth16u IsNot Nothing Then
-                        pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
-                    End If
+                    color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, alignedFrames.ColorFrame.Data).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+
+                    Dim pcFrame = ptcloud.Process(alignedFrames.DepthFrame)
+                    pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcFrame.Data).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End SyncLock
 
                 MyBase.GetNextFrameCounts(IMU_FrameTime)

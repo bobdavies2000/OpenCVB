@@ -452,8 +452,6 @@ Namespace VBClasses
             desc = "This runs and is helpful to understanding how to use rtree.  Learn Z from X, Y, and grayscale of the RedCloud cells."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) ' input to ML
-
             regions.Run(src)
 
             Dim ptList As New List(Of cv.Point3f)
@@ -462,7 +460,7 @@ Namespace VBClasses
             For y = 0 To regions.rcMapX.Height - 1
                 For x = 0 To regions.rcMapX.Width - 1
                     Dim zVal = task.pcSplit(2).Get(Of Single)(y, x)
-                    Dim val = CSng(gray.Get(Of Byte)(y, x))
+                    Dim val = CSng(task.gray.Get(Of Byte)(y, x))
                     If zVal = 0 Then
                         ptList.Add(New cv.Point3f(CSng(x), CSng(y), val))
                     Else

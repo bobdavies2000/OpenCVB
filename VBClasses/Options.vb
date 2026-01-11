@@ -6818,21 +6818,6 @@ Namespace VBClasses
 
 
 
-    Public Class Options_TransformationMatrix : Inherits OptionParent
-        Public mul As Integer = 500
-        Public Sub New()
-            If sliders.Setup(traceName) Then sliders.setupTrackBar("TMatrix Top View multiplier", 1, 1000, mul)
-        End Sub
-        Public Sub Run()
-            Static multSlider = OptionParent.FindSlider("TMatrix Top View multiplier")
-            mul = multSlider.value
-        End Sub
-    End Class
-
-
-
-
-
     Public Class Options_Vignetting : Inherits OptionParent
         Public radius As Double = 80
         Public Sub New()

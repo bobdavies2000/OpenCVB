@@ -134,6 +134,7 @@ LeftRight
 Line
 Line3D
 LinearRegression
+LineDepth
 LineEnds
 LineMatch
 LineRect
@@ -155,7 +156,6 @@ Mouse
 MSER
 MultiDimensionScaling
 Neighbor
-NotLine
 OEX
 OilPaint
 OpAuto
@@ -226,7 +226,6 @@ Thickness
 Threshold
 Track
 Transform
-TransformationMatrix
 Triangle
 Vector
 Video

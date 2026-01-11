@@ -12,6 +12,7 @@ Namespace MainApp
                     camera = New Camera_ZED2(settings.workRes, settings.captureRes, settings.cameraName)
                 Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
                     camera = New Camera_RS2(settings.workRes, settings.captureRes, settings.cameraName)
+                    ' camera = New Camera_RS2_RGB(settings.workRes, settings.captureRes, settings.cameraName)
                 Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
                     camera = New Camera_ORB(settings.workRes, settings.captureRes, settings.cameraName)
                 Case "Oak-D camera"

@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class NotLine_Basics : Inherits TaskParent
-        Dim edges As New edge_Basics
+    Public Class LineDepth_Basics : Inherits TaskParent
+        Dim edges As New Edge_Basics
         Public Sub New()
             desc = "Find all the edges that are not lines"
         End Sub
@@ -9,9 +9,6 @@ Namespace VBClasses
             edges.Run(src)
             dst2 = edges.dst2
             dst3 = task.lines.dst2
-            For Each lp In task.lines.lpList
-                dst2.Line(lp.p1, lp.p2, black, task.lineWidth, task.lineType)
-            Next
         End Sub
     End Class
 End Namespace

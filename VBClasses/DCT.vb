@@ -72,10 +72,9 @@ Namespace VBClasses
             desc = "Find featureless surfaces in the depth data - expected to be useful only on the K4A for Azure camera."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2Gray)
             Dim frequencies As New cv.Mat
             Dim src32f As New cv.Mat
-            gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
+            task.gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
             cv.Cv2.Dct(src32f, frequencies, dct.options.dctFlag)
 
             Dim roi As New cv.Rect(0, 0, dct.options.removeFrequency, src32f.Height)
@@ -85,7 +84,7 @@ Namespace VBClasses
             cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
             src32f.ConvertTo(dst2, cv.MatType.CV_8UC1, 255)
 
-            cv.Cv2.Subtract(gray, dst2, dst3)
+            cv.Cv2.Subtract(task.gray, dst2, dst3)
         End Sub
     End Class
 

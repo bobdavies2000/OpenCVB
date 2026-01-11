@@ -94,8 +94,7 @@ Namespace VBClasses
             input.Run(src)
             dst2 = input.dst2
             If task.frameCount Mod input.updateFrequency = 0 Then
-                Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
+                Dim binary = task.gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
                 Dim labelView = dst2.EmptyClone
                 Dim stats As New cv.Mat
                 Dim centroids As New cv.Mat

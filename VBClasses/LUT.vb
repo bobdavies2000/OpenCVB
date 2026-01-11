@@ -52,7 +52,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim gray = If(src.Channels() = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            Dim gray = If(src.Channels() = 1, src, task.gray)
             Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
             Dim splitIndex As Integer
             For i = 0 To 255
