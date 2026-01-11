@@ -9,6 +9,10 @@ Module Startup
         Application.SetCompatibleTextRenderingDefault(False)
         Dim showSplash As Boolean = GetSetting("OpenCVB", "ShowSplash", "ShowSplash", True)
         Dim splash As New MainApp.Splash()
+
+        Dim Splashmessage = GetSetting("OpenCVB", "SplashMessage", "SplashMessage", "Loading...")
+        splash.loadingLabel.Text = Splashmessage
+
         If showSplash Then splash.Show()
         Application.DoEvents()
 
@@ -19,7 +23,6 @@ Module Startup
         splash.Dispose()
         splash = Nothing
 
-        ' Run application with main form
         Application.Run(mainForm)
     End Sub
 End Module

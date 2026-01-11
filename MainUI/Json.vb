@@ -179,6 +179,9 @@ Namespace MainApp
             Catch ex As Exception
                 ' Log error if needed, but don't throw
             End Try
+
+            SaveSetting("OpenCVB", "SplashMessage", "SplashMessage", "Camera: " + settings.cameraName + vbCrLf +
+                        "Algorithm: " + settings.algorithm)
         End Sub
     End Class
 End Namespace
