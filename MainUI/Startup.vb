@@ -7,10 +7,9 @@ Module Startup
     Sub Main()
         Application.EnableVisualStyles()
         Application.SetCompatibleTextRenderingDefault(False)
-
-        ' Show splash screen
+        Dim showSplash As Boolean = GetSetting("OpenCVB", "ShowSplash", "ShowSplash", True)
         Dim splash As New MainApp.Splash()
-        'splash.Show()
+        If showSplash Then splash.Show()
         Application.DoEvents()
 
         Dim mainForm As New MainApp.MainUI()

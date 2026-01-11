@@ -35,6 +35,8 @@ Namespace jsonShared
         Public sharpGLWidth As Integer = 300
         Public sharpGLHeight As Integer = 500
 
+        Public ShowSplashScreen As Boolean
+
         Public ShowAllOptions As Boolean
         Public testAllDuration As Integer = 5
 

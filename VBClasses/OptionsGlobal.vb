@@ -86,6 +86,8 @@ Public Class OptionsGlobal
 
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
 
+        ShowSplash.Checked = CBool(GetSetting("OpenCVB", "ShowSplash", "ShowSplash", True))
+
         Me.Left = 0
         Me.Top = 30
         maxCount.Text = CStr(MaxDepthBar.Value)
@@ -247,5 +249,8 @@ Public Class OptionsGlobal
     End Sub
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs)
         task.optionsChanged = True
+    End Sub
+    Private Sub ShowSplash_CheckedChanged(sender As Object, e As EventArgs) Handles ShowSplash.CheckedChanged
+        SaveSetting("OpenCVB", "ShowSplash", "ShowSplash", ShowSplash.Checked)
     End Sub
 End Class
