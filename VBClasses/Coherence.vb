@@ -33,13 +33,14 @@ Namespace VBClasses
             Dim eigen As New cv.Mat
             Dim split() As cv.Mat
             For i = 0 To 3
-                eigen = task.gray.CornerEigenValsAndVecs(options.str_sigma, options.eigenkernelsize)
+                Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                eigen = gray.CornerEigenValsAndVecs(options.str_sigma, options.eigenkernelsize)
                 split = eigen.Split()
                 Dim x = split(2), y = split(3)
 
-                Dim gxx = task.gray.Sobel(cv.MatType.CV_32F, 2, 0, options.sigma)
-                Dim gxy = task.gray.Sobel(cv.MatType.CV_32F, 1, 1, options.sigma)
-                Dim gyy = task.gray.Sobel(cv.MatType.CV_32F, 0, 2, options.sigma)
+                Dim gxx = gray.Sobel(cv.MatType.CV_32F, 2, 0, options.sigma)
+                Dim gxy = gray.Sobel(cv.MatType.CV_32F, 1, 1, options.sigma)
+                Dim gyy = gray.Sobel(cv.MatType.CV_32F, 0, 2, options.sigma)
 
                 Dim tmpX As New cv.Mat, tmpXY As New cv.Mat, tmpY As New cv.Mat
                 cv.Cv2.Multiply(x, x, tmpX)

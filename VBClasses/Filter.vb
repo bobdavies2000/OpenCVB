@@ -8,6 +8,7 @@ Namespace VBClasses
             desc = "Filter the input for algorithm or set the defaults."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            Exit Sub ' I have removed the checkbox from featureOptions
             Dim filterIndex As Integer
             For Each cb In task.featureOptions.colorCheckbox
                 If cb.Checked Then
@@ -54,6 +55,7 @@ Namespace VBClasses
             desc = "Demo the RGB Filters selected in 'FeatureOptions'.  If none selected, just the input is displayed."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            Exit Sub ' I have removed the checkbox from featureOptions
             dst2 = src
             For Each cb In task.featureOptions.grayCheckbox
                 If cb.Checked Then
