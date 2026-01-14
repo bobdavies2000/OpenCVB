@@ -20,6 +20,12 @@ Namespace MainApp
             Dim ctx As New Context
             Dim devList = ctx.QueryDeviceList()
             Dim dev = devList.GetDevice(0)
+            Dim firmwareVersion = dev.GetDeviceInfo().FirmwareVersion
+            Debug.WriteLine("ORB Firmware Version: " & firmwareVersion)
+            Debug.WriteLine("ORB Firmware Version: " & firmwareVersion)
+            Debug.WriteLine("ORB Firmware Version: " & firmwareVersion)
+            Debug.WriteLine("ORB Firmware Version: " & firmwareVersion)
+            Debug.WriteLine("ORB Firmware Version: " & firmwareVersion)
 
             Dim fps = 0
             Dim w = captureRes.Width, h = captureRes.Height
@@ -36,8 +42,8 @@ Namespace MainApp
             config.EnableStream(colorProfile)
             config.EnableStream(depthProfile)
             config.EnableStream(leftProfile)
-            config.EnableStream(rightProfile) ' USE_RIGHT_IMAGE
-            config.SetAlignMode(AlignMode.ALIGN_D2C_SW_MODE)
+            config.EnableStream(rightProfile)
+            config.SetAlignMode(AlignMode.ALIGN_DISABLE)
 
             gyroSensor = dev.GetSensorList.GetSensor(SensorType.OB_SENSOR_GYRO)
             accelSensor = dev.GetSensorList.GetSensor(SensorType.OB_SENSOR_ACCEL)

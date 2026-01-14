@@ -47,8 +47,8 @@ Namespace MainApp
                 updatePath("C:\Program Files (x86)\ZED SDK\bin", "StereoLabs support")
             End If
             updatePath(homeDir + "OrbbecSDK\lib\win_x64\", "Orbbec camera support.")
-            updatePath(homeDir + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
             updatePath(homeDir + "OrbbecSDK_CSharp\Build\Release\", "Orbbec camera support.")  ' 
+            updatePath(homeDir + "OrbbecSDK_CSharp\Build\Debug\", "Orbbec camera support.")
 
             updatePath(homeDir + "librealsense\build\Debug\", "Realsense camera support.")
             updatePath(homeDir + "librealsense\build\Release\", "Realsense camera support.")
