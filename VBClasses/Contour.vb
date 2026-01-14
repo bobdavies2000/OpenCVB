@@ -145,7 +145,7 @@ Namespace VBClasses
             If depth = 0 Then Return 0 ' no correlation if there is no depth...
             If task.rgbLeftAligned Then
                 rRect = lrect
-                rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / depth.Val0
+                rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth.Val0
                 If rRect.X < 0 Or rRect.X + rRect.Width >= task.color.Width Then
                     Return 0 ' no correlation if there is no depth...
                 End If

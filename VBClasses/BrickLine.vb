@@ -292,7 +292,7 @@ Namespace VBClasses
                 brick.depth = task.pcSplit(2)(brick.rect).Mean()(0)
                 If brick.depth > 0 Then
                     brick.rRect = brick.rect
-                    brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
+                    brick.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
                     If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then Continue For
 
                     If task.rgbLeftAligned = False Then

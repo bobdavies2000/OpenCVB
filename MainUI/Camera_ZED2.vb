@@ -7,20 +7,13 @@ Namespace MainApp
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
             captureRes = _captureRes
             workRes = _workRes
-            ratio = captureRes.Width \ workRes.Width
             zed = New CamZed(workRes, captureRes, deviceName)
 
-            calibData.rgbIntrinsics.fx = zed.rgbIntrinsics.fx / ratio
-            calibData.rgbIntrinsics.fy = zed.rgbIntrinsics.fy / ratio
-            calibData.rgbIntrinsics.ppx = zed.rgbIntrinsics.ppx / ratio
-            calibData.rgbIntrinsics.ppy = zed.rgbIntrinsics.ppy / ratio
-
-            calibData.leftIntrinsics = calibData.rgbIntrinsics
-
-            calibData.rightIntrinsics.fx = zed.rightIntrinsics.fx / ratio
-            calibData.rightIntrinsics.fy = zed.rightIntrinsics.fy / ratio
-            calibData.rightIntrinsics.ppx = zed.rightIntrinsics.ppx / ratio
-            calibData.rightIntrinsics.ppy = zed.rightIntrinsics.ppy / ratio
+            Dim ratio = captureRes.Width \ workRes.Width
+            calibData.leftIntrinsics.fx = zed.leftIntrinsics.fx / ratio
+            calibData.leftIntrinsics.fy = zed.leftIntrinsics.fy / ratio
+            calibData.leftIntrinsics.ppx = zed.leftIntrinsics.ppx / ratio
+            calibData.leftIntrinsics.ppy = zed.leftIntrinsics.ppy / ratio
 
             calibData.baseline = zed.baseline
 

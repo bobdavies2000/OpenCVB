@@ -417,7 +417,7 @@ Namespace VBClasses
             desc = "Build the left and right edge lines."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edges.Run(task.leftViewStable)
+            edges.Run(task.leftView)
             dst2 = edges.dst2.Clone
 
             edges.Run(task.rightView)

@@ -2033,7 +2033,7 @@ Namespace VBClasses
                     If task.rgbLeftAligned Then
                         brick.lRect = brick.rect
                         brick.rRect = brick.lRect
-                        brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
+                        brick.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
                         brick.rRect = ValidateRect(brick.rRect)
                         cv.Cv2.MatchTemplate(LRMeanSub.dst2(brick.lRect), LRMeanSub.dst3(brick.rRect), correlationMat,
                                                      cv.TemplateMatchModes.CCoeffNormed)

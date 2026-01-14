@@ -47,8 +47,6 @@ Public Class GenericCamera
 
     Public calibData As cameraInfo
 
-    Public cPtr As IntPtr
-    Public ratio As Single
     Public Event FrameReady(sender As GenericCamera)
     Public isCapturing As Boolean
     Public frameProcessed As Boolean = True
@@ -129,16 +127,16 @@ Public Class GenericCamera
         Dim cols = disparity.Cols
         Dim pc = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, New cv.Scalar(0, 0, 0))
 
-        Dim fx = intrinsics.fx * (captureRes.Width / workRes.Width)
-        Dim fy = intrinsics.fy * (captureRes.Height / workRes.Height)
-        Dim cx = intrinsics.ppx * (captureRes.Width / workRes.Width)
-        Dim cy = intrinsics.ppy * (captureRes.Height / workRes.Height)
+        Dim fx = intrinsics.fx
+        Dim fy = intrinsics.fy
+        Dim cx = intrinsics.ppx
+        Dim cy = intrinsics.ppy
 
         ' Use indexer for depth data
         Dim disparityIndexer = disparity.GetGenericIndexer(Of Byte)()
         Dim pcIndexer = pc.GetGenericIndexer(Of cv.Vec3f)()
 
-        Dim disp_constant As Single = calibData.baseline * fx * 30 ' picked XXX to match the real depth values.  Don't understand yet.
+        Dim disp_constant As Single = calibData.baseline * fx
         For y = 0 To rows - 1
             For x = 0 To cols - 1
                 Dim disp = CSng(disparityIndexer(y, x))

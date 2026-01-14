@@ -2,10 +2,10 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Cloud_Basics : Inherits TaskParent
-        Public Shared ppx = task.calibData.rgbIntrinsics.ppx
-        Public Shared ppy = task.calibData.rgbIntrinsics.ppy
-        Public Shared fx = task.calibData.rgbIntrinsics.fx
-        Public Shared fy = task.calibData.rgbIntrinsics.fy
+        Public Shared ppx = task.calibData.leftIntrinsics.ppx
+        Public Shared ppy = task.calibData.leftIntrinsics.ppy
+        Public Shared fx = task.calibData.leftIntrinsics.fx
+        Public Shared fy = task.calibData.leftIntrinsics.fy
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
             labels = {"", "", "Recomputed point cloud from the depth image data", "PointCloud from camera."}
@@ -712,8 +712,8 @@ Namespace VBClasses
             For i = 1 To templateY.Width - 1
                 templateY.Col(0).CopyTo(templateY.Col(i))
             Next
-            templateX -= cv.Scalar.All(task.calibData.rgbIntrinsics.ppx)
-            templateY -= cv.Scalar.All(task.calibData.rgbIntrinsics.ppy)
+            templateX -= cv.Scalar.All(task.calibData.leftIntrinsics.ppx)
+            templateY -= cv.Scalar.All(task.calibData.leftIntrinsics.ppy)
 
             desc = "Prepare for injecting depth into the point cloud."
         End Sub
@@ -727,8 +727,8 @@ Namespace VBClasses
                     src(contour.rect).SetTo(contour.depth, contour.mask)
                 Next
             End If
-            Dim fxTemplate = task.calibData.rgbIntrinsics.fx
-            Dim fyTemplate = task.calibData.rgbIntrinsics.fy
+            Dim fxTemplate = task.calibData.leftIntrinsics.fx
+            Dim fyTemplate = task.calibData.leftIntrinsics.fy
             Dim worldX As New cv.Mat, worldY As New cv.Mat
 
             cv.Cv2.Multiply(templateX, src, worldX)

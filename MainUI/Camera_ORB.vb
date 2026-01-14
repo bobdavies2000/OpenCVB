@@ -119,6 +119,8 @@ Namespace MainApp
                     Dim pcData = PtCloud.Process(dFrame)
                     If pcData IsNot Nothing Then
                         pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcData.GetDataPtr) / 1000
+                        'Dim minVal As Double, maxval As Double
+                        'depth16u.MinMaxIdx(minVal, maxval)
                         pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     End If
                 End If

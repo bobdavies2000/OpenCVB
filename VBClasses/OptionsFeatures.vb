@@ -34,31 +34,31 @@ Public Class OptionsFeatures
 
         MatchCorrSlider.Value = 95
 
-        'ReDim grayCheckbox(task.rgbFilter.grayFilter.filterList.Count - 1)
-        'For i = 0 To task.rgbFilter.grayFilter.filterList.Count - 1
-        '    Dim cb As New RadioButton
-        '    cb.Text = task.rgbFilter.grayFilter.filterList(i)
-        '    cb.Location = New Point(20, 20 + i * 20)
-        '    cb.AutoSize = True
-        '    cb.Tag = i
-        '    AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
-        '    GrayGroup.Controls.Add(cb)
-        '    grayCheckbox(i) = cb
-        'Next
-        'grayCheckbox(0).Checked = True
+        ReDim grayCheckbox(task.rgbFilter.grayFilter.filterList.Count - 1)
+        For i = 0 To task.rgbFilter.grayFilter.filterList.Count - 1
+            Dim cb As New RadioButton
+            cb.Text = task.rgbFilter.grayFilter.filterList(i)
+            cb.Location = New Point(20, 20 + i * 20)
+            cb.AutoSize = True
+            cb.Tag = i
+            AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
+            GrayGroup.Controls.Add(cb)
+            grayCheckbox(i) = cb
+        Next
+        grayCheckbox(0).Checked = True
 
-        'ReDim colorCheckbox(task.rgbFilter.filterList.Count - 1)
-        'For i = 0 To task.rgbFilter.filterList.Count - 1
-        '    Dim cb As New RadioButton
-        '    cb.Text = task.rgbFilter.filterList(i)
-        '    cb.Location = New Point(20, 20 + i * 20)
-        '    cb.AutoSize = True
-        '    cb.Tag = i
-        '    AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
-        '    ColorGroup.Controls.Add(cb)
-        '    colorCheckbox(i) = cb
-        'Next
-        'colorCheckbox(0).Checked = True
+        ReDim colorCheckbox(task.rgbFilter.filterList.Count - 1)
+        For i = 0 To task.rgbFilter.filterList.Count - 1
+            Dim cb As New RadioButton
+            cb.Text = task.rgbFilter.filterList(i)
+            cb.Location = New Point(20, 20 + i * 20)
+            cb.AutoSize = True
+            cb.Tag = i
+            AddHandler cb.CheckedChanged, AddressOf CheckBox_CheckedChanged
+            ColorGroup.Controls.Add(cb)
+            colorCheckbox(i) = cb
+        Next
+        colorCheckbox(0).Checked = True
 
         For i = 0 To colorMethods.Count - 1
             Dim method = colorMethods(i)

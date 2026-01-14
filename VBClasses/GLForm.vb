@@ -23,10 +23,10 @@ Public Class SharpGLForm
     Public options As Options_SharpGL
     Public options1 As Options_GL
     Public options2 As Options_SharpGL2
-    Public ppx = task.calibData.rgbIntrinsics.ppx
-    Public ppy = task.calibData.rgbIntrinsics.ppy
-    Public fx = task.calibData.rgbIntrinsics.fx
-    Public fy = task.calibData.rgbIntrinsics.fy
+    Public ppx = task.calibData.leftIntrinsics.ppx
+    Public ppy = task.calibData.leftIntrinsics.ppy
+    Public fx = task.calibData.leftIntrinsics.fx
+    Public fy = task.calibData.leftIntrinsics.fy
     Public hulls As RedCloud_Basics
     Private Sub GLForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         options = New Options_SharpGL

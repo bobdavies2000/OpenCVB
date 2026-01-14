@@ -19,6 +19,7 @@ Namespace MainApp
             Dim cfg As New Config()
             cfg.EnableDevice(serialNumber)
 
+            cfg.EnableStream(Stream.Color, captureRes.Width, captureRes.Height, Format.Bgr8, fps)
             cfg.EnableStream(Stream.Infrared, 1, captureRes.Width, captureRes.Height, Format.Y8, fps)
             cfg.EnableStream(Stream.Infrared, 2, captureRes.Width, captureRes.Height, Format.Y8, fps)
             cfg.EnableStream(Stream.Depth, captureRes.Width, captureRes.Height, Format.Z16, fps)
@@ -26,28 +27,22 @@ Namespace MainApp
             cfg.EnableStream(Stream.Gyro, Format.MotionXyz32f, 200)
 
             Dim profiles = pipe.Start(cfg)
+            Dim StreamColor = profiles.GetStream(Stream.Color)
             Dim streamLeft = profiles.GetStream(Stream.Infrared, 1)
             Dim streamRight = profiles.GetStream(Stream.Infrared, 2)
+
             Dim leftIntrin As Intrinsics = streamLeft.As(Of VideoStreamProfile)().GetIntrinsics()
             Dim leftExtrinsics As Extrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamRight)
 
-            Dim ratio = captureRes.Width \ workRes.Width
-            calibData.leftIntrinsics.ppx = leftIntrin.ppx / ratio
-            calibData.leftIntrinsics.ppy = leftIntrin.ppy / ratio
+            Dim ratio As Single = captureRes.Width \ workRes.Width
             calibData.leftIntrinsics.fx = leftIntrin.fx / ratio
             calibData.leftIntrinsics.fy = leftIntrin.fy / ratio
+            calibData.leftIntrinsics.ppx = leftIntrin.ppx / ratio
+            calibData.leftIntrinsics.ppy = leftIntrin.ppy / ratio
 
             ReDim calibData.LtoR_translation(3 - 1)
-            ReDim calibData.LtoR_rotation(9 - 1)
-
-            ReDim calibData.ColorToLeft_translation(3 - 1)
-            ReDim calibData.ColorToLeft_rotation(9 - 1)
-
             For i = 0 To 3 - 1
                 calibData.LtoR_translation(i) = leftExtrinsics.translation(i)
-            Next
-            For i = 0 To 9 - 1
-                calibData.LtoR_rotation(i) = leftExtrinsics.rotation(i)
             Next
 
             calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.LtoR_translation(0), 2) +
@@ -78,14 +73,23 @@ Namespace MainApp
             Using frames As FrameSet = pipe.WaitForFrames(5000)
                 SyncLock cameraMutex
                     For Each frame As Intel.RealSense.Frame In frames
+                        If frame.Profile.Stream = Stream.Color AndAlso frame.Profile.Index = 0 Then
+                            color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, frame.Data)
+                            color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                        End If
                         If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 1 Then
-                            leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                            leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
+                            leftView = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                         End If
                         If frame.Profile.Stream = Stream.Infrared AndAlso frame.Profile.Index = 2 Then
-                            rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                            rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, frame.Data)
+                            rightView = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                         End If
                         If frame.Profile.Stream = Stream.Depth Then
-                            depth16u = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, frame.Data).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                            depth16u = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, frame.Data)
+                            depth16u = depth16u.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                            Dim minVal As Double, maxval As Double
+                            depth16u.MinMaxIdx(minVal, maxval)
                         End If
                         If frame.Profile.Stream = Stream.Accel Then
                             IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
@@ -98,11 +102,8 @@ Namespace MainApp
                         End If
                     Next
 
-                    color = leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-                    If depth16u IsNot Nothing Then
-                        pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
-                    End If
+                    pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
+                    pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End SyncLock
 
                 MyBase.GetNextFrameCounts(IMU_FrameTime)

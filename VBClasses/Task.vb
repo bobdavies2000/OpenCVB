@@ -45,7 +45,7 @@ Namespace VBClasses
             pcMotion = New Motion_PointCloud
             grid = New Grid_Basics
             lines = New Line_Basics
-            ' rgbFilter = New Filter_Basics
+            rgbFilter = New Filter_Basics
             brightness = New Brightness_Basics
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
@@ -109,29 +109,21 @@ Namespace VBClasses
             brightness.Run(leftView)
             leftView = brightness.dst2.Clone
 
-            color = brightness.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            gray = leftView.Clone
-
             brightness.Run(rightView)
             rightView = brightness.dst2.Clone
 
-            ' rgbFilter.Run(color)
+            rgbFilter.Run(color)
             If gOptions.UseMotionMask.Checked Then
                 motionBasics.Run(gray)
                 If optionsChanged Or task.frameCount < 5 Then
                     grayStable = gray.Clone
-                    leftViewStable = leftView.Clone
                 Else
-                    If motionBasics.motionList.Count > 0 Then
-                        gray.CopyTo(grayStable, motionMask)
-                        leftView.CopyTo(leftViewStable, motionMask)
-                    End If
+                    If motionBasics.motionList.Count > 0 Then gray.CopyTo(grayStable, motionMask)
                 End If
             Else
                 motionMask.SetTo(255)
                 motionBasics.motionList.Clear()
                 grayStable = gray
-                leftViewStable = leftView
             End If
 
             If pcMotion IsNot Nothing Then
@@ -189,6 +181,7 @@ Namespace VBClasses
             End If
 
 
+            Dim mm = GetMinMax(task.pcSplit(2))
 
 
             algorithmPrep = False

@@ -65,6 +65,7 @@ Namespace MainApp
         Private Shared Function OakDDisparityFactor(cPtr As IntPtr) As Single
         End Function
 
+        Private cPtr As IntPtr
         Private initialTime As Double = 0
 #End Region
 
@@ -79,19 +80,7 @@ Namespace MainApp
                 Throw New Exception("Failed to open Oak-D camera")
             End If
 
-            ' Get calibration data
             Dim ratio = captureRes.Width \ workRes.Width
-            Dim intrinsicsPtr = OakDintrinsics(cPtr, 1) ' RGB camera
-            If intrinsicsPtr <> IntPtr.Zero Then
-                Dim intrinsics(8) As Single
-                Marshal.Copy(intrinsicsPtr, intrinsics, 0, 9)
-                ' Intrinsics matrix: [fx, 0, cx; 0, fy, cy; 0, 0, 1]
-                calibData.rgbIntrinsics.fx = intrinsics(0) / ratio
-                calibData.rgbIntrinsics.ppx = intrinsics(2) / ratio
-                calibData.rgbIntrinsics.fy = intrinsics(4) / ratio
-                calibData.rgbIntrinsics.ppy = intrinsics(5) / ratio
-            End If
-
             Dim leftIntrinsicsPtr = OakDintrinsics(cPtr, 2) ' Left camera
             If leftIntrinsicsPtr <> IntPtr.Zero Then
                 Dim intrinsics(8) As Single
@@ -102,49 +91,18 @@ Namespace MainApp
                 calibData.leftIntrinsics.ppy = intrinsics(5) / ratio
             End If
 
-            Dim rightIntrinsicsPtr = OakDintrinsics(cPtr, 3) ' Right camera
-            If rightIntrinsicsPtr <> IntPtr.Zero Then
-                Dim intrinsics(8) As Single
-                Marshal.Copy(rightIntrinsicsPtr, intrinsics, 0, 9)
-                calibData.rightIntrinsics.fx = intrinsics(0) / ratio
-                calibData.rightIntrinsics.ppx = intrinsics(2) / ratio
-                calibData.rightIntrinsics.fy = intrinsics(4) / ratio
-                calibData.rightIntrinsics.ppy = intrinsics(5) / ratio
-            End If
-
-            ' Get extrinsics
-            Dim rgbToLeftPtr = OakDExtrinsicsRGBtoLeft(cPtr)
-            If rgbToLeftPtr <> IntPtr.Zero Then
-                Dim extrinsics(11) As Single
-                Marshal.Copy(rgbToLeftPtr, extrinsics, 0, 12)
-                ReDim calibData.ColorToLeft_translation(2)
-                ReDim calibData.ColorToLeft_rotation(8)
-                For i = 0 To 2
-                    calibData.ColorToLeft_translation(i) = extrinsics(i)
-                Next
-                For i = 0 To 8
-                    calibData.ColorToLeft_rotation(i) = extrinsics(i + 3)
-                Next
-            End If
-
             Dim leftToRightPtr = OakDExtrinsicsLeftToRight(cPtr)
             If leftToRightPtr <> IntPtr.Zero Then
                 Dim extrinsics(11) As Single
                 Marshal.Copy(leftToRightPtr, extrinsics, 0, 12)
                 ReDim calibData.LtoR_translation(2)
-                ReDim calibData.LtoR_rotation(8)
-                For i = 0 To 2
-                    calibData.LtoR_translation(i) = -extrinsics(i)
-                Next
-                For i = 0 To 8
-                    calibData.LtoR_rotation(i) = extrinsics(i + 3)
-                Next
+                calibData.LtoR_translation(0) = extrinsics(0)
+                calibData.LtoR_translation(1) = extrinsics(4)
+                calibData.LtoR_translation(2) = extrinsics(8)
 
-                ' Calculate baseline from translation vector
-                calibData.baseline = CSng(Math.Sqrt(
-                    calibData.LtoR_translation(0) * calibData.LtoR_translation(0) +
-                    calibData.LtoR_translation(1) * calibData.LtoR_translation(1) +
-                    calibData.LtoR_translation(2) * calibData.LtoR_translation(2)))
+                calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.LtoR_translation(0), 2) +
+                                                      System.Math.Pow(calibData.LtoR_translation(1), 2) +
+                                                      System.Math.Pow(calibData.LtoR_translation(2), 2))
             End If
 
             MyBase.prepImages()

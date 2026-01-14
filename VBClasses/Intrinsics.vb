@@ -17,8 +17,8 @@ Namespace VBClasses
             ptTranslated3D.Z = task.calibData.LtoR_rotation(6) * pt.X +
                                task.calibData.LtoR_rotation(7) * pt.Y +
                                task.calibData.LtoR_rotation(8) * pt.Z + task.calibData.LtoR_translation(2)
-            ptTranslated.X = task.calibData.rgbIntrinsics.fx * ptTranslated3D.X / ptTranslated3D.Z + task.calibData.rgbIntrinsics.ppx
-            ptTranslated.Y = task.calibData.rgbIntrinsics.fy * ptTranslated3D.Y / ptTranslated3D.Z + task.calibData.rgbIntrinsics.ppy
+            ptTranslated.X = task.calibData.leftIntrinsics.fx * ptTranslated3D.X / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppx
+            ptTranslated.Y = task.calibData.leftIntrinsics.fy * ptTranslated3D.Y / ptTranslated3D.Z + task.calibData.leftIntrinsics.ppy
 
             Return ptTranslated
         End Function

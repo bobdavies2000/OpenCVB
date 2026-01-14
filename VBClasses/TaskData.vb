@@ -17,7 +17,6 @@ Namespace VBClasses
         Public color As New cv.Mat
         Public gray As New cv.Mat
         Public grayStable As New cv.Mat
-        Public leftViewStable As New cv.Mat
         Public leftView As New cv.Mat
         Public rightView As New cv.Mat
         Public pointCloud As New cv.Mat
@@ -85,7 +84,7 @@ Namespace VBClasses
         Public grid As Grid_Basics
         Public palette As Palette_LoadColorMap
         Public PixelViewer As Pixel_Viewer
-        ' Public rgbFilter As Filter_Basics
+        Public rgbFilter As Filter_Basics
         Public gravityBasics As Gravity_Basics
         Public imuBasics As IMU_Basics
         Public motionBasics As Motion_Basics

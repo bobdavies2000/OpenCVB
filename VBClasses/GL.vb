@@ -341,10 +341,10 @@ Namespace VBClasses
 
 
     Public Class GL_DisplayPC : Inherits TaskParent
-        Public Shared ppx = task.calibData.rgbIntrinsics.ppx
-        Public Shared ppy = task.calibData.rgbIntrinsics.ppy
-        Public Shared fx = task.calibData.rgbIntrinsics.fx
-        Public Shared fy = task.calibData.rgbIntrinsics.fy
+        Public Shared ppx = task.calibData.leftIntrinsics.ppx
+        Public Shared ppy = task.calibData.leftIntrinsics.ppy
+        Public Shared fx = task.calibData.leftIntrinsics.fx
+        Public Shared fy = task.calibData.leftIntrinsics.fy
         Public Shared msg As String
         Shared mm As mmData
         Public Sub New()

@@ -62,7 +62,7 @@ Namespace VBClasses
                     brickDepthCount += 1
                     If task.rgbLeftAligned Then
                         brick.rRect = brick.rect
-                        brick.rRect.X -= task.calibData.baseline * task.calibData.rgbIntrinsics.fx / brick.depth
+                        brick.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
                         If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then
                             brick.rRect.Width = 0 ' off the image
                         End If
@@ -646,10 +646,10 @@ Namespace VBClasses
                         split(2).SetTo(brick.mm.maxVal, task.depthmask(brick.rect))
 
                         cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
-                        split(0) *= cv.Scalar.All(1 / task.calibData.rgbIntrinsics.fx)
+                        split(0) *= cv.Scalar.All(1 / task.calibData.leftIntrinsics.fx)
 
                         cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
-                        split(1) *= cv.Scalar.All(1 / task.calibData.rgbIntrinsics.fy)
+                        split(1) *= cv.Scalar.All(1 / task.calibData.leftIntrinsics.fy)
 
                         cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
                         splitCount += 1
@@ -684,10 +684,10 @@ Namespace VBClasses
                     split(2).SetTo(brick.depth, task.depthmask(brick.rect))
 
                     cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
-                    split(0) *= cv.Scalar.All(1 / task.calibData.rgbIntrinsics.fx)
+                    split(0) *= cv.Scalar.All(1 / task.calibData.leftIntrinsics.fx)
 
                     cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
-                    split(1) *= cv.Scalar.All(1 / task.calibData.rgbIntrinsics.fy)
+                    split(1) *= cv.Scalar.All(1 / task.calibData.leftIntrinsics.fy)
 
                     cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
                     splitCount += 1
@@ -725,10 +725,10 @@ Namespace VBClasses
                         split(2) += brick.depth
 
                         cv.Cv2.Multiply(template.dst2(brick.rect), split(2), split(0))
-                        split(0) *= cv.Scalar.All(1 / task.calibData.rgbIntrinsics.fx)
+                        split(0) *= cv.Scalar.All(1 / task.calibData.leftIntrinsics.fx)
 
                         cv.Cv2.Multiply(template.dst3(brick.rect), split(2), split(1))
-                        split(1) *= cv.Scalar.All(1 / task.calibData.rgbIntrinsics.fy)
+                        split(1) *= cv.Scalar.All(1 / task.calibData.leftIntrinsics.fy)
 
                         cv.Cv2.Merge({split(0), split(1), split(2)}, dst2(brick.rect))
                         dst2(brick.rect).SetTo(0, task.noDepthMask(brick.rect))
