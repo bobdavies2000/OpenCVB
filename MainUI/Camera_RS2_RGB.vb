@@ -70,7 +70,6 @@ Namespace MainApp
                                               System.Math.Pow(calibData.ColorToLeft_translation(1), 2) +
                                               System.Math.Pow(calibData.ColorToLeft_translation(2), 2))
 
-            rgbLeftAligned = False
             MyBase.prepImages()
 
             ' Start background thread to capture frames

@@ -51,7 +51,6 @@ Public Class GenericCamera
     Public isCapturing As Boolean
     Public frameProcessed As Boolean = True
     Public captureThread As Thread = Nothing
-    Public rgbLeftAligned As Boolean = True
     Public Structure imuDataStruct
         Dim r00 As Single
         Dim r01 As Single

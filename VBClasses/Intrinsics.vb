@@ -42,19 +42,9 @@ Namespace VBClasses
             If standalone Then
                 dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 Dim vec = New cv.Vec3b(0, 255, 255) ' yellow
-                If task.rgbLeftAligned Then
-                    For Each brick In task.bricks.brickList
-                        If brick.depth > 0 Then DrawCircle(dst2, brick.rect.TopLeft)
-                    Next
-                Else
-                    For Each brick In task.bricks.brickList
-                        Dim pt = translate_ColorToLeft(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
-                        If Single.IsNaN(pt.X) Or Single.IsNaN(pt.Y) Then Continue For
-                        If Single.IsInfinity(pt.X) Or Single.IsInfinity(pt.Y) Then Continue For
-                        pt = lpData.validatePoint(pt)
-                        DrawCircle(dst2, pt)
-                    Next
-                End If
+                For Each brick In task.bricks.brickList
+                    If brick.depth > 0 Then DrawCircle(dst2, brick.rect.TopLeft)
+                Next
             End If
         End Sub
     End Class

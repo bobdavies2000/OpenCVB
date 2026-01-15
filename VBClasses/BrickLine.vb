@@ -295,10 +295,6 @@ Namespace VBClasses
                     brick.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
                     If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then Continue For
 
-                    If task.rgbLeftAligned = False Then
-                        brick = Brick_Basics.RealSenseAlign(brick)
-                    End If
-
                     cv.Cv2.MatchTemplate(task.leftView(brick.lRect), task.rightView(brick.rRect), correlationMat,
                                      cv.TemplateMatchModes.CCoeffNormed)
 

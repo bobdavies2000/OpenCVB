@@ -6,7 +6,6 @@ Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
         Public Sub Initialize(settings As jsonShared.Settings)
             task.Settings = settings
-            If settings.cameraName.Contains("RealSense") Then rgbLeftAligned = False
 
             rows = settings.workRes.Height
             cols = settings.workRes.Width

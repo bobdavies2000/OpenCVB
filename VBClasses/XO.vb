@@ -2030,34 +2030,14 @@ Namespace VBClasses
                     brick.rRect = emptyRect
                 Else
                     brick.mm = GetMinMax(task.pcSplit(2)(brick.rect), task.depthMask(brick.rect))
-                    If task.rgbLeftAligned Then
-                        brick.lRect = brick.rect
-                        brick.rRect = brick.lRect
-                        brick.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
-                        brick.rRect = ValidateRect(brick.rRect)
-                        cv.Cv2.MatchTemplate(LRMeanSub.dst2(brick.lRect), LRMeanSub.dst3(brick.rRect), correlationMat,
+                    brick.lRect = brick.rect
+                    brick.rRect = brick.lRect
+                    brick.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
+                    brick.rRect = ValidateRect(brick.rRect)
+                    cv.Cv2.MatchTemplate(LRMeanSub.dst2(brick.lRect), LRMeanSub.dst3(brick.rRect), correlationMat,
                                                      cv.TemplateMatchModes.CCoeffNormed)
 
-                        brick.correlation = correlationMat.Get(Of Single)(0, 0)
-                    Else
-                        Dim irPt = Intrinsics_Basics.translate_LeftToRight(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
-                        If irPt.X < 0 Or (irPt.X = 0 And irPt.Y = 0 And i > 0) Or (irPt.X >= dst2.Width Or irPt.Y >= dst2.Height) Then
-                            brick.depth = 0 ' off the grid.
-                            brick.lRect = emptyRect
-                            brick.rRect = emptyRect
-                        Else
-                            brick.lRect = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
-                            brick.lRect = ValidateRect(brick.lRect)
-
-                            brick.rRect = brick.lRect
-                            brick.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
-                            brick.rRect = ValidateRect(brick.rRect)
-                            cv.Cv2.MatchTemplate(LRMeanSub.dst2(brick.lRect), LRMeanSub.dst3(brick.rRect), correlationMat,
-                                                      cv.TemplateMatchModes.CCoeffNormed)
-
-                            brick.correlation = correlationMat.Get(Of Single)(0, 0)
-                        End If
-                    End If
+                    brick.correlation = correlationMat.Get(Of Single)(0, 0)
                 End If
 
                 lastCorrelation(i) = brick.correlation

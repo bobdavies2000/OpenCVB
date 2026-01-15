@@ -10,29 +10,6 @@ Namespace VBClasses
             labels(3) = "Right camera image.  Highlighted rectangle matches the dst2 (left) rectangle."
             desc = "Create the grid of bricks that reduce depth volatility"
         End Sub
-        Public Shared Function RealSenseAlign(brick As brickData) As brickData
-            Dim irPt = Intrinsics_Basics.translate_ColorToLeft(task.pointCloud.Get(Of cv.Point3f)(brick.rect.Y, brick.rect.X))
-            Dim badTranslation As Boolean = False
-            If Single.IsNaN(irPt.X) Or Single.IsNaN(irPt.Y) Then badTranslation = True
-            If irPt.X = 0 And irPt.Y = 0 Then badTranslation = True
-            If irPt.X < 0 Or irPt.X >= task.color.Width Or irPt.Y >= task.color.Height Or badTranslation Then
-                brick.depth = 0 ' off the image
-            Else
-                brick.lRect = New cv.Rect(irPt.X, irPt.Y, brick.rect.Width, brick.rect.Height)
-                brick.lRect = ValidateRect(brick.lRect)
-
-                Dim LtoR_Pt = Intrinsics_Basics.translate_LeftToRight(task.pointCloud.Get(Of cv.Point3f)(brick.lRect.Y, brick.lRect.X))
-                If LtoR_Pt.X < 0 Or (LtoR_Pt.X = 0 And LtoR_Pt.Y = 0) Or
-                                        (LtoR_Pt.X >= task.color.Width Or LtoR_Pt.Y >= task.color.Height) Then
-                    brick.depth = 0 ' off the image
-                Else
-                    ' brick.rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, brick.rect.Width, brick.rect.Height)
-                    brick.rRect = New cv.Rect(LtoR_Pt.X, brick.lRect.Y, brick.rect.Width, brick.rect.Height)
-                    brick.rRect = ValidateRect(brick.rRect)
-                End If
-            End If
-            Return brick
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
@@ -60,14 +37,10 @@ Namespace VBClasses
                 If brick.depth > 0 Then
                     brick.mm = GetMinMax(task.pcSplit(2)(brick.rect), task.depthmask(brick.rect))
                     brickDepthCount += 1
-                    If task.rgbLeftAligned Then
-                        brick.rRect = brick.rect
-                        brick.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
-                        If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then
-                            brick.rRect.Width = 0 ' off the image
-                        End If
-                    Else
-                        If i > 0 Then brick = RealSenseAlign(brick)
+                    brick.rRect = brick.rect
+                    brick.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
+                    If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then
+                        brick.rRect.Width = 0 ' off the image
                     End If
 
                     If brick.lRect.Width = brick.rRect.Width Then
@@ -170,11 +143,7 @@ Namespace VBClasses
             desc = "Display the bricks for all cells with depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.rgbLeftAligned Then
-                dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            Else
-                dst2 = src
-            End If
+            dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
             Dim col As Integer, bricksPerRow = task.bricksPerRow
@@ -566,24 +535,7 @@ Namespace VBClasses
             ' stereolabs and orbbec already aligned the RGB and left images so depth in the left image
             ' can be found.  For Intel, the left image and RGB need to be aligned first.
             ' With depth the correlation between the left and right for that brick will be accurate (if there is depth.)
-            If task.rgbLeftAligned Then
-                irPt = brick.rect.TopLeft ' the above cameras are already have RGB aligned to the left image.
-            Else
-                Dim pcTop = task.pointCloud.Get(Of cv.Point3f)(rgbTop.Y, rgbTop.X)
-                If pcTop.Z > 0 Then
-                    ir3D.X = camInfo.ColorToLeft_rotation(0) * pcTop.X +
-                         camInfo.ColorToLeft_rotation(1) * pcTop.Y +
-                         camInfo.ColorToLeft_rotation(2) * pcTop.Z + camInfo.ColorToLeft_translation(0)
-                    ir3D.Y = camInfo.ColorToLeft_rotation(3) * pcTop.X +
-                         camInfo.ColorToLeft_rotation(4) * pcTop.Y +
-                         camInfo.ColorToLeft_rotation(5) * pcTop.Z + camInfo.ColorToLeft_translation(1)
-                    ir3D.Z = camInfo.ColorToLeft_rotation(6) * pcTop.X +
-                         camInfo.ColorToLeft_rotation(7) * pcTop.Y +
-                         camInfo.ColorToLeft_rotation(8) * pcTop.Z + camInfo.ColorToLeft_translation(2)
-                    irPt.X = camInfo.leftIntrinsics.fx * ir3D.X / ir3D.Z + camInfo.leftIntrinsics.ppx
-                    irPt.Y = camInfo.leftIntrinsics.fy * ir3D.Y / ir3D.Z + camInfo.leftIntrinsics.ppy
-                End If
-            End If
+            irPt = brick.rect.TopLeft ' the above cameras are already have RGB aligned to the left image.
             labels(2) = "RGB point at " + rgbTop.ToString + " is at " + irPt.ToString + " in the left view "
 
             dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

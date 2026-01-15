@@ -125,7 +125,6 @@ Namespace VBClasses
         Public gridNabeRects As New List(Of cv.Rect) ' The surrounding rect for every gridRect
         Public gridROIclicked As Integer
         Public depthDiffMeters As Single ' bricks > than this value are depth edges - in meters
-        Public rgbLeftAligned As Boolean ' if the rgb image is the left image...
         Public gridRatioX As Single ' translate from display width to workres to find grid element.
         Public gridRatioY As Single ' translate from display height to workres to find grid element.
 

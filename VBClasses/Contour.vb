@@ -143,33 +143,10 @@ Namespace VBClasses
             Dim rRect As cv.Rect
             Dim depth = task.pcSplit(2)(lrect).Mean(task.depthmask(lrect))
             If depth = 0 Then Return 0 ' no correlation if there is no depth...
-            If task.rgbLeftAligned Then
-                rRect = lrect
-                rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth.Val0
-                If rRect.X < 0 Or rRect.X + rRect.Width >= task.color.Width Then
-                    Return 0 ' no correlation if there is no depth...
-                End If
-            Else
-                Dim irPt = Intrinsics_Basics.translate_ColorToLeft(task.pointCloud.Get(Of cv.Point3f)(lrect.Y, lrect.X))
-                Dim badTranslation As Boolean = False
-                If Single.IsNaN(irPt.X) Or Single.IsNaN(irPt.Y) Then badTranslation = True
-                If irPt.X = 0 And irPt.Y = 0 Then badTranslation = True
-                If irPt.X < 0 Or irPt.X >= task.color.Width Or irPt.Y >= task.color.Height Or badTranslation Then
-                    Return 0 ' no correlation if there is no depth..
-                Else
-                    lrect = New cv.Rect(irPt.X, irPt.Y, lrect.Width, lrect.Height)
-                    lrect = ValidateRect(lrect)
-
-                    Dim LtoR_Pt = Intrinsics_Basics.translate_LeftToRight(task.pointCloud.Get(Of cv.Point3f)(lrect.Y, lrect.X))
-                    If LtoR_Pt.X < 0 Or (LtoR_Pt.X = 0 And LtoR_Pt.Y = 0) Or
-                                    (LtoR_Pt.X >= task.color.Width Or
-                                     LtoR_Pt.Y >= task.color.Height) Then
-                        Return 0 ' no correlation if there is no depth..
-                    Else
-                        rRect = New cv.Rect(LtoR_Pt.X, LtoR_Pt.Y, lrect.Width, lrect.Height)
-                        rRect = ValidateRect(rRect)
-                    End If
-                End If
+            rRect = lrect
+            rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / depth.Val0
+            If rRect.X < 0 Or rRect.X + rRect.Width >= task.color.Width Then
+                Return 0 ' no correlation if there is no depth...
             End If
 
             cv.Cv2.MatchTemplate(task.leftView(lrect), task.rightView(rRect), correlationMat, cv.TemplateMatchModes.CCoeffNormed)
