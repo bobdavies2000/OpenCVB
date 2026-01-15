@@ -18,6 +18,10 @@ Namespace MainApp
         End Function
 
         <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Sub OakDLaserOff(cPtr As IntPtr)
+        End Sub
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
         Private Shared Function OakDLeftImage(cPtr As IntPtr) As IntPtr
         End Function
 
@@ -74,7 +78,7 @@ Namespace MainApp
             workRes = _workRes
 
             ' Open the Oak-D camera
-            cPtr = OakDOpen(workRes.Width, workRes.Height)
+            cPtr = OakDOpen(captureRes.Width, captureRes.Height)
 
             If cPtr = IntPtr.Zero Then
                 Throw New Exception("Failed to open Oak-D camera")
@@ -124,30 +128,34 @@ Namespace MainApp
         Public Sub GetNextFrame()
             If cPtr = IntPtr.Zero Then Return
 
-            Dim rows = workRes.Height
-            Dim cols = workRes.Width
+            Dim rows = captureRes.Height
+            Dim cols = captureRes.Width
 
             OakDWaitForFrame(cPtr)
 
             SyncLock cameraMutex
                 Dim rgbPtr = OakDColor(cPtr)
                 If rgbPtr <> IntPtr.Zero Then
-                    color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rgbPtr).Clone()
+                    color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, rgbPtr).Clone()
+                    color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
                 Dim leftPtr = OakDLeftImage(cPtr)
                 If leftPtr <> IntPtr.Zero Then
                     leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr).Clone()
+                    leftView = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
                 Dim rightPtr = OakDRightImage(cPtr)
                 If rightPtr <> IntPtr.Zero Then
                     rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr).Clone()
+                    rightView = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
                 Dim depthPtr = OakDRawDepth(cPtr)
                 If depthPtr <> IntPtr.Zero Then
                     depth16u = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr).Clone()
+                    depth16u = depth16u.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                     pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
                 End If
 
@@ -165,6 +173,7 @@ Namespace MainApp
                 IMU_FrameTime = OakDIMUTimeStamp(cPtr)
             End SyncLock
 
+            ' OakDLaserOff(cPtr)
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
         Public Overrides Sub StopCamera()

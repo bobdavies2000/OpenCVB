@@ -531,7 +531,7 @@ Namespace VBClasses
             End If
 
             Dim irPt As cv.Point = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-            Dim rgbTop = brick.rect.TopLeft, ir3D As cv.Point3f
+            Dim rgbTop = brick.rect.TopLeft
             ' stereolabs and orbbec already aligned the RGB and left images so depth in the left image
             ' can be found.  For Intel, the left image and RGB need to be aligned first.
             ' With depth the correlation between the left and right for that brick will be accurate (if there is depth.)

@@ -8,7 +8,7 @@
 using namespace std;
 using namespace cv;
 
-constexpr float FPS = 60.0f;
+constexpr float FPS = 30.0f;
 
 static std::atomic<bool> subpixel{ true };
 static std::atomic<bool> lr_check{ true };
@@ -23,7 +23,8 @@ public:
 	dai::CalibrationHandler deviceCalib;
 	double imuTimeStamp;
 	bool firstTs = false;
-	std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration> baseTs; int rows, cols;
+	std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration> baseTs; 
+	int captureRows, captureCols;
 
 	float intrinsics[9]; 
 	float extrinsicsRGBtoLeft[12];
@@ -40,8 +41,8 @@ public:
 
 	OakDCamera(int _cols, int _rows)
 	{
-		rows = _rows;
-		cols = _cols;
+		captureRows = _rows;
+		captureCols = _cols;
 
 		auto pipeIMU = pipeline.create<dai::node::IMU>();
 
@@ -63,9 +64,9 @@ public:
 		auto pipeStereo = pipeline.create<dai::node::StereoDepth>();
 
 		// Properties
-		auto* outRGB = pipeRGB->requestOutput({ cols, rows });
-		auto* outLeft = pipeLeft->requestOutput({ cols, rows });
-		auto* outRight = pipeRight->requestOutput({ cols, rows });
+		auto* outRGB = pipeRGB->requestOutput({ captureCols, captureRows });
+		auto* outLeft = pipeLeft->requestOutput({ captureCols, captureRows });
+		auto* outRight = pipeRight->requestOutput({ captureCols, captureRows });
 
 		// Create a node that will produce the depth map
 		pipeStereo->build(*outLeft, *outRight, dai::node::StereoDepth::PresetMode::DEFAULT);
@@ -93,14 +94,10 @@ public:
 		auto inLeft = qLeft->get<dai::ImgFrame>();
 		auto inRight = qRight->get<dai::ImgFrame>();
 
-		// Get raw depth frame (depth values in millimeters)
 		depth16u = inDepth->getFrame();
-		// Get RGB color frame
 		rgb = inRGB->getFrame().clone();
 		leftView = inLeft->getFrame().clone();
 		rightView = inRight->getFrame().clone();
-		cv::resize(depth16u, depth16u, cv::Size(cols, rows));
-		cv::resize(rgb, rgb, cv::Size(cols, rows));
 
 		auto imuData = qIMU->get<dai::IMUData>();
 		if (imuData != nullptr)
@@ -133,9 +130,9 @@ public:
 
 
 extern "C" __declspec(dllexport)
-int* OakDOpen(int w, int h)
+int* OakDOpen(int captureWidth, int captureHeight)
 {
-	OakDCamera* cPtr = new OakDCamera(w, h);
+	OakDCamera* cPtr = new OakDCamera(captureWidth, captureHeight);
 	return (int*)cPtr;
 }
 
@@ -145,13 +142,13 @@ int* OakDintrinsics(OakDCamera* cPtr, int camera)
 	std::vector<std::vector<float>> intrin;
 	if (camera == 1) // rgb camera
 	{
-		intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_A, cPtr->cols, cPtr->rows);
+		intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_A, cPtr->captureCols, cPtr->captureRows);
 	}
 	else {
-		if (camera == 2)  // left camera
-			intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_B, cPtr->cols, cPtr->rows);
+		if (camera == 2)  
+			intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_B, cPtr->captureCols, cPtr->captureRows);
 		else
-			intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_C, cPtr->cols, cPtr->rows);  // right camera
+			intrin = cPtr->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::CAM_C, cPtr->captureCols, cPtr->captureRows);  
 	}
 
 	int i = 0;

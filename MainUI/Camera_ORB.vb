@@ -101,15 +101,18 @@ Namespace MainApp
 
             SyncLock cameraMutex
                 If cFrame IsNot Nothing Then
-                    color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, cFrame.GetDataPtr).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, cFrame.GetDataPtr)
+                    color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
                 If lFrame IsNot Nothing Then
-                    leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, lFrame.GetDataPtr).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, lFrame.GetDataPtr)
+                    leftView = leftView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
                 If rFrame IsNot Nothing Then
-                    rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rFrame.GetDataPtr).Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rFrame.GetDataPtr)
+                    rightView = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
                 If dFrame IsNot Nothing Then

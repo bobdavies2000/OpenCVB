@@ -122,9 +122,7 @@ Public Class GenericCamera
 
     Public Function ComputePointCloud(rawDepth As cv.Mat, intrinsics As intrinsicData) As cv.Mat
         ' Compute point cloud from depth image and camera intrinsics
-        Dim rows = rawDepth.Rows
-        Dim cols = rawDepth.Cols
-        Dim pc = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, New cv.Scalar(0, 0, 0))
+        Dim pc = New cv.Mat(rawDepth.Size(), cv.MatType.CV_32FC3, 0)
 
         Dim depth As New cv.Mat
         rawDepth.ConvertTo(depth, cv.MatType.CV_32F)
@@ -134,8 +132,8 @@ Public Class GenericCamera
         Dim depthIndexer = depth.GetGenericIndexer(Of Single)()
         Dim pcIndexer = pc.GetGenericIndexer(Of cv.Vec3f)()
 
-        For y = 0 To rows - 1
-            For x = 0 To cols - 1
+        For y = 0 To pc.Rows - 1
+            For x = 0 To pc.Cols - 1
                 Dim z = depthIndexer(y, x)
                 If z > 0 Then
                     Dim px = (x - intrinsics.ppx) * z / intrinsics.fx
