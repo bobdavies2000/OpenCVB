@@ -19,12 +19,13 @@ private:
 public:
 	dai::Pipeline pipeline;
 	std::shared_ptr<dai::Device> device;
-	Mat rgb, leftView, rightView, depth16u;
+	Mat rgb, leftView, rightView, depth16u, disparity;
 	dai::CalibrationHandler deviceCalib;
 	double imuTimeStamp;
 	bool firstTs = false;
 	std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration> baseTs; 
 	int captureRows, captureCols;
+	float maxDisparity = 1;
 
 	float intrinsics[9]; 
 	float extrinsicsRGBtoLeft[12];
@@ -35,6 +36,7 @@ public:
 	std::shared_ptr<dai::MessageQueue> qIMU;
 	std::shared_ptr<dai::MessageQueue> qDepth;
 	std::shared_ptr<dai::MessageQueue> qRGB;
+	std::shared_ptr<dai::MessageQueue> qDisparity;
 
 	dai::IMUReportAccelerometer acceleroValues;
 	dai::IMUReportGyroscope gyroValues;
@@ -73,10 +75,12 @@ public:
 		// Options: MEDIAN_OFF, KERNEL_3x3, KERNEL_5x5, KERNEL_7x7 (default)
 		pipeStereo->initialConfig->setMedianFilter(dai::StereoDepthConfig::MedianFilter::KERNEL_7x7);
 		pipeStereo->setLeftRightCheck(lr_check);
+		pipeStereo->setExtendedDisparity(false);
 		pipeStereo->setSubpixel(subpixel);
 
 		// Output queue will be used to get the raw depth frames from the outputs defined above
 		qDepth = pipeStereo->depth.createOutputQueue();
+		qDisparity = pipeStereo->disparity.createOutputQueue(); 
 		qRGB = outRGB->createOutputQueue();
 		qLeft = outLeft->createOutputQueue();
 		qRight = outRight->createOutputQueue();
@@ -86,10 +90,12 @@ public:
 		device = pipeline.getDefaultDevice();
 		deviceCalib = device->readCalibration();
 		baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();
+		maxDisparity = (float)pipeStereo->initialConfig->getMaxDisparity();
 	}
 	void waitForFrame()
 	{
 		auto inDepth = qDepth->get<dai::ImgFrame>();
+		auto inDisparity = qDisparity->get<dai::ImgFrame>();
 		auto inRGB = qRGB->get<dai::ImgFrame>();
 		auto inLeft = qLeft->get<dai::ImgFrame>();
 		auto inRight = qRight->get<dai::ImgFrame>();
@@ -107,6 +113,15 @@ public:
 		// Get left and right frames (mono cameras - should be CV_8UC1)
 		leftView = inLeft->getFrame().clone();
 		rightView = inRight->getFrame().clone();
+		auto disparityFrame = inDisparity->getFrame();
+		if (disparityFrame.size() != cv::Size(captureCols, captureRows)) {
+			cv::resize(disparityFrame, disparity, cv::Size(captureCols, captureRows), 0, 0, cv::INTER_NEAREST);
+		}
+		else {
+			disparity = depthFrame;
+		}
+		
+		disparity.convertTo(disparity, CV_8UC1, 255 / maxDisparity);
 
 		auto imuData = qIMU->get<dai::IMUData>();
 		if (imuData != nullptr)
@@ -221,6 +236,7 @@ extern "C" __declspec(dllexport) int* OakDColor(OakDCamera* cPtr) { return (int*
 extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera* cPtr) { cPtr->waitForFrame(); }
 extern "C" __declspec(dllexport) int* OakDLeftImage(OakDCamera* cPtr) { return (int*)cPtr->leftView.data; }
 extern "C" __declspec(dllexport) int* OakDRightImage(OakDCamera* cPtr) { return (int*)cPtr->rightView.data; }
+extern "C" __declspec(dllexport) int* OakDDisparity(OakDCamera* cPtr) { return (int*)cPtr->disparity.data; }
 
 extern "C" __declspec(dllexport) void OakDStop(OakDCamera* cPtr) {
 	if (cPtr != nullptr) {

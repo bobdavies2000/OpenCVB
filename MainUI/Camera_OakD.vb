@@ -158,6 +158,16 @@ Namespace MainApp
                     color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, rgbPtr).Clone()
                     color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
+
+                Dim disparityPtr = OakDDisparity(cPtr)
+                If disparityPtr <> IntPtr.Zero Then
+                    disparity = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, disparityPtr).Clone()
+                    disparity = disparity.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                End If
+
+                cv.Cv2.ImShow("disparity", disparity)
+                cv.Cv2.WaitKey(1)
+
                 ' Get IMU data
                 Dim accelPtr = OakDAccel(cPtr)
                 If accelPtr <> IntPtr.Zero Then

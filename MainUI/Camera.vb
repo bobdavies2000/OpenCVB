@@ -29,7 +29,7 @@ End Structure
 
 Public Class GenericCamera
     Public cameraMutex = New Mutex(True, "CameraMutex")
-    Public color As cv.Mat, leftView As cv.Mat, pointCloud As cv.Mat, rightView As cv.Mat, depth16u As cv.Mat
+    Public color As cv.Mat, leftView As cv.Mat, pointCloud As cv.Mat, rightView As cv.Mat, depth16u As cv.Mat, disparity As cv.Mat  
 
     Public IMU_TimeStamp As Double
     Public IMU_Acceleration As cv.Point3f
@@ -89,6 +89,8 @@ Public Class GenericCamera
             leftView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
             pointCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
             rightView = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
+            depth16u = New cv.Mat(workRes, cv.MatType.CV_16UC1, 0)
+            disparity = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
         End SyncLock
     End Sub
     Public Sub GetNextFrameCounts(frameTime As Double)
