@@ -88,8 +88,7 @@ Namespace MainApp
                         If frame.Profile.Stream = Stream.Depth Then
                             depth16u = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, frame.Data)
                             depth16u = depth16u.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                            Dim minVal As Double, maxval As Double
-                            depth16u.MinMaxIdx(minVal, maxval)
+                            pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
                         End If
                         If frame.Profile.Stream = Stream.Accel Then
                             IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
@@ -101,9 +100,6 @@ Namespace MainApp
                             IMU_FrameTime = mFrame.Timestamp - initialTime
                         End If
                     Next
-
-                    pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
-                    pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End SyncLock
 
                 MyBase.GetNextFrameCounts(IMU_FrameTime)

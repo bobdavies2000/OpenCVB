@@ -127,23 +127,20 @@ Public Class GenericCamera
         Dim cols = rawDepth.Cols
         Dim pc = New cv.Mat(rows, cols, cv.MatType.CV_32FC3, New cv.Scalar(0, 0, 0))
 
-        Dim fx = intrinsics.fx
-        Dim fy = intrinsics.fy
-        Dim cx = intrinsics.ppx
-        Dim cy = intrinsics.ppy
+        Dim depth As New cv.Mat
+        rawDepth.ConvertTo(depth, cv.MatType.CV_32F)
+        depth *= 0.001
 
         ' Use indexer for depth data
-        Dim rawDepthIndexer = rawDepth.GetGenericIndexer(Of Byte)()
+        Dim depthIndexer = depth.GetGenericIndexer(Of Single)()
         Dim pcIndexer = pc.GetGenericIndexer(Of cv.Vec3f)()
 
-        Dim disp_constant As Single = calibData.baseline * fx
         For y = 0 To rows - 1
             For x = 0 To cols - 1
-                Dim disp = CSng(rawDepthIndexer(y, x))
-                If disp > 0 Then ' Valid depth in mm
-                    Dim z = disp_constant / disp
-                    Dim px = (x - cx) * z / fx
-                    Dim py = (y - cy) * z / fy
+                Dim z = depthIndexer(y, x)
+                If z > 0 Then
+                    Dim px = (x - intrinsics.ppx) * z / intrinsics.fx
+                    Dim py = (y - intrinsics.ppy) * z / intrinsics.fy
                     pcIndexer(y, x) = New cv.Vec3f(px, py, z)
                 End If
             Next

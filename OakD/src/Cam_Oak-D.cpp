@@ -10,11 +10,7 @@ using namespace cv;
 
 constexpr float FPS = 60.0f;
 
-// Closer-in minimum depth, disparity range is doubled (from 95 to 190):
-static std::atomic<bool> extended_disparity{ false };
-// Better accuracy for longer distance, fractional disparity 32-levels:
 static std::atomic<bool> subpixel{ true };
-// Better handling for occlusions:
 static std::atomic<bool> lr_check{ true };
 
 class OakDCamera
@@ -23,10 +19,9 @@ private:
 public:
 	dai::Pipeline pipeline;
 	std::shared_ptr<dai::Device> device;
-	Mat rgb, leftView, rightView, depth16u, disparity;
+	Mat rgb, leftView, rightView, depth16u;
 	dai::CalibrationHandler deviceCalib;
 	double imuTimeStamp;
-	float disparityFactor = 0;
 	bool firstTs = false;
 	std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration> baseTs; int rows, cols;
 
@@ -37,7 +32,7 @@ public:
 	std::shared_ptr<dai::MessageQueue> qLeft;
 	std::shared_ptr<dai::MessageQueue> qRight;
 	std::shared_ptr<dai::MessageQueue> qIMU;
-	std::shared_ptr<dai::MessageQueue> qDisparity;
+	std::shared_ptr<dai::MessageQueue> qDepth;
 
 	dai::IMUReportAccelerometer acceleroValues;
 	dai::IMUReportGyroscope gyroValues;
@@ -69,16 +64,15 @@ public:
 		auto* outLeft = pipeLeft->requestOutput({ cols, rows });
 		auto* outRight = pipeRight->requestOutput({ cols, rows });
 
-		// Create a node that will produce the depth map (using disparity output as it's easier to visualize depth this way)
+		// Create a node that will produce the depth map
 		pipeStereo->build(*outLeft, *outRight, dai::node::StereoDepth::PresetMode::DEFAULT);
 		// Options: MEDIAN_OFF, KERNEL_3x3, KERNEL_5x5, KERNEL_7x7 (default)
 		pipeStereo->initialConfig->setMedianFilter(dai::StereoDepthConfig::MedianFilter::KERNEL_7x7);
 		pipeStereo->setLeftRightCheck(lr_check);
-		pipeStereo->setExtendedDisparity(extended_disparity);
 		pipeStereo->setSubpixel(subpixel);
 
-		// Output queue will be used to get the disparity frames from the outputs defined above
-		qDisparity = pipeStereo->disparity.createOutputQueue();
+		// Output queue will be used to get the raw depth frames from the outputs defined above
+		qDepth = pipeStereo->depth.createOutputQueue();
 		qLeft = outLeft->createOutputQueue();
 		qRight = outRight->createOutputQueue();
 
@@ -87,21 +81,18 @@ public:
 		device = pipeline.getDefaultDevice();
 		deviceCalib = device->readCalibration();
 		baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();
-
-		disparityFactor = 255 / pipeStereo->initialConfig->getMaxDisparity();
 	}
 	void waitForFrame()
 	{
-		auto inDisparity = qDisparity->get<dai::ImgFrame>();
+		auto inDepth = qDepth->get<dai::ImgFrame>();
 		auto inLeft = qLeft->get<dai::ImgFrame>();
 		auto inRight = qRight->get<dai::ImgFrame>();
 
-		disparity = inDisparity->getFrame();
+		// Get raw depth frame (depth values in millimeters)
+		depth16u = inDepth->getFrame();
 		leftView = inLeft->getFrame().clone();
 		rightView = inRight->getFrame().clone();
-		cv::resize(disparity, disparity, cv::Size(cols, rows));
-
-		//disparity.convertTo(test, CV_8UC1, disparityFactor);
+		cv::resize(depth16u, depth16u, cv::Size(cols, rows));
 
 		auto imuData = qIMU->get<dai::IMUData>();
 		if (imuData != nullptr)
@@ -120,6 +111,15 @@ public:
 				imuTimeStamp = std::chrono::duration<double>(std::min(acceleroTs, gyroTs) - baseTs).count();
 			}
 		}
+	}
+	
+	~OakDCamera()
+	{
+		// Cleanup: reset device to close it properly before destruction
+		if (device) {
+			device.reset();
+		}
+		// Queues and pipeline will be cleaned up automatically when shared_ptrs are destroyed
 	}
 };
 
@@ -207,8 +207,7 @@ extern "C" __declspec(dllexport) int* OakDColor(OakDCamera* cPtr) { return (int*
 extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera* cPtr) { cPtr->waitForFrame(); }
 extern "C" __declspec(dllexport) int* OakDLeftImage(OakDCamera* cPtr) { return (int*)cPtr->leftView.data; }
 extern "C" __declspec(dllexport) int* OakDRightImage(OakDCamera* cPtr) { return (int*)cPtr->rightView.data; }
-extern "C" __declspec(dllexport) int* OakDDisparity(OakDCamera* cPtr) { return (int*)cPtr->disparity.data; }
-extern "C" __declspec(dllexport) float OakDDisparityFactor(OakDCamera* cPtr) { return cPtr->disparityFactor; }
+
 extern "C" __declspec(dllexport) void OakDStop(OakDCamera* cPtr) {
 	if (cPtr != nullptr) {
 		cPtr->device.reset();

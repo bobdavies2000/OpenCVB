@@ -18,13 +18,10 @@ Namespace MainApp
             captureRes = _captureRes
             workRes = _workRes
             Dim ctx As New Context
-            Dim devList = ctx.QueryDeviceList()
-            Dim dev = devList.GetDevice(0)
+            Dim list = ctx.QueryDeviceList()
+            Dim dev = list.GetDevice(0)
+
             Dim firmwareVersion = dev.GetDeviceInfo().FirmwareVersion
-            Debug.WriteLine("ORB Firmware Version: " & firmwareVersion)
-            Debug.WriteLine("ORB Firmware Version: " & firmwareVersion)
-            Debug.WriteLine("ORB Firmware Version: " & firmwareVersion)
-            Debug.WriteLine("ORB Firmware Version: " & firmwareVersion)
             Debug.WriteLine("ORB Firmware Version: " & firmwareVersion)
 
             Dim fps = 0
@@ -67,6 +64,15 @@ Namespace MainApp
 
             pipe.Start(config)
 
+            Dim param As CameraParam = pipe.GetCameraParam()
+            Dim ratio = captureRes.Width \ workRes.Width
+            calibData.leftIntrinsics.ppx = param.depthIntrinsic.cx / ratio
+            calibData.leftIntrinsics.ppy = param.depthIntrinsic.cy / ratio
+            calibData.leftIntrinsics.fx = param.depthIntrinsic.fx / ratio
+            calibData.leftIntrinsics.fy = param.depthIntrinsic.fy / ratio
+            calibData.baseline = 0.095 ' the RGB and left image provided are aligned so depth is easily found.
+            PtCloud.SetCameraParam(param)
+
             ' Start background thread to capture frames
             isCapturing = True
             captureThread = New Thread(AddressOf CaptureFrames)
@@ -80,7 +86,6 @@ Namespace MainApp
                 GetNextFrame()
             End While
         End Sub
-
         Public Sub GetNextFrame()
             Dim rows = captureRes.Height, cols = captureRes.Width
 
@@ -88,17 +93,6 @@ Namespace MainApp
             While frames Is Nothing
                 frames = pipe.WaitForFrames(100)
             End While
-
-            If calibData.baseline = 0 Then
-                Dim param As CameraParam = pipe.GetCameraParam()
-                Dim ratio = captureRes.Width \ workRes.Width
-                calibData.rgbIntrinsics.ppx = param.rgbIntrinsic.cx / ratio
-                calibData.rgbIntrinsics.ppy = param.rgbIntrinsic.cy / ratio
-                calibData.rgbIntrinsics.fx = param.rgbIntrinsic.fx / ratio
-                calibData.rgbIntrinsics.fy = param.rgbIntrinsic.fy / ratio
-                calibData.baseline = 0.095 ' the RGB and left image provided are aligned so depth is easily found.
-                PtCloud.SetCameraParam(param)
-            End If
 
             Dim cFrame = frames.GetColorFrame
             Dim dFrame = frames.GetDepthFrame
@@ -119,16 +113,9 @@ Namespace MainApp
                 End If
 
                 If dFrame IsNot Nothing Then
-                    Dim depthValueScale As Single = dFrame.GetValueScale()
-                    PtCloud.SetPositionDataScaled(depthValueScale)
-                    PtCloud.SetPointFormat(Format.OB_FORMAT_POINT)
-                    Dim pcData = PtCloud.Process(dFrame)
-                    If pcData IsNot Nothing Then
-                        pointCloud = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_32FC3, pcData.GetDataPtr) / 1000
-                        'Dim minVal As Double, maxval As Double
-                        'depth16u.MinMaxIdx(minVal, maxval)
-                        pointCloud = pointCloud.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                    End If
+                    depth16u = cv.Mat(Of UShort).FromPixelData(rows, cols, cv.MatType.CV_16UC1, dFrame.GetDataPtr)
+                    depth16u = depth16u.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
                 End If
 
                 IMU_AngularVelocity = angularVelocity

@@ -122,8 +122,6 @@ Namespace MainApp
         End Sub
 
         Public Sub GetNextFrame()
-            Static disparity As New cv.Mat
-            Static depth16 As New cv.Mat
             If cPtr = IntPtr.Zero Then Return
 
             Dim rows = workRes.Height
@@ -143,13 +141,10 @@ Namespace MainApp
                     rightView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rightPtr).Clone()
                 End If
 
-                Dim disparityPtr = OakDDisparity(cPtr)
-                If disparityPtr <> IntPtr.Zero Then
-                    disparity = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, disparityPtr).Clone()
-                    disparity *= OakDDisparityFactor(cPtr)
-                    Dim minVal As Double, maxVal As Double
-                    disparity.MinMaxLoc(minVal, maxVal)
-                    pointCloud = ComputePointCloud(disparity, calibData.leftIntrinsics)
+                Dim depthPtr = OakDRawDepth(cPtr)
+                If depthPtr <> IntPtr.Zero Then
+                    depth16u = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr).Clone()
+                    pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
                 End If
 
                 ' Get IMU data
