@@ -33,6 +33,7 @@ public:
 	std::shared_ptr<dai::MessageQueue> qRight;
 	std::shared_ptr<dai::MessageQueue> qIMU;
 	std::shared_ptr<dai::MessageQueue> qDepth;
+	std::shared_ptr<dai::MessageQueue> qRGB;
 
 	dai::IMUReportAccelerometer acceleroValues;
 	dai::IMUReportGyroscope gyroValues;
@@ -56,11 +57,13 @@ public:
 		qIMU = pipeIMU->out.createOutputQueue(50, false);
 
 		// Define sources and outputs
+		auto pipeRGB = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_A);
 		auto pipeLeft = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_B);
 		auto pipeRight = pipeline.create<dai::node::Camera>()->build(dai::CameraBoardSocket::CAM_C);
 		auto pipeStereo = pipeline.create<dai::node::StereoDepth>();
 
 		// Properties
+		auto* outRGB = pipeRGB->requestOutput({ cols, rows });
 		auto* outLeft = pipeLeft->requestOutput({ cols, rows });
 		auto* outRight = pipeRight->requestOutput({ cols, rows });
 
@@ -73,6 +76,7 @@ public:
 
 		// Output queue will be used to get the raw depth frames from the outputs defined above
 		qDepth = pipeStereo->depth.createOutputQueue();
+		qRGB = outRGB->createOutputQueue();
 		qLeft = outLeft->createOutputQueue();
 		qRight = outRight->createOutputQueue();
 
@@ -85,14 +89,18 @@ public:
 	void waitForFrame()
 	{
 		auto inDepth = qDepth->get<dai::ImgFrame>();
+		auto inRGB = qRGB->get<dai::ImgFrame>();
 		auto inLeft = qLeft->get<dai::ImgFrame>();
 		auto inRight = qRight->get<dai::ImgFrame>();
 
 		// Get raw depth frame (depth values in millimeters)
 		depth16u = inDepth->getFrame();
+		// Get RGB color frame
+		rgb = inRGB->getFrame().clone();
 		leftView = inLeft->getFrame().clone();
 		rightView = inRight->getFrame().clone();
 		cv::resize(depth16u, depth16u, cv::Size(cols, rows));
+		cv::resize(rgb, rgb, cv::Size(cols, rows));
 
 		auto imuData = qIMU->get<dai::IMUData>();
 		if (imuData != nullptr)

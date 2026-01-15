@@ -130,10 +130,14 @@ Namespace MainApp
             OakDWaitForFrame(cPtr)
 
             SyncLock cameraMutex
+                Dim rgbPtr = OakDColor(cPtr)
+                If rgbPtr <> IntPtr.Zero Then
+                    color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, rgbPtr).Clone()
+                End If
+
                 Dim leftPtr = OakDLeftImage(cPtr)
                 If leftPtr <> IntPtr.Zero Then
                     leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr).Clone()
-                    color = leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 End If
 
                 Dim rightPtr = OakDRightImage(cPtr)
