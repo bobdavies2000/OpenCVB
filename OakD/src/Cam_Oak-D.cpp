@@ -10,9 +10,6 @@ using namespace cv;
 
 constexpr float FPS = 30.0f;
 
-static std::atomic<bool> subpixel{ true };
-static std::atomic<bool> lr_check{ true };
-
 class OakDCamera
 {
 private:
@@ -74,9 +71,9 @@ public:
 		pipeStereo->build(*outLeft, *outRight, dai::node::StereoDepth::PresetMode::DEFAULT);
 		// Options: MEDIAN_OFF, KERNEL_3x3, KERNEL_5x5, KERNEL_7x7 (default)
 		pipeStereo->initialConfig->setMedianFilter(dai::StereoDepthConfig::MedianFilter::KERNEL_7x7);
-		pipeStereo->setLeftRightCheck(lr_check);
+		pipeStereo->setLeftRightCheck(true);
 		pipeStereo->setExtendedDisparity(false);
-		pipeStereo->setSubpixel(subpixel);
+		pipeStereo->setSubpixel(false);
 
 		// Output queue will be used to get the raw depth frames from the outputs defined above
 		qDepth = pipeStereo->depth.createOutputQueue();
@@ -113,15 +110,17 @@ public:
 		// Get left and right frames (mono cameras - should be CV_8UC1)
 		leftView = inLeft->getFrame().clone();
 		rightView = inRight->getFrame().clone();
+		// Get disparity frame and resize to match capture resolution
 		auto disparityFrame = inDisparity->getFrame();
 		if (disparityFrame.size() != cv::Size(captureCols, captureRows)) {
 			cv::resize(disparityFrame, disparity, cv::Size(captureCols, captureRows), 0, 0, cv::INTER_NEAREST);
 		}
 		else {
-			disparity = depthFrame;
+			disparity = disparityFrame;
 		}
 		
-		disparity.convertTo(disparity, CV_8UC1, 255 / maxDisparity);
+		// Convert disparity to 8-bit for visualization (0-255 range)
+		disparity.convertTo(disparity, CV_8UC1, 255.0f / maxDisparity);
 
 		auto imuData = qIMU->get<dai::IMUData>();
 		if (imuData != nullptr)
