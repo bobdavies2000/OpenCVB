@@ -53,8 +53,8 @@ Namespace VBClasses
                     strOut += CStr(i) + ":" + vbTab + Format(i * incr, fmt1) + vbTab +
                               Format(histArray(i) / 1000, fmt3) + "k" + vbCrLf
                 Next
-                SetTrueText(strOut, 3)
             End If
+            SetTrueText(strOut, 3)
 
             plotHist.Run(histogram)
             histogram = plotHist.histogram ' reflect any updates to the 0 entry...  
@@ -75,7 +75,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hist_Grayscale : Inherits TaskParent
+    Public Class Hist_ Hist_Grayscale : Inherits TaskParent
         Public hist As New Hist_Basics
         Public Sub New()
             If standalone Then task.gOptions.setHistogramBins(255)

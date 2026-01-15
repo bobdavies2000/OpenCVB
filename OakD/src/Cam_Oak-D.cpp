@@ -87,7 +87,11 @@ public:
 		device = pipeline.getDefaultDevice();
 		deviceCalib = device->readCalibration();
 		baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();
-		maxDisparity = (float)pipeStereo->initialConfig->getMaxDisparity();
+		
+		// Get max disparity - with subpixel enabled, actual max is maxDisparity * subpixel_multiplier
+		// Subpixel uses fractional bits: 3 bits = 8x, 4 bits = 16x, 5 bits = 32x
+		int maxIntDisparity = pipeStereo->initialConfig->getMaxDisparity();
+		maxDisparity = (float)maxIntDisparity;
 	}
 	void waitForFrame()
 	{
@@ -111,16 +115,24 @@ public:
 		leftView = inLeft->getFrame().clone();
 		rightView = inRight->getFrame().clone();
 		// Get disparity frame and resize to match capture resolution
+		// Disparity is CV_16UC1 (16-bit) when subpixel is enabled, CV_8UC1 otherwise
 		auto disparityFrame = inDisparity->getFrame();
+		Mat disparityTemp;
 		if (disparityFrame.size() != cv::Size(captureCols, captureRows)) {
-			cv::resize(disparityFrame, disparity, cv::Size(captureCols, captureRows), 0, 0, cv::INTER_NEAREST);
+			cv::resize(disparityFrame, disparityTemp, cv::Size(captureCols, captureRows), 0, 0, cv::INTER_NEAREST);
 		}
 		else {
-			disparity = disparityFrame;
+			disparityTemp = disparityFrame;
 		}
 		
 		// Convert disparity to 8-bit for visualization (0-255 range)
-		disparity.convertTo(disparity, CV_8UC1, 255.0f / maxDisparity);
+		// maxDisparity already accounts for subpixel multiplier if enabled
+		// Disparity values are in pixels (with subpixel precision), not depth in mm
+		if (maxDisparity > 0) {
+			disparityTemp.convertTo(disparity, CV_8UC1, 255.0f / maxDisparity);
+		} else {
+			disparityTemp.convertTo(disparity, CV_8UC1);
+		}
 
 		auto imuData = qIMU->get<dai::IMUData>();
 		if (imuData != nullptr)
