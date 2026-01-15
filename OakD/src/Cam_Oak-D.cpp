@@ -94,8 +94,17 @@ public:
 		auto inLeft = qLeft->get<dai::ImgFrame>();
 		auto inRight = qRight->get<dai::ImgFrame>();
 
-		depth16u = inDepth->getFrame();
-		rgb = inRGB->getFrame().clone();
+		// Get depth frame and resize to match capture resolution
+		auto depthFrame = inDepth->getFrame();
+		if (depthFrame.size() != cv::Size(captureCols, captureRows)) {
+			cv::resize(depthFrame, depth16u, cv::Size(captureCols, captureRows), 0, 0, cv::INTER_NEAREST);
+		} else {
+			depth16u = depthFrame;
+		}
+
+		rgb = inRGB->getCvFrame();
+		
+		// Get left and right frames (mono cameras - should be CV_8UC1)
 		leftView = inLeft->getFrame().clone();
 		rightView = inRight->getFrame().clone();
 

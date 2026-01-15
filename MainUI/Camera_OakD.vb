@@ -134,12 +134,6 @@ Namespace MainApp
             OakDWaitForFrame(cPtr)
 
             SyncLock cameraMutex
-                Dim rgbPtr = OakDColor(cPtr)
-                If rgbPtr <> IntPtr.Zero Then
-                    color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, rgbPtr).Clone()
-                    color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
-                End If
-
                 Dim leftPtr = OakDLeftImage(cPtr)
                 If leftPtr <> IntPtr.Zero Then
                     leftView = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, leftPtr).Clone()
@@ -159,6 +153,11 @@ Namespace MainApp
                     pointCloud = ComputePointCloud(depth16u, calibData.leftIntrinsics)
                 End If
 
+                Dim rgbPtr = OakDColor(cPtr)
+                If rgbPtr <> IntPtr.Zero Then
+                    color = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC3, rgbPtr).Clone()
+                    color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                End If
                 ' Get IMU data
                 Dim accelPtr = OakDAccel(cPtr)
                 If accelPtr <> IntPtr.Zero Then
