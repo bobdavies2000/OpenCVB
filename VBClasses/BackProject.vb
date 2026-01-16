@@ -767,7 +767,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2).Clone
-            classCount = task.histogramBins + 1
+            classCount = task.histogramBins
 
             src.SetTo(task.MaxZmeters, task.maxDepthMask)
             plotHist.Run(src)

@@ -88,7 +88,7 @@ Public Class TreeviewForm
     End Sub
     Public Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
         If task Is Nothing Then Exit Sub
-        If task.cpu.callTrace.Count <> treeData.Count Then
+        If task.cpu.callTrace.Count > treeData.Count Then
             updateTree(New List(Of String)(task.cpu.callTrace))
         End If
 
