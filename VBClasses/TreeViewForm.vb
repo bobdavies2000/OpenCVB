@@ -1,4 +1,4 @@
-﻿Imports System.ComponentModel
+Imports System.ComponentModel
 Imports VBClasses
 Public Class TreeviewForm
     Dim botDistance As Integer
@@ -50,35 +50,28 @@ Public Class TreeviewForm
                 Dim fullname = callTrace(i)
                 fullname = fullname.Replace("at Startup\at Windows\", "")
                 Dim split() = fullname.Split("\")
-                'If split.Count = nodeLevel + 3 Then
-                alldone = False
+                If split.Count = nodeLevel + 3 Then
+                    alldone = False
                     Dim node = getNode(tv, fullname)
-                If node Is Nothing Then
-                    If nodeLevel = 0 Then
-                        node = tv.Nodes(nodeLevel).Nodes.Add(split(nodeLevel + 1))
-                        Debug.WriteLine("level 0 " + fullname)
+                    If node Is Nothing Then
+                        If nodeLevel = 0 Then
+                            node = tv.Nodes(nodeLevel).Nodes.Add(split(nodeLevel + 1))
+                        Else
+                            Dim parent = Mid(fullname, 1, Len(fullname) - Len(split(nodeLevel + 1)) - 1)
+                            If parent <> rootcall Then
+                                node = getNode(tv, parent)
+                                If node Is Nothing Then Continue For
+                                node = node.Nodes.Add(split(nodeLevel + 1))
+                            End If
+                        End If
                     Else
-                        Dim parent = Mid(fullname, 1, Len(fullname) - Len(split(nodeLevel + 1)) - 1)
-                        If parent <> rootcall Then
-                            node = getNode(tv, parent)
-                            If node Is Nothing Then Continue For
-                            node = node.Nodes.Add(split(nodeLevel + 1))
-                            Debug.WriteLine(fullname)
+                        If nodeLevel < split.Count Then
+                            If split(nodeLevel) <> "" Then node = node.Nodes.Add(split(nodeLevel))
                         End If
                     End If
-                Else
-                    If nodeLevel < split.Count Then
-                        If split(nodeLevel) <> "" Then
-                            node = node.Nodes.Add(split(nodeLevel))
-                            Debug.WriteLine("Not nothing" + fullname)
-                        End If
-                    End If
-                End If
-                entryCount += 1
+                    entryCount += 1
                     node.Tag = fullname
-                'Else
-                '    Dim k = 0
-                'End If
+                End If
             Next
             If alldone Then Exit For ' we didn't find any more nodes to add.
         Next

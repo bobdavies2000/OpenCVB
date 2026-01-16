@@ -61,6 +61,8 @@ Namespace VBClasses
             dst3 = New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
 
             standalone = traceName = task.Settings.algorithm
+            callStack = callStack.Replace("at Startup\", "")
+            callStack = callStack.Replace("at Windows\", "")
             task.cpu.callTrace.Add(callStack)
 
             task.cpu.activeObjects.Add(Me)
