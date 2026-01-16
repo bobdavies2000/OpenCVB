@@ -457,7 +457,7 @@ Namespace VBClasses
 
     Public Class Plane_Histogram : Inherits TaskParent
         Dim solo As New Cloud_Solo
-        Dim hist As New Hist_Basics
+        Dim hist As New Histogram_Basics
         Public peakCeiling As Single
         Public peakFloor As Single
         Public ceilingPop As Single

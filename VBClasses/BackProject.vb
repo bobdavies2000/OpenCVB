@@ -1,10 +1,10 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
-' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
+' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
 Namespace VBClasses
     Public Class BackProject_Basics : Inherits TaskParent
         Implements IDisposable
-        Public hist As New Hist_Basics
+        Public hist As New Histogram_Basics
         Public minRange As cv.Scalar, maxRange As cv.Scalar
         Public Sub New()
             labels(2) = "Move mouse to backproject a histogram column"
@@ -110,7 +110,7 @@ Namespace VBClasses
 
 
     Public Class BackProject_PointCloud : Inherits TaskParent
-        Public hist As New Hist_PointCloud_XZ_YZ
+        Public hist As New Histogram_PointCloud_XZ_YZ
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
             labels = {"", "", "Backprojection after histogram binning X and Z values", "Backprojection after histogram binning Y and Z values"}
@@ -194,7 +194,7 @@ Namespace VBClasses
 
     Public Class BackProject_FullEqualized : Inherits TaskParent
         Dim backP As New BackProject_Full
-        Dim equalize As New Hist_EqualizeColor
+        Dim equalize As New Histogram_EqualizeColor
         Public Sub New()
             labels = {"", "", "BackProject_Full output without equalization", "BackProject_Full with equalization"}
             desc = "Create a histogram from the equalized color and then backproject it."
@@ -333,9 +333,9 @@ Namespace VBClasses
 
 
 
-    ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
+    ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
     Public Class BackProject_Image : Inherits TaskParent
-        Public hist As New Hist_Basics
+        Public hist As New Histogram_Basics
         Public mask As New cv.Mat
         Public useInrange As Boolean
         Public Sub New()
@@ -503,7 +503,7 @@ Namespace VBClasses
 
 
     Public Class BackProject_Masks : Inherits TaskParent
-        Public hist As New Hist_Basics
+        Public hist As New Histogram_Basics
         Public histIndex As Integer
         Public mask As New cv.Mat
         Public Sub New()
@@ -549,7 +549,7 @@ Namespace VBClasses
         Public histList As New List(Of List(Of Single))
         Public histogramList As New List(Of cv.Mat)
         Dim inputMatList As New List(Of cv.Mat)
-        Dim histS As New Hist_DepthSimple
+        Dim histS As New Histogram_DepthSimple
         Dim plotHist As New Plot_Histogram
         Public Sub New()
             plotHist.addLabels = False

@@ -2,7 +2,7 @@
 'https://security.stackexchange.com/questions/42428/Is-generating-random-numbers-using-a-smartphone-camera-a-good-idea
 Namespace VBClasses
     Public Class Photon_Basics : Inherits TaskParent
-        Dim hist As New Hist_Basics
+        Dim hist As New Histogram_Basics
         Public Sub New()
             labels = {"", "", "Points where B, G, or R differ from the previous image", "Histogram showing distribution of absolute value of differences"}
             desc = "With no motion the camera values will show the random photon differences.  Are they random?"
@@ -89,7 +89,7 @@ Namespace VBClasses
 
     'https://security.stackexchange.com/questions/42428/Is-generating-random-numbers-using-a-smartphone-camera-a-good-idea
     Public Class Photon_Subtraction : Inherits TaskParent
-        Dim hist As New Hist_Basics
+        Dim hist As New Histogram_Basics
         Public Sub New()
             labels = {"", "", "Points where B, G, or R differ", "Histogram showing distribution of differences"}
             desc = "Same as Photon_Basics but without ignoring sign."
@@ -118,7 +118,7 @@ Namespace VBClasses
 
 
     Public Class Photon_Distance3D : Inherits TaskParent
-        Dim hist As New Hist_Basics
+        Dim hist As New Histogram_Basics
         Dim distances As New List(Of Single)
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics

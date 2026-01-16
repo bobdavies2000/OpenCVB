@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Bin2Way_Basics : Inherits TaskParent
-        Public hist As New Hist_Basics
+        Public hist As New Histogram_Basics
         Public mats As New Mat_4Click
         Public fraction As Single
         Dim halfSplit As Integer

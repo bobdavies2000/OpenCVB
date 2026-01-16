@@ -29,7 +29,7 @@ Namespace VBClasses
 
 
     Public Class Duster_MaskZ : Inherits TaskParent
-        Public hist As New Hist_Basics
+        Public hist As New Histogram_Basics
         Public classCount As Integer
         Public options As New Options_GuidedBPDepth
         Public Sub New()

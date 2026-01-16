@@ -279,7 +279,7 @@ Namespace VBClasses
 
 
 
-    'https://docs.opencvb.org/master/d1/db7/tutorial_py_Hist_begins.html
+    'https://docs.opencvb.org/master/d1/db7/tutorial_py_Histogram_begins.html
     Public Class Filter_Equalize : Inherits TaskParent
         Public Sub New()
             labels(2) = "Equalized image"

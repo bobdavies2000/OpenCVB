@@ -102,11 +102,11 @@ Guess
 GuidedBP
 HeatMap
 HighVis
-Hist
 Hist2D
 Hist3D
 Hist3Dcloud
 Hist3Dcolor
+Histogram
 History
 HistPeak2D
 HistValley

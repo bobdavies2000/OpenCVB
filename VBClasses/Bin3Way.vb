@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Bin3Way_Basics : Inherits TaskParent
-        Dim hist As New Hist_Basics
+        Dim hist As New Histogram_Basics
         Public mats As New Mat_4Click
         Dim firstThird As Integer, lastThird As Integer
         Public Sub New()

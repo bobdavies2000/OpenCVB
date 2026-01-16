@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
+' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
 Namespace VBClasses
     Public Class BackProject2D_Basics : Inherits TaskParent
         Public hist2d As New Hist2D_Basics
@@ -54,7 +54,7 @@ Namespace VBClasses
 
 
 
-    ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Hist_backprojection.html
+    ' https://docs.opencvb.org/3.4/dc/df6/tutorial_py_Histogram_backprojection.html
     'Public Class BackProject2D_BasicsOld : Inherits TaskParent
     '    Public hist2d As New Hist2D_Basics
     '    Public xRange As Integer = 255
@@ -108,7 +108,7 @@ Namespace VBClasses
         Public Sub New()
             labels(2) = "Hue (upper left), sat (upper right), highlighted backprojection (bottom left)"
             If standalone Then task.gOptions.GridSlider.Value = 10
-            desc = "Compare the hue and brightness images and the results of the Hist_backprojection2d"
+            desc = "Compare the hue and brightness images and the results of the Histogram_backprojection2d"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             hueSat.Run(task.color.Clone)

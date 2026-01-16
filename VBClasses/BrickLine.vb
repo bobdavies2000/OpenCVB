@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class BrickLine_Basics : Inherits TaskParent
-        Dim hist As New Hist_GridCell
+        Dim hist As New Histogram_GridCell
         Public edgeRequest As Boolean
         Public options As New Options_Features
         Public Sub New()

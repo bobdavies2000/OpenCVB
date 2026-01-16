@@ -1003,10 +1003,10 @@ Namespace VBClasses
 
 
     Public Class Edge_CloudSegments : Inherits TaskParent
-        Dim segments As New Hist_CloudSegments
+        Dim segments As New Histogram_CloudSegments
         Dim edges As New Edge_Sobel
         Public Sub New()
-            desc = "Build edges from the point cloud segments from Hist_Cloud - simplistic approach"
+            desc = "Build edges from the point cloud segments from Histogram_Cloud - simplistic approach"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             segments.Run(src)
@@ -1021,7 +1021,7 @@ Namespace VBClasses
 
     Public Class Edge_DiffX_CPP : Inherits TaskParent
         Implements IDisposable
-        Public segments As New Hist_CloudSegments
+        Public segments As New Histogram_CloudSegments
         Dim edges As New Edge_Sobel
         Public Sub New()
             cPtr = Edge_DiffX_Open()
@@ -1051,7 +1051,7 @@ Namespace VBClasses
 
     Public Class Edge_DiffY_CPP : Inherits TaskParent
         Implements IDisposable
-        Public segments As New Hist_CloudSegments
+        Public segments As New Histogram_CloudSegments
         Dim edges As New Edge_Sobel
         Public Sub New()
             cPtr = Edge_DiffY_Open()
@@ -1081,7 +1081,7 @@ Namespace VBClasses
 
     Public Class Edge_DiffZ_CPP : Inherits TaskParent
         Implements IDisposable
-        Public segments As New Hist_CloudSegments
+        Public segments As New Histogram_CloudSegments
         Dim edges As New Edge_Sobel
         Public Sub New()
             cPtr = Edge_DiffY_Open()

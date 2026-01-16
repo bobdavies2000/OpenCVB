@@ -3,7 +3,6 @@ Imports VBClasses
 Public Class TreeviewForm
     Dim botDistance As Integer
     Dim treeData As New List(Of String)
-    Dim moduleList As New List(Of String) ' the list of all active algorithms.
     Dim titleStr = " - Click on any node to review the algorithm's output."
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         TreeView1.Height = Me.Height
@@ -33,9 +32,6 @@ Public Class TreeviewForm
         Return Nothing
     End Function
     Public Sub updateTree(callTrace As List(Of String))
-        If callTrace.Count = 0 Then Exit Sub
-        moduleList.Clear()
-
         Dim tv = TreeView1
         tv.Nodes.Clear()
         Dim rootcall = Trim(callTrace(0))
@@ -52,27 +48,37 @@ Public Class TreeviewForm
 
             For i = 1 To callTrace.Count - 1
                 Dim fullname = callTrace(i)
+                fullname = fullname.Replace("at Startup\at Windows\", "")
                 Dim split() = fullname.Split("\")
-                If split.Count = nodeLevel + 3 Then
-                    alldone = False
+                'If split.Count = nodeLevel + 3 Then
+                alldone = False
                     Dim node = getNode(tv, fullname)
-                    If node Is Nothing Then
-                        If nodeLevel = 0 Then
-                            node = tv.Nodes(nodeLevel).Nodes.Add(split(nodeLevel + 1))
-                        Else
-                            Dim parent = Mid(fullname, 1, Len(fullname) - Len(split(nodeLevel + 1)) - 1)
-                            If parent <> rootcall Then
-                                node = getNode(tv, parent)
-                                If node Is Nothing Then Continue For
-                                node = node.Nodes.Add(split(nodeLevel + 1))
-                            End If
-                        End If
+                If node Is Nothing Then
+                    If nodeLevel = 0 Then
+                        node = tv.Nodes(nodeLevel).Nodes.Add(split(nodeLevel + 1))
+                        Debug.WriteLine("level 0 " + fullname)
                     Else
-                        node = node.Nodes.Add(split(nodeLevel))
+                        Dim parent = Mid(fullname, 1, Len(fullname) - Len(split(nodeLevel + 1)) - 1)
+                        If parent <> rootcall Then
+                            node = getNode(tv, parent)
+                            If node Is Nothing Then Continue For
+                            node = node.Nodes.Add(split(nodeLevel + 1))
+                            Debug.WriteLine(fullname)
+                        End If
                     End If
-                    entryCount += 1
-                    node.Tag = fullname
+                Else
+                    If nodeLevel < split.Count Then
+                        If split(nodeLevel) <> "" Then
+                            node = node.Nodes.Add(split(nodeLevel))
+                            Debug.WriteLine("Not nothing" + fullname)
+                        End If
+                    End If
                 End If
+                entryCount += 1
+                    node.Tag = fullname
+                'Else
+                '    Dim k = 0
+                'End If
             Next
             If alldone Then Exit For ' we didn't find any more nodes to add.
         Next
@@ -89,9 +95,7 @@ Public Class TreeviewForm
     End Sub
     Public Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
         If task Is Nothing Then Exit Sub
-        Static saveCount As Integer
-        If task.cpu.callTrace.Count <> saveCount Then
-            saveCount = task.cpu.callTrace.Count
+        If task.cpu.callTrace.Count <> treeData.Count Then
             updateTree(New List(Of String)(task.cpu.callTrace))
         End If
 

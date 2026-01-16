@@ -38,7 +38,7 @@ Namespace VBClasses
         Public threshold As Integer
         Public classCount As Integer
         Public histArray() As Single
-        Dim plot As New Hist_Depth
+        Dim plot As New Histogram_Depth
         Public Sub New()
             desc = "Build a guided 3D histogram from the 3D histogram supplied in src."
         End Sub

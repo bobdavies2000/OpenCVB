@@ -225,7 +225,7 @@ Namespace VBClasses
 
 
     Public Class SLR_Trends : Inherits TaskParent
-        Public hist As New Hist_KalmanAuto
+        Public hist As New Histogram_KalmanAuto
         Dim valList As New List(Of Single)
         Dim barMidPoint As Single
         Dim lastPoint As cv.Point2f

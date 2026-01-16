@@ -10300,7 +10300,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCell_Basics : Inherits TaskParent
-        Dim plot As New Hist_Depth
+        Dim plot As New Histogram_Depth
         Public runRedCflag As Boolean
         Public Sub New()
             If standalone Then task.gOptions.setHistogramBins(20)
@@ -10453,7 +10453,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCell_BasicsPlot : Inherits TaskParent
-        Dim plot As New Hist_Depth
+        Dim plot As New Histogram_Depth
         Public runRedCflag As Boolean
         Dim stats As New XO_RedCell_Basics
         Public Sub New()
@@ -14382,7 +14382,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCC_Histograms : Inherits TaskParent
-        Dim hist As New Hist_Basics
+        Dim hist As New Histogram_Basics
         Public redCC As New RedCC_Color8U
         Public colorIDList As New List(Of List(Of Integer))
         Public Sub New()

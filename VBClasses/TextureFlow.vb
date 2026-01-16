@@ -66,7 +66,7 @@ Namespace VBClasses
 
 
     Public Class TextureFlow_DepthSegments : Inherits TaskParent
-        Dim segments As New Hist_CloudSegments
+        Dim segments As New Histogram_CloudSegments
         Dim diffx As New Edge_DiffX_CPP
         Dim flow As New TextureFlow_Basics
         Public Sub New()

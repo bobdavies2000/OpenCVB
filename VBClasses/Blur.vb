@@ -184,7 +184,7 @@ Namespace VBClasses
     Public Class Blur_PlusHistogram : Inherits TaskParent
         Dim mat2to1 As New Mat_2to1
         Dim blur As New Blur_Bilateral
-        Dim myhist As New Hist_EqualizeGray
+        Dim myhist As New Histogram_EqualizeGray
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(2) = "Use Blur slider to see impact on histogram peak values"
@@ -216,7 +216,7 @@ Namespace VBClasses
 
     Public Class Blur_Histogram : Inherits TaskParent
         Dim blur As New Blur_Bilateral
-        Dim myhist As New Hist_Basics
+        Dim myhist As New Histogram_Basics
         Public Sub New()
             labels(2) = "Histogram of the input without any blur."
             desc = "Visualize the impact of blurring with the histogram.  Draw a rectangle anywhere to test a section of the image."

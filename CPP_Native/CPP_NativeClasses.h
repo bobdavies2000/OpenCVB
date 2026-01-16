@@ -760,27 +760,27 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-Project_GravityHistogram* Project_GravityHist_Open()
+Project_GravityHistogram* Project_GravityHistogram_Open()
 {
     Project_GravityHistogram* cPtr = new Project_GravityHistogram();
     return cPtr;
 }
 
 extern "C" __declspec(dllexport)
-int* Project_GravityHist_Close(Project_GravityHistogram* cPtr)
+int* Project_GravityHistogram_Close(Project_GravityHistogram* cPtr)
 {
     delete cPtr;
     return (int*)0;
 }
 
 extern "C" __declspec(dllexport)
-int* Project_GravityHist_Side(Project_GravityHistogram* cPtr)
+int* Project_GravityHistogram_Side(Project_GravityHistogram* cPtr)
 {
     return (int*)cPtr->histSide.data;
 }
 
 extern "C" __declspec(dllexport)
-int* Project_GravityHist_Run(Project_GravityHistogram* cPtr, int* xyzPtr, float maxZ, int rows, int cols)
+int* Project_GravityHistogram_Run(Project_GravityHistogram* cPtr, int* xyzPtr, float maxZ, int rows, int cols)
 {
     cPtr->xyz = Mat(rows, cols, CV_32FC3, xyzPtr);
     cPtr->histTop = Mat(rows, cols, CV_32F).setTo(0);
@@ -1414,13 +1414,13 @@ uchar* BackProjectCloud_Run(int* inputPtr, int rows, int cols, int bins, float t
 
 
 
-class Hist_1D
+class Histogram_1D
 {
 private:
 public:
     Mat src;
     Mat histogram;
-    Hist_1D() {}
+    Histogram_1D() {}
     void RunCPP(int bins) {
         float hRange[] = { 0, 256 };
         int hbins[] = { bins };
@@ -1429,22 +1429,22 @@ public:
     }
 };
 extern "C" __declspec(dllexport)
-Hist_1D* Hist_1D_Open() {
-    Hist_1D* cPtr = new Hist_1D();
+Histogram_1D* Histogram_1D_Open() {
+    Histogram_1D* cPtr = new Histogram_1D();
     return cPtr;
 }
 extern "C" __declspec(dllexport)
-float Hist_1D_Sum(Hist_1D* cPtr) {
+float Histogram_1D_Sum(Histogram_1D* cPtr) {
     Scalar count = sum(cPtr->histogram);
     return count[0];
 }
 extern "C" __declspec(dllexport)
-void Hist_1D_Close(Hist_1D* cPtr)
+void Histogram_1D_Close(Histogram_1D* cPtr)
 {
     delete cPtr;
 }
 extern "C" __declspec(dllexport)
-int* Hist_1D_RunCPP(Hist_1D* cPtr, int* dataPtr, int rows, int cols, int bins)
+int* Histogram_1D_RunCPP(Histogram_1D* cPtr, int* dataPtr, int rows, int cols, int bins)
 {
     cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
     cPtr->RunCPP(bins);

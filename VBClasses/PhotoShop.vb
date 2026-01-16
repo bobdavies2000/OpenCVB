@@ -97,7 +97,7 @@ Namespace VBClasses
 
     ' https://blog.csdn.net/just_sort/article/details/85982871
     Public Class PhotoShop_WhiteBalancePlot : Inherits TaskParent
-        Dim hist As New Hist_Graph
+        Dim hist As New Histogram_Graph
         Dim whiteCPP As New PhotoShop_WhiteBalance
         Public Sub New()
             hist.plotRequested = True
@@ -172,8 +172,8 @@ Namespace VBClasses
     ' https://blog.csdn.net/just_sort/article/details/85982871
     Public Class PhotoShop_PlotHist : Inherits TaskParent
         Dim whiteBal As New PhotoShop_ChangeMask
-        Public hist1 As New Hist_Basics
-        Public hist2 As New Hist_Basics
+        Public hist1 As New Histogram_Basics
+        Public hist2 As New Histogram_Basics
         Dim mat2to1 As New Mat_2to1
         Public Sub New()
             hist1.plotHist.addLabels = False

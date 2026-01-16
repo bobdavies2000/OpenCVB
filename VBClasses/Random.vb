@@ -233,7 +233,7 @@ Namespace VBClasses
 
 
     Public Class Random_CheckUniformSmoothed : Inherits TaskParent
-        Dim histogram As New Hist_Basics
+        Dim histogram As New Histogram_Basics
         Dim rUniform As New Random_UniformDist
         Public Sub New()
             desc = "Display the smoothed histogram for a uniform distribution."
@@ -253,7 +253,7 @@ Namespace VBClasses
 
 
     Public Class Random_CheckUniformDist : Inherits TaskParent
-        Dim histogram As New Hist_Graph
+        Dim histogram As New Histogram_Graph
         Dim rUniform As New Random_UniformDist
         Public Sub New()
             desc = "Display the histogram for a uniform distribution."
@@ -273,7 +273,7 @@ Namespace VBClasses
 
 
     Public Class Random_CheckNormalDist : Inherits TaskParent
-        Dim histogram As New Hist_Graph
+        Dim histogram As New Histogram_Graph
         Dim normalDist As New Random_NormalDist
         Public Sub New()
             desc = "Display the histogram for a Normal distribution."
@@ -292,7 +292,7 @@ Namespace VBClasses
 
 
     Public Class Random_CheckNormalDistSmoothed : Inherits TaskParent
-        Dim histogram As New Hist_Basics
+        Dim histogram As New Histogram_Basics
         Dim normalDist As New Random_NormalDist
         Public Sub New()
             histogram.plotHist.minRange = 1
@@ -421,7 +421,7 @@ Namespace VBClasses
 
     Public Class Random_CustomHistogram : Inherits TaskParent
         Public random As New Random_CustomDistribution
-        Public hist As New Hist_Simple
+        Public hist As New Histogram_Simple
         Public saveHist As cv.Mat
         Public Sub New()
             random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, cv.Scalar.All(0))

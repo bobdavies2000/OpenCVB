@@ -44,7 +44,7 @@ Namespace VBClasses
             pcMotion = New Motion_PointCloud
             grid = New Grid_Basics
             lines = New Line_Basics
-            rgbFilter = New Filter_Basics
+            filterBasics = New Filter_Basics
             brightness = New Brightness_Basics
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
@@ -78,7 +78,7 @@ Namespace VBClasses
 
             taskUpdate()
 
-            If task.cpu.algorithm_ms.Count = 0 Then task.cpu.initialize(Settings.algorithm)
+            If task.firstPass Then task.cpu.initialize(Settings.algorithm)
 
             Dim src = task.color
             If src.Width = 0 Or task.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
@@ -111,7 +111,7 @@ Namespace VBClasses
             brightness.Run(rightView)
             rightView = brightness.dst2.Clone
 
-            rgbFilter.Run(color)
+            filterBasics.Run(color)
             If gOptions.UseMotionMask.Checked Then
                 motionBasics.Run(gray)
                 If optionsChanged Or task.frameCount < 5 Then
@@ -180,7 +180,6 @@ Namespace VBClasses
             End If
 
 
-            Dim mm = GetMinMax(task.pcSplit(2))
 
 
             algorithmPrep = False

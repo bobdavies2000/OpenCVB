@@ -34,10 +34,10 @@ Public Class OptionsFeatures
 
         MatchCorrSlider.Value = 95
 
-        ReDim grayCheckbox(task.rgbFilter.grayFilter.filterList.Count - 1)
-        For i = 0 To task.rgbFilter.grayFilter.filterList.Count - 1
+        ReDim grayCheckbox(task.filterBasics.grayFilter.filterList.Count - 1)
+        For i = 0 To task.filterBasics.grayFilter.filterList.Count - 1
             Dim cb As New RadioButton
-            cb.Text = task.rgbFilter.grayFilter.filterList(i)
+            cb.Text = task.filterBasics.grayFilter.filterList(i)
             cb.Location = New Point(20, 20 + i * 20)
             cb.AutoSize = True
             cb.Tag = i
@@ -47,10 +47,10 @@ Public Class OptionsFeatures
         Next
         grayCheckbox(0).Checked = True
 
-        ReDim colorCheckbox(task.rgbFilter.filterList.Count - 1)
-        For i = 0 To task.rgbFilter.filterList.Count - 1
+        ReDim colorCheckbox(task.filterBasics.filterList.Count - 1)
+        For i = 0 To task.filterBasics.filterList.Count - 1
             Dim cb As New RadioButton
-            cb.Text = task.rgbFilter.filterList(i)
+            cb.Text = task.filterBasics.filterList(i)
             cb.Location = New Point(20, 20 + i * 20)
             cb.AutoSize = True
             cb.Tag = i

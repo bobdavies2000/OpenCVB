@@ -176,7 +176,7 @@ Namespace VBClasses
 
 
     Public Class GuidedBP_Depth : Inherits TaskParent
-        Public hist As New Hist_PointCloud
+        Public hist As New Histogram_PointCloud
         Public classCount As Integer
         Public Sub New()
             task.gOptions.setHistogramBins(16)

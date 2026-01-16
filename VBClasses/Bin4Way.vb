@@ -323,7 +323,7 @@ Namespace VBClasses
 
 
     Public Class Bin4Way_UnstablePixels1 : Inherits TaskParent
-        Dim hist As New Hist_Basics
+        Dim hist As New Histogram_Basics
         Dim unstable As New Bin4Way_UnstableEdges
         Public gapValues As New List(Of Byte)
         Dim boundaries(4) As Byte
@@ -560,7 +560,7 @@ Namespace VBClasses
 
     Public Class Bin4Way_BasicsRed : Inherits TaskParent
         Public mats As New Mat_4to1
-        Dim hist As New Hist_Basics
+        Dim hist As New Histogram_Basics
         Public Sub New()
             task.gOptions.setHistogramBins(255)
             labels(3) = "Grayscale histogram of the image with markers showing where each quarter of the samples are."

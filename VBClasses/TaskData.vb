@@ -84,7 +84,7 @@ Namespace VBClasses
         Public grid As Grid_Basics
         Public palette As Palette_LoadColorMap
         Public PixelViewer As Pixel_Viewer
-        Public rgbFilter As Filter_Basics
+        Public filterBasics As Filter_Basics
         Public gravityBasics As Gravity_Basics
         Public imuBasics As IMU_Basics
         Public motionBasics As Motion_Basics

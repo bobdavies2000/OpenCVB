@@ -348,18 +348,18 @@ Namespace VBClasses
 
 
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function Hist_1D_Open() As IntPtr
+        Public Function Histogram_1D_Open() As IntPtr
         End Function
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Sub Hist_1D_Close(cPtr As IntPtr)
+        Public Sub Histogram_1D_Close(cPtr As IntPtr)
         End Sub
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function Hist_1D_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32,
+        Public Function Histogram_1D_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Int32, cols As Int32,
                                             bins As Integer) As IntPtr
         End Function
 
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function Hist_1D_Sum(cPtr As IntPtr) As Single
+        Public Function Histogram_1D_Sum(cPtr As IntPtr) As Single
         End Function
 
         Public histDelta = 0.00001

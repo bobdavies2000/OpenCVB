@@ -165,9 +165,6 @@ Namespace MainApp
                     disparity = disparity.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
-                cv.Cv2.ImShow("disparity", disparity)
-                cv.Cv2.WaitKey(1)
-
                 ' Get IMU data
                 Dim accelPtr = OakDAccel(cPtr)
                 If accelPtr <> IntPtr.Zero Then
@@ -182,7 +179,6 @@ Namespace MainApp
                 IMU_FrameTime = OakDIMUTimeStamp(cPtr)
             End SyncLock
 
-            ' OakDLaserOff(cPtr)
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End Sub
         Public Overrides Sub StopCamera()

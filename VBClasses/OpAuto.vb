@@ -4,7 +4,7 @@ Namespace VBClasses
     Public Class OpAuto_Valley : Inherits TaskParent
         Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Public options As New Options_Boundary
-        Dim kalmanHist As New Hist_Kalman
+        Dim kalmanHist As New Histogram_Kalman
         Public Sub New()
             If standalone Then task.gOptions.setHistogramBins(255)
             desc = "Get the top X highest quality valley points in the histogram."

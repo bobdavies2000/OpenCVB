@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class HistValley_Basics : Inherits TaskParent
-        Dim hist As New Hist_Basics
+        Dim hist As New Histogram_Basics
         Dim options As New Options_Boundary
         Public valleys(3) As Integer ' grayscale values for low points in the histogram.
         Dim scaleList As New List(Of Single)
@@ -119,7 +119,7 @@ Namespace VBClasses
 
 
     Public Class HistValley_Peaks : Inherits TaskParent
-        Public hist As New Hist_Basics
+        Public hist As New Histogram_Basics
         Public options As New Options_Boundary
         Public peaks As New List(Of Integer)
         Public histArray() As Single
@@ -258,7 +258,7 @@ Namespace VBClasses
     Public Class HistValley_Test : Inherits TaskParent
         Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         Public options As New Options_Boundary
-        Dim kalmanHist As New Hist_Kalman
+        Dim kalmanHist As New Histogram_Kalman
         Public Sub New()
             If standalone Then task.gOptions.setHistogramBins(255)
             desc = "Get the top X highest quality valley points in the histogram."
@@ -321,7 +321,7 @@ Namespace VBClasses
 
 
     Public Class HistValley_OptionsAuto : Inherits TaskParent
-        Dim kalman As New Hist_Kalman
+        Dim kalman As New Histogram_Kalman
         Public histogram As New cv.Mat
         Public auto As New OpAuto_Valley
         Public Sub New()
@@ -499,7 +499,7 @@ Namespace VBClasses
 
 
     Public Class HistValley_Colors : Inherits TaskParent
-        Dim hist As New Hist_Kalman
+        Dim hist As New Histogram_Kalman
         Dim auto As New OpAuto_Valley
         Dim splitIndex As Integer
         Public Sub New()
@@ -536,7 +536,7 @@ Namespace VBClasses
 
 
     Public Class HistValley_GrayKalman : Inherits TaskParent
-        Dim hist As New Hist_Kalman
+        Dim hist As New Histogram_Kalman
         Dim auto As New OpAuto_Valley
         Public Sub New()
             task.kalman = New Kalman_Basics
@@ -577,7 +577,7 @@ Namespace VBClasses
 
 
     Public Class HistValley_GrayScale1 : Inherits TaskParent
-        Dim hist As New Hist_Basics
+        Dim hist As New Histogram_Basics
         Public Sub New()
             If standalone Then task.gOptions.setHistogramBins(255)
             desc = "Find the histogram valleys for a grayscale image."

@@ -140,7 +140,7 @@ Namespace VBClasses
 
 
     Public Class LUT_Equalized : Inherits TaskParent
-        Dim eq As New Hist_EqualizeGray
+        Dim eq As New Histogram_EqualizeGray
         Dim lut As New LUT_Basics
         Public Sub New()
             labels(2) = "Without Histogram Equalized"
