@@ -1,44 +1,22 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class LeftRight_Basics : Inherits TaskParent
+        Public meanLeft As Double
+        Public meanRight As Double
         Public Sub New()
             labels = {"", "", "Left camera image", "Right camera image"}
             desc = "Display the left and right views as they came from the camera."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = task.leftView
-            dst3 = task.rightView
-        End Sub
-    End Class
-
-
-
-
-
-
-
-    Public Class LeftRight_Raw : Inherits TaskParent
-        Dim options As New Options_LeftRight
-        Public Sub New()
-            desc = "Show slices of the left and right view next to each other for visual comparison"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
+            cv.Cv2.Normalize(dst2, task.leftView, 0, 255, cv.NormTypes.MinMax)
             dst2 = task.leftView
+
             dst3 = task.rightView
-
-            'Dim r1 = New cv.Rect(0, options.sliceY, task.leftView.Width, options.sliceHeight)
-            'Dim r2 = New cv.Rect(0, 25, task.leftView.Width, options.sliceHeight)
-            'dst2.SetTo(0)
-            'task.leftView(r1).CopyTo(dst2(r2))
-
-            'r2.Y += options.sliceHeight
-            'task.rightView(r1).CopyTo(dst2(r2))
-            'dst3 = task.rightView
+            cv.Cv2.Normalize(dst3, task.rightView, 0, 255, cv.NormTypes.MinMax)
+            dst3 = task.rightView
         End Sub
     End Class
-
 
 
 
@@ -252,6 +230,80 @@ Namespace VBClasses
 
             edges.Run(task.rightView)
             dst3 = edges.dst2
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class LeftRight_RedMask : Inherits TaskParent
+        Dim redLeft As New LeftRight_RedLeft
+        Dim redRight As New LeftRight_RedRight
+        Public Sub New()
+            desc = "Display the RedMask_Basics output for both the left and right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redLeft.Run(task.leftView)
+            dst2 = redLeft.dst2.Clone
+            If standaloneTest() Then
+                For Each md In redLeft.redMask.mdList
+                    DrawCircle(dst2, md.maxDist, task.DotSize, task.highlight)
+                Next
+            End If
+
+            redRight.Run(task.rightView)
+            dst3 = redRight.dst2.Clone
+            If standaloneTest() Then
+                For Each md In redRight.redMask.mdList
+                    DrawCircle(dst3, md.maxDist, task.DotSize, task.highlight)
+                Next
+            End If
+            labels(2) = redLeft.labels(2)
+            labels(3) = redRight.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class LeftRight_RedRight : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Public redMask As New RedMask_Basics
+        Public Sub New()
+            desc = "Segment the right view image with RedMask_Basics"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst3 = task.leftView
+            fLess.Run(dst3)
+
+            dst2 = fLess.dst2
+            redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            dst2 = PaletteFull(redMask.dst2)
+            labels(2) = redMask.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class LeftRight_RedLeft : Inherits TaskParent
+        Dim fLess As New FeatureLess_Basics
+        Public redMask As New RedMask_Basics
+        Public Sub New()
+            desc = "Segment the left view image with RedMask_Basics"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst3 = task.leftView
+            fLess.Run(dst3)
+
+            redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            dst2 = PaletteFull(redMask.dst2)
+            labels(2) = redMask.labels(2)
         End Sub
     End Class
 End Namespace

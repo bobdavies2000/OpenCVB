@@ -4348,6 +4348,7 @@ int EdgeLineRaw_GetSegCount(EdgeLineRaw* cPtr)
 
 extern "C" __declspec(dllexport) int* EdgeLineRaw_Rects(EdgeLineRaw* cPtr)
 {
+    if (cPtr->rects.size() == 0) return 0;
     return (int*)&cPtr->rects[0];
 }
 

@@ -139,7 +139,6 @@ Boundary_RedCloud
 Boundary_RedColor
 Boundary_RemovedRects
 Brick_Basics
-Brick_Cloud
 Brick_CloudMaxVal
 Brick_CloudMean
 Brick_CloudRange
@@ -810,7 +809,7 @@ Histogram_GotchaFixed_CPP
 Histogram_Graph
 Histogram_Grayscale
 Histogram_GridCell
-Histogram_Inverse
+Histogram_InverseLUT
 Histogram_Kalman
 Histogram_KalmanAuto
 Histogram_Lab
@@ -990,10 +989,11 @@ LeftRight_ContourLeft
 LeftRight_Edges
 LeftRight_EdgesColor
 LeftRight_Palettized
-LeftRight_Raw
 LeftRight_RawLeft
+LeftRight_RedLeft
 LeftRight_RedLeftGray
 LeftRight_RedMask
+LeftRight_RedRight
 LeftRight_RedRightGray
 LeftRight_Reduction
 LeftRight_RGBAlignLeft
@@ -1360,7 +1360,6 @@ RedCloud_Basics
 RedCloud_Cell
 RedCloud_CellDepthHistogram
 RedCloud_CellMask
-RedCloud_Small
 RedCloud_Sweep
 RedColor_Basics
 RedColor_CPP

@@ -1393,7 +1393,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_cloudData : Inherits TaskParent
+    Public Class Edge_CloudData : Inherits TaskParent
         Dim prep As New RedPrep_ReductionChoices
         Dim edges As New Edge_Basics
         Public Sub New()
@@ -1421,7 +1421,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             gEdges.Run(src)
-            dst2 = gEdges.edges.dst2
+            dst2 = gEdges.edgeline.dst2
 
             Dim popSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
             Dim pops As New List(Of Integer)

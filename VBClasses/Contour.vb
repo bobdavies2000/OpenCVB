@@ -1222,7 +1222,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            edgeline.Run(task.grayStable)
+            If src.Channels <> 1 Then edgeline.Run(task.grayStable) Else edgeline.Run(src)
             dst3 = edgeline.dst2
 
             sortContours.allContours = Contour_Basics.buildContours(dst3)

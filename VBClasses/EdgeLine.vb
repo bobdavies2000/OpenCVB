@@ -28,7 +28,9 @@ Namespace VBClasses
             ' prevent leaks at the image boundary...
             dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, imageEdgeWidth)
 
-            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, EdgeLineRaw_Rects(cPtr))
+            Dim rectPtr = EdgeLineRaw_Rects(cPtr)
+            If rectPtr = IntPtr.Zero Then Exit Sub ' no rects
+            Dim rectData = cv.Mat.FromPixelData(classCount, 1, cv.MatType.CV_32SC4, rectPtr)
 
             classCount = Math.Min(EdgeLineRaw_GetSegCount(cPtr), 255)
             If classCount = 0 Then Exit Sub ' nothing to work with....

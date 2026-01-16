@@ -46,6 +46,7 @@ Namespace VBClasses
             lines = New Line_Basics
             filterBasics = New Filter_Basics
             brightness = New Brightness_Basics
+            leftRight = New LeftRight_Basics
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1
@@ -105,12 +106,6 @@ Namespace VBClasses
 
             If optionsChanged Then motionMask.SetTo(255)
 
-            brightness.Run(leftView)
-            leftView = brightness.dst2.Clone
-
-            brightness.Run(rightView)
-            rightView = brightness.dst2.Clone
-
             filterBasics.Run(color)
             If gOptions.UseMotionMask.Checked Then
                 motionBasics.Run(gray)
@@ -124,6 +119,14 @@ Namespace VBClasses
                 motionBasics.motionList.Clear()
                 grayStable = gray
             End If
+
+            brightness.Run(leftView)
+            leftView = brightness.dst2.Clone
+
+            brightness.Run(rightView)
+            rightView = brightness.dst2.Clone
+
+            leftRight.Run(src) ' this is to facilitate tuning brightness and optimizing contrast.
 
             If pcMotion IsNot Nothing Then
                 pcMotion.Run(emptyMat) '******* this is the gravity rotation *******

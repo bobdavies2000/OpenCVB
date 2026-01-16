@@ -46,9 +46,8 @@ Namespace VBClasses
 
     Public Class Filter_BasicsGray : Inherits TaskParent
         Public filterIndex As Integer = -1
-        Public filterList As String() = {"Original", "Blur_Basics", "Brightness_Basics", "Contrast_Basics",
-                                     "Dilate_Basics", "Erode_Basics", "Filter_Equalize", "Filter_Laplacian",
-                                     "MeanSubtraction_Gray", "PhotoShop_Gamma"}
+        Public filterList As String() = {"Original", "Blur_Basics", "Dilate_Basics", "Erode_Basics",
+                                         "Filter_Equalize", "Filter_Laplacian", "MeanSubtraction_Gray", "PhotoShop_Gamma"}
         Dim filters(filterList.Count - 1) As Object
         Public Sub New()
             desc = "Demo the RGB Filters selected in 'FeatureOptions'.  If none selected, just the input is displayed."
@@ -61,10 +60,6 @@ Namespace VBClasses
                         Case "Original"
                         Case "Blur_Basics"
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Blur_Basics
-                        Case "Brightness_Basics"
-                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Brightness_Basics
-                        Case "Contrast_Basics"
-                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Contrast_Basics
                         Case "Dilate_Basics"
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Dilate_Basics
                         Case "Erode_Basics"

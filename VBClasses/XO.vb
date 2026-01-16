@@ -11188,84 +11188,6 @@ Namespace VBClasses
 
 
 
-
-
-
-
-    Public Class LeftRight_RedMask : Inherits TaskParent
-        Dim redLeft As New XO_LeftRight_RedLeft
-        Dim redRight As New XO_LeftRight_RedRight
-        Public Sub New()
-            desc = "Display the RedMask_Basics output for both the left and right images."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            redLeft.Run(task.leftView)
-            dst2 = redLeft.dst2.Clone
-            If standaloneTest() Then
-                For Each md In redLeft.redMask.mdList
-                    DrawCircle(dst2, md.maxDist, task.DotSize, task.highlight)
-                Next
-            End If
-
-            redRight.Run(task.rightView)
-            dst3 = redRight.dst2.Clone
-            If standaloneTest() Then
-                For Each md In redRight.redMask.mdList
-                    DrawCircle(dst3, md.maxDist, task.DotSize, task.highlight)
-                Next
-            End If
-            labels(2) = redLeft.labels(2)
-            labels(3) = redRight.labels(2)
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class XO_LeftRight_RedRight : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
-        Public redMask As New RedMask_Basics
-        Public Sub New()
-            desc = "Segment the right view image with RedMask_Basics"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = task.rightView.Clone
-            fLess.Run(task.rightView)
-            dst2 = fLess.dst2
-            redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            dst2 = PaletteFull(redMask.dst2)
-            labels(2) = redMask.labels(2)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-    Public Class XO_LeftRight_RedLeft : Inherits TaskParent
-        Dim fLess As New FeatureLess_Basics
-        Public redMask As New RedMask_Basics
-        Public Sub New()
-            desc = "Segment the left view image with RedMask_Basics"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = task.leftView
-            fLess.Run(src)
-            redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            dst2 = PaletteFull(redMask.dst2)
-            labels(2) = redMask.labels(2)
-        End Sub
-    End Class
-
-
-
-
-
-
     Public Class XO_RedList_LeftRight : Inherits TaskParent
         Dim redLR As New LeftRight_RedMask
         Public Sub New()
@@ -17147,4 +17069,99 @@ Namespace VBClasses
     '        SetTrueText(trace.strOut, 3)
     '    End Sub
     'End Class
+
+
+
+
+
+
+    Public Class XO_RedCloud_Small : Inherits TaskParent
+        Dim minRes As cv.Size
+        Public Sub New()
+            Select Case CStr(task.cols) + "x" + CStr(task.rows)
+                Case "1920x1080", "960x540", "480x270"
+                    minRes = New cv.Size(480, 270)
+                Case "1280x720", "640x360", "320x180"
+                    minRes = New cv.Size(320, 180)
+                Case "640x480", "320x240", "160x120"
+                    minRes = New cv.Size(160, 120)
+                Case "960x600", "480x300", "240x150"
+                    minRes = New cv.Size(240, 150)
+                Case "672x376", "336x188", "168x94"
+                    minRes = New cv.Size(168, 94)
+            End Select
+            desc = "Run RedCloud at the smallest resolution and resize. NOT WORTH IT!"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim minRect = New cv.Rect(0, 0, minRes.Width, minRes.Height)
+            If src.Size <> minRes Then src = task.pointCloud.Resize(minRes) Else src = task.pointCloud
+            dst1 = runRedCloud(src, labels(2))(minRect)
+            dst2 = dst1.Resize(task.workRes)
+
+            If task.firstPass Then
+                OptionParent.FindSlider("Reduction Target").Value = 400
+            End If
+
+            Dim ratio = task.workRes.Width \ minRes.Width
+            task.redCloud.rcMap.SetTo(0)
+            For Each rc In task.redCloud.rcList
+                Dim r = rc.rect
+                rc.rect = New cv.Rect(r.X * ratio, r.Y * ratio, r.Width * ratio, r.Height * ratio)
+                Dim maskSize = New cv.Size(rc.rect.Width, rc.rect.Height)
+                rc.mask = rc.mask.Resize(maskSize)
+                task.redCloud.rcMap(rc.rect).SetTo(rc.index, rc.mask)
+            Next
+
+            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            SetTrueText(strOut, 3)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Brick_Cloud : Inherits TaskParent
+        Dim template As New Math_Intrinsics
+        Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+            desc = "Use RGB motion bricks to determine if depth has changed in any brick."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
+            If task.motionBasics.motionList.Count = 0 Then Exit Sub ' no change...
+
+            Dim updateCount As Integer
+            Dim newRange As Single = 0.01F
+
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+            cv.Cv2.ExtractChannel(dst2, dst1, 2)
+            dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
+
+            For Each brick In task.bricks.brickList
+                If brick.depth > 0 Then
+                    If brick.age = 1 Then
+                        task.pointCloud(brick.rect).CopyTo(dst2(brick.rect))
+                        Continue For
+                    End If
+                    If task.depthmask.CountNonZero = 0 Then Continue For
+                    'If brick.mm.range >= 1 Then
+                    '    dst2(brick.rect).SetTo(0) ' an 8x8 block spread over a meter?  Can't be real data...
+                    '    Continue For
+                    'End If
+
+                    ' check for any new depth pixels (not updates to existing as those come only with motion (age = 1)
+                    Dim mask As cv.Mat = dst1(brick.rect) And task.depthmask(brick.rect)
+                    If mask.CountNonZero = 0 Then Continue For ' nothing to update.
+                    task.pointCloud(brick.rect).CopyTo(dst2(brick.rect), mask) ' update any newly arrived depth data.
+                    updateCount += 1
+                End If
+            Next
+
+            labels(2) = CStr(updateCount) + " bricks of " + CStr(task.gridRects.Count) + " were reviewed for changes."
+        End Sub
+    End Class
 End Namespace

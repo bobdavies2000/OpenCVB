@@ -21,18 +21,13 @@ Namespace VBClasses
             dst2 = hist.dst2
 
             Dim totalPixels = dst2.Total ' assume we are including zeros.
-            Dim brickWidth = dst2.Width / task.histogramBins
+            Dim colWidth = dst2.Width / task.histogramBins
             Dim incr = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
-            Dim histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
+            Dim histIndex = Math.Floor(task.mouseMovePoint.X / colWidth)
 
             minRange = New cv.Scalar(histIndex * incr)
             maxRange = New cv.Scalar((histIndex + 1) * incr)
             If histIndex + 1 = task.histogramBins Then maxRange = New cv.Scalar(255)
-
-            '     Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-            '     cv.Cv2.CalcBackProject({task.gray}, {0}, histK.hist.histogram, dst0, ranges)
-            ' for single dimension histograms, backprojection is the same as inrange
-            ' (and this works for backproject_FeatureLess below)
             dst0 = src.InRange(minRange, maxRange)
 
             Dim actualCount = dst0.CountNonZero
@@ -41,7 +36,7 @@ Namespace VBClasses
             Dim count = hist.histogram.Get(Of Single)(CInt(histIndex), 0)
             Dim histMax As mmData = GetMinMax(hist.histogram)
             labels(3) = $"Highlight pixels {CInt(minRange(0))}-{CInt(maxRange(0))} with {CInt(count)} of {totalPixels}"
-            dst2.Rectangle(New cv.Rect(CInt(histIndex) * brickWidth, 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+            dst2.Rectangle(New cv.Rect(CInt(histIndex) * colWidth, 0, colWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
             hist.Dispose()
@@ -741,9 +736,7 @@ Namespace VBClasses
             dst2 += 1 ' get away from zeros...
             labels(2) = "CV_8U backprojection of the " + CStr(classCount) + " histogram bins."
             If standaloneTest() Then
-                If task.heartBeatLT Then index += 1
-                If index >= classCount Then index = 0
-                dst3 = dst2.InRange(index, index)
+                dst3 = PaletteFull(dst2)
                 labels(3) = "Class " + CStr(index) + " had " + CStr(plotHist.histArray(index)) + " pixels after backprojection."
             End If
         End Sub

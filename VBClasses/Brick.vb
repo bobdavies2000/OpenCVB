@@ -195,7 +195,7 @@ Namespace VBClasses
 
 
     Public Class Brick_Edges : Inherits TaskParent
-        Public edges As New Edge_Basics
+        Public edgeline As New EdgeLine_Basics
         Public featureRects As New List(Of cv.Rect)
         Public featureMask As New cv.Mat
         Public fLessMask As New cv.Mat
@@ -210,7 +210,7 @@ Namespace VBClasses
             Static stateList As New List(Of Single)
             Static lastDepth As cv.Mat = task.lowResDepth.Clone
 
-            edges.Run(src)
+            edgeline.Run(src)
 
             featureRects.Clear()
             fLessRects.Clear()
@@ -218,7 +218,7 @@ Namespace VBClasses
             fLessMask.SetTo(0)
             Dim flist As New List(Of Single)
             For Each r In task.gridRects
-                flist.Add(If(edges.dst2(r).CountNonZero <= 1, 1, 2))
+                flist.Add(If(edgeline.dst2(r).CountNonZero <= 1, 1, 2))
             Next
 
             If task.optionsChanged Or stateList.Count = 0 Then
@@ -282,7 +282,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bounds.Run(src)
-            Dim edgeMask = bounds.feat.edges.dst2
+            Dim edgeMask = bounds.feat.edgeline.dst2
 
             Dim rgb32f As New cv.Mat, tmp As New cv.Mat
             src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
@@ -699,52 +699,6 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_Cloud : Inherits TaskParent
-        Dim template As New Math_Intrinsics
-        Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
-            desc = "Use RGB motion bricks to determine if depth has changed in any brick."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
-            If task.motionBasics.motionList.Count = 0 Then Exit Sub ' no change...
-
-            Dim updateCount As Integer
-            Dim newRange As Single = 0.01F
-
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-            cv.Cv2.ExtractChannel(dst2, dst1, 2)
-            dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
-
-            For Each brick In task.bricks.brickList
-                If brick.depth > 0 Then
-                    If brick.age = 1 Then
-                        task.pointCloud(brick.rect).CopyTo(dst2(brick.rect))
-                        Continue For
-                    End If
-                    If task.depthmask.CountNonZero = 0 Then Continue For
-                    'If brick.mm.range >= 1 Then
-                    '    dst2(brick.rect).SetTo(0) ' an 8x8 block spread over a meter?  Can't be real data...
-                    '    Continue For
-                    'End If
-
-                    ' check for any new depth pixels (not updates to existing as those come only with motion (age = 1)
-                    Dim mask As cv.Mat = dst1(brick.rect) And task.depthmask(brick.rect)
-                    If mask.CountNonZero = 0 Then Continue For ' nothing to update.
-                    task.pointCloud(brick.rect).CopyTo(dst2(brick.rect), mask) ' update any newly arrived depth data.
-                    updateCount += 1
-                End If
-            Next
-
-            labels(2) = CStr(updateCount) + " bricks of " + CStr(task.gridRects.Count) + " were reviewed for changes."
-        End Sub
-    End Class
-
-
-
-
-
     Public Class Brick_Features : Inherits TaskParent
         Public featureBricks As New List(Of cv.Rect)
         Public Sub New()
@@ -852,7 +806,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bounds.Run(src)
-            Dim edgeMask = bounds.feat.edges.dst2
+            Dim edgeMask = bounds.feat.edgeline.dst2
 
             Dim rgb32f As New cv.Mat, tmp As New cv.Mat
             src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)

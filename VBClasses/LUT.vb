@@ -6,7 +6,7 @@ Namespace VBClasses
     Public Class LUT_Basics : Inherits TaskParent
         Public classCount As Integer
         Dim options As New Options_LUT
-        Dim segment(255) As Byte
+        Public segment(255) As Byte
         Dim myLut As cv.Mat
         Public Sub New()
             labels(3) = "Palettized version of dst2"
@@ -249,7 +249,7 @@ Namespace VBClasses
         Dim pixels(2)() As Byte
         Dim options As New Options_LUT_Create
         Public Sub New()
-            desc = "Create a LUT table that can map similar pixels to the same exact pixel."
+            desc = "Create a LUT table that can map similar pixels to the same Value."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()

@@ -1,4 +1,6 @@
 Imports System.Runtime.InteropServices
+Imports OpenCvSharp
+Imports SharpGL.SceneGraph.Raytracing
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Histogram_Basics : Inherits TaskParent
@@ -44,7 +46,7 @@ Namespace VBClasses
             ReDim histArray(histogram.Total - 1)
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
-            If task.heartBeat Then
+            If task.heartBeatLT Then
                 strOut = "Distance" + vbTab + "Value" + vbTab + "Count" + vbTab + "min val: " +
                          vbTab + Format(mm.minVal, fmt1) + vbTab + "max val:" + vbTab +
                          Format(mm.maxVal, fmt1) + vbCrLf
@@ -1632,19 +1634,43 @@ Namespace VBClasses
 
 
 
-    Public Class Histogram_Inverse : Inherits TaskParent
+    Public Class Histogram_InverseLUT : Inherits TaskParent
         Dim hist As New Histogram_Basics
-        Dim lut As New LUT_Basics
         Public Sub New()
-            desc = "Invert the histogram of the color image using green.  ?? = 0.299 ?? + 0.587 ?? + 0.114 ??"
+            task.gOptions.displayDst1.Checked = True
+            task.gOptions.HistBinBar.Value = 5
+            desc = "Invert the histogram of the color image using green.  G = 0.299 R + 0.587 G + 0.114 B"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim split = task.color.Split()
             hist.Run(split(1))
             dst2 = hist.dst2
 
-            lut.classCount = task.histogramBins
-            lut.Run(src)
+            Dim colWidth = dst2.Width / task.histogramBins
+            Dim incr = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
+            Dim histIndex = Math.Floor(task.mouseMovePoint.X / colWidth)
+
+            Dim minRange = New cv.Scalar(histIndex * incr)
+            Dim maxRange = New cv.Scalar((histIndex + 1) * incr)
+            If histIndex + 1 = task.histogramBins Then maxRange = New cv.Scalar(255)
+            dst1 = split(1).InRange(minRange, maxRange)
+            dst2.Rectangle(New cv.Rect(CInt(histIndex) * colWidth, 0, colWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+            labels(1) = CStr(dst1.CountNonZero) + " pixels in that range"
+
+            incr = Math.Truncate(255 / task.histogramBins)
+            Dim lutTable As New cv.Mat(1, 256, cv.MatType.CV_8UC3)
+            Dim lutTable2 As New cv.Mat(1, 256, cv.MatType.CV_8UC1)
+            For i = 0 To task.histogramBins - 1
+                Dim val = CInt(i * incr)
+                For j = 0 To incr - 1
+                    lutTable.Set(Of cv.Vec3b)(0, j, task.vecColors(val))
+                    lutTable2.Set(Of Byte)(0, j, val)
+                Next
+            Next
+
+            dst0.SetTo(0)
+            dst0 = split(1).LUT(lutTable2) + 1
+            dst3 = PaletteFull(dst0)
         End Sub
     End Class
 
