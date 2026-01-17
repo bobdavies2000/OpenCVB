@@ -1415,13 +1415,13 @@ Namespace VBClasses
 
 
     Public Class Edge_Stability : Inherits TaskParent
-        Dim gEdges As New Brick_Edges
+        Dim gEdges As New Brick_EdgeFlips
         Public Sub New()
             desc = "Measure the stability of edges in each grid Rect"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             gEdges.Run(src)
-            dst2 = gEdges.edgeline.dst2
+            dst2 = gEdges.edges.dst2
 
             Dim popSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
             Dim pops As New List(Of Integer)

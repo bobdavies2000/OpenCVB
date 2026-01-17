@@ -145,6 +145,7 @@ Brick_CloudRange
 Brick_CorrelationInput
 Brick_CorrelationMap
 Brick_EdgeDraw
+Brick_EdgeFlips
 Brick_Edges
 Brick_Features
 Brick_FeaturesAndEdges
@@ -457,7 +458,7 @@ Edge_CannyCombined
 Edge_CannyHistory
 Edge_CannyLeftRight
 Edge_CannyMin
-Edge_cloudData
+Edge_CloudData
 Edge_CloudSegments
 Edge_Color8U
 Edge_ColorGap_CPP

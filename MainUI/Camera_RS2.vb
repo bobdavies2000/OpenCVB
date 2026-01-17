@@ -1,4 +1,5 @@
 Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices.JavaScript.JSType
 Imports System.Threading
 Imports Intel.RealSense
 Imports cv = OpenCvSharp
@@ -27,6 +28,15 @@ Namespace MainApp
             cfg.EnableStream(Stream.Gyro, Format.MotionXyz32f, 200)
 
             Dim profiles = pipe.Start(cfg)
+
+            Dim device As Device = profiles.Device
+            For Each s In device.Sensors
+                If s.Info.Item(0).Contains("Stereo Module") Then
+                    s.Options(Intel.RealSense.Option.EmitterEnabled).Value = 1
+                    s.Options(Intel.RealSense.Option.LaserPower).Value = 13
+                End If
+            Next
+
             Dim StreamColor = profiles.GetStream(Stream.Color)
             Dim streamLeft = profiles.GetStream(Stream.Infrared, 1)
             Dim streamRight = profiles.GetStream(Stream.Infrared, 2)

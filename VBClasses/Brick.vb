@@ -193,84 +193,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class Brick_Edges : Inherits TaskParent
-        Public edgeline As New EdgeLine_Basics
-        Public featureRects As New List(Of cv.Rect)
-        Public featureMask As New cv.Mat
-        Public fLessMask As New cv.Mat
-        Public fLessRects As New List(Of cv.Rect)
-        Public Sub New()
-            featureMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-            fLessMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-            task.featureOptions.EdgeMethods.SelectedItem() = "Laplacian"
-            desc = "Add edges to features"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Static stateList As New List(Of Single)
-            Static lastDepth As cv.Mat = task.lowResDepth.Clone
-
-            edgeline.Run(src)
-
-            featureRects.Clear()
-            fLessRects.Clear()
-            featureMask.SetTo(0)
-            fLessMask.SetTo(0)
-            Dim flist As New List(Of Single)
-            For Each r In task.gridRects
-                flist.Add(If(edgeline.dst2(r).CountNonZero <= 1, 1, 2))
-            Next
-
-            If task.optionsChanged Or stateList.Count = 0 Then
-                stateList.Clear()
-                For Each n In flist
-                    stateList.Add(n)
-                Next
-            End If
-
-            Dim flipRects As New List(Of cv.Rect)
-            For i = 0 To task.gridRects.Count - 1
-                stateList(i) = (stateList(i) + flist(i)) / 2
-                Dim r = task.gridRects(i)
-                If stateList(i) >= 1.95 Then
-                    featureRects.Add(r)
-                    featureMask(r).SetTo(255)
-                ElseIf stateList(i) <= 1.05 Then
-                    fLessRects.Add(r)
-                    fLessMask(r).SetTo(255)
-                Else
-                    flipRects.Add(r)
-                End If
-            Next
-
-            dst2.SetTo(0)
-            dst3.SetTo(0)
-            src.CopyTo(dst2, featureMask)
-            src.CopyTo(dst3, featureMask)
-
-            For Each r In flipRects
-                dst2.Rectangle(r, task.highlight, task.lineWidth)
-            Next
-
-            For Each r In fLessRects
-                Dim x = CInt(r.X / task.brickSize)
-                Dim y = CInt(r.Y / task.brickSize)
-                task.lowResDepth.Set(Of Single)(y, x, lastDepth.Get(Of Single)(y, x))
-            Next
-            lastDepth = task.lowResDepth.Clone
-            If task.heartBeat Then
-                labels(2) = CStr(fLessRects.Count) + " cells without features were found.  " +
-                        "Cells that are flipping (with and without edges) are highlighted"
-            End If
-        End Sub
-    End Class
-
-
-
-
-
-
-
     Public Class Brick_MLColorDepth : Inherits TaskParent
         Dim ml As New ML_Basics
         Dim bounds As New Brick_FeaturesAndEdges
@@ -282,7 +204,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bounds.Run(src)
-            Dim edgeMask = bounds.feat.edgeline.dst2
+            Dim edgeMask = bounds.feat.edges.dst2
 
             Dim rgb32f As New cv.Mat, tmp As New cv.Mat
             src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
@@ -746,7 +668,7 @@ Namespace VBClasses
 
 
     Public Class Brick_FeaturesAndEdges : Inherits TaskParent
-        Public feat As New Brick_Edges
+        Public feat As New Brick_EdgeFlips
         Public boundaryCells As New List(Of List(Of Integer))
         Public Sub New()
             labels(2) = "Gray and black regions are featureless while white has features..."
@@ -806,7 +728,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             bounds.Run(src)
-            Dim edgeMask = bounds.feat.edgeline.dst2
+            Dim edgeMask = bounds.feat.edges.dst2
 
             Dim rgb32f As New cv.Mat, tmp As New cv.Mat
             src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
@@ -941,6 +863,115 @@ Namespace VBClasses
                     End If
                 Next
             Next
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class Brick_Edges : Inherits TaskParent
+        Dim brick
+        Public edges As New Edge_Basics
+        Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Add edges to features"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static stateList As New List(Of Single)
+            Static lastDepth As cv.Mat = task.lowResDepth.Clone
+
+            edges.Run(task.leftView)
+            dst2 = edges.dst2
+
+            Dim count As Integer
+            dst3.SetTo(0)
+            For Each brick In task.bricks.brickList
+                If dst2(brick.lrect).CountNonZero And brick.rrect.width > 0 Then
+                    task.rightView(brick.rrect).copyto(dst3(brick.rrect))
+                    count += 1
+                End If
+            Next
+            labels(3) = CStr(count) + " of " + CStr(task.bricks.brickList.Count) + " rects were identified in dst3"
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Brick_EdgeFlips : Inherits TaskParent
+        Public edges As New Edge_Basics
+        Public featureRects As New List(Of cv.Rect)
+        Public featureMask As New cv.Mat
+        Public fLessMask As New cv.Mat
+        Public fLessRects As New List(Of cv.Rect)
+        Public Sub New()
+            featureMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+            fLessMask = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+            task.featureOptions.EdgeMethods.SelectedItem() = "Laplacian"
+            desc = "Add edges to features"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Static stateList As New List(Of Single)
+            Static lastDepth As cv.Mat = task.lowResDepth.Clone
+
+            edges.Run(src)
+
+            featureRects.Clear()
+            fLessRects.Clear()
+            featureMask.SetTo(0)
+            fLessMask.SetTo(0)
+            Dim flist As New List(Of Single)
+            For Each r In task.gridRects
+                flist.Add(If(edges.dst2(r).CountNonZero <= 1, 1, 2))
+            Next
+
+            If task.optionsChanged Or stateList.Count = 0 Then
+                stateList.Clear()
+                For Each n In flist
+                    stateList.Add(n)
+                Next
+            End If
+
+            Dim flipRects As New List(Of cv.Rect)
+            For i = 0 To task.gridRects.Count - 1
+                stateList(i) = (stateList(i) + flist(i)) / 2
+                Dim r = task.gridRects(i)
+                If stateList(i) >= 1.95 Then
+                    featureRects.Add(r)
+                    featureMask(r).SetTo(255)
+                ElseIf stateList(i) <= 1.05 Then
+                    fLessRects.Add(r)
+                    fLessMask(r).SetTo(255)
+                Else
+                    flipRects.Add(r)
+                End If
+            Next
+
+            dst2.SetTo(0)
+            dst3.SetTo(0)
+            src.CopyTo(dst2, featureMask)
+            src.CopyTo(dst3, featureMask)
+
+            For Each r In flipRects
+                dst2.Rectangle(r, task.highlight, task.lineWidth)
+            Next
+
+            For Each r In fLessRects
+                Dim x = CInt(r.X / task.brickSize)
+                Dim y = CInt(r.Y / task.brickSize)
+                task.lowResDepth.Set(Of Single)(y, x, lastDepth.Get(Of Single)(y, x))
+            Next
+            lastDepth = task.lowResDepth.Clone
+            If task.heartBeat Then
+                labels(2) = CStr(fLessRects.Count) + " cells without features were found.  " +
+                        "Cells that are flipping (with and without edges) are highlighted"
+            End If
         End Sub
     End Class
 End Namespace
