@@ -52,7 +52,7 @@ Namespace VBClasses
 
 
 
-    Public Class AddWeighted_DepthAccumulate : Inherits TaskParent
+    Public Class NR_AddWeighted_DepthAccumulate : Inherits TaskParent
         Dim options As New Options_AddWeighted
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
@@ -73,7 +73,7 @@ Namespace VBClasses
 
 
 
-    Public Class AddWeighted_InfraRed : Inherits TaskParent
+    Public Class NR_AddWeighted_InfraRed : Inherits TaskParent
         Public Sub New()
             desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image.  Some cameras are not close to aligned."
         End Sub
@@ -96,7 +96,7 @@ Namespace VBClasses
 
 
 
-    Public Class AddWeighted_Edges : Inherits TaskParent
+    Public Class NR_AddWeighted_Edges : Inherits TaskParent
         Dim edges As New Edge_Basics
         Public Sub New()
             labels = {"", "", "Edges_BinarizedSobel output", "AddWeighted edges and BGR image"}
@@ -117,7 +117,7 @@ Namespace VBClasses
 
 
 
-    Public Class AddWeighted_LeftRight : Inherits TaskParent
+    Public Class NR_AddWeighted_LeftRight : Inherits TaskParent
         Public Sub New()
             desc = "Use AddWeighted to add the left and right images."
         End Sub

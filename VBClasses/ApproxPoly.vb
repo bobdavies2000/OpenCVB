@@ -41,7 +41,7 @@ Namespace VBClasses
 
 
     ' https://stackoverflow.com/questions/22132510/opencv-approxpolydp-for-edge-maps-Not-contours
-    Public Class ApproxPoly_FindandDraw : Inherits TaskParent
+    Public Class NR_ApproxPoly_FindandDraw : Inherits TaskParent
         Dim rotatedRect As New Rectangle_Rotated
         Public allContours As cv.Point()()
         Public Sub New()
@@ -75,7 +75,7 @@ Namespace VBClasses
 
 
 
-    Public Class ApproxPoly_Hull : Inherits TaskParent
+    Public Class NR_ApproxPoly_Hull : Inherits TaskParent
         Dim hull As New Hull_Basics
         Dim aPoly As New ApproxPoly_Basics
         Public Sub New()

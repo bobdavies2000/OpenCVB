@@ -57,7 +57,7 @@ Namespace VBClasses
 
 
 
-    Public Class AsciiArt_Diff : Inherits TaskParent
+    Public Class NR_AsciiArt_Diff : Inherits TaskParent
         Dim grayAA As New AsciiArt_Color
         Dim diff As New Diff_Basics
         Public Sub New()
@@ -67,7 +67,7 @@ Namespace VBClasses
             grayAA.Run(src)
             dst2 = grayAA.dst2
 
-            diff.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray))
+            diff.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             dst3 = diff.dst2
         End Sub
     End Class

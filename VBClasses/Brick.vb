@@ -88,7 +88,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_Plot : Inherits TaskParent
+    Public Class NR_Brick_Plot : Inherits TaskParent
         Dim plotHist As New Plot_Histogram
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -135,7 +135,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_FullDepth : Inherits TaskParent
+    Public Class NR_Brick_FullDepth : Inherits TaskParent
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "Left image bricks - no overlap.  Click in any column to highlight that column."
@@ -170,7 +170,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_InstantUpdate : Inherits TaskParent
+    Public Class NR_Brick_InstantUpdate : Inherits TaskParent
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.bricks = New Brick_Basics
@@ -193,7 +193,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_MLColorDepth : Inherits TaskParent
+    Public Class NR_Brick_MLColorDepth : Inherits TaskParent
         Dim ml As New ML_Basics
         Dim bounds As New Brick_FeaturesAndEdges
         Public Sub New()
@@ -271,7 +271,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_EdgeDraw : Inherits TaskParent
+    Public Class NR_Brick_EdgeDraw : Inherits TaskParent
         Dim regions As New Region_Contours
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
@@ -297,7 +297,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_CorrelationInput : Inherits TaskParent
+    Public Class NR_Brick_CorrelationInput : Inherits TaskParent
         Dim LRMeanSub As New MeanSubtraction_LeftRight
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -366,7 +366,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_LeftToColor : Inherits TaskParent
+    Public Class NR_Brick_LeftToColor : Inherits TaskParent
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             If task.Settings.cameraName.StartsWith("Intel(R) RealSense(TM) Depth Camera") Then task.gOptions.gravityPointCloud.Checked = False
@@ -392,7 +392,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_LeftRightMouse : Inherits TaskParent
+    Public Class NR_Brick_LeftRightMouse : Inherits TaskParent
         Public means As New List(Of Single)
         Dim myBricks As New List(Of Integer)
         Public Sub New()
@@ -433,7 +433,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_RGBtoLeft : Inherits TaskParent
+    Public Class NR_Brick_RGBtoLeft : Inherits TaskParent
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(3) = "Right camera image..."
@@ -474,7 +474,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_RegionLines : Inherits TaskParent
+    Public Class NR_Brick_RegionLines : Inherits TaskParent
         Dim regions As New Region_Contours
         Public Sub New()
             desc = "Lines can mean cells are connected."
@@ -502,7 +502,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_CloudMaxVal : Inherits TaskParent
+    Public Class NR_Brick_CloudMaxVal : Inherits TaskParent
         Dim template As New Math_Intrinsics
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -541,7 +541,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_CloudMean : Inherits TaskParent
+    Public Class NR_Brick_CloudMean : Inherits TaskParent
         Dim template As New Math_Intrinsics
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -578,7 +578,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_CloudRange : Inherits TaskParent
+    Public Class NR_Brick_CloudRange : Inherits TaskParent
         Dim template As New Math_Intrinsics
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -717,7 +717,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_MLColor : Inherits TaskParent
+    Public Class NR_Brick_MLColor : Inherits TaskParent
         Dim ml As New ML_Basics
         Dim bounds As New Brick_FeaturesAndEdges
         Public Sub New()
@@ -790,7 +790,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_CorrelationMap : Inherits TaskParent
+    Public Class NR_Brick_CorrelationMap : Inherits TaskParent
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(3) = "The map to identify each brick's depth."
@@ -842,7 +842,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_LeftRight : Inherits TaskParent
+    Public Class NR_Brick_LeftRight : Inherits TaskParent
         Public means As New List(Of Single)
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -872,7 +872,7 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_Edges : Inherits TaskParent
+    Public Class NR_Brick_Edges : Inherits TaskParent
         Dim brick
         Public edges As New Edge_Basics
         Public Sub New()

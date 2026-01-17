@@ -985,7 +985,7 @@ Namespace VBClasses
 
     Public Class Edge_CannyAccum : Inherits TaskParent
         Dim canny As New Edge_Canny
-        Dim accum As New AddWeighted_Accumulate
+        Dim accum As New NR_AddWeighted_DepthAccumulate
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Accumulate Canny edges to highlight all real edges better."

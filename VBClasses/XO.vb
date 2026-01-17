@@ -17164,4 +17164,30 @@ Namespace VBClasses
             labels(2) = CStr(updateCount) + " bricks of " + CStr(task.gridRects.Count) + " were reviewed for changes."
         End Sub
     End Class
+
+
+
+
+
+
+    Public Class XO_BackProject_FullEqualized : Inherits TaskParent
+        Dim backP As New BackProject_Full
+        Dim equalize As New Histogram_EqualizeColor
+        Public Sub New()
+            labels = {"", "", "BackProject_Full output without equalization", "BackProject_Full with equalization"}
+            desc = "Create a histogram from the equalized color and then backproject it."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            backP.Run(src)
+            backP.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+            dst2 = PaletteFull(dst2)
+
+            equalize.Run(task.grayStable)
+            backP.Run(equalize.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+            backP.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
+            dst3 = PaletteFull(dst3)
+        End Sub
+    End Class
+
 End Namespace

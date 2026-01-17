@@ -80,7 +80,7 @@ Namespace VBClasses
 
 
 
-    Public Class Annealing_MT_CPP : Inherits TaskParent
+    Public Class NR_Annealing_MT_CPP : Inherits TaskParent
         Dim random As New Random_Basics
         Dim anneal() As Annealing_Basics_CPP
         Dim mats As New Mat_4to1

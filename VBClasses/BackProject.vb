@@ -49,7 +49,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_Reduction : Inherits TaskParent
+    Public Class NR_BackProject_Reduction : Inherits TaskParent
         Dim reduction As New Reduction_Basics
         Dim bProject As New BackProject_Basics
         Public Sub New()
@@ -104,7 +104,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_PointCloud : Inherits TaskParent
+    Public Class NR_BackProject_PointCloud : Inherits TaskParent
         Public hist As New Histogram_PointCloud_XZ_YZ
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
@@ -160,7 +160,47 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_Unstable : Inherits TaskParent
+
+    ' https://docs.opencvb.org/3.4/da/d7f/tutorial_back_projection.html
+    Public Class BackProject_Full : Inherits TaskParent
+        Public classCount As Integer
+        Dim plotHist As New Plot_Histogram
+        Dim index As Integer
+        Public Sub New()
+            task.gOptions.setHistogramBins(10)
+            plotHist.createHistogram = True
+            plotHist.removeZeroEntry = False
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Create a histogram for the grayscale image, uniquely identify each bin, and backproject it."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Then src = task.grayStable
+            classCount = task.histogramBins
+            plotHist.Run(src)
+            dst1 = plotHist.dst2
+
+            Dim histogram = plotHist.histogram
+            For i = 0 To classCount
+                histogram.Set(Of Single)(i, 0, i)
+            Next
+
+            cv.Cv2.CalcBackProject({src}, {0}, histogram, dst2, plotHist.ranges)
+            dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+            dst2 += 1 ' get away from zeros...
+            labels(2) = "CV_8U backprojection of the " + CStr(classCount) + " histogram bins."
+            If standaloneTest() Then
+                dst3 = PaletteFull(dst2)
+                labels(3) = "Class " + CStr(index) + " had " + CStr(plotHist.histArray(index)) + " pixels after backprojection."
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class NR_BackProject_Unstable : Inherits TaskParent
         Dim backP As New BackProject_Full
         Dim diff As New Diff_Basics
         Public Sub New()
@@ -176,39 +216,6 @@ Namespace VBClasses
             dst3 = diff.dst2
         End Sub
     End Class
-
-
-
-
-
-
-
-
-
-
-
-    Public Class BackProject_FullEqualized : Inherits TaskParent
-        Dim backP As New BackProject_Full
-        Dim equalize As New Histogram_EqualizeColor
-        Public Sub New()
-            labels = {"", "", "BackProject_Full output without equalization", "BackProject_Full with equalization"}
-            desc = "Create a histogram from the equalized color and then backproject it."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            backP.Run(src)
-            backP.dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-            dst2 = PaletteFull(dst2)
-
-            equalize.Run(task.grayStable)
-            backP.Run(equalize.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-            backP.dst2.ConvertTo(dst3, cv.MatType.CV_8U)
-            dst3 = PaletteFull(dst3)
-        End Sub
-    End Class
-
-
-
 
 
 
@@ -258,7 +265,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_Horizontal : Inherits TaskParent
+    Public Class NR_BackProject_Horizontal : Inherits TaskParent
         Dim bpTop As New BackProject_Top
         Dim bpSide As New BackProject_Side
         Public Sub New()
@@ -394,7 +401,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_Mouse : Inherits TaskParent
+    Public Class NR_BackProject_Mouse : Inherits TaskParent
         Dim backP As New BackProject_Image
         Public Sub New()
             labels(2) = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
@@ -411,7 +418,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_MeterByMeter : Inherits TaskParent
+    Public Class NR_BackProject_MeterByMeter : Inherits TaskParent
         Dim histogram As New cv.Mat
         Public Sub New()
             desc = "Backproject the depth data at 1 meter intervals without a histogram."
@@ -441,7 +448,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_Hue : Inherits TaskParent
+    Public Class NR_BackProject_Hue : Inherits TaskParent
         Dim hue As New OEX_CalcBackProject_Demo1
         Public classCount As Integer
         Public Sub New()
@@ -462,7 +469,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_MaskLines : Inherits TaskParent
+    Public Class NR_BackProject_MaskLines : Inherits TaskParent
         Dim masks As New BackProject_Masks
         Dim rawLines As New Line_Core
         Public Sub New()
@@ -540,7 +547,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_MaskList : Inherits TaskParent
+    Public Class NR_BackProject_MaskList : Inherits TaskParent
         Public histList As New List(Of List(Of Single))
         Public histogramList As New List(Of cv.Mat)
         Dim inputMatList As New List(Of cv.Mat)
@@ -600,7 +607,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/3.4/da/d7f/tutorial_back_projection.html
-    Public Class BackProject_FullOld : Inherits TaskParent
+    Public Class NR_BackProject_FullOld : Inherits TaskParent
         Public classCount As Integer
         Public ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255)}
         Public Sub New()
@@ -627,7 +634,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_InRangeDepthTest : Inherits TaskParent
+    Public Class NR_BackProject_InRangeDepthTest : Inherits TaskParent
         Public classCount As Integer
         Public Sub New()
             task.gOptions.setHistogramBins(4)
@@ -708,46 +715,6 @@ Namespace VBClasses
 
 
 
-    ' https://docs.opencvb.org/3.4/da/d7f/tutorial_back_projection.html
-    Public Class BackProject_Full : Inherits TaskParent
-        Public classCount As Integer
-        Dim plotHist As New Plot_Histogram
-        Dim index As Integer
-        Public Sub New()
-            task.gOptions.setHistogramBins(10)
-            plotHist.createHistogram = True
-            plotHist.removeZeroEntry = False
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Create a histogram for the grayscale image, uniquely identify each bin, and backproject it."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.grayStable
-            classCount = task.histogramBins
-            plotHist.Run(src)
-            dst1 = plotHist.dst2
-
-            Dim histogram = plotHist.histogram
-            For i = 0 To classCount
-                histogram.Set(Of Single)(i, 0, i)
-            Next
-
-            cv.Cv2.CalcBackProject({src}, {0}, histogram, dst2, plotHist.ranges)
-            dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-            dst2 += 1 ' get away from zeros...
-            labels(2) = "CV_8U backprojection of the " + CStr(classCount) + " histogram bins."
-            If standaloneTest() Then
-                dst3 = PaletteFull(dst2)
-                labels(3) = "Class " + CStr(index) + " had " + CStr(plotHist.histArray(index)) + " pixels after backprojection."
-            End If
-        End Sub
-    End Class
-
-
-
-
-
-
-
     Public Class BackProject_FullDepth : Inherits TaskParent
         Public classCount As Integer
         Dim plotHist As New Plot_Histogram
@@ -792,7 +759,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_Basics_Depth : Inherits TaskParent
+    Public Class NR_BackProject_Basics_Depth : Inherits TaskParent
         Public bpDepth As New BackProject_FullDepth
         Public Sub New()
             task.gOptions.setHistogramBins(20)
@@ -812,7 +779,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_DepthSlider : Inherits TaskParent
+    Public Class NR_BackProject_DepthSlider : Inherits TaskParent
         Public bpDepth As New BackProject_FullDepth
         Public Sub New()
             task.gOptions.setHistogramBins(20)
