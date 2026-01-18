@@ -85,7 +85,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_Plot : Inherits TaskParent
+    Public Class NR_BrickPoint_Plot : Inherits TaskParent
         Dim plotHist As New Plot_Histogram
         Dim bPoint As New BrickPoint_Basics
         Public Sub New()
@@ -127,7 +127,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_MaskRedColor : Inherits TaskParent
+    Public Class NR_BrickPoint_MaskRedColor : Inherits TaskParent
         Dim fLess As New BrickPoint_FeatureLess
         Public Sub New()
             desc = "Run RedColor with the featureless mask from BrickPoint_FeatureLess"
@@ -144,7 +144,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_TopRow : Inherits TaskParent
+    Public Class NR_BrickPoint_TopRow : Inherits TaskParent
         Dim bPoint As New BrickPoint_Basics
         Public Sub New()
             labels(3) = "BrickPoint_Basics output of intensity = 255 - not necessarily in the top row of the brick."
@@ -176,7 +176,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_DistanceAbove : Inherits TaskParent
+    Public Class NR_BrickPoint_DistanceAbove : Inherits TaskParent
         Dim plotHist As New Plot_Histogram
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -259,7 +259,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_Busiest : Inherits TaskParent
+    Public Class NR_BrickPoint_Busiest : Inherits TaskParent
         Dim bPoint As New BrickPoint_Basics
         Public bestBricks As New List(Of cv.Point)
         Public sortedBricks As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
@@ -352,7 +352,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_ContourCompare : Inherits TaskParent
+    Public Class NR_BrickPoint_ContourCompare : Inherits TaskParent
         Dim fLess As New BrickPoint_FeatureLess
         Dim contours As New Contour_Basics
         Public Sub New()
@@ -431,7 +431,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_EndPoints : Inherits TaskParent
+    Public Class NR_BrickPoint_EndPoints : Inherits TaskParent
         Dim brickKNN As New BrickPoint_KNN
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -524,7 +524,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_Horizontal : Inherits TaskParent
+    Public Class NR_BrickPoint_Horizontal : Inherits TaskParent
         Dim horizontal As New Edge_SobelHorizontal
         Public bpCore As New BrickPoint_Core
         Public ptList As New List(Of cv.Point)
@@ -544,7 +544,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickPoint_Blocks : Inherits TaskParent
+    Public Class NR_BrickPoint_Blocks : Inherits TaskParent
         Public threshold As Single
         Public Sub New()
             desc = "Use the bricks to portray the brickpoints"

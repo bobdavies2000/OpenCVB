@@ -92,7 +92,7 @@ Namespace VBClasses
 
 
     ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-    Public Class Benford_NormalizedImage : Inherits TaskParent
+    Public Class NR_Benford_NormalizedImage : Inherits TaskParent
         Public benford As New Benford_Basics
         Public Sub New()
             desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
@@ -114,7 +114,7 @@ Namespace VBClasses
 
 
     ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-    Public Class Benford_NormalizedImage99 : Inherits TaskParent
+    Public Class NR_Benford_NormalizedImage99 : Inherits TaskParent
         Public benford As New Benford_Basics
         Public Sub New()
             benford.setup99()
@@ -138,7 +138,7 @@ Namespace VBClasses
 
 
     ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-    Public Class Benford_JPEG : Inherits TaskParent
+    Public Class NR_Benford_JPEG : Inherits TaskParent
         Public benford As New Benford_Basics
         Dim options As New Options_JpegQuality
         Public Sub New()
@@ -163,7 +163,7 @@ Namespace VBClasses
 
 
     ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-    Public Class Benford_JPEG99 : Inherits TaskParent
+    Public Class NR_Benford_JPEG99 : Inherits TaskParent
         Public benford As New Benford_Basics
         Public options As New Options_JpegQuality
         Public Sub New()
@@ -190,7 +190,7 @@ Namespace VBClasses
 
 
     ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-    Public Class Benford_PNG : Inherits TaskParent
+    Public Class NR_Benford_PNG : Inherits TaskParent
         Dim options As New Options_PNGCompression
         Public benford As New Benford_Basics
         Public Sub New()
@@ -214,7 +214,7 @@ Namespace VBClasses
 
 
 
-    Public Class Benford_Depth : Inherits TaskParent
+    Public Class NR_Benford_Depth : Inherits TaskParent
         Public benford As New Benford_Basics
         Public Sub New()
             desc = "Apply Benford to the depth data"
@@ -234,7 +234,7 @@ Namespace VBClasses
 
 
 
-    Public Class Benford_Primes : Inherits TaskParent
+    Public Class NR_Benford_Primes : Inherits TaskParent
         Dim sieve As New Sieve_BasicsVB
         Dim benford As New Benford_Basics
         Public Sub New()

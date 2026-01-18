@@ -153,7 +153,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickLine_DepthGaps : Inherits TaskParent
+    Public Class NR_BrickLine_DepthGaps : Inherits TaskParent
         Dim findCells As New BrickLine_DepthGap
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -178,7 +178,7 @@ Namespace VBClasses
 
 
 
-    Public Class BrickLine_Lines : Inherits TaskParent
+    Public Class NR_BrickLine_Lines : Inherits TaskParent
         Dim findCells As New BrickLine_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

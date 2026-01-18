@@ -17,7 +17,7 @@ Namespace VBClasses
                     Case "Bin4Way_Regions"
                         If colorMethods(index) Is Nothing Then colorMethods(index) = New Bin4Way_Regions
                     Case "Binarize_DepthTiers"
-                        If colorMethods(index) Is Nothing Then colorMethods(index) = New Binarize_DepthTiers
+                        If colorMethods(index) Is Nothing Then colorMethods(index) = New NR_Binarize_DepthTiers
                     Case "EdgeLine_Basics"
                         If colorMethods(index) Is Nothing Then colorMethods(index) = New EdgeLine_Basics
                     Case "Hist3DColor_Basics"

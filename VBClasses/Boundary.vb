@@ -93,7 +93,7 @@ Namespace VBClasses
 
 
 
-    Public Class Boundary_RemovedRects : Inherits TaskParent
+    Public Class NR_Boundary_RemovedRects : Inherits TaskParent
         Public bRects As New Boundary_Rectangles
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -119,7 +119,7 @@ Namespace VBClasses
 
 
 
-    Public Class Boundary_GuidedBP : Inherits TaskParent
+    Public Class NR_Boundary_GuidedBP : Inherits TaskParent
         Dim guided As New GuidedBP_Depth
         Public Sub New()
             task.gOptions.setHistogramBins(100)
@@ -145,7 +145,7 @@ Namespace VBClasses
 
 
 
-    Public Class Boundary_RedColor : Inherits TaskParent
+    Public Class NR_Boundary_RedColor : Inherits TaskParent
         Dim prep As New RedPrep_ReductionChoices
         Public Sub New()
             task.gOptions.MaxDepthBar.Value = 20
@@ -170,7 +170,7 @@ Namespace VBClasses
 
 
 
-    Public Class Boundary_RedCloud : Inherits TaskParent
+    Public Class NR_Boundary_RedCloud : Inherits TaskParent
         Dim prep As New RedPrep_Basics
         Public Sub New()
             task.gOptions.MaxDepthBar.Value = 20

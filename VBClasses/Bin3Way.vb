@@ -86,7 +86,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bin3Way_Color : Inherits TaskParent
+    Public Class NR_Bin3Way_Color : Inherits TaskParent
         Dim bin3 As New Bin3Way_KMeans
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -108,7 +108,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bin3Way_RedColorDarkest : Inherits TaskParent
+    Public Class NR_Bin3Way_RedColorDarkest : Inherits TaskParent
         Dim bin3 As New Bin3Way_KMeans
         Dim flood As New Flood_BasicsMask
         Public Sub New()
@@ -129,7 +129,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bin3Way_RedColorLightest : Inherits TaskParent
+    Public Class NR_Bin3Way_RedColorLightest : Inherits TaskParent
         Dim bin3 As New Bin3Way_KMeans
         Dim flood As New Flood_BasicsMask
         Public Sub New()
@@ -148,7 +148,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bin3Way_RedColorOther : Inherits TaskParent
+    Public Class NR_Bin3Way_RedColorOther : Inherits TaskParent
         Dim bin3 As New Bin3Way_KMeans
         Dim flood As New Flood_BasicsMask
         Dim color8U As New Color8U_Basics

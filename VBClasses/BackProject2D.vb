@@ -101,7 +101,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject2D_Compare : Inherits TaskParent
+    Public Class NR_BackProject2D_Compare : Inherits TaskParent
         Dim hueSat As New PhotoShop_HSV
         Dim backP As New BackProject2D_Basics
         Dim mats As New Mat_4Click
@@ -137,7 +137,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject2D_Top : Inherits TaskParent
+    Public Class NR_BackProject2D_Top : Inherits TaskParent
         Dim heat As New HeatMap_Basics
         Public Sub New()
             labels = {"", "", "Top Down HeatMap", "BackProject2D for the top-down view"}
@@ -158,7 +158,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject2D_Side : Inherits TaskParent
+    Public Class NR_BackProject2D_Side : Inherits TaskParent
         Dim heat As New HeatMap_Basics
         Public Sub New()
             labels = {"", "", "Side View HeatMap", "BackProject2D for the side view"}
@@ -267,7 +267,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject2D_FilterBoth : Inherits TaskParent
+    Public Class NR_BackProject2D_FilterBoth : Inherits TaskParent
         Dim filterSide As New BackProject2D_FilterSide
         Dim filterTop As New BackProject2D_FilterTop
         Public Sub New()
@@ -288,7 +288,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject2D_Full : Inherits TaskParent
+    Public Class NR_BackProject2D_Full : Inherits TaskParent
         Dim backP As New BackProject2D_Basics
         Public classCount As Integer
         Public Sub New()
@@ -311,7 +311,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject2D_RowCol : Inherits TaskParent
+    Public Class NR_BackProject2D_RowCol : Inherits TaskParent
         Dim backp As New BackProject2D_Basics
         Dim options As New Options_BackProject2D
         Public Sub New()

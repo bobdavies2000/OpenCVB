@@ -675,7 +675,7 @@ Namespace VBClasses
 
 
 
-    Public Class BackProject_InRangeDepth : Inherits TaskParent
+    Public Class NR_BackProject_InRangeDepth : Inherits TaskParent
         Public classCount As Integer
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

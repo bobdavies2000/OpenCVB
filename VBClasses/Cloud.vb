@@ -66,7 +66,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_Inverse : Inherits TaskParent
+    Public Class NR_Cloud_Inverse : Inherits TaskParent
         Dim colorizer As New DepthColorizer_CPP
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
@@ -96,7 +96,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_Display : Inherits TaskParent
+    Public Class NR_Cloud_Display : Inherits TaskParent
         Dim pcHistory As New List(Of cv.Mat)
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
@@ -277,7 +277,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_SoloRegions : Inherits TaskParent
+    Public Class NR_Cloud_SoloRegions : Inherits TaskParent
         Public solo As New Cloud_Solo
         Dim dilate As New Dilate_Basics
         Public Sub New()
@@ -298,7 +298,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_SurfaceH_CPP : Inherits TaskParent
+    Public Class NR_Cloud_SurfaceH_CPP : Inherits TaskParent
         Public heat As New HeatMap_Basics
         Public plot As New Plot_Basics_CPP
         Public topRow As Integer
@@ -388,7 +388,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_GridInspector : Inherits TaskParent
+    Public Class NR_Cloud_GridInspector : Inherits TaskParent
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -424,7 +424,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_FrustrumTop : Inherits TaskParent
+    Public Class NR_Cloud_FrustrumTop : Inherits TaskParent
         Dim frustrum As New Draw_Frustrum
         Dim heat As New HeatMap_Basics
         Dim setupTop As New Cloud_SetupTop
@@ -448,7 +448,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_FrustrumSide : Inherits TaskParent
+    Public Class NR_Cloud_FrustrumSide : Inherits TaskParent
         Dim frustrum As New Draw_Frustrum
         Dim heat As New HeatMap_Basics
         Dim setupSide As New Cloud_SetupSide
@@ -495,7 +495,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_ReducedTopView : Inherits TaskParent
+    Public Class NR_Cloud_ReducedTopView : Inherits TaskParent
         Dim split2 As New Cloud_ReduceSplit2
         Public Sub New()
             desc = "Create a stable side view of the point cloud"
@@ -514,7 +514,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_ReducedSideView : Inherits TaskParent
+    Public Class NR_Cloud_ReducedSideView : Inherits TaskParent
         Dim split2 As New Cloud_ReduceSplit2
         Public Sub New()
             desc = "Show where vertical neighbor depth values are within X mm's"
@@ -534,7 +534,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_ReducedViews : Inherits TaskParent
+    Public Class NR_Cloud_ReducedViews : Inherits TaskParent
         Dim split2 As New Cloud_ReduceSplit2
         Public Sub New()
             labels = {"", "", "Reduced side view", "Reduced top view"}
@@ -560,7 +560,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_Split : Inherits TaskParent
+    Public Class NR_Cloud_Split : Inherits TaskParent
         Public Sub New()
             desc = "Attempting to debug pointcloud problem - display the 3 components"
         End Sub
@@ -583,7 +583,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_Continuous_VB : Inherits TaskParent
+    Public Class NR_Cloud_Continuous_VB : Inherits TaskParent
         Dim options As New Options_Features
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -618,7 +618,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_Continuous_GridX : Inherits TaskParent
+    Public Class NR_Cloud_Continuous_GridX : Inherits TaskParent
         Dim options As New Options_Features
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -656,7 +656,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_Continuous_GridXY : Inherits TaskParent
+    Public Class NR_Cloud_Continuous_GridXY : Inherits TaskParent
         Dim options As New Options_Features
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -694,7 +694,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cloud_Templates : Inherits TaskParent
+    Public Class NR_Cloud_Templates : Inherits TaskParent
         Public templateX As New cv.Mat, templateY As New cv.Mat
         Dim contours As New Contour_Basics
         Public Sub New()

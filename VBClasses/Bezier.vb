@@ -42,7 +42,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bezier_Example : Inherits TaskParent
+    Public Class NR_Bezier_Example : Inherits TaskParent
         Dim bezier As New Bezier_Basics
         Public points() As cv.Point = {New cv.Point(task.DotSize, task.DotSize), New cv.Point(dst2.Width / 6, dst2.Width / 6),
                                    New cv.Point(dst2.Width * 3 / 4, dst2.Height / 2),

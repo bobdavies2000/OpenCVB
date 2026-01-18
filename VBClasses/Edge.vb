@@ -935,7 +935,7 @@ Namespace VBClasses
                             Case 1
                                 colorMethods(i) = New Bin4Way_Regions
                             Case 2
-                                colorMethods(i) = New Binarize_DepthTiers
+                                colorMethods(i) = New NR_Binarize_DepthTiers
                             Case 3
                                 colorMethods(i) = New EdgeLine_Basics
                             Case 4

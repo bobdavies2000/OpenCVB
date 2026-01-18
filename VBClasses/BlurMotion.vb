@@ -30,8 +30,10 @@ Namespace VBClasses
 
 
 
+
+
     ' https://docs.opencvb.org/trunk/d1/dfd/tutorial_motion_deblur_filter.html
-    Public Class BlurMotion_Deblur : Inherits TaskParent
+    Public Class NR_BlurMotion_Deblur : Inherits TaskParent
         Dim mblur As New BlurMotion_Basics
         Private Function calcPSF(filterSize As cv.Size, len As Integer, theta As Double) As cv.Mat
             Dim h As New cv.Mat(filterSize, cv.MatType.CV_32F, cv.Scalar.All(0))
@@ -136,7 +138,7 @@ Namespace VBClasses
             Dim h = calcPSF(roi.Size(), mblur.options.restoreLen, mblur.options.theta)
             Dim hW = calcWeinerFilter(h, 1.0 / mblur.options.SNR)
 
-            Dim gray8u = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+            Dim gray8u = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim imgIn As New cv.Mat
             gray8u.ConvertTo(imgIn, cv.MatType.CV_32F)
             imgIn = edgeTaper(imgIn, mblur.options.gamma, beta)

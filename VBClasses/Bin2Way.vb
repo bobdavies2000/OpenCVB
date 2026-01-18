@@ -44,7 +44,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bin2Way_KMeans : Inherits TaskParent
+    Public Class NR_Bin2Way_KMeans : Inherits TaskParent
         Public bin2 As New Bin2Way_Basics
         Dim kmeans As New KMeans_Dimensions
         Dim mats As New Mat_4Click
@@ -72,7 +72,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bin2Way_RedColor : Inherits TaskParent
+    Public Class NR_Bin2Way_RedColor : Inherits TaskParent
         Dim bin2 As New Bin2Way_Gradation
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -142,7 +142,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bin2Way_GradationEdges : Inherits TaskParent
+    Public Class NR_Bin2Way_GradationEdges : Inherits TaskParent
         Dim grad As New Bin2Way_Gradation
         Dim edges As New Edge_Basics
         Public Sub New()
@@ -161,7 +161,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bin2Way_RedCloudDarkest : Inherits TaskParent
+    Public Class NR_Bin2Way_RedCloudDarkest : Inherits TaskParent
         Dim bin2 As New Bin2Way_RecurseOnce
         Dim flood As New Flood_BasicsMask
         Public Sub New()
@@ -182,7 +182,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bin2Way_RedCloudLight : Inherits TaskParent
+    Public Class NR_Bin2Way_RedCloudLight : Inherits TaskParent
         Dim bin2 As New Bin2Way_RecurseOnce
         Dim flood As New Flood_BasicsMask
         Public Sub New()
@@ -238,7 +238,7 @@ Namespace VBClasses
 
 
 
-    Public Class Bin2Way_RedCloudLightToDark : Inherits TaskParent
+    Public Class NR_Bin2Way_RedCloudLightToDark : Inherits TaskParent
         Dim recurse As New Bin2Way_RecurseOnce
         Dim redCs(3) As RedColor_Basics
         Dim mats As New Mat_4to1

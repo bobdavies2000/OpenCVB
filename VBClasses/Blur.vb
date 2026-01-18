@@ -19,7 +19,7 @@ Namespace VBClasses
 
 
 
-    Public Class Blur_Homogeneous : Inherits TaskParent
+    Public Class NR_Blur_Homogeneous : Inherits TaskParent
         Dim blur As New Blur_Basics
         Dim blurKernelSlider As TrackBar
         Public Sub New()
@@ -38,7 +38,7 @@ Namespace VBClasses
 
 
 
-    Public Class Blur_Median : Inherits TaskParent
+    Public Class NR_Blur_Median : Inherits TaskParent
         Dim blur As New Blur_Basics
         Dim blurKernelSlider As TrackBar
         Public Sub New()
@@ -75,7 +75,7 @@ Namespace VBClasses
 
 
 
-    Public Class Blur_TopoMap : Inherits TaskParent
+    Public Class NR_Blur_TopoMap : Inherits TaskParent
         Dim gradient As New Gradient_CartToPolar
         Dim options As New Options_BlurTopo
         Public Sub New()
@@ -110,7 +110,7 @@ Namespace VBClasses
 
 
 
-    Public Class Blur_Detection : Inherits TaskParent
+    Public Class NR_Blur_Detection : Inherits TaskParent
         Dim laplace As New Laplacian_Basics
         Dim blur As New Blur_Basics
         Public Sub New()
@@ -148,7 +148,7 @@ Namespace VBClasses
 
 
 
-    Public Class Blur_Depth : Inherits TaskParent
+    Public Class NR_Blur_Depth : Inherits TaskParent
         Dim blur As New Blur_Basics
         Public Sub New()
             desc = "Blur the depth results to help find the boundaries to large depth regions"
@@ -165,7 +165,7 @@ Namespace VBClasses
 
 
 
-    Public Class Blur_Gaussian : Inherits TaskParent
+    Public Class NR_Blur_Gaussian : Inherits TaskParent
         Public options As New Options_Blur()
         Public Sub New()
             desc = "Smooth each pixel with a Gaussian kernel of different sizes."
@@ -181,7 +181,7 @@ Namespace VBClasses
 
 
 
-    Public Class Blur_PlusHistogram : Inherits TaskParent
+    Public Class NR_Blur_PlusHistogram : Inherits TaskParent
         Dim mat2to1 As New Mat_2to1
         Dim blur As New Blur_Bilateral
         Dim myhist As New Histogram_EqualizeGray
@@ -214,7 +214,7 @@ Namespace VBClasses
 
 
 
-    Public Class Blur_Histogram : Inherits TaskParent
+    Public Class NR_Blur_Histogram : Inherits TaskParent
         Dim blur As New Blur_Bilateral
         Dim myhist As New Histogram_Basics
         Public Sub New()

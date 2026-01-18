@@ -19,7 +19,7 @@ Namespace VBClasses
 
 
     ' https://github.com/spmallick/learnopencv/blob/master/Photoshop-Filters-in-OpenCV/brightness.cpp
-    Public Class Brightness_HSV : Inherits TaskParent
+    Public Class NR_Brightness_HSV : Inherits TaskParent
         Dim options As New Options_BrightnessContrast
         Public Sub New()
             labels(3) = "HSV image"

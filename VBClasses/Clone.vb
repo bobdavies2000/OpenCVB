@@ -37,7 +37,7 @@ Namespace VBClasses
 
 
 
-    Public Class Clone_ColorChange : Inherits TaskParent
+    Public Class NR_Clone_ColorChange : Inherits TaskParent
         Dim clone As New Clone_Basics
         Dim options As New Options_Clone
         Public Sub New()
@@ -59,7 +59,7 @@ Namespace VBClasses
 
 
 
-    Public Class Clone_IlluminationChange : Inherits TaskParent
+    Public Class NR_Clone_IlluminationChange : Inherits TaskParent
         Dim clone As New Clone_Basics
         Dim options As New Options_Clone
         Public Sub New()
@@ -82,7 +82,7 @@ Namespace VBClasses
 
 
 
-    Public Class Clone_TextureFlattening : Inherits TaskParent
+    Public Class NR_Clone_TextureFlattening : Inherits TaskParent
         Dim clone As New Clone_Basics
         Dim options As New Options_Clone
         Public Sub New()
@@ -108,7 +108,7 @@ Namespace VBClasses
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_gui.cpp
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/cloning_demo.cpp
-    Public Class Clone_Eagle : Inherits TaskParent
+    Public Class NR_Clone_Eagle : Inherits TaskParent
         Dim sourceImage As cv.Mat
         Dim mask As cv.Mat
         Dim srcROI As cv.Rect
@@ -138,7 +138,7 @@ Namespace VBClasses
 
             dst2 = src.Clone()
             If task.mouseClickFlag Then
-                pt = task.ClickPoint  ' pt corresponds To the center Of the source image.  Roi can't be outside image boundary.
+                pt = task.clickPoint  ' pt corresponds To the center Of the source image.  Roi can't be outside image boundary.
                 If pt.X + srcROI.Width / 2 >= src.Width Then pt.X = src.Width - srcROI.Width / 2
                 If pt.X - srcROI.Width / 2 < 0 Then pt.X = srcROI.Width / 2
                 If pt.Y + srcROI.Height >= src.Height Then pt.Y = src.Height - srcROI.Height / 2
@@ -153,7 +153,7 @@ Namespace VBClasses
 
 
     ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Cv2.SeamlessClone(OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.Point,%20OpenCvSharp.OutputArray,%20OpenCvSharp.SeamlessCloneMethods)/
-    Public Class Clone_Seamless : Inherits TaskParent
+    Public Class NR_Clone_Seamless : Inherits TaskParent
         Dim options As New Options_Clone
         Public Sub New()
             labels(2) = "Results for SeamlessClone"
