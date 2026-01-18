@@ -17190,4 +17190,68 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+    Public Class XO_Contour_BasicsOld : Inherits TaskParent
+        Public classCount As Integer
+        Public contourList As New List(Of contourData)
+        Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
+        Dim sortContours As New Contour_Sort
+        Dim edgeline As New EdgeLine_Basics
+        Public Sub New()
+            labels(3) = "Input to OpenCV's FindContours"
+            desc = "General purpose contour finder"
+        End Sub
+        Public Shared Function selectContour(contours As Contour_Basics_List) As contourData
+            Dim tour As New contourData
+            Dim id = contours.contourMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            For Each task.contourD In contours.contourList
+                If id = task.contourD.ID Then Exit For
+            Next
+
+            For Each tour In contours.contourList
+                If tour.ID = id Then Exit For
+            Next
+            task.color(tour.rect).SetTo(cv.Scalar.White, tour.mask)
+            Return task.contourD
+        End Function
+        Public Shared Function buildContours(input As cv.Mat) As cv.Point()()
+            Static options As New Options_Contours
+            options.Run()
+
+            Dim mm = GetMinMax(input)
+            If mm.maxVal < 255 Then input = (input - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+
+            Dim allContours As cv.Point()() = Nothing
+
+            Dim mode = options.options2.ApproximationMode
+            If options.retrievalMode = cv.RetrievalModes.FloodFill Then
+                Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
+                input.ConvertTo(dst, cv.MatType.CV_32SC1)
+                cv.Cv2.FindContours(dst, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
+            Else
+                cv.Cv2.FindContours(input, allContours, Nothing, options.retrievalMode, mode)
+            End If
+            Return allContours
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            edgeline.Run(task.grayStable)
+            If src.Type = cv.MatType.CV_8U Then dst3 = src Else dst3 = edgeline.dst2
+
+            sortContours.allContours = buildContours(dst3)
+            If sortContours.allContours.Count <= 1 Then Exit Sub
+
+            sortContours.Run(src)
+
+            contourList = sortContours.contourList
+            contourMap = sortContours.contourMap
+            labels(2) = sortContours.labels(2)
+            dst2 = sortContours.dst2
+
+            classCount = contourList.Count
+
+            labels(2) = CStr(contourList.Count) + " contours were found"
+        End Sub
+    End Class
 End Namespace

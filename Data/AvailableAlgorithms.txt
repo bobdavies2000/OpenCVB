@@ -611,7 +611,6 @@ NR_Color8U_Smoothing
 NR_Color8U_TopX
 NR_Concat_4way
 NR_Concat_Basics
-NR_Contour_BasicsOld
 NR_Contour_BrickPoints
 NR_Contour_Compare
 NR_Contour_Delaunay

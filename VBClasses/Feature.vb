@@ -883,7 +883,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_Feature_StableVisualize : Inherits TaskParent
+    Public Class NR_Feature_StableVisualize : Inherits TaskParent
         Dim noMotion As New Feature_NoMotion
         Public fpStable As New List(Of fpData)
         Public ptStable As New List(Of cv.Point)

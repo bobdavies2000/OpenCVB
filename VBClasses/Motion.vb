@@ -193,7 +193,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_Motion_ValidateRight : Inherits TaskParent
+    Public Class NR_Motion_ValidateRight : Inherits TaskParent
         Dim diff As New Diff_Basics
         Dim motionRight As New Motion_RightImage
         Public Sub New()

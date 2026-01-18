@@ -169,7 +169,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_GridROI_ColorSplit : Inherits TaskParent
+    Public Class NR_GridROI_ColorSplit : Inherits TaskParent
         Dim devGrid As New GridROI_Sorted
         Public Sub New()
             devGrid.maskVal = 255
@@ -346,7 +346,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_GridROI_LRClick : Inherits TaskParent
+    Public Class NR_GridROI_LRClick : Inherits TaskParent
         Dim gather As New GridROI_Basics
         Dim ClickPoint As cv.Point, picTag As Integer
         Dim options As New Options_Features
@@ -425,7 +425,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_GridROI_LRAll : Inherits TaskParent
+    Public Class NR_GridROI_LRAll : Inherits TaskParent
         Dim gather As New GridROI_Basics
         Dim options As New Options_Features
         Public sortedRects As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)

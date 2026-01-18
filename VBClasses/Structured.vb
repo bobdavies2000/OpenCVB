@@ -482,7 +482,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_Structured_CountSideSum : Inherits TaskParent
+    Public Class NR_Structured_CountSideSum : Inherits TaskParent
         Public counts As New List(Of Single)
         Public maxCountIndex As Integer
         Public yValues As New List(Of Single)

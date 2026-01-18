@@ -280,7 +280,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_Mat_Inverse_4D : Inherits TaskParent
+    Public Class NR_Mat_Inverse_4D : Inherits TaskParent
         Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
         Public input As cv.Mat
         Public Sub New()

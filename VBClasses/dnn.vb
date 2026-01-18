@@ -166,7 +166,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_DNN_SuperResize : Inherits TaskParent
+    Public Class NR_DNN_SuperResize : Inherits TaskParent
         Dim super = New NR_DNN_SuperRes
         Public Sub New()
             labels(2) = "Super Res resized back to original size"

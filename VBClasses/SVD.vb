@@ -43,7 +43,7 @@ Namespace VBClasses
 
     ' https://www.programcreek.com/python/example/89344/cv2.SVDecomp
     ' https://github.com/mzucker/page_dewarp/blob/master/page_dewarp.py
-    Public Class NR_NR_SVD_Example2 : Inherits TaskParent
+    Public Class NR_SVD_Example2 : Inherits TaskParent
         Public Sub New()
             desc = "Compute the mean and tangent of a RedCloud Cell"
         End Sub

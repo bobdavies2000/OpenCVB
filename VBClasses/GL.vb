@@ -28,7 +28,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_GL_Line3DNoMotionInput : Inherits TaskParent
+    Public Class NR_GL_Line3DNoMotionInput : Inherits TaskParent
         Public Sub New()
             task.FeatureSampleSize = 1000 ' want all the lines 
             desc = "Build a 3D model of the lines found in the rgb data."
@@ -110,7 +110,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_GL_RunSharpHist : Inherits TaskParent
+    Public Class NR_GL_RunSharpHist : Inherits TaskParent
         Dim plotHist As New GL_PlotHist
         Dim displayPC As New GL_DisplayPC
         Public Sub New()
@@ -137,7 +137,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_GL_Line3DWhite : Inherits TaskParent
+    Public Class NR_GL_Line3DWhite : Inherits TaskParent
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
@@ -177,7 +177,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_GL_Line3DReconstructed : Inherits TaskParent
+    Public Class NR_GL_Line3DReconstructed : Inherits TaskParent
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
@@ -315,7 +315,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_GL_ReadPCHist : Inherits TaskParent
+    Public Class NR_GL_ReadPCHist : Inherits TaskParent
         Dim glPlot As New GL_PlotHist
         Dim displayPC As New GL_DisplayPC
         Public Sub New()
@@ -470,7 +470,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_GL_Line3D_Debug : Inherits TaskParent
+    Public Class NR_GL_Line3D_Debug : Inherits TaskParent
         Dim line3d As New Line3D_DrawLines_Debug
         Public Sub New()
             If standalone Then task.gOptions.LineWidth.Value = 3
@@ -492,7 +492,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_NR_GL_Line3D_DebugAlt : Inherits TaskParent
+    Public Class NR_NR_GL_Line3D_DebugAlt : Inherits TaskParent
         Dim line3d As New Line3D_DrawLines_Debug
         Public Sub New()
             If standalone Then task.gOptions.LineWidth.Value = 3
@@ -572,7 +572,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_GL_ImageHullsColor : Inherits TaskParent
+    Public Class NR_GL_ImageHullsColor : Inherits TaskParent
         Public Sub New()
             desc = "Prepare triangles from the RedCloud_HeartBeat output"
         End Sub

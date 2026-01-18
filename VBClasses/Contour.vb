@@ -606,7 +606,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_Contour_GeneralWithOptions : Inherits TaskParent
+    Public Class NR_Contour_GeneralWithOptions : Inherits TaskParent
         Public contourlist As New List(Of cv.Point())
         Public allContours As cv.Point()()
         Public options As New Options_Contours
@@ -698,7 +698,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_Contour_InfoDepth : Inherits TaskParent
+    Public Class NR_Contour_InfoDepth : Inherits TaskParent
         Dim contours As New Contour_Basics
         Public Sub New()
             desc = "Provide details about the selected contour's contourList entry."
@@ -1238,53 +1238,39 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Contour_BasicsOld : Inherits TaskParent
+
+    Public Class Contour_Test : Inherits TaskParent
+        Implements IDisposable
         Public classCount As Integer
         Public contourList As New List(Of contourData)
         Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)
-        Dim sortContours As New Contour_Sort
-        Dim edgeline As New EdgeLine_Basics
+        Dim color8u As New Color8U_Basics
         Public Sub New()
             labels(3) = "Input to OpenCV's FindContours"
             desc = "General purpose contour finder"
         End Sub
-        Public Shared Function selectContour(contours As Contour_Basics_List) As contourData
+        Public Function selectContour() As contourData
             Dim tour As New contourData
-            Dim id = contours.contourMap.Get(Of Integer)(task.ClickPoint.Y, task.ClickPoint.X)
-            For Each task.contourD In contours.contourList
+            Dim id = contourMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            For Each task.contourD In contourList
                 If id = task.contourD.ID Then Exit For
             Next
 
-            For Each tour In contours.contourList
+            For Each tour In contourList
                 If tour.ID = id Then Exit For
             Next
             task.color(tour.rect).SetTo(cv.Scalar.White, tour.mask)
             Return task.contourD
         End Function
-        Public Shared Function buildContours(input As cv.Mat) As cv.Point()()
-            Static options As New Options_Contours
-            options.Run()
-
-            Dim mm = GetMinMax(input)
-            If mm.maxVal < 255 Then input = (input - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
-
-            Dim allContours As cv.Point()() = Nothing
-
-            Dim mode = options.options2.ApproximationMode
-            If options.retrievalMode = cv.RetrievalModes.FloodFill Then
-                Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8U, 0)
-                input.ConvertTo(dst, cv.MatType.CV_32SC1)
-                cv.Cv2.FindContours(dst, allContours, Nothing, cv.RetrievalModes.FloodFill, mode)
-            Else
-                cv.Cv2.FindContours(input, allContours, Nothing, options.retrievalMode, mode)
-            End If
-            Return allContours
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edgeline.Run(task.grayStable)
-            If src.Type = cv.MatType.CV_8U Then dst3 = src Else dst3 = edgeline.dst2
+            If src.Type = cv.MatType.CV_8U Then
+                dst3 = src
+            Else
+                color8u.Run(task.grayStable)
+                dst3 = color8u.dst2
+            End If
 
-            sortContours.allContours = buildContours(dst3)
+            sortContours.allContours = Contour_Basics.buildContours(dst3)
             If sortContours.allContours.Count <= 1 Then Exit Sub
 
             sortContours.Run(src)
@@ -1298,6 +1284,8 @@ Namespace VBClasses
 
             labels(2) = CStr(contourList.Count) + " contours were found"
         End Sub
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            edgeline.Dispose()
+        End Sub
     End Class
-
 End Namespace

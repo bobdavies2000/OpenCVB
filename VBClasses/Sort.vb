@@ -231,7 +231,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_Sort_GrayScale1 : Inherits TaskParent
+    Public Class NR_Sort_GrayScale1 : Inherits TaskParent
         Dim sort As New Sort_Integer
         Dim pixels(2)() As Byte
         Public Sub New()

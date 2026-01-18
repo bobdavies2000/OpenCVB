@@ -371,7 +371,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_Edge_SobelLRBinarized : Inherits TaskParent
+    Public Class NR_Edge_SobelLRBinarized : Inherits TaskParent
         Dim edges As New Bin4Way_Sobel
         Public Sub New()
             labels = {"", "", "Horizontal Sobel - Left View", "Horizontal Sobel - Right View"}

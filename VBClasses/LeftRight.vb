@@ -213,7 +213,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_LeftRight_EdgesColor : Inherits TaskParent
+    Public Class NR_LeftRight_EdgesColor : Inherits TaskParent
         Dim edges As New Edge_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True

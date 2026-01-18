@@ -250,7 +250,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_EdgeLine_SimpleMotion : Inherits TaskParent
+    Public Class NR_EdgeLine_SimpleMotion : Inherits TaskParent
         Implements IDisposable
         Public edgeList As New List(Of List(Of cv.Point))
         Public Sub New()

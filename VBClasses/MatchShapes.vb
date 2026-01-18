@@ -64,7 +64,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_MatchShapes_NearbyHull : Inherits TaskParent
+    Public Class NR_MatchShapes_NearbyHull : Inherits TaskParent
         Public similarCells As New List(Of oldrcData)
         Public bestCell As Integer
         Dim rc As New oldrcData
