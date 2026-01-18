@@ -65,9 +65,6 @@ Namespace VBClasses
 
             labels(2) = CStr(contourList.Count) + " contours were found"
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
-            edgeline.Dispose()
-        End Sub
     End Class
 
 
@@ -1270,22 +1267,19 @@ Namespace VBClasses
                 dst3 = color8u.dst2
             End If
 
-            sortContours.allContours = Contour_Basics.buildContours(dst3)
-            If sortContours.allContours.Count <= 1 Then Exit Sub
+            Dim allContours = Contour_Basics.buildContours(dst3)
+            'If sortContours.allContours.Count <= 1 Then Exit Sub
 
-            sortContours.Run(src)
+            'sortContours.Run(src)
 
-            contourList = sortContours.contourList
-            contourMap = sortContours.contourMap
-            labels(2) = sortContours.labels(2)
-            dst2 = sortContours.dst2
+            'contourList = sortContours.contourList
+            'contourMap = sortContours.contourMap
+            'labels(2) = sortContours.labels(2)
+            'dst2 = sortContours.dst2
 
             classCount = contourList.Count
 
             labels(2) = CStr(contourList.Count) + " contours were found"
-        End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
-            edgeline.Dispose()
         End Sub
     End Class
 End Namespace

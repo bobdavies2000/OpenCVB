@@ -42,32 +42,16 @@ Namespace VBClasses
                 Static sobel As New Edge_Sobel
                 sobel.Run(src)
                 src = sobel.dst2
-                'Static thresholdSlider = OptionParent.FindSlider("Sobel Intensity Threshold")
                 threshold = 255 ' thresholdSlider.value
             End If
-
-            'Dim noMotionList As New List(Of cv.Point)
-            'For Each pt In ptList
-            '    If task.motionMask.Get(Of Byte)(pt.Y, pt.X) = 0 Then noMotionList.Add(pt)
-            'Next
 
             dst2 = task.color.Clone
             ptList.Clear()
             For Each brick In task.bricks.brickList
                 Dim mm = GetMinMax(src(brick.rect))
                 brick.pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
-                brick.feature = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
-                brick.intensity = mm.maxVal
-                'If task.motionMask.Get(Of Byte)(brick.pt.Y, brick.pt.X) Then
-                If brick.intensity >= threshold Then
-                    ptList.Add(brick.feature)
-                End If
-                'End If
+                If mm.maxVal >= threshold Then ptList.Add(New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y))
             Next
-
-            'For Each pt In noMotionList
-            '    ptList.Add(pt)
-            'Next
 
             For Each pt In ptList
                 DrawCircle(dst2, pt)
@@ -101,7 +85,7 @@ Namespace VBClasses
 
             Dim sobelValues As New List(Of Byte)
             For Each brick In task.bricks.brickList
-                sobelValues.Add(brick.intensity)
+                sobelValues.Add(brick.mm.maxVal)
             Next
             plotHist.Run(cv.Mat.FromPixelData(sobelValues.Count, 1, cv.MatType.CV_8U, sobelValues.ToArray))
             dst2 = plotHist.dst2
@@ -114,8 +98,8 @@ Namespace VBClasses
 
             dst3 = src
             For Each brick In task.bricks.brickList
-                If brick.intensity <= maxVal And brick.intensity >= minVal Then
-                    DrawCircle(dst3, brick.feature)
+                If brick.mm.maxVal <= maxVal And brick.mm.maxVal >= minVal Then
+                    DrawCircle(dst3, New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y))
                 End If
             Next
             labels(2) = "There were " + CStr(sobelValues.Count) + " points found.  Cursor over each bar to see where they originated from"
@@ -157,10 +141,10 @@ Namespace VBClasses
 
             Dim count As Integer
             For Each brick In task.bricks.brickList
-                If brick.feature = newPoint Then Continue For
-                If brick.intensity <> 255 Then Continue For
-                If brick.feature.Y = brick.rect.Y Then
-                    DrawCircle(dst2, brick.feature)
+                If brick.mm.maxLoc = newPoint Then Continue For
+                If brick.mm.maxVal <> 255 Then Continue For
+                If brick.mm.maxLoc.Y = brick.rect.Y Then
+                    DrawCircle(dst2, brick.mm.maxLoc)
                     DrawCircle(dst3, brick.rect.TopLeft)
                     count += 1
                 End If
@@ -314,7 +298,7 @@ Namespace VBClasses
             For Each pt In bPoint.ptList
                 Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 Dim brick = task.bricks.brickList(index)
-                results(brick.feature.X - brick.rect.X, brick.feature.Y - brick.rect.Y) += 1
+                results(brick.mm.maxLoc.X, brick.mm.maxLoc.Y) += 1
             Next
 
             Dim incrX = dst1.Width / task.brickSize
@@ -325,8 +309,9 @@ Namespace VBClasses
             dst2 = cv.Mat.FromPixelData(task.brickSize, task.brickSize, cv.MatType.CV_32F, results)
 
             For Each brick In task.bricks.brickList
-                If brick.feature.X = col And brick.feature.Y = row Then
-                    DrawCircle(dst3, brick.pt)
+                If brick.mm.maxLoc.X = col And brick.mm.maxLoc.Y = row Then
+                    Dim ptfeat = New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y)
+                    DrawCircle(dst3, ptfeat)
                 End If
             Next
 
