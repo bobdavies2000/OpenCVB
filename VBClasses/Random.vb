@@ -291,7 +291,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_Random_CheckNormalDistSmoothed : Inherits TaskParent
+    Public Class NR_NR_Random_CheckNormalDistSmoothed : Inherits TaskParent
         Dim histogram As New Histogram_Basics
         Dim normalDist As New Random_NormalDist
         Public Sub New()

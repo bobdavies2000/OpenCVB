@@ -170,10 +170,26 @@ Namespace VBClasses
 
     Public Class Swarm_Flood : Inherits TaskParent
         Dim swarm As New Swarm_Basics
-        Public flood As New XO_Flood_BasicsMask
+        Public flood As New Flood_BasicsMask
         Dim color8U As New Color8U_Basics
         Public Sub New()
             desc = "Floodfill the color image using the swarm outline as a mask"
+        End Sub
+        Public Shared Sub setSelectedCell()
+            If task.redList Is Nothing Then Exit Sub
+            If task.redList.oldrclist.Count = 0 Then Exit Sub
+            If task.clickPoint = newPoint And task.redList.oldrclist.Count > 1 Then
+                task.clickPoint = task.redList.oldrclist(1).maxDist
+            End If
+            Dim index = task.redList.rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            If index = 0 Then Exit Sub
+            If index > 0 And index < task.redList.oldrclist.Count Then
+                task.oldrcD = task.redList.oldrclist(index)
+                task.color(task.oldrcD.rect).SetTo(cv.Scalar.White, task.oldrcD.mask)
+            Else
+                ' the 0th cell is always the upper left corner with just 1 pixel.
+                If task.redList.oldrclist.Count > 1 Then task.oldrcD = task.redList.oldrclist(1)
+            End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             swarm.Run(src)
@@ -184,8 +200,8 @@ Namespace VBClasses
             flood.Run(color8U.dst2)
             dst2 = flood.dst2
 
-            XO_RedList_Basics.setSelectedCell()
-            labels(2) = flood.cellGen.labels(2)
+            setSelectedCell()
+            ' labels(2) = flood.cellGen.labels(2)
         End Sub
     End Class
 End Namespace

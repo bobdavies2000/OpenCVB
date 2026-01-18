@@ -158,7 +158,7 @@ Namespace VBClasses
         Public km2 As New KMeans_Basics
         Public colorFmt As New Color_Basics
         Public Sub New()
-            If standaloneTest() Then task.gOptions.displayDst1.Checked = True
+            If standaloneTest() Then task.gOptions.displaydst1.checked = True
             labels(0) = "Recombined channels in other images."
             desc = "Run KMeans on each of the 3 color channels"
         End Sub

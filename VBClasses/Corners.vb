@@ -212,7 +212,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_Corners_BasicsCentroids : Inherits TaskParent
+    Public Class NR_NR_Corners_BasicsCentroids : Inherits TaskParent
         Dim fast As New Corners_Basics
         Dim fastCenters() As cv.Point2f
         Public Sub New()

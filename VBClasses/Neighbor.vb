@@ -27,7 +27,7 @@ Namespace VBClasses
             Next
 
             If standalone Then
-                XO_RedList_Basics.setSelectedCell()
+                Swarm_Flood.setSelectedCell()
                 dst3.SetTo(0)
                 For Each index In task.oldrcD.nabs
                     If index < task.redList.oldrclist.Count Then

@@ -46,7 +46,7 @@ Namespace VBClasses
         Dim options As New Options_MinArea
         Public inputPoints As New List(Of cv.Point2f)
         Public Sub New()
-            labels(2) = "NF_FitEllipse_AMS_CPP C++ "
+            labels(2) = "NR_FitEllipse_AMS_CPP C++ "
             desc = "Use FitEllipse_AMS to draw around a set of points"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

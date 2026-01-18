@@ -47,7 +47,7 @@ Namespace VBClasses
     Public Class Filter_BasicsGray : Inherits TaskParent
         Public filterIndex As Integer = -1
         Public filterList As String() = {"Original", "Blur_Basics", "Dilate_Basics", "Erode_Basics",
-                                         "NF_Filter_Equalize", "NF_Filter_Laplacian", "MeanSubtraction_Gray", "PhotoShop_Gamma"}
+                                         "NR_Filter_Equalize", "NR_Filter_Laplacian", "MeanSubtraction_Gray", "PhotoShop_Gamma"}
         Dim filters(filterList.Count - 1) As Object
         Public Sub New()
             desc = "Demo the RGB Filters selected in 'FeatureOptions'.  If none selected, just the input is displayed."
@@ -64,9 +64,9 @@ Namespace VBClasses
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Dilate_Basics
                         Case "Erode_Basics"
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Erode_Basics
-                        Case "NF_Filter_Equalize"
+                        Case "NR_Filter_Equalize"
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New NR_Filter_Equalize
-                        Case "NF_Filter_Laplacian"
+                        Case "NR_Filter_Laplacian"
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New NR_Filter_Laplacian
                         Case "MeanSubtraction_Gray"
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New MeanSubtraction_Gray
@@ -123,7 +123,7 @@ Namespace VBClasses
             desc = "Create a normalized kernel and use it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
+            Options.Run()
 
             Dim sum As Double
             For i = 0 To options.kernel.Width - 1
@@ -171,13 +171,13 @@ Namespace VBClasses
             desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
+            Options.Run()
             Dim kernel = cv.Cv2.GetGaussianKernel(options.xDim, options.sigma)
             dst2 = src.GaussianBlur(New cv.Size(options.xDim, options.yDim), options.sigma)
             dst3 = src.SepFilter2D(cv.MatType.CV_8UC3, kernel, kernel)
             If options.diffCheck Then
-                Dim graySep = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                Dim grayGauss = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                Dim graySep = dst3.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+                Dim grayGauss = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
                 dst3 = (graySep - grayGauss).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
                 labels(3) = "Gaussian - SepFilter2D " + CStr(dst3.CountNonZero) + " pixels different."
             Else

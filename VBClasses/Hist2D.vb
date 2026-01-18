@@ -186,7 +186,7 @@ Namespace VBClasses
         Dim plotHist As New Plot_Histogram
         Public Sub New()
             plotHist.removeZeroEntry = False
-            labels(2) = "NF_Hist2D_PlotHistogram1D output shown with plot_histogram"
+            labels(2) = "NR_Hist2D_PlotHistogram1D output shown with plot_histogram"
             desc = "Create a 2D histogram for blue to red and blue to green."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

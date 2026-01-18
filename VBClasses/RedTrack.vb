@@ -114,7 +114,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_RedTrack_FeaturesKNN : Inherits TaskParent
+    Public Class NR_NR_RedTrack_FeaturesKNN : Inherits TaskParent
         Public knn As New KNN_Basics
         Public Sub New()
             labels = {"", "", "Output of Feature_Stable", "Grid of points to measure motion."}

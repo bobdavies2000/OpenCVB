@@ -8168,4 +8168,22 @@ Namespace VBClasses
             mmThreshold = mmSlider.value
         End Sub
     End Class
+
+
+
+
+
+    Public Class Options_LeftRightCorrelation : Inherits OptionParent
+        Public correlation As Single
+        Public Sub New()
+            If sliders.Setup(traceName) Then
+                sliders.setupTrackBar("Left to Right brick correlation Minimum X100", 0, 100, 80)
+            End If
+        End Sub
+        Public Sub Run()
+            Static corrSlider = FindSlider("Left to Right brick correlation Minimum X100")
+            correlation = corrSlider.value / 100
+        End Sub
+    End Class
+
 End Namespace

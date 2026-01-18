@@ -130,6 +130,7 @@ Match
 MatchShapes
 Math
 MaxDist
+MDScaling
 MeanShift
 MeanSubtraction
 Mesh
@@ -138,8 +139,8 @@ Moments
 Motion
 Mouse
 MSER
-MultiDimensionalScaling
 Neighbor
+NF
 NR
 OEX
 OpAuto
@@ -166,7 +167,7 @@ Pyramid
 PyrFilter
 QRcode
 Quadrant
-Quaterion
+Quaternion
 Random
 Rectangle
 RedCC

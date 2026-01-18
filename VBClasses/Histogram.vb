@@ -201,7 +201,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_Histogram_ColorsAndGray : Inherits TaskParent
+    Public Class NR_NR_Histogram_ColorsAndGray : Inherits TaskParent
         Dim histogram As New Histogram_Basics
         Dim mats As New Mat_4Click
         Public Sub New()
@@ -400,7 +400,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_Histogram_PeaksDepth : Inherits TaskParent
+    Public Class NR_NR_Histogram_PeaksDepth : Inherits TaskParent
         Dim peaks As New Histogram_PeakFinder
         Public Sub New()
             desc = "Find the peaks - columns taller that both neighbors - in the histogram"
@@ -422,7 +422,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_Histogram_PeaksRGB : Inherits TaskParent
+    Public Class NR_NR_Histogram_PeaksRGB : Inherits TaskParent
         Public mats As New Mat_4Click
         Dim peaks(2) As Histogram_PeakFinder
         Public Sub New()
@@ -956,7 +956,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_Histogram_Gotcha2D : Inherits TaskParent
+    Public Class NR_NR_Histogram_Gotcha2D : Inherits TaskParent
         Public histogram As New cv.Mat
         Public Sub New()
             labels(2) = "ZY (Side View)"
@@ -1023,7 +1023,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_Histogram_GotchaFixed_CPP : Inherits TaskParent
+    Public Class NR_NR_Histogram_GotchaFixed_CPP : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
             cPtr = Histogram_1D_Open()

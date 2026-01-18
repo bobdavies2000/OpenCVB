@@ -268,7 +268,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_Hist3D_RedCloudGrid : Inherits TaskParent
+    Public Class NR_NR_Hist3D_RedCloudGrid : Inherits TaskParent
         Dim pixels As New Pixel_Vectors
         Dim hVector As New Hist3Dcolor_Vector
         Public Sub New()

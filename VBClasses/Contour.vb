@@ -606,7 +606,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_Contour_GeneralWithOptions : Inherits TaskParent
+    Public Class NR_NR_Contour_GeneralWithOptions : Inherits TaskParent
         Public contourlist As New List(Of cv.Point())
         Public allContours As cv.Point()()
         Public options As New Options_Contours
@@ -698,7 +698,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_Contour_InfoDepth : Inherits TaskParent
+    Public Class NR_NR_Contour_InfoDepth : Inherits TaskParent
         Dim contours As New Contour_Basics
         Public Sub New()
             desc = "Provide details about the selected contour's contourList entry."

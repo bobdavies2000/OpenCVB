@@ -340,7 +340,7 @@ Namespace VBClasses
 
 
     ' https://github.com/BhanuPrakashNani/Image_Processing/blob/master/Successive%20Rotations/rotation.py
-    Public Class NR_NF_WarpAffine_RepeatedExample8 : Inherits TaskParent
+    Public Class NR_NR_WarpAffine_RepeatedExample8 : Inherits TaskParent
         Public Sub New()
             labels = {"", "", "Rotated repeatedly 45 degrees", "Rotated repeatedly 90 degrees"}
             desc = "Compare an image before and after repeated rotations."

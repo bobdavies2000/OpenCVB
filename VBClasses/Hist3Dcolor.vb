@@ -164,7 +164,7 @@ Namespace VBClasses
             End If
             cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
             dst3 = PaletteFull(dst2)
-            labels(2) = "NF_Hist3Dcolor_ZeroGroups classCount = " + CStr(classCount)
+            labels(2) = "NR_Hist3Dcolor_ZeroGroups classCount = " + CStr(classCount)
         End Sub
     End Class
 

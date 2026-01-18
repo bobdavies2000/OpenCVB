@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Numerics
 Namespace VBClasses
-    Public Class Quaterion_Basics : Inherits TaskParent
+    Public Class Quaternion_Basics : Inherits TaskParent
         Dim options As New Options_Quaternion
         Public Sub New()
             desc = "Use the quaternion values to multiply and compute conjugate"
@@ -21,10 +21,10 @@ Namespace VBClasses
 
 
     ' https://github.com/IntelRealSense/librealsense/tree/master/examples/pose-predict
-    Public Class Quaterion_IMUPrediction : Inherits TaskParent
+    Public Class Quaternion_IMUPrediction : Inherits TaskParent
         Dim host As New IMU_PlotHostFrameTimes
         Public Sub New()
-            labels(2) = "NF_Quaternion_IMUPrediction"
+            labels(2) = "NR_Quaternion_IMUPrediction"
             labels(3) = ""
             desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
         End Sub
@@ -82,7 +82,4 @@ Namespace VBClasses
                                  Format(diffq.Z, fmt3) + vbTab)
         End Sub
     End Class
-
-
-
 End Namespace

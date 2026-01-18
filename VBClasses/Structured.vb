@@ -163,7 +163,7 @@ Namespace VBClasses
         Public sliceMask As cv.Mat
         Dim options As New Options_Structured
         Public Sub New()
-            OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
+            OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = False
             desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -279,12 +279,12 @@ Namespace VBClasses
         Public sliceMask As New cv.Mat
         Dim options As New Options_Structured
         Public Sub New()
-            OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
+            OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = False
             desc = "Create slices in top and side views"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            Static topRadio = OptionParent.FindCheckBox("Top View (Unchecked Side View)")
+            Static topRadio = OptionParent.findCheckBox("Top View (Unchecked Side View)")
             Dim topView = topRadio.checked
 
             Dim sliceVal = If(topView, task.mouseMovePoint.X, task.mouseMovePoint.Y)
@@ -482,7 +482,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_Structured_CountSideSum : Inherits TaskParent
+    Public Class NR_NR_Structured_CountSideSum : Inherits TaskParent
         Public counts As New List(Of Single)
         Public maxCountIndex As Integer
         Public yValues As New List(Of Single)
@@ -546,7 +546,7 @@ Namespace VBClasses
         Public sliceMask As New cv.Mat
         Public options As New Options_Structured
         Public Sub New()
-            OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = True
+            OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = True
             desc = "Find and isolate planes using the top view histogram data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -816,7 +816,7 @@ Namespace VBClasses
         Public heat As New HeatMap_Basics
         Dim options As New Options_Structured
         Public Sub New()
-            OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = True
+            OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = True
             desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

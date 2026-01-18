@@ -76,7 +76,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_ROI_AccumulateOld : Inherits TaskParent
+    Public Class NR_NR_ROI_AccumulateOld : Inherits TaskParent
         Public diff As New Diff_Basics
         Public aoiRect As cv.Rect
         Public minX = Integer.MaxValue, maxX = Integer.MinValue, minY = Integer.MaxValue, maxY = Integer.MinValue
@@ -142,7 +142,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            SetTrueText(traceName + " is the same as NR_NF_ROI_AccumulateOld but simpler.", 3)
+            SetTrueText(traceName + " is the same as NR_NR_ROI_AccumulateOld but simpler.", 3)
             If roiRect.Width * roiRect.Height > src.Total * options.roiPercent Or task.optionsChanged Then
                 dst2.SetTo(0)
                 roiRect = New cv.Rect

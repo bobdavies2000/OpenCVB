@@ -872,8 +872,8 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Brick_Edges : Inherits TaskParent
-        Dim brick
+    Public Class Brick_Edges : Inherits TaskParent
+        Dim options As New Options_LeftRightCorrelation
         Public edges As New Edge_Basics
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -881,17 +881,16 @@ Namespace VBClasses
             desc = "Add edges to features"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static stateList As New List(Of Single)
-            Static lastDepth As cv.Mat = task.lowResDepth.Clone
+            options.Run()
 
             edges.Run(task.leftView)
             dst2 = edges.dst2
 
             Dim count As Integer
             dst3.SetTo(0)
-            For Each brick In task.bricks.brickList
-                If dst2(brick.lrect).CountNonZero And brick.rrect.width > 0 Then
-                    task.rightView(brick.rrect).copyto(dst3(brick.rrect))
+            For Each brick As brickData In task.bricks.brickList
+                If dst2(brick.lRect).CountNonZero And brick.rRect.Width > 0 And brick.correlation > options.correlation Then
+                    task.rightView(brick.rRect).CopyTo(dst3(brick.rRect))
                     count += 1
                 End If
             Next

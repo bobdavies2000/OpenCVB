@@ -34,23 +34,25 @@
             GroupDataView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
             GroupDataView.BackgroundColor = SystemColors.ActiveCaption
             GroupDataView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
-            GroupDataView.Dock = DockStyle.Fill
+            GroupDataView.Dock = DockStyle.Top
             GroupDataView.Location = New Point(0, 0)
+            GroupDataView.Margin = New Padding(4)
             GroupDataView.Name = "GroupDataView"
             GroupDataView.ReadOnly = True
             GroupDataView.RowHeadersWidth = 62
-            GroupDataView.Size = New Size(1972, 1302)
+            GroupDataView.Size = New Size(1198, 729)
             GroupDataView.TabIndex = 0
             ' 
-            ' Groups_AtoZ
+            ' AtoZ
             ' 
-            AutoScaleDimensions = New SizeF(10F, 25F)
+            AutoScaleDimensions = New SizeF(12F, 30F)
             AutoScaleMode = AutoScaleMode.Font
-            ClientSize = New Size(1972, 1302)
+            ClientSize = New Size(1198, 729)
             Controls.Add(GroupDataView)
             Icon = CType(resources.GetObject("$this.Icon"), Icon)
             KeyPreview = True
-            Name = "Groups_AtoZ"
+            Margin = New Padding(4)
+            Name = "AtoZ"
             Text = "Groups_AtoZ"
             CType(GroupDataView, ComponentModel.ISupportInitialize).EndInit()
             ResumeLayout(False)

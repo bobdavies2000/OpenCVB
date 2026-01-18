@@ -365,13 +365,13 @@ Namespace VBClasses
             desc = "Draw a line between the selected p1 and p2 - either by clicking twice in the image or externally providing p1 and p2."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If p1 <> newPoint And p2 <> New cv.Point And task.clickPoint <> newPoint Then
+            If p1 <> newPoint And p2 <> New cv.Point And task.ClickPoint <> newPoint Then
                 p1 = newPoint
                 p2 = newPoint
             End If
             dst2 = src
-            If task.clickPoint <> New cv.Point Or externalUse Then
-                If p1 = New cv.Point Then p1 = task.clickPoint Else p2 = task.clickPoint
+            If task.ClickPoint <> New cv.Point Or externalUse Then
+                If p1 = New cv.Point Then p1 = task.ClickPoint Else p2 = task.ClickPoint
             End If
             If p1 <> newPoint And p2 = newPoint Then DrawCircle(dst2, p1, task.DotSize, task.highlight)
             If p1 <> newPoint And p2 <> newPoint Then

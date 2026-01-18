@@ -280,7 +280,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_Mat_Inverse_4D : Inherits TaskParent
+    Public Class NR_NR_Mat_Inverse_4D : Inherits TaskParent
         Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
         Public input As cv.Mat
         Public Sub New()
@@ -378,15 +378,15 @@ Namespace VBClasses
             dst2 = mats.dst2.Clone
             If standalone Then mats.defaultMats(emptyMat)
             If task.firstPass Then
-                task.clickPoint = New cv.Point(0, 0)
+                task.ClickPoint = New cv.Point(0, 0)
                 task.mousePicTag = 2
             End If
 
             If task.mouseClickFlag And task.mousePicTag = 2 Then
-                If task.clickPoint.Y < dst2.Rows / 2 Then
-                    quadrant = If(task.clickPoint.X < task.workRes.Width / 2, 0, 1)
+                If task.ClickPoint.Y < dst2.Rows / 2 Then
+                    quadrant = If(task.ClickPoint.X < task.workRes.Width / 2, 0, 1)
                 Else
-                    quadrant = If(task.clickPoint.X < task.workRes.Width / 2, 2, 3)
+                    quadrant = If(task.ClickPoint.X < task.workRes.Width / 2, 2, 3)
                 End If
             End If
             mats.Run(emptyMat)

@@ -65,7 +65,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_TextureFlow_DepthSegments : Inherits TaskParent
+    Public Class NR_NR_TextureFlow_DepthSegments : Inherits TaskParent
         Dim segments As New Histogram_CloudSegments
         Dim diffx As New Edge_DiffX_CPP
         Dim flow As New TextureFlow_Basics

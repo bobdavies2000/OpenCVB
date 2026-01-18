@@ -9874,7 +9874,7 @@ Namespace VBClasses
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             Dim mm = GetMinMax(dst2)
             dst3 = PaletteFull(dst2)
-            XO_RedList_Basics.setSelectedCell()
+            Swarm_Flood.setSelectedCell()
 
             labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
         End Sub
@@ -10051,7 +10051,7 @@ Namespace VBClasses
             Next
             dst2 = PaletteBlackZero(dst1)
 
-            Dim clickIndex = dst1.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X)
+            Dim clickIndex = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
             If clickIndex > 0 And clickIndex < rcList.Count Then
                 task.color(rcList(clickIndex - 1).rect).SetTo(white, rcList(clickIndex - 1).mask)
                 task.color.Rectangle(rcList(clickIndex - 1).rect, white, task.lineWidth, task.lineType)
@@ -10280,7 +10280,7 @@ Namespace VBClasses
             Next
 
             Dim beforeCount = dst1.CountNonZero
-            dst1.SetTo(0, task.depthMask)
+            dst1.SetTo(0, task.depthmask)
             Dim aftercount = dst1.CountNonZero
 
             If beforeCount <> aftercount Then
@@ -10474,10 +10474,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Or runRedCflag Then
                 dst2 = runRedList(src, labels(2))
-                If task.ClickPoint = newPoint Then
+                If task.clickPoint = newPoint Then
                     If task.redList.oldrclist.Count > 1 Then
                         task.oldrcD = task.redList.oldrclist(1)
-                        task.ClickPoint = task.oldrcD.maxDist
+                        task.clickPoint = task.oldrcD.maxDist
                     End If
                 End If
             End If
@@ -10512,7 +10512,7 @@ Namespace VBClasses
             For Each pc In task.redCloud.rcList
                 If pc.pixels > 0 Then dst1(pc.rect).SetTo(255, pc.mask)
                 If pc.pixels > 0 Then
-                    Dim tmp As cv.Mat = task.depthMask(pc.rect) And pc.mask
+                    Dim tmp As cv.Mat = task.depthmask(pc.rect) And pc.mask
 
                     Dim percent = tmp.CountNonZero / pc.pixels
                     percentDepth.Add(percent)
@@ -10522,7 +10522,7 @@ Namespace VBClasses
             Next
 
             Dim beforeCount = dst1.CountNonZero
-            dst1.SetTo(0, task.depthMask)
+            dst1.SetTo(0, task.depthmask)
             Dim aftercount = dst1.CountNonZero
 
             If beforeCount <> aftercount Then
@@ -10879,7 +10879,7 @@ Namespace VBClasses
             desc = "Use the Depth_Outline output over time to isolate high quality cells"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            outline.Run(task.depthMask)
+            outline.Run(task.depthmask)
 
             If task.heartBeat Then dst3.SetTo(0)
             dst3 = dst3 Or outline.dst2
@@ -10900,7 +10900,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            dst2.SetTo(0, task.depthMask)
+            dst2.SetTo(0, task.depthmask)
         End Sub
     End Class
 
@@ -11214,7 +11214,7 @@ Namespace VBClasses
             desc = "Use the depth outline as input to RedList_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            outline.Run(task.depthMask)
+            outline.Run(task.depthmask)
 
             color8U.Run(src)
             dst1 = color8U.dst2 + 1
@@ -11354,7 +11354,7 @@ Namespace VBClasses
             rcList = New List(Of rcData)(task.redCloud.rcList)
 
             dst3 = task.gray
-            dst3.SetTo(0, task.depthMask)
+            dst3.SetTo(0, task.depthmask)
             reduction.Run(dst3)
             dst1 = reduction.dst2 - 1
 
@@ -12383,7 +12383,7 @@ Namespace VBClasses
             desc = "Build contours for each cell"
         End Sub
         Public Function motionDisplayCell() As rcData
-            Dim clickIndex = rcMap.Get(Of Byte)(task.ClickPoint.Y, task.ClickPoint.X) - 1
+            Dim clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X) - 1
             If clickIndex >= 0 Then
                 Return rcList(clickIndex)
             End If
@@ -12862,7 +12862,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Flood_BasicsMask : Inherits TaskParent
+    Public Class XO_Flood_BasicsMaskOld : Inherits TaskParent
         Public inputRemoved As cv.Mat
         Public cellGen As New XO_RedCell_Color
         Dim redMask As New RedMask_Basics
@@ -12891,7 +12891,7 @@ Namespace VBClasses
 
             If task.heartBeat Then labels(2) = $"{task.redList.oldrclist.Count} cells identified"
 
-            If showSelected Then XO_RedList_Basics.setSelectedCell()
+            If showSelected Then Swarm_Flood.setSelectedCell()
         End Sub
     End Class
 
@@ -13640,8 +13640,8 @@ Namespace VBClasses
                 cv.Cv2.Merge(task.pcSplit, task.pointCloud)
             End If
 
-            task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-            task.noDepthMask = Not task.depthMask
+            task.depthmask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            task.noDepthMask = Not task.depthmask
 
             If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
                 Dim xRatio = task.xRangeDefault / task.xRange
@@ -13654,7 +13654,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
 
-            If task.settings.cameraName = "StereoLabs ZED 2/2i" Then
+            If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
                 originalPointcloud = checkNanInf(task.pointCloud).Clone
             Else
                 originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
@@ -15308,10 +15308,10 @@ Namespace VBClasses
             brick.tc1.strOut = Format(brick.tc1.correlation, fmt2) + vbCrLf + Format(brick.tc1.depth, fmt2) + "m"
             brick.tc2.strOut = Format(brick.tc2.correlation, fmt2) + vbCrLf + Format(brick.tc2.depth, fmt2) + "m"
 
-            Dim mean = task.pointCloud(brick.tc1.rect).Mean(task.depthMask(brick.tc1.rect))
+            Dim mean = task.pointCloud(brick.tc1.rect).Mean(task.depthmask(brick.tc1.rect))
             brick.pt1 = New cv.Point3f(mean(0), mean(1), mean(2))
             brick.tc1.depth = brick.pt1.Z
-            mean = task.pointCloud(brick.tc2.rect).Mean(task.depthMask(brick.tc2.rect))
+            mean = task.pointCloud(brick.tc2.rect).Mean(task.depthmask(brick.tc2.rect))
             brick.pt2 = New cv.Point3f(mean(0), mean(1), mean(2))
             brick.tc2.depth = brick.pt2.Z
 
@@ -15973,7 +15973,7 @@ Namespace VBClasses
 
             tc.rect = ValidateRect(New cv.Rect(pt.X - task.brickSize, pt.Y - task.brickSize, task.brickSize * 2, task.brickSize * 2))
             tc.correlation = correlation
-            tc.depth = task.pcSplit(2)(tc.rect).Mean(task.depthMask(tc.rect))(0) / 1000
+            tc.depth = task.pcSplit(2)(tc.rect).Mean(task.depthmask(tc.rect))(0) / 1000
             tc.center = pt
             tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - task.brickSize * 3, tc.center.Y - task.brickSize * 3,
                                                  task.brickSize * 6, task.brickSize * 6))
@@ -15998,7 +15998,7 @@ Namespace VBClasses
                 tc.searchRect = ValidateRect(New cv.Rect(tc.center.X - rSize * 3, tc.center.Y - rSize * 3, rSize * 6, rSize * 6))
                 tc.rect = ValidateRect(New cv.Rect(tc.center.X - rSize, tc.center.Y - rSize, rSize * 2, rSize * 2))
                 tc.correlation = mm.maxVal
-                tc.depth = task.pcSplit(2)(tc.rect).Mean(task.depthMask(tc.rect))(0) / 1000
+                tc.depth = task.pcSplit(2)(tc.rect).Mean(task.depthmask(tc.rect))(0) / 1000
                 tc.strOut = Format(tc.correlation, fmt2) + vbCrLf + Format(tc.depth, fmt2) + "m"
                 tCells(i) = tc
             Next
@@ -16293,7 +16293,7 @@ Namespace VBClasses
             labels(2) = cellGen.labels(2)
             labels(3) = ""
             SetTrueText("", newPoint, 1)
-            XO_RedList_Basics.setSelectedCell()
+            Swarm_Flood.setSelectedCell()
         End Sub
     End Class
 

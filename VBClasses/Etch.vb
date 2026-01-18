@@ -28,7 +28,7 @@ Namespace VBClasses
             If options.demoMode Then
                 keyIn.Clear() ' ignore any keyboard input when in Demo mode.
                 Dim nextKey = Choose(ms_rng.Next(1, 5), "Down", "Up", "Left", "Right")
-                labels(2) = "NF_Etch_ASketch demo mode - moving randomly"
+                labels(2) = "NR_Etch_ASketch demo mode - moving randomly"
                 For i = 0 To ms_rng.Next(10, 50)
                     keyIn.Add(nextKey)
                 Next

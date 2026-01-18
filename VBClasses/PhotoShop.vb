@@ -257,7 +257,7 @@ Namespace VBClasses
             Dim kernel = kernelGenerator(sizeSlider.Value)
 
             Dim direction As Integer
-            Static frm = OptionParent.FindFrm(traceName + " Radio Buttons")
+            Static frm = OptionParent.findFrm(traceName + " Radio Buttons")
             For direction = 0 To frm.check.Count - 1
                 If frm.check(direction).Checked Then Exit For
             Next
@@ -361,7 +361,7 @@ Namespace VBClasses
             desc = "Create a DuoTone image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static duoCheck = OptionParent.FindCheckBox("DuoTone Dark if checked, Light otherwise")
+            Static duoCheck = OptionParent.findCheckBox("DuoTone Dark if checked, Light otherwise")
             options.Run()
             Static expSlider = OptionParent.FindSlider("DuoTone Exponent")
             Dim exp = 1 + expSlider.Value / 100
@@ -375,7 +375,7 @@ Namespace VBClasses
             Dim split = src.Split()
 
             Dim switch1 As Integer
-            Static frm = OptionParent.FindFrm(traceName + " Radio Buttons")
+            Static frm = OptionParent.findFrm(traceName + " Radio Buttons")
             For switch1 = 0 To frm.check.Count - 1
                 If frm.check(switch1).Checked Then Exit For
             Next
@@ -503,7 +503,7 @@ Namespace VBClasses
             cv.Cv2.Divide(src, 255 - blur, dst2, 256)
 
             Dim index As Integer = -1
-            Static frm = OptionParent.FindFrm(traceName + " Radio Buttons")
+            Static frm = OptionParent.findFrm(traceName + " Radio Buttons")
             For index = 0 To frm.check.Count - 1
                 If radio.check(index).Checked Then Exit For
             Next

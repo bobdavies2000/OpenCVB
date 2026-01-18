@@ -110,7 +110,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_FitLine_Simple3D : Inherits TaskParent
+    Public Class NR_NR_FitLine_Simple3D : Inherits TaskParent
         Public ptList As New List(Of cv.Point3f)
         Public lpResult As lpData
         Public center As cv.Point2f

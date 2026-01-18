@@ -63,7 +63,7 @@ Namespace VBClasses
             dst3 = src + dst3
             dst2 = dst3 / saveFrames.Count
 
-            frames.Run(task.depthmask)
+            frames.Run(task.depthMask)
             dst2.SetTo(0, Not frames.dst2)
         End Sub
     End Class

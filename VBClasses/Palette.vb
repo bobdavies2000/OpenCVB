@@ -229,7 +229,7 @@ Namespace VBClasses
                 gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
             End If
 
-            Dim sliderVal = If(task.Settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i", 50, 80)
+            Dim sliderVal = If(task.settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i", 50, 80)
             Dim depth8u = task.pcSplit(2).ConvertScaleAbs(sliderVal)
             Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
             cv.Cv2.ApplyColorMap(depth8u, dst2, ColorMap)
@@ -252,7 +252,7 @@ Namespace VBClasses
                 dst2(r).SetTo(task.scalarColors(index Mod 256))
                 index += 1
             Next
-            labels(2) = "NF_Palette_Layout2D - " + CStr(task.gridRects.Count) + " regions"
+            labels(2) = "NR_Palette_Layout2D - " + CStr(task.gridRects.Count) + " regions"
         End Sub
     End Class
 

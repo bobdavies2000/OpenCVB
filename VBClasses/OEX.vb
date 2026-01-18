@@ -160,7 +160,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_OEX_BasicLinearTransformsTrackBar : Inherits TaskParent
+    Public Class NR_NR_OEX_BasicLinearTransformsTrackBar : Inherits TaskParent
         Dim options As New Options_BrightnessContrast
         Public Sub New()
             desc = "OpenCV Example BasicLinearTransformTrackBar - much slower than NR_OEX_BasicLinearTransforms"
@@ -427,7 +427,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_OEX_Threshold_Inrange : Inherits TaskParent
+    Public Class NR_NR_OEX_Threshold_Inrange : Inherits TaskParent
         Dim options As New Options_OEX
         Public Sub New()
             desc = "OpenCV Example Threshold_Inrange"

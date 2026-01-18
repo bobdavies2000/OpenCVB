@@ -23,7 +23,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NF_ExPhoto_Bm3dDenoiseDepthImage : Inherits TaskParent
+    Public Class NR_NR_ExPhoto_Bm3dDenoiseDepthImage : Inherits TaskParent
         Public Sub New()
             desc = "Denoise the depth image with block matching and filtering."
             labels(3) = "Difference from Input"

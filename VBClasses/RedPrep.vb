@@ -602,7 +602,7 @@ Namespace VBClasses
             Next
 
             dst2 = RebuildRCMap(task.redList.oldrclist.ToList)
-            XO_RedList_Basics.setSelectedCell()
+            Swarm_Flood.setSelectedCell()
         End Sub
     End Class
 
