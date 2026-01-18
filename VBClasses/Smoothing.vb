@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Namespace VBClasses
-    Public Class Smoothing_Exterior : Inherits TaskParent
+    Public Class NR_Smoothing_Exterior : Inherits TaskParent
         Dim hull As New Convex_Basics
         Public inputPoints As List(Of cv.Point)
         Public smoothPoints As List(Of cv.Point)
@@ -80,7 +80,7 @@ Namespace VBClasses
 
 
     ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
-    Public Class Smoothing_Interior : Inherits TaskParent
+    Public Class NR_Smoothing_Interior : Inherits TaskParent
         Dim hull As New Convex_Basics
         Public inputPoints As List(Of cv.Point)
         Public smoothPoints As List(Of cv.Point)
@@ -139,7 +139,7 @@ Namespace VBClasses
                     hull.Run(src)
                     Dim nextHull = cv.Cv2.ConvexHull(hullList.ToArray, True)
                     inputPoints = nextHull.ToList
-                    Smoothing_Exterior.DrawPoly(dst2, nextHull.ToList, white)
+                    NR_Smoothing_Exterior.DrawPoly(dst2, nextHull.ToList, white)
                 Else
                     Exit Sub
                 End If
@@ -151,7 +151,7 @@ Namespace VBClasses
             For i = 0 To smoothPoints2d.Count - 1 Step options.stepSize
                 smoothPoints.Add(New cv.Point(CInt(smoothPoints2d.ElementAt(i).X), CInt(smoothPoints2d.ElementAt(i).Y)))
             Next
-            If smoothPoints.Count > 0 Then Smoothing_Exterior.DrawPoly(dst2, smoothPoints, plotColor)
+            If smoothPoints.Count > 0 Then NR_Smoothing_Exterior.DrawPoly(dst2, smoothPoints, plotColor)
         End Sub
     End Class
 End Namespace

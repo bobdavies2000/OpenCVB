@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class TextureFlow_Basics : Inherits TaskParent
         Dim options As New Options_Texture
@@ -28,7 +28,7 @@ Namespace VBClasses
 
 
 
-    Public Class TextureFlow_Depth : Inherits TaskParent
+    Public Class NR_TextureFlow_Depth : Inherits TaskParent
         Dim flow As New TextureFlow_Basics
         Public Sub New()
             desc = "Display texture flow in the depth data"
@@ -44,7 +44,7 @@ Namespace VBClasses
 
 
 
-    Public Class TextureFlow_Reduction : Inherits TaskParent
+    Public Class NR_TextureFlow_Reduction : Inherits TaskParent
         Dim flow As New TextureFlow_Basics
         Dim reduction As New Reduction_Basics
         Public Sub New()
@@ -65,7 +65,7 @@ Namespace VBClasses
 
 
 
-    Public Class TextureFlow_DepthSegments : Inherits TaskParent
+    Public Class NR_NF_TextureFlow_DepthSegments : Inherits TaskParent
         Dim segments As New Histogram_CloudSegments
         Dim diffx As New Edge_DiffX_CPP
         Dim flow As New TextureFlow_Basics
@@ -87,7 +87,7 @@ Namespace VBClasses
 
 
 
-    Public Class TextureFlow_Bricks : Inherits TaskParent
+    Public Class NR_TextureFlow_Bricks : Inherits TaskParent
         Dim bPoint As New BrickPoint_Best
         Dim flow As New TextureFlow_Basics
         Dim knn As New KNN_Basics

@@ -1,6 +1,6 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class ContourPlane_Basics : Inherits TaskParent
+    Public Class NR_ContourPlane_Basics : Inherits TaskParent
         Public Sub New()
             If task.contours Is Nothing Then task.contours = New Contour_Basics_List
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
@@ -26,7 +26,7 @@ Namespace VBClasses
 
 
 
-    Public Class ContourPlane_MaxDist : Inherits TaskParent
+    Public Class NR_ContourPlane_MaxDist : Inherits TaskParent
         Public Sub New()
             If task.contours Is Nothing Then task.contours = New Contour_Basics_List
             desc = "Show the maxDist value in color (yellow) and in depth (blue)"
@@ -48,7 +48,7 @@ Namespace VBClasses
 
 
 
-    Public Class ContourPlane_RectX : Inherits TaskParent
+    Public Class NR_ContourPlane_RectX : Inherits TaskParent
         Public Sub New()
             If task.contours Is Nothing Then task.contours = New Contour_Basics_List
             desc = "Assume the plane in a contour in X"
@@ -95,7 +95,7 @@ Namespace VBClasses
 
 
 
-    Public Class ContourPlane_X : Inherits TaskParent
+    Public Class NR_ContourPlane_X : Inherits TaskParent
         Public Sub New()
             If task.contours Is Nothing Then task.contours = New Contour_Basics_List
             desc = "Assume the plane in a contour in X"

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Projection_Basics : Inherits TaskParent
         Public redCellInput As New List(Of oldrcData)
@@ -91,7 +91,7 @@ Namespace VBClasses
 
 
 
-    Public Class Projection_Lines : Inherits TaskParent
+    Public Class NR_Projection_Lines : Inherits TaskParent
         Dim heat As New HeatMap_Basics
         Dim options As New Options_Projection
         Public Sub New()
@@ -197,7 +197,7 @@ Namespace VBClasses
 
 
 
-    Public Class Projection_Floor : Inherits TaskParent
+    Public Class NR_Projection_Floor : Inherits TaskParent
         Dim isolate As New Projection_ObjectIsolate
         Dim objSlider As TrackBar
         Public Sub New()
@@ -234,7 +234,7 @@ Namespace VBClasses
 
 
 
-    Public Class Projection_Cell : Inherits TaskParent
+    Public Class NR_Projection_Cell : Inherits TaskParent
         Dim heat As New HeatMap_Basics
         Dim heatCell As New HeatMap_Basics
         Public Sub New()
@@ -269,7 +269,7 @@ Namespace VBClasses
 
 
 
-    Public Class Projection_Derivative : Inherits TaskParent
+    Public Class NR_Projection_Derivative : Inherits TaskParent
         Dim heat As New HeatMap_Basics
         Dim heatDeriv As New HeatMap_Basics
         Dim deriv As New Derivative_Basics

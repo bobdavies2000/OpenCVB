@@ -34,7 +34,7 @@ Namespace VBClasses
 
 
 
-    Public Class Font_FlowMsgs : Inherits TaskParent
+    Public Class NR_Font_FlowMsgs : Inherits TaskParent
         Public msgs As New List(Of String)
         Public dst As Integer = 2
         Public Sub New()

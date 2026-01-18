@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class FeatureFlow_Basics : Inherits TaskParent
+    Public Class NR_FeatureFlow_Basics : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public mpCorrelation As New List(Of Single)
         Dim feat As New Feature_General
@@ -106,7 +106,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureFlow_LeftRight1 : Inherits TaskParent
+    Public Class NR_FeatureFlow_LeftRight1 : Inherits TaskParent
         Dim pyrLeft As New FeatureFlow_LucasKanade
         Dim pyrRight As New FeatureFlow_LucasKanade
         Dim ptLeft As New List(Of cv.Point)

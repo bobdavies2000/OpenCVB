@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class HeatMap_Basics : Inherits TaskParent
         Public topframes As New History_Basics
@@ -40,7 +40,7 @@ Namespace VBClasses
 
 
 
-    Public Class HeatMap_Grid : Inherits TaskParent
+    Public Class NR_HeatMap_Grid : Inherits TaskParent
         Dim heat As New HeatMap_Basics
         Public Sub New()
             task.gOptions.GridSlider.Value = 5
@@ -104,7 +104,7 @@ Namespace VBClasses
 
 
 
-    Public Class HeatMap_Cell : Inherits TaskParent
+    Public Class NR_HeatMap_Cell : Inherits TaskParent
         Dim flood As New Flood_Basics
         Dim heat As New HeatMap_Hot
         Public Sub New()
@@ -135,7 +135,7 @@ Namespace VBClasses
 
 
 
-    Public Class HeatMap_GuidedBP : Inherits TaskParent
+    Public Class NR_HeatMap_GuidedBP : Inherits TaskParent
         Dim guided As New GuidedBP_Basics
         Public Sub New()
             desc = "This is just a placeholder to make it easy to find the GuidedBP_Basics which shows objects in top/side views."

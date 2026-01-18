@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class HullLine_Basics : Inherits TaskParent
         Public hulls As New Contour_Hulls
@@ -76,7 +76,7 @@ Namespace VBClasses
 
 
 
-    Public Class HullLine_SelectHull : Inherits TaskParent
+    Public Class NR_HullLine_SelectHull : Inherits TaskParent
         Dim hullLines As New HullLine_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)

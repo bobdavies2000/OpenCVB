@@ -28,7 +28,7 @@ Namespace VBClasses
 
 
 
-    Public Class Mat_PointToMat : Inherits TaskParent
+    Public Class NR_Mat_PointToMat : Inherits TaskParent
         Dim random As New Random_Basics
         Public Sub New()
             labels(2) = "Random_Basics points (original)"
@@ -58,7 +58,7 @@ Namespace VBClasses
 
 
 
-    Public Class Mat_MatToPoint : Inherits TaskParent
+    Public Class NR_Mat_MatToPoint : Inherits TaskParent
         Public Sub New()
             desc = "Convert a mat into a vector of points."
             labels(2) = "Reconstructed BGR Image"
@@ -86,7 +86,7 @@ Namespace VBClasses
 
 
 
-    Public Class Mat_Transpose : Inherits TaskParent
+    Public Class NR_Mat_Transpose : Inherits TaskParent
         Public Sub New()
             desc = "Transpose a Mat and show task.results.."
             labels(2) = "Color Image Transposed"
@@ -106,7 +106,7 @@ Namespace VBClasses
 
 
     ' https://csharp.hotexamples.com/examples/OpenCvSharp/Mat/-/php-mat-class-examples.html#0x95f170f4714e3258c220a78eacceeee99591440b9885a2997bbbc6b3aebdcf1c-19,,37,
-    Public Class Mat_Tricks : Inherits TaskParent
+    Public Class NR_Mat_Tricks : Inherits TaskParent
         Public Sub New()
             labels(2) = "Image squeezed into square Mat"
             labels(3) = "Mat transposed around the diagonal"
@@ -126,7 +126,7 @@ Namespace VBClasses
 
     ' https://csharp.hotexamples.com/examples/OpenCvSharp/MatExpr/-/php-matexpr-class-examples.html
     ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/MatOperations.cs
-    Public Class Mat_RowColRange : Inherits TaskParent
+    Public Class NR_Mat_RowColRange : Inherits TaskParent
         Public Sub New()
             labels(2) = "BitwiseNot of RowRange and ColRange"
             desc = "Perform operation on a range of cols and/or Rows."
@@ -144,7 +144,7 @@ Namespace VBClasses
 
 
 
-    Public Class Mat_Managed : Inherits TaskParent
+    Public Class NR_Mat_Managed : Inherits TaskParent
         Dim autoRand As New Random()
         Dim img(dst2.Total - 1) As cv.Vec3b
         Dim nextColor As cv.Vec3b
@@ -170,7 +170,7 @@ Namespace VBClasses
 
 
 
-    Public Class Mat_MultiplyReview : Inherits TaskParent
+    Public Class NR_Mat_MultiplyReview : Inherits TaskParent
         Public Sub New()
             desc = "Review matrix multiplication"
         End Sub
@@ -224,7 +224,7 @@ Namespace VBClasses
 
 
     ' https://stackoverflow.com/questions/11015119/inverse-matrix-opencv-matrix-inv-not-working-properly
-    Public Class Mat_Inverse : Inherits TaskParent
+    Public Class NR_Mat_Inverse : Inherits TaskParent
         Public matrix(,) As Single = {{1.1688, 0.23, 62.2}, {-0.013, 1.225, -6.29}, {0, 0, 1}}
         Public validateInverse As Boolean
         Public inverse As New cv.Mat
@@ -280,7 +280,7 @@ Namespace VBClasses
 
 
 
-    Public Class Mat_Inverse_4D : Inherits TaskParent
+    Public Class NR_NF_Mat_Inverse_4D : Inherits TaskParent
         Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
         Public input As cv.Mat
         Public Sub New()
@@ -378,15 +378,15 @@ Namespace VBClasses
             dst2 = mats.dst2.Clone
             If standalone Then mats.defaultMats(emptyMat)
             If task.firstPass Then
-                task.ClickPoint = New cv.Point(0, 0)
+                task.clickPoint = New cv.Point(0, 0)
                 task.mousePicTag = 2
             End If
 
             If task.mouseClickFlag And task.mousePicTag = 2 Then
-                If task.ClickPoint.Y < dst2.Rows / 2 Then
-                    quadrant = If(task.ClickPoint.X < task.workRes.Width / 2, 0, 1)
+                If task.clickPoint.Y < dst2.Rows / 2 Then
+                    quadrant = If(task.clickPoint.X < task.workRes.Width / 2, 0, 1)
                 Else
-                    quadrant = If(task.ClickPoint.X < task.workRes.Width / 2, 2, 3)
+                    quadrant = If(task.clickPoint.X < task.workRes.Width / 2, 2, 3)
                 End If
             End If
             mats.Run(emptyMat)
@@ -448,7 +448,7 @@ Namespace VBClasses
 
 
 
-    Public Class Mat_FindNearZero : Inherits TaskParent
+    Public Class NR_Mat_FindNearZero : Inherits TaskParent
         Public Sub New()
             If sliders.Setup(traceName) Then sliders.setupTrackBar("FindNearZero threshold X1000", 0, 200, 10)
             desc = "Find samples near zero using FindNonZero"

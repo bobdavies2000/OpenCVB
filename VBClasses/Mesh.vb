@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Mesh_Basics : Inherits TaskParent
         Dim knn As New KNN_Basics
@@ -45,7 +45,7 @@ Namespace VBClasses
 
 
 
-    Public Class Mesh_Features : Inherits TaskParent
+    Public Class NR_Mesh_Features : Inherits TaskParent
         Dim mesh As New Mesh_Basics
         Dim feat As New Feature_General
         Public Sub New()

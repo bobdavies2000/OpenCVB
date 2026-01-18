@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class EdgeLine_Basics : Inherits TaskParent
@@ -61,7 +61,7 @@ Namespace VBClasses
 
 
 
-    Public Class EdgeLine_Motion : Inherits TaskParent
+    Public Class NR_EdgeLine_Motion : Inherits TaskParent
         Dim edgeLine As New EdgeLine_Basics
         Public rcList As New List(Of rcData)
         Public classCount As Integer
@@ -144,7 +144,7 @@ Namespace VBClasses
 
 
 
-    Public Class EdgeLine_Simple : Inherits TaskParent
+    Public Class NR_EdgeLine_Simple : Inherits TaskParent
         Implements IDisposable
         Public classCount As Integer
         Public Sub New()
@@ -181,7 +181,7 @@ Namespace VBClasses
 
 
 
-    Public Class EdgeLine_SplitMean : Inherits TaskParent
+    Public Class NR_EdgeLine_SplitMean : Inherits TaskParent
         Dim binary As New Bin4Way_SplitMean
         Dim edges As New EdgeLine_Basics
         Public Sub New()
@@ -205,7 +205,7 @@ Namespace VBClasses
 
 
 
-    Public Class EdgeLine_Segments : Inherits TaskParent
+    Public Class NR_EdgeLine_Segments : Inherits TaskParent
         Implements IDisposable
         Public segments As New List(Of List(Of cv.Point))
         Public Sub New()
@@ -250,7 +250,7 @@ Namespace VBClasses
 
 
 
-    Public Class EdgeLine_SimpleMotion : Inherits TaskParent
+    Public Class NR_NF_EdgeLine_SimpleMotion : Inherits TaskParent
         Implements IDisposable
         Public edgeList As New List(Of List(Of cv.Point))
         Public Sub New()
@@ -290,7 +290,7 @@ Namespace VBClasses
 
 
 
-    Public Class EdgeLine_BrickPoints : Inherits TaskParent
+    Public Class NR_EdgeLine_BrickPoints : Inherits TaskParent
         Dim bPoint As New BrickPoint_Basics
         Public classCount As Integer
         Dim edgeline As New EdgeLine_Basics
@@ -362,7 +362,7 @@ Namespace VBClasses
 
 
 
-    Public Class EdgeLine_DepthSegments : Inherits TaskParent
+    Public Class NR_EdgeLine_DepthSegments : Inherits TaskParent
         Public segments As New List(Of List(Of cv.Point))
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()

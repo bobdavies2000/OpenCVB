@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class LineRect_Basics : Inherits TaskParent
         Public lpInput1 As lpData
@@ -41,7 +41,7 @@ Namespace VBClasses
 
 
 
-    Public Class LineRect_CenterNeighbor : Inherits TaskParent
+    Public Class NR_LineRect_CenterNeighbor : Inherits TaskParent
         Public options As New Options_LineRect
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -96,7 +96,7 @@ Namespace VBClasses
 
 
 
-    Public Class LineRect_CenterRange : Inherits TaskParent
+    Public Class NR_LineRect_CenterRange : Inherits TaskParent
         Public options As New Options_LineRect
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics

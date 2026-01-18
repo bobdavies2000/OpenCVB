@@ -23,7 +23,7 @@ Namespace VBClasses
 
 
 
-    Public Class LeftRight_RawLeft : Inherits TaskParent
+    Public Class NR_LeftRight_RawLeft : Inherits TaskParent
         Public Sub New()
             task.drawRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
             desc = "Match the raw left image with the color image with a drawRect"
@@ -38,7 +38,7 @@ Namespace VBClasses
 
 
 
-    Public Class LeftRight_Palettized : Inherits TaskParent
+    Public Class NR_LeftRight_Palettized : Inherits TaskParent
         Public Sub New()
             desc = "Add color to the 8-bit infrared images."
             labels(2) = "Left Image"
@@ -57,7 +57,7 @@ Namespace VBClasses
 
 
 
-    Public Class LeftRight_BRISK : Inherits TaskParent
+    Public Class NR_LeftRight_BRISK : Inherits TaskParent
         Dim brisk As New BRISK_Basics
         Dim options As New Options_Features
         Public Sub New()
@@ -140,7 +140,7 @@ Namespace VBClasses
 
 
 
-    Public Class LeftRight_RGBAlignLeft : Inherits TaskParent
+    Public Class NR_LeftRight_RGBAlignLeft : Inherits TaskParent
         Dim options As New Options_RGBAlign
         Public Sub New()
             desc = "This is a crude method to align the left image with the RGB for the D435i camera only..."
@@ -172,7 +172,7 @@ Namespace VBClasses
 
 
 
-    Public Class LeftRight_ContourLeft : Inherits TaskParent
+    Public Class NR_LeftRight_ContourLeft : Inherits TaskParent
         Dim color8U As New Color8U_Basics
         Public Sub New()
             If task.contours Is Nothing Then task.contours = New Contour_Basics_List
@@ -191,7 +191,7 @@ Namespace VBClasses
 
 
 
-    Public Class LeftRight_Edges : Inherits TaskParent
+    Public Class NR_LeftRight_Edges : Inherits TaskParent
         Dim edges As New Edge_Basics
         Public Sub New()
             desc = "Display the edges in the left and right views"
@@ -213,7 +213,7 @@ Namespace VBClasses
 
 
 
-    Public Class LeftRight_EdgesColor : Inherits TaskParent
+    Public Class NR_NF_LeftRight_EdgesColor : Inherits TaskParent
         Dim edges As New Edge_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True

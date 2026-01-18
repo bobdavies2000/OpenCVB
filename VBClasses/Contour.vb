@@ -131,7 +131,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_Features : Inherits TaskParent
+    Public Class NR_Contour_Features : Inherits TaskParent
         Dim contours As New Contour_Basics
         Public Sub New()
             If task.feat Is Nothing Then task.feat = New Feature_Basics
@@ -175,7 +175,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_BrickPoints : Inherits TaskParent
+    Public Class NR_Contour_BrickPoints : Inherits TaskParent
         Dim bPoint As New BrickPoint_Basics
         Dim contours As New Contour_Basics
         Public Sub New()
@@ -197,7 +197,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_Delaunay : Inherits TaskParent
+    Public Class NR_Contour_Delaunay : Inherits TaskParent
         Dim delaunay As New Delaunay_Basics
         Dim contours As New Contour_Basics
         Public Sub New()
@@ -230,7 +230,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_LineRGB : Inherits TaskParent
+    Public Class NR_Contour_LineRGB : Inherits TaskParent
         Dim contours As New Contour_Basics
         Public Sub New()
             desc = "Identify contour by its Lines"
@@ -252,7 +252,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_RotatedRects : Inherits TaskParent
+    Public Class NR_Contour_RotatedRects : Inherits TaskParent
         Public rotatedRect As New Rectangle_Rotated
         Dim basics As New Contour_Regions
         Public Sub New()
@@ -284,7 +284,7 @@ Namespace VBClasses
 
 
     ' https://github.com/SciSharp/SharpCV/blob/master/src/Sharpcvb.Examples/Program.cs
-    Public Class Contour_RemoveLines : Inherits TaskParent
+    Public Class NR_Contour_RemoveLines : Inherits TaskParent
         Dim options As New Options_Morphology
         Dim image As cv.Mat
         Public Sub New()
@@ -396,7 +396,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_Foreground : Inherits TaskParent
+    Public Class NR_Contour_Foreground : Inherits TaskParent
         Dim km As New Foreground_KMeans
         Dim contour As New Contour_Regions
         Public Sub New()
@@ -423,7 +423,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_SelfIntersect : Inherits TaskParent
+    Public Class NR_Contour_SelfIntersect : Inherits TaskParent
         Public rc As New oldrcData
         Public Sub New()
             desc = "Search the contour points for duplicates indicating the contour is self-intersecting."
@@ -515,7 +515,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_Compare : Inherits TaskParent
+    Public Class NR_Contour_Compare : Inherits TaskParent
         Public options As New Options_Contours
         Public Sub New()
             desc = "Compare findContours options - ApproxSimple, ApproxNone, etc."
@@ -542,7 +542,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_Smoothing : Inherits TaskParent
+    Public Class NR_Contour_Smoothing : Inherits TaskParent
         Dim options As New Options_Contours2
         Public Sub New()
             labels(3) = "The white outline is the truest contour while the red is the selected approximation."
@@ -572,7 +572,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_FromPoints : Inherits TaskParent
+    Public Class NR_Contour_FromPoints : Inherits TaskParent
         Dim random As New Random_Basics
         Public Sub New()
             OptionParent.FindSlider("Random Pixel Count").Value = 3
@@ -606,7 +606,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_GeneralWithOptions : Inherits TaskParent
+    Public Class NR_NF_Contour_GeneralWithOptions : Inherits TaskParent
         Public contourlist As New List(Of cv.Point())
         Public allContours As cv.Point()()
         Public options As New Options_Contours
@@ -652,7 +652,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_General : Inherits TaskParent
+    Public Class NR_Contour_General : Inherits TaskParent
         Public contourlist As New List(Of cv.Point())
         Public allContours As cv.Point()()
         Dim rotatedRect As New Rectangle_Rotated
@@ -698,7 +698,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_InfoDepth : Inherits TaskParent
+    Public Class NR_NF_Contour_InfoDepth : Inherits TaskParent
         Dim contours As New Contour_Basics
         Public Sub New()
             desc = "Provide details about the selected contour's contourList entry."
@@ -734,7 +734,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_Lines : Inherits TaskParent
+    Public Class NR_Contour_Lines : Inherits TaskParent
         Dim hulls As New Contour_Hulls
         Public Sub New()
             desc = "Build a list of the lines in the output of Contour_Hulls"
@@ -756,7 +756,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_Isolate : Inherits TaskParent
+    Public Class NR_Contour_Isolate : Inherits TaskParent
         Dim contours As New Contour_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -829,7 +829,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_EdgePoints : Inherits TaskParent
+    Public Class NR_Contour_EdgePoints : Inherits TaskParent
         Dim plot As New Plot_OverTimeSingle
         Dim rangeVal As Integer = 3
         Dim contours As New Contour_Basics
@@ -902,7 +902,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_Depth : Inherits TaskParent
+    Public Class NR_Contour_Depth : Inherits TaskParent
         Dim prep As New RedPrep_Depth ' only interested in XY reduction.
         Dim contours As New Contour_Basics
         Public Sub New()
@@ -968,7 +968,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_Info : Inherits TaskParent
+    Public Class NR_Contour_Info : Inherits TaskParent
         Dim contours As New Contour_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
@@ -1101,7 +1101,7 @@ Namespace VBClasses
             Next
 
             If contourList.Count > 0 Then
-                strOut = Contour_Info.contourDesc(contourMap, contourList)
+                strOut = NR_Contour_Info.contourDesc(contourMap, contourList)
                 If standaloneTest() Then SetTrueText(strOut, 3)
             End If
 
@@ -1194,7 +1194,7 @@ Namespace VBClasses
             Next
 
             If rcList.Count > 0 Then
-                strOut = Contour_Info.contourDesc(rcMap, rcList)
+                strOut = NR_Contour_Info.contourDesc(rcMap, rcList)
                 If standaloneTest() Then SetTrueText(strOut, 3)
             End If
 
@@ -1238,7 +1238,7 @@ Namespace VBClasses
 
 
 
-    Public Class Contour_BasicsOld : Inherits TaskParent
+    Public Class NR_Contour_BasicsOld : Inherits TaskParent
         Public classCount As Integer
         Public contourList As New List(Of contourData)
         Public contourMap As New cv.Mat(task.workRes, cv.MatType.CV_32F, 0)

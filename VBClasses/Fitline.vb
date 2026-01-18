@@ -63,7 +63,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/3.4/js_contour_features_fitLine.html
-    Public Class FitLine_Lines : Inherits TaskParent
+    Public Class NR_FitLine_Lines : Inherits TaskParent
         Dim options As New Options_FitLine
         Public draw As New Draw_Lines
         Public lines As New List(Of cv.Point)
@@ -110,7 +110,7 @@ Namespace VBClasses
 
 
 
-    Public Class FitLine_Simple3D : Inherits TaskParent
+    Public Class NR_NF_FitLine_Simple3D : Inherits TaskParent
         Public ptList As New List(Of cv.Point3f)
         Public lpResult As lpData
         Public center As cv.Point2f
@@ -151,7 +151,7 @@ Namespace VBClasses
 
 
 
-    Public Class FitLine_Example2D : Inherits TaskParent
+    Public Class NR_FitLine_Example2D : Inherits TaskParent
         Dim noisyLine As New Eigen_Input
         Dim fitLine As New FitLine_Conventional
         Public Sub New()
@@ -177,7 +177,7 @@ Namespace VBClasses
 
 
 
-    Public Class FitLine_Basics3D : Inherits TaskParent
+    Public Class NR_FitLine_Basics3D : Inherits TaskParent
         Public ptList As New List(Of cv.Point3f)
         Public lp As lpData
         Public center As cv.Point2f
@@ -216,7 +216,7 @@ Namespace VBClasses
 
 
 
-    Public Class FitLine_Grid : Inherits TaskParent
+    Public Class NR_FitLine_Grid : Inherits TaskParent
         Dim nZero As New FindNonZero_Basics
         Dim edges As New Edge_Basics
         Dim fitline As New FitLine_Basics
@@ -250,7 +250,7 @@ Namespace VBClasses
 
 
 
-    Public Class FitLine_Simple : Inherits TaskParent
+    Public Class NR_FitLine_Simple : Inherits TaskParent
         Public Sub New()
             desc = "Simple test of the Fitline interface"
         End Sub

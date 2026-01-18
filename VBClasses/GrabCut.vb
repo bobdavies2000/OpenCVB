@@ -44,7 +44,7 @@ Namespace VBClasses
 
 
 
-    Public Class GrabCut_FineTune : Inherits TaskParent
+    Public Class NR_GrabCut_FineTune : Inherits TaskParent
         Dim basics As New GrabCut_Basics
         Dim mats As New Mat_4to1
         Dim options As New Options_GrabCut
@@ -95,7 +95,7 @@ Namespace VBClasses
 
 
 
-    Public Class GrabCut_ImageRect : Inherits TaskParent
+    Public Class NR_GrabCut_ImageRect : Inherits TaskParent
         Dim bgModel As New cv.Mat, fgModel As New cv.Mat
         Dim bgRect1 = New cv.Rect(482, 0, 128, 640)
         Dim bgRect2 = New cv.Rect(0, 0, 162, 320)
@@ -144,7 +144,7 @@ Namespace VBClasses
 
 
 
-    Public Class GrabCut_ImageMask : Inherits TaskParent
+    Public Class NR_GrabCut_ImageMask : Inherits TaskParent
         Dim image As cv.Mat
         Public Sub New()
             Dim fileInputName = New FileInfo(task.homeDir + "data/cat.jpg")

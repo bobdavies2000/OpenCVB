@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class MaxDist_Basics : Inherits TaskParent
         Public Sub New()
@@ -19,7 +19,7 @@ Namespace VBClasses
 
             If zeroRectangle Then
                 Dim tmp As cv.Mat = pc.mask.Clone
-                ' see MaxDist_NoRectangle below to confirm this is needed (it is.)
+                ' see NR_MaxDist_NoRectangle below to confirm this is needed (it is.)
                 tmp.Rectangle(New cv.Rect(0, 0, pc.mask.Width, pc.mask.Height), 0, 1)
                 Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
                 Dim mm As mmData = vbc.GetMinMax(distance32f)
@@ -54,7 +54,7 @@ Namespace VBClasses
 
 
 
-    Public Class MaxDist_NoRectangle : Inherits TaskParent
+    Public Class NR_MaxDist_NoRectangle : Inherits TaskParent
         Public Sub New()
             labels(3) = "Below left shows hullMask while below shows the contour mask."
             desc = "Is it necessary to draw a rectangle of zeros at the edge of the mask?  Answer: no"

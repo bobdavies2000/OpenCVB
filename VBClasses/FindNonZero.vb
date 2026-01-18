@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FindNonZero_Basics : Inherits TaskParent
@@ -45,7 +45,7 @@ Namespace VBClasses
 
 
 
-    Public Class FindNonZero_SoloPoints : Inherits TaskParent
+    Public Class NR_FindNonZero_SoloPoints : Inherits TaskParent
         Dim hotTop As New BackProject_SoloTop
         Dim hotSide As New BackProject_SoloSide
         Dim nZero As New FindNonZero_Basics
@@ -74,7 +74,7 @@ Namespace VBClasses
 
 
 
-    Public Class FindNonZero_Line3DWorld : Inherits TaskParent
+    Public Class NR_FindNonZero_Line3DWorld : Inherits TaskParent
         Public lp As lpData
         Public vecMat As New cv.Mat
         Public ptList As New List(Of cv.Point)

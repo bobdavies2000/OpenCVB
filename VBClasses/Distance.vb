@@ -113,7 +113,7 @@ Namespace VBClasses
 
 
 
-    Public Class Distance_Background : Inherits TaskParent
+    Public Class NR_Distance_Background : Inherits TaskParent
         Dim dist As New Distance_Foreground
         Public Sub New()
             dist.useBackgroundAsInput = True
@@ -202,7 +202,7 @@ Namespace VBClasses
 
 
 
-    Public Class Distance_BinaryImage : Inherits TaskParent
+    Public Class NR_Distance_BinaryImage : Inherits TaskParent
         Dim binary As New Binarize_Simple
         Dim distance As New Distance_Basics
         Public Sub New()
@@ -229,7 +229,7 @@ Namespace VBClasses
 
 
 
-    Public Class Distance_PeakDepth : Inherits TaskParent
+    Public Class NR_Distance_PeakDepth : Inherits TaskParent
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             labels(2) = "The brightest grid rects are those farthest from zero depth"
@@ -270,7 +270,7 @@ Namespace VBClasses
 
 
 
-    Public Class Distance_PeakNoDepth : Inherits TaskParent
+    Public Class NR_Distance_PeakNoDepth : Inherits TaskParent
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             labels(2) = "The brightest grid rects are those farthest from any depth"
@@ -340,7 +340,7 @@ Namespace VBClasses
 
 
 
-    Public Class Distance_LabelsNoDepth : Inherits TaskParent
+    Public Class NR_Distance_LabelsNoDepth : Inherits TaskParent
         Dim labeller As New Distance_Labels
         Public Sub New()
             desc = "Distance algorithm for the regions with no depth"
@@ -360,7 +360,7 @@ Namespace VBClasses
 
 
 
-    Public Class Distance_LabelsDepth : Inherits TaskParent
+    Public Class NR_Distance_LabelsDepth : Inherits TaskParent
         Dim labeller As New Distance_Labels
         Public Sub New()
             desc = "Distance algorithm for the regions with no depth"
@@ -380,7 +380,7 @@ Namespace VBClasses
 
 
 
-    Public Class Distance_Edges : Inherits TaskParent
+    Public Class NR_Distance_Edges : Inherits TaskParent
         Dim distance As New Distance_Basics
         Dim edges As New Edge_Basics
         Public Sub New()
@@ -400,7 +400,7 @@ Namespace VBClasses
 
 
 
-    Public Class Distance_RedDistance : Inherits TaskParent
+    Public Class NR_Distance_RedDistance : Inherits TaskParent
         Dim distance As New Distance_Basics
         Public Sub New()
             desc = "Combine the output of RedList_Basics and distance_basics."
@@ -419,7 +419,7 @@ Namespace VBClasses
 
 
 
-    Public Class Distance_RedColor : Inherits TaskParent
+    Public Class NR_Distance_RedColor : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
         Public pixelVector As New List(Of List(Of Single))
         Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
@@ -549,7 +549,7 @@ Namespace VBClasses
 
 
 
-    Public Class Distance_DepthPeaks : Inherits TaskParent
+    Public Class NR_Distance_DepthPeaks : Inherits TaskParent
         Dim dist As New Distance_Depth
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32F, 0)
@@ -574,7 +574,7 @@ Namespace VBClasses
 
 
 
-    Public Class Distance_ClickPoint : Inherits TaskParent
+    Public Class NR_Distance_ClickPoint : Inherits TaskParent
         Dim options As New Options_Distance
         Public Sub New()
             labels(3) = "Inverse of dst2"
@@ -597,7 +597,7 @@ Namespace VBClasses
 
 
 
-    Public Class Distance_DepthBricks : Inherits TaskParent
+    Public Class NR_Distance_DepthBricks : Inherits TaskParent
         Dim dist As New Distance_Depth
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -626,7 +626,7 @@ Namespace VBClasses
 
 
 
-    Public Class Distance_Contour : Inherits TaskParent
+    Public Class NR_Distance_Contour : Inherits TaskParent
         Dim options As New Options_Distance
         Public Sub New()
             If task.contours Is Nothing Then task.contours = New Contour_Basics_List

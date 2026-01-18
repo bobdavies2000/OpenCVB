@@ -20,7 +20,7 @@ Namespace VBClasses
 
 
 
-    Public Class ImShow_WaitKey : Inherits TaskParent
+    Public Class NR_ImShow_WaitKey : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
             desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
@@ -41,7 +41,7 @@ Namespace VBClasses
 
 
 
-    Public Class ImShow_CV32FC3 : Inherits TaskParent
+    Public Class NR_ImShow_CV32FC3 : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
             desc = "Experimenting with how to show an 32fc3 Mat file."

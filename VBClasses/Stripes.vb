@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Stripes_Basics : Inherits TaskParent
         Public classCount As Integer
@@ -105,7 +105,7 @@ Namespace VBClasses
 
 
 
-    Public Class Stripes_Histogram : Inherits TaskParent
+    Public Class NR_Stripes_Histogram : Inherits TaskParent
         Dim stripes As New Stripes_XYZ
         Public Sub New()
             desc = "Show a histogram for the output of stripes"

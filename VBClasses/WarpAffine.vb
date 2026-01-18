@@ -62,7 +62,7 @@ Namespace VBClasses
 
 
     ' http://opencvexamples.blogspot.com/
-    Public Class WarpAffine_Captcha : Inherits TaskParent
+    Public Class NR_WarpAffine_Captcha : Inherits TaskParent
         Const charHeight = 40
         Const charWidth = 30
         Const captchaLength = 8
@@ -152,7 +152,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
-    Public Class WarpAffine_3Points : Inherits TaskParent
+    Public Class NR_WarpAffine_3Points : Inherits TaskParent
         Dim triangle As New FindTriangle_Basics
         Dim M As New cv.Mat
         Public Sub New()
@@ -220,7 +220,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
-    Public Class WarpAffine_4Points : Inherits TaskParent
+    Public Class NR_WarpAffine_4Points : Inherits TaskParent
         Dim mRect As New FindMinRect_Basics
         Dim options As New Options_MinArea
         Dim M As New cv.Mat
@@ -284,7 +284,7 @@ Namespace VBClasses
 
 
     ' https://github.com/BhanuPrakashNani/Image_Processing/blob/master/Successive%20Rotations/rotation.py
-    Public Class WarpAffine_Repeated : Inherits TaskParent
+    Public Class NR_WarpAffine_Repeated : Inherits TaskParent
         Public Sub New()
             labels = {"", "", "Rotated repeatedly 45 degrees - note the blur", "Rotated repeatedly 90 degrees"}
             desc = "Compare an image before and after repeated and equivalent in degrees rotations."
@@ -340,7 +340,7 @@ Namespace VBClasses
 
 
     ' https://github.com/BhanuPrakashNani/Image_Processing/blob/master/Successive%20Rotations/rotation.py
-    Public Class WarpAffine_RepeatedExample8 : Inherits TaskParent
+    Public Class NR_NF_WarpAffine_RepeatedExample8 : Inherits TaskParent
         Public Sub New()
             labels = {"", "", "Rotated repeatedly 45 degrees", "Rotated repeatedly 90 degrees"}
             desc = "Compare an image before and after repeated rotations."

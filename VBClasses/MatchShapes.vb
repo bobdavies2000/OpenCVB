@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/3.4/d3/dc0/group__imgproc__shape.html
 ' https://docs.opencvb.org/3.4/d5/d45/tutorial_py_contours_more_functions.html
 ' https://stackoverflow.com/questions/55529371/opencv-shape-matching-between-two-similar-shapes
@@ -64,7 +64,7 @@ Namespace VBClasses
 
 
 
-    Public Class MatchShapes_NearbyHull : Inherits TaskParent
+    Public Class NR_NF_MatchShapes_NearbyHull : Inherits TaskParent
         Public similarCells As New List(Of oldrcData)
         Public bestCell As Integer
         Dim rc As New oldrcData
@@ -115,7 +115,7 @@ Namespace VBClasses
 
 
 
-    Public Class MatchShapes_Nearby : Inherits TaskParent
+    Public Class NR_MatchShapes_Nearby : Inherits TaskParent
         Public oldrclist As New List(Of oldrcData)
         Public similarCells As New List(Of oldrcData)
         Public bestCell As Integer
@@ -179,7 +179,7 @@ Namespace VBClasses
 
 
 
-    Public Class MatchShapes_Hulls : Inherits TaskParent
+    Public Class NR_MatchShapes_Hulls : Inherits TaskParent
         Dim options As New Options_MatchShapes
         Dim hulls As New RedList_Hulls
         Public Sub New()
@@ -214,7 +214,7 @@ Namespace VBClasses
 
 
 
-    Public Class MatchShapes_Contours : Inherits TaskParent
+    Public Class NR_MatchShapes_Contours : Inherits TaskParent
         Dim options As New Options_MatchShapes
         Public Sub New()
             OptionParent.FindSlider("Match Threshold %").Value = 3

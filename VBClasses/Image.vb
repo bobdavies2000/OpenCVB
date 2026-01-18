@@ -1,4 +1,4 @@
-﻿Imports System.IO
+Imports System.IO
 Imports System.Drawing
 Imports cv = OpenCvSharp
 ' https://www.kaggle.com/datasets/balraj98/berkeley-segmentation-dataset-500-bsds500
@@ -82,7 +82,7 @@ Namespace VBClasses
 
 
 
-    Public Class Image_CellStats : Inherits TaskParent
+    Public Class NR_Image_CellStats : Inherits TaskParent
         Dim images As New Image_RedCloudColor
         Dim stats As New XO_RedCell_Basics
         Public Sub New()
@@ -113,7 +113,7 @@ Namespace VBClasses
 
 
 
-    Public Class Image_MSER : Inherits TaskParent
+    Public Class NR_Image_MSER : Inherits TaskParent
         Public images As New Image_Series
         Dim core As New MSER_Detect
         Dim options As New Options_Images
@@ -140,7 +140,7 @@ Namespace VBClasses
 
 
 
-    Public Class Image_Icon : Inherits TaskParent
+    Public Class NR_Image_Icon : Inherits TaskParent
         Dim inputImage As Bitmap
         Public Sub New()
             Dim filePath As String = task.homeDir + "/MainUI/Data/Magnify.png"

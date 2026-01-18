@@ -93,7 +93,7 @@ Namespace VBClasses
 
 
     ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
-    Public Class ProCon_Variation : Inherits TaskParent
+    Public Class NR_ProCon_Variation : Inherits TaskParent
         Implements IDisposable
         Dim procon As ProCon_Basics
         Dim frameCount As Integer
@@ -104,7 +104,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.testAllRunning Then
-                SetTrueText("ProCon_Variation is well-tested but threads hang around during overnight testing. " + vbCrLf + "Skipping for now...")
+                SetTrueText("NF_ProCon_Variation is well-tested but threads hang around during overnight testing. " + vbCrLf + "Skipping for now...")
                 Exit Sub
             End If
             SyncLock procon.mutex

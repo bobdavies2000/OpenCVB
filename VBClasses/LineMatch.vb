@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class LineMatch_Basics : Inherits TaskParent
@@ -69,7 +69,7 @@ Namespace VBClasses
 
 
 
-    Public Class LineMatch_Tester : Inherits TaskParent
+    Public Class NR_LineMatch_Tester : Inherits TaskParent
         Dim match As New LineMatch_Basics
         Public Sub New()
             task.gOptions.DebugCheckBox.Checked = True
@@ -122,7 +122,7 @@ Namespace VBClasses
 
 
 
-    Public Class LineMatch_XYOffsets : Inherits TaskParent
+    Public Class NR_LineMatch_XYOffsets : Inherits TaskParent
         Public lpMapLast As cv.Mat
         Public lpMatches As New List(Of lpData)
         Public lpList As New List(Of lpData)
@@ -194,7 +194,7 @@ Namespace VBClasses
 
 
 
-    Public Class LineMatch_Correlation : Inherits TaskParent
+    Public Class NR_LineMatch_Correlation : Inherits TaskParent
         Public Sub New()
             desc = "Compute the correlation of the lpData.rect for the current and previous line."
         End Sub

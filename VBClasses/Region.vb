@@ -1,4 +1,4 @@
-﻿Imports System.Security.Cryptography
+Imports System.Security.Cryptography
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Region_Basics : Inherits TaskParent
@@ -82,7 +82,7 @@ Namespace VBClasses
 
 
 
-    Public Class Region_Quads : Inherits TaskParent
+    Public Class NR_Region_Quads : Inherits TaskParent
         Public quadMat As New cv.Mat
         Public inputRects As New List(Of cv.Rect)
         Public Sub New()

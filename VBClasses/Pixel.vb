@@ -190,7 +190,7 @@ End Namespace
 
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/PixelAccess.cs
 Namespace VBClasses
-    Public Class Pixel_GetSet : Inherits TaskParent
+    Public Class NR_Pixel_GetSet : Inherits TaskParent
         Dim mats As New Mat_4Click
         Public Sub New()
             labels(2) = "Time to copy using get/set,Generic Index, Marshal Copy"
@@ -280,7 +280,7 @@ Namespace VBClasses
 
 
 
-    Public Class Pixel_SampleColor : Inherits TaskParent
+    Public Class NR_Pixel_SampleColor : Inherits TaskParent
         Public random As New Random_Basics
         Public maskColor As cv.Vec3b
         Public Sub New()
@@ -336,7 +336,7 @@ Namespace VBClasses
 
 
 
-    Public Class Pixel_Unstable : Inherits TaskParent
+    Public Class NR_Pixel_Unstable : Inherits TaskParent
         Dim km As New KMeans_Basics
         Dim pixelCounts As New List(Of Integer)
         Dim k As Integer = -1
@@ -447,7 +447,7 @@ Namespace VBClasses
 
 
 
-    Public Class Pixel_NeighborsHorizontal : Inherits TaskParent
+    Public Class NR_Pixel_NeighborsHorizontal : Inherits TaskParent
         Public options As New Options_Neighbors
         Public pt1 As New List(Of cv.Point)
         Public pt2 As New List(Of cv.Point)
@@ -489,7 +489,7 @@ Namespace VBClasses
 
 
 
-    Public Class Pixel_NeighborsVertical : Inherits TaskParent
+    Public Class NR_Pixel_NeighborsVertical : Inherits TaskParent
         Public options As New Options_Neighbors
         Public pt1 As New List(Of cv.Point)
         Public pt2 As New List(Of cv.Point)
@@ -606,7 +606,7 @@ Namespace VBClasses
 
 
 
-    Public Class Pixel_NeighborsPatchNeighbors : Inherits TaskParent
+    Public Class NR_Pixel_NeighborsPatchNeighbors : Inherits TaskParent
         Public options As New Options_Neighbors
         Public Sub New()
             OptionParent.FindSlider("Minimum offset to neighbor pixel").Value = 1
@@ -658,7 +658,7 @@ Namespace VBClasses
 
 
 
-    Public Class Pixel_Vector3D : Inherits TaskParent
+    Public Class NR_Pixel_Vector3D : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
         Public pixelVector As New List(Of List(Of Single))
         Public Sub New()
@@ -781,7 +781,7 @@ Namespace VBClasses
 
 
 
-    Public Class Pixel_MapLeftRight : Inherits TaskParent
+    Public Class NR_Pixel_MapLeftRight : Inherits TaskParent
         Dim mapper As New Pixel_Mapper
         Public Sub New()
             labels = {"", "", "Left view with averaged color", "Right view with averaged color"}
@@ -803,7 +803,7 @@ Namespace VBClasses
 
 
 
-    Public Class Pixel_MapDistance : Inherits TaskParent
+    Public Class NR_Pixel_MapDistance : Inherits TaskParent
         Dim mapper As New Pixel_Mapper
         Public Sub New()
             labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}
@@ -862,7 +862,7 @@ Namespace VBClasses
 
 
 
-    Public Class Pixel_Sampler : Inherits TaskParent
+    Public Class NR_Pixel_Sampler : Inherits TaskParent
         Public random As New Random_Basics
         Public dominantGray As Byte
         Dim width = 25
@@ -929,7 +929,7 @@ Namespace VBClasses
 
 
 
-    Public Class Pixel_Display : Inherits TaskParent
+    Public Class NR_Pixel_Display : Inherits TaskParent
         Public random As New Random_Basics
         Dim width = 25
         Dim height = 25
@@ -964,7 +964,7 @@ Namespace VBClasses
 
 
 
-    Public Class Pixel_ColorGuess : Inherits TaskParent
+    Public Class NR_Pixel_ColorGuess : Inherits TaskParent
         Dim mapper As New Pixel_Mapper
         Public Sub New()
             labels = {"", "", "Left view with averaged color after distance reduction", "Right view with averaged color after distance reduction"}

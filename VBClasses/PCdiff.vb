@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class PCdiff_Basics : Inherits TaskParent
         Public options As New Options_ImageOffset
@@ -48,7 +48,7 @@ Namespace VBClasses
 
 
 
-    Public Class PCdiff_Edges : Inherits TaskParent
+    Public Class NR_PCdiff_Edges : Inherits TaskParent
         Dim pcDiff As New PCdiff_Basics
         Public Sub New()
             task.gOptions.DebugSlider.Value = 0
@@ -154,7 +154,7 @@ Namespace VBClasses
 
 
 
-    Public Class PCdiff_GuidedBP : Inherits TaskParent
+    Public Class NR_PCdiff_GuidedBP : Inherits TaskParent
         Dim points As New PCdiff_Points
         Dim backP As New GuidedBP_TopView
         Public Sub New()

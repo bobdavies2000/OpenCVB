@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class LineEnds_Basics : Inherits TaskParent
         Dim match As New LineEnds_Correlation
@@ -34,7 +34,7 @@ Namespace VBClasses
 
 
 
-    Public Class LineEnds_Concat : Inherits TaskParent
+    Public Class NR_LineEnds_Concat : Inherits TaskParent
         Public lpInput As lpData
         Dim match As New Match_Basics
         Public correlation As Single

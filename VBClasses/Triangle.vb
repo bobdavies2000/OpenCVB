@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Triangle_Basics : Inherits TaskParent
         Public triangles As New List(Of cv.Point3f)
@@ -42,7 +42,7 @@ Namespace VBClasses
 
 
 
-    Public Class Triangle_HullContour : Inherits TaskParent
+    Public Class NR_Triangle_HullContour : Inherits TaskParent
         Dim hulls As New RedList_Hulls
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -77,7 +77,7 @@ Namespace VBClasses
 
 
 
-    Public Class Triangle_Cell : Inherits TaskParent
+    Public Class NR_Triangle_Cell : Inherits TaskParent
         Public triangles As New List(Of cv.Point3f)
         Public Sub New()
             labels = {"", "", "RedList_Basics output", "Selected contour - each pixel has depth"}
@@ -130,7 +130,7 @@ Namespace VBClasses
 
 
 
-    Public Class Triangle_Mask : Inherits TaskParent
+    Public Class NR_Triangle_Mask : Inherits TaskParent
         Public triangles As New List(Of cv.Point3f)
         Public Sub New()
             labels = {"", "", "RedList_Basics output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
@@ -181,7 +181,7 @@ Namespace VBClasses
 
 
 
-    Public Class Triangle_Basics2D : Inherits TaskParent
+    Public Class NR_Triangle_Basics2D : Inherits TaskParent
         Public points As New List(Of cv.Point3f)
         Public colors As New List(Of cv.Scalar)
         Public oglOptions As New Options_OpenGLFunctions

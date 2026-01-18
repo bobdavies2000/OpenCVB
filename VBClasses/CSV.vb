@@ -1,7 +1,7 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.IO
 Namespace VBClasses
-    Public Class CSV_Basics : Inherits TaskParent
+    Public Class NR_CSV_Basics : Inherits TaskParent
         Public inputFile As String
         Public array(,) As String
         Public arrayList As New List(Of List(Of String))

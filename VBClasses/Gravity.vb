@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Gravity_Basics : Inherits TaskParent
         Public options As New Options_Features
@@ -75,7 +75,7 @@ Namespace VBClasses
 
 
 
-    Public Class Gravity_RGB : Inherits TaskParent
+    Public Class NR_Gravity_RGB : Inherits TaskParent
         Dim survey As New BrickPoint_PopulationSurvey
         Public Sub New()
             desc = "Rotate the RGB image using the offset from gravity."
@@ -108,7 +108,7 @@ Namespace VBClasses
 
 
 
-    Public Class Gravity_BrickRotate : Inherits TaskParent
+    Public Class NR_Gravity_BrickRotate : Inherits TaskParent
         Dim survey As New BrickPoint_PopulationSurvey
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -147,7 +147,7 @@ Namespace VBClasses
 
 
 
-    Public Class Gravity_BasicsOld : Inherits TaskParent
+    Public Class NR_Gravity_BasicsOld : Inherits TaskParent
         Public points As New List(Of cv.Point2f)
         Public autoDisplay As Boolean
         Public Sub New()
@@ -213,7 +213,7 @@ Namespace VBClasses
 
 
 
-    Public Class Gravity_BasicsOriginal : Inherits TaskParent
+    Public Class NR_Gravity_BasicsOriginal : Inherits TaskParent
         Public vec As New lpData
         Dim options As New Options_History
         Public Sub New()

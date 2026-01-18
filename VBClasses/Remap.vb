@@ -73,22 +73,4 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-
-
-
-
-
-
-
-    Public Class Flip_Basics : Inherits TaskParent
-        Dim flip As New Remap_Flip
-        Public Sub New()
-            desc = "Placeholder to make it easy to remember 'Remap'."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            flip.Run(src)
-            dst2 = flip.dst2
-            labels = flip.labels
-        End Sub
-    End Class
 End Namespace

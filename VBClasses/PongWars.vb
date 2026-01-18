@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://github.com/vnglst/pong-wars
 ' https://twitter.com/nicolasdnl/status/1749715070928433161
 Namespace VBClasses
@@ -120,7 +120,7 @@ Namespace VBClasses
 
 
 
-    Public Class PongWars_Two : Inherits TaskParent
+    Public Class NR_PongWars_Two : Inherits TaskParent
         Dim pong1 As New PongWars_Basics
         Dim pong2 As New PongWars_Basics
         Public Sub New()

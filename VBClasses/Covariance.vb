@@ -47,7 +47,7 @@ Namespace VBClasses
 
 
     ' http://answers.opencvb.org/question/31228/how-to-use-function-calccovarmatrix/
-    Public Class Covariance_Test : Inherits TaskParent
+    Public Class NR_Covariance_Test : Inherits TaskParent
         Dim covar As New Covariance_Basics
         Public Sub New()
             desc = "Test the covariance basics algorithm."

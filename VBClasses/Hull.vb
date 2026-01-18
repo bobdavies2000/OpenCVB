@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Hull_Basics : Inherits TaskParent
         Dim random As New Random_Basics
@@ -38,7 +38,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hull_Defect : Inherits TaskParent
+    Public Class NR_Hull_Defect : Inherits TaskParent
         Public hull As New List(Of cv.Point)
         Public contour As cv.Point()
         Public Sub New()

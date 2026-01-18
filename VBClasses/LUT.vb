@@ -44,7 +44,7 @@ Namespace VBClasses
 
 
 
-    Public Class LUT_Sliders : Inherits TaskParent
+    Public Class NR_LUT_Sliders : Inherits TaskParent
         Dim options As New Options_LUT
         Public Sub New()
             desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image."
@@ -72,7 +72,7 @@ Namespace VBClasses
 
 
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-    Public Class LUT_Reduction : Inherits TaskParent
+    Public Class NR_LUT_Reduction : Inherits TaskParent
         Public reduction As New Reduction_Basics
         Dim vector = New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         Public Sub New()
@@ -99,7 +99,7 @@ Namespace VBClasses
 
 
 
-    Public Class LUT_RGBDepth : Inherits TaskParent
+    Public Class NR_LUT_RGBDepth : Inherits TaskParent
         Dim lut As New LUT_Basics
         Public Sub New()
             desc = "Use a LUT on the RGBDepth to segregate depth data."
@@ -118,7 +118,7 @@ Namespace VBClasses
 
 
 
-    Public Class LUT_Depth32f : Inherits TaskParent
+    Public Class NR_LUT_Depth32f : Inherits TaskParent
         Dim lut As New LUT_Basics
         Public Sub New()
             desc = "Use a LUT on the 32-bit depth to segregate depth data."
@@ -166,7 +166,7 @@ Namespace VBClasses
 
 
 
-    Public Class LUT_Watershed : Inherits TaskParent
+    Public Class NR_LUT_Watershed : Inherits TaskParent
         Public wShed As New Watershed_Basics
         Public lut As New LUT_Equalized
         Dim edges As New Edge_Basics
@@ -195,7 +195,7 @@ Namespace VBClasses
 
 
 
-    Public Class LUT_Custom : Inherits TaskParent
+    Public Class NR_LUT_Custom : Inherits TaskParent
         Dim gradMap As New Palette_RandomColorMap
         Public colorMap As cv.Mat
         Dim saveColorCount = -1
@@ -222,7 +222,7 @@ Namespace VBClasses
 
 
 
-    Public Class LUT_RedCloud : Inherits TaskParent
+    Public Class NR_LUT_RedCloud : Inherits TaskParent
         Dim sort3 As New Sort_3Channel
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -245,7 +245,7 @@ Namespace VBClasses
 
 
 
-    Public Class LUT_Create : Inherits TaskParent
+    Public Class NR_LUT_Create : Inherits TaskParent
         Dim pixels(2)() As Byte
         Dim options As New Options_LUT_Create
         Public Sub New()

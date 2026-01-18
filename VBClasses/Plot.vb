@@ -49,7 +49,7 @@ Namespace VBClasses
 
 
 
-    Public Class Plot_Depth : Inherits TaskParent
+    Public Class NR_Plot_Depth : Inherits TaskParent
         Dim plotDepth As New Plot_Basics_CPP
         Dim hist As New Histogram_Basics
         Public Sub New()
@@ -394,7 +394,7 @@ Namespace VBClasses
 
 
 
-    Public Class Plot_Beats : Inherits TaskParent
+    Public Class NR_Plot_Beats : Inherits TaskParent
         Dim plot As New Plot_OverTimeFixedScale
         Public Sub New()
             plot.plotCount = 4
@@ -462,7 +462,7 @@ Namespace VBClasses
 
 
     ' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
-    Public Class Plot_Dots : Inherits TaskParent
+    Public Class NR_Plot_Dots : Inherits TaskParent
         Public srcX As New List(Of Double)
         Public srcY As New List(Of Double)
         Public plotColor = cv.Scalar.Yellow

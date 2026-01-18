@@ -1,4 +1,4 @@
-﻿Imports System.IO
+Imports System.IO
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 ' all examples in this file are from https://github.com/opencv/opencv/tree/4.x/samples
@@ -46,7 +46,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_CalcBackProject_Demo2 : Inherits TaskParent
+    Public Class NR_OEX_CalcBackProject_Demo2 : Inherits TaskParent
         Public histogram As New cv.Mat
         Public classCount As Integer = 10 ' initial value is just a guess.  It is refined after the first pass.
         Public Sub New()
@@ -90,7 +90,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_bgfg_segm : Inherits TaskParent
+    Public Class NR_OEX_bgfg_segm : Inherits TaskParent
         Dim bgSub As New BGSubtract_Basics
         Public Sub New()
             desc = "OpenCV example bgfg_segm - existing BGSubtract_Basics is the same."
@@ -108,7 +108,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_bgSub : Inherits TaskParent
+    Public Class NR_OEX_bgSub : Inherits TaskParent
         Implements IDisposable
         Dim pBackSub As cv.BackgroundSubtractor
         Dim options As New Options_BGSubtract
@@ -144,7 +144,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_BasicLinearTransforms : Inherits TaskParent
+    Public Class NR_OEX_BasicLinearTransforms : Inherits TaskParent
         Dim options As New Options_BrightnessContrast
         Public Sub New()
             desc = "OpenCV Example BasicLinearTransforms - NOTE: much faster than BasicLinearTransformTrackBar"
@@ -160,10 +160,10 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_BasicLinearTransformsTrackBar : Inherits TaskParent
+    Public Class NR_NF_OEX_BasicLinearTransformsTrackBar : Inherits TaskParent
         Dim options As New Options_BrightnessContrast
         Public Sub New()
-            desc = "OpenCV Example BasicLinearTransformTrackBar - much slower than OEX_BasicLinearTransforms"
+            desc = "OpenCV Example BasicLinearTransformTrackBar - much slower than NR_OEX_BasicLinearTransforms"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -187,7 +187,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_delaunay2 : Inherits TaskParent
+    Public Class NR_OEX_delaunay2 : Inherits TaskParent
         Dim active_facet_color As New cv.Scalar(0, 0, 255)
         Dim delaunay_color As New cv.Scalar(255, 255, 255)
         Dim points As New List(Of cv.Point2f)
@@ -272,7 +272,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_MeanShift : Inherits TaskParent
+    Public Class NR_OEX_MeanShift : Inherits TaskParent
         Dim term_crit As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
         Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180)}
         Public histogram As New cv.Mat
@@ -355,7 +355,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_PointPolygon_demo : Inherits TaskParent
+    Public Class NR_OEX_PointPolygon_demo : Inherits TaskParent
         Dim pointPoly As New OEX_PointPolygon
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -388,7 +388,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_Remap : Inherits TaskParent
+    Public Class NR_OEX_Remap : Inherits TaskParent
         Dim remap As New Remap_Basics
         Public Sub New()
             desc = "The OpenCV Remap example became the Remap_Basics algorithm."
@@ -407,7 +407,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_Threshold : Inherits TaskParent
+    Public Class NR_OEX_Threshold : Inherits TaskParent
         Dim threshold As New Threshold_Basics
         Public Sub New()
             desc = "OpenCV Example Threshold became Threshold_Basics"
@@ -427,7 +427,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_Threshold_Inrange : Inherits TaskParent
+    Public Class NR_NF_OEX_Threshold_Inrange : Inherits TaskParent
         Dim options As New Options_OEX
         Public Sub New()
             desc = "OpenCV Example Threshold_Inrange"
@@ -446,7 +446,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_Points_Classifier : Inherits TaskParent
+    Public Class NR_OEX_Points_Classifier : Inherits TaskParent
         Dim basics As New Classifier_Basics_CPP
         Public Sub New()
             desc = "OpenCV Example Points_Classifier became Classifier_Basics"
@@ -466,7 +466,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_Core_Reduce : Inherits TaskParent
+    Public Class NR_OEX_Core_Reduce : Inherits TaskParent
         Public Sub New()
             desc = "Use OpenCV's reduce API to create row/col sums, averages, and min/max."
         End Sub
@@ -530,7 +530,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_Core_Split : Inherits TaskParent
+    Public Class NR_OEX_Core_Split : Inherits TaskParent
         Public Sub New()
             desc = "OpenCV Example Core_Split"
         End Sub
@@ -566,7 +566,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_Filter2D : Inherits TaskParent
+    Public Class NR_OEX_Filter2D : Inherits TaskParent
         Dim ddepth As cv.MatType = -1, anchor = New cv.Point(-1, -1), kernelSize As Integer = 3, ind = 0
         Public Sub New()
             desc = "OpenCV Example Filter2D demo - Use a varying kernel to show the impact."
@@ -586,7 +586,7 @@ Namespace VBClasses
 
 
 
-    Public Class OEX_FitEllipse : Inherits TaskParent
+    Public Class NR_OEX_FitEllipse : Inherits TaskParent
         Implements IDisposable
         Dim img As cv.Mat
         Dim options As New Options_FitEllipse
@@ -594,7 +594,7 @@ Namespace VBClasses
             Dim fileInputName As New FileInfo(task.homeDir + "opencv/samples/data/ellipses.jpg")
             img = cv.Cv2.ImRead(fileInputName.FullName).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            cPtr = OEX_FitEllipse_Open()
+            cPtr = NR_OEX_FitEllipse_Open()
             desc = "OEX Example fitellipse"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -603,26 +603,26 @@ Namespace VBClasses
             Dim cppData(img.Total * img.ElemSize - 1) As Byte
             Marshal.Copy(img.Data, cppData, 0, cppData.Length)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-            Dim imagePtr = OEX_FitEllipse_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), img.Rows, img.Cols,
+            Dim imagePtr = NR_OEX_FitEllipse_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), img.Rows, img.Cols,
                                              options.threshold, options.fitType)
             handleSrc.Free()
 
             dst2 = cv.Mat.FromPixelData(img.Rows + 4, img.Cols + 4, cv.MatType.CV_8UC3, imagePtr).Clone
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
-            OEX_FitEllipse_Close(cPtr)
+            NR_OEX_FitEllipse_Close(cPtr)
         End Sub
     End Class
 
-    Module OEX_FitEllipse_CPP_Module
+    Module NR_OEX_FitEllipse_CPP_Module
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function OEX_FitEllipse_Open() As IntPtr
+        Public Function NR_OEX_FitEllipse_Open() As IntPtr
         End Function
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Sub OEX_FitEllipse_Close(cPtr As IntPtr)
+        Public Sub NR_OEX_FitEllipse_Close(cPtr As IntPtr)
         End Sub
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function OEX_FitEllipse_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer,
+        Public Function NR_OEX_FitEllipse_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer,
                                           threshold As Integer, fitType As Integer) As IntPtr
         End Function
     End Module

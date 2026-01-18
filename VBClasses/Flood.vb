@@ -19,7 +19,7 @@ Namespace VBClasses
 
 
 
-    Public Class Flood_CellStatsPlot : Inherits TaskParent
+    Public Class NR_Flood_CellStatsPlot : Inherits TaskParent
         Public Sub New()
             task.gOptions.setHistogramBins(1000)
             desc = "Provide cell stats on the flood_basics cells.  Identical to XO_RedCell_FloodFill"
@@ -74,7 +74,7 @@ Namespace VBClasses
 
 
 
-    Public Class Flood_Tiers : Inherits TaskParent
+    Public Class NR_Flood_Tiers : Inherits TaskParent
         Dim flood As New Flood_BasicsMask
         Dim tiers As New Depth_Tiers
         Dim color8U As New Color8U_Basics
@@ -113,7 +113,7 @@ Namespace VBClasses
 
 
 
-    Public Class Flood_Motion : Inherits TaskParent
+    Public Class NR_Flood_Motion : Inherits TaskParent
         Dim flood As New Flood_Basics
         Dim oldrclist As New List(Of oldrcData)
         Dim cellMap As New cv.Mat
@@ -158,7 +158,7 @@ Namespace VBClasses
 
 
 
-    Public Class Flood_Minimal : Inherits TaskParent
+    Public Class NR_Flood_Minimal : Inherits TaskParent
         Dim prep As New RedPrep_ReductionChoices
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -172,7 +172,7 @@ Namespace VBClasses
 
             If task.mouseClickFlag Then
                 Dim rect As New cv.Rect
-                Dim pt = task.ClickPoint
+                Dim pt = task.clickPoint
                 Dim mask = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8U, 0)
                 Dim flags = cv.FloodFillFlags.FixedRange Or (255 << 8) Or cv.FloodFillFlags.MaskOnly
                 Dim count = cv.Cv2.FloodFill(dst2, mask, pt, 255, rect, 0, 0, flags)

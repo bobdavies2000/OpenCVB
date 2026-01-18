@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Swarm_Basics : Inherits TaskParent
         Public knn As New KNN_Basics
@@ -97,7 +97,7 @@ Namespace VBClasses
 
 
 
-    Public Class Swarm_LeftRight : Inherits TaskParent
+    Public Class NR_Swarm_LeftRight : Inherits TaskParent
         Public leftDistance As Single
         Public leftDirection As Single
         Public leftMax As Single
@@ -137,7 +137,7 @@ Namespace VBClasses
 
 
 
-    Public Class Swarm_Percentage : Inherits TaskParent
+    Public Class NR_Swarm_Percentage : Inherits TaskParent
         Dim swarm As New Swarm_Flood
         Dim options As New Options_SwarmPercent
         Public Sub New()

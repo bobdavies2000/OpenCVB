@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class RedMask_Basics : Inherits TaskParent
@@ -67,7 +67,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedMask_Redraw : Inherits TaskParent
+    Public Class NR_RedMask_Redraw : Inherits TaskParent
         Public redMask As New RedMask_Basics
         Public Sub New()
             desc = "Redraw the image using the mean color of each cell."

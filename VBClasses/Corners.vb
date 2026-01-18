@@ -128,7 +128,7 @@ Namespace VBClasses
 
 
 
-    Public Class Corners_PreCornerDetect : Inherits TaskParent
+    Public Class NR_Corners_PreCornerDetect : Inherits TaskParent
         Dim median As New Math_Median_CDF
         Dim options As New Options_PreCorners
         Public Sub New()
@@ -180,7 +180,7 @@ Namespace VBClasses
 
 
 
-    Public Class Corners_BasicsCentroid : Inherits TaskParent
+    Public Class NR_Corners_BasicsCentroid : Inherits TaskParent
         Dim fast As New Corners_Basics
         Public Sub New()
             task.kalman = New Kalman_Basics
@@ -212,7 +212,7 @@ Namespace VBClasses
 
 
 
-    Public Class Corners_BasicsCentroids : Inherits TaskParent
+    Public Class NR_NF_Corners_BasicsCentroids : Inherits TaskParent
         Dim fast As New Corners_Basics
         Dim fastCenters() As cv.Point2f
         Public Sub New()
@@ -248,7 +248,7 @@ Namespace VBClasses
 
 
     ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-    Public Class Corners_Harris_CPP : Inherits TaskParent
+    Public Class NR_Corners_Harris_CPP : Inherits TaskParent
         Implements IDisposable
         Dim options As New Options_Harris
         Public Sub New()
@@ -323,7 +323,7 @@ Namespace VBClasses
 
 
 
-    Public Class Corners_RedCloud : Inherits TaskParent
+    Public Class NR_Corners_RedCloud : Inherits TaskParent
         Dim corners As New Neighbor_Intersects
         Public Sub New()
             labels = {"", "", "Grayscale", "Highlighted points show where more than 2 cells intersect."}
@@ -345,7 +345,7 @@ Namespace VBClasses
 
 
 
-    Public Class Corners_SubPix : Inherits TaskParent
+    Public Class NR_Corners_SubPix : Inherits TaskParent
         Dim fast As New Corners_Basics
         Dim options As New Options_PreCorners
         Public Sub New()

@@ -1,7 +1,7 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
-    Public Class RedList_CellStatsPlot : Inherits TaskParent
+    Public Class NR_RedList_CellStatsPlot : Inherits TaskParent
         Dim cells As New XO_RedCell_BasicsPlot
         Public Sub New()
             If standaloneTest() Then task.gOptions.displayDst1.Checked = True
@@ -26,7 +26,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedList_FourColor : Inherits TaskParent
+    Public Class NR_RedList_FourColor : Inherits TaskParent
         Dim binar4 As New Bin4Way_Regions
         Public Sub New()
             labels(3) = "A 4-way split of the input grayscale image based on brightness"
@@ -48,7 +48,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedList_Hue : Inherits TaskParent
+    Public Class NR_RedList_Hue : Inherits TaskParent
         Dim hue As New Color8U_Hue
         Public Sub New()
             labels(3) = "Mask of the areas with Hue"
@@ -71,7 +71,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedList_Consistent : Inherits TaskParent
+    Public Class NR_RedList_Consistent : Inherits TaskParent
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             task.featureOptions.ColorDiffSlider.Value = 1
@@ -98,7 +98,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedList_Features : Inherits TaskParent
+    Public Class NR_RedList_Features : Inherits TaskParent
         Dim options As New Options_RedCloudFeatures
         Public Sub New()
             desc = "Display And validate the keyPoints for each RedCloud cell"
@@ -250,7 +250,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedList_CellDepthHistogram : Inherits TaskParent
+    Public Class NR_RedList_CellDepthHistogram : Inherits TaskParent
         Dim plot As New Plot_Histogram
         Public Sub New()
             task.gOptions.setHistogramBins(100)
@@ -282,7 +282,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedList_EdgesZ : Inherits TaskParent
+    Public Class NR_RedList_EdgesZ : Inherits TaskParent
         Dim reduction As New Reduction_Basics
         Dim edgesZ As New RedPrep_EdgesZ
         Public Sub New()

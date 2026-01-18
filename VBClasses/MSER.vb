@@ -155,7 +155,7 @@ Namespace VBClasses
 
 
 
-    Public Class MSER_LeftRight : Inherits TaskParent
+    Public Class NR_MSER_LeftRight : Inherits TaskParent
         Dim left As New MSER_Left
         Dim right As New MSER_Right
         Public Sub New()
@@ -219,7 +219,7 @@ Namespace VBClasses
 
 
     ' https://github.com/opencv/opencv/blob/master/samples/python/mser.py
-    Public Class MSER_Hulls : Inherits TaskParent
+    Public Class NR_MSER_Hulls : Inherits TaskParent
         Dim options As New Options_MSER
         Dim mser As New MSER_Basics
         Public Sub New()
@@ -252,7 +252,7 @@ Namespace VBClasses
 
 
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-    Public Class MSER_TestSynthetic : Inherits TaskParent
+    Public Class NR_MSER_TestSynthetic : Inherits TaskParent
         Dim options As New Options_MSER
         Dim synth As New MSER_SyntheticInput
         Dim mser As New MSER_Basics
@@ -279,7 +279,7 @@ Namespace VBClasses
 
 
 
-    Public Class MSER_Grayscale : Inherits TaskParent
+    Public Class NR_MSER_Grayscale : Inherits TaskParent
         Dim mser As New MSER_Basics
         Dim reduction As New Reduction_Basics
         Public Sub New()
@@ -301,7 +301,7 @@ Namespace VBClasses
 
 
 
-    Public Class MSER_ReducedRGB : Inherits TaskParent
+    Public Class NR_MSER_ReducedRGB : Inherits TaskParent
         Dim mser As New MSER_Basics
         Dim color8u As New Color8U_Basics
         Public Sub New()
@@ -325,7 +325,7 @@ Namespace VBClasses
 
 
     'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_rr.cpp
-    Public Class MSER_ROI : Inherits TaskParent
+    Public Class NR_MSER_ROI : Inherits TaskParent
         Public containers As New List(Of cv.Rect)
         Dim options As New Options_MSER
         Dim core As New MSER_Detect
@@ -387,7 +387,7 @@ Namespace VBClasses
 
 
     ' https://github.com/shimat/opencvsharp/wiki/MSER
-    Public Class MSER_TestExample : Inherits TaskParent
+    Public Class NR_MSER_TestExample : Inherits TaskParent
         Implements IDisposable
         Dim image As cv.Mat
         Dim mser As cv.MSER
@@ -442,7 +442,7 @@ Namespace VBClasses
 
 
 
-    Public Class MSER_RedCloud : Inherits TaskParent
+    Public Class NR_MSER_RedCloud : Inherits TaskParent
         Dim mser As New MSER_Basics
         Public Sub New()
             task.redList = New XO_RedList_Basics
@@ -463,7 +463,7 @@ Namespace VBClasses
 
 
 
-    Public Class MSER_Mask_CPP : Inherits TaskParent
+    Public Class NR_MSER_Mask_CPP : Inherits TaskParent
         Implements IDisposable
         Dim options As New Options_MSER
         Public classCount As Integer
@@ -510,7 +510,7 @@ Namespace VBClasses
 
 
 
-    Public Class MSER_Binarize : Inherits TaskParent
+    Public Class NR_MSER_Binarize : Inherits TaskParent
         Dim mser As New MSER_Basics
         Dim bin4 As New Bin4Way_Regions
         Public Sub New()
@@ -530,7 +530,7 @@ Namespace VBClasses
 
 
 
-    Public Class MSER_Basics1 : Inherits TaskParent
+    Public Class NR_MSER_Basics1 : Inherits TaskParent
         Dim detect As New MSER_CPP
         Public Sub New()
             desc = "Create cells for each region in MSER output"
@@ -546,7 +546,7 @@ Namespace VBClasses
 
 
 
-    Public Class MSER_BasicsNew : Inherits TaskParent
+    Public Class NR_MSER_BasicsNew : Inherits TaskParent
         Dim detect As New MSER_CPP
         Dim displaycount As Integer
         Public Sub New()
@@ -581,7 +581,7 @@ Namespace VBClasses
 
 
 
-    Public Class MSER_Basics2 : Inherits TaskParent
+    Public Class NR_MSER_Basics2 : Inherits TaskParent
         Dim detect As New MSER_CPP
         Dim cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
         Public Sub New()

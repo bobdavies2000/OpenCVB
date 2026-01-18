@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FrameRate_Basics : Inherits TaskParent
         Dim mats As New Mat_4to1
@@ -36,7 +36,7 @@ Namespace VBClasses
 
 
 
-    Public Class FrameRate_BasicsGray : Inherits TaskParent
+    Public Class NR_FrameRate_BasicsGray : Inherits TaskParent
         Dim mats As New Mat_4to1
         Dim frameCounts(4 - 1) As Integer
         Public Sub New()

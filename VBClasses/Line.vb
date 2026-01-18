@@ -170,7 +170,7 @@ Namespace VBClasses
 
 
 
-    Public Class Line_Parallel : Inherits TaskParent
+    Public Class NR_Line_Parallel : Inherits TaskParent
         Public classes() As List(Of Integer) ' groups of lines that are parallel
         Public unParallel As New List(Of Integer) ' lines which are not parallel
         Public Sub New()
@@ -231,7 +231,7 @@ Namespace VBClasses
 
 
 
-    Public Class Line_BrickList : Inherits TaskParent
+    Public Class NR_Line_BrickList : Inherits TaskParent
         Public lp As lpData ' set this input
         Public lpOutput As lpData ' this is the result lp
         Public sobel As New Edge_Sobel
@@ -414,7 +414,7 @@ Namespace VBClasses
 
 
 
-    Public Class Line_Select : Inherits TaskParent
+    Public Class NR_Line_Select : Inherits TaskParent
         Public delaunay As New Delaunay_LineSelect
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -433,7 +433,7 @@ Namespace VBClasses
 
 
 
-    Public Class Line_Vertical : Inherits TaskParent
+    Public Class NR_Line_Vertical : Inherits TaskParent
         Dim vbPoints As New BrickPoint_Vertical
         Dim knn As New KNN_Basics
         Public Sub New()

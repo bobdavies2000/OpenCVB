@@ -36,7 +36,7 @@ Namespace VBClasses
 
 
 
-    Public Class MeanShift_Depth : Inherits TaskParent
+    Public Class NR_MeanShift_Depth : Inherits TaskParent
         Dim meanShift As New MeanShift_Basics
         Public Sub New()
             labels(2) = "Draw anywhere to start mean shift tracking."

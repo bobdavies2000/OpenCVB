@@ -154,7 +154,7 @@ Namespace VBClasses
 
 
 
-    Public Class KNN_N2BasicsTest : Inherits TaskParent
+    Public Class NR_KNN_N2BasicsTest : Inherits TaskParent
         Public knn As New KNN_Basics
         Dim random As New Random_Basics
         Public Sub New()
@@ -306,7 +306,7 @@ Namespace VBClasses
 
 
 
-    Public Class KNN_N3BasicsTest : Inherits TaskParent
+    Public Class NR_KNN_N3BasicsTest : Inherits TaskParent
         Dim knn As New KNN_N3Basics
         Dim dist As New Distance_Point3D
         Dim random As New Random_Basics3D
@@ -367,7 +367,7 @@ Namespace VBClasses
 
 
 
-    Public Class KNN_N4BasicsTest : Inherits TaskParent
+    Public Class NR_KNN_N4BasicsTest : Inherits TaskParent
         Dim knn As New KNN_N4Basics
         Dim dist As New Distance_Point4D
         Dim random As New Random_Basics4D
@@ -414,7 +414,7 @@ Namespace VBClasses
 
 
 
-    Public Class KNN_Farthest : Inherits TaskParent
+    Public Class NR_KNN_Farthest : Inherits TaskParent
         Public knn As New KNN_Basics
         Public lpFar As lpData
         Public Sub New()
@@ -463,7 +463,7 @@ Namespace VBClasses
 
 
 
-    Public Class KNN_NNBasicsTest : Inherits TaskParent
+    Public Class NR_KNN_NNBasicsTest : Inherits TaskParent
         Dim knn As New KNN_NNBasics
         Public Sub New()
             labels(2) = "Highlight color (Yellow) is query.  The red dots are the training set."
@@ -663,7 +663,7 @@ Namespace VBClasses
 
 
 
-    Public Class KNN_MaxDistance : Inherits TaskParent
+    Public Class NR_KNN_MaxDistance : Inherits TaskParent
         Dim knn As New KNN_Basics
         Public outputPoints As New List(Of (cv.Point2f, cv.Point2f))
         Public options As New Options_KNN
@@ -740,7 +740,7 @@ Namespace VBClasses
 
 
 
-    Public Class KNN_NormalizedTestDim2 : Inherits TaskParent
+    Public Class NR_KNN_NormalizedTestDim2 : Inherits TaskParent
         Public knn As New KNN_NormalizedBasics
         Dim random As New Random_Basics
         Public trainInput As New List(Of cv.Point2f)
@@ -803,7 +803,7 @@ Namespace VBClasses
 
 
 
-    Public Class KNN_NormalizedTestDim3 : Inherits TaskParent
+    Public Class NR_KNN_NormalizedTestDim3 : Inherits TaskParent
         Public knn As New KNN_NormalizedBasics
         Dim random As New Random_Basics3D
         Public trainInput As New List(Of cv.Point3f)
@@ -869,7 +869,7 @@ Namespace VBClasses
 
 
 
-    Public Class KNN_NormalizedTestDim4 : Inherits TaskParent
+    Public Class NR_KNN_NormalizedTestDim4 : Inherits TaskParent
         Public knn As New KNN_NormalizedBasics
         Dim random As New Random_Basics4D
         Public trainInput As New List(Of cv.Vec4f)

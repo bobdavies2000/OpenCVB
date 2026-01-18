@@ -146,7 +146,7 @@ Namespace VBClasses
 
 
 
-    Public Class ML_DepthFromColor : Inherits TaskParent
+    Public Class NR_ML_DepthFromColor : Inherits TaskParent
         Implements IDisposable
         Dim colorPal As New DepthColorizer_Basics
         Dim mats As New Mat_4Click
@@ -210,7 +210,7 @@ Namespace VBClasses
 
 
 
-    Public Class ML_DepthFromXYColor : Inherits TaskParent
+    Public Class NR_ML_DepthFromXYColor : Inherits TaskParent
         Implements IDisposable
         Dim mats As New Mat_4to1
         Dim resizer As New Resize_Smaller
@@ -302,7 +302,7 @@ Namespace VBClasses
     End Structure
 
 
-    Public Class ML_Color2Depth : Inherits TaskParent
+    Public Class NR_ML_Color2Depth : Inherits TaskParent
         Implements IDisposable
         Dim color8U As New Color8U_Basics
         Dim rtree As RTrees
@@ -377,7 +377,7 @@ Namespace VBClasses
 
 
 
-    Public Class ML_ColorInTier2Depth : Inherits TaskParent
+    Public Class NR_ML_ColorInTier2Depth : Inherits TaskParent
         Implements IDisposable
         Dim color8U As New Color8U_Basics
         Dim rtree As RTrees
@@ -444,7 +444,7 @@ Namespace VBClasses
 
 
 
-    Public Class ML_LearnZfromXGray : Inherits TaskParent
+    Public Class NR_ML_LearnZfromXGray : Inherits TaskParent
         Implements IDisposable
         Dim regions As New GuidedBP_Regions
         Dim rtree As RTrees
@@ -491,7 +491,7 @@ Namespace VBClasses
 
 
 
-    Public Class ML_LearnRegions : Inherits TaskParent
+    Public Class NR_ML_LearnRegions : Inherits TaskParent
         Implements IDisposable
         Dim regions As New GuidedBP_Regions
         Dim color8U As New Color8U_Basics

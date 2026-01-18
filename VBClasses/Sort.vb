@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class Sort_Basics : Inherits TaskParent
@@ -28,7 +28,7 @@ Namespace VBClasses
 
 
 
-    Public Class Sort_RectAndMask : Inherits TaskParent
+    Public Class NR_Sort_RectAndMask : Inherits TaskParent
         Dim sort As New Sort_Basics
         Public mask As cv.Mat
         Public rect As cv.Rect
@@ -56,7 +56,7 @@ Namespace VBClasses
 
 
 
-    Public Class Sort_MLPrepTest_CPP : Inherits TaskParent
+    Public Class NR_Sort_MLPrepTest_CPP : Inherits TaskParent
         Implements IDisposable
         Public reduction As New Reduction_Basics
         Public MLTestData As New cv.Mat
@@ -231,7 +231,7 @@ Namespace VBClasses
 
 
 
-    Public Class Sort_GrayScale1 : Inherits TaskParent
+    Public Class NR_NF_Sort_GrayScale1 : Inherits TaskParent
         Dim sort As New Sort_Integer
         Dim pixels(2)() As Byte
         Public Sub New()
@@ -271,7 +271,7 @@ Namespace VBClasses
 
 
 
-    Public Class Sort_GrayScale : Inherits TaskParent
+    Public Class NR_Sort_GrayScale : Inherits TaskParent
         Dim plot As New Plot_Histogram
         Dim pixels(2)() As Byte
         Public Sub New()

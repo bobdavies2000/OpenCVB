@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Neighbor_Basics : Inherits TaskParent
@@ -97,7 +97,7 @@ Namespace VBClasses
 
 
 
-    Public Class Neighbor_ColorOnly : Inherits TaskParent
+    Public Class NR_Neighbor_ColorOnly : Inherits TaskParent
         Dim corners As New Neighbor_Intersects
         Public Sub New()
             desc = "Find neighbors in a redColor cellMap"

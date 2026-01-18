@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedColor_Basics : Inherits TaskParent
@@ -95,7 +95,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_CPP : Inherits TaskParent
+    Public Class NR_RedColor_CPP : Inherits TaskParent
         Implements IDisposable
         Public classCount As Integer
         Public rcList As New List(Of rcData)
@@ -201,7 +201,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_LeftRight : Inherits TaskParent
+    Public Class NR_RedColor_LeftRight : Inherits TaskParent
         Dim redLeft As New RedColor_Basics
         Dim redRight As New RedColor_Basics
         Dim reduction As New Reduction_Basics
@@ -227,7 +227,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedColor_NWay : Inherits TaskParent
+    Public Class NR_RedColor_NWay : Inherits TaskParent
         Dim binN As New BinNWay_Basics
         Public Sub New()
             desc = "Run RedColor on the output of the BinNWay_Basics"

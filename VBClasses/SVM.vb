@@ -101,7 +101,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-    Public Class SVM_TestCase : Inherits TaskParent
+    Public Class NR_SVM_TestCase : Inherits TaskParent
         Implements IDisposable
         Dim options As New Options_SVM
         Dim points As New List(Of cv.Point2f)
@@ -171,7 +171,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-    Public Class SVM_ReuseBasics : Inherits TaskParent
+    Public Class NR_SVM_ReuseBasics : Inherits TaskParent
         Dim svm As New SVM_Basics
         Dim points As New List(Of cv.Point2f)
         Dim responses As New List(Of Integer)
@@ -220,7 +220,7 @@ Namespace VBClasses
 
 
 
-    Public Class SVM_ReuseRandom : Inherits TaskParent
+    Public Class NR_SVM_ReuseRandom : Inherits TaskParent
         Dim svm As New SVM_Basics
         Dim blueCount As Integer
         Public Sub New()

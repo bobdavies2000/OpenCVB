@@ -28,7 +28,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/3.2.0/de/db2/laplace_8cpp-example.html
-    Public Class Laplacian_Blur : Inherits TaskParent
+    Public Class NR_Laplacian_Blur : Inherits TaskParent
         Dim options As New Options_Laplacian
         Public Sub New()
             desc = "Laplacian filter - the second derivative - with different bluring techniques"

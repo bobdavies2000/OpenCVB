@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports  System.IO
 Imports System.Runtime.InteropServices
 Namespace VBClasses
@@ -34,7 +34,7 @@ Namespace VBClasses
 
 
 
-    Public Class Vignetting_VB : Inherits TaskParent
+    Public Class NR_Vignetting_VB : Inherits TaskParent
         Public removeVig As Boolean
         Dim center As New cv.Point(dst2.Width / 2, dst2.Height / 2)
         Dim options As New Options_Vignetting
@@ -102,7 +102,7 @@ Namespace VBClasses
 
     ' https://github.com/dajuric/dot-devignetting
     ' https://stackoverflow.com/questions/22654770/creating-vignette-filter-in-opencv
-    Public Class Vignetting_Devignetting : Inherits TaskParent
+    Public Class NR_Vignetting_Devignetting : Inherits TaskParent
         Dim devignet As New Vignetting_Removal
         Dim basics As New Vignetting_Basics
         Public Sub New()

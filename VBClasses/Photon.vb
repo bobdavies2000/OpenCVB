@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 'https://security.stackexchange.com/questions/42428/Is-generating-random-numbers-using-a-smartphone-camera-a-good-idea
 Namespace VBClasses
     Public Class Photon_Basics : Inherits TaskParent
@@ -33,7 +33,7 @@ Namespace VBClasses
 
 
 
-    Public Class Photon_Test : Inherits TaskParent
+    Public Class NR_Photon_Test : Inherits TaskParent
         Dim reduction As New Reduction_Basics
         Dim counts(4 - 1) As List(Of Integer)
         Dim mats As New Mat_4to1
@@ -88,7 +88,7 @@ Namespace VBClasses
 
 
     'https://security.stackexchange.com/questions/42428/Is-generating-random-numbers-using-a-smartphone-camera-a-good-idea
-    Public Class Photon_Subtraction : Inherits TaskParent
+    Public Class NR_Photon_Subtraction : Inherits TaskParent
         Dim hist As New Histogram_Basics
         Public Sub New()
             labels = {"", "", "Points where B, G, or R differ", "Histogram showing distribution of differences"}
@@ -117,7 +117,7 @@ Namespace VBClasses
 
 
 
-    Public Class Photon_Distance3D : Inherits TaskParent
+    Public Class NR_Photon_Distance3D : Inherits TaskParent
         Dim hist As New Histogram_Basics
         Dim distances As New List(Of Single)
         Public Sub New()

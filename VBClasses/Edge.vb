@@ -4,15 +4,15 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Edge_Basics : Inherits TaskParent
         Dim canny As Edge_Canny
-        Dim scharr As Edge_Scharr
-        Dim binRed As Edge_BinarizedReduction
+        Dim scharr As NR_Edge_Scharr
+        Dim binRed As NR_Edge_BinarizedReduction
         Dim binSobel As Bin4Way_Sobel
         Dim sobel As Edge_Sobel
-        Dim colorGap As Edge_ColorGap_CPP
+        Dim colorGap As NR_Edge_ColorGap_CPP
         Dim deriche As Edge_Deriche_CPP
         Dim Laplacian As Edge_Laplacian
         Dim resizeAdd As Edge_ResizeAdd
-        Dim regions As Edge_Regions
+        Dim regions As NR_Edge_Regions
         Dim edges As Object
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -24,13 +24,13 @@ Namespace VBClasses
                 saveSelection = task.edgeMethod
                 Select Case task.edgeMethod
                     Case "Binarized Reduction"
-                        edges = New Edge_BinarizedReduction
+                        edges = New NR_Edge_BinarizedReduction
                     Case "Binarized Sobel"
                         edges = New Bin4Way_Sobel
                     Case "Canny"
                         edges = New Edge_Canny
                     Case "Color Gap"
-                        edges = New Edge_ColorGap_CPP
+                        edges = New NR_Edge_ColorGap_CPP
                     Case "Deriche"
                         edges = New Edge_Deriche_CPP
                     Case "Laplacian"
@@ -38,7 +38,7 @@ Namespace VBClasses
                     Case "Resize and Add"
                         edges = New Edge_ResizeAdd
                     Case "Scharr"
-                        edges = New Edge_Scharr
+                        edges = New NR_Edge_Scharr
                     Case "Sobel"
                         edges = New Edge_Sobel
                 End Select
@@ -58,17 +58,17 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_MotionFree : Inherits TaskParent
+    Public Class NR_Edge_MotionFree : Inherits TaskParent
         Dim canny As New Edge_Canny
-        Dim scharr As Edge_Scharr
-        Dim binRed As Edge_BinarizedReduction
+        Dim scharr As NR_Edge_Scharr
+        Dim binRed As NR_Edge_BinarizedReduction
         Dim binSobel As Bin4Way_Sobel
         Dim sobel As Edge_Sobel
-        Dim colorGap As Edge_ColorGap_CPP
+        Dim colorGap As NR_Edge_ColorGap_CPP
         Dim deriche As Edge_Deriche_CPP
         Dim Laplacian As Edge_Laplacian
         Dim resizeAdd As Edge_ResizeAdd
-        Dim regions As Edge_Regions
+        Dim regions As NR_Edge_Regions
         Dim edges As Object
         Public Sub New()
             desc = "Use Radio Buttons to select the different edge algorithms."
@@ -81,15 +81,15 @@ Namespace VBClasses
                     Case "Canny"
                         edges = New Edge_Canny
                     Case "Scharr"
-                        edges = New Edge_Scharr
+                        edges = New NR_Edge_Scharr
                     Case "Binarized Reduction"
-                        edges = New Edge_BinarizedReduction
+                        edges = New NR_Edge_BinarizedReduction
                     Case "Binarized Sobel"
                         edges = New Bin4Way_Sobel
                     Case "Sobel"
                         edges = New Edge_Sobel
                     Case "Color Gap"
-                        edges = New Edge_ColorGap_CPP
+                        edges = New NR_Edge_ColorGap_CPP
                     Case "Deriche"
                         edges = New Edge_Deriche_CPP
                     Case "Laplacian"
@@ -112,7 +112,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_DepthAndColor : Inherits TaskParent
+    Public Class NR_Edge_DepthAndColor : Inherits TaskParent
         Dim shadow As New Depth_Holes
         Dim edges As New Edge_Basics
         Dim dilate As New Dilate_Basics
@@ -140,7 +140,7 @@ Namespace VBClasses
 
 
     'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-    Public Class Edge_Scharr : Inherits TaskParent
+    Public Class NR_Edge_Scharr : Inherits TaskParent
         Dim options As New Options_Edges
         Public Sub New()
             labels(3) = "x field + y field in CV_32F format"
@@ -163,7 +163,7 @@ Namespace VBClasses
 
 
     ' https://www.learnopencvb.com/non-photorealistic-rendering-using-opencv-python-c/
-    Public Class Edge_Preserving : Inherits TaskParent
+    Public Class NR_Edge_Preserving : Inherits TaskParent
         Dim options As New Options_Edges
         Public Sub New()
             labels(3) = "Edge preserving blur for BGR depth image above"
@@ -192,7 +192,7 @@ Namespace VBClasses
 
 
     '  https://docs.opencvb.org/3.1.0/d0/da5/tutorial_ximgproc_prediction.html
-    Public Class Edge_RandomForest_CPP : Inherits TaskParent
+    Public Class NR_Edge_RandomForest_CPP : Inherits TaskParent
         Implements IDisposable
         Dim rgbData() As Byte
         Dim options As New Options_Edges2
@@ -237,7 +237,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_DCTfrequency : Inherits TaskParent
+    Public Class NR_Edge_DCTfrequency : Inherits TaskParent
         Dim options As New Options_Edges2
         Public Sub New()
             labels(3) = "Mask for the isolated frequencies"
@@ -267,7 +267,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_DCTinput : Inherits TaskParent
+    Public Class NR_Edge_DCTinput : Inherits TaskParent
         Dim edges As New Edge_Basics
         Dim dct As New DCT_FeatureLess
         Public Sub New()
@@ -293,7 +293,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_Consistent : Inherits TaskParent
+    Public Class NR_Edge_Consistent : Inherits TaskParent
         Dim edges As New Edge_Basics
         Dim saveFrames As New List(Of cv.Mat)
         Public Sub New()
@@ -323,7 +323,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_BinarizedReduction : Inherits TaskParent
+    Public Class NR_Edge_BinarizedReduction : Inherits TaskParent
         Dim edges As New Bin4Way_Sobel
         Dim reduction As New Reduction_Basics
         Public Sub New()
@@ -344,7 +344,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_BinarizedBrightness : Inherits TaskParent
+    Public Class NR_Edge_BinarizedBrightness : Inherits TaskParent
         Dim edges As New Edge_Basics
         Dim bright As New Brightness_Basics
         Public Sub New()
@@ -371,7 +371,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_SobelLRBinarized : Inherits TaskParent
+    Public Class NR_NF_Edge_SobelLRBinarized : Inherits TaskParent
         Dim edges As New Bin4Way_Sobel
         Public Sub New()
             labels = {"", "", "Horizontal Sobel - Left View", "Horizontal Sobel - Right View"}
@@ -395,7 +395,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_Matching : Inherits TaskParent
+    Public Class NR_Edge_Matching : Inherits TaskParent
         Dim match As New Match_Basics
         Dim redRects As New List(Of Integer)
         Dim options As New Options_EdgeMatching
@@ -500,7 +500,7 @@ Namespace VBClasses
 
 
     ' https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_adapt_rgb.html#sphx-glr-auto-examples-color-exposure-plot-adapt-rgb-py
-    Public Class Edge_HSV : Inherits TaskParent
+    Public Class NR_Edge_HSV : Inherits TaskParent
         Dim edges As New Edge_RGB
         Public Sub New()
             desc = "Combine the edges from all 3 HSV channels"
@@ -519,7 +519,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_SobelLR : Inherits TaskParent
+    Public Class NR_Edge_SobelLR : Inherits TaskParent
         Dim sobel As New Edge_Sobel
         Public Sub New()
             OptionParent.FindSlider("Sobel kernel Size").Value = 3
@@ -541,7 +541,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_ColorGap_CPP : Inherits TaskParent
+    Public Class NR_Edge_ColorGap_CPP : Inherits TaskParent
         Implements IDisposable
         Dim gap As New Edge_ColorGap_VB
         Public Sub New()
@@ -621,7 +621,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_Reduction : Inherits TaskParent
+    Public Class NR_Edge_Reduction : Inherits TaskParent
         Dim reduction As New Reduction_Basics
         Dim edge As New Edge_Basics
         Public Sub New()
@@ -644,7 +644,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_Regions : Inherits TaskParent
+    Public Class NR_Edge_Regions : Inherits TaskParent
         Dim tiers As New Depth_Tiers
         Dim edge As New Edge_Basics
         Public Sub New()
@@ -726,7 +726,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_CannyCombined : Inherits TaskParent
+    Public Class NR_Edge_CannyCombined : Inherits TaskParent
         Dim canny As New Edge_CannyHistory
         Dim edges As New Edge_ResizeAdd
         Public Sub New()
@@ -821,7 +821,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_SobelCustomLeftRight : Inherits TaskParent
+    Public Class NR_Edge_SobelCustomLeftRight : Inherits TaskParent
         Dim custom As New Edge_SobelCustom
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -847,7 +847,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_Projection : Inherits TaskParent
+    Public Class NR_Edge_Projection : Inherits TaskParent
         Dim valley As New HistValley_OptionsAuto
         Dim canny As New Edge_Basics
         Public Sub New()
@@ -878,7 +878,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_RedCloud : Inherits TaskParent
+    Public Class NR_Edge_RedCloud : Inherits TaskParent
         Dim canny As New Edge_Basics
         Public mats As New Mat_4Click
         Public Sub New()
@@ -908,7 +908,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_Color8U : Inherits TaskParent
+    Public Class NR_Edge_Color8U : Inherits TaskParent
         Public colorMethods(10 - 1)
         Dim canny As New Edge_Basics
         Dim options As New Options_ColorMethod
@@ -1002,7 +1002,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_CloudSegments : Inherits TaskParent
+    Public Class NR_Edge_CloudSegments : Inherits TaskParent
         Dim segments As New Histogram_CloudSegments
         Dim edges As New Edge_Sobel
         Public Sub New()
@@ -1111,7 +1111,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_DiffXYZ : Inherits TaskParent
+    Public Class NR_Edge_DiffXYZ : Inherits TaskParent
         Dim diffX As New Edge_DiffX_CPP
         Dim diffY As New Edge_DiffY_CPP
         Dim diffZ As New Edge_DiffZ_CPP
@@ -1144,7 +1144,7 @@ Namespace VBClasses
 
 
     'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-    Public Class Edge_LaplacianColor : Inherits TaskParent
+    Public Class NR_Edge_LaplacianColor : Inherits TaskParent
         Dim options As New Options_LaplacianKernels
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -1186,7 +1186,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_Sweep : Inherits TaskParent
+    Public Class NR_Edge_Sweep : Inherits TaskParent
         Dim edges As New Edge_Basics
         Public Sub New()
             desc = "Sweep through the various edge algorithms"
@@ -1247,7 +1247,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_DericheFiltered : Inherits TaskParent
+    Public Class NR_Edge_DericheFiltered : Inherits TaskParent
         Dim deriche As New Edge_Deriche_CPP
         Public Sub New()
             desc = "Filter the data from the Deriche algorithm to highlight the edges."
@@ -1268,7 +1268,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_MeanSubtraction : Inherits TaskParent
+    Public Class NR_Edge_MeanSubtraction : Inherits TaskParent
         Dim canny As New Edge_Canny
         Dim LRMeanSub As New MeanSubtraction_Basics
         Public Sub New()
@@ -1289,7 +1289,7 @@ Namespace VBClasses
 
 
     'https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-    Public Class Edge_SobelQT : Inherits TaskParent
+    Public Class NR_Edge_SobelQT : Inherits TaskParent
         Public Sub New()
             desc = "Show Sobel vertical and horizontal edge detection no options."
         End Sub
@@ -1370,7 +1370,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_NoDepth : Inherits TaskParent
+    Public Class NR_Edge_NoDepth : Inherits TaskParent
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -1393,7 +1393,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_CloudData : Inherits TaskParent
+    Public Class NR_Edge_CloudData : Inherits TaskParent
         Dim prep As New RedPrep_ReductionChoices
         Dim edges As New Edge_Basics
         Public Sub New()
@@ -1414,7 +1414,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_Stability : Inherits TaskParent
+    Public Class NR_Edge_Stability : Inherits TaskParent
         Dim gEdges As New Brick_EdgeFlips
         Public Sub New()
             desc = "Measure the stability of edges in each grid Rect"
@@ -1461,7 +1461,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_LeftRightDepth : Inherits TaskParent
+    Public Class NR_Edge_LeftRightDepth : Inherits TaskParent
         Dim edgesLR As New Edge_LeftRight
         Public ptLeft As New List(Of cv.Point)
         Public ptRight As New List(Of cv.Point)
@@ -1511,7 +1511,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_LeftRightBrick : Inherits TaskParent
+    Public Class NR_Edge_LeftRightBrick : Inherits TaskParent
         Dim edgesLR As New Edge_LeftRight
         Public means As New List(Of Single)
         Public Sub New()
@@ -1559,7 +1559,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_CannyMin : Inherits TaskParent
+    Public Class NR_Edge_CannyMin : Inherits TaskParent
         Dim canny As New Edge_Canny
         Public Sub New()
             OptionParent.FindSlider("Canny threshold1").Value = 200
@@ -1602,7 +1602,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_CannyLeftRight : Inherits TaskParent
+    Public Class NR_Edge_CannyLeftRight : Inherits TaskParent
         Dim canny As New Edge_Canny
         Public Sub New()
             OptionParent.FindSlider("Canny threshold1").Value = 200
@@ -1642,7 +1642,7 @@ Namespace VBClasses
 
 
 
-    Public Class Edge_MotionFrames : Inherits TaskParent
+    Public Class NR_Edge_MotionFrames : Inherits TaskParent
         Dim edges As New Edge_Basics
         Dim frames As New History_Basics
         Dim diff As New Diff_Basics

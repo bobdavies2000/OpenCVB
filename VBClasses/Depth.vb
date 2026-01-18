@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
 Namespace VBClasses
-    Public Class Depth_Basics : Inherits TaskParent
+    Public Class NR_Depth_Basics : Inherits TaskParent
         Public Sub New()
             desc = "Colorize the depth data into task.depthRGB"
         End Sub
@@ -23,7 +23,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_Display : Inherits TaskParent
+    Public Class NR_Depth_Display : Inherits TaskParent
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -44,7 +44,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_FirstLastDistance : Inherits TaskParent
+    Public Class NR_Depth_FirstLastDistance : Inherits TaskParent
         Public Sub New()
             desc = "Monitor the first and last depth distances"
         End Sub
@@ -74,7 +74,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_HolesRect : Inherits TaskParent
+    Public Class NR_Depth_HolesRect : Inherits TaskParent
         Dim shadow As New Depth_Holes
         Public Sub New()
             labels(2) = "The 10 largest contours in the depth holes."
@@ -108,7 +108,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_MeanStdevPlot : Inherits TaskParent
+    Public Class NR_Depth_MeanStdevPlot : Inherits TaskParent
         Dim plot1 As New Plot_OverTimeSingle
         Dim plot2 As New Plot_OverTimeSingle
         Public Sub New()
@@ -135,7 +135,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_Uncertainty : Inherits TaskParent
+    Public Class NR_Depth_Uncertainty : Inherits TaskParent
         Dim retina As New Retina_Basics_CPP
         Dim options As New Options_Uncertainty
         Public Sub New()
@@ -157,7 +157,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_LocalMinMax_MT : Inherits TaskParent
+    Public Class NR_Depth_LocalMinMax_MT : Inherits TaskParent
         Public minPoint(0) As cv.Point2f
         Public maxPoint(0) As cv.Point2f
         Public Sub New()
@@ -244,7 +244,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_Median : Inherits TaskParent
+    Public Class NR_Depth_Median : Inherits TaskParent
         Dim median As New Math_Median_CDF
         Public Sub New()
             median.rangeMax = task.MaxZmeters
@@ -337,7 +337,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_HolesOverTime : Inherits TaskParent
+    Public Class NR_Depth_HolesOverTime : Inherits TaskParent
         Dim images As New List(Of cv.Mat)
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -404,7 +404,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_Dilate : Inherits TaskParent
+    Public Class NR_Depth_Dilate : Inherits TaskParent
         Dim dilate As New Dilate_Basics
         Public Sub New()
             desc = "Dilate the depth data to fill holes."
@@ -422,7 +422,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_ForegroundHead : Inherits TaskParent
+    Public Class NR_Depth_ForegroundHead : Inherits TaskParent
         Dim fgnd As New Depth_ForegroundBlob
         Public trustedRect As cv.Rect
         Public trustworthy As Boolean
@@ -467,7 +467,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_RGBShadow : Inherits TaskParent
+    Public Class NR_Depth_RGBShadow : Inherits TaskParent
         Public Sub New()
             desc = "Merge the BGR and Depth Shadow"
         End Sub
@@ -483,7 +483,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_BGSubtract : Inherits TaskParent
+    Public Class NR_Depth_BGSubtract : Inherits TaskParent
         Dim bgSub As New BGSubtract_Basics
         Public Sub New()
             labels = {"", "", "Latest task.noDepthMask", "BGSubtract output for the task.noDepthMask"}
@@ -506,7 +506,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_MaxMask : Inherits TaskParent
+    Public Class NR_Depth_MaxMask : Inherits TaskParent
         Dim contour As New Contour_Regions
         Public Sub New()
             labels = {"", "", "Depth that is too far", "Contour of depth that is too far..."}
@@ -531,7 +531,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_ForegroundOverTime : Inherits TaskParent
+    Public Class NR_Depth_ForegroundOverTime : Inherits TaskParent
         Dim options As New Options_ForeGround
         Dim fore As New Depth_Foreground
         Dim contours As New Contour_Largest
@@ -722,7 +722,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_Regions : Inherits TaskParent
+    Public Class NR_Depth_Regions : Inherits TaskParent
         Public classCount As Integer = 5
         Public Sub New()
             desc = "Separate the scene into a specified number of regions by depth"
@@ -746,7 +746,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_Colorizer_VB : Inherits TaskParent
+    Public Class NR_Depth_Colorizer_VB : Inherits TaskParent
         Dim nearColor = cv.Scalar.Yellow
         Dim farColor = cv.Scalar.Blue
         Public Sub New()
@@ -777,7 +777,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_PunchIncreasing : Inherits TaskParent
+    Public Class NR_Depth_PunchIncreasing : Inherits TaskParent
         Public depth As New Depth_PunchDecreasing
         Public Sub New()
             depth.Increasing = True
@@ -830,7 +830,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_Contour : Inherits TaskParent
+    Public Class NR_Depth_Contour : Inherits TaskParent
         Dim contour As New Contour_Regions
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -884,7 +884,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_StableAverage : Inherits TaskParent
+    Public Class NR_Depth_StableAverage : Inherits TaskParent
         Dim dAvg As New DepthColorizer_Mean
         Dim extrema As New Depth_StableMinMax
         Public Sub New()
@@ -1016,7 +1016,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_Flatland : Inherits TaskParent
+    Public Class NR_Depth_Flatland : Inherits TaskParent
         Dim options As New Options_FlatLand
         Public Sub New()
             labels(3) = "Grayscale version"
@@ -1067,7 +1067,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_MinMaxNone : Inherits TaskParent
+    Public Class NR_Depth_MinMaxNone : Inherits TaskParent
         Public options As New Options_MinMaxNone
         Dim filtered As Integer
         Public Sub New()
@@ -1106,7 +1106,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_InfinityCheck : Inherits TaskParent
+    Public Class NR_Depth_InfinityCheck : Inherits TaskParent
         Public Sub New()
             desc = "Check the pointcloud depth for infinities"
         End Sub
@@ -1156,7 +1156,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_ColorizerOld : Inherits TaskParent
+    Public Class NR_Depth_ColorizerOld : Inherits TaskParent
         Dim customColorMap As cv.Mat
         Dim gColor As New Gradient_Color
         Public Sub New()
@@ -1210,7 +1210,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_CellTiers : Inherits TaskParent
+    Public Class NR_Depth_CellTiers : Inherits TaskParent
         Public valley As New HistValley_Count
         Public Sub New()
             desc = "Find the number of valleys (tiers) in a RedCloud cell."
@@ -1244,7 +1244,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_ErrorEstimate : Inherits TaskParent
+    Public Class NR_Depth_ErrorEstimate : Inherits TaskParent
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32F)
@@ -1278,7 +1278,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_MinMaxToVoronoi : Inherits TaskParent
+    Public Class NR_Depth_MinMaxToVoronoi : Inherits TaskParent
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.kalman = New Kalman_Basics
@@ -1327,7 +1327,7 @@ Namespace VBClasses
 
 
 
-    Public Class Depth_WorldXYMT : Inherits TaskParent
+    Public Class NR_Depth_WorldXYMT : Inherits TaskParent
         Public depthUnitsMeters = False
         Public Sub New()
             labels(3) = "dst3 = pointcloud"

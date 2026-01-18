@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class LinearRegression_Basics : Inherits TaskParent
         Public x As New List(Of Single)
@@ -43,7 +43,7 @@ Namespace VBClasses
 
 
 
-    Public Class LinearRegression_Test : Inherits TaskParent
+    Public Class NR_LinearRegression_Test : Inherits TaskParent
         Dim regress As New LinearRegression_Basics
         Public Sub New()
             desc = "A simple example of using OpenCV's linear regression."
@@ -70,7 +70,7 @@ Namespace VBClasses
 
 
 
-    Public Class LinearRegression_Random : Inherits TaskParent
+    Public Class NR_LinearRegression_Random : Inherits TaskParent
         Dim regress As New LinearRegression_Basics
         Dim random As New Random_Basics
         Public Sub New()

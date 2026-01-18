@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
-    Public Class PhotoShop_Clahe : Inherits TaskParent
+    Public Class NR_PhotoShop_Clahe : Inherits TaskParent
         ' Contrast Limited Adaptive Histogram Equalization (CLAHE) : Inherits TaskParent
         Public Sub New()
             If sliders.Setup(traceName) Then
@@ -48,7 +48,7 @@ Namespace VBClasses
 
 
 
-    Public Class PhotoShop_AlphaBeta : Inherits TaskParent
+    Public Class NR_PhotoShop_AlphaBeta : Inherits TaskParent
         Public Sub New()
             desc = "Use alpha and beta with ConvertScaleAbs."
             If sliders.Setup(traceName) Then
@@ -96,7 +96,7 @@ Namespace VBClasses
 
 
     ' https://blog.csdn.net/just_sort/article/details/85982871
-    Public Class PhotoShop_WhiteBalancePlot : Inherits TaskParent
+    Public Class NR_PhotoShop_WhiteBalancePlot : Inherits TaskParent
         Dim hist As New Histogram_Graph
         Dim whiteCPP As New PhotoShop_WhiteBalance
         Public Sub New()
@@ -170,7 +170,7 @@ Namespace VBClasses
 
 
     ' https://blog.csdn.net/just_sort/article/details/85982871
-    Public Class PhotoShop_PlotHist : Inherits TaskParent
+    Public Class NR_PhotoShop_PlotHist : Inherits TaskParent
         Dim whiteBal As New PhotoShop_ChangeMask
         Public hist1 As New Histogram_Basics
         Public hist2 As New Histogram_Basics
@@ -205,7 +205,7 @@ Namespace VBClasses
 
 
     ' https://github.com/spmallick/learnopencv/tree/master/
-    Public Class PhotoShop_Sepia : Inherits TaskParent
+    Public Class NR_PhotoShop_Sepia : Inherits TaskParent
         Public Sub New()
             desc = "Create a sepia image"
         End Sub
@@ -257,7 +257,7 @@ Namespace VBClasses
             Dim kernel = kernelGenerator(sizeSlider.Value)
 
             Dim direction As Integer
-            Static frm = OptionParent.findFrm(traceName + " Radio Buttons")
+            Static frm = OptionParent.FindFrm(traceName + " Radio Buttons")
             For direction = 0 To frm.check.Count - 1
                 If frm.check(direction).Checked Then Exit For
             Next
@@ -285,7 +285,7 @@ Namespace VBClasses
 
 
     ' https://github.com/spmallick/learnopencv/tree/master/
-    Public Class PhotoShop_EmbossAll : Inherits TaskParent
+    Public Class NR_PhotoShop_EmbossAll : Inherits TaskParent
         Dim emboss As New PhotoShop_Emboss
         Dim mats As New Mat_4to1
         Dim sizeSlider As TrackBar
@@ -341,7 +341,7 @@ Namespace VBClasses
 
 
     ' https://github.com/spmallick/learnopencv/tree/master/
-    Public Class PhotoShop_DuoTone : Inherits TaskParent
+    Public Class NR_PhotoShop_DuoTone : Inherits TaskParent
         Dim options As New Options_Photoshop
         Public Sub New()
 
@@ -361,7 +361,7 @@ Namespace VBClasses
             desc = "Create a DuoTone image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static duoCheck = OptionParent.findCheckBox("DuoTone Dark if checked, Light otherwise")
+            Static duoCheck = OptionParent.FindCheckBox("DuoTone Dark if checked, Light otherwise")
             options.Run()
             Static expSlider = OptionParent.FindSlider("DuoTone Exponent")
             Dim exp = 1 + expSlider.Value / 100
@@ -375,7 +375,7 @@ Namespace VBClasses
             Dim split = src.Split()
 
             Dim switch1 As Integer
-            Static frm = OptionParent.findFrm(traceName + " Radio Buttons")
+            Static frm = OptionParent.FindFrm(traceName + " Radio Buttons")
             For switch1 = 0 To frm.check.Count - 1
                 If frm.check(switch1).Checked Then Exit For
             Next
@@ -398,7 +398,7 @@ Namespace VBClasses
 
 
 
-    Public Class PhotoShop_UnsharpMask : Inherits TaskParent
+    Public Class NR_PhotoShop_UnsharpMask : Inherits TaskParent
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("sigma", 1, 2000, 100)
@@ -433,7 +433,7 @@ Namespace VBClasses
 
 
     ' https://www.learnopencvb.com/non-photorealistic-rendering-using-opencv-python-c/
-    Public Class PhotoShop_SharpenStylize : Inherits TaskParent
+    Public Class NR_PhotoShop_SharpenStylize : Inherits TaskParent
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Stylize Sigma_s", 0, 200, 60)
@@ -479,7 +479,7 @@ Namespace VBClasses
 
 
     ' https://cppsecrets.com/users/2582658986657266505064717765737646677977/Convert-photo-to-sketch-using-python.php?fbclid=IwAR3pOtiqxeOPiqouii7tmN9Q7yA5vG4dFdXGqA0XgZqcMB87w5a1PEMzGOw
-    Public Class PhotoShop_Pencil_Manual : Inherits TaskParent
+    Public Class NR_PhotoShop_Pencil_Manual : Inherits TaskParent
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Blur kernel size", 2, 100, 10)
@@ -503,7 +503,7 @@ Namespace VBClasses
             cv.Cv2.Divide(src, 255 - blur, dst2, 256)
 
             Dim index As Integer = -1
-            Static frm = OptionParent.findFrm(traceName + " Radio Buttons")
+            Static frm = OptionParent.FindFrm(traceName + " Radio Buttons")
             For index = 0 To frm.check.Count - 1
                 If radio.check(index).Checked Then Exit For
             Next
@@ -518,7 +518,7 @@ Namespace VBClasses
 
 
 
-    Public Class PhotoShop_Vignetting : Inherits TaskParent
+    Public Class NR_PhotoShop_Vignetting : Inherits TaskParent
         Dim vignet As New Vignetting_Basics
         Public Sub New()
             labels(2) = "Vignetted image.  Click anywhere to establish a different center."

@@ -70,7 +70,7 @@ Namespace VBClasses
 
 
     ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
-    Public Class IMU_BasicsKalman : Inherits TaskParent
+    Public Class NR_IMU_BasicsKalman : Inherits TaskParent
         Dim lastTimeStamp As Double
         Public Sub New()
             task.kalman = New Kalman_Basics
@@ -122,7 +122,7 @@ Namespace VBClasses
 
 
     ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
-    Public Class IMU_BasicsWithOptions : Inherits TaskParent
+    Public Class NR_IMU_BasicsWithOptions : Inherits TaskParent
         Dim lastTimeStamp As Double
         Dim options As New Options_IMU
         Public Sub New()
@@ -316,7 +316,7 @@ Namespace VBClasses
 
 
 
-    Public Class IMU_Stabilize : Inherits TaskParent
+    Public Class NR_IMU_Stabilize : Inherits TaskParent
         Public Sub New()
             task.kalman = New Kalman_Basics
             ReDim task.kalman.kInput(3 - 1)
@@ -451,7 +451,7 @@ Namespace VBClasses
 
 
 
-    Public Class IMU_PlotTotalDelay : Inherits TaskParent
+    Public Class NR_IMU_PlotTotalDelay : Inherits TaskParent
         Dim host As New IMU_PlotHostFrameTimes
         Dim imu As New IMU_PlotIMUFrameTime
         Dim plot As New Plot_OverTime
@@ -520,7 +520,7 @@ Namespace VBClasses
 
 
 
-    Public Class IMU_VerticalAngles : Inherits TaskParent
+    Public Class NR_IMU_VerticalAngles : Inherits TaskParent
         Dim vert As New XO_Line_GCloud
         Public Sub New()
             labels = {"", "", "Highlighted vertical lines", "Line details"}
@@ -555,7 +555,7 @@ Namespace VBClasses
 
 
 
-    Public Class IMU_PlotGravityAngles : Inherits TaskParent
+    Public Class NR_IMU_PlotGravityAngles : Inherits TaskParent
         Dim plot As New Plot_OverTimeScalar
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -582,7 +582,7 @@ Namespace VBClasses
 
 
 
-    Public Class IMU_PlotAngularVelocity : Inherits TaskParent
+    Public Class NR_IMU_PlotAngularVelocity : Inherits TaskParent
         Dim plot As New Plot_OverTimeScalar
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -609,7 +609,7 @@ Namespace VBClasses
 
 
 
-    Public Class IMU_Lines : Inherits TaskParent
+    Public Class NR_IMU_Lines : Inherits TaskParent
         Dim vert As New XO_Line_GCloud
         Dim lastGcell As gravityLine
         Public Sub New()
@@ -663,7 +663,7 @@ Namespace VBClasses
 
 
 
-    Public Class IMU_PlotAcceleration : Inherits TaskParent
+    Public Class NR_IMU_PlotAcceleration : Inherits TaskParent
         Dim plot As New Plot_OverTimeScalar
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -711,7 +711,7 @@ Namespace VBClasses
 
 
 
-    Public Class IMU_PlotCompareIMU : Inherits TaskParent
+    Public Class NR_IMU_PlotCompareIMU : Inherits TaskParent
         Dim plot(3 - 1) As Plot_OverTimeScalar
         Dim imuAll As New IMU_AllMethods
         Public Sub New()
@@ -811,7 +811,7 @@ Namespace VBClasses
 
 
 
-    Public Class IMU_VelocityPlot : Inherits TaskParent
+    Public Class NR_IMU_VelocityPlot : Inherits TaskParent
         Dim plot As New IMU_Plot
         Public Sub New()
             If standalone Then task.gOptions.displaydst1.checked = True
@@ -846,7 +846,7 @@ Namespace VBClasses
 
 
 
-    Public Class IMU_IscameraStable : Inherits TaskParent
+    Public Class NR_IMU_IscameraStable : Inherits TaskParent
         Dim plot As New IMU_Plot
         Dim options As New Options_IMU
         Public Sub New()
@@ -953,7 +953,7 @@ Namespace VBClasses
 
 
 
-    Public Class IMU_PlotHostFrameScalar : Inherits TaskParent
+    Public Class NR_IMU_PlotHostFrameScalar : Inherits TaskParent
         Public plot As New Plot_OverTimeScalar
         Public CPUInterval As Double
         Public HostInterruptDelayEstimate As Double

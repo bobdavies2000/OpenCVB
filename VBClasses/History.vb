@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class History_Basics : Inherits TaskParent
         Public saveFrames As New List(Of cv.Mat)
@@ -40,7 +40,7 @@ Namespace VBClasses
 
 
 
-    Public Class History_Cloud : Inherits TaskParent
+    Public Class NR_History_Cloud : Inherits TaskParent
         Public frames As New History_BasicsNoSaturation
         Dim saveFrames As New List(Of cv.Mat)
         Public Sub New()
@@ -63,7 +63,7 @@ Namespace VBClasses
             dst3 = src + dst3
             dst2 = dst3 / saveFrames.Count
 
-            frames.Run(task.depthMask)
+            frames.Run(task.depthmask)
             dst2.SetTo(0, Not frames.dst2)
         End Sub
     End Class
@@ -107,7 +107,7 @@ Namespace VBClasses
 
 
 
-    Public Class History_BasicsDiff : Inherits TaskParent
+    Public Class NR_History_BasicsDiff : Inherits TaskParent
         Dim frames As New History_BasicsNoSaturation
         Dim diff As New Diff_Basics
         Public Sub New()
@@ -160,7 +160,7 @@ Namespace VBClasses
                 dst2 = dst2 Or m
             Next
 
-            If task.settings.algorithm = traceName Then
+            If task.Settings.algorithm = traceName Then
                 For i = 0 To Math.Min(saveFrames.Count, 4) - 1
                     mats.mat(i) = saveFrames(i).Clone
                 Next

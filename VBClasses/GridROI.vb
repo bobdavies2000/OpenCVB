@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class GridROI_Basics : Inherits TaskParent
         Public rects As New List(Of cv.Rect)
@@ -49,7 +49,7 @@ Namespace VBClasses
 
 
 
-    Public Class GridROI_Color : Inherits TaskParent
+    Public Class NR_GridROI_Color : Inherits TaskParent
         Public Sub New()
             task.gOptions.GridSlider.Value = dst2.Width \ 40 ' arbitrary but the goal is to get a reasonable (< 500) number of roi's.
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -169,7 +169,7 @@ Namespace VBClasses
 
 
 
-    Public Class GridROI_ColorSplit : Inherits TaskParent
+    Public Class NR_NF_GridROI_ColorSplit : Inherits TaskParent
         Dim devGrid As New GridROI_Sorted
         Public Sub New()
             devGrid.maskVal = 255
@@ -201,7 +201,7 @@ Namespace VBClasses
 
 
 
-    Public Class GridROI_CorrelationMotion : Inherits TaskParent
+    Public Class NR_GridROI_CorrelationMotion : Inherits TaskParent
         Public gather As New GridROI_Basics
         Dim plot As New Plot_OverTimeSingle
         Dim options As New Options_Features
@@ -272,7 +272,7 @@ Namespace VBClasses
 
 
 
-    Public Class GridROI_LowStdevCorrelation : Inherits TaskParent
+    Public Class NR_GridROI_LowStdevCorrelation : Inherits TaskParent
         Dim gather As New GridROI_LowStdev
         Dim correlations As New List(Of Single)
         Dim options As New Options_Features
@@ -324,7 +324,7 @@ Namespace VBClasses
 
 
 
-    Public Class GridROI_LR : Inherits TaskParent
+    Public Class NR_GridROI_LR : Inherits TaskParent
         Public gLeft As New GridROI_Basics
         Public gRight As New GridROI_Basics
         Public Sub New()
@@ -346,7 +346,7 @@ Namespace VBClasses
 
 
 
-    Public Class GridROI_LRClick : Inherits TaskParent
+    Public Class NR_NF_GridROI_LRClick : Inherits TaskParent
         Dim gather As New GridROI_Basics
         Dim ClickPoint As cv.Point, picTag As Integer
         Dim options As New Options_Features
@@ -425,7 +425,7 @@ Namespace VBClasses
 
 
 
-    Public Class GridROI_LRAll : Inherits TaskParent
+    Public Class NR_NF_GridROI_LRAll : Inherits TaskParent
         Dim gather As New GridROI_Basics
         Dim options As New Options_Features
         Public sortedRects As New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
@@ -491,7 +491,7 @@ Namespace VBClasses
 
 
 
-    Public Class GridROI_Sobel : Inherits TaskParent
+    Public Class NR_GridROI_Sobel : Inherits TaskParent
         Dim edges As New GridROI_Canny
         Dim sobel As New Edge_Sobel
         Public Sub New()

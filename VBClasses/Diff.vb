@@ -139,7 +139,7 @@ Namespace VBClasses
 
 
 
-    Public Class Diff_Identical : Inherits TaskParent
+    Public Class NR_Diff_Identical : Inherits TaskParent
         Dim diffColor As New Diff_Color
         Dim noMotionFrames As Integer
         Dim flowText As New List(Of String)

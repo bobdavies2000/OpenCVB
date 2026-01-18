@@ -37,7 +37,7 @@ Namespace VBClasses
 
 
 
-    Public Class Palette_Color : Inherits TaskParent
+    Public Class NR_Palette_Color : Inherits TaskParent
         Dim options As New Options_Colors
         Public Sub New()
             desc = "Define a color Using sliders."
@@ -58,7 +58,7 @@ Namespace VBClasses
 
 
 
-    Public Class Palette_LinearPolar : Inherits TaskParent
+    Public Class NR_Palette_LinearPolar : Inherits TaskParent
         Public rotateOptions As New Options_Resize
         Dim pt = New cv.Point2f(msRNG.Next(0, dst2.Cols - 1), msRNG.Next(0, dst2.Rows - 1))
         Public Sub New()
@@ -92,7 +92,7 @@ Namespace VBClasses
 
 
 
-    Public Class Palette_Reduction : Inherits TaskParent
+    Public Class NR_Palette_Reduction : Inherits TaskParent
         Dim reduction As New Reduction_Basics
         Public Sub New()
             desc = "Map colors To different palette"
@@ -109,7 +109,7 @@ Namespace VBClasses
 
 
 
-    Public Class Palette_DrawTest : Inherits TaskParent
+    Public Class NR_Palette_DrawTest : Inherits TaskParent
         Dim draw As New Draw_Shapes
         Public Sub New()
             desc = "Experiment With palette Using a drawn image"
@@ -124,7 +124,7 @@ Namespace VBClasses
 
 
 
-    Public Class Palette_Gradient : Inherits TaskParent
+    Public Class NR_Palette_Gradient : Inherits TaskParent
         Public color1 As cv.Scalar
         Public color2 As cv.Scalar
         Public Sub New()
@@ -156,7 +156,7 @@ Namespace VBClasses
 
 
 
-    Public Class Palette_DepthColorMap : Inherits TaskParent
+    Public Class NR_Palette_DepthColorMap : Inherits TaskParent
         Public gradientColorMap As New cv.Mat
         Dim gColor As New Gradient_Color
         Public Sub New()
@@ -205,11 +205,11 @@ Namespace VBClasses
 
 
 
-    Public Class Palette_RGBDepth : Inherits TaskParent
+    Public Class NR_Palette_RGBDepth : Inherits TaskParent
         Dim gradientColorMap As New cv.Mat
         Dim gColor As New Gradient_Color
         Public Sub New()
-            desc = "Build a colormap that best shows the depth.  NOTE: duplicate of Palette_DepthColorMap but no slider."
+            desc = "Build a colormap that best shows the depth.  NOTE: duplicate of NR_Palette_DepthColorMap but no slider."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.optionsChanged Then
@@ -229,7 +229,7 @@ Namespace VBClasses
                 gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
             End If
 
-            Dim sliderVal = If(task.settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i", 50, 80)
+            Dim sliderVal = If(task.Settings.cameraName = "Intel(R) RealSense(TM) Depth Camera 435i", 50, 80)
             Dim depth8u = task.pcSplit(2).ConvertScaleAbs(sliderVal)
             Dim ColorMap = cv.Mat.FromPixelData(256, 1, cv.MatType.CV_8UC3, gradientColorMap.Data())
             cv.Cv2.ApplyColorMap(depth8u, dst2, ColorMap)
@@ -242,7 +242,7 @@ Namespace VBClasses
 
 
 
-    Public Class Palette_Layout2D : Inherits TaskParent
+    Public Class NR_Palette_Layout2D : Inherits TaskParent
         Public Sub New()
             desc = "Layout the available colors in a 2D grid"
         End Sub
@@ -252,7 +252,7 @@ Namespace VBClasses
                 dst2(r).SetTo(task.scalarColors(index Mod 256))
                 index += 1
             Next
-            labels(2) = "Palette_Layout2D - " + CStr(task.gridRects.Count) + " regions"
+            labels(2) = "NF_Palette_Layout2D - " + CStr(task.gridRects.Count) + " regions"
         End Sub
     End Class
 
@@ -263,7 +263,7 @@ Namespace VBClasses
 
 
 
-    Public Class Palette_LeftRightImages : Inherits TaskParent
+    Public Class NR_Palette_LeftRightImages : Inherits TaskParent
         Public Sub New()
             desc = "Use a palette with the left and right images."
         End Sub
@@ -272,7 +272,7 @@ Namespace VBClasses
             dst3 = PaletteFull(task.rightView.ConvertScaleAbs)
         End Sub
     End Class
-    Public Class Palette_TaskColors : Inherits TaskParent
+    Public Class NR_Palette_TaskColors : Inherits TaskParent
         Dim direction = 1
         Public Sub New()
             labels = {"", "", "ScalarColors", "VecColors"}
@@ -298,7 +298,7 @@ Namespace VBClasses
 
 
 
-    Public Class Palette_Create : Inherits TaskParent
+    Public Class NR_Palette_Create : Inherits TaskParent
         Dim schemes() As FileInfo
         Dim schemeName As String
         Dim colorGrad As New cv.Mat
@@ -474,7 +474,7 @@ Namespace VBClasses
 
 
 
-    Public Class Palette_GrayToColor : Inherits TaskParent
+    Public Class NR_Palette_GrayToColor : Inherits TaskParent
         Public Sub New()
             desc = "Build a palette for the current image using samples from each gray level.  Everything turns out sepia-like."
         End Sub
@@ -514,7 +514,7 @@ Namespace VBClasses
 
 
 
-    Public Class Palette_Bin4Way : Inherits TaskParent
+    Public Class NR_Palette_Bin4Way : Inherits TaskParent
         Dim binary As New Bin4Way_SplitMean
         Dim tiers As New Depth_Tiers
         Public classCount As Integer
@@ -627,7 +627,7 @@ Namespace VBClasses
 
 
 
-    Public Class Palette_RandomWithBlack : Inherits TaskParent
+    Public Class NR_Palette_RandomWithBlack : Inherits TaskParent
         Public whitebackground As Boolean
         Public colorMap As New cv.Mat
         Public Sub New()

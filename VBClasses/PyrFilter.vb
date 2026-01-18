@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 'http://study.marearts.com/2014/12/opencv-meanshiftfiltering-example.html
 Namespace VBClasses
     Public Class PyrFilter_Basics : Inherits TaskParent
@@ -18,7 +18,7 @@ Namespace VBClasses
 
 
 
-    Public Class PyrFilter_RedCloud : Inherits TaskParent
+    Public Class NR_PyrFilter_RedCloud : Inherits TaskParent
         Dim reduction As New Reduction_Basics
         Dim pyr As New PyrFilter_Basics
         Public Sub New()

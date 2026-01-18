@@ -1,6 +1,6 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class Quad_RightView : Inherits TaskParent
+    Public Class NR_Quad_RightView : Inherits TaskParent
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Create a grayscale low resolution quad view of the right image."
@@ -20,7 +20,7 @@ Namespace VBClasses
 
 
 
-    Public Class Quad_MinMax : Inherits TaskParent
+    Public Class NR_Quad_MinMax : Inherits TaskParent
         Public quadData As New List(Of cv.Point3f)
         Public depthList1 As New List(Of List(Of Single))
         Public depthList2 As New List(Of List(Of Single))
@@ -112,7 +112,7 @@ Namespace VBClasses
 
 
 
-    Public Class Quad_Hulls : Inherits TaskParent
+    Public Class NR_Quad_Hulls : Inherits TaskParent
         Public quadData As New List(Of cv.Point3f)
         Public depthList As New List(Of List(Of Single))
         Public colorList As New List(Of cv.Scalar)
@@ -189,7 +189,7 @@ Namespace VBClasses
 
 
 
-    Public Class Quad_Bricks : Inherits TaskParent
+    Public Class NR_Quad_Bricks : Inherits TaskParent
         Public quadData As New List(Of cv.Point3f)
         Public depths As New List(Of Single)
         Public options As New Options_OpenGLFunctions
@@ -291,7 +291,7 @@ Namespace VBClasses
 
 
 
-    Public Class Quad_Boundaries : Inherits TaskParent
+    Public Class NR_Quad_Boundaries : Inherits TaskParent
         Dim options As New Options_Features
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics

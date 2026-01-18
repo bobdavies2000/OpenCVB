@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Disparity_Basics : Inherits TaskParent
         Dim match As New Match_Basics
@@ -58,7 +58,7 @@ Namespace VBClasses
 
 
 
-    Public Class Disparity_Edges : Inherits TaskParent
+    Public Class NR_Disparity_Edges : Inherits TaskParent
         Dim disparity As New Disparity_Basics
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
@@ -86,7 +86,7 @@ Namespace VBClasses
 
 
 
-    Public Class Disparity_Validate : Inherits TaskParent
+    Public Class NR_Disparity_Validate : Inherits TaskParent
         Dim disparity As New Disparity_Basics
         Public Sub New()
             dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -112,7 +112,7 @@ Namespace VBClasses
 
 
 
-    Public Class Disparity_RedMask : Inherits TaskParent
+    Public Class NR_Disparity_RedMask : Inherits TaskParent
         Dim disparity As New Disparity_Basics
         Dim leftCells As New LeftRight_RedLeftGray
         Dim rightCells As New LeftRight_RedRightGray
@@ -155,7 +155,7 @@ Namespace VBClasses
 
     ' Z = 0.5 * 1000 / 100 = 5 meters
     ' The Function() relating depth To disparity Is only valid For a calibrated stereo setup.
-    Public Class Disparity_Inverse : Inherits TaskParent
+    Public Class NR_Disparity_Inverse : Inherits TaskParent
         Public Sub New()
             task.drawRect = New cv.Rect(dst2.Width / 2 - 10, dst2.Height / 2 - 10, 20, 20)
             desc = "Use the depth to find the disparity"
@@ -188,7 +188,7 @@ Namespace VBClasses
 
 
 
-    Public Class Disparity_Color8u : Inherits TaskParent
+    Public Class NR_Disparity_Color8u : Inherits TaskParent
         Dim color8u As New Color8U_LeftRight
         Dim disparity As New Disparity_Basics
         Public Sub New()

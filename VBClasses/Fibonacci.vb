@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
 Namespace VBClasses
-    Public Class Fibonacci_Basics : Inherits TaskParent
+    Public Class NR_Fibonacci_Basics : Inherits TaskParent
         Dim flow As New Font_FlowText
         Dim a As Double = 0, b As Double = 1
         Public Sub New()
@@ -27,7 +27,7 @@ Namespace VBClasses
 
 
     ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
-    Public Class Fibonacci_Yield : Inherits TaskParent
+    Public Class NR_Fibonacci_Yield : Inherits TaskParent
         Dim flow As New Font_FlowText
         Public Sub New()
             flow.parentData = Me

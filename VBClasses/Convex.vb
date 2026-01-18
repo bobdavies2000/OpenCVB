@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Convex_Basics : Inherits TaskParent
         Public hull() As cv.Point
@@ -51,7 +51,7 @@ Namespace VBClasses
 
 
 
-    Public Class Convex_RedColor : Inherits TaskParent
+    Public Class NR_Convex_RedColor : Inherits TaskParent
         Dim convex As New Convex_Basics
         Public Sub New()
             labels = {"", "", "Selected contour - line shows hull with white is contour.  Click to select another contour.", "RedCloud cells"}
@@ -76,12 +76,12 @@ Namespace VBClasses
 
 
     ' https://stackoverflow.com/questions/31354150/opencv-convexity-defects-drawing
-    Public Class Convex_Defects : Inherits TaskParent
+    Public Class NR_Convex_Defects : Inherits TaskParent
         Dim contours As New Contour_Largest
         Public Sub New()
             dst2 = cv.Cv2.ImRead(task.homeDir + "Data/star2.png").Threshold(200, 255,
                             cv.ThresholdTypes.Binary).Resize(New cv.Size(task.workRes.Width, task.workRes.Height))
-            dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+            dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
             labels = {"", "", "Input to the ConvexHull and ConvexityDefects", "Yellow = ConvexHull, Red = ConvexityDefects, Yellow dots are convexityDefect 'Far' points"}
             desc = "Find the convexityDefects in the image"

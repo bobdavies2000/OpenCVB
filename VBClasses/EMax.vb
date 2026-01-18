@@ -74,7 +74,7 @@ Namespace VBClasses
 
 
 
-    Public Class EMax_Centers : Inherits TaskParent
+    Public Class NR_EMax_Centers : Inherits TaskParent
         Dim emax As New EMax_Basics
         Public Sub New()
             labels(2) = "Centers are highlighted, Previous centers are black"
@@ -157,7 +157,7 @@ Namespace VBClasses
 
     ' https://docs.opencvb.org/3.0-beta/modules/ml/doc/expectation_maximization.html
     ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
-    Public Class EMax_VB_Failing : Inherits TaskParent
+    Public Class NR_EMax_VB_Failing : Inherits TaskParent
         Implements IDisposable
         Public emaxInput As New EMax_InputClusters
         Public eLabels As New List(Of Integer)
@@ -212,7 +212,7 @@ Namespace VBClasses
 
 
 
-    Public Class EMax_PointTracker : Inherits TaskParent
+    Public Class NR_EMax_PointTracker : Inherits TaskParent
         Dim knn As New KNN_Basics
         Dim emax As New EMax_Basics
         Public Sub New()
@@ -250,7 +250,7 @@ Namespace VBClasses
 
 
 
-    Public Class EMax_RandomClusters : Inherits TaskParent
+    Public Class NR_EMax_RandomClusters : Inherits TaskParent
         Dim clusters As New Random_Clusters
         Dim emax As New EMax_Basics
         Public Sub New()

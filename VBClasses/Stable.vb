@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Stable_Basics : Inherits TaskParent
         Public lp As lpData
@@ -110,7 +110,7 @@ Namespace VBClasses
 
 
 
-    Public Class Stable_Lines : Inherits TaskParent
+    Public Class NR_Stable_Lines : Inherits TaskParent
         Public basics As New FCS_StablePoints
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -146,7 +146,7 @@ Namespace VBClasses
 
 
 
-    Public Class Stable_FAST : Inherits TaskParent
+    Public Class NR_Stable_FAST : Inherits TaskParent
         Public basics As New FCS_StablePoints
         Dim fast As New Corners_Basics
         Public Sub New()

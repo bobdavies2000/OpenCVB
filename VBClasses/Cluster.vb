@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Cluster_Basics : Inherits TaskParent
         Dim knn As New KNN_Basics
@@ -75,7 +75,7 @@ Namespace VBClasses
 
 
 
-    Public Class Cluster_Hulls : Inherits TaskParent
+    Public Class NR_Cluster_Hulls : Inherits TaskParent
         Dim cluster As New Cluster_Basics
         Public hulls As New List(Of List(Of cv.Point))
         Dim bPoint As New BrickPoint_Basics

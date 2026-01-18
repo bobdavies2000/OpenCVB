@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://github.com/ufoym
 Namespace VBClasses
-    Public Class RecursiveBilateralFilter_CPP : Inherits TaskParent
+    Public Class NR_RecursiveBilateralFilter_CPP : Inherits TaskParent
         Implements IDisposable
         Dim dataSrc(0) As Byte
         Dim options As New Options_RBF

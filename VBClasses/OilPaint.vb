@@ -3,7 +3,7 @@ Imports System.Windows.Forms
 
 ' Source: https://hackernoon.com/https-medium-com-matteoronchetti-pointillism-with-python-and-opencv-f4274e6bbb7b
 Namespace VBClasses
-    Public Class OilPaint_Pointilism : Inherits TaskParent
+    Public Class NR_OilPaint_Pointilism : Inherits TaskParent
         Dim randomMask As cv.Mat
         Dim myRNG As New cv.RNG
         Dim options As New Options_Pointilism
@@ -74,7 +74,7 @@ Namespace VBClasses
 
 
     ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
-    Public Class OilPaint_ManualVB : Inherits TaskParent
+    Public Class NR_OilPaint_ManualVB : Inherits TaskParent
         Public options As New Options_OilPaint
         Public Sub New()
             task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)

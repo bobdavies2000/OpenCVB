@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class Interpolate_Basics : Inherits TaskParent
@@ -114,7 +114,7 @@ Namespace VBClasses
 
 
 
-    Public Class Interpolate_Lines : Inherits TaskParent
+    Public Class NR_Interpolate_Lines : Inherits TaskParent
         Dim inter As New Interpolate_Basics
         Public Sub New()
             OptionParent.FindSlider("Interpolation Resize %").Value = 80
@@ -142,7 +142,7 @@ Namespace VBClasses
 
 
 
-    Public Class Interpolate_Difference : Inherits TaskParent
+    Public Class NR_Interpolate_Difference : Inherits TaskParent
         Dim inter As New Interpolate_Kalman
         Dim diff As New Diff_Basics
         Public Sub New()
@@ -166,7 +166,7 @@ Namespace VBClasses
 
 
 
-    Public Class Interpolate_QuarterBeat : Inherits TaskParent
+    Public Class NR_Interpolate_QuarterBeat : Inherits TaskParent
         Dim diff As New Diff_Basics
         Dim updatedFrames As Integer
         Dim myFrameCount As Integer

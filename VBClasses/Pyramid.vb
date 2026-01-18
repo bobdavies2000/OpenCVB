@@ -30,7 +30,7 @@ Namespace VBClasses
 
 
 
-    Public Class Pyramid_Filter : Inherits TaskParent
+    Public Class NR_Pyramid_Filter : Inherits TaskParent
         Dim laplace As New Laplacian_PyramidFilter
         Public Sub New()
             desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"

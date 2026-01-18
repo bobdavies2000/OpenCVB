@@ -1,4 +1,4 @@
-﻿Imports System.Drawing.Imaging
+Imports System.Drawing.Imaging
 Imports System.IO
 Imports System.Runtime.Intrinsics
 Imports cv = OpenCvSharp

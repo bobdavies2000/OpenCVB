@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class Hist3Dcolor_Basics : Inherits TaskParent
@@ -114,7 +114,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hist3Dcolor_ZeroGroups : Inherits TaskParent
+    Public Class NR_Hist3Dcolor_ZeroGroups : Inherits TaskParent
         Public maskInput As New cv.Mat
         Public classCount As Integer
         Public histogram As New cv.Mat
@@ -164,7 +164,7 @@ Namespace VBClasses
             End If
             cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, task.rangesBGR)
             dst3 = PaletteFull(dst2)
-            labels(2) = "Hist3Dcolor_ZeroGroups classCount = " + CStr(classCount)
+            labels(2) = "NF_Hist3Dcolor_ZeroGroups classCount = " + CStr(classCount)
         End Sub
     End Class
 
@@ -201,7 +201,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hist3Dcolor_Select : Inherits TaskParent
+    Public Class NR_Hist3Dcolor_Select : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
         Public Sub New()
             labels(3) = "The highlighted pixels are in the selected bin"
@@ -230,7 +230,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hist3Dcolor_Basics_CPP : Inherits TaskParent
+    Public Class NR_Hist3Dcolor_Basics_CPP : Inherits TaskParent
         Public histogram As New cv.Mat
         Public prepareImage As Boolean = True
         Public histogram1D As New cv.Mat
@@ -278,7 +278,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hist3Dcolor_Diff : Inherits TaskParent
+    Public Class NR_Hist3Dcolor_Diff : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
         Dim diff As New Diff_Basics
         Public Sub New()

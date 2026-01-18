@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.IO
 ' https://github.com/opencv/opencv/blob/3.2.0/samples/gpu/super_resolution.cpp
 Namespace VBClasses
@@ -91,11 +91,11 @@ Namespace VBClasses
 
 
 
-    Public Class SuperRes_SubPixelZoom : Inherits TaskParent
+    Public Class NR_SuperRes_SubPixelZoom : Inherits TaskParent
         Dim zoom As New Pixel_SubPixel
         Dim video As New SuperRes_Input
         Public Sub New()
-            If standalone Then task.gOptions.displaydst1.checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Is SuperRes better than just zoom with sub-pixel accuracy?"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -158,7 +158,7 @@ Namespace VBClasses
 
 
 
-    Public Class SLR_TrendImages : Inherits TaskParent
+    Public Class NR_SLR_TrendImages : Inherits TaskParent
         Dim trends As New SLR_Trends
         Dim options As New Options_SLRImages
         Public Sub New()
@@ -177,18 +177,18 @@ Namespace VBClasses
                     trends.hist.plotHist.maxRange = task.MaxZmeters
                     trends.hist.plotHist.removeZeroEntry = True ' not interested in the undefined depth areas...
                     trends.Run(task.pcSplit(2))
-                    labels(2) = "SLR_TrendImages - pcSplit(2)"
+                    labels(2) = "NF_SLR_TrendImages - pcSplit(2)"
                 Case "Grayscale input"
                     trends.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-                    labels(2) = "SLR_TrendImages - grayscale"
+                    labels(2) = "NF_SLR_TrendImages - grayscale"
                 Case "Blue input"
-                    labels(2) = "SLR_TrendImages - Blue channel"
+                    labels(2) = "NF_SLR_TrendImages - Blue channel"
                     splitIndex = 0
                 Case "Green input"
-                    labels(2) = "SLR_TrendImages - Green channel"
+                    labels(2) = "NF_SLR_TrendImages - Green channel"
                     splitIndex = 1
                 Case "Red input"
-                    labels(2) = "SLR_TrendImages - Red channel"
+                    labels(2) = "NF_SLR_TrendImages - Red channel"
                     splitIndex = 2
             End Select
             trends.Run(split(splitIndex))
@@ -205,7 +205,7 @@ Namespace VBClasses
 
 
 
-    Public Class SLR_SurfaceH : Inherits TaskParent
+    Public Class NR_SLR_SurfaceH : Inherits TaskParent
         Dim surface As New Cloud_SurfaceH
         Public Sub New()
             desc = "Use the Cloud_SurfaceH data to indicate valleys and peaks."

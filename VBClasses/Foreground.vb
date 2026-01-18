@@ -1,4 +1,4 @@
-﻿Imports System.Windows.Forms
+Imports System.Windows.Forms
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Foreground_Basics : Inherits TaskParent
@@ -112,7 +112,7 @@ Namespace VBClasses
 
 
 
-    Public Class Foreground_RedCloud : Inherits TaskParent
+    Public Class NR_Foreground_RedCloud : Inherits TaskParent
         Dim fore As New Foreground_CellsFore
         Dim back As New Foreground_CellsBack
         Public Sub New()

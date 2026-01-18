@@ -26,7 +26,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Canny : Inherits TaskParent
+    Public Class NR_FeatureLess_Canny : Inherits TaskParent
         Dim edges As New Edge_Basics
         Dim options As New Options_Sobel()
         Public Sub New()
@@ -47,7 +47,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Sobel : Inherits TaskParent
+    Public Class NR_FeatureLess_Sobel : Inherits TaskParent
         Dim edges As New Edge_Sobel
         Dim options As New Options_Sobel()
         Public Sub New()
@@ -67,7 +67,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_UniquePixels : Inherits TaskParent
+    Public Class NR_FeatureLess_UniquePixels : Inherits TaskParent
         Dim fless As New Hough_FeatureLessTopX
         Dim sort As New Sort_1Channel
         Public Sub New()
@@ -89,7 +89,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Unique3Pixels : Inherits TaskParent
+    Public Class NR_FeatureLess_Unique3Pixels : Inherits TaskParent
         Dim fless As New Hough_FeatureLessTopX
         Dim sort3 As New Sort_3Channel
         Public Sub New()
@@ -109,7 +109,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Histogram : Inherits TaskParent
+    Public Class NR_FeatureLess_Histogram : Inherits TaskParent
         Dim backP As New BackProject_FeatureLess
         Public Sub New()
             desc = "Create a histogram of the featureless regions"
@@ -131,7 +131,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_DCT : Inherits TaskParent
+    Public Class NR_FeatureLess_DCT : Inherits TaskParent
         Dim dct As New DCT_FeatureLess
         Public Sub New()
             labels(3) = "Largest FeatureLess Region"
@@ -178,7 +178,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_History : Inherits TaskParent
+    Public Class NR_FeatureLess_History : Inherits TaskParent
         Dim fLess As New FeatureLess_Basics
         Dim frames As New History_Basics
         Public Sub New()
@@ -199,7 +199,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_Groups : Inherits TaskParent
+    Public Class NR_FeatureLess_Groups : Inherits TaskParent
         Dim redCPP As New RedList_CPP
         Dim fless As New FeatureLess_Basics
         Public classCount As Integer
@@ -225,7 +225,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_LeftRight : Inherits TaskParent
+    Public Class NR_FeatureLess_LeftRight : Inherits TaskParent
         Dim fLess As New FeatureLess_Basics
         Public Sub New()
             labels = {"", "", "FeatureLess Left mask", "FeatureLess Right mask"}
@@ -249,7 +249,7 @@ Namespace VBClasses
 
 
 
-    Public Class FeatureLess_RedColor : Inherits TaskParent
+    Public Class NR_FeatureLess_RedColor : Inherits TaskParent
         Dim fLess As New FeatureLess_Basics
         Public Sub New()
             desc = "Use the featureLess_Basics output as input to RedList_Basics"

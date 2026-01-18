@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class GL_Basics : Inherits TaskParent
         Public Sub New()
@@ -14,7 +14,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_MainForm : Inherits TaskParent
+    Public Class NR_GL_MainForm : Inherits TaskParent
         Public Sub New()
             desc = "Display the pointcloud in the main form - too much work..."
         End Sub
@@ -28,7 +28,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_Line3DNoMotionInput : Inherits TaskParent
+    Public Class NR_NF_GL_Line3DNoMotionInput : Inherits TaskParent
         Public Sub New()
             task.FeatureSampleSize = 1000 ' want all the lines 
             desc = "Build a 3D model of the lines found in the rgb data."
@@ -52,7 +52,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_Bricks : Inherits TaskParent
+    Public Class NR_GL_Bricks : Inherits TaskParent
         Public Sub New()
             desc = "Display the bricks in SharpGL"
         End Sub
@@ -67,7 +67,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_StructuredLines : Inherits TaskParent
+    Public Class NR_GL_StructuredLines : Inherits TaskParent
         Dim sMask = New Structured_Mask
         Public Sub New()
             desc = "Build a 3D model of the lines found in the structured depth data."
@@ -91,7 +91,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_RunSharp : Inherits TaskParent
+    Public Class NR_GL_RunSharp : Inherits TaskParent
         Dim displayPC As New GL_DisplayPC
         Public Sub New()
             desc = "Create a SharpGL view that uses the point cloud coordinates."
@@ -110,7 +110,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_RunSharpHist : Inherits TaskParent
+    Public Class NR_NF_GL_RunSharpHist : Inherits TaskParent
         Dim plotHist As New GL_PlotHist
         Dim displayPC As New GL_DisplayPC
         Public Sub New()
@@ -137,7 +137,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_Line3DWhite : Inherits TaskParent
+    Public Class NR_NF_GL_Line3DWhite : Inherits TaskParent
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
@@ -177,7 +177,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_Line3DReconstructed : Inherits TaskParent
+    Public Class NR_NF_GL_Line3DReconstructed : Inherits TaskParent
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
@@ -219,7 +219,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_LinePoints3D : Inherits TaskParent
+    Public Class NR_GL_LinePoints3D : Inherits TaskParent
         Dim line3D As New Line3D_ReconstructLine
         Public Sub New()
             desc = "Visualize with OpenGL the reconstructed 3D line behind the RGB line selected."
@@ -239,7 +239,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_LinePointsAll : Inherits TaskParent
+    Public Class NR_GL_LinePointsAll : Inherits TaskParent
         Public Sub New()
             desc = "Visualize all the reconstructed 3D lines found in the RGB image."
         End Sub
@@ -260,7 +260,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_ReadPC : Inherits TaskParent
+    Public Class NR_GL_ReadPC : Inherits TaskParent
         Dim displayPC As New GL_DisplayPC
         Public Sub New()
             desc = "Read the point cloud from a rendered geometry"
@@ -315,7 +315,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_ReadPCHist : Inherits TaskParent
+    Public Class NR_NF_GL_ReadPCHist : Inherits TaskParent
         Dim glPlot As New GL_PlotHist
         Dim displayPC As New GL_DisplayPC
         Public Sub New()
@@ -404,7 +404,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_ReadLines : Inherits TaskParent
+    Public Class NR_GL_ReadLines : Inherits TaskParent
         Dim displayPC As New GL_DisplayPC
         Public Sub New()
             desc = "Draw lines in SharpGL and read them back."
@@ -433,7 +433,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_ReadQuads : Inherits TaskParent
+    Public Class NR_GL_ReadQuads : Inherits TaskParent
         Dim displayPC As New GL_DisplayPC
         Public Sub New()
             desc = "Read the quads back from a rendered geometry"
@@ -451,7 +451,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_Line3D : Inherits TaskParent
+    Public Class NR_GL_Line3D : Inherits TaskParent
         Dim line3d As New Line3D_DrawLines
         Public Sub New()
             desc = "Display the point cloud with the 3D lines drawn"
@@ -470,7 +470,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_Line3D_Debug : Inherits TaskParent
+    Public Class NR_NF_GL_Line3D_Debug : Inherits TaskParent
         Dim line3d As New Line3D_DrawLines_Debug
         Public Sub New()
             If standalone Then task.gOptions.LineWidth.Value = 3
@@ -492,7 +492,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_Line3D_DebugAlt : Inherits TaskParent
+    Public Class NR_NF_NF_GL_Line3D_DebugAlt : Inherits TaskParent
         Dim line3d As New Line3D_DrawLines_Debug
         Public Sub New()
             If standalone Then task.gOptions.LineWidth.Value = 3
@@ -516,7 +516,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_Draw3DLines : Inherits TaskParent
+    Public Class NR_GL_Draw3DLines : Inherits TaskParent
         Public Sub New()
             desc = "Draw the RGB lines in SharpGL"
         End Sub
@@ -553,7 +553,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_LogicalCloud : Inherits TaskParent
+    Public Class NR_GL_LogicalCloud : Inherits TaskParent
         Dim glTest As New GL_LogicalLines
         Public Sub New()
             glTest.drawRequest = Common.oCase.draw3DLinesAndCloud
@@ -572,7 +572,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_ImageHullsColor : Inherits TaskParent
+    Public Class NR_NF_GL_ImageHullsColor : Inherits TaskParent
         Public Sub New()
             desc = "Prepare triangles from the RedCloud_HeartBeat output"
         End Sub
@@ -620,7 +620,7 @@ Namespace VBClasses
 
 
 
-    Public Class GL_ImageHulls : Inherits TaskParent
+    Public Class NR_GL_ImageHulls : Inherits TaskParent
         Public Sub New()
             desc = "Prepare a texture map and project it onto the RedCloud_HeartBeat hulls"
         End Sub

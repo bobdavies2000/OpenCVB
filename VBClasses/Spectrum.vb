@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Spectrum_Basics : Inherits TaskParent
         Dim dSpec As New Spectrum_Z
@@ -132,7 +132,7 @@ Namespace VBClasses
 
 
 
-    Public Class Spectrum_GrayAndCloud : Inherits TaskParent
+    Public Class NR_Spectrum_GrayAndCloud : Inherits TaskParent
         Dim options As New Options_Spectrum
         Dim gSpec As New Spectrum_Gray
         Dim sCloud As New Spectrum_Cloud
@@ -160,7 +160,7 @@ Namespace VBClasses
 
 
 
-    Public Class Spectrum_RGB : Inherits TaskParent
+    Public Class NR_Spectrum_RGB : Inherits TaskParent
         Dim options As New Options_Spectrum
         Dim gSpec As New Spectrum_Gray
         Public Sub New()
@@ -194,7 +194,7 @@ Namespace VBClasses
 
 
 
-    Public Class Spectrum_CellZoom : Inherits TaskParent
+    Public Class NR_Spectrum_CellZoom : Inherits TaskParent
         Dim proportion As New Resize_Proportional
         Dim breakdown As New Spectrum_Breakdown
         Public Sub New()
@@ -296,7 +296,7 @@ Namespace VBClasses
 
 
 
-    Public Class Spectrum_RedCloud : Inherits TaskParent
+    Public Class NR_Spectrum_RedCloud : Inherits TaskParent
         Dim breakdown As New Spectrum_Breakdown
         Public Sub New()
             desc = "Breakdown each cell in oldrclist."
@@ -323,7 +323,7 @@ Namespace VBClasses
 
 
 
-    Public Class Spectrum_Mask : Inherits TaskParent
+    Public Class NR_Spectrum_Mask : Inherits TaskParent
         Dim gSpec As New Spectrum_Gray
         Public Sub New()
             If standalone Then strOut = "Select a cell to see its depth spectrum"

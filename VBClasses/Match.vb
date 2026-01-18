@@ -70,7 +70,7 @@ Namespace VBClasses
 
 
 
-    Public Class Match_Duplicate : Inherits TaskParent
+    Public Class NR_Match_Duplicate : Inherits TaskParent
         Public match As New Match_Basics
         Public Sub New()
             desc = "Test the correlation of 2 identical Mat's."
@@ -89,7 +89,7 @@ Namespace VBClasses
 
 
 
-    Public Class Match_BasicsTest : Inherits TaskParent
+    Public Class NR_Match_BasicsTest : Inherits TaskParent
         Public match As New Match_Basics
         Dim matchRect As cv.Rect
         Public Sub New()
@@ -124,7 +124,7 @@ Namespace VBClasses
 
 
 
-    Public Class Match_RandomTest : Inherits TaskParent
+    Public Class NR_Match_RandomTest : Inherits TaskParent
         Dim flow As New Font_FlowText
         Public template As cv.Mat
         Public correlationMat As New cv.Mat
@@ -180,7 +180,7 @@ Namespace VBClasses
 
 
 
-    Public Class Match_BestEntropy : Inherits TaskParent
+    Public Class NR_Match_BestEntropy : Inherits TaskParent
         Dim entropy As New Entropy_Highest
         Dim match As New Match_DrawRect
         Public Sub New()
@@ -207,7 +207,7 @@ Namespace VBClasses
 
 
 
-    Public Class Match_Motion : Inherits TaskParent
+    Public Class NR_Match_Motion : Inherits TaskParent
         Dim options As New Options_Features
         Public mask As cv.Mat
         Dim optionsMatch As New Options_Match
@@ -268,7 +268,7 @@ Namespace VBClasses
 
 
 
-    Public Class Match_LinesKNN : Inherits TaskParent
+    Public Class NR_Match_LinesKNN : Inherits TaskParent
         Dim knn As New KNN_N4Basics
         Public Sub New()
             labels(2) = "This is not matching lines from the previous frame because lines often disappear and nearby lines are selected."
@@ -311,7 +311,7 @@ Namespace VBClasses
 
 
 
-    Public Class Match_TraceRedC : Inherits TaskParent
+    Public Class NR_Match_TraceRedC : Inherits TaskParent
         Dim frameList As New List(Of cv.Mat)
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32S, 0)
@@ -396,7 +396,7 @@ Namespace VBClasses
 
 
 
-    Public Class Match_LinePairTest : Inherits TaskParent
+    Public Class NR_Match_LinePairTest : Inherits TaskParent
         Public ptx(2 - 1) As cv.Point2f
         Public target(ptx.Count - 1) As cv.Mat
         Public correlation(ptx.Count - 1)
@@ -460,7 +460,7 @@ Namespace VBClasses
 
 
 
-    Public Class Match_GoodFeatureKNN : Inherits TaskParent
+    Public Class NR_Match_GoodFeatureKNN : Inherits TaskParent
         Public knn As New KNN_OneToOne
         Dim frameList As New List(Of cv.Mat)
         Public Sub New()

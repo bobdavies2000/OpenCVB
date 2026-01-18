@@ -52,7 +52,7 @@ Namespace VBClasses
 
 
 
-    Public Class Sieve_Image : Inherits TaskParent
+    Public Class NR_Sieve_Image : Inherits TaskParent
         Dim zoom As New Pixel_Zoom
         Dim numArray() As Byte
         Dim referenceResults = New Dictionary(Of Integer, Integer) From

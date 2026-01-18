@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/2.4/modules/imgproc/doc/histograms.html
 Namespace VBClasses
@@ -74,7 +74,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hist2D_Depth : Inherits TaskParent
+    Public Class NR_Hist2D_Depth : Inherits TaskParent
         Dim hist2d As New Hist2D_Cloud
         Public channels() As Integer
         Public ranges() As cv.Rangef
@@ -104,7 +104,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hist2D_Zoom : Inherits TaskParent
+    Public Class NR_Hist2D_Zoom : Inherits TaskParent
         Dim hist2d As New Hist2D_Basics
         Dim zoom As New Magnify_Basics
         Public Sub New()
@@ -181,12 +181,12 @@ Namespace VBClasses
 
 
 
-    Public Class Hist2D_PlotHistogram1D : Inherits TaskParent
+    Public Class NR_Hist2D_PlotHistogram1D : Inherits TaskParent
         Dim histogram As New cv.Mat
         Dim plotHist As New Plot_Histogram
         Public Sub New()
             plotHist.removeZeroEntry = False
-            labels(2) = "Hist2D_PlotHistogram1D output shown with plot_histogram"
+            labels(2) = "NF_Hist2D_PlotHistogram1D output shown with plot_histogram"
             desc = "Create a 2D histogram for blue to red and blue to green."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

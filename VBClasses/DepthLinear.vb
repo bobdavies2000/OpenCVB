@@ -1,7 +1,7 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
-    Public Class DepthLinear_Basics : Inherits TaskParent
+    Public Class NR_DepthLinear_Basics : Inherits TaskParent
         Dim inputX As New DepthLinear_InputX
         Dim inputY As New DepthLinear_InputY
         Dim inputZ As New DepthLinear_InputZ
@@ -52,7 +52,7 @@ Namespace VBClasses
 
 
 
-    Public Class DepthLinear_Visualize : Inherits TaskParent
+    Public Class NR_DepthLinear_Visualize : Inherits TaskParent
         Public plotHist As New Plot_Histogram
         Public roi As New cv.Rect(0, 0, dst2.Width, dst2.Height)
         Public pc As cv.Mat
@@ -226,7 +226,7 @@ Namespace VBClasses
 
 
 
-    Public Class DepthLinear_Slices : Inherits TaskParent
+    Public Class NR_DepthLinear_Slices : Inherits TaskParent
         Dim options As New Options_LinearInput
         Dim plotSLR As New SLR_Basics
         Public Sub New()
@@ -283,7 +283,7 @@ Namespace VBClasses
 
 
 
-    Public Class DepthLinear_ImageX : Inherits TaskParent
+    Public Class NR_DepthLinear_ImageX : Inherits TaskParent
         Dim options As New Options_SLR
         Dim inputX As New List(Of Double)
         Dim slr As New SLR()
@@ -330,7 +330,7 @@ Namespace VBClasses
 
 
 
-    Public Class DepthLinear_ImageY : Inherits TaskParent
+    Public Class NR_DepthLinear_ImageY : Inherits TaskParent
         Dim options As New Options_SLR
         Dim inputX As New List(Of Double)
         Dim slr As New SLR()

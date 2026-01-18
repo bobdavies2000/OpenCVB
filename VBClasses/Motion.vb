@@ -164,7 +164,7 @@ Namespace VBClasses
 
 
 
-    Public Class Motion_Validate : Inherits TaskParent
+    Public Class NR_Motion_Validate : Inherits TaskParent
         Dim diff As New Diff_Basics
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
@@ -193,7 +193,7 @@ Namespace VBClasses
 
 
 
-    Public Class Motion_ValidateRight : Inherits TaskParent
+    Public Class NR_NF_Motion_ValidateRight : Inherits TaskParent
         Dim diff As New Diff_Basics
         Dim motionRight As New Motion_RightImage
         Public Sub New()

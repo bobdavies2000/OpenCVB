@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 'https://github.com/omidsakhi/cv-hmm
 Namespace VBClasses
-    Public Class HMM_Example_CPP : Inherits TaskParent
+    Public Class NR_HMM_Example_CPP : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
             If task.testAllRunning = False Then cPtr = HMM_Open()
@@ -11,7 +11,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.testAllRunning Then
-                SetTrueText("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
+                SetTrueText("When NR_HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
                 Exit Sub
             End If
             Dim dataSrc(src.Total * src.ElemSize - 1) As Byte

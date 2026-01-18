@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Profile_Basics : Inherits TaskParent
         Public ptLeft As cv.Point3f, ptRight As cv.Point3f, ptTop As cv.Point3f, ptBot As cv.Point3f, ptFront As cv.Point3f, ptBack As cv.Point3f
@@ -132,7 +132,7 @@ Namespace VBClasses
 
 
 
-    Public Class Profile_Derivative : Inherits TaskParent
+    Public Class NR_Profile_Derivative : Inherits TaskParent
         Public sides As New Profile_Basics
         Dim saveTrueText As New List(Of TrueText)
         Public Sub New()
@@ -200,7 +200,7 @@ Namespace VBClasses
 
 
 
-    Public Class Profile_ConcentrationSide : Inherits TaskParent
+    Public Class NR_Profile_ConcentrationSide : Inherits TaskParent
         Dim profile As New Profile_ConcentrationTop
         Public Sub New()
             OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = False
@@ -290,7 +290,7 @@ Namespace VBClasses
 
 
 
-    Public Class Profile_Kalman : Inherits TaskParent
+    Public Class NR_Profile_Kalman : Inherits TaskParent
         Dim sides As New Profile_Basics
         Public Sub New()
             task.kalman = New Kalman_Basics

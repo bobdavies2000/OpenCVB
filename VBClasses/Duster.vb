@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Duster_Basics : Inherits TaskParent
@@ -93,7 +93,7 @@ Namespace VBClasses
 
 
 
-    Public Class Duster_BasicsY : Inherits TaskParent
+    Public Class NR_Duster_BasicsY : Inherits TaskParent
         Dim dust As New Duster_MaskZ
         Public Sub New()
             desc = "Removed blowback in the pointcloud"
@@ -120,7 +120,7 @@ Namespace VBClasses
 
 
 
-    Public Class Duster_RedCloud : Inherits TaskParent
+    Public Class NR_Duster_RedCloud : Inherits TaskParent
         Dim duster As New Duster_Basics
         Public Sub New()
             desc = "Run Bin3Way_RedCloud on the largest regions identified in Duster_Basics"

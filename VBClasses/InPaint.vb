@@ -29,7 +29,7 @@ Namespace VBClasses
 
 
 
-    Public Class InPaint_Noise : Inherits TaskParent
+    Public Class NR_InPaint_Noise : Inherits TaskParent
         Dim noise As New Draw_Noise
         Dim options As New Options_InPaint
         Public Sub New()
@@ -50,7 +50,7 @@ Namespace VBClasses
 
 
 
-    Public Class InPaint_Depth : Inherits TaskParent
+    Public Class NR_InPaint_Depth : Inherits TaskParent
         Dim options As New Options_InPaint
         Public Sub New()
             labels(2) = "32-bit representation of original depth"
@@ -71,7 +71,7 @@ Namespace VBClasses
 
 
 
-    Public Class InPaint_PointCloud : Inherits TaskParent
+    Public Class NR_InPaint_PointCloud : Inherits TaskParent
         Dim options As New Options_InPaint
         Public Sub New()
             labels(2) = "Pointcloud before inpaint"
@@ -95,7 +95,7 @@ Namespace VBClasses
 
 
 
-    Public Class InPaint_MissingDepth : Inherits TaskParent
+    Public Class NR_InPaint_MissingDepth : Inherits TaskParent
         Dim options As New Options_InPaint
         Public Sub New()
             desc = "Fill in depth with smoothed depth values."

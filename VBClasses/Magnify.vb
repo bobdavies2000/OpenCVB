@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Magnify_Basics : Inherits TaskParent
         Public Sub New()
@@ -17,7 +17,7 @@ Namespace VBClasses
 
 
 
-    Public Class Magnify_Example : Inherits TaskParent
+    Public Class NR_Magnify_Example : Inherits TaskParent
         Dim prep As New Neighbor_Intersects
         Dim zoom As New Magnify_Basics
         Public Sub New()

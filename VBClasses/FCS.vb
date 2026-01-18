@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class FCS_Basics : Inherits TaskParent
         Public basics As New FCS_StablePoints
@@ -110,7 +110,7 @@ Namespace VBClasses
 
 
 
-    Public Class FCS_BasicsOld : Inherits TaskParent
+    Public Class NR_FCS_BasicsOld : Inherits TaskParent
         Dim fcs As New FCS_Core
         Public desiredMapCount As Integer = 5
         Public Sub New()
@@ -277,7 +277,7 @@ Namespace VBClasses
 
 
 
-    Public Class FCS_ViewLeft : Inherits TaskParent
+    Public Class NR_FCS_ViewLeft : Inherits TaskParent
         Dim fcs As New FCS_CreateList
         Public Sub New()
             desc = "Build an FCS for left view."
@@ -301,7 +301,7 @@ Namespace VBClasses
 
 
 
-    Public Class FCS_ViewRight : Inherits TaskParent
+    Public Class NR_FCS_ViewRight : Inherits TaskParent
         Dim fcs As New FCS_CreateList
         Public Sub New()
             desc = "Build an FCS for right view."
@@ -325,7 +325,7 @@ Namespace VBClasses
 
 
 
-    Public Class FCS_FloodFill : Inherits TaskParent
+    Public Class NR_FCS_FloodFill : Inherits TaskParent
         Dim flood As New Flood_Basics
         Dim edges As New Edge_Canny
         Public Sub New()
@@ -360,7 +360,7 @@ Namespace VBClasses
 
 
 
-    Public Class FCS_Edges : Inherits TaskParent
+    Public Class NR_FCS_Edges : Inherits TaskParent
         Dim fcs As New FCS_CreateList
         Dim edges As New Edge_Canny
         Public Sub New()
@@ -386,7 +386,7 @@ Namespace VBClasses
 
 
 
-    Public Class FCS_WithAge : Inherits TaskParent
+    Public Class NR_FCS_WithAge : Inherits TaskParent
         Dim fcs As New FCS_CreateList
         Public Sub New()
             labels(3) = "Ages are kept below 1000 to make the output more readable..."
@@ -410,7 +410,7 @@ Namespace VBClasses
 
 
 
-    Public Class FCS_BestAge : Inherits TaskParent
+    Public Class NR_FCS_BestAge : Inherits TaskParent
         Dim fcs As New FCS_CreateList
         Public Sub New()
             labels(3) = "Ages are kept below 1000 to make the output more readable..."
@@ -444,7 +444,7 @@ Namespace VBClasses
 
 
 
-    Public Class FCS_RedCloud1 : Inherits TaskParent
+    Public Class NR_FCS_RedCloud1 : Inherits TaskParent
         Dim fcs As New FCS_CreateList
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -469,7 +469,7 @@ Namespace VBClasses
 
 
 
-    Public Class FCS_InfoTest : Inherits TaskParent
+    Public Class NR_FCS_InfoTest : Inherits TaskParent
         Dim fcs As New FCS_CreateList
         Dim info As New FCS_Info
         Public Sub New()
@@ -553,7 +553,7 @@ Namespace VBClasses
 
 
 
-    Public Class FCS_MotionDirection : Inherits TaskParent
+    Public Class NR_FCS_MotionDirection : Inherits TaskParent
         Dim fcsM As New FCS_Motion
         Dim plothist As New Plot_Histogram
         Dim mats As New Mat_4Click
@@ -688,7 +688,7 @@ Namespace VBClasses
 
 
 
-    Public Class FCS_Lines : Inherits TaskParent
+    Public Class NR_FCS_Lines : Inherits TaskParent
         Dim fcs As New FCS_CreateList
         Dim options As New Options_Features
         Public Sub New()
@@ -720,7 +720,7 @@ Namespace VBClasses
 
 
 
-    Public Class FCS_ByDepth : Inherits TaskParent
+    Public Class NR_FCS_ByDepth : Inherits TaskParent
         Dim plotHist As New Plot_Histogram
         Dim fcs As New FCS_CreateList
         Dim palInput As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -839,7 +839,7 @@ Namespace VBClasses
 
 
 
-    Public Class FCS_PeripheryNot : Inherits TaskParent
+    Public Class NR_FCS_PeripheryNot : Inherits TaskParent
         Dim perif As New FCS_Periphery
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -863,7 +863,7 @@ Namespace VBClasses
 
 
 
-    Public Class FCS_BrickPoints : Inherits TaskParent
+    Public Class NR_FCS_BrickPoints : Inherits TaskParent
         Public facetGen As New Delaunay_Generations
         Public ptList As New List(Of cv.Point2f)
         Public anchorPoint As cv.Point2f

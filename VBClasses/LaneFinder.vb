@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.IO
 Namespace VBClasses
     Public Class LaneFinder_Basics : Inherits TaskParent
@@ -52,7 +52,7 @@ Namespace VBClasses
 
 
     ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
-    Public Class LaneFinder_Edges : Inherits TaskParent
+    Public Class NR_LaneFinder_Edges : Inherits TaskParent
         Dim input As New LaneFinder_Videos
         Dim edges As New Edge_Basics
         Public Sub New()
@@ -97,7 +97,7 @@ Namespace VBClasses
 
 
     ' https://github.com/mohamedameen93/Lane-lines-detection-using-Python-and-OpenCV
-    Public Class LaneFinder_ROI : Inherits TaskParent
+    Public Class NR_LaneFinder_ROI : Inherits TaskParent
         Dim hls As New LaneFinder_HLSColor
         Dim pListList = New cv.Point()() {Nothing}
         Public Sub New()

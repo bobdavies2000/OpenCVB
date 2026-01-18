@@ -24,7 +24,7 @@ Namespace VBClasses
     Public Class Quaterion_IMUPrediction : Inherits TaskParent
         Dim host As New IMU_PlotHostFrameTimes
         Public Sub New()
-            labels(2) = "Quaternion_IMUPrediction"
+            labels(2) = "NF_Quaternion_IMUPrediction"
             labels(3) = ""
             desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
         End Sub

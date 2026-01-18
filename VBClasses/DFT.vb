@@ -75,7 +75,7 @@ Namespace VBClasses
 
 
     ' http://opencvexamples.blogspot.com/
-    Public Class DFT_Inverse : Inherits TaskParent
+    Public Class NR_DFT_Inverse : Inherits TaskParent
         Dim mats As New Mat_2to1
         Public Sub New()
             labels(2) = "Image after Inverse DFT"
@@ -159,7 +159,7 @@ Namespace VBClasses
     ' https://www.codeproject.com/Articles/5313198/Customizable-Butterworth-Digital-Filter
     ' http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/c++/butterworth_lowpass.cpp
     ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
-    Public Class DFT_ButterworthDepth : Inherits TaskParent
+    Public Class NR_DFT_ButterworthDepth : Inherits TaskParent
         Dim bfilter As New DFT_ButterworthFilter_MT
         Public Sub New()
             desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
@@ -184,7 +184,7 @@ Namespace VBClasses
 
 
 
-    Public Class DFT_Shapes : Inherits TaskParent
+    Public Class NR_DFT_Shapes : Inherits TaskParent
         Dim dft As New DFT_Basics
         Dim circle As New Draw_Circles
         Dim ellipse As New Draw_Ellipses

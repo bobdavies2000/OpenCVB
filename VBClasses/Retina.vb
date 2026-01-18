@@ -71,7 +71,7 @@ Namespace VBClasses
 
 
 
-    Public Class Retina_Depth : Inherits TaskParent
+    Public Class NR_Retina_Depth : Inherits TaskParent
         Dim retina As New Retina_Basics_CPP
         Dim lastMotion As New cv.Mat
         Public Sub New()

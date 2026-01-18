@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Threading
 Namespace VBClasses
     Public Class Grid_Basics : Inherits TaskParent
@@ -124,7 +124,7 @@ Namespace VBClasses
 
 
 
-    Public Class Grid_BasicsTest : Inherits TaskParent
+    Public Class NR_Grid_BasicsTest : Inherits TaskParent
         Public Sub New()
             If standalone Then task.gOptions.GridSlider.Value = 16
             labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each roi.  Bottom might be a shortened roi."}
@@ -160,7 +160,7 @@ Namespace VBClasses
 
 
 
-    Public Class Grid_List : Inherits TaskParent
+    Public Class NR_Grid_List : Inherits TaskParent
         Public Sub New()
             labels(2) = "Adjust grid width/height to increase thread count."
             If standalone Then desc = "List the active threads"
@@ -226,7 +226,7 @@ Namespace VBClasses
 
 
 
-    Public Class Grid_ValidateLocation : Inherits TaskParent
+    Public Class NR_Grid_ValidateLocation : Inherits TaskParent
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             task.clickPoint = New cv.Point(msRNG.Next(0, dst2.Width), msRNG.Next(0, dst2.Height))
@@ -261,7 +261,7 @@ Namespace VBClasses
 
 
 
-    Public Class Grid_MinMaxDepth : Inherits TaskParent
+    Public Class NR_Grid_MinMaxDepth : Inherits TaskParent
         Public minMaxLocs(0) As lpData
         Public minMaxVals(0) As cv.Vec2f
         Public Sub New()
@@ -297,7 +297,7 @@ Namespace VBClasses
 
 
 
-    Public Class Grid_TrackCenter : Inherits TaskParent
+    Public Class NR_Grid_TrackCenter : Inherits TaskParent
         Public center As cv.Point
         Dim match As New Match_Basics
         Public Sub New()

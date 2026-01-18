@@ -75,7 +75,7 @@ Namespace VBClasses
 
 
 
-    Public Class Fuzzy_Filter : Inherits TaskParent
+    Public Class NR_Fuzzy_Filter : Inherits TaskParent
         Dim kernel As cv.Mat
         Dim reduction As New Reduction_Basics
         Public contours As cv.Point()()
@@ -140,7 +140,7 @@ Namespace VBClasses
 
 
 
-    Public Class Fuzzy_ContoursDepth : Inherits TaskParent
+    Public Class NR_Fuzzy_ContoursDepth : Inherits TaskParent
         Public fuzzyD As New Fuzzy_Basics
         Public Sub New()
             desc = "Use contours to outline solids in the depth data"
@@ -158,7 +158,7 @@ Namespace VBClasses
 
 
 
-    Public Class Fuzzy_NeighborProof : Inherits TaskParent
+    Public Class NR_Fuzzy_NeighborProof : Inherits TaskParent
         Dim fuzzy As New Fuzzy_Basics
         Dim proofFailed As Boolean = False
         Public Sub New()
@@ -254,7 +254,7 @@ Namespace VBClasses
 
 
 
-    Public Class Fuzzy_TrackerDepthClick : Inherits TaskParent
+    Public Class NR_Fuzzy_TrackerDepthClick : Inherits TaskParent
         Public tracker As New Fuzzy_TrackerDepth
         Public highlightPoint As cv.Point
         Public highlightRect As cv.Rect

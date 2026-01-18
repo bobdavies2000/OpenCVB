@@ -84,7 +84,7 @@ Namespace VBClasses
 
 
 
-    Public Class Structured_MultiSliceLines : Inherits TaskParent
+    Public Class NR_Structured_MultiSliceLines : Inherits TaskParent
         Dim multi As New Structured_MultiSlice
         Dim lines As New Line_Core
         Public Sub New()
@@ -106,7 +106,7 @@ Namespace VBClasses
 
 
 
-    Public Class Structured_CountTop : Inherits TaskParent
+    Public Class NR_Structured_CountTop : Inherits TaskParent
         Dim slice As New Structured_SliceV
         Dim plot As New Plot_Histogram
         Dim counts As New List(Of Single)
@@ -158,12 +158,12 @@ Namespace VBClasses
 
 
 
-    Public Class Structured_MultiSliceH : Inherits TaskParent
+    Public Class NR_Structured_MultiSliceH : Inherits TaskParent
         Public heat As New HeatMap_Basics
         Public sliceMask As cv.Mat
         Dim options As New Options_Structured
         Public Sub New()
-            OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = False
+            OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
             desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -197,7 +197,7 @@ Namespace VBClasses
 
 
 
-    Public Class Structured_SliceXPlot : Inherits TaskParent
+    Public Class NR_Structured_SliceXPlot : Inherits TaskParent
         Dim multi As New Structured_MultiSlice
         Dim options As New Options_Structured
         Public Sub New()
@@ -235,7 +235,7 @@ Namespace VBClasses
 
 
 
-    Public Class Structured_SliceYPlot : Inherits TaskParent
+    Public Class NR_Structured_SliceYPlot : Inherits TaskParent
         Dim multi As New Structured_MultiSlice
         Dim options As New Options_Structured
         Public Sub New()
@@ -279,12 +279,12 @@ Namespace VBClasses
         Public sliceMask As New cv.Mat
         Dim options As New Options_Structured
         Public Sub New()
-            OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = False
+            OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = False
             desc = "Create slices in top and side views"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            Static topRadio = OptionParent.findCheckBox("Top View (Unchecked Side View)")
+            Static topRadio = OptionParent.FindCheckBox("Top View (Unchecked Side View)")
             Dim topView = topRadio.checked
 
             Dim sliceVal = If(topView, task.mouseMovePoint.X, task.mouseMovePoint.Y)
@@ -340,7 +340,7 @@ Namespace VBClasses
 
 
 
-    Public Class Structured_TransformH : Inherits TaskParent
+    Public Class NR_Structured_TransformH : Inherits TaskParent
         Dim options As New Options_Structured
         Dim histTop As New Projection_HistTop
         Public Sub New()
@@ -385,7 +385,7 @@ Namespace VBClasses
 
 
 
-    Public Class Structured_TransformV : Inherits TaskParent
+    Public Class NR_Structured_TransformV : Inherits TaskParent
         Dim options As New Options_Structured
         Dim histSide As New Projection_HistSide
         Public Sub New()
@@ -432,7 +432,7 @@ Namespace VBClasses
 
 
 
-    Public Class Structured_CountSide : Inherits TaskParent
+    Public Class NR_Structured_CountSide : Inherits TaskParent
         Dim slice As New Structured_SliceH
         Dim plot As New Plot_Histogram
         Dim rotate As New Rotate_Basics
@@ -482,7 +482,7 @@ Namespace VBClasses
 
 
 
-    Public Class Structured_CountSideSum : Inherits TaskParent
+    Public Class NR_NF_Structured_CountSideSum : Inherits TaskParent
         Public counts As New List(Of Single)
         Public maxCountIndex As Integer
         Public yValues As New List(Of Single)
@@ -546,7 +546,7 @@ Namespace VBClasses
         Public sliceMask As New cv.Mat
         Public options As New Options_Structured
         Public Sub New()
-            OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = True
+            OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = True
             desc = "Find and isolate planes using the top view histogram data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -632,7 +632,7 @@ Namespace VBClasses
 
 
 
-    Public Class Structured_SurveyH : Inherits TaskParent
+    Public Class NR_Structured_SurveyH : Inherits TaskParent
         Public Sub New()
             labels(2) = "Each slice represents point cloud pixels with the same Y-Range"
             labels(3) = "Y-Range - compressed to increase the size of each slice.  Use Y-range slider to adjust the size of each slice."
@@ -677,7 +677,7 @@ Namespace VBClasses
 
 
 
-    Public Class Structured_SurveyV : Inherits TaskParent
+    Public Class NR_Structured_SurveyV : Inherits TaskParent
         Public Sub New()
             labels(2) = "Each slice represents point cloud pixels with the same X-Range"
             labels(3) = "X-Range - compressed to increase the size of each slice.  Use X-range slider to adjust the size of each slice."
@@ -723,7 +723,7 @@ Namespace VBClasses
 
 
 
-    Public Class Structured_MultiSlicePolygon : Inherits TaskParent
+    Public Class NR_Structured_MultiSlicePolygon : Inherits TaskParent
         Dim multi As New Structured_MultiSlice
         Dim options As New Options_StructuredMulti
         Public Sub New()
@@ -812,11 +812,11 @@ Namespace VBClasses
 
 
 
-    Public Class Structured_MultiSliceV : Inherits TaskParent
+    Public Class NR_Structured_MultiSliceV : Inherits TaskParent
         Public heat As New HeatMap_Basics
         Dim options As New Options_Structured
         Public Sub New()
-            OptionParent.findCheckBox("Top View (Unchecked Side View)").Checked = True
+            OptionParent.FindCheckBox("Top View (Unchecked Side View)").Checked = True
             desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -852,7 +852,7 @@ Namespace VBClasses
 
 
 
-    Public Class Structured_LinearizeFloor : Inherits TaskParent
+    Public Class NR_Structured_LinearizeFloor : Inherits TaskParent
         Public floor As New XO_Structured_FloorCeiling
         Dim kalman As New Kalman_VB_Basics
         Public sliceMask As cv.Mat

@@ -1,6 +1,6 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class MinMath_Edges : Inherits TaskParent
+    Public Class NR_MinMath_Edges : Inherits TaskParent
         Dim bPoints As New BrickPoint_Basics
         Dim edges As New Edge_Basics
         Public Sub New()
@@ -27,7 +27,7 @@ Namespace VBClasses
 
 
 
-    Public Class MinMath_EdgeLine : Inherits TaskParent
+    Public Class NR_MinMath_EdgeLine : Inherits TaskParent
         Dim bPoints As New BrickPoint_Basics
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
@@ -55,7 +55,7 @@ Namespace VBClasses
 
 
 
-    Public Class MinMath_Neighbors : Inherits TaskParent
+    Public Class NR_MinMath_Neighbors : Inherits TaskParent
         Dim bPoints As New BrickPoint_Basics
         Public Sub New()
             desc = "Connect each brick to its neighbors"
@@ -76,7 +76,7 @@ Namespace VBClasses
 
 
 
-    Public Class MinMath_KNN : Inherits TaskParent
+    Public Class NR_MinMath_KNN : Inherits TaskParent
         Dim bPoint As New BrickPoint_Basics
         Dim knn As New KNN_Basics
         Public Sub New()

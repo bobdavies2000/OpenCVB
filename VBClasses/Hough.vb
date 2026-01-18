@@ -51,7 +51,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hough_Sudoku : Inherits TaskParent
+    Public Class NR_Hough_Sudoku : Inherits TaskParent
         Dim hough As New Hough_Basics
         Public Sub New()
             OptionParent.FindSlider("Hough rho").Value = 1
@@ -74,7 +74,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/3.1.0/d6/d10/tutorial_py_houghlines.html
-    Public Class Hough_Circles : Inherits TaskParent
+    Public Class NR_Hough_Circles : Inherits TaskParent
         Dim circles As New Draw_Circles
         Dim method As Integer = 3
         Public Sub New()
@@ -321,7 +321,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hough_FullImage : Inherits TaskParent
+    Public Class NR_Hough_FullImage : Inherits TaskParent
         Dim edges As New Edge_Basics
         Public segments() As cv.LineSegmentPolar
         Public options As New Options_Hough
@@ -352,7 +352,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hough_Probabilistic : Inherits TaskParent
+    Public Class NR_Hough_Probabilistic : Inherits TaskParent
         Dim edges As New Edge_Basics
         Public segments() As cv.LineSegmentPolar
         Public options As New Options_Hough

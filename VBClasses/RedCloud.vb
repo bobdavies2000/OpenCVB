@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
         Public redSweep As New RedCloud_Sweep
@@ -146,7 +146,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_CellDepthHistogram : Inherits TaskParent
+    Public Class NR_RedCloud_CellDepthHistogram : Inherits TaskParent
         Dim plot As New Plot_Histogram
         Public Sub New()
             task.gOptions.setHistogramBins(100)

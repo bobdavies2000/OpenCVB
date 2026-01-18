@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Line3D_Basics : Inherits TaskParent
@@ -46,7 +46,7 @@ Namespace VBClasses
 
 
 
-    Public Class Line3D_Longest : Inherits TaskParent
+    Public Class NR_Line3D_Longest : Inherits TaskParent
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -141,7 +141,7 @@ Namespace VBClasses
 
 
 
-    Public Class Line3D_DrawArbitrary : Inherits TaskParent
+    Public Class NR_Line3D_DrawArbitrary : Inherits TaskParent
         Public p1 As cv.Point, p2 As cv.Point
         Dim plot As New Plot_OverTimeScalar
         Dim toggleFirstSecond As Boolean

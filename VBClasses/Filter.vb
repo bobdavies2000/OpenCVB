@@ -47,7 +47,7 @@ Namespace VBClasses
     Public Class Filter_BasicsGray : Inherits TaskParent
         Public filterIndex As Integer = -1
         Public filterList As String() = {"Original", "Blur_Basics", "Dilate_Basics", "Erode_Basics",
-                                         "Filter_Equalize", "Filter_Laplacian", "MeanSubtraction_Gray", "PhotoShop_Gamma"}
+                                         "NF_Filter_Equalize", "NF_Filter_Laplacian", "MeanSubtraction_Gray", "PhotoShop_Gamma"}
         Dim filters(filterList.Count - 1) As Object
         Public Sub New()
             desc = "Demo the RGB Filters selected in 'FeatureOptions'.  If none selected, just the input is displayed."
@@ -64,10 +64,10 @@ Namespace VBClasses
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Dilate_Basics
                         Case "Erode_Basics"
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Erode_Basics
-                        Case "Filter_Equalize"
-                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Filter_Equalize
-                        Case "Filter_Laplacian"
-                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New Filter_Laplacian
+                        Case "NF_Filter_Equalize"
+                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New NR_Filter_Equalize
+                        Case "NF_Filter_Laplacian"
+                            If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New NR_Filter_Laplacian
                         Case "MeanSubtraction_Gray"
                             If filters(cb.Tag) Is Nothing Then filters(cb.Tag) = New MeanSubtraction_Gray
                         Case "PhotoShop_Gamma"
@@ -95,7 +95,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-    Public Class Filter_Laplacian : Inherits TaskParent
+    Public Class NR_Filter_Laplacian : Inherits TaskParent
         Public Sub New()
             labels(2) = "Sharpened image using Filter2D output"
             labels(3) = "Output of Filter2D (approximated Laplacian)"
@@ -117,13 +117,13 @@ Namespace VBClasses
 
 
 
-    Public Class Filter_NormalizedKernel : Inherits TaskParent
+    Public Class NR_Filter_NormalizedKernel : Inherits TaskParent
         Dim options As New Options_FilterNorm
         Public Sub New()
             desc = "Create a normalized kernel and use it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Options.Run()
+            options.Run()
 
             Dim sum As Double
             For i = 0 To options.kernel.Width - 1
@@ -142,7 +142,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/2.4/doc/tutorials/imgproc/imgtrans/filter_2d/filter_2d.html
-    Public Class Filter_Normalized2D : Inherits TaskParent
+    Public Class NR_Filter_Normalized2D : Inherits TaskParent
         Dim options As New Options_Filter
         Public Sub New()
             desc = "Create and apply a normalized kernel."
@@ -164,20 +164,20 @@ Namespace VBClasses
 
 
     'https://www.cc.gatech.edu/classes/AY2015/cs4475_summer/documents/smoothing_separable.py
-    Public Class Filter_SepFilter2D : Inherits TaskParent
+    Public Class NR_Filter_SepFilter2D : Inherits TaskParent
         Dim options As New Options_SepFilter2D
         Public Sub New()
             labels(2) = "Gaussian Blur result"
             desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Options.Run()
+            options.Run()
             Dim kernel = cv.Cv2.GetGaussianKernel(options.xDim, options.sigma)
             dst2 = src.GaussianBlur(New cv.Size(options.xDim, options.yDim), options.sigma)
             dst3 = src.SepFilter2D(cv.MatType.CV_8UC3, kernel, kernel)
             If options.diffCheck Then
-                Dim graySep = dst3.CvtColor(cv.ColorConversionCodes.BGR2Gray)
-                Dim grayGauss = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
+                Dim graySep = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                Dim grayGauss = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
                 dst3 = (graySep - grayGauss).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
                 labels(3) = "Gaussian - SepFilter2D " + CStr(dst3.CountNonZero) + " pixels different."
             Else
@@ -192,7 +192,7 @@ Namespace VBClasses
 
 
     ' https://datamahadev.com/filters-in-image-processing-using-opencv/
-    Public Class Filter_Minimum : Inherits TaskParent
+    Public Class NR_Filter_Minimum : Inherits TaskParent
         Dim options As New Options_Filter
         Public Sub New()
             desc = "Implement the Minimum Filter - use minimum value in kernel"
@@ -211,7 +211,7 @@ Namespace VBClasses
 
 
     ' https://datamahadev.com/filters-in-image-processing-using-opencv/
-    Public Class Filter_Maximum : Inherits TaskParent
+    Public Class NR_Filter_Maximum : Inherits TaskParent
         Dim options As New Options_Filter
         Public Sub New()
             desc = "Implement the Maximum Filter - use maximum value in kernel"
@@ -230,7 +230,7 @@ Namespace VBClasses
 
 
     ' https://datamahadev.com/filters-in-image-processing-using-opencv/
-    Public Class Filter_Mean : Inherits TaskParent
+    Public Class NR_Filter_Mean : Inherits TaskParent
         Dim options As New Options_Filter
         Public Sub New()
             desc = "Implement the Mean Filter - use mean value in kernel"
@@ -249,7 +249,7 @@ Namespace VBClasses
 
 
     ' https://datamahadev.com/filters-in-image-processing-using-opencv/
-    Public Class Filter_Median : Inherits TaskParent
+    Public Class NR_Filter_Median : Inherits TaskParent
         Dim options As New Options_Filter
         Public Sub New()
             desc = "Implement the Median Filter - use median value in kernel"
@@ -275,7 +275,7 @@ Namespace VBClasses
 
 
     'https://docs.opencvb.org/master/d1/db7/tutorial_py_Histogram_begins.html
-    Public Class Filter_Equalize : Inherits TaskParent
+    Public Class NR_Filter_Equalize : Inherits TaskParent
         Public Sub New()
             labels(2) = "Equalized image"
             desc = "Create an equalized image of the grayscale input."

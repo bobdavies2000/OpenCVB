@@ -149,7 +149,7 @@ Namespace VBClasses
 
 
 
-    Public Class Random_Shuffle : Inherits TaskParent
+    Public Class NR_Random_Shuffle : Inherits TaskParent
         Dim myRNG As New cv.RNG
         Public Sub New()
             desc = "Use randomShuffle to reorder an image."
@@ -166,7 +166,7 @@ Namespace VBClasses
 
 
 
-    Public Class Random_LUTMask : Inherits TaskParent
+    Public Class NR_Random_LUTMask : Inherits TaskParent
         Dim random As New Random_Basics
         Dim km As New KMeans_Image
         Dim lutMat As cv.Mat
@@ -232,7 +232,7 @@ Namespace VBClasses
 
 
 
-    Public Class Random_CheckUniformSmoothed : Inherits TaskParent
+    Public Class NR_Random_CheckUniformSmoothed : Inherits TaskParent
         Dim histogram As New Histogram_Basics
         Dim rUniform As New Random_UniformDist
         Public Sub New()
@@ -252,7 +252,7 @@ Namespace VBClasses
 
 
 
-    Public Class Random_CheckUniformDist : Inherits TaskParent
+    Public Class NR_Random_CheckUniformDist : Inherits TaskParent
         Dim histogram As New Histogram_Graph
         Dim rUniform As New Random_UniformDist
         Public Sub New()
@@ -272,7 +272,7 @@ Namespace VBClasses
 
 
 
-    Public Class Random_CheckNormalDist : Inherits TaskParent
+    Public Class NR_Random_CheckNormalDist : Inherits TaskParent
         Dim histogram As New Histogram_Graph
         Dim normalDist As New Random_NormalDist
         Public Sub New()
@@ -291,7 +291,7 @@ Namespace VBClasses
 
 
 
-    Public Class Random_CheckNormalDistSmoothed : Inherits TaskParent
+    Public Class NR_NF_Random_CheckNormalDistSmoothed : Inherits TaskParent
         Dim histogram As New Histogram_Basics
         Dim normalDist As New Random_NormalDist
         Public Sub New()
@@ -312,7 +312,7 @@ Namespace VBClasses
 
 
 
-    Public Class Random_PatternGenerator_CPP : Inherits TaskParent
+    Public Class NR_Random_PatternGenerator_CPP : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
             cPtr = Random_PatternGenerator_Open()
@@ -382,7 +382,7 @@ Namespace VBClasses
 
 
     ' https://www.khanacademy.org/computing/computer-programming/programming-natural-simulations/programming-randomness/a/custom-distribution-of-random-numbers
-    Public Class Random_MonteCarlo : Inherits TaskParent
+    Public Class NR_Random_MonteCarlo : Inherits TaskParent
         Public plot As New Plot_Histogram
         Dim options As New Options_MonteCarlo
         Public outputRandom = New cv.Mat(New cv.Size(1, 4000), cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
@@ -419,7 +419,7 @@ Namespace VBClasses
 
 
 
-    Public Class Random_CustomHistogram : Inherits TaskParent
+    Public Class NR_Random_CustomHistogram : Inherits TaskParent
         Public random As New Random_CustomDistribution
         Public hist As New Histogram_Simple
         Public saveHist As cv.Mat
@@ -491,7 +491,7 @@ Namespace VBClasses
 
 
     ' https://github.com/spmallick/learnopencv/tree/master/
-    Public Class Random_StaticTVFaster : Inherits TaskParent
+    Public Class NR_Random_StaticTVFaster : Inherits TaskParent
         Dim random As New Random_UniformDist
         Dim mats As New Mat_4to1
         Dim options As New Random_StaticTV
@@ -535,7 +535,7 @@ Namespace VBClasses
 
 
     ' https://github.com/spmallick/learnopencv/tree/master/
-    Public Class Random_StaticTVFastSimple : Inherits TaskParent
+    Public Class NR_Random_StaticTVFastSimple : Inherits TaskParent
         Dim random As New Random_UniformDist
         Dim options As New Random_StaticTV
         Public Sub New()
@@ -570,7 +570,7 @@ Namespace VBClasses
 
 
 
-    Public Class Random_KalmanPoints : Inherits TaskParent
+    Public Class NR_Random_KalmanPoints : Inherits TaskParent
         Dim random As New Random_Basics
         Dim targetSet As New List(Of cv.Point2f)
         Dim currSet As New List(Of cv.Point2f)

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' https://opencv24-python-tutorials.readthedocs.io/en/latest/py_tutorials/py_imgproc/py_thresholding/py_thresholding.html
 Namespace VBClasses
     Public Class Threshold_Basics : Inherits TaskParent
@@ -31,7 +31,7 @@ Namespace VBClasses
 
 
     ' https://www.tutorialspoint.com/opencv/opencv_adaptive_threshold.htm
-    Public Class Threshold_Adaptive : Inherits TaskParent
+    Public Class NR_Threshold_Adaptive : Inherits TaskParent
         Dim options As New Options_Threshold
         Dim optionsAdaptive As New Options_AdaptiveThreshold
         Public Sub New()
@@ -55,7 +55,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/4.x/d7/d4d/tutorial_py_thresholding.html
-    Public Class Threshold_Definitions : Inherits TaskParent
+    Public Class NR_Threshold_Definitions : Inherits TaskParent
         Dim gradient As New Gradient_Color
         Dim mats As New Mat_4to1
         Dim options As New Options_ThresholdDef
@@ -146,7 +146,7 @@ Namespace VBClasses
 
 
 
-    Public Class Threshold_ColorSource : Inherits TaskParent
+    Public Class NR_Threshold_ColorSource : Inherits TaskParent
         Dim color8U As New Color8U_Basics
         Dim byChan As New Threshold_ByChannels
         Public Sub New()

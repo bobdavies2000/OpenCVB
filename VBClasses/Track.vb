@@ -79,7 +79,7 @@ Namespace VBClasses
 
 
 
-    Public Class Track_LongestLine : Inherits TaskParent
+    Public Class NR_Track_LongestLine : Inherits TaskParent
         Dim track As New Track_Basics
         Public Sub New()
             desc = "Track the longest RGB line"
@@ -104,7 +104,7 @@ Namespace VBClasses
 
 
 
-    Public Class Track_GridRect : Inherits TaskParent
+    Public Class NR_Track_GridRect : Inherits TaskParent
         Dim track As New Track_Basics
         Public Sub New()
             desc = "Track the gravity RGB vector"
@@ -137,7 +137,7 @@ Namespace VBClasses
 
 
 
-    Public Class Track_Lines : Inherits TaskParent
+    Public Class NR_Track_Lines : Inherits TaskParent
         Dim track(4) As Track_BasicsQT
         Public Sub New()
             For i = 0 To track.Length - 1

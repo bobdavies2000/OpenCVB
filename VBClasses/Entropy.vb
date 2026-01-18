@@ -99,7 +99,7 @@ Namespace VBClasses
 
 
 
-    Public Class Entropy_FAST : Inherits TaskParent
+    Public Class NR_Entropy_FAST : Inherits TaskParent
         Dim fast As New Corners_Basics
         Dim entropy As New Entropy_Highest
         Public Sub New()
@@ -165,7 +165,7 @@ Namespace VBClasses
 
 
 
-    Public Class Entropy_SubDivisions : Inherits TaskParent
+    Public Class NR_Entropy_SubDivisions : Inherits TaskParent
         Dim entropy As New Entropy_Rectangle
         Dim entropies As New List(Of List(Of Single))
         Dim eROI As New List(Of List(Of cv.Rect))
@@ -258,7 +258,7 @@ Namespace VBClasses
 
 
 
-    Public Class Entropy_BinaryImage : Inherits TaskParent
+    Public Class NR_Entropy_BinaryImage : Inherits TaskParent
         Dim binary As New Binarize_Simple
         Dim entropy As New Entropy_Basics
         Public Sub New()

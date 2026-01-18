@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class Transform_Resize : Inherits TaskParent
+    Public Class NR_Transform_Resize : Inherits TaskParent
         Dim options As New Options_Transform
         Public Sub New()
             desc = "Resize an image based on the slider value."
@@ -27,7 +27,7 @@ Namespace VBClasses
 
 
 
-    Public Class Transform_Affine3D : Inherits TaskParent
+    Public Class NR_Transform_Affine3D : Inherits TaskParent
         Dim pc1 As cv.Mat
         Dim pc2 As cv.Mat
         Dim affineTransform As cv.Mat
@@ -91,7 +91,7 @@ Namespace VBClasses
 
 
 
-    Public Class Transform_Rotate : Inherits TaskParent
+    Public Class NR_Transform_Rotate : Inherits TaskParent
         Public imageCenter As cv.Point2f
         Dim options As New Options_Transform
         Public Sub New()

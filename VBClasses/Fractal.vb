@@ -108,7 +108,7 @@ Namespace VBClasses
 
     ' http://www.malinc.se/m/JuliaSets.php
     ' https://www.geeksforgeeks.org/julia-fractal-set-in-c-c-using-graphics/
-    Public Class Fractal_Julia : Inherits TaskParent
+    Public Class NR_Fractal_Julia : Inherits TaskParent
         Dim mandel As New Fractal_MandelbrotZoomColor
         Dim rt As Double = 0.282
         Dim mt As Double = -0.58
@@ -161,7 +161,7 @@ Namespace VBClasses
 
 
     ' https://github.com/brian-xu/FractalDimension/blob/master/FractalDimension.py
-    Public Class Fractal_Dimension : Inherits TaskParent
+    Public Class NR_Fractal_Dimension : Inherits TaskParent
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             labels = {"", "", "RedList_Basics output - select any region.", "The selected region (as a square)"}

@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 ' https://docs.opencvb.org/2.4/modules/flann/doc/flann_fast_approximate_nearest_Neighbor_search.html#
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FlannSample.vb
 Namespace VBClasses
-    Public Class FLANN_Test : Inherits TaskParent
+    Public Class NR_FLANN_Test : Inherits TaskParent
         Public Sub New()
             desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
             labels(2) = "FLANN Basics"
@@ -48,7 +48,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/3.4/d5/d6f/tutorial_feature_flann_matcher.html
-    Public Class FLANN_Basics : Inherits TaskParent
+    Public Class NR_FLANN_Basics : Inherits TaskParent
         Dim random As New Random_Basics
         Dim qArray() As cv.Point2f
         Dim dist As New Distance_Point3D

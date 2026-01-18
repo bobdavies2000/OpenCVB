@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCC_Basics : Inherits TaskParent
         Dim reduction As New Reduction_Basics
@@ -30,7 +30,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCC_BasicsOld : Inherits TaskParent
+    Public Class NR_RedCC_BasicsOld : Inherits TaskParent
         Dim reduction As New Reduction_Basics
         Public rcList As List(Of rcData)
         Public rcMap As cv.Mat
@@ -95,7 +95,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCC_Merge : Inherits TaskParent
+    Public Class NR_RedCC_Merge : Inherits TaskParent
         Public redSweep As New RedCloud_Sweep
         Public color8u As New Color8U_Basics
         Public Sub New()
@@ -124,7 +124,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCC_CellHistogram : Inherits TaskParent
+    Public Class NR_RedCC_CellHistogram : Inherits TaskParent
         Dim plot As New Plot_Histogram
         Dim redCC As New RedCC_Basics
         Public Sub New()

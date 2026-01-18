@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
     Public Class Hist3D_Basics : Inherits TaskParent
@@ -90,7 +90,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hist3D_RedCloud : Inherits TaskParent
+    Public Class NR_Hist3D_RedCloud : Inherits TaskParent
         Dim hist3D As New Hist3D_Basics
         Public Sub New()
             desc = "Run RedList_Basics on the combined Hist3D color/cloud output."
@@ -111,7 +111,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hist3D_RedColor : Inherits TaskParent
+    Public Class NR_Hist3D_RedColor : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
         Public Sub New()
             desc = "Use the Hist3D color classes to segment the image with RedList_Basics"
@@ -131,7 +131,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hist3D_DepthWithMask : Inherits TaskParent
+    Public Class NR_Hist3D_DepthWithMask : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
         Public depthMask As New cv.Mat
         Dim fore As New Foreground_KMeans
@@ -200,7 +200,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hist3D_PixelCells : Inherits TaskParent
+    Public Class NR_Hist3D_PixelCells : Inherits TaskParent
         Dim pixel As New Hist3D_Pixel
         Dim flood As New Flood_Basics
         Public Sub New()
@@ -228,7 +228,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hist3D_PixelClassify : Inherits TaskParent
+    Public Class NR_Hist3D_PixelClassify : Inherits TaskParent
         Dim pixel As New Hist3D_Pixel
         Public Sub New()
             desc = "Classify each pixel with a 3D histogram backprojection and run RedList_Basics on the output."
@@ -249,7 +249,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hist3D_PixelDiffMask : Inherits TaskParent
+    Public Class NR_Hist3D_PixelDiffMask : Inherits TaskParent
         Dim pixel As New Hist3D_Pixel
         Public Sub New()
             desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection"
@@ -268,7 +268,7 @@ Namespace VBClasses
 
 
 
-    Public Class Hist3D_RedCloudGrid : Inherits TaskParent
+    Public Class NR_NF_Hist3D_RedCloudGrid : Inherits TaskParent
         Dim pixels As New Pixel_Vectors
         Dim hVector As New Hist3Dcolor_Vector
         Public Sub New()

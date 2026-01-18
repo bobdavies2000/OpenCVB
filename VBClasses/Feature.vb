@@ -41,7 +41,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_BrickLine : Inherits TaskParent
+    Public Class NR_Feature_BrickLine : Inherits TaskParent
         Public features As New List(Of cv.Point)
         Public Sub New()
             task.gOptions.LineWidth.Value = 3
@@ -216,7 +216,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-    Public Class Feature_NoMotionTest : Inherits TaskParent
+    Public Class NR_Feature_NoMotionTest : Inherits TaskParent
         Public options As New Options_Features
         Dim method As New Feature_General
         Public Sub New()
@@ -276,7 +276,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_LucasKanade : Inherits TaskParent
+    Public Class NR_Feature_LucasKanade : Inherits TaskParent
         Dim pyr As New FeatureFlow_LucasKanade
         Public ptList As New List(Of cv.Point)
         Public ptLast As New List(Of cv.Point)
@@ -317,7 +317,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_Points : Inherits TaskParent
+    Public Class NR_Feature_Points : Inherits TaskParent
         Dim feat As New Feature_General
         Public Sub New()
             labels(3) = "Features found in the image"
@@ -340,7 +340,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_TraceDelaunay : Inherits TaskParent
+    Public Class NR_Feature_TraceDelaunay : Inherits TaskParent
         Dim features As New Feature_Delaunay
         Public goodList As New List(Of List(Of cv.Point2f)) ' stable points only
         Public Sub New()
@@ -375,7 +375,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_ShiTomasi : Inherits TaskParent
+    Public Class NR_Feature_ShiTomasi : Inherits TaskParent
         Dim harris As New Corners_HarrisDetector_CPP
         Dim shiTomasi As New Corners_ShiTomasi_CPP
         Dim options As New Options_ShiTomasi
@@ -409,7 +409,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_Generations : Inherits TaskParent
+    Public Class NR_Feature_Generations : Inherits TaskParent
         Dim features As New List(Of cv.Point)
         Dim gens As New List(Of Integer)
         Dim feat As New Feature_General
@@ -450,7 +450,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-    Public Class Feature_History : Inherits TaskParent
+    Public Class NR_Feature_History : Inherits TaskParent
         Public features As New List(Of cv.Point)
         Dim featureHistory As New List(Of List(Of cv.Point))
         Dim gens As New List(Of Integer)
@@ -540,7 +540,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_AKaze : Inherits TaskParent
+    Public Class NR_Feature_AKaze : Inherits TaskParent
         Implements IDisposable
         Dim kazeKeyPoints As cv.KeyPoint() = Nothing
         Dim kaze As cv.AKAZE
@@ -569,7 +569,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_RedCloud : Inherits TaskParent
+    Public Class NR_Feature_RedCloud : Inherits TaskParent
         Dim feat As New Feature_General
         Public Sub New()
             desc = "Show the feature points in the RedCloud output."
@@ -590,7 +590,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_WithDepth : Inherits TaskParent
+    Public Class NR_Feature_WithDepth : Inherits TaskParent
         Dim feat As New Feature_General
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -616,7 +616,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_Matching : Inherits TaskParent
+    Public Class NR_Feature_Matching : Inherits TaskParent
         Public features As New List(Of cv.Point)
         Public motionPoints As New List(Of cv.Point)
         Dim match As New Match_Basics
@@ -667,7 +667,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_SteadyCam : Inherits TaskParent
+    Public Class NR_Feature_SteadyCam : Inherits TaskParent
         Public options As New Options_Features
         Dim feat As New Feature_General
         Public Sub New()
@@ -716,7 +716,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_FacetPoints : Inherits TaskParent
+    Public Class NR_Feature_FacetPoints : Inherits TaskParent
         Dim delaunay As New Delaunay_Basics
         Dim feat As New Feature_General
         Public Sub New()
@@ -770,7 +770,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_Agast : Inherits TaskParent
+    Public Class NR_Feature_Agast : Inherits TaskParent
         Implements IDisposable
         Dim agastFD As cv.AgastFeatureDetector
         Dim stablePoints As New List(Of cv.Point2f)
@@ -847,7 +847,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_StableVisual : Inherits TaskParent
+    Public Class NR_Feature_StableVisual : Inherits TaskParent
         Dim noMotion As New Feature_General
         Public fpStable As New List(Of fpData)
         Public ptStable As New List(Of cv.Point)
@@ -883,7 +883,7 @@ Namespace VBClasses
 
 
 
-    Public Class Feature_StableVisualize : Inherits TaskParent
+    Public Class NR_NF_Feature_StableVisualize : Inherits TaskParent
         Dim noMotion As New Feature_NoMotion
         Public fpStable As New List(Of fpData)
         Public ptStable As New List(Of cv.Point)

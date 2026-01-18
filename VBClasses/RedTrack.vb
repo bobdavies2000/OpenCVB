@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedTrack_Basics : Inherits TaskParent
         Public Sub New()
@@ -22,7 +22,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedTrack_Lines : Inherits TaskParent
+    Public Class NR_RedTrack_Lines : Inherits TaskParent
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, 0)
             desc = "Identify and track the lines in an image as RedCloud Cells"
@@ -49,7 +49,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedTrack_LineSingle : Inherits TaskParent
+    Public Class NR_RedTrack_LineSingle : Inherits TaskParent
         Dim track As New RedTrack_Basics
         Dim leftMost As Integer, rightmost As Integer
         Dim leftCenter As cv.Point, rightCenter As cv.Point
@@ -114,7 +114,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedTrack_FeaturesKNN : Inherits TaskParent
+    Public Class NR_NF_RedTrack_FeaturesKNN : Inherits TaskParent
         Public knn As New KNN_Basics
         Public Sub New()
             labels = {"", "", "Output of Feature_Stable", "Grid of points to measure motion."}
@@ -145,7 +145,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedTrack_GoodCellInput : Inherits TaskParent
+    Public Class NR_RedTrack_GoodCellInput : Inherits TaskParent
         Public knn As New KNN_Basics
         Public featureList As New List(Of cv.Point2f)
         Public Sub New()
@@ -178,7 +178,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedTrack_Points : Inherits TaskParent
+    Public Class NR_RedTrack_Points : Inherits TaskParent
         Dim track As New RedTrack_Basics
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -206,7 +206,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedTrack_Features : Inherits TaskParent
+    Public Class NR_RedTrack_Features : Inherits TaskParent
         Public Sub New()
             task.redList = New XO_RedList_Basics
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

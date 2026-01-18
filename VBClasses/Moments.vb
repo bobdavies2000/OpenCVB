@@ -39,7 +39,7 @@ Namespace VBClasses
 
 
 
-    Public Class Moments_CentroidKalman : Inherits TaskParent
+    Public Class NR_Moments_CentroidKalman : Inherits TaskParent
         Dim fore As New Foreground_KMeans
         Public Sub New()
             task.kalman = New Kalman_Basics

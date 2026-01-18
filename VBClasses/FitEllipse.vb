@@ -42,11 +42,11 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
-    Public Class FitEllipse_AMS_CPP : Inherits TaskParent
+    Public Class NR_FitEllipse_AMS_CPP : Inherits TaskParent
         Dim options As New Options_MinArea
         Public inputPoints As New List(Of cv.Point2f)
         Public Sub New()
-            labels(2) = "FitEllipse_AMS_CPP C++ "
+            labels(2) = "NF_FitEllipse_AMS_CPP C++ "
             desc = "Use FitEllipse_AMS to draw around a set of points"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -88,7 +88,7 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
-    Public Class FitEllipse_Direct_CPP : Inherits TaskParent
+    Public Class NR_FitEllipse_Direct_CPP : Inherits TaskParent
         Dim options As New Options_MinArea
         Public Sub New()
             labels(2) = "The FitEllipse_Direct C++ "
@@ -130,7 +130,7 @@ Namespace VBClasses
 
 
 
-    Public Class FitEllipse_RedCloud : Inherits TaskParent
+    Public Class NR_FitEllipse_RedCloud : Inherits TaskParent
         Dim fitE As New FitEllipse_Basics
         Public Sub New()
             desc = "Create an ellipse from a contour"
@@ -157,7 +157,7 @@ Namespace VBClasses
 
 
 
-    Public Class FitEllipse_Rectangle : Inherits TaskParent
+    Public Class NR_FitEllipse_Rectangle : Inherits TaskParent
         Public noisyLine As New Eigen_Input
         Public rect As cv.RotatedRect
         Public vertices() As cv.Point2f
