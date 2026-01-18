@@ -263,8 +263,31 @@ Namespace VBClasses
             Next
 
             dst3 = ShowAddweighted(dst1, task.rightView, labels(3))
+            labels(3) += " " + CStr(count) + " bricks mapped into the right image."
         End Sub
     End Class
 
+
+
+
+
+    Public Class RedColor_Bricks : Inherits TaskParent
+        Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            desc = "Attach an rcData to each brick using the rcList index."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = runRedColor(src, labels(2))
+
+            Dim count As Integer
+            dst1.SetTo(0)
+            For Each brick As brickData In task.bricks.brickList
+                If task.redColor.rcMap(brick.lRect).CountNonZero And brick.rRect.Width > 0 Then
+                    dst2(brick.lRect).CopyTo(dst1(brick.rRect))
+                    count += 1
+                End If
+            Next
+        End Sub
+    End Class
 
 End Namespace

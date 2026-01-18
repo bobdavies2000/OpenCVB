@@ -7,7 +7,8 @@ Imports cv = OpenCvSharp
 Namespace MainApp
     Public Class Camera_RS2 : Inherits GenericCamera
         Dim pipe As New Pipeline()
-        Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, devName As String, Optional fps As Integer = 30)
+        Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, devName As String, emitterOn As Integer,
+                       Optional fps As Integer = 30)
             captureRes = _captureRes
             workRes = _workRes
             Dim serialNumber As String = ""
@@ -32,8 +33,8 @@ Namespace MainApp
             Dim device As Device = profiles.Device
             For Each s In device.Sensors
                 If s.Info.Item(0).Contains("Stereo Module") Then
-                    s.Options(Intel.RealSense.Option.EmitterEnabled).Value = 1
-                    s.Options(Intel.RealSense.Option.LaserPower).Value = 13
+                    s.Options(Intel.RealSense.Option.EmitterEnabled).Value = emitterOn
+                    ' s.Options(Intel.RealSense.Option.LaserPower).Value = 13
                 End If
             Next
 

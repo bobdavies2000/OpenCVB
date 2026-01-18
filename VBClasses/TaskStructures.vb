@@ -266,7 +266,7 @@ Namespace VBClasses
 
             Public mm As mmData ' min and max values of the depth data.
             Public corners As New List(Of cv.Point3f)
-            Public feature As cv.Point ' the max grid output from the current image
+            Public feature As cv.Point ' the max intensity value point
             Public intensity As Integer ' sobel maximum intensity in this brick.
             Public pt As cv.Point ' Brick's Sobel maximum in absolute coordinates.
             Public Function displayCell() As String

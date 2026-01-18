@@ -1482,6 +1482,7 @@ RedCloud_CellMask
 RedCloud_LeftRight
 RedCloud_Sweep
 RedColor_Basics
+RedColor_Bricks
 RedList_CPP
 RedList_Hulls
 RedMask_Basics
