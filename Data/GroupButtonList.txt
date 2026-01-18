@@ -140,7 +140,6 @@ Motion
 Mouse
 MSER
 Neighbor
-NF
 NR
 OEX
 OpAuto

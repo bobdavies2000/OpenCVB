@@ -1,3 +1,5 @@
+Imports System.Windows.Forms.Design.AxImporter
+Imports System.Windows.Forms.VisualStyles
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
@@ -240,4 +242,29 @@ Namespace VBClasses
             SetTrueText(strOut, 3)
         End Sub
     End Class
+
+
+
+    Public Class RedCloud_LeftRight : Inherits TaskParent
+        Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            desc = "Map the RedCloud output into the right view."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = runRedCloud(src, labels(2))
+
+            Dim count As Integer
+            dst1.SetTo(0)
+            For Each brick As brickData In task.bricks.brickList
+                If task.redCloud.rcMap(brick.lRect).CountNonZero And brick.rRect.Width > 0 Then
+                    dst2(brick.lRect).CopyTo(dst1(brick.rRect))
+                    count += 1
+                End If
+            Next
+
+            dst3 = ShowAddweighted(dst1, task.rightView, labels(3))
+        End Sub
+    End Class
+
+
 End Namespace
