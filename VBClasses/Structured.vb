@@ -3,36 +3,32 @@ Namespace VBClasses
     Public Class Structured_Basics : Inherits TaskParent
         Public lpListX As New List(Of lpData)
         Public lpListY As New List(Of lpData)
-        Public linesX As New Line_Basics
-        Public linesY As New Line_Basics
+        Public lines As New Line_Basics
         Dim struct As New Structured_Core
         Public Sub New()
+            task.gOptions.highlight.SelectedItem = "Red"
+            task.gOptions.LineWidth.Value += 1
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Find the lines in the X-direction of the Structured_Core output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             struct.Run(src)
-            linesX.Run(struct.dst2)
+            lines.Run(struct.dst2)
 
-            dst2 = src.Clone
-            task.FeatureSampleSize = 1000 ' want all the lines 
-            lpListX = New List(Of lpData)(linesX.lpList)
-            For Each lp In linesX.lpList
+            dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            lpListX = New List(Of lpData)(lines.lpList)
+            For Each lp In lines.lpList
                 DrawLine(dst2, lp)
             Next
+            labels(2) = struct.labels(2)
 
-            task.FeatureSampleSize = 1000 ' want all the lines 
-            linesY.Run(struct.dst3)
-            If task.heartBeat Then
-                labels(2) = linesX.labels(2)
-                labels(3) = linesY.labels(2)
-            End If
-
-            dst3 = src.Clone
-            lpListY = New List(Of lpData)(linesY.lpList)
-            For Each lp In linesY.lpList
+            lines.Run(struct.dst3)
+            dst3 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            lpListY = New List(Of lpData)(lines.lpList)
+            For Each lp In lines.lpList
                 DrawLine(dst3, lp)
             Next
+            labels(3) = struct.labels(3)
         End Sub
     End Class
 

@@ -272,4 +272,20 @@ Namespace VBClasses
             labels(3) += " " + CStr(count) + " bricks mapped into the right image."
         End Sub
     End Class
+
+
+
+
+
+
+    Public Class RedColor_LeftRight : Inherits TaskParent
+        Public Sub New()
+            task.gOptions.UseMotionMask.Checked = False
+            desc = "Create a color transformation for both the left and right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = runRedColor(task.leftView, labels(2))
+            dst3 = runRedColor(task.rightView, labels(3))
+        End Sub
+    End Class
 End Namespace

@@ -36,7 +36,7 @@ Public Class Options
             Case "Intel(R) RealSense(TM) Depth Camera 435i", "Intel(R) RealSense(TM) Depth Camera 455"
                 settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                                       True, True, True,
-                                                                      True, True, True,
+                                                                      False, False, False,
                                                                       False, False, False,
                                                                       False, False, False})
             Case "Oak-D camera"

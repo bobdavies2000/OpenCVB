@@ -1484,6 +1484,7 @@ RedCloud_LeftRight
 RedCloud_Sweep
 RedColor_Basics
 RedColor_Bricks
+RedColor_LeftRight
 RedList_CPP
 RedList_Hulls
 RedMask_Basics
