@@ -8,7 +8,6 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            If task.optionsChanged Then lastFrame = src.Clone
 
             cv.Cv2.Absdiff(src, lastFrame, dst3)
             dst2 = dst3.Threshold(task.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
@@ -17,10 +16,9 @@ Namespace VBClasses
                 lastFrame = src.Clone
                 strOut = "Motion detected - " + CStr(changedPixels) + " pixels changed with threshold " +
                          CStr(task.colorDiffThreshold)
-            Else
-                strOut = "No motion detected"
             End If
-            If task.heartBeat Then labels(3) = strOut
+            If changedPixels = 0 Then Dim k = 0
+            If task.heartBeat Then labels(3) = strOut + " " + CStr(changedPixels)
         End Sub
     End Class
 
@@ -165,4 +163,38 @@ Namespace VBClasses
             SetTrueText(strOut, 3)
         End Sub
     End Class
+
+
+
+
+    Public Class Diff_RGB : Inherits TaskParent
+        Dim diff(2) As Diff_Basics
+        Dim mats As New Mat_4Click
+        Public Sub New()
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            For i = 0 To diff.Count - 1
+                diff(i) = New Diff_Basics
+            Next
+            labels(3) = "This is the diff of the grayscale image."
+            desc = "Create a mask that shows when R, G, and B are different.  Compare it to diff for grayscale."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim split = src.Split()
+            dst2.SetTo(0)
+            For i = 0 To 2
+                diff(i).Run(split(i))
+                mats.mat(i) = diff(i).dst2
+                mats.mat(i).SetTo(1, mats.mat(i))
+                dst2 += mats.mat(i)
+            Next
+
+            dst2 = dst2.Threshold(2, 255, cv.ThresholdTypes.Binary)
+            dst3 = task.motionBasics.diff.dst2
+
+            If task.heartBeat Then
+                labels(2) = "Diff of RGB.split has " + CStr(dst2.CountNonZero) + " while gray has " + CStr(dst3.CountNonZero)
+            End If
+        End Sub
+    End Class
+
 End Namespace

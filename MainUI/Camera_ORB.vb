@@ -66,10 +66,16 @@ Namespace MainApp
 
             Dim param As CameraParam = pipe.GetCameraParam()
             Dim ratio = captureRes.Width \ workRes.Width
+            calibData.rgbIntrinsics.ppx = param.rgbIntrinsic.cx / ratio
+            calibData.rgbIntrinsics.ppy = param.rgbIntrinsic.cy / ratio
+            calibData.rgbIntrinsics.fx = param.rgbIntrinsic.fx / ratio
+            calibData.rgbIntrinsics.fy = param.rgbIntrinsic.fy / ratio
+
             calibData.leftIntrinsics.ppx = param.depthIntrinsic.cx / ratio
             calibData.leftIntrinsics.ppy = param.depthIntrinsic.cy / ratio
             calibData.leftIntrinsics.fx = param.depthIntrinsic.fx / ratio
             calibData.leftIntrinsics.fy = param.depthIntrinsic.fy / ratio
+
             calibData.baseline = 0.095 ' the RGB and left image provided are aligned so depth is easily found.
             PtCloud.SetCameraParam(param)
 

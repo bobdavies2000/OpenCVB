@@ -48,4 +48,77 @@ Namespace VBClasses
             End If
         End Sub
     End Class
+
+
+
+
+    Public Class Intrinsics_TranslateRGBtoLeft : Inherits TaskParent
+        Public Sub New()
+            task.gOptions.highlight.SelectedItem = "Red"
+            task.gOptions.LineWidth.Value += 1
+            desc = "Translate a point from the RGB image to the left image.  Test with the longest line as input."
+        End Sub
+        '---------------------------------------------
+        ' Map a pixel from RGB image into Left IR image
+        '---------------------------------------------
+        Public Shared Function MapRgbToLeftIr(uRgb As Single, vRgb As Single, depth As Single) As cv.Point2f
+            Dim rgbintr = task.calibData.rgbIntrinsics
+            Dim leftintr = task.calibData.leftIntrinsics
+            Dim rotation = task.calibData.ColorToLeft_Rotation
+            Dim translation = task.calibData.ColorToLeft_Translation
+
+            '-------------------------------
+            ' 1. Unproject RGB pixel to 3D
+            '-------------------------------
+            Dim Xrgb As Single = (uRgb - rgbIntr.ppx) * depth / rgbIntr.fx
+            Dim Yrgb As Single = (vRgb - rgbIntr.ppy) * depth / rgbIntr.fy
+            Dim Zrgb As Single = depth
+
+            ' Pack into vector
+            Dim Prgb() As Single = {Xrgb, Yrgb, Zrgb}
+
+            '-----------------------------------------
+            ' 2. Transform RGB 3D point → Left IR 3D
+            '-----------------------------------------
+            Dim Pleft(2) As Single
+
+            ' Matrix multiply: R * P + T
+            For i = 0 To 2
+                Pleft(i) = rotation(i * 3 + 0) * Prgb(0) + rotation(i * 3 + 1) * Prgb(1) +
+                           rotation(i * 3 + 2) * Prgb(2) + translation(i)
+            Next
+
+            Dim Xleft As Single = Pleft(0)
+            Dim Yleft As Single = Pleft(1)
+            Dim Zleft As Single = Pleft(2)
+
+            '-----------------------------------------
+            ' 3. Project Left IR 3D point → Left pixel
+            '-----------------------------------------
+            Dim uLeft As Single = leftIntr.fx * (Xleft / Zleft) + leftIntr.ppx
+            Dim vLeft As Single = leftIntr.fy * (Yleft / Zleft) + leftIntr.ppy
+
+            Return New cv.Point2f(uLeft, vLeft)
+        End Function
+
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = src
+            dst3 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
+            Dim count As Integer
+            For Each lp In task.lines.lpList
+                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                Dim depth1 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
+                Dim depth2 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
+
+                If depth1 > 0 And depth2 > 0 Then
+                    Dim p1 = MapRgbToLeftIr(lp.p1.X, lp.p1.Y, depth1)
+                    Dim p2 = MapRgbToLeftIr(lp.p2.X, lp.p2.Y, depth2)
+                    dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+                    count += 1
+                End If
+            Next
+            labels(2) = CStr(count) + " lines had depth for both ends and could be translated from BGR to left."
+        End Sub
+    End Class
+
 End Namespace

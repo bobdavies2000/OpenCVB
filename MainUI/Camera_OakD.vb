@@ -85,6 +85,17 @@ Namespace MainApp
             End If
 
             Dim ratio = captureRes.Width \ workRes.Width
+            Dim intrinsicsPtr = OakDintrinsics(cPtr, 1) ' RGB camera
+            If intrinsicsPtr <> IntPtr.Zero Then
+                Dim intrinsics(8) As Single
+                Marshal.Copy(intrinsicsPtr, intrinsics, 0, 9)
+                ' Intrinsics matrix: [fx, 0, cx; 0, fy, cy; 0, 0, 1]
+                calibData.rgbIntrinsics.fx = intrinsics(0) / ratio
+                calibData.rgbIntrinsics.ppx = intrinsics(2) / ratio
+                calibData.rgbIntrinsics.fy = intrinsics(4) / ratio
+                calibData.rgbIntrinsics.ppy = intrinsics(5) / ratio
+            End If
+
             Dim leftIntrinsicsPtr = OakDintrinsics(cPtr, 2) ' Left camera
             If leftIntrinsicsPtr <> IntPtr.Zero Then
                 Dim intrinsics(8) As Single
@@ -93,6 +104,16 @@ Namespace MainApp
                 calibData.leftIntrinsics.ppx = intrinsics(2) / ratio
                 calibData.leftIntrinsics.fy = intrinsics(4) / ratio
                 calibData.leftIntrinsics.ppy = intrinsics(5) / ratio
+            End If
+
+            Dim rightIntrinsicsPtr = OakDintrinsics(cPtr, 3) ' Right camera
+            If rightIntrinsicsPtr <> IntPtr.Zero Then
+                Dim intrinsics(8) As Single
+                Marshal.Copy(rightIntrinsicsPtr, intrinsics, 0, 9)
+                calibData.rightIntrinsics.fx = intrinsics(0) / ratio
+                calibData.rightIntrinsics.ppx = intrinsics(2) / ratio
+                calibData.rightIntrinsics.fy = intrinsics(4) / ratio
+                calibData.rightIntrinsics.ppy = intrinsics(5) / ratio
             End If
 
             Dim leftToRightPtr = OakDExtrinsicsLeftToRight(cPtr)

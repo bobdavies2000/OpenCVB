@@ -12,7 +12,7 @@ Namespace VBClasses
                    "(allows multiple targets per image.)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone And task.algorithmPrep = False Then
+            If standalone Then
                 SetTrueText("Match is called often so no need for standalone test.")
                 Exit Sub
             End If
@@ -46,7 +46,7 @@ Namespace VBClasses
                "(allows multiple targets per image.)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone And task.algorithmPrep = False Then
+            If standalone Then
                 SetTrueText("Match is called often so no need for standalone test.")
                 Exit Sub
             End If

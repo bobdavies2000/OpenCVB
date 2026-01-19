@@ -424,7 +424,6 @@ Namespace MainApp
             Debug.WriteLine("OptionsTesting USER: " & GdiMonitor.GetUserCount())
 
             StartStopTask()
-
             Dim optionsForm As New Options()
             If optionsForm.ShowDialog() = DialogResult.OK Then SaveJsonSettings()
 

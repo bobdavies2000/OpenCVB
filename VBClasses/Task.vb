@@ -104,11 +104,9 @@ Namespace VBClasses
 
             frameHistoryCount = 3 ' default value.  Use Options_History to update this value.
 
-            If optionsChanged Then motionMask.SetTo(255)
-
             filterBasics.Run(color)
             If gOptions.UseMotionMask.Checked Then
-                motionBasics.Run(gray)
+                motionBasics.Run(src)
                 If optionsChanged Or task.frameCount < 5 Then
                     grayStable = gray.Clone
                 Else
@@ -185,9 +183,7 @@ Namespace VBClasses
 
 
 
-            algorithmPrep = False
             MainUI_Algorithm.Run(src.Clone) ' <<<<<<<< This is where the VB algorithm runs...
-            algorithmPrep = True
 
 
 

@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Motion_Basics : Inherits TaskParent
         Public motionList As New List(Of Integer)
-        Dim diff As New Diff_Basics
+        Public diff As New Diff_RGB
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -11,10 +11,6 @@ Namespace VBClasses
             desc = "Find all the grid rects that had motion since the last frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Then src = task.gray
-            If task.heartBeat Or task.optionsChanged Then dst2 = src.Clone
-
-            diff.lastFrame = dst2
             diff.Run(src)
 
             motionList.Clear()
@@ -129,7 +125,6 @@ Namespace VBClasses
             Else
                 originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
             End If
-            If task.algorithmPrep = False Then Exit Sub ' this is a 'task' algorithm - run every frame.
 
             If task.optionsChanged Then
                 If task.rangesCloud Is Nothing Then
@@ -228,6 +223,7 @@ Namespace VBClasses
 
     Public Class Motion_RightImage : Inherits TaskParent
         Public motion As New Motion_Basics
+        Public motionMask As cv.Mat
         Public Sub New()
             desc = "Build the MotionMask for the right camera and validate it."
         End Sub
@@ -237,10 +233,30 @@ Namespace VBClasses
             dst2 = motion.dst2
             dst3 = motion.dst3
 
-            task.motionMaskRight = dst3.Clone
+            motionMask = dst3.Clone
             labels(2) = motion.labels(2)
             labels(3) = "The motion mask for the right image - MotionMaskRight"
         End Sub
     End Class
 
+
+
+
+    Public Class Motion_LeftImage : Inherits TaskParent
+        Public motion As New Motion_Basics
+        Public motionMask As cv.Mat
+        Public Sub New()
+            desc = "Build the MotionMask for the right camera and validate it."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            motion.Run(task.leftView)
+            dst1 = motion.dst1
+            dst2 = motion.dst2
+            dst3 = motion.dst3
+
+            motionMask = dst3.Clone
+            labels(2) = motion.labels(2)
+            labels(3) = "The motion mask for the right image - MotionMaskRight"
+        End Sub
+    End Class
 End Namespace

@@ -13373,8 +13373,6 @@ Namespace VBClasses
             desc = "Use the motionlist of rects to create one motion rectangle."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.algorithmPrep = False Then Exit Sub
-
             mCore.Run(src)
 
             If task.heartBeat Then dst2 = task.gray
@@ -16046,10 +16044,11 @@ Namespace VBClasses
 
 
     Public Class XO_Motion_RightMask : Inherits TaskParent
+        Public motionMaskRight As New cv.Mat
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             If standalone Then task.gOptions.showMotionMask.Checked = True
-            task.motionMaskRight = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            motionMaskRight = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             labels = {"", "Right View", "Motion Mask for the left view", "Motion Mask for the right view."}
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Build the MotionMask for the right image from the left image bricks with " + vbCrLf +
@@ -16060,13 +16059,13 @@ Namespace VBClasses
             dst2 = task.motionMask
             dst1 = task.rightView
 
-            task.motionMaskRight.SetTo(0)
+            motionMaskRight.SetTo(0)
             For Each index In task.motionBasics.motionList
                 Dim brick = task.bricks.brickList(index)
-                task.motionMaskRight.Rectangle(brick.rRect, 255, -1)
+                motionMaskRight.Rectangle(brick.rRect, 255, -1)
                 dst1.Rectangle(brick.rRect, 255, task.lineWidth)
             Next
-            dst3 = task.motionMaskRight.Clone
+            dst3 = motionMaskRight.Clone
         End Sub
     End Class
 

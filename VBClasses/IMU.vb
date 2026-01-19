@@ -274,7 +274,6 @@ Namespace VBClasses
                   {gArray(2, 0) * -sy + gArray(2, 1) * 0 + gArray(2, 2) * cy}})
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.algorithmPrep = False Then Exit Sub ' a direct call from another algorithm is unnecessary - already been run...
             If standaloneTest() Then
                 labels(2) = "IMU_GMatrix builds the gMatrix (gravity matrix) on every iteration."
             End If

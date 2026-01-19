@@ -45,21 +45,43 @@ Namespace MainApp
             Dim leftIntrin As Intrinsics = streamLeft.As(Of VideoStreamProfile)().GetIntrinsics()
             Dim leftExtrinsics As Extrinsics = streamLeft.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamRight)
 
-            Dim ratio As Single = captureRes.Width \ workRes.Width
+            Dim rgb As Intrinsics = StreamColor.As(Of VideoStreamProfile)().GetIntrinsics()
+            Dim rgbExtrinsics As Extrinsics = StreamColor.As(Of VideoStreamProfile)().GetExtrinsicsTo(streamLeft)
+
+            Dim ratio = captureRes.Width \ workRes.Width
+            calibData.rgbIntrinsics.ppx = rgb.ppx / ratio
+            calibData.rgbIntrinsics.ppy = rgb.ppy / ratio
+            calibData.rgbIntrinsics.fx = rgb.fx / ratio
+            calibData.rgbIntrinsics.fy = rgb.fy / ratio
+
             calibData.leftIntrinsics.fx = leftIntrin.fx / ratio
             calibData.leftIntrinsics.fy = leftIntrin.fy / ratio
             calibData.leftIntrinsics.ppx = leftIntrin.ppx / ratio
             calibData.leftIntrinsics.ppy = leftIntrin.ppy / ratio
 
             ReDim calibData.LtoR_translation(3 - 1)
+            ReDim calibData.LtoR_rotation(9 - 1)
+
+            ReDim calibData.ColorToLeft_translation(3 - 1)
+            ReDim calibData.ColorToLeft_rotation(9 - 1)
+
             For i = 0 To 3 - 1
                 calibData.LtoR_translation(i) = leftExtrinsics.translation(i)
+            Next
+            For i = 0 To 9 - 1
+                calibData.LtoR_rotation(i) = leftExtrinsics.rotation(i)
+            Next
+
+            For i = 0 To 3 - 1
+                calibData.ColorToLeft_translation(i) = rgbExtrinsics.translation(i)
+            Next
+            For i = 0 To 9 - 1
+                calibData.ColorToLeft_rotation(i) = rgbExtrinsics.rotation(i)
             Next
 
             calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.LtoR_translation(0), 2) +
                                                   System.Math.Pow(calibData.LtoR_translation(1), 2) +
                                                   System.Math.Pow(calibData.LtoR_translation(2), 2))
-
             MyBase.prepImages()
 
             ' Start background thread to capture frames

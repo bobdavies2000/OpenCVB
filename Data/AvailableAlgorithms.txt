@@ -159,6 +159,7 @@ DFT_ButterworthFilter_MT
 Diff_Basics
 Diff_Color
 Diff_Depth32f
+Diff_RGB
 Diff_RGBAccum
 Diff_UnstableDepthAndColor
 Dilate_Basics
@@ -363,6 +364,7 @@ InPaint_Basics
 Interpolate_Basics
 Interpolate_Kalman
 Intrinsics_Basics
+Intrinsics_TranslateRGBtoLeft
 Kalman_Basics
 Kalman_CVMat
 Kalman_ImageSmall
@@ -448,6 +450,7 @@ ML_Basics
 ML_RemoveDups_CPP
 Moments_Basics
 Motion_Basics
+Motion_LeftImage
 Motion_PointCloud
 Motion_RightImage
 Mouse_Basics
@@ -1355,7 +1358,6 @@ NR_TextureFlow_DepthSegments
 NR_TextureFlow_Reduction
 NR_Threshold_Adaptive
 NR_Threshold_ColorSource
-NR_Threshold_Definitions
 NR_Track_GridRect
 NR_Track_Lines
 NR_Track_LongestLine
@@ -1558,6 +1560,7 @@ TextureFlow_Basics
 Thickness_Basics
 Threshold_Basics
 Threshold_ByChannels
+Threshold_Definitions
 Track_Basics
 Track_BasicsQT
 Triangle_Basics

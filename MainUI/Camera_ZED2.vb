@@ -10,6 +10,11 @@ Namespace MainApp
             zed = New CamZed(workRes, captureRes, deviceName)
 
             Dim ratio = captureRes.Width \ workRes.Width
+            calibData.rgbIntrinsics.fx = zed.rgbIntrinsics.fx / ratio
+            calibData.rgbIntrinsics.fy = zed.rgbIntrinsics.fy / ratio
+            calibData.rgbIntrinsics.ppx = zed.rgbIntrinsics.ppx / ratio
+            calibData.rgbIntrinsics.ppy = zed.rgbIntrinsics.ppy / ratio
+
             calibData.leftIntrinsics.fx = zed.leftIntrinsics.fx / ratio
             calibData.leftIntrinsics.fy = zed.leftIntrinsics.fy / ratio
             calibData.leftIntrinsics.ppx = zed.leftIntrinsics.ppx / ratio

@@ -15,8 +15,6 @@ Namespace VBClasses
             Return False
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.algorithmPrep = False Then Exit Sub ' only run as a task algorithm.
-
             If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
             If lpList.Count <= 1 Then
                 task.motionMask.SetTo(255)

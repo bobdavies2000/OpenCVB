@@ -3,33 +3,9 @@ Imports System.Threading
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 Imports Intel.RealSense
 Imports cv = OpenCvSharp
-Public Structure intrinsicData
-    Public ppx As Single
-    Public ppy As Single
-    Public fx As Single
-    Public fy As Single
-End Structure
-Public Structure cameraInfo
-    Public baseline As Single ' this is the baseline of the left to right cameras
-
-    Public rgbIntrinsics As intrinsicData
-    Public leftIntrinsics As intrinsicData
-    Public rightIntrinsics As intrinsicData
-
-    Public ColorToLeft_translation() As Single
-    Public ColorToLeft_rotation() As Single
-
-    Public LtoR_translation() As Single
-    Public LtoR_rotation() As Single
-
-    Public v_fov As Single ' vertical field of view in degrees.
-    Public h_fov As Single ' horizontal field of view in degrees.
-    Public d_fov As Single ' diagonal field of view in degrees.
-End Structure
-
 Public Class GenericCamera
     Public cameraMutex = New Mutex(True, "CameraMutex")
-    Public color As cv.Mat, leftView As cv.Mat, pointCloud As cv.Mat, rightView As cv.Mat, depth16u As cv.Mat, disparity As cv.Mat  
+    Public color As cv.Mat, leftView As cv.Mat, pointCloud As cv.Mat, rightView As cv.Mat, depth16u As cv.Mat, disparity As cv.Mat
 
     Public IMU_TimeStamp As Double
     Public IMU_Acceleration As cv.Point3f
@@ -45,12 +21,35 @@ Public Class GenericCamera
     Public captureRes As cv.Size
     Public workRes As cv.Size
 
-    Public calibData As cameraInfo
+    Public calibData As CameraInfo
 
     Public Event FrameReady(sender As GenericCamera)
     Public isCapturing As Boolean
     Public frameProcessed As Boolean = True
     Public captureThread As Thread = Nothing
+    Public Structure intrinsicData
+        Public ppx As Single
+        Public ppy As Single
+        Public fx As Single
+        Public fy As Single
+    End Structure
+    Public Structure cameraInfo
+        Public baseline As Single ' this is the baseline of the left to right cameras
+
+        Public rgbIntrinsics As intrinsicData
+        Public leftIntrinsics As intrinsicData
+        Public rightIntrinsics As intrinsicData
+
+        Public ColorToLeft_translation() As Single
+        Public ColorToLeft_rotation() As Single
+
+        Public LtoR_translation() As Single
+        Public LtoR_rotation() As Single
+
+        Public v_fov As Single ' vertical field of view in degrees.
+        Public h_fov As Single ' horizontal field of view in degrees.
+        Public d_fov As Single ' diagonal field of view in degrees.
+    End Structure
     Public Structure imuDataStruct
         Dim r00 As Single
         Dim r01 As Single

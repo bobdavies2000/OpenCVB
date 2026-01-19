@@ -346,6 +346,13 @@ Namespace VBClasses
 
             Public p1 As cv.Point2f
             Public p2 As cv.Point2f
+
+            Public pLeft1 As cv.Point2f
+            Public pLeft2 As cv.Point2f
+
+            Public pRight1 As cv.Point2f
+            Public pRight2 As cv.Point2f
+
             Public pVec1 As cv.Vec3f
             Public pVec2 As cv.Vec3f
             Public pE1 As cv.Point2f ' end points - goes to the edge of the image.
@@ -431,6 +438,8 @@ Namespace VBClasses
                 End If
 
                 length = p1.DistanceTo(p2)
+
+                'p1left = New cv.Point2f()
 
                 p1GridIndex = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
                 p2GridIndex = task.gridMap.Get(Of Integer)(p2.Y, p2.X)

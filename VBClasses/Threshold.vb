@@ -55,13 +55,13 @@ Namespace VBClasses
 
 
     ' https://docs.opencvb.org/4.x/d7/d4d/tutorial_py_thresholding.html
-    Public Class NR_Threshold_Definitions : Inherits TaskParent
+    Public Class Threshold_Definitions : Inherits TaskParent
         Dim gradient As New Gradient_Color
         Dim mats As New Mat_4to1
         Dim options As New Options_ThresholdDef
         Public Sub New()
-            If standalone Then task.gOptions.displaydst0.checked = True
-            If standalone Then task.gOptions.displaydst1.checked = True
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
             labels = {"Gradient input (from Gradient_Basics)", "Binary threshold output of Gradient input at left", "Clockwise: binaryInv, Trunc, ToZero, ToZeroInv", "Current selection"}
             desc = "Demonstrate BinaryInv, Trunc, ToZero, and ToZero_Inv threshold methods"
         End Sub
