@@ -96,6 +96,7 @@ Cluster_Basics
 Coherence_Basics
 Color_Basics
 Color8U_Basics
+Color8U_Bricks
 Color8U_Complementary
 Color8U_Hue
 Color8U_LeftRight

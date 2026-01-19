@@ -419,13 +419,45 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8u.Run(task.leftView)
-            dst2 = color8u.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst2 = color8u.dst3.Clone
             labels(2) = color8u.labels(2)
 
             color8u.Run(task.rightView)
-            dst3 = color8u.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst3 = color8u.dst3.Clone
             labels(3) = color8u.labels(2)
         End Sub
     End Class
 
+
+
+
+
+
+    Public Class Color8U_Bricks : Inherits TaskParent
+        Dim color8u As New Color8U_Basics
+        Public brickList As New List(Of brickData)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            desc = "Attach an color8u class to each brick."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst0 = task.leftView
+            color8u.Run(task.leftView)
+            dst2 = color8u.dst3
+
+            Dim count As Integer
+            dst1.SetTo(0)
+            For Each brick As brickData In task.bricks.brickList
+                If brick.rRect.Width > 0 Then
+                    dst2(brick.lRect).CopyTo(dst1(brick.rRect))
+                    brick.colorClass = color8u.dst2.Get(Of Integer)
+                    count += 1
+                End If
+            Next
+
+            dst3 = ShowAddweighted(dst1, task.rightView, labels(3))
+            labels(3) += " " + CStr(count) + " bricks mapped into the right image."
+        End Sub
+    End Class
 End Namespace

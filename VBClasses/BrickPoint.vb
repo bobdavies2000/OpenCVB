@@ -49,7 +49,7 @@ Namespace VBClasses
             ptList.Clear()
             For Each brick In task.bricks.brickList
                 Dim mm = GetMinMax(src(brick.rect))
-                brick.pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
+                Dim pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
                 If mm.maxVal >= threshold Then ptList.Add(New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y))
             Next
 
@@ -177,7 +177,9 @@ Namespace VBClasses
                     lpList.Add(lpZero)
                 Else
                     Dim gc1 = task.bricks.brickList(brick.index - task.bricksPerRow)
-                    Dim lp = New lpData(brick.pt, gc1.pt)
+                    Dim pt = New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y)
+                    Dim ptGc1 = New cv.Point(gc1.mm.maxLoc.X + gc1.rect.X, gc1.mm.maxLoc.Y + gc1.rect.Y)
+                    Dim lp = New lpData(pt, ptGc1)
                     lpList.Add(lp)
                 End If
             Next

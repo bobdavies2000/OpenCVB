@@ -124,7 +124,10 @@ Namespace VBClasses
 
             dst1 = src
             For Each brick In task.bricks.brickList
-                If brick.pt.Y = brick.rect.Y Then DrawCircle(dst1, brick.pt)
+                Dim pt = New cv.Point(brick.mm.maxLoc.X + brick.rect.X, brick.mm.maxLoc.Y + brick.rect.Y)
+                If pt.Y = brick.rect.Y Then
+                    DrawCircle(dst1, pt)
+                End If
             Next
 
             Dim M = cv.Cv2.GetRotationMatrix2D(rotateCenter, -rotateAngle, 1)

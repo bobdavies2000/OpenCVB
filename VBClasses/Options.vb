@@ -8177,7 +8177,7 @@ Namespace VBClasses
         Public correlation As Single
         Public Sub New()
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Left to Right brick correlation Minimum X100", 0, 100, 80)
+                sliders.setupTrackBar("Left to Right brick correlation Minimum X100", 0, 100, 70)
             End If
         End Sub
         Public Sub Run()

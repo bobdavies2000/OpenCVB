@@ -240,4 +240,36 @@ Namespace VBClasses
             dst2 = runRedColor(binN.dst2, labels(2))
         End Sub
     End Class
+
+
+
+
+
+    Public Class RedColor_Bricks : Inherits TaskParent
+        Dim color8u As New Color8U_Basics
+        Public brickList As New List(Of brickData)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            desc = "Attach an color8u class to each brick."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst0 = task.leftView
+            color8u.Run(task.leftView)
+            dst2 = runRedColor(color8u.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY), labels(3))
+
+            Dim count As Integer
+            dst1.SetTo(0)
+            For Each brick As brickData In task.bricks.brickList
+                If task.redColor.rcMap(brick.lRect).CountNonZero And brick.rRect.Width > 0 Then
+                    dst2(brick.lRect).CopyTo(dst1(brick.rRect))
+                    brick.colorClass = color8u.dst2.Get(Of Integer)
+                    count += 1
+                End If
+            Next
+
+            dst3 = ShowAddweighted(dst1, task.rightView, labels(3))
+            labels(3) += " " + CStr(count) + " bricks mapped into the right image."
+        End Sub
+    End Class
 End Namespace

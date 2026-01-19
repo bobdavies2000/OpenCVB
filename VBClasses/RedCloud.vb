@@ -266,32 +266,4 @@ Namespace VBClasses
             labels(3) += " " + CStr(count) + " bricks mapped into the right image."
         End Sub
     End Class
-
-
-
-
-
-    Public Class RedColor_Bricks : Inherits TaskParent
-        Dim color8u As New Color8U_Basics
-        Public brickList As New List(Of brickData)
-        Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-            desc = "Attach an color8u class to each brick."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedColor(src, labels(2))
-            color8u.Run(task.grayStable)
-
-            'Dim count As Integer
-            'dst1.SetTo(0)
-            'For Each brick As brickData In task.bricks.brickList
-            '    If task.redColor.rcMap(brick.lRect).CountNonZero And brick.rRect.Width > 0 Then
-            '        dst2(brick.lRect).CopyTo(dst1(brick.rRect))
-            '        brick.
-            '        count += 1
-            '    End If
-            'Next
-        End Sub
-    End Class
-
 End Namespace

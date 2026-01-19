@@ -266,7 +266,7 @@ Namespace VBClasses
 
             Public mm As mmData ' min and max values of the depth data.
             Public corners As New List(Of cv.Point3f)
-            Public pt As cv.Point ' brick's Sobel maximum in absolute coordinates.
+            Public colorClass As Integer
             Public Function displayCell() As String
                 Dim strOut = "rcList index = " + CStr(index) + vbCrLf
                 strOut += "Age = " + CStr(age) + vbCrLf

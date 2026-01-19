@@ -67,7 +67,9 @@ Namespace VBClasses
             dst0.SetTo(0, task.noDepthMask)
 
             Dim mm = GetMinMax(task.pcSplit(2), dst0)
-            If gcMin.pt.DistanceTo(mm.minLoc) > gcMin.pt.DistanceTo(mm.maxLoc) Then
+            Dim ptMin = New cv.Point(gcMin.mm.minLoc.X + gcMin.rect.X, gcMin.mm.minLoc.Y + gcMin.rect.Y)
+            Dim ptMax = New cv.Point(gcMin.mm.maxLoc.X + gcMin.rect.X, gcMin.mm.maxLoc.Y + gcMin.rect.Y)
+            If ptMin.DistanceTo(mm.minLoc) > ptMax.DistanceTo(mm.maxLoc) Then
                 Dim tmp = gcMin
                 gcMin = gcMax
                 gcMax = tmp
