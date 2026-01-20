@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Intrinsics_Basics : Inherits TaskParent
         Public Sub New()
@@ -118,6 +119,123 @@ Namespace VBClasses
                 End If
             Next
             labels(2) = CStr(count) + " lines had depth for both ends and could be translated from BGR to left."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Intrinsics_TranslateLeftToRGB : Inherits TaskParent
+        Public Sub New()
+            desc = "Translate a point from the left image to the RGB image"
+        End Sub
+
+        '---------------------------------------------------------
+        ' Convert a pixel from Left IR image to RGB image (VB.NET)
+        '---------------------------------------------------------
+        'Public Function MapLeftToRgb(uLeft As Single, vLeft As Single, depth As Single) As cv.Point2f
+
+        '    Dim rgbintr = task.calibData.rgbIntrinsics
+        '    Dim leftintr = task.calibData.leftIntrinsics
+        '    Dim rotation = task.calibData.ColorToLeft_Rotation
+        '    Dim translation = task.calibData.ColorToLeft_Translation
+
+        '    '-----------------------------------------
+        '    ' 1. Unproject Left IR pixel into 3D point
+        '    '-----------------------------------------
+        '    Dim Xleft As Single = (uLeft - leftintr.ppx) * depth / leftintr.fx
+        '    Dim Yleft As Single = (vLeft - leftintr.ppy) * depth / leftintr.fy
+        '    Dim Zleft As Single = depth
+
+        '    Dim Pleft() As Single = {Xleft, Yleft, Zleft}
+
+        '    '-----------------------------------------------------
+        '    ' 2. Transform Left IR 3D point → RGB camera 3D point
+        '    '-----------------------------------------------------
+        '    Dim Prgb(2) As Single
+
+        '    For i = 0 To 2
+        '        Prgb(i) =
+        '    extrLeftToRgb.rotation(i * 3 + 0) * Pleft(0) +
+        '    extrLeftToRgb.rotation(i * 3 + 1) * Pleft(1) +
+        '    extrLeftToRgb.rotation(i * 3 + 2) * Pleft(2) +
+        '    extrLeftToRgb.translation(i)
+        '    Next
+
+        '    Dim Xrgb As Single = Prgb(0)
+        '    Dim Yrgb As Single = Prgb(1)
+        '    Dim Zrgb As Single = Prgb(2)
+
+        '    '-----------------------------------------
+        '    ' 3. Project RGB 3D point → RGB pixel
+        '    '-----------------------------------------
+        '    Dim uRgb As Single = rgbintr.fx * (Xrgb / Zrgb) + rgbintr.ppx
+        '    Dim vRgb As Single = rgbintr.fy * (Yrgb / Zrgb) + rgbintr.ppy
+
+        '    Return New cv.Point2f(uRgb, vRgb)
+        'End Function
+
+        'Public Function InvertExtrinsicsOpenCV(src As Single())
+        ''-----------------------------------------
+        '' Convert rotation[] → 3×3 Mat
+        ''-----------------------------------------
+        'Dim R = cv.Mat.FromPixelData(3, 3, MatType.CV_32F, task.calibData.ColorToLeft_Rotation)
+
+        '' Convert translation[] → 3×1 Mat
+        'Dim T = cv.Mat.FromPixelData(3, 1, MatType.CV_32F, task.calibData.ColorToLeft_Translation)
+
+        ''-----------------------------------------
+        '' 1. Invert rotation: R_inv = R^T
+        ''-----------------------------------------
+        'Dim Rinv As New Mat()
+        'Cv2.Transpose(R, Rinv)
+
+        ''-----------------------------------------
+        '' 2. Invert translation: T_inv = -R^T * T
+        ''-----------------------------------------
+        'Dim Tinv As Mat = -(Rinv * T)
+
+        ''-----------------------------------------
+        '' Pack back into rs2_extrinsics
+        ''-----------------------------------------
+        'Dim inv As New rs2_extrinsics()
+        'inv.rotation = New Single(8) {}
+        'inv.translation = New Single(2) {}
+
+        '' Copy rotation
+        'For R = 0 To 2
+        '    For c = 0 To 2
+        '        inv.rotation(R * 3 + c) = Rinv.Get(Of Single)(R, c)
+        '    Next
+        'Next
+
+        '' Copy translation
+        'For i = 0 To 2
+        '    inv.translation(i) = Tinv.Get(Of Single)(i, 0)
+        'Next
+
+        'Return inv
+        'End Function
+
+
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            'dst2 = src
+            'dst3 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
+            'Dim count As Integer
+            'For Each lp In task.lines.lpList
+            '    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            '    Dim depth1 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
+            '    Dim depth2 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
+
+            '    If depth1 > 0 And depth2 > 0 Then
+            '        Dim p1 = MapRgbToLeftIr(lp.p1.X, lp.p1.Y, depth1)
+            '        Dim p2 = MapRgbToLeftIr(lp.p2.X, lp.p2.Y, depth2)
+            '        dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+            '        count += 1
+            '    End If
+            'Next
+            'labels(2) = CStr(count) + " lines had depth for both ends and could be translated from BGR to left."
         End Sub
     End Class
 

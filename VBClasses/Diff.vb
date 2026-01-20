@@ -9,6 +9,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
+            If task.firstPass Then lastFrame.SetTo(0)
+
             cv.Cv2.Absdiff(src, lastFrame, dst3)
             dst2 = dst3.Threshold(task.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
             changedPixels = dst2.CountNonZero
@@ -17,8 +19,6 @@ Namespace VBClasses
                 strOut = "Motion detected - " + CStr(changedPixels) + " pixels changed with threshold " +
                          CStr(task.colorDiffThreshold)
             End If
-            If changedPixels = 0 Then Dim k = 0
-            If task.heartBeat Then labels(3) = strOut + " " + CStr(changedPixels)
         End Sub
     End Class
 

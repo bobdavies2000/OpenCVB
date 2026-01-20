@@ -88,8 +88,9 @@ Namespace VBClasses
         Public gravityBasics As Gravity_Basics
         Public imuBasics As IMU_Basics
         Public motionBasics As Motion_Basics
+        Public motionLeft As Motion_Left
         Public contours As Contour_Basics_List
-        Public pcMotion As Motion_PointCloud
+        Public pcMotion As XO_Motion_PointCloud
         Public brightness As Brightness_Basics
         Public leftRight As LeftRight_Basics
 
@@ -140,8 +141,6 @@ Namespace VBClasses
         Public flessBoundary As New cv.Mat
         Public lowResColor As New cv.Mat
         Public lowResDepth As New cv.Mat
-
-        Public motionMask As New cv.Mat
 
         Public MainUI_Algorithm As Object
         Public myStopWatch As Stopwatch

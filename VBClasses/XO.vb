@@ -812,7 +812,7 @@ Namespace VBClasses
                 DrawCircle(dst1, maxList(i), task.DotSize, cv.Scalar.Blue)
             Next
 
-            If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
+            If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionBasics.motionMask)
 
             Dim facets = New cv.Point2f()() {Nothing}
             Dim centers() As cv.Point2f = Nothing
@@ -1568,7 +1568,7 @@ Namespace VBClasses
 
             Dim lineList = New List(Of cv.Rect)
             If task.optionsChanged Then dst3.SetTo(0)
-            dst3.SetTo(0, task.motionMask)
+            dst3.SetTo(0, task.motionBasics.motionMask)
             p1List.Clear()
             p2List.Clear()
             z1List.Clear()
@@ -1629,7 +1629,7 @@ Namespace VBClasses
             lpList.Clear()
             lpList.Add(New lpData) ' placeholder to allow us to build a map.
             If lastList.Count > 0 Then
-                lpRectMap.SetTo(0, Not task.motionMask)
+                lpRectMap.SetTo(0, Not task.motionBasics.motionMask)
                 cv.Cv2.CalcHist({lpRectMap}, {0}, emptyMat, histogram, 1, {lastList.Count}, New cv.Rangef() {New cv.Rangef(0, lastList.Count)})
                 Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
@@ -1642,7 +1642,7 @@ Namespace VBClasses
             ReDim histarray(lines.lpList.Count - 1)
 
             Dim tmp = lines.lpRectMap.Clone
-            tmp.SetTo(0, Not task.motionMask)
+            tmp.SetTo(0, Not task.motionBasics.motionMask)
             cv.Cv2.CalcHist({tmp}, {0}, emptyMat, histogram, 1, {lines.lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lines.lpList.Count)})
             Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
@@ -4729,7 +4729,7 @@ Namespace VBClasses
                     dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
                 Next
 
-                cv.Cv2.CalcHist({dst1}, {0}, task.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lpList.Count)})
+                cv.Cv2.CalcHist({dst1}, {0}, task.motionBasics.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lpList.Count)})
 
                 Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
             End If
@@ -4826,7 +4826,7 @@ Namespace VBClasses
             End If
 
             If task.heartBeatLT Or task.lines.lpList.Count <= 1 Or match.correlation < 0.98 Or runOnEachFrame Then
-                task.motionMask.SetTo(255) ' force a complete line detection
+                task.motionBasics.motionMask.SetTo(255) ' force a complete line detection
                 task.lines.Run(src.Clone)
 
                 cameraMotionProxy = task.lines.lpList(0)
@@ -7650,7 +7650,7 @@ Namespace VBClasses
                 If match.p1Correlation < task.fCorrThreshold Or task.frameCount < 10 Or
                match.p2Correlation < task.fCorrThreshold Then
 
-                    task.motionMask.SetTo(255) ' force a complete line detection
+                    task.motionBasics.motionMask.SetTo(255) ' force a complete line detection
                     task.lines.Run(src.Clone)
 
                     match.lpInput = task.lines.lpList(0)
@@ -8043,7 +8043,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.optionsChanged Then
                 lpList.Clear()
-                task.motionMask.SetTo(255)
+                task.motionBasics.motionMask.SetTo(255)
             End If
 
             Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
@@ -11055,7 +11055,7 @@ Namespace VBClasses
 
             Dim oldrclist As New List(Of oldrcData)
             For Each rc In task.redList.oldrclist
-                If task.motionMask(rc.rect).CountNonZero = 0 Then
+                If task.motionBasics.motionMask(rc.rect).CountNonZero = 0 Then
                     If rc.indexLast > 0 And rc.indexLast < lastList.Count Then rc = lastList(rc.indexLast)
                 End If
                 Dim index = oldrclist.Count
@@ -11110,7 +11110,7 @@ Namespace VBClasses
                 Dim md = mdList(index)
                 rc.color = task.scalarColors(md.index)
                 If rc.indexLast <> 0 Then
-                    If (task.motionMask(rc.rect) And rc.mask).ToMat.CountNonZero = 0 Then
+                    If (task.motionBasics.motionMask(rc.rect) And rc.mask).ToMat.CountNonZero = 0 Then
                         rc = rcLastList(rc.indexLast)
                         lastCount += 1
                     End If
@@ -11534,7 +11534,7 @@ Namespace VBClasses
                         "Any differences that persist should not be visible in the RGB image at left." + vbCrLf, 3)
             End If
             If task.heartBeat Then dst2 = src.Clone
-            task.motionMask = dst1.Clone
+            task.motionBasics.motionMask = dst1.Clone
         End Sub
     End Class
 
@@ -11824,7 +11824,7 @@ Namespace VBClasses
 
             If cellList.Count >= task.frameHistoryCount Then cellList.RemoveAt(0)
             src.CopyTo(dst2, dst3)
-            task.motionMask = dst3.Clone
+            task.motionBasics.motionMask = dst3.Clone
 
             labels(2) = CStr(motionList.Count) + " grid rect's or " +
                     Format(motionList.Count / task.gridRects.Count, "0.0%") +
@@ -12268,7 +12268,7 @@ Namespace VBClasses
             dst2 = redContours.dst2
             labels(2) = redContours.labels(2)
 
-            dst1.SetTo(0, Not task.motionMask)
+            dst1.SetTo(0, Not task.motionBasics.motionMask)
 
             Dim histogram As New cv.Mat
             Dim ranges = {New cv.Rangef(1, 256)}
@@ -13428,7 +13428,7 @@ Namespace VBClasses
                 dst3(rect).SetTo(255)
             Next
 
-            task.motionMask = dst3.Clone
+            task.motionBasics.motionMask = dst3.Clone
             labels(2) = CStr(motionList.Count) + " grid rects had motion."
         End Sub
     End Class
@@ -13740,7 +13740,7 @@ Namespace VBClasses
 
             If motionLists.Count > 10 Then motionLists.RemoveAt(0)
 
-            task.motionMask = dst3.Clone
+            task.motionBasics.motionMask = dst3.Clone
             labels(2) = CStr(motionList.Count) + " grid rects had motion."
         End Sub
     End Class
@@ -14398,8 +14398,8 @@ Namespace VBClasses
         End Sub
         Private Function lpMotion(lp As lpData) As Boolean
             ' return true if either line endpoint was in the motion mask.
-            If task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
-            If task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
+            If task.motionBasics.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
+            If task.motionBasics.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
             Return False
         End Function
         Public Shared Function createMap() As cv.Mat
@@ -14412,7 +14412,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If lpList.Count <= 1 Then
-                task.motionMask.SetTo(255)
+                task.motionBasics.motionMask.SetTo(255)
                 rawLines.Run(src)
                 lpList = New List(Of lpData)(rawLines.lpList)
             End If
@@ -16056,7 +16056,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             task.bricks.Run(task.grayStable)
-            dst2 = task.motionMask
+            dst2 = task.motionBasics.motionMask
             dst1 = task.rightView
 
             motionMaskRight.SetTo(0)
@@ -16726,15 +16726,15 @@ Namespace VBClasses
         Public classCount As Integer
         Dim motion As New XO_Motion_BGSub
         Public Sub New()
-            desc = "Prepare a Color8U_Basics image using the task.motionMask"
+            desc = "Prepare a Color8U_Basics image using the motionMask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.motionMask.CountNonZero Then
-                src.SetTo(0, Not task.motionMask)
+            If task.motionBasics.motionMask.CountNonZero Then
+                src.SetTo(0, Not task.motionBasics.motionMask)
                 color8U.Run(src)
                 dst2 = color8U.dst3
-                dst2.CopyTo(dst3, task.motionMask)
-                dst2.SetTo(0, Not task.motionMask)
+                dst2.CopyTo(dst3, task.motionBasics.motionMask)
+                dst2.SetTo(0, Not task.motionBasics.motionMask)
                 classCount = color8U.classCount
             End If
             If task.heartBeatLT Then dst3.SetTo(0)
@@ -17252,6 +17252,125 @@ Namespace VBClasses
             classCount = contourList.Count
 
             labels(2) = CStr(contourList.Count) + " contours were found"
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class XO_Motion_PointCloud : Inherits TaskParent
+        Public originalPointcloud As cv.Mat
+        Public Sub New()
+            labels(1) = "The difference between the latest pointcloud and the motion-adjusted point cloud."
+            labels(2) = "Point cloud after updating with the motion mask changes."
+            labels(3) = "task.pointcloud for the current frame."
+            desc = "Point cloud after updating with the motion mask"
+        End Sub
+        Public Shared Function checkNanInf(pc As cv.Mat) As cv.Mat
+            ' these don't work because there are NaN's and Infinity's (both can be present)
+            ' cv.Cv2.PatchNaNs(pc, 0.0) 
+            ' Dim mask As New cv.Mat
+            ' cv.Cv2.Compare(pc, pc, mask, cv.CmpType.EQ)
+
+            Dim count As Integer
+            Dim vec As New cv.Vec3f(0, 0, 0)
+            ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+            ' with and without gravity transform.  Probably my fault but just fix it here.
+            For y = 0 To pc.Rows - 1
+                For x = 0 To pc.Cols - 1
+                    Dim val = pc.Get(Of cv.Vec3f)(y, x)
+                    If Single.IsNaN(val(0)) Or Single.IsInfinity(val(0)) Then
+                        pc.Set(Of cv.Vec3f)(y, x, vec)
+                        count += 1
+                    End If
+                Next
+            Next
+
+            'Dim mean As cv.Scalar, stdev As cv.Scalar
+            'cv.Cv2.MeanStdDev(originalPointcloud, mean, stdev)
+            'Debug.WriteLine("Before Motion mean " + mean.ToString())
+
+            Return pc
+        End Function
+        Public Sub preparePointcloud()
+            If task.gOptions.gravityPointCloud.Checked Then
+                '******* this is the gravity rotation *******
+                task.gravityCloud = (task.pointCloud.Reshape(1,
+                            task.rows * task.cols) * task.gMatrix).ToMat.Reshape(3, task.rows)
+                task.pointCloud = task.gravityCloud
+            End If
+
+            ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+            ' with and without gravity transform.  Probably my fault but just fix it here.
+            If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
+                task.pointCloud = checkNanInf(task.pointCloud)
+            End If
+
+            task.pcSplit = task.pointCloud.Split
+
+            If task.optionsChanged Then
+                task.maxDepthMask = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_8U, 0)
+            End If
+            If task.gOptions.TruncateDepth.Checked Then
+                task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
+                                                        task.MaxZmeters, cv.ThresholdTypes.Trunc)
+                task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
+                                                        task.MaxZmeters).ConvertScaleAbs()
+                cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+            End If
+
+            task.depthmask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            task.noDepthMask = Not task.depthmask
+
+            If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
+                Dim xRatio = task.xRangeDefault / task.xRange
+                Dim yRatio = task.yRangeDefault / task.yRange
+                task.pcSplit(0) *= xRatio
+                task.pcSplit(1) *= yRatio
+
+                cv.Cv2.Merge(task.pcSplit, task.pointCloud)
+            End If
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeatLT Or task.optionsChanged Or task.frameCount < 5 Then
+                dst2 = task.pointCloud.Clone
+                'dst0 = task.depthMask.Clone
+            End If
+            If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
+                originalPointcloud = checkNanInf(task.pointCloud).Clone
+            Else
+                originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
+            End If
+
+            If task.optionsChanged Then
+                If task.rangesCloud Is Nothing Then
+                    Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+                    Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+                    Dim rz = New cv.Vec2f(0, task.MaxZmeters)
+                    task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1),
+                                                    New cv.Rangef(ry.Item0, ry.Item1),
+                                                    New cv.Rangef(rz.Item0, rz.Item1)}
+                End If
+            End If
+
+            task.pointCloud.CopyTo(dst2, task.motionBasics.motionMask)
+            task.pointCloud = dst2
+            ' dst0.CopyTo(task.depthMask, task.motionBasics.motionMask)
+
+            preparePointcloud()
+
+            If standaloneTest() Then
+                dst3 = originalPointcloud.Clone
+
+                Static diff As New Diff_Depth32f
+                Dim split = dst3.Split()
+                diff.lastDepth32f = split(2)
+                diff.Run(task.pcSplit(2))
+            End If
         End Sub
     End Class
 End Namespace

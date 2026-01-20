@@ -32,7 +32,6 @@ Namespace VBClasses
 
             cpu.callTrace = New List(Of String)
             gravityCloud = New cv.Mat(workRes, cv.MatType.CV_32FC3, 0)
-            motionMask = New cv.Mat(workRes, cv.MatType.CV_8U, 255)
             noDepthMask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
             depthmask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
 
@@ -41,7 +40,7 @@ Namespace VBClasses
             gravityBasics = New Gravity_Basics
             imuBasics = New IMU_Basics
             motionBasics = New Motion_Basics
-            pcMotion = New Motion_PointCloud
+            pcMotion = New XO_Motion_PointCloud
             grid = New Grid_Basics
             lines = New Line_Basics
             filterBasics = New Filter_Basics
@@ -106,14 +105,14 @@ Namespace VBClasses
 
             filterBasics.Run(color)
             If gOptions.UseMotionMask.Checked And firstPass = False Then
-                motionBasics.Run(src)
+                motionBasics.Run(gray)
                 If optionsChanged Or task.frameCount < 5 Then
                     grayStable = gray.Clone
                 Else
-                    If motionBasics.motionList.Count > 0 Then gray.CopyTo(grayStable, motionMask)
+                    If motionBasics.motionList.Count > 0 Then gray.CopyTo(grayStable, task.motionBasics.motionMask)
                 End If
             Else
-                motionMask.SetTo(255)
+                task.motionBasics.motionMask.SetTo(255)
                 motionBasics.motionList.Clear()
                 grayStable = gray
             End If

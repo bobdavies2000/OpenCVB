@@ -564,7 +564,7 @@ Namespace VBClasses
             Dim newList As New List(Of oldrcData), tmp As New cv.Mat
             Dim countMaxD As Integer, countMissedMaxD As Integer
             For Each rc In task.redList.oldrclist
-                tmp = task.motionMask(rc.rect) And rc.mask
+                tmp = task.motionBasics.motionMask(rc.rect) And rc.mask
                 If tmp.CountNonZero = 0 Then
                     If rc.indexLast <> 0 And rc.indexLast < rcLastList.Count Then
                         Dim lrc = rcLastList(rc.indexLast)

@@ -1279,7 +1279,7 @@ Namespace VBClasses
 
             canny.Run(LRMeanSub.dst2)
 
-            If task.optionsChanged Then dst2 = canny.dst2.Clone Else canny.dst2.CopyTo(dst2, task.motionMask)
+            If task.optionsChanged Then dst2 = canny.dst2.Clone Else canny.dst2.CopyTo(dst2, task.motionBasics.motionMask)
         End Sub
     End Class
 

@@ -10,14 +10,14 @@ Namespace VBClasses
         End Sub
         Private Function lpMotion(lp As lpData) As Boolean
             ' return true if either line endpoint was in the motion mask.
-            If task.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
-            If task.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
+            If task.motionBasics.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
+            If task.motionBasics.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
             Return False
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
             If lpList.Count <= 1 Then
-                task.motionMask.SetTo(255)
+                task.motionBasics.motionMask.SetTo(255)
                 rawLines.Run(src)
                 lpList = New List(Of lpData)(rawLines.lpList)
             End If

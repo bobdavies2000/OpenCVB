@@ -364,6 +364,7 @@ InPaint_Basics
 Interpolate_Basics
 Interpolate_Kalman
 Intrinsics_Basics
+Intrinsics_TranslateLeftToRGB
 Intrinsics_TranslateRGBtoLeft
 Kalman_Basics
 Kalman_CVMat
@@ -450,10 +451,11 @@ ML_Basics
 ML_RemoveDups_CPP
 Moments_Basics
 Motion_Basics
-Motion_LeftImage
+Motion_Left
 Motion_LeftRight
+Motion_LeftTest
 Motion_PointCloud
-Motion_RightImage
+Motion_Right
 Mouse_Basics
 MSER_Basics
 MSER_CPP

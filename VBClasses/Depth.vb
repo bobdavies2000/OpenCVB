@@ -927,7 +927,7 @@ Namespace VBClasses
                 stableMin = src.Clone
                 dst3.SetTo(0)
             Else
-                src.CopyTo(stableMin, task.motionMask)
+                src.CopyTo(stableMin, task.motionBasics.motionMask)
                 If src.Type <> stableMin.Type Then src.ConvertTo(src, stableMin.Type)
                 stableMin.CopyTo(src, task.noDepthMask)
                 cv.Cv2.Min(src, stableMin, stableMin)
@@ -1051,7 +1051,7 @@ Namespace VBClasses
             If task.heartBeat Then
                 stableMax = src.Clone
             Else
-                src.CopyTo(stableMax, task.motionMask)
+                src.CopyTo(stableMax, task.motionBasics.motionMask)
                 If src.Type <> stableMax.Type Then src.ConvertTo(src, stableMax.Type)
                 stableMax.CopyTo(src, task.noDepthMask)
                 cv.Cv2.Min(src, stableMax, stableMax)
@@ -1298,7 +1298,7 @@ Namespace VBClasses
                 DrawCircle(dst1(brick.rect), brick.mm.maxLoc, task.DotSize, cv.Scalar.Blue)
             Next
 
-            If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionMask)
+            If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionBasics.motionMask)
 
             Dim facets = New cv.Point2f()() {Nothing}
             Dim centers() As cv.Point2f = Nothing
