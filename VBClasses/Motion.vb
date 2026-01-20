@@ -2,7 +2,9 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Motion_Basics : Inherits TaskParent
         Public motionList As New List(Of Integer)
-        Public diff As New Diff_RGB
+        Public diffRGB As New Diff_RGB
+        Public diffGray As New Diff_Basics
+        Public result As New cv.Mat
         Public Sub New()
             If standalone Then task.gOptions.showMotionMask.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -11,11 +13,17 @@ Namespace VBClasses
             desc = "Find all the grid rects that had motion since the last frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            diff.Run(src)
+            If src.Channels = 3 Then
+                diffRGB.Run(src)
+                result = diffRGB.dst2
+            Else
+                diffGray.Run(src)
+                result = diffGray.dst2
+            End If
 
             motionList.Clear()
             For i = 0 To task.gridRects.Count - 1
-                Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
+                Dim diffCount = result(task.gridRects(i)).CountNonZero
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.grid.gridNeighbors(i)
                         If motionList.Contains(index) = False Then motionList.Add(index)
@@ -231,7 +239,10 @@ Namespace VBClasses
             motion.Run(task.rightView)
             dst1 = motion.dst1
             dst2 = motion.dst2
-            dst3 = motion.dst3
+            dst3 = task.leftView
+            For Each index In motion.motionList
+                dst3.Rectangle(task.gridRects(index), white, task.lineWidth)
+            Next
 
             motionMask = dst3.Clone
             labels(2) = motion.labels(2)
@@ -252,11 +263,39 @@ Namespace VBClasses
             motion.Run(task.leftView)
             dst1 = motion.dst1
             dst2 = motion.dst2
-            dst3 = motion.dst3
+            dst3 = task.leftView
+            For Each index In motion.motionList
+                dst3.Rectangle(task.gridRects(index), white, task.lineWidth)
+            Next
 
             motionMask = dst3.Clone
             labels(2) = motion.labels(2)
             labels(3) = "The motion mask for the right image - MotionMaskRight"
         End Sub
     End Class
+
+
+
+
+
+    Public Class Motion_LeftRight : Inherits TaskParent
+        Dim motionLeft As New Motion_LeftImage
+        Dim motionRight As New Motion_RightImage
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Show the motion in the left and right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            motionLeft.Run(Nothing)
+            dst2 = motionLeft.dst3
+
+            motionRight.Run(Nothing)
+            dst3 = motionRight.dst3
+
+            dst0 = motionLeft.dst3
+            dst1 = motionLeft.dst3
+        End Sub
+    End Class
+
 End Namespace

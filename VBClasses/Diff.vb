@@ -189,7 +189,7 @@ Namespace VBClasses
             Next
 
             dst2 = dst2.Threshold(2, 255, cv.ThresholdTypes.Binary)
-            dst3 = task.motionBasics.diff.dst2
+            dst3 = task.motionBasics.result
 
             If task.heartBeat Then
                 labels(2) = "Diff of RGB.split has " + CStr(dst2.CountNonZero) + " while gray has " + CStr(dst3.CountNonZero)

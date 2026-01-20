@@ -451,6 +451,7 @@ ML_RemoveDups_CPP
 Moments_Basics
 Motion_Basics
 Motion_LeftImage
+Motion_LeftRight
 Motion_PointCloud
 Motion_RightImage
 Mouse_Basics

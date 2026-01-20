@@ -105,7 +105,7 @@ Namespace VBClasses
             frameHistoryCount = 3 ' default value.  Use Options_History to update this value.
 
             filterBasics.Run(color)
-            If gOptions.UseMotionMask.Checked Then
+            If gOptions.UseMotionMask.Checked And firstPass = False Then
                 motionBasics.Run(src)
                 If optionsChanged Or task.frameCount < 5 Then
                     grayStable = gray.Clone
