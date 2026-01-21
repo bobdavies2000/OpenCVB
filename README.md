@@ -9,27 +9,27 @@
 -   Improved splash screen shows camera and current algorithm.
     -   Splash screen is now optional.
 -   Text markups are removed from “Test All” runs to reduce object usage.
+    -   This only happens during overnight test runs, not normal usage.
     -   Extensive use on some algorithms can exceed User/GDI objects.
--   All supported cameras now can align the left view and the depth.
+-   All supported cameras now can align the left view and depth.
     -   All previous solutions aligned depth to color.
 -   Oak 3D and Oak 4D cameras collect disparity as well as depth.
     -   Whether this is useful has yet to be determined.
 -   A small piece of electrical tape can turn off the IR emitter on any camera.
     -   This allows some interesting tests to be done with left/right images.
-    -   The featureless regions will have degraded depth.
+    -   The featureless regions will have degraded depth when tape is present.
 -   The “NR_” category of algorithms are all the algorithms that are not reused.
     -   The algorithms are in the same VB.Net file as before but prefixed “NR_”.
     -   They are still tested in the overnight runs and will still work.
     -   Benefit: the algorithm combo box is much more readable.
     -   To reactivate an algorithm, just remove the “NR_” prefix.
--   An alternative motion detector was added to OpenCVB - not valuable.
+-   An alternative motion detector was added to OpenCVB.
     -   A pixel is “changed” if all 3 colors are different from the accumulated frame.
-    -   Fewer pixels pass the threshold tests for motion with each camera.
-    -   Motion_Basics can use Diff_RGB if the input has 3 channels.
+    -   About 20% fewer pixels pass threshold tests for motion.
     -   This is an experiment and will be reviewed over time.
 -   Another alternative for motion detection is to use the left infrared image.
     -   The experimental code for detecting left image motion is in Motion_Left.
-    -   This is an experiment and the results needs to be reviewed over time.
+    -   This is an experiment and will be reviewed over time.
 
 **January 10, 2026 – Play/Pause, Oak Support, Test All, Exceptions.**
 
@@ -1410,7 +1410,7 @@
 
 ![A colorful pattern with dots Description automatically generated with medium confidence](media/db52b0115273726a6ff2d1aa986c0817.gif)
 
-**RedCloud_Basics:**  *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
+**RedCloud_Basics:** *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
 
 ![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
 
