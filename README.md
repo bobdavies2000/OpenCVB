@@ -1,3 +1,36 @@
+**January 20, 2026 – Splash Screen, Oak 4D, Align Left to RGB, Disparity, IR Emitters, “NR_” Prefix, and Motion Detection**
+
+-   Over 1500 algorithms are included, averaging 36 lines of code per algorithm.
+    -   Over 300 additional obsolete algorithms compiled for reference use.
+-   Showing the splash screen is now optional and default is true.
+-   Oak3 D camera correctly stops when changing cameras or resolution.
+-   The Oak 4D camera is now recognized and supported.
+-   Updated snippets with Namespace. Also unused snippets removed.
+-   Improved splash screen shows camera and current algorithm.
+    -   Splash screen is now optional.
+-   Text markups are removed from “Test All” runs to reduce object usage.
+    -   Extensive use on some algorithms can exceed User/GDI objects.
+-   All supported cameras now can align the left view and the depth.
+    -   All previous solutions aligned depth to color.
+-   Oak 3D and Oak 4D cameras collect disparity as well as depth.
+    -   Whether this is useful has yet to be determined.
+-   A small piece of electrical tape can turn off the IR emitter on any camera.
+    -   This allows some interesting tests to be done with left/right images.
+    -   The featureless regions will have degraded depth.
+-   The “NR_” category of algorithms are all the algorithms that are not reused.
+    -   The algorithms are in the same VB.Net file as before but prefixed “NR_”.
+    -   They are still tested in the overnight runs and will still work.
+    -   Benefit: the algorithm combo box is much more readable.
+    -   To reactivate an algorithm, just remove the “NR_” prefix.
+-   An alternative motion detector was added to OpenCVB - not valuable.
+    -   A pixel is “changed” if all 3 colors are different from the accumulated frame.
+    -   Fewer pixels pass the threshold tests for motion with each camera.
+    -   Motion_Basics can use Diff_RGB if the input has 3 channels.
+    -   This is an experiment and will be reviewed over time.
+-   Another alternative for motion detection is to use the left infrared image.
+    -   The experimental code for detecting left image motion is in Motion_Left.
+    -   This is an experiment and the results needs to be reviewed over time.
+
 **January 10, 2026 – Play/Pause, Oak Support, Test All, Exceptions.**
 
 -   Over 1500 algorithms are included, averaging 36 lines of code per algorithm.
