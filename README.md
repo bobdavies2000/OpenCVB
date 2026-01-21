@@ -30,6 +30,10 @@
 -   Another alternative for motion detection is to use the left infrared image.
     -   The experimental code for detecting left image motion is in Motion_Left.
     -   This is an experiment and will be reviewed over time.
+-   The Orbbec SDK distribution is currently unavailable.
+    -   The installer .exe is missing from their download page.
+    -   The Github source code uses and old CMake version that is unsupported.
+    -   I will try again in a week or so to see if they have updated their install.
 
 **January 10, 2026 – Play/Pause, Oak Support, Test All, Exceptions.**
 
@@ -1410,7 +1414,7 @@
 
 ![A colorful pattern with dots Description automatically generated with medium confidence](media/db52b0115273726a6ff2d1aa986c0817.gif)
 
-**RedCloud_Basics:** *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
+**RedCloud_Basics:**  *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
 
 ![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
 
