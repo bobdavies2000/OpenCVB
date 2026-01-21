@@ -17,6 +17,7 @@ public:
 	dai::Pipeline pipeline;
 	std::shared_ptr<dai::Device> device;
 	Mat rgb, leftView, rightView, depth16u, disparity;
+	uint16_t* depthBuffer;
 	dai::CalibrationHandler deviceCalib;
 	double imuTimeStamp;
 	bool firstTs = false;
@@ -92,6 +93,7 @@ public:
 		// Subpixel uses fractional bits: 3 bits = 8x, 4 bits = 16x, 5 bits = 32x
 		int maxIntDisparity = pipeStereo->initialConfig->getMaxDisparity();
 		maxDisparity = (float)maxIntDisparity;
+		depthBuffer = new uint16_t[captureRows * captureCols * 2];
 	}
 	void waitForFrame()
 	{
@@ -101,37 +103,28 @@ public:
 		auto inLeft = qLeft->get<dai::ImgFrame>();
 		auto inRight = qRight->get<dai::ImgFrame>();
 
-		// Get depth frame and resize to match capture resolution
 		auto depthFrame = inDepth->getFrame();
-		if (depthFrame.size() != cv::Size(captureCols, captureRows)) {
-			cv::resize(depthFrame, depth16u, cv::Size(captureCols, captureRows), 0, 0, cv::INTER_NEAREST);
-		} else {
-			depth16u = depthFrame;
-		}
+		depth16u = depthFrame;
+		// Why can't OakDRawDepth just return depth16u.data?  This works though... Only depth fails using .data.
+		std::memcpy(depthBuffer, depth16u.data, captureRows * captureCols * 2);
 
 		rgb = inRGB->getCvFrame();
 		
 		// Get left and right frames (mono cameras - should be CV_8UC1)
 		leftView = inLeft->getFrame().clone();
 		rightView = inRight->getFrame().clone();
+		
 		// Get disparity frame and resize to match capture resolution
 		// Disparity is CV_16UC1 (16-bit) when subpixel is enabled, CV_8UC1 otherwise
 		auto disparityFrame = inDisparity->getFrame();
-		Mat disparityTemp;
-		if (disparityFrame.size() != cv::Size(captureCols, captureRows)) {
-			cv::resize(disparityFrame, disparityTemp, cv::Size(captureCols, captureRows), 0, 0, cv::INTER_NEAREST);
-		}
-		else {
-			disparityTemp = disparityFrame;
-		}
 		
 		// Convert disparity to 8-bit for visualization (0-255 range)
 		// maxDisparity already accounts for subpixel multiplier if enabled
 		// Disparity values are in pixels (with subpixel precision), not depth in mm
 		if (maxDisparity > 0) {
-			disparityTemp.convertTo(disparity, CV_8UC1, 255.0f / maxDisparity);
+			disparityFrame.convertTo(disparity, CV_8UC1, 255.0f / maxDisparity);
 		} else {
-			disparityTemp.convertTo(disparity, CV_8UC1);
+			disparityFrame.convertTo(disparity, CV_8UC1);
 		}
 
 		auto imuData = qIMU->get<dai::IMUData>();
@@ -163,6 +156,15 @@ public:
 	}
 };
 
+extern "C" __declspec(dllexport) int* OakDRawDepth(OakDCamera* cPtr) { return (int*)cPtr->depthBuffer; /* return (int*)cPtr->depth16u.data; */ }
+extern "C" __declspec(dllexport) double OakDIMUTimeStamp(OakDCamera* cPtr) { return cPtr->imuTimeStamp; }
+extern "C" __declspec(dllexport) int* OakDGyro(OakDCamera* cPtr) { return (int*)&cPtr->gyroValues.x; }
+extern "C" __declspec(dllexport) int* OakDAccel(OakDCamera* cPtr) { return (int*)&cPtr->acceleroValues.x; }
+extern "C" __declspec(dllexport) int* OakDColor(OakDCamera* cPtr) { return (int*)cPtr->rgb.data; }
+extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera* cPtr) { cPtr->waitForFrame(); }
+extern "C" __declspec(dllexport) int* OakDLeftImage(OakDCamera* cPtr) { return (int*)cPtr->leftView.data; }
+extern "C" __declspec(dllexport) int* OakDRightImage(OakDCamera* cPtr) { return (int*)cPtr->rightView.data; }
+extern "C" __declspec(dllexport) int* OakDDisparity(OakDCamera* cPtr) { return (int*)cPtr->disparity.data; }
 
 extern "C" __declspec(dllexport)
 int* OakDOpen(int captureWidth, int captureHeight)
@@ -233,24 +235,9 @@ int* OakDExtrinsicsLeftToRight(OakDCamera* cPtr)
 	return (int*)&cPtr->extrinsicsLeftToRight[0];
 }
 
-
-extern "C" __declspec(dllexport) int* OakDRawDepth(OakDCamera* cPtr)
-{
-	return (int*)cPtr->depth16u.data;
-}
-
-
-extern "C" __declspec(dllexport) double OakDIMUTimeStamp(OakDCamera* cPtr) { return cPtr->imuTimeStamp; }
-extern "C" __declspec(dllexport) int* OakDGyro(OakDCamera* cPtr) { return (int*)&cPtr->gyroValues.x; }
-extern "C" __declspec(dllexport) int* OakDAccel(OakDCamera* cPtr) { return (int*)&cPtr->acceleroValues.x; }
-extern "C" __declspec(dllexport) int* OakDColor(OakDCamera* cPtr) { return (int*)cPtr->rgb.data; }
-extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera* cPtr) { cPtr->waitForFrame(); }
-extern "C" __declspec(dllexport) int* OakDLeftImage(OakDCamera* cPtr) { return (int*)cPtr->leftView.data; }
-extern "C" __declspec(dllexport) int* OakDRightImage(OakDCamera* cPtr) { return (int*)cPtr->rightView.data; }
-extern "C" __declspec(dllexport) int* OakDDisparity(OakDCamera* cPtr) { return (int*)cPtr->disparity.data; }
-
 extern "C" __declspec(dllexport) void OakDStop(OakDCamera* cPtr) {
 	if (cPtr != nullptr) {
+		delete[] cPtr->depthBuffer;
 		cPtr->device.reset();
 		delete cPtr;
 	}
