@@ -40,11 +40,11 @@ Namespace VBClasses
             gravityBasics = New Gravity_Basics
             imuBasics = New IMU_Basics
             motionBasics = New Motion_Basics
+            motionLeft = New Motion_Left
             pcMotion = New XO_Motion_PointCloud
             grid = New Grid_Basics
             lines = New Line_Basics
             filterBasics = New Filter_Basics
-            brightness = New Brightness_Basics
             leftRight = New LeftRight_Basics
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
@@ -104,6 +104,8 @@ Namespace VBClasses
             frameHistoryCount = 3 ' default value.  Use Options_History to update this value.
 
             filterBasics.Run(color)
+            task.gray = filterBasics.dst3
+
             If gOptions.UseMotionMask.Checked And firstPass = False Then
                 motionBasics.Run(gray)
                 If optionsChanged Or task.frameCount < 5 Then
@@ -117,13 +119,8 @@ Namespace VBClasses
                 grayStable = gray
             End If
 
-            brightness.Run(leftView)
-            leftView = brightness.dst2.Clone
-
-            brightness.Run(rightView)
-            rightView = brightness.dst2.Clone
-
             leftRight.Run(src) ' this is to facilitate tuning brightness and optimizing contrast.
+            ' motionLeft.Run(leftView)
 
             If pcMotion IsNot Nothing Then
                 pcMotion.Run(emptyMat) '******* this is the gravity rotation *******

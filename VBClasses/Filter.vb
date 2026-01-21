@@ -36,7 +36,6 @@ Namespace VBClasses
             dst3 = grayFilter.dst2
 
             task.color = dst2
-            task.gray = dst3
         End Sub
     End Class
 

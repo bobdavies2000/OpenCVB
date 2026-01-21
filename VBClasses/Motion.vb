@@ -2,12 +2,9 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Motion_Basics : Inherits TaskParent
         Public motionList As New List(Of Integer)
-        Public motionMask As New cv.Mat
-        Public diffRGB As New Diff_RGB
-        Public diffGray As New Diff_Basics
-        Public result As New cv.Mat
+        Dim diff As New Diff_Basics
+        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         Public Sub New()
-            motionMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
             If standalone Then task.gOptions.showMotionMask.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -15,17 +12,15 @@ Namespace VBClasses
             desc = "Find all the grid rects that had motion since the last frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels = 3 Then
-                diffRGB.Run(src)
-                result = diffRGB.dst2
-            Else
-                diffGray.Run(src)
-                result = diffGray.dst2
-            End If
+            If src.Channels <> 1 Then src = task.gray
+            If task.optionsChanged Then dst2 = src.Clone
+
+            diff.lastFrame = dst2
+            diff.Run(src)
 
             motionList.Clear()
             For i = 0 To task.gridRects.Count - 1
-                Dim diffCount = result(task.gridRects(i)).CountNonZero
+                Dim diffCount = diff.dst2(task.gridRects(i)).CountNonZero
                 If diffCount >= task.motionThreshold Then
                     For Each index In task.grid.gridNeighbors(i)
                         If motionList.Contains(index) = False Then motionList.Add(index)
@@ -40,12 +35,10 @@ Namespace VBClasses
                 dst3(rect).SetTo(255)
             Next
 
-            motionMask = dst3.Clone
+            motionMask = dst3
             labels(2) = "Grid rects with motion: " + CStr(motionList.Count)
         End Sub
     End Class
-
-
 
 
 
@@ -162,14 +155,12 @@ Namespace VBClasses
 
 
     Public Class Motion_LeftRight : Inherits TaskParent
-        Dim motionLeft As New Motion_Left
         Dim motionRight As New Motion_Right
         Public Sub New()
             desc = "Show the motion in the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            motionLeft.Run(Nothing)
-            dst2 = motionLeft.dst3
+            dst2 = task.motionLeft.motionMask
 
             motionRight.Run(Nothing)
             dst3 = motionRight.dst3

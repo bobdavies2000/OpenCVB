@@ -39,7 +39,7 @@ Public Class Options
                                                                       False, False, False,
                                                                       False, False, False,
                                                                       False, False, False})
-            Case "Oak-D camera"
+            Case "Oak-3D camera", "Oak-4D camera"
                 settings.resolutionsSupported = New List(Of Boolean)({False, False, False,
                                                                       True, True, True,
                                                                       True, True, True,

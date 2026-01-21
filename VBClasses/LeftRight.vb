@@ -3,18 +3,21 @@ Namespace VBClasses
     Public Class LeftRight_Basics : Inherits TaskParent
         Public meanLeft As Double
         Public meanRight As Double
+        Dim brightness = New Brightness_Basics
         Public Sub New()
             labels = {"", "", "Left camera image", "Right camera image"}
             desc = "Display the left and right views as they came from the camera."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.leftView
-            cv.Cv2.Normalize(dst2, task.leftView, 0, 255, cv.NormTypes.MinMax)
-            dst2 = task.leftView
+            brightness.run(task.leftView)
+            Dim tmpLeft As cv.Mat = brightness.dst2 ' input array conflict
+            task.leftView = tmpLeft.Normalize(0, 255, cv.NormTypes.MinMax)
+            If standaloneTest() Then dst2 = task.leftView
 
-            dst3 = task.rightView
-            cv.Cv2.Normalize(dst3, task.rightView, 0, 255, cv.NormTypes.MinMax)
-            dst3 = task.rightView
+            brightness.run(task.rightView)
+            Dim tmpRight As cv.Mat = brightness.dst2 ' inputarray conflict
+            task.rightView = tmpRight.Normalize(0, 255, cv.NormTypes.MinMax)
+            If standaloneTest() Then dst3 = task.rightView
         End Sub
     End Class
 

@@ -7990,7 +7990,7 @@ Namespace VBClasses
                 Case "StereoLabs ZED 2/2i"
                     task.xRange = 4
                     task.yRange = 1.5
-                Case "Oak-D camera"
+                Case "Oak-3D camera", "Oak-4D camera"
                     task.xRange = 4.07
                     task.yRange = 1.32
                 Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"

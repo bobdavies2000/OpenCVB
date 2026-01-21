@@ -4,6 +4,7 @@ Namespace VBClasses
         Public changedPixels As Integer
         Public lastFrame As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         Public Sub New()
+            labels = {"", "", "Highlighting the changed pixels ", "AbsDiff output"}
             desc = "Capture an image and compare it to previous frame using absDiff and threshold"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -17,7 +18,7 @@ Namespace VBClasses
             If changedPixels > 0 Then
                 lastFrame = src.Clone
                 strOut = "Motion detected - " + CStr(changedPixels) + " pixels changed with threshold " +
-                         CStr(task.colorDiffThreshold)
+                          CStr(task.colorDiffThreshold)
             End If
         End Sub
     End Class
@@ -189,7 +190,7 @@ Namespace VBClasses
             Next
 
             dst2 = dst2.Threshold(2, 255, cv.ThresholdTypes.Binary)
-            dst3 = task.motionBasics.result
+            dst3 = task.motionBasics.dst2
 
             If task.heartBeat Then
                 labels(2) = "Diff of RGB.split has " + CStr(dst2.CountNonZero) + " while gray has " + CStr(dst3.CountNonZero)

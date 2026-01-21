@@ -53,10 +53,10 @@ Namespace MainApp
             updatePath(homeDir + "librealsense\build\Debug\", "Realsense camera support.")
             updatePath(homeDir + "librealsense\build\Release\", "Realsense camera support.")
 
-            updatePath(homeDir + "bin\", "Oak-D camera support.")
-            updatePath(homeDir + "OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin\", "Oak-D camera support.")
-            updatePath(homeDir + "OakD\depthai-core\Build\Release", "Oak-D camera support.")
-            updatePath(homeDir + "OakD\depthai-core\Build\Debug", "Oak-D camera support.")
+            updatePath(homeDir + "bin\", "Oak-3D/Oak-4D camera support.")
+            updatePath(homeDir + "OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin\", "Oak-3D/Oak-4D camera support.")
+            updatePath(homeDir + "OakD\depthai-core\Build\Release", "Oak-3D/Oak-4D camera support.")
+            updatePath(homeDir + "OakD\depthai-core\Build\Debug", "Oak-3D/Oak-4D camera support.")
         End Sub
         Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
             Dim systemPath = Environment.GetEnvironmentVariable("Path")
