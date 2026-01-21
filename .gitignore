@@ -366,8 +366,6 @@ Data/ssd_mobilenet_v2_coco_2018_03_29/
 Data/ssd_mobilenet_v3_large_coco_2020_01_14/
 VBClasses/Share/
 Hunter/
-OrbbecSDK/
-OrbbecSDK_v1.10.5/
 Orb
 survey/
 eigen/
@@ -385,7 +383,6 @@ VB_to_CPP/.vs/
 .vs/OpenCVB/v17/.suo
 cmake.db
 OakD/Build/
-OrbbecSDK/
 *.json
 AlgorithmList.*
 CS_Classes\createAlgorithms.cs

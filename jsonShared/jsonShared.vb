@@ -9,7 +9,7 @@ Namespace jsonShared
         Public allOptionsWidth As Integer = MainFormWidth
         Public allOptionsHeight As Integer = MainFormHeight
 
-        Public cameraName As String = "StereoLabs ZED 2/2I"
+        Public cameraName As String = "" ' "StereoLabs ZED 2/2i"
         Public cameraPresent As List(Of Boolean)
         Public cameraFound As Boolean
         Public cameraSupported As List(Of Boolean)
