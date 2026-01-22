@@ -6,7 +6,7 @@ Namespace MainApp
 #Region "Externs"
     Public Class Camera_OakD : Inherits GenericCamera
         <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
-        Private Shared Function OakDOpen(w As Integer, h As Integer) As IntPtr
+        Private Shared Function OakDOpen(w As Integer, h As Integer, deviceClass As Integer) As IntPtr
         End Function
 
         <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
@@ -78,7 +78,8 @@ Namespace MainApp
             workRes = _workRes
 
             ' Open the Oak-D camera
-            cPtr = OakDOpen(captureRes.Width, captureRes.Height)
+            Dim deviceClass = If(deviceName.Contains("Oak-4D"), 4, 3) ' oak 4D is 4 while oak 3, duh.
+            cPtr = OakDOpen(captureRes.Width, captureRes.Height, deviceClass)
 
             If cPtr = IntPtr.Zero Then
                 Throw New Exception("Failed to open Oak-D camera")

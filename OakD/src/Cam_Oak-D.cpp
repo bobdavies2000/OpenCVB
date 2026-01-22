@@ -39,7 +39,7 @@ public:
 	dai::IMUReportAccelerometer acceleroValues;
 	dai::IMUReportGyroscope gyroValues;
 
-	OakDCamera(int _cols, int _rows)
+	OakDCamera(int _cols, int _rows, int deviceClass)
 	{
 		captureRows = _rows;
 		captureCols = _cols;
@@ -85,7 +85,19 @@ public:
 
 		pipeline.start();
 
-		device = pipeline.getDefaultDevice();
+			//auto devices = dai::Device::getAllAvailableDevices();
+
+			//for (const auto& d : devices) {
+			//	if (d.getMxId() == "18443010C1A3F01201")
+			//	std::cout << "MXID: " << d.getMxId() << "\n";
+			//	std::cout << "Name: " << d.name << "\n";
+			//	std::cout << "Protocol: " << d.protocol << "\n\n";
+			//}
+		
+		//if (deviceClass == 3)
+			device = pipeline.getDefaultDevice();
+		
+
 		deviceCalib = device->readCalibration();
 		baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();
 		
@@ -95,6 +107,8 @@ public:
 		maxDisparity = (float)maxIntDisparity;
 		depthBuffer = new uint16_t[captureRows * captureCols * 2];
 	}
+
+
 	void waitForFrame()
 	{
 		auto inDepth = qDepth->get<dai::ImgFrame>();
@@ -167,9 +181,9 @@ extern "C" __declspec(dllexport) int* OakDRightImage(OakDCamera* cPtr) { return 
 extern "C" __declspec(dllexport) int* OakDDisparity(OakDCamera* cPtr) { return (int*)cPtr->disparity.data; }
 
 extern "C" __declspec(dllexport)
-int* OakDOpen(int captureWidth, int captureHeight)
+int* OakDOpen(int captureWidth, int captureHeight, int deviceClass)
 {
-	OakDCamera* cPtr = new OakDCamera(captureWidth, captureHeight);
+	OakDCamera* cPtr = new OakDCamera(captureWidth, captureHeight, deviceClass);
 	return (int*)cPtr;
 }
 
