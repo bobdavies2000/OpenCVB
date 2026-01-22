@@ -111,7 +111,7 @@ Partial Class OptionsGlobal
         GroupBox1.Margin = New Padding(3, 4, 3, 4)
         GroupBox1.Name = "GroupBox1"
         GroupBox1.Padding = New Padding(3, 4, 3, 4)
-        GroupBox1.Size = New Size(994, 534)
+        GroupBox1.Size = New Size(825, 534)
         GroupBox1.TabIndex = 1
         GroupBox1.TabStop = False
         ' 
@@ -295,7 +295,7 @@ Partial Class OptionsGlobal
         ' Label3
         ' 
         Label3.AutoSize = True
-        Label3.Location = New Point(1020, 402)
+        Label3.Location = New Point(846, 392)
         Label3.Name = "Label3"
         Label3.Size = New Size(78, 30)
         Label3.TabIndex = 23
@@ -303,7 +303,7 @@ Partial Class OptionsGlobal
         ' 
         ' DebugSlider
         ' 
-        DebugSlider.Location = New Point(1116, 402)
+        DebugSlider.Location = New Point(942, 392)
         DebugSlider.Margin = New Padding(3, 4, 3, 4)
         DebugSlider.Maximum = 100
         DebugSlider.Minimum = -100
@@ -315,7 +315,7 @@ Partial Class OptionsGlobal
         ' DebugSliderLabel
         ' 
         DebugSliderLabel.AutoSize = True
-        DebugSliderLabel.Location = New Point(1671, 402)
+        DebugSliderLabel.Location = New Point(1497, 392)
         DebugSliderLabel.Name = "DebugSliderLabel"
         DebugSliderLabel.Size = New Size(78, 30)
         DebugSliderLabel.TabIndex = 21
@@ -324,7 +324,7 @@ Partial Class OptionsGlobal
         ' DebugCheckBox
         ' 
         DebugCheckBox.AutoSize = True
-        DebugCheckBox.Location = New Point(1020, 482)
+        DebugCheckBox.Location = New Point(854, 460)
         DebugCheckBox.Margin = New Padding(3, 4, 3, 4)
         DebugCheckBox.Name = "DebugCheckBox"
         DebugCheckBox.Size = New Size(665, 34)
@@ -341,11 +341,11 @@ Partial Class OptionsGlobal
         GroupBox2.Controls.Add(ShowAllOptions)
         GroupBox2.Controls.Add(displayDst1)
         GroupBox2.Controls.Add(displayDst0)
-        GroupBox2.Location = New Point(1022, 48)
+        GroupBox2.Location = New Point(854, 48)
         GroupBox2.Margin = New Padding(3, 4, 3, 4)
         GroupBox2.Name = "GroupBox2"
         GroupBox2.Padding = New Padding(3, 4, 3, 4)
-        GroupBox2.Size = New Size(429, 306)
+        GroupBox2.Size = New Size(429, 340)
         GroupBox2.TabIndex = 2
         GroupBox2.TabStop = False
         GroupBox2.Text = "Miscellaneous Globals"
@@ -457,42 +457,42 @@ Partial Class OptionsGlobal
         ShowGrid.Location = New Point(9, 36)
         ShowGrid.Margin = New Padding(3, 4, 3, 4)
         ShowGrid.Name = "ShowGrid"
-        ShowGrid.Size = New Size(270, 34)
+        ShowGrid.Size = New Size(193, 34)
         ShowGrid.TabIndex = 3
-        ShowGrid.Text = "Show grid mask overlay"
+        ShowGrid.Text = "Show grid mask"
         ShowGrid.UseVisualStyleBackColor = True
         ' 
         ' Palettes
         ' 
         Palettes.FormattingEnabled = True
-        Palettes.Location = New Point(1478, 36)
+        Palettes.Location = New Point(1304, 26)
         Palettes.Margin = New Padding(3, 4, 3, 4)
         Palettes.Name = "Palettes"
-        Palettes.Size = New Size(187, 38)
+        Palettes.Size = New Size(116, 38)
         Palettes.TabIndex = 5
         ' 
         ' LineType
         ' 
         LineType.FormattingEnabled = True
-        LineType.Location = New Point(1478, 80)
+        LineType.Location = New Point(1304, 70)
         LineType.Margin = New Padding(3, 4, 3, 4)
         LineType.Name = "LineType"
-        LineType.Size = New Size(187, 38)
+        LineType.Size = New Size(116, 38)
         LineType.TabIndex = 6
         ' 
         ' highlight
         ' 
         highlight.FormattingEnabled = True
-        highlight.Location = New Point(1478, 126)
+        highlight.Location = New Point(1304, 116)
         highlight.Margin = New Padding(3, 4, 3, 4)
         highlight.Name = "highlight"
-        highlight.Size = New Size(187, 38)
+        highlight.Size = New Size(116, 38)
         highlight.TabIndex = 7
         ' 
         ' Label11
         ' 
         Label11.AutoSize = True
-        Label11.Location = New Point(1678, 36)
+        Label11.Location = New Point(1426, 21)
         Label11.Name = "Label11"
         Label11.Size = New Size(78, 30)
         Label11.TabIndex = 22
@@ -501,7 +501,7 @@ Partial Class OptionsGlobal
         ' Label13
         ' 
         Label13.AutoSize = True
-        Label13.Location = New Point(1678, 84)
+        Label13.Location = New Point(1426, 69)
         Label13.Name = "Label13"
         Label13.Size = New Size(105, 30)
         Label13.TabIndex = 23
@@ -510,11 +510,11 @@ Partial Class OptionsGlobal
         ' Label14
         ' 
         Label14.AutoSize = True
-        Label14.Location = New Point(1678, 134)
+        Label14.Location = New Point(1426, 119)
         Label14.Name = "Label14"
-        Label14.Size = New Size(160, 30)
+        Label14.Size = New Size(101, 30)
         Label14.TabIndex = 24
-        Label14.Text = "Highlight Color"
+        Label14.Text = "Highlight"
         ' 
         ' DepthGroupBox
         ' 
@@ -522,11 +522,11 @@ Partial Class OptionsGlobal
         DepthGroupBox.Controls.Add(ShowGrid)
         DepthGroupBox.Controls.Add(showMotionMask)
         DepthGroupBox.Controls.Add(CrossHairs)
-        DepthGroupBox.Location = New Point(1478, 184)
+        DepthGroupBox.Location = New Point(1304, 174)
         DepthGroupBox.Margin = New Padding(3, 4, 3, 4)
         DepthGroupBox.Name = "DepthGroupBox"
         DepthGroupBox.Padding = New Padding(3, 4, 3, 4)
-        DepthGroupBox.Size = New Size(295, 188)
+        DepthGroupBox.Size = New Size(247, 214)
         DepthGroupBox.TabIndex = 25
         DepthGroupBox.TabStop = False
         DepthGroupBox.Text = "Display Masks"
@@ -546,7 +546,7 @@ Partial Class OptionsGlobal
         ' 
         AutoScaleDimensions = New SizeF(12F, 30F)
         AutoScaleMode = AutoScaleMode.Font
-        ClientSize = New Size(1850, 588)
+        ClientSize = New Size(1569, 588)
         Controls.Add(DepthGroupBox)
         Controls.Add(Label14)
         Controls.Add(Label3)

@@ -84,19 +84,7 @@ public:
 		qRight = outRight->createOutputQueue();
 
 		pipeline.start();
-
-			//auto devices = dai::Device::getAllAvailableDevices();
-
-			//for (const auto& d : devices) {
-			//	if (d.getMxId() == "18443010C1A3F01201")
-			//	std::cout << "MXID: " << d.getMxId() << "\n";
-			//	std::cout << "Name: " << d.name << "\n";
-			//	std::cout << "Protocol: " << d.protocol << "\n\n";
-			//}
-		
-		//if (deviceClass == 3)
-			device = pipeline.getDefaultDevice();
-		
+		device = pipeline.getDefaultDevice();
 
 		deviceCalib = device->readCalibration();
 		baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();

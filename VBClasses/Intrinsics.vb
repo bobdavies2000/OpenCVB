@@ -57,6 +57,7 @@ Namespace VBClasses
         Public Sub New()
             task.gOptions.highlight.SelectedItem = "Red"
             task.gOptions.LineWidth.Value += 1
+            labels(3) = "The left image with the lines that can be translated on both ends."
             desc = "Translate a point from the RGB image to the left image.  Test with the longest line as input."
         End Sub
         '---------------------------------------------
@@ -118,7 +119,7 @@ Namespace VBClasses
                     count += 1
                 End If
             Next
-            labels(2) = CStr(count) + " lines had depth for both ends and could be translated from BGR to left."
+            labels(2) = CStr(count) + " lines were found in the BGR image."
         End Sub
     End Class
 

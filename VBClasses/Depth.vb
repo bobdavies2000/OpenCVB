@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
 Namespace VBClasses
-    Public Class NR_Depth_Basics : Inherits TaskParent
+    Public Class Depth_Basics : Inherits TaskParent
         Public Sub New()
             desc = "Colorize the depth data into task.depthRGB"
         End Sub
@@ -12,10 +12,24 @@ Namespace VBClasses
 
             task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
             task.maxDepthMask = task.pcSplit(2).ConvertScaleAbs().InRange(task.MaxZmeters, 1000)
-            If standalone Then dst3 = task.maxDepthMask
             SetTrueText(task.gmat.strOut, 3)
         End Sub
     End Class
+
+
+
+
+
+
+    Public Class Depth_Aligned : Inherits TaskParent
+        Public Sub New()
+            desc = "Align the BGR data into the depth."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.depthRGB
+        End Sub
+    End Class
+
 
 
 

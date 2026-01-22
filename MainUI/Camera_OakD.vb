@@ -117,14 +117,51 @@ Namespace MainApp
                 calibData.rightIntrinsics.ppy = intrinsics(5) / ratio
             End If
 
+            Dim rgbToLeftPtr = OakDExtrinsicsRGBtoLeft(cPtr)
+            Dim extrinsics(11) As Single
+            If rgbToLeftPtr <> IntPtr.Zero Then
+                Marshal.Copy(rgbToLeftPtr, extrinsics, 0, 12)
+                ReDim calibData.ColorToLeft_translation(2)
+                ReDim calibData.ColorToLeft_rotation(9 - 1)
+
+                calibData.ColorToLeft_translation(0) = extrinsics(0) / ratio
+                calibData.ColorToLeft_translation(1) = extrinsics(4) / ratio
+                calibData.ColorToLeft_translation(2) = extrinsics(8) / ratio
+
+                calibData.ColorToLeft_rotation(0) = extrinsics(0)
+                calibData.ColorToLeft_rotation(1) = extrinsics(1)
+                calibData.ColorToLeft_rotation(2) = extrinsics(2)
+
+                calibData.ColorToLeft_rotation(3) = extrinsics(4)
+                calibData.ColorToLeft_rotation(4) = extrinsics(5)
+                calibData.ColorToLeft_rotation(5) = extrinsics(6)
+
+                calibData.ColorToLeft_rotation(6) = extrinsics(8)
+                calibData.ColorToLeft_rotation(7) = extrinsics(9)
+                calibData.ColorToLeft_rotation(8) = extrinsics(10)
+
+            End If
+
             Dim leftToRightPtr = OakDExtrinsicsLeftToRight(cPtr)
             If leftToRightPtr <> IntPtr.Zero Then
-                Dim extrinsics(11) As Single
                 Marshal.Copy(leftToRightPtr, extrinsics, 0, 12)
                 ReDim calibData.LtoR_translation(2)
+                ReDim calibData.LtoR_rotation(9 - 1)
                 calibData.LtoR_translation(0) = extrinsics(0)
                 calibData.LtoR_translation(1) = extrinsics(4)
                 calibData.LtoR_translation(2) = extrinsics(8)
+
+                calibData.LtoR_rotation(0) = extrinsics(0)
+                calibData.LtoR_rotation(1) = extrinsics(1)
+                calibData.LtoR_rotation(2) = extrinsics(2)
+
+                calibData.LtoR_rotation(3) = extrinsics(4)
+                calibData.LtoR_rotation(4) = extrinsics(5)
+                calibData.LtoR_rotation(5) = extrinsics(6)
+
+                calibData.LtoR_rotation(6) = extrinsics(8)
+                calibData.LtoR_rotation(7) = extrinsics(9)
+                calibData.LtoR_rotation(8) = extrinsics(10)
 
                 calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.LtoR_translation(0), 2) +
                                                       System.Math.Pow(calibData.LtoR_translation(1), 2) +

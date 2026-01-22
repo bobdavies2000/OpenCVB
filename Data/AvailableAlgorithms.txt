@@ -126,6 +126,8 @@ Delaunay_ConsistentColor
 Delaunay_Contours
 Delaunay_Generations
 Delaunay_LineSelect
+Depth_Aligned
+Depth_Basics
 Depth_ColorMap
 Depth_Foreground
 Depth_ForegroundBlob
@@ -661,7 +663,6 @@ NR_DCT_Surfaces_debug
 NR_Delaunay_GenerationsNoKNN
 NR_Delaunay_SubDiv
 NR_Delaunay_Subdiv2D
-NR_Depth_Basics
 NR_Depth_BGSubtract
 NR_Depth_CellTiers
 NR_Depth_Colorizer_VB
