@@ -309,4 +309,28 @@ Namespace VBClasses
             labels(2) = redMask.labels(2)
         End Sub
     End Class
+
+
+
+
+    Public Class LeftRight_Brightness : Inherits TaskParent
+        Dim Options As New Options_BrightnessContrast
+        Public Sub New()
+            OptionParent.FindSlider("Alpha (contrast)").Value = 650
+            OptionParent.FindSlider("Beta (brightness)").Value = -85
+            desc = "Implement brightness/contrast for the grayscale left/right views"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Options.Run()
+
+            dst2 = task.leftView.ConvertScaleAbs(Options.brightness, Options.contrast)
+            dst2 = dst2.Normalize(0, 220, cv.NormTypes.MinMax)
+
+            dst3 = task.rightView.ConvertScaleAbs(Options.brightness, Options.contrast)
+            dst3 = dst3.Normalize(0, 220, cv.NormTypes.MinMax)
+
+            labels(2) = "Left Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)
+            labels(3) = "Right Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)
+        End Sub
+    End Class
 End Namespace

@@ -4096,12 +4096,12 @@ Namespace VBClasses
         Public Sub Run()
             Static betaSlider = OptionParent.FindSlider("Beta (brightness)")
             Static alphaSlider = OptionParent.FindSlider("Alpha (contrast)")
-            If alphaSlider Is Nothing Then Exit Sub ' shutting down...
+            Static brightnessSlider = OptionParent.FindSlider("HSV Brightness Value")
+            Static exponentSlider = OptionParent.FindSlider("Contrast exponent to use X100")
+
             brightness = alphaSlider.value / 500
             contrast = betaSlider.value
-            Static brightnessSlider = OptionParent.FindSlider("HSV Brightness Value")
             hsvBrightness = brightnessSlider.Value / 100
-            Static exponentSlider = OptionParent.FindSlider("Contrast exponent to use X100")
             exponent = exponentSlider.value / 100
         End Sub
     End Class

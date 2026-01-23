@@ -77,7 +77,6 @@ BrickPoint_PopulationSurvey
 BrickPoint_Vertical
 Brightness_Basics
 Brightness_Grid
-Brightness_LeftRight
 BRISK_Basics
 CamShift_Basics
 CamShift_RedHue
@@ -404,6 +403,7 @@ LaneFinder_Videos
 Laplacian_Basics
 Laplacian_PyramidFilter
 LeftRight_Basics
+LeftRight_Brightness
 LeftRight_RedLeft
 LeftRight_RedLeftGray
 LeftRight_RedMask

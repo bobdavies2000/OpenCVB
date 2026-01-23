@@ -382,28 +382,26 @@ Namespace VBClasses
 
 
     Public Class Line_LeftRight : Inherits TaskParent
-        Public leftLines As New List(Of lpData)
-        Public rightLines As New List(Of lpData)
-        Dim lines As New Line_Core
+        Public linesLeft As New Line_Core
+        Public linesRight As New Line_Core
         Public Sub New()
             labels = {"", "", "Left image lines", "Right image lines"}
             desc = "Find the lines in the Left and Right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            leftLines = New List(Of lpData)(task.lines.lpList)
-            dst2 = task.leftView.Clone
-            For Each lp In leftLines
+            dst2 = task.leftView
+            linesLeft.Run(task.leftView)
+            For Each lp In linesLeft.lpList
                 dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
-            labels(2) = "There were " + CStr(leftLines.Count) + " lines found in the left view"
+            labels(2) = "There were " + CStr(linesLeft.lpList.Count) + " lines found in the left view"
 
-            lines.Run(task.rightView.Clone)
-            rightLines = New List(Of lpData)(lines.lpList)
-            dst3 = task.rightView.Clone
-            For Each lp In rightLines
+            dst3 = task.rightView
+            linesRight.Run(task.rightView)
+            For Each lp In linesRight.lpList
                 dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
             Next
-            labels(3) = "There were " + CStr(rightLines.Count) + " lines found in the right view"
+            labels(3) = "There were " + CStr(linesRight.lpList.Count) + " lines found in the right view"
         End Sub
     End Class
 

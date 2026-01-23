@@ -134,7 +134,7 @@ Namespace VBClasses
         Public motion As New Motion_Basics
         Public motionMask As cv.Mat
         Public Sub New()
-            desc = "Build the MotionMask for the right camera and validate it."
+            desc = "Build the MotionMask for the left camera and validate it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             motion.Run(task.leftView)
@@ -156,11 +156,13 @@ Namespace VBClasses
 
     Public Class Motion_LeftRight : Inherits TaskParent
         Dim motionRight As New Motion_Right
+        Dim motionLeft As New Motion_Right
         Public Sub New()
             desc = "Show the motion in the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.motionLeft.motionMask
+            motionLeft.Run(Nothing)
+            dst2 = motionLeft.dst3
 
             motionRight.Run(Nothing)
             dst3 = motionRight.dst3

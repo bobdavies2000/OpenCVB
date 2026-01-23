@@ -45,7 +45,7 @@ Namespace VBClasses
             grid = New Grid_Basics
             lines = New Line_Basics
             filterBasics = New Filter_Basics
-            leftRight = New Brightness_LeftRight
+            leftRight = New LeftRight_Brightness
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1
@@ -119,8 +119,10 @@ Namespace VBClasses
                 grayStable = gray
             End If
 
-            leftRight.Run(Nothing) ' this makes the left/right input available at all times.
-            ' motionLeft.Run(leftView)
+            leftRight.Run(Nothing)
+            task.leftView = leftRight.dst2.Clone
+            task.rightView = leftRight.dst3.Clone
+            motionLeft.Run(leftView)
 
             If pcMotion IsNot Nothing Then
                 pcMotion.Run(emptyMat) '******* this is the gravity rotation *******

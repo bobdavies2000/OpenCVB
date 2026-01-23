@@ -855,13 +855,17 @@ Namespace VBClasses
             dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
+            Dim colorIndex As Integer
             For i = 0 To task.bricksPerRow - 1 Step 2
+                colorIndex = 0
                 For j = i To task.gridRects.Count - task.bricksPerRow - 1 Step task.bricksPerRow
                     Dim brick = task.bricks.brickList(j)
+                    Dim color = task.scalarColors(colorIndex)
                     If brick.depth > 0 Then
-                        dst2.Rectangle(brick.lRect, task.highlight, task.lineWidth)
-                        dst3.Rectangle(brick.rRect, task.highlight, task.lineWidth)
+                        dst2.Rectangle(brick.lRect, color, task.lineWidth)
+                        dst3.Rectangle(brick.rRect, color, task.lineWidth)
                     End If
+                    colorIndex += 1
                 Next
             Next
         End Sub
