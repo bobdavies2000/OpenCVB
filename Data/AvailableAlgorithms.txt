@@ -1272,7 +1272,6 @@ NR_RedCC_CellHistogram
 NR_RedCC_Merge
 NR_RedCloud_CellDepthHistogram
 NR_RedColor_CPP
-NR_RedColor_LeftRight
 NR_RedColor_NWay
 NR_RedList_CellDepthHistogram
 NR_RedList_CellStatsPlot
