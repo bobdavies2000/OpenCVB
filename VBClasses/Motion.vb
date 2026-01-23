@@ -118,7 +118,7 @@ Namespace VBClasses
             dst2 = motion.dst2
             dst3 = task.rightView
             For Each index In motion.motionList
-                dst3.Rectangle(task.gridRects(index), white, task.lineWidth)
+                dst3.Rectangle(task.gridRects(index), white, -1)
             Next
 
             motionMask = dst3
@@ -132,16 +132,16 @@ Namespace VBClasses
 
     Public Class Motion_Left : Inherits TaskParent
         Public motion As New Motion_Basics
-        Public motionMask As cv.Mat
+        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         Public Sub New()
             desc = "Build the MotionMask for the left camera and validate it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             motion.Run(task.leftView)
             dst2 = motion.dst2
-            dst3 = task.leftView.Clone
+            dst3 = task.leftView
             For Each index In motion.motionList
-                dst3.Rectangle(task.gridRects(index), white, task.lineWidth)
+                dst3.Rectangle(task.gridRects(index), white, -1)
             Next
 
             motionMask = dst3

@@ -3,6 +3,7 @@ Namespace VBClasses
     Public Class Line_Basics : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public rawLines As New Line_Core
+        Public motionMask As cv.Mat
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMotionMask.Checked = True
@@ -10,14 +11,14 @@ Namespace VBClasses
         End Sub
         Private Function lpMotion(lp As lpData) As Boolean
             ' return true if either line endpoint was in the motion mask.
-            If task.motionBasics.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
-            If task.motionBasics.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
+            If motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
+            If motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
             Return False
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
             If lpList.Count <= 1 Then
-                task.motionBasics.motionMask.SetTo(255)
+                motionMask.SetTo(255)
                 rawLines.Run(src)
                 lpList = New List(Of lpData)(rawLines.lpList)
             End If
@@ -380,36 +381,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class Line_LeftRight : Inherits TaskParent
-        Public linesLeft As New Line_Core
-        Public linesRight As New Line_Core
-        Public Sub New()
-            labels = {"", "", "Left image lines", "Right image lines"}
-            desc = "Find the lines in the Left and Right images."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.leftView
-            linesLeft.Run(task.leftView)
-            For Each lp In linesLeft.lpList
-                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            Next
-            labels(2) = "There were " + CStr(linesLeft.lpList.Count) + " lines found in the left view"
-
-            dst3 = task.rightView
-            linesRight.Run(task.rightView)
-            For Each lp In linesRight.lpList
-                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
-            Next
-            labels(3) = "There were " + CStr(linesRight.lpList.Count) + " lines found in the right view"
-        End Sub
-    End Class
-
-
-
-
-
-
     Public Class NR_Line_Select : Inherits TaskParent
         Public delaunay As New Delaunay_LineSelect
         Public Sub New()
@@ -501,6 +472,39 @@ Namespace VBClasses
             End If
 
             labels(2) = "There were " + CStr(lpList.Count) + " neighbors that formed good lines."
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Line_LeftRight : Inherits TaskParent
+        Public linesLeft As New Line_Basics
+        Public linesRight As New Line_Basics
+        Dim motionLeft As New Motion_Basics
+        Dim motionRight As New Motion_Basics
+        Public Sub New()
+            labels = {"", "", "Left image lines", "Right image lines"}
+            desc = "Find the lines in the Left and Right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            motionLeft.Run(task.leftView)
+            linesLeft.motionMask = motionLeft.motionMask
+
+            linesLeft.Run(motionLeft.dst2)
+
+            dst2 = linesLeft.dst2
+            labels(2) = "There were " + CStr(linesLeft.lpList.Count) + " lines found in the left view"
+
+            motionRight.Run(task.rightView)
+            linesRight.motionMask = motionRight.motionMask
+
+            linesRight.Run(motionRight.dst2)
+
+            dst3 = linesRight.dst2
+            labels(3) = "There were " + CStr(linesRight.lpList.Count) + " lines found in the right view"
         End Sub
     End Class
 End Namespace

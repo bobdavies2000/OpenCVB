@@ -40,7 +40,6 @@ Namespace VBClasses
             gravityBasics = New Gravity_Basics
             imuBasics = New IMU_Basics
             motionBasics = New Motion_Basics
-            motionLeft = New Motion_Left
             pcMotion = New XO_Motion_PointCloud
             grid = New Grid_Basics
             lines = New Line_Basics
@@ -122,7 +121,6 @@ Namespace VBClasses
             leftRight.Run(Nothing)
             task.leftView = leftRight.dst2.Clone
             task.rightView = leftRight.dst3.Clone
-            motionLeft.Run(leftView)
 
             If pcMotion IsNot Nothing Then
                 pcMotion.Run(emptyMat) '******* this is the gravity rotation *******
@@ -166,6 +164,7 @@ Namespace VBClasses
             End If
 
             gravityBasics.Run(src.Clone)
+            lines.motionMask = motionBasics.motionMask
             lines.Run(grayStable)
             histBinList = {histogramBins, histogramBins, histogramBins}
 
