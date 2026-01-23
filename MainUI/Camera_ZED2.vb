@@ -1,5 +1,6 @@
-Imports cv = OpenCvSharp
 Imports System.Threading
+Imports sl
+Imports cv = OpenCvSharp
 
 Namespace MainApp
     Public Class Camera_ZED2 : Inherits GenericCamera
@@ -21,6 +22,18 @@ Namespace MainApp
             calibData.leftIntrinsics.ppy = zed.leftIntrinsics.ppy / ratio
 
             calibData.baseline = zed.baseline
+
+            ReDim calibData.LtoR_rotation(8)
+            ReDim calibData.ColorToLeft_rotation(8)
+
+            calibData.LtoR_rotation = {1, 0, 0, 0, 1, 0, 0, 0, 1}
+            calibData.ColorToLeft_rotation = calibData.LtoR_rotation
+
+            ReDim calibData.LtoR_translation(2)
+            ReDim calibData.ColorToLeft_translation(2)
+
+            calibData.LtoR_translation = {baseline, 0, 0}
+            calibData.ColorToLeft_translation = {1, 1, 1}
 
             MyBase.prepImages()
 

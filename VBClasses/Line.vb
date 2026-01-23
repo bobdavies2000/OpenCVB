@@ -435,7 +435,7 @@ Namespace VBClasses
         Dim vbPoints As New BrickPoint_Vertical
         Dim knn As New KNN_Basics
         Public Sub New()
-            desc = "Match points to the nearest that is also vertical"
+            desc = "Match points to the nearest line that is also vertical"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             vbPoints.Run(src)

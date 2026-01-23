@@ -1434,4 +1434,64 @@ Namespace VBClasses
             dst3 = colorizer.dst2
         End Sub
     End Class
+
+
+
+
+    Public Class Depth_ReliableLines : Inherits TaskParent
+        Dim rightPoints As New List(Of cv.Point)
+        Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            desc = "Find the lines that are consistent in both the left and right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.Settings.cameraName.StartsWith("StereoLabs") = False Then
+                SetTrueText("The " + traceName + " algorithm is currently only working for StereoLabs cameras.")
+                Exit Sub
+            End If
+            dst2 = src
+            dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
+
+            Dim count As Integer
+            Dim lastPoints As New List(Of cv.Point)(rightPoints)
+            rightPoints.Clear()
+            For Each lp In task.lines.lpList
+                Dim brick1 = task.bricks.brickList(lp.p1GridIndex)
+                Dim brick2 = task.bricks.brickList(lp.p2GridIndex)
+                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+
+                Dim p1 = lp.p1 ' avoid updating list of lines.
+                Dim p2 = lp.p2
+                If brick1.depth > 0 And brick2.depth > 0 Then
+                    p1.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick1.depth
+                    p2.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick2.depth
+
+                    Dim pt1 = New cv.Point(CInt(p1.X), CInt(p1.Y))
+                    Dim pt2 = New cv.Point(CInt(p2.X), CInt(p2.Y))
+
+                    Dim found1 = rightPoints.Contains(pt1)
+                    Dim found2 = rightPoints.Contains(pt2)
+
+                    If found1 = False Then rightPoints.Add(pt1)
+                    If found2 = False Then rightPoints.Add(pt2)
+
+                    If found1 And lastPoints.Contains(pt1) And found2 And lastPoints.Contains(pt2) Then
+                        dst3.Line(p1, p2, lp.color, task.lineWidth + 1, task.lineType)
+                        rightPoints.Add(p1)
+                        rightPoints.Add(p2)
+                    Else
+                        count += 1
+                    End If
+                Else
+                    count += 1
+                End If
+            Next
+
+            If task.heartBeat Then
+                labels(2) = task.lines.labels(2)
+                labels(3) = CStr(count) + " were not consistently present after translation."
+            End If
+        End Sub
+    End Class
+
 End Namespace

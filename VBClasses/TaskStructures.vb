@@ -263,6 +263,7 @@ Namespace VBClasses
 
             Public center As cv.Point ' center of the brick
             Public depth As Single
+            Public mmDepth As mmData
 
             Public mm As mmData ' min and max values of the depth data.
             Public corners As New List(Of cv.Point3f)

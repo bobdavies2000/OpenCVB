@@ -1,4 +1,5 @@
-﻿Imports OpenCvSharp
+﻿Imports System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Intrinsics_Basics : Inherits TaskParent
@@ -107,18 +108,25 @@ Namespace VBClasses
             dst2 = src
             dst3 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
             Dim count As Integer
-            For Each lp In task.lines.lpList
-                dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
-                Dim depth1 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
-                Dim depth2 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
+            If task.Settings.cameraName.startswith("StereoLabs") Then
+                For Each lp In task.lines.lpList
+                    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                    dst3.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                Next
+            Else
+                For Each lp In task.lines.lpList
+                    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                    Dim depth1 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
+                    Dim depth2 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
 
-                If depth1 > 0 And depth2 > 0 Then
-                    Dim p1 = MapRgbToLeftIr(lp.p1.X, lp.p1.Y, depth1)
-                    Dim p2 = MapRgbToLeftIr(lp.p2.X, lp.p2.Y, depth2)
-                    dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
-                    count += 1
-                End If
-            Next
+                    If depth1 > 0 And depth2 > 0 Then
+                        Dim p1 = MapRgbToLeftIr(lp.p1.X, lp.p1.Y, depth1)
+                        Dim p2 = MapRgbToLeftIr(lp.p2.X, lp.p2.Y, depth2)
+                        dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+                        count += 1
+                    End If
+                Next
+            End If
             labels(2) = CStr(count) + " lines were found in the BGR image."
         End Sub
     End Class
@@ -237,6 +245,52 @@ Namespace VBClasses
             '    End If
             'Next
             'labels(2) = CStr(count) + " lines had depth for both ends and could be translated from BGR to left."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Intrinsics_MapLeftToRight : Inherits TaskParent
+        Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            desc = "Map a point from the left image to the right image"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = src
+            dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR) ' so we can show the red line...
+            Dim count As Integer
+            If task.Settings.cameraName.StartsWith("StereoLabs") Then
+                For Each lp In task.lines.lpList
+                    Dim brick1 = task.bricks.brickList(lp.p1GridIndex)
+                    Dim brick2 = task.bricks.brickList(lp.p2GridIndex)
+                    Dim p1 = lp.p1 ' avoid updating list of lines.
+                    Dim p2 = lp.p2
+                    If brick1.depth > 0 And brick2.depth > 0 Then
+                        p1.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick1.mmDepth.minVal
+                        p2.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick2.mmDepth.minVal
+                        dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+                        dst3.Line(p1, p2, lp.color, task.lineWidth + 1, task.lineType)
+                    Else
+                        count += 1
+                    End If
+                Next
+            Else
+                'For Each lp In task.lines.lpList
+                '    dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+                '    Dim depth1 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p1.Y), CInt(lp.p1.X)).Z
+                '    Dim depth2 = task.pointCloud.Get(Of cv.Point3f)(CInt(lp.p2.Y), CInt(lp.p2.X)).Z
+
+                '    If depth1 > 0 And depth2 > 0 Then
+                '        Dim p1 = MapRgbToLeftIr(lp.p1.X, lp.p1.Y, depth1)
+                '        Dim p2 = MapRgbToLeftIr(lp.p2.X, lp.p2.Y, depth2)
+                '        dst3.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+                '        count += 1
+                '    End If
+                'Next
+            End If
+            labels(3) = CStr(count) + " were missing depth and could not be mapped into the right image."
         End Sub
     End Class
 

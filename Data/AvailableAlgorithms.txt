@@ -136,6 +136,7 @@ Depth_InRange
 Depth_NotMissing
 Depth_Outline
 Depth_PunchDecreasing
+Depth_ReliableLines
 Depth_Smoothing
 Depth_SmoothingMat
 Depth_StableMax
@@ -366,6 +367,7 @@ InPaint_Basics
 Interpolate_Basics
 Interpolate_Kalman
 Intrinsics_Basics
+Intrinsics_MapLeftToRight
 Intrinsics_TranslateLeftToRGB
 Intrinsics_TranslateRGBtoLeft
 Kalman_Basics

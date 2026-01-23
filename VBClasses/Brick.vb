@@ -29,6 +29,7 @@ Namespace VBClasses
                 brick.lRect = brick.rect
 
                 brick.depth = task.pcSplit(2)(brick.rect).Mean(task.depthmask(brick.rect))
+                brick.mmDepth = GetMinMax(task.pcSplit(2)(brick.rect), task.depthmask(brick.rect))
                 If brick.depth > Single.MaxValue Or brick.depth < Single.MinValue Then brick.depth = 0
 
                 cv.Cv2.MeanStdDev(src(brick.rect), brick.color, colorstdev)

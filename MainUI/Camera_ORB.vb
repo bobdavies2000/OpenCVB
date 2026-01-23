@@ -1,5 +1,6 @@
 Imports System.IO
 Imports System.Runtime.InteropServices
+Imports System.Security.Claims
 Imports System.Threading
 Imports Orbbec
 Imports cv = OpenCvSharp
@@ -75,6 +76,16 @@ Namespace MainApp
             calibData.leftIntrinsics.ppy = param.depthIntrinsic.cy / ratio
             calibData.leftIntrinsics.fx = param.depthIntrinsic.fx / ratio
             calibData.leftIntrinsics.fy = param.depthIntrinsic.fy / ratio
+
+            calibData.ColorToLeft_rotation = param.transform.rot
+            calibData.ColorToLeft_translation = param.transform.trans
+
+            calibData.LtoR_rotation = param.transform.rot
+            calibData.LtoR_translation = param.transform.trans
+
+            calibData.baseline = System.Math.Sqrt(System.Math.Pow(calibData.LtoR_translation(0), 2) +
+                                                  System.Math.Pow(calibData.LtoR_translation(1), 2) +
+                                                  System.Math.Pow(calibData.LtoR_translation(2), 2))
 
             calibData.baseline = 0.095 ' the RGB and left image provided are aligned so depth is easily found.
             PtCloud.SetCameraParam(param)
