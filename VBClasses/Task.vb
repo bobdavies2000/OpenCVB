@@ -45,7 +45,7 @@ Namespace VBClasses
             grid = New Grid_Basics
             lines = New Line_Basics
             filterBasics = New Filter_Basics
-            leftRight = New LeftRight_Basics
+            leftRight = New Brightness_LeftRight
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1
@@ -119,7 +119,7 @@ Namespace VBClasses
                 grayStable = gray
             End If
 
-            leftRight.Run(src) ' this is to facilitate tuning brightness and optimizing contrast.
+            leftRight.Run(Nothing) ' this makes the left/right input available at all times.
             ' motionLeft.Run(leftView)
 
             If pcMotion IsNot Nothing Then

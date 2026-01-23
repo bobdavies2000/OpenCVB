@@ -298,7 +298,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Brick_CorrelationInput : Inherits TaskParent
+    Public Class Brick_CorrelationInput : Inherits TaskParent
         Dim LRMeanSub As New MeanSubtraction_LeftRight
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -393,7 +393,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Brick_LeftRightMouse : Inherits TaskParent
+    Public Class Brick_LeftRightMouse : Inherits TaskParent
         Public means As New List(Of Single)
         Dim myBricks As New List(Of Integer)
         Public Sub New()
@@ -843,7 +843,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Brick_LeftRight : Inherits TaskParent
+    Public Class Brick_LeftRight : Inherits TaskParent
         Public means As New List(Of Single)
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics

@@ -11,12 +11,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             brightness.run(task.leftView)
             Dim tmpLeft As cv.Mat = brightness.dst2 ' input array conflict
-            task.leftView = tmpLeft.Normalize(0, 255, cv.NormTypes.MinMax)
+            task.leftView = tmpLeft.Normalize(100, 150, cv.NormTypes.MinMax)
             If standaloneTest() Then dst2 = task.leftView
 
             brightness.run(task.rightView)
             Dim tmpRight As cv.Mat = brightness.dst2 ' inputarray conflict
-            task.rightView = tmpRight.Normalize(0, 255, cv.NormTypes.MinMax)
+            task.rightView = tmpRight.Normalize(100, 150, cv.NormTypes.MinMax)
             If standaloneTest() Then dst3 = task.rightView
         End Sub
     End Class

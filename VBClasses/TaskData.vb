@@ -91,7 +91,7 @@ Namespace VBClasses
         Public motionLeft As Motion_Left
         Public contours As Contour_Basics_List
         Public pcMotion As XO_Motion_PointCloud
-        Public leftRight As LeftRight_Basics
+        Public leftRight As Brightness_LeftRight
 
         Public GLRequest As Integer
         Public GLcloud As cv.Mat

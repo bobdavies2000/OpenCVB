@@ -54,11 +54,14 @@ BlurMotion_Basics
 Boundary_Basics
 Boundary_Rectangles
 Brick_Basics
+Brick_CorrelationInput
 Brick_EdgeFlips
 Brick_Edges
 Brick_Features
 Brick_FeaturesAndEdges
 Brick_Info
+Brick_LeftRight
+Brick_LeftRightMouse
 BrickLine_Basics
 BrickLine_DepthGap
 BrickLine_Edges
@@ -74,6 +77,7 @@ BrickPoint_PopulationSurvey
 BrickPoint_Vertical
 Brightness_Basics
 Brightness_Grid
+Brightness_LeftRight
 BRISK_Basics
 CamShift_Basics
 CamShift_RedHue
@@ -557,13 +561,10 @@ NR_Boundary_RemovedRects
 NR_Brick_CloudMaxVal
 NR_Brick_CloudMean
 NR_Brick_CloudRange
-NR_Brick_CorrelationInput
 NR_Brick_CorrelationMap
 NR_Brick_EdgeDraw
 NR_Brick_FullDepth
 NR_Brick_InstantUpdate
-NR_Brick_LeftRight
-NR_Brick_LeftRightMouse
 NR_Brick_LeftToColor
 NR_Brick_MLColor
 NR_Brick_MLColorDepth
