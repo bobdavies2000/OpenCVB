@@ -412,9 +412,12 @@ LeftRight_RedRightGray
 LeftRight_Reduction
 Line_Basics
 Line_Core
+Line_DepthHistogram
 Line_Intersection
 Line_LeftRight
+Line_Motion
 Line_PerpendicularTest
+Line_Vertical
 Line3D_Basics
 Line3D_DrawLines
 Line3D_DrawLines_Debug
@@ -461,8 +464,10 @@ Moments_Basics
 Motion_Basics
 Motion_Left
 Motion_LeftRight
+Motion_LeftRightTest
 Motion_LeftTest
 Motion_PointCloud
+Motion_PointCloud_MotionRect
 Motion_Right
 Mouse_Basics
 MSER_Basics

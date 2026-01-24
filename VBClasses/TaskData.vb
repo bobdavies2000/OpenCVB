@@ -89,7 +89,7 @@ Namespace VBClasses
         Public imuBasics As IMU_Basics
         Public motionBasics As Motion_Basics
         Public contours As Contour_Basics_List
-        Public pcMotion As XO_Motion_PointCloud
+        Public pcMotion As Motion_PointCloud
         Public leftRight As LeftRight_Brightness
 
         Public GLRequest As Integer

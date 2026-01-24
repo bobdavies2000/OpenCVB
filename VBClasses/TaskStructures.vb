@@ -334,8 +334,8 @@ Namespace VBClasses
 
             Public color As cv.Scalar
 
-            Public p1GridIndex As Integer
-            Public p2GridIndex As Integer
+            Public depth1 As Single ' this value may not be pVec1(2) which is preferred.  See Line3D_Basics.getDepth.
+            Public depth2 As Single ' this value may not be pVec2(2) which is preferred.  See Line3D_Basics.getDepth.
 
             Public index As Integer
             Public indexVTop As Integer = -1
@@ -348,11 +348,11 @@ Namespace VBClasses
             Public p1 As cv.Point2f
             Public p2 As cv.Point2f
 
-            Public pLeft1 As cv.Point2f
-            Public pLeft2 As cv.Point2f
+            Public p1GridIndex As Integer
+            Public p2GridIndex As Integer
 
-            Public pRight1 As cv.Point2f
-            Public pRight2 As cv.Point2f
+            Public p1Motion As Boolean
+            Public p2Motion As Boolean
 
             Public pVec1 As cv.Vec3f
             Public pVec2 As cv.Vec3f
@@ -363,6 +363,7 @@ Namespace VBClasses
             Public rect As cv.Rect
             Public roRect As cv.RotatedRect
             Public slope As Single
+            Public Const maxSlope As Integer = 100000
             Public Function perpendicularPoints(pt As cv.Point2f) As lpData
                 Dim perpSlope = -1 / slope
                 Dim angleRadians As Double = Math.Atan(perpSlope)
@@ -440,10 +441,11 @@ Namespace VBClasses
 
                 length = p1.DistanceTo(p2)
 
-                'p1left = New cv.Point2f()
-
                 p1GridIndex = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
                 p2GridIndex = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
+                p1Motion = task.motionBasics.motionList.Contains(p1GridIndex)
+                p2Motion = task.motionBasics.motionList.Contains(p2GridIndex)
+                If p1Motion Then Dim k = 0
                 color = task.scalarColors(p1GridIndex Mod 255)
 
                 pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
@@ -451,6 +453,7 @@ Namespace VBClasses
                     Dim r = task.gridRects(p1GridIndex)
                     pVec1 = New cv.Vec3f(0, 0, task.pcSplit(2)(r).Mean(task.depthmask(r)).Item(0))
                 End If
+
                 pVec2 = task.pointCloud.Get(Of cv.Vec3f)(p2.Y, p2.X)
                 If Single.IsNaN(pVec2(0)) Or pVec2(2) = 0 Then
                     Dim r = task.gridRects(p2GridIndex)

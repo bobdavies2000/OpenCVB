@@ -3,7 +3,7 @@ Namespace VBClasses
     Public Class Line_Basics : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public rawLines As New Line_Core
-        Public motionMask As cv.Mat
+        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMotionMask.Checked = True
@@ -131,7 +131,7 @@ Namespace VBClasses
         End Sub
         Public Shared Function computePerp(lp As lpData) As lpData
             Dim midPoint = New cv.Point2f((lp.p1.X + lp.p2.X) / 2, (lp.p1.Y + lp.p2.Y) / 2)
-            Dim m = If(lp.slope = 0, 100000, -1 / lp.slope)
+            Dim m = If(lp.slope = 0, lpData.maxSlope, -1 / lp.slope)
             Dim b = midPoint.Y - m * midPoint.X
             Dim p1 = New cv.Point2f(-b / m, 0)
             Dim p2 = New cv.Point2f((task.workRes.Height - b) / m, task.workRes.Height)
@@ -507,4 +507,115 @@ Namespace VBClasses
             labels(3) = "There were " + CStr(linesRight.lpList.Count) + " lines found in the right view"
         End Sub
     End Class
+
+
+
+
+    Public Class Line_Vertical : Inherits TaskParent
+        Dim lrLines As New Line_LeftRight
+        Public lpLeft As New List(Of lpData)
+        Public lpRight As New List(Of lpData)
+        Public Sub New()
+            desc = "Find just the vertical lines in the left and right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            lrLines.Run(src)
+            dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            lpLeft.Clear()
+            For Each lp In lrLines.linesLeft.lpList
+                If Math.Abs(lp.angle) > 87 Then
+                    lpLeft.Add(lp)
+                    dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
+                End If
+            Next
+
+            dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            lpRight.Clear()
+            For Each lp In lrLines.linesLeft.lpList
+                If Math.Abs(lp.angle) > 87 Then
+                    lpRight.Add(lp)
+                    dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
+                End If
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Line_DepthHistogram : Inherits TaskParent
+        Dim lineVert As New Line_Vertical
+        Dim plotHist As New Plot_Histogram
+        Public Sub New()
+            plotHist.createHistogram = True
+            plotHist.removeZeroEntry = True
+            If standalone Then task.gOptions.DebugCheckBox.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Show the histogram of the depth data for a line.  Use debug check box to study longest line."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            lineVert.Run(src)
+            dst2 = lineVert.dst2
+            For Each lp In lineVert.lpLeft
+                Dim depth = task.pcSplit(2)(lp.rect)
+                Dim depthMask As New cv.Mat(lp.rect.Size, cv.MatType.CV_8U, 0)
+                Dim p1 = New cv.Point2f(lp.p1.X - lp.rect.TopLeft.X, lp.p1.Y - lp.rect.TopLeft.Y)
+                Dim p2 = New cv.Point2f(lp.p2.X - lp.rect.BottomRight.X, lp.p2.Y - lp.rect.BottomRight.Y)
+                depthMask.Line(p1, p2, 255, task.lineWidth, task.lineType)
+                Dim mmDepth = GetMinMax(depth, depthMask)
+                plotHist.Run(depth)
+                Dim hist = plotHist.histArray.ToList
+                Dim bestIndex = hist.IndexOf(hist.Max)
+                Dim incr = (mmDepth.maxVal - mmDepth.minVal) / task.gOptions.HistBinBar.Value
+                lp.depth1 = mmDepth.minVal + incr * bestIndex
+                lp.depth2 = lp.depth1
+                If task.gOptions.DebugCheckBox.Checked Then
+                    dst1 = plotHist.dst2
+                    dst2.Rectangle(lp.rect, task.highlight, task.lineWidth)
+                    SetTrueText("histogram indicates that the depth is likely at " + Format(lp.depth1, fmt1) + "m", 3)
+                    Exit For
+                End If
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Line_Motion : Inherits TaskParent
+        Dim lrLines As New Line_LeftRight
+        Public Sub New()
+            desc = "Show lines with motion and lines with no motion in the leftView."
+        End Sub
+        Public Shared Sub lpUpdateMotionFlags()
+            For Each lp In task.lines.lpList
+                lp.p1Motion = task.motionBasics.motionList
+                lp.p2Motion = False
+                If task.motion.lpMotion(lp.p1) Then lp.p1Motion = True
+                If task.motion.lpMotion(lp.p2) Then lp.p2Motion = True
+
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst3 = dst2.Clone
+            lrLines.Run(Nothing)
+
+            Dim motionCount As Integer
+            Dim noMotionCount As Integer
+            For Each lp In lrLines.linesLeft.lpList
+                If lp.p1Motion Or lp.p2Motion Then
+                    dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+                    motionCount += 1
+                Else
+                    dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+                    noMotionCount += 1
+                End If
+            Next
+            labels(2) = CStr(motionCount) + " lines showed motion"
+            labels(3) = CStr(noMotionCount) + " lines showed no motion"
+        End Sub
+    End Class
+
 End Namespace

@@ -20,7 +20,7 @@ Namespace VBClasses
                 Dim ptLast As cv.Point = contour.hull(0)
                 For Each pt In contour.hull
                     Dim lp = New lpData(pt, ptLast)
-                    If lp.slope >= 100000 Then Continue For ' likely just the edge of the image.
+                    If lp.slope >= lpData.maxSlope Then Continue For ' likely just the edge of the image.
                     If Math.Abs(lp.slope) < 0.0001 Then Continue For ' likely just the edge of the image
 
                     lpList.Add(lp)

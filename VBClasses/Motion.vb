@@ -106,15 +106,46 @@ Namespace VBClasses
 
 
 
+
+    Public Class Motion_LeftTest : Inherits TaskParent
+        Dim motionLeft As New Motion_Left
+        Public Sub New()
+            dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            task.featureOptions.ColorDiffSlider.Value = 6
+            desc = "Emphasize differences between the accumulated left view and the left view."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.firstPass Then dst3 = task.leftView
+
+            motionLeft.Run(Nothing)
+            dst2 = motionLeft.dst3
+            dst3 = motionLeft.motion.dst2
+
+            labels(2) = CStr(motionLeft.motion.motionList.Count) + " bricks were copied to dst3"
+
+            cv.Cv2.Absdiff(dst3, task.leftView, dst1)
+            dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+            dst0 = dst3 - task.leftView
+            dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        End Sub
+    End Class
+
+
+
+
+
     Public Class Motion_Right : Inherits TaskParent
         Public motion As New Motion_Basics
-        Public motionMask As cv.Mat
+        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         Public Sub New()
             desc = "Build the MotionMask for the right camera and validate it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             motion.Run(task.rightView)
-            dst1 = motion.dst1
             dst2 = motion.dst2
             dst3 = task.rightView
             For Each index In motion.motionList
@@ -156,7 +187,7 @@ Namespace VBClasses
 
     Public Class Motion_LeftRight : Inherits TaskParent
         Dim motionRight As New Motion_Right
-        Dim motionLeft As New Motion_Right
+        Dim motionLeft As New Motion_Left
         Public Sub New()
             desc = "Show the motion in the left and right images."
         End Sub
@@ -173,30 +204,19 @@ Namespace VBClasses
 
 
 
-    Public Class Motion_LeftTest : Inherits TaskParent
+    Public Class Motion_LeftRightTest : Inherits TaskParent
+        Dim motionRight As New Motion_Right
         Dim motionLeft As New Motion_Left
         Public Sub New()
-            dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            If standalone Then task.gOptions.displayDst0.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            task.featureOptions.ColorDiffSlider.Value = 6
-            desc = "Emphasize differences between the accumulated left view and the left view."
+            labels = {"", "", "Accumulated left image", "Accumulated right image"}
+            desc = "Show the motion in the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.firstPass Then dst3 = task.leftView
-
             motionLeft.Run(Nothing)
-            dst2 = motionLeft.dst3
-            dst3 = motionLeft.motion.dst2
+            dst2 = motionLeft.dst2
 
-            labels(2) = CStr(motionLeft.motion.motionList.Count) + " bricks were copied to dst3"
-
-            cv.Cv2.Absdiff(dst3, task.leftView, dst1)
-            dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-            dst0 = dst3 - task.leftView
-            dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            motionRight.Run(Nothing)
+            dst3 = motionRight.dst2
         End Sub
     End Class
 
@@ -215,12 +235,35 @@ Namespace VBClasses
             labels(3) = "task.pointcloud for the current frame."
             desc = "Point cloud after updating with the motion mask"
         End Sub
+        Public Shared Function checkNanInf(pc As cv.Mat) As cv.Mat
+            Dim count As Integer
+            Dim vec As New cv.Vec3f(0, 0, 0)
+            ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+            ' with and without gravity transform.  Probably my fault but just fix it here.
+            For y = 0 To pc.Rows - 1
+                For x = 0 To pc.Cols - 1
+                    Dim val = pc.Get(Of cv.Vec3f)(y, x)
+                    If Single.IsNaN(val(0)) Or Single.IsInfinity(val(0)) Then
+                        pc.Set(Of cv.Vec3f)(y, x, vec)
+                        count += 1
+                    End If
+                Next
+            Next
+
+            Return pc
+        End Function
         Public Sub preparePointcloud()
             If task.gOptions.gravityPointCloud.Checked Then
                 '******* this is the gravity rotation *******
-                task.gravityCloud = (task.pointCloud.Reshape(1, task.rows * task.cols) * task.gMatrix).ToMat
-                task.gravityCloud = task.gravityCloud.Reshape(3, task.rows)
+                task.gravityCloud = (task.pointCloud.Reshape(1,
+                            task.rows * task.cols) * task.gMatrix).ToMat.Reshape(3, task.rows)
                 task.pointCloud = task.gravityCloud
+            End If
+
+            ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
+            ' with and without gravity transform.  Probably my fault but just fix it here.
+            If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
+                task.pointCloud = checkNanInf(task.pointCloud)
             End If
 
             task.pcSplit = task.pointCloud.Split
@@ -230,9 +273,9 @@ Namespace VBClasses
             End If
             If task.gOptions.TruncateDepth.Checked Then
                 task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
-                                                            task.MaxZmeters, cv.ThresholdTypes.Trunc)
+                                                        task.MaxZmeters, cv.ThresholdTypes.Trunc)
                 task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
-                                                            task.MaxZmeters).ConvertScaleAbs()
+                                                        task.MaxZmeters).ConvertScaleAbs()
                 cv.Cv2.Merge(task.pcSplit, task.pointCloud)
             End If
 
@@ -251,9 +294,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.heartBeatLT Or task.optionsChanged Or task.frameCount < 5 Then
                 dst2 = task.pointCloud.Clone
-                'dst0 = task.depthMask.Clone
             End If
-            originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
+            If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
+                originalPointcloud = checkNanInf(task.pointCloud).Clone
+            Else
+                originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
+            End If
 
             If task.optionsChanged Then
                 If task.rangesCloud Is Nothing Then
@@ -268,7 +314,6 @@ Namespace VBClasses
 
             task.pointCloud.CopyTo(dst2, task.motionBasics.motionMask)
             task.pointCloud = dst2
-            ' dst0.CopyTo(task.depthMask, task.motionBasics.motionMask)
 
             preparePointcloud()
 

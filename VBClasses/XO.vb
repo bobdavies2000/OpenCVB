@@ -13584,7 +13584,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_Motion_PointCloud_MotionRect : Inherits TaskParent
+    Public Class Motion_PointCloud_MotionRect : Inherits TaskParent
         Public originalPointcloud As cv.Mat
         Public Sub New()
             labels = {"", "", "Pointcloud updated only with motion Rect",
@@ -17258,6 +17258,43 @@ Namespace VBClasses
 
 
 
+    Public Class XO_Line_LeftRight1 : Inherits TaskParent
+        Public linesLeft As New Line_Basics
+        Public linesRight As New Line_Basics
+        Dim motionLeft As New Motion_Basics
+        Dim motionRight As New Motion_Basics
+        Public Sub New()
+            labels = {"", "", "Left image lines", "Right image lines"}
+            desc = "Find the lines in the Left and Right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            motionLeft.Run(task.leftView)
+            linesLeft.motionMask = motionLeft.motionMask
+
+            linesLeft.Run(motionLeft.dst2)
+
+            dst2 = motionLeft.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            For Each lp In linesLeft.lpList
+                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+            Next
+            labels(2) = "There were " + CStr(linesLeft.lpList.Count) + " lines found in the left view"
+
+            motionRight.Run(task.rightView)
+            linesRight.motionMask = motionRight.motionMask
+
+            linesRight.Run(motionRight.dst2)
+
+            dst3 = motionRight.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            For Each lp In linesRight.lpList
+                dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
+            Next
+            labels(3) = "There were " + CStr(linesRight.lpList.Count) + " lines found in the right view"
+        End Sub
+    End Class
+
+
+
+
 
 
 
@@ -17270,44 +17307,12 @@ Namespace VBClasses
             labels(3) = "task.pointcloud for the current frame."
             desc = "Point cloud after updating with the motion mask"
         End Sub
-        Public Shared Function checkNanInf(pc As cv.Mat) As cv.Mat
-            ' these don't work because there are NaN's and Infinity's (both can be present)
-            ' cv.Cv2.PatchNaNs(pc, 0.0) 
-            ' Dim mask As New cv.Mat
-            ' cv.Cv2.Compare(pc, pc, mask, cv.CmpType.EQ)
-
-            Dim count As Integer
-            Dim vec As New cv.Vec3f(0, 0, 0)
-            ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
-            ' with and without gravity transform.  Probably my fault but just fix it here.
-            For y = 0 To pc.Rows - 1
-                For x = 0 To pc.Cols - 1
-                    Dim val = pc.Get(Of cv.Vec3f)(y, x)
-                    If Single.IsNaN(val(0)) Or Single.IsInfinity(val(0)) Then
-                        pc.Set(Of cv.Vec3f)(y, x, vec)
-                        count += 1
-                    End If
-                Next
-            Next
-
-            'Dim mean As cv.Scalar, stdev As cv.Scalar
-            'cv.Cv2.MeanStdDev(originalPointcloud, mean, stdev)
-            'Debug.WriteLine("Before Motion mean " + mean.ToString())
-
-            Return pc
-        End Function
         Public Sub preparePointcloud()
             If task.gOptions.gravityPointCloud.Checked Then
                 '******* this is the gravity rotation *******
-                task.gravityCloud = (task.pointCloud.Reshape(1,
-                            task.rows * task.cols) * task.gMatrix).ToMat.Reshape(3, task.rows)
+                task.gravityCloud = (task.pointCloud.Reshape(1, task.rows * task.cols) * task.gMatrix).ToMat
+                task.gravityCloud = task.gravityCloud.Reshape(3, task.rows)
                 task.pointCloud = task.gravityCloud
-            End If
-
-            ' The stereolabs camera has some weird -inf and inf values in the Y-plane 
-            ' with and without gravity transform.  Probably my fault but just fix it here.
-            If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
-                task.pointCloud = checkNanInf(task.pointCloud)
             End If
 
             task.pcSplit = task.pointCloud.Split
@@ -17317,9 +17322,9 @@ Namespace VBClasses
             End If
             If task.gOptions.TruncateDepth.Checked Then
                 task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters,
-                                                        task.MaxZmeters, cv.ThresholdTypes.Trunc)
+                                                            task.MaxZmeters, cv.ThresholdTypes.Trunc)
                 task.maxDepthMask = task.pcSplit(2).InRange(task.MaxZmeters,
-                                                        task.MaxZmeters).ConvertScaleAbs()
+                                                            task.MaxZmeters).ConvertScaleAbs()
                 cv.Cv2.Merge(task.pcSplit, task.pointCloud)
             End If
 
@@ -17340,11 +17345,7 @@ Namespace VBClasses
                 dst2 = task.pointCloud.Clone
                 'dst0 = task.depthMask.Clone
             End If
-            If task.Settings.cameraName = "StereoLabs ZED 2/2i" Then
-                originalPointcloud = checkNanInf(task.pointCloud).Clone
-            Else
-                originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
-            End If
+            originalPointcloud = task.pointCloud.Clone ' save the original camera pointcloud.
 
             If task.optionsChanged Then
                 If task.rangesCloud Is Nothing Then

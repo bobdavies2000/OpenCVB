@@ -8,6 +8,19 @@ Namespace VBClasses
             If standalone Then task.featureOptions.FeatureSampleSize.Value = 10
             desc = "Find the end point depth for the top X longest lines."
         End Sub
+        'Public Shared Function getDepth(lp As lpData) As lpData
+        '    If lp.pVec1(2) > 0 And lp.pVec2(2) > 0 Then
+        '        lp.depth1 = lp.pVec1(2)
+        '        lp.depth1 = lp.pVec2(2)
+        '        Return lp
+        '    End If
+
+        '    Dim depth As New cv.Mat(lp.rect.Size, cv.MatType.CV_8U, 0)
+
+        '    Dim r = task.gridRects(lp.p1GridIndex)
+        '    Dim depth = task.pcSplit(2)(r).Mean(task.depthmask(r))(0)
+
+        'End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
             labels(2) = task.lines.labels(2)

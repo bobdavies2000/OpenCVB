@@ -324,10 +324,10 @@ Namespace VBClasses
             Options.Run()
 
             dst2 = task.leftView.ConvertScaleAbs(Options.brightness, Options.contrast)
-            dst2 = dst2.Normalize(0, 220, cv.NormTypes.MinMax)
+            dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
 
             dst3 = task.rightView.ConvertScaleAbs(Options.brightness, Options.contrast)
-            dst3 = dst3.Normalize(0, 220, cv.NormTypes.MinMax)
+            dst3 = dst3.Normalize(0, 255, cv.NormTypes.MinMax)
 
             labels(2) = "Left Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)
             labels(3) = "Right Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)
