@@ -37,6 +37,7 @@ Namespace VBClasses
             traceName = Me.GetType.Name
 
             If task.cpu.callTrace.Count = 0 Then task.cpu.callTrace.Add(task.Settings.algorithm + "\")
+
             labels = {"", "", traceName, ""}
             Dim stackTrace = Environment.StackTrace
             Dim lines() = stackTrace.Split(vbCrLf)
@@ -63,6 +64,7 @@ Namespace VBClasses
             standalone = traceName = task.Settings.algorithm
             callStack = callStack.Replace("at Startup\", "")
             callStack = callStack.Replace("at Windows\", "")
+
             task.cpu.callTrace.Add(callStack)
 
             task.cpu.activeObjects.Add(Me)

@@ -329,7 +329,7 @@ Namespace VBClasses
 
 
         Public Class lpData
-            Public age As Integer
+            Public age As Integer = 1
             Public angle As Single ' varies from -90 to 90 degrees
 
             Public color As cv.Scalar
@@ -344,15 +344,13 @@ Namespace VBClasses
             Public indexHRight As Integer = -1
 
             Public length As Single
+            Public motion As Boolean
 
             Public p1 As cv.Point2f
             Public p2 As cv.Point2f
 
             Public p1GridIndex As Integer
             Public p2GridIndex As Integer
-
-            Public p1Motion As Boolean
-            Public p2Motion As Boolean
 
             Public pVec1 As cv.Vec3f
             Public pVec2 As cv.Vec3f
@@ -443,9 +441,6 @@ Namespace VBClasses
 
                 p1GridIndex = task.gridMap.Get(Of Integer)(p1.Y, p1.X)
                 p2GridIndex = task.gridMap.Get(Of Integer)(p2.Y, p2.X)
-                p1Motion = task.motionBasics.motionList.Contains(p1GridIndex)
-                p2Motion = task.motionBasics.motionList.Contains(p2GridIndex)
-                If p1Motion Then Dim k = 0
                 color = task.scalarColors(p1GridIndex Mod 255)
 
                 pVec1 = task.pointCloud.Get(Of cv.Vec3f)(p1.Y, p1.X)
@@ -504,6 +499,11 @@ Namespace VBClasses
                 If pE2.X = task.workRes.Width - 1 Then indexHRight = pE2.Y / task.workRes.Height * bpCol
 
                 CalculateRotatedRectFromLine()
+
+                If task.motionRGB.motionMask.Get(Of Byte)(p1.Y, p1.X) Or
+                   task.motionRGB.motionMask.Get(Of Byte)(p2.Y, p2.X) Then
+                    motion = True
+                End If
             End Sub
             Sub New()
                 p1 = New cv.Point2f()

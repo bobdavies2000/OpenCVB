@@ -65,7 +65,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then src = task.depthmask.Clone
-            If task.optionsChanged Then dst1 = src.Clone Else src.CopyTo(dst1, task.motionBasics.motionMask)
+            If task.optionsChanged Then dst1 = src.Clone Else src.CopyTo(dst1, task.motionRGB.motionMask)
             distance.Run(dst1)
             dst2 = distance.dst2
             dst2.SetTo(0, task.noDepthMask)

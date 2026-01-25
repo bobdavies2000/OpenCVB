@@ -28,14 +28,15 @@ Namespace VBClasses
                 End If
             Next
 
+            motionMask.SetTo(0)
             dst3.SetTo(0)
             For Each index In motionList
                 Dim rect = task.gridRects(index)
                 src(rect).CopyTo(dst2(rect))
                 dst3(rect).SetTo(255)
+                motionMask(rect).SetTo(255)
             Next
 
-            motionMask = dst3
             labels(2) = "Grid rects with motion: " + CStr(motionList.Count)
         End Sub
     End Class
@@ -56,7 +57,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Then dst1 = task.gray.Clone Else dst1 = src.Clone
-            dst2 = task.motionBasics.dst2.Clone()
+            dst2 = task.motionRGB.dst2.Clone()
 
             diff.lastFrame = dst2
             diff.Run(dst1)
@@ -64,7 +65,7 @@ Namespace VBClasses
 
             SetTrueText("Pixels different from camera image: " + CStr(diff.dst2.CountNonZero) + vbCrLf +
                     "Grid rects with more than " + CStr(task.motionThreshold) +
-                    " pixels different: " + CStr(task.motionBasics.motionList.Count), 3)
+                    " pixels different: " + CStr(task.motionRGB.motionList.Count), 3)
         End Sub
     End Class
 
@@ -133,95 +134,6 @@ Namespace VBClasses
             dst0 = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
         End Sub
     End Class
-
-
-
-
-
-    Public Class Motion_Right : Inherits TaskParent
-        Public motion As New Motion_Basics
-        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-        Public Sub New()
-            desc = "Build the MotionMask for the right camera and validate it."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            motion.Run(task.rightView)
-            dst2 = motion.dst2
-            dst3 = task.rightView
-            For Each index In motion.motionList
-                dst3.Rectangle(task.gridRects(index), white, -1)
-            Next
-
-            motionMask = dst3
-            labels(2) = motion.labels(2)
-            labels(3) = "The motion mask for the right image - MotionMaskRight"
-        End Sub
-    End Class
-
-
-
-
-    Public Class Motion_Left : Inherits TaskParent
-        Public motion As New Motion_Basics
-        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-        Public Sub New()
-            desc = "Build the MotionMask for the left camera and validate it."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            motion.Run(task.leftView)
-            dst2 = motion.dst2
-            dst3 = task.leftView
-            For Each index In motion.motionList
-                dst3.Rectangle(task.gridRects(index), white, -1)
-            Next
-
-            motionMask = dst3
-            labels(2) = motion.labels(2)
-            labels(3) = "The motion mask for the right image - MotionMaskRight"
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class Motion_LeftRight : Inherits TaskParent
-        Dim motionRight As New Motion_Right
-        Dim motionLeft As New Motion_Left
-        Public Sub New()
-            desc = "Show the motion in the left and right images."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            motionLeft.Run(Nothing)
-            dst2 = motionLeft.dst3
-
-            motionRight.Run(Nothing)
-            dst3 = motionRight.dst3
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class Motion_LeftRightTest : Inherits TaskParent
-        Dim motionRight As New Motion_Right
-        Dim motionLeft As New Motion_Left
-        Public Sub New()
-            labels = {"", "", "Accumulated left image", "Accumulated right image"}
-            desc = "Show the motion in the left and right images."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            motionLeft.Run(Nothing)
-            dst2 = motionLeft.dst2
-
-            motionRight.Run(Nothing)
-            dst3 = motionRight.dst2
-        End Sub
-    End Class
-
-
-
 
 
 
@@ -312,7 +224,7 @@ Namespace VBClasses
                 End If
             End If
 
-            task.pointCloud.CopyTo(dst2, task.motionBasics.motionMask)
+            task.pointCloud.CopyTo(dst2, task.motionRGB.motionMask)
             task.pointCloud = dst2
 
             preparePointcloud()
@@ -325,6 +237,43 @@ Namespace VBClasses
                 diff.lastDepth32f = split(2)
                 diff.Run(task.pcSplit(2))
             End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Motion_Right : Inherits TaskParent
+        Public motion As New Motion_Basics
+        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+        Public Sub New()
+            desc = "Build the MotionMask for the right camera."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            motion.Run(task.rightView)
+            dst2 = motion.dst2
+            dst3 =  motion.motionMask.Clone
+            labels(2) = motion.labels(2)
+            labels(3) = "The motion mask for the right image"
+        End Sub
+    End Class
+
+
+
+
+    Public Class Motion_Left : Inherits TaskParent
+        Public motion As New Motion_Basics
+        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+        Public Sub New()
+            desc = "Build the MotionMask for the left camera."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            motion.Run(task.leftView)
+            dst2 = motion.dst2
+            dst3 = motion.motionMask.Clone
+            labels(2) = motion.labels(2)
+            labels(3) = "The motion mask for the left image "
         End Sub
     End Class
 End Namespace

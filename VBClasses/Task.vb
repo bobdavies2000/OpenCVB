@@ -39,12 +39,14 @@ Namespace VBClasses
             gmat = New IMU_GMatrix
             gravityBasics = New Gravity_Basics
             imuBasics = New IMU_Basics
-            motionBasics = New Motion_Basics
+            motionRGB = New Motion_Basics
+            motionLeft = New Motion_Left
+            motionRight = New Motion_Right
             pcMotion = New Motion_PointCloud
             grid = New Grid_Basics
             lines = New Line_Basics
             filterBasics = New Filter_Basics
-            leftRight = New LeftRight_Brightness
+            leftRightEnhanced = New LeftRight_Brightness
 
             ' all the algorithms in the list are task algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1
@@ -104,23 +106,39 @@ Namespace VBClasses
 
             filterBasics.Run(color)
             task.gray = filterBasics.dst3
+            leftRightEnhanced.Run(Nothing)
+
+            leftView = leftRightEnhanced.dst2.Clone
+            rightView = leftRightEnhanced.dst3.Clone
 
             If gOptions.UseMotionMask.Checked And firstPass = False Then
-                motionBasics.Run(gray)
+                motionRGB.Run(gray)
+                motionLeft.Run(leftView)
+                motionRight.Run(rightView)
+
                 If optionsChanged Or task.frameCount < 5 Then
                     grayStable = gray.Clone
+                    leftStable = leftView.Clone
+                    rightStable = rightView.Clone
                 Else
-                    If motionBasics.motionList.Count > 0 Then gray.CopyTo(grayStable, task.motionBasics.motionMask)
+                    If motionRGB.motionList.Count > 0 Then gray.CopyTo(grayStable, motionRGB.motionMask)
+                    If motionLeft.motion.motionList.Count > 0 Then leftView.CopyTo(leftStable, motionLeft.motionMask)
+                    If motionRight.motion.motionList.Count > 0 Then rightView.CopyTo(rightStable, task.motionRGB.motionMask)
                 End If
             Else
-                task.motionBasics.motionMask.SetTo(255)
-                motionBasics.motionList.Clear()
-                grayStable = gray
-            End If
+                motionLeft.motionMask.SetTo(255)
+                motionRight.motionMask.SetTo(255)
+                motionRGB.motionMask.SetTo(255)
 
-            leftRight.Run(Nothing)
-            task.leftView = leftRight.dst2.Clone
-            task.rightView = leftRight.dst3.Clone
+                motionRGB.motionList.Clear()
+                grayStable = gray
+                leftStable = leftView
+                rightStable = rightView
+
+                motionLeft.Run(leftView)
+                motionRight.Run(rightView)
+                motionRGB.Run(gray)
+            End If
 
             If pcMotion IsNot Nothing Then
                 pcMotion.Run(emptyMat) '******* this is the gravity rotation *******
@@ -164,7 +182,7 @@ Namespace VBClasses
             End If
 
             gravityBasics.Run(src.Clone)
-            lines.motionMask = motionBasics.motionMask
+            lines.motionMask = motionRGB.motionMask
             lines.Run(grayStable)
             histBinList = {histogramBins, histogramBins, histogramBins}
 
@@ -193,14 +211,9 @@ Namespace VBClasses
             firstPass = False
             heartBeatLT = False
 
-            ' they could have asked to display one of the algorithms in the TreeView.
-            For Each obj In task.cpu.activeObjects
-                If obj.tracename = task.cpu.displayObjectName Then
-                    displayObject = obj
-                    Exit For
-                End If
-            Next
-
+            If task.cpu.indexTask > 0 Then
+                displayObject = task.cpu.activeObjects(task.cpu.indexTask - 1)
+            End If
             postProcess(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
 
             dstList(0) = If(gOptions.displayDst0.Checked, Mat_Convert.Mat_Check8uc3(displayObject.dst0), color).Clone
@@ -210,7 +223,7 @@ Namespace VBClasses
 
             If gOptions.ShowGrid.Checked Then dstList(2).SetTo(cv.Scalar.White, gridMask)
             If gOptions.showMotionMask.Checked Then
-                For Each mIndex In motionBasics.motionList
+                For Each mIndex In motionRGB.motionList
                     dstList(0).Rectangle(gridRects(mIndex), cv.Scalar.White, lineWidth)
                 Next
             End If

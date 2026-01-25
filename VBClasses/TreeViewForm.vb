@@ -2,7 +2,8 @@ Imports System.ComponentModel
 Imports VBClasses
 Public Class TreeviewForm
     Dim botDistance As Integer
-    Dim treeData As New List(Of String)
+    Dim treeData As New List(Of String) ' treedata is only used to trigger a rebuild of the tree nodes.
+    Dim taskIndices As New List(Of Integer)
     Dim titleStr = " - Click on any node to review the algorithm's output."
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         TreeView1.Height = Me.Height
@@ -48,7 +49,6 @@ Public Class TreeviewForm
 
             For i = 1 To callTrace.Count - 1
                 Dim fullname = callTrace(i)
-                fullname = fullname.Replace("at Startup\at Windows\", "")
                 Dim split() = fullname.Split("\")
                 If split.Count = nodeLevel + 3 Then
                     alldone = False
@@ -76,10 +76,8 @@ Public Class TreeviewForm
             If alldone Then Exit For ' we didn't find any more nodes to add.
         Next
 
-        For Each sn In callTrace
-            If sn = "" Then Exit For
-            Dim split() = sn.Split("\")
-            If split.Length > 1 Then treeData.Add(split(split.Length - 2))
+        For i = 0 To callTrace.Count - 1
+            treeData.Add(callTrace(i))
         Next
 
         tv.ExpandAll()
@@ -89,7 +87,8 @@ Public Class TreeviewForm
     Public Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
         If task Is Nothing Then Exit Sub
         If task.cpu.callTrace.Count > treeData.Count Then
-            updateTree(New List(Of String)(task.cpu.callTrace))
+            treeData.Clear()
+            updateTree(task.cpu.callTrace)
         End If
 
         PercentTime.Text = task.cpu.PrepareReport(treeData)
@@ -109,6 +108,13 @@ Public Class TreeviewForm
         Dim algorithm = e.Node.Text
         Dim split = e.Node.Text.Split(" ")
         task.cpu.displayObjectName = split(0)
+
+        For i = 0 To treeData.Count - 1
+            If treeData(i) = e.Node.Tag Then
+                task.cpu.indexTask = i
+                Exit For
+            End If
+        Next
         Timer2_Tick(sender, e)
     End Sub
 End Class

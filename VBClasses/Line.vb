@@ -9,12 +9,6 @@ Namespace VBClasses
             If standalone Then task.gOptions.showMotionMask.Checked = True
             desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
         End Sub
-        Private Function lpMotion(lp As lpData) As Boolean
-            ' return true if either line endpoint was in the motion mask.
-            If motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
-            If motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
-            Return False
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
             If lpList.Count <= 1 Then
@@ -26,7 +20,7 @@ Namespace VBClasses
             Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
             Dim count As Integer
             For Each lp In lpList
-                If lpMotion(lp) = False Then
+                If lp.motion = False Then
                     lp.age += 1
                     sortlines.Add(lp.length, lp)
                     count += 1
@@ -36,10 +30,7 @@ Namespace VBClasses
             rawLines.Run(src)
 
             For Each lp In rawLines.lpList
-                If lpMotion(lp) Then
-                    lp.age = 1
-                    sortlines.Add(lp.length, lp)
-                End If
+                If lp.motion Then sortlines.Add(lp.length, lp)
             Next
 
             lpList.Clear()
@@ -479,38 +470,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class Line_LeftRight : Inherits TaskParent
-        Public linesLeft As New Line_Basics
-        Public linesRight As New Line_Basics
-        Dim motionLeft As New Motion_Basics
-        Dim motionRight As New Motion_Basics
-        Public Sub New()
-            labels = {"", "", "Left image lines", "Right image lines"}
-            desc = "Find the lines in the Left and Right images."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            motionLeft.Run(task.leftView)
-            linesLeft.motionMask = motionLeft.motionMask
-
-            linesLeft.Run(motionLeft.dst2)
-
-            dst2 = linesLeft.dst2
-            labels(2) = "There were " + CStr(linesLeft.lpList.Count) + " lines found in the left view"
-
-            motionRight.Run(task.rightView)
-            linesRight.motionMask = motionRight.motionMask
-
-            linesRight.Run(motionRight.dst2)
-
-            dst3 = linesRight.dst2
-            labels(3) = "There were " + CStr(linesRight.lpList.Count) + " lines found in the right view"
-        End Sub
-    End Class
-
-
-
-
     Public Class Line_Vertical : Inherits TaskParent
         Dim lrLines As New Line_LeftRight
         Public lpLeft As New List(Of lpData)
@@ -587,25 +546,18 @@ Namespace VBClasses
     Public Class Line_Motion : Inherits TaskParent
         Dim lrLines As New Line_LeftRight
         Public Sub New()
+            If standalone Then task.gOptions.showMotionMask.Checked = True
             desc = "Show lines with motion and lines with no motion in the leftView."
         End Sub
-        Public Shared Sub lpUpdateMotionFlags()
-            For Each lp In task.lines.lpList
-                lp.p1Motion = task.motionBasics.motionList
-                lp.p2Motion = False
-                If task.motion.lpMotion(lp.p1) Then lp.p1Motion = True
-                If task.motion.lpMotion(lp.p2) Then lp.p2Motion = True
-
-        End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = task.leftStable.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst3 = dst2.Clone
             lrLines.Run(Nothing)
 
             Dim motionCount As Integer
             Dim noMotionCount As Integer
             For Each lp In lrLines.linesLeft.lpList
-                If lp.p1Motion Or lp.p2Motion Then
+                If lp.motion Or lp.motion Then
                     dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth + 1, task.lineType)
                     motionCount += 1
                 Else
@@ -618,4 +570,28 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+    Public Class Line_LeftRight : Inherits TaskParent
+        Public linesLeft As New Line_Basics
+        Public linesRight As New Line_Basics
+        Public Sub New()
+            labels = {"", "", "Left image lines", "Right image lines"}
+            desc = "Find the lines in the Left and Right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            linesLeft.motionMask = task.motionLeft.motionMask
+            linesLeft.Run(task.leftStable)
+
+            dst2 = linesLeft.dst2
+            labels(2) = "There were " + CStr(linesLeft.lpList.Count) + " lines found in the left view"
+
+            linesRight.motionMask = task.motionRight.motionMask
+            linesRight.Run(task.rightStable)
+
+            dst3 = linesRight.dst2
+            labels(3) = "There were " + CStr(linesRight.lpList.Count) + " lines found in the right view"
+        End Sub
+    End Class
 End Namespace

@@ -551,7 +551,7 @@ Namespace VBClasses
             desc = "If a RedCloud cell has no motion, it is preserved."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.motionBasics.motionList.Count = 0 Then Exit Sub ' full image stable means nothing needs to be done...
+            If task.motionRGB.motionList.Count = 0 Then Exit Sub ' full image stable means nothing needs to be done...
             runRedList(src, labels(2))
             If task.redList.oldrclist.Count = 0 Then Exit Sub
 
@@ -564,7 +564,7 @@ Namespace VBClasses
             Dim newList As New List(Of oldrcData), tmp As New cv.Mat
             Dim countMaxD As Integer, countMissedMaxD As Integer
             For Each rc In task.redList.oldrclist
-                tmp = task.motionBasics.motionMask(rc.rect) And rc.mask
+                tmp = task.motionRGB.motionMask(rc.rect) And rc.mask
                 If tmp.CountNonZero = 0 Then
                     If rc.indexLast <> 0 And rc.indexLast < rcLastList.Count Then
                         Dim lrc = rcLastList(rc.indexLast)

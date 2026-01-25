@@ -463,8 +463,6 @@ ML_RemoveDups_CPP
 Moments_Basics
 Motion_Basics
 Motion_Left
-Motion_LeftRight
-Motion_LeftRightTest
 Motion_LeftTest
 Motion_PointCloud
 Motion_PointCloud_MotionRect

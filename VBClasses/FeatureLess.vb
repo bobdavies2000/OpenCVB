@@ -211,7 +211,7 @@ Namespace VBClasses
             dst1 = fless.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
             labels(2) = fless.labels(2)
 
-            If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionBasics.motionMask)
+            If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionRGB.motionMask)
             redCPP.Run(dst2 - 1)
             classCount = redCPP.classCount
             dst3 = PaletteFull(redCPP.dst2)

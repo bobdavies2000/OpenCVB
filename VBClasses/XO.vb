@@ -790,7 +790,7 @@ Namespace VBClasses
                 ReDim minList(task.gridRects.Count - 1)
                 ReDim maxList(task.gridRects.Count - 1)
             End If
-            For Each index In task.motionBasics.motionList
+            For Each index In task.motionRGB.motionList
                 Dim rect = task.gridRects(index)
                 Dim ptmin = New cv.Point2f(task.kalman.kOutput(index * 4) + rect.X,
                                        task.kalman.kOutput(index * 4 + 1) + rect.Y)
@@ -812,7 +812,7 @@ Namespace VBClasses
                 DrawCircle(dst1, maxList(i), task.DotSize, cv.Scalar.Blue)
             Next
 
-            If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionBasics.motionMask)
+            If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionRGB.motionMask)
 
             Dim facets = New cv.Point2f()() {Nothing}
             Dim centers() As cv.Point2f = Nothing
@@ -1568,7 +1568,7 @@ Namespace VBClasses
 
             Dim lineList = New List(Of cv.Rect)
             If task.optionsChanged Then dst3.SetTo(0)
-            dst3.SetTo(0, task.motionBasics.motionMask)
+            dst3.SetTo(0, task.motionRGB.motionMask)
             p1List.Clear()
             p2List.Clear()
             z1List.Clear()
@@ -1629,7 +1629,7 @@ Namespace VBClasses
             lpList.Clear()
             lpList.Add(New lpData) ' placeholder to allow us to build a map.
             If lastList.Count > 0 Then
-                lpRectMap.SetTo(0, Not task.motionBasics.motionMask)
+                lpRectMap.SetTo(0, Not task.motionRGB.motionMask)
                 cv.Cv2.CalcHist({lpRectMap}, {0}, emptyMat, histogram, 1, {lastList.Count}, New cv.Rangef() {New cv.Rangef(0, lastList.Count)})
                 Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
@@ -1642,7 +1642,7 @@ Namespace VBClasses
             ReDim histarray(lines.lpList.Count - 1)
 
             Dim tmp = lines.lpRectMap.Clone
-            tmp.SetTo(0, Not task.motionBasics.motionMask)
+            tmp.SetTo(0, Not task.motionRGB.motionMask)
             cv.Cv2.CalcHist({tmp}, {0}, emptyMat, histogram, 1, {lines.lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lines.lpList.Count)})
             Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
 
@@ -4729,7 +4729,7 @@ Namespace VBClasses
                     dst1.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth, cv.LineTypes.Link4)
                 Next
 
-                cv.Cv2.CalcHist({dst1}, {0}, task.motionBasics.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lpList.Count)})
+                cv.Cv2.CalcHist({dst1}, {0}, task.motionRGB.motionMask, histogram, 1, {lpList.Count}, New cv.Rangef() {New cv.Rangef(0, lpList.Count)})
 
                 Marshal.Copy(histogram.Data, histarray, 0, histarray.Length)
             End If
@@ -4826,7 +4826,7 @@ Namespace VBClasses
             End If
 
             If task.heartBeatLT Or task.lines.lpList.Count <= 1 Or match.correlation < 0.98 Or runOnEachFrame Then
-                task.motionBasics.motionMask.SetTo(255) ' force a complete line detection
+                task.motionRGB.motionMask.SetTo(255) ' force a complete line detection
                 task.lines.Run(src.Clone)
 
                 cameraMotionProxy = task.lines.lpList(0)
@@ -7650,7 +7650,7 @@ Namespace VBClasses
                 If match.p1Correlation < task.fCorrThreshold Or task.frameCount < 10 Or
                match.p2Correlation < task.fCorrThreshold Then
 
-                    task.motionBasics.motionMask.SetTo(255) ' force a complete line detection
+                    task.motionRGB.motionMask.SetTo(255) ' force a complete line detection
                     task.lines.Run(src.Clone)
 
                     match.lpInput = task.lines.lpList(0)
@@ -8043,7 +8043,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.optionsChanged Then
                 lpList.Clear()
-                task.motionBasics.motionMask.SetTo(255)
+                task.motionRGB.motionMask.SetTo(255)
             End If
 
             Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
@@ -11055,7 +11055,7 @@ Namespace VBClasses
 
             Dim oldrclist As New List(Of oldrcData)
             For Each rc In task.redList.oldrclist
-                If task.motionBasics.motionMask(rc.rect).CountNonZero = 0 Then
+                If task.motionRGB.motionMask(rc.rect).CountNonZero = 0 Then
                     If rc.indexLast > 0 And rc.indexLast < lastList.Count Then rc = lastList(rc.indexLast)
                 End If
                 Dim index = oldrclist.Count
@@ -11110,7 +11110,7 @@ Namespace VBClasses
                 Dim md = mdList(index)
                 rc.color = task.scalarColors(md.index)
                 If rc.indexLast <> 0 Then
-                    If (task.motionBasics.motionMask(rc.rect) And rc.mask).ToMat.CountNonZero = 0 Then
+                    If (task.motionRGB.motionMask(rc.rect) And rc.mask).ToMat.CountNonZero = 0 Then
                         rc = rcLastList(rc.indexLast)
                         lastCount += 1
                     End If
@@ -11534,7 +11534,7 @@ Namespace VBClasses
                         "Any differences that persist should not be visible in the RGB image at left." + vbCrLf, 3)
             End If
             If task.heartBeat Then dst2 = src.Clone
-            task.motionBasics.motionMask = dst1.Clone
+            task.motionRGB.motionMask = dst1.Clone
         End Sub
     End Class
 
@@ -11604,7 +11604,7 @@ Namespace VBClasses
         End Sub
         Public Shared Function getMotionRect() As cv.Rect
             Dim motionRect As cv.Rect
-            For Each index In task.motionBasics.motionList
+            For Each index In task.motionRGB.motionList
                 motionRect = motionRect.Union(task.gridRects(index))
             Next
             Return motionRect
@@ -11619,7 +11619,7 @@ Namespace VBClasses
                 For Each rect In lastRects
                     r = r.Union(rect)
                 Next
-                dst2 = task.motionBasics.dst2
+                dst2 = task.motionRGB.dst2
                 lastRects.Add(r)
                 If lastRects.Count > task.frameHistoryCount Then lastRects.RemoveAt(0)
             End If
@@ -11824,7 +11824,7 @@ Namespace VBClasses
 
             If cellList.Count >= task.frameHistoryCount Then cellList.RemoveAt(0)
             src.CopyTo(dst2, dst3)
-            task.motionBasics.motionMask = dst3.Clone
+            task.motionRGB.motionMask = dst3.Clone
 
             labels(2) = CStr(motionList.Count) + " grid rect's or " +
                     Format(motionList.Count / task.gridRects.Count, "0.0%") +
@@ -12268,7 +12268,7 @@ Namespace VBClasses
             dst2 = redContours.dst2
             labels(2) = redContours.labels(2)
 
-            dst1.SetTo(0, Not task.motionBasics.motionMask)
+            dst1.SetTo(0, Not task.motionRGB.motionMask)
 
             Dim histogram As New cv.Mat
             Dim ranges = {New cv.Rangef(1, 256)}
@@ -13428,7 +13428,7 @@ Namespace VBClasses
                 dst3(rect).SetTo(255)
             Next
 
-            task.motionBasics.motionMask = dst3.Clone
+            task.motionRGB.motionMask = dst3.Clone
             labels(2) = CStr(motionList.Count) + " grid rects had motion."
         End Sub
     End Class
@@ -13740,7 +13740,7 @@ Namespace VBClasses
 
             If motionLists.Count > 10 Then motionLists.RemoveAt(0)
 
-            task.motionBasics.motionMask = dst3.Clone
+            task.motionRGB.motionMask = dst3.Clone
             labels(2) = CStr(motionList.Count) + " grid rects had motion."
         End Sub
     End Class
@@ -14398,8 +14398,8 @@ Namespace VBClasses
         End Sub
         Private Function lpMotion(lp As lpData) As Boolean
             ' return true if either line endpoint was in the motion mask.
-            If task.motionBasics.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
-            If task.motionBasics.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
+            If task.motionRGB.motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
+            If task.motionRGB.motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
             Return False
         End Function
         Public Shared Function createMap() As cv.Mat
@@ -14412,7 +14412,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If lpList.Count <= 1 Then
-                task.motionBasics.motionMask.SetTo(255)
+                task.motionRGB.motionMask.SetTo(255)
                 rawLines.Run(src)
                 lpList = New List(Of lpData)(rawLines.lpList)
             End If
@@ -16056,11 +16056,11 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             task.bricks.Run(task.grayStable)
-            dst2 = task.motionBasics.motionMask
+            dst2 = task.motionRGB.motionMask
             dst1 = task.rightView
 
             motionMaskRight.SetTo(0)
-            For Each index In task.motionBasics.motionList
+            For Each index In task.motionRGB.motionList
                 Dim brick = task.bricks.brickList(index)
                 motionMaskRight.Rectangle(brick.rRect, 255, -1)
                 dst1.Rectangle(brick.rRect, 255, task.lineWidth)
@@ -16729,12 +16729,12 @@ Namespace VBClasses
             desc = "Prepare a Color8U_Basics image using the motionMask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.motionBasics.motionMask.CountNonZero Then
-                src.SetTo(0, Not task.motionBasics.motionMask)
+            If task.motionRGB.motionMask.CountNonZero Then
+                src.SetTo(0, Not task.motionRGB.motionMask)
                 color8U.Run(src)
                 dst2 = color8U.dst3
-                dst2.CopyTo(dst3, task.motionBasics.motionMask)
-                dst2.SetTo(0, Not task.motionBasics.motionMask)
+                dst2.CopyTo(dst3, task.motionRGB.motionMask)
+                dst2.SetTo(0, Not task.motionRGB.motionMask)
                 classCount = color8U.classCount
             End If
             If task.heartBeatLT Then dst3.SetTo(0)
@@ -17132,7 +17132,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.heartBeatLT Or task.frameCount < 3 Then task.pointCloud.CopyTo(dst2)
-            If task.motionBasics.motionList.Count = 0 Then Exit Sub ' no change...
+            If task.motionRGB.motionList.Count = 0 Then Exit Sub ' no change...
 
             Dim updateCount As Integer
             Dim newRange As Single = 0.01F
@@ -17358,9 +17358,9 @@ Namespace VBClasses
                 End If
             End If
 
-            task.pointCloud.CopyTo(dst2, task.motionBasics.motionMask)
+            task.pointCloud.CopyTo(dst2, task.motionRGB.motionMask)
             task.pointCloud = dst2
-            ' dst0.CopyTo(task.depthMask, task.motionBasics.motionMask)
+            ' dst0.CopyTo(task.depthMask, task.motionRGB.motionMask)
 
             preparePointcloud()
 
