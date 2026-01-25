@@ -77,8 +77,7 @@ Namespace MainApp
             captureRes = _captureRes
             workRes = _workRes
 
-            ' Open the Oak-D camera
-            Dim deviceClass = If(deviceName.Contains("Oak-4D"), 4, 3) ' oak 4D is 4 while oak 3, duh.
+            Dim deviceClass = If(deviceName.Contains("Oak-4D"), 4, 3)
             cPtr = OakDOpen(captureRes.Width, captureRes.Height, deviceClass)
 
             If cPtr = IntPtr.Zero Then

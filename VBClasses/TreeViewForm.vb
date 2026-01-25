@@ -98,8 +98,8 @@ Public Class TreeviewForm
         TreeView1.Dock = DockStyle.Fill
         TreeView1.SendToBack()
 
-        Me.Location = New Point(task.Settings.TreeViewLeft, task.Settings.TreeViewTop)
-        Me.Size = New Size(task.Settings.TreeViewWidth, task.Settings.TreeViewHeight)
+        Me.Location = New System.Drawing.Point(task.Settings.TreeViewLeft, task.Settings.TreeViewTop)
+        Me.Size = New System.Drawing.Size(task.Settings.TreeViewWidth, task.Settings.TreeViewHeight)
 
         PercentTime.Width = 250
         PercentTime.Left = 250

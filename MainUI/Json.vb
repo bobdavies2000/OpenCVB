@@ -6,6 +6,14 @@ Imports Newtonsoft.Json
 Imports cv = OpenCvSharp
 Namespace MainApp
     Public Class jsonIO
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDDevices() As Integer
+        End Function
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDNextDevice() As IntPtr
+        End Function
+
         Private jsonFileName As String
         Public Sub New(fileName As String)
             jsonFileName = fileName
@@ -30,12 +38,24 @@ Namespace MainApp
         End Function
         Public Function initialize(Settings As jsonShared.Settings) As jsonShared.Settings
             Dim usbList = USBenumeration()
+
+            Dim countOak = OakDDevices()
+            Dim Oak3DPresent As Boolean
+            Dim Oak4DPresent As Boolean
+            For i = 0 To countOak - 1
+                Dim strPtr = OakDNextDevice()
+                Dim productName As String = Marshal.PtrToStringAnsi(strPtr)
+                Debug.WriteLine("Oak-D device found: " + productName)
+                If productName.StartsWith("OAK-D") Then Oak3DPresent = True
+                If productName.StartsWith("OAK-4") Then Oak4DPresent = True
+            Next
+
             Settings.cameraPresent = New List(Of Boolean)
             For i = 0 To cameraNames.Count - 1
                 Dim searchname = cameraNames(i)
                 Dim present As Boolean = False
-                If searchname.StartsWith("Oak-3D") Then searchname = "Movidius"
-                If searchname.StartsWith("Oak-4D") Then searchname = "OAK4-D"
+                If searchname.StartsWith("Oak-3D") Then present = Oak3DPresent
+                If searchname.StartsWith("Oak-4D") Then present = Oak4DPresent
                 If searchname.StartsWith("StereoLabs ZED 2/2i") Then searchname = "ZED 2"
 
                 Dim subsetList As New List(Of String)

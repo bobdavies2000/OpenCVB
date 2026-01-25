@@ -14,8 +14,8 @@ Namespace VBClasses
 
             allOptions = New OptionsContainer
             allOptions.Show()
-            allOptions.Location = New Point(task.Settings.allOptionsLeft, task.Settings.allOptionsTop)
-            allOptions.Size = New Size(task.Settings.allOptionsWidth, task.Settings.allOptionsHeight)
+            allOptions.Location = New System.Drawing.Point(task.Settings.allOptionsLeft, task.Settings.allOptionsTop)
+            allOptions.Size = New System.Drawing.Size(task.Settings.allOptionsWidth, task.Settings.allOptionsHeight)
             allOptions.positionedFromSettings = True
 
             If settings.algorithm.StartsWith("GL_") And settings.algorithm <> "GL_MainForm" And optionsChanged Then

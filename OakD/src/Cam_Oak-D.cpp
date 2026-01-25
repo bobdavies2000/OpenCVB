@@ -4,11 +4,15 @@
 #include "depthai/pipeline/node/StereoDepth.hpp"
 #include "depthai/properties/StereoDepthProperties.hpp"
 #include "../CPP_Native/PragmaLibs.h"
+#include <string>
 
 using namespace std;
 using namespace cv;
 
 constexpr float FPS = 30.0f;
+
+static std::vector<dai::DeviceInfo> devList;
+static int devIndex = -1;
 
 class OakDCamera
 {
@@ -244,56 +248,20 @@ extern "C" __declspec(dllexport) void OakDStop(OakDCamera* cPtr) {
 		delete cPtr;
 	}
 }
-extern "C" __declspec(dllexport) bool OakGetDevice() {
-	auto devices = dai::Device::getAllAvailableDevices();
-	if (devices.empty()) return false;
-	return true;
+
+extern "C" __declspec(dllexport) int OakDDevices() {
+	devList = dai::Device::getAllAvailableDevices();
+	return static_cast<int>(devList.size());
 }
 
-// Helper function to check if a device matches the deviceClass (3 for Oak-3D, 4 for Oak-4D)
-bool checkDeviceClass(const dai::DeviceInfo& devInfo, int deviceClass) {
-	try {
-		// Create a temporary device connection to get product name
-		std::shared_ptr<dai::Device> tempDevice = std::make_shared<dai::Device>(devInfo);
-		auto calib = tempDevice->readCalibration();
-		auto eeprom = calib.getEepromData();
-		std::string productName = eeprom.productName;
-		tempDevice.reset(); // Close temporary connection
-		
-		// Determine search string based on deviceClass
-		std::string searchString = (deviceClass == 4) ? "4D" : "3D";
-		
-		// Check if product name contains the search string
-		return productName.find(searchString) != std::string::npos;
-	}
-	catch (...) {
-		// If we can't connect or read device info, return false
-		return false;
-	}
-}
+extern "C" __declspec(dllexport) char* OakDNextDevice() {
+	auto& devInfo = devList[++devIndex];
+	std::shared_ptr<dai::Device> tempDevice = std::make_shared<dai::Device>(devInfo);
+	auto calib = tempDevice->readCalibration();
+	auto eeprom = calib.getEepromData();
+	std::string productName = eeprom.productName;
+	tempDevice.reset(); // Close temporary connection
 
-extern "C" __declspec(dllexport) int OakDDetect3D() {
-	int count = 0;
-	auto devices = dai::Device::getAllAvailableDevices();
-	
-	for (const auto& devInfo : devices) {
-		if (checkDeviceClass(devInfo, 3)) {
-			count++;
-		}
-	}
-	
-	return count;
-}
-
-extern "C" __declspec(dllexport) int OakDDetect4D() {
-	int count = 0;
-	auto devices = dai::Device::getAllAvailableDevices();
-	
-	for (const auto& devInfo : devices) {
-		if (checkDeviceClass(devInfo, 4)) {
-			count++;
-		}
-	}
-	
-	return count;
+	char* c = _strdup(productName.c_str());
+	return c;
 }

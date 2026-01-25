@@ -17,6 +17,7 @@ Module Startup
         Application.DoEvents()
 
         Dim mainForm As New MainApp.MainUI()
+        Application.DoEvents()
         mainForm.Show()
 
         splash.Close()
