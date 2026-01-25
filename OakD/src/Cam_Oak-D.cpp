@@ -249,3 +249,51 @@ extern "C" __declspec(dllexport) bool OakGetDevice() {
 	if (devices.empty()) return false;
 	return true;
 }
+
+// Helper function to check if a device matches the deviceClass (3 for Oak-3D, 4 for Oak-4D)
+bool checkDeviceClass(const dai::DeviceInfo& devInfo, int deviceClass) {
+	try {
+		// Create a temporary device connection to get product name
+		std::shared_ptr<dai::Device> tempDevice = std::make_shared<dai::Device>(devInfo);
+		auto calib = tempDevice->readCalibration();
+		auto eeprom = calib.getEepromData();
+		std::string productName = eeprom.productName;
+		tempDevice.reset(); // Close temporary connection
+		
+		// Determine search string based on deviceClass
+		std::string searchString = (deviceClass == 4) ? "4D" : "3D";
+		
+		// Check if product name contains the search string
+		return productName.find(searchString) != std::string::npos;
+	}
+	catch (...) {
+		// If we can't connect or read device info, return false
+		return false;
+	}
+}
+
+extern "C" __declspec(dllexport) int OakDDetect3D() {
+	int count = 0;
+	auto devices = dai::Device::getAllAvailableDevices();
+	
+	for (const auto& devInfo : devices) {
+		if (checkDeviceClass(devInfo, 3)) {
+			count++;
+		}
+	}
+	
+	return count;
+}
+
+extern "C" __declspec(dllexport) int OakDDetect4D() {
+	int count = 0;
+	auto devices = dai::Device::getAllAvailableDevices();
+	
+	for (const auto& devInfo : devices) {
+		if (checkDeviceClass(devInfo, 4)) {
+			count++;
+		}
+	}
+	
+	return count;
+}
