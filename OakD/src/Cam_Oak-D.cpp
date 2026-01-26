@@ -162,7 +162,9 @@ public:
 	}
 };
 
-extern "C" __declspec(dllexport) int* OakDRawDepth(OakDCamera* cPtr) { return (int*)cPtr->depthBuffer; /* return (int*)cPtr->depth16u.data; */ }
+extern "C" __declspec(dllexport) int* OakDRawDepth3D(OakDCamera* cPtr) { return (int*)cPtr->depth16u.data; }
+extern "C" __declspec(dllexport) int* OakDRawDepth4D(OakDCamera* cPtr) { return (int*)cPtr->depthBuffer;  } // why is this needed? depth16u fails.
+extern "C" __declspec(dllexport) int* OakDDisparity(OakDCamera* cPtr) { return (int*)cPtr->disparity.data; }
 extern "C" __declspec(dllexport) double OakDIMUTimeStamp(OakDCamera* cPtr) { return cPtr->imuTimeStamp; }
 extern "C" __declspec(dllexport) int* OakDGyro(OakDCamera* cPtr) { return (int*)&cPtr->gyroValues.x; }
 extern "C" __declspec(dllexport) int* OakDAccel(OakDCamera* cPtr) { return (int*)&cPtr->acceleroValues.x; }
@@ -170,7 +172,6 @@ extern "C" __declspec(dllexport) int* OakDColor(OakDCamera* cPtr) { return (int*
 extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera* cPtr) { cPtr->waitForFrame(); }
 extern "C" __declspec(dllexport) int* OakDLeftImage(OakDCamera* cPtr) { return (int*)cPtr->leftView.data; }
 extern "C" __declspec(dllexport) int* OakDRightImage(OakDCamera* cPtr) { return (int*)cPtr->rightView.data; }
-extern "C" __declspec(dllexport) int* OakDDisparity(OakDCamera* cPtr) { return (int*)cPtr->disparity.data; }
 
 extern "C" __declspec(dllexport)
 int* OakDOpen(int captureWidth, int captureHeight, int deviceClass)

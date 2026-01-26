@@ -246,7 +246,6 @@ Namespace VBClasses
 
     Public Class Motion_Right : Inherits TaskParent
         Public motion As New Motion_Basics
-        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         Public Sub New()
             desc = "Build the MotionMask for the right camera."
         End Sub
@@ -264,7 +263,6 @@ Namespace VBClasses
 
     Public Class Motion_Left : Inherits TaskParent
         Public motion As New Motion_Basics
-        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         Public Sub New()
             desc = "Build the MotionMask for the left camera."
         End Sub

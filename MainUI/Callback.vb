@@ -15,8 +15,8 @@ Namespace MainApp
                     camera = New Camera_RS2(settings.workRes, settings.captureRes, settings.cameraName, emitterOn)
                 Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
                     camera = New Camera_ORB(settings.workRes, settings.captureRes, settings.cameraName)
-                Case "Oak-3D camera"
-                    camera = New Camera_OakD(settings.workRes, settings.captureRes, settings.cameraName)
+                'Case "Oak-3D camera"
+                '    camera = New Camera_OakD(settings.workRes, settings.captureRes, settings.cameraName)
                 Case "Oak-4D camera"
                     camera = New Camera_OakD(settings.workRes, settings.captureRes, settings.cameraName)
                 Case Else

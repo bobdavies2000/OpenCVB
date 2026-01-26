@@ -2,10 +2,9 @@
 
 Module GlobalVariables
     Public settings As jsonShared.Settings
-
+    '                                         "Oak-3D camera",
     Public cameraNames As New List(Of String)({"Intel(R) RealSense(TM) Depth Camera 435i",
                                                "Intel(R) RealSense(TM) Depth Camera 455",
-                                               "Oak-3D camera",
                                                "Oak-4D camera",
                                                "Orbbec Gemini 335",
                                                "Orbbec Gemini 335L",

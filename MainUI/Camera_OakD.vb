@@ -30,7 +30,11 @@ Namespace MainApp
         End Function
 
         <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
-        Private Shared Function OakDRawDepth(cPtr As IntPtr) As IntPtr
+        Private Shared Function OakDRawDepth3D(cPtr As IntPtr) As IntPtr
+        End Function
+
+        <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
+        Private Shared Function OakDRawDepth4D(cPtr As IntPtr) As IntPtr
         End Function
 
         <DllImport("Cam_Oak-D.dll", CallingConvention:=CallingConvention.Cdecl)>
@@ -70,7 +74,7 @@ Namespace MainApp
         End Function
 
         Private cPtr As IntPtr
-        Private initialTime As Double = 0
+        Private deviceClass As Integer = 3 ' 3D or 4D.
 #End Region
 
         Public Sub New(_workRes As cv.Size, _captureRes As cv.Size, deviceName As String)
@@ -78,6 +82,7 @@ Namespace MainApp
             workRes = _workRes
 
             Dim deviceIndex = If(deviceName.Contains("Oak-4D"), settings.OakIndex4D, settings.OakIndex3D)
+            deviceClass = If(deviceName.Contains("Oak-4D"), 4, 3)
             cPtr = OakDOpen(captureRes.Width, captureRes.Height, deviceIndex)
 
             If cPtr = IntPtr.Zero Then
@@ -204,7 +209,7 @@ Namespace MainApp
                     rightView = rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
-                Dim depthPtr = OakDRawDepth(cPtr)
+                Dim depthPtr = OakDRawDepth4D(cPtr)
                 If depthPtr <> IntPtr.Zero Then
                     depth16u = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_16UC1, depthPtr).Clone()
                     depth16u = depth16u.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
@@ -217,10 +222,12 @@ Namespace MainApp
                     color = color.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
                 End If
 
-                Dim disparityPtr = OakDDisparity(cPtr)
-                If disparityPtr <> IntPtr.Zero Then
-                    disparity = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, disparityPtr).Clone()
-                    disparity = disparity.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                If deviceClass = 4 Then
+                    Dim disparityPtr = OakDDisparity(cPtr)
+                    If disparityPtr <> IntPtr.Zero Then
+                        disparity = cv.Mat.FromPixelData(rows, cols, cv.MatType.CV_8UC1, disparityPtr).Clone()
+                        disparity = disparity.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
+                    End If
                 End If
 
                 ' Get IMU data

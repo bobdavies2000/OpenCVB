@@ -1,6 +1,92 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Line_Basics : Inherits TaskParent
+        Implements IDisposable
+        Public lpList As New List(Of lpData)
+        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+        Dim ld As cv.XImgProc.FastLineDetector
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            If standalone Then task.gOptions.showMotionMask.Checked = True
+            ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+            desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
+        End Sub
+        Private Function lpMotion(lp As lpData) As Boolean
+            ' return true if either line endpoint was in the motion mask.
+            If motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
+            If motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
+            Return False
+        End Function
+        Public Shared Function getRawLines(lines As cv.Vec4f()) As List(Of lpData)
+            Dim lpList As New List(Of lpData)
+            For Each v In lines
+                If v(0) >= 0 And v(0) <= task.workRes.Width And v(1) >= 0 And v(1) <= task.workRes.Height And
+                   v(2) >= 0 And v(2) <= task.workRes.Width And v(3) >= 0 And v(3) <= task.workRes.Height Then
+                    Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
+                    Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
+                    If p1.X >= 0 And p1.X < task.workRes.Width And p1.Y >= 0 And p1.Y < task.workRes.Height And
+                       p2.X >= 0 And p2.X < task.workRes.Width And p2.Y >= 0 And p2.Y < task.workRes.Height Then
+                        p1 = lpData.validatePoint(p1)
+                        p2 = lpData.validatePoint(p2)
+                        Dim lp = New lpData(p1, p2)
+                        If lp.pVec1(2) > 0 And lp.pVec2(2) > 0 Then lpList.Add(lp)
+                    End If
+                End If
+            Next
+            Return lpList
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+            If lpList.Count <= 1 Then
+                motionMask.SetTo(255)
+                lpList = getRawLines(ld.Detect(src))
+            End If
+
+            Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+            For Each lp In lpList
+                If lpMotion(lp) = False Then
+                    lp.age += 1
+                    sortlines.Add(lp.length, lp)
+                End If
+            Next
+            Dim count As Integer = sortlines.Count
+
+            lpList = getRawLines(ld.Detect(src))
+
+            For Each lp In lpList
+                If lpMotion(lp) Then
+                    sortlines.Add(lp.length, lp)
+                End If
+            Next
+            Dim newCount As Integer = sortlines.Count - count
+
+            lpList.Clear()
+            For Each lp In sortlines.Values
+                lp.index = lpList.Count
+                lpList.Add(lp)
+            Next
+
+            dst1.SetTo(0)
+            dst2.SetTo(0)
+            For Each lp In lpList
+                dst1.Line(lp.p1, lp.p2, lp.index + 1, 1, cv.LineTypes.Link4)
+                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
+            Next
+
+            If task.frameCount > 10 Then If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
+            If lpList.Count > 0 Then task.lineLongest = lpList(0)
+
+            If task.heartBeat Then labels(2) = CStr(count) + " lines retained - " + CStr(newCount) + " were new"
+        End Sub
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            ld.Dispose()
+        End Sub
+    End Class
+
+
+
+
+    Public Class Line_BasicsCore : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public rawLines As New Line_Core
         Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
@@ -46,10 +132,6 @@ Namespace VBClasses
                 dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
             Next
 
-            ' so we don't have to check the lplist.count every time we need the longest line...
-            If lpList.Count = 0 Then
-                lpList.Add(task.gravityIMU)
-            End If
             If task.frameCount > 10 Then If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
             task.lineLongest = lpList(0)
 
@@ -76,22 +158,7 @@ Namespace VBClasses
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
 
-            Dim lines = ld.Detect(src)
-            lpList.Clear()
-            For Each v In lines
-                If v(0) >= 0 And v(0) <= src.Cols And v(1) >= 0 And v(1) <= src.Rows And
-               v(2) >= 0 And v(2) <= src.Cols And v(3) >= 0 And v(3) <= src.Rows Then
-                    Dim p1 = New cv.Point(CInt(v(0)), CInt(v(1)))
-                    Dim p2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                    If p1.X >= 0 And p1.X < dst2.Width And p1.Y >= 0 And p1.Y < dst2.Height And
-                   p2.X >= 0 And p2.X < dst2.Width And p2.Y >= 0 And p2.Y < dst2.Height Then
-                        p1 = lpData.validatePoint(p1)
-                        p2 = lpData.validatePoint(p2)
-                        Dim lp = New lpData(p1, p2)
-                        If lp.pVec1(2) > 0 And lp.pVec2(2) > 0 Then lpList.Add(lp)
-                    End If
-                End If
-            Next
+            lpList = Line_Basics.getRawLines(ld.Detect(src))
 
             dst2.SetTo(0)
             For Each lp In lpList
@@ -581,17 +648,17 @@ Namespace VBClasses
             desc = "Find the lines in the Left and Right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            linesLeft.motionMask = task.motionLeft.motionMask
+            linesLeft.motionMask = task.motionLeft.dst3
             linesLeft.Run(task.leftStable)
 
             dst2 = linesLeft.dst2
-            labels(2) = "There were " + CStr(linesLeft.lpList.Count) + " lines found in the left view"
+            labels(2) = linesLeft.labels(2)
 
-            linesRight.motionMask = task.motionRight.motionMask
+            linesRight.motionMask = task.motionRight.dst3
             linesRight.Run(task.rightStable)
 
             dst3 = linesRight.dst2
-            labels(3) = "There were " + CStr(linesRight.lpList.Count) + " lines found in the right view"
+            labels(3) = linesLeft.labels(2)
         End Sub
     End Class
 End Namespace

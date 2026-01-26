@@ -123,22 +123,23 @@ Namespace VBClasses
                     rightStable = rightView.Clone
                 Else
                     If motionRGB.motionList.Count > 0 Then gray.CopyTo(grayStable, motionRGB.motionMask)
-                    If motionLeft.motion.motionList.Count > 0 Then leftView.CopyTo(leftStable, motionLeft.motionMask)
-                    If motionRight.motion.motionList.Count > 0 Then rightView.CopyTo(rightStable, task.motionRGB.motionMask)
+                    If motionLeft.motion.motionList.Count > 0 Then
+                        leftView.CopyTo(leftStable, motionLeft.dst2)
+                    End If
+                    If motionRight.motion.motionList.Count > 0 Then
+                        rightView.CopyTo(rightStable, task.motionRGB.dst2)
+                    End If
                 End If
             Else
-                motionLeft.motionMask.SetTo(255)
-                motionRight.motionMask.SetTo(255)
                 motionRGB.motionMask.SetTo(255)
-
                 motionRGB.motionList.Clear()
                 grayStable = gray
                 leftStable = leftView
                 rightStable = rightView
 
+                motionRGB.Run(gray)
                 motionLeft.Run(leftView)
                 motionRight.Run(rightView)
-                motionRGB.Run(gray)
             End If
 
             If pcMotion IsNot Nothing Then
