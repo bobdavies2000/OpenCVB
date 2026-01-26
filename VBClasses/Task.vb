@@ -18,7 +18,8 @@ Namespace VBClasses
             allOptions.Size = New System.Drawing.Size(task.Settings.allOptionsWidth, task.Settings.allOptionsHeight)
             allOptions.positionedFromSettings = True
 
-            If settings.algorithm.StartsWith("GL_") And settings.algorithm <> "GL_MainForm" And optionsChanged Then
+            If (settings.algorithm.StartsWith("GL_") Or settings.algorithm.StartsWith("NR_GL_")) And
+                settings.algorithm <> "GL_MainForm" And optionsChanged Then
                 If sharpGL IsNot Nothing Then sharpGL.Dispose()
                 sharpGL = New SharpGLForm
                 sharpGL.Show()

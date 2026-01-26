@@ -462,7 +462,9 @@ Namespace MainApp
             Dim index = AvailableAlgorithms.SelectedIndex + 1
             If AvailableAlgorithms.Items.Count <= index Then index = 0
             If AvailableAlgorithms.Items(index) = " " Then index += 1
-            While AvailableAlgorithms.Items(index).StartsWith("GL_") Or AvailableAlgorithms.Items(index).StartsWith("ImShow_")
+            While AvailableAlgorithms.Items(index).StartsWith("GL_") Or
+                AvailableAlgorithms.Items(index).StartsWith("NR_GL_") Or
+                AvailableAlgorithms.Items(index).StartsWith("ImShow_")
                 index += 1
             End While
             Debug.WriteLine(vbCrLf + "Usage GDI/USER: " & CStr(GdiMonitor.GetGdiCount()) + "/" & CStr(GdiMonitor.GetUserCount()))
