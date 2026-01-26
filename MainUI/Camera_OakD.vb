@@ -77,8 +77,8 @@ Namespace MainApp
             captureRes = _captureRes
             workRes = _workRes
 
-            Dim deviceClass = If(deviceName.Contains("Oak-4D"), 4, 3)
-            cPtr = OakDOpen(captureRes.Width, captureRes.Height, deviceClass)
+            Dim deviceIndex = If(deviceName.Contains("Oak-4D"), settings.OakIndex4D, settings.OakIndex3D)
+            cPtr = OakDOpen(captureRes.Width, captureRes.Height, deviceIndex)
 
             If cPtr = IntPtr.Zero Then
                 Throw New Exception("Failed to open Oak-D camera")

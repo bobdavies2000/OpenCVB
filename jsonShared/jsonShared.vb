@@ -14,6 +14,9 @@ Namespace jsonShared
         Public cameraFound As Boolean
         Public cameraSupported As List(Of Boolean)
 
+        Public OakIndex3D As Integer = -1
+        Public OakIndex4D As Integer = -1
+
         Public captureRes As New cv.Size(640, 480)
 
         Public desiredFPS As Integer = 60

@@ -43,7 +43,7 @@ public:
 	dai::IMUReportAccelerometer acceleroValues;
 	dai::IMUReportGyroscope gyroValues;
 
-	OakDCamera(int _cols, int _rows, int deviceClass)
+	OakDCamera(int _cols, int _rows, int deviceIndex)
 	{
 		captureRows = _rows;
 		captureCols = _cols;
