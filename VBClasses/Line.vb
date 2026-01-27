@@ -623,8 +623,6 @@ Namespace VBClasses
 
     ''' <summary>Find all lines in the left image, assign each a stable ID, and track them as the camera moves.</summary>
     Public Class Line_LeftTrack : Inherits TaskParent
-        Implements IDisposable
-        Dim ld As cv.XImgProc.FastLineDetector
         ''' <summary>Tracked lines: (trackId, lpData, color, missedCount, age).</summary>
         Dim tracked As New List(Of TrackedLine)
         Dim nextTrackId As Integer = 1
@@ -636,9 +634,9 @@ Namespace VBClasses
         Const lenRatioThresh As Single = 0.45F
 
         Public lpList As New List(Of lpData)
+        Dim lines As New Line_Basics
 
         Public Sub New()
-            ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
             labels = {"", "", "Left image: detected lines with stable track IDs", ""}
             desc = "Find all lines in the left image, identify each with a stable ID, and track them as the camera moves."
         End Sub
@@ -656,9 +654,10 @@ Namespace VBClasses
         End Function
 
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim vecs = ld.Detect(task.leftView)
-            Dim raw = Line_Basics.getRawLines(vecs)
-            raw = raw.Where(Function(lp) lp.length >= minLength).ToList()
+            lines.Run(task.leftStable)
+            Dim raw = lines.lpList
+            cv.Cv2.ImShow("lines.dst2", lines.dst2)
+            cv.Cv2.ImShow("lines.dst3", lines.dst3)
 
             Dim usedRaw As New HashSet(Of lpData)
             Dim usedTracked As New HashSet(Of TrackedLine)
@@ -726,10 +725,6 @@ Namespace VBClasses
             Next
 
             labels(2) = "Tracked " + CStr(tracked.Count) + " lines, " + CStr(raw.Count) + " detected this frame"
-        End Sub
-
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
-            If ld IsNot Nothing Then ld.Dispose()
         End Sub
     End Class
 

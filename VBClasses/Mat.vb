@@ -485,7 +485,7 @@ Namespace VBClasses
             outMat.ConvertTo(outMat, cv.MatType.CV_8UC3)
             Return outMat
         End Function
-        Public Shared Function Mat_Check8uc3(src As cv.Mat) As cv.Mat
+        Public Shared Function Mat_Check8UC3(src As cv.Mat) As cv.Mat
             If src.Type = cv.MatType.CV_8UC3 Then Return src
             Dim dst As New cv.Mat
             If src.Type = cv.MatType.CV_32F Then
@@ -507,7 +507,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then src = task.pointCloud
-            dst2 = Mat_Check8uc3(src)
+            dst2 = Mat_Check8UC3(src)
         End Sub
     End Class
 
