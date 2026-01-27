@@ -471,7 +471,6 @@ Namespace VBClasses
 
     Public Class NR_BackProject_MaskLines : Inherits TaskParent
         Dim masks As New BackProject_Masks
-        Dim rawLines As New Line_Core
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -487,9 +486,10 @@ Namespace VBClasses
             Static saveHistIndex As Integer = masks.histIndex
             If masks.histIndex <> saveHistIndex Then dst1.SetTo(0)
 
-            rawLines.Run(masks.mask)
+            Dim vecArray = task.lines.getRawVecs(masks.mask)
+            Dim lpList = Line_Basics.getRawLines(vecArray)
 
-            For Each lp In rawLines.lpList
+            For Each lp In lpList
                 Dim val = masks.dst3.Get(Of Byte)(lp.p1.Y, lp.p1.X)
                 If val = 255 Then dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineWidth)
             Next

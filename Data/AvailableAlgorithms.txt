@@ -411,8 +411,6 @@ LeftRight_RedRight
 LeftRight_RedRightGray
 LeftRight_Reduction
 Line_Basics
-Line_BasicsCore
-Line_Core
 Line_DepthHistogram
 Line_Intersection
 Line_LeftRight
@@ -1072,6 +1070,7 @@ NR_LeftRight_Palettized
 NR_LeftRight_RawLeft
 NR_LeftRight_RGBAlignLeft
 NR_Line_BrickList
+NR_Line_Core
 NR_Line_Parallel
 NR_Line_Select
 NR_Line_Vertical
@@ -1301,6 +1300,7 @@ NR_Reduction_BGR
 NR_Reduction_Edges
 NR_Reduction_Floodfill
 NR_Reduction_HeatMapLines
+NR_Reduction_HeatMapLines1
 NR_Reduction_Histogram
 NR_Reduction_MotionTest
 NR_Reduction_NoDepth

@@ -82,16 +82,20 @@ Namespace VBClasses
 
     Public Class NR_Structured_MultiSliceLines : Inherits TaskParent
         Dim multi As New Structured_MultiSlice
-        Dim lines As New Line_Core
         Public Sub New()
             desc = "Detect lines in the multiSlice output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             multi.Run(src)
             dst3 = multi.dst3
-            lines.Run(dst3)
-            dst2 = lines.dst2
-            labels(2) = lines.labels(2)
+
+            Dim vecArray = task.lines.getRawVecs(dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            Dim lpList = Line_Basics.getRawLines(vecArray)
+
+            dst2.SetTo(0)
+            For Each lp In lpList
+                dst2.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+            Next
         End Sub
     End Class
 

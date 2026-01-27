@@ -5343,7 +5343,6 @@ Namespace VBClasses
     Public Class XO_TrackLine_BasicsSimple : Inherits TaskParent
         Dim lp As New lpData
         Dim match As New Match_Basics
-        Public rawLines As New Line_Core
         Dim matchRect As cv.Rect
         Public Sub New()
             desc = "Track an individual line as best as possible."
@@ -5371,8 +5370,9 @@ Namespace VBClasses
                 SetTrueText(Format(match.correlation, fmt3), match.newCenter)
             End If
 
-            rawLines.Run(src(matchRect))
-            If rawLines.lpList.Count > 0 Then lp = rawLines.lpList(0)
+            Dim vecArray = task.lines.getRawVecs(src)
+            Dim lpListRaw = Line_Basics.getRawLines(vecArray)
+            If lpListRaw.Count > 0 Then lp = lpListRaw(0)
             dst2(matchRect).Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
         End Sub
     End Class
@@ -5385,7 +5385,6 @@ Namespace VBClasses
         Public lpInput As lpData
         Public foundLine As Boolean
         Dim match As New LineEnds_Correlation
-        Public rawLines As New Line_Core
         Public Sub New()
             desc = "Track an individual line as best as possible."
         End Sub
@@ -5419,11 +5418,16 @@ Namespace VBClasses
                     End If
                 End If
             Else
-                rawLines.Run(src(subsetrect))
-                dst3(subsetrect) = rawLines.dst2(subsetrect)
-                If rawLines.lpList.Count > 0 Then
-                    Dim p1 = New cv.Point(CInt(rawLines.lpList(0).p1.X + subsetrect.X), CInt(rawLines.lpList(0).p1.Y + subsetrect.Y))
-                    Dim p2 = New cv.Point(CInt(rawLines.lpList(0).p2.X + subsetrect.X), CInt(rawLines.lpList(0).p2.Y + subsetrect.Y))
+                dst3(subsetrect).SetTo(0)
+                Dim vecArray = task.lines.getRawVecs(src(subsetrect))
+                Dim lpListRaw = Line_Basics.getRawLines(vecArray)
+                For Each lp In lplist
+                    dst3.Line(lp.p1, lp.p2, 255, task.lineWidth, task.lineType)
+                Next
+
+                If lplist.Count > 0 Then
+                    Dim p1 = New cv.Point(CInt(lplist(0).p1.X + subsetrect.X), CInt(lplist(0).p1.Y + subsetrect.Y))
+                    Dim p2 = New cv.Point(CInt(lplist(0).p2.X + subsetrect.X), CInt(lplist(0).p2.Y + subsetrect.Y))
                     lpInput = New lpData(p1, p2)
                 Else
                     lpInput = lplist(0)
@@ -5450,7 +5454,7 @@ Namespace VBClasses
     Public Class XO_TrackLine_BasicsSave : Inherits TaskParent
         Dim match As New Match_Basics
         Dim matchRect As cv.Rect
-        Public rawLines As New Line_Core
+        Public rawLines As New NR_Line_Core
         Dim lplist As List(Of lpData)
         Dim knn As New KNN_NNBasics
         Public Sub New()
@@ -8036,7 +8040,7 @@ Namespace VBClasses
     Public Class XO_Line_BasicsNoAging : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public lpRectMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Public rawLines As New Line_Core
+        Public rawLines As New NR_Line_Core
         Public Sub New()
             desc = "Retain line from earlier image if not in motion mask.  If new line is in motion mask, add it."
         End Sub
@@ -8081,7 +8085,7 @@ Namespace VBClasses
 
     Public Class XO_Line_ViewLeftRight : Inherits TaskParent
         Dim lines As New Line_Basics
-        Dim rawLines As New Line_Core
+        Dim rawLines As New NR_Line_Core
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
             desc = "Find lines in the left and right images."
@@ -8173,7 +8177,7 @@ Namespace VBClasses
     Public Class XO_Line_RawSubset : Inherits TaskParent
         Public lpList As New List(Of lpData)
         Public subsetRect As cv.Rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-        Public rawLines As New Line_Core
+        Public rawLines As New NR_Line_Core
         Public Sub New()
             task.drawRect = New cv.Rect(25, 25, 25, 25)
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -8382,7 +8386,7 @@ Namespace VBClasses
 
     Public Class XO_KNN_BoundingRect : Inherits TaskParent
         Public lp As lpData
-        Dim rawlines As New Line_Core
+        Dim rawlines As New NR_Line_Core
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Find the line with the largest bounding rectangle."
@@ -8461,7 +8465,7 @@ Namespace VBClasses
 
     Public Class XO_Line_Grid : Inherits TaskParent
         Public lpList As New List(Of lpData)
-        Public rawLines As New Line_Core
+        Public rawLines As New NR_Line_Core
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "find the lines in each grid rectangle"
@@ -14392,7 +14396,7 @@ Namespace VBClasses
 
     Public Class XO_Line_CoreNew : Inherits TaskParent
         Public lpList As New List(Of lpData)
-        Public rawLines As New Line_Core
+        Public rawLines As New NR_Line_Core
         Public Sub New()
             desc = "The core algorithm to find lines.  Line_Basics is a task algorithm that exits when run as a normal algorithm."
         End Sub
@@ -14486,7 +14490,7 @@ Namespace VBClasses
 
     Public Class XO_Line_Backprojection : Inherits TaskParent
         Dim backP As New BackProject_DisplayColor
-        Dim rawLines As New Line_Core
+        Dim rawLines As New NR_Line_Core
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
             labels = {"", "", "Lines found in the back projection", "Backprojection results"}
@@ -15293,7 +15297,6 @@ Namespace VBClasses
         Public options As New Options_LineFinder
         Dim match As New XO_Match_tCell
         Dim angleSlider As System.Windows.Forms.TrackBar
-        Dim rawLines As New Line_Core
         Public Sub New()
             angleSlider = OptionParent.FindSlider("Angle tolerance in degrees")
             labels(2) = "XO_Line_GCloud - Blue are vertical lines using the angle thresholds."
@@ -15332,11 +15335,12 @@ Namespace VBClasses
             Dim maxAngle = angleSlider.Value
 
             dst2 = src.Clone
-            rawLines.Run(src.Clone)
+            Dim vecArray = task.lines.getRawVecs(src.Clone)
+            Dim lplist = Line_Basics.getRawLines(vecArray)
 
             sortedVerticals.Clear()
             sortedHorizontals.Clear()
-            For Each lp In rawLines.lpList
+            For Each lp In lpList
                 Dim brick As New gravityLine
                 brick = updateGLine(src, brick, lp.p1, lp.p2)
                 allLines.Add(lp.p1.DistanceTo(lp.p2), brick)
@@ -17372,6 +17376,63 @@ Namespace VBClasses
                 diff.lastDepth32f = split(2)
                 diff.Run(task.pcSplit(2))
             End If
+        End Sub
+    End Class
+
+
+
+
+    Public Class XO_Line_BasicsCore : Inherits TaskParent
+        Public lpList As New List(Of lpData)
+        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            If standalone Then task.gOptions.showMotionMask.Checked = True
+            desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
+            If lpList.Count <= 1 Then
+                motionMask.SetTo(255)
+                Dim vecArray1 = task.lines.getRawVecs(src)
+                lpList = Line_Basics.getRawLines(vecArray1)
+            End If
+
+            Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
+            Dim count As Integer
+            For Each lp In lpList
+                If lp.motion = False Then
+                    lp.age += 1
+                    sortlines.Add(lp.length, lp)
+                    count += 1
+                End If
+            Next
+
+            Dim vecArray = task.lines.getRawVecs(src)
+            Dim lpListRaw = Line_Basics.getRawLines(vecArray)
+
+
+            For Each lp In lpListRaw
+                If lp.motion Then sortlines.Add(lp.length, lp)
+            Next
+
+            lpList.Clear()
+            For Each lp In sortlines.Values
+                lp.index = lpList.Count
+                lpList.Add(lp)
+            Next
+
+            dst1.SetTo(0)
+            dst2.SetTo(0)
+            For Each lp In lpList
+                dst1.Line(lp.p1, lp.p2, lp.index + 1, 1, cv.LineTypes.Link4)
+                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
+            Next
+
+            If task.frameCount > 10 Then If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
+            task.lineLongest = lpList(0)
+
+            labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
         End Sub
     End Class
 End Namespace

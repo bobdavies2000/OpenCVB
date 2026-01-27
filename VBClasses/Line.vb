@@ -1,3 +1,4 @@
+Imports System.Threading
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Line_Basics : Inherits TaskParent
@@ -34,6 +35,10 @@ Namespace VBClasses
                 End If
             Next
             Return lpList
+        End Function
+        Public Function getRawVecs(src As cv.Mat) As cv.Vec4f()
+            ' task.lines is always going to present.  Reuse the stateless lp detector.
+            Return ld.Detect(src)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
@@ -86,71 +91,12 @@ Namespace VBClasses
 
 
 
-    Public Class Line_BasicsCore : Inherits TaskParent
-        Public lpList As New List(Of lpData)
-        Public rawLines As New Line_Core
-        Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
-        Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            If standalone Then task.gOptions.showMotionMask.Checked = True
-            desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
-            If lpList.Count <= 1 Then
-                motionMask.SetTo(255)
-                rawLines.Run(src)
-                lpList = New List(Of lpData)(rawLines.lpList)
-            End If
 
-            Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
-            Dim count As Integer
-            For Each lp In lpList
-                If lp.motion = False Then
-                    lp.age += 1
-                    sortlines.Add(lp.length, lp)
-                    count += 1
-                End If
-            Next
-
-            rawLines.Run(src)
-
-            For Each lp In rawLines.lpList
-                If lp.motion Then sortlines.Add(lp.length, lp)
-            Next
-
-            lpList.Clear()
-            For Each lp In sortlines.Values
-                lp.index = lpList.Count
-                lpList.Add(lp)
-            Next
-
-            dst1.SetTo(0)
-            dst2.SetTo(0)
-            For Each lp In lpList
-                dst1.Line(lp.p1, lp.p2, lp.index + 1, 1, cv.LineTypes.Link4)
-                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
-            Next
-
-            If task.frameCount > 10 Then If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
-            task.lineLongest = lpList(0)
-
-            labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class Line_Core : Inherits TaskParent
+    Public Class NR_Line_Core : Inherits TaskParent
         Implements IDisposable
-        Dim ld As cv.XImgProc.FastLineDetector
         Public lpList As New List(Of lpData)
         Public Sub New()
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
             desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines in a subset " +
                "rectangle (provided externally)"
         End Sub
@@ -158,7 +104,8 @@ Namespace VBClasses
             If src.Channels() = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
 
-            lpList = Line_Basics.getRawLines(ld.Detect(src))
+            Dim vecArray = task.lines.getRawVecs(src)
+            lpList = Line_Basics.getRawLines(vecArray)
 
             dst2.SetTo(0)
             For Each lp In lpList
@@ -167,12 +114,7 @@ Namespace VBClasses
 
             labels(2) = CStr(lpList.Count) + " lines were detected."
         End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
-            ld.Dispose()
-        End Sub
     End Class
-
-
 
 
 
@@ -537,38 +479,6 @@ Namespace VBClasses
 
 
 
-    Public Class Line_Vertical : Inherits TaskParent
-        Dim lrLines As New Line_LeftRight
-        Public lpLeft As New List(Of lpData)
-        Public lpRight As New List(Of lpData)
-        Public Sub New()
-            desc = "Find just the vertical lines in the left and right images."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            lrLines.Run(src)
-            dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            lpLeft.Clear()
-            For Each lp In lrLines.linesLeft.lpList
-                If Math.Abs(lp.angle) > 87 Then
-                    lpLeft.Add(lp)
-                    dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
-                End If
-            Next
-
-            dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            lpRight.Clear()
-            For Each lp In lrLines.linesLeft.lpList
-                If Math.Abs(lp.angle) > 87 Then
-                    lpRight.Add(lp)
-                    dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
-                End If
-            Next
-        End Sub
-    End Class
-
-
-
-
 
     Public Class Line_DepthHistogram : Inherits TaskParent
         Dim lineVert As New Line_Vertical
@@ -659,6 +569,39 @@ Namespace VBClasses
 
             dst3 = linesRight.dst2
             labels(3) = linesLeft.labels(2)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Line_Vertical : Inherits TaskParent
+        Dim lrLines As New Line_LeftRight
+        Public lpLeft As New List(Of lpData)
+        Public lpRight As New List(Of lpData)
+        Public Sub New()
+            desc = "Find just the vertical lines in the left and right images."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            lrLines.Run(src)
+            dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            lpLeft.Clear()
+            For Each lp In lrLines.linesLeft.lpList
+                If Math.Abs(lp.angle) > 87 Then
+                    lpLeft.Add(lp)
+                    dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
+                End If
+            Next
+
+            dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            lpRight.Clear()
+            For Each lp In lrLines.linesLeft.lpList
+                If Math.Abs(lp.angle) > 87 Then
+                    lpRight.Add(lp)
+                    dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
+                End If
+            Next
         End Sub
     End Class
 End Namespace

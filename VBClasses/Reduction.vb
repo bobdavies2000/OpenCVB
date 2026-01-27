@@ -58,12 +58,43 @@ Namespace VBClasses
 
 
 
+    Public Class NR_Reduction_HeatMapLines1 : Inherits TaskParent
+        Dim heat As New HeatMap_Basics
+        Public setupSide As New Cloud_SetupSide
+        Public setupTop As New Cloud_SetupTop
+        Dim reduction As New Reduction_PointCloud
+        Public Sub New()
+            labels(2) = "Gravity rotated Side View with detected lines"
+            labels(3) = "Gravity rotated Top View width detected lines"
+            desc = "Present both the top and side view to minimize pixel counts."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            reduction.Run(src)
+            heat.Run(src)
+
+            Dim vecArray = task.lines.getRawVecs(heat.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            Dim lplist = Line_Basics.getRawLines(vecArray)
+            setupTop.Run(heat.dst2)
+            dst2 = setupTop.dst2
+
+            vecArray = task.lines.getRawVecs(heat.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            lplist = Line_Basics.getRawLines(vecArray)
+            setupSide.Run(heat.dst3)
+            dst3 = setupSide.dst2
+        End Sub
+    End Class
+
+
+
+
+
+
     Public Class NR_Reduction_HeatMapLines : Inherits TaskParent
         Dim heat As New HeatMap_Basics
         Public setupSide As New Cloud_SetupSide
         Public setupTop As New Cloud_SetupTop
         Dim reduction As New Reduction_PointCloud
-        Dim rawLines As New Line_Core
+        Dim rawLines As New NR_Line_Core
         Public Sub New()
             labels(2) = "Gravity rotated Side View with detected lines"
             labels(3) = "Gravity rotated Top View width detected lines"
@@ -82,7 +113,6 @@ Namespace VBClasses
             dst3 = setupSide.dst2
         End Sub
     End Class
-
 
 
 
