@@ -58,9 +58,7 @@ Public Class TreeviewForm
                 End If
 
                 ' Create if missing, or always create at leaf to allow duplicate names
-                Dim node0 As String = ""
-                If nodeList.Count > 0 Then node0 = nodeList(0)
-                If found Is Nothing And part <> node0 Then
+                If found Is Nothing Then
                     found = currentNodes.Add(part)
                     found.Tag = nodeList.Count
                     nodeList.Add(found.Text)

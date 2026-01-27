@@ -23,7 +23,10 @@ Module Startup
         splash.Close()
         splash.Dispose()
         splash = Nothing
-
-        Application.Run(mainForm)
+        Try
+            Application.Run(mainForm)
+        Catch ex As Exception
+            Debug.WriteLine("Application Run Exception: " & ex.Message)
+        End Try
     End Sub
 End Module

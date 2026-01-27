@@ -36,9 +36,7 @@ Namespace VBClasses
         Public Sub New()
             traceName = Me.GetType.Name
 
-            If task.cpu.callTrace.Count = 0 Then
-                task.cpu.callTrace.Add(task.Settings.algorithm + "\")
-            End If
+            If task.cpu.callTrace.Count = 0 Then task.cpu.callTrace.Add(task.Settings.algorithm + "\")
 
             labels = {"", "", traceName, ""}
             Dim stackTrace = Environment.StackTrace

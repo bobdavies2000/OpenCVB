@@ -656,8 +656,6 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             lines.Run(task.leftStable)
             Dim raw = lines.lpList
-            cv.Cv2.ImShow("lines.dst2", lines.dst2)
-            cv.Cv2.ImShow("lines.dst3", lines.dst3)
 
             Dim usedRaw As New HashSet(Of lpData)
             Dim usedTracked As New HashSet(Of TrackedLine)
