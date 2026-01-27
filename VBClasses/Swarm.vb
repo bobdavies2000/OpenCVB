@@ -145,6 +145,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
+            dst2 = runRedList(src, labels(2))
 
             swarm.Run(src)
             dst2 = swarm.dst2

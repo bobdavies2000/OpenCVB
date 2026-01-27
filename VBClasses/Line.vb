@@ -596,7 +596,7 @@ Namespace VBClasses
 
             dst3 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             lpRight.Clear()
-            For Each lp In lrLines.linesLeft.lpList
+            For Each lp In lrLines.linesRight.lpList
                 If Math.Abs(lp.angle) > 87 Then
                     lpRight.Add(lp)
                     dst3.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)

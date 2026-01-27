@@ -18,30 +18,7 @@ Namespace VBClasses
 
 
 
-
-
-    Public Class NR_ImShow_WaitKey : Inherits TaskParent
-        Implements IDisposable
-        Public Sub New()
-            desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.testAllRunning Then Exit Sub ' when testing, this can occasionally fail - mysterious.
-            cv.Cv2.ImShow("Hit space bar to advance to the next frame", dst2)
-            cv.Cv2.WaitKey(1000) ' No need for waitkey with imshow in OpenCVB - finishing a buffer is the same thing so waitkey just delays by 1 second here.
-        End Sub
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
-            cv.Cv2.DestroyWindow("Hit space bar to advance to the next frame")
-        End Sub
-    End Class
-
-
-
-
-
-
-
-    Public Class NR_ImShow_CV32FC3 : Inherits TaskParent
+    Public Class XO_ImShow_CV32FC3 : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
             desc = "Experimenting with how to show an 32fc3 Mat file."

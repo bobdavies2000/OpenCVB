@@ -2,7 +2,7 @@ Imports System.ComponentModel
 Imports VBClasses
 Public Class TreeviewForm
     Dim botDistance As Integer
-    Dim treeData As New List(Of String) ' treedata is only used to trigger a rebuild of the tree nodes.
+    Dim treeData As New List(Of String) ' treedata is used to trigger a rebuild of the tree nodes.
     Dim taskIndices As New List(Of Integer)
     Dim titleStr = " - Click on any node to review the algorithm's output."
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
@@ -84,11 +84,55 @@ Public Class TreeviewForm
         tv.HideSelection = False
         tv.SelectedNode = n
     End Sub
+    Public Sub BuildTreeView(tree As TreeView, paths As IEnumerable(Of String))
+        tree.BeginUpdate()
+        tree.Nodes.Clear()
+
+        For Each path In paths
+            Dim parts = path.Split("\"c)
+            Dim currentNodes = tree.Nodes
+            Dim currentNode As TreeNode = Nothing
+
+            For Each part In parts
+                ' Try to find an existing node
+                Dim found As TreeNode = Nothing
+                For Each n As TreeNode In currentNodes
+                    If n.Text = part Then
+                        found = n
+                        Exit For
+                    End If
+                Next
+
+                ' Create if missing
+                If found Is Nothing Then
+                    found = currentNodes.Add(part)
+                End If
+
+                currentNode = found
+                currentNodes = found.Nodes
+            Next
+        Next
+
+        tree.EndUpdate()
+        tree.ExpandAll()
+    End Sub
+
     Public Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
         If task Is Nothing Then Exit Sub
-        If task.cpu.callTrace.Count > treeData.Count Then
+        If task.cpu.callTrace.Count <> treeData.Count Then
             treeData.Clear()
-            updateTree(task.cpu.callTrace)
+            For Each td In task.cpu.callTrace
+                If td.EndsWith("\") Then td = td.Substring(0, td.Length - 1)
+                treeData.Add(td)
+            Next
+            BuildTreeView(TreeView1, treeData)
+
+            Dim tempList As New List(Of String)(treeData)
+            treeData.Clear()
+            For Each td In tempList
+                Dim split = td.Split("\")
+                treeData.Add(split.Last)
+            Next
         End If
 
         PercentTime.Text = task.cpu.PrepareReport(treeData)
@@ -105,12 +149,8 @@ Public Class TreeviewForm
         PercentTime.Left = 250
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
-        Dim algorithm = e.Node.Text
-        Dim split = e.Node.Text.Split(" ")
-        task.cpu.displayObjectName = split(0)
-
         For i = 0 To treeData.Count - 1
-            If treeData(i) = e.Node.Tag Then
+            If treeData(i) = e.Node.Text Then
                 task.cpu.indexTask = i
                 Exit For
             End If

@@ -594,7 +594,7 @@ Namespace VBClasses
             Dim fileInputName As New FileInfo(task.homeDir + "opencv/samples/data/ellipses.jpg")
             img = cv.Cv2.ImRead(fileInputName.FullName).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            cPtr = NR_OEX_FitEllipse_Open()
+            cPtr = OEX_FitEllipse_Open()
             desc = "OEX Example fitellipse"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -603,26 +603,26 @@ Namespace VBClasses
             Dim cppData(img.Total * img.ElemSize - 1) As Byte
             Marshal.Copy(img.Data, cppData, 0, cppData.Length)
             Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-            Dim imagePtr = NR_OEX_FitEllipse_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), img.Rows, img.Cols,
+            Dim imagePtr = OEX_FitEllipse_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), img.Rows, img.Cols,
                                              options.threshold, options.fitType)
             handleSrc.Free()
 
             dst2 = cv.Mat.FromPixelData(img.Rows + 4, img.Cols + 4, cv.MatType.CV_8UC3, imagePtr).Clone
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
-            NR_OEX_FitEllipse_Close(cPtr)
+            OEX_FitEllipse_Close(cPtr)
         End Sub
     End Class
 
-    Module NR_OEX_FitEllipse_CPP_Module
+    Module OEX_FitEllipse_CPP_Module
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function NR_OEX_FitEllipse_Open() As IntPtr
+        Public Function OEX_FitEllipse_Open() As IntPtr
         End Function
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Sub NR_OEX_FitEllipse_Close(cPtr As IntPtr)
+        Public Sub OEX_FitEllipse_Close(cPtr As IntPtr)
         End Sub
         <DllImport(("CPP_Native.dll"), CallingConvention:=CallingConvention.Cdecl)>
-        Public Function NR_OEX_FitEllipse_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer,
+        Public Function OEX_FitEllipse_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer,
                                           threshold As Integer, fitType As Integer) As IntPtr
         End Function
     End Module

@@ -206,17 +206,16 @@ Namespace VBClasses
 
 
             Dim displayObject = task.MainUI_Algorithm
+            If task.cpu.indexTask > 0 Then
+                displayObject = task.cpu.activeObjects(task.cpu.indexTask - 1)
+            End If
             Dim nextTrueData As List(Of TrueText) = displayObject.trueData
-
             trueData = New List(Of TrueText)(nextTrueData)
 
             firstPass = False
             heartBeatLT = False
 
-            If task.cpu.indexTask > 0 Then
-                displayObject = task.cpu.activeObjects(task.cpu.indexTask - 1)
-            End If
-            postProcess(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
+            pixelViewerOrGIFProcessing(src, displayObject.dst1, displayObject.dst2, displayObject.dst3)
 
             dstList(0) = If(gOptions.displayDst0.Checked, Mat_Convert.Mat_Check8uc3(displayObject.dst0), color).Clone
             dstList(1) = If(gOptions.displayDst1.Checked, Mat_Convert.Mat_Check8uc3(displayObject.dst1), depthRGB).Clone
@@ -261,7 +260,8 @@ Namespace VBClasses
             If task.gOptions.displayDst0.Checked = False Then labels(0) = task.resolutionDetails
             If task.gOptions.displayDst1.Checked = False Then labels(1) = task.depthAndDepthRange.Replace(vbCrLf, "")
         End Sub
-        Private Sub postProcess(src As cv.Mat, dst1 As cv.Mat, dst2 As cv.Mat, dst3 As cv.Mat)
+        Private Sub pixelViewerOrGIFProcessing(src As cv.Mat, dst1 As cv.Mat,
+                                               dst2 As cv.Mat, dst3 As cv.Mat)
             If PixelViewer IsNot Nothing Then
                 If pixelViewerOn Then
                     PixelViewer.viewerForm.Visible = True

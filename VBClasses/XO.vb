@@ -15335,7 +15335,7 @@ Namespace VBClasses
             Dim maxAngle = angleSlider.Value
 
             dst2 = src.Clone
-            Dim vecArray = task.lines.getRawVecs(src.Clone)
+            Dim vecArray = task.lines.getRawVecs(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             Dim lplist = Line_Basics.getRawLines(vecArray)
 
             sortedVerticals.Clear()
@@ -17433,6 +17433,27 @@ Namespace VBClasses
             task.lineLongest = lpList(0)
 
             labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_ImShow_WaitKey : Inherits TaskParent
+        Implements IDisposable
+        Public Sub New()
+            desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.testAllRunning Then Exit Sub ' when testing, this can occasionally fail - mysterious.
+            cv.Cv2.ImShow("Hit space bar to advance to the next frame", dst2)
+            cv.Cv2.WaitKey(10) ' No need for waitkey with imshow in OpenCVB - finishing a buffer is the same thing so waitkey just delays by 1 second here.
+        End Sub
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            cv.Cv2.DestroyWindow("Hit space bar to advance to the next frame")
         End Sub
     End Class
 End Namespace

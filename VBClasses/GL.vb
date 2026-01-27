@@ -492,7 +492,7 @@ Namespace VBClasses
 
 
 
-    Public Class NR_NR_GL_Line3D_DebugAlt : Inherits TaskParent
+    Public Class NR_GL_Line3D_DebugAlt : Inherits TaskParent
         Dim line3d As New Line3D_DrawLines_Debug
         Public Sub New()
             If standalone Then task.gOptions.LineWidth.Value = 3

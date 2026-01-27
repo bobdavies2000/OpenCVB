@@ -893,6 +893,7 @@ NR_GL_ImageHulls
 NR_GL_ImageHullsColor
 NR_GL_Line3D
 NR_GL_Line3D_Debug
+NR_GL_Line3D_DebugAlt
 NR_GL_Line3DNoMotionInput
 NR_GL_Line3DReconstructed
 NR_GL_Line3DWhite
@@ -1012,8 +1013,6 @@ NR_Image_MSER
 NR_ImageOffset_Cloud
 NR_ImageOffset_SliceH
 NR_ImageOffset_SliceV
-NR_ImShow_CV32FC3
-NR_ImShow_WaitKey
 NR_IMU_BasicsKalman
 NR_IMU_BasicsWithOptions
 NR_IMU_IscameraStable
@@ -1155,7 +1154,6 @@ NR_MSER_ROI
 NR_MSER_TestExample
 NR_MSER_TestSynthetic
 NR_Neighbor_ColorOnly
-NR_NR_GL_Line3D_DebugAlt
 NR_OEX_BasicLinearTransforms
 NR_OEX_BasicLinearTransformsTrackBar
 NR_OEX_bgfg_segm
