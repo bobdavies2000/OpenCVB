@@ -3,6 +3,7 @@ Imports VBClasses
 Public Class TreeviewForm
     Dim botDistance As Integer
     Dim treeData As New List(Of String) ' treedata is used to trigger a rebuild of the tree nodes.
+    Dim nodeList As New List(Of String) ' this is used to define the tag but is not referenced later.
     Dim taskIndices As New List(Of Integer)
     Dim titleStr = " - Click on any node to review the algorithm's output."
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
@@ -32,58 +33,6 @@ Public Class TreeviewForm
         Next
         Return Nothing
     End Function
-    Public Sub updateTree(callTrace As List(Of String))
-        Dim tv = TreeView1
-        tv.Nodes.Clear()
-        Dim rootcall = Trim(callTrace(0))
-
-        Dim title = Mid(rootcall, 1, Len(rootcall) - 1)
-        Me.Text = title + titleStr
-
-        Dim n = tv.Nodes.Add(title)
-        n.Tag = rootcall
-
-        Dim entryCount = 1
-        For nodeLevel = 0 To 100 ' this loop will terminate after the depth of the nesting.  100 is excessive insurance deep nesting may occur.
-            Dim alldone = True
-
-            For i = 1 To callTrace.Count - 1
-                Dim fullname = callTrace(i)
-                Dim split() = fullname.Split("\")
-                If split.Count = nodeLevel + 3 Then
-                    alldone = False
-                    Dim node = getNode(tv, fullname)
-                    If node Is Nothing Then
-                        If nodeLevel = 0 Then
-                            node = tv.Nodes(nodeLevel).Nodes.Add(split(nodeLevel + 1))
-                        Else
-                            Dim parent = Mid(fullname, 1, Len(fullname) - Len(split(nodeLevel + 1)) - 1)
-                            If parent <> rootcall Then
-                                node = getNode(tv, parent)
-                                If node Is Nothing Then Continue For
-                                node = node.Nodes.Add(split(nodeLevel + 1))
-                            End If
-                        End If
-                    Else
-                        If nodeLevel < split.Count Then
-                            If split(nodeLevel) <> "" Then node = node.Nodes.Add(split(nodeLevel))
-                        End If
-                    End If
-                    entryCount += 1
-                    node.Tag = fullname
-                End If
-            Next
-            If alldone Then Exit For ' we didn't find any more nodes to add.
-        Next
-
-        For i = 0 To callTrace.Count - 1
-            treeData.Add(callTrace(i))
-        Next
-
-        tv.ExpandAll()
-        tv.HideSelection = False
-        tv.SelectedNode = n
-    End Sub
     Public Sub BuildTreeView(tree As TreeView, paths As IEnumerable(Of String))
         tree.BeginUpdate()
         tree.Nodes.Clear()
@@ -93,23 +42,34 @@ Public Class TreeviewForm
             Dim currentNodes = tree.Nodes
             Dim currentNode As TreeNode = Nothing
 
-            For Each part In parts
-                ' Try to find an existing node
-                Dim found As TreeNode = Nothing
-                For Each n As TreeNode In currentNodes
-                    If n.Text = part Then
-                        found = n
-                        Exit For
-                    End If
-                Next
+            For i = 0 To parts.Length - 1
+                Dim part = parts(i)
+                Dim isLeaf = (i = parts.Length - 1)
 
-                ' Create if missing
-                If found Is Nothing Then
-                    found = currentNodes.Add(part)
+                ' Try to find an existing node to reuse (only when not at leaf)
+                Dim found As TreeNode = Nothing
+                If Not isLeaf Then
+                    For Each n As TreeNode In currentNodes
+                        If n.Text = part Then
+                            found = n
+                            Exit For
+                        End If
+                    Next
                 End If
 
-                currentNode = found
-                currentNodes = found.Nodes
+                ' Create if missing, or always create at leaf to allow duplicate names
+                Dim node0 As String = ""
+                If nodeList.Count > 0 Then node0 = nodeList(0)
+                If found Is Nothing And part <> node0 Then
+                    found = currentNodes.Add(part)
+                    found.Tag = nodeList.Count
+                    nodeList.Add(found.Text)
+                End If
+
+                If found IsNot Nothing Then
+                    currentNode = found
+                    currentNodes = found.Nodes
+                End If
             Next
         Next
 
@@ -126,13 +86,6 @@ Public Class TreeviewForm
                 treeData.Add(td)
             Next
             BuildTreeView(TreeView1, treeData)
-
-            Dim tempList As New List(Of String)(treeData)
-            treeData.Clear()
-            For Each td In tempList
-                Dim split = td.Split("\")
-                treeData.Add(split.Last)
-            Next
         End If
 
         PercentTime.Text = task.cpu.PrepareReport(treeData)
@@ -149,12 +102,7 @@ Public Class TreeviewForm
         PercentTime.Left = 250
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
-        For i = 0 To treeData.Count - 1
-            If treeData(i) = e.Node.Text Then
-                task.cpu.indexTask = i
-                Exit For
-            End If
-        Next
+        task.cpu.indexTask = e.Node.Tag
         Timer2_Tick(sender, e)
     End Sub
 End Class
