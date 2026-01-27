@@ -414,6 +414,7 @@ Line_Basics
 Line_DepthHistogram
 Line_Intersection
 Line_LeftRight
+Line_LeftTrack
 Line_Motion
 Line_PerpendicularTest
 Line_Vertical

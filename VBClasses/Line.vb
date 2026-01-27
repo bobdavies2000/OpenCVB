@@ -1,3 +1,4 @@
+Imports System.Linq
 Imports System.Threading
 Imports cv = OpenCvSharp
 Namespace VBClasses
@@ -604,4 +605,132 @@ Namespace VBClasses
             Next
         End Sub
     End Class
+
+
+
+
+
+
+    ''' <summary>Holds a line with a stable track ID and color for multi-frame tracking.</summary>
+    Friend Class TrackedLine
+        Public trackId As Integer
+        Public lp As lpData
+        Public color As cv.Scalar
+        Public missedCount As Integer
+        Public trackedAge As Integer
+    End Class
+
+
+    ''' <summary>Find all lines in the left image, assign each a stable ID, and track them as the camera moves.</summary>
+    Public Class Line_LeftTrack : Inherits TaskParent
+        Implements IDisposable
+        Dim ld As cv.XImgProc.FastLineDetector
+        ''' <summary>Tracked lines: (trackId, lpData, color, missedCount, age).</summary>
+        Dim tracked As New List(Of TrackedLine)
+        Dim nextTrackId As Integer = 1
+        Const minLength As Single = 12.0F
+        Const maxMissed As Integer = 5
+        Const maxTracked As Integer = 200
+        Const angleThresh As Single = 8.0F
+        Const distThresh As Single = 120.0F
+        Const lenRatioThresh As Single = 0.45F
+
+        Public lpList As New List(Of lpData)
+
+        Public Sub New()
+            ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+            labels = {"", "", "Left image: detected lines with stable track IDs", ""}
+            desc = "Find all lines in the left image, identify each with a stable ID, and track them as the camera moves."
+        End Sub
+
+        Private Function matchScore(r As lpData, t As TrackedLine) As Single
+            Dim ad = Math.Abs(r.angle - t.lp.angle)
+            If ad > 90 Then ad = 180 - ad
+            If ad > angleThresh Then Return Single.MaxValue
+            Dim dist = r.ptCenter.DistanceTo(t.lp.ptCenter)
+            If dist > distThresh Then Return Single.MaxValue
+            Dim mx = Math.Max(r.length, t.lp.length) + 1.0F
+            Dim lr = Math.Abs(r.length - t.lp.length) / mx
+            If lr > lenRatioThresh Then Return Single.MaxValue
+            Return ad * 2.0F + dist / 20.0F + lr * 20.0F
+        End Function
+
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim vecs = ld.Detect(task.leftView)
+            Dim raw = Line_Basics.getRawLines(vecs)
+            raw = raw.Where(Function(lp) lp.length >= minLength).ToList()
+
+            Dim usedRaw As New HashSet(Of lpData)
+            Dim usedTracked As New HashSet(Of TrackedLine)
+
+            ' Greedy assignment: longest raw lines first to reduce conflicts
+            Dim rawByLen = raw.OrderByDescending(Function(x) x.length).ToList()
+            For Each r In rawByLen
+                Dim bestT As TrackedLine = Nothing
+                Dim bestSc As Single = Single.MaxValue
+                For Each t In tracked
+                    If usedTracked.Contains(t) Then Continue For
+                    Dim sc = matchScore(r, t)
+                    If sc < bestSc Then bestSc = sc : bestT = t
+                Next
+                If bestT IsNot Nothing Then
+                    bestT.lp = r
+                    bestT.lp.color = bestT.color
+                    bestT.lp.index = bestT.trackId
+                    bestT.missedCount = 0
+                    bestT.trackedAge += 1
+                    usedRaw.Add(r)
+                    usedTracked.Add(bestT)
+                End If
+            Next
+
+            ' Increment missed; remove if over threshold
+            For Each t In tracked
+                If usedTracked.Contains(t) Then Continue For
+                t.missedCount += 1
+            Next
+            tracked.RemoveAll(Function(t) t.missedCount > maxMissed)
+
+            ' Add new tracks for unmatched raw
+            For Each r In raw
+                If usedRaw.Contains(r) Then Continue For
+                If tracked.Count >= maxTracked Then Exit For
+                Dim t As New TrackedLine With {
+                    .trackId = nextTrackId,
+                    .lp = r,
+                    .color = task.scalarColors(nextTrackId Mod 255),
+                    .missedCount = 0,
+                    .trackedAge = 1
+                }
+                r.color = t.color
+                r.index = t.trackId
+                nextTrackId += 1
+                tracked.Add(t)
+            Next
+
+            ' Build lpList and draw
+            lpList.Clear()
+            For Each t In tracked
+                t.lp.index = t.trackId
+                lpList.Add(t.lp)
+            Next
+
+            dst2 = task.leftView.Clone
+            If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+
+            For Each t In tracked
+                dst2.Line(t.lp.p1, t.lp.p2, t.color, task.lineWidth, task.lineType)
+                dst1.Line(t.lp.p1, t.lp.p2, t.trackId Mod 255 + 1, 1, cv.LineTypes.Link4)
+                SetTrueText(CStr(t.trackId), New cv.Point(CInt(t.lp.ptCenter.X), CInt(t.lp.ptCenter.Y)), 2)
+            Next
+
+            labels(2) = "Tracked " + CStr(tracked.Count) + " lines, " + CStr(raw.Count) + " detected this frame"
+        End Sub
+
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            If ld IsNot Nothing Then ld.Dispose()
+        End Sub
+    End Class
+
 End Namespace
