@@ -75,8 +75,9 @@ Namespace VBClasses
                 Dim mask = task.depthmask(task.gridRects(gridIndex))
                 Dim depth = depthGrid.Mean(mask)(0)
                 Dim mm = GetMinMax(depthGrid, mask)
-                task.depthAndDepthRange = "Depth = " + Format(depth, fmt1) + "m grid = " + CStr(gridIndex) + " " + vbCrLf +
-                                                       "Depth range = " + Format(mm.minVal, fmt1) + "m to " + Format(mm.maxVal, fmt1) + "m"
+                task.depthAndDepthRange = "Depth = " + Format(depth, fmt1) + "m grid = " + CStr(gridIndex) +
+                                          " " + vbCrLf + "Depth range = " +
+                                          Format(mm.maxVal - mm.minVal, fmt3) + "m"
             Else
                 task.depthAndDepthRange = ""
             End If

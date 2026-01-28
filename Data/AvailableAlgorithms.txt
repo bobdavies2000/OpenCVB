@@ -59,9 +59,12 @@ Brick_EdgeFlips
 Brick_Edges
 Brick_Features
 Brick_FeaturesAndEdges
+Brick_HighRange
 Brick_Info
 Brick_LeftRight
 Brick_LeftRightMouse
+Brick_Lines
+Brick_Plot
 BrickLine_Basics
 BrickLine_DepthGap
 BrickLine_Edges
@@ -571,7 +574,6 @@ NR_Brick_InstantUpdate
 NR_Brick_LeftToColor
 NR_Brick_MLColor
 NR_Brick_MLColorDepth
-NR_Brick_Plot
 NR_Brick_RegionLines
 NR_Brick_RGBtoLeft
 NR_BrickLine_DepthGaps

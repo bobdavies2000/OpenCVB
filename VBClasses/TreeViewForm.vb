@@ -70,6 +70,8 @@ Public Class TreeviewForm
             Next
         Next
 
+        tree.Nodes(tree.Nodes.Count - 1).Remove()
+
         tree.EndUpdate()
         tree.ExpandAll()
     End Sub
@@ -99,6 +101,7 @@ Public Class TreeviewForm
         PercentTime.Left = 250
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
+        task.cpu.displayObjectName = e.Node.Text
         task.cpu.indexTask = e.Node.Tag
         Timer2_Tick(sender, e)
     End Sub

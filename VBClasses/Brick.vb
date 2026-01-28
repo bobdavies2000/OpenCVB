@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows.Forms.Design.AxImporter
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Brick_Basics : Inherits TaskParent
         Public instantUpdate As Boolean
@@ -83,54 +84,6 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-
-
-
-
-
-
-    Public Class NR_Brick_Plot : Inherits TaskParent
-        Dim plotHist As New Plot_Histogram
-        Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-            plotHist.createHistogram = True
-            plotHist.addLabels = False
-            labels(2) = "Click anywhere In the image To the histogram Of that the depth In that cell."
-            desc = "Select any cell To plot a histogram Of that cell's depth"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.bricks.dst2
-
-            Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            If task.bricks.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
-
-            Dim brick As brickData
-            If index < 0 Or index >= task.bricks.brickList.Count Then
-                brick = task.bricks.brickList(task.bricks.brickList.Count / 2)
-                task.mouseMovePoint = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
-            Else
-                brick = task.bricks.brickList(index)
-            End If
-
-            Dim split() = task.pointCloud(brick.rect).Split()
-            Dim mm = GetMinMax(split(2))
-            If Single.IsInfinity(mm.maxVal) Then Exit Sub
-
-            Static lastMouse As cv.Point = task.mouseMovePoint
-            If task.heartBeat Or lastMouse <> task.mouseMovePoint Then
-                lastMouse = task.mouseMovePoint
-                If Math.Abs(mm.maxVal - mm.minVal) > 0 Then
-                    plotHist.minRange = mm.minVal
-                    plotHist.maxRange = mm.maxVal
-                    plotHist.Run(split(2))
-                    dst3 = plotHist.dst2
-                    labels(3) = "Depth values vary from " + Format(plotHist.minRange, fmt3) +
-                                " to " + Format(plotHist.maxRange, fmt3)
-                End If
-            End If
-        End Sub
-    End Class
-
 
 
 
@@ -877,37 +830,6 @@ Namespace VBClasses
 
 
 
-    Public Class Brick_Edges : Inherits TaskParent
-        Dim options As New Options_LeftRightCorrelation
-        Public edges As New Edge_Basics
-        Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-            dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "Add edges to features"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            edges.Run(task.leftView)
-            dst2 = edges.dst2
-
-            Dim count As Integer
-            dst3.SetTo(0)
-            For Each brick As brickData In task.bricks.brickList
-                If dst2(brick.lRect).CountNonZero And brick.rRect.Width > 0 And brick.correlation > options.correlation Then
-                    task.rightView(brick.rRect).CopyTo(dst3(brick.rRect))
-                    count += 1
-                End If
-            Next
-            labels(3) = CStr(count) + " of " + CStr(task.bricks.brickList.Count) + " rects were identified in dst3"
-        End Sub
-    End Class
-
-
-
-
-
-
     Public Class Brick_EdgeFlips : Inherits TaskParent
         Public edges As New Edge_Basics
         Public featureRects As New List(Of cv.Rect)
@@ -975,6 +897,148 @@ Namespace VBClasses
             If task.heartBeat Then
                 labels(2) = CStr(fLessRects.Count) + " cells without features were found.  " +
                         "Cells that are flipping (with and without edges) are highlighted"
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class Brick_Edges : Inherits TaskParent
+        Dim options As New Options_LeftRightCorrelation
+        Public edges As New Edge_Basics
+        Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Add edges to features"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            edges.Run(task.leftView)
+            dst2 = edges.dst2
+
+            Dim count As Integer
+            dst3.SetTo(0)
+            For Each brick As brickData In task.bricks.brickList
+                If dst2(brick.lRect).CountNonZero And brick.rRect.Width > 0 And brick.correlation > options.correlation Then
+                    task.rightView(brick.rRect).CopyTo(dst3(brick.rRect))
+                    count += 1
+                End If
+            Next
+            labels(3) = CStr(count) + " of " + CStr(task.bricks.brickList.Count) + " rects were identified in dst3"
+        End Sub
+    End Class
+
+
+
+
+    Public Class Brick_Lines : Inherits TaskParent
+        Dim lines As New Line_Basics
+        Dim options As New Options_LeftRightCorrelation
+        Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            labels(2) = "The lines are for the left image."
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Find all the bricks that contain lines"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            lines.motionMask = task.motionLeft.dst3
+            lines.Run(task.leftStable)
+            dst2 = lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+            Dim count As Integer
+            dst3.SetTo(0)
+            For Each brick As brickData In task.bricks.brickList
+                If dst2(brick.lRect).CountNonZero And brick.rRect.Width > 0 And
+                    brick.correlation > options.correlation Then
+
+                    task.leftView(brick.lRect).CopyTo(dst3(brick.lRect))
+                    count += 1
+                End If
+            Next
+            labels(3) = CStr(count) + " of " + CStr(task.bricks.brickList.Count) +
+                        " rects had an edge and a range for depth > X cm's"
+        End Sub
+    End Class
+
+
+
+
+    Public Class Brick_HighRange : Inherits TaskParent
+        Dim lines As New Line_Basics
+        Dim options As New Options_LeftRightCorrelation
+        Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            labels(2) = "Left view (stable)"
+            desc = "Find all the bricks that have a high range (> X mm's)"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            dst2 = task.leftStable
+
+            Dim count As Integer
+            dst3.SetTo(0)
+            For Each brick As brickData In task.bricks.brickList
+                If brick.mm.maxVal - brick.mm.minVal > options.mmRange Then
+                    dst2(brick.lRect).CopyTo(dst3(brick.lRect))
+                    count += 1
+                End If
+            Next
+            labels(3) = CStr(count) + " of " + CStr(task.bricks.brickList.Count) +
+                        " rects had a range for depth > " + CStr(options.mmRange) + " mm's"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Brick_Plot : Inherits TaskParent
+        Dim plotHist As New Plot_Histogram
+        Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            plotHist.createHistogram = True
+            plotHist.addLabels = False
+            plotHist.removeZeroEntry = False
+            labels(2) = "Click anywhere In the image To the histogram Of that the depth In that cell."
+            desc = "Select any cell To plot a histogram Of that cell's depth"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst2 = task.leftStable
+
+            Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
+            If task.bricks.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
+
+            Dim brick As brickData
+            If index < 0 Or index >= task.bricks.brickList.Count Then
+                brick = task.bricks.brickList(task.bricks.brickList.Count / 2)
+                task.mouseMovePoint = New cv.Point(brick.rect.X + brick.rect.Width / 2, brick.rect.Y + brick.rect.Height / 2)
+            Else
+                brick = task.bricks.brickList(index)
+            End If
+
+            Dim split() = task.pointCloud(brick.rect).Split()
+            Dim mm = GetMinMax(split(2))
+            If Single.IsInfinity(mm.maxVal) Then Exit Sub
+
+            Static lastMouse As cv.Point = task.mouseMovePoint
+            If task.heartBeat Or lastMouse <> task.mouseMovePoint Then
+                lastMouse = task.mouseMovePoint
+                If Math.Abs(mm.maxVal - mm.minVal) > 0 Then
+                    plotHist.minRange = mm.minVal
+                    plotHist.maxRange = mm.maxVal
+                    plotHist.Run(split(2))
+                    dst3 = plotHist.dst2
+                    labels(3) = "Depth values vary from " + Format(plotHist.minRange, fmt3) +
+                                " to " + Format(plotHist.maxRange, fmt3)
+                End If
             End If
         End Sub
     End Class
