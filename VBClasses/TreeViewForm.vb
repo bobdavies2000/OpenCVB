@@ -36,7 +36,6 @@ Public Class TreeviewForm
     Public Sub BuildTreeView(tree As TreeView, paths As IEnumerable(Of String))
         tree.BeginUpdate()
         tree.Nodes.Clear()
-
         For Each path In paths
             Dim parts = path.Split("\"c)
             Dim currentNodes = tree.Nodes

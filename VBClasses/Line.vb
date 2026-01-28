@@ -654,6 +654,7 @@ Namespace VBClasses
         End Function
 
         Public Overrides Sub RunAlg(src As cv.Mat)
+            lines.motionMask = task.motionLeft.dst3
             lines.Run(task.leftStable)
             Dim raw = lines.lpList
 
