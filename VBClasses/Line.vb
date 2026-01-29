@@ -1,8 +1,3 @@
-Imports System.Linq
-Imports System.Threading
-Imports System.Windows.Forms.Design.AxImporter
-Imports OpenCvSharp
-Imports OpenCvSharp.ML.DTrees
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Line_Basics : Inherits TaskParent
@@ -742,62 +737,40 @@ Namespace VBClasses
 
 
 
-    Public Class Line_RotatedRectMap : Inherits TaskParent
+    Public Class Line_Map : Inherits TaskParent
         Dim lines As New Line_Basics
         Public lpList As New List(Of lpData)
         Dim options As New Options_LeftRightCorrelation
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
-            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-            desc = "Create a map of rotated rects for each line found."
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Create a map of the lines provided, eliminating overlapping lines."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst0 = task.leftStable
-            lines.motionMask = task.motionLeft.dst3
-            lines.Run(task.leftStable)
+            If standalone Then
+                dst0 = task.leftStable
+                lines.motionMask = task.motionLeft.dst3
+                lines.Run(task.leftStable)
+            End If
 
-            If task.heartBeatLT Then dst2.SetTo(0)
+            dst1.SetTo(0)
             For Each lp In lines.lpList
-                dst2.Line(lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link8)
-                lpList.Add(lp)
-                If lpList.Count >= 10 Then Exit For
+                dst1.Line(lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link8)
             Next
+            dst2 = PaletteBlackZero(dst1)
 
-            dst3 = PaletteBlackZero(dst2)
-        End Sub
-    End Class
-
-
-
-
-    Public Class NR_Line_RotatedRects : Inherits TaskParent
-        Dim roRect As New Line_RotatedRectMap
-        Public rcList As New List(Of rcData)
-        Dim redC As New RedColor_Basics
-        Public Sub New()
-            desc = "Track each rotated rect."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            roRect.Run(src)
-            dst2 = roRect.dst3
-
-            redC.Run(roRect.dst2)
-            labels(2) = redC.labels(2)
-
-            rcList.Clear()
             dst3.SetTo(0)
-            For i = 1 To task.redColor.rcList.Count - 2
-                Dim rc = task.redColor.rcList(i)
-                rc.index = i - 1
-                rc.color = task.scalarColors(rc.index)
-                rc.maxDist = roRect.lpList(i).ptCenter
-                dst3(rc.rect).SetTo(rc.color, rc.mask)
-                rcList.Add(rc)
+            lpList.Clear()
+            For Each lp In lines.lpList
+                dst3(lp.rect).SetTo(255, lp.mask)
+                lpList.Add(lp)
             Next
+
         End Sub
     End Class
+
 
 
 

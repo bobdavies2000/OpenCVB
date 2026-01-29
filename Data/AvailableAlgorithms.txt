@@ -420,9 +420,9 @@ Line_DepthHistogram
 Line_Intersection
 Line_LeftRight
 Line_LeftTrack
+Line_Map
 Line_Motion
 Line_PerpendicularTest
-Line_RotatedRectMap
 Line_Tracker
 Line_Vertical
 Line3D_Basics
@@ -1077,7 +1077,6 @@ NR_LeftRight_RawLeft
 NR_LeftRight_RGBAlignLeft
 NR_Line_Core
 NR_Line_Parallel
-NR_Line_RotatedRects
 NR_Line_Select
 NR_Line_Vertical
 NR_Line3D_DrawArbitrary

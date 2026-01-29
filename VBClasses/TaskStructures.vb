@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports OpenCvSharp
+Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Module Structures
         Public Enum pointStyle
@@ -398,6 +399,36 @@ Namespace VBClasses
                 If pt.Y > task.color.Height - 1 Then pt.Y = task.color.Height - 1
                 Return pt
             End Function
+            Public Function BuildLineRectangle(halfThickness As Single) As cv.Rect
+                ' Direction vector
+                Dim dx As Single = p2.X - p1.X
+                Dim dy As Single = p2.Y - p1.Y
+
+                ' Normalize direction
+                Dim ux As Single = dx / length
+                Dim uy As Single = dy / length
+
+                ' Perpendicular vector (unit)
+                Dim px As Single = -uy
+                Dim py As Single = ux
+
+                ' Scale by half thickness
+                px *= halfThickness
+                py *= halfThickness
+
+                ' Compute 4 corners
+                Dim c1 As New cv.Point2f(p1.X + px, p1.Y + py)
+                Dim c2 As New cv.Point2f(p2.X + px, p2.Y + py)
+                Dim c3 As New cv.Point2f(p2.X - px, p2.Y - py)
+                Dim c4 As New cv.Point2f(p1.X - px, p1.Y - py)
+
+                Dim w = Math.Abs(c3.X - c1.X)
+                If w < 1 Then w = task.lineWidth
+                Dim h = Math.Abs(c3.Y - c1.Y)
+                If h < 1 Then h = task.lineWidth
+                Return New cv.Rect(c1.X, c1.Y, w, h)
+            End Function
+
             Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
                 p1 = validatePoint(_p1)
                 p2 = validatePoint(_p2)
@@ -478,6 +509,18 @@ Namespace VBClasses
 
                 computeAngleDegrees()
 
+                Dim w = Math.Abs(p1.X - p2.X)
+                Dim h = Math.Abs(p1.Y - p2.Y)
+                If h < 1 Then h = task.lineWidth
+                If w < 1 Then w = task.lineWidth
+                ' p1 is always leftmost point.
+                rect = New cv.Rect(p1.X, Math.Min(p1.Y, p2.Y), w, h)
+
+                mask = New cv.Mat(rect.Size, cv.MatType.CV_8U, 0)
+                Dim rp1 = New cv.Point(p1.X - rect.TopLeft.X, 0)
+                Dim rp2 = New cv.Point(rect.BottomRight.X - p2.X, h)
+                mask.Line(rp1, rp2, 255, task.lineWidth, cv.LineTypes.Link8)
+
                 If task.motionRGB.motionMask.Get(Of Byte)(p1.Y, p1.X) Or
                    task.motionRGB.motionMask.Get(Of Byte)(p2.Y, p2.X) Then
                     motion = True
@@ -494,7 +537,8 @@ Namespace VBClasses
             Public Function displayCell(ByRef dst As cv.Mat) As String
                 dst.SetTo(0)
                 For Each lp In task.lines.lpList
-                    dst.Line(lp.p1, lp.p2, white, task.lineWidth, cv.LineTypes.Link8)
+                    dst.Line(lp.p1, lp.
+                             p2, white, task.lineWidth, cv.LineTypes.Link8)
                     dst.Circle(lp.ptCenter, task.DotSize, task.highlight, -1)
                 Next
 

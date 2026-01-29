@@ -17456,4 +17456,34 @@ Namespace VBClasses
             cv.Cv2.DestroyWindow("Hit space bar to advance to the next frame")
         End Sub
     End Class
+
+
+
+
+    Public Class XO_Line_RotatedRects : Inherits TaskParent
+        Dim roRect As New Line_Map
+        Public rcList As New List(Of rcData)
+        Dim redC As New RedColor_Basics
+        Public Sub New()
+            desc = "Track each rotated rect."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            roRect.Run(src)
+            dst2 = roRect.dst3
+
+            redC.Run(roRect.dst2)
+            labels(2) = redC.labels(2)
+
+            rcList.Clear()
+            dst3.SetTo(0)
+            For i = 1 To task.redColor.rcList.Count - 2
+                Dim rc = task.redColor.rcList(i)
+                rc.index = i - 1
+                rc.color = task.scalarColors(rc.index)
+                rc.maxDist = roRect.lpList(i).ptCenter
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+                rcList.Add(rc)
+            Next
+        End Sub
+    End Class
 End Namespace
