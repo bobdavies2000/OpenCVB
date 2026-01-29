@@ -75,12 +75,14 @@ Namespace VBClasses
             For Each lp In sortlines.Values
                 lp.index = lpList.Count
                 If noOverlappingLines Then
+                    If lp.rect.Width = 0 Then Continue For
+                    If lp.rect.Height = 0 Then Continue For
                     If dst0(lp.rect).CountNonZero > 0 Then
                         overLappingCount += 1
                         Continue For
                     End If
                 End If
-                dst0.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth + 1, cv.LineTypes.Link4)
+                dst0.Line(lp.p1, lp.p2, 255, task.lineWidth + 1, cv.LineTypes.Link4)
                 lpList.Add(lp)
             Next
 
@@ -116,8 +118,6 @@ Namespace VBClasses
             desc = "Line_Basics is a task algorithm so this is the better way to test it."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
             lines.motionMask = task.motionRGB.motionMask
             lines.Run(task.gray)
             dst2.SetTo(0)

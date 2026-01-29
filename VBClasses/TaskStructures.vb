@@ -513,6 +513,12 @@ Namespace VBClasses
                 If w < 1 Then w = task.lineWidth
                 ' p1 is always leftmost point.
                 rect = New cv.Rect(p1.X, Math.Min(p1.Y, p2.Y), w, h)
+                If rect.TopLeft.X + w >= task.workRes.Width Then
+                    rect.Width = task.workRes.Width - rect.TopLeft.X - 1
+                End If
+                If p1.Y + h >= task.workRes.Height Then
+                    rect.Height = task.workRes.Height - p1.Y - 1
+                End If
             End Sub
             Sub New()
                 p1 = New cv.Point2f()

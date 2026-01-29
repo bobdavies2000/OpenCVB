@@ -17468,7 +17468,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_RotatedRects : Inherits TaskParent
-        Dim roRect As New NR_Line_Map
+        Dim roRect As New XO_Line_Map
         Public rcList As New List(Of rcData)
         Dim redC As New RedColor_Basics
         Public Sub New()
