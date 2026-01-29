@@ -4,21 +4,29 @@ Namespace VBClasses
         Dim reduction As New Reduction_Basics
         Public rcList As List(Of rcData)
         Public rcMap As cv.Mat
+        Public redC1 As New RedColor_Basics
+        Dim redC2 As New RedCloud_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Insert the RedCloud cells into the RedColor_Basics input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedCloud(src, labels(2))
+            redC2.Run(src)
+            labels(2) = redC2.labels(2)
+            dst2 = redC2.dst2
+
             reduction.Run(src)
-            dst3 = runRedColor(reduction.dst2, labels(3))
+
+            redC1.Run(reduction.dst2)
+            labels(3) = redC1.labels(2)
+            dst3 = redC1.dst2
 
             Static picTag As Integer = task.mousePicTag
             If task.mouseClickFlag Then picTag = task.mousePicTag
             If picTag = 2 Then
-                RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
+                RedCloud_Cell.selectCell(redC2.rcMap, redC2.rcList)
             Else
-                RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
+                RedCloud_Cell.selectCell(redC1.rcMap, redC1.rcList)
             End If
 
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
@@ -30,17 +38,21 @@ Namespace VBClasses
 
 
 
-    Public Class NR_RedCC_BasicsOld : Inherits TaskParent
+    Public Class RedCC_BasicsCombined : Inherits TaskParent
         Dim reduction As New Reduction_Basics
         Public rcList As List(Of rcData)
         Public rcMap As cv.Mat
+        Dim redC1 As New RedColor_Basics
+        Dim redC2 As New RedCloud_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(1) = "Contours of each RedCloud cell - if missing some, CV_8U is the problem."
             desc = "Insert the RedCloud cells into the RedColor_Basics input."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            runRedCloud(src, labels(3))
+            redC2.Run(src)
+            labels(3) = redC2.labels(2)
+
             reduction.Run(src)
 
             Dim index = reduction.classCount + 1
@@ -55,9 +67,12 @@ Namespace VBClasses
 
             dst1 = reduction.dst2.InRange(255, 255)
 
-            dst2 = runRedColor(reduction.dst2, labels(2))
-            rcList = New List(Of rcData)(task.redColor.rcList)
-            rcMap = task.redColor.rcMap
+            redC1.Run(reduction.dst2)
+            labels(2) = redC1.labels(2)
+            dst2 = redC1.dst2
+
+            rcList = New List(Of rcData)(redC1.rcList)
+            rcMap = redC1.rcMap
 
             RedCloud_Cell.selectCell(rcMap, rcList)
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
@@ -140,7 +155,7 @@ Namespace VBClasses
 
             RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
             If task.rcD Is Nothing Then
-                RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
+                RedCloud_Cell.selectCell(redCC.redC1.rcMap, redCC.redC1.rcList)
                 If task.rcD Is Nothing Then
                     labels(3) = "Select a RedCloud cell to see the histogram"
                     Exit Sub

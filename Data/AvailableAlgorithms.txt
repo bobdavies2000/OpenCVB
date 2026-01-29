@@ -1274,7 +1274,6 @@ NR_Rectangle_MultiOverlap
 NR_Rectangle_Overlap
 NR_Rectangle_Union
 NR_RecursiveBilateralFilter_CPP
-NR_RedCC_BasicsOld
 NR_RedCC_CellHistogram
 NR_RedCC_Merge
 NR_RedCloud_CellDepthHistogram
@@ -1492,6 +1491,7 @@ Rectangle_EnclosingPoints
 Rectangle_Fit
 Rectangle_Rotated
 RedCC_Basics
+RedCC_BasicsCombined
 RedCC_Color8U
 RedCloud_Basics
 RedCloud_Cell
@@ -1501,6 +1501,7 @@ RedCloud_Sweep
 RedColor_Basics
 RedColor_Bricks
 RedColor_LeftRight
+RedList_Basics
 RedList_CPP
 RedList_Hulls
 RedMask_Basics

@@ -78,8 +78,8 @@ Namespace VBClasses
 
         ' task algorithms - operate on every frame regardless of which algorithm is being run.
         Public colorizer As DepthColorizer_Basics
-        Public redColor As RedColor_Basics
         Public redList As XO_RedList_Basics
+        Public redListNew As RedList_Basics
         Public redCloud As RedCloud_Basics
         Public gmat As IMU_GMatrix
         Public lines As Line_Basics

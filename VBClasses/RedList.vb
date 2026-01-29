@@ -1,6 +1,48 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Namespace VBClasses
+    Public Class RedList_Basics : Inherits TaskParent
+        Public inputRemoved As cv.Mat
+        Public cellGen As New XO_RedCell_Color
+        Public redMask As New RedMask_Basics
+        Public rclist As New List(Of rcData)
+        Public contours As New Contour_Basics
+        Public Sub New()
+            desc = "Find cells and then match them to the previous generation with minimum boundary"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            contours.Run(src)
+            If src.Type <> cv.MatType.CV_8U Then
+                If standalone And task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                    dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                Else
+                    dst1 = Mat_Basics.srcMustBe8U(src)
+                End If
+            Else
+                dst1 = src
+            End If
+
+            If inputRemoved IsNot Nothing Then dst1.SetTo(0, inputRemoved)
+            redMask.Run(dst1)
+
+            If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
+            cellGen.mdList = redMask.mdList
+            cellGen.Run(redMask.dst2)
+
+            dst2 = cellGen.dst2
+
+            For Each rc In cellGen.mdList
+                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+            Next
+            labels(2) = cellGen.labels(2)
+            labels(3) = ""
+            SetTrueText("", newPoint, 1)
+        End Sub
+    End Class
+
+
+
+
     Public Class NR_RedList_CellStatsPlot : Inherits TaskParent
         Dim cells As New XO_RedCell_BasicsPlot
         Public Sub New()

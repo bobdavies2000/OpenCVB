@@ -74,6 +74,7 @@ Namespace VBClasses
 
     Public Class NR_Bin2Way_RedColor : Inherits TaskParent
         Dim bin2 As New Bin2Way_Gradation
+        Dim redC As New RedColor_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             desc = "Identify 4 gradations of light and combine them for input to RedColor"
@@ -81,10 +82,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             bin2.Run(src)
 
-            runRedColor(bin2.dst3, labels(2))
+            redC.Run(bin2.dst3)
+            labels(2) = redC.labels(2)
+
+            redC.Run(bin2.dst3)
+            labels(2) = redC.labels(2)
 
             dst1.SetTo(0)
-            For Each rc In task.redColor.rcList
+            For Each rc In redC.rcList
                 dst1(rc.rect).SetTo(rc.index, rc.mask)
             Next
 
@@ -173,7 +178,7 @@ Namespace VBClasses
             flood.inputRemoved = Not bin2.mats.mat(0)
             flood.Run(bin2.mats.mat(0))
             dst2 = flood.dst2
-            If task.heartBeat Then labels(2) = CStr(task.redColor.rcList.Count) + " cells were identified"
+            If task.heartBeat Then labels(2) = CStr(flood.redC.rcList.Count) + " cells were identified"
         End Sub
     End Class
 
@@ -194,7 +199,7 @@ Namespace VBClasses
             flood.inputRemoved = Not bin2.mats.mat(3)
             flood.Run(bin2.mats.mat(3))
             dst2 = flood.dst2
-            If task.heartBeat Then labels(2) = CStr(task.redColor.rcList.Count) + " cells were identified"
+            If task.heartBeat Then labels(2) = CStr(flood.redC.rcList.Count) + " cells were identified"
         End Sub
     End Class
 

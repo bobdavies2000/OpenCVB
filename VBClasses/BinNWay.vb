@@ -3,6 +3,7 @@ Namespace VBClasses
     Public Class BinNWay_Basics : Inherits TaskParent
         Dim options As New Options_BinNWay
         Dim binSplit(0) As Integer
+        Dim redC As New RedColor_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -29,8 +30,11 @@ Namespace VBClasses
             dst3 = PaletteFull(dst1)
 
             If standalone Then
-                dst2 = runRedColor(dst1, labels(2))
-                RedCloud_Cell.selectCell(task.redColor.rcMap, task.redColor.rcList)
+                redC.Run(dst1)
+                labels(2) = redC.labels(2)
+                dst2 = redC.dst2
+
+                RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
                 If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
                 SetTrueText(strOut, 1)
             End If

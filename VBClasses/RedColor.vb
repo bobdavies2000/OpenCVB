@@ -7,7 +7,6 @@ Namespace VBClasses
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
-            task.redColor = Me
             cPtr = RedCloud_Open()
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
@@ -229,6 +228,7 @@ Namespace VBClasses
 
     Public Class NR_RedColor_NWay : Inherits TaskParent
         Dim binN As New BinNWay_Basics
+        Dim redC As New RedColor_Basics
         Public Sub New()
             desc = "Run RedColor on the output of the BinNWay_Basics"
         End Sub
@@ -237,7 +237,9 @@ Namespace VBClasses
             dst3 = binN.dst3
             labels(3) = binN.labels(3)
 
-            dst2 = runRedColor(binN.dst2, labels(2))
+            redC.Run(binN.dst2)
+            labels(2) = redC.labels(2)
+            dst2 = redC.dst2
         End Sub
     End Class
 
@@ -248,6 +250,7 @@ Namespace VBClasses
     Public Class RedColor_Bricks : Inherits TaskParent
         Dim color8u As New Color8U_Basics
         Public brickList As New List(Of brickData)
+        Dim redC As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
@@ -256,12 +259,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst0 = task.leftView
             color8u.Run(task.leftView)
-            dst2 = runRedColor(color8u.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY), labels(3))
+
+            redC.Run(color8u.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            labels(2) = redC.labels(3)
+            dst2 = redC.dst2
 
             Dim count As Integer
             dst1.SetTo(0)
             For Each brick As brickData In task.bricks.brickList
-                If task.redColor.rcMap(brick.lRect).CountNonZero And brick.rRect.Width > 0 Then
+                If redC.rcMap(brick.lRect).CountNonZero And brick.rRect.Width > 0 Then
                     dst2(brick.lRect).CopyTo(dst1(brick.rRect))
                     brick.colorClass = color8u.dst2.Get(Of Integer)
                     count += 1

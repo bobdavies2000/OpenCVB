@@ -191,6 +191,7 @@ Namespace VBClasses
     Public Class Flood_BasicsMask : Inherits TaskParent
         Public inputRemoved As cv.Mat
         Public showSelected As Boolean = True
+        Public redC As New RedColor_Basics
         Public Sub New()
             labels(3) = "The inputRemoved mask is used to limit how much of the image is processed."
             desc = "Floodfill by color as usual but this is run repeatedly with the different tiers."
@@ -205,9 +206,12 @@ Namespace VBClasses
 
             dst3 = inputRemoved
             If inputRemoved IsNot Nothing Then src.SetTo(0, inputRemoved)
-            dst2 = runRedColor(src, labels(2)).SetTo(0, inputRemoved)
 
-            If task.heartBeat Then labels(2) = $"{task.redColor.rcList.Count} cells identified"
+            redC.Run(src)
+            labels(2) = redC.labels(2)
+            dst2 = redC.dst2.SetTo(0, inputRemoved)
+
+            If task.heartBeat Then labels(2) = $"{redC.rcList.Count} cells identified"
 
             If showSelected Then Swarm_Flood.setSelectedCell()
         End Sub
