@@ -346,8 +346,6 @@ Namespace VBClasses
             Public indexHRight As Integer = -1
 
             Public length As Single
-            Public mask As cv.Mat
-            Public motion As Boolean
 
             Public p1 As cv.Point2f
             Public p2 As cv.Point2f
@@ -515,16 +513,6 @@ Namespace VBClasses
                 If w < 1 Then w = task.lineWidth
                 ' p1 is always leftmost point.
                 rect = New cv.Rect(p1.X, Math.Min(p1.Y, p2.Y), w, h)
-
-                mask = New cv.Mat(rect.Size, cv.MatType.CV_8U, 0)
-                Dim rp1 = New cv.Point(p1.X - rect.TopLeft.X, 0)
-                Dim rp2 = New cv.Point(rect.BottomRight.X - p2.X, h)
-                mask.Line(rp1, rp2, 255, task.lineWidth, cv.LineTypes.Link8)
-
-                If task.motionRGB.motionMask.Get(Of Byte)(p1.Y, p1.X) Or
-                   task.motionRGB.motionMask.Get(Of Byte)(p2.Y, p2.X) Then
-                    motion = True
-                End If
             End Sub
             Sub New()
                 p1 = New cv.Point2f()

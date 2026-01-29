@@ -17390,6 +17390,13 @@ Namespace VBClasses
             If standalone Then task.gOptions.showMotionMask.Checked = True
             desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
         End Sub
+        Private Function lpMotion(lp As lpData) As Boolean
+            ' return true if either line endpoint was in the motion mask.
+            If motionMask.Get(Of Byte)(lp.p1.Y, lp.p1.X) Then Return True
+            If motionMask.Get(Of Byte)(lp.p2.Y, lp.p2.X) Then Return True
+            Return False
+        End Function
+
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
             If lpList.Count <= 1 Then
@@ -17401,7 +17408,7 @@ Namespace VBClasses
             Dim sortlines As New SortedList(Of Single, lpData)(New compareAllowIdenticalSingleInverted)
             Dim count As Integer
             For Each lp In lpList
-                If lp.motion = False Then
+                If lpMotion(lp) = False Then
                     lp.age += 1
                     sortlines.Add(lp.length, lp)
                     count += 1
@@ -17413,7 +17420,7 @@ Namespace VBClasses
 
 
             For Each lp In lpListRaw
-                If lp.motion Then sortlines.Add(lp.length, lp)
+                If lpMotion(lp) Then sortlines.Add(lp.length, lp)
             Next
 
             lpList.Clear()
@@ -17461,7 +17468,7 @@ Namespace VBClasses
 
 
     Public Class XO_Line_RotatedRects : Inherits TaskParent
-        Dim roRect As New Line_Map
+        Dim roRect As New NR_Line_Map
         Public rcList As New List(Of rcData)
         Dim redC As New RedColor_Basics
         Public Sub New()
