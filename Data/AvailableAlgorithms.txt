@@ -421,6 +421,8 @@ Line_LeftRight
 Line_LeftTrack
 Line_Motion
 Line_PerpendicularTest
+Line_RotatedRectMap
+Line_RotatedRects
 Line_Vertical
 Line3D_Basics
 Line3D_DrawLines

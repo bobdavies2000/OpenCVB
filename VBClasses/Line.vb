@@ -732,4 +732,66 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class Line_RotatedRectMap : Inherits TaskParent
+        Dim lines As New Line_Basics
+        Public lpList As New List(Of lpData)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Create a map of rotated rects for each line found."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst0 = task.leftStable
+            lines.motionMask = task.motionLeft.dst3
+            lines.Run(task.leftStable)
+
+            If task.heartBeatLT Then dst2.SetTo(0)
+            For Each lp In lines.lpList
+                Dim pts() As cv.Point2f = lp.roRect.Points()
+                Dim ptsInt() As cv.Point = pts.Select(Function(p)
+                                                          Return New cv.Point(CInt(p.X), CInt(p.Y))
+                                                      End Function).ToArray
+                dst2.FillConvexPoly(ptsInt.ToList, lp.index + 1)
+                lpList.Add(lp)
+                If lpList.Count >= 10 Then Exit For
+            Next
+
+            dst3 = PaletteBlackZero(dst2)
+        End Sub
+    End Class
+
+
+
+
+    Public Class Line_RotatedRects : Inherits TaskParent
+        Dim roRect As New Line_RotatedRectMap
+        Public rcList As New List(Of rcData)
+        Dim redC As New RedColor_Basics
+        Public Sub New()
+            desc = "Track each rotated rect."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            roRect.Run(src)
+            dst2 = roRect.dst3
+
+            redC.Run(roRect.dst2)
+            labels(2) = redC.labels(2)
+
+            rcList.Clear()
+            dst3.SetTo(0)
+            For i = 1 To task.redColor.rcList.Count - 2
+                Dim rc = task.redColor.rcList(i)
+                rc.index = i - 1
+                rc.color = task.scalarColors(rc.index)
+                rc.maxDist = roRect.lpList(i).ptCenter
+                dst3(rc.rect).SetTo(rc.color, rc.mask)
+                rcList.Add(rc)
+            Next
+        End Sub
+    End Class
+
 End Namespace
