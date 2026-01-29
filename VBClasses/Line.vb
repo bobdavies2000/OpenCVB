@@ -1,6 +1,8 @@
 Imports System.Linq
 Imports System.Threading
+Imports System.Windows.Forms.Design.AxImporter
 Imports OpenCvSharp
+Imports OpenCvSharp.ML.DTrees
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Line_Basics : Inherits TaskParent
@@ -80,8 +82,12 @@ Namespace VBClasses
                 dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
             Next
 
-            If task.frameCount > 10 Then If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
-            If lpList.Count > 0 Then task.lineLongest = lpList(0)
+            If lpList.Count > 0 Then
+                If task.frameCount > 10 Then
+                    If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
+                End If
+                task.lineLongest = lpList(0)
+            End If
 
             If task.heartBeat Then labels(2) = CStr(count) + " lines retained - " + CStr(newCount) + " were new"
         End Sub
@@ -232,11 +238,12 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Line_BrickList : Inherits TaskParent
+    Public Class Line_BrickList : Inherits TaskParent
         Public lp As lpData ' set this input
         Public lpOutput As lpData ' this is the result lp
         Public sobel As New Edge_Sobel
         Public ptList As New List(Of cv.Point)
+        Dim options As New Options_LeftRightCorrelation
         Public Sub New()
             labels(3) = "The line's rotated rect and the bricks containing the line."
             dst3 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -244,13 +251,15 @@ Namespace VBClasses
             desc = "Add a bricklist to the requested lp"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
             If standalone Then
                 lp = task.lineLongest
                 If lp.length = 0 Then Exit Sub
             End If
 
             dst3.SetTo(0)
-            lp.drawRoRectMask(dst3)
+            dst3.Line(lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link8)
 
             Dim r = lp.rect
             dst1.SetTo(0)
@@ -309,7 +318,6 @@ Namespace VBClasses
             Dim y2 = epListY2.Average
             lpOutput = New lpData(New cv.Point2f(x1, y1), New cv.Point2f(x2, y2))
             vbc.DrawLine(dst2, lpOutput)
-            lpOutput.drawRoRect(dst2)
 
             If standalone Then lp = lpOutput
 
@@ -634,7 +642,7 @@ Namespace VBClasses
 
         Public lpList As New List(Of lpData)
         Dim lines As New Line_Basics
-
+        Dim options As New Options_LeftRightCorrelation
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
             labels = {"", "", "Left image: detected lines with stable track IDs", ""}
@@ -654,6 +662,8 @@ Namespace VBClasses
         End Function
 
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
             dst0 = task.leftStable
             lines.motionMask = task.motionLeft.dst3
             lines.Run(task.leftStable)
@@ -674,7 +684,7 @@ Namespace VBClasses
                 Next
                 If bestT IsNot Nothing Then
                     bestT.lp = r
-                    bestT.lp.trackid = bestT.trackId
+                    bestT.lp.trackID = bestT.trackId
                     bestT.missedCount = 0
                     usedRaw.Add(r)
                     usedTracked.Add(bestT)
@@ -709,11 +719,7 @@ Namespace VBClasses
             For Each t In tracked
                 t.lp.index = t.trackId
                 If lpList.Count < 10 Then
-                    Dim pts() As cv.Point2f = t.lp.roRect.Points()
-                    Dim ptsInt() As cv.Point = pts.Select(Function(p)
-                                                              Return New cv.Point(CInt(p.X), CInt(p.Y))
-                                                          End Function).ToArray
-                    dst3.FillConvexPoly(ptsInt.ToList, t.lp.color)
+                    dst2.Line(t.lp.p1, t.lp.p2, t.lp.color, options.lineTrackerWidth, cv.LineTypes.Link8)
                 End If
                 lpList.Add(t.lp)
             Next
@@ -739,23 +745,22 @@ Namespace VBClasses
     Public Class Line_RotatedRectMap : Inherits TaskParent
         Dim lines As New Line_Basics
         Public lpList As New List(Of lpData)
+        Dim options As New Options_LeftRightCorrelation
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             desc = "Create a map of rotated rects for each line found."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
             dst0 = task.leftStable
             lines.motionMask = task.motionLeft.dst3
             lines.Run(task.leftStable)
 
             If task.heartBeatLT Then dst2.SetTo(0)
             For Each lp In lines.lpList
-                Dim pts() As cv.Point2f = lp.roRect.Points()
-                Dim ptsInt() As cv.Point = pts.Select(Function(p)
-                                                          Return New cv.Point(CInt(p.X), CInt(p.Y))
-                                                      End Function).ToArray
-                dst2.FillConvexPoly(ptsInt.ToList, lp.index + 1)
+                dst2.Line(lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link8)
                 lpList.Add(lp)
                 If lpList.Count >= 10 Then Exit For
             Next
@@ -767,7 +772,7 @@ Namespace VBClasses
 
 
 
-    Public Class Line_RotatedRects : Inherits TaskParent
+    Public Class NR_Line_RotatedRects : Inherits TaskParent
         Dim roRect As New Line_RotatedRectMap
         Public rcList As New List(Of rcData)
         Dim redC As New RedColor_Basics
@@ -793,5 +798,38 @@ Namespace VBClasses
             Next
         End Sub
     End Class
+
+
+
+
+    Public Class Line_Tracker : Inherits TaskParent
+        Dim lines As New Line_Basics
+        Dim options As New Options_LeftRightCorrelation
+        Dim lpList As New List(Of lpData)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            desc = "Track lines in the left image."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            dst0 = task.leftStable
+            lines.motionMask = task.motionLeft.dst3
+            lines.Run(task.leftStable)
+            labels(2) = lines.labels(2)
+
+            dst2.SetTo(0)
+            lpList.Clear()
+            For Each lp In lines.lpList
+                dst2.Line(lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link8)
+                lpList.Add(lp)
+                If lpList.Count > 10 Then Exit For
+            Next
+
+            dst3 = PaletteBlackZero(dst2)
+        End Sub
+    End Class
+
 
 End Namespace

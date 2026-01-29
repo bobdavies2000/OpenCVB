@@ -345,6 +345,7 @@ Namespace VBClasses
             Public indexHRight As Integer = -1
 
             Public length As Single
+            Public mask As cv.Mat
             Public motion As Boolean
 
             Public p1 As cv.Point2f
@@ -360,7 +361,6 @@ Namespace VBClasses
             Public ptCenter As cv.Point2f
 
             Public rect As cv.Rect
-            Public roRect As cv.RotatedRect
             Public slope As Single
             Public Const maxSlope As Integer = 100000
             Public Function perpendicularPoints(pt As cv.Point2f) As lpData
@@ -380,39 +380,16 @@ Namespace VBClasses
                 If p2.Y >= task.color.Height Then p2.Y = task.color.Height - 1
                 Return New lpData(p1, p2)
             End Function
-            Public Sub drawRoRectMask(dst As cv.Mat)
-                Dim vertices2f = roRect.Points
-                Dim vertices As New List(Of cv.Point)
-                For Each pt In vertices2f
-                    vertices.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
-                Next
-                cv.Cv2.FillConvexPoly(dst, vertices, 255, cv.LineTypes.AntiAlias)
-            End Sub
-            Public Sub drawRoRect(dst As cv.Mat)
-                Dim vertices = roRect.Points
-                For i = 0 To vertices.Count - 1
-                    vbc.DrawLine(dst, vertices(i), vertices((i + 1) Mod 4), task.highlight)
-                Next
-            End Sub
-            Public Sub CalculateRotatedRectFromLine()
-                Dim deltaX As Single = p2.X - p1.X
-                Dim deltaY As Single = p2.Y - p1.Y
-                Dim thickness As Single = 3
-                Dim outSize = New cv.Size2f(length, thickness)
+            Public Sub computeAngleDegrees()
+                If p2.X = p1.X Then
+                    angle = 90
+                    Exit Sub
+                End If
 
-                Dim angleRadians As Double = Math.Atan2(deltaY, deltaX)
+                Dim angleRadians As Double = Math.Atan2((p2.Y - p1.Y), (p2.X - p1.X))
                 angle = CType(angleRadians * (180.0 / Math.PI), Single)
                 If angle >= 90.0 Then angle -= 180.0
                 If angle < -90.0 Then angle += 180.0
-                roRect = New cv.RotatedRect(ptCenter, outSize, angle)
-                angle *= -1
-                rect = ValidateRect(roRect.BoundingRect)
-                If rect.Width <= 15 Then
-                    rect = ValidateRect(New cv.Rect(rect.X - (20 - rect.Width) / 2, rect.Y, 20, rect.Height))
-                End If
-                If rect.Height <= 15 Then
-                    rect = ValidateRect(New cv.Rect(rect.X, rect.Y - (20 - rect.Height) / 2, rect.Width, 20))
-                End If
             End Sub
             Public Shared Function validatePoint(pt As cv.Point2f) As cv.Point2f
                 If pt.X < 0 Then pt.X = 0
@@ -499,7 +476,7 @@ Namespace VBClasses
                 If pE2.X = 0 Then indexHLeft = pE2.Y / task.workRes.Height * bpCol
                 If pE2.X = task.workRes.Width - 1 Then indexHRight = pE2.Y / task.workRes.Height * bpCol
 
-                CalculateRotatedRectFromLine()
+                computeAngleDegrees()
 
                 If task.motionRGB.motionMask.Get(Of Byte)(p1.Y, p1.X) Or
                    task.motionRGB.motionMask.Get(Of Byte)(p2.Y, p2.X) Then

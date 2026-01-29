@@ -8176,17 +8176,21 @@ Namespace VBClasses
     Public Class Options_LeftRightCorrelation : Inherits OptionParent
         Public correlation As Single
         Public mmRange As Single
+        Public lineTrackerWidth As Integer
         Public Sub New()
             If sliders.Setup(traceName) Then
                 sliders.setupTrackBar("Left to Right brick correlation Minimum X100", 0, 100, 70)
                 sliders.setupTrackBar("Range in mm's", 1, 100, 20)
+                sliders.setupTrackBar("Line_Tracker width", 1, 20, 5)
             End If
         End Sub
         Public Sub Run()
             Static corrSlider = FindSlider("Left to Right brick correlation Minimum X100")
             Static rangeSlider = FindSlider("Range in mm's")
+            Static widthSlider = FindSlider("Line_Tracker width")
             correlation = corrSlider.value / 100
             mmRange = rangeSlider.value / 1000
+            lineTrackerWidth = widthSlider.value
         End Sub
     End Class
 End Namespace
