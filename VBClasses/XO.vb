@@ -17493,4 +17493,37 @@ Namespace VBClasses
             Next
         End Sub
     End Class
+
+
+
+
+
+    Public Class XO_Line_Map : Inherits TaskParent
+        Dim lines As New Line_Basics
+        Public lpList As New List(Of lpData)
+        Dim options As New Options_LeftRightCorrelation
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Create a map of the lines provided, eliminating overlapping lines."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            Dim lastMap = dst1.Clone
+            If standalone Then
+                dst0 = task.leftStable
+                lines.motionMask = task.motionLeft.dst3
+                lines.Run(task.leftStable)
+            End If
+
+            dst1.SetTo(0)
+            For Each lp In lines.lpList
+                If dst1(lp.rect).CountNonZero = 0 Then
+                    dst1.Line(lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link8)
+                End If
+            Next
+            dst2 = PaletteBlackZero(dst1)
+        End Sub
+    End Class
 End Namespace

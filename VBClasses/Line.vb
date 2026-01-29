@@ -7,7 +7,6 @@ Namespace VBClasses
         Dim ld As cv.XImgProc.FastLineDetector
         Public noOverlappingLines As Boolean = True
         Public overLappingCount As Integer
-        Dim options As New Options_LeftRightCorrelation
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -44,8 +43,6 @@ Namespace VBClasses
             Return ld.Detect(src)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
             If standalone Then motionMask = task.motionRGB.motionMask
 
             If src.Channels <> 1 Or src.Type <> cv.MatType.CV_8U Then src = task.gray.Clone
@@ -83,7 +80,7 @@ Namespace VBClasses
                         Continue For
                     End If
                 End If
-                dst0.Line(lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link4)
+                dst0.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth + 1, cv.LineTypes.Link4)
                 lpList.Add(lp)
             Next
 
@@ -115,7 +112,6 @@ Namespace VBClasses
 
     Public Class NR_Line_BasicsTest : Inherits TaskParent
         Dim lines As New Line_Basics
-        Dim options As New Options_LeftRightCorrelation
         Public Sub New()
             desc = "Line_Basics is a task algorithm so this is the better way to test it."
         End Sub
@@ -126,7 +122,7 @@ Namespace VBClasses
             lines.Run(task.gray)
             dst2.SetTo(0)
             For Each lp In lines.lpList
-                dst2.Line(lp.p1, lp.p2, lp.color, options.lineTrackerWidth, task.lineType)
+                dst2.Line(lp.p1, lp.p2, lp.color, task.lineWidth, task.lineType)
             Next
             labels(2) = lines.labels(2)
         End Sub
@@ -785,38 +781,6 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Line_Map : Inherits TaskParent
-        Dim lines As New Line_Basics
-        Public lpList As New List(Of lpData)
-        Dim options As New Options_LeftRightCorrelation
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst0.Checked = True
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Create a map of the lines provided, eliminating overlapping lines."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            Dim lastMap = dst1.Clone
-            If standalone Then
-                dst0 = task.leftStable
-                lines.motionMask = task.motionLeft.dst3
-                lines.Run(task.leftStable)
-            End If
-
-            dst1.SetTo(0)
-            For Each lp In lines.lpList
-                If dst1(lp.rect).CountNonZero = 0 Then
-                    dst1.Line(lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link8)
-                End If
-            Next
-            dst2 = PaletteBlackZero(dst1)
-        End Sub
-    End Class
-
-
-
-
 
     Public Class Line_Tracker : Inherits TaskParent
         Dim lines As New Line_Basics
@@ -846,6 +810,4 @@ Namespace VBClasses
             dst3 = PaletteBlackZero(dst2)
         End Sub
     End Class
-
-
 End Namespace
