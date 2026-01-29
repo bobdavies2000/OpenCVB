@@ -64,6 +64,7 @@ Brick_Info
 Brick_LeftRight
 Brick_LeftRightMouse
 Brick_Lines
+Brick_NoDepthLines
 Brick_Plot
 BrickLine_Basics
 BrickLine_DepthGap

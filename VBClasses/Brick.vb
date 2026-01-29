@@ -1042,4 +1042,40 @@ Namespace VBClasses
             End If
         End Sub
     End Class
+
+
+
+
+    Public Class Brick_NoDepthLines : Inherits TaskParent
+        Dim lines As New Line_Basics
+        Dim options As New Options_LeftRightCorrelation
+        Public Sub New()
+            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            labels(2) = "The lines are for the left image."
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Find bricks that contain lines and depth zeros."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+            dst0 = task.leftStable
+
+            lines.motionMask = task.motionLeft.dst3
+            lines.Run(task.leftStable)
+            dst2 = lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+            Dim count As Integer
+            dst3.SetTo(0)
+            For Each brick In task.bricks.brickList
+                If dst2(brick.lRect).CountNonZero And task.noDepthMask(brick.rect).CountNonZero Then
+                    If brick.mm.maxVal - brick.mm.minVal > options.mmRange Then
+                        task.leftView(brick.lRect).CopyTo(dst3(brick.lRect))
+                        count += 1
+                    End If
+                End If
+            Next
+            labels(3) = CStr(count) + " of " + CStr(task.bricks.brickList.Count) +
+                        " rects had an edge and pixels with zero depth"
+        End Sub
+    End Class
 End Namespace

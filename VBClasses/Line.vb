@@ -1,5 +1,6 @@
 Imports System.Linq
 Imports System.Threading
+Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Line_Basics : Inherits TaskParent
@@ -615,15 +616,13 @@ Namespace VBClasses
     Friend Class TrackedLine
         Public trackId As Integer
         Public lp As lpData
-        Public color As cv.Scalar
         Public missedCount As Integer
-        Public trackedAge As Integer
     End Class
 
 
     ''' <summary>Find all lines in the left image, assign each a stable ID, and track them as the camera moves.</summary>
     Public Class Line_LeftTrack : Inherits TaskParent
-        ''' <summary>Tracked lines: (trackId, lpData, color, missedCount, age).</summary>
+        ''' <summary>Tracked lines: (trackId, lpData, color, missedCount).</summary>
         Dim tracked As New List(Of TrackedLine)
         Dim nextTrackId As Integer = 1
         Const minLength As Single = 12.0F
@@ -637,8 +636,9 @@ Namespace VBClasses
         Dim lines As New Line_Basics
 
         Public Sub New()
+            If standalone Then task.gOptions.displayDst0.Checked = True
             labels = {"", "", "Left image: detected lines with stable track IDs", ""}
-            desc = "Find all lines in the left image, identify each with a stable ID, and track them as the camera moves."
+            desc = "Cursor.ai: Find all lines in the left image, identify each and track them."
         End Sub
 
         Private Function matchScore(r As lpData, t As TrackedLine) As Single
@@ -654,6 +654,7 @@ Namespace VBClasses
         End Function
 
         Public Overrides Sub RunAlg(src As cv.Mat)
+            dst0 = task.leftStable
             lines.motionMask = task.motionLeft.dst3
             lines.Run(task.leftStable)
             Dim raw = lines.lpList
@@ -673,10 +674,8 @@ Namespace VBClasses
                 Next
                 If bestT IsNot Nothing Then
                     bestT.lp = r
-                    bestT.lp.color = bestT.color
-                    bestT.lp.index = bestT.trackId
+                    bestT.lp.trackid = bestT.trackId
                     bestT.missedCount = 0
-                    bestT.trackedAge += 1
                     usedRaw.Add(r)
                     usedTracked.Add(bestT)
                 End If
@@ -696,11 +695,9 @@ Namespace VBClasses
                 Dim t As New TrackedLine With {
                     .trackId = nextTrackId,
                     .lp = r,
-                    .color = task.scalarColors(nextTrackId Mod 255),
-                    .missedCount = 0,
-                    .trackedAge = 1
+                    .missedCount = 0
                 }
-                r.color = t.color
+                r.color = t.lp.color
                 r.index = t.trackId
                 nextTrackId += 1
                 tracked.Add(t)
@@ -708,8 +705,16 @@ Namespace VBClasses
 
             ' Build lpList and draw
             lpList.Clear()
+            dst3.SetTo(0)
             For Each t In tracked
                 t.lp.index = t.trackId
+                If lpList.Count < 10 Then
+                    Dim pts() As cv.Point2f = t.lp.roRect.Points()
+                    Dim ptsInt() As cv.Point = pts.Select(Function(p)
+                                                              Return New cv.Point(CInt(p.X), CInt(p.Y))
+                                                          End Function).ToArray
+                    dst3.FillConvexPoly(ptsInt.ToList, t.lp.color)
+                End If
                 lpList.Add(t.lp)
             Next
 
@@ -718,7 +723,7 @@ Namespace VBClasses
             dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
 
             For Each t In tracked
-                dst2.Line(t.lp.p1, t.lp.p2, t.color, task.lineWidth, task.lineType)
+                dst2.Line(t.lp.p1, t.lp.p2, t.lp.color, task.lineWidth, task.lineType)
                 dst1.Line(t.lp.p1, t.lp.p2, t.trackId Mod 255 + 1, 1, cv.LineTypes.Link4)
                 SetTrueText(CStr(t.trackId), New cv.Point(CInt(t.lp.ptCenter.X), CInt(t.lp.ptCenter.Y)), 2)
             Next

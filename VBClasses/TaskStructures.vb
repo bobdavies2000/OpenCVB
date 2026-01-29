@@ -338,6 +338,7 @@ Namespace VBClasses
             Public depth2 As Single ' this value may not be pVec2(2) which is preferred.  See Line3D_Basics.getDepth.
 
             Public index As Integer
+            Public trackID As Integer
             Public indexVTop As Integer = -1
             Public indexVBot As Integer = -1
             Public indexHLeft As Integer = -1
