@@ -35,6 +35,7 @@ Namespace VBClasses
             desc = "Use Diff_Basics with a color image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.firstPass Then diff.lastFrame = src.Reshape(1, src.Rows * 3)
             diff.Run(src.Reshape(1, src.Rows * 3))
             dst2 = diff.dst2.Reshape(3, src.Rows)
             dst3 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

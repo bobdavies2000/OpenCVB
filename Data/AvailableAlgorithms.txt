@@ -33,7 +33,6 @@ Bin3Way_Basics
 Bin3Way_KMeans
 Bin3Way_RedCloud
 Bin4Way_Basics
-Bin4Way_BasicsRed
 Bin4Way_Regions
 Bin4Way_Sobel
 Bin4Way_SplitMean
@@ -540,7 +539,6 @@ NR_Bin3Way_RedColorLightest
 NR_Bin3Way_RedColorOther
 NR_Bin4Way_BasicsColors
 NR_Bin4Way_Canny
-NR_Bin4Way_RedCloud
 NR_Bin4Way_Regions1
 NR_Bin4Way_RegionsLeftRight
 NR_Bin4Way_SplitGaps

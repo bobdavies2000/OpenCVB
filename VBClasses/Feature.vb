@@ -94,6 +94,7 @@ Namespace VBClasses
     Public Class Feature_General : Inherits TaskParent
         Implements IDisposable
         Public options As New Options_Features
+        Public ptLatest As New List(Of cv.Point2f)
         Public Sub New()
             desc = "Gather features from a list of sources - GoodFeatures, Agast, Brisk..."
         End Sub
@@ -102,7 +103,6 @@ Namespace VBClasses
 
             If standaloneTest() Then dst2 = task.color.Clone
 
-            Dim ptLatest As New List(Of cv.Point2f)
             Dim ptNew As New List(Of cv.Point2f)
             If task.optionsChanged = False Then
                 For Each pt In task.features

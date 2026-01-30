@@ -91,6 +91,7 @@ Namespace VBClasses
 
             Dim tmp As New cv.Mat
             cv.Cv2.FindNonZero(dst2(lp.rect), tmp)
+            If tmp.Rows = 0 Then Exit Sub ' nothing to work on...
 
             Dim points(tmp.Rows * 2 - 1) As Integer
             Marshal.Copy(tmp.Data, points, 0, points.Length)
@@ -136,6 +137,7 @@ Namespace VBClasses
 
             Dim tmp As New cv.Mat
             cv.Cv2.FindNonZero(dst2(lp.rect), tmp)
+            If tmp.Rows = 0 Then Exit Sub ' nothing to work on...
 
             Dim points(tmp.Rows * 2 - 1) As Integer
             Marshal.Copy(tmp.Data, points, 0, points.Length)

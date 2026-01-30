@@ -7,15 +7,21 @@ Namespace VBClasses
         Public clusterID As New List(Of Integer)
         Public clusters As New SortedList(Of Integer, List(Of cv.Point))
         Dim options As New Options_Features
+        Dim feat As New Feature_General
         Public Sub New()
             OptionParent.FindSlider("Min Distance").Value = 10
-            desc = "Group the points based on their proximity to each other."
+            desc = "Group feature points based on their proximity to each other."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst2 = src.Clone
-            If standalone Then ptInput = task.featurePoints
+            If standalone Then
+                feat.Run(src)
+                ptInput.Clear()
+                For Each pt In feat.ptLatest
+                    ptInput.Add(New cv.Point(CInt(pt.X), CInt(pt.Y)))
+                Next
+            End If
 
             If ptInput.Count <= 3 Then Exit Sub
 
@@ -54,6 +60,7 @@ Namespace VBClasses
                 End If
             Next
 
+            dst2.SetTo(0)
             For Each group In clusters
                 For i = 0 To group.Value.Count - 1
                     For j = 0 To group.Value.Count - 1
@@ -61,12 +68,13 @@ Namespace VBClasses
                     Next
                 Next
             Next
-            dst3.SetTo(0)
+            dst3 = src
             For i = 0 To knn.queries.Count - 1
                 DrawCircle(dst2, knn.queries(i), task.DotSize, cv.Scalar.Red)
                 DrawCircle(dst3, knn.queries(i), task.DotSize, task.highlight)
             Next
             labels(2) = CStr(clusters.Count) + " groups built from " + CStr(ptInput.Count) + " by combining each input point and its nearest neighbor."
+            labels(3) = CStr(ptInput.Count) + " input features found."
         End Sub
     End Class
 
