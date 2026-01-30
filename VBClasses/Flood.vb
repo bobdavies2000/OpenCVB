@@ -194,26 +194,4 @@ Namespace VBClasses
             End If
         End Sub
     End Class
-
-
-
-
-
-    Public Class XO_Foreground_CellsFore : Inherits TaskParent
-        Dim fore As New Foreground_Hist3D
-        Public oldrclist As New List(Of oldrcData)
-        Public Sub New()
-            desc = "Get the foreground cells"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            runRedList(src, labels(2))
-            fore.Run(src)
-            dst3 = fore.dst3
-            dst2.SetTo(0)
-            For Each rc In task.redList.oldrclist
-                Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
-                If tmp.CountNonZero Then dst2(rc.rect).SetTo(rc.color, rc.mask)
-            Next
-        End Sub
-    End Class
 End Namespace

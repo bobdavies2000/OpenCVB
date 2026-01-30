@@ -1363,7 +1363,6 @@ NR_Track_LongestLine
 NR_Transform_Affine3D
 NR_Transform_Resize
 NR_Transform_Rotate
-NR_Triangle_Basics2D
 NR_Triangle_Cell
 NR_Triangle_HullContour
 NR_Triangle_Mask

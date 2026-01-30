@@ -17397,11 +17397,7 @@ Namespace VBClasses
                 sortedCells.Add(rc.pixels, rc)
             Next
 
-            If task.heartBeat Then
-                labels(2) = CStr(task.redList.oldrclist.Count) + " total cells (shown with '" + task.gOptions.trackingLabel + "' and " +
-                        CStr(task.redList.oldrclist.Count - rcNewCount) + " matched to previous frame"
-            End If
-
+            If task.heartBeat Then labels(2) = CStr(mdList.Count) + " total cells"
             dst2 = RebuildRCMap(sortedCells.Values.ToList.ToList)
         End Sub
     End Class
@@ -17953,6 +17949,96 @@ Namespace VBClasses
             Dim r As New cv.Rect(0, 0, dst2.Height, dst2.Height)
             dst2(r) = dst0.Resize(New cv.Size(dst2.Height, dst2.Height), 0, 0, cv.InterpolationFlags.Nearest)
             dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Triangle_Basics2D : Inherits TaskParent
+        Public points As New List(Of cv.Point3f)
+        Public colors As New List(Of cv.Scalar)
+        Public oglOptions As New Options_OpenGLFunctions
+        Public hulls As New RedList_Hulls
+        Public Sub New()
+            task.gOptions.GridSlider.Value = 30
+            desc = "Prepare the list of 2D triangles"
+        End Sub
+        Private Function addTriangle(c1 As cv.Point, c2 As cv.Point, center As cv.Point,
+                                     rc As oldrcData, shift As cv.Point3f) As List(Of cv.Point)
+            Dim pt1 = Cloud_Basics.worldCoordinates(New cv.Point3f(c1.X, c1.Y, rc.depth))
+            Dim ptCenter = Cloud_Basics.worldCoordinates(New cv.Point3f(center.X, center.Y, rc.depth))
+            Dim pt2 = Cloud_Basics.worldCoordinates(New cv.Point3f(c2.X, c2.Y, rc.depth))
+
+            colors.Add(rc.color)
+            points.Add(New cv.Point3f(pt1.X + shift.X, pt1.Y + shift.Y, pt1.Z + shift.Z))
+            points.Add(New cv.Point3f(ptCenter.X + shift.X, ptCenter.Y + shift.Y, ptCenter.Z + shift.Z))
+            points.Add(New cv.Point3f(pt2.X + shift.X, pt2.Y + shift.Y, pt2.Z + shift.Z))
+
+            Dim points2d As New List(Of cv.Point)
+            points2d.Add(c1)
+            points2d.Add(center)
+            points2d.Add(c2)
+            Return points2d
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            oglOptions.Run()
+            Dim ptM = oglOptions.moveAmount
+            Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
+
+            hulls.Run(src)
+            dst2 = hulls.dst2
+            points.Clear()
+            colors.Clear()
+            Dim listOfPoints = New List(Of List(Of cv.Point))
+            For Each rc In task.redList.oldrclist
+                If rc.contour Is Nothing Then Continue For
+                If rc.contour.Count < 5 Then Continue For
+                Dim corners(4 - 1) As cv.Point
+                For i = 0 To corners.Count - 1
+                    Dim pt = rc.contour(i * rc.contour.Count / 4)
+                    corners(i) = New cv.Point(rc.rect.X + pt.X, rc.rect.Y + pt.Y)
+                Next
+                Dim center = New cv.Point(rc.rect.X + rc.rect.Width / 2, rc.rect.Y + rc.rect.Height / 2)
+                vbc.DrawLine(dst2, corners(0), center, white)
+                vbc.DrawLine(dst2, corners(1), center, white)
+                vbc.DrawLine(dst2, corners(2), center, white)
+                vbc.DrawLine(dst2, corners(3), center, white)
+
+                listOfPoints.Add(addTriangle(corners(0), corners(3), center, rc, shift))
+                listOfPoints.Add(addTriangle(corners(1), corners(0), center, rc, shift))
+                listOfPoints.Add(addTriangle(corners(2), corners(1), center, rc, shift))
+                listOfPoints.Add(addTriangle(corners(3), corners(2), center, rc, shift))
+            Next
+            dst3.SetTo(0)
+            For i = 0 To colors.Count - 1
+                cv.Cv2.DrawContours(dst3, listOfPoints, i, colors(i), -1)
+            Next
+            labels(2) = CStr(colors.Count) + " triangles from " + CStr(task.redList.oldrclist.Count) + " RedCloud cells"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_Foreground_CellsFore : Inherits TaskParent
+        Dim fore As New Foreground_Hist3D
+        Public oldrclist As New List(Of oldrcData)
+        Public Sub New()
+            desc = "Get the foreground cells"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            runRedList(src, labels(2))
+            fore.Run(src)
+            dst3 = fore.dst3
+            dst2.SetTo(0)
+            For Each rc In task.redList.oldrclist
+                Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
+                If tmp.CountNonZero Then dst2(rc.rect).SetTo(rc.color, rc.mask)
+            Next
         End Sub
     End Class
 End Namespace
