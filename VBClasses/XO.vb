@@ -10311,7 +10311,7 @@ Namespace VBClasses
             desc = "Display the statistics for the selected cell."
         End Sub
         Public Sub statsString()
-            Dim rc = task.oldrcD
+            Dim rc = task.rcD
 
             Dim gridID As Integer = task.gridMap.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
             strOut = "rc.index = " + CStr(rc.index) + vbTab + " gridID = " + CStr(gridID) + vbTab
@@ -10322,27 +10322,21 @@ Namespace VBClasses
             strOut += vbTab + CStr(CInt(rc.color(2))) + vbCrLf
             strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + "," + CStr(rc.maxDist.Y) + vbCrLf
 
-            strOut += If(rc.depthPixels > 0, "Cell is marked as having depth" + vbCrLf, "")
+            strOut += If(rc.depth > 0, "Cell is marked as having depth" + vbCrLf, "")
             strOut += "Pixels " + Format(rc.pixels, "###,###") + vbCrLf + "depth pixels "
-            If rc.depthPixels > 0 Then
-                strOut += Format(rc.depthPixels, "###,###") + " or " +
-                          Format(rc.depthPixels / rc.pixels, "0%") + " depth " + vbCrLf
+            If rc.depth > 0 Then
+                Dim depthPixels = task.depthmask(rc.rect).CountNonZero()
+                strOut += Format(depthPixels, "###,###") + " or " +
+                          Format(depthPixels / rc.pixels, "0%") + " depth " + vbCrLf
             Else
                 strOut += Format(rc.pixels, "###,###") + " - no depth data" + vbCrLf
             End If
-
-            strOut += "Cloud Min/Max/Range: X = " + Format(rc.mmX.minVal, fmt1) + "/" + Format(rc.mmX.maxVal, fmt1)
-            strOut += "/" + Format(rc.mmX.range, fmt1) + vbTab
-            strOut += "Y = " + Format(rc.mmY.minVal, fmt1) + "/" + Format(rc.mmY.maxVal, fmt1)
-            strOut += "/" + Format(rc.mmY.range, fmt1) + vbTab
-            strOut += "Z = " + Format(rc.mmZ.minVal, fmt2) + "/" + Format(rc.mmZ.maxVal, fmt2)
-            strOut += "/" + Format(rc.mmZ.range, fmt2) + vbCrLf + vbCrLf
 
             strOut += "Cell Depth in 3D: z = " + vbTab + Format(rc.depth, fmt2) + vbCrLf
 
             Dim tmp = New cv.Mat(task.oldrcD.mask.Rows, task.oldrcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
             task.pcSplit(2)(task.oldrcD.rect).CopyTo(tmp, task.oldrcD.mask)
-            plot.rc = task.oldrcD
+            plot.rc = task.rcD
             plot.Run(tmp)
             dst3 = plot.dst2
         End Sub
@@ -10353,6 +10347,11 @@ Namespace VBClasses
             labels(3) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.MaxZmeters)) + " meters"
         End Sub
     End Class
+
+
+
+
+
     Public Class XO_RedCell_Distance : Inherits TaskParent
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
@@ -10468,7 +10467,7 @@ Namespace VBClasses
         Public Sub statsString(src As cv.Mat)
             Dim tmp = New cv.Mat(task.oldrcD.mask.Rows, task.oldrcD.mask.Cols, cv.MatType.CV_32F, cv.Scalar.All(0))
             task.pcSplit(2)(task.oldrcD.rect).CopyTo(tmp, task.oldrcD.mask)
-            plot.rc = task.oldrcD
+            plot.rc = task.rcD
             plot.Run(tmp)
             dst3 = plot.dst2
 
@@ -17501,6 +17500,459 @@ Namespace VBClasses
                 mats.Run(emptyMat)
                 dst2 = mats.dst2
             End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_Contour_SelfIntersect : Inherits TaskParent
+        Public rc As New oldrcData
+        Public Sub New()
+            desc = "Search the contour points for duplicates indicating the contour is self-intersecting."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If standaloneTest() Then
+                dst2 = runRedList(src, labels(2))
+                rc = task.oldrcD
+                DrawTour(dst2(rc.rect), rc.contour, white, -1)
+            End If
+
+            Dim selfInt As Boolean
+            Dim ptList As New List(Of String)
+            dst3 = rc.mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            For Each pt In rc.contour
+                Dim ptStr = Format(pt.X, "0000") + Format(pt.Y, "0000")
+                If ptList.Contains(ptStr) Then
+                    Dim pct = ptList.Count / rc.contour.Count
+                    If pct > 0.1 And pct < 0.9 Then
+                        selfInt = True
+                        DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Red)
+                    End If
+                End If
+                ptList.Add(ptStr)
+            Next
+            labels(3) = If(selfInt, "Self intersecting - red shows where", "Not self-intersecting")
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Distance_RedColor : Inherits TaskParent
+        Dim hColor As New Hist3Dcolor_Basics
+        Public pixelVector As New List(Of List(Of Single))
+        Dim distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
+        Dim lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
+        Dim lastrcList As New List(Of oldrcData)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            OptionParent.FindSlider("Histogram 3D Bins").Value = 5
+            hColor.noMotionMask = True
+            labels(1) = "3D Histogram distance for each of the cells at left"
+            labels(2) = "RedColor output with the cell's distance from zero depth"
+            desc = "Identify RedCloud cells using the cell's 3D histogram distance from zero"
+        End Sub
+        Private Function distanceFromZero(histlist As List(Of Single)) As Double
+            Dim result As Double
+            For Each d In histlist
+                result += d * d
+            Next
+            Return Math.Sqrt(result)
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            dst3 = runRedList(src, labels(3))
+
+            pixelVector.Clear()
+            distances.Clear()
+            For i = 1 To task.redList.oldrclist.Count - 1
+                Dim rc = task.redList.oldrclist(i)
+                hColor.inputMask = rc.mask
+                hColor.Run(src(rc.rect))
+
+                Dim nextD = distanceFromZero(hColor.histArray.ToList)
+                distances.Add(nextD, i)
+            Next
+
+            If task.heartBeatLT Then
+                strOut = "3D histogram distances from zero for each cell" + vbCrLf
+                Dim index As Integer
+                For Each el In distances
+                    strOut += "(" + CStr(el.Value) + ") "
+                    strOut += Format(el.Key, fmt1) + vbTab
+                    If index Mod 6 = 5 Then strOut += vbCrLf
+                    index += 1
+                Next
+
+                strOut += "----------------------" + vbCrLf
+                index = 0
+                For Each el In lastDistances
+                    strOut += "(" + CStr(el.Value) + ") "
+                    strOut += Format(el.Key, fmt1) + vbTab
+                    If index Mod 6 = 5 Then strOut += vbCrLf
+                    index += 1
+                    Dim rc = lastrcList(el.Value)
+                Next
+            End If
+
+            For Each el In lastDistances
+                Dim rp = lastrcList(el.Value)
+                SetTrueText(el.Value, New cv.Point(rp.maxDist.X, rp.maxDist.Y + 10))
+            Next
+
+            SetTrueText(strOut, 1)
+
+            dst2.SetTo(0)
+            For i = 0 To distances.Count - 1
+                Dim rp = task.redList.oldrclist(distances.ElementAt(i).Value)
+                task.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
+            Next
+            labels(2) = task.redList.labels(3)
+
+            lastDistances.Clear()
+            For Each el In distances
+                lastDistances.Add(el.Key, el.Value)
+            Next
+
+            lastrcList = New List(Of oldrcData)(task.redList.oldrclist)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_Flood_Motion : Inherits TaskParent
+        Dim flood As New Flood_Basics
+        Dim oldrclist As New List(Of oldrcData)
+        Dim maxDists As New List(Of cv.Point2f)
+        Dim maxIndex As New List(Of Integer)
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeat Then
+                flood.Run(src)
+                oldrclist = New List(Of oldrcData)(task.redList.oldrclist)
+                dst2 = flood.dst2.Clone
+                dst3 = flood.dst2.Clone
+                labels(2) = flood.labels(2)
+                labels(3) = flood.labels(2)
+
+                maxDists.Clear()
+                For Each rc In oldrclist
+                    maxDists.Add(rc.maxDist)
+                    maxIndex.Add(rc.index)
+                Next
+            Else
+                flood.Run(src)
+                dst1.SetTo(0)
+                For Each rc In task.redList.oldrclist
+                    If maxDists.Contains(rc.maxDist) Then
+                        Dim lrc = oldrclist(maxIndex(maxDists.IndexOf(rc.maxDist)))
+                        dst1(lrc.rect).SetTo(lrc.color, lrc.mask)
+                    End If
+                Next
+                dst3 = flood.dst2
+                labels(3) = flood.labels(2)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_Foreground_CellsBack : Inherits TaskParent
+        Dim fore As New Foreground_Hist3D
+        Public oldrclist As New List(Of oldrcData)
+        Public Sub New()
+            desc = "Get the background cells"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            runRedList(src, labels(2))
+            fore.Run(src)
+            dst3 = Not fore.dst2 And task.depthmask
+            dst2.SetTo(0)
+            For Each rc In task.redList.oldrclist
+                Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
+                If tmp.CountNonZero Then dst2(rc.rect).SetTo(rc.color, rc.mask)
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_GuidedBP_RedCloud : Inherits TaskParent
+        Dim guide As New GuidedBP_MultiSlice
+        Public redCx As New XO_RedList_Basics
+        Public redCy As New XO_RedList_Basics
+        Public rcListX As New List(Of oldrcData)
+        Public rcListY As New List(Of oldrcData)
+        Public rcMapX As New cv.Mat
+        Public rcMapY As New cv.Mat
+        Public Sub New()
+            task.redList = New XO_RedList_Basics
+            desc = "Identify each segment in the X and Y point cloud data"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            guide.Run(src)
+
+            redCx.Run(guide.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            rcMapX = task.redList.rcMap.Clone
+            dst2 = redCx.dst2
+            rcListX = New List(Of oldrcData)(task.redList.oldrclist)
+            labels(2) = CStr(task.redList.oldrclist.Count) + " cells were found in vertical segments"
+
+            redCx.Run(guide.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            rcMapY = task.redList.rcMap.Clone
+            dst3 = redCx.dst2
+            rcListY = New List(Of oldrcData)(task.redList.oldrclist)
+            labels(3) = CStr(task.redList.oldrclist.Count) + " cells were found in horizontal segments"
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_GuidedBP_Regions : Inherits TaskParent
+        Public redCold As New XO_GuidedBP_RedCloud
+        Public mats As New Mat_4Click
+        Dim options As New Options_BP_Regions
+        Public rcListX As New List(Of oldrcData)
+        Public rcListY As New List(Of oldrcData)
+        Public rcMapX As New cv.Mat
+        Public rcMapY As New cv.Mat
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels(3) = "Click a quadrant in the left image and see it below."
+            desc = "Identify the top X regions in the GuidedBP_RedCloud output"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            redCold.Run(src)
+
+            rcMapX = redCold.rcMapX.Threshold(options.cellCount - 1, 255, cv.ThresholdTypes.TozeroInv)
+            rcMapY = redCold.rcMapY.Threshold(options.cellCount - 1, 255, cv.ThresholdTypes.TozeroInv)
+            If standaloneTest() Then
+                dst0 = PaletteFull(rcMapX)
+                dst1 = PaletteFull(rcMapY)
+            End If
+
+            mats.mat(0) = redCold.dst2
+            mats.mat(1) = redCold.dst3
+
+            mats.mat(2).SetTo(0)
+            mats.mat(3).SetTo(0)
+
+            rcListX.Clear()
+            rcListY.Clear()
+
+            For i = 1 To Math.Min(options.cellCount, redCold.rcListX.Count) - 1
+                Dim rc = redCold.rcListX(i)
+                mats.mat(2)(rc.rect).SetTo(rc.color, rc.mask)
+                rcListX.Add(rc)
+            Next
+            For i = 1 To Math.Min(options.cellCount, redCold.rcListY.Count) - 1
+                Dim rc = redCold.rcListY(i)
+                mats.mat(3)(rc.rect).SetTo(rc.color, rc.mask)
+                rcListY.Add(rc)
+            Next
+
+            mats.Run(emptyMat)
+            dst2 = mats.dst2
+            dst3 = mats.dst3
+
+            labels(2) = "(left to right) Regions from cloud X, Regions from Cloud Y, Top " + CStr(options.cellCount) +
+                    " X regions, Top " + CStr(options.cellCount) + " Y regions"
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_ML_LearnZfromXGray : Inherits TaskParent
+        Implements IDisposable
+        Dim regions As New XO_GuidedBP_Regions
+        Dim rtree As RTrees
+        Public Sub New()
+            desc = "This runs and is helpful to understanding how to use rtree.  Learn Z from X, Y, and grayscale of the RedCloud cells."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            regions.Run(src)
+
+            Dim ptList As New List(Of cv.Point3f)
+            Dim mlInput As New List(Of cv.Vec3f)
+            Dim mResponse As New List(Of Single)
+            For y = 0 To regions.rcMapX.Height - 1
+                For x = 0 To regions.rcMapX.Width - 1
+                    Dim zVal = task.pcSplit(2).Get(Of Single)(y, x)
+                    Dim val = CSng(task.gray.Get(Of Byte)(y, x))
+                    If zVal = 0 Then
+                        ptList.Add(New cv.Point3f(CSng(x), CSng(y), val))
+                    Else
+                        mlInput.Add(New cv.Vec3f(val, x, y))
+                        mResponse.Add(zVal)
+                    End If
+                Next
+            Next
+
+            If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
+            Dim mLearn As cv.Mat = cv.Mat.FromPixelData(mlInput.Count, 3, cv.MatType.CV_32F, mlInput.ToArray)
+            If mResponse.Count = 0 Then Exit Sub
+            Dim response As cv.Mat = cv.Mat.FromPixelData(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
+            rtree.Train(mLearn, cv.ML.SampleTypes.RowSample, response)
+
+            Dim predMat = cv.Mat.FromPixelData(ptList.Count, 3, cv.MatType.CV_32F, ptList.ToArray)
+            Dim output = New cv.Mat(ptList.Count, 1, cv.MatType.CV_32FC1, cv.Scalar.All(0))
+            rtree.Predict(predMat, output)
+        End Sub
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            If rtree IsNot Nothing Then rtree.Dispose()
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_ML_LearnRegions : Inherits TaskParent
+        Implements IDisposable
+        Dim regions As New XO_GuidedBP_Regions
+        Dim color8U As New Color8U_Basics
+        Dim rtree As RTrees
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels = {"", "", "Entire image after ML", "ML Predictions where no region was defined."}
+            desc = "Learn region from X, Y, and grayscale for the RedCloud cells."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            regions.Run(src)
+
+            color8U.Run(src)
+            dst1 = color8U.dst3
+
+            Dim graySrc = If(dst1.Channels = 1, dst1, dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)) ' input to ML
+            Dim regionX = regions.rcMapX ' Target variable
+
+            Dim ptList As New List(Of cv.Point3f)
+            Dim mlInput As New List(Of cv.Vec3f)
+            Dim mResponse As New List(Of Single)
+
+            For y = 0 To regions.rcMapX.Height - 1
+                For x = 0 To regions.rcMapX.Width - 1
+                    Dim gray = CSng(graySrc.Get(Of Byte)(y, x))
+                    Dim region = CSng(regionX.Get(Of Byte)(y, x))
+                    If region = 0 Then
+                        ptList.Add(New cv.Point3f(CSng(x), CSng(y), gray))
+                    Else
+                        mlInput.Add(New cv.Vec3f(gray, x, y))
+                        mResponse.Add(region)
+                    End If
+                Next
+            Next
+
+            If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
+            Dim mLearn As cv.Mat = cv.Mat.FromPixelData(mlInput.Count, 3, cv.MatType.CV_32F, mlInput.ToArray)
+            If mResponse.Count = 0 Then Exit Sub
+            Dim response As cv.Mat = cv.Mat.FromPixelData(mResponse.Count, 1, cv.MatType.CV_32F, mResponse.ToArray)
+            rtree.Train(mLearn, cv.ML.SampleTypes.RowSample, response)
+
+            Dim predMat = cv.Mat.FromPixelData(ptList.Count, 3, cv.MatType.CV_32F, ptList.ToArray)
+            Dim output = New cv.Mat(ptList.Count, 1, cv.MatType.CV_32FC1, cv.Scalar.All(0))
+            rtree.Predict(predMat, output)
+
+            regions.mats.mat(0).CopyTo(dst2)
+            dst3.SetTo(0)
+            For i = 0 To ptList.Count - 1
+                Dim pt = ptList(i)
+                Dim regionID = CInt(output.Get(Of Single)(i, 0))
+                If regionID < regions.rcListX.Count Then
+                    Dim rc = regions.rcListX(regionID)
+                    Dim color As cv.Vec3b = New cv.Vec3b(rc.color(0), rc.color(1), rc.color(2))
+                    dst2.Set(Of cv.Vec3b)(pt.Y, pt.X, color)
+                    dst3.Set(Of cv.Vec3b)(pt.Y, pt.X, color)
+                End If
+            Next
+        End Sub
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            If rtree IsNot Nothing Then rtree.Dispose()
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_Histogram_ShapeSide : Inherits TaskParent
+        Public rc As New oldrcData
+        Public Sub New()
+            task.gOptions.setHistogramBins(60)
+            labels = {"", "", "ZY Side View", "ZY Side View Mask"}
+            desc = "Create a 2D side view for ZY histogram of depth"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If rc.pixels = 0 Then src = task.pointCloud
+
+            cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, dst0, 2,
+                        {task.histogramBins, task.histogramBins}, task.rangesSide)
+            dst0.Col(0).SetTo(0) ' too many zero depth points...
+
+            dst0 = Mat_Convert.Mat_32f_To_8UC3(dst0)
+            dst0.ConvertTo(dst0, cv.MatType.CV_8UC1)
+
+            Dim r As New cv.Rect(0, 0, dst2.Height, dst2.Height)
+            dst2(r) = dst0.Resize(New cv.Size(dst2.Height, dst2.Height), 0, 0, cv.InterpolationFlags.Nearest)
+            dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        End Sub
+    End Class
+
+
+
+
+
+
+
+    Public Class XO_Histogram_ShapeTop : Inherits TaskParent
+        Public rc As New oldrcData
+        Public Sub New()
+            task.gOptions.setHistogramBins(60)
+            labels = {"", "", "ZY Side View", "ZY Side View Mask"}
+            desc = "Create a 2D top view for XZ histogram of depth"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If rc.pixels = 0 Then src = task.pointCloud
+
+            cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, dst0, 2,
+                        {task.histogramBins, task.histogramBins}, task.rangesTop)
+            dst0.Row(0).SetTo(0) ' too many zero depth points...
+
+            dst0 = Mat_Convert.Mat_32f_To_8UC3(dst0)
+            dst0.ConvertTo(dst0, cv.MatType.CV_8UC1)
+
+            Dim r As New cv.Rect(0, 0, dst2.Height, dst2.Height)
+            dst2(r) = dst0.Resize(New cv.Size(dst2.Height, dst2.Height), 0, 0, cv.InterpolationFlags.Nearest)
+            dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         End Sub
     End Class
 End Namespace

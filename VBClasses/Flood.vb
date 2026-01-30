@@ -111,53 +111,6 @@ Namespace VBClasses
 
 
 
-
-
-    Public Class NR_Flood_Motion : Inherits TaskParent
-        Dim flood As New Flood_Basics
-        Dim oldrclist As New List(Of oldrcData)
-        Dim cellMap As New cv.Mat
-        Dim maxDists As New List(Of cv.Point2f)
-        Dim maxIndex As New List(Of Integer)
-        Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
-            desc = "Create RedCloud cells every heartbeat and compare the results against RedCloud cells created with the current frame."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeat Then
-                flood.Run(src)
-                oldrclist = New List(Of oldrcData)(task.redList.oldrclist)
-                cellMap = task.redList.rcMap.Clone
-                dst2 = flood.dst2.Clone
-                dst3 = flood.dst2.Clone
-                labels(2) = flood.labels(2)
-                labels(3) = flood.labels(2)
-
-                maxDists.Clear()
-                For Each rc In oldrclist
-                    maxDists.Add(rc.maxDist)
-                    maxIndex.Add(rc.index)
-                Next
-            Else
-                flood.Run(src)
-                dst1.SetTo(0)
-                For Each rc In task.redList.oldrclist
-                    If maxDists.Contains(rc.maxDist) Then
-                        Dim lrc = oldrclist(maxIndex(maxDists.IndexOf(rc.maxDist)))
-                        dst1(lrc.rect).SetTo(lrc.color, lrc.mask)
-                    End If
-                Next
-                dst3 = flood.dst2
-                labels(3) = flood.labels(2)
-            End If
-        End Sub
-    End Class
-
-
-
-
-
-
     Public Class NR_Flood_Minimal : Inherits TaskParent
         Dim prep As New RedPrep_ReductionChoices
         Public Sub New()
@@ -214,6 +167,53 @@ Namespace VBClasses
             If task.heartBeat Then labels(2) = $"{redC.rcList.Count} cells identified"
 
             If showSelected Then Swarm_Flood.setSelectedCell()
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Foreground_RedCloud : Inherits TaskParent
+        Dim fore As New XO_Foreground_CellsFore
+        Dim back As New XO_Foreground_CellsBack
+        Public Sub New()
+            desc = "Isolate foreground from background, then segment each with RedCloud"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fore.Run(src)
+            dst2 = fore.dst2
+            labels(2) = fore.labels(2)
+
+            back.Run(src)
+            dst3 = back.dst2
+            labels(3) = back.labels(2)
+            If task.redList.oldrclist.Count > 0 Then
+                dst2(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class XO_Foreground_CellsFore : Inherits TaskParent
+        Dim fore As New Foreground_Hist3D
+        Public oldrclist As New List(Of oldrcData)
+        Public Sub New()
+            desc = "Get the foreground cells"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            runRedList(src, labels(2))
+            fore.Run(src)
+            dst3 = fore.dst3
+            dst2.SetTo(0)
+            For Each rc In task.redList.oldrclist
+                Dim tmp As cv.Mat = dst3(rc.rect) And rc.mask
+                If tmp.CountNonZero Then dst2(rc.rect).SetTo(rc.color, rc.mask)
+            Next
         End Sub
     End Class
 End Namespace

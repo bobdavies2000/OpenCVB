@@ -894,68 +894,6 @@ Namespace VBClasses
 
 
 
-
-
-    Public Class NR_Histogram_ShapeSide : Inherits TaskParent
-        Public rc As New oldrcData
-        Public Sub New()
-            task.gOptions.setHistogramBins(60)
-            labels = {"", "", "ZY Side View", "ZY Side View Mask"}
-            desc = "Create a 2D side view for ZY histogram of depth"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If rc.pixels = 0 Then src = task.pointCloud
-
-            cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, dst0, 2,
-                        {task.histogramBins, task.histogramBins}, task.rangesSide)
-            dst0.Col(0).SetTo(0) ' too many zero depth points...
-
-            dst0 = Mat_Convert.Mat_32f_To_8UC3(dst0)
-            dst0.ConvertTo(dst0, cv.MatType.CV_8UC1)
-
-            Dim r As New cv.Rect(0, 0, dst2.Height, dst2.Height)
-            dst2(r) = dst0.Resize(New cv.Size(dst2.Height, dst2.Height), 0, 0, cv.InterpolationFlags.Nearest)
-            dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-    Public Class NR_Histogram_ShapeTop : Inherits TaskParent
-        Public rc As New oldrcData
-        Public Sub New()
-            task.gOptions.setHistogramBins(60)
-            labels = {"", "", "ZY Side View", "ZY Side View Mask"}
-            desc = "Create a 2D top view for XZ histogram of depth"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If rc.pixels = 0 Then src = task.pointCloud
-
-            cv.Cv2.CalcHist({src}, task.channelsTop, New cv.Mat, dst0, 2,
-                        {task.histogramBins, task.histogramBins}, task.rangesTop)
-            dst0.Row(0).SetTo(0) ' too many zero depth points...
-
-            dst0 = Mat_Convert.Mat_32f_To_8UC3(dst0)
-            dst0.ConvertTo(dst0, cv.MatType.CV_8UC1)
-
-            Dim r As New cv.Rect(0, 0, dst2.Height, dst2.Height)
-            dst2(r) = dst0.Resize(New cv.Size(dst2.Height, dst2.Height), 0, 0, cv.InterpolationFlags.Nearest)
-            dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-
     Public Class NR_Histogram_Gotcha2D : Inherits TaskParent
         Public histogram As New cv.Mat
         Public Sub New()
@@ -1171,67 +1109,6 @@ Namespace VBClasses
 
 
 
-
-
-
-    Public Class Histogram_Depth : Inherits TaskParent
-        Public plotHist As New Plot_Histogram
-        Public rc As oldrcData
-        Public mm As mmData
-        Public histogram As New cv.Mat
-        Public Sub New()
-            plotHist.minRange = 0.1
-            plotHist.removeZeroEntry = True
-            task.gOptions.MaxDepthBar.Value = 10
-            task.gOptions.HistBinBar.Value = 10
-            desc = "Show depth data as a histogram."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Rows <= 0 Then Exit Sub
-            plotHist.minRange = 0
-            plotHist.maxRange = task.MaxZmeters
-            If rc IsNot Nothing Then
-                If rc.index = 0 Then Exit Sub
-                src = task.pcSplit(2)(rc.rect).Clone
-            Else
-                If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-                mm = GetMinMax(src)
-                If mm.minVal = mm.maxVal Then Exit Sub
-                plotHist.minRange = mm.minVal ' because OpenCV's histogram makes the ranges exclusive.
-                plotHist.maxRange = mm.maxVal
-            End If
-
-            If plotHist.minRange = plotHist.maxRange Then Exit Sub ' at startup some cameras have no depth...
-            cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, {task.histogramBins},
-                        {New cv.Rangef(plotHist.minRange, plotHist.maxRange)})
-
-            plotHist.histogram = histogram
-            plotHist.maxRange = task.MaxZmeters
-            plotHist.Run(plotHist.histogram)
-            dst2 = plotHist.dst2
-
-            Dim stepsize = dst2.Width / task.MaxZmeters
-            For i = 1 To CInt(task.MaxZmeters) - 1
-                dst2.Line(New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, task.cvFontThickness)
-            Next
-
-            If standaloneTest() Then
-                Dim expected = src.CountNonZero
-                Dim actual = CInt(plotHist.histogram.Sum(0))
-                strOut = "Expected sample count (non-zero task.pcSplit(2) entries):" + vbTab + CStr(expected) + vbCrLf
-                strOut += "Histogram sum (ranges can reduce):" + vbTab + vbTab + vbTab + CStr(actual) + vbCrLf
-                strOut += "Difference:" + vbTab + vbTab + vbTab + vbTab + vbTab + vbTab + CStr(Math.Abs(actual - expected)) + vbCrLf
-                'strOut += "Count nonzero entries in task.maxDepthMask: " + vbTab + vbTab + CStr(task.maxDepthMask.CountNonZero)
-            End If
-            SetTrueText(strOut, 3)
-            labels(2) = "Histogram Depth to " + Format(task.MaxZmeters, "0.0") + " m"
-        End Sub
-    End Class
-
-
-
-
-
     Public Class Histogram_Kalman : Inherits TaskParent
         Public hist As New Histogram_Basics
         Public Sub New()
@@ -1367,8 +1244,8 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            hist.rc = task.oldrcD
-            If hist.rc.index = 0 Or hist.rc.mmZ.maxVal = 0 Then Exit Sub
+            hist.rc = task.rcD
+            If hist.rc.index = 0 Or hist.rc.depth = 0 Then Exit Sub
 
             dst0.SetTo(0)
             task.pcSplit(2)(hist.rc.rect).CopyTo(dst0)
@@ -1674,4 +1551,62 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+
+    Public Class Histogram_Depth : Inherits TaskParent
+        Public plotHist As New Plot_Histogram
+        Public rc As rcData
+        Public mm As mmData
+        Public histogram As New cv.Mat
+        Public Sub New()
+            plotHist.minRange = 0.1
+            plotHist.removeZeroEntry = True
+            task.gOptions.MaxDepthBar.Value = 10
+            task.gOptions.HistBinBar.Value = 10
+            desc = "Show depth data as a histogram."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Rows <= 0 Then Exit Sub
+            plotHist.minRange = 0
+            plotHist.maxRange = task.MaxZmeters
+            If rc IsNot Nothing Then
+                If rc.index = 0 Then Exit Sub
+                src = task.pcSplit(2)(rc.rect).Clone
+            Else
+                If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+                mm = GetMinMax(src)
+                If mm.minVal = mm.maxVal Then Exit Sub
+                plotHist.minRange = mm.minVal ' because OpenCV's histogram makes the ranges exclusive.
+                plotHist.maxRange = mm.maxVal
+            End If
+
+            If plotHist.minRange = plotHist.maxRange Then Exit Sub ' at startup some cameras have no depth...
+            cv.Cv2.CalcHist({src}, {0}, New cv.Mat, histogram, 1, {task.histogramBins},
+                        {New cv.Rangef(plotHist.minRange, plotHist.maxRange)})
+
+            plotHist.histogram = histogram
+            plotHist.maxRange = task.MaxZmeters
+            plotHist.Run(plotHist.histogram)
+            dst2 = plotHist.dst2
+
+            Dim stepsize = dst2.Width / task.MaxZmeters
+            For i = 1 To CInt(task.MaxZmeters) - 1
+                dst2.Line(New cv.Point(stepsize * i, 0), New cv.Point(stepsize * i, dst2.Height), white, task.cvFontThickness)
+            Next
+
+            If standaloneTest() Then
+                Dim expected = src.CountNonZero
+                Dim actual = CInt(plotHist.histogram.Sum(0))
+                strOut = "Expected sample count (non-zero task.pcSplit(2) entries):" + vbTab + CStr(expected) + vbCrLf
+                strOut += "Histogram sum (ranges can reduce):" + vbTab + vbTab + vbTab + CStr(actual) + vbCrLf
+                strOut += "Difference:" + vbTab + vbTab + vbTab + vbTab + vbTab + vbTab + CStr(Math.Abs(actual - expected)) + vbCrLf
+                'strOut += "Count nonzero entries in task.maxDepthMask: " + vbTab + vbTab + CStr(task.maxDepthMask.CountNonZero)
+            End If
+            SetTrueText(strOut, 3)
+            labels(2) = "Histogram Depth to " + Format(task.MaxZmeters, "0.0") + " m"
+        End Sub
+    End Class
 End Namespace

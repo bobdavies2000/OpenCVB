@@ -418,46 +418,6 @@ Namespace VBClasses
 
 
 
-
-
-    Public Class NR_Contour_SelfIntersect : Inherits TaskParent
-        Public rc As New oldrcData
-        Public Sub New()
-            desc = "Search the contour points for duplicates indicating the contour is self-intersecting."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() Then
-                dst2 = runRedList(src, labels(2))
-                rc = task.oldrcD
-                DrawTour(dst2(rc.rect), rc.contour, white, -1)
-            End If
-
-            Dim selfInt As Boolean
-            Dim ptList As New List(Of String)
-            dst3 = rc.mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            For Each pt In rc.contour
-                Dim ptStr = Format(pt.X, "0000") + Format(pt.Y, "0000")
-                If ptList.Contains(ptStr) Then
-                    Dim pct = ptList.Count / rc.contour.Count
-                    If pct > 0.1 And pct < 0.9 Then
-                        selfInt = True
-                        DrawCircle(dst3, pt, task.DotSize, cv.Scalar.Red)
-                    End If
-                End If
-                ptList.Add(ptStr)
-            Next
-            labels(3) = If(selfInt, "Self intersecting - red shows where", "Not self-intersecting")
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-
     Public Class Contour_Largest : Inherits TaskParent
         Public bestContour As New List(Of cv.Point)
         Public allContours As cv.Point()()

@@ -255,8 +255,6 @@ Flood_ContainedCells
 Font_Basics
 Font_FlowText
 Foreground_Basics
-Foreground_CellsBack
-Foreground_CellsFore
 Foreground_Hist3D
 Foreground_KMeans
 Fractal_Mandelbrot
@@ -291,8 +289,6 @@ GuidedBP_Basics
 GuidedBP_Depth
 GuidedBP_HotPoints
 GuidedBP_MultiSlice
-GuidedBP_RedCloud
-GuidedBP_Regions
 GuidedBP_Top
 GuidedBP_TopView
 HeatMap_Basics
@@ -647,7 +643,6 @@ NR_Contour_LineRGB
 NR_Contour_Lines
 NR_Contour_RemoveLines
 NR_Contour_RotatedRects
-NR_Contour_SelfIntersect
 NR_Contour_Smoothing
 NR_ContourPlane_Basics
 NR_ContourPlane_MaxDist
@@ -732,7 +727,6 @@ NR_Distance_LabelsDepth
 NR_Distance_LabelsNoDepth
 NR_Distance_PeakDepth
 NR_Distance_PeakNoDepth
-NR_Distance_RedColor
 NR_Distance_RedDistance
 NR_Dither_Basics
 NR_DNN_Basics
@@ -878,10 +872,8 @@ NR_FLANN_Basics
 NR_FLANN_Test
 NR_Flood_CellStatsPlot
 NR_Flood_Minimal
-NR_Flood_Motion
 NR_Flood_Tiers
 NR_Font_FlowMsgs
-NR_Foreground_RedCloud
 NR_Fractal_Dimension
 NR_Fractal_Julia
 NR_FrameRate_BasicsGray
@@ -984,8 +976,6 @@ NR_Histogram_PeaksDepth
 NR_Histogram_PeaksRGB
 NR_Histogram_PointCloudXYZ
 NR_Histogram_RedCell
-NR_Histogram_ShapeSide
-NR_Histogram_ShapeTop
 NR_Histogram_ToggleFeatureLess
 NR_History_BasicsDiff
 NR_History_Cloud
@@ -1136,8 +1126,6 @@ NR_ML_Color2Depth
 NR_ML_ColorInTier2Depth
 NR_ML_DepthFromColor
 NR_ML_DepthFromXYColor
-NR_ML_LearnRegions
-NR_ML_LearnZfromXGray
 NR_Moments_CentroidKalman
 NR_Motion_Validate
 NR_Motion_ValidateRight

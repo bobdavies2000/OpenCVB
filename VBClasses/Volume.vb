@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Volume_Basics : Inherits TaskParent
-        Public rc As New oldrcData
+        Public rc As New rcData
         Public volume As Single
         Public Sub New()
             desc = "Build a box containing all the 3D points of a RedCloud cell"
@@ -9,7 +9,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 dst2 = runRedList(src, labels(2))
-                rc = task.oldrcD
+                rc = task.rcD
             End If
 
             Dim xList As New List(Of Single)
