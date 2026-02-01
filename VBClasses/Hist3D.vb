@@ -314,10 +314,10 @@ Namespace VBClasses
                             Dim vec = pixels.pixelVector(index - 1)
                             distances.Add(distanceN(vec, hVector.histArray))
                         Next
-                        Dim cell = pixels.oldrclist(candidates(distances.IndexOf(distances.Min)) - 1)
+                        Dim cell = pixels.rclist(candidates(distances.IndexOf(distances.Min)) - 1)
                         dst1(roi).SetTo(cell.color, dst3(roi))
                     ElseIf candidates.Count = 1 Then
-                        Dim cell = pixels.oldrclist(candidates(0) - 1)
+                        Dim cell = pixels.rclist(candidates(0) - 1)
                         dst1(roi).SetTo(cell.color, dst3(roi))
                     End If
                 End If

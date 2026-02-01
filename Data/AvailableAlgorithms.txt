@@ -1211,7 +1211,6 @@ NR_Pixel_NeighborsVertical
 NR_Pixel_SampleColor
 NR_Pixel_Sampler
 NR_Pixel_Unstable
-NR_Pixel_Vector3D
 NR_Plane_EqCorrelation
 NR_Plane_FlatSurfaces
 NR_Plane_FloorStudy
@@ -1418,6 +1417,7 @@ Pixel_NeighborsMask
 Pixel_NeighborsMaskH
 Pixel_NeighborsMaskV
 Pixel_SubPixel
+Pixel_Vector3D
 Pixel_Vectors
 Pixel_Viewer
 Pixel_Zoom

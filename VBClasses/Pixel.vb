@@ -658,9 +658,10 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Pixel_Vector3D : Inherits TaskParent
+    Public Class Pixel_Vector3D : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
         Public pixelVector As New List(Of List(Of Single))
+        Dim redC As New RedColor_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             OptionParent.FindSlider("Histogram 3D Bins").Value = 3
@@ -668,13 +669,15 @@ Namespace VBClasses
             desc = "Identify RedCloud cells and create a vector for each cell's 3D histogram."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            runRedList(src, labels(2))
+            redC.Run(src)
+            labels(2) = redC.labels(2)
+
             Dim maxRegion = 20
 
             If task.heartBeat Then
                 pixelVector.Clear()
                 strOut = "3D histogram counts for each cell - " + CStr(maxRegion) + " largest only for readability..." + vbCrLf
-                For Each rc In task.redList.oldrclist
+                For Each rc In redC.rcList
                     hColor.inputMask = rc.mask
                     hColor.Run(src(rc.rect))
                     pixelVector.Add(hColor.histArray.ToList)
@@ -690,12 +693,12 @@ Namespace VBClasses
 
             dst1.SetTo(0)
             dst2.SetTo(0)
-            For Each rc In task.redList.oldrclist
+            For Each rc In redC.rcList
                 task.color(rc.rect).CopyTo(dst2(rc.rect), rc.mask)
                 dst1(rc.rect).SetTo(rc.color, rc.mask)
                 If rc.index <= maxRegion Then SetTrueText(CStr(rc.index), rc.maxDist, 2)
             Next
-            labels(1) = task.redList.labels(3)
+            labels(1) = redC.labels(3)
         End Sub
     End Class
 
@@ -706,21 +709,24 @@ Namespace VBClasses
     Public Class Pixel_Vectors : Inherits TaskParent
         Dim hVector As New Hist3Dcolor_Vector
         Public pixelVector As New List(Of Single())
-        Public oldrclist As New List(Of oldrcData)
+        Public rclist As New List(Of rcData)
+        Dim redC As New RedColor_Basics
         Public Sub New()
             labels = {"", "", "RedList_Basics output", ""}
             desc = "Create a vector for each cell's 3D histogram."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             pixelVector.Clear()
-            For Each rc In task.redList.oldrclist
+            For Each rc In redC.rcList
                 hVector.inputMask = rc.mask
                 hVector.Run(src(rc.rect))
                 pixelVector.Add(hVector.histArray)
             Next
-            oldrclist = task.redList.oldrclist
+            rclist = redC.rcList
 
             SetTrueText("3D color histograms were created for " + CStr(pixelVector.Count) + " cells", 3)
         End Sub
@@ -733,6 +739,7 @@ Namespace VBClasses
     Public Class Pixel_Mapper : Inherits TaskParent
         Public colorMap As New cv.Mat(256, 1, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         Public Sub New()
+            labels(2) = "The image below is the output of the ApplyColorMap"
             desc = "Resize the input to a small image, convert to gray, and map gray to color"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
