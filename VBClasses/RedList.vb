@@ -251,47 +251,6 @@ Namespace VBClasses
 
 
 
-
-
-
-    Public Class RedList_Hulls : Inherits TaskParent
-        Public oldrclist As New List(Of oldrcData)
-        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Public Sub New()
-            labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
-            desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
-
-            Dim defectCount As Integer
-            task.redList.rcMap.SetTo(0)
-            oldrclist.Clear()
-            For Each rc In task.redList.oldrclist
-                If rc.contour.Count >= 5 Then
-                    rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
-                    Dim hullIndices = cv.Cv2.ConvexHullIndices(rc.hull.ToArray, False)
-                    Try
-                        Dim defects = cv.Cv2.ConvexityDefects(rc.contour, hullIndices)
-                        rc.contour = Convex_RedColorDefects.betterContour(rc.contour, defects)
-                    Catch ex As Exception
-                        defectCount += 1
-                    End Try
-                    DrawTour(rcMap(rc.rect), rc.hull, rc.index, -1)
-                    oldrclist.Add(rc)
-                End If
-            Next
-            dst3 = PaletteFull(rcMap)
-            labels(3) = CStr(oldrclist.Count) + " hulls identified below.  " + CStr(defectCount) +
-                    " hulls failed to build the defect list."
-        End Sub
-    End Class
-
-
-
-
-
-
     Public Class NR_RedList_CellDepthHistogram : Inherits TaskParent
         Dim plot As New Plot_Histogram
         Public Sub New()

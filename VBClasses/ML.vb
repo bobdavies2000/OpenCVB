@@ -319,20 +319,20 @@ Namespace VBClasses
             Dim mlInput As New List(Of mlColor)
             Dim mResponse As New List(Of Single)
             Dim predictList As New List(Of mlColor)
-            Dim roiPredict As New List(Of cv.Rect)
+            Dim grPredict As New List(Of cv.Rect)
             For i = 0 To task.gridRects.Count - 1
-                Dim roi = task.gridRects(i)
+                Dim gr = task.gridRects(i)
                 Dim mls As mlColor
-                mls.colorIndex = color8U.dst2.Get(Of Byte)(roi.Y, roi.X)
-                mls.x = roi.X
-                mls.y = roi.Y
+                mls.colorIndex = color8U.dst2.Get(Of Byte)(gr.Y, gr.X)
+                mls.x = gr.X
+                mls.y = gr.Y
 
-                If task.noDepthMask(roi).CountNonZero > 0 Then
-                    roiPredict.Add(roi)
+                If task.noDepthMask(gr).CountNonZero > 0 Then
+                    grPredict.Add(gr)
                     predictList.Add(mls)
                 Else
                     mlInput.Add(mls)
-                    mResponse.Add(task.pcSplit(2)(roi).Mean())
+                    mResponse.Add(task.pcSplit(2)(gr).Mean())
                 End If
             Next
 
@@ -352,9 +352,9 @@ Namespace VBClasses
             dst3 = task.pcSplit(2).Clone
             For i = 0 To predictList.Count - 1
                 Dim mls = predictList(i)
-                Dim roi = roiPredict(i)
+                Dim gr = grPredict(i)
                 Dim depth = output.Get(Of Single)(i, 0)
-                dst3(roi).SetTo(depth, task.noDepthMask(roi))
+                dst3(gr).SetTo(depth, task.noDepthMask(gr))
             Next
 
         End Sub
@@ -394,20 +394,20 @@ Namespace VBClasses
             Dim mlInput As New List(Of mlColorInTier)
             Dim mResponse As New List(Of Single)
             Dim predictList As New List(Of mlColorInTier)
-            Dim roiPredict As New List(Of cv.Rect)
+            Dim grPredict As New List(Of cv.Rect)
             For i = 0 To task.gridRects.Count - 1
-                Dim roi = task.gridRects(i)
+                Dim gr = task.gridRects(i)
                 Dim mls As mlColorInTier
-                mls.colorIndex = color8U.dst2.Get(Of Byte)(roi.Y, roi.X)
-                mls.x = roi.X
-                mls.y = roi.Y
+                mls.colorIndex = color8U.dst2.Get(Of Byte)(gr.Y, gr.X)
+                mls.x = gr.X
+                mls.y = gr.Y
 
-                If task.noDepthMask(roi).CountNonZero > 0 Then
-                    roiPredict.Add(roi)
+                If task.noDepthMask(gr).CountNonZero > 0 Then
+                    grPredict.Add(gr)
                     predictList.Add(mls)
                 Else
                     mlInput.Add(mls)
-                    mResponse.Add(task.pcSplit(2)(roi).Mean())
+                    mResponse.Add(task.pcSplit(2)(gr).Mean())
                 End If
             Next
 
@@ -427,9 +427,9 @@ Namespace VBClasses
             dst3 = task.pcSplit(2).Clone
             For i = 0 To predictList.Count - 1
                 Dim mls = predictList(i)
-                Dim roi = roiPredict(i)
+                Dim gr = grPredict(i)
                 Dim depth = output.Get(Of Single)(i, 0)
-                dst3(roi).SetTo(depth, task.noDepthMask(roi))
+                dst3(gr).SetTo(depth, task.noDepthMask(gr))
             Next
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose

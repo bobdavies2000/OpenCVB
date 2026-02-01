@@ -57,7 +57,7 @@ Namespace VBClasses
             Next
 
             task.redList.oldrclist = New List(Of oldrcData)(sortedCells.Values)
-            dst2 = RebuildRCMap(sortedCells.Values.ToList)
+            dst2 = XO_RedList_MaxDist.RebuildRCMap(sortedCells.Values.ToList)
 
             labels(2) = CStr(task.redList.oldrclist.Count) + " cells were identified and " + CStr(matched.Count) + " were matched."
         End Sub

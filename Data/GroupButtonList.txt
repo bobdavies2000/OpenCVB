@@ -84,7 +84,7 @@ GrabCut
 Gradient
 Gravity
 Grid
-GridROI
+GridRect
 GuidedBP
 HeatMap
 HighVis
@@ -165,6 +165,7 @@ Puzzle
 Pyramid
 PyrFilter
 QRcode
+Quad
 Quadrant
 Quaternion
 Random

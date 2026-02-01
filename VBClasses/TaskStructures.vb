@@ -556,50 +556,6 @@ Namespace VBClasses
 
 
 
-        Public Class oldrcData
-            Public rect As cv.Rect
-            Public mask As cv.Mat
-            Public pixels As Integer
-            Public age As Integer
-
-            Public color As cv.Scalar
-
-            Public depthPixels As Integer
-            Public depthMask As cv.Mat
-            Public depth As Single
-
-            Public mmX As mmData
-            Public mmY As mmData
-            Public mmZ As mmData
-
-            Public maxDist As cv.Point
-            Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
-
-            Public index As Integer
-            Public indexLast As Integer
-
-            Public container As Integer
-
-            Public contour As New List(Of cv.Point)
-
-            Public ptFacets As New List(Of cv.Point)
-            Public ptList As New List(Of cv.Point)
-
-            ' transition these...
-            Public nabs As New List(Of Integer)
-            Public hull As New List(Of cv.Point)
-            Public eq As cv.Vec4f ' plane equation
-            Public contour3D As New List(Of cv.Point3f)
-            Public Sub New()
-                index = 0
-                mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
-                depthMask = mask
-                rect = New cv.Rect(0, 0, 1, 1)
-            End Sub
-        End Class
-
-
-
 
         Public Class rcData
             Public age As Integer = 1

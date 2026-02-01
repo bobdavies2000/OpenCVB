@@ -1,15 +1,18 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedTrack_Basics : Inherits TaskParent
+        Dim redC As New RedColor_Basics
         Public Sub New()
             If New cv.Size(task.workRes.Width, task.workRes.Height) <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
             desc = "Get stats on each RedCloud cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = runRedList(src, labels(2))
-            labels(2) = task.redList.labels(2)
+            redC.Run(src)
+            dst3 = redC.dst2
+            labels(3) = redC.labels(2)
+
             dst2.SetTo(0)
-            For Each rc As oldrcData In task.redList.oldrclist
+            For Each rc As rcData In redC.rcList
                 DrawTour(dst2(rc.rect), rc.contour, rc.color, -1)
                 If rc.index = task.oldrcD.index Then DrawTour(dst2(rc.rect), rc.contour, white, -1)
             Next

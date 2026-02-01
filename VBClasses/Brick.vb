@@ -168,9 +168,9 @@ Namespace VBClasses
             For i = 0 To bounds.boundaryCells.Count - 1
                 Dim nList = bounds.boundaryCells(i)
 
-                ' the first roi is the center one and the only roi with edges.  The rest are featureless.
-                Dim roi = task.gridRects(nList(0))
-                Dim edgePixels = edgeMask(roi).FindNonZero()
+                ' the first gr is the center one and the only gr with edges.  The rest are featureless.
+                Dim gr = task.gridRects(nList(0))
+                Dim edgePixels = edgeMask(gr).FindNonZero()
 
                 ' mark the edge pixels as class 2 - others will be updated next
                 ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
@@ -179,9 +179,9 @@ Namespace VBClasses
                 trainDepth = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32F)
 
                 For j = 1 To nList.Count - 1
-                    Dim roiA = task.gridRects(nList(j))
-                    Dim x As Integer = Math.Floor(roiA.X * task.bricksPerRow / task.cols)
-                    Dim y As Integer = Math.Floor(roiA.Y * task.bricksPerCol / task.rows)
+                    Dim grA = task.gridRects(nList(j))
+                    Dim x As Integer = Math.Floor(grA.X * task.bricksPerRow / task.cols)
+                    Dim y As Integer = Math.Floor(grA.Y * task.bricksPerCol / task.rows)
                     Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
                     trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
                     trainDepth.Set(Of Single)(j - 1, 0, task.lowResDepth.Get(Of Single)(y, x))
@@ -192,20 +192,20 @@ Namespace VBClasses
                 Dim index = nList.Count - 1
                 For j = 0 To edgePixels.Rows - 1
                     Dim pt = edgePixels.Get(Of cv.Point)(j, 0)
-                    Dim val = rgb32f(roi).Get(Of cv.Vec3f)(pt.Y, pt.X)
+                    Dim val = rgb32f(gr).Get(Of cv.Vec3f)(pt.Y, pt.X)
                     trainRGB.Set(Of cv.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
-                    Dim depth = task.pcSplit(2)(roi).Get(Of Single)(pt.Y, pt.X)
+                    Dim depth = task.pcSplit(2)(gr).Get(Of Single)(pt.Y, pt.X)
                     trainDepth.Set(Of Single)(index + j, 0, depth)
                 Next
 
                 ml.trainMats = {trainRGB, trainDepth}
 
-                Dim roiB = task.gridRects(nList(0))
-                ml.testMats = {rgb32f(roiB), task.pcSplit(2)(roiB)}
+                Dim grB = task.gridRects(nList(0))
+                ml.testMats = {rgb32f(grB), task.pcSplit(2)(grB)}
                 ml.Run(src)
 
-                dst1(roiB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
-                                        ConvertScaleAbs.Reshape(1, roiB.Height)
+                dst1(grB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
+                                        ConvertScaleAbs.Reshape(1, grB.Height)
             Next
 
             dst2.SetTo(0)
@@ -635,14 +635,14 @@ Namespace VBClasses
 
             boundaryCells.Clear()
             For Each nabeList In task.grid.gridNeighbors
-                Dim roiA = task.gridRects(nabeList(0))
-                Dim centerType = feat.featureMask.Get(Of Byte)(roiA.Y, roiA.X)
+                Dim grA = task.gridRects(nabeList(0))
+                Dim centerType = feat.featureMask.Get(Of Byte)(grA.Y, grA.X)
                 If centerType <> 0 Then
                     Dim boundList = New List(Of Integer)
                     Dim addFirst As Boolean = True
                     For i = 1 To nabeList.Count - 1
-                        Dim roiB = task.gridRects(nabeList(i))
-                        Dim val = feat.featureMask.Get(Of Byte)(roiB.Y, roiB.X)
+                        Dim grB = task.gridRects(nabeList(i))
+                        Dim val = feat.featureMask.Get(Of Byte)(grB.Y, grB.X)
                         If centerType <> val Then
                             If addFirst Then boundList.Add(nabeList(0)) ' first element is the center point (has features)
                             addFirst = False
@@ -657,8 +657,8 @@ Namespace VBClasses
             For Each nlist In boundaryCells
                 For Each n In nlist
                     Dim mytoggle As Integer
-                    Dim roi = task.gridRects(n)
-                    Dim val = feat.featureMask.Get(Of Byte)(roi.Y, roi.X)
+                    Dim gr = task.gridRects(n)
+                    Dim val = feat.featureMask.Get(Of Byte)(gr.Y, gr.X)
                     If val > 0 Then mytoggle = 255 Else mytoggle = 128
                     dst2(task.gridRects(n)).SetTo(mytoggle)
                 Next
@@ -692,9 +692,9 @@ Namespace VBClasses
             For i = 0 To bounds.boundaryCells.Count - 1
                 Dim nList = bounds.boundaryCells(i)
 
-                ' the first roi is the center one and the only roi with edges.  The rest are featureless.
-                Dim roi = task.gridRects(nList(0))
-                Dim edgePixels = edgeMask(roi).FindNonZero()
+                ' the first gr is the center one and the only gr with edges.  The rest are featureless.
+                Dim gr = task.gridRects(nList(0))
+                Dim edgePixels = edgeMask(gr).FindNonZero()
 
                 ' mark the edge pixels as class 2 - others will be updated next
                 ml.trainResponse = New cv.Mat(nList.Count + edgePixels.Rows - 1, 1,
@@ -702,9 +702,9 @@ Namespace VBClasses
                 trainRGB = New cv.Mat(ml.trainResponse.Rows, 1, cv.MatType.CV_32FC3)
 
                 For j = 1 To nList.Count - 1
-                    Dim roiA = task.gridRects(nList(j))
-                    Dim x As Integer = Math.Floor(roiA.X * task.bricksPerRow / task.cols)
-                    Dim y As Integer = Math.Floor(roiA.Y * task.bricksPerCol / task.rows)
+                    Dim grA = task.gridRects(nList(j))
+                    Dim x As Integer = Math.Floor(grA.X * task.bricksPerRow / task.cols)
+                    Dim y As Integer = Math.Floor(grA.Y * task.bricksPerCol / task.rows)
                     Dim val = task.lowResColor.Get(Of cv.Vec3f)(y, x)
                     trainRGB.Set(Of cv.Vec3f)(j - 1, 0, val)
                     ml.trainResponse.Set(Of Single)(j - 1, 0, 1)
@@ -714,18 +714,18 @@ Namespace VBClasses
                 Dim index = nList.Count - 1
                 For j = 0 To edgePixels.Rows - 1
                     Dim pt = edgePixels.Get(Of cv.Point)(j, 0)
-                    Dim val = rgb32f.Get(Of cv.Vec3f)(roi.Y + pt.Y, roi.X + pt.X)
+                    Dim val = rgb32f.Get(Of cv.Vec3f)(gr.Y + pt.Y, gr.X + pt.X)
                     trainRGB.Set(Of cv.Vec3f)(index + j, 0, val) ' ml.trainResponse already set to 2
                 Next
 
                 ml.trainMats = {trainRGB}
 
-                Dim roiB = task.gridRects(nList(0))
-                ml.testMats = {rgb32f(roiB)}
+                Dim grB = task.gridRects(nList(0))
+                ml.testMats = {rgb32f(grB)}
                 ml.Run(src)
 
-                dst1(roiB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
-                                        ConvertScaleAbs.Reshape(1, roiB.Height)
+                dst1(grB) = ml.predictions.Threshold(1.5, 255, cv.ThresholdTypes.BinaryInv).
+                                        ConvertScaleAbs.Reshape(1, grB.Height)
             Next
 
             dst2.SetTo(0)

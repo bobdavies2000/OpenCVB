@@ -77,11 +77,10 @@ Namespace VBClasses
 
                 SetTrueText(CStr(rc.age), rc.maxDist)
             Next
-            If standaloneTest() Then
-                RedCloud_Cell.selectCell(rcMap, rcList)
-                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
-                SetTrueText(strOut, 3)
-            End If
+
+            RedCloud_Cell.selectCell(rcMap, rcList)
+            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            SetTrueText(strOut, 3)
 
             labels(2) = CStr(classCount) + " RedColor cells. " + CStr(rcList.Count) + " cells >" +
                         " minpixels.  " + CStr(rcList.Count - changed) + " matched to previous generation"
@@ -276,6 +275,79 @@ Namespace VBClasses
 
             dst3 = ShowAddweighted(dst1, task.rightView, labels(3))
             labels(3) += " " + CStr(count) + " bricks mapped into the right image."
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class RedColor_Hulls : Inherits TaskParent
+        Public rclist As New List(Of rcData)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim redC As New RedColor_Basics
+        Public Sub New()
+            labels = {"", "Cells where convexity defects failed", "", "Improved contour results Using OpenCV's ConvexityDefects"}
+            desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            Dim defectCount As Integer
+            rcMap.SetTo(0)
+            rclist.Clear()
+            For Each rc In redC.rcList
+                If rc.contour.Count >= 5 Then
+                    rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
+                    Dim hullIndices = cv.Cv2.ConvexHullIndices(rc.hull.ToArray, False)
+                    Try
+                        Dim defects = cv.Cv2.ConvexityDefects(rc.contour, hullIndices)
+                        rc.contour = Convex_RedColorDefects.betterContour(rc.contour, defects)
+                    Catch ex As Exception
+                        defectCount += 1
+                    End Try
+                    DrawTour(rcMap(rc.rect), rc.hull, rc.index, -1)
+                    rclist.Add(rc)
+                End If
+            Next
+            dst3 = PaletteFull(rcMap)
+            labels(3) = CStr(rclist.Count) + " hulls identified below.  " + CStr(defectCount) +
+                    " hulls failed to build the defect list."
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class RedColor_GridRects : Inherits TaskParent
+        Dim redC As New RedColor_Basics
+        Public rcGridMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0) ' map of rc data to grid map
+        Public Sub New()
+            labels(3) = "RedColor output mapped into the gridrects."
+            desc = "Create a triangle representation of the point cloud with RedCloud data"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+
+            rcGridMap.SetTo(0)
+            dst3.SetTo(0)
+            For i = 0 To task.gridRects.Count - 1
+                Dim gr = task.gridRects(i)
+
+                Dim center = New cv.Point(CInt(gr.X + gr.Width / 2), CInt(gr.Y + gr.Height / 2))
+                Dim index = redC.rcMap.Get(Of Byte)(center.Y, center.X) - 1
+                If index >= redC.rcList.Count Or index < 0 Then Continue For
+                Dim rc = redC.rcList(index)
+                dst3(gr).SetTo(rc.color)
+                rcGridMap(gr).SetTo(rc.index)
+            Next
+            RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
         End Sub
     End Class
 End Namespace

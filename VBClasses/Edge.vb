@@ -412,16 +412,17 @@ Namespace VBClasses
             Dim maxLocs(task.gridRects.Count - 1) As Integer
             Dim highlights As New List(Of Integer)
             For i = 0 To task.gridRects.Count - 1
-                Dim roi = task.gridRects(i)
-                Dim width = If(roi.X + roi.Width + options.searchDepth < dst2.Width, roi.Width + options.searchDepth, dst2.Width - roi.X - 1)
-                Dim searchROI = New cv.Rect(roi.X, roi.Y, width, roi.Height)
-                match.template = dst3(roi)
-                match.Run(dst2(searchROI))
+                Dim gr = task.gridRects(i)
+                Dim width = If(gr.X + gr.Width + options.searchDepth < dst2.Width,
+                                      gr.Width + options.searchDepth, dst2.Width - gr.X - 1)
+                Dim searchgr = New cv.Rect(gr.X, gr.Y, width, gr.Height)
+                match.template = dst3(gr)
+                match.Run(dst2(searchgr))
 
                 maxLocs(i) = match.newRect.X
                 If match.correlation > options.threshold Or redRects.Contains(i) Then
                     highlights.Add(i)
-                    SetTrueText(Format(match.correlation, fmt2), New cv.Point(roi.X, roi.Y), 3)
+                    SetTrueText(Format(match.correlation, fmt2), New cv.Point(gr.X, gr.Y), 3)
                 End If
             Next
 
@@ -435,11 +436,11 @@ Namespace VBClasses
             If options.highlightChecked Then
                 labels(2) = "Matched grid segments in dst3 with disparity"
                 For Each i In highlights
-                    Dim roi = task.gridRects(i)
-                    dst3.Rectangle(roi, cv.Scalar.Red, 2)
-                    roi.X += maxLocs(i)
-                    dst2.Rectangle(roi, cv.Scalar.Red, 2)
-                    SetTrueText(CStr(maxLocs(i)), New cv.Point(roi.X, roi.Y), 2)
+                    Dim gr = task.gridRects(i)
+                    dst3.Rectangle(gr, cv.Scalar.Red, 2)
+                    gr.X += maxLocs(i)
+                    dst2.Rectangle(gr, cv.Scalar.Red, 2)
+                    SetTrueText(CStr(maxLocs(i)), New cv.Point(gr.X, gr.Y), 2)
                 Next
             Else
                 labels(2) = "Click in dst3 to highlight segment in dst2"
@@ -451,11 +452,11 @@ Namespace VBClasses
                 If task.gridROIclicked Then
                     If redRects.Contains(task.gridROIclicked) = False Then redRects.Add(task.gridROIclicked)
                     For Each i In redRects
-                        Dim roi = task.gridRects(i)
-                        dst3.Rectangle(roi, cv.Scalar.Red, 2)
-                        roi.X += maxLocs(i)
-                        dst2.Rectangle(roi, cv.Scalar.Red, 2)
-                        SetTrueText(CStr(maxLocs(i)), New cv.Point(roi.X, roi.Y), 2)
+                        Dim gr = task.gridRects(i)
+                        dst3.Rectangle(gr, cv.Scalar.Red, 2)
+                        gr.X += maxLocs(i)
+                        dst2.Rectangle(gr, cv.Scalar.Red, 2)
+                        SetTrueText(CStr(maxLocs(i)), New cv.Point(gr.X, gr.Y), 2)
                     Next
                 End If
             End If

@@ -228,14 +228,14 @@ Namespace VBClasses
             Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
             Dim hist As New cv.Mat
             For i = 0 To task.gridRects.Count - 1
-                Dim roi = task.gridRects(i)
-                cv.Cv2.CalcHist({dst1(roi)}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
+                Dim gr = task.gridRects(i)
+                cv.Cv2.CalcHist({dst1(gr)}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
                 hist = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
 
-                Dim nextEntropy = entropy.channelEntropy(dst1(roi).Total, hist) * 1000
+                Dim nextEntropy = entropy.channelEntropy(dst1(gr).Total, hist) * 1000
 
                 entropies(subDivisions(i)).Add(nextEntropy)
-                eROI(subDivisions(i)).Add(roi)
+                eROI(subDivisions(i)).Add(gr)
             Next
 
             Dim str = If(task.toggleOn, "minimum", "maximum")

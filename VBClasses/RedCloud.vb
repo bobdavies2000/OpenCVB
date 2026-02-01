@@ -220,19 +220,21 @@ Namespace VBClasses
                 Dim clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X) - 1
                 If clickIndex >= 0 And clickIndex < rcList.Count Then
                     task.rcD = rcList(clickIndex)
+                    'Else
+                    '    Dim ages As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+                    '    For Each pc In rcList
+                    '        ages.Add(pc.age, pc.index - 1)
+                    '    Next
+                    '    task.rcD = rcList(ages.ElementAt(0).Value)
                 Else
-                    Dim ages As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-                    For Each pc In rcList
-                        ages.Add(pc.age, pc.index - 1)
-                    Next
-                    task.rcD = rcList(ages.ElementAt(0).Value)
+                    If task.rcD.rect.Contains(task.clickPoint) Then
+                        task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                    End If
+                    task.rcD = rcList(0)
                 End If
-                If task.rcD.rect.Contains(task.clickPoint) Then
-                    task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
-                    Exit Sub
-                End If
+            Else
+                task.rcD = Nothing
             End If
-            task.rcD = Nothing
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then dst2 = runRedCloud(src, labels(2))

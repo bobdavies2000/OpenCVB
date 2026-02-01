@@ -12,14 +12,14 @@ Namespace VBClasses
             For i = 0 To diff.Count - 1
                 diff(i) = New Diff_Basics
             Next
-            labels = {"", "Quartiles for selected roi.  Click in dst1 to see different roi.", "4 brightness levels - darkest to lightest",
+            labels = {"", "Quartiles for selected gr.  Click in dst1 to see different gr.", "4 brightness levels - darkest to lightest",
                           "Quartiles for the selected grid element, darkest to lightest"}
             desc = "Highlight the contours for each grid element with stats for each."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static index As Integer = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
             index = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            Dim roiSave = If(index < task.gridRects.Count, task.gridRects(index), New cv.Rect)
+            Dim grSave = If(index < task.gridRects.Count, task.gridRects(index), New cv.Rect)
 
             If task.optionsChanged Then index = 0
 
@@ -50,16 +50,16 @@ Namespace VBClasses
             Dim allContours As cv.Point()() = Nothing
             For i = 0 To counts.GetUpperBound(0)
                 For j = 0 To task.gridRects.Count - 1
-                    Dim roi = task.gridRects(j)
-                    Dim tmp = matList(i)(roi)
+                    Dim gr = task.gridRects(j)
+                    Dim tmp = matList(i)(gr)
                     cv.Cv2.FindContours(tmp, allContours, Nothing, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
                     If i = 0 Then
                         contourCounts.Add(New List(Of Integer))
                         means.Add(New List(Of Single))
                     End If
                     contourCounts(j).Add(allContours.Count)
-                    means(j).Add(task.gray(roi).Mean(tmp)(0))
-                    If i = quadrant Then SetTrueText(CStr(allContours.Count), roi.TopLeft, 1)
+                    means(j).Add(task.gray(gr).Mean(tmp)(0))
+                    If i = quadrant Then SetTrueText(CStr(allContours.Count), gr.TopLeft, 1)
                     counts(i, j) = allContours.Count
                 Next
             Next
@@ -67,11 +67,11 @@ Namespace VBClasses
             Dim bump = 3
             Dim ratio = dst2.Height / task.gridRects(0).Height
             For i = 0 To matList.Count - 1
-                Dim tmp As cv.Mat = matList(i)(roiSave) * 0.5
+                Dim tmp As cv.Mat = matList(i)(grSave) * 0.5
                 Dim nextCount = tmp.CountNonZero
-                Dim tmpVolatile As cv.Mat = dst0(roiSave) And tmp
+                Dim tmpVolatile As cv.Mat = dst0(grSave) And tmp
                 tmp.SetTo(255, tmpVolatile)
-                dst0(roiSave).CopyTo(tmp, tmpVolatile)
+                dst0(grSave).CopyTo(tmp, tmpVolatile)
                 Dim r = New cv.Rect(0, 0, tmp.Width * ratio, tmp.Height * ratio)
                 mats.mat(i)(r) = tmp.Resize(New cv.Size(r.Width, r.Height))
 
@@ -92,8 +92,8 @@ Namespace VBClasses
             mats.Run(emptyMat)
             dst3 = mats.dst2
 
-            dst1.Rectangle(roiSave, white, task.lineWidth)
-            task.color.Rectangle(roiSave, white, task.lineWidth)
+            dst1.Rectangle(grSave, white, task.lineWidth)
+            task.color.Rectangle(grSave, white, task.lineWidth)
         End Sub
     End Class
 

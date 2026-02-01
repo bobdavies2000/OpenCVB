@@ -1,12 +1,13 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Projection_Basics : Inherits TaskParent
-        Public redCellInput As New List(Of oldrcData)
-        Public oldrclist As New List(Of oldrcData)
+        Public redCellInput As New List(Of rcData)
+        Public rclist As New List(Of rcData)
         Public viewType As String = "Top"
         Public objectList As New List(Of cv.Vec4f)
         Public showRectangles As Boolean = True
         Dim histTop As New Projection_HistTop
+        Public redC As New RedColor_Basics
         Public Sub New()
             desc = "Find all the masks, rects, and counts in the input"
         End Sub
@@ -15,11 +16,15 @@ Namespace VBClasses
                 histTop.Run(src)
                 src = histTop.dst2
 
-                dst2 = runRedList(histTop.dst3, labels(2), Not histTop.dst3)
-                redCellInput = task.redList.oldrclist
+                ' redC.inputRemoved = Not histTop.dst3
+                redC.Run(histTop.dst3)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+
+                redCellInput = redC.rcList
             End If
 
-            Dim sortedCells As New SortedList(Of Integer, oldrcData)(New compareAllowIdenticalIntegerInverted)
+            Dim sortedCells As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
             Dim check2 As Integer
             For i = 0 To redCellInput.Count - 1
                 Dim rc = redCellInput(i)
@@ -30,11 +35,11 @@ Namespace VBClasses
                 check2 += rc.pixels
             Next
 
-            oldrclist.Clear()
-            oldrclist.Add(New oldrcData)
+            rclist.Clear()
+            rclist.Add(New rcData)
             For Each rc In sortedCells.Values
-                rc.index = oldrclist.Count
-                oldrclist.Add(rc)
+                rc.index = rclist.Count
+                rclist.Add(rc)
             Next
 
             Dim meterDesc = "tall"
@@ -46,7 +51,7 @@ Namespace VBClasses
             objectList.Clear()
             Dim xy1 As Single, xy2 As Single, z1 As Single, z2 As Single
             If task.heartBeat Then strOut = ""
-            For Each rc In oldrclist
+            For Each rc In rclist
                 If rc.index = 0 Then Continue For
                 If viewType = "Side" Then
                     xy1 = (ranges(0).End - ranges(0).Start) * rc.rect.Y / dst2.Height + ranges(0).Start
@@ -75,11 +80,11 @@ Namespace VBClasses
             End If
             SetTrueText(strOut, 3)
             If showRectangles Then
-                For i = 0 To oldrclist.Count - 1
-                    dst2.Rectangle(oldrclist(i).rect, task.highlight, task.lineWidth)
+                For i = 0 To rclist.Count - 1
+                    dst2.Rectangle(rclist(i).rect, task.highlight, task.lineWidth)
                 Next
             End If
-            labels(2) = CStr(oldrclist.Count) + " objects were found in the " + viewType + " view."
+            labels(2) = CStr(rclist.Count) + " objects were found in the " + viewType + " view."
         End Sub
     End Class
 
@@ -178,7 +183,7 @@ Namespace VBClasses
                 Dim upper = New cv.Scalar(top.objects.objectList(index)(1), +100, top.objects.objectList(index)(3))
                 Dim mask = task.pointCloud.InRange(lower, upper)
 
-                Dim rc = top.objects.oldrclist(task.gOptions.DebugSlider.Value + 1) ' the biggest by default...
+                Dim rc = top.objects.rclist(task.gOptions.DebugSlider.Value + 1) ' the biggest by default...
                 dst0.SetTo(0)
                 dst0(rc.rect) = top.histTop.dst2(rc.rect).Threshold(0, 255, cv.ThresholdTypes.Binary)
                 dst0.SetTo(0, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -211,8 +216,8 @@ Namespace VBClasses
             labels(2) = isolate.labels(2)
             labels(3) = isolate.labels(3)
 
-            If objSlider.Value + 1 >= isolate.side.objects.oldrclist.Count Then Exit Sub
-            Dim rc = isolate.top.objects.oldrclist(objSlider.Value + 1) ' the biggest by default...
+            If objSlider.Value + 1 >= isolate.side.objects.rclist.Count Then Exit Sub
+            Dim rc = isolate.top.objects.rclist(objSlider.Value + 1) ' the biggest by default...
             Dim rowList As New List(Of Integer)
             For y = 0 To rc.rect.Height - 1
                 rowList.Add(dst2(rc.rect).Row(y).CountNonZero() + rc.rect.Y)
@@ -234,23 +239,26 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Projection_Cell : Inherits TaskParent
+    Public Class Projection_Cell : Inherits TaskParent
         Dim heat As New HeatMap_Basics
         Dim heatCell As New HeatMap_Basics
+        Dim redC As New RedColor_Basics
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_32FC3, 0)
             If standalone Then task.gOptions.displayDst1.Checked = True
-            labels = {"", "Top View projection of the selected cell", "RedList_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
+            labels = {"", "Top View projection of the selected cell", "RedColor_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
             desc = "Create a top and side projection of the selected cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             heat.Run(src)
             dst1 = heat.dst2.Clone
             dst3 = heat.dst3.Clone
 
-            Dim rc = task.oldrcD
+            Dim rc = task.rcD
 
             dst0.SetTo(0)
             task.pointCloud(rc.rect).CopyTo(dst0(rc.rect), rc.mask)
@@ -316,15 +324,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             histTop.Run(src)
 
-            dst2 = runRedList(histTop.dst3, labels(2), Not histTop.dst3)
+            objects.redC.Run(histTop.dst3)
 
-            objects.redCellInput = task.redList.oldrclist
-            objects.dst2 = task.redList.dst2
-            objects.labels(2) = task.redList.labels(2)
+            objects.redCellInput = objects.redC.rcList
+            objects.dst2 = objects.redC.dst2
+            objects.labels(2) = objects.redC.labels(2)
             objects.Run(histTop.dst2)
 
             dst2 = objects.dst2
-            labels(2) = task.redList.labels(2)
+            labels(2) = objects.redC.labels(2)
             SetTrueText(objects.strOut, 3)
         End Sub
     End Class
@@ -346,15 +354,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             histSide.Run(src)
 
-            dst2 = runRedList(histSide.dst3, labels(2), Not histSide.dst3)
+            objects.redC.Run(histSide.dst3)
 
-            objects.redCellInput = task.redList.oldrclist
-            objects.dst2 = task.redList.dst2
-            objects.labels(2) = task.redList.labels(2)
+            objects.redCellInput = objects.redC.rcList
+            objects.dst2 = objects.redC.dst2
+            objects.labels(2) = objects.redC.labels(2)
             objects.Run(histSide.dst2)
 
             dst2 = objects.dst2
-            labels(2) = task.redList.labels(2)
+            labels(2) = objects.redC.labels(2)
             SetTrueText(objects.strOut, 3)
         End Sub
     End Class

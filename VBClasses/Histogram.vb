@@ -1446,11 +1446,11 @@ Namespace VBClasses
 
                     Dim maxVal = histData.ToList.Max
                     For i = 0 To task.gridRects.Count - 1
-                        Dim roi = task.gridRects(i)
+                        Dim gr = task.gridRects(i)
                         If i >= histData.Length Then
-                            dst2(roi).SetTo(0)
+                            dst2(gr).SetTo(0)
                         Else
-                            dst2(roi).SetTo(255 * histData(i) / maxVal)
+                            dst2(gr).SetTo(255 * histData(i) / maxVal)
                         End If
                     Next
                     labels(2) = "2D plot of the resulting 3D histogram."

@@ -11,24 +11,24 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
-            Dim roi = task.gridRects(index)
+            Dim gr = task.gridRects(index)
 
             colorFmt.Run(task.color)
             hist2d.Run(colorFmt.dst2)
             dst2 = hist2d.dst2
 
-            If standaloneTest() Then DrawRect(dst2, roi, white)
+            If standaloneTest() Then DrawRect(dst2, gr, white)
 
             Dim histogram As New cv.Mat
             If backProjectByGrid Then
                 histogram = task.gridMap.Clone
             Else
                 histogram = New cv.Mat(hist2d.histogram.Size, cv.MatType.CV_32F, cv.Scalar.All(0))
-                hist2d.histogram(roi).CopyTo(histogram(roi))
+                hist2d.histogram(gr).CopyTo(histogram(gr))
             End If
             cv.Cv2.CalcBackProject({colorFmt.dst2}, hist2d.channels, histogram, dst0, hist2d.ranges)
 
-            Dim bpCount = hist2d.histogram(roi).CountNonZero
+            Dim bpCount = hist2d.histogram(gr).CountNonZero
 
             If backProjectByGrid Then
                 Dim mm = GetMinMax(dst0)
@@ -331,12 +331,13 @@ Namespace VBClasses
             backp.Run(task.color)
             dst2 = Mat_Convert.Mat_32f_To_8UC3(backp.dst2) * 255
 
-            Dim roi = task.gridRects(task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X))
+            Dim gr = task.gridRects(task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y,
+                                                                 task.mouseMovePoint.X))
             Dim rect As cv.Rect
             If options.backProjectRow Then
-                rect = New cv.Rect(0, roi.Y, dst2.Width, roi.Height)
+                rect = New cv.Rect(0, gr.Y, dst2.Width, gr.Height)
             Else
-                rect = New cv.Rect(roi.X, 0, roi.Width, dst2.Height)
+                rect = New cv.Rect(gr.X, 0, gr.Width, dst2.Height)
             End If
             dst2.Rectangle(rect, task.highlight, task.lineWidth)
             Dim histData As New cv.Mat(backp.hist2d.histogram.Size, cv.MatType.CV_32F, cv.Scalar.All(0))

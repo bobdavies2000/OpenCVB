@@ -59,62 +59,6 @@ Namespace VBClasses
 
 
 
-
-
-
-
-
-    Public Class NR_MatchShapes_NearbyHull : Inherits TaskParent
-        Public similarCells As New List(Of oldrcData)
-        Public bestCell As Integer
-        Dim rc As New oldrcData
-        Dim options As New Options_MatchShapes
-        Dim hulls As New RedList_Hulls
-        Public Sub New()
-            labels = {"", "", "Output of RedList_Hulls", "Cells similar to selected cell"}
-            desc = "MatchShapes: Find all the reasonable matches (< 1.0 for matchVal)"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            If standaloneTest() Then
-                hulls.Run(task.color)
-                If task.redList.oldrclist.Count = 0 Then Exit Sub
-                dst2 = hulls.dst2
-                rc = task.oldrcD
-            End If
-
-            dst3.SetTo(0)
-            similarCells.Clear()
-
-            Dim minMatch As Single = Single.MaxValue
-            For Each rc2 In task.redList.oldrclist
-                If rc2.hull Is Nothing Or rc.hull Is Nothing Then Continue For
-                If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta Then Continue For
-                Dim matchVal = cv.Cv2.MatchShapes(rc.hull, rc2.hull, options.matchOption)
-                If matchVal < options.matchThreshold Then
-                    If matchVal < minMatch And matchVal > 0 Then
-                        minMatch = matchVal
-                        bestCell = similarCells.Count
-                    End If
-                    DrawTour(dst3(rc2.rect), rc2.hull, white, -1)
-                    similarCells.Add(rc2)
-                End If
-            Next
-
-            If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-
-
     Public Class NR_MatchShapes_Nearby : Inherits TaskParent
         Public oldrclist As New List(Of oldrcData)
         Public similarCells As New List(Of oldrcData)
@@ -181,10 +125,10 @@ Namespace VBClasses
 
     Public Class NR_MatchShapes_Hulls : Inherits TaskParent
         Dim options As New Options_MatchShapes
-        Dim hulls As New RedList_Hulls
+        Dim hulls As New RedColor_Hulls
         Public Sub New()
             OptionParent.FindSlider("Match Threshold %").Value = 3
-            labels = {"", "", "Output of RedList_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
+            labels = {"", "", "Output of RedColor_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
             desc = "Find all RedCloud hull shapes similar to the one selected.  Use sliders and radio buttons to see impact."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -194,9 +138,9 @@ Namespace VBClasses
             dst2 = hulls.dst2
             If task.heartBeat Then dst3.SetTo(0)
 
-            Dim rcX = task.oldrcD
+            Dim rcX = task.rcD
 
-            For Each rc In task.redList.oldrclist
+            For Each rc In hulls.rclist
                 If rc.hull Is Nothing Or rcX.hull Is Nothing Then Continue For
                 Dim matchVal = cv.Cv2.MatchShapes(rcX.hull, rc.hull, options.matchOption)
                 If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.hull, white, -1)
@@ -216,6 +160,7 @@ Namespace VBClasses
 
     Public Class NR_MatchShapes_Contours : Inherits TaskParent
         Dim options As New Options_MatchShapes
+        Dim redC As New RedColor_Basics
         Public Sub New()
             OptionParent.FindSlider("Match Threshold %").Value = 3
             labels = {"", "", "Output of RedList_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
@@ -225,15 +170,70 @@ Namespace VBClasses
             options.Run()
 
             dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
             If task.heartBeat Then dst3.SetTo(0)
 
-            Dim rcX = task.oldrcD
+            Dim rcX = task.rcD
 
             For Each rc In task.redList.oldrclist
                 If rc.contour Is Nothing Then Continue For
                 Dim matchVal = cv.Cv2.MatchShapes(rcX.contour, rc.contour, options.matchOption)
                 If matchVal < options.matchThreshold Then DrawTour(dst3(rc.rect), rc.contour, white, -1)
             Next
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+
+
+
+    Public Class NR_MatchShapes_NearbyHull : Inherits TaskParent
+        Public similarCells As New List(Of rcData)
+        Public bestCell As Integer
+        Dim rc As New rcData
+        Dim options As New Options_MatchShapes
+        Dim hulls As New RedColor_Hulls
+        Public Sub New()
+            labels = {"", "", "Output of RedColor_Hulls", "Cells similar to selected cell"}
+            desc = "MatchShapes: Find all the reasonable matches (< 1.0 for matchVal)"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If standaloneTest() Then
+                hulls.Run(task.color)
+                If hulls.rclist.Count = 0 Then Exit Sub
+                dst2 = hulls.dst2
+                rc = task.rcD
+            End If
+
+            dst3.SetTo(0)
+            similarCells.Clear()
+
+            Dim minMatch As Single = Single.MaxValue
+            For Each rc2 In hulls.rclist
+                If rc2.hull Is Nothing Or rc.hull Is Nothing Then Continue For
+                If Math.Abs(rc2.maxDist.Y - rc.maxDist.Y) > options.maxYdelta Then Continue For
+                Dim matchVal = cv.Cv2.MatchShapes(rc.hull, rc2.hull, options.matchOption)
+                If matchVal < options.matchThreshold Then
+                    If matchVal < minMatch And matchVal > 0 Then
+                        minMatch = matchVal
+                        bestCell = similarCells.Count
+                    End If
+                    DrawTour(dst3(rc2.rect), rc2.hull, white, -1)
+                    similarCells.Add(rc2)
+                End If
+            Next
+
+            If similarCells.Count = 0 Then SetTrueText("No matches with match value < " + Format(options.matchThreshold, fmt2), New cv.Point(5, 5), 3)
         End Sub
     End Class
 End Namespace

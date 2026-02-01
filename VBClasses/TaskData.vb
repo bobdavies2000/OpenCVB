@@ -109,7 +109,6 @@ Namespace VBClasses
         Public bricks As Brick_Basics
 
         Public fpList As New List(Of fpData)
-        Public regionList As New List(Of oldrcData)
         Public featList As New List(Of List(Of Integer))
         Public fLess As New List(Of List(Of Integer))
 

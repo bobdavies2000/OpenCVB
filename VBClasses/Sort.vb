@@ -128,10 +128,10 @@ Namespace VBClasses
             Dim inputCount = dups.dst3.CountNonZero
             Dim testVals As New List(Of Integer)
             For i = 0 To Math.Min(inputCount, task.gridRects.Count) - 1
-                Dim roi = task.gridRects(i)
+                Dim gr = task.gridRects(i)
                 Dim val = CInt(dups.dst3.Get(Of Byte)(0, i))
                 testVals.Add(val)
-                dst3(roi).SetTo(val)
+                dst3(gr).SetTo(val)
             Next
 
             If testVals.Count = 0 Then Exit Sub

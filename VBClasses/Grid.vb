@@ -84,11 +84,11 @@ Namespace VBClasses
                 For Each nabeList In gridNeighbors
                     Dim xList As New List(Of Integer), yList As New List(Of Integer)
                     For Each index In nabeList
-                        Dim roi = task.gridRects(index)
-                        xList.Add(roi.X)
-                        yList.Add(roi.Y)
-                        xList.Add(roi.BottomRight.X)
-                        yList.Add(roi.BottomRight.Y)
+                        Dim gr = task.gridRects(index)
+                        xList.Add(gr.X)
+                        yList.Add(gr.Y)
+                        xList.Add(gr.BottomRight.X)
+                        yList.Add(gr.BottomRight.Y)
                     Next
                     Dim r = New cv.Rect(xList.Min, yList.Min, xList.Max - xList.Min, yList.Max - yList.Min)
                     If r.Width < task.brickSize * 3 Then
@@ -127,7 +127,7 @@ Namespace VBClasses
     Public Class NR_Grid_BasicsTest : Inherits TaskParent
         Public Sub New()
             If standalone Then task.gOptions.GridSlider.Value = 16
-            labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each roi.  Bottom might be a shortened roi."}
+            labels = {"", "", "Each grid element is assigned a value below", "The line is the diagonal for each gr.  Bottom might be a shortened gr."}
             If standalone Then desc = "Validation test for Grid_Basics algorithm"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -135,18 +135,18 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             For i = 0 To task.gridRects.Count - 1
-                Dim roi = task.gridRects(i)
-                cv.Cv2.Subtract(mean, src(roi), dst2(roi))
-                SetTrueText(CStr(i), New cv.Point(roi.X, roi.Y))
+                Dim gr = task.gridRects(i)
+                cv.Cv2.Subtract(mean, src(gr), dst2(gr))
+                SetTrueText(CStr(i), New cv.Point(gr.X, gr.Y))
             Next
             dst2.SetTo(white, task.gridMask)
 
             dst3.SetTo(0)
             Parallel.For(0, task.gridRects.Count,
          Sub(i)
-             Dim roi = task.gridRects(i)
-             cv.Cv2.Subtract(mean, src(roi), dst3(roi))
-             vbc.DrawLine(dst3(roi), New cv.Point(0, 0), New cv.Point(roi.Width, roi.Height), white)
+             Dim gr = task.gridRects(i)
+             cv.Cv2.Subtract(mean, src(gr), dst3(gr))
+             vbc.DrawLine(dst3(gr), New cv.Point(0, 0), New cv.Point(gr.Width, gr.Height), white)
          End Sub)
         End Sub
     End Class
@@ -239,17 +239,17 @@ Namespace VBClasses
             SetTrueText("Click any grid entry to see its neighbors", 3)
             dst2.SetTo(white, task.gridMask)
 
-            Dim roiIndex As Integer = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            If task.gridRects(roiIndex).Contains(task.clickPoint) Then
-                labels(3) = "Grid index = " + CStr(roiIndex) + " contains the mouse clickpoint" + vbCrLf
+            Dim grIndex As Integer = task.gridMap.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            If task.gridRects(grIndex).Contains(task.clickPoint) Then
+                labels(3) = "Grid index = " + CStr(grIndex) + " contains the mouse clickpoint" + vbCrLf
             Else
-                labels(3) = "Grid index = " + CStr(roiIndex) + " does NOT match the grid location." + vbCrLf
+                labels(3) = "Grid index = " + CStr(grIndex) + " does NOT match the grid location." + vbCrLf
             End If
             dst3.SetTo(0)
-            For Each index In task.grid.gridNeighbors(roiIndex)
-                Dim roi = task.gridRects(index)
-                dst2.Rectangle(roi, white, task.lineWidth)
-                dst3.Rectangle(roi, 255, task.lineWidth)
+            For Each index In task.grid.gridNeighbors(grIndex)
+                Dim gr = task.gridRects(index)
+                dst2.Rectangle(gr, white, task.lineWidth)
+                dst3.Rectangle(gr, 255, task.lineWidth)
             Next
         End Sub
     End Class
@@ -266,15 +266,15 @@ Namespace VBClasses
         Public minMaxVals(0) As cv.Vec2f
         Public Sub New()
             task.gOptions.GridSlider.Value = 8
-            desc = "Find the min and max depth within each grid roi."
+            desc = "Find the min and max depth within each grid gr."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If minMaxLocs.Count <> task.gridRects.Count Then ReDim minMaxLocs(task.gridRects.Count - 1)
             If minMaxVals.Count <> task.gridRects.Count Then ReDim minMaxVals(task.gridRects.Count - 1)
             Dim mm As mmData
             For i = 0 To minMaxLocs.Count - 1
-                Dim roi = task.gridRects(i)
-                task.pcSplit(2)(roi).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthmask(roi))
+                Dim gr = task.gridRects(i)
+                task.pcSplit(2)(gr).MinMaxLoc(mm.minVal, mm.maxVal, mm.minLoc, mm.maxLoc, task.depthmask(gr))
                 minMaxLocs(i) = New lpData(mm.minLoc, mm.maxLoc)
                 minMaxVals(i) = New cv.Vec2f(mm.minVal, mm.maxVal)
             Next
@@ -308,9 +308,9 @@ Namespace VBClasses
             If match.correlation < task.fCorrThreshold Or task.gOptions.DebugCheckBox.Checked Then
                 task.gOptions.DebugCheckBox.Checked = False
                 Dim index As Integer = task.gridMap.Get(Of Integer)(dst2.Height / 2, dst2.Width / 2)
-                Dim roi = task.gridRects(index)
-                match.template = src(roi).Clone
-                center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
+                Dim gr = task.gridRects(index)
+                match.template = src(gr).Clone
+                center = New cv.Point(gr.X + gr.Width / 2, gr.Y + gr.Height / 2)
             End If
 
             Dim pad = task.brickSize / 2

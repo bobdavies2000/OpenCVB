@@ -42,18 +42,18 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Triangle_HullContour : Inherits TaskParent
-        Dim hulls As New RedList_Hulls
+    Public Class Triangle_HullContour : Inherits TaskParent
+        Dim hulls As New RedColor_Hulls
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            labels = {"", "Selected cell", "RedList_Basics output", "Selected contour"}
+            labels = {"", "Selected cell", "RedColor_Basics output", "Selected contour"}
             desc = "Given a contour, convert that contour to a series of triangles"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             hulls.Run(src)
             dst2 = hulls.dst2
-            If task.redList.oldrclist.Count <= 1 Then Exit Sub
-            Dim rc = task.oldrcD
+            If hulls.rclist.Count <= 1 Then Exit Sub
+            Static rc As rcData = hulls.rclist(0)
 
             rc.contour = ContourBuild(rc.mask, cv.ContourApproximationModes.ApproxTC89L1)
 
@@ -68,6 +68,9 @@ Namespace VBClasses
                 pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
                 DrawCircle(dst1, pt, task.DotSize, cv.Scalar.Yellow)
             Next
+
+            RedCloud_Cell.selectCell(hulls.rcMap, hulls.rclist)
+            rc = If(task.rcD Is Nothing, hulls.rclist(0), task.rcD)
         End Sub
     End Class
 
