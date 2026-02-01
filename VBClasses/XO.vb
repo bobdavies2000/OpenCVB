@@ -51,6 +51,10 @@ Namespace VBClasses
         End Class
     End Module
 
+
+
+
+
     Public Class XO_Model_FlatSurfaces : Inherits TaskParent
         Public totalPixels As Integer
         Dim floorList As New List(Of Single)

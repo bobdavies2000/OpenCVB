@@ -218,7 +218,7 @@ Namespace VBClasses
 
 
     '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
-    Public Class NR_Plane_OnlyPlanes : Inherits TaskParent
+    Public Class Plane_OnlyPlanes : Inherits TaskParent
         Public plane As New Plane_CellColor
         Public contours As List(Of cv.Point)
         Public Sub New()
@@ -226,14 +226,14 @@ Namespace VBClasses
             labels = {"", "", "RedCloud Cells", "gCloud reworked with planes instead of depth data"}
             desc = "Replace the gCloud with planes in every RedCloud cell"
         End Sub
-        Public Sub buildCloudPlane(rc As oldrcData)
+        Public Sub buildCloudPlane(rc As rcData)
             For y = 0 To rc.rect.Height - 1
                 For x = 0 To rc.rect.Width - 1
                     If rc.mask.Get(Of Byte)(y, x) > 0 Then
                         Dim pt = task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x)
                         ' a*x + b*y + c*z + k = 0 ---> z = -(k + a*x + b*y) / c
                         pt.Z = -(rc.eq(0) * pt.X + rc.eq(1) * pt.Y + rc.eq(3)) / rc.eq(2)
-                        If rc.mmZ.minVal <= pt.Z And rc.mmZ.maxVal >= pt.Z Then
+                        If rc.depth <= pt.Z Then
                             dst3(rc.rect).Set(Of cv.Point3f)(y, x, pt)
                         End If
                     End If
@@ -245,12 +245,12 @@ Namespace VBClasses
             dst2 = plane.dst2
 
             dst3.SetTo(0)
-            For Each rc In task.redList.oldrclist
+            For Each rc In plane.redC.rcList
                 If plane.options.reuseRawDepthData = False Then buildCloudPlane(rc)
             Next
             If plane.options.reuseRawDepthData Then dst3 = task.pointCloud
 
-            Dim rcX = task.oldrcD
+            Dim rcX = task.rcD
         End Sub
     End Class
 
@@ -333,7 +333,7 @@ Namespace VBClasses
     ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
     Public Class Plane_CellColor : Inherits TaskParent
         Public options As New Options_Plane
-        Dim redC As New RedColor_Basics
+        Public redC As New RedColor_Basics
         Public Sub New()
             labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"}
             desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"

@@ -59,14 +59,15 @@ Namespace VBClasses
 
 
 
-    Public Class NR_MatchShapes_Nearby : Inherits TaskParent
-        Public oldrclist As New List(Of oldrcData)
-        Public similarCells As New List(Of oldrcData)
+    Public Class MatchShapes_Nearby : Inherits TaskParent
+        Public rclist As New List(Of rcData)
+        Public similarCells As New List(Of rcData)
         Public bestCell As Integer
-        Public rc As New oldrcData
+        Public rc As New rcData
         Dim options As New Options_MatchShapes
         Public runStandalone As Boolean = False
-        Dim addTour As New XO_RedList_Basics
+        Dim addTour As New RedColor_Basics
+        Dim redC As New RedColor_Basics
         Public Sub New()
             labels = {"Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells"}
             desc = "MatchShapes: Find matches at similar latitude (controlled with slider)"
@@ -77,11 +78,14 @@ Namespace VBClasses
             Dim myStandalone = standaloneTest() Or runStandalone
 
             If myStandalone Then
-                dst2 = runRedList(task.color, labels(2)).Clone
-                If task.redList.oldrclist.Count = 0 Then Exit Sub
-                addTour.oldrclist = New List(Of oldrcData)(task.redList.oldrclist)
+                redC.Run(task.color)
+                dst2 = redC.dst2.Clone
+                labels(2) = redC.labels(2)
+
+                If redC.rcList.Count = 0 Then Exit Sub
+                addTour.rcList = New List(Of rcData)(redC.rcList)
                 addTour.Run(src)
-                rc = task.oldrcD
+                rc = task.rcD
             End If
 
             If task.heartBeat And myStandalone Then dst3.SetTo(0)
@@ -94,8 +98,8 @@ Namespace VBClasses
 
             Dim minMatch As Single = Single.MaxValue
             bestCell = -1
-            For i = 0 To addTour.oldrclist.Count - 1
-                Dim rc2 = addTour.oldrclist(i)
+            For i = 0 To addTour.rcList.Count - 1
+                Dim rc2 = addTour.rcList(i)
                 If rc2.contour Is Nothing Then Continue For
                 Dim matchVal = cv.Cv2.MatchShapes(rc.contour, rc2.contour, options.matchOption)
                 If matchVal < options.matchThreshold Then

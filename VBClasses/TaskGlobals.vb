@@ -36,16 +36,6 @@ Namespace VBClasses
         Public Function vecToScalar(c As cv.Vec3b) As cv.Scalar
             Return New cv.Scalar(c(0), c(1), c(2))
         End Function
-        Public Function RebuildRCMap(rclist As List(Of rcData)) As cv.Mat
-            task.redCloud.rcMap.SetTo(0)
-            Dim dst As New cv.Mat(task.workRes, cv.MatType.CV_8UC3, 0)
-            For Each rc In rclist
-                task.redCloud.rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                dst(rc.rect).SetTo(rc.color, rc.mask)
-                If rc.index >= 255 Then Exit For
-            Next
-            Return dst
-        End Function
         Public Sub taskUpdate()
             If task.myStopWatch Is Nothing Then task.myStopWatch = Stopwatch.StartNew()
 

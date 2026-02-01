@@ -569,7 +569,9 @@ Namespace VBClasses
             Public maxDist As cv.Point
             Public pixels As Integer
             Public rect As cv.Rect
-            Public eq As cv.Vec4f
+            Public eq As cv.Vec4f ' only here for compatibility
+            Public nabs As New List(Of Integer) ' only here for compatibility
+            Public indexLast As Integer ' only here for compatibility
             Public Sub New()
             End Sub
             Public Shared Function getHullMask(hull As List(Of cv.Point), mask As cv.Mat) As cv.Mat

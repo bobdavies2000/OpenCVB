@@ -447,6 +447,7 @@ Match_Brick
 Match_DrawRect
 Match_Point
 MatchShapes_Basics
+MatchShapes_Nearby
 Math_ImageAverage
 Math_Intrinsics
 Math_Median_CDF
@@ -472,13 +473,14 @@ Mouse_Basics
 MSER_Basics
 MSER_Basics1
 MSER_Basics2
-MSER_BasicsNew
+MSER_Basics3
 MSER_CPP
 MSER_Detect
 MSER_Left
 MSER_Right
 MSER_SyntheticInput
 Neighbor_Basics
+Neighbor_ColorOnly
 Neighbor_Intersects
 Neighbor_Precise
 NR_AddWeighted_DepthAccumulate
@@ -1109,7 +1111,6 @@ NR_Match_RandomTest
 NR_Match_TraceRedC
 NR_MatchShapes_Contours
 NR_MatchShapes_Hulls
-NR_MatchShapes_Nearby
 NR_MatchShapes_NearbyHull
 NR_Math_DepthMeanStdev
 NR_Math_ImageMaskedAverage
@@ -1144,7 +1145,6 @@ NR_MSER_ReducedRGB
 NR_MSER_ROI
 NR_MSER_TestExample
 NR_MSER_TestSynthetic
-NR_Neighbor_ColorOnly
 NR_OEX_BasicLinearTransforms
 NR_OEX_BasicLinearTransformsTrackBar
 NR_OEX_bgfg_segm
@@ -1216,7 +1216,6 @@ NR_Plane_FlatSurfaces
 NR_Plane_FloorStudy
 NR_Plane_Histogram
 NR_Plane_Horizontals
-NR_Plane_OnlyPlanes
 NR_Plane_Verticals
 NR_Plot_Beats
 NR_Plot_Depth
@@ -1425,6 +1424,7 @@ Plane_Basics
 Plane_CellColor
 Plane_Equation
 Plane_From3Points
+Plane_OnlyPlanes
 Plane_Points
 Plot_Basics
 Plot_Basics_CPP

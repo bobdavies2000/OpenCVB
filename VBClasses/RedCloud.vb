@@ -1,5 +1,3 @@
-Imports System.Windows.Forms.Design.AxImporter
-Imports System.Windows.Forms.VisualStyles
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
@@ -26,7 +24,8 @@ Namespace VBClasses
                 If rc.rect.Contains(lrc.maxDist) Then
                     Dim row = lrc.maxDist.Y - lrc.rect.Y
                     Dim col = lrc.maxDist.X - lrc.rect.X
-                    If row < rc.mask.Height And col < rc.mask.Width Then
+                    If row < rc.mask.Height And col < rc.mask.Width And
+                       row >= .0 And col >= 0 Then
                         If rc.mask.Get(Of Byte)(row, col) Then ' more doublechecking...
                             rc.maxDist = lrc.maxDist
                             rc.depth = lrc.depth
