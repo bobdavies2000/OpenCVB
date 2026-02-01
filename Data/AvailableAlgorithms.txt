@@ -470,6 +470,9 @@ Motion_PointCloud_MotionRect
 Motion_Right
 Mouse_Basics
 MSER_Basics
+MSER_Basics1
+MSER_Basics2
+MSER_BasicsNew
 MSER_CPP
 MSER_Detect
 MSER_Left
@@ -727,7 +730,6 @@ NR_Distance_LabelsDepth
 NR_Distance_LabelsNoDepth
 NR_Distance_PeakDepth
 NR_Distance_PeakNoDepth
-NR_Distance_RedDistance
 NR_Dither_Basics
 NR_DNN_Basics
 NR_DNN_SuperRes
@@ -1132,9 +1134,6 @@ NR_Motion_ValidateRight
 NR_Mouse_ClickPointUsage
 NR_Mouse_LeftClickZoom
 NR_Mouse_ValidateLocation
-NR_MSER_Basics1
-NR_MSER_Basics2
-NR_MSER_BasicsNew
 NR_MSER_Binarize
 NR_MSER_Grayscale
 NR_MSER_Hulls

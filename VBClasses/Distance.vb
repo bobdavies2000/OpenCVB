@@ -53,16 +53,6 @@ Namespace VBClasses
 
             Return mm.maxLoc
         End Function
-        Public Shared Function GetMaxDist(ByRef rc As oldrcData) As cv.Point
-            Dim mask = rc.mask.Clone
-            mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-            Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-            Dim mm As mmData = GetMinMax(distance32f)
-            mm.maxLoc.X += rc.rect.X
-            mm.maxLoc.Y += rc.rect.Y
-
-            Return mm.maxLoc
-        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then src = task.depthmask.Clone
             If task.optionsChanged Then dst1 = src.Clone Else src.CopyTo(dst1, task.motionRGB.motionMask)
@@ -399,20 +389,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class NR_Distance_RedDistance : Inherits TaskParent
-        Dim distance As New Distance_Basics
-        Public Sub New()
-            desc = "Combine the output of RedList_Basics and distance_basics."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
-
-            distance.Run(dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-            dst2 = ShowAddweighted(distance.dst2, task.redList.dst2, labels(2))
-        End Sub
-    End Class
 
 
 

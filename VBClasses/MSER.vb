@@ -38,7 +38,7 @@ Namespace VBClasses
                 rc.contour = ContourBuild(rc.mask)
                 DrawTour(rc.mask, rc.contour, 255, -1)
 
-                rc.maxDist = Distance_Basics.GetMaxDist(rc)
+                rc.maxDist = XO_RedList_MaxDist.GetMaxDist(rc)
 
                 rc.indexLast = task.redList.rcMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If rc.indexLast <> 0 And rc.indexLast < task.redList.oldrclist.Count Then
@@ -63,6 +63,114 @@ Namespace VBClasses
         End Sub
     End Class
 
+
+
+
+
+    Public Class MSER_Basics1 : Inherits TaskParent
+        Dim detect As New MSER_CPP
+        Dim redC As New RedColor_Basics
+        Public Sub New()
+            labels(3) = "MSER (Maximally Stable Extremal Region) output that is input to RedColor."
+            desc = "Create cells for each region in MSER (Maximally Stable Extremal Region) output"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            detect.Run(src)
+            dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+            RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class MSER_BasicsNew : Inherits TaskParent
+        Dim detect As New MSER_CPP
+        Dim displaycount As Integer
+        Public Sub New()
+            desc = "Create cells for each region in MSER output"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            detect.Run(src)
+
+            Dim boxInput = New List(Of cv.Rect)(detect.boxes)
+            Dim boxes As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
+            For i = 0 To boxInput.Count - 1
+                Dim r = boxInput(i)
+                boxes.Add(r.Width * r.Height, r)
+            Next
+
+            dst3 = src
+            For i = 0 To boxes.Count - 1
+                Dim r = boxes.ElementAt(i).Value
+                dst3.Rectangle(r, task.highlight, task.lineWidth)
+                If i >= displaycount Then Exit For
+            Next
+
+            If task.heartBeat Then
+                labels(2) = "Displaying the largest " + CStr(displaycount) + " rectangles out of " + CStr(boxes.Count) + " found"
+                ' displaycount += 1
+                If displaycount >= boxes.Count Then displaycount = 0
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class MSER_Basics2 : Inherits TaskParent
+        Dim detect As New MSER_CPP
+        Dim cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+        Public Sub New()
+            dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            desc = "Create cells for each region in MSER output"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            detect.Run(src)
+            dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+            Dim floodPoints = New List(Of cv.Point)(detect.floodPoints)
+            Dim boxInput = New List(Of cv.Rect)(detect.boxes)
+            Dim boxes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+            For i = 0 To boxInput.Count - 1
+                Dim r = boxInput(i)
+                boxes.Add(r.Width * r.Height, i)
+            Next
+
+            Dim oldrclist As New List(Of oldrcData)({New oldrcData})
+            dst1.SetTo(0)
+            dst2.SetTo(0)
+            Dim lastMap = cellMap.Clone
+            cellMap.SetTo(0)
+            Dim matchCount As Integer
+            For i = 0 To floodPoints.Count - 1
+                Dim rc As New oldrcData
+                rc.index = oldrclist.Count
+                Dim val = dst3.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
+                rc.rect = boxInput(boxes.ElementAt(i).Value)
+                rc.mask = dst3(rc.rect).InRange(val, val)
+                dst1(rc.rect).SetTo(rc.index, rc.mask)
+                rc.pixels = detect.maskCounts(i)
+
+                rc.maxDist = XO_RedList_MaxDist.GetMaxDist(rc)
+                rc.indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+
+                rc.color = task.scalarColors(i Mod 255)
+                If rc.indexLast <> 0 Then matchCount += 1
+
+                oldrclist.Add(rc)
+                cellMap(rc.rect).SetTo(rc.index, rc.mask)
+                dst2(rc.rect).SetTo(rc.color, rc.mask)
+            Next
+
+            If task.heartBeat Then labels(2) = detect.labels(2) + " and " + CStr(matchCount) + " were matched to the previous frame"
+        End Sub
+    End Class
 
 
 
@@ -525,113 +633,6 @@ Namespace VBClasses
             labels(3) = mser.labels(2)
         End Sub
     End Class
-
-
-
-
-
-    Public Class NR_MSER_Basics1 : Inherits TaskParent
-        Dim detect As New MSER_CPP
-        Public Sub New()
-            desc = "Create cells for each region in MSER output"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            detect.Run(src)
-            dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            dst2 = runRedList(src, labels(2))
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class NR_MSER_BasicsNew : Inherits TaskParent
-        Dim detect As New MSER_CPP
-        Dim displaycount As Integer
-        Public Sub New()
-            desc = "Create cells for each region in MSER output"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            detect.Run(src)
-
-            Dim boxInput = New List(Of cv.Rect)(detect.boxes)
-            Dim boxes As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To boxInput.Count - 1
-                Dim r = boxInput(i)
-                boxes.Add(r.Width * r.Height, r)
-            Next
-
-            dst3 = src
-            For i = 0 To boxes.Count - 1
-                Dim r = boxes.ElementAt(i).Value
-                dst3.Rectangle(r, task.highlight, task.lineWidth)
-                If i >= displaycount Then Exit For
-            Next
-
-            If task.heartBeat Then
-                labels(2) = "Displaying the largest " + CStr(displaycount) + " rectangles out of " + CStr(boxes.Count) + " found"
-                ' displaycount += 1
-                If displaycount >= boxes.Count Then displaycount = 0
-            End If
-        End Sub
-    End Class
-
-
-
-
-
-    Public Class NR_MSER_Basics2 : Inherits TaskParent
-        Dim detect As New MSER_CPP
-        Dim cellMap As New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-        Public Sub New()
-            dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            desc = "Create cells for each region in MSER output"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            detect.Run(src)
-            dst3 = detect.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-            Dim floodPoints = New List(Of cv.Point)(detect.floodPoints)
-            Dim boxInput = New List(Of cv.Rect)(detect.boxes)
-            Dim boxes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-            For i = 0 To boxInput.Count - 1
-                Dim r = boxInput(i)
-                boxes.Add(r.Width * r.Height, i)
-            Next
-
-            Dim oldrclist As New List(Of oldrcData)({New oldrcData})
-            dst1.SetTo(0)
-            dst2.SetTo(0)
-            Dim lastMap = cellMap.Clone
-            cellMap.SetTo(0)
-            Dim matchCount As Integer
-            For i = 0 To floodPoints.Count - 1
-                Dim rc As New oldrcData
-                rc.index = oldrclist.Count
-                Dim val = dst3.Get(Of Byte)(floodPoints(i).Y, floodPoints(i).X)
-                rc.rect = boxInput(boxes.ElementAt(i).Value)
-                rc.mask = dst3(rc.rect).InRange(val, val)
-                dst1(rc.rect).SetTo(rc.index, rc.mask)
-                rc.pixels = detect.maskCounts(i)
-
-                rc.maxDist = Distance_Basics.GetMaxDist(rc)
-                rc.indexLast = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-
-                rc.color = task.scalarColors(i Mod 255)
-                If rc.indexLast <> 0 Then matchCount += 1
-
-                oldrclist.Add(rc)
-                cellMap(rc.rect).SetTo(rc.index, rc.mask)
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
-            Next
-
-            If task.heartBeat Then labels(2) = detect.labels(2) + " and " + CStr(matchCount) + " were matched to the previous frame"
-        End Sub
-    End Class
-
-
-
 
 
 

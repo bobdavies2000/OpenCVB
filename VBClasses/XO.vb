@@ -10824,6 +10824,16 @@ Namespace VBClasses
         Public Sub New()
             desc = "Show the maxdist before and after updating the mask with the contour."
         End Sub
+        Public Shared Function GetMaxDist(ByRef rc As oldrcData) As cv.Point
+            Dim mask = rc.mask.Clone
+            mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+            Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+            Dim mm As mmData = GetMinMax(distance32f)
+            mm.maxLoc.X += rc.rect.X
+            mm.maxLoc.Y += rc.rect.Y
+
+            Return mm.maxLoc
+        End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
@@ -10837,7 +10847,7 @@ Namespace VBClasses
 
             For i = 1 To addTour.oldrclist.Count - 1
                 Dim rc = addTour.oldrclist(i)
-                rc.maxDist = Distance_Basics.GetMaxDist(rc)
+                rc.maxDist = GetMaxDist(rc)
                 DrawCircle(dst3, rc.maxDist, task.DotSize, task.highlight)
             Next
         End Sub
