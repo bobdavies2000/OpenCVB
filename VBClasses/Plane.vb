@@ -7,7 +7,7 @@ Namespace VBClasses
             labels = {"", "Top down mask after after thresholding heatmap", "Vertical regions", "Horizontal regions"}
             desc = "Find the regions that are mostly vertical and mostly horizontal."
         End Sub
-        Public Shared Function validContourPoint(rc As oldrcData, pt As cv.Point, offset As Integer) As cv.Point
+        Public Shared Function validContourPoint(rc As rcData, pt As cv.Point, offset As Integer) As cv.Point
             If pt.X < rc.rect.Width And pt.Y < rc.rect.Height Then Return pt
             Dim count = rc.contour.Count
             For i = offset + 1 To rc.contour.Count - 1
@@ -16,7 +16,7 @@ Namespace VBClasses
             Next
             Return New cv.Point
         End Function
-        Public Shared Function build3PointEquation(rc As oldrcData) As cv.Vec4f
+        Public Shared Function build3PointEquation(rc As rcData) As cv.Vec4f
             If rc.contour.Count < 3 Then Return New cv.Vec4f
             Dim offset = rc.contour.Count / 3
             Dim p1 = validContourPoint(rc, rc.contour(offset * 0), offset * 0)
@@ -333,11 +333,12 @@ Namespace VBClasses
     ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
     Public Class Plane_CellColor : Inherits TaskParent
         Public options As New Options_Plane
+        Dim redC As New RedColor_Basics
         Public Sub New()
             labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"}
             desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
         End Sub
-        Public Function buildContourPoints(rc As oldrcData) As List(Of cv.Point3f)
+        Public Function buildContourPoints(rc As rcData) As List(Of cv.Point3f)
             Dim fitPoints As New List(Of cv.Point3f)
             For Each pt In rc.contour
                 If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
@@ -346,7 +347,7 @@ Namespace VBClasses
             Next
             Return fitPoints
         End Function
-        Public Function buildMaskPointEq(rc As oldrcData) As List(Of cv.Point3f)
+        Public Function buildMaskPointEq(rc As rcData) As List(Of cv.Point3f)
             Dim fitPoints As New List(Of cv.Point3f)
             For y = 0 To rc.rect.Height - 1
                 For x = 0 To rc.rect.Width - 1
@@ -358,12 +359,13 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
             dst3.SetTo(0)
-            Dim newCells As New List(Of oldrcData)
-            Dim rcX = task.oldrcD
-            For Each rc In task.redList.oldrclist
+            Dim newCells As New List(Of rcData)
+            For Each rc In redC.rcList
                 rc.eq = New cv.Vec4f
                 If options.useMaskPoints Then
                     rc.eq = Plane_Basics.fitDepthPlane(buildMaskPointEq(rc))
@@ -372,12 +374,10 @@ Namespace VBClasses
                 ElseIf options.use3Points Then
                     rc.eq = Plane_Basics.build3PointEquation(rc)
                 End If
-                newCells.Add(rc)
                 dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)),
-                                              Math.Abs(255 * rc.eq(1)),
-                                              Math.Abs(255 * rc.eq(2))), rc.mask)
+                                    Math.Abs(255 * rc.eq(1)),
+                                    Math.Abs(255 * rc.eq(2))), rc.mask)
             Next
-            task.redList.oldrclist = New List(Of oldrcData)(newCells)
         End Sub
     End Class
 

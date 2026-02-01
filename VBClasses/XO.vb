@@ -16296,14 +16296,14 @@ Namespace VBClasses
             Dim fitPoints As New List(Of cv.Point3f)
             For Each rc In task.redList.oldrclist
                 If rc.eq = newVec4f Then
-                    rc.eq = New cv.Vec4f
-                    If options.useMaskPoints Then
-                        rc.eq = Plane_Basics.fitDepthPlane(planeCells.buildMaskPointEq(rc))
-                    ElseIf options.useContourPoints Then
-                        rc.eq = Plane_Basics.fitDepthPlane(planeCells.buildContourPoints(rc))
-                    ElseIf options.use3Points Then
-                        rc.eq = Plane_Basics.build3PointEquation(rc)
-                    End If
+                    'rc.eq = New cv.Vec4f
+                    'If options.useMaskPoints Then
+                    '    rc.eq = Plane_Basics.fitDepthPlane(planeCells.buildMaskPointEq(rc))
+                    'ElseIf options.useContourPoints Then
+                    '    rc.eq = Plane_Basics.fitDepthPlane(planeCells.buildContourPoints(rc))
+                    'ElseIf options.use3Points Then
+                    '    rc.eq = Plane_Basics.build3PointEquation(rc)
+                    'End If
                 End If
                 dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)),
                                               Math.Abs(255 * rc.eq(1)),
