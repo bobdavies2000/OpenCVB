@@ -262,7 +262,7 @@ Namespace VBClasses
             Public lRect As New cv.Rect ' Intel RealSense camera use this. They don't align left and color automatically.
             Public rRect As New cv.Rect ' The rect in the right image matching the left image rect.
 
-            Public center As cv.Point ' center of the brick
+            Public center As cv.Point ' center of the gr
             Public depth As Single
             Public mmDepth As mmData
 

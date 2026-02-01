@@ -548,11 +548,11 @@ Namespace VBClasses
 
     Public Class Match_Brick : Inherits TaskParent
         Public match As New Match_Basics1
-        Public gridIndex As Integer ' provide this - it identifies the brick 
+        Public gridIndex As Integer ' provide this - it identifies the gr 
         Public correlation As Single
         Public deltaX As Single, deltaY As Single
         Public Sub New()
-            desc = "Match a brick's movement from the previous frame."
+            desc = "Match a gr's movement from the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then gridIndex = task.lineLongest.p1GridIndex
@@ -613,29 +613,29 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            Dim brick As gravityLine
+            Dim gr As gravityLine
             brickCells.Clear()
             match.tCells.Clear()
             For i = 0 To sortedLines.Count - 1
-                brick = sortedLines.ElementAt(i).Value
+                gr = sortedLines.ElementAt(i).Value
 
                 If i = 0 Then
                     dst1.SetTo(0)
-                    brick.tc1.template.CopyTo(dst1(brick.tc1.rect))
-                    brick.tc2.template.CopyTo(dst1(brick.tc2.rect))
+                    gr.tc1.template.CopyTo(dst1(gr.tc1.rect))
+                    gr.tc2.template.CopyTo(dst1(gr.tc2.rect))
                 End If
 
                 match.tCells.Clear()
-                match.tCells.Add(brick.tc1)
-                match.tCells.Add(brick.tc2)
+                match.tCells.Add(gr.tc1)
+                match.tCells.Add(gr.tc2)
 
                 match.Run(src)
                 Dim threshold = task.fCorrThreshold
                 If match.tCells(0).correlation >= threshold And match.tCells(1).correlation >= threshold Then
-                    brick.tc1 = match.tCells(0)
-                    brick.tc2 = match.tCells(1)
-                    brick = gLines.updateGLine(src, brick, brick.tc1.center, brick.tc2.center)
-                    If brick.len3D > 0 Then brickCells.Add(brick)
+                    gr.tc1 = match.tCells(0)
+                    gr.tc2 = match.tCells(1)
+                    gr = gLines.updateGLine(src, gr, gr.tc1.center, gr.tc2.center)
+                    If gr.len3D > 0 Then brickCells.Add(gr)
                 End If
             Next
 
@@ -644,14 +644,14 @@ Namespace VBClasses
 
             For i = 0 To brickCells.Count - 1
                 Dim tc As New tCell
-                brick = brickCells(i)
+                gr = brickCells(i)
                 Dim p1 As cv.Point2f, p2 As cv.Point2f
                 For j = 0 To 2 - 1
-                    tc = Choose(j + 1, brick.tc1, brick.tc2)
+                    tc = Choose(j + 1, gr.tc1, gr.tc2)
                     If j = 0 Then p1 = tc.center Else p2 = tc.center
                 Next
-                SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(brick.arcY, fmt1), brick.tc1.center, 2)
-                SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(brick.arcY, fmt1), brick.tc1.center, 3)
+                SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gr.arcY, fmt1), gr.tc1.center, 2)
+                SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gr.arcY, fmt1), gr.tc1.center, 3)
 
                 vbc.DrawLine(dst2, p1, p2, task.highlight)
                 vbc.DrawLine(dst3, p1, p2, task.highlight)

@@ -7291,13 +7291,13 @@ Namespace VBClasses
         Public height As Integer = 8
         Public Sub New()
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("brick Width", 1, task.cols, width)
-                sliders.setupTrackBar("brick Height", 1, task.rows, height)
+                sliders.setupTrackBar("gr Width", 1, task.cols, width)
+                sliders.setupTrackBar("gr Height", 1, task.rows, height)
             End If
         End Sub
         Public Sub Run()
-            Static widthSlider = OptionParent.FindSlider("brick Width")
-            Static heightSlider = OptionParent.FindSlider("brick Height")
+            Static widthSlider = OptionParent.FindSlider("gr Width")
+            Static heightSlider = OptionParent.FindSlider("gr Height")
             width = widthSlider.value
             height = heightSlider.value
         End Sub
@@ -8179,13 +8179,13 @@ Namespace VBClasses
         Public lineTrackerWidth As Integer
         Public Sub New()
             If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Left to Right brick correlation Minimum X100", 0, 100, 70)
+                sliders.setupTrackBar("Left to Right gr correlation Minimum X100", 0, 100, 70)
                 sliders.setupTrackBar("Range in mm's", 1, 100, 20)
                 sliders.setupTrackBar("Line_Tracker width", 1, 20, 5)
             End If
         End Sub
         Public Sub Run()
-            Static corrSlider = FindSlider("Left to Right brick correlation Minimum X100")
+            Static corrSlider = FindSlider("Left to Right gr correlation Minimum X100")
             Static rangeSlider = FindSlider("Range in mm's")
             Static widthSlider = FindSlider("Line_Tracker width")
             correlation = corrSlider.value / 100

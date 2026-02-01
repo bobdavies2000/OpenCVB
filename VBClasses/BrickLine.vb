@@ -27,11 +27,11 @@ Namespace VBClasses
                 featList.Add(New List(Of Integer))
             Next
 
-            For Each brick In task.bricks.brickList
-                hist.Run(src(brick.rect))
+            For Each gr In task.bricks.brickList
+                hist.Run(src(gr.rect))
                 For i = 1 To hist.histarray.Count - 1
                     If hist.histarray(i) > 0 Then
-                        featList(i).Add(brick.index)
+                        featList(i).Add(gr.index)
                     End If
                 Next
             Next
@@ -49,8 +49,8 @@ Namespace VBClasses
             Dim edgeIndex = Math.Abs(task.gOptions.DebugSlider.Value)
             If edgeIndex <> 0 And edgeIndex < task.featList.Count Then
                 For Each index In task.featList(edgeIndex)
-                    Dim brick = task.bricks.brickList(index)
-                    dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
+                    Dim gr = task.bricks.brickList(index)
+                    dst2.Rectangle(gr.rect, task.highlight, task.lineWidth)
                 Next
             End If
 
@@ -58,15 +58,15 @@ Namespace VBClasses
                 If i <> Math.Abs(task.gOptions.DebugSlider.Value) Then Continue For
                 Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
                 For Each index In task.featList(i)
-                    Dim brick = task.bricks.brickList(index)
-                    depthSorted.Add(brick.depth, index)
+                    Dim gr = task.bricks.brickList(index)
+                    depthSorted.Add(gr.depth, index)
                 Next
 
                 Dim lastDepth = depthSorted.ElementAt(0).Key
                 For Each ele In depthSorted
                     If Math.Abs(ele.Key - lastDepth) > task.depthDiffMeters Then
-                        Dim brick = task.bricks.brickList(ele.Value)
-                        dst2.Rectangle(brick.rect, red, task.lineWidth + 1)
+                        Dim gr = task.bricks.brickList(ele.Value)
+                        dst2.Rectangle(gr.rect, red, task.lineWidth + 1)
                     End If
                     lastDepth = ele.Key
                 Next
@@ -121,8 +121,8 @@ Namespace VBClasses
                 If task.featList(i).Count = 0 Then Exit For
                 Dim depthSorted As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
                 For Each index In task.featList(i)
-                    Dim brick = task.bricks.brickList(index)
-                    depthSorted.Add(brick.depth, index)
+                    Dim gr = task.bricks.brickList(index)
+                    depthSorted.Add(gr.depth, index)
                 Next
 
                 Dim lastDepth = depthSorted.ElementAt(0).Key
@@ -137,10 +137,10 @@ Namespace VBClasses
                 Dim debugMode = task.gOptions.DebugSlider.Value <> 0
                 For i = 0 To gapCells.Count - 1
                     If debugMode Then If i <> Math.Abs(task.gOptions.DebugSlider.Value) Then Continue For
-                    Dim brick = task.bricks.brickList(gapCells(i))
-                    dst2.Rectangle(brick.rect, task.highlight, task.lineWidth)
+                    Dim gr = task.bricks.brickList(gapCells(i))
+                    dst2.Rectangle(gr.rect, task.highlight, task.lineWidth)
                     If i = Math.Abs(task.gOptions.DebugSlider.Value) Then
-                        SetTrueText(Format(brick.depth, fmt1), brick.rect.BottomRight)
+                        SetTrueText(Format(gr.depth, fmt1), gr.rect.BottomRight)
                     End If
                 Next
             End If
@@ -207,7 +207,7 @@ Namespace VBClasses
         Public noEdges As New List(Of Integer)
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
-            desc = "Define each brick according to whether it has edges or not.  Ignore peripheral bricks..."
+            desc = "Define each gr according to whether it has edges or not.  Ignore peripheral bricks..."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             edgeline.Run(task.grayStable)
@@ -281,27 +281,27 @@ Namespace VBClasses
             Dim correlationMat As New cv.Mat
             bestBricks.Clear()
             For Each index In leftEdges
-                Dim brick As New brickData
-                brick.rect = task.gridRects(index)
+                Dim gr As New brickData
+                gr.rect = task.gridRects(index)
 
                 ' too close to the edges of the image
-                If task.gridNabeRects(index).Width + brick.rect.X + task.brickSize * 2 > dst2.Width Then Continue For
-                If task.gridNabeRects(index).Height + brick.rect.Y + task.brickSize * 2 > dst2.Height Then Continue For
+                If task.gridNabeRects(index).Width + gr.rect.X + task.brickSize * 2 > dst2.Width Then Continue For
+                If task.gridNabeRects(index).Height + gr.rect.Y + task.brickSize * 2 > dst2.Height Then Continue For
 
-                brick.lRect = brick.rect
-                brick.depth = task.pcSplit(2)(brick.rect).Mean()(0)
-                If brick.depth > 0 Then
-                    brick.rRect = brick.rect
-                    brick.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / brick.depth
-                    If brick.rRect.X < 0 Or brick.rRect.X + brick.rRect.Width >= dst2.Width Then Continue For
+                gr.lRect = gr.rect
+                gr.depth = task.pcSplit(2)(gr.rect).Mean()(0)
+                If gr.depth > 0 Then
+                    gr.rRect = gr.rect
+                    gr.rRect.X -= task.calibData.baseline * task.calibData.leftIntrinsics.fx / gr.depth
+                    If gr.rRect.X < 0 Or gr.rRect.X + gr.rRect.Width >= dst2.Width Then Continue For
 
-                    cv.Cv2.MatchTemplate(task.leftView(brick.lRect), task.rightView(brick.rRect), correlationMat,
+                    cv.Cv2.MatchTemplate(task.leftView(gr.lRect), task.rightView(gr.rRect), correlationMat,
                                      cv.TemplateMatchModes.CCoeffNormed)
 
-                    brick.correlation = correlationMat.Get(Of Single)(0, 0)
-                    If brick.correlation >= task.fCorrThreshold Then
-                        DrawRect(dst2, brick.rect, white)
-                        DrawRect(dst3, brick.rRect, red)
+                    gr.correlation = correlationMat.Get(Of Single)(0, 0)
+                    If gr.correlation >= task.fCorrThreshold Then
+                        DrawRect(dst2, gr.rect, white)
+                        DrawRect(dst3, gr.rRect, red)
                         bestBricks.Add(index)
                     End If
                 End If

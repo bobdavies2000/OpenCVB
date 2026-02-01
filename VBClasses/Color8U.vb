@@ -439,7 +439,7 @@ Namespace VBClasses
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
-            desc = "Attach a color8u class to each brick."
+            desc = "Attach a color8u class to each gr."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst0 = task.leftView
@@ -448,10 +448,10 @@ Namespace VBClasses
 
             Dim count As Integer
             dst1.SetTo(0)
-            For Each brick As brickData In task.bricks.brickList
-                If brick.rRect.Width > 0 Then
-                    dst2(brick.lRect).CopyTo(dst1(brick.rRect))
-                    brick.colorClass = color8u.dst2.Get(Of Byte)
+            For Each gr As brickData In task.bricks.brickList
+                If gr.rRect.Width > 0 Then
+                    dst2(gr.lRect).CopyTo(dst1(gr.rRect))
+                    gr.colorClass = color8u.dst2.Get(Of Byte)
                     count += 1
                 End If
             Next

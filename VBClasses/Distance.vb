@@ -519,7 +519,7 @@ Namespace VBClasses
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             task.gOptions.DebugSlider.Value = 20
-            desc = "Threshold the maxDist in each brick to highlight centers for key objects.  Use the 'DebugSlider' to provide the value."
+            desc = "Threshold the maxDist in each gr to highlight centers for key objects.  Use the 'DebugSlider' to provide the value."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dist.Run(src)
@@ -527,10 +527,10 @@ Namespace VBClasses
             dst3 = src.Clone
 
             Dim threshold = Math.Abs(task.gOptions.DebugSlider.Value)
-            For Each brick In task.bricks.brickList
-                Dim mm = GetMinMax(dst2(brick.rect))
+            For Each gr In task.bricks.brickList
+                Dim mm = GetMinMax(dst2(gr.rect))
                 If mm.maxVal >= threshold Then
-                    Dim pt = New cv.Point(mm.maxLoc.X + brick.rect.X, mm.maxLoc.Y + brick.rect.Y)
+                    Dim pt = New cv.Point(mm.maxLoc.X + gr.rect.X, mm.maxLoc.Y + gr.rect.Y)
                     DrawCircle(dst3, pt)
                 End If
             Next

@@ -197,7 +197,7 @@ Namespace VBClasses
         Dim depthMaxList As New List(Of List(Of Single))
         Dim myListMax = 10
         Public Sub New()
-            desc = "Create triangles from each brick in point cloud"
+            desc = "Create triangles from each gr in point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))

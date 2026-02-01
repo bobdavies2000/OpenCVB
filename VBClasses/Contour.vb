@@ -176,7 +176,7 @@ Namespace VBClasses
         Dim bPoint As New BrickPoint_Basics
         Dim contours As New Contour_Basics
         Public Sub New()
-            desc = "Show contours and Brick points"
+            desc = "Show contours and gr points"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             contours.Run(src)

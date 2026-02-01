@@ -6,7 +6,7 @@ Namespace VBClasses
         Public rect As cv.Rect
         Public matchRect As cv.Rect
         Public Sub New()
-            desc = "Given a brick, find the match in the right view image."
+            desc = "Given a gr, find the match in the right view image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = task.color.Clone

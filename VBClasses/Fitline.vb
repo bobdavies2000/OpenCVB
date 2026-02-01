@@ -222,7 +222,7 @@ Namespace VBClasses
         Dim fitline As New FitLine_Basics
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-            desc = "Find lines within each brick."
+            desc = "Find lines within each gr."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             edges.Run(src)

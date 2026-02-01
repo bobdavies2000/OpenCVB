@@ -303,9 +303,9 @@ Namespace VBClasses
             Dim allPoints As New List(Of cv.Point)
             Dim brickList As New List(Of cv.Rect)
             For Each rect In task.gridRects
-                Dim brick = dst1(rect)
-                If brick.CountNonZero = 0 Then Continue For
-                Dim mm = GetMinMax(brick)
+                Dim gr = dst1(rect)
+                If gr.CountNonZero = 0 Then Continue For
+                Dim mm = GetMinMax(gr)
                 Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
                 If mm.maxVal = 255 Then
                     allPoints.Add(pt)
@@ -336,7 +336,7 @@ Namespace VBClasses
             Next
 
             If ptList.Count < 2 Then
-                SetTrueText("No brick points were found in the area.", 3)
+                SetTrueText("No gr points were found in the area.", 3)
                 lp = Nothing
                 Exit Sub
             End If

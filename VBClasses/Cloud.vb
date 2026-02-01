@@ -393,7 +393,7 @@ Namespace VBClasses
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             task.mouseMovePoint.X = dst2.Width / 2
-            desc = "Inspect x, y, and z values by brick"
+            desc = "Inspect x, y, and z values by gr"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim cLine = task.mouseMovePoint.X
@@ -406,7 +406,7 @@ Namespace VBClasses
             dst2 = task.depthRGB
             dst2.Line(topPt, botPt, 255, task.lineWidth, task.lineWidth)
 
-            SetTrueText("Values show brick.pt3d values at the blue line.", New cv.Point(dst2.Width / 2, 0), 3)
+            SetTrueText("Values show gr.pt3d values at the blue line.", New cv.Point(dst2.Width / 2, 0), 3)
             For i = 0 To dst2.Height - 1 Step task.brickSize
                 Dim pt = New cv.Point2f(cLine, i)
                 Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
@@ -624,7 +624,7 @@ Namespace VBClasses
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            desc = "Show where the pointcloud is continuous at the brick resolution"
+            desc = "Show where the pointcloud is continuous at the gr resolution"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -635,15 +635,15 @@ Namespace VBClasses
             dst2.SetTo(0)
             dst3.SetTo(0)
             Dim gcPrev = task.bricks.brickList(0)
-            For Each brick In task.bricks.brickList
-                If brick.rect.X > 0 Then
-                    If Math.Abs(brick.depth - gcPrev.depth) <= task.depthDiffMeters Then
-                        dst2(brick.rect).SetTo(255)
+            For Each gr In task.bricks.brickList
+                If gr.rect.X > 0 Then
+                    If Math.Abs(gr.depth - gcPrev.depth) <= task.depthDiffMeters Then
+                        dst2(gr.rect).SetTo(255)
                     Else
-                        dst3(brick.rect).SetTo(255)
+                        dst3(gr.rect).SetTo(255)
                     End If
                 End If
-                gcPrev = brick
+                gcPrev = gr
             Next
 
             labels(2) = "White pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of neighbor in X direction"
@@ -661,7 +661,7 @@ Namespace VBClasses
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            desc = "Show where the pointcloud is continuous at the brick resolution"
+            desc = "Show where the pointcloud is continuous at the gr resolution"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -672,17 +672,17 @@ Namespace VBClasses
             dst2.SetTo(0)
             Dim gcPrev = task.bricks.brickList(0)
             Dim cellMat As New cv.Mat(task.brickSize, task.brickSize, cv.MatType.CV_8U, cv.Scalar.All(127))
-            For Each brick In task.bricks.brickList
-                Dim gcAbove = task.bricks.brickList(CInt(brick.index Mod task.bricksPerRow))
-                If brick.correlation > task.fCorrThreshold Then
-                    If brick.rect.Y = 0 Or brick.rect.X = 0 Then Continue For
-                    If Math.Abs(brick.depth - gcPrev.depth) <= task.depthDiffMeters Then dst2(brick.rect).SetTo(128)
-                    If Math.Abs(brick.depth - gcAbove.depth) <= task.depthDiffMeters And
-                brick.rect.Width = cellMat.Width And brick.rect.Height = cellMat.Height Then
-                        cv.Cv2.Add(dst2(brick.rect), cellMat, dst2(brick.rect))
+            For Each gr In task.bricks.brickList
+                Dim gcAbove = task.bricks.brickList(CInt(gr.index Mod task.bricksPerRow))
+                If gr.correlation > task.fCorrThreshold Then
+                    If gr.rect.Y = 0 Or gr.rect.X = 0 Then Continue For
+                    If Math.Abs(gr.depth - gcPrev.depth) <= task.depthDiffMeters Then dst2(gr.rect).SetTo(128)
+                    If Math.Abs(gr.depth - gcAbove.depth) <= task.depthDiffMeters And
+                gr.rect.Width = cellMat.Width And gr.rect.Height = cellMat.Height Then
+                        cv.Cv2.Add(dst2(gr.rect), cellMat, dst2(gr.rect))
                     End If
                 End If
-                gcPrev = brick
+                gcPrev = gr
             Next
 
             labels(2) = "White pixels: Z-values within " + CStr(task.depthDiffMeters) + " meters of neighbor in X and Y direction"

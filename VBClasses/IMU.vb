@@ -534,14 +534,14 @@ Namespace VBClasses
             strOut = "ID" + vbTab + "len3D" + vbTab + "Depth" + vbTab + "Arc X" + vbTab + "Arc Y" + vbTab + "Arc Z" + vbTab + "IMU X" + vbTab + "IMU Y" + vbTab + "IMU Z" + vbCrLf
             dst3.SetTo(0)
             For i = 0 To cells.Count - 1
-                Dim brick = cells.ElementAt(i).Value
-                strOut += CStr(i) + vbTab + Format(brick.len3D, fmt1) + "m" + vbTab + Format(brick.tc1.depth, fmt1) + "m" + vbTab +
-                      Format(brick.arcX, fmt1) + vbTab + Format(brick.arcY, fmt1) + vbTab + Format(brick.arcZ, fmt1) + vbTab
+                Dim gr = cells.ElementAt(i).Value
+                strOut += CStr(i) + vbTab + Format(gr.len3D, fmt1) + "m" + vbTab + Format(gr.tc1.depth, fmt1) + "m" + vbTab +
+                      Format(gr.arcX, fmt1) + vbTab + Format(gr.arcY, fmt1) + vbTab + Format(gr.arcZ, fmt1) + vbTab
                 strOut += Format(task.accRadians.X * 57.2958, fmt1) + vbTab + Format(task.accRadians.Y * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbTab + vbCrLf
-                SetTrueText(CStr(i), brick.tc1.center, 2)
-                SetTrueText(CStr(i), brick.tc1.center, 3)
-                vbc.DrawLine(dst2, brick.tc1.center, brick.tc2.center, task.highlight)
-                vbc.DrawLine(dst3, brick.tc1.center, brick.tc2.center, white)
+                SetTrueText(CStr(i), gr.tc1.center, 2)
+                SetTrueText(CStr(i), gr.tc1.center, 3)
+                vbc.DrawLine(dst2, gr.tc1.center, gr.tc2.center, task.highlight)
+                vbc.DrawLine(dst3, gr.tc1.center, gr.tc2.center, white)
             Next
             SetTrueText(strOut, 3)
         End Sub
@@ -1127,27 +1127,27 @@ Namespace VBClasses
             dst3.SetTo(0)
             Dim index As Integer
             For i = brickCells.Count - 1 To 0 Step -1
-                Dim brick = brickCells(i)
-                If brick.arcY > options.angleThreshold Then
+                Dim gr = brickCells(i)
+                If gr.arcY > options.angleThreshold Then
                     index = brickCells.Count - i
-                    Dim p1 = brick.tc1.center
-                    Dim p2 = brick.tc2.center
+                    Dim p1 = gr.tc1.center
+                    Dim p2 = gr.tc2.center
                     Dim xOffset = p1.X - p2.X
                     If p1.Y < p2.Y Then xOffset = p2.X - p1.X
                     Dim hypot = p1.DistanceTo(p2)
-                    brick.imageAngle = -Math.Asin(xOffset / hypot) * 57.2958
+                    gr.imageAngle = -Math.Asin(xOffset / hypot) * 57.2958
 
-                    strOut += CStr(index) + vbTab + Format(brick.len3D, fmt1) + "m" + vbTab +
-                                                Format(brick.tc1.depth, fmt1) + "m" + vbTab +
-                                                Format(brick.arcY, fmt1) + vbTab +
-                                                Format(brick.imageAngle, fmt1) + vbTab
+                    strOut += CStr(index) + vbTab + Format(gr.len3D, fmt1) + "m" + vbTab +
+                                                Format(gr.tc1.depth, fmt1) + "m" + vbTab +
+                                                Format(gr.arcY, fmt1) + vbTab +
+                                                Format(gr.imageAngle, fmt1) + vbTab
                     strOut += Format(task.accRadians.Y * 57.2958, fmt1) + vbCrLf
 
-                    SetTrueText(CStr(index), brick.tc1.center, 2)
-                    SetTrueText(CStr(index), brick.tc1.center, 3)
-                    vbc.DrawLine(dst2, brick.tc1.center, brick.tc2.center, task.highlight)
-                    vbc.DrawLine(dst3, brick.tc1.center, brick.tc2.center, white)
-                    brickCells(i) = brick
+                    SetTrueText(CStr(index), gr.tc1.center, 2)
+                    SetTrueText(CStr(index), gr.tc1.center, 3)
+                    vbc.DrawLine(dst2, gr.tc1.center, gr.tc2.center, task.highlight)
+                    vbc.DrawLine(dst3, gr.tc1.center, gr.tc2.center, white)
+                    brickCells(i) = gr
                 Else
                     brickCells.RemoveAt(i)
                 End If
