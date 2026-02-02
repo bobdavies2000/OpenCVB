@@ -8,6 +8,7 @@ Namespace VBClasses
         ''' <summary>Unit gravity vector in body/sensor frame (points down).</summary>
         Public GravityVector As New cv.Point3f(0, 0, -1)
         Public Sub New()
+            If standalone Then task.gOptions.CrossHairs.Checked = True
             desc = "Compute the gravity vector using the complementary filter: fuse gyroscope (fast, drifts) with accelerometer (slow, stable)."
             labels(2) = "Complementary-filter gravity: angles and unit gravity vector"
         End Sub
@@ -119,10 +120,12 @@ Namespace VBClasses
             task.lpHorizon = New lpData(endpoints.p1, endpoints.p2)
             task.lpGravity = Line_PerpendicularTest.computePerp(task.lpHorizon)
 
-            strOut = "Complementary filter gravity" + vbCrLf +
+            If standaloneTest() Then
+                strOut = "Complementary filter gravity" + vbCrLf +
                      "Tilt (rad): X=" + Format(task.accRadians.X, fmt3) + " Y=" + Format(task.accRadians.Y, fmt3) + " Z=" + Format(task.accRadians.Z, fmt3) + vbCrLf +
                      "Gravity unit vector (body): " + Format(GravityVector.X, fmt3) + ", " + Format(GravityVector.Y, fmt3) + ", " + Format(GravityVector.Z, fmt3)
-            SetTrueText(strOut)
+                SetTrueText(strOut)
+            End If
         End Sub
     End Class
 
