@@ -113,6 +113,7 @@ Namespace VBClasses
 
     Public Class NR_Hist3D_RedColor : Inherits TaskParent
         Dim hColor As New Hist3Dcolor_Basics
+        Dim redC As New RedColor_Basics
         Public Sub New()
             desc = "Use the Hist3D color classes to segment the image with RedList_Basics"
         End Sub
@@ -120,8 +121,11 @@ Namespace VBClasses
             hColor.Run(src)
             dst3 = hColor.dst3
             labels(3) = hColor.labels(3)
-            dst2 = runRedList(hColor.dst2, labels(2))
-            If task.redList.oldrclist.Count > 0 Then dst2(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
+
+            redC.Run(hColor.dst2)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+            If redC.rcList.Count > 0 Then dst2(task.rcD.rect).SetTo(white, task.rcD.mask)
         End Sub
     End Class
 
@@ -291,34 +295,40 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             pixels.Run(src)
-            dst2 = task.redList.rcMap
+            dst2 = pixels.redC.rcMap
+            dst0 = pixels.redC.rcMap
+
             dst3 = dst2.InRange(0, 0)
             If pixels.pixelVector.Count = 0 Then Exit Sub
             dst1.SetTo(0)
-            dst0 = task.redList.rcMap
-            For Each roi In task.gridRects
-                If dst3(roi).CountNonZero Then
+            For Each gr In task.gridRects
+                If dst3(gr).CountNonZero Then
                     Dim candidates As New List(Of Integer)
-                    For y = 0 To roi.Height - 1
-                        For x = 0 To roi.Width - 1
-                            Dim val = dst0(roi).Get(Of Byte)(y, x)
+                    For y = 0 To gr.Height - 1
+                        For x = 0 To gr.Width - 1
+                            Dim val = dst0(gr).Get(Of Byte)(y, x)
                             If val = 0 Then Continue For
                             If candidates.Contains(val) = False Then candidates.Add(val)
                         Next
                     Next
                     If candidates.Count > 1 Then
-                        hVector.inputMask = dst3(roi)
-                        hVector.Run(src(roi))
+                        hVector.inputMask = dst3(gr)
+                        hVector.Run(src(gr))
                         Dim distances As New List(Of Double)
                         For Each index In candidates
-                            Dim vec = pixels.pixelVector(index - 1)
-                            distances.Add(distanceN(vec, hVector.histArray))
+                            If index >= 0 And index < pixels.pixelVector.Count Then
+                                Dim vec = pixels.pixelVector(index - 1)
+                                distances.Add(distanceN(vec, hVector.histArray))
+                            End If
                         Next
-                        Dim cell = pixels.rclist(candidates(distances.IndexOf(distances.Min)) - 1)
-                        dst1(roi).SetTo(cell.color, dst3(roi))
+                        Dim index1 = candidates(distances.IndexOf(distances.Min)) - 1
+                        If index1 < pixels.rclist.Count Then
+                            Dim cell = pixels.rclist(index1)
+                            dst1(gr).SetTo(cell.color, dst3(gr))
+                        End If
                     ElseIf candidates.Count = 1 Then
                         Dim cell = pixels.rclist(candidates(0) - 1)
-                        dst1(roi).SetTo(cell.color, dst3(roi))
+                        dst1(gr).SetTo(cell.color, dst3(gr))
                     End If
                 End If
             Next

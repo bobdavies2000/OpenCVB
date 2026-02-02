@@ -231,9 +231,8 @@ Namespace VBClasses
 
             If gOptions.CrossHairs.Checked Then
                 Gravity_Basics.showVectors(dstList(0))
-                Dim lp = lineLongest
+                Dim lp = If(lpGravity IsNot Nothing, lpGravity, lines.lpList(0))
                 Dim pt = New cv.Point2f((lp.pE1.X + lp.pE2.X) / 2 + 5, (lp.pE1.Y + lp.pE2.Y) / 2)
-                displayObject.trueData.Add(New TrueText("Longest", pt, 0))
             End If
 
             If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then

@@ -178,13 +178,11 @@ Namespace VBClasses
         Public pcFloor As Single ' y-value for floor...
         Public pcCeiling As Single ' y-value for ceiling...
 
-        Public lineGravity As New lpData
-        Public lineHorizon As New lpData
-        Public lineLongest As New lpData
+        Public lpGravity As New lpData
+        Public lpHorizon As New lpData
         Public lineLongestChanged As Boolean
         Public angleThreshold = 2
 
-        Public gravityIMU As New lpData
         Public IMU_RawAcceleration As cv.Point3f
         Public IMU_Acceleration As cv.Point3f
         Public IMU_AverageAcceleration As cv.Point3f

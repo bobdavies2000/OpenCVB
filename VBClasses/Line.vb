@@ -5,7 +5,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public motionMask As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         Dim ld As cv.XImgProc.FastLineDetector
-        Public noOverlappingLines As Boolean = True
+        Public removeOverlappingLines As Boolean = True
         Public overLappingCount As Integer
         Public Sub New()
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
@@ -74,7 +74,7 @@ Namespace VBClasses
             dst0.SetTo(0)
             For Each lp In sortlines.Values
                 lp.index = lpList.Count
-                If noOverlappingLines Then
+                If removeOverlappingLines Then
                     If lp.rect.Width = 0 Then Continue For
                     If lp.rect.Height = 0 Then Continue For
                     If dst0(lp.rect).CountNonZero > 0 Then
@@ -95,12 +95,11 @@ Namespace VBClasses
                 If task.frameCount > 10 Then
                     If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
                 End If
-                task.lineLongest = lpList(0)
             End If
 
             If task.heartBeat Then
                 labels(2) = CStr(count) + " lines retained - " + CStr(newCount) + " were new"
-                If noOverlappingLines Then labels(2) += ". " + CStr(overLappingCount) + " overlaps removed."
+                If removeOverlappingLines Then labels(2) += ". " + CStr(overLappingCount) + " overlaps removed."
             End If
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
@@ -193,7 +192,7 @@ Namespace VBClasses
             Return New lpData(p1, p2)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() Then input = task.gravityIMU
+            If standaloneTest() Then input = task.lpGravity
             dst2.SetTo(0)
             dst2.Line(input.p1, input.p2, white, task.lineWidth, task.lineType)
 
@@ -266,99 +265,6 @@ Namespace VBClasses
         End Sub
     End Class
 
-
-
-
-
-
-    Public Class Line_BrickList : Inherits TaskParent
-        Public lp As lpData ' set this input
-        Public lpOutput As lpData ' this is the result lp
-        Public sobel As New Edge_Sobel
-        Public ptList As New List(Of cv.Point)
-        Dim options As New Options_LeftRightCorrelation
-        Public Sub New()
-            labels(3) = "The line's rotated rect and the bricks containing the line."
-            dst3 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            desc = "Add a bricklist to the requested lp"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
-            If standalone Then
-                lp = task.lineLongest
-                If lp.length = 0 Then Exit Sub
-            End If
-
-            dst3.SetTo(0)
-            dst3.Line(lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link8)
-
-            Dim r = lp.rect
-            dst1.SetTo(0)
-            sobel.Run(task.gray)
-            sobel.dst2(r).CopyTo(dst1(r), dst3(r))
-            DrawRect(dst1, r, black)
-
-            Dim allPoints As New List(Of cv.Point)
-            Dim brickList As New List(Of cv.Rect)
-            For Each rect In task.gridRects
-                Dim gr = dst1(rect)
-                If gr.CountNonZero = 0 Then Continue For
-                Dim mm = GetMinMax(gr)
-                Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
-                If mm.maxVal = 255 Then
-                    allPoints.Add(pt)
-                    brickList.Add(rect)
-                End If
-            Next
-
-            ptList.Clear()
-            Dim angles As New List(Of Single)
-            Dim epListX1 As New List(Of Single)
-            Dim epListY1 As New List(Of Single)
-            Dim epListX2 As New List(Of Single)
-            Dim epListY2 As New List(Of Single)
-            For i = 0 To allPoints.Count - 1
-                Dim pt = allPoints(i)
-                For j = i + 1 To allPoints.Count - 1
-                    Dim lpTest = New lpData(pt, allPoints(j))
-                    If Math.Abs(lp.angle - lpTest.angle) < task.angleThreshold Then
-                        angles.Add(lpTest.angle)
-                        ptList.Add(pt)
-                        ptList.Add(allPoints(j))
-                        epListX1.Add(lpTest.pE1.X)
-                        epListY1.Add(lpTest.pE1.Y)
-                        epListX2.Add(lpTest.pE2.X)
-                        epListY2.Add(lpTest.pE2.Y)
-                    End If
-                Next
-            Next
-
-            If ptList.Count < 2 Then
-                SetTrueText("No gr points were found in the area.", 3)
-                lp = Nothing
-                Exit Sub
-            End If
-            dst2 = src
-            For Each pt In ptList
-                DrawCircle(dst2, pt)
-            Next
-
-            Dim x1 = epListX1.Average
-            Dim y1 = epListY1.Average
-            Dim x2 = epListX2.Average
-            Dim y2 = epListY2.Average
-            lpOutput = New lpData(New cv.Point2f(x1, y1), New cv.Point2f(x2, y2))
-            vbc.DrawLine(dst2, lpOutput)
-
-            If standalone Then lp = lpOutput
-
-            For Each r In brickList
-                DrawRect(dst3, r, white)
-            Next
-        End Sub
-    End Class
 
 
 
@@ -808,6 +714,116 @@ Namespace VBClasses
             Next
 
             dst3 = PaletteBlackZero(dst2)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class Line_BrickList : Inherits TaskParent
+        Public lp As lpData ' set this input
+        Public lpOutput As lpData ' this is the result lp
+        Public sobel As New Edge_Sobel
+        Public ptList As New List(Of cv.Point)
+        Dim options As New Options_LeftRightCorrelation
+        Public Sub New()
+            labels(3) = "Find the line's bricks containing the line."
+            dst3 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            desc = "Add a bricklist to the requested lp"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            If task.lines.lpList.Count = 0 Then Exit Sub
+
+            If standalone Then
+                lp = task.lines.lpList(0)
+                If lp.length = 0 Then Exit Sub
+            End If
+
+            dst3.SetTo(0)
+            dst3.Line(lp.p1, lp.p2, lp.index + 1, options.lineTrackerWidth, cv.LineTypes.Link8)
+
+            Dim r = lp.rect
+            dst1.SetTo(0)
+            sobel.Run(task.gray)
+            sobel.dst2(r).CopyTo(dst1(r), dst3(r))
+            DrawRect(dst1, r, black)
+
+            Dim allPoints As New List(Of cv.Point)
+            Dim brickList As New List(Of cv.Rect)
+            For Each rect In task.gridRects
+                Dim brick = dst1(rect)
+                If brick.CountNonZero = 0 Then Continue For
+                Dim mm = GetMinMax(brick)
+                Dim pt = New cv.Point(mm.maxLoc.X + rect.X, mm.maxLoc.Y + rect.Y)
+                allPoints.Add(pt)
+                brickList.Add(rect)
+            Next
+
+            ptList.Clear()
+            Dim angles As New List(Of Single)
+            Dim epListX1 As New List(Of Single)
+            Dim epListY1 As New List(Of Single)
+            Dim epListX2 As New List(Of Single)
+            Dim epListY2 As New List(Of Single)
+            For i = 0 To allPoints.Count - 1
+                Dim pt = allPoints(i)
+                For j = i + 1 To allPoints.Count - 1
+                    Dim lpTest = New lpData(pt, allPoints(j))
+                    'If Math.Abs(lp.angle - lpTest.angle) < task.angleThreshold Then
+                    angles.Add(lpTest.angle)
+                    ptList.Add(pt)
+                    ptList.Add(allPoints(j))
+                    epListX1.Add(lpTest.pE1.X)
+                    epListY1.Add(lpTest.pE1.Y)
+                    epListX2.Add(lpTest.pE2.X)
+                    epListY2.Add(lpTest.pE2.Y)
+                    'End If
+                Next
+            Next
+
+            If ptList.Count < 2 Then
+                SetTrueText("No edges were found in the area.", 3)
+                lp = Nothing
+                Exit Sub
+            End If
+            dst2 = src
+            For Each pt In ptList
+                DrawCircle(dst2, pt)
+            Next
+
+            Dim x1 = epListX1.Average
+            Dim y1 = epListY1.Average
+            Dim x2 = epListX2.Average
+            Dim y2 = epListY2.Average
+            lpOutput = New lpData(New cv.Point2f(x1, y1), New cv.Point2f(x2, y2))
+            vbc.DrawLine(dst2, lpOutput)
+
+            If standalone Then lp = lpOutput
+
+            For Each r In brickList
+                DrawRect(dst3, r, white)
+            Next
+        End Sub
+    End Class
+
+
+
+    Public Class Line_BrickListTest : Inherits TaskParent
+        Dim brickLines As New Line_BrickList
+        Public Sub New()
+            desc = "Find the brick list for each line in the lines.lplist"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            brickLines.lp = task.lines.lpList(0)
+            brickLines.Run(task.grayStable)
+            'For Each r In brickLines.brickList
+            '    DrawRect(dst3, r, white)
+            'Next
         End Sub
     End Class
 End Namespace

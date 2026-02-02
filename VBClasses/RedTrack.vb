@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedTrack_Basics : Inherits TaskParent
-        Dim redC As New RedColor_Basics
+        Public redC As New RedColor_Basics
         Public Sub New()
             If New cv.Size(task.workRes.Width, task.workRes.Height) <> New cv.Size(168, 94) Then task.frameHistoryCount = 1
             desc = "Get stats on each RedCloud cell."
@@ -62,7 +62,7 @@ Namespace VBClasses
         Private Function findNearest(pt As cv.Point) As Integer
             Dim bestDistance As Single = Single.MaxValue
             Dim bestIndex As Integer
-            For Each rc In task.redList.oldrclist
+            For Each rc In track.redC.rcList
                 Dim d = pt.DistanceTo(rc.maxDist)
                 If d < bestDistance Then
                     bestDistance = d
@@ -74,12 +74,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             track.Run(src)
             dst2 = track.dst2
-            If task.redList.oldrclist.Count = 0 Then
+            If track.redC.rcList.Count = 0 Then
                 SetTrueText("No lines found to track.", 3)
                 Exit Sub
             End If
             Dim xList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-            For Each rc In task.redList.oldrclist
+            For Each rc In track.redC.rcList
                 If rc.index = 0 Then Continue For
                 xList.Add(rc.rect.X, rc.index)
             Next
@@ -93,21 +93,23 @@ Namespace VBClasses
                 While leftCenter.DistanceTo(rightCenter) < dst2.Width / 4
                     leftMost = msRNG.Next(minLeft, minRight)
                     rightmost = msRNG.Next(minLeft, minRight)
-                    leftCenter = task.redList.oldrclist(leftMost).maxDist
-                    rightCenter = task.redList.oldrclist(rightmost).maxDist
+                    leftCenter = track.redC.rcList(leftMost).maxDist
+                    rightCenter = track.redC.rcList(rightmost).maxDist
                     iterations += 1
                     If iterations > 10 Then Exit Sub
                 End While
             End If
 
-            leftMost = findNearest(leftCenter)
-            leftCenter = task.redList.oldrclist(leftMost).maxDist
+            leftMost = findNearest(leftCenter) - 1
+            rightmost = findNearest(rightCenter) - 1
+            If leftMost >= 0 And leftMost < track.redC.rcList.Count And
+                rightmost >= 0 And rightmost < track.redC.rcList.Count Then
+                leftCenter = track.redC.rcList(leftMost).maxDist
+                rightCenter = track.redC.rcList(rightmost).maxDist
 
-            rightmost = findNearest(rightCenter)
-            rightCenter = task.redList.oldrclist(rightmost).maxDist
-
-            vbc.DrawLine(dst2, leftCenter, rightCenter, white)
-            labels(2) = task.redList.labels(2)
+                vbc.DrawLine(dst2, leftCenter, rightCenter, white)
+            End If
+            labels(2) = track.redC.labels(2)
         End Sub
     End Class
 

@@ -983,7 +983,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             selectLine.Run(src) ' this will select a line if not standalone
-            Dim lp = If(standalone, task.lineLongest, task.lpD)
+            Dim lp = If(standalone, task.lines.lpList(0), task.lpD)
 
             findLine3D.lp = lp
             findLine3D.Run(src)

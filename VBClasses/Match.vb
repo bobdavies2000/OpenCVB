@@ -28,7 +28,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 dst2 = task.gray.Clone
                 dst2.Rectangle(newRect, white, task.lineWidth)
-                vbc.DrawLine(dst2, task.lineLongest.p1, task.lineLongest.p2, white)
+                vbc.DrawLine(dst2, task.lines.lpList(0).p1, task.lines.lpList(0).p2, white)
             End If
         End Sub
     End Class
@@ -60,7 +60,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 dst2 = task.gray.Clone
                 dst2.Rectangle(newRect, white, task.lineWidth)
-                vbc.DrawLine(dst2, task.lineLongest.p1, task.lineLongest.p2, white)
+                vbc.DrawLine(dst2, task.lines.lpList(0).p1, task.lines.lpList(0).p2, white)
             End If
         End Sub
     End Class
@@ -99,7 +99,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
                 If task.heartBeatLT Then
-                    matchRect = ValidateRect(task.lineLongest.rect)
+                    matchRect = ValidateRect(task.lines.lpList(0).rect)
                     match.template = src(matchRect)
                 End If
             End If
@@ -555,7 +555,7 @@ Namespace VBClasses
             desc = "Match a gr's movement from the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then gridIndex = task.lineLongest.p1GridIndex
+            If standalone Then gridIndex = task.lines.lpList(0).p1GridIndex
             Static lastImage As cv.Mat = task.gray.Clone
 
             Dim rect = task.gridRects(gridIndex)

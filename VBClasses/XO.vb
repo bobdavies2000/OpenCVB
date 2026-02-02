@@ -193,18 +193,18 @@ Namespace VBClasses
             xBot = findLast(gPoints, False, sampleUnused)
 
             If standaloneTest() Then
-                Dim lineHorizon As lpData, lineGravity As lpData
+                Dim lpHorizon As lpData, lpGravity As lpData
                 If hPoints.Total > 0 Then
-                    lineHorizon = New lpData(New cv.Point(0, yLeft), New cv.Point(dst2.Width, yRight))
+                    lpHorizon = New lpData(New cv.Point(0, yLeft), New cv.Point(dst2.Width, yRight))
                 Else
-                    lineHorizon = New lpData
+                    lpHorizon = New lpData
                 End If
 
-                lineGravity = New lpData(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
+                lpGravity = New lpData(New cv.Point(xTop, 0), New cv.Point(xBot, dst2.Height))
 
                 dst2.SetTo(0)
-                vbc.DrawLine(dst2, lineGravity.p1, lineGravity.p2, task.highlight)
-                vbc.DrawLine(dst2, lineHorizon.p1, lineHorizon.p2, cv.Scalar.Red)
+                vbc.DrawLine(dst2, lpGravity.p1, lpGravity.p2, task.highlight)
+                vbc.DrawLine(dst2, lpHorizon.p1, lpHorizon.p2, cv.Scalar.Red)
             End If
         End Sub
     End Class
@@ -217,10 +217,10 @@ Namespace VBClasses
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            task.lineGravity = New lpData(New cv.Point2f(dst2.Width / 2, 0),
+            task.lpGravity = New lpData(New cv.Point2f(dst2.Width / 2, 0),
                                              New cv.Point2f(dst2.Width / 2, dst2.Height))
-            task.lineHorizon = New lpData(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
-            labels = {"", "Horizon vector mask", "Crosshairs - lineGravity (vertical) and lineHorizon (horizontal)", "Gravity vector mask"}
+            task.lpHorizon = New lpData(New cv.Point2f(0, dst2.Height / 2), New cv.Point2f(dst2.Width, dst2.Height / 2))
+            labels = {"", "Horizon vector mask", "Crosshairs - lpGravity (vertical) and lpHorizon (horizontal)", "Gravity vector mask"}
             desc = "Create lines for the gravity vector and horizon vector in the camera image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -248,8 +248,8 @@ Namespace VBClasses
                 Dim p2 = points(xVals.IndexOf(xVals.Max()))
 
                 Dim lp = findEdgePoints(New lpData(p1, p2))
-                task.lineHorizon = New lpData(lp.p1, lp.p2)
-                vbc.DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, 255)
+                task.lpHorizon = New lpData(lp.p1, lp.p2)
+                vbc.DrawLine(dst2, task.lpHorizon.p1, task.lpHorizon.p2, 255)
             End If
 
             dst3 = split(0).InRange(-0.01, 0.01)
@@ -267,12 +267,12 @@ Namespace VBClasses
                 Dim p1 = points(yVals.IndexOf(yVals.Min()))
                 Dim p2 = points(yVals.IndexOf(yVals.Max()))
                 If Math.Abs(p1.X - p2.X) < 2 Then
-                    task.lineGravity = New lpData(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
+                    task.lpGravity = New lpData(New cv.Point2f(dst2.Width / 2, 0), New cv.Point2f(dst2.Width / 2, dst2.Height))
                 Else
                     Dim lp = findEdgePoints(New lpData(p1, p2))
-                    task.lineGravity = New lpData(lp.p1, lp.p2)
+                    task.lpGravity = New lpData(lp.p1, lp.p2)
                 End If
-                vbc.DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, 255)
+                vbc.DrawLine(dst2, task.lpGravity.p1, task.lpGravity.p2, 255)
             End If
         End Sub
     End Class
@@ -291,13 +291,13 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            vbc.DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, white)
+            vbc.DrawLine(dst2, task.lpHorizon.p1, task.lpHorizon.p2, white)
 
-            perp.input = task.lineHorizon
+            perp.input = task.lpHorizon
             perp.Run(src)
             vbc.DrawLine(dst2, perp.output.p1, perp.output.p2, cv.Scalar.Yellow)
 
-            Dim gVec = task.lineGravity
+            Dim gVec = task.lpGravity
             gVec.p1.X += 10
             gVec.p2.X += 10
             vbc.DrawLine(dst2, gVec.p1, gVec.p2, white)
@@ -419,8 +419,8 @@ Namespace VBClasses
 
             src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             If task.heartBeat Then
-                ptLeft = task.lineGravity.p1
-                ptRight = task.lineGravity.p2
+                ptLeft = task.lpGravity.p1
+                ptRight = task.lpGravity.p2
                 Dim r = ValidateRect(New cv.Rect(ptLeft.X - pad, ptLeft.Y - pad, task.brickSize, task.brickSize))
                 leftTemplate = src(r)
 
@@ -478,8 +478,8 @@ Namespace VBClasses
                 DrawCircle(dst2, pt, task.DotSize, white)
             Next
 
-            vbc.DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, white)
-            vbc.DrawLine(dst3, task.lineGravity.p1, task.lineGravity.p2, white)
+            vbc.DrawLine(dst2, task.lpGravity.p1, task.lpGravity.p2, white)
+            vbc.DrawLine(dst3, task.lpGravity.p1, task.lpGravity.p2, white)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(0) Else dst0 = src
@@ -513,11 +513,11 @@ Namespace VBClasses
                 strOut += "Using the previous value for the gravity vector."
             Else
                 Dim lp = findEdgePoints(New lpData(p1, p2))
-                task.lineGravity = New lpData(lp.p1, lp.p2)
+                task.lpGravity = New lpData(lp.p1, lp.p2)
                 If standaloneTest() Then displayResults(p1, p2)
             End If
 
-            task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
+            task.lpHorizon = Line_PerpendicularTest.computePerp(task.lpGravity)
             SetTrueText(strOut, 3)
         End Sub
     End Class
@@ -540,16 +540,16 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim lineGravity = New lpData(task.lineGravity.p1, task.lineGravity.p2)
-            Dim lineHorizon = New lpData(task.lineHorizon.p1, task.lineHorizon.p2)
+            Dim lpGravity = New lpData(task.lpGravity.p1, task.lpGravity.p2)
+            Dim lpHorizon = New lpData(task.lpHorizon.p1, task.lpHorizon.p2)
 
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            translationX = task.gOptions.DebugSlider.Value ' Math.Round(lineGravity.p1.X - task.lineGravity.p1.X)
-            translationY = task.gOptions.DebugSlider.Value ' Math.Round(lineHorizon.p1.Y - task.lineHorizon.p1.Y)
+            translationX = task.gOptions.DebugSlider.Value ' Math.Round(lpGravity.p1.X - task.lpGravity.p1.X)
+            translationY = task.gOptions.DebugSlider.Value ' Math.Round(lpHorizon.p1.Y - task.lpHorizon.p1.Y)
             If Math.Abs(translationX) >= dst2.Width / 2 Then translationX = 0
-            If lineHorizon.p1.Y >= dst2.Height Or lineHorizon.p2.Y >= dst2.Height Or Math.Abs(translationY) >= dst2.Height / 2 Then
-                lineHorizon = New lpData(New cv.Point2f, New cv.Point2f(336, 0))
+            If lpHorizon.p1.Y >= dst2.Height Or lpHorizon.p2.Y >= dst2.Height Or Math.Abs(translationY) >= dst2.Height / 2 Then
+                lpHorizon = New lpData(New cv.Point2f, New cv.Point2f(336, 0))
                 translationY = 0
             End If
 
@@ -593,12 +593,12 @@ Namespace VBClasses
                 End If
             End If
 
-            lineGravity = New lpData(task.lineGravity.p1, task.lineGravity.p2)
-            lineHorizon = New lpData(task.lineHorizon.p1, task.lineHorizon.p2)
+            lpGravity = New lpData(task.lpGravity.p1, task.lpGravity.p2)
+            lpHorizon = New lpData(task.lpHorizon.p1, task.lpHorizon.p2)
             SetTrueText(strOut, 3)
 
             labels(2) = "Translation (X, Y) = (" + CStr(translationX) + ", " + CStr(translationY) + ")" +
-                        If(lineHorizon.p1.Y = 0 And lineHorizon.p2.Y = 0, " there is no horizon present", "")
+                        If(lpHorizon.p1.Y = 0 And lpHorizon.p2.Y = 0, " there is no horizon present", "")
             labels(3) = "Camera direction (radians) = " + Format(task.camDirection, fmt1) + " with distance = " + Format(task.camMotionPixels, fmt1)
         End Sub
     End Class
@@ -614,8 +614,8 @@ Namespace VBClasses
         Public rotationY As Single
         Public centerY As cv.Point2f
         Public rotate As New Rotate_BasicsQT
-        Dim lineGravity As lpData
-        Dim lineHorizon As lpData
+        Dim lpGravity As lpData
+        Dim lpHorizon As lpData
         Dim options As New Options_Diff
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -624,13 +624,13 @@ Namespace VBClasses
         End Sub
         Public Sub translateRotateX(x1 As Integer, x2 As Integer)
             rotationX = Math.Atan(Math.Abs((x1 - x2)) / dst2.Height) * 57.2958
-            centerX = New cv.Point2f((task.lineGravity.p1.X + task.lineGravity.p2.X) / 2, (task.lineGravity.p1.Y + task.lineGravity.p2.Y) / 2)
+            centerX = New cv.Point2f((task.lpGravity.p1.X + task.lpGravity.p2.X) / 2, (task.lpGravity.p1.Y + task.lpGravity.p2.Y) / 2)
             If x1 >= 0 And x2 > 0 Then
                 translationX = If(x1 > x2, x1 - x2, x2 - x1)
-                centerX = task.lineGravity.p2
+                centerX = task.lpGravity.p2
             ElseIf x1 <= 0 And x2 < 0 Then
                 translationX = If(x1 > x2, x1 - x2, x2 - x1)
-                centerX = task.lineGravity.p1
+                centerX = task.lpGravity.p1
             ElseIf x1 < 0 And x2 > 0 Then
                 translationX = 0
             Else
@@ -640,13 +640,13 @@ Namespace VBClasses
         End Sub
         Public Sub translateRotateY(y1 As Integer, y2 As Integer)
             rotationY = Math.Atan(Math.Abs((y1 - y2)) / dst2.Width) * 57.2958
-            centerY = New cv.Point2f((task.lineHorizon.p1.X + task.lineHorizon.p2.X) / 2, (task.lineHorizon.p1.Y + task.lineHorizon.p2.Y) / 2)
+            centerY = New cv.Point2f((task.lpHorizon.p1.X + task.lpHorizon.p2.X) / 2, (task.lpHorizon.p1.Y + task.lpHorizon.p2.Y) / 2)
             If y1 > 0 And y2 > 0 Then
                 translationY = If(y1 > y2, y1 - y2, y2 - y1)
-                centerY = task.lineHorizon.p2
+                centerY = task.lpHorizon.p2
             ElseIf y1 < 0 And y2 < 0 Then
                 translationY = If(y1 > y2, y1 - y2, y2 - y1)
-                centerY = task.lineHorizon.p1
+                centerY = task.lpHorizon.p1
             ElseIf y1 < 0 And y2 > 0 Then
                 translationY = 0
             Else
@@ -658,17 +658,17 @@ Namespace VBClasses
             options.Run()
 
             If task.firstPass Then
-                lineGravity = task.lineGravity
-                lineHorizon = task.lineHorizon
+                lpGravity = task.lpGravity
+                lpHorizon = task.lpHorizon
             End If
 
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            Dim x1 = lineGravity.p1.X - task.lineGravity.p1.X
-            Dim x2 = lineGravity.p2.X - task.lineGravity.p2.X
+            Dim x1 = lpGravity.p1.X - task.lpGravity.p1.X
+            Dim x2 = lpGravity.p2.X - task.lpGravity.p2.X
 
-            Dim y1 = lineHorizon.p1.Y - task.lineHorizon.p1.Y
-            Dim y2 = lineHorizon.p2.Y - task.lineHorizon.p2.Y
+            Dim y1 = lpHorizon.p1.Y - task.lpHorizon.p1.Y
+            Dim y2 = lpHorizon.p2.Y - task.lpHorizon.p2.Y
 
             translateRotateX(x1, x2)
             translateRotateY(y1, y2)
@@ -688,8 +688,8 @@ Namespace VBClasses
                 dst2 = src
             End If
 
-            lineGravity = task.lineGravity
-            lineHorizon = task.lineHorizon
+            lpGravity = task.lpGravity
+            lpHorizon = task.lpHorizon
 
             labels(2) = "Translation X = " + Format(translationX, fmt1) + " rotation X = " + Format(rotationX, fmt1) + " degrees " +
                         " center of rotation X = " + Format(centerX.X, fmt0) + ", " + Format(centerX.Y, fmt0)
@@ -733,16 +733,16 @@ Namespace VBClasses
             dst2 = rotate.dst2.Clone
             dst1 = dst2.Clone
 
-            Dim lineHorizon = New lpData(task.lineHorizon.p1, task.lineHorizon.p2)
+            Dim lpHorizon = New lpData(task.lpHorizon.p1, task.lpHorizon.p2)
 
-            lineHorizon.p1 = RotatePoint(task.lineHorizon.p1, rotate.rotateCenter, -rotate.rotateAngle)
-            lineHorizon.p2 = RotatePoint(task.lineHorizon.p2, rotate.rotateCenter, -rotate.rotateAngle)
+            lpHorizon.p1 = RotatePoint(task.lpHorizon.p1, rotate.rotateCenter, -rotate.rotateAngle)
+            lpHorizon.p2 = RotatePoint(task.lpHorizon.p2, rotate.rotateCenter, -rotate.rotateAngle)
 
-            vbc.DrawLine(dst2, lineHorizon.p1, lineHorizon.p2, task.highlight)
-            vbc.DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, white)
+            vbc.DrawLine(dst2, lpHorizon.p1, lpHorizon.p2, task.highlight)
+            vbc.DrawLine(dst2, task.lpHorizon.p1, task.lpHorizon.p2, white)
 
-            Dim y1 = lineHorizon.p1.Y - task.lineHorizon.p1.Y
-            Dim y2 = lineHorizon.p2.Y - task.lineHorizon.p2.Y
+            Dim y1 = lpHorizon.p1.Y - task.lpHorizon.p1.Y
+            Dim y2 = lpHorizon.p2.Y - task.lpHorizon.p2.Y
             edges.translateRotateY(y1, y2)
 
             rotate.rotateAngle = edges.rotationY
@@ -3359,10 +3359,10 @@ Namespace VBClasses
             dst2 = src.Clone
             If standaloneTest() Then dst3 = task.lines.dst2
 
-            nearest.lp = task.lineGravity
-            vbc.DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, white)
+            nearest.lp = task.lpGravity
+            vbc.DrawLine(dst2, task.lpGravity.p1, task.lpGravity.p2, white)
             For Each lp In task.lines.lpList
-                Dim ptInter = Line_Intersection.IntersectTest(lp.p1, lp.p2, task.lineGravity.p1, task.lineGravity.p2)
+                Dim ptInter = Line_Intersection.IntersectTest(lp.p1, lp.p2, task.lpGravity.p1, task.lpGravity.p2)
                 If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then
                     Continue For
                 End If
@@ -3380,10 +3380,10 @@ Namespace VBClasses
                 End If
             Next
 
-            vbc.DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, white)
-            nearest.lp = task.lineHorizon
+            vbc.DrawLine(dst2, task.lpHorizon.p1, task.lpHorizon.p2, white)
+            nearest.lp = task.lpHorizon
             For Each lp In task.lines.lpList
-                Dim ptInter = Line_Intersection.IntersectTest(lp.p1, lp.p2, task.lineHorizon.p1, task.lineHorizon.p2)
+                Dim ptInter = Line_Intersection.IntersectTest(lp.p1, lp.p2, task.lpHorizon.p1, task.lpHorizon.p2)
                 If ptInter.X >= 0 And ptInter.X < dst2.Width And ptInter.Y >= 0 And ptInter.Y < dst2.Height Then Continue For
 
                 nearest.pt = lp.p1
@@ -3398,8 +3398,8 @@ Namespace VBClasses
                     vbc.DrawLine(dst2, lp.p1, lp.p2, cv.Scalar.Red)
                 End If
             Next
-            labels(2) = "Slope for gravity is " + Format(task.lineGravity.slope, fmt1) + ".  Slope for horizon is " +
-                    Format(task.lineHorizon.slope, fmt1)
+            labels(2) = "Slope for gravity is " + Format(task.lpGravity.slope, fmt1) + ".  Slope for horizon is " +
+                    Format(task.lpHorizon.slope, fmt1)
         End Sub
     End Class
 
@@ -4896,7 +4896,7 @@ Namespace VBClasses
             dst2.Rectangle(firstRect, task.highlight, task.lineWidth)
             dst2.Rectangle(lastRect, task.highlight, task.lineWidth)
             dst2.Line(cameraMotionProxy.p1, cameraMotionProxy.p2, task.highlight, task.lineWidth, task.lineType)
-            dst2.Line(task.lineGravity.pE1, task.lineGravity.pE2, task.highlight, task.lineWidth, task.lineType)
+            dst2.Line(task.lpGravity.pE1, task.lpGravity.pE2, task.highlight, task.lineWidth, task.lineType)
         End Sub
     End Class
 
@@ -5438,11 +5438,11 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lplist = task.lines.lpList
-            If standalone And foundLine = False Then lpInput = task.lineLongest
+            If standalone And foundLine = False Then lpInput = task.lines.lpList(0)
 
             Static subsetrect = lpInput.rect
             If subsetrect.width <= dst2.Height / 10 Then
-                lpInput = task.lineLongest
+                lpInput = task.lines.lpList(0)
                 subsetrect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
                 Exit Sub
             End If
@@ -5481,10 +5481,10 @@ Namespace VBClasses
                     lpInput = lplist(0)
                 End If
 
-                Dim deltaX1 = Math.Abs(task.gravityIMU.pE1.X - lpInput.pE1.X)
-                Dim deltaX2 = Math.Abs(task.gravityIMU.pE2.X - lpInput.pE2.X)
+                Dim deltaX1 = Math.Abs(task.lpGravity.pE1.X - lpInput.pE1.X)
+                Dim deltaX2 = Math.Abs(task.lpGravity.pE2.X - lpInput.pE2.X)
                 If Math.Abs(deltaX1 - deltaX2) > task.gravityBasics.options.pixelThreshold Then
-                    lpInput = task.lineLongest
+                    lpInput = task.lines.lpList(0)
                 End If
                 subsetrect = lpInput.rect
             End If
@@ -5512,7 +5512,7 @@ Namespace VBClasses
         End Sub
         Private Function restartLine(src As cv.Mat) As lpData
             For Each lpTemp In lplist
-                If Math.Abs(task.lineGravity.angle - lpTemp.angle) < task.angleThreshold Then
+                If Math.Abs(task.lpGravity.angle - lpTemp.angle) < task.angleThreshold Then
                     matchRect = lpTemp.rect
                     match.template = src(matchRect).Clone
                     Return lpTemp
@@ -5638,9 +5638,9 @@ Namespace VBClasses
             dst.Rectangle(lastRect, task.highlight, task.lineWidth)
         End Sub
         Public Shared Sub showVectors(dst As cv.Mat)
-            dst.Line(task.lineGravity.p1, task.lineGravity.p2, white, task.lineWidth, task.lineType)
-            dst.Line(task.lineHorizon.p1, task.lineHorizon.p2, white, task.lineWidth, task.lineType)
-            showVec(dst, task.lineLongest)
+            dst.Line(task.lpGravity.p1, task.lpGravity.p2, white, task.lineWidth, task.lineType)
+            dst.Line(task.lpHorizon.p1, task.lpHorizon.p2, white, task.lineWidth, task.lineType)
+            showVec(dst, task.lines.lpList(0))
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
@@ -5663,20 +5663,18 @@ Namespace VBClasses
                 nearest.lpInput = RGBcandidate
                 nearest.Run(src)
                 RGBcandidate = nearest.lpOutput
-                Dim deltaX1 = Math.Abs(task.lineGravity.pE1.X - RGBcandidate.pE1.X)
-                Dim deltaX2 = Math.Abs(task.lineGravity.pE2.X - RGBcandidate.pE2.X)
+                Dim deltaX1 = Math.Abs(task.lpGravity.pE1.X - RGBcandidate.pE1.X)
+                Dim deltaX2 = Math.Abs(task.lpGravity.pE2.X - RGBcandidate.pE2.X)
                 If Math.Abs(deltaX1 - deltaX2) > options.pixelThreshold Then
-                    task.lineGravity = task.gravityIMU
                     RGBcandidate = New lpData
                     If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
                 End If
             Else
-                task.lineGravity = task.gravityIMU
                 RGBcandidate = New lpData
                 If gravityMatch.gLines.Count > 0 Then RGBcandidate = gravityMatch.gLines(0)
             End If
 
-            task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
+            task.lpHorizon = Line_PerpendicularTest.computePerp(task.lpGravity)
 
             gravityRGB = RGBcandidate
 
@@ -7857,7 +7855,7 @@ Namespace VBClasses
                 dst3 = task.lines.dst2
             End If
 
-            ' task.lineLongest = lp
+            ' task.lines.lplist(0) = lp
             Static strList As New List(Of String)
             strList.Add(strOut)
             If strList.Count > 10 Then strList.RemoveAt(0)
@@ -7915,12 +7913,12 @@ Namespace VBClasses
             If match.correlation < task.fCorrThreshold Or task.frameCount < 10 Or lp Is Nothing Then
                 lp = lplist(0)
                 For Each lp In lplist
-                    If Math.Abs(task.lineGravity.angle - lp.angle) < task.angleThreshold Then Exit For
+                    If Math.Abs(task.lpGravity.angle - lp.angle) < task.angleThreshold Then Exit For
                 Next
                 match.template = src(lp.rect)
             End If
 
-            If Math.Abs(task.lineGravity.angle - lp.angle) >= task.angleThreshold Then
+            If Math.Abs(task.lpGravity.angle - lp.angle) >= task.angleThreshold Then
                 lp = Nothing
                 Exit Sub
             End If
@@ -8202,7 +8200,7 @@ Namespace VBClasses
             gLines.Clear()
             dst2 = src.Clone
             For Each lp In task.lines.lpList
-                If Math.Abs(task.lineGravity.angle - lp.angle) < 2 Then
+                If Math.Abs(task.lpGravity.angle - lp.angle) < 2 Then
                     dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth + 1, task.lineType)
                     gLines.Add(lp)
                 End If
@@ -8257,14 +8255,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
 
-            Dim p1 = task.lineHorizon.p1, p2 = task.lineHorizon.p2
+            Dim p1 = task.lpHorizon.p1, p2 = task.lpHorizon.p2
             Dim sideOpposite = p2.Y - p1.Y
             If p1.X = 0 Then sideOpposite = p1.Y - p2.Y
             Dim hAngle = Math.Atan(sideOpposite / dst2.Width) * 57.2958
 
             horizList.Clear()
             For Each lp In task.lines.lpList
-                If Math.Abs(task.lineHorizon.angle - lp.angle) < task.angleThreshold Then
+                If Math.Abs(task.lpHorizon.angle - lp.angle) < task.angleThreshold Then
                     vbc.DrawLine(dst2, lp.p1, lp.p2)
                     horizList.Add(lp)
                 End If
@@ -8284,14 +8282,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
 
-            Dim p1 = task.lineGravity.p1, p2 = task.lineGravity.p2
+            Dim p1 = task.lpGravity.p1, p2 = task.lpGravity.p2
             Dim sideOpposite = p2.X - p1.X
             If p1.Y = 0 Then sideOpposite = p1.X - p2.X
             Dim gAngle = Math.Atan(sideOpposite / dst2.Height) * 57.2958
 
             vertList.Clear()
             For Each lp In task.lines.lpList
-                If Math.Abs(task.lineGravity.angle - lp.angle) < task.angleThreshold Then
+                If Math.Abs(task.lpGravity.angle - lp.angle) < task.angleThreshold Then
                     vbc.DrawLine(dst2, lp.p1, lp.p2)
                     vertList.Add(lp)
                 End If
@@ -8357,7 +8355,7 @@ Namespace VBClasses
             desc = "Find the line that is closest to the input line"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then lpInput = task.lineLongest
+            If standalone Then lpInput = task.lines.lpList(0)
             Dim lpList = task.lines.lpList
 
             Dim sortDistance As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
@@ -8547,7 +8545,7 @@ Namespace VBClasses
             desc = "Highlight both vertical and horizontal lines"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim gravityDelta As Single = task.lineGravity.pE1.X - task.lineGravity.pE2.X
+            Dim gravityDelta As Single = task.lpGravity.pE1.X - task.lpGravity.pE2.X
 
             kalman.kInput = {gravityDelta}
             kalman.Run(emptyMat)
@@ -8583,14 +8581,14 @@ Namespace VBClasses
             desc = "Highlight both vertical and horizontal lines - not terribly good..."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim gravityDelta As Single = task.lineGravity.pE1.X - task.lineGravity.pE2.X
+            Dim gravityDelta As Single = task.lpGravity.pE1.X - task.lpGravity.pE2.X
 
             dst2 = src
             If standalone Then dst3 = task.lines.dst2
             Dim deltaList As New List(Of Single)
             vertList.Clear()
             For Each lp In task.lines.lpList
-                If Math.Abs(lp.angle) > 45 And Math.Sign(task.lineGravity.slope) = Math.Sign(lp.slope) Then
+                If Math.Abs(lp.angle) > 45 And Math.Sign(task.lpGravity.slope) = Math.Sign(lp.slope) Then
                     Dim delta = lp.pE1.X - lp.pE2.X
                     If Math.Abs(gravityDelta - delta) < task.gravityBasics.options.pixelThreshold Then
                         deltaList.Add(delta)
@@ -8603,7 +8601,7 @@ Namespace VBClasses
 
             If task.heartBeat Then
                 labels(3) = "Gravity offset at image edge = " + Format(gravityDelta, fmt3) + " and m = " +
-                        Format(task.lineGravity.slope, fmt3)
+                        Format(task.lpGravity.slope, fmt3)
                 If deltaList.Count > 0 Then
                     labels(2) = Format(gravityDelta, fmt3) + "/" + Format(deltaList.Average(), fmt3) + " gravity delta/line average delta"
                 Else
@@ -9020,8 +9018,8 @@ Namespace VBClasses
             desc = "Measure how much the camera has moved."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static vecLast = task.lineLongest
-            Dim vec = task.lineLongest
+            Static vecLast = task.lines.lpList(0)
+            Dim vec = task.lines.lpList(0)
 
             deltaX1 = vec.pE1.X - vecLast.pE1.x
             deltaY1 = vec.pE1.Y - vecLast.pE1.Y
@@ -9513,7 +9511,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst3.SetTo(0)
-            If standalone Then lp = task.lineLongest
+            If standalone Then lp = task.lines.lpList(0)
             If lp.pVec1(2) = 0 Or lp.pVec2(2) = 0 Then
                 lp = Nothing ' no result...
                 Exit Sub
@@ -9560,7 +9558,7 @@ Namespace VBClasses
             desc = "Create a 3D line where there is a detected line in 2D."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then lp = task.lineLongest
+            If standalone Then lp = task.lines.lpList(0)
             If lp.pVec1(2) = 0 Or lp.pVec2(2) = 0 Then
                 lp = Nothing ' no result...
                 Exit Sub
@@ -12017,7 +12015,7 @@ Namespace VBClasses
             If task.heartBeatLT Or gravitySnap.p1.X = 0 Or correlation < correlationThreshold Then
                 If inputRect.Width <> 0 Then task.centerRect = inputRect
                 template = src(task.centerRect).Clone
-                gravitySnap = task.lineGravity
+                gravitySnap = task.lpGravity
             End If
 
             cv.Cv2.MatchTemplate(template, src, dst3, options.matchOption)
@@ -12042,7 +12040,7 @@ Namespace VBClasses
             Dim yDisp = matchCenter.Y - dst2.Height / 2
             translation = New cv.Point2f(xDisp, yDisp)
 
-            Dim mp = task.lineGravity
+            Dim mp = task.lpGravity
             dst2.Line(mp.p1, mp.p2, black, task.lineWidth, task.lineType)
 
             Dim sideAdjacent = dst2.Height / 2
@@ -12282,7 +12280,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = task.gray
 
-            Dim lp = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
+            Dim lp = New lpData(task.lines.lpList(0).pE1, task.lines.lpList(0).pE2)
             vbc.DrawLine(dst2, lp, white)
         End Sub
     End Class
@@ -14782,7 +14780,7 @@ Namespace VBClasses
             desc = "Display details about the line selected."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then task.lpD = task.lineGravity
+            If standalone Then task.lpD = task.lpGravity
             labels(2) = task.lines.labels(2) + " - Use the global option 'DebugSlider' to select a line."
 
             If task.lines.lpList.Count <= 1 Then Exit Sub
@@ -14861,7 +14859,7 @@ Namespace VBClasses
             desc = "Identify a line that is a match in the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            lp = task.lineLongest
+            lp = task.lines.lpList(0)
 
             lrLines.Run(emptyMat)
             dst2 = lrLines.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -14997,7 +14995,6 @@ Namespace VBClasses
                 dst3 = task.lines.dst2
             End If
 
-            task.lineLongest = lp
             labels(2) = "Selected line has a correlation of " + Format(match.correlation, fmt3) + " with the previous frame."
         End Sub
     End Class
@@ -15012,11 +15009,11 @@ Namespace VBClasses
             desc = "Use the slope of the longest RGB line to figure out if camera moved enough to obtain the IMU gravity vector."
         End Sub
         Public Shared Sub showVectors(dst As cv.Mat)
-            dst.Line(task.lineGravity.pE1, task.lineGravity.pE2, white, task.lineWidth, task.lineType)
-            dst.Line(task.lineHorizon.pE1, task.lineHorizon.pE2, white, task.lineWidth, task.lineType)
-            If task.lineLongest IsNot Nothing Then
-                dst.Line(task.lineLongest.p1, task.lineLongest.p2, task.highlight, task.lineWidth * 2, task.lineType)
-                vbc.DrawLine(dst, task.lineLongest.pE1, task.lineLongest.pE2, white)
+            dst.Line(task.lpGravity.pE1, task.lpGravity.pE2, white, task.lineWidth, task.lineType)
+            dst.Line(task.lpHorizon.pE1, task.lpHorizon.pE2, white, task.lineWidth, task.lineType)
+            If task.lines.lpList(0) IsNot Nothing Then
+                dst.Line(task.lines.lpList(0).p1, task.lines.lpList(0).p2, task.highlight, task.lineWidth * 2, task.lineType)
+                vbc.DrawLine(dst, task.lines.lpList(0).pE1, task.lines.lpList(0).pE2, white)
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -15025,19 +15022,17 @@ Namespace VBClasses
             gravityRaw.Run(emptyMat)
             longLine.Run(src)
             Static lastLongest = task.lines.lpList(0)
-            If task.lineLongest.length <> lastLongest.length Or task.lineGravity.length = 0 Or
-            task.frameCount < 5 Then
-
-                task.lineGravity = task.gravityIMU
-                task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
-                lastLongest = task.lineLongest
+            If task.lines.lpList(0).length <> lastLongest.length Or task.lpGravity.length = 0 Or
+               task.frameCount < 5 Then
+                task.lpHorizon = Line_PerpendicularTest.computePerp(task.lpGravity)
+                lastLongest = task.lines.lpList(0)
             End If
             If standaloneTest() Then
                 dst2.SetTo(0)
                 showVectors(dst2)
                 dst3.SetTo(0)
                 For Each lp In task.lines.lpList
-                    If Math.Abs(task.lineGravity.angle - lp.angle) < task.angleThreshold Then vbc.DrawLine(dst3, lp, white)
+                    If Math.Abs(task.lpGravity.angle - lp.angle) < task.angleThreshold Then vbc.DrawLine(dst3, lp, white)
                 Next
                 labels(3) = task.lines.labels(3)
             End If
@@ -15058,17 +15053,17 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             gravity.Run(src)
 
-            kalman.kInput = {task.lineGravity.pE1.X, task.lineGravity.pE1.Y, task.lineGravity.pE2.X, task.lineGravity.pE2.Y}
+            kalman.kInput = {task.lpGravity.pE1.X, task.lpGravity.pE1.Y, task.lpGravity.pE2.X, task.lpGravity.pE2.Y}
             kalman.Run(emptyMat)
-            task.lineGravity = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
+            task.lpGravity = New lpData(New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1)),
                                      New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3)))
 
-            task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
+            task.lpHorizon = Line_PerpendicularTest.computePerp(task.lpGravity)
 
             If standaloneTest() Then
                 dst2.SetTo(0)
-                vbc.DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, task.highlight)
-                vbc.DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, cv.Scalar.Red)
+                vbc.DrawLine(dst2, task.lpGravity.p1, task.lpGravity.p2, task.highlight)
+                vbc.DrawLine(dst2, task.lpHorizon.p1, task.lpHorizon.p2, cv.Scalar.Red)
             End If
         End Sub
     End Class
@@ -15085,9 +15080,9 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.heartBeat Then dst2.SetTo(0)
-            vbc.DrawLine(dst2, task.lineLongest, task.highlight)
-            labels(2) = "Longest line is " + Format(task.lineLongest.length, fmt1) + " pixels, slope = " +
-                     Format(task.lineLongest.slope, fmt1)
+            vbc.DrawLine(dst2, task.lines.lpList(0), task.highlight)
+            labels(2) = "Longest line is " + Format(task.lines.lpList(0).length, fmt1) + " pixels, slope = " +
+                     Format(task.lines.lpList(0).slope, fmt1)
 
             Static strList = New List(Of String)({labels(2)})
             strList.add(labels(2))
@@ -15118,8 +15113,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim lplist = task.lines.lpList
 
-            Static lpLast = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
-            Dim linePerp = Line_PerpendicularTest.computePerp(task.lineLongest)
+            Static lpLast = New lpData(task.lines.lpList(0).pE1, task.lines.lpList(0).pE2)
+            Dim linePerp = Line_PerpendicularTest.computePerp(task.lines.lpList(0))
 
             dst2 = src
             vbc.DrawLine(dst2, lpLast, white)
@@ -15134,7 +15129,7 @@ Namespace VBClasses
             DrawCircle(dst3, trackPoint)
             DrawCircle(dst3, trackPoint)
 
-            lpLast = New lpData(task.lineLongest.pE1, task.lineLongest.pE2)
+            lpLast = New lpData(task.lines.lpList(0).pE1, task.lines.lpList(0).pE2)
         End Sub
     End Class
 
@@ -15438,11 +15433,11 @@ Namespace VBClasses
             desc = "Verify the horizon using MatchTemplate."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            'If matchLine.match.correlation < matchLine.match.options.correlationThreshold Then matchLine.lpInput = task.lineHorizon
-            If task.quarterBeat Then matchLine.lpInput = task.lineHorizon
+            'If matchLine.match.correlation < matchLine.match.options.correlationThreshold Then matchLine.lpInput = task.lpHorizon
+            If task.quarterBeat Then matchLine.lpInput = task.lpHorizon
             matchLine.Run(src)
             dst2 = matchLine.dst2
-            vbc.DrawLine(dst2, task.lineHorizon.p1, task.lineHorizon.p2, cv.Scalar.Red)
+            vbc.DrawLine(dst2, task.lpHorizon.p1, task.lpHorizon.p2, cv.Scalar.Red)
             labels(2) = "MatchLine correlation = " + Format(matchLine.match.correlation, fmt3) + " - Red = current horizon, yellow is matchLine output"
         End Sub
     End Class
@@ -15457,10 +15452,10 @@ Namespace VBClasses
             desc = "Verify the gravity vector using MatchTemplate."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            matchLine.lpInput = task.lineGravity
+            matchLine.lpInput = task.lpGravity
             matchLine.Run(src)
             dst2 = matchLine.dst2
-            vbc.DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, cv.Scalar.Red)
+            vbc.DrawLine(dst2, task.lpGravity.p1, task.lpGravity.p2, cv.Scalar.Red)
             labels(2) = "MatchLine correlation = " + Format(matchLine.match.correlation, fmt3) +
                     " - Red = current gravity vector, yellow is matchLine output"
         End Sub
@@ -16142,7 +16137,8 @@ Namespace VBClasses
 
     Public Class XO_RedList_Equations : Inherits TaskParent
         Dim eq As New Plane_Equation
-        Public oldrclist As New List(Of oldrcData)
+        Public rclist As New List(Of rcData)
+        Dim redC As New RedColor_Basics
         Public Sub New()
             labels(3) = "The estimated plane equations for the largest 20 RedCloud cells."
             desc = "Show the estimated plane equations for all the cells."
@@ -16150,24 +16146,28 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 dst2 = runRedList(src, labels(2))
-                oldrclist = New List(Of oldrcData)(task.redList.oldrclist)
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+
+                rclist = New List(Of rcData)(redC.rcList)
             End If
 
-            Dim newCells As New List(Of oldrcData)
-            For Each orc As oldrcData In oldrclist
-                If orc.contour.Count > 4 Then
-                    eq.rc = orc
+            Dim newCells As New List(Of rcData)
+            For Each rc As rcData In rclist
+                If rc.contour.Count > 4 Then
+                    eq.rc = rc
                     eq.Run(src)
                     newCells.Add(eq.rc)
                 End If
             Next
 
-            oldrclist = New List(Of oldrcData)(newCells)
+            rclist = New List(Of rcData)(newCells)
 
             If task.heartBeat Then
                 Dim index As Integer
                 strOut = ""
-                For Each rc In oldrclist
+                For Each rc In rclist
                     If rc.contour.Count > 4 Then
                         Dim justEquation = Format(rc.eq(0), fmt3) + "*X + " + Format(rc.eq(1), fmt3) + "*Y + "
                         justEquation += Format(rc.eq(2), fmt3) + "*Z + " + Format(rc.eq(3), fmt3) + vbCrLf
@@ -16392,8 +16392,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            Dim rc = task.oldrcD
-            If rc.mmZ.maxVal Then
+            Dim rc = task.rcD
+            If rc.depth Then
                 eq.rc = rc
                 eq.Run(src)
                 rc = eq.rc
@@ -17198,7 +17198,6 @@ Namespace VBClasses
             Next
 
             If task.frameCount > 10 Then If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
-            task.lineLongest = lpList(0)
 
             labels(2) = CStr(lpList.Count) + " lines - " + CStr(lpList.Count - count) + " were new"
         End Sub

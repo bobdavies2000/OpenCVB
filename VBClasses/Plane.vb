@@ -171,7 +171,7 @@ Namespace VBClasses
         Public Sub New()
             labels = {"RedCloud Cell contours", "", "RedCloud cells", ""}
             addW.src2 = dst2.Clone
-            desc = "Find all the cells from a RedList_Basics output that are likely to be flat"
+            desc = "Find all the cells from a RedColor_Basics output that are likely to be flat"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             plane.Run(src)
@@ -180,7 +180,7 @@ Namespace VBClasses
             If task.heartBeat Then addW.src2.SetTo(0)
 
             Dim flatCount = 0
-            For Each rc In task.redList.oldrclist
+            For Each rc In plane.redC.rcList
                 If rc.depth < 1.0 Then Continue For ' close objects look like planes.
                 Dim RMSerror As Double = 0
                 Dim pixelCount = 0
@@ -394,14 +394,17 @@ Namespace VBClasses
         Public ptList As New List(Of cv.Point3f)
         Public ptList2D As New List(Of List(Of cv.Point))
         Dim needOutput As Boolean
+        Public redC As New RedColor_Basics
         Public Sub New()
             labels = {"", "", "RedCloud Basics output - click to highlight a cell", ""}
             desc = "Detect if a some or all points in a RedCloud cell are in a plane."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = runRedList(src, labels(2))
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
 
-            Dim rc = task.oldrcD
+            Dim rc = task.rcD
             labels(2) = "Selected cell has " + CStr(rc.contour.Count) + " points."
 
             ' this contour will have more depth data behind it.  Simplified contours will lose lots of depth data.
@@ -514,15 +517,18 @@ Namespace VBClasses
 
     ' https://stackoverflow.com/questions/33997220/plane-construction-from-3d-points-in-opencv
     Public Class Plane_Equation : Inherits TaskParent
-        Public rc As New oldrcData
+        Public rc As New rcData
         Public justEquation As String
+        Dim redC As New RedColor_Basics
         Public Sub New()
             desc = "Compute the coefficients for an estimated plane equation given the rc contour"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                dst2 = runRedList(src, labels(2))
-                rc = task.oldrcD
+                redC.Run(src)
+                dst2 = redC.dst2
+                labels(2) = redC.labels(2)
+                rc = task.rcD
                 If rc.index = 0 Then SetTrueText("Select a cell in the image at left.")
             End If
 

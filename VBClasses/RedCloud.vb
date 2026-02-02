@@ -226,10 +226,10 @@ Namespace VBClasses
                     '    Next
                     '    task.rcD = rcList(ages.ElementAt(0).Value)
                 Else
+                    If task.rcD Is Nothing Then task.rcD = rcList(0)
                     If task.rcD.rect.Contains(task.clickPoint) Then
                         task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
                     End If
-                    task.rcD = rcList(0)
                 End If
             Else
                 task.rcD = Nothing

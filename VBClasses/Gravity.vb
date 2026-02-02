@@ -12,12 +12,12 @@ Namespace VBClasses
             desc = "Method to find gravity and horizon vectors from the IMU"
         End Sub
         Public Shared Sub showVectors(dst As cv.Mat)
-            dst.Line(task.lineGravity.pE1, task.lineGravity.pE2, white, task.lineWidth, task.lineType)
-            dst.Line(task.lineHorizon.pE1, task.lineHorizon.pE2, white, task.lineWidth, task.lineType)
-            If task.lineLongest IsNot Nothing Then
-                dst.Line(task.lineLongest.p1, task.lineLongest.p2, task.highlight, task.lineWidth * 2, task.lineType)
-                dst.Line(task.lineLongest.pE1, task.lineLongest.pE2, white, task.lineWidth, task.lineType)
-            End If
+            dst.Line(task.lpGravity.pE1, task.lpGravity.pE2, white, task.lineWidth, task.lineType)
+            dst.Line(task.lpHorizon.pE1, task.lpHorizon.pE2, white, task.lineWidth, task.lineType)
+            'If task.lpGravity Is Nothing Then
+            '    dst.Line(task.lines.lpList(0).p1, task.lines.lpList(0).p2, task.highlight, task.lineWidth * 2, task.lineType)
+            '    dst.Line(task.lines.lpList(0).pE1, task.lines.lpList(0).pE2, white, task.lineWidth, task.lineType)
+            'End If
         End Sub
         Private Function findFirst(points As cv.Mat) As Single
             ptList.Clear()
@@ -54,19 +54,19 @@ Namespace VBClasses
             If gPoints.Rows = 0 Then
                 ' build a fake gravity vector when we don't have anything so task.lines.lplist has 1 entry.
                 ' It will be updated in the next frame.  This is a startup issue.
-                task.gravityIMU = New lpData(New cv.Point2f(dst2.Width / 2, 0),
-                                             New cv.Point2f(dst2.Width / 2, dst2.Height))
+                task.lpGravity = New lpData(New cv.Point2f(dst2.Width / 2, 0),
+                                            New cv.Point2f(dst2.Width / 2, dst2.Height))
 
                 Exit Sub ' no point cloud data to get the gravity line in the image coordinates.
             End If
             xTop = findFirst(gPoints)
             xBot = findLast(gPoints)
-            task.gravityIMU = New lpData(New cv.Point2f(xTop, 0), New cv.Point2f(xBot, dst2.Height))
-
+            task.lpGravity = New lpData(New cv.Point2f(xTop, 0), New cv.Point2f(xBot, dst2.Height))
             If standaloneTest() Then
                 dst2 = task.color
-                vbc.DrawLine(dst2, task.gravityIMU.p1, task.gravityIMU.p2, task.highlight)
+                vbc.DrawLine(dst2, task.lpGravity.p1, task.lpGravity.p2, task.highlight)
             End If
+            task.lpHorizon = Line_PerpendicularTest.computePerp(task.lpGravity)
         End Sub
     End Class
 
@@ -168,8 +168,8 @@ Namespace VBClasses
                 DrawCircle(dst2, pt, task.DotSize, white)
             Next
 
-            vbc.DrawLine(dst2, task.lineGravity.p1, task.lineGravity.p2, white)
-            vbc.DrawLine(dst3, task.lineGravity.p1, task.lineGravity.p2, white)
+            vbc.DrawLine(dst2, task.lpGravity.p1, task.lpGravity.p2, white)
+            vbc.DrawLine(dst3, task.lpGravity.p1, task.lpGravity.p2, white)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Type <> cv.MatType.CV_32F Then dst0 = task.pcSplit(0) Else dst0 = src
@@ -203,11 +203,11 @@ Namespace VBClasses
                 strOut += "Using the previous value for the gravity vector."
             Else
                 Dim lp = New lpData(p1, p2)
-                task.lineGravity = New lpData(lp.pE1, lp.pE2)
+                task.lpGravity = New lpData(lp.pE1, lp.pE2)
                 If standaloneTest() Or autoDisplay Then displayResults(p1, p2)
             End If
 
-            task.lineHorizon = Line_PerpendicularTest.computePerp(task.lineGravity)
+            task.lpHorizon = Line_PerpendicularTest.computePerp(task.lpGravity)
             SetTrueText(strOut, 3)
         End Sub
     End Class

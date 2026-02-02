@@ -49,7 +49,7 @@ Namespace VBClasses
                 dst3.SetTo(0)
             End If
 
-            If standalone Then lpInput = task.lineLongest
+            If standalone Then lpInput = task.lines.lpList(0)
 
             Dim nabeRect1 = task.gridNabeRects(task.gridMap.Get(Of Integer)(lpInput.p1.Y, lpInput.p1.X))
             Dim nabeRect2 = task.gridNabeRects(task.gridMap.Get(Of Integer)(lpInput.p2.Y, lpInput.p2.X))
@@ -90,7 +90,7 @@ Namespace VBClasses
             desc = "Compare area around end points of a line to the previous image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then lpInput = task.lineLongest
+            If standalone Then lpInput = task.lines.lpList(0)
             Static lastImage = task.gray.Clone
 
             Dim rect = task.gridRects(lpInput.p1GridIndex)

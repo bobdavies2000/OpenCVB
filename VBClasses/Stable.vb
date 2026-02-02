@@ -4,7 +4,7 @@ Namespace VBClasses
         Public lp As lpData
         Public lpLast As lpData
         Public Sub New()
-            desc = "Use task.lineLongest to find the angle needed to stabilize the image."
+            desc = "Use task.lines.lplist(0) to find the angle needed to stabilize the image."
         End Sub
         Public Function GetAngleBetweenLinesBySlopes(ByVal slope1 As Double, ByVal slope2 As Double) As Double
             Const EPSILON As Double = 0.000000001
@@ -44,7 +44,7 @@ Namespace VBClasses
             Return angleDegrees
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then lp = task.lineLongest
+            If standalone Then lp = task.lines.lpList(0)
             If lpLast Is Nothing Then lpLast = lp
 
             Dim rotateAngle = GetAngleBetweenLinesBySlopes(lp.slope, lpLast.slope)

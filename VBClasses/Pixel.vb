@@ -710,7 +710,7 @@ Namespace VBClasses
         Dim hVector As New Hist3Dcolor_Vector
         Public pixelVector As New List(Of Single())
         Public rclist As New List(Of rcData)
-        Dim redC As New RedColor_Basics
+        Public redC As New RedColor_Basics
         Public Sub New()
             labels = {"", "", "RedList_Basics output", ""}
             desc = "Create a vector for each cell's 3D histogram."
