@@ -3060,8 +3060,8 @@ Namespace VBClasses
             If raw3D.Count = 0 Then
                 SetTrueText("No vertical or horizontal lines were found")
             Else
-                task.gMatrix = task.gmat.gMatrix
-                Dim matLines3D = cv.Mat.FromPixelData(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray) * task.gmat.gMatrix
+                task.gMatrix = task.gravityMatrix.gMatrix
+                Dim matLines3D = cv.Mat.FromPixelData(raw3D.Count, 3, cv.MatType.CV_32F, raw3D.ToArray) * task.gravityMatrix.gMatrix
             End If
         End Sub
     End Class
@@ -3665,7 +3665,7 @@ Namespace VBClasses
                             If p1.Y = midY Then p(1) = mmPP
                         End If
                         Dim r = New cv.Rect(p1.X - halfStepX, p1.Y - halfStepy, stepX, stepY)
-                        Dim meanVal = cv.Cv2.Mean(task.pcSplit(2)(r), task.depthMask(r))
+                        Dim meanVal = cv.Cv2.Mean(task.pcSplit(2)(r), task.depthmask(r))
                         p(2) = (d1 + d2) / 2
                         dst3.Set(Of cv.Vec3f)(y, x, p)
                     End If
@@ -4966,9 +4966,9 @@ Namespace VBClasses
               {gM(1, 0) * cy + gM(1, 1) * 0 + gM(1, 2) * sy}, {gM(1, 0) * 0 + gM(1, 1) * 1 + gM(1, 2) * 0}, {gM(1, 0) * -sy + gM(1, 1) * 0 + gM(1, 2) * cy},
               {gM(2, 0) * cy + gM(2, 1) * 0 + gM(2, 2) * sy}, {gM(2, 0) * 0 + gM(2, 1) * 1 + gM(2, 2) * 0}, {gM(2, 0) * -sy + gM(2, 1) * 0 + gM(2, 2) * cy}}
 
-            Dim gMat = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, gM)
+            Dim gravityMatrix = cv.Mat.FromPixelData(3, 3, cv.MatType.CV_32F, gM)
             Dim gInput = input.Reshape(1, input.Rows * input.Cols)
-            Dim gOutput = (gInput * gMat).ToMat
+            Dim gOutput = (gInput * gravityMatrix).ToMat
             input = gOutput.Reshape(3, input.Rows)
 
             Dim split = input.Split()
@@ -5083,7 +5083,7 @@ Namespace VBClasses
             desc = "Automatically adjust the X-Range option of the pointcloud to maximize visible pixels"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim expectedCount = task.depthMask.CountNonZero
+            Dim expectedCount = task.depthmask.CountNonZero
 
             Dim diff = Math.Abs(expectedCount - adjustedCount)
 
@@ -5132,7 +5132,7 @@ Namespace VBClasses
             desc = "Automatically adjust the Y-Range option of the pointcloud to maximize visible pixels"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim expectedCount = task.depthMask.CountNonZero
+            Dim expectedCount = task.depthmask.CountNonZero
 
             Dim diff = Math.Abs(expectedCount - adjustedCount)
 
@@ -5242,7 +5242,7 @@ Namespace VBClasses
 
             Dim mm = GetMinMax(dst0)
             Dim ranges = New cv.Rangef() {New cv.Rangef(mm.minVal, mm.maxVal)}
-            cv.Cv2.CalcHist({dst0}, channels, task.depthMask, histogram, 1, {task.histogramBins}, ranges)
+            cv.Cv2.CalcHist({dst0}, channels, task.depthmask, histogram, 1, {task.histogramBins}, ranges)
 
             Dim histArray(histogram.Total - 1) As Single
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -7659,7 +7659,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            task.ClickPoint = task.oldrcD.maxDist
+            task.clickPoint = task.oldrcD.maxDist
 
             If task.heartBeat Then matchRect.rectInput = task.oldrcD.rect
 
@@ -9151,7 +9151,7 @@ Namespace VBClasses
         Sub(i)
             Dim roi = task.gridRects(i)
             roiColor(i) = src(roi).Get(Of cv.Vec3b)(roi.Height / 2, roi.Width / 2)
-            dst2(roi).SetTo(roiColor(i), task.depthMask(roi))
+            dst2(roi).SetTo(roiColor(i), task.depthmask(roi))
             noDepthCount(i) = task.noDepthMask(roi).CountNonZero
         End Sub)
 
@@ -9389,7 +9389,7 @@ Namespace VBClasses
 
     Public Class XO_Cloud_Spin : Inherits TaskParent
         Dim options As New Options_IMU
-        Dim gMat As New IMU_GMatrixWithOptions
+        Dim gravityMatrix As New IMU_GMatrixWithOptions
         Dim xBump = 1, yBump = 1, zBump = 1
         Public Sub New()
             If OptionParent.FindFrm(traceName + " CheckBoxes") Is Nothing Then
@@ -9411,27 +9411,27 @@ Namespace VBClasses
             Static yRotateSlider = OptionParent.FindSlider("Rotate pointcloud around Y-axis (degrees)")
             Static zRotateSlider = OptionParent.FindSlider("Rotate pointcloud around Z-axis (degrees)")
 
-            If xCheck.checked Then
+            If xCheck.Checked Then
                 If xRotateSlider.value = -90 Then xBump = 1
                 If xRotateSlider.value = 90 Then xBump = -1
                 xRotateSlider.value += xBump
             End If
 
-            If yCheck.checked Then
+            If yCheck.Checked Then
                 If yRotateSlider.value = -90 Then yBump = 1
                 If yRotateSlider.value = 90 Then yBump = -1
                 yRotateSlider.value += yBump
             End If
 
-            If zCheck.checked Then
+            If zCheck.Checked Then
                 If zRotateSlider.value = -90 Then zBump = 1
                 If zRotateSlider.value = 90 Then zBump = -1
                 zRotateSlider.value += zBump
             End If
 
-            gMat.Run(src)
+            gravityMatrix.Run(src)
 
-            Dim gOutput = (task.pointCloud.Reshape(1, dst2.Rows * dst2.Cols) * gMat.gMatrix).ToMat  ' <<<<<<<<<<<<<<<<<<<<<<< this is the rotation...
+            Dim gOutput = (task.pointCloud.Reshape(1, dst2.Rows * dst2.Cols) * gravityMatrix.gMatrix).ToMat  ' <<<<<<<<<<<<<<<<<<<<<<< this is the rotation...
             dst2 = gOutput.Reshape(3, src.Rows)
         End Sub
     End Class

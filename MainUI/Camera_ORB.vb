@@ -144,7 +144,7 @@ Namespace MainApp
                 IMU_FrameTime = timeStamp - initialTime
             End SyncLock
 
-            MyBase.GetNextFrameCounts(IMU_FrameTime)
+            MyBase.GetNextFrameCounts()
         End Sub
 
         Public Overrides Sub StopCamera()

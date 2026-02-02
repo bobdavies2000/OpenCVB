@@ -27,7 +27,7 @@ Namespace VBClasses
             End If
 
             ' NOTE: Initialize the angle around the y-axis to zero.
-            Dim g = task.IMU_RawAcceleration
+            Dim g = task.IMU_Acceleration
             task.accRadians = New cv.Point3f(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                              Math.Abs(Math.Atan2(g.X, g.Y)), Math.Atan2(g.Y, g.Z))
             If task.optionsChanged Then
@@ -50,9 +50,9 @@ Namespace VBClasses
                      Format(x1, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf +
                      "Velocity-Filtered Angles to gravity in degrees" + vbCrLf +
                      Format(x2, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.theta.Z * 57.2958, fmt1) + vbCrLf
-            strOut += "cx = " + Format(task.gmat.cx, fmt3) + " sx = " + Format(task.gmat.sx, fmt3) + vbCrLf +
-                      "cy = " + Format(task.gmat.cy, fmt3) + " sy = " + Format(task.gmat.sy, fmt3) + vbCrLf +
-                      "cz = " + Format(task.gmat.cz, fmt3) + " sz = " + Format(task.gmat.sz, fmt3)
+            strOut += "cx = " + Format(task.gravityMatrix.cx, fmt3) + " sx = " + Format(task.gravityMatrix.sx, fmt3) + vbCrLf +
+                      "cy = " + Format(task.gravityMatrix.cy, fmt3) + " sy = " + Format(task.gravityMatrix.sy, fmt3) + vbCrLf +
+                      "cz = " + Format(task.gravityMatrix.cz, fmt3) + " sz = " + Format(task.gravityMatrix.sz, fmt3)
 
             task.accRadians = task.theta
             If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
@@ -63,10 +63,132 @@ Namespace VBClasses
     End Class
 
 
+    ''' <summary>Compute the gravity vector using the complementary filter: fuse gyro (fast, drifts) with accelerometer (slow, stable).</summary>
+    Public Class IMU_GravityComplementary : Inherits TaskParent
+        Dim lastTimeStamp As Double
+        Dim options As New Options_IMU
 
+        ''' <summary>Unit gravity vector in body/sensor frame (points down).</summary>
+        Public GravityVector As New cv.Point3f(0, 0, -1)
 
+        ''' <summary>Line through image center in the direction of gravity (extends to image edges).</summary>
+        Public lpGravity As lpData
 
+        Public Sub New()
+            desc = "Compute the gravity vector using the complementary filter: fuse gyroscope (fast, drifts) with accelerometer (slow, stable)."
+            labels(2) = "Complementary-filter gravity: angles and unit gravity vector"
+        End Sub
 
+        ''' <summary>Compute two image points for the line through (cx,cy) in direction of gravity projection (gx,gy), extended to rect [0,w] x [0,h].</summary>
+        Public Shared Function GravityVectorToLineEndpoints(gravityVec As cv.Point3f, width As Integer, height As Integer) As (p1 As cv.Point2f, p2 As cv.Point2f)
+            Dim cx = width / 2.0F
+            Dim cy = height / 2.0F
+            Dim dx = gravityVec.X
+            Dim dy = gravityVec.Y
+            Dim len = CSng(Math.Sqrt(dx * dx + dy * dy))
+            If len < 0.0001F Then
+                dx = 0.0F
+                dy = 1.0F
+            Else
+                dx /= len
+                dy /= len
+            End If
+            Dim tList As New List(Of Single)
+            If Math.Abs(dx) > 0.0001F Then
+                Dim t0 = -cx / dx
+                Dim y0 = cy + t0 * dy
+                If y0 >= 0 AndAlso y0 <= height Then tList.Add(t0)
+                Dim t1 = (width - cx) / dx
+                Dim y1 = cy + t1 * dy
+                If y1 >= 0 AndAlso y1 <= height Then tList.Add(t1)
+            End If
+            If Math.Abs(dy) > 0.0001F Then
+                Dim t0 = -cy / dy
+                Dim x0 = cx + t0 * dx
+                If x0 >= 0 AndAlso x0 <= width Then tList.Add(t0)
+                Dim t1 = (height - cy) / dy
+                Dim x1 = cx + t1 * dx
+                If x1 >= 0 AndAlso x1 <= width Then tList.Add(t1)
+            End If
+            If tList.Count < 2 Then
+                Return (New cv.Point2f(cx, 0), New cv.Point2f(cx, height))
+            End If
+            tList.Sort()
+            Dim tMin = tList(0)
+            Dim tMax = tList(tList.Count - 1)
+            Dim p1 = New cv.Point2f(cx + tMin * dx, cy + tMin * dy)
+            Dim p2 = New cv.Point2f(cx + tMax * dx, cy + tMax * dy)
+            Return (p1, p2)
+        End Function
+
+        ''' <summary>Unit gravity in body frame from tilt angles (same convention as IMU_GMatrix: roll=X, pitch=Y, yaw=Z).</summary>
+        Public Shared Function AnglesToGravityVector(accRadians As cv.Point3f) As cv.Point3f
+            Dim cx = CSng(Math.Cos(accRadians.X))
+            Dim sx = CSng(Math.Sin(accRadians.X))
+            Dim cy = CSng(Math.Cos(accRadians.Y))
+            Dim sy = CSng(Math.Sin(accRadians.Y))
+            ' R = Ry(pitch)*Rx(roll); world down = (0,0,-1). Rx*(0,0,-1) = (0, sx, -cx). Ry* that = (sy*cx, sx, -cy*cx)
+            Dim gx = sy * cx
+            Dim gy = sx
+            Dim gz = -cy * cx
+            Dim n = CSng(Math.Sqrt(gx * gx + gy * gy + gz * gz))
+            If n < 0.0001F Then n = 1.0F
+            Return New cv.Point3f(gx / n, gy / n, gz / n)
+        End Function
+
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
+            Dim gyro = task.IMU_AngularVelocity
+            If task.optionsChanged Then
+                lastTimeStamp = task.IMU_TimeStamp
+            Else
+                Dim dt = (task.IMU_TimeStamp - lastTimeStamp) / 1000.0
+                If task.Settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then dt /= 1000.0
+                dt = Math.Max(0.000001, Math.Min(1.0, dt))
+                task.theta += New cv.Point3f(-gyro.Z * dt, -gyro.Y * dt, gyro.X * dt)
+                lastTimeStamp = task.IMU_TimeStamp
+            End If
+
+            ' Tilt angles from accelerometer (low-pass source)
+            Dim g = task.IMU_Acceleration
+            task.accRadians = New cv.Point3f(
+                CSng(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z))),
+                CSng(Math.Abs(Math.Atan2(g.X, g.Y))),
+                CSng(Math.Atan2(g.Y, g.Z)))
+
+            ' Complementary filter: angle = alpha * (gyro-integrated) + (1-alpha) * (accel-derived)
+            If task.optionsChanged Then
+                task.theta = task.accRadians
+            Else
+                Dim a = task.IMU_AlphaFilter
+                task.theta.X = a * task.theta.X + (1.0F - a) * task.accRadians.X
+                task.theta.Y = task.accRadians.Y
+                task.theta.Z = a * task.theta.Z + (1.0F - a) * task.accRadians.Z
+            End If
+
+            task.accRadians = task.theta
+            If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
+            task.accRadians.Z += cv.Cv2.PI / 2
+
+            Dim y1 = task.accRadians.Y - cv.Cv2.PI
+            If task.accRadians.X < 0 Then y1 *= -1
+            task.verticalizeAngle = y1 * 58.2958
+
+            ' Unit gravity vector in body frame (points down)
+            GravityVector = AnglesToGravityVector(task.accRadians)
+
+            ' Line through image center in gravity direction (lpData extends to image edges)
+            Dim endpoints = GravityVectorToLineEndpoints(GravityVector, task.workRes.Width, task.workRes.Height)
+            lpGravity = New lpData(endpoints.p1, endpoints.p2)
+            task.lpGravity = lpGravity
+
+            strOut = "Complementary filter gravity" + vbCrLf +
+                     "Tilt (rad): X=" + Format(task.accRadians.X, fmt3) + " Y=" + Format(task.accRadians.Y, fmt3) + " Z=" + Format(task.accRadians.Z, fmt3) + vbCrLf +
+                     "Gravity unit vector (body): " + Format(GravityVector.X, fmt3) + ", " + Format(GravityVector.Y, fmt3) + ", " + Format(GravityVector.Z, fmt3)
+            SetTrueText(strOut)
+        End Sub
+    End Class
 
 
     ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
@@ -83,7 +205,7 @@ Namespace VBClasses
             Else
                 gyroAngle = task.IMU_AngularVelocity
                 Dim dt_gyro = (task.IMU_TimeStamp - lastTimeStamp) / 1000
-                If task.settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
+                If task.Settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
                     dt_gyro /= 1000 ' different units in the timestamp?
                 End If
                 gyroAngle = gyroAngle * dt_gyro
@@ -91,7 +213,7 @@ Namespace VBClasses
             End If
 
             ' NOTE: Initialize the angle around the y-axis to zero.
-            Dim g = task.IMU_RawAcceleration
+            Dim g = task.IMU_Acceleration
             task.accRadians = New cv.Point3f(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                          Math.Abs(Math.Atan2(g.X, g.Y)), Math.Atan2(g.Y, g.Z))
 
@@ -105,9 +227,9 @@ Namespace VBClasses
             If task.accRadians.X < 0 Then y1 *= -1
             strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
                  Format(x1, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf
-            strOut += "cx = " + Format(task.gmat.cx, fmt3) + " sx = " + Format(task.gmat.sx, fmt3) + vbCrLf +
-                  "cy = " + Format(task.gmat.cy, fmt3) + " sy = " + Format(task.gmat.sy, fmt3) + vbCrLf +
-                  "cz = " + Format(task.gmat.cz, fmt3) + " sz = " + Format(task.gmat.sz, fmt3)
+            strOut += "cx = " + Format(task.gravityMatrix.cx, fmt3) + " sx = " + Format(task.gravityMatrix.sx, fmt3) + vbCrLf +
+                  "cy = " + Format(task.gravityMatrix.cy, fmt3) + " sy = " + Format(task.gravityMatrix.sy, fmt3) + vbCrLf +
+                  "cz = " + Format(task.gravityMatrix.cz, fmt3) + " sz = " + Format(task.gravityMatrix.sz, fmt3)
             If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
             task.accRadians.Z += cv.Cv2.PI / 2
 
@@ -137,7 +259,7 @@ Namespace VBClasses
             Else
                 gyroAngle = task.IMU_AngularVelocity
                 Dim dt_gyro = (task.IMU_TimeStamp - lastTimeStamp) / 1000
-                If task.settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
+                If task.Settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
                     dt_gyro /= 1000 ' different units in the timestamp?
                 End If
                 gyroAngle = gyroAngle * dt_gyro
@@ -146,7 +268,7 @@ Namespace VBClasses
             End If
 
             ' NOTE: Initialize the angle around the y-axis to zero.
-            Dim g = task.IMU_RawAcceleration
+            Dim g = task.IMU_Acceleration
             task.accRadians = New cv.Point3f(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
                                          Math.Abs(Math.Atan2(g.X, g.Y)), Math.Atan2(g.Y, g.Z))
 
@@ -694,7 +816,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.optionsChanged Then accList.Clear()
-            accList.Add(task.IMU_RawAcceleration)
+            accList.Add(task.IMU_Acceleration)
             Dim accMat = cv.Mat.FromPixelData(accList.Count, 1, cv.MatType.CV_64FC4, accList.ToArray)
             Dim imuMean = accMat.Mean()
             task.IMU_AverageAcceleration = New cv.Point3f(imuMean(0), imuMean(1), imuMean(2))
@@ -712,10 +834,10 @@ Namespace VBClasses
 
     Public Class NR_IMU_PlotCompareIMU : Inherits TaskParent
         Dim plot(3 - 1) As Plot_OverTimeScalar
-        Dim imuAll As New IMU_AllMethods
+        Dim imuAll As New IMU_Methods
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
-            If standalone Then task.gOptions.displaydst1.checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
 
             For i = 0 To plot.Count - 1
                 plot(i) = New Plot_OverTimeScalar
@@ -728,15 +850,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             imuAll.Run(src)
 
-            plot(0).plotData = New cv.Scalar(task.IMU_RawAcceleration.X, task.IMU_Acceleration.X, task.kalmanIMUacc.X, task.IMU_AverageAcceleration.X)
+            plot(0).plotData = New cv.Scalar(task.IMU_Acceleration.X, task.IMU_Acceleration.X, task.kalmanIMUacc.X, task.IMU_AverageAcceleration.X)
             plot(0).Run(src)
             dst0 = plot(0).dst2
 
-            plot(1).plotData = New cv.Scalar(task.IMU_RawAcceleration.Y, task.IMU_Acceleration.Y, task.kalmanIMUacc.Y, task.IMU_AverageAcceleration.Y)
+            plot(1).plotData = New cv.Scalar(task.IMU_Acceleration.Y, task.IMU_Acceleration.Y, task.kalmanIMUacc.Y, task.IMU_AverageAcceleration.Y)
             plot(1).Run(src)
             dst1 = plot(1).dst2
 
-            plot(2).plotData = New cv.Scalar(task.IMU_RawAcceleration.Z, task.IMU_Acceleration.Z, task.kalmanIMUacc.Z, task.IMU_AverageAcceleration.Z)
+            plot(2).plotData = New cv.Scalar(task.IMU_Acceleration.Z, task.IMU_Acceleration.Z, task.kalmanIMUacc.Z, task.IMU_AverageAcceleration.Z)
             plot(2).Run(src)
             dst2 = plot(2).dst2
 
@@ -764,16 +886,16 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.kalman Is Nothing Then task.kalman = New Kalman_Basics
             With task.kalman
-                .kInput = {task.IMU_RawAcceleration.X, task.IMU_RawAcceleration.Y, task.IMU_RawAcceleration.Z,
-                       task.IMU_RawAngularVelocity.X, task.IMU_RawAngularVelocity.Y, task.IMU_RawAngularVelocity.Z}
+                .kInput = {task.IMU_Acceleration.X, task.IMU_Acceleration.Y, task.IMU_Acceleration.Z,
+                       task.IMU_AngularVelocity.X, task.IMU_AngularVelocity.Y, task.IMU_AngularVelocity.Z}
                 .Run(src)
                 task.kalmanIMUacc = New cv.Point3f(.kOutput(0), .kOutput(1), .kOutput(2))
                 task.kalmanIMUvelocity = New cv.Point3f(.kOutput(3), .kOutput(4), .kOutput(5))
             End With
             strOut = "IMU Acceleration Raw" + vbTab + "IMU Velocity Raw" + vbCrLf +
-                 Format(task.IMU_RawAcceleration.X, fmt3) + vbTab + Format(task.IMU_RawAcceleration.Y, fmt3) + vbTab +
-                 Format(task.IMU_RawAcceleration.Z, fmt3) + vbTab + Format(task.IMU_RawAngularVelocity.X, fmt3) + vbTab +
-                 Format(task.IMU_RawAngularVelocity.Y, fmt3) + vbTab + Format(task.IMU_RawAngularVelocity.Z, fmt3) + vbTab + vbCrLf + vbCrLf +
+                 Format(task.IMU_Acceleration.X, fmt3) + vbTab + Format(task.IMU_Acceleration.Y, fmt3) + vbTab +
+                 Format(task.IMU_Acceleration.Z, fmt3) + vbTab + Format(task.IMU_AngularVelocity.X, fmt3) + vbTab +
+                 Format(task.IMU_AngularVelocity.Y, fmt3) + vbTab + Format(task.IMU_AngularVelocity.Z, fmt3) + vbTab + vbCrLf + vbCrLf +
                  "kalmanIMUacc" + vbTab + vbTab + "kalmanIMUvelocity" + vbCrLf +
                  Format(task.kalmanIMUacc.X, fmt3) + vbTab + Format(task.kalmanIMUacc.Y, fmt3) + vbTab +
                  Format(task.kalmanIMUacc.Z, fmt3) + vbTab + Format(task.kalmanIMUvelocity.X, fmt3) + vbTab +
@@ -788,7 +910,7 @@ Namespace VBClasses
 
 
 
-    Public Class IMU_AllMethods : Inherits TaskParent
+    Public Class IMU_Methods : Inherits TaskParent
         Dim basics As New IMU_Basics
         Dim imuAvg As New IMU_Average
         Dim kalman As New IMU_Kalman

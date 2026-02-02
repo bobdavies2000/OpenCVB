@@ -74,6 +74,10 @@ Namespace MainApp
                                        camera.pointCloud.CopyTo(task.pointCloud)
                                        camera.leftView.CopyTo(task.leftView)
                                        camera.rightView.CopyTo(task.rightView)
+                                       task.IMU_Acceleration = camera.IMU_Acceleration
+                                       task.IMU_FrameTime = camera.IMU_FrameTime
+                                       task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
+                                       task.IMU_AngularVelocity = camera.IMU_AngularVelocity
                                    End SyncLock
 
                                    task.RunAlgorithm()

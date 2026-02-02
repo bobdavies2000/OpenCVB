@@ -12,7 +12,7 @@ Namespace VBClasses
 
             task.pcSplit(2) = task.pcSplit(2).Threshold(task.MaxZmeters, task.MaxZmeters, cv.ThresholdTypes.Trunc)
             task.maxDepthMask = task.pcSplit(2).ConvertScaleAbs().InRange(task.MaxZmeters, 1000)
-            SetTrueText(task.gmat.strOut, 3)
+            SetTrueText(task.gravityMatrix.strOut, 3)
         End Sub
     End Class
 

@@ -115,9 +115,9 @@ Namespace VBClasses
             If standaloneTest() Then
                 options.Run()
                 strOut = "Gravity-oriented gMatrix" + vbCrLf
-                strOut += task.gmat.strOut + vbCrLf
+                strOut += task.gravityMatrix.strOut + vbCrLf
                 strOut += vbCrLf + "New gMatrix from sliders" + vbCrLf
-                strOut += IMU_GMatrix.gMatrixToStr(task.gmat.gMatrix) + vbCrLf + vbCrLf
+                strOut += IMU_GMatrix.gMatrixToStr(task.gravityMatrix.gMatrix) + vbCrLf + vbCrLf
                 strOut += "Angle X = " + Format(options.rotateX, fmt1) + vbCrLf
                 strOut += "Angle Y = " + Format(options.rotateY, fmt1) + vbCrLf
                 strOut += "Angle Z = " + Format(options.rotateZ, fmt1) + vbCrLf
@@ -252,7 +252,7 @@ Namespace VBClasses
 
             ySlider.Value += 1
             rotate.Run(src)
-            Dim output = (vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * task.gmat.gMatrix).ToMat  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
+            Dim output = (vecMat.Reshape(1, vecMat.Rows * vecMat.Cols) * task.gravityMatrix.gMatrix).ToMat  ' <<<<<<<<<<<<<<<<<<<<<<< this is the XYZ-axis rotation...
             vecMat = output.Reshape(3, vecMat.Rows)
 
             heat.Run(vecMat)

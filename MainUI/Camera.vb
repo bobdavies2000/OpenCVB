@@ -92,12 +92,7 @@ Public Class GenericCamera
             disparity = New cv.Mat(workRes, cv.MatType.CV_8UC1, 0)
         End SyncLock
     End Sub
-    Public Sub GetNextFrameCounts(frameTime As Double)
-        Static lastFrameTime As Double = IMU_TimeStamp
-        Static imuStartTime As Double = IMU_TimeStamp
-        IMU_FrameTime = IMU_TimeStamp - lastFrameTime - imuStartTime
-        lastFrameTime = IMU_TimeStamp - imuStartTime
-
+    Public Sub GetNextFrameCounts()
         Static myStopWatch As New System.Diagnostics.Stopwatch
         If cameraFrameCount = 0 Then myStopWatch.Start()
         CPU_TimeStamp = myStopWatch.ElapsedMilliseconds

@@ -244,7 +244,7 @@ Namespace MainApp
                 IMU_FrameTime = OakDIMUTimeStamp(cPtr)
             End SyncLock
 
-            MyBase.GetNextFrameCounts(IMU_FrameTime)
+            MyBase.GetNextFrameCounts()
         End Sub
         Public Overrides Sub StopCamera()
             OakDStop(cPtr)

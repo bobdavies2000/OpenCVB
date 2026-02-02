@@ -37,7 +37,7 @@ Namespace VBClasses
             depthmask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
 
             colorizer = New DepthColorizer_Basics
-            gmat = New IMU_GMatrix
+            gravityMatrix = New IMU_GMatrix
             gravityBasics = New Gravity_Basics
             imuBasics = New IMU_Basics
             motionRGB = New Motion_Basics
@@ -88,13 +88,14 @@ Namespace VBClasses
             bins2D = {task.workRes.Height, task.workRes.Width}
 
             ' run any universal algorithms here
-            IMU_RawAcceleration = IMU_Acceleration
-            IMU_RawAngularVelocity = IMU_AngularVelocity
+            IMU_Acceleration = IMU_Acceleration
+            IMU_AngularVelocity = IMU_AngularVelocity
+            IMU_FrameTime =
             IMU_AlphaFilter = 0.5 '  gOptions.imu_Alpha
 
             grid.Run(task.color)
             imuBasics.Run(emptyMat)
-            gmat.Run(emptyMat)
+            gravityMatrix.Run(emptyMat)
 
             If gOptions.CreateGif.Checked Then
                 heartBeat = False

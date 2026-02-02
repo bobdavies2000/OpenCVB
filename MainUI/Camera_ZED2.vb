@@ -63,7 +63,7 @@ Namespace MainApp
                 rightView = zed.rightView.Resize(workRes, 0, 0, cv.InterpolationFlags.Nearest)
             End SyncLock
 
-            MyBase.GetNextFrameCounts(IMU_FrameTime)
+            MyBase.GetNextFrameCounts()
         End Sub
         Public Overrides Sub StopCamera()
             If zed IsNot Nothing Then zed.StopCamera()

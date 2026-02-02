@@ -129,13 +129,13 @@ Namespace MainApp
                         If frame.Profile.Stream = Stream.Gyro Then
                             IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(frame.Data)
                             Dim mFrame = frame.As(Of MotionFrame)
-                            Static initialTime As Int64 = mFrame.Timestamp
-                            IMU_FrameTime = mFrame.Timestamp - initialTime
+                            Static IMU_StartTime As Int64 = mFrame.Timestamp
+                            IMU_FrameTime = mFrame.Timestamp - IMU_StartTime
                         End If
                     Next
                 End SyncLock
 
-                MyBase.GetNextFrameCounts(IMU_FrameTime)
+                MyBase.GetNextFrameCounts()
             End Using
         End Sub
         Public Overrides Sub StopCamera()

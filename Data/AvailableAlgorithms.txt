@@ -278,6 +278,7 @@ Gradient_CartToPolar
 Gradient_Color
 Gradient_PhaseDepth
 Gravity_Basics
+Gravity_CloudMethod
 Grid_Basics
 Grid_FPS
 Grid_Rectangles
@@ -354,12 +355,13 @@ Image_RedCloudColor
 Image_Series
 ImageOffset_Basics
 ImShow_Basics
-IMU_AllMethods
 IMU_Average
 IMU_Basics
 IMU_GMatrix
 IMU_GMatrixWithOptions
+IMU_GravityComplementary
 IMU_Kalman
+IMU_Methods
 IMU_Plot
 IMU_PlotHostFrameTimes
 IMU_PlotIMUFrameTime

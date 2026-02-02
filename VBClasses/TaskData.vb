@@ -81,7 +81,7 @@ Namespace VBClasses
         Public redList As XO_RedList_Basics
         Public redListNew As RedList_Basics
         Public redCloud As RedCloud_Basics
-        Public gmat As IMU_GMatrix
+        Public gravityMatrix As IMU_GMatrix
         Public lines As Line_Basics
         Public grid As Grid_Basics
         Public palette As Palette_LoadColorMap
@@ -183,11 +183,10 @@ Namespace VBClasses
         Public lineLongestChanged As Boolean
         Public angleThreshold = 2
 
-        Public IMU_RawAcceleration As cv.Point3f
         Public IMU_Acceleration As cv.Point3f
         Public IMU_AverageAcceleration As cv.Point3f
-        Public IMU_RawAngularVelocity As cv.Point3f
         Public IMU_AngularVelocity As cv.Point3f
+
         Public kalmanIMUacc As cv.Point3f
         Public kalmanIMUvelocity As cv.Point3f
         Public IMU_TimeStamp As Double

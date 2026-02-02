@@ -1,6 +1,135 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
+    ''' <summary>Compute the gravity vector using the complementary filter: fuse gyro (fast, drifts) with accelerometer (slow, stable).</summary>
     Public Class Gravity_Basics : Inherits TaskParent
+        Public options As New Options_Features
+        Dim lastTimeStamp As Double
+        Dim optionsIMU As New Options_IMU
+        ''' <summary>Unit gravity vector in body/sensor frame (points down).</summary>
+        Public GravityVector As New cv.Point3f(0, 0, -1)
+        Public Sub New()
+            desc = "Compute the gravity vector using the complementary filter: fuse gyroscope (fast, drifts) with accelerometer (slow, stable)."
+            labels(2) = "Complementary-filter gravity: angles and unit gravity vector"
+        End Sub
+        Public Shared Sub showVectors(dst As cv.Mat)
+            dst.Line(task.lpGravity.pE1, task.lpGravity.pE2, white, task.lineWidth, task.lineType)
+            dst.Line(task.lpHorizon.pE1, task.lpHorizon.pE2, white, task.lineWidth, task.lineType)
+        End Sub
+        ''' <summary>Compute two image points for the line through (cx,cy) in direction of gravity projection (gx,gy), extended to rect [0,w] x [0,h].</summary>
+        Public Function GravityVectorToLineEndpoints(gravityVec As cv.Point3f, width As Integer, height As Integer) As (p1 As cv.Point2f, p2 As cv.Point2f)
+            Dim cx = width / 2.0F
+            Dim cy = height / 2.0F
+            Dim dx = gravityVec.X
+            Dim dy = gravityVec.Y
+            Dim len = CSng(Math.Sqrt(dx * dx + dy * dy))
+            If len < 0.0001F Then
+                dx = 0.0F
+                dy = 1.0F
+            Else
+                dx /= len
+                dy /= len
+            End If
+            Dim tList As New List(Of Single)
+            If Math.Abs(dx) > 0.0001F Then
+                Dim t0 = -cx / dx
+                Dim y0 = cy + t0 * dy
+                If y0 >= 0 AndAlso y0 <= height Then tList.Add(t0)
+                Dim t1 = (width - cx) / dx
+                Dim y1 = cy + t1 * dy
+                If y1 >= 0 AndAlso y1 <= height Then tList.Add(t1)
+            End If
+            If Math.Abs(dy) > 0.0001F Then
+                Dim t0 = -cy / dy
+                Dim x0 = cx + t0 * dx
+                If x0 >= 0 AndAlso x0 <= width Then tList.Add(t0)
+                Dim t1 = (height - cy) / dy
+                Dim x1 = cx + t1 * dx
+                If x1 >= 0 AndAlso x1 <= width Then tList.Add(t1)
+            End If
+            If tList.Count < 2 Then
+                Return (New cv.Point2f(cx, 0), New cv.Point2f(cx, height))
+            End If
+            tList.Sort()
+            Dim tMin = tList(0)
+            Dim tMax = tList(tList.Count - 1)
+            Dim p1 = New cv.Point2f(cx + tMin * dx, cy + tMin * dy)
+            Dim p2 = New cv.Point2f(cx + tMax * dx, cy + tMax * dy)
+            Return (p1, p2)
+        End Function
+
+        ''' <summary>Unit gravity in body frame from tilt angles (same convention as IMU_GMatrix: roll=X, pitch=Y, yaw=Z).</summary>
+        Public Function AnglesToGravityVector(accRadians As cv.Point3f) As cv.Point3f
+            Dim cx = CSng(Math.Cos(accRadians.X))
+            Dim sx = CSng(Math.Sin(accRadians.X))
+            Dim cy = CSng(Math.Cos(accRadians.Y))
+            Dim sy = CSng(Math.Sin(accRadians.Y))
+            ' R = Ry(pitch)*Rx(roll); world down = (0,0,-1). Rx*(0,0,-1) = (0, sx, -cx). Ry* that = (sy*cx, sx, -cy*cx)
+            Dim gx = sy * cx
+            Dim gy = sx
+            Dim gz = -cy * cx
+            Dim n = CSng(Math.Sqrt(gx * gx + gy * gy + gz * gz))
+            If n < 0.0001F Then n = 1.0F
+            Return New cv.Point3f(gx / n, gy / n, gz / n)
+        End Function
+
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            optionsIMU.Run()
+
+            Dim gyro = task.IMU_AngularVelocity
+            If task.optionsChanged Then
+                lastTimeStamp = task.IMU_TimeStamp
+            Else
+                Dim dt = (task.IMU_TimeStamp - lastTimeStamp) / 1000.0
+                If task.Settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then dt /= 1000.0
+                dt = Math.Max(0.000001, Math.Min(1.0, dt))
+                task.theta += New cv.Point3f(-gyro.Z * dt, -gyro.Y * dt, gyro.X * dt)
+                lastTimeStamp = task.IMU_TimeStamp
+            End If
+
+            ' Tilt angles from accelerometer (low-pass source)
+            Dim g = task.IMU_Acceleration
+            task.accRadians = New cv.Point3f(
+                CSng(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z))),
+                CSng(Math.Abs(Math.Atan2(g.X, g.Y))),
+                CSng(Math.Atan2(g.Y, g.Z)))
+
+            ' Complementary filter: angle = alpha * (gyro-integrated) + (1-alpha) * (accel-derived)
+            If task.optionsChanged Then
+                task.theta = task.accRadians
+            Else
+                Dim a = task.IMU_AlphaFilter
+                task.theta.X = a * task.theta.X + (1.0F - a) * task.accRadians.X
+                task.theta.Y = task.accRadians.Y
+                task.theta.Z = a * task.theta.Z + (1.0F - a) * task.accRadians.Z
+            End If
+
+            task.accRadians = task.theta
+            If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
+            task.accRadians.Z += cv.Cv2.PI / 2
+
+            Dim y1 = task.accRadians.Y - cv.Cv2.PI
+            If task.accRadians.X < 0 Then y1 *= -1
+            task.verticalizeAngle = y1 * 58.2958
+
+            ' Unit gravity vector in body frame (points down)
+            GravityVector = AnglesToGravityVector(task.accRadians)
+
+            ' Line through image center in gravity direction (lpData extends to image edges)
+            Dim endpoints = GravityVectorToLineEndpoints(GravityVector, task.workRes.Width, task.workRes.Height)
+            task.lpHorizon = New lpData(endpoints.p1, endpoints.p2)
+            task.lpGravity = Line_PerpendicularTest.computePerp(task.lpHorizon)
+
+            strOut = "Complementary filter gravity" + vbCrLf +
+                     "Tilt (rad): X=" + Format(task.accRadians.X, fmt3) + " Y=" + Format(task.accRadians.Y, fmt3) + " Z=" + Format(task.accRadians.Z, fmt3) + vbCrLf +
+                     "Gravity unit vector (body): " + Format(GravityVector.X, fmt3) + ", " + Format(GravityVector.Y, fmt3) + ", " + Format(GravityVector.Z, fmt3)
+            SetTrueText(strOut)
+        End Sub
+    End Class
+
+
+
+
+    Public Class Gravity_CloudMethod : Inherits TaskParent
         Public options As New Options_Features
         Public xTop As Single, xBot As Single
         Dim sampleSize As Integer = 25
