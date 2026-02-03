@@ -832,8 +832,11 @@ Namespace VBClasses
 
 
     Public Class Line_Map : Inherits TaskParent
+        Public lpList As New List(Of lpData) ' the list of non-overlapping lines.
+        Public pointCloud As New cv.Mat
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
+            labels(1) = "Move mouse over any image to see line."
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Create a map with the lp.rect field."
@@ -847,26 +850,21 @@ Namespace VBClasses
             Return False
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim depthMask = task.depthmask.Clone
-
-            dst3.SetTo(0)
             Dim mmList As New List(Of mmData)
             Dim pad = 5
+            dst3.SetTo(0)
             dst0.SetTo(0)
+            lpList.Clear()
             For Each lp In task.lines.lpList
                 Dim val = dst3.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
                 If val = 0 Then
-                    Dim r = New cv.Rect(lp.rect.X - pad, lp.rect.Y - pad,
-                                        lp.rect.Width + pad * 2, lp.rect.Height + pad * 2)
-                    dst0.Rectangle(r, lp.index + 1, -1)
+                    dst0.Rectangle(lp.rect, lp.index + 1, -1)
                     dst3.Rectangle(lp.rect, lp.index + 1, -1)
                     dst3.Line(lp.p1, lp.p2, 0, task.lineWidth, cv.LineTypes.Link8)
-                    depthMask.Line(lp.p1, lp.p2, 0, task.lineWidth)
-                    If lp.mmDepth.maxVal = 0 Then
-                        lp.mmDepth = GetMinMax(task.pcSplit(2)(lp.rect), depthMask(lp.rect))
-                    End If
+                    lpList.Add(lp)
                 End If
             Next
+            labels(2) = CStr(lpList.Count) + " non-overlapping lines were found."
 
             For Each lp In task.lines.lpList
                 If fillTriangle(lp, lp.rect.TopLeft) Then Continue For
@@ -880,18 +878,20 @@ Namespace VBClasses
             Next
 
             dst2 = PaletteBlackZero(dst3)
+            Dim depth = task.pcSplit(2).Clone
             For Each lp In task.lines.lpList
-                Dim val1 = dst0.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-                Dim val2 = dst0.Get(Of Byte)(lp.p2.Y, lp.p2.X)
-                If val1 = 0 And val2 = 0 Then
-                    Dim p1 = New cv.Point2f(lp.rect.X + lp.mmDepth.minLoc.X,
-                                            lp.rect.Y + lp.mmDepth.minLoc.Y)
-                    Dim p2 = New cv.Point2f(lp.rect.X + lp.mmDepth.maxLoc.X,
-                                            lp.rect.Y + lp.mmDepth.maxLoc.Y)
-                    dst2.Circle(p1, task.DotSize, task.highlight, -1)
-                    dst2.Circle(p2, task.DotSize, white, -1)
-                End If
+                Dim mask1 = dst3(lp.rect).Clone
+                mask1 = mask1.InRange(255, 255)
+                Dim mask2 = Not mask1
+
+                Dim depth1 = depth(lp.rect).Mean(mask1)(0)
+                Dim depth2 = depth(lp.rect).Mean(mask2)(0)
+
+                depth(lp.rect).SetTo(depth1, mask1)
+                depth(lp.rect).SetTo(depth2, mask2)
             Next
+
+            cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), depth}, pointCloud)
 
             Dim index = dst0.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X) - 1
             If index >= 0 Then
