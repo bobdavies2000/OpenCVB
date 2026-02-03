@@ -337,6 +337,7 @@ Namespace VBClasses
 
             Public depth1 As Single ' this value may not be pVec1(2) which is preferred.  See Line3D_Basics.getDepth.
             Public depth2 As Single ' this value may not be pVec2(2) which is preferred.  See Line3D_Basics.getDepth.
+            Public mmDepth As mmData
 
             Public index As Integer
             Public trackID As Integer
@@ -397,36 +398,6 @@ Namespace VBClasses
                 If pt.Y > task.color.Height - 1 Then pt.Y = task.color.Height - 1
                 Return pt
             End Function
-            Public Function BuildLineRectangle(halfThickness As Single) As cv.Rect
-                ' Direction vector
-                Dim dx As Single = p2.X - p1.X
-                Dim dy As Single = p2.Y - p1.Y
-
-                ' Normalize direction
-                Dim ux As Single = dx / length
-                Dim uy As Single = dy / length
-
-                ' Perpendicular vector (unit)
-                Dim px As Single = -uy
-                Dim py As Single = ux
-
-                ' Scale by half thickness
-                px *= halfThickness
-                py *= halfThickness
-
-                ' Compute 4 corners
-                Dim c1 As New cv.Point2f(p1.X + px, p1.Y + py)
-                Dim c2 As New cv.Point2f(p2.X + px, p2.Y + py)
-                Dim c3 As New cv.Point2f(p2.X - px, p2.Y - py)
-                Dim c4 As New cv.Point2f(p1.X - px, p1.Y - py)
-
-                Dim w = Math.Abs(c3.X - c1.X)
-                If w < 1 Then w = task.lineWidth
-                Dim h = Math.Abs(c3.Y - c1.Y)
-                If h < 1 Then h = task.lineWidth
-                Return New cv.Rect(c1.X, c1.Y, w, h)
-            End Function
-
             Sub New(_p1 As cv.Point2f, _p2 As cv.Point2f)
                 p1 = validatePoint(_p1)
                 p2 = validatePoint(_p2)
@@ -574,21 +545,6 @@ Namespace VBClasses
             Public indexLast As Integer ' only here for compatibility
             Public Sub New()
             End Sub
-            Public Shared Function getHullMask(hull As List(Of cv.Point), mask As cv.Mat) As cv.Mat
-                Dim hullMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-                Dim listOfPoints = New List(Of List(Of cv.Point))({hull})
-                cv.Cv2.DrawContours(hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
-                Return hullMask
-            End Function
-            Public Sub buildMaxDist()
-                Dim tmp As cv.Mat = mask.Clone
-                ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle.
-                tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
-                Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
-                Dim mm As mmData = GetMinMax(distance32f)
-                maxDist.X = mm.maxLoc.X + rect.X
-                maxDist.Y = mm.maxLoc.Y + rect.Y
-            End Sub
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer, Optional minContours As Integer = 3)
                 rect = _rect
                 mask = _mask.InRange(_index, _index)
@@ -614,6 +570,21 @@ Namespace VBClasses
                     pixels = mask.CountNonZero
                     depth = task.pcSplit(2)(rect).Mean(task.depthmask(rect))(0)
                 End If
+            End Sub
+            Public Shared Function getHullMask(hull As List(Of cv.Point), mask As cv.Mat) As cv.Mat
+                Dim hullMask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+                Dim listOfPoints = New List(Of List(Of cv.Point))({hull})
+                cv.Cv2.DrawContours(hullMask, listOfPoints, 0, cv.Scalar.All(255), -1, cv.LineTypes.Link8)
+                Return hullMask
+            End Function
+            Public Sub buildMaxDist()
+                Dim tmp As cv.Mat = mask.Clone
+                ' Rectangle is definitely needed.  Test it again with MaxDist_NoRectangle.
+                tmp.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
+                Dim distance32f = tmp.DistanceTransform(cv.DistanceTypes.L1, 0)
+                Dim mm As mmData = GetMinMax(distance32f)
+                maxDist.X = mm.maxLoc.X + rect.X
+                maxDist.Y = mm.maxLoc.Y + rect.Y
             End Sub
             Public Function displayCell() As String
                 Dim strOut = "rcList index = " + CStr(index) + vbCrLf

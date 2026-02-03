@@ -64,11 +64,9 @@ Namespace VBClasses
                 SetTrueText(CStr(rc.age), rc.maxDist)
             Next
 
-            If standaloneTest() Then
-                RedCloud_Cell.selectCell(rcMap, rcList)
-                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
-                SetTrueText(strOut, 3)
-            End If
+            RedCloud_Cell.selectCell(rcMap, rcList)
+            strOut = task.rcD.displayCell()
+            SetTrueText(strOut, 3)
         End Sub
     End Class
 
@@ -162,10 +160,7 @@ Namespace VBClasses
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell
             SetTrueText(strOut, 1)
 
-            If task.rcD Is Nothing Then
-                labels(3) = "Select a RedCloud cell to see the histogram"
-                Exit Sub
-            End If
+            labels(3) = "Select a RedCloud cell to see the histogram"
 
             Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
             depth.SetTo(0, task.noDepthMask(task.rcD.rect))
@@ -219,20 +214,21 @@ Namespace VBClasses
                 Dim clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X) - 1
                 If clickIndex >= 0 And clickIndex < rcList.Count Then
                     task.rcD = rcList(clickIndex)
-                    'Else
-                    '    Dim ages As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-                    '    For Each pc In rcList
-                    '        ages.Add(pc.age, pc.index - 1)
-                    '    Next
-                    '    task.rcD = rcList(ages.ElementAt(0).Value)
                 Else
-                    If task.rcD Is Nothing Then task.rcD = rcList(0)
-                    If task.rcD.rect.Contains(task.clickPoint) Then
-                        task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+                    If task.rcD Is Nothing And rcList.Count > 0 Then
+                        task.rcD = rcList(0)
+                    Else
+                        task.rcD = Nothing
                     End If
                 End If
-            Else
-                task.rcD = Nothing
+            End If
+            If task.rcD Is Nothing Then
+                ' placeholder rcData to avoid errors downstream.
+                task.rcD = New rcData(New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 255),
+                                              New cv.Rect(0, 0, 1, 1), 0)
+            End If
+            If task.rcD.rect.Contains(task.clickPoint) Then
+                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

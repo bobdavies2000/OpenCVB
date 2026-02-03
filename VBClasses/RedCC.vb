@@ -131,7 +131,9 @@ Namespace VBClasses
             If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
             SetTrueText(strOut, 1)
 
-            If task.rcD IsNot Nothing Then dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
+            If task.rcD IsNot Nothing And task.rcD.rect.Width > 0 Then
+                dst3(task.rcD.rect).SetTo(white, task.rcD.mask)
+            End If
         End Sub
     End Class
 
@@ -154,13 +156,8 @@ Namespace VBClasses
             labels(2) = redCC.labels(2)
 
             RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            If task.rcD Is Nothing Then
-                RedCloud_Cell.selectCell(redCC.redC1.rcMap, redCC.redC1.rcList)
-                If task.rcD Is Nothing Then
-                    labels(3) = "Select a RedCloud cell to see the histogram"
-                    Exit Sub
-                End If
-            End If
+            RedCloud_Cell.selectCell(redCC.redC1.rcMap, redCC.redC1.rcList)
+            labels(3) = "Select a RedCloud cell to see the histogram"
 
             SetTrueText(task.rcD.displayCell, 1)
 

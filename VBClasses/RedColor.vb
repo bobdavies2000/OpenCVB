@@ -79,7 +79,7 @@ Namespace VBClasses
             Next
 
             RedCloud_Cell.selectCell(rcMap, rcList)
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            strOut = task.rcD.displayCell()
             SetTrueText(strOut, 3)
 
             labels(2) = CStr(classCount) + " RedColor cells. " + CStr(rcList.Count) + " cells >" +

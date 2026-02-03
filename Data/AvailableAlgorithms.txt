@@ -418,6 +418,7 @@ Line_DepthHistogram
 Line_Intersection
 Line_LeftRight
 Line_LeftTrack
+Line_Map
 Line_Motion
 Line_PerpendicularTest
 Line_Tracker
