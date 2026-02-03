@@ -32,7 +32,7 @@ Namespace VBClasses
             Next
 
             If standalone Then
-                Swarm_Flood.setSelectedCell()
+                Swarm_Flood.oldSelectCell()
                 dst3.SetTo(0)
                 For Each index In task.oldrcD.nabs
                     If index < redC.rcList.Count Then

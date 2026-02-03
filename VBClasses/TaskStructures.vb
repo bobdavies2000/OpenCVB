@@ -480,16 +480,17 @@ Namespace VBClasses
 
                 Dim w = Math.Abs(p1.X - p2.X)
                 Dim h = Math.Abs(p1.Y - p2.Y)
-                If h < 1 Then h = task.lineWidth
-                If w < 1 Then w = task.lineWidth
+                Dim pad As Integer = 5
                 ' p1 is always leftmost point.
-                rect = New cv.Rect(p1.X, Math.Min(p1.Y, p2.Y), w, h)
-                If rect.TopLeft.X + w >= task.workRes.Width Then
-                    rect.Width = task.workRes.Width - rect.TopLeft.X - 1
+                If Math.Abs(angle) > 45 Then
+                    rect = New cv.Rect(p1.X - pad, Math.Min(p1.Y, p2.Y),
+                                       Math.Max(pad * 2, w), Math.Max(pad * 2, h))
+                Else
+                    rect = New cv.Rect(p1.X, Math.Min(p1.Y, p2.Y) - pad,
+                                   Math.Max(pad * 2, w), Math.Max(pad * 2, h))
                 End If
-                If p1.Y + h >= task.workRes.Height Then
-                    rect.Height = task.workRes.Height - p1.Y - 1
-                End If
+
+                rect = ValidateRect(rect)
             End Sub
             Sub New()
                 p1 = New cv.Point2f()

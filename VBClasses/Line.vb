@@ -833,14 +833,15 @@ Namespace VBClasses
 
     Public Class Line_Map : Inherits TaskParent
         Public Sub New()
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Create a map with the lp.rect field."
         End Sub
-        Private Function fillTriangle(lp As lpData, pt As cv.Point) As Boolean
-            Dim val = dst3.Get(Of Byte)(pt.Y, pt.X)
+        Private Function fillTriangle(lp As lpData, p1 As cv.Point) As Boolean
+            Dim val = dst3.Get(Of Byte)(p1.Y, p1.X)
             If val > 0 Then
-                Dim count = dst3.FloodFill(pt, 255)
+                dst3.FloodFill(p1, 255)
                 Return True
             End If
             Return False
@@ -851,13 +852,13 @@ Namespace VBClasses
             dst3.SetTo(0)
             Dim mmList As New List(Of mmData)
             Dim pad = 5
-            dst1.SetTo(0)
+            dst0.SetTo(0)
             For Each lp In task.lines.lpList
                 Dim val = dst3.Get(Of Byte)(lp.ptCenter.Y, lp.ptCenter.X)
                 If val = 0 Then
                     Dim r = New cv.Rect(lp.rect.X - pad, lp.rect.Y - pad,
                                         lp.rect.Width + pad * 2, lp.rect.Height + pad * 2)
-                    dst1.Rectangle(r, lp.index + 1, -1)
+                    dst0.Rectangle(r, lp.index + 1, -1)
                     dst3.Rectangle(lp.rect, lp.index + 1, -1)
                     dst3.Line(lp.p1, lp.p2, 0, task.lineWidth, cv.LineTypes.Link8)
                     depthMask.Line(lp.p1, lp.p2, 0, task.lineWidth)
@@ -878,30 +879,10 @@ Namespace VBClasses
                 If fillTriangle(lp, botleft) Then Continue For
             Next
 
-            For Each lp In task.lines.lpList
-                Dim pixelCount As Integer = 0
-
-                Dim val = dst3.Get(Of Byte)(lp.rect.TopLeft.Y, lp.rect.TopLeft.X)
-                If val = 255 Then pixelCount += 1
-
-                val = dst3.Get(Of Byte)(lp.rect.BottomRight.Y, lp.rect.BottomRight.X)
-                If val = 255 Then pixelCount += 1
-
-                Dim topRight As New cv.Point(lp.rect.TopLeft.X + lp.rect.Width, lp.rect.Top)
-                val = dst3.Get(Of Byte)(topRight.Y, topRight.X)
-                If val = 255 Then pixelCount += 1
-
-                Dim botleft As New cv.Point(lp.rect.TopLeft.X, lp.rect.Top + lp.rect.Height)
-                val = dst3.Get(Of Byte)(botleft.Y, botleft.X)
-                If val = 255 Then pixelCount += 1
-
-                If pixelCount > 1 Then Dim k = 0
-            Next
-
             dst2 = PaletteBlackZero(dst3)
             For Each lp In task.lines.lpList
-                Dim val1 = dst1.Get(Of Byte)(lp.p1.Y, lp.p1.X)
-                Dim val2 = dst1.Get(Of Byte)(lp.p2.Y, lp.p2.X)
+                Dim val1 = dst0.Get(Of Byte)(lp.p1.Y, lp.p1.X)
+                Dim val2 = dst0.Get(Of Byte)(lp.p2.Y, lp.p2.X)
                 If val1 = 0 And val2 = 0 Then
                     Dim p1 = New cv.Point2f(lp.rect.X + lp.mmDepth.minLoc.X,
                                             lp.rect.Y + lp.mmDepth.minLoc.Y)
@@ -911,6 +892,12 @@ Namespace VBClasses
                     dst2.Circle(p2, task.DotSize, white, -1)
                 End If
             Next
+
+            Dim index = dst0.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X) - 1
+            If index >= 0 Then
+                task.lpD = task.lines.lpList(index)
+                task.lpD.displayCell(dst1)
+            End If
         End Sub
     End Class
 

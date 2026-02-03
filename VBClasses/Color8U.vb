@@ -61,33 +61,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class XO_Color8U_Sweep : Inherits TaskParent
-        Dim color8u As New Color8U_Basics
-        Public classCount As Integer
-        Public Sub New()
-            desc = "Sweep through all the Color8U_Basics algorithms..."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.heartBeatLT Then
-                Static index As Integer = task.featureOptions.Color8USource.SelectedIndex + 1
-                If index >= task.featureOptions.Color8USource.Items.Count Then index = 0
-                task.featureOptions.Color8USource.SelectedIndex = index
-            End If
-
-            color8u.Run(src)
-            classCount = color8u.classCount
-            dst2 = PaletteFull(color8u.dst2)
-
-            strOut = "Current color source = " + task.featureOptions.Color8USource.Text
-            SetTrueText(strOut, 2)
-        End Sub
-    End Class
-
-
-
-
-
     Public Class NR_Color8U_Grayscale : Inherits TaskParent
         Dim options As New Options_Grayscale8U
         Public classCount = 255

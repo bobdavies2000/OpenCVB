@@ -508,38 +508,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class XO_Feature_GridPopulation : Inherits TaskParent
-        Dim feat As New Feature_General
-        Public Sub New()
-            dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
-            labels(3) = "Click 'Show grid mask overlay' to see grid boundaries."
-            desc = "Find the feature population for each cell."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
-            labels(2) = feat.labels(2)
-
-            dst3.SetTo(0)
-            For Each pt In task.featurePoints
-                dst3.Set(Of Byte)(pt.Y, pt.X, 255)
-            Next
-
-            For Each roi In task.gridRects
-                Dim test = dst3(roi).FindNonZero()
-                SetTrueText(CStr(test.Rows), roi.TopLeft, 3)
-            Next
-        End Sub
-    End Class
-
-
-
-
-
-
-
-
-
     Public Class NR_Feature_AKaze : Inherits TaskParent
         Implements IDisposable
         Dim kazeKeyPoints As cv.KeyPoint() = Nothing

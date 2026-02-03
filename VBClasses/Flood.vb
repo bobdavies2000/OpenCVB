@@ -22,7 +22,7 @@ Namespace VBClasses
     Public Class NR_Flood_CellStatsPlot : Inherits TaskParent
         Public Sub New()
             task.gOptions.setHistogramBins(1000)
-            desc = "Provide cell stats on the flood_basics cells.  Identical to XO_RedCell_FloodFill"
+            desc = "Provide cell stats on the flood_basics cells.  Identical to RedCell_FloodFill"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
@@ -103,7 +103,7 @@ Namespace VBClasses
             dst2 = flood.dst2
             dst3 = flood.dst3
 
-            Swarm_Flood.setSelectedCell()
+            Swarm_Flood.oldSelectCell()
         End Sub
     End Class
 
@@ -166,32 +166,7 @@ Namespace VBClasses
 
             If task.heartBeat Then labels(2) = $"{redC.rcList.Count} cells identified"
 
-            If showSelected Then Swarm_Flood.setSelectedCell()
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class XO_Foreground_RedCloud : Inherits TaskParent
-        Dim fore As New XO_Foreground_CellsFore
-        Dim back As New XO_Foreground_CellsBack
-        Public Sub New()
-            desc = "Isolate foreground from background, then segment each with RedCloud"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            fore.Run(src)
-            dst2 = fore.dst2
-            labels(2) = fore.labels(2)
-
-            back.Run(src)
-            dst3 = back.dst2
-            labels(3) = back.labels(2)
-            If task.redList.oldrclist.Count > 0 Then
-                dst2(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
-            End If
+            If showSelected Then Swarm_Flood.oldSelectCell()
         End Sub
     End Class
 End Namespace

@@ -350,4 +350,58 @@ Namespace VBClasses
             RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
         End Sub
     End Class
+
+
+
+
+
+
+    Public Class RedColor_List : Inherits TaskParent
+        Public inputRemoved As cv.Mat
+        Public cellGen As New XO_RedCell_Color
+        Public redMask As New RedMask_Basics
+        Public rclist As New List(Of rcData)
+        Public rcMap As cv.Mat ' redColor map 
+        Public contours As New Contour_Basics
+        Public Sub New()
+            rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+            desc = "Find cells and then match them to the previous generation with minimum boundary"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            contours.Run(src)
+            If src.Type <> cv.MatType.CV_8U Then
+                If standalone And task.featureOptions.Color8USource.SelectedItem = "EdgeLine_Basics" Then
+                    dst1 = contours.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                Else
+                    dst1 = Mat_Basics.srcMustBe8U(src)
+                End If
+            Else
+                dst1 = src
+            End If
+
+            If inputRemoved IsNot Nothing Then dst1.SetTo(0, inputRemoved)
+            redMask.Run(dst1)
+
+            If redMask.mdList.Count = 0 Then Exit Sub ' no data to process.
+            cellGen.mdList = redMask.mdList
+            cellGen.Run(redMask.dst2)
+
+            dst2 = cellGen.dst2
+
+            rclist.Clear()
+            For Each md In redMask.mdList
+                Dim rc = New rcData(md.mask, md.rect, rclist.Count + 1)
+                rc.buildMaxDist()
+                rclist.Add(rc)
+            Next
+
+            For Each rc In rclist
+                DrawCircle(dst2, rc.maxDist)
+            Next
+            labels(2) = cellGen.labels(2)
+            labels(3) = ""
+            SetTrueText("", newPoint, 1)
+            RedCloud_Cell.selectCell(rcMap, rclist)
+        End Sub
+    End Class
 End Namespace

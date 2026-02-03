@@ -176,7 +176,7 @@ Namespace VBClasses
         Public Sub New()
             desc = "Floodfill the color image using the swarm outline as a mask"
         End Sub
-        Public Shared Sub setSelectedCell()
+        Public Shared Sub oldSelectCell()
             If task.redList Is Nothing Then Exit Sub
             If task.redList.oldrclist.Count = 0 Then Exit Sub
             If task.clickPoint = newPoint And task.redList.oldrclist.Count > 1 Then
@@ -201,7 +201,7 @@ Namespace VBClasses
             flood.Run(color8U.dst2)
             dst2 = flood.dst2
 
-            setSelectedCell()
+            oldSelectCell()
             ' labels(2) = flood.cellGen.labels(2)
         End Sub
     End Class

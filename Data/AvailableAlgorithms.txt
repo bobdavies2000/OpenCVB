@@ -355,6 +355,7 @@ Image_RedCloudColor
 Image_Series
 ImageOffset_Basics
 ImShow_Basics
+ImShow_CV32FC3
 IMU_Average
 IMU_Basics
 IMU_GMatrix
@@ -1009,7 +1010,6 @@ NR_Hough_Probabilistic
 NR_Hough_Sudoku
 NR_Hull_Defect
 NR_HullLine_SelectHull
-NR_Image_CellStats
 NR_Image_Icon
 NR_Image_MSER
 NR_ImageOffset_Cloud
@@ -1490,6 +1490,7 @@ RedColor_Bricks
 RedColor_GridRects
 RedColor_Hulls
 RedColor_LeftRight
+RedColor_List
 RedList_Basics
 RedList_CPP
 RedMask_Basics

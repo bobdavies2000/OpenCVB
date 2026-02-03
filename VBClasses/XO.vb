@@ -9924,7 +9924,7 @@ Namespace VBClasses
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
             Dim mm = GetMinMax(dst2)
             dst3 = PaletteFull(dst2)
-            Swarm_Flood.setSelectedCell()
+            Swarm_Flood.oldSelectCell()
 
             labels(2) = CStr(mm.maxVal + 1) + " regions were mapped in the depth data - region 0 (black) has no depth."
         End Sub
@@ -12738,7 +12738,7 @@ Namespace VBClasses
 
             If task.heartBeat Then labels(2) = $"{task.redList.oldrclist.Count} cells identified"
 
-            If showSelected Then Swarm_Flood.setSelectedCell()
+            If showSelected Then Swarm_Flood.oldSelectCell()
         End Sub
     End Class
 
@@ -16053,7 +16053,7 @@ Namespace VBClasses
             labels(2) = cellGen.labels(2)
             labels(3) = ""
             SetTrueText("", newPoint, 1)
-            Swarm_Flood.setSelectedCell()
+            Swarm_Flood.oldSelectCell()
         End Sub
     End Class
 
@@ -16479,6 +16479,30 @@ Namespace VBClasses
     End Class
 
 
+
+
+
+    Public Class XO_Color8U_Sweep : Inherits TaskParent
+        Dim color8u As New Color8U_Basics
+        Public classCount As Integer
+        Public Sub New()
+            desc = "Sweep through all the Color8U_Basics algorithms..."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If task.heartBeatLT Then
+                Static index As Integer = task.featureOptions.Color8USource.SelectedIndex + 1
+                If index >= task.featureOptions.Color8USource.Items.Count Then index = 0
+                task.featureOptions.Color8USource.SelectedIndex = index
+            End If
+
+            color8u.Run(src)
+            classCount = color8u.classCount
+            dst2 = PaletteFull(color8u.dst2)
+
+            strOut = "Current color source = " + task.featureOptions.Color8USource.Text
+            SetTrueText(strOut, 2)
+        End Sub
+    End Class
 
 
 
@@ -17303,7 +17327,7 @@ Namespace VBClasses
             rcMap = New cv.Mat(New cv.Size(dst2.Width, dst2.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Find cells and then match them to the previous generation with minimum boundary"
         End Sub
-        Public Shared Sub setSelectedCell()
+        Public Shared Sub oldSelectCell()
             If task.redList Is Nothing Then Exit Sub
             If task.redList.oldrclist.Count = 0 Then Exit Sub
             If task.clickPoint = newPoint And task.redList.oldrclist.Count > 1 Then
@@ -17375,7 +17399,7 @@ Namespace VBClasses
             labels(2) = cellGen.labels(2)
             labels(3) = ""
             SetTrueText("", newPoint, 1)
-            ' setSelectedCell()
+            ' oldSelectCell()
         End Sub
     End Class
 
@@ -18279,7 +18303,7 @@ Namespace VBClasses
             Next
 
             dst2 = XO_RedList_MaxDist.RebuildRCMap(task.redList.oldrclist.ToList)
-            Swarm_Flood.setSelectedCell()
+            Swarm_Flood.oldSelectCell()
         End Sub
     End Class
 
@@ -18352,6 +18376,88 @@ Namespace VBClasses
             labels(2) = task.redList.labels(3) + " " + CStr(unmatched) + " cells were not matched to previous frame."
 
             If task.redList.oldrclist.Count > 0 Then dst2 = PaletteFull(lastMap)
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Feature_GridPopulation : Inherits TaskParent
+        Dim feat As New Feature_General
+        Public Sub New()
+            dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
+            labels(3) = "Click 'Show grid mask overlay' to see grid boundaries."
+            desc = "Find the feature population for each cell."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            feat.Run(task.grayStable)
+            labels(2) = feat.labels(2)
+
+            dst3.SetTo(0)
+            For Each pt In task.featurePoints
+                dst3.Set(Of Byte)(pt.Y, pt.X, 255)
+            Next
+
+            For Each roi In task.gridRects
+                Dim test = dst3(roi).FindNonZero()
+                SetTrueText(CStr(test.Rows), roi.TopLeft, 3)
+            Next
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Foreground_RedCloud : Inherits TaskParent
+        Dim fore As New XO_Foreground_CellsFore
+        Dim back As New XO_Foreground_CellsBack
+        Public Sub New()
+            desc = "Isolate foreground from background, then segment each with RedCloud"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            fore.Run(src)
+            dst2 = fore.dst2
+            labels(2) = fore.labels(2)
+
+            back.Run(src)
+            dst3 = back.dst2
+            labels(3) = back.labels(2)
+            If task.redList.oldrclist.Count > 0 Then
+                dst2(task.oldrcD.rect).SetTo(white, task.oldrcD.mask)
+            End If
+        End Sub
+    End Class
+
+
+
+
+
+
+    Public Class XO_Image_CellStats : Inherits TaskParent
+        Dim images As New Image_RedCloudColor
+        Dim stats As New XO_RedCell_Basics
+        Public Sub New()
+            images.images.images.options.imageSeries = False
+            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            desc = "Display the statistics for the selected cell"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            task.pointCloud.SetTo(0)
+            task.pcSplit = task.pointCloud.Split()
+
+            images.Run(src)
+            dst0 = images.dst0
+            dst1 = images.dst1
+            dst2 = images.dst2
+
+            stats.statsString()
+
+            SetTrueText(stats.strOut, 3)
         End Sub
     End Class
 End Namespace

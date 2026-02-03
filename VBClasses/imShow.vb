@@ -18,7 +18,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_ImShow_CV32FC3 : Inherits TaskParent
+    Public Class ImShow_CV32FC3 : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
             desc = "Experimenting with how to show an 32fc3 Mat file."

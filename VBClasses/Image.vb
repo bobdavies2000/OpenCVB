@@ -82,35 +82,6 @@ Namespace VBClasses
 
 
 
-    Public Class NR_Image_CellStats : Inherits TaskParent
-        Dim images As New Image_RedCloudColor
-        Dim stats As New XO_RedCell_Basics
-        Public Sub New()
-            images.images.images.options.imageSeries = False
-            If standalone Then task.gOptions.displaydst0.checked = True
-            If standalone Then task.gOptions.displaydst1.checked = True
-            desc = "Display the statistics for the selected cell"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            task.pointCloud.SetTo(0)
-            task.pcSplit = task.pointCloud.Split()
-
-            images.Run(src)
-            dst0 = images.dst0
-            dst1 = images.dst1
-            dst2 = images.dst2
-
-            stats.statsString()
-
-            SetTrueText(stats.strOut, 3)
-        End Sub
-    End Class
-
-
-
-
-
-
 
 
     Public Class NR_Image_MSER : Inherits TaskParent
