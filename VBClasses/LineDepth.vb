@@ -14,7 +14,11 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.optionsChanged Then lines.lpList.Clear()
 
-            prepEdges.Run(src)
+            If src.Type <> cv.MatType.CV_32FC3 Then
+                prepEdges.Run(src)
+            Else
+                prepEdges.dst3 = src
+            End If
 
             dst0 = task.leftView
             motionLeft.Run(dst0)
