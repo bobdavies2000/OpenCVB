@@ -63,6 +63,27 @@ Namespace VBClasses
 
 
 
+    Public Class Cloud_DepthToWorld : Inherits TaskParent
+        Public Sub New()
+            desc = "Update the world coordinates with the new depth for the mask provided."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            If src.Type <> cv.MatType.CV_32F Then
+                SetTrueText("Input must be CV_32F depth image.", 2)
+                Exit Sub
+            End If
+
+            dst2 = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
+            For y = 0 To src.Height - 1
+                For x = 0 To src.Width - 1
+                    Dim depth = src.Get(Of Single)(y, x)
+                    If depth = 0 Then Continue For
+                    dst2.Set(Of cv.Point3f)(y, x, Cloud_Basics.worldCoordinates(x, y, depth))
+                Next
+            Next
+        End Sub
+    End Class
+
 
 
 

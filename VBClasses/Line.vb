@@ -8,8 +8,7 @@ Namespace VBClasses
         Public removeOverlappingLines As Boolean = True
         Public overLappingCount As Integer
         Public Sub New()
-            dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             If standalone Then task.gOptions.showMotionMask.Checked = True
             ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
             desc = "If line is NOT in motion mask, then keep it.  If line is in motion mask, add it."
@@ -63,26 +62,24 @@ Namespace VBClasses
             lpList = getRawLines(ld.Detect(src))
 
             For Each lp In lpList
-                If lpMotion(lp) Then
-                    sortlines.Add(lp.length, lp)
-                End If
+                If lpMotion(lp) Then sortlines.Add(lp.length, lp)
             Next
             Dim newCount As Integer = sortlines.Count - count
 
             lpList.Clear()
             overLappingCount = 0
-            dst0.SetTo(0)
+            dst3.SetTo(0)
             For Each lp In sortlines.Values
                 lp.index = lpList.Count
                 If removeOverlappingLines Then
                     If lp.rect.Width = 0 Then Continue For
                     If lp.rect.Height = 0 Then Continue For
-                    If dst0(lp.rect).CountNonZero > 0 Then
+                    If dst3(lp.rect).CountNonZero > 0 Then
                         overLappingCount += 1
                         Continue For
                     End If
                 End If
-                dst0.Line(lp.p1, lp.p2, 255, task.lineWidth + 1, cv.LineTypes.Link4)
+                dst3.Line(lp.p1, lp.p2, 255, task.lineWidth + 1, cv.LineTypes.Link4)
                 lpList.Add(lp)
             Next
 
@@ -92,15 +89,11 @@ Namespace VBClasses
             Next
 
             If lpList.Count > 0 Then
-                If task.frameCount > 10 Then
-                    If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
-                End If
+                If task.lpD.rect.Width = 0 Then task.lpD = lpList(0)
             End If
 
-            If task.heartBeat Then
-                labels(2) = CStr(count) + " lines retained - " + CStr(newCount) + " were new"
-                If removeOverlappingLines Then labels(2) += ". " + CStr(overLappingCount) + " overlaps removed."
-            End If
+            labels(2) = CStr(count) + " lines retained - " + CStr(newCount) + " were new"
+            If removeOverlappingLines Then labels(2) += ". " + CStr(overLappingCount) + " overlaps removed."
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
             ld.Dispose()
@@ -831,12 +824,14 @@ Namespace VBClasses
 
 
 
-    Public Class Line_Map : Inherits TaskParent
+    Public Class Line_MapRects : Inherits TaskParent
         Public lpList As New List(Of lpData) ' the list of non-overlapping lines.
         Public pointCloud As New cv.Mat
+        Dim depthToWorld As New Cloud_DepthToWorld
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             labels(1) = "Move mouse over any image to see line."
+            labels(3) = "Each rectangle is divided into 2 regions defined by the line."
             dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Create a map with the lp.rect field."
@@ -878,27 +873,80 @@ Namespace VBClasses
             Next
 
             dst2 = PaletteBlackZero(dst3)
-            Dim depth = task.pcSplit(2).Clone
+            Dim pcZ = task.pcSplit(2).Clone
             For Each lp In task.lines.lpList
                 Dim mask1 = dst3(lp.rect).Clone
                 mask1 = mask1.InRange(255, 255)
                 Dim mask2 = Not mask1
 
-                Dim depth1 = depth(lp.rect).Mean(mask1)(0)
-                Dim depth2 = depth(lp.rect).Mean(mask2)(0)
+                Dim depth1 = pcZ(lp.rect).Mean(mask1)(0)
+                Dim depth2 = pcZ(lp.rect).Mean(mask2)(0)
 
-                depth(lp.rect).SetTo(depth1, mask1)
-                depth(lp.rect).SetTo(depth2, mask2)
+                ' if the depth change at the line is less than 5 cm's, ignore it.
+                If Math.Abs(depth1 - depth2) > 0.05 Then
+                    depth2 = depth1
+                    pcZ(lp.rect).SetTo(depth1, mask1)
+                    pcZ(lp.rect).SetTo(depth2, mask2)
+
+                    depthToWorld.Run(pcZ(lp.rect))
+                    depthToWorld.dst2.CopyTo(pcZ(lp.rect))
+                End If
             Next
 
-            cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), depth}, pointCloud)
+            cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), pcZ}, pointCloud)
 
             Dim index = dst0.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X) - 1
-            If index >= 0 Then
-                task.lpD = task.lines.lpList(index)
+            If task.lines.lpList.Count > 0 Then
+                If index <= 0 Then
+                    If task.lpD Is Nothing Then task.lpD = task.lines.lpList(0)
+                Else
+                    task.lpD = task.lines.lpList(index)
+                End If
                 task.lpD.displayCell(dst1)
             End If
         End Sub
     End Class
 
+
+
+
+
+    Public Class Line_Map : Inherits TaskParent
+        Public Sub New()
+            If standalone Then task.gOptions.displayDst1.Checked = True
+            labels(1) = "Move mouse over any image to see line."
+            labels(3) = "Each rectangle is divided into 2 regions defined by the line."
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+            desc = "Create a map with the lp.rect field."
+        End Sub
+        Private Function fillTriangle(lp As lpData, p1 As cv.Point) As Boolean
+            Dim val = dst3.Get(Of Byte)(p1.Y, p1.X)
+            If val > 0 Then
+                dst3.FloodFill(p1, 255)
+                Return True
+            End If
+            Return False
+        End Function
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim mmList As New List(Of mmData)
+            Dim pad = 5
+            dst3.SetTo(0)
+            For Each lp In task.lines.lpList
+                dst3.Line(lp.p1, lp.p2, lp.index + 1, task.lineWidth * 3, cv.LineTypes.Link8)
+            Next
+            labels(2) = CStr(task.lines.lpList.Count) + " non-overlapping lines were found."
+
+            dst2 = PaletteBlackZero(dst3)
+
+            Dim index = dst3.Get(Of Byte)(task.mouseMovePoint.Y, task.mouseMovePoint.X) - 1
+            If task.lines.lpList.Count > 0 Then
+                If index <= 0 Then
+                    If task.lpD Is Nothing Then task.lpD = task.lines.lpList(0)
+                Else
+                    task.lpD = task.lines.lpList(index)
+                End If
+                task.lpD.displayCell(dst1)
+            End If
+        End Sub
+    End Class
 End Namespace

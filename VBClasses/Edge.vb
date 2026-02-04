@@ -1395,10 +1395,10 @@ Namespace VBClasses
 
 
     Public Class NR_Edge_CloudData : Inherits TaskParent
-        Dim prep As New RedPrep_ReductionChoices
+        Dim prep As New RedPrep_Core
         Dim edges As New Edge_Basics
         Public Sub New()
-            desc = "Find the lines in the RedPrep_ReductionChoices output"
+            desc = "Find the lines in the RedPrep_Core output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             prep.Run(src)

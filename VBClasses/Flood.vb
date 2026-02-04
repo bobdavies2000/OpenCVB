@@ -112,10 +112,10 @@ Namespace VBClasses
 
 
     Public Class NR_Flood_Minimal : Inherits TaskParent
-        Dim prep As New RedPrep_ReductionChoices
+        Dim prep As New RedPrep_Core
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            labels(2) = "Output is from RedPrep_ReductionChoices. Click any region to floodfill it."
+            labels(2) = "Output is from RedPrep_Core. Click any region to floodfill it."
             labels(3) = "Mask resulting region selected by the click."
             desc = "Floodfill the selected segment of the RedPrep image."
         End Sub

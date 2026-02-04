@@ -10163,7 +10163,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_XY : Inherits TaskParent
-        Dim prep As New RedPrep_ReductionChoices
+        Dim prep As New RedPrep_Core
         Public Sub New()
             OptionParent.findRadio("XY Reduction").Checked = True
             labels(3) = "Above is the depth histogram of the selected cell.  Below are the stats for the same cell"
@@ -10185,7 +10185,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_YZ : Inherits TaskParent
-        Dim prep As New RedPrep_ReductionChoices
+        Dim prep As New RedPrep_Core
         Dim stats As New XO_RedCell_Basics
         Public Sub New()
             OptionParent.findRadio("YZ Reduction").Checked = True
@@ -10210,7 +10210,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_XZ : Inherits TaskParent
-        Dim prep As New RedPrep_ReductionChoices
+        Dim prep As New RedPrep_Core
         Dim stats As New XO_RedCell_Basics
         Public Sub New()
             OptionParent.findRadio("XZ Reduction").Checked = True
@@ -10234,7 +10234,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_X : Inherits TaskParent
-        Dim prep As New RedPrep_ReductionChoices
+        Dim prep As New RedPrep_Core
         Dim stats As New XO_RedCell_Basics
         Public Sub New()
             OptionParent.findRadio("X Reduction").Checked = True
@@ -10258,7 +10258,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_Y : Inherits TaskParent
-        Dim prep As New RedPrep_ReductionChoices
+        Dim prep As New RedPrep_Core
         Dim stats As New XO_RedCell_Basics
         Public Sub New()
             OptionParent.findRadio("Y Reduction").Checked = True
@@ -10281,7 +10281,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedCloud_Z : Inherits TaskParent
-        Dim prep As New RedPrep_ReductionChoices
+        Dim prep As New RedPrep_Core
         Dim stats As New XO_RedCell_Basics
         Public Sub New()
             OptionParent.findRadio("Z Reduction").Checked = True

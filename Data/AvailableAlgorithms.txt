@@ -93,6 +93,7 @@ Classifier_Basics_CPP
 Classifier_BayesianTest
 Clone_Basics
 Cloud_Basics
+Cloud_DepthToWorld
 Cloud_ReduceSplit2
 Cloud_SetupSide
 Cloud_SetupTop
@@ -269,8 +270,10 @@ GeneticDrawing_Basics
 Gif_Basics
 Gif_OpenCVB
 GL_Basics
+GL_BasicsLineMap
 GL_DisplayPC
 GL_LogicalLines
+GL_LogicalLines1
 GL_PlotHist
 GrabCut_Basics
 Gradient_Basics
@@ -420,6 +423,7 @@ Line_Intersection
 Line_LeftRight
 Line_LeftTrack
 Line_Map
+Line_MapRects
 Line_Motion
 Line_PerpendicularTest
 Line_Tracker
@@ -1495,11 +1499,12 @@ RedList_Basics
 RedList_CPP
 RedMask_Basics
 RedPrep_Basics
+RedPrep_Core
 RedPrep_Depth
 RedPrep_EdgeMask
 RedPrep_Edges_CPP
 RedPrep_EdgesZ
-RedPrep_ReductionChoices
+RedPrep_Input
 RedTrack_Basics
 Reduction_Basics
 Reduction_PointCloud

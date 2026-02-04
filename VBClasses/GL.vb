@@ -13,6 +13,21 @@ Namespace VBClasses
 
 
 
+    Public Class GL_BasicsLineMap : Inherits TaskParent
+        Dim mapLine As New Line_MapRects
+        Public Sub New()
+            desc = "Display the pointcloud updated with the line information"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            mapLine.Run(src)
+            strOut = task.sharpGL.RunSharp(Common.oCase.drawPointCloudRGB, mapLine.pointCloud)
+            SetTrueText(strOut, 2)
+        End Sub
+    End Class
+
+
+
+
 
     Public Class NR_GL_MainForm : Inherits TaskParent
         Public Sub New()
@@ -530,28 +545,6 @@ Namespace VBClasses
 
 
 
-    Public Class GL_LogicalLines : Inherits TaskParent
-        Dim logLines As New Line3D_LogicalLines
-        Public drawRequest As Integer = Common.oCase.draw3DLines
-        Public Sub New()
-            desc = "Draw the logical lines found in the point cloud with the RGB lines."
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            logLines.Run(src)
-            dst2 = logLines.dst2.Clone
-            If task.toggleOn Then
-                strOut = "Missing depth removed from lines in the image at left (dst2)"
-                SetTrueText(strOut, 3)
-                dst2.SetTo(0, task.noDepthMask)
-            End If
-
-            labels = logLines.labels
-            task.sharpGL.RunLines(drawRequest, logLines.lpList)
-        End Sub
-    End Class
-
-
-
 
     Public Class NR_GL_LogicalCloud : Inherits TaskParent
         Dim glTest As New GL_LogicalLines
@@ -632,6 +625,48 @@ Namespace VBClasses
             labels(2) = task.sharpGL.hulls.labels(2) + " " + Format(task.sharpGL.hulls.percentImage, "0.0%") +
                     " of depth data used."
             labels(3) = task.sharpGL.hulls.labels(3)
+        End Sub
+    End Class
+
+
+
+
+    Public Class GL_LogicalLines : Inherits TaskParent
+        Dim logLines As New Line3D_LogicalLines
+        Public drawRequest As Integer = Common.oCase.draw3DLines
+        Public Sub New()
+            desc = "Draw the logical lines found in the point cloud with the RGB lines."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            logLines.Run(src)
+            dst2 = logLines.dst2.Clone
+            If task.toggleOn Then
+                strOut = "Missing depth removed from lines in the image at left (dst2)"
+                SetTrueText(strOut, 3)
+                dst2.SetTo(0, task.noDepthMask)
+            End If
+
+            labels = logLines.labels
+            task.sharpGL.RunLines(drawRequest, logLines.lpList)
+        End Sub
+    End Class
+
+
+
+
+    Public Class GL_LogicalLines1 : Inherits TaskParent
+        Dim logLines As New Line3D_LogicalLines
+        Public drawRequest As Integer = Common.oCase.draw3DLines
+        Public Sub New()
+            desc = "Draw the logical lines found in the point cloud with the RGB lines."
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            logLines.Run(src)
+            dst2 = logLines.dst2.Clone
+
+            dst3.SetTo(0)
+            labels = logLines.labels
+            task.sharpGL.RunLines(drawRequest, logLines.lpList)
         End Sub
     End Class
 End Namespace

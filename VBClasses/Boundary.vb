@@ -146,7 +146,7 @@ Namespace VBClasses
 
 
     Public Class NR_Boundary_RedColor : Inherits TaskParent
-        Dim prep As New RedPrep_ReductionChoices
+        Dim prep As New RedPrep_Core
         Public Sub New()
             task.gOptions.MaxDepthBar.Value = 20
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))

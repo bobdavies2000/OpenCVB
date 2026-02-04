@@ -64,7 +64,11 @@ Public Class Options
             workResRadio(i).Enabled = settings.resolutionsSupported(i)
         Next
 
-        workResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
+        If settings.cameraName = "StereoLabs ZED 2/2i" Then
+            workResRadio(resolutionList.IndexOf("336x188 - Quarter resolution")).Checked = True
+        Else
+            workResRadio(resolutionList.IndexOf("320x180 - Small resolution")).Checked = True
+        End If
     End Sub
     Public Sub MainOptions_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim resStr = CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height)
