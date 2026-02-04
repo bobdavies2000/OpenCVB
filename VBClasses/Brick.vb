@@ -939,6 +939,7 @@ Namespace VBClasses
     Public Class Brick_Lines : Inherits TaskParent
         Dim lines As New Line_Basics
         Dim options As New Options_LeftRightCorrelation
+        Dim motionLeft As New Motion_Basics
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             labels(2) = "The lines are for the left image."
@@ -948,8 +949,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            lines.motionMask = task.motionLeft.dst3
-            lines.Run(task.leftStable)
+            motionLeft.Run(task.leftView)
+
+            lines.motionMask = motionLeft.dst3
+            lines.Run(task.leftView)
             dst2 = lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
             Dim count As Integer
@@ -981,7 +984,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            dst2 = task.leftStable
+            dst2 = task.leftView
 
             Dim count As Integer
             dst3.SetTo(0)
@@ -1011,7 +1014,7 @@ Namespace VBClasses
             desc = "Select any cell To plot a histogram Of that cell's depth"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.leftStable
+            dst2 = task.leftView
 
             Dim index As Integer = task.gridMap.Get(Of Integer)(task.mouseMovePoint.Y, task.mouseMovePoint.X)
             If task.bricks.brickList.Count = 0 Or task.optionsChanged Then Exit Sub
@@ -1049,6 +1052,7 @@ Namespace VBClasses
     Public Class Brick_NoDepthLines : Inherits TaskParent
         Dim lines As New Line_Basics
         Dim options As New Options_LeftRightCorrelation
+        Dim motionLeft As New Motion_Basics
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             If standalone Then task.gOptions.displayDst0.Checked = True
@@ -1058,10 +1062,12 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            dst0 = task.leftStable
+            dst0 = task.leftView
 
-            lines.motionMask = task.motionLeft.dst3
-            lines.Run(task.leftStable)
+            motionLeft.Run(task.leftView)
+
+            lines.motionMask = motionLeft.dst3
+            lines.Run(task.leftView)
             dst2 = lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
             Dim count As Integer

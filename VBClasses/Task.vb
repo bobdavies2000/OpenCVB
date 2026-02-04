@@ -41,8 +41,6 @@ Namespace VBClasses
             gravityBasics = New Gravity_Basics
             imuBasics = New IMU_Basics
             motionRGB = New Motion_Basics
-            motionLeft = New Motion_Left
-            motionRight = New Motion_Right
             pcMotion = New Motion_PointCloud
             grid = New Grid_Basics
             lines = New Line_Basics
@@ -115,32 +113,17 @@ Namespace VBClasses
 
             If gOptions.UseMotionMask.Checked And firstPass = False Then
                 motionRGB.Run(gray)
-                motionLeft.Run(leftView)
-                motionRight.Run(rightView)
 
                 If optionsChanged Or task.frameCount < 5 Then
                     grayStable = gray.Clone
-                    leftStable = leftView.Clone
-                    rightStable = rightView.Clone
                 Else
                     If motionRGB.motionList.Count > 0 Then gray.CopyTo(grayStable, motionRGB.motionMask)
-                    If motionLeft.motion.motionList.Count > 0 Then
-                        leftView.CopyTo(leftStable, motionLeft.dst2)
-                    End If
-                    If motionRight.motion.motionList.Count > 0 Then
-                        rightView.CopyTo(rightStable, task.motionRGB.dst2)
-                    End If
                 End If
             Else
                 motionRGB.motionMask.SetTo(255)
                 motionRGB.motionList.Clear()
                 grayStable = gray
-                leftStable = leftView
-                rightStable = rightView
-
                 motionRGB.Run(gray)
-                motionLeft.Run(leftView)
-                motionRight.Run(rightView)
             End If
 
             If pcMotion IsNot Nothing Then

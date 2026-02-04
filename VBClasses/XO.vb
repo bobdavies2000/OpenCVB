@@ -17286,6 +17286,7 @@ Namespace VBClasses
         Dim lines As New Line_Basics
         Public lpList As New List(Of lpData)
         Dim options As New Options_LeftRightCorrelation
+        Dim motionLeft As New Motion_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -17296,9 +17297,10 @@ Namespace VBClasses
 
             Dim lastMap = dst1.Clone
             If standalone Then
-                dst0 = task.leftStable
-                lines.motionMask = task.motionLeft.dst3
-                lines.Run(task.leftStable)
+                dst0 = task.leftView
+                motionLeft.Run(task.leftView)
+                lines.motionMask = motionLeft.dst3
+                lines.Run(task.leftView)
             End If
 
             dst1.SetTo(0)

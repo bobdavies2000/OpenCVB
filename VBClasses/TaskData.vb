@@ -17,8 +17,6 @@ Namespace VBClasses
         Public color As New cv.Mat
         Public gray As New cv.Mat
         Public grayStable As New cv.Mat
-        Public leftStable As New cv.Mat
-        Public rightStable As New cv.Mat
         Public leftView As New cv.Mat
         Public rightView As New cv.Mat
         Public pointCloud As New cv.Mat
@@ -90,8 +88,6 @@ Namespace VBClasses
         Public gravityBasics As Gravity_Basics
         Public imuBasics As IMU_Basics
         Public motionRGB As Motion_Basics
-        Public motionLeft As Motion_Left
-        Public motionRight As Motion_Right
         Public contours As Contour_Basics_List
         Public pcMotion As Motion_PointCloud
         Public leftRightEnhanced As LeftRight_Brightness

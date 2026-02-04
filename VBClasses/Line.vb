@@ -475,7 +475,7 @@ Namespace VBClasses
             Return False
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = task.leftStable.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst3 = dst2.Clone
             lrLines.Run(Nothing)
 
@@ -501,19 +501,23 @@ Namespace VBClasses
     Public Class Line_LeftRight : Inherits TaskParent
         Public linesLeft As New Line_Basics
         Public linesRight As New Line_Basics
+        Dim motionLeft As New Motion_Basics
+        Dim motionRight As New Motion_Basics
         Public Sub New()
             labels = {"", "", "Left image lines", "Right image lines"}
             desc = "Find the lines in the Left and Right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            linesLeft.motionMask = task.motionLeft.dst3
-            linesLeft.Run(task.leftStable)
+            motionLeft.Run(task.leftView)
+            linesLeft.motionMask = motionLeft.dst3
+            linesLeft.Run(task.leftView)
 
             dst2 = linesLeft.dst2
             labels(2) = linesLeft.labels(2)
 
-            linesRight.motionMask = task.motionRight.dst3
-            linesRight.Run(task.rightStable)
+            motionRight.Run(task.rightView)
+            linesRight.motionMask = motionRight.dst3
+            linesRight.Run(task.rightView)
 
             dst3 = linesRight.dst2
             labels(3) = linesLeft.labels(2)
@@ -581,6 +585,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Dim lines As New Line_Basics
         Dim options As New Options_LeftRightCorrelation
+        Dim motionLeft As New Motion_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
             labels = {"", "", "Left image: detected lines with stable track IDs", ""}
@@ -602,9 +607,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst0 = task.leftStable
-            lines.motionMask = task.motionLeft.dst3
-            lines.Run(task.leftStable)
+            dst0 = task.leftView
+            motionLeft.Run(task.leftView)
+            lines.motionMask = motionLeft.dst3
+            lines.Run(task.leftView)
             Dim raw = lines.lpList
 
             Dim usedRaw As New HashSet(Of lpData)
@@ -685,6 +691,7 @@ Namespace VBClasses
         Dim lines As New Line_Basics
         Dim options As New Options_LeftRightCorrelation
         Dim lpList As New List(Of lpData)
+        Dim motionLeft As New Motion_Basics
         Public Sub New()
             If standalone Then task.gOptions.displayDst0.Checked = True
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -693,9 +700,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst0 = task.leftStable
-            lines.motionMask = task.motionLeft.dst3
-            lines.Run(task.leftStable)
+            dst0 = task.leftView
+            motionLeft.Run(task.leftView)
+            lines.motionMask = motionLeft.dst3
+            lines.Run(task.leftView)
             labels(2) = lines.labels(2)
 
             dst2.SetTo(0)
