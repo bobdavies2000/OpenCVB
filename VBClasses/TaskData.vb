@@ -255,7 +255,6 @@ Namespace VBClasses
         Public projectionThreshold As Integer ' In heatmap views, this defines what is hot in a heatmap.
 
         Public useXYRange As Boolean ' OpenGL applications don't need to adjust the ranges.
-        Public reductionName As String = "XY Reduction"
         Public xRange As Single
         Public yRange As Single
         Public xRangeDefault As Single

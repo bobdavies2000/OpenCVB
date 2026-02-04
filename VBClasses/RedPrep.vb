@@ -79,14 +79,11 @@ Namespace VBClasses
 
     Public Class RedPrep_Depth : Inherits TaskParent
         Implements IDisposable
-        Dim options As New Options_HistPointCloud
         Public Sub New()
             cPtr = PrepXY_Open()
             desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
             Dim inputX(task.pcSplit(0).Total * task.pcSplit(0).ElemSize - 1) As Byte
             Dim inputY(task.pcSplit(1).Total * task.pcSplit(1).ElemSize - 1) As Byte
 
@@ -106,7 +103,7 @@ Namespace VBClasses
 
             dst3 = PaletteBlackZero(dst2)
         End Sub
-                Public Overloads Sub Dispose() Implements IDisposable.Dispose
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = PrepXY_Close(cPtr)
         End Sub
     End Class
@@ -372,7 +369,7 @@ Namespace VBClasses
 
 
     Public Class RedPrep_Core : Inherits TaskParent
-        Public options As New Options_RedCloud
+        Dim options As New Options_RedCloud
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Reduction transform for the point cloud"
@@ -386,7 +383,7 @@ Namespace VBClasses
             task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
             task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
 
-            Select Case task.reductionName
+            Select Case options.reductionName
                 Case "X Reduction"
                     dst0 = split(0) * reduceAmt
                 Case "Y Reduction"
@@ -442,15 +439,13 @@ Namespace VBClasses
 
 
     Public Class RedPrep_Input : Inherits TaskParent
-        Public options As New Options_RedCloud
-        Public options1 As New Options_HistPointCloud
+        Dim options As New Options_RedCloud
         Public Sub New()
             If standalone Then task.gOptions.displayDst1.Checked = True
             desc = "Reduction transform for the point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            options1.Run()
 
             Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
             Dim reduceAmt = task.reductionTarget
@@ -458,7 +453,7 @@ Namespace VBClasses
             task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reduceAmt)
             task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reduceAmt)
 
-            Select Case task.reductionName
+            Select Case options.reductionName
                 Case "X Reduction"
                     dst0 = split(0) * reduceAmt
                 Case "Y Reduction"
@@ -488,21 +483,6 @@ Namespace VBClasses
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
             dst2.SetTo(0, task.noDepthMask)
-
-            If standaloneTest() Then
-                Static plot As New Plot_Histogram
-                mm = GetMinMax(dst2)
-                plot.createHistogram = True
-                plot.removeZeroEntry = False
-                plot.maxRange = mm.maxVal
-                plot.Run(dst2)
-                dst1 = plot.dst2
-
-                For i = 0 To plot.histArray.Count - 1
-                    plot.histArray(i) = i
-                Next
-            End If
-            dst3 = PaletteBlackZero(dst2)
 
             labels(2) = "Using reduction factor = " + CStr(reduceAmt)
         End Sub

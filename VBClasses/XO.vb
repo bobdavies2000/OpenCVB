@@ -5212,14 +5212,17 @@ Namespace VBClasses
 
 
     Public Class XO_RedPrep_BasicsCalcHist : Inherits TaskParent
+        Dim options As New Options_RedCloud
         Public Sub New()
             desc = "Simpler transforms for the point cloud using CalcHist instead of reduction."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            options.Run()
+
             Dim histogram As New cv.Mat
 
             Dim channels() As Integer = {0}
-            Select Case task.reductionName
+            Select Case options.reductionName
                 Case "X Reduction"
                     dst0 = task.pcSplit(0)
                 Case "Y Reduction"

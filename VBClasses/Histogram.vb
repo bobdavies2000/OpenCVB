@@ -1403,7 +1403,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Select Case task.reductionName
+            Select Case options.rcOptions.reductionName
                 Case "X Reduction", "Y Reduction", "Z Reduction"
                     cv.Cv2.CalcHist({task.pointCloud}, task.channels, New cv.Mat(), histogram,
                                  task.channelCount, task.histBinList, task.ranges)

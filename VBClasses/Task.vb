@@ -55,7 +55,6 @@ Namespace VBClasses
             taskUpdate()
             featureOptions.Show()
             gOptions.Show()
-            Options_HistPointCloud.setupCalcHist()
             treeView.Show()
             centerRect = New cv.Rect(workRes.Width / 4, workRes.Height / 4, workRes.Width / 2, workRes.Height / 2)
             fpList.Clear()

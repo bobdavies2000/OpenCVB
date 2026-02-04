@@ -7886,202 +7886,6 @@ Namespace VBClasses
 
 
 
-
-
-
-    Public Class Options_RedCloud : Inherits OptionParent
-        Public PrepX As Boolean
-        Public PrepY As Boolean
-        Public PrepZ As Boolean
-        Public PrepAddEdges As Boolean
-        Sub New()
-            If FindFrm(traceName + " CheckBox Options") Is Nothing Then
-                check.Setup(traceName)
-                check.addCheckBox("Prep Edges in X")
-                check.addCheckBox("Prep Edges in Y")
-                check.addCheckBox("Prep Edges in Z")
-                check.addCheckBox("Add RGB Edges")
-                check.Box(0).Checked = True
-                check.Box(1).Checked = True
-                check.Box(2).Checked = True
-            End If
-            If sliders.Setup(traceName) Then
-                ' Reduction target depends on resolution.  Default is set in GlobalOptions.vb.
-                sliders.setupTrackBar("Reduction Target", 1, 1000, task.reductionTarget)
-            End If
-        End Sub
-        Public Sub Run()
-            Static redSlider = FindSlider("Reduction Target")
-            Dim lastTarget = task.reductionTarget
-            task.reductionTarget = redSlider.value
-            If lastTarget <> task.reductionTarget Then task.optionsChanged = False
-
-
-            Static PrepXBox = FindCheckBox("Prep Edges in X")
-            Static PrepYBox = FindCheckBox("Prep Edges in Y")
-            Static PrepZBox = FindCheckBox("Prep Edges in Z")
-            Static PrepEdges = FindCheckBox("Add RGB Edges")
-            PrepX = PrepXBox.checked
-            PrepY = PrepYBox.checked
-            PrepZ = PrepZBox.checked
-            PrepAddEdges = PrepEdges.checked
-        End Sub
-    End Class
-
-
-
-
-
-
-    Public Class Options_HistPointCloud : Inherits OptionParent
-        Public threshold As Integer = 60
-        Public xBins As Integer = 30
-        Public yBins As Integer = 30
-        Public zBins As Integer = 100
-        Public Sub New()
-            If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Histogram threshold", 0, 1000, threshold)
-                sliders.setupTrackBar("Histogram X bins", 1, task.cols, xBins)
-                sliders.setupTrackBar("Histogram Y bins", 1, task.rows, yBins)
-                sliders.setupTrackBar("Histogram Z bins", 1, 200, zBins)
-            End If
-
-            Select Case task.cols
-                Case 640
-                    OptionParent.FindSlider("Histogram threshold").Value = 200
-                Case 320
-                    OptionParent.FindSlider("Histogram threshold").Value = threshold
-                Case 160
-                    OptionParent.FindSlider("Histogram threshold").Value = 25
-            End Select
-            If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-                radio.Setup(traceName)
-                radio.addRadio("X Reduction")
-                radio.addRadio("Y Reduction")
-                radio.addRadio("Z Reduction")
-                radio.addRadio("XY Reduction")
-                radio.addRadio("XZ Reduction")
-                radio.addRadio("YZ Reduction")
-                radio.addRadio("XYZ Reduction")
-                radio.check(3).Checked = True
-            End If
-            setupCalcHist()
-        End Sub
-        Public Shared Sub setupCalcHist()
-            ' The specification for each camera spells out the FOV angle
-            ' The sliders adjust the depth data histogram to fill the frustrum which is built from the specification FOV
-            Select Case task.settings.cameraName
-                Case "Intel(R) RealSense(TM) Depth Camera 435i"
-                    If task.workRes.Height = 480 Or task.workRes.Height = 240 Or task.workRes.Height = 120 Then
-                        task.xRange = 1.38
-                        task.yRange = 1.0
-                    Else
-                        task.xRange = 2.5
-                        task.yRange = 0.8
-                    End If
-                Case "Intel(R) RealSense(TM) Depth Camera 455", ""
-                    If task.workRes.Height = 480 Or task.workRes.Height = 240 Or task.workRes.Height = 120 Then
-                        task.xRange = 2.04
-                        task.yRange = 2.14
-                    Else
-                        task.xRange = 3.22
-                        task.yRange = 1.39
-                    End If
-                Case "StereoLabs ZED 2/2i"
-                    task.xRange = 4
-                    task.yRange = 1.5
-                Case "Oak-3D camera", "Oak-4D camera"
-                    task.xRange = 4.07
-                    task.yRange = 1.32
-                Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
-                    task.xRange = 3.5
-                    task.yRange = 1.5
-            End Select
-
-            task.xRangeDefault = task.xRange
-            task.yRangeDefault = task.yRange
-
-            task.sideCameraPoint = New cv.Point(0, task.workRes.Height \ 2)
-            task.topCameraPoint = New cv.Point(task.workRes.Width \ 2, 0)
-
-            task.channelsTop = {2, 0}
-            task.channelsSide = {1, 2}
-
-            task.rangesTop = New cv.Rangef() {New cv.Rangef(0.1, task.MaxZmeters + 0.1),
-                                              New cv.Rangef(-task.xRange, task.xRange)}
-            task.rangesSide = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange),
-                                               New cv.Rangef(0.1, task.MaxZmeters + 0.1)}
-
-            task.sideCameraPoint = New cv.Point(0, CInt(task.workRes.Height / 2))
-            task.topCameraPoint = New cv.Point(task.workRes.Width \ 2, 0)
-
-            task.projectionThreshold = 3 ' ProjectionThresholdBar.Value
-            task.channelCount = 1
-            task.channelIndex = 0
-
-            Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
-            Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-            Dim rz = New cv.Vec2f(0, task.MaxZmeters)
-            task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1),
-                                                New cv.Rangef(rz.Item0, rz.Item1)}
-
-            Select Case task.reductionName
-                Case "X Reduction"
-                    task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
-                    task.channels = {0}
-                    task.histBinList = {task.histogramBins}
-                Case "Y Reduction"
-                    task.ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1)}
-                    task.channels = {1}
-                    task.histBinList = {task.histogramBins}
-                Case "Z Reduction"
-                    task.ranges = New cv.Rangef() {New cv.Rangef(rz.Item0, rz.Item1)}
-                    task.channels = {2}
-                    task.histBinList = {task.histogramBins}
-                Case "XY Reduction"
-                    task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
-                    task.channelCount = 2
-                    task.channels = {0, 1}
-                    task.histBinList = {task.histogramBins, task.histogramBins}
-                Case "XZ Reduction"
-                    task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-                    task.channelCount = 2
-                    task.channels = {0, 2}
-                    task.channelIndex = 1
-                    task.histBinList = {task.histogramBins, task.histogramBins}
-                Case "YZ Reduction"
-                    task.ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-                    task.channelCount = 2
-                    task.channels = {1, 2}
-                    task.channelIndex = 1
-                    task.histBinList = {task.histogramBins, task.histogramBins}
-                Case "XYZ Reduction"
-                    task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-                    task.channelCount = 3
-                    task.channels = {0, 1, 2}
-                    task.channelIndex = 2
-                    task.histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
-            End Select
-        End Sub
-        Public Sub Run()
-            Static xSlider = OptionParent.FindSlider("Histogram X bins")
-            Static ySlider = OptionParent.FindSlider("Histogram Y bins")
-            Static zSlider = OptionParent.FindSlider("Histogram Z bins")
-            Static tSlider = OptionParent.FindSlider("Histogram threshold")
-            xBins = xSlider.Value
-            yBins = ySlider.Value
-            zBins = zSlider.Value
-            threshold = tSlider.value
-
-            Static frm = FindFrm(traceName + " Radio Buttons")
-            task.reductionName = frm.check(findRadioIndex(frm.check)).Text
-        End Sub
-    End Class
-
-
-
-
-
     Public Class Options_History : Inherits OptionParent
         Public Sub New()
             If sliders.Setup(traceName) Then sliders.setupTrackBar("Frame History", 1, 35, 3)
@@ -8191,6 +7995,207 @@ Namespace VBClasses
             correlation = corrSlider.value / 100
             mmRange = rangeSlider.value / 1000
             lineTrackerWidth = widthSlider.value
+        End Sub
+    End Class
+
+
+
+
+
+
+
+
+    Public Class Options_HistPointCloud : Inherits OptionParent
+        Public threshold As Integer = 60
+        Public xBins As Integer = 30
+        Public yBins As Integer = 30
+        Public zBins As Integer = 100
+        Public rcOptions As New Options_RedCloud
+        Public Sub New()
+            If sliders.Setup(traceName) Then
+                sliders.setupTrackBar("Histogram threshold", 0, 1000, threshold)
+                sliders.setupTrackBar("Histogram X bins", 1, task.cols, xBins)
+                sliders.setupTrackBar("Histogram Y bins", 1, task.rows, yBins)
+                sliders.setupTrackBar("Histogram Z bins", 1, 200, zBins)
+            End If
+
+            Select Case task.cols
+                Case 640
+                    OptionParent.FindSlider("Histogram threshold").Value = 200
+                Case 320
+                    OptionParent.FindSlider("Histogram threshold").Value = threshold
+                Case 160
+                    OptionParent.FindSlider("Histogram threshold").Value = 25
+            End Select
+
+            setupCalcHist()
+        End Sub
+        Public Sub setupCalcHist()
+            rcOptions.Run()
+
+            ' The specification for each camera spells out the FOV angle
+            ' The sliders adjust the depth data histogram to fill the frustrum which is built from the specification FOV
+            Select Case task.Settings.cameraName
+                Case "Intel(R) RealSense(TM) Depth Camera 435i"
+                    If task.workRes.Height = 480 Or task.workRes.Height = 240 Or task.workRes.Height = 120 Then
+                        task.xRange = 1.38
+                        task.yRange = 1.0
+                    Else
+                        task.xRange = 2.5
+                        task.yRange = 0.8
+                    End If
+                Case "Intel(R) RealSense(TM) Depth Camera 455", ""
+                    If task.workRes.Height = 480 Or task.workRes.Height = 240 Or task.workRes.Height = 120 Then
+                        task.xRange = 2.04
+                        task.yRange = 2.14
+                    Else
+                        task.xRange = 3.22
+                        task.yRange = 1.39
+                    End If
+                Case "StereoLabs ZED 2/2i"
+                    task.xRange = 4
+                    task.yRange = 1.5
+                Case "Oak-3D camera", "Oak-4D camera"
+                    task.xRange = 4.07
+                    task.yRange = 1.32
+                Case "Orbbec Gemini 335L", "Orbbec Gemini 336L", "Orbbec Gemini 335"
+                    task.xRange = 3.5
+                    task.yRange = 1.5
+            End Select
+
+            task.xRangeDefault = task.xRange
+            task.yRangeDefault = task.yRange
+
+            task.sideCameraPoint = New cv.Point(0, task.workRes.Height \ 2)
+            task.topCameraPoint = New cv.Point(task.workRes.Width \ 2, 0)
+
+            task.channelsTop = {2, 0}
+            task.channelsSide = {1, 2}
+
+            task.rangesTop = New cv.Rangef() {New cv.Rangef(0.1, task.MaxZmeters + 0.1),
+                                              New cv.Rangef(-task.xRange, task.xRange)}
+            task.rangesSide = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange),
+                                               New cv.Rangef(0.1, task.MaxZmeters + 0.1)}
+
+            task.sideCameraPoint = New cv.Point(0, CInt(task.workRes.Height / 2))
+            task.topCameraPoint = New cv.Point(task.workRes.Width \ 2, 0)
+
+            task.projectionThreshold = 3 ' ProjectionThresholdBar.Value
+            task.channelCount = 1
+            task.channelIndex = 0
+
+            Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+            Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+            Dim rz = New cv.Vec2f(0, task.MaxZmeters)
+            task.rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1),
+                                                New cv.Rangef(rz.Item0, rz.Item1)}
+
+            Select Case rcOptions.reductionName
+                Case "X Reduction"
+                    task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
+                    task.channels = {0}
+                    task.histBinList = {task.histogramBins}
+                Case "Y Reduction"
+                    task.ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1)}
+                    task.channels = {1}
+                    task.histBinList = {task.histogramBins}
+                Case "Z Reduction"
+                    task.ranges = New cv.Rangef() {New cv.Rangef(rz.Item0, rz.Item1)}
+                    task.channels = {2}
+                    task.histBinList = {task.histogramBins}
+                Case "XY Reduction"
+                    task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
+                    task.channelCount = 2
+                    task.channels = {0, 1}
+                    task.histBinList = {task.histogramBins, task.histogramBins}
+                Case "XZ Reduction"
+                    task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                    task.channelCount = 2
+                    task.channels = {0, 2}
+                    task.channelIndex = 1
+                    task.histBinList = {task.histogramBins, task.histogramBins}
+                Case "YZ Reduction"
+                    task.ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                    task.channelCount = 2
+                    task.channels = {1, 2}
+                    task.channelIndex = 1
+                    task.histBinList = {task.histogramBins, task.histogramBins}
+                Case "XYZ Reduction"
+                    task.ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                    task.channelCount = 3
+                    task.channels = {0, 1, 2}
+                    task.channelIndex = 2
+                    task.histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
+            End Select
+        End Sub
+        Public Sub Run()
+            Static xSlider = OptionParent.FindSlider("Histogram X bins")
+            Static ySlider = OptionParent.FindSlider("Histogram Y bins")
+            Static zSlider = OptionParent.FindSlider("Histogram Z bins")
+            Static tSlider = OptionParent.FindSlider("Histogram threshold")
+            xBins = xSlider.Value
+            yBins = ySlider.Value
+            zBins = zSlider.Value
+            threshold = tSlider.value
+            setupCalcHist()
+        End Sub
+    End Class
+
+
+
+
+
+    Public Class Options_RedCloud : Inherits OptionParent
+        Public PrepX As Boolean
+        Public PrepY As Boolean
+        Public PrepZ As Boolean
+        Public PrepAddEdges As Boolean
+        Public reductionName As String = "XY Reduction"
+        Sub New()
+            If FindFrm(traceName + " CheckBox Options") Is Nothing Then
+                check.Setup(traceName)
+                check.addCheckBox("Prep Edges in X")
+                check.addCheckBox("Prep Edges in Y")
+                check.addCheckBox("Prep Edges in Z")
+                check.addCheckBox("Add RGB Edges")
+                check.Box(0).Checked = True
+                check.Box(1).Checked = True
+                check.Box(2).Checked = True
+            End If
+            If sliders.Setup(traceName) Then
+                ' Reduction target depends on resolution.  Default is set in GlobalOptions.vb.
+                sliders.setupTrackBar("Reduction Target", 1, 1000, task.reductionTarget)
+            End If
+            If FindFrm(traceName + " Radio Buttons") Is Nothing Then
+                radio.Setup(traceName)
+                radio.addRadio("X Reduction")
+                radio.addRadio("Y Reduction")
+                radio.addRadio("Z Reduction")
+                radio.addRadio("XY Reduction")
+                radio.addRadio("XZ Reduction")
+                radio.addRadio("YZ Reduction")
+                radio.addRadio("XYZ Reduction")
+                radio.check(3).Checked = True
+            End If
+        End Sub
+        Public Sub Run()
+            Static redSlider = FindSlider("Reduction Target")
+            Dim lastTarget = task.reductionTarget
+            task.reductionTarget = redSlider.value
+            If lastTarget <> task.reductionTarget Then task.optionsChanged = False
+
+
+            Static PrepXBox = FindCheckBox("Prep Edges in X")
+            Static PrepYBox = FindCheckBox("Prep Edges in Y")
+            Static PrepZBox = FindCheckBox("Prep Edges in Z")
+            Static PrepEdges = FindCheckBox("Add RGB Edges")
+            PrepX = PrepXBox.checked
+            PrepY = PrepYBox.checked
+            PrepZ = PrepZBox.checked
+            PrepAddEdges = PrepEdges.checked
+
+            Static frm = FindFrm(traceName + " Radio Buttons")
+            reductionName = frm.check(findRadioIndex(frm.check)).Text
         End Sub
     End Class
 End Namespace
