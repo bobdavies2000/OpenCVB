@@ -2141,7 +2141,7 @@ Namespace VBClasses
 
         Public vList As New List(Of List(Of cv.Point3f))
         Public xyVList As New List(Of List(Of cv.Point))
-        Dim options As New Options_PointCloud()
+        Dim options As New Options_Cloud()
         Public Sub New()
             desc = "Reduce the point cloud to a manageable number points in 3D"
         End Sub

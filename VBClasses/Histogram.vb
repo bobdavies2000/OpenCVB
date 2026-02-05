@@ -1363,7 +1363,7 @@ Namespace VBClasses
     Public Class Histogram_PointCloud_XZ_YZ : Inherits TaskParent
         Public rangesX() As cv.Rangef
         Public rangesY() As cv.Rangef
-        Public options As New Options_HistPointCloud
+        Public options As New Options_PointCloud
         Public Sub New()
             labels = {"", "", "Histogram of XZ - X on the Y-Axis and Z on the X-Axis", "Histogram of YZ with Y on the Y-Axis and Z on the X-Axis"}
             desc = "Create a 2D histogram for the pointcloud in XZ and YZ."
@@ -1394,7 +1394,7 @@ Namespace VBClasses
         Dim grid As New Grid_Basics
         Public histogram As New cv.Mat
         Public histArray() As Single
-        Dim options As New Options_HistPointCloud
+        Dim options As New Options_PointCloud
         Public Sub New()
             task.gOptions.setHistogramBins(9)
             labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}

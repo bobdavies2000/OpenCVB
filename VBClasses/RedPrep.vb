@@ -397,7 +397,7 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 Static plot As New Plot_Histogram
-                Static options1 As New Options_HistPointCloud
+                Static options1 As New Options_PointCloud
                 options1.Run()
                 mm = GetMinMax(dst2)
                 plot.createHistogram = True

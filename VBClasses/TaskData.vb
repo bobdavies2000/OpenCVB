@@ -79,6 +79,7 @@ Namespace VBClasses
         Public redList As XO_RedList_Basics
         Public redListNew As RedList_Basics
         Public redCloud As RedCloud_Basics
+        Public cloudOptions As Options_PointCloud
         Public gravityMatrix As IMU_GMatrix
         Public lines As Line_Basics
         Public grid As Grid_Basics

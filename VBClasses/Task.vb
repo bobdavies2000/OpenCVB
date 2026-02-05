@@ -36,6 +36,7 @@ Namespace VBClasses
             noDepthMask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
             depthmask = New cv.Mat(workRes, cv.MatType.CV_8U, 0)
 
+            cloudOptions = New Options_PointCloud
             colorizer = New DepthColorizer_Basics
             gravityMatrix = New IMU_GMatrix
             gravityBasics = New Gravity_Basics
@@ -55,6 +56,7 @@ Namespace VBClasses
             taskUpdate()
             featureOptions.Show()
             gOptions.Show()
+            cloudOptions.Run()
             treeView.Show()
             centerRect = New cv.Rect(workRes.Width / 4, workRes.Height / 4, workRes.Width / 2, workRes.Height / 2)
             fpList.Clear()

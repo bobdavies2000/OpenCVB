@@ -761,5 +761,4 @@ Namespace VBClasses
             cv.Cv2.Merge({worldX, worldY, src}, dst2)
         End Sub
     End Class
-
 End Namespace

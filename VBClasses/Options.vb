@@ -6016,22 +6016,6 @@ Namespace VBClasses
 
 
 
-
-
-    Public Class Options_PointCloud : Inherits OptionParent
-        Public deltaThreshold As Double = 5
-        Public Sub New()
-            If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Delta Z threshold (cm)", 0, 100, deltaThreshold)
-        End Sub
-        Public Sub Run()
-            Static deltaSlider = OptionParent.FindSlider("Delta Z threshold (cm)")
-            deltaThreshold = deltaSlider.value / 100
-        End Sub
-    End Class
-
-
-
-
     Public Class Options_PolyLines : Inherits OptionParent
         Public polyCount As Integer = 100
         Public polyClosed As Boolean = True
@@ -8003,9 +7987,24 @@ Namespace VBClasses
 
 
 
+    Public Class Options_Cloud : Inherits OptionParent
+        Public deltaThreshold As Double = 5
+        Public Sub New()
+            If (sliders.Setup(traceName)) Then sliders.setupTrackBar("Delta Z threshold (cm)", 0, 100, deltaThreshold)
+        End Sub
+        Public Sub Run()
+            Static deltaSlider = OptionParent.FindSlider("Delta Z threshold (cm)")
+            deltaThreshold = deltaSlider.value / 100
+        End Sub
+    End Class
 
 
-    Public Class Options_HistPointCloud : Inherits OptionParent
+
+
+
+
+
+    Public Class Options_PointCloud : Inherits OptionParent
         Public threshold As Integer = 60
         Public xBins As Integer = 30
         Public yBins As Integer = 30
