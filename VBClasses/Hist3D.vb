@@ -321,13 +321,15 @@ Namespace VBClasses
                                 distances.Add(distanceN(vec, hVector.histArray))
                             End If
                         Next
-                        Dim index1 = candidates(distances.IndexOf(distances.Min)) - 1
-                        If index1 < pixels.rclist.Count Then
-                            Dim cell = pixels.rclist(index1)
-                            dst1(gr).SetTo(cell.color, dst3(gr))
+                        If distances.Count > 0 Then
+                            Dim index1 = candidates(distances.IndexOf(distances.Min)) - 1
+                            If index1 < pixels.rclist.Count Then
+                                Dim cell = pixels.rclist(index1)
+                                dst1(gr).SetTo(cell.color, dst3(gr))
+                            End If
                         End If
                     ElseIf candidates.Count = 1 Then
-                        Dim cell = pixels.rclist(candidates(0) - 1)
+                            Dim cell = pixels.rclist(candidates(0) - 1)
                         dst1(gr).SetTo(cell.color, dst3(gr))
                     End If
                 End If

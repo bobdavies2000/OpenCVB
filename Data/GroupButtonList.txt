@@ -42,6 +42,7 @@ DCT
 Delaunay
 Depth
 DepthColorizer
+DepthLine
 DepthLinear
 Derivative
 Deterministic
@@ -119,7 +120,6 @@ LeftRight
 Line
 Line3D
 LinearRegression
-LineDepth
 LineEnds
 LineMatch
 LineRect

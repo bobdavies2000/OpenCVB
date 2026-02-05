@@ -156,6 +156,12 @@ Depth_WorldXYZ
 DepthColorizer_Basics
 DepthColorizer_CPP
 DepthColorizer_Mean
+DepthLine_Basics
+DepthLine_Common
+DepthLine_Horizontal
+DepthLine_HorizontalVertical
+DepthLine_Vertical
+DepthLine_XY
 DepthLinear_Input
 DepthLinear_InputX
 DepthLinear_InputY
@@ -435,12 +441,6 @@ Line3D_LogicalLines
 Line3D_ReconstructLine
 Line3D_Selection
 LinearRegression_Basics
-LineDepth_Basics
-LineDepth_Common
-LineDepth_Horizontal
-LineDepth_HorizontalVertical
-LineDepth_Vertical
-LineDepth_XY
 LineEnds_Basics
 LineEnds_Correlation
 LineEnds_VH

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
-    Public Class LineDepth_Basics : Inherits TaskParent
+    Public Class DepthLine_Basics : Inherits TaskParent
         Public prepEdges As New RedPrep_EdgeMask
         Dim lines As New Line_Basics
         Dim motionLeft As New Motion_Basics
@@ -36,8 +36,8 @@ Namespace VBClasses
 
 
 
-    Public Class LineDepth_XY : Inherits TaskParent
-        Dim lineD As New LineDepth_Basics
+    Public Class DepthLine_XY : Inherits TaskParent
+        Dim lineD As New DepthLine_Basics
         Public lpList As New List(Of lpData)
         Public Sub New()
             OptionParent.FindSlider("Reduction Target").Value = 200
@@ -59,8 +59,8 @@ Namespace VBClasses
 
 
 
-    Public Class LineDepth_Vertical : Inherits TaskParent
-        Dim lineD As New LineDepth_Basics
+    Public Class DepthLine_Vertical : Inherits TaskParent
+        Dim lineD As New DepthLine_Basics
         Public lpList As New List(Of lpData)
         Public Sub New()
             OptionParent.FindSlider("Reduction Target").Value = 200
@@ -82,8 +82,8 @@ Namespace VBClasses
 
 
 
-    Public Class LineDepth_Horizontal : Inherits TaskParent
-        Dim lineD As New LineDepth_Basics
+    Public Class DepthLine_Horizontal : Inherits TaskParent
+        Dim lineD As New DepthLine_Basics
         Public lpList As New List(Of lpData)
         Public Sub New()
             OptionParent.FindSlider("Reduction Target").Value = 200
@@ -108,10 +108,10 @@ Namespace VBClasses
 
 
 
-    Public Class LineDepth_Common : Inherits TaskParent
-        Dim lineX As New LineDepth_Vertical
-        Dim lineY As New LineDepth_Horizontal
-        Dim lineXY As New LineDepth_XY
+    Public Class DepthLine_Common : Inherits TaskParent
+        Dim lineX As New DepthLine_Vertical
+        Dim lineY As New DepthLine_Horizontal
+        Dim lineXY As New DepthLine_XY
         Public lpList As New List(Of lpData)
         Public Sub New()
             OptionParent.FindSlider("Reduction Target").Value = 200
@@ -131,6 +131,12 @@ Namespace VBClasses
             For Each lp In lineY.lpList
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             Next
+            labels(0) = lineX.labels(0)
+
+            labels(2) = CStr(lineY.lpList.Count) + " horizontal (yellow), " +
+                        CStr(lineX.lpList.Count) + " vertical (white) lines, " +
+                        CStr(lineXY.lpList.Count) + " XY lines (various colors)"
+
         End Sub
     End Class
 
@@ -140,9 +146,9 @@ Namespace VBClasses
 
 
 
-    Public Class LineDepth_HorizontalVertical : Inherits TaskParent
-        Dim lineX As New LineDepth_Vertical
-        Dim lineY As New LineDepth_Horizontal
+    Public Class DepthLine_HorizontalVertical : Inherits TaskParent
+        Dim lineX As New DepthLine_Vertical
+        Dim lineY As New DepthLine_Horizontal
         Public lpList As New List(Of lpData)
         Public Sub New()
             OptionParent.FindSlider("Reduction Target").Value = 200
@@ -161,6 +167,9 @@ Namespace VBClasses
             For Each lp In lineY.lpList
                 dst2.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
             Next
+            labels(0) = lineX.labels(0)
+            labels(2) = CStr(lineY.lpList.Count) + " horizontal (yellow), " +
+                        CStr(lineX.lpList.Count) + " vertical (white) lines"
         End Sub
     End Class
 End Namespace

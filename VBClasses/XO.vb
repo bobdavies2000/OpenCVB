@@ -14689,7 +14689,7 @@ Namespace VBClasses
 
 
 
-    Public Class XO_LineDepth_Basics : Inherits TaskParent
+    Public Class XO_DepthLine_Basics : Inherits TaskParent
         Public Sub New()
             If task.bricks Is Nothing Then task.bricks = New Brick_Basics
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
