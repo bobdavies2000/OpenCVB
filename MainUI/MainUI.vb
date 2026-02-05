@@ -1,10 +1,8 @@
 Imports System.IO
-Imports System.Runtime.InteropServices
-Imports System.Runtime.Intrinsics
 Imports System.Text.RegularExpressions
-Imports System.Threading
 Imports VBClasses
 Imports cv = OpenCvSharp
+Imports cvext = OpenCvSharp.Extensions
 Namespace MainApp
     Partial Public Class MainUI : Inherits Form
         Dim isPlaying As Boolean
@@ -18,6 +16,8 @@ Namespace MainApp
         Dim resolutionDetails As String
         Dim magnifyIndex As Integer
         Dim windowsFont = New System.Drawing.Font("Tahoma", 9)
+        Dim pixelViewerRect As cv.Rect
+        Dim pixelViewerOn As Boolean
         Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
             updatePath(homeDir + "bin\", "Oak-3D/Oak-4D camera support.")
             updatePath(homeDir + "OakD\depthai-core\Build\vcpkg_installed\x64-windows\bin\", "Oak-3D/Oak-4D camera support.")
@@ -196,12 +196,16 @@ Namespace MainApp
             magnifyIndex += 1
         End Sub
         Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
-            Dim ratio = settings.workRes.Width / pics(0).Width
-            Dim r = New cv.Rect(task.drawRect.X * ratio, task.drawRect.Y * ratio,
-                                task.drawRect.Width * ratio, task.drawRect.Height * ratio)
-            r = validateRect(r, task.dstList(task.mousePicTag).Width, task.dstList(task.mousePicTag).Height)
+            Dim pt = task.mouseMagnifyStartPoint
+            Dim w = Math.Abs(pt.X - task.mouseMagnifyEndPoint.X)
+            Dim h = Math.Abs(pt.Y - task.mouseMagnifyEndPoint.Y)
+            Dim r = New cv.Rect(pt.X, pt.Y, w, h)
+            Dim input As New cv.Mat
+            input = cvext.BitmapConverter.ToMat(pics(task.mouseMagnifyPicTag).Image)
+            r = validateRect(r, input.Width, input.Height)
             If r.Width = 0 Or r.Height = 0 Then Exit Sub
-            Dim img = task.dstList(task.mousePicTag)(r).Resize(New cv.Size(task.drawRect.Width * 5, task.drawRect.Height * 5))
+            Dim img = input(r).Resize(New cv.Size(task.drawRect.Width * 5, task.drawRect.Height * 5))
+            cv.Cv2.ImShow("Magnifier", img)
         End Sub
         Private Sub MainForm_Closing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             If TestAllTimer.Enabled = False Then SaveJsonSettings()
@@ -492,6 +496,11 @@ Namespace MainApp
                     task = Nothing
                 End If
             End If
+        End Sub
+
+        Private Sub PixelViewer_Click(sender As Object, e As EventArgs) Handles PixelViewer.Click
+            PixelViewer.Checked = Not PixelViewer.Checked
+            pixelViewerOn = PixelViewer.Checked
         End Sub
     End Class
 End Namespace

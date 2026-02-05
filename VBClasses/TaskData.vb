@@ -213,6 +213,9 @@ Namespace VBClasses
         Public activateTaskForms As Boolean
         Public mousePicTag As Integer ' which image was the mouse in?
         Public mouseDisplayPoint As cv.Point ' Mouse location in terms of the display resolution
+        Public mouseMagnifyStartPoint As cv.Point ' Mouse location in terms of the display resolution
+        Public mouseMagnifyEndPoint As cv.Point ' Mouse location in terms of the display resolution
+        Public mouseMagnifyPicTag As Integer
         Public mouseMovePoint As cv.Point ' mouse location in the workRes resolution.
         Public mouseMovePointUpdated As Boolean
 

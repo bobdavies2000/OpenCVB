@@ -443,7 +443,7 @@ Namespace VBClasses
 
     Public Class RedPrep_EdgeMask : Inherits TaskParent
         Public reductionName As String
-        Dim prep As New RedPrep_Core
+        Public prep As New RedPrep_Core
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Get the edges in the RedPrep_Core output"

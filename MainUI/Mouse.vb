@@ -12,10 +12,12 @@ Namespace MainApp
         Private Sub CamPic_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
             If DrawingRectangle Then DrawingRectangle = False
             activeMouseDown = False
+            Dim x As Integer = e.X * settings.workRes.Width / pics(0).Width
+            Dim y As Integer = e.Y * settings.workRes.Height / pics(0).Height
+            task.mouseMagnifyEndPoint = New cv.Point(e.X, e.Y)
         End Sub
         Private Sub CamPic_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
             If task Is Nothing Then Exit Sub
-
             Dim x As Integer = e.X * settings.workRes.Width / pics(0).Width
             Dim y As Integer = e.Y * settings.workRes.Height / pics(0).Height
             Dim pic = DirectCast(sender, PictureBox)
@@ -30,6 +32,9 @@ Namespace MainApp
                 mouseDownPoint.X = x
                 mouseDownPoint.Y = y
             End If
+
+            task.mouseMagnifyStartPoint = New cv.Point(e.X, e.Y)
+            task.mouseMagnifyPicTag = pic.Tag
         End Sub
         Private Sub CamPic_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
             If task Is Nothing Then Exit Sub

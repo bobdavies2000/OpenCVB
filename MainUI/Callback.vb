@@ -1,4 +1,3 @@
-Imports System.Security.Cryptography
 Imports VBClasses
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions

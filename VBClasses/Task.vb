@@ -155,7 +155,7 @@ Namespace VBClasses
                     Next
 
                     gifImages.Clear()
-                    Dim dirInfo As New DirectoryInfo(task.homeDir + "GifBuilder\bin\Debug\net8.0\")
+                    Dim dirInfo As New DirectoryInfo(task.homeDir + "GifBuilder\bin\x64\Debug\net8.0\")
                     Dim dirData = dirInfo.GetDirectories()
                     Dim gifExe As New FileInfo(dirInfo.FullName + "GifBuilder.exe")
                     If gifExe.Exists = False Then
@@ -191,8 +191,9 @@ Namespace VBClasses
 
 
             Dim displayObject = task.MainUI_Algorithm
-            If task.cpu.indexTask > 0 Then
-                displayObject = task.cpu.activeObjects(task.cpu.indexTask - 1)
+            Dim index = task.cpu.indexTask
+            If index > 0 And index < task.cpu.activeObjects.Count Then
+                displayObject = task.cpu.activeObjects(index - 1)
             End If
             Dim nextTrueData As List(Of TrueText) = displayObject.trueData
             trueData = New List(Of TrueText)(nextTrueData)
@@ -226,13 +227,6 @@ Namespace VBClasses
                 Next
             End If
 
-            ' if there were no cycles spent on this routine, then it was inactive.
-            ' if any active algorithm has an index = -1, it has not been run.
-            Dim index = task.cpu.algorithmNames.IndexOf(displayObject.traceName)
-            If index = -1 Then
-                displayObject.trueData.Add(New TrueText("This task is not active at this time.",
-                                               New cv.Point(workRes.Width / 3, workRes.Height / 2), 2))
-            End If
             trueData.Clear()
             trueData.Add(New TrueText(task.depthAndDepthRange, New cv.Point(task.mouseMovePoint.X, task.mouseMovePoint.Y - 24), 1))
             For Each tt In displayObject.trueData

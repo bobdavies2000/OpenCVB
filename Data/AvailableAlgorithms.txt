@@ -158,9 +158,11 @@ DepthColorizer_CPP
 DepthColorizer_Mean
 DepthLine_Basics
 DepthLine_Common
-DepthLine_Horizontal
-DepthLine_HorizontalVertical
-DepthLine_Vertical
+DepthLine_H
+DepthLine_HV
+DepthLine_HV2
+DepthLine_Points
+DepthLine_V
 DepthLine_XY
 DepthLinear_Input
 DepthLinear_InputX

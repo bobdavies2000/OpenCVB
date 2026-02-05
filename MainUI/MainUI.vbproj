@@ -108,8 +108,10 @@
   <ItemGroup>
     <ProjectReference Include="..\CamZed\CamZed.csproj" />
     <ProjectReference Include="..\CPP_Native\CPP_Native.vcxproj" />
+    <ProjectReference Include="..\GifBuilder\GifBuilder.vbproj" />
     <ProjectReference Include="..\jsonShared\jsonShared.vbproj" />
     <ProjectReference Include="..\OakD\src\Cam_Oak-D.vcxproj" />
+    <ProjectReference Include="..\UI_Generator\UI_Generator.vbproj" />
     <ProjectReference Include="..\VBClasses\VBClasses.vbproj" />
   </ItemGroup>
 

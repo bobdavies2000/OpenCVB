@@ -102,12 +102,7 @@ Public Class TreeviewForm
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         task.cpu.displayObjectName = e.Node.Text
-        For i = 0 To treeData.Count - 1
-            If treeData(i).EndsWith(e.Node.Text) Then
-                task.cpu.indexTask = i
-                Exit For
-            End If
-        Next
+        task.cpu.indexTask = e.Node.Tag
         Timer2_Tick(sender, e)
     End Sub
 End Class
