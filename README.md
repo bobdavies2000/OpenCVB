@@ -6,16 +6,14 @@
     -   There are some subtle differences in Oak 4D support vs Oak 3D.
     -   The Oak 3D camera is a USB only device. Oak 4D is a network device.
     -   The depthai function getDefaultDevice is the way to get images.
-    -   The AI was recycling methods indicating it was unable to figure it out.
+    -   Cursor.ai was recycling methods and unable to access Oak 3D.
 -   Left and right images are transformed for enhanced brightness and contrast.
-    -   The enhanced left and right images are prepared for every frame.
 -   Changes in the left and right images are detected the same as for the RGB image.
     -   The left and right cameras are of lower quality.
-    -   Harmless defects in left/right motion masks are in featureless regions.
+    -   Harmless defects in left/right motion masks appear in featureless regions.
 -   Lines are detected in the motion enhanced left and right image.
 -   TreeView selections are now properly handling duplicate names in the tree.
-    -   Previously, the first duplicate algorithm in the tree was displayed.
-    -   As the tree view complexity increased this became apparent.
+    -   Algorithms are growing in complexity and the tree view updates were needed.
 -   The list of lines produced by Line_Basics eliminates any lines that overlap.
     -   The longer lines are preferred when there is overlap.
 -   Gravity and Horizon vectors were not updated since the UI rewrite.

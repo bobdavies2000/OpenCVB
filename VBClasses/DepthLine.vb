@@ -223,8 +223,6 @@ Namespace VBClasses
 
 
 
-
-
     Public Class DepthLine_Points : Inherits TaskParent
         Dim lineX As New RedPrep_EdgeMask
         Dim lineY As New RedPrep_EdgeMask
