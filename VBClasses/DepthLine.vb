@@ -15,14 +15,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.optionsChanged Then lines.lpList.Clear()
 
+            dst0 = task.leftView
+
             If src.Type <> cv.MatType.CV_32FC3 Then
                 prepEdges.Run(src)
             Else
                 prepEdges.dst3 = src
             End If
 
-            dst0 = task.leftView
-            motionLeft.Run(dst0)
+            motionLeft.Run(task.leftView)
 
             lines.motionMask = motionLeft.dst3
             lines.Run(prepEdges.dst3)
@@ -50,7 +51,7 @@ Namespace VBClasses
             lineD.Run(src)
 
             lpList = New List(Of lpData)(lineD.lpList)
-            dst0 = lineD.dst0
+            dst0 = task.leftView
             dst2 = lineD.dst2
             dst3 = lineD.dst3
             labels = lineD.labels
@@ -73,7 +74,7 @@ Namespace VBClasses
             lineD.Run(src)
 
             lpList = New List(Of lpData)(lineD.lpList)
-            dst0 = lineD.dst0
+            dst0 = task.leftView
             dst2 = lineD.dst2
             dst3 = lineD.dst3
             labels = lineD.labels
@@ -96,7 +97,7 @@ Namespace VBClasses
             lineD.Run(src)
 
             lpList = New List(Of lpData)(lineD.lpList)
-            dst0 = lineD.dst0
+            dst0 = task.leftView
             dst2 = lineD.dst2
             dst3 = lineD.dst3
             labels = lineD.labels
@@ -124,8 +125,8 @@ Namespace VBClasses
             lineY.Run(src)
             lineXY.Run(src)
 
-            dst0 = lineXY.dst0
-            dst2 = lineXY.dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst0 = task.leftView
+            dst2.SetTo(0)
             For Each lp In lineX.lpList
                 dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
             Next
@@ -159,8 +160,9 @@ Namespace VBClasses
             lineX.Run(src)
             lineY.Run(src)
 
-            dst0 = lineX.dst0
-            dst2 = lineX.dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst0 = task.leftView
+
+            dst2.SetTo(0)
             For Each lp In lineX.lpList
                 dst2.Line(lp.p1, lp.p2, white, task.lineWidth, task.lineType)
             Next
@@ -191,6 +193,8 @@ Namespace VBClasses
         Dim lines As New Line_Basics
         Public motionLeft As New Motion_Basics
         Public Sub New()
+            lineX.reductionName = "X Reduction"
+            lineY.reductionName = "Y Reduction"
             OptionParent.FindSlider("Reduction Target").Value = 200
             If standalone Then task.gOptions.displayDst0.Checked = True
             labels(3) = "Input to Line_Basics"
@@ -198,9 +202,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If task.optionsChanged Then lpList.Clear()
-            lineX.prep.reductionName = "X Reduction"
             lineX.Run(src)
-            lineY.prep.reductionName = "Y Reduction"
             lineY.Run(src)
 
             dst3 = lineX.dst3
@@ -226,7 +228,10 @@ Namespace VBClasses
     Public Class DepthLine_Points : Inherits TaskParent
         Dim lineX As New RedPrep_EdgeMask
         Dim lineY As New RedPrep_EdgeMask
-        Public lpList As New List(Of lpData)
+        Public ptList As New List(Of cv.Point)
+        Public ptDepth As New List(Of Single)
+        Public ptGrid As New List(Of Integer)
+        Public motionLeft As New Motion_Basics
         Public Sub New()
             lineX.reductionName = "X Reduction"
             lineY.reductionName = "Y Reduction"
@@ -235,10 +240,11 @@ Namespace VBClasses
             desc = "Identify the points where horizontal and vertical depth lines intersect."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.optionsChanged Then lpList.Clear()
+            If task.optionsChanged Then ptList.Clear()
 
             lineX.Run(src)
             lineY.Run(src)
+            motionLeft.Run(task.leftView)
 
             dst0.SetTo(0)
             dst1.SetTo(0)
@@ -247,8 +253,49 @@ Namespace VBClasses
             dst1.SetTo(64, lineY.dst3)
 
             dst3 = dst0 + dst1
-            dst2 = dst3.Threshold(128, 255, cv.ThresholdTypes.Binary)
+            dst1 = dst3.Threshold(127, 255, cv.ThresholdTypes.Binary)
+
+            Dim ptMat = dst1.FindNonZero()
+            labels(3) = CStr(ptMat.Rows) + " Points found"
+
+            Dim retainedList As New List(Of cv.Point)
+            Dim retainedDepth As New List(Of Single)
+            Dim retainedGrid As New List(Of Integer)
+            For i = 0 To ptList.Count - 1
+                Dim pt = ptList(i)
+                If motionLeft.dst3.Get(Of Byte)(pt.Y, pt.X) = 0 Then
+                    retainedList.Add(pt)
+                    retainedDepth.Add(ptDepth(i))
+                    retainedGrid.Add(ptGrid(i))
+                End If
+            Next
+            Dim count = retainedList.Count
+
+            ptList = New List(Of cv.Point)(retainedList)
+            ptDepth = New List(Of Single)(retainedDepth)
+            ptGrid = New List(Of Integer)(retainedGrid)
+            For i = 0 To ptMat.Rows - 1
+                Dim pt = ptMat.Get(Of cv.Point)(i, 0)
+
+                ' the grid rect may have already been found.
+                Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                If ptGrid.Contains(index) = False Then
+                    If motionLeft.dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
+                        ptList.Add(pt)
+                        Dim gr = task.gridRects(index)
+                        dst1(gr).SetTo(0)
+                        ptDepth.Add(task.pcSplit(2)(gr).Mean(task.depthmask(gr))(0))
+                        ptGrid.Add(index)
+                    End If
+                End If
+            Next
+
+            dst2 = task.leftView.Clone
+            For Each pt In ptList
+                dst2.Circle(pt, task.DotSize, white, -1, task.lineType)
+            Next
+            Dim newCount = ptList.Count - count
+            labels(2) = CStr(count) + " points were retained " + CStr(newCount) + " points were added."
         End Sub
     End Class
-
 End Namespace

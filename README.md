@@ -1,3 +1,32 @@
+**February 5, 2026 – Oak 3D, Enhanced Left/Right Views, Left/Right Motion, Left/Right Lines, TreeView, Gravity, Depth Lines**
+
+-   Over 1500 algorithms are included, averaging 36 lines of code per algorithm.
+    -   Over 300 additional obsolete algorithms compiled for reference use.
+-   OpenCVB is *temporarily* dropping support for the Oak-3D cameras.
+    -   There are some subtle differences in Oak 4D support vs Oak 3D.
+    -   The Oak 3D camera is a USB only device. Oak 4D is a network device.
+    -   The depthai function getDefaultDevice is the way to get images.
+    -   The AI was recycling methods indicating it was unable to figure it out.
+-   Left and right images are transformed for enhanced brightness and contrast.
+    -   The enhanced left and right images are prepared for every frame.
+-   Changes in the left and right images are detected the same as for the RGB image.
+    -   The left and right cameras are of lower quality.
+    -   Harmless defects in left/right motion masks are in featureless regions.
+-   Lines are detected in the motion enhanced left and right image.
+-   TreeView selections are now properly handling duplicate names in the tree.
+    -   Previously, the first duplicate algorithm in the tree was displayed.
+    -   As the tree view complexity increased this became apparent.
+-   The list of lines produced by Line_Basics eliminates any lines that overlap.
+    -   The longer lines are preferred when there is overlap.
+-   Gravity and Horizon vectors were not updated since the UI rewrite.
+    -   Cursor.ai was used to build the gravity and horizon vectors.
+-   Lines can be found in the reduced depth data. Example below.
+-   The Magnifier button in the main is now working properly.
+
+**![](media/b826383dc61f41ee5ba828024559efbb.gif)**
+
+**DepthLine_HV :** *The horizontal and vertical lines are obtained from the reduced depth data. The lower right image contains the input lines found in the reduced depth data. The lower left shows the lines that reasonably match the input. The upper left image is the left camera view because it aligns to the depth data. The changes in the lower right image are from adjusting the “Reduction Target” which determines how much the depth data is reduced. More lines are found with the lower amount of reduction, fewer when reduction is higher.*
+
 **January 20, 2026 – Splash Screen, Oak 4D, Align Left to RGB, Disparity, IR Emitters, “NR_” Prefix, and Motion Detection**
 
 -   Over 1500 algorithms are included, averaging 36 lines of code per algorithm.
