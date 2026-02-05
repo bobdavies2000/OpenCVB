@@ -30,7 +30,6 @@ Public Class OptionsGlobal
         task.DotSize = 1
         task.cvFontThickness = 1
         task.brickSize = 8
-        task.reductionTarget = 400
         task.DotSize = 1
         task.lineWidth = 1
         Select Case task.workRes.Width

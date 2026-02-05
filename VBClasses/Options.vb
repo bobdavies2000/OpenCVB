@@ -8150,6 +8150,7 @@ Namespace VBClasses
         Public PrepZ As Boolean
         Public PrepAddEdges As Boolean
         Public reductionName As String = "XY Reduction"
+        Public reductionTarget As Integer = 400
         Sub New()
             If FindFrm(traceName + " CheckBox Options") Is Nothing Then
                 check.Setup(traceName)
@@ -8163,7 +8164,7 @@ Namespace VBClasses
             End If
             If sliders.Setup(traceName) Then
                 ' Reduction target depends on resolution.  Default is set in GlobalOptions.vb.
-                sliders.setupTrackBar("Reduction Target", 1, 1000, task.reductionTarget)
+                sliders.setupTrackBar("Reduction Target", 1, 1000, reductionTarget)
             End If
             If FindFrm(traceName + " Radio Buttons") Is Nothing Then
                 radio.Setup(traceName)
@@ -8179,15 +8180,12 @@ Namespace VBClasses
         End Sub
         Public Sub Run()
             Static redSlider = FindSlider("Reduction Target")
-            Dim lastTarget = task.reductionTarget
-            task.reductionTarget = redSlider.value
-            If lastTarget <> task.reductionTarget Then task.optionsChanged = False
-
-
             Static PrepXBox = FindCheckBox("Prep Edges in X")
             Static PrepYBox = FindCheckBox("Prep Edges in Y")
             Static PrepZBox = FindCheckBox("Prep Edges in Z")
             Static PrepEdges = FindCheckBox("Add RGB Edges")
+
+            reductionTarget = redSlider.value
             PrepX = PrepXBox.checked
             PrepY = PrepYBox.checked
             PrepZ = PrepZBox.checked

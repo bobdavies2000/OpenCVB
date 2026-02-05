@@ -51,7 +51,6 @@ Namespace VBClasses
         Public lineWidth As Integer
         Public cvFontThickness As Integer
         Public brickSize As Integer
-        Public reductionTarget As Integer
         Public cvFontSize As Single
         Public lineType As cv.LineTypes
         Public histogramBins As Integer
