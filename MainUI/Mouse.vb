@@ -50,11 +50,11 @@ Namespace MainApp
                 task.drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
                 task.drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
                 task.drawRect.Height = Math.Abs(mouseDownPoint.Y - mouseMovePoint.Y)
-                If task.drawRect.X + task.drawRect.Width > pics(0).Width Then
-                    task.drawRect.Width = pics(0).Width - task.drawRect.X
+                If task.drawRect.X + task.drawRect.Width > task.workRes.Width Then
+                    task.drawRect.Width = task.workRes.Width - task.drawRect.X
                 End If
-                If task.drawRect.Y + task.drawRect.Height > pics(0).Height Then
-                    task.drawRect.Height = pics(0).Height - task.drawRect.Y
+                If task.drawRect.Y + task.drawRect.Height > task.workRes.Height Then
+                    task.drawRect.Height = task.workRes.Height - task.drawRect.Y
                 End If
                 BothFirstAndLastReady = True
             End If

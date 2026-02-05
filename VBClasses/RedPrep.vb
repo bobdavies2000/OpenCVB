@@ -372,30 +372,51 @@ Namespace VBClasses
 
     Public Class RedPrep_Core : Inherits TaskParent
         Public options As New Options_RedCloud
-        Dim redInput As New RedPrep_Input
+        Public reductionName As String
         Public Sub New()
             desc = "Reduction transform for the point cloud"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            redInput.reductionName = options.reductionName
-            redInput.Run(Nothing)
-            labels(2) = redInput.labels(2)
+            If reductionName = "" Then reductionName = options.reductionName
 
-            Dim mm As mmData = GetMinMax(redInput.dst2)
+            Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
+            task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / options.reductionTarget)
+            task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / options.reductionTarget)
+            task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / options.reductionTarget)
+
+            Select Case reductionName
+                Case "X Reduction"
+                    dst3 = split(0) * options.reductionTarget
+                Case "Y Reduction"
+                    dst3 = split(1) * options.reductionTarget
+                Case "Z Reduction"
+                    dst3 = split(2) * options.reductionTarget
+                Case "XY Reduction"
+                    dst3 = (split(0) + split(1)) * options.reductionTarget
+                Case "XZ Reduction"
+                    dst3 = (split(0) + split(2)) * options.reductionTarget
+                Case "YZ Reduction"
+                    dst3 = (split(1) + split(2)) * options.reductionTarget
+                Case "XYZ Reduction"
+                    dst3 = (split(0) + split(1) + split(2)) * options.reductionTarget
+            End Select
+
+            Dim mm As mmData = GetMinMax(dst3)
             Dim dst32f As New cv.Mat
             If Math.Abs(mm.minVal) > mm.maxVal Then
                 mm.minVal = -mm.maxVal
-                redInput.dst2.ConvertTo(dst32f, cv.MatType.CV_32F)
+                dst3.ConvertTo(dst32f, cv.MatType.CV_32F)
                 Dim mask = dst32f.Threshold(mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
                 mask.ConvertTo(mask, cv.MatType.CV_8U)
                 dst32f.SetTo(mm.minVal, mask)
             End If
-            dst2 = (redInput.dst2 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
+            dst2 = (dst3 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
             dst2.SetTo(0, task.noDepthMask)
+            labels(2) = "Using reduction factor = " + CStr(options.reductionTarget)
 
             If standaloneTest() Then
                 Static plot As New Plot_Histogram
@@ -418,62 +439,17 @@ Namespace VBClasses
 
 
 
-    Public Class RedPrep_Input : Inherits TaskParent
-        Public reductionName As String = "XY Reduction"
-        Public Sub New()
-            desc = "Reduction transform for the point cloud"
-        End Sub
-        Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
-            Dim reductionTarget = task.cloudOptions.rcOptions.reductionTarget
-            task.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / reductionTarget)
-            task.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / reductionTarget)
-            task.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / reductionTarget)
-
-            Select Case reductionName
-                Case "X Reduction"
-                    dst3 = split(0) * reductionTarget
-                Case "Y Reduction"
-                    dst3 = split(1) * reductionTarget
-                Case "Z Reduction"
-                    dst3 = split(2) * reductionTarget
-                Case "XY Reduction"
-                    dst3 = (split(0) + split(1)) * reductionTarget
-                Case "XZ Reduction"
-                    dst3 = (split(0) + split(2)) * reductionTarget
-                Case "YZ Reduction"
-                    dst3 = (split(1) + split(2)) * reductionTarget
-                Case "XYZ Reduction"
-                    dst3 = (split(0) + split(1) + split(2)) * reductionTarget
-            End Select
-
-            Dim mm As mmData = GetMinMax(dst3)
-            Dim dst32f As New cv.Mat
-            If Math.Abs(mm.minVal) > mm.maxVal Then
-                mm.minVal = -mm.maxVal
-                dst3.ConvertTo(dst32f, cv.MatType.CV_32F)
-                Dim mask = dst32f.Threshold(mm.minVal, mm.minVal, cv.ThresholdTypes.BinaryInv)
-                mask.ConvertTo(mask, cv.MatType.CV_8U)
-                dst32f.SetTo(mm.minVal, mask)
-            End If
-            dst2 = (dst3 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
-            dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-
-            dst2.SetTo(0, task.noDepthMask)
-            labels(2) = "Using reduction factor = " + CStr(reductionTarget)
-        End Sub
-    End Class
-
-
 
 
     Public Class RedPrep_EdgeMask : Inherits TaskParent
+        Public reductionName As String
         Dim prep As New RedPrep_Core
         Public Sub New()
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Get the edges in the RedPrep_Core output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            prep.reductionName = reductionName
             prep.Run(src)
             dst2 = prep.dst2
             labels(2) = prep.labels(2)

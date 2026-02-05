@@ -436,6 +436,11 @@ Line3D_ReconstructLine
 Line3D_Selection
 LinearRegression_Basics
 LineDepth_Basics
+LineDepth_Common
+LineDepth_Horizontal
+LineDepth_HorizontalVertical
+LineDepth_Vertical
+LineDepth_XY
 LineEnds_Basics
 LineEnds_Correlation
 LineEnds_VH
@@ -1504,7 +1509,6 @@ RedPrep_Depth
 RedPrep_EdgeMask
 RedPrep_Edges_CPP
 RedPrep_EdgesZ
-RedPrep_Input
 RedTrack_Basics
 Reduction_Basics
 Reduction_PointCloud
