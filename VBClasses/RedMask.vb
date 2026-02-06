@@ -45,7 +45,7 @@ Namespace VBClasses
                 DrawTour(md.mask, md.contour, 255, -1)
                 md.pixels = md.mask.CountNonZero
                 md.maxDist = Distance_Basics.GetMaxDist(md)
-                md.mm = vbc.GetMinMax(task.pcSplit(2)(md.rect), task.depthmask(md.rect))
+                md.mm = vbc.GetMinMax(atask.pcSplit(2)(md.rect), atask.depthmask(md.rect))
                 md.index = mdList.Count
                 mdList.Add(md)
             Next
@@ -54,8 +54,8 @@ Namespace VBClasses
 
             dst3 = PaletteBlackZero(dst2)
 
-            If task.heartBeat Then labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
-            If task.heartBeat Then labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
+            If atask.heartBeat Then labels(2) = "CV_8U result with " + CStr(classCount) + " regions."
+            If atask.heartBeat Then labels(3) = "Palette version of the data in dst2 with " + CStr(classCount) + " regions."
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = RedMask_Close(cPtr)

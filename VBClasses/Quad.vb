@@ -7,8 +7,8 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim colorStdev As cv.Scalar, colorMean As cv.Scalar
-            For Each rect In task.gridRects
-                cv.Cv2.MeanStdDev(task.rightView(rect), colorMean, colorStdev)
+            For Each rect In atask.gridRects
+                cv.Cv2.MeanStdDev(atask.rightView(rect), colorMean, colorStdev)
                 dst2(rect).SetTo(colorMean)
             Next
         End Sub
@@ -37,10 +37,10 @@ Namespace VBClasses
             Dim ptM = oglOptions.moveAmount
             Dim shift As New cv.Point3f(ptM(0), ptM(1), ptM(2))
 
-            If task.optionsChanged Then
+            If atask.optionsChanged Then
                 depthList1 = New List(Of List(Of Single))
                 depthList2 = New List(Of List(Of Single))
-                For i = 0 To task.gridRects.Count
+                For i = 0 To atask.gridRects.Count
                     depthList1.Add(New List(Of Single))
                     depthList2.Add(New List(Of Single))
                     colorList.Add(black)
@@ -50,22 +50,22 @@ Namespace VBClasses
             quadData.Clear()
             dst3.SetTo(0)
 
-            Dim depth32f As cv.Mat = task.pcSplit(2) * 1000, depth32s As New cv.Mat
+            Dim depth32f As cv.Mat = atask.pcSplit(2) * 1000, depth32s As New cv.Mat
             depth32f.ConvertTo(depth32s, cv.MatType.CV_32S)
-            For i = 0 To task.gridRects.Count - 1
-                Dim gr = task.gridRects(i)
+            For i = 0 To atask.gridRects.Count - 1
+                Dim gr = atask.gridRects(i)
 
                 Dim center = New cv.Point(CInt(gr.X + gr.Width / 2), CInt(gr.Y + gr.Height / 2))
-                Dim index = task.redList.rcMap.Get(Of Byte)(center.Y, center.X)
+                Dim index = atask.redList.rcMap.Get(Of Byte)(center.Y, center.X)
 
-                If index <= 0 Or index >= task.redList.oldrclist.Count Then
+                If index <= 0 Or index >= atask.redList.oldrclist.Count Then
                     depthList1(i).Clear()
                     depthList2(i).Clear()
                     colorList(i) = black
                     Continue For
                 End If
 
-                Dim rc = task.redList.oldrclist(index)
+                Dim rc = atask.redList.oldrclist(index)
                 If rc.depth = 0 Then Continue For
 
                 If colorList(i) <> rc.color Then
@@ -73,7 +73,7 @@ Namespace VBClasses
                     depthList2(i).Clear()
                 End If
 
-                Dim mm = GetMinMax(depth32s(gr), task.depthmask(gr))
+                Dim mm = GetMinMax(depth32s(gr), atask.depthmask(gr))
                 depthList1(i).Add(mm.minVal / 1000)
                 depthList2(i).Add(mm.maxVal / 1000)
                 colorList(i) = rc.color
@@ -130,9 +130,9 @@ Namespace VBClasses
             hulls.Run(src)
             dst2 = hulls.dst2
 
-            If task.optionsChanged Then
+            If atask.optionsChanged Then
                 depthList = New List(Of List(Of Single))
-                For i = 0 To task.gridRects.Count
+                For i = 0 To atask.gridRects.Count
                     depthList.Add(New List(Of Single))
                     colorList.Add(black)
                 Next
@@ -141,8 +141,8 @@ Namespace VBClasses
             quadData.Clear()
             dst3.SetTo(0)
 
-            For i = 0 To task.gridRects.Count - 1
-                Dim gr = task.gridRects(i)
+            For i = 0 To atask.gridRects.Count - 1
+                Dim gr = atask.gridRects(i)
 
                 Dim center = New cv.Point(CInt(gr.X + gr.Width / 2), CInt(gr.Y + gr.Height / 2))
                 Dim index = hulls.rcMap.Get(Of Byte)(center.Y, center.X)
@@ -204,10 +204,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
 
-            If task.optionsChanged Then
+            If atask.optionsChanged Then
                 depthMinList.Clear()
                 depthMaxList.Clear()
-                For i = 0 To task.gridRects.Count - 1
+                For i = 0 To atask.gridRects.Count - 1
                     depthMinList.Add(New List(Of Single))
                     depthMaxList.Add(New List(Of Single))
                 Next
@@ -222,17 +222,17 @@ Namespace VBClasses
 
             Dim min(4 - 1) As cv.Point3f, max(4 - 1) As cv.Point3f
             depths.Clear()
-            For i = 0 To task.gridRects.Count - 1
-                Dim gr = task.gridRects(i)
+            For i = 0 To atask.gridRects.Count - 1
+                Dim gr = atask.gridRects(i)
                 Dim center = New cv.Point(gr.X + gr.Width / 2, gr.Y + gr.Height / 2)
-                Dim index = task.redList.rcMap.Get(Of Byte)(center.Y, center.X)
+                Dim index = atask.redList.rcMap.Get(Of Byte)(center.Y, center.X)
                 Dim depthMin As Single = 0, depthMax As Single = 0, minLoc As cv.Point, maxLoc As cv.Point
-                If index >= 0 And task.redList.oldrclist.Count > 0 Then
-                    task.pcSplit(2)(gr).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthmask(gr))
-                    Dim rc = task.redList.oldrclist(index)
+                If index >= 0 And atask.redList.oldrclist.Count > 0 Then
+                    atask.pcSplit(2)(gr).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, atask.depthmask(gr))
+                    Dim rc = atask.redList.oldrclist(index)
                     depthMin = If(depthMax > rc.depth, rc.depth, depthMin)
 
-                    If depthMin > 0 And depthMax > 0 And depthMax < task.MaxZmeters Then
+                    If depthMin > 0 And depthMax > 0 And depthMax < atask.MaxZmeters Then
                         depthMinList(i).Add(depthMin)
                         depthMaxList(i).Add(depthMax)
 
@@ -283,7 +283,7 @@ Namespace VBClasses
                     depths.Add(depthMax)
                 End If
             Next
-            labels(2) = traceName + " completed: " + Format(task.gridRects.Count, fmt0) + " gr's produced " +
+            labels(2) = traceName + " completed: " + Format(atask.gridRects.Count, fmt0) + " gr's produced " +
                                 Format(quadData.Count / 25, fmt0) + " six sided bricks with color"
             SetTrueText("There should be no 0.0 values in the list of min and max depths in the dst2 image.", 3)
         End Sub
@@ -296,32 +296,32 @@ Namespace VBClasses
     Public Class NR_Quad_Boundaries : Inherits TaskParent
         Dim options As New Options_Features
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            If atask.bricks Is Nothing Then atask.bricks = New Brick_Basics
             labels(2) = "Depth differences large enough to label them boundaries"
             desc = "Find large differences in depth between cells that could provide boundaries."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst2 = task.bricks.dst2.Clone
-            Dim width = dst2.Width / task.brickSize
-            Dim height = dst2.Height / task.brickSize
-            For i = 0 To task.bricks.brickList.Count - width Step width
+            dst2 = atask.bricks.dst2.Clone
+            Dim width = dst2.Width / atask.brickSize
+            Dim height = dst2.Height / atask.brickSize
+            For i = 0 To atask.bricks.brickList.Count - width Step width
                 For j = i + 1 To i + width - 1
-                    Dim d1 = task.bricks.brickList(j).depth
-                    Dim d2 = task.bricks.brickList(j - 1).depth
-                    If Math.Abs(d1 - d2) > task.depthDiffMeters Then
-                        dst2.Rectangle(task.bricks.brickList(j).rect, task.highlight, -1)
+                    Dim d1 = atask.bricks.brickList(j).depth
+                    Dim d2 = atask.bricks.brickList(j - 1).depth
+                    If Math.Abs(d1 - d2) > atask.depthDiffMeters Then
+                        dst2.Rectangle(atask.bricks.brickList(j).rect, atask.highlight, -1)
                     End If
                 Next
             Next
 
             For i = 0 To width - 1
                 For j = 1 To height - 1
-                    Dim d1 = task.bricks.brickList(j * width).depth
-                    Dim d2 = task.bricks.brickList((j - 1) * width).depth
-                    If Math.Abs(d1 - d2) > task.depthDiffMeters Then
-                        dst2.Rectangle(task.bricks.brickList(j).rect, task.highlight, -1)
+                    Dim d1 = atask.bricks.brickList(j * width).depth
+                    Dim d2 = atask.bricks.brickList((j - 1) * width).depth
+                    If Math.Abs(d1 - d2) > atask.depthDiffMeters Then
+                        dst2.Rectangle(atask.bricks.brickList(j).rect, atask.highlight, -1)
                     End If
                 Next
             Next

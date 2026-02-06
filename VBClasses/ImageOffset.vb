@@ -7,7 +7,7 @@ Namespace VBClasses
         Public dst(2) As cv.Mat
         Public pcFiltered(2) As cv.Mat
         Public Sub New()
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then atask.gOptions.displayDst1.Checked = True
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
@@ -17,7 +17,7 @@ Namespace VBClasses
             options.Run()
             options1.Run()
 
-            Dim r1 = New cv.Rect(1, 1, task.cols - 2, task.rows - 2)
+            Dim r1 = New cv.Rect(1, 1, atask.cols - 2, atask.rows - 2)
             Dim r2 As cv.Rect
             Select Case options.offsetDirection
                 Case "Upper Left"
@@ -40,16 +40,16 @@ Namespace VBClasses
 
             Dim r3 = New cv.Rect(1, 1, r1.Width, r1.Height)
 
-            cv.Cv2.Absdiff(task.pcSplit(0)(r1), task.pcSplit(0)(r2), dst1(r3))
-            cv.Cv2.Absdiff(task.pcSplit(1)(r1), task.pcSplit(1)(r2), dst2(r3))
-            cv.Cv2.Absdiff(task.pcSplit(2)(r1), task.pcSplit(2)(r2), dst3(r3))
+            cv.Cv2.Absdiff(atask.pcSplit(0)(r1), atask.pcSplit(0)(r2), dst1(r3))
+            cv.Cv2.Absdiff(atask.pcSplit(1)(r1), atask.pcSplit(1)(r2), dst2(r3))
+            cv.Cv2.Absdiff(atask.pcSplit(2)(r1), atask.pcSplit(2)(r2), dst3(r3))
 
             dst = {dst1, dst2, dst3}
             For i = 0 To dst.Count - 1
                 masks(i) = dst(i).Threshold(options1.pixelDiffThreshold, 255,
                                             cv.ThresholdTypes.BinaryInv).ConvertScaleAbs
                 pcFiltered(i) = New cv.Mat(src.Size, cv.MatType.CV_32FC1, New cv.Scalar(0))
-                task.pcSplit(i).CopyTo(pcFiltered(i), masks(i))
+                atask.pcSplit(i).CopyTo(pcFiltered(i), masks(i))
             Next
         End Sub
     End Class
@@ -74,8 +74,8 @@ Namespace VBClasses
 
             iOff.Run(src)
 
-            Dim pt = task.mouseMovePoint
-            If standalone And task.mouseMovePoint.X = 0 And task.mouseMovePoint.Y = 0 Then
+            Dim pt = atask.mouseMovePoint
+            If standalone And atask.mouseMovePoint.X = 0 And atask.mouseMovePoint.Y = 0 Then
                 pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
             End If
 
@@ -99,8 +99,8 @@ Namespace VBClasses
                     plot.input.Add(New cv.Point2d(CDbl(outputX(j)), CDbl(outputY(j))))
                 Next
 
-                plot.minY = Choose(i + 1, -task.xRange, -task.yRange, 0)
-                plot.maxY = Choose(i + 1, task.xRange, task.yRange, task.MaxZmeters)
+                plot.minY = Choose(i + 1, -atask.xRange, -atask.yRange, 0)
+                plot.maxY = Choose(i + 1, atask.xRange, atask.yRange, atask.MaxZmeters)
                 plot.Run(src)
 
                 mats.mat(i) = plot.dst2.Clone
@@ -110,8 +110,8 @@ Namespace VBClasses
             dst2 = mats.dst2
 
             Dim p1 = New cv.Point(0, pt.Y), p2 = New cv.Point(dst2.Width, pt.Y)
-            task.color.Line(p1, p2, task.highlight, task.lineWidth)
-            task.depthRGB.Line(p1, p2, task.highlight, task.lineWidth)
+            atask.color.Line(p1, p2, atask.highlight, atask.lineWidth)
+            atask.depthRGB.Line(p1, p2, atask.highlight, atask.lineWidth)
         End Sub
     End Class
 
@@ -136,8 +136,8 @@ Namespace VBClasses
 
             iOff.Run(src)
 
-            Dim pt = task.mouseMovePoint
-            If standalone And task.mouseMovePoint.X = 0 And task.mouseMovePoint.Y = 0 Then
+            Dim pt = atask.mouseMovePoint
+            If standalone And atask.mouseMovePoint.X = 0 And atask.mouseMovePoint.Y = 0 Then
                 pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
             End If
 
@@ -161,8 +161,8 @@ Namespace VBClasses
                     plot.input.Add(New cv.Point2d(CDbl(outputX(j)), CDbl(outputY(j))))
                 Next
 
-                plot.minY = Choose(i + 1, -task.xRange, -task.yRange, 0)
-                plot.maxy = Choose(i + 1, task.xRange, task.yRange, task.MaxZmeters)
+                plot.minY = Choose(i + 1, -atask.xRange, -atask.yRange, 0)
+                plot.maxy = Choose(i + 1, atask.xRange, atask.yRange, atask.MaxZmeters)
                 plot.Run(src)
                 mats.mat(i) = plot.dst2.Clone
             Next
@@ -171,8 +171,8 @@ Namespace VBClasses
             dst2 = mats.dst2
 
             Dim p1 = New cv.Point(pt.X, 0), p2 = New cv.Point(pt.X, dst2.Height)
-            task.color.Line(p1, p2, task.highlight, task.lineWidth)
-            task.depthRGB.Line(p1, p2, task.highlight, task.lineWidth)
+            atask.color.Line(p1, p2, atask.highlight, atask.lineWidth)
+            atask.depthRGB.Line(p1, p2, atask.highlight, atask.lineWidth)
         End Sub
     End Class
 

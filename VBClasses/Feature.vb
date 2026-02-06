@@ -32,7 +32,7 @@ Namespace VBClasses
 
             strOut = CStr(features.Count) + " features were found using 'BrickPoints' method. " +
                      CStr(count) + " features were skipped."
-            If task.heartBeat Then labels(2) = strOut
+            If atask.heartBeat Then labels(2) = strOut
         End Sub
     End Class
 
@@ -44,24 +44,24 @@ Namespace VBClasses
     Public Class NR_Feature_BrickLine : Inherits TaskParent
         Public features As New List(Of cv.Point)
         Public Sub New()
-            task.gOptions.LineWidth.Value = 3
-            If task.feat Is Nothing Then task.feat = New Feature_Basics
+            atask.gOptions.LineWidth.Value = 3
+            If atask.feat Is Nothing Then atask.feat = New Feature_Basics
             desc = "Find the lines implied in the gr points."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim sortByGrid As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
-            For Each pt In task.feat.features
-                Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
+            For Each pt In atask.feat.features
+                Dim lineIndex = atask.lines.dst1.Get(Of Byte)(pt.Y, pt.X)
                 If lineIndex = 0 Then Continue For
-                Dim gridindex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim gridindex = atask.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 sortByGrid.Add(gridindex, pt)
             Next
 
-            Dim brickLines(task.lines.lpList.Count - 1) As List(Of cv.Point)
+            Dim brickLines(atask.lines.lpList.Count - 1) As List(Of cv.Point)
             dst3.SetTo(0)
             features.Clear()
             For Each pt In sortByGrid.Values
-                Dim lineIndex = task.lines.dst1.Get(Of Byte)(pt.Y, pt.X) - 1
+                Dim lineIndex = atask.lines.dst1.Get(Of Byte)(pt.Y, pt.X) - 1
                 If brickLines(lineIndex) Is Nothing Then
                     brickLines(lineIndex) = New List(Of cv.Point)({pt})
                 Else
@@ -77,7 +77,7 @@ Namespace VBClasses
                 If brickLines.Count = 1 Then Continue For
                 Dim pt = brickLines(i)(0)
                 If pt = brickLines(i).Last Then Continue For
-                Dim color = vecToScalar(task.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
+                Dim color = vecToScalar(atask.lines.dst2.Get(Of cv.Vec3b)(pt.Y, pt.X))
                 DrawCircle(dst3, pt, color)
                 vbc.DrawLine(dst2, pt, brickLines(i).Last, color)
                 vbc.DrawLine(dst3, pt, brickLines(i).Last, color)
@@ -101,26 +101,26 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If standaloneTest() Then dst2 = task.color.Clone
+            If standaloneTest() Then dst2 = atask.color.Clone
 
             Dim ptNew As New List(Of cv.Point2f)
-            If task.optionsChanged = False Then
-                For Each pt In task.features
-                    Dim val = task.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
+            If atask.optionsChanged = False Then
+                For Each pt In atask.features
+                    Dim val = atask.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
                     If val = 0 Then ptNew.Add(pt)
                 Next
             End If
 
             strOut = ""
-            Select Case task.featureOptions.FeatureMethod.Text
+            Select Case atask.featureOptions.FeatureMethod.Text
                 Case "GoodFeatures"
-                    ptLatest = cv.Cv2.GoodFeaturesToTrack(task.gray, task.FeatureSampleSize, options.quality,
+                    ptLatest = cv.Cv2.GoodFeaturesToTrack(atask.gray, atask.FeatureSampleSize, options.quality,
                                                       options.minDistance, New cv.Mat,
                                                       options.blockSize, True, options.k).ToList
                     strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
                 Case "AGAST"
                     If cPtr = 0 Then cPtr = Agast_Open()
-                    src = task.color.Clone
+                    src = atask.color.Clone
                     Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
                     Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
 
@@ -132,27 +132,27 @@ Namespace VBClasses
                     For i = 0 To ptMat.Rows - 1
                         Dim pt = ptMat.Get(Of cv.Point2f)(i, 0)
                         ptLatest.Add(pt)
-                        If standaloneTest() Then DrawCircle(dst2, pt, task.DotSize, white)
+                        If standaloneTest() Then DrawCircle(dst2, pt, atask.DotSize, white)
                     Next
 
                     strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
                 Case "BRISK"
                     Static brisk As New BRISK_Basics
-                    brisk.Run(task.gray)
+                    brisk.Run(atask.gray)
                     ptLatest = brisk.features
                     strOut = "GoodFeatures produced " + CStr(ptLatest.Count) + " features"
                 Case "Harris"
                     Static harris As New Corners_HarrisDetector_CPP
-                    harris.Run(task.gray)
+                    harris.Run(atask.gray)
                     ptLatest = harris.features
                     strOut = "Harris Detector produced " + CStr(ptLatest.Count) + " features"
                 Case "FAST"
                     Static FAST As New Corners_Basics
-                    FAST.Run(task.gray)
+                    FAST.Run(atask.gray)
                     ptLatest = FAST.features
                     strOut = "FAST produced " + CStr(ptLatest.Count) + " features"
                 Case "LineInput"
-                    For Each lp In task.lines.lpList
+                    For Each lp In atask.lines.lpList
                         ptLatest.Add(lp.ptCenter)
                     Next
                 Case "BrickPoint"
@@ -164,47 +164,47 @@ Namespace VBClasses
                     strOut = bPoint.labels(2)
             End Select
 
-            task.fpFromGridCellLast = New List(Of Integer)(task.fpFromGridCell)
-            task.fpLastList = New List(Of fpData)(task.fpList)
+            atask.fpFromGridCellLast = New List(Of Integer)(atask.fpFromGridCell)
+            atask.fpLastList = New List(Of fpData)(atask.fpList)
 
-            If task.optionsChanged Or ptNew.Count = 0 Then
+            If atask.optionsChanged Or ptNew.Count = 0 Then
                 For Each pt In ptLatest
                     ptNew.Add(pt)
                 Next
             Else
                 For Each pt In ptLatest
-                    Dim val = task.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                    Dim val = atask.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
                     If val = 255 Then ptNew.Add(pt)
                 Next
             End If
 
             Dim sortByGrid As New SortedList(Of Single, cv.Point2f)(New compareAllowIdenticalSingle)
             For Each pt In ptNew
-                Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim index = atask.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 sortByGrid.Add(index, pt)
             Next
 
-            task.features.Clear()
-            task.featurePoints.Clear()
-            task.fpFromGridCell.Clear()
+            atask.features.Clear()
+            atask.featurePoints.Clear()
+            atask.fpFromGridCell.Clear()
             For i = 0 To sortByGrid.Count - 1
                 Dim pt = sortByGrid.ElementAt(i).Value
-                task.features.Add(pt)
-                task.featurePoints.Add(New cv.Point(pt.X, pt.Y))
+                atask.features.Add(pt)
+                atask.featurePoints.Add(New cv.Point(pt.X, pt.Y))
 
-                Dim nextIndex = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                task.fpFromGridCell.Add(nextIndex)
+                Dim nextIndex = atask.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                atask.fpFromGridCell.Add(nextIndex)
             Next
 
             If standaloneTest() Then
-                For Each pt In task.features
-                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                For Each pt In atask.features
+                    DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
                 Next
             End If
 
-            strOut += "  " + CStr(task.features.Count) + " features were found using '" + task.featureOptions.FeatureMethod.Text +
+            strOut += "  " + CStr(atask.features.Count) + " features were found using '" + atask.featureOptions.FeatureMethod.Text +
                   "' method."
-            If task.heartBeat Then labels(2) = strOut
+            If atask.heartBeat Then labels(2) = strOut
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = Agast_Close(cPtr)
@@ -228,8 +228,8 @@ Namespace VBClasses
 
             method.Run(src)
 
-            For Each pt In task.features
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            For Each pt In atask.features
+                DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
             Next
 
             labels(2) = method.labels(2)
@@ -264,9 +264,9 @@ Namespace VBClasses
             delaunay.Run(src)
             dst3 = delaunay.dst2
             For Each pt In delaunay.bPoint.ptList
-                DrawCircle(dst3, pt, task.DotSize, white)
+                DrawCircle(dst3, pt, atask.DotSize, white)
             Next
-            labels(3) = "There were " + CStr(task.features.Count) + " Delaunay contours"
+            labels(3) = "There were " + CStr(atask.features.Count) + " Delaunay contours"
         End Sub
     End Class
 
@@ -288,7 +288,7 @@ Namespace VBClasses
             dst2 = pyr.dst2
             labels(2) = pyr.labels(2)
 
-            If task.heartBeat Then dst3.SetTo(0)
+            If atask.heartBeat Then dst3.SetTo(0)
 
             ptList.Clear()
             Dim stationary As Integer, motion As Integer
@@ -296,7 +296,7 @@ Namespace VBClasses
                 Dim pt = New cv.Point(pyr.features(i).X, pyr.features(i).Y)
                 ptList.Add(pt)
                 If ptLast.Contains(pt) Then
-                    DrawCircle(dst3, pt, task.DotSize, task.highlight)
+                    DrawCircle(dst3, pt, atask.DotSize, atask.highlight)
                     stationary += 1
                 Else
                     vbc.DrawLine(dst3, pyr.lastFeatures(i), pyr.features(i), white)
@@ -304,7 +304,7 @@ Namespace VBClasses
                 End If
             Next
 
-            If task.heartBeat Then labels(3) = CStr(stationary) + " features were stationary and " + CStr(motion) + " features had some motion."
+            If atask.heartBeat Then labels(3) = CStr(stationary) + " features were stationary and " + CStr(motion) + " features had some motion."
             ptLast = New List(Of cv.Point)(ptList)
         End Sub
     End Class
@@ -324,14 +324,14 @@ Namespace VBClasses
             desc = "Use the sorted list of Delaunay regions to find the top X points to track."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
+            feat.Run(atask.grayStable)
 
-            If task.heartBeat Then dst2.SetTo(0)
+            If atask.heartBeat Then dst2.SetTo(0)
 
-            For Each pt In task.features
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            For Each pt In atask.features
+                DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
             Next
-            labels(2) = CStr(task.features.Count) + " targets were present with " + CStr(task.FeatureSampleSize) + " requested."
+            labels(2) = CStr(atask.features.Count) + " targets were present with " + CStr(atask.FeatureSampleSize) + " requested."
         End Sub
     End Class
 
@@ -351,22 +351,22 @@ Namespace VBClasses
             features.Run(src)
             dst3 = features.dst3
 
-            If task.optionsChanged Then goodList.Clear()
+            If atask.optionsChanged Then goodList.Clear()
 
-            Dim ptList As New List(Of cv.Point2f)(task.features)
+            Dim ptList As New List(Of cv.Point2f)(atask.features)
             goodList.Add(ptList)
 
-            If goodList.Count >= task.frameHistoryCount Then goodList.RemoveAt(0)
+            If goodList.Count >= atask.frameHistoryCount Then goodList.RemoveAt(0)
 
             dst2.SetTo(0)
             For Each ptList In goodList
                 For Each pt In ptList
-                    DrawCircle(task.color, pt, task.DotSize, task.highlight)
+                    DrawCircle(atask.color, pt, atask.DotSize, atask.highlight)
                     Dim c = dst3.Get(Of cv.Vec3b)(pt.Y, pt.X)
-                    DrawCircle(dst2, pt, task.DotSize + 1, c)
+                    DrawCircle(dst2, pt, atask.DotSize + 1, c)
                 Next
             Next
-            labels(2) = CStr(task.features.Count) + " features were identified in the image."
+            labels(2) = CStr(atask.features.Count) + " features were identified in the image."
         End Sub
     End Class
 
@@ -388,17 +388,17 @@ Namespace VBClasses
             options.Run()
 
             If options.useShiTomasi Then
-                dst2 = task.leftView
-                dst3 = task.rightView
-                shiTomasi.Run(task.leftView)
+                dst2 = atask.leftView
+                dst3 = atask.rightView
+                shiTomasi.Run(atask.leftView)
                 dst2.SetTo(cv.Scalar.White, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
-                shiTomasi.Run(task.rightView)
-                dst3.SetTo(task.highlight, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+                shiTomasi.Run(atask.rightView)
+                dst3.SetTo(atask.highlight, shiTomasi.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             Else
-                harris.Run(task.leftView)
+                harris.Run(atask.leftView)
                 dst2 = harris.dst2.Clone
-                harris.Run(task.rightView)
+                harris.Run(atask.rightView)
                 dst3 = harris.dst2
             End If
         End Sub
@@ -417,15 +417,15 @@ Namespace VBClasses
             desc = "Find feature age maximum and average."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
+            feat.Run(atask.grayStable)
 
             Dim newfeatures As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
-            For Each pt In task.featurePoints
+            For Each pt In atask.featurePoints
                 Dim index = features.IndexOf(pt)
                 If index >= 0 Then newfeatures.Add(gens(index) + 1, pt) Else newfeatures.Add(1, pt)
             Next
 
-            If task.heartBeat Then
+            If atask.heartBeat Then
                 features.Clear()
                 gens.Clear()
             End If
@@ -437,10 +437,10 @@ Namespace VBClasses
             For i = 0 To features.Count - 1
                 If gens(i) = 1 Then Exit For
                 Dim pt = features(i)
-                DrawCircle(dst2, pt, task.DotSize, white)
+                DrawCircle(dst2, pt, atask.DotSize, white)
             Next
 
-            If task.heartBeat And gens.Count > 0 Then
+            If atask.heartBeat And gens.Count > 0 Then
                 labels(2) = CStr(features.Count) + " features found with max/average " + CStr(gens(0)) + "/" + Format(gens.Average, fmt0) + " generations"
             End If
         End Sub
@@ -459,11 +459,11 @@ Namespace VBClasses
             desc = "Find good features across multiple frames."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
+            feat.Run(atask.grayStable)
 
             dst2 = src.Clone
 
-            featureHistory.Add(New List(Of cv.Point)(task.featurePoints))
+            featureHistory.Add(New List(Of cv.Point)(atask.featurePoints))
 
             Dim newFeatures As New List(Of cv.Point)
             gens.Clear()
@@ -479,27 +479,27 @@ Namespace VBClasses
                 Next
             Next
 
-            Dim threshold = If(task.frameHistoryCount = 1, 0, 1)
+            Dim threshold = If(atask.frameHistoryCount = 1, 0, 1)
             features.Clear()
             Dim whiteCount As Integer
             For i = 0 To newFeatures.Count - 1
                 If gens(i) > threshold Then
                     Dim pt = newFeatures(i)
                     features.Add(pt)
-                    If gens(i) < task.frameHistoryCount Then
-                        DrawCircle(dst2, pt, task.DotSize + 2, cv.Scalar.Red)
+                    If gens(i) < atask.frameHistoryCount Then
+                        DrawCircle(dst2, pt, atask.DotSize + 2, cv.Scalar.Red)
                     Else
                         whiteCount += 1
-                        DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                        DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
                     End If
                 End If
             Next
 
-            If featureHistory.Count > task.frameHistoryCount Then featureHistory.RemoveAt(0)
-            If task.heartBeat Then
+            If featureHistory.Count > atask.frameHistoryCount Then featureHistory.RemoveAt(0)
+            If atask.heartBeat Then
                 labels(2) = CStr(features.Count) + "/" + CStr(whiteCount) + " present/present on every frame" +
                         " Red is a recent addition, yellow is present on previous " +
-                        CStr(task.frameHistoryCount) + " frames"
+                        CStr(atask.frameHistoryCount) + " frames"
             End If
         End Sub
     End Class
@@ -525,7 +525,7 @@ Namespace VBClasses
             Dim kazeDescriptors As New cv.Mat()
             kaze.DetectAndCompute(src, Nothing, kazeKeyPoints, kazeDescriptors)
             For i As Integer = 0 To kazeKeyPoints.Length - 1
-                DrawCircle(dst2, kazeKeyPoints(i).Pt, task.DotSize, task.highlight)
+                DrawCircle(dst2, kazeKeyPoints(i).Pt, atask.DotSize, atask.highlight)
             Next
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
@@ -547,8 +547,8 @@ Namespace VBClasses
 
             dst2 = runRedList(src, labels(2))
 
-            For Each pt In task.featurePoints
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            For Each pt In atask.featurePoints
+                DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
             Next
         End Sub
     End Class
@@ -561,22 +561,22 @@ Namespace VBClasses
     Public Class NR_Feature_WithDepth : Inherits TaskParent
         Dim feat As New Feature_General
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            If atask.bricks Is Nothing Then atask.bricks = New Brick_Basics
             desc = "Show the feature points that have depth."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
+            feat.Run(atask.grayStable)
 
             dst2 = src
             Dim depthCount As Integer
-            For Each pt In task.featurePoints
-                Dim index = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                If task.bricks.brickList(index).depth > 0 Then
-                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            For Each pt In atask.featurePoints
+                Dim index = atask.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                If atask.bricks.brickList(index).depth > 0 Then
+                    DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
                     depthCount += 1
                 End If
             Next
-            labels(2) = CStr(depthCount) + " features had depth or " + Format(depthCount / task.features.Count, "0%")
+            labels(2) = CStr(depthCount) + " features had depth or " + Format(depthCount / atask.features.Count, "0%")
         End Sub
     End Class
 
@@ -590,7 +590,7 @@ Namespace VBClasses
         Dim match As New Match_Basics
         Dim feat As New Feature_General
         Public Sub New()
-            task.featureOptions.FeatureSampleSize.Value = 150
+            atask.featureOptions.FeatureSampleSize.Value = 150
             desc = "Use correlation coefficient to keep features from frame to frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -599,13 +599,13 @@ Namespace VBClasses
             Dim matched As New List(Of cv.Point)
             motionPoints.Clear()
             For Each pt In features
-                Dim val = task.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                Dim val = atask.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
                 If val = 0 Then
-                    Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                    Dim r = task.gridRects(index)
+                    Dim index As Integer = atask.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                    Dim r = atask.gridRects(index)
                     match.template = fpLastSrc(r)
                     match.Run(src(r))
-                    If match.correlation > task.fCorrThreshold Then matched.Add(pt)
+                    If match.correlation > atask.fCorrThreshold Then matched.Add(pt)
                 Else
                     motionPoints.Add(pt)
                 End If
@@ -614,16 +614,16 @@ Namespace VBClasses
             labels(2) = "There were " + CStr(features.Count) + " features identified and " + CStr(matched.Count) +
                     " were matched to the previous frame"
 
-            If matched.Count < task.FeatureSampleSize / 2 Then
+            If matched.Count < atask.FeatureSampleSize / 2 Then
                 feat.Run(src)
-                features = task.featurePoints
+                features = atask.featurePoints
             Else
                 features = New List(Of cv.Point)(matched)
             End If
 
             dst2 = src.Clone
             For Each pt In features
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
             Next
 
             fpLastSrc = src.Clone
@@ -645,14 +645,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            feat.Run(task.grayStable)
+            feat.Run(atask.grayStable)
 
-            Static features As New List(Of cv.Point)(task.featurePoints)
+            Static features As New List(Of cv.Point)(atask.featurePoints)
             Static lastSrc As cv.Mat = src.Clone
 
-            Dim resync = features.Count / task.features.Count < options.resyncThreshold
-            If task.heartBeat Or task.optionsChanged Or resync Then
-                features = New List(Of cv.Point)(task.featurePoints)
+            Dim resync = features.Count / atask.features.Count < options.resyncThreshold
+            If atask.heartBeat Or atask.optionsChanged Or resync Then
+                features = New List(Of cv.Point)(atask.featurePoints)
             End If
 
             Dim ptList = New List(Of cv.Point)(features)
@@ -660,17 +660,17 @@ Namespace VBClasses
             Dim mode = cv.TemplateMatchModes.CCoeffNormed
             features.Clear()
             For Each pt In ptList
-                Dim index As Integer = task.gridMap.Get(Of Integer)(pt.Y, pt.X)
-                Dim r = task.gridRects(index)
+                Dim index As Integer = atask.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim r = atask.gridRects(index)
                 cv.Cv2.MatchTemplate(src(r), lastSrc(r), correlationMat, mode)
-                If correlationMat.Get(Of Single)(0, 0) >= task.fCorrThreshold Then
+                If correlationMat.Get(Of Single)(0, 0) >= atask.fCorrThreshold Then
                     features.Add(pt)
                 End If
             Next
 
             dst2 = src
             For Each pt In features
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
             Next
 
             lastSrc = src.Clone
@@ -694,7 +694,7 @@ Namespace VBClasses
             feat.Run(src)
             dst2 = runRedList(src, labels(2))
 
-            delaunay.inputPoints = task.features
+            delaunay.inputPoints = atask.features
             delaunay.Run(src)
 
             Dim ptList As New List(Of cv.Point)
@@ -707,26 +707,26 @@ Namespace VBClasses
             Next
 
             For Each pt In ptList
-                Dim index = task.redList.rcMap.Get(Of Byte)(pt.Y, pt.X)
+                Dim index = atask.redList.rcMap.Get(Of Byte)(pt.Y, pt.X)
                 If index = 0 Then Continue For
-                Dim rc = task.redList.oldrclist(index)
-                Dim val = task.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+                Dim rc = atask.redList.oldrclist(index)
+                Dim val = atask.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
                 If val <> 0 Then
                     rc.ptFacets.Add(pt)
-                    task.redList.oldrclist(index) = rc
+                    atask.redList.oldrclist(index) = rc
                 End If
             Next
 
-            For Each rc In task.redList.oldrclist
+            For Each rc In atask.redList.oldrclist
                 For Each pt In rc.ptFacets
-                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                    DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
                 Next
             Next
 
-            If standalone And task.redList.oldrclist.Count > 0 Then
-                task.color.Rectangle(task.oldrcD.rect, task.highlight, task.lineWidth)
-                For Each pt In task.oldrcD.ptFacets
-                    DrawCircle(task.color, pt, task.DotSize, task.highlight)
+            If standalone And atask.redList.oldrclist.Count > 0 Then
+                atask.color.Rectangle(atask.oldrcD.rect, atask.highlight, atask.lineWidth)
+                For Each pt In atask.oldrcD.ptFacets
+                    DrawCircle(atask.color, pt, atask.DotSize, atask.highlight)
                 Next
             End If
         End Sub
@@ -749,7 +749,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If task.optionsChanged Then
+            If atask.optionsChanged Then
                 If agastFD IsNot Nothing Then agastFD.Dispose()
                 agastFD = cv.AgastFeatureDetector.Create(options.agastThreshold, options.useNonMaxSuppression,
                                                      cv.AgastFeatureDetector.DetectorType.OAST_9_16)
@@ -764,19 +764,19 @@ Namespace VBClasses
 
             Dim newList As New List(Of cv.Point2f)
             For Each pt In stablePoints
-                Dim val = task.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                Dim val = atask.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
                 If val = 0 Then newList.Add(pt)
             Next
 
             For Each pt In currPoints
-                Dim val = task.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
+                Dim val = atask.motionRGB.motionMask.Get(Of Byte)(pt.Y, pt.X)
                 If val <> 0 Then newList.Add(pt)
             Next
 
             stablePoints = New List(Of cv.Point2f)(newList)
             dst2 = src
             For Each pt In stablePoints
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
             Next
             labels(2) = $"Found {keypoints.Length} features with agast"
         End Sub
@@ -793,17 +793,17 @@ Namespace VBClasses
     Public Class Feature_NoMotion : Inherits TaskParent
         Dim feat As New Feature_General
         Public Sub New()
-            task.gOptions.UseMotionMask.Checked = False
+            atask.gOptions.UseMotionMask.Checked = False
             dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
             desc = "Find good features to track in a BGR image using the motion mask+"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
+            feat.Run(atask.grayStable)
             dst2 = src.Clone
 
             dst3.SetTo(0)
-            For Each pt In task.featurePoints
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+            For Each pt In atask.featurePoints
+                DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
                 dst3.Set(Of Byte)(pt.Y, pt.X, 255)
             Next
 
@@ -823,16 +823,16 @@ Namespace VBClasses
             desc = "Show only features present on this and the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastFeatures As New List(Of cv.Point)(task.featurePoints)
+            Dim lastFeatures As New List(Of cv.Point)(atask.featurePoints)
 
             noMotion.Run(src)
             dst3 = noMotion.dst2
 
             dst2.SetTo(0)
             Dim stable As New List(Of cv.Point)
-            For Each pt In task.featurePoints
+            For Each pt In atask.featurePoints
                 If lastFeatures.Contains(pt) Then
-                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                    DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
                     stable.Add(pt)
                 End If
             Next
@@ -841,7 +841,7 @@ Namespace VBClasses
 
             dst2 = src.Clone
             For Each pt In stable
-                DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
             Next
             labels(3) = "The " + CStr(stable.Count) + " points are present for more than one frame."
         End Sub
@@ -859,15 +859,15 @@ Namespace VBClasses
             desc = "Identify features that consistently present in the image - with motion ignored."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lastFeatures As New List(Of cv.Point)(task.featurePoints)
+            Dim lastFeatures As New List(Of cv.Point)(atask.featurePoints)
 
             noMotion.Run(src)
 
             dst2 = src
             Dim stable As New List(Of cv.Point)
-            For Each pt In task.featurePoints
+            For Each pt In atask.featurePoints
                 If lastFeatures.Contains(pt) Then
-                    DrawCircle(dst2, pt, task.DotSize, task.highlight)
+                    DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
                     stable.Add(pt)
                 End If
             Next
@@ -898,7 +898,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             For Each fp In fpStable
                 If fp.age > 2 Then
-                    DrawCircle(dst3, fp.pt, task.DotSize, task.highlight)
+                    DrawCircle(dst3, fp.pt, atask.DotSize, atask.highlight)
                     SetTrueText(CStr(fp.age), fp.pt, 3)
                 End If
             Next
@@ -922,17 +922,17 @@ Namespace VBClasses
             desc = "Find good features to track in the image but use the same point if closer than a threshold"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(task.grayStable)
+            feat.Run(atask.grayStable)
 
-            If task.features.Count = 0 Then
+            If atask.features.Count = 0 Then
                 featurePoints.Clear()
                 Exit Sub
             End If
 
-            knn.queries = New List(Of cv.Point2f)(task.features)
-            If knn.trainInput.Count = 0 Or task.gOptions.DebugCheckBox.Checked Then
+            knn.queries = New List(Of cv.Point2f)(atask.features)
+            If knn.trainInput.Count = 0 Or atask.gOptions.DebugCheckBox.Checked Then
                 knn.trainInput = New List(Of cv.Point2f)(knn.queries)
-                task.gOptions.DebugCheckBox.Checked = False
+                atask.gOptions.DebugCheckBox.Checked = False
             End If
 
             knn.Run(src)
@@ -940,8 +940,8 @@ Namespace VBClasses
             For i = 0 To knn.neighbors.Count - 1
                 Dim trainIndex = knn.neighbors(i)(0) ' index of the matched train input
                 Dim pt = knn.trainInput(trainIndex)
-                Dim qPt = task.features(i)
-                If pt.DistanceTo(qPt) > 2 Then knn.trainInput(trainIndex) = task.features(i)
+                Dim qPt = atask.features(i)
+                If pt.DistanceTo(qPt) > 2 Then knn.trainInput(trainIndex) = atask.features(i)
             Next
 
             featurePoints = New List(Of cv.Point2f)(knn.trainInput)
@@ -949,8 +949,8 @@ Namespace VBClasses
             src.CopyTo(dst2)
             dst3.SetTo(0)
             For Each pt In featurePoints
-                DrawCircle(dst2, pt, task.DotSize + 2, white)
-                DrawCircle(dst3, pt, task.DotSize + 2, white)
+                DrawCircle(dst2, pt, atask.DotSize + 2, white)
+                DrawCircle(dst3, pt, atask.DotSize + 2, white)
             Next
 
             labels(2) = feat.labels(2)

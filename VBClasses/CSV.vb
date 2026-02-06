@@ -8,7 +8,7 @@ Namespace VBClasses
         Dim readText() As String
         Dim variables() As String
         Public Sub New()
-            Dim fileInput As New FileInfo(task.homeDir + "Data/agaricus-lepiota.data")
+            Dim fileInput As New FileInfo(atask.homeDir + "Data/agaricus-lepiota.data")
             inputFile = fileInput.FullName
             readText = File.ReadAllLines(inputFile) ' user supplies the inputfile name.
             Dim variables = readText(0).Split(",")

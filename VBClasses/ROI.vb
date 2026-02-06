@@ -6,7 +6,7 @@ Namespace VBClasses
         Public Sub New()
             labels = {"", "", "Enclosing rectangle of all pixels that have changed", ""}
             dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
-            task.featureOptions.ColorDiffSlider.Value = 30
+            atask.featureOptions.ColorDiffSlider.Value = 30
             desc = "Find the motion ROI in the latest image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -21,8 +21,8 @@ Namespace VBClasses
             aoiRect = New cv.Rect(mm0.minVal, mm1.minVal, mm0.maxVal - mm0.minVal, mm1.maxVal - mm1.minVal)
 
             If aoiRect.Width > 0 And aoiRect.Height > 0 Then
-                task.color.Rectangle(aoiRect, cv.Scalar.Yellow, task.lineWidth)
-                dst2.Rectangle(aoiRect, white, task.lineWidth)
+                atask.color.Rectangle(aoiRect, cv.Scalar.Yellow, atask.lineWidth)
+                dst2.Rectangle(aoiRect, white, atask.lineWidth)
             End If
         End Sub
     End Class
@@ -38,7 +38,7 @@ Namespace VBClasses
         Public Sub New()
             labels = {"", "", "Enclosing rectangle of all changed pixels (after removing single pixels)", ""}
             dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
-            task.featureOptions.ColorDiffSlider.Value = 30
+            atask.featureOptions.ColorDiffSlider.Value = 30
             desc = "Find the motion ROI in just the latest image - eliminate single pixels"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -65,8 +65,8 @@ Namespace VBClasses
             Next
             If minX <> Integer.MaxValue Then
                 aoiRect = New cv.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1)
-                task.color.Rectangle(aoiRect, cv.Scalar.Yellow, task.lineWidth)
-                dst2.Rectangle(aoiRect, white, task.lineWidth)
+                atask.color.Rectangle(aoiRect, cv.Scalar.Yellow, atask.lineWidth)
+                dst2.Rectangle(aoiRect, white, atask.lineWidth)
             End If
         End Sub
     End Class
@@ -82,16 +82,16 @@ Namespace VBClasses
         Public minX = Integer.MaxValue, maxX = Integer.MinValue, minY = Integer.MaxValue, maxY = Integer.MinValue
         Dim options As New Options_ROI
         Public Sub New()
-            If standalone Then task.gOptions.displaydst1.checked = True
+            If standalone Then atask.gOptions.displaydst1.checked = True
             labels = {"", "", "Area of Interest", ""}
             dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
-            task.featureOptions.ColorDiffSlider.Value = 30
+            atask.featureOptions.ColorDiffSlider.Value = 30
             desc = "Accumulate pixels in a motion ROI - all pixels that are different by X"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If aoiRect.Width * aoiRect.Height > src.Total * options.roiPercent Or task.optionsChanged Then
-                dst0 = task.color
+            If aoiRect.Width * aoiRect.Height > src.Total * options.roiPercent Or atask.optionsChanged Then
+                dst0 = atask.color
                 dst1.SetTo(0)
                 aoiRect = New cv.Rect
                 minX = Integer.MaxValue
@@ -105,9 +105,9 @@ Namespace VBClasses
             cv.Cv2.BitwiseOr(dst3, dst1, dst1)
             Dim tmp = dst3.FindNonZero()
             If aoiRect <> New cv.Rect Then
-                task.color(aoiRect).CopyTo(dst0(aoiRect))
-                dst0.Rectangle(aoiRect, cv.Scalar.Yellow, task.lineWidth)
-                dst2.Rectangle(aoiRect, white, task.lineWidth)
+                atask.color(aoiRect).CopyTo(dst0(aoiRect))
+                dst0.Rectangle(aoiRect, cv.Scalar.Yellow, atask.lineWidth)
+                dst2.Rectangle(aoiRect, white, atask.lineWidth)
             End If
             If tmp.Rows = 0 Then Exit Sub
             For i = 0 To tmp.Rows - 1
@@ -119,7 +119,7 @@ Namespace VBClasses
             Next
             aoiRect = New cv.Rect(minX, minY, maxX - minX + 1, maxY - minY + 1)
             dst1.CopyTo(dst2)
-            dst2.Rectangle(aoiRect, white, task.lineWidth)
+            dst2.Rectangle(aoiRect, white, atask.lineWidth)
         End Sub
     End Class
 
@@ -136,14 +136,14 @@ Namespace VBClasses
         Public Sub New()
             labels = {"", "", "Area of Interest", ""}
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
-            task.featureOptions.ColorDiffSlider.Value = 30
+            atask.featureOptions.ColorDiffSlider.Value = 30
             desc = "Accumulate pixels in a motion ROI until the size is x% of the total image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
             SetTrueText(traceName + " is the same as NR_ROI_AccumulateOld but simpler.", 3)
-            If roiRect.Width * roiRect.Height > src.Total * options.roiPercent Or task.optionsChanged Then
+            If roiRect.Width * roiRect.Height > src.Total * options.roiPercent Or atask.optionsChanged Then
                 dst2.SetTo(0)
                 roiRect = New cv.Rect
             End If
@@ -161,8 +161,8 @@ Namespace VBClasses
                     cv.Cv2.BitwiseOr(diff.dst2, dst2, dst2)
                 End If
             End If
-            dst2.Rectangle(roiRect, white, task.lineWidth)
-            task.color.Rectangle(roiRect, task.highlight, task.lineWidth)
+            dst2.Rectangle(roiRect, white, atask.lineWidth)
+            atask.color.Rectangle(roiRect, atask.highlight, atask.lineWidth)
         End Sub
     End Class
 End Namespace

@@ -73,7 +73,7 @@ Namespace VBClasses
         Public colorMapZeroIsBlack As cv.Mat
         Public correlationColorMap As cv.Mat
 
-        ' task algorithms - operate on every frame regardless of which algorithm is being run.
+        ' atask algorithms - operate on every frame regardless of which algorithm is being run.
         Public colorizer As DepthColorizer_Basics
         Public redList As XO_RedList_Basics
         Public redListNew As RedList_Basics
@@ -215,7 +215,7 @@ Namespace VBClasses
         Public mouseDisplayPoint As cv.Point ' Mouse location in terms of the display resolution
         Public mouseMagnifyStartPoint As cv.Point ' Mouse location in terms of the display resolution
         Public mouseMagnifyEndPoint As cv.Point ' Mouse location in terms of the display resolution
-        Public mouseMagnifyPicTag As Integer
+        Public mouseMagnifyPicTag As Integer = -1
         Public mouseMovePoint As cv.Point ' mouse location in the workRes resolution.
         Public mouseMovePointUpdated As Boolean
 

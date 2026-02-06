@@ -19,7 +19,7 @@ Namespace VBClasses
 
             Dim accumulator As Single
 
-            If task.frameCount Mod 1000 = 0 Or task.optionsChanged Then
+            If atask.frameCount Mod 1000 = 0 Or atask.optionsChanged Then
                 dst2.SetTo(0)
                 dst3.SetTo(0)
             End If
@@ -49,11 +49,11 @@ Namespace VBClasses
             p1 = New cv.Point2f(p1.X * 2, p1.Y * 0.5F)
             Dim p2 = New cv.Point2f(p1.X + (Math.Sin(o2) * l2 + dw * 0.5F) / dw, p1.Y - (Math.Cos(o2) * l2 + dh * 0.5F) / dh)
 
-            vbc.DrawLine(dst2, center, p1, task.scalarColors(task.frameCount Mod 255))
-            vbc.DrawLine(dst2, p1, p2, task.scalarColors(task.frameCount Mod 255))
+            vbc.DrawLine(dst2, center, p1, atask.scalarColors(atask.frameCount Mod 255))
+            vbc.DrawLine(dst2, p1, p2, atask.scalarColors(atask.frameCount Mod 255))
 
-            DrawCircle(dst3, p1, task.DotSize, task.scalarColors(task.frameCount Mod 255))
-            DrawCircle(dst3, p2, task.DotSize, task.scalarColors(task.frameCount Mod 255))
+            DrawCircle(dst3, p1, atask.DotSize, atask.scalarColors(atask.frameCount Mod 255))
+            DrawCircle(dst3, p2, atask.DotSize, atask.scalarColors(atask.frameCount Mod 255))
         End Sub
     End Class
 End Namespace

@@ -2,7 +2,7 @@
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Module vbc
-        Public task As AlgorithmTask
+        Public atask As AlgorithmTask
         Public AlgorithmTestAllCount As Integer = 1
 
         Public Const fmt0 = "0"
@@ -37,47 +37,47 @@ Namespace VBClasses
             Return New cv.Scalar(c(0), c(1), c(2))
         End Function
         Public Sub taskUpdate()
-            If task.myStopWatch Is Nothing Then task.myStopWatch = Stopwatch.StartNew()
+            If atask.myStopWatch Is Nothing Then atask.myStopWatch = Stopwatch.StartNew()
 
             ' update the time measures
-            task.msWatch = task.myStopWatch.ElapsedMilliseconds
+            atask.msWatch = atask.myStopWatch.ElapsedMilliseconds
 
-            task.quarterBeat = False
-            task.midHeartBeat = False
-            task.heartBeat = False
-            Dim ms = (task.msWatch - task.msLast) / 1000
-            For i = 0 To task.quarter.Count - 1
-                If task.quarter(i) = False And ms > Choose(i + 1, 0.25, 0.5, 0.75, 1.0) Then
-                    task.quarterBeat = True
-                    If i = 1 Then task.midHeartBeat = True
-                    If i = 3 Then task.heartBeat = True
-                    task.quarter(i) = True
+            atask.quarterBeat = False
+            atask.midHeartBeat = False
+            atask.heartBeat = False
+            Dim ms = (atask.msWatch - atask.msLast) / 1000
+            For i = 0 To atask.quarter.Count - 1
+                If atask.quarter(i) = False And ms > Choose(i + 1, 0.25, 0.5, 0.75, 1.0) Then
+                    atask.quarterBeat = True
+                    If i = 1 Then atask.midHeartBeat = True
+                    If i = 3 Then atask.heartBeat = True
+                    atask.quarter(i) = True
                 End If
             Next
-            If task.heartBeat Then ReDim task.quarter(4)
+            If atask.heartBeat Then ReDim atask.quarter(4)
 
-            If task.frameCount = 1 Then task.heartBeat = True
+            If atask.frameCount = 1 Then atask.heartBeat = True
 
-            Static lastHeartBeatLT As Boolean = task.heartBeatLT
-            task.afterHeartBeatLT = If(lastHeartBeatLT, True, False)
-            lastHeartBeatLT = task.heartBeatLT
+            Static lastHeartBeatLT As Boolean = atask.heartBeatLT
+            atask.afterHeartBeatLT = If(lastHeartBeatLT, True, False)
+            lastHeartBeatLT = atask.heartBeatLT
 
             Static heartBeatCount As Integer = 5
-            If task.heartBeat Then
+            If atask.heartBeat Then
                 heartBeatCount += 1
                 If heartBeatCount >= 5 Then
-                    task.heartBeatLT = True
+                    atask.heartBeatLT = True
                     heartBeatCount = 0
                 End If
             End If
 
-            Dim frameDuration = 1000 / task.fpsAlgorithm
-            task.almostHeartBeat = If(task.msWatch - task.msLast + frameDuration * 1.5 > 1000, True, False)
+            Dim frameDuration = 1000 / atask.fpsAlgorithm
+            atask.almostHeartBeat = If(atask.msWatch - atask.msLast + frameDuration * 1.5 > 1000, True, False)
 
-            If (task.msWatch - task.msLast) > 1000 Then task.msLast = task.msWatch
-            If task.heartBeatLT Then task.toggleOn = Not task.toggleOn
+            If (atask.msWatch - atask.msLast) > 1000 Then atask.msLast = atask.msWatch
+            If atask.heartBeatLT Then atask.toggleOn = Not atask.toggleOn
 
-            task.metersPerPixel = task.MaxZmeters / task.workRes.Height ' meters per pixel in projections - side and top.
+            atask.metersPerPixel = atask.MaxZmeters / atask.workRes.Height ' meters per pixel in projections - side and top.
         End Sub
 
         Public Function findRectFromLine(lp As lpData) As cv.Rect
@@ -90,7 +90,7 @@ Namespace VBClasses
         Public Function findEdgePoints(lp As lpData) As lpData
             ' compute the edge to edge line - might be useful...
             Dim yIntercept = lp.p1.Y - lp.slope * lp.p1.X
-            Dim w = task.cols, h = task.rows
+            Dim w = atask.cols, h = atask.rows
 
             Dim xp1 = New cv.Point2f(0, yIntercept)
             Dim xp2 = New cv.Point2f(w, w * lp.slope + yIntercept)
@@ -113,8 +113,8 @@ Namespace VBClasses
                 xp2.Y = 0
             End If
 
-            If xp1.Y = task.color.Height Then xp1.Y -= 1
-            If xp2.Y = task.color.Height Then xp2.Y -= 1
+            If xp1.Y = atask.color.Height Then xp1.Y -= 1
+            If xp2.Y = atask.color.Height Then xp2.Y -= 1
             Return New lpData(xp1, xp2)
         End Function
         Public Function GetMinMax(mat As cv.Mat, Optional mask As cv.Mat = Nothing) As mmData
@@ -149,27 +149,27 @@ Namespace VBClasses
         Public Sub DrawLine(ByRef dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar)
             Dim pt1 = New cv.Point(p1.X, p1.Y)
             Dim pt2 = New cv.Point(p2.X, p2.Y)
-            dst.Line(pt1, pt2, color, task.lineWidth, task.lineType)
+            dst.Line(pt1, pt2, color, atask.lineWidth, atask.lineType)
         End Sub
         Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f, color As cv.Scalar, lineWidth As Integer)
-            dst.Line(p1, p2, color, lineWidth, task.lineType)
+            dst.Line(p1, p2, color, lineWidth, atask.lineType)
         End Sub
         Public Sub DrawLine(dst As cv.Mat, lp As lpData, color As cv.Scalar)
-            dst.Line(lp.p1, lp.p2, color, task.lineWidth, task.lineType)
+            dst.Line(lp.p1, lp.p2, color, atask.lineWidth, atask.lineType)
         End Sub
         Public Sub DrawLine(dst As cv.Mat, lp As lpData)
-            dst.Line(lp.p1, lp.p2, task.highlight, task.lineWidth, task.lineType)
+            dst.Line(lp.p1, lp.p2, atask.highlight, atask.lineWidth, atask.lineType)
         End Sub
         Public Sub DrawLine(dst As cv.Mat, p1 As cv.Point2f, p2 As cv.Point2f)
-            dst.Line(p1, p2, task.highlight, task.lineWidth, task.lineType)
+            dst.Line(p1, p2, atask.highlight, atask.lineWidth, atask.lineType)
         End Sub
         Public Function ValidateRect(ByVal r As cv.Rect, Optional ratio As Integer = 1) As cv.Rect
             If r.X < 0 Then r.X = 0
             If r.Y < 0 Then r.Y = 0
-            If r.X + r.Width >= task.workRes.Width * ratio Then r.Width = task.workRes.Width * ratio - r.X - 1
-            If r.Y + r.Height >= task.workRes.Height * ratio Then r.Height = task.workRes.Height * ratio - r.Y - 1
-            If r.X >= task.workRes.Width * ratio Then r.X = task.workRes.Width - 1
-            If r.Y >= task.workRes.Height * ratio Then r.Y = task.workRes.Height - 1
+            If r.X + r.Width >= atask.workRes.Width * ratio Then r.Width = atask.workRes.Width * ratio - r.X - 1
+            If r.Y + r.Height >= atask.workRes.Height * ratio Then r.Height = atask.workRes.Height * ratio - r.Y - 1
+            If r.X >= atask.workRes.Width * ratio Then r.X = atask.workRes.Width - 1
+            If r.Y >= atask.workRes.Height * ratio Then r.Y = atask.workRes.Height - 1
             If r.Width <= 0 Then r.Width = 1
             If r.Height <= 0 Then r.Height = 1
             Return r

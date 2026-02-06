@@ -11,10 +11,10 @@ Public Class TreeviewForm
         PercentTime.Height = TreeView1.Height
     End Sub
     Private Sub TreeviewForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
-        task.Settings.TreeViewLeft = Me.Left
-        task.Settings.TreeViewTop = Me.Top
-        task.Settings.TreeViewWidth = Me.Width
-        task.Settings.TreeViewHeight = Me.Height
+        atask.Settings.TreeViewLeft = Me.Left
+        atask.Settings.TreeViewTop = Me.Top
+        atask.Settings.TreeViewWidth = Me.Width
+        atask.Settings.TreeViewHeight = Me.Height
     End Sub
     Private Function FindRecursive(ByVal tNode As TreeNode, name As String) As TreeNode
         Dim tn As TreeNode
@@ -77,32 +77,32 @@ Public Class TreeviewForm
     End Sub
 
     Public Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
-        If task Is Nothing Then Exit Sub
-        If task.cpu.callTrace.Count <> treeData.Count Then
+        If atask Is Nothing Then Exit Sub
+        If atask.cpu.callTrace.Count <> treeData.Count Then
             treeData.Clear()
-            For Each td In task.cpu.callTrace
+            For Each td In atask.cpu.callTrace
                 If td.EndsWith("\") Then td = td.Substring(0, td.Length - 1)
                 treeData.Add(td)
             Next
             BuildTreeView(TreeView1, treeData)
         End If
 
-        PercentTime.Text = task.cpu.PrepareReport(treeData)
+        PercentTime.Text = atask.cpu.PrepareReport(treeData)
         PercentTime.Refresh()
     End Sub
     Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         TreeView1.Dock = DockStyle.Fill
         TreeView1.SendToBack()
 
-        Me.Location = New System.Drawing.Point(task.Settings.TreeViewLeft, task.Settings.TreeViewTop)
-        Me.Size = New System.Drawing.Size(task.Settings.TreeViewWidth, task.Settings.TreeViewHeight)
+        Me.Location = New System.Drawing.Point(atask.Settings.TreeViewLeft, atask.Settings.TreeViewTop)
+        Me.Size = New System.Drawing.Size(atask.Settings.TreeViewWidth, atask.Settings.TreeViewHeight)
 
         PercentTime.Width = 250
         PercentTime.Left = 250
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
-        task.cpu.displayObjectName = e.Node.Text
-        task.cpu.indexTask = e.Node.Tag
+        atask.cpu.displayObjectName = e.Node.Text
+        atask.cpu.indexTask = e.Node.Tag
         Timer2_Tick(sender, e)
     End Sub
 End Class

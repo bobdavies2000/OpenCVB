@@ -85,9 +85,9 @@ Namespace VBClasses
             dst2 = emax.dst2
             Static lastCenters As New List(Of cv.Point2f)(emax.centers)
             For i = 0 To emax.centers.Count - 1
-                DrawCircle(dst2, emax.centers(i), task.DotSize + 1, task.highlight)
+                DrawCircle(dst2, emax.centers(i), atask.DotSize + 1, atask.highlight)
                 If i < lastCenters.Count Then
-                    DrawCircle(dst2, lastCenters(i), task.DotSize + 2, cv.Scalar.Black)
+                    DrawCircle(dst2, lastCenters(i), atask.DotSize + 2, cv.Scalar.Black)
                 End If
             Next
             lastCenters = New List(Of cv.Point2f)(emax.centers)
@@ -115,7 +115,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If task.optionsChanged Then grid.Run(dst2)
+            If atask.optionsChanged Then grid.Run(dst2)
             regionCount = grid.gridRects.Count
 
             Dim samples = New cv.Mat(regionCount * options.samplesPerRegion, 2, cv.MatType.CV_32F).Reshape(2, 0)
@@ -142,7 +142,7 @@ Namespace VBClasses
                 Dim ePt = New cv.Point2f(CInt(roi.X + pt.X), CInt(roi.Y + pt.Y))
                 eSamples.Add(ePt) ' easier to debug with just integers...
                 Dim label = eLabelMat.Get(Of Integer)(i)
-                DrawCircle(dst2, ePt, task.DotSize + 2, task.highlight)
+                DrawCircle(dst2, ePt, atask.DotSize + 2, atask.highlight)
             Next
 
             ReDim eLabels(eLabelMat.Rows - 1)
@@ -195,8 +195,8 @@ Namespace VBClasses
 
                     Dim response = Math.Round(em_model.Predict2(sample)(1))
 
-                    Dim c = task.vecColors(response)
-                    DrawCircle(dst2, New cv.Point(j, i), task.DotSize, c)
+                    Dim c = atask.vecColors(response)
+                    DrawCircle(dst2, New cv.Point(j, i), atask.DotSize, c)
                 Next
             Next
         End Sub
@@ -225,7 +225,7 @@ Namespace VBClasses
 
             knn.queries = New List(Of cv.Point2f)(emax.centers)
             knn.Run(src)
-            If task.firstPass Then
+            If atask.firstPass Then
                 knn.trainInput = New List(Of cv.Point2f)(knn.queries)
                 Exit Sub
             End If
@@ -234,8 +234,8 @@ Namespace VBClasses
             For i = 0 To knn.queries.Count - 1
                 Dim p1 = knn.queries(i)
                 Dim p2 = knn.trainInput(knn.result(i, 0))
-                DrawCircle(dst3, p1, task.DotSize, task.highlight)
-                DrawCircle(dst3, p2, task.DotSize, cv.Scalar.Red)
+                DrawCircle(dst3, p1, atask.DotSize, atask.highlight)
+                DrawCircle(dst3, p2, atask.DotSize, cv.Scalar.Red)
                 vbc.DrawLine(dst3, p1, p2, white)
             Next
             knn.trainInput = New List(Of cv.Point2f)(knn.queries)

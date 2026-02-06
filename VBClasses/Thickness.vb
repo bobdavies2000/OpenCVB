@@ -9,7 +9,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 dst2 = runRedCloud(src, labels(2))
-                rc = task.rcD
+                rc = atask.rcD
             End If
 
             volZ.rc = rc

@@ -6,7 +6,7 @@ Namespace VBClasses
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public percentImage As Single
         Public Sub New()
-            task.redCloud = Me
+            atask.redCloud = Me
             desc = "Build contours for each cell"
         End Sub
         Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData), rcMapLast As cv.Mat) As rcData
@@ -19,7 +19,7 @@ Namespace VBClasses
                 r2 = rcListLast(indexLast).rect
             End If
 
-            If indexLast >= 0 And indexLast < rcListLast.Count And r1.IntersectsWith(r2) And task.optionsChanged = False Then
+            If indexLast >= 0 And indexLast < rcListLast.Count And r1.IntersectsWith(r2) And atask.optionsChanged = False Then
                 Dim lrc = rcListLast(indexLast)
                 If rc.rect.Contains(lrc.maxDist) Then
                     Dim row = lrc.maxDist.Y - lrc.rect.Y
@@ -60,12 +60,12 @@ Namespace VBClasses
                 rcList.Add(rc)
 
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+                dst2.Circle(rc.maxDist, atask.DotSize, atask.highlight, -1)
                 SetTrueText(CStr(rc.age), rc.maxDist)
             Next
 
             RedCloud_Cell.selectCell(rcMap, rcList)
-            strOut = task.rcD.displayCell()
+            strOut = atask.rcD.displayCell()
             SetTrueText(strOut, 3)
         End Sub
     End Class
@@ -122,20 +122,20 @@ Namespace VBClasses
             For Each rc In rcList
                 index += 1
                 rc.index = index
-                rc.color = task.vecColors(rc.index Mod 255)
+                rc.color = atask.vecColors(rc.index Mod 255)
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                dst2.Circle(rc.maxDist, task.DotSize, task.highlight, -1)
+                dst2.Circle(rc.maxDist, atask.DotSize, atask.highlight, -1)
             Next
 
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
 
             Static unchanged As Integer
-            If task.motionRGB.motionList.Count = 0 Then
+            If atask.motionRGB.motionList.Count = 0 Then
                 unchanged += 1
                 labels(3) = "The rcMap was unchanged " + CStr(unchanged) + " times since last heartBeatLT"
             End If
-            If task.heartBeatLT Then unchanged = 0
+            If atask.heartBeatLT Then unchanged = 0
         End Sub
     End Class
 
@@ -148,29 +148,29 @@ Namespace VBClasses
     Public Class NR_RedCloud_CellDepthHistogram : Inherits TaskParent
         Dim plot As New Plot_Histogram
         Public Sub New()
-            task.gOptions.setHistogramBins(100)
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            atask.gOptions.setHistogramBins(100)
+            If standalone Then atask.gOptions.displayDst1.Checked = True
             plot.createHistogram = True
             desc = "Display the histogram of a selected RedCloud cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedCloud(src, labels(2))
 
-            RedCloud_Cell.selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell
+            RedCloud_Cell.selectCell(atask.redCloud.rcMap, atask.redCloud.rcList)
+            If atask.rcD IsNot Nothing Then strOut = atask.rcD.displayCell
             SetTrueText(strOut, 1)
 
             labels(3) = "Select a RedCloud cell to see the histogram"
 
-            Dim depth As cv.Mat = task.pcSplit(2)(task.rcD.rect)
-            depth.SetTo(0, task.noDepthMask(task.rcD.rect))
+            Dim depth As cv.Mat = atask.pcSplit(2)(atask.rcD.rect)
+            depth.SetTo(0, atask.noDepthMask(atask.rcD.rect))
             plot.minRange = 0
-            plot.maxRange = task.MaxZmeters
+            plot.maxRange = atask.MaxZmeters
             plot.Run(depth)
-            labels(3) = "0 meters to " + Format(task.MaxZmeters, fmt0) + " meters - vertical lines every meter"
+            labels(3) = "0 meters to " + Format(atask.MaxZmeters, fmt0) + " meters - vertical lines every meter"
 
-            Dim incr = dst2.Width / task.MaxZmeters
-            For i = 1 To CInt(task.MaxZmeters - 1)
+            Dim incr = dst2.Width / atask.MaxZmeters
+            For i = 1 To CInt(atask.MaxZmeters - 1)
                 Dim x = incr * i
                 vbc.DrawLine(dst3, New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.White)
             Next
@@ -192,12 +192,12 @@ Namespace VBClasses
             redMotion.Run(src)
 
             dst3.SetTo(0)
-            For Each rc In task.redCloud.rcList
+            For Each rc In atask.redCloud.rcList
                 Dim listOfPoints = New List(Of List(Of cv.Point))({rc.contour})
-                cv.Cv2.DrawContours(dst3(rc.rect), listOfPoints, 0, white, task.lineWidth, cv.LineTypes.Link8)
+                cv.Cv2.DrawContours(dst3(rc.rect), listOfPoints, 0, white, atask.lineWidth, cv.LineTypes.Link8)
             Next
 
-            dst2 = task.redCloud.redSweep.dst1
+            dst2 = atask.redCloud.redSweep.dst1
         End Sub
     End Class
 
@@ -211,31 +211,31 @@ Namespace VBClasses
         End Sub
         Public Shared Sub selectCell(rcMap As cv.Mat, rcList As List(Of rcData))
             If rcList.Count > 0 Then
-                Dim clickIndex = rcMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X) - 1
+                Dim clickIndex = rcMap.Get(Of Byte)(atask.clickPoint.Y, atask.clickPoint.X) - 1
                 If clickIndex >= 0 And clickIndex < rcList.Count Then
-                    task.rcD = rcList(clickIndex)
+                    atask.rcD = rcList(clickIndex)
                 Else
-                    If task.rcD Is Nothing And rcList.Count > 0 Then
-                        task.rcD = rcList(0)
+                    If atask.rcD Is Nothing And rcList.Count > 0 Then
+                        atask.rcD = rcList(0)
                     Else
-                        task.rcD = Nothing
+                        atask.rcD = Nothing
                     End If
                 End If
             End If
-            If task.rcD Is Nothing Then
+            If atask.rcD Is Nothing Then
                 ' placeholder rcData to avoid errors downstream.
-                task.rcD = New rcData(New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 255),
+                atask.rcD = New rcData(New cv.Mat(New cv.Size(1, 1), cv.MatType.CV_8U, 255),
                                               New cv.Rect(0, 0, 1, 1), 0)
             End If
-            If task.rcD.rect.Contains(task.clickPoint) Then
-                task.color(task.rcD.rect).SetTo(white, task.rcD.mask)
+            If atask.rcD.rect.Contains(atask.clickPoint) Then
+                atask.color(atask.rcD.rect).SetTo(white, atask.rcD.mask)
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then dst2 = runRedCloud(src, labels(2))
 
-            selectCell(task.redCloud.rcMap, task.redCloud.rcList)
-            If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+            selectCell(atask.redCloud.rcMap, atask.redCloud.rcList)
+            If atask.rcD IsNot Nothing Then strOut = atask.rcD.displayCell()
             SetTrueText(strOut, 3)
         End Sub
     End Class
@@ -244,7 +244,7 @@ Namespace VBClasses
 
     Public Class RedCloud_LeftRight : Inherits TaskParent
         Public Sub New()
-            If task.bricks Is Nothing Then task.bricks = New Brick_Basics
+            If atask.bricks Is Nothing Then atask.bricks = New Brick_Basics
             desc = "Map the RedCloud output into the right view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -252,14 +252,14 @@ Namespace VBClasses
 
             Dim count As Integer
             dst1.SetTo(0)
-            For Each gr As brickData In task.bricks.brickList
-                If task.redCloud.rcMap(gr.lRect).CountNonZero And gr.rRect.Width > 0 Then
+            For Each gr As brickData In atask.bricks.brickList
+                If atask.redCloud.rcMap(gr.lRect).CountNonZero And gr.rRect.Width > 0 Then
                     dst2(gr.lRect).CopyTo(dst1(gr.rRect))
                     count += 1
                 End If
             Next
 
-            dst3 = ShowAddweighted(dst1, task.rightView, labels(3))
+            dst3 = ShowAddweighted(dst1, atask.rightView, labels(3))
             labels(3) += " " + CStr(count) + " bricks mapped into the right image."
         End Sub
     End Class

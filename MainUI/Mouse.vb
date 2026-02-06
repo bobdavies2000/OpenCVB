@@ -14,10 +14,10 @@ Namespace MainApp
             activeMouseDown = False
             Dim x As Integer = e.X * settings.workRes.Width / pics(0).Width
             Dim y As Integer = e.Y * settings.workRes.Height / pics(0).Height
-            task.mouseMagnifyEndPoint = New cv.Point(e.X, e.Y)
+            atask.mouseMagnifyEndPoint = New cv.Point(e.X, e.Y)
         End Sub
         Private Sub CamPic_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
-            If task Is Nothing Then Exit Sub
+            If atask Is Nothing Then Exit Sub
             Dim x As Integer = e.X * settings.workRes.Width / pics(0).Width
             Dim y As Integer = e.Y * settings.workRes.Height / pics(0).Height
             Dim pic = DirectCast(sender, PictureBox)
@@ -27,64 +27,64 @@ Namespace MainApp
             If e.Button = System.Windows.Forms.MouseButtons.Left Then
                 DrawingRectangle = True
                 BothFirstAndLastReady = False ' we have to see some movement after mousedown.
-                task.drawRect.Width = 0
-                task.drawRect.Height = 0
+                atask.drawRect.Width = 0
+                atask.drawRect.Height = 0
                 mouseDownPoint.X = x
                 mouseDownPoint.Y = y
             End If
 
-            task.mouseMagnifyStartPoint = New cv.Point(e.X, e.Y)
-            task.mouseMagnifyPicTag = pic.Tag
+            atask.mouseMagnifyStartPoint = New cv.Point(e.X, e.Y)
+            atask.mouseMagnifyPicTag = pic.Tag
         End Sub
         Private Sub CamPic_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
-            If task Is Nothing Then Exit Sub
-            task.mouseDisplayPoint = New cv.Point(e.X, e.Y)
+            If atask Is Nothing Then Exit Sub
+            atask.mouseDisplayPoint = New cv.Point(e.X, e.Y)
             Dim x As Integer = e.X * settings.workRes.Width / pics(0).Width
             Dim y As Integer = e.Y * settings.workRes.Height / pics(0).Height
             Dim pic = DirectCast(sender, PictureBox)
-            task.mousePicTag = pic.Tag
+            atask.mousePicTag = pic.Tag
             If activeMouseDown Then Exit Sub
             If DrawingRectangle Then
                 If x < 0 Then x = 0
-                If x >= task.workRes.Width Then x = task.workRes.Width - 1
+                If x >= atask.workRes.Width Then x = atask.workRes.Width - 1
                 If y < 0 Then y = 0
-                If y >= task.workRes.Height Then y = task.workRes.Height - 1
+                If y >= atask.workRes.Height Then y = atask.workRes.Height - 1
                 mouseMovePoint.X = x
                 mouseMovePoint.Y = y
-                task.drawRect.X = Math.Min(mouseDownPoint.X, mouseMovePoint.X)
-                task.drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
-                task.drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
-                task.drawRect.Height = Math.Abs(mouseDownPoint.Y - mouseMovePoint.Y)
-                If task.drawRect.X + task.drawRect.Width > task.workRes.Width Then
-                    task.drawRect.Width = task.workRes.Width - task.drawRect.X
+                atask.drawRect.X = Math.Min(mouseDownPoint.X, mouseMovePoint.X)
+                atask.drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
+                atask.drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
+                atask.drawRect.Height = Math.Abs(mouseDownPoint.Y - mouseMovePoint.Y)
+                If atask.drawRect.X + atask.drawRect.Width > atask.workRes.Width Then
+                    atask.drawRect.Width = atask.workRes.Width - atask.drawRect.X
                 End If
-                If task.drawRect.Y + task.drawRect.Height > task.workRes.Height Then
-                    task.drawRect.Height = task.workRes.Height - task.drawRect.Y
+                If atask.drawRect.Y + atask.drawRect.Height > atask.workRes.Height Then
+                    atask.drawRect.Height = atask.workRes.Height - atask.drawRect.Y
                 End If
                 BothFirstAndLastReady = True
             End If
 
             StatusLabel.Text = String.Format("X: {0}, Y: {1}    ", x, y)
-            task.mouseMovePoint = New cv.Point(x, y)
-            If task IsNot Nothing Then
-                StatusLabel.Text += String.Format("Last click: {0}, {1}    ", task.clickPoint.X, task.clickPoint.Y)
+            atask.mouseMovePoint = New cv.Point(x, y)
+            If atask IsNot Nothing Then
+                StatusLabel.Text += String.Format("Last click: {0}, {1}    ", atask.clickPoint.X, atask.clickPoint.Y)
             End If
 
-            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
-                StatusLabel.Text += "DrawRect = " + String.Format("x: {0}, y: {1}, w: {2}, h: {3}", task.drawRect.X, task.drawRect.Y,
-                                    task.drawRect.Width, task.drawRect.Height)
+            If atask.drawRect.Width > 0 And atask.drawRect.Height > 0 Then
+                StatusLabel.Text += "DrawRect = " + String.Format("x: {0}, y: {1}, w: {2}, h: {3}", atask.drawRect.X, atask.drawRect.Y,
+                                    atask.drawRect.Width, atask.drawRect.Height)
             End If
         End Sub
         Private Sub campic_DoubleClick(sender As Object, e As EventArgs)
             DrawingRectangle = False
         End Sub
         Private Sub clickPic(sender As Object, e As EventArgs)
-            If task Is Nothing Then Exit Sub
-            'If task IsNot Nothing Then  if task.sharpgl IsNot Nothing Then sharpGL.Activate()
-            If task IsNot Nothing Then If task.treeView IsNot Nothing Then task.treeView.Activate()
-            If task IsNot Nothing Then If task.allOptions IsNot Nothing Then task.allOptions.Activate()
-            task.clickPoint = task.mouseMovePoint
-            task.mouseClickFlag = True
+            If atask Is Nothing Then Exit Sub
+            'If atask IsNot Nothing Then  if atask.sharpgl IsNot Nothing Then sharpGL.Activate()
+            If atask IsNot Nothing Then If atask.treeView IsNot Nothing Then atask.treeView.Activate()
+            If atask IsNot Nothing Then If atask.allOptions IsNot Nothing Then atask.allOptions.Activate()
+            atask.clickPoint = atask.mouseMovePoint
+            atask.mouseClickFlag = True
         End Sub
     End Class
 End Namespace

@@ -6,7 +6,7 @@ Public Class OptionsGlobal
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
     Public trackingLabel As String
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.MdiParent = task.allOptions
+        Me.MdiParent = atask.allOptions
 
         Palettes.Items.Clear()
         For Each mapName In mapNames
@@ -25,61 +25,61 @@ Public Class OptionsGlobal
         highlight.Items.Add("Red")
         highlight.SelectedIndex = 0
 
-        ShowAllOptions.Checked = task.Settings.ShowAllOptions
+        ShowAllOptions.Checked = atask.Settings.ShowAllOptions
 
-        task.DotSize = 1
-        task.cvFontThickness = 1
-        task.brickSize = 8
-        task.DotSize = 1
-        task.lineWidth = 1
-        Select Case task.workRes.Width
+        atask.DotSize = 1
+        atask.cvFontThickness = 1
+        atask.brickSize = 8
+        atask.DotSize = 1
+        atask.lineWidth = 1
+        Select Case atask.workRes.Width
             Case 1920
-                task.cvFontSize = 3.5
-                task.cvFontThickness = 4
-                task.DotSize = 5
-                task.lineWidth = 5
-                task.brickSize = 36
+                atask.cvFontSize = 3.5
+                atask.cvFontThickness = 4
+                atask.DotSize = 5
+                atask.lineWidth = 5
+                atask.brickSize = 36
             Case 1280
-                task.cvFontSize = 2.5
-                task.cvFontThickness = 2
-                task.DotSize = 5
-                task.lineWidth = 4
-                task.brickSize = 24
+                atask.cvFontSize = 2.5
+                atask.cvFontThickness = 2
+                atask.DotSize = 5
+                atask.lineWidth = 4
+                atask.brickSize = 24
             Case 960
-                task.cvFontSize = 2.0
-                task.cvFontThickness = 2
-                task.DotSize = 2
-                task.lineWidth = 3
-                task.brickSize = 16
+                atask.cvFontSize = 2.0
+                atask.cvFontThickness = 2
+                atask.DotSize = 2
+                atask.lineWidth = 3
+                atask.brickSize = 16
             Case 672
-                task.cvFontSize = 1.5
-                task.DotSize = 2
-                task.lineWidth = 2
-                task.brickSize = 16
+                atask.cvFontSize = 1.5
+                atask.DotSize = 2
+                atask.lineWidth = 2
+                atask.brickSize = 16
             Case 640
-                task.cvFontSize = 1.5
-                task.lineWidth = 2
-                task.DotSize = 2
-                task.brickSize = 16
+                atask.cvFontSize = 1.5
+                atask.lineWidth = 2
+                atask.DotSize = 2
+                atask.brickSize = 16
             Case 480
-                task.cvFontSize = 1.2
+                atask.cvFontSize = 1.2
             Case 240
-                task.cvFontSize = 1.2
+                atask.cvFontSize = 1.2
             Case 336
-                task.cvFontSize = 1.0
+                atask.cvFontSize = 1.0
             Case 320
-                task.cvFontSize = 1.0
+                atask.cvFontSize = 1.0
             Case 168
-                task.cvFontSize = 0.5
+                atask.cvFontSize = 0.5
             Case 160
-                task.cvFontSize = 1.0
+                atask.cvFontSize = 1.0
         End Select
 
-        GridSlider.Value = task.brickSize
-        DotSizeSlider.Value = task.DotSize
+        GridSlider.Value = atask.brickSize
+        DotSizeSlider.Value = atask.DotSize
         DotSizeLabel.Text = CStr(DotSizeSlider.Value)
         FPSDisplayLabel.Text = CStr(TargetDisplaySlider.Value)
-        LineWidth.Value = task.lineWidth
+        LineWidth.Value = atask.lineWidth
         HistBinBar.Value = 16
         labelBinsCount.Text = CStr(HistBinBar.Value)
 
@@ -92,115 +92,115 @@ Public Class OptionsGlobal
         maxCount.Text = CStr(MaxDepthBar.Value)
     End Sub
     Private Sub LineType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LineType.SelectedIndexChanged
-        task.optionsChanged = True
+        atask.optionsChanged = True
         Select Case LineType.Text
             Case "AntiAlias"
-                task.lineType = cv.LineTypes.AntiAlias
+                atask.lineType = cv.LineTypes.AntiAlias
             Case "Link4"
-                task.lineType = cv.LineTypes.Link4
+                atask.lineType = cv.LineTypes.Link4
             Case "Link8"
-                task.lineType = cv.LineTypes.Link8
+                atask.lineType = cv.LineTypes.Link8
         End Select
     End Sub
     Private Sub LineWidth_ValueChanged(sender As Object, e As EventArgs) Handles LineWidth.ValueChanged
         LineThicknessAmount.Text = CStr(LineWidth.Value)
-        task.lineWidth = LineWidth.Value
-        task.optionsChanged = True
+        atask.lineWidth = LineWidth.Value
+        atask.optionsChanged = True
     End Sub
     Private Sub DotSizeSlider_ValueChanged(sender As Object, e As EventArgs) Handles DotSizeSlider.ValueChanged
-        task.DotSize = DotSizeSlider.Value
-        DotSizeLabel.Text = CStr(task.DotSize)
-        task.optionsChanged = True
+        atask.DotSize = DotSizeSlider.Value
+        DotSizeLabel.Text = CStr(atask.DotSize)
+        atask.optionsChanged = True
     End Sub
     Private Sub UseKalman_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub displayDst0_CheckedChanged(sender As Object, e As EventArgs) Handles displayDst0.CheckedChanged
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub displayDst1_CheckedChanged(sender As Object, e As EventArgs) Handles displayDst1.CheckedChanged
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub MaxDepth_ValueChanged(sender As Object, e As EventArgs) Handles MaxDepthBar.ValueChanged
         maxCount.Text = CStr(MaxDepthBar.Value)
         ' why add anything?  Because histograms are exclusive on ranges.
-        task.MaxZmeters = MaxDepthBar.Value + 0.01
-        task.optionsChanged = True
+        atask.MaxZmeters = MaxDepthBar.Value + 0.01
+        atask.optionsChanged = True
     End Sub
     Private Sub GridSlider_ValueChanged(sender As Object, e As EventArgs) Handles GridSlider.ValueChanged
         GridSizeLabel.Text = CStr(GridSlider.Value)
-        task.brickSize = GridSlider.Value
-        task.optionsChanged = True
+        atask.brickSize = GridSlider.Value
+        atask.optionsChanged = True
     End Sub
     Private Sub HistBinBar_ValueChanged(sender As Object, e As EventArgs) Handles HistBinBar.ValueChanged
-        task.histogramBins = HistBinBar.Value
-        labelBinsCount.Text = CStr(task.histogramBins)
-        task.optionsChanged = True
+        atask.histogramBins = HistBinBar.Value
+        labelBinsCount.Text = CStr(atask.histogramBins)
+        atask.optionsChanged = True
     End Sub
     Private Sub DisplayFPSSlider_ValueChanged(sender As Object, e As EventArgs) Handles TargetDisplaySlider.ValueChanged
-        task.optionsChanged = True
-        task.Settings.FPSPaintTarget = TargetDisplaySlider.Value
+        atask.optionsChanged = True
+        atask.Settings.FPSPaintTarget = TargetDisplaySlider.Value
         FPSDisplayLabel.Text = CStr(TargetDisplaySlider.Value)
     End Sub
     Private Sub gravityPointCloud_CheckedChanged(sender As Object, e As EventArgs) Handles gravityPointCloud.CheckedChanged
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub Palettes_SelectedIndexChanged_1(sender As Object, e As EventArgs) Handles Palettes.SelectedIndexChanged
-        task.optionsChanged = True
-        task.paletteIndex = mapNames.IndexOf(Palettes.Text)
+        atask.optionsChanged = True
+        atask.paletteIndex = mapNames.IndexOf(Palettes.Text)
     End Sub
     Private Sub DebugCheckBox_CheckedChanged(sender As Object, e As EventArgs) Handles DebugCheckBox.CheckedChanged
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub OpenGLCapture_Click(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub useMotion_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub ShowAllByDefault_CheckedChanged(sender As Object, e As EventArgs) Handles ShowAllOptions.CheckedChanged
-        task.Settings.ShowAllOptions = ShowAllOptions.Checked
+        atask.Settings.ShowAllOptions = ShowAllOptions.Checked
     End Sub
     Private Sub DebugSliderSlider_ValueChanged(sender As Object, e As EventArgs) Handles DebugSlider.ValueChanged
         DebugSliderLabel.Text = CStr(DebugSlider.Value)
     End Sub
     Private Sub useCloudHistory_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
 
 
 
     Private Sub unFiltered_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub MotionFilteredCloudOnly_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub MotionFilteredColorOnly_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub MotionFilteredColorAndCloud_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub UseHistoryCloud_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub DustFree_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub useFilter_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub highlight_SelectedIndexChanged(sender As Object, e As EventArgs) Handles highlight.SelectedIndexChanged
         Select Case highlight.Text
             Case "Yellow"
-                task.highlight = cv.Scalar.Yellow
+                atask.highlight = cv.Scalar.Yellow
             Case "Black"
-                task.highlight = cv.Scalar.Black
+                atask.highlight = cv.Scalar.Black
             Case "White"
-                task.highlight = cv.Scalar.White
+                atask.highlight = cv.Scalar.White
             Case "Red"
-                task.highlight = cv.Scalar.Red
+                atask.highlight = cv.Scalar.Red
         End Select
     End Sub
     Public Sub setMaxDepth(val As Integer)
@@ -235,19 +235,19 @@ Public Class OptionsGlobal
         DotSizeSlider.Value = val
     End Sub
     Private Sub TruncateDepth_CheckedChanged(sender As Object, e As EventArgs) Handles TruncateDepth.CheckedChanged
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub ShowQuadDepth_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub UseMotionMask_CheckedChanged(sender As Object, e As EventArgs) Handles UseMotionMask.CheckedChanged
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub showMotionMask_CheckedChanged(sender As Object, e As EventArgs) Handles showMotionMask.CheckedChanged
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub ShowSplash_CheckedChanged(sender As Object, e As EventArgs) Handles ShowSplash.CheckedChanged
         SaveSetting("OpenCVB", "ShowSplash", "ShowSplash", ShowSplash.Checked)

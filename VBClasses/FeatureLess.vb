@@ -3,19 +3,19 @@ Namespace VBClasses
     Public Class FeatureLess_Basics : Inherits TaskParent
         Dim edgeline As New EdgeLine_Basics
         Public Sub New()
-            If task.contours Is Nothing Then task.contours = New Contour_Basics_List
+            If atask.contours Is Nothing Then atask.contours = New Contour_Basics_List
             desc = "Use Contour_Basics to get the contour data for the top contours by size."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Channels = 1 Then edgeline.Run(src) Else edgeline.Run(task.grayStable)
+            If src.Channels = 1 Then edgeline.Run(src) Else edgeline.Run(atask.grayStable)
             If src.Type <> cv.MatType.CV_8U Then
-                task.contours.Run(edgeline.dst2)
-                dst2 = task.contours.dst2
-                labels = task.contours.labels
+                atask.contours.Run(edgeline.dst2)
+                dst2 = atask.contours.dst2
+                labels = atask.contours.labels
             Else
-                task.contours.Run(src)
-                dst2 = task.contours.dst2
-                labels = task.contours.labels
+                atask.contours.Run(src)
+                dst2 = atask.contours.dst2
+                labels = atask.contours.labels
             End If
         End Sub
     End Class
@@ -211,7 +211,7 @@ Namespace VBClasses
             dst1 = fless.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
             labels(2) = fless.labels(2)
 
-            If task.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, task.motionRGB.motionMask)
+            If atask.optionsChanged Then dst2 = dst1.Clone Else dst1.CopyTo(dst2, atask.motionRGB.motionMask)
             redCPP.Run(dst2 - 1)
             classCount = redCPP.classCount
             dst3 = PaletteFull(redCPP.dst2)
@@ -232,15 +232,15 @@ Namespace VBClasses
             desc = "Find the featureless regions of the left and right images"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.toggleOn Then
-                fLess.Run(task.leftView)
+            If atask.toggleOn Then
+                fLess.Run(atask.leftView)
                 dst2 = fLess.dst2.Clone
 
-                fLess.Run(task.rightView)
+                fLess.Run(atask.rightView)
                 dst3 = fLess.dst2.Clone
             Else
-                dst2 = task.leftView
-                dst3 = task.rightView
+                dst2 = atask.leftView
+                dst3 = atask.rightView
             End If
         End Sub
     End Class

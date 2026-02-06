@@ -6,13 +6,13 @@ Namespace VBClasses
         Dim redC As New RedColor_Basics
         Public Sub New()
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then atask.gOptions.displayDst1.Checked = True
             desc = "Run RedColor for each gradation from light to dark."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If task.optionsChanged Then
+            If atask.optionsChanged Then
                 ReDim binSplit(options.gradations)
                 Dim incr = 255 / options.gradations
                 For i = 0 To binSplit.Count - 1
@@ -22,7 +22,7 @@ Namespace VBClasses
             End If
 
             For i = 0 To options.gradations - 1
-                Dim tmp = task.grayStable.InRange(binSplit(i), binSplit(i + 1))
+                Dim tmp = atask.grayStable.InRange(binSplit(i), binSplit(i + 1))
                 tmp = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary)
                 dst1.SetTo(i + 1, tmp)
             Next
@@ -35,7 +35,7 @@ Namespace VBClasses
                 dst2 = redC.dst2
 
                 RedCloud_Cell.selectCell(redC.rcMap, redC.rcList)
-                If task.rcD IsNot Nothing Then strOut = task.rcD.displayCell()
+                If atask.rcD IsNot Nothing Then strOut = atask.rcD.displayCell()
                 SetTrueText(strOut, 1)
             End If
             labels(3) = CStr(options.gradations) + " of the motion-adjusted gray image."

@@ -6,7 +6,7 @@ Namespace VBClasses
             desc = "Create a frame history to sum the last X frames"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.frameHistoryCount = 1 Then
+            If atask.frameHistoryCount = 1 Then
                 dst2 = src
                 Exit Sub
             End If
@@ -14,12 +14,12 @@ Namespace VBClasses
             Dim input = src.Clone
             If input.Type <> cv.MatType.CV_32F Then input.ConvertTo(input, cv.MatType.CV_32F)
 
-            If dst1.Type <> input.Type Or dst1.Channels() <> input.Channels() Or task.optionsChanged Then
+            If dst1.Type <> input.Type Or dst1.Channels() <> input.Channels() Or atask.optionsChanged Then
                 dst1 = input
                 saveFrames.Clear()
             End If
 
-            If saveFrames.Count >= task.frameHistoryCount Then saveFrames.RemoveAt(0)
+            If saveFrames.Count >= atask.frameHistoryCount Then saveFrames.RemoveAt(0)
             saveFrames.Add(input.Clone)
 
             For Each m In saveFrames
@@ -44,17 +44,17 @@ Namespace VBClasses
         Public frames As New History_BasicsNoSaturation
         Dim saveFrames As New List(Of cv.Mat)
         Public Sub New()
-            desc = "Create a frame history and sum the last X task.pointcloud's"
+            desc = "Create a frame history and sum the last X atask.pointcloud's"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC3 Or src.Channels() <> 3 Then src = task.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Or src.Channels() <> 3 Then src = atask.pointCloud
 
-            If task.optionsChanged Or dst3.Type <> cv.MatType.CV_32FC3 Then
+            If atask.optionsChanged Or dst3.Type <> cv.MatType.CV_32FC3 Then
                 saveFrames.Clear()
                 dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
             End If
 
-            If saveFrames.Count >= task.frameHistoryCount Then
+            If saveFrames.Count >= atask.frameHistoryCount Then
                 dst3 = dst3.Subtract(saveFrames.ElementAt(0))
                 saveFrames.RemoveAt(0)
             End If
@@ -63,7 +63,7 @@ Namespace VBClasses
             dst3 = src + dst3
             dst2 = dst3 / saveFrames.Count
 
-            frames.Run(task.depthMask)
+            frames.Run(atask.depthMask)
             dst2.SetTo(0, Not frames.dst2)
         End Sub
     End Class
@@ -84,12 +84,12 @@ Namespace VBClasses
             If dst3.Type <> input.Type Or dst3.Channels() <> input.Channels() Then dst3 = New cv.Mat(input.Size(), input.Type, 0)
             input /= 255 ' input is all zeros or ones.
 
-            If task.optionsChanged Then
+            If atask.optionsChanged Then
                 saveFrames.Clear()
                 dst3.SetTo(0)
             End If
 
-            If saveFrames.Count >= task.frameHistoryCount Then
+            If saveFrames.Count >= atask.frameHistoryCount Then
                 dst3 = dst3.Subtract(saveFrames.ElementAt(0))
                 saveFrames.RemoveAt(0)
             End If
@@ -111,7 +111,7 @@ Namespace VBClasses
         Dim frames As New History_BasicsNoSaturation
         Dim diff As New Diff_Basics
         Public Sub New()
-            task.featureOptions.ColorDiffSlider.Value = 1
+            atask.featureOptions.ColorDiffSlider.Value = 1
             labels(3) = "Adjust 'Color Difference Thresold' to change trouble spots."
             desc = "Find the floodfill trouble spots."
         End Sub
@@ -141,18 +141,18 @@ Namespace VBClasses
             If standalone Then
                 options.Run()
                 src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                If task.firstPass Then lastFrame = src.Clone
+                If atask.firstPass Then lastFrame = src.Clone
                 cv.Cv2.Absdiff(src, lastFrame, dst3)
                 lastFrame = src.Clone
                 src = dst3.Threshold(options.pixelDiffThreshold, 255, cv.ThresholdTypes.Binary)
             End If
 
-            If task.frameHistoryCount = 1 Then
+            If atask.frameHistoryCount = 1 Then
                 dst2 = src
                 Exit Sub
             End If
 
-            If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
+            If saveFrames.Count > atask.frameHistoryCount Then saveFrames.RemoveAt(0)
             saveFrames.Add(src.Clone)
 
             dst2.SetTo(0)
@@ -160,7 +160,7 @@ Namespace VBClasses
                 dst2 = dst2 Or m
             Next
 
-            If task.Settings.algorithm = traceName Then
+            If atask.Settings.algorithm = traceName Then
                 For i = 0 To Math.Min(saveFrames.Count, 4) - 1
                     mats.mat(i) = saveFrames(i).Clone
                 Next
@@ -181,19 +181,19 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If saveFrames.Count > 0 Then
-                If task.optionsChanged Or saveFrames(0).Size <> src.Size Then saveFrames.Clear()
+                If atask.optionsChanged Or saveFrames(0).Size <> src.Size Then saveFrames.Clear()
             End If
 
-            If standalone Then src = task.noDepthMask
+            If standalone Then src = atask.noDepthMask
 
-            If task.frameHistoryCount = 1 Then
-                dst2 = task.depthMask
+            If atask.frameHistoryCount = 1 Then
+                dst2 = atask.depthMask
                 Exit Sub
             End If
 
-            If task.optionsChanged Then saveFrames.Clear()
+            If atask.optionsChanged Then saveFrames.Clear()
 
-            If saveFrames.Count > task.frameHistoryCount Then saveFrames.RemoveAt(0)
+            If saveFrames.Count > atask.frameHistoryCount Then saveFrames.RemoveAt(0)
             saveFrames.Add(src.Clone)
 
             dst2 = saveFrames(0)
@@ -202,7 +202,7 @@ Namespace VBClasses
             Next
             dst2 = Not dst2
             dst3.SetTo(0)
-            task.depthRGB.CopyTo(dst3, dst2)
+            atask.depthRGB.CopyTo(dst3, dst2)
         End Sub
     End Class
 End Namespace

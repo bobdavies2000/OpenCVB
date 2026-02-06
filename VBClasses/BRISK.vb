@@ -20,7 +20,7 @@ Namespace VBClasses
             For Each pt In keyPoints
                 If pt.Size > options.minDistance Then
                     features.Add(New cv.Point2f(pt.Pt.X, pt.Pt.Y))
-                    DrawCircle(dst2, pt.Pt, task.DotSize + 1, task.highlight)
+                    DrawCircle(dst2, pt.Pt, atask.DotSize + 1, atask.highlight)
                 End If
             Next
             labels(2) = CStr(features.Count) + " features found with BRISK"

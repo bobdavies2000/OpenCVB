@@ -9,15 +9,15 @@ Namespace VBClasses
             desc = "Display the left and right views as they came from the camera."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            brightness.run(task.leftView)
+            brightness.run(atask.leftView)
             Dim tmpLeft As cv.Mat = brightness.dst2 ' input array conflict
-            task.leftView = tmpLeft.Normalize(100, 150, cv.NormTypes.MinMax)
-            If standaloneTest() Then dst2 = task.leftView
+            atask.leftView = tmpLeft.Normalize(100, 150, cv.NormTypes.MinMax)
+            If standaloneTest() Then dst2 = atask.leftView
 
-            brightness.run(task.rightView)
+            brightness.run(atask.rightView)
             Dim tmpRight As cv.Mat = brightness.dst2 ' inputarray conflict
-            task.rightView = tmpRight.Normalize(100, 150, cv.NormTypes.MinMax)
-            If standaloneTest() Then dst3 = task.rightView
+            atask.rightView = tmpRight.Normalize(100, 150, cv.NormTypes.MinMax)
+            If standaloneTest() Then dst3 = atask.rightView
         End Sub
     End Class
 
@@ -28,12 +28,12 @@ Namespace VBClasses
 
     Public Class NR_LeftRight_RawLeft : Inherits TaskParent
         Public Sub New()
-            task.drawRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            atask.drawRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
             desc = "Match the raw left image with the color image with a drawRect"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src
-            If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then dst3 = src(task.drawRect)
+            If atask.drawRect.Width > 0 And atask.drawRect.Height > 0 Then dst3 = src(atask.drawRect)
         End Sub
     End Class
 
@@ -48,8 +48,8 @@ Namespace VBClasses
             labels(3) = "Right Image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = PaletteFull(task.leftView)
-            dst3 = PaletteFull(task.rightView)
+            dst2 = PaletteFull(atask.leftView)
+            dst3 = PaletteFull(atask.rightView)
         End Sub
     End Class
 
@@ -71,10 +71,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            brisk.Run(task.leftView)
+            brisk.Run(atask.leftView)
             dst2 = brisk.dst2.Clone
 
-            brisk.Run(task.rightView)
+            brisk.Run(atask.rightView)
             dst3 = brisk.dst2.Clone
         End Sub
     End Class
@@ -92,10 +92,10 @@ Namespace VBClasses
             desc = "Reduce both the left and right color images"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            reduction.Run(task.leftView)
+            reduction.Run(atask.leftView)
             dst2 = reduction.dst2.Clone
 
-            reduction.Run(task.rightView)
+            reduction.Run(atask.rightView)
             dst3 = reduction.dst2.Clone
         End Sub
     End Class
@@ -112,7 +112,7 @@ Namespace VBClasses
             desc = "Segment the right view image with RedMask_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8u.Run(task.rightView)
+            color8u.Run(atask.rightView)
             redMask.Run(color8u.dst2)
             dst2 = redMask.dst2.Clone
             dst3 = PaletteFull(dst2)
@@ -131,7 +131,7 @@ Namespace VBClasses
             desc = "Segment the left view image with RedMask_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8u.Run(task.leftView)
+            color8u.Run(atask.leftView)
             redMask.Run(color8u.dst2)
             dst2 = redMask.dst2.Clone
             dst3 = PaletteFull(dst2)
@@ -149,7 +149,7 @@ Namespace VBClasses
             desc = "This is a crude method to align the left image with the RGB for the D435i camera only..."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
+            If atask.settings.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then
                 SetTrueText("This is just a crude way to align the left and rgb images." + vbCrLf +
                         "The parameters are set for only the Intel D435i camera.")
                 Exit Sub
@@ -164,7 +164,7 @@ Namespace VBClasses
             Dim xS = options.xShift
             Dim yS = options.yShift
             Dim rect = New cv.Rect(xD + xS, yD + yS, w - xD * 2, h - yD * 2)
-            dst2 = task.leftView(rect).Resize(dst0.Size)
+            dst2 = atask.leftView(rect).Resize(dst0.Size)
 
             dst3 = ShowAddweighted(dst2, src, labels(3))
         End Sub
@@ -178,13 +178,13 @@ Namespace VBClasses
     Public Class NR_LeftRight_ContourLeft : Inherits TaskParent
         Dim color8U As New Color8U_Basics
         Public Sub New()
-            If task.contours Is Nothing Then task.contours = New Contour_Basics_List
+            If atask.contours Is Nothing Then atask.contours = New Contour_Basics_List
             desc = "Segment the left view with contour_basics_List"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            color8U.Run(task.leftView)
-            task.contours.Run(color8U.dst2)
-            dst2 = task.contours.dst2
+            color8U.Run(atask.leftView)
+            atask.contours.Run(color8U.dst2)
+            dst2 = atask.contours.dst2
         End Sub
     End Class
 
@@ -202,10 +202,10 @@ Namespace VBClasses
             labels(3) = "Right Image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edges.Run(task.leftView)
+            edges.Run(atask.leftView)
             dst2 = edges.dst2
 
-            edges.Run(task.rightView)
+            edges.Run(atask.rightView)
             dst3 = edges.dst2
         End Sub
     End Class
@@ -219,19 +219,19 @@ Namespace VBClasses
     Public Class NR_LeftRight_EdgesColor : Inherits TaskParent
         Dim edges As New Edge_Basics
         Public Sub New()
-            If standalone Then task.gOptions.displayDst0.Checked = True
+            If standalone Then atask.gOptions.displayDst0.Checked = True
             desc = "Display the edges in the left, right, and color views"
             labels(2) = "Left Image"
             labels(3) = "Right Image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edges.Run(task.gray)
+            edges.Run(atask.gray)
             dst0 = edges.dst2.Clone
 
-            edges.Run(task.leftView)
+            edges.Run(atask.leftView)
             dst2 = edges.dst2.Clone
 
-            edges.Run(task.rightView)
+            edges.Run(atask.rightView)
             dst3 = edges.dst2
         End Sub
     End Class
@@ -247,19 +247,19 @@ Namespace VBClasses
             desc = "Display the RedMask_Basics output for both the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redLeft.Run(task.leftView)
+            redLeft.Run(atask.leftView)
             dst2 = redLeft.dst2.Clone
             If standaloneTest() Then
                 For Each md In redLeft.redMask.mdList
-                    DrawCircle(dst2, md.maxDist, task.DotSize, task.highlight)
+                    DrawCircle(dst2, md.maxDist, atask.DotSize, atask.highlight)
                 Next
             End If
 
-            redRight.Run(task.rightView)
+            redRight.Run(atask.rightView)
             dst3 = redRight.dst2.Clone
             If standaloneTest() Then
                 For Each md In redRight.redMask.mdList
-                    DrawCircle(dst3, md.maxDist, task.DotSize, task.highlight)
+                    DrawCircle(dst3, md.maxDist, atask.DotSize, atask.highlight)
                 Next
             End If
             labels(2) = redLeft.labels(2)
@@ -278,7 +278,7 @@ Namespace VBClasses
             desc = "Segment the right view image with RedMask_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = task.leftView
+            dst3 = atask.leftView
             fLess.Run(dst3)
 
             dst2 = fLess.dst2
@@ -301,7 +301,7 @@ Namespace VBClasses
             desc = "Segment the left view image with RedMask_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst3 = task.leftView
+            dst3 = atask.leftView
             fLess.Run(dst3)
 
             redMask.Run(fLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -323,10 +323,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Options.Run()
 
-            dst2 = task.leftView.ConvertScaleAbs(Options.brightness, Options.contrast)
+            dst2 = atask.leftView.ConvertScaleAbs(Options.brightness, Options.contrast)
             dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
 
-            dst3 = task.rightView.ConvertScaleAbs(Options.brightness, Options.contrast)
+            dst3 = atask.rightView.ConvertScaleAbs(Options.brightness, Options.contrast)
             dst3 = dst3.Normalize(0, 255, cv.NormTypes.MinMax)
 
             labels(2) = "Left Image brightness/contrast = " + CStr(Options.brightness) + "/" + CStr(Options.contrast)

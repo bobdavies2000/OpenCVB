@@ -5,17 +5,17 @@ Namespace VBClasses
         Public mats As New Mat_4Click
         Dim firstThird As Integer, lastThird As Integer
         Public Sub New()
-            task.gOptions.setHistogramBins(255)
+            atask.gOptions.setHistogramBins(255)
             labels = {"", "", "Image separated into three segments from darkest to lightest and 'Other' (between)", "Histogram Of grayscale image"}
             desc = "Split an image into 3 parts - darkest, lightest, and in-between (2)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim bins = task.histogramBins
+            Dim bins = atask.histogramBins
 
-            If task.heartBeat Then
+            If atask.heartBeat Then
                 firstThird = 0
                 lastThird = 0
-                hist.Run(task.gray)
+                hist.Run(atask.gray)
                 dst3 = hist.dst2
 
                 Dim histogram = hist.histArray
@@ -35,13 +35,13 @@ Namespace VBClasses
             End If
 
             Dim offset = firstThird / bins * dst3.Width
-            dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, task.lineWidth, task.lineWidth)
+            dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, atask.lineWidth, atask.lineWidth)
             offset = lastThird / bins * dst3.Width
-            dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, task.lineWidth, task.lineWidth)
+            dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, atask.lineWidth, atask.lineWidth)
 
-            mats.mat(0) = task.gray.InRange(0, firstThird - 1)         ' darkest
-            mats.mat(1) = task.gray.InRange(lastThird, 255)            ' lightest
-            mats.mat(2) = task.gray.InRange(firstThird, lastThird - 1) ' other
+            mats.mat(0) = atask.gray.InRange(0, firstThird - 1)         ' darkest
+            mats.mat(1) = atask.gray.InRange(lastThird, 255)            ' lightest
+            mats.mat(2) = atask.gray.InRange(firstThird, lastThird - 1) ' other
 
             If standaloneTest() Then
                 mats.Run(emptyMat)
@@ -66,9 +66,9 @@ Namespace VBClasses
             desc = "Use kmeans with each of the 3-way split images"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bin3.Run(task.gray)
+            bin3.Run(atask.gray)
 
-            kmeans.Run(task.gray)
+            kmeans.Run(atask.gray)
             For i = 0 To 2
                 mats.mat(i).SetTo(0)
                 kmeans.dst3.CopyTo(mats.mat(i), bin3.mats.mat(i))

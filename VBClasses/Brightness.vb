@@ -65,7 +65,7 @@ Namespace VBClasses
             dst2 = bright.dst2
 
             Dim meanVals As New List(Of Single)
-            For Each r In task.gridRects
+            For Each r In atask.gridRects
                 meanVals.Add(dst2(r).Mean()(0))
             Next
 
@@ -74,7 +74,7 @@ Namespace VBClasses
                 Dim nextVal = alphaSlider.value - 10
                 If nextVal > 0 Then alphaSlider.value = nextVal
             End If
-            brightRect = task.gridRects(meanVals.IndexOf(max))
+            brightRect = atask.gridRects(meanVals.IndexOf(max))
             If standaloneTest() Then
                 dst3.SetTo(0)
                 dst2(brightRect).CopyTo(dst3(brightRect))

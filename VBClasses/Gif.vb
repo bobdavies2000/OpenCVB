@@ -16,7 +16,7 @@ Namespace VBClasses
             desc = "Create a GIF file by clicking on the checkbox when dst2 is to be used."
         End Sub
         Private Sub clearTempDir()
-            Dim imgDir As New DirectoryInfo(task.homeDir + "Temp")
+            Dim imgDir As New DirectoryInfo(atask.homeDir + "Temp")
             If imgDir.Exists = False Then imgDir.Create()
             Dim imgList As FileInfo() = imgDir.GetFiles("*.bmp")
 
@@ -24,7 +24,7 @@ Namespace VBClasses
                 For Each imgFile In imgList
                     My.Computer.FileSystem.DeleteFile(imgFile.FullName)
                 Next
-                Dim gifFile As New FileInfo(task.homeDir + "Temp\myGif.gif")
+                Dim gifFile As New FileInfo(atask.homeDir + "Temp\myGif.gif")
                 If gifFile.Exists Then My.Computer.FileSystem.DeleteFile(gifFile.FullName)
             End If
         End Sub
@@ -34,13 +34,13 @@ Namespace VBClasses
             dst2 = src
 
             If options.restartRequest Then
-                task.gifImages.Clear()
+                atask.gifImages.Clear()
                 clearTempDir()
             End If
 
-            task.optionsChanged = False ' trying to reduce the impact of options changing on the active algorithm
+            atask.optionsChanged = False ' trying to reduce the impact of options changing on the active algorithm
 
-            labels(2) = "Images captured: " + CStr(task.gifImages.Count)
+            labels(2) = "Images captured: " + CStr(atask.gifImages.Count)
             SetTrueText("Gif_Basics is typically called from VB_Task to create the .gif file." + vbCrLf +
                         "The snapshots that are input to GifBuilder are created in TaskParent.vb (see GifCreator)", 3)
         End Sub
@@ -87,47 +87,47 @@ Namespace VBClasses
             Static snapCheck = OptionParent.FindCheckBox("Step 1: Check this box when ready to capture the desired snapshot.")
             If snapCheck.checked Then
                 Dim nextBMP As Bitmap = Nothing
-                Select Case task.gifCaptureIndex
+                Select Case atask.gifCaptureIndex
                     Case gifTypes.gifdst0
-                        If task.gOptions.CrossHairs.Checked Then Gravity_Basics.showVectors(task.color)
-                        Dim dst = If(task.gOptions.displayDst0.Checked, dst0, task.color)
+                        If atask.gOptions.CrossHairs.Checked Then Gravity_Basics.showVectors(atask.color)
+                        Dim dst = If(atask.gOptions.displayDst0.Checked, dst0, atask.color)
                         If dst.Channels() = 1 Then
                             dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                         End If
                         nextBMP = New Bitmap(dst.Width, dst.Height, Imaging.PixelFormat.Format24bppRgb)
                         cvext.BitmapConverter.ToBitmap(dst, nextBMP)
                     Case gifTypes.gifdst1
-                        Dim dst = If(task.gOptions.displayDst1.Checked, dst1, task.depthRGB)
+                        Dim dst = If(atask.gOptions.displayDst1.Checked, dst1, atask.depthRGB)
                         If dst.Channels() = 1 Then
                             dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                         End If
                         nextBMP = New Bitmap(dst.Width, dst.Height, Imaging.PixelFormat.Format24bppRgb)
                         cvext.BitmapConverter.ToBitmap(dst, nextBMP)
                     Case gifTypes.gifdst2
-                        If task.gOptions.ShowGrid.Checked Then task.dstList(2).SetTo(cv.Scalar.White, task.gridMask)
-                        If task.dstList(2).Channels() = 1 Then
-                            task.dstList(2) = task.dstList(2).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                        If atask.gOptions.ShowGrid.Checked Then atask.dstList(2).SetTo(cv.Scalar.White, atask.gridMask)
+                        If atask.dstList(2).Channels() = 1 Then
+                            atask.dstList(2) = atask.dstList(2).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                         End If
-                        nextBMP = New Bitmap(task.workRes.Width, task.workRes.Height, Imaging.PixelFormat.Format24bppRgb)
-                        cvext.BitmapConverter.ToBitmap(task.dstList(2), nextBMP)
+                        nextBMP = New Bitmap(atask.workRes.Width, atask.workRes.Height, Imaging.PixelFormat.Format24bppRgb)
+                        cvext.BitmapConverter.ToBitmap(atask.dstList(2), nextBMP)
                     Case gifTypes.gifdst3
-                        If task.dstList(3).Channels() = 1 Then
-                            task.dstList(3) = task.dstList(3).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                        If atask.dstList(3).Channels() = 1 Then
+                            atask.dstList(3) = atask.dstList(3).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                         End If
-                        nextBMP = New Bitmap(task.workRes.Width, task.workRes.Height, Imaging.PixelFormat.Format24bppRgb)
-                        cvext.BitmapConverter.ToBitmap(task.dstList(3), nextBMP)
+                        nextBMP = New Bitmap(atask.workRes.Width, atask.workRes.Height, Imaging.PixelFormat.Format24bppRgb)
+                        cvext.BitmapConverter.ToBitmap(atask.dstList(3), nextBMP)
                     Case gifTypes.openCVBwindow
-                        Dim r = New cv.Rect(0, 0, task.Settings.MainFormWidth - 20, task.Settings.MainFormHeight - 40)
+                        Dim r = New cv.Rect(0, 0, atask.Settings.MainFormWidth - 20, atask.Settings.MainFormHeight - 40)
                         nextBMP = New Bitmap(r.Width, r.Height, Imaging.PixelFormat.Format24bppRgb)
-                        Dim snapshot As Bitmap = GetWindowImage(task.main_hwnd, r)
+                        Dim snapshot As Bitmap = GetWindowImage(atask.main_hwnd, r)
                         Dim snap = cvext.BitmapConverter.ToMat(snapshot)
                         snap = snap.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
                         cvext.BitmapConverter.ToBitmap(snap, nextBMP)
                     Case gifTypes.openGLwindow
-                        Dim r = New Rectangle(0, 0, task.sharpGL.Width, task.sharpGL.Height)
+                        Dim r = New Rectangle(0, 0, atask.sharpGL.Width, atask.sharpGL.Height)
                         nextBMP = New Bitmap(r.Width, r.Height, Imaging.PixelFormat.Format32bppArgb)
                         Dim snapshot As Bitmap = New Bitmap(r.Width, r.Height, Imaging.PixelFormat.Format32bppArgb)
-                        task.sharpGL.DrawToBitmap(snapshot, r)
+                        atask.sharpGL.DrawToBitmap(snapshot, r)
                         Dim snap = cvext.BitmapConverter.ToMat(snapshot)
                         cvext.BitmapConverter.ToBitmap(snap, nextBMP)
                     Case gifTypes.EntireScreen
@@ -137,7 +137,7 @@ Namespace VBClasses
                         ' snap = snap.Resize(New cv.Size(snap.Width / 3, snap.Height / 3))
                         cvext.BitmapConverter.ToBitmap(snap, nextBMP)
                 End Select
-                task.gifImages.Add(nextBMP)
+                atask.gifImages.Add(nextBMP)
                 snapCheck.checked = False
             End If
         End Sub
@@ -147,9 +147,9 @@ Namespace VBClasses
 
             gifC.Run(dst2)
 
-            labels(2) = "Images captured: " + CStr(task.gifImages.Count)
+            labels(2) = "Images captured: " + CStr(atask.gifImages.Count)
             labels(3) = "After 'Build GIF file...' was clicked, resulting gif will be in '" +
-                    task.homeDir + "/temp/myGIF.gif'"
+                    atask.homeDir + "/temp/myGIF.gif'"
         End Sub
     End Class
 End Namespace

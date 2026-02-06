@@ -60,8 +60,8 @@ Namespace VBClasses
         Dim mats As New Mat_4to1
         Dim options As New Options_ThresholdDef
         Public Sub New()
-            If standalone Then task.gOptions.displayDst0.Checked = True
-            If standalone Then task.gOptions.displayDst1.Checked = True
+            If standalone Then atask.gOptions.displayDst0.Checked = True
+            If standalone Then atask.gOptions.displayDst1.Checked = True
             labels = {"Gradient input (from Gradient_Basics)", "Binary threshold output of Gradient input at left", "Clockwise: binaryInv, Trunc, ToZero, ToZeroInv", "Current selection"}
             desc = "Demonstrate BinaryInv, Trunc, ToZero, and ToZero_Inv threshold methods"
         End Sub

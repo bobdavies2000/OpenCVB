@@ -7,7 +7,7 @@ Public Class OptionsFeatures
                                        "KMeans_Basics", "LUT_Basics", "Reduction_Basics",
                                        "PCA_NColor_CPP", "MeanSubtraction_Gray"}
     Private Sub OptionsFeatures_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.MdiParent = task.allOptions
+        Me.MdiParent = atask.allOptions
         Me.Left = 0
         Me.Top = 0
 
@@ -30,14 +30,14 @@ Public Class OptionsFeatures
         EdgeMethods.Items.Add("Scharr")
         EdgeMethods.Items.Add("Sobel")
         EdgeMethods.SelectedItem() = "Canny"
-        task.edgeMethod = "Canny"
+        atask.edgeMethod = "Canny"
 
         MatchCorrSlider.Value = 95
 
-        ReDim grayCheckbox(task.filterBasics.grayFilter.filterList.Count - 1)
-        For i = 0 To task.filterBasics.grayFilter.filterList.Count - 1
+        ReDim grayCheckbox(atask.filterBasics.grayFilter.filterList.Count - 1)
+        For i = 0 To atask.filterBasics.grayFilter.filterList.Count - 1
             Dim cb As New RadioButton
-            cb.Text = task.filterBasics.grayFilter.filterList(i)
+            cb.Text = atask.filterBasics.grayFilter.filterList(i)
             cb.Location = New Point(20, 20 + i * 20)
             cb.AutoSize = True
             cb.Tag = i
@@ -47,10 +47,10 @@ Public Class OptionsFeatures
         Next
         grayCheckbox(0).Checked = True
 
-        ReDim colorCheckbox(task.filterBasics.filterList.Count - 1)
-        For i = 0 To task.filterBasics.filterList.Count - 1
+        ReDim colorCheckbox(atask.filterBasics.filterList.Count - 1)
+        For i = 0 To atask.filterBasics.filterList.Count - 1
             Dim cb As New RadioButton
-            cb.Text = task.filterBasics.filterList(i)
+            cb.Text = atask.filterBasics.filterList(i)
             cb.Location = New Point(20, 20 + i * 20)
             cb.AutoSize = True
             cb.Tag = i
@@ -66,10 +66,10 @@ Public Class OptionsFeatures
         Next
         Color8USource.SelectedItem = "Reduction_Basics"
 
-        Select Case task.workRes.Width
+        Select Case atask.workRes.Width
             Case 1920
                 MotionPixelSlider.Value = 400
-                task.colorDiffThreshold = 50
+                atask.colorDiffThreshold = 50
             Case 1280
                 ColorDiffSlider.Value = 40
                 MotionPixelSlider.Value = 100
@@ -94,45 +94,45 @@ Public Class OptionsFeatures
 
 
     Private Sub CheckBox_CheckedChanged(sender As Object, e As EventArgs)
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub FeatureMethod_SelectedIndexChanged(sender As Object, e As EventArgs) Handles FeatureMethod.SelectedIndexChanged
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
     Private Sub verticalRadio_CheckedChanged(sender As Object, e As EventArgs)
-        task.verticalLines = True
+        atask.verticalLines = True
     End Sub
     Private Sub HorizRadio_CheckedChanged(sender As Object, e As EventArgs)
-        task.verticalLines = False
+        atask.verticalLines = False
     End Sub
     Private Sub EdgeMethods_SelectedIndexChanged(sender As Object, e As EventArgs) Handles EdgeMethods.SelectedIndexChanged
-        task.edgeMethod = EdgeMethods.Text
-        task.optionsChanged = True
+        atask.edgeMethod = EdgeMethods.Text
+        atask.optionsChanged = True
     End Sub
 
 
 
     Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles MatchCorrSlider.ValueChanged
-        task.fCorrThreshold = MatchCorrSlider.Value / 100
-        task.optionsChanged = True
-        FeatureCorrelationLabel.Text = Format(task.fCorrThreshold, fmt2)
+        atask.fCorrThreshold = MatchCorrSlider.Value / 100
+        atask.optionsChanged = True
+        FeatureCorrelationLabel.Text = Format(atask.fCorrThreshold, fmt2)
     End Sub
     Private Sub FeatureSampleSize_ValueChanged(sender As Object, e As EventArgs) Handles FeatureSampleSize.ValueChanged
-        task.FeatureSampleSize = FeatureSampleSize.Value
-        task.optionsChanged = True
-        FeatureSampleSizeLabel.Text = CStr(task.FeatureSampleSize)
+        atask.FeatureSampleSize = FeatureSampleSize.Value
+        atask.optionsChanged = True
+        FeatureSampleSizeLabel.Text = CStr(atask.FeatureSampleSize)
     End Sub
     Private Sub ColorDiffSlider_ValueChanged(sender As Object, e As EventArgs) Handles ColorDiffSlider.ValueChanged
-        task.colorDiffThreshold = ColorDiffSlider.Value
-        task.optionsChanged = True
-        ColorDiffLabel.Text = CStr(task.colorDiffThreshold)
+        atask.colorDiffThreshold = ColorDiffSlider.Value
+        atask.optionsChanged = True
+        ColorDiffLabel.Text = CStr(atask.colorDiffThreshold)
     End Sub
     Private Sub MotionPixelSlider_ValueChanged(sender As Object, e As EventArgs) Handles MotionPixelSlider.ValueChanged
-        task.motionThreshold = MotionPixelSlider.Value
-        task.optionsChanged = True
-        MotionPixelLabel1.Text = CStr(task.motionThreshold)
+        atask.motionThreshold = MotionPixelSlider.Value
+        atask.optionsChanged = True
+        MotionPixelLabel1.Text = CStr(atask.motionThreshold)
     End Sub
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles Color8USource.SelectedIndexChanged
-        task.optionsChanged = True
+        atask.optionsChanged = True
     End Sub
 End Class

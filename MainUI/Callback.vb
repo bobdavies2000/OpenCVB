@@ -38,9 +38,9 @@ Namespace MainApp
         Private Sub Camera_FrameReady(sender As GenericCamera)
             ' Check if camera is still valid (might be Nothing during shutdown)
             If camera Is Nothing OrElse Not camera.isCapturing Then Exit Sub
-            If task Is Nothing Then Exit Sub
+            If atask Is Nothing Then Exit Sub
 
-            If task.readyForCameraInput = False Then Exit Sub
+            If atask.readyForCameraInput = False Then Exit Sub
             Static lastPaintTime As DateTime = Now
 
             If camera.frameProcessed = False Then Exit Sub
@@ -48,8 +48,8 @@ Namespace MainApp
 
             Me.BeginInvoke(Sub()
                                Try
-                                   If task Is Nothing Then Exit Sub
-                                   task.testAllRunning = testAllRunning
+                                   If atask Is Nothing Then Exit Sub
+                                   atask.testAllRunning = testAllRunning
 
                                    ' The testall timer will occasionally not get called after running test all overnight.
                                    ' The cause can be too many GDI or User Objects created and
@@ -58,53 +58,53 @@ Namespace MainApp
                                    ' But this doevents is intended to allow any shortfall to be addressed.
                                    If testAllRunning Then If camera.cameraFrameCount Mod 10 = 0 Then Application.DoEvents()
 
-                                   If task.cpu.algorithm_ms.Count = 0 Then task.cpu.startRun(settings.algorithm)
+                                   If atask.cpu.algorithm_ms.Count = 0 Then atask.cpu.startRun(settings.algorithm)
 
-                                   task.cpu.algorithmTimes(1) = Now
+                                   atask.cpu.algorithmTimes(1) = Now
 
-                                   Dim elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - task.cpu.algorithmTimes(0).Ticks
+                                   Dim elapsedWaitTicks = atask.cpu.algorithmTimes(1).Ticks - atask.cpu.algorithmTimes(0).Ticks
                                    Dim spanWait = New TimeSpan(elapsedWaitTicks)
-                                   task.cpu.algorithm_ms(0) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
+                                   atask.cpu.algorithm_ms(0) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                                   task.cpu.algorithmTimes(0) = task.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
+                                   atask.cpu.algorithmTimes(0) = atask.cpu.algorithmTimes(1)  ' start time algorithm = end time wait.
 
                                    SyncLock camera.cameraMutex
-                                       camera.color.CopyTo(task.color)
-                                       camera.pointCloud.CopyTo(task.pointCloud)
-                                       camera.leftView.CopyTo(task.leftView)
-                                       camera.rightView.CopyTo(task.rightView)
-                                       task.IMU_Acceleration = camera.IMU_Acceleration
-                                       task.IMU_FrameTime = camera.IMU_FrameTime
-                                       task.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
-                                       task.IMU_AngularVelocity = camera.IMU_AngularVelocity
+                                       camera.color.CopyTo(atask.color)
+                                       camera.pointCloud.CopyTo(atask.pointCloud)
+                                       camera.leftView.CopyTo(atask.leftView)
+                                       camera.rightView.CopyTo(atask.rightView)
+                                       atask.IMU_Acceleration = camera.IMU_Acceleration
+                                       atask.IMU_FrameTime = camera.IMU_FrameTime
+                                       atask.IMU_AngularAcceleration = camera.IMU_AngularAcceleration
+                                       atask.IMU_AngularVelocity = camera.IMU_AngularVelocity
                                    End SyncLock
 
-                                   task.RunAlgorithm()
+                                   atask.RunAlgorithm()
 
-                                   task.cpu.algorithmTimes(1) = Now
+                                   atask.cpu.algorithmTimes(1) = Now
 
-                                   elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - task.cpu.algorithmTimes(0).Ticks
+                                   elapsedWaitTicks = atask.cpu.algorithmTimes(1).Ticks - atask.cpu.algorithmTimes(0).Ticks
 
                                    spanWait = New TimeSpan(elapsedWaitTicks)
-                                   task.cpu.algorithm_ms(1) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
+                                   atask.cpu.algorithm_ms(1) += spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                                   task.cpu.algorithmTimes(0) = task.cpu.algorithmTimes(1) ' start time wait = end time algorithm
+                                   atask.cpu.algorithmTimes(0) = atask.cpu.algorithmTimes(1) ' start time wait = end time algorithm
 
-                                   task.mouseClickFlag = False
-                                   task.frameCount += 1
+                                   atask.mouseClickFlag = False
+                                   atask.frameCount += 1
 
-                                   elapsedWaitTicks = task.cpu.algorithmTimes(1).Ticks - lastPaintTime.Ticks
+                                   elapsedWaitTicks = atask.cpu.algorithmTimes(1).Ticks - lastPaintTime.Ticks
                                    spanWait = New TimeSpan(elapsedWaitTicks)
                                    Dim msSinceLastPaint = spanWait.Ticks / TimeSpan.TicksPerMillisecond
 
-                                   Dim threshold = 1000 / task.Settings.FPSPaintTarget
+                                   Dim threshold = 1000 / atask.Settings.FPSPaintTarget
 
                                    If msSinceLastPaint > threshold Then
-                                       lastPaintTime = task.cpu.algorithmTimes(1)
+                                       lastPaintTime = atask.cpu.algorithmTimes(1)
                                        Dim tmp As cv.Mat
                                        For i = 0 To pics.Count - 1
-                                           tmp = task.dstList(i).Clone
-                                           tmp.Rectangle(task.drawRect, cv.Scalar.White, 1)
+                                           tmp = atask.dstList(i).Clone
+                                           tmp.Rectangle(atask.drawRect, cv.Scalar.White, 1)
                                            tmp = tmp.Resize(New cv.Size(settings.displayRes.Width, settings.displayRes.Height))
                                            If pics(i).Image IsNot Nothing Then pics(i).Image.Dispose()
                                            pics(i).Image = cvext.BitmapConverter.ToBitmap(tmp)

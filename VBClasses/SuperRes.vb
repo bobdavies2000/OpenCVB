@@ -72,7 +72,7 @@ Namespace VBClasses
         Public video As New Video_Basics
         Public inputFileName As String
         Public Sub New()
-            video.options.fileInfo = New FileInfo(task.homeDir + "Data/testdata_superres_car.avi")
+            video.options.fileInfo = New FileInfo(atask.homeDir + "Data/testdata_superres_car.avi")
             inputFileName = video.options.fileInfo.FullName
             desc = "Input data for the superres testing"
         End Sub
@@ -95,11 +95,11 @@ Namespace VBClasses
         Dim zoom As New Pixel_SubPixel
         Dim video As New SuperRes_Input
         Public Sub New()
-            If standalone Then task.gOptions.displaydst1.checked = True
+            If standalone Then atask.gOptions.displaydst1.checked = True
             desc = "Is SuperRes better than just zoom with sub-pixel accuracy?"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            task.mouseMovePoint = New cv.Point(45, 60)
+            atask.mouseMovePoint = New cv.Point(45, 60)
             video.Run(src)
             If video.video.captureVideo.PosFrames > 30 Then Exit Sub
             dst1 = video.dst2

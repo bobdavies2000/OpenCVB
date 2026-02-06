@@ -10,15 +10,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            If task.firstPass Then lastFrame.SetTo(0)
+            If atask.firstPass Then lastFrame.SetTo(0)
 
             cv.Cv2.Absdiff(src, lastFrame, dst3)
-            dst2 = dst3.Threshold(task.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
+            dst2 = dst3.Threshold(atask.colorDiffThreshold, 255, cv.ThresholdTypes.Binary)
             changedPixels = dst2.CountNonZero
             If changedPixels > 0 Then
                 lastFrame = src.Clone
                 strOut = "Motion detected - " + CStr(changedPixels) + " pixels changed with threshold " +
-                          CStr(task.colorDiffThreshold)
+                          CStr(atask.colorDiffThreshold)
             End If
         End Sub
     End Class
@@ -35,7 +35,7 @@ Namespace VBClasses
             desc = "Use Diff_Basics with a color image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If task.firstPass Then diff.lastFrame = src.Reshape(1, src.Rows * 3)
+            If atask.firstPass Then diff.lastFrame = src.Reshape(1, src.Rows * 3)
             diff.Run(src.Reshape(1, src.Rows * 3))
             dst2 = diff.dst2.Reshape(3, src.Rows)
             dst3 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -56,7 +56,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             diff.Run(src)
             Dim unstableGray = diff.dst2.Clone()
-            depth.Run(task.depthRGB)
+            depth.Run(atask.depthRGB)
             Dim unstableDepth As New cv.Mat
             Dim mask As New cv.Mat
             unstableDepth = Not depth.dst3
@@ -85,11 +85,11 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If task.optionsChanged Then history.Clear()
+            If atask.optionsChanged Then history.Clear()
 
             diff.Run(src)
             history.Add(diff.dst2)
-            If history.Count > task.frameHistoryCount Then history.RemoveAt(0)
+            If history.Count > atask.frameHistoryCount Then history.RemoveAt(0)
 
             dst2.SetTo(0)
             For Each m In history
@@ -114,9 +114,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2).Clone
+            If src.Type <> cv.MatType.CV_32F Then src = atask.pcSplit(2).Clone
 
-            If task.optionsChanged Or lastDepth32f Is Nothing Then lastDepth32f = task.pcSplit(2).Clone
+            If atask.optionsChanged Or lastDepth32f Is Nothing Then lastDepth32f = atask.pcSplit(2).Clone
 
             cv.Cv2.Absdiff(src, lastDepth32f, dst1)
             Dim mm As mmData = GetMinMax(dst1)
@@ -124,10 +124,10 @@ Namespace VBClasses
             dst2 = dst1.Threshold(options.meters, 255, cv.ThresholdTypes.Binary)
 
             lastDepth32f = src.Clone
-            If task.heartBeat Then
+            If atask.heartBeat Then
                 labels(2) = "Mask where depth difference between frames is more than " + CStr(options.millimeters) + " mm's"
                 Dim count = dst2.CountNonZero()
-                labels(3) = CStr(count) + " pixels (" + Format(count / task.depthmask.CountNonZero, "0%") +
+                labels(3) = CStr(count) + " pixels (" + Format(count / atask.depthmask.CountNonZero, "0%") +
                         " of all depth pixels) were different by more than " + CStr(options.millimeters) + " mm's"
             End If
         End Sub
@@ -151,9 +151,9 @@ Namespace VBClasses
             dst2 = diffColor.dst2
             If diffColor.diff.changedPixels = 0 Then noMotionFrames += 1
 
-            If task.heartBeat Then
+            If atask.heartBeat Then
                 labels(2) = CStr(noMotionFrames) + " frames since the last heartbeat with no motion " +
-                        " or " + Format(noMotionFrames / task.fpsAlgorithm, "0%")
+                        " or " + Format(noMotionFrames / atask.fpsAlgorithm, "0%")
                 flowText.Add(labels(2))
                 noMotionFrames = 0
                 If flowText.Count > 20 Then flowText.RemoveAt(0)
@@ -191,9 +191,9 @@ Namespace VBClasses
             Next
 
             dst2 = dst2.Threshold(2, 255, cv.ThresholdTypes.Binary)
-            dst3 = task.motionRGB.dst2
+            dst3 = atask.motionRGB.dst2
 
-            If task.heartBeat Then
+            If atask.heartBeat Then
                 labels(2) = "Diff of RGB.split has " + CStr(dst2.CountNonZero) + " while gray has " + CStr(dst3.CountNonZero)
             End If
         End Sub

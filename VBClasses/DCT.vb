@@ -10,7 +10,7 @@ Namespace VBClasses
             options.Run()
 
             Dim src32f As New cv.Mat
-            task.gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
+            atask.gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
 
             Dim frequencies As New cv.Mat
             cv.Cv2.Dct(src32f, frequencies, options.removeFrequency)
@@ -22,7 +22,7 @@ Namespace VBClasses
             cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
             src32f.ConvertTo(dst2, cv.MatType.CV_8UC1, 255)
 
-            cv.Cv2.Subtract(task.gray, dst2, dst3)
+            cv.Cv2.Subtract(atask.gray, dst2, dst3)
         End Sub
     End Class
 
@@ -74,7 +74,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim frequencies As New cv.Mat
             Dim src32f As New cv.Mat
-            task.gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
+            atask.gray.ConvertTo(src32f, cv.MatType.CV_32F, 1 / 255)
             cv.Cv2.Dct(src32f, frequencies, dct.options.dctFlag)
 
             Dim roi As New cv.Rect(0, 0, dct.options.removeFrequency, src32f.Height)
@@ -84,7 +84,7 @@ Namespace VBClasses
             cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
             src32f.ConvertTo(dst2, cv.MatType.CV_8UC1, 255)
 
-            cv.Cv2.Subtract(task.gray, dst2, dst3)
+            cv.Cv2.Subtract(atask.gray, dst2, dst3)
         End Sub
     End Class
 
@@ -142,43 +142,43 @@ Namespace VBClasses
         Public Sub New()
             flow.parentData = Me
             labels = {"", "", "Stats on the largest region below DCT threshold", "Various views of regions with DCT below threshold"}
-            If standalone Then task.gOptions.displayDst0.Checked = False
+            If standalone Then atask.gOptions.displayDst0.Checked = False
             desc = "Find plane equation for a featureless surface - debugging one region for now."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            ' If task.heartBeat Then flow.msgs.Clear()
+            ' If atask.heartBeat Then flow.msgs.Clear()
 
             mats.mat(0) = src.Clone
-            mats.mat(0).SetTo(white, task.gridMask)
+            mats.mat(0).SetTo(white, atask.gridMask)
 
             dct.Run(src)
             mats.mat(1) = dct.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Clone()
             mats.mat(2) = dct.dst3.Clone()
 
             Dim mask = dct.dst2.Clone() ' result1 contains the DCT mask of featureless surfaces.
-            task.pcSplit(2).SetTo(0, Not mask) ' remove non-featureless surface depth data.
+            atask.pcSplit(2).SetTo(0, Not mask) ' remove non-featureless surface depth data.
 
             ' find the most featureless roi
             Dim maxIndex As Integer
-            Dim grCounts(task.gridRects.Count - 1)
-            For i = 0 To task.gridRects.Count - 1
-                grCounts(i) = mask(task.gridRects(i)).CountNonZero
+            Dim grCounts(atask.gridRects.Count - 1)
+            For i = 0 To atask.gridRects.Count - 1
+                grCounts(i) = mask(atask.gridRects(i)).CountNonZero
                 If grCounts(i) > grCounts(maxIndex) Then maxIndex = i
             Next
 
             mats.mat(3) = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
-            src(task.gridRects(maxIndex)).CopyTo(mats.mat(3)(task.gridRects(maxIndex)), mask(task.gridRects(maxIndex)))
+            src(atask.gridRects(maxIndex)).CopyTo(mats.mat(3)(atask.gridRects(maxIndex)), mask(atask.gridRects(maxIndex)))
             mats.Run(emptyMat)
             dst3 = mats.dst2
 
-            Dim gr = task.gridRects(maxIndex) ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
-            If gr.X = task.gridRects(maxIndex).X And gr.Y = task.gridRects(maxIndex).Y Then
+            Dim gr = atask.gridRects(maxIndex) ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
+            If gr.X = atask.gridRects(maxIndex).X And gr.Y = atask.gridRects(maxIndex).Y Then
                 If grCounts(maxIndex) > gr.Width * gr.Height / 4 Then
                     Dim fitPoints As New List(Of cv.Point3f)
                     Dim minDepth = Single.MaxValue, maxDepth = Single.MinValue
                     For j = 0 To gr.Height - 1
                         For i = 0 To gr.Width - 1
-                            Dim nextD = task.pcSplit(2)(gr).Get(Of Single)(j, i)
+                            Dim nextD = atask.pcSplit(2)(gr).Get(Of Single)(j, i)
                             If nextD <> 0 Then
                                 If minDepth > nextD Then minDepth = nextD
                                 If maxDepth < nextD Then maxDepth = nextD
