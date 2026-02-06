@@ -9,7 +9,7 @@ Namespace VBClasses
         Dim svm As cv.ML.SVM
         Public Sub New()
             desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
-            If standalone Then atask.gOptions.GridSlider.Value = 8
+            If standalone Then taskA.gOptions.GridSlider.Value = 8
             labels = {"", "", "SVM_Basics input data", "Results - white line is ground truth"}
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -26,14 +26,14 @@ Namespace VBClasses
             Dim resMat = cv.Mat.FromPixelData(options.sampleCount, 1, cv.MatType.CV_32SC1, response.ToArray)
             dataMat *= 1 / src.Height
 
-            If atask.optionsChanged Then
+            If taskA.optionsChanged Then
                 If svm IsNot Nothing Then svm.Dispose()
                 svm = options.createSVM()
             End If
             svm.Train(dataMat, cv.ML.SampleTypes.RowSample, resMat)
 
             dst3.SetTo(0)
-            For Each roi In atask.gridRects
+            For Each roi In taskA.gridRects
                 If roi.X > src.Height Then Continue For ' working only with square - not rectangles.
                 Dim samples() As Single = {roi.X / src.Height, roi.Y / src.Height}
                 If svm.Predict(cv.Mat.FromPixelData(1, 2, cv.MatType.CV_32F, samples)) = 1 Then
@@ -120,7 +120,7 @@ Namespace VBClasses
             Dim labeled = 1
             Dim nonlabel = -1
 
-            If atask.heartBeat Then
+            If taskA.heartBeat Then
                 points.Clear()
                 responses.Clear()
                 For i = 0 To 4 - 1
@@ -133,7 +133,7 @@ Namespace VBClasses
             Dim labelsMat = cv.Mat.FromPixelData(4, 1, cv.MatType.CV_32SC1, responses.ToArray)
             Dim dataMat = trainMat * 1 / src.Height
 
-            If atask.optionsChanged Then
+            If taskA.optionsChanged Then
                 If svm IsNot Nothing Then svm.Dispose()
                 svm = options.createSVM()
             End If
@@ -146,15 +146,15 @@ Namespace VBClasses
                     sampleMat.Set(Of Single)(0, 1, y / src.Height)
                     Dim response = svm.Predict(sampleMat)
                     Dim color = If(response >= 0, cv.Scalar.Blue, cv.Scalar.Red)
-                    DrawCircle(dst3, New cv.Point(CInt(x), CInt(y)), atask.DotSize + 1, color)
+                    DrawCircle(dst3, New cv.Point(CInt(x), CInt(y)), taskA.DotSize + 1, color)
                 Next
             Next
 
             For i = 0 To trainMat.Rows - 1
                 Dim color = If(labelsMat.Get(Of Integer)(i) = 1, cv.Scalar.Blue, cv.Scalar.Red)
                 Dim pt = New cv.Point(trainMat.Get(Of Single)(i, 0), trainMat.Get(Of Single)(i, 1))
-                DrawCircle(dst2, pt, atask.DotSize + 2, color)
-                DrawCircle(dst3, pt, atask.DotSize + 2, color)
+                DrawCircle(dst2, pt, taskA.DotSize + 2, color)
+                DrawCircle(dst3, pt, taskA.DotSize + 2, color)
             Next
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
@@ -186,7 +186,7 @@ Namespace VBClasses
             Dim labeled = 1
             Dim nonlabel = -1
 
-            If atask.heartBeat Then
+            If taskA.heartBeat Then
                 points.Clear()
                 responses.Clear()
                 For i = 0 To 4 - 1
@@ -208,8 +208,8 @@ Namespace VBClasses
             dst2.SetTo(white)
             For i = 0 To svm.points.Count - 1
                 Dim color = If(svm.response(i) = 1, cv.Scalar.Blue, cv.Scalar.Red)
-                DrawCircle(dst2, svm.points(i), atask.DotSize, color)
-                DrawCircle(dst3, svm.points(i), atask.DotSize, color)
+                DrawCircle(dst2, svm.points(i), taskA.DotSize, color)
+                DrawCircle(dst3, svm.points(i), taskA.DotSize, color)
             Next
         End Sub
     End Class
@@ -225,14 +225,14 @@ Namespace VBClasses
         Dim blueCount As Integer
         Public Sub New()
             OptionParent.FindSlider("Granularity").Value = 15
-            atask.drawRect = New cv.Rect(dst2.Cols / 4, dst2.Rows / 4, dst2.Cols / 2, dst2.Rows / 2)
+            taskA.drawRect = New cv.Rect(dst2.Cols / 4, dst2.Rows / 4, dst2.Cols / 2, dst2.Rows / 2)
             labels(2) = "SVM Training data - draw a rectangle anywhere to test further."
             desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             svm.options.Run()
 
-            Dim rect = atask.drawRect
+            Dim rect = taskA.drawRect
             Dim contour As New List(Of cv.Point)
             contour.Clear()
             contour.Add(New cv.Point(rect.X, rect.Y))
@@ -248,7 +248,7 @@ Namespace VBClasses
                 rect.Width = width
             End If
 
-            If atask.heartBeat Then
+            If taskA.heartBeat Then
                 dst2.SetTo(0)
                 blueCount = 0
                 svm.points.Clear()
@@ -265,7 +265,7 @@ Namespace VBClasses
 
                     svm.response.Add(res)
                     If res > 0 Then blueCount += 1
-                    DrawCircle(dst2, pt, atask.DotSize, If(res = 1, cv.Scalar.Blue, cv.Scalar.Green))
+                    DrawCircle(dst2, pt, taskA.DotSize, If(res = 1, cv.Scalar.Blue, cv.Scalar.Green))
                 Next
 
                 svm.Run(src)

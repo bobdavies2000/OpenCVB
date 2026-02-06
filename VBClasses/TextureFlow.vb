@@ -34,7 +34,7 @@ Namespace VBClasses
             desc = "Display texture flow in the depth data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            flow.Run(atask.depthRGB)
+            flow.Run(taskA.depthRGB)
             dst2 = flow.dst2
         End Sub
     End Class
@@ -95,7 +95,7 @@ Namespace VBClasses
             desc = "Use the grid points as input to the texture flow algorithm"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bPoint.Run(atask.grayStable)
+            bPoint.Run(taskA.grayStable)
             dst3 = bPoint.dst3
 
             knn.trainInput.Clear()
@@ -106,8 +106,8 @@ Namespace VBClasses
             knn.Run(emptyMat)
 
             For i = 0 To knn.neighbors.Count - 1
-                dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(1)), 255, atask.lineWidth, atask.lineType)
-                dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(2)), 255, atask.lineWidth, atask.lineType)
+                dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(1)), 255, taskA.lineWidth, taskA.lineType)
+                dst3.Line(knn.trainInput(i), knn.trainInput(knn.neighbors(i)(2)), 255, taskA.lineWidth, taskA.lineType)
             Next
 
             flow.Run(dst3)

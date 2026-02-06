@@ -6,18 +6,18 @@ Namespace VBClasses
         Public trackbox As New cv.Rect
         Dim histogram As New cv.Mat
         Public Sub New()
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             labels(2) = "Draw anywhere to start mean shift tracking."
             desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim roi = If(atask.drawRect.Width > 0, atask.drawRect, New cv.Rect(0, 0, dst2.Width, dst2.Height))
+            Dim roi = If(taskA.drawRect.Width > 0, taskA.drawRect, New cv.Rect(0, 0, dst2.Width, dst2.Height))
             Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
             Dim ch() As Integer = {0, 1, 2}
             Dim hsize() As Integer = {16, 16, 16}
             Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180)}
-            If atask.optionsChanged Then
-                trackbox = atask.drawRect
+            If taskA.optionsChanged Then
+                trackbox = taskA.drawRect
                 Dim maskROI = hsv(roi).InRange(New cv.Scalar(0, 60, 32), New cv.Scalar(180, 255, 255))
                 cv.Cv2.CalcHist({hsv(roi)}, ch, maskROI, histogram, 1, hsize, ranges)
                 histogram = histogram.Normalize(0, 255, cv.NormTypes.MinMax)
@@ -26,7 +26,7 @@ Namespace VBClasses
             dst2 = src
             If trackbox.Width <> 0 Then
                 cv.Cv2.MeanShift(dst1, trackbox, cv.TermCriteria.Both(10, 1))
-                dst2.Rectangle(trackbox, cv.Scalar.Red, rectangleEdgeWidth, atask.lineType)
+                dst2.Rectangle(trackbox, cv.Scalar.Red, rectangleEdgeWidth, taskA.lineType)
                 dst3 = CamShift_Basics.Show_HSV_Hist(histogram)
                 dst3 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR)
             End If
@@ -43,7 +43,7 @@ Namespace VBClasses
             desc = "Use depth to start mean shift algorithm."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            meanShift.Run(atask.depthRGB)
+            meanShift.Run(taskA.depthRGB)
             dst2 = meanShift.dst2
             dst3 = meanShift.dst1
         End Sub

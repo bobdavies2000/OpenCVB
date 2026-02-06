@@ -20,12 +20,12 @@ Namespace VBClasses
             For i = 0 To lineCount
                 Dim p1 = New cv.Point(0, spacer * i)
                 Dim p2 = New cv.Point(dst.Width, spacer * i)
-                dst.Line(p1, p2, white, atask.cvFontThickness)
+                dst.Line(p1, p2, white, taskA.cvFontThickness)
                 Dim nextVal = (maxVal - spaceVal * i)
                 Dim nextText = If(maxVal > 1000, Format(nextVal / 1000, "###,##0.0") + "k", Format(nextVal, fmt2))
                 Dim p3 = New cv.Point(0, p1.Y + 12)
-                cv.Cv2.PutText(dst, nextText, p3, cv.HersheyFonts.HersheyPlain, atask.cvFontSize,
-                            white, atask.cvFontThickness, atask.lineType)
+                cv.Cv2.PutText(dst, nextText, p3, cv.HersheyFonts.HersheyPlain, taskA.cvFontSize,
+                            white, taskA.cvFontThickness, taskA.lineType)
             Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -56,20 +56,20 @@ Namespace VBClasses
             desc = "Show depth using OpenCV's plot format with variable bins."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32F Then src = atask.pcSplit(2)
-            'src.SetTo(atask.MaxZmeters, atask.maxDepthMask)
+            If src.Type <> cv.MatType.CV_32F Then src = taskA.pcSplit(2)
+            'src.SetTo(taskA.MaxZmeters, taskA.maxDepthMask)
 
             hist.Run(src)
             plotDepth.srcX.Clear()
             plotDepth.srcY.Clear()
-            For i = 0 To atask.histogramBins - 1
-                plotDepth.srcX.Add(i * atask.MaxZmeters / atask.histogramBins)
+            For i = 0 To taskA.histogramBins - 1
+                plotDepth.srcX.Add(i * taskA.MaxZmeters / taskA.histogramBins)
                 plotDepth.srcY.Add(hist.histogram.Get(Of Single)(i, 0))
             Next
             plotDepth.Run(src)
             dst2 = plotDepth.dst2
 
-            If atask.heartBeat Then labels(2) = plotDepth.labels(2)
+            If taskA.heartBeat Then labels(2) = plotDepth.labels(2)
             Dim Split = Regex.Split(labels(2), "\W+")
             Dim lineCount = CInt(Split(4))
             If lineCount > 0 Then
@@ -99,8 +99,8 @@ Namespace VBClasses
             If standaloneTest() Then
                 colorFmt.Run(src)
                 src = colorFmt.dst2
-                Dim bins = atask.histogramBins
-                cv.Cv2.CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, atask.rangesBGR)
+                Dim bins = taskA.histogramBins
+                cv.Cv2.CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, taskA.rangesBGR)
             End If
 
             dst2 = histogram.Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Nearest)
@@ -128,7 +128,7 @@ Namespace VBClasses
             desc = "Plot an input variable over time"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() Then plotData = atask.color.Mean(atask.depthmask)(0)
+            If standaloneTest() Then plotData = taskA.color.Mean(taskA.depthmask)(0)
 
             If inputList.Count >= dst2.Width Then inputList.RemoveAt(0)
             inputList.Add(plotData)
@@ -144,7 +144,7 @@ Namespace VBClasses
                 y *= dst2.Height - 1
                 Dim c As New cv.Point2f(i, y)
                 If c.X < 1 Then c.X = 1
-                dst2.Circle(c, atask.DotSize, blue, -1, atask.lineType)
+                dst2.Circle(c, taskA.DotSize, blue, -1, taskA.lineType)
             Next
 
             If inputList.Count > dst2.Width / 8 Then
@@ -159,13 +159,13 @@ Namespace VBClasses
                     End If
                     Dim pt = Choose(i + 1, New cv.Point(0, 10), New cv.Point(0, dst2.Height \ 2 - 5),
                                 New cv.Point(0, dst2.Height - 3))
-                    cv.Cv2.PutText(dst2, nextText, pt, cv.HersheyFonts.HersheyPlain, 0.7, white, 1, atask.lineType)
+                    cv.Cv2.PutText(dst2, nextText, pt, cv.HersheyFonts.HersheyPlain, 0.7, white, 1, taskA.lineType)
                 Next
             End If
 
             Dim p1 = New cv.Point(0, dst2.Height / 2)
             Dim p2 = New cv.Point(dst2.Width, dst2.Height / 2)
-            dst2.Line(p1, p2, white, atask.cvFontThickness)
+            dst2.Line(p1, p2, white, taskA.cvFontThickness)
             If standaloneTest() Then SetTrueText("standaloneTest() test is with the blue channel mean of the color image.", 3)
         End Sub
     End Class
@@ -190,7 +190,7 @@ Namespace VBClasses
             desc = "Plot the requested number of entries in the cv.scalar input"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standaloneTest() Then plotData = atask.color.Mean()
+            If standaloneTest() Then plotData = taskA.color.Mean()
 
             For i = 0 To Math.Min(plotCount, 4) - 1
                 plotList(i).plotData = plotData(i)
@@ -223,30 +223,30 @@ Namespace VBClasses
         Public controlScale As Boolean ' Use this to programmatically control the scale (rather than let the automated way below keep the scale.)
         Public Sub New()
             desc = "Plot an input variable over time"
-            Select Case atask.workRes.Width
+            Select Case taskA.workRes.Width
                 Case 1920
-                    atask.gOptions.LineWidth.Value = 10
+                    taskA.gOptions.LineWidth.Value = 10
                 Case 1280
-                    atask.gOptions.LineWidth.Value = 7
+                    taskA.gOptions.LineWidth.Value = 7
                 Case 640
-                    atask.gOptions.LineWidth.Value = 4
+                    taskA.gOptions.LineWidth.Value = 4
                 Case 320
-                    atask.gOptions.LineWidth.Value = 2
+                    taskA.gOptions.LineWidth.Value = 2
                 Case Else
-                    atask.gOptions.LineWidth.Value = 1
+                    taskA.gOptions.LineWidth.Value = 1
             End Select
-            atask.gOptions.DotSizeSlider.Value = atask.gOptions.LineWidth.Value
+            taskA.gOptions.DotSizeSlider.Value = taskA.gOptions.LineWidth.Value
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Const plotSeriesCount = 100
             lastXdelta.Add(plotData)
 
-            If columnIndex + atask.DotSize >= dst2.Width Then
+            If columnIndex + taskA.DotSize >= dst2.Width Then
                 dst2.ColRange(columnIndex, dst2.Width).SetTo(backColor)
                 columnIndex = 1
             End If
-            dst2.ColRange(columnIndex, columnIndex + atask.DotSize).SetTo(backColor)
-            If standaloneTest() Then plotData = atask.color.Mean()
+            dst2.ColRange(columnIndex, columnIndex + taskA.DotSize).SetTo(backColor)
+            If standaloneTest() Then plotData = taskA.color.Mean()
 
             For i = 0 To plotCount - 1
                 If Math.Floor(plotData(i)) < minScale Or Math.Ceiling(plotData(i)) > maxScale Then
@@ -257,7 +257,7 @@ Namespace VBClasses
 
             ' if enough points are off the charted area or if manually requested, then redo the scale.
             If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount And controlScale = False) Then
-                If Not atask.firstPass Then
+                If Not taskA.firstPass Then
                     maxScale = Integer.MinValue
                     minScale = Integer.MaxValue
                     For i = 0 To lastXdelta.Count - 1
@@ -278,17 +278,17 @@ Namespace VBClasses
             For i = 0 To plotCount - 1
                 Dim y = 1 - (plotData(i) - minScale) / (maxScale - minScale)
                 y *= dst2.Height - 1
-                Dim c As New cv.Point(columnIndex - atask.DotSize, y - atask.DotSize)
+                Dim c As New cv.Point(columnIndex - taskA.DotSize, y - taskA.DotSize)
                 If c.X < 1 Then c.X = 1
-                DrawCircle(dst2, c, atask.DotSize, plotColors(i))
+                DrawCircle(dst2, c, taskA.DotSize, plotColors(i))
             Next
 
 
-            If atask.heartBeat Then
+            If taskA.heartBeat Then
                 dst2.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), white, 1)
             End If
 
-            columnIndex += atask.DotSize
+            columnIndex += taskA.DotSize
             dst2.Col(columnIndex).SetTo(0)
             If standaloneTest() Then labels(2) = "RGB Means: blue = " + Format(plotData(0), fmt1) + " green = " + Format(plotData(1), fmt1) + " red = " + Format(plotData(2), fmt1)
             Dim lineCount = CInt(maxScale - minScale - 1)
@@ -318,19 +318,19 @@ Namespace VBClasses
         Public fixedScale As Boolean
         Public Sub New()
             desc = "Plot an input variable over time"
-            atask.gOptions.LineWidth.Value = 1
-            atask.gOptions.DotSizeSlider.Value = 2
+            taskA.gOptions.LineWidth.Value = 1
+            taskA.gOptions.DotSizeSlider.Value = 2
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Const plotSeriesCount = 100
             lastXdelta.Add(plotData)
 
-            If columnIndex + atask.DotSize >= dst2.Width Then
+            If columnIndex + taskA.DotSize >= dst2.Width Then
                 dst2.ColRange(columnIndex, dst2.Width).SetTo(backColor)
                 columnIndex = 1
             End If
-            dst2.ColRange(columnIndex, columnIndex + atask.DotSize).SetTo(backColor)
-            If standaloneTest() Then plotData = atask.color.Mean()
+            dst2.ColRange(columnIndex, columnIndex + taskA.DotSize).SetTo(backColor)
+            If standaloneTest() Then plotData = taskA.color.Mean()
 
             For i = 0 To plotCount - 1
                 If Math.Floor(plotData(i)) < minScale Or Math.Ceiling(plotData(i)) > maxScale Then
@@ -342,7 +342,7 @@ Namespace VBClasses
             If fixedScale = False Then
                 ' if enough points are off the charted area or if manually requested, then redo the scale.
                 If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount And controlScale = False) Then
-                    If Not atask.firstPass Then
+                    If Not taskA.firstPass Then
                         maxScale = Integer.MinValue
                         minScale = Integer.MaxValue
                         For i = 0 To lastXdelta.Count - 1
@@ -361,17 +361,17 @@ Namespace VBClasses
 
             If lastXdelta.Count >= plotSeriesCount Then lastXdelta.RemoveAt(0)
 
-            If atask.heartBeat Then
-                dst2.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), white, atask.lineWidth)
+            If taskA.heartBeat Then
+                dst2.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), white, taskA.lineWidth)
             End If
 
             For i = 0 To plotCount - 1
                 If plotData(i) <> 0 Then
                     Dim y = 1 - (plotData(i) - minScale) / (maxScale - minScale)
                     y *= dst2.Height - 1
-                    Dim c As New cv.Point(columnIndex - atask.DotSize, y - atask.DotSize)
+                    Dim c As New cv.Point(columnIndex - taskA.DotSize, y - taskA.DotSize)
                     If c.X < 1 Then c.X = 1
-                    DrawCircle(dst2, c, atask.DotSize, plotColors(i))
+                    DrawCircle(dst2, c, taskA.DotSize, plotColors(i))
                 End If
             Next
 
@@ -405,17 +405,17 @@ Namespace VBClasses
             desc = "Plot the beats to validate things are working."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            plot.plotData(0) = If(atask.heartBeat, 1, -1)
-            plot.plotData(1) = If(atask.midHeartBeat, 2, -1)
-            plot.plotData(2) = If(atask.quarterBeat, 3, -1)
-            plot.plotData(3) = If(atask.almostHeartBeat, 4, -1)
+            plot.plotData(0) = If(taskA.heartBeat, 1, -1)
+            plot.plotData(1) = If(taskA.midHeartBeat, 2, -1)
+            plot.plotData(2) = If(taskA.quarterBeat, 3, -1)
+            plot.plotData(3) = If(taskA.almostHeartBeat, 4, -1)
             plot.Run(src)
             dst2 = plot.dst2
 
-            strOut = "atask.heartBeat (blue) = " + CStr(plot.plotData(0)) + vbCrLf
-            strOut += "atask.midHeartBeat (green) = " + CStr(plot.plotData(1)) + vbCrLf
-            strOut += "atask.quarterBeat (red) = " + CStr(plot.plotData(2)) + vbCrLf
-            strOut += "atask.almostHeartBeat (white) = " + CStr(plot.plotData(3)) + vbCrLf
+            strOut = "taskA.heartBeat (blue) = " + CStr(plot.plotData(0)) + vbCrLf
+            strOut += "taskA.midHeartBeat (green) = " + CStr(plot.plotData(1)) + vbCrLf
+            strOut += "taskA.quarterBeat (red) = " + CStr(plot.plotData(2)) + vbCrLf
+            strOut += "taskA.almostHeartBeat (white) = " + CStr(plot.plotData(3)) + vbCrLf
             SetTrueText(strOut, 3)
         End Sub
     End Class
@@ -430,7 +430,7 @@ Namespace VBClasses
         Public srcX As New List(Of Double)
         Public srcY As New List(Of Double)
         Public Sub New()
-            For i = 0 To CInt(atask.MaxZmeters) ' something to plot if standaloneTest().
+            For i = 0 To CInt(taskA.MaxZmeters) ' something to plot if standaloneTest().
                 srcX.Add(i)
                 srcY.Add(i * i * i)
             Next
@@ -479,7 +479,7 @@ Namespace VBClasses
             If wipeSlate Then dst2.SetTo(0)
             For i = 0 To srcX.Count - 1
                 Dim pt = New cv.Point(dst2.Width * srcX(i) / maxX, dst2.Height - dst2.Height * srcY(i) / maxY)
-                DrawCircle(dst2, pt, atask.DotSize, plotColor)
+                DrawCircle(dst2, pt, taskA.DotSize, plotColor)
             Next
             labels(2) = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + ", y-axis: " + CStr(minY) + " to " + CStr(maxY)
         End Sub
@@ -511,14 +511,14 @@ Namespace VBClasses
             Dim min = minRange
             Dim max = maxRange
             If standaloneTest() Or createHistogram Then
-                If src.Channels() <> 1 Then src = atask.grayStable.Clone
+                If src.Channels() <> 1 Then src = taskA.grayStable.Clone
                 If minRange = 0 And maxRange = 0 Then
                     Dim mm = GetMinMax(src)
                     min = mm.minVal
                     max = mm.maxVal
                     If min = 0 And max = 0 Then
                         If src.Type = cv.MatType.CV_32F Then
-                            max = atask.MaxZmeters
+                            max = taskA.MaxZmeters
                         Else
                             max = 255
                         End If
@@ -527,7 +527,7 @@ Namespace VBClasses
                 If Single.IsNaN(min) Or Single.IsInfinity(min) Then min = Single.MinValue
                 If Single.IsNaN(max) Or Single.IsInfinity(max) Then max = Single.MaxValue
                 ranges = {New cv.Rangef(min, max)}
-                cv.Cv2.CalcHist({src}, {0}, histMask, histogram, 1, {atask.histogramBins}, ranges)
+                cv.Cv2.CalcHist({src}, {0}, histMask, histogram, 1, {taskA.histogramBins}, ranges)
             Else
                 histogram = src
             End If
@@ -562,7 +562,7 @@ Namespace VBClasses
                 Next
                 If addLabels Then Plot_Basics.AddPlotScale(dst2, mm.minVal, mm.maxVal)
             End If
-            If atask.heartBeat Then labels(2) = CStr(CInt(mm.maxVal)) + " max value " + CStr(CInt(mm.minVal)) + " min value"
+            If taskA.heartBeat Then labels(2) = CStr(CInt(mm.maxVal)) + " max value " + CStr(CInt(mm.minVal)) + " min value"
         End Sub
     End Class
 
@@ -573,7 +573,7 @@ Namespace VBClasses
         Public input As New List(Of cv.Point2d)
         Public output As New List(Of cv.Point)
         Public minX As Double = 0, maxX As Double = dst2.Width
-        Public minY As Double = -atask.xRange, maxY As Double = atask.xRange
+        Public minY As Double = -taskA.xRange, maxY As Double = taskA.xRange
         Public Sub New()
             For i = 0 To 50 ' something to plot if standaloneTest().
                 input.Add(New cv.Point2d(i, i * i * i))
@@ -589,7 +589,7 @@ Namespace VBClasses
                 Dim pt = New cv.Point(dst2.Width * (input(i).X - minX) \ (maxX - minX),
                                   dst2.Height - dst2.Height * (y - minY) \ (maxY - minY))
                 If pt.Y <> dst2.Height / 2 Then
-                    DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
+                    DrawCircle(dst2, pt, taskA.DotSize, taskA.highlight)
                     output.Add(pt)
                 Else
                     output.Add(newPoint)

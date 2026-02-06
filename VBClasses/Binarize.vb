@@ -20,10 +20,10 @@ Namespace VBClasses
             meanScalar = cv.Cv2.Mean(src, mask)
 
             If useBlur Then
-                blur.Run(atask.gray)
+                blur.Run(taskA.gray)
                 dst2 = blur.dst2.Threshold(meanScalar(0), 255, thresholdType)
             Else
-                dst2 = atask.gray.Threshold(meanScalar(0), 255, thresholdType)
+                dst2 = taskA.gray.Threshold(meanScalar(0), 255, thresholdType)
             End If
         End Sub
     End Class
@@ -46,7 +46,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            binarize.meanScalar = cv.Cv2.Mean(atask.gray)
+            binarize.meanScalar = cv.Cv2.Mean(taskA.gray)
 
             binarize.useBlur = False
             Select Case labels(2)
@@ -60,7 +60,7 @@ Namespace VBClasses
                     binarize.useBlur = True
                     binarize.thresholdType = cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu
             End Select
-            binarize.Run(atask.gray)
+            binarize.Run(taskA.gray)
             dst2 = binarize.dst2
         End Sub
     End Class
@@ -78,9 +78,9 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            CvXImgProc.NiblackThreshold(atask.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
+            CvXImgProc.NiblackThreshold(taskA.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Niblack)
             dst2 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            CvXImgProc.NiblackThreshold(atask.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)
+            CvXImgProc.NiblackThreshold(taskA.gray, dst0, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Sauvola)
             dst3 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End Sub
     End Class
@@ -100,8 +100,8 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            CvXImgProc.NiblackThreshold(atask.gray, dst2, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf)
-            CvXImgProc.NiblackThreshold(atask.gray, dst3, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick)
+            CvXImgProc.NiblackThreshold(taskA.gray, dst2, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Wolf)
+            CvXImgProc.NiblackThreshold(taskA.gray, dst3, 255, cv.ThresholdTypes.Binary, 5, 0.5, LocalBinarizationMethods.Nick)
         End Sub
     End Class
 
@@ -198,7 +198,7 @@ Namespace VBClasses
             desc = "Binarize an image using Threshold with OTSU."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            meanScalar = cv.Cv2.Mean(atask.gray)
+            meanScalar = cv.Cv2.Mean(taskA.gray)
             dst2 = src.Threshold(meanScalar(0), injectVal, cv.ThresholdTypes.Binary)
         End Sub
     End Class

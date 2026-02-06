@@ -10,7 +10,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             slrCore.Run(src)
 
-            If atask.firstPass And standalone Then
+            If taskA.firstPass And standalone Then
                 Static slrInput As New SLR_PlotTest()
                 slrInput.getData(slrCore.inputX, slrCore.inputY)
             End If
@@ -83,7 +83,7 @@ Namespace VBClasses
 
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If atask.firstPass And standalone Then
+            If taskA.firstPass And standalone Then
                 Static slrInput As New SLR_PlotTest()
                 slrInput.getData(dataX, dataY)
             End If
@@ -131,7 +131,7 @@ Namespace VBClasses
             desc = "Plot the data used in SLR_Basics"
         End Sub
         Public Sub getData(ByRef x As List(Of Double), ByRef y As List(Of Double))
-            Dim filePath As String = atask.homeDir + "/Data/real_data.txt"
+            Dim filePath As String = taskA.homeDir + "/Data/real_data.txt"
             Dim sr = New StreamReader(filePath)
             Dim code As String = sr.ReadToEnd
             sr.Close()
@@ -174,9 +174,9 @@ Namespace VBClasses
             Dim splitIndex = 0
             Select Case options.radioText
                 Case "pcSplit(2) input"
-                    trends.hist.plotHist.maxRange = atask.MaxZmeters
+                    trends.hist.plotHist.maxRange = taskA.MaxZmeters
                     trends.hist.plotHist.removeZeroEntry = True ' not interested in the undefined depth areas...
-                    trends.Run(atask.pcSplit(2))
+                    trends.Run(taskA.pcSplit(2))
                     labels(2) = "NR_SLR_TrendImages - pcSplit(2)"
                 Case "Grayscale input"
                     trends.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -240,7 +240,7 @@ Namespace VBClasses
             Dim p1 = New cv.Point2f(x, y)
             resultingPoints.Add(p1)
             resultingValues.Add(p1.Y)
-            dst.Line(lastPoint, p1, cv.Scalar.Yellow, atask.lineWidth + 1, atask.lineType)
+            dst.Line(lastPoint, p1, cv.Scalar.Yellow, taskA.lineWidth + 1, taskA.lineType)
             lastPoint = p1
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

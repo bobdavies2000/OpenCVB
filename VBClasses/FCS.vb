@@ -8,17 +8,17 @@ Namespace VBClasses
             desc = "Track the stable good features found in the BGR image."
         End Sub
         Public Shared Sub fpDSet()
-            If atask.fpList.Count = 0 Then Exit Sub
-            Dim brickIndex = atask.fpMap.Get(Of Single)(atask.clickPoint.Y, atask.clickPoint.X)
-            Dim fpIndex = atask.fpFromGridCell.IndexOf(brickIndex)
-            If fpIndex >= 0 Then atask.fpD = atask.fpList(fpIndex)
+            If taskA.fpList.Count = 0 Then Exit Sub
+            Dim brickIndex = taskA.fpMap.Get(Of Single)(taskA.clickPoint.Y, taskA.clickPoint.X)
+            Dim fpIndex = taskA.fpFromGridCell.IndexOf(brickIndex)
+            If fpIndex >= 0 Then taskA.fpD = taskA.fpList(fpIndex)
         End Sub
         Public Shared Sub fpCellContour(fp As fpData, dst As cv.Mat, Optional colorIndex As Integer = 0)
             Dim color = Choose(colorIndex + 1, cv.Scalar.White, cv.Scalar.Black)
             For i = 0 To fp.facets.Count - 1
                 Dim p1 = fp.facets(i)
                 Dim p2 = fp.facets((i + 1) Mod fp.facets.Count)
-                dst.Line(p1, p2, color, atask.lineWidth, atask.lineType)
+                dst.Line(p1, p2, color, taskA.lineWidth, taskA.lineType)
             Next
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -35,13 +35,13 @@ Namespace VBClasses
             genSorted.Clear()
             For i = 0 To basics.ptList.Count - 1
                 Dim pt = basics.ptList(i)
-                If standaloneTest() Then DrawCircle(dst2, pt, atask.DotSize + 1, cv.Scalar.Yellow)
+                If standaloneTest() Then DrawCircle(dst2, pt, taskA.DotSize + 1, cv.Scalar.Yellow)
                 dst1.Set(Of Byte)(pt.Y, pt.X, 255)
 
                 Dim g = basics.facetGen.dst0.Get(Of Integer)(pt.Y, pt.X)
                 genSorted.Add(g, i)
                 SetTrueText(CStr(g), pt)
-                DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
+                DrawCircle(dst2, pt, taskA.DotSize, taskA.highlight)
             Next
             labels(2) = basics.labels(2)
             labels(3) = CStr(basics.ptList.Count) + " stable good features were found"
@@ -90,16 +90,16 @@ Namespace VBClasses
             anchorPoint = ptList(index)
             If index < facetGen.facet.facetList.Count Then
                 Dim bestFacet = facetGen.facet.facetList(index)
-                dst2.FillConvexPoly(bestFacet, cv.Scalar.Black, atask.lineType)
-                DrawTour(dst2, bestFacet, atask.highlight)
+                dst2.FillConvexPoly(bestFacet, cv.Scalar.Black, taskA.lineType)
+                DrawTour(dst2, bestFacet, taskA.highlight)
             End If
 
             dst2 = facetGen.dst2
             dst3 = src.Clone
             For i = 0 To ptList.Count - 1
                 Dim pt = ptList(i)
-                DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
-                DrawCircle(dst3, pt, atask.DotSize, atask.highlight)
+                DrawCircle(dst2, pt, taskA.DotSize, taskA.highlight)
+                DrawCircle(dst3, pt, taskA.DotSize, taskA.highlight)
             Next
             labels(2) = CStr(ptList.Count) + " stable points were identified with a max of " + CStr(maxGens) +
                     " generations."
@@ -114,21 +114,21 @@ Namespace VBClasses
         Dim fcs As New FCS_Core
         Public desiredMapCount As Integer = 5
         Public Sub New()
-            If atask.contours Is Nothing Then atask.contours = New Contour_Basics_List
+            If taskA.contours Is Nothing Then taskA.contours = New Contour_Basics_List
             desc = "Create the reference map for FCS. "
         End Sub
         Public Function ShowPaletteFullColor(input As cv.Mat) As cv.Mat
-            If atask.paletteRandom Is Nothing Then atask.paletteRandom = New Palette_RandomColors
-            Return atask.paletteRandom.useColorMapFull(input)
+            If taskA.paletteRandom Is Nothing Then taskA.paletteRandom = New Palette_RandomColors
+            Return taskA.paletteRandom.useColorMapFull(input)
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            atask.contours.Run(src)
+            taskA.contours.Run(src)
             Static restartRequest As Boolean
             fcs.inputFeatures.Clear()
-            For Each contour In atask.contours.contourList
+            For Each contour In taskA.contours.contourList
                 fcs.inputFeatures.Add(Distance_Basics.GetMaxDist(contour.mask, contour.rect))
             Next
-            If atask.contours.contourList.Count <= 1 Then ' when the camera is starting up the image may be too dark to process... Restart if so.
+            If taskA.contours.contourList.Count <= 1 Then ' when the camera is starting up the image may be too dark to process... Restart if so.
                 restartRequest = True
                 Exit Sub
             End If
@@ -137,9 +137,9 @@ Namespace VBClasses
             fcs.Run(emptyMat)
 
             dst2 = ShowPaletteFullColor(fcs.fcsMap)
-            dst3 = atask.contours.dst2
+            dst3 = taskA.contours.dst2
             labels(2) = fcs.labels(2)
-            labels(3) = atask.contours.labels(2)
+            labels(3) = taskA.contours.labels(2)
         End Sub
     End Class
 
@@ -172,7 +172,7 @@ Namespace VBClasses
 
             If standaloneTest() Then dst2 = PaletteFull(fcsMap)
 
-            If atask.heartBeat Then labels(2) = traceName + ": " + CStr(inputFeatures.Count) + " cells found."
+            If taskA.heartBeat Then labels(2) = traceName + ": " + CStr(inputFeatures.Count) + " cells found."
         End Sub
     End Class
 
@@ -185,35 +185,35 @@ Namespace VBClasses
         Dim subdiv As New cv.Subdiv2D
         Dim feat As New Feature_General
         Public Sub New()
-            If atask.bricks Is Nothing Then atask.bricks = New Brick_Basics
+            If taskA.bricks Is Nothing Then taskA.bricks = New Brick_Basics
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            atask.fpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
+            taskA.fpMap = New cv.Mat(dst2.Size(), cv.MatType.CV_32F, 0)
             labels(3) = "CV_8U map of Delaunay cells."
             desc = "Subdivide an image based on the points provided."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(atask.grayStable)
+            feat.Run(taskA.grayStable)
 
             subdiv.InitDelaunay(New cv.Rect(0, 0, dst1.Width, dst1.Height))
-            subdiv.Insert(atask.features)
+            subdiv.Insert(taskA.features)
 
             Dim facets = New cv.Point2f()() {Nothing}
             subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
 
-            atask.fpList.Clear()
+            taskA.fpList.Clear()
             Dim matchCount As Integer
             dst1.SetTo(0)
-            For i = 0 To Math.Min(atask.features.Count, facets.Count) - 1
+            For i = 0 To Math.Min(taskA.features.Count, facets.Count) - 1
                 Dim fp As New fpData
-                fp.pt = atask.features(i)
+                fp.pt = taskA.features(i)
                 fp.ptHistory.Add(fp.pt)
                 fp.index = i
 
-                Dim brickIndex = atask.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
-                Dim gr = atask.bricks.brickList(brickIndex)
-                Dim fpIndex = atask.fpFromGridCellLast.IndexOf(brickIndex)
+                Dim brickIndex = taskA.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
+                Dim gr = taskA.bricks.brickList(brickIndex)
+                Dim fpIndex = taskA.fpFromGridCellLast.IndexOf(brickIndex)
                 If fpIndex >= 0 Then
-                    Dim fpLast = atask.fpLastList(fpIndex)
+                    Dim fpLast = taskA.fpLastList(fpIndex)
                     fp.ptLast = fpLast.pt
                     fp.age = fpLast.age + 1
                     matchCount += 1
@@ -236,36 +236,36 @@ Namespace VBClasses
 
                 fp.depth = gr.depth
 
-                atask.fpList.Add(fp)
+                taskA.fpList.Add(fp)
 
-                atask.fpMap.FillConvexPoly(fp.facets, CSng(brickIndex), atask.lineType)
-                dst1.FillConvexPoly(fp.facets, i, atask.lineType)
+                taskA.fpMap.FillConvexPoly(fp.facets, CSng(brickIndex), taskA.lineType)
+                dst1.FillConvexPoly(fp.facets, i, taskA.lineType)
             Next
 
-            If atask.features.Count <> facets.Length Then
-                atask.fpFromGridCell.Clear()
-                For Each fp In atask.fpList
-                    Dim nextIndex = atask.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
-                    atask.fpFromGridCell.Add(nextIndex)
+            If taskA.features.Count <> facets.Length Then
+                taskA.fpFromGridCell.Clear()
+                For Each fp In taskA.fpList
+                    Dim nextIndex = taskA.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
+                    taskA.fpFromGridCell.Add(nextIndex)
                 Next
             End If
 
             dst2 = PaletteFull(dst1)
-            For Each fp In atask.fpList
-                If fp.depth > 0 Then DrawCircle(dst2, fp.pt, atask.DotSize, atask.highlight)
+            For Each fp In taskA.fpList
+                If fp.depth > 0 Then DrawCircle(dst2, fp.pt, taskA.DotSize, taskA.highlight)
             Next
 
             If standalone Then
-                For Each fp In atask.fpList
+                For Each fp In taskA.fpList
                     SetTrueTextBase(CStr(fp.age), fp.pt, 2)
                 Next
-                FCS_Basics.fpCellContour(atask.fpD, atask.color)
+                FCS_Basics.fpCellContour(taskA.fpD, taskA.color)
             End If
             FCS_Basics.fpDSet()
 
-            If atask.heartBeat Then
-                labels(2) = traceName + ": " + Format(atask.features.Count, "000") + " cells found.  Matched = " +
-                        CStr(matchCount) + " of " + CStr(atask.features.Count)
+            If taskA.heartBeat Then
+                labels(2) = traceName + ": " + Format(taskA.features.Count, "000") + " cells found.  Matched = " +
+                        CStr(matchCount) + " of " + CStr(taskA.features.Count)
             End If
         End Sub
     End Class
@@ -283,11 +283,11 @@ Namespace VBClasses
             desc = "Build an FCS for left view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fcs.Run(atask.leftView)
+            fcs.Run(taskA.leftView)
             dst2 = fcs.dst2
             dst3 = fcs.dst3
 
-            For Each fp In atask.fpList
+            For Each fp In taskA.fpList
                 SetTrueTextBase(CStr(fp.age), fp.pt, 2)
             Next
             FCS_Basics.fpDSet()
@@ -307,11 +307,11 @@ Namespace VBClasses
             desc = "Build an FCS for right view."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fcs.Run(atask.rightView)
+            fcs.Run(taskA.rightView)
             dst2 = fcs.dst2
             dst3 = fcs.dst3
 
-            For Each fp In atask.fpList
+            For Each fp In taskA.fpList
                 SetTrueTextBase(CStr(fp.age), fp.pt, 2)
             Next
             FCS_Basics.fpDSet()
@@ -329,7 +329,7 @@ Namespace VBClasses
         Dim flood As New Flood_Basics
         Dim edges As New Edge_Canny
         Public Sub New()
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             desc = "Use color to connect FCS cells - visualize the data mostly."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -341,13 +341,13 @@ Namespace VBClasses
             edges.Run(src)
             dst3 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-            For i = 0 To atask.fpList.Count - 1
-                Dim fp = atask.fpList(i)
-                DrawCircle(dst1, fp.pt, atask.DotSize, atask.highlight)
-                DrawCircle(dst2, fp.pt, atask.DotSize, atask.highlight)
+            For i = 0 To taskA.fpList.Count - 1
+                Dim fp = taskA.fpList(i)
+                DrawCircle(dst1, fp.pt, taskA.DotSize, taskA.highlight)
+                DrawCircle(dst2, fp.pt, taskA.DotSize, taskA.highlight)
 
-                atask.fpList(i) = fp
-                DrawCircle(dst3, fp.pt, atask.DotSize, atask.highlight)
+                taskA.fpList(i) = fp
+                DrawCircle(dst3, fp.pt, taskA.DotSize, taskA.highlight)
             Next
         End Sub
     End Class
@@ -372,10 +372,10 @@ Namespace VBClasses
 
             edges.Run(src)
             dst3 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            For Each fp In atask.fpList
+            For Each fp In taskA.fpList
                 If fp.depth Then
-                    DrawCircle(dst2, fp.pt, atask.DotSize, atask.highlight)
-                    DrawCircle(dst3, fp.pt, atask.DotSize, atask.highlight)
+                    DrawCircle(dst2, fp.pt, taskA.DotSize, taskA.highlight)
+                    DrawCircle(dst3, fp.pt, taskA.DotSize, taskA.highlight)
                 End If
             Next
             FCS_Basics.fpDSet()
@@ -393,13 +393,13 @@ Namespace VBClasses
             desc = "Display the age of each cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fcs.Run(atask.grayStable)
+            fcs.Run(taskA.grayStable)
             dst2 = fcs.dst2
             labels(2) = fcs.labels(2)
 
             dst3.SetTo(0)
-            For Each fp In atask.fpList
-                DrawCircle(dst3, fp.pt, atask.DotSize, atask.highlight)
+            For Each fp In taskA.fpList
+                DrawCircle(dst3, fp.pt, taskA.DotSize, taskA.highlight)
                 Dim age = If(fp.age >= 900, fp.age Mod 900 + 100, fp.age)
                 SetTrueText(CStr(age), fp.pt, 3)
             Next
@@ -417,20 +417,20 @@ Namespace VBClasses
             desc = "Display the top X oldest (best) cells."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fcs.Run(atask.grayStable)
+            fcs.Run(taskA.grayStable)
             dst2 = fcs.dst2
             labels(2) = fcs.labels(2)
 
             Dim fpSorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-            For Each fp In atask.fpList
+            For Each fp In taskA.fpList
                 fpSorted.Add(fp.age, fp.index)
             Next
 
             dst3.SetTo(0)
             Dim maxIndex As Integer = 0
             For Each index In fpSorted.Values
-                Dim fp = atask.fpList(index)
-                DrawCircle(dst3, fp.pt, atask.DotSize, atask.highlight)
+                Dim fp = taskA.fpList(index)
+                DrawCircle(dst3, fp.pt, taskA.DotSize, taskA.highlight)
                 Dim age = If(fp.age >= 900, fp.age Mod 900 + 100, fp.age)
                 SetTrueText(CStr(age), fp.pt, 3)
                 maxIndex += 1
@@ -447,7 +447,7 @@ Namespace VBClasses
     Public Class NR_FCS_RedCloud1 : Inherits TaskParent
         Dim fcs As New FCS_CreateList
         Public Sub New()
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             labels(1) = "Output of FCS_CreateList."
             desc = "Isolate FCS cells for each redCell."
         End Sub
@@ -457,7 +457,7 @@ Namespace VBClasses
             fcs.Run(src)
             dst1 = fcs.dst2
             labels(3) = fcs.labels(2)
-            For Each fp In atask.fpList
+            For Each fp In taskA.fpList
                 Dim val = dst2.Get(Of cv.Vec3b)(fp.pt.Y, fp.pt.X)
                 dst3.FillConvexPoly(fp.facets, val)
             Next
@@ -502,16 +502,16 @@ Namespace VBClasses
             plot.maxScale = 100
             plot.minScale = 0
             plot.plotCount = 1
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             labels(1) = "Plot of % of cells that moved - move camera to see value."
             desc = "Highlight the motion of each feature identified in the current and previous frame"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fcs.Run(atask.grayStable)
+            fcs.Run(taskA.grayStable)
             dst2 = fcs.dst2
 
-            For Each fp In atask.fpList
-                If fp.depth > 0 Then DrawCircle(dst2, fp.pt, atask.DotSize, atask.highlight)
+            For Each fp In taskA.fpList
+                If fp.depth > 0 Then DrawCircle(dst2, fp.pt, taskA.DotSize, taskA.highlight)
             Next
 
             Dim motionCount As Integer, linkedCount As Integer
@@ -520,9 +520,9 @@ Namespace VBClasses
             xDist.Add(0)
             yDist.Add(0)
             dst3.SetTo(0)
-            For Each fp In atask.fpList
-                Dim brickIndex = atask.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
-                Dim fpIndex = atask.fpFromGridCellLast.IndexOf(brickIndex)
+            For Each fp In taskA.fpList
+                Dim brickIndex = taskA.gridMap.Get(Of Integer)(fp.pt.Y, fp.pt.X)
+                Dim fpIndex = taskA.fpFromGridCellLast.IndexOf(brickIndex)
                 If fpIndex >= 0 Then
                     linkedCount += 1
                     DrawLine(dst3, fp.pt, fp.ptLast)
@@ -534,7 +534,7 @@ Namespace VBClasses
                 End If
             Next
             motionPercent = 100 * motionCount / linkedCount
-            If atask.heartBeat Then
+            If taskA.heartBeat Then
                 labels(2) = fcs.labels(2)
                 labels(3) = Format(motionPercent, fmt1) + "% of linked cells had motion or " +
                         CStr(motionCount) + " of " + CStr(linkedCount) + ".  Distance moved X/Y " +
@@ -561,8 +561,8 @@ Namespace VBClasses
         Public Sub New()
             plothist.createHistogram = True
             plothist.addLabels = False
-            atask.gOptions.setHistogramBins(64) ' should this be an odd number.
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            taskA.gOptions.setHistogramBins(64) ' should this be an odd number.
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             desc = "Using all the feature points with motion, determine any with a common direction."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -570,21 +570,21 @@ Namespace VBClasses
             mats.mat(2) = fcsM.dst2
             mats.mat(3) = fcsM.dst3
 
-            plothist.maxRange = atask.histogramBins / 2 Or 1
+            plothist.maxRange = taskA.histogramBins / 2 Or 1
             plothist.minRange = -plothist.maxRange
             rangeText = " ranging from " + CStr(plothist.minRange) + " to " + CStr(plothist.maxRange)
             range = Math.Abs(plothist.maxRange - plothist.minRange)
 
-            Dim incr = range / atask.histogramBins
+            Dim incr = range / taskA.histogramBins
 
             plothist.Run(cv.Mat.FromPixelData(fcsM.xDist.Count, 1, cv.MatType.CV_32F, fcsM.xDist.ToArray))
             Dim xDist As New List(Of Single)(plothist.histArray)
-            atask.fpMotion.X = plothist.minRange + xDist.IndexOf(xDist.Max) * incr
+            taskA.fpMotion.X = plothist.minRange + xDist.IndexOf(xDist.Max) * incr
             mats.mat(0) = plothist.dst2.Clone
 
             plothist.Run(cv.Mat.FromPixelData(fcsM.yDist.Count, 1, cv.MatType.CV_32F, fcsM.yDist.ToArray))
             Dim yDist As New List(Of Single)(plothist.histArray)
-            atask.fpMotion.Y = plothist.minRange + yDist.IndexOf(yDist.Max) * incr
+            taskA.fpMotion.Y = plothist.minRange + yDist.IndexOf(yDist.Max) * incr
             mats.mat(1) = plothist.dst2.Clone
 
             mats.Run(emptyMat)
@@ -592,13 +592,13 @@ Namespace VBClasses
             dst3 = mats.dst3
 
             If fcsM.motionPercent < 50 Then
-                atask.fpMotion.X = 0
-                atask.fpMotion.Y = 0
+                taskA.fpMotion.X = 0
+                taskA.fpMotion.Y = 0
             End If
 
             strOut = "CameraMotion estimate: " + vbCrLf + vbCrLf
-            strOut += "Displacement in X: " + CStr(atask.fpMotion.X) + vbCrLf
-            strOut += "Displacement in Y: " + CStr(atask.fpMotion.Y) + vbCrLf
+            strOut += "Displacement in X: " + CStr(taskA.fpMotion.X) + vbCrLf
+            strOut += "Displacement in Y: " + CStr(taskA.fpMotion.Y) + vbCrLf
 
             SetTrueText(strOut, 1)
             SetTrueText("X distances" + rangeText, 2)
@@ -615,25 +615,25 @@ Namespace VBClasses
 
     Public Class FCS_Info : Inherits TaskParent
         Public Sub New()
-            If atask.bricks Is Nothing Then atask.bricks = New Brick_Basics
+            If taskA.bricks Is Nothing Then taskA.bricks = New Brick_Basics
             desc = "Display the contents of the Feature Coordinate System (FCS) cell."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
                 Static fcs As New FCS_CreateList
-                fcs.Run(atask.grayStable)
+                fcs.Run(taskA.grayStable)
                 dst2 = fcs.dst2
             End If
 
-            Dim fp = atask.fpD
+            Dim fp = taskA.fpD
             strOut = "Feature point: " + fp.pt.ToString + vbCrLf + vbCrLf
             strOut += "index = " + CStr(fp.index) + vbCrLf
             strOut += "age (in frames) = " + CStr(fp.age) + vbCrLf
             strOut += "Facet count = " + CStr(fp.facets.Count) + " facets" + vbCrLf
-            strOut += "ClickPoint = " + atask.ClickPoint.ToString + vbCrLf + vbCrLf
+            strOut += "ClickPoint = " + taskA.ClickPoint.ToString + vbCrLf + vbCrLf
 
             strOut += "brickIndex = " + CStr(fp.brickIndex) + vbCrLf
-            Dim gr = atask.bricks.brickList(fp.brickIndex)
+            Dim gr = taskA.bricks.brickList(fp.brickIndex)
             strOut += CStr(gr.age) + vbTab + "Age" + vbTab + vbCrLf
             strOut += Format(gr.correlation, fmt3) + vbTab + "Correlation to right image" + vbCrLf
 
@@ -668,14 +668,14 @@ Namespace VBClasses
     '        labels(2) = redCombo.labels(2)
 
     '        knnMin.inputPoints.Clear()
-    '        For Each rc In atask.redList.oldrclist
+    '        For Each rc In taskA.redList.oldrclist
     '            knnMin.inputPoints.Add(rc.maxDist)
     '        Next
     '        knnMin.Run(src)
 
-    '        atask.features = New List(Of cv.Point2f)(knnMin.outputPoints2f)
+    '        taskA.features = New List(Of cv.Point2f)(knnMin.outputPoints2f)
     '        fcs.Run(src)
-    '        dst2 = atask.feat.fcs.dst2
+    '        dst2 = taskA.feat.fcs.dst2
     '        FCS_Basics.fpDSet()
     '        labels(3) = fcs.labels(2)
     '    End Sub
@@ -693,22 +693,22 @@ Namespace VBClasses
         Dim options As New Options_Features
         Public Sub New()
             OptionParent.FindSlider("Min Distance").Value = 60
-            atask.featureOptions.FeatureMethod.SelectedItem() = "LineInput"
+            taskA.featureOptions.FeatureMethod.SelectedItem() = "LineInput"
             labels(3) = "Cell boundaries with the age (in frames) for each cell."
             desc = "Use lines as input to FCS."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            fcs.Run(atask.grayStable)
+            fcs.Run(taskA.grayStable)
             dst2 = fcs.dst2
 
-            For Each fp In atask.fpList
+            For Each fp In taskA.fpList
                 SetTrueTextBase(CStr(fp.age), fp.pt, 2)
             Next
 
-            If atask.heartBeat Then labels(2) = CStr(atask.features.Count) + " lines were used to create " +
-                                           CStr(atask.fpList.Count) + " cells"
+            If taskA.heartBeat Then labels(2) = CStr(taskA.features.Count) + " lines were used to create " +
+                                           CStr(taskA.fpList.Count) + " cells"
         End Sub
     End Class
 
@@ -728,17 +728,17 @@ Namespace VBClasses
             plotHist.addLabels = False
             plotHist.removeZeroEntry = True
             plotHist.createHistogram = True
-            If standalone Then atask.gOptions.displayDst1.Checked = True
-            atask.gOptions.setHistogramBins(20)
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            taskA.gOptions.setHistogramBins(20)
             desc = "Use cell depth to break down the layers in an image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
                 Static bPoint As New BrickPoint_Basics
                 bPoint.Run(src)
-                atask.features.Clear()
+                taskA.features.Clear()
                 For Each pt In bPoint.ptList
-                    atask.features.Add(New cv.Point2f(pt.X, pt.Y))
+                    taskA.features.Add(New cv.Point2f(pt.X, pt.Y))
                 Next
             End If
             fcs.Run(src)
@@ -746,37 +746,37 @@ Namespace VBClasses
             labels(2) = fcs.labels(2)
 
             Dim bricks As New List(Of Single)
-            For Each fp In atask.fpList
+            For Each fp In taskA.fpList
                 bricks.Add(fp.depth)
             Next
 
             plotHist.minRange = 0
-            plotHist.maxRange = atask.MaxZmeters
+            plotHist.maxRange = taskA.MaxZmeters
             plotHist.Run(cv.Mat.FromPixelData(bricks.Count, 1, cv.MatType.CV_32F, bricks.ToArray))
             dst1 = plotHist.dst2
 
-            Dim incr = dst1.Width / atask.histogramBins
-            Dim histIndex = Math.Truncate(atask.mouseMovePoint.X / incr)
-            dst1.Rectangle(New cv.Rect(CInt(histIndex * incr), 0, incr, dst2.Height), cv.Scalar.Yellow, atask.lineWidth)
-            Dim depthIncr = (plotHist.maxRange - plotHist.minRange) / atask.histogramBins
+            Dim incr = dst1.Width / taskA.histogramBins
+            Dim histIndex = Math.Truncate(taskA.mouseMovePoint.X / incr)
+            dst1.Rectangle(New cv.Rect(CInt(histIndex * incr), 0, incr, dst2.Height), cv.Scalar.Yellow, taskA.lineWidth)
+            Dim depthIncr = (plotHist.maxRange - plotHist.minRange) / taskA.histogramBins
             Dim depthStart = histIndex * depthIncr
             Dim depthEnd = (histIndex + 1) * depthIncr
 
             Static fpCells As New List(Of (fpData, Integer))
             Static histIndexSave = histIndex
 
-            If histIndexSave <> histIndex Or atask.optionsChanged Then
+            If histIndexSave <> histIndex Or taskA.optionsChanged Then
                 histIndexSave = histIndex
                 fpCells.Clear()
             End If
             palInput.SetTo(0)
 
-            For Each fp In atask.fpList
+            For Each fp In taskA.fpList
                 If fp.depth > depthStart And fp.depth < depthEnd Then
                     Dim val = palInput.Get(Of Byte)(fp.pt.Y, fp.pt.X)
                     If val = 0 Then
                         palInput.FillConvexPoly(fp.facets, fp.brickIndex Mod 255)
-                        fpCells.Add((fp, atask.frameCount))
+                        fpCells.Add((fp, taskA.frameCount))
                     End If
                 End If
             Next
@@ -784,13 +784,13 @@ Namespace VBClasses
             For Each ele In fpCells
                 Dim fp As fpData = ele.Item1
                 SetTrueText(Format(fp.age, fmt0), fp.pt, 0)
-                FCS_Basics.fpCellContour(fp, atask.color, 0)
+                FCS_Basics.fpCellContour(fp, taskA.color, 0)
             Next
             dst3 = PaletteFull(palInput)
             dst3.SetTo(0, palInput.Threshold(0, 255, cv.ThresholdTypes.BinaryInv))
 
 
-            Dim removeFrame As Integer = If(atask.frameCount > atask.frameHistoryCount, atask.frameCount - atask.frameHistoryCount, -1)
+            Dim removeFrame As Integer = If(taskA.frameCount > taskA.frameHistoryCount, taskA.frameCount - taskA.frameHistoryCount, -1)
             For i = fpCells.Count - 1 To 0 Step -1
                 Dim frame = fpCells(i).Item2
                 If frame = removeFrame Then fpCells.RemoveAt(i)
@@ -814,16 +814,16 @@ Namespace VBClasses
             desc = "Display the cells which are on the periphery of the image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fcs.Run(atask.grayStable)
+            fcs.Run(taskA.grayStable)
             dst2 = fcs.dst2
 
             dst3 = dst2.Clone
             ptOutside.Clear()
             ptInside.Clear()
-            For Each fp In atask.fpList
+            For Each fp In taskA.fpList
                 If fp.periph Then
-                    dst3.FillConvexPoly(fp.facets, cv.Scalar.Gray, atask.lineType)
-                    DrawCircle(dst3, fp.pt, atask.DotSize, atask.highlight)
+                    dst3.FillConvexPoly(fp.facets, cv.Scalar.Gray, taskA.lineType)
+                    DrawCircle(dst3, fp.pt, taskA.DotSize, taskA.highlight)
                     ptOutside.Add(fp.pt)
                 Else
                     ptInside.Add(fp.pt)
@@ -831,7 +831,7 @@ Namespace VBClasses
             Next
             FCS_Basics.fpDSet()
             labels(2) = "There are " + CStr(ptOutside.Count) + " features on the periphery of the image."
-            labels(3) = "There are " + CStr(atask.fpList.Count - ptOutside.Count) + " features in the interior region of the image."
+            labels(3) = "There are " + CStr(taskA.fpList.Count - ptOutside.Count) + " features in the interior region of the image."
         End Sub
     End Class
 
@@ -846,12 +846,12 @@ Namespace VBClasses
             desc = "Create a mask for the cells which are not on the periphery of the image - the interior region that is fully visible and connected."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            perif.Run(atask.grayStable)
+            perif.Run(taskA.grayStable)
             dst2 = perif.dst3
 
             dst3.SetTo(0)
-            For Each fp In atask.fpList
-                If fp.periph = False Then dst3.FillConvexPoly(fp.facets, 255, atask.lineType)
+            For Each fp In taskA.fpList
+                If fp.periph = False Then dst3.FillConvexPoly(fp.facets, 255, taskA.lineType)
             Next
             FCS_Basics.fpDSet()
             labels = perif.labels
@@ -900,16 +900,16 @@ Namespace VBClasses
             anchorPoint = ptList(index)
             If index < facetGen.facet.facetList.Count Then
                 Dim bestFacet = facetGen.facet.facetList(index)
-                dst2.FillConvexPoly(bestFacet, cv.Scalar.Black, atask.lineType)
-                DrawTour(dst2, bestFacet, atask.highlight)
+                dst2.FillConvexPoly(bestFacet, cv.Scalar.Black, taskA.lineType)
+                DrawTour(dst2, bestFacet, taskA.highlight)
             End If
 
             dst2 = facetGen.dst2
             dst3 = src.Clone
             For i = 0 To ptList.Count - 1
                 Dim pt = ptList(i)
-                DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
-                DrawCircle(dst3, pt, atask.DotSize, atask.highlight)
+                DrawCircle(dst2, pt, taskA.DotSize, taskA.highlight)
+                DrawCircle(dst3, pt, taskA.DotSize, taskA.highlight)
             Next
             labels(2) = CStr(ptList.Count) + " stable points were identified with a max of " + CStr(maxGens) +
                     " generations."

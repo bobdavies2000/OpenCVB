@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class Stabilizer_Basics : Inherits TaskParent
         Public Sub New()
-            desc = "Use atask.lines.lplist(0) to find the angle needed to stabilize the image."
+            desc = "Use taskA.lines.lplist(0) to find the angle needed to stabilize the image."
         End Sub
         Public Function GetAngleBetweenLinesBySlopes(ByVal slope1 As Double, ByVal slope2 As Double) As Double
             Const EPSILON As Double = 0.000000001
@@ -43,12 +43,12 @@ Namespace VBClasses
             Return angleDegrees
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Static lpLast As lpData = atask.lines.lpList(0)
+            Static lpLast As lpData = taskA.lines.lpList(0)
 
-            Dim lp = atask.lines.lpList(0)
-            If lp.pE1 = lpLast.pE1 And lp.pE2 = lpLast.pE2 Or atask.lineLongestChanged Then
+            Dim lp = taskA.lines.lpList(0)
+            If lp.pE1 = lpLast.pE1 And lp.pE2 = lpLast.pE2 Or taskA.lineLongestChanged Then
                 dst2 = src
-                If atask.lineLongestChanged Then lpLast = atask.lines.lpList(0)
+                If taskA.lineLongestChanged Then lpLast = taskA.lines.lpList(0)
             Else
                 Dim rotateAngle = GetAngleBetweenLinesBySlopes(lp.slope, lpLast.slope)
 

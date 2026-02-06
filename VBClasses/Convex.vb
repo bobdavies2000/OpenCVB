@@ -21,9 +21,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim hullList = atask.oldrcD.contour
+            Dim hullList = taskA.oldrcD.contour
             If standaloneTest() Then
-                If Not atask.heartBeat Then Exit Sub
+                If Not taskA.heartBeat Then Exit Sub
                 hullList = buildRandomHullPoints()
             End If
 
@@ -41,7 +41,7 @@ Namespace VBClasses
             DrawTour(dst2, hullList, white, -1)
 
             For i = 0 To hull.Count - 1
-                dst2.Line(hull(i), hull((i + 1) Mod hull.Count), white, atask.lineWidth, atask.lineWidth)
+                dst2.Line(hull(i), hull((i + 1) Mod hull.Count), white, taskA.lineWidth, taskA.lineWidth)
             Next
         End Sub
     End Class
@@ -59,12 +59,12 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = runRedList(src, labels(2))
-            If atask.oldrcD.contour IsNot Nothing Then
+            If taskA.oldrcD.contour IsNot Nothing Then
                 convex.Run(src)
 
                 dst3.SetTo(0)
-                dst3(atask.oldrcD.rect) = convex.dst2(New cv.Rect(0, 0, atask.oldrcD.rect.Width, atask.oldrcD.rect.Height))
-                DrawCircle(dst3, atask.oldrcD.maxDist, atask.DotSize, white)
+                dst3(taskA.oldrcD.rect) = convex.dst2(New cv.Rect(0, 0, taskA.oldrcD.rect.Width, taskA.oldrcD.rect.Height))
+                DrawCircle(dst3, taskA.oldrcD.maxDist, taskA.DotSize, white)
             End If
         End Sub
     End Class
@@ -79,8 +79,8 @@ Namespace VBClasses
     Public Class NR_Convex_Defects : Inherits TaskParent
         Dim contours As New Contour_Largest
         Public Sub New()
-            dst2 = cv.Cv2.ImRead(atask.homeDir + "Data/star2.png").Threshold(200, 255,
-                            cv.ThresholdTypes.Binary).Resize(New cv.Size(atask.workRes.Width, atask.workRes.Height))
+            dst2 = cv.Cv2.ImRead(taskA.homeDir + "Data/star2.png").Threshold(200, 255,
+                            cv.ThresholdTypes.Binary).Resize(New cv.Size(taskA.workRes.Width, taskA.workRes.Height))
             dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray)
 
             labels = {"", "", "Input to the ConvexHull and ConvexityDefects", "Yellow = ConvexHull, Red = ConvexityDefects, Yellow dots are convexityDefect 'Far' points"}
@@ -92,13 +92,13 @@ Namespace VBClasses
             dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             Dim hull = cv.Cv2.ConvexHull(c, False)
             Dim hullIndices = cv.Cv2.ConvexHullIndices(c, False)
-            DrawTour(dst3, hull.ToList, atask.highlight)
+            DrawTour(dst3, hull.ToList, taskA.highlight)
 
             Dim defects = cv.Cv2.ConvexityDefects(contours.bestContour, hullIndices.ToList)
             For Each v In defects
-                dst3.Line(c(v(0)), c(v(2)), cv.Scalar.Red, atask.lineWidth + 1, atask.lineType)
-                dst3.Line(c(v(1)), c(v(2)), cv.Scalar.Red, atask.lineWidth + 1, atask.lineType)
-                DrawCircle(dst3, c(v(2)), atask.DotSize + 2, atask.highlight)
+                dst3.Line(c(v(0)), c(v(2)), cv.Scalar.Red, taskA.lineWidth + 1, taskA.lineType)
+                dst3.Line(c(v(1)), c(v(2)), cv.Scalar.Red, taskA.lineWidth + 1, taskA.lineType)
+                DrawCircle(dst3, c(v(2)), taskA.DotSize + 2, taskA.highlight)
             Next
         End Sub
     End Class
@@ -111,7 +111,7 @@ Namespace VBClasses
     Public Class Convex_RedColorDefects : Inherits TaskParent
         Dim contours As New Contour_Largest
         Public Sub New()
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             labels(2) = "Hull outline in yellow, red is hull with defects removed.  Select any cell in the upper right..."
             labels(3) = "Original mask that produces the hull at left"
             desc = "Find the convexityDefects in the selected RedCloud cell"
@@ -143,7 +143,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst1 = runRedList(src, labels(1))
 
-            Dim rc = atask.oldrcD
+            Dim rc = taskA.oldrcD
             If rc.mask Is Nothing Then Exit Sub
 
             Dim sz = New cv.Size(dst2.Height * rc.mask.Width / rc.mask.Height, dst2.Height)
@@ -160,7 +160,7 @@ Namespace VBClasses
             Dim hull = cv.Cv2.ConvexHull(c, False)
             Dim hullIndices = cv.Cv2.ConvexHullIndices(c, False)
             dst2.SetTo(0)
-            DrawTour(dst2, hull.ToList, atask.highlight, -1)
+            DrawTour(dst2, hull.ToList, taskA.highlight, -1)
 
             Dim defects = cv.Cv2.ConvexityDefects(c, hullIndices.ToList)
             rc.contour = betterContour(c, defects)

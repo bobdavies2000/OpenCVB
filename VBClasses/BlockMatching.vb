@@ -20,8 +20,8 @@ Namespace VBClasses
             If blockMatch Is Nothing Then blockMatch = cv.StereoBM.Create()
             blockMatch.BlockSize = options.blockSize
             blockMatch.MinDisparity = 0
-            blockMatch.ROI1 = New cv.Rect(0, 0, atask.leftView.Width, atask.leftView.Height)
-            blockMatch.ROI2 = New cv.Rect(0, 0, atask.leftView.Width, atask.leftView.Height)
+            blockMatch.ROI1 = New cv.Rect(0, 0, taskA.leftView.Width, taskA.leftView.Height)
+            blockMatch.ROI2 = New cv.Rect(0, 0, taskA.leftView.Width, taskA.leftView.Height)
             blockMatch.PreFilterCap = 31
             blockMatch.NumDisparities = options.numDisparity
             blockMatch.TextureThreshold = 10
@@ -40,7 +40,7 @@ Namespace VBClasses
             dst1(rect) = dst1(rect).Threshold(10, 10, cv.ThresholdTypes.Trunc)
             colorizer.Run(dst1)
             dst2(rect) = colorizer.dst2(rect)
-            dst3 = atask.rightView.Resize(src.Size())
+            dst3 = taskA.rightView.Resize(src.Size())
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If blockMatch IsNot Nothing Then blockMatch.Dispose()

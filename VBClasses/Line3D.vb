@@ -5,7 +5,7 @@ Namespace VBClasses
         Public lines3D As New List(Of cv.Point3f)
         Public lines3DMat As New cv.Mat
         Public Sub New()
-            If standalone Then atask.featureOptions.FeatureSampleSize.Value = 10
+            If standalone Then taskA.featureOptions.FeatureSampleSize.Value = 10
             desc = "Find the end point depth for the top X longest lines."
         End Sub
         'Public Shared Function getDepth(lp As lpData) As lpData
@@ -17,39 +17,39 @@ Namespace VBClasses
 
         '    Dim depth As New cv.Mat(lp.rect.Size, cv.MatType.CV_8U, 0)
 
-        '    Dim r = atask.gridRects(lp.p1GridIndex)
-        '    Dim depth = atask.pcSplit(2)(r).Mean(atask.depthmask(r))(0)
+        '    Dim r = taskA.gridRects(lp.p1GridIndex)
+        '    Dim depth = taskA.pcSplit(2)(r).Mean(taskA.depthmask(r))(0)
 
         'End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
-            labels(2) = atask.lines.labels(2)
+            labels(2) = taskA.lines.labels(2)
 
             lines3D.Clear()
 
-            For Each lp In atask.lines.lpList
-                Dim rect1 = atask.gridRects(atask.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-                Dim depth1 = atask.pcSplit(2)(rect1).Mean(atask.depthmask(rect1))(0)
+            For Each lp In taskA.lines.lpList
+                Dim rect1 = taskA.gridRects(taskA.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+                Dim depth1 = taskA.pcSplit(2)(rect1).Mean(taskA.depthmask(rect1))(0)
                 If depth1 = 0 Then Continue For
 
-                Dim rect2 = atask.gridRects(atask.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-                Dim depth2 = atask.pcSplit(2)(rect2).Mean(atask.depthmask(rect2))(0)
+                Dim rect2 = taskA.gridRects(taskA.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+                Dim depth2 = taskA.pcSplit(2)(rect2).Mean(taskA.depthmask(rect2))(0)
                 If depth2 = 0 Then Continue For
 
                 Dim p1 = Cloud_Basics.worldCoordinates(rect1.TopLeft, depth1)
                 Dim p2 = Cloud_Basics.worldCoordinates(rect2.TopLeft, depth2)
                 lines3D.Add(p1)
                 lines3D.Add(p2)
-                dst2.Line(lp.p1, lp.p2, atask.highlight, atask.lineWidth, cv.LineTypes.Link8)
+                dst2.Line(lp.p1, lp.p2, taskA.highlight, taskA.lineWidth, cv.LineTypes.Link8)
                 SetTrueText(Format(depth1, fmt1), lp.p1, 2)
                 SetTrueText(Format(depth2, fmt1), lp.p2, 2)
             Next
 
             lines3DMat = cv.Mat.FromPixelData(lines3D.Count / 2, 1, cv.MatType.CV_32FC3, lines3D.ToArray)
 
-            If atask.heartBeat Then
+            If taskA.heartBeat Then
                 strOut = CStr(lines3D.Count / 2) + " 3D lines are prepared in lines3D." + vbCrLf +
-                         CStr(atask.lines.lpList.Count - lines3D.Count / 2) + " lines occurred in areas with no depth and were skipped."
+                         CStr(taskA.lines.lpList.Count - lines3D.Count / 2) + " lines occurred in areas with no depth and were skipped."
             End If
             SetTrueText(strOut, 3)
         End Sub
@@ -61,25 +61,25 @@ Namespace VBClasses
 
     Public Class NR_Line3D_Longest : Inherits TaskParent
         Public Sub New()
-            If atask.bricks Is Nothing Then atask.bricks = New Brick_Basics
+            If taskA.bricks Is Nothing Then taskA.bricks = New Brick_Basics
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Find the longest line in BGR and use it to measure the average depth for the line"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.lines.lpList.Count <= 1 Then Exit Sub
-            Dim lp = atask.lines.lpList(0)
+            If taskA.lines.lpList.Count <= 1 Then Exit Sub
+            Dim lp = taskA.lines.lpList(0)
             dst2 = src
 
-            dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, atask.lineWidth + 3, atask.lineType)
+            dst2.Line(lp.p1, lp.p2, cv.Scalar.Yellow, taskA.lineWidth + 3, taskA.lineType)
 
-            Dim gcMin = atask.bricks.brickList(atask.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
-            Dim gcMax = atask.bricks.brickList(atask.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
+            Dim gcMin = taskA.bricks.brickList(taskA.gridMap.Get(Of Integer)(lp.p1.Y, lp.p1.X))
+            Dim gcMax = taskA.bricks.brickList(taskA.gridMap.Get(Of Integer)(lp.p2.Y, lp.p2.X))
 
             dst0.SetTo(0)
-            dst0.Line(lp.p1, lp.p2, 255, 3, atask.lineType)
-            dst0.SetTo(0, atask.noDepthMask)
+            dst0.Line(lp.p1, lp.p2, 255, 3, taskA.lineType)
+            dst0.SetTo(0, taskA.noDepthMask)
 
-            Dim mm = GetMinMax(atask.pcSplit(2), dst0)
+            Dim mm = GetMinMax(taskA.pcSplit(2), dst0)
             Dim ptMin = New cv.Point(gcMin.mm.minLoc.X + gcMin.rect.X, gcMin.mm.minLoc.Y + gcMin.rect.Y)
             Dim ptMax = New cv.Point(gcMin.mm.maxLoc.X + gcMin.rect.X, gcMin.mm.maxLoc.Y + gcMin.rect.Y)
             If ptMin.DistanceTo(mm.minLoc) > ptMax.DistanceTo(mm.maxLoc) Then
@@ -91,9 +91,9 @@ Namespace VBClasses
             Dim depthMin = If(gcMin.depth > 0, gcMin.depth, mm.minVal)
             Dim depthMax = If(gcMax.depth > 0, gcMax.depth, mm.maxVal)
 
-            Dim depthMean = atask.pcSplit(2).Mean(dst0)(0)
-            DrawCircle(dst2, lp.p1, atask.DotSize + 4, cv.Scalar.Red)
-            DrawCircle(dst2, lp.p2, atask.DotSize + 4, cv.Scalar.Blue)
+            Dim depthMean = taskA.pcSplit(2).Mean(dst0)(0)
+            DrawCircle(dst2, lp.p1, taskA.DotSize + 4, cv.Scalar.Red)
+            DrawCircle(dst2, lp.p2, taskA.DotSize + 4, cv.Scalar.Blue)
 
             If lp.p1.DistanceTo(mm.minLoc) < lp.p2.DistanceTo(mm.maxLoc) Then
                 mm.minLoc = lp.p1
@@ -132,8 +132,8 @@ Namespace VBClasses
             dst2 = selectLine.dst2
             labels(2) = selectLine.labels(2)
 
-            If atask.lpD.age = 1 Or atask.optionsChanged Then
-                findLine3D.lp = atask.lpD
+            If taskA.lpD.age = 1 Or taskA.optionsChanged Then
+                findLine3D.lp = taskA.lpD
                 findLine3D.Run(src)
 
                 If findLine3D.veclist.Count = 0 Then Exit Sub ' nothing to work on...
@@ -161,7 +161,7 @@ Namespace VBClasses
         Dim plot As New Plot_OverTimeScalar
         Dim toggleFirstSecond As Boolean
         Public Sub New()
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             plot.plotCount = 2
 
             dst0 = New cv.Mat(dst0.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
@@ -179,11 +179,11 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                If atask.mouseClickFlag Then
+                If taskA.mouseClickFlag Then
                     If toggleFirstSecond = False Then
-                        p1 = atask.ClickPoint
+                        p1 = taskA.ClickPoint
                     Else
-                        p2 = atask.ClickPoint
+                        p2 = taskA.ClickPoint
                         toggleFirstSecond = False
                     End If
                 End If
@@ -192,17 +192,17 @@ Namespace VBClasses
             If toggleFirstSecond Then Exit Sub ' wait until the second point is selected...
 
             dst1 = src
-            vbc.DrawLine(dst1, p1, p2, atask.highlight)
+            vbc.DrawLine(dst1, p1, p2, taskA.highlight)
             dst0.SetTo(0)
             vbc.DrawLine(dst0, p1, p2, 255)
             dst1.SetTo(0)
-            atask.pcSplit(0).CopyTo(dst1, dst0)
+            taskA.pcSplit(0).CopyTo(dst1, dst0)
             Dim points = dst1.FindNonZero()
 
             Dim nextList As New List(Of cv.Point3f)
             For i = 0 To points.Rows - 1
                 Dim pt = points.Get(Of cv.Point)(i, 0)
-                nextList.Add(atask.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X))
+                nextList.Add(taskA.pointCloud.Get(Of cv.Point3f)(pt.Y, pt.X))
             Next
             If nextList.Count = 0 Then Exit Sub ' line is completely in area with no depth.
 
@@ -235,24 +235,24 @@ Namespace VBClasses
             desc = "Select a line using the debug slider."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If lp Is Nothing Then lp = atask.lines.lpList(0)
+            If lp Is Nothing Then lp = taskA.lines.lpList(0)
 
-            If atask.firstPass = False Then
+            If taskA.firstPass = False Then
                 dst1(lp.rect).SetTo(0)
                 dst2(lp.rect).SetTo(0)
                 dst3(lp.rect).SetTo(0)
             End If
 
             If standalone Or debugRequest Then
-                If Math.Abs(atask.gOptions.DebugSlider.Value) < atask.lines.lpList.Count Then
-                    lp = atask.lines.lpList(Math.Abs(atask.gOptions.DebugSlider.Value))
+                If Math.Abs(taskA.gOptions.DebugSlider.Value) < taskA.lines.lpList.Count Then
+                    lp = taskA.lines.lpList(Math.Abs(taskA.gOptions.DebugSlider.Value))
                 End If
             End If
             dst3.Line(lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
             If standaloneTest() Or debugRequest Then allPoints = dst3(lp.rect).FindNonZero()
 
-            atask.pcSplit(2)(lp.rect).CopyTo(dst1(lp.rect), dst3(lp.rect))
-            dst3(lp.rect).SetTo(0, atask.noDepthMask(lp.rect))
+            taskA.pcSplit(2)(lp.rect).CopyTo(dst1(lp.rect), dst3(lp.rect))
+            dst3(lp.rect).SetTo(0, taskA.noDepthMask(lp.rect))
             Dim depthAvg = dst1(lp.rect).Mean(dst3(lp.rect)).Item(0)
             Dim points = dst3(lp.rect).FindNonZero()
             Dim ptList As New List(Of cv.Point)
@@ -276,8 +276,8 @@ Namespace VBClasses
                 p1 = ptList(i - 1)
                 p2 = ptList(i)
                 If p1.DistanceTo(p2) > 2 Then Continue For ' too big a gap of missing depth.
-                d1 = atask.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
-                d2 = atask.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
+                d1 = taskA.pcSplit(2).Get(Of Single)(p1.Y, p1.X)
+                d2 = taskA.pcSplit(2).Get(Of Single)(p2.Y, p2.X)
                 Dim delta = d2 - d1
                 If Math.Abs(delta) < 0.1 Then incrList.Add(delta) ' if delta is less than 10 centimeters, then keep it.
             Next
@@ -343,12 +343,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             lpList.Clear()
 
-            dst2 = atask.pointCloud.Clone
+            dst2 = taskA.pointCloud.Clone
             dst3 = src.Clone
-            For Each selection.lp In atask.lines.lpList
+            For Each selection.lp In taskA.lines.lpList
                 selection.run(emptyMat)
                 lpList.Add(selection.lp)
-                dst3.Line(selection.lp.p1, selection.lp.p2, atask.highlight, atask.lineWidth)
+                dst3.Line(selection.lp.p1, selection.lp.p2, taskA.highlight, taskA.lineWidth)
             Next
         End Sub
     End Class
@@ -366,18 +366,18 @@ Namespace VBClasses
             desc = "Use the debug slider in Global Options to select which line to test."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.heartBeatLT Then dst1.SetTo(0)
+            If taskA.heartBeatLT Then dst1.SetTo(0)
             Selection.Run(emptyMat)
             Dim lp = Selection.lp
 
             dst3.SetTo(0)
             dst3.Line(lp.p1, lp.p2, 255, 1, cv.LineTypes.Link4)
-            dst1(lp.rect).SetTo(atask.highlight, dst3(lp.rect))
+            dst1(lp.rect).SetTo(taskA.highlight, dst3(lp.rect))
 
-            dst2 = atask.pointCloud.Clone
+            dst2 = taskA.pointCloud.Clone
             Selection.dst2.CopyTo(dst2, dst3)
 
-            labels(2) = "Line " + CStr(lp.index) + " selected of " + CStr(atask.lines.lpList.Count) + " top lines.  " +
+            labels(2) = "Line " + CStr(lp.index) + " selected of " + CStr(taskA.lines.lpList.Count) + " top lines.  " +
                     "Use Global Options debug slider to select other lines."
             labels(3) = "Mask of selected line - use debug slider to select other lines."
 
@@ -397,13 +397,13 @@ Namespace VBClasses
             desc = "Create logical lines for all the lines detected."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            dst2 = atask.lines.dst2
-            labels = atask.lines.labels
+            dst2 = taskA.lines.dst2
+            labels = taskA.lines.labels
 
             Dim count As Integer
             lpList.Clear()
 
-            For Each selection.lp In atask.lines.lpList
+            For Each selection.lp In taskA.lines.lpList
                 If selection.lp.age = 1 Then
                     count += 1
                     selection.Run(src)

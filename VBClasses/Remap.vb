@@ -39,7 +39,7 @@ Namespace VBClasses
                     cv.Cv2.Remap(src, dst2, mapx3, mapy3, cv.InterpolationFlags.Nearest)
             End Select
 
-            If atask.heartBeat Then
+            If taskA.heartBeat Then
                 direction += 1
                 direction = direction Mod 4
             End If
@@ -67,7 +67,7 @@ Namespace VBClasses
                 Case 3 ' flip horizontally and vertically
                     cv.Cv2.Flip(src, dst2, cv.FlipMode.XY)
             End Select
-            If atask.heartBeat Then
+            If taskA.heartBeat Then
                 direction += 1
                 direction = direction Mod 4
             End If

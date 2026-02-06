@@ -11,7 +11,7 @@ Namespace VBClasses
         Dim cornerHistory As New List(Of List(Of cv.Point2f))
         Dim feat As New Feature_General
         Public Sub New()
-            atask.featureOptions.FeatureSampleSize.Value = atask.featureOptions.FeatureSampleSize.Maximum
+            taskA.featureOptions.FeatureSampleSize.Value = taskA.featureOptions.FeatureSampleSize.Maximum
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             desc = "Track the GoodFeatures across a frame history and connect the first and last good.corners in the history."
@@ -26,25 +26,25 @@ Namespace VBClasses
                 Dim pt = queries(i)
                 For j = 0 To Math.Min(nabList.Count, options.ptCount) - 1
                     Dim ptNew = trainInput(nabList(j))
-                    vbc.DrawLine(dst, pt, ptNew, white, atask.lineWidth)
-                    If ptNew.X < options.border Then vbc.DrawLine(dst, New cv.Point2f(0, ptNew.Y), ptNew, white, atask.lineWidth)
-                    If ptNew.Y < options.border Then vbc.DrawLine(dst, New cv.Point2f(ptNew.X, 0), ptNew, white, atask.lineWidth)
-                    If ptNew.X > dst.Width - options.border Then vbc.DrawLine(dst, New cv.Point2f(dst.Width, ptNew.Y), ptNew, white, atask.lineWidth)
-                    If ptNew.Y > dst.Height - options.border Then vbc.DrawLine(dst, New cv.Point2f(ptNew.X, dst.Height), ptNew, white, atask.lineWidth)
+                    vbc.DrawLine(dst, pt, ptNew, white, taskA.lineWidth)
+                    If ptNew.X < options.border Then vbc.DrawLine(dst, New cv.Point2f(0, ptNew.Y), ptNew, white, taskA.lineWidth)
+                    If ptNew.Y < options.border Then vbc.DrawLine(dst, New cv.Point2f(ptNew.X, 0), ptNew, white, taskA.lineWidth)
+                    If ptNew.X > dst.Width - options.border Then vbc.DrawLine(dst, New cv.Point2f(dst.Width, ptNew.Y), ptNew, white, taskA.lineWidth)
+                    If ptNew.Y > dst.Height - options.border Then vbc.DrawLine(dst, New cv.Point2f(ptNew.X, dst.Height), ptNew, white, taskA.lineWidth)
                 Next
             Next
             Return dst
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            feat.Run(atask.grayStable)
+            feat.Run(taskA.grayStable)
 
             dst3 = feat.dst2
 
-            If atask.optionsChanged Then cornerHistory.Clear()
+            If taskA.optionsChanged Then cornerHistory.Clear()
 
-            Dim histCount = atask.frameHistoryCount
-            cornerHistory.Add(New List(Of cv.Point2f)(atask.features))
+            Dim histCount = taskA.frameHistoryCount
+            cornerHistory.Add(New List(Of cv.Point2f)(taskA.features))
 
             Dim lastIndex = cornerHistory.Count - 1
             knn.trainInput = New List(Of cv.Point2f)(cornerHistory.ElementAt(0))
@@ -75,7 +75,7 @@ Namespace VBClasses
 
             labels(3) = CStr(lpList.Count) + " points were matched to the previous set of features."
             distanceAvg = 0
-            If atask.heartBeat Then distanceMax = 0
+            If taskA.heartBeat Then distanceMax = 0
             If disList.Count > 10 Then
                 distanceAvg = disList.Average
                 distanceMax = Math.Max(distanceMax, disList.Max)
@@ -106,23 +106,23 @@ Namespace VBClasses
         Public rightMax As Single
         Dim swarm As New Swarm_Basics
         Public Sub New()
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             labels = {"", "", "Left view feature points", "Right view feature points"}
             desc = "Get direction and distance from the left and right images."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            swarm.Run(atask.leftView)
+            swarm.Run(taskA.leftView)
             leftDistance = swarm.distanceAvg
             leftDirection = swarm.directionAvg
             leftMax = swarm.distanceMax
-            dst2 = atask.leftView
+            dst2 = taskA.leftView
             dst2.SetTo(cv.Scalar.White, swarm.DrawLines())
 
-            swarm.Run(atask.rightView)
+            swarm.Run(taskA.rightView)
             rightDistance = swarm.distanceAvg
             rightDirection = swarm.directionAvg
             rightMax = swarm.distanceMax
-            dst3 = atask.rightView
+            dst3 = taskA.rightView
             dst3.SetTo(cv.Scalar.White, swarm.DrawLines())
 
             strOut = swarm.labels(2) + vbCrLf + swarm.labels(3)
@@ -153,7 +153,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             Dim pixels As Integer
             Dim count As Integer
-            For Each rc In atask.redList.oldrclist
+            For Each rc In taskA.redList.oldrclist
                 dst3(rc.rect).SetTo(rc.color, rc.mask)
                 pixels += rc.pixels
                 count += 1
@@ -177,19 +177,19 @@ Namespace VBClasses
             desc = "Floodfill the color image using the swarm outline as a mask"
         End Sub
         Public Shared Sub oldSelectCell()
-            If atask.redList Is Nothing Then Exit Sub
-            If atask.redList.oldrclist.Count = 0 Then Exit Sub
-            If atask.clickPoint = newPoint And atask.redList.oldrclist.Count > 1 Then
-                atask.clickPoint = atask.redList.oldrclist(1).maxDist
+            If taskA.redList Is Nothing Then Exit Sub
+            If taskA.redList.oldrclist.Count = 0 Then Exit Sub
+            If taskA.clickPoint = newPoint And taskA.redList.oldrclist.Count > 1 Then
+                taskA.clickPoint = taskA.redList.oldrclist(1).maxDist
             End If
-            Dim index = atask.redList.rcMap.Get(Of Byte)(atask.clickPoint.Y, atask.clickPoint.X)
+            Dim index = taskA.redList.rcMap.Get(Of Byte)(taskA.clickPoint.Y, taskA.clickPoint.X)
             If index = 0 Then Exit Sub
-            If index > 0 And index < atask.redList.oldrclist.Count Then
-                atask.oldrcD = atask.redList.oldrclist(index)
-                atask.color(atask.oldrcD.rect).SetTo(cv.Scalar.White, atask.oldrcD.mask)
+            If index > 0 And index < taskA.redList.oldrclist.Count Then
+                taskA.oldrcD = taskA.redList.oldrclist(index)
+                taskA.color(taskA.oldrcD.rect).SetTo(cv.Scalar.White, taskA.oldrcD.mask)
             Else
                 ' the 0th cell is always the upper left corner with just 1 pixel.
-                If atask.redList.oldrclist.Count > 1 Then atask.oldrcD = atask.redList.oldrclist(1)
+                If taskA.redList.oldrclist.Count > 1 Then taskA.oldrcD = taskA.redList.oldrclist(1)
             End If
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

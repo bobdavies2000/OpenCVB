@@ -67,7 +67,7 @@ Namespace VBClasses
             desc = "Use this kalman filter to predict the next value."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.optionsChanged Then
+            If taskA.optionsChanged Then
                 If kalman IsNot Nothing Then
                     If kalman.Count > 0 Then
                         For i = 0 To kalman.Count - 1
@@ -150,8 +150,8 @@ Namespace VBClasses
             drawCross(dst2, statePt, white)
             drawCross(dst2, measPt, white)
             drawCross(dst2, predictPt, white)
-            dst2.Line(statePt, measPt, New cv.Scalar(0, 0, 255), atask.lineWidth + 2, atask.lineType)
-            dst2.Line(statePt, predictPt, New cv.Scalar(0, 255, 255), atask.lineWidth + 2, atask.lineType)
+            dst2.Line(statePt, measPt, New cv.Scalar(0, 0, 255), taskA.lineWidth + 2, taskA.lineType)
+            dst2.Line(statePt, predictPt, New cv.Scalar(0, 255, 255), taskA.lineWidth + 2, taskA.lineType)
 
             If msRNG.Next(0, 4) <> 0 Then kf.Correct(measurement)
 
@@ -169,23 +169,23 @@ Namespace VBClasses
     ' https://www.codeproject.com/Articles/865935/Object-Tracking-Kalman-Filter-with-Ease
     Public Class NR_Kalman_MousePredict : Inherits TaskParent
         Public Sub New()
-            atask.kalman = New Kalman_Basics
-            ReDim atask.kalman.kInput(2 - 1)
-            ReDim atask.kalman.kOutput(2 - 1)
+            taskA.kalman = New Kalman_Basics
+            ReDim taskA.kalman.kInput(2 - 1)
+            ReDim taskA.kalman.kOutput(2 - 1)
 
             labels(2) = "Red is real mouse, white is prediction"
             desc = "Use kalman filter to predict the next mouse location."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.frameCount Mod 300 = 0 Then dst2.SetTo(0)
+            If taskA.frameCount Mod 300 = 0 Then dst2.SetTo(0)
 
-            Dim lastStateResult = New cv.Point(atask.kalman.kOutput(0), atask.kalman.kOutput(1))
-            Static lastRealMouse As cv.Point = atask.mouseMovePoint
-            atask.kalman.kInput = {atask.mouseMovePoint.X, atask.mouseMovePoint.Y}
-            atask.kalman.Run(emptyMat)
-            vbc.DrawLine(dst2, New cv.Point(atask.kalman.kOutput(0), atask.kalman.kOutput(1)), lastStateResult, white)
-            dst2.Line(atask.mouseMovePoint, lastRealMouse, cv.Scalar.Red)
-            lastRealMouse = atask.mouseMovePoint
+            Dim lastStateResult = New cv.Point(taskA.kalman.kOutput(0), taskA.kalman.kOutput(1))
+            Static lastRealMouse As cv.Point = taskA.mouseMovePoint
+            taskA.kalman.kInput = {taskA.mouseMovePoint.X, taskA.mouseMovePoint.Y}
+            taskA.kalman.Run(emptyMat)
+            vbc.DrawLine(dst2, New cv.Point(taskA.kalman.kOutput(0), taskA.kalman.kOutput(1)), lastStateResult, white)
+            dst2.Line(taskA.mouseMovePoint, lastRealMouse, cv.Scalar.Red)
+            lastRealMouse = taskA.mouseMovePoint
         End Sub
     End Class
 
@@ -303,7 +303,7 @@ Namespace VBClasses
             desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            kalman.Run(atask.depthRGB)
+            kalman.Run(taskA.depthRGB)
             dst2 = kalman.dst2
             dst3 = kalman.dst3
         End Sub
@@ -326,13 +326,13 @@ Namespace VBClasses
             desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            resize.Run(atask.pcSplit(2))
+            resize.Run(taskA.pcSplit(2))
 
             kalman.input = resize.dst2.Reshape(1, resize.dst2.Width * resize.dst2.Height)
             kalman.Run(src)
             dst2 = kalman.output.Reshape(1, resize.dst2.Height)
             dst2 = dst2.Resize(src.Size())
-            cv.Cv2.Subtract(dst2, atask.pcSplit(2), dst3)
+            cv.Cv2.Subtract(dst2, taskA.pcSplit(2), dst3)
             dst3 = dst3.Normalize(255)
         End Sub
     End Class
@@ -567,7 +567,7 @@ Namespace VBClasses
                 Next
             End If
 
-            matrix(atask.frameCount Mod saveAvgCount) = kInput
+            matrix(taskA.frameCount Mod saveAvgCount) = kInput
             kAverage = (cv.Mat.FromPixelData(saveAvgCount, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean()(0)
 
             If options.useKalman Then

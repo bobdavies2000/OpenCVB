@@ -27,7 +27,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Type <> cv.MatType.CV_32FC3 Then src = atask.pointCloud.Clone
+            If src.Type <> cv.MatType.CV_32FC3 Then src = taskA.pointCloud.Clone
 
             Dim pc32S As New cv.Mat
             src.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / options.reductionTarget)
@@ -35,12 +35,12 @@ Namespace VBClasses
 
             dst2.SetTo(0)
             Dim saveNoDepth As cv.Mat = Nothing
-            If src.Size <> atask.workRes Then
-                saveNoDepth = atask.noDepthMask.Clone
-                atask.noDepthMask = atask.noDepthMask.Resize(src.Size)
+            If src.Size <> taskA.workRes Then
+                saveNoDepth = taskA.noDepthMask.Clone
+                taskA.noDepthMask = taskA.noDepthMask.Resize(src.Size)
             End If
             If options.PrepX Then
-                prepEdges.Run(reduceChan(split(0), atask.noDepthMask))
+                prepEdges.Run(reduceChan(split(0), taskA.noDepthMask))
                 If dst2.Size <> src.Size Then
                     dst2 = dst2.Resize(src.Size)
                     dst2 = dst2 Or prepEdges.dst3
@@ -50,12 +50,12 @@ Namespace VBClasses
             End If
 
             If options.PrepY Then
-                prepEdges.Run(reduceChan(split(1), atask.noDepthMask))
+                prepEdges.Run(reduceChan(split(1), taskA.noDepthMask))
                 dst2 = dst2 Or prepEdges.dst3
             End If
 
             If options.PrepZ Then
-                prepEdges.Run(reduceChan(split(2), atask.noDepthMask))
+                prepEdges.Run(reduceChan(split(2), taskA.noDepthMask))
                 dst2 = dst2 Or prepEdges.dst3
             End If
 
@@ -66,7 +66,7 @@ Namespace VBClasses
             ' this rectangle prevents bleeds at the image edges.  It is necessary.  Test without it to see the impact.
             dst2.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), 255, 2)
 
-            If src.Size <> atask.workRes Then atask.noDepthMask = saveNoDepth.Clone
+            If src.Size <> taskA.workRes Then taskA.noDepthMask = saveNoDepth.Clone
             labels(2) = "Using reduction factor = " + CStr(options.reductionTarget)
         End Sub
     End Class
@@ -84,22 +84,22 @@ Namespace VBClasses
             desc = "Run the C++ PrepXY to create a list of mask, rect, and other info about image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim inputX(atask.pcSplit(0).Total * atask.pcSplit(0).ElemSize - 1) As Byte
-            Dim inputY(atask.pcSplit(1).Total * atask.pcSplit(1).ElemSize - 1) As Byte
+            Dim inputX(taskA.pcSplit(0).Total * taskA.pcSplit(0).ElemSize - 1) As Byte
+            Dim inputY(taskA.pcSplit(1).Total * taskA.pcSplit(1).ElemSize - 1) As Byte
 
-            Marshal.Copy(atask.pcSplit(0).Data, inputX, 0, inputX.Length)
-            Marshal.Copy(atask.pcSplit(1).Data, inputY, 0, inputY.Length)
+            Marshal.Copy(taskA.pcSplit(0).Data, inputX, 0, inputX.Length)
+            Marshal.Copy(taskA.pcSplit(1).Data, inputY, 0, inputY.Length)
 
             Dim handleX = GCHandle.Alloc(inputX, GCHandleType.Pinned)
             Dim handleY = GCHandle.Alloc(inputY, GCHandleType.Pinned)
 
             Dim imagePtr = PrepXY_Run(cPtr, handleX.AddrOfPinnedObject(), handleY.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                  atask.xRange, atask.yRange, atask.histogramBins)
+                                  taskA.xRange, taskA.yRange, taskA.histogramBins)
             handleX.Free()
             handleY.Free()
 
             dst2 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
-            dst2.SetTo(0, atask.noDepthMask)
+            dst2.SetTo(0, taskA.noDepthMask)
 
             dst3 = PaletteBlackZero(dst2)
         End Sub
@@ -126,14 +126,14 @@ Namespace VBClasses
             For i = 0 To 1
                 Select Case i
                     Case 0 ' X Reduction
-                        dst1 = atask.pcSplit(0)
-                        ranges = New cv.Rangef() {New cv.Rangef(-atask.xRange, atask.xRange)}
+                        dst1 = taskA.pcSplit(0)
+                        ranges = New cv.Rangef() {New cv.Rangef(-taskA.xRange, taskA.xRange)}
                     Case 1 ' Y Reduction
-                        dst1 = atask.pcSplit(1)
-                        ranges = New cv.Rangef() {New cv.Rangef(-atask.yRange, atask.yRange)}
+                        dst1 = taskA.pcSplit(1)
+                        ranges = New cv.Rangef() {New cv.Rangef(-taskA.yRange, taskA.yRange)}
                 End Select
 
-                cv.Cv2.CalcHist({dst1}, {0}, atask.depthMask, histogram, 1, {atask.histogramBins}, ranges)
+                cv.Cv2.CalcHist({dst1}, {0}, taskA.depthMask, histogram, 1, {taskA.histogramBins}, ranges)
 
                 Dim histArray(histogram.Total - 1) As Single
                 Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -150,9 +150,9 @@ Namespace VBClasses
             Next
 
             dst3.ConvertTo(dst2, cv.MatType.CV_8U)
-            dst2.SetTo(0, atask.noDepthMask)
+            dst2.SetTo(0, taskA.noDepthMask)
 
-            labels(2) = CStr(atask.histogramBins * 2 - zeroCount) + " depth regions mapped (control with histogram bins.)"
+            labels(2) = CStr(taskA.histogramBins * 2 - zeroCount) + " depth regions mapped (control with histogram bins.)"
         End Sub
     End Class
 
@@ -228,12 +228,12 @@ Namespace VBClasses
             handleSrc.Free()
 
             dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
-            If src.Size <> atask.noDepthMask.Size Then
-                dst3.SetTo(255, atask.noDepthMask.Resize(src.Size))
+            If src.Size <> taskA.noDepthMask.Size Then
+                dst3.SetTo(255, taskA.noDepthMask.Resize(src.Size))
                 dst2 = dst2.Resize(src.Size)
                 dst2.SetTo(0, dst3)
             Else
-                dst3.SetTo(255, atask.noDepthMask)
+                dst3.SetTo(255, taskA.noDepthMask)
                 dst2.SetTo(0, dst3)
             End If
         End Sub
@@ -256,7 +256,7 @@ Namespace VBClasses
             desc = "Reduction transform for the point cloud"
         End Sub
         Private Function reduceChan(chan As cv.Mat) As cv.Mat
-            chan *= atask.cloudOptions.rcOptions.reductionTarget
+            chan *= taskA.cloudOptions.rcOptions.reductionTarget
             Dim mm As mmData = GetMinMax(chan)
             Dim dst32f As New cv.Mat
             If Math.Abs(mm.minVal) > mm.maxVal Then
@@ -268,15 +268,15 @@ Namespace VBClasses
             End If
             chan = (chan - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
             chan.ConvertTo(chan, cv.MatType.CV_8U)
-            chan.SetTo(0, atask.noDepthMask)
+            chan.SetTo(0, taskA.noDepthMask)
             Return chan
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            reductionTarget = atask.cloudOptions.rcOptions.reductionTarget
+            reductionTarget = taskA.cloudOptions.rcOptions.reductionTarget
 
             Dim pc32S As New cv.Mat
-            atask.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / reductionTarget)
+            taskA.pointCloud.ConvertTo(pc32S, cv.MatType.CV_32SC3, 1000 / reductionTarget)
             Dim split = pc32S.Split()
 
             dst2.SetTo(0)
@@ -298,9 +298,9 @@ Namespace VBClasses
             redSimple.Run(src)
             edges.Run(redSimple.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             dst3 = edges.dst2
-            dst3.CopyTo(dst2, atask.noDepthMask)
+            dst3.CopyTo(dst2, taskA.noDepthMask)
 
-            dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, atask.lineWidth)
+            dst2.Rectangle(New cv.Rect(0, 0, dst2.Width - 1, dst2.Height - 1), 255, taskA.lineWidth)
             labels(2) = "Using reduction factor = " + CStr(reductionTarget)
         End Sub
     End Class
@@ -321,7 +321,7 @@ Namespace VBClasses
             dst2 = edges.dst2
             labels(2) = edges.labels(2)
 
-            dst2.SetTo(0, atask.noDepthMask)
+            dst2.SetTo(0, taskA.noDepthMask)
         End Sub
     End Class
 
@@ -342,7 +342,7 @@ Namespace VBClasses
             dst2 = edges.dst2
             labels(2) = edges.labels(2)
 
-            dst2.SetTo(0, atask.noDepthMask)
+            dst2.SetTo(0, taskA.noDepthMask)
         End Sub
     End Class
 
@@ -361,7 +361,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             edges.Run(src)
             dst2 = edges.dst2
-            dst2.SetTo(0, atask.noDepthMask)
+            dst2.SetTo(0, taskA.noDepthMask)
 
             labels(2) = edges.labels(2)
         End Sub
@@ -382,9 +382,9 @@ Namespace VBClasses
             If reductionName = "" Then reductionName = options.reductionName
 
             Dim split() = {New cv.Mat, New cv.Mat, New cv.Mat}
-            atask.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / options.reductionTarget)
-            atask.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / options.reductionTarget)
-            atask.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / options.reductionTarget)
+            taskA.pcSplit(0).ConvertTo(split(0), cv.MatType.CV_32S, 1000 / options.reductionTarget)
+            taskA.pcSplit(1).ConvertTo(split(1), cv.MatType.CV_32S, 1000 / options.reductionTarget)
+            taskA.pcSplit(2).ConvertTo(split(2), cv.MatType.CV_32S, 1000 / options.reductionTarget)
 
             Select Case reductionName
                 Case "X Reduction"
@@ -415,7 +415,7 @@ Namespace VBClasses
             dst2 = (dst3 - mm.minVal) * 255 / (mm.maxVal - mm.minVal)
             dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-            dst2.SetTo(0, atask.noDepthMask)
+            dst2.SetTo(0, taskA.noDepthMask)
             labels(2) = "Using reduction factor = " + CStr(options.reductionTarget)
 
             If standaloneTest() Then

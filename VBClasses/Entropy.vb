@@ -12,27 +12,27 @@ Namespace VBClasses
             If r.Height <= 0 Then r.Height = 1
             If r.X < 0 Then r.X = 0
             If r.Y < 0 Then r.Y = 0
-            If r.X + r.Width >= atask.workRes.Width Then r.X = atask.workRes.Width - r.Width - 1
-            If r.Y + r.Height >= atask.workRes.Height Then r.Y = atask.workRes.Height - r.Height - 1
+            If r.X + r.Width >= taskA.workRes.Width Then r.X = taskA.workRes.Width - r.Width - 1
+            If r.Y + r.Height >= taskA.workRes.Height Then r.Y = taskA.workRes.Height - r.Height - 1
             Return r
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim stdSize = 30
-            If atask.drawRect = New cv.Rect Then
-                atask.drawRect = New cv.Rect(30, 30, stdSize, stdSize) ' arbitrary rectangle
+            If taskA.drawRect = New cv.Rect Then
+                taskA.drawRect = New cv.Rect(30, 30, stdSize, stdSize) ' arbitrary rectangle
             End If
-            If atask.mouseClickFlag Then
-                atask.drawRect = validatePreserve(New cv.Rect(atask.clickPoint.X, atask.clickPoint.Y, stdSize, stdSize))
+            If taskA.mouseClickFlag Then
+                taskA.drawRect = validatePreserve(New cv.Rect(taskA.clickPoint.X, taskA.clickPoint.Y, stdSize, stdSize))
             End If
-            atask.drawRect = ValidateRect(atask.drawRect)
+            taskA.drawRect = ValidateRect(taskA.drawRect)
             If src.Channels() = 3 Then
-                entropy.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)(atask.drawRect))
+                entropy.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)(taskA.drawRect))
             Else
-                entropy.Run(src(atask.drawRect))
+                entropy.Run(src(taskA.drawRect))
             End If
             dst2 = entropy.dst2
-            dst2.Rectangle(atask.drawRect, white, atask.lineWidth)
-            If atask.heartBeat Then strOut = "Click anywhere to measure the entropy with rect(pt.x, pt.y, " +
+            dst2.Rectangle(taskA.drawRect, white, taskA.lineWidth)
+            If taskA.heartBeat Then strOut = "Click anywhere to measure the entropy with rect(pt.x, pt.y, " +
                                              CStr(stdSize) + ", " + CStr(stdSize) + ")" + vbCrLf + vbCrLf + "Total entropy = " +
                                              Format(entropy.entropyVal, fmt1) + vbCrLf + entropy.strOut
             SetTrueText(strOut, 3)
@@ -51,30 +51,30 @@ Namespace VBClasses
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
             If standalone Then
                 Dim val As Integer = dst2.Width / 10
-                If atask.gOptions.GridSlider.Maximum < val Then atask.gOptions.GridSlider.Maximum = val
-                atask.gOptions.GridSlider.Value = dst2.Width \ 10
+                If taskA.gOptions.GridSlider.Maximum < val Then taskA.gOptions.GridSlider.Maximum = val
+                taskA.gOptions.GridSlider.Value = dst2.Width \ 10
             End If
             desc = "Find the highest entropy section of the color image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim entropyList(atask.gridRects.Count - 1) As Single
+            Dim entropyList(taskA.gridRects.Count - 1) As Single
             Dim maxEntropy As Single = Single.MinValue
             Dim minEntropy As Single = Single.MaxValue
             trueData.Clear()
 
             src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst1.SetTo(0)
-            For Each roi In atask.gridRects
+            For Each roi In taskA.gridRects
                 If roi.Width = roi.Height Then
                     entropy.Run(src(roi))
                     dst1(roi).SetTo(entropy.entropyVal)
 
-                    If entropy.entropyVal > maxEntropy Or atask.optionsChanged Then
+                    If entropy.entropyVal > maxEntropy Or taskA.optionsChanged Then
                         maxEntropy = entropy.entropyVal
                         eMaxRect = roi
                     End If
                     If entropy.entropyVal < minEntropy Then minEntropy = entropy.entropyVal
-                    If standaloneTest() And atask.brickSize > 16 Then
+                    If standaloneTest() And taskA.brickSize > 16 Then
                         Dim pt = New cv.Point(roi.X, roi.Y)
                         SetTrueText(Format(entropy.entropyVal, fmt2), pt, 2)
                         SetTrueText(Format(entropy.entropyVal, fmt2), pt, 3)
@@ -86,9 +86,9 @@ Namespace VBClasses
             dst2 = ShowAddweighted(src, dst2, labels(3))
 
             If standaloneTest() Then
-                dst2.Rectangle(eMaxRect, 255, atask.lineWidth)
+                dst2.Rectangle(eMaxRect, 255, taskA.lineWidth)
                 dst3.SetTo(0)
-                dst3.Rectangle(eMaxRect, white, atask.lineWidth)
+                dst3.Rectangle(eMaxRect, white, taskA.lineWidth)
             End If
             labels(2) = "Lighter = higher entropy. Range: " + Format(minEntropy, "0.0") + " to " + Format(maxEntropy, "0.0")
         End Sub
@@ -112,7 +112,7 @@ Namespace VBClasses
             entropy.Run(fast.dst2)
             dst2 = entropy.dst2
             dst3 = entropy.dst2
-            dst3.Rectangle(entropy.eMaxRect, atask.highlight, atask.lineWidth)
+            dst3.Rectangle(entropy.eMaxRect, taskA.highlight, taskA.lineWidth)
         End Sub
     End Class
 
@@ -134,7 +134,7 @@ Namespace VBClasses
             Return channelEntropy
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim dimensions() = New Integer() {atask.histogramBins}
+            Dim dimensions() = New Integer() {taskA.histogramBins}
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
             Dim mm = GetMinMax(src)
@@ -142,10 +142,10 @@ Namespace VBClasses
             If mm.minVal = mm.maxVal Then ranges = New cv.Rangef() {New cv.Rangef(0, 255)}
 
             If standalone Then
-                If atask.drawRect.Width = 0 Or atask.drawRect.Height = 0 Then
-                    atask.drawRect = New cv.Rect(10, 10, 50, 50) ' arbitrary template to match
+                If taskA.drawRect.Width = 0 Or taskA.drawRect.Height = 0 Then
+                    taskA.drawRect = New cv.Rect(10, 10, 50, 50) ' arbitrary template to match
                 End If
-                src = src(atask.drawRect)
+                src = src(taskA.drawRect)
             End If
             Dim hist As New cv.Mat
             cv.Cv2.CalcHist({src}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
@@ -154,7 +154,7 @@ Namespace VBClasses
             entropyVal = channelEntropy(src.Total, histNormalized) * 1000
             strOut = "Entropy X1000 " + Format(entropyVal, fmt1) + vbCrLf
             dst2 = src
-            dst2.Rectangle(atask.drawRect, white, atask.lineWidth)
+            dst2.Rectangle(taskA.drawRect, white, taskA.lineWidth)
             dst3 = src
             SetTrueText(strOut, 3)
         End Sub
@@ -182,8 +182,8 @@ Namespace VBClasses
             desc = "Find the highest entropy in each quadrant"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.firstPass Then
-                For Each roi In atask.gridRects
+            If taskA.firstPass Then
+                For Each roi In taskA.gridRects
                     Dim xSub = roi.X + roi.Width
                     Dim ySub = roi.Y + roi.Height
                     If ySub <= dst2.Height / 3 Then
@@ -217,18 +217,18 @@ Namespace VBClasses
                 vbc.DrawLine(dst0, p1, p2, white)
             End If
 
-            dst2 = atask.color.Clone
+            dst2 = taskA.color.Clone
             For i = 0 To subDivisionCount - 1
                 entropies(i).Clear()
                 eROI(i).Clear()
             Next
 
-            dst1 = atask.grayStable.Clone
-            Dim dimensions() = New Integer() {atask.histogramBins}
+            dst1 = taskA.grayStable.Clone
+            Dim dimensions() = New Integer() {taskA.histogramBins}
             Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
             Dim hist As New cv.Mat
-            For i = 0 To atask.gridRects.Count - 1
-                Dim gr = atask.gridRects(i)
+            For i = 0 To taskA.gridRects.Count - 1
+                Dim gr = taskA.gridRects(i)
                 cv.Cv2.CalcHist({dst1(gr)}, {0}, New cv.Mat(), hist, 1, dimensions, ranges)
                 hist = hist.Normalize(0, hist.Rows, cv.NormTypes.MinMax)
 
@@ -238,10 +238,10 @@ Namespace VBClasses
                 eROI(subDivisions(i)).Add(gr)
             Next
 
-            Dim str = If(atask.toggleOn, "minimum", "maximum")
+            Dim str = If(taskA.toggleOn, "minimum", "maximum")
             labels(3) = "The " + str + " entropy values in each subdivision"
             For i = 0 To entropies.Count - 1
-                Dim val = If(atask.toggleOn, entropies(i).Min, entropies(i).Max)
+                Dim val = If(taskA.toggleOn, entropies(i).Min, entropies(i).Max)
                 Dim index = entropies(i).IndexOf(val)
                 Dim roi = eROI(i)(index)
                 dst2.Rectangle(roi, white)

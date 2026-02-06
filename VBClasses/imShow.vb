@@ -6,7 +6,7 @@ Namespace VBClasses
             desc = "This is just a reminder that all HighGUI methods are available in OpenCVB"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.testAllRunning Then Exit Sub ' when testing, this can occasionally fail - mysterious.
+            If taskA.testAllRunning Then Exit Sub ' when testing, this can occasionally fail - mysterious.
             If src.Width > 0 Then cv.Cv2.ImShow("color", src)
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
@@ -24,9 +24,9 @@ Namespace VBClasses
             desc = "Experimenting with how to show an 32fc3 Mat file."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.testAllRunning Then Exit Sub ' when testing, this can occasionally fail - mysterious.
-            cv.Cv2.ImShow("Point cloud", atask.pointCloud)
-            dst2 = atask.pointCloud.Clone
+            If taskA.testAllRunning Then Exit Sub ' when testing, this can occasionally fail - mysterious.
+            cv.Cv2.ImShow("Point cloud", taskA.pointCloud)
+            dst2 = taskA.pointCloud.Clone
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
             cv.Cv2.DestroyWindow("Point cloud")

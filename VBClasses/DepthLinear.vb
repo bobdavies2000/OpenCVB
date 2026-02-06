@@ -18,7 +18,7 @@ Namespace VBClasses
 
             inputX.Run(src)
             dst2 = inputX.dst2.Clone
-            dst0 = atask.pcSplit(0).Clone
+            dst0 = taskA.pcSplit(0).Clone
             Dim fixCount As Integer
             For y = 0 To mask.Height - 1
                 For x = 0 To mask.Width - 1
@@ -44,7 +44,7 @@ Namespace VBClasses
 
             inputY.Run(src)
             dst3 = inputY.dst2.Clone
-            cv.Cv2.Merge({dst2, dst3, atask.pcSplit(2)}, cloud)
+            cv.Cv2.Merge({dst2, dst3, taskA.pcSplit(2)}, cloud)
         End Sub
     End Class
 
@@ -63,7 +63,7 @@ Namespace VBClasses
             plotHist.createHistogram = True
             plotHist.removeZeroEntry = True
 
-            'If standalone Then atask.gOptions.displaydst1.checked = true
+            'If standalone Then taskA.gOptions.displaydst1.checked = true
             'labels(1) = "Mask of differences > deltaZ (only last shown)"
             labels(3) = "Histograms showing the range of pointcloud differences for X, Y, and Z"
             desc = "Provide a mask for pixels that are within x mm depth of its neighbor"
@@ -72,15 +72,15 @@ Namespace VBClasses
             options.Run()
             Dim r1 As cv.Rect, r2 As cv.Rect
 
-            For i = 0 To atask.pcSplit.Count - 1
-                pc = atask.pcSplit(i)(roi)
+            For i = 0 To taskA.pcSplit.Count - 1
+                pc = taskA.pcSplit(i)(roi)
 
                 ' toggle between the pixel to the right or below
-                If atask.toggleOn Then
-                    r1 = New cv.Rect(0, 0, atask.cols - 1, atask.rows)
+                If taskA.toggleOn Then
+                    r1 = New cv.Rect(0, 0, taskA.cols - 1, taskA.rows)
                     r2 = New cv.Rect(1, 0, r1.Width, r1.Height)
                 Else
-                    r1 = New cv.Rect(0, 0, atask.cols, atask.rows - 1)
+                    r1 = New cv.Rect(0, 0, taskA.cols, taskA.rows - 1)
                     r2 = New cv.Rect(0, 1, r1.Width, r1.Height)
                 End If
 
@@ -91,7 +91,7 @@ Namespace VBClasses
 
                 mats.mat(i).SetTo(0, dst1)
 
-                If atask.optionsChanged Then
+                If taskA.optionsChanged Then
                     plotHist.minRange = 0
                     plotHist.maxRange = options.delta
                 End If
@@ -112,7 +112,7 @@ Namespace VBClasses
             SetTrueText("Lower left is a mask showing where depth is" + vbCrLf + "within " +
                      Str(CInt(options.delta * 1000)) + " mm's of its neighbor" + vbCrLf + vbCrLf +
                      "Toggle is between using the pixel to the right " + vbCrLf + "or below",
-                     New cv.Point(atask.cols / 2 + 5, atask.rows / 2 + 5))
+                     New cv.Point(taskA.cols / 2 + 5, taskA.rows / 2 + 5))
         End Sub
     End Class
 
@@ -126,7 +126,7 @@ Namespace VBClasses
         Public pc As cv.Mat
         Public options As New Options_LinearInput
         Public Sub New()
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
 
             plotHist.createHistogram = True
             plotHist.removeZeroEntry = True
@@ -137,15 +137,15 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            pc = atask.pcSplit(options.dimension)(roi)
+            pc = taskA.pcSplit(options.dimension)(roi)
 
             ' use the pixel below for Y dimension
             Dim r1 As cv.Rect, r2 As cv.Rect
             If options.dimension <> 1 Or (options.dimension = 2 And options.zy) Then
-                r1 = New cv.Rect(0, 0, atask.cols - 1, atask.rows)
+                r1 = New cv.Rect(0, 0, taskA.cols - 1, taskA.rows)
                 r2 = New cv.Rect(1, 0, r1.Width, r1.Height)
             Else
-                r1 = New cv.Rect(0, 0, atask.cols, atask.rows - 1)
+                r1 = New cv.Rect(0, 0, taskA.cols, taskA.rows - 1)
                 r2 = New cv.Rect(0, 1, r1.Width, r1.Height)
             End If
 
@@ -159,7 +159,7 @@ Namespace VBClasses
             labels(2) = "Pointcloud data in " + msg + " where neighbors are less than " +
                     CStr(CInt(options.delta * 1000)) + " mm's apart"
             If standaloneTest() Then
-                If atask.optionsChanged Then
+                If taskA.optionsChanged Then
                     plotHist.minRange = 0
                     plotHist.maxRange = options.delta
                     labels(3) = "0 to " + CStr(CInt(options.delta * 1000)) + " mm's difference from neighbor "
@@ -238,27 +238,27 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim pt = atask.mouseMovePoint
-            If standalone And atask.mouseMovePoint = newPoint Then
+            Dim pt = taskA.mouseMovePoint
+            If standalone And taskA.mouseMovePoint = newPoint Then
                 pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
             End If
 
             Dim rowCol As cv.Mat, p1 As cv.Point, p2 As cv.Point
             If options.dimension = 1 Or (options.dimension = 2 And options.zy) Then
-                rowCol = atask.pcSplit(options.dimension).Col(pt.X).Clone
+                rowCol = taskA.pcSplit(options.dimension).Col(pt.X).Clone
                 rowCol = cv.Mat.FromPixelData(1, rowCol.Rows, cv.MatType.CV_32FC1, rowCol.Data)
                 p1 = New cv.Point(pt.X, 0)
                 p2 = New cv.Point(pt.X, dst2.Height)
-                plotSLR.plot.minY = -atask.yRange
-                plotSLR.plot.maxY = atask.yRange
+                plotSLR.plot.minY = -taskA.yRange
+                plotSLR.plot.maxY = taskA.yRange
             Else
-                rowCol = atask.pcSplit(options.dimension).Row(pt.Y)
+                rowCol = taskA.pcSplit(options.dimension).Row(pt.Y)
                 p1 = New cv.Point(0, pt.Y)
                 p2 = New cv.Point(dst2.Width, pt.Y)
-                plotSLR.plot.minY = -atask.xRange
-                plotSLR.plot.maxY = atask.xRange
+                plotSLR.plot.minY = -taskA.xRange
+                plotSLR.plot.maxY = taskA.xRange
             End If
-            atask.depthRGB.Line(p1, p2, atask.highlight, atask.lineWidth)
+            taskA.depthRGB.Line(p1, p2, taskA.highlight, taskA.lineWidth)
 
             plotSLR.slrCore.inputX.Clear()
             plotSLR.slrCore.inputY.Clear()
@@ -273,7 +273,7 @@ Namespace VBClasses
                 plotSLR.Run(src)
                 dst2 = plotSLR.dst2
                 dst3 = plotSLR.dst3
-                If atask.heartBeat Then labels(2) = plotSLR.plot.labels(2)
+                If taskA.heartBeat Then labels(2) = plotSLR.plot.labels(2)
             End If
         End Sub
     End Class
@@ -296,14 +296,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst2 = atask.pcSplit(0).Clone
+            dst2 = taskA.pcSplit(0).Clone
 
             Dim outputX As New List(Of Double)
             Dim outputY As New List(Of Double)
             Dim output As New List(Of cv.Point2d)
 
             For y = 0 To dst2.Height - 1
-                Dim rowCol As cv.Mat = atask.pcSplit(0).Row(y)
+                Dim rowCol As cv.Mat = taskA.pcSplit(0).Row(y)
 
                 Dim dataY(rowCol.Total - 1) As Single
                 Marshal.Copy(rowCol.Data, dataY, 0, dataY.Length)
@@ -320,8 +320,8 @@ Namespace VBClasses
                     dst2.Set(Of Single)(y, x, CSng(outputY(x)))
                 Next
             Next
-            cv.Cv2.Merge({dst2, atask.pcSplit(1), atask.pcSplit(2)}, dst3)
-            dst3.SetTo(0, atask.noDepthMask)
+            cv.Cv2.Merge({dst2, taskA.pcSplit(1), taskA.pcSplit(2)}, dst3)
+            dst3.SetTo(0, taskA.noDepthMask)
         End Sub
     End Class
 
@@ -343,14 +343,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            dst2 = atask.pcSplit(1).Clone
+            dst2 = taskA.pcSplit(1).Clone
 
             Dim outputX As New List(Of Double)
             Dim outputY As New List(Of Double)
             Dim output As New List(Of cv.Point2d)
 
             For x = 0 To dst2.Width - 1
-                Dim rowCol = atask.pcSplit(1).Col(x).Clone
+                Dim rowCol = taskA.pcSplit(1).Col(x).Clone
                 rowCol = cv.Mat.FromPixelData(1, rowCol.Rows, cv.MatType.CV_32FC1, rowCol.Data)
 
                 Dim dataY(rowCol.Total - 1) As Single
@@ -368,8 +368,8 @@ Namespace VBClasses
                     dst2.Set(Of Single)(y, x, CSng(outputY(y)))
                 Next
             Next
-            cv.Cv2.Merge({atask.pcSplit(0), dst2, atask.pcSplit(2)}, dst3)
-            dst3.SetTo(0, atask.noDepthMask)
+            cv.Cv2.Merge({taskA.pcSplit(0), dst2, taskA.pcSplit(2)}, dst3)
+            dst3.SetTo(0, taskA.noDepthMask)
         End Sub
     End Class
 End Namespace

@@ -43,7 +43,7 @@ Namespace VBClasses
             Dim responseMat = cv.Mat.FromPixelData(trainMats(0).Total, 1, cv.MatType.CV_32F, trainResponse.Data)
 
             Dim respFormat = cv.MatType.CV_32F
-            If atask.heartBeat Or buildEveryPass Then
+            If taskA.heartBeat Or buildEveryPass Then
                 Select Case options.ML_Name
                     Case "NormalBayesClassifier"
                         normalBayes = cv.ML.NormalBayesClassifier.Create()
@@ -158,7 +158,7 @@ Namespace VBClasses
             desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            mats.mat(1) = atask.noDepthMask.Clone
+            mats.mat(1) = taskA.noDepthMask.Clone
 
             Dim color32f As New cv.Mat
             resizer.Run(src)
@@ -167,13 +167,13 @@ Namespace VBClasses
             resizer.dst2.ConvertTo(color32f, cv.MatType.CV_32FC3)
             Dim shadowSmall = mats.mat(1).Resize(color32f.Size()).Clone()
             color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
-            Dim depth = atask.pcSplit(2).Resize(color32f.Size())
+            Dim depth = taskA.pcSplit(2).Resize(color32f.Size())
 
-            Dim mask = depth.Threshold(atask.MaxZmeters, 255, cv.ThresholdTypes.Binary)
+            Dim mask = depth.Threshold(taskA.MaxZmeters, 255, cv.ThresholdTypes.Binary)
             mask.ConvertTo(mask, cv.MatType.CV_8U)
             mats.mat(2) = mask.Resize(src.Size())
 
-            depth.SetTo(atask.MaxZmeters, Not mask)
+            depth.SetTo(taskA.MaxZmeters, Not mask)
 
             colorPal.Run(depth.ConvertScaleAbs())
             mats.mat(3) = colorPal.dst2.Clone()
@@ -200,7 +200,7 @@ Namespace VBClasses
 
             mats.Run(emptyMat)
             dst2 = mats.dst2
-            labels(2) = "prediction, shadow, Depth Mask < " + CStr(atask.MaxZmeters) + ", Learn Input"
+            labels(2) = "prediction, shadow, Depth Mask < " + CStr(taskA.MaxZmeters) + ", Learn Input"
             dst3 = mats.dst3
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
@@ -222,7 +222,7 @@ Namespace VBClasses
             ' desc = "Use BGR to predict depth across the entire image, maxDepth = slider value, resize % as well."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            mats.mat(0) = atask.noDepthMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            mats.mat(0) = taskA.noDepthMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
             Dim color32f As New cv.Mat
 
@@ -230,17 +230,17 @@ Namespace VBClasses
 
             Dim colorROI As New cv.Rect(0, 0, resizer.newSize.Width, resizer.newSize.Height)
             resizer.dst2.ConvertTo(color32f, cv.MatType.CV_32FC3)
-            Dim shadowSmall = atask.noDepthMask.Resize(color32f.Size())
+            Dim shadowSmall = taskA.noDepthMask.Resize(color32f.Size())
             color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
-            Dim depth32f = atask.pcSplit(2).Resize(color32f.Size())
+            Dim depth32f = taskA.pcSplit(2).Resize(color32f.Size())
 
-            Dim mask = depth32f.Threshold(atask.MaxZmeters, atask.MaxZmeters, cv.ThresholdTypes.BinaryInv)
+            Dim mask = depth32f.Threshold(taskA.MaxZmeters, taskA.MaxZmeters, cv.ThresholdTypes.BinaryInv)
             mask.SetTo(0, shadowSmall) ' remove the unknown depth...
             mask.ConvertTo(mask, cv.MatType.CV_8U)
             mats.mat(2) = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Resize(src.Size)
 
             mask = Not mask
-            depth32f.SetTo(atask.MaxZmeters, mask)
+            depth32f.SetTo(taskA.MaxZmeters, mask)
 
             colorizer.Run(depth32f.ConvertScaleAbs)
             mats.mat(3) = colorizer.dst2.Clone()
@@ -283,7 +283,7 @@ Namespace VBClasses
 
             mats.Run(emptyMat)
             dst3 = mats.dst2
-            labels(3) = "shadow, empty, Depth Mask < " + CStr(atask.MaxZmeters) + ", Learn Input"
+            labels(3) = "shadow, empty, Depth Mask < " + CStr(taskA.MaxZmeters) + ", Learn Input"
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If rtree IsNot Nothing Then rtree.Dispose()
@@ -307,32 +307,32 @@ Namespace VBClasses
         Dim color8U As New Color8U_Basics
         Dim rtree As RTrees
         Public Sub New()
-            atask.featureOptions.Color8USource.SelectedItem() = "Bin4Way_Regions"
+            taskA.featureOptions.Color8USource.SelectedItem() = "Bin4Way_Regions"
             desc = "Prepare a grid of color and depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(src)
             dst2 = color8U.dst3
-            labels(2) = "Output of Color8U_Basics running " + atask.featureOptions.Color8USource.Text
+            labels(2) = "Output of Color8U_Basics running " + taskA.featureOptions.Color8USource.Text
 
             If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
             Dim mlInput As New List(Of mlColor)
             Dim mResponse As New List(Of Single)
             Dim predictList As New List(Of mlColor)
             Dim grPredict As New List(Of cv.Rect)
-            For i = 0 To atask.gridRects.Count - 1
-                Dim gr = atask.gridRects(i)
+            For i = 0 To taskA.gridRects.Count - 1
+                Dim gr = taskA.gridRects(i)
                 Dim mls As mlColor
                 mls.colorIndex = color8U.dst2.Get(Of Byte)(gr.Y, gr.X)
                 mls.x = gr.X
                 mls.y = gr.Y
 
-                If atask.noDepthMask(gr).CountNonZero > 0 Then
+                If taskA.noDepthMask(gr).CountNonZero > 0 Then
                     grPredict.Add(gr)
                     predictList.Add(mls)
                 Else
                     mlInput.Add(mls)
-                    mResponse.Add(atask.pcSplit(2)(gr).Mean())
+                    mResponse.Add(taskA.pcSplit(2)(gr).Mean())
                 End If
             Next
 
@@ -349,12 +349,12 @@ Namespace VBClasses
             Dim output = New cv.Mat(predictList.Count, 1, cv.MatType.CV_32FC1, cv.Scalar.All(0))
             rtree.Predict(predMat, output)
 
-            dst3 = atask.pcSplit(2).Clone
+            dst3 = taskA.pcSplit(2).Clone
             For i = 0 To predictList.Count - 1
                 Dim mls = predictList(i)
                 Dim gr = grPredict(i)
                 Dim depth = output.Get(Of Single)(i, 0)
-                dst3(gr).SetTo(depth, atask.noDepthMask(gr))
+                dst3(gr).SetTo(depth, taskA.noDepthMask(gr))
             Next
 
         End Sub
@@ -382,32 +382,32 @@ Namespace VBClasses
         Dim color8U As New Color8U_Basics
         Dim rtree As RTrees
         Public Sub New()
-            atask.featureOptions.Color8USource.SelectedItem() = "Bin4Way_Regions"
+            taskA.featureOptions.Color8USource.SelectedItem() = "Bin4Way_Regions"
             desc = "Prepare a grid of color and depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             color8U.Run(src)
             dst2 = color8U.dst3
-            labels(2) = "Output of Color8U_Basics running " + atask.featureOptions.Color8USource.Text
+            labels(2) = "Output of Color8U_Basics running " + taskA.featureOptions.Color8USource.Text
 
             If rtree Is Nothing Then rtree = cv.ML.RTrees.Create()
             Dim mlInput As New List(Of mlColorInTier)
             Dim mResponse As New List(Of Single)
             Dim predictList As New List(Of mlColorInTier)
             Dim grPredict As New List(Of cv.Rect)
-            For i = 0 To atask.gridRects.Count - 1
-                Dim gr = atask.gridRects(i)
+            For i = 0 To taskA.gridRects.Count - 1
+                Dim gr = taskA.gridRects(i)
                 Dim mls As mlColorInTier
                 mls.colorIndex = color8U.dst2.Get(Of Byte)(gr.Y, gr.X)
                 mls.x = gr.X
                 mls.y = gr.Y
 
-                If atask.noDepthMask(gr).CountNonZero > 0 Then
+                If taskA.noDepthMask(gr).CountNonZero > 0 Then
                     grPredict.Add(gr)
                     predictList.Add(mls)
                 Else
                     mlInput.Add(mls)
-                    mResponse.Add(atask.pcSplit(2)(gr).Mean())
+                    mResponse.Add(taskA.pcSplit(2)(gr).Mean())
                 End If
             Next
 
@@ -424,12 +424,12 @@ Namespace VBClasses
             Dim output = New cv.Mat(predictList.Count, cv.MatType.CV_32FC1, 0)
             rtree.Predict(predMat, output)
 
-            dst3 = atask.pcSplit(2).Clone
+            dst3 = taskA.pcSplit(2).Clone
             For i = 0 To predictList.Count - 1
                 Dim mls = predictList(i)
                 Dim gr = grPredict(i)
                 Dim depth = output.Get(Of Single)(i, 0)
-                dst3(gr).SetTo(depth, atask.noDepthMask(gr))
+                dst3(gr).SetTo(depth, taskA.noDepthMask(gr))
             Next
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose

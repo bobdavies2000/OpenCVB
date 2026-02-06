@@ -7,15 +7,15 @@ Namespace VBClasses
         Public motionLeft As New Motion_Basics
         Public lpList As New List(Of lpData)
         Public Sub New()
-            If standalone Then atask.gOptions.displayDst0.Checked = True
+            If standalone Then taskA.gOptions.displayDst0.Checked = True
             labels(0) = "LeftView after brightness/contrast transform."
             labels(3) = "Input to Line_Basics"
             desc = "Find lines in reduced the depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.optionsChanged Then lines.lpList.Clear()
+            If taskA.optionsChanged Then lines.lpList.Clear()
 
-            dst0 = atask.leftView
+            dst0 = taskA.leftView
 
             If src.Type <> cv.MatType.CV_32FC3 Then
                 prepEdges.Run(src)
@@ -23,7 +23,7 @@ Namespace VBClasses
                 prepEdges.dst3 = src
             End If
 
-            motionLeft.Run(atask.leftView)
+            motionLeft.Run(taskA.leftView)
 
             lines.motionMask = motionLeft.dst3
             lines.Run(prepEdges.dst3)
@@ -43,7 +43,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public Sub New()
             OptionParent.FindSlider("Reduction Target").Value = 200
-            If standalone Then atask.gOptions.displayDst0.Checked = True
+            If standalone Then taskA.gOptions.displayDst0.Checked = True
             desc = "Find vertical lines in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -51,7 +51,7 @@ Namespace VBClasses
             lineD.Run(src)
 
             lpList = New List(Of lpData)(lineD.lpList)
-            dst0 = atask.leftView
+            dst0 = taskA.leftView
             dst2 = lineD.dst2
             dst3 = lineD.dst3
             labels = lineD.labels
@@ -66,7 +66,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public Sub New()
             OptionParent.FindSlider("Reduction Target").Value = 200
-            If standalone Then atask.gOptions.displayDst0.Checked = True
+            If standalone Then taskA.gOptions.displayDst0.Checked = True
             desc = "Find vertical lines in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -74,7 +74,7 @@ Namespace VBClasses
             lineD.Run(src)
 
             lpList = New List(Of lpData)(lineD.lpList)
-            dst0 = atask.leftView
+            dst0 = taskA.leftView
             dst2 = lineD.dst2
             dst3 = lineD.dst3
             labels = lineD.labels
@@ -89,7 +89,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public Sub New()
             OptionParent.FindSlider("Reduction Target").Value = 200
-            If standalone Then atask.gOptions.displayDst0.Checked = True
+            If standalone Then taskA.gOptions.displayDst0.Checked = True
             desc = "Find horizontal lines in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -97,7 +97,7 @@ Namespace VBClasses
             lineD.Run(src)
 
             lpList = New List(Of lpData)(lineD.lpList)
-            dst0 = atask.leftView
+            dst0 = taskA.leftView
             dst2 = lineD.dst2
             dst3 = lineD.dst3
             labels = lineD.labels
@@ -117,7 +117,7 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public Sub New()
             OptionParent.FindSlider("Reduction Target").Value = 200
-            If standalone Then atask.gOptions.displayDst0.Checked = True
+            If standalone Then taskA.gOptions.displayDst0.Checked = True
             desc = "Find vertical lines in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -125,13 +125,13 @@ Namespace VBClasses
             lineY.Run(src)
             lineXY.Run(src)
 
-            dst0 = atask.leftView
+            dst0 = taskA.leftView
             dst2.SetTo(0)
             For Each lp In lineX.lpList
-                dst2.Line(lp.p1, lp.p2, white, atask.lineWidth, atask.lineType)
+                dst2.Line(lp.p1, lp.p2, white, taskA.lineWidth, taskA.lineType)
             Next
             For Each lp In lineY.lpList
-                dst2.Line(lp.p1, lp.p2, atask.highlight, atask.lineWidth, atask.lineType)
+                dst2.Line(lp.p1, lp.p2, taskA.highlight, taskA.lineWidth, taskA.lineType)
             Next
             labels(0) = lineX.labels(0)
 
@@ -153,22 +153,22 @@ Namespace VBClasses
         Public lpList As New List(Of lpData)
         Public Sub New()
             OptionParent.FindSlider("Reduction Target").Value = 200
-            If standalone Then atask.gOptions.displayDst0.Checked = True
+            If standalone Then taskA.gOptions.displayDst0.Checked = True
             desc = "Find horizontal and vertical lines in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             lineX.Run(src)
             lineY.Run(src)
 
-            dst0 = atask.leftView
+            dst0 = taskA.leftView
 
             dst2.SetTo(0)
             For Each lp In lineX.lpList
-                dst2.Line(lp.p1, lp.p2, white, atask.lineWidth, atask.lineType)
+                dst2.Line(lp.p1, lp.p2, white, taskA.lineWidth, taskA.lineType)
             Next
 
             For Each lp In lineY.lpList
-                dst2.Line(lp.p1, lp.p2, atask.highlight, atask.lineWidth, atask.lineType)
+                dst2.Line(lp.p1, lp.p2, taskA.highlight, taskA.lineWidth, taskA.lineType)
             Next
 
             dst3 = lineX.dst3
@@ -196,19 +196,19 @@ Namespace VBClasses
             lineX.reductionName = "X Reduction"
             lineY.reductionName = "Y Reduction"
             OptionParent.FindSlider("Reduction Target").Value = 200
-            If standalone Then atask.gOptions.displayDst0.Checked = True
+            If standalone Then taskA.gOptions.displayDst0.Checked = True
             labels(3) = "Input to Line_Basics"
             desc = "Find horizontal and vertical lines in the reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.optionsChanged Then lpList.Clear()
+            If taskA.optionsChanged Then lpList.Clear()
             lineX.Run(src)
             lineY.Run(src)
 
-            dst3 = lineX.dst3
-            dst3 = dst3 Or lineY.dst3
+            dst1 = lineX.dst3
+            dst1 = dst1 Or lineY.dst3
 
-            dst0 = atask.leftView
+            dst0 = taskA.leftView
             motionLeft.Run(dst0)
 
             lines.motionMask = motionLeft.dst3
@@ -216,6 +216,11 @@ Namespace VBClasses
 
             dst2 = lines.dst2
             lpList = New List(Of lpData)(lines.lpList)
+
+            dst3 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            For Each lp In lpList
+                dst3.Line(lp.p1, lp.p2, taskA.highlight, taskA.lineWidth * 2, taskA.lineType)
+            Next
 
             labels(2) = lines.labels(2)
         End Sub
@@ -238,11 +243,11 @@ Namespace VBClasses
             desc = "Identify the points where horizontal and vertical depth lines intersect."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.optionsChanged Then ptList.Clear()
+            If taskA.optionsChanged Then ptList.Clear()
 
             lineX.Run(src)
             lineY.Run(src)
-            motionLeft.Run(atask.leftView)
+            motionLeft.Run(taskA.leftView)
 
             dst0.SetTo(0)
             dst1.SetTo(0)
@@ -276,21 +281,21 @@ Namespace VBClasses
                 Dim pt = ptMat.Get(Of cv.Point)(i, 0)
 
                 ' the grid rect may have already been found.
-                Dim index = atask.gridMap.Get(Of Integer)(pt.Y, pt.X)
+                Dim index = taskA.gridMap.Get(Of Integer)(pt.Y, pt.X)
                 If ptGrid.Contains(index) = False Then
                     If motionLeft.dst3.Get(Of Byte)(pt.Y, pt.X) > 0 Then
                         ptList.Add(pt)
-                        Dim gr = atask.gridRects(index)
+                        Dim gr = taskA.gridRects(index)
                         dst1(gr).SetTo(0)
-                        ptDepth.Add(atask.pcSplit(2)(gr).Mean(atask.depthmask(gr))(0))
+                        ptDepth.Add(taskA.pcSplit(2)(gr).Mean(taskA.depthmask(gr))(0))
                         ptGrid.Add(index)
                     End If
                 End If
             Next
 
-            dst2 = atask.leftView.Clone
+            dst2 = taskA.leftView.Clone
             For Each pt In ptList
-                dst2.Circle(pt, atask.DotSize, white, -1, atask.lineType)
+                dst2.Circle(pt, taskA.DotSize, white, -1, taskA.lineType)
             Next
             Dim newCount = ptList.Count - count
             labels(2) = CStr(count) + " points were retained " + CStr(newCount) + " points were added."

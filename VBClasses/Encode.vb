@@ -10,7 +10,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If atask.firstPass Then OptionParent.FindSlider("Encode Output Scaling").Value = 10
+            If taskA.firstPass Then OptionParent.FindSlider("Encode Output Scaling").Value = 10
 
             Dim encodeParams() As Integer = {options.encodeOption, options.qualityLevel}
             Dim buf() = src.ImEncode(".jpg", encodeParams)

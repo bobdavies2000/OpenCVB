@@ -4,16 +4,16 @@ Namespace VBClasses
         Public newSize As cv.Size
         Public options As New Options_Resize
         Public Sub New()
-            If standalone Then atask.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
+            If standalone Then taskA.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
             desc = "Resize with different options and compare them"
             labels(2) = "Rectangle highlight above resized"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If atask.drawRect.Width <> 0 Then
-                src = src(atask.drawRect)
-                newSize = atask.drawRect.Size
+            If taskA.drawRect.Width <> 0 Then
+                src = src(taskA.drawRect)
+                newSize = taskA.drawRect.Size
             End If
 
             dst2 = src.Resize(newSize, 0, 0, options.warpFlag)
@@ -59,7 +59,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 options.Run()
                 dst2 = runRedList(src, labels(2))
-                src = src(atask.oldrcD.rect)
+                src = src(taskA.oldrcD.rect)
             End If
 
             Dim newSize As cv.Size

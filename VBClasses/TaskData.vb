@@ -73,7 +73,7 @@ Namespace VBClasses
         Public colorMapZeroIsBlack As cv.Mat
         Public correlationColorMap As cv.Mat
 
-        ' atask algorithms - operate on every frame regardless of which algorithm is being run.
+        ' taskA algorithms - operate on every frame regardless of which algorithm is being run.
         Public colorizer As DepthColorizer_Basics
         Public redList As XO_RedList_Basics
         Public redListNew As RedList_Basics

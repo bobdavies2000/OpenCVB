@@ -7,8 +7,8 @@ Namespace VBClasses
         Dim ecc As New WarpModel_ECC
         Dim options As New Options_WarpModel
         Public Sub New()
-            If standalone Then atask.gOptions.displayDst1.Checked = True
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "ECC Aligned image"}
             desc = "Align the BGR inputs raw images from the Prokudin examples."
         End Sub
@@ -106,8 +106,8 @@ Namespace VBClasses
                 cv.Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
             End If
 
-            dst2 = New cv.Mat(New cv.Size(atask.workRes.Width, atask.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
-            dst3 = New cv.Mat(New cv.Size(atask.workRes.Width, atask.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+            dst2 = New cv.Mat(New cv.Size(taskA.workRes.Width, taskA.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
+            dst3 = New cv.Mat(New cv.Size(taskA.workRes.Width, taskA.workRes.Height), cv.MatType.CV_8U, cv.Scalar.All(0))
 
             outputRect = New cv.Rect(0, 0, src.Width, src.Height)
             dst2(outputRect) = src
@@ -120,7 +120,7 @@ Namespace VBClasses
             Next
 
             If options.useWarpAffine Or options.useWarpHomography Then
-                outStr += vbCrLf + "NOTE: Gradients may give better atask.results.."
+                outStr += vbCrLf + "NOTE: Gradients may give better taskA.results.."
             End If
             SetTrueText(outStr, New cv.Point(aligned.Width + 10, 220))
         End Sub
@@ -143,7 +143,7 @@ Namespace VBClasses
         Dim sobel As New Edge_Sobel
         Dim options As New Options_WarpModel
         Public Sub New()
-            If standalone Then atask.gOptions.displaydst1.checked = True
+            If standalone Then taskA.gOptions.displaydst1.checked = True
             labels = {"Original Blue plane", "Original Green plane", "Original Red plane", "Naively Aligned image"}
             desc = "Import the misaligned input."
         End Sub

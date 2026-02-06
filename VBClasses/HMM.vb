@@ -5,12 +5,12 @@ Namespace VBClasses
     Public Class NR_HMM_Example_CPP : Inherits TaskParent
         Implements IDisposable
         Public Sub New()
-            If atask.testAllRunning = False Then cPtr = HMM_Open()
+            If taskA.testAllRunning = False Then cPtr = HMM_Open()
             labels(2) = "Text output with explanation will appear in the Visual Studio output."
             desc = "Simple test of Hidden Markov Model - text output"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.testAllRunning Then
+            If taskA.testAllRunning Then
                 SetTrueText("When NR_HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
                 Exit Sub
             End If

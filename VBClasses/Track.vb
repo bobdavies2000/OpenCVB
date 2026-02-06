@@ -10,16 +10,16 @@ Namespace VBClasses
         Dim options As New Options_Tracker
         Dim track As New Track_BasicsQT
         Public Sub New()
-            If standalone Then atask.drawRect = New cv.Rect(25, 25, 25, 25)
+            If standalone Then taskA.drawRect = New cv.Rect(25, 25, 25, 25)
             desc = "Use C++ to track objects.  Results are poor compared to Match_DrawRect"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If standalone Then inputRect = atask.drawRect
+            If standalone Then inputRect = taskA.drawRect
 
             track.inputRect = inputRect
             track.trackerIndex = options.trackType
-            track.Run(atask.gray)
+            track.Run(taskA.gray)
             dst2 = track.dst2
             outputRect = track.outputRect
             SetTrueText("Draw a rectangle around any object to be tracked in the BGR image above.", 3)
@@ -40,23 +40,23 @@ Namespace VBClasses
         Public inputRect As cv.Rect
         Public trackerIndex As Integer = 1 ' default is "MIL" 
         Public Sub New()
-            If atask.drawRect.Width = 0 Or atask.drawRect.Height = 0 Then
-                atask.drawRect = New cv.Rect(25, 25, 25, 25)
+            If taskA.drawRect.Width = 0 Or taskA.drawRect.Height = 0 Then
+                taskA.drawRect = New cv.Rect(25, 25, 25, 25)
             End If
             desc = "Use C++ to track objects.  Results are poor compared to Match_DrawRect"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.optionsChanged Or cPtr = 0 Then
+            If taskA.optionsChanged Or cPtr = 0 Then
                 If cPtr <> 0 Then Track_Basics_Close(cPtr)
                 cPtr = Track_Basics_Open(trackerIndex)
-                If standalone Then inputRect = atask.drawRect
+                If standalone Then inputRect = taskA.drawRect
             End If
 
             Dim dataSrc(src.Total) As Byte
             Marshal.Copy(src.Data, dataSrc, 0, dataSrc.Length)
             Dim handleSrc = GCHandle.Alloc(dataSrc, GCHandleType.Pinned)
             Dim r = inputRect
-            If r.Width = 0 Or r.Height = 0 Then r = atask.drawRect
+            If r.Width = 0 Or r.Height = 0 Then r = taskA.drawRect
             Dim imagePtr = Track_Basics_Run(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, r.X, r.Y, r.Width, r.Height)
             handleSrc.Free()
 
@@ -65,7 +65,7 @@ Namespace VBClasses
             Marshal.Copy(imagePtr, rectData, 0, rectData.Length)
 
             outputRect = New cv.Rect(rectData(0), rectData(1), rectData(2), rectData(3))
-            dst2.Rectangle(outputRect, white, atask.lineWidth)
+            dst2.Rectangle(outputRect, white, taskA.lineWidth)
             SetTrueText("Draw a rectangle around any object to be tracked in the BGR image above.", 3)
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
@@ -85,16 +85,16 @@ Namespace VBClasses
             desc = "Track the longest RGB line"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lpList = atask.lines.lpList
+            Dim lpList = taskA.lines.lpList
 
-            If atask.heartBeatLT Then
-                atask.optionsChanged = True
-                Dim gridIndex = atask.gridMap.Get(Of Integer)(lpList(0).p1.Y, lpList(0).p1.X)
-                track.inputRect = atask.gridNabeRects(gridIndex)
+            If taskA.heartBeatLT Then
+                taskA.optionsChanged = True
+                Dim gridIndex = taskA.gridMap.Get(Of Integer)(lpList(0).p1.Y, lpList(0).p1.X)
+                track.inputRect = taskA.gridNabeRects(gridIndex)
                 dst3.SetTo(0)
                 dst3(track.inputRect) = src(track.inputRect).Clone
             End If
-            track.Run(atask.gray)
+            track.Run(taskA.gray)
             dst2 = track.dst2
         End Sub
     End Class
@@ -110,25 +110,25 @@ Namespace VBClasses
             desc = "Track the gravity RGB vector"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lpList = atask.lines.lpList
+            Dim lpList = taskA.lines.lpList
 
             Static searchRect As cv.Rect, originalRect As cv.Rect
             If searchRect.Width = 0 Or searchRect.Height = 0 Then
-                Dim gridIndex = atask.gridMap.Get(Of Integer)(lpList(0).p1.Y, lpList(0).p1.X)
-                originalRect = atask.gridRects(gridIndex)
-                searchRect = atask.gridNabeRects(gridIndex)
+                Dim gridIndex = taskA.gridMap.Get(Of Integer)(lpList(0).p1.Y, lpList(0).p1.X)
+                originalRect = taskA.gridRects(gridIndex)
+                searchRect = taskA.gridNabeRects(gridIndex)
                 Dim x = originalRect.X - searchRect.X
                 Dim y = originalRect.Y - searchRect.Y
-                track.inputRect = New cv.Rect(x, y, atask.brickSize, atask.brickSize)
+                track.inputRect = New cv.Rect(x, y, taskA.brickSize, taskA.brickSize)
                 dst3 = src
-                dst3.Rectangle(searchRect, white, atask.lineWidth)
-                dst3.Rectangle(originalRect, white, atask.lineWidth)
+                dst3.Rectangle(searchRect, white, taskA.lineWidth)
+                dst3.Rectangle(originalRect, white, taskA.lineWidth)
             End If
-            track.Run(atask.gray(searchRect))
+            track.Run(taskA.gray(searchRect))
             dst2 = src
-            Dim r = New cv.Rect(originalRect.X + track.outputRect.X, originalRect.Y + track.outputRect.Y, atask.brickSize, atask.brickSize)
-            dst2.Rectangle(r, white, atask.lineWidth)
-            dst3.Rectangle(r, white, atask.lineWidth)
+            Dim r = New cv.Rect(originalRect.X + track.outputRect.X, originalRect.Y + track.outputRect.Y, taskA.brickSize, taskA.brickSize)
+            dst2.Rectangle(r, white, taskA.lineWidth)
+            dst3.Rectangle(r, white, taskA.lineWidth)
         End Sub
     End Class
 
@@ -146,17 +146,17 @@ Namespace VBClasses
             desc = "Track the top X lines using Track_Basics"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lpList = atask.lines.lpList
+            Dim lpList = taskA.lines.lpList
 
             Dim trackCount = Math.Min(track.Length, lpList.Count)
             dst2 = src
             For i = 0 To trackCount - 1
-                If atask.heartBeat Then
-                    Dim gridIndex = atask.gridMap.Get(Of Integer)(lpList(i).p1.Y, lpList(i).p1.X)
-                    track(i).inputRect = atask.gridNabeRects(gridIndex)
+                If taskA.heartBeat Then
+                    Dim gridIndex = taskA.gridMap.Get(Of Integer)(lpList(i).p1.Y, lpList(i).p1.X)
+                    track(i).inputRect = taskA.gridNabeRects(gridIndex)
                 End If
-                track(i).Run(atask.gray)
-                dst2.Rectangle(track(i).outputRect, atask.highlight, atask.lineWidth)
+                track(i).Run(taskA.gray)
+                dst2.Rectangle(track(i).outputRect, taskA.highlight, taskA.lineWidth)
             Next
             labels(2) = "Tracking the top " + CStr(track.Length) + " line endpoints"
         End Sub

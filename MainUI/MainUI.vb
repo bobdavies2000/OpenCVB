@@ -196,24 +196,24 @@ Namespace MainApp
             magnifyIndex += 1
         End Sub
         Private Sub MagnifyTimer_Tick(sender As Object, e As EventArgs) Handles MagnifyTimer.Tick
-            If atask.mouseMagnifyEndPoint <> New cv.Point Then
-                Dim pt = atask.mouseMagnifyStartPoint
-                Dim w = Math.Abs(pt.X - atask.mouseMagnifyEndPoint.X)
-                Dim h = Math.Abs(pt.Y - atask.mouseMagnifyEndPoint.Y)
+            If taskA.mouseMagnifyEndPoint <> New cv.Point Then
+                Dim pt = taskA.mouseMagnifyStartPoint
+                Dim w = Math.Abs(pt.X - taskA.mouseMagnifyEndPoint.X)
+                Dim h = Math.Abs(pt.Y - taskA.mouseMagnifyEndPoint.Y)
                 Dim r = New cv.Rect(pt.X, pt.Y, w, h)
                 Dim input As New cv.Mat
-                input = cvext.BitmapConverter.ToMat(pics(atask.mouseMagnifyPicTag).Image)
+                input = cvext.BitmapConverter.ToMat(pics(taskA.mouseMagnifyPicTag).Image)
                 r = validateRect(r, input.Width, input.Height)
                 If r.Width = 0 Or r.Height = 0 Then Exit Sub
-                Dim img = input(r).Resize(New cv.Size(atask.drawRect.Width * 5, atask.drawRect.Height * 5))
+                Dim img = input(r).Resize(New cv.Size(taskA.drawRect.Width * 5, taskA.drawRect.Height * 5))
                 cv.Cv2.ImShow("Magnifier", img)
-                atask.mouseMagnifyEndPoint = New cv.Point
+                taskA.mouseMagnifyEndPoint = New cv.Point
             End If
         End Sub
         Private Sub MainForm_Closing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
             If TestAllTimer.Enabled = False Then SaveJsonSettings()
             If isPlaying Then
-                vbc.atask.Dispose()
+                vbc.taskA.Dispose()
                 isPlaying = False
                 StopCamera()
             End If
@@ -293,7 +293,7 @@ Namespace MainApp
             resolutionDetails = "CaptureRes " + CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) +
                                 ", WorkRes " + CStr(settings.workRes.Width) + "x" + CStr(settings.workRes.Height) +
                                 ", DisplayRes " + CStr(settings.displayRes.Width) + "x" + CStr(settings.displayRes.Height)
-            If atask IsNot Nothing Then atask.resolutionDetails = resolutionDetails
+            If taskA IsNot Nothing Then taskA.resolutionDetails = resolutionDetails
 
             StatusLabel.Location = New Point(offset, pics(2).Top + h)
             StatusLabel.Width = w * 2
@@ -310,17 +310,17 @@ Namespace MainApp
                 AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
                 TestAllTimer.Interval = settings.testAllDuration * 1000
                 TestAllTimer.Enabled = True
-                atask.testAllRunning = True
+                taskA.testAllRunning = True
             Else
                 Debug.WriteLine("Stopping 'TestAll' overnight run.")
                 AvailableAlgorithms.Enabled = True
                 TestAllTimer.Enabled = False
-                atask.testAllRunning = False
+                taskA.testAllRunning = False
             End If
-            testAllRunning = atask.testAllRunning ' share with the callback...
+            testAllRunning = taskA.testAllRunning ' share with the callback...
         End Sub
         Private Sub Pic_Paint(sender As Object, e As PaintEventArgs)
-            If atask Is Nothing Then Exit Sub
+            If taskA Is Nothing Then Exit Sub
 
             Dim timeStart As DateTime = Now
 
@@ -330,7 +330,7 @@ Namespace MainApp
 
             If pics(pic.Tag).Image IsNot Nothing Then g.DrawImage(pics(pic.Tag).Image, 0, 0)
 
-            labels(pic.Tag).Text = atask.labels(pic.Tag)
+            labels(pic.Tag).Text = taskA.labels(pic.Tag)
 
             Dim ratioX = pic.Width / settings.workRes.Width
             Dim ratioY = pic.Height / settings.workRes.Height
@@ -341,7 +341,7 @@ Namespace MainApp
                 g.DrawString("Text markups are removed during testing to reduce GDI objects.", windowsFont, brush,
                               CSng(pt.X * ratioX), CSng(pt.Y * ratioY))
             Else
-                For Each tt In atask.trueData
+                For Each tt In taskA.trueData
                     If tt.text Is Nothing Then Continue For
                     If tt.text.Length > 0 And tt.picTag = pic.Tag Then
                         g.DrawString(tt.text, windowsFont, brush, CSng(tt.pt.X * ratioX), CSng(tt.pt.Y * ratioY))
@@ -353,7 +353,7 @@ Namespace MainApp
             Dim timeEnd As DateTime = Now
             Dim elapsedTime = timeEnd.Ticks - timeStart.Ticks
             Dim spanCopy As TimeSpan = New TimeSpan(elapsedTime)
-            atask.cpu.paintTime += spanCopy.Ticks / TimeSpan.TicksPerMillisecond
+            taskA.cpu.paintTime += spanCopy.Ticks / TimeSpan.TicksPerMillisecond
         End Sub
         Private Sub startAlgorithm()
             Const WM_SETICON As Integer = &H80
@@ -363,32 +363,32 @@ Namespace MainApp
             SendMessage(Me.Handle, WM_SETICON, CType(ICON_SMALL, IntPtr), Me.Icon.Handle)
             SendMessage(Me.Handle, WM_SETICON, CType(ICON_BIG, IntPtr), Me.Icon.Handle)
 
-            If vbc.atask IsNot Nothing Then vbc.atask.Dispose()
-            vbc.atask = New AlgorithmTask
+            If vbc.taskA IsNot Nothing Then vbc.taskA.Dispose()
+            vbc.taskA = New AlgorithmTask
 
             For i = 0 To pics.Count - 1
-                atask.dstList(i) = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
+                taskA.dstList(i) = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
             Next
 
-            atask.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
-            atask.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
-            atask.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
-            atask.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
-            atask.gridRatioX = pics(0).Width / settings.workRes.Width
-            atask.gridRatioY = pics(0).Height / settings.workRes.Height
-            atask.homeDir = homeDir
-            atask.calibData = camera.calibData
+            taskA.color = New cv.Mat(settings.workRes, cv.MatType.CV_8UC3, 0)
+            taskA.pointCloud = New cv.Mat(settings.workRes, cv.MatType.CV_32FC3, 0)
+            taskA.leftView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
+            taskA.rightView = New cv.Mat(settings.workRes, cv.MatType.CV_8U, 0)
+            taskA.gridRatioX = pics(0).Width / settings.workRes.Width
+            taskA.gridRatioY = pics(0).Height / settings.workRes.Height
+            taskA.homeDir = homeDir
+            taskA.calibData = camera.calibData
 
-            atask.main_hwnd = Me.Handle
+            taskA.main_hwnd = Me.Handle
 
-            atask.Initialize(settings)
-            atask.lowResDepth = New cv.Mat(atask.workRes, cv.MatType.CV_32F)
-            atask.lowResColor = New cv.Mat(atask.workRes, cv.MatType.CV_32F)
-            atask.MainUI_Algorithm = createAlgorithm(settings.algorithm)
-            AlgDescription.Text = atask.MainUI_Algorithm.desc
-            atask.resolutionDetails = resolutionDetails
+            taskA.Initialize(settings)
+            taskA.lowResDepth = New cv.Mat(taskA.workRes, cv.MatType.CV_32F)
+            taskA.lowResColor = New cv.Mat(taskA.workRes, cv.MatType.CV_32F)
+            taskA.MainUI_Algorithm = createAlgorithm(settings.algorithm)
+            AlgDescription.Text = taskA.MainUI_Algorithm.desc
+            taskA.resolutionDetails = resolutionDetails
 
-            If atask.calibData IsNot Nothing Then atask.calibData = camera.calibData
+            If taskA.calibData IsNot Nothing Then taskA.calibData = camera.calibData
 
             MainForm_Resize(Nothing, Nothing)
         End Sub
@@ -437,7 +437,7 @@ Namespace MainApp
             StartStopTask()
             AvailableAlgorithms_SelectedIndexChanged(Nothing, Nothing)
 
-            If atask Is Nothing Then startAlgorithm()
+            If taskA Is Nothing Then startAlgorithm()
 
             MainForm_Resize(Nothing, Nothing)
 
@@ -446,10 +446,10 @@ Namespace MainApp
             optionsForm.Dispose()
         End Sub
         Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-            vbc.atask.MainUI_Algorithm.Dispose()
+            vbc.taskA.MainUI_Algorithm.Dispose()
 
             Debug.Write(Format(totalBytesOfMemoryUsed, "###") + " Mb" + " FPS Algorithm/" + settings.cameraName + " " +
-                        Format(atask.fpsAlgorithm, "0") + "/" + Format(atask.fpsCamera, "0"))
+                        Format(taskA.fpsAlgorithm, "0") + "/" + Format(taskA.fpsCamera, "0"))
 
             Static lastTime As DateTime = Now
             Dim timeNow As DateTime = Now
@@ -493,10 +493,10 @@ Namespace MainApp
             Else
                 StopCamera()
 
-                If atask IsNot Nothing Then ' already stopped...
-                    atask.readyForCameraInput = False
-                    atask.Dispose()
-                    atask = Nothing
+                If taskA IsNot Nothing Then ' already stopped...
+                    taskA.readyForCameraInput = False
+                    taskA.Dispose()
+                    taskA = Nothing
                 End If
             End If
         End Sub

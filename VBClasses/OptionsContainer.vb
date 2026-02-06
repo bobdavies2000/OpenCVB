@@ -16,7 +16,7 @@ Public Class OptionsContainer
         titlesAdded = True
     End Sub
     Public Sub layoutOptions(normalRequest As Boolean)
-        Dim w = atask.Settings.allOptionsWidth
+        Dim w = taskA.Settings.allOptionsWidth
         Dim radioCheckOffset = New cv.Point(w / 2, 0)
 
         Dim sliderOffset As New cv.Point(0, 0)
@@ -40,13 +40,13 @@ Public Class OptionsContainer
                 Dim sidelineOptions As Boolean = True
                 Dim displayTheseOptions As New List(Of String)({"Image_Basics OpenFile Options"})
                 If displayTheseOptions.Contains(frm.Text) Then sidelineOptions = False
-                If normalRequest And sidelineOptions And atask.Settings.ShowAllOptions = False Then
+                If normalRequest And sidelineOptions And taskA.Settings.ShowAllOptions = False Then
                     If frm Is Nothing Then Continue For
                     frm.SetDesktopLocation(Me.Width - 2 * offset, sliderOffset.Y + indexHide * offset)
                     indexHide += 1
                 Else
                     If title.Contains("OpenFile") Then
-                        frm.SetDesktopLocation(0, atask.gOptions.Top + 350)
+                        frm.SetDesktopLocation(0, taskA.gOptions.Top + 350)
                     End If
                     If title.EndsWith(" Sliders") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                         If frm Is Nothing Then Continue For
@@ -65,9 +65,9 @@ Public Class OptionsContainer
     End Sub
     Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
         layoutOptions(normalRequest:=True)
-        atask.featureOptions.BringToFront()
-        atask.gOptions.BringToFront()
-        atask.gOptions.BringToFront()
+        taskA.featureOptions.BringToFront()
+        taskA.gOptions.BringToFront()
+        taskA.gOptions.BringToFront()
     End Sub
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
         layoutOptions(normalRequest:=False)
@@ -76,10 +76,10 @@ Public Class OptionsContainer
     End Sub
     Private Sub OptionsContainer_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         If positionedFromSettings Then
-            atask.Settings.allOptionsLeft = Me.Left
-            atask.Settings.allOptionsTop = Me.Top
-            atask.Settings.allOptionsWidth = Me.Width
-            atask.Settings.allOptionsHeight = Me.Height
+            taskA.Settings.allOptionsLeft = Me.Left
+            taskA.Settings.allOptionsTop = Me.Top
+            taskA.Settings.allOptionsWidth = Me.Width
+            taskA.Settings.allOptionsHeight = Me.Height
         End If
     End Sub
     Private Sub OptionsContainer_Move(sender As Object, e As EventArgs) Handles Me.Move
@@ -92,6 +92,6 @@ Public Class OptionsContainer
                 If frm.text = title Then frm.close()
             Next
         Next
-        atask.gOptions.Close()
+        taskA.gOptions.Close()
     End Sub
 End Class

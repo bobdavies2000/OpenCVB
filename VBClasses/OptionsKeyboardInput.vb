@@ -3,9 +3,9 @@ Public Class OptionsKeyboardInput
     Public inputText As New List(Of String)
     Dim keyboardLastInput As String
     Public Sub Setup(traceName As String)
-        Me.MdiParent = atask.allOptions
+        Me.MdiParent = taskA.allOptions
         Me.Text = traceName + " Keyboard Options"
-        atask.allOptions.addTitle(Me)
+        taskA.allOptions.addTitle(Me)
     End Sub
     Private Sub TextBox1_KeyUp(sender As Object, e As KeyEventArgs) Handles TextBox1.KeyUp
         inputText.Add(e.KeyCode.ToString)

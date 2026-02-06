@@ -38,7 +38,7 @@ Namespace VBClasses
         Dim counts(4 - 1) As List(Of Integer)
         Dim mats As New Mat_4to1
         Public Sub New()
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             For i = 0 To counts.Count - 1
                 counts(i) = New List(Of Integer)
             Next
@@ -121,20 +121,20 @@ Namespace VBClasses
         Dim hist As New Histogram_Basics
         Dim distances As New List(Of Single)
         Public Sub New()
-            If atask.bricks Is Nothing Then atask.bricks = New Brick_Basics
+            If taskA.bricks Is Nothing Then taskA.bricks = New Brick_Basics
             hist.plotHist.removeZeroEntry = False
-            atask.gOptions.setHistogramBins(10)
-            atask.gOptions.UseMotionMask.Checked = False
+            taskA.gOptions.setHistogramBins(10)
+            taskA.gOptions.UseMotionMask.Checked = False
             desc = "Plot a histogram of the 3D distance of each picture from the previous image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim currColors As New List(Of cv.Vec3b)
-            For Each roi In atask.gridRects
-                currColors.Add(atask.bricks.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
+            For Each roi In taskA.gridRects
+                currColors.Add(taskA.bricks.dst2.Get(Of cv.Vec3b)(roi.Y, roi.X))
             Next
 
             Static lastColors As New List(Of cv.Vec3b)(currColors)
-            If atask.optionsChanged Then
+            If taskA.optionsChanged Then
                 lastColors = New List(Of cv.Vec3b)(currColors)
             End If
 

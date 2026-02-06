@@ -11,10 +11,10 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            feat.Run(atask.grayStable)
+            feat.Run(taskA.grayStable)
 
             dst2 = src
-            If atask.heartBeat And standaloneTest() Then ptList = atask.features
+            If taskA.heartBeat And standaloneTest() Then ptList = taskA.features
 
             If ptList.Count <= 3 Then Exit Sub
 
@@ -33,8 +33,8 @@ Namespace VBClasses
 
             dst3.SetTo(0)
             For i = 0 To knn.queries.Count - 1
-                DrawCircle(dst2, knn.queries(i), atask.DotSize, cv.Scalar.Red)
-                DrawCircle(dst3, knn.queries(i), atask.DotSize, atask.highlight)
+                DrawCircle(dst2, knn.queries(i), taskA.DotSize, cv.Scalar.Red)
+                DrawCircle(dst3, knn.queries(i), taskA.DotSize, taskA.highlight)
             Next
             labels(2) = "Triangles built each input point and its " + CStr(options.nabeCount) + " nearest neighbors."
         End Sub
@@ -53,21 +53,21 @@ Namespace VBClasses
             desc = "Build triangles from feature points"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            feat.Run(atask.grayStable)
+            feat.Run(taskA.grayStable)
 
-            If atask.features.Count < 3 Then Exit Sub
-            mesh.ptList = atask.features
+            If taskA.features.Count < 3 Then Exit Sub
+            mesh.ptList = taskA.features
             mesh.Run(src)
             dst2 = mesh.dst2
             dst3 = mesh.dst3
 
-            Dim pad = atask.brickSize / 2
+            Dim pad = taskA.brickSize / 2
             Dim depthMiss As Integer
-            For Each pt In atask.features
-                Dim depth = atask.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
+            For Each pt In taskA.features
+                Dim depth = taskA.pcSplit(2).Get(Of Single)(pt.Y, pt.X)
                 If depth = 0 Then
-                    Dim r = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, atask.brickSize, atask.brickSize))
-                    depth = atask.pcSplit(2)(r).Mean(atask.depthMask(r))(0)
+                    Dim r = ValidateRect(New cv.Rect(pt.X - pad, pt.Y - pad, taskA.brickSize, taskA.brickSize))
+                    depth = taskA.pcSplit(2)(r).Mean(taskA.depthMask(r))(0)
                     depthMiss += 1
                 End If
                 ' SetTrueText(Format(depth, fmt1) + "m ", pt)

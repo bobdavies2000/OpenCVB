@@ -7,13 +7,13 @@ Namespace VBClasses
         Dim halfSplit As Integer
         Public Sub New()
             fraction = dst2.Total / 2
-            atask.gOptions.setHistogramBins(255)
+            taskA.gOptions.setHistogramBins(255)
             labels = {"", "", "Image separated into 2 segments from darkest and lightest", "Histogram Of grayscale image"}
             desc = "Split an image into 2 parts - darkest and lightest,"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim bins = atask.histogramBins
-            hist.Run(atask.gray)
+            Dim bins = taskA.histogramBins
+            hist.Run(taskA.gray)
             dst3 = hist.dst2
 
             Dim histArray = hist.histArray
@@ -27,10 +27,10 @@ Namespace VBClasses
             Next
 
             Dim offset = halfSplit / bins * dst3.Width
-            dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, atask.lineWidth, atask.lineWidth)
+            dst3.Line(New cv.Point(offset, 0), New cv.Point(offset, dst3.Height), white, taskA.lineWidth, taskA.lineWidth)
 
-            mats.mat(0) = atask.gray.InRange(0, halfSplit - 1)         ' darkest
-            mats.mat(1) = atask.gray.InRange(halfSplit, 255)            ' lightest
+            mats.mat(0) = taskA.gray.InRange(0, halfSplit - 1)         ' darkest
+            mats.mat(1) = taskA.gray.InRange(halfSplit, 255)            ' lightest
 
             If standaloneTest() Then
                 mats.Run(emptyMat)
@@ -54,9 +54,9 @@ Namespace VBClasses
             desc = "Use kmeans with each of the 2-way split images"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bin2.Run(atask.gray)
+            bin2.Run(taskA.gray)
 
-            kmeans.Run(atask.gray)
+            kmeans.Run(taskA.gray)
             For i = 0 To 2
                 mats.mat(i).SetTo(0)
                 kmeans.dst3.CopyTo(mats.mat(i), bin2.mats.mat(i))
@@ -114,22 +114,22 @@ Namespace VBClasses
             desc = "Build 4 gradations of light and combine them."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bin2.fraction = atask.gray.Total / 2
+            bin2.fraction = taskA.gray.Total / 2
             bin2.hist.histMask = New cv.Mat
-            bin2.Run(atask.gray)
+            bin2.Run(taskA.gray)
             Dim darkestMask = bin2.mats.mat(0).Clone
             Dim lightestMask = bin2.mats.mat(1).Clone
 
-            bin2.fraction = atask.gray.Total / 4
+            bin2.fraction = taskA.gray.Total / 4
             bin2.hist.histMask = darkestMask
-            bin2.Run(atask.gray)
+            bin2.Run(taskA.gray)
 
             mats(0) = bin2.mats.mat(0)
             mats(1) = bin2.mats.mat(1) And Not lightestMask
 
-            bin2.fraction = atask.gray.Total / 4
+            bin2.fraction = taskA.gray.Total / 4
             bin2.hist.histMask = lightestMask
-            bin2.Run(atask.gray)
+            bin2.Run(taskA.gray)
             mats(2) = bin2.mats.mat(0) And Not darkestMask
             mats(3) = bin2.mats.mat(1)
 
@@ -155,7 +155,7 @@ Namespace VBClasses
             desc = "Add edges to the 4-way gradation."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            edges.Run(atask.gray)
+            edges.Run(taskA.gray)
 
             grad.Run(src)
             dst2 = grad.dst2
@@ -178,7 +178,7 @@ Namespace VBClasses
             flood.inputRemoved = Not bin2.mats.mat(0)
             flood.Run(bin2.mats.mat(0))
             dst2 = flood.dst2
-            If atask.heartBeat Then labels(2) = CStr(flood.redC.rcList.Count) + " cells were identified"
+            If taskA.heartBeat Then labels(2) = CStr(flood.redC.rcList.Count) + " cells were identified"
         End Sub
     End Class
 
@@ -199,7 +199,7 @@ Namespace VBClasses
             flood.inputRemoved = Not bin2.mats.mat(3)
             flood.Run(bin2.mats.mat(3))
             dst2 = flood.dst2
-            If atask.heartBeat Then labels(2) = CStr(flood.redC.rcList.Count) + " cells were identified"
+            If taskA.heartBeat Then labels(2) = CStr(flood.redC.rcList.Count) + " cells were identified"
         End Sub
     End Class
 
@@ -214,22 +214,22 @@ Namespace VBClasses
             desc = "Keep splitting an image between light and dark"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            bin2.fraction = atask.gray.Total / 2
+            bin2.fraction = taskA.gray.Total / 2
             bin2.hist.histMask = New cv.Mat
-            bin2.Run(atask.gray)
+            bin2.Run(taskA.gray)
             Dim darkestMask = bin2.mats.mat(0).Clone
             Dim lightestMask = bin2.mats.mat(1).Clone
 
-            bin2.fraction = atask.gray.Total / 4
+            bin2.fraction = taskA.gray.Total / 4
             bin2.hist.histMask = darkestMask
-            bin2.Run(atask.gray)
+            bin2.Run(taskA.gray)
 
             mats.mat(0) = bin2.mats.mat(0)
             mats.mat(1) = bin2.mats.mat(1) And Not lightestMask
 
-            bin2.fraction = atask.gray.Total / 4
+            bin2.fraction = taskA.gray.Total / 4
             bin2.hist.histMask = lightestMask
-            bin2.Run(atask.gray)
+            bin2.Run(taskA.gray)
             mats.mat(2) = bin2.mats.mat(0) And Not darkestMask
             mats.mat(3) = bin2.mats.mat(1)
 
@@ -253,7 +253,7 @@ Namespace VBClasses
             For i = 0 To redCs.Count - 1
                 redCs(i) = New RedColor_Basics
             Next
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             labels(2) = "4 separate RedColor runs - darkest to lightest."
             labels(3) = "All 4 gradations of light"
             desc = "Run RedColor one each gradation of the colors - better separation?"
@@ -288,7 +288,7 @@ Namespace VBClasses
             dst3 = PaletteFull(rcMap)
 
             RedCloud_Cell.selectCell(rcMap, rclist)
-            If atask.rcD IsNot Nothing Then strOut = atask.rcD.displayCell()
+            If taskA.rcD IsNot Nothing Then strOut = taskA.rcD.displayCell()
             SetTrueText(strOut, 1)
         End Sub
     End Class

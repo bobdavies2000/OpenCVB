@@ -8,9 +8,9 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim tmp As New cv.Mat
-            cv.Cv2.HConcat(src, atask.depthRGB, tmp)
+            cv.Cv2.HConcat(src, taskA.depthRGB, tmp)
             dst2 = tmp.Resize(src.Size())
-            cv.Cv2.VConcat(src, atask.depthRGB, tmp)
+            cv.Cv2.VConcat(src, taskA.depthRGB, tmp)
             dst3 = tmp.Resize(src.Size())
         End Sub
     End Class
@@ -30,9 +30,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
                 img(0) = src
-                img(1) = atask.depthRGB
-                img(2) = If(atask.leftView.Channels() = 1, atask.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), atask.leftView)
-                img(3) = If(atask.rightView.Channels() = 1, atask.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), atask.rightView)
+                img(1) = taskA.depthRGB
+                img(2) = If(taskA.leftView.Channels() = 1, taskA.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), taskA.leftView)
+                img(3) = If(taskA.rightView.Channels() = 1, taskA.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), taskA.rightView)
             End If
             Dim tmp1 As New cv.Mat, tmp2 As New cv.Mat, tmp3 As New cv.Mat
             cv.Cv2.HConcat(img(0), img(1), tmp1)

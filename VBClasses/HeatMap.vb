@@ -12,12 +12,12 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            If src.Type <> cv.MatType.CV_32FC3 Then src = atask.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Then src = taskA.pointCloud
 
-            cv.Cv2.CalcHist({src}, atask.channelsTop, New cv.Mat, histogramTop, 2, atask.bins2D, atask.rangesTop)
+            cv.Cv2.CalcHist({src}, taskA.channelsTop, New cv.Mat, histogramTop, 2, taskA.bins2D, taskA.rangesTop)
             histogramTop.Row(0).SetTo(0)
 
-            cv.Cv2.CalcHist({src}, atask.channelsSide, New cv.Mat, histogramSide, 2, atask.bins2D, atask.rangesSide)
+            cv.Cv2.CalcHist({src}, taskA.channelsSide, New cv.Mat, histogramSide, 2, taskA.bins2D, taskA.rangesSide)
             histogramSide.Col(0).SetTo(0)
 
             topframes.Run(histogramTop)
@@ -28,8 +28,8 @@ Namespace VBClasses
 
             dst2 = PaletteBlackZero(dst0.ConvertScaleAbs()).Clone
             dst3 = PaletteBlackZero(dst1.ConvertScaleAbs())
-            labels(2) = "Top view of heat map with the last " + CStr(atask.frameHistoryCount) + " frames"
-            labels(3) = "Side view of heat map with the last " + CStr(atask.frameHistoryCount) + " frames"
+            labels(2) = "Top view of heat map with the last " + CStr(taskA.frameHistoryCount) + " frames"
+            labels(3) = "Side view of heat map with the last " + CStr(taskA.frameHistoryCount) + " frames"
         End Sub
     End Class
 
@@ -43,14 +43,14 @@ Namespace VBClasses
     Public Class NR_HeatMap_Grid : Inherits TaskParent
         Dim heat As New HeatMap_Basics
         Public Sub New()
-            atask.gOptions.GridSlider.Value = 5
+            taskA.gOptions.GridSlider.Value = 5
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
             labels = {"", "", "Histogram mask for top-down view - original histogram in dst0", "Histogram mask for side view - original histogram in dst1"}
             desc = "Apply a grid to the HeatMap_OverTime to isolate objects."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If src.Type <> cv.MatType.CV_32FC3 Then src = atask.pointCloud
+            If src.Type <> cv.MatType.CV_32FC3 Then src = taskA.pointCloud
 
             heat.Run(src)
 
@@ -58,7 +58,7 @@ Namespace VBClasses
             dst3.SetTo(0)
             Dim maxCount1 As Integer, maxCount2 As Integer
             Dim sync1 As New Object, sync2 As New Object
-            For Each roi In atask.gridRects
+            For Each roi In taskA.gridRects
                 Dim count1 = heat.histogramTop(roi).CountNonZero
                 dst2(roi).SetTo(count1)
                 If count1 > maxCount1 Then maxCount1 = count1
@@ -92,8 +92,8 @@ Namespace VBClasses
 
             Dim mmTop = GetMinMax(dst2)
             Dim mmSide = GetMinMax(dst3)
-            If atask.heartBeat Then labels(2) = CStr(mmTop.maxVal) + " max count " + CStr(dst2.CountNonZero) + " pixels in the top down view"
-            If atask.heartBeat Then labels(3) = CStr(mmSide.maxVal) + " max count " + CStr(dst3.CountNonZero) + " pixels in the side view"
+            If taskA.heartBeat Then labels(2) = CStr(mmTop.maxVal) + " max count " + CStr(dst2.CountNonZero) + " pixels in the top down view"
+            If taskA.heartBeat Then labels(3) = CStr(mmSide.maxVal) + " max count " + CStr(dst3.CountNonZero) + " pixels in the side view"
         End Sub
     End Class
 
@@ -108,7 +108,7 @@ Namespace VBClasses
         Dim flood As New Flood_Basics
         Dim heat As New HeatMap_Hot
         Public Sub New()
-            If standalone Then atask.gOptions.displaydst1.checked = True
+            If standalone Then taskA.gOptions.displaydst1.checked = True
             desc = "Display the heat map for the selected cell"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -117,7 +117,7 @@ Namespace VBClasses
             labels(2) = flood.labels(2)
 
             dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
-            atask.pointCloud(atask.oldrcD.rect).CopyTo(dst0(atask.oldrcD.rect), atask.oldrcD.mask)
+            taskA.pointCloud(taskA.oldrcD.rect).CopyTo(dst0(taskA.oldrcD.rect), taskA.oldrcD.mask)
 
             heat.Run(dst0)
             dst1 = heat.dst2

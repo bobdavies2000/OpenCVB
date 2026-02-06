@@ -11,7 +11,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            Dim gray8u = atask.gray.MedianBlur(options.medianBlur)
+            Dim gray8u = taskA.gray.MedianBlur(options.medianBlur)
             Dim edges = gray8u.Laplacian(cv.MatType.CV_8U, options.kernelSize)
             Dim mask = edges.Threshold(options.threshold, 255, cv.ThresholdTypes.Binary)
             dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

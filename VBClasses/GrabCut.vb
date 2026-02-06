@@ -64,15 +64,15 @@ Namespace VBClasses
 
             If saveRadio <> options.fineTuning Then
                 saveRadio = options.fineTuning
-                atask.drawRectClear = True
+                taskA.drawRectClear = True
                 Exit Sub
             End If
 
-            If atask.drawRect.Width <> 0 Then
+            If taskA.drawRect.Width <> 0 Then
                 If options.fineTuning Then
-                    basics.fgFineTune(atask.drawRect).SetTo(255)
+                    basics.fgFineTune(taskA.drawRect).SetTo(255)
                 Else
-                    basics.bgFineTune(atask.drawRect).SetTo(255)
+                    basics.bgFineTune(taskA.drawRect).SetTo(255)
                 End If
             End If
 
@@ -102,12 +102,12 @@ Namespace VBClasses
         Dim fgRect1 = New cv.Rect(196, 134, 212, 344)
         Dim fgRect2 = New cv.Rect(133, 420, 284, 60)
         Public Sub New()
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             desc = "Grabcut example using a single image.  Fix this."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.heartBeat = False Then Exit Sub
-            Dim fileInputName = New FileInfo(atask.homeDir + "data/cat.jpg")
+            If taskA.heartBeat = False Then Exit Sub
+            Dim fileInputName = New FileInfo(taskA.homeDir + "data/cat.jpg")
             dst2 = cv.Cv2.ImRead(fileInputName.FullName)
 
             dst0 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
@@ -116,7 +116,7 @@ Namespace VBClasses
             dst0(fgRect1).SetTo(cv.GrabCutClasses.FGD)
             dst0(fgRect2).SetTo(cv.GrabCutClasses.FGD)
 
-            If atask.firstPass Then
+            If taskA.firstPass Then
                 cv.Cv2.GrabCut(dst2, dst0, bgRect1, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)
                 cv.Cv2.GrabCut(dst2, dst0, bgRect2, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)
                 cv.Cv2.GrabCut(dst2, dst0, fgRect1, bgModel, fgModel, 1, cv.GrabCutModes.InitWithRect)
@@ -131,10 +131,10 @@ Namespace VBClasses
             dst2.CopyTo(dst3, dst0 + 1)
 
             dst1.SetTo(0)
-            dst1.Rectangle(bgRect1, atask.highlight, atask.lineWidth)
-            dst1.Rectangle(bgRect2, atask.highlight, atask.lineWidth)
-            dst1.Rectangle(fgRect1, atask.highlight, atask.lineWidth)
-            dst1.Rectangle(fgRect2, atask.highlight, atask.lineWidth)
+            dst1.Rectangle(bgRect1, taskA.highlight, taskA.lineWidth)
+            dst1.Rectangle(bgRect2, taskA.highlight, taskA.lineWidth)
+            dst1.Rectangle(fgRect1, taskA.highlight, taskA.lineWidth)
+            dst1.Rectangle(fgRect2, taskA.highlight, taskA.lineWidth)
         End Sub
     End Class
 
@@ -147,14 +147,14 @@ Namespace VBClasses
     Public Class NR_GrabCut_ImageMask : Inherits TaskParent
         Dim image As cv.Mat
         Public Sub New()
-            Dim fileInputName = New FileInfo(atask.homeDir + "data/cat.jpg")
+            Dim fileInputName = New FileInfo(taskA.homeDir + "data/cat.jpg")
             image = cv.Cv2.ImRead(fileInputName.FullName)
             desc = "Grabcut example using a single image. "
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static bgModel As New cv.Mat, fgModel As New cv.Mat
 
-            If atask.heartBeat Then
+            If taskA.heartBeat Then
                 dst2 = image
                 dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2Gray).Threshold(50, 255, cv.ThresholdTypes.Binary)
                 dst1 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)

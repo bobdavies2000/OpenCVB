@@ -7,7 +7,7 @@ Namespace VBClasses
         Public histogram As New cv.Mat
         Public ranges() As cv.Rangef
         Public Sub New()
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             desc = "Find the top X peaks in a 2D histogram and use Delaunay to setup the backprojection"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -16,7 +16,7 @@ Namespace VBClasses
                 bgr.Run(src)
                 histogram = bgr.histogram02
             End If
-            If atask.heartBeat Then
+            If taskA.heartBeat Then
                 auto.Run(histogram)
                 delaunay.inputPoints = New List(Of cv.Point2f)(auto.clusterPoints)
                 delaunay.Run(src)
@@ -28,14 +28,14 @@ Namespace VBClasses
             delaunay.dst1.ConvertTo(histogram, cv.MatType.CV_32F)
             histogram.SetTo(0, Not mask)
 
-            If ranges Is Nothing Or atask.optionsChanged Then
-                ' the pcsplit arrays have been patched for inf and nan's already in atask.vb.
-                If atask.settings.cameraName.StartsWith("StereoLabs") Then cv.Cv2.Merge(atask.pcSplit, src)
-                ranges = Hist2D_Basics.GetHist2Dminmax(src, atask.channels(0), atask.channels(1))
+            If ranges Is Nothing Or taskA.optionsChanged Then
+                ' the pcsplit arrays have been patched for inf and nan's already in taskA.vb.
+                If taskA.settings.cameraName.StartsWith("StereoLabs") Then cv.Cv2.Merge(taskA.pcSplit, src)
+                ranges = Hist2D_Basics.GetHist2Dminmax(src, taskA.channels(0), taskA.channels(1))
             End If
 
             Dim backProjection As New cv.Mat
-            cv.Cv2.CalcBackProject({src}, atask.channels, histogram, backProjection, ranges)
+            cv.Cv2.CalcBackProject({src}, taskA.channels, histogram, backProjection, ranges)
             dst2 = PaletteFull(backProjection)
         End Sub
     End Class
@@ -56,18 +56,18 @@ Namespace VBClasses
             desc = "Find the top X peaks in the 2D histogram of the top and side views and backproject them."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.toggleOn Then
+            If taskA.toggleOn Then
                 histSide.Run(src)
-                peak.ranges = atask.rangesSide
-                atask.channels = atask.channelsSide
+                peak.ranges = taskA.rangesSide
+                taskA.channels = taskA.channelsSide
                 peak.histogram = histSide.histogram
             Else
                 histTop.Run(src)
-                atask.channels = atask.channelsTop
-                peak.ranges = atask.rangesTop
+                taskA.channels = taskA.channelsTop
+                peak.ranges = taskA.rangesTop
                 peak.histogram = histTop.histogram
             End If
-            peak.Run(atask.pointCloud)
+            peak.Run(taskA.pointCloud)
             dst1 = peak.dst2
             dst2 = PaletteFull(dst1)
         End Sub
@@ -97,7 +97,7 @@ Namespace VBClasses
             dst3.SetTo(0, dst1)
 
             peak.histogram = histTop.histogram
-            peak.Run(atask.pointCloud)
+            peak.Run(taskA.pointCloud)
             dst2 = peak.dst2
         End Sub
     End Class
@@ -118,9 +118,9 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             histTop.Run(src)
 
-            dst3 = histTop.histogram.Threshold(atask.projectionThreshold, 255, cv.ThresholdTypes.Binary)
+            dst3 = histTop.histogram.Threshold(taskA.projectionThreshold, 255, cv.ThresholdTypes.Binary)
             peak.histogram = histTop.histogram
-            peak.Run(atask.pointCloud)
+            peak.Run(taskA.pointCloud)
             dst2 = peak.dst2
 
             edges.Run(dst2)
@@ -214,15 +214,15 @@ Namespace VBClasses
 
             For i = 0 To peak.auto.clusterPoints.Count - 1
                 Dim pt = peak.auto.clusterPoints(i)
-                DrawCircle(dst3, pt, atask.DotSize * 3, white)
+                DrawCircle(dst3, pt, taskA.DotSize * 3, white)
             Next
 
             peak.histogram = histSide.histogram
-            peak.ranges = atask.rangesSide
-            atask.channels = atask.channelsSide
-            peak.Run(atask.pointCloud)
+            peak.ranges = taskA.rangesSide
+            taskA.channels = taskA.channelsSide
+            peak.Run(taskA.pointCloud)
             dst2 = peak.dst2
-            dst2.SetTo(0, atask.noDepthMask)
+            dst2.SetTo(0, taskA.noDepthMask)
         End Sub
     End Class
 
@@ -244,15 +244,15 @@ Namespace VBClasses
 
             For i = 0 To peak.auto.clusterPoints.Count - 1
                 Dim pt = peak.auto.clusterPoints(i)
-                DrawCircle(dst3, pt, atask.DotSize * 3, white)
+                DrawCircle(dst3, pt, taskA.DotSize * 3, white)
             Next
 
             peak.histogram = histTop.histogram
-            peak.ranges = atask.rangesTop
-            atask.channels = atask.channelsTop
-            peak.Run(atask.pointCloud)
+            peak.ranges = taskA.rangesTop
+            taskA.channels = taskA.channelsTop
+            peak.Run(taskA.pointCloud)
             dst2 = peak.dst2
-            dst2.SetTo(0, atask.noDepthMask)
+            dst2.SetTo(0, taskA.noDepthMask)
         End Sub
     End Class
 End Namespace

@@ -26,9 +26,9 @@ Namespace VBClasses
             newCenter = New cv.Point(mm.maxLoc.X + w / 2, mm.maxLoc.Y + h / 2)
             newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, w, h)
             If standaloneTest() Then
-                dst2 = atask.gray.Clone
-                dst2.Rectangle(newRect, white, atask.lineWidth)
-                vbc.DrawLine(dst2, atask.lines.lpList(0).p1, atask.lines.lpList(0).p2, white)
+                dst2 = taskA.gray.Clone
+                dst2.Rectangle(newRect, white, taskA.lineWidth)
+                vbc.DrawLine(dst2, taskA.lines.lpList(0).p1, taskA.lines.lpList(0).p2, white)
             End If
         End Sub
     End Class
@@ -58,9 +58,9 @@ Namespace VBClasses
             labels(2) = "Template has " + Format(correlation, fmt3) + " Correlation to the src input"
             newRect = New cv.Rect(mm.maxLoc.X, mm.maxLoc.Y, template.Width, template.Height)
             If standaloneTest() Then
-                dst2 = atask.gray.Clone
-                dst2.Rectangle(newRect, white, atask.lineWidth)
-                vbc.DrawLine(dst2, atask.lines.lpList(0).p1, atask.lines.lpList(0).p2, white)
+                dst2 = taskA.gray.Clone
+                dst2.Rectangle(newRect, white, taskA.lineWidth)
+                vbc.DrawLine(dst2, taskA.lines.lpList(0).p1, taskA.lines.lpList(0).p2, white)
             End If
         End Sub
     End Class
@@ -77,9 +77,9 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst2 = src.Clone
-            If atask.drawRect.Width = 0 Then atask.drawRect = New cv.Rect(10, 10, 50, 50)
-            If atask.optionsChanged Then match.template = src(atask.drawRect).Clone
-            match.Run(src(atask.drawRect))
+            If taskA.drawRect.Width = 0 Then taskA.drawRect = New cv.Rect(10, 10, 50, 50)
+            If taskA.optionsChanged Then match.template = src(taskA.drawRect).Clone
+            match.Run(src(taskA.drawRect))
             labels(2) = "Correlation coefficient = " + Format(match.correlation, fmt3)
         End Sub
     End Class
@@ -98,8 +98,8 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standalone Then
-                If atask.heartBeatLT Then
-                    matchRect = ValidateRect(atask.lines.lpList(0).rect)
+                If taskA.heartBeatLT Then
+                    matchRect = ValidateRect(taskA.lines.lpList(0).rect)
                     match.template = src(matchRect)
                 End If
             End If
@@ -109,8 +109,8 @@ Namespace VBClasses
 
             If standaloneTest() Then
                 dst2 = src
-                DrawCircle(dst2, match.newCenter, atask.DotSize, white)
-                dst2.Rectangle(matchRect, atask.highlight, atask.lineWidth)
+                DrawCircle(dst2, match.newCenter, taskA.DotSize, white)
+                dst2.Rectangle(matchRect, taskA.highlight, taskA.lineWidth)
                 dst3 = match.dst0.Normalize(0, 255, cv.NormTypes.MinMax)
                 SetTrueText(Format(match.correlation, fmt3), match.newCenter)
             End If
@@ -140,14 +140,14 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
             If standaloneTest() Then
-                Static saveSampleCount = atask.FeatureSampleSize
-                If saveSampleCount <> atask.FeatureSampleSize Then
-                    saveSampleCount = atask.FeatureSampleSize
+                Static saveSampleCount = taskA.FeatureSampleSize
+                If saveSampleCount <> taskA.FeatureSampleSize Then
+                    saveSampleCount = taskA.FeatureSampleSize
                     maxCorrelation = Single.MinValue
                     minCorrelation = Single.MaxValue
                 End If
-                template = New cv.Mat(New cv.Size(atask.FeatureSampleSize, 1), cv.MatType.CV_32FC1)
-                src = New cv.Mat(New cv.Size(atask.FeatureSampleSize, 1), cv.MatType.CV_32FC1)
+                template = New cv.Mat(New cv.Size(taskA.FeatureSampleSize, 1), cv.MatType.CV_32FC1)
+                src = New cv.Mat(New cv.Size(taskA.FeatureSampleSize, 1), cv.MatType.CV_32FC1)
                 cv.Cv2.Randn(template, 100, 25)
                 cv.Cv2.Randn(src, 0, 25)
             End If
@@ -190,14 +190,14 @@ Namespace VBClasses
             desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.heartBeat Then
+            If taskA.heartBeat Then
                 entropy.Run(src)
-                atask.drawRect = entropy.eMaxRect
+                taskA.drawRect = entropy.eMaxRect
             End If
             match.Run(src)
             dst2 = match.dst2
             dst3 = match.dst3
-            dst2.SetTo(white, atask.gridMask)
+            dst2.SetTo(white, taskA.gridMask)
         End Sub
     End Class
 
@@ -228,13 +228,13 @@ Namespace VBClasses
             Dim updateCount As Integer
             mask.SetTo(0)
 
-            For Each roi In atask.gridRects
+            For Each roi In taskA.gridRects
                 Dim correlation As New cv.Mat, mean As Single, stdev As Single
                 cv.Cv2.MeanStdDev(dst2(roi), mean, stdev)
                 If stdev > optionsMatch.stdevThreshold Then
                     cv.Cv2.MatchTemplate(dst2(roi), lastFrame(roi), correlation, options.matchOption)
                     Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                    If correlation.Get(Of Single)(0, 0) < atask.fCorrThreshold Then
+                    If correlation.Get(Of Single)(0, 0) < taskA.fCorrThreshold Then
                         Interlocked.Increment(updateCount)
                     Else
                         mask(roi).SetTo(255)
@@ -246,15 +246,15 @@ Namespace VBClasses
                 End If
             Next
 
-            dst2.SetTo(255, atask.gridMask)
+            dst2.SetTo(255, taskA.gridMask)
             dst3.SetTo(0)
             saveFrame.CopyTo(dst3, mask)
             lastFrame = saveFrame
-            Dim corrPercent = Format(atask.fCorrThreshold, "0.0%") + " correlation"
+            Dim corrPercent = Format(taskA.fCorrThreshold, "0.0%") + " correlation"
             labels(2) = "Correlation value for each cell is shown. " + CStr(updateCount) + " of " +
-                     CStr(atask.gridRects.Count) + " with < " + corrPercent + " or stdev < " +
+                     CStr(taskA.gridRects.Count) + " with < " + corrPercent + " or stdev < " +
                      Format(optionsMatch.stdevThreshold, fmt0)
-            labels(3) = CStr(atask.gridRects.Count - updateCount) + " segments out of " + CStr(atask.gridRects.Count) + " had > " + corrPercent
+            labels(3) = CStr(taskA.gridRects.Count - updateCount) + " segments out of " + CStr(taskA.gridRects.Count) + " had > " + corrPercent
         End Sub
     End Class
 
@@ -275,7 +275,7 @@ Namespace VBClasses
             desc = "Use the 2 points from a line as input to a 4-dimension KNN"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim lplist = atask.lines.lpList
+            Dim lplist = taskA.lines.lpList
 
             dst2 = dst2
             Static lastPt As New List(Of lpData)(lplist)
@@ -284,7 +284,7 @@ Namespace VBClasses
             For Each lp In lplist
                 knn.queries.Add(New cv.Vec4f(lp.p1.X, lp.p1.Y, lp.p2.X, lp.p2.Y))
             Next
-            If atask.optionsChanged Then knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
+            If taskA.optionsChanged Then knn.trainInput = New List(Of cv.Vec4f)(knn.queries)
             knn.Run(src)
 
             If knn.queries.Count = 0 Then Exit Sub
@@ -321,19 +321,19 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             dst3 = runRedList(src, labels(3))
-            If atask.heartBeat Then dst2.SetTo(0)
-            If atask.optionsChanged Then frameList.Clear()
+            If taskA.heartBeat Then dst2.SetTo(0)
+            If taskA.optionsChanged Then frameList.Clear()
 
             dst0.SetTo(0)
             Dim points As New List(Of cv.Point)
 
-            For Each rc In atask.redList.oldrclist
+            For Each rc In taskA.redList.oldrclist
                 dst0.Set(Of Byte)(rc.maxDist.Y, rc.maxDist.X, 1)
             Next
-            labels(2) = CStr(atask.redList.oldrclist.Count) + " cells added"
+            labels(2) = CStr(taskA.redList.oldrclist.Count) + " cells added"
 
             frameList.Add(dst0.Clone)
-            If frameList.Count >= atask.frameHistoryCount Then
+            If frameList.Count >= taskA.frameHistoryCount Then
                 dst1 = dst1.Subtract(frameList(0))
                 frameList.RemoveAt(0)
             End If
@@ -359,15 +359,15 @@ Namespace VBClasses
             dst3 = New cv.Mat(dst3.Size(), cv.MatType.CV_32F, cv.Scalar.All(0))
             If standalone Then labels(3) = "Probabilities (draw rectangle to test again)"
             labels(2) = "Red dot marks best match for the selected region.  Draw a rectangle anywhere to test again. "
-            desc = "Find the requested template in atask.drawrect in an image"
+            desc = "Find the requested template in taskA.drawrect in an image"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static lastImage As cv.Mat = src.Clone
-            If atask.mouseClickFlag And atask.drawRect.Width <> 0 Then
-                inputRect = ValidateRect(atask.drawRect)
+            If taskA.mouseClickFlag And taskA.drawRect.Width <> 0 Then
+                inputRect = ValidateRect(taskA.drawRect)
                 match.template = src(inputRect).Clone()
             Else
-                If atask.firstPass Then match.template = lastImage(inputRect).Clone()
+                If taskA.firstPass Then match.template = lastImage(inputRect).Clone()
             End If
 
             match.Run(src)
@@ -383,7 +383,7 @@ Namespace VBClasses
             SetTrueText("maxLoc = " + CStr(match.newCenter.X) + ", " + CStr(match.newCenter.Y), New cv.Point(1, 1), 3)
 
             If standaloneTest() Then
-                DrawCircle(dst2, match.newCenter, atask.DotSize, cv.Scalar.Red)
+                DrawCircle(dst2, match.newCenter, taskA.DotSize, cv.Scalar.Red)
                 SetTrueText(Format(match.correlation, fmt3), match.newCenter, 2)
             End If
             lastImage = src
@@ -404,20 +404,20 @@ Namespace VBClasses
             desc = "Use MatchTemplate to find the new location of the template and update the point provided."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim radius = atask.brickSize / 2
+            Dim radius = taskA.brickSize / 2
 
             Dim rect As cv.Rect
 
-            If target(0) IsNot Nothing And correlation(0) < atask.fCorrThreshold Then target(0) = Nothing
-            If atask.mouseClickFlag Then
-                ptx(0) = atask.ClickPoint
-                ptx(1) = New cv.Point2f(msRNG.Next(atask.brickSize, dst2.Width - 2 * atask.brickSize),
-                                    msRNG.Next(atask.brickSize, dst2.Height - 2 * atask.brickSize))
+            If target(0) IsNot Nothing And correlation(0) < taskA.fCorrThreshold Then target(0) = Nothing
+            If taskA.mouseClickFlag Then
+                ptx(0) = taskA.ClickPoint
+                ptx(1) = New cv.Point2f(msRNG.Next(taskA.brickSize, dst2.Width - 2 * taskA.brickSize),
+                                    msRNG.Next(taskA.brickSize, dst2.Height - 2 * taskA.brickSize))
 
-                rect = ValidateRect(New cv.Rect(ptx(0).X - radius, ptx(0).Y - radius, atask.brickSize, atask.brickSize))
+                rect = ValidateRect(New cv.Rect(ptx(0).X - radius, ptx(0).Y - radius, taskA.brickSize, taskA.brickSize))
                 target(0) = src(rect)
 
-                rect = ValidateRect(New cv.Rect(ptx(1).X - radius, ptx(1).Y - radius, atask.brickSize, atask.brickSize))
+                rect = ValidateRect(New cv.Rect(ptx(1).X - radius, ptx(1).Y - radius, taskA.brickSize, taskA.brickSize))
                 target(1) = src(rect)
             End If
 
@@ -431,21 +431,21 @@ Namespace VBClasses
             dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC1, 0)
 
             For i = 0 To ptx.Count - 1
-                rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, atask.brickSize, atask.brickSize))
-                Dim searchRect = ValidateRect(New cv.Rect(rect.X - atask.brickSize, rect.Y - atask.brickSize,
-                                                      atask.brickSize * 3, atask.brickSize * 3))
+                rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, taskA.brickSize, taskA.brickSize))
+                Dim searchRect = ValidateRect(New cv.Rect(rect.X - taskA.brickSize, rect.Y - taskA.brickSize,
+                                                      taskA.brickSize * 3, taskA.brickSize * 3))
                 cv.Cv2.MatchTemplate(target(i), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
                 Dim mmData = GetMinMax(dst0)
                 correlation(i) = mmData.maxVal
                 If i = 0 Then
                     dst0.CopyTo(dst2(New cv.Rect(0, 0, dst0.Width, dst0.Height)))
-                    dst2 = dst2.Threshold(atask.fCorrThreshold, 255, cv.ThresholdTypes.Binary)
+                    dst2 = dst2.Threshold(taskA.fCorrThreshold, 255, cv.ThresholdTypes.Binary)
                 End If
                 ptx(i) = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-                DrawCircle(dst3, ptx(i), atask.DotSize, atask.highlight)
+                DrawCircle(dst3, ptx(i), taskA.DotSize, taskA.highlight)
                 dst3.Rectangle(searchRect, cv.Scalar.Yellow, 1)
-                rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, atask.brickSize, atask.brickSize))
-                target(i) = atask.color(rect)
+                rect = ValidateRect(New cv.Rect(ptx(i).X - radius, ptx(i).Y - radius, taskA.brickSize, taskA.brickSize))
+                target(i) = taskA.color(rect)
             Next
 
             labels(3) = "p1 = " + CStr(ptx(0).X) + "," + CStr(ptx(0).Y) + " p2 = " + CStr(ptx(1).X) + "," + CStr(ptx(1).Y)
@@ -474,20 +474,20 @@ Namespace VBClasses
             Static distSlider = OptionParent.FindSlider("Maximum travel distance per frame")
             Dim maxDistance = distSlider.Value
 
-            knn.queries = New List(Of cv.Point2f)(atask.features)
+            knn.queries = New List(Of cv.Point2f)(taskA.features)
             knn.Run(src)
 
-            If atask.optionsChanged Then
+            If taskA.optionsChanged Then
                 frameList.Clear()
                 dst1.SetTo(0)
             End If
 
             dst0.SetTo(0)
             For Each lp In knn.matches
-                If lp.p1.DistanceTo(lp.p2) <= maxDistance Then dst0.Line(lp.p1, lp.p2, 255, atask.lineWidth + 2, cv.LineTypes.Link4)
+                If lp.p1.DistanceTo(lp.p2) <= maxDistance Then dst0.Line(lp.p1, lp.p2, 255, taskA.lineWidth + 2, cv.LineTypes.Link4)
             Next
             frameList.Add(dst0.Clone)
-            If frameList.Count >= atask.frameHistoryCount Then
+            If frameList.Count >= taskA.frameHistoryCount Then
                 dst1 = dst1.Subtract(frameList(0))
                 frameList.RemoveAt(0)
             End If
@@ -495,7 +495,7 @@ Namespace VBClasses
             dst2 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
             dst3 = src
-            dst3.SetTo(atask.highlight, dst2)
+            dst3.SetTo(taskA.highlight, dst2)
         End Sub
     End Class
 
@@ -524,16 +524,16 @@ Namespace VBClasses
                 Exit Sub
             End If
 
-            Dim radius = atask.brickSize / 2
+            Dim radius = taskA.brickSize / 2
 
-            Dim rect = ValidateRect(New cv.Rect(pt.X - radius, pt.Y - radius, atask.brickSize, atask.brickSize))
-            searchRect = ValidateRect(New cv.Rect(rect.X - atask.brickSize, rect.Y - atask.brickSize,
-                                              atask.brickSize * 3, atask.brickSize * 3))
+            Dim rect = ValidateRect(New cv.Rect(pt.X - radius, pt.Y - radius, taskA.brickSize, taskA.brickSize))
+            searchRect = ValidateRect(New cv.Rect(rect.X - taskA.brickSize, rect.Y - taskA.brickSize,
+                                              taskA.brickSize * 3, taskA.brickSize * 3))
             cv.Cv2.MatchTemplate(target(rect), src(searchRect), dst0, cv.TemplateMatchModes.CCoeffNormed)
             Dim mmData = GetMinMax(dst0)
             correlation = mmData.maxVal
             pt = New cv.Point2f(mmData.maxLoc.X + searchRect.X + radius, mmData.maxLoc.Y + searchRect.Y + radius)
-            DrawCircle(src, pt, atask.DotSize, white)
+            DrawCircle(src, pt, taskA.DotSize, white)
             src.Rectangle(searchRect, cv.Scalar.Yellow, 1)
         End Sub
     End Class
@@ -555,12 +555,12 @@ Namespace VBClasses
             desc = "Match a gr's movement from the previous frame."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then gridIndex = atask.lines.lpList(0).p1GridIndex
-            Static lastImage As cv.Mat = atask.gray.Clone
+            If standalone Then gridIndex = taskA.lines.lpList(0).p1GridIndex
+            Static lastImage As cv.Mat = taskA.gray.Clone
 
-            Dim rect = atask.gridRects(gridIndex)
-            match.template = atask.gray(rect)
-            Dim searchrect = atask.gridNabeRects(gridIndex)
+            Dim rect = taskA.gridRects(gridIndex)
+            match.template = taskA.gray(rect)
+            Dim searchrect = taskA.gridNabeRects(gridIndex)
 
             match.Run(lastImage(searchrect))
             correlation = match.correlation
@@ -576,9 +576,9 @@ Namespace VBClasses
                 newRect.X += deltaX
                 newRect.Y += deltaY
 
-                dst2 = atask.gray.Clone
+                dst2 = taskA.gray.Clone
                 DrawRect(dst2, newRect, white)
-                DrawRect(dst2, atask.gridNabeRects(gridIndex), white)
+                DrawRect(dst2, taskA.gridNabeRects(gridIndex), white)
 
                 dst3 = lastImage
                 DrawRect(dst3, newRect, white)
@@ -586,7 +586,7 @@ Namespace VBClasses
             labels(2) = "Delta X/Y = " + Format(deltaX, fmt2) + "/" + Format(deltaY, fmt2) + ", corr: " +
                      Format(correlation, fmt3)
 
-            If correlation < atask.fCorrThreshold Then lastImage = atask.gray.Clone
+            If correlation < taskA.fCorrThreshold Then lastImage = taskA.gray.Clone
         End Sub
     End Class
 
@@ -607,7 +607,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             gLines.Run(src)
 
-            Dim sortedLines = If(atask.verticalLines, gLines.sortedVerticals, gLines.sortedHorizontals)
+            Dim sortedLines = If(taskA.verticalLines, gLines.sortedVerticals, gLines.sortedHorizontals)
             If sortedLines.Count = 0 Then
                 SetTrueText("There were no vertical lines found.", 3)
                 Exit Sub
@@ -630,7 +630,7 @@ Namespace VBClasses
                 match.tCells.Add(gr.tc2)
 
                 match.Run(src)
-                Dim threshold = atask.fCorrThreshold
+                Dim threshold = taskA.fCorrThreshold
                 If match.tCells(0).correlation >= threshold And match.tCells(1).correlation >= threshold Then
                     gr.tc1 = match.tCells(0)
                     gr.tc2 = match.tCells(1)
@@ -653,8 +653,8 @@ Namespace VBClasses
                 SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gr.arcY, fmt1), gr.tc1.center, 2)
                 SetTrueText(CStr(i) + vbCrLf + tc.strOut + vbCrLf + Format(gr.arcY, fmt1), gr.tc1.center, 3)
 
-                vbc.DrawLine(dst2, p1, p2, atask.highlight)
-                vbc.DrawLine(dst3, p1, p2, atask.highlight)
+                vbc.DrawLine(dst2, p1, p2, taskA.highlight)
+                vbc.DrawLine(dst3, p1, p2, taskA.highlight)
             Next
         End Sub
     End Class

@@ -10,7 +10,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                If Not atask.heartBeat Then Exit Sub
+                If Not taskA.heartBeat Then Exit Sub
                 options.Run()
                 inputPoints = Rectangle_EnclosingPoints.quickRandomPoints(options.numPoints)
             End If
@@ -23,7 +23,7 @@ Namespace VBClasses
             If standaloneTest() Then
                 dst2.SetTo(0)
                 For Each pt In inputPoints
-                    DrawCircle(dst2, pt, atask.DotSize + 2, cv.Scalar.Red)
+                    DrawCircle(dst2, pt, taskA.DotSize + 2, cv.Scalar.Red)
                 Next
                 Draw_Arc.DrawRotatedOutline(minRect, dst2, cv.Scalar.Yellow)
             End If

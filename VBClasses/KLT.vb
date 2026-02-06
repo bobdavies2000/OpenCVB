@@ -47,7 +47,7 @@ Namespace VBClasses
                 Dim pt = outputMat.Get(Of cv.Point2f)(i)
                 If pt.X >= 0 And pt.X <= src.Cols And pt.Y >= 0 And pt.Y <= src.Rows Then
                     If status.Get(Of Byte)(i) Then
-                        DrawCircle(dst2, pt, atask.DotSize + 1, circleColor)
+                        DrawCircle(dst2, pt, taskA.DotSize + 1, circleColor)
                     End If
                 Else
                     status.Set(Of Byte)(i, 0) ' this point is not visible!
@@ -70,15 +70,15 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             klt.Run(src)
-            If atask.frameCount > 0 And lastpoints IsNot Nothing And klt.ptInput IsNot Nothing Then
+            If taskA.frameCount > 0 And lastpoints IsNot Nothing And klt.ptInput IsNot Nothing Then
                 dst2 = klt.dst2
                 src.CopyTo(dst3)
                 For i = 0 To klt.ptInput.Length - 1
                     If klt.status.Get(Of Byte)(i) And i < lastpoints.Length And i < klt.ptInput.Length Then
-                        ' DrawLine(dst2,lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, atask.lineWidth + 1, atask.lineType)
+                        ' DrawLine(dst2,lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, taskA.lineWidth + 1, taskA.lineType)
                         'Static lastFlowPoints() As cv.Point2f = klt.inputPoints
-                        ' DrawLine(dst3, lastFlowPoints(i), klt.inputPoints(i), cv.Scalar.Yellow, atask.lineWidth + 1, atask.lineType)
-                        'If atask.heartBeat Then lastFlowPoints = klt.inputPoints
+                        ' DrawLine(dst3, lastFlowPoints(i), klt.inputPoints(i), cv.Scalar.Yellow, taskA.lineWidth + 1, taskA.lineType)
+                        'If taskA.heartBeat Then lastFlowPoints = klt.inputPoints
                     End If
                 Next
             End If

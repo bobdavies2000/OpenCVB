@@ -11,7 +11,7 @@ Namespace VBClasses
         Public Sub New()
             Dim floodRadio = OptionParent.findRadio("FloodFill")
             If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             cPtr = Fuzzy_Open()
             OptionParent.findRadio("CComp").Checked = True
             labels = {"", "Solid regions", "8-Bit output of Fuzzy_Basics", "Fuzzy edges"}
@@ -146,7 +146,7 @@ Namespace VBClasses
             desc = "Use contours to outline solids in the depth data"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            fuzzyD.Run(atask.depthRGB)
+            fuzzyD.Run(taskA.depthRGB)
             dst2 = fuzzyD.dst1
         End Sub
     End Class
@@ -214,7 +214,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
 
-            fuzzy.Run(atask.depthRGB)
+            fuzzy.Run(taskA.depthRGB)
             dst2 = fuzzy.dst1
 
             centroids.Clear()
@@ -237,8 +237,8 @@ Namespace VBClasses
                     rects.Add(rect)
                     layoutColor.Add(vec(1))
                     If options.displayRect Then
-                        DrawCircle(dst2, centroid, atask.DotSize + 3, cv.Scalar.Yellow)
-                        DrawCircle(dst2, centroid, atask.DotSize, cv.Scalar.Red)
+                        DrawCircle(dst2, centroid, taskA.DotSize + 3, cv.Scalar.Yellow)
+                        DrawCircle(dst2, centroid, taskA.DotSize, cv.Scalar.Red)
                         dst2.Rectangle(rect, cv.Scalar.Yellow, 2)
                     End If
                 End If
@@ -270,8 +270,8 @@ Namespace VBClasses
             If highlightRegion < 0 Then SetTrueText("Click any color region to get more details and track it", New cv.Point(10, 50), 3)
 
             dst3 = tracker.fuzzy.dst1
-            If atask.mouseClickFlag Then
-                highlightPoint = atask.ClickPoint
+            If taskA.mouseClickFlag Then
+                highlightPoint = taskA.ClickPoint
                 highlightRegion = tracker.fuzzy.dst2.Get(Of Byte)(highlightPoint.Y, highlightPoint.X)
             End If
             If highlightRegion >= 0 Then

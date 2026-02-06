@@ -51,7 +51,7 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim fibs As System.Collections.Generic.IEnumerable(Of Double) = nextFib()
-            flow.nextMsg = Format(atask.frameCount Mod 74, "00") + " fibonacci number " + Format(fibs.ElementAt(atask.frameCount), "###,##0")
+            flow.nextMsg = Format(taskA.frameCount Mod 74, "00") + " fibonacci number " + Format(fibs.ElementAt(taskA.frameCount), "###,##0")
             flow.Run(src)
         End Sub
     End Class

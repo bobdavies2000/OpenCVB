@@ -5,7 +5,7 @@ Imports jsonShared
 Namespace VBClasses
     Public Class AlgorithmTask : Implements IDisposable
         Public Sub Initialize(settings As jsonShared.Settings)
-            atask.Settings = settings
+            taskA.Settings = settings
 
             rows = settings.workRes.Height
             cols = settings.workRes.Width
@@ -14,8 +14,8 @@ Namespace VBClasses
 
             allOptions = New OptionsContainer
             allOptions.Show()
-            allOptions.Location = New System.Drawing.Point(atask.Settings.allOptionsLeft, atask.Settings.allOptionsTop)
-            allOptions.Size = New System.Drawing.Size(atask.Settings.allOptionsWidth, atask.Settings.allOptionsHeight)
+            allOptions.Location = New System.Drawing.Point(taskA.Settings.allOptionsLeft, taskA.Settings.allOptionsTop)
+            allOptions.Size = New System.Drawing.Size(taskA.Settings.allOptionsWidth, taskA.Settings.allOptionsHeight)
             allOptions.positionedFromSettings = True
 
             If (settings.algorithm.StartsWith("GL_") Or settings.algorithm.StartsWith("NR_GL_")) And
@@ -25,7 +25,7 @@ Namespace VBClasses
                 sharpGL.Show()
             End If
 
-            Dim fps = atask.Settings.FPSPaintTarget
+            Dim fps = taskA.Settings.FPSPaintTarget
             gOptions = New OptionsGlobal
             gOptions.TargetDisplaySlider.Value = fps
             featureOptions = New OptionsFeatures
@@ -48,7 +48,7 @@ Namespace VBClasses
             filterBasics = New Filter_Basics
             leftRightEnhanced = New LeftRight_Brightness
 
-            ' all the algorithms in the list are atask algorithms that are children of the algorithm.
+            ' all the algorithms in the list are taskA algorithms that are children of the algorithm.
             For i = 1 To cpu.callTrace.Count - 1
                 cpu.callTrace(i) = settings.algorithm + "\" + cpu.callTrace(i)
             Next
@@ -61,7 +61,7 @@ Namespace VBClasses
             centerRect = New cv.Rect(workRes.Width / 4, workRes.Height / 4, workRes.Width / 2, workRes.Height / 2)
             fpList.Clear()
 
-            atask.mouseMovePoint = New cv.Point(atask.workRes.Width \ 2, atask.workRes.Height \ 2)
+            taskA.mouseMovePoint = New cv.Point(taskA.workRes.Width \ 2, taskA.workRes.Height \ 2)
 
             myStopWatch = Stopwatch.StartNew()
             optionsChanged = True
@@ -79,12 +79,12 @@ Namespace VBClasses
 
             taskUpdate()
 
-            If atask.firstPass Then atask.cpu.initialize(Settings.algorithm)
+            If taskA.firstPass Then taskA.cpu.initialize(Settings.algorithm)
 
-            Dim src = atask.color
-            If src.Width = 0 Or atask.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
+            Dim src = taskA.color
+            If src.Width = 0 Or taskA.pointCloud.Width = 0 Then Exit Sub ' camera data is not ready.
 
-            bins2D = {atask.workRes.Height, atask.workRes.Width}
+            bins2D = {taskA.workRes.Height, taskA.workRes.Width}
 
             ' run any universal algorithms here
             IMU_Acceleration = IMU_Acceleration
@@ -92,7 +92,7 @@ Namespace VBClasses
             IMU_FrameTime =
             IMU_AlphaFilter = 0.5 '  gOptions.imu_Alpha
 
-            grid.Run(atask.color)
+            grid.Run(taskA.color)
             imuBasics.Run(emptyMat)
             gravityMatrix.Run(emptyMat)
 
@@ -106,7 +106,7 @@ Namespace VBClasses
             frameHistoryCount = 3 ' default value.  Use Options_History to update this value.
 
             filterBasics.Run(color)
-            atask.gray = filterBasics.dst3
+            taskA.gray = filterBasics.dst3
             leftRightEnhanced.Run(Nothing)
 
             leftView = leftRightEnhanced.dst2.Clone
@@ -115,7 +115,7 @@ Namespace VBClasses
             If gOptions.UseMotionMask.Checked And firstPass = False Then
                 motionRGB.Run(gray)
 
-                If optionsChanged Or atask.frameCount < 5 Then
+                If optionsChanged Or taskA.frameCount < 5 Then
                     grayStable = gray.Clone
                 Else
                     If motionRGB.motionList.Count > 0 Then gray.CopyTo(grayStable, motionRGB.motionMask)
@@ -130,7 +130,7 @@ Namespace VBClasses
             If pcMotion IsNot Nothing Then
                 pcMotion.Run(emptyMat) '******* this is the gravity rotation *******
             Else
-                atask.pcSplit = atask.pointCloud.Split
+                taskA.pcSplit = taskA.pointCloud.Split
             End If
 
             colorizer.Run(src)
@@ -150,12 +150,12 @@ Namespace VBClasses
                 If gifCreator.gifC.options.buildCheck.Checked Then
                     gifCreator.gifC.options.buildCheck.Checked = False
                     For i = 0 To gifImages.Count - 1
-                        Dim fileName As New FileInfo(atask.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
+                        Dim fileName As New FileInfo(taskA.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
                         gifImages(i).Save(fileName.FullName)
                     Next
 
                     gifImages.Clear()
-                    Dim dirInfo As New DirectoryInfo(atask.homeDir + "GifBuilder\bin\x64\Debug\net8.0\")
+                    Dim dirInfo As New DirectoryInfo(taskA.homeDir + "GifBuilder\bin\x64\Debug\net8.0\")
                     Dim dirData = dirInfo.GetDirectories()
                     Dim gifExe As New FileInfo(dirInfo.FullName + "GifBuilder.exe")
                     If gifExe.Exists = False Then
@@ -190,10 +190,10 @@ Namespace VBClasses
 
 
 
-            Dim displayObject = atask.MainUI_Algorithm
-            Dim index = atask.cpu.indexTask
-            If index > 0 And index < atask.cpu.activeObjects.Count Then
-                displayObject = atask.cpu.activeObjects(index - 1)
+            Dim displayObject = taskA.MainUI_Algorithm
+            Dim index = taskA.cpu.indexTask
+            If index > 0 And index < taskA.cpu.activeObjects.Count Then
+                displayObject = taskA.cpu.activeObjects(index - 1)
             End If
             Dim nextTrueData As List(Of TrueText) = displayObject.trueData
             trueData = New List(Of TrueText)(nextTrueData)
@@ -221,22 +221,22 @@ Namespace VBClasses
                 Dim pt = New cv.Point2f((lp.pE1.X + lp.pE2.X) / 2 + 5, (lp.pE1.Y + lp.pE2.Y) / 2)
             End If
 
-            If atask.drawRect.Width > 0 And atask.drawRect.Height > 0 Then
+            If taskA.drawRect.Width > 0 And taskA.drawRect.Height > 0 Then
                 For Each dst In dstList
-                    dst.Rectangle(atask.drawRect, cv.Scalar.White, 1)
+                    dst.Rectangle(taskA.drawRect, cv.Scalar.White, 1)
                 Next
             End If
 
             trueData.Clear()
-            trueData.Add(New TrueText(atask.depthAndDepthRange, New cv.Point(atask.mouseMovePoint.X, atask.mouseMovePoint.Y - 24), 1))
+            trueData.Add(New TrueText(taskA.depthAndDepthRange, New cv.Point(taskA.mouseMovePoint.X, taskA.mouseMovePoint.Y - 24), 1))
             For Each tt In displayObject.trueData
                 trueData.Add(tt)
             Next
 
             displayObject.trueData.Clear()
             labels = displayObject.labels
-            If atask.gOptions.displayDst0.Checked = False Then labels(0) = atask.resolutionDetails
-            If atask.gOptions.displayDst1.Checked = False Then labels(1) = atask.depthAndDepthRange.Replace(vbCrLf, "")
+            If taskA.gOptions.displayDst0.Checked = False Then labels(0) = taskA.resolutionDetails
+            If taskA.gOptions.displayDst1.Checked = False Then labels(1) = taskA.depthAndDepthRange.Replace(vbCrLf, "")
         End Sub
         Private Sub pixelViewerOrGIFProcessing(src As cv.Mat, dst1 As cv.Mat,
                                                dst2 As cv.Mat, dst3 As cv.Mat)
@@ -263,14 +263,14 @@ Namespace VBClasses
             gridRects = New List(Of cv.Rect)
             optionsChanged = True
             firstPass = True
-            useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve atask.results..
+            useXYRange = True ' Most projections of pointcloud data can use the xRange and yRange to improve taskA.results..
         End Sub
         Public Sub Dispose() Implements IDisposable.Dispose
             If allOptions IsNot Nothing Then allOptions.Dispose()
 
-            atask.featureOptions.Close()
-            atask.treeView.Close()
-            If atask.sharpGL IsNot Nothing Then atask.sharpGL.Close()
+            taskA.featureOptions.Close()
+            taskA.treeView.Close()
+            If taskA.sharpGL IsNot Nothing Then taskA.sharpGL.Close()
 
             GC.Collect()
         End Sub

@@ -52,20 +52,20 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim r1 As cv.Vec2f, r2 As cv.Vec2f
-            If atask.channels(0) = 0 Or atask.channels(0) = 1 Then
-                r1 = New cv.Vec2f(-atask.xRangeDefault, atask.xRangeDefault)
+            If taskA.channels(0) = 0 Or taskA.channels(0) = 1 Then
+                r1 = New cv.Vec2f(-taskA.xRangeDefault, taskA.xRangeDefault)
             End If
-            If atask.channels(1) = 1 Then r2 = New cv.Vec2f(-atask.yRangeDefault, atask.yRangeDefault)
-            If atask.channels(1) = 2 Then r2 = New cv.Vec2f(0, atask.MaxZmeters)
+            If taskA.channels(1) = 1 Then r2 = New cv.Vec2f(-taskA.yRangeDefault, taskA.yRangeDefault)
+            If taskA.channels(1) = 2 Then r2 = New cv.Vec2f(0, taskA.MaxZmeters)
 
             ranges = New cv.Rangef() {New cv.Rangef(r1.Item0, r1.Item1),
                                   New cv.Rangef(r2.Item0, r2.Item1)}
-            cv.Cv2.CalcHist({atask.pointCloud}, atask.channels, New cv.Mat(),
-                        histogram, 2, {atask.histogramBins, atask.histogramBins}, ranges)
+            cv.Cv2.CalcHist({taskA.pointCloud}, taskA.channels, New cv.Mat(),
+                        histogram, 2, {taskA.histogramBins, taskA.histogramBins}, ranges)
 
             plot1D.Run(histogram)
             dst2 = plot1D.dst2
-            channels = atask.channels
+            channels = taskA.channels
         End Sub
     End Class
 
@@ -83,14 +83,14 @@ Namespace VBClasses
             desc = "Create 2D histogram from the 3D pointcloud - use options to select dimensions."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            hist2d.Run(atask.pointCloud)
+            hist2d.Run(taskA.pointCloud)
 
             histogram = hist2d.histogram
             ranges = hist2d.ranges
-            channels = atask.channels
+            channels = taskA.channels
 
             dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-            dst3 = histogram.Threshold(atask.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+            dst3 = histogram.Threshold(taskA.projectionThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
 
             labels = {"", "", "Mask of the 2D histogram for selected channels", "Mask of 2D histogram after thresholding"}
         End Sub
@@ -140,10 +140,10 @@ Namespace VBClasses
             Dim histRowsCols = {dst2.Height, dst2.Width}
 
             src = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-            cv.Cv2.CalcHist({src}, {0, 2}, atask.depthMask, histogram02, 2, histRowsCols, atask.rangesHSV)
+            cv.Cv2.CalcHist({src}, {0, 2}, taskA.depthMask, histogram02, 2, histRowsCols, taskA.rangesHSV)
             dst2 = histogram02.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-            cv.Cv2.CalcHist({src}, {0, 1}, atask.depthMask, histogram01, 2, histRowsCols, atask.rangesHSV)
+            cv.Cv2.CalcHist({src}, {0, 1}, taskA.depthMask, histogram01, 2, histRowsCols, taskA.rangesHSV)
             dst3 = histogram01.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
             labels(2) = "Hue is on the X-Axis and Value is on the Y-Axis"
@@ -160,15 +160,15 @@ Namespace VBClasses
         Public histogram01 As New cv.Mat
         Public histogram02 As New cv.Mat
         Public Sub New()
-            atask.gOptions.setHistogramBins(256)
+            taskA.gOptions.setHistogramBins(256)
             desc = "Create a 2D histogram for blue to red and blue to green."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Dim histRowsCols = {dst2.Height, dst2.Width}
-            cv.Cv2.CalcHist({src}, {0, 2}, atask.depthMask, histogram02, 2, histRowsCols, atask.rangesBGR)
+            cv.Cv2.CalcHist({src}, {0, 2}, taskA.depthMask, histogram02, 2, histRowsCols, taskA.rangesBGR)
             dst2 = histogram02.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-            cv.Cv2.CalcHist({src}, {0, 1}, atask.depthMask, histogram01, 2, histRowsCols, atask.rangesBGR)
+            cv.Cv2.CalcHist({src}, {0, 1}, taskA.depthMask, histogram01, 2, histRowsCols, taskA.rangesBGR)
             dst3 = histogram01.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
             labels(2) = "Blue is on the X-Axis and Red is on the Y-Axis"
@@ -190,8 +190,8 @@ Namespace VBClasses
             desc = "Create a 2D histogram for blue to red and blue to green."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            cv.Cv2.CalcHist({src}, atask.channels, atask.depthMask, histogram, 2,
-                        {atask.histogramBins, atask.histogramBins}, atask.rangesBGR)
+            cv.Cv2.CalcHist({src}, taskA.channels, taskA.depthMask, histogram, 2,
+                        {taskA.histogramBins, taskA.histogramBins}, taskA.rangesBGR)
             dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
             plotHist.Run(histogram)

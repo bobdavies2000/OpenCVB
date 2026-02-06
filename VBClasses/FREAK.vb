@@ -7,7 +7,7 @@ Namespace VBClasses
         Dim orb As New ORB_Basics
         Dim freak As FREAK
         Public Sub New()
-            If standalone Then atask.gOptions.displayDst1.Checked = True
+            If standalone Then taskA.gOptions.displayDst1.Checked = True
             desc = "Find keypoints using FREAK algorithm"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

@@ -25,7 +25,7 @@ Namespace VBClasses
                 dst3 = New cv.Mat(src.Size(), cv.MatType.CV_8U, cv.Scalar.All(0))
                 ' mark the points so they are visible...
                 For i = 0 To ptMat.Rows - 1
-                    DrawCircle(dst3, ptMat.Get(Of cv.Point)(0, i), atask.DotSize, white)
+                    DrawCircle(dst3, ptMat.Get(Of cv.Point)(0, i), taskA.DotSize, white)
                 Next
 
                 Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf
@@ -66,7 +66,7 @@ Namespace VBClasses
                 soloPoints.Add(nZero.ptMat.Get(Of cv.Point)(i, 0))
             Next
 
-            If atask.heartBeat Then labels(2) = $"There were {soloPoints.Count} points found"
+            If taskA.heartBeat Then labels(2) = $"There were {soloPoints.Count} points found"
         End Sub
     End Class
 
@@ -84,10 +84,10 @@ Namespace VBClasses
             desc = "Find 3D points behind an RGB line and compute their world coordinates."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then lp = atask.lines.lpList(0)
+            If standalone Then lp = taskA.lines.lpList(0)
 
             dst2.SetTo(0)
-            dst2.Line(lp.p1, lp.p2, 255, atask.lineWidth, cv.LineTypes.Link8)
+            dst2.Line(lp.p1, lp.p2, 255, taskA.lineWidth, cv.LineTypes.Link8)
 
             Dim tmp As New cv.Mat
             cv.Cv2.FindNonZero(dst2(lp.rect), tmp)
@@ -108,7 +108,7 @@ Namespace VBClasses
             veclist.Clear()
             For i = 0 To ptList.Count - 1
                 Dim pt = ptList(i)
-                Dim testvec = atask.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+                Dim testvec = taskA.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
                 Dim rVec = Cloud_Basics.worldCoordinates(pt, lp.pVec1(2) + incr * i)
                 veclist.Add(rVec)
             Next
@@ -130,10 +130,10 @@ Namespace VBClasses
             desc = "Find 3D points behind an RGB line and linearly interpolate their values."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If standalone Then lp = atask.lines.lpList(0)
+            If standalone Then lp = taskA.lines.lpList(0)
 
             dst2.SetTo(0)
-            dst2.Line(lp.p1, lp.p2, 255, atask.lineWidth, cv.LineTypes.Link8)
+            dst2.Line(lp.p1, lp.p2, 255, taskA.lineWidth, cv.LineTypes.Link8)
 
             Dim tmp As New cv.Mat
             cv.Cv2.FindNonZero(dst2(lp.rect), tmp)
@@ -156,7 +156,7 @@ Namespace VBClasses
             veclist.Clear()
             For i = 0 To ptList.Count - 1
                 Dim pt = ptList(i)
-                Dim vec = atask.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+                Dim vec = taskA.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
                 vec(0) = lp.pVec1(0) + incrX * i
                 vec(1) = lp.pVec1(1) + incrY * i
                 vec(2) = lp.pVec1(2) + incrZ * i

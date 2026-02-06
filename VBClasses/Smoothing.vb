@@ -55,7 +55,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             smOptions.Run()
             If standaloneTest() Then
-                If atask.heartBeat Then
+                If taskA.heartBeat Then
                     Dim hullList = hull.buildRandomHullPoints()
                     dst2.SetTo(0)
                     hull.Run(src)
@@ -133,7 +133,7 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
             If standaloneTest() Then
-                If atask.heartBeat Then
+                If taskA.heartBeat Then
                     Dim hullList = hull.buildRandomHullPoints()
                     dst2.SetTo(0)
                     hull.Run(src)

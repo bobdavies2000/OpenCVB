@@ -13,11 +13,11 @@ Namespace VBClasses
             For j = 0 To vertices2f.Length - 1
                 vertices(j) = New cv.Point(CInt(vertices2f(j).X), CInt(vertices2f(j).Y))
             Next
-            dst.FillConvexPoly(vertices, color, atask.lineType)
+            dst.FillConvexPoly(vertices, color, taskA.lineType)
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             options.Run()
-            If atask.heartBeat Then
+            If taskA.heartBeat Then
                 dst2.SetTo(cv.Scalar.Black)
                 rectangles.Clear()
                 rotatedRectangles.Clear()
@@ -28,7 +28,7 @@ Namespace VBClasses
                     Dim eSize = New cv.Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
                     Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
 
-                    Dim nextColor = New cv.Scalar(atask.vecColors(i)(0), atask.vecColors(i)(1), atask.vecColors(i)(2))
+                    Dim nextColor = New cv.Scalar(taskA.vecColors(i)(0), taskA.vecColors(i)(1), taskA.vecColors(i)(2))
                     Dim rr = New cv.RotatedRect(nPoint, eSize, angle)
                     Dim r = New cv.Rect(nPoint.X, nPoint.Y, width, height)
                     If options.drawRotated Then
@@ -76,7 +76,7 @@ Namespace VBClasses
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
             Static typeCheckBox = OptionParent.findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-            If atask.heartBeatLT = False Then Exit Sub
+            If taskA.heartBeatLT = False Then Exit Sub
             If standaloneTest() Then
                 draw.Run(src)
                 dst2 = draw.dst2
@@ -143,8 +143,8 @@ Namespace VBClasses
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
             If standaloneTest() Then
-                If atask.heartBeat Then
-                    rotatedCheck.Enabled = atask.toggleOn
+                If taskA.heartBeat Then
+                    rotatedCheck.Enabled = taskA.toggleOn
                     countSlider.Value = msRNG.Next(2, 10)
                     labels(2) = "Input rectangles = " + CStr(countSlider.Value)
 
@@ -307,8 +307,8 @@ Namespace VBClasses
         End Sub
         Public Shared Function quickRandomPoints(howMany As Integer) As List(Of cv.Point2f)
             Dim srcPoints As New List(Of cv.Point2f)
-            Dim w = atask.workRes.Width
-            Dim h = atask.workRes.Height
+            Dim w = taskA.workRes.Width
+            Dim h = taskA.workRes.Height
             For i = 0 To howMany - 1
                 Dim pt = New cv.Point2f(msRNG.Next(0, w), msRNG.Next(0, h))
                 srcPoints.Add(pt)
@@ -320,7 +320,7 @@ Namespace VBClasses
                 pointList = quickRandomPoints(20)
                 dst2.SetTo(0)
                 For Each pt In pointList
-                    DrawCircle(dst2, pt, atask.DotSize, atask.highlight)
+                    DrawCircle(dst2, pt, taskA.DotSize, taskA.highlight)
                 Next
             End If
 
@@ -337,13 +337,13 @@ Namespace VBClasses
 
     Public Class Rectangle_Fit : Inherits TaskParent
         Public Sub New()
-            If standalone Then atask.drawRect = New cv.Rect(25, 25, 25, 35)
+            If standalone Then taskA.drawRect = New cv.Rect(25, 25, 25, 35)
             desc = "Fit a rectangle into dst2 that maximizes the width or height of the rectangle"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            If atask.optionsChanged Then dst2.SetTo(0)
+            If taskA.optionsChanged Then dst2.SetTo(0)
 
-            If src.Width = dst2.Width Then dst1 = src(atask.drawRect) Else dst1 = src
+            If src.Width = dst2.Width Then dst1 = src(taskA.drawRect) Else dst1 = src
 
             Dim w = dst2.Width / dst1.Width
             Dim h = dst2.Height / dst1.Height
