@@ -84,7 +84,7 @@ Namespace MainApp
             Magnifier.Image = CType(resources.GetObject("Magnifier.Image"), Image)
             Magnifier.Name = "Magnifier"
             Magnifier.Size = New Size(34, 34)
-            Magnifier.ToolTipText = "Magnifier"
+            Magnifier.ToolTipText = "Draw a rectangle anywhere"
             ' 
             ' ToolStripSeparator1
             ' 
