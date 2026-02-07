@@ -38,7 +38,7 @@ Namespace VBClasses
 
 
 
-    Public Class DepthLine_XY : Inherits TaskParent
+    Public Class NR_DepthLine_XY : Inherits TaskParent
         Dim lineD As New DepthLine_Basics
         Public lpList As New List(Of lpData)
         Public Sub New()
@@ -110,10 +110,10 @@ Namespace VBClasses
 
 
 
-    Public Class DepthLine_Common : Inherits TaskParent
+    Public Class NR_DepthLine_Common : Inherits TaskParent
         Dim lineX As New DepthLine_V
         Dim lineY As New DepthLine_H
-        Dim lineXY As New DepthLine_XY
+        Dim lineXY As New NR_DepthLine_XY
         Public lpList As New List(Of lpData)
         Public Sub New()
             OptionParent.FindSlider("Reduction Target").Value = 200
@@ -147,7 +147,7 @@ Namespace VBClasses
 
 
 
-    Public Class DepthLine_HV2 : Inherits TaskParent
+    Public Class DepthLine_HV : Inherits TaskParent
         Dim lineX As New DepthLine_V
         Dim lineY As New DepthLine_H
         Public lpList As New List(Of lpData)
@@ -186,7 +186,7 @@ Namespace VBClasses
 
 
 
-    Public Class DepthLine_HV : Inherits TaskParent
+    Public Class NR_DepthLine_HV2 : Inherits TaskParent
         Dim lineX As New RedPrep_EdgeMask
         Dim lineY As New RedPrep_EdgeMask
         Public lpList As New List(Of lpData)
@@ -307,7 +307,7 @@ Namespace VBClasses
 
 
 
-    Public Class DepthLine_TextureFlow : Inherits TaskParent
+    Public Class NR_DepthLine_TextureFlow : Inherits TaskParent
         Dim lineX As New RedPrep_EdgeMask
         Dim lineY As New RedPrep_EdgeMask
         Dim texFlow As New TextureFlow_Basics

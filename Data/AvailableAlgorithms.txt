@@ -157,14 +157,10 @@ DepthColorizer_Basics
 DepthColorizer_CPP
 DepthColorizer_Mean
 DepthLine_Basics
-DepthLine_Common
 DepthLine_H
 DepthLine_HV
-DepthLine_HV2
 DepthLine_Points
-DepthLine_TextureFlow
 DepthLine_V
-DepthLine_XY
 DepthLinear_Input
 DepthLinear_InputX
 DepthLinear_InputY
@@ -716,6 +712,10 @@ NR_Depth_RGBShadow
 NR_Depth_StableAverage
 NR_Depth_Uncertainty
 NR_Depth_WorldXYMT
+NR_DepthLine_Common
+NR_DepthLine_HV2
+NR_DepthLine_TextureFlow
+NR_DepthLine_XY
 NR_DepthLinear_Basics
 NR_DepthLinear_ImageX
 NR_DepthLinear_ImageY

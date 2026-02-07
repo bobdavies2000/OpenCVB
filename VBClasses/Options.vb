@@ -8163,7 +8163,6 @@ Namespace VBClasses
                 check.Box(2).Checked = True
             End If
             If sliders.Setup(traceName) Then
-                ' Reduction target depends on resolution.  Default is set in GlobalOptions.vb.
                 sliders.setupTrackBar("Reduction Target", 1, 1000, reductionTarget)
             End If
             If FindFrm(traceName + " Radio Buttons") Is Nothing Then
