@@ -162,6 +162,7 @@ DepthLine_H
 DepthLine_HV
 DepthLine_HV2
 DepthLine_Points
+DepthLine_TextureFlow
 DepthLine_V
 DepthLine_XY
 DepthLinear_Input

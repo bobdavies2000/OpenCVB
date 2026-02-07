@@ -218,9 +218,11 @@ Namespace VBClasses
             lpList = New List(Of lpData)(lines.lpList)
 
             dst3 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            For Each lp In lpList
-                dst3.Line(lp.p1, lp.p2, taskA.highlight, taskA.lineWidth * 2, taskA.lineType)
-            Next
+            If taskA.toggleOn Then
+                For Each lp In lpList
+                    dst3.Line(lp.p1, lp.p2, taskA.highlight, taskA.lineWidth * 2, taskA.lineType)
+                Next
+            End If
 
             labels(2) = lines.labels(2)
         End Sub
@@ -301,4 +303,27 @@ Namespace VBClasses
             labels(2) = CStr(count) + " points were retained " + CStr(newCount) + " points were added."
         End Sub
     End Class
+
+
+
+
+    Public Class DepthLine_TextureFlow : Inherits TaskParent
+        Dim lineX As New RedPrep_EdgeMask
+        Dim lineY As New RedPrep_EdgeMask
+        Dim texFlow As New TextureFlow_Basics
+        Public Sub New()
+            OptionParent.FindSlider("Reduction Target").Value = 200
+            desc = "Use texture flow on the mesh input"
+        End Sub
+        Public Overrides Sub RunAlg(src As cv.Mat)
+            lineX.Run(src)
+            lineY.Run(src)
+
+            dst3 = lineX.dst3 Or lineY.dst3
+
+            texFlow.Run(dst3)
+            dst2 = texFlow.dst2
+        End Sub
+    End Class
+
 End Namespace
