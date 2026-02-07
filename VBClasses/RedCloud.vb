@@ -7,6 +7,7 @@ Namespace VBClasses
         Public percentImage As Single
         Public Sub New()
             taskA.redCloud = Me
+            taskA.featureOptions.ReductionTargetSlider.Value = 400
             desc = "Build contours for each cell"
         End Sub
         Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData), rcMapLast As cv.Mat) As rcData

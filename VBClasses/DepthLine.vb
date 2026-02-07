@@ -42,7 +42,6 @@ Namespace VBClasses
         Dim lineD As New DepthLine_Basics
         Public lpList As New List(Of lpData)
         Public Sub New()
-            OptionParent.FindSlider("Reduction Target").Value = 200
             If standalone Then taskA.gOptions.displayDst0.Checked = True
             desc = "Find vertical lines in the reduced depth data."
         End Sub
@@ -65,7 +64,6 @@ Namespace VBClasses
         Dim lineD As New DepthLine_Basics
         Public lpList As New List(Of lpData)
         Public Sub New()
-            OptionParent.FindSlider("Reduction Target").Value = 200
             If standalone Then taskA.gOptions.displayDst0.Checked = True
             desc = "Find vertical lines in the reduced depth data."
         End Sub
@@ -88,7 +86,6 @@ Namespace VBClasses
         Dim lineD As New DepthLine_Basics
         Public lpList As New List(Of lpData)
         Public Sub New()
-            OptionParent.FindSlider("Reduction Target").Value = 200
             If standalone Then taskA.gOptions.displayDst0.Checked = True
             desc = "Find horizontal lines in the reduced depth data."
         End Sub
@@ -116,7 +113,6 @@ Namespace VBClasses
         Dim lineXY As New NR_DepthLine_XY
         Public lpList As New List(Of lpData)
         Public Sub New()
-            OptionParent.FindSlider("Reduction Target").Value = 200
             If standalone Then taskA.gOptions.displayDst0.Checked = True
             desc = "Find vertical lines in the reduced depth data."
         End Sub
@@ -152,7 +148,6 @@ Namespace VBClasses
         Dim lineY As New DepthLine_H
         Public lpList As New List(Of lpData)
         Public Sub New()
-            OptionParent.FindSlider("Reduction Target").Value = 200
             If standalone Then taskA.gOptions.displayDst0.Checked = True
             desc = "Find horizontal and vertical lines in the reduced depth data."
         End Sub
@@ -195,7 +190,7 @@ Namespace VBClasses
         Public Sub New()
             lineX.reductionName = "X Reduction"
             lineY.reductionName = "Y Reduction"
-            OptionParent.FindSlider("Reduction Target").Value = 200
+            taskA.featureOptions.ReductionTargetSlider.Value = 200
             If standalone Then taskA.gOptions.displayDst0.Checked = True
             labels(3) = "Input to Line_Basics"
             desc = "Find horizontal and vertical lines in the reduced depth data."
@@ -307,12 +302,12 @@ Namespace VBClasses
 
 
 
-    Public Class NR_DepthLine_TextureFlow : Inherits TaskParent
+    Public Class DepthLine_TextureFlow : Inherits TaskParent
         Dim lineX As New RedPrep_EdgeMask
         Dim lineY As New RedPrep_EdgeMask
         Dim texFlow As New TextureFlow_Basics
         Public Sub New()
-            OptionParent.FindSlider("Reduction Target").Value = 200
+            taskA.featureOptions.ReductionTargetSlider.Value = 200
             desc = "Use texture flow on the mesh input"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)

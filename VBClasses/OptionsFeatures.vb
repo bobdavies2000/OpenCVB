@@ -65,6 +65,7 @@ Public Class OptionsFeatures
             Color8USource.Items.Add(method)
         Next
         Color8USource.SelectedItem = "Reduction_Basics"
+        ReductionTargetSlider.Value = 50
 
         Select Case taskA.workRes.Width
             Case 1920
@@ -112,6 +113,11 @@ Public Class OptionsFeatures
 
 
 
+
+    Private Sub ReductionTargetSlider_ValueChanged(sender As Object, e As EventArgs) Handles ReductionTargetSlider.ValueChanged
+        Lab1.Text = Format(ReductionTargetSlider.Value, fmt0)
+        taskA.optionsChanged = True
+    End Sub
     Private Sub FCorrSlider_ValueChanged(sender As Object, e As EventArgs) Handles MatchCorrSlider.ValueChanged
         taskA.fCorrThreshold = MatchCorrSlider.Value / 100
         taskA.optionsChanged = True
@@ -132,6 +138,9 @@ Public Class OptionsFeatures
         taskA.optionsChanged = True
         MotionPixelLabel1.Text = CStr(taskA.motionThreshold)
     End Sub
+
+
+
     Private Sub ColorSource_SelectedIndexChanged(sender As Object, e As EventArgs) Handles Color8USource.SelectedIndexChanged
         taskA.optionsChanged = True
     End Sub

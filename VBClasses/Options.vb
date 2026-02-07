@@ -8150,7 +8150,6 @@ Namespace VBClasses
         Public PrepZ As Boolean
         Public PrepAddEdges As Boolean
         Public reductionName As String = "XY Reduction"
-        Public reductionTarget As Integer = 400
         Sub New()
             If FindFrm(traceName + " CheckBox Options") Is Nothing Then
                 check.Setup(traceName)
@@ -8161,9 +8160,6 @@ Namespace VBClasses
                 check.Box(0).Checked = True
                 check.Box(1).Checked = True
                 check.Box(2).Checked = True
-            End If
-            If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Reduction Target", 1, 1000, reductionTarget)
             End If
             If FindFrm(traceName + " Radio Buttons") Is Nothing Then
                 radio.Setup(traceName)
@@ -8178,13 +8174,11 @@ Namespace VBClasses
             End If
         End Sub
         Public Sub Run()
-            Static redSlider = FindSlider("Reduction Target")
             Static PrepXBox = FindCheckBox("Prep Edges in X")
             Static PrepYBox = FindCheckBox("Prep Edges in Y")
             Static PrepZBox = FindCheckBox("Prep Edges in Z")
             Static PrepEdges = FindCheckBox("Add RGB Edges")
 
-            reductionTarget = redSlider.value
             PrepX = PrepXBox.checked
             PrepY = PrepYBox.checked
             PrepZ = PrepZBox.checked
