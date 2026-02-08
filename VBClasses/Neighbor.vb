@@ -63,7 +63,7 @@ Namespace VBClasses
                 src = redC.rcMap
             End If
 
-            Dim samples(src.Total - 1) As Byte
+            Dim samples(src.Total - 1) As Integer
             Marshal.Copy(src.Data, samples, 0, samples.Length)
 
             Dim w = dst2.Width
@@ -150,7 +150,7 @@ Namespace VBClasses
                 rclist = redC.rcList
             End If
 
-            Dim mapData(src.Total - 1) As Byte
+            Dim mapData(src.Total - 1) As Integer
             Marshal.Copy(src.Data, mapData, 0, mapData.Length)
             Dim handleSrc = GCHandle.Alloc(mapData, GCHandleType.Pinned)
             Dim nabCount = Neighbor_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)

@@ -7759,44 +7759,6 @@ Namespace VBClasses
 
 
 
-
-    Public Class Options_Reduction : Inherits OptionParent
-        Public simpleReduction As Boolean
-        Public bitwiseReduction As Boolean
-        Public noReduction As Boolean
-        Public simpleReductionValue As Integer
-        Public bitwiseValue As Integer
-        Public Sub New()
-            If FindFrm(traceName + " Radio Buttons") Is Nothing Then
-                radio.Setup(traceName)
-                radio.addRadio("Use Simple Reduction")
-                radio.addRadio("Use Bitwise Reduction")
-                radio.addRadio("No Reduction")
-                radio.check(0).Checked = True
-            End If
-
-            If sliders.Setup(traceName) Then
-                sliders.setupTrackBar("Simple Reduction", 1, 255, 60)
-                sliders.setupTrackBar("Reduct X Bits", 0, 8, 5)
-            End If
-
-        End Sub
-        Public Sub Run()
-            Static simpleSlider = FindSlider("Simple Reduction")
-            Static bitwiseSlider = FindSlider("Reduct X Bits")
-            Static simpleRadio = findRadio("Use Simple Reduction")
-            Static bitwiseRadio = findRadio("Use Bitwise Reduction")
-            bitwiseReduction = bitwiseRadio.checked
-            simpleReduction = simpleRadio.checked
-            noReduction = simpleReduction = False And bitwiseReduction = False
-            simpleReductionValue = simpleSlider.value
-            bitwiseValue = bitwiseSlider.value
-        End Sub
-    End Class
-
-
-
-
     Public Class Options_Features : Inherits OptionParent
         Public quality As Double = 0.01
         Public matchOption As cv.TemplateMatchModes = cv.TemplateMatchModes.CCoeffNormed

@@ -3,30 +3,18 @@ Namespace VBClasses
     Public Class Reduction_Basics : Inherits TaskParent
         Public classCount As Integer
         Public alwaysDisplay As Boolean
-        Public options As New Options_Reduction
         Public Sub New()
             desc = "Reduction: a simpler way to KMeans by reducing color resolution"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            options.Run()
-
             If src.Channels() <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-            If options.bitwiseReduction Then
-                Dim bits = options.bitwiseValue
-                classCount = 255 / Math.Pow(2, bits)
-                Dim zeroBits = Math.Pow(2, bits) - 1
-                dst2 = src And New cv.Mat(src.Size(), src.Type, cv.Scalar.All(255 - zeroBits))
-                dst2 = dst2 / zeroBits
-            ElseIf options.simpleReduction Then
-                classCount = Math.Ceiling(255 / options.simpleReductionValue)
+            Dim reductionTarget = tsk.featureOptions.ReductionTargetSlider.Value
 
-                dst2 = src / options.simpleReductionValue + 1 ' map the input to values ranging from 1 to X - no zeros allowed.
-                labels(2) = "Reduced image - factor = " + CStr(options.simpleReductionValue)
-            Else
-                dst2 = src
-                labels(2) = "No reduction requested"
-            End If
+            classCount = Math.Ceiling(255 / reductionTarget)
+
+            dst2 = src / reductionTarget
+            labels(2) = "Reduced image - factor = " + CStr(reductionTarget)
 
             If standaloneTest() Or alwaysDisplay Then dst3 = PaletteBlackZero(dst2)
             labels(2) = CStr(classCount) + " colors after reduction - 8uC1 below"
@@ -270,8 +258,8 @@ Namespace VBClasses
             reduction.Run(src)
             dst2 = reduction.dst2 * 255 / reduction.classCount
 
-            labels(2) = If(reduction.options.noReduction, "Reduced image", "Original image")
-            labels(3) = If(reduction.options.noReduction, "Laplacian edges of reduced image", "Laplacian edges of original image")
+            labels(2) = "Reduced image"
+            labels(3) = "Laplacian edges of reduced image"
             edges.Run(dst2)
             dst3 = edges.dst2
         End Sub

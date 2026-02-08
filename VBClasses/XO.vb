@@ -12628,7 +12628,7 @@ Namespace VBClasses
             If tsk.optionsChanged Then
                 For i = 0 To rclist.Count - 1
                     rclist(i) = New List(Of rcData)
-                    cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+                    cellMaps(i) = New cv.Mat(dst2.Size(), cv.MatType.CV_32S, 0)
                 Next
             End If
 

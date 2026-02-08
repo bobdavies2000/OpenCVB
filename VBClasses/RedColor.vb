@@ -8,6 +8,7 @@ Namespace VBClasses
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public Sub New()
             cPtr = RedCloud_Open()
+            tsk.featureOptions.ReductionTargetSlider.Value = 20
             desc = "Run the C++ RedCloud interface without a mask"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -347,7 +348,7 @@ Namespace VBClasses
                 Dim gr = tsk.gridRects(i)
 
                 Dim center = New cv.Point(CInt(gr.X + gr.Width / 2), CInt(gr.Y + gr.Height / 2))
-                Dim index = redC.rcMap.Get(Of Byte)(center.Y, center.X) - 1
+                Dim index = redC.rcMap.Get(Of Integer)(center.Y, center.X) - 1
                 If index >= redC.rcList.Count Or index < 0 Then Continue For
                 Dim rc = redC.rcList(index)
                 dst3(gr).SetTo(rc.color)

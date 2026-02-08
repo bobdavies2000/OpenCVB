@@ -41,7 +41,6 @@ Namespace VBClasses
     Public Class RedCC_BasicsCombined : Inherits TaskParent
         Dim reduction As New Reduction_Basics
         Public rcList As List(Of rcData)
-        Public rcMap As cv.Mat
         Dim redC1 As New RedColor_Basics
         Dim redC2 As New RedCloud_Basics
         Public Sub New()
@@ -72,9 +71,7 @@ Namespace VBClasses
             dst2 = redC1.dst2
 
             rcList = New List(Of rcData)(redC1.rcList)
-            rcMap = redC1.rcMap
-
-            RedCloud_Cell.selectCell(rcMap, rcList)
+            RedCloud_Cell.selectCell(redC1.rcMap, rcList)
             If tsk.rcD IsNot Nothing Then strOut = tsk.rcD.displayCell()
             SetTrueText(strOut, 3)
         End Sub

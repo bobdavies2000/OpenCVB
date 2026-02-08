@@ -46,7 +46,7 @@ Namespace VBClasses
             desc = ""
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            Dim reduce = reduction.options.bitwiseReduction
+            Dim reductionTarget = tsk.featureOptions.ReductionTargetSlider.Value
 
             reduction.Run(src)
             dst1 = reduction.dst2
@@ -54,10 +54,10 @@ Namespace VBClasses
             Dim testCount = dst2.Width - 1
             strOut = ""
             For i = 0 To counts.Length - 1
-                mats.mat(i) = dst1.InRange(reduce * i, reduce * i)
+                mats.mat(i) = dst1.InRange(reductionTarget * i, reductionTarget * i)
                 counts(i).Add(mats.mat(i).CountNonZero)
                 If counts(i).Count > testCount Then counts(i).RemoveAt(0)
-                strOut += "for " + CStr(i * reduce) + " average = " + Format(counts(i).Average, "###,##0") + " min = " +
+                strOut += "for " + CStr(i * reductionTarget) + " average = " + Format(counts(i).Average, "###,##0") + " min = " +
                        Format(counts(i).Min, "###,##0.0") + " max = " + Format(counts(i).Max, "###,##0.0") + vbCrLf
             Next
             SetTrueText(strOut, 3)

@@ -58,12 +58,13 @@ Namespace VBClasses
             desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
+            Dim reductionTarget = tsk.featureOptions.ReductionTargetSlider.Value
             reduction.Run(src)
 
             bProject.Run(reduction.dst2)
             dst2 = bProject.dst2
             dst3 = bProject.dst3
-            labels(2) = "Reduction = " + CStr(reduction.options.simpleReductionValue) + " and bins = " + CStr(tsk.histogramBins)
+            labels(2) = "Reduction = " + CStr(reductionTarget) + " and bins = " + CStr(tsk.histogramBins)
         End Sub
     End Class
 

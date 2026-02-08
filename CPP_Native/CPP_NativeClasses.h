@@ -663,7 +663,6 @@ public:
         float range = float(desiredMax - desiredMin);
         float hRange = float(h);
         float wRange = float(w);
-#pragma omp parallel for
         for (int y = 0; y < depth32f.rows; ++y)
         {
             for (int x = 0; x < depth32f.cols; ++x)
@@ -3209,9 +3208,9 @@ public:
         for (int y = 1; y < src.rows; y++)
             for (int x = 1; x < src.cols; x++)
             {
-                uchar val = src.at<uchar>(y, x);
-                checkPoint(Point(src.at<uchar>(y, x - 1), val));
-                checkPoint(Point(src.at<uchar>(y - 1, x), val));
+                int val = src.at<int>(y, x);
+                checkPoint(Point(src.at<int>(y, x - 1), val));
+                checkPoint(Point(src.at<int>(y - 1, x), val));
             }
     }
 };
@@ -3221,7 +3220,7 @@ extern "C" __declspec(dllexport) int* Neighbor_NabList(Neighbors* cPtr) { return
 extern "C" __declspec(dllexport)
 int Neighbor_RunCPP(Neighbors* cPtr, int* dataPtr, int rows, int cols)
 {
-    cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
+    cPtr->src = Mat(rows, cols, CV_32S, dataPtr);
     cPtr->RunCPP();
     return (int)cPtr->nabList.size();
 }

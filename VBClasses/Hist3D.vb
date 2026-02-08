@@ -306,7 +306,7 @@ Namespace VBClasses
                     Dim candidates As New List(Of Integer)
                     For y = 0 To gr.Height - 1
                         For x = 0 To gr.Width - 1
-                            Dim val = dst0(gr).Get(Of Byte)(y, x)
+                            Dim val = dst0(gr).Get(Of Integer)(y, x)
                             If val = 0 Then Continue For
                             If candidates.Contains(val) = False Then candidates.Add(val)
                         Next

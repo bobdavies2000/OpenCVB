@@ -207,7 +207,7 @@ Namespace VBClasses
         End Sub
         Public Shared Sub selectCell(rcMap As cv.Mat, rcList As List(Of rcData))
             If rcList.Count > 0 Then
-                Dim clickIndex = rcMap.Get(Of Byte)(tsk.clickPoint.Y, tsk.clickPoint.X) - 1
+                Dim clickIndex = rcMap.Get(Of Integer)(tsk.clickPoint.Y, tsk.clickPoint.X) - 1
                 If clickIndex >= 0 And clickIndex < rcList.Count Then
                     tsk.rcD = rcList(clickIndex)
                 Else
