@@ -111,23 +111,23 @@ Namespace VBClasses
 
 
     Public Class NR_RedCC_Merge : Inherits TaskParent
-        Public redSweep As New RedCloud_Sweep
+        Public redCore As New RedCloud_Core
         Public color8u As New Color8U_Basics
         Public Sub New()
             If standalone Then tsk.gOptions.displayDst1.Checked = True
             desc = "Merge the color and reduced depth data."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redSweep.Run(src)
-            dst1 = redSweep.dst3
-            dst1.SetTo(0, redSweep.prepEdges.dst2)
+            redCore.Run(src)
+            dst1 = redCore.dst3
+            dst1.SetTo(0, redCore.prepEdges.dst2)
 
             color8u.Run(tsk.gray)
             dst3 = color8u.dst3
 
             dst2 = PaletteFull(color8u.dst2 + dst1)
 
-            RedCloud_Cell.selectCell(redSweep.rcMap, redSweep.rcList)
+            RedCloud_Cell.selectCell(redCore.rcMap, redCore.rcList)
             If tsk.rcD IsNot Nothing Then strOut = tsk.rcD.displayCell()
             SetTrueText(strOut, 1)
 

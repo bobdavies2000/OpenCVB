@@ -166,7 +166,7 @@ Namespace VBClasses
         End Function
         Private Sub preparePointcloud()
             If tsk.gOptions.gravityPointCloud.Checked Then
-                '******* this is the gravity rotation *******
+                '******* this is the gravity rotation (" * tsk.gMatrix") *******
                 tsk.gravityCloud = (tsk.pointCloud.Reshape(1,
                                     tsk.rows * tsk.cols) * tsk.gMatrix).ToMat.Reshape(3, tsk.rows)
                 tsk.pointCloud = tsk.gravityCloud

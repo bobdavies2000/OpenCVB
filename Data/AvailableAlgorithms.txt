@@ -1494,9 +1494,9 @@ RedCC_Color8U
 RedCloud_Basics
 RedCloud_Cell
 RedCloud_CellMask
+RedCloud_Core
 RedCloud_KNN
 RedCloud_LeftRight
-RedCloud_Sweep
 RedColor_Basics
 RedColor_Bricks
 RedColor_GridRects

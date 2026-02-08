@@ -3,7 +3,7 @@ Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
-        Public redSweep As New RedCloud_Sweep
+        Public redCore As New RedCloud_Core
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public percentImage As Single
@@ -44,9 +44,9 @@ Namespace VBClasses
             Return rc
         End Function
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redSweep.Run(src)
-            labels(3) = redSweep.labels(3)
-            labels(2) = redSweep.labels(2)
+            redCore.Run(src)
+            labels(3) = redCore.labels(3)
+            labels(2) = redCore.labels(2)
 
             Dim rcListLast As New List(Of rcData)(rcList)
             Dim rcMapLast As cv.Mat = rcMap.Clone
@@ -54,7 +54,7 @@ Namespace VBClasses
             rcList.Clear()
             rcMap.SetTo(0)
             dst2.SetTo(0)
-            For Each rc In redSweep.rcList
+            For Each rc In redCore.rcList
                 rc = rcDataMatch(rc, rcListLast, rcMapLast)
 
                 rc.index = rcList.Count + 1
@@ -74,7 +74,7 @@ Namespace VBClasses
 
 
 
-    Public Class RedCloud_Sweep : Inherits TaskParent
+    Public Class RedCloud_Core : Inherits TaskParent
         Public prepEdges As New RedPrep_Basics
         Public rcList As New List(Of rcData)
         Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
@@ -198,7 +198,7 @@ Namespace VBClasses
                 cv.Cv2.DrawContours(dst3(rc.rect), listOfPoints, 0, white, tsk.lineWidth, cv.LineTypes.Link8)
             Next
 
-            dst2 = tsk.redCloud.redSweep.dst1
+            dst2 = tsk.redCloud.redCore.dst1
         End Sub
     End Class
 

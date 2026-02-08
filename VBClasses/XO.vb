@@ -12547,7 +12547,7 @@ Namespace VBClasses
         Public prepEdges As New RedPrep_Basics
         Public Sub New()
             If standalone Then tsk.gOptions.displayDst1.Checked = True
-            redCore.redSweep.prepEdges = prepEdges
+            redCore.redCore.prepEdges = prepEdges
             desc = "Run RedCloud_Map on the heartbeat but just floodFill at maxDist otherwise."
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
@@ -12557,7 +12557,7 @@ Namespace VBClasses
                 labels(2) = redCore.labels(2)
                 rcList = New List(Of rcData)(redCore.rcList)
                 dst3 = redCore.dst2
-                dst1 = redCore.redSweep.prepEdges.dst2
+                dst1 = redCore.redCore.prepEdges.dst2
                 labels(3) = redCore.labels(2)
             Else
                 Dim rcListLast = New List(Of rcData)(redCore.rcList)
@@ -13902,7 +13902,7 @@ Namespace VBClasses
 
 
     Public Class XO_RedColor_BasicsSlow : Inherits TaskParent
-        Public redSweep As New XO_RedColor_Sweep
+        Public redCore As New XO_RedColor_Sweep
         Public rcList As New List(Of rcData)
         Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         Public Sub New()
@@ -13910,17 +13910,17 @@ Namespace VBClasses
             desc = "Track the RedColor cells from RedColor_Core"
         End Sub
         Public Overrides Sub RunAlg(src As cv.Mat)
-            redSweep.Run(src)
-            dst3 = redSweep.dst3
+            redCore.Run(src)
+            dst3 = redCore.dst3
 
-            Static rcListLast = New List(Of rcData)(redSweep.rcList)
-            Static rcMapLast As cv.Mat = redSweep.rcMap.clone
+            Static rcListLast = New List(Of rcData)(redCore.rcList)
+            Static rcMapLast As cv.Mat = redCore.rcMap.clone
 
             rcList.Clear()
             Dim r2 As cv.Rect
             rcMap.SetTo(0)
             dst2.SetTo(0)
-            For Each rc In redSweep.rcList
+            For Each rc In redCore.rcList
                 Dim r1 = rc.rect
                 r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
                 Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X) - 1
@@ -13944,7 +13944,7 @@ Namespace VBClasses
             Next
 
             labels(2) = CStr(rcList.Count) + " redColor cells were identified "
-            labels(3) = redSweep.labels(3)
+            labels(3) = redCore.labels(3)
 
             rcListLast = New List(Of rcData)(rcList)
             rcMapLast = rcMap.Clone
@@ -13978,8 +13978,8 @@ Namespace VBClasses
                 labels(2) = redCore.labels(2)
             Else
                 If src.Type <> cv.MatType.CV_8U Then src = tsk.gray
-                redCore.redSweep.reduction.Run(src)
-                dst1 = redCore.redSweep.reduction.dst2 + 1
+                redCore.redCore.reduction.Run(src)
+                dst1 = redCore.redCore.reduction.dst2 + 1
 
                 Dim index As Integer = 1
                 Dim rect As New cv.Rect
