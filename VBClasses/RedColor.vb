@@ -5,7 +5,7 @@ Namespace VBClasses
         Implements IDisposable
         Public classCount As Integer
         Public rcList As New List(Of rcData)
-        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public Sub New()
             cPtr = RedCloud_Open()
             desc = "Run the C++ RedCloud interface without a mask"
@@ -49,9 +49,15 @@ Namespace VBClasses
             dst2.SetTo(0)
             Dim changed As Integer
             Dim usedColor As New List(Of cv.Scalar)
+            Dim matchCount As Integer
+            Dim unMatched As Integer
+            Dim matchAverage As Single
             For Each rc In newList.Values
                 Dim maxDist = rc.maxDist
                 rc = RedCloud_Basics.rcDataMatch(rc, rcListLast, rcMapLast)
+
+                If rc.age = 1 Then unMatched += 1 Else matchCount += 1
+                matchAverage += rc.age
 
                 rc.index = rcList.Count + 1
 
@@ -82,8 +88,8 @@ Namespace VBClasses
             strOut = tsk.rcD.displayCell()
             SetTrueText(strOut, 3)
 
-            labels(2) = CStr(classCount) + " RedColor cells. " + CStr(rcList.Count) + " cells >" +
-                        " minpixels.  " + CStr(rcList.Count - changed) + " matched to previous generation"
+            labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
+                            "average age: " + Format(matchAverage / rcList.Count, fmt1)
         End Sub
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
             If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)

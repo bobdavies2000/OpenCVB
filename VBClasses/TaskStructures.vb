@@ -536,6 +536,7 @@ Namespace VBClasses
             Public depth As Single
             Public hull As List(Of cv.Point)
             Public index As Integer
+            Public indexLast As Integer ' only here for compatibility
             Public gridIndex As Integer
             Public mask As cv.Mat
             Public maxDist As cv.Point
@@ -543,7 +544,6 @@ Namespace VBClasses
             Public rect As cv.Rect
             Public eq As cv.Vec4f ' only here for compatibility
             Public nabs As New List(Of Integer) ' only here for compatibility
-            Public indexLast As Integer ' only here for compatibility
             Public Sub New()
             End Sub
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer, Optional minContours As Integer = 3)

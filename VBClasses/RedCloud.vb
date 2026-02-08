@@ -28,7 +28,7 @@ Namespace VBClasses
                     Dim row = lrc.maxDist.Y - lrc.rect.Y
                     Dim col = lrc.maxDist.X - lrc.rect.X
                     If row < rc.mask.Height And col < rc.mask.Width And
-                       row >= .0 And col >= 0 Then
+                       row >= 0 And col >= 0 Then
                         If rc.mask.Get(Of Byte)(row, col) Then ' more doublechecking...
                             rc.maxDist = lrc.maxDist
                             rc.depth = lrc.depth
@@ -46,7 +46,6 @@ Namespace VBClasses
         Public Overrides Sub RunAlg(src As cv.Mat)
             redCore.Run(src)
             labels(3) = redCore.labels(3)
-            labels(2) = redCore.labels(2)
 
             Dim rcListLast As New List(Of rcData)(rcList)
             Dim rcMapLast As cv.Mat = rcMap.Clone
@@ -54,9 +53,14 @@ Namespace VBClasses
             rcList.Clear()
             rcMap.SetTo(0)
             dst2.SetTo(0)
+            Dim matchCount As Integer
+            Dim unMatched As Integer
+            Dim matchAverage As Single
             For Each rc In redCore.rcList
                 rc = rcDataMatch(rc, rcListLast, rcMapLast)
 
+                If rc.age = 1 Then unMatched += 1 Else matchCount += 1
+                matchAverage += rc.age
                 rc.index = rcList.Count + 1
                 rcMap(rc.rect).SetTo(rc.index, rc.mask)
 
@@ -68,6 +72,9 @@ Namespace VBClasses
             RedCloud_Cell.selectCell(rcMap, rcList)
             strOut = tsk.rcD.displayCell()
             SetTrueText(strOut, 3)
+
+            labels(2) = CStr(unMatched) + " were new cells and " + CStr(matchCount) + " were matched, " +
+                            "average age: " + Format(matchAverage / rcList.Count, fmt1)
         End Sub
     End Class
 
@@ -77,7 +84,6 @@ Namespace VBClasses
     Public Class RedCloud_Core : Inherits TaskParent
         Public prepEdges As New RedPrep_Basics
         Public rcList As New List(Of rcData)
-        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public Sub New()
             desc = "Find the biggest chunks of consistent depth data "
         End Sub
@@ -117,18 +123,7 @@ Namespace VBClasses
 
             rcList = sweepImage(dst3)
 
-            Dim index As Integer
-            dst2.SetTo(0)
-            rcMap.SetTo(0)
-            For Each rc In rcList
-                index += 1
-                rc.index = index
-                rc.color = tsk.vecColors(rc.index Mod 255)
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
-                rcMap(rc.rect).SetTo(rc.index, rc.mask)
-                dst2.Circle(rc.maxDist, tsk.DotSize, tsk.highlight, -1)
-            Next
-
+            If standaloneTest() Then dst2 = PaletteBlackZero(dst3)
             labels(2) = "RedCloud cells identified: " + CStr(rcList.Count)
 
             Static unchanged As Integer
