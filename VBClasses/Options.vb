@@ -8159,7 +8159,6 @@ Namespace VBClasses
                 check.addCheckBox("Add RGB Edges")
                 check.Box(0).Checked = True
                 check.Box(1).Checked = True
-                check.Box(2).Checked = True
             End If
             If FindFrm(traceName + " Radio Buttons") Is Nothing Then
                 radio.Setup(traceName)

@@ -46,7 +46,7 @@ Namespace VBClasses
                 Dim rc = New rcData(mask, r, index, 0)
 
                 rcList.Add(rc)
-                If standaloneTest() Then dst3(rc.rect).SetTo(taskA.scalarColors(rc.gridIndex), rc.mask)
+                If standaloneTest() Then dst3(rc.rect).SetTo(taskA.scalarColors(rc.gridIndex Mod 255), rc.mask)
             Next
 
             labels(2) = CStr(classCount) + " line segments were found with motion threshold of " +

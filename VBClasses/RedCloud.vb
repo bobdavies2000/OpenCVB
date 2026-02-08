@@ -3,17 +3,17 @@ Namespace VBClasses
     Public Class RedCloud_Basics : Inherits TaskParent
         Public redSweep As New RedCloud_Sweep
         Public rcList As New List(Of rcData)
-        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public rcMap As cv.Mat = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public percentImage As Single
         Public Sub New()
             taskA.redCloud = Me
-            taskA.featureOptions.ReductionTargetSlider.Value = 400
+            taskA.featureOptions.ReductionTargetSlider.Value = 50
             desc = "Build contours for each cell"
         End Sub
         Public Shared Function rcDataMatch(rc As rcData, rcListLast As List(Of rcData), rcMapLast As cv.Mat) As rcData
             Dim r1 = rc.rect
             Dim r2 = New cv.Rect(0, 0, 1, 1) ' fake rect for conditional below...
-            Dim indexLast = rcMapLast.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            Dim indexLast = rcMapLast.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
 
             If indexLast > 0 And indexLast < rcListLast.Count Then
                 indexLast -= 1 ' index is 1 less than the rcMap value
@@ -61,8 +61,6 @@ Namespace VBClasses
                 rcList.Add(rc)
 
                 dst2(rc.rect).SetTo(rc.color, rc.mask)
-                dst2.Circle(rc.maxDist, taskA.DotSize, taskA.highlight, -1)
-                SetTrueText(CStr(rc.age), rc.maxDist)
             Next
 
             RedCloud_Cell.selectCell(rcMap, rcList)
@@ -77,7 +75,7 @@ Namespace VBClasses
     Public Class RedCloud_Sweep : Inherits TaskParent
         Public prepEdges As New RedPrep_Basics
         Public rcList As New List(Of rcData)
-        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Public rcMap As New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
         Public Sub New()
             desc = "Find the biggest chunks of consistent depth data "
         End Sub
@@ -86,10 +84,9 @@ Namespace VBClasses
             Dim rect As New cv.Rect
             Dim mask = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8U, 0)
             Dim flags As cv.FloodFillFlags = cv.FloodFillFlags.Link4 ' Or cv.FloodFillFlags.MaskOnly ' maskonly is expensive but why?
-            Dim minSize As Integer = input.Total * 0.001
+            Dim minSize As Integer = 3 ' input.Total * 0.001
             Dim rc As rcData = Nothing
             Dim newList As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
-            Dim minCount As Integer
             For y = 0 To input.Height - 1
                 For x = 0 To input.Width - 1
                     Dim pt = New cv.Point(x, y)
@@ -102,11 +99,10 @@ Namespace VBClasses
                                 If rc.index < 0 Then Continue For
                                 newList.Add(rc.pixels, rc)
                                 index += 1
-                            Else
-                                minCount += 1
                             End If
                         End If
                     End If
+                    If index = 254 Then index = 1
                 Next
             Next
             Return New List(Of rcData)(newList.Values)

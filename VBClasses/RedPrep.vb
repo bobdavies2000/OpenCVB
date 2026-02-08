@@ -229,7 +229,7 @@ Namespace VBClasses
             Dim imagePtr = RedPrep_CPP_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), dst2.Rows, dst2.Cols)
             handleSrc.Free()
 
-            dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+            dst3 = cv.Mat.FromPixelData(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
             If src.Size <> taskA.noDepthMask.Size Then
                 dst3.SetTo(255, taskA.noDepthMask.Resize(src.Size))
                 dst2 = dst2.Resize(src.Size)

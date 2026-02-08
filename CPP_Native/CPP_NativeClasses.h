@@ -4072,10 +4072,9 @@ public:
         dst.setTo(0);
         for (int y = 1; y < src.rows - 2; ++y) {
             for (int x = 1; x < src.cols - 2; ++x) {
-                // Access pixel values
                 pix1 = src.at<uchar>(y, x);
-
                 pix2 = src.at<uchar>(y, x + 1);
+
                 if (pix1 != 0 && pix2 != 0 && pix1 != pix2) dst.at<uchar>(y, x) = 255;
 
                 pix2 = src.at<uchar>(y + 1, x);

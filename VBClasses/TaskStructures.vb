@@ -549,25 +549,22 @@ Namespace VBClasses
             Public Sub New(_mask As cv.Mat, _rect As cv.Rect, _index As Integer, Optional minContours As Integer = 3)
                 rect = _rect
                 mask = _mask.InRange(_index, _index)
-                index = -1 ' assume it is not going to be valid...
                 contour = ContourBuild(mask)
-                If contour.Count >= minContours Then
+                If contour.Count < minContours Then
+                    index = -1
+                Else
                     index = _index
-                    If contour.Count >= 3 Then
-                        Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
-                        mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
-                        cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
+                    Dim listOfPoints = New List(Of List(Of cv.Point))({contour})
+                    mask = New cv.Mat(mask.Size, cv.MatType.CV_8U, 0)
+                    cv.Cv2.DrawContours(mask, listOfPoints, 0, cv.Scalar.All(index), -1, cv.LineTypes.Link4)
 
-                        ' keep the hull points around (there aren't many of them.)
-                        hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
-                        gridIndex = taskA.gridMap.Get(Of Integer)(rect.TopLeft.Y + contour(0).Y,
-                                                          rect.TopLeft.X + contour(0).X) Mod 255
-                    Else
-                        gridIndex = taskA.gridMap.Get(Of Integer)(rect.TopLeft.Y, rect.TopLeft.X) Mod 255
-                    End If
+                    ' keep the hull points around (there aren't many of them.)
+                    hull = cv.Cv2.ConvexHull(contour.ToArray, True).ToList
+                    gridIndex = taskA.gridMap.Get(Of Integer)(rect.TopLeft.Y + contour(0).Y,
+                                                              rect.TopLeft.X + contour(0).X)
                     buildMaxDist()
 
-                    color = taskA.vecColors(index)
+                    color = taskA.vecColors(index Mod 255)
                     pixels = mask.CountNonZero
                     depth = taskA.pcSplit(2)(rect).Mean(taskA.depthmask(rect))(0)
                 End If
